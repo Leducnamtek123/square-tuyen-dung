@@ -1,17 +1,17 @@
 ﻿'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Tooltip, IconButton, Stack, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Paper, Tooltip, IconButton, Stack, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useProfiles } from './hooks/useProfiles';
 import { useDataTable, useDebounce } from '../../../hooks';
 import { JobSeekerProfile } from '../../../types/models';
 import dayjs from '../../../configs/dayjs-config';
+import FilterBar from '@/components/Common/FilterBar';
 
 const ProfilesPage = () => {
     const { t } = useTranslation('admin');
@@ -44,8 +44,8 @@ const ProfilesPage = () => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [currentProfile, setCurrentProfile] = useState<JobSeekerProfile | null>(null);
 
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
+    const handleSearch = (value: string) => {
+        setSearchTerm(value);
         onPaginationChange({ pageIndex: 0, pageSize: pageSize });
     };
 
@@ -154,24 +154,15 @@ const ProfilesPage = () => {
             </Box>
 
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
-                <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
-                    <TextField
-                        size="small"
-                        placeholder={t('pages.profiles.searchPlaceholder')}
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        sx={{ width: 400 }}
-                        slotProps={{
-                            input: {
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon fontSize="small" color="action" />
-                                    </InputAdornment>
-                                ),
-                            }
-                        }}
-                    />
-                </Box>
+                <FilterBar
+                    title={t('pages.profiles.filter.title', 'Bộ lọc hồ sơ')}
+                    searchValue={searchTerm}
+                    searchPlaceholder={t('pages.profiles.searchPlaceholder')}
+                    onSearchChange={handleSearch}
+                    onReset={() => handleSearch('')}
+                    resetDisabled={!searchTerm}
+                    resetLabel={t('common.clearFilters', 'Xóa lọc')}
+                />
 
                 <DataTable
                     columns={columns}

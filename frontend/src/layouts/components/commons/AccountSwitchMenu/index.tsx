@@ -159,7 +159,7 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
               whiteSpace: 'normal',
               textAlign: 'center',
               py: 0.75,
-              borderRadius: 2,
+              
             }}
 
           >
@@ -189,7 +189,7 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
               whiteSpace: 'normal',
               textAlign: 'center',
               py: 0.75,
-              borderRadius: 2,
+              
             }}
 
             onClick={() => handleClickAuth(false)}
@@ -221,7 +221,7 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
           sx={{
             backgroundColor: 'rgba(255, 255, 255, 0.15)',
             color: 'white',
-            borderRadius: '20px',
+            
             px: 1.5,
             py: 0.6,
             fontSize: '0.78rem',

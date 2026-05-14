@@ -37,6 +37,9 @@
   },
   "loadPreviousMessages": "Load previous messages",
   "typeAMessage": "Type a message...",
+  "auto": {
+    "index_chn_mt_cuc_hi_thoi_danh_sch_bn_5d32": "Choose a conversation from the list on the left to start messaging"
+  },
   "slogan": "New way to follow your chance.",
   "sloganSub": "More engage, more success"
 }

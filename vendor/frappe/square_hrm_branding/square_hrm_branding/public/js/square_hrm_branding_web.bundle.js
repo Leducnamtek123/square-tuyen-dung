@@ -8,12 +8,12 @@
 	const LANGUAGE_COOKIE = "preferred_language";
 	const SUPPORTED_LANGUAGES = new Set(["en", "vi"]);
 	const LANGUAGE_OPTIONS = {
-		en: "English",
 		vi: "Ti\u1ebfng Vi\u1ec7t",
+		en: "English",
 	};
 	const LANGUAGE_LABELS = {
-		en: "Language",
 		vi: "Ng\u00f4n ng\u1eef",
+		en: "Language",
 	};
 	const translations = {
 		"Login to Square HRM": {
@@ -97,6 +97,124 @@
 			vi: "Ng\u00f4n ng\u1eef",
 		},
 	};
+	const hrmTranslations = {
+		"Edit Profile": { en: "Edit Profile", vi: "Chỉnh sửa hồ sơ" },
+		"Toggle Theme": { en: "Toggle Theme", vi: "Đổi giao diện" },
+		"About": { en: "About", vi: "Giới thiệu" },
+		"Frappe Support": { en: "Square HRM Support", vi: "Hỗ trợ Square HRM" },
+		"Square HRM Support": { en: "Square HRM Support", vi: "Hỗ trợ Square HRM" },
+		"Reset Desktop Layout": { en: "Reset Desktop Layout", vi: "Đặt lại bố cục" },
+		"Desktop": { en: "Desktop", vi: "Màn hình chính" },
+		"Workspaces": { en: "Workspaces", vi: "Không gian làm việc" },
+		"Website": { en: "Website", vi: "Website" },
+		"Edit Sidebar": { en: "Edit Sidebar", vi: "Sửa thanh bên" },
+		"Session Defaults": { en: "Session Defaults", vi: "Mặc định phiên" },
+		"Reload": { en: "Reload", vi: "Tải lại" },
+		"Toggle Full Width": { en: "Toggle Full Width", vi: "Đổi chế độ toàn chiều rộng" },
+		"Help": { en: "Help", vi: "Trợ giúp" },
+		"Notification": { en: "Notification", vi: "Thông báo" },
+		"Notifications": { en: "Notifications", vi: "Thông báo" },
+		"Dashboard": { en: "Dashboard", vi: "Bảng điều khiển" },
+		"Settings": { en: "Settings", vi: "Cài đặt" },
+		"Setup": { en: "Setup", vi: "Thiết lập" },
+		"Expenses": { en: "Expenses", vi: "Chi phí" },
+		"Expense Claims": { en: "Expense Claims", vi: "Yêu cầu thanh toán chi phí" },
+		"Expense Claim": { en: "Expense Claim", vi: "Yêu cầu thanh toán chi phí" },
+		"Expense Claim Type": { en: "Expense Claim Type", vi: "Loại yêu cầu chi phí" },
+		"Employee Advance": { en: "Employee Advance", vi: "Tạm ứng nhân viên" },
+		"Travel": { en: "Travel", vi: "Công tác" },
+		"Purpose of Travel": { en: "Purpose of Travel", vi: "Mục đích công tác" },
+		"Travel Request": { en: "Travel Request", vi: "Yêu cầu công tác" },
+		"Vehicle Log": { en: "Vehicle Log", vi: "Nhật ký xe" },
+		"Accounting Entries": { en: "Accounting Entries", vi: "Bút toán kế toán" },
+		"Reports": { en: "Reports", vi: "Báo cáo" },
+		"Masters & Reports": { en: "Masters & Reports", vi: "Danh mục & Báo cáo" },
+		"Masters and Reports": { en: "Masters and Reports", vi: "Danh mục & Báo cáo" },
+		"Claims": { en: "Claims", vi: "Yêu cầu" },
+		"Advances": { en: "Advances", vi: "Tạm ứng" },
+		"Accounting Reports": { en: "Accounting Reports", vi: "Báo cáo kế toán" },
+		"Fleet Management": { en: "Fleet Management", vi: "Quản lý đội xe" },
+		"Payment Entry": { en: "Payment Entry", vi: "Phiếu thanh toán" },
+		"Journal Entry": { en: "Journal Entry", vi: "Bút toán nhật ký" },
+		"Additional Salary": { en: "Additional Salary", vi: "Lương bổ sung" },
+		"Employee Advance Summary": { en: "Employee Advance Summary", vi: "Tổng hợp tạm ứng nhân viên" },
+		"Unpaid Expense Claim": { en: "Unpaid Expense Claim", vi: "Yêu cầu chi phí chưa thanh toán" },
+		"Vehicle Expenses": { en: "Vehicle Expenses", vi: "Chi phí xe" },
+		"Accounts Receivable": { en: "Accounts Receivable", vi: "Phải thu" },
+		"Accounts Payable": { en: "Accounts Payable", vi: "Phải trả" },
+		"General Ledger": { en: "General Ledger", vi: "Sổ cái" },
+		"Vehicle": { en: "Vehicle", vi: "Xe" },
+		"Driver": { en: "Driver", vi: "Tài xế" },
+		"Vehicle Service Item": { en: "Vehicle Service Item", vi: "Hạng mục dịch vụ xe" },
+		"Last synced just now": { en: "Last synced just now", vi: "Vừa đồng bộ" },
+		"Last Year": { en: "Last Year", vi: "Năm trước" },
+		"Monthly": { en: "Monthly", vi: "Hàng tháng" },
+		"Filter": { en: "Filter", vi: "Bộ lọc" },
+		"New": { en: "New", vi: "Tạo mới" },
+		"Save": { en: "Save", vi: "Lưu" },
+		"Submit": { en: "Submit", vi: "Gửi duyệt" },
+		"Cancel": { en: "Cancel", vi: "Hủy" },
+		"Delete": { en: "Delete", vi: "Xóa" },
+		"Duplicate": { en: "Duplicate", vi: "Nhân bản" },
+		"Print": { en: "Print", vi: "In" },
+		"Email": { en: "Email", vi: "Email" },
+		"Export": { en: "Export", vi: "Xuất dữ liệu" },
+		"Import": { en: "Import", vi: "Nhập dữ liệu" },
+		"Refresh": { en: "Refresh", vi: "Làm mới" },
+		"Upload": { en: "Upload", vi: "Tải lên" },
+		"Download": { en: "Download", vi: "Tải xuống" },
+		"Sort": { en: "Sort", vi: "Sắp xếp" },
+		"List": { en: "List", vi: "Danh sách" },
+		"Report": { en: "Report", vi: "Báo cáo" },
+		"Calendar": { en: "Calendar", vi: "Lịch" },
+		"Kanban": { en: "Kanban", vi: "Kanban" },
+		"Gantt": { en: "Gantt", vi: "Gantt" },
+		"Assign": { en: "Assign", vi: "Giao việc" },
+		"Share": { en: "Share", vi: "Chia sẻ" },
+		"Tags": { en: "Tags", vi: "Thẻ" },
+		"Comments": { en: "Comments", vi: "Bình luận" },
+		"Activity": { en: "Activity", vi: "Hoạt động" },
+		"Timeline": { en: "Timeline", vi: "Dòng thời gian" },
+		"Details": { en: "Details", vi: "Chi tiết" },
+		"Created": { en: "Created", vi: "Đã tạo" },
+		"Modified": { en: "Modified", vi: "Đã sửa" },
+		"Owner": { en: "Owner", vi: "Người sở hữu" },
+		"Status": { en: "Status", vi: "Trạng thái" },
+		"Open": { en: "Open", vi: "Mở" },
+		"Closed": { en: "Closed", vi: "Đã đóng" },
+		"Draft": { en: "Draft", vi: "Nháp" },
+		"Submitted": { en: "Submitted", vi: "Đã gửi duyệt" },
+		"Cancelled": { en: "Cancelled", vi: "Đã hủy" },
+		"Approved": { en: "Approved", vi: "Đã duyệt" },
+		"Rejected": { en: "Rejected", vi: "Từ chối" },
+		"Pending": { en: "Pending", vi: "Đang chờ" },
+		"Active": { en: "Active", vi: "Đang hoạt động" },
+		"Disabled": { en: "Disabled", vi: "Đã tắt" },
+		"Enabled": { en: "Enabled", vi: "Đã bật" },
+		"Employee": { en: "Employee", vi: "Nhân viên" },
+		"Employees": { en: "Employees", vi: "Nhân viên" },
+		"Company": { en: "Company", vi: "Công ty" },
+		"Department": { en: "Department", vi: "Phòng ban" },
+		"Designation": { en: "Designation", vi: "Chức danh" },
+		"Branch": { en: "Branch", vi: "Chi nhánh" },
+		"Leave": { en: "Leave", vi: "Nghỉ phép" },
+		"Leaves": { en: "Leaves", vi: "Nghỉ phép" },
+		"Attendance": { en: "Attendance", vi: "Chấm công" },
+		"Payroll": { en: "Payroll", vi: "Bảng lương" },
+		"Recruitment": { en: "Recruitment", vi: "Tuyển dụng" },
+		"Performance": { en: "Performance", vi: "Hiệu suất" },
+		"Shift & Attendance": { en: "Shift & Attendance", vi: "Ca làm & Chấm công" },
+		"HR Setup": { en: "HR Setup", vi: "Thiết lập nhân sự" },
+		"Salary Slip": { en: "Salary Slip", vi: "Phiếu lương" },
+		"Salary Structure": { en: "Salary Structure", vi: "Cơ cấu lương" },
+		"Leave Application": { en: "Leave Application", vi: "Đơn nghỉ phép" },
+		"Attendance Request": { en: "Attendance Request", vi: "Yêu cầu chấm công" },
+		"Shift Assignment": { en: "Shift Assignment", vi: "Phân ca" },
+		"Job Opening": { en: "Job Opening", vi: "Vị trí tuyển dụng" },
+		"Job Applicant": { en: "Job Applicant", vi: "Ứng viên" },
+		"Interview": { en: "Interview", vi: "Phỏng vấn" },
+	};
+	Object.assign(translations, hrmTranslations);
 	const translationAliases = {
 		"Connexion": "Login",
 		"Afficher": "Show",
@@ -109,6 +227,11 @@
 		"Accueil": "Home",
 		"Langue": "Language",
 	};
+	for (const [key, labels] of Object.entries(translations)) {
+		for (const label of Object.values(labels || {})) {
+			if (label) translationAliases[label] = key;
+		}
+	}
 	const replacements = [
 		[/Frappe HR/g, BRAND_NAME],
 		[/Frappe Framework/g, BRAND_NAME],
@@ -153,15 +276,10 @@
 		}
 	}
 
-	function getBootLanguage() {
-		return window.frappe?.boot?.lang || "";
-	}
-
 	function getCurrentLanguage() {
 		return normalizeLanguage(
 			getQueryLanguage()
 				|| getStoredLanguage()
-				|| getBootLanguage()
 				|| getCookie(LANGUAGE_COOKIE)
 				|| FALLBACK_LANGUAGE
 		);
@@ -184,12 +302,48 @@
 
 	function setPreferredLanguage(language, shouldReload = false) {
 		const normalizedLanguage = rememberLanguage(language);
+		patchFrappeMessages();
 		if (shouldReload) {
-			const url = new URL(window.location.href);
-			url.searchParams.set("_lang", normalizedLanguage);
-			window.location.assign(url.toString());
+			syncUserLanguage(normalizedLanguage).finally(() => {
+				const url = new URL(window.location.href);
+				url.searchParams.set("_lang", normalizedLanguage);
+				window.location.assign(url.toString());
+			});
+		} else {
+			syncUserLanguage(normalizedLanguage);
 		}
 		return normalizedLanguage;
+	}
+
+	function syncUserLanguage(language) {
+		const user = window.frappe?.session?.user || window.frappe?.boot?.user?.name || "";
+		if (!window.frappe?.xcall || !user || user === "Guest") {
+			return Promise.resolve();
+		}
+		return window.frappe
+			.xcall("square_hrm_branding.api.set_user_language", { language })
+			.catch(() => {});
+	}
+
+	function patchFrappeMessages() {
+		if (!window.frappe) return;
+		const language = getCurrentLanguage();
+		const messages = {};
+		for (const [key, labels] of Object.entries(translations)) {
+			const translated = labels?.[language];
+			if (translated) messages[key] = translated;
+		}
+		window.frappe._messages = {
+			...(window.frappe._messages || {}),
+			...messages,
+		};
+		if (window.frappe.boot) {
+			window.frappe.boot.lang = language;
+			window.frappe.boot.__messages = {
+				...(window.frappe.boot.__messages || {}),
+				...messages,
+			};
+		}
 	}
 
 	function setAttributeIfChanged(element, attr, value) {
@@ -335,23 +489,17 @@
 		);
 	}
 
-	function getDeskHeaderActions() {
-		if (!isDeskShell()) return null;
-		const navbar = document.querySelector("header.desktop-navbar")
-			|| document.querySelector(".desktop-navbar")
-			|| document.querySelector("header .navbar")
-			|| document.querySelector(".navbar");
-		if (!navbar) return null;
-		let actions = navbar.querySelector(".square-hrm-desk-actions");
-		if (!actions) {
-			actions = document.createElement("div");
-			actions.className = "square-hrm-desk-actions";
-			const parent = navbar.querySelector(".navbar-right")
-				|| navbar.querySelector(".container")
-				|| navbar;
-			parent.appendChild(actions);
+	function normalizeDeskHeader() {
+		for (const element of document.querySelectorAll(".square-hrm-desk-actions, .square-hrm-user-avatar")) {
+			element.remove();
 		}
-		return actions;
+		if (!isDeskShell()) return;
+		const desktopNavbar = document.querySelector("header.desktop-navbar");
+		if (!desktopNavbar) return;
+		desktopNavbar.classList.add("square-hrm-desktop-navbar");
+		const actionGroup = desktopNavbar.querySelector(".desktop-notifications")?.parentElement;
+		actionGroup?.classList.add("square-hrm-desktop-native-actions");
+		setAttributeIfChanged(desktopNavbar.querySelector("#brand-logo"), "alt", BRAND_NAME);
 	}
 
 	function renderLanguageSwitcher() {
@@ -390,25 +538,36 @@
 		}
 	}
 
-	function getVisibleSidebarMenu() {
+	function getCanonicalMenuTitle(title) {
+		const text = String(title || "").replace(/\s+/g, " ").trim();
+		return resolveTranslationKey(text) || text;
+	}
+
+	function getVisibleDeskMenu() {
 		const menus = [...document.querySelectorAll(".frappe-menu.context-menu")];
 		return menus.find((menu) => {
 			const style = getComputedStyle(menu);
 			if (style.display === "none" || style.visibility === "hidden" || !menu.getClientRects().length) return false;
-			const titles = [...menu.querySelectorAll(".menu-item-title")].map((title) => title.textContent.trim());
-			return titles.includes("Reload") && titles.includes("Toggle Theme");
+			const titles = [...menu.querySelectorAll(".menu-item-title")].map((title) => getCanonicalMenuTitle(title.textContent));
+			const isSidebarMenu = titles.includes("Reload") && titles.includes("Toggle Theme");
+			const isAvatarMenu = titles.includes("Toggle Theme") && (
+				titles.includes("Edit Profile")
+				|| titles.includes("Reset Desktop Layout")
+				|| titles.includes("About")
+			);
+			return isSidebarMenu || isAvatarMenu;
 		});
 	}
 
 	function getMenuItemByTitle(menu, label) {
 		return [...menu.querySelectorAll(".dropdown-menu-item")].find((item) => {
-			return item.querySelector(".menu-item-title")?.textContent.trim() === label;
+			return getCanonicalMenuTitle(item.querySelector(".menu-item-title")?.textContent) === label;
 		});
 	}
 
 	function renderDeskMenuLanguageSwitcher() {
 		if (!isDeskShell()) return;
-		const menu = getVisibleSidebarMenu();
+		const menu = getVisibleDeskMenu();
 		if (!menu) return;
 		const language = getCurrentLanguage();
 		let item = menu.querySelector(".square-hrm-menu-language-item");
@@ -458,63 +617,6 @@
 		}
 	}
 
-	function getUserDisplayName() {
-		const bootUser = window.frappe?.boot?.user;
-		if (bootUser && typeof bootUser === "object") {
-			return bootUser.full_name || bootUser.name || window.frappe?.session?.user || "User";
-		}
-		return window.frappe?.boot?.full_name || window.frappe?.session?.user || "User";
-	}
-
-	function getUserInitials(name) {
-		const cleanName = String(name || "A").replace(/@.*/, "").trim();
-		const parts = cleanName.split(/\s+/).filter(Boolean);
-		if (!parts.length) return "A";
-		return parts.slice(0, 2).map((part) => part[0]).join("").toUpperCase();
-	}
-
-	function logoutFromAvatar() {
-		const csrfToken = window.frappe?.csrf_token
-			|| document.querySelector("meta[name='csrf-token']")?.content
-			|| "";
-		window.fetch("/api/method/logout", {
-			method: "POST",
-			credentials: "same-origin",
-			headers: {
-				"Accept": "application/json",
-				"X-Frappe-CSRF-Token": csrfToken,
-			},
-		}).finally(() => {
-			window.location.assign("/login");
-		});
-	}
-
-	function renderDeskUserAvatar() {
-		let avatar = document.querySelector(".square-hrm-user-avatar");
-		if (!isDeskShell()) {
-			avatar?.remove();
-			return;
-		}
-		const headerActions = getDeskHeaderActions();
-		if (!headerActions) return;
-		if (!avatar) {
-			avatar = document.createElement("button");
-			avatar.type = "button";
-			avatar.className = "square-hrm-user-avatar";
-			avatar.addEventListener("click", logoutFromAvatar);
-		}
-		const language = getCurrentLanguage();
-		const name = getUserDisplayName();
-		const label = translations.Logout[language] || translations.Logout.en;
-		avatar.setAttribute("title", label);
-		avatar.setAttribute("aria-label", label);
-		avatar.innerHTML = `
-			<span class="square-hrm-user-avatar__initials">${getUserInitials(name)}</span>
-			<span class="square-hrm-user-avatar__name">${name}</span>
-		`;
-		headerActions.appendChild(avatar);
-	}
-
 	let observer;
 	let patching = false;
 	let scheduled = false;
@@ -525,6 +627,7 @@
 		observer?.disconnect();
 		try {
 			patchLanguage();
+			patchFrappeMessages();
 			walkText(document.body);
 			patchI18nText(document.body);
 			patchAttributes(document.body);
@@ -534,7 +637,7 @@
 			patchTitle();
 			renderLanguageSwitcher();
 			renderDeskMenuLanguageSwitcher();
-			renderDeskUserAvatar();
+			normalizeDeskHeader();
 		} finally {
 			patching = false;
 			observer?.observe(document.documentElement, { childList: true, subtree: true });
@@ -550,6 +653,8 @@
 		});
 	}
 
+	patchLanguage();
+	patchFrappeMessages();
 	window.SquareHRMBranding = { apply, setPreferredLanguage, getCurrentLanguage };
 	document.addEventListener("DOMContentLoaded", apply);
 	window.addEventListener("load", apply);

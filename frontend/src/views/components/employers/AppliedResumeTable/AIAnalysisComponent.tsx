@@ -118,7 +118,7 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
       onClick={onOpenDrawer}
       sx={{ 
         textTransform: 'none', 
-        borderRadius: 2, 
+         
         fontSize: '0.75rem', 
         py: 0.5,
         px: 1.5,

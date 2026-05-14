@@ -96,6 +96,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "confirm": "Confirm",
+    "apply": "Apply",
     "add": "Add",
     "download": "Download",
     "upload": "Upload",
@@ -288,7 +289,8 @@
   "validation": {
     "max255": "Maximum 255 characters",
     "max30": "Maximum 30 characters",
-    "invalidDate": "Invalid date"
+    "invalidDate": "Invalid date",
+    "invalidUrl": "Please enter a valid URL."
   },
   "messages": {
     "loadingPdf": "Loading PDF...",
@@ -810,6 +812,9 @@
       "languages": "LANGUAGES",
       "certificates": "CERTIFICATES"
     }
+  },
+  "auto": {
+    "index_wwwsquarevn_9a21": "www.square.vn"
   },
   "fileUpload": {
     "dragDropOrSelect": "Drag and drop file here or",

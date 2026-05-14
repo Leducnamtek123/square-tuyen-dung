@@ -9,13 +9,17 @@ import {
   Paper,
   Avatar,
   Chip,
-  TextField,
-  InputAdornment,
   Stack,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Divider,
+  CircularProgress,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
@@ -25,11 +29,13 @@ import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
 import { ChatConversation } from '../../../types/models';
 import { useDataTable } from '../../../hooks';
-import { useChat } from './hooks/useChat';
+import { useChat, useChatMessages } from './hooks/useChat';
 import dayjs from '../../../configs/dayjs-config';
+import FilterBar from '@/components/Common/FilterBar';
 
 const AdminChatPage = () => {
   const { t } = useTranslation('admin');
+  const [selectedConversation, setSelectedConversation] = React.useState<ChatConversation | null>(null);
   const {
       searchTerm: search,
       debouncedSearchTerm: debouncedSearch,
@@ -42,6 +48,7 @@ const AdminChatPage = () => {
   } = useChat({ kw: debouncedSearch });
 
   const conversations = data?.results || [];
+  const { data: messages = [], isLoading: isLoadingMessages } = useChatMessages(selectedConversation?.id);
 
   const stats = [
     {
@@ -150,9 +157,9 @@ const AdminChatPage = () => {
       header: '',
       id: 'actions',
       meta: { align: 'right' },
-      cell: () => (
+      cell: (info) => (
         <Tooltip title={t('chat.tooltip.viewDetail')}>
-          <IconButton size="small" color="primary">
+          <IconButton size="small" color="primary" onClick={() => setSelectedConversation(info.row.original)}>
             <VisibilityIcon fontSize="small" />
           </IconButton>
         </Tooltip>
@@ -219,25 +226,15 @@ const AdminChatPage = () => {
 
       {/* Table */}
       <Paper sx={{ p: 2, borderRadius: '12px' }} elevation={0}>
-        {/* Search */}
-        <Box sx={{ mb: 2 }}>
-          <TextField
-            size="small"
-            placeholder={t('chat.search.placeholder')}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            slotProps={{
-                input: {
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchIcon fontSize="small" />
-                        </InputAdornment>
-                    ),
-                }
-            }}
-            sx={{ width: { xs: '100%', sm: 320 } }}
-          />
-        </Box>
+        <FilterBar
+          title={t('chat.search.title', 'Bộ lọc hội thoại')}
+          searchValue={search}
+          searchPlaceholder={t('chat.search.placeholder')}
+          onSearchChange={setSearch}
+          onReset={() => setSearch('')}
+          resetDisabled={!search}
+          resetLabel={t('common.clearFilters', 'Xóa lọc')}
+        />
 
         <DataTable
           columns={columns}
@@ -247,6 +244,74 @@ const AdminChatPage = () => {
           emptyMessage={conversations.length === 0 ? t('chat.empty.noConversations') : t('chat.empty.noResults')}
         />
       </Paper>
+
+      <Dialog open={!!selectedConversation} onClose={() => setSelectedConversation(null)} fullWidth maxWidth="sm">
+        <DialogTitle>{t('chat.detail.title', 'Conversation detail')}</DialogTitle>
+        <DialogContent dividers>
+          {selectedConversation && (
+            <Stack spacing={2}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="caption" color="text.secondary">{t('chat.table.candidate')}</Typography>
+                  <Typography variant="body2" fontWeight={700}>{selectedConversation.jobSeekerName || 'N/A'}</Typography>
+                  <Typography variant="caption">{selectedConversation.jobSeekerEmail || ''}</Typography>
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="caption" color="text.secondary">{t('chat.table.employer')}</Typography>
+                  <Typography variant="body2" fontWeight={700}>{selectedConversation.companyName || selectedConversation.employerName || 'N/A'}</Typography>
+                </Box>
+              </Stack>
+
+              <Divider />
+
+              {isLoadingMessages ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                  <CircularProgress size={24} />
+                </Box>
+              ) : messages.length === 0 ? (
+                <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
+                  {t('chat.detail.noMessages', 'No messages found.')}
+                </Typography>
+              ) : (
+                <Stack spacing={1.5} sx={{ maxHeight: 420, overflowY: 'auto' }}>
+                  {messages.map((message) => {
+                    const isCandidate = String(message.senderId) === String(selectedConversation.jobSeekerId);
+                    return (
+                      <Box
+                        key={message.id}
+                        sx={{
+                          alignSelf: isCandidate ? 'flex-start' : 'flex-end',
+                          maxWidth: '80%',
+                          p: 1.5,
+                          borderRadius: 1.5,
+                          bgcolor: isCandidate ? 'action.hover' : 'primary.main',
+                          color: isCandidate ? 'text.primary' : 'primary.contrastText',
+                        }}
+                      >
+                        <Typography variant="caption" sx={{ opacity: 0.75 }}>
+                          {isCandidate ? selectedConversation.jobSeekerName : (selectedConversation.companyName || selectedConversation.employerName || 'Employer')}
+                          {message.createAt ? ` · ${dayjs(message.createAt).format('DD/MM/YYYY HH:mm')}` : ''}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: 'pre-wrap' }}>
+                          {message.text || message.fileName || '—'}
+                        </Typography>
+                        {message.attachmentUrl && (
+                          <Link href={message.attachmentUrl} target="_blank" rel="noreferrer" color="inherit" underline="always">
+                            {message.fileName || t('chat.detail.openAttachment', 'Open attachment')}
+                          </Link>
+                        )}
+                      </Box>
+                    );
+                  })}
+                </Stack>
+              )}
+            </Stack>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSelectedConversation(null)}>{t('common.close', 'Close')}</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

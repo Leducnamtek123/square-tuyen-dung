@@ -37,6 +37,9 @@
   },
   "loadPreviousMessages": "Tải tin nhắn trước",
   "typeAMessage": "Nhập tin nhắn...",
+  "auto": {
+    "index_chn_mt_cuc_hi_thoi_danh_sch_bn_5d32": "Chọn một cuộc hội thoại ở danh sách bên trái để bắt đầu nhắn tin"
+  },
   "slogan": "Cách mới để nắm bắt cơ hội của bạn.",
   "sloganSub": "Tương tác nhiều hơn, thành công nhiều hơn"
 }

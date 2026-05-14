@@ -22,6 +22,7 @@ import AddIcon from '@mui/icons-material/Add';
 import type { QuestionGroup, Question } from '../../../../types/models';
 import type { TFunction } from 'i18next';
 import type { SelectChangeEvent } from '@mui/material';
+import type { SxProps } from '@mui/material/styles';
 import pc from '@/utils/muiColors';
 
 type Props = {
@@ -34,7 +35,7 @@ type Props = {
   openCreateQuestion: boolean;
   newQuestionContent: string;
   allQuestions: Question[];
-  inputSx: Record<string, unknown>;
+  inputSx: SxProps<Theme>;
   isGroupMutating: boolean;
   isQuestionMutating: boolean;
   t: TFunction;
@@ -153,21 +154,21 @@ const QuestionGroupsDialogs = ({
               startIcon={<AddIcon />}
               onClick={onOpenCreateQuestion}
               color="primary"
-              sx={{ alignSelf: 'flex-start', borderRadius: 1.5, textTransform: 'none', fontWeight: 800, px: 2, py: 1, bgcolor: pc.primary( 0.05), '&:hover': { bgcolor: pc.primary( 0.1) } }}
+              sx={{ alignSelf: 'flex-start', textTransform: 'none', fontWeight: 800, px: 2, py: 1, bgcolor: pc.primary( 0.05), '&:hover': { bgcolor: pc.primary( 0.1) } }}
             >
               {t('employer:questionGroupsCard.actions.createNewQuestion')}
             </Button>
           </Stack>
         </DialogContent>
         <DialogActions sx={{ p: 4, pt: 3, gap: 2 }}>
-          <Button onClick={onCloseDialog} color="inherit" sx={{ fontWeight: 700, textTransform: 'none', borderRadius: 1.5, px: 3 }}>
+          <Button onClick={onCloseDialog} color="inherit" sx={{ fontWeight: 700, textTransform: 'none', px: 3 }}>
             {t('common:actions.cancel')}
           </Button>
           <Button
             onClick={onSaveGroup}
             variant="contained"
             disabled={isGroupMutating || !groupName.trim()}
-            sx={{ px: 4, py: 1.25, borderRadius: 1.5, fontWeight: 900, boxShadow: 'none', textTransform: 'none' }}
+            sx={{ px: 4, py: 1.25, fontWeight: 900, boxShadow: 'none', textTransform: 'none' }}
           >
             {t('common:actions.save')}
           </Button>
@@ -198,14 +199,14 @@ const QuestionGroupsDialogs = ({
           </Box>
         </DialogContent>
         <DialogActions sx={{ p: 4, pt: 3, gap: 2 }}>
-          <Button onClick={onCloseCreateQuestion} color="inherit" sx={{ fontWeight: 700, textTransform: 'none', borderRadius: 1.5, px: 3 }}>
+          <Button onClick={onCloseCreateQuestion} color="inherit" sx={{ fontWeight: 700, textTransform: 'none', px: 3 }}>
             {t('common:actions.cancel')}
           </Button>
           <Button
             onClick={onCreateQuestion}
             variant="contained"
             disabled={isQuestionMutating || !newQuestionContent.trim()}
-            sx={{ px: 4, py: 1.25, borderRadius: 1.5, fontWeight: 900, boxShadow: 'none', textTransform: 'none' }}
+            sx={{ px: 4, py: 1.25, fontWeight: 900, boxShadow: 'none', textTransform: 'none' }}
           >
             {t('common:actions.save')}
           </Button>

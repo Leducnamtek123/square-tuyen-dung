@@ -1,5 +1,6 @@
 from rest_framework import generics, status, viewsets
 from rest_framework.response import Response
+from django.db.models import Q
 
 from apps.accounts import permissions as perms_custom
 from shared import pagination as paginations
@@ -128,3 +129,33 @@ class AdminJobPostNotificationViewSet(viewsets.ModelViewSet):
     serializer_class = JobPostNotificationSerializer
     permission_classes = [perms_custom.IsAdminUser]
     pagination_class = paginations.CustomPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.query_params.get("kw") or self.request.query_params.get("search")
+        if search:
+            queryset = queryset.filter(
+                Q(job_name__icontains=search)
+                | Q(user__full_name__icontains=search)
+                | Q(user__email__icontains=search)
+                | Q(career__name__icontains=search)
+                | Q(city__name__icontains=search)
+            )
+
+        ordering = self.request.query_params.get("ordering")
+        ordering_map = {
+            "id": "id",
+            "jobName": "job_name",
+            "frequency": "frequency",
+            "salary": "salary",
+            "isActive": "is_active",
+            "createAt": "create_at",
+            "updateAt": "update_at",
+        }
+        if ordering:
+            is_desc = ordering.startswith("-")
+            key = ordering[1:] if is_desc else ordering
+            mapped = ordering_map.get(key)
+            if mapped:
+                queryset = queryset.order_by(f"-{mapped}" if is_desc else mapped)
+        return queryset

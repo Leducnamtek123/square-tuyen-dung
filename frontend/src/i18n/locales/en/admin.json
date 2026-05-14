@@ -70,6 +70,9 @@
       "breadcrumbCareers": "Careers",
       "addCareer": "Add Career",
       "searchPlaceholder": "Search careers...",
+      "filter": {
+        "title": "Career filters"
+      },
       "addConfirmTitle": "Add New Career",
       "editConfirmTitle": "Edit Career",
       "careerNameLabel": "Career Name",
@@ -112,6 +115,9 @@
       "breadcrumbGeneral": "General Config",
       "breadcrumbCities": "Cities",
       "addCity": "Add City",
+      "filter": {
+        "title": "City filters"
+      },
       "addConfirmTitle": "Add New City",
       "editConfirmTitle": "Edit City",
       "cityNameLabel": "City Name",
@@ -151,6 +157,9 @@
       "breadcrumbDistricts": "Districts",
       "addDistrict": "Add District",
       "filterCityPlaceholder": "Select city to filter",
+      "filter": {
+        "title": "District filters"
+      },
       "addConfirmTitle": "Add New District",
       "editConfirmTitle": "Edit District",
       "cityLabel": "City",
@@ -196,6 +205,9 @@
       "addWard": "Add Ward",
       "filterCityPlaceholder": "Select city",
       "filterDistrictPlaceholder": "Select district to filter",
+      "filter": {
+        "title": "Ward filters"
+      },
       "addConfirmTitle": "Add New Ward",
       "editConfirmTitle": "Edit Ward",
       "districtLabel": "District",
@@ -247,6 +259,9 @@
     "companies": {
       "addCompany": "Add Company",
       "searchPlaceholder": "Search companies...",
+      "filter": {
+        "title": "Company filters"
+      },
       "addConfirmTitle": "Add New Company",
       "editConfirmTitle": "Edit Company Information",
       "companyNameLabel": "Company Name",
@@ -279,7 +294,16 @@
       "title": "Company List",
       "breadcrumbAdmin": "Admin",
       "breadcrumbList": "List",
-      "descriptionLabel": "Description"
+      "descriptionLabel": "Description",
+      "form": {
+        "since": "Founded date",
+        "cityId": "City ID",
+        "districtId": "District ID",
+        "wardId": "Ward ID",
+        "address": "Address",
+        "latitude": "Latitude",
+        "longitude": "Longitude"
+      }
     },
     "jobActivity": {
       "title": "Job Post Activity Log",
@@ -287,6 +311,9 @@
       "breadcrumbJobs": "Jobs & Interviews",
       "breadcrumbActivity": "Job Post Activities",
       "searchPlaceholder": "Search activities...",
+      "filter": {
+        "title": "Application filters"
+      },
       "editStatusTitle": "Update Application Status",
       "statusLabel": "Status",
       "statusOptions": {
@@ -369,12 +396,16 @@
         "verify": "Verify Payment"
       },
       "filter": {
+        "title": "Job post filters",
         "searchPlaceholder": "Search by job title or company..."
       },
       "status": {
         "draft": "Draft",
         "active": "Active",
         "expired": "Expired",
+        "pending": "Pending Review",
+        "rejected": "Rejected",
+        "approved": "Approved",
         "unknown": "Unknown"
       },
       "verified": {
@@ -390,6 +421,9 @@
     "profiles": {
       "addCandidate": "Add Candidate",
       "searchPlaceholder": "Search candidates...",
+      "filter": {
+        "title": "Candidate profile filters"
+      },
       "addTitle": "Add New Candidate Profile",
       "editTitle": "Edit Candidate Profile",
       "fullNameLabel": "Full Name",
@@ -489,6 +523,9 @@
     },
     "resumes": {
       "searchPlaceholder": "Search resumes...",
+      "filter": {
+        "title": "Resume filters"
+      },
       "editTitle": "Edit Resume",
       "resumeTitleLabel": "Resume Title",
       "minSalaryLabel": "Min Salary",
@@ -586,6 +623,7 @@
       },
       "searchPlaceholder": "Search name/email...",
       "filters": {
+        "title": "User filters",
         "role": "Role",
         "allRoles": "All"
       },
@@ -717,6 +755,9 @@
       "breadcrumbJobsInterviews": "Jobs & Interviews",
       "addBtn": "Create Notification",
       "searchPlaceholder": "Search notifications...",
+      "filter": {
+        "title": "Job notification filters"
+      },
       "addTitle": "Create New Notification",
       "editTitle": "Edit Notification",
       "labelTitle": "Title",
@@ -789,12 +830,27 @@
         "status": "Status",
         "scheduledAt": "Scheduled At",
         "actions": "Actions",
+        "view": "View details",
+        "markCompleted": "Mark completed",
+        "cancel": "Cancel",
         "editStatus": "Edit Status",
         "delete": "Delete"
       },
       "title": "Interview Schedule",
       "breadcrumbAdmin": "Admin",
       "breadcrumb": "Interviews",
+      "searchPlaceholder": "Search interviews...",
+      "filter": {
+        "title": "Interview filters"
+      },
+      "detailTitle": "Interview details",
+      "recordingLink": "Open recording",
+      "toast": {
+        "statusUpdated": "Interview status updated",
+        "statusUpdateError": "Could not update interview status",
+        "deleteSuccess": "Interview deleted",
+        "deleteError": "Could not delete interview"
+      },
       "editStatusTitle": "Change Interview Status",
       "form": {
         "status": "Status"
@@ -914,6 +970,11 @@
         }
       }
     },
+    "bannerTypes": {
+      "filter": {
+        "title": "Banner type filters"
+      }
+    },
     "feedbacks": {
       "title": "Feedback Management",
       "breadcrumbAdmin": "Admin",
@@ -958,6 +1019,8 @@
     "next": "Next",
     "submit": "Submit",
     "reset": "Reset",
+    "clearFilters": "Clear filters",
+    "advancedFilters": "Advanced filters",
     "actions": "Actions",
     "status": {
       "completed": "Completed",
@@ -995,6 +1058,7 @@
       "employersJoined": "Employers joined"
     },
     "search": {
+      "title": "Conversation filters",
       "placeholder": "Search candidate or employer..."
     },
     "table": {
@@ -1015,6 +1079,11 @@
     },
     "tooltip": {
       "viewDetail": "View detail"
+    },
+    "detail": {
+      "title": "Conversation detail",
+      "noMessages": "No messages found.",
+      "openAttachment": "Open attachment"
     }
   }
 }

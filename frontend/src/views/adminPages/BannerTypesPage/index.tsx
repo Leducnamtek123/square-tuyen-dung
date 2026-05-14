@@ -8,7 +8,6 @@ import {
   Link,
   Paper,
   TextField,
-  InputAdornment,
   Button,
   Dialog,
   DialogTitle,
@@ -23,7 +22,6 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -31,6 +29,7 @@ import DataTable from '../../../components/Common/DataTable';
 import { BannerType } from '../../../types/models';
 import { useDataTable, useDebounce } from '../../../hooks';
 import { useBannerTypes } from './hooks/useBannerTypes';
+import FilterBar from '@/components/Common/FilterBar';
 
 interface BannerTypeFormData {
   code: string;
@@ -158,8 +157,8 @@ const BannerTypesPage = () => {
     ordering,
   });
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
     onPaginationChange({ pageIndex: 0, pageSize });
   };
 
@@ -268,24 +267,15 @@ const BannerTypesPage = () => {
       </Box>
 
       <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
-        <Box sx={{ mb: 3 }}>
-          <TextField
-            size="small"
-            placeholder="Search banner types..."
-            value={searchTerm}
-            onChange={handleSearch}
-            sx={{ width: 400 }}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" color="action" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        </Box>
+        <FilterBar
+          title={t('pages.bannerTypes.filter.title', 'Banner type filters')}
+          searchValue={searchTerm}
+          searchPlaceholder="Search banner types..."
+          onSearchChange={handleSearch}
+          onReset={() => handleSearch('')}
+          resetDisabled={!searchTerm}
+          resetLabel={t('common.clearFilters', 'Clear filters')}
+        />
 
         <DataTable
           columns={columns}

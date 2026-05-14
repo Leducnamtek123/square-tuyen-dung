@@ -19,6 +19,7 @@
     "sections": {
       "personal": "Personal Information",
       "general": "General Information",
+      "generalInfo": "General Information",
       "experience": "Work Experience",
       "education": "Education",
       "skills": "Professional Skills",
@@ -436,5 +437,29 @@
     "followers": "followers",
     "notUpdated": "Information not updated",
     "jobCount": "jobs"
+  },
+  "home": {
+    "topCompanies": "Featured companies",
+    "noCompaniesFound": "No companies match your criteria yet",
+    "noFeedbacks": "No user feedback yet"
+  },
+  "jobPost": {
+    "timeLeft": "Left"
+  },
+  "login": {
+    "phone": "Phone number",
+    "phoneIntro": "Enter your phone number to receive a verification code.",
+    "otpIntro": "Enter the 6-digit code sent to your phone.",
+    "resendIn": "Resend in"
+  },
+  "actions": {
+    "sendOTP": "Send OTP code",
+    "verifyOTP": "Verify & Sign In",
+    "changePhone": "Change phone number",
+    "resendOTP": "Resend code"
+  },
+  "form": {
+    "phoneNumber": "Phone number",
+    "otpCode": "OTP code"
   }
 }

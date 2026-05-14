@@ -97,7 +97,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src --ext .ts,.tsx",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "i18n:audit": "node audit_i18n.cjs"
   },
   "browserslist": {
     "production": [

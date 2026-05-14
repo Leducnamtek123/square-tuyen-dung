@@ -6,16 +6,14 @@ import {
   Stack, 
   IconButton, 
   Tooltip, 
-  Grid2 as Grid, 
-  alpha, 
-  useTheme 
+  Grid2 as Grid,
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import { useConfig } from '@/hooks/useConfig';
-import pc from '@/utils/muiColors';
+import { filterControlSx } from '@/components/Common/FilterBar';
 
 export interface SavedResumeFilterValues {
   kw: string;
@@ -31,7 +29,6 @@ interface SavedResumeFilterFormProps {
 const SavedResumeFilterForm: React.FC<SavedResumeFilterFormProps> = ({ handleFilter }) => {
   const { t } = useTranslation(['employer', 'common']);
   const { allConfig } = useConfig();
-  const theme = useTheme();
 
   const {
     control,
@@ -52,14 +49,7 @@ const SavedResumeFilterForm: React.FC<SavedResumeFilterFormProps> = ({ handleFil
     handleFilter(defaultValues as Partial<SavedResumeFilterValues>);
   };
 
-  const inputSx = {
-    '& .MuiOutlinedInput-root': {
-        borderRadius: 2.5,
-        backgroundColor: pc.actionDisabled( 0.03),
-        '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
-        '& fieldset': { borderColor: pc.divider( 0.8) }
-    }
-  };
+  const inputSx = filterControlSx;
 
   return (
     <form onSubmit={handleSubmit(handleFilter)}>
@@ -107,7 +97,9 @@ const SavedResumeFilterForm: React.FC<SavedResumeFilterFormProps> = ({ handleFil
                 onClick={onReset}
                 sx={{ 
                     bgcolor: 'background.paper', 
-                    borderRadius: 2,
+                    width: 42,
+                    height: 42,
+                    
                     border: '1px solid',
                     borderColor: 'divider',
                     '&:hover': { bgcolor: 'action.hover' }
@@ -124,10 +116,11 @@ const SavedResumeFilterForm: React.FC<SavedResumeFilterFormProps> = ({ handleFil
               sx={{ 
                 color: 'white', 
                 flex: 1,
-                borderRadius: 2.5,
+                
                 fontWeight: 900,
                 textTransform: 'none',
                 boxShadow: (theme) => theme.customShadows?.secondary,
+                minHeight: 42,
                 '&:hover': { bgcolor: 'secondary.dark' }
               }}
             >

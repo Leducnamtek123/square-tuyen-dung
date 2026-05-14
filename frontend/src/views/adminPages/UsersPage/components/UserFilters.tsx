@@ -1,8 +1,11 @@
 import React from 'react';
-import { Box, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
-import SearchIcon from '@mui/icons-material/Search';
+import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ROLES_NAME } from '../../../../configs/constants';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
+import type { SxProps, Theme } from '@mui/material/styles';
+
+const roleFilterSx = [{ minWidth: 220 }, filterControlSx] as SxProps<Theme>;
 
 interface UserFiltersProps {
     search: string;
@@ -14,34 +17,25 @@ interface UserFiltersProps {
 const UserFilters = ({ search, role, onSearchChange, onRoleChange }: UserFiltersProps) => {
     const { t } = useTranslation('admin');
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onSearchChange(e.target.value);
-    };
-
     const handleRoleChange = (e: SelectChangeEvent<string>) => {
         onRoleChange(e.target.value);
     };
 
     return (
-        <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <TextField
-                size="small"
-                placeholder={t('pages.users.searchPlaceholder')}
-                value={search}
-                onChange={handleSearchChange}
-                sx={{ width: 400 }}
-                slotProps={{
-                    input: {
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon fontSize="small" color="action" />
-                            </InputAdornment>
-                        ),
-                    }
-                }}
-            />
-            
-            <FormControl size="small" sx={{ minWidth: 200 }}>
+        <FilterBar
+            title={t('pages.users.filters.title', 'Bộ lọc người dùng')}
+            searchValue={search}
+            searchPlaceholder={t('pages.users.searchPlaceholder')}
+            onSearchChange={onSearchChange}
+            activeFilterCount={role ? 1 : 0}
+            onReset={() => {
+                onSearchChange('');
+                onRoleChange('');
+            }}
+            resetDisabled={!search && !role}
+            resetLabel={t('common.clearFilters', 'Xóa lọc')}
+        >
+            <FormControl size="small" sx={roleFilterSx}>
                 <InputLabel id="role-filter-label">{t('pages.users.filters.role')}</InputLabel>
                 <Select
                     labelId="role-filter-label"
@@ -55,7 +49,7 @@ const UserFilters = ({ search, role, onSearchChange, onRoleChange }: UserFilters
                     <MenuItem value={ROLES_NAME.JOB_SEEKER}>{t('pages.users.roles.jobSeeker')}</MenuItem>
                 </Select>
             </FormControl>
-        </Box>
+        </FilterBar>
     );
 };
 

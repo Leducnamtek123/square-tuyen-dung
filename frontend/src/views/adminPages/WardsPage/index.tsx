@@ -8,7 +8,6 @@ import {
   Link,
   Paper,
   TextField,
-  InputAdornment,
   Button,
   Dialog,
   DialogTitle,
@@ -23,7 +22,6 @@ import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 
 import DataTable from '../../../components/Common/DataTable';
@@ -33,8 +31,12 @@ import { useCities } from '../CitiesPage/hooks/useCities';
 import { useDataTable, useDebounce } from '../../../hooks';
 import type { Ward, District, City } from '../../../types/models';
 import type { WardPayload } from '../../../services/adminManagementService';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
+import type { SxProps, Theme } from '@mui/material/styles';
 
 type WardFormData = Partial<WardPayload>;
+const cityFilterSx = [{ width: { xs: '100%', sm: 220 } }, filterControlSx] as SxProps<Theme>;
+const districtFilterSx = [{ width: { xs: '100%', sm: 260 } }, filterControlSx] as SxProps<Theme>;
 
 type UiState = {
   searchTerm: string;
@@ -124,7 +126,6 @@ const WardFilters = ({
   onSearchChange,
   onCityChange,
   onDistrictChange,
-  onOpenAdd,
 }: {
   t: ReturnType<typeof useTranslation>['t'];
   searchTerm: string;
@@ -135,33 +136,31 @@ const WardFilters = ({
   onSearchChange: (value: string) => void;
   onCityChange: (value: string | number) => void;
   onDistrictChange: (value: string | number) => void;
-  onOpenAdd: () => void;
 }) => (
-  <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, flexWrap: 'wrap' }}>
-    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-      <TextField
-        size="small"
-        placeholder={t('pages.wards.searchPlaceholder')}
-        value={searchTerm}
-        onChange={(e) => onSearchChange(e.target.value)}
-        sx={{ width: 250 }}
-        slotProps={{
-          input: {
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" color="action" />
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
+  <FilterBar
+    title={t('pages.wards.filter.title', 'Bộ lọc phường/xã')}
+    searchValue={searchTerm}
+    searchPlaceholder={t('pages.wards.searchPlaceholder')}
+    onSearchChange={onSearchChange}
+    activeFilterCount={[cityFilter, districtFilter].filter(Boolean).length}
+    onReset={() => {
+      onSearchChange('');
+      onCityChange('');
+      onDistrictChange('');
+    }}
+    resetDisabled={!searchTerm && !cityFilter && !districtFilter}
+    resetLabel={t('common.clearFilters', 'Xóa lọc')}
+    advancedLabel={t('common.advancedFilters', 'Bộ lọc nâng cao')}
+    advancedDefaultOpen={Boolean(cityFilter || districtFilter)}
+    advancedFilters={(
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
       <TextField
         select
         size="small"
         label={t('pages.wards.filterByCity')}
         value={cityFilter}
         onChange={(e) => onCityChange(e.target.value)}
-        sx={{ width: 180 }}
+        sx={cityFilterSx}
       >
         <MenuItem value="">{t('common.all')}</MenuItem>
         {cities.map((city) => (
@@ -176,7 +175,7 @@ const WardFilters = ({
         label={t('pages.wards.filterByDistrict')}
         value={districtFilter}
         onChange={(e) => onDistrictChange(e.target.value)}
-        sx={{ width: 220 }}
+        sx={districtFilterSx}
         disabled={!cityFilter}
       >
         <MenuItem value="">{t('common.all')}</MenuItem>
@@ -186,11 +185,9 @@ const WardFilters = ({
           </MenuItem>
         ))}
       </TextField>
-    </Box>
-    <Button variant="contained" startIcon={<AddIcon />} onClick={onOpenAdd}>
-      {t('pages.wards.add')}
-    </Button>
-  </Box>
+      </Stack>
+    )}
+  />
 );
 
 const WardDialogs = ({
@@ -467,7 +464,6 @@ const WardsPage = () => {
             dispatch({ type: 'set_district_filter', payload: value });
             onPaginationChange({ pageIndex: 0, pageSize });
           }}
-          onOpenAdd={handleOpenAdd}
         />
 
         <DataTable

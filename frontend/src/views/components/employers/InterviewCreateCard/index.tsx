@@ -255,7 +255,7 @@ const InterviewCreateCardInner = ({
           <Button
             onClick={() => setIsQuestionDialogOpen(false)}
             color="inherit"
-            sx={{ fontWeight: 900, textTransform: 'none', borderRadius: 2.5, px: 3 }}
+            sx={{ fontWeight: 900, textTransform: 'none', px: 3 }}
           >
             {t('common:cancel')}
           </Button>
@@ -265,7 +265,7 @@ const InterviewCreateCardInner = ({
             color="primary"
             disabled={isQuestionMutating}
             sx={{
-              borderRadius: 2.5,
+              
               px: 5,
               py: 1.25,
               fontWeight: 900,

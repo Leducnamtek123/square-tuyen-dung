@@ -189,7 +189,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                     color="primary"
                     startIcon={<AddIcon />}
                     onClick={() => handleOpen()}
-                    sx={{ borderRadius: 1.5, px: 3, py: 1, boxShadow: 'none', fontWeight: 700, textTransform: 'none' }}
+                    sx={{ px: 3, py: 1, boxShadow: 'none', fontWeight: 700, textTransform: 'none' }}
                 >
                     {t('interview:employer.questionBank.add')}
                 </Button>
@@ -237,14 +237,14 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                     <Button 
                         onClick={handleClose} 
                         color="inherit" 
-                        sx={{ fontWeight: 700, textTransform: 'none', borderRadius: 1.5, px: 3 }}
+                        sx={{ fontWeight: 700, textTransform: 'none', px: 3 }}
                     >
                         {t('common:actions.cancel')}
                     </Button>
                     <Button 
                         onClick={handleSubmit} 
                         variant="contained" 
-                        sx={{ px: 4, py: 1.25, borderRadius: 1.5, fontWeight: 900, boxShadow: 'none', textTransform: 'none' }}
+                        sx={{ px: 4, py: 1.25, fontWeight: 900, boxShadow: 'none', textTransform: 'none' }}
                     >
                         {t('common:actions.save')}
                     </Button>

@@ -8,21 +8,16 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   allowSubmit: boolean;
   setAllowSubmit: (allow: boolean) => void;
-  selectedDateRange: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null;
-  setSelectedDateRange: (range: [dayjs.Dayjs | null, dayjs.Dayjs | null]) => void;
-}
-
-function getMonthDiff(dateA: Date, dateB: Date) {
-  const msPerDay = 86400000;
-  const daysDiff = Math.round((dateB.getTime() - dateA.getTime()) / msPerDay);
-  const monthDiff = Math.floor(daysDiff / 30);
-  const daysRemaining = daysDiff % 30;
-  return { months: monthDiff, days: daysRemaining };
+  selectedDateRange: [Dayjs | null, Dayjs | null] | null;
+  setSelectedDateRange: (range: [Dayjs | null, Dayjs | null]) => void;
+  maxRangeMonths?: number;
+  resetRangeMonths?: number;
 }
 
 const RangePickerCustom = ({
@@ -30,65 +25,39 @@ const RangePickerCustom = ({
   setAllowSubmit,
   selectedDateRange,
   setSelectedDateRange,
+  maxRangeMonths = 1,
+  resetRangeMonths = maxRangeMonths,
 }: Props) => {
 
-  const [maxDate, setMaxDate] = React.useState(() => dayjs());
+  const { t } = useTranslation('common');
 
-  const handleDateRangeChange = (startValue: dayjs.Dayjs | null, endValue: dayjs.Dayjs | null) => {
-    if (startValue && endValue) {
-      const startDate = new Date(dayjs(startValue).format('YYYY-MM-DD'));
-      const endDate = new Date(dayjs(endValue).format('YYYY-MM-DD'));
-      const { months, days } = getMonthDiff(startDate, endDate);
-      if (months > 1 || (months === 1 && days > 1)) {
-        const capped = dayjs(startValue).add(1, 'month');
-        setSelectedDateRange([startValue, capped]);
-        return;
+  const getMaxEndDate = React.useCallback((startValue: Dayjs | null) => {
+    const today = dayjs();
+    if (!startValue) return today;
+
+    const rangeLimit = startValue.add(maxRangeMonths, 'month');
+    return rangeLimit.isAfter(today, 'day') ? today : rangeLimit;
+  }, [maxRangeMonths]);
+
+  const handleDateRangeChange = (startValue: Dayjs | null, endValue: Dayjs | null) => {
+    let nextEndValue = endValue;
+
+    if (startValue && nextEndValue) {
+      const maxEndDate = getMaxEndDate(startValue);
+
+      if (nextEndValue.isAfter(maxEndDate, 'day')) {
+        nextEndValue = maxEndDate;
+      }
+      if (nextEndValue.isBefore(startValue, 'day')) {
+        nextEndValue = startValue;
       }
     }
-    setSelectedDateRange([startValue, endValue]);
+    setSelectedDateRange([startValue, nextEndValue]);
   };
-
-  function handleCalendarChange(dates: (dayjs.Dayjs | null)[]) {
-
-    if (
-
-      dates !== null &&
-
-      Array.isArray(dates) &&
-
-      dates.length > 0 &&
-
-      dates[0] !== null
-
-    ) {
-
-      const startDateString = dayjs(dates[0]).format('YYYY-MM-DD');
-
-      const startDate = new Date(startDateString);
-
-      const endDate = new Date(startDate);
-
-      endDate.setMonth(endDate.getMonth() + 1);
-
-      if (endDate < new Date()) {
-
-        setMaxDate(dayjs(endDate));
-
-      } else {
-
-        setMaxDate(dayjs());
-
-      }
-
-    }
-
-  }
 
   const refreshFilter = () => {
 
-    setSelectedDateRange([dayjs().subtract(1, 'month'), dayjs()]);
-
-    setMaxDate(dayjs());
+    setSelectedDateRange([dayjs().subtract(resetRangeMonths, 'month'), dayjs()]);
 
     setAllowSubmit(!allowSubmit);
 
@@ -102,11 +71,9 @@ const RangePickerCustom = ({
 
     if (!startValue) return dayjs();
 
-    const capped = dayjs(startValue).add(1, 'month');
+    return getMaxEndDate(startValue);
 
-    return capped.isAfter(dayjs()) ? dayjs() : capped;
-
-  }, [startValue]);
+  }, [getMaxEndDate, startValue]);
 
   return (
 
@@ -122,15 +89,13 @@ const RangePickerCustom = ({
 
             onChange={(newValue) => {
 
-              handleCalendarChange([newValue]);
-
               handleDateRangeChange(newValue, endValue);
 
             }}
 
             format="DD/MM/YYYY"
 
-            maxDate={maxDate}
+            maxDate={dayjs()}
 
             slotProps={{ textField: { size: 'small' } }}
 
@@ -184,7 +149,7 @@ const RangePickerCustom = ({
 
         >
 
-          Ap dung
+          {t('actions.apply')}
 
         </Button>
 

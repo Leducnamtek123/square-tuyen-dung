@@ -71,6 +71,10 @@ def _tts_fn(request: HttpRequest):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
     body = _get_json_body(request)
+    return _tts_response_from_body(body)
+
+
+def _tts_response_from_body(body: Dict[str, Any]):
     text = (body.get("text") or "").strip()
     if not text:
         return JsonResponse({"detail": "Missing `text`."}, status=400)
@@ -126,8 +130,7 @@ class TTSAPIView(APIView):
     throttle_classes = [AIHeavyAnonThrottle, AIHeavyUserThrottle] if AIHeavyUserThrottle else [AIHeavyAnonThrottle]
 
     def post(self, request: DRFRequest):
-        # Delegate to the original function-based logic using the underlying HttpRequest
-        return _tts_fn(request._request)
+        return _tts_response_from_body(dict(request.data))
 
 
 # Backward-compat alias — urls.py uses ai_views.tts

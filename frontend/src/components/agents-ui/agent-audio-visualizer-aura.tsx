@@ -7,7 +7,7 @@
  * Licensed under the Polyform Non-Resale License 1.0.0
  * https://polyformproject.org/licenses/non-resale/1.0.0/
  *
- * Â© 2026 UNCRN LLC
+ * © 2026 UNCRN LLC
  */
 
 'use client';

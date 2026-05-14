@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Backdrop from '@mui/material/Backdrop';
+import Box from '@mui/material/Box';
 import Image from 'next/image';
 import { LOADING_IMAGES } from '@/configs/constants';
 
@@ -24,17 +25,34 @@ const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }: Backdr
       transitionDuration={300}
     >
 
-      <Image
-        src={LOADING_IMAGES.LOADING_SPINNER}
-        alt="Loading ..."
-        width={100}
-        height={100}
-        style={{
-          width: '100px',
-          height: 'auto',
-          animation: 'spin 1s linear infinite',
+      <Box
+        sx={{
+          width: 100,
+          height: 100,
+          display: 'grid',
+          placeItems: 'center',
+          animation: 'sq-backdrop-spin 900ms linear infinite',
+          animationDuration: '900ms !important',
+          animationIterationCount: 'infinite !important',
+          animationTimingFunction: 'linear !important',
+          '@keyframes sq-backdrop-spin': {
+            from: { transform: 'rotate(0deg)' },
+            to: { transform: 'rotate(360deg)' },
+          },
         }}
-      />
+      >
+        <Image
+          src={LOADING_IMAGES.LOADING_SPINNER}
+          alt="Loading ..."
+          width={100}
+          height={100}
+          style={{
+            width: '100px',
+            height: 'auto',
+            display: 'block',
+          }}
+        />
+      </Box>
 
     </Backdrop>
 

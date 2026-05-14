@@ -18,39 +18,33 @@ type UseSystemSettingsResult = UseQueryResult<SystemSettings> & {
     isMutating: boolean;
 };
 
+const normalizeSettings = (res: Partial<SystemSettingsPayload> = {}): SystemSettings => ({
+    maintenanceMode: !!res.maintenanceMode,
+    autoApproveJobs: !!res.autoApproveJobs,
+    emailNotifications: res.emailNotifications ?? true,
+    googleApiKey: res.googleApiKey || '',
+    supportEmail: res.supportEmail || '',
+});
+
 export const useSystemSettings = (): UseSystemSettingsResult => {
     const { t } = useTranslation('admin');
     const queryClient = useQueryClient();
 
-    const query = useQuery({
+    const query = useQuery<SystemSettings>({
         queryKey: ['system-settings'],
         queryFn: async () => {
             const res = await adminSettingsService.getSystemSettings();
-            return {
-                maintenanceMode: !!res.maintenanceMode,
-                autoApproveJobs: !!res.autoApproveJobs,
-                emailNotifications: res.emailNotifications ?? true,
-                ...res,
-            } as SystemSettings;
-        },
-        initialData: {
-            maintenanceMode: false,
-            autoApproveJobs: false,
-            emailNotifications: true,
+            return normalizeSettings(res);
         },
     });
 
     const updateMutation = useMutation({
         mutationFn: async (data: Partial<SystemSettings>): Promise<SystemSettings> => {
             const res = await adminSettingsService.updateSystemSettings(data);
-            return {
-                maintenanceMode: !!res.maintenanceMode,
-                autoApproveJobs: !!res.autoApproveJobs,
-                emailNotifications: res.emailNotifications ?? true,
-                ...res,
-            } as SystemSettings;
+            return normalizeSettings(res);
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
+            queryClient.setQueryData(['system-settings'], data);
             toastMessages.success(t('pages.settings.toast.saveSuccess'));
             queryClient.invalidateQueries({ queryKey: ['system-settings'] });
         },

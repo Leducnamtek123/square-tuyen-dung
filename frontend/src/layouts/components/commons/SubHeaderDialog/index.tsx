@@ -175,7 +175,7 @@ const MobileContent = (
               >
                 {career?.name}{' '}
                 {career.isHot && (
-                  <Chip label={t('common.hot', { ns: 'admin' })} size="small" color="error" />
+                  <Chip label={t('common.hot', { defaultValue: 'Hot' })} size="small" color="error" />
                 )}
               </Typography>
             </Grid>

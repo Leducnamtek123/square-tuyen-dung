@@ -18,9 +18,23 @@ from apps.jobs.exceptions import (
     JobPostInactiveError,
     ResumeOwnershipError,
 )
+from apps.content.system_settings import auto_approve_jobs_enabled, email_notifications_enabled
 from shared.configs import variable_system as var_sys
 
 logger = logging.getLogger(__name__)
+
+JOB_POST_REVIEW_FIELDS = {
+    'job_name',
+    'job_description',
+    'job_requirement',
+    'salary_min',
+    'salary_max',
+    'benefits_enjoyed',
+    'quantity',
+    'position',
+    'experience',
+    'academic_level',
+}
 
 
 class JobPostService:
@@ -77,10 +91,14 @@ class JobPostService:
         if not company:
             raise CompanyNotConfiguredError("Người dùng chưa có thông tin công ty.")
 
+        payload = dict(validated_data)
+        if auto_approve_jobs_enabled():
+            payload["status"] = var_sys.JobPostStatus.APPROVED
+
         job_post = JobPost.objects.create(
             user=user,
             company=company,
-            **validated_data
+            **payload
         )
         return job_post
 
@@ -89,8 +107,16 @@ class JobPostService:
     def update_job(user: Any, job_post: JobPost, validated_data: Dict[str, Any]) -> JobPost:
         """Updates an existing job post."""
         old_status = job_post.status
+        payload = dict(validated_data)
 
-        for attr, value in validated_data.items():
+        if set(payload.keys()) & JOB_POST_REVIEW_FIELDS:
+            payload["status"] = (
+                var_sys.JobPostStatus.APPROVED
+                if auto_approve_jobs_enabled()
+                else var_sys.JobPostStatus.PENDING
+            )
+
+        for attr, value in payload.items():
             setattr(job_post, attr, value)
 
         job_post.save()
@@ -237,11 +263,14 @@ class JobActivityService:
             "find_job_post_link": domain + "viec-lam",
         }
 
-        try:
-            from console.jobs import queue_mail
-            queue_mail.send_email_confirm_application.delay(to=to, subject=subject, data=data)
-        except Exception as ex:
-            helper.print_log_error("send confirmation email", ex)
+        if email_notifications_enabled():
+            try:
+                from console.jobs import queue_mail
+                queue_mail.send_email_confirm_application.delay(to=to, subject=subject, data=data)
+            except Exception as ex:
+                helper.print_log_error("send confirmation email", ex)
+        else:
+            logger.info("Application confirmation email skipped because email notifications are disabled.")
 
         try:
             helper.add_apply_job_notifications(job_post_activity=activity)
@@ -328,6 +357,10 @@ class JobActivityService:
     def send_email_to_job_seeker(activity: JobPostActivity, user: Any, validated_data: Dict[str, Any]) -> None:
         from shared.configs import variable_system as var_sys
         from console.jobs import queue_mail
+
+        if not email_notifications_enabled():
+            logger.info("Employer email skipped because email notifications are disabled.")
+            return
 
         company = user.active_company
         if not company:

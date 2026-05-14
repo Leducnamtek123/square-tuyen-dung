@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useMemo, useReducer } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Tooltip, IconButton, Chip, Stack } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Paper, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Tooltip, IconButton, Chip, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
@@ -9,10 +9,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from '../../../configs/dayjs-config';
 
-import SearchIcon from '@mui/icons-material/Search';
 import { useJobActivities } from './hooks/useJobActivities';
 import { useDataTable, useDebounce } from '../../../hooks';
 import { JobPostActivity } from '../../../types/models';
+import FilterBar from '@/components/Common/FilterBar';
 
 const JobActivityPage = () => {
     const { t } = useTranslation('admin');
@@ -96,8 +96,8 @@ const JobActivityPage = () => {
         ordering
     });
 
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        dispatch({ type: 'set-search-term', value: e.target.value });
+    const handleSearch = (value: string) => {
+        dispatch({ type: 'set-search-term', value });
         onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
     };
 
@@ -158,12 +158,12 @@ const JobActivityPage = () => {
             ),
         },
         {
-            accessorKey: 'jobPost.jobName',
+            accessorKey: 'jobName',
             header: t('pages.jobActivity.table.jobPost') as string,
             cell: (info) => info.getValue() as string || '---',
         },
         {
-            accessorKey: 'jobPost.company.companyName',
+            accessorKey: 'companyDict.companyName',
             header: t('pages.jobActivity.table.company') as string,
             cell: (info) => info.getValue() as string || '---',
         },
@@ -228,24 +228,15 @@ const JobActivityPage = () => {
                 </Breadcrumbs>
             </Box>
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
-                <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
-                    <TextField
-                        size="small"
-                        placeholder={t('pages.jobActivity.searchPlaceholder')}
-                        value={state.searchTerm}
-                        onChange={handleSearch}
-                        sx={{ width: 400 }}
-                        slotProps={{
-                            input: {
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon fontSize="small" color="action" />
-                                    </InputAdornment>
-                                ),
-                            }
-                        }}
-                    />
-                </Box>
+                <FilterBar
+                    title={t('pages.jobActivity.filter.title', 'Bộ lọc ứng tuyển')}
+                    searchValue={state.searchTerm}
+                    searchPlaceholder={t('pages.jobActivity.searchPlaceholder')}
+                    onSearchChange={handleSearch}
+                    onReset={() => handleSearch('')}
+                    resetDisabled={!state.searchTerm}
+                    resetLabel={t('common.clearFilters', 'Xóa lọc')}
+                />
 
                 <DataTable
                     columns={columns}

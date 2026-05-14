@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -27,8 +27,11 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
 import { useSystemSettings, SystemSettings } from './hooks/useSystemSettings';
 import fptGpuService, { type FPTGpuControlStatus } from '../../../services/fptGpuService';
+import adminSettingsService, { type SystemHealthPayload } from '../../../services/adminSettingsService';
 import toastMessages from '../../../utils/toastMessages';
 
 const INITIAL_SETTINGS: SystemSettings = {
@@ -66,6 +69,26 @@ const formatVndPerHour = (value?: number): string => {
   return `${new Intl.NumberFormat('vi-VN').format(value)} VND/h`;
 };
 
+const getApiErrorMessage = (error: unknown, fallback: string): string => {
+  const responseData = (error as { response?: { data?: unknown } })?.response?.data as
+    | {
+        detail?: string;
+        error?: {
+          message?: string;
+          details?: { detail?: string };
+        };
+      }
+    | undefined;
+
+  return (
+    responseData?.error?.details?.detail ||
+    responseData?.error?.message ||
+    responseData?.detail ||
+    (error instanceof Error ? error.message : '') ||
+    fallback
+  );
+};
+
 const FPTGpuControlCard = () => {
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, error } = useQuery<FPTGpuControlStatus>({
@@ -82,8 +105,7 @@ const FPTGpuControlCard = () => {
       queryClient.invalidateQueries({ queryKey: ['fpt-gpu-control'] });
     },
     onError: (mutationError) => {
-      const message = mutationError instanceof Error ? mutationError.message : 'FPT GPU action failed.';
-      toastMessages.error(message);
+      toastMessages.error(getApiErrorMessage(mutationError, 'FPT GPU action failed.'));
     },
   });
 
@@ -211,6 +233,26 @@ type SettingsFormProps = {
 const SettingsForm = ({ initialSettings, onSave, isMutating }: SettingsFormProps) => {
   const { t } = useTranslation('admin');
   const [formData, setFormData] = useState<SystemSettings>(() => initialSettings);
+  const [healthResult, setHealthResult] = useState<SystemHealthPayload | null>(null);
+
+  const notificationDemoMutation = useMutation({
+    mutationFn: adminSettingsService.sendNotificationDemo,
+    onSuccess: () => toastMessages.success(t('pages.settings.notificationDemo.success')),
+    onError: (error) => toastMessages.error(getApiErrorMessage(error, t('pages.settings.notificationDemo.error'))),
+  });
+
+  const healthMutation = useMutation({
+    mutationFn: adminSettingsService.healthCheck,
+    onSuccess: (result) => {
+      setHealthResult(result);
+      toastMessages.success(`${t('pages.settings.healthCheck.title')}: ${result.status}`);
+    },
+    onError: (error) => toastMessages.error(getApiErrorMessage(error, t('pages.settings.healthCheck.description'))),
+  });
+
+  useEffect(() => {
+    setFormData(initialSettings);
+  }, [initialSettings]);
 
   const handleToggleChange = (name: keyof SystemSettings) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [name]: event.target.checked }));
@@ -330,24 +372,65 @@ const SettingsForm = ({ initialSettings, onSave, isMutating }: SettingsFormProps
         </Grid>
 
         <Grid size={{ xs: 12, md: 4 }}>
-          <Paper sx={{ p: 3, borderRadius: '16px', position: 'sticky', top: 24, border: '1px solid', borderColor: 'divider' }} elevation={0}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
-              {t('pages.settings.summary')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              {t('pages.settings.summaryText')}
-            </Typography>
-            <Button
-              variant="contained"
-              fullWidth
-              startIcon={isMutating ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-              onClick={handleSave}
-              disabled={isMutating}
-              sx={{ py: 1.5, borderRadius: '12px', fontWeight: 700 }}
-            >
-              {isMutating ? t('common.saving') : t('common.saveChanges')}
-            </Button>
-          </Paper>
+          <Stack spacing={3} sx={{ position: 'sticky', top: 24 }}>
+            <Paper sx={{ p: 3, borderRadius: '16px', border: '1px solid', borderColor: 'divider' }} elevation={0}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
+                {t('pages.settings.summary')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                {t('pages.settings.summaryText')}
+              </Typography>
+              <Button
+                variant="contained"
+                fullWidth
+                startIcon={isMutating ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
+                onClick={handleSave}
+                disabled={isMutating}
+                sx={{ py: 1.5, fontWeight: 700 }}
+              >
+                {isMutating ? t('common.saving') : t('common.saveChanges')}
+              </Button>
+            </Paper>
+
+            <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid', borderColor: 'divider' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Stack spacing={2}>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    startIcon={
+                      notificationDemoMutation.isPending
+                        ? <CircularProgress size={18} />
+                        : <NotificationsActiveIcon />
+                    }
+                    onClick={() => notificationDemoMutation.mutate()}
+                    disabled={notificationDemoMutation.isPending}
+                  >
+                    {notificationDemoMutation.isPending
+                      ? t('pages.settings.notificationDemo.sending')
+                      : t('pages.settings.notificationDemo.send')}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    startIcon={healthMutation.isPending ? <CircularProgress size={18} /> : <MonitorHeartIcon />}
+                    onClick={() => healthMutation.mutate()}
+                    disabled={healthMutation.isPending}
+                  >
+                    {healthMutation.isPending
+                      ? t('pages.settings.healthCheck.checking')
+                      : t('pages.settings.healthCheck.check')}
+                  </Button>
+                  {healthResult && (
+                    <Alert severity={healthResult.status === 'healthy' ? 'success' : 'warning'} sx={{ mt: 1 }}>
+                      {t('pages.settings.healthCheck.database')}: {healthResult.database || 'N/A'} |{' '}
+                      {t('pages.settings.healthCheck.redis')}: {healthResult.redis || 'N/A'}
+                    </Alert>
+                  )}
+                </Stack>
+              </CardContent>
+            </Card>
+          </Stack>
         </Grid>
       </Grid>
     </Box>

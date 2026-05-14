@@ -1,7 +1,7 @@
 import datetime
 
 from django.db import DatabaseError
-from django.db.models import Count, F, Prefetch, Avg, Min, Max
+from django.db.models import Count, F, Prefetch, Avg, Min, Max, Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions as perms_sys, status, viewsets
 from rest_framework.decorators import action
@@ -528,6 +528,17 @@ class AdminJobPostViewSet(viewsets.ModelViewSet):
     filterset_class = JobPostFilter
     search_fields = ['job_name', 'company__company_name']
     ordering_fields = ['create_at', 'deadline', 'views']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        kw = self.request.query_params.get("kw")
+        if kw:
+            queryset = queryset.filter(
+                Q(job_name__icontains=kw)
+                | Q(company__company_name__icontains=kw)
+                | Q(contact_person_email__icontains=kw)
+            )
+        return queryset
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())

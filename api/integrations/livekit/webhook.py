@@ -4,6 +4,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from django.conf import settings
+from django.db import connection
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -21,6 +22,8 @@ _FILE_URL_KEYS = ("location", "url", "fileUrl", "file_url", "downloadUrl", "file
 
 
 def _run_in_thread(func, *args, **kwargs):
+    if connection.in_atomic_block:
+        return func(*args, **kwargs)
     return run_django_sync_in_thread(func, *args, **kwargs)
 
 

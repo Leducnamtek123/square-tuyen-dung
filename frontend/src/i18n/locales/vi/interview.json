@@ -101,7 +101,8 @@
     "missingSessionId": "Thiếu ID phiên phỏng vấn.",
     "tokenMissing": "Không thể lấy token để tham gia phỏng vấn.",
     "invalidSession": "Lỗi kết nối hoặc phiên phỏng vấn không hợp lệ.",
-    "sessionNotReadyForJoin": "Không thể vào phòng lúc này vì phiên đang ở trạng thái {{status}}."
+    "sessionNotReadyForJoin": "Không thể vào phòng lúc này vì phiên đang ở trạng thái {{status}}.",
+    "mic_denied": "Quyền truy cập microphone bị từ chối. Vui lòng cho phép truy cập microphone để tiếp tục."
   },
   "employer": {
     "questions": {
@@ -278,7 +279,11 @@
     },
     "tooltips": {
       "cannotJoin": "Chưa thể tham gia lúc này",
-      "forceEndNow": "Kết thúc ngay lập tức buổi phỏng vấn này"
+      "forceEndNow": "Kết thúc ngay lập tức buổi phỏng vấn này",
+      "observeHidden": "Quan sát ẩn không tham gia phòng"
+    },
+    "status": {
+      "interruptedResume": "Bị gián đoạn - có thể tiếp tục"
     },
     "messages": {
       "evaluationSuccess": "Lưu đánh giá thành công",
@@ -299,7 +304,8 @@
       "noDetails": "Không có thông tin chi tiết",
       "noQuestions": "Không có danh sách câu hỏi",
       "noTranscript": "Không có bản ghi",
-      "noTranscriptDesc": "Chưa có cuộc hội thoại nào để ghi lại."
+      "noTranscriptDesc": "Chưa có cuộc hội thoại nào để ghi lại.",
+      "interruptedResumeHint": "Kết nối vừa bị ngắt tạm thời. Bạn có thể tham gia lại để tiếp tục buổi phỏng vấn."
     },
     "actions": {
       "triggerAi": "Kích hoạt AI đánh giá",
@@ -329,7 +335,8 @@
       "employer": "Nhà tuyển dụng",
       "you": "Bạn",
       "candidate": "Ứng viên",
-      "guest": "Khách"
+      "guest": "Khách",
+      "observer": "Quan sát viên"
     },
     "chips": {
       "ai": "AI",
@@ -339,6 +346,7 @@
     },
     "chat": {
       "title": "Hội thoại",
+      "subtitle": "Giọng nói và tin nhắn dùng chung một dòng thời gian.",
       "messagesCount": "{{count}} tin nhắn",
       "noMessages": "Chưa có tin nhắn",
       "noMessagesDesc": "Hội thoại sẽ xuất hiện tại đây khi ai đó nói hoặc nhắn tin.",

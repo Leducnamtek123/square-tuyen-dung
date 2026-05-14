@@ -34,6 +34,12 @@ def _clear_language_cache():
 			frappe.cache.delete_value(key)
 		with suppress(Exception):
 			frappe.client_cache.delete_value(key)
+	with suppress(Exception):
+		from frappe.translate import MERGED_TRANSLATION_KEY, USER_TRANSLATION_KEY
+
+		for language_code in SUPPORTED_LANGUAGES:
+			frappe.cache.hdel(MERGED_TRANSLATION_KEY, language_code)
+			frappe.cache.hdel(USER_TRANSLATION_KEY, language_code)
 
 
 def _clear_desk_cache():

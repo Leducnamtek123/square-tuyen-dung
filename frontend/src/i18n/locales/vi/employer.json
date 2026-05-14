@@ -22,8 +22,10 @@
       "actions": "Thao tác",
       "tooltips": {
         "view": "Xem hồ sơ",
-        "delete": "Xóa hồ sơ"
-      }
+        "delete": "Xóa hồ sơ",
+        "scheduleInterview": "Lên lịch phỏng vấn"
+      },
+      "clickToDownload": "Nhấp để tải xuống"
     },
     "ai": {
       "analysisStarted": "Đã bắt đầu phân tích AI. Vui lòng đợi trong giây lát.",
@@ -57,6 +59,9 @@
       "allSkillsTitle": "Tất cả kỹ năng",
       "noData": "Không có dữ liệu",
       "resumeTitle": "Hồ sơ ứng viên",
+      "onlineResumeLabel": "Hồ sơ trực tuyến",
+      "onlineResumeHint": "AI sẽ phân tích hồ sơ trực tuyến của ứng viên.",
+      "viewOnlineProfile": "Xem hồ sơ trực tuyến",
       "viewAnalysis": "Xem phân tích AI",
       "failed": "Phân tích AI thất bại"
     },
@@ -361,7 +366,8 @@
       "tone": "Giọng điệu",
       "culturalFit": "Mức độ phù hợp văn hoá",
       "questionPerformance": "Hiệu suất câu hỏi",
-      "question": "Câu hỏi"
+      "question": "Câu hỏi",
+      "aiOverallQuality": "Chất lượng tổng quan AI"
     },
     "tooltips": {
       "cannotJoin": "Chưa thể tham gia lúc này",
@@ -394,6 +400,7 @@
       "professionalScore": "Điểm chuyên môn",
       "overallScore": "Điểm tổng quan",
       "resultLabel": "Kết quả cuối cùng",
+      "commentsPlaceholder": "Thêm ghi chú HR và đánh giá cuối cùng...",
       "comments": "Nhận xét chi tiết",
       "proposedSalary": "Lương đề xuất (VNĐ)",
       "submitEvaluation": "Gửi đánh giá cuối cùng",
@@ -412,6 +419,7 @@
     "validation": {
       "jobnameisrequired": "Yêu cầu nhập tên công việc",
       "jobnameexceededallowedlength": "Tên công việc vượt quá độ dài",
+      "interviewtemplateinvalid": "Mẫu phỏng vấn không hợp lệ.",
       "careerisrequired": "Yêu cầu chọn ngành nghề",
       "positionisrequired": "Yêu cầu chọn cấp bậc",
       "experienceisrequired": "Yêu cầu kinh nghiệm",
@@ -468,6 +476,7 @@
       "jobdescription": "Mô tả công việc",
       "jobrequirement": "Yêu cầu công việc",
       "benefits": "Quyền lợi",
+      "interviewtemplate": "Mẫu phỏng vấn",
       "cityprovince": "Tỉnh/Thành phố",
       "district": "Quận/Huyện",
       "address": "Địa chỉ",
@@ -494,6 +503,7 @@
       "enterminimumsalary": "Nhập lương tối thiểu",
       "entermaximumsalary": "Nhập lương tối đa",
       "selectacademiclevel": "Chọn trình độ HV",
+      "selectinterviewtemplate": "Chọn mẫu phỏng vấn cho đánh giá sơ bộ tự động...",
       "selectcityprovince": "Chọn Tỉnh/Thành phố",
       "selectdistrict": "Chọn Quận/Huyện",
       "enteraddress": "Nhập địa chỉ",
@@ -586,6 +596,7 @@
     },
     "onlineInterview": "Phỏng vấn trực tuyến",
     "questionGroups": "Nhóm câu hỏi",
+    "filters": "Bộ lọc nhóm câu hỏi",
     "addQuestionGroup": "Thêm nhóm câu hỏi",
     "table": {
       "groupName": "Tên nhóm câu hỏi",
@@ -661,6 +672,7 @@
   "interviewHistory": {
     "title": "Thư viện Video",
     "subtitle": "Xem lại và tải về các buổi phỏng vấn đã hoàn thành.",
+    "filterTitle": "Bộ lọc lịch sử phỏng vấn",
     "searchPlaceholder": "Tìm kiếm ứng viên, vị trí...",
     "noRecording": "Không có bản ghi",
     "viewMode": {
@@ -685,11 +697,11 @@
     },
     "subtitle": "Chỉ hiển thị các phiên đang live và preview realtime của ứng viên.",
     "autoRefresh": {
-      "on": "Auto refresh: ON",
-      "off": "Auto refresh: OFF"
+      "on": "Tự động làm mới: Bật",
+      "off": "Tự động làm mới: Tắt"
     },
     "updating": "Đang cập nhật...",
-    "activeNow": "Active Now",
+    "activeNow": "Đang hoạt động",
     "noData": {
       "title": "Chưa có phiên live nào",
       "subtitle": "Khi ứng viên bật camera hoặc mic, card realtime sẽ xuất hiện ở đây."
@@ -821,6 +833,10 @@
     "label": {
       "lastUpdated": "Cập nhật:",
       "lastViewed": "Xem lần cuối:",
+      "onlineCv": "CV trực tuyến",
+      "attachedCv": "CV đính kèm",
+      "active": "Đang hoạt động",
+      "inactive": "Không hoạt động",
       "printProfile": "In hồ sơ",
       "saveProfile": "Lưu hồ sơ",
       "saved": "Đã lưu",
@@ -848,7 +864,12 @@
       "major": "Chuyên ngành",
       "school": "Trường",
       "proficiency": "Mức độ thành thạo",
-      "noExpiration": "Không thời hạn"
+      "noExpiration": "Không thời hạn",
+      "issuedDate": "Ngày cấp",
+      "views": "Lượt xem",
+      "contactInfo": "Thông tin liên hệ",
+      "quickFacts": "Thông tin nhanh",
+      "profileType": "Loại hồ sơ"
     },
     "messages": {
       "saveSuccess": "Lưu hồ sơ thành công.",
@@ -861,7 +882,10 @@
   "common": {
     "notUpdated": "Chưa cập nhật",
     "present": "Hiện tại",
-    "appName": "Square Tuyển Dụng"
+    "appName": "Square Tuyển Dụng",
+    "search": "Tìm kiếm",
+    "clearFilters": "Xóa bộ lọc",
+    "advancedFilters": "Bộ lọc nâng cao"
   },
   "company": {
     "tabs": {
@@ -1039,6 +1063,9 @@
   "blog": {
     "title": "Blog tuyển dụng",
     "subtitle": "Nơi cập nhật kiến thức và kinh nghiệm dành cho nhà tuyển dụng. Nội dung sẽ được bổ sung liên tục theo từng chủ đề.",
+    "filter": {
+      "title": "Bộ lọc blog"
+    },
     "placeholders": {
       "exp_title": "Chia sẻ kinh nghiệm tuyển dụng",
       "exp_desc": "Nội dung đang được cập nhật để mang lại thông tin hữu ích.",
@@ -1345,6 +1372,10 @@
     "good": "Phù hợp",
     "fair": "Tạm được",
     "poor": "Chưa phù hợp"
+  },
+  "auto": {
+    "ScoreGauge_ai_matching_score_158d": "Điểm phù hợp AI",
+    "index_try_adjusting_your_search_filt_5ec9": "Hãy thử điều chỉnh bộ lọc hoặc từ khóa để tìm thêm ứng viên phù hợp."
   },
   "applyForm": {
     "resume": {

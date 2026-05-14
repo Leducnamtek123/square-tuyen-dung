@@ -208,7 +208,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
     <Box sx={{ p: 3, maxWidth: 1100, mx: 'auto' }}>
       {/* Header */}
       <Stack direction="row" alignItems="center" spacing={2} mb={4}>
-        <IconButton onClick={() => push('/employer/blog')} sx={{ bgcolor: 'action.hover', borderRadius: 1.5 }}>
+        <IconButton onClick={() => push('/employer/blog')} sx={{ bgcolor: 'action.hover' }}>
           <ArrowBackIcon />
         </IconButton>
         <Box flex={1}>
@@ -225,7 +225,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
             startIcon={<SaveIcon />}
             onClick={() => handleSave(false)}
             disabled={saving}
-            sx={{ borderRadius: 2, fontWeight: 700 }}
+            sx={{ fontWeight: 700 }}
           >
             Lưu nháp
           </Button>
@@ -234,7 +234,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
             startIcon={<SendIcon />}
             onClick={() => handleSave(true)}
             disabled={saving}
-            sx={{ borderRadius: 2, fontWeight: 700 }}
+            sx={{ fontWeight: 700 }}
           >
             {saving ? 'Đang gửi...' : 'Gửi duyệt'}
           </Button>
@@ -303,7 +303,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
             ) : (
               <Button variant="outlined" fullWidth startIcon={<ImageIcon />}
                 onClick={() => fileInputRef.current?.click()}
-                sx={{ height: 100, borderStyle: 'dashed', borderRadius: 1.5 }}>
+                sx={{ height: 100, borderStyle: 'dashed' }}>
                 Chọn ảnh đại diện
               </Button>
             )}

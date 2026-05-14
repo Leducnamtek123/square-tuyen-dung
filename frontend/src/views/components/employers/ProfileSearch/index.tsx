@@ -12,10 +12,7 @@ import {
   Paper,
   Divider,
   Tooltip,
-  alpha,
-  useTheme,
 } from '@mui/material';
-import type { Theme } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import BriefcaseIcon from '@mui/icons-material/WorkHistory';
@@ -33,6 +30,8 @@ import { resetSearchResume, searchResume } from '../../../../redux/filterSlice';
 import type { ResumeFilter } from '../../../../redux/filterSlice';
 import { useConfig } from '@/hooks/useConfig';
 import pc from '@/utils/muiColors';
+import { filterControlSx } from '@/components/Common/FilterBar';
+import type { SxProps, Theme } from '@mui/material/styles';
 
 interface ProfileSearchValues {
   kw: string;
@@ -54,8 +53,16 @@ interface FilterGroupProps {
   options: React.ComponentProps<typeof SingleSelectCustom>['options'];
   placeholder: string;
   control: ReturnType<typeof useForm<ProfileSearchValues>>['control'];
-  theme: Theme;
 }
+
+const compactFilterControlSx = {
+  ...(filterControlSx as Record<string, unknown>),
+  '& .MuiOutlinedInput-root': {
+    ...((filterControlSx as Record<string, Record<string, unknown>>)['& .MuiOutlinedInput-root'] || {}),
+    height: 48,
+    fontWeight: 700,
+  },
+} as SxProps<Theme>;
 
 const FilterGroup = ({
   label,
@@ -64,7 +71,6 @@ const FilterGroup = ({
   options,
   placeholder,
   control,
-  theme,
 }: FilterGroupProps) => (
   <Stack spacing={1.5}>
     <Typography
@@ -85,24 +91,16 @@ const FilterGroup = ({
     <SingleSelectCustom
       name={name}
       control={control}
-      options={options}
-      placeholder={placeholder}
-      sx={{
-        '& .MuiOutlinedInput-root': {
-          borderRadius: 2.5,
-          backgroundColor: pc.actionDisabled( 0.03),
-          '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
-          '& fieldset': { borderColor: pc.divider( 0.8) },
-        },
-      }}
-    />
-  </Stack>
+    options={options}
+    placeholder={placeholder}
+    sx={filterControlSx}
+  />
+</Stack>
 );
 
 const ProfileSearch: React.FC = () => {
   const { t } = useTranslation(['employer', 'common']);
   const dispatch = useDispatch();
-  const theme = useTheme();
   const { allConfig } = useConfig();
   const { resumeFilter } = useAppSelector((state) => state.filter);
 
@@ -126,8 +124,8 @@ const ProfileSearch: React.FC = () => {
         <Paper
           elevation={0}
           sx={{
-            p: 2,
-            borderRadius: 4,
+            p: 1.5,
+            borderRadius: '8px',
             bgcolor: 'background.paper',
             border: '1px solid',
             borderColor: 'divider',
@@ -141,16 +139,7 @@ const ProfileSearch: React.FC = () => {
                 placeholder={t('employer:profileSearch.placeholder.enterkeywords')}
                 control={control}
                 icon={<SearchIcon sx={{ color: 'primary.main' }} />}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 3.5,
-                    backgroundColor: pc.actionDisabled( 0.05),
-                    border: 'none',
-                    '& fieldset': { border: 'none' },
-                    height: 56,
-                    fontWeight: 700,
-                  },
-                }}
+                sx={compactFilterControlSx}
               />
             </Grid>
             <Grid size={{ xs: 12, md: 3, lg: 3 }}>
@@ -159,16 +148,7 @@ const ProfileSearch: React.FC = () => {
                 control={control}
                 options={allConfig?.cityOptions || []}
                 placeholder={t('employer:profileSearch.placeholder.selectcityprovince')}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 3.5,
-                    backgroundColor: pc.actionDisabled( 0.05),
-                    border: 'none',
-                    '& fieldset': { border: 'none' },
-                    height: 56,
-                    fontWeight: 700,
-                  },
-                }}
+                sx={compactFilterControlSx}
               />
             </Grid>
             <Grid size={{ xs: 12, md: 3, lg: 2.5 }}>
@@ -179,8 +159,8 @@ const ProfileSearch: React.FC = () => {
                 type="submit"
                 fullWidth
                 sx={{
-                  height: 56,
-                  borderRadius: 3.5,
+                  height: 48,
+                  
                   boxShadow: (theme) => theme.customShadows?.primary,
                   fontWeight: 900,
                   fontSize: '1rem',
@@ -198,9 +178,9 @@ const ProfileSearch: React.FC = () => {
       <Grid size={{ xs: 12, lg: 3 }}>
         <Paper
           sx={{
-            p: 4,
+            p: 2.5,
             bgcolor: 'background.paper',
-            borderRadius: 4,
+            borderRadius: '8px',
             border: '1px solid',
             borderColor: 'divider',
             boxShadow: (theme) => theme.customShadows?.z1,
@@ -231,7 +211,7 @@ const ProfileSearch: React.FC = () => {
                   sx={{
                     minWidth: 44,
                     height: 44,
-                    borderRadius: 2.5,
+                    
                     p: 0,
                     bgcolor: pc.error( 0.08),
                     color: 'error.main',
@@ -253,7 +233,6 @@ const ProfileSearch: React.FC = () => {
                 options={allConfig?.careerOptions || []}
                 placeholder={t('employer:profileSearch.placeholder.allcareers')}
                 control={control}
-                theme={theme}
               />
               <FilterGroup
                 label={t('employer:profileSearch.label.experience')}
@@ -262,7 +241,6 @@ const ProfileSearch: React.FC = () => {
                 options={allConfig?.experienceOptions || []}
                 placeholder={t('employer:profileSearch.placeholder.allexperience')}
                 control={control}
-                theme={theme}
               />
               <FilterGroup
                 label={t('employer:profileSearch.label.position')}
@@ -271,7 +249,6 @@ const ProfileSearch: React.FC = () => {
                 options={allConfig?.positionOptions || []}
                 placeholder={t('employer:profileSearch.placeholder.allpositions')}
                 control={control}
-                theme={theme}
               />
               <FilterGroup
                 label={t('employer:profileSearch.label.academicLevel')}
@@ -280,7 +257,6 @@ const ProfileSearch: React.FC = () => {
                 options={allConfig?.academicLevelOptions || []}
                 placeholder={t('employer:profileSearch.placeholder.allacademiclevels')}
                 control={control}
-                theme={theme}
               />
               <FilterGroup
                 label={t('employer:profileSearch.label.workplace')}
@@ -289,7 +265,6 @@ const ProfileSearch: React.FC = () => {
                 options={allConfig?.typeOfWorkplaceOptions || []}
                 placeholder={t('employer:profileSearch.placeholder.allworkplaces')}
                 control={control}
-                theme={theme}
               />
               <FilterGroup
                 label={t('employer:profileSearch.label.employmentType')}
@@ -298,7 +273,6 @@ const ProfileSearch: React.FC = () => {
                 options={allConfig?.jobTypeOptions || []}
                 placeholder={t('employer:profileSearch.placeholder.allemploymenttypes')}
                 control={control}
-                theme={theme}
               />
               <FilterGroup
                 label={t('employer:profileSearch.label.gender')}
@@ -307,7 +281,6 @@ const ProfileSearch: React.FC = () => {
                 options={allConfig?.genderOptions || []}
                 placeholder={t('employer:profileSearch.placeholder.allgenders')}
                 control={control}
-                theme={theme}
               />
               <FilterGroup
                 label={t('employer:profileSearch.label.maritalStatus')}
@@ -316,7 +289,6 @@ const ProfileSearch: React.FC = () => {
                 options={allConfig?.maritalStatusOptions || []}
                 placeholder={t('employer:profileSearch.placeholder.allmaritalstatuses')}
                 control={control}
-                theme={theme}
               />
             </Stack>
           </Stack>

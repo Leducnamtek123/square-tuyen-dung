@@ -11,6 +11,7 @@ from rest_framework import serializers
 
 from django.db import transaction
 from django.utils import timezone
+from apps.content.system_settings import auto_approve_jobs_enabled
 
 from .models import (
 
@@ -287,7 +288,11 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 'quantity', 'position', 'experience', 'academic_level',
             }
             if set(validated_data.keys()) & SENSITIVE_FIELDS:
-                validated_data['status'] = var_sys.JobPostStatus.PENDING
+                validated_data['status'] = (
+                    var_sys.JobPostStatus.APPROVED
+                    if auto_approve_jobs_enabled()
+                    else var_sys.JobPostStatus.PENDING
+                )
 
             with transaction.atomic():
                 if location_data and instance.location:

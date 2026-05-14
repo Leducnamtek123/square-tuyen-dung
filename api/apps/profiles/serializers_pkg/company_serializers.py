@@ -21,6 +21,7 @@ from ..models import (
     Company, CompanyFollowed, CompanyImage,
     CompanyRole, CompanyMember, TrustReport, CompanyVerification
 )
+from apps.accounts.models import User
 from apps.files.models import File
 from apps.locations.models import Location
 from apps.accounts import serializers as auth_serializers
@@ -227,6 +228,62 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   'followNumber', 'jobPostNumber', 'isFollowed',
                   'companyImages', 'mobileUserDict')
 
+    def validate(self, attrs):
+        request = self.context.get("request")
+        if self.instance is None and request and getattr(request.user, "role_name", None) == var_sys.ADMIN:
+            email = attrs.get("company_email")
+            owner = User.objects.filter(email__iexact=email).first() if email else None
+            if owner and Company.objects.filter(user=owner).exists():
+                raise serializers.ValidationError({
+                    "companyEmail": "This email already owns a company."
+                })
+            if owner and owner.role_name == var_sys.ADMIN:
+                raise serializers.ValidationError({
+                    "companyEmail": "Admin accounts cannot be assigned as company owners."
+                })
+        return attrs
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        location_data = validated_data.pop("location", None)
+
+        try:
+            with transaction.atomic():
+                location_obj = Location.objects.create(**location_data) if location_data else None
+                user = request.user if request and request.user.is_authenticated else None
+
+                if request and getattr(request.user, "role_name", None) == var_sys.ADMIN:
+                    email = validated_data.get("company_email")
+                    full_name = validated_data.get("company_name") or email
+                    user = User.objects.filter(email__iexact=email).first()
+                    if user:
+                        user.role_name = var_sys.EMPLOYER
+                        user.has_company = True
+                        user.is_active = True
+                        user.is_verify_email = True
+                        user.save(update_fields=["role_name", "has_company", "is_active", "is_verify_email", "update_at"])
+                    else:
+                        user = User.objects.create_user_with_role_name(
+                            email=email,
+                            full_name=full_name,
+                            role_name=var_sys.EMPLOYER,
+                            password=None,
+                            is_active=True,
+                            has_company=True,
+                            is_verify_email=True,
+                        )
+                elif user:
+                    user.has_company = True
+                    user.save(update_fields=["has_company", "update_at"])
+
+                if not user:
+                    raise serializers.ValidationError({"user": "Company owner is required."})
+
+                return Company.objects.create(user=user, location=location_obj, **validated_data)
+        except Exception as ex:
+            helper.print_log_error("create company", ex)
+            raise
+
     def update(self, instance, validated_data):
         try:
             instance.tax_code = validated_data.get('tax_code', instance.tax_code)
@@ -250,6 +307,7 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                     if location_obj:
                         location_obj.city = location_data.get("city", location_obj.city)
                         location_obj.district = location_data.get("district", location_obj.district)
+                        location_obj.ward = location_data.get("ward", location_obj.ward)
                         location_obj.address = location_data.get("address", location_obj.address)
                         location_obj.lat = location_data.get("lat", location_obj.lat)
                         location_obj.lng = location_data.get("lng", location_obj.lng)

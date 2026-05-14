@@ -61,6 +61,28 @@ const InterviewCreateCardForm = ({
   onOpenAddQuestion,
   onOpenEditQuestion,
 }: Props) => {
+  const jobPostSlotProps = React.useMemo(() => ({
+    input: {
+      startAdornment: (
+        <InputAdornment position="start">
+          <WorkIcon sx={{ fontSize: 20, color: 'primary.main' }} />
+        </InputAdornment>
+      ),
+    },
+    inputLabel: { sx: { fontWeight: 600 } },
+  }), []);
+
+  const candidateSlotProps = React.useMemo(() => ({
+    input: {
+      startAdornment: (
+        <InputAdornment position="start">
+          <PersonIcon sx={{ fontSize: 20, color: 'secondary.main' }} />
+        </InputAdornment>
+      ),
+    },
+    inputLabel: { sx: { fontWeight: 600 } },
+  }), []);
+
   return (
     <Paper
       elevation={0}
@@ -131,16 +153,7 @@ const InterviewCreateCardForm = ({
                     helperText={errors.job_post?.message}
                     disabled={isLoadingJobs}
                     sx={inputSx}
-                    slotProps={{
-                      input: {
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <WorkIcon sx={{ fontSize: 20, color: 'primary.main' }} />
-                          </InputAdornment>
-                        ),
-                      },
-                      inputLabel: { sx: { fontWeight: 600 } },
-                    }}
+                    slotProps={jobPostSlotProps}
                   >
                     {jobs.map((job) => (
                       <MenuItem key={job.id} value={job.id} sx={{ fontWeight: 600 }}>
@@ -167,16 +180,7 @@ const InterviewCreateCardForm = ({
                     error={!!errors.candidate}
                     helperText={errors.candidate?.message}
                     sx={inputSx}
-                    slotProps={{
-                      input: {
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <PersonIcon sx={{ fontSize: 20, color: 'secondary.main' }} />
-                          </InputAdornment>
-                        ),
-                      },
-                      inputLabel: { sx: { fontWeight: 600 } },
-                    }}
+                    slotProps={candidateSlotProps}
                   >
                     {candidates.length === 0 && !isLoadingCandidates && selectedJobPostId ? (
                       <MenuItem disabled value="">

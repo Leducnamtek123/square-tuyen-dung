@@ -11,6 +11,7 @@
     "exploreDescription": "Bắt đầu từ một nơi duy nhất để tìm việc, xem công ty, lọc theo ngành và đi nhanh đến hành động tiếp theo.",
     "startExploring": "Bắt đầu khám phá",
     "userFeedback": "Đánh giá từ người dùng",
+    "userFeedbackSubtitle": "Đánh giá thật từ người dùng giúp trải nghiệm tuyển dụng thêm tin cậy.",
     "noFeedbacks": "Chưa có người dùng nào đánh giá",
     "noCompaniesFound": "Hiện chưa tìm công ty phù hợp với tiêu chí của bạn",
     "jobsCount": "{{count}} Việc Làm",
@@ -95,7 +96,8 @@
       "applied": "Đã ứng tuyển",
       "save": "Lưu tin",
       "saved": "Đã lưu",
-      "share": "Chia sẻ"
+      "share": "Chia sẻ",
+      "report": "Báo cáo"
     }
   },
   "jobSearch": {

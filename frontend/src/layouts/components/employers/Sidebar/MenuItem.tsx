@@ -22,7 +22,7 @@ interface MenuItemProps {
 }
 
 const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementType; href?: string; target?: string; rel?: string }>(({ theme }) => ({
-  borderRadius: '8px',
+  borderRadius: 0,
   marginBottom: '2px',
   color: theme.palette.text.secondary,
   textDecoration: 'none',

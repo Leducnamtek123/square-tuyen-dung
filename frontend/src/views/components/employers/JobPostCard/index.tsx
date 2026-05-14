@@ -1,10 +1,9 @@
 'use client';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Divider, LinearProgress, Stack, Typography, Paper, Tooltip, Theme } from "@mui/material";
+import { Box, Button, Stack, Typography, Paper, Theme } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import {
   convertEditorStateToHTMLString,
@@ -26,6 +25,7 @@ import { useDataTable } from '../../../../hooks';
 import { useEmployerJobPosts, useJobPostMutations } from '../hooks/useEmployerQueries';
 import type { ApiError } from '../../../../types/api';
 import type { JobPostInput } from '../../../../services/jobService';
+import FilterBar from '@/components/Common/FilterBar';
 
 type JobPostEditData = Partial<JobPostFormValues> & { id?: string | number };
 
@@ -282,7 +282,7 @@ const JobPostCard = () => {
               startIcon={<FileDownloadOutlinedIcon />} 
               onClick={handleExport} 
               sx={{ 
-                borderRadius: 2.5, 
+                 
                 px: 3, 
                 py: 1,
                 fontWeight: 800, 
@@ -298,7 +298,7 @@ const JobPostCard = () => {
               startIcon={<AddIcon />} 
               onClick={handleShowAdd} 
               sx={{ 
-                borderRadius: 3, 
+                 
                 px: 4, 
                 py: 1.25,
                 boxShadow: (theme: Theme) => theme.customShadows?.primary, 
@@ -311,37 +311,11 @@ const JobPostCard = () => {
           </Stack>
         </Stack>
 
-        <Paper
-          elevation={0}
-          sx={{
-            p: 3,
-            mb: 5,
-            borderRadius: 3,
-            bgcolor: 'background.neutral',
-            border: '1px solid',
-            borderColor: 'divider'
-          }}
-        >
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', md: 'center' }}>
-            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 140 }}>
-              <Box sx={{ 
-                p: 0.75, 
-                borderRadius: 1.5, 
-                bgcolor: 'primary.extralight', 
-                color: 'primary.main',
-                display: 'flex'
-              }}>
-                <FilterListIcon sx={{ fontSize: 20 }} />
-              </Box>
-              <Typography variant="subtitle1" sx={{ color: 'text.primary', fontWeight: 900, letterSpacing: '0.5px' }}>
-                {t('jobPost.filter').toUpperCase()}
-              </Typography>
-            </Stack>
-            <Box flex={1} width="100%">
-              <JobPostFilterForm handleFilter={handleFilter} />
-            </Box>
-          </Stack>
-        </Paper>
+        <FilterBar title={t('jobPost.filter')} sx={{ mb: 5 }}>
+          <Box sx={{ width: '100%', minWidth: 0 }}>
+            <JobPostFilterForm handleFilter={handleFilter} />
+          </Box>
+        </FilterBar>
 
         <JobPostsTable
           rows={data?.results || []}

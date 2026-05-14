@@ -22,8 +22,10 @@
       "actions": "Actions",
       "tooltips": {
         "view": "View profile",
-        "delete": "Delete profile"
-      }
+        "delete": "Delete profile",
+        "scheduleInterview": "Schedule interview"
+      },
+      "clickToDownload": "Click to download"
     },
     "ai": {
       "analysisStarted": "AI analysis started. Please wait a few seconds.",
@@ -57,6 +59,9 @@
       "allSkillsTitle": "All skills",
       "noData": "No data",
       "resumeTitle": "Candidate resume",
+      "onlineResumeLabel": "Online profile",
+      "onlineResumeHint": "AI will analyze the candidate's online profile.",
+      "viewOnlineProfile": "View online profile",
       "viewAnalysis": "View AI Analysis",
       "failed": "AI analysis failed"
     },
@@ -131,7 +136,8 @@
     "recruitmentChart": "RECRUITMENT CHART",
     "candidateChart": "CANDIDATE CHART",
     "applicationChart": "RECRUITMENT & APPLICATION CHART",
-    "academicChart": "RECRUITMENT BY ACADEMIC LEVEL"
+    "academicChart": "RECRUITMENT BY ACADEMIC LEVEL",
+    "interviewChart": "INTERVIEW STATISTICS"
   },
   "jobPost": {
     "title": "Job Post Management",
@@ -286,7 +292,11 @@
       "totaljobposts": "Total Job Posts",
       "pendingjobposts": "Pending Job Posts",
       "expiredjobposts": "Expired Job Posts",
-      "totalapplications": "Total Applications"
+      "totalapplications": "Total Applications",
+      "totalinterviews": "Total Interviews",
+      "completedinterviews": "Completed Interviews",
+      "conversionrate": "Conversion Rate",
+      "avgaiscore": "Avg AI Score"
     }
   },
   "interviewCreateCard": {
@@ -356,7 +366,8 @@
       "tone": "Tone",
       "culturalFit": "Cultural Fit",
       "questionPerformance": "Question Performance",
-      "question": "Question"
+      "question": "Question",
+      "aiOverallQuality": "AI overall quality"
     },
     "tooltips": {
       "cannotJoin": "Cannot join at this time",
@@ -378,6 +389,7 @@
       "noTranscriptDesc": "No conversation has been recorded yet."
     },
     "actions": {
+      "triggerAi": "Trigger AI Evaluation",
       "backToList": "Back to list",
       "viewReport": "View detailed report",
       "openRecording": "Open recording",
@@ -388,6 +400,7 @@
       "professionalScore": "Professional Score",
       "overallScore": "Overall Score",
       "resultLabel": "Final Result",
+      "commentsPlaceholder": "Add HR notes and final assessment...",
       "comments": "Detailed Comments",
       "proposedSalary": "Proposed Salary (VND)",
       "submitEvaluation": "Submit Final Evaluation",
@@ -406,6 +419,7 @@
     "validation": {
       "jobnameisrequired": "Job name is required.",
       "jobnameexceededallowedlength": "Job name exceeded allowed length.",
+      "interviewtemplateinvalid": "Invalid interview template selection.",
       "careerisrequired": "Career is required.",
       "positionisrequired": "Position is required.",
       "experienceisrequired": "Experience is required.",
@@ -462,6 +476,7 @@
       "jobdescription": "Job Description",
       "jobrequirement": "Job Requirement",
       "benefits": "Benefits",
+      "interviewtemplate": "Interview Template",
       "cityprovince": "City/Province",
       "district": "District",
       "address": "Address",
@@ -485,6 +500,7 @@
       "enterminimumsalary": "Enter minimum salary",
       "entermaximumsalary": "Enter maximum salary",
       "selectacademiclevel": "Select academic level",
+      "selectinterviewtemplate": "Select an interview template for automated preliminary assessment...",
       "selectcityprovince": "Select city/province",
       "selectdistrict": "Select district",
       "enteraddress": "Enter address",
@@ -499,6 +515,11 @@
     },
     "label": {
       "isUrgent": "Urgent Hiring"
+    },
+    "section": {
+      "basicInfo": "Basic Information",
+      "location": "Work Location",
+      "contact": "Contact Information"
     }
   },
   "profileCard": {
@@ -563,6 +584,7 @@
     },
     "onlineInterview": "Online Interview",
     "questionGroups": "Question Groups",
+    "filters": "Question group filters",
     "addQuestionGroup": "Add Question Group",
     "table": {
       "groupName": "Question Group Name",
@@ -631,6 +653,7 @@
     "onlineInterviews": "Online Interviews",
     "interviewList": "Interview List",
     "interviewLive": "Live Interview Room",
+    "interviewHistory": "Video Library",
     "questionBank": "Question Bank",
     "questionSets": "Question Sets",
     "notifications": "Notifications",
@@ -649,6 +672,7 @@
   "interviewHistory": {
     "title": "Video Library",
     "subtitle": "Review and download completed interview sessions.",
+    "filterTitle": "Interview history filters",
     "searchPlaceholder": "Search candidate, position...",
     "noRecording": "No recording",
     "viewMode": {
@@ -663,10 +687,24 @@
   "interviewLive": {
     "title": "Live Interviews",
     "scheduleBtn": "Schedule Interview",
+    "subtitle": "Only live sessions and candidate realtime previews are shown.",
     "stats": {
       "inProgress": "In Progress: {{count}}",
       "scheduled": "Scheduled: {{count}}",
-      "completed": "Completed: {{count}}"
+      "completed": "Completed: {{count}}",
+      "inProgressLabel": "In Progress",
+      "scheduledLabel": "Scheduled",
+      "completedLabel": "Completed"
+    },
+    "autoRefresh": {
+      "on": "Auto refresh: ON",
+      "off": "Auto refresh: OFF"
+    },
+    "updating": "Updating...",
+    "activeNow": "Active Now",
+    "noData": {
+      "title": "No live sessions yet",
+      "subtitle": "When a candidate turns on camera or mic, their realtime card will appear here."
     },
     "table": {
       "candidate": "Candidate",
@@ -795,6 +833,10 @@
     "label": {
       "lastUpdated": "Updated:",
       "lastViewed": "Last viewed:",
+      "onlineCv": "Online CV",
+      "attachedCv": "Attached CV",
+      "active": "Active",
+      "inactive": "Inactive",
       "printProfile": "Print profile",
       "saveProfile": "Save profile",
       "saved": "Saved",
@@ -822,7 +864,12 @@
       "major": "Major",
       "school": "School",
       "proficiency": "Proficiency Level",
-      "noExpiration": "No expiration"
+      "noExpiration": "No expiration",
+      "issuedDate": "Issued Date",
+      "views": "Views",
+      "contactInfo": "Contact information",
+      "quickFacts": "Quick facts",
+      "profileType": "Profile type"
     },
     "messages": {
       "saveSuccess": "Saved successfully.",
@@ -835,7 +882,10 @@
   "common": {
     "notUpdated": "Not updated",
     "present": "Present",
-    "appName": "Square Tuyển Dụng"
+    "appName": "Square Tuyển Dụng",
+    "search": "Search",
+    "clearFilters": "Clear filters",
+    "advancedFilters": "Advanced filters"
   },
   "company": {
     "tabs": {
@@ -863,6 +913,20 @@
       "update": "Update"
     },
     "title": "Company Profile"
+  },
+  "interviewChart": {
+    "labels": {
+      "completed": "Completed",
+      "scheduled": "Scheduled",
+      "inProgress": "In Progress",
+      "cancelled": "Cancelled"
+    },
+    "tooltip": "Interview performance breakdown by month",
+    "passed": "Passed",
+    "failed": "Failed",
+    "pending": "Pending",
+    "avgDuration": "Avg Duration",
+    "noData": "No interview data available"
   },
   "pricing": {
     "heroTitle": "HR Investment Solutions",
@@ -999,6 +1063,9 @@
   "blog": {
     "title": "Recruitment Blog",
     "subtitle": "A place to update knowledge and experience for employers. Content will be added continuously according to each topic.",
+    "filter": {
+      "title": "Blog filters"
+    },
     "placeholders": {
       "exp_title": "Sharing recruitment experience",
       "exp_desc": "Content is being updated to bring useful information.",
@@ -1306,6 +1373,10 @@
     "fair": "Fair",
     "poor": "Not a match"
   },
+  "auto": {
+    "ScoreGauge_ai_matching_score_158d": "AI Matching Score",
+    "index_try_adjusting_your_search_filt_5ec9": "Try adjusting your search filters or keywords to discover more talented candidates."
+  },
   "interviewListCard": {
     "editInterview": "Edit Interview",
     "description": "View and manage your scheduled interviews",
@@ -1326,5 +1397,13 @@
       "pleaseUpload": "Please attach a CV or create a new one.",
       "createNow": "Create resume now"
     }
+  },
+  "form": {
+    "district": "Ward",
+    "districtPlaceholder": "Select ward"
+  },
+  "questionBank": {
+    "deleteTitle": "Delete question",
+    "hint": "Keep the question clear and concise."
   }
 }

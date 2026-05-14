@@ -13,6 +13,12 @@ const adminInterviewService = {
   getInterviewDetail: (id: IdType): Promise<InterviewSession> => {
     return httpRequest.get<InterviewSession>(`interview/admin/sessions/${id}/`);
   },
+  updateInterviewStatus: (id: IdType, status: string): Promise<InterviewSession> => {
+    return httpRequest.patch<InterviewSession>(`interview/admin/sessions/${id}/`, { status });
+  },
+  deleteInterview: (id: IdType): Promise<void> => {
+    return httpRequest.delete(`interview/admin/sessions/${id}/`);
+  },
 };
 
 export default adminInterviewService;

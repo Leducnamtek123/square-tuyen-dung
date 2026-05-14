@@ -13,7 +13,6 @@ import {
   DialogTitle,
   FormHelperText,
   IconButton,
-  InputAdornment,
   Link,
   Paper,
   Stack,
@@ -24,7 +23,6 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ImageIcon from '@mui/icons-material/Image';
-import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +32,7 @@ import { useDataTable, useDebounce } from '../../../hooks';
 import { Career } from '../../../types/models';
 import type { CareerPayload } from '../../../services/adminManagementService';
 import { useCareers } from './hooks/useCareers';
+import FilterBar from '@/components/Common/FilterBar';
 
 type CareersPageState = {
   searchTerm: string;
@@ -342,8 +341,8 @@ const CareersPage = () => {
     ordering,
   });
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: 'set_search_term', value: e.target.value });
+  const handleSearch = (value: string) => {
+    dispatch({ type: 'set_search_term', value });
     onPaginationChange({ pageIndex: 0, pageSize });
   };
 
@@ -521,24 +520,15 @@ const CareersPage = () => {
       </Box>
 
       <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
-        <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
-          <TextField
-            size="small"
-            placeholder={t('pages.careers.searchPlaceholder')}
-            value={state.searchTerm}
-            onChange={handleSearch}
-            sx={{ width: 400, maxWidth: '100%' }}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" color="action" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        </Box>
+        <FilterBar
+          title={t('pages.careers.filter.title', 'Bộ lọc ngành nghề')}
+          searchValue={state.searchTerm}
+          searchPlaceholder={t('pages.careers.searchPlaceholder')}
+          onSearchChange={handleSearch}
+          onReset={() => handleSearch('')}
+          resetDisabled={!state.searchTerm}
+          resetLabel={t('common.clearFilters', 'Xóa lọc')}
+        />
 
         <DataTable
           columns={columns}

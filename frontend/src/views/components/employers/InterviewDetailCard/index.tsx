@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Box, Grid2 as Grid, Paper, Skeleton, Stack, Typography } from '@mui/material';
+import { Box, Button, Grid2 as Grid, Paper, Skeleton, Stack, Typography } from '@mui/material';
 import { LiveKitRoom, SessionProvider, useSession } from '@livekit/components-react';
 import { TokenSource } from 'livekit-client';
 import { useTranslation } from 'react-i18next';
@@ -119,19 +119,19 @@ const reducer = (state: State, action: Action): State => {
 };
 
 const InterviewDetailSkeleton = () => (
-  <Box sx={{ p: 4 }}>
-    <Skeleton variant="text" width={200} height={40} sx={{ mb: 3 }} />
-    <Grid container spacing={4}>
+  <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1440, mx: 'auto' }}>
+    <Skeleton variant="text" width={220} height={36} sx={{ mb: 3 }} />
+    <Grid container spacing={3}>
       <Grid size={{ xs: 12, lg: 4 }}>
-        <Stack spacing={4}>
-          <Skeleton variant="rectangular" height={350} sx={{ borderRadius: 4 }} />
-          <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 4 }} />
+        <Stack spacing={3}>
+          <Skeleton variant="rectangular" height={280} sx={{ borderRadius: 2 }} />
+          <Skeleton variant="rectangular" height={180} sx={{ borderRadius: 2 }} />
         </Stack>
       </Grid>
       <Grid size={{ xs: 12, lg: 8 }}>
-        <Stack spacing={4}>
-          <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 4 }} />
-          <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 4 }} />
+        <Stack spacing={3}>
+          <Skeleton variant="rectangular" height={320} sx={{ borderRadius: 2 }} />
+          <Skeleton variant="rectangular" height={480} sx={{ borderRadius: 2 }} />
         </Stack>
       </Grid>
     </Grid>
@@ -149,16 +149,16 @@ const InterviewDetailNotFound = ({
   actionLabel: string;
   onBack: () => void;
 }) => (
-  <Paper elevation={0} sx={{ textAlign: 'center', py: 12, borderRadius: 4, bgcolor: 'background.neutral', border: '1px dashed', borderColor: 'divider' }}>
-    <Typography color="text.secondary" variant="h5" sx={{ fontWeight: 800, mb: 1 }}>
+  <Paper elevation={0} sx={{ textAlign: 'center', py: 10, px: 3, borderRadius: 2, bgcolor: 'background.paper', border: '1px dashed', borderColor: 'divider' }}>
+    <Typography color="text.primary" variant="h5" sx={{ fontWeight: 800, mb: 1, letterSpacing: 0 }}>
       {title}
     </Typography>
     <Typography color="text.disabled" variant="body2" sx={{ fontWeight: 600, mb: 4 }}>
       {description}
     </Typography>
-    <Box component="button" onClick={onBack} sx={{ borderRadius: 2.5, fontWeight: 800, px: 4, py: 1.25, textTransform: 'none' }}>
+    <Button variant="contained" onClick={onBack} sx={{ fontWeight: 800, px: 3, textTransform: 'none' }}>
       {actionLabel}
-    </Box>
+    </Button>
   </Paper>
 );
 
@@ -248,12 +248,12 @@ const InterviewDetailCard = () => {
     try {
       await submitEvaluation({
         interview: Number(id),
-        attitudeScore: Number(state.evalForm.attitude_score),
-        professionalScore: Number(state.evalForm.professional_score),
-        overallScore: (Number(state.evalForm.attitude_score) + Number(state.evalForm.professional_score)) / 2,
+        attitude_score: Number(state.evalForm.attitude_score),
+        professional_score: Number(state.evalForm.professional_score),
+        overall_score: (Number(state.evalForm.attitude_score) + Number(state.evalForm.professional_score)) / 2,
         result: state.evalForm.result,
         comments: state.evalForm.comments,
-        proposedSalary: Number(state.evalForm.proposed_salary),
+        proposed_salary: Number(state.evalForm.proposed_salary),
       });
       toastMessages.success(t('interview:interviewDetail.messages.evaluationSuccess'));
     } catch {
@@ -314,12 +314,14 @@ const InterviewDetailCard = () => {
 
   if (!session) {
     return (
-      <InterviewDetailNotFound
-        title={t('interview:interviewDetail.messages.notFound')}
-        description={t('interview:interviewDetail.messages.notFoundDesc')}
-        actionLabel={t('interview:interviewDetail.actions.backToList')}
-        onBack={() => back()}
-      />
+      <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1440, mx: 'auto' }}>
+        <InterviewDetailNotFound
+          title={t('interview:interviewDetail.messages.notFound')}
+          description={t('interview:interviewDetail.messages.notFoundDesc')}
+          actionLabel={t('interview:interviewDetail.actions.backToList')}
+          onBack={() => back()}
+        />
+      </Box>
     );
   }
 
@@ -375,9 +377,9 @@ const InterviewDetailCard = () => {
         t={t}
       />
 
-      <Grid container spacing={5}>
+      <Grid container spacing={3}>
         <Grid size={{ xs: 12, lg: 4 }}>
-          <Stack spacing={5}>
+          <Stack spacing={3}>
             <InterviewInfoCard session={session} t={t} i18n={i18n} />
             <InterviewAiEvaluationCard session={session} effectiveStatus={effectiveStatus} t={t} onTriggerAi={handleTriggerAi} isTriggeringAi={state.isTriggeringAi} />
             <InterviewHrEvaluationForm
@@ -393,7 +395,7 @@ const InterviewDetailCard = () => {
         </Grid>
 
         <Grid size={{ xs: 12, lg: 8 }}>
-          <Stack spacing={5}>
+          <Stack spacing={3}>
             <InterviewRecordingCard recordingUrl={recordingUrl} isCompleted={effectiveStatus === 'completed'} t={t} />
             <InterviewAnalysisPanel session={session} t={t} />
             {liveKitReady ? (
@@ -421,7 +423,7 @@ const InterviewDetailCard = () => {
   );
 
   return (
-    <Paper elevation={0} sx={{ p: { xs: 3, sm: 6 }, backgroundColor: 'background.paper', borderRadius: 4, boxShadow: (theme) => theme.customShadows?.z1, border: '1px solid', borderColor: 'divider' }}>
+    <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1440, mx: 'auto' }}>
       {liveKitReady ? (
         <LiveKitRoom
           token={state.connectionDetails!.token}
@@ -438,7 +440,7 @@ const InterviewDetailCard = () => {
       ) : (
         detailContent
       )}
-    </Paper>
+    </Box>
   );
 };
 

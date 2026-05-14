@@ -1,11 +1,12 @@
 import React from 'react';
-import { alpha, Box, Button, Chip, Stack, Typography, Tooltip, IconButton } from '@mui/material';
+import { Box, Button, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import type { TFunction } from 'i18next';
+import pc from '@/utils/muiColors';
 import type { InterviewSession } from '../../../../types/models';
 
 type Props = {
@@ -43,6 +44,15 @@ const getStatusColor = (status: string | undefined): 'success' | 'primary' | 'er
   }
 };
 
+const statusChipColors: Record<string, { bg: string; border: string }> = {
+  success: { bg: pc.success(0.08), border: pc.success(0.18) },
+  primary: { bg: pc.primary(0.08), border: pc.primary(0.16) },
+  error: { bg: pc.error(0.08), border: pc.error(0.16) },
+  info: { bg: pc.info(0.08), border: pc.info(0.16) },
+  warning: { bg: pc.warning(0.08), border: pc.warning(0.18) },
+  default: { bg: pc.actionDisabled(0.12), border: pc.divider(0.7) },
+};
+
 const InterviewDetailHeader = ({
   session,
   effectiveStatus,
@@ -63,38 +73,44 @@ const InterviewDetailHeader = ({
   const statusDefaultValue = effectiveStatus ? effectiveStatus.replaceAll('_', ' ').toUpperCase() : '';
   const statusTranslationKey = effectiveStatus ? `interview:interviewListCard.statuses.${effectiveStatus}` : undefined;
   const isInterrupted = normalizedStatus === 'interrupted';
+  const chipColors = statusChipColors[themeStatus] ?? statusChipColors.default;
+  const subtitle = [session.candidateName, session.jobName].filter(Boolean).join(' | ');
 
-  // Hardcoded rgba values — alpha(var(--mui-palette-X-main), n) crashes in MUI v6 (Error #9)
-  const STATUS_CHIP: Record<string, { bg: string; border: string }> = {
-    success: { bg: 'rgba(5, 150, 105, 0.08)',  border: 'rgba(5, 150, 105, 0.1)' },
-    primary: { bg: 'rgba(26, 64, 125, 0.08)',  border: 'rgba(26, 64, 125, 0.1)' },
-    error:   { bg: 'rgba(220, 38, 38, 0.08)',  border: 'rgba(220, 38, 38, 0.1)' },
-    info:    { bg: 'rgba(42, 169, 225, 0.08)', border: 'rgba(42, 169, 225, 0.1)' },
-    warning: { bg: 'rgba(245, 158, 11, 0.08)', border: 'rgba(245, 158, 11, 0.1)' },
-    default: { bg: 'rgba(100, 116, 139, 0.08)', border: 'rgba(100, 116, 139, 0.1)' },
-  };
-  const chipColors = STATUS_CHIP[themeStatus] ?? STATUS_CHIP.default;
+  const actionButtonSx = {
+    borderRadius: 2,
+    minHeight: 42,
+    px: 2,
+    fontWeight: 800,
+    textTransform: 'none',
+    fontSize: '0.9rem',
+    boxShadow: 'none',
+    whiteSpace: 'nowrap',
+  } as const;
 
   return (
-    <>
-      <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 5 }}>
+    <Box sx={{ mb: 3, pb: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
+      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
         <IconButton
           onClick={onBack}
+          size="small"
           sx={{
+            width: 34,
+            height: 34,
             color: 'text.secondary',
-            bgcolor: alpha('#000', 0.04),
-            borderRadius: 1.5,
-            '&:hover': { bgcolor: alpha('#1976d2', 0.08), color: 'primary.main' },
-            transition: 'all 0.2s',
+            bgcolor: pc.primary(0.05),
+            
+            border: '1px solid',
+            borderColor: pc.primary(0.08),
+            '&:hover': { bgcolor: pc.primary(0.1), color: 'primary.main' },
           }}
         >
           <ArrowBackIcon fontSize="small" />
         </IconButton>
         <Typography
-          variant="subtitle2"
+          variant="body2"
           onClick={onBack}
           sx={{
-            fontWeight: 900,
+            fontWeight: 800,
             color: 'text.secondary',
             cursor: 'pointer',
             '&:hover': { color: 'primary.main' },
@@ -104,97 +120,111 @@ const InterviewDetailHeader = ({
         </Typography>
       </Stack>
 
-      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }} spacing={4} mb={8}>
-        <Box>
-          <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2.5 }}>
-            <Typography variant="h2" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1.5px' }}>
-              {t('interview:interviewDetail.title')}
-            </Typography>
+      <Stack
+        direction={{ xs: 'column', lg: 'row' }}
+        justifyContent="space-between"
+        alignItems={{ xs: 'stretch', lg: 'flex-end' }}
+        spacing={2.5}
+      >
+        <Box sx={{ minWidth: 0 }}>
+          <Stack direction="row" alignItems="center" spacing={1.25} sx={{ mb: 1.25, flexWrap: 'wrap' }}>
             <Chip
               label={statusTranslationKey ? t(statusTranslationKey, { defaultValue: statusDefaultValue }) : statusDefaultValue}
               size="small"
               sx={{
-                fontWeight: 900,
+                height: 26,
+                fontWeight: 800,
                 borderRadius: 1.5,
-                px: 1,
+                px: 0.5,
                 bgcolor: chipColors.bg,
                 color: themeStatus === 'default' ? 'text.secondary' : `${themeStatus}.main`,
                 border: '1px solid',
                 borderColor: chipColors.border,
                 textTransform: 'uppercase',
-                fontSize: '0.75rem',
-                letterSpacing: '0.5px',
+                fontSize: '0.72rem',
+                letterSpacing: 0,
               }}
             />
             {isInterrupted && (
               <Chip
-                label={t('interview:interviewDetail.status.interruptedResume', { defaultValue: 'TẠM NGẮT, CÓ THỂ TIẾP TỤC' })}
+                label={t('interview:interviewDetail.status.interruptedResume', { defaultValue: 'Interrupted, can resume' })}
                 size="small"
                 sx={{
-                  fontWeight: 900,
+                  height: 26,
+                  fontWeight: 800,
                   borderRadius: 1.5,
-                  px: 1,
-                  bgcolor: 'rgba(245, 158, 11, 0.08)',
+                  bgcolor: pc.warning(0.08),
                   color: 'warning.main',
                   border: '1px solid',
-                  borderColor: 'rgba(245, 158, 11, 0.18)',
-                  textTransform: 'uppercase',
+                  borderColor: pc.warning(0.18),
                   fontSize: '0.72rem',
-                  letterSpacing: '0.5px',
+                  letterSpacing: 0,
                 }}
               />
             )}
             {isSessionActive && sseConnected && (
               <Chip
-                icon={
-                  <FiberManualRecordIcon
-                    sx={{
-                      fontSize: '10px !important',
-                      color: '#22c55e !important',
-                      animation: 'pulse 2s infinite',
-                      '@keyframes pulse': {
-                        '0%,100%': { opacity: 1 },
-                        '50%': { opacity: 0.3 },
-                      },
-                    }}
-                  />
-                }
+                icon={<FiberManualRecordIcon sx={{ fontSize: '9px !important', color: '#22c55e !important' }} />}
                 label={t('employer:interviewLive.candidateCard.live')}
                 size="small"
                 sx={{
-                  fontWeight: 900,
-                  fontSize: '0.65rem',
-                  letterSpacing: 1.5,
-                  height: 24,
-                  bgcolor: alpha('#22c55e', 0.08),
-                  color: '#22c55e',
+                  height: 26,
+                  fontWeight: 800,
+                  fontSize: '0.72rem',
+                  letterSpacing: 0,
+                  bgcolor: pc.success(0.08),
+                  color: 'success.main',
                   border: '1px solid',
-                  borderColor: alpha('#22c55e', 0.15),
+                  borderColor: pc.success(0.18),
                 }}
               />
             )}
           </Stack>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2 }} alignItems={{ xs: 'flex-start', sm: 'center' }}>
-            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center' }}>
-              {t('interview:interviewDetail.label.roomCode')}:
+
+          <Typography variant="h4" sx={{ fontWeight: 850, color: 'text.primary', letterSpacing: 0, mb: 0.75 }}>
+            {t('interview:interviewDetail.title')}
+          </Typography>
+          {subtitle && (
+            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 650, mb: 1.75 }}>
+              {subtitle}
             </Typography>
-            <Box sx={{ fontWeight: 900, color: 'primary.main', bgcolor: alpha('#1976d2', 0.06), px: 2, py: 0.75, borderRadius: 1.5, letterSpacing: '1px', fontSize: '0.95rem', border: '1px dashed', borderColor: alpha('#1976d2', 0.2) }}>
+          )}
+
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} alignItems={{ xs: 'flex-start', sm: 'center' }}>
+            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700 }}>
+              {t('interview:interviewDetail.label.roomCode')}
+            </Typography>
+            <Box
+              sx={{
+                fontWeight: 850,
+                color: 'primary.main',
+                bgcolor: pc.primary(0.06),
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 1.5,
+                fontSize: '0.9rem',
+                border: '1px solid',
+                borderColor: pc.primary(0.14),
+                letterSpacing: 0,
+              }}
+            >
               {session.roomName}
             </Box>
-            <Typography variant="body2" color="text.disabled" sx={{ fontWeight: 600, ml: { sm: 1 } }}>
+            <Typography variant="body2" color="text.disabled" sx={{ fontWeight: 650 }}>
               ID: <Box component="span" sx={{ color: 'text.secondary', fontWeight: 800 }}>{session.id}</Box>
             </Typography>
           </Stack>
+
           {isInterrupted && (
-            <Typography variant="body2" sx={{ mt: 2, color: 'warning.main', fontWeight: 700 }}>
+            <Typography variant="body2" sx={{ mt: 1.5, color: 'warning.main', fontWeight: 650 }}>
               {t('interview:interviewDetail.messages.interruptedResumeHint', {
-                defaultValue: 'Phiên phỏng vấn đang tạm ngắt. Ứng viên vẫn có thể quay lại trong một khoảng thời gian ngắn để tiếp tục.',
+                defaultValue: 'The interview was interrupted. The candidate may return shortly to continue.',
               })}
             </Typography>
           )}
         </Box>
 
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ width: { xs: '100%', md: 'auto' } }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} sx={{ width: { xs: '100%', lg: 'auto' } }}>
           {canObserve && (
             <Tooltip title={t('interview:interviewDetail.tooltips.forceEndNow')} arrow placement="top">
               <Button
@@ -202,20 +232,14 @@ const InterviewDetailHeader = ({
                 onClick={onForceEndInterview}
                 startIcon={<StopCircleIcon />}
                 sx={{
-                  borderRadius: 3,
-                  minWidth: { xs: '100%', sm: 200 },
-                  fontWeight: 900,
-                  py: 2,
-                  px: 3,
-                  textTransform: 'none',
-                  fontSize: '0.95rem',
-                  borderColor: alpha('#ef4444', 0.4),
+                  ...actionButtonSx,
+                  minWidth: { xs: '100%', sm: 118 },
+                  borderColor: pc.error(0.28),
                   color: 'error.main',
-                  transition: 'all 0.2s',
                   '&:hover': {
                     borderColor: 'error.main',
-                    bgcolor: alpha('#ef4444', 0.04),
-                    transform: 'translateY(-2px)',
+                    bgcolor: pc.error(0.04),
+                    boxShadow: 'none',
                   },
                 }}
               >
@@ -225,27 +249,21 @@ const InterviewDetailHeader = ({
           )}
 
           {canObserve && (
-            <Tooltip title="Quan sát ẩn — ứng viên không biết bạn đang xem" arrow placement="top">
+            <Tooltip title={t('interview:interviewDetail.tooltips.observeHidden', { defaultValue: 'Observe silently' })} arrow placement="top">
               <Button
                 variant="outlined"
                 onClick={onTriggerObserver}
                 disabled={observerLoading}
                 startIcon={<VisibilityOffIcon />}
                 sx={{
-                  borderRadius: 3,
-                  minWidth: { xs: '100%', sm: 200 },
-                  fontWeight: 900,
-                  py: 2,
-                  px: 3,
-                  textTransform: 'none',
-                  fontSize: '0.95rem',
-                  borderColor: alpha('#f59e0b', 0.4),
+                  ...actionButtonSx,
+                  minWidth: { xs: '100%', sm: 128 },
+                  borderColor: pc.warning(0.3),
                   color: 'warning.main',
-                  transition: 'all 0.2s',
                   '&:hover': {
                     borderColor: 'warning.main',
-                    bgcolor: alpha('#f59e0b', 0.04),
-                    transform: 'translateY(-2px)',
+                    bgcolor: pc.warning(0.04),
+                    boxShadow: 'none',
                   },
                 }}
               >
@@ -255,25 +273,20 @@ const InterviewDetailHeader = ({
           )}
 
           <Tooltip title={!canJoinLiveRoom ? t('interview:interviewDetail.tooltips.cannotJoin') : ''} arrow placement="top">
-            <Box sx={{ width: { xs: '100%', md: 'auto' } }}>
+            <Box sx={{ width: { xs: '100%', lg: 'auto' } }}>
               <Button
                 variant="contained"
                 disabled={!canJoinLiveRoom || joinLoading}
                 onClick={onJoinRoom}
                 startIcon={joinLoading ? undefined : <PlayCircleOutlineIcon />}
                 sx={{
-                  borderRadius: 3,
-                  minWidth: { xs: '100%', md: 280 },
-                  boxShadow: (theme) => theme.customShadows?.primary,
-                  fontWeight: 900,
-                  py: 2,
-                  px: 4,
-                  textTransform: 'none',
-                  fontSize: '1.1rem',
-                  transition: 'all 0.2s',
+                  ...actionButtonSx,
+                  minWidth: { xs: '100%', lg: 180 },
+                  px: 2.5,
+                  bgcolor: 'primary.main',
                   '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: (theme) => theme.customShadows?.primary,
+                    bgcolor: 'primary.dark',
+                    boxShadow: 'none',
                   },
                   '&.Mui-disabled': {
                     bgcolor: 'action.disabledBackground',
@@ -281,13 +294,13 @@ const InterviewDetailHeader = ({
                   },
                 }}
               >
-                {joinLoading ? t('interviewDetail.actions.joinAsHrLoading') : t('common:actions.joinNow')}
+                {joinLoading ? t('interview:interviewDetail.actions.joinAsHrLoading') : t('common:actions.joinNow')}
               </Button>
             </Box>
           </Tooltip>
         </Stack>
       </Stack>
-    </>
+    </Box>
   );
 };
 

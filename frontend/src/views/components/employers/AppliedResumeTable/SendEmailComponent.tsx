@@ -71,7 +71,7 @@ const SendEmailComponent: React.FC<SendEmailComponentProps> = ({
           sx={{ 
             textTransform: 'none', 
             minWidth: 100,
-            borderRadius: 1.5,
+            
             fontWeight: 900,
             boxShadow: 'none',
             fontSize: '0.7rem',

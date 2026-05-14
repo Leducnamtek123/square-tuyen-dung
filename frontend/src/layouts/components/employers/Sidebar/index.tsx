@@ -37,7 +37,7 @@ const Sidebar = ({ drawerWidth, isAdmin }: SidebarProps) => {
           borderRight: '0px',
           backgroundColor: theme.palette.background.paper,
           boxShadow: (theme as Theme).customShadows?.z8,
-          borderRadius: '0px 10px 10px 0px',
+          borderRadius: 0,
         },
       }}
       open
@@ -81,7 +81,7 @@ const MobileSidebar = ({
           borderRight: '0px',
           backgroundColor: theme.palette.background.paper,
           boxShadow: (theme: StylesTheme & { customShadows?: Record<string, string> }) => theme.customShadows?.sidebar,
-          borderRadius: '0px 10px 10px 0px',
+          borderRadius: 0,
         },
       }}
     >

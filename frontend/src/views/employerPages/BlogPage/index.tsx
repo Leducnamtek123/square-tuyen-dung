@@ -2,12 +2,11 @@
 import React, { useCallback, useEffect, useReducer } from 'react';
 import {
   Box, Button, Chip, IconButton, Stack, Tooltip, Typography,
-  TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel,
+  MenuItem, Select, FormControl, InputLabel,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SearchIcon from '@mui/icons-material/Search';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +14,8 @@ import contentService, { Article, ArticleStatus } from '@/services/contentServic
 import DataTable from '@/components/Common/DataTable';
 import toastMessages from '@/utils/toastMessages';
 import dayjs from '@/configs/dayjs-config';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
+import type { SxProps, Theme } from '@mui/material/styles';
 
 const STATUS_COLOR: Record<ArticleStatus, 'default' | 'warning' | 'success' | 'error' | 'info'> = {
   draft: 'default',
@@ -29,6 +30,8 @@ const STATUS_LABEL: Record<ArticleStatus, string> = {
   published: 'Đã đăng',
   archived: 'Lưu trữ',
 };
+
+const statusFilterSx = [{ width: { xs: '100%', sm: 220 } }, filterControlSx] as SxProps<Theme>;
 
 type BlogListPagination = {
   pageIndex: number;
@@ -213,7 +216,7 @@ const EmployerBlogListPage = () => {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => push('/employer/blog/create')}
-          sx={{ borderRadius: 2, fontWeight: 700, px: 3 }}
+          sx={{ fontWeight: 700, px: 3 }}
         >
           Viết bài mới
         </Button>
@@ -225,40 +228,51 @@ const EmployerBlogListPage = () => {
         Bài viết sẽ được gửi cho Admin duyệt trước khi hiển thị trên website. Thời gian duyệt thường trong 24 giờ.
       </Box>
 
-      {/* Filters */}
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} mb={3}>
-        <FormControl size="small" sx={{ minWidth: 160 }}>
-          <InputLabel>Trạng thái</InputLabel>
-          <Select
-            value={statusFilter}
-            label="Trạng thái"
-            onChange={(e) => dispatch({ type: 'patch', patch: { statusFilter: e.target.value as ArticleStatus | 'all' } })}
-          >
-            <MenuItem value="all">Tất cả</MenuItem>
-            <MenuItem value="draft">Bản nháp</MenuItem>
-            <MenuItem value="pending">Chờ duyệt</MenuItem>
-            <MenuItem value="published">Đã đăng</MenuItem>
-          </Select>
-        </FormControl>
-
-        <TextField
-          size="small"
-          placeholder="Tìm kiếm bài viết..."
-          value={searchInput}
-          onChange={(e) => dispatch({ type: 'patch', patch: { searchInput: e.target.value } })}
-          onKeyDown={(e) => e.key === 'Enter' && dispatch({ type: 'patch', patch: { search: searchInput } })}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-              ),
-            },
-          }}
-          sx={{ flex: 1, maxWidth: 400 }}
-        />
-      </Stack>
+      <FilterBar
+        title={t('blog.filter.title', 'Bộ lọc blog')}
+        searchValue={searchInput}
+        searchPlaceholder="Tìm kiếm bài viết..."
+        onSearchChange={(value) => dispatch({ type: 'patch', patch: { searchInput: value } })}
+        onSearchSubmit={() => dispatch({ type: 'patch', patch: { search: searchInput, pagination: { ...pagination, pageIndex: 0 } } })}
+        showSearchButton
+        searchButtonLabel={t('common.search', 'Tìm kiếm')}
+        activeFilterCount={[statusFilter !== 'all', Boolean(search)].filter(Boolean).length}
+        onReset={() => dispatch({
+          type: 'patch',
+          patch: {
+            statusFilter: 'all',
+            search: '',
+            searchInput: '',
+            pagination: { ...pagination, pageIndex: 0 },
+          },
+        })}
+        resetDisabled={statusFilter === 'all' && !search && !searchInput}
+        resetLabel={t('common.clearFilters', 'Xóa lọc')}
+        advancedLabel={t('common.advancedFilters', 'Bộ lọc nâng cao')}
+        advancedDefaultOpen={statusFilter !== 'all'}
+        advancedFilters={(
+          <FormControl size="small" sx={statusFilterSx}>
+            <InputLabel>Trạng thái</InputLabel>
+            <Select
+              value={statusFilter}
+              label="Trạng thái"
+              onChange={(e) => dispatch({
+                type: 'patch',
+                patch: {
+                  statusFilter: e.target.value as ArticleStatus | 'all',
+                  pagination: { ...pagination, pageIndex: 0 },
+                },
+              })}
+            >
+              <MenuItem value="all">Tất cả</MenuItem>
+              <MenuItem value="draft">Bản nháp</MenuItem>
+              <MenuItem value="pending">Chờ duyệt</MenuItem>
+              <MenuItem value="published">Đã đăng</MenuItem>
+            </Select>
+          </FormControl>
+        )}
+      >
+      </FilterBar>
 
       {/* Table */}
       <DataTable

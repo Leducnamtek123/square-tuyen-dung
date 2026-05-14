@@ -30,7 +30,7 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
               color: "white",
               display: "block",
               whiteSpace: "nowrap",
-              borderRadius: 999,
+              
               px: 2,
               py: 0.85,
               backgroundColor: activePathname.startsWith(page.path) ? "rgba(255, 255, 255, 0.12)" : "transparent",

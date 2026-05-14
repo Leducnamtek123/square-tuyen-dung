@@ -1,26 +1,23 @@
 import React from 'react';
-import { 
-    Box, 
-    Button, 
-    CircularProgress, 
-    Divider, 
-    MenuItem, 
-    Paper, 
-    Stack, 
-    TextField, 
-    Typography,
-    InputAdornment,
-    alpha,
-    useTheme
+import {
+  Button,
+  CircularProgress,
+  InputAdornment,
+  MenuItem,
+  Paper,
+  Stack,
+  TextField,
 } from '@mui/material';
-import RateReviewIcon from '@mui/icons-material/RateReview';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 import SchoolIcon from '@mui/icons-material/School';
 import SendIcon from '@mui/icons-material/Send';
+import type { TFunction } from 'i18next';
 import type { EvalFormType } from './types';
-import { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
+import InterviewDetailSectionHeader from './InterviewDetailSectionHeader';
+import { interviewDetailCardSx } from './sectionStyles';
 
 interface InterviewHrEvaluationFormProps {
   evalForm: EvalFormType;
@@ -31,171 +28,150 @@ interface InterviewHrEvaluationFormProps {
   t: TFunction;
 }
 
-const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({ evalForm, onChange, onSubmit, disabled, submitting, t }) => {
-    const theme = useTheme();
+const inputSx = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 2,
+    backgroundColor: pc.actionDisabled(0.025),
+    '&:hover': { bgcolor: pc.actionDisabled(0.045) },
+    '& fieldset': { borderColor: pc.divider(0.8) },
+  },
+  '& .MuiInputLabel-root': { fontWeight: 650 },
+} as const;
 
-    const inputSx = {
-        '& .MuiOutlinedInput-root': {
-            borderRadius: 2.5,
-            backgroundColor: pc.actionDisabled( 0.03),
-            '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
-            '& fieldset': { borderColor: pc.divider( 0.8) }
-        }
-    };
+const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({
+  evalForm,
+  onChange,
+  onSubmit,
+  disabled,
+  submitting,
+  t,
+}) => (
+  <Paper elevation={0} sx={interviewDetailCardSx}>
+    <InterviewDetailSectionHeader
+      icon={<RateReviewIcon />}
+      title={t('interviewDetail.actions.hrEvaluation')}
+      iconColor="secondary"
+    />
 
-    return (
-        <Paper 
-            elevation={0}
-            sx={{
-                p: { xs: 3, md: 5 },
-                borderRadius: 4,
-                border: '1px solid',
-                borderColor: 'divider',
-                boxShadow: (theme) => theme.customShadows?.z1,
-                bgcolor: 'background.paper',
-                position: 'relative',
-                overflow: 'hidden'
-            }}
-        >
-            <Stack direction="row" alignItems="center" spacing={1.5} mb={3}>
-                <RateReviewIcon color="secondary" sx={{ fontSize: 24 }} />
-                <Typography variant="h6" sx={{ fontWeight: 900, color: 'secondary.main', letterSpacing: '-0.5px' }}>
-                    {t('interviewDetail.actions.hrEvaluation')}
-                </Typography>
-            </Stack>
+    <Stack spacing={2}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+        <TextField
+          label={t('interviewDetail.actions.attitudeScore')}
+          name="attitude_score"
+          type="number"
+          fullWidth
+          size="small"
+          value={evalForm.attitude_score}
+          onChange={onChange}
+          sx={inputSx}
+          slotProps={{
+            htmlInput: { min: 0, max: 10, step: 0.1 },
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EmojiEmotionsIcon sx={{ fontSize: 20, color: 'warning.main' }} />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+        <TextField
+          label={t('interviewDetail.actions.professionalScore')}
+          name="professional_score"
+          type="number"
+          fullWidth
+          size="small"
+          value={evalForm.professional_score}
+          onChange={onChange}
+          sx={inputSx}
+          slotProps={{
+            htmlInput: { min: 0, max: 10, step: 0.1 },
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SchoolIcon sx={{ fontSize: 20, color: 'info.main' }} />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+      </Stack>
 
-            <Divider sx={{ mb: 4, borderStyle: 'dashed' }} />
+      <TextField
+        select
+        label={t('interviewDetail.actions.resultLabel')}
+        name="result"
+        fullWidth
+        size="small"
+        value={evalForm.result}
+        onChange={onChange}
+        sx={inputSx}
+      >
+        <MenuItem value="pending" sx={{ fontWeight: 650 }}>{t('interviewDetail.actions.pending')}</MenuItem>
+        <MenuItem value="passed" sx={{ fontWeight: 750, color: 'success.main', bgcolor: pc.success(0.04) }}>{t('interviewDetail.actions.passed')}</MenuItem>
+        <MenuItem value="failed" sx={{ fontWeight: 750, color: 'error.main', bgcolor: pc.error(0.04) }}>{t('interviewDetail.actions.failed')}</MenuItem>
+      </TextField>
 
-            <Stack spacing={4}>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
-                    <TextField
-                        label={t('interviewDetail.actions.attitudeScore')}
-                        name="attitude_score"
-                        type="number"
-                        fullWidth
-                        value={evalForm.attitude_score}
-                        onChange={onChange}
-                        sx={inputSx}
-                        slotProps={{ 
-                            htmlInput: { min: 0, max: 10, step: 0.1 },
-                            input: {
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <EmojiEmotionsIcon sx={{ fontSize: 20, color: 'warning.main' }} />
-                                    </InputAdornment>
-                                ),
-                            },
-                            inputLabel: { sx: { fontWeight: 600 } }
-                        }}
-                    />
-                    <TextField
-                        label={t('interviewDetail.actions.professionalScore')}
-                        name="professional_score"
-                        type="number"
-                        fullWidth
-                        value={evalForm.professional_score}
-                        onChange={onChange}
-                        sx={inputSx}
-                        slotProps={{ 
-                            htmlInput: { min: 0, max: 10, step: 0.1 },
-                            input: {
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SchoolIcon sx={{ fontSize: 20, color: 'info.main' }} />
-                                    </InputAdornment>
-                                ),
-                            },
-                            inputLabel: { sx: { fontWeight: 600 } }
-                        }}
-                    />
-                </Stack>
+      <TextField
+        label={t('interviewDetail.actions.comments')}
+        name="comments"
+        multiline
+        rows={3}
+        fullWidth
+        value={evalForm.comments}
+        onChange={onChange}
+        placeholder={t('interviewDetail.actions.commentsPlaceholder', { defaultValue: 'Add HR notes and final assessment...' })}
+        sx={inputSx}
+        slotProps={{ input: { sx: { lineHeight: 1.7 } } }}
+      />
 
-                <TextField
-                    select
-                    label={t('interviewDetail.actions.resultLabel')}
-                    name="result"
-                    fullWidth
-                    value={evalForm.result}
-                    onChange={onChange}
-                    sx={inputSx}
-                    slotProps={{
-                        inputLabel: { sx: { fontWeight: 600 } }
-                    }}
-                >
-                    <MenuItem value="pending" sx={{ fontWeight: 600 }}>{t('interviewDetail.actions.pending')}</MenuItem>
-                    <MenuItem value="passed" sx={{ fontWeight: 800, color: 'success.main', bgcolor: pc.success( 0.04) }}>{t('interviewDetail.actions.passed')}</MenuItem>
-                    <MenuItem value="failed" sx={{ fontWeight: 800, color: 'error.main', bgcolor: pc.error( 0.04) }}>{t('interviewDetail.actions.failed')}</MenuItem>
-                </TextField>
+      <TextField
+        label={t('interviewDetail.actions.proposedSalary')}
+        name="proposed_salary"
+        type="number"
+        fullWidth
+        size="small"
+        value={evalForm.proposed_salary}
+        onChange={onChange}
+        sx={{
+          ...inputSx,
+          '& .MuiOutlinedInput-root': {
+            ...inputSx['& .MuiOutlinedInput-root'],
+            fontWeight: 800,
+            color: 'success.main',
+          },
+        }}
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <MonetizationOnIcon sx={{ fontSize: 20, color: 'success.main' }} />
+              </InputAdornment>
+            ),
+          },
+        }}
+      />
 
-                <TextField
-                    label={t('interviewDetail.actions.comments')}
-                    name="comments"
-                    multiline
-                    rows={4}
-                    fullWidth
-                    value={evalForm.comments}
-                    onChange={onChange}
-                    placeholder="Enter HR feedback and internal notes..."
-                    sx={inputSx}
-                    slotProps={{
-                        input: { sx: { lineHeight: 1.8 } },
-                        inputLabel: { sx: { fontWeight: 600 } }
-                    }}
-                />
-
-                <TextField
-                    label={t('interviewDetail.actions.proposedSalary')}
-                    name="proposed_salary"
-                    type="number"
-                    fullWidth
-                    value={evalForm.proposed_salary}
-                    onChange={onChange}
-                    sx={{
-                        ...inputSx,
-                        '& .MuiOutlinedInput-root': {
-                            ...inputSx['& .MuiOutlinedInput-root'],
-                            fontWeight: 800, 
-                            color: 'success.main'
-                        }
-                    }}
-                    slotProps={{
-                        input: {
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <MonetizationOnIcon sx={{ fontSize: 20, color: 'success.main' }} />
-                                </InputAdornment>
-                            ),
-                        },
-                        inputLabel: { sx: { fontWeight: 600 } }
-                    }}
-                />
-
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    fullWidth
-                    disabled={disabled || submitting}
-                    onClick={onSubmit}
-                    startIcon={!submitting && <SendIcon />}
-                    sx={{ 
-                        borderRadius: 3, 
-                        py: 2, 
-                        fontWeight: 900,
-                        boxShadow: (theme) => theme.customShadows?.secondary,
-                        textTransform: 'none',
-                        fontSize: '1.1rem',
-                        transition: 'all 0.25s',
-                        '&:hover': {
-                            transform: 'translateY(-2px)',
-                            boxShadow: (theme) => theme.customShadows?.secondary
-                        }
-                    }}
-                >
-                    {submitting ? <CircularProgress size={24} color="inherit" /> : t('interviewDetail.actions.submitEvaluation')}
-                </Button>
-            </Stack>
-        </Paper>
-    );
-};
+      <Button
+        variant="contained"
+        color="secondary"
+        fullWidth
+        disabled={disabled || submitting}
+        onClick={onSubmit}
+        startIcon={!submitting && <SendIcon />}
+        sx={{
+          
+          py: 1.25,
+          fontWeight: 850,
+          boxShadow: 'none',
+          textTransform: 'none',
+          '&:hover': { boxShadow: 'none' },
+        }}
+      >
+        {submitting ? <CircularProgress size={22} color="inherit" /> : t('interviewDetail.actions.submitEvaluation')}
+      </Button>
+    </Stack>
+  </Paper>
+);
 
 export default InterviewHrEvaluationForm;

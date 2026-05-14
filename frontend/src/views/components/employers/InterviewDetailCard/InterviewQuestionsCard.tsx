@@ -1,10 +1,12 @@
 import React from 'react';
-import { Box, Divider, Paper, Typography, Stack, Chip, alpha, useTheme } from '@mui/material';
+import { Box, Chip, Paper, Stack, Typography } from '@mui/material';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import QuizIcon from '@mui/icons-material/Quiz';
+import type { TFunction } from 'i18next';
 import { InterviewSession } from '@/types/models';
-import { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
+import InterviewDetailSectionHeader from './InterviewDetailSectionHeader';
+import { interviewDetailCardSx, interviewDetailPanelSx } from './sectionStyles';
 
 interface InterviewQuestionsCardProps {
   session: InterviewSession;
@@ -12,102 +14,84 @@ interface InterviewQuestionsCardProps {
 }
 
 const InterviewQuestionsCard: React.FC<InterviewQuestionsCardProps> = ({ session, t }) => {
-    const theme = useTheme();
-    const questions = session.questions || [];
-    
-    return (
-        <Paper 
-            elevation={0}
+  const questions = session.questions || [];
+
+  return (
+    <Paper elevation={0} sx={interviewDetailCardSx}>
+      <InterviewDetailSectionHeader
+        icon={<QuizIcon />}
+        title={t('interviewDetail.subtitle.questions')}
+        action={
+          <Chip
+            label={questions.length}
+            size="small"
             sx={{
-                p: { xs: 3, md: 5 },
-                borderRadius: 4,
-                border: '1px solid',
-                borderColor: 'divider',
-                boxShadow: (theme) => theme.customShadows?.z1,
-                bgcolor: 'background.paper',
-                position: 'relative',
-                overflow: 'hidden'
+              height: 24,
+              minWidth: 28,
+              fontWeight: 850,
+              bgcolor: pc.primary(0.08),
+              color: 'primary.main',
+              border: '1px solid',
+              borderColor: pc.primary(0.14),
+              letterSpacing: 0,
             }}
-        >
-            <Stack direction="row" alignItems="center" spacing={1.5} mb={3}>
-                <QuizIcon color="primary" sx={{ fontSize: 22 }} />
-                <Typography variant="h6" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
-                    {t('interviewDetail.subtitle.questions')}
+          />
+        }
+      />
+
+      <Stack spacing={1.25}>
+        {questions.length > 0 ? (
+          questions.map((q, idx) => (
+            <Box
+              key={q.id}
+              sx={{
+                ...interviewDetailPanelSx,
+                p: 1.75,
+                bgcolor: pc.actionDisabled(0.025),
+                transition: 'border-color 0.2s ease, background-color 0.2s ease',
+                '&:hover': {
+                  bgcolor: pc.primary(0.025),
+                  borderColor: pc.primary(0.18),
+                },
+              }}
+            >
+              <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                <Box
+                  sx={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 1.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: pc.primary(0.08),
+                    color: 'primary.main',
+                    fontWeight: 850,
+                    fontSize: '0.8rem',
+                    border: '1px solid',
+                    borderColor: pc.primary(0.14),
+                    flexShrink: 0,
+                  }}
+                >
+                  {idx + 1}
+                </Box>
+                <Typography variant="body2" sx={{ fontWeight: 650, color: 'text.primary', lineHeight: 1.65, pt: 0.25 }}>
+                  {q.text || q.questionText || q.content}
                 </Typography>
-                <Chip 
-                    label={questions.length} 
-                    size="small" 
-                    sx={{ 
-                        ml: 1, 
-                        fontWeight: 900, 
-                        bgcolor: pc.primary( 0.08), 
-                        color: 'primary.main',
-                        height: 20,
-                        fontSize: '0.75rem',
-                        border: '1px solid',
-                        borderColor: pc.primary( 0.1)
-                    }} 
-                />
-            </Stack>
-
-            <Divider sx={{ mb: 4, borderStyle: 'dashed' }} />
-
-            <Stack spacing={2.5}>
-                {questions.length > 0 ? (
-                    questions.map((q, idx) => (
-                        <Box 
-                            key={q.id} 
-                            sx={{ 
-                                p: 3, 
-                                bgcolor: pc.actionDisabled( 0.03), 
-                                borderRadius: 3,
-                                border: '1px solid',
-                                borderColor: 'divider',
-                                '&:hover': {
-                                    bgcolor: pc.primary( 0.02),
-                                    borderColor: pc.primary( 0.2),
-                                    transform: 'translateX(4px)',
-                                    boxShadow: (theme) => theme.customShadows?.z8
-                                },
-                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-                            }}
-                        >
-                            <Stack direction="row" spacing={2.5} alignItems="flex-start">
-                                <Box 
-                                    sx={{ 
-                                        width: 32, 
-                                        height: 32, 
-                                        borderRadius: 1.5, 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
-                                        justifyContent: 'center',
-                                        bgcolor: 'primary.main',
-                                        color: 'primary.contrastText',
-                                        fontWeight: 900,
-                                        fontSize: '0.85rem',
-                                        boxShadow: (theme) => theme.customShadows?.primary,
-                                        flexShrink: 0
-                                    }} 
-                                >
-                                    {idx + 1}
-                                </Box>
-                                <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.8, pt: 0.5 }}>
-                                    {q.text || q.questionText || q.content}
-                                </Typography>
-                            </Stack>
-                        </Box>
-                    ))
-                ) : (
-                    <Box sx={{ textAlign: 'center', py: 8, bgcolor: pc.actionDisabled( 0.04), borderRadius: 4, border: '1px dashed', borderColor: 'divider' }}>
-                        <HelpOutlineIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2, opacity: 0.2 }} />
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 800 }}>
-                            {t('interviewDetail.messages.noQuestions')}
-                        </Typography>
-                    </Box>
-                )}
-            </Stack>
-        </Paper>
-    );
+              </Stack>
+            </Box>
+          ))
+        ) : (
+          <Box sx={{ textAlign: 'center', py: 5, ...interviewDetailPanelSx, borderStyle: 'dashed', bgcolor: pc.actionDisabled(0.025) }}>
+            <HelpOutlineIcon sx={{ fontSize: 38, color: 'text.disabled', mb: 1.5, opacity: 0.35 }} />
+            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 750 }}>
+              {t('interviewDetail.messages.noQuestions')}
+            </Typography>
+          </Box>
+        )}
+      </Stack>
+    </Paper>
+  );
 };
 
 export default InterviewQuestionsCard;

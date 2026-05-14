@@ -138,23 +138,23 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 3, md: 5 },
-        borderRadius: 4,
+        p: { xs: 2.5, md: 3 },
+        borderRadius: 2,
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        maxHeight: 1200,
+        maxHeight: 900,
         border: '1px solid',
         borderColor: 'divider',
-        boxShadow: (theme) => theme.customShadows?.z1,
+        boxShadow: 'none',
         bgcolor: 'background.paper',
         position: 'relative',
         overflow: 'hidden',
       }}
     >
-      <Stack direction="row" alignItems="center" spacing={1.5} mb={3}>
-        <ForumIcon color="primary" sx={{ fontSize: 24 }} />
-        <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+      <Stack direction="row" alignItems="center" spacing={1.25} mb={2}>
+        <ForumIcon color="primary" sx={{ fontSize: 22 }} />
+        <Typography variant="subtitle1" sx={{ fontWeight: 850, color: 'text.primary', letterSpacing: 0 }}>
           {t('interviewDetail.subtitle.transcript')}
         </Typography>
         <Chip
@@ -174,10 +174,10 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
           label={t('employer:interviewLive.candidateCard.live')}
           size="small"
           sx={{
-            fontWeight: 900,
+            fontWeight: 850,
             height: 24,
-            fontSize: '0.65rem',
-            letterSpacing: 1.5,
+            fontSize: '0.72rem',
+            letterSpacing: 0,
             bgcolor: 'rgba(34, 197, 94, 0.08)',
             color: '#22c55e',
             border: '1px solid',
@@ -191,12 +191,12 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
             size="small"
             sx={{
               ml: 'auto',
-              fontWeight: 900,
+              fontWeight: 850,
               height: 24,
               fontSize: '0.75rem',
               bgcolor: pc.primary(0.08),
               color: 'primary.main',
-              letterSpacing: '0.5px',
+              letterSpacing: 0,
               border: '1px solid',
               borderColor: pc.primary(0.1),
             }}
@@ -204,7 +204,7 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
         )}
       </Stack>
 
-      <Divider sx={{ mb: 4, borderStyle: 'dashed' }} />
+      <Divider sx={{ mb: 2.5 }} />
 
       <Box
         sx={{
@@ -218,7 +218,7 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
         }}
       >
         {mergedTranscripts.length > 0 ? (
-          <Stack spacing={3}>
+          <Stack spacing={2.5}>
             {mergedTranscripts.map((item) => {
               const isInterviewer = item.speaker === 'interviewer';
               const isEmployer = item.speaker === 'employer';
@@ -229,7 +229,7 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
                 <Stack
                   key={`${item.id}-${item.timestamp}-${item.isLive ? 'live' : 'history'}`}
                   direction="row"
-                  spacing={2}
+                  spacing={1.75}
                   alignItems="flex-start"
                   sx={{
                     animation: item.isLive ? 'fadeSlideIn 0.5s ease-out' : 'none',
@@ -241,8 +241,8 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
                 >
                   <Avatar
                     sx={{
-                      width: 42,
-                      height: 42,
+                      width: 36,
+                      height: 36,
                       bgcolor: isInterviewer
                         ? 'primary.main'
                         : isEmployer
@@ -252,13 +252,8 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
                             : isCandidate
                               ? 'success.main'
                               : 'secondary.main',
-                      boxShadow: (theme) =>
-                        isInterviewer
-                          ? theme.customShadows?.primary
-                          : isEmployer
-                            ? '0 8px 24px rgba(245, 158, 11, 0.14)'
-                            : theme.customShadows?.secondary,
-                      border: '2.5px solid',
+                      boxShadow: 'none',
+                      border: '2px solid',
                       borderColor: isInterviewer
                         ? 'rgba(42, 169, 225, 0.5)'
                         : isEmployer
@@ -270,26 +265,25 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
                               : 'rgba(16, 185, 129, 0.5)',
                     }}
                   >
-                    {isInterviewer ? <SmartToyIcon sx={{ fontSize: 24 }} /> : <PersonIcon sx={{ fontSize: 24 }} />}
+                    {isInterviewer ? <SmartToyIcon sx={{ fontSize: 20 }} /> : <PersonIcon sx={{ fontSize: 20 }} />}
                   </Avatar>
 
                   <Box sx={{ flex: 1 }}>
-                    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2, flexWrap: 'wrap' }}>
+                    <Stack direction="row" spacing={1.25} alignItems="center" sx={{ mb: 1, flexWrap: 'wrap' }}>
                       <Typography
                         variant="caption"
                         sx={{
-                          fontWeight: 900,
+                          fontWeight: 850,
                           color: isInterviewer ? 'primary.main' : 'secondary.main',
-                          textTransform: 'uppercase',
-                          fontSize: '0.8rem',
-                          letterSpacing: 1.5,
+                          fontSize: '0.78rem',
+                          letterSpacing: 0,
                         }}
                       >
                         {item.speakerName}
                       </Typography>
                       <Stack direction="row" alignItems="center" spacing={0.5} sx={{ color: 'text.disabled' }}>
                         <AccessTimeIcon sx={{ fontSize: 14 }} />
-                        <Typography variant="caption" sx={{ fontWeight: 800 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 750 }}>
                           {formatTime(item.timestamp, i18n.language)}
                         </Typography>
                       </Stack>
@@ -299,9 +293,9 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
                           size="small"
                           sx={{
                             height: 18,
-                            fontSize: '0.55rem',
-                            fontWeight: 900,
-                            letterSpacing: 1,
+                            fontSize: '0.65rem',
+                            fontWeight: 850,
+                            letterSpacing: 0,
                             bgcolor: 'rgba(245, 158, 11, 0.1)',
                             color: '#f59e0b',
                             border: '1px solid',
@@ -314,17 +308,17 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
                     <Paper
                       elevation={0}
                       sx={{
-                        p: 3,
+                        p: 2,
                         bgcolor: isInterviewer ? pc.primary(0.03) : pc.actionDisabled(0.03),
-                        borderRadius: isInterviewer ? '0px 20px 20px 20px' : '20px 0px 20px 20px',
+                        borderRadius: 2,
                         border: '1px solid',
                         borderColor: isInterviewer ? pc.primary(0.1) : pc.divider(0.5),
-                        boxShadow: (theme) => (isInterviewer ? 'none' : theme.customShadows?.z1),
+                        boxShadow: 'none',
                       }}
                     >
                       <Typography
                         variant="body2"
-                        sx={{ lineHeight: 2, color: 'text.primary', fontWeight: 700, fontSize: '0.95rem' }}
+                        sx={{ lineHeight: 1.75, color: 'text.primary', fontWeight: 650 }}
                       >
                         {item.content}
                       </Typography>
@@ -336,9 +330,9 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
             <div ref={transcriptEndRef} />
           </Stack>
         ) : (
-          <Box sx={{ textAlign: 'center', py: 15, opacity: 0.6 }}>
-            <ForumIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 3, opacity: 0.2 }} />
-            <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 900, letterSpacing: '0.5px' }}>
+          <Box sx={{ textAlign: 'center', py: 8, opacity: 0.7 }}>
+            <ForumIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2, opacity: 0.25 }} />
+            <Typography variant="subtitle1" color="text.secondary" sx={{ fontWeight: 850, letterSpacing: 0 }}>
               {t('interviewDetail.messages.noTranscript')}
             </Typography>
             <Typography variant="body2" color="text.disabled" sx={{ mt: 1, fontWeight: 600 }}>

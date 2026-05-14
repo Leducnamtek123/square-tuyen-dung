@@ -128,7 +128,7 @@ const AIAnalysisDrawerStatePanels = ({
           startIcon={<RefreshIcon />}
           onClick={onAnalyze}
           disabled={analyzing}
-          sx={{ mt: 3, textTransform: 'none', fontWeight: 900, borderRadius: 2, boxShadow: (muiTheme) => muiTheme.customShadows?.error }}
+          sx={{ mt: 3, textTransform: 'none', fontWeight: 900, boxShadow: (muiTheme) => muiTheme.customShadows?.error }}
         >
           {t('appliedResume.ai.retry')}
         </Button>
@@ -182,7 +182,7 @@ const AIAnalysisDrawerStatePanels = ({
             textTransform: 'none',
             px: 4,
             py: 1.5,
-            borderRadius: 3,
+            
             background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
             color: 'white',
             fontWeight: 900,
@@ -279,7 +279,7 @@ const AIAnalysisDrawerStatePanels = ({
           sx={{
             textTransform: 'none',
             fontWeight: 900,
-            borderRadius: 2,
+            
             px: 3,
           }}
         >

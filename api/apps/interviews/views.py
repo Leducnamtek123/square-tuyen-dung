@@ -6,8 +6,8 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-from django.db.models import Count
-from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count, Q
+from django.core.exceptions import ObjectDoesNotExist, ValidationError as DjangoValidationError
 
 from shared.configs.variable_response import response_data
 
@@ -402,18 +402,53 @@ class InterviewEvaluationViewSet(viewsets.ModelViewSet):
         serializer.save(evaluator=self.request.user)
 
 
-class AdminInterviewSessionReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
-    """Admin-only read access to interview sessions for monitoring."""
+class AdminInterviewSessionReadOnlyViewSet(viewsets.ModelViewSet):
+    """Admin-only access to interview sessions for monitoring and status control."""
     queryset = InterviewSession.objects.select_related(
-        'candidate', 'job_post', 'created_by'
+        'candidate', 'job_post', 'job_post__company', 'created_by'
     ).prefetch_related('questions', 'transcripts', 'evaluations').all()
     permission_classes = [perms_custom.IsAdminUser]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['status', 'type']
     search_fields = ['room_name', 'candidate__full_name', 'candidate__email', 'job_post__job_name']
-    ordering_fields = ['create_at', 'status', 'start_time']
+    ordering_fields = ['create_at', 'status', 'start_time', 'scheduled_at']
+    http_method_names = ['get', 'patch', 'delete', 'head', 'options']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        kw = self.request.query_params.get("kw")
+        if kw:
+            queryset = queryset.filter(
+                Q(room_name__icontains=kw)
+                | Q(candidate__full_name__icontains=kw)
+                | Q(candidate__email__icontains=kw)
+                | Q(job_post__job_name__icontains=kw)
+                | Q(job_post__company__company_name__icontains=kw)
+            )
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return InterviewSessionDetailSerializer
         return InterviewSessionListSerializer
+
+    def partial_update(self, request, *args, **kwargs):
+        session = self.get_object()
+        serializer = UpdateStatusSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            update_interview_status(session, serializer.validated_data['status'])
+        except DjangoValidationError as exc:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": [str(exc)]},
+            )
+
+        session.refresh_from_db()
+        return response_data(data=InterviewSessionDetailSerializer(session).data)
+
+    def destroy(self, request, *args, **kwargs):
+        session = self.get_object()
+        session.delete()
+        return response_data(status=status.HTTP_204_NO_CONTENT)

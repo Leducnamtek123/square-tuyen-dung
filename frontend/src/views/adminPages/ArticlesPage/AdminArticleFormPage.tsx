@@ -228,7 +228,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
     <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
       {/* Header */}
       <Stack direction="row" alignItems="center" spacing={2} mb={4}>
-        <IconButton onClick={() => push('/admin/articles')} sx={{ bgcolor: 'action.hover', borderRadius: 1.5 }}>
+        <IconButton onClick={() => push('/admin/articles')} sx={{ bgcolor: 'action.hover' }}>
           <ArrowBackIcon />
         </IconButton>
         <Box flex={1}>
@@ -242,7 +242,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
             startIcon={<SaveIcon />}
             onClick={() => handleSave()}
             disabled={saving}
-            sx={{ borderRadius: 2, fontWeight: 700 }}
+            sx={{ fontWeight: 700 }}
           >
             {saving ? 'Đang lưu...' : 'Lưu nháp'}
           </Button>
@@ -252,7 +252,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
             onClick={() => handleSave('published')}
             disabled={saving}
             color="success"
-            sx={{ borderRadius: 2, fontWeight: 700 }}
+            sx={{ fontWeight: 700 }}
           >
             Đăng bài
           </Button>
@@ -366,7 +366,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
                 fullWidth
                 startIcon={<ImageIcon />}
                 onClick={() => fileInputRef.current?.click()}
-                sx={{ height: 100, borderStyle: 'dashed', borderRadius: 1.5 }}
+                sx={{ height: 100, borderStyle: 'dashed' }}
               >
                 Chọn ảnh đại diện
               </Button>

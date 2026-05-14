@@ -177,7 +177,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
               size="medium"
               sx={{
                 textTransform: 'none',
-                borderRadius: 2,
+                
                 fontWeight: 600,
                 '&:hover': {
                   backgroundColor: 'error.main',
@@ -197,7 +197,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
                 size="medium"
                 sx={{
                   textTransform: 'none',
-                  borderRadius: 2,
+                  
                   fontSize: '0.85rem',
                 }}
                 onClick={() => {
@@ -214,7 +214,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
                 size="medium"
                 sx={{
                   textTransform: 'none',
-                  borderRadius: 2,
+                  
                   fontSize: '0.85rem',
                   fontWeight: 600,
                 }}

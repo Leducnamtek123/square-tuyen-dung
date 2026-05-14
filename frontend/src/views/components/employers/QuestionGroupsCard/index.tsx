@@ -1,8 +1,7 @@
 'use client';
 import React, { useCallback, useMemo, useReducer } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Button, TextField, InputAdornment, Stack, Paper, alpha, useTheme, IconButton } from '@mui/material';
+import { Box, Typography, Breadcrumbs, Link, Button, Stack, Paper, useTheme, IconButton } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -17,7 +16,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import type { QuestionGroup, Question } from '../../../../types/models';
 import QuestionGroupsDialogs from './QuestionGroupsDialogs';
 import type { SelectChangeEvent } from '@mui/material';
-import pc from '@/utils/muiColors';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 
 interface QuestionGroupsCardProps {
   title?: string;
@@ -97,14 +96,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
   const theme = useTheme();
   const resolvedTitle = title || t('employer:questionGroupsCard.title', 'Question Groups Management');
 
-  const inputSx = {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: 2.5,
-      backgroundColor: pc.actionDisabled( 0.03),
-      '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
-      '& fieldset': { borderColor: pc.divider( 0.8) },
-    },
-  };
+  const inputSx = filterControlSx as Record<string, unknown>;
 
   const { page, pageSize, pagination, onPaginationChange } = useDataTable({ initialPageSize: 10 });
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -120,8 +112,8 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
   const groups = groupData?.results || [];
   const count = groupData?.count || 0;
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
     onPaginationChange({ pageIndex: 0, pageSize });
   };
 
@@ -235,29 +227,21 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
             <Typography color="text.primary" sx={{ fontSize: '0.875rem', fontWeight: 700 }}>{t('employer:questionGroupsCard.questionGroups')}</Typography>
           </Breadcrumbs>
         </Box>
-        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleOpenAdd} sx={{ borderRadius: 1.5, px: 3, py: 1, boxShadow: 'none', fontWeight: 700, textTransform: 'none' }}>
+        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleOpenAdd} sx={{ px: 3, py: 1, boxShadow: 'none', fontWeight: 700, textTransform: 'none' }}>
           {t('employer:questionGroupsCard.actions.addGroup')}
         </Button>
       </Stack>
 
-      <Box sx={{ mb: 4 }}>
-        <TextField
-          size="small"
-          placeholder={t('employer:questionGroupsCard.placeholder.searchquestiongroups')}
-          value={searchTerm}
-          onChange={handleSearchChange}
-          sx={{ width: { xs: '100%', sm: 320 }, ...inputSx }}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" color="action" />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </Box>
+      <FilterBar
+        title={t('employer:questionGroupsCard.filters', 'Bộ lọc nhóm câu hỏi')}
+        searchValue={searchTerm}
+        searchPlaceholder={t('employer:questionGroupsCard.placeholder.searchquestiongroups')}
+        onSearchChange={handleSearchChange}
+        onReset={() => handleSearchChange('')}
+        resetDisabled={!searchTerm}
+        resetLabel={t('common:reset')}
+        sx={{ mb: 4 }}
+      />
 
       <DataTable columns={columns} data={groups} isLoading={groupsLoading} rowCount={count} pagination={pagination} onPaginationChange={onPaginationChange} emptyMessage={t('employer:questionGroupsCard.noData')} />
 

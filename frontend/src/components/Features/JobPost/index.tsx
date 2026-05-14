@@ -238,7 +238,7 @@ const JobPost = ({
 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <MetaItem icon={<FontAwesomeIcon icon={faClock} style={{ fontSize: 14 }} color={theme.palette.grey[400]} />}>
-          {t('jobPost.timeLeft', { defaultValue: 'CÃ²n' })} <TimeAgo date={deadline} type="fromNow" />
+          {t('jobPost.timeLeft', { defaultValue: 'Còn' })} <TimeAgo date={deadline} type="fromNow" />
         </MetaItem>
       </Box>
     </Card>

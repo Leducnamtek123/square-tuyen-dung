@@ -175,7 +175,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
               onClick={() => push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || info.row.original.resume?.slug || '')}`)}
               sx={{ 
                 bgcolor: pc.primary( 0.06), 
-                borderRadius: 1.5,
+                
                 '&:hover': { bgcolor: pc.primary( 0.12) }
               }}
             >
@@ -190,7 +190,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
                 sx={{ 
                     textTransform: 'none', 
                     minWidth: 100, 
-                    borderRadius: 2,
+                    
                     fontWeight: 900,
                     boxShadow: (theme) => theme.customShadows?.z1,
                     '&:hover': { bgcolor: 'error.dark' }

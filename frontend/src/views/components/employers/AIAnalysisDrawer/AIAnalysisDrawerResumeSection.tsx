@@ -46,7 +46,7 @@ const AIAnalysisDrawerResumeSection = ({
             variant="outlined"
             size="small"
             startIcon={<OpenInNewIcon fontSize="small" />}
-            sx={{ textTransform: 'none', fontSize: '0.8rem', fontWeight: 900, borderRadius: 2 }}
+            sx={{ textTransform: 'none', fontSize: '0.8rem', fontWeight: 900 }}
           >
             {t('appliedResume.ai.viewOnlineProfile', { defaultValue: 'Xem hồ sơ trực tuyến' })}
           </Button>

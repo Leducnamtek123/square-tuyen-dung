@@ -1,4 +1,7 @@
 import pytest
+from datetime import timedelta
+from django.utils import timezone
+from oauth2_provider.models import AccessToken
 from rest_framework.test import APIClient
 
 from apps.content.models import SystemSetting
@@ -47,3 +50,28 @@ class TestSystemSettingsAPI:
         )
 
         assert response.status_code == 403
+
+    def test_maintenance_mode_blocks_non_admin_api_requests(self):
+        SystemSetting.objects.create(key="maintenanceMode", value="true")
+
+        response = APIClient().get("/api/v1/content/web/banner/")
+
+        assert response.status_code == 503
+        assert response.json()["error"]["code"] == "MAINTENANCE_MODE"
+
+    def test_maintenance_mode_allows_admin_bearer_requests(self, admin_user):
+        SystemSetting.objects.create(key="maintenanceMode", value="true")
+        AccessToken.objects.create(
+            user=admin_user,
+            token="admin-maintenance-token",
+            expires=timezone.now() + timedelta(hours=1),
+            scope="read write",
+        )
+
+        client = APIClient()
+        response = client.get(
+            "/api/v1/content/web/banner/",
+            HTTP_AUTHORIZATION="Bearer admin-maintenance-token",
+        )
+
+        assert response.status_code == 200

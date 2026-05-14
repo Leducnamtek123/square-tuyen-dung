@@ -2,6 +2,7 @@ import logging
 import httpx
 import json
 import os
+import re
 import tempfile
 import fitz  # PyMuPDF
 import docx
@@ -48,11 +49,104 @@ def _strip_code_fences(text: str) -> str:
     return value
 
 
+def _strip_reasoning_blocks(text: str) -> str:
+    value = (text or "").strip()
+    value = value.replace("\ufeff", "").replace("\u200b", " ")
+    value = re.sub(r"<think>[\s\S]*?</think>", " ", value, flags=re.IGNORECASE)
+    value = re.sub(r"<think>[\s\S]*", " ", value, flags=re.IGNORECASE)
+    value = re.sub(r"</think>", " ", value, flags=re.IGNORECASE)
+    return value.strip()
+
+
+def _json_object_candidates(text: str):
+    """Yield balanced JSON-object substrings from model output."""
+    value = text or ""
+    for start, char in enumerate(value):
+        if char != "{":
+            continue
+
+        depth = 0
+        in_string = False
+        escape = False
+        for idx in range(start, len(value)):
+            current = value[idx]
+            if in_string:
+                if escape:
+                    escape = False
+                elif current == "\\":
+                    escape = True
+                elif current == '"':
+                    in_string = False
+                continue
+
+            if current == '"':
+                in_string = True
+            elif current == "{":
+                depth += 1
+            elif current == "}":
+                depth -= 1
+                if depth == 0:
+                    yield value[start:idx + 1]
+                    break
+
+
 def _parse_llm_json_content(raw_text: str) -> dict:
-    cleaned = _strip_code_fences(raw_text)
+    cleaned = _strip_reasoning_blocks(_strip_code_fences(raw_text))
     if not cleaned:
         raise ValueError("Empty model content")
-    return json.loads(cleaned)
+
+    try:
+        parsed = json.loads(cleaned)
+        if isinstance(parsed, dict):
+            return parsed
+    except json.JSONDecodeError:
+        pass
+
+    decoder = json.JSONDecoder()
+    try:
+        parsed, _ = decoder.raw_decode(cleaned)
+        if isinstance(parsed, dict):
+            return parsed
+    except json.JSONDecodeError:
+        pass
+
+    for candidate in _json_object_candidates(cleaned):
+        try:
+            parsed = json.loads(candidate)
+            if isinstance(parsed, dict):
+                return parsed
+        except json.JSONDecodeError:
+            continue
+
+    raise ValueError("Model response does not contain valid JSON.")
+
+
+def _coerce_list(value) -> list[str]:
+    if isinstance(value, list):
+        return [str(item).strip() for item in value if str(item).strip()][:8]
+    if isinstance(value, str):
+        parts = [part.strip(" -•\t\r\n") for part in value.split(",")]
+        return [part for part in parts if part][:8]
+    return []
+
+
+def _normalize_analysis_result(result: dict) -> dict:
+    score = result.get("score", result.get("overall_score", 0))
+    try:
+        score = int(float(score))
+    except (TypeError, ValueError):
+        score = 0
+    score = max(0, min(100, score))
+
+    return {
+        "score": score,
+        "summary": str(result.get("summary") or result.get("recommendation") or "").strip(),
+        "skills": _coerce_list(result.get("skills")),
+        "pros": _coerce_list(result.get("pros") or result.get("strengths")),
+        "cons": _coerce_list(result.get("cons") or result.get("gaps")),
+        "matching_skills": _coerce_list(result.get("matching_skills")),
+        "missing_skills": _coerce_list(result.get("missing_skills")),
+    }
 
 
 @shared_task(
@@ -253,7 +347,7 @@ def analyze_resume_ai(self, activity_id):
         resume_excerpt = _truncate_text(resume_text, max_resume_chars)
 
         prompt = f"""
-        Analyze candidate CV fit for this role and return ONLY one valid JSON object.
+        Analyze candidate CV fit for this role and return ONLY one compact valid JSON object.
 
         Job title: {activity.job_post.job_name}
         Job description: {job_description}
@@ -275,8 +369,9 @@ def analyze_resume_ai(self, activity_id):
 
         Constraints:
         - summary max 70 words.
-        - each list max 8 items.
+        - each list max 5 short items.
         - no markdown, no extra text outside JSON.
+        - no <think> block, no explanation.
         """
 
         llm_base_url = config(
@@ -289,14 +384,14 @@ def analyze_resume_ai(self, activity_id):
         )
         llm_temperature = config("AI_RESUME_LLM_TEMPERATURE", default=0.1, cast=float)
         llm_top_p = config("AI_RESUME_LLM_TOP_P", default=0.9, cast=float)
-        llm_max_tokens = config("AI_RESUME_LLM_MAX_TOKENS", default=420, cast=int)
+        llm_max_tokens = config("AI_RESUME_LLM_MAX_TOKENS", default=900, cast=int)
         llm_timeout = config("AI_RESUME_LLM_TIMEOUT_SECONDS", default=240.0, cast=float)
         llm_connect_timeout = config("AI_RESUME_LLM_CONNECT_TIMEOUT_SECONDS", default=10.0, cast=float)
 
         payload = {
             "model": model_alias,
             "messages": [
-                {"role": "system", "content": "Ban la AI tuyen dung. Luon tra ve JSON object hop le."},
+                {"role": "system", "content": "Ban la AI tuyen dung. Chi tra ve dung mot JSON object hop le, khong markdown, khong giai thich, khong <think>."},
                 {"role": "user", "content": prompt},
             ],
             "temperature": llm_temperature,
@@ -324,6 +419,11 @@ def analyze_resume_ai(self, activity_id):
         message = (response_json.get("choices") or [{}])[0].get("message") or {}
         content = message.get("content") or ""
         reasoning = message.get("reasoning") or ""
+        if isinstance(content, list):
+            content = "\n".join(
+                part.get("text", "") if isinstance(part, dict) else str(part)
+                for part in content
+            )
 
         # Ollama + some reasoning models may return empty "content" on /v1/chat/completions.
         # Fallback to native /api/chat to force JSON output when needed.
@@ -359,6 +459,7 @@ def analyze_resume_ai(self, activity_id):
             if result is None:
                 raise ValueError("Model response does not contain valid JSON.")
 
+        result = _normalize_analysis_result(result)
         activity.ai_analysis_score = result.get('score', 0)
         activity.ai_analysis_summary = result.get('summary', '')
         activity.ai_analysis_skills = ", ".join(result.get('skills', []))

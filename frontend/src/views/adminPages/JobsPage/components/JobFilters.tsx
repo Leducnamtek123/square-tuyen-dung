@@ -1,8 +1,6 @@
 import React from 'react';
-import { TextField, InputAdornment, Box } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-
-import SearchIcon from '@mui/icons-material/Search';
+import FilterBar from '@/components/Common/FilterBar';
 
 interface JobFiltersProps {
     searchTerm: string;
@@ -12,24 +10,15 @@ interface JobFiltersProps {
 const JobFilters = ({ searchTerm, onSearchChange }: JobFiltersProps) => {
     const { t } = useTranslation('admin');
     return (
-        <Box sx={{ mb: 3 }}>
-            <TextField
-                fullWidth
-                variant="outlined"
-                placeholder={t('pages.jobs.filter.searchPlaceholder')}
-                value={searchTerm}
-                onChange={(e) => onSearchChange(e.target.value)}
-                slotProps={{
-                    input: {
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon />
-                            </InputAdornment>
-                        ),
-                    }
-                }}
-            />
-        </Box>
+        <FilterBar
+            title={t('pages.jobs.filter.title', 'Bộ lọc tin tuyển dụng')}
+            searchValue={searchTerm}
+            searchPlaceholder={t('pages.jobs.filter.searchPlaceholder')}
+            onSearchChange={onSearchChange}
+            onReset={() => onSearchChange('')}
+            resetDisabled={!searchTerm}
+            resetLabel={t('common.clearFilters', 'Xóa lọc')}
+        />
     );
 };
 

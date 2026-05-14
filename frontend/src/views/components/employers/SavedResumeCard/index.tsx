@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { 
   Box, 
   Button, 
-  Divider, 
   Stack, 
   Typography,
   Paper
@@ -24,6 +23,7 @@ import type { AxiosError } from 'axios';
 import type { ApiError } from '../../../../types/api';
 import type { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
 import { SavedResumeFilterValues } from '../SavedResumeFilterForm';
+import FilterBar from '@/components/Common/FilterBar';
 
 interface SavedResumeCardProps {
   title: string;
@@ -137,7 +137,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
               startIcon={<FileDownloadOutlinedIcon />} 
               onClick={handleExport} 
               sx={{ 
-                borderRadius: 3, 
+                 
                 px: 4, 
                 py: 1.25,
                 boxShadow: (theme) => theme.customShadows?.primary, 
@@ -149,35 +149,9 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
           </Button>
         </Stack>
 
-        <Paper
-          elevation={0}
-          sx={{
-            p: 3,
-            mb: 5,
-            borderRadius: 3,
-            bgcolor: 'background.neutral',
-            border: '1px solid',
-            borderColor: 'divider'
-          }}
-        >
-          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
-            <Box sx={{ 
-              p: 0.75, 
-              borderRadius: 1.5, 
-              bgcolor: 'primary.extralight', 
-              color: 'primary.main',
-              display: 'flex'
-            }}>
-              <Box component="span" sx={{ width: 18, height: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Box sx={{ width: 4, height: 14, bgcolor: 'currentColor', borderRadius: 1 }} />
-              </Box>
-            </Box>
-            <Typography variant="subtitle1" sx={{ color: 'text.primary', fontWeight: 900, letterSpacing: '0.5px' }}>
-                {t('employer:savedResume.filters').toUpperCase()}
-            </Typography>
-          </Stack>
+        <FilterBar title={t('employer:savedResume.filters')} sx={{ mb: 5 }}>
           <SavedResumeFilterForm handleFilter={handleFilter} />
-        </Paper>
+        </FilterBar>
 
         <Box sx={{ overflow: 'hidden', width: '100%' }}>
           <SavedResumeTable

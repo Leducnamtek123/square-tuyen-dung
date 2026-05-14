@@ -277,7 +277,7 @@ const BannersPageContent = () => {
             <Typography color="text.primary">{t('pages.banners.breadcrumb')}</Typography>
           </Breadcrumbs>
         </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => dispatch({ type: 'open-add' })} sx={{ borderRadius: '8px', textTransform: 'none' }}>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={() => dispatch({ type: 'open-add' })} sx={{ textTransform: 'none' }}>
           {t('pages.banners.addBtn')}
         </Button>
       </Box>

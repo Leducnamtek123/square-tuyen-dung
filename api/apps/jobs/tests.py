@@ -12,6 +12,7 @@ from apps.jobs.models import JobPost, JobPostActivity
 from apps.jobs.serializers import JobSeekerJobPostActivitySerializer
 from apps.jobs.services import JobPostService, JobActivityService
 from apps.jobs.ai_scoring_service import _fallback_scoring, build_scoring_prompt
+from apps.content.models import SystemSetting
 from shared.configs import variable_system as var_sys
 
 
@@ -190,6 +191,49 @@ class TestJobService:
         assert stats['total_jobs'] == 1
         assert stats['active_jobs'] == 1
         assert stats['total_applications'] == 0
+
+    def test_create_job_auto_approves_when_setting_enabled(self, employer_user, company, career, location):
+        SystemSetting.objects.create(key="autoApproveJobs", value="true")
+
+        job = JobPostService.create_job(
+            user=employer_user,
+            validated_data={
+                "job_name": "Auto Approved Job",
+                "deadline": timezone.now().date() + timedelta(days=30),
+                "quantity": 1,
+                "job_description": "<p>Job description</p>",
+                "job_requirement": "<p>Requirement</p>",
+                "benefits_enjoyed": "<p>Benefits</p>",
+                "position": 4,
+                "type_of_workplace": 1,
+                "experience": 2,
+                "academic_level": 2,
+                "job_type": 1,
+                "salary_min": 10000000,
+                "salary_max": 20000000,
+                "contact_person_name": "HR",
+                "contact_person_phone": "0901234567",
+                "contact_person_email": "hr@test.com",
+                "career": career,
+                "location": location,
+            },
+        )
+
+        assert job.status == var_sys.JobPostStatus.APPROVED
+
+    def test_apply_to_job_skips_email_when_email_notifications_disabled(self, job_seeker_user, job_post, resume):
+        SystemSetting.objects.create(key="emailNotifications", value="false")
+        validated_data = {
+            'job_post': job_post,
+            'resume': resume,
+            'fullName': 'Test Name',
+            'email': 'test@test.com'
+        }
+
+        with patch("console.jobs.queue_mail.send_email_confirm_application.delay") as send_email:
+            JobActivityService.apply_to_job(job_seeker_user, validated_data)
+
+        send_email.assert_not_called()
 
 
 # ==================== AI Scoring Tests ====================

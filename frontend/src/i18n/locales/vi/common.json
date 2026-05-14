@@ -38,6 +38,7 @@
     "delete": "Xóa",
     "edit": "Chỉnh sửa",
     "confirm": "Xác nhận",
+    "apply": "Áp dụng",
     "add": "Thêm",
     "download": "Tải xuống",
     "upload": "Tải lên",
@@ -298,7 +299,8 @@
   "validation": {
     "invalidDate": "Ngày không hợp lệ",
     "max255": "Tối đa 255 ký tự",
-    "max30": "Tối đa 30 ký tự"
+    "max30": "Tối đa 30 ký tự",
+    "invalidUrl": "Vui lòng nhập URL hợp lệ."
   },
   "form": {
     "phoneNumber": "Số điện thoại của bạn",
@@ -814,28 +816,7 @@
     }
   },
   "auto": {
-    "index_general_0db3": "General",
-    "index_technical_ad1e": "Technical",
-    "index_behavioral_f828": "Behavioral",
-    "index_wwwsquarevn_9a21": "www.square.vn",
-    "ScoreGauge_ai_matching_score_158d": "AI Matching Score",
-    "index__sessionid_tcommonsave_tinterv_60cb": ": (sessionId ? t('common:save') : t('interview:interviewCreateCard.scheduleNow'))}",
-    "index__tcommonsave_340e": ": t('common:save')}",
-    "InterviewObserverDialog_observer_mode_daff": "Observer Mode",
-    "InterviewObserverDialog_end_observation_130a": "End Observation",
-    "InterviewObserverDialog__hidden_observer_mode_72e9": "Hidden Observer Mode",
-    "InterviewObserverDialog_you_are_observing_this_intervi_7cb3": "You are observing this interview silently. The candidate cannot see or hear you.",
-    "InterviewObserverDialog_live_transcript_b857": "Live Transcript",
-    "InterviewObserverDialog_waiting_for_conversation_to_be_3e38": "Waiting for conversation to begin...",
-    "index_try_adjusting_your_search_filt_5ec9": "Try adjusting your search filters or keywords to discover more talented candidates.",
-    "EducationSection__tcommonlabelspresent__2cd9": ") : (\r\n                                                t('common:labels.present')\r\n                                            )}",
-    "ExperienceSection__tcommonlabelspresent_9bab": ": t('common:labels.present')}",
-    "index__tjobseekerprofilefieldsnoexpi_b689": ") : (\r\n\r\n                              t('jobSeeker:profile.fields.noExpiration')\r\n\r\n                            )}",
-    "index__tprofilefieldspresent__9c7c": ") : (\r\n\r\n                              t('profile.fields.present')\r\n\r\n                            )}",
-    "index__tjobseekerprofilefieldspresen_f5e0": ") : (\r\n\r\n                              t('jobSeeker:profile.fields.present')\r\n\r\n                            )}",
-    "index_active_18ff": "ACTIVE",
-    "index_invited_3792": "INVITED",
-    "index_disabled_055c": "DISABLED"
+    "index_wwwsquarevn_9a21": "www.square.vn"
   },
   "fileUpload": {
     "dragDropOrSelect": "Kéo thả file vào đây hoặc",

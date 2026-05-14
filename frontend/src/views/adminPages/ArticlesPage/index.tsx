@@ -2,13 +2,12 @@
 import React, { useCallback, useEffect, useReducer } from 'react';
 import {
   Box, Button, Chip, IconButton, Stack, Tooltip, Typography,
-  TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel,
+  MenuItem, Select, FormControl, InputLabel,
   ToggleButton, ToggleButtonGroup,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SearchIcon from '@mui/icons-material/Search';
 import ArticleIcon from '@mui/icons-material/Article';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import { useRouter } from 'next/navigation';
@@ -17,6 +16,8 @@ import contentService, { Article, ArticleCategory, ArticleStatus } from '@/servi
 import DataTable from '@/components/Common/DataTable';
 import toastMessages from '@/utils/toastMessages';
 import dayjs from '@/configs/dayjs-config';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
+import type { SxProps, Theme } from '@mui/material/styles';
 
 const STATUS_COLOR: Record<ArticleStatus, 'default' | 'warning' | 'success' | 'error' | 'info'> = {
   draft: 'default',
@@ -31,6 +32,8 @@ const STATUS_LABEL: Record<ArticleStatus, string> = {
   published: 'Đã đăng',
   archived: 'Lưu trữ',
 };
+
+const statusFilterSx = [{ width: { xs: '100%', sm: 220 } }, filterControlSx] as SxProps<Theme>;
 
 type ArticleListPagination = {
   pageIndex: number;
@@ -232,64 +235,80 @@ const AdminArticlesPage = () => {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => push('/admin/articles/create')}
-          sx={{ borderRadius: 2, fontWeight: 700, px: 3 }}
+          sx={{ fontWeight: 700, px: 3 }}
         >
           Viết bài mới
         </Button>
       </Stack>
 
-      {/* Filters */}
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} mb={3} alignItems="center">
+      <FilterBar
+        title="Bộ lọc bài viết"
+        searchValue={searchInput}
+        searchPlaceholder="Tìm kiếm bài viết..."
+        onSearchChange={(value) => dispatch({ type: 'patch', patch: { searchInput: value } })}
+        onSearchSubmit={() => dispatch({ type: 'patch', patch: { search: searchInput, pagination: { ...pagination, pageIndex: 0 } } })}
+        showSearchButton
+        searchButtonLabel="Tìm kiếm"
+        activeFilterCount={[category !== 'all', statusFilter !== 'all', Boolean(search)].filter(Boolean).length}
+        onReset={() => dispatch({
+          type: 'patch',
+          patch: {
+            category: 'all',
+            statusFilter: 'all',
+            search: '',
+            searchInput: '',
+            pagination: { ...pagination, pageIndex: 0 },
+          },
+        })}
+        resetDisabled={category === 'all' && statusFilter === 'all' && !search && !searchInput}
+        resetLabel="Xóa lọc"
+        advancedLabel="Bộ lọc nâng cao"
+        advancedDefaultOpen={statusFilter !== 'all'}
+        advancedFilters={(
+          <FormControl size="small" sx={statusFilterSx}>
+            <InputLabel>Trạng thái</InputLabel>
+            <Select
+              value={statusFilter}
+              label="Trạng thái"
+              onChange={(e) => dispatch({
+                type: 'patch',
+                patch: {
+                  statusFilter: e.target.value as ArticleStatus | 'all',
+                  pagination: { ...pagination, pageIndex: 0 },
+                },
+              })}
+            >
+              <MenuItem value="all">Tất cả</MenuItem>
+              <MenuItem value="draft">Bản nháp</MenuItem>
+              <MenuItem value="pending">Chờ duyệt</MenuItem>
+              <MenuItem value="published">Đã đăng</MenuItem>
+              <MenuItem value="archived">Lưu trữ</MenuItem>
+            </Select>
+          </FormControl>
+        )}
+      >
         <ToggleButtonGroup
           value={category}
           exclusive
           onChange={(_, v) => {
-            if (v) dispatch({ type: 'patch', patch: { category: v } });
+            if (v) dispatch({ type: 'patch', patch: { category: v, pagination: { ...pagination, pageIndex: 0 } } });
           }}
           size="small"
-          sx={{ height: 40 }}
+          sx={{
+            height: 42,
+            '& .MuiToggleButton-root': {
+              px: 2,
+              borderRadius: '8px',
+              fontWeight: 800,
+              textTransform: 'none',
+            },
+          }}
         >
           <ToggleButton value="all">Tất cả</ToggleButton>
           <ToggleButton value="news">Tin tức</ToggleButton>
           <ToggleButton value="blog">Blog</ToggleButton>
         </ToggleButtonGroup>
-
-        <FormControl size="small" sx={{ minWidth: 160 }}>
-          <InputLabel>Trạng thái</InputLabel>
-          <Select
-            value={statusFilter}
-            label="Trạng thái"
-            onChange={(e) => dispatch({ type: 'patch', patch: { statusFilter: e.target.value as ArticleStatus | 'all' } })}
-          >
-            <MenuItem value="all">Tất cả</MenuItem>
-            <MenuItem value="draft">Bản nháp</MenuItem>
-            <MenuItem value="pending">Chờ duyệt</MenuItem>
-            <MenuItem value="published">Đã đăng</MenuItem>
-            <MenuItem value="archived">Lưu trữ</MenuItem>
-          </Select>
-        </FormControl>
-
-        <TextField
-          size="small"
-          placeholder="Tìm kiếm bài viết..."
-          value={searchInput}
-          onChange={(e) => dispatch({ type: 'patch', patch: { searchInput: e.target.value } })}
-          onKeyDown={(e) => e.key === 'Enter' && dispatch({ type: 'patch', patch: { search: searchInput } })}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-              ),
-            },
-          }}
-          sx={{ flex: 1, maxWidth: 400 }}
-        />
-        <Button variant="outlined" onClick={() => dispatch({ type: 'patch', patch: { search: searchInput } })} sx={{ height: 40 }}>
-          Tìm kiếm
-        </Button>
-      </Stack>
+      </FilterBar>
 
       {/* Table */}
       <DataTable

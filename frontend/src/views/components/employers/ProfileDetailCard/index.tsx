@@ -553,7 +553,7 @@ const ProfileDetailCard: React.FC = () => {
                       target="_blank"
                       rel="noreferrer"
                       disabled={!fileUrl}
-                      sx={{ borderRadius: 2, fontWeight: 900, textTransform: 'none' }}
+                      sx={{ fontWeight: 900, textTransform: 'none' }}
                     >
                       {t('common:actions.openNewTab')}
                     </Button>
@@ -565,7 +565,7 @@ const ProfileDetailCard: React.FC = () => {
                       download
                       disabled={!fileUrl}
                       sx={{
-                        borderRadius: 2,
+                        
                         fontWeight: 900,
                         textTransform: 'none',
                         boxShadow: (theme) => theme.customShadows?.primary,
@@ -686,7 +686,7 @@ const ProfileDetailCard: React.FC = () => {
                       rel="noreferrer"
                       disabled={!fileUrl}
                       sx={{
-                        borderRadius: 2,
+                        
                         py: 1.15,
                         fontWeight: 900,
                         textTransform: 'none',
@@ -702,7 +702,7 @@ const ProfileDetailCard: React.FC = () => {
                       href={fileUrl}
                       download
                       disabled={!fileUrl}
-                      sx={{ borderRadius: 2, py: 1.15, fontWeight: 900, textTransform: 'none' }}
+                      sx={{ py: 1.15, fontWeight: 900, textTransform: 'none' }}
                     >
                       {t('common:actions.download')}
                     </Button>

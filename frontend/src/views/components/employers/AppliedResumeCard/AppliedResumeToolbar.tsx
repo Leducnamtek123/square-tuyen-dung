@@ -4,19 +4,15 @@ import {
   Box,
   Button,
   Grid2 as Grid,
-  IconButton,
-  Paper,
   Stack,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import ViewListIcon from '@mui/icons-material/ViewList';
@@ -27,6 +23,7 @@ import type { SelectOption, SystemConfig } from '@/types/models';
 import type { AppliedResumeFilterData } from '../AppliedResumeFilterForm';
 import { tConfig } from '../../../../utils/tConfig';
 import type { JobPostOption } from '../hooks/useEmployerQueries';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 
 interface Props {
   title: string;
@@ -166,7 +163,7 @@ const AppliedResumeToolbar: React.FC<Props> = ({
             startIcon={<FileDownloadOutlinedIcon />}
             onClick={onExport}
             sx={{
-              borderRadius: 3,
+              
               px: 4,
               py: 1.25,
               boxShadow: theme.customShadows?.primary,
@@ -179,36 +176,54 @@ const AppliedResumeToolbar: React.FC<Props> = ({
         </Stack>
       </Stack>
 
-      <Paper
-        elevation={0}
-        sx={{
-          p: 3,
-          mb: 5,
-          borderRadius: 3,
-          bgcolor: 'background.neutral',
-          border: '1px solid',
-          borderColor: 'divider',
-        }}
-      >
-        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
-          <Box
+      <FilterBar
+        title={t('employer:appliedResume.filters')}
+        sx={{ mb: 5 }}
+        activeFilterCount={numbersFilter + (jobPostIdSelect ? 1 : 0) + (applicationStatusSelect ? 1 : 0)}
+        onReset={onResetFilterData}
+        resetDisabled={!numbersFilter && !jobPostIdSelect && !applicationStatusSelect}
+        resetLabel={t('common:reset')}
+        actions={(
+          <Button
+            variant="outlined"
+            color="inherit"
+            startIcon={<FilterListIcon />}
+            endIcon={<ExpandMoreIcon />}
+            onClick={onOpenFilterPopup}
             sx={{
-              p: 0.75,
-              borderRadius: 1.5,
-              bgcolor: 'primary.extralight',
-              color: 'primary.main',
-              display: 'flex',
+              
+              px: 2,
+              fontWeight: 800,
+              textTransform: 'none',
+              bgcolor: 'background.paper',
+              borderStyle: 'dashed',
+              whiteSpace: 'nowrap',
+              '&:hover': { bgcolor: 'primary.extralight', borderColor: 'primary.main', borderStyle: 'solid' },
             }}
           >
-            <FilterListIcon sx={{ fontSize: 20 }} />
-          </Box>
-          <Typography variant="subtitle1" sx={{ color: 'text.primary', fontWeight: 900, letterSpacing: '0.5px' }}>
-            {t('employer:appliedResume.filters').toUpperCase()}
-          </Typography>
-        </Stack>
-
-        <Grid container spacing={3} alignItems="center">
-          <Grid size={{ xs: 12, sm: 6, md: 5 }}>
+            {t('employer:appliedResume.advancedFilter')}
+            {numbersFilter > 0 && (
+              <Box
+                component="span"
+                sx={{
+                  ml: 1,
+                  px: 1,
+                  py: 0.25,
+                  borderRadius: '8px',
+                  bgcolor: 'primary.main',
+                  color: 'white',
+                  fontSize: '0.75rem',
+                  fontWeight: 900,
+                }}
+              >
+                {numbersFilter}
+              </Box>
+            )}
+          </Button>
+        )}
+      >
+        <Grid container spacing={1.5} alignItems="center" sx={{ width: '100%' }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Autocomplete
               getOptionLabel={(option) => option.jobName}
               value={jobPostOptions.find((o) => String(o.id) === jobPostIdSelect) || null}
@@ -231,18 +246,12 @@ const AppliedResumeToolbar: React.FC<Props> = ({
                       ),
                     },
                   }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      bgcolor: 'background.paper',
-                      fontWeight: 600,
-                    },
-                  }}
+                  sx={filterControlSx}
                 />
               )}
             />
           </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Autocomplete
               getOptionLabel={(option) => tConfig(option.name as string)}
               value={allConfig?.applicationStatusOptions?.find((o) => String(o.id) === applicationStatusSelect) || null}
@@ -265,72 +274,13 @@ const AppliedResumeToolbar: React.FC<Props> = ({
                       ),
                     },
                   }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      bgcolor: 'background.paper',
-                      fontWeight: 600,
-                    },
-                  }}
+                  sx={filterControlSx}
                 />
               )}
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 3 }}>
-            <Stack direction="row" spacing={1.5} justifyContent={{ xs: 'flex-end', md: 'flex-end' }}>
-              <Tooltip title={t('common:reset')} arrow>
-                <IconButton
-                  onClick={onResetFilterData}
-                  sx={{
-                    bgcolor: 'background.paper',
-                    borderRadius: 2,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    '&:hover': { bgcolor: 'action.hover' },
-                  }}
-                >
-                  <RefreshIcon sx={{ fontSize: 20 }} />
-                </IconButton>
-              </Tooltip>
-              <Button
-                variant="outlined"
-                color="inherit"
-                startIcon={<FilterListIcon />}
-                endIcon={<ExpandMoreIcon />}
-                onClick={onOpenFilterPopup}
-                sx={{
-                  borderRadius: 2.5,
-                  px: 3,
-                  fontWeight: 800,
-                  textTransform: 'none',
-                  bgcolor: 'background.paper',
-                  borderStyle: 'dashed',
-                  '&:hover': { bgcolor: 'primary.extralight', borderColor: 'primary.main', borderStyle: 'solid' },
-                }}
-              >
-                {t('employer:appliedResume.advancedFilter')}
-                {numbersFilter > 0 && (
-                  <Box
-                    component="span"
-                    sx={{
-                      ml: 1,
-                      px: 1,
-                      py: 0.25,
-                      borderRadius: 1,
-                      bgcolor: 'primary.main',
-                      color: 'white',
-                      fontSize: '0.75rem',
-                      fontWeight: 900,
-                    }}
-                  >
-                    {numbersFilter}
-                  </Box>
-                )}
-              </Button>
-            </Stack>
-          </Grid>
         </Grid>
-      </Paper>
+      </FilterBar>
     </>
   );
 };

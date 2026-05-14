@@ -23,7 +23,7 @@ const ProfileDetailPage = () => {
           onClick={() => back()}
           sx={{
             px: 1.5,
-            borderRadius: 2,
+            
             color: 'text.secondary',
             fontWeight: 900,
             textTransform: 'none',

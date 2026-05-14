@@ -104,13 +104,22 @@ const DashboardPage = () => {
 
             </Box>
 
-            <Card sx={{ p: 2 }}>
+            <Card
+              sx={{
+                p: { xs: 2, sm: 3 },
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: (theme) => theme.customShadows?.z1,
+                overflow: 'hidden',
+              }}
+            >
 
               <Stack>
 
                 <Box sx={{ mb: 2 }}>
 
-                  <Typography variant="h6">{t('dashboard.yourActivity')}</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: 0 }}>{t('dashboard.yourActivity')}</Typography>
 
                 </Box>
 

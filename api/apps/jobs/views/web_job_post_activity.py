@@ -2,7 +2,7 @@ from django.conf import settings
 from datetime import timedelta
 from django.db import IntegrityError, connection
 from django.db.utils import OperationalError, ProgrammingError
-from django.db.models import Case, CharField, F, When
+from django.db.models import Case, CharField, F, Q, When
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status, viewsets
@@ -440,7 +440,39 @@ class EmployerJobPostActivityViewSet(
 
 
 class AdminJobPostActivityViewSet(viewsets.ModelViewSet):
-    queryset = JobPostActivity.objects.select_related('user', 'job_post', 'resume').all().order_by('id')
+    queryset = JobPostActivity.objects.select_related('user', 'job_post', 'job_post__company', 'resume').all().order_by('id')
     serializer_class = EmployerJobPostActivitySerializer
     permission_classes = [perms_custom.IsAdminUser]
     pagination_class = paginations.CustomPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.query_params.get("kw") or self.request.query_params.get("search")
+        if search:
+            queryset = queryset.filter(
+                Q(full_name__icontains=search)
+                | Q(email__icontains=search)
+                | Q(phone__icontains=search)
+                | Q(user__full_name__icontains=search)
+                | Q(user__email__icontains=search)
+                | Q(job_post__job_name__icontains=search)
+                | Q(job_post__company__company_name__icontains=search)
+            )
+
+        ordering = self.request.query_params.get("ordering")
+        ordering_map = {
+            "id": "id",
+            "fullName": "full_name",
+            "email": "email",
+            "jobName": "job_post__job_name",
+            "status": "status",
+            "createAt": "create_at",
+            "updateAt": "update_at",
+        }
+        if ordering:
+            is_desc = ordering.startswith("-")
+            key = ordering[1:] if is_desc else ordering
+            mapped = ordering_map.get(key)
+            if mapped:
+                queryset = queryset.order_by(f"-{mapped}" if is_desc else mapped)
+        return queryset

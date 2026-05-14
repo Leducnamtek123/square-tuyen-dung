@@ -6,62 +6,33 @@ import {
   Stack, 
   Tooltip as MuiTooltip, 
   Typography, 
-  CircularProgress,
   Paper,
-  alpha,
   useTheme
 } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
-import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 import dayjs from 'dayjs';
 import LineChartClient from '@/components/Common/Charts/LineChartClient';
+import {
+  ChartEmptyState,
+  ChartLoadingState,
+  chartAreaSx,
+  chartCardSx,
+  chartColors,
+  chartTitleSx,
+  createCartesianOptions,
+  makeLineFill,
+} from '@/components/Common/Charts/chartDesign';
 import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 import { useEmployerCandidateStatistics } from '../../hooks/useEmployerQueries';
-import pc from '@/utils/muiColors';
 
 interface CandidateChartProps {
   title: string;
 }
 
-const options = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: 'bottom' as const,
-      labels: {
-        padding: 20,
-        usePointStyle: true,
-        pointStyle: 'circle',
-        font: { size: 12, weight: 600 }
-      }
-    },
-    tooltip: {
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      titleColor: '#212529',
-      bodyColor: '#212529',
-      padding: 12,
-      boxPadding: 6,
-      borderColor: 'rgba(0,0,0,0.1)',
-      borderWidth: 1,
-      usePointStyle: true,
-    }
-  },
-  scales: {
-    x: {
-      grid: { display: false },
-      ticks: { font: { size: 12, weight: 500 } }
-    },
-    y: {
-      grid: { color: 'rgba(0,0,0,0.05)' },
-      ticks: { font: { size: 12, weight: 500 } }
-    }
-  }
-};
-
 const CandidateChart = ({ title }: CandidateChartProps) => {
   const { t } = useTranslation('employer');
   const theme = useTheme();
+  const options = React.useMemo(() => createCartesianOptions(theme), [theme]);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([
     dayjs(new Date()).subtract(1, 'month'),
@@ -86,51 +57,56 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
         {
           label: t(`candidateChart.labels.${title1Key}`, { defaultValue: title1 }),
           data: data?.data1 || [],
-          borderColor: theme.palette.secondary.main,
-          backgroundColor: theme.palette.secondary.light || 'rgba(255, 152, 0, 0.1)',
-          borderWidth: 2,
-          tension: 0.4,
-          pointRadius: 4,
+          borderColor: chartColors.emerald,
+          backgroundColor: makeLineFill(chartColors.emerald),
+          fill: true,
+          borderWidth: 3,
+          tension: 0.38,
+          cubicInterpolationMode: 'monotone' as const,
+          pointRadius: 0,
           pointHoverRadius: 6,
+          pointHitRadius: 14,
           pointBackgroundColor: '#fff',
           pointHoverBackgroundColor: '#fff',
+          pointBorderColor: chartColors.emerald,
           pointBorderWidth: 2,
           pointHoverBorderWidth: 2,
         },
         {
           label: t(`candidateChart.labels.${title2Key}`, { defaultValue: title2 }),
           data: data?.data2 || [],
-          borderColor: theme.palette.primary.main,
-          backgroundColor: theme.palette.primary.light || 'rgba(68, 29, 160, 0.1)',
-          borderWidth: 2,
-          tension: 0.4,
-          pointRadius: 4,
+          borderColor: chartColors.sky,
+          backgroundColor: makeLineFill(chartColors.sky),
+          fill: true,
+          borderWidth: 3,
+          tension: 0.38,
+          cubicInterpolationMode: 'monotone' as const,
+          pointRadius: 0,
           pointHoverRadius: 6,
+          pointHitRadius: 14,
           pointBackgroundColor: '#fff',
           pointHoverBackgroundColor: '#fff',
+          pointBorderColor: chartColors.sky,
           pointBorderWidth: 2,
           pointHoverBorderWidth: 2,
         },
       ],
     });
-  }, [data, t, theme]);
+  }, [data, t]);
+
+  const hasChartData = React.useMemo(() => {
+    if (!data?.labels?.length) return false;
+    return [data.data1, data.data2].some((series) => (series || []).some((value) => Number(value) > 0));
+  }, [data]);
 
   return (
     <Paper 
       elevation={0}
-      sx={{ 
-        p: { xs: 2.5, sm: 4 },
-        borderRadius: 4,
-        boxShadow: (theme) => theme.customShadows?.z1,
-        border: '1px solid',
-        borderColor: 'divider',
-        height: '100%',
-        bgcolor: 'background.paper'
-      }}
+      sx={chartCardSx}
     >
       <Stack spacing={3}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+          <Typography variant="h4" sx={chartTitleSx}>
             {title}
           </Typography>
           <MuiTooltip title={t('candidateChart.title')} arrow placement="top">
@@ -150,32 +126,13 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
             />
           </Stack>
 
-          <Box sx={{ position: 'relative', minHeight: 320 }}>
+          <Box sx={chartAreaSx(320)}>
             {queryLoading ? (
-              <Stack alignItems="center" justifyContent="center" sx={{ height: 320 }}>
-                <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
-              </Stack>
-            ) : !data ? (
-              <Stack
-                alignItems="center"
-                justifyContent="center"
-                sx={{
-                  height: 320,
-                  bgcolor: pc.actionDisabled( 0.05),
-                  borderRadius: 3,
-                  border: '1px dashed',
-                  borderColor: 'divider'
-                }}
-              >
-                <InsertChartOutlinedIcon sx={{ fontSize: 48, color: "text.disabled", mb: 1 }} />
-                <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700 }}>
-                    {t('candidateChart.noData')}
-                </Typography>
-              </Stack>
+              <ChartLoadingState height="100%" label={t('candidateChart.loading', { defaultValue: 'Loading chart' })} />
+            ) : !hasChartData ? (
+              <ChartEmptyState height="100%" label={t('candidateChart.noData')} />
             ) : (
-              <Box sx={{ height: 320 }}>
-                <LineChartClient data={dataOptions} options={options} height={300} />
-              </Box>
+              <LineChartClient data={dataOptions} options={options} height="100%" />
             )}
           </Box>
         </Box>

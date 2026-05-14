@@ -172,8 +172,7 @@ const JobPostsTable = ({
               sx={{ 
                 color: 'primary.main',
                 bgcolor: pc.primary( 0.08),
-                '&:hover': { bgcolor: pc.primary( 0.16) },
-                borderRadius: 1.5
+                '&:hover': { bgcolor: pc.primary( 0.16) }
               }}
             >
               <EditIcon fontSize="small" />
@@ -186,8 +185,7 @@ const JobPostsTable = ({
               sx={{ 
                 color: 'error.main',
                 bgcolor: pc.error( 0.08),
-                '&:hover': { bgcolor: pc.error( 0.16) },
-                borderRadius: 1.5
+                '&:hover': { bgcolor: pc.error( 0.16) }
               }}
             >
               <DeleteIcon fontSize="small" />

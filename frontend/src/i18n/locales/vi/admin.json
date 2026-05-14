@@ -70,6 +70,9 @@
       "breadcrumbCareers": "Ngành nghề",
       "addCareer": "Thêm ngành nghề",
       "searchPlaceholder": "Tìm kiếm ngành nghề...",
+      "filter": {
+        "title": "Bộ lọc ngành nghề"
+      },
       "addConfirmTitle": "Thêm ngành nghề mới",
       "editConfirmTitle": "Sửa ngành nghề",
       "careerNameLabel": "Tên ngành nghề",
@@ -112,6 +115,9 @@
       "breadcrumbGeneral": "Cấu hình chung",
       "breadcrumbCities": "Tỉnh/Thành phố",
       "addCity": "Thêm thành phố",
+      "filter": {
+        "title": "Bộ lọc tỉnh/thành"
+      },
       "addConfirmTitle": "Thêm thành phố mới",
       "editConfirmTitle": "Sửa thành phố",
       "cityNameLabel": "Tên thành phố",
@@ -151,6 +157,9 @@
       "breadcrumbDistricts": "Quận/Huyện",
       "addDistrict": "Thêm quận/huyện",
       "filterCityPlaceholder": "Chọn thành phố để lọc",
+      "filter": {
+        "title": "Bộ lọc quận/huyện"
+      },
       "addConfirmTitle": "Thêm quận/huyện mới",
       "editConfirmTitle": "Sửa quận/huyện",
       "cityLabel": "Thành phố",
@@ -196,6 +205,9 @@
       "addWard": "Thêm phường/xã",
       "filterCityPlaceholder": "Chọn thành phố",
       "filterDistrictPlaceholder": "Chọn quận/huyện để lọc",
+      "filter": {
+        "title": "Bộ lọc phường/xã"
+      },
       "addConfirmTitle": "Thêm phường/xã mới",
       "editConfirmTitle": "Sửa phường/xã",
       "districtLabel": "Quận/Huyện",
@@ -247,6 +259,9 @@
     "companies": {
       "addCompany": "Thêm công ty",
       "searchPlaceholder": "Tìm kiếm công ty...",
+      "filter": {
+        "title": "Bộ lọc công ty"
+      },
       "addConfirmTitle": "Thêm công ty mới",
       "editConfirmTitle": "Sửa thông tin công ty",
       "companyNameLabel": "Tên công ty",
@@ -279,7 +294,16 @@
       "title": "Danh sách công ty",
       "breadcrumbAdmin": "Admin",
       "breadcrumbList": "Danh sách",
-      "descriptionLabel": "Mô tả"
+      "descriptionLabel": "Mô tả",
+      "form": {
+        "since": "Ngày thành lập",
+        "cityId": "ID tỉnh/thành",
+        "districtId": "ID quận/huyện",
+        "wardId": "ID phường/xã",
+        "address": "Địa chỉ",
+        "latitude": "Vĩ độ",
+        "longitude": "Kinh độ"
+      }
     },
     "jobActivity": {
       "title": "Lịch sử Ứng tuyển Tuyển dụng",
@@ -287,6 +311,9 @@
       "breadcrumbJobs": "Việc làm & Phỏng vấn",
       "breadcrumbActivity": "Hoạt động Ứng tuyển",
       "searchPlaceholder": "Tìm kiếm hoạt động...",
+      "filter": {
+        "title": "Bộ lọc ứng tuyển"
+      },
       "editStatusTitle": "Cập nhật Trạng thái Ứng tuyển",
       "statusLabel": "Trạng thái",
       "statusOptions": {
@@ -369,12 +396,16 @@
         "verify": "Xác nhận thu tiền"
       },
       "filter": {
+        "title": "Bộ lọc tin tuyển dụng",
         "searchPlaceholder": "Tìm theo tiêu đề hoặc công ty..."
       },
       "status": {
         "draft": "Bản nháp",
         "active": "Đang mở",
         "expired": "Hết hạn",
+        "pending": "Chờ duyệt",
+        "rejected": "Đã từ chối",
+        "approved": "Đã duyệt",
         "unknown": "Không rõ"
       },
       "verified": {
@@ -390,6 +421,9 @@
     "profiles": {
       "addCandidate": "Thêm ứng viên",
       "searchPlaceholder": "Tìm kiếm ứng viên...",
+      "filter": {
+        "title": "Bộ lọc hồ sơ"
+      },
       "addTitle": "Thêm hồ sơ ứng viên mới",
       "editTitle": "Sửa hồ sơ ứng viên",
       "fullNameLabel": "Họ và tên",
@@ -489,6 +523,9 @@
     },
     "resumes": {
       "searchPlaceholder": "Tìm kiếm hồ sơ...",
+      "filter": {
+        "title": "Bộ lọc CV"
+      },
       "editTitle": "Sửa hồ sơ",
       "resumeTitleLabel": "Tiêu đề hồ sơ",
       "minSalaryLabel": "Lương tối thiểu",
@@ -586,6 +623,7 @@
       },
       "searchPlaceholder": "Tìm tên/email...",
       "filters": {
+        "title": "Bộ lọc người dùng",
         "role": "Vai trò",
         "allRoles": "Tất cả"
       },
@@ -717,6 +755,9 @@
       "breadcrumbJobsInterviews": "Việc làm & Phỏng vấn",
       "addBtn": "Tạo thông báo",
       "searchPlaceholder": "Tìm kiếm thông báo...",
+      "filter": {
+        "title": "Bộ lọc thông báo việc làm"
+      },
       "addTitle": "Tạo thông báo mới",
       "editTitle": "Chỉnh sửa thông báo",
       "labelTitle": "Tiêu đề",
@@ -789,12 +830,27 @@
         "status": "Trạng thái",
         "scheduledAt": "Lịch hẹn",
         "actions": "Thao tác",
+        "view": "Xem chi tiết",
+        "markCompleted": "Đánh dấu hoàn thành",
+        "cancel": "Hủy",
         "editStatus": "Đổi trạng thái",
         "delete": "Xóa"
       },
       "title": "Lịch phỏng vấn",
       "breadcrumbAdmin": "Admin",
       "breadcrumb": "Phỏng vấn",
+      "searchPlaceholder": "Tìm kiếm lịch phỏng vấn...",
+      "filter": {
+        "title": "Bộ lọc phỏng vấn"
+      },
+      "detailTitle": "Chi tiết phỏng vấn",
+      "recordingLink": "Mở bản ghi",
+      "toast": {
+        "statusUpdated": "Đã cập nhật trạng thái phỏng vấn",
+        "statusUpdateError": "Không thể cập nhật trạng thái phỏng vấn",
+        "deleteSuccess": "Đã xóa lịch phỏng vấn",
+        "deleteError": "Không thể xóa lịch phỏng vấn"
+      },
       "editStatusTitle": "Đổi trạng thái lịch",
       "form": {
         "status": "Trạng thái"
@@ -914,6 +970,11 @@
       "noWebImage": "Chưa có ảnh web",
       "noMobileImage": "Chưa có ảnh mobile"
     },
+    "bannerTypes": {
+      "filter": {
+        "title": "Bộ lọc loại banner"
+      }
+    },
     "feedbacks": {
       "title": "Quản lý Đánh giá",
       "breadcrumbAdmin": "Admin",
@@ -958,6 +1019,8 @@
     "next": "Tiếp theo",
     "submit": "Gửi",
     "reset": "Đặt lại",
+    "clearFilters": "Xóa bộ lọc",
+    "advancedFilters": "Bộ lọc nâng cao",
     "actions": "Thao tác",
     "status": {
       "completed": "Hoàn thành",
@@ -995,6 +1058,7 @@
       "employersJoined": "Nhà tuyển dụng tham gia"
     },
     "search": {
+      "title": "Bộ lọc hội thoại",
       "placeholder": "Tìm kiếm ứng viên hoặc nhà tuyển dụng..."
     },
     "table": {
@@ -1015,6 +1079,11 @@
     },
     "tooltip": {
       "viewDetail": "Xem chi tiết"
+    },
+    "detail": {
+      "title": "Chi tiết cuộc hội thoại",
+      "noMessages": "Không tìm thấy tin nhắn.",
+      "openAttachment": "Mở tệp đính kèm"
     }
   }
 }

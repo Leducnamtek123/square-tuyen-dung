@@ -6,69 +6,39 @@ import {
   Stack,
   Tooltip as MuiTooltip,
   Typography,
-  CircularProgress,
   Paper,
   Chip,
   alpha,
   useTheme,
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
-import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import TimerIcon from '@mui/icons-material/Timer';
 import dayjs, { Dayjs } from 'dayjs';
 import BarChartClient from '@/components/Common/Charts/BarChartClient';
+import {
+  ChartEmptyState,
+  ChartLoadingState,
+  chartAreaSx,
+  chartCardSx,
+  chartColors,
+  chartTitleSx,
+  createCartesianOptions,
+  makeBarFill,
+} from '@/components/Common/Charts/chartDesign';
 import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 import { useEmployerInterviewStatistics } from '../../hooks/useEmployerQueries';
-import pc from '@/utils/muiColors';
 
 interface InterviewStatsChartProps {
   title: string;
 }
 
-const options = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: 'bottom' as const,
-      labels: {
-        padding: 20,
-        usePointStyle: true,
-        pointStyle: 'circle',
-        font: { size: 12, weight: 600 },
-      },
-    },
-    tooltip: {
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      titleColor: '#212529',
-      bodyColor: '#212529',
-      padding: 12,
-      boxPadding: 6,
-      borderColor: 'rgba(0,0,0,0.1)',
-      borderWidth: 1,
-      usePointStyle: true,
-    },
-  },
-  scales: {
-    x: {
-      stacked: true,
-      grid: { display: false },
-      ticks: { font: { size: 12, weight: 500 } },
-    },
-    y: {
-      stacked: true,
-      grid: { color: 'rgba(0,0,0,0.05)' },
-      ticks: { font: { size: 12, weight: 500 } },
-    },
-  },
-};
-
 const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
   const { t } = useTranslation('employer');
   const theme = useTheme();
+  const options = React.useMemo(() => createCartesianOptions(theme, { stacked: true }), [theme]);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[Dayjs | null, Dayjs | null]>([
     dayjs().subtract(6, 'month'),
@@ -92,34 +62,61 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
         {
           label: t('interviewChart.labels.completed', 'Completed'),
           data: data?.completedData || [],
-          backgroundColor: 'rgba(0, 200, 83, 0.85)',
-          borderRadius: 4,
+          backgroundColor: makeBarFill(chartColors.emerald),
+          hoverBackgroundColor: chartColors.emerald,
+          borderRadius: 8,
+          borderSkipped: false,
+          categoryPercentage: 0.62,
+          barPercentage: 0.74,
+          maxBarThickness: 34,
           stack: 'Stack 0',
         },
         {
           label: t('interviewChart.labels.scheduled', 'Scheduled'),
           data: data?.scheduledData || [],
-          backgroundColor: 'rgba(41, 121, 255, 0.85)',
-          borderRadius: 4,
+          backgroundColor: makeBarFill(chartColors.sky),
+          hoverBackgroundColor: chartColors.sky,
+          borderRadius: 8,
+          borderSkipped: false,
+          categoryPercentage: 0.62,
+          barPercentage: 0.74,
+          maxBarThickness: 34,
           stack: 'Stack 0',
         },
         {
           label: t('interviewChart.labels.inProgress', 'In Progress'),
           data: data?.inProgressData || [],
-          backgroundColor: 'rgba(255, 171, 0, 0.85)',
-          borderRadius: 4,
+          backgroundColor: makeBarFill(chartColors.amber),
+          hoverBackgroundColor: chartColors.amber,
+          borderRadius: 8,
+          borderSkipped: false,
+          categoryPercentage: 0.62,
+          barPercentage: 0.74,
+          maxBarThickness: 34,
           stack: 'Stack 0',
         },
         {
           label: t('interviewChart.labels.cancelled', 'Cancelled'),
           data: data?.cancelledData || [],
-          backgroundColor: 'rgba(255, 86, 48, 0.85)',
-          borderRadius: 4,
+          backgroundColor: makeBarFill(chartColors.red),
+          hoverBackgroundColor: chartColors.red,
+          borderRadius: 8,
+          borderSkipped: false,
+          categoryPercentage: 0.62,
+          barPercentage: 0.74,
+          maxBarThickness: 34,
           stack: 'Stack 0',
         },
       ],
     };
   }, [data, t]);
+
+  const hasChartData = React.useMemo(() => {
+    if (!data?.labels?.length) return false;
+    return [data.completedData, data.scheduledData, data.inProgressData, data.cancelledData].some((series) =>
+      (series || []).some((value) => Number(value) > 0)
+    );
+  }, [data]);
 
   const formatDuration = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -130,19 +127,11 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
   return (
     <Paper
       elevation={0}
-      sx={{
-        p: { xs: 2.5, sm: 4 },
-        borderRadius: 4,
-        boxShadow: (theme) => theme.customShadows?.z1,
-        border: '1px solid',
-        borderColor: 'divider',
-        height: '100%',
-        bgcolor: 'background.paper',
-      }}
+      sx={chartCardSx}
     >
       <Stack spacing={3}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+          <Typography variant="h4" sx={chartTitleSx}>
             {title}
           </Typography>
           <MuiTooltip
@@ -217,35 +206,18 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
               setAllowSubmit={setAllowSubmit}
               selectedDateRange={selectedDateRange}
               setSelectedDateRange={setSelectedDateRange}
+              maxRangeMonths={6}
+              resetRangeMonths={6}
             />
           </Stack>
 
-          <Box sx={{ position: 'relative', minHeight: 320 }}>
+          <Box sx={chartAreaSx(320)}>
             {isLoading ? (
-              <Stack alignItems="center" justifyContent="center" sx={{ height: 320 }}>
-                <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
-              </Stack>
-            ) : !data ? (
-              <Stack
-                alignItems="center"
-                justifyContent="center"
-                sx={{
-                  height: 320,
-                  bgcolor: pc.actionDisabled( 0.05),
-                  borderRadius: 3,
-                  border: '1px dashed',
-                  borderColor: 'divider',
-                }}
-              >
-                <InsertChartOutlinedIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
-                <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700 }}>
-                  {t('interviewChart.noData', 'No interview data available')}
-                </Typography>
-              </Stack>
+              <ChartLoadingState height="100%" label={t('interviewChart.loading', { defaultValue: 'Loading chart' })} />
+            ) : !hasChartData ? (
+              <ChartEmptyState height="100%" label={t('interviewChart.noData', 'No interview data available')} />
             ) : (
-              <Box sx={{ height: 320 }}>
-                <BarChartClient options={options} data={chartData} />
-              </Box>
+              <BarChartClient options={options} data={chartData} height="100%" />
             )}
           </Box>
         </Box>

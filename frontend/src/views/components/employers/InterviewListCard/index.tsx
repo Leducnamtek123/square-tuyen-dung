@@ -128,7 +128,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
           component={Link}
           href={`/${ROUTES.EMPLOYER.INTERVIEW_CREATE}`}
           sx={{
-            borderRadius: 3,
+            
             px: 4,
             py: 1.5,
             boxShadow: (theme) => theme.customShadows?.primary,

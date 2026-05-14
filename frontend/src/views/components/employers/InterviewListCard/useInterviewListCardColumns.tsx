@@ -164,7 +164,7 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
                   size="small"
                   sx={{
                     bgcolor: 'rgba(26, 64, 125, 0.06)',
-                    borderRadius: 1.5,
+                    
                     '&:hover': { bgcolor: 'rgba(26, 64, 125, 0.12)' },
                   }}
                 >
@@ -181,7 +181,7 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
                     size="small"
                     sx={{
                       bgcolor: 'rgba(42, 169, 225, 0.06)',
-                      borderRadius: 1.5,
+                      
                       '&:hover': { bgcolor: 'rgba(42, 169, 225, 0.12)' },
                     }}
                   >
@@ -198,7 +198,7 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
                     size="small"
                     sx={{
                       bgcolor: 'rgba(245, 158, 11, 0.06)',
-                      borderRadius: 1.5,
+                      
                       '&:hover': { bgcolor: 'rgba(245, 158, 11, 0.12)' },
                     }}
                   >
@@ -214,7 +214,7 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
                   size="small"
                   sx={{
                     bgcolor: 'rgba(220, 38, 38, 0.06)',
-                    borderRadius: 1.5,
+                    
                     '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.12)' },
                   }}
                 >

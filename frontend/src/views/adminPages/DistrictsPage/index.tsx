@@ -8,7 +8,6 @@ import {
   Link,
   Paper,
   TextField,
-  InputAdornment,
   Button,
   Dialog,
   DialogTitle,
@@ -24,19 +23,21 @@ import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useDistricts } from './hooks/useDistricts';
 import { useCities } from '../CitiesPage/hooks/useCities';
 import { useDataTable, useDebounce } from '../../../hooks';
 import { District, City } from '../../../types/models';
 import type { DistrictPayload } from '../../../services/adminManagementService';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
+import type { SxProps, Theme } from '@mui/material/styles';
 
 const EMPTY_FORM: Partial<DistrictPayload> = {
   name: '',
   code: '',
   city: undefined,
 };
+const cityFilterSx = [{ width: { xs: '100%', sm: 280 } }, filterControlSx] as SxProps<Theme>;
 
 type DialogMode = 'add' | 'edit';
 
@@ -124,13 +125,13 @@ const DistrictsPage = () => {
   const { data: citiesData } = useCities({ pageSize: 100 });
   const cities = citiesData?.results || [];
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: 'set_search', value: e.target.value });
+  const handleSearch = (value: string) => {
+    dispatch({ type: 'set_search', value });
     onPaginationChange({ pageIndex: 0, pageSize });
   };
 
-  const handleCityFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: 'set_city_filter', value: e.target.value });
+  const handleCityFilterChange = (value: string | number) => {
+    dispatch({ type: 'set_city_filter', value });
     onPaginationChange({ pageIndex: 0, pageSize });
   };
 
@@ -246,35 +247,34 @@ const DistrictsPage = () => {
       </Box>
 
       <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
-        <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
-          <TextField
-            size="small"
-            placeholder={t('pages.districts.searchPlaceholder')}
-            value={state.searchTerm}
-            onChange={handleSearch}
-            sx={{ width: 300 }}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" color="action" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          <TextField
-            select
-            size="small"
-            label={t('pages.districts.filterByCity')}
-            value={state.cityFilter}
-            onChange={handleCityFilterChange}
-            sx={{ width: 220 }}
-          >
-            <MenuItem value="">{t('common.all')}</MenuItem>
-            {cities.map((city: City) => <MenuItem key={city.id} value={city.id}>{city.name}</MenuItem>)}
-          </TextField>
-        </Box>
+        <FilterBar
+          title={t('pages.districts.filter.title', 'Bộ lọc quận/huyện')}
+          searchValue={state.searchTerm}
+          searchPlaceholder={t('pages.districts.searchPlaceholder')}
+          onSearchChange={handleSearch}
+          activeFilterCount={state.cityFilter ? 1 : 0}
+          onReset={() => {
+            handleSearch('');
+            handleCityFilterChange('');
+          }}
+          resetDisabled={!state.searchTerm && !state.cityFilter}
+          resetLabel={t('common.clearFilters', 'Xóa lọc')}
+          advancedLabel={t('common.advancedFilters', 'Bộ lọc nâng cao')}
+          advancedDefaultOpen={Boolean(state.cityFilter)}
+          advancedFilters={(
+            <TextField
+              select
+              size="small"
+              label={t('pages.districts.filterByCity')}
+              value={state.cityFilter}
+              onChange={(event) => handleCityFilterChange(event.target.value)}
+              sx={cityFilterSx}
+            >
+              <MenuItem value="">{t('common.all')}</MenuItem>
+              {cities.map((city: City) => <MenuItem key={city.id} value={city.id}>{city.name}</MenuItem>)}
+            </TextField>
+          )}
+        />
 
         <DataTable
           columns={columns}

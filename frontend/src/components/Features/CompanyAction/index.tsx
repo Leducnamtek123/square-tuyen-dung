@@ -177,7 +177,7 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 
                 >
 
-                  ÄÃ£ xem há»“ sÆ¡ {resume?.title} {views} láº§n
+                  Đã xem hồ sơ {resume?.title} {views} lần
 
                 </Typography>
 
@@ -199,7 +199,7 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 
                 >
 
-                  Láº§n xem cuá»‘i {dayjs(createAt).format('DD/MM/YYYY HH:mm')}
+                  Lần xem cuối {dayjs(createAt).format('DD/MM/YYYY HH:mm')}
 
                 </Typography>
 

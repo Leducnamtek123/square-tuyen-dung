@@ -1,12 +1,11 @@
 ﻿'use client';
 
 import React, { useCallback, useState, useMemo } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Tooltip, IconButton, Stack, Chip, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Paper, Tooltip, IconButton, Stack, Chip, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -14,6 +13,7 @@ import { useJobs } from './hooks/useJobs';
 import { useDataTable, useDebounce } from '../../../hooks';
 import { JobPost } from '../../../types/models';
 import dayjs from '../../../configs/dayjs-config';
+import FilterBar from '@/components/Common/FilterBar';
 
 const JobsPage = () => {
     const { t } = useTranslation('admin');
@@ -48,8 +48,8 @@ const JobsPage = () => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [currentJob, setCurrentJob] = useState<JobPost | null>(null);
 
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
+    const handleSearch = (value: string) => {
+        setSearchTerm(value);
         onPaginationChange({ pageIndex: 0, pageSize: pageSize });
     };
 
@@ -124,7 +124,7 @@ const JobsPage = () => {
         },
         {
             accessorKey: 'status',
-            header: t('pages.jobs.table.status') as string,
+            header: t('pages.jobs.table.statusCol') as string,
             cell: (info) => getStatusLabel(info.getValue() as JobPost['status'], info.row.original.isExpired),
         },
         {
@@ -147,12 +147,12 @@ const JobsPage = () => {
                         </Tooltip>
                         {Number(job.status) === 1 && (
                             <>
-                                <Tooltip title={t('pages.jobs.table.approve', 'Approve')}>
+                                <Tooltip title={t('pages.jobs.table.approveAction', 'Approve')}>
                                     <IconButton size="small" onClick={() => handleApprove(job.id)} color="success">
                                         <CheckCircleIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title={t('pages.jobs.table.reject', 'Reject')}>
+                                <Tooltip title={t('pages.jobs.table.rejectAction', 'Reject')}>
                                     <IconButton size="small" onClick={() => handleReject(job.id)} color="warning">
                                         <CancelIcon fontSize="small" />
                                     </IconButton>
@@ -160,7 +160,7 @@ const JobsPage = () => {
                             </>
                         )}
                         {Number(job.status) === 3 && (
-                            <Tooltip title={t('pages.jobs.table.reject', 'Revoke/Reject')}>
+                            <Tooltip title={t('pages.jobs.table.rejectAction', 'Revoke/Reject')}>
                                 <IconButton size="small" onClick={() => handleReject(job.id)} color="warning">
                                     <CancelIcon fontSize="small" />
                                 </IconButton>
@@ -195,24 +195,15 @@ const JobsPage = () => {
             </Box>
 
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
-                <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
-                    <TextField
-                        size="small"
-                        placeholder={t('pages.jobs.searchPlaceholder')}
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        sx={{ width: 400 }}
-                        slotProps={{
-                            input: {
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon fontSize="small" color="action" />
-                                    </InputAdornment>
-                                ),
-                            }
-                        }}
-                    />
-                </Box>
+                <FilterBar
+                    title={t('pages.jobs.filter.title', 'Bộ lọc tin tuyển dụng')}
+                    searchValue={searchTerm}
+                    searchPlaceholder={t('pages.jobs.searchPlaceholder')}
+                    onSearchChange={handleSearch}
+                    onReset={() => handleSearch('')}
+                    resetDisabled={!searchTerm}
+                    resetLabel={t('common.clearFilters', 'Xóa lọc')}
+                />
 
                 <DataTable
                     columns={columns}

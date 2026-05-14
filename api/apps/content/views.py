@@ -1,14 +1,13 @@
 
 from console.jobs import queue_notification
 
-from django.conf import settings
 from django.db import models
 
 from shared.helpers import helper, utils
 
 from shared import renderers
 from shared import pagination as paginations
-from shared.configs import variable_response as var_res, variable_system as var_sys, app_setting as app_set
+from shared.configs import variable_response as var_res, variable_system as var_sys
 from shared.configs.messages import NOTIFICATION_MESSAGES, ERROR_MESSAGES
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 
@@ -189,13 +188,8 @@ def get_mobile_banner(request):
 
 
 @api_view(http_method_names=['post'])
-@permission_classes([perms_sys.AllowAny])
+@permission_classes([perms_sys.IsAdminUser])
 def send_notification_demo(request):
-
-    if settings.APP_ENVIRONMENT == app_set.ENV_PROD:
-
-        return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
-
     data = request.data
 
     title = data.get("title", "TEST")
@@ -401,35 +395,13 @@ class AdminBannerTypeViewSet(viewsets.ModelViewSet):
 @permission_classes([perms_sys.IsAdminUser])
 def system_settings_view(request):
     """GET/PUT system settings (key-value store)."""
-    from .models import SystemSetting
-
-    DEFAULTS = {
-        'maintenanceMode': ('false', 'Enable maintenance mode'),
-        'autoApproveJobs': ('false', 'Auto-approve job posts'),
-        'emailNotifications': ('true', 'Enable email notifications'),
-    }
+    from .system_settings import load_system_settings, update_system_settings
 
     if request.method == 'GET':
-        for key, (default_val, desc) in DEFAULTS.items():
-            SystemSetting.objects.get_or_create(
-                key=key, defaults={'value': default_val, 'description': desc}
-            )
-        settings_qs = SystemSetting.objects.all()
-        data = {}
-        for s in settings_qs:
-            if s.value.lower() in ('true', 'false'):
-                data[s.key] = s.value.lower() == 'true'
-            else:
-                data[s.key] = s.value
-        return var_res.response_data(data=data)
+        return var_res.response_data(data=load_system_settings())
 
     elif request.method == 'PUT':
-        for key, value in request.data.items():
-            str_value = str(value).lower() if isinstance(value, bool) else str(value)
-            SystemSetting.objects.update_or_create(
-                key=key, defaults={'value': str_value}
-            )
-        return var_res.response_data()
+        return var_res.response_data(data=update_system_settings(request.data))
 
 
 # ===== Article ViewSets =====

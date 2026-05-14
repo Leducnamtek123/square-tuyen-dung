@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm, useWatch, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Alert, Grid2 as Grid, Stack } from "@mui/material";
+import { Alert, Box, Stack } from "@mui/material";
 
 import errorHandling from '../../../../utils/errorHandling';
 import { REGEX_VALIDATE } from '../../../../configs/constants';
@@ -178,20 +178,18 @@ const CompanyFormContent = ({
 
   return (
     <form id="company-form" onSubmit={handleSubmit(handleUpdate)}>
-      <Stack spacing={2}>
+      <Stack spacing={2.5}>
         {errorText ? <Alert severity="error">{errorText}</Alert> : null}
-        <Grid container justifyContent="center">
-          <Grid size={{ xs: 12, lg: 10 }}>
-            <CompanyFormFields
-              control={control}
-              t={t}
-              allConfig={allConfig}
-              districtOptions={localDistrictOptions}
-              locationOptions={localLocationOptions}
-              handleSelectLocation={handleSelectLocation}
-            />
-          </Grid>
-        </Grid>
+        <Box sx={{ width: '100%' }}>
+          <CompanyFormFields
+            control={control}
+            t={t}
+            allConfig={allConfig}
+            districtOptions={localDistrictOptions}
+            locationOptions={localLocationOptions}
+            handleSelectLocation={handleSelectLocation}
+          />
+        </Box>
       </Stack>
     </form>
   );

@@ -112,7 +112,7 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
                   e.stopPropagation();
                   setSelectedFile(null);
                 }}
-                sx={{ minWidth: 'auto', px: 1.5, borderRadius: 1.5, textTransform: 'none' }}
+                sx={{ minWidth: 'auto', px: 1.5, textTransform: 'none' }}
               >
                 {t('fileUpload.delete')}
               </Button>

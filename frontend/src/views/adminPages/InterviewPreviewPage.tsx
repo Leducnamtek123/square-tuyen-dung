@@ -93,7 +93,7 @@ function WaitingStep({ onNext }: { onNext: () => void }) {
         </div>
         <div className="flex flex-col items-center gap-3">
           <Button variant="contained" onClick={onNext}
-            sx={{ height: 56, borderRadius: '1rem', background: '#0ea5e9', px: 6, fontSize: '0.8rem', fontWeight: 900, letterSpacing: '0.2em', textTransform: 'uppercase', boxShadow: '0 0 30px rgba(14,165,233,0.3)', '&:hover': { background: '#38bdf8' } }}>
+            sx={{ height: 56, background: '#0ea5e9', px: 6, fontSize: '0.8rem', fontWeight: 900, letterSpacing: '0.2em', textTransform: 'uppercase', boxShadow: '0 0 30px rgba(14,165,233,0.3)', '&:hover': { background: '#38bdf8' } }}>
             Kiểm tra thiết bị &amp; Vào phòng
           </Button>
           <p className="text-[11px] text-zinc-500">Đã lên lịch: 25/04/2026, 14:00</p>
@@ -152,11 +152,11 @@ function PreflightStep({ onNext, onBack }: { onNext: () => void; onBack: () => v
 
         <div className="flex justify-center gap-3">
           <Button variant="outlined" onClick={onBack}
-            sx={{ borderRadius: '12px', borderColor: 'rgba(255,255,255,0.2)', color: 'white', px: 4, '&:hover': { borderColor: 'white', background: 'rgba(255,255,255,0.05)' } }}>
+            sx={{ borderColor: 'rgba(255,255,255,0.2)', color: 'white', px: 4, '&:hover': { borderColor: 'white', background: 'rgba(255,255,255,0.05)' } }}>
             Quay lại
           </Button>
           <Button variant="contained" onClick={onNext}
-            sx={{ borderRadius: '12px', background: 'linear-gradient(135deg,#0ea5e9,#2563eb)', fontWeight: 900, px: 5, boxShadow: '0 4px 20px rgba(14,165,233,0.4)', '&:hover': { background: 'linear-gradient(135deg,#38bdf8,#3b82f6)' } }}>
+            sx={{ background: 'linear-gradient(135deg,#0ea5e9,#2563eb)', fontWeight: 900, px: 5, boxShadow: '0 4px 20px rgba(14,165,233,0.4)', '&:hover': { background: 'linear-gradient(135deg,#38bdf8,#3b82f6)' } }}>
             Vào phòng phỏng vấn
           </Button>
         </div>
@@ -234,26 +234,26 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
       {/* Control bar */}
       <div className="flex items-center justify-center gap-3 border-t border-white/8 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl">
         <button onClick={() => setMicOn(!micOn)}
-          className={`flex size-11 items-center justify-center rounded-full border transition-all
+          className={`flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border transition-all
             ${micOn ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}>
           <FontAwesomeIcon icon={micOn ? faMicrophone : faMicrophoneSlash} />
         </button>
         <button onClick={() => setCamOn(!camOn)}
-          className={`flex size-11 items-center justify-center rounded-full border transition-all
+          className={`flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border transition-all
             ${camOn ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}>
           <FontAwesomeIcon icon={camOn ? faVideo : faVideoSlash} />
         </button>
-        <button className="flex size-11 items-center justify-center rounded-full border border-white/15 bg-white/8 text-white hover:bg-white/15 transition-all">
+        <button className="flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border border-white/15 bg-white/8 text-white hover:bg-white/15 transition-all">
           <FontAwesomeIcon icon={faDesktop} />
         </button>
         <button onClick={() => setChatOpen(!chatOpen)}
-          className={`flex size-11 items-center justify-center rounded-full border transition-all
+          className={`flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border transition-all
             ${chatOpen ? 'border-cyan-400/40 bg-cyan-500/20 text-cyan-300' : 'border-white/15 bg-white/8 text-white hover:bg-white/15'}`}>
           <FontAwesomeIcon icon={faComment} />
         </button>
         <div className="mx-2 h-6 w-px bg-white/10" />
         <button onClick={onEnd}
-          className="flex h-11 items-center gap-2 rounded-full border border-rose-400/40 bg-rose-500/20 px-5 text-sm font-semibold text-rose-300 hover:bg-rose-500/30 transition-all">
+          className="flex h-11 items-center gap-2 rounded-[var(--sq-button-radius)] border border-rose-400/40 bg-rose-500/20 px-5 text-sm font-semibold text-rose-300 hover:bg-rose-500/30 transition-all">
           <FontAwesomeIcon icon={faPhoneSlash} />
           Kết thúc
         </button>
@@ -293,7 +293,7 @@ export default function InterviewPreviewPage() {
       <div className="mb-4 flex gap-2 rounded-2xl border border-white/8 bg-zinc-900/40 p-2">
         {STEPS.map(s => (
           <button key={s.key} onClick={() => setStep(s.key)}
-            className={`flex-1 rounded-xl px-3 py-2.5 text-left transition-all duration-200
+            className={`flex-1 rounded-[var(--sq-button-radius)] px-3 py-2.5 text-left transition-all duration-200
               ${step === s.key ? 'bg-cyan-500/15 border border-cyan-400/30' : 'border border-transparent hover:bg-white/5'}`}>
             <p className={`text-xs font-semibold ${step === s.key ? 'text-cyan-300' : 'text-zinc-400'}`}>{s.label}</p>
             <p className="text-[10px] text-zinc-500 mt-0.5">{s.desc}</p>
@@ -320,7 +320,7 @@ export default function InterviewPreviewPage() {
         <div className="ml-auto">
           {step !== 'connected' && (
             <Button variant="contained" size="small" onClick={() => setStep('connected')}
-              sx={{ borderRadius: '10px', background: '#0ea5e9', fontWeight: 700, fontSize: '0.7rem', '&:hover': { background: '#38bdf8' } }}>
+              sx={{ background: '#0ea5e9', fontWeight: 700, fontSize: '0.7rem', '&:hover': { background: '#38bdf8' } }}>
               Nhảy đến phòng PV →
             </Button>
           )}

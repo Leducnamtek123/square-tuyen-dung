@@ -1,6 +1,7 @@
 'use client';
 import React, { useCallback, useRef, useMemo } from 'react';
-import { Box, Button, Stack, Typography, Paper, Divider, Theme } from '@mui/material';
+import { Box, Button, Stack, Typography, Divider } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
@@ -10,8 +11,6 @@ import {
 } from '@/utils/editorUtils';
 import toastMessages from '@/utils/toastMessages';
 import errorHandling from '@/utils/errorHandling';
-import type { AxiosError } from 'axios';
-import type { ApiError } from '@/types/api';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import CompanyForm from '../CompanyForm';
 import CompanyFormLoading from '../CompanyForm/CompanyFormLoading';
@@ -175,130 +174,200 @@ const CompanyCard = () => {
   if (isLoading) return <CompanyFormLoading />;
 
   return (
-    <Paper 
-        elevation={0}
-        sx={{ 
-            p: { xs: 3, md: 5 }, 
-            borderRadius: 4, 
-            border: '1px solid',
-            borderColor: 'divider',
-            boxShadow: (theme: Theme) => theme.customShadows?.z1 
+    <Box sx={{ maxWidth: '100%' }}>
+      <Typography
+        variant="h4"
+        sx={{
+          mb: 3,
+          color: 'text.primary',
+          fontSize: { xs: '1.5rem', md: '1.875rem' },
+          fontWeight: 900,
+          letterSpacing: 0,
+          lineHeight: 1.2,
         }}
-    >
-      <Typography variant="h4" sx={{ fontWeight: 900, mb: 4, color: 'text.primary', letterSpacing: '-0.5px' }}>
+      >
         {t('companyProfile.title', 'Company Information')}
       </Typography>
 
-      <Stack spacing={5}>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={4}>
-            <Box>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>
-                    {t('companyProfile.labels.logo')}
-                </Typography>
-                <Box sx={{ position: 'relative', width: 140 }}>
-                    <MuiImageCustom
-                        src={company?.companyImageUrl || ''}
-                        width={140}
-                        height={140}
-                        sx={{
-                            borderRadius: 4,
-                            border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
-                            backgroundColor: 'grey.50',
-                            boxShadow: (theme: Theme) => theme.customShadows?.z1
-                        }}
-                    />
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        size="small"
-                        startIcon={<CameraAltOutlinedIcon />}
-                        onClick={() => logoInputRef.current?.click()}
-                        sx={{ 
-                            mt: 2, 
-                            borderRadius: 2.5, 
-                            textTransform: 'none', 
-                            boxShadow: (theme: Theme) => theme.customShadows?.secondary,
-                            width: '100%',
-                            fontWeight: 900,
-                            color: 'white'
-                        }}
-                    >
-                        {t('common:actions.change')}
-                    </Button>
-                </Box>
+      <Stack spacing={4}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '184px minmax(0, 1fr)' },
+            gap: { xs: 2.5, md: 3 },
+            alignItems: 'stretch',
+          }}
+        >
+          <Stack spacing={1.25}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                color: 'primary.main',
+                fontSize: '0.75rem',
+                fontWeight: 900,
+                letterSpacing: 0,
+                textTransform: 'uppercase',
+              }}
+            >
+              {t('companyProfile.labels.logo')}
+            </Typography>
+            <Box
+              sx={{
+                height: { xs: 196, md: 190 },
+                p: 1.5,
+                borderRadius: 3,
+                border: '1px solid',
+                borderColor: 'divider',
+                bgcolor: 'grey.50',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Box
+                sx={{
+                  width: 128,
+                  height: 128,
+                  borderRadius: 2.5,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper',
+                  overflow: 'hidden',
+                  boxShadow: (theme: Theme) => theme.customShadows?.z1,
+                }}
+              >
+                <MuiImageCustom
+                  src={company?.companyImageUrl || ''}
+                  width="100%"
+                  height="100%"
+                  sx={{ display: 'block' }}
+                />
+              </Box>
+              <Button
+                variant="contained"
+                color="secondary"
+                size="small"
+                startIcon={<CameraAltOutlinedIcon />}
+                onClick={() => logoInputRef.current?.click()}
+                sx={{
+                  minHeight: 34,
+                  width: '100%',
+                  
+                  boxShadow: 'none',
+                  color: 'white',
+                  fontWeight: 800,
+                  textTransform: 'none',
+                }}
+              >
+                {t('companyProfile.labels.changeLogo')}
+              </Button>
             </Box>
+          </Stack>
 
-            <Box flex={1}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>
-                    {t('companyProfile.labels.cover')}
-                </Typography>
-                <Box sx={{ position: 'relative' }}>
-                    <MuiImageCustom
-                        src={company?.companyCoverImageUrl || company?.coverImageUrl || ''}
-                        height={170}
-                        width="100%"
-                        sx={{
-                            borderRadius: 4,
-                            border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
-                            backgroundColor: 'grey.50',
-                            boxShadow: (theme: Theme) => theme.customShadows?.z1
-                        }}
-                        fit="cover"
-                    />
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        size="small"
-                        startIcon={<CameraAltOutlinedIcon />}
-                        onClick={() => coverInputRef.current?.click()}
-                        sx={{ 
-                            mt: 2, 
-                            borderRadius: 2.5, 
-                            textTransform: 'none', 
-                            boxShadow: (theme: Theme) => theme.customShadows?.secondary,
-                            fontWeight: 900,
-                            color: 'white'
-                        }}
-                    >
-                        {t('common:actions.change')}
-                    </Button>
-                </Box>
+          <Stack spacing={1.25} sx={{ minWidth: 0 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                color: 'primary.main',
+                fontSize: '0.75rem',
+                fontWeight: 900,
+                letterSpacing: 0,
+                textTransform: 'uppercase',
+              }}
+            >
+              {t('companyProfile.labels.cover')}
+            </Typography>
+            <Box
+              sx={{
+                position: 'relative',
+                height: { xs: 196, md: 190 },
+                borderRadius: 3,
+                border: '1px solid',
+                borderColor: 'divider',
+                bgcolor: 'grey.50',
+                overflow: 'hidden',
+                boxShadow: (theme: Theme) => theme.customShadows?.z1,
+              }}
+            >
+              <MuiImageCustom
+                src={company?.companyCoverImageUrl || company?.coverImageUrl || ''}
+                height="100%"
+                width="100%"
+                sx={{ display: 'block' }}
+                fit="cover"
+              />
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: 'auto 0 0',
+                  height: 72,
+                  background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.46) 100%)',
+                }}
+              />
+              <Button
+                variant="contained"
+                color="secondary"
+                size="small"
+                startIcon={<CameraAltOutlinedIcon />}
+                onClick={() => coverInputRef.current?.click()}
+                sx={{
+                  position: 'absolute',
+                  left: 14,
+                  bottom: 14,
+                  minHeight: 34,
+                  
+                  boxShadow: 'none',
+                  color: 'white',
+                  fontWeight: 800,
+                  textTransform: 'none',
+                }}
+              >
+                {t('companyProfile.labels.changeCover')}
+              </Button>
             </Box>
-        </Stack>
+          </Stack>
+        </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box>
-                <CompanyForm
-                handleUpdate={handleUpdate}
-                editData={editData}
-                serverErrors={state.serverErrors}
-            />
-            <Box sx={{ mt: 6, display: 'flex', justifyContent: 'flex-end' }}>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<SaveOutlinedIcon />}
-                    type="submit"
-                    form="company-form"
-                    sx={{
-                        px: 8,
-                        py: 1.5,
-                        borderRadius: 3,
-                        fontWeight: 900,
-                        boxShadow: (theme: Theme) => theme.customShadows?.primary,
-                        textTransform: 'none',
-                        fontSize: '1rem',
-                        '&:hover': { bgcolor: 'primary.dark' },
-                    }}
-                >
-                    {t('common:actions.saveChanges')}
-                </Button>
-            </Box>
+          <CompanyForm
+            handleUpdate={handleUpdate}
+            editData={editData}
+            serverErrors={state.serverErrors}
+          />
+          <Box
+            sx={{
+              mt: 4,
+              display: 'flex',
+              justifyContent: 'flex-end',
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<SaveOutlinedIcon />}
+              type="submit"
+              form="company-form"
+              sx={{
+                minHeight: 44,
+                px: { xs: 3, sm: 5 },
+                width: { xs: '100%', sm: 'auto' },
+                
+                fontWeight: 900,
+                boxShadow: (theme: Theme) => theme.customShadows?.primary,
+                textTransform: 'none',
+                fontSize: '0.9375rem',
+                '&:hover': { bgcolor: 'primary.dark' },
+              }}
+            >
+              {t('common:actions.saveChanges')}
+            </Button>
+          </Box>
         </Box>
       </Stack>
 
-      {/* Hidden Inputs */}
       <input
         ref={logoInputRef}
         type="file"
@@ -325,7 +394,7 @@ const CompanyCard = () => {
         onConfirm={handleCropConfirm}
         onCancel={handleCropCancel}
       />
-    </Paper>
+    </Box>
   );
 };
 

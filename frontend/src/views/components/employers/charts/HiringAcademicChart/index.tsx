@@ -6,52 +6,33 @@ import {
   Stack,
   Tooltip as MuiTooltip,
   Typography,
-  CircularProgress,
   Paper,
-  alpha,
   useTheme
 } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
-import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 import dayjs from 'dayjs';
 import PieChartClient from '@/components/Common/Charts/PieChartClient';
+import {
+  ChartEmptyState,
+  ChartLoadingState,
+  chartAreaSx,
+  chartCardSx,
+  chartColors,
+  chartTitleSx,
+  createDoughnutOptions,
+  rgba,
+} from '@/components/Common/Charts/chartDesign';
 import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 import { useEmployerRecruitmentByRank } from '../../hooks/useEmployerQueries';
-import pc from '@/utils/muiColors';
 
 interface HiringAcademicChartProps {
   title: string;
 }
 
-const options = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: 'bottom' as const,
-      labels: {
-        padding: 20,
-        usePointStyle: true,
-        pointStyle: 'circle',
-        font: { size: 12, weight: 600 }
-      }
-    },
-    tooltip: {
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      titleColor: '#212529',
-      bodyColor: '#212529',
-      padding: 12,
-      boxPadding: 6,
-      borderColor: 'rgba(0,0,0,0.1)',
-      borderWidth: 1,
-      usePointStyle: true,
-    }
-  }
-};
-
 const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
   const { t } = useTranslation('employer');
   const theme = useTheme();
+  const options = React.useMemo(() => createDoughnutOptions(theme), [theme]);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([
     dayjs(new Date()).subtract(1, 'month'),
@@ -79,37 +60,39 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
           label: t('hiringAcademicChart.applicationCount'),
           data: data?.data || [],
           backgroundColor: [
-            'rgba(255, 152, 0, 0.9)',  // secondary
-            'rgba(25, 118, 210, 0.9)', // primary
-            'rgba(46, 125, 50, 0.9)',  // success
-            'rgba(2, 136, 209, 0.9)',  // info
-            'rgba(211, 47, 47, 0.9)',  // error
+            rgba(chartColors.sky, 0.92),
+            rgba(chartColors.emerald, 0.92),
+            rgba(chartColors.amber, 0.92),
+            rgba(chartColors.violet, 0.92),
+            rgba(chartColors.red, 0.9),
           ],
-          borderWidth: 0,
-          borderRadius: 4,
-          spacing: 2,
-          hoverOffset: 4
+          hoverBackgroundColor: [
+            chartColors.sky,
+            chartColors.emerald,
+            chartColors.amber,
+            chartColors.violet,
+            chartColors.red,
+          ],
+          borderColor: '#ffffff',
+          borderWidth: 3,
+          borderRadius: 6,
+          spacing: 3,
+          hoverOffset: 8
         },
       ],
     };
   }, [data, t]);
 
+  const hasChartData = React.useMemo(() => Boolean(data?.data?.some((value: unknown) => Number(value) > 0)), [data]);
+
   return (
     <Paper
       elevation={0}
-      sx={{
-        p: { xs: 2.5, sm: 4 },
-        borderRadius: 4,
-        boxShadow: (theme) => theme.customShadows?.z1,
-        border: '1px solid',
-        borderColor: 'divider',
-        height: '100%',
-        bgcolor: 'background.paper'
-      }}
+      sx={chartCardSx}
     >
       <Stack spacing={3}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+          <Typography variant="h4" sx={chartTitleSx}>
             {title}
           </Typography>
           <MuiTooltip title={t('hiringAcademicChart.title')} arrow placement="top">
@@ -129,32 +112,13 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
             />
           </Stack>
 
-          <Box sx={{ position: 'relative', minHeight: 320 }}>
+          <Box sx={chartAreaSx(320)}>
             {queryLoading ? (
-              <Stack alignItems="center" justifyContent="center" sx={{ height: 320 }}>
-                <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
-              </Stack>
-            ) : (!data || !data.data || data.data.length === 0) ? (
-              <Stack
-                alignItems="center"
-                justifyContent="center"
-                sx={{
-                  height: 320,
-                  bgcolor: pc.actionDisabled( 0.05),
-                  borderRadius: 3,
-                  border: '1px dashed',
-                  borderColor: 'divider'
-                }}
-              >
-                <InsertChartOutlinedIcon sx={{ fontSize: 48, color: "text.disabled", mb: 1 }} />
-                <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700 }}>
-                  {t('hiringAcademicChart.noData')}
-                </Typography>
-              </Stack>
+              <ChartLoadingState height="100%" label={t('hiringAcademicChart.loading', { defaultValue: 'Loading chart' })} />
+            ) : !hasChartData ? (
+              <ChartEmptyState height="100%" label={t('hiringAcademicChart.noData')} />
             ) : (
-              <Box sx={{ height: 320 }}>
-                <PieChartClient data={dataOptions} options={options} height={300} />
-              </Box>
+              <PieChartClient data={dataOptions} options={options} height="100%" />
             )}
           </Box>
         </Box>

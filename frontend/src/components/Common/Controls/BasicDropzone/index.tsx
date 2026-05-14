@@ -150,7 +150,7 @@ const FileDropzone = ({ accept, onDrop, values }: FileDropzoneProps) => {
 
                 py: 1,
 
-                borderRadius: 2,
+                
 
                 boxShadow: (theme) => theme.customShadows.small,
 
@@ -222,7 +222,7 @@ const FileDropzone = ({ accept, onDrop, values }: FileDropzoneProps) => {
 
                 px: 3,
 
-                borderRadius: 2,
+                
 
               }}
 

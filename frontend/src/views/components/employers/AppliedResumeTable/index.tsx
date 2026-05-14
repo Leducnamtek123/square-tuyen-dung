@@ -243,7 +243,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
               onClick={() => push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || info.row.original.resume?.slug || '')}`)}
               sx={{ 
                 bgcolor: pc.primary( 0.06),
-                borderRadius: 1.5,
+                
                 '&:hover': { bgcolor: pc.primary( 0.12) }
               }}
             >
@@ -270,7 +270,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                 }}
                 sx={{
                   bgcolor: pc.primary(0.06),
-                  borderRadius: 1.5,
+                  
                   '&:hover': { bgcolor: pc.primary(0.12) }
                 }}
               >
@@ -285,7 +285,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                 onClick={() => onCreateEmployee(info.row.original)}
                 sx={{
                   bgcolor: pc.success(0.06),
-                  borderRadius: 1.5,
+                  
                   '&:hover': { bgcolor: pc.success(0.12) }
                 }}
               >
@@ -301,7 +301,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
               onClick={() => handleDelete(info.row.original.id)}
               sx={{ 
                 bgcolor: pc.error( 0.06),
-                borderRadius: 1.5,
+                
                 '&:hover': { bgcolor: pc.error( 0.12) }
               }}
             >

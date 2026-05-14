@@ -180,7 +180,7 @@ const InterviewLivePage = () => {
             variant="outlined"
             color={state.autoRefresh ? 'primary' : 'inherit'}
             onClick={() => dispatch({ type: 'toggle-auto-refresh' })}
-            sx={{ borderRadius: 2, px: 2, textTransform: 'none' }}
+            sx={{ px: 2, textTransform: 'none' }}
           >
             {state.autoRefresh ? t('interviewLive.autoRefresh.on') : t('interviewLive.autoRefresh.off')}
           </Button>
@@ -189,7 +189,7 @@ const InterviewLivePage = () => {
             color="primary"
             onClick={() => fetchSessions()}
             startIcon={<RefreshIcon />}
-            sx={{ borderRadius: 2, px: 2, textTransform: 'none' }}
+            sx={{ px: 2, textTransform: 'none' }}
           >
             {state.refreshing ? t('interviewLive.updating') : t('common:actions.refresh')}
           </Button>

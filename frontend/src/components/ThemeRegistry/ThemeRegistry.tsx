@@ -9,6 +9,7 @@ import { createTheme } from '@mui/material/styles';
 import type { ThemeOptions } from '@mui/material/styles';
 
 const baseTheme = createTheme(defaultTheme as ThemeOptions);
+const BUTTON_RADIUS = 'var(--sq-button-radius)';
 
 /**
  * Extend theme with MuiAlert overrides to prevent MUI v6 from calling
@@ -41,7 +42,7 @@ const theme = createTheme(baseTheme, {
       },
       styleOverrides: {
         root: {
-          borderRadius: 999,
+          borderRadius: BUTTON_RADIUS,
           textTransform: 'none',
           minHeight: 42,
           paddingInline: 18,
@@ -157,6 +158,7 @@ const theme = createTheme(baseTheme, {
     MuiIconButton: {
       styleOverrides: {
         root: {
+          borderRadius: BUTTON_RADIUS,
           transition: 'transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease',
           '&:hover': {
             transform: 'translateY(-1px)',

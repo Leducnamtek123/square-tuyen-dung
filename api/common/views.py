@@ -6,7 +6,7 @@ from shared.helpers import utils, helper
 
 from shared.configs import variable_response as var_res
 
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 
@@ -47,6 +47,25 @@ from shared.helpers.cloudinary_service import CloudinaryService
 
 from rest_framework import viewsets
 
+
+def _admin_search_order_queryset(queryset, request, search_fields, ordering_map):
+    search = request.query_params.get("kw") or request.query_params.get("search")
+    if search:
+        query = Q()
+        for field in search_fields:
+            query |= Q(**{f"{field}__icontains": search})
+        queryset = queryset.filter(query)
+
+    ordering = request.query_params.get("ordering")
+    if ordering:
+        is_desc = ordering.startswith("-")
+        key = ordering[1:] if is_desc else ordering
+        mapped = ordering_map.get(key)
+        if mapped:
+            queryset = queryset.order_by(f"-{mapped}" if is_desc else mapped)
+
+    return queryset
+
 class AdminCareerViewSet(viewsets.ModelViewSet):
 
     queryset = Career.objects.all().order_by('id')
@@ -57,6 +76,26 @@ class AdminCareerViewSet(viewsets.ModelViewSet):
         return [perms_custom.IsAdminUser()]
 
     pagination_class = paginations.CustomPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        ordering = self.request.query_params.get("ordering", "")
+        if "jobPostTotal" in ordering:
+            queryset = queryset.annotate(job_post_total=Count("job_posts"))
+        return _admin_search_order_queryset(
+            queryset,
+            self.request,
+            ["name", "app_icon_name"],
+            {
+                "id": "id",
+                "name": "name",
+                "appIconName": "app_icon_name",
+                "isHot": "is_hot",
+                "jobPostTotal": "job_post_total",
+                "createAt": "create_at",
+                "updateAt": "update_at",
+            },
+        )
 
     def get_serializer(self, *args, **kwargs):
 
@@ -77,6 +116,20 @@ class AdminCityViewSet(viewsets.ModelViewSet):
 
     pagination_class = paginations.CustomPagination
 
+    def get_queryset(self):
+        return _admin_search_order_queryset(
+            super().get_queryset(),
+            self.request,
+            ["name", "code"],
+            {
+                "id": "id",
+                "name": "name",
+                "code": "code",
+                "createAt": "create_at",
+                "updateAt": "update_at",
+            },
+        )
+
 class AdminDistrictViewSet(viewsets.ModelViewSet):
 
     queryset = District.objects.select_related('city').all().order_by('id')
@@ -90,6 +143,25 @@ class AdminDistrictViewSet(viewsets.ModelViewSet):
 
     filterset_fields = ['city']
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        city = self.request.query_params.get("city")
+        if city:
+            queryset = queryset.filter(city_id=city)
+        return _admin_search_order_queryset(
+            queryset,
+            self.request,
+            ["name", "code", "city__name"],
+            {
+                "id": "id",
+                "name": "name",
+                "code": "code",
+                "city": "city__name",
+                "createAt": "create_at",
+                "updateAt": "update_at",
+            },
+        )
+
 class AdminWardViewSet(viewsets.ModelViewSet):
 
     queryset = Ward.objects.select_related('district').all().order_by('id')
@@ -102,6 +174,25 @@ class AdminWardViewSet(viewsets.ModelViewSet):
     pagination_class = paginations.CustomPagination
 
     filterset_fields = ['district']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        district = self.request.query_params.get("district")
+        if district:
+            queryset = queryset.filter(district_id=district)
+        return _admin_search_order_queryset(
+            queryset,
+            self.request,
+            ["name", "code", "district__name"],
+            {
+                "id": "id",
+                "name": "name",
+                "code": "code",
+                "district": "district__name",
+                "createAt": "create_at",
+                "updateAt": "update_at",
+            },
+        )
 
 def _run_blocking(func, timeout: int = 5):
     # Keep ORM/cache work out of the ASGI event loop.
@@ -146,8 +237,19 @@ def get_all_config(request):
     careers = _run_blocking(lambda: list(Career.objects.values_list("id", "name")))
     city_tuple = utils.convert_tuple_or_list_to_options(cities)
     career_tuple = utils.convert_tuple_or_list_to_options(careers)
+    from apps.content.system_settings import load_system_settings
+
+    system_settings = load_system_settings()
+    company_info = {
+        **var_sys.COMPANY_INFO,
+        "EMAIL": system_settings.get("supportEmail") or var_sys.COMPANY_INFO.get("EMAIL", ""),
+    }
 
     res_data = {
+        "systemSettings": {
+            "maintenanceMode": bool(system_settings.get("maintenanceMode")),
+        },
+        "companyInfo": company_info,
         "genderOptions": gender_tuple[0],
         "maritalStatusOptions": marital_status_tuple[0],
         "languageOptions": language_tuple[0],

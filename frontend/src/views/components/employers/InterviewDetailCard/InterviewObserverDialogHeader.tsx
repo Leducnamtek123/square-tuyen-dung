@@ -98,7 +98,7 @@ const InterviewObserverDialogHeader = ({ candidateName, jobName, liveStatus, sse
             fontSize: '0.7rem',
             letterSpacing: 1,
             textTransform: 'uppercase',
-            borderRadius: 2,
+            
             border: '1px solid',
             borderColor: alpha('#ef4444', 0.3),
             '&:hover': { bgcolor: alpha('#ef4444', 0.25) },

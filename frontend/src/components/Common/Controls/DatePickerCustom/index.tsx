@@ -103,12 +103,8 @@ const DatePickerCustom = <T extends FieldValues = FieldValues>({
                 format="DD-MM-YYYY"
 
                 sx={{
-                  ...sx,
-                  '& .MuiOutlinedInput-root': {
-                    height: '1.4375em',
-                    py: 2.5,
-                  },
                   width: '100%',
+                  ...sx,
                 }}
 
                 value={parseDate(field.value)}
@@ -126,6 +122,8 @@ const DatePickerCustom = <T extends FieldValues = FieldValues>({
                 slotProps={{
 
                   textField: {
+
+                    size: 'small',
 
                     error: fieldState.invalid,
 

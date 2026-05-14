@@ -11,6 +11,7 @@
     "exploreDescription": "Start from one place to search jobs, view companies, filter by industry, and move quickly to your next step.",
     "startExploring": "Start exploring",
     "userFeedback": "User Feedback",
+    "userFeedbackSubtitle": "Real user feedback adds more trust to the recruitment experience.",
     "noFeedbacks": "No user reviews yet",
     "noCompaniesFound": "No companies match your criteria",
     "jobsCount": "{{count}} Jobs",
@@ -95,7 +96,8 @@
       "applied": "Applied",
       "save": "Save job",
       "saved": "Saved",
-      "share": "Share"
+      "share": "Share",
+      "report": "Report"
     }
   },
   "jobSearch": {

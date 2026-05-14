@@ -1,18 +1,18 @@
 ﻿'use client';
 
 import React, { useMemo } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton, Stack } from '@mui/material';
+import { Box, Typography, Breadcrumbs, Link, Paper, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton, Stack } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useCities } from './hooks/useCities';
 import { useDataTable, useDebounce } from '../../../hooks';
 import { City } from '../../../types/models';
 import type { CityPayload } from '../../../services/adminManagementService';
+import FilterBar from '@/components/Common/FilterBar';
 
 type CitiesState = {
   searchTerm: string;
@@ -91,8 +91,8 @@ const CitiesPage = () => {
     ordering,
   });
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: 'search', value: e.target.value });
+  const handleSearch = (value: string) => {
+    dispatch({ type: 'search', value });
     onPaginationChange({ pageIndex: 0, pageSize });
   };
 
@@ -173,24 +173,15 @@ const CitiesPage = () => {
       </Box>
 
       <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
-        <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
-          <TextField
-            size="small"
-            placeholder={t('pages.cities.searchPlaceholder')}
-            value={state.searchTerm}
-            onChange={handleSearch}
-            sx={{ width: 400 }}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" color="action" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        </Box>
+        <FilterBar
+          title={t('pages.cities.filter.title', 'Bộ lọc tỉnh/thành')}
+          searchValue={state.searchTerm}
+          searchPlaceholder={t('pages.cities.searchPlaceholder')}
+          onSearchChange={handleSearch}
+          onReset={() => handleSearch('')}
+          resetDisabled={!state.searchTerm}
+          resetLabel={t('common.clearFilters', 'Xóa lọc')}
+        />
 
         <DataTable
           columns={columns}

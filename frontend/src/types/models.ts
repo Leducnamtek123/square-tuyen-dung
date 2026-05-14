@@ -503,13 +503,13 @@ export interface JobPostNotification {
 /* Chat */
 
 export interface ChatConversation {
-  id: number;
-  jobSeekerId: number;
+  id: number | string;
+  jobSeekerId: number | string;
   jobSeekerName: string;
   jobSeekerAvatar?: string;
   jobSeekerEmail?: string;
-  employerId?: number;
-  companyId?: number;
+  employerId?: number | string;
+  companyId?: number | string;
   employerName?: string;
   companyName?: string;
   employerLogo?: string;
@@ -596,6 +596,9 @@ export interface SystemConfig {
   banners?: Banner[];
   socialMediaLinks?: Record<string, string>;
   companyInfo?: Record<string, string>;
+  systemSettings?: {
+    maintenanceMode?: boolean;
+  };
   cityOptions?: SelectOption[];
   careerOptions?: SelectOption[];
   jobTypeOptions?: SelectOption[];

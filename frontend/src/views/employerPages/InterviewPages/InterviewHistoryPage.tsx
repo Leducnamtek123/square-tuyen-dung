@@ -2,14 +2,13 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import {
   Box, Typography, Chip, Stack, Divider, Button, IconButton,
-  Paper, Avatar, useTheme, TextField, InputAdornment,
-  FormControl, InputLabel, Select, MenuItem, Tooltip,
+  Paper, Avatar, useTheme,
+  FormControl, Select, MenuItem, Tooltip,
   Grid2 as Grid,
 } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DownloadIcon from '@mui/icons-material/Download';
-import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
 import WorkIcon from '@mui/icons-material/Work';
 import ScheduleIcon from '@mui/icons-material/Schedule';
@@ -25,10 +24,13 @@ import type { CellContext as ReactTableCellContext } from '@tanstack/react-table
 import useDebounce from '../../../hooks/useDebounce';
 import pc from '@/utils/muiColors';
 import dayjs from '@/configs/dayjs-config';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
+import type { SxProps, Theme } from '@mui/material/styles';
 
 interface VideoCardProps {
   session: InterviewSession;
 }
+const viewModeFilterSx = [{ minWidth: 180 }, filterControlSx] as SxProps<Theme>;
 
 const VideoCard = ({ session }: VideoCardProps) => {
   const theme = useTheme();
@@ -117,7 +119,7 @@ const VideoCard = ({ session }: VideoCardProps) => {
             component="a"
             href={recordingUrl}
             download
-            sx={{ borderRadius: 2, fontWeight: 800, textTransform: 'none' }}
+            sx={{ fontWeight: 800, textTransform: 'none' }}
           >
             {t('common:actions.download')}
           </Button>
@@ -299,54 +301,33 @@ const InterviewHistoryPage = () => {
             variant="outlined"
             onClick={fetchSessions}
             startIcon={<RefreshIcon />}
-            sx={{ borderRadius: 2.5, fontWeight: 800 }}
+            sx={{ fontWeight: 800 }}
           >
             {t('common:actions.refresh')}
           </Button>
         </Stack>
       </Stack>
 
-      <Paper
-        elevation={0}
-        sx={{
-          p: 3,
-          mb: 4,
-          borderRadius: 3,
-          bgcolor: pc.bgDefault( 0.5),
-          border: '1px solid',
-          borderColor: 'divider',
-        }}
+      <FilterBar
+        title={t('employer:interviewHistory.filterTitle', 'Bộ lọc lịch sử phỏng vấn')}
+        searchValue={state.searchTerm}
+        searchPlaceholder={t('employer:interviewHistory.searchPlaceholder')}
+        onSearchChange={(value) => dispatch({ type: 'set-search-term', value })}
+        onReset={() => dispatch({ type: 'set-search-term', value: '' })}
+        resetDisabled={!state.searchTerm}
+        resetLabel={t('common:reset', 'Xóa lọc')}
+        sx={{ mb: 4 }}
       >
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder={t('employer:interviewHistory.searchPlaceholder')}
-            value={state.searchTerm}
-            onChange={(e) => dispatch({ type: 'set-search-term', value: e.target.value })}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-            sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
-          />
-          <FormControl size="small" sx={{ minWidth: 150 }}>
+          <FormControl size="small" sx={viewModeFilterSx}>
             <Select
               value={state.viewMode}
               onChange={(e) => dispatch({ type: 'set-view-mode', value: e.target.value as 'grid' | 'table' })}
-              sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
             >
               <MenuItem value="grid">{t('employer:interviewHistory.viewMode.grid')}</MenuItem>
               <MenuItem value="table">{t('employer:interviewHistory.viewMode.table')}</MenuItem>
             </Select>
           </FormControl>
-        </Stack>
-      </Paper>
+      </FilterBar>
 
       {state.loading && state.sessions.length === 0 ? (
         <Grid container spacing={3}>

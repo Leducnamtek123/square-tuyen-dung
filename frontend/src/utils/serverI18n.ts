@@ -94,7 +94,7 @@ const PAGE_TITLES: Record<string, Record<SupportedLocale, string>> = {
   // Public
   'companies':                { vi: 'Công ty', en: 'Companies' },
   'about':                    { vi: 'Về chúng tôi', en: 'About Us' },
-  'news':                     { vi: 'Tin tá»©c & Blog tuyá»ƒn dá»¥ng', en: 'News & Recruitment Blog' },
+  'news':                     { vi: 'Tin tức & Blog tuyển dụng', en: 'News & Recruitment Blog' },
 };
 
 /**

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid2 as Grid, alpha, useTheme, Paper } from "@mui/material";
+import { Grid2 as Grid, Paper } from "@mui/material";
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
@@ -29,19 +29,45 @@ const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({
   locationOptions,
   handleSelectLocation,
 }) => {
-  const theme = useTheme();
-
   const inputSx = {
     '& .MuiOutlinedInput-root': {
-        borderRadius: 2.5,
-        backgroundColor: pc.actionDisabled( 0.03),
-        '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
-        '& fieldset': { borderColor: pc.divider( 0.8) }
-    }
+      minHeight: 42,
+      borderRadius: 2,
+      backgroundColor: 'background.paper',
+      transition: 'background-color 0.2s ease, border-color 0.2s ease',
+      '& fieldset': { borderColor: pc.divider(0.95) },
+      '&:hover': { backgroundColor: pc.bgDefault(0.45) },
+      '&:hover fieldset': { borderColor: pc.primary(0.35) },
+      '&.Mui-focused fieldset': {
+        borderColor: 'primary.main',
+        borderWidth: 1,
+      },
+    },
+    '& .MuiInputBase-input': {
+      fontSize: '0.875rem',
+      py: '10px',
+    },
+    '& .MuiFormHelperText-root': {
+      mx: 0,
+      mt: 0.75,
+    },
   };
 
   return (
-    <Grid container spacing={3}>
+    <Grid
+      container
+      spacing={{ xs: 2.25, md: 2.75 }}
+      columnSpacing={{ xs: 2, md: 3 }}
+      sx={{
+        '& > .MuiGrid2-root > div > .MuiTypography-root': {
+          mb: 0.75,
+          color: 'primary.main',
+          fontSize: '0.8125rem',
+          fontWeight: 800,
+          lineHeight: 1.35,
+        },
+      }}
+    >
       <Grid size={12}>
         <TextFieldCustom name="companyName" title={t('companyForm.title.companyname', 'Company Name')} showRequired={true} placeholder={t('companyForm.placeholder.entercompanyname', 'Enter company name')} control={control} sx={inputSx} />
       </Grid>
@@ -91,7 +117,7 @@ const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({
         <TextFieldCustom name="location.lng" title={t('companyForm.title.longitude', 'Longitude')} showRequired={true} placeholder={t('companyForm.placeholder.enterlongitudecoordinateonthemap', 'Enter longitude coordinate on the map.')} helperText={t('companyForm.helperText.automaticallyfilledifyouchooseasuggestedaddress', 'Automatically filled if you choose a suggested address.')} control={control} sx={inputSx} />
       </Grid>
       <Grid size={12}>
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 2.5, border: '1px solid', borderColor: 'divider', bgcolor: pc.actionDisabled( 0.03) }}>
+        <Paper elevation={0} sx={{ p: { xs: 2, md: 2.5 }, borderRadius: 2.5, border: '1px solid', borderColor: pc.divider(0.95), bgcolor: 'background.paper' }}>
           <RichTextEditorCustom name="description" control={control} title={t('companyForm.title.additionaldescription', 'Additional Description')} />
         </Paper>
       </Grid>

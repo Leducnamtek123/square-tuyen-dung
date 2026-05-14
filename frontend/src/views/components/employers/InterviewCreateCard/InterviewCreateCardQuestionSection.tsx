@@ -31,10 +31,6 @@ import type { Question, QuestionGroup } from '../../../../types/models';
 import type { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
 
-const subscribeToStaticDateTime = () => () => {};
-const getClientMinDateTime = (): string | null => new Date().toISOString();
-const getServerMinDateTime = (): string | null => null;
-
 type Props = {
   t: TFunction;
   theme: Theme;
@@ -70,11 +66,25 @@ const InterviewCreateCardQuestionSection = ({
   onOpenEditQuestion,
   onQuestionGroupChange,
 }: Props) => {
-  const minDateTime = React.useSyncExternalStore(
-    subscribeToStaticDateTime,
-    getClientMinDateTime,
-    getServerMinDateTime
-  );
+  const minDateTime = React.useMemo(() => new Date().toISOString(), []);
+
+  const questionGroupSlotProps = React.useMemo(() => ({
+    input: {
+      startAdornment: (
+        <InputAdornment position="start">
+          <CategoryIcon sx={{ fontSize: 20, color: 'info.main' }} />
+        </InputAdornment>
+      ),
+    },
+    inputLabel: { sx: { fontWeight: 600 } },
+    formHelperText: { sx: { fontWeight: 700, fontStyle: 'italic', color: 'info.main', opacity: 0.8 } },
+  }), []);
+
+  const questionsStartAdornment = React.useMemo(() => (
+    <InputAdornment position="start">
+      <QuizIcon sx={{ fontSize: 20, color: 'warning.main', ml: 1 }} />
+    </InputAdornment>
+  ), []);
 
   return (
     <>
@@ -112,17 +122,7 @@ const InterviewCreateCardQuestionSection = ({
               variant="outlined"
               helperText={t('interview:interviewCreateCard.helperText.selectaquestiongrouptoautomaticallyfillthequestions below')}
               sx={inputSx}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <CategoryIcon sx={{ fontSize: 20, color: 'info.main' }} />
-                    </InputAdornment>
-                  ),
-                },
-                inputLabel: { sx: { fontWeight: 600 } },
-                formHelperText: { sx: { fontWeight: 700, fontStyle: 'italic', color: 'info.main', opacity: 0.8 } },
-              }}
+              slotProps={questionGroupSlotProps}
             >
               <MenuItem value="" sx={{ fontWeight: 600 }}>
                 <em>{t('common:none')}</em>
@@ -172,9 +172,7 @@ const InterviewCreateCardQuestionSection = ({
                   </Box>
                 )}
                 startAdornment={
-                  <InputAdornment position="start">
-                    <QuizIcon sx={{ fontSize: 20, color: 'warning.main', ml: 1 }} />
-                  </InputAdornment>
+                  questionsStartAdornment
                 }
               >
                 <MenuItem disabled value="">
@@ -209,7 +207,7 @@ const InterviewCreateCardQuestionSection = ({
             size="medium"
             startIcon={<AddCircleOutlineIcon />}
             onClick={onOpenAddQuestion}
-            sx={{ textTransform: 'none', borderRadius: 2.5, fontWeight: 900, borderStyle: 'dashed', px: 3 }}
+            sx={{ textTransform: 'none', fontWeight: 900, borderStyle: 'dashed', px: 3 }}
           >
             {t('interview:employer.questions.add')}
           </Button>
@@ -220,7 +218,7 @@ const InterviewCreateCardQuestionSection = ({
             startIcon={<EditIcon />}
             disabled={selectedQuestionsCount !== 1}
             onClick={onOpenEditQuestion}
-            sx={{ textTransform: 'none', borderRadius: 2.5, fontWeight: 900, borderStyle: 'dashed', px: 3 }}
+            sx={{ textTransform: 'none', fontWeight: 900, borderStyle: 'dashed', px: 3 }}
           >
             {t('interview:employer.questions.edit')}
           </Button>
@@ -235,7 +233,7 @@ const InterviewCreateCardQuestionSection = ({
             variant="text"
             color="inherit"
             startIcon={<CloseIcon />}
-            sx={{ fontWeight: 900, px: 4, py: 1.5, textTransform: 'none', borderRadius: 3 }}
+            sx={{ fontWeight: 900, px: 4, py: 1.5, textTransform: 'none' }}
           >
             {t('common:cancel')}
           </Button>
@@ -246,7 +244,7 @@ const InterviewCreateCardQuestionSection = ({
             disabled={isInterviewMutating}
             startIcon={!isInterviewMutating && <SendIcon />}
             sx={{
-              borderRadius: 3,
+              
               px: 8,
               py: 1.5,
               fontWeight: 900,

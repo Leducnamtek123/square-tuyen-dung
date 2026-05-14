@@ -65,7 +65,7 @@ const WorkspaceSwitchMenu = () => {
         sx={{
           textTransform: "none",
           border: "1px solid rgba(255,255,255,0.25)",
-          borderRadius: 2,
+          
           px: 1.5,
           minWidth: 150,
         }}

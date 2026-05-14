@@ -101,7 +101,8 @@
     "missingSessionId": "Missing interview session ID.",
     "tokenMissing": "Unable to fetch token to join the interview.",
     "invalidSession": "Connection error or invalid interview session.",
-    "sessionNotReadyForJoin": "Cannot join this room right now because the session is currently {{status}}."
+    "sessionNotReadyForJoin": "Cannot join this room right now because the session is currently {{status}}.",
+    "mic_denied": "Microphone permission was denied. Please allow microphone access to continue."
   },
   "employer": {
     "questions": {
@@ -278,7 +279,11 @@
     },
     "tooltips": {
       "cannotJoin": "Cannot join at this time",
-      "forceEndNow": "End this interview immediately"
+      "forceEndNow": "End this interview immediately",
+      "observeHidden": "Observe without joining the room"
+    },
+    "status": {
+      "interruptedResume": "Interrupted - can resume"
     },
     "messages": {
       "evaluationSuccess": "Evaluation saved successfully",
@@ -299,7 +304,8 @@
       "noDetails": "No details available",
       "noQuestions": "No interview questions",
       "noTranscript": "No transcript",
-      "noTranscriptDesc": "No conversation has been recorded yet."
+      "noTranscriptDesc": "No conversation has been recorded yet.",
+      "interruptedResumeHint": "The connection was interrupted temporarily. You can join again to continue the interview."
     },
     "actions": {
       "triggerAi": "Trigger AI Evaluation",
@@ -329,7 +335,8 @@
       "employer": "Employer",
       "you": "You",
       "candidate": "Candidate",
-      "guest": "Guest"
+      "guest": "Guest",
+      "observer": "Observer"
     },
     "chips": {
       "ai": "AI",
@@ -339,6 +346,7 @@
     },
     "chat": {
       "title": "Conversation",
+      "subtitle": "Voice and messages share the same timeline.",
       "messagesCount": "{{count}} messages",
       "noMessages": "No messages yet",
       "noMessagesDesc": "Conversation will appear here when someone speaks or types.",

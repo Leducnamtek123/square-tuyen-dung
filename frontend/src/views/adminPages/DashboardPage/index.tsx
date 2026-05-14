@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useMemo } from 'react';
-import { Box, Typography, Card, CardHeader, CardContent, Skeleton, Paper, Stack, Chip } from "@mui/material";
+import { Box, Typography, Card, CardHeader, CardContent, Paper, Stack, Chip } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from "@mui/material/styles";
 import { Grid2 as Grid } from "@mui/material";
@@ -10,8 +10,14 @@ import PeopleIcon from '@mui/icons-material/People';
 import WorkIcon from '@mui/icons-material/Work';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import VideocamIcon from '@mui/icons-material/Videocam';
 import PieChartClient from '@/components/Common/Charts/PieChartClient';
+import {
+    ChartEmptyState,
+    ChartLoadingState,
+    chartColors,
+    createDoughnutOptions,
+    rgba,
+} from '@/components/Common/Charts/chartDesign';
 import { useAdminStats } from './hooks/useAdminStats';
 import StatCard from './components/StatCard';
 
@@ -22,12 +28,10 @@ const DashboardPage = () => {
     const { data: stats, isLoading } = useAdminStats();
 
     const BRAND_COLORS = useMemo(() => [
-        theme.palette.primary.main,
-        theme.palette.info.main,
-        theme.palette.secondary.main,
-        theme.palette.warning.main,
-        theme.palette.primary.dark,
-    ], [theme.palette.primary.main, theme.palette.info.main, theme.palette.secondary.main, theme.palette.warning.main, theme.palette.primary.dark]);
+        chartColors.sky,
+        chartColors.emerald,
+        chartColors.amber,
+    ], []);
 
     const userRoleData = useMemo(() => stats
         ? [
@@ -42,33 +46,18 @@ const DashboardPage = () => {
         datasets: [
             {
                 data: userRoleData.map((item) => item.value),
-                backgroundColor: BRAND_COLORS,
-                borderWidth: 0,
+                backgroundColor: BRAND_COLORS.map((color) => rgba(color, 0.9)),
+                hoverBackgroundColor: BRAND_COLORS,
+                borderColor: '#ffffff',
+                borderWidth: 3,
+                hoverOffset: 8,
+                spacing: 3,
             },
         ],
     }), [userRoleData, BRAND_COLORS]);
 
-    const pieOptions = useMemo(() => ({
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    usePointStyle: true,
-                    padding: 20,
-                    font: {
-                        family: theme.typography.fontFamily,
-                        size: 12
-                    }
-                }
-            },
-            tooltip: {
-                callbacks: {
-                    label: (context: any) => `${context.label}: ${context.parsed}`,
-                },
-            },
-        },
-        maintainAspectRatio: false,
-    }), [theme.typography.fontFamily]);
+    const pieOptions = useMemo(() => createDoughnutOptions(theme), [theme]);
+    const hasUserRoleData = userRoleData.some((item) => item.value > 0);
 
     return (
         <Box>
@@ -112,18 +101,20 @@ const DashboardPage = () => {
             </Grid>
             <Grid container spacing={3}>
                 <Grid size={{ xs: 12, md: 8 }}>
-                    <Card elevation={0} sx={{ height: '100%', borderRadius: '16px', border: '1px solid', borderColor: 'divider' }}>
+                    <Card elevation={0} sx={{ height: '100%', borderRadius: 2, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
                         <CardHeader 
                             title={t('dashboard.userDistribution')} 
                             slotProps={{ title: { variant: 'h6', fontWeight: 700 } }}
                         />
-                        <CardContent sx={{ height: 350, pt: 0 }}>
+                        <CardContent sx={{ height: 360, pt: 0 }}>
                             {isLoading ? (
-                                <Skeleton variant="rectangular" height="100%" sx={{ borderRadius: '12px' }} />
+                                <ChartLoadingState height="100%" label={t('dashboard.loadingChart', { defaultValue: 'Loading chart' })} />
+                            ) : !hasUserRoleData ? (
+                                <ChartEmptyState height="100%" label={t('dashboard.noUserData', { defaultValue: 'No user data yet' })} />
                             ) : (
                                 <Box sx={{ height: '100%', display: 'flex', justifyContent: 'center' }}>
-                <PieChartClient data={pieData} options={pieOptions} />
-            </Box>
+                                    <PieChartClient data={pieData} options={pieOptions} height="100%" />
+                                </Box>
                             )}
                         </CardContent>
                     </Card>

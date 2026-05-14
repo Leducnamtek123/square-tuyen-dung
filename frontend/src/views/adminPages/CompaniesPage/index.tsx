@@ -1,10 +1,9 @@
 ﻿'use client';
 
 import React, { useCallback, useMemo, useReducer } from 'react';
-import { Box, Paper, TextField, InputAdornment, Button, Typography, Avatar, Chip, Tooltip, IconButton, Breadcrumbs, Link } from '@mui/material';
+import { Box, Paper, Button, Typography, Avatar, Chip, Tooltip, IconButton, Breadcrumbs, Link } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import type { ColumnDef } from '@tanstack/react-table';
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -17,6 +16,7 @@ import type { AdminCompanyPayload } from './hooks/useCompanies';
 import CompanyFormDialog from './CompanyFormDialog';
 import CompanyDeleteDialog from './CompanyDeleteDialog';
 import { createEmptyCompanyFormData, type CompanyFormData } from './types';
+import FilterBar from '@/components/Common/FilterBar';
 
 type CompanyPageState = {
   dialogOpen: boolean;
@@ -147,8 +147,8 @@ const CompaniesPage = () => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSearchChange(e.target.value);
+  const handleSearch = (value: string) => {
+    onSearchChange(value);
   };
 
   const handleOpenAdd = useCallback(() => {
@@ -276,30 +276,21 @@ const CompaniesPage = () => {
             <Typography color="text.primary">{t('pages.companies.breadcrumbList')}</Typography>
           </Breadcrumbs>
         </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd} sx={{ borderRadius: '8px', textTransform: 'none' }}>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd} sx={{ textTransform: 'none' }}>
           {t('pages.companies.addCompany')}
         </Button>
       </Box>
 
       <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
-        <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
-          <TextField
-            size="small"
-            placeholder={t('pages.companies.searchPlaceholder')}
-            value={searchTerm}
-            onChange={handleSearch}
-            sx={{ width: 400 }}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" color="action" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        </Box>
+        <FilterBar
+          title={t('pages.companies.filter.title', 'Bộ lọc công ty')}
+          searchValue={searchTerm}
+          searchPlaceholder={t('pages.companies.searchPlaceholder')}
+          onSearchChange={handleSearch}
+          onReset={() => handleSearch('')}
+          resetDisabled={!searchTerm}
+          resetLabel={t('common.clearFilters', 'Xóa lọc')}
+        />
 
         <DataTable
           columns={columns}

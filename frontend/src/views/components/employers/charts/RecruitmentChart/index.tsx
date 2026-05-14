@@ -22,77 +22,42 @@ import {
   Stack, 
   Tooltip as MuiTooltip, 
   Typography, 
-  CircularProgress,
   Paper,
-  alpha,
   useTheme
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import dayjs, { Dayjs } from "dayjs";
 import BarChartClient from '@/components/Common/Charts/BarChartClient';
+import {
+  ChartEmptyState,
+  ChartLoadingState,
+  chartAreaSx,
+  chartCardSx,
+  chartColors,
+  chartTitleSx,
+  createCartesianOptions,
+  makeBarFill,
+} from '@/components/Common/Charts/chartDesign';
 import RangePickerCustom from "../../../../../components/Common/Controls/RangePickerCustom";
 import { useEmployerRecruitmentStatistics } from '../../hooks/useEmployerQueries';
-import pc from '@/utils/muiColors';
 
 interface RecruitmentChartProps {
   title: string;
 }
 
 const colors = [
-  "rgba(255, 159, 64, 0.9)",
-  "rgba(255, 206, 86, 0.9)",
-  "rgba(153, 102, 255, 0.9)",
-  "rgba(54, 162, 235, 0.9)",
-  "rgba(75, 192, 192, 0.9)",
-  "rgba(255, 99, 132, 0.9)",
+  chartColors.sky,
+  chartColors.emerald,
+  chartColors.amber,
+  chartColors.violet,
+  chartColors.cyan,
+  chartColors.red,
 ];
-
-const options = {
-  plugins: {
-    legend: {
-      position: "bottom" as const,
-      labels: {
-        padding: 20,
-        usePointStyle: true,
-        pointStyle: "circle",
-        font: { size: 12, weight: 600 }
-      }
-    },
-    tooltip: {
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      titleColor: '#212529',
-      bodyColor: '#212529',
-      padding: 12,
-      boxPadding: 6,
-      borderColor: 'rgba(0,0,0,0.1)',
-      borderWidth: 1,
-      usePointStyle: true,
-    }
-  },
-  responsive: true,
-  maintainAspectRatio: false,
-  interaction: {
-    mode: "index" as const,
-    intersect: false,
-  },
-  scales: {
-    x: {
-      stacked: true,
-      grid: { display: false },
-      ticks: { font: { size: 12, weight: 500 } }
-    },
-    y: {
-      stacked: true,
-      grid: { color: "rgba(0,0,0,0.05)" },
-      ticks: { font: { size: 12, weight: 500 } }
-    }
-  }
-};
 
 const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
   const { t } = useTranslation('employer');
   const theme = useTheme();
+  const options = React.useMemo(() => createCartesianOptions(theme, { stacked: true }), [theme]);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[Dayjs | null, Dayjs | null]>([
     dayjs(new Date()).subtract(1, "month"),
@@ -108,15 +73,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
 
   const dataOptions = React.useMemo(() => {
     const safeData = data || [];
-    const datasets: Array<{
-      label: string | undefined;
-      data: unknown[];
-      backgroundColor: string | undefined;
-      stack: string;
-      borderRadius: number;
-      barThickness: number;
-      maxBarThickness: number;
-    }> = [];
+    const datasets: Array<Record<string, unknown>> = [];
 
     for (let i = safeData.length - 1; i >= 0; i--) {
       const labelText = safeData[i]?.label;
@@ -127,11 +84,14 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
       datasets.push({
         label: t(`recruitmentChart.labels.${labelKey}`, { defaultValue: labelText }),
         data: (safeData[i]?.data || []),
-        backgroundColor: colors[i],
+        backgroundColor: makeBarFill(colors[i % colors.length]),
+        hoverBackgroundColor: colors[i % colors.length],
         stack: "Stack 0",
-        borderRadius: 4,
-        barThickness: 12,
-        maxBarThickness: 12
+        borderRadius: 8,
+        borderSkipped: false,
+        categoryPercentage: 0.64,
+        barPercentage: 0.72,
+        maxBarThickness: 42
       });
     }
 
@@ -141,22 +101,19 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
     };
   }, [data, t]);
 
+  const hasChartData = React.useMemo(() => {
+    if (!data?.length) return false;
+    return data.some((item) => (item?.data || []).some((value: unknown) => Number(value) > 0));
+  }, [data]);
+
   return (
     <Paper 
       elevation={0}
-      sx={{ 
-        p: { xs: 2.5, sm: 4 },
-        borderRadius: 4,
-        boxShadow: (theme) => theme.customShadows?.z1,
-        border: '1px solid',
-        borderColor: 'divider',
-        height: '100%',
-        bgcolor: 'background.paper'
-      }}
+      sx={chartCardSx}
     >
       <Stack spacing={3}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+          <Typography variant="h4" sx={chartTitleSx}>
             {title}
           </Typography>
           <MuiTooltip title={t('recruitmentChart.title')} arrow placement="top">
@@ -176,32 +133,13 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
             />
           </Stack>
 
-          <Box sx={{ position: 'relative', minHeight: 320 }}>
+          <Box sx={chartAreaSx(320)}>
             {queryLoading ? (
-              <Stack alignItems="center" justifyContent="center" sx={{ height: 320 }}>
-                <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
-              </Stack>
-            ) : (!data || data.length === 0) ? (
-              <Stack
-                alignItems="center"
-                justifyContent="center"
-                sx={{
-                  height: 320,
-                  bgcolor: pc.actionDisabled( 0.05),
-                  borderRadius: 3,
-                  border: '1px dashed',
-                  borderColor: 'divider'
-                }}
-              >
-                <InsertChartOutlinedIcon sx={{ fontSize: 48, color: "text.disabled", mb: 1 }} />
-                <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700 }}>
-                    {t('recruitmentChart.noData')}
-                </Typography>
-              </Stack>
+              <ChartLoadingState height="100%" label={t('recruitmentChart.loading', { defaultValue: 'Loading chart' })} />
+            ) : !hasChartData ? (
+              <ChartEmptyState height="100%" label={t('recruitmentChart.noData')} />
             ) : (
-              <Box sx={{ height: 320 }}>
-                <BarChartClient options={options} data={dataOptions} />
-              </Box>
+              <BarChartClient options={options} data={dataOptions} height="100%" />
             )}
           </Box>
         </Box>
