@@ -30,6 +30,7 @@
     "share": "Chia sẻ",
     "chat": "Trò chuyện",
     "end": "Kết thúc",
+    "ending": "Đang kết thúc...",
     "enableAudio": "Bật âm thanh"
   },
   "agentView": {
@@ -102,6 +103,7 @@
     "tokenMissing": "Không thể lấy token để tham gia phỏng vấn.",
     "invalidSession": "Lỗi kết nối hoặc phiên phỏng vấn không hợp lệ.",
     "sessionNotReadyForJoin": "Không thể vào phòng lúc này vì phiên đang ở trạng thái {{status}}.",
+    "endSessionFailed": "Không thể cập nhật trạng thái kết thúc. Phiên đã được ngắt khỏi phòng.",
     "mic_denied": "Quyền truy cập microphone bị từ chối. Vui lòng cho phép truy cập microphone để tiếp tục."
   },
   "employer": {

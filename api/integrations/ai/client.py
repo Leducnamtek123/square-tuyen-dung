@@ -72,11 +72,11 @@ def get_llm_candidates(default_model: str = "") -> List[AIEndpointCandidate]:
     candidates: List[AIEndpointCandidate] = []
     seen: set[str] = set()
 
-    primary_api_key = (
-        _setting("AI_LLM_API_KEY")
-        or _setting("LLM_API_KEY")
-        or _setting("GROQ_API_KEY")
-    )
+    # settings.AI_LLM_API_KEY already applies the legacy LLM_API_KEY/GROQ_API_KEY
+    # fallback when AI_LLM_API_KEY is not configured. Reading only the resolved
+    # setting here lets deployments intentionally leave the text LLM key empty
+    # for local OpenAI-compatible servers such as Ollama.
+    primary_api_key = _setting("AI_LLM_API_KEY")
     _add_candidate(
         candidates,
         seen,

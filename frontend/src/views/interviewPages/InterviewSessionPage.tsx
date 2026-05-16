@@ -77,6 +77,20 @@ const statusClassMap: Record<string, string> = {
 };
 
 const JOINABLE_STATUSES = ['scheduled', 'calibration', 'in_progress', 'interrupted'];
+const END_SESSION_STATUS_TIMEOUT_MS = 8000;
+
+const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error('end_session_timeout')), timeoutMs);
+  });
+
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+};
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -108,6 +122,7 @@ type SessionPageAction =
   | { type: 'set-connect-room'; value: boolean }
   | { type: 'set-connection-details'; value?: LiveKitConnectionDetails }
   | { type: 'set-session'; value: InterviewSession | null }
+  | { type: 'set-session-status'; value: string }
   | { type: 'set-session-invite-token'; value: string };
 
 const initialState: SessionPageState = {
@@ -130,6 +145,7 @@ const reducer = (state: SessionPageState, action: SessionPageAction): SessionPag
     case 'set-connect-room':       return { ...state, connectRoom: action.value };
     case 'set-connection-details': return { ...state, connectionDetails: action.value };
     case 'set-session':            return { ...state, session: action.value };
+    case 'set-session-status':     return { ...state, session: state.session ? { ...state.session, status: action.value } : state.session };
     case 'set-session-invite-token': return { ...state, sessionInviteToken: action.value };
   default:                       return state;
   }
@@ -555,16 +571,32 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
   const handleDisconnected = React.useCallback(() => {
     dispatch({ type: 'set-connect-room', value: false });
     dispatch({ type: 'set-connection-details', value: undefined });
+    dispatch({ type: 'set-show-preflight', value: false });
     finalizeOnDisconnectRef.current = false;
   }, []);
 
   const finalizeInterviewSession = React.useCallback(async () => {
     if (!roomName) return;
     finalizeOnDisconnectRef.current = true;
+    dispatch({ type: 'set-error', value: '' });
+    dispatch({ type: 'set-session-status', value: 'processing' });
+    dispatch({ type: 'set-connect-room', value: false });
+    dispatch({ type: 'set-connection-details', value: undefined });
+    dispatch({ type: 'set-show-preflight', value: false });
+
     try {
-      await interviewService.updateSessionStatus(roomName, 'completed');
-    } catch {
+      await withTimeout(
+        interviewService.updateSessionStatus(roomName, 'completed'),
+        END_SESSION_STATUS_TIMEOUT_MS
+      );
+    } catch (err) {
       finalizeOnDisconnectRef.current = false;
+      dispatch({
+        type: 'set-error',
+        value: getErrorDetail(err) || tRef.current('errors.endSessionFailed', {
+          defaultValue: 'Khong the cap nhat trang thai ket thuc. Phien da duoc ngat khoi phong.',
+        }),
+      });
     }
   }, [roomName]);
 

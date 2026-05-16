@@ -60,6 +60,7 @@ function CustomControlBar({
 }) {
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled, isScreenShareEnabled } = useLocalParticipant();
   const { t } = useTranslation(['interview']);
+  const [ending, setEnding] = useState(false);
 
   return (
     <div className="flex items-center justify-center gap-3 border-t border-white/8 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl">
@@ -94,16 +95,23 @@ function CustomControlBar({
       <div className="mx-2 h-6 w-px bg-white/10" />
       <button
         onClick={async () => {
+          if (ending) return;
+          setEnding(true);
           try {
             await onEndSession?.();
           } catch {
             // keep disconnect flow resilient
+          } finally {
+            setEnding(false);
           }
         }}
-        className="flex h-11 items-center gap-2 rounded-full border border-rose-400/40 bg-rose-500/20 px-5 text-sm font-bold text-rose-300 transition-all hover:bg-rose-500/30"
+        disabled={ending}
+        className={`flex h-11 items-center gap-2 rounded-full border border-rose-400/40 bg-rose-500/20 px-5 text-sm font-bold text-rose-300 transition-all ${
+          ending ? 'cursor-wait opacity-70' : 'hover:bg-rose-500/30'
+        }`}
       >
-        <FontAwesomeIcon icon={faPhoneSlash} />
-        {t('controls.end', 'Kết thúc')}
+        <FontAwesomeIcon icon={ending ? faSpinner : faPhoneSlash} className={ending ? 'animate-spin' : undefined} />
+        {ending ? t('controls.ending', 'Dang ket thuc...') : t('controls.end', 'Kết thúc')}
       </button>
     </div>
   );
@@ -644,11 +652,9 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
           chatOpen={chatOpen}
           setChatOpen={setChatOpen}
           onEndSession={async () => {
-            try {
-              await onEndSession?.();
-            } finally {
-              room.disconnect();
-            }
+            const finalizePromise = onEndSession?.();
+            room.disconnect();
+            await finalizePromise;
           }}
         />
       </div>

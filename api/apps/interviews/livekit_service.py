@@ -63,7 +63,9 @@ class LiveKitService:
         Room names are unique per interview session, so if the room already
         exists we keep it intact instead of deleting/recreating it. Recreating
         an empty room can race against LiveKit dispatch and abort in-flight
-        participant joins.
+        participant joins. A room may already exist because an employer
+        observer joined it before the candidate; in that case explicitly add
+        the room-level agent dispatch so the AI interviewer still starts.
         """
         async def _create_room():
             lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
@@ -83,13 +85,43 @@ class LiveKitService:
             finally:
                 await lkapi.aclose()
 
+        async def _ensure_agent_dispatch():
+            if not LIVEKIT_AGENT_NAME:
+                return
+
+            lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
+            try:
+                dispatches = await lkapi.agent_dispatch.list_dispatch(room_name)
+                for dispatch in dispatches or []:
+                    if getattr(dispatch, "agent_name", "") == LIVEKIT_AGENT_NAME:
+                        return
+
+                await lkapi.agent_dispatch.create_dispatch(
+                    api.CreateAgentDispatchRequest(
+                        agent_name=LIVEKIT_AGENT_NAME,
+                        room=room_name,
+                    )
+                )
+                logger.info(
+                    "LiveKit agent %s dispatched for existing room %s",
+                    LIVEKIT_AGENT_NAME,
+                    room_name,
+                )
+            finally:
+                await lkapi.aclose()
+
         try:
             if asyncio.run(_room_exists()):
+                asyncio.run(_ensure_agent_dispatch())
                 return
             asyncio.run(_create_room())
         except Exception as exc:
             message = str(exc).lower()
             if "already exists" in message or "already_exists" in message:
+                try:
+                    asyncio.run(_ensure_agent_dispatch())
+                except Exception as dispatch_exc:
+                    logger.warning("LiveKit agent dispatch failed: %s", dispatch_exc)
                 return
             logger.warning("LiveKit create_room failed: %s", exc)
 

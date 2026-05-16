@@ -11,6 +11,7 @@ from django.db.models import Count, Q
 from django.core.exceptions import ObjectDoesNotExist, ValidationError as DjangoValidationError
 
 from shared.configs.variable_response import response_data
+from config.django_threading import run_django_sync_in_thread
 
 from .models import (
     Question, QuestionGroup,
@@ -37,6 +38,11 @@ from .services import (
 )
 from apps.accounts import permissions as perms_custom
 from shared.helpers import helper
+
+
+def _update_interview_status_by_room(room_name: str, new_status: str) -> str:
+    session = InterviewSession.objects.get(room_name=room_name)
+    return update_interview_status(session, new_status)
 
 
 class InterviewStatisticViewSet(viewsets.ViewSet):
@@ -263,18 +269,26 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
             permission_classes=[permissions.AllowAny])
     def update_status(self, request, room_name=None):
         """Cập nhật trạng thái (cho Agent hoặc Frontend)."""
+        serializer = UpdateStatusSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
         try:
-            session = InterviewSession.objects.get(room_name=room_name)
+            new_status = run_django_sync_in_thread(
+                _update_interview_status_by_room,
+                room_name,
+                serializer.validated_data['status'],
+            )
         except InterviewSession.DoesNotExist:
             return response_data(
                 status=status.HTTP_404_NOT_FOUND,
                 errors={"detail": ["Interview session not found."]},
             )
+        except (DjangoValidationError, ValueError) as exc:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": [str(exc)]},
+            )
 
-        serializer = UpdateStatusSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        new_status = update_interview_status(session, serializer.validated_data['status'])
         return response_data(data={"status": new_status})
 
     # POST /sessions/{room_name}/append-transcription/

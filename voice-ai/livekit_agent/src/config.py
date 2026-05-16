@@ -78,6 +78,9 @@ class Config:
         "true",
         "yes",
     )
+    PARTICIPANT_WAIT_TIMEOUT_SECONDS: float = _get_float(
+        "PARTICIPANT_WAIT_TIMEOUT_SECONDS", 60.0
+    )
 
     BACKEND_API_URL: str = os.getenv("BACKEND_API_URL", "http://backend:8000/api")
 

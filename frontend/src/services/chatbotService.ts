@@ -7,6 +7,7 @@ export interface ChatMessagePayload {
 
 export interface ChatPayload {
   messages: ChatMessagePayload[];
+  max_tokens?: number;
 }
 
 type ChatResponse = {
@@ -15,7 +16,7 @@ type ChatResponse = {
 
 const chatbotService = {
   async chat(payload: ChatPayload): Promise<ChatResponse> {
-    return httpRequest.post('ai/chat/', payload);
+    return httpRequest.post('ai/chat/', payload, { timeout: 120000 });
   },
 };
 

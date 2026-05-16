@@ -131,7 +131,7 @@ const ChatBot = () => {
       .filter((message) => message.role !== 'system')
       .slice(-MAX_HISTORY)
       .map((message) => ({ role: message.role, content: message.content }));
-    return { messages: [{ role: 'system', content: systemPrompt }, ...history] };
+    return { messages: [{ role: 'system', content: systemPrompt }, ...history], max_tokens: 1024 };
   };
 
   const sendChat = async (payload: ChatPayload) => {

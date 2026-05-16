@@ -30,6 +30,7 @@
     "share": "Share",
     "chat": "Chat",
     "end": "End call",
+    "ending": "Ending...",
     "enableAudio": "Enable audio"
   },
   "agentView": {
@@ -102,6 +103,7 @@
     "tokenMissing": "Unable to fetch token to join the interview.",
     "invalidSession": "Connection error or invalid interview session.",
     "sessionNotReadyForJoin": "Cannot join this room right now because the session is currently {{status}}.",
+    "endSessionFailed": "Unable to update the end status. The room has been disconnected.",
     "mic_denied": "Microphone permission was denied. Please allow microphone access to continue."
   },
   "employer": {

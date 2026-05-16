@@ -210,7 +210,7 @@ class LiveKitWebhookTests(TestCase):
 
 class LiveKitServiceTests(TestCase):
     @patch("apps.interviews.livekit_service.api.LiveKitAPI")
-    def test_ensure_room_with_agent_keeps_existing_room_intact(self, mock_livekit_api_cls):
+    def test_ensure_room_with_agent_dispatches_agent_for_existing_room(self, mock_livekit_api_cls):
         mock_api = mock_livekit_api_cls.return_value
         mock_api.aclose = AsyncMock()
         mock_api.room = SimpleNamespace(
@@ -219,11 +219,38 @@ class LiveKitServiceTests(TestCase):
             delete_room=AsyncMock(),
             list_participants=AsyncMock(),
         )
+        mock_api.agent_dispatch = SimpleNamespace(
+            list_dispatch=AsyncMock(return_value=[]),
+            create_dispatch=AsyncMock(),
+        )
 
         LiveKitService.ensure_room_with_agent("interview-existing-room")
 
         mock_api.room.create_room.assert_not_called()
         mock_api.room.delete_room.assert_not_called()
+        mock_api.agent_dispatch.create_dispatch.assert_awaited_once()
+
+    @patch("apps.interviews.livekit_service.api.LiveKitAPI")
+    def test_ensure_room_with_agent_does_not_duplicate_existing_dispatch(self, mock_livekit_api_cls):
+        mock_api = mock_livekit_api_cls.return_value
+        mock_api.aclose = AsyncMock()
+        mock_api.room = SimpleNamespace(
+            list_rooms=AsyncMock(return_value=SimpleNamespace(rooms=[object()])),
+            create_room=AsyncMock(),
+            delete_room=AsyncMock(),
+            list_participants=AsyncMock(),
+        )
+        mock_api.agent_dispatch = SimpleNamespace(
+            list_dispatch=AsyncMock(
+                return_value=[SimpleNamespace(agent_name="square-ai-interviewer")]
+            ),
+            create_dispatch=AsyncMock(),
+        )
+
+        LiveKitService.ensure_room_with_agent("interview-existing-room")
+
+        mock_api.room.create_room.assert_not_called()
+        mock_api.agent_dispatch.create_dispatch.assert_not_called()
 
     @patch("apps.interviews.services.LiveKitService.create_hr_presence_token", return_value="fake-token")
     def test_create_hr_presence_livekit_token_includes_company_name(self, mock_create_hr_presence_token):
@@ -312,6 +339,31 @@ class InterviewSessionAPITests(TestCase):
 
 
 # ─── NEW: Evaluation API Tests ─────────────────────────────────────────────
+
+    @patch(
+        "apps.interviews.views.run_django_sync_in_thread",
+        side_effect=lambda func, *args, **kwargs: func(*args, **kwargs),
+    )
+    @patch("apps.interviews.tasks.evaluate_interview_session.delay")
+    def test_update_status_by_room_completes_without_async_orm_error(self, mock_delay, mock_thread):
+        session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            status="scheduled",
+        )
+
+        response = self.client.patch(
+            f"/api/v1/interview/web/sessions/{session.room_name}/status/",
+            data={"status": "completed"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json().get("data", {}).get("status"), "completed")
+        session.refresh_from_db()
+        self.assertEqual(session.status, "processing")
+        mock_delay.assert_called_once_with(session.id)
+        mock_thread.assert_called_once()
+
 
 class InterviewEvaluationAPITests(TestCase):
     """Tests that evaluation submission uses snake_case and auto-calculates overall_score."""

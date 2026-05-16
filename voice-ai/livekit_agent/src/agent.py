@@ -262,9 +262,28 @@ async def entrypoint(ctx: JobContext) -> None:
         session_started = True
         # Mark interview as active only after the agent has a live room connection.
         await _update_backend_status(ctx.room.name, "in_progress")
+        participant_identity = str(agent_context.get("participantIdentity") or "").strip() or None
+        if participant_identity:
+            participant = await _wait_for_participant(
+                participant_identity,
+                timeout_seconds=config.PARTICIPANT_WAIT_TIMEOUT_SECONDS,
+            )
+            if participant is None:
+                logger.warning(
+                    "Candidate participant %s did not join room %s within %.1fs; starting session anyway",
+                    participant_identity,
+                    ctx.room.name,
+                    config.PARTICIPANT_WAIT_TIMEOUT_SECONDS,
+                )
+            else:
+                logger.info(
+                    "Candidate participant %s detected in room %s; starting interview session",
+                    participant_identity,
+                    ctx.room.name,
+                )
         room_options = room_io.RoomOptions(
             text_input=False,
-            participant_identity=str(agent_context.get("participantIdentity") or "").strip() or None,
+            participant_identity=participant_identity,
             close_on_disconnect=False,
         )
         await session.start(
