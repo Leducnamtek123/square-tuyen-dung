@@ -11,6 +11,7 @@ from django.utils import timezone as tz
 from django.utils.html import strip_tags
 from pydantic import BaseModel, Field, ValidationError
 
+from integrations.ai.client import post_chat_completion_httpx
 from .livekit_service import LiveKitService
 from .models import InterviewSession
 from .services import broadcast_interview_event
@@ -308,7 +309,6 @@ Hãy trả về kết quả DƯỚI DẠNG JSON với các trường:
 Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
 """
 
-        llm_base_url = config("AI_LLM_BASE_URL", default=config("LLM_BASE_URL", default=config("OLLAMA_BASE_URL", default="http://ollama:11434/v1")))
         model_alias = config("AI_LLM_MODEL", default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b")))
 
         payload = {
@@ -326,23 +326,19 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
 
         logger.info("Starting AI evaluation for session %s using %s", session_id, model_alias)
 
-        llm_api_key = config("AI_LLM_API_KEY", default="")
-        headers = {}
-        if llm_api_key:
-            headers["Authorization"] = f"Bearer {llm_api_key}"
+        response_json, llm_candidate = post_chat_completion_httpx(
+            payload,
+            default_model=model_alias,
+            timeout_seconds=120.0,
+            connect_timeout_seconds=15.0,
+        )
+        logger.info(
+            "AI evaluation for session %s using LLM source %s",
+            session_id,
+            llm_candidate.name,
+        )
 
-        with httpx.Client(timeout=httpx.Timeout(timeout=120.0, connect=15.0)) as client:
-            resp = client.post(f"{llm_base_url}/chat/completions", json=payload, headers=headers)
-
-        if resp.status_code != 200:
-            logger.error("LLM API call failed with status %s: %s", resp.status_code, resp.text)
-            _mark_evaluation_unavailable(
-                session,
-                "AI evaluation service returned an error. Please check AI readiness and try again.",
-            )
-            return None
-
-        content = resp.json()["choices"][0]["message"]["content"]
+        content = response_json["choices"][0]["message"]["content"]
         raw_json = _extract_json_object(content)
         validated = InterviewEvaluationSchema.model_validate_json(raw_json)
 

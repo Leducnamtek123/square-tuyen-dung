@@ -35,6 +35,8 @@ interface ResumeInput {
   description?: string;
   salaryMin?: number;
   salaryMax?: number;
+  expectedSalary?: number | null;
+  skillsSummary?: string | null;
   position?: number;
   experience?: number;
   academicLevel?: number;

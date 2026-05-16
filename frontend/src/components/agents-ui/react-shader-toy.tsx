@@ -863,6 +863,7 @@ function useReactShaderToyRuntime({
   };
 
   const drawScene = (timestamp: number) => {
+    animFrameIdRef.current = undefined;
     const gl = glRef.current;
     if (!gl) return;
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
@@ -879,8 +880,13 @@ function useReactShaderToyRuntime({
       mouseValue[1] = lerpVal(currentY, lastMouseArrRef.current[1] ?? 0, lerp);
     }
     if (animateWhenNotVisibleRef.current || isVisibleRef.current) {
-      animFrameIdRef.current = requestAnimationFrame(drawScene);
+      scheduleDrawScene();
     }
+  };
+
+  const scheduleDrawScene = () => {
+    if (animFrameIdRef.current !== undefined) return;
+    animFrameIdRef.current = requestAnimationFrame(drawScene);
   };
 
   const addEventListeners = () => {
@@ -944,7 +950,7 @@ function useReactShaderToyRuntime({
         for (const entry of entries) {
           isVisibleRef.current = entry.isIntersecting;
           if (entry.isIntersecting) {
-            requestAnimationFrame(drawScene);
+            scheduleDrawScene();
           }
         }
       },
@@ -974,7 +980,7 @@ function useReactShaderToyRuntime({
         processTextures();
         initShaders(preProcessFragment(fs || BASIC_FS), vs || BASIC_VS);
         initBuffers();
-        requestAnimationFrame(drawScene);
+        scheduleDrawScene();
         addEventListeners();
         onResize();
       }
@@ -999,6 +1005,8 @@ function useReactShaderToyRuntime({
       removeEventListeners();
       cancelAnimationFrame(initFrameIdRef.current ?? 0);
       cancelAnimationFrame(animFrameIdRef.current ?? 0);
+      initFrameIdRef.current = undefined;
+      animFrameIdRef.current = undefined;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array to run only once on mount

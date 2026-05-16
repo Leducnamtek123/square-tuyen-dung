@@ -588,7 +588,11 @@ const ProfileDetailCard: React.FC = () => {
                         </Stack>
                       }
                     >
-                      <LazyPdf fileUrl={fileUrl} title={profileDetail.title || ''} />
+                      <LazyPdf
+                        key={`${fileUrl}-${profileDetail.updateAt || ''}`}
+                        fileUrl={fileUrl}
+                        title={profileDetail.title || ''}
+                      />
                     </Suspense>
                   </Box>
                 ) : (

@@ -23,8 +23,6 @@ const DEFAULT_TRANSITION: ValueAnimationTransition = { duration: 0.5, ease: 'eas
 const DEFAULT_PULSE_TRANSITION: ValueAnimationTransition = {
   duration: 0.35,
   ease: 'easeOut',
-  repeat: Infinity,
-  repeatType: 'mirror',
 };
 const LISTENING_SCALE_TRANSITION: ValueAnimationTransition = {
   type: 'spring',
@@ -71,7 +69,7 @@ const getAuraAnimationConfig = (state: AgentState | undefined): AuraAnimationCon
         amplitudeTransition: DEFAULT_TRANSITION,
         frequency: 0.7,
         frequencyTransition: DEFAULT_TRANSITION,
-        brightness: [1.5, 2.0],
+        brightness: 1.8,
         brightnessTransition: DEFAULT_PULSE_TRANSITION,
       };
     case 'thinking':
@@ -85,7 +83,7 @@ const getAuraAnimationConfig = (state: AgentState | undefined): AuraAnimationCon
         amplitudeTransition: DEFAULT_TRANSITION,
         frequency: 1,
         frequencyTransition: DEFAULT_TRANSITION,
-        brightness: [0.5, 2.5],
+        brightness: 1.7,
         brightnessTransition: DEFAULT_PULSE_TRANSITION,
       };
     case 'speaking':
@@ -171,15 +169,7 @@ export function useAgentAudioVisualizerAura(
     if (state === 'speaking' && volume > 0 && !scaleMotionValue.isAnimating()) {
       animateScale(0.2 + 0.2 * volume, { duration: 0 });
     }
-  }, [
-    state,
-    volume,
-    scaleMotionValue,
-    animateScale,
-    animateAmplitude,
-    animateFrequency,
-    animateBrightness,
-  ]);
+  }, [state, volume, scaleMotionValue, animateScale]);
 
   return {
     speed,

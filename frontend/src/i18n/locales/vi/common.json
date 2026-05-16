@@ -834,6 +834,14 @@
     "tryAgain": "Vui lòng thử lại sau.",
     "reload": "Tải lại trang."
   },
+  "maintenanceMode": {
+    "badge": "Đang bảo trì",
+    "title": "Hệ thống đang bảo trì",
+    "message": "Square Tuyển Dụng đang nâng cấp hệ thống để phục vụ bạn tốt hơn. Vui lòng quay lại sau ít phút.",
+    "reload": "Tải lại trang",
+    "retryHint": "Bạn có thể thử lại sau ít phút.",
+    "statusCode": "Mã trạng thái"
+  },
   "language": {
     "vietnamese": "Tiếng Việt",
     "english": "English"

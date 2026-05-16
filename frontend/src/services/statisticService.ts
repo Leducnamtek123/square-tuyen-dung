@@ -94,7 +94,45 @@ export interface AdminGeneralStats {
   totalAdmins: number;
   totalJobPosts: number;
   totalJobPostsPending: number;
+  totalJobPostsRejected?: number;
+  totalJobPostsApproved?: number;
+  totalJobPostsActive?: number;
+  totalJobPostsExpired?: number;
   totalApplications: number;
+  totalApplicationsPending?: number;
+  totalApplicationsContacted?: number;
+  totalApplicationsTested?: number;
+  totalApplicationsInterviewed?: number;
+  totalApplicationsHired?: number;
+  totalApplicationsNotSelected?: number;
+  totalInterviews?: number;
+  totalInterviewsDraft?: number;
+  totalInterviewsScheduled?: number;
+  totalInterviewsInProgress?: number;
+  totalInterviewsCompleted?: number;
+  totalInterviewsCancelled?: number;
+  totalCompanies?: number;
+  totalCompaniesVerified?: number;
+  totalCompaniesUnverified?: number;
+  totalCompanyVerifications?: number;
+  totalCompanyVerificationsPending?: number;
+  totalCompanyVerificationsReviewing?: number;
+  totalCompanyVerificationsRejected?: number;
+  totalJobSeekerProfiles?: number;
+  totalResumes?: number;
+  totalActiveResumes?: number;
+  totalSavedJobPosts?: number;
+  totalSavedResumes?: number;
+  totalCompanyFollowers?: number;
+  totalResumeViews?: number;
+  totalQuestions?: number;
+  totalQuestionGroups?: number;
+  newUsers30d?: number;
+  newEmployers30d?: number;
+  newJobSeekers30d?: number;
+  newJobPosts30d?: number;
+  newApplications30d?: number;
+  newInterviews30d?: number;
 }
 
 export type EmployerStatsParams = {

@@ -21,6 +21,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PersonIcon from '@mui/icons-material/Person';
 import TagIcon from '@mui/icons-material/Tag';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
 import contentService, { type Article } from '@/services/contentService';
 import NoDataCard from '@/components/Common/NoDataCard';
 import HtmlContent from '@/components/Common/HtmlContent';
@@ -41,6 +42,10 @@ const formatDate = (value?: string | null) => {
   const date = dayjs(value);
   return date.isValid() ? date.format('DD/MM/YYYY') : '';
 };
+
+const getCategoryLabel = (category?: Article['category']) => (
+  category === 'news' ? 'Tin tức' : 'Blog tuyển dụng'
+);
 
 const ArticleDetailSkeleton = () => (
   <Stack spacing={3}>
@@ -137,7 +142,7 @@ const ArticleDetailPage = () => {
     image: article?.thumbnailUrl || undefined,
     url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}/${slug}`,
     type: 'article',
-    keywords: article ? `${article.title}, ${t('nav.blog', { ns: 'common' })}` : undefined,
+    keywords: article ? `${article.title}, ${getCategoryLabel(article.category)}` : undefined,
   });
 
   useStructuredData(
@@ -147,7 +152,7 @@ const ArticleDetailPage = () => {
             type: 'BreadcrumbList' as const,
             items: [
               { name: t('seo.articleDetail.breadcrumb.home', { ns: 'public' }), url: typeof window !== 'undefined' ? window.location.origin : '' },
-              { name: t('nav.blog', { ns: 'common' }), url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}` },
+              { name: 'Tin tức & Blog tuyển dụng', url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}` },
               { name: article.title, url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}/${slug}` },
             ],
           },
@@ -173,7 +178,7 @@ const ArticleDetailPage = () => {
   }
 
   const publishedDate = formatDate(article.publishedAt || article.create_at || article.update_at);
-  const categoryLabel = t('nav.blog', { ns: 'common' });
+  const categoryLabel = getCategoryLabel(article.category);
 
   return (
     <Box sx={{ py: { xs: 3, md: 6 } }}>
@@ -212,7 +217,7 @@ const ArticleDetailPage = () => {
               <Stack spacing={2.5}>
                 <Chip
                   label={categoryLabel}
-                  icon={article.category === 'news' ? <TagIcon fontSize="small" /> : <TagIcon fontSize="small" />}
+                  icon={article.category === 'news' ? <NewspaperIcon fontSize="small" /> : <TagIcon fontSize="small" />}
                   sx={{ alignSelf: 'flex-start' }}
                 />
 

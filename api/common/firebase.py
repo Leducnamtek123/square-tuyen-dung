@@ -1,4 +1,6 @@
 import logging
+import base64
+import json
 import os
 from typing import Optional
 
@@ -26,14 +28,22 @@ def initialize_firebase_app() -> Optional[firebase_admin.App]:
     except ValueError:
         pass
 
-    credentials_path = getattr(settings, "FIREBASE_CREDENTIALS_PATH", "")
-    if not credentials_path or not os.path.isfile(credentials_path):
-        logger.info("Firebase disabled: FIREBASE_CREDENTIALS_PATH is missing or invalid.")
-        _FIREBASE_DISABLED = True
-        return None
-
     try:
-        credential = credentials.Certificate(credentials_path)
+        credentials_json = getattr(settings, "FIREBASE_CREDENTIALS_JSON", "")
+        credentials_json_base64 = getattr(settings, "FIREBASE_CREDENTIALS_JSON_BASE64", "")
+        if credentials_json_base64 and not credentials_json:
+            credentials_json = base64.b64decode(credentials_json_base64).decode("utf-8")
+
+        if credentials_json:
+            credential = credentials.Certificate(json.loads(credentials_json))
+        else:
+            credentials_path = getattr(settings, "FIREBASE_CREDENTIALS_PATH", "")
+            if not credentials_path or not os.path.isfile(credentials_path):
+                logger.info("Firebase disabled: FIREBASE_CREDENTIALS_PATH or FIREBASE_CREDENTIALS_JSON is missing or invalid.")
+                _FIREBASE_DISABLED = True
+                return None
+            credential = credentials.Certificate(credentials_path)
+
         _FIREBASE_APP = firebase_admin.initialize_app(credential)
         return _FIREBASE_APP
     except Exception:

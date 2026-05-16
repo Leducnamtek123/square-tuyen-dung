@@ -9,7 +9,7 @@ import store from '../redux/store';
 import '../configs/dayjs-config';
 import '../i18n';
 import errorHandling from '@/utils/errorHandling';
-import type { AxiosError } from 'axios';
+import { isMaintenanceModeError } from '@/utils/maintenanceMode';
 
 function makeQueryClient() {
   return new QueryClient({
@@ -22,7 +22,8 @@ function makeQueryClient() {
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
-        retry: 1,
+        retry: (failureCount, error) =>
+          !isMaintenanceModeError(error) && failureCount < 1,
         staleTime: 5 * 60_000,
         gcTime: 10 * 60_000,
       },

@@ -91,11 +91,14 @@ export interface CompanyRole {
   description?: string;
   permissions?: string[];
   is_system?: boolean;
+  isSystem?: boolean;
+  isActive?: boolean;
 }
 
 export interface CompanyMember {
   id: number;
   companyId?: number;
+  userId?: number;
   user?: User;
   userDict?: User;
   invitedEmail?: string;

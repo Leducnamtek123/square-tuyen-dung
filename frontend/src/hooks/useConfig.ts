@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import commonService from '../services/commonService';
 import type { SystemConfig } from '../types/models';
 import type { Career } from '../types/models';
+import { isMaintenanceModeError } from '../utils/maintenanceMode';
 
 const CONFIG_QUERY_KEY = ['systemConfig'];
 const STALE_TIME = 10 * 60 * 1000; // 10 minutes
@@ -33,7 +34,8 @@ export const useConfig = () => {
     },
     staleTime: STALE_TIME,
     gcTime: STALE_TIME + 5 * 60 * 1000,
-    retry: 2,
+    retry: (failureCount, error) =>
+      !isMaintenanceModeError(error) && failureCount < 2,
     refetchOnWindowFocus: false,
   });
 
@@ -41,5 +43,6 @@ export const useConfig = () => {
     allConfig: query.data || null,
     isLoadingConfig: query.isLoading,
     isErrorConfig: query.isError,
+    errorConfig: query.error,
   };
 };

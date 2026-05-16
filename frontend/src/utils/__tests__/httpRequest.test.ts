@@ -44,7 +44,19 @@ describe('httpRequest', () => {
     expect(response).toEqual({ success: true }); // Because of unwrapResponse / camelizeKeys
   });
 
-  it('does not add access token for public endpoints', async () => {
+  it('adds access token to public data endpoints when available', async () => {
+    (tokenService.getAccessTokenFromCookie as jest.Mock).mockReturnValue('mock-token');
+
+    mock.onGet('job/web/job-posts/senior-react-dev/').reply(config => {
+      expect(config.headers?.['Authorization']).toBe('Bearer mock-token');
+      return [200, { data: { is_saved: true } }];
+    });
+
+    const response = await httpRequest.get('job/web/job-posts/senior-react-dev/');
+    expect(response).toEqual({ isSaved: true });
+  });
+
+  it('does not add access token for auth token endpoint', async () => {
     (tokenService.getAccessTokenFromCookie as jest.Mock).mockReturnValue('mock-token');
 
     mock.onPost('auth/token/').reply(config => {
@@ -100,6 +112,18 @@ describe('httpRequest', () => {
       expect(response).toEqual({ success: true });
     });
 
+    it('does not retry maintenance mode responses', async () => {
+      mock.onGet('/maintenance-endpoint').reply(503, {
+        error: {
+          code: 'MAINTENANCE_MODE',
+          message: 'He thong dang bao tri. Vui long thu lai sau.',
+        },
+      });
+
+      await expect(httpRequest.get('/maintenance-endpoint')).rejects.toThrow();
+      expect(mock.history.get.filter((req) => req.url === '/maintenance-endpoint')).toHaveLength(1);
+    });
+
     it('rejects on generic non-401 error', async () => {
       mock.onGet('/400-endpoint').reply(400, { message: 'Bad request' });
       await expect(httpRequest.get('/400-endpoint')).rejects.toThrow();
@@ -108,6 +132,24 @@ describe('httpRequest', () => {
     it('rejects immediately on 401 if it is a public endpoint', async () => {
       mock.onPost('auth/token/').reply(401);
       await expect(httpRequest.post('auth/token/')).rejects.toThrow();
+    });
+
+    it('retries a public endpoint without auth if refresh token is missing', async () => {
+      (tokenService.getAccessTokenFromCookie as jest.Mock).mockReturnValueOnce('expired-token').mockReturnValue(null);
+      (tokenService.getRefreshTokenFromCookie as jest.Mock).mockReturnValue(null);
+
+      mock.onGet('job/web/job-posts/senior-react-dev/').replyOnce(config => {
+        expect(config.headers?.['Authorization']).toBe('Bearer expired-token');
+        return [401];
+      });
+      mock.onGet('job/web/job-posts/senior-react-dev/').replyOnce(config => {
+        expect(config.headers?.['Authorization']).toBeUndefined();
+        return [200, { data: { is_saved: false } }];
+      });
+
+      const response = await httpRequest.get('job/web/job-posts/senior-react-dev/');
+      expect(response).toEqual({ isSaved: false });
+      expect(tokenService.removeAccessTokenAndRefreshTokenFromCookie).toHaveBeenCalled();
     });
 
     it('removes tokens and rejects if refresh token is missing on 401', async () => {

@@ -1,4 +1,6 @@
 
+import re
+
 from console.jobs import queue_notification
 
 from django.db import models
@@ -60,6 +62,58 @@ def _run_blocking(func, timeout: int = 5):
             return future.result(timeout=timeout)
         except (FuturesTimeoutError, Exception):
             raise
+
+
+ARTICLE_SEARCH_FIELDS = ("title", "excerpt", "content", "tags")
+
+
+def _normalize_article_search(value):
+    search = re.sub(r"\s+", " ", str(value or "")).strip()
+    if len(search) < 2:
+        return ""
+    return search[:200]
+
+
+def _build_article_search_q(fields, term):
+    query = models.Q()
+    for field in fields:
+        query |= models.Q(**{f"{field}__icontains": term})
+    return query
+
+
+def _apply_article_search(queryset, raw_search, fields=ARTICLE_SEARCH_FIELDS):
+    search = _normalize_article_search(raw_search)
+    if not search:
+        return queryset
+
+    phrase_query = _build_article_search_q(fields, search)
+    tokens = [
+        token
+        for token in re.split(r"[\s,;|/]+", search)
+        if len(token) >= 2
+    ][:8]
+
+    token_query = models.Q()
+    for token in tokens:
+        token_query &= _build_article_search_q(fields, token)
+
+    combined_query = phrase_query | token_query if tokens else phrase_query
+
+    rank = models.Case(
+        models.When(title__icontains=search, then=models.Value(80)),
+        models.When(tags__icontains=search, then=models.Value(70)),
+        models.When(excerpt__icontains=search, then=models.Value(60)),
+        models.When(content__icontains=search, then=models.Value(50)),
+        default=models.Value(10),
+        output_field=models.IntegerField(),
+    )
+
+    return (
+        queryset
+        .filter(combined_query)
+        .annotate(search_rank=rank)
+        .order_by("-search_rank", "-published_at", "-create_at")
+    )
 
 
 class FeedbackViewSet(viewsets.ViewSet,
@@ -423,9 +477,7 @@ class ArticlePublicViewSet(viewsets.ReadOnlyModelViewSet):
         if tag:
             qs = qs.filter(tags__icontains=tag)
         if search:
-            qs = qs.filter(
-                models.Q(title__icontains=search) | models.Q(excerpt__icontains=search)
-            )
+            qs = _apply_article_search(qs, search)
         return qs
 
     def get_serializer_class(self):
@@ -470,9 +522,7 @@ class AdminArticleViewSet(viewsets.ModelViewSet):
         if status_filter:
             qs = qs.filter(status=status_filter)
         if search:
-            qs = qs.filter(
-                models.Q(title__icontains=search) | models.Q(excerpt__icontains=search)
-            )
+            qs = _apply_article_search(qs, search)
         return qs
 
     def list(self, request, *args, **kwargs):
@@ -539,7 +589,7 @@ class EmployerArticleViewSet(viewsets.ModelViewSet):
         if status_filter:
             qs = qs.filter(status=status_filter)
         if search:
-            qs = qs.filter(models.Q(title__icontains=search))
+            qs = _apply_article_search(qs, search)
         return qs
 
     def list(self, request, *args, **kwargs):

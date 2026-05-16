@@ -39,15 +39,21 @@ const StyledButton = styled(Button)(({ theme }) => ({
 
   textTransform: "none",
 
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  color: theme.palette.common.white,
+
+  backgroundColor: theme.palette.primary.main,
+
+  boxShadow: "0 10px 22px rgba(26, 64, 125, 0.2)",
 
   transition: "all 0.2s ease",
 
   "&:hover": {
 
+    backgroundColor: theme.palette.primary.dark,
+
     transform: "translateY(-1px)",
 
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+    boxShadow: "0 14px 28px rgba(26, 64, 125, 0.26)",
 
   },
 

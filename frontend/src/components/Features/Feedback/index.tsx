@@ -5,26 +5,44 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography, Box } from "@mui/material";
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography, Box } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
 import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
 import errorHandling from '@/utils/errorHandling';
 import toastMessages from '@/utils/toastMessages';
-import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import RatingCustom from '@/components/Common/Controls/RatingCustom';
 import MultilineTextFieldCustom from '@/components/Common/Controls/MultilineTextFieldCustom';
 import contentService from '@/services/contentService';
 import { FEEDBACK_IMAGES } from '@/configs/constants';
 
-interface FeedbackProps {}
+interface FeedbackProps {
+  trigger?: 'floating' | 'menuItem' | 'none';
+  onBeforeOpen?: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
 
-const Feedback = (_props: FeedbackProps) => {
+interface FeedbackData {
+  rating: number;
+  content: string;
+}
+
+const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, onOpenChange }: FeedbackProps) => {
   const { t } = useTranslation('common');
 
-  const [open, setOpen] = React.useState(false);
-  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
+  const [internalOpen, setInternalOpen] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [hover, setHover] = React.useState(-1);
+  const open = controlledOpen ?? internalOpen;
+
+  const setFeedbackOpen = React.useCallback((nextOpen: boolean) => {
+    if (controlledOpen === undefined) {
+      setInternalOpen(nextOpen);
+    }
+    onOpenChange?.(nextOpen);
+  }, [controlledOpen, onOpenChange]);
 
   const schema = yup.object().shape({
     rating: yup.number().required(t('feedback.ratingRequired')),
@@ -34,7 +52,7 @@ const Feedback = (_props: FeedbackProps) => {
       .max(500, t('feedback.contentMax')),
   });
 
-  const { control, handleSubmit, watch } = useForm({
+  const { control, handleSubmit, watch, reset } = useForm<FeedbackData>({
     defaultValues: {
       rating: 5,
       content: '',
@@ -45,93 +63,76 @@ const Feedback = (_props: FeedbackProps) => {
   const currentRating = watch('rating');
 
   const handleOpen = () => {
-    setOpen(true);
+    onBeforeOpen?.();
+    setFeedbackOpen(true);
   };
 
   const handleClose = () => {
-    setOpen(false);
+    if (isSubmitting) return;
+    setFeedbackOpen(false);
   };
 
-  interface FeedbackData {
-    rating: number;
-    content: string;
-  }
-
-  const handleSendFeedback = (data: FeedbackData) => {
-    const sendFeedback = async (payload: FeedbackData) => {
-      setIsFullScreenLoading(true);
-      try {
-        await contentService.createFeedback(payload);
-        handleClose();
-        toastMessages.success(t('feedback.success'));
-      } catch (error) {
-        // We use an explicit cast here because errorHandling expects AxiosError but catching produces unknown.
-        errorHandling(error);
-      } finally {
-        setIsFullScreenLoading(false);
-      }
-    };
-
-    sendFeedback(data);
+  const handleSendFeedback = async (data: FeedbackData) => {
+    setIsSubmitting(true);
+    try {
+      await contentService.createFeedback(data);
+      setFeedbackOpen(false);
+      setHover(-1);
+      reset({ rating: 5, content: '' });
+      toastMessages.success(t('feedback.success'));
+    } catch (error) {
+      // We use an explicit cast here because errorHandling expects AxiosError but catching produces unknown.
+      errorHandling(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const triggerButton = trigger === 'none' ? null : trigger === 'menuItem' ? (
+    <Button
+      startIcon={<FeedbackOutlinedIcon style={{ marginLeft: 4 }} />}
+      variant="text"
+      color="primary"
+      sx={{ textTransform: "inherit" }}
+      fullWidth
+      onClick={handleOpen}
+    >
+      <Typography marginRight="auto">{t('feedback.button')}</Typography>
+    </Button>
+  ) : (
+    <Button
+      variant="contained"
+      onClick={handleOpen}
+      sx={{
+        position: 'fixed',
+        right: { xs: 16, md: 96 },
+        bottom: { xs: 88, md: 24 },
+        padding: { xs: '9px 14px', md: '8px 16px' },
+        textTransform: 'none',
+        color: 'white',
+        zIndex: 1250,
+        boxShadow: (theme) => theme.customShadows.feedback,
+        backdropFilter: 'blur(8px)',
+        backgroundColor: (theme) => theme.palette.feedback.button.background,
+        borderRadius: '999px',
+        fontSize: '0.95rem',
+        fontWeight: 600,
+        '&:hover': {
+          backgroundColor: (theme) => theme.palette.feedback.button.hover,
+          transform: 'translateY(-2px)',
+          boxShadow: (theme) => `0 12px 24px ${theme.palette.feedback.button.shadow}`,
+        },
+        transition: 'all 0.2s ease',
+      }}
+      startIcon={<SentimentVerySatisfiedIcon sx={{ fontSize: '1.4rem' }} />}
+    >
+      {t('feedback.button')}
+    </Button>
+  );
 
   return (
     <>
-      <Button
-        variant="contained"
-        onClick={handleOpen}
-        sx={{
-          position: 'fixed',
-          right: { xs: 16, md: 96 },
-          bottom: { xs: 88, md: 24 },
-          padding: { xs: '9px 14px', md: '8px 16px' },
-          textTransform: 'none',
-          color: 'white',
-          zIndex: 1250,
-          boxShadow: (theme) => theme.customShadows.feedback,
-          backdropFilter: 'blur(8px)',
-          backgroundColor: (theme) => theme.palette.feedback.button.background,
-          borderRadius: '999px',
-          fontSize: '0.95rem',
-          fontWeight: 600,
-          letterSpacing: '0.2px',
-          '&:hover': {
-            backgroundColor: (theme) => theme.palette.feedback.button.hover,
-            transform: 'translateY(-2px)',
-            boxShadow: (theme) => `0 12px 24px ${theme.palette.feedback.button.shadow}`,
-          },
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          animation: 'feedbackIn 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-          '@keyframes feedbackIn': {
-            '0%': {
-              transform: 'translateY(24px)',
-              opacity: 0,
-            },
-            '100%': {
-              transform: 'translateY(0)',
-              opacity: 1,
-            }
-          },
-        }}
-        startIcon={
-          <SentimentVerySatisfiedIcon
-            sx={{
-              fontSize: '1.4rem',
-              animation: 'smile 3s ease-in-out infinite',
-              '@keyframes smile': {
-                '0%, 100%': {
-                  transform: 'scale(1) rotate(0)',
-                },
-                '50%': {
-                  transform: 'scale(1.2) rotate(10deg)',
-                }
-              },
-            }}
-          />
-        }
-      >
-        {t('feedback.button')}
-      </Button>
+      {triggerButton}
 
       <Dialog
         open={open}
@@ -141,7 +142,7 @@ const Feedback = (_props: FeedbackProps) => {
         slotProps={{
           paper: {
             sx: {
-              borderRadius: '24px',
+              borderRadius: '18px',
               boxShadow: (theme) => theme.customShadows.large,
               border: (theme) => `1px solid ${theme.palette.feedback.dialog.border}`,
             }
@@ -160,10 +161,7 @@ const Feedback = (_props: FeedbackProps) => {
               component="div"
               sx={{
                 fontWeight: 700,
-                background: (theme) => theme.palette.secondary.main,
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                color: 'text.primary',
               }}
             >
               {t('feedback.title')}
@@ -171,6 +169,8 @@ const Feedback = (_props: FeedbackProps) => {
 
             <IconButton
               onClick={handleClose}
+              disabled={isSubmitting}
+              aria-label={t('actions.close')}
               sx={{
                 color: 'grey.500',
                 '&:hover': {
@@ -219,6 +219,7 @@ const Feedback = (_props: FeedbackProps) => {
                 <RatingCustom
                   name="rating"
                   control={control}
+                  disabled={isSubmitting}
                   sx={{
                     '& .MuiRating-icon': {
                       transition: 'transform 0.2s ease-in-out',
@@ -239,6 +240,7 @@ const Feedback = (_props: FeedbackProps) => {
                 name="content"
                 placeholder={t('feedback.placeholder')}
                 control={control}
+                disabled={isSubmitting}
                 minRows={5}
                 maxRows={8}
                 sx={{
@@ -262,6 +264,8 @@ const Feedback = (_props: FeedbackProps) => {
             variant="contained"
             onClick={handleSubmit(handleSendFeedback)}
             fullWidth
+            disabled={isSubmitting}
+            startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : null}
             sx={{
               py: 1.5,
               borderRadius: '12px',
@@ -274,12 +278,10 @@ const Feedback = (_props: FeedbackProps) => {
               }
             }}
           >
-            {t('feedback.submit')}
+            {isSubmitting ? t('saving') : t('feedback.submit')}
           </Button>
         </DialogActions>
       </Dialog>
-
-      {isFullScreenLoading && <BackdropLoading />}
     </>
   );
 };

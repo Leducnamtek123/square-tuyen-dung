@@ -23,6 +23,7 @@ import type { InterviewSession } from '../../types/models';
 import { PreflightRoom } from './PreflightRoom';
 import { AIInterviewLayout } from './AIInterviewLayout';
 import { cn } from '@/lib/utils';
+import { IMAGES } from '@/configs/images';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -338,13 +339,14 @@ function InterviewWaitingRoom({
               <div className="relative flex w-full max-w-2xl flex-col items-center gap-10 text-center">
                 <div className="relative group">
                   <div className="absolute inset-0 rounded-full bg-cyan-500/10 blur-[80px] transition-all duration-1000 group-hover:bg-cyan-500/20" />
-                  <div className="relative z-10 flex h-[180px] w-[180px] items-center justify-center opacity-70 transition-all duration-1000 group-hover:opacity-100 md:h-[260px] md:w-[260px]">
+                  <div className="relative z-10 flex h-[96px] w-[240px] max-w-[70vw] items-center justify-center opacity-90 transition-all duration-1000 group-hover:opacity-100 md:h-[120px] md:w-[320px]">
                     <Image
-                      src="/square-icons/logo.svg"
+                      src={IMAGES.getTextLogo('light')}
                       alt="Square"
-                      width={180}
-                      height={180}
-                      style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
+                      width={320}
+                      height={107}
+                      style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
+                      priority
                     />
                   </div>
                 </div>
@@ -424,6 +426,11 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
   const { t, i18n } = useTranslation(['interview', 'common']);
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const finalizeOnDisconnectRef = React.useRef(false);
+  const tRef = React.useRef(t);
+
+  React.useEffect(() => {
+    tRef.current = t;
+  }, [t]);
 
   const roomName   = state.session?.roomName;
   const isJoinable = !!state.session && JOINABLE_STATUSES.includes(state.session.status);
@@ -432,6 +439,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
   // ── Fetch session ────────────────────────────────────────────────────────
 
   const fetchSessionDetails = React.useCallback(async () => {
+    const translate = tRef.current;
     try {
       dispatch({ type: 'set-loading', value: true });
       dispatch({ type: 'set-error', value: '' });
@@ -441,16 +449,16 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
 
       if (normalizedRole === 'jobseeker') {
         inviteToken = routeId || '';
-        if (!inviteToken) throw new Error(t('errors.missingInvite'));
+        if (!inviteToken) throw new Error(translate('errors.missingInvite'));
         detailRaw = await interviewService.getSessionDetailByInviteToken(inviteToken);
       } else {
-        if (!routeId) throw new Error(t('errors.missingSessionId'));
+        if (!routeId) throw new Error(translate('errors.missingSessionId'));
         detailRaw = await interviewService.getSessionDetail(routeId);
         inviteToken = (detailRaw as { inviteToken?: string } | null)?.inviteToken || '';
       }
 
       const mapped = transformInterviewSession(detailRaw);
-      if (!mapped) throw new Error(t('errors.invalidSession'));
+      if (!mapped) throw new Error(translate('errors.invalidSession'));
 
       dispatch({ type: 'set-session', value: mapped });
       dispatch({
@@ -462,30 +470,31 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
           '',
       });
     } catch (err) {
-      dispatch({ type: 'set-error', value: err instanceof Error ? err.message : t('errors.invalidSession') });
+      dispatch({ type: 'set-error', value: err instanceof Error ? err.message : translate('errors.invalidSession') });
     } finally {
       dispatch({ type: 'set-loading', value: false });
     }
-  }, [normalizedRole, routeId, t]);
+  }, [normalizedRole, routeId]);
 
   React.useEffect(() => { fetchSessionDetails(); }, [fetchSessionDetails]);
 
   // ── Start / terminate session ─────────────────────────────────────────────
 
   const initiateInterviewSession = React.useCallback(async () => {
+    const translate = tRef.current;
     try {
       dispatch({ type: 'set-starting', value: true });
       dispatch({ type: 'set-error', value: '' });
 
-      if (!state.sessionInviteToken) throw new Error(t('errors.missingInvite'));
-      if (normalizedRole !== 'jobseeker' && !routeId) throw new Error(t('errors.missingSessionId'));
+      if (!state.sessionInviteToken) throw new Error(translate('errors.missingInvite'));
+      if (normalizedRole !== 'jobseeker' && !routeId) throw new Error(translate('errors.missingSessionId'));
 
       const latestRaw =
         normalizedRole === 'jobseeker'
           ? await interviewService.getSessionDetailByInviteToken(state.sessionInviteToken)
           : await interviewService.getSessionDetail(routeId as string);
       const latestSession = transformInterviewSession(latestRaw);
-      if (!latestSession) throw new Error(t('errors.invalidSession'));
+      if (!latestSession) throw new Error(translate('errors.invalidSession'));
 
       dispatch({ type: 'set-session', value: latestSession });
       dispatch({
@@ -498,8 +507,8 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
 
       if (!JOINABLE_STATUSES.includes(latestSession.status)) {
         throw new Error(
-          t('errors.sessionNotReadyForJoin', {
-            status: t(`interviewListCard.statuses.${latestSession.status}`),
+          translate('errors.sessionNotReadyForJoin', {
+            status: translate(`interviewListCard.statuses.${latestSession.status}`),
           })
         );
       }
@@ -508,7 +517,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
         normalizedRole === 'jobseeker'
           ? await interviewService.getLiveKitToken(state.sessionInviteToken)
           : await interviewService.getHrPresenceToken(routeId as string);
-      if (!tokenData?.token) throw new Error(t('errors.tokenMissing'));
+      if (!tokenData?.token) throw new Error(translate('errors.tokenMissing'));
 
       const isLocalOrigin =
         window.location.hostname === 'localhost' ||
@@ -529,18 +538,19 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
         }
       }
 
-      if (roomName && tokenService.getAccessTokenFromCookie()) {
-        await interviewService.updateSessionStatus(roomName, 'in_progress').catch(() => {});
+      const targetRoomName = latestSession.roomName || roomName;
+      if (targetRoomName && tokenService.getAccessTokenFromCookie()) {
+        await interviewService.updateSessionStatus(targetRoomName, 'in_progress').catch(() => {});
       }
 
       dispatch({ type: 'set-connection-details', value: { token: tokenData.token, serverUrl: urlToUse } });
       dispatch({ type: 'set-connect-room', value: true });
     } catch (err) {
-      dispatch({ type: 'set-error', value: getErrorDetail(err) || t('errors.invalidSession') });
+      dispatch({ type: 'set-error', value: getErrorDetail(err) || translate('errors.invalidSession') });
     } finally {
       dispatch({ type: 'set-starting', value: false });
     }
-  }, [normalizedRole, roomName, routeId, state.sessionInviteToken, t]);
+  }, [normalizedRole, roomName, routeId, state.sessionInviteToken]);
 
   const handleDisconnected = React.useCallback(() => {
     dispatch({ type: 'set-connect-room', value: false });

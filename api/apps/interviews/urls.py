@@ -17,6 +17,7 @@ admin_router = DefaultRouter()
 admin_router.register('sessions', views.AdminInterviewSessionReadOnlyViewSet, basename='admin-interview-sessions')
 
 urlpatterns = [
+    path('web/screening-results/<int:session_id>/', views.ScreeningResultAPIView.as_view()),
     path('web/', include(web_router.urls)),
     path('admin/', include(admin_router.urls)),
     path('web/sessions/<int:session_id>/stream/', interview_event_stream, name='interview-sse-stream'),

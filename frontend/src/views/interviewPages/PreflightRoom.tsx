@@ -55,16 +55,29 @@ export const PreflightRoom = ({ onJoin, onCancel, starting }: PreflightRoomProps
   const { t } = useTranslation(['interview', 'common']);
   const [state, dispatch] = useReducer(reducer, initialState);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const micDeniedMessageRef = useRef(t('errors.mic_denied'));
+
+  useEffect(() => {
+    micDeniedMessageRef.current = t('errors.mic_denied');
+  }, [t]);
 
   useEffect(() => {
     let animationFrame = 0;
     let localStream: MediaStream | null = null;
+    let disposed = false;
+    let lastVolume = -1;
+    let lastVolumeDispatchAt = 0;
 
     const checkMicrophone = async () => {
       dispatch({ type: 'loading', value: true });
 
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        if (disposed) {
+          localStream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+
         dispatch({ type: 'stream', value: localStream });
         dispatch({ type: 'error', value: '' });
 
@@ -81,7 +94,8 @@ export const PreflightRoom = ({ onJoin, onCancel, starting }: PreflightRoomProps
 
           const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-          const renderFrame = () => {
+          const renderFrame = (timestamp: number) => {
+            if (disposed) return;
             analyser.getByteFrequencyData(dataArray);
 
             let sum = 0;
@@ -90,30 +104,36 @@ export const PreflightRoom = ({ onJoin, onCancel, starting }: PreflightRoomProps
             }
 
             const average = sum / dataArray.length;
-            dispatch({
-              type: 'volume',
-              value: Math.min(100, Math.round((average / 255) * 100 * 2)),
-            });
+            const nextVolume = Math.min(100, Math.round((average / 255) * 100 * 2));
+            if (nextVolume !== lastVolume && timestamp - lastVolumeDispatchAt >= 80) {
+              lastVolume = nextVolume;
+              lastVolumeDispatchAt = timestamp;
+              dispatch({ type: 'volume', value: nextVolume });
+            }
 
             animationFrame = window.requestAnimationFrame(renderFrame);
           };
 
-          renderFrame();
+          animationFrame = window.requestAnimationFrame(renderFrame);
         }
       } catch (error) {
+        if (disposed) return;
         dispatch({ type: 'stream', value: null });
         dispatch({
           type: 'error',
-          value: t('errors.mic_denied'),
+          value: micDeniedMessageRef.current,
         });
       } finally {
-        dispatch({ type: 'loading', value: false });
+        if (!disposed) {
+          dispatch({ type: 'loading', value: false });
+        }
       }
     };
 
     void checkMicrophone();
 
     return () => {
+      disposed = true;
       if (animationFrame) {
         cancelAnimationFrame(animationFrame);
       }
@@ -126,7 +146,7 @@ export const PreflightRoom = ({ onJoin, onCancel, starting }: PreflightRoomProps
         localStream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [t]);
+  }, []);
 
   return (
     <Box

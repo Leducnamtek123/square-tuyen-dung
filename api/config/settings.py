@@ -79,6 +79,14 @@ AI_LLM_BASE_URL = config(
 )
 AI_LLM_MODEL = config("AI_LLM_MODEL", default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b")))
 AI_LLM_API_KEY = config("AI_LLM_API_KEY", default=config("LLM_API_KEY", default=config("GROQ_API_KEY", default="")))
+AI_LLM_LOCAL_BASE_URL = config("AI_LLM_LOCAL_BASE_URL", default="")
+AI_LLM_LOCAL_MODEL = config("AI_LLM_LOCAL_MODEL", default=AI_LLM_MODEL)
+AI_LLM_LOCAL_API_KEY = config("AI_LLM_LOCAL_API_KEY", default="")
+AI_LLM_FALLBACK_BASE_URLS = config("AI_LLM_FALLBACK_BASE_URLS", default=AI_LLM_LOCAL_BASE_URL)
+AI_LLM_FALLBACK_MODELS = config("AI_LLM_FALLBACK_MODELS", default=AI_LLM_LOCAL_MODEL if AI_LLM_LOCAL_BASE_URL else "")
+AI_LLM_FALLBACK_API_KEYS = config("AI_LLM_FALLBACK_API_KEYS", default=AI_LLM_LOCAL_API_KEY if AI_LLM_LOCAL_BASE_URL else "")
+AI_STT_FALLBACK_BASE_URLS = config("AI_STT_FALLBACK_BASE_URLS", default="")
+AI_TTS_FALLBACK_BASE_URLS = config("AI_TTS_FALLBACK_BASE_URLS", default="")
 AI_RESUME_AUTO_ANALYZE = config("AI_RESUME_AUTO_ANALYZE", default=True, cast=bool)
 LIVEKIT_PUBLIC_URL = config("LIVEKIT_PUBLIC_URL", default="")
 LIVEKIT_URL = config("LIVEKIT_URL", default="http://livekit:7880")
@@ -524,6 +532,8 @@ FIREBASE_CONFIG = {
     "measurementId": config('FIREBASE_MEASUREMENT_ID', default='')
 }
 FIREBASE_CREDENTIALS_PATH = config('FIREBASE_CREDENTIALS_PATH', default='')
+FIREBASE_CREDENTIALS_JSON = config('FIREBASE_CREDENTIALS_JSON', default='')
+FIREBASE_CREDENTIALS_JSON_BASE64 = config('FIREBASE_CREDENTIALS_JSON_BASE64', default='')
 
 JSON_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'config', '')
 

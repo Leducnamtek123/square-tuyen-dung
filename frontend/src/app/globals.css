@@ -12,6 +12,43 @@
 @import 'swiper/css/autoplay';
 @import 'swiper/css/grid';
 @import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+@import '@react-pdf-viewer/core/lib/styles/index.css';
+
+/* PDF viewer fallback: keep the selectable text layer over the canvas and invisible.
+   Without these rules the PDF text can flow below the canvas, looking like a duplicated CV. */
+.rpv-core__page-layer {
+  position: relative;
+}
+
+.rpv-core__canvas-layer,
+.rpv-core__text-layer {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+}
+
+.rpv-core__canvas-layer {
+  overflow: hidden;
+}
+
+.rpv-core__text-layer {
+  width: 100% !important;
+  height: 100% !important;
+  line-height: 1 !important;
+  z-index: 1;
+}
+
+.rpv-core__text-layer-text {
+  color: transparent !important;
+  position: absolute !important;
+  transform-origin: 0 0 !important;
+  white-space: pre !important;
+}
+
+.rpv-core__text-layer span::selection {
+  color: transparent !important;
+}
+
 @font-face {
   font-family: 'Geist Variable';
   font-style: normal;
@@ -320,5 +357,37 @@ h1, h2, h3, h4, h5, .display-text {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  [data-loading-indicator="true"],
+  [data-loading-indicator="true"] *,
+  .MuiCircularProgress-indeterminate,
+  .MuiCircularProgress-circleIndeterminate,
+  .MuiLinearProgress-indeterminate,
+  .MuiLinearProgress-bar1Indeterminate,
+  .MuiLinearProgress-bar2Indeterminate,
+  .MuiSkeleton-pulse,
+  .MuiSkeleton-wave::after,
+  .animate-spin {
+    animation-iteration-count: infinite !important;
+  }
+
+  [data-loading-indicator="true"],
+  [data-loading-indicator="true"] *,
+  .MuiCircularProgress-indeterminate,
+  .MuiCircularProgress-circleIndeterminate,
+  .MuiSkeleton-pulse,
+  .MuiSkeleton-wave::after {
+    animation-duration: var(--sq-loading-animation-duration, 1.4s) !important;
+  }
+
+  .MuiLinearProgress-indeterminate,
+  .MuiLinearProgress-bar1Indeterminate,
+  .MuiLinearProgress-bar2Indeterminate {
+    animation-duration: var(--sq-loading-animation-duration, 2.1s) !important;
+  }
+
+  .animate-spin {
+    animation-duration: var(--sq-loading-animation-duration, 1s) !important;
   }
 }

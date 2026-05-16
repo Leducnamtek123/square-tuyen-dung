@@ -43,6 +43,11 @@ const defaultState: GeneralInfoCardState = {
   resumeDetail: null,
 };
 
+const optionalNumber = (value: string | number | null | undefined) => {
+  if (value === '' || value === null || value === undefined) return undefined;
+  return Number(value);
+};
+
 const reducer = (state: GeneralInfoCardState, action: GeneralInfoCardAction): GeneralInfoCardState => {
   switch (action.type) {
     case 'open-popup':
@@ -109,16 +114,16 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
           title: payload.title,
           description: payload.description,
           skillsSummary: payload.skillsSummary,
-          salaryMin: Number(payload.salaryMin) || undefined,
-          salaryMax: Number(payload.salaryMax) || undefined,
-          expectedSalary: Number(payload.expectedSalary) || undefined,
-          position: Number(payload.position) || undefined,
-          experience: Number(payload.experience) || undefined,
-          academicLevel: Number(payload.academicLevel) || undefined,
-          typeOfWorkplace: Number(payload.typeOfWorkplace) || undefined,
-          jobType: Number(payload.jobType) || undefined,
-          city: Number(payload.city) || undefined,
-          career: Number(payload.career) || undefined,
+          salaryMin: optionalNumber(payload.salaryMin),
+          salaryMax: optionalNumber(payload.salaryMax),
+          expectedSalary: optionalNumber(payload.expectedSalary),
+          position: optionalNumber(payload.position),
+          experience: optionalNumber(payload.experience),
+          academicLevel: optionalNumber(payload.academicLevel),
+          typeOfWorkplace: optionalNumber(payload.typeOfWorkplace),
+          jobType: optionalNumber(payload.jobType),
+          city: optionalNumber(payload.city),
+          career: optionalNumber(payload.career),
         };
 
         await resumeService.updateResume(slug, apiPayload);

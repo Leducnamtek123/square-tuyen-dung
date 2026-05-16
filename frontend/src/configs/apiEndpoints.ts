@@ -62,6 +62,10 @@ const PRIVATE_PREFIX_OVERRIDES: readonly string[] = [
   'job/web/job-posts/job-posts-saved/',
 ];
 
+const PRIVATE_REGEX_OVERRIDES: readonly RegExp[] = [
+  /^info\/web\/companies\/[^/]+\/followed\/(?:\?.*)?$/,
+];
+
 /**
  * Check if a URL is a public endpoint (no auth token needed).
  *
@@ -78,6 +82,7 @@ export const isPublicEndpoint = (url: string | undefined): boolean => {
 
   if (/(?:^|\/)admin\//.test(safeUrl)) return false;
   if (PRIVATE_PREFIX_OVERRIDES.some((pfx) => safeUrl.startsWith(pfx))) return false;
+  if (PRIVATE_REGEX_OVERRIDES.some((pattern) => pattern.test(safeUrl))) return false;
 
   if (PUBLIC_EXACT_URLS.has(safeUrl)) return true;
   if (PUBLIC_PREFIX_URLS.some((pfx) => safeUrl.startsWith(pfx))) return true;

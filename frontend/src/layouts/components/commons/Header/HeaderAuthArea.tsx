@@ -92,19 +92,22 @@ const HeaderAuthArea = ({
     <Box sx={{ ml: 1, display: "block" }}>
       <Stack direction="row" spacing={{ xs: 0.5, sm: 1 }}>
         <Button
-          variant="outlined"
-          color="inherit"
+          variant="contained"
           size="small"
           sx={{
             color: "white",
-            borderColor: "rgba(255, 255, 255, 0.35)",
+            backgroundColor: "primary.main",
+            border: "1px solid rgba(255, 255, 255, 0.28)",
             px: { xs: 1.5, sm: 2.5 },
             py: 0.75,
             fontSize: { xs: "0.75rem", sm: "0.85rem" },
-            backdropFilter: "blur(4px)",
+            boxShadow: "0 10px 22px rgba(26, 64, 125, 0.24)",
+            transition: "all 0.2s ease",
             "&:hover": {
-              borderColor: "rgba(255, 255, 255, 0.65)",
-              backgroundColor: "rgba(255, 255, 255, 0.12)",
+              backgroundColor: "primary.dark",
+              borderColor: "rgba(255, 255, 255, 0.45)",
+              boxShadow: "0 14px 28px rgba(26, 64, 125, 0.3)",
+              transform: "translateY(-1px)",
             },
           }}
           onClick={onLogin}
@@ -139,4 +142,3 @@ const HeaderAuthArea = ({
 };
 
 export default HeaderAuthArea;
-

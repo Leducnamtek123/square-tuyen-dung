@@ -71,6 +71,7 @@ describe('apiEndpoints', () => {
       'job/web/job-posts/job-posts-saved/',
       'job/web/job-posts/job-posts-saved/?page=1&pageSize=10',
       'job/web/job-posts/123/save/',
+      'info/web/companies/square-e2e/followed/',
       'some/random/private/endpoint/',
     ])('returns false for non-public URL: %s', (url) => {
       expect(isPublicEndpoint(url)).toBe(false);

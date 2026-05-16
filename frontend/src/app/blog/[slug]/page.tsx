@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'article',
       url: `/blog/${slug}`,
       siteName: 'Square Tuyển Dụng',
-      locale: 'en_US',
+      locale: 'vi_VN',
       ...(article.thumbnailUrl && {
         images: [{ url: article.thumbnailUrl }],
       }),

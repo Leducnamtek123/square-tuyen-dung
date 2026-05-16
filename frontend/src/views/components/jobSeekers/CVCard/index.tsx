@@ -20,6 +20,7 @@ interface CVCardProps {
 interface CVData {
   title: string;
   fileUrl: string;
+  updateAt?: string;
 }
 
 type CVCardState = {
@@ -191,7 +192,11 @@ const CVCard = ({ title }: CVCardProps) => {
                     </Stack>
                   }
                 >
-                  <LazyPdf title={state.cv.title} fileUrl={state.cv.fileUrl} />
+                  <LazyPdf
+                    key={`${state.cv.fileUrl}-${state.cv.updateAt || ''}`}
+                    title={state.cv.title}
+                    fileUrl={state.cv.fileUrl}
+                  />
                 </Suspense>
               </Box>
             </Stack>

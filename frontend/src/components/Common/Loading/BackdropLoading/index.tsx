@@ -26,11 +26,13 @@ const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }: Backdr
     >
 
       <Box
+        data-loading-indicator="true"
         sx={{
           width: 100,
           height: 100,
           display: 'grid',
           placeItems: 'center',
+          '--sq-loading-animation-duration': '900ms',
           animation: 'sq-backdrop-spin 900ms linear infinite',
           animationDuration: '900ms !important',
           animationIterationCount: 'infinite !important',

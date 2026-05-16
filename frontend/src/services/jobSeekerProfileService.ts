@@ -37,6 +37,32 @@ export interface JobSeekerProfileUpdatePayload {
   emergencyContactPhone?: string;
 }
 
+const formatDateForApi = (value: Date | string | null | undefined): string | null | undefined => {
+  if (value === undefined) return undefined;
+  if (value === null || value === '') return null;
+
+  if (value instanceof Date) {
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, '0');
+    const day = String(value.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    return trimmed.includes('T') ? trimmed.slice(0, 10) : trimmed;
+  }
+
+  return undefined;
+};
+
+const normalizeProfilePayload = (data: JobSeekerProfileUpdatePayload): JobSeekerProfileUpdatePayload => ({
+  ...data,
+  birthday: formatDateForApi(data.birthday),
+  idCardIssueDate: formatDateForApi(data.idCardIssueDate),
+});
+
 const jobSeekerProfileService = {
   getProfile: async (): Promise<JobSeekerProfile> => {
     const url = 'info/profile/';
@@ -46,7 +72,7 @@ const jobSeekerProfileService = {
 
   updateProfile: async (data: JobSeekerProfileUpdatePayload): Promise<JobSeekerProfile> => {
     const url = 'info/profile/';
-    const resData = await httpRequest.put<JobSeekerProfile>(url, data);
+    const resData = await httpRequest.put<JobSeekerProfile>(url, normalizeProfilePayload(data));
     return presignInObject(resData);
   },
 

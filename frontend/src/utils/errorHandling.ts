@@ -2,6 +2,7 @@
 import type { ApiError } from '../types/api';
 import toastMessages from './toastMessages';
 import i18n from '../i18n';
+import { isMaintenanceModeError, notifyMaintenanceMode } from './maintenanceMode';
 
 type SetError = ((errors: ApiError) => void) | null;
 
@@ -47,6 +48,11 @@ const errorHandling = (
   error: unknown,
   setError: SetError = null,
 ): void => {
+  if (isMaintenanceModeError(error)) {
+    notifyMaintenanceMode(error);
+    return;
+  }
+
   // If it's not an Axios error, show a generic network/unknown error
   if (!isAxiosError(error)) {
     console.error('[errorHandling] Non-Axios error:', error);

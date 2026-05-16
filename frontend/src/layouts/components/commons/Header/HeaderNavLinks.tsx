@@ -20,7 +20,7 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
   return (
     <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
       {pages.map((page) => (
-        <Link href={page.path} key={page.id} onClick={onClose}>
+        <Link href={page.path} key={page.id} onClick={onClose} style={{ textDecoration: "none" }}>
           <Button
             color="inherit"
             variant="text"
@@ -30,6 +30,7 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
               color: "white",
               display: "block",
               whiteSpace: "nowrap",
+              textDecoration: "none",
               
               px: 2,
               py: 0.85,
@@ -39,6 +40,10 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
               '&:hover': {
                 backgroundColor: "rgba(255, 255, 255, 0.08)",
                 borderColor: "rgba(255, 255, 255, 0.15)",
+                textDecoration: "none",
+              },
+              '&:focus, &:active': {
+                textDecoration: "none",
               },
             }}
           >

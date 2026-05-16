@@ -27,14 +27,26 @@ export interface CompanyMemberPayload {
   roleId: number;
   status?: string;
   invitedEmail?: string;
+  invited_email?: string;
   is_active?: boolean;
 }
 
 export interface CompanyMemberUpdatePayload {
   roleId?: number;
   status?: string;
+  invitedEmail?: string;
+  invited_email?: string;
   is_active?: boolean;
 }
+
+const normalizeMemberPayload = <T extends CompanyMemberPayload | CompanyMemberUpdatePayload>(data: T) => {
+  const payload = { ...data } as T & { invitedEmail?: string; invited_email?: string };
+  if (payload.invitedEmail && !payload.invited_email) {
+    payload.invited_email = payload.invitedEmail;
+  }
+  delete payload.invitedEmail;
+  return payload;
+};
 
 const companyTeamService = {
   getRoles: (params: CompanyTeamListParams = {}): Promise<PaginatedResponse<CompanyRole>> => {
@@ -53,10 +65,10 @@ const companyTeamService = {
     return httpRequest.get<PaginatedResponse<CompanyMember>>('info/web/company-members/', { params: cleanParams(params) });
   },
   createMember: (data: CompanyMemberPayload): Promise<CompanyMember> => {
-    return httpRequest.post<CompanyMember>('info/web/company-members/', data);
+    return httpRequest.post<CompanyMember>('info/web/company-members/', normalizeMemberPayload(data));
   },
   updateMember: (id: IdType, data: CompanyMemberUpdatePayload): Promise<CompanyMember> => {
-    return httpRequest.patch<CompanyMember>(`info/web/company-members/${id}/`, data);
+    return httpRequest.patch<CompanyMember>(`info/web/company-members/${id}/`, normalizeMemberPayload(data));
   },
   deleteMember: (id: IdType): Promise<void> => {
     return httpRequest.delete<void>(`info/web/company-members/${id}/`);

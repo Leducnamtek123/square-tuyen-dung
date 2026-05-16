@@ -10,6 +10,10 @@ from celery import shared_task
 from django.core.cache import cache
 from decouple import config
 from .models import JobPostActivity
+from integrations.ai.client import (
+    post_chat_completion_httpx,
+    post_ollama_native_chat_httpx,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -374,10 +378,6 @@ def analyze_resume_ai(self, activity_id):
         - no <think> block, no explanation.
         """
 
-        llm_base_url = config(
-            "AI_LLM_BASE_URL",
-            default=config("LLM_BASE_URL", default=config("OLLAMA_BASE_URL", default="http://ollama:11434/v1")),
-        )
         model_alias = config(
             "AI_RESUME_LLM_MODEL",
             default=config("AI_LLM_MODEL", default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b"))),
@@ -404,18 +404,12 @@ def analyze_resume_ai(self, activity_id):
         activity.ai_analysis_progress = 70
         activity.save(update_fields=['ai_analysis_progress', 'update_at'])
 
-        llm_api_key = config("AI_LLM_API_KEY", default="")
-        headers = {}
-        if llm_api_key:
-            headers["Authorization"] = f"Bearer {llm_api_key}"
-
-        with httpx.Client(timeout=httpx.Timeout(timeout=llm_timeout, connect=llm_connect_timeout)) as client:
-            resp = client.post(f"{llm_base_url}/chat/completions", json=payload, headers=headers)
-
-        if resp.status_code != 200:
-            raise Exception(f"LLM API failed with status {resp.status_code}")
-
-        response_json = resp.json()
+        response_json, llm_candidate = post_chat_completion_httpx(
+            payload,
+            default_model=model_alias,
+            timeout_seconds=llm_timeout,
+            connect_timeout_seconds=llm_connect_timeout,
+        )
         message = (response_json.get("choices") or [{}])[0].get("message") or {}
         content = message.get("content") or ""
         reasoning = message.get("reasoning") or ""
@@ -438,9 +432,8 @@ def analyze_resume_ai(self, activity_id):
                     result = None
 
             if result is None and config("AI_RESUME_OLLAMA_FALLBACK_ENABLED", default=True, cast=bool):
-                native_base = llm_base_url[:-3] if llm_base_url.endswith("/v1") else llm_base_url
                 native_payload = {
-                    "model": model_alias,
+                    "model": llm_candidate.model or model_alias,
                     "messages": payload["messages"],
                     "stream": False,
                     "think": False,
@@ -449,10 +442,13 @@ def analyze_resume_ai(self, activity_id):
                         "temperature": llm_temperature,
                     },
                 }
-                with httpx.Client(timeout=httpx.Timeout(timeout=llm_timeout, connect=llm_connect_timeout)) as native_client:
-                    native_resp = native_client.post(f"{native_base}/api/chat", json=native_payload, headers=headers)
-                if native_resp.status_code == 200:
-                    native_json = native_resp.json()
+                native_json = post_ollama_native_chat_httpx(
+                    llm_candidate,
+                    native_payload,
+                    timeout_seconds=llm_timeout,
+                    connect_timeout_seconds=llm_connect_timeout,
+                )
+                if native_json:
                     native_content = (native_json.get("message") or {}).get("content") or ""
                     result = _parse_llm_json_content(native_content)
 

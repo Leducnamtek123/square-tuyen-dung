@@ -23,6 +23,12 @@ from rest_framework.throttling import AnonRateThrottle
 
 from apps.accounts.permissions import IsAdminUser
 from shared.configs.variable_response import data_response
+from integrations.ai.client import (
+    AIServiceUnavailable,
+    get_llm_candidates,
+    get_service_base_urls,
+    post_chat_completion_requests,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -83,9 +89,6 @@ def _tts_response_from_body(body: Dict[str, Any]):
     response_format = body.get("format") or body.get("response_format") or "mp3"
     speed = body.get("speed") or 1.0
 
-    base_url = getattr(settings, "AI_TTS_BASE_URL", "http://localhost:8298/v1").rstrip("/")
-    url = f"{base_url}/audio/speech"
-
     payload = {
         "input": text,
         "model": body.get("model") or "tts-1",
@@ -94,31 +97,39 @@ def _tts_response_from_body(body: Dict[str, Any]):
         "speed": speed,
     }
 
-    try:
-        upstream = requests.post(url, json=payload, stream=True, timeout=(10, 300))
-    except requests.RequestException as e:
-        return JsonResponse({"detail": f"TTS upstream unavailable: {str(e)}"}, status=502)
-
-    if upstream.status_code >= 400:
-        # Try to surface upstream error body (may be JSON).
+    last_error: Dict[str, Any] = {}
+    for index, base_url in enumerate(get_service_base_urls("tts")):
+        url = f"{base_url}/audio/speech"
         try:
-            err = upstream.json()
-        except Exception:
-            err = {"detail": upstream.text[:500]}
-        return JsonResponse({"detail": "TTS upstream error.", "upstream": err}, status=502)
+            upstream = requests.post(url, json=payload, stream=True, timeout=(10, 300))
+        except requests.RequestException as e:
+            last_error = {"source": "primary" if index == 0 else f"fallback-{index}", "detail": str(e)}
+            logger.warning("TTS candidate %s unavailable: %s", base_url, e)
+            continue
 
-    content_type = upstream.headers.get("content-type") or "audio/mpeg"
+        if upstream.status_code >= 400:
+            try:
+                err = upstream.json()
+            except Exception:
+                err = {"detail": upstream.text[:500]}
+            last_error = {"source": "primary" if index == 0 else f"fallback-{index}", "upstream": err}
+            logger.warning("TTS candidate %s returned HTTP %s", base_url, upstream.status_code)
+            continue
 
-    def gen():
-        for chunk in upstream.iter_content(chunk_size=64 * 1024):
-            if chunk:
-                yield chunk
+        content_type = upstream.headers.get("content-type") or "audio/mpeg"
 
-    resp = StreamingHttpResponse(gen(), content_type=content_type)
-    # Best-effort content length
-    if upstream.headers.get("content-length"):
-        resp["Content-Length"] = upstream.headers["content-length"]
-    return resp
+        def gen():
+            for chunk in upstream.iter_content(chunk_size=64 * 1024):
+                if chunk:
+                    yield chunk
+
+        resp = StreamingHttpResponse(gen(), content_type=content_type)
+        # Best-effort content length
+        if upstream.headers.get("content-length"):
+            resp["Content-Length"] = upstream.headers["content-length"]
+        return resp
+
+    return JsonResponse({"detail": "TTS upstream unavailable.", "upstream": last_error}, status=502)
 
 
 class TTSAPIView(APIView):
@@ -153,39 +164,50 @@ def _transcribe_fn(request: HttpRequest):
     if not audio_file:
         return JsonResponse(data_response(errors={"detail": "Missing `audio`."}, data=None), status=400)
 
-    base_url = getattr(settings, "AI_STT_BASE_URL", "http://localhost:11437/v1").rstrip("/")
-    url = f"{base_url}/audio/transcriptions"
     model = request.POST.get("model") or getattr(settings, "AI_STT_MODEL", "openai/whisper-large-v3")
     language = request.POST.get("language") or getattr(settings, "AI_STT_LANGUAGE", "vi")
+    audio_bytes = audio_file.read()
 
     files = {
-        "file": (audio_file.name or "audio.webm", audio_file.read(), audio_file.content_type or "application/octet-stream")
+        "file": (audio_file.name or "audio.webm", audio_bytes, audio_file.content_type or "application/octet-stream")
     }
     data = {
         "model": model,
         "language": language,
     }
 
-    try:
-        upstream = requests.post(url, data=data, files=files, timeout=(10, 300))
-    except requests.RequestException as e:
-        return JsonResponse(data_response(errors={"detail": f"STT upstream unavailable: {str(e)}"}, data=None), status=502)
-
-    if upstream.status_code >= 400:
+    last_error: Dict[str, Any] = {}
+    for index, base_url in enumerate(get_service_base_urls("stt")):
+        url = f"{base_url}/audio/transcriptions"
         try:
-            err = upstream.json()
+            upstream = requests.post(url, data=data, files=files, timeout=(10, 300))
+        except requests.RequestException as e:
+            last_error = {"source": "primary" if index == 0 else f"fallback-{index}", "detail": str(e)}
+            logger.warning("STT candidate %s unavailable: %s", base_url, e)
+            continue
+
+        if upstream.status_code >= 400:
+            try:
+                err = upstream.json()
+            except Exception:
+                err = {"detail": upstream.text[:500]}
+            last_error = {"source": "primary" if index == 0 else f"fallback-{index}", "upstream": err}
+            logger.warning("STT candidate %s returned HTTP %s", base_url, upstream.status_code)
+            continue
+
+        try:
+            upstream_json = upstream.json()
         except Exception:
-            err = {"detail": upstream.text[:500]}
-        return JsonResponse(data_response(errors={"detail": "STT upstream error.", "upstream": err}, data=None), status=502)
+            upstream_json = {}
 
-    try:
-        upstream_json = upstream.json()
-    except Exception:
-        upstream_json = {}
+        # OpenAI-compatible STT typically returns { text: "..." }.
+        transcription = upstream_json.get("text") or upstream_json.get("transcription") or ""
+        return JsonResponse(data_response(errors={}, data={"transcription": transcription}), status=200)
 
-    # OpenAI-compatible STT typically returns { text: "..." }.
-    transcription = upstream_json.get("text") or upstream_json.get("transcription") or ""
-    return JsonResponse(data_response(errors={}, data={"transcription": transcription}), status=200)
+    return JsonResponse(
+        data_response(errors={"detail": "STT upstream unavailable.", "upstream": last_error}, data=None),
+        status=502,
+    )
 
 
 class TranscribeAPIView(APIView):
@@ -239,6 +261,38 @@ def _probe_http_service(name: str, base_url: str, path: str = "/models", headers
         return {"status": "offline", "latencyMs": None, "error": str(exc)}
 
 
+def _probe_http_candidates(candidates: List[Dict[str, Any]], path: str = "/models") -> Dict[str, Any]:
+    if not candidates:
+        return {"status": "not_configured", "latencyMs": None, "candidates": []}
+
+    probe_results = []
+    for candidate in candidates:
+        result = _probe_http_service(
+            candidate.get("name", "candidate"),
+            candidate.get("baseUrl", ""),
+            path=path,
+            headers=candidate.get("headers") or {},
+        )
+        result["name"] = candidate.get("name")
+        result["baseUrl"] = candidate.get("baseUrl")
+        probe_results.append(result)
+
+    online = next((item for item in probe_results if item.get("status") == "online"), None)
+    if online:
+        return {
+            "status": "online",
+            "latencyMs": online.get("latencyMs"),
+            "active": online.get("name"),
+            "candidates": probe_results,
+        }
+
+    return {
+        "status": "offline",
+        "latencyMs": None,
+        "candidates": probe_results,
+    }
+
+
 def _probe_celery() -> Dict[str, Any]:
     try:
         from config.celery import app as celery_app
@@ -250,14 +304,29 @@ def _probe_celery() -> Dict[str, Any]:
 
 
 def _ai_service_checks() -> Dict[str, Any]:
-    llm_api_key = getattr(settings, "AI_LLM_API_KEY", "") or getattr(settings, "LLM_API_KEY", "") or getattr(settings, "GROQ_API_KEY", "")
-    headers = {"Authorization": f"Bearer {llm_api_key}"} if llm_api_key else {}
     livekit_url = getattr(settings, "LIVEKIT_URL", "") or getattr(settings, "LIVEKIT_PUBLIC_URL", "")
+    llm_model = getattr(settings, "AI_LLM_MODEL", "")
+    llm_candidates = [
+        {
+            "name": candidate.name,
+            "baseUrl": candidate.normalized_base_url,
+            "headers": candidate.headers(),
+        }
+        for candidate in get_llm_candidates(default_model=llm_model)
+    ]
+    stt_candidates = [
+        {"name": "primary" if index == 0 else f"fallback-{index}", "baseUrl": base_url}
+        for index, base_url in enumerate(get_service_base_urls("stt"))
+    ]
+    tts_candidates = [
+        {"name": "primary" if index == 0 else f"fallback-{index}", "baseUrl": base_url}
+        for index, base_url in enumerate(get_service_base_urls("tts"))
+    ]
 
     return {
-        "llm": _probe_http_service("llm", getattr(settings, "AI_LLM_BASE_URL", ""), headers=headers),
-        "stt": _probe_http_service("stt", getattr(settings, "AI_STT_BASE_URL", "")),
-        "tts": _probe_http_service("tts", getattr(settings, "AI_TTS_BASE_URL", ""), path="/voices"),
+        "llm": _probe_http_candidates(llm_candidates),
+        "stt": _probe_http_candidates(stt_candidates),
+        "tts": _probe_http_candidates(tts_candidates, path="/voices"),
         "livekit": _probe_http_service("livekit", livekit_url, path="/"),
         "celery": _probe_celery(),
     }
@@ -675,9 +744,7 @@ class ChatAPIView(APIView):
                 messages.append({"role": "system", "content": system_prompt})
             messages.append({"role": "user", "content": message})
 
-        base_url = getattr(settings, "AI_LLM_BASE_URL", "http://ollama:11434/v1").rstrip("/")
         model = body.get("model") or getattr(settings, "AI_LLM_MODEL", "gemma4:e4b")
-        url = f"{base_url}/chat/completions"
 
         # Determine which tools to make available.
         # Only authenticated employers/admins can create interview invitations.
@@ -710,13 +777,10 @@ class ChatAPIView(APIView):
         except (TypeError, ValueError):
             max_tool_rounds = 4
         max_tool_rounds = max(1, min(max_tool_rounds, 8))
-        llm_api_key = getattr(settings, "AI_LLM_API_KEY", "") or getattr(settings, "LLM_API_KEY", "") or getattr(settings, "GROQ_API_KEY", "")
-        headers = {}
-        if llm_api_key:
-            headers["Authorization"] = f"Bearer {llm_api_key}"
-
         try:
             upstream_json = {}
+            active_model = model
+            active_source = None
             current_messages = list(messages)
 
             for _ in range(max_tool_rounds):
@@ -724,14 +788,13 @@ class ChatAPIView(APIView):
                     **base_payload,
                     "messages": current_messages,
                 }
-                upstream = requests.post(url, json=payload, headers=headers, timeout=(10, 120))
-                if upstream.status_code >= 400:
-                    return Response(
-                        data_response(errors={}, data={"reply": _LLM_FALLBACK_REPLY, "model": model}),
-                        status=200,
-                    )
-
-                upstream_json = upstream.json()
+                upstream_json, candidate = post_chat_completion_requests(
+                    payload,
+                    default_model=model,
+                    timeout=(10, 120),
+                )
+                active_model = candidate.model or model
+                active_source = candidate.name
                 choices = upstream_json.get("choices") or []
                 message_obj = choices[0].get("message", {}) if choices else {}
                 tool_calls = message_obj.get("tool_calls") or []
@@ -752,7 +815,7 @@ class ChatAPIView(APIView):
                         }
                     )
 
-        except (requests.ConnectionError, requests.Timeout):
+        except (requests.ConnectionError, requests.Timeout, AIServiceUnavailable):
             # LLM not reachable — return friendly fallback
             return Response(
                 data_response(errors={}, data={"reply": _LLM_FALLBACK_REPLY, "model": model}),
@@ -782,7 +845,8 @@ class ChatAPIView(APIView):
                 errors={},
                 data={
                     "reply": reply,
-                    "model": model,
+                    "model": active_model,
+                    "source": active_source,
                     "usage": upstream_json.get("usage") if isinstance(upstream_json, dict) else None,
                 },
             ),

@@ -5,13 +5,14 @@ import { Box, Button, CircularProgress, Divider, IconButton, Stack, Typography }
 import ClearIcon from "@mui/icons-material/Clear";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { IMAGES, ROUTES } from "../../../../configs/constants";
+import { IMAGES } from "../../../../configs/constants";
 import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
 import NoDataCard from "../../../../components/Common/NoDataCard";
 import TimeAgo from "../../../../components/Common/TimeAgo";
-import { formatRoute } from "../../../../utils/funcUtils";
 import { useNotifications } from "../../../../hooks/useNotifications";
+import { useAppSelector } from "../../../../hooks/useAppStore";
 import { useTranslation } from 'react-i18next';
+import { getNotificationTargetPath, isExternalNotificationTarget } from "../../../../utils/notificationRouting";
 
 interface NotificationCardProps {
   title: React.ReactNode;
@@ -20,8 +21,10 @@ interface NotificationCardProps {
 const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
   const { push } = useRouter();
   const { t } = useTranslation('common');
+  const { currentUser } = useAppSelector((state) => state.user);
   const {
     isLoading,
+    unreadCount,
     notifications,
     loadMore,
     hasMore,
@@ -31,35 +34,16 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
     handleRemoveAll
   } = useNotifications();
 
-  const handleClickItem = (item: typeof notifications[0]) => {
-    switch (item.type) {
-      case "SYSTEM":
-        handleRead(item.key);
-        push("/");
-        break;
-      case "EMPLOYER_VIEWED_RESUME":
-      case "EMPLOYER_SAVED_RESUME":
-        handleRead(item.key);
-        push(`/${ROUTES.JOB_SEEKER.MY_COMPANY}`);
-        break;
-      case "APPLY_STATUS":
-        handleRead(item.key);
-        push(`/${ROUTES.JOB_SEEKER.MY_JOB}`);
-        break;
-      case "COMPANY_FOLLOWED":
-        handleRead(item.key);
-        push(`/${ROUTES.EMPLOYER.PROFILE}`);
-        break;
-      case "POST_VERIFY_RESULT":
-        handleRead(item.key);
-        push(`/${ROUTES.EMPLOYER.JOB_POST}`);
-        break;
-      case "APPLY_JOB":
-        handleRead(item.key);
-        push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, (item["APPLY_JOB"] as Record<string, string>)?.resume_slug)}`);
-        break;
-      default:
-        break;
+  const handleClickItem = async (item: typeof notifications[0]) => {
+    await handleRead(item.key);
+
+    const targetPath = getNotificationTargetPath(item, currentUser?.roleName);
+    if (targetPath) {
+      if (isExternalNotificationTarget(targetPath)) {
+        window.location.assign(targetPath);
+      } else {
+        push(targetPath);
+      }
     }
   };
 
@@ -75,6 +59,11 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
           <Typography variant="h6" sx={{ fontWeight: 600, color: "text.primary" }}>
             {title}
           </Typography>
+          {unreadCount > 0 && (
+            <Typography variant="body2" color="text.secondary">
+              {t('notification.unreadCount', { count: unreadCount, defaultValue: '{{count}} unread' })}
+            </Typography>
+          )}
           <Stack direction="row" spacing={1}>
             {notifications.length > 0 && (
               <>
@@ -87,7 +76,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                     borderRadius: 2,
                     "&:hover": { backgroundColor: "action.hover" },
                   }}
-                  onClick={handleMakeAllRead}
+                  onClick={() => void handleMakeAllRead()}
                 >
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
                     {t('notification.markAllRead')}
@@ -103,7 +92,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                     borderRadius: 2,
                     "&:hover": { backgroundColor: "error.light", color: "white" },
                   }}
-                  onClick={handleRemoveAll}
+                  onClick={() => void handleRemoveAll()}
                 >
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
                     {t('clearAll')}
@@ -147,7 +136,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                 <MuiImageCustom
                   width={80}
                   height={80}
-                  src={value?.image || IMAGES.notificationImageDefault}
+                  src={value?.image || value?.imageUrl || IMAGES.notificationImageDefault}
                   sx={{ p: 0.5, borderRadius: 2, border: 1, borderColor: "divider" }}
                   duration={500}
                 />
@@ -177,7 +166,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                     </Typography>
                     {!value?.is_read && (
                       <Box sx={{ px: 1, py: 0.25, backgroundColor: "error.main", color: "white", borderRadius: 1, fontSize: "0.7rem", fontWeight: "bold" }}>
-                        {t('common.hot', { defaultValue: 'MỚI' })}
+                        {t('notification.new', { defaultValue: 'New' })}
                       </Box>
                     )}
                   </Stack>
@@ -198,7 +187,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
           {hasMore && (
             <Stack direction="row" justifyContent="center" sx={{ mt: 2 }}>
               <Button onClick={loadMore} variant="contained" disabled={isLoading}>
-                {isLoading ? <CircularProgress size={24} /> : t('loading')}
+                {isLoading ? <CircularProgress size={24} /> : t('notification.loadMore', { defaultValue: 'Load more' })}
               </Button>
             </Stack>
           )}

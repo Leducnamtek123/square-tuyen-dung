@@ -17,6 +17,8 @@ import { Grid2 as Grid } from '@mui/material';
 import { LINKS, ROUTES, APP_NAME, IMAGES } from '../../../../configs/constants';
 import { FacebookIcon, WebsiteIcon } from '../../../../components/Common/SocialIcons';
 import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
+import { useAppSelector } from '../../../../redux/hooks';
+import { canAccessJobSeekerPortal } from '../../../../utils/accessControl';
 
 const subscribeToStaticYear = () => () => {};
 const getCurrentYearSnapshot = () => new Date().getFullYear();
@@ -24,6 +26,7 @@ const getCurrentYearSnapshot = () => new Date().getFullYear();
 const Footer = () => {
   const { t, i18n } = useTranslation('common');
   const { push } = useRouter();
+  const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
   const lang = i18n.language;
 
   const brandNavy = '#1a407d';
@@ -48,6 +51,14 @@ const Footer = () => {
       backgroundColor: 'transparent',
     },
   } as const;
+
+  const candidateLinks = [
+    { label: t('nav.jobs'), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, lang) },
+    { label: t('nav.companies'), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.COMPANY}`, lang) },
+    ...(isAuthenticated && canAccessJobSeekerPortal(currentUser)
+      ? [{ label: t('footer.candidateDashboard'), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.DASHBOARD}`, lang) }]
+      : []),
+  ];
 
   return (
     <Box
@@ -112,11 +123,7 @@ const Footer = () => {
               <Typography variant="subtitle2" sx={{ fontWeight: 800, color: brandNavy }}>
                 {t('footer.forCandidates')}
               </Typography>
-              {[
-                { label: t('nav.jobs'), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, lang) },
-                { label: t('nav.companies'), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.COMPANY}`, lang) },
-                { label: t('footer.candidateDashboard'), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.DASHBOARD}`, lang) },
-              ].map((item) => (
+              {candidateLinks.map((item) => (
                 <Button
                   key={item.label}
                   onClick={() => push(item.route)}

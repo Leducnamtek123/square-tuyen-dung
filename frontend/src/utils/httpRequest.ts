@@ -24,6 +24,7 @@ interface HttpServiceInstance extends Omit<AxiosInstance, 'get' | 'post' | 'put'
 }
 import { cleanParams } from './params';
 import { camelizeKeys } from './camelCase';
+import { isMaintenanceModeError, notifyMaintenanceMode } from './maintenanceMode';
 
 // Prefix for API endpoints
 const prefix = 'api';
@@ -63,6 +64,49 @@ const dispatchAuthExpired = () => {
   }
 };
 
+const setAuthorizationHeader = (config: AxiosRequestConfig, accessToken: string) => {
+  config.headers = config.headers ?? {};
+  const headers = config.headers as Record<string, unknown> & {
+    set?: (name: string, value: string) => void;
+  };
+
+  if (typeof headers.set === 'function') {
+    headers.set('Authorization', `Bearer ${accessToken}`);
+    return;
+  }
+
+  headers.Authorization = `Bearer ${accessToken}`;
+};
+
+const removeAuthorizationHeader = (config: AxiosRequestConfig) => {
+  const headers = config.headers as (Record<string, unknown> & {
+    delete?: (name: string) => void;
+  }) | undefined;
+
+  if (!headers) return;
+
+  if (typeof headers.delete === 'function') {
+    headers.delete('Authorization');
+    headers.delete('authorization');
+    return;
+  }
+
+  delete headers.Authorization;
+  delete headers.authorization;
+};
+
+const hasAuthorizationHeader = (config: AxiosRequestConfig | undefined) => {
+  const headers = config?.headers as (Record<string, unknown> & {
+    has?: (name: string) => boolean;
+    get?: (name: string) => unknown;
+  }) | undefined;
+
+  if (!headers) return false;
+  if (typeof headers.has === 'function') return headers.has('Authorization');
+  if (typeof headers.get === 'function') return Boolean(headers.get('Authorization'));
+  return Boolean(headers.Authorization || headers.authorization);
+};
+
 type RefreshTokenResponse = AxiosResponse<{ data?: unknown }>;
 let refreshPromise: Promise<RefreshTokenResponse> | null = null;
 
@@ -80,9 +124,8 @@ httpRequest.interceptors.request.use(
 
     const accessToken = tokenService.getAccessTokenFromCookie();
 
-    if (accessToken && !isPublicEndpoint(config.url)) {
-      config.headers = config.headers ?? {};
-      config.headers.set('Authorization', `Bearer ${accessToken}`);
+    if (accessToken && !isAuthTokenEndpoint(config.url)) {
+      setAuthorizationHeader(config, accessToken);
     }
     return config;
   },
@@ -105,6 +148,13 @@ httpRequest.interceptors.response.use(
     const originalConfig = error.config as RetryAxiosRequestConfig;
     const status = error.response?.status;
     const method = String(originalConfig?.method || 'get').toLowerCase();
+    const publicEndpoint = isPublicEndpoint(originalConfig?.url);
+    const requestHadAuthorization = hasAuthorizationHeader(originalConfig);
+
+    if (isMaintenanceModeError(error)) {
+      notifyMaintenanceMode(error);
+      return Promise.reject(error);
+    }
 
     if (
       originalConfig &&
@@ -130,11 +180,17 @@ httpRequest.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (isPublicEndpoint(originalConfig.url)) {
+    if (publicEndpoint && !requestHadAuthorization) {
       return Promise.reject(error);
     }
 
-    if (originalConfig._retry || isAuthTokenEndpoint(originalConfig.url)) {
+    const retryPublicWithoutAuth = () => {
+      originalConfig._retryWithoutAuth = true;
+      removeAuthorizationHeader(originalConfig);
+      return httpRequest(originalConfig);
+    };
+
+    if (originalConfig._retry || originalConfig._retryWithoutAuth || isAuthTokenEndpoint(originalConfig.url)) {
       tokenService.removeAccessTokenAndRefreshTokenFromCookie();
       dispatchAuthExpired();
       return Promise.reject(error);
@@ -144,6 +200,9 @@ httpRequest.interceptors.response.use(
     if (!refreshToken) {
       tokenService.removeAccessTokenAndRefreshTokenFromCookie();
       dispatchAuthExpired();
+      if (publicEndpoint && requestHadAuthorization) {
+        return retryPublicWithoutAuth();
+      }
       return Promise.reject(error);
     }
 
@@ -175,6 +234,9 @@ httpRequest.interceptors.response.use(
       if (!accessToken) {
         tokenService.removeAccessTokenAndRefreshTokenFromCookie();
         dispatchAuthExpired();
+        if (publicEndpoint && requestHadAuthorization) {
+          return retryPublicWithoutAuth();
+        }
         return Promise.reject(error);
       }
 
@@ -185,8 +247,7 @@ httpRequest.interceptors.response.use(
       );
 
       originalConfig._retry = true;
-      originalConfig.headers = originalConfig.headers || {};
-      originalConfig.headers['Authorization'] = `Bearer ${accessToken}`;
+      setAuthorizationHeader(originalConfig, accessToken);
       return httpRequest(originalConfig);
     } catch (refreshError: unknown) {
       const refreshErrorResponse = (refreshError as { response?: { status?: number; data?: unknown } }).response;
@@ -197,6 +258,9 @@ httpRequest.interceptors.response.use(
       refreshPromise = null;
       tokenService.removeAccessTokenAndRefreshTokenFromCookie();
       dispatchAuthExpired();
+      if (publicEndpoint && requestHadAuthorization) {
+        return retryPublicWithoutAuth();
+      }
       return Promise.reject(refreshError);
     }
   },

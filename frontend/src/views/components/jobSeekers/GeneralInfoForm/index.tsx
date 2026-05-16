@@ -25,7 +25,11 @@ const createGeneralInfoSchema = (t: TFunction<'jobSeeker', undefined>) => yup.ob
   city: yup.number().required(t('jobSeeker:profile.validation.cityRequired')).typeError(t('jobSeeker:profile.validation.cityRequired')),
   salaryMin: yup.number().required(t('jobSeeker:profile.validation.salaryMinRequired')).typeError(t('jobSeeker:profile.validation.salaryMinInvalid')).min(0, t('jobSeeker:profile.validation.salaryMinInvalid')),
   salaryMax: yup.number().required(t('jobSeeker:profile.validation.salaryMaxRequired')).typeError(t('jobSeeker:profile.validation.salaryMaxInvalid')).min(0, t('jobSeeker:profile.validation.salaryMaxInvalid')),
-  expectedSalary: yup.number().nullable().min(0, t('jobSeeker:profile.validation.expectedSalaryInvalid')),
+  expectedSalary: yup
+    .number()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value))
+    .min(0, t('jobSeeker:profile.validation.expectedSalaryInvalid')),
   typeOfWorkplace: yup.number().required(t('jobSeeker:profile.validation.workplaceTypeRequired')).typeError(t('jobSeeker:profile.validation.workplaceTypeRequired')),
   jobType: yup.number().required(t('jobSeeker:profile.validation.jobTypeRequired')).typeError(t('jobSeeker:profile.validation.jobTypeRequired')),
   description: yup.string().required(t('jobSeeker:profile.validation.objectiveRequired')).max(800, t('jobSeeker:profile.validation.objectiveMax')),

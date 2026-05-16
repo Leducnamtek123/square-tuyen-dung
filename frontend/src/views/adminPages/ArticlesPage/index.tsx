@@ -246,7 +246,7 @@ const AdminArticlesPage = () => {
         searchValue={searchInput}
         searchPlaceholder="Tìm kiếm bài viết..."
         onSearchChange={(value) => dispatch({ type: 'patch', patch: { searchInput: value } })}
-        onSearchSubmit={() => dispatch({ type: 'patch', patch: { search: searchInput, pagination: { ...pagination, pageIndex: 0 } } })}
+        onSearchSubmit={() => dispatch({ type: 'patch', patch: { search: searchInput.trim(), pagination: { ...pagination, pageIndex: 0 } } })}
         showSearchButton
         searchButtonLabel="Tìm kiếm"
         activeFilterCount={[category !== 'all', statusFilter !== 'all', Boolean(search)].filter(Boolean).length}

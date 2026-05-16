@@ -4,6 +4,7 @@ import { Box, Tab } from "@mui/material";
 import { TabTitle } from '../../../utils/generalFunction';
 import CompanyCard from '../../components/employers/CompanyCard';
 import CompanyImageCard from '../../components/employers/CompanyImageCard';
+import CompanyTeamCard from '../../components/employers/CompanyTeamCard';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useTranslation } from 'react-i18next';
 
@@ -50,6 +51,7 @@ const CompanyPage = () => {
                     >
                         <Tab label={t("company.tabs.info")} value="0" />
                         <Tab label={t("company.tabs.multimedia")} value="1" />
+                        <Tab label={t("company.tabs.team", "Team")} value="2" />
                     </TabList>
                 </Box>
                 <TabPanel value="0" sx={{ px: 0, pt: 3, pb: 0 }}>
@@ -61,6 +63,9 @@ const CompanyPage = () => {
                     {/* Start: Company image card */}
                     <CompanyImageCard />
                     {/* End: Company image card */}
+                </TabPanel>
+                <TabPanel value="2" sx={{ px: 0, pt: 3, pb: 0 }}>
+                    <CompanyTeamCard />
                 </TabPanel>
             </TabContext>
         </Box>

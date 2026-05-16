@@ -838,6 +838,14 @@
     "tryAgain": "Please try again later.",
     "reload": "Reload page."
   },
+  "maintenanceMode": {
+    "badge": "Under maintenance",
+    "title": "System maintenance in progress",
+    "message": "Square Recruitment is upgrading the system to serve you better. Please come back in a few minutes.",
+    "reload": "Reload page",
+    "retryHint": "You can try again in a few minutes.",
+    "statusCode": "Status code"
+  },
   "language": {
     "vietnamese": "Tiếng Việt",
     "english": "English"

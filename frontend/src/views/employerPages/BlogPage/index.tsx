@@ -233,7 +233,7 @@ const EmployerBlogListPage = () => {
         searchValue={searchInput}
         searchPlaceholder="Tìm kiếm bài viết..."
         onSearchChange={(value) => dispatch({ type: 'patch', patch: { searchInput: value } })}
-        onSearchSubmit={() => dispatch({ type: 'patch', patch: { search: searchInput, pagination: { ...pagination, pageIndex: 0 } } })}
+        onSearchSubmit={() => dispatch({ type: 'patch', patch: { search: searchInput.trim(), pagination: { ...pagination, pageIndex: 0 } } })}
         showSearchButton
         searchButtonLabel={t('common.search', 'Tìm kiếm')}
         activeFilterCount={[statusFilter !== 'all', Boolean(search)].filter(Boolean).length}

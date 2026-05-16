@@ -6,12 +6,21 @@ import pandas as pd
 import pytz
 from django.db.models import Avg, Count, F, Q, Sum
 from django.db.models.functions import ExtractMonth, ExtractYear, TruncDate, TruncMonth
+from django.utils import timezone
 from rest_framework import status, viewsets
 
 from apps.accounts import permissions as perms_custom
 from apps.accounts.models import User
-from apps.interviews.models import InterviewEvaluation, InterviewSession
-from apps.profiles.models import CompanyFollowed, ResumeSaved, ResumeViewed
+from apps.interviews.models import InterviewEvaluation, InterviewSession, Question, QuestionGroup
+from apps.profiles.models import (
+    Company,
+    CompanyFollowed,
+    CompanyVerification,
+    JobSeekerProfile,
+    Resume,
+    ResumeSaved,
+    ResumeViewed,
+)
 from shared.configs import variable_response as var_res
 from shared.configs import variable_system as var_sys
 
@@ -631,14 +640,82 @@ class AdminStatisticViewSet(viewsets.ViewSet):
         return self.general_statistics(request)
 
     def general_statistics(self, request):
-        total_users = User.objects.count()
-        total_employers = User.objects.filter(role_name=var_sys.EMPLOYER).count()
-        total_job_seekers = User.objects.filter(role_name=var_sys.JOB_SEEKER).count()
-        total_admins = User.objects.filter(role_name=var_sys.ADMIN).count()
-        total_job_posts = JobPost.objects.count()
-        total_job_posts_pending = JobPost.objects.filter(status=var_sys.JobPostStatus.PENDING).count()
-        total_applications = JobPostActivity.objects.count()
-        total_interviews = InterviewSession.objects.count()
+        today = timezone.localdate()
+        recent_start = timezone.now() - timedelta(days=30)
+
+        users_qs = User.objects.all()
+        job_posts_qs = JobPost.objects.all()
+        applications_qs = JobPostActivity.objects.filter(is_deleted=False)
+        interviews_qs = InterviewSession.objects.all()
+        companies_qs = Company.objects.all()
+        verifications_qs = CompanyVerification.objects.all()
+        resumes_qs = Resume.objects.all()
+
+        total_users = users_qs.count()
+        total_employers = users_qs.filter(role_name=var_sys.EMPLOYER).count()
+        total_job_seekers = users_qs.filter(role_name=var_sys.JOB_SEEKER).count()
+        total_admins = users_qs.filter(role_name=var_sys.ADMIN).count()
+
+        total_job_posts = job_posts_qs.count()
+        total_job_posts_pending = job_posts_qs.filter(status=var_sys.JobPostStatus.PENDING).count()
+        total_job_posts_rejected = job_posts_qs.filter(status=var_sys.JobPostStatus.REJECTED).count()
+        total_job_posts_approved = job_posts_qs.filter(status=var_sys.JobPostStatus.APPROVED).count()
+        total_job_posts_active = job_posts_qs.filter(
+            status=var_sys.JobPostStatus.APPROVED,
+            deadline__gte=today,
+        ).count()
+        total_job_posts_expired = job_posts_qs.filter(
+            status=var_sys.JobPostStatus.APPROVED,
+            deadline__lt=today,
+        ).count()
+
+        total_applications = applications_qs.count()
+        total_applications_pending = applications_qs.filter(
+            status=var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+        ).count()
+        total_applications_contacted = applications_qs.filter(status=var_sys.ApplicationStatus.CONTACTED).count()
+        total_applications_tested = applications_qs.filter(status=var_sys.ApplicationStatus.TESTED).count()
+        total_applications_interviewed = applications_qs.filter(status=var_sys.ApplicationStatus.INTERVIEWED).count()
+        total_applications_hired = applications_qs.filter(status=var_sys.ApplicationStatus.HIRED).count()
+        total_applications_not_selected = applications_qs.filter(status=var_sys.ApplicationStatus.NOT_SELECTED).count()
+
+        total_interviews = interviews_qs.count()
+        total_interviews_draft = interviews_qs.filter(status="draft").count()
+        total_interviews_scheduled = interviews_qs.filter(status__in=["scheduled", "calibration"]).count()
+        total_interviews_in_progress = interviews_qs.filter(status__in=["in_progress", "processing"]).count()
+        total_interviews_completed = interviews_qs.filter(status="completed").count()
+        total_interviews_cancelled = interviews_qs.filter(status__in=["cancelled", "interrupted"]).count()
+
+        total_companies = companies_qs.count()
+        total_companies_verified = companies_qs.filter(is_verified=True).count()
+        total_companies_unverified = companies_qs.filter(is_verified=False).count()
+        total_company_verifications = verifications_qs.count()
+        total_company_verifications_pending = verifications_qs.filter(
+            status=CompanyVerification.STATUS_PENDING,
+        ).count()
+        total_company_verifications_reviewing = verifications_qs.filter(
+            status=CompanyVerification.STATUS_REVIEWING,
+        ).count()
+        total_company_verifications_rejected = verifications_qs.filter(
+            status=CompanyVerification.STATUS_REJECTED,
+        ).count()
+
+        total_job_seeker_profiles = JobSeekerProfile.objects.count()
+        total_resumes = resumes_qs.count()
+        total_active_resumes = resumes_qs.filter(is_active=True).count()
+        total_saved_job_posts = SavedJobPost.objects.count()
+        total_saved_resumes = ResumeSaved.objects.count()
+        total_company_followers = CompanyFollowed.objects.count()
+        total_resume_views = ResumeViewed.objects.aggregate(total=Sum("views")).get("total") or 0
+        total_questions = Question.objects.count()
+        total_question_groups = QuestionGroup.objects.count()
+
+        new_users_30d = users_qs.filter(create_at__gte=recent_start).count()
+        new_employers_30d = users_qs.filter(role_name=var_sys.EMPLOYER, create_at__gte=recent_start).count()
+        new_job_seekers_30d = users_qs.filter(role_name=var_sys.JOB_SEEKER, create_at__gte=recent_start).count()
+        new_job_posts_30d = job_posts_qs.filter(create_at__gte=recent_start).count()
+        new_applications_30d = applications_qs.filter(create_at__gte=recent_start).count()
+        new_interviews_30d = interviews_qs.filter(create_at__gte=recent_start).count()
 
         return var_res.response_data(
             data={
@@ -648,7 +725,44 @@ class AdminStatisticViewSet(viewsets.ViewSet):
                 "totalAdmins": total_admins,
                 "totalJobPosts": total_job_posts,
                 "totalJobPostsPending": total_job_posts_pending,
+                "totalJobPostsRejected": total_job_posts_rejected,
+                "totalJobPostsApproved": total_job_posts_approved,
+                "totalJobPostsActive": total_job_posts_active,
+                "totalJobPostsExpired": total_job_posts_expired,
                 "totalApplications": total_applications,
+                "totalApplicationsPending": total_applications_pending,
+                "totalApplicationsContacted": total_applications_contacted,
+                "totalApplicationsTested": total_applications_tested,
+                "totalApplicationsInterviewed": total_applications_interviewed,
+                "totalApplicationsHired": total_applications_hired,
+                "totalApplicationsNotSelected": total_applications_not_selected,
                 "totalInterviews": total_interviews,
+                "totalInterviewsDraft": total_interviews_draft,
+                "totalInterviewsScheduled": total_interviews_scheduled,
+                "totalInterviewsInProgress": total_interviews_in_progress,
+                "totalInterviewsCompleted": total_interviews_completed,
+                "totalInterviewsCancelled": total_interviews_cancelled,
+                "totalCompanies": total_companies,
+                "totalCompaniesVerified": total_companies_verified,
+                "totalCompaniesUnverified": total_companies_unverified,
+                "totalCompanyVerifications": total_company_verifications,
+                "totalCompanyVerificationsPending": total_company_verifications_pending,
+                "totalCompanyVerificationsReviewing": total_company_verifications_reviewing,
+                "totalCompanyVerificationsRejected": total_company_verifications_rejected,
+                "totalJobSeekerProfiles": total_job_seeker_profiles,
+                "totalResumes": total_resumes,
+                "totalActiveResumes": total_active_resumes,
+                "totalSavedJobPosts": total_saved_job_posts,
+                "totalSavedResumes": total_saved_resumes,
+                "totalCompanyFollowers": total_company_followers,
+                "totalResumeViews": total_resume_views,
+                "totalQuestions": total_questions,
+                "totalQuestionGroups": total_question_groups,
+                "newUsers30d": new_users_30d,
+                "newEmployers30d": new_employers_30d,
+                "newJobSeekers30d": new_job_seekers_30d,
+                "newJobPosts30d": new_job_posts_30d,
+                "newApplications30d": new_applications_30d,
+                "newInterviews30d": new_interviews_30d,
             }
         )

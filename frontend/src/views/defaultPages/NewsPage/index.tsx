@@ -25,25 +25,43 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ArticleIcon from '@mui/icons-material/Article';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { IMAGES } from '@/configs/constants';
-import contentService, { type Article } from '@/services/contentService';
+import { ABOUT_IMAGES, IMAGES } from '@/configs/constants';
+import contentService, { type Article, type ArticleCategory } from '@/services/contentService';
 import useSEO from '@/hooks/useSEO';
 import errorHandling from '@/utils/errorHandling';
 import NoDataCard from '@/components/Common/NoDataCard';
 import { ROUTES } from '@/configs/constants';
 
-type NewsCategory = 'blog';
+type NewsCategory = 'all' | ArticleCategory;
 
 const PAGE_SIZE = 9;
 
 const categoryOptions: Array<{
   value: NewsCategory;
-  labelKey: string;
+  label: string;
   icon: React.ReactElement;
 }> = [
-  { value: 'blog', labelKey: 'nav.blog', icon: <ArticleIcon fontSize="small" /> },
+  { value: 'all', label: 'Tất cả', icon: <ArticleIcon fontSize="small" /> },
+  { value: 'news', label: 'Tin tức', icon: <NewspaperIcon fontSize="small" /> },
+  { value: 'blog', label: 'Blog tuyển dụng', icon: <ArticleIcon fontSize="small" /> },
 ];
+
+const topicOptions = [
+  'tuyển dụng',
+  'bất động sản',
+  'xây dựng',
+  'nội thất',
+  'kiến trúc',
+  'portfolio',
+  'kỹ năng',
+];
+
+const categoryLabelMap: Record<ArticleCategory, string> = {
+  news: 'Tin tức',
+  blog: 'Blog tuyển dụng',
+};
 
 const stripHtml = (html?: string | null) =>
   (html || '')
@@ -60,17 +78,16 @@ const formatDate = (value?: string | null) => {
 const ArticleCard = ({
   article,
   featured = false,
-  blogLabel,
   ctaLabel,
 }: {
   article: Article;
   featured?: boolean;
-  blogLabel: string;
   ctaLabel: string;
 }) => {
   const href = `/${ROUTES.JOB_SEEKER.NEWS}/${article.slug}`;
   const publishedDate = formatDate(article.publishedAt || article.create_at || article.update_at);
-  const badgeLabel = blogLabel;
+  const badgeLabel = categoryLabelMap[article.category] || 'Bài viết';
+  const BadgeIcon = article.category === 'news' ? NewspaperIcon : ArticleIcon;
 
   return (
     <Card
@@ -101,7 +118,7 @@ const ArticleCard = ({
             <Chip
               label={badgeLabel}
               size="small"
-              icon={<ArticleIcon fontSize="small" />}
+              icon={<BadgeIcon fontSize="small" />}
               sx={{
                 position: 'absolute',
                 top: 16,
@@ -169,6 +186,7 @@ const ArticleSkeleton = () => (
 
 type NewsState = {
   category: NewsCategory;
+  activeTag: string;
   inputValue: string;
   searchValue: string;
   page: number;
@@ -179,6 +197,8 @@ type NewsState = {
 
 type NewsAction =
   | { type: 'categoryChanged'; category: NewsCategory }
+  | { type: 'tagChanged'; tag: string }
+  | { type: 'tagCleared' }
   | { type: 'inputChanged'; inputValue: string }
   | { type: 'searchCommitted'; searchValue: string }
   | { type: 'pageChanged'; page: number }
@@ -187,7 +207,8 @@ type NewsAction =
   | { type: 'failed' };
 
 const initialNewsState: NewsState = {
-  category: 'blog',
+  category: 'all',
+  activeTag: '',
   inputValue: '',
   searchValue: '',
   page: 1,
@@ -202,6 +223,18 @@ const newsReducer = (state: NewsState, action: NewsAction): NewsState => {
       return {
         ...state,
         category: action.category,
+        page: 1,
+      };
+    case 'tagChanged':
+      return {
+        ...state,
+        activeTag: action.tag,
+        page: 1,
+      };
+    case 'tagCleared':
+      return {
+        ...state,
+        activeTag: '',
         page: 1,
       };
     case 'inputChanged':
@@ -247,14 +280,10 @@ const newsReducer = (state: NewsState, action: NewsAction): NewsState => {
 const NewsPage = () => {
   const { t } = useTranslation(['common', 'public']);
   const [state, dispatch] = React.useReducer(newsReducer, initialNewsState);
-  const { category, inputValue, searchValue, page, articles, total, isLoading } = state;
+  const { category, activeTag, inputValue, searchValue, page, articles, total, isLoading } = state;
 
-  React.useEffect(() => {
-    const timer = window.setTimeout(() => {
-      dispatch({ type: 'searchCommitted', searchValue: inputValue.trim() });
-    }, 350);
-
-    return () => window.clearTimeout(timer);
+  const commitSearch = React.useCallback(() => {
+    dispatch({ type: 'searchCommitted', searchValue: inputValue.trim() });
   }, [inputValue]);
 
   React.useEffect(() => {
@@ -264,7 +293,8 @@ const NewsPage = () => {
       dispatch({ type: 'loading' });
       try {
         const response = await contentService.getPublicArticles({
-          category: 'blog',
+          category: category === 'all' ? undefined : category,
+          tag: activeTag || undefined,
           search: searchValue || undefined,
           page,
           page_size: PAGE_SIZE,
@@ -290,13 +320,18 @@ const NewsPage = () => {
     return () => {
       active = false;
     };
-  }, [category, page, searchValue]);
+  }, [activeTag, category, page, searchValue]);
 
   const featuredArticle = articles[0] || null;
   const remainingArticles = featuredArticle ? articles.slice(1) : articles;
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const blogLabel = t('nav.blog', { ns: 'common' });
   const ctaLabel = t('viewDetails', { ns: 'common' });
+  const selectedCategoryLabel = categoryOptions.find((option) => option.value === category)?.label || 'Tất cả';
+  const activeFilterText = [
+    selectedCategoryLabel,
+    activeTag ? `#${activeTag}` : '',
+    searchValue ? `"${searchValue}"` : '',
+  ].filter(Boolean).join(' · ');
 
   useSEO({
     title: t('seo.newsList.title', { ns: 'public' }),
@@ -311,30 +346,23 @@ const NewsPage = () => {
         sx={{
           position: 'relative',
           overflow: 'hidden',
-          borderRadius: 4,
+          borderRadius: 2,
           px: { xs: 3, md: 5 },
-          py: { xs: 4, md: 6 },
+          py: { xs: 4, md: 5 },
           mb: 4,
           color: 'common.white',
-          background: 'linear-gradient(135deg, #0f2d5e 0%, #1e6bb8 52%, #5bb6ff 100%)',
+          backgroundImage: `linear-gradient(90deg, rgba(10, 37, 82, 0.94) 0%, rgba(15, 68, 130, 0.82) 48%, rgba(20, 121, 177, 0.62) 100%), url(${ABOUT_IMAGES.JOB_POST})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
           boxShadow: '0 24px 60px rgba(15, 57, 127, 0.24)',
         }}
       >
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'radial-gradient(circle at top right, rgba(255,255,255,0.22) 0, rgba(255,255,255,0) 40%), radial-gradient(circle at bottom left, rgba(255,255,255,0.14) 0, rgba(255,255,255,0) 35%)',
-            pointerEvents: 'none',
-          }}
-        />
         <Stack spacing={2.5} sx={{ position: 'relative', maxWidth: 760 }}>
           <Chip
-            label={blogLabel}
+            label="Tin tức & Blog tuyển dụng"
             sx={{ alignSelf: 'flex-start', bgcolor: 'rgba(255,255,255,0.16)', color: 'common.white' }}
           />
-          <Typography variant="h3" fontWeight={800} sx={{ fontSize: { xs: 34, md: 52 }, lineHeight: 1.08 }}>
+          <Typography variant="h3" fontWeight={800} sx={{ fontSize: { xs: 34, md: 46 }, lineHeight: 1.08 }}>
             Tin tức và blog tuyển dụng dành cho ứng viên, nhà tuyển dụng
           </Typography>
           <Typography variant="h6" sx={{ maxWidth: 720, color: 'rgba(255,255,255,0.9)', fontWeight: 400 }}>
@@ -381,7 +409,7 @@ const NewsPage = () => {
               value={option.value}
               icon={option.icon}
               iconPosition="start"
-              label={t(option.labelKey, { ns: 'common' })}
+              label={option.label}
             />
           ))}
         </Tabs>
@@ -389,6 +417,7 @@ const NewsPage = () => {
         <Box
           sx={{
             display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
             gap: 1.5,
             alignItems: 'center',
             p: 1.5,
@@ -401,6 +430,9 @@ const NewsPage = () => {
           <TextField
             value={inputValue}
             onChange={(event) => dispatch({ type: 'inputChanged', inputValue: event.target.value })}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') commitSearch();
+            }}
             placeholder="Tìm bài viết, chủ đề hoặc từ khóa"
             fullWidth
             size="small"
@@ -408,13 +440,32 @@ const NewsPage = () => {
           <Button
             variant="contained"
             startIcon={<SearchIcon />}
-            onClick={() => {
-              dispatch({ type: 'searchCommitted', searchValue: inputValue.trim() });
-            }}
+            onClick={commitSearch}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
           >
             Tìm
           </Button>
         </Box>
+
+        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+          <Chip
+            label="Tất cả chủ đề"
+            clickable
+            color={!activeTag ? 'primary' : 'default'}
+            variant={!activeTag ? 'filled' : 'outlined'}
+            onClick={() => dispatch({ type: 'tagCleared' })}
+          />
+          {topicOptions.map((tag) => (
+            <Chip
+              key={tag}
+              label={tag}
+              clickable
+              color={activeTag === tag ? 'primary' : 'default'}
+              variant={activeTag === tag ? 'filled' : 'outlined'}
+              onClick={() => dispatch({ type: 'tagChanged', tag })}
+            />
+          ))}
+        </Stack>
       </Stack>
 
       <Grid container spacing={3}>
@@ -437,12 +488,12 @@ const NewsPage = () => {
             />
           ) : (
             <Stack spacing={3}>
-              {featuredArticle && <ArticleCard article={featuredArticle} featured blogLabel={blogLabel} ctaLabel={ctaLabel} />}
+              {featuredArticle && <ArticleCard article={featuredArticle} featured ctaLabel={ctaLabel} />}
 
               <Grid container spacing={3}>
                 {remainingArticles.map((article) => (
                   <Grid key={article.id} size={{ xs: 12, md: 6 }}>
-                    <ArticleCard article={article} blogLabel={blogLabel} ctaLabel={ctaLabel} />
+                    <ArticleCard article={article} ctaLabel={ctaLabel} />
                   </Grid>
                 ))}
               </Grid>
@@ -480,10 +531,22 @@ const NewsPage = () => {
                   <Typography variant="body2" color="text.secondary">
                     {total.toLocaleString('vi-VN')} bài viết đang hiển thị trong kho nội dung công khai.
                   </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
+                    Bộ lọc hiện tại: {activeFilterText}
+                  </Typography>
                   <Stack spacing={1}>
                     {categoryOptions.map((option) => (
                       <Box
                         key={option.value}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => dispatch({ type: 'categoryChanged', category: option.value })}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            dispatch({ type: 'categoryChanged', category: option.value });
+                          }
+                        }}
                         sx={{
                           display: 'flex',
                           alignItems: 'center',
@@ -492,12 +555,13 @@ const NewsPage = () => {
                           borderRadius: 2,
                           bgcolor: category === option.value ? 'primary.light' : 'action.hover',
                           color: category === option.value ? 'primary.contrastText' : 'text.primary',
+                          cursor: 'pointer',
                         }}
                       >
                         <Stack direction="row" spacing={1} alignItems="center">
                           {option.icon}
                           <Typography variant="body2" fontWeight={600}>
-                            {blogLabel}
+                            {option.label}
                           </Typography>
                         </Stack>
                       </Box>

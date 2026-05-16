@@ -239,7 +239,7 @@ class PrivateResumeViewSet(PermissionActionMapMixin, viewsets.ViewSet,
 
         serializer = ResumeSerializer(data=data, fields=[
 
-            "title", "description", "salaryMin", "salaryMax",
+            "title", "description", "salaryMin", "salaryMax", "expectedSalary", "skillsSummary",
 
             "position", "experience", "academicLevel", "typeOfWorkplace",
 
@@ -269,7 +269,7 @@ class PrivateResumeViewSet(PermissionActionMapMixin, viewsets.ViewSet,
 
                                              "id", "slug", "title", "description",
 
-                                             "salaryMin", "salaryMax",
+                                             "salaryMin", "salaryMax", "expectedSalary", "skillsSummary",
 
                                              "position", "experience", "academicLevel",
 
@@ -337,6 +337,8 @@ class PrivateResumeViewSet(PermissionActionMapMixin, viewsets.ViewSet,
 
                                                      "typeOfWorkplace", "jobType", "description",
 
+                                                     "expectedSalary", "skillsSummary",
+
                                                      "isActive", "city", "career"])
 
         return var_res.response_data(data=resume_serializer.data)
@@ -351,7 +353,7 @@ class PrivateResumeViewSet(PermissionActionMapMixin, viewsets.ViewSet,
 
         resume_serializer = CvSerializer(resume_queryset,
 
-                                         fields=["id", "slug", "title", "fileUrl"])
+                                         fields=["id", "slug", "title", "fileUrl", "updateAt"])
 
         return var_res.response_data(data=resume_serializer.data)
 

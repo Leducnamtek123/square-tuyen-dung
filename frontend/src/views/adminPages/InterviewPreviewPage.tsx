@@ -10,6 +10,7 @@ import {
   faPhoneSlash, faDesktop, faComment, faUser, faRobot,
   faCheckCircle, faExclamationTriangle, faEye,
 } from '@fortawesome/free-solid-svg-icons';
+import { IMAGES } from '@/configs/images';
 
 // ─── Fake data ────────────────────────────────────────────────────────────────
 const FAKE_SESSION = {
@@ -80,9 +81,15 @@ function WaitingStep({ onNext }: { onNext: () => void }) {
       <div className="relative flex w-full max-w-2xl flex-col items-center gap-10 text-center">
         <div className="relative group">
           <div className="absolute inset-0 rounded-full bg-cyan-500/10 blur-[80px] transition-all duration-700 group-hover:bg-cyan-500/25" />
-          <div className="relative z-10 flex size-[200px] items-center justify-center opacity-80 transition-opacity group-hover:opacity-100">
-            <Image src="/square-icons/logo.svg" alt="Square" width={160} height={160}
-              style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+          <div className="relative z-10 flex h-[96px] w-[240px] max-w-[70vw] items-center justify-center opacity-90 transition-opacity group-hover:opacity-100 md:h-[120px] md:w-[320px]">
+            <Image
+              src={IMAGES.getTextLogo('light')}
+              alt="Square"
+              width={320}
+              height={107}
+              style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
+              priority
+            />
           </div>
         </div>
         <div className="space-y-4">

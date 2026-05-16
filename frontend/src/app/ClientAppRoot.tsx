@@ -8,14 +8,22 @@ import { getUserInfo, removeUserInfo } from "../redux/userSlice";
 import { useConfig } from "@/hooks/useConfig";
 import { toast, ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Feedback from "../components/Features/Feedback";
 import ChatBot from "../components/Features/ChatBot";
 import ScrollToTop from "../components/Common/ScrollToTop";
-import { ROLES_NAME, ROUTES, AUTH_CONFIG } from "../configs/constants";
+import { ROUTES, AUTH_CONFIG } from "../configs/constants";
 import { isAdminPortalPath } from "../configs/portalRouting";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import tokenService from "../services/tokenService";
 import ErrorBoundary from "../components/ErrorBoundary";
+import MaintenanceModeScreen from "../components/Common/MaintenanceModeScreen";
+import {
+  MAINTENANCE_MODE_CODE,
+  MAINTENANCE_MODE_EVENT,
+  getMaintenanceModeDetail,
+  isMaintenanceModeError,
+  notifyMaintenanceMode,
+  type MaintenanceModeDetail,
+} from "../utils/maintenanceMode";
 
 export default function ClientAppRoot({ children }: { children: React.ReactNode }) {
   const hasMounted = React.useSyncExternalStore(
@@ -24,14 +32,13 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     () => false,
   );
   const dispatch = useAppDispatch();
-  const { allConfig, isLoadingConfig } = useConfig();
+  const { allConfig, isLoadingConfig, errorConfig } = useConfig();
+  const [maintenanceDetail, setMaintenanceDetail] =
+    React.useState<MaintenanceModeDetail | null>(null);
+  const configMaintenanceDetail = getMaintenanceModeDetail(errorConfig);
+  const effectiveMaintenanceDetail = maintenanceDetail ?? configMaintenanceDetail;
   const hasCachedConfig = !!allConfig;
-  const { isAuthenticated, currentUser, activeWorkspace } = useAppSelector((state) => state.user);
-
-  const isAdminAccount = currentUser?.roleName === ROLES_NAME.ADMIN;
-  const workspaceType = activeWorkspace?.type || null;
-  const isEmployerWorkspace = workspaceType === "company";
-  const isJobSeekerWorkspace = workspaceType === "job_seeker";
+  const { currentUser } = useAppSelector((state) => state.user);
 
   const pathname = usePathname() || "/";
   const isAdminPortal = isAdminPortalPath(pathname);
@@ -49,7 +56,14 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     pathname.startsWith(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', '')}`);
   
   const canShowChatBot = !isAdminPortal && !isChatPage && !isInterviewPage;
-  const isInitializing = !isJobSeekerInterviewRoute && !hasCachedConfig && isLoadingConfig;
+  const isMaintenanceMode =
+    !!effectiveMaintenanceDetail || !!allConfig?.systemSettings?.maintenanceMode;
+  const shouldShowMaintenanceMode = isMaintenanceMode && !isAdminPortal;
+  const isInitializing =
+    !shouldShowMaintenanceMode &&
+    !isJobSeekerInterviewRoute &&
+    !hasCachedConfig &&
+    isLoadingConfig;
 
   React.useEffect(() => {
     if (!hasMounted || isJobSeekerInterviewRoute) return;
@@ -62,6 +76,12 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
       // Ignore stale/invalid token errors at bootstrap.
     });
   }, [currentUser?.id, dispatch, hasMounted, isAdminPortal, isJobSeekerInterviewRoute, pathname]);
+
+  React.useEffect(() => {
+    if (isAdminPortal && maintenanceDetail) {
+      setMaintenanceDetail(null);
+    }
+  }, [isAdminPortal, maintenanceDetail]);
 
   React.useEffect(() => {
     let lastErrorToast = 0;
@@ -86,6 +106,11 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     };
 
     const handleRejection = (event: PromiseRejectionEvent) => {
+      if (isMaintenanceModeError(event.reason)) {
+        notifyMaintenanceMode(event.reason);
+        return;
+      }
+
       console.error("Unhandled Promise Rejection:", event.reason);
       const now = Date.now();
       if (now - lastErrorToast < THROTTLE_MS) return;
@@ -102,16 +127,31 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
       dispatch(removeUserInfo({ accessToken: '' }));
     };
 
+    const handleMaintenanceMode = (event: Event) => {
+      setMaintenanceDetail(
+        (event as CustomEvent<MaintenanceModeDetail>).detail ?? {
+          code: MAINTENANCE_MODE_CODE,
+          status: 503,
+        },
+      );
+    };
+
     window.addEventListener("error", handleError);
     window.addEventListener("unhandledrejection", handleRejection);
     window.addEventListener("auth:expired", handleAuthExpired as EventListener);
+    window.addEventListener(MAINTENANCE_MODE_EVENT, handleMaintenanceMode as EventListener);
 
     return () => {
       window.removeEventListener("error", handleError);
       window.removeEventListener("unhandledrejection", handleRejection);
       window.removeEventListener("auth:expired", handleAuthExpired as EventListener);
+      window.removeEventListener(MAINTENANCE_MODE_EVENT, handleMaintenanceMode as EventListener);
     };
   }, [dispatch]);
+
+  if (hasMounted && shouldShowMaintenanceMode) {
+    return <MaintenanceModeScreen detail={effectiveMaintenanceDetail} />;
+  }
 
   if (!hasMounted || isInitializing) {
     return null;
@@ -122,11 +162,6 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
       <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
           {children}
           <ToastContainer autoClose={1300} transition={Bounce} position="top-right" theme="colored" />
-          {!isChatPage && !isInterviewPage && (
-            <>
-              {isAuthenticated && <Feedback />}
-            </>
-          )}
           {canShowChatBot && <ChatBot />}
       </GoogleOAuthProvider>
       <ScrollToTop />

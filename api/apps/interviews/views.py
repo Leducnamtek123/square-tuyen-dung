@@ -4,6 +4,7 @@ Interview Module — DRF Views
 
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
+from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.db.models import Count, Q
@@ -68,7 +69,7 @@ class InterviewStatisticViewSet(viewsets.ViewSet):
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.select_related('career', 'career__icon', 'company', 'author').all()
     serializer_class = QuestionSerializer
-    permission_classes = [perms_custom.IsEmployerUser]
+    permission_classes = [perms_custom.IsEmployerOrAdminUser]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['career', 'difficulty']
     search_fields = ['text']
@@ -104,7 +105,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 class QuestionGroupViewSet(viewsets.ModelViewSet):
     queryset = QuestionGroup.objects.prefetch_related('questions', 'questions__career', 'questions__career__icon').select_related('company', 'author').all()
     serializer_class = QuestionGroupSerializer
-    permission_classes = [perms_custom.IsEmployerUser]
+    permission_classes = [perms_custom.IsEmployerOrAdminUser]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['name', 'description']
     ordering_fields = ['create_at', 'name']
@@ -400,6 +401,60 @@ class InterviewEvaluationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(evaluator=self.request.user)
+
+
+class ScreeningResultAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def _can_view(self, user, session: InterviewSession) -> bool:
+        role = getattr(user, "role_name", None)
+        if role == "JOB_SEEKER":
+            return session.candidate_id == user.id
+        if role == "EMPLOYER":
+            if session.created_by_id == user.id:
+                return True
+            try:
+                company = user.get_active_company()
+            except Exception:
+                company = None
+            return bool(company and session.job_post and session.job_post.company_id == company.id)
+        return role == "ADMIN" or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False)
+
+    def get(self, request, session_id: int):
+        try:
+            session = InterviewSession.objects.select_related(
+                "candidate", "job_post", "job_post__company", "created_by"
+            ).get(id=session_id)
+        except InterviewSession.DoesNotExist:
+            return response_data(
+                status=status.HTTP_404_NOT_FOUND,
+                errors={"detail": ["Interview session not found."]},
+            )
+
+        if not self._can_view(request.user, session):
+            return response_data(status=status.HTTP_403_FORBIDDEN)
+
+        return response_data(data={
+            "id": session.id,
+            "status": session.status,
+            "score": session.ai_overall_score,
+            "technical_score": session.ai_technical_score,
+            "communication_score": session.ai_communication_score,
+            "summary": session.ai_summary,
+            "strengths": session.ai_strengths or [],
+            "weaknesses": session.ai_weaknesses or [],
+            "detailed_feedback": session.ai_detailed_feedback or {},
+            "candidate_name": session.candidate.full_name if session.candidate else None,
+            "candidate_email": session.candidate.email if session.candidate else None,
+            "job_name": session.job_post.job_name if session.job_post else None,
+            "company_name": (
+                session.job_post.company.company_name
+                if session.job_post and session.job_post.company
+                else None
+            ),
+            "create_at": session.create_at,
+            "update_at": session.update_at,
+        })
 
 
 class AdminInterviewSessionReadOnlyViewSet(viewsets.ModelViewSet):

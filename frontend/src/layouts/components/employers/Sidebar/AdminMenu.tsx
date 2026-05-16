@@ -77,6 +77,8 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
       <Collapse in={expandedItems.recruitment} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           <MenuItem text={t('admin:sidebar.jobPosts')} to={`/${ROUTES.ADMIN.JOBS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.JOBS}` }} />
+          <MenuItem text={t('admin:sidebar.questionBank')} to={`/${ROUTES.ADMIN.QUESTIONS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.QUESTIONS}` }} />
+          <MenuItem text={t('admin:sidebar.interviewQuestionSets')} to={`/${ROUTES.ADMIN.QUESTION_GROUPS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.QUESTION_GROUPS}` }} />
           <MenuItem text={t('admin:sidebar.trustReports')} to={`/${ROUTES.ADMIN.TRUST_REPORTS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.TRUST_REPORTS}` }} />
           <MenuItem text={t('admin:sidebar.activityLogs')} to={`/${ROUTES.ADMIN.JOB_ACTIVITY}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.JOB_ACTIVITY}` }} />
           <MenuItem text={t('admin:sidebar.interviewSchedule')} to={`/${ROUTES.ADMIN.INTERVIEWS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.INTERVIEWS}` }} />
@@ -90,5 +92,4 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
 };
 
 export default AdminMenu;
-
 

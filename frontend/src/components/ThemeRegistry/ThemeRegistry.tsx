@@ -36,6 +36,13 @@ const theme = createTheme(baseTheme, {
         },
       },
     },
+    MuiTabs: {
+      styleOverrides: {
+        indicator: {
+          display: 'none',
+        },
+      },
+    },
     MuiButton: {
       defaultProps: {
         disableElevation: true,
