@@ -11,7 +11,9 @@ from django.db.models import Count, Q
 from django.core.exceptions import ObjectDoesNotExist, ValidationError as DjangoValidationError
 
 from shared.configs.variable_response import response_data
+from shared.audit import AuditLogViewSetMixin, record_audit_log
 from config.django_threading import run_django_sync_in_thread
+from .agent_auth import verify_interview_agent_request
 
 from .models import (
     Question, QuestionGroup,
@@ -72,7 +74,7 @@ class InterviewStatisticViewSet(viewsets.ViewSet):
         return response_data(data=data)
 
 
-class QuestionViewSet(viewsets.ModelViewSet):
+class QuestionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = Question.objects.select_related('career', 'career__icon', 'company', 'author').all()
     serializer_class = QuestionSerializer
     permission_classes = [perms_custom.IsEmployerOrAdminUser]
@@ -103,12 +105,13 @@ class QuestionViewSet(viewsets.ModelViewSet):
         role = getattr(user, 'role_name', None)
         company = self._resolve_company(user)
         if role == 'EMPLOYER' and company:
-            serializer.save(author=user, company=company)
+            question = serializer.save(author=user, company=company)
         else:
-            serializer.save(author=user)
+            question = serializer.save(author=user)
+        self._audit_instance("create", question)
 
 
-class QuestionGroupViewSet(viewsets.ModelViewSet):
+class QuestionGroupViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = QuestionGroup.objects.prefetch_related('questions', 'questions__career', 'questions__career__icon').select_related('company', 'author').all()
     serializer_class = QuestionGroupSerializer
     permission_classes = [perms_custom.IsEmployerOrAdminUser]
@@ -138,9 +141,10 @@ class QuestionGroupViewSet(viewsets.ModelViewSet):
         role = getattr(user, 'role_name', None)
         company = self._resolve_company(user)
         if role == 'EMPLOYER' and company:
-            serializer.save(author=user, company=company)
+            group = serializer.save(author=user, company=company)
         else:
-            serializer.save(author=user)
+            group = serializer.save(author=user)
+        self._audit_instance("create", group)
 
     def list(self, request, *args, **kwargs):
         try:
@@ -150,7 +154,7 @@ class QuestionGroupViewSet(viewsets.ModelViewSet):
             return response_data(data={"count": 0, "results": []})
 
 
-class InterviewSessionViewSet(viewsets.ModelViewSet):
+class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_permissions(self):
@@ -194,6 +198,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         session = serializer.save(created_by=self.request.user)
+        self._audit_instance("create", session)
         queue_invitation_email(session.id)
 
     def list(self, request, *args, **kwargs):
@@ -252,6 +257,9 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
             permission_classes=[permissions.AllowAny])
     def context(self, request, room_name=None):
         """Trả context cho AI Agent khi join room."""
+        auth_error = verify_interview_agent_request(request)
+        if auth_error is not None:
+            return auth_error
         try:
             session = InterviewSession.objects.select_related(
                 'candidate', 'job_post'
@@ -269,6 +277,9 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
             permission_classes=[permissions.AllowAny])
     def update_status(self, request, room_name=None):
         """Cập nhật trạng thái (cho Agent hoặc Frontend)."""
+        auth_error = verify_interview_agent_request(request)
+        if auth_error is not None:
+            return auth_error
         serializer = UpdateStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -289,6 +300,14 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
                 errors={"detail": [str(exc)]},
             )
 
+        record_audit_log(
+            request=request,
+            action="status_change",
+            resource_type="interviews.InterviewSession",
+            resource_id=room_name,
+            resource_repr=room_name or "",
+            metadata={"status": new_status, "agentEndpoint": True},
+        )
         return response_data(data={"status": new_status})
 
     # POST /sessions/{room_name}/append-transcription/
@@ -296,6 +315,9 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
             permission_classes=[permissions.AllowAny])
     def append_transcription(self, request, room_name=None):
         """Agent gửi transcript hội thoại."""
+        auth_error = verify_interview_agent_request(request)
+        if auth_error is not None:
+            return auth_error
         try:
             session = InterviewSession.objects.get(room_name=room_name)
         except InterviewSession.DoesNotExist:
@@ -391,7 +413,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
         })
 
 
-class InterviewEvaluationViewSet(viewsets.ModelViewSet):
+class InterviewEvaluationViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = InterviewEvaluation.objects.select_related('interview', 'evaluator').all()
     serializer_class = InterviewEvaluationSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -414,7 +436,8 @@ class InterviewEvaluationViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(interview__candidate=user)
 
     def perform_create(self, serializer):
-        serializer.save(evaluator=self.request.user)
+        evaluation = serializer.save(evaluator=self.request.user)
+        self._audit_instance("create", evaluation)
 
 
 class ScreeningResultAPIView(APIView):
@@ -471,7 +494,7 @@ class ScreeningResultAPIView(APIView):
         })
 
 
-class AdminInterviewSessionReadOnlyViewSet(viewsets.ModelViewSet):
+class AdminInterviewSessionReadOnlyViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     """Admin-only access to interview sessions for monitoring and status control."""
     queryset = InterviewSession.objects.select_related(
         'candidate', 'job_post', 'job_post__company', 'created_by'
@@ -515,6 +538,12 @@ class AdminInterviewSessionReadOnlyViewSet(viewsets.ModelViewSet):
             )
 
         session.refresh_from_db()
+        record_audit_log(
+            request=request,
+            action="status_change",
+            instance=session,
+            metadata={"status": serializer.validated_data["status"]},
+        )
         return response_data(data=InterviewSessionDetailSerializer(session).data)
 
     def destroy(self, request, *args, **kwargs):

@@ -4,6 +4,7 @@ from rest_framework import status
 
 from apps.accounts.permissions import IsAdminUser
 from apps.content.system_settings import load_system_settings, update_system_settings
+from shared.audit import record_audit_log
 
 
 class SystemSettingsAPIView(APIView):
@@ -13,4 +14,11 @@ class SystemSettingsAPIView(APIView):
         return Response(load_system_settings())
 
     def put(self, request):
-        return Response(update_system_settings(request.data), status=status.HTTP_200_OK)
+        data = update_system_settings(request.data)
+        record_audit_log(
+            request=request,
+            action="update",
+            resource_type="config.SystemSettings",
+            metadata={"keys": sorted(list(request.data.keys()))},
+        )
+        return Response(data, status=status.HTTP_200_OK)

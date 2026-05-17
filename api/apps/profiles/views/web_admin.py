@@ -1,10 +1,12 @@
 from rest_framework import viewsets
+from django.db import transaction
 from django.db.models import Count, Q
 
 from apps.accounts import permissions as perms_custom
+from shared.audit import AuditLogViewSetMixin
 from shared import pagination as paginations
 
-from ..models import Company, JobSeekerProfile, Resume
+from ..models import Company, CompanyMember, JobSeekerProfile, Resume
 from ..serializers import CompanySerializer, JobSeekerProfileSerializer, ResumeSerializer
 
 
@@ -27,7 +29,7 @@ def _apply_search_ordering(queryset, request, search_fields, ordering_map):
     return queryset
 
 
-class AdminCompanyViewSet(viewsets.ModelViewSet):
+class AdminCompanyViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
     queryset = Company.objects.all().order_by('id')
 
@@ -67,8 +69,14 @@ class AdminCompanyViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save()
 
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            self._audit_instance("delete", instance)
+            CompanyMember.objects.filter(Q(company=instance) | Q(role__company=instance)).delete()
+            instance.delete()
 
-class AdminJobSeekerProfileViewSet(viewsets.ModelViewSet):
+
+class AdminJobSeekerProfileViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
     queryset = JobSeekerProfile.objects.select_related("user", "user__avatar", "location").all().order_by('id')
 
@@ -92,7 +100,7 @@ class AdminJobSeekerProfileViewSet(viewsets.ModelViewSet):
         )
 
 
-class AdminResumeViewSet(viewsets.ModelViewSet):
+class AdminResumeViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
     queryset = Resume.objects.select_related("user", "user__avatar", "file", "city", "career").all().order_by('id')
 

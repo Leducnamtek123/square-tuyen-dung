@@ -395,14 +395,19 @@ class JobActivityService:
         activity.save()
 
     @staticmethod
-    def trigger_ai_analysis(activity: JobPostActivity) -> None:
+    def trigger_ai_analysis(activity: JobPostActivity, criteria: Any = None) -> None:
         from apps.jobs.tasks import analyze_resume_ai
 
         try:
+            if isinstance(criteria, list):
+                activity.ai_analysis_criteria = criteria
             analyze_resume_ai.delay(activity.id)
             activity.ai_analysis_status = 'processing'
             activity.ai_analysis_progress = 5
-            activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'update_at'])
+            update_fields = ['ai_analysis_status', 'ai_analysis_progress', 'update_at']
+            if isinstance(criteria, list):
+                update_fields.append('ai_analysis_criteria')
+            activity.save(update_fields=update_fields)
         except Exception:
             activity.ai_analysis_status = 'failed'
             activity.ai_analysis_progress = 0

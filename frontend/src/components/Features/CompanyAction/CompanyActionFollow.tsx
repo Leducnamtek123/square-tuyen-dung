@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -17,11 +17,13 @@ interface CompanyActionFollowProps {
 }
 
 const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) => {
-  const { push } = useRouter();
   const { t } = useTranslation('common');
   const followRef = React.useRef<HTMLDivElement>(null);
   const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>('column');
   const theme = useTheme();
+  const companyHref = company?.slug
+    ? `/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company.slug)}`
+    : '#';
 
   React.useEffect(() => {
     const el = followRef.current;
@@ -69,15 +71,18 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                 <Box>
                   <Tooltip followCursor title={company?.companyName}>
                     <Typography
+                      component={Link}
+                      href={companyHref}
+                      prefetch={Boolean(company?.slug)}
                       variant="h6"
                       sx={{
                         fontSize: 16,
                         cursor: 'pointer',
                         color: theme.palette.primary.main,
+                        textDecoration: 'none',
                         transition: 'color 0.2s ease',
                         '&:hover': { color: theme.palette.primary.dark }
                       }}
-                      onClick={() => push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug || '')}`)}
                     >
                       {company?.companyName}
                     </Typography>

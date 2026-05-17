@@ -13,6 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from shared.helpers import helper
 from shared.helpers.cloudinary_service import CloudinaryService
+from shared.audit import AuditLogViewSetMixin, record_audit_log
 
 from .. import filters
 
@@ -413,6 +414,7 @@ class CompanyFollowedAPIView(views.APIView):
 
 
 class TrustReportViewSet(
+    AuditLogViewSetMixin,
     viewsets.ViewSet,
     generics.CreateAPIView,
     generics.ListAPIView,
@@ -452,10 +454,11 @@ class TrustReportViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         report = serializer.save()
+        record_audit_log(request=request, action="create", instance=report)
         return var_res.response_data(status=status.HTTP_201_CREATED, data=self.get_serializer(report).data)
 
 
-class AdminTrustReportViewSet(viewsets.ModelViewSet):
+class AdminTrustReportViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = TrustReport.objects.select_related("company", "job_post", "reporter")
     serializer_class = AdminTrustReportSerializer
     renderer_classes = [renderers.MyJSONRenderer]
@@ -541,7 +544,7 @@ class CompanyVerificationView(views.APIView):
     patch = put
 
 
-class AdminCompanyVerificationViewSet(viewsets.ModelViewSet):
+class AdminCompanyVerificationViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = CompanyVerification.objects.select_related("company", "submitted_by", "reviewed_by")
     serializer_class = AdminCompanyVerificationSerializer
     renderer_classes = [renderers.MyJSONRenderer]
@@ -557,7 +560,7 @@ class AdminCompanyVerificationViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class CompanyImageViewSet(viewsets.ViewSet,
+class CompanyImageViewSet(AuditLogViewSetMixin, viewsets.ViewSet,
 
                           generics.CreateAPIView,
 
@@ -599,6 +602,12 @@ class CompanyImageViewSet(viewsets.ViewSet,
         serializer.is_valid(raise_exception=True)
 
         results = serializer.save()
+        record_audit_log(
+            request=request,
+            action="create",
+            resource_type="info.CompanyImage",
+            metadata={"created": len(results) if isinstance(results, list) else 1},
+        )
 
         return var_res.response_data(status=status.HTTP_201_CREATED, data=results)
 
@@ -618,7 +627,7 @@ class CompanyImageViewSet(viewsets.ViewSet,
         return var_res.response_data(status=status.HTTP_204_NO_CONTENT)
 
 
-class CompanyRoleViewSet(viewsets.ModelViewSet):
+class CompanyRoleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = CompanyRole.objects.all()
     serializer_class = CompanyRoleSerializer
     permission_classes = [perms_sys.IsAuthenticated]
@@ -645,7 +654,8 @@ class CompanyRoleViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(company=company)
+        role = serializer.save(company=company)
+        record_audit_log(request=request, action="create", instance=role)
         return var_res.response_data(status=status.HTTP_201_CREATED, data=serializer.data)
 
     def update(self, request, *args, **kwargs):
@@ -690,7 +700,7 @@ class CompanyRoleViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
 
-class CompanyMemberViewSet(viewsets.ModelViewSet):
+class CompanyMemberViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = CompanyMember.objects.select_related("user", "role", "company")
     serializer_class = CompanyMemberSerializer
     permission_classes = [perms_sys.IsAuthenticated]
@@ -750,6 +760,7 @@ class CompanyMemberViewSet(viewsets.ModelViewSet):
             if member.status == CompanyMember.STATUS_ACTIVE and member.joined_at is None:
                 member.joined_at = timezone.now()
             member.save()
+            record_audit_log(request=request, action="update", instance=member)
             return var_res.response_data(status=status.HTTP_200_OK, data=self.get_serializer(member).data)
 
         member = serializer.save(
@@ -757,6 +768,7 @@ class CompanyMemberViewSet(viewsets.ModelViewSet):
             invited_by=request.user,
             joined_at=timezone.now(),
         )
+        record_audit_log(request=request, action="create", instance=member)
         return var_res.response_data(status=status.HTTP_201_CREATED, data=self.get_serializer(member).data)
 
     def update(self, request, *args, **kwargs):
@@ -786,7 +798,8 @@ class CompanyMemberViewSet(viewsets.ModelViewSet):
                     errors={"roleId": ["Role is invalid for this company."]},
                 )
 
-        serializer.save()
+        member = serializer.save()
+        record_audit_log(request=request, action="update", instance=member)
         return var_res.response_data(status=status.HTTP_200_OK, data=serializer.data)
 
     def destroy(self, request, *args, **kwargs):

@@ -1,20 +1,12 @@
 'use client';
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import dayjs from 'dayjs';
 import { Box, Card, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
-import defaultTheme from '@/themeConfigs/defaultTheme';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faBriefcase,
-  faFontAwesome,
-  faUsers,
-} from '@fortawesome/free-solid-svg-icons';
 import { formatRoute } from '@/utils/funcUtils';
 import { ROUTES } from '@/configs/constants';
-import { RootState } from '@/redux/store';
 
 interface CompanyActionProps {
   id: string | number;
@@ -28,14 +20,14 @@ interface CompanyActionProps {
 
 
 const CompanyAction = ({ id, views, createAt, resume, company, children }: CompanyActionProps) => {
-
-  const { push } = useRouter();
-
   const parentRef = React.useRef<HTMLDivElement>(null);
 
   const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>('column');
 
   const theme = useTheme();
+  const companyHref = company?.slug
+    ? `/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company.slug as string)}`
+    : '#';
 
   React.useEffect(() => {
     const el = parentRef.current;
@@ -125,6 +117,9 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 
                 <Typography
 
+                  component={Link}
+                  href={companyHref}
+                  prefetch={Boolean(company?.slug)}
                   variant="h6"
 
                   sx={{
@@ -134,6 +129,7 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
                     cursor: 'pointer',
 
                     color: theme.palette.primary.main,
+                    textDecoration: 'none',
 
                     transition: 'color 0.2s ease',
 
@@ -146,8 +142,6 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
                   }}
 
                   noWrap
-
-                  onClick={() => push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug as string)}`)}
 
                 >
 

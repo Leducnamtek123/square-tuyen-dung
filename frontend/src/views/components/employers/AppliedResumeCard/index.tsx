@@ -38,7 +38,11 @@ const defaultFilterData: AppliedResumeFilterData = {
   jobTypeId: '',
   genderId: '',
   maritalStatusId: '',
+  aiReviewStatus: '',
+  aiScoreMax: '',
 };
+
+const hasFilterValue = (value: unknown) => value !== '' && value !== null && value !== undefined;
 
 type AppliedResumeState = {
   viewMode: 'table' | 'board';
@@ -47,6 +51,9 @@ type AppliedResumeState = {
   isProcessing: boolean;
   jobPostIdSelect: string;
   applicationStatusSelect: string;
+  aiAnalysisStatusSelect: string;
+  aiScoreMin: string;
+  blindMode: boolean;
 };
 
 type AppliedResumeAction =
@@ -57,6 +64,9 @@ type AppliedResumeAction =
   | { type: 'set_processing'; payload: boolean }
   | { type: 'set_job_post_id'; payload: string }
   | { type: 'set_application_status'; payload: string }
+  | { type: 'set_ai_analysis_status'; payload: string }
+  | { type: 'set_ai_score_min'; payload: string }
+  | { type: 'set_blind_mode'; payload: boolean }
   | { type: 'reset_filters' };
 
 const initialState: AppliedResumeState = {
@@ -66,6 +76,9 @@ const initialState: AppliedResumeState = {
   isProcessing: false,
   jobPostIdSelect: '',
   applicationStatusSelect: '',
+  aiAnalysisStatusSelect: '',
+  aiScoreMin: '',
+  blindMode: false,
 };
 
 const reducer = (state: AppliedResumeState, action: AppliedResumeAction): AppliedResumeState => {
@@ -84,12 +97,21 @@ const reducer = (state: AppliedResumeState, action: AppliedResumeAction): Applie
       return { ...state, jobPostIdSelect: action.payload };
     case 'set_application_status':
       return { ...state, applicationStatusSelect: action.payload };
+    case 'set_ai_analysis_status':
+      return { ...state, aiAnalysisStatusSelect: action.payload };
+    case 'set_ai_score_min':
+      return { ...state, aiScoreMin: action.payload };
+    case 'set_blind_mode':
+      return { ...state, blindMode: action.payload };
     case 'reset_filters':
       return {
         ...state,
         filterData: defaultFilterData,
         jobPostIdSelect: '',
         applicationStatusSelect: '',
+        aiAnalysisStatusSelect: '',
+        aiScoreMin: '',
+        blindMode: false,
       };
     default:
       return state;
@@ -127,7 +149,21 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     ...state.filterData,
     jobPostId: state.jobPostIdSelect,
     status: state.applicationStatusSelect,
-  }), [page, pageSize, ordering, state.filterData, state.jobPostIdSelect, state.applicationStatusSelect, state.viewMode]);
+    aiAnalysisStatus: state.aiAnalysisStatusSelect,
+    aiScoreMin: state.aiScoreMin,
+    blind: state.blindMode ? true : undefined,
+  }), [
+    page,
+    pageSize,
+    ordering,
+    state.filterData,
+    state.jobPostIdSelect,
+    state.applicationStatusSelect,
+    state.aiAnalysisStatusSelect,
+    state.aiScoreMin,
+    state.blindMode,
+    state.viewMode,
+  ]);
 
   const { data: queryData, isLoading } = useAppliedResumes(queryParams);
   const { deleteJobPostActivity, isMutating: isDeleting } = useDeleteJobPostActivity();
@@ -261,7 +297,22 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
             dispatch({ type: 'set_application_status', payload: value });
             onPaginationChange({ pageIndex: 0, pageSize });
           }}
-          numbersFilter={Object.values(state.filterData).filter((v) => v !== '').length}
+          aiAnalysisStatusSelect={state.aiAnalysisStatusSelect}
+          onAiAnalysisStatusSelect={(value) => {
+            dispatch({ type: 'set_ai_analysis_status', payload: value });
+            onPaginationChange({ pageIndex: 0, pageSize });
+          }}
+          aiScoreMin={state.aiScoreMin}
+          onAiScoreMinChange={(value) => {
+            dispatch({ type: 'set_ai_score_min', payload: value });
+            onPaginationChange({ pageIndex: 0, pageSize });
+          }}
+          blindMode={state.blindMode}
+          onBlindModeChange={(value) => {
+            dispatch({ type: 'set_blind_mode', payload: value });
+            onPaginationChange({ pageIndex: 0, pageSize });
+          }}
+          numbersFilter={Object.values(state.filterData).filter(hasFilterValue).length}
           onResetFilterData={handleResetFilterData}
           onOpenFilterPopup={() => dispatch({ type: 'open_popup' })}
           onExport={handleExport}
@@ -280,6 +331,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               handleDelete={handleDelete}
               onCreateEmployee={setEmployeeSourceActivity}
               onAnalysisStateChange={handleAnalysisStateChange}
+              blindMode={state.blindMode}
             />
         ) : (
           <AppliedResumeKanban
@@ -289,6 +341,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               handleDelete={handleDelete}
               onCreateEmployee={setEmployeeSourceActivity}
               onAnalysisStateChange={handleAnalysisStateChange}
+              blindMode={state.blindMode}
             />
         )}
 

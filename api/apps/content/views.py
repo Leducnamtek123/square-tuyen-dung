@@ -9,6 +9,7 @@ from shared.helpers import helper, utils
 
 from shared import renderers
 from shared import pagination as paginations
+from shared.audit import AuditLogViewSetMixin, record_audit_log
 from shared.configs import variable_response as var_res, variable_system as var_sys
 from shared.configs.messages import NOTIFICATION_MESSAGES, ERROR_MESSAGES
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
@@ -279,7 +280,7 @@ def send_notification_demo(request):
 
 # ===== Admin ViewSets =====
 
-class AdminBannerViewSet(viewsets.ModelViewSet):
+class AdminBannerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     """Admin CRUD for Banners with MinIO image upload."""
     queryset = Banner.objects.all().select_related('image', 'image_mobile').order_by('-create_at')
     permission_classes = [perms_sys.IsAdminUser]
@@ -347,6 +348,7 @@ class AdminBannerViewSet(viewsets.ModelViewSet):
                 banner.save()
 
         banner.refresh_from_db()
+        record_audit_log(request=request, action="create", instance=banner)
         output = self.get_serializer(banner)
         return var_res.response_data(data=output.data)
 
@@ -373,11 +375,12 @@ class AdminBannerViewSet(viewsets.ModelViewSet):
                 banner.save()
 
         banner.refresh_from_db()
+        record_audit_log(request=request, action="update", instance=banner)
         output = self.get_serializer(banner)
         return var_res.response_data(data=output.data)
 
 
-class AdminFeedbackViewSet(viewsets.ModelViewSet):
+class AdminFeedbackViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     """Admin management for Feedbacks."""
     queryset = Feedback.objects.all().select_related('user').order_by('-create_at')
     permission_classes = [perms_sys.IsAdminUser]
@@ -407,7 +410,7 @@ class AdminFeedbackViewSet(viewsets.ModelViewSet):
         return var_res.response_data(data=serializer.data)
 
 
-class AdminBannerTypeViewSet(viewsets.ModelViewSet):
+class AdminBannerTypeViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = BannerType.objects.all().order_by('value')
     permission_classes = [perms_sys.IsAdminUser]
     renderer_classes = [renderers.MyJSONRenderer]
@@ -503,7 +506,7 @@ class ArticlePublicViewSet(viewsets.ReadOnlyModelViewSet):
         return var_res.response_data(data=serializer.data)
 
 
-class AdminArticleViewSet(viewsets.ModelViewSet):
+class AdminArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     """Admin full CRUD for articles (news + blog)."""
     queryset = Article.objects.all().select_related('author', 'thumbnail').order_by('-create_at')
     permission_classes = [perms_sys.IsAdminUser]
@@ -540,6 +543,7 @@ class AdminArticleViewSet(viewsets.ModelViewSet):
         article = serializer.save(author=request.user if not request.data.get('author') else None)
         self._handle_thumbnail(request, article)
         article.refresh_from_db()
+        record_audit_log(request=request, action="create", instance=article)
         return var_res.response_data(data=self.get_serializer(article).data)
 
     def update(self, request, *args, **kwargs):
@@ -549,6 +553,7 @@ class AdminArticleViewSet(viewsets.ModelViewSet):
         serializer.save()
         self._handle_thumbnail(request, article)
         article.refresh_from_db()
+        record_audit_log(request=request, action="update", instance=article)
         return var_res.response_data(data=self.get_serializer(article).data)
 
     def retrieve(self, request, *args, **kwargs):
@@ -571,7 +576,7 @@ class AdminArticleViewSet(viewsets.ModelViewSet):
                     article.save()
 
 
-class EmployerArticleViewSet(viewsets.ModelViewSet):
+class EmployerArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     """Employer CRUD for their own blog posts."""
     permission_classes = [perms_sys.IsAuthenticated]
     renderer_classes = [renderers.MyJSONRenderer]
@@ -607,6 +612,7 @@ class EmployerArticleViewSet(viewsets.ModelViewSet):
         article = serializer.save()
         self._handle_thumbnail(request, article)
         article.refresh_from_db()
+        record_audit_log(request=request, action="create", instance=article)
         return var_res.response_data(data=self.get_serializer(article).data)
 
     def update(self, request, *args, **kwargs):
@@ -618,12 +624,14 @@ class EmployerArticleViewSet(viewsets.ModelViewSet):
         serializer.save()
         self._handle_thumbnail(request, article)
         article.refresh_from_db()
+        record_audit_log(request=request, action="update", instance=article)
         return var_res.response_data(data=self.get_serializer(article).data)
 
     def destroy(self, request, *args, **kwargs):
         article = self.get_object()
         if article.author != request.user:
             return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+        record_audit_log(request=request, action="delete", instance=article)
         article.delete()
         return var_res.response_data()
 

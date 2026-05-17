@@ -11,6 +11,7 @@ Tests cover:
 from unittest.mock import AsyncMock, patch
 from decimal import Decimal
 from types import SimpleNamespace
+import time
 
 from django.test import TestCase, TransactionTestCase
 from django.test import RequestFactory, override_settings
@@ -23,6 +24,7 @@ from apps.interviews.models import (
     InterviewSession, Question, QuestionGroup,
     InterviewTranscript, InterviewEvaluation,
 )
+from apps.interviews.agent_auth import build_signature
 from apps.interviews.serializers import (
     InterviewSessionCreateSerializer,
     InterviewEvaluationSerializer,
@@ -142,6 +144,27 @@ class InterviewCompatEndpointTests(TransactionTestCase):
         self.session.refresh_from_db()
         self.assertEqual(self.session.status, "scheduled")
         self.assertEqual(response.json()["status"], "scheduled")
+
+    @override_settings(INTERVIEW_AGENT_SHARED_SECRET="agent-secret", INTERVIEW_AGENT_AUTH_REQUIRED=True)
+    def test_agent_auth_required_blocks_unsigned_context_request(self):
+        response = self.client.get(f"/api/v1/interview/compat/{self.session.room_name}/context")
+
+        self.assertEqual(response.status_code, 401)
+
+    @override_settings(INTERVIEW_AGENT_SHARED_SECRET="agent-secret", INTERVIEW_AGENT_AUTH_REQUIRED=True)
+    def test_agent_auth_accepts_signed_context_request(self):
+        path = f"/api/v1/interview/compat/{self.session.room_name}/context"
+        timestamp = str(int(time.time()))
+        signature = build_signature("agent-secret", "GET", path, timestamp, b"")
+
+        response = self.client.get(
+            path,
+            HTTP_X_SQUARE_AGENT_TIMESTAMP=timestamp,
+            HTTP_X_SQUARE_AGENT_SIGNATURE=signature,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("candidateEmail", response.json())
 
 
 class _FakeFileResult:

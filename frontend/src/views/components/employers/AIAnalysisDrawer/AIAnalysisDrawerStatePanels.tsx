@@ -7,6 +7,7 @@ import {
   LinearProgress,
   Paper,
   Stack,
+  TextField,
   Typography,
   useTheme,
 } from '@mui/material';
@@ -33,8 +34,31 @@ type Props = {
   isFailed: boolean;
   stats: { matchingSkills: number; missingSkills: number; totalSkills: number };
   onAnalyze: () => void;
+  onSaveReview: (payload: { overrideScore?: number | string | null; note?: string; reviewStatus?: string }) => Promise<void>;
   t: TFunction;
 };
+
+const toRecordArray = (value: unknown): Array<Record<string, unknown>> => {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object' && !Array.isArray(item));
+  }
+  return [];
+};
+
+const getEvidenceArrays = (value: AIAnalysisData['aiAnalysisEvidence']) => {
+  if (Array.isArray(value)) {
+    return { criteriaResults: [], evidence: toRecordArray(value) };
+  }
+  if (value && typeof value === 'object') {
+    return {
+      criteriaResults: toRecordArray(value.criteria_results),
+      evidence: toRecordArray(value.evidence),
+    };
+  }
+  return { criteriaResults: [], evidence: [] };
+};
+
+const textValue = (value: unknown): string => (value == null ? '' : String(value));
 
 const AIAnalysisDrawerStatePanels = ({
   data,
@@ -45,9 +69,33 @@ const AIAnalysisDrawerStatePanels = ({
   isFailed,
   stats,
   onAnalyze,
+  onSaveReview,
   t,
 }: Props) => {
   const theme = useTheme();
+  const [overrideScore, setOverrideScore] = React.useState<string>('');
+  const [reviewNote, setReviewNote] = React.useState<string>('');
+  const [savingReview, setSavingReview] = React.useState(false);
+
+  React.useEffect(() => {
+    setOverrideScore(data?.aiAnalysisHrOverrideScore == null ? '' : String(data.aiAnalysisHrOverrideScore));
+    setReviewNote(data?.aiAnalysisHrOverrideNote || '');
+  }, [data?.id, data?.aiAnalysisHrOverrideScore, data?.aiAnalysisHrOverrideNote]);
+
+  const { criteriaResults, evidence } = getEvidenceArrays(data?.aiAnalysisEvidence);
+
+  const handleSaveReview = async () => {
+    setSavingReview(true);
+    try {
+      await onSaveReview({
+        overrideScore: overrideScore.trim() ? overrideScore : null,
+        note: reviewNote,
+        reviewStatus: overrideScore.trim() ? 'overridden' : 'reviewed',
+      });
+    } finally {
+      setSavingReview(false);
+    }
+  };
 
   if (isProcessing) {
     return (
@@ -238,14 +286,100 @@ const AIAnalysisDrawerStatePanels = ({
           boxShadow: (muiTheme) => muiTheme.customShadows?.z1,
         }}
       >
-        <ScoreGauge score={data?.aiAnalysisScore || 0} />
+        <ScoreGauge score={data?.aiAnalysisEffectiveScore ?? data?.aiAnalysisScore ?? 0} />
       </Paper>
+
+      <SectionCard title={t('appliedResume.ai.reviewTitle', { defaultValue: 'HR review' })} icon={<PsychologyIcon fontSize="small" />} iconColor={theme.palette.info.main}>
+        <Stack spacing={2}>
+          <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
+            <Chip
+              size="small"
+              label={t(`appliedResume.ai.reviewStatus.${data?.aiAnalysisReviewStatus || 'ai_only'}`, {
+                defaultValue: data?.aiAnalysisReviewStatus || 'ai_only',
+              })}
+              sx={{ fontWeight: 800, borderRadius: 1.5 }}
+            />
+            {data?.aiAnalysisModel && (
+              <Chip size="small" label={`Model: ${data.aiAnalysisModel}`} sx={{ fontWeight: 800, borderRadius: 1.5 }} />
+            )}
+            {data?.aiAnalysisPromptVersion && (
+              <Chip size="small" label={`Prompt: ${data.aiAnalysisPromptVersion}`} sx={{ fontWeight: 800, borderRadius: 1.5 }} />
+            )}
+          </Stack>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+            <TextField
+              label={t('appliedResume.ai.overrideScore', { defaultValue: 'Override score' })}
+              value={overrideScore}
+              onChange={(event) => setOverrideScore(event.target.value)}
+              type="number"
+              size="small"
+              inputProps={{ min: 0, max: 100 }}
+              sx={{ width: { xs: '100%', sm: 150 } }}
+            />
+            <TextField
+              label={t('appliedResume.ai.reviewNote', { defaultValue: 'Review note' })}
+              value={reviewNote}
+              onChange={(event) => setReviewNote(event.target.value)}
+              size="small"
+              fullWidth
+            />
+          </Stack>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={handleSaveReview}
+            disabled={savingReview}
+            sx={{ alignSelf: 'flex-start', textTransform: 'none', fontWeight: 900 }}
+          >
+            {t('appliedResume.ai.saveReview', { defaultValue: 'Save review' })}
+          </Button>
+        </Stack>
+      </SectionCard>
 
       <SectionCard title={t('appliedResume.ai.overviewTitle')} icon={<PsychologyIcon fontSize="small" />} iconColor={theme.palette.secondary.main}>
         <Typography variant="body2" sx={{ color: 'text.primary', lineHeight: 1.8, fontWeight: 600, opacity: 0.9 }}>
           {data?.aiAnalysisSummary || t('appliedResume.ai.noEvaluation')}
         </Typography>
       </SectionCard>
+
+      {criteriaResults.length > 0 && (
+        <SectionCard title={t('appliedResume.ai.criteriaTitle', { defaultValue: 'Weighted criteria' })} icon={<CheckCircleIcon fontSize="small" />} iconColor={theme.palette.info.main}>
+          <Stack spacing={1.25}>
+            {criteriaResults.map((item, index) => (
+              <Paper key={`${textValue(item.key)}-${index}`} elevation={0} sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+                <Stack direction="row" justifyContent="space-between" spacing={2} alignItems="flex-start">
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 900 }}>
+                      {textValue(item.label || item.key || `Criterion ${index + 1}`)}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontWeight: 600 }}>
+                      {textValue(item.reason || item.evidence)}
+                    </Typography>
+                  </Box>
+                  <Chip size="small" label={`${textValue(item.score || 0)}/100`} sx={{ fontWeight: 900, borderRadius: 1.5 }} />
+                </Stack>
+              </Paper>
+            ))}
+          </Stack>
+        </SectionCard>
+      )}
+
+      {evidence.length > 0 && (
+        <SectionCard title={t('appliedResume.ai.evidenceTitle', { defaultValue: 'Evidence' })} icon={<AutoFixHighIcon fontSize="small" />} iconColor={theme.palette.primary.main}>
+          <Stack spacing={1.25}>
+            {evidence.map((item, index) => (
+              <Paper key={`${textValue(item.claim)}-${index}`} elevation={0} sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 0.5 }}>
+                  {textValue(item.claim || item.source || `Evidence ${index + 1}`)}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, lineHeight: 1.6 }}>
+                  {textValue(item.quote || item.evidence)}
+                </Typography>
+              </Paper>
+            ))}
+          </Stack>
+        </SectionCard>
+      )}
 
       <SectionCard title={t('appliedResume.ai.prosTitle')} icon={<ThumbUpAltIcon fontSize="small" />} iconColor={theme.palette.success.main}>
         <SkillChipList skills={data?.aiAnalysisPros} color="success" />

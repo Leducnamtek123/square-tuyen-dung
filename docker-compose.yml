@@ -42,8 +42,8 @@ services:
         NEXT_PUBLIC_PROJECT_HOST_NAME: ${NEXT_PUBLIC_PROJECT_HOST_NAME:-tuyendung.square.vn}
         NEXT_PUBLIC_ADMIN_PROJECT_HOST_NAME: ${NEXT_PUBLIC_ADMIN_PROJECT_HOST_NAME:-admin.tuyendung.square.vn}
         NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME: ${NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME:-employer.tuyendung.square.vn}
-        NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID: ${NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID}
-        NEXT_PUBLIC_PROJECT_SERVER_CLIENT_SECRET: ${NEXT_PUBLIC_PROJECT_SERVER_CLIENT_SECRET}
+        NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID: ${NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID:-${CLIENT_ID}}
+        NEXT_PUBLIC_PROJECT_SERVER_CLIENT_SECRET: ${NEXT_PUBLIC_PROJECT_SERVER_CLIENT_SECRET:-${CLIENT_SECRET}}
         NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
         NEXT_PUBLIC_GOOGLE_CLIENT_SECRET: ${NEXT_PUBLIC_GOOGLE_CLIENT_SECRET}
         NEXT_PUBLIC_FACEBOOK_CLIENT_ID: ${NEXT_PUBLIC_FACEBOOK_CLIENT_ID:-}
@@ -86,6 +86,9 @@ services:
     environment:
       - DEBUG=${DEBUG:-False}
       - AUTO_MIGRATE=${AUTO_MIGRATE:-1}
+      - INTERVIEW_AGENT_SHARED_SECRET=${INTERVIEW_AGENT_SHARED_SECRET:?Set INTERVIEW_AGENT_SHARED_SECRET in .env and share it with livekit-agent}
+      - INTERVIEW_AGENT_AUTH_REQUIRED=${INTERVIEW_AGENT_AUTH_REQUIRED:-True}
+      - INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS=${INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS:-300}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     deploy:
@@ -100,7 +103,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/api/common/health/ > /dev/null || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS -H 'X-Forwarded-Proto: https' http://localhost:8000/api/common/health/ > /dev/null || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10
@@ -190,13 +193,13 @@ services:
     container_name: tuyendung-studio-db
     image: public.ecr.aws/docker/library/mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
       MYSQL_DATABASE: ${DB_NAME:-square_db}
     volumes:
       - db_data:/var/lib/mysql
       - ./tuyendungsqstudio.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-secret}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:?Set DB_PASSWORD in .env}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -242,8 +245,8 @@ services:
     environment:
       DB_HOST: frappe-hrms-db
       DB_PORT: "3306"
-      MYSQL_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:-admin}
-      MARIADB_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:-admin}
+      MYSQL_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:?Set FRAPPE_HR_DB_ROOT_PASSWORD in .env}
+      MARIADB_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:?Set FRAPPE_HR_DB_ROOT_PASSWORD in .env}
     volumes:
       - frappe-hrms-sites:/home/frappe/frappe-bench/sites
       - frappe-hrms-logs:/home/frappe/frappe-bench/logs
@@ -331,8 +334,8 @@ services:
         bench --site "$${FRAPPE_SITE_NAME}" clear-cache;
     environment:
       FRAPPE_SITE_NAME: ${FRAPPE_HR_SITE_NAME:-hrm.tuyendung.square.vn}
-      ADMIN_PASSWORD: ${FRAPPE_HR_ADMIN_PASSWORD:-admin}
-      DB_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:-admin}
+      ADMIN_PASSWORD: ${FRAPPE_HR_ADMIN_PASSWORD:?Set FRAPPE_HR_ADMIN_PASSWORD in .env}
+      DB_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:?Set FRAPPE_HR_DB_ROOT_PASSWORD in .env}
     volumes:
       - frappe-hrms-sites:/home/frappe/frappe-bench/sites
       - frappe-hrms-logs:/home/frappe/frappe-bench/logs
@@ -352,8 +355,8 @@ services:
       - --collation-server=utf8mb4_unicode_ci
       - --skip-character-set-client-handshake
     environment:
-      MYSQL_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:-admin}
-      MARIADB_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:-admin}
+      MYSQL_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:?Set FRAPPE_HR_DB_ROOT_PASSWORD in .env}
+      MARIADB_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:?Set FRAPPE_HR_DB_ROOT_PASSWORD in .env}
     volumes:
       - frappe-hrms-db-data:/var/lib/mysql
     healthcheck:
@@ -495,11 +498,12 @@ services:
   livekit:
     container_name: tuyendung-studio-livekit
     image: livekit/livekit-server:latest
-    command: --config /etc/livekit.yaml
-    env_file:
-      - .env
+    entrypoint: ["/bin/sh", "/usr/local/bin/render-livekit-config.sh"]
+    environment:
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:?Set LIVEKIT_API_KEY in .env}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:?Set LIVEKIT_API_SECRET in .env}
     volumes:
-      - ./voice-ai/livekit.yaml:/etc/livekit.yaml
+      - ./voice-ai/docker-livekit-entrypoint.sh:/usr/local/bin/render-livekit-config.sh:ro
     expose:
       - "7880"
       - "7881"
@@ -538,9 +542,11 @@ services:
     cap_add:
       - SYS_ADMIN
     environment:
-      - EGRESS_CONFIG_FILE=/etc/egress.yaml
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:?Set LIVEKIT_API_KEY in .env}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:?Set LIVEKIT_API_SECRET in .env}
+    entrypoint: ["/bin/sh", "/usr/local/bin/render-egress-config.sh"]
     volumes:
-      - ./voice-ai/egress.yaml:/etc/egress.yaml
+      - ./voice-ai/docker-egress-entrypoint.sh:/usr/local/bin/render-egress-config.sh:ro
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       redis:
@@ -608,6 +614,7 @@ services:
       - .env
     environment:
       - BACKEND_API_URL=${BACKEND_API_URL:-http://backend:8000/api}
+      - INTERVIEW_AGENT_SHARED_SECRET=${INTERVIEW_AGENT_SHARED_SECRET:?Set INTERVIEW_AGENT_SHARED_SECRET in .env and share it with backend}
       - LIVEKIT_URL=${LIVEKIT_URL:-http://tuyendung-studio-livekit:7880}
       - LIVEKIT_AGENT_NAME=square-ai-interviewer
       - STT_LANGUAGE=${STT_LANGUAGE:-vi}

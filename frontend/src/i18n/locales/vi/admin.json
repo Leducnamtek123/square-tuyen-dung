@@ -20,6 +20,8 @@
     "jobSeekers": "Người tìm việc:",
     "status": "Trạng thái:",
     "statusActive": "Đang hoạt động",
+    "loadingChart": "Đang tải biểu đồ...",
+    "noUserData": "Chưa có dữ liệu người dùng",
     "pendingPosts": "Tin chờ duyệt:",
     "users": "người dùng",
     "roles": {
@@ -93,6 +95,7 @@
     "systemAndUsers": "Người dùng & HT",
     "usersAndPermissions": "Phân quyền",
     "systemConfiguration": "Cấu hình hệ thống",
+    "auditLogs": "Nhật ký hệ thống",
     "generalCategories": "Danh mục chung",
     "careersManagement": "Ngành nghề",
     "citiesManagement": "Tỉnh/Thành phố",
@@ -740,6 +743,42 @@
       "toast": {
         "updateSuccess": "Đã cập nhật trạng thái báo cáo.",
         "updateError": "Không thể cập nhật trạng thái báo cáo."
+      }
+    },
+    "auditLogs": {
+      "title": "Nh\u1eadt k\u00fd h\u1ec7 th\u1ed1ng",
+      "breadcrumbAdmin": "Qu\u1ea3n tr\u1ecb",
+      "breadcrumb": "Nh\u1eadt k\u00fd h\u1ec7 th\u1ed1ng",
+      "searchPlaceholder": "T\u00ecm email, h\u00e0nh \u0111\u1ed9ng, \u0111\u1ed1i t\u01b0\u1ee3ng, request...",
+      "exportCsv": "Xu\u1ea5t CSV",
+      "exportingCsv": "\u0110ang xu\u1ea5t...",
+      "filter": {
+        "title": "B\u1ed9 l\u1ecdc nh\u1eadt k\u00fd",
+        "action": "H\u00e0nh \u0111\u1ed9ng",
+        "allActions": "T\u1ea5t c\u1ea3",
+        "actorEmail": "Email ng\u01b0\u1eddi thao t\u00e1c",
+        "resourceType": "Lo\u1ea1i \u0111\u1ed1i t\u01b0\u1ee3ng",
+        "resourceId": "ID \u0111\u1ed1i t\u01b0\u1ee3ng",
+        "dateFrom": "T\u1eeb ng\u00e0y",
+        "dateTo": "\u0110\u1ebfn ng\u00e0y"
+      },
+      "actions": {
+        "create": "T\u1ea1o",
+        "update": "C\u1eadp nh\u1eadt",
+        "delete": "X\u00f3a",
+        "approve": "Duy\u1ec7t",
+        "reject": "T\u1eeb ch\u1ed1i",
+        "status_change": "\u0110\u1ed5i tr\u1ea1ng th\u00e1i",
+        "bulk_status": "\u0110\u1ed5i tr\u1ea1ng th\u00e1i h\u00e0ng lo\u1ea1t",
+        "agent_access": "Agent truy c\u1eadp",
+        "export": "Xu\u1ea5t"
+      },
+      "table": {
+        "time": "Th\u1eddi gian",
+        "action": "H\u00e0nh \u0111\u1ed9ng",
+        "actor": "Ng\u01b0\u1eddi thao t\u00e1c",
+        "resource": "\u0110\u1ed1i t\u01b0\u1ee3ng",
+        "request": "Request"
       }
     },
     "questions": {

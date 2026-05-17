@@ -204,6 +204,34 @@ class EmployerJobPostActivityFilter(django_filters.FilterSet):
 
                                          field_name='status')
 
+    aiAnalysisStatus = django_filters.ChoiceFilter(
+        choices=(
+            ('pending', 'Pending'),
+            ('processing', 'Processing'),
+            ('completed', 'Completed'),
+            ('failed', 'Failed'),
+        ),
+        field_name='ai_analysis_status',
+    )
+
+    aiReviewStatus = django_filters.ChoiceFilter(
+        choices=(
+            ('ai_only', 'AI only'),
+            ('reviewed', 'Reviewed'),
+            ('overridden', 'Overridden'),
+        ),
+        field_name='ai_analysis_review_status',
+    )
+
+    aiScoreMin = django_filters.NumberFilter(field_name='ai_analysis_score', lookup_expr='gte')
+    aiScoreMax = django_filters.NumberFilter(field_name='ai_analysis_score', lookup_expr='lte')
+    hasAiAnalysis = django_filters.BooleanFilter(method='filter_has_ai_analysis')
+
+    def filter_has_ai_analysis(self, queryset, name, value):
+        if value:
+            return queryset.filter(ai_analysis_status='completed', ai_analysis_score__isnull=False)
+        return queryset.exclude(ai_analysis_status='completed', ai_analysis_score__isnull=False)
+
     class Meta:
 
         model = JobPostActivity
@@ -218,6 +246,7 @@ class EmployerJobPostActivityFilter(django_filters.FilterSet):
 
             'jobTypeId', 'genderId', 'maritalStatusId',
 
-            'jobPostId', 'status'
+            'jobPostId', 'status', 'aiAnalysisStatus', 'aiReviewStatus',
+            'aiScoreMin', 'aiScoreMax', 'hasAiAnalysis'
 
         ]

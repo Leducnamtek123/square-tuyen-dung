@@ -23,6 +23,7 @@ from rest_framework.views import APIView
 
 from shared import pagination as paginations
 from shared import renderers
+from shared.audit import AuditLogViewSetMixin, record_audit_log
 
 from shared.configs import variable_system as var_sys
 from shared.configs.variable_response import response_data
@@ -506,6 +507,7 @@ class UserSettingAPIView(APIView):
 
 
 class UserViewSet(
+    AuditLogViewSetMixin,
     viewsets.ViewSet,
     generics.ListAPIView,
     generics.UpdateAPIView,
@@ -562,6 +564,12 @@ class UserViewSet(
     def toggle_active(self, request, pk=None):
         try:
             user = AccountService.toggle_active(pk, request.user)
+            record_audit_log(
+                request=request,
+                action="status_change",
+                instance=user,
+                metadata={"isActive": user.is_active},
+            )
             return response_data(data={"isActive": user.is_active})
 
         except PermissionError as e:
@@ -604,4 +612,10 @@ class UserViewSet(
             is_active = bool(is_active)
 
         updated = User.objects.filter(pk__in=ids).update(is_active=is_active)
+        record_audit_log(
+            request=request,
+            action="bulk_status",
+            resource_type="accounts.User",
+            metadata={"ids": ids, "isActive": is_active, "updated": updated},
+        )
         return response_data(data={"updated": updated, "isActive": is_active})

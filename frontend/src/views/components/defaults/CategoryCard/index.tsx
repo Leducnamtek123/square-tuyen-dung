@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
+import Link from 'next/link';
 import { useAppSelector } from '@/redux/hooks';
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { InputBase, Paper, Typography } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
@@ -18,7 +18,6 @@ interface CategoryCardProps {
 const CategoryCard = ({ options, type }: CategoryCardProps) => {
   const { t } = useTranslation('common');
   const dispatch = useDispatch();
-  const { push } = useRouter();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [searchTerm, setSearchTerm] = React.useState('');
   const items = React.useMemo(() => {
@@ -47,7 +46,6 @@ const CategoryCard = ({ options, type }: CategoryCardProps) => {
       default:
         break;
     }
-    push(`/${ROUTES.JOB_SEEKER.JOBS}`);
   };
 
   return (
@@ -81,8 +79,13 @@ const CategoryCard = ({ options, type }: CategoryCardProps) => {
       {items.map((item) => (
         <Grid key={item.id} size={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 3 }}>
           <Typography
+            component={Link}
+            href={`/${ROUTES.JOB_SEEKER.JOBS}`}
+            prefetch
             sx={{
               cursor: 'pointer',
+              color: 'inherit',
+              textDecoration: 'none',
               '&:hover': {
                 color: '#fca34d',
                 fontWeight: 'bold',

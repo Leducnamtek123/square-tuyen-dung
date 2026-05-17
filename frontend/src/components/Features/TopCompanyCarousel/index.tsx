@@ -1,6 +1,6 @@
  'use client';
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { Pagination, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -83,7 +83,6 @@ const Loading = () => {
 };
 
 const TopCompanyCarousel = () => {
-  const { push } = useRouter();
   const { i18n, t } = useTranslation('common');
   const [parentWidth, setParentWidth] = React.useState(0);
   const col = parentWidth < 600 ? 2 : parentWidth < 900 ? 3 : parentWidth < 1200 ? 4 : 5;
@@ -134,9 +133,18 @@ const TopCompanyCarousel = () => {
                   <Loading />
                 </SwiperSlide>
               ))
-            : companies.map((value: Company & { shortDescription?: string }) => (
+            : companies.map((value: Company & { shortDescription?: string }) => {
+                const detailHref = localizeRoutePath(
+                  `/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, value.slug as string)}`,
+                  i18n.language,
+                );
+
+                return (
                 <SwiperSlide key={value.id}>
                   <Card
+                    component={Link}
+                    href={detailHref}
+                    prefetch
                     sx={{
                       boxShadow: 0,
                       p: 2.5,
@@ -151,6 +159,8 @@ const TopCompanyCarousel = () => {
                       bgcolor: 'background.paper',
                       display: 'flex',
                       flexDirection: 'column',
+                      color: 'inherit',
+                      textDecoration: 'none',
                       '&:hover': {
                         transform: 'translateY(-4px)',
                         boxShadow: (theme: Theme & { customShadows?: { medium?: string } }) => theme.customShadows?.medium || 'none',
@@ -160,7 +170,6 @@ const TopCompanyCarousel = () => {
                         }
                       },
                     }}
-                    onClick={() => push(localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, value.slug as string)}`, i18n.language))}
                   >
                     <Box
                       sx={{
@@ -242,10 +251,12 @@ const TopCompanyCarousel = () => {
                           <StarIcon key={key} sx={{ color: 'primary.main', fontSize: 18 }} />
                         ))}
                       </Stack>
-                      <Button 
+                      <Button
+                        component="span"
                         variant="contained" 
                         size="small" 
                         disableElevation
+                        tabIndex={-1}
                         sx={{ 
                           borderRadius: 2, 
                           textTransform: 'none', 
@@ -258,7 +269,8 @@ const TopCompanyCarousel = () => {
                     </Stack>
                   </Card>
                 </SwiperSlide>
-              ))}
+              );
+              })}
         </Swiper>
       </Box>
     </div>

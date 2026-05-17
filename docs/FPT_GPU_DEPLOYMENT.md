@@ -359,6 +359,12 @@ Sau khi FPT cấp endpoint, copy mẫu app env:
 infra/fpt-gpu/app-env.all-in-one.env
 ```
 
+Với template `NVIDIA Pytorch 25.03`, không nhập `-lc exec ...` vào ô Arguments trên UI vì FPT có thể truyền nó thành một argument duy nhất làm `/bin/bash` báo `invalid option`. Hãy để `Command` và `Arguments` trống, chờ container `Running`, rồi upload/run bootstrap qua SSH:
+
+```powershell
+.\infra\fpt-gpu\upload-bootstrap-to-fpt.ps1 -HostName tcp-endpoint.serverless.fptcloud.com -Port <tcp-port>
+```
+
 Nếu muốn tách 3 container riêng, các file vẫn có sẵn:
 
 ```text

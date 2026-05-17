@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import NextLink from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 import { useTranslation } from 'react-i18next';
@@ -69,9 +69,10 @@ const RenderItem = ({ item }: { item: Banner }) => {
 
 const TopSlide = () => {
   const { t, i18n } = useTranslation('public');
-  const { push } = useRouter();
   const [banners, setBanners] = React.useState<Banner[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
+  const employerIntroHref = localizeRoutePath(`/${ROUTES.EMPLOYER.INTRODUCE}`, i18n.language);
 
   React.useEffect(() => {
     const getBanners = async () => {
@@ -201,11 +202,13 @@ const TopSlide = () => {
                   </Typography>
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
                     <Button
+                      component={NextLink}
+                      href={jobsHref}
+                      prefetch
                       variant="contained"
                       size="large"
                       startIcon={<SearchIcon />}
                       endIcon={<ArrowForwardIcon />}
-                      onClick={() => push(localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language))}
                       sx={{
                         width: { xs: '100%', sm: 'auto' },
                         justifyContent: 'center',
@@ -214,10 +217,12 @@ const TopSlide = () => {
                       {t('home.heroPrimaryCta', 'Khám phá việc làm')}
                     </Button>
                     <Button
+                      component={NextLink}
+                      href={employerIntroHref}
+                      prefetch
                       variant="outlined"
                       size="large"
                       startIcon={<ApartmentIcon />}
-                      onClick={() => push(`/${ROUTES.EMPLOYER.INTRODUCE}`)}
                       sx={{
                         width: { xs: '100%', sm: 'auto' },
                         justifyContent: 'center',

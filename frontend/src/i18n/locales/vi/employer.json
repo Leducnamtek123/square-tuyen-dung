@@ -196,6 +196,7 @@
   },
   "applicationChart": {
     "title": "Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất",
+    "loading": "Đang tải biểu đồ ứng tuyển...",
     "noData": "Không có dữ liệu để thống kê",
     "labels": {
       "totalapplications": "Tổng số lượng ứng tuyển",
@@ -206,6 +207,7 @@
   },
   "candidateChart": {
     "title": "Thống kê số hồ sơ ứng tuyển nhận được theo ngày",
+    "loading": "Đang tải biểu đồ ứng viên...",
     "noData": "Không có dữ liệu để thống kê",
     "labels": {
       "newcandidates": "Ứng viên mới",
@@ -216,6 +218,7 @@
   "hiringAcademicChart": {
     "title": "Thống kê chỉ số ứng tuyển theo trình độ học vấn",
     "applicationCount": "Số lượng ứng tuyển",
+    "loading": "Đang tải biểu đồ học vấn...",
     "noData": "Không có dữ liệu để thống kê",
     "labels": {
       "postgraduate": "Sau đại học",
@@ -228,6 +231,7 @@
   },
   "recruitmentChart": {
     "title": "Thống kê quy trình tuyển dụng theo thời gian",
+    "loading": "Đang tải biểu đồ tuyển dụng...",
     "noData": "Không có dữ liệu tuyển dụng trong khoảng thời gian này",
     "labels": {
       "applied": "Hồ sơ ứng tuyển",
@@ -890,7 +894,37 @@
   "company": {
     "tabs": {
       "info": "Thông tin công ty",
-      "multimedia": "Đa phương tiện"
+      "multimedia": "Đa phương tiện",
+      "team": "Đội ngũ"
+    },
+    "team": {
+      "description": "Quản lý thành viên, vai trò và quyền truy cập workspace công ty.",
+      "addMember": "Thêm thành viên",
+      "addRole": "Thêm vai trò",
+      "createMember": "Tạo thành viên",
+      "createRole": "Tạo vai trò",
+      "editMember": "Sửa thành viên",
+      "editRole": "Sửa vai trò",
+      "deleteMemberTitle": "Xóa thành viên",
+      "deleteMemberConfirm": "Xóa thành viên này khỏi workspace công ty?",
+      "deleteRoleTitle": "Xóa vai trò",
+      "deleteRoleConfirm": "Xóa vai trò công ty này?",
+      "member": "Thành viên",
+      "membersTitle": "Thành viên",
+      "membersSubtitle": "Người có quyền truy cập workspace công ty",
+      "noMembers": "Chưa có thành viên",
+      "rolesTitle": "Vai trò",
+      "rolesSubtitle": "Nhóm quyền dành cho thành viên công ty",
+      "noRoles": "Chưa có vai trò",
+      "permissions": "Quyền",
+      "permissionsHint": "Chọn các quyền mà vai trò này được sử dụng.",
+      "roleCode": "Mã vai trò",
+      "roleName": "Tên vai trò",
+      "status": "Trạng thái",
+      "statusActive": "Hoạt động",
+      "statusDisabled": "Đã khóa",
+      "statusInvited": "Đã mời",
+      "userId": "ID người dùng"
     },
     "title": "Thông tin công ty",
     "following": "Đang theo dõi",
@@ -915,6 +949,7 @@
     "title": "Hồ sơ công ty"
   },
   "interviewChart": {
+    "loading": "Đang tải biểu đồ phỏng vấn...",
     "labels": {
       "completed": "Hoàn thành",
       "scheduled": "Đã lên lịch",

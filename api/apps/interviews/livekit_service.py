@@ -12,8 +12,8 @@ from typing import Dict, Optional
 from decouple import config
 from livekit import api
 
-LIVEKIT_API_KEY = config('LIVEKIT_API_KEY', default='devkey')
-LIVEKIT_API_SECRET = config('LIVEKIT_API_SECRET', default='secret')
+LIVEKIT_API_KEY = config('LIVEKIT_API_KEY', default='')
+LIVEKIT_API_SECRET = config('LIVEKIT_API_SECRET', default='')
 LIVEKIT_URL = config('LIVEKIT_URL', default='http://livekit:7880')
 MINIO_ROOT_USER = config('MINIO_ROOT_USER', default='minioadmin')
 MINIO_ROOT_PASSWORD = config('MINIO_ROOT_PASSWORD', default='minioadmin')

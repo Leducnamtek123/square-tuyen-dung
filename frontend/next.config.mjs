@@ -27,6 +27,7 @@ const apiProxyOrigin =
 const nextConfig = {
   reactStrictMode: true,
   skipTrailingSlashRedirect: true,
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   output: 'standalone',
   turbopack: {
     root: frontendRoot,
@@ -160,6 +161,7 @@ const nextConfig = {
       { source: '/quan-tri/thong-bao-viec-lam', destination: '/admin/job-notifications' },
       { source: '/quan-tri/xac-thuc-cong-ty', destination: '/admin/company-verifications' },
       { source: '/quan-tri/bao-cao-tin-cay', destination: '/admin/trust-reports' },
+      { source: '/quan-tri/nhat-ky-he-thong', destination: '/admin/audit-logs' },
       { source: '/quan-tri', destination: '/admin/dashboard' },
       { source: '/quan-tri/:path*', destination: '/admin/:path*' },
 

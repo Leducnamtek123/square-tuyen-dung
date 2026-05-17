@@ -144,6 +144,22 @@ export interface TrustReport {
   createAt?: string;
 }
 
+export interface AuditLog {
+  id: number;
+  actor?: number | null;
+  actorEmail?: string;
+  action: 'create' | 'update' | 'delete' | 'approve' | 'reject' | 'status_change' | 'bulk_status' | 'agent_access' | string;
+  resourceType: string;
+  resourceId?: string;
+  resourceRepr?: string;
+  ipAddress?: string | null;
+  userAgent?: string;
+  requestMethod?: string;
+  requestPath?: string;
+  metadata?: Record<string, unknown>;
+  createAt?: string;
+}
+
 /* Job */
 
 export interface JobPost {
@@ -204,9 +220,28 @@ export interface JobPostActivity {
   resume?: Resume;
   createAt?: string;
   aiAnalysisScore?: number | null;
+  aiAnalysisEffectiveScore?: number | null;
   aiAnalysisSummary?: string | null;
   aiAnalysisStatus?: 'pending' | 'processing' | 'completed' | 'failed';
   aiAnalysisProgress?: number;
+  aiAnalysisSkills?: string | string[] | null;
+  aiAnalysisPros?: string | string[] | null;
+  aiAnalysisCons?: string | string[] | null;
+  aiAnalysisMatchingSkills?: string | string[] | null;
+  aiAnalysisMissingSkills?: string | string[] | null;
+  aiAnalysisCriteria?: Array<Record<string, unknown>> | null;
+  aiAnalysisEvidence?: {
+    criteria_results?: Array<Record<string, unknown>>;
+    evidence?: Array<Record<string, unknown>>;
+  } | Array<Record<string, unknown>> | null;
+  aiAnalysisModel?: string;
+  aiAnalysisSource?: string;
+  aiAnalysisPromptVersion?: string;
+  aiAnalysisReviewStatus?: 'ai_only' | 'reviewed' | 'overridden' | string;
+  aiAnalysisHrOverrideScore?: number | null;
+  aiAnalysisHrOverrideNote?: string | null;
+  aiAnalysisReviewedAt?: string | null;
+  aiAnalysisReviewedBy?: UserDict | null;
 }
 
 export interface UserDict {

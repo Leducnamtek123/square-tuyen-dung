@@ -22,6 +22,7 @@
   "reset": "Đặt lại",
   "actionsLabel": "Thao tác",
   "actions": {
+    "title": "Thao tác",
     "start": "Bắt đầu",
     "close": "Đóng",
     "submit": "Gửi",
@@ -625,6 +626,7 @@
   },
   "messages": {
     "loadingPdf": "Đang tải PDF...",
+    "saveSuccess": "Đã lưu thành công.",
     "loadFailed": "Không thể tải dữ liệu. Vui lòng thử lại.",
     "actionFailed": "Không thể thao tác lúc này. Vui lòng thử lại."
   },
@@ -848,7 +850,13 @@
   },
   "notification": {
     "markAllRead": "Đánh dấu tất cả là đã đọc",
-    "empty": "Không có thông báo mới"
+    "empty": "Không có thông báo mới",
+    "loadMore": "Tải thêm",
+    "new": "Mới",
+    "openMenu": "Mở thông báo",
+    "read": "Đã đọc",
+    "unreadCount": "{{count}} chưa đọc",
+    "viewAll": "Xem tất cả"
   },
   "profileUpload": {
     "lastUpdated": "Cập nhật lần cuối: {{date}}",

@@ -30,6 +30,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
         <List component="div" disablePadding>
           <MenuItem text={t('admin:sidebar.usersAndPermissions')} to={`/${ROUTES.ADMIN.USERS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.USERS}` }} />
           <MenuItem text={t('admin:sidebar.systemConfiguration')} to={`/${ROUTES.ADMIN.SETTINGS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.SETTINGS}` }} />
+          <MenuItem text={t('admin:sidebar.auditLogs')} to={`/${ROUTES.ADMIN.AUDIT_LOGS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.AUDIT_LOGS}` }} />
           <MenuItem text={t('admin:sidebar.squareHrmAdmin')} to={LINKS.SQUARE_HRM_ADMIN_LINK} kind="child" external />
         </List>
       </Collapse>
@@ -92,4 +93,3 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
 };
 
 export default AdminMenu;
-

@@ -6,7 +6,7 @@ rtc:
   port_range_start: 50000
   port_range_end: 50010
 keys:
-  devkey: secret
+  CHANGE_ME_LIVEKIT_API_KEY: CHANGE_ME_LIVEKIT_API_SECRET
 logging:
   level: info
 room:
@@ -15,6 +15,6 @@ redis:
   address: redis:6379
 
 webhook:
-  api_key: devkey
+  api_key: CHANGE_ME_LIVEKIT_API_KEY
   urls:
     - http://backend:8000/api/livekit/webhook

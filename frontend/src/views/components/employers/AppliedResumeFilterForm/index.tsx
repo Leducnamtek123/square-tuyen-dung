@@ -1,6 +1,6 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
-import { Box, Stack, Typography } from "@mui/material";
+import { Controller, useForm } from 'react-hook-form';
+import { Box, Stack, TextField, Typography } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
@@ -14,6 +14,8 @@ import ApartmentIcon from '@mui/icons-material/Apartment';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import WcIcon from '@mui/icons-material/Wc';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import FactCheckIcon from '@mui/icons-material/FactCheck';
+import SpeedIcon from '@mui/icons-material/Speed';
 import pc from '@/utils/muiColors';
 import { filterControlSx } from '@/components/Common/FilterBar';
 
@@ -27,6 +29,8 @@ export interface AppliedResumeFilterData {
   jobTypeId?: number | string | null;
   genderId?: number | string | null;
   maritalStatusId?: number | string | null;
+  aiReviewStatus?: number | string | null;
+  aiScoreMax?: number | string | null;
 }
 
 interface AppliedResumeFilterFormProps {
@@ -62,6 +66,11 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
   const { t } = useTranslation('common');
   const { allConfig } = useConfig();
   const { control, handleSubmit, reset } = useForm<AppliedResumeFilterData>();
+  const aiReviewStatusOptions = React.useMemo(() => ([
+    { id: 'ai_only', name: t('ai.reviewStatus.aiOnly', { defaultValue: 'AI only' }) },
+    { id: 'reviewed', name: t('ai.reviewStatus.reviewed', { defaultValue: 'Đã rà soát' }) },
+    { id: 'overridden', name: t('ai.reviewStatus.overridden', { defaultValue: 'Đã override' }) },
+  ]), [t]);
 
   React.useEffect(() => {
     reset((formValues) => ({
@@ -180,6 +189,41 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
                     options={allConfig?.maritalStatusOptions || []}
                     placeholder={t('placeholders.allMaritalStatuses')}
                     sx={inputSx}
+                  />
+                </Box>
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2}>
+              <Grid size={6}>
+                <Box>
+                  <SectionHeader icon={<FactCheckIcon />} title={t('ai.reviewStatus.label', { defaultValue: 'Rà soát AI' })} />
+                  <SingleSelectCustom
+                    name="aiReviewStatus"
+                    control={control}
+                    options={aiReviewStatusOptions}
+                    placeholder={t('ai.reviewStatus.all', { defaultValue: 'Tất cả trạng thái' })}
+                    sx={inputSx}
+                  />
+                </Box>
+              </Grid>
+              <Grid size={6}>
+                <Box>
+                  <SectionHeader icon={<SpeedIcon />} title={t('ai.scoreMax', { defaultValue: 'Điểm AI tối đa' })} />
+                  <Controller
+                    name="aiScoreMax"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        value={field.value ?? ''}
+                        type="number"
+                        size="small"
+                        placeholder="100"
+                        slotProps={{ htmlInput: { min: 0, max: 100 } }}
+                        sx={inputSx}
+                      />
+                    )}
                   />
                 </Box>
               </Grid>

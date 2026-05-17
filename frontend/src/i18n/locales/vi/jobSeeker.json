@@ -404,6 +404,7 @@
   "educationAddedSuccess": "Thêm thông tin học vấn thành công.",
   "educationUpdatedSuccess": "Cập nhật thông tin học vấn thành công.",
   "activityChart": {
+    "loading": "Đang tải biểu đồ hoạt động...",
     "labels": {
       "appliedjobs": "Việc đã ứng tuyển",
       "savedjobs": "Việc đã lưu",

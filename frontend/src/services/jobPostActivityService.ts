@@ -22,6 +22,12 @@ export type JobPostActivityListParams = {
   status?: number | string;
   jobPost?: number | string;
   jobPostId?: number | string;
+  aiAnalysisStatus?: number | string | null;
+  aiReviewStatus?: number | string | null;
+  aiScoreMin?: number | string | null;
+  aiScoreMax?: number | string | null;
+  hasAiAnalysis?: boolean | string;
+  blind?: boolean | string;
 };
 
 interface SendEmailPayload {
@@ -31,6 +37,12 @@ interface SendEmailPayload {
 
 interface ChangeApplicationStatusPayload {
   status: number | string;
+}
+
+interface AIAnalysisReviewPayload {
+  reviewStatus?: 'ai_only' | 'reviewed' | 'overridden' | string;
+  overrideScore?: number | string | null;
+  note?: string;
 }
 
 interface ActionResponse {
@@ -103,9 +115,14 @@ const jobPostActivityService = {
     return withPresign(httpRequest.get(url)) as Promise<JobPostActivity>;
   },
 
-  analyzeResume: (id: IdType, payload?: { onlineProfileUrl?: string }): Promise<ActionResponse> => {
+  analyzeResume: (id: IdType, payload?: { onlineProfileUrl?: string; criteria?: Array<Record<string, unknown>> }): Promise<ActionResponse> => {
     const url = `job/web/employer-job-posts-activity/${id}/analyze-resume/`;
     return httpRequest.post(url, payload || {});
+  },
+
+  reviewAIAnalysis: (id: IdType, payload: AIAnalysisReviewPayload): Promise<JobPostActivity> => {
+    const url = `job/web/employer-job-posts-activity/${id}/ai-analysis-review/`;
+    return httpRequest.post(url, payload) as Promise<JobPostActivity>;
   },
 };
 

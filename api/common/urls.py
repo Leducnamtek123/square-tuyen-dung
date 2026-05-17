@@ -28,6 +28,7 @@ from rest_framework.routers import DefaultRouter
 admin_router = DefaultRouter()
 
 admin_router.register(r'admin/careers', views.AdminCareerViewSet, basename='admin-careers')
+admin_router.register(r'admin/audit-logs', views.AdminAuditLogViewSet, basename='admin-audit-logs')
 
 admin_router.register(r'admin/cities', views.AdminCityViewSet, basename='admin-cities')
 

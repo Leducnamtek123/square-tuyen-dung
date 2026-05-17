@@ -21,6 +21,7 @@ from livekit.agents.llm import ChatMessage
 from livekit.plugins import openai, silero
 import openai as openai_lib
 
+from .backend_auth import auth_event_hook
 from .config import config
 from .interviewer import Interviewer
 from .session_settings import build_session_kwargs
@@ -37,7 +38,7 @@ async def _update_backend_status(room_name: str, status: str) -> None:
     """Update the interview status in the central backend."""
     try:
         url = f"{config.BACKEND_API_URL}/v1/interview/compat/{room_name}/status"
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(event_hooks={"request": [auth_event_hook()]}) as client:
             await client.patch(url, json={"status": status}, timeout=5.0)
     except Exception as e:
         logger.warning(f"Failed to update backend status for {room_name}: {e}")
@@ -124,7 +125,7 @@ async def entrypoint(ctx: JobContext) -> None:
     # Fetch pre-loaded questions from context endpoint
     try:
         url = f"{config.BACKEND_API_URL}/v1/interview/compat/{ctx.room.name}/context"
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(event_hooks={"request": [auth_event_hook()]}) as client:
             resp = await client.get(url, timeout=5.0)
         if resp.status_code == 200:
             data = resp.json()

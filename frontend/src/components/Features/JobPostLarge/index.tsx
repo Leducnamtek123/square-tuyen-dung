@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import { alpha, useTheme } from '@mui/material/styles';
-import { useRouter } from 'next/navigation';
+import { useTheme } from '@mui/material/styles';
+import Link from 'next/link';
 import { Box, Card, Skeleton, Stack, Typography } from '@mui/material';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import { formatRoute } from '@/utils/funcUtils';
@@ -29,22 +29,10 @@ const JobPostLarge = ({
   salaryMax,
 }: JobPostLargeProps) => {
   const theme = useTheme();
-  const { push } = useRouter();
   const { allConfig } = useConfig();
   const { i18n } = useTranslation('public');
 
-  const goToDetail = () => {
-    push(
-      localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language),
-    );
-  };
-
-  const handleCardKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      goToDetail();
-    }
-  };
+  const detailHref = localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language);
 
   const cityLabel =
     tConfig(allConfig?.cityDict?.[String(cityId)]) || (
@@ -53,10 +41,17 @@ const JobPostLarge = ({
 
   return (
     <Card
+      component={Link}
+      href={detailHref}
+      prefetch
       variant="outlined"
       sx={{
+        display: 'block',
+        width: '100%',
         boxShadow: 0,
         cursor: 'pointer',
+        color: 'inherit',
+        textDecoration: 'none',
         px: 2,
         pt: 2,
         pb: 1,
@@ -92,10 +87,6 @@ const JobPostLarge = ({
               : theme.palette.grey[800],
         },
       }}
-      onClick={goToDetail}
-      role="link"
-      tabIndex={0}
-      onKeyDown={handleCardKeyDown}
       aria-label={jobName || 'Job detail'}
     >
       <Stack spacing={1.5}>

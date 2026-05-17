@@ -2,7 +2,7 @@
 import { useAppSelector } from '@/redux/hooks';
 import React from "react";
 import { useDispatch } from "react-redux";
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { Pagination, Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -67,7 +67,6 @@ const Loading = (
 const CareerCarousel = () => {
   const { t } = useTranslation('public');
   const dispatch = useDispatch();
-  const { push } = useRouter();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [parentWidth, setParentWidth] = React.useState(0);
   const col = parentWidth < 600 ? 2 : parentWidth < 900 ? 3 : parentWidth < 1200 ? 4 : 5;
@@ -95,7 +94,6 @@ const CareerCarousel = () => {
 
   const handleFilter = (id: string | number) => {
     dispatch(searchJobPost({ ...jobPostFilter, careerId: String(id) }));
-    push(`/${ROUTES.JOB_SEEKER.JOBS}`);
   };
 
   return (
@@ -120,11 +118,16 @@ const CareerCarousel = () => {
             : topCareers.map((value: Career & { jobPostTotal?: number }) => (
               <SwiperSlide key={value.id}>
                 <Card
+                  component={Link}
+                  href={`/${ROUTES.JOB_SEEKER.JOBS}`}
+                  prefetch
                   sx={{
                     alignItems: "center",
                     p: 2,
                     mb: 0.5,
                     cursor: "pointer",
+                    color: 'inherit',
+                    textDecoration: 'none',
                     boxShadow: 0,
                     backgroundColor: (theme) => theme.palette.background.paper,
                     borderRadius: "16px",

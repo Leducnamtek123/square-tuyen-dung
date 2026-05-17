@@ -496,12 +496,49 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
 
     aiAnalysisMissingSkills = serializers.JSONField(source='ai_analysis_missing_skills', read_only=True)
 
+    aiAnalysisCriteria = serializers.JSONField(source='ai_analysis_criteria', read_only=True)
+
+    aiAnalysisEvidence = serializers.JSONField(source='ai_analysis_evidence', read_only=True)
+
+    aiAnalysisModel = serializers.CharField(source='ai_analysis_model', read_only=True)
+
+    aiAnalysisSource = serializers.CharField(source='ai_analysis_source', read_only=True)
+
+    aiAnalysisPromptVersion = serializers.CharField(source='ai_analysis_prompt_version', read_only=True)
+
+    aiAnalysisReviewStatus = serializers.CharField(source='ai_analysis_review_status', read_only=True)
+
+    aiAnalysisHrOverrideScore = serializers.IntegerField(source='ai_analysis_hr_override_score', read_only=True)
+
+    aiAnalysisHrOverrideNote = serializers.CharField(source='ai_analysis_hr_override_note', read_only=True)
+
+    aiAnalysisReviewedAt = serializers.DateTimeField(source='ai_analysis_reviewed_at', read_only=True)
+
+    aiAnalysisReviewedBy = serializers.SerializerMethodField(method_name='get_ai_analysis_reviewed_by', read_only=True)
+
+    aiAnalysisEffectiveScore = serializers.SerializerMethodField(method_name='get_ai_analysis_effective_score', read_only=True)
+
     resumeFileUrl = serializers.SerializerMethodField(method_name='get_resume_file_url', read_only=True)
 
     def get_resume_file_url(self, activity):
         if activity.resume and activity.resume.file:
             return activity.resume.file.get_full_url()
         return None
+
+    def get_ai_analysis_reviewed_by(self, activity):
+        user = getattr(activity, 'ai_analysis_reviewed_by', None)
+        if not user:
+            return None
+        return {
+            "id": user.id,
+            "fullName": user.full_name,
+            "email": user.email,
+        }
+
+    def get_ai_analysis_effective_score(self, activity):
+        if activity.ai_analysis_hr_override_score is not None:
+            return activity.ai_analysis_hr_override_score
+        return activity.ai_analysis_score
 
     def get_statusName(self, activity):
         try:
@@ -547,6 +584,23 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
             "slug": company.slug,
         }
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if self.context.get("blind_screening"):
+            representation["fullName"] = f"Candidate #{instance.id}"
+            representation["email"] = None
+            representation["phone"] = None
+            representation["resumeFileUrl"] = None
+            representation["resumeSlug"] = None
+            representation["userDict"] = {
+                "id": instance.user_id,
+                "fullName": f"Candidate #{instance.id}",
+                "email": None,
+                "avatar": var_sys.AVATAR_DEFAULT["AVATAR"],
+                "phone": None,
+            }
+        return representation
+
 
 
 
@@ -559,6 +613,9 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
                   "hrmSyncStatus", "hrmSyncError", "hrmSyncedAt", "hrmEmployeeUrl", "createAt", "isSentEmail",
 
                   "aiAnalysisScore", "aiAnalysisSummary", "aiAnalysisSkills", "aiAnalysisStatus", "aiAnalysisProgress", "aiAnalysisPros", "aiAnalysisCons", "aiAnalysisMatchingSkills", "aiAnalysisMissingSkills",
+                  "aiAnalysisCriteria", "aiAnalysisEvidence", "aiAnalysisModel", "aiAnalysisSource", "aiAnalysisPromptVersion",
+                  "aiAnalysisReviewStatus", "aiAnalysisHrOverrideScore", "aiAnalysisHrOverrideNote",
+                  "aiAnalysisReviewedAt", "aiAnalysisReviewedBy", "aiAnalysisEffectiveScore",
                   "resumeFileUrl", "userDict", "jobPostDict", "companyDict")
 
 class EmployerJobPostActivityExportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):

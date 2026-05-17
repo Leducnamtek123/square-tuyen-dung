@@ -113,8 +113,17 @@ API_VERSION = config("API_VERSION", default="v1")
 SUPPORT_CONTACT_EMAIL = config("SUPPORT_CONTACT_EMAIL", default="support@squaregroup.vn")
 LIVEKIT_WEBHOOK_TOKEN = config("LIVEKIT_WEBHOOK_TOKEN", default="")
 LIVEKIT_WEBHOOK_STRICT = config("LIVEKIT_WEBHOOK_STRICT", default=True, cast=_to_bool)
+INTERVIEW_AGENT_SHARED_SECRET = config("INTERVIEW_AGENT_SHARED_SECRET", default="")
+INTERVIEW_AGENT_AUTH_REQUIRED = config(
+    "INTERVIEW_AGENT_AUTH_REQUIRED",
+    default=bool(INTERVIEW_AGENT_SHARED_SECRET),
+    cast=_to_bool,
+)
+INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS = config("INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS", default=300, cast=int)
 INTERVIEW_DISCONNECT_GRACE_SECONDS = config("INTERVIEW_DISCONNECT_GRACE_SECONDS", default=300, cast=int)
-APP_ENVIRONMENT = config("APP_ENVIRONMENT", default="development")
+APP_ENV = config("APP_ENV", default=config("APP_ENVIRONMENT", default="development"))
+APP_ENVIRONMENT = config("APP_ENVIRONMENT", default=APP_ENV)
+IS_PRODUCTION = str(APP_ENVIRONMENT).strip().lower() == "production"
 STRICT_ENV_VALIDATION = config("STRICT_ENV_VALIDATION", default=False, cast=_to_bool)
 API_RESPONSE_ENVELOPE_V2 = config("API_RESPONSE_ENVELOPE_V2", default=True, cast=_to_bool)
 FRAPPE_HR_BASE_URL = config("FRAPPE_HR_BASE_URL", default="")
@@ -629,13 +638,18 @@ if SENTRY_DSN:
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
-if APP_ENVIRONMENT == 'production':
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = config("USE_X_FORWARDED_HOST", default=IS_PRODUCTION, cast=_to_bool)
+SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=IS_PRODUCTION, cast=_to_bool)
+SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", default=IS_PRODUCTION, cast=_to_bool)
+CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", default=IS_PRODUCTION, cast=_to_bool)
+SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=31536000 if IS_PRODUCTION else 0, cast=int)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = config(
+    "SECURE_HSTS_INCLUDE_SUBDOMAINS",
+    default=IS_PRODUCTION,
+    cast=_to_bool,
+)
+SECURE_HSTS_PRELOAD = config("SECURE_HSTS_PRELOAD", default=IS_PRODUCTION, cast=_to_bool)
 
 # === Database Connection Persistence ===
 CONN_MAX_AGE = 600  # Keep DB connections alive for 10 minutes

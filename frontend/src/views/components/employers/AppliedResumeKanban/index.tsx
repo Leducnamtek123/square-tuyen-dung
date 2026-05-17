@@ -50,9 +50,10 @@ interface AppliedResumeKanbanProps {
     handleDelete: (id: string | number) => void;
     onCreateEmployee?: (activity: JobPostActivity) => void;
     onAnalysisStateChange?: (id: string | number, nextState: Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>) => void;
+    blindMode?: boolean;
 }
 
-const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoading, handleChangeApplicationStatus, handleDelete, onCreateEmployee, onAnalysisStateChange }) => {
+const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoading, handleChangeApplicationStatus, handleDelete, onCreateEmployee, onAnalysisStateChange, blindMode = false }) => {
     const { t } = useTranslation(['employer', 'common']);
     const { allConfig } = useConfig();
     const { push } = useRouter();
@@ -219,17 +220,25 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                          </Box>
                                                                          <Stack direction="row" spacing={0.5}>
                                                                              <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
-                                                                                <IconButton size="small" onClick={() => push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, item.resumeSlug || item.resume?.slug || '')}`)}>
+                                                                                <IconButton size="small" disabled={blindMode} onClick={() => {
+                                                                                    if (blindMode) return;
+                                                                                    push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, item.resumeSlug || item.resume?.slug || '')}`);
+                                                                                }}>
                                                                                     <RemoveRedEyeIcon fontSize="small" />
                                                                                 </IconButton>
                                                                              </Tooltip>
                                                                              <Tooltip title={t('appliedResume.table.tooltips.scheduleInterview', 'Schedule Interview')} arrow>
-                                                                                 <IconButton size="small" onClick={() => push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}/create?candidate=${item.userId ?? ''}&jobPost=${item.jobPost?.id ?? ''}`)}>
+                                                                                 <IconButton size="small" disabled={blindMode} onClick={() => {
+                                                                                     if (blindMode) return;
+                                                                                     push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}/create?candidate=${item.userId ?? ''}&jobPost=${item.jobPost?.id ?? ''}`);
+                                                                                 }}>
                                                                                      <EventIcon fontSize="small" sx={{ color: 'info.main' }} />
                                                                                  </IconButton>
                                                                              </Tooltip>
-                                                                             <SendEmailComponent jobPostActivityId={String(item.id)} isSentEmail={item.isSentEmail || false} email={item.email || ''} fullName={item.fullName || ''} />
-                                                                             {item.hrmEmployeeId ? (
+                                                                             {!blindMode && (
+                                                                                <SendEmailComponent jobPostActivityId={String(item.id)} isSentEmail={item.isSentEmail || false} email={item.email || ''} fullName={item.fullName || ''} />
+                                                                             )}
+                                                                             {!blindMode && item.hrmEmployeeId ? (
                                                                                 <Tooltip title={t('employees.hrm.convert.openEmployee', { defaultValue: 'Open Frappe HR employee profile' })} arrow>
                                                                                    <IconButton size="small" color="primary" onClick={() => {
                                                                                        if (item.hrmEmployeeUrl) {
@@ -239,7 +248,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                                        <PersonAddAltIcon fontSize="small" />
                                                                                    </IconButton>
                                                                                 </Tooltip>
-                                                                             ) : ([4, 5].includes(Number(item.status)) && onCreateEmployee && (
+                                                                             ) : (!blindMode && [4, 5].includes(Number(item.status)) && onCreateEmployee && (
                                                                                 <Tooltip title={t('employees.hrm.convert.action')} arrow>
                                                                                    <IconButton size="small" color="success" onClick={() => onCreateEmployee(item)}>
                                                                                        <PersonAddAltIcon fontSize="small" />

@@ -196,6 +196,7 @@
   },
   "applicationChart": {
     "title": "Statistics of recruitment index within the last 1 month",
+    "loading": "Loading application chart...",
     "noData": "No data available for statistics",
     "labels": {
       "totalapplications": "Total Applications",
@@ -206,6 +207,7 @@
   },
   "candidateChart": {
     "title": "Statistics of total applications received by day",
+    "loading": "Loading candidate chart...",
     "noData": "No data available for statistics",
     "labels": {
       "newcandidates": "New Candidates",
@@ -216,6 +218,7 @@
   "hiringAcademicChart": {
     "title": "Recruitment statistics by academic level",
     "applicationCount": "Application count",
+    "loading": "Loading academic chart...",
     "noData": "No data available for statistics",
     "labels": {
       "postgraduate": "Postgraduate",
@@ -228,6 +231,7 @@
   },
   "recruitmentChart": {
     "title": "Recruitment process statistics over time",
+    "loading": "Loading recruitment chart...",
     "noData": "No recruitment data for this period",
     "labels": {
       "applied": "Applied",
@@ -890,7 +894,37 @@
   "company": {
     "tabs": {
       "info": "Company Information",
-      "multimedia": "Multimedia"
+      "multimedia": "Multimedia",
+      "team": "Team"
+    },
+    "team": {
+      "description": "Manage company members, roles, and workspace permissions.",
+      "addMember": "Add member",
+      "addRole": "Add role",
+      "createMember": "Create member",
+      "createRole": "Create role",
+      "editMember": "Edit member",
+      "editRole": "Edit role",
+      "deleteMemberTitle": "Delete member",
+      "deleteMemberConfirm": "Remove this member from the company workspace?",
+      "deleteRoleTitle": "Delete role",
+      "deleteRoleConfirm": "Delete this company role?",
+      "member": "Member",
+      "membersTitle": "Members",
+      "membersSubtitle": "People who can access this company workspace",
+      "noMembers": "No members yet",
+      "rolesTitle": "Roles",
+      "rolesSubtitle": "Permission groups for company members",
+      "noRoles": "No roles yet",
+      "permissions": "Permissions",
+      "permissionsHint": "Choose the permissions this role can use.",
+      "roleCode": "Role code",
+      "roleName": "Role name",
+      "status": "Status",
+      "statusActive": "Active",
+      "statusDisabled": "Disabled",
+      "statusInvited": "Invited",
+      "userId": "User ID"
     },
     "title": "Company Information",
     "following": "Following",
@@ -915,6 +949,7 @@
     "title": "Company Profile"
   },
   "interviewChart": {
+    "loading": "Loading interview chart...",
     "labels": {
       "completed": "Completed",
       "scheduled": "Scheduled",

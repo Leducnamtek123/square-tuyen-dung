@@ -17,6 +17,7 @@ from apps.profiles.serializers import SendMailToJobSeekerSerializer
 from console.jobs import queue_mail
 from shared import pagination as paginations
 from shared import renderers
+from shared.audit import AuditLogViewSetMixin, record_audit_log
 from shared.configs import table_export
 from shared.configs import variable_response as var_res
 from shared.configs import variable_system as var_sys
@@ -39,6 +40,10 @@ logger = logging.getLogger(__name__)
 AI_PROCESSING_TIMEOUT_MINUTES = 20
 
 
+def _is_truthy(value) -> bool:
+    return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 @lru_cache(maxsize=1)
 def has_ai_analysis_progress_column() -> bool:
     try:
@@ -54,6 +59,7 @@ def has_ai_analysis_progress_column() -> bool:
 
 
 class JobSeekerJobPostActivityViewSet(
+    AuditLogViewSetMixin,
     viewsets.ViewSet,
     generics.ListAPIView,
     generics.CreateAPIView,
@@ -153,18 +159,20 @@ class JobSeekerJobPostActivityViewSet(
 
         response_serializer = self.get_serializer(job_post_activity)
         headers = self.get_success_headers(response_serializer.data)
+        record_audit_log(request=request, action="create", instance=job_post_activity)
 
         return var_res.response_data(status=status.HTTP_201_CREATED, data=response_serializer.data, headers=headers)
 
 
 class EmployerJobPostActivityViewSet(
+    AuditLogViewSetMixin,
     viewsets.ViewSet,
     generics.ListAPIView,
     generics.RetrieveAPIView,
     generics.UpdateAPIView,
     generics.DestroyAPIView,
 ):
-    queryset = JobPostActivity.objects.select_related('user', 'resume', 'job_post', 'job_post__company')
+    queryset = JobPostActivity.objects.select_related('user', 'resume', 'resume__file', 'job_post', 'job_post__company')
     serializer_class = EmployerJobPostActivitySerializer
     permission_classes = [perms_custom.IsEmployerUser]
     renderer_classes = [renderers.MyJSONRenderer]
@@ -175,7 +183,15 @@ class EmployerJobPostActivityViewSet(
         ('createAt', 'create_at'),
         ('status', 'status'),
         ('fullName', 'full_name'),
+        ('aiAnalysisScore', 'ai_analysis_score'),
+        ('aiAnalysisStatus', 'ai_analysis_status'),
+        ('aiReviewStatus', 'ai_analysis_review_status'),
     )
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["blind_screening"] = _is_truthy(self.request.query_params.get("blind"))
+        return context
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -210,6 +226,8 @@ class EmployerJobPostActivityViewSet(
             "fullName",
             "email",
             "title",
+            "type",
+            "resumeSlug",
             "jobName",
             "resumeFileUrl",
             "aiAnalysisScore",
@@ -220,6 +238,17 @@ class EmployerJobPostActivityViewSet(
             "aiAnalysisCons",
             "aiAnalysisMatchingSkills",
             "aiAnalysisMissingSkills",
+            "aiAnalysisCriteria",
+            "aiAnalysisEvidence",
+            "aiAnalysisModel",
+            "aiAnalysisSource",
+            "aiAnalysisPromptVersion",
+            "aiAnalysisReviewStatus",
+            "aiAnalysisHrOverrideScore",
+            "aiAnalysisHrOverrideNote",
+            "aiAnalysisReviewedAt",
+            "aiAnalysisReviewedBy",
+            "aiAnalysisEffectiveScore",
         ]
         if has_ai_analysis_progress_column():
             fields.append("aiAnalysisProgress")
@@ -265,6 +294,8 @@ class EmployerJobPostActivityViewSet(
                 "aiAnalysisSummary",
                 "aiAnalysisSkills",
                 "aiAnalysisStatus",
+                "aiAnalysisReviewStatus",
+                "aiAnalysisEffectiveScore",
             ]
             if has_ai_analysis_progress_column():
                 fields.append("aiAnalysisProgress")
@@ -282,6 +313,7 @@ class EmployerJobPostActivityViewSet(
         instance = self.get_object()
         instance.is_deleted = True
         instance.save(update_fields=["is_deleted", "update_at"])
+        record_audit_log(request=request, action="delete", instance=instance, metadata={"softDelete": True})
         return var_res.response_data(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=["get"], detail=False, url_path="chat", url_name="employer-job-posts-activity-chat")
@@ -348,8 +380,18 @@ class EmployerJobPostActivityViewSet(
             ],
         )
 
+        export_data = list(serializer.data)
+        if _is_truthy(request.query_params.get("blind")):
+            for item, activity in zip(export_data, queryset):
+                item["fullName"] = f"Candidate #{activity.id}"
+                item["email"] = ""
+                item["phone"] = ""
+                item["gender"] = ""
+                item["birthday"] = ""
+                item["address"] = ""
+
         result_data = utils.convert_data_with_en_key_to_vn_kew(
-            serializer.data,
+            export_data,
             table_export.JOB_POST_ACTIVITY_FIELD,
         )
 
@@ -382,6 +424,12 @@ class EmployerJobPostActivityViewSet(
                         "hrmSyncStatus",
                         "hrmEmployeeUrl",
                     ],
+                )
+                record_audit_log(
+                    request=request,
+                    action="status_change",
+                    instance=job_post_activity,
+                    metadata={"status": stt},
                 )
                 return var_res.response_data(status=status.HTTP_200_OK, data=serializer.data)
             except InvalidApplicationStatusTransitionError as exc:
@@ -427,7 +475,8 @@ class EmployerJobPostActivityViewSet(
 
         from ..services import JobActivityService
         try:
-            JobActivityService.trigger_ai_analysis(job_post_activity)
+            criteria = request.data.get("criteria") if isinstance(request.data, dict) else None
+            JobActivityService.trigger_ai_analysis(job_post_activity, criteria=criteria)
         except Exception:
             logger.exception("Failed to queue AI analysis for activity id=%s", job_post_activity.id)
             return var_res.response_data(
@@ -437,9 +486,77 @@ class EmployerJobPostActivityViewSet(
 
         return var_res.response_data(data={"detail": "AI analysis task has been queued."}, status=status.HTTP_202_ACCEPTED)
 
+    @action(methods=["post"], detail=True, url_path="ai-analysis-review", url_name="ai-analysis-review")
+    def ai_analysis_review(self, request, pk):
+        activity = self.get_object()
+        if activity.job_post.company != request.user.active_company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        payload = request.data if isinstance(request.data, dict) else {}
+        review_status = payload.get("reviewStatus") or payload.get("review_status") or "reviewed"
+        override_score = payload.get("overrideScore", payload.get("override_score"))
+        note = str(payload.get("note") or payload.get("overrideNote") or "").strip()
+
+        if override_score in ("", None):
+            activity.ai_analysis_hr_override_score = None
+            review_status = "reviewed" if review_status != "ai_only" else "ai_only"
+        else:
+            try:
+                override_score = int(float(override_score))
+            except (TypeError, ValueError):
+                return var_res.response_data(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    errors={"errorMessage": ["Override score must be a number from 0 to 100."]},
+                )
+            if override_score < 0 or override_score > 100:
+                return var_res.response_data(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    errors={"errorMessage": ["Override score must be between 0 and 100."]},
+                )
+            activity.ai_analysis_hr_override_score = override_score
+            review_status = "overridden"
+
+        if review_status not in {"ai_only", "reviewed", "overridden"}:
+            review_status = "reviewed"
+
+        activity.ai_analysis_review_status = review_status
+        activity.ai_analysis_hr_override_note = note[:2000]
+        activity.ai_analysis_reviewed_by = request.user if review_status != "ai_only" else None
+        activity.ai_analysis_reviewed_at = timezone.now() if review_status != "ai_only" else None
+        activity.save(update_fields=[
+            "ai_analysis_review_status",
+            "ai_analysis_hr_override_score",
+            "ai_analysis_hr_override_note",
+            "ai_analysis_reviewed_by",
+            "ai_analysis_reviewed_at",
+            "update_at",
+        ])
+
+        record_audit_log(
+            request=request,
+            action="ai_analysis_review",
+            instance=activity,
+            metadata={
+                "reviewStatus": activity.ai_analysis_review_status,
+                "overrideScore": activity.ai_analysis_hr_override_score,
+            },
+        )
+
+        serializer = self.get_serializer(activity, fields=[
+            "id",
+            "aiAnalysisScore",
+            "aiAnalysisEffectiveScore",
+            "aiAnalysisReviewStatus",
+            "aiAnalysisHrOverrideScore",
+            "aiAnalysisHrOverrideNote",
+            "aiAnalysisReviewedAt",
+            "aiAnalysisReviewedBy",
+        ])
+        return var_res.response_data(status=status.HTTP_200_OK, data=serializer.data)
 
 
-class AdminJobPostActivityViewSet(viewsets.ModelViewSet):
+
+class AdminJobPostActivityViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = JobPostActivity.objects.select_related('user', 'job_post', 'job_post__company', 'resume').all().order_by('id')
     serializer_class = EmployerJobPostActivitySerializer
     permission_classes = [perms_custom.IsAdminUser]
@@ -468,6 +585,9 @@ class AdminJobPostActivityViewSet(viewsets.ModelViewSet):
             "status": "status",
             "createAt": "create_at",
             "updateAt": "update_at",
+            "aiAnalysisScore": "ai_analysis_score",
+            "aiAnalysisStatus": "ai_analysis_status",
+            "aiReviewStatus": "ai_analysis_review_status",
         }
         if ordering:
             is_desc = ordering.startswith("-")

@@ -2,7 +2,15 @@ import os
 
 # Provide safe defaults so pytest can boot without production secrets.
 os.environ["DEBUG"] = "False"
+os.environ["APP_ENV"] = "test"
+os.environ["APP_ENVIRONMENT"] = "test"
 os.environ["APPEND_SLASH"] = "True"
+os.environ["SECURE_SSL_REDIRECT"] = "False"
+os.environ["SESSION_COOKIE_SECURE"] = "False"
+os.environ["CSRF_COOKIE_SECURE"] = "False"
+os.environ["SECURE_HSTS_SECONDS"] = "0"
+os.environ["SECURE_HSTS_INCLUDE_SUBDOMAINS"] = "False"
+os.environ["SECURE_HSTS_PRELOAD"] = "False"
 os.environ.setdefault("SECRET_KEY", "test-secret-key")
 os.environ.setdefault("DB_ENGINE", "django.db.backends.sqlite3")
 os.environ.setdefault("DB_NAME", ":memory:")
@@ -33,6 +41,9 @@ CELERY_TASK_EAGER_PROPAGATES = True
 
 # Keep envelope v2 enabled in tests.
 API_RESPONSE_ENVELOPE_V2 = True
+INTERVIEW_AGENT_SHARED_SECRET = "test-agent-secret"
+INTERVIEW_AGENT_AUTH_REQUIRED = False
+INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS = 300
 
 # Do not depend on external Redis in tests.
 CACHES = {

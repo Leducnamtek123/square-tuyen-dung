@@ -20,6 +20,8 @@
     "jobSeekers": "Job Seekers:",
     "status": "Status:",
     "statusActive": "Active",
+    "loadingChart": "Loading chart...",
+    "noUserData": "No user data yet",
     "pendingPosts": "Pending Posts:",
     "users": "users",
     "roles": {
@@ -93,6 +95,7 @@
     "systemAndUsers": "System & Users",
     "usersAndPermissions": "Users & Permissions",
     "systemConfiguration": "System Configuration",
+    "auditLogs": "Audit Logs",
     "generalCategories": "General Categories",
     "careersManagement": "Careers Management",
     "citiesManagement": "Cities Management",
@@ -740,6 +743,42 @@
       "toast": {
         "updateSuccess": "Report status updated.",
         "updateError": "Could not update report status."
+      }
+    },
+    "auditLogs": {
+      "title": "Audit Logs",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Audit Logs",
+      "searchPlaceholder": "Search email, action, resource, request...",
+      "exportCsv": "Export CSV",
+      "exportingCsv": "Exporting...",
+      "filter": {
+        "title": "Audit log filters",
+        "action": "Action",
+        "allActions": "All",
+        "actorEmail": "Actor email",
+        "resourceType": "Resource type",
+        "resourceId": "Resource ID",
+        "dateFrom": "From date",
+        "dateTo": "To date"
+      },
+      "actions": {
+        "create": "Create",
+        "update": "Update",
+        "delete": "Delete",
+        "approve": "Approve",
+        "reject": "Reject",
+        "status_change": "Status change",
+        "bulk_status": "Bulk status",
+        "agent_access": "Agent access",
+        "export": "Export"
+      },
+      "table": {
+        "time": "Time",
+        "action": "Action",
+        "actor": "Actor",
+        "resource": "Resource",
+        "request": "Request"
       }
     },
     "questions": {

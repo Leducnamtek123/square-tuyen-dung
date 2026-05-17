@@ -40,6 +40,7 @@ interface AppliedResumeTableProps {
   handleDelete: (id: string | number) => void;
   onCreateEmployee?: (activity: JobPostActivity) => void;
   onAnalysisStateChange?: (id: string | number, nextState: Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>) => void;
+  blindMode?: boolean;
   rowCount: number;
   pagination: PaginationState;
   onPaginationChange: OnChangeFn<PaginationState>;
@@ -57,6 +58,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     handleDelete,
     onCreateEmployee,
     onAnalysisStateChange,
+    blindMode = false,
     rowCount,
     pagination,
     onPaginationChange,
@@ -212,9 +214,11 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       },
     },
     {
-      id: 'aiAnalysis',
+      accessorKey: 'aiAnalysisScore',
+      id: 'aiAnalysisScore',
       header: t('appliedResume.table.aiAnalysis'),
       meta: { align: 'center' },
+      enableSorting: true,
       cell: (info) => <AIAnalysisComponent row={info.row.original} onOpenDrawer={() => setOpenDrawerId(info.row.original.id)} />,
     },
     {
@@ -240,7 +244,11 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             <IconButton
               color="primary"
               size="small"
-              onClick={() => push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || info.row.original.resume?.slug || '')}`)}
+              disabled={blindMode}
+              onClick={() => {
+                if (blindMode) return;
+                push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || info.row.original.resume?.slug || '')}`);
+              }}
               sx={{ 
                 bgcolor: pc.primary( 0.06),
                 
@@ -251,14 +259,16 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             </IconButton>
           </Tooltip>
           
-          <SendEmailComponent
-            jobPostActivityId={String(info.row.original.id)}
-            isSentEmail={info.row.original.isSentEmail || false}
-            email={info.row.original.email || ''}
-            fullName={info.row.original.fullName || ''}
-          />
+          {!blindMode && (
+            <SendEmailComponent
+              jobPostActivityId={String(info.row.original.id)}
+              isSentEmail={info.row.original.isSentEmail || false}
+              email={info.row.original.email || ''}
+              fullName={info.row.original.fullName || ''}
+            />
+          )}
 
-          {info.row.original.hrmEmployeeId ? (
+          {!blindMode && info.row.original.hrmEmployeeId ? (
             <Tooltip title={t('employees.hrm.convert.openEmployee', { defaultValue: 'Open Frappe HR employee profile' })} arrow>
               <IconButton
                 size="small"
@@ -277,7 +287,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                 <PersonAddAltIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-          ) : ([4, 5].includes(Number(info.row.original.status)) && onCreateEmployee && (
+          ) : (!blindMode && [4, 5].includes(Number(info.row.original.status)) && onCreateEmployee && (
             <Tooltip title={t('employees.hrm.convert.action')} arrow>
               <IconButton
                 size="small"
@@ -311,7 +321,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
         </Stack>
       ),
     },
-  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, onCreateEmployee, push]);
+  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, onCreateEmployee, push, blindMode]);
 
   return (
     <>

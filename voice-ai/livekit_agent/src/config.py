@@ -26,8 +26,8 @@ def _get_int(name: str, default: int) -> int:
 @dataclass
 class Config:
     LIVEKIT_URL: str = os.getenv("LIVEKIT_URL", "http://livekit:7880")
-    LIVEKIT_API_KEY: str = os.getenv("LIVEKIT_API_KEY", "devkey")
-    LIVEKIT_API_SECRET: str = os.getenv("LIVEKIT_API_SECRET", "secret")
+    LIVEKIT_API_KEY: str = os.getenv("LIVEKIT_API_KEY", "")
+    LIVEKIT_API_SECRET: str = os.getenv("LIVEKIT_API_SECRET", "")
 
     # LLM
     LLM_MODEL: str = os.getenv("LLM_MODEL") or os.getenv("AI_LLM_MODEL", "gemma4:e4b")
@@ -83,5 +83,6 @@ class Config:
     )
 
     BACKEND_API_URL: str = os.getenv("BACKEND_API_URL", "http://backend:8000/api")
+    INTERVIEW_AGENT_SHARED_SECRET: str = os.getenv("INTERVIEW_AGENT_SHARED_SECRET", "")
 
 config = Config()

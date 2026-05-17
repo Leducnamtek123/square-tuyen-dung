@@ -12,6 +12,7 @@ from apps.accounts import permissions as perms_custom
 from apps.profiles.models import Resume
 from shared import pagination as paginations
 from shared import renderers
+from shared.audit import AuditLogViewSetMixin, record_audit_log
 from shared.permissions import PermissionActionMapMixin
 from shared.configs import table_export
 from shared.configs import variable_response as var_res
@@ -25,6 +26,7 @@ from ..serializers import JobPostSerializer
 
 
 class PrivateJobPostViewSet(
+    AuditLogViewSetMixin,
     PermissionActionMapMixin,
     viewsets.ViewSet,
     generics.ListAPIView,
@@ -155,6 +157,7 @@ class PrivateJobPostViewSet(
             raise ValidationError({"errorMessage": [str(exc)]})
 
         response_serializer = self.get_serializer(job_post)
+        record_audit_log(request=request, action="create", instance=job_post)
         return var_res.response_data(status=status.HTTP_201_CREATED, data=response_serializer.data)
 
     def update(self, request, *args, **kwargs):
@@ -175,6 +178,7 @@ class PrivateJobPostViewSet(
             updated_instance._prefetched_objects_cache = {}
 
         response_serializer = self.get_serializer(updated_instance)
+        record_audit_log(request=request, action="update", instance=updated_instance)
         return var_res.response_data(data=response_serializer.data)
 
     def list(self, request, *args, **kwargs):
@@ -517,7 +521,7 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
         })
 
 
-class AdminJobPostViewSet(viewsets.ModelViewSet):
+class AdminJobPostViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = JobPost.objects.select_related('user', 'company', 'career', 'location').all().order_by(
         "-create_at", "-update_at", "-id"
     )
@@ -538,6 +542,14 @@ class AdminJobPostViewSet(viewsets.ModelViewSet):
                 | Q(company__company_name__icontains=kw)
                 | Q(contact_person_email__icontains=kw)
             )
+        is_expired = self.request.query_params.get("isExpired") or self.request.query_params.get("is_expired")
+        if is_expired is not None:
+            normalized = str(is_expired).strip().lower()
+            if normalized in {"1", "true", "yes", "on"}:
+                queryset = queryset.filter(
+                    status=var_sys.JobPostStatus.APPROVED,
+                    deadline__lt=datetime.datetime.now().date(),
+                )
         return queryset
 
     def list(self, request, *args, **kwargs):
@@ -572,6 +584,7 @@ class AdminJobPostViewSet(viewsets.ModelViewSet):
         job_post = self.get_object()
         job_post.status = var_sys.JobPostStatus.APPROVED
         job_post.save()
+        record_audit_log(request=request, action="approve", instance=job_post)
         return var_res.response_data(data=JobPostSerializer(job_post).data)
 
     @action(detail=True, methods=['patch'], url_path='reject')
@@ -579,4 +592,5 @@ class AdminJobPostViewSet(viewsets.ModelViewSet):
         job_post = self.get_object()
         job_post.status = var_sys.JobPostStatus.REJECTED
         job_post.save()
+        record_audit_log(request=request, action="reject", instance=job_post)
         return var_res.response_data(data=JobPostSerializer(job_post).data)

@@ -19,6 +19,7 @@ import {
   JobPostNotification,
   TrustReport,
   CompanyVerification,
+  AuditLog,
 } from '../types/models';
 
 type IdType = string | number;
@@ -31,7 +32,15 @@ export type AdminListParams = {
   search?: string;
   roleName?: string;
   status?: string;
+  action?: string;
+  actorEmail?: string;
   targetType?: string;
+  resourceType?: string;
+  resourceId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  statusId?: string | number;
+  isExpired?: boolean | string;
 };
 
 export interface CareerPayload {
@@ -250,6 +259,19 @@ const adminManagementService = {
   getTrustReports: (params: AdminListParams = {}): Promise<PaginatedResponse<TrustReport>> => {
     const url = 'info/web/admin/trust-reports/';
     return httpRequest.get<PaginatedResponse<TrustReport>>(url, { params: cleanParams(params) });
+  },
+
+  getAuditLogs: (params: AdminListParams = {}): Promise<PaginatedResponse<AuditLog>> => {
+    const url = 'common/admin/audit-logs/';
+    return httpRequest.get<PaginatedResponse<AuditLog>>(url, { params: cleanParams(params) });
+  },
+
+  exportAuditLogs: (params: AdminListParams = {}): Promise<Blob> => {
+    const url = 'common/admin/audit-logs/export/';
+    return httpRequest.get<Blob>(url, {
+      params: cleanParams(params),
+      responseType: 'blob',
+    });
   },
 
   updateTrustReport: (id: IdType, data: Pick<TrustReport, 'status'>): Promise<TrustReport> => {

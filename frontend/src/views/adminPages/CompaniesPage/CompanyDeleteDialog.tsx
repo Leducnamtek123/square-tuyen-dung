@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import { Trans } from 'react-i18next';
 import type { Company } from '../../../types/models';
 import type { TFunction } from 'i18next';
 
@@ -17,7 +18,12 @@ const CompanyDeleteDialog = ({ open, company, loading, t, onClose, onDelete }: P
     <DialogTitle>{t('pages.companies.deleteTitle')}</DialogTitle>
     <DialogContent>
       <Typography>
-        {t('pages.companies.deleteText', { name: company?.companyName })}
+        <Trans
+          t={t}
+          i18nKey="pages.companies.deleteText"
+          values={{ name: company?.companyName || '' }}
+          components={{ strong: <strong /> }}
+        />
       </Typography>
     </DialogContent>
     <DialogActions sx={{ px: 3, pb: 2 }}>

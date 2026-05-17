@@ -5,6 +5,7 @@ from django.db.models import Q
 from apps.accounts import permissions as perms_custom
 from shared import pagination as paginations
 from shared import renderers
+from shared.audit import AuditLogViewSetMixin
 from shared.configs import app_setting
 from shared.configs import variable_response as var_res
 from shared.configs.messages import ERROR_MESSAGES
@@ -28,6 +29,7 @@ def _coerce_bool(value):
 
 
 class JobPostNotificationViewSet(
+    AuditLogViewSetMixin,
     viewsets.ViewSet,
     generics.CreateAPIView,
     generics.ListAPIView,
@@ -124,7 +126,7 @@ class JobPostNotificationViewSet(
         return super().partial_update(request, *args, **kwargs)
 
 
-class AdminJobPostNotificationViewSet(viewsets.ModelViewSet):
+class AdminJobPostNotificationViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = JobPostNotification.objects.select_related('user', 'career', 'city').all().order_by('id')
     serializer_class = JobPostNotificationSerializer
     permission_classes = [perms_custom.IsAdminUser]

@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Grid2 as Grid,
+  InputAdornment,
   Stack,
   TextField,
   ToggleButton,
@@ -17,10 +18,12 @@ import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewKanbanIcon from '@mui/icons-material/ViewKanban';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import SpeedIcon from '@mui/icons-material/Speed';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { alpha, useTheme } from '@mui/material/styles';
 import type { TFunction } from 'i18next';
 import type { SelectOption, SystemConfig } from '@/types/models';
-import type { AppliedResumeFilterData } from '../AppliedResumeFilterForm';
 import { tConfig } from '../../../../utils/tConfig';
 import type { JobPostOption } from '../hooks/useEmployerQueries';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
@@ -36,6 +39,12 @@ interface Props {
   onJobPostSelect: (value: string) => void;
   applicationStatusSelect: string;
   onApplicationStatusSelect: (value: string) => void;
+  aiAnalysisStatusSelect: string;
+  onAiAnalysisStatusSelect: (value: string) => void;
+  aiScoreMin: string;
+  onAiScoreMinChange: (value: string) => void;
+  blindMode: boolean;
+  onBlindModeChange: (value: boolean) => void;
   numbersFilter: number;
   onResetFilterData: () => void;
   onOpenFilterPopup: () => void;
@@ -53,12 +62,30 @@ const AppliedResumeToolbar: React.FC<Props> = ({
   onJobPostSelect,
   applicationStatusSelect,
   onApplicationStatusSelect,
+  aiAnalysisStatusSelect,
+  onAiAnalysisStatusSelect,
+  aiScoreMin,
+  onAiScoreMinChange,
+  blindMode,
+  onBlindModeChange,
   numbersFilter,
   onResetFilterData,
   onOpenFilterPopup,
   onExport,
 }) => {
   const theme = useTheme();
+  const aiAnalysisStatusOptions: SelectOption[] = [
+    { id: 'pending', name: t('employer:appliedResume.ai.status.pending', { defaultValue: 'Chưa phân tích' }) },
+    { id: 'processing', name: t('employer:appliedResume.ai.status.processing', { defaultValue: 'Đang phân tích' }) },
+    { id: 'completed', name: t('employer:appliedResume.ai.status.completed', { defaultValue: 'Đã phân tích' }) },
+    { id: 'failed', name: t('employer:appliedResume.ai.status.failed', { defaultValue: 'Lỗi phân tích' }) },
+  ];
+  const quickFilterCount =
+    (jobPostIdSelect ? 1 : 0) +
+    (applicationStatusSelect ? 1 : 0) +
+    (aiAnalysisStatusSelect ? 1 : 0) +
+    (aiScoreMin ? 1 : 0) +
+    (blindMode ? 1 : 0);
 
   return (
     <>
@@ -179,9 +206,9 @@ const AppliedResumeToolbar: React.FC<Props> = ({
       <FilterBar
         title={t('employer:appliedResume.filters')}
         sx={{ mb: 5 }}
-        activeFilterCount={numbersFilter + (jobPostIdSelect ? 1 : 0) + (applicationStatusSelect ? 1 : 0)}
+        activeFilterCount={numbersFilter + quickFilterCount}
         onReset={onResetFilterData}
-        resetDisabled={!numbersFilter && !jobPostIdSelect && !applicationStatusSelect}
+        resetDisabled={!numbersFilter && !quickFilterCount}
         resetLabel={t('common:reset')}
         actions={(
           <Button
@@ -223,7 +250,7 @@ const AppliedResumeToolbar: React.FC<Props> = ({
         )}
       >
         <Grid container spacing={1.5} alignItems="center" sx={{ width: '100%' }}>
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
             <Autocomplete
               getOptionLabel={(option) => option.jobName}
               value={jobPostOptions.find((o) => String(o.id) === jobPostIdSelect) || null}
@@ -251,7 +278,7 @@ const AppliedResumeToolbar: React.FC<Props> = ({
               )}
             />
           </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
             <Autocomplete
               getOptionLabel={(option) => tConfig(option.name as string)}
               value={allConfig?.applicationStatusOptions?.find((o) => String(o.id) === applicationStatusSelect) || null}
@@ -278,6 +305,82 @@ const AppliedResumeToolbar: React.FC<Props> = ({
                 />
               )}
             />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
+            <Autocomplete
+              getOptionLabel={(option) => option.name}
+              value={aiAnalysisStatusOptions.find((o) => String(o.id) === aiAnalysisStatusSelect) || null}
+              onChange={(e, value) => onAiAnalysisStatusSelect(value?.id ? String(value.id) : '')}
+              disablePortal
+              size="small"
+              options={aiAnalysisStatusOptions}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder={t('employer:appliedResume.ai.allStatuses', { defaultValue: 'Trạng thái AI' })}
+                  slotProps={{
+                    input: {
+                      ...params.InputProps,
+                      startAdornment: (
+                        <>
+                          <AutoAwesomeIcon sx={{ color: 'text.disabled', mr: 1, fontSize: 20 }} />
+                          {params.InputProps.startAdornment}
+                        </>
+                      ),
+                    },
+                  }}
+                  sx={filterControlSx}
+                />
+              )}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
+            <TextField
+              value={aiScoreMin}
+              onChange={(event) => onAiScoreMinChange(event.target.value)}
+              type="number"
+              size="small"
+              placeholder={t('employer:appliedResume.ai.scoreMin', { defaultValue: 'Điểm AI từ' })}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SpeedIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
+                },
+                htmlInput: { min: 0, max: 100 },
+              }}
+              sx={filterControlSx}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
+            <ToggleButton
+              value="blind"
+              selected={blindMode}
+              onChange={() => onBlindModeChange(!blindMode)}
+              fullWidth
+              size="small"
+              sx={{
+                height: 40,
+                justifyContent: 'flex-start',
+                gap: 1,
+                px: 1.5,
+                borderRadius: 1.5,
+                borderColor: 'divider',
+                color: blindMode ? 'primary.contrastText' : 'text.secondary',
+                bgcolor: blindMode ? 'primary.main' : 'background.paper',
+                fontWeight: 800,
+                textTransform: 'none',
+                '&.Mui-selected, &.Mui-selected:hover': {
+                  bgcolor: 'primary.main',
+                  color: 'primary.contrastText',
+                },
+              }}
+            >
+              <VisibilityOffIcon sx={{ fontSize: 20 }} />
+              {t('employer:appliedResume.ai.blindMode', { defaultValue: 'Blind mode' })}
+            </ToggleButton>
           </Grid>
         </Grid>
       </FilterBar>

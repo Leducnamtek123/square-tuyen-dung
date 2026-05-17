@@ -1,4 +1,5 @@
 import logging
+import hashlib
 import httpx
 import json
 import os
@@ -6,6 +7,7 @@ import re
 import tempfile
 import fitz  # PyMuPDF
 import docx
+from bs4 import BeautifulSoup
 from celery import shared_task
 from django.core.cache import cache
 from decouple import config
@@ -16,6 +18,166 @@ from integrations.ai.client import (
 )
 
 logger = logging.getLogger(__name__)
+RESUME_ANALYSIS_PROMPT_VERSION = "resume-screen-v2"
+
+
+def _strip_html(value: str) -> str:
+    text = BeautifulSoup(value or "", "html.parser").get_text(" ")
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _display(instance, field_name: str) -> str:
+    getter = getattr(instance, f"get_{field_name}_display", None)
+    if callable(getter):
+        try:
+            return str(getter() or "").strip()
+        except Exception:
+            return ""
+    return str(getattr(instance, field_name, "") or "").strip()
+
+
+def _build_resume_profile_text(resume) -> str:
+    """Build analyzable text for online CVs and as a fallback to file text."""
+    if not resume:
+        return ""
+
+    lines = [
+        f"Title: {resume.title or ''}",
+        f"Career: {getattr(resume.career, 'name', '') if resume.career else ''}",
+        f"City: {getattr(resume.city, 'name', '') if resume.city else ''}",
+        f"Position: {_display(resume, 'position')}",
+        f"Experience: {_display(resume, 'experience')}",
+        f"Academic level: {_display(resume, 'academic_level')}",
+        f"Workplace type: {_display(resume, 'type_of_workplace')}",
+        f"Job type: {_display(resume, 'job_type')}",
+        f"Expected salary: {resume.salary_min or 0} - {resume.salary_max or 0}",
+        f"Summary: {resume.description or ''}",
+        f"Skills summary: {resume.skills_summary or ''}",
+    ]
+
+    try:
+        for item in resume.advanced_skills.all():
+            lines.append(f"Skill: {item.name} level {item.level}")
+    except Exception:
+        pass
+
+    try:
+        for item in resume.experience_details.all():
+            lines.append(
+                "Experience detail: "
+                f"{item.job_name} at {item.company_name}, "
+                f"{item.start_date} - {item.end_date}. {item.description or ''}"
+            )
+    except Exception:
+        pass
+
+    try:
+        for item in resume.education_details.all():
+            lines.append(
+                "Education: "
+                f"{item.degree_name}, {item.major}, {item.training_place_name}. "
+                f"{item.description or ''}"
+            )
+    except Exception:
+        pass
+
+    try:
+        for item in resume.certificates.all():
+            lines.append(f"Certificate: {item.name} from {item.training_place}")
+    except Exception:
+        pass
+
+    try:
+        for item in resume.language_skills.all():
+            lines.append(f"Language: {item.get_language_display()} - {item.get_level_display()}")
+    except Exception:
+        pass
+
+    return "\n".join(line for line in lines if line and line.strip())
+
+
+def _build_default_screening_criteria(activity: JobPostActivity) -> list[dict]:
+    job = activity.job_post
+    return [
+        {
+            "key": "must_have_requirements",
+            "label": "Must-have requirements from the JD",
+            "category": "requirements",
+            "weight": 35,
+            "required": True,
+            "description": _strip_html(job.job_requirement or "")[:700],
+        },
+        {
+            "key": "role_experience",
+            "label": "Relevant role and experience level",
+            "category": "experience",
+            "weight": 25,
+            "required": True,
+            "description": f"Role: {job.job_name}. Expected experience: {_display(job, 'experience')}.",
+        },
+        {
+            "key": "core_skills",
+            "label": "Core skills and work history evidence",
+            "category": "skills",
+            "weight": 20,
+            "required": False,
+            "description": _strip_html(job.job_description or "")[:700],
+        },
+        {
+            "key": "education_and_certifications",
+            "label": "Education and certifications",
+            "category": "education",
+            "weight": 10,
+            "required": False,
+            "description": f"Academic level: {_display(job, 'academic_level')}.",
+        },
+        {
+            "key": "compensation_and_working_model",
+            "label": "Compensation and working model fit",
+            "category": "logistics",
+            "weight": 10,
+            "required": False,
+            "description": (
+                f"Salary range: {job.salary_min} - {job.salary_max}. "
+                f"Workplace: {_display(job, 'type_of_workplace')}. Job type: {_display(job, 'job_type')}."
+            ),
+        },
+    ]
+
+
+def _normalize_criteria(criteria) -> list[dict]:
+    if not isinstance(criteria, list):
+        return []
+
+    normalized = []
+    for idx, item in enumerate(criteria[:12]):
+        if not isinstance(item, dict):
+            continue
+        label = str(item.get("label") or item.get("name") or item.get("key") or "").strip()
+        if not label:
+            continue
+        try:
+            weight = int(float(item.get("weight", 0)))
+        except (TypeError, ValueError):
+            weight = 0
+        normalized.append(
+            {
+                "key": str(item.get("key") or f"criterion_{idx + 1}").strip()[:80],
+                "label": label[:180],
+                "category": str(item.get("category") or "custom").strip()[:60],
+                "weight": max(0, min(100, weight)),
+                "required": bool(item.get("required", False)),
+                "description": str(item.get("description") or "").strip()[:900],
+            }
+        )
+
+    total_weight = sum(item["weight"] for item in normalized)
+    if normalized and total_weight <= 0:
+        equal_weight = max(1, int(100 / len(normalized)))
+        for item in normalized:
+            item["weight"] = equal_weight
+
+    return normalized
 
 
 def _truncate_text(value: str, max_chars: int) -> str:
@@ -134,6 +296,29 @@ def _coerce_list(value) -> list[str]:
     return []
 
 
+def _coerce_dict_list(value, max_items: int = 12) -> list[dict]:
+    if not isinstance(value, list):
+        return []
+
+    items = []
+    for raw in value[:max_items]:
+        if not isinstance(raw, dict):
+            continue
+        clean = {}
+        for key, item_value in raw.items():
+            if item_value is None:
+                continue
+            if isinstance(item_value, (str, int, float, bool)):
+                clean[str(key)] = item_value
+            elif isinstance(item_value, list):
+                clean[str(key)] = _coerce_list(item_value)
+            else:
+                clean[str(key)] = str(item_value)[:500]
+        if clean:
+            items.append(clean)
+    return items
+
+
 def _normalize_analysis_result(result: dict) -> dict:
     score = result.get("score", result.get("overall_score", 0))
     try:
@@ -150,6 +335,8 @@ def _normalize_analysis_result(result: dict) -> dict:
         "cons": _coerce_list(result.get("cons") or result.get("gaps")),
         "matching_skills": _coerce_list(result.get("matching_skills")),
         "missing_skills": _coerce_list(result.get("missing_skills")),
+        "criteria_results": _coerce_dict_list(result.get("criteria_results")),
+        "evidence": _coerce_dict_list(result.get("evidence") or result.get("source_evidence")),
     }
 
 
@@ -258,12 +445,23 @@ def analyze_resume_ai(self, activity_id):
             )
             raise self.retry(countdown=slot_wait_seconds)
 
-        activity = JobPostActivity.objects.select_related('job_post', 'resume', 'resume__file').get(id=activity_id)
+        activity = (
+            JobPostActivity.objects
+            .select_related('job_post', 'resume', 'resume__file', 'resume__career', 'resume__city')
+            .prefetch_related(
+                'resume__advanced_skills',
+                'resume__experience_details',
+                'resume__education_details',
+                'resume__certificates',
+                'resume__language_skills',
+            )
+            .get(id=activity_id)
+        )
 
-        if not activity.resume or not activity.resume.file:
+        if not activity.resume:
             activity.ai_analysis_status = 'failed'
             activity.ai_analysis_progress = 0
-            activity.ai_analysis_summary = "Khong tim thay file CV de phan tich."
+            activity.ai_analysis_summary = "Khong tim thay ho so ung vien de phan tich."
             activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
             return
 
@@ -272,72 +470,82 @@ def analyze_resume_ai(self, activity_id):
         activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'update_at'])
 
         file_obj = activity.resume.file
-        file_format = file_obj.format.lower() if file_obj.format else 'pdf'
+        file_format = file_obj.format.lower() if file_obj and file_obj.format else 'pdf'
         resume_text = ""
+        input_source = "profile"
 
-        # Strategy 1: direct MinIO fetch inside Docker network
-        try:
-            from shared.helpers.cloudinary_service import CloudinaryService
-            from django.conf import settings as django_settings
+        if file_obj:
+            input_source = f"file:{file_format}"
+            # Strategy 1: direct MinIO fetch inside Docker network
+            try:
+                from shared.helpers.cloudinary_service import CloudinaryService
+                from django.conf import settings as django_settings
 
-            minio_client = CloudinaryService._get_client()
-            bucket = django_settings.MINIO_BUCKET
-            object_name = file_obj.public_id.lstrip('/')
+                minio_client = CloudinaryService._get_client()
+                bucket = django_settings.MINIO_BUCKET
+                object_name = file_obj.public_id.lstrip('/')
 
-            if object_name.startswith("http://") or object_name.startswith("https://"):
-                from urllib.parse import urlparse
-                parsed = urlparse(object_name)
-                object_name = parsed.path.lstrip("/")
-                if object_name.startswith(f"{bucket}/"):
-                    object_name = object_name[len(bucket) + 1:]
+                if object_name.startswith("http://") or object_name.startswith("https://"):
+                    from urllib.parse import urlparse
+                    parsed = urlparse(object_name)
+                    object_name = parsed.path.lstrip("/")
+                    if object_name.startswith(f"{bucket}/"):
+                        object_name = object_name[len(bucket) + 1:]
 
-            logger.info("Downloading CV from MinIO: bucket=%s, object=%s", bucket, object_name)
+                logger.info("Downloading CV from MinIO: bucket=%s, object=%s", bucket, object_name)
 
-            response = minio_client.get_object(bucket, object_name)
-            with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
-                for chunk in response.stream(1024 * 32):
-                    tf.write(chunk)
-                temp_file = tf.name
-            response.close()
-            response.release_conn()
-
-            activity.ai_analysis_progress = 25
-            activity.save(update_fields=['ai_analysis_progress', 'update_at'])
-
-        except Exception as minio_err:
-            logger.warning("MinIO direct download failed: %s. Falling back to HTTP URL.", minio_err)
-
-            resume_url = file_obj.get_full_url()
-            logger.info("Downloading CV from URL: %s", resume_url)
-            with httpx.Client(timeout=30.0) as client:
-                response = client.get(resume_url)
-                if response.status_code != 200:
-                    raise Exception(f"Failed to download resume file: HTTP {response.status_code}")
-
+                response = minio_client.get_object(bucket, object_name)
                 with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
-                    tf.write(response.content)
+                    for chunk in response.stream(1024 * 32):
+                        tf.write(chunk)
                     temp_file = tf.name
+                response.close()
+                response.release_conn()
 
-            activity.ai_analysis_progress = 25
-            activity.save(update_fields=['ai_analysis_progress', 'update_at'])
+                activity.ai_analysis_progress = 25
+                activity.save(update_fields=['ai_analysis_progress', 'update_at'])
 
-        # Extract text from downloaded file
-        if temp_file:
-            if file_format == 'pdf':
-                resume_text = extract_text_from_pdf(temp_file)
-            elif file_format in ['docx', 'doc']:
-                resume_text = extract_text_from_docx(temp_file)
-            else:
-                with open(temp_file, 'r', errors='ignore') as f:
-                    resume_text = f.read()
+            except Exception as minio_err:
+                logger.warning("MinIO direct download failed: %s. Falling back to HTTP URL.", minio_err)
 
-            activity.ai_analysis_progress = 45
-            activity.save(update_fields=['ai_analysis_progress', 'update_at'])
+                resume_url = file_obj.get_full_url()
+                logger.info("Downloading CV from URL: %s", resume_url)
+                with httpx.Client(timeout=30.0) as client:
+                    response = client.get(resume_url)
+                    if response.status_code != 200:
+                        raise Exception(f"Failed to download resume file: HTTP {response.status_code}")
+
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
+                        tf.write(response.content)
+                        temp_file = tf.name
+
+                activity.ai_analysis_progress = 25
+                activity.save(update_fields=['ai_analysis_progress', 'update_at'])
+
+            # Extract text from downloaded file
+            if temp_file:
+                if file_format == 'pdf':
+                    resume_text = extract_text_from_pdf(temp_file)
+                elif file_format in ['docx', 'doc']:
+                    resume_text = extract_text_from_docx(temp_file)
+                else:
+                    with open(temp_file, 'r', errors='ignore') as f:
+                        resume_text = f.read()
+
+                activity.ai_analysis_progress = 45
+                activity.save(update_fields=['ai_analysis_progress', 'update_at'])
+
+        profile_text = _build_resume_profile_text(activity.resume)
+        if profile_text:
+            resume_text = f"{resume_text}\n\nStructured online profile:\n{profile_text}".strip()
+            if not file_obj:
+                activity.ai_analysis_progress = 45
+                activity.save(update_fields=['ai_analysis_progress', 'update_at'])
 
         if not resume_text or len(resume_text.strip()) < 50:
             activity.ai_analysis_status = 'failed'
             activity.ai_analysis_progress = 0
-            activity.ai_analysis_summary = "Khong the doc duoc noi dung CV (co the la file anh hoac file loi)."
+            activity.ai_analysis_summary = "Khong the doc duoc noi dung CV hoac ho so truc tuyen."
             activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
             return
 
@@ -349,13 +557,19 @@ def analyze_resume_ai(self, activity_id):
         job_description = _truncate_text(activity.job_post.job_description or "", max_jd_chars)
         job_requirement = _truncate_text(activity.job_post.job_requirement or "", max_req_chars)
         resume_excerpt = _truncate_text(resume_text, max_resume_chars)
+        criteria = _normalize_criteria(activity.ai_analysis_criteria) or _build_default_screening_criteria(activity)
+        criteria_json = json.dumps(criteria, ensure_ascii=False)
 
         prompt = f"""
-        Analyze candidate CV fit for this role and return ONLY one compact valid JSON object.
+        Analyze candidate CV fit for this role using the weighted screening criteria.
+        Return ONLY one compact valid JSON object.
 
         Job title: {activity.job_post.job_name}
-        Job description: {job_description}
-        Job requirements: {job_requirement}
+        Job description: {_strip_html(job_description)}
+        Job requirements: {_strip_html(job_requirement)}
+
+        Weighted screening criteria:
+        {criteria_json}
 
         Candidate CV:
         {resume_excerpt}
@@ -368,15 +582,36 @@ def analyze_resume_ai(self, activity_id):
           "pros": ["..."],
           "cons": ["..."],
           "matching_skills": ["..."],
-          "missing_skills": ["..."]
+          "missing_skills": ["..."],
+          "criteria_results": [
+            {{
+              "key": "criterion key",
+              "score": 0-100,
+              "matched": true,
+              "evidence": "short exact or near-exact evidence from CV/JD",
+              "reason": "short Vietnamese reason"
+            }}
+          ],
+          "evidence": [
+            {{
+              "claim": "short claim",
+              "source": "cv|jd",
+              "quote": "short quote",
+              "confidence": 0-100
+            }}
+          ]
         }}
 
         Constraints:
         - summary max 70 words.
         - each list max 5 short items.
+        - criteria_results must include every criterion key.
+        - evidence quotes must be short and grounded in the provided CV/JD text.
+        - do not infer protected attributes such as age, gender, marital status, race, religion, disability, or family status.
         - no markdown, no extra text outside JSON.
         - no <think> block, no explanation.
         """
+        prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
 
         model_alias = config(
             "AI_RESUME_LLM_MODEL",
@@ -463,6 +698,20 @@ def analyze_resume_ai(self, activity_id):
         activity.ai_analysis_cons = ", ".join(result.get('cons', []))
         activity.ai_analysis_matching_skills = result.get('matching_skills', [])
         activity.ai_analysis_missing_skills = result.get('missing_skills', [])
+        activity.ai_analysis_criteria = criteria
+        activity.ai_analysis_evidence = {
+            "criteria_results": result.get("criteria_results", []),
+            "evidence": result.get("evidence", []),
+        }
+        activity.ai_analysis_model = llm_candidate.model or model_alias
+        activity.ai_analysis_source = f"{input_source}:{llm_candidate.name}"
+        activity.ai_analysis_prompt_version = RESUME_ANALYSIS_PROMPT_VERSION
+        activity.ai_analysis_prompt_hash = prompt_hash
+        activity.ai_analysis_review_status = 'ai_only'
+        activity.ai_analysis_hr_override_score = None
+        activity.ai_analysis_hr_override_note = ""
+        activity.ai_analysis_reviewed_by = None
+        activity.ai_analysis_reviewed_at = None
         activity.ai_analysis_status = 'completed'
         activity.ai_analysis_progress = 100
         activity.save()

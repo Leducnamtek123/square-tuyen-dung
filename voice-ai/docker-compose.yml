@@ -39,9 +39,12 @@ services:
   
   livekit:
     image: livekit/livekit-server:latest
-    command: --dev --config /etc/livekit.yaml
+    entrypoint: ["/bin/sh", "/usr/local/bin/render-livekit-config.sh"]
+    environment:
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:?Set LIVEKIT_API_KEY in ../.env}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:?Set LIVEKIT_API_SECRET in ../.env}
     volumes:
-      - ./livekit-configs/livekit.yaml:/etc/livekit.yaml
+      - ./docker-livekit-entrypoint.sh:/usr/local/bin/render-livekit-config.sh:ro
     ports:
       - "7880:7880"
       - "7881:7881"
@@ -60,9 +63,10 @@ services:
     environment:
       - LIVEKIT_URL=${LIVEKIT_URL:-ws://livekit:7880}
       - LIVEKIT_HOST=${LIVEKIT_URL:-ws://livekit:7880}
-      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
-      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-secret}
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:?Set LIVEKIT_API_KEY in ../.env}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:?Set LIVEKIT_API_SECRET in ../.env}
       - LIVEKIT_AGENT_PORT=${LIVEKIT_AGENT_PORT:-7880}
+      - INTERVIEW_AGENT_SHARED_SECRET=${INTERVIEW_AGENT_SHARED_SECRET:?Set INTERVIEW_AGENT_SHARED_SECRET in ../.env and share it with the API}
       - STT_LANGUAGE=${STT_LANGUAGE:-vi}
       - LLM_BASE_URL=${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
       - LLM_MODEL=${LLM_MODEL:-gemma4:e4b}
@@ -93,8 +97,8 @@ services:
     environment:
       - NEXT_PUBLIC_LIVEKIT_URL=ws://localhost:7880
       - LIVEKIT_URL=ws://livekit:7880
-      - LIVEKIT_API_KEY=devkey
-      - LIVEKIT_API_SECRET=secret
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:?Set LIVEKIT_API_KEY in ../.env}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:?Set LIVEKIT_API_SECRET in ../.env}
     depends_on:
       livekit:
         condition: service_started

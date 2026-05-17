@@ -93,6 +93,7 @@ export const SEGMENT_MAP = {
   'quan-ly-loai-banner': 'banner-types',
   'xac-thuc-cong-ty': 'company-verifications',
   'bao-cao-tin-cay': 'trust-reports',
+  'nhat-ky-he-thong': 'audit-logs',
 
   // Interview (candidate)
   'phong-van': 'interview',
@@ -235,6 +236,7 @@ export const ROUTES = {
     JOB_NOTIFICATIONS: 'admin/job-notifications',
     COMPANY_VERIFICATIONS: 'admin/company-verifications',
     TRUST_REPORTS: 'admin/trust-reports',
+    AUDIT_LOGS: 'admin/audit-logs',
     BANNERS: 'admin/banners',
     BANNER_TYPES: 'admin/banner-types',
     FEEDBACKS: 'admin/feedbacks',
@@ -359,6 +361,7 @@ export function generateRewrites(): RewriteRule[] {
     ['/quan-tri/quan-ly-loai-banner', '/admin/banner-types'],
     ['/quan-tri/xac-thuc-cong-ty', '/admin/company-verifications'],
     ['/quan-tri/bao-cao-tin-cay', '/admin/trust-reports'],
+    ['/quan-tri/nhat-ky-he-thong', '/admin/audit-logs'],
     // Catch-all for admin
     ['/quan-tri', '/admin/dashboard'],
     ['/quan-tri/:path*', '/admin/:path*'],

@@ -250,6 +250,7 @@
   "educationAddedSuccess": "Education information added successfully.",
   "educationUpdatedSuccess": "Education information updated successfully.",
   "activityChart": {
+    "loading": "Loading activity chart...",
     "labels": {
       "appliedjobs": "Applied Jobs",
       "savedjobs": "Saved Jobs",

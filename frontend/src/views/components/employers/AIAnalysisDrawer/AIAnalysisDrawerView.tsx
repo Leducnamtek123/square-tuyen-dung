@@ -22,6 +22,7 @@ type Props = {
   };
   stats: { matchingSkills: number; missingSkills: number; totalSkills: number };
   onAnalyze: () => void;
+  onSaveReview: (payload: { overrideScore?: number | string | null; note?: string; reviewStatus?: string }) => Promise<void>;
   t: TFunction;
 };
 
@@ -38,6 +39,7 @@ const AIAnalysisDrawerView = ({
   analysisState,
   stats,
   onAnalyze,
+  onSaveReview,
   t,
 }: Props) => {
   const { loading, analyzing, canEmbedResume } = analysisState;
@@ -98,6 +100,7 @@ const AIAnalysisDrawerView = ({
             isFailed={isFailed}
             stats={stats}
             onAnalyze={onAnalyze}
+            onSaveReview={onSaveReview}
             t={t}
           />
         </Box>

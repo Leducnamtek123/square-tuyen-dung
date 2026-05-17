@@ -26,7 +26,11 @@ if ($Mode -eq "gpu") {
   $composeFiles += "docker-compose.gpu.yml"
 }
 
+$rootEnvFile = Join-Path $PSScriptRoot "..\.env"
 $cmd = @("compose")
+if (Test-Path $rootEnvFile) {
+  $cmd += @("--env-file", $rootEnvFile)
+}
 foreach ($file in $composeFiles) {
   $cmd += @("-f", $file)
 }

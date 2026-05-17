@@ -61,6 +61,13 @@ CANDIDATE_PROFILES = [
 ]
 
 
+def required_config(name):
+    value = config(name, default="")
+    if not value:
+        raise RuntimeError(f"{name} is required before creating OAuth2 application seed data.")
+    return value
+
+
 def _upload_avatar(avatar_filename: str, username_slug: str) -> "File | None":
     path = os.path.join(_AVATAR_DIR, avatar_filename)
     if not os.path.exists(path):
@@ -89,8 +96,8 @@ def seed_accounts():
     """Seed system accounts for the Square-only demo dataset."""
     logger.info("Bắt đầu sinh dữ liệu tài khoản và cấu hình OAuth2...")
 
-    client_id = config("CLIENT_ID", default="qDZFCwY3yuN5mVNHqVVz8cAcREy5iQuGOTtQthjS")
-    client_secret = config("CLIENT_SECRET", default="project_secret_client_key_2024")
+    client_id = required_config("CLIENT_ID")
+    client_secret = required_config("CLIENT_SECRET")
 
     admin_user = User.objects.filter(is_superuser=True).first()
     app, created = Application.objects.get_or_create(

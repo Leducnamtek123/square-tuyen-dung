@@ -1,10 +1,13 @@
 import React from 'react';
-import { Box, Button, Stack, styled, TextField, Typography, Alert } from '@mui/material';
+import { Alert, Box, Button, Stack, styled, TextField, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { setupRecaptcha, signInWithPhone, verifyCode } from '../../../../services/firebaseService';
 import PhoneIcon from '@mui/icons-material/Phone';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import type { ConfirmationResult } from 'firebase/auth';
+import type { CountryCode } from 'libphonenumber-js';
+import CountryPhoneInput from './CountryPhoneInput';
+import { DEFAULT_PHONE_COUNTRY, toE164PhoneNumber } from './phoneNumberUtils';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   padding: '12px 16px',
@@ -21,6 +24,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 type PhoneOTPLoginFormState = {
+  countryCode: CountryCode;
   phoneNumber: string;
   otpCode: string;
   confirmationResult: ConfirmationResult | null;
@@ -29,6 +33,7 @@ type PhoneOTPLoginFormState = {
 };
 
 type PhoneOTPLoginFormAction =
+  | { type: 'set-country-code'; value: CountryCode }
   | { type: 'set-phone-number'; value: string }
   | { type: 'set-otp-code'; value: string }
   | { type: 'set-confirmation-result'; value: ConfirmationResult | null }
@@ -37,6 +42,7 @@ type PhoneOTPLoginFormAction =
   | { type: 'tick-resend-timer' };
 
 const initialState: PhoneOTPLoginFormState = {
+  countryCode: DEFAULT_PHONE_COUNTRY,
   phoneNumber: '',
   otpCode: '',
   confirmationResult: null,
@@ -49,6 +55,8 @@ const reducer = (
   action: PhoneOTPLoginFormAction
 ): PhoneOTPLoginFormState => {
   switch (action.type) {
+    case 'set-country-code':
+      return { ...state, countryCode: action.value };
     case 'set-phone-number':
       return { ...state, phoneNumber: action.value };
     case 'set-otp-code':
@@ -74,6 +82,10 @@ interface PhoneOTPLoginFormProps {
 const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
   const { t } = useTranslation('auth');
   const [state, dispatch] = React.useReducer(reducer, initialState);
+  const normalizedPhoneNumber = React.useMemo(
+    () => toE164PhoneNumber(state.phoneNumber, state.countryCode),
+    [state.countryCode, state.phoneNumber]
+  );
 
   React.useEffect(() => {
     if (state.resendTimer <= 0) {
@@ -88,10 +100,18 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
   }, [state.resendTimer]);
 
   const handleSendOTP = async () => {
+    if (!normalizedPhoneNumber) {
+      dispatch({
+        type: 'set-error',
+        value: t('login.phoneInvalid', { defaultValue: 'Số điện thoại không hợp lệ.' }),
+      });
+      return;
+    }
+
     try {
       dispatch({ type: 'set-error', value: null });
       const appVerifier = setupRecaptcha('recaptcha-container');
-      const result = await signInWithPhone(state.phoneNumber, appVerifier);
+      const result = await signInWithPhone(normalizedPhoneNumber, appVerifier);
       dispatch({ type: 'set-confirmation-result', value: result });
       dispatch({ type: 'set-resend-timer', value: 60 });
     } catch (err: unknown) {
@@ -123,28 +143,21 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
       {!state.confirmationResult ? (
         <Stack spacing={2}>
           <Typography variant="body2" color="text.secondary">
-          {t('login.phoneIntro')}
+            {t('login.phoneIntro')}
           </Typography>
-          <TextField
-            fullWidth
+          <CountryPhoneInput
+            countryCode={state.countryCode}
             label={t('form.phoneNumber')}
-            placeholder="+84..."
             value={state.phoneNumber}
-            onChange={(e) => dispatch({ type: 'set-phone-number', value: e.target.value })}
             disabled={isLoading}
-            variant="outlined"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              },
-            }}
+            onCountryCodeChange={(countryCode) => dispatch({ type: 'set-country-code', value: countryCode })}
+            onValueChange={(value) => dispatch({ type: 'set-phone-number', value })}
           />
           <StyledButton
             fullWidth
             variant="contained"
             onClick={handleSendOTP}
-            disabled={!state.phoneNumber || isLoading}
+            disabled={!normalizedPhoneNumber || isLoading}
             startIcon={<PhoneIcon />}
           >
             {t('actions.sendOTP')}

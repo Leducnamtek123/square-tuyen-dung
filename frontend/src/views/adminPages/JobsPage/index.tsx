@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useCallback, useState, useMemo } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, Tooltip, IconButton, Stack, Chip, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Paper, Tooltip, IconButton, Stack, Chip, Dialog, DialogTitle, DialogContent, DialogActions, Button, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
@@ -13,7 +13,7 @@ import { useJobs } from './hooks/useJobs';
 import { useDataTable, useDebounce } from '../../../hooks';
 import { JobPost } from '../../../types/models';
 import dayjs from '../../../configs/dayjs-config';
-import FilterBar from '@/components/Common/FilterBar';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 
 const JobsPage = () => {
     const { t } = useTranslation('admin');
@@ -29,7 +29,13 @@ const JobsPage = () => {
     } = useDataTable({ initialPageSize: 10 });
 
     const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
     const debouncedSearch = useDebounce(searchTerm, 500);
+    const statusParams = useMemo(() => {
+        if (!statusFilter) return {};
+        if (statusFilter === 'expired') return { isExpired: true };
+        return { statusId: statusFilter };
+    }, [statusFilter]);
 
     const {
         data,
@@ -42,6 +48,7 @@ const JobsPage = () => {
         page: page + 1,
         pageSize,
         kw: debouncedSearch,
+        ...statusParams,
         ordering
     });
 
@@ -51,6 +58,11 @@ const JobsPage = () => {
     const handleSearch = (value: string) => {
         setSearchTerm(value);
         onPaginationChange({ pageIndex: 0, pageSize: pageSize });
+    };
+
+    const handleStatusFilterChange = (value: string) => {
+        setStatusFilter(value);
+        onPaginationChange({ pageIndex: 0, pageSize });
     };
 
     const handleApprove = useCallback(async (id: string | number) => {
@@ -200,10 +212,30 @@ const JobsPage = () => {
                     searchValue={searchTerm}
                     searchPlaceholder={t('pages.jobs.searchPlaceholder')}
                     onSearchChange={handleSearch}
-                    onReset={() => handleSearch('')}
-                    resetDisabled={!searchTerm}
+                    onReset={() => {
+                        handleSearch('');
+                        setStatusFilter('');
+                    }}
+                    resetDisabled={!searchTerm && !statusFilter}
                     resetLabel={t('common.clearFilters', 'Xóa lọc')}
-                />
+                    activeFilterCount={statusFilter ? 1 : 0}
+                >
+                    <FormControl size="small" sx={[{ minWidth: 210 }, filterControlSx]}>
+                        <InputLabel id="job-status-filter-label">{t('common.status.label', 'Trạng thái')}</InputLabel>
+                        <Select
+                            labelId="job-status-filter-label"
+                            value={statusFilter}
+                            label={t('common.status.label', 'Trạng thái')}
+                            onChange={(event) => handleStatusFilterChange(event.target.value)}
+                        >
+                            <MenuItem value="">{t('common.all', 'Tất cả')}</MenuItem>
+                            <MenuItem value="1">{t('pages.jobs.status.pending', 'Pending Review')}</MenuItem>
+                            <MenuItem value="2">{t('pages.jobs.status.rejected', 'Rejected')}</MenuItem>
+                            <MenuItem value="3">{t('pages.jobs.status.approved', 'Approved')}</MenuItem>
+                            <MenuItem value="expired">{t('pages.jobs.status.expired', 'Expired')}</MenuItem>
+                        </Select>
+                    </FormControl>
+                </FilterBar>
 
                 <DataTable
                     columns={columns}

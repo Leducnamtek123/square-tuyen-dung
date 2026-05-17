@@ -14,6 +14,14 @@ from shared.configs import variable_system as var_sys
 from django.db import transaction
 from oauth2_provider.models import Application
 
+
+def required_env(name):
+    value = os.getenv(name)
+    if not value:
+        raise RuntimeError(f"{name} is required before creating OAuth2 application seed data.")
+    return value
+
+
 class Command(BaseCommand):
     help = 'Seed initial data for development - Construction & Design Industry'
 
@@ -44,8 +52,8 @@ class Command(BaseCommand):
             Career.objects.get_or_create(name='Cơ khí')
 
             # 2.5. OAuth Application
-            client_id = os.getenv('CLIENT_ID', 'qDZFCwY3yuN5mVNHqVVz8cAcREy5iQuGOTtQthjS')
-            client_secret = os.getenv('CLIENT_SECRET', 'project_secret_client_key_2024')
+            client_id = required_env('CLIENT_ID')
+            client_secret = required_env('CLIENT_SECRET')
 
             admin_user = User.objects.filter(is_superuser=True).first()
             if not admin_user:

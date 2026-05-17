@@ -8,7 +8,7 @@ from shared.serializers import DynamicFieldsMixin
 
 from apps.files.models import File
 from apps.locations.models import City, District, Location, Ward
-from .models import Career
+from .models import AuditLog, Career
 
 class CitySerializer(serializers.ModelSerializer):
 
@@ -179,3 +179,33 @@ class LocationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 class FileUploadSerializer(serializers.Serializer):
     file = serializers.FileField(required=True)
     file_type = serializers.ChoiceField(choices=File.FILE_TYPES, default=File.OTHER_TYPE)
+
+
+class AuditLogSerializer(serializers.ModelSerializer):
+    actorEmail = serializers.EmailField(source="actor_email", read_only=True)
+    resourceType = serializers.CharField(source="resource_type", read_only=True)
+    resourceId = serializers.CharField(source="resource_id", read_only=True)
+    resourceRepr = serializers.CharField(source="resource_repr", read_only=True)
+    ipAddress = serializers.IPAddressField(source="ip_address", read_only=True)
+    userAgent = serializers.CharField(source="user_agent", read_only=True)
+    requestMethod = serializers.CharField(source="request_method", read_only=True)
+    requestPath = serializers.CharField(source="request_path", read_only=True)
+    createAt = serializers.DateTimeField(source="create_at", read_only=True)
+
+    class Meta:
+        model = AuditLog
+        fields = (
+            "id",
+            "actor",
+            "actorEmail",
+            "action",
+            "resourceType",
+            "resourceId",
+            "resourceRepr",
+            "ipAddress",
+            "userAgent",
+            "requestMethod",
+            "requestPath",
+            "metadata",
+            "createAt",
+        )

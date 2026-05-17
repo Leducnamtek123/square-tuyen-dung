@@ -11,6 +11,7 @@ from livekit.agents import Agent, RunContext
 from livekit.agents.job import get_job_context
 from livekit.agents.llm import function_tool
 
+from .backend_auth import auth_event_hook
 from .interview_flow import decide_next_action, parse_question_payload
 from .prompts import DEFAULT_GREETING, INTERVIEWER_INSTRUCTIONS
 
@@ -189,7 +190,7 @@ class Interviewer(Agent):
             return None
         try:
             url = f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/next-question"
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(event_hooks={"request": [auth_event_hook()]}) as client:
                 resp = await client.post(url, json={"advance": True}, timeout=5.0)
             if resp.status_code == 200:
                 payload = resp.json()
@@ -270,7 +271,7 @@ class Interviewer(Agent):
             return
         try:
             url = f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/status"
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(event_hooks={"request": [auth_event_hook()]}) as client:
                 await client.patch(url, json={"status": status}, timeout=5.0)
         except Exception as exc:
             logger.warning("Failed to update status: %s", exc)
@@ -299,7 +300,7 @@ class Interviewer(Agent):
             }
             if speech_duration_ms is not None:
                 payload["speech_duration_ms"] = int(speech_duration_ms)
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(event_hooks={"request": [auth_event_hook()]}) as client:
                 url = f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/append-transcription"
                 resp = await client.post(url, json=payload, timeout=5.0)
                 if resp.status_code != 201:

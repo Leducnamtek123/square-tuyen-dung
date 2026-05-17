@@ -17,6 +17,13 @@ from oauth2_provider.models import Application
 from shared.configs import variable_system as var_sys
 
 
+def required_env(name):
+    value = os.environ.get(name)
+    if not value:
+        raise RuntimeError(f"{name} is required before creating OAuth2 application seed data.")
+    return value
+
+
 print("Creating common data...")
 city, _ = City.objects.get_or_create(name="Hồ Chí Minh")
 district, _ = District.objects.get_or_create(name="Quận 1", city=city)
@@ -190,7 +197,7 @@ Application.objects.create(
     client_type=Application.CLIENT_CONFIDENTIAL,
     authorization_grant_type=Application.GRANT_PASSWORD,
     name='project_web_app',
-    client_id=os.environ.get('CLIENT_ID', 'qDZFCwY3yuN5mVNHqVVz8cAcREy5iQuGOTtQthjS'),
-    client_secret=os.environ.get('CLIENT_SECRET', 'project_secret_client_key_2024')
+    client_id=required_env('CLIENT_ID'),
+    client_secret=required_env('CLIENT_SECRET')
 )
 print("Done. Square-only seed complete.")

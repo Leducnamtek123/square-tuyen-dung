@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import dayjs from 'dayjs';
 import { Box, Card, Skeleton, Stack, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
@@ -47,13 +47,11 @@ const JobPostAction = ({
   salaryMax,
   children,
 }: JobPostActionProps) => {
-
-  const { push } = useRouter();
-
   const { allConfig } = useConfig();
 
   const theme = useTheme();
   const stackDirection = useMediaQuery(theme.breakpoints.down('sm')) ? 'column' : 'row';
+  const detailHref = `/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`;
 
   return (
 
@@ -135,6 +133,9 @@ const JobPostAction = ({
 
                     <Typography
 
+                      component={Link}
+                      href={detailHref}
+                      prefetch
                       variant="h6"
 
                       sx={{
@@ -144,6 +145,7 @@ const JobPostAction = ({
                         cursor: 'pointer',
 
                         color: theme.palette.primary.main,
+                        textDecoration: 'none',
 
                         transition: 'color 0.2s ease',
 
@@ -156,8 +158,6 @@ const JobPostAction = ({
                         }
 
                       }}
-
-                      onClick={() => push(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`)}
 
                       noWrap
 

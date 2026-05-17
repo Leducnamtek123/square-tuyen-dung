@@ -3,6 +3,7 @@ import json
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from apps.interviews.agent_auth import verify_interview_agent_request
 from apps.interviews.models import InterviewSession
 from apps.interviews.services import (
     append_transcript,
@@ -51,6 +52,9 @@ def interview_context(request: HttpRequest, room_name: str):
     """
     if request.method != "GET":
         return JsonResponse({"detail": "Method not allowed."}, status=405)
+    auth_error = verify_interview_agent_request(request)
+    if auth_error is not None:
+        return auth_error
 
     try:
         session = _run_in_thread(_get_context_session, room_name)
@@ -72,6 +76,9 @@ def interview_next_question(request: HttpRequest, room_name: str):
     """
     if request.method not in ("POST", "GET"):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
+    auth_error = verify_interview_agent_request(request)
+    if auth_error is not None:
+        return auth_error
 
     advance = True
     if request.method == "GET":
@@ -108,6 +115,9 @@ def interview_status(request: HttpRequest, room_name: str):
     """
     if request.method not in ("PATCH", "POST"):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
+    auth_error = verify_interview_agent_request(request)
+    if auth_error is not None:
+        return auth_error
 
     try:
         payload = json.loads(request.body.decode("utf-8") or "{}")
@@ -138,6 +148,9 @@ def interview_append_transcription(request: HttpRequest, room_name: str):
     """
     if request.method not in ("POST",):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
+    auth_error = verify_interview_agent_request(request)
+    if auth_error is not None:
+        return auth_error
 
     try:
         payload = json.loads(request.body.decode("utf-8") or "{}")

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
@@ -97,7 +97,7 @@ const EntryPointCard = ({
   description,
   benefits,
   ctaLabel,
-  onClick,
+  href,
   accent,
 }: {
   icon: React.ReactNode;
@@ -105,7 +105,7 @@ const EntryPointCard = ({
   description: string;
   benefits: string[];
   ctaLabel: string;
-  onClick: () => void;
+  href: string;
   accent: string;
 }) => {
   return (
@@ -169,9 +169,11 @@ const EntryPointCard = ({
           </Stack>
 
           <Button
+            component={Link}
+            href={href}
+            prefetch
             variant="contained"
             endIcon={<ArrowForwardIcon />}
-            onClick={onClick}
             sx={{
               width: { xs: '100%', sm: 'fit-content' },
               justifyContent: 'center',
@@ -194,7 +196,8 @@ const EntryPointCard = ({
 
 export default function HomePage() {
   const { t, i18n } = useTranslation('public');
-  const { push } = useRouter();
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
+  const employerIntroHref = localizeRoutePath(`/${ROUTES.EMPLOYER.INTRODUCE}`, i18n.language);
 
   useSEO({
     title: t('seo.home.title'),
@@ -278,7 +281,7 @@ export default function HomePage() {
                 t('home.candidateBenefit3', 'Gợi ý phù hợp'),
               ]}
               ctaLabel={t('home.candidateCta', 'Khám phá việc làm')}
-              onClick={() => push(localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language))}
+              href={jobsHref}
               accent="#1e6bb8"
             />
           </Grid>
@@ -296,7 +299,7 @@ export default function HomePage() {
                 t('home.employerBenefit3', 'Phỏng vấn hiệu quả'),
               ]}
               ctaLabel={t('home.employerCta', 'Xem giải pháp')}
-              onClick={() => push(`/${ROUTES.EMPLOYER.INTRODUCE}`)}
+              href={employerIntroHref}
               accent="#2aa9e1"
             />
           </Grid>
@@ -334,12 +337,14 @@ export default function HomePage() {
                 </Typography>
               </Box>
               <Button
+                component={Link}
+                href={jobsHref}
+                prefetch
                 variant="contained"
                 color="primary"
                 size="large"
                 startIcon={<SearchIcon />}
                 endIcon={<ArrowForwardIcon />}
-                onClick={() => push(localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language))}
                 sx={{
                   bgcolor: 'white',
                   color: 'primary.main',

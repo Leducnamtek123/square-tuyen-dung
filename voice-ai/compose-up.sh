@@ -28,6 +28,12 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
   export OLLAMA_CTX_SIZE="${OLLAMA_CTX_SIZE:-16384}"
 fi
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+env_args=()
+if [[ -f "$script_dir/../.env" ]]; then
+  env_args=(--env-file "$script_dir/../.env")
+fi
+
 compose_files=(-f docker-compose.yml)
 if [[ "$mode" == "gpu" ]]; then
   compose_files+=(-f docker-compose.gpu.yml)
@@ -35,5 +41,5 @@ elif [[ "$(uname -s)" == "Darwin" && "$(uname -m)" == "arm64" ]]; then
   compose_files+=(-f docker-compose.macos.yml)
 fi
 
-echo "Running: docker compose ${compose_files[*]} up $*"
-docker compose "${compose_files[@]}" up "$@"
+echo "Running: docker compose ${env_args[*]} ${compose_files[*]} up $*"
+docker compose "${env_args[@]}" "${compose_files[@]}" up "$@"

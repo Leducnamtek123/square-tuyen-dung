@@ -3,6 +3,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AxiosError } from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
@@ -25,6 +26,20 @@ export type AIAnalysisData = {
   aiAnalysisPros?: string | string[];
   aiAnalysisCons?: string | string[];
   aiAnalysisScore?: number;
+  aiAnalysisEffectiveScore?: number;
+  aiAnalysisCriteria?: Array<Record<string, unknown>>;
+  aiAnalysisEvidence?: {
+    criteria_results?: Array<Record<string, unknown>>;
+    evidence?: Array<Record<string, unknown>>;
+  } | Array<Record<string, unknown>>;
+  aiAnalysisModel?: string;
+  aiAnalysisSource?: string;
+  aiAnalysisPromptVersion?: string;
+  aiAnalysisReviewStatus?: 'ai_only' | 'reviewed' | 'overridden' | string;
+  aiAnalysisHrOverrideScore?: number | null;
+  aiAnalysisHrOverrideNote?: string | null;
+  aiAnalysisReviewedAt?: string | null;
+  aiAnalysisReviewedBy?: { id?: number; fullName?: string; email?: string } | null;
 };
 
 type ActivityRawFields = JobPostActivity & {
@@ -35,6 +50,8 @@ type ActivityRawFields = JobPostActivity & {
   aiAnalysisSkills?: string | string[];
   aiAnalysisPros?: string | string[];
   aiAnalysisCons?: string | string[];
+  aiAnalysisCriteria?: Array<Record<string, unknown>>;
+  aiAnalysisEvidence?: AIAnalysisData['aiAnalysisEvidence'];
 };
 
 interface AIAnalysisDrawerProps {
@@ -114,6 +131,17 @@ const toAIAnalysisData = (activity: JobPostActivity): AIAnalysisData => {
     aiAnalysisPros: toStringOrStringArray(raw.aiAnalysisPros),
     aiAnalysisCons: toStringOrStringArray(raw.aiAnalysisCons),
     aiAnalysisScore: typeof aiAnalysisScoreRaw === 'number' ? aiAnalysisScoreRaw : undefined,
+    aiAnalysisEffectiveScore: typeof activity.aiAnalysisEffectiveScore === 'number' ? activity.aiAnalysisEffectiveScore : undefined,
+    aiAnalysisCriteria: Array.isArray(raw.aiAnalysisCriteria) ? raw.aiAnalysisCriteria : undefined,
+    aiAnalysisEvidence: raw.aiAnalysisEvidence,
+    aiAnalysisModel: activity.aiAnalysisModel,
+    aiAnalysisSource: activity.aiAnalysisSource,
+    aiAnalysisPromptVersion: activity.aiAnalysisPromptVersion,
+    aiAnalysisReviewStatus: activity.aiAnalysisReviewStatus,
+    aiAnalysisHrOverrideScore: activity.aiAnalysisHrOverrideScore,
+    aiAnalysisHrOverrideNote: activity.aiAnalysisHrOverrideNote,
+    aiAnalysisReviewedAt: activity.aiAnalysisReviewedAt,
+    aiAnalysisReviewedBy: activity.aiAnalysisReviewedBy,
   };
 };
 
@@ -171,6 +199,7 @@ function reducer(state: AIAnalysisDrawerState, action: AIAnalysisDrawerAction): 
 
 const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisStateChange }: AIAnalysisDrawerProps) => {
   const { t } = useTranslation('employer');
+  const queryClient = useQueryClient();
   const [state, dispatch] = React.useReducer(reducer, {
     ...initialState,
     data: initialData || null,
@@ -277,6 +306,26 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
     }
   };
 
+  const handleSaveReview = async (payload: { overrideScore?: number | string | null; note?: string; reviewStatus?: string }) => {
+    if (!activityId) return;
+    const res = await jobPostActivityService.reviewAIAnalysis(activityId, payload);
+    const nextData = toAIAnalysisData(res);
+    dispatch({
+      type: 'set-data',
+      value: {
+        ...(state.data || {}),
+        ...nextData,
+        fullName: nextData.fullName ?? state.data?.fullName,
+        jobName: nextData.jobName ?? state.data?.jobName,
+        resumeFileUrl: nextData.resumeFileUrl ?? state.data?.resumeFileUrl,
+        onlineProfileUrl: nextData.onlineProfileUrl ?? state.data?.onlineProfileUrl,
+        resumeType: nextData.resumeType ?? state.data?.resumeType,
+      },
+    });
+    queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
+    toastMessages.success(t('appliedResume.ai.reviewSaved', { defaultValue: 'AI review saved.' }));
+  };
+
   const status = state.data?.aiAnalysisStatus;
   const isCompleted = status === 'completed';
   const isProcessing = status === 'processing';
@@ -319,6 +368,7 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
       }}
       stats={stats}
       onAnalyze={handleAnalyze}
+      onSaveReview={handleSaveReview}
       t={t}
     />
   );

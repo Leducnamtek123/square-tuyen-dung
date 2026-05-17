@@ -9,7 +9,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            validate_required_settings(vars(settings))
+            validate_required_settings(settings)
         except Exception as exc:
             raise CommandError(str(exc)) from exc
 

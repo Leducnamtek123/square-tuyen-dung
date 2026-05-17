@@ -1,7 +1,6 @@
  'use client';
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Grid2 as Grid, Stack, Typography } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
@@ -24,6 +23,7 @@ type CategorySectionProps = {
   title: string;
   items: Option[];
   viewAllHref: string;
+  selectHref: string;
   viewAllLabel: string;
   hoverColor?: string;
   onSelect: (id: string | number) => void;
@@ -33,6 +33,7 @@ const CategorySection = ({
   title,
   items,
   viewAllHref,
+  selectHref,
   viewAllLabel,
   hoverColor = 'primary.main',
   onSelect,
@@ -54,9 +55,14 @@ const CategorySection = ({
       {items.slice(0, maxItem).map((item) => (
         <Typography
           key={item.id}
+          component={Link}
+          href={selectHref}
+          prefetch
           onClick={() => onSelect(item.id)}
           sx={{
             cursor: 'pointer',
+            color: 'inherit',
+            textDecoration: 'none',
             py: 0.5,
             px: 1.5,
             borderRadius: 1,
@@ -102,8 +108,8 @@ const JobByCategory = () => {
   const { t } = useTranslation('public');
   const { allConfig } = useConfig();
   const dispatch = useAppDispatch();
-  const { push } = useRouter();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
+  const jobsHref = `/${ROUTES.JOB_SEEKER.JOBS}`;
 
   const careerOptions = (allConfig?.careerOptions || []) as Option[];
   const cityOptions = (allConfig?.cityOptions || []) as Option[];
@@ -121,8 +127,6 @@ const JobByCategory = () => {
         dispatch(searchJobPost({ ...jobPostFilter, jobTypeId: String(id) }));
         break;
     }
-
-    push(`/${ROUTES.JOB_SEEKER.JOBS}`);
   };
 
   return (
@@ -132,6 +136,7 @@ const JobByCategory = () => {
           title={t('jobByCategory.jobsByCareer')}
           items={careerOptions}
           viewAllHref={`/${ROUTES.JOB_SEEKER.JOBS_BY_CAREER}`}
+          selectHref={jobsHref}
           viewAllLabel={t('jobByCategory.viewAllCareers')}
           hoverColor="primary.main"
           onSelect={(id) => handleFilter(id, 'CARRER')}
@@ -143,6 +148,7 @@ const JobByCategory = () => {
           title={t('jobByCategory.jobsByCity')}
           items={cityOptions}
           viewAllHref={`/${ROUTES.JOB_SEEKER.JOBS_BY_CITY}`}
+          selectHref={jobsHref}
           viewAllLabel={t('jobByCategory.viewAllCities')}
           hoverColor="primary.main"
           onSelect={(id) => handleFilter(id, 'CITY')}
@@ -154,6 +160,7 @@ const JobByCategory = () => {
           title={t('jobByCategory.jobsByJobType')}
           items={jobTypeOptions}
           viewAllHref={`/${ROUTES.JOB_SEEKER.JOBS_BY_TYPE}`}
+          selectHref={jobsHref}
           viewAllLabel={t('jobByCategory.viewAllJobTypes')}
           hoverColor="primary.main"
           onSelect={(id) => handleFilter(id, 'JOB_TYPE')}

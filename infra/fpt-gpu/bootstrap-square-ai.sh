@@ -28,6 +28,7 @@ APT_PACKAGES=(
   libgomp1
   libsndfile1
   build-essential
+  openssh-server
   supervisor
 )
 
@@ -41,6 +42,14 @@ done
 if [ "${#missing_packages[@]}" -gt 0 ]; then
   apt-get update
   apt-get install -y --no-install-recommends "${missing_packages[@]}"
+fi
+
+if [ -x /usr/sbin/sshd ]; then
+  mkdir -p /run/sshd
+  ssh-keygen -A >/dev/null 2>&1 || true
+  if ! pgrep -x sshd >/dev/null 2>&1; then
+    /usr/sbin/sshd || service ssh start || true
+  fi
 fi
 
 if ! command -v uv >/dev/null 2>&1; then
@@ -162,7 +171,8 @@ install_if_missing "$VENV_ROOT/llm/bin/python" "vllm" \
   "transformers>=4.55.0,<5.0"
 
 ensure_venv "$VENV_ROOT/whisper"
-install_if_missing "$VENV_ROOT/whisper/bin/python" "setuptools" "pip" "setuptools<82.0" wheel
+uv pip install --python "$VENV_ROOT/whisper/bin/python" --no-cache \
+  --force-reinstall pip "setuptools<82.0" wheel
 if ! "$VENV_ROOT/whisper/bin/python" -c "import vox_box" >/dev/null 2>&1; then
   uv pip install --python "$VENV_ROOT/whisper/bin/python" --no-cache --no-build-isolation vox-box
 fi
@@ -170,6 +180,8 @@ fi
 ensure_venv "$VENV_ROOT/tts"
 install_if_missing "$VENV_ROOT/tts/bin/python" "torch" \
   "torch==2.5.1" "torchaudio==2.5.1" --index-url https://download.pytorch.org/whl/cu124
+uv pip install --python "$VENV_ROOT/tts/bin/python" --no-cache \
+  --force-reinstall pip "setuptools<82.0" wheel
 install_if_missing "$VENV_ROOT/tts/bin/python" "vieneu" \
   "accelerate>=0.30.0" \
   "vieneu[gpu]==1.2.6" \
@@ -184,7 +196,9 @@ install_if_missing "$VENV_ROOT/tts/bin/python" "vieneu" \
 cat > "$INSTALL_ROOT/start_llm.sh" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+set -a
 source /models/square-ai/square-ai.env
+set +a
 
 args=(
   "serve" "$LLM_MODEL"
@@ -221,7 +235,9 @@ EOF
 cat > "$INSTALL_ROOT/start_whisper.sh" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+set -a
 source /models/square-ai/square-ai.env
+set +a
 sleep "${STT_STARTUP_DELAY_SECONDS:-30}"
 exec /models/venvs/whisper/bin/vox-box start \
   --host 0.0.0.0 \
@@ -234,7 +250,9 @@ EOF
 cat > "$INSTALL_ROOT/start_tts.sh" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+set -a
 source /models/square-ai/square-ai.env
+set +a
 sleep "${TTS_STARTUP_DELAY_SECONDS:-60}"
 export PORT=8298
 exec /models/venvs/tts/bin/python /models/square-ai/tts_api.py

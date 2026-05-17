@@ -100,7 +100,12 @@ class JobPost(CommonBaseModel):
 
     peoples_saved = models.ManyToManyField(User, through='SavedJobPost', related_name="saved_job_posts")
 
-    peoples_applied = models.ManyToManyField(User, through='JobPostActivity', related_name="job_posts_activity")
+    peoples_applied = models.ManyToManyField(
+        User,
+        through='JobPostActivity',
+        through_fields=('job_post', 'user'),
+        related_name="job_posts_activity",
+    )
 
     interview_template = models.ForeignKey('interview.QuestionGroup', on_delete=models.SET_NULL, null=True, blank=True, related_name='linked_job_posts')
 
@@ -184,6 +189,42 @@ class JobPostActivity(CommonBaseModel):
     ai_analysis_matching_skills = models.JSONField(null=True, blank=True)
 
     ai_analysis_missing_skills = models.JSONField(null=True, blank=True)
+
+    ai_analysis_criteria = models.JSONField(null=True, blank=True)
+
+    ai_analysis_evidence = models.JSONField(null=True, blank=True)
+
+    ai_analysis_model = models.CharField(max_length=120, blank=True, default="")
+
+    ai_analysis_source = models.CharField(max_length=60, blank=True, default="")
+
+    ai_analysis_prompt_version = models.CharField(max_length=40, blank=True, default="")
+
+    ai_analysis_prompt_hash = models.CharField(max_length=64, blank=True, default="")
+
+    ai_analysis_review_status = models.CharField(max_length=20, choices=[
+
+        ('ai_only', 'AI only'),
+
+        ('reviewed', 'Reviewed'),
+
+        ('overridden', 'Overridden')
+
+    ], default='ai_only')
+
+    ai_analysis_hr_override_score = models.IntegerField(null=True, blank=True)
+
+    ai_analysis_hr_override_note = models.TextField(blank=True, default="")
+
+    ai_analysis_reviewed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reviewed_ai_resume_analyses",
+    )
+
+    ai_analysis_reviewed_at = models.DateTimeField(null=True, blank=True)
 
     ai_analysis_status = models.CharField(max_length=20, choices=[
 

@@ -80,6 +80,7 @@
   "next": "Next",
   "actionsLabel": "Actions",
   "actions": {
+    "title": "Actions",
     "start": "Start",
     "close": "Close",
     "submit": "Submit",
@@ -294,6 +295,7 @@
   },
   "messages": {
     "loadingPdf": "Loading PDF...",
+    "saveSuccess": "Saved successfully.",
     "loadFailed": "Unable to load data. Please try again.",
     "actionFailed": "Unable to perform this action right now. Please try again."
   },
@@ -852,7 +854,13 @@
   },
   "notification": {
     "markAllRead": "Mark all as read",
-    "empty": "No new notifications"
+    "empty": "No new notifications",
+    "loadMore": "Load more",
+    "new": "New",
+    "openMenu": "Open notifications",
+    "read": "Read",
+    "unreadCount": "{{count}} unread",
+    "viewAll": "View all"
   },
   "jobPost": {
     "urgentHiring": "Urgent Hiring",

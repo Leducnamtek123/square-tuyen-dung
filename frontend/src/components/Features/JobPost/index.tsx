@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import dayjs from 'dayjs';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useTheme } from '@mui/material/styles';
 import { Box, Card, Divider, Skeleton, Stack, Tooltip, Typography } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -44,9 +44,11 @@ const MetaItem = ({
   icon: React.ReactNode;
   children: React.ReactNode;
 }) => (
-  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: 'text.secondary' }}>
-    {icon}
-    <Typography sx={{ fontWeight: 500, fontSize: 13 }} variant="body2">
+  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: 'text.secondary', minWidth: 0 }}>
+    <Box component="span" sx={{ display: 'inline-flex', flexShrink: 0 }}>
+      {icon}
+    </Box>
+    <Typography sx={{ fontWeight: 500, fontSize: 13, minWidth: 0 }} variant="body2">
       {children}
     </Typography>
   </Box>
@@ -64,33 +66,29 @@ const JobPost = ({
   salaryMin,
   salaryMax,
 }: JobPostProps) => {
-  const { push } = useRouter();
   const theme = useTheme();
   const { allConfig } = useConfig();
   const { t, i18n } = useTranslation('public');
 
-  const goToDetail = () => {
-    push(localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language));
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      goToDetail();
-    }
-  };
+  const detailHref = localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language);
 
   return (
     <Card
+      component={Link}
+      href={detailHref}
+      prefetch
       variant="outlined"
-      onClick={goToDetail}
-      onKeyDown={handleKeyDown}
-      role="link"
-      tabIndex={0}
       aria-label={jobName || 'Job detail'}
       sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        height: '100%',
+        minHeight: 150,
         boxShadow: 0,
         cursor: 'pointer',
+        color: 'inherit',
+        textDecoration: 'none',
         px: 2,
         pt: 2,
         pb: 1,
@@ -99,6 +97,7 @@ const JobPost = ({
         border: `1px solid ${theme.palette.divider}`,
         position: 'relative',
         overflow: 'hidden',
+        backgroundColor: theme.palette.background.paper,
         ...(isUrgent && {
           borderLeft: 'none',
           backgroundColor: theme.palette.secondary.background,
@@ -222,7 +221,7 @@ const JobPost = ({
         </Stack>
       </Stack>
 
-      <Stack direction="row" spacing={2} sx={{ mt: 2, flexWrap: 'wrap', gap: 1 }} justifyContent="flex-start">
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', columnGap: 2, rowGap: 1, mt: 2 }}>
         <MetaItem icon={<FontAwesomeIcon icon={faCircleDollarToSlot} color={theme.palette.primary.main} />}>
           {salaryString(salaryMin, salaryMax)}
         </MetaItem>
@@ -232,9 +231,9 @@ const JobPost = ({
         <MetaItem icon={<FontAwesomeIcon icon={faCalendarDays} color={theme.palette.primary.main} />}>
           {dayjs(deadline).format('DD/MM/YYYY')}
         </MetaItem>
-      </Stack>
+      </Box>
 
-      <Divider sx={{ mt: 1, mb: 0.75, borderColor: theme.palette.grey[400] }} />
+      <Divider sx={{ mt: 'auto', mb: 0.75, pt: 1, borderColor: theme.palette.grey[400] }} />
 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <MetaItem icon={<FontAwesomeIcon icon={faClock} style={{ fontSize: 14 }} color={theme.palette.grey[400]} />}>

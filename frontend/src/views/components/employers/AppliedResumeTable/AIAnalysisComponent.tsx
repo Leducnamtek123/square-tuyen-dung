@@ -25,7 +25,7 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
   };
 
   if (isCompleted) {
-    const score = (row.aiAnalysisScore as number) || 0;
+    const score = (row.aiAnalysisEffectiveScore ?? row.aiAnalysisScore ?? 0) as number;
     const color = getScoreColor(score);
     return (
       <Tooltip

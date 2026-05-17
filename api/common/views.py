@@ -5,10 +5,16 @@ from shared.configs import variable_system as var_sys
 from shared.helpers import utils, helper
 
 from shared.configs import variable_response as var_res
+from shared.audit import AuditLogViewSetMixin, record_audit_log
 
 from django.db.models import Count, Q
+from django.http import HttpResponse
+from django.utils import timezone
+from django.utils.dateparse import parse_date, parse_datetime
+import csv
+import json
 
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
@@ -26,9 +32,10 @@ from urllib.parse import urlparse
 
 from django.core.cache import cache as django_cache
 from apps.locations.models import City, District, Ward
-from .models import Career
+from .models import AuditLog, Career
 
 from .serializers import (
+    AuditLogSerializer,
 
     CareerSerializer,
 
@@ -46,6 +53,7 @@ from apps.accounts import permissions as perms_custom
 from shared.helpers.cloudinary_service import CloudinaryService
 
 from rest_framework import viewsets
+from rest_framework.filters import OrderingFilter, SearchFilter
 
 
 def _admin_search_order_queryset(queryset, request, search_fields, ordering_map):
@@ -66,7 +74,7 @@ def _admin_search_order_queryset(queryset, request, search_fields, ordering_map)
 
     return queryset
 
-class AdminCareerViewSet(viewsets.ModelViewSet):
+class AdminCareerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
     queryset = Career.objects.all().order_by('id')
 
@@ -105,7 +113,7 @@ class AdminCareerViewSet(viewsets.ModelViewSet):
 
         return super().get_serializer(*args, **kwargs)
 
-class AdminCityViewSet(viewsets.ModelViewSet):
+class AdminCityViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
     queryset = City.objects.all().order_by('id')
 
@@ -130,7 +138,7 @@ class AdminCityViewSet(viewsets.ModelViewSet):
             },
         )
 
-class AdminDistrictViewSet(viewsets.ModelViewSet):
+class AdminDistrictViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
     queryset = District.objects.select_related('city').all().order_by('id')
 
@@ -162,7 +170,7 @@ class AdminDistrictViewSet(viewsets.ModelViewSet):
             },
         )
 
-class AdminWardViewSet(viewsets.ModelViewSet):
+class AdminWardViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
     queryset = Ward.objects.select_related('district').all().order_by('id')
 
@@ -193,6 +201,119 @@ class AdminWardViewSet(viewsets.ModelViewSet):
                 "updateAt": "update_at",
             },
         )
+
+
+class AdminAuditLogViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = AuditLog.objects.select_related("actor").all().order_by("-create_at")
+    serializer_class = AuditLogSerializer
+    permission_classes = [perms_custom.IsAdminUser]
+    pagination_class = paginations.CustomPagination
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ["actor_email", "action", "resource_type", "resource_id", "resource_repr", "request_path"]
+    ordering_fields = ["create_at", "action", "resource_type"]
+
+    def _parse_boundary_datetime(self, value, *, end_of_day=False):
+        if not value:
+            return None
+
+        raw_value = str(value).strip()
+        parsed_date = parse_date(raw_value)
+        if parsed_date is not None and "T" not in raw_value and " " not in raw_value:
+            boundary_time = timezone.datetime.max.time() if end_of_day else timezone.datetime.min.time()
+            parsed = timezone.datetime.combine(parsed_date, boundary_time)
+        else:
+            parsed = parse_datetime(raw_value)
+        if parsed is None:
+            parsed_date = parse_date(raw_value)
+            if parsed_date is None:
+                return None
+            boundary_time = timezone.datetime.max.time() if end_of_day else timezone.datetime.min.time()
+            parsed = timezone.datetime.combine(parsed_date, boundary_time)
+
+        if timezone.is_naive(parsed):
+            parsed = timezone.make_aware(parsed, timezone.get_current_timezone())
+        return parsed
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        action = self.request.query_params.get("action")
+        resource_type = self.request.query_params.get("resourceType") or self.request.query_params.get("resource_type")
+        resource_id = self.request.query_params.get("resourceId") or self.request.query_params.get("resource_id")
+        actor_id = self.request.query_params.get("actor")
+        actor_email = self.request.query_params.get("actorEmail") or self.request.query_params.get("actor_email")
+        date_from = self._parse_boundary_datetime(
+            self.request.query_params.get("dateFrom") or self.request.query_params.get("date_from"),
+        )
+        date_to = self._parse_boundary_datetime(
+            self.request.query_params.get("dateTo") or self.request.query_params.get("date_to"),
+            end_of_day=True,
+        )
+
+        if action:
+            queryset = queryset.filter(action=action)
+        if resource_type:
+            queryset = queryset.filter(resource_type__icontains=resource_type)
+        if resource_id:
+            queryset = queryset.filter(resource_id=str(resource_id))
+        if actor_id:
+            queryset = queryset.filter(actor_id=actor_id)
+        if actor_email:
+            queryset = queryset.filter(actor_email__icontains=actor_email)
+        if date_from:
+            queryset = queryset.filter(create_at__gte=date_from)
+        if date_to:
+            queryset = queryset.filter(create_at__lte=date_to)
+        return queryset
+
+    @action(detail=False, methods=["get"], url_path="export")
+    def export(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        max_rows = 20000
+        total_count = queryset.count()
+
+        response = HttpResponse(content_type="text/csv; charset=utf-8")
+        response["Content-Disposition"] = 'attachment; filename="audit-logs.csv"'
+        response.write("\ufeff")
+
+        writer = csv.writer(response)
+        writer.writerow([
+            "id",
+            "created_at",
+            "action",
+            "actor_email",
+            "resource_type",
+            "resource_id",
+            "resource_repr",
+            "request_method",
+            "request_path",
+            "ip_address",
+            "metadata",
+        ])
+
+        rows_written = 0
+        for log in queryset[:max_rows]:
+            rows_written += 1
+            writer.writerow([
+                log.id,
+                timezone.localtime(log.create_at).isoformat() if log.create_at else "",
+                log.action,
+                log.actor_email,
+                log.resource_type,
+                log.resource_id,
+                log.resource_repr,
+                log.request_method,
+                log.request_path,
+                log.ip_address or "",
+                json.dumps(log.metadata or {}, ensure_ascii=False),
+            ])
+
+        record_audit_log(
+            request=request,
+            action=AuditLog.ACTION_EXPORT,
+            resource_type="common.AuditLog",
+            metadata={"rows": rows_written, "truncated": total_count > max_rows},
+        )
+        return response
 
 def _run_blocking(func, timeout: int = 5):
     # Keep ORM/cache work out of the ASGI event loop.

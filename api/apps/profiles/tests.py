@@ -10,7 +10,7 @@ from apps.profiles.models import (
     Resume, Company, CompanyFollowed,
     JobSeekerProfile, ResumeViewed, ResumeSaved,
     EducationDetail, ExperienceDetail,
-    CompanyVerification, TrustReport
+    CompanyVerification, TrustReport, CompanyRole, CompanyMember
 )
 from apps.profiles.services import ResumeService, CompanyService
 
@@ -233,6 +233,33 @@ class TestCompanyVerificationAPI:
         assert verification.status == CompanyVerification.STATUS_APPROVED
         assert verification.admin_note == "Approved"
         assert company.is_verified is True
+
+
+@pytest.mark.django_db
+class TestAdminCompanyAPI:
+    def test_admin_can_delete_company_with_members_and_roles(self, admin_user, employer_user, company):
+        role = CompanyRole.objects.create(
+            company=company,
+            code="owner",
+            name="Owner",
+            is_system=True,
+        )
+        CompanyMember.objects.create(
+            company=company,
+            user=employer_user,
+            role=role,
+            status=CompanyMember.STATUS_ACTIVE,
+        )
+        client = APIClient()
+        client.force_authenticate(user=admin_user)
+
+        response = client.delete(f"/api/v1/info/web/admin/companies/{company.id}/")
+
+        assert response.status_code == 204
+        assert not Company.objects.filter(id=company.id).exists()
+        assert not CompanyRole.objects.filter(id=role.id).exists()
+        assert not CompanyMember.objects.filter(company_id=company.id).exists()
+        assert employer_user.__class__.objects.filter(id=employer_user.id).exists()
 
 
 @pytest.mark.django_db
