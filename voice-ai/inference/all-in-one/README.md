@@ -49,8 +49,10 @@ VOXBOX_DEVICE=cuda
 DATA_DIR=/models/whisper
 
 TTS_DEVICE=cuda
-TTS_MODE=standard
-TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS-0.3B
+TTS_CODEC_DEVICE=cuda
+TTS_MODE=fast
+TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS
+TTS_GGUF_FILENAME=
 TTS_GPU_MEM_FRACTION=0.15
 HF_HOME=/models/huggingface
 ```
@@ -73,5 +75,5 @@ AI_STT_MODEL=Systran/faster-whisper-large-v3
 AI_STT_LANGUAGE=vi
 
 AI_TTS_BASE_URL=https://<fpt-tts-endpoint>/v1
-AI_TTS_DEFAULT_VOICE=Bình (nam miền Bắc)
+AI_TTS_DEFAULT_VOICE=Ly
 ```

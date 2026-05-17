@@ -4,10 +4,37 @@ import { useTranslation } from 'react-i18next';
 import { setupRecaptcha, signInWithPhone, verifyCode } from '../../../../services/firebaseService';
 import PhoneIcon from '@mui/icons-material/Phone';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import type { ConfirmationResult } from 'firebase/auth';
+import type { ConfirmationResult, RecaptchaVerifier } from 'firebase/auth';
 import type { CountryCode } from 'libphonenumber-js';
 import CountryPhoneInput from './CountryPhoneInput';
 import { DEFAULT_PHONE_COUNTRY, toE164PhoneNumber } from './phoneNumberUtils';
+
+const RECAPTCHA_CONTAINER_ID = 'recaptcha-container';
+
+const getFirebaseAuthErrorMessage = (
+  error: unknown,
+  t: ReturnType<typeof useTranslation<'auth'>>['t']
+): string => {
+  const firebaseError = error as { code?: string; message?: string };
+
+  switch (firebaseError.code) {
+    case 'auth/operation-not-allowed':
+      return t('login.phoneProviderDisabled', {
+        defaultValue:
+          'Phone sign-in is not enabled for this Firebase project, or SMS is blocked by the Firebase SMS region policy.',
+      });
+    case 'auth/too-many-requests':
+      return t('login.phoneTooManyRequests', {
+        defaultValue: 'Too many OTP requests. Please try again later.',
+      });
+    case 'auth/unauthorized-domain':
+      return t('login.unauthorizedDomain', {
+        defaultValue: 'This domain is not authorized for Firebase Authentication.',
+      });
+    default:
+      return firebaseError.message || t('login.phoneSendFailed');
+  }
+};
 
 const StyledButton = styled(Button)(({ theme }) => ({
   padding: '12px 16px',
@@ -82,10 +109,18 @@ interface PhoneOTPLoginFormProps {
 const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
   const { t } = useTranslation('auth');
   const [state, dispatch] = React.useReducer(reducer, initialState);
+  const recaptchaVerifierRef = React.useRef<RecaptchaVerifier | null>(null);
   const normalizedPhoneNumber = React.useMemo(
     () => toE164PhoneNumber(state.phoneNumber, state.countryCode),
     [state.countryCode, state.phoneNumber]
   );
+
+  const resetRecaptcha = React.useCallback(() => {
+    recaptchaVerifierRef.current?.clear();
+    recaptchaVerifierRef.current = null;
+  }, []);
+
+  React.useEffect(() => resetRecaptcha, [resetRecaptcha]);
 
   React.useEffect(() => {
     if (state.resendTimer <= 0) {
@@ -110,13 +145,16 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
 
     try {
       dispatch({ type: 'set-error', value: null });
-      const appVerifier = setupRecaptcha('recaptcha-container');
+      resetRecaptcha();
+      const appVerifier = setupRecaptcha(RECAPTCHA_CONTAINER_ID);
+      recaptchaVerifierRef.current = appVerifier;
       const result = await signInWithPhone(normalizedPhoneNumber, appVerifier);
       dispatch({ type: 'set-confirmation-result', value: result });
       dispatch({ type: 'set-resend-timer', value: 60 });
     } catch (err: unknown) {
       console.error(err);
-      dispatch({ type: 'set-error', value: (err as Error).message || t('login.phoneSendFailed') });
+      resetRecaptcha();
+      dispatch({ type: 'set-error', value: getFirebaseAuthErrorMessage(err, t) });
     }
   };
 
@@ -162,7 +200,7 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
           >
             {t('actions.sendOTP')}
           </StyledButton>
-          <Box id="recaptcha-container" sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}></Box>
+          <Box id={RECAPTCHA_CONTAINER_ID} sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}></Box>
         </Stack>
       ) : (
         <Stack spacing={2}>

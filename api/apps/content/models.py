@@ -58,6 +58,14 @@ class Feedback(ProjectBaseModel):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="feedbacks")
 
+    evidence_image = models.ForeignKey(
+        File,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="feedback_evidence_images",
+    )
+
     class Meta:
 
         db_table = "project_project_feedback"

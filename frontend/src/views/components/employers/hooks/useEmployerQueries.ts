@@ -5,12 +5,13 @@ import resumeService from '../../../../services/resumeService';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 import jobService from '../../../../services/jobService';
 import interviewService from '../../../../services/interviewService';
+import voiceProfileService from '../../../../services/voiceProfileService';
 import questionService from '../../../../services/questionService';
 import questionGroupService from '../../../../services/questionGroupService';
 import companyService from '../../../../services/companyService';
 import companyImageService from '../../../../services/companyImageService';
 import { PaginatedResponse } from '@/types/api';
-import { JobPost, JobPostActivity, Resume, ResumeSaved, InterviewSession, Question, QuestionGroup, CompanyImage } from '@/types/models';
+import { JobPost, JobPostActivity, Resume, ResumeSaved, InterviewSession, Question, QuestionGroup, CompanyImage, VoiceProfile } from '@/types/models';
 import type { ScheduleSessionInput } from '../../../../services/interviewService';
 import type { EmployerCandidateStats } from '../../../../services/statisticService';
 import type { JobPostInput } from '../../../../services/jobService';
@@ -42,6 +43,7 @@ type UseEmployerResumesResult = UseQueryResult<PaginatedResponse<Resume>>;
 type UseEmployerJobPostsResult = UseQueryResult<PaginatedResponse<JobPost>>;
 type UseInterviewSessionsResult = UseQueryResult<PaginatedResponse<InterviewSession>>;
 type UseInterviewDetailResult = UseQueryResult<InterviewSession>;
+type UseVoiceProfilesResult = UseQueryResult<PaginatedResponse<VoiceProfile>>;
 type UseEmployerQuestionsResult = UseQueryResult<PaginatedResponse<Question>>;
 type UseQuestionGroupsResult = UseQueryResult<PaginatedResponse<QuestionGroup>>;
 
@@ -314,6 +316,13 @@ export const useInterviewDetail = (id: string | number): UseInterviewDetailResul
   });
 };
 
+export const useEmployerVoiceProfiles = (): UseVoiceProfilesResult => {
+  return useQuery({
+    queryKey: ['employerVoiceProfiles'],
+    queryFn: () => voiceProfileService.getVoiceProfiles({ page: 1, pageSize: 200 }),
+  });
+};
+
 export const useInterviewMutations = () => {
   const queryClient = useQueryClient();
 
@@ -515,4 +524,3 @@ export const useCompanyImageMutations = () => {
     isMutating: addMutation.isPending || deleteMutation.isPending,
   };
 };
-

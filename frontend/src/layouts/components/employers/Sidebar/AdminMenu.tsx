@@ -7,6 +7,7 @@ import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
+import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
 import { ROUTES, LINKS } from '@/configs/constants';
 import MenuItem from './MenuItem';
 
@@ -83,6 +84,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
           <MenuItem text={t('admin:sidebar.trustReports')} to={`/${ROUTES.ADMIN.TRUST_REPORTS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.TRUST_REPORTS}` }} />
           <MenuItem text={t('admin:sidebar.activityLogs')} to={`/${ROUTES.ADMIN.JOB_ACTIVITY}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.JOB_ACTIVITY}` }} />
           <MenuItem text={t('admin:sidebar.interviewSchedule')} to={`/${ROUTES.ADMIN.INTERVIEWS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.INTERVIEWS}` }} />
+          <MenuItem icon={RecordVoiceOverOutlinedIcon} text="AI Voice Profiles" to={`/${ROUTES.ADMIN.VOICE_PROFILES}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.VOICE_PROFILES}` }} />
           <MenuItem text={t('admin:sidebar.jobNotifications')} to={`/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.JOB_NOTIFICATIONS}` }} />
           <MenuItem icon={VideoLibraryIcon} text="Interview UI Preview" to="/admin/interview-preview" kind="child" state={{ selected: location.pathname === '/admin/interview-preview' }} />
         </List>

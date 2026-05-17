@@ -5,8 +5,41 @@ Interview Module — Django Admin Registration
 from django.contrib import admin
 from .models import (
     Question, QuestionGroup,
-    InterviewSession, InterviewTranscript, InterviewEvaluation
+    InterviewSession, InterviewTranscript, InterviewEvaluation,
+    VoiceProfile, VoiceProfileSample, VoiceProfileGrant
 )
+
+
+class VoiceProfileSampleInline(admin.TabularInline):
+    model = VoiceProfileSample
+    extra = 0
+    readonly_fields = ['audio_file', 'reference_text', 'original_filename', 'create_at']
+
+
+class VoiceProfileGrantInline(admin.TabularInline):
+    model = VoiceProfileGrant
+    extra = 0
+
+
+@admin.register(VoiceProfile)
+class VoiceProfileAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'voice_type', 'status', 'language', 'consent_confirmed', 'create_at']
+    list_filter = ['voice_type', 'status', 'language', 'consent_confirmed']
+    search_fields = ['name', 'description', 'preset_voice_id']
+    inlines = [VoiceProfileSampleInline, VoiceProfileGrantInline]
+
+
+@admin.register(VoiceProfileSample)
+class VoiceProfileSampleAdmin(admin.ModelAdmin):
+    list_display = ['id', 'profile', 'original_filename', 'sort_order', 'create_at']
+    search_fields = ['profile__name', 'reference_text', 'original_filename']
+
+
+@admin.register(VoiceProfileGrant)
+class VoiceProfileGrantAdmin(admin.ModelAdmin):
+    list_display = ['id', 'profile', 'company', 'job_post', 'is_default', 'is_active', 'create_at']
+    list_filter = ['is_default', 'is_active']
+    search_fields = ['profile__name', 'company__company_name', 'job_post__job_name']
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):

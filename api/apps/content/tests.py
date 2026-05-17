@@ -1,13 +1,86 @@
 
+import base64
+
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from apps.content.models import Article
+from apps.content.models import Article, Feedback
+from shared.helpers.cloudinary_service import CloudinaryService
+
+
+ONE_PIXEL_PNG = base64.b64decode(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4//8/AAX+Av4N70a4AAAAAElFTkSuQmCC"
+)
 
 
 def _article_payload(response):
     return response.data.get("data", response.data)
+
+
+@pytest.mark.django_db
+class TestFeedbackAPI:
+    def test_create_feedback_accepts_evidence_image_and_admin_can_view_it(
+        self,
+        monkeypatch,
+        job_seeker_user,
+        admin_user,
+    ):
+        def fake_upload_image(file_obj, folder, public_id=None, options={}):
+            assert folder == "feedback-evidence"
+            assert file_obj.name == "proof.png"
+            return {
+                "public_id": "feedback-evidence/proof.webp",
+                "version": "1",
+                "format": "webp",
+                "resource_type": "image",
+                "created_at": timezone.now().isoformat(),
+                "bytes": len(ONE_PIXEL_PNG),
+            }
+
+        monkeypatch.setattr(
+            CloudinaryService,
+            "upload_image",
+            staticmethod(fake_upload_image),
+        )
+
+        client = APIClient()
+        client.force_authenticate(user=job_seeker_user)
+        image_file = SimpleUploadedFile(
+            "proof.png",
+            ONE_PIXEL_PNG,
+            content_type="image/png",
+        )
+
+        response = client.post(
+            "/api/content/web/feedbacks/",
+            {
+                "rating": 4,
+                "content": "Can admin review this issue?",
+                "evidenceImageFile": image_file,
+            },
+            format="multipart",
+        )
+
+        assert response.status_code == 201
+        payload = _article_payload(response)
+        assert payload["evidenceImageUrl"]
+
+        feedback = Feedback.objects.get(content="Can admin review this issue?")
+        assert feedback.evidence_image is not None
+        assert feedback.evidence_image.public_id == "feedback-evidence/proof.webp"
+
+        admin_client = APIClient()
+        admin_client.force_authenticate(user=admin_user)
+        admin_response = admin_client.get("/api/content/web/admin/feedbacks/")
+
+        assert admin_response.status_code == 200
+        admin_payload = _article_payload(admin_response)
+        admin_feedback = next(
+            item for item in admin_payload["results"] if item["id"] == feedback.id
+        )
+        assert admin_feedback["evidenceImageUrl"]
 
 
 @pytest.mark.django_db

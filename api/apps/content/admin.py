@@ -94,7 +94,9 @@ class FeedbackAdmin(admin.ModelAdmin):
 
     list_display = ("id", "create_at", "content",
 
-                    "rating", "is_active", "user")
+                    "rating", "is_active", "user",
+
+                    "show_evidence_image")
 
     list_display_links = ("id",)
 
@@ -114,13 +116,25 @@ class FeedbackAdmin(admin.ModelAdmin):
 
     fields = (
 
-        "content", "rating", "user", "is_active"
+        "content", "rating", "user", "is_active", "show_evidence_image"
 
     )
 
-    readonly_fields = ('user',)
+    readonly_fields = ('user', 'show_evidence_image')
 
     form = FeedbackForm
+
+    def show_evidence_image(self, obj):
+        if not obj or not obj.evidence_image:
+            return "-"
+        url = obj.evidence_image.get_full_url()
+        return mark_safe(
+            f'<a href="{url}" target="_blank" rel="noopener">'
+            f'<img src="{url}" style="height:56px;max-width:120px;object-fit:cover;border-radius:6px;" />'
+            f'</a>'
+        )
+
+    show_evidence_image.short_description = "Evidence image"
 
 class BannerAdmin(admin.ModelAdmin):
 

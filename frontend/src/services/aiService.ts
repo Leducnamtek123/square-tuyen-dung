@@ -3,6 +3,7 @@ import httpRequest from '../utils/httpRequest';
 interface TTSPayload {
   text: string;
   voice?: string;
+  voiceProfileId?: number | string;
   speed?: number;
   format?: 'mp3' | 'wav';
 }

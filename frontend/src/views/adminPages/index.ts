@@ -5,6 +5,7 @@ export { default as JobsPage } from './JobsPage';
 export { default as InterviewsPage } from './InterviewsPage';
 // InterviewLivePage removed — managed by employers, not admin
 export { default as SettingsPage } from './SettingsPage';
+export { default as VoiceProfilesPage } from './VoiceProfilesPage';
 export { default as CareersPage } from './CareersPage';
 export { default as CitiesPage } from './CitiesPage';
 export { default as CompaniesPage } from './CompaniesPage';

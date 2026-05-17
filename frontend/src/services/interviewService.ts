@@ -6,6 +6,9 @@ import type { PaginatedResponse } from '../types/api';
 type IdType = string | number;
 
 type RoomNameLike = { roomName?: string } | string | number | null | undefined;
+type UpdateSessionStatusOptions = {
+  inviteToken?: string;
+};
 
 /* ── Request DTOs ─────────────────────────────────────────────────────── */
 
@@ -25,6 +28,7 @@ export interface ScheduleSessionInput {
   type?: 'technical' | 'behavioral' | 'mixed';
   question_ids?: number[];
   question_group?: number;
+  voice_profile?: number | null;
   notes?: string;
 }
 
@@ -95,12 +99,19 @@ const interviewService = {
     return httpRequest.delete(url) as Promise<void>;
   },
 
-  updateSessionStatus: (roomName: RoomNameLike, status: string): Promise<InterviewSession> => {
+  updateSessionStatus: (
+    roomName: RoomNameLike,
+    status: string,
+    options: UpdateSessionStatusOptions = {},
+  ): Promise<InterviewSession> => {
     const target =
       typeof roomName === 'object' && roomName ? roomName.roomName : roomName;
 
     const url = `interview/web/sessions/${target}/status/`;
-    return httpRequest.patch(url, { status }).then((res) => presignInObject(res)) as Promise<InterviewSession>;
+    const payload = options.inviteToken
+      ? { status, invite_token: options.inviteToken }
+      : { status };
+    return httpRequest.patch(url, payload).then((res) => presignInObject(res)) as Promise<InterviewSession>;
   },
 
   getLiveKitToken: (inviteToken: string): Promise<LiveKitTokenResponse> => {

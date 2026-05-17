@@ -199,6 +199,7 @@ export interface JobPost {
 export interface JobPostActivity {
   id: number;
   userId?: number;
+  userDict?: UserDict | null;
   fullName?: string;
   email?: string;
   phone?: string;
@@ -480,6 +481,10 @@ export interface InterviewSession {
   questionGroup?: number | string | QuestionGroup | null;
   question_group?: number | string | QuestionGroup | null;
   transcripts?: InterviewTranscript[];
+  voiceProfile?: number | null;
+  voice_profile?: number | null;
+  voiceProfileName?: string | null;
+  voice_profile_name?: string | null;
 }
 
 export interface InterviewTranscript {
@@ -512,6 +517,57 @@ export interface InterviewEvaluation {
   proposedSalary?: number | null;
   proposed_salary?: number | null;
   interview?: number | InterviewSession;
+}
+
+export interface VoiceProfileSample {
+  id: number;
+  profile?: number;
+  referenceText?: string;
+  reference_text?: string;
+  audioUrl?: string | null;
+  originalFilename?: string;
+  original_filename?: string;
+  durationSeconds?: number | string | null;
+  sortOrder?: number;
+  create_at?: string;
+}
+
+export interface VoiceProfileGrant {
+  id: number;
+  profile: number;
+  profileName?: string;
+  company?: number | null;
+  companyName?: string | null;
+  job_post?: number | null;
+  jobPost?: number | null;
+  jobName?: string | null;
+  is_default?: boolean;
+  isDefault?: boolean;
+  is_active?: boolean;
+  isActive?: boolean;
+  note?: string;
+}
+
+export interface VoiceProfile {
+  id: number;
+  name: string;
+  description?: string;
+  language?: string;
+  voice_type?: 'cloned' | 'preset';
+  voiceType?: 'cloned' | 'preset';
+  status: 'draft' | 'processing' | 'ready' | 'disabled' | 'failed' | string;
+  preset_engine?: string;
+  presetEngine?: string;
+  preset_voice_id?: string;
+  presetVoiceId?: string;
+  consent_confirmed?: boolean;
+  consentConfirmed?: boolean;
+  sampleCount?: number;
+  grantCount?: number;
+  samples?: VoiceProfileSample[];
+  grants?: VoiceProfileGrant[];
+  create_at?: string;
+  update_at?: string;
 }
 
 /* Misc */
@@ -566,6 +622,9 @@ export interface Feedback {
   is_active?: boolean;
   createAt?: string;
   create_at?: string;
+  evidenceImage?: number | null;
+  evidence_image?: number | null;
+  evidenceImageUrl?: string | null;
   userDict?: {
     fullName?: string;
     avatarUrl?: string;

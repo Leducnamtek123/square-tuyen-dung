@@ -14,6 +14,12 @@
 @import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 @import '@react-pdf-viewer/core/lib/styles/index.css';
 
+/* Swiper sets its wrapper to content-box; keep slide content aligned with MUI sizing. */
+.swiper-slide,
+.swiper-slide * {
+  box-sizing: border-box;
+}
+
 /* PDF viewer fallback: keep the selectable text layer over the canvas and invisible.
    Without these rules the PDF text can flow below the canvas, looking like a duplicated CV. */
 .rpv-core__page-layer {

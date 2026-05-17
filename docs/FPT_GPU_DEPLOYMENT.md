@@ -49,7 +49,7 @@ Luồng phỏng vấn AI dùng 1 FPT GPU Container duy nhất:
 
 1. LLM: `Qwen/Qwen3-14B`, serve alias `qwen3-14b-interview`.
 2. STT: `Systran/faster-whisper-large-v3`.
-3. TTS: `pnnbao-ump/VieNeu-TTS-0.3B`.
+3. TTS: `pnnbao-ump/VieNeu-TTS` chạy VieNeu `fast` GPU mode.
 
 File import chính: `infra/fpt-gpu/square-ai-all-in-one.yaml`.
 
@@ -114,26 +114,43 @@ VOXBOX_DEVICE=cuda
 DATA_DIR=/models/whisper
 
 TTS_DEVICE=cuda
-TTS_MODE=standard
-TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS-0.3B
+TTS_CODEC_DEVICE=cuda
+TTS_MODE=fast
+TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS
+TTS_GGUF_FILENAME=
+TTS_EMOTION=natural
 TTS_GPU_MEM_FRACTION=0.15
+TTS_INFER_TEMPERATURE=1.0
+TTS_INFER_TOP_K=50
+TTS_MAX_CHARS=256
+TTS_DEFAULT_SPEED=1.0
+TTS_NORMALIZE_AUDIO=0
+TTS_PEAK_LIMIT=0.98
 HF_HOME=/models/huggingface
 ```
 
 Sau khi FPT cấp endpoint cho từng port, trỏ app:
 
 ```env
-AI_LLM_BASE_URL=https://<fpt-port-8000-endpoint>/v1
+AI_LLM_BASE_URL=http://<fpt-port-8000-endpoint>/v1
 AI_LLM_MODEL=qwen3-14b-interview
 AI_LLM_API_KEY=<token-tu-dat>
 AI_RESUME_LLM_MODEL=qwen3-14b-interview
+AI_LLM_USE_VLLM_PARAMS=1
+AI_LLM_ENABLE_THINKING=0
+AI_LLM_TEMPERATURE=0.7
+AI_LLM_TOP_P=0.8
+AI_LLM_TOP_K=20
+AI_LLM_MIN_P=0
+AI_LLM_PRESENCE_PENALTY=1.5
+AI_LLM_MAX_TOKENS=2048
 
-AI_STT_BASE_URL=https://<fpt-port-8080-endpoint>/v1
+AI_STT_BASE_URL=http://<fpt-port-8080-endpoint>/v1
 AI_STT_MODEL=Systran/faster-whisper-large-v3
 AI_STT_LANGUAGE=vi
 
-AI_TTS_BASE_URL=https://<fpt-port-8298-endpoint>/v1
-AI_TTS_DEFAULT_VOICE=Bình (nam miền Bắc)
+AI_TTS_BASE_URL=http://<fpt-port-8298-endpoint>/v1
+AI_TTS_DEFAULT_VOICE=Ly
 ```
 
 Nếu bị out-of-memory, giảm `GPU_MEMORY_UTILIZATION`, dùng model LLM nhỏ hơn, hoặc tách lại thành 3 containers riêng.
@@ -158,7 +175,7 @@ Nếu muốn tự host LLM bằng GPU Container:
 - App config:
 
 ```env
-AI_LLM_BASE_URL=https://<fpt-vllm-endpoint>/v1
+AI_LLM_BASE_URL=http://<fpt-vllm-endpoint>/v1
 AI_LLM_MODEL=<hf-model-id-hoac-model-alias>
 AI_LLM_API_KEY=<API_TOKEN>
 AI_RESUME_LLM_MODEL=<hf-model-id-hoac-model-alias>
@@ -167,7 +184,7 @@ AI_RESUME_LLM_MODEL=<hf-model-id-hoac-model-alias>
 Test:
 
 ```powershell
-curl https://<fpt-vllm-endpoint>/v1/models -H "Authorization: Bearer <API_TOKEN>"
+curl http://<fpt-vllm-endpoint>/v1/models -H "Authorization: Bearer <API_TOKEN>"
 ```
 
 ### STT Whisper
@@ -194,7 +211,7 @@ DATA_DIR=/data
 App config:
 
 ```env
-AI_STT_BASE_URL=https://<fpt-whisper-endpoint>/v1
+AI_STT_BASE_URL=http://<fpt-whisper-endpoint>/v1
 AI_STT_MODEL=Systran/faster-whisper-large-v3
 AI_STT_LANGUAGE=vi
 ```
@@ -202,7 +219,7 @@ AI_STT_LANGUAGE=vi
 Test:
 
 ```powershell
-curl https://<fpt-whisper-endpoint>/v1/models
+curl http://<fpt-whisper-endpoint>/v1/models
 ```
 
 ### TTS VieNeu
@@ -223,24 +240,33 @@ GPU Container settings:
 ```env
 PORT=8298
 TTS_DEVICE=cuda
-TTS_MODE=standard
-TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS-0.3B
+TTS_CODEC_DEVICE=cuda
+TTS_MODE=fast
+TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS
+TTS_GGUF_FILENAME=
+TTS_EMOTION=natural
 TTS_GPU_MEM_FRACTION=0.65
+TTS_INFER_TEMPERATURE=1.0
+TTS_INFER_TOP_K=50
+TTS_MAX_CHARS=256
+TTS_DEFAULT_SPEED=1.0
+TTS_NORMALIZE_AUDIO=0
+TTS_PEAK_LIMIT=0.98
 HF_HOME=/root/.cache/huggingface
 ```
 
 App config:
 
 ```env
-AI_TTS_BASE_URL=https://<fpt-tts-endpoint>/v1
-AI_TTS_DEFAULT_VOICE=Bình (nam miền Bắc)
+AI_TTS_BASE_URL=http://<fpt-tts-endpoint>/v1
+AI_TTS_DEFAULT_VOICE=Ly
 ```
 
 Test:
 
 ```powershell
-curl https://<fpt-tts-endpoint>/health
-curl https://<fpt-tts-endpoint>/v1/voices
+curl http://<fpt-tts-endpoint>/health
+curl http://<fpt-tts-endpoint>/v1/voices
 ```
 
 ## Cấu hình web stack
@@ -248,17 +274,17 @@ curl https://<fpt-tts-endpoint>/v1/voices
 Trong `.env` của server chạy app chính, đặt các endpoint public do FPT GPU Container cấp:
 
 ```env
-AI_LLM_BASE_URL=https://<llm-endpoint>/v1
+AI_LLM_BASE_URL=http://<llm-endpoint>/v1
 AI_LLM_MODEL=<model>
 AI_LLM_API_KEY=<token-neu-co>
 AI_RESUME_LLM_MODEL=<model>
 
-AI_STT_BASE_URL=https://<whisper-endpoint>/v1
+AI_STT_BASE_URL=http://<whisper-endpoint>/v1
 AI_STT_MODEL=Systran/faster-whisper-large-v3
 AI_STT_LANGUAGE=vi
 
-AI_TTS_BASE_URL=https://<tts-endpoint>/v1
-AI_TTS_DEFAULT_VOICE=Bình (nam miền Bắc)
+AI_TTS_BASE_URL=http://<tts-endpoint>/v1
+AI_TTS_DEFAULT_VOICE=Ly
 
 LIVEKIT_URL=http://livekit:7880
 LIVEKIT_PUBLIC_URL=wss://<domain>/livekit
@@ -338,10 +364,16 @@ advanced_settings:
       value: /models/whisper
     - key: TTS_DEVICE
       value: cuda
+    - key: TTS_CODEC_DEVICE
+      value: cpu
     - key: TTS_MODE
-      value: standard
+      value: fast
     - key: TTS_BACKBONE_REPO
-      value: pnnbao-ump/VieNeu-TTS-0.3B
+      value: pnnbao-ump/VieNeu-TTS
+    - key: TTS_GGUF_FILENAME
+      value: ""
+    - key: TTS_EMOTION
+      value: natural
     - key: TTS_GPU_MEM_FRACTION
       value: "0.15"
     - key: STT_STARTUP_DELAY_SECONDS
@@ -364,6 +396,15 @@ Với template `NVIDIA Pytorch 25.03`, không nhập `-lc exec ...` vào ô Argu
 ```powershell
 .\infra\fpt-gpu\upload-bootstrap-to-fpt.ps1 -HostName tcp-endpoint.serverless.fptcloud.com -Port <tcp-port>
 ```
+
+Sau khi bootstrap chạy thành công ít nhất một lần, có thể cấu hình lại Startup commands để tự phục hồi sau stop/start. Chỉ dùng một argument là path script, không dùng `-lc`:
+
+```text
+Command: /bin/bash
+Arguments: /models/square-ai/start-on-boot.sh
+```
+
+Nếu để `Command` trống, mỗi lần FPT stop/start lại container thì chỉ template PyTorch mặc định chạy; các service `vLLM`, `Whisper`, `TTS` sẽ không tự listen trên các port `8000/8080/8298`, và endpoint có thể trả `upstream connect error ... delayed connect error: 111`.
 
 Nếu muốn tách 3 container riêng, các file vẫn có sẵn:
 

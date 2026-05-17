@@ -7,6 +7,8 @@
   "unavailableTitle": "Session Unavailable",
   "sessionNotJoinable": "This interview session has already ended or been cancelled.",
   "sessionNotJoinableBody": "This interview session has already ended or been cancelled. Please contact the employer for details.",
+  "processingTitle": "Processing interview results",
+  "processingBody": "This interview has ended. The system is preparing the transcript and evaluation, so please check again in a few minutes.",
   "startInterview": "Start interview",
   "preflight": {
     "title": "Device check",

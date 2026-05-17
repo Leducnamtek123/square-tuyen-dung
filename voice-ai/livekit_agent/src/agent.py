@@ -32,6 +32,10 @@ load_dotenv()
 logger = logging.getLogger("square-ai-interviewer")
 logger.setLevel(logging.INFO)
 
+CHAT_TOPIC = "lk.chat"
+AI_CONTROL_TOPIC = "square.interview.ai_control"
+EMPLOYER_CONTROL_ROLES = {"employer", "observer"}
+
 
 # --- Helper Functions ---
 async def _update_backend_status(room_name: str, status: str) -> None:
@@ -54,6 +58,81 @@ def prewarm(proc: JobProcess) -> None:
 
 
 server.setup_fnc = prewarm
+
+
+def _build_llm_extra_body() -> dict:
+    if not config.LLM_USE_VLLM_PARAMS:
+        return {}
+
+    return {
+        "top_k": config.LLM_TOP_K,
+        "min_p": config.LLM_MIN_P,
+        "presence_penalty": config.LLM_PRESENCE_PENALTY,
+        "repetition_penalty": config.LLM_REPETITION_PENALTY,
+        "chat_template_kwargs": {"enable_thinking": config.LLM_ENABLE_THINKING},
+    }
+
+
+def _participant_identity(value) -> str:
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        return str(value.get("identity") or "")
+    return str(getattr(value, "identity", "") or "")
+
+
+def _participant_metadata(participant) -> dict:
+    metadata = getattr(participant, "metadata", None)
+    if not metadata:
+        return {}
+    try:
+        parsed = json.loads(metadata)
+        return parsed if isinstance(parsed, dict) else {}
+    except Exception:
+        return {}
+
+
+def _participant_role(participant, identity_hint: str = "") -> str:
+    identity = (getattr(participant, "identity", None) or identity_hint or "").lower()
+    name = (getattr(participant, "name", None) or "").lower()
+    attributes = getattr(participant, "attributes", None) or {}
+    metadata = _participant_metadata(participant)
+
+    values = [identity, name]
+    values.extend(str(value).lower() for value in attributes.values() if value)
+    values.extend(str(value).lower() for value in metadata.values() if value)
+    haystack = " ".join(values)
+
+    role_values = [
+        str(attributes.get("role", "")).lower(),
+        str(attributes.get("participant_role", "")).lower(),
+        str(metadata.get("role", "")).lower(),
+    ]
+    for role in role_values:
+        if role in {"candidate", "employer", "observer", "agent"}:
+            return role
+
+    if identity.startswith("candidate-") or "candidate" in haystack:
+        return "candidate"
+    if identity.startswith("employer-") or "employer" in haystack or "admin" in haystack:
+        return "employer"
+    if identity.startswith("observer-") or "observer" in haystack:
+        return "observer"
+    if "agent" in haystack or "interviewer" in haystack:
+        return "agent"
+    return "guest"
+
+
+def _participant_display_name(participant, fallback: str = "") -> str:
+    if participant is None:
+        return fallback
+    metadata = _participant_metadata(participant)
+    return (
+        str(getattr(participant, "name", "") or "")
+        or str(metadata.get("name", "") or "")
+        or str(metadata.get("company_name", "") or "")
+        or fallback
+    ).strip()
 
 
 @server.rtc_session(agent_name="square-ai-interviewer")
@@ -79,24 +158,10 @@ async def entrypoint(ctx: JobContext) -> None:
             ),
         ),
         model=config.LLM_MODEL,
-    )
-
-    tts_model = openai.TTS(
-        client=openai_lib.AsyncOpenAI(
-            api_key=config.TTS_API_KEY,
-            base_url=config.TTS_BASE_URL,
-            max_retries=config.TTS_MAX_RETRIES,
-            http_client=httpx.AsyncClient(
-                timeout=httpx.Timeout(
-                    connect=config.TTS_CONNECT_TIMEOUT_SECONDS,
-                    read=config.TTS_READ_TIMEOUT_SECONDS,
-                    write=config.TTS_WRITE_TIMEOUT_SECONDS,
-                    pool=config.TTS_POOL_TIMEOUT_SECONDS,
-                )
-            ),
-        ),
-        model=config.TTS_MODEL,
-        voice=config.TTS_VOICE,
+        temperature=config.LLM_TEMPERATURE,
+        top_p=config.LLM_TOP_P,
+        max_completion_tokens=config.LLM_MAX_COMPLETION_TOKENS,
+        extra_body=_build_llm_extra_body(),
     )
 
     # 2. Context Preparation from room metadata
@@ -132,8 +197,39 @@ async def entrypoint(ctx: JobContext) -> None:
             if isinstance(data, dict):
                 agent_context.update(data)
                 agent_context["questions"] = data.get("questions", [])
+                logger.info(
+                    "Loaded interview context for room %s: questionCount=%s, candidate=%s, job=%s",
+                    ctx.room.name,
+                    data.get("questionCount", len(data.get("questions", []))),
+                    data.get("candidateName"),
+                    data.get("jobTitle"),
+                )
     except Exception as e:
         logger.warning(f"Failed to fetch predefined questions: {e}")
+
+    tts_voice = str(agent_context.get("ttsVoice") or config.TTS_VOICE)
+    logger.info("Using TTS voice for room %s: %s", ctx.room.name, tts_voice)
+
+    tts_kwargs = {
+        "client": openai_lib.AsyncOpenAI(
+            api_key=config.TTS_API_KEY,
+            base_url=config.TTS_BASE_URL,
+            max_retries=config.TTS_MAX_RETRIES,
+            http_client=httpx.AsyncClient(
+                timeout=httpx.Timeout(
+                    connect=config.TTS_CONNECT_TIMEOUT_SECONDS,
+                    read=config.TTS_READ_TIMEOUT_SECONDS,
+                    write=config.TTS_WRITE_TIMEOUT_SECONDS,
+                    pool=config.TTS_POOL_TIMEOUT_SECONDS,
+                )
+            ),
+        ),
+        "model": config.TTS_MODEL,
+        "voice": tts_voice,
+    }
+    if config.TTS_SPEED is not None:
+        tts_kwargs["speed"] = config.TTS_SPEED
+    tts_model = openai.TTS(**tts_kwargs)
 
     # 3. Create Interviewer Agent (greeting is handled in on_enter)
     interviewer = Interviewer(context=agent_context)
@@ -151,7 +247,8 @@ async def entrypoint(ctx: JobContext) -> None:
                 return None
             await asyncio.sleep(0.1)
 
-    async def _handle_text_stream(reader, participant_identity: str) -> None:
+    async def _handle_candidate_chat_stream(reader, participant_identity) -> None:
+        participant_identity = _participant_identity(participant_identity)
         text = (await reader.read_all()).strip()
         if not text:
             return
@@ -162,6 +259,16 @@ async def entrypoint(ctx: JobContext) -> None:
                 "participant not found after retry, ignoring text input for room %s from %s",
                 ctx.room.name,
                 participant_identity,
+            )
+            return
+
+        participant_role = _participant_role(participant, participant_identity)
+        if participant_role != "candidate":
+            logger.info(
+                "Ignoring public chat for AI input in room %s from %s role=%s",
+                ctx.room.name,
+                participant_identity,
+                participant_role,
             )
             return
 
@@ -185,6 +292,40 @@ async def entrypoint(ctx: JobContext) -> None:
         # LLM when a candidate sends a plain text answer.
         session.generate_reply(user_input=text, tools=[], tool_choice="none")
 
+    async def _handle_employer_control_stream(reader, participant_identity) -> None:
+        participant_identity = _participant_identity(participant_identity)
+        text = (await reader.read_all()).strip()
+        if not text:
+            return
+
+        participant = await _wait_for_participant(participant_identity)
+        participant_role = _participant_role(participant, participant_identity)
+        if participant_role not in EMPLOYER_CONTROL_ROLES:
+            logger.info(
+                "Ignoring AI control text in room %s from %s role=%s",
+                ctx.room.name,
+                participant_identity,
+                participant_role,
+            )
+            return
+
+        speaker_name = _participant_display_name(participant, "Nhà tuyển dụng")
+        logger.info(
+            "Received employer AI control for room %s from %s: %s",
+            ctx.room.name,
+            participant_identity,
+            text,
+        )
+        try:
+            await session.interrupt(force=True)
+        except Exception as exc:
+            logger.info(
+                "Skipping interrupt before employer control reply for room %s: %s",
+                ctx.room.name,
+                exc,
+            )
+        await interviewer.handle_employer_instruction(text, speaker_name=speaker_name)
+
     # 4. Setup Session (Standard 1.5.x Pattern)
     session = AgentSession(
         stt=stt_model,
@@ -199,6 +340,26 @@ async def entrypoint(ctx: JobContext) -> None:
     @session.on("session_usage_updated")
     def _on_session_usage_updated(ev: SessionUsageUpdatedEvent) -> None:
         logger.info("Session usage updated for room %s: %s", ctx.room.name, ev.usage)
+
+    @session.on("speech_created")
+    def _on_speech_created(ev) -> None:
+        if getattr(ev, "source", "") != "generate_reply":
+            return
+        speech_handle = getattr(ev, "speech_handle", None)
+        if speech_handle is None:
+            return
+        try:
+            speech_handle.allow_interruptions = False
+        except Exception as exc:
+            logger.debug("Could not make generated speech uninterruptible: %s", exc)
+
+        def _finalize_when_completed(_speech_handle) -> None:
+            asyncio.create_task(interviewer.finalize_completed_interview())
+
+        try:
+            speech_handle.add_done_callback(_finalize_when_completed)
+        except Exception as exc:
+            logger.debug("Could not attach completion finalizer: %s", exc)
 
     @session.on("conversation_item_added")
     def _on_conversation_item_added(ev) -> None:
@@ -256,7 +417,18 @@ async def entrypoint(ctx: JobContext) -> None:
     # Establish the room connection up front so the greeting and first audio turn
     # don't race the agent connection handshake.
     await ctx.connect(auto_subscribe=AutoSubscribe.SUBSCRIBE_ALL)
-    ctx.room.register_text_stream_handler("lk.chat", lambda reader, participant_identity: asyncio.create_task(_handle_text_stream(reader, participant_identity)))
+    ctx.room.register_text_stream_handler(
+        CHAT_TOPIC,
+        lambda reader, participant_identity: asyncio.create_task(
+            _handle_candidate_chat_stream(reader, participant_identity)
+        ),
+    )
+    ctx.room.register_text_stream_handler(
+        AI_CONTROL_TOPIC,
+        lambda reader, participant_identity: asyncio.create_task(
+            _handle_employer_control_stream(reader, participant_identity)
+        ),
+    )
 
     # 7. Start the Session (no ctx.connect() needed - handled by session.start)
     try:

@@ -184,6 +184,16 @@
       "error": "Không thể chuyển âm thanh lúc này."
     }
   },
+  "ai": {
+    "reviewStatus": {
+      "label": "Rà soát AI",
+      "all": "Tất cả trạng thái",
+      "aiOnly": "Chỉ AI",
+      "reviewed": "Đã rà soát",
+      "overridden": "Đã ghi đè"
+    },
+    "scoreMax": "Điểm AI tối đa"
+  },
   "choices": {
     "Male": "Nam",
     "Female": "Nữ",
@@ -268,7 +278,13 @@
     "ratingRequired": "Vui lòng chọn mức đánh giá.",
     "contentRequired": "Vui lòng nhập nội dung phản hồi.",
     "contentMax": "Nội dung phản hồi vượt quá độ dài cho phép.",
-    "success": "Gửi phản hồi thành công."
+    "success": "Gửi phản hồi thành công.",
+    "evidenceImageLabel": "Ảnh bằng chứng",
+    "evidenceImageUpload": "Tải ảnh bằng chứng",
+    "evidenceImageRemove": "Xóa ảnh bằng chứng",
+    "evidenceImageHint": "Không bắt buộc. Hỗ trợ PNG, JPG hoặc WebP tối đa 5MB.",
+    "evidenceImageInvalid": "Vui lòng chọn tệp ảnh.",
+    "evidenceImageTooLarge": "Ảnh không được vượt quá 5MB."
   },
   "employerViewedProfile": "Nhà tuyển dụng xem hồ sơ",
   "errorBoundary": {

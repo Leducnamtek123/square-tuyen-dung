@@ -230,6 +230,15 @@ class LiveKitWebhookTests(TestCase):
             "http://localhost:9000/square/interviews/demo/recording.mp4",
         )
 
+    def test_room_finished_does_not_interrupt_processing_session(self):
+        self.session.status = "processing"
+        self.session.save(update_fields=["status", "update_at"])
+
+        _handle_livekit_event({"event": "room_finished", "room": self.session.room_name})
+
+        self.session.refresh_from_db()
+        self.assertEqual(self.session.status, "processing")
+
 
 class LiveKitServiceTests(TestCase):
     @patch("apps.interviews.livekit_service.api.LiveKitAPI")
@@ -386,6 +395,68 @@ class InterviewSessionAPITests(TestCase):
         self.assertEqual(session.status, "processing")
         mock_delay.assert_called_once_with(session.id)
         mock_thread.assert_called_once()
+
+    @override_settings(INTERVIEW_AGENT_SHARED_SECRET="agent-secret", INTERVIEW_AGENT_AUTH_REQUIRED=True)
+    @patch(
+        "apps.interviews.views.run_django_sync_in_thread",
+        side_effect=lambda func, *args, **kwargs: func(*args, **kwargs),
+    )
+    def test_authenticated_user_can_update_status_without_agent_signature(self, mock_thread):
+        session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            created_by=self.employer,
+            status="scheduled",
+        )
+
+        response = self.client.patch(
+            f"/api/v1/interview/web/sessions/{session.room_name}/status/",
+            data={"status": "calibration"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        session.refresh_from_db()
+        self.assertEqual(session.status, "calibration")
+        mock_thread.assert_called_once()
+
+    @override_settings(INTERVIEW_AGENT_SHARED_SECRET="agent-secret", INTERVIEW_AGENT_AUTH_REQUIRED=True)
+    @patch(
+        "apps.interviews.views.run_django_sync_in_thread",
+        side_effect=lambda func, *args, **kwargs: func(*args, **kwargs),
+    )
+    def test_invite_token_can_update_candidate_session_status_without_agent_signature(self, mock_thread):
+        anonymous_client = APIClient()
+        session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            status="scheduled",
+        )
+
+        response = anonymous_client.patch(
+            f"/api/v1/interview/web/sessions/{session.room_name}/status/",
+            data={"status": "calibration", "invite_token": session.invite_token},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        session.refresh_from_db()
+        self.assertEqual(session.status, "calibration")
+        mock_thread.assert_called_once()
+
+    @override_settings(INTERVIEW_AGENT_SHARED_SECRET="agent-secret", INTERVIEW_AGENT_AUTH_REQUIRED=True)
+    def test_unsigned_anonymous_status_update_without_invite_token_is_rejected(self):
+        anonymous_client = APIClient()
+        session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            status="scheduled",
+        )
+
+        response = anonymous_client.patch(
+            f"/api/v1/interview/web/sessions/{session.room_name}/status/",
+            data={"status": "calibration"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 401)
 
 
 class InterviewEvaluationAPITests(TestCase):

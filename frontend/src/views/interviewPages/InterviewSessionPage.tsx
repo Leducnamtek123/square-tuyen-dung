@@ -78,6 +78,13 @@ const statusClassMap: Record<string, string> = {
 
 const JOINABLE_STATUSES = ['scheduled', 'calibration', 'in_progress', 'interrupted'];
 const END_SESSION_STATUS_TIMEOUT_MS = 8000;
+const PROCESSING_STATUS_REFRESH_MS = 3000;
+const INTERVIEW_AUDIO_CAPTURE_OPTIONS = {
+  echoCancellation: true,
+  noiseSuppression: true,
+  autoGainControl: true,
+  voiceIsolation: true,
+};
 
 const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -124,6 +131,10 @@ type SessionPageAction =
   | { type: 'set-session'; value: InterviewSession | null }
   | { type: 'set-session-status'; value: string }
   | { type: 'set-session-invite-token'; value: string };
+
+type FetchSessionDetailsOptions = {
+  showLoading?: boolean;
+};
 
 const initialState: SessionPageState = {
   loading: true,
@@ -249,7 +260,7 @@ function ActiveInterviewRoom({
           serverUrl={connectionDetails.serverUrl}
           connect={true}
           video={role === 'jobseeker'}
-          audio={true}
+          audio={role === 'jobseeker' ? INTERVIEW_AUDIO_CAPTURE_OPTIONS : false}
           onDisconnected={onDisconnected}
           style={{ height: '100%' }}
         >
@@ -454,10 +465,13 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
 
   // ── Fetch session ────────────────────────────────────────────────────────
 
-  const fetchSessionDetails = React.useCallback(async () => {
+  const fetchSessionDetails = React.useCallback(async (options: FetchSessionDetailsOptions = {}) => {
+    const showLoading = options.showLoading ?? true;
     const translate = tRef.current;
     try {
-      dispatch({ type: 'set-loading', value: true });
+      if (showLoading) {
+        dispatch({ type: 'set-loading', value: true });
+      }
       dispatch({ type: 'set-error', value: '' });
 
       let detailRaw: unknown;
@@ -486,13 +500,27 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
           '',
       });
     } catch (err) {
-      dispatch({ type: 'set-error', value: err instanceof Error ? err.message : translate('errors.invalidSession') });
+      if (showLoading) {
+        dispatch({ type: 'set-error', value: err instanceof Error ? err.message : translate('errors.invalidSession') });
+      }
     } finally {
-      dispatch({ type: 'set-loading', value: false });
+      if (showLoading) {
+        dispatch({ type: 'set-loading', value: false });
+      }
     }
   }, [normalizedRole, routeId]);
 
   React.useEffect(() => { fetchSessionDetails(); }, [fetchSessionDetails]);
+
+  React.useEffect(() => {
+    if (state.session?.status !== 'processing') return undefined;
+
+    const intervalId = window.setInterval(() => {
+      void fetchSessionDetails({ showLoading: false });
+    }, PROCESSING_STATUS_REFRESH_MS);
+
+    return () => window.clearInterval(intervalId);
+  }, [fetchSessionDetails, state.session?.status]);
 
   // ── Start / terminate session ─────────────────────────────────────────────
 
@@ -555,8 +583,11 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
       }
 
       const targetRoomName = latestSession.roomName || roomName;
-      if (targetRoomName && tokenService.getAccessTokenFromCookie()) {
-        await interviewService.updateSessionStatus(targetRoomName, 'in_progress').catch(() => {});
+      if (targetRoomName && (state.sessionInviteToken || tokenService.getAccessTokenFromCookie())) {
+        const updatedStatus = await interviewService
+          .updateSessionStatus(targetRoomName, 'in_progress', { inviteToken: state.sessionInviteToken })
+          .catch(() => null);
+        dispatch({ type: 'set-session-status', value: updatedStatus?.status || 'in_progress' });
       }
 
       dispatch({ type: 'set-connection-details', value: { token: tokenData.token, serverUrl: urlToUse } });
@@ -586,9 +617,12 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
 
     try {
       await withTimeout(
-        interviewService.updateSessionStatus(roomName, 'completed'),
+        interviewService.updateSessionStatus(roomName, 'completed', { inviteToken: state.sessionInviteToken }),
         END_SESSION_STATUS_TIMEOUT_MS
       );
+      window.setTimeout(() => {
+        void fetchSessionDetails({ showLoading: false });
+      }, PROCESSING_STATUS_REFRESH_MS);
     } catch (err) {
       finalizeOnDisconnectRef.current = false;
       dispatch({
@@ -598,7 +632,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
         }),
       });
     }
-  }, [roomName]);
+  }, [fetchSessionDetails, roomName, state.sessionInviteToken]);
 
   // ── Loading state ─────────────────────────────────────────────────────────
 
@@ -620,9 +654,14 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
 
   // ── Derived display values ─────────────────────────────────────────────────
 
-  const statusKey   = (state.session?.status || 'scheduled').toLowerCase();
-  const statusText  = t(`interviewListCard.statuses.${statusKey}`, { defaultValue: statusKey.replaceAll('_', ' ') });
-  const statusClass = statusClassMap[statusKey] || 'border-white/15 bg-white/10 text-zinc-200';
+  const statusKey = (state.session?.status || 'scheduled').toLowerCase();
+  const displayStatusKey =
+    state.connectRoom && state.connectionDetails && ['scheduled', 'calibration', 'interrupted'].includes(statusKey)
+      ? 'in_progress'
+      : statusKey;
+  const isProcessing = statusKey === 'processing';
+  const statusText  = t(`interviewListCard.statuses.${displayStatusKey}`, { defaultValue: displayStatusKey.replaceAll('_', ' ') });
+  const statusClass = statusClassMap[displayStatusKey] || 'border-white/15 bg-white/10 text-zinc-200';
   const formattedSchedule = state.session?.scheduledAt
     ? new Date(state.session.scheduledAt).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US')
     : undefined;
@@ -633,7 +672,9 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
     ? normalizedRole === 'jobseeker'
       ? t('readyTitle')
       : t('interviewDetail.title', { ns: 'employer' })
-    : t('unavailableTitle');
+    : isProcessing
+      ? t('processingTitle')
+      : t('unavailableTitle');
 
   // ─── Active video conference (LiveKit VideoConference) ────────────────────
 
@@ -674,9 +715,9 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
         candidateLabel,
         statusText,
         readyTitle: t('readyTitle'),
-        unavailableTitle: t('sessionNotJoinable'),
+        unavailableTitle: isProcessing ? t('processingTitle') : t('sessionNotJoinable'),
         readyBody: t('readyBody'),
-        unavailableBody: t('sessionNotJoinableBody'),
+        unavailableBody: isProcessing ? t('processingBody') : t('sessionNotJoinableBody'),
         startInterview: t('startInterview'),
         back: t('common:actions.back'),
         backHome: t('common:actions.backHome'),

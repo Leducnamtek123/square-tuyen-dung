@@ -46,6 +46,28 @@ def _setting(name: str, default: str = "") -> str:
         return ""
     return str(value).strip()
 
+def _setting_bool(name: str, default: bool = False) -> bool:
+    value = getattr(settings, name, default)
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "on", "y", "t"}
+
+
+def _setting_float(name: str, default: float) -> float:
+    value = getattr(settings, name, default)
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _setting_int(name: str, default: int) -> int:
+    value = getattr(settings, name, default)
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
 
 def _split_csv(value: str) -> List[str]:
     if not value or not str(value).strip():
@@ -53,9 +75,48 @@ def _split_csv(value: str) -> List[str]:
     return [item.strip() for item in str(value).split(",")]
 
 
-def _add_candidate(candidates: List[AIEndpointCandidate], seen: set[str], candidate: AIEndpointCandidate) -> None:
+def apply_llm_request_defaults(payload: Dict[str, Any]) -> Dict[str, Any]:
+    next_payload = dict(payload)
+
+    if "temperature" not in next_payload:
+        next_payload["temperature"] = _setting_float("AI_LLM_TEMPERATURE", 0.7)
+    if "top_p" not in next_payload:
+        next_payload["top_p"] = _setting_float("AI_LLM_TOP_P", 0.8)
+    if "max_tokens" not in next_payload and "max_completion_tokens" not in next_payload:
+        max_tokens = _setting_int("AI_LLM_MAX_TOKENS", 2048)
+        if max_tokens > 0:
+            next_payload["max_tokens"] = max_tokens
+
+    if _setting_bool("AI_LLM_USE_VLLM_PARAMS", False):
+        next_payload.setdefault("top_k", _setting_int("AI_LLM_TOP_K", 20))
+        next_payload.setdefault("min_p", _setting_float("AI_LLM_MIN_P", 0.0))
+        next_payload.setdefault(
+            "presence_penalty",
+            _setting_float("AI_LLM_PRESENCE_PENALTY", 1.5),
+        )
+        next_payload.setdefault(
+            "repetition_penalty",
+            _setting_float("AI_LLM_REPETITION_PENALTY", 1.0),
+        )
+        next_payload.setdefault(
+            "chat_template_kwargs",
+            {"enable_thinking": _setting_bool("AI_LLM_ENABLE_THINKING", False)},
+        )
+
+    return next_payload
+
+
+def _add_candidate(
+    candidates: List[AIEndpointCandidate],
+    seen: set[tuple[str, str, str]],
+    candidate: AIEndpointCandidate,
+    *,
+    default_model: str = "",
+) -> None:
     base_url = candidate.normalized_base_url
-    if not base_url or base_url in seen:
+    effective_model = candidate.model or default_model
+    dedupe_key = (base_url, candidate.api_key, effective_model)
+    if not base_url or dedupe_key in seen:
         return
     candidates.append(
         AIEndpointCandidate(
@@ -65,12 +126,12 @@ def _add_candidate(candidates: List[AIEndpointCandidate], seen: set[str], candid
             model=candidate.model,
         )
     )
-    seen.add(base_url)
+    seen.add(dedupe_key)
 
 
 def get_llm_candidates(default_model: str = "") -> List[AIEndpointCandidate]:
     candidates: List[AIEndpointCandidate] = []
-    seen: set[str] = set()
+    seen: set[tuple[str, str, str]] = set()
 
     # settings.AI_LLM_API_KEY already applies the legacy LLM_API_KEY/GROQ_API_KEY
     # fallback when AI_LLM_API_KEY is not configured. Reading only the resolved
@@ -86,6 +147,7 @@ def get_llm_candidates(default_model: str = "") -> List[AIEndpointCandidate]:
             api_key=primary_api_key,
             model="",
         ),
+        default_model=default_model,
     )
 
     local_base_url = _setting("AI_LLM_LOCAL_BASE_URL")
@@ -99,6 +161,7 @@ def get_llm_candidates(default_model: str = "") -> List[AIEndpointCandidate]:
                 api_key=_setting("AI_LLM_LOCAL_API_KEY"),
                 model=_setting("AI_LLM_LOCAL_MODEL", default_model),
             ),
+            default_model=default_model,
         )
 
     fallback_urls = _split_csv(_setting("AI_LLM_FALLBACK_BASE_URLS"))
@@ -114,6 +177,7 @@ def get_llm_candidates(default_model: str = "") -> List[AIEndpointCandidate]:
                 api_key=fallback_api_keys[index] if index < len(fallback_api_keys) else "",
                 model=fallback_models[index] if index < len(fallback_models) else default_model,
             ),
+            default_model=default_model,
         )
 
     return candidates
@@ -163,7 +227,7 @@ def post_chat_completion_requests(
         try:
             response = requests.post(
                 url,
-                json=candidate.payload(payload),
+                json=candidate.payload(apply_llm_request_defaults(payload)),
                 headers=candidate.headers(),
                 timeout=timeout,
             )
@@ -209,7 +273,7 @@ def post_chat_completion_httpx(
             try:
                 response = client.post(
                     url,
-                    json=candidate.payload(payload),
+                    json=candidate.payload(apply_llm_request_defaults(payload)),
                     headers=candidate.headers(),
                 )
             except (httpx.TimeoutException, httpx.ConnectError) as exc:

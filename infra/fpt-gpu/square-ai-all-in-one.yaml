@@ -48,12 +48,38 @@ advanced_settings:
       value: /models/whisper
     - key: TTS_DEVICE
       value: cuda
+    - key: TTS_CODEC_DEVICE
+      value: cuda
     - key: TTS_MODE
-      value: standard
+      value: fast
     - key: TTS_BACKBONE_REPO
-      value: pnnbao-ump/VieNeu-TTS-0.3B
+      value: pnnbao-ump/VieNeu-TTS
+    - key: TTS_GGUF_FILENAME
+      value: ""
+    - key: TTS_EMOTION
+      value: natural
     - key: TTS_GPU_MEM_FRACTION
-      value: "0.15"
+      value: "0.30"
+    - key: TTS_INFER_TEMPERATURE
+      value: ""
+    - key: TTS_INFER_TOP_K
+      value: ""
+    - key: TTS_MAX_CHARS
+      value: ""
+    - key: TTS_DEFAULT_SPEED
+      value: ""
+    - key: TTS_NORMALIZE_AUDIO
+      value: ""
+    - key: TTS_PEAK_LIMIT
+      value: "0.98"
+    - key: TTS_PEAK_NORMALIZE_TARGET
+      value: ""
+    - key: VOICE_PROFILE_BACKEND_API_URL
+      value: "https://<your-backend-domain>/api"
+    - key: INTERVIEW_AGENT_SHARED_SECRET
+      value: "<shared-secret>"
+    - key: TTS_VOICE_PROFILE_CACHE_DIR
+      value: /tmp/vieneu_voice_profiles
     - key: STT_STARTUP_DELAY_SECONDS
       value: "30"
     - key: TTS_STARTUP_DELAY_SECONDS

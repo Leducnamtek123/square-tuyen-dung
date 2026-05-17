@@ -7,6 +7,8 @@
   "unavailableTitle": "Phỏng vấn không khả dụng",
   "sessionNotJoinable": "Buổi phỏng vấn này đã kết thúc hoặc đã bị hủy.",
   "sessionNotJoinableBody": "Buổi phỏng vấn này đã kết thúc hoặc đã bị hủy. Vui lòng liên hệ nhà tuyển dụng để biết thêm chi tiết.",
+  "processingTitle": "Đang xử lý kết quả phỏng vấn",
+  "processingBody": "Buổi phỏng vấn đã kết thúc. Hệ thống đang tổng hợp transcript và chấm điểm, bạn có thể quay lại sau ít phút.",
   "startInterview": "Bắt đầu phỏng vấn",
   "preflight": {
     "title": "Kiểm tra thiết bị",

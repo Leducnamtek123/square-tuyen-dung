@@ -6,31 +6,79 @@ import { isMaintenanceModeError, notifyMaintenanceMode } from './maintenanceMode
 
 type SetError = ((errors: ApiError) => void) | null;
 
-const normalizeErrorsToMessage = (errors: unknown): string | null => {
-  if (!errors || typeof errors !== 'object') return null;
+const humanizeKey = (key: string): string =>
+  key
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 
-  const entries = Object.entries(errors as ApiError);
+const normalizeErrorsToMessage = (errors: unknown, parentKey = ''): string | null => {
+  if (!errors) return null;
+
+  if (typeof errors === 'string' || typeof errors === 'number' || typeof errors === 'boolean') {
+    return String(errors);
+  }
+
+  if (Array.isArray(errors)) {
+    const chunks = errors
+      .map((item) => normalizeErrorsToMessage(item, parentKey))
+      .filter(Boolean) as string[];
+    return chunks.length > 0 ? chunks.join(' ') : null;
+  }
+
+  if (typeof errors !== 'object') return null;
+
+  const entries = Object.entries(errors as Record<string, unknown>);
   if (entries.length === 0) return null;
 
   const chunks: string[] = [];
-  for (const [, value] of entries) {
-    if (Array.isArray(value)) {
-      const text = value.map((v) => String(v)).join(' ');
-      if (text) chunks.push(text);
-      continue;
-    }
-    if (value !== null && value !== undefined && String(value).trim()) {
-      chunks.push(String(value));
+  for (const [key, value] of entries) {
+    const text = normalizeErrorsToMessage(value, key);
+    if (!text) continue;
+
+    if (key === 'detail' || key === 'message' || key === 'errorMessage' || key === 'non_field_errors') {
+      chunks.push(text);
+    } else {
+      chunks.push(`${humanizeKey(key)}: ${text}`);
     }
   }
 
-  return chunks.length > 0 ? chunks.join(' ') : null;
+  const prefix = parentKey && chunks.length === 1 && !chunks[0].includes(':')
+    ? `${humanizeKey(parentKey)}: `
+    : '';
+  return chunks.length > 0 ? `${prefix}${chunks.join(' ')}` : null;
+};
+
+const extractApiErrorMessage = (data: unknown): string | null => {
+  if (!data || typeof data !== 'object') return normalizeErrorsToMessage(data);
+
+  const payload = data as {
+    error?: { message?: unknown; details?: unknown };
+    errors?: unknown;
+    detail?: unknown;
+    message?: unknown;
+  };
+
+  if (payload.error) {
+    return (
+      normalizeErrorsToMessage(payload.error.details) ||
+      normalizeErrorsToMessage(payload.error.message) ||
+      normalizeErrorsToMessage(payload.error)
+    );
+  }
+
+  return (
+    normalizeErrorsToMessage(payload.errors) ||
+    normalizeErrorsToMessage(payload.detail) ||
+    normalizeErrorsToMessage(payload.message) ||
+    normalizeErrorsToMessage(data)
+  );
 };
 
 /**
  * Type guard: checks if an unknown value is an Axios error with a response.
  */
-const isAxiosError = (error: unknown): error is AxiosError<{ errors?: ApiError }> =>
+const isAxiosError = (error: unknown): error is AxiosError<Record<string, unknown>> =>
   typeof error === 'object' &&
   error !== null &&
   'isAxiosError' in error &&
@@ -72,19 +120,13 @@ const errorHandling = (
 
   switch (res.status) {
     case 400: {
-      const errors = res.data?.errors;
-      if (errors && 'errorMessage' in errors) {
-        const msg = errors.errorMessage;
-        toastMessages.error(Array.isArray(msg) ? msg.join(' ') : String(msg));
+      const message = extractApiErrorMessage(res.data);
+      if (message) {
+        toastMessages.error(message);
       } else {
-        const normalizedMessage = normalizeErrorsToMessage(errors);
-        if (normalizedMessage) {
-          toastMessages.error(normalizedMessage);
-        } else {
-          toastMessages.error(i18n.t('common:errors.generic', 'An error occurred, please try again.'));
-        }
-        setError && setError((errors || {}) as ApiError);
+        toastMessages.error(i18n.t('common:errors.generic', 'An error occurred, please try again.'));
       }
+      setError && setError((res.data?.errors || res.data?.error || {}) as ApiError);
       break;
     }
     case 401:
@@ -106,7 +148,7 @@ const errorHandling = (
       if (res.status >= 500) {
         toastMessages.error(i18n.t('common:errors.serverError', 'Server error, please try again later.'));
       } else {
-        toastMessages.error(i18n.t('common:errors.generic', 'An error occurred, please try again.'));
+        toastMessages.error(extractApiErrorMessage(res.data) || i18n.t('common:errors.generic', 'An error occurred, please try again.'));
       }
   }
 };

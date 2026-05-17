@@ -19,12 +19,14 @@ import {
 import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import toastMessages from '../../../../utils/toastMessages';
+import errorHandling from '../../../../utils/errorHandling';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../../../configs/constants';
 import {
   useAppliedResumes,
   useEmployerJobPosts,
   useEmployerQuestions,
+  useEmployerVoiceProfiles,
   useInterviewDetail,
   useInterviewMutations,
   useQuestionGroups,
@@ -34,7 +36,7 @@ import BackdropLoading from '../../../../components/Common/Loading/BackdropLoadi
 import CloseIcon from '@mui/icons-material/Close';
 import InterviewCreateCardForm from './InterviewCreateCardForm';
 import type { FormValues } from './types';
-import type { JobPostActivity, Question, QuestionGroup } from '../../../../types/models';
+import type { JobPostActivity, Question, QuestionGroup, VoiceProfile } from '../../../../types/models';
 import pc from '@/utils/muiColors';
 
 interface InterviewCreateCardProps {
@@ -47,6 +49,20 @@ const extractId = (field: unknown): string | number => {
     return (field as { id: number }).id;
   }
   return (field as string | number) ?? '';
+};
+
+const getGrantJobId = (grant: NonNullable<VoiceProfile['grants']>[number]) => grant.jobPost ?? grant.job_post ?? null;
+
+const isVoiceProfileAvailableForJob = (profile: VoiceProfile, jobPostId: string | number) => {
+  const grants = profile.grants ?? [];
+  if (!grants.length) return true;
+  if (!jobPostId) {
+    return grants.some((grant) => !getGrantJobId(grant));
+  }
+  return grants.some((grant) => {
+    const grantJobId = getGrantJobId(grant);
+    return !grantJobId || String(grantJobId) === String(jobPostId);
+  });
 };
 
 type InterviewCreateCardInnerProps = {
@@ -77,12 +93,14 @@ const InterviewCreateCardInner = ({
   const theme = useTheme();
   const { scheduleSession, updateSession, isMutating: isInterviewMutating } = useInterviewMutations();
   const { createQuestion, updateQuestion, isMutating: isQuestionMutating } = useQuestionMutations();
+  const { data: voiceProfileData, isLoading: isLoadingVoiceProfiles } = useEmployerVoiceProfiles();
 
   const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
     defaultValues: initialValues,
   });
 
   const selectedJobPostId = watch('job_post');
+  const selectedVoiceProfileId = useWatch({ control, name: 'voice_profile' });
   const { data: candidateData, isLoading: isLoadingCandidates } = useAppliedResumes(
     {
       jobPostId: selectedJobPostId as number,
@@ -92,6 +110,10 @@ const InterviewCreateCardInner = ({
   );
 
   const candidates = useMemo(() => candidateData?.results ?? [], [candidateData]) as JobPostActivity[];
+  const voiceProfiles = useMemo(
+    () => (voiceProfileData?.results ?? []).filter((profile) => isVoiceProfileAvailableForJob(profile, selectedJobPostId)),
+    [selectedJobPostId, voiceProfileData],
+  );
   const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
   const [questionDraft, setQuestionDraft] = useState('');
   const [editingQuestionId, setEditingQuestionId] = useState<number | null>(null);
@@ -100,7 +122,16 @@ const InterviewCreateCardInner = ({
   const handleJobPostChange = useCallback((value: string | number) => {
     setValue('job_post', value, { shouldValidate: true });
     setValue('candidate', '', { shouldValidate: false });
+    setValue('voice_profile', '', { shouldValidate: false });
   }, [setValue]);
+
+  React.useEffect(() => {
+    if (!selectedVoiceProfileId) return;
+    const stillAvailable = voiceProfiles.some((profile) => String(profile.id) === String(selectedVoiceProfileId));
+    if (!stillAvailable) {
+      setValue('voice_profile', '', { shouldValidate: false });
+    }
+  }, [selectedVoiceProfileId, setValue, voiceProfiles]);
 
     const handleQuestionGroupChange = useCallback((value: string | number) => {
     setValue('selected_group', value, { shouldValidate: true });
@@ -140,10 +171,14 @@ const InterviewCreateCardInner = ({
   const onSubmit = useCallback(async (data: FormValues) => {
     try {
       setIsLoadingSessionSave(true);
+      const selectedVoiceProfile = data.voice_profile && data.voice_profile !== 'auto'
+        ? Number(data.voice_profile)
+        : null;
       const payload = {
         job_post: Number(data.job_post),
         candidate: Number(data.candidate),
         scheduled_at: data.scheduled_at,
+        voice_profile: selectedVoiceProfile,
         question_ids: data.selected_questions.filter(Boolean),
         type: 'mixed' as const,
       };
@@ -156,8 +191,8 @@ const InterviewCreateCardInner = ({
         toastMessages.success(t('interview:interviewCreateCard.messages.scheduleSuccess'));
       }
       push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`);
-    } catch {
-      // Error handled by mutation hook
+    } catch (error) {
+      errorHandling(error);
     } finally {
       setIsLoadingSessionSave(false);
     }
@@ -202,8 +237,10 @@ const InterviewCreateCardInner = ({
         questions={questions}
         questionGroups={questionGroups}
         candidates={candidates}
+        voiceProfiles={voiceProfiles}
         isLoadingJobs={isLoadingJobs}
         isLoadingCandidates={isLoadingCandidates}
+        isLoadingVoiceProfiles={isLoadingVoiceProfiles}
         isInterviewMutating={isInterviewMutating || isLoadingSessionSave}
         selectedJobPostId={selectedJobPostId}
         selectedQuestionsCount={(watch('selected_questions') ?? []).length}
@@ -308,6 +345,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
     candidate: sessionDetail?.candidate ? extractId(sessionDetail.candidate) : (candidateIdQuery ? Number(candidateIdQuery) : ''),
     scheduled_at: sessionDetail?.scheduledAt ?? '',
     selected_group: sessionDetail?.questionGroup ? extractId(sessionDetail.questionGroup) : '',
+    voice_profile: sessionDetail?.voiceProfile ?? sessionDetail?.voice_profile ?? '',
     selected_questions: sessionDetail?.questions?.map((q: Question) => q.id) ?? [],
   }), [candidateIdQuery, jobPostIdQuery, sessionDetail]);
 

@@ -1,5 +1,4 @@
- 'use client';
-import { useAppSelector } from '@/redux/hooks';
+'use client';
 import React from "react";
 import { useDispatch } from "react-redux";
 import Link from 'next/link';
@@ -10,8 +9,9 @@ import { Box, Card, Skeleton, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import commonService from "@/services/commonService";
 import MuiImageCustom from "@/components/Common/MuiImageCustom";
-import { searchJobPost } from "@/redux/filterSlice";
+import { buildJobPostFilter, searchJobPost } from "@/redux/filterSlice";
 import { IMAGES, ROUTES } from "@/configs/constants";
+import { localizeRoutePath } from "@/configs/routeLocalization";
 import { Theme } from "@mui/material/styles";
 import { Career } from "@/types/models";
 
@@ -21,6 +21,10 @@ const styles = {
   },
   ".swiper-wrapper": {
     paddingBottom: "35px",
+    alignItems: "stretch",
+  },
+  ".swiper-slide": {
+    height: "auto",
   },
   ".swiper-pagination-bullet": {
     width: 8,
@@ -40,7 +44,11 @@ const styles = {
 const Loading = (
   <Card
     sx={{
+      display: "flex",
+      flexDirection: "column",
       alignItems: "center",
+      justifyContent: "center",
+      minHeight: 190,
       p: 2,
       mb: 0.5,
       boxShadow: 0,
@@ -64,14 +72,24 @@ const Loading = (
   </Card>
 );
 
+const normalizeCareers = (careers: Career[] = []) =>
+  careers
+    .map((career) => ({
+      ...career,
+      id: Number(career.id),
+      name: String(career.name ?? '').trim(),
+      jobPostTotal: Number(career.jobPostTotal ?? career.job_post_total ?? 0),
+    }))
+    .filter((career) => Number.isFinite(career.id) && career.id > 0 && career.name);
+
 const CareerCarousel = () => {
-  const { t } = useTranslation('public');
+  const { t, i18n } = useTranslation('public');
   const dispatch = useDispatch();
-  const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [parentWidth, setParentWidth] = React.useState(0);
   const col = parentWidth < 600 ? 2 : parentWidth < 900 ? 3 : parentWidth < 1200 ? 4 : 5;
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
 
-  const { data: topCareers = [], isLoading } = useQuery({
+  const { data: rawTopCareers = [], isLoading } = useQuery({
     queryKey: ['top-careers'],
     queryFn: async () => {
       const resData = await commonService.getTop10Careers();
@@ -79,6 +97,7 @@ const CareerCarousel = () => {
     },
     staleTime: 5 * 60_000,
   });
+  const topCareers = React.useMemo(() => normalizeCareers(rawTopCareers), [rawTopCareers]);
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -93,7 +112,7 @@ const CareerCarousel = () => {
   }, []);
 
   const handleFilter = (id: string | number) => {
-    dispatch(searchJobPost({ ...jobPostFilter, careerId: String(id) }));
+    dispatch(searchJobPost(buildJobPostFilter({ careerId: String(id) })));
   };
 
   return (
@@ -119,10 +138,15 @@ const CareerCarousel = () => {
               <SwiperSlide key={value.id}>
                 <Card
                   component={Link}
-                  href={`/${ROUTES.JOB_SEEKER.JOBS}`}
+                  href={jobsHref}
                   prefetch
                   sx={{
+                    display: "flex",
+                    flexDirection: "column",
                     alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                    minHeight: 190,
                     p: 2,
                     mb: 0.5,
                     cursor: "pointer",
@@ -132,6 +156,7 @@ const CareerCarousel = () => {
                     backgroundColor: (theme) => theme.palette.background.paper,
                     borderRadius: "16px",
                     transition: "all 0.3s ease",
+                    overflow: "hidden",
                     "&:hover": {
                       transform: "translateY(-4px)",
                       boxShadow: (theme: Theme) => theme.customShadows?.medium,
@@ -149,7 +174,8 @@ const CareerCarousel = () => {
                     direction="row"
                     justifyContent="center"
                     sx={{
-                      p: 2,
+                      p: 1,
+                      width: "100%",
                       "& .career-icon": {
                         transition: "transform 0.3s ease",
                       },
@@ -182,15 +208,18 @@ const CareerCarousel = () => {
                       textOverflow: "ellipsis",
                       transition: "color 0.3s ease",
                       px: 1,
+                      width: "100%",
                     }}
                   >
                     {value?.name}
                   </Typography>
                   <Typography
                     variant="caption"
-                    display="block"
+                    display="inline-flex"
                     gutterBottom
                     sx={{
+                      alignSelf: "center",
+                      maxWidth: "100%",
                       textAlign: "center",
                       color: (theme: Theme) => theme.palette.text.secondary,
                       backgroundColor: (theme: Theme) => theme.palette.primary.background,
@@ -198,6 +227,8 @@ const CareerCarousel = () => {
                       py: 0.5,
                       borderRadius: "20px",
                       fontSize: "0.75rem",
+                      lineHeight: 1.4,
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {t("home.jobsCount", { count: value.jobPostTotal, defaultValue: "{{count}} Việc Làm" })}

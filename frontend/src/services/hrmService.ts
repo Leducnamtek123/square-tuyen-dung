@@ -1,6 +1,6 @@
 import httpRequest from '../utils/httpRequest';
 
-export type FrappeEmployeeFromApplicationPayload = {
+export type EmployeeFromApplicationPayload = {
   applicationId: number;
   fullName?: string;
   email?: string;
@@ -10,15 +10,13 @@ export type FrappeEmployeeFromApplicationPayload = {
   jobTitle?: string;
   department?: string;
   startDate?: string | null;
-  createFrappeAccount?: boolean;
+  createHrmAccount?: boolean;
   sendWelcomeEmail?: boolean;
-  frappeRoles?: string[];
+  hrmRoles?: string[];
   notes?: string;
 };
 
-export type EmployeeFromApplicationPayload = FrappeEmployeeFromApplicationPayload;
-
-export type FrappeEmployeeSyncResult = {
+export type EmployeeSyncResult = {
   id: number;
   applicationId: number;
   status?: number;
@@ -32,23 +30,23 @@ export type FrappeEmployeeSyncResult = {
   recruiterUserId?: string;
 };
 
-export type FrappeIntegrationStatus = {
+export type HRMIntegrationStatus = {
   enabled: boolean;
   baseUrl: string;
   siteName?: string;
 };
 
 const hrmService = {
-  createEmployeeFromApplication: (data: FrappeEmployeeFromApplicationPayload): Promise<FrappeEmployeeSyncResult> => {
-    return httpRequest.post<FrappeEmployeeSyncResult>('hrm/web/employees/from-application/', data);
+  createEmployeeFromApplication: (data: EmployeeFromApplicationPayload): Promise<EmployeeSyncResult> => {
+    return httpRequest.post<EmployeeSyncResult>('hrm/web/employees/from-application/', data);
   },
 
   provisionCurrentUser: (): Promise<{ userId: string; companyId: string }> => {
     return httpRequest.post<{ userId: string; companyId: string }>('hrm/web/employees/provision-current-user/', {});
   },
 
-  getIntegrationStatus: (): Promise<FrappeIntegrationStatus> => {
-    return httpRequest.get<FrappeIntegrationStatus>('hrm/web/integration-status/');
+  getIntegrationStatus: (): Promise<HRMIntegrationStatus> => {
+    return httpRequest.get<HRMIntegrationStatus>('hrm/web/integration-status/');
   },
 };
 

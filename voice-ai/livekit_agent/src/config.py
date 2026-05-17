@@ -14,6 +14,17 @@ def _get_float(name: str, default: float) -> float:
     except ValueError:
         return default
 
+def _get_optional_float(*names: str) -> float | None:
+    for name in names:
+        raw = os.getenv(name)
+        if raw is None or str(raw).strip() == "":
+            continue
+        try:
+            return float(raw)
+        except ValueError:
+            continue
+    return None
+
 def _get_int(name: str, default: int) -> int:
     raw = os.getenv(name)
     if raw is None:
@@ -22,6 +33,12 @@ def _get_int(name: str, default: int) -> int:
         return int(raw)
     except ValueError:
         return default
+
+def _get_bool(name: str, default: bool = False) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return str(raw).strip().lower() in {"1", "true", "yes", "on", "y", "t"}
 
 @dataclass
 class Config:
@@ -33,6 +50,30 @@ class Config:
     LLM_MODEL: str = os.getenv("LLM_MODEL") or os.getenv("AI_LLM_MODEL", "gemma4:e4b")
     LLM_BASE_URL: str = os.getenv("LLM_BASE_URL") or os.getenv("AI_LLM_BASE_URL", "http://ollama:11434/v1")
     LLM_API_KEY: str = os.getenv("LLM_API_KEY") or os.getenv("AI_LLM_API_KEY", "no-key-needed")
+    LLM_TEMPERATURE: float = _get_float("LLM_TEMPERATURE", _get_float("AI_LLM_TEMPERATURE", 0.7))
+    LLM_TOP_P: float = _get_float("LLM_TOP_P", _get_float("AI_LLM_TOP_P", 0.8))
+    LLM_TOP_K: int = _get_int("LLM_TOP_K", _get_int("AI_LLM_TOP_K", 20))
+    LLM_MIN_P: float = _get_float("LLM_MIN_P", _get_float("AI_LLM_MIN_P", 0.0))
+    LLM_PRESENCE_PENALTY: float = _get_float(
+        "LLM_PRESENCE_PENALTY",
+        _get_float("AI_LLM_PRESENCE_PENALTY", 1.5),
+    )
+    LLM_REPETITION_PENALTY: float = _get_float(
+        "LLM_REPETITION_PENALTY",
+        _get_float("AI_LLM_REPETITION_PENALTY", 1.0),
+    )
+    LLM_MAX_COMPLETION_TOKENS: int = _get_int(
+        "LLM_MAX_COMPLETION_TOKENS",
+        _get_int("AI_LLM_MAX_TOKENS", 512),
+    )
+    LLM_ENABLE_THINKING: bool = _get_bool(
+        "LLM_ENABLE_THINKING",
+        _get_bool("AI_LLM_ENABLE_THINKING", False),
+    )
+    LLM_USE_VLLM_PARAMS: bool = _get_bool(
+        "LLM_USE_VLLM_PARAMS",
+        _get_bool("AI_LLM_USE_VLLM_PARAMS", False),
+    )
 
     STT_PROVIDER: str = os.getenv("STT_PROVIDER", "whisper").lower()
 
@@ -43,7 +84,7 @@ class Config:
 
     TTS_BASE_URL: str = os.getenv("TTS_BASE_URL") or os.getenv("AI_TTS_BASE_URL", "http://vieneu-tts:8298/v1")
     TTS_MODEL: str = os.getenv("TTS_MODEL") or os.getenv("AI_TTS_MODEL", "tts-1")
-    TTS_VOICE: str = os.getenv("TTS_VOICE") or os.getenv("AI_TTS_DEFAULT_VOICE", "Bình (nam miền Bắc)")
+    TTS_VOICE: str = os.getenv("TTS_VOICE") or os.getenv("AI_TTS_DEFAULT_VOICE", "Ly")
     TTS_API_KEY: str = os.getenv("TTS_API_KEY") or os.getenv("AI_TTS_API_KEY", "no-key-needed")
     TTS_CONNECT_TIMEOUT_SECONDS: float = _get_float(
         "TTS_CONNECT_TIMEOUT_SECONDS", 15.0
@@ -52,10 +93,11 @@ class Config:
     TTS_WRITE_TIMEOUT_SECONDS: float = _get_float("TTS_WRITE_TIMEOUT_SECONDS", 30.0)
     TTS_POOL_TIMEOUT_SECONDS: float = _get_float("TTS_POOL_TIMEOUT_SECONDS", 30.0)
     TTS_MAX_RETRIES: int = _get_int("TTS_MAX_RETRIES", 3)
+    TTS_SPEED: float | None = _get_optional_float("TTS_SPEED", "TTS_DEFAULT_SPEED")
 
 
     # Streaming/latency tuning
-    PREEMPTIVE_GENERATION: bool = os.getenv("PREEMPTIVE_GENERATION", "1").lower() in (
+    PREEMPTIVE_GENERATION: bool = os.getenv("PREEMPTIVE_GENERATION", "0").lower() in (
         "1",
         "true",
         "yes",
@@ -70,8 +112,10 @@ class Config:
     MIN_ENDPOINTING_DELAY: float = _get_float("MIN_ENDPOINTING_DELAY", 0.45)
     MAX_ENDPOINTING_DELAY: float = _get_float("MAX_ENDPOINTING_DELAY", 1.5)
     MIN_CONSECUTIVE_SPEECH_DELAY: float = _get_float("MIN_CONSECUTIVE_SPEECH_DELAY", 0.25)
-    MIN_INTERRUPTION_DURATION: float = _get_float("MIN_INTERRUPTION_DURATION", 0.75)
-    MIN_INTERRUPTION_WORDS: int = _get_int("MIN_INTERRUPTION_WORDS", 2)
+    MIN_INTERRUPTION_DURATION: float = _get_float("MIN_INTERRUPTION_DURATION", 1.0)
+    MIN_INTERRUPTION_WORDS: int = _get_int("MIN_INTERRUPTION_WORDS", 3)
+    ANSWER_MIN_WORDS: int = _get_int("ANSWER_MIN_WORDS", 8)
+    ANSWER_MIN_CHARS: int = _get_int("ANSWER_MIN_CHARS", 28)
 
     AUTO_END_ON_COMPLETION: bool = os.getenv("AUTO_END_ON_COMPLETION", "0").lower() in (
         "1",

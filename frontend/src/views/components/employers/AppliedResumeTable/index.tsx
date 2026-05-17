@@ -1,5 +1,5 @@
 'use client';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Box, 
@@ -39,7 +39,7 @@ interface AppliedResumeTableProps {
   handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;
   handleDelete: (id: string | number) => void;
   onCreateEmployee?: (activity: JobPostActivity) => void;
-  onAnalysisStateChange?: (id: string | number, nextState: Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>) => void;
+  onAnalysisStateChange?: (id: string | number, nextState: Partial<JobPostActivity>) => void;
   blindMode?: boolean;
   rowCount: number;
   pagination: PaginationState;
@@ -72,6 +72,11 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     if (!openDrawerId) return null;
     return rows.find(r => r.id === openDrawerId);
   }, [openDrawerId, rows]);
+
+  const handleDrawerAnalysisStateChange = useCallback((nextState: Partial<JobPostActivity>) => {
+    if (!openDrawerId || !onAnalysisStateChange) return;
+    onAnalysisStateChange(openDrawerId, nextState);
+  }, [openDrawerId, onAnalysisStateChange]);
 
   const columns = useMemo<ColumnDef<JobPostActivity>[]>(() => [
     {
@@ -269,7 +274,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
           )}
 
           {!blindMode && info.row.original.hrmEmployeeId ? (
-            <Tooltip title={t('employees.hrm.convert.openEmployee', { defaultValue: 'Open Frappe HR employee profile' })} arrow>
+            <Tooltip title={t('employees.hrm.convert.openEmployee', { defaultValue: 'Open HRM employee profile' })} arrow>
               <IconButton
                 size="small"
                 color="primary"
@@ -330,10 +335,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
           open={Boolean(openDrawerId)}
           onClose={() => setOpenDrawerId(null)}
           activityId={openDrawerId}
-          onAnalysisStateChange={(nextState) => {
-            if (!openDrawerId || !onAnalysisStateChange) return;
-            onAnalysisStateChange(openDrawerId, nextState);
-          }}
+          onAnalysisStateChange={handleDrawerAnalysisStateChange}
           initialData={{
             ...selectedActivityInfo,
             aiAnalysisSummary: selectedActivityInfo.aiAnalysisSummary ?? undefined

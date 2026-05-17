@@ -44,6 +44,7 @@ api_v1_patterns = [
     path("interview/compat/<str:room_name>/next-question", interviews_compat_views.interview_next_question),
     path("interview/compat/<str:room_name>/status", interviews_compat_views.interview_status),
     path("interview/compat/<str:room_name>/append-transcription", interviews_compat_views.interview_append_transcription),
+    path("interview/compat/voice-profiles/<int:profile_id>", interviews_compat_views.interview_voice_profile),
 ]
 
 urlpatterns = [

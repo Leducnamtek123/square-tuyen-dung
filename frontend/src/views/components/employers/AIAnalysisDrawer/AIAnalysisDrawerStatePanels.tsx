@@ -289,7 +289,7 @@ const AIAnalysisDrawerStatePanels = ({
         <ScoreGauge score={data?.aiAnalysisEffectiveScore ?? data?.aiAnalysisScore ?? 0} />
       </Paper>
 
-      <SectionCard title={t('appliedResume.ai.reviewTitle', { defaultValue: 'HR review' })} icon={<PsychologyIcon fontSize="small" />} iconColor={theme.palette.info.main}>
+      <SectionCard title={t('employer:appliedResume.ai.reviewTitle', { defaultValue: 'HR review' })} icon={<PsychologyIcon fontSize="small" />} iconColor={theme.palette.info.main}>
         <Stack spacing={2}>
           <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
             <Chip
@@ -308,16 +308,16 @@ const AIAnalysisDrawerStatePanels = ({
           </Stack>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
             <TextField
-              label={t('appliedResume.ai.overrideScore', { defaultValue: 'Override score' })}
+              label={t('employer:appliedResume.ai.overrideScore', { defaultValue: 'Override score' })}
               value={overrideScore}
               onChange={(event) => setOverrideScore(event.target.value)}
               type="number"
               size="small"
-              inputProps={{ min: 0, max: 100 }}
+              slotProps={{ htmlInput: { min: 0, max: 100 } }}
               sx={{ width: { xs: '100%', sm: 150 } }}
             />
             <TextField
-              label={t('appliedResume.ai.reviewNote', { defaultValue: 'Review note' })}
+              label={t('employer:appliedResume.ai.reviewNote', { defaultValue: 'Review note' })}
               value={reviewNote}
               onChange={(event) => setReviewNote(event.target.value)}
               size="small"
@@ -331,7 +331,7 @@ const AIAnalysisDrawerStatePanels = ({
             disabled={savingReview}
             sx={{ alignSelf: 'flex-start', textTransform: 'none', fontWeight: 900 }}
           >
-            {t('appliedResume.ai.saveReview', { defaultValue: 'Save review' })}
+            {t('employer:appliedResume.ai.saveReview', { defaultValue: 'Save review' })}
           </Button>
         </Stack>
       </SectionCard>
@@ -343,7 +343,7 @@ const AIAnalysisDrawerStatePanels = ({
       </SectionCard>
 
       {criteriaResults.length > 0 && (
-        <SectionCard title={t('appliedResume.ai.criteriaTitle', { defaultValue: 'Weighted criteria' })} icon={<CheckCircleIcon fontSize="small" />} iconColor={theme.palette.info.main}>
+        <SectionCard title={t('employer:appliedResume.ai.criteriaTitle', { defaultValue: 'Weighted criteria' })} icon={<CheckCircleIcon fontSize="small" />} iconColor={theme.palette.info.main}>
           <Stack spacing={1.25}>
             {criteriaResults.map((item, index) => (
               <Paper key={`${textValue(item.key)}-${index}`} elevation={0} sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
@@ -365,7 +365,7 @@ const AIAnalysisDrawerStatePanels = ({
       )}
 
       {evidence.length > 0 && (
-        <SectionCard title={t('appliedResume.ai.evidenceTitle', { defaultValue: 'Evidence' })} icon={<AutoFixHighIcon fontSize="small" />} iconColor={theme.palette.primary.main}>
+        <SectionCard title={t('employer:appliedResume.ai.evidenceTitle', { defaultValue: 'Evidence' })} icon={<AutoFixHighIcon fontSize="small" />} iconColor={theme.palette.primary.main}>
           <Stack spacing={1.25}>
             {evidence.map((item, index) => (
               <Paper key={`${textValue(item.claim)}-${index}`} elevation={0} sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>

@@ -19,12 +19,14 @@ ENV DEBIAN_FRONTEND=noninteractive \
     GPU_MEMORY_UTILIZATION=0.55 \
     MAX_MODEL_LEN=8192 \
     MAX_NUM_SEQS=8 \
-    TTS_GPU_MEM_FRACTION=0.15 \
+    TTS_GPU_MEM_FRACTION=0.30 \
     VOXBOX_HF_REPO_ID=Systran/faster-whisper-large-v3 \
     VOXBOX_DEVICE=cuda \
     TTS_DEVICE=cuda \
-    TTS_MODE=standard \
-    TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS-0.3B
+    TTS_CODEC_DEVICE=cuda \
+    TTS_MODE=fast \
+    TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS \
+    TTS_GGUF_FILENAME=
 
 USER root
 
@@ -50,17 +52,17 @@ RUN python3.10 -m venv /opt/whisper-venv \
 
 RUN python3.10 -m venv /opt/tts-venv \
     && uv pip install --python /opt/tts-venv/bin/python --no-cache \
-      "torch==2.5.1" "torchaudio==2.5.1" --index-url https://download.pytorch.org/whl/cu124 \
+      "torch==2.7.1" "torchaudio==2.7.1" "torchvision==0.22.1" --index-url https://download.pytorch.org/whl/cu128 \
     && uv pip install --python /opt/tts-venv/bin/python --no-cache \
       "accelerate>=0.30.0" \
-      "vieneu[gpu]==1.2.6" \
+      "vieneu[gpu]==2.7.0" \
       "loguru" \
       "fastapi" \
       "uvicorn" \
       "pydantic" \
       "numpy" \
       "transformers>=4.45.0" \
-      "torchao==0.6.1"
+      "torchao==0.12.0"
 
 WORKDIR /opt/square-ai
 

@@ -50,7 +50,7 @@ const HOST_NAME = {
 } as const;
 
 const getSquareHrmPublicUrl = (): string => {
-  const configured = process.env.NEXT_PUBLIC_FRAPPE_HR_PUBLIC_URL?.trim().replace(/\/$/, '');
+  const configured = process.env.NEXT_PUBLIC_HRM_PUBLIC_URL?.trim().replace(/\/$/, '');
   if (configured) return configured;
 
   if (BASE_HOSTNAME === 'localhost' || BASE_HOSTNAME === '127.0.0.1') {

@@ -9,15 +9,25 @@ from .models import (
 )
 
 from apps.accounts import serializers as auth_serializers
+from apps.files.models import File
+from shared.helpers.cloudinary_service import CloudinaryService
 
 
 class FeedbackSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
-    content = serializers.CharField(max_length=255)
+    content = serializers.CharField(max_length=500)
 
     rating = serializers.IntegerField(default=5)
 
     isActive = serializers.BooleanField(source='is_active', default=False)
+
+    evidenceImageFile = serializers.ImageField(
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
+
+    evidenceImageUrl = serializers.SerializerMethodField(read_only=True)
 
     userDict = auth_serializers.UserSerializer(
         source="user",
@@ -25,14 +35,47 @@ class FeedbackSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         read_only=True
     )
 
+    def get_evidenceImageUrl(self, feedback):
+        if feedback.evidence_image:
+            return feedback.evidence_image.get_full_url()
+        return None
+
+    def _upload_evidence_image(self, image_file):
+        upload_result = CloudinaryService.upload_image(
+            image_file,
+            'feedback-evidence',
+        )
+        if not upload_result:
+            return None
+        return File.update_or_create_file_with_cloudinary(
+            None,
+            upload_result,
+            File.OTHER_TYPE,
+        )
+
     def create(self, validated_data):
         request = self.context['request']
-        feedback = Feedback.objects.create(**validated_data, user=request.user)
+        evidence_image_file = validated_data.pop('evidenceImageFile', None)
+        evidence_image = None
+        if evidence_image_file:
+            evidence_image = self._upload_evidence_image(evidence_image_file)
+            if not evidence_image:
+                raise serializers.ValidationError({
+                    'evidenceImageFile': ['Upload failed.'],
+                })
+        feedback = Feedback.objects.create(
+            **validated_data,
+            user=request.user,
+            evidence_image=evidence_image,
+        )
         return feedback
 
     class Meta:
         model = Feedback
-        fields = ('id', 'content', 'rating', 'isActive', 'userDict')
+        fields = (
+            'id', 'content', 'rating', 'isActive',
+            'evidenceImageFile', 'evidenceImageUrl', 'userDict',
+        )
 
 
 class BannerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
@@ -112,19 +155,30 @@ class AdminBannerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
 class AdminFeedbackSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """Full admin serializer for Feedback management."""
+    evidenceImageUrl = serializers.SerializerMethodField(read_only=True)
+
     userDict = auth_serializers.UserSerializer(
         source="user",
         fields=['id', 'fullName', 'avatarUrl', 'email'],
         read_only=True
     )
 
+    def get_evidenceImageUrl(self, feedback):
+        if feedback.evidence_image:
+            return feedback.evidence_image.get_full_url()
+        return None
+
     class Meta:
         model = Feedback
         fields = (
             'id', 'content', 'rating', 'is_active',
-            'user', 'userDict', 'create_at', 'update_at',
+            'user', 'userDict', 'evidence_image', 'evidenceImageUrl',
+            'create_at', 'update_at',
         )
-        read_only_fields = ('id', 'create_at', 'update_at', 'userDict')
+        read_only_fields = (
+            'id', 'create_at', 'update_at',
+            'userDict', 'evidenceImageUrl',
+        )
 
 
 class AdminBannerTypeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):

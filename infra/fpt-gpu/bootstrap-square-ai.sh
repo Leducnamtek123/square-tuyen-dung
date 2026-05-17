@@ -19,6 +19,26 @@ fi
 mkdir -p "$INSTALL_ROOT" "$SRC_ROOT" "$VENV_ROOT" "$LOG_ROOT" \
   /models/huggingface /models/whisper
 
+if [ -f "${BASH_SOURCE[0]}" ]; then
+  source_bootstrap="$(readlink -f "${BASH_SOURCE[0]}")"
+  target_bootstrap="$(readlink -m "$INSTALL_ROOT/bootstrap-square-ai.sh")"
+  if [ "$source_bootstrap" != "$target_bootstrap" ]; then
+    install -m 0755 "${BASH_SOURCE[0]}" "$INSTALL_ROOT/bootstrap-square-ai.sh"
+  fi
+fi
+
+start_sshd() {
+  if [ -x /usr/sbin/sshd ]; then
+    mkdir -p /run/sshd
+    ssh-keygen -A >/dev/null 2>&1 || true
+    if ! pgrep -x sshd >/dev/null 2>&1; then
+      /usr/sbin/sshd || service ssh start || true
+    fi
+  fi
+}
+
+start_sshd
+
 APT_PACKAGES=(
   ca-certificates
   curl
@@ -44,13 +64,7 @@ if [ "${#missing_packages[@]}" -gt 0 ]; then
   apt-get install -y --no-install-recommends "${missing_packages[@]}"
 fi
 
-if [ -x /usr/sbin/sshd ]; then
-  mkdir -p /run/sshd
-  ssh-keygen -A >/dev/null 2>&1 || true
-  if ! pgrep -x sshd >/dev/null 2>&1; then
-    /usr/sbin/sshd || service ssh start || true
-  fi
-fi
+start_sshd
 
 if ! command -v uv >/dev/null 2>&1; then
   curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -79,6 +93,37 @@ install_if_missing() {
   fi
 }
 
+install_if_version_lt() {
+  local python="$1"
+  local package_name="$2"
+  local min_version="$3"
+  shift 3
+  if ! "$python" - "$package_name" "$min_version" <<'PY' >/dev/null 2>&1; then
+import importlib.metadata
+import sys
+
+package_name, min_version = sys.argv[1], sys.argv[2]
+
+def parse(value):
+    parts = []
+    for part in value.replace("-", ".").split("."):
+        if part.isdigit():
+            parts.append(int(part))
+        else:
+            break
+    return tuple(parts)
+
+try:
+    installed = importlib.metadata.version(package_name)
+except importlib.metadata.PackageNotFoundError:
+    sys.exit(1)
+
+sys.exit(0 if parse(installed) >= parse(min_version) else 1)
+PY
+    uv pip install --python "$python" --no-cache --upgrade "$@"
+  fi
+}
+
 if [ ! -d "$SRC_ROOT/.git" ]; then
   rm -rf "$SRC_ROOT"
   git clone --depth 1 --branch "${SQUARE_REPO_REF:-main}" \
@@ -89,7 +134,11 @@ else
   git -C "$SRC_ROOT" checkout FETCH_HEAD
 fi
 
-cp "$SRC_ROOT/voice-ai/inference/vieneu-text-to-speech/api.py" "$INSTALL_ROOT/tts_api.py"
+if [ ! -f "$INSTALL_ROOT/tts_api.py" ] || [ "${REFRESH_TTS_API_FROM_SOURCE:-0}" = "1" ]; then
+  cp "$SRC_ROOT/voice-ai/inference/vieneu-text-to-speech/api.py" "$INSTALL_ROOT/tts_api.py"
+else
+  echo "Keeping existing $INSTALL_ROOT/tts_api.py. Set REFRESH_TTS_API_FROM_SOURCE=1 to replace it from source."
+fi
 
 existing_env_value() {
   local key="$1"
@@ -137,11 +186,38 @@ default_env VOXBOX_HF_REPO_ID "Systran/faster-whisper-large-v3"
 default_env VOXBOX_DEVICE "cuda"
 default_env DATA_DIR "/models/whisper"
 default_env TTS_DEVICE "cuda"
-default_env TTS_MODE "standard"
-default_env TTS_BACKBONE_REPO "pnnbao-ump/VieNeu-TTS-0.3B"
-default_env TTS_GPU_MEM_FRACTION "0.15"
+default_env TTS_CODEC_DEVICE "cuda"
+default_env TTS_MODE "fast"
+default_env TTS_BACKBONE_REPO "pnnbao-ump/VieNeu-TTS"
+default_env TTS_GGUF_FILENAME ""
+default_env TTS_EMOTION "natural"
+default_env TTS_GPU_MEM_FRACTION "0.30"
+default_env TTS_INFER_TEMPERATURE ""
+default_env TTS_INFER_TOP_K ""
+default_env TTS_MAX_CHARS ""
+default_env TTS_DEFAULT_SPEED ""
+default_env TTS_NORMALIZE_AUDIO ""
+default_env TTS_PEAK_LIMIT "0.98"
+default_env TTS_PEAK_NORMALIZE_TARGET ""
 default_env STT_STARTUP_DELAY_SECONDS "30"
 default_env TTS_STARTUP_DELAY_SECONDS "60"
+
+if [ "${SQUARE_TTS_KEEP_LEGACY_TUNING:-0}" != "1" ]; then
+  # Use VieNeu's documented GPU/LMDeploy fast path for interview quality.
+  # This intentionally overrides older FPT Advanced Settings such as
+  # TTS_MODE=standard and TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS-0.3B.
+  TTS_MODE="fast"
+  TTS_BACKBONE_REPO="pnnbao-ump/VieNeu-TTS"
+  TTS_CODEC_DEVICE="cuda"
+  TTS_GPU_MEM_FRACTION="0.30"
+  TTS_GGUF_FILENAME=""
+  TTS_INFER_TEMPERATURE=""
+  TTS_INFER_TOP_K=""
+  TTS_MAX_CHARS=""
+  TTS_DEFAULT_SPEED=""
+  TTS_NORMALIZE_AUDIO=""
+  TTS_PEAK_NORMALIZE_TARGET=""
+fi
 
 cat > "$INSTALL_ROOT/square-ai.env" <<EOF
 LLM_MODEL="$LLM_MODEL"
@@ -158,9 +234,19 @@ VOXBOX_HF_REPO_ID="$VOXBOX_HF_REPO_ID"
 VOXBOX_DEVICE="$VOXBOX_DEVICE"
 DATA_DIR="$DATA_DIR"
 TTS_DEVICE="$TTS_DEVICE"
+TTS_CODEC_DEVICE="$TTS_CODEC_DEVICE"
 TTS_MODE="$TTS_MODE"
 TTS_BACKBONE_REPO="$TTS_BACKBONE_REPO"
+TTS_GGUF_FILENAME="$TTS_GGUF_FILENAME"
+TTS_EMOTION="$TTS_EMOTION"
 TTS_GPU_MEM_FRACTION="$TTS_GPU_MEM_FRACTION"
+TTS_INFER_TEMPERATURE="$TTS_INFER_TEMPERATURE"
+TTS_INFER_TOP_K="$TTS_INFER_TOP_K"
+TTS_MAX_CHARS="$TTS_MAX_CHARS"
+TTS_DEFAULT_SPEED="$TTS_DEFAULT_SPEED"
+TTS_NORMALIZE_AUDIO="$TTS_NORMALIZE_AUDIO"
+TTS_PEAK_LIMIT="$TTS_PEAK_LIMIT"
+TTS_PEAK_NORMALIZE_TARGET="$TTS_PEAK_NORMALIZE_TARGET"
 STT_STARTUP_DELAY_SECONDS="$STT_STARTUP_DELAY_SECONDS"
 TTS_STARTUP_DELAY_SECONDS="$TTS_STARTUP_DELAY_SECONDS"
 EOF
@@ -178,13 +264,13 @@ if ! "$VENV_ROOT/whisper/bin/python" -c "import vox_box" >/dev/null 2>&1; then
 fi
 
 ensure_venv "$VENV_ROOT/tts"
-install_if_missing "$VENV_ROOT/tts/bin/python" "torch" \
-  "torch==2.5.1" "torchaudio==2.5.1" --index-url https://download.pytorch.org/whl/cu124
+install_if_version_lt "$VENV_ROOT/tts/bin/python" "torch" "2.7.1" \
+  "torch==2.7.1" "torchaudio==2.7.1" "torchvision==0.22.1" --index-url https://download.pytorch.org/whl/cu128
 uv pip install --python "$VENV_ROOT/tts/bin/python" --no-cache \
   --force-reinstall pip "setuptools<82.0" wheel
-install_if_missing "$VENV_ROOT/tts/bin/python" "vieneu" \
+install_if_version_lt "$VENV_ROOT/tts/bin/python" "vieneu" "2.7.0" \
   "accelerate>=0.30.0" \
-  "vieneu[gpu]==1.2.6" \
+  "vieneu[gpu]==2.7.0" \
   "loguru" \
   "fastapi" \
   "uvicorn" \
@@ -192,6 +278,8 @@ install_if_missing "$VENV_ROOT/tts/bin/python" "vieneu" \
   "numpy" \
   "transformers>=4.45.0,<5.0" \
   "torchao==0.12.0"
+install_if_missing "$VENV_ROOT/tts/bin/python" "lmdeploy" "lmdeploy"
+install_if_missing "$VENV_ROOT/tts/bin/python" "neucodec" "neucodec>=0.0.4"
 
 cat > "$INSTALL_ROOT/start_llm.sh" <<'EOF'
 #!/usr/bin/env bash
@@ -259,6 +347,31 @@ exec /models/venvs/tts/bin/python /models/square-ai/tts_api.py
 EOF
 
 chmod +x "$INSTALL_ROOT/start_llm.sh" "$INSTALL_ROOT/start_whisper.sh" "$INSTALL_ROOT/start_tts.sh"
+
+cat > "$INSTALL_ROOT/start-on-boot.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p /models/logs/square-ai
+
+if [ -x /usr/sbin/sshd ]; then
+  mkdir -p /run/sshd
+  ssh-keygen -A >/dev/null 2>&1 || true
+  pgrep -x sshd >/dev/null 2>&1 || /usr/sbin/sshd || true
+fi
+
+if [ -x /models/square-ai/bootstrap-square-ai.sh ]; then
+  /models/square-ai/bootstrap-square-ai.sh >> /models/logs/square-ai/bootstrap.log 2>&1 || true
+elif [ -x /models/bootstrap-square-ai.sh ]; then
+  /models/bootstrap-square-ai.sh >> /models/logs/square-ai/bootstrap.log 2>&1 || true
+else
+  echo "Missing Square AI bootstrap script on /models." >&2
+fi
+
+exec sleep infinity
+EOF
+
+chmod +x "$INSTALL_ROOT/start-on-boot.sh"
 
 cat > "$INSTALL_ROOT/supervisord.conf" <<EOF
 [supervisord]

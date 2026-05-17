@@ -33,9 +33,9 @@ const EmployeeFromApplicationDialog = ({ open, activity, loading, onClose, onSub
     jobTitle: '',
     department: '',
     startDate: today(),
-    createFrappeAccount: true,
+    createHrmAccount: true,
     sendWelcomeEmail: false,
-    frappeRoles: 'Employee',
+    hrmRoles: 'Employee',
     notes: '',
   });
 
@@ -48,9 +48,9 @@ const EmployeeFromApplicationDialog = ({ open, activity, loading, onClose, onSub
       jobTitle: activity.jobName || activity.jobPost?.jobName || '',
       department: '',
       startDate: today(),
-      createFrappeAccount: true,
+      createHrmAccount: true,
       sendWelcomeEmail: false,
-      frappeRoles: 'Employee',
+      hrmRoles: 'Employee',
       notes: '',
     });
   }, [activity]);
@@ -70,20 +70,20 @@ const EmployeeFromApplicationDialog = ({ open, activity, loading, onClose, onSub
           <TextField type="date" label={t('employer:employees.hrm.fields.startDate')} value={form.startDate} onChange={(e) => setForm((prev) => ({ ...prev, startDate: e.target.value }))} fullWidth slotProps={{ inputLabel: { shrink: true } }} />
           <Stack>
             <FormControlLabel
-              control={<Checkbox checked={form.createFrappeAccount} onChange={(e) => setForm((prev) => ({ ...prev, createFrappeAccount: e.target.checked }))} />}
-              label={t('employer:employees.hrm.convert.createFrappeAccount', { defaultValue: 'Create Frappe HR account' })}
+              control={<Checkbox checked={form.createHrmAccount} onChange={(e) => setForm((prev) => ({ ...prev, createHrmAccount: e.target.checked }))} />}
+              label={t('employer:employees.hrm.convert.createHrmAccount', { defaultValue: 'Create HRM account' })}
             />
             <FormControlLabel
-              control={<Checkbox checked={form.sendWelcomeEmail} disabled={!form.createFrappeAccount} onChange={(e) => setForm((prev) => ({ ...prev, sendWelcomeEmail: e.target.checked }))} />}
-              label={t('employer:employees.hrm.convert.sendWelcomeEmail', { defaultValue: 'Send Frappe welcome email' })}
+              control={<Checkbox checked={form.sendWelcomeEmail} disabled={!form.createHrmAccount} onChange={(e) => setForm((prev) => ({ ...prev, sendWelcomeEmail: e.target.checked }))} />}
+              label={t('employer:employees.hrm.convert.sendWelcomeEmail', { defaultValue: 'Send HRM welcome email' })}
             />
           </Stack>
           <TextField
-            label={t('employer:employees.hrm.convert.roles', { defaultValue: 'Frappe roles' })}
-            value={form.frappeRoles}
-            onChange={(e) => setForm((prev) => ({ ...prev, frappeRoles: e.target.value }))}
+            label={t('employer:employees.hrm.convert.roles', { defaultValue: 'HRM roles' })}
+            value={form.hrmRoles}
+            onChange={(e) => setForm((prev) => ({ ...prev, hrmRoles: e.target.value }))}
             fullWidth
-            disabled={!form.createFrappeAccount}
+            disabled={!form.createHrmAccount}
           />
           <TextField label={t('employer:employees.hrm.fields.notes')} value={form.notes} onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))} fullWidth multiline minRows={3} />
         </Stack>
@@ -101,9 +101,9 @@ const EmployeeFromApplicationDialog = ({ open, activity, loading, onClose, onSub
             jobTitle: form.jobTitle.trim(),
             department: form.department.trim() || undefined,
             startDate: form.startDate || null,
-            createFrappeAccount: form.createFrappeAccount,
-            sendWelcomeEmail: form.createFrappeAccount && form.sendWelcomeEmail,
-            frappeRoles: form.createFrappeAccount ? form.frappeRoles.split(',').map((role) => role.trim()).filter(Boolean) : [],
+            createHrmAccount: form.createHrmAccount,
+            sendWelcomeEmail: form.createHrmAccount && form.sendWelcomeEmail,
+            hrmRoles: form.createHrmAccount ? form.hrmRoles.split(',').map((role) => role.trim()).filter(Boolean) : [],
             notes: form.notes.trim() || undefined,
           })}
         >

@@ -7,6 +7,7 @@ import {
   Button, Tooltip, Rating, Stack
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ImageIcon from '@mui/icons-material/Image';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
@@ -19,6 +20,10 @@ const FeedbacksPage = () => {
   const { t } = useTranslation('admin');
   const [openDelete, setOpenDelete] = useState(false);
   const [current, setCurrent] = useState<Feedback | null>(null);
+  const [evidencePreview, setEvidencePreview] = useState<{
+    url: string;
+    title: string;
+  } | null>(null);
 
   const {
     sorting,
@@ -87,6 +92,32 @@ const FeedbacksPage = () => {
           {info.getValue() as string}
         </Typography>
       ),
+    },
+    {
+      accessorKey: 'evidenceImageUrl',
+      header: t('pages.feedbacks.table.evidence') as string,
+      cell: (info) => {
+        const feedback = info.row.original;
+        const evidenceImageUrl = feedback.evidenceImageUrl;
+        if (!evidenceImageUrl) {
+          return <Typography variant="body2" color="text.secondary">—</Typography>;
+        }
+
+        return (
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<ImageIcon fontSize="small" />}
+            onClick={() => setEvidencePreview({
+              url: evidenceImageUrl,
+              title: feedback.userDict?.fullName || `#${feedback.id}`,
+            })}
+            sx={{ textTransform: 'none' }}
+          >
+            {t('pages.feedbacks.table.viewEvidence')}
+          </Button>
+        );
+      },
     },
     {
       accessorKey: 'rating',
@@ -165,6 +196,40 @@ const FeedbacksPage = () => {
           <Button onClick={() => setOpenDelete(false)} color="inherit">{t('pages.feedbacks.cancel')}</Button>
           <Button onClick={handleDelete} color="error" variant="contained" disabled={isMutating}>
             {isMutating ? t('pages.feedbacks.deleting') : t('pages.feedbacks.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={!!evidencePreview}
+        onClose={() => setEvidencePreview(null)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          {t('pages.feedbacks.evidencePreviewTitle', { name: evidencePreview?.title || '' })}
+        </DialogTitle>
+        <DialogContent>
+          {evidencePreview?.url && (
+            <Box
+              component="img"
+              src={evidencePreview.url}
+              alt={evidencePreview.title}
+              sx={{
+                display: 'block',
+                width: '100%',
+                maxHeight: '70vh',
+                objectFit: 'contain',
+                borderRadius: 1,
+                border: '1px solid',
+                borderColor: 'divider',
+              }}
+            />
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setEvidencePreview(null)} variant="contained">
+            {t('pages.feedbacks.close')}
           </Button>
         </DialogActions>
       </Dialog>

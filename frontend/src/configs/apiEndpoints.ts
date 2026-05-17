@@ -55,6 +55,8 @@ const PUBLIC_REGEX_URLS: readonly RegExp[] = [
   /^job\/web\/job-posts\/(?:\?.*)?$/,
   // Public job detail by slug/id (single segment only)
   /^job\/web\/job-posts\/[^/]+\/(?:\?.*)?$/,
+  // Candidate interview status changes are authorized by invite_token in body.
+  /^interview\/web\/sessions\/[^/]+\/status\/(?:\?.*)?$/,
 ];
 
 /** Prefixes that are always private, even if they overlap public patterns. */

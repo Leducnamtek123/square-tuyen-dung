@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path, RegisterOptions } from 'react-hook-form';
 
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
@@ -26,6 +26,7 @@ interface Props<T extends FieldValues = FieldValues> {
     maxDateTime?: Dayjs | string | null;
     fullWidth?: boolean;
     sx?: SxProps<Theme>;
+    rules?: RegisterOptions<T, Path<T>>;
 }
 
 const DateTimePickerCustom = <T extends FieldValues = FieldValues>({
@@ -37,6 +38,7 @@ const DateTimePickerCustom = <T extends FieldValues = FieldValues>({
     maxDateTime = null,
     fullWidth = true,
     sx = EMPTY_SX,
+    rules,
 }: Props<T>) => {
 
     const parseDate = (date: Dayjs | string | null | undefined) => {
@@ -70,6 +72,8 @@ const DateTimePickerCustom = <T extends FieldValues = FieldValues>({
                     name={name as Path<T>}
 
                     control={control}
+
+                    rules={rules}
 
                     render={({ field, fieldState }) => (
 

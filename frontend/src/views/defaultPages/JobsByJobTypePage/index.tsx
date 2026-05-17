@@ -3,7 +3,6 @@ import React from 'react';
 import { Container, Divider, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import CategoryCard from '../../components/defaults/CategoryCard';
-import { useAppSelector } from '../../../hooks/useAppStore';
 import useSEO from '../../../hooks/useSEO';
 import { useConfig } from '@/hooks/useConfig';
 

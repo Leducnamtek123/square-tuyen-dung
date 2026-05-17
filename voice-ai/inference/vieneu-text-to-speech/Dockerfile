@@ -2,7 +2,7 @@
 ARG MIRROR_PREFIX=docker.io/nvidia
 
 # --- SINGLE STAGE BUILD FOR RELIABILITY ---
-FROM ${MIRROR_PREFIX}/cuda:12.4.1-runtime-ubuntu22.04
+FROM ${MIRROR_PREFIX}/cuda:12.8.1-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
@@ -25,15 +25,13 @@ WORKDIR /workspace
 
 # Create virtual environment and install packages
 # We use a single stage to ensure no path/symlink issues with the venv
-# NOTE: PyTorch 2.6.0 is required to match the NCCL version in cuda:12.4.1-runtime
-#       PyTorch 2.4.0 was built against an older NCCL, causing:
-#       "undefined symbol: ncclCommWindowDeregister"
+# NOTE: VieNeu fast mode uses LMDeploy Turbomind, which requires CUDA 12.8+.
 RUN uv venv /opt/venv && \
     uv pip install --no-cache \
-    "torch==2.5.1" "torchaudio==2.5.1" --index-url https://download.pytorch.org/whl/cu124 && \
+    "torch==2.7.1" "torchaudio==2.7.1" "torchvision==0.22.1" --index-url https://download.pytorch.org/whl/cu128 && \
     # Pin to 1.2.6 because vieneu 2.x pulls sea-g2p, which requires a Rust source build.
-    uv pip install --no-cache "accelerate>=0.30.0" "vieneu[gpu]==1.2.6" "loguru" "fastapi" "uvicorn" "pydantic" "numpy" && \
-    uv pip install --no-cache "transformers>=4.45.0" "torchao==0.6.1"
+    uv pip install --no-cache "accelerate>=0.30.0" "vieneu[gpu]==2.7.0" "loguru" "fastapi" "uvicorn" "pydantic" "numpy" && \
+    uv pip install --no-cache "transformers>=4.45.0" "torchao==0.12.0"
 
 # Ensure PyTorch's bundled NCCL takes priority over the system one
 ENV LD_LIBRARY_PATH="/opt/venv/lib/python3.10/site-packages/torch/lib:${LD_LIBRARY_PATH}"

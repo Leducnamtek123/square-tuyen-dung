@@ -40,11 +40,17 @@ def test_finish_interview_waits_for_playout_before_shutdown() -> None:
     async def run() -> None:
         agent = Interviewer(context={"backendApiUrl": "http://test", "roomName": "room-1"})
         shutdown_calls = {"count": 0}
+        status_calls = []
 
         async def fake_shutdown_session() -> None:
             shutdown_calls["count"] += 1
 
+        async def fake_update_backend_status(status: str) -> bool:
+            status_calls.append(status)
+            return True
+
         agent._shutdown_session = fake_shutdown_session  # type: ignore[assignment]
+        agent._update_backend_status = fake_update_backend_status  # type: ignore[assignment]
 
         speech_handle = DummySpeechHandle()
         context = type("Ctx", (), {"speech_handle": speech_handle})()
@@ -58,6 +64,7 @@ def test_finish_interview_waits_for_playout_before_shutdown() -> None:
         await asyncio.sleep(0)
 
         assert shutdown_calls["count"] == 1
+        assert status_calls == ["completed"]
 
     asyncio.run(run())
 
@@ -66,11 +73,17 @@ def test_finish_interview_falls_back_when_no_speech_handle() -> None:
     async def run() -> None:
         agent = Interviewer(context={"backendApiUrl": "http://test", "roomName": "room-2"})
         shutdown_calls = {"count": 0}
+        status_calls = []
 
         async def fake_shutdown_session() -> None:
             shutdown_calls["count"] += 1
 
+        async def fake_update_backend_status(status: str) -> bool:
+            status_calls.append(status)
+            return True
+
         agent._shutdown_session = fake_shutdown_session  # type: ignore[assignment]
+        agent._update_backend_status = fake_update_backend_status  # type: ignore[assignment]
 
         context = type("Ctx", (), {})()
 
@@ -80,5 +93,6 @@ def test_finish_interview_falls_back_when_no_speech_handle() -> None:
         await asyncio.sleep(0)
 
         assert shutdown_calls["count"] == 1
+        assert status_calls == ["completed"]
 
     asyncio.run(run())

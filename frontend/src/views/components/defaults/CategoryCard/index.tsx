@@ -1,47 +1,68 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import { useAppSelector } from '@/redux/hooks';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { InputBase, Paper, Typography } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-import { searchJobPost } from '../../../../redux/filterSlice';
+import { buildJobPostFilter, searchJobPost } from '../../../../redux/filterSlice';
 import { ROUTES } from '../../../../configs/constants';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 
 interface CategoryCardProps {
-  options: { id: string | number | null; name: string }[];
-  type: string;
+  options: CategoryOption[];
+  type: CategoryType;
 }
 
+type CategoryOption = {
+  id: string | number | null | undefined;
+  name?: string | null;
+};
+
+type CategoryType = 'CAREER' | 'CARRER' | 'CITY' | 'JOB_TYPE';
+
+const normalizeOptions = (options: CategoryOption[] = []) =>
+  options
+    .map((option) => ({
+      id: option.id === null || option.id === undefined ? '' : String(option.id),
+      name: String(option.name ?? '').trim(),
+    }))
+    .filter((option) => option.id && option.name);
+
 const CategoryCard = ({ options, type }: CategoryCardProps) => {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const dispatch = useDispatch();
-  const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [searchTerm, setSearchTerm] = React.useState('');
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
+
+  const normalizedOptions = React.useMemo(
+    () => normalizeOptions(Array.isArray(options) ? options : []),
+    [options]
+  );
+
   const items = React.useMemo(() => {
     const safeValue = String(searchTerm ?? '').toLowerCase();
-    return options.filter((option) =>
+    return normalizedOptions.filter((option) =>
       String(option?.name ?? '').toLowerCase().includes(safeValue)
     );
-  }, [options, searchTerm]);
+  }, [normalizedOptions, searchTerm]);
 
   const handleFilterChange = (value: string) => {
     setSearchTerm(value);
   };
 
-  const handleFilter = (id: string | number | null) => {
-    if (id === null) return;
+  const handleFilter = (id: string) => {
     switch (type) {
+      case 'CAREER':
       case 'CARRER':
-        dispatch(searchJobPost({ ...jobPostFilter, careerId: id as string }));
+        dispatch(searchJobPost(buildJobPostFilter({ careerId: id })));
         break;
       case 'CITY':
-        dispatch(searchJobPost({ ...jobPostFilter, cityId: id as string }));
+        dispatch(searchJobPost(buildJobPostFilter({ cityId: id })));
         break;
       case 'JOB_TYPE':
-        dispatch(searchJobPost({ ...jobPostFilter, jobTypeId: id as string }));
+        dispatch(searchJobPost(buildJobPostFilter({ jobTypeId: id })));
         break;
       default:
         break;
@@ -65,6 +86,7 @@ const CategoryCard = ({ options, type }: CategoryCardProps) => {
             maxWidth: { xs: '100%', md: '30%' },
             mb: 1,
           }}
+          onSubmit={(event) => event.preventDefault()}
         >
           <SearchIcon color="disabled" />
           <InputBase
@@ -77,10 +99,10 @@ const CategoryCard = ({ options, type }: CategoryCardProps) => {
         </Paper>
       </Grid>
       {items.map((item) => (
-        <Grid key={item.id} size={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 3 }}>
+        <Grid key={`${type}-${item.id}`} size={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 3 }}>
           <Typography
             component={Link}
-            href={`/${ROUTES.JOB_SEEKER.JOBS}`}
+            href={jobsHref}
             prefetch
             sx={{
               cursor: 'pointer',

@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { useAppSelector } from '@/redux/hooks';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
@@ -193,11 +192,11 @@ const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderD
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const customCareers = React.useCallback((allCareers: CareerOption[], topCareers: CareerOption[]) => {
-    const topCareerIds = new Set(topCareers.map((value: CareerOption) => value.id));
+    const topCareerIds = new Set(topCareers.map((value: CareerOption) => String(value.id)));
     const careerResult: CareerOption[] = [];
 
     for (let i = 0; i < allCareers.length; i++) {
-      if (topCareerIds.has(allCareers[i].id)) {
+      if (topCareerIds.has(String(allCareers[i].id))) {
         careerResult.push({ ...allCareers[i], isHot: true });
       } else {
         careerResult.push({ ...allCareers[i], isHot: false });
@@ -209,18 +208,22 @@ const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderD
 
   const careersSource = React.useMemo<CareerOption[]>(() => {
     if (Array.isArray(allConfig?.careers) && allConfig.careers.length > 0) {
-      return allConfig.careers.map((career) => ({
-        id: career.id,
-        name: career.name,
-        isHot: career.isHot,
-      }));
+      return allConfig.careers
+        .map((career) => ({
+          id: career.id,
+          name: String(career.name ?? '').trim(),
+          isHot: career.isHot,
+        }))
+        .filter((career) => career.id && career.name);
     }
     if (Array.isArray(allConfig?.careerOptions)) {
-      return allConfig.careerOptions.map((option) => ({
-        id: option.id ?? '',
-        name: option.name,
-        isHot: Boolean(option.isHot),
-      }));
+      return allConfig.careerOptions
+        .map((option) => ({
+          id: option.id ?? '',
+          name: String(option.name ?? '').trim(),
+          isHot: Boolean(option.isHot),
+        }))
+        .filter((option) => option.id && option.name);
     }
     return [];
   }, [allConfig?.careers, allConfig?.careerOptions]);
@@ -239,7 +242,9 @@ const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderD
       slotProps={{
         paper: {
           sx: {
-            top: window.document.getElementById('common-header')?.clientHeight,
+            top: typeof window === 'undefined'
+              ? undefined
+              : window.document.getElementById('common-header')?.clientHeight,
             position: 'absolute',
           },
         }

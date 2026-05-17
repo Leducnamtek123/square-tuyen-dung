@@ -19,3 +19,14 @@ class FrappeEmployeeFromApplicationSerializer(serializers.Serializer):
         allow_empty=True,
     )
     notes = serializers.CharField(required=False, allow_blank=True)
+
+    def to_internal_value(self, data):
+        if hasattr(data, "copy"):
+            data = data.copy()
+        else:
+            data = dict(data)
+        if "createHrmAccount" in data and "createFrappeAccount" not in data:
+            data["createFrappeAccount"] = data["createHrmAccount"]
+        if "hrmRoles" in data and "frappeRoles" not in data:
+            data["frappeRoles"] = data["hrmRoles"]
+        return super().to_internal_value(data)

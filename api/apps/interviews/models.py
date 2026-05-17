@@ -102,6 +102,139 @@ class QuestionGroup(CommonBaseModel):
     def __str__(self):
         return self.name
 
+
+class VoiceProfile(CommonBaseModel):
+    """Saved TTS voice profile that can be granted to companies or job posts."""
+
+    TYPE_CLONED = "cloned"
+    TYPE_PRESET = "preset"
+    TYPE_CHOICES = [
+        (TYPE_CLONED, "Cloned"),
+        (TYPE_PRESET, "Preset"),
+    ]
+
+    STATUS_DRAFT = "draft"
+    STATUS_PROCESSING = "processing"
+    STATUS_READY = "ready"
+    STATUS_DISABLED = "disabled"
+    STATUS_FAILED = "failed"
+    STATUS_CHOICES = [
+        (STATUS_DRAFT, "Draft"),
+        (STATUS_PROCESSING, "Processing"),
+        (STATUS_READY, "Ready"),
+        (STATUS_DISABLED, "Disabled"),
+        (STATUS_FAILED, "Failed"),
+    ]
+
+    name = models.CharField(max_length=160)
+    description = models.TextField(blank=True, default="")
+    language = models.CharField(max_length=16, default="vi")
+    voice_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default=TYPE_CLONED)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_DRAFT, db_index=True)
+    preset_engine = models.CharField(max_length=80, blank=True, default="vieneu")
+    preset_voice_id = models.CharField(max_length=255, blank=True, default="")
+    consent_confirmed = models.BooleanField(default=False)
+    metadata = models.JSONField(blank=True, null=True)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_voice_profiles",
+    )
+
+    class Meta:
+        db_table = "project_interview_voice_profile"
+        ordering = ["name", "-create_at"]
+        indexes = [
+            models.Index(fields=["status", "voice_type"], name="idx_voice_profile_status_type"),
+            models.Index(fields=["created_by", "status"], name="idx_voice_prof_creator_st"),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class VoiceProfileSample(CommonBaseModel):
+    """Reference audio sample for a cloned voice profile."""
+
+    profile = models.ForeignKey(VoiceProfile, on_delete=models.CASCADE, related_name="samples")
+    audio_file = models.ForeignKey(
+        "files.File",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="voice_profile_samples",
+    )
+    reference_text = models.TextField()
+    original_filename = models.CharField(max_length=255, blank=True, default="")
+    duration_seconds = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    sort_order = models.PositiveSmallIntegerField(default=0)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_voice_profile_samples",
+    )
+
+    class Meta:
+        db_table = "project_interview_voice_profile_sample"
+        ordering = ["sort_order", "create_at", "id"]
+        indexes = [
+            models.Index(fields=["profile", "sort_order"], name="idx_voice_sample_profile_order"),
+        ]
+
+    def __str__(self):
+        return f"{self.profile.name} sample #{self.id}"
+
+
+class VoiceProfileGrant(CommonBaseModel):
+    """Grants a voice profile to a company or a specific job post."""
+
+    profile = models.ForeignKey(VoiceProfile, on_delete=models.CASCADE, related_name="grants")
+    company = models.ForeignKey(
+        "info.Company",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="voice_profile_grants",
+    )
+    job_post = models.ForeignKey(
+        "job.JobPost",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="voice_profile_grants",
+    )
+    is_default = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    note = models.CharField(max_length=255, blank=True, default="")
+    granted_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="granted_voice_profiles",
+    )
+
+    class Meta:
+        db_table = "project_interview_voice_profile_grant"
+        ordering = ["-is_default", "-create_at"]
+        indexes = [
+            models.Index(fields=["company", "is_active", "is_default"], name="idx_voice_grant_company"),
+            models.Index(fields=["job_post", "is_active", "is_default"], name="idx_voice_grant_job"),
+            models.Index(fields=["profile", "is_active"], name="idx_voice_grant_profile_active"),
+        ]
+
+    def __str__(self):
+        if self.job_post_id:
+            return f"{self.profile.name} -> job #{self.job_post_id}"
+        if self.company_id:
+            return f"{self.profile.name} -> company #{self.company_id}"
+        return f"{self.profile.name} grant"
+
+
 class InterviewSession(CommonBaseModel):
     """Buổi Phỏng vấn trực tuyến."""
 
@@ -248,6 +381,12 @@ class InterviewSession(CommonBaseModel):
         null=True, blank=True,
         related_name='interview_sessions',
         verbose_name="Nhóm câu hỏi"
+    )
+    voice_profile = models.ForeignKey(
+        VoiceProfile, on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='interview_sessions',
+        verbose_name="Voice profile"
     )
     question_cursor = models.IntegerField(
         default=0,

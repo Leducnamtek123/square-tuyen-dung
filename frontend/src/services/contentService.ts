@@ -12,6 +12,7 @@ const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
 interface FeedbackPayload {
   rating: number;
   content: string;
+  evidenceImageFile?: File | null;
 }
 
 interface SMSDownloadAppPayload {
@@ -105,7 +106,15 @@ const contentService = {
 
   createFeedback: (data: FeedbackPayload): Promise<Feedback> => {
     const url = 'content/web/feedbacks/';
-    return httpRequest.post(url, data) as Promise<Feedback>;
+    const formData = new FormData();
+    formData.append('rating', String(data.rating));
+    formData.append('content', data.content);
+    if (data.evidenceImageFile) {
+      formData.append('evidenceImageFile', data.evidenceImageFile);
+    }
+    return httpRequest.post(url, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }) as Promise<Feedback>;
   },
 
   sendSMSDownloadApp: (data: SMSDownloadAppPayload): Promise<{ sent?: boolean; message?: string }> => {

@@ -6,7 +6,7 @@ url = "http://localhost:8298/v1/audio/speech"
 payload = {
     "input": "Xin chào! Đây là bản tin thử nghiệm âm thanh từ cụm dịch vụ Square AI. Hệ thống nói đã hoạt động cực kỳ mượt mà. Xin chào! Đây là bản tin thử nghiệm âm thanh từ cụm dịch vụ Square AI. Hệ thống nói đã hoạt động cực kỳ mượt mà. Xin chào! Đây là bản tin thử nghiệm âm thanh từ cụm dịch vụ Square AI. Hệ thống nói đã hoạt động cực kỳ mượt mà.Xin chào! Đây là bản tin thử nghiệm âm thanh từ cụm dịch vụ Square AI. Hệ thống nói đã hoạt động cực kỳ mượt mà.Xin chào! Đây là bản tin thử nghiệm âm thanh từ cụm dịch vụ Square AI. Hệ thống nói đã hoạt động cực kỳ mượt mà.",
     "model": "tts-1",
-    "voice": "Ly (nữ miền Bắc)",
+    "voice": "Ly",
     "response_format": "mp3"
 }
 

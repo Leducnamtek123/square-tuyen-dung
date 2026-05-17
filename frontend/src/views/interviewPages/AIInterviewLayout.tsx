@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Chip, Paper, Stack, Typography, alpha } from '@mui/material';
+import { Box, Button, Chip, Paper, Stack, ToggleButton, ToggleButtonGroup, Typography, alpha } from '@mui/material';
 import {
   BarVisualizer,
   TrackReferenceOrPlaceholder,
@@ -35,6 +35,10 @@ import {
   sanitizeInterviewText,
 } from './livekitParticipant';
 import { useInterviewMessages } from './useInterviewMessages';
+
+const AI_CONTROL_TOPIC = 'square.interview.ai_control';
+
+type ChatComposerMode = 'chat' | 'aiControl';
 
 function useLiveTimer() {
   const [time, setTime] = useState(0);
@@ -413,6 +417,10 @@ function ChatPanel({
   chatDraft,
   setChatDraft,
   isSending,
+  composerMode,
+  setComposerMode,
+  canControlAI,
+  isControlSending,
   agentState,
 }: {
   messages: ReceivedMessage[];
@@ -420,10 +428,23 @@ function ChatPanel({
   chatDraft: string;
   setChatDraft: React.Dispatch<React.SetStateAction<string>>;
   isSending: boolean;
+  composerMode: ChatComposerMode;
+  setComposerMode: (value: ChatComposerMode) => void;
+  canControlAI: boolean;
+  isControlSending: boolean;
   agentState?: AgentState;
 }) {
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const { t } = useTranslation(['interview']);
+  const sending = composerMode === 'aiControl' ? isControlSending : isSending;
+  const inputPlaceholder =
+    composerMode === 'aiControl'
+      ? t('liveRoom.chat.aiControlPlaceholder', 'Tell AI what to ask or say...')
+      : t('liveRoom.chat.placeholder');
+  const sendLabel =
+    composerMode === 'aiControl'
+      ? t('liveRoom.chat.aiControlSend', 'AI say')
+      : t('liveRoom.chat.send');
 
   useEffect(() => {
     if (!scrollRef.current) return;
@@ -503,17 +524,54 @@ function ChatPanel({
               backdropFilter: 'blur(12px)',
             }}
           >
+            {canControlAI && (
+              <ToggleButtonGroup
+                exclusive
+                size="small"
+                value={composerMode}
+                onChange={(_, value: ChatComposerMode | null) => {
+                  if (value) setComposerMode(value);
+                }}
+                sx={{
+                  mb: 1,
+                  '& .MuiToggleButton-root': {
+                    borderColor: 'rgba(255,255,255,0.1)',
+                    color: 'rgba(255,255,255,0.62)',
+                    px: 1.25,
+                    py: 0.5,
+                    gap: 0.75,
+                    fontSize: '0.7rem',
+                    fontWeight: 850,
+                    textTransform: 'none',
+                    '&.Mui-selected': {
+                      bgcolor: alpha('#38bdf8', 0.14),
+                      borderColor: alpha('#38bdf8', 0.35),
+                      color: '#7dd3fc',
+                    },
+                  },
+                }}
+              >
+                <ToggleButton value="chat">
+                  <FontAwesomeIcon icon={faComment} />
+                  {t('liveRoom.chat.chatMode', 'Chat')}
+                </ToggleButton>
+                <ToggleButton value="aiControl">
+                  <FontAwesomeIcon icon={faMicrophone} />
+                  {t('liveRoom.chat.aiControlMode', 'AI speaks')}
+                </ToggleButton>
+              </ToggleButtonGroup>
+            )}
             <Stack direction="row" spacing={1}>
               <input
                 value={chatDraft}
                 onChange={(event) => setChatDraft(event.target.value)}
-                placeholder={t('liveRoom.chat.placeholder')}
+                placeholder={inputPlaceholder}
                 className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40 focus:bg-white/8"
               />
               <Button
                 type="submit"
                 variant="contained"
-                disabled={!chatDraft.trim() || isSending}
+                disabled={!chatDraft.trim() || sending}
                 sx={{
                   borderRadius: 2.5,
                   minWidth: 76,
@@ -524,7 +582,7 @@ function ChatPanel({
                   '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.35)' },
                 }}
               >
-                {t('liveRoom.chat.send')}
+                {sendLabel}
               </Button>
             </Stack>
           </Box>
@@ -541,6 +599,8 @@ type AIInterviewLayoutProps = {
 export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatDraft, setChatDraft] = useState('');
+  const [composerMode, setComposerMode] = useState<ChatComposerMode>('chat');
+  const [isControlSending, setIsControlSending] = useState(false);
   const timeFormatted = useLiveTimer();
   const participants = useParticipants();
   const { localParticipant } = useLocalParticipant();
@@ -602,6 +662,12 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
     showObservingBar = true;
     observingMessage = t('liveRoom.observingBar.employerObserving');
   }
+
+  useEffect(() => {
+    if (!isLocalEmployer && composerMode === 'aiControl') {
+      setComposerMode('chat');
+    }
+  }, [composerMode, isLocalEmployer]);
 
   return (
     <div className="relative flex h-full w-full overflow-hidden bg-[#020617]">
@@ -666,12 +732,30 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
           onSend={async () => {
             const text = chatDraft.trim();
             if (!text) return;
+            if (composerMode === 'aiControl' && isLocalEmployer) {
+              setIsControlSending(true);
+              try {
+                await room.localParticipant.sendText(text, {
+                  topic: AI_CONTROL_TOPIC,
+                  attributes: { kind: 'employer_instruction' },
+                });
+                setChatDraft('');
+              } finally {
+                setIsControlSending(false);
+              }
+              return;
+            }
+
             await send(text, { topic: 'lk.chat' });
             setChatDraft('');
           }}
           chatDraft={chatDraft}
           setChatDraft={setChatDraft}
           isSending={isSending}
+          composerMode={composerMode}
+          setComposerMode={setComposerMode}
+          canControlAI={isLocalEmployer}
+          isControlSending={isControlSending}
         />
       )}
     </div>

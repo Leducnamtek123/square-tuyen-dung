@@ -76,7 +76,8 @@ const commonService = {
   getTop10Careers: async (): Promise<Career[]> => {
     const url = 'common/top-careers/';
     const data = (await httpRequest.get(url)) as unknown;
-    return (await presignInObject(data)) as Career[];
+    const signedData = await presignInObject(data);
+    return extractResults<Career>(signedData);
   },
 
   /**

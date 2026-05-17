@@ -8,7 +8,9 @@ import { useTranslation } from 'react-i18next';
 import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography, Box } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
 import errorHandling from '@/utils/errorHandling';
 import toastMessages from '@/utils/toastMessages';
@@ -29,12 +31,17 @@ interface FeedbackData {
   content: string;
 }
 
+const MAX_EVIDENCE_IMAGE_SIZE = 5 * 1024 * 1024;
+
 const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, onOpenChange }: FeedbackProps) => {
   const { t } = useTranslation('common');
 
   const [internalOpen, setInternalOpen] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [evidenceImageFile, setEvidenceImageFile] = React.useState<File | null>(null);
+  const [evidencePreviewUrl, setEvidencePreviewUrl] = React.useState<string | null>(null);
   const [hover, setHover] = React.useState(-1);
+  const evidenceInputRef = React.useRef<HTMLInputElement | null>(null);
   const open = controlledOpen ?? internalOpen;
 
   const setFeedbackOpen = React.useCallback((nextOpen: boolean) => {
@@ -62,6 +69,42 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
 
   const currentRating = watch('rating');
 
+  React.useEffect(() => {
+    return () => {
+      if (evidencePreviewUrl) {
+        URL.revokeObjectURL(evidencePreviewUrl);
+      }
+    };
+  }, [evidencePreviewUrl]);
+
+  const handleClearEvidenceImage = React.useCallback(() => {
+    setEvidenceImageFile(null);
+    setEvidencePreviewUrl(null);
+    if (evidenceInputRef.current) {
+      evidenceInputRef.current.value = '';
+    }
+  }, []);
+
+  const handleEvidenceImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toastMessages.error(t('feedback.evidenceImageInvalid', { defaultValue: 'Please choose an image file.' }));
+      event.target.value = '';
+      return;
+    }
+
+    if (file.size > MAX_EVIDENCE_IMAGE_SIZE) {
+      toastMessages.error(t('feedback.evidenceImageTooLarge', { defaultValue: 'Image must be 5MB or smaller.' }));
+      event.target.value = '';
+      return;
+    }
+
+    setEvidenceImageFile(file);
+    setEvidencePreviewUrl(URL.createObjectURL(file));
+  };
+
   const handleOpen = () => {
     onBeforeOpen?.();
     setFeedbackOpen(true);
@@ -75,9 +118,10 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
   const handleSendFeedback = async (data: FeedbackData) => {
     setIsSubmitting(true);
     try {
-      await contentService.createFeedback(data);
+      await contentService.createFeedback({ ...data, evidenceImageFile });
       setFeedbackOpen(false);
       setHover(-1);
+      handleClearEvidenceImage();
       reset({ rating: 5, content: '' });
       toastMessages.success(t('feedback.success'));
     } catch (error) {
@@ -255,6 +299,83 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
                   }
                 }}
               />
+            </Grid>
+
+            <Grid size={12}>
+              <Box>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                  {t('feedback.evidenceImageLabel', { defaultValue: 'Evidence image' })}
+                </Typography>
+
+                <input
+                  ref={evidenceInputRef}
+                  hidden
+                  type="file"
+                  accept="image/*"
+                  onChange={handleEvidenceImageChange}
+                />
+
+                {!evidenceImageFile ? (
+                  <Button
+                    variant="outlined"
+                    startIcon={<PhotoCameraIcon fontSize="small" />}
+                    disabled={isSubmitting}
+                    onClick={() => evidenceInputRef.current?.click()}
+                    sx={{ textTransform: 'none', borderRadius: '10px' }}
+                  >
+                    {t('feedback.evidenceImageUpload', { defaultValue: 'Upload image proof' })}
+                  </Button>
+                ) : (
+                  <Stack
+                    direction="row"
+                    spacing={1.5}
+                    alignItems="center"
+                    sx={{
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: '12px',
+                      p: 1,
+                      backgroundColor: 'background.paper',
+                    }}
+                  >
+                    {evidencePreviewUrl && (
+                      <Box
+                        component="img"
+                        src={evidencePreviewUrl}
+                        alt={evidenceImageFile.name}
+                        sx={{
+                          width: 64,
+                          height: 64,
+                          objectFit: 'cover',
+                          borderRadius: '8px',
+                          border: '1px solid',
+                          borderColor: 'divider',
+                        }}
+                      />
+                    )}
+                    <Typography
+                      variant="body2"
+                      sx={{ flex: 1, minWidth: 0 }}
+                      noWrap
+                    >
+                      {evidenceImageFile.name}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      disabled={isSubmitting}
+                      onClick={handleClearEvidenceImage}
+                      aria-label={t('feedback.evidenceImageRemove', { defaultValue: 'Remove evidence image' })}
+                    >
+                      <DeleteOutlineIcon fontSize="small" />
+                    </IconButton>
+                  </Stack>
+                )}
+
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.75 }}>
+                  {t('feedback.evidenceImageHint', { defaultValue: 'Optional. PNG, JPG, or WebP up to 5MB.' })}
+                </Typography>
+              </Box>
             </Grid>
           </Grid>
         </DialogContent>

@@ -40,6 +40,7 @@ describe('apiEndpoints', () => {
       'content/web/banner',
       'content/web/feedbacks/',
       'interview/web/sessions/invite/',
+      'interview/web/sessions/interview-abc123/status/',
     ])('returns true for public prefix URL: %s', (url) => {
       expect(isPublicEndpoint(url)).toBe(true);
     });

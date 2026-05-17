@@ -49,7 +49,7 @@ interface AppliedResumeKanbanProps {
     handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;
     handleDelete: (id: string | number) => void;
     onCreateEmployee?: (activity: JobPostActivity) => void;
-    onAnalysisStateChange?: (id: string | number, nextState: Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>) => void;
+    onAnalysisStateChange?: (id: string | number, nextState: Partial<JobPostActivity>) => void;
     blindMode?: boolean;
 }
 
@@ -108,6 +108,11 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
         return rows.find((r) => r.id === openDrawerId);
     }, [openDrawerId, rows]);
 
+    const handleDrawerAnalysisStateChange = React.useCallback((nextState: Partial<JobPostActivity>) => {
+        if (!openDrawerId || !onAnalysisStateChange) return;
+        onAnalysisStateChange(openDrawerId, nextState);
+    }, [openDrawerId, onAnalysisStateChange]);
+
     if (isLoading) {
         return <LinearProgress sx={{ my: 4, borderRadius: 2 }} />;
     }
@@ -119,10 +124,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                     open={Boolean(openDrawerId)}
                     onClose={() => setOpenDrawerId(null)}
                     activityId={openDrawerId}
-                    onAnalysisStateChange={(nextState) => {
-                        if (!openDrawerId || !onAnalysisStateChange) return;
-                        onAnalysisStateChange(openDrawerId, nextState);
-                    }}
+                    onAnalysisStateChange={handleDrawerAnalysisStateChange}
                     initialData={
                         {
                             ...selectedActivityInfo,
@@ -239,7 +241,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                                 <SendEmailComponent jobPostActivityId={String(item.id)} isSentEmail={item.isSentEmail || false} email={item.email || ''} fullName={item.fullName || ''} />
                                                                              )}
                                                                              {!blindMode && item.hrmEmployeeId ? (
-                                                                                <Tooltip title={t('employees.hrm.convert.openEmployee', { defaultValue: 'Open Frappe HR employee profile' })} arrow>
+                                                                                <Tooltip title={t('employees.hrm.convert.openEmployee', { defaultValue: 'Open HRM employee profile' })} arrow>
                                                                                    <IconButton size="small" color="primary" onClick={() => {
                                                                                        if (item.hrmEmployeeUrl) {
                                                                                            window.open(item.hrmEmployeeUrl, '_blank', 'noopener,noreferrer');

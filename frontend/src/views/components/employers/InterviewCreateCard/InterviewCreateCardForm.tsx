@@ -5,8 +5,9 @@ import { Controller, type Control, type FieldErrors, type UseFormHandleSubmit } 
 import EventIcon from '@mui/icons-material/Event';
 import WorkIcon from '@mui/icons-material/Work';
 import PersonIcon from '@mui/icons-material/Person';
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import type { FormValues } from './types';
-import type { JobPostActivity, Question, QuestionGroup } from '../../../../types/models';
+import type { JobPostActivity, Question, QuestionGroup, VoiceProfile } from '../../../../types/models';
 import type { TFunction } from 'i18next';
 import InterviewCreateCardQuestionSection from './InterviewCreateCardQuestionSection';
 
@@ -24,8 +25,10 @@ type Props = {
   questions: Question[];
   questionGroups: QuestionGroup[];
   candidates: JobPostActivity[];
+  voiceProfiles: VoiceProfile[];
   isLoadingJobs: boolean;
   isLoadingCandidates: boolean;
+  isLoadingVoiceProfiles: boolean;
   isInterviewMutating: boolean;
   selectedJobPostId: string | number;
   selectedQuestionsCount: number;
@@ -50,8 +53,10 @@ const InterviewCreateCardForm = ({
   questionGroups,
   questions,
   candidates,
+  voiceProfiles,
   isLoadingJobs,
   isLoadingCandidates,
+  isLoadingVoiceProfiles,
   isInterviewMutating,
   selectedJobPostId,
   selectedQuestionsCount,
@@ -61,6 +66,20 @@ const InterviewCreateCardForm = ({
   onOpenAddQuestion,
   onOpenEditQuestion,
 }: Props) => {
+  const getCandidateUserId = React.useCallback((candidate: JobPostActivity) => {
+    return candidate.userId ?? candidate.userDict?.id ?? null;
+  }, []);
+
+  const getCandidateLabel = React.useCallback((candidate: JobPostActivity) => {
+    const name = candidate.userDict?.fullName || candidate.fullName || '';
+    const email = candidate.userDict?.email || candidate.email || '';
+    return [name, email].filter(Boolean).join(' - ');
+  }, []);
+
+  const isDefaultVoiceProfile = React.useCallback((profile: VoiceProfile) => {
+    return Boolean(profile.grants?.some((grant) => grant.isDefault ?? grant.is_default));
+  }, []);
+
   const jobPostSlotProps = React.useMemo(() => ({
     input: {
       startAdornment: (
@@ -77,6 +96,17 @@ const InterviewCreateCardForm = ({
       startAdornment: (
         <InputAdornment position="start">
           <PersonIcon sx={{ fontSize: 20, color: 'secondary.main' }} />
+        </InputAdornment>
+      ),
+    },
+    inputLabel: { sx: { fontWeight: 600 } },
+  }), []);
+
+  const voiceProfileSlotProps = React.useMemo(() => ({
+    input: {
+      startAdornment: (
+        <InputAdornment position="start">
+          <RecordVoiceOverIcon sx={{ fontSize: 20, color: 'success.main' }} />
         </InputAdornment>
       ),
     },
@@ -187,9 +217,46 @@ const InterviewCreateCardForm = ({
                         <em>{t('interview:interviewCreateCard.noCandidates')}</em>
                       </MenuItem>
                     ) : null}
-                    {candidates.map((candidate) => (
-                      <MenuItem key={candidate.userId ?? candidate.id} value={candidate.userId ?? candidate.id} sx={{ fontWeight: 600 }}>
-                        {candidate.fullName} - {candidate.email}
+                    {candidates.map((candidate) => {
+                      const candidateUserId = getCandidateUserId(candidate);
+                      if (candidateUserId == null) return null;
+
+                      return (
+                        <MenuItem key={candidateUserId} value={candidateUserId} sx={{ fontWeight: 600 }}>
+                          {getCandidateLabel(candidate)}
+                        </MenuItem>
+                      );
+                    })}
+                  </TextField>
+                )}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Controller
+                name="voice_profile"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    name={field.name}
+                    inputRef={field.ref}
+                    onBlur={field.onBlur}
+                    value={field.value || 'auto'}
+                    onChange={(e) => field.onChange(e.target.value === 'auto' ? '' : e.target.value)}
+                    select
+                    fullWidth
+                    label="AI voice"
+                    disabled={isLoadingVoiceProfiles}
+                    helperText="Leave auto to use the default voice granted for this job or company."
+                    sx={inputSx}
+                    slotProps={voiceProfileSlotProps}
+                  >
+                    <MenuItem value="auto" sx={{ fontWeight: 600 }}>
+                      <em>Auto/default voice</em>
+                    </MenuItem>
+                    {voiceProfiles.map((profile) => (
+                      <MenuItem key={profile.id} value={profile.id} sx={{ fontWeight: 600 }}>
+                        {profile.name}{isDefaultVoiceProfile(profile) ? ' (default)' : ''}
                       </MenuItem>
                     ))}
                   </TextField>

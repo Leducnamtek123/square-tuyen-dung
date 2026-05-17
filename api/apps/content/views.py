@@ -123,7 +123,7 @@ class FeedbackViewSet(viewsets.ViewSet,
 
                       generics.ListAPIView):
 
-    queryset = Feedback.objects.all()
+    queryset = Feedback.objects.all().select_related('user', 'evidence_image')
 
     serializer_class = FeedbackSerializer
 
@@ -382,7 +382,7 @@ class AdminBannerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
 class AdminFeedbackViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     """Admin management for Feedbacks."""
-    queryset = Feedback.objects.all().select_related('user').order_by('-create_at')
+    queryset = Feedback.objects.all().select_related('user', 'evidence_image').order_by('-create_at')
     permission_classes = [perms_sys.IsAdminUser]
     renderer_classes = [renderers.MyJSONRenderer]
     pagination_class = paginations.CustomPagination

@@ -17,6 +17,11 @@ type InterviewMessagesResult = {
 };
 
 const CHAT_OPTIONS = { channelTopic: 'lk.chat' };
+const MAX_TIMELINE_MESSAGES = 80;
+
+function messageKey(message: ReceivedMessage): string {
+  return `${message.type}-${message.id}`;
+}
 
 export function mapTranscriptions(
   transcriptions: TextStreamData[],
@@ -69,30 +74,42 @@ export function useInterviewMessages(): InterviewMessagesResult {
   const room = useRoomContext();
   const participants = useParticipants();
   const transcriptions = useTranscriptions({ room });
-  const chat = useChat({ room, ...CHAT_OPTIONS });
+  const chatOptions = React.useMemo(() => ({ room, ...CHAT_OPTIONS }), [room]);
+  const chat = useChat(chatOptions);
 
   const transcriptionMessages = React.useMemo(() => {
     return mapTranscriptions(transcriptions, room.localParticipant.identity, participants);
   }, [participants, room.localParticipant.identity, transcriptions]);
 
   const receivedMessages = React.useMemo<ReceivedMessage[]>(() => {
-    return [...transcriptionMessages, ...chat.chatMessages];
+    const byId = new Map<string, ReceivedMessage>();
+    for (const message of [...transcriptionMessages, ...chat.chatMessages]) {
+      byId.set(messageKey(message), message);
+    }
+    return Array.from(byId.values()).slice(-MAX_TIMELINE_MESSAGES);
   }, [chat.chatMessages, transcriptionMessages]);
 
-  const messageFirstReceivedTimeMapRef = React.useRef(new Map<ReceivedMessage['id'], Date>());
+  const messageFirstReceivedTimeMapRef = React.useRef(new Map<string, Date>());
   const sortedReceivedMessages = React.useMemo(() => {
     const now = new Date();
     for (const message of receivedMessages) {
-      if (messageFirstReceivedTimeMapRef.current.has(message.id)) {
+      const key = messageKey(message);
+      if (messageFirstReceivedTimeMapRef.current.has(key)) {
         continue;
       }
 
-      messageFirstReceivedTimeMapRef.current.set(message.id, now);
+      messageFirstReceivedTimeMapRef.current.set(key, now);
+    }
+    const activeKeys = new Set(receivedMessages.map(messageKey));
+    for (const key of messageFirstReceivedTimeMapRef.current.keys()) {
+      if (!activeKeys.has(key)) {
+        messageFirstReceivedTimeMapRef.current.delete(key);
+      }
     }
 
     return receivedMessages.toSorted((a, b) => {
-      const aFirstReceivedAt = messageFirstReceivedTimeMapRef.current.get(a.id);
-      const bFirstReceivedAt = messageFirstReceivedTimeMapRef.current.get(b.id);
+      const aFirstReceivedAt = messageFirstReceivedTimeMapRef.current.get(messageKey(a));
+      const bFirstReceivedAt = messageFirstReceivedTimeMapRef.current.get(messageKey(b));
       if (typeof aFirstReceivedAt === 'undefined' || typeof bFirstReceivedAt === 'undefined') {
         return 0;
       }

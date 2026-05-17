@@ -8,6 +8,7 @@ import jobPostActivityService from '../../../../services/jobPostActivityService'
 import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
 import type { JobPostActivity } from '@/types/models';
+import type { PaginatedResponse } from '@/types/api';
 import AIAnalysisDrawerView from './AIAnalysisDrawerView';
 
 export type AIAnalysisData = {
@@ -59,10 +60,7 @@ interface AIAnalysisDrawerProps {
   onClose: () => void;
   activityId: string | number | null;
   initialData?: AIAnalysisData | null;
-  onAnalysisStateChange?: (nextState: {
-    aiAnalysisStatus?: JobPostActivity['aiAnalysisStatus'];
-    aiAnalysisProgress?: number;
-  }) => void;
+  onAnalysisStateChange?: (nextState: Partial<JobPostActivity>) => void;
 }
 
 const EMBEDDABLE_HOSTS = new Set([
@@ -145,6 +143,45 @@ const toAIAnalysisData = (activity: JobPostActivity): AIAnalysisData => {
   };
 };
 
+const toJobPostActivityPatch = (data: AIAnalysisData | null): Partial<JobPostActivity> => {
+  if (!data) return {};
+
+  const patch: Partial<JobPostActivity> = {};
+  const status = normalizeAiStatus(data.aiAnalysisStatus);
+  if (status) patch.aiAnalysisStatus = status;
+  if (typeof data.aiAnalysisProgress === 'number') patch.aiAnalysisProgress = data.aiAnalysisProgress;
+  if (typeof data.aiAnalysisScore === 'number') patch.aiAnalysisScore = data.aiAnalysisScore;
+  if (typeof data.aiAnalysisEffectiveScore === 'number') patch.aiAnalysisEffectiveScore = data.aiAnalysisEffectiveScore;
+  if (typeof data.aiAnalysisSummary === 'string') patch.aiAnalysisSummary = data.aiAnalysisSummary;
+  if (data.aiAnalysisSkills !== undefined) patch.aiAnalysisSkills = data.aiAnalysisSkills;
+  if (data.aiAnalysisPros !== undefined) patch.aiAnalysisPros = data.aiAnalysisPros;
+  if (data.aiAnalysisCons !== undefined) patch.aiAnalysisCons = data.aiAnalysisCons;
+  if (data.aiAnalysisMatchingSkills !== undefined) patch.aiAnalysisMatchingSkills = data.aiAnalysisMatchingSkills;
+  if (data.aiAnalysisMissingSkills !== undefined) patch.aiAnalysisMissingSkills = data.aiAnalysisMissingSkills;
+  if (data.aiAnalysisCriteria !== undefined) patch.aiAnalysisCriteria = data.aiAnalysisCriteria;
+  if (data.aiAnalysisEvidence !== undefined) patch.aiAnalysisEvidence = data.aiAnalysisEvidence;
+  if (typeof data.aiAnalysisModel === 'string') patch.aiAnalysisModel = data.aiAnalysisModel;
+  if (typeof data.aiAnalysisSource === 'string') patch.aiAnalysisSource = data.aiAnalysisSource;
+  if (typeof data.aiAnalysisPromptVersion === 'string') patch.aiAnalysisPromptVersion = data.aiAnalysisPromptVersion;
+  if (typeof data.aiAnalysisReviewStatus === 'string') patch.aiAnalysisReviewStatus = data.aiAnalysisReviewStatus;
+  if (data.aiAnalysisHrOverrideScore !== undefined) patch.aiAnalysisHrOverrideScore = data.aiAnalysisHrOverrideScore;
+  if (data.aiAnalysisHrOverrideNote !== undefined) patch.aiAnalysisHrOverrideNote = data.aiAnalysisHrOverrideNote;
+  if (data.aiAnalysisReviewedAt !== undefined) patch.aiAnalysisReviewedAt = data.aiAnalysisReviewedAt;
+  if (data.aiAnalysisReviewedBy !== undefined) patch.aiAnalysisReviewedBy = data.aiAnalysisReviewedBy;
+
+  return patch;
+};
+
+const mergeDefinedAIAnalysisData = (current: AIAnalysisData | null, next: AIAnalysisData): AIAnalysisData => {
+  const merged: AIAnalysisData = { ...(current || {}) };
+  Object.entries(next).forEach(([key, value]) => {
+    if (value !== undefined) {
+      (merged as Record<string, unknown>)[key] = value;
+    }
+  });
+  return merged;
+};
+
 const canEmbedUrl = (url: string): boolean => {
   if (!url || typeof window === 'undefined') return false;
 
@@ -205,6 +242,27 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
     data: initialData || null,
   });
 
+  const syncActivityPatch = React.useCallback((patch: Partial<JobPostActivity>) => {
+    if (!activityId || !Object.keys(patch).length) return;
+
+    onAnalysisStateChange?.(patch);
+    queryClient.setQueriesData<PaginatedResponse<JobPostActivity>>(
+      { queryKey: ['appliedResumes'] },
+      (oldData) => {
+        if (!oldData?.results?.length) return oldData;
+
+        let changed = false;
+        const results = oldData.results.map((row) => {
+          if (String(row.id) !== String(activityId)) return row;
+          changed = true;
+          return { ...row, ...patch };
+        });
+
+        return changed ? { ...oldData, results } : oldData;
+      }
+    );
+  }, [activityId, onAnalysisStateChange, queryClient]);
+
   React.useEffect(() => {
     if (!open || !initialData) return;
     dispatch({ type: 'sync-initial-data', value: initialData });
@@ -217,7 +275,9 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
       dispatch({ type: 'set-loading', value: true });
       try {
         const res = await jobPostActivityService.getJobPostActivityDetail(activityId);
-        dispatch({ type: 'set-data', value: res ? toAIAnalysisData(res) : null });
+        const nextData = res ? toAIAnalysisData(res) : null;
+        dispatch({ type: 'set-data', value: nextData });
+        syncActivityPatch(toJobPostActivityPatch(nextData));
       } catch {
         // keep current data
       } finally {
@@ -226,7 +286,7 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
     };
 
     fetchDetail();
-  }, [open, activityId]);
+  }, [open, activityId, syncActivityPatch]);
 
   React.useEffect(() => {
     if (!open || !activityId || state.data?.aiAnalysisStatus !== 'processing') return;
@@ -237,10 +297,7 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
         const newData = toAIAnalysisData(res);
         if (newData) {
           dispatch({ type: 'set-data', value: newData });
-          onAnalysisStateChange?.({
-            aiAnalysisStatus: normalizeAiStatus(newData.aiAnalysisStatus),
-            aiAnalysisProgress: newData.aiAnalysisProgress,
-          });
+          syncActivityPatch(toJobPostActivityPatch(newData));
         }
         if (newData && newData.aiAnalysisStatus !== 'processing') {
           dispatch({ type: 'set-analyzing', value: false });
@@ -252,7 +309,7 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [open, activityId, state.data?.aiAnalysisStatus, onAnalysisStateChange]);
+  }, [open, activityId, state.data?.aiAnalysisStatus, syncActivityPatch]);
 
   React.useEffect(() => {
     if (!open || state.data?.aiAnalysisStatus !== 'processing') {
@@ -290,19 +347,20 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
         type: 'set-data',
         value: { ...(state.data || {}), aiAnalysisStatus: 'processing', aiAnalysisProgress: 5 },
       });
-      onAnalysisStateChange?.({ aiAnalysisStatus: 'processing', aiAnalysisProgress: 5 });
+      syncActivityPatch({ aiAnalysisStatus: 'processing', aiAnalysisProgress: 5 });
       // For online CVs, pass the online profile URL so backend can scrape it
       const payload: { onlineProfileUrl?: string } = {};
       if (state.data?.onlineProfileUrl && !state.data?.resumeFileUrl) {
         payload.onlineProfileUrl = state.data.onlineProfileUrl;
       }
       await jobPostActivityService.analyzeResume(activityId, payload);
+      queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
       toastMessages.success(t('appliedResume.ai.analysisStarted'));
     } catch (err: unknown) {
       errorHandling(err as AxiosError);
       dispatch({ type: 'set-analyzing', value: false });
       dispatch({ type: 'set-data', value: { ...(state.data || {}), aiAnalysisStatus: 'failed' } });
-      onAnalysisStateChange?.({ aiAnalysisStatus: 'failed', aiAnalysisProgress: 0 });
+      syncActivityPatch({ aiAnalysisStatus: 'failed', aiAnalysisProgress: 0 });
     }
   };
 
@@ -310,18 +368,12 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
     if (!activityId) return;
     const res = await jobPostActivityService.reviewAIAnalysis(activityId, payload);
     const nextData = toAIAnalysisData(res);
+    const nextPatch = toJobPostActivityPatch(nextData);
     dispatch({
       type: 'set-data',
-      value: {
-        ...(state.data || {}),
-        ...nextData,
-        fullName: nextData.fullName ?? state.data?.fullName,
-        jobName: nextData.jobName ?? state.data?.jobName,
-        resumeFileUrl: nextData.resumeFileUrl ?? state.data?.resumeFileUrl,
-        onlineProfileUrl: nextData.onlineProfileUrl ?? state.data?.onlineProfileUrl,
-        resumeType: nextData.resumeType ?? state.data?.resumeType,
-      },
+      value: mergeDefinedAIAnalysisData(state.data, nextData),
     });
+    syncActivityPatch(nextPatch);
     queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
     toastMessages.success(t('appliedResume.ai.reviewSaved', { defaultValue: 'AI review saved.' }));
   };

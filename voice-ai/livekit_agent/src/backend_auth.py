@@ -9,6 +9,11 @@ from .config import config
 
 
 async def sign_backend_request(request: httpx.Request) -> None:
+    # Internal Docker calls hit Django directly over HTTP. Mark them as
+    # originally HTTPS so SecurityMiddleware does not redirect to
+    # https://backend:8000, which is not a TLS listener.
+    request.headers.setdefault("X-Forwarded-Proto", "https")
+
     secret = (config.INTERVIEW_AGENT_SHARED_SECRET or "").strip()
     if not secret:
         return

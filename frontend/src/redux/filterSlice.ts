@@ -58,6 +58,13 @@ const initialJobPostFilter: JobPostFilter = {
   pageSize: 30,
 };
 
+const buildJobPostFilter = (
+  overrides: Partial<JobPostFilter> = {},
+): JobPostFilter => ({
+  ...initialJobPostFilter,
+  ...overrides,
+});
+
 const initialCompanyFilter: CompanyFilter = {
   kw: '',
   cityId: '',
@@ -128,6 +135,7 @@ const {
 
 export default reducer;
 export {
+  buildJobPostFilter,
   searchJobPost,
   searchJobPostWithKeyword,
   resetSearchJobPostFilter,

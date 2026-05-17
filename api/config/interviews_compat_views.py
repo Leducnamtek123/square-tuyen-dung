@@ -8,6 +8,7 @@ from apps.interviews.models import InterviewSession
 from apps.interviews.services import (
     append_transcript,
     advance_question_cursor,
+    build_tts_voice_profile_payload,
     build_interview_context,
     get_next_question_payload,
     update_interview_status,
@@ -24,7 +25,7 @@ def _run_in_thread(func, *args, **kwargs):
 
 def _get_context_session(room_name: str) -> InterviewSession:
     return (
-        InterviewSession.objects.select_related("candidate", "job_post", "question_group")
+        InterviewSession.objects.select_related("candidate", "job_post", "question_group", "voice_profile")
         .prefetch_related("questions")
         .get(room_name=room_name)
     )
@@ -36,6 +37,16 @@ def _get_question_session(room_name: str) -> InterviewSession:
 
 def _get_session(room_name: str) -> InterviewSession:
     return InterviewSession.objects.get(room_name=room_name)
+
+
+def _get_voice_profile_payload(profile_id: int):
+    from apps.interviews.models import VoiceProfile
+
+    profile = (
+        VoiceProfile.objects.prefetch_related("samples", "samples__audio_file")
+        .get(id=profile_id)
+    )
+    return build_tts_voice_profile_payload(profile)
 
 
 # ---------------------------------------------------------------------------
@@ -190,3 +201,27 @@ def interview_append_transcription(request: HttpRequest, room_name: str):
         },
         status=201,
     )
+
+
+@csrf_exempt
+def interview_voice_profile(request: HttpRequest, profile_id: int):
+    """
+    GET /api/v1/interview/compat/voice-profiles/{profile_id}
+
+    Compatibility endpoint for internal TTS services. Returns raw JSON profile
+    metadata and reference sample URLs after shared-secret verification.
+    """
+    if request.method != "GET":
+        return JsonResponse({"detail": "Method not allowed."}, status=405)
+    auth_error = verify_interview_agent_request(request)
+    if auth_error is not None:
+        return auth_error
+
+    try:
+        payload = _run_in_thread(_get_voice_profile_payload, profile_id)
+    except Exception:
+        return JsonResponse({"detail": "Voice profile not found."}, status=404)
+
+    if not payload:
+        return JsonResponse({"detail": "Voice profile is not ready."}, status=404)
+    return JsonResponse(payload, status=200)

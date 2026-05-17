@@ -63,7 +63,23 @@
       "onlineResumeHint": "AI sẽ phân tích hồ sơ trực tuyến của ứng viên.",
       "viewOnlineProfile": "Xem hồ sơ trực tuyến",
       "viewAnalysis": "Xem phân tích AI",
-      "failed": "Phân tích AI thất bại"
+      "failed": "Phân tích AI thất bại",
+      "allStatuses": "Trạng thái AI",
+      "blindMode": "Chế độ ẩn danh",
+      "scoreMin": "Điểm AI từ",
+      "reviewSaved": "Đã lưu rà soát AI.",
+      "reviewTitle": "Rà soát của HR",
+      "overrideScore": "Điểm ghi đè",
+      "reviewNote": "Ghi chú rà soát",
+      "saveReview": "Lưu rà soát",
+      "criteriaTitle": "Tiêu chí có trọng số",
+      "evidenceTitle": "Bằng chứng",
+      "status": {
+        "pending": "Chưa phân tích",
+        "processing": "Đang phân tích",
+        "completed": "Đã phân tích",
+        "failed": "Lỗi phân tích"
+      }
     },
     "email": {
       "sentSuccess": "Gửi email thành công.",
@@ -1264,15 +1280,15 @@
         "portalAccessError": "Không thể kích hoạt portal nhân sự"
       },
       "convert": {
-        "action": "Đưa sang Frappe HR",
-        "openEmployee": "Mở hồ sơ Frappe HR",
-        "title": "Đưa ứng viên sang Frappe HR",
-        "submit": "Đưa sang Frappe HR",
-        "createFrappeAccount": "Tạo tài khoản Frappe HR",
-        "sendWelcomeEmail": "Gửi email mời từ Frappe",
-        "roles": "Vai trò Frappe",
-        "success": "Đã đưa ứng viên sang Frappe HR",
-        "error": "Không thể đưa hồ sơ này sang Frappe HR"
+        "action": "Đưa sang HRM",
+        "openEmployee": "Mở hồ sơ HRM",
+        "title": "Đưa ứng viên sang HRM",
+        "submit": "Đưa sang HRM",
+        "createHrmAccount": "Tạo tài khoản HRM",
+        "sendWelcomeEmail": "Gửi email mời từ HRM",
+        "roles": "Vai trò HRM",
+        "success": "Đã đưa ứng viên sang HRM",
+        "error": "Không thể đưa hồ sơ này sang HRM"
       },
       "detail": {
         "back": "Về danh sách nhân sự",

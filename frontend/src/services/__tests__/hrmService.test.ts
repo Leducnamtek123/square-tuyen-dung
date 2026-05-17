@@ -11,29 +11,29 @@ describe('hrmService', () => {
     jest.clearAllMocks();
   });
 
-  it('createEmployeeFromApplication posts to Frappe HR bridge endpoint', async () => {
+  it('createEmployeeFromApplication posts to HRM bridge endpoint', async () => {
     (httpRequest.post as jest.Mock).mockResolvedValueOnce({ hrmEmployeeId: 'HR-EMP-0001' });
     await hrmService.createEmployeeFromApplication({
       applicationId: 10,
       fullName: 'Candidate',
       jobTitle: 'Designer',
-      createFrappeAccount: true,
+      createHrmAccount: true,
     });
     expect(httpRequest.post).toHaveBeenCalledWith('hrm/web/employees/from-application/', {
       applicationId: 10,
       fullName: 'Candidate',
       jobTitle: 'Designer',
-      createFrappeAccount: true,
+      createHrmAccount: true,
     });
   });
 
-  it('provisionCurrentUser posts to Frappe HR account endpoint', async () => {
+  it('provisionCurrentUser posts to HRM account endpoint', async () => {
     (httpRequest.post as jest.Mock).mockResolvedValueOnce({ userId: 'hr@example.com' });
     await hrmService.provisionCurrentUser();
     expect(httpRequest.post).toHaveBeenCalledWith('hrm/web/employees/provision-current-user/', {});
   });
 
-  it('getIntegrationStatus calls Frappe HR status endpoint', async () => {
+  it('getIntegrationStatus calls HRM status endpoint', async () => {
     (httpRequest.get as jest.Mock).mockResolvedValueOnce({ enabled: true });
     await hrmService.getIntegrationStatus();
     expect(httpRequest.get).toHaveBeenCalledWith('hrm/web/integration-status/');

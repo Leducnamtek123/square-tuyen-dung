@@ -86,16 +86,25 @@ def _tts_response_from_body(body: Dict[str, Any]):
         return JsonResponse({"detail": "Missing `text`."}, status=400)
 
     voice = body.get("voice") or getattr(settings, "AI_TTS_DEFAULT_VOICE", None)
+    voice_profile_id = (
+        body.get("voiceProfileId")
+        or body.get("voice_profile_id")
+        or body.get("voiceProfile")
+        or body.get("voice_profile")
+    )
+    if isinstance(voice_profile_id, dict):
+        voice_profile_id = voice_profile_id.get("id")
+    if voice_profile_id:
+        voice = f"profile:{voice_profile_id}"
     response_format = body.get("format") or body.get("response_format") or "mp3"
-    speed = body.get("speed") or 1.0
-
     payload = {
         "input": text,
         "model": body.get("model") or "tts-1",
-        "voice": voice or "Ly (nữ miền Bắc)",
+        "voice": voice or "Ly",
         "response_format": response_format,
-        "speed": speed,
     }
+    if body.get("speed") is not None:
+        payload["speed"] = body.get("speed")
 
     last_error: Dict[str, Any] = {}
     for index, base_url in enumerate(get_service_base_urls("tts")):

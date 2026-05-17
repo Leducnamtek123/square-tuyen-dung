@@ -5,9 +5,10 @@ import { Grid2 as Grid, Stack, Typography } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
-import { useAppDispatch, useAppSelector } from '../../../../hooks/useAppStore';
-import { searchJobPost } from '../../../../redux/filterSlice';
+import { useAppDispatch } from '../../../../hooks/useAppStore';
+import { buildJobPostFilter, searchJobPost } from '../../../../redux/filterSlice';
 import { ROUTES } from '../../../../configs/constants';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 import { useConfig } from '@/hooks/useConfig';
 
 interface Option {
@@ -15,7 +16,7 @@ interface Option {
   name: string;
 }
 
-type CategoryType = 'CARRER' | 'CITY' | 'JOB_TYPE';
+type CategoryType = 'CAREER' | 'CITY' | 'JOB_TYPE';
 
 const maxItem = 6;
 
@@ -28,6 +29,14 @@ type CategorySectionProps = {
   hoverColor?: string;
   onSelect: (id: string | number) => void;
 };
+
+const normalizeOptions = (options: Option[] = []) =>
+  options
+    .map((option) => ({
+      id: option.id === null || option.id === undefined ? '' : String(option.id),
+      name: String(option.name ?? '').trim(),
+    }))
+    .filter((option) => option.id && option.name);
 
 const CategorySection = ({
   title,
@@ -105,26 +114,25 @@ const CategorySection = ({
 );
 
 const JobByCategory = () => {
-  const { t } = useTranslation('public');
+  const { t, i18n } = useTranslation('public');
   const { allConfig } = useConfig();
   const dispatch = useAppDispatch();
-  const { jobPostFilter } = useAppSelector((state) => state.filter);
-  const jobsHref = `/${ROUTES.JOB_SEEKER.JOBS}`;
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
 
-  const careerOptions = (allConfig?.careerOptions || []) as Option[];
-  const cityOptions = (allConfig?.cityOptions || []) as Option[];
-  const jobTypeOptions = (allConfig?.jobTypeOptions || []) as Option[];
+  const careerOptions = normalizeOptions((allConfig?.careerOptions || []) as Option[]);
+  const cityOptions = normalizeOptions((allConfig?.cityOptions || []) as Option[]);
+  const jobTypeOptions = normalizeOptions((allConfig?.jobTypeOptions || []) as Option[]);
 
   const handleFilter = (id: string | number, type: CategoryType) => {
     switch (type) {
-      case 'CARRER':
-        dispatch(searchJobPost({ ...jobPostFilter, careerId: String(id) }));
+      case 'CAREER':
+        dispatch(searchJobPost(buildJobPostFilter({ careerId: String(id) })));
         break;
       case 'CITY':
-        dispatch(searchJobPost({ ...jobPostFilter, cityId: String(id) }));
+        dispatch(searchJobPost(buildJobPostFilter({ cityId: String(id) })));
         break;
       case 'JOB_TYPE':
-        dispatch(searchJobPost({ ...jobPostFilter, jobTypeId: String(id) }));
+        dispatch(searchJobPost(buildJobPostFilter({ jobTypeId: String(id) })));
         break;
     }
   };
@@ -135,11 +143,11 @@ const JobByCategory = () => {
         <CategorySection
           title={t('jobByCategory.jobsByCareer')}
           items={careerOptions}
-          viewAllHref={`/${ROUTES.JOB_SEEKER.JOBS_BY_CAREER}`}
+          viewAllHref={localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS_BY_CAREER}`, i18n.language)}
           selectHref={jobsHref}
           viewAllLabel={t('jobByCategory.viewAllCareers')}
           hoverColor="primary.main"
-          onSelect={(id) => handleFilter(id, 'CARRER')}
+          onSelect={(id) => handleFilter(id, 'CAREER')}
         />
       </Grid>
 
@@ -147,7 +155,7 @@ const JobByCategory = () => {
         <CategorySection
           title={t('jobByCategory.jobsByCity')}
           items={cityOptions}
-          viewAllHref={`/${ROUTES.JOB_SEEKER.JOBS_BY_CITY}`}
+          viewAllHref={localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS_BY_CITY}`, i18n.language)}
           selectHref={jobsHref}
           viewAllLabel={t('jobByCategory.viewAllCities')}
           hoverColor="primary.main"
@@ -159,7 +167,7 @@ const JobByCategory = () => {
         <CategorySection
           title={t('jobByCategory.jobsByJobType')}
           items={jobTypeOptions}
-          viewAllHref={`/${ROUTES.JOB_SEEKER.JOBS_BY_TYPE}`}
+          viewAllHref={localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS_BY_TYPE}`, i18n.language)}
           selectHref={jobsHref}
           viewAllLabel={t('jobByCategory.viewAllJobTypes')}
           hoverColor="primary.main"

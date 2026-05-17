@@ -182,6 +182,16 @@
       "error": "Unable to transcribe audio right now."
     }
   },
+  "ai": {
+    "reviewStatus": {
+      "label": "AI review",
+      "all": "All review statuses",
+      "aiOnly": "AI only",
+      "reviewed": "Reviewed",
+      "overridden": "Overridden"
+    },
+    "scoreMax": "Max AI score"
+  },
   "feedback": {
     "button": "Feedback",
     "title": "Your Feedback",
@@ -190,7 +200,13 @@
     "ratingRequired": "Please select a rating.",
     "contentRequired": "Please enter your feedback.",
     "contentMax": "Feedback content exceeds allowed length.",
-    "success": "Feedback submitted successfully."
+    "success": "Feedback submitted successfully.",
+    "evidenceImageLabel": "Evidence image",
+    "evidenceImageUpload": "Upload image proof",
+    "evidenceImageRemove": "Remove evidence image",
+    "evidenceImageHint": "Optional. PNG, JPG, or WebP up to 5MB.",
+    "evidenceImageInvalid": "Please choose an image file.",
+    "evidenceImageTooLarge": "Image must be 5MB or smaller."
   },
   "choices": {
     "Male": "Male",

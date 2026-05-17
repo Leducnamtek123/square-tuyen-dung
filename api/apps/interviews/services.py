@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.utils.html import strip_tags
 
 from .livekit_service import LiveKitService
-from .models import InterviewSession, InterviewTranscript, Question
+from .models import InterviewSession, InterviewTranscript, Question, VoiceProfile, VoiceProfileGrant
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +77,78 @@ def _build_interview_subject(
     return fallback[:120] if fallback else "Phong van tuyen dung"
 
 
+def resolve_voice_profile_for_session(session: InterviewSession) -> VoiceProfile | None:
+    direct_profile = getattr(session, "voice_profile", None)
+    if direct_profile and direct_profile.status == VoiceProfile.STATUS_READY:
+        return direct_profile
+
+    job_post = getattr(session, "job_post", None)
+    company_id = getattr(job_post, "company_id", None) if job_post else None
+
+    grants = (
+        VoiceProfileGrant.objects.select_related("profile")
+        .prefetch_related("profile__samples", "profile__samples__audio_file")
+        .filter(is_active=True, profile__status=VoiceProfile.STATUS_READY)
+    )
+
+    if job_post:
+        job_grant = grants.filter(job_post=job_post, is_default=True).order_by("-update_at", "-create_at").first()
+        if job_grant:
+            return job_grant.profile
+
+    if company_id:
+        company_grant = grants.filter(company_id=company_id, job_post__isnull=True, is_default=True).order_by("-update_at", "-create_at").first()
+        if company_grant:
+            return company_grant.profile
+
+    if job_post:
+        job_grant = grants.filter(job_post=job_post).order_by("-update_at", "-create_at").first()
+        if job_grant:
+            return job_grant.profile
+
+    if company_id:
+        company_grant = grants.filter(company_id=company_id, job_post__isnull=True).order_by("-update_at", "-create_at").first()
+        if company_grant:
+            return company_grant.profile
+
+    return None
+
+
+def build_tts_voice_profile_payload(profile: VoiceProfile | None) -> dict | None:
+    if not profile or profile.status != VoiceProfile.STATUS_READY:
+        return None
+
+    samples = []
+    for sample in profile.samples.all():
+        audio_url = ""
+        try:
+            audio_url = sample.audio_file.get_full_url() if sample.audio_file else ""
+        except Exception:
+            audio_url = ""
+        if not audio_url:
+            continue
+        samples.append(
+            {
+                "id": sample.id,
+                "audioUrl": audio_url,
+                "referenceText": sample.reference_text,
+                "durationSeconds": float(sample.duration_seconds) if sample.duration_seconds is not None else None,
+                "sortOrder": sample.sort_order,
+            }
+        )
+
+    return {
+        "id": profile.id,
+        "name": profile.name,
+        "voiceType": profile.voice_type,
+        "status": profile.status,
+        "language": profile.language,
+        "presetEngine": profile.preset_engine,
+        "presetVoiceId": profile.preset_voice_id,
+        "samples": samples,
+    }
+
+
 def build_interview_context(session: InterviewSession) -> Dict[str, object]:
     questions = list(get_session_questions(session).order_by("sort_order", "create_at", "id"))
     template = getattr(getattr(session, "job_post", None), "interview_template", None)
@@ -85,8 +157,9 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
     job_requirement = _truncate_text(_clean_text(getattr(session.job_post, "job_requirement", "")), 900)
     question_group_description = _truncate_text(_clean_text(getattr(question_group, "description", "")), 900)
     notes = _truncate_text(_clean_text(session.notes), 500)
+    voice_profile_payload = build_tts_voice_profile_payload(resolve_voice_profile_for_session(session))
 
-    return {
+    payload = {
         "participantIdentity": f"candidate-{session.candidate_id}",
         "candidateName": session.candidate.full_name,
         "candidateEmail": session.candidate.email,
@@ -112,6 +185,10 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
         ],
         "interviewType": session.type,
     }
+    if voice_profile_payload:
+        payload["ttsVoice"] = f"profile:{voice_profile_payload['id']}"
+        payload["ttsVoiceProfile"] = voice_profile_payload
+    return payload
 
 
 def _build_public_livekit_url(request) -> str:

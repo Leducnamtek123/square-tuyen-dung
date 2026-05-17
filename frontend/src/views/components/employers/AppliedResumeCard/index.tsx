@@ -138,7 +138,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     initialPageSize: 10
   });
 
-  const [optimisticAnalysis, setOptimisticAnalysis] = React.useState<Record<string, Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>>>({});
+  const [optimisticAnalysis, setOptimisticAnalysis] = React.useState<Record<string, Partial<JobPostActivity>>>({});
 
   const { data: jobPostOptions = [] } = useJobPostOptions();
 
@@ -191,16 +191,26 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
   React.useEffect(() => {
     const sourceRows = queryData?.results || [];
-    if (!sourceRows.length || !Object.keys(optimisticAnalysis).length) return;
 
     setOptimisticAnalysis((prev) => {
+      if (!sourceRows.length || !Object.keys(prev).length) return prev;
+
       let changed = false;
       const next = { ...prev };
 
-      Object.keys(prev).forEach((id) => {
+      Object.entries(prev).forEach(([id, patch]) => {
         const row = sourceRows.find((item) => String(item.id) === id);
-        const status = row?.aiAnalysisStatus;
-        if (!row || status === 'processing' || status === 'completed' || status === 'failed') {
+        if (!row) {
+          delete next[id];
+          changed = true;
+          return;
+        }
+
+        const patchEntries = Object.entries(patch).filter(([, value]) => value !== undefined);
+        const serverHasPatch = patchEntries.every(([key, value]) => Object.is((row as unknown as Record<string, unknown>)[key], value));
+        const serverFinishedAnalysis = patch.aiAnalysisStatus === 'processing' && ['completed', 'failed'].includes(row.aiAnalysisStatus || '');
+
+        if (serverHasPatch || serverFinishedAnalysis) {
           delete next[id];
           changed = true;
         }
@@ -208,9 +218,9 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
       return changed ? next : prev;
     });
-  }, [queryData?.results, optimisticAnalysis]);
+  }, [queryData?.results]);
 
-  const handleAnalysisStateChange = useCallback((id: string | number, nextState: Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>) => {
+  const handleAnalysisStateChange = useCallback((id: string | number, nextState: Partial<JobPostActivity>) => {
     setOptimisticAnalysis((prev) => ({
       ...prev,
       [String(id)]: nextState,

@@ -3,6 +3,7 @@ from unittest.mock import Mock
 import pytest
 from rest_framework.test import APIClient
 
+from integrations.ai.client import get_llm_candidates
 from integrations.ai.views import _http_probe_url, _probe_http_service
 
 
@@ -21,6 +22,24 @@ def test_probe_http_service_uses_http_url_for_wss(monkeypatch):
     assert result["status"] == "online"
     mock_get.assert_called_once()
     assert mock_get.call_args.args[0] == "https://tuyendung.square.vn/livekit/"
+
+
+def test_llm_candidates_keep_same_base_url_with_different_model(settings):
+    settings.AI_LLM_BASE_URL = "http://llm.test/v1"
+    settings.AI_LLM_API_KEY = ""
+    settings.AI_LLM_LOCAL_BASE_URL = "http://llm.test/v1"
+    settings.AI_LLM_LOCAL_MODEL = "gemma4:e4b"
+    settings.AI_LLM_LOCAL_API_KEY = ""
+    settings.AI_LLM_FALLBACK_BASE_URLS = "http://llm.test/v1"
+    settings.AI_LLM_FALLBACK_MODELS = "gemma4:e4b"
+    settings.AI_LLM_FALLBACK_API_KEYS = ""
+
+    candidates = get_llm_candidates(default_model="qwen3-14b-interview")
+
+    assert [(candidate.name, candidate.model) for candidate in candidates] == [
+        ("primary", ""),
+        ("local", "gemma4:e4b"),
+    ]
 
 
 @pytest.mark.django_db

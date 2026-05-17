@@ -63,7 +63,23 @@
       "onlineResumeHint": "AI will analyze the candidate's online profile.",
       "viewOnlineProfile": "View online profile",
       "viewAnalysis": "View AI Analysis",
-      "failed": "AI analysis failed"
+      "failed": "AI analysis failed",
+      "allStatuses": "AI status",
+      "blindMode": "Blind mode",
+      "scoreMin": "Min AI score",
+      "reviewSaved": "AI review saved.",
+      "reviewTitle": "HR review",
+      "overrideScore": "Override score",
+      "reviewNote": "Review note",
+      "saveReview": "Save review",
+      "criteriaTitle": "Weighted criteria",
+      "evidenceTitle": "Evidence",
+      "status": {
+        "pending": "Not analyzed",
+        "processing": "Analyzing",
+        "completed": "Analyzed",
+        "failed": "Analysis failed"
+      }
     },
     "email": {
       "sentSuccess": "Email sent successfully.",
@@ -1264,15 +1280,15 @@
         "portalAccessError": "Failed to enable employee portal access"
       },
       "convert": {
-        "action": "Send to Frappe HR",
-        "openEmployee": "Open Frappe HR profile",
-        "title": "Send candidate to Frappe HR",
-        "submit": "Send to Frappe HR",
-        "createFrappeAccount": "Create Frappe HR account",
-        "sendWelcomeEmail": "Send Frappe welcome email",
-        "roles": "Frappe roles",
-        "success": "Candidate sent to Frappe HR",
-        "error": "Failed to send this application to Frappe HR"
+        "action": "Send to HRM",
+        "openEmployee": "Open HRM profile",
+        "title": "Send candidate to HRM",
+        "submit": "Send to HRM",
+        "createHrmAccount": "Create HRM account",
+        "sendWelcomeEmail": "Send HRM welcome email",
+        "roles": "HRM roles",
+        "success": "Candidate sent to HRM",
+        "error": "Failed to send this application to HRM"
       },
       "detail": {
         "back": "Back to employees",
