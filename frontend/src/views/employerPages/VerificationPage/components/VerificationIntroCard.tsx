@@ -1,27 +1,116 @@
 'use client';
 import React from 'react';
-import { Box, Button, Card, Chip, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  Chip,
+  LinearProgress,
+  Stack,
+  Typography,
+} from '@mui/material';
+import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
+import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
+import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
 import { ROUTES } from '../../../../configs/constants';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import type { ChipProps } from '@mui/material';
 
-const VerificationIntroCard = () => {
+interface Props {
+  statusLabel: string;
+  statusColor: ChipProps['color'];
+  completion: number;
+  missingCount: number;
+  canPost: boolean;
+  legalReady: boolean;
+  scheduleReady: boolean;
+}
+
+const VerificationIntroCard = ({
+  statusLabel,
+  statusColor,
+  completion,
+  missingCount,
+  canPost,
+  legalReady,
+  scheduleReady,
+}: Props) => {
   const { push } = useRouter();
   const { t } = useTranslation('employer');
+  const steps = [
+    {
+      icon: BusinessOutlinedIcon,
+      label: t('verification.summary.companyProfile', { defaultValue: 'Hồ sơ công ty' }),
+      done: true,
+    },
+    {
+      icon: AssignmentTurnedInOutlinedIcon,
+      label: t('verification.summary.legalProfile', { defaultValue: 'Hồ sơ pháp lý' }),
+      done: legalReady,
+    },
+    {
+      icon: EventAvailableOutlinedIcon,
+      label: t('verification.summary.appointment', { defaultValue: 'Lịch xác minh' }),
+      done: scheduleReady,
+    },
+  ];
 
   return (
-    <Card sx={{ p: 3, mb: 3 }}>
-      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-        {t('verification.step1.title')}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-        {t('verification.step1.description')}
-      </Typography>
+    <Card elevation={0} sx={{ p: 3, mb: 3, border: '1px solid', borderColor: 'divider' }}>
+      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2}>
+        <Box>
+          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+            {t('verification.step1.title')}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            {t('verification.step1.description')}
+          </Typography>
+        </Box>
+        <Chip label={statusLabel} color={statusColor} sx={{ alignSelf: { xs: 'flex-start', md: 'center' } }} />
+      </Stack>
+
+      <Box sx={{ mt: 3 }}>
+        <Stack direction="row" justifyContent="space-between" spacing={2} sx={{ mb: 1 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            {t('verification.summary.progress', { defaultValue: 'Mức độ hoàn thiện' })}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {completion}%
+          </Typography>
+        </Stack>
+        <LinearProgress variant="determinate" value={completion} sx={{ height: 8, borderRadius: 1 }} />
+      </Box>
+
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mt: 3 }}>
+        {steps.map(({ icon: Icon, label, done }) => (
+          <Chip
+            key={label}
+            icon={<Icon />}
+            label={label}
+            color={done ? 'success' : 'default'}
+            variant={done ? 'filled' : 'outlined'}
+            sx={{ justifyContent: 'flex-start' }}
+          />
+        ))}
+      </Stack>
+
+      <Alert severity={canPost ? 'success' : 'warning'} sx={{ mt: 3 }}>
+        {canPost
+          ? t('verification.summary.canPost', { defaultValue: 'Công ty đã được xác thực và có thể đăng tin tuyển dụng.' })
+          : t('verification.summary.cannotPost', {
+              count: missingCount,
+              defaultValue: missingCount > 0
+                ? `Còn ${missingCount} thông tin pháp lý cần bổ sung trước khi gửi duyệt.`
+                : 'Hồ sơ đã đủ thông tin, vui lòng gửi yêu cầu xác minh và chờ admin duyệt.',
+            })}
+      </Alert>
+
       <Box sx={{ mt: 2, display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-        <Button variant="contained" onClick={() => push(`/${ROUTES.EMPLOYER.COMPANY}`)}>
+        <Button variant="outlined" onClick={() => push(`/${ROUTES.EMPLOYER.COMPANY}`)}>
           {t('verification.step1.openBtn')}
         </Button>
-        <Chip label={t('verification.step1.statusRequired')} color="warning" />
       </Box>
     </Card>
   );

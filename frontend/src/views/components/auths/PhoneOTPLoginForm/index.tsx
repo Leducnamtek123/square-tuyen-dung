@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Box, Button, Stack, styled, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Stack, styled, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { setupRecaptcha, signInWithPhone, verifyCode } from '../../../../services/firebaseService';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -10,6 +10,7 @@ import CountryPhoneInput from './CountryPhoneInput';
 import { DEFAULT_PHONE_COUNTRY, toE164PhoneNumber } from './phoneNumberUtils';
 
 const RECAPTCHA_CONTAINER_ID = 'recaptcha-container';
+const OTP_CODE_LENGTH = 6;
 
 const getFirebaseAuthErrorMessage = (
   error: unknown,
@@ -23,6 +24,11 @@ const getFirebaseAuthErrorMessage = (
         defaultValue:
           'Phone sign-in is not enabled for this Firebase project, or SMS is blocked by the Firebase SMS region policy.',
       });
+    case 'auth/billing-not-enabled':
+      return t('login.phoneBillingNotEnabled', {
+        defaultValue:
+          'Firebase requires Cloud Billing for real SMS phone sign-in. For testing, use a Firebase test phone number and fixed OTP code.',
+      });
     case 'auth/too-many-requests':
       return t('login.phoneTooManyRequests', {
         defaultValue: 'Too many OTP requests. Please try again later.',
@@ -34,6 +40,146 @@ const getFirebaseAuthErrorMessage = (
     default:
       return firebaseError.message || t('login.phoneSendFailed');
   }
+};
+
+type OtpCodeInputProps = {
+  value: string;
+  disabled?: boolean;
+  label: string;
+  onChange: (value: string) => void;
+  onEnter: () => void;
+};
+
+const OtpCodeInput = ({ value, disabled, label, onChange, onEnter }: OtpCodeInputProps) => {
+  const inputRefs = React.useRef<Array<HTMLInputElement | null>>([]);
+  const digits = Array.from({ length: OTP_CODE_LENGTH }, (_, index) => value[index] || '');
+
+  const focusInput = React.useCallback((index: number) => {
+    requestAnimationFrame(() => inputRefs.current[index]?.focus());
+  }, []);
+
+  const applyValue = React.useCallback(
+    (nextValue: string) => {
+      onChange(nextValue.replace(/\D/g, '').slice(0, OTP_CODE_LENGTH));
+    },
+    [onChange]
+  );
+
+  const handleChange = (index: number, rawValue: string) => {
+    const nextDigits = rawValue.replace(/\D/g, '');
+
+    if (!nextDigits) {
+      applyValue(value.slice(0, index) + value.slice(index + 1));
+      return;
+    }
+
+    if (nextDigits.length > 1) {
+      const slots = value.padEnd(OTP_CODE_LENGTH, ' ').slice(0, OTP_CODE_LENGTH).split('');
+      nextDigits
+        .slice(0, OTP_CODE_LENGTH - index)
+        .split('')
+        .forEach((digit, offset) => {
+          slots[index + offset] = digit;
+        });
+      applyValue(slots.join(''));
+      focusInput(Math.min(index + nextDigits.length, OTP_CODE_LENGTH - 1));
+      return;
+    }
+
+    applyValue(value.slice(0, index) + nextDigits + value.slice(index + 1));
+    if (index < OTP_CODE_LENGTH - 1) {
+      focusInput(index + 1);
+    }
+  };
+
+  const handleKeyDown = (index: number, event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      if (value.length === OTP_CODE_LENGTH) {
+        onEnter();
+      }
+      return;
+    }
+
+    if (event.key === 'ArrowLeft' && index > 0) {
+      event.preventDefault();
+      focusInput(index - 1);
+      return;
+    }
+
+    if (event.key === 'ArrowRight' && index < OTP_CODE_LENGTH - 1) {
+      event.preventDefault();
+      focusInput(index + 1);
+      return;
+    }
+
+    if (event.key === 'Backspace') {
+      event.preventDefault();
+      if (digits[index]) {
+        applyValue(value.slice(0, index) + value.slice(index + 1));
+      } else if (index > 0) {
+        focusInput(index - 1);
+      }
+    }
+  };
+
+  const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedCode = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_CODE_LENGTH);
+    if (!pastedCode) {
+      return;
+    }
+
+    event.preventDefault();
+    applyValue(pastedCode);
+    focusInput(Math.min(pastedCode.length, OTP_CODE_LENGTH - 1));
+  };
+
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, width: '100%' }}>
+      {digits.map((digit, index) => (
+        <Box
+          key={index}
+          component="input"
+          ref={(element: HTMLInputElement | null) => {
+            inputRefs.current[index] = element;
+          }}
+          type="text"
+          inputMode="numeric"
+          autoComplete={index === 0 ? 'one-time-code' : 'off'}
+          aria-label={`${label} ${index + 1}`}
+          value={digit}
+          disabled={disabled}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleChange(index, event.target.value)}
+          onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(index, event)}
+          onPaste={handlePaste}
+          sx={{
+            width: { xs: 42, sm: 52 },
+            height: 52,
+            maxWidth: 'calc((100% - 40px) / 6)',
+            border: '1px solid',
+            borderColor: 'rgba(36, 74, 143, 0.28)',
+            borderRadius: '10px',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            color: 'primary.main',
+            fontSize: 22,
+            fontWeight: 700,
+            lineHeight: 1,
+            outline: 'none',
+            textAlign: 'center',
+            transition: 'border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease',
+            '&:focus': {
+              borderColor: 'primary.main',
+              boxShadow: '0 0 0 3px rgba(36, 74, 143, 0.14)',
+              backgroundColor: '#fff',
+            },
+            '&:disabled': {
+              color: 'text.disabled',
+              backgroundColor: 'action.disabledBackground',
+            },
+          }}
+        />
+      ))}
+    </Box>
+  );
 };
 
 const StyledButton = styled(Button)(({ theme }) => ({
@@ -207,26 +353,18 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
           <Typography variant="body2" color="text.secondary">
             {t('login.otpIntro')}
           </Typography>
-          <TextField
-            fullWidth
+          <OtpCodeInput
             label={t('form.otpCode')}
-            placeholder="123456"
             value={state.otpCode}
-            onChange={(e) => dispatch({ type: 'set-otp-code', value: e.target.value })}
             disabled={isLoading}
-            variant="outlined"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              },
-            }}
+            onChange={(value) => dispatch({ type: 'set-otp-code', value })}
+            onEnter={handleVerifyOTP}
           />
           <StyledButton
             fullWidth
             variant="contained"
             onClick={handleVerifyOTP}
-            disabled={state.otpCode.length < 6 || isLoading}
+            disabled={state.otpCode.length !== OTP_CODE_LENGTH || isLoading}
             startIcon={<VerifiedUserIcon />}
           >
             {t('actions.verifyOTP', 'Xác thực & Đăng nhập')}
@@ -234,7 +372,11 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
           <Button
             fullWidth
             variant="text"
-            onClick={() => dispatch({ type: 'set-confirmation-result', value: null })}
+            onClick={() => {
+              resetRecaptcha();
+              dispatch({ type: 'set-confirmation-result', value: null });
+              dispatch({ type: 'set-otp-code', value: '' });
+            }}
             disabled={isLoading}
             size="small"
           >
@@ -242,7 +384,10 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
           </Button>
           {state.resendTimer > 0 ? (
             <Typography variant="caption" align="center" display="block">
-              {t('login.resendIn', 'Gửi lại sau')} {state.resendTimer}s
+              {t('login.resendIn', {
+                seconds: state.resendTimer,
+                defaultValue: `Gửi lại sau ${state.resendTimer}s`,
+              })}
             </Typography>
           ) : (
             <Button
@@ -255,6 +400,7 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
               {t('actions.resendOTP', 'Gửi lại mã')}
             </Button>
           )}
+          <Box id={RECAPTCHA_CONTAINER_ID} sx={{ mt: 1, display: 'flex', justifyContent: 'center' }}></Box>
         </Stack>
       )}
     </Box>

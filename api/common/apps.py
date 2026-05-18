@@ -8,7 +8,8 @@ class CommonConfig(AppConfig):
     name = 'common'
 
     def ready(self):
-        # Single initialization point for Firebase app lifecycle.
-        from common.firebase import initialize_firebase_app
+        # Initialize Admin SDK only when service-account credentials are configured.
+        from common.firebase import has_firebase_admin_credentials, initialize_firebase_app
 
-        initialize_firebase_app()
+        if has_firebase_admin_credentials():
+            initialize_firebase_app()

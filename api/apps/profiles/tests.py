@@ -234,6 +234,74 @@ class TestCompanyVerificationAPI:
         assert verification.admin_note == "Approved"
         assert company.is_verified is True
 
+    def test_admin_reviewing_unmarks_company_verified(self, admin_user, company):
+        company.is_verified = True
+        company.save(update_fields=["is_verified"])
+        verification = CompanyVerification.objects.create(
+            company=company,
+            legal_company_name=company.company_name,
+            tax_code=company.tax_code,
+            status=CompanyVerification.STATUS_APPROVED,
+        )
+        client = APIClient()
+        client.force_authenticate(user=admin_user)
+
+        response = client.patch(
+            f"/api/v1/info/web/admin/company-verifications/{verification.id}/",
+            {"status": CompanyVerification.STATUS_REVIEWING, "adminNote": "Needs more review"},
+            format="json",
+        )
+
+        assert response.status_code == 200
+        company.refresh_from_db()
+        assert company.is_verified is False
+
+    def test_employer_resubmission_unmarks_company_verified(self, employer_user, company):
+        company.is_verified = True
+        company.save(update_fields=["is_verified"])
+        CompanyVerification.objects.create(
+            company=company,
+            legal_company_name=company.company_name,
+            tax_code=company.tax_code,
+            business_license="BL-OLD",
+            representative_name="Old Rep",
+            contact_phone=company.company_phone,
+            contact_email=company.company_email,
+            status=CompanyVerification.STATUS_APPROVED,
+        )
+        client = APIClient()
+        client.force_authenticate(user=employer_user)
+
+        response = client.put(
+            "/api/v1/info/web/company-verification/",
+            {
+                "companyName": company.company_name,
+                "taxCode": company.tax_code,
+                "businessLicense": "BL-NEW",
+                "representative": "New Rep",
+                "phone": company.company_phone,
+                "email": company.company_email,
+            },
+            format="json",
+        )
+
+        assert response.status_code == 200
+        company.refresh_from_db()
+        assert response.data["data"]["status"] == CompanyVerification.STATUS_PENDING
+        assert company.is_verified is False
+
+    def test_employer_verification_requires_legal_profile(self, employer_user, company):
+        client = APIClient()
+        client.force_authenticate(user=employer_user)
+
+        response = client.put(
+            "/api/v1/info/web/company-verification/",
+            {"companyName": "", "taxCode": "", "businessLicense": ""},
+            format="json",
+        )
+
+        assert response.status_code == 400
+
 
 @pytest.mark.django_db
 class TestAdminCompanyAPI:

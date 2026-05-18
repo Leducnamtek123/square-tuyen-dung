@@ -1,7 +1,7 @@
 'use client';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Stack, Typography, Paper, Theme } from "@mui/material";
+import { Alert, Box, Button, Stack, Typography, Paper, Theme } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
@@ -22,10 +22,11 @@ import type { JobPostFormValues } from '../JobPostForm/JobPostSchema';
 import jobService from '../../../../services/jobService';
 import JobPostsTable from '../JobPostsTable';
 import { useDataTable } from '../../../../hooks';
-import { useEmployerJobPosts, useJobPostMutations } from '../hooks/useEmployerQueries';
+import { useCompanyProfile, useEmployerJobPosts, useJobPostMutations } from '../hooks/useEmployerQueries';
 import type { ApiError } from '../../../../types/api';
 import type { JobPostInput } from '../../../../services/jobService';
 import FilterBar from '@/components/Common/FilterBar';
+import { ROUTES } from '@/configs/constants';
 
 type JobPostEditData = Partial<JobPostFormValues> & { id?: string | number };
 
@@ -103,6 +104,9 @@ const JobPostCard = () => {
   });
 
   const { addJobPost, updateJobPost, deleteJobPost, isMutating } = useJobPostMutations();
+  const { data: companyProfile } = useCompanyProfile();
+  const isCompanyVerified = Boolean(companyProfile?.isVerified);
+  const isCreateBlocked = Boolean(companyProfile) && !isCompanyVerified;
 
   const handleShowUpdate = useCallback(async (slugOrId: string | number) => {
     dispatch({ type: 'setProcessing', value: true });
@@ -137,8 +141,12 @@ const JobPostCard = () => {
   }, []);
 
   const handleShowAdd = useCallback(() => {
+    if (isCreateBlocked) {
+      toastMessages.warn(t('jobPost.verificationRequired.toast', 'Vui lòng xác thực Nhà tuyển dụng trước khi đăng tin.'));
+      return;
+    }
     dispatch({ type: 'openAdd' });
-  }, []);
+  }, [isCreateBlocked, t]);
 
   const handleAddOrUpdate = async (formData: JobPostFormValues) => {
     dispatch({ type: 'setErrors', value: null });
@@ -297,6 +305,7 @@ const JobPostCard = () => {
               color="primary" 
               startIcon={<AddIcon />} 
               onClick={handleShowAdd} 
+              disabled={isCreateBlocked}
               sx={{ 
                  
                 px: 4, 
@@ -310,6 +319,23 @@ const JobPostCard = () => {
             </Button>
           </Stack>
         </Stack>
+
+        {isCreateBlocked ? (
+          <Alert
+            severity="warning"
+            sx={{ mb: 3 }}
+            action={
+              <Button color="inherit" size="small" href={`/${ROUTES.EMPLOYER.VERIFICATION}`}>
+                {t('jobPost.verificationRequired.action', 'Xác thực ngay')}
+              </Button>
+            }
+          >
+            {t(
+              'jobPost.verificationRequired.message',
+              'Công ty cần được xác thực trước khi tạo tin tuyển dụng mới. Hồ sơ đã duyệt sẽ mở lại quyền đăng tin.',
+            )}
+          </Alert>
+        ) : null}
 
         <FilterBar title={t('jobPost.filter')} sx={{ mb: 5 }}>
           <Box sx={{ width: '100%', minWidth: 0 }}>

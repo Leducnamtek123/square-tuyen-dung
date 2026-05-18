@@ -1,6 +1,7 @@
 import copy
 import json
 import logging
+import re
 
 import requests
 from django.db import transaction
@@ -36,6 +37,40 @@ from common.firebase import verify_id_token
 from .models import User
 
 logger = logging.getLogger(__name__)
+
+
+def _phone_digits(value):
+    return re.sub(r"\D", "", str(value or ""))
+
+
+def _normalize_phone_key(value):
+    digits = _phone_digits(value)
+    if not digits:
+        return ""
+    if digits.startswith("84") and len(digits) >= 10:
+        return f"84{digits[2:]}"
+    if digits.startswith("0") and len(digits) >= 10:
+        return f"84{digits[1:]}"
+    return digits
+
+
+def _phone_lookup_values(phone_number):
+    digits = _phone_digits(phone_number)
+    values = {str(phone_number or "").strip(), digits}
+    if digits.startswith("84") and len(digits) >= 10:
+        national = f"0{digits[2:]}"
+        values.update({f"+{digits}", national})
+    elif digits.startswith("0") and len(digits) >= 10:
+        e164_digits = f"84{digits[1:]}"
+        values.update({f"+{e164_digits}", e164_digits})
+    return {value for value in values if value}
+
+
+def _national_phone_from_e164(phone_number):
+    digits = _phone_digits(phone_number)
+    if digits.startswith("84") and len(digits) >= 10:
+        return f"0{digits[2:]}"
+    return digits or str(phone_number or "").strip()
 
 
 def _build_oauth_request(request, payload):
@@ -348,6 +383,53 @@ class FirebaseLoginView(TokenView):
     # Only these roles are allowed via Firebase phone login
     ALLOWED_FIREBASE_ROLES = {var_sys.JOB_SEEKER, var_sys.EMPLOYER}
 
+    def _find_existing_user_by_phone(self, phone_number, role_name):
+        user = User.objects.filter(phone_number=phone_number).first()
+        if user:
+            return user, None
+
+        phone_key = _normalize_phone_key(phone_number)
+        if not phone_key:
+            return None, None
+
+        matched_users = []
+        lookup_values = _phone_lookup_values(phone_number)
+
+        if role_name == var_sys.JOB_SEEKER:
+            from apps.profiles.models import JobSeekerProfile
+
+            profiles = (
+                JobSeekerProfile.objects.select_related("user")
+                .filter(phone__in=lookup_values)
+                .exclude(user__isnull=True)
+            )
+            for profile in profiles:
+                if _normalize_phone_key(profile.phone) == phone_key:
+                    matched_users.append(profile.user)
+
+        if role_name == var_sys.EMPLOYER:
+            from apps.profiles.models import Company
+
+            companies = (
+                Company.objects.select_related("user")
+                .filter(company_phone__in=lookup_values)
+                .exclude(user__isnull=True)
+            )
+            for company in companies:
+                if _normalize_phone_key(company.company_phone) == phone_key:
+                    matched_users.append(company.user)
+
+        unique_users = {user.id: user for user in matched_users}
+        if len(unique_users) > 1:
+            return None, "Số điện thoại này đang liên kết với nhiều tài khoản. Vui lòng đăng nhập bằng email hoặc liên hệ hỗ trợ."
+
+        user = next(iter(unique_users.values()), None)
+        if user and not user.phone_number:
+            user.phone_number = phone_number
+            user.save(update_fields=["phone_number"])
+
+        return user, None
+
     def post(self, request, *args, **kwargs):
         id_token = request.data.get("token")
         role_name = request.data.get("role_name")
@@ -386,8 +468,15 @@ class FirebaseLoginView(TokenView):
                 errors={"token": ["Token không chứa số điện thoại."]},
             )
 
-        # Find or create user
-        user = User.objects.filter(phone_number=phone_number).first()
+        # Find or create user. Prefer linking phone login to an existing account
+        # whose profile already owns this verified phone number.
+        user, phone_lookup_error = self._find_existing_user_by_phone(phone_number, role_name)
+        if phone_lookup_error:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": [phone_lookup_error]},
+            )
+
         if not user:
             dummy_email = f"{phone_number.replace('+', '')}" + "@phone.auth"
             user = User.objects.filter(email=dummy_email).first()
@@ -404,12 +493,27 @@ class FirebaseLoginView(TokenView):
                     # Create associated profile for JOB_SEEKER
                     if role_name == var_sys.JOB_SEEKER:
                         from apps.profiles.models import JobSeekerProfile, Resume
-                        profile = JobSeekerProfile.objects.create(user=user)
+                        profile = JobSeekerProfile.objects.create(
+                            user=user,
+                            phone=_national_phone_from_e164(phone_number),
+                        )
                         Resume.objects.create(
                             job_seeker_profile=profile,
                             user=user,
                             type=var_sys.CV_WEBSITE,
                         )
+
+        if not user.is_active:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": [ERROR_MESSAGES["ACCOUNT_DISABLED"]]},
+            )
+
+        if not _can_login_as_role(user, role_name):
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": [ERROR_MESSAGES["LOGIN_ERROR"]]},
+            )
 
         # Identify Application
         Application = get_application_model()

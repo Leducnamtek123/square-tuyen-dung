@@ -12,6 +12,7 @@ from typing import Optional, Dict, Any, Union
 from apps.jobs.models import JobPost, JobPostActivity
 from apps.jobs.exceptions import (
     CompanyNotConfiguredError,
+    CompanyNotVerifiedError,
     DuplicateApplicationError,
     InvalidApplicationStatusTransitionError,
     JobPostExpiredError,
@@ -90,6 +91,10 @@ class JobPostService:
         company = user.active_company
         if not company:
             raise CompanyNotConfiguredError("Người dùng chưa có thông tin công ty.")
+        if not company.is_verified:
+            raise CompanyNotVerifiedError(
+                "Công ty của bạn chưa được xác thực. Vui lòng hoàn tất xác thực Nhà tuyển dụng trước khi đăng tin."
+            )
 
         payload = dict(validated_data)
         if auto_approve_jobs_enabled():

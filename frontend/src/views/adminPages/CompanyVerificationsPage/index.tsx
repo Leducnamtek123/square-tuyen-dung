@@ -3,6 +3,7 @@
 import React from 'react';
 import {
   Box,
+  Button,
   Chip,
   FormControl,
   InputLabel,
@@ -13,6 +14,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
   TextField,
@@ -20,6 +22,7 @@ import {
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
 import adminManagementService from '../../../services/adminManagementService';
 import toastMessages from '../../../utils/toastMessages';
 import type { CompanyVerification } from '../../../types/models';
@@ -39,6 +42,7 @@ const CompanyVerificationsPage = () => {
   const { t } = useTranslation('admin');
   const queryClient = useQueryClient();
   const [notes, setNotes] = React.useState<Record<number, string>>({});
+  const [statuses, setStatuses] = React.useState<Record<number, VerificationStatus>>({});
   const { data, isLoading } = useQuery({
     queryKey: ['admin-company-verifications'],
     queryFn: () => adminManagementService.getCompanyVerifications({ page: 1, pageSize: 100 }),
@@ -54,8 +58,21 @@ const CompanyVerificationsPage = () => {
     onError: () => toastMessages.error(t('pages.companyVerifications.toast.updateError')),
   });
 
-  const rows = data?.results || [];
+  const rows = React.useMemo(() => data?.results || [], [data?.results]);
   const emptyValue = t('common.na');
+  const statusCounts = React.useMemo(() => {
+    return STATUS_OPTIONS.reduce<Record<VerificationStatus, number>>((acc, status) => {
+      acc[status] = rows.filter((row) => (row.status || 'pending') === status).length;
+      return acc;
+    }, { pending: 0, reviewing: 0, approved: 0, rejected: 0 });
+  }, [rows]);
+
+  const formatDate = (value?: string | null) => {
+    if (!value) return emptyValue;
+    const date = dayjs(value);
+    return date.isValid() ? date.format('DD/MM/YYYY HH:mm') : value;
+  };
+
   const getStatusLabel = (status: VerificationStatus) => {
     switch (status) {
       case 'reviewing':
@@ -68,6 +85,10 @@ const CompanyVerificationsPage = () => {
       default:
         return t('pages.companyVerifications.status.pending');
     }
+  };
+  const handleUpdate = (row: CompanyVerification, status: VerificationStatus, adminNote: string) => {
+    if (!row.id) return;
+    updateMutation.mutate({ id: row.id, status, adminNote });
   };
 
   return (
@@ -82,98 +103,113 @@ const CompanyVerificationsPage = () => {
           </Typography>
         </Box>
       </Stack>
+      <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap', rowGap: 1 }}>
+        {STATUS_OPTIONS.map((status) => (
+          <Chip
+            key={status}
+            color={statusColor(status)}
+            variant="outlined"
+            label={`${getStatusLabel(status)}: ${statusCounts[status]}`}
+          />
+        ))}
+      </Stack>
 
       <Paper elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, overflow: 'hidden' }}>
-        <Table sx={{ minWidth: 1000 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('pages.companyVerifications.table.company')}</TableCell>
-              <TableCell>{t('pages.companyVerifications.table.legalProfile')}</TableCell>
-              <TableCell>{t('pages.companyVerifications.table.appointment')}</TableCell>
-              <TableCell>{t('pages.companyVerifications.table.adminNote')}</TableCell>
-              <TableCell>{t('pages.companyVerifications.table.status')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => {
-              const status = row.status || 'pending';
-              const note = notes[row.id || 0] ?? row.adminNote ?? '';
-              return (
-                <TableRow key={row.id} hover>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {row.companyDict?.companyName || row.companyName || emptyValue}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {row.companyDict?.companyEmail || row.email || emptyValue}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {t('pages.companyVerifications.legal.tax', { value: row.taxCode || emptyValue })}
-                    </Typography>
-                    <Typography variant="body2">
-                      {t('pages.companyVerifications.legal.license', { value: row.businessLicense || emptyValue })}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {t('pages.companyVerifications.legal.representative', { value: row.representative || emptyValue })}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">{row.scheduledAt || emptyValue}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {row.contactName || emptyValue} {row.contactPhone ? `- ${row.contactPhone}` : ''}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <TextField
-                      size="small"
-                      value={note}
-                      onChange={(event) => setNotes((prev) => ({ ...prev, [row.id || 0]: event.target.value }))}
-                      placeholder={t('pages.companyVerifications.reviewNotePlaceholder')}
-                      multiline
-                      minRows={2}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Chip size="small" label={getStatusLabel(status)} color={statusColor(status)} variant="outlined" />
-                      <FormControl size="small" sx={{ minWidth: 130 }}>
-                        <InputLabel>{t('pages.companyVerifications.table.status')}</InputLabel>
-                        <Select
-                          label={t('pages.companyVerifications.table.status')}
-                          value={status}
+        <TableContainer>
+          <Table sx={{ minWidth: 1080 }}>
+            <TableHead>
+              <TableRow>
+                <TableCell>{t('pages.companyVerifications.table.company')}</TableCell>
+                <TableCell>{t('pages.companyVerifications.table.legalProfile')}</TableCell>
+                <TableCell>{t('pages.companyVerifications.table.appointment')}</TableCell>
+                <TableCell>{t('pages.companyVerifications.table.adminNote')}</TableCell>
+                <TableCell>{t('pages.companyVerifications.table.status')}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row) => {
+                const rowId = row.id || 0;
+                const status = statuses[rowId] ?? row.status ?? 'pending';
+                const note = notes[rowId] ?? row.adminNote ?? '';
+                return (
+                  <TableRow key={row.id} hover>
+                    <TableCell sx={{ minWidth: 220 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {row.companyDict?.companyName || row.companyName || emptyValue}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {row.companyDict?.companyEmail || row.email || emptyValue}
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 260 }}>
+                      <Typography variant="body2">
+                        {t('pages.companyVerifications.legal.tax', { value: row.taxCode || emptyValue })}
+                      </Typography>
+                      <Typography variant="body2">
+                        {t('pages.companyVerifications.legal.license', { value: row.businessLicense || emptyValue })}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('pages.companyVerifications.legal.representative', { value: row.representative || emptyValue })}
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 210 }}>
+                      <Typography variant="body2">{formatDate(row.scheduledAt)}</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {row.contactName || emptyValue} {row.contactPhone ? `- ${row.contactPhone}` : ''}
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 240 }}>
+                      <TextField
+                        size="small"
+                        value={note}
+                        onChange={(event) => setNotes((prev) => ({ ...prev, [rowId]: event.target.value }))}
+                        placeholder={t('pages.companyVerifications.reviewNotePlaceholder')}
+                        multiline
+                        minRows={2}
+                        fullWidth
+                      />
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 280 }}>
+                      <Stack direction={{ xs: 'column', lg: 'row' }} spacing={1} alignItems={{ xs: 'stretch', lg: 'center' }}>
+                        <Chip size="small" label={getStatusLabel(status)} color={statusColor(status)} variant="outlined" />
+                        <FormControl size="small" sx={{ minWidth: 130 }}>
+                          <InputLabel>{t('pages.companyVerifications.table.status')}</InputLabel>
+                          <Select
+                            label={t('pages.companyVerifications.table.status')}
+                            value={status}
+                            disabled={updateMutation.isPending || !row.id}
+                            onChange={(event) => setStatuses((prev) => ({ ...prev, [rowId]: event.target.value as VerificationStatus }))}
+                          >
+                            {STATUS_OPTIONS.map((item) => (
+                              <MenuItem key={item} value={item}>
+                                {getStatusLabel(item)}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        <Button
+                          size="small"
+                          variant="contained"
                           disabled={updateMutation.isPending || !row.id}
-                          onChange={(event) =>
-                            row.id &&
-                            updateMutation.mutate({
-                              id: row.id,
-                              status: event.target.value as VerificationStatus,
-                              adminNote: note,
-                            })
-                          }
+                          onClick={() => handleUpdate(row, status, note)}
                         >
-                          {STATUS_OPTIONS.map((item) => (
-                            <MenuItem key={item} value={item}>
-                              {getStatusLabel(item)}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Stack>
+                          {t('pages.companyVerifications.actions.update', { defaultValue: 'Cập nhật' })}
+                        </Button>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+              {!isLoading && rows.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                    {t('pages.companyVerifications.empty')}
                   </TableCell>
                 </TableRow>
-              );
-            })}
-            {!isLoading && rows.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
-                  {t('pages.companyVerifications.empty')}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Paper>
     </Box>
   );

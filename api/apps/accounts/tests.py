@@ -162,6 +162,49 @@ class TestSocialAuthPipeline:
         assert result == {"is_new": True, "user": None}
 
 
+@pytest.mark.django_db
+class TestFirebasePhoneLoginMapping:
+    def test_job_seeker_phone_login_reuses_profile_owner(self, job_seeker_user, job_seeker_profile):
+        from apps.accounts.views_oauth import FirebaseLoginView
+
+        job_seeker_user.phone_number = None
+        job_seeker_user.save(update_fields=["phone_number"])
+
+        user, error = FirebaseLoginView()._find_existing_user_by_phone(
+            "+84909876543",
+            var_sys.JOB_SEEKER,
+        )
+
+        assert error is None
+        assert user == job_seeker_user
+        job_seeker_user.refresh_from_db()
+        assert job_seeker_user.phone_number == "+84909876543"
+
+    def test_duplicate_profile_phone_is_rejected(self, db, job_seeker_user, job_seeker_profile, location):
+        from apps.accounts.views_oauth import FirebaseLoginView
+        from apps.profiles.models import JobSeekerProfile
+
+        other_user = User.objects.create_user_with_role_name(
+            email="other-phone@test.com",
+            full_name="Other Phone",
+            role_name=var_sys.JOB_SEEKER,
+            password="pass123",
+        )
+        JobSeekerProfile.objects.create(
+            user=other_user,
+            phone=job_seeker_profile.phone,
+            location=location,
+        )
+
+        user, error = FirebaseLoginView()._find_existing_user_by_phone(
+            "+84909876543",
+            var_sys.JOB_SEEKER,
+        )
+
+        assert user is None
+        assert "nhiều tài khoản" in error
+
+
 # ==================== Permission Tests ====================
 
 @pytest.mark.django_db

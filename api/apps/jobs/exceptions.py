@@ -13,6 +13,10 @@ class CompanyNotConfiguredError(JobsDomainError):
     """Employer has no active company configured."""
 
 
+class CompanyNotVerifiedError(JobsDomainError):
+    """Employer company must be verified before posting jobs."""
+
+
 class JobPostInactiveError(JobsDomainError):
     """Job post is not active/approved anymore."""
 

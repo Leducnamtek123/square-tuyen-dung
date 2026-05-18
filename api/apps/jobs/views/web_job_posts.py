@@ -20,7 +20,7 @@ from shared.configs import variable_system as var_sys
 from shared.helpers import helper, utils
 
 from ..filters import AliasedOrderingFilter, JobPostFilter
-from ..exceptions import CompanyNotConfiguredError, JobsDomainError
+from ..exceptions import JobsDomainError
 from ..models import JobPost, JobPostActivity, SavedJobPost
 from ..serializers import JobPostSerializer
 
@@ -153,7 +153,7 @@ class PrivateJobPostViewSet(
                 user=request.user,
                 validated_data=serializer.validated_data
             )
-        except CompanyNotConfiguredError as exc:
+        except JobsDomainError as exc:
             raise ValidationError({"errorMessage": [str(exc)]})
 
         response_serializer = self.get_serializer(job_post)

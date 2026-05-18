@@ -452,6 +452,15 @@ class AdminTrustReportSerializer(TrustReportSerializer):
 
 
 class CompanyVerificationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    REQUIRED_LEGAL_FIELDS = {
+        "legal_company_name": ("companyName", "Tên doanh nghiệp là bắt buộc."),
+        "tax_code": ("taxCode", "Mã số thuế là bắt buộc."),
+        "business_license": ("businessLicense", "Số giấy phép kinh doanh là bắt buộc."),
+        "representative_name": ("representative", "Người đại diện là bắt buộc."),
+        "contact_phone": ("phone", "Số điện thoại liên hệ là bắt buộc."),
+        "contact_email": ("email", "Email liên hệ là bắt buộc."),
+    }
+
     companyId = serializers.IntegerField(source="company_id", read_only=True)
     companyDict = CompanySerializer(source="company", read_only=True, fields=["id", "slug", "companyName", "taxCode", "isVerified"])
     companyName = serializers.CharField(source="legal_company_name", required=False, allow_blank=True)
@@ -470,6 +479,39 @@ class CompanyVerificationSerializer(DynamicFieldsMixin, serializers.ModelSeriali
     reviewedAt = serializers.DateTimeField(source="reviewed_at", read_only=True)
     createAt = serializers.DateTimeField(source="create_at", read_only=True)
     updateAt = serializers.DateTimeField(source="update_at", read_only=True)
+
+    def _merged_value(self, attrs, model_field):
+        if model_field in attrs:
+            return attrs.get(model_field)
+        if self.instance is not None:
+            return getattr(self.instance, model_field, None)
+        return None
+
+    def validate(self, attrs):
+        errors = {}
+
+        if self.context.get("require_legal_profile"):
+            for model_field, (api_field, message) in self.REQUIRED_LEGAL_FIELDS.items():
+                value = self._merged_value(attrs, model_field)
+                if value is None or str(value).strip() == "":
+                    errors[api_field] = [message]
+
+        scheduled_at = attrs.get("verification_scheduled_at")
+        if scheduled_at and scheduled_at < timezone.now():
+            errors["scheduledAt"] = ["Thời gian xác minh phải ở hiện tại hoặc tương lai."]
+
+        if scheduled_at:
+            for model_field, api_field, message in (
+                ("verification_contact_name", "contactName", "Người liên hệ lịch xác minh là bắt buộc."),
+                ("verification_contact_phone", "contactPhone", "Số điện thoại liên hệ lịch xác minh là bắt buộc."),
+            ):
+                value = self._merged_value(attrs, model_field)
+                if value is None or str(value).strip() == "":
+                    errors[api_field] = [message]
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
 
     class Meta:
         model = CompanyVerification
@@ -524,11 +566,9 @@ class AdminCompanyVerificationSerializer(CompanyVerificationSerializer):
             instance.reviewed_by = request.user if request and request.user.is_authenticated else None
             instance.reviewed_at = timezone.now()
             instance.save(update_fields=["reviewed_by", "reviewed_at", "update_at"])
-            if status_value == CompanyVerification.STATUS_APPROVED and not instance.company.is_verified:
-                instance.company.is_verified = True
-                instance.company.save(update_fields=["is_verified", "update_at"])
-            elif status_value == CompanyVerification.STATUS_REJECTED and instance.company.is_verified:
-                instance.company.is_verified = False
+            should_be_verified = status_value == CompanyVerification.STATUS_APPROVED
+            if instance.company.is_verified != should_be_verified:
+                instance.company.is_verified = should_be_verified
                 instance.company.save(update_fields=["is_verified", "update_at"])
         return instance
 

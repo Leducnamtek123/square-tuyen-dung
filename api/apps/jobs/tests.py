@@ -12,6 +12,7 @@ from rest_framework.test import APIClient
 from apps.jobs.models import JobPost, JobPostActivity
 from apps.jobs.serializers import JobSeekerJobPostActivitySerializer
 from apps.jobs.services import JobPostService, JobActivityService
+from apps.jobs.exceptions import CompanyNotVerifiedError
 from apps.jobs.ai_scoring_service import _fallback_scoring, build_scoring_prompt
 from apps.content.models import SystemSetting
 from shared.configs import variable_system as var_sys
@@ -264,6 +265,8 @@ class TestJobService:
 
     def test_create_job_auto_approves_when_setting_enabled(self, employer_user, company, career, location):
         SystemSetting.objects.create(key="autoApproveJobs", value="true")
+        company.is_verified = True
+        company.save(update_fields=["is_verified"])
 
         job = JobPostService.create_job(
             user=employer_user,
@@ -290,6 +293,32 @@ class TestJobService:
         )
 
         assert job.status == var_sys.JobPostStatus.APPROVED
+
+    def test_create_job_requires_verified_company(self, employer_user, company, career, location):
+        with pytest.raises(CompanyNotVerifiedError, match="chưa được xác thực"):
+            JobPostService.create_job(
+                user=employer_user,
+                validated_data={
+                    "job_name": "Blocked Job",
+                    "deadline": timezone.now().date() + timedelta(days=30),
+                    "quantity": 1,
+                    "job_description": "<p>Job description</p>",
+                    "job_requirement": "<p>Requirement</p>",
+                    "benefits_enjoyed": "<p>Benefits</p>",
+                    "position": 4,
+                    "type_of_workplace": 1,
+                    "experience": 2,
+                    "academic_level": 2,
+                    "job_type": 1,
+                    "salary_min": 10000000,
+                    "salary_max": 20000000,
+                    "contact_person_name": "HR",
+                    "contact_person_phone": "0901234567",
+                    "contact_person_email": "hr@test.com",
+                    "career": career,
+                    "location": location,
+                },
+            )
 
     def test_apply_to_job_skips_email_when_email_notifications_disabled(self, job_seeker_user, job_post, resume):
         SystemSetting.objects.create(key="emailNotifications", value="false")

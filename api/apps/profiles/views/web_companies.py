@@ -532,13 +532,16 @@ class CompanyVerificationView(views.APIView):
             verification,
             data=request.data,
             partial=True,
-            context={"request": request},
+            context={"request": request, "require_legal_profile": True},
         )
         serializer.is_valid(raise_exception=True)
         verification = serializer.save(
             submitted_by=request.user,
             status=CompanyVerification.STATUS_PENDING,
         )
+        if company.is_verified:
+            company.is_verified = False
+            company.save(update_fields=["is_verified", "update_at"])
         return var_res.response_data(status=status.HTTP_200_OK, data=CompanyVerificationSerializer(verification).data)
 
     patch = put
