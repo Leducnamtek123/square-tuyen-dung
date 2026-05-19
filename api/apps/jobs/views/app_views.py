@@ -124,13 +124,16 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.ViewSet,
     }
     default_permission_classes = [perms_sys.AllowAny]
 
+    def get_queryset(self):
+        return self.queryset.filter(
+            status=var_sys.JobPostStatus.APPROVED,
+            deadline__gte=timezone.localdate(),
+            company__is_verified=True,
+        )
+
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(
             self.get_queryset()
-            .filter(
-                status=var_sys.JobPostStatus.APPROVED,
-                deadline__gte=timezone.localdate()
-            )
             .prefetch_related(
                 Prefetch(
                     'savedjobpost_set',
@@ -138,7 +141,7 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.ViewSet,
                 ),
                 Prefetch(
                     'jobpostactivity_set',
-                    queryset=JobPostActivity.objects.filter(user=request.user) if request.user.is_authenticated else JobPostActivity.objects.none(),
+                    queryset=JobPostActivity.objects.filter(user=request.user, is_deleted=False) if request.user.is_authenticated else JobPostActivity.objects.none(),
                 ),
             )
         )
@@ -185,7 +188,11 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.ViewSet,
                 'company', 'company__logo', 'company__cover_image', 'company__user',
                 'location', 'location__city', 'career'
             )
-            .filter(status=var_sys.JobPostStatus.APPROVED, deadline__gte=timezone.localdate())
+            .filter(
+                status=var_sys.JobPostStatus.APPROVED,
+                deadline__gte=timezone.localdate(),
+                company__is_verified=True,
+            )
             .filter(career__in=careers_id, location__city__in=cities_id)
             .prefetch_related(
                 Prefetch(
@@ -194,7 +201,7 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.ViewSet,
                 ),
                 Prefetch(
                     'jobpostactivity_set',
-                    queryset=JobPostActivity.objects.filter(user=request.user) if request.user.is_authenticated else JobPostActivity.objects.none(),
+                    queryset=JobPostActivity.objects.filter(user=request.user, is_deleted=False) if request.user.is_authenticated else JobPostActivity.objects.none(),
                 ),
             )
             .order_by("-create_at", "-update_at")
@@ -258,14 +265,18 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.ViewSet,
 
         queryset = (
             user.saved_job_posts
-            .filter(status=var_sys.JobPostStatus.APPROVED)
+            .filter(
+                status=var_sys.JobPostStatus.APPROVED,
+                deadline__gte=timezone.localdate(),
+                company__is_verified=True,
+            )
             .select_related(
                 'company', 'company__logo', 'company__cover_image', 'company__user',
                 'location', 'location__city', 'career'
             )
             .prefetch_related(
                 Prefetch('savedjobpost_set', queryset=SavedJobPost.objects.filter(user=user)),
-                Prefetch('jobpostactivity_set', queryset=JobPostActivity.objects.filter(user=user)),
+                Prefetch('jobpostactivity_set', queryset=JobPostActivity.objects.filter(user=user, is_deleted=False)),
             )
             .order_by('update_at', 'create_at')
         )
@@ -311,7 +322,7 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.ViewSet,
             url_path="count-job-posts-by-job-type", url_name="count-job-posts-by-job-type")
 
     def count_job_posts_by_job_type(self, request):
-        data = JobPost.objects.values(typeOfWorkplace=F('type_of_workplace')).annotate(total=Count('id')).order_by()
+        data = self.get_queryset().values(typeOfWorkplace=F('type_of_workplace')).annotate(total=Count('id')).order_by()
 
         return var_res.response_data(data=data)
 
@@ -353,11 +364,7 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.ViewSet,
 
         # Tính toán khoảng cách và filter các dòng thỏa mãn
 
-        queryset = self.filter_queryset(self.get_queryset()
-
-                                        .filter(status=var_sys.JobPostStatus.APPROVED, deadline__gte=timezone.localdate()
-
-                                                ).annotate(
+        queryset = self.filter_queryset(self.get_queryset().annotate(
 
             lat_radian=Radians('location__lat'),
 
@@ -441,6 +448,7 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
         user = request.user
 
         queryset = user.jobpostactivity_set \
+            .filter(is_deleted=False) \
             .order_by('-create_at', '-update_at')
 
         page = self.paginate_queryset(queryset)

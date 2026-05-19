@@ -4,6 +4,7 @@ Interview Module — DRF Views
 
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -119,17 +120,60 @@ def _user_can_update_status(user, session: InterviewSession) -> bool:
     role = str(getattr(user, "role_name", "") or "").upper()
     if role == var_sys.ADMIN or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
         return True
+    if session.created_by_id == user.id:
+        return True
+
+    try:
+        company = user.get_active_company()
+    except Exception:
+        company = None
+    if (
+        company
+        and session.job_post_id
+        and session.job_post.company_id == company.id
+        and perms_custom.user_has_company_permission(user, "manage_interviews", company)
+    ):
+        return True
     if role == var_sys.JOB_SEEKER:
         return session.candidate_id == user.id
     if role == var_sys.EMPLOYER:
-        if session.created_by_id == user.id:
-            return True
-        try:
-            company = user.get_active_company()
-        except Exception:
-            company = None
-        return bool(company and session.job_post_id and session.job_post.company_id == company.id)
+        return bool(
+            company
+            and session.job_post_id
+            and session.job_post.company_id == company.id
+            and perms_custom.user_has_company_permission(user, "manage_interviews", company)
+        )
     return False
+
+
+def _user_can_manage_session(user, session: InterviewSession) -> bool:
+    if not getattr(user, "is_authenticated", False):
+        return False
+    if _is_admin_user(user):
+        return True
+    if session.created_by_id == user.id:
+        return True
+
+    company = _resolve_active_company(user)
+    if not company:
+        return False
+
+    session_company_id = None
+    if session.job_post_id and session.job_post:
+        session_company_id = session.job_post.company_id
+    elif session.question_group_id and session.question_group:
+        session_company_id = session.question_group.company_id
+
+    return bool(
+        session_company_id
+        and session_company_id == company.id
+        and perms_custom.user_has_company_permission(user, "manage_interviews", company)
+    )
+
+
+def _deny_if_cannot_manage_session(user, session: InterviewSession) -> None:
+    if not _user_can_manage_session(user, session):
+        raise PermissionDenied("Interview management permission required.")
 
 
 def _invite_token_can_update_status(request, session: InterviewSession, new_status: str) -> bool:
@@ -176,7 +220,7 @@ class VoiceProfileViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         .all()
     )
     serializer_class = VoiceProfileSerializer
-    permission_classes = [perms_custom.IsEmployerOrAdminUser]
+    permission_classes = [perms_custom.CanManageInterviews]
     parser_classes = [JSONParser, MultiPartParser, FormParser]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ["name", "description", "preset_voice_id"]
@@ -334,7 +378,7 @@ class VoiceProfileGrantViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 class QuestionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = Question.objects.select_related('career', 'career__icon', 'company', 'author').all()
     serializer_class = QuestionSerializer
-    permission_classes = [perms_custom.IsEmployerOrAdminUser]
+    permission_classes = [perms_custom.CanManageQuestionBank]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['career', 'difficulty']
     search_fields = ['text']
@@ -343,13 +387,13 @@ class QuestionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         qs = super().get_queryset()
-        role = getattr(user, 'role_name', None)
         company = self._resolve_company(user)
 
-        if role == 'EMPLOYER' and company:
-            from django.db.models import Q
+        if _is_admin_user(user):
+            return qs
+        if company and perms_custom.user_has_company_permission(user, "manage_question_bank", company):
             return qs.filter(Q(company__isnull=True) | Q(company=company))
-        return qs
+        return qs.none()
 
     def _resolve_company(self, user):
         try:
@@ -359,19 +403,20 @@ class QuestionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
-        role = getattr(user, 'role_name', None)
         company = self._resolve_company(user)
-        if role == 'EMPLOYER' and company:
+        if _is_admin_user(user):
+            question = serializer.save(author=user)
+        elif company and perms_custom.user_has_company_permission(user, "manage_question_bank", company):
             question = serializer.save(author=user, company=company)
         else:
-            question = serializer.save(author=user)
+            raise PermissionDenied("Question bank management permission required.")
         self._audit_instance("create", question)
 
 
 class QuestionGroupViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = QuestionGroup.objects.prefetch_related('questions', 'questions__career', 'questions__career__icon').select_related('company', 'author').all()
     serializer_class = QuestionGroupSerializer
-    permission_classes = [perms_custom.IsEmployerOrAdminUser]
+    permission_classes = [perms_custom.CanManageQuestionBank]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['name', 'description']
     ordering_fields = ['create_at', 'name']
@@ -379,13 +424,13 @@ class QuestionGroupViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         qs = super().get_queryset()
-        role = getattr(user, 'role_name', None)
         company = self._resolve_company(user)
 
-        if role == 'EMPLOYER' and company:
-            from django.db.models import Q
+        if _is_admin_user(user):
+            return qs
+        if company and perms_custom.user_has_company_permission(user, "manage_question_bank", company):
             return qs.filter(Q(company__isnull=True) | Q(company=company))
-        return qs
+        return qs.none()
 
     def _resolve_company(self, user):
         try:
@@ -395,12 +440,13 @@ class QuestionGroupViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
-        role = getattr(user, 'role_name', None)
         company = self._resolve_company(user)
-        if role == 'EMPLOYER' and company:
+        if _is_admin_user(user):
+            group = serializer.save(author=user)
+        elif company and perms_custom.user_has_company_permission(user, "manage_question_bank", company):
             group = serializer.save(author=user, company=company)
         else:
-            group = serializer.save(author=user)
+            raise PermissionDenied("Question bank management permission required.")
         self._audit_instance("create", group)
 
     def list(self, request, *args, **kwargs):
@@ -426,7 +472,7 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         base_qs = InterviewSession.objects.select_related(
-            'candidate', 'job_post', 'created_by', 'voice_profile'
+            'candidate', 'job_post', 'job_post__company', 'created_by', 'voice_profile', 'question_group'
         ).prefetch_related('questions', 'transcripts', 'evaluations')
 
         if user.is_anonymous:
@@ -434,17 +480,21 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
         role = getattr(user, 'role_name', None)
 
+        company = self._resolve_company(user)
+        if company and perms_custom.user_has_company_permission(user, "manage_interviews", company):
+            filters = Q(created_by=user) | Q(job_post__company=company)
+            if role == 'JOB_SEEKER':
+                filters |= Q(candidate=user)
+            return base_qs.filter(filters).distinct()
+
         if role == 'JOB_SEEKER':
             return base_qs.filter(candidate=user)
         elif role == 'EMPLOYER':
-            from django.db.models import Q
-            company = self._resolve_company(user)
-            if company:
-                return base_qs.filter(Q(job_post__company=company) | Q(created_by=user)).distinct()
             return base_qs.filter(created_by=user)
 
-        # Admin or other roles can see all
-        return base_qs.all()
+        if _is_admin_user(user):
+            return base_qs.all()
+        return base_qs.none()
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -456,9 +506,8 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     def perform_create(self, serializer):
         voice_profile = serializer.validated_data.get("voice_profile")
         job_post = serializer.validated_data.get("job_post")
+        self._ensure_can_manage_interviews(job_post)
         if not _user_can_use_voice_profile(self.request.user, voice_profile, job_post):
-            from rest_framework.exceptions import PermissionDenied
-
             raise PermissionDenied("Voice profile is not available for this company or job post.")
         session = serializer.save(created_by=self.request.user)
         self._audit_instance("create", session)
@@ -467,9 +516,8 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     def perform_update(self, serializer):
         voice_profile = serializer.validated_data.get("voice_profile", getattr(serializer.instance, "voice_profile", None))
         job_post = serializer.validated_data.get("job_post", getattr(serializer.instance, "job_post", None))
+        self._ensure_can_manage_interviews(job_post)
         if not _user_can_use_voice_profile(self.request.user, voice_profile, job_post):
-            from rest_framework.exceptions import PermissionDenied
-
             raise PermissionDenied("Voice profile is not available for this company or job post.")
         session = serializer.save()
         self._audit_instance("update", session)
@@ -487,6 +535,21 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             return user.get_active_company()
         except Exception:
             return None
+
+    def _ensure_can_manage_interviews(self, job_post=None):
+        user = self.request.user
+        if _is_admin_user(user):
+            return
+
+        company = job_post.company if job_post else self._resolve_company(user)
+        role = getattr(user, "role_name", None)
+        if not company:
+            if role in {var_sys.EMPLOYER, var_sys.JOB_SEEKER}:
+                raise PermissionDenied("Interview management permission required.")
+            return
+
+        if not perms_custom.user_has_company_permission(user, "manage_interviews", company):
+            raise PermissionDenied("Interview management permission required.")
 
     @action(detail=False, methods=['get'], url_path='invite/(?P<invite_token>[^/.]+)',
             permission_classes=[permissions.AllowAny])
@@ -636,6 +699,7 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     def evaluate_ai(self, request, pk=None):
         """Manually trigger AI evaluation for this session."""
         session = self.get_object()
+        _deny_if_cannot_manage_session(request.user, session)
         queue_ai_evaluation(session)
         return response_data(data={"detail": "AI evaluation task has been queued."})
 
@@ -645,6 +709,7 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     def observer_token(self, request, pk=None):
         """Create a hidden LiveKit token for employer to observe interview silently."""
         session = self.get_object()
+        _deny_if_cannot_manage_session(request.user, session)
         try:
             data = create_observer_livekit_token(session, request)
             return response_data(data=data)
@@ -666,6 +731,7 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         HR không publish audio/video để không làm rối AI agent.
         """
         session = self.get_object()
+        _deny_if_cannot_manage_session(request.user, session)
         try:
             data = create_hr_presence_livekit_token(session, request)
             return response_data(data=data)
@@ -683,6 +749,7 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     def live_metrics(self, request, pk=None):
         """Return realtime metrics for an interview session."""
         session = self.get_object()
+        _deny_if_cannot_manage_session(request.user, session)
         questions = get_session_questions(session)
         total_questions = questions.count()
         transcript_count = session.transcripts.count()
@@ -720,9 +787,16 @@ class InterviewEvaluationViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         if user.is_anonymous:
             return self.queryset.none()
         role = getattr(user, 'role_name', None)
+        try:
+            company = user.get_active_company()
+        except Exception:
+            company = None
+        if company and perms_custom.user_has_company_permission(user, "manage_interviews", company):
+            return self.queryset.filter(
+                Q(interview__job_post__company=company) | Q(evaluator=user)
+            ).distinct()
         if role == 'EMPLOYER':
-            company = user.get_active_company() if hasattr(user, 'get_active_company') else None
-            if company:
+            if company and perms_custom.user_has_company_permission(user, "manage_interviews", company):
                 return self.queryset.filter(interview__job_post__company=company)
             return self.queryset.filter(evaluator=user)
         elif role == 'ADMIN':
@@ -731,8 +805,25 @@ class InterviewEvaluationViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         return self.queryset.filter(interview__candidate=user)
 
     def perform_create(self, serializer):
+        user = self.request.user
+        interview = serializer.validated_data.get("interview")
+        _deny_if_cannot_manage_session(user, interview)
         evaluation = serializer.save(evaluator=self.request.user)
         self._audit_instance("create", evaluation)
+
+    def perform_update(self, serializer):
+        interview = serializer.validated_data.get(
+            "interview",
+            getattr(serializer.instance, "interview", None),
+        )
+        _deny_if_cannot_manage_session(self.request.user, interview)
+        evaluation = serializer.save()
+        self._audit_instance("update", evaluation)
+
+    def perform_destroy(self, instance):
+        _deny_if_cannot_manage_session(self.request.user, instance.interview)
+        self._audit_instance("delete", instance)
+        instance.delete()
 
 
 class ScreeningResultAPIView(APIView):
@@ -740,17 +831,31 @@ class ScreeningResultAPIView(APIView):
 
     def _can_view(self, user, session: InterviewSession) -> bool:
         role = getattr(user, "role_name", None)
+        if role == "ADMIN" or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+            return True
+        if session.created_by_id == user.id:
+            return True
+        try:
+            company = user.get_active_company()
+        except Exception:
+            company = None
+        if (
+            company
+            and session.job_post
+            and session.job_post.company_id == company.id
+            and perms_custom.user_has_company_permission(user, "manage_interviews", company)
+        ):
+            return True
         if role == "JOB_SEEKER":
             return session.candidate_id == user.id
         if role == "EMPLOYER":
-            if session.created_by_id == user.id:
-                return True
-            try:
-                company = user.get_active_company()
-            except Exception:
-                company = None
-            return bool(company and session.job_post and session.job_post.company_id == company.id)
-        return role == "ADMIN" or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False)
+            return bool(
+                company
+                and session.job_post
+                and session.job_post.company_id == company.id
+                and perms_custom.user_has_company_permission(user, "manage_interviews", company)
+            )
+        return False
 
     def get(self, request, session_id: int):
         try:

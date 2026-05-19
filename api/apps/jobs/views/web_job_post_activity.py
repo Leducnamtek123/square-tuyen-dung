@@ -72,7 +72,7 @@ class JobSeekerJobPostActivityViewSet(
 
     def list(self, request, *args, **kwargs):
         user = request.user
-        queryset = user.jobpostactivity_set.order_by('-create_at', '-update_at')
+        queryset = user.jobpostactivity_set.filter(is_deleted=False).order_by('-create_at', '-update_at')
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -95,7 +95,7 @@ class JobSeekerJobPostActivityViewSet(
     def job_seeker_job_posts_activity_chat(self, request):
         user = request.user
         queryset = (
-            user.jobpostactivity_set.order_by('-create_at', '-update_at')
+            user.jobpostactivity_set.filter(is_deleted=False).order_by('-create_at', '-update_at')
             .annotate(
                 userId=F('job_post__company__user_id'),
                 fullName=F('job_post__company__user__full_name'),
@@ -174,7 +174,7 @@ class EmployerJobPostActivityViewSet(
 ):
     queryset = JobPostActivity.objects.select_related('user', 'resume', 'resume__file', 'job_post', 'job_post__company')
     serializer_class = EmployerJobPostActivitySerializer
-    permission_classes = [perms_custom.IsEmployerUser]
+    permission_classes = [perms_custom.CanManageCandidates]
     renderer_classes = [renderers.MyJSONRenderer]
     pagination_class = paginations.CustomPagination
     filterset_class = EmployerJobPostActivityFilter
@@ -198,7 +198,7 @@ class EmployerJobPostActivityViewSet(
         user = self.request.user
         company = user.active_company if hasattr(user, 'active_company') else None
         if company:
-            queryset = queryset.filter(job_post__company=company)
+            queryset = queryset.filter(job_post__company=company, is_deleted=False)
         else:
             queryset = queryset.none()
 
@@ -322,7 +322,7 @@ class EmployerJobPostActivityViewSet(
         queryset = (
             self.filter_queryset(
                 self.get_queryset()
-                .filter(job_post__company=user.active_company)
+                .filter(job_post__company=user.active_company, is_deleted=False)
                 .annotate(
                     userId=F('user_id'),
                     fullName=F('user__full_name'),
@@ -359,7 +359,7 @@ class EmployerJobPostActivityViewSet(
         user = request.user
         queryset = (
             self.filter_queryset(
-                self.get_queryset().filter(job_post__company=user.active_company).order_by('-id', 'create_at')
+                self.get_queryset().filter(job_post__company=user.active_company, is_deleted=False).order_by('-id', 'create_at')
             )
         )
 

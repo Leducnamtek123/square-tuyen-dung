@@ -471,7 +471,7 @@ class ResumeViewSet(viewsets.ViewSet,
 
     serializer_class = ResumeSerializer
 
-    permission_classes = [perms_custom.IsEmployerUser]
+    permission_classes = [perms_custom.CanManageCandidates]
 
     renderer_classes = [renderers.MyJSONRenderer]
 
@@ -518,7 +518,7 @@ class ResumeViewSet(viewsets.ViewSet,
                 ),
                 Prefetch(
                     'jobpostactivity_set',
-                    queryset=JobPostActivity.objects.filter(job_post__company=company).select_related('job_post').order_by('-create_at') if company else JobPostActivity.objects.none(),
+                    queryset=JobPostActivity.objects.filter(job_post__company=company, is_deleted=False).select_related('job_post').order_by('-create_at') if company else JobPostActivity.objects.none(),
                 ),
             )
             .order_by('-id', 'update_at', 'create_at')
@@ -738,7 +738,7 @@ class ResumeSavedViewSet(viewsets.ViewSet,
 
     queryset = ResumeSaved.objects
 
-    permission_classes = [perms_custom.IsEmployerUser]
+    permission_classes = [perms_custom.CanManageCandidates]
 
     renderer_classes = [renderers.MyJSONRenderer]
 

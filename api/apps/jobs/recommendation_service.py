@@ -15,7 +15,7 @@ import logging
 from datetime import date
 
 from django.core.cache import cache
-from django.db.models import Q, Case, When, IntegerField, Value
+from django.db.models import Q, Case, When, IntegerField, Value, ExpressionWrapper
 
 from apps.jobs.models import JobPost
 from apps.profiles.models import Resume, AdvancedSkill
@@ -24,6 +24,14 @@ from shared.configs import variable_system as var_sys
 logger = logging.getLogger(__name__)
 
 CACHE_TTL = 1800  # 30 minutes
+
+
+def _active_public_jobs_queryset():
+    return JobPost.objects.filter(
+        status=var_sys.JobPostStatus.APPROVED,
+        deadline__gte=date.today(),
+        company__is_verified=True,
+    )
 
 
 def get_recommended_jobs(user, limit=20):
@@ -40,13 +48,17 @@ def get_recommended_jobs(user, limit=20):
     cached_ids = cache.get(cache_key)
 
     if cached_ids is not None:
+        if not cached_ids:
+            return JobPost.objects.none()
+
         # Preserve ordering from cached list
         preserved = Case(
             *[When(pk=pk, then=pos) for pos, pk in enumerate(cached_ids)],
             output_field=IntegerField(),
         )
         return (
-            JobPost.objects.filter(pk__in=cached_ids)
+            _active_public_jobs_queryset()
+            .filter(pk__in=cached_ids)
             .select_related(
                 'company', 'company__logo', 'company__cover_image',
                 'location', 'location__city', 'career',
@@ -55,7 +67,7 @@ def get_recommended_jobs(user, limit=20):
         )
 
     # 1. Gather user profile data from resumes
-    resumes = Resume.objects.filter(user=user).select_related('city', 'career')
+    resumes = Resume.objects.filter(user=user, is_active=True).select_related('city', 'career')
     if not resumes.exists():
         return JobPost.objects.none()
 
@@ -77,7 +89,7 @@ def get_recommended_jobs(user, limit=20):
 
     # Get user's advanced skills
     skill_names = list(
-        AdvancedSkill.objects.filter(resume__user=user)
+        AdvancedSkill.objects.filter(resume__user=user, resume__is_active=True)
         .values_list('name', flat=True)
         .distinct()
     )
@@ -85,10 +97,7 @@ def get_recommended_jobs(user, limit=20):
 
     # 2. Base queryset — only approved, non-expired jobs
     base_qs = (
-        JobPost.objects.filter(
-            status=var_sys.JobPostStatus.APPROVED,
-            deadline__gte=date.today(),
-        )
+        _active_public_jobs_queryset()
         .select_related(
             'company', 'company__logo', 'company__cover_image',
             'location', 'location__city', 'career',
@@ -147,20 +156,28 @@ def get_recommended_jobs(user, limit=20):
         base_qs
         .annotate(**annotations)
         .annotate(
-            relevance_score=(
-                annotations.get('career_score', Value(0))
+            relevance_score=ExpressionWrapper(
+                annotations['career_score']
+                + annotations['city_score']
+                + annotations['exp_score']
+                + annotations['salary_score'],
+                output_field=IntegerField(),
             ),
         )
         .order_by('-relevance_score', '-is_hot', '-is_urgent', '-create_at')
     )
 
     # Filter to only jobs with at least some relevance
-    if career_ids or city_ids:
+    if career_ids or city_ids or experience_levels or salary_ranges:
         filter_q = Q()
         if career_ids:
             filter_q |= Q(career_id__in=career_ids)
         if city_ids:
             filter_q |= Q(location__city_id__in=city_ids)
+        if experience_levels:
+            filter_q |= Q(experience__in=experience_levels)
+        if salary_ranges:
+            filter_q |= salary_q
         queryset = queryset.filter(filter_q)
 
     result_ids = list(queryset.values_list('id', flat=True)[:limit])

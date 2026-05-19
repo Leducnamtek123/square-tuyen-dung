@@ -7,6 +7,7 @@ from django.utils import timezone
 from oauth2_provider.models import Application
 from rest_framework.test import APIClient
 
+from apps.files.models import File
 from common.models import AuditLog, Career
 from shared.configs.env_validation import validate_required_settings
 
@@ -114,6 +115,59 @@ def test_audit_log_export_returns_csv_and_records_export(admin_user):
     assert AuditLog.objects.filter(actor=admin_user, action=AuditLog.ACTION_EXPORT).exists()
 
 
+@pytest.mark.django_db
+def test_presign_rejects_anonymous_private_cv_path():
+    response = APIClient().get("/api/v1/common/presign/", {"publicId": "cv/private.pdf"})
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_presign_allows_public_asset_path(monkeypatch):
+    class FakePresignClient:
+        def presigned_get_object(self, bucket, object_path, expires):
+            return f"https://cdn.example.test/{bucket}/{object_path}?X-Amz-Signature=test"
+
+    monkeypatch.setattr(
+        "common.views.CloudinaryService._get_presign_client",
+        lambda: FakePresignClient(),
+    )
+
+    response = APIClient().get("/api/v1/common/presign/", {"publicId": "logo/company.webp"})
+
+    assert response.status_code == 200
+    assert response.json()["data"]["url"].endswith("logo/company.webp?X-Amz-Signature=test")
+
+
+@pytest.mark.django_db
+def test_presign_allows_resume_owner_for_cv_file(monkeypatch, job_seeker_user, resume):
+    class FakePresignClient:
+        def presigned_get_object(self, bucket, object_path, expires):
+            return f"https://cdn.example.test/{bucket}/{object_path}?X-Amz-Signature=test"
+
+    cv_file = File.objects.create(
+        public_id="cv/owner.pdf",
+        format="pdf",
+        resource_type="raw",
+        file_type=File.CV_TYPE,
+        uploaded_at=timezone.now(),
+    )
+    resume.file = cv_file
+    resume.save(update_fields=["file", "update_at"])
+
+    monkeypatch.setattr(
+        "common.views.CloudinaryService._get_presign_client",
+        lambda: FakePresignClient(),
+    )
+    client = APIClient()
+    client.force_authenticate(user=job_seeker_user)
+
+    response = client.get("/api/v1/common/presign/", {"publicId": "cv/owner.pdf"})
+
+    assert response.status_code == 200
+    assert "X-Amz-Signature=test" in response.json()["data"]["url"]
+
+
 def test_validate_env_rejects_production_placeholders():
     with pytest.raises(ImproperlyConfigured, match="Invalid production secret settings"):
         validate_required_settings(
@@ -175,6 +229,8 @@ def test_validate_env_accepts_production_secrets_from_database_settings():
             "LIVEKIT_API_SECRET": "lk-" + ("x" * 40),
             "INTERVIEW_AGENT_AUTH_REQUIRED": True,
             "INTERVIEW_AGENT_SHARED_SECRET": "agent-" + ("x" * 40),
+            "FRAPPE_HR_ADMIN_PASSWORD": "frappe-admin-" + ("x" * 40),
+            "FRAPPE_HR_DB_ROOT_PASSWORD": "frappe-root-" + ("x" * 40),
         }
     )
 

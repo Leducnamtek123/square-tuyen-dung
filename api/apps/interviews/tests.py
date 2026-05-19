@@ -24,6 +24,8 @@ from apps.interviews.models import (
     InterviewSession, Question, QuestionGroup,
     InterviewTranscript, InterviewEvaluation,
 )
+from apps.profiles.models import Company, CompanyMember, CompanyRole
+from shared.configs import variable_system as var_sys
 from apps.interviews.agent_auth import build_signature
 from apps.interviews.serializers import (
     InterviewSessionCreateSerializer,
@@ -310,16 +312,120 @@ class LiveKitServiceTests(TestCase):
 
 # ─── NEW: Session CRUD API Tests ───────────────────────────────────────────
 
+class QuestionBankPermissionTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.owner = User.objects.create_user_with_role_name(
+            email="question-owner@example.com",
+            full_name="Question Owner",
+            role_name=var_sys.EMPLOYER,
+            password="password123",
+            is_active=True,
+            has_company=True,
+        )
+        self.company = Company.objects.create(
+            company_name="Question Company",
+            company_email="question-company@example.com",
+            company_phone="0911000001",
+            tax_code="QB000001",
+            user=self.owner,
+        )
+        self.member = User.objects.create_user_with_role_name(
+            email="question-member@example.com",
+            full_name="Question Member",
+            role_name=var_sys.JOB_SEEKER,
+            password="password123",
+            is_active=True,
+        )
+        role = CompanyRole.objects.create(
+            company=self.company,
+            code="question-bank",
+            name="Question Bank",
+            permissions=["manage_question_bank"],
+        )
+        CompanyMember.objects.create(
+            company=self.company,
+            user=self.member,
+            role=role,
+            status=CompanyMember.STATUS_ACTIVE,
+            is_active=True,
+        )
+        self.other_owner = User.objects.create_user_with_role_name(
+            email="other-question-owner@example.com",
+            full_name="Other Question Owner",
+            role_name=var_sys.EMPLOYER,
+            password="password123",
+            is_active=True,
+            has_company=True,
+        )
+        self.other_company = Company.objects.create(
+            company_name="Other Question Company",
+            company_email="other-question-company@example.com",
+            company_phone="0911000002",
+            tax_code="QB000002",
+            user=self.other_owner,
+        )
+        self.client.force_authenticate(user=self.member)
+
+    def test_member_with_question_bank_permission_sees_global_and_company_questions(self):
+        global_question = Question.objects.create(text="Global question")
+        company_question = Question.objects.create(text="Company question", company=self.company)
+        other_question = Question.objects.create(text="Other question", company=self.other_company)
+
+        response = self.client.get("/api/v1/interview/web/questions/")
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        data = payload.get("data", payload)
+        results = data.get("results", data if isinstance(data, list) else [])
+        ids = {item["id"] for item in results}
+        self.assertIn(global_question.id, ids)
+        self.assertIn(company_question.id, ids)
+        self.assertNotIn(other_question.id, ids)
+
+    def test_member_created_question_is_scoped_to_active_company(self):
+        response = self.client.post(
+            "/api/v1/interview/web/questions/",
+            data={"text": "Scoped question"},
+            format="json",
+        )
+
+        self.assertIn(response.status_code, [200, 201])
+        question = Question.objects.get(text="Scoped question")
+        self.assertEqual(question.company, self.company)
+        self.assertEqual(question.author, self.member)
+
+    def test_member_cannot_attach_other_company_question_to_group(self):
+        other_question = Question.objects.create(text="Other company question", company=self.other_company)
+
+        response = self.client.post(
+            "/api/v1/interview/web/question-groups/",
+            data={"name": "Invalid scoped group", "question_ids": [other_question.id]},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(QuestionGroup.objects.filter(name="Invalid scoped group").exists())
+
+
 class InterviewSessionAPITests(TestCase):
     """Tests that the session API accepts snake_case fields and rejects camelCase."""
 
     def setUp(self):
         self.client = APIClient()
-        self.employer = User.objects.create_user(
+        self.employer = User.objects.create_user_with_role_name(
             email="employer@example.com",
             full_name="Employer HR",
+            role_name=var_sys.EMPLOYER,
             password="password123",
-            role="employer",
+            has_company=True,
+        )
+        self.company = Company.objects.create(
+            company_name="Interview API Company",
+            company_email="interview-api-company@example.com",
+            company_phone="0912000001",
+            tax_code="IA000001",
+            user=self.employer,
         )
         self.candidate = User.objects.create_user(
             email="candidate3@example.com",
@@ -334,7 +440,7 @@ class InterviewSessionAPITests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_retrieve_session_detail(self):
-        session = InterviewSession.objects.create(candidate=self.candidate)
+        session = InterviewSession.objects.create(candidate=self.candidate, created_by=self.employer)
         response = self.client.get(f"/api/v1/interview/web/sessions/{session.pk}/")
         self.assertEqual(response.status_code, 200)
         data = response.json()
@@ -368,6 +474,45 @@ class InterviewSessionAPITests(TestCase):
             format="json",
         )
         self.assertEqual(response.status_code, 400)
+
+    def test_candidate_cannot_request_employer_monitoring_actions(self):
+        session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            created_by=self.employer,
+            status="scheduled",
+        )
+        self.client.force_authenticate(user=self.candidate)
+
+        post_endpoints = [
+            f"/api/v1/interview/web/sessions/{session.pk}/evaluate-ai/",
+            f"/api/v1/interview/web/sessions/{session.pk}/observer-token/",
+            f"/api/v1/interview/web/sessions/{session.pk}/hr-token/",
+        ]
+        for endpoint in post_endpoints:
+            response = self.client.post(endpoint, format="json")
+            self.assertEqual(response.status_code, 403)
+
+        response = self.client.get(f"/api/v1/interview/web/sessions/{session.pk}/live-metrics/")
+        self.assertEqual(response.status_code, 403)
+
+    def test_sse_stream_permission_requires_session_scope(self):
+        from apps.interviews.sse_views import _user_can_stream_session
+
+        other_employer = User.objects.create_user_with_role_name(
+            email="other-sse-employer@example.com",
+            full_name="Other SSE Employer",
+            role_name=var_sys.EMPLOYER,
+            password="password123",
+            has_company=True,
+        )
+        session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            created_by=self.employer,
+            status="scheduled",
+        )
+
+        self.assertTrue(_user_can_stream_session(self.employer, session))
+        self.assertFalse(_user_can_stream_session(other_employer, session))
 
 
 # ─── NEW: Evaluation API Tests ─────────────────────────────────────────────
@@ -459,23 +604,65 @@ class InterviewSessionAPITests(TestCase):
         self.assertEqual(response.status_code, 401)
 
 
+    def test_create_session_rejects_question_ids_outside_company(self):
+        other_owner = User.objects.create_user_with_role_name(
+            email="other-session-owner@example.com",
+            full_name="Other Session Owner",
+            role_name=var_sys.EMPLOYER,
+            password="password123",
+            is_active=True,
+            has_company=True,
+        )
+        other_company = Company.objects.create(
+            company_name="Other Session Company",
+            company_email="other-session-company@example.com",
+            company_phone="0912000003",
+            tax_code="IS000003",
+            user=other_owner,
+        )
+        other_question = Question.objects.create(text="Other session question", company=other_company)
+
+        response = self.client.post(
+            "/api/v1/interview/web/sessions/",
+            data={
+                "candidate": self.candidate.pk,
+                "type": "mixed",
+                "question_ids": [other_question.id],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+
 class InterviewEvaluationAPITests(TestCase):
     """Tests that evaluation submission uses snake_case and auto-calculates overall_score."""
 
     def setUp(self):
         self.client = APIClient()
-        self.employer = User.objects.create_user(
+        self.employer = User.objects.create_user_with_role_name(
             email="evaluator@example.com",
             full_name="Evaluator",
+            role_name=var_sys.EMPLOYER,
             password="password123",
-            role="employer",
+            has_company=True,
+        )
+        self.company = Company.objects.create(
+            company_name="Evaluation API Company",
+            company_email="evaluation-api-company@example.com",
+            company_phone="0912000002",
+            tax_code="EA000001",
+            user=self.employer,
         )
         self.candidate = User.objects.create_user(
             email="candidate4@example.com",
             full_name="Candidate Four",
             password="password123",
         )
-        self.session = InterviewSession.objects.create(candidate=self.candidate)
+        self.session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            created_by=self.employer,
+        )
         self.client.force_authenticate(user=self.employer)
 
     def test_submit_evaluation_with_snake_case(self):
@@ -513,6 +700,23 @@ class InterviewEvaluationAPITests(TestCase):
         # (8 + 6) / 2 = 7.0
         overall = float(data.get("overall_score", 0))
         self.assertEqual(overall, 7.0)
+
+    def test_candidate_cannot_submit_evaluation_for_own_interview(self):
+        self.client.force_authenticate(user=self.candidate)
+        payload = {
+            "interview": self.session.pk,
+            "attitude_score": 8,
+            "professional_score": 7,
+            "result": "passed",
+        }
+
+        response = self.client.post(
+            "/api/v1/interview/web/evaluations/",
+            data=payload,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 403)
 
 
 # ─── NEW: Serializer Validation Tests ──────────────────────────────────────

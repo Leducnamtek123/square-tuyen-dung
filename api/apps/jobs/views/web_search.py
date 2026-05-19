@@ -20,6 +20,7 @@ def job_suggest_title_search(request):
         JobPost.objects.filter(
             status=var_sys.JobPostStatus.APPROVED,
             deadline__gte=datetime.datetime.now().date(),
+            company__is_verified=True,
             job_name__icontains=q,
         )
         .order_by('job_name')

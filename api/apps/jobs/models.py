@@ -168,6 +168,14 @@ class JobPostActivity(CommonBaseModel):
 
     is_deleted = models.BooleanField(default=False, db_index=True)
 
+    active_application_key = models.CharField(
+        max_length=64,
+        unique=True,
+        null=True,
+        blank=True,
+        editable=False,
+    )
+
     job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -264,12 +272,23 @@ class JobPostActivity(CommonBaseModel):
             models.Index(fields=["job_post", "status"], name="job_act_post_stt_idx"),
             models.Index(fields=["create_at"], name="job_act_create_idx"),
         ]
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'job_post', 'is_deleted'],
-                name='uq_jobpostactivity_user_jobpost_deleted_state',
-            ),
-        ]
+        constraints = []
+
+    def save(self, *args, **kwargs):
+        if self.is_deleted or not self.user_id or not self.job_post_id:
+            self.active_application_key = None
+        else:
+            self.active_application_key = f"{self.user_id}:{self.job_post_id}"
+
+        update_fields = kwargs.get("update_fields")
+        if update_fields is not None:
+            update_fields = set(update_fields)
+            watched_fields = {"is_deleted", "user", "user_id", "job_post", "job_post_id"}
+            if watched_fields & update_fields:
+                update_fields.add("active_application_key")
+                kwargs["update_fields"] = list(update_fields)
+
+        super().save(*args, **kwargs)
 
 class JobPostNotification(CommonBaseModel):
 

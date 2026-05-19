@@ -135,7 +135,7 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
     serializer_class = CompanySerializer
 
-    permission_classes = [perms_custom.IsEmployerUser]
+    permission_classes = [perms_custom.CanManageCompanyProfile]
 
     renderer_classes = [renderers.MyJSONRenderer]
 
@@ -211,6 +211,9 @@ class CompanyViewSet(viewsets.ViewSet,
     ordering_fields = (('updateAt', 'update_at'), ('createAt', 'create_at'))
 
     lookup_field = "slug"
+
+    def get_queryset(self):
+        return self.queryset.filter(is_verified=True)
 
     def get_permissions(self):
 
@@ -306,9 +309,16 @@ class CompanyViewSet(viewsets.ViewSet,
             url_path="top", url_name="companies-top")
 
     def get_top_companies(self, request):
-        queryset = Company.objects.annotate(
-            num_follow=Count('companyfollowed'),
-            num_job_post=Count('job_posts')
+        queryset = Company.objects.filter(is_verified=True).annotate(
+            num_follow=Count('companyfollowed', distinct=True),
+            num_job_post=Count(
+                'job_posts',
+                filter=Q(
+                    job_posts__deadline__gte=timezone.now().date(),
+                    job_posts__status=var_sys.JobPostStatus.APPROVED,
+                ),
+                distinct=True,
+            )
         ).order_by('-num_follow', '-num_job_post')[:10]
         serializer = CompanySerializer(
             queryset,
@@ -395,7 +405,7 @@ class CompanyFollowedAPIView(views.APIView):
 
         user = request.user
 
-        queryset = CompanyFollowed.objects.filter(user=user) \
+        queryset = CompanyFollowed.objects.filter(user=user, company__is_verified=True) \
             .order_by("-update_at", "-create_at")
 
         paginator = self.pagination_class()
@@ -478,7 +488,7 @@ class AdminTrustReportViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
 
 class CompanyVerificationView(views.APIView):
-    permission_classes = [perms_custom.IsEmployerUser]
+    permission_classes = [perms_custom.CanManageCompanyProfile]
     renderer_classes = [renderers.MyJSONRenderer]
 
     def get_company(self, request):
@@ -542,6 +552,10 @@ class CompanyVerificationView(views.APIView):
         if company.is_verified:
             company.is_verified = False
             company.save(update_fields=["is_verified", "update_at"])
+
+        from apps.jobs.services import JobPostService
+
+        JobPostService.suspend_company_job_posts_for_verification(company)
         return var_res.response_data(status=status.HTTP_200_OK, data=CompanyVerificationSerializer(verification).data)
 
     patch = put
@@ -788,6 +802,15 @@ class CompanyMemberViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+
+        if (
+            "user_id" in serializer.validated_data
+            and serializer.validated_data["user_id"] != instance.user_id
+        ):
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"userId": ["Member user cannot be changed."]},
+            )
 
         if "role_id" in serializer.validated_data:
             role = CompanyRole.objects.filter(

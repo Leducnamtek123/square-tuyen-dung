@@ -45,6 +45,9 @@ class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
 
     ordering_fields = (("updateAt", "update_at"), ("createAt", "create_at"))
 
+    def get_queryset(self):
+        return self.queryset.filter(is_verified=True)
+
     def get_permissions(self):
         if self.action in ["followed"]:
             return [perms_custom.IsJobSeekerUser()]
@@ -120,9 +123,16 @@ class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
 
     @action(methods=["get"], detail=False, url_path="top", url_name="companies-top")
     def get_top_companies(self, request):
-        queryset = Company.objects.annotate(
-            num_follow=Count("companyfollowed"),
-            num_job_post=Count("job_posts"),
+        queryset = Company.objects.filter(is_verified=True).annotate(
+            num_follow=Count("companyfollowed", distinct=True),
+            num_job_post=Count(
+                "job_posts",
+                filter=Q(
+                    job_posts__deadline__gte=datetime.date.today(),
+                    job_posts__status=var_sys.JobPostStatus.APPROVED,
+                ),
+                distinct=True,
+            ),
         ).order_by("-num_follow", "-num_job_post")[:10]
 
         serializer = CompanySerializer(
@@ -172,7 +182,7 @@ class CompanyFollowedAPIView(views.APIView):
     def get(self, request):
         user = request.user
 
-        queryset = CompanyFollowed.objects.filter(user=user).order_by(
+        queryset = CompanyFollowed.objects.filter(user=user, company__is_verified=True).order_by(
             "-update_at", "-create_at"
         )
 

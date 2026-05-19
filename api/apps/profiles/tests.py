@@ -12,7 +12,8 @@ from apps.profiles.models import (
     EducationDetail, ExperienceDetail,
     CompanyVerification, TrustReport, CompanyRole, CompanyMember
 )
-from apps.profiles.services import ResumeService, CompanyService
+from apps.profiles.services import ResumeService, CompanyService, ensure_company_system_roles
+from shared.configs import variable_system as var_sys
 
 
 # ==================== Model Tests ====================
@@ -179,6 +180,116 @@ class TestCompanyService:
         assert 'resumes_saved' in stats
         assert 'resumes_viewed' in stats
 
+    def test_ensure_company_system_roles_creates_reserved_roles(self, company):
+        roles = ensure_company_system_roles(company)
+
+        owner = roles["owner"]
+        hr = roles["hr"]
+        assert owner.is_system is True
+        assert owner.permissions == ["*"]
+        assert hr.is_system is True
+        assert "manage_question_bank" in hr.permissions
+
+
+@pytest.mark.django_db
+def test_public_company_list_excludes_unverified_company(company):
+    client = APIClient()
+    response = client.get("/api/v1/info/web/companies/", {"cacheBust": company.id})
+
+    assert response.status_code == 200
+    payload = response.json()
+    data = payload.get("data", payload)
+    results = data.get("results", data if isinstance(data, list) else [])
+    assert company.id not in [item["id"] for item in results]
+
+
+@pytest.mark.django_db
+def test_company_owner_member_me_returns_owner_system_role(employer_user, company):
+    ensure_company_system_roles(company)
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.get("/api/v1/info/web/company-members/me/")
+
+    assert response.status_code == 200
+    data = response.data["data"]
+    assert data["isOwner"] is True
+    assert data["role"]["code"] == "owner"
+
+
+@pytest.mark.django_db
+def test_company_member_without_profile_permission_can_read_company_info(company):
+    member = company.user.__class__.objects.create_user_with_role_name(
+        email="company-reader@test.com",
+        full_name="Company Reader",
+        role_name=var_sys.JOB_SEEKER,
+        password="pass123",
+        is_active=True,
+    )
+    role = CompanyRole.objects.create(
+        company=company,
+        code="reader",
+        name="Reader",
+        permissions=["manage_candidates"],
+    )
+    CompanyMember.objects.create(
+        company=company,
+        user=member,
+        role=role,
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+    client = APIClient()
+    client.force_authenticate(user=member)
+
+    response = client.get("/api/v1/info/web/company/")
+
+    assert response.status_code == 200
+    assert response.data["data"]["id"] == company.id
+
+
+@pytest.mark.django_db
+def test_company_member_update_cannot_change_user(employer_user, company):
+    member_user = company.user.__class__.objects.create_user_with_role_name(
+        email="member-original@test.com",
+        full_name="Original Member",
+        role_name=var_sys.JOB_SEEKER,
+        password="pass123",
+        is_active=True,
+    )
+    other_user = company.user.__class__.objects.create_user_with_role_name(
+        email="member-other@test.com",
+        full_name="Other Member",
+        role_name=var_sys.JOB_SEEKER,
+        password="pass123",
+        is_active=True,
+    )
+    role = CompanyRole.objects.create(
+        company=company,
+        code="member-update-role",
+        name="Member Update Role",
+        permissions=["manage_candidates"],
+    )
+    member = CompanyMember.objects.create(
+        company=company,
+        user=member_user,
+        role=role,
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.patch(
+        f"/api/v1/info/web/company-members/{member.id}/",
+        {"userId": other_user.id},
+        format="json",
+    )
+
+    assert response.status_code == 400
+    member.refresh_from_db()
+    assert member.user_id == member_user.id
+
 
 @pytest.mark.django_db
 class TestCompanyVerificationAPI:
@@ -234,9 +345,11 @@ class TestCompanyVerificationAPI:
         assert verification.admin_note == "Approved"
         assert company.is_verified is True
 
-    def test_admin_reviewing_unmarks_company_verified(self, admin_user, company):
+    def test_admin_reviewing_unmarks_company_verified(self, admin_user, company, job_post):
         company.is_verified = True
         company.save(update_fields=["is_verified"])
+        job_post.status = var_sys.JobPostStatus.APPROVED
+        job_post.save(update_fields=["status", "update_at"])
         verification = CompanyVerification.objects.create(
             company=company,
             legal_company_name=company.company_name,
@@ -254,11 +367,15 @@ class TestCompanyVerificationAPI:
 
         assert response.status_code == 200
         company.refresh_from_db()
+        job_post.refresh_from_db()
         assert company.is_verified is False
+        assert job_post.status == var_sys.JobPostStatus.PENDING
 
-    def test_employer_resubmission_unmarks_company_verified(self, employer_user, company):
+    def test_employer_resubmission_unmarks_company_verified(self, employer_user, company, job_post):
         company.is_verified = True
         company.save(update_fields=["is_verified"])
+        job_post.status = var_sys.JobPostStatus.APPROVED
+        job_post.save(update_fields=["status", "update_at"])
         CompanyVerification.objects.create(
             company=company,
             legal_company_name=company.company_name,
@@ -287,8 +404,10 @@ class TestCompanyVerificationAPI:
 
         assert response.status_code == 200
         company.refresh_from_db()
+        job_post.refresh_from_db()
         assert response.data["data"]["status"] == CompanyVerification.STATUS_PENDING
         assert company.is_verified is False
+        assert job_post.status == var_sys.JobPostStatus.PENDING
 
     def test_employer_verification_requires_legal_profile(self, employer_user, company):
         client = APIClient()

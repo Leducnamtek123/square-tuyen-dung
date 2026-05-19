@@ -43,7 +43,11 @@ class PrivateJobPostViewSet(
         'location__city',
         'career',
     ).annotate(
-        applied_total=Count('peoples_applied', distinct=True),
+        applied_total=Count(
+            'jobpostactivity',
+            filter=Q(jobpostactivity__is_deleted=False),
+            distinct=True,
+        ),
     ).order_by("-create_at", "-update_at", "-id")
     serializer_class = JobPostSerializer
     renderer_classes = [renderers.MyJSONRenderer]
@@ -98,6 +102,7 @@ class PrivateJobPostViewSet(
             .filter(
                 status=var_sys.JobPostStatus.APPROVED,
                 deadline__gte=datetime.datetime.now().date(),
+                company__is_verified=True,
             )
             .filter(career__in=careers_id, location__city__in=cities_id)
             .prefetch_related(
@@ -109,7 +114,7 @@ class PrivateJobPostViewSet(
                 ),
                 Prefetch(
                     'jobpostactivity_set',
-                    queryset=JobPostActivity.objects.filter(user=request.user)
+                    queryset=JobPostActivity.objects.filter(user=request.user, is_deleted=False)
                     if request.user.is_authenticated
                     else JobPostActivity.objects.none(),
                 ),
@@ -289,6 +294,7 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
     ).filter(
         status=var_sys.JobPostStatus.APPROVED,
         deadline__gte=datetime.datetime.now().date(),
+        company__is_verified=True,
     ).order_by("-create_at", "-update_at", "-id")
     serializer_class = JobPostSerializer
     renderer_classes = [renderers.MyJSONRenderer]
@@ -343,7 +349,7 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
                 ),
                 Prefetch(
                     'jobpostactivity_set',
-                    queryset=JobPostActivity.objects.filter(user=request.user)
+                    queryset=JobPostActivity.objects.filter(user=request.user, is_deleted=False)
                     if request.user.is_authenticated
                     else JobPostActivity.objects.none(),
                 ),
@@ -425,7 +431,11 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
     def get_job_posts_saved(self, request):
         user = request.user
         queryset = (
-            user.saved_job_posts.filter(status=var_sys.JobPostStatus.APPROVED)
+            user.saved_job_posts.filter(
+                status=var_sys.JobPostStatus.APPROVED,
+                deadline__gte=datetime.datetime.now().date(),
+                company__is_verified=True,
+            )
             .select_related(
                 'company',
                 'company__logo',
@@ -437,7 +447,7 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
             )
             .prefetch_related(
                 Prefetch('savedjobpost_set', queryset=SavedJobPost.objects.filter(user=user)),
-                Prefetch('jobpostactivity_set', queryset=JobPostActivity.objects.filter(user=user)),
+                Prefetch('jobpostactivity_set', queryset=JobPostActivity.objects.filter(user=user, is_deleted=False)),
             )
             .order_by('update_at', 'create_at')
         )
@@ -582,6 +592,11 @@ class AdminJobPostViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     @action(detail=True, methods=['patch'], url_path='approve')
     def approve_job(self, request, pk=None):
         job_post = self.get_object()
+        if not job_post.company.is_verified:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["Company must be verified before approving a job post."]},
+            )
         job_post.status = var_sys.JobPostStatus.APPROVED
         job_post.save()
         record_audit_log(request=request, action="approve", instance=job_post)

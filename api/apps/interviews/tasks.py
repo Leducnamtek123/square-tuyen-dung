@@ -106,6 +106,7 @@ def end_interview_session(session_id, reason="max_duration"):
         # Update Candidate Pipeline to INTERVIEWED if applicable
         try:
             from apps.jobs.models import JobPostActivity
+            from apps.jobs.services import JobActivityService
             from shared.configs.variable_system import ApplicationStatus
             activity = JobPostActivity.objects.filter(
                 user=session.candidate, 
@@ -113,8 +114,7 @@ def end_interview_session(session_id, reason="max_duration"):
                 is_deleted=False
             ).first()
             if activity and activity.status not in (ApplicationStatus.HIRED, ApplicationStatus.NOT_SELECTED):
-                activity.status = ApplicationStatus.INTERVIEWED
-                activity.save(update_fields=['status', 'update_at'])
+                JobActivityService.advance_application_to_interviewed(activity)
         except Exception as err:
             logger.error("Could not update JobPostActivity pipeline for session %s: %s", session_id, err)
 

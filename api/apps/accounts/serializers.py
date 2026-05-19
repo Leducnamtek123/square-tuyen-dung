@@ -42,12 +42,21 @@ class UpdatePasswordSerializer(PasswordConfirmMixin, serializers.Serializer):
     newPassword = serializers.CharField(required=True, max_length=128)
     confirmPassword = serializers.CharField(required=True, max_length=128)
 
+    def validate_newPassword(self, value):
+        django_validate_password(value)
+        return value
+
 class ResetPasswordSerializer(PlatformValidationMixin, PasswordConfirmMixin, DynamicFieldsMixin, serializers.Serializer):
     newPassword = serializers.CharField(required=True, max_length=128)
     confirmPassword = serializers.CharField(required=True, max_length=128)
     token = serializers.CharField(required=False)
     code = serializers.CharField(required=False)
+    email = serializers.EmailField(required=False, max_length=100)
     platform = serializers.CharField(required=True)
+
+    def validate_newPassword(self, value):
+        django_validate_password(value)
+        return value
 
     def validate(self, attrs):
         attrs = super().validate(attrs)

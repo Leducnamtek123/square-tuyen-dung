@@ -1,7 +1,11 @@
 """
 Unit tests for the Accounts app — User model, authentication, permissions.
 """
+import datetime
+
 import pytest
+from django.test import override_settings
+from django.utils import timezone
 from rest_framework.test import APIClient
 
 from apps.accounts.models import User, ForgotPasswordToken
@@ -205,6 +209,158 @@ class TestFirebasePhoneLoginMapping:
         assert "nhiều tài khoản" in error
 
 
+@pytest.mark.django_db
+class TestPasswordResetSecurity:
+    def test_web_reset_accepts_stored_random_token(self, job_seeker_user):
+        token = ForgotPasswordToken.objects.create(
+            user=job_seeker_user,
+            token="web-random-token",
+            platform="WEB",
+            expired_at=timezone.now() + datetime.timedelta(minutes=15),
+        )
+
+        response = APIClient().post(
+            "/api/v1/auth/reset-password/",
+            {
+                "platform": "WEB",
+                "token": "web-random-token",
+                "newPassword": "SquareNewPass123!",
+                "confirmPassword": "SquareNewPass123!",
+            },
+            format="json",
+        )
+
+        assert response.status_code == 200
+        job_seeker_user.refresh_from_db()
+        token.refresh_from_db()
+        assert job_seeker_user.check_password("SquareNewPass123!")
+        assert token.is_active is False
+
+    def test_app_reset_rejects_ambiguous_active_code(self, db):
+        first = User.objects.create_user_with_role_name(
+            email="first-reset@test.com",
+            full_name="First Reset",
+            role_name=var_sys.JOB_SEEKER,
+            password="OldPass123!",
+        )
+        second = User.objects.create_user_with_role_name(
+            email="second-reset@test.com",
+            full_name="Second Reset",
+            role_name=var_sys.JOB_SEEKER,
+            password="OldPass123!",
+        )
+        expires_at = timezone.now() + datetime.timedelta(minutes=15)
+        ForgotPasswordToken.objects.create(user=first, code=123456, platform="APP", expired_at=expires_at)
+        ForgotPasswordToken.objects.create(user=second, code=123456, platform="APP", expired_at=expires_at)
+
+        response = APIClient().post(
+            "/api/v1/auth/reset-password/",
+            {
+                "platform": "APP",
+                "code": "123456",
+                "newPassword": "SquareNewPass123!",
+                "confirmPassword": "SquareNewPass123!",
+            },
+            format="json",
+        )
+
+        assert response.status_code == 400
+        first.refresh_from_db()
+        second.refresh_from_db()
+        assert first.check_password("OldPass123!")
+        assert second.check_password("OldPass123!")
+
+    def test_app_reset_can_disambiguate_code_by_email(self, db):
+        first = User.objects.create_user_with_role_name(
+            email="first-email-reset@test.com",
+            full_name="First Email Reset",
+            role_name=var_sys.JOB_SEEKER,
+            password="OldPass123!",
+        )
+        second = User.objects.create_user_with_role_name(
+            email="second-email-reset@test.com",
+            full_name="Second Email Reset",
+            role_name=var_sys.JOB_SEEKER,
+            password="OldPass123!",
+        )
+        expires_at = timezone.now() + datetime.timedelta(minutes=15)
+        ForgotPasswordToken.objects.create(user=first, code=654321, platform="APP", expired_at=expires_at)
+        token = ForgotPasswordToken.objects.create(user=second, code=654321, platform="APP", expired_at=expires_at)
+
+        response = APIClient().post(
+            "/api/v1/auth/reset-password/",
+            {
+                "platform": "APP",
+                "email": second.email,
+                "code": "654321",
+                "newPassword": "SquareNewPass123!",
+                "confirmPassword": "SquareNewPass123!",
+            },
+            format="json",
+        )
+
+        assert response.status_code == 200
+        first.refresh_from_db()
+        second.refresh_from_db()
+        token.refresh_from_db()
+        assert first.check_password("OldPass123!")
+        assert second.check_password("SquareNewPass123!")
+        assert token.is_active is False
+
+    @override_settings(
+        AUTH_PASSWORD_VALIDATORS=[
+            {
+                "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+                "OPTIONS": {"min_length": 8},
+            }
+        ]
+    )
+    def test_reset_password_rejects_weak_password(self, job_seeker_user):
+        ForgotPasswordToken.objects.create(
+            user=job_seeker_user,
+            token="weak-token",
+            platform="WEB",
+            expired_at=timezone.now() + datetime.timedelta(minutes=15),
+        )
+
+        response = APIClient().post(
+            "/api/v1/auth/reset-password/",
+            {
+                "platform": "WEB",
+                "token": "weak-token",
+                "newPassword": "short",
+                "confirmPassword": "short",
+            },
+            format="json",
+        )
+
+        assert response.status_code == 400
+
+    @override_settings(
+        AUTH_PASSWORD_VALIDATORS=[
+            {
+                "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+                "OPTIONS": {"min_length": 8},
+            }
+        ]
+    )
+    def test_change_password_rejects_weak_password(self, job_seeker_user):
+        client = APIClient()
+        client.force_authenticate(user=job_seeker_user)
+
+        response = client.put(
+            "/api/v1/auth/change-password/",
+            {
+                "oldPassword": "testpass123",
+                "newPassword": "short",
+                "confirmPassword": "short",
+            },
+            format="json",
+        )
+
+        assert response.status_code == 400
+
+
 # ==================== Permission Tests ====================
 
 @pytest.mark.django_db
@@ -263,6 +419,62 @@ class TestPermissions:
         perm = IsOwnerOrReadOnly()
         request = self._make_request(job_seeker_user, method='PUT')
         assert perm.has_object_permission(request, None, resume) is True
+
+    def test_company_member_without_job_permission_cannot_manage_job_posts(self, company):
+        member = User.objects.create_user_with_role_name(
+            email="member-no-job@test.com",
+            full_name="Member No Job",
+            role_name=var_sys.JOB_SEEKER,
+            password="pass123",
+            is_active=True,
+        )
+        role = CompanyRole.objects.create(
+            company=company,
+            code="candidate-only",
+            name="Candidate Only",
+            permissions=["manage_candidates"],
+        )
+        CompanyMember.objects.create(
+            company=company,
+            user=member,
+            role=role,
+            status=CompanyMember.STATUS_ACTIVE,
+            is_active=True,
+        )
+
+        client = APIClient()
+        client.force_authenticate(user=member)
+        response = client.get("/api/v1/job/web/private-job-posts/")
+
+        assert response.status_code == 403
+
+    def test_company_member_with_job_permission_can_manage_job_posts(self, company):
+        member = User.objects.create_user_with_role_name(
+            email="member-job@test.com",
+            full_name="Member Job",
+            role_name=var_sys.JOB_SEEKER,
+            password="pass123",
+            is_active=True,
+        )
+        role = CompanyRole.objects.create(
+            company=company,
+            code="job-manager",
+            name="Job Manager",
+            permissions=["manage_job_posts"],
+        )
+        CompanyMember.objects.create(
+            company=company,
+            user=member,
+            role=role,
+            status=CompanyMember.STATUS_ACTIVE,
+            is_active=True,
+        )
+
+        client = APIClient()
+        client.force_authenticate(user=member)
+        response = client.get("/api/v1/job/web/private-job-posts/")
+
+        assert response.status_code == 200
 
 
 @pytest.mark.django_db

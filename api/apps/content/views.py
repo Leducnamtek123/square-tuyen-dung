@@ -40,6 +40,7 @@ from .serializers import (
     AdminArticleSerializer,
     EmployerArticleSerializer,
 )
+from apps.accounts import permissions as perms_custom
 
 
 def get_banner_type_value_map():
@@ -578,7 +579,7 @@ class AdminArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
 class EmployerArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     """Employer CRUD for their own blog posts."""
-    permission_classes = [perms_sys.IsAuthenticated]
+    permission_classes = [perms_custom.IsEmployerUser]
     renderer_classes = [renderers.MyJSONRenderer]
     pagination_class = paginations.CustomPagination
     serializer_class = EmployerArticleSerializer

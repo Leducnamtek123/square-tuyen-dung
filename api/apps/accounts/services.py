@@ -10,13 +10,9 @@ import secrets
 import pytz
 from django.conf import settings
 from django.db import transaction
-from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-
-from django_otp.oath import TOTP
 
 from shared.configs import variable_system as var_sys
-from shared.configs.messages import ERROR_MESSAGES, SUCCESS_MESSAGES, SYSTEM_MESSAGES
+from shared.configs.messages import ERROR_MESSAGES, SYSTEM_MESSAGES
 from shared.helpers import helper
 
 from console.jobs import queue_mail
@@ -130,8 +126,7 @@ class PasswordResetService:
 
     @staticmethod
     def _send_app_reset(user: User, expired_at) -> None:
-        totp = TOTP(settings.SECRET_KEY.encode())
-        code = totp.token()
+        code = PasswordResetService._generate_app_reset_code()
 
         new_token = ForgotPasswordToken.objects.create(
             user=user,
@@ -147,6 +142,21 @@ class PasswordResetService:
         )
 
     @staticmethod
+    def _generate_app_reset_code() -> int:
+        now = datetime.datetime.now(tz=pytz.utc)
+        for _ in range(10):
+            code = secrets.randbelow(900000) + 100000
+            exists = ForgotPasswordToken.objects.filter(
+                code=code,
+                platform="APP",
+                is_active=True,
+                expired_at__gte=now,
+            ).exists()
+            if not exists:
+                return code
+        return secrets.randbelow(900000) + 100000
+
+    @staticmethod
     def reset_password(data: dict) -> dict:
         """
         Verify token/code and reset user password.
@@ -159,13 +169,8 @@ class PasswordResetService:
 
         if platform == "WEB":
             token = data.get("token")
-            try:
-                user_id = force_str(urlsafe_base64_decode(token))
-            except Exception:
-                raise InvalidTokenError(ERROR_MESSAGES["INVALID_PASSWORD_RESET_LINK"])
-
             token_obj = ForgotPasswordToken.objects.filter(
-                token=token, user_id=user_id, is_active=True
+                token=token, platform="WEB", is_active=True
             ).first()
 
             if not token_obj:
@@ -180,18 +185,31 @@ class PasswordResetService:
                 user.save()
 
                 token_obj.is_active = False
-                token_obj.save()
+                token_obj.save(update_fields=["is_active", "update_at"])
 
                 return {"redirectLoginUrl": f"/{settings.REDIRECT_LOGIN_CLIENT}"}
 
         else:  # APP
             code = data.get("code")
-            token_obj = ForgotPasswordToken.objects.filter(code=code).first()
+            token_queryset = ForgotPasswordToken.objects.select_related("user").filter(
+                code=code,
+                platform="APP",
+                is_active=True,
+            )
+            email = data.get("email")
+            if email:
+                token_queryset = token_queryset.filter(user__email__iexact=email)
+
+            matches = list(token_queryset.order_by("-create_at")[:2])
+            token_obj = matches[0] if matches else None
 
             if not token_obj:
                 raise InvalidTokenError(ERROR_MESSAGES["INVALID_PASSWORD_RESET_CODE"])
 
-            if token_obj.expired_at < now or not token_obj.is_active:
+            if len(matches) > 1:
+                raise InvalidTokenError(ERROR_MESSAGES["INVALID_PASSWORD_RESET_CODE"])
+
+            if token_obj.expired_at < now:
                 raise TokenExpiredError(ERROR_MESSAGES["PASSWORD_RESET_CODE_EXPIRED"])
 
             with transaction.atomic():
@@ -200,7 +218,7 @@ class PasswordResetService:
                 user.save()
 
                 token_obj.is_active = False
-                token_obj.save()
+                token_obj.save(update_fields=["is_active", "update_at"])
 
                 return {}
 
@@ -363,11 +381,14 @@ class RegistrationService:
                 )
 
                 # 3. Create Company
-                Company.objects.create(
+                company = Company.objects.create(
                     user=user, 
                     **company_data, 
                     location=location_obj
                 )
+                from apps.profiles.services import ensure_company_system_roles
+
+                ensure_company_system_roles(company)
 
                 return user
         except Exception as ex:

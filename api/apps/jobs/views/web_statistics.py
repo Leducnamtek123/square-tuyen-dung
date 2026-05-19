@@ -50,7 +50,7 @@ class JobSeekerStatisticViewSet(viewsets.ViewSet):
 
     def general_statistics(self, request):
         user = request.user
-        total_apply = JobPostActivity.objects.filter(user=user).count()
+        total_apply = JobPostActivity.objects.filter(user=user, is_deleted=False).count()
         total_save = SavedJobPost.objects.filter(user=user).count()
         total_view = ResumeViewed.objects.filter(resume__user=user).aggregate(Sum('views'))
         total_follow = CompanyFollowed.objects.filter(user=user).count()
@@ -88,7 +88,9 @@ class JobSeekerStatisticViewSet(viewsets.ViewSet):
 
         queryset1 = (
             JobPostActivity.objects.filter(
-                user=user, create_at__date__range=[first_day_of_month_utc, last_day_of_month_utc]
+                user=user,
+                is_deleted=False,
+                create_at__date__range=[first_day_of_month_utc, last_day_of_month_utc],
             )
             .order_by('create_at')
             .annotate(year=ExtractYear('create_at'), month=ExtractMonth('create_at'))
@@ -208,7 +210,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
             company=company,
             deadline__lt=datetime.datetime.now().date(),
         ).count()
-        total_apply = JobPostActivity.objects.filter(job_post__company=company).count()
+        total_apply = JobPostActivity.objects.filter(job_post__company=company, is_deleted=False).count()
 
         # Company engagement stats
         total_followers = CompanyFollowed.objects.filter(
@@ -390,7 +392,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         user = request.user
 
         queryset = (
-            JobPostActivity.objects.filter(job_post__company=user.active_company)
+            JobPostActivity.objects.filter(job_post__company=user.active_company, is_deleted=False)
             .values(stt=F('status'))
             .filter(
                 Q(create_at__isnull=True)
@@ -437,6 +439,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         queryset1 = (
             JobPostActivity.objects.filter(
                 job_post__company=user.active_company,
+                is_deleted=False,
                 create_at__date__range=[
                     start_date1.tz_localize(pytz.utc).date(),
                     end_date1.tz_localize(pytz.utc).date(),
@@ -451,6 +454,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         queryset2 = (
             JobPostActivity.objects.filter(
                 job_post__company=user.active_company,
+                is_deleted=False,
                 create_at__date__range=[
                     start_date2.tz_localize(pytz.utc).date(),
                     end_date2.tz_localize(pytz.utc).date(),
@@ -529,6 +533,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         applies_by_date = dict(
             JobPostActivity.objects.filter(
                 job_post__company=user.active_company,
+                is_deleted=False,
                 create_at__date__range=[
                     start_date.tz_localize(pytz.utc).date(),
                     end_date.tz_localize(pytz.utc).date(),
@@ -587,13 +592,14 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
             .filter(
                 Q(jobpostactivity__create_at__isnull=True)
                 | Q(
+                    jobpostactivity__is_deleted=False,
                     jobpostactivity__create_at__date__range=[
                         start_date.tz_localize(pytz.utc).date(),
                         end_date.tz_localize(pytz.utc).date(),
                     ]
                 )
             )
-            .annotate(countJobPostActivity=Count('jobpostactivity'))
+            .annotate(countJobPostActivity=Count('jobpostactivity', filter=Q(jobpostactivity__is_deleted=False)))
             .order_by('academic_level')
         )
 

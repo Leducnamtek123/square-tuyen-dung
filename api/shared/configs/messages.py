@@ -85,6 +85,8 @@ SUCCESS_MESSAGES = {
 
     'CHANGES_SAVED': 'Thay đổi đã được lưu.',
 
+    'PASSWORD_RESET_SUCCESS': 'Mat khau da duoc cap nhat.',
+
 }
 
 SYSTEM_MESSAGES = {

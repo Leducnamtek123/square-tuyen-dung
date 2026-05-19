@@ -127,6 +127,40 @@ def _authenticate_from_token(request):
     return None
 
 
+def _is_admin_user(user) -> bool:
+    role = getattr(user, "role_name", None)
+    return role == "ADMIN" or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False)
+
+
+def _user_can_stream_session(user, session) -> bool:
+    if not getattr(user, "is_authenticated", False):
+        return False
+    if _is_admin_user(user):
+        return True
+    if session.created_by_id == user.id:
+        return True
+
+    try:
+        company = user.get_active_company()
+    except Exception:
+        company = None
+    if not company:
+        return False
+
+    session_company_id = None
+    if session.job_post_id and session.job_post:
+        session_company_id = session.job_post.company_id
+    elif session.question_group_id and session.question_group:
+        session_company_id = session.question_group.company_id
+
+    if not session_company_id or session_company_id != company.id:
+        return False
+
+    from apps.accounts import permissions as perms_custom
+
+    return perms_custom.user_has_company_permission(user, "manage_interviews", company)
+
+
 @csrf_exempt
 def interview_event_stream(request, session_id):
     """
@@ -148,13 +182,16 @@ def interview_event_stream(request, session_id):
         return JsonResponse({"detail": "Authentication required."}, status=401)
 
     try:
-        session = InterviewSession.objects.get(pk=session_id)
+        session = InterviewSession.objects.select_related(
+            "job_post",
+            "job_post__company",
+            "question_group",
+            "created_by",
+        ).get(pk=session_id)
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Session not found."}, status=404)
 
-    # Permission: only employer/admin
-    role = getattr(user, "role_name", None)
-    if role not in ("EMPLOYER", "ADMIN"):
+    if not _user_can_stream_session(user, session):
         return JsonResponse({"detail": "Forbidden."}, status=403)
 
     response = StreamingHttpResponse(

@@ -13,6 +13,51 @@ from .models import (
 from apps.jobs.models import JobPost
 from common import serializers as common_serializers
 
+
+def _is_admin_user(user) -> bool:
+    role = str(getattr(user, "role_name", "") or "").upper()
+    return role == "ADMIN" or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False)
+
+
+def _request_active_company(request):
+    user = getattr(request, "user", None)
+    if not user or not getattr(user, "is_authenticated", False):
+        return None
+    try:
+        return user.get_active_company()
+    except Exception:
+        return None
+
+
+def _visible_questions_queryset(request):
+    user = getattr(request, "user", None)
+    if user and getattr(user, "is_authenticated", False) and _is_admin_user(user):
+        return Question.objects.all()
+
+    company = _request_active_company(request)
+    if not company:
+        return Question.objects.none()
+    return Question.objects.filter(Q(company__isnull=True) | Q(company=company))
+
+
+def _visible_question_groups_queryset(request):
+    user = getattr(request, "user", None)
+    if user and getattr(user, "is_authenticated", False) and _is_admin_user(user):
+        return QuestionGroup.objects.all()
+
+    company = _request_active_company(request)
+    if not company:
+        return QuestionGroup.objects.none()
+    return QuestionGroup.objects.filter(Q(company__isnull=True) | Q(company=company))
+
+
+def _set_related_queryset(field, queryset):
+    if hasattr(field, "child_relation"):
+        field.child_relation.queryset = queryset
+    else:
+        field.queryset = queryset
+
+
 class QuestionSerializer(serializers.ModelSerializer):
     questionText = serializers.CharField(source="text", read_only=True)
     careerDict = serializers.SerializerMethodField()
@@ -56,6 +101,11 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
             'evaluation_rubric_input', 'question_ids', 'author', 'company', 'create_at', 'update_at'
         ]
         read_only_fields = ['id', 'author', 'company', 'create_at', 'update_at']
+
+    def get_fields(self):
+        fields = super().get_fields()
+        _set_related_queryset(fields["question_ids"], _visible_questions_queryset(self.context.get("request")))
+        return fields
 
     def get_evaluation_rubric(self, obj):
         return getattr(obj, "evaluation_rubric", None)
@@ -465,6 +515,13 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
             'scheduled_at', 'notes',
             'question_group', 'question_ids', 'voice_profile'
         ]
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request")
+        _set_related_queryset(fields["question_ids"], _visible_questions_queryset(request))
+        _set_related_queryset(fields["question_group"], _visible_question_groups_queryset(request))
+        return fields
 
     def create(self, validated_data):
         question_ids = validated_data.pop('question_ids', [])

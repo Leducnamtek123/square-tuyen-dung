@@ -49,4 +49,6 @@ python-docx
 requests
 beautifulsoup4
 faker
+pytest
+pytest-django
 sentry-sdk[django]>=2.0.0

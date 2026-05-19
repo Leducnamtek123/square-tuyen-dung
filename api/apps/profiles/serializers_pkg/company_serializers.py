@@ -279,7 +279,11 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 if not user:
                     raise serializers.ValidationError({"user": "Company owner is required."})
 
-                return Company.objects.create(user=user, location=location_obj, **validated_data)
+                company = Company.objects.create(user=user, location=location_obj, **validated_data)
+                from apps.profiles.services import ensure_company_system_roles
+
+                ensure_company_system_roles(company)
+                return company
         except Exception as ex:
             helper.print_log_error("create company", ex)
             raise
@@ -570,6 +574,10 @@ class AdminCompanyVerificationSerializer(CompanyVerificationSerializer):
             if instance.company.is_verified != should_be_verified:
                 instance.company.is_verified = should_be_verified
                 instance.company.save(update_fields=["is_verified", "update_at"])
+            if not should_be_verified:
+                from apps.jobs.services import JobPostService
+
+                JobPostService.suspend_company_job_posts_for_verification(instance.company)
         return instance
 
     class Meta(CompanyVerificationSerializer.Meta):
@@ -616,6 +624,10 @@ class CompanyMemberSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             "is_active", "createAt", "updateAt",
         )
         read_only_fields = ("id", "companyId", "userDict", "role", "invitedById", "createAt", "updateAt")
+
+    def update(self, instance, validated_data):
+        validated_data.pop("user_id", None)
+        return super().update(instance, validated_data)
 
 
 class LogoCompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):

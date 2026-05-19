@@ -49,7 +49,8 @@ class JobPostService:
             .select_related('company', 'company__logo', 'career', 'location', 'user')
             .filter(
                 status=var_sys.JobPostStatus.APPROVED,
-                deadline__gte=timezone.now().date()
+                deadline__gte=timezone.now().date(),
+                company__is_verified=True,
             )
             .order_by('-update_at', '-id')
         )
@@ -62,7 +63,7 @@ class JobPostService:
                 ),
                 Prefetch(
                     'jobpostactivity_set',
-                    queryset=JobPostActivity.objects.filter(user=user)
+                    queryset=JobPostActivity.objects.filter(user=user, is_deleted=False)
                 ),
             )
 
@@ -139,6 +140,18 @@ class JobPostService:
 
         return job_post
 
+    @staticmethod
+    @transaction.atomic
+    def suspend_company_job_posts_for_verification(company: Any) -> int:
+        """Move approved jobs back to pending when a company loses verification."""
+        if not company:
+            return 0
+
+        return JobPost.objects.filter(
+            company=company,
+            status=var_sys.JobPostStatus.APPROVED,
+        ).update(status=var_sys.JobPostStatus.PENDING, update_at=timezone.now())
+
 
 class JobActivityService:
     """Business logic for Job Applications and Saves."""
@@ -185,6 +198,10 @@ class JobActivityService:
         if job_post.status != var_sys.JobPostStatus.APPROVED:
             logger.warning("Apply failed: job %s status is %s", job_post.id, job_post.status)
             raise JobPostInactiveError("Tin tuyển dụng không còn hoạt động.")
+
+        if not job_post.company.is_verified:
+            logger.warning("Apply failed: job %s company %s is not verified", job_post.id, job_post.company_id)
+            raise CompanyNotVerifiedError("CÃ´ng ty cá»§a tin tuyá»ƒn dá»¥ng chÆ°a Ä‘Æ°á»£c xÃ¡c thá»±c.")
 
         if hasattr(timezone, 'localdate'):
             current_date = timezone.localdate()
@@ -301,7 +318,7 @@ class JobActivityService:
 
     @staticmethod
     @transaction.atomic
-    def change_application_status(activity: JobPostActivity, new_status: int) -> JobPostActivity:
+    def change_application_status(activity: JobPostActivity, new_status: int, notify: bool = True) -> JobPostActivity:
         from shared.configs import variable_system as var_sys
         from shared.configs.messages import APPLICATION_STATUS_MESSAGES
         from shared.helpers import helper
@@ -332,6 +349,9 @@ class JobActivityService:
         activity.status = new_status
         activity.save(update_fields=["status", "update_at"])
 
+        if not notify:
+            return activity
+
         notification_title = activity.job_post.company.company_name
         status_label = ""
         for x in var_sys.APPLICATION_STATUS:
@@ -356,6 +376,39 @@ class JobActivityService:
             )
         except Exception as e:
             logger.error(f"Failed to send apply status notification: {str(e)}")
+        return activity
+
+    @staticmethod
+    @transaction.atomic
+    def advance_application_to_interviewed(activity: JobPostActivity) -> JobPostActivity:
+        path_by_current_status = {
+            var_sys.ApplicationStatus.PENDING_CONFIRMATION: [
+                var_sys.ApplicationStatus.CONTACTED,
+                var_sys.ApplicationStatus.TESTED,
+                var_sys.ApplicationStatus.INTERVIEWED,
+            ],
+            var_sys.ApplicationStatus.CONTACTED: [
+                var_sys.ApplicationStatus.TESTED,
+                var_sys.ApplicationStatus.INTERVIEWED,
+            ],
+            var_sys.ApplicationStatus.TESTED: [
+                var_sys.ApplicationStatus.INTERVIEWED,
+            ],
+            var_sys.ApplicationStatus.INTERVIEWED: [],
+        }
+
+        current_status = var_sys.ApplicationStatus(activity.status)
+        if current_status not in path_by_current_status:
+            raise InvalidApplicationStatusTransitionError(
+                f"Cannot advance application from {current_status.label} to {var_sys.ApplicationStatus.INTERVIEWED.label}."
+            )
+
+        for next_status in path_by_current_status[current_status]:
+            activity = JobActivityService.change_application_status(
+                activity,
+                next_status,
+                notify=next_status == var_sys.ApplicationStatus.INTERVIEWED,
+            )
         return activity
 
     @staticmethod
@@ -434,10 +487,12 @@ class JobActivityService:
             ).count(),
             'expired_jobs': jobs.filter(deadline__lt=today).count(),
             'total_applications': JobPostActivity.objects.filter(
-                job_post__company=company
+                job_post__company=company,
+                is_deleted=False,
             ).count(),
             'pending_applications': JobPostActivity.objects.filter(
                 job_post__company=company,
-                status=var_sys.ApplicationStatus.PENDING_CONFIRMATION
+                status=var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+                is_deleted=False,
             ).count(),
         }

@@ -11,13 +11,64 @@ from typing import Optional, Tuple, Dict, Any, Union
 
 from apps.profiles.models import (
     Resume, Company, CompanyFollowed,
-    ResumeViewed, ResumeSaved, ContactProfile
+    ResumeViewed, ResumeSaved, ContactProfile, CompanyRole
 )
 from apps.profiles.exceptions import ActiveCompanyRequiredError
 from shared.configs import variable_system as var_sys
 from console.jobs import queue_mail
 
 logger = logging.getLogger(__name__)
+
+
+def _unique_role_name(role: CompanyRole) -> str:
+    suffix = f" ({role.id})"
+    base = role.name or role.code or "Role"
+    return f"{base[:100 - len(suffix)]}{suffix}"
+
+
+@transaction.atomic
+def ensure_company_system_roles(company: Company) -> dict[str, CompanyRole]:
+    """Ensure each company has the reserved system roles used by permissions."""
+    roles: dict[str, CompanyRole] = {}
+
+    for code, role_data in var_sys.COMPANY_SYSTEM_ROLES.items():
+        name = str(role_data.get("name") or code.title())
+        permissions = list(role_data.get("permissions") or [])
+
+        role = CompanyRole.objects.filter(company=company, code=code).first()
+        if not role:
+            role = CompanyRole.objects.filter(company=company, name=name).first()
+
+        if role:
+            name_conflict = CompanyRole.objects.filter(
+                company=company,
+                name=name,
+            ).exclude(id=role.id).first()
+            if name_conflict:
+                name_conflict.name = _unique_role_name(name_conflict)
+                name_conflict.save(update_fields=["name", "update_at"])
+
+            role.code = code
+            role.name = name
+            role.permissions = permissions
+            role.is_system = True
+            role.is_active = True
+            role.save(update_fields=[
+                "code", "name", "permissions", "is_system", "is_active", "update_at",
+            ])
+        else:
+            role = CompanyRole.objects.create(
+                company=company,
+                code=code,
+                name=name,
+                permissions=permissions,
+                is_system=True,
+                is_active=True,
+            )
+
+        roles[code] = role
+
+    return roles
 
 
 class ResumeService:
@@ -176,7 +227,8 @@ class CompanyService:
             'total_followers': CompanyFollowed.objects.filter(company=company).count(),
             'total_jobs': JobPost.objects.filter(company=company).count(),
             'total_applications': JobPostActivity.objects.filter(
-                job_post__company=company
+                job_post__company=company,
+                is_deleted=False,
             ).count(),
             'resumes_saved': ResumeSaved.objects.filter(company=company).count(),
             'resumes_viewed': ResumeViewed.objects.filter(company=company).count(),

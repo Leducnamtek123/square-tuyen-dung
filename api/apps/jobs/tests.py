@@ -7,13 +7,15 @@ from unittest.mock import patch, MagicMock
 
 from django.utils import timezone
 from django.test import TestCase
-from rest_framework.test import APIClient
+from django.core.cache import cache
+from rest_framework.test import APIClient, APIRequestFactory
 
 from apps.jobs.models import JobPost, JobPostActivity
-from apps.jobs.serializers import JobSeekerJobPostActivitySerializer
+from apps.jobs.serializers import JobPostSerializer, JobSeekerJobPostActivitySerializer
 from apps.jobs.services import JobPostService, JobActivityService
 from apps.jobs.exceptions import CompanyNotVerifiedError
 from apps.jobs.ai_scoring_service import _fallback_scoring, build_scoring_prompt
+from apps.jobs.recommendation_service import get_recommended_jobs
 from apps.content.models import SystemSetting
 from shared.configs import variable_system as var_sys
 
@@ -108,6 +110,138 @@ def test_admin_job_posts_filter_expired_returns_only_approved_expired(
     assert [item["id"] for item in results] == [job_post.id]
 
 
+@pytest.mark.django_db
+def test_public_job_posts_exclude_unverified_company(job_post):
+    job_post.company.is_verified = False
+    job_post.company.save(update_fields=["is_verified", "update_at"])
+
+    client = APIClient()
+    response = client.get("/api/v1/job/web/job-posts/", {"cacheBust": job_post.id})
+
+    assert response.status_code == 200
+    payload = response.json()
+    data = payload.get("data", payload)
+    results = data.get("results", data if isinstance(data, list) else [])
+    assert job_post.id not in [item["id"] for item in results]
+
+
+@pytest.mark.django_db
+def test_job_seeker_statistics_excludes_soft_deleted_applications(job_seeker_user, job_post, resume):
+    JobPostActivity.objects.create(
+        user=job_seeker_user,
+        job_post=job_post,
+        resume=resume,
+        is_deleted=False,
+    )
+    JobPostActivity.objects.create(
+        user=job_seeker_user,
+        job_post=job_post,
+        resume=resume,
+        is_deleted=True,
+    )
+    client = APIClient()
+    client.force_authenticate(user=job_seeker_user)
+
+    response = client.get("/api/v1/job/web/statistics/job-seeker/", {"type": "general"})
+
+    assert response.status_code == 200
+    assert response.data["data"]["totalApply"] == 1
+
+
+@pytest.mark.django_db
+def test_recommended_jobs_uses_active_resumes_and_rechecks_cached_public_filters(job_seeker_user, job_post, resume):
+    cache.clear()
+
+    resume.is_active = False
+    resume.save(update_fields=["is_active", "update_at"])
+
+    assert list(get_recommended_jobs(job_seeker_user)) == []
+
+    resume.is_active = True
+    resume.save(update_fields=["is_active", "update_at"])
+    first_ids = list(get_recommended_jobs(job_seeker_user).values_list("id", flat=True))
+    assert job_post.id in first_ids
+
+    job_post.company.is_verified = False
+    job_post.company.save(update_fields=["is_verified", "update_at"])
+
+    second_ids = list(get_recommended_jobs(job_seeker_user).values_list("id", flat=True))
+    assert job_post.id not in second_ids
+
+
+@pytest.mark.django_db
+def test_recommended_jobs_orders_by_combined_relevance(job_seeker_user, employer_user, company, job_post, resume, career):
+    from apps.locations.models import City, Location
+
+    cache.clear()
+    other_city = City.objects.create(name="Da Nang", code="DNG")
+    other_location = Location.objects.create(city=other_city, address="Other city")
+    weaker_job = JobPost.objects.create(
+        job_name="Career Only Match",
+        deadline=timezone.now().date() + timedelta(days=30),
+        quantity=1,
+        job_description="<p>Career only</p>",
+        job_requirement="<p>Requirement</p>",
+        benefits_enjoyed="<p>Benefits</p>",
+        position=4,
+        type_of_workplace=1,
+        experience=9,
+        academic_level=2,
+        job_type=1,
+        salary_min=1000000,
+        salary_max=2000000,
+        contact_person_name="HR",
+        contact_person_phone="0901234567",
+        contact_person_email="hr@test.com",
+        status=var_sys.JobPostStatus.APPROVED,
+        user=employer_user,
+        company=company,
+        career=career,
+        location=other_location,
+    )
+
+    ids = list(get_recommended_jobs(job_seeker_user, limit=10).values_list("id", flat=True))
+
+    assert job_post.id in ids
+    assert weaker_job.id in ids
+    assert ids.index(job_post.id) < ids.index(weaker_job.id)
+
+
+@pytest.mark.django_db
+def test_job_post_serializer_scopes_interview_template_to_active_company(employer_user, company):
+    from apps.accounts.models import User
+    from apps.interviews.models import QuestionGroup
+    from apps.profiles.models import Company
+
+    global_group = QuestionGroup.objects.create(name="Global template")
+    own_group = QuestionGroup.objects.create(name="Own template", company=company)
+    other_owner = User.objects.create_user_with_role_name(
+        email="other-template-owner@test.com",
+        full_name="Other Template Owner",
+        role_name=var_sys.EMPLOYER,
+        password="pass123",
+        is_active=True,
+        has_company=True,
+    )
+    other_company = Company.objects.create(
+        company_name="Other Template Company",
+        company_email="other-template-company@test.com",
+        company_phone="0913000001",
+        tax_code="TPL000001",
+        user=other_owner,
+    )
+    other_group = QuestionGroup.objects.create(name="Other template", company=other_company)
+    request = APIRequestFactory().post("/")
+    request.user = employer_user
+
+    serializer = JobPostSerializer(context={"request": request})
+    queryset = serializer.fields["interviewTemplate"].queryset
+
+    assert global_group in queryset
+    assert own_group in queryset
+    assert other_group not in queryset
+
+
 # ==================== Service Tests ====================
 
 @pytest.mark.django_db
@@ -133,6 +267,14 @@ class TestJobService:
         job_post.save()
 
         jobs = JobPostService.get_active_jobs()
+        assert job_post not in jobs
+
+    def test_get_active_jobs_excludes_unverified_company(self, job_post):
+        job_post.company.is_verified = False
+        job_post.company.save(update_fields=["is_verified", "update_at"])
+
+        jobs = JobPostService.get_active_jobs()
+
         assert job_post not in jobs
 
     def test_get_active_jobs_filter_by_career(self, job_post, career):
@@ -217,6 +359,20 @@ class TestJobService:
         with pytest.raises(ValueError):
             JobActivityService.change_application_status(activity, var_sys.ApplicationStatus.CONTACTED)
 
+    def test_advance_application_to_interviewed_uses_valid_status_path(self, job_seeker_user, job_post, resume):
+        activity = JobPostActivity.objects.create(
+            user=job_seeker_user,
+            job_post=job_post,
+            resume=resume,
+            status=var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+        )
+
+        with patch("shared.helpers.helper.add_apply_status_notifications"):
+            activity = JobActivityService.advance_application_to_interviewed(activity)
+
+        activity.refresh_from_db()
+        assert activity.status == var_sys.ApplicationStatus.INTERVIEWED
+
     def test_apply_to_job_expired_rejected(self, job_seeker_user, job_post, resume):
         """Should reject applications to expired jobs."""
         job_post.deadline = timezone.now().date() - timedelta(days=1)
@@ -244,6 +400,41 @@ class TestJobService:
         }
         with pytest.raises(ValueError, match="không còn hoạt động"):
             JobActivityService.apply_to_job(job_seeker_user, validated_data)
+
+    def test_apply_to_job_unverified_company_rejected(self, job_seeker_user, job_post, resume):
+        job_post.company.is_verified = False
+        job_post.company.save(update_fields=["is_verified", "update_at"])
+
+        validated_data = {
+            'job_post': job_post,
+            'resume': resume,
+            'fullName': 'Test Name',
+            'email': 'test@test.com'
+        }
+        with pytest.raises(CompanyNotVerifiedError):
+            JobActivityService.apply_to_job(job_seeker_user, validated_data)
+
+    def test_soft_deleted_application_can_be_reapplied_multiple_times(self, job_seeker_user, job_post, resume):
+        validated_data = {
+            'job_post': job_post,
+            'resume': resume,
+            'fullName': 'Test Name',
+            'email': 'test@test.com'
+        }
+
+        first = JobActivityService.apply_to_job(job_seeker_user, validated_data)
+        first.is_deleted = True
+        first.save(update_fields=["is_deleted", "update_at"])
+
+        second = JobActivityService.apply_to_job(job_seeker_user, validated_data)
+        second.is_deleted = True
+        second.save(update_fields=["is_deleted", "update_at"])
+
+        third = JobActivityService.apply_to_job(job_seeker_user, validated_data)
+
+        assert third.id != first.id
+        assert JobPostActivity.objects.filter(user=job_seeker_user, job_post=job_post, is_deleted=False).count() == 1
+        assert JobPostActivity.objects.filter(user=job_seeker_user, job_post=job_post, is_deleted=True).count() == 2
 
     def test_apply_wrong_resume_owner(self, employer_user, job_post, resume):
         """Should reject if resume doesn't belong to applicant."""

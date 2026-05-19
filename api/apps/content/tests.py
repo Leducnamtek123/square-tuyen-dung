@@ -171,6 +171,23 @@ class TestArticlePublicAPI:
 
 @pytest.mark.django_db
 class TestEmployerArticleAPI:
+    def test_job_seeker_cannot_create_employer_article(self, job_seeker_user):
+        client = APIClient()
+        client.force_authenticate(user=job_seeker_user)
+
+        response = client.post(
+            "/api/content/web/employer/articles/",
+            {
+                "title": "Bai viet tu ung vien",
+                "excerpt": "Khong phai nha tuyen dung",
+                "content": "<p>content</p>",
+                "tags": "candidate",
+            },
+            format="json",
+        )
+
+        assert response.status_code == 403
+
     def test_employer_blog_search_covers_content_and_tags(self, employer_user):
         client = APIClient()
         client.force_authenticate(user=employer_user)

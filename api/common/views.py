@@ -573,7 +573,6 @@ def health_check(request):
     return Response(response_data, status=status_code)
 
 @api_view(["GET"])
-@authentication_classes([])
 @permission_classes([AllowAny])
 def presign_url(request):
     """
@@ -621,12 +620,22 @@ def presign_url(request):
             # Plain public_id
             object_path = str(target).lstrip("/") if target else None
 
+        if object_path:
+            object_path = _normalize_presign_object_path(object_path)
+
         if not object_path:
             if url and _is_allowed_public_minio_url(url):
                 return var_res.response_data(data={"url": url})
             return var_res.response_data(
                 status=status.HTTP_400_BAD_REQUEST,
                 errors={"errorMessage": ["Unable to generate presigned URL. Path identify failed."]},
+                data=None,
+            )
+
+        if not _can_presign_object(request, object_path):
+            return var_res.response_data(
+                status=status.HTTP_403_FORBIDDEN,
+                errors={"errorMessage": ["You do not have permission to access this file."]},
                 data=None,
             )
 
@@ -683,6 +692,154 @@ def _is_allowed_public_minio_url(value: str) -> bool:
         return False
     except Exception:
         return False
+
+
+def _normalize_presign_object_path(object_path: str) -> str:
+    path = str(object_path or "").lstrip("/")
+    bucket = str(getattr(settings, "MINIO_BUCKET", "") or "").strip("/")
+    if bucket and path.startswith(f"{bucket}/"):
+        path = path[len(bucket) + 1:]
+    return path
+
+
+def _path_has_prefix(path: str, prefixes) -> bool:
+    for prefix in prefixes:
+        normalized = str(prefix or "").strip("/")
+        if normalized and (path == normalized or path.startswith(f"{normalized}/")):
+            return True
+    return False
+
+
+def _public_presign_prefixes():
+    directories = getattr(settings, "CLOUDINARY_DIRECTORY", {}) or {}
+    return (
+        directories.get("avatar", "avatar/"),
+        "avatars/",
+        directories.get("logo", "logo/"),
+        directories.get("cover_image", "cover_image/"),
+        directories.get("company_image", "company_image/"),
+        directories.get("career_image", "career_image/"),
+        directories.get("web_banner", "banners/web_banners/"),
+        directories.get("mobile_banner", "banners/mobile_banners/"),
+        "banners/",
+        "articles/",
+        directories.get("system", "system/"),
+        directories.get("icons", "icons/"),
+        directories.get("about_us", "about_us/"),
+    )
+
+
+def _is_public_presign_path(object_path: str) -> bool:
+    return _path_has_prefix(object_path, _public_presign_prefixes())
+
+
+def _is_private_presign_path(object_path: str) -> bool:
+    return _path_has_prefix(object_path, ("cv/", "interviews/", "chat_attachments/"))
+
+
+def _user_can_presign_resume_file(user, file_obj) -> bool:
+    if not getattr(user, "is_authenticated", False):
+        return False
+
+    if getattr(user, "role_name", None) == var_sys.ADMIN or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+        return True
+
+    try:
+        resume = file_obj.resume_file
+    except Exception:
+        return True
+
+    if resume.user_id == user.id:
+        return True
+
+    try:
+        company = user.get_active_company()
+    except Exception:
+        company = None
+    if not company or not getattr(resume, "is_active", False):
+        return False
+
+    return perms_custom.user_has_company_permission(user, "manage_candidates", company)
+
+
+def _user_can_presign_interview_object(user, object_path: str) -> bool:
+    if not getattr(user, "is_authenticated", False):
+        return False
+
+    parts = object_path.split("/")
+    if len(parts) < 2 or parts[0] != "interviews":
+        return False
+    room_name = parts[1]
+
+    try:
+        from apps.interviews.models import InterviewSession
+
+        session = InterviewSession.objects.select_related(
+            "candidate",
+            "created_by",
+            "job_post",
+            "job_post__company",
+            "question_group",
+        ).filter(room_name=room_name).first()
+    except Exception:
+        session = None
+
+    if not session:
+        return False
+
+    if getattr(user, "role_name", None) == var_sys.ADMIN or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+        return True
+    if session.candidate_id == user.id or session.created_by_id == user.id:
+        return True
+
+    try:
+        company = user.get_active_company()
+    except Exception:
+        company = None
+    if not company:
+        return False
+
+    session_company_id = None
+    if session.job_post_id and session.job_post:
+        session_company_id = session.job_post.company_id
+    elif session.question_group_id and session.question_group:
+        session_company_id = session.question_group.company_id
+
+    return bool(
+        session_company_id
+        and session_company_id == company.id
+        and perms_custom.user_has_company_permission(user, "manage_interviews", company)
+    )
+
+
+def _can_presign_object(request, object_path: str) -> bool:
+    object_path = _normalize_presign_object_path(object_path)
+    if _is_public_presign_path(object_path):
+        return True
+
+    user = getattr(request, "user", None)
+    if not getattr(user, "is_authenticated", False):
+        return False
+
+    try:
+        from apps.files.models import File
+
+        file_obj = File.objects.filter(public_id=object_path).first()
+    except Exception:
+        file_obj = None
+
+    if file_obj and getattr(file_obj, "file_type", None) == "CV":
+        return _user_can_presign_resume_file(user, file_obj)
+
+    if _path_has_prefix(object_path, ("cv/",)):
+        return _user_can_presign_resume_file(user, file_obj) if file_obj else False
+    if _path_has_prefix(object_path, ("interviews/",)):
+        return _user_can_presign_interview_object(user, object_path)
+    if _is_private_presign_path(object_path):
+        return True
+
+    return True
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])

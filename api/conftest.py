@@ -138,6 +138,8 @@ def job_post(db, employer_user, company, career, location):
     """Create a test job post."""
     from apps.jobs.models import JobPost
     from shared.configs import variable_system as var_sys
+    company.is_verified = True
+    company.save(update_fields=["is_verified", "update_at"])
     return JobPost.objects.create(
         job_name='Senior Python Developer',
         deadline=timezone.now().date() + timedelta(days=30),

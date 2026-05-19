@@ -670,7 +670,7 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             latest_activity = activities[0] if activities else None
         else:
             latest_activity = JobPostActivity.objects.filter(
-                resume=resume, job_post__company=company
+                resume=resume, job_post__company=company, is_deleted=False
             ).order_by('-create_at').first()
         if latest_activity:
             return {

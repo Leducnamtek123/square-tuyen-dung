@@ -10,6 +10,7 @@ from shared.serializers import DynamicFieldsMixin
 from rest_framework import serializers
 
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 from apps.content.system_settings import auto_approve_jobs_enabled
 
@@ -139,6 +140,34 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         allow_null=True
     )
 
+    def get_fields(self):
+        fields = super().get_fields()
+        template_field = fields.get("interviewTemplate")
+        if template_field is None:
+            return fields
+
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if user and getattr(user, "is_authenticated", False) and (
+            getattr(user, "role_name", None) == var_sys.ADMIN
+            or getattr(user, "is_staff", False)
+            or getattr(user, "is_superuser", False)
+        ):
+            return fields
+
+        try:
+            company = user.get_active_company() if user else None
+        except Exception:
+            company = None
+
+        from apps.interviews.models import QuestionGroup
+
+        if company:
+            template_field.queryset = QuestionGroup.objects.filter(Q(company__isnull=True) | Q(company=company))
+        else:
+            template_field.queryset = QuestionGroup.objects.none()
+        return fields
+
     def get_salary(self, obj):
         return f"{obj.salary_min} - {obj.salary_max}"
 
@@ -150,10 +179,10 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         if hasattr(job_post, 'applied_total'):
             return job_post.applied_total
 
-        if hasattr(job_post, '_prefetched_objects_cache') and 'peoples_applied' in job_post._prefetched_objects_cache:
-            return len(job_post.peoples_applied.all())
+        if hasattr(job_post, '_prefetched_objects_cache') and 'jobpostactivity_set' in job_post._prefetched_objects_cache:
+            return sum(1 for activity in job_post.jobpostactivity_set.all() if not activity.is_deleted)
 
-        return job_post.peoples_applied.count()
+        return job_post.jobpostactivity_set.filter(is_deleted=False).count()
 
     def check_saved(self, job_post):
 
@@ -182,8 +211,11 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
         if user.is_authenticated:
             if hasattr(job_post, '_prefetched_objects_cache') and 'jobpostactivity_set' in job_post._prefetched_objects_cache:
-                return any(activity.user_id == user.id for activity in job_post.jobpostactivity_set.all())
-            return job_post.jobpostactivity_set.filter(user=user).exists()
+                return any(
+                    activity.user_id == user.id and not activity.is_deleted
+                    for activity in job_post.jobpostactivity_set.all()
+                )
+            return job_post.jobpostactivity_set.filter(user=user, is_deleted=False).exists()
 
         return False
 
@@ -430,6 +462,9 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
 
             if job_post.deadline < timezone.localdate():
                 raise serializers.ValidationError({"job_post": "Tin tuyển dụng đã hết hạn ứng tuyển."})
+
+            if not job_post.company.is_verified:
+                raise serializers.ValidationError({"job_post": "CÃ´ng ty cá»§a tin tuyá»ƒn dá»¥ng chÆ°a Ä‘Æ°á»£c xÃ¡c thá»±c."})
 
         return attrs
 
