@@ -52,7 +52,7 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
   }, [controlledOpen, onOpenChange]);
 
   const schema = yup.object().shape({
-    rating: yup.number().required(t('feedback.ratingRequired')),
+    rating: yup.number().required(t('feedback.ratingRequired')).min(1, t('feedback.ratingRequired')),
     content: yup
       .string()
       .required(t('feedback.contentRequired'))

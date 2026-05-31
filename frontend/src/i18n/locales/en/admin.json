@@ -717,6 +717,9 @@
         "approved": "Approved",
         "rejected": "Rejected"
       },
+      "actions": {
+        "update": "Update"
+      },
       "toast": {
         "updateSuccess": "Verification status updated.",
         "updateError": "Could not update verification status."

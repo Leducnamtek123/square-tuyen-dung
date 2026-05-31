@@ -717,6 +717,9 @@
         "approved": "Đã duyệt",
         "rejected": "Từ chối"
       },
+      "actions": {
+        "update": "Cập nhật"
+      },
       "toast": {
         "updateSuccess": "Đã cập nhật trạng thái xác minh.",
         "updateError": "Không thể cập nhật trạng thái xác minh."

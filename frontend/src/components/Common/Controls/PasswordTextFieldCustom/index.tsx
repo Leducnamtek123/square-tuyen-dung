@@ -94,7 +94,7 @@ const PasswordTextFieldCustom = <T extends FieldValues = FieldValues>({
 
               }
 
-              value={field.value}
+              value={field.value ?? ''}
 
               onChange={field.onChange}
 

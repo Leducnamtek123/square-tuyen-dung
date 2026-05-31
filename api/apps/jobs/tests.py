@@ -126,6 +126,62 @@ def test_public_job_posts_exclude_unverified_company(job_post):
 
 
 @pytest.mark.django_db
+def test_salary_insight_uses_market_fallback_and_excludes_current_job(
+    employer_user,
+    company,
+    career,
+    job_post,
+):
+    from apps.locations.models import City, Location
+
+    other_city = City.objects.create(name="Ha Noi", code="HN-SALARY")
+    other_location = Location.objects.create(city=other_city, address="Ha Noi")
+
+    def create_salary_job(name, salary_min, salary_max, job_location):
+        return JobPost.objects.create(
+            job_name=name,
+            deadline=timezone.now().date() + timedelta(days=30),
+            quantity=1,
+            job_description="<p>Market job</p>",
+            job_requirement="<p>Requirement</p>",
+            benefits_enjoyed="<p>Benefits</p>",
+            position=4,
+            type_of_workplace=1,
+            experience=2,
+            academic_level=2,
+            job_type=1,
+            salary_min=salary_min,
+            salary_max=salary_max,
+            contact_person_name="HR",
+            contact_person_phone="0901234567",
+            contact_person_email="hr@test.com",
+            status=var_sys.JobPostStatus.APPROVED,
+            user=employer_user,
+            company=company,
+            career=career,
+            location=job_location,
+        )
+
+    create_salary_job("Same career other city 1", 10000000, 20000000, other_location)
+    create_salary_job("Same career other city 2", 12000000, 22000000, other_location)
+    create_salary_job("Same career other city 3", 14000000, 24000000, other_location)
+
+    client = APIClient()
+    response = client.get(f"/api/v1/job/web/job-posts/{job_post.slug}/salary-insight/")
+
+    assert response.status_code == 200
+    payload = response.json()
+    data = payload.get("data", payload)
+    assert data["scope"] == "sameCareer"
+    assert data["count"] == 3
+    assert data["medianSalary"] == 17000000
+    assert data["p25Salary"] == 16000000
+    assert data["p75Salary"] == 18000000
+    assert data["salaryPosition"] == "above"
+    assert job_post.slug not in [item["slug"] for item in data["relatedJobs"]]
+
+
+@pytest.mark.django_db
 def test_job_seeker_statistics_excludes_soft_deleted_applications(job_seeker_user, job_post, resume):
     JobPostActivity.objects.create(
         user=job_seeker_user,
@@ -292,6 +348,74 @@ class TestJobService:
 
         jobs = JobPostService.get_active_jobs(filters={'keyword': 'nonexistent'})
         assert job_post not in jobs
+
+    def test_create_job_creates_location_from_nested_payload(self, employer_user, company, career, city):
+        from apps.locations.models import District, Location
+
+        company.is_verified = True
+        company.save(update_fields=["is_verified", "update_at"])
+        district = District.objects.create(name="Quan 1", code="Q1", city=city)
+
+        job = JobPostService.create_job(
+            user=employer_user,
+            validated_data={
+                "job_name": "Nested Location Job",
+                "deadline": timezone.now().date() + timedelta(days=30),
+                "quantity": 1,
+                "job_description": "<p>Description</p>",
+                "job_requirement": "<p>Requirement</p>",
+                "benefits_enjoyed": "<p>Benefits</p>",
+                "position": 4,
+                "type_of_workplace": 1,
+                "experience": 2,
+                "academic_level": 2,
+                "job_type": 1,
+                "salary_min": 10000000,
+                "salary_max": 20000000,
+                "contact_person_name": "HR",
+                "contact_person_phone": "0901234567",
+                "contact_person_email": "hr@test.com",
+                "career": career,
+                "location": {
+                    "city": city,
+                    "district": district,
+                    "address": "123 Test",
+                    "lat": 10.7,
+                    "lng": 106.7,
+                },
+            },
+        )
+
+        assert isinstance(job.location, Location)
+        assert job.location.city == city
+        assert job.location.district == district
+        assert job.location.address == "123 Test"
+
+    def test_update_job_updates_existing_location_from_nested_payload(self, employer_user, job_post, city):
+        from apps.locations.models import District
+
+        district = District.objects.create(name="Quan 3", code="Q3", city=city)
+        original_location_id = job_post.location_id
+
+        updated = JobPostService.update_job(
+            user=employer_user,
+            job_post=job_post,
+            validated_data={
+                "location": {
+                    "city": city,
+                    "district": district,
+                    "address": "456 Updated",
+                    "lat": 10.8,
+                    "lng": 106.8,
+                },
+            },
+        )
+
+        updated.refresh_from_db()
+        assert updated.location_id == original_location_id
+        assert updated.location.city == city
+        assert updated.location.district == district
+        assert updated.location.address == "456 Updated"
 
     def test_apply_to_job_success(self, job_seeker_user, job_post, resume):
         """Should successfully create an application."""

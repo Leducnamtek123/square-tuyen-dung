@@ -16,7 +16,7 @@ if "livekit_agent" not in sys.modules:
     sys.modules["livekit_agent"] = module
     spec.loader.exec_module(module)
 
-from livekit_agent.interviewer import Interviewer
+from livekit_agent.interviewer import Interviewer  # noqa: E402
 
 
 def _strip_accents(value: str) -> str:
@@ -38,7 +38,9 @@ class DummySpeechHandle:
 
 def test_finish_interview_waits_for_playout_before_shutdown() -> None:
     async def run() -> None:
-        agent = Interviewer(context={"backendApiUrl": "http://test", "roomName": "room-1"})
+        agent = Interviewer(
+            context={"backendApiUrl": "http://test", "roomName": "room-1"}
+        )
         shutdown_calls = {"count": 0}
         status_calls = []
 
@@ -71,7 +73,9 @@ def test_finish_interview_waits_for_playout_before_shutdown() -> None:
 
 def test_finish_interview_falls_back_when_no_speech_handle() -> None:
     async def run() -> None:
-        agent = Interviewer(context={"backendApiUrl": "http://test", "roomName": "room-2"})
+        agent = Interviewer(
+            context={"backendApiUrl": "http://test", "roomName": "room-2"}
+        )
         shutdown_calls = {"count": 0}
         status_calls = []
 

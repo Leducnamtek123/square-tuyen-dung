@@ -3,11 +3,9 @@ import L from "leaflet";
 import markerShadowImport from "leaflet/dist/images/marker-shadow.png";
 import markerIconRetinaImport from "leaflet/dist/images/marker-icon-2x.png";
 import * as React from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { Box, Typography, Paper } from "@mui/material";
 import { ICONS } from "@/configs/constants";
-import type { LatLngExpression } from "leaflet";
 
 interface StaticImageData {
   src: string;
@@ -32,6 +30,10 @@ interface Props {
   longitude?: number;
 }
 
+type LeafletContainer = HTMLDivElement & {
+  _leaflet_id?: number;
+};
+
 // Fix for default Leaflet icon issues in Webpack/Next.js
 interface LeafletIconDefault extends L.Icon.Default {
   _getIconUrl?: string;
@@ -49,6 +51,49 @@ L.Icon.Default.mergeOptions({
 });
 
 const Map = ({ title, subTitle, latitude, longitude }: Props) => {
+  const mapRef = React.useRef<L.Map | null>(null);
+  const containerRef = React.useRef<LeafletContainer | null>(null);
+
+  React.useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !latitude || !longitude) return;
+
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
+    delete container._leaflet_id;
+
+    const position: L.LatLngExpression = [latitude, longitude];
+    const map = L.map(container, {
+      center: position,
+      zoom: 15,
+      scrollWheelZoom: false,
+    });
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+    const popup = document.createElement("div");
+    const popupTitle = document.createElement("strong");
+    popupTitle.textContent = title || "";
+    const popupSubtitle = document.createElement("p");
+    popupSubtitle.textContent = subTitle || "";
+    popupSubtitle.style.margin = "4px 0 0";
+    popup.appendChild(popupTitle);
+    popup.appendChild(popupSubtitle);
+
+    L.marker(position).addTo(map).bindPopup(popup);
+    mapRef.current = map;
+
+    window.setTimeout(() => map.invalidateSize(), 0);
+
+    return () => {
+      map.remove();
+      mapRef.current = null;
+      delete container._leaflet_id;
+    };
+  }, [latitude, longitude, title, subTitle]);
+
   if (!latitude || !longitude) {
     return (
       <Box 
@@ -79,8 +124,6 @@ const Map = ({ title, subTitle, latitude, longitude }: Props) => {
     );
   }
 
-  const position: LatLngExpression = [latitude, longitude];
-
   return (
     <Paper 
       elevation={3} 
@@ -90,22 +133,11 @@ const Map = ({ title, subTitle, latitude, longitude }: Props) => {
         borderRadius: 2,
       }}
     >
-      <MapContainer
-        center={position}
-        zoom={15}
-        scrollWheelZoom={false}
-        style={{ height: "100%", width: "100%"}}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <Marker position={position}>
-          <Popup>
-            <Typography variant="subtitle2" fontWeight="bold">{title}</Typography>
-            <Typography variant="body2">{subTitle}</Typography>
-          </Popup>
-        </Marker>
-      </MapContainer>
+      <Box
+        ref={containerRef}
+        aria-label={title || "Map"}
+        sx={{ height: "100%", width: "100%" }}
+      />
     </Paper>
   );
 };

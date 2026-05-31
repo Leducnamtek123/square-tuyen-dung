@@ -141,7 +141,11 @@ const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
 
       ),
 
-    expectedSalary: yup.number().nullable().min(0, t('jobSeeker:profile.validation.expectedSalaryInvalid')),
+    expectedSalary: yup
+      .number()
+      .nullable()
+      .transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value))
+      .min(0, t('jobSeeker:profile.validation.expectedSalaryInvalid')),
 
     typeOfWorkplace: yup
 

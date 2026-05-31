@@ -8,6 +8,10 @@ interface JobDetailInfoItemProps {
 
 const JobDetailInfoItem: React.FC<JobDetailInfoItemProps> = ({ title, value }) => {
   const { t } = useTranslation(["public", "common"]);
+  const displayValue = typeof value === "string"
+    ? t(`choices.${value}`, { ns: "common", defaultValue: value })
+    : value;
+
   return (
     <div>
       <p className="pb-1 text-sm font-normal text-muted-foreground">
@@ -16,7 +20,7 @@ const JobDetailInfoItem: React.FC<JobDetailInfoItemProps> = ({ title, value }) =
       <p className="text-sm leading-6 text-foreground">
         {value ? (
           <span className="font-semibold">
-            {typeof value === "string" ? t([`choices.${value}`, value]) : value}
+            {displayValue}
           </span>
         ) : (
           <span className="text-xs italic text-zinc-300">

@@ -41,7 +41,7 @@ const commonService = {
     return (await presignInObject(data)) as SystemConfig;
   },
 
-  getDistrictsByCityId: (cityId: CityInput): Promise<DistrictsResponse> => {
+  getDistrictsByCityId: async (cityId: CityInput): Promise<DistrictsResponse> => {
     const normalizedCityId =
       cityId && typeof cityId === 'object' ? cityId.id : cityId;
 
@@ -50,14 +50,15 @@ const commonService = {
       normalizedCityId === null ||
       normalizedCityId === ''
     ) {
-      return Promise.resolve({ data: [] });
+      return { data: [] };
     }
 
     const url = `common/districts/?cityId=${encodeURIComponent(normalizedCityId)}`;
-    return httpRequest.get(url) as Promise<DistrictsResponse>;
+    const data = await httpRequest.get(url);
+    return { data: extractResults<District>(data) };
   },
 
-  getWardsByDistrictId: (districtId: DistrictInput): Promise<WardsResponse> => {
+  getWardsByDistrictId: async (districtId: DistrictInput): Promise<WardsResponse> => {
     const normalizedDistrictId =
       districtId && typeof districtId === 'object' ? districtId.id : districtId;
 
@@ -66,11 +67,12 @@ const commonService = {
       normalizedDistrictId === null ||
       normalizedDistrictId === ''
     ) {
-      return Promise.resolve({ data: [] });
+      return { data: [] };
     }
 
     const url = `common/wards/?districtId=${encodeURIComponent(normalizedDistrictId)}`;
-    return httpRequest.get(url) as Promise<WardsResponse>;
+    const data = await httpRequest.get(url);
+    return { data: extractResults<WardsResponse['data'][number]>(data) };
   },
 
   getTop10Careers: async (): Promise<Career[]> => {

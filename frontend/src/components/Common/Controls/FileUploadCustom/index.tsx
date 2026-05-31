@@ -23,6 +23,7 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
   const { t } = useTranslation('common');
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const formOnChangeRef = React.useRef<(file: File | null) => void>(() => {});
 
   const handleInputClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -33,6 +34,14 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
     const file = event.target.files?.[0];
     setSelectedFile(file || null);
     onChange(file || null);
+  };
+
+  const clearSelectedFile = (onChange: (file: File | null) => void) => {
+    setSelectedFile(null);
+    onChange(null);
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
   };
 
   return (
@@ -110,7 +119,7 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
                 color="error"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setSelectedFile(null);
+                  clearSelectedFile(formOnChangeRef.current);
                 }}
                 sx={{ minWidth: 'auto', px: 1.5, textTransform: 'none' }}
               >
@@ -124,27 +133,31 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
       <Controller
         name={name as Path<T>}
         control={control}
-        render={({ field, fieldState }) => (
-          <>
-            <input
-              name={name}
-              hidden
-              accept=".pdf"
-              type="file"
-              ref={inputRef}
-              onChange={(e) => handleFileChange(e, field.onChange)}
-            />
-            {fieldState.invalid && (
-              <Typography
-                variant="caption"
-                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'error.main', mt: 1 }}
-              >
-                <ErrorOutlineIcon fontSize="small" />
-                {fieldState.error?.message}
-              </Typography>
-            )}
-          </>
-        )}
+        render={({ field, fieldState }) => {
+          formOnChangeRef.current = field.onChange;
+
+          return (
+            <>
+              <input
+                name={name}
+                hidden
+                accept=".pdf"
+                type="file"
+                ref={inputRef}
+                onChange={(e) => handleFileChange(e, field.onChange)}
+              />
+              {fieldState.invalid && (
+                <Typography
+                  variant="caption"
+                  sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'error.main', mt: 1 }}
+                >
+                  <ErrorOutlineIcon fontSize="small" />
+                  {fieldState.error?.message}
+                </Typography>
+              )}
+            </>
+          );
+        }}
       />
     </div>
   );

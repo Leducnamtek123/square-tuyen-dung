@@ -168,6 +168,50 @@ def test_presign_allows_resume_owner_for_cv_file(monkeypatch, job_seeker_user, r
     assert "X-Amz-Signature=test" in response.json()["data"]["url"]
 
 
+@pytest.mark.django_db
+def test_presign_allows_employer_for_submitted_inactive_cv(
+    monkeypatch,
+    employer_user,
+    job_seeker_user,
+    job_post,
+    resume,
+):
+    from apps.jobs.models import JobPostActivity
+
+    class FakePresignClient:
+        def presigned_get_object(self, bucket, object_path, expires):
+            return f"https://cdn.example.test/{bucket}/{object_path}?X-Amz-Signature=test"
+
+    cv_file = File.objects.create(
+        public_id="cv/submitted-inactive.pdf",
+        format="pdf",
+        resource_type="raw",
+        file_type=File.CV_TYPE,
+        uploaded_at=timezone.now(),
+    )
+    resume.file = cv_file
+    resume.is_active = False
+    resume.save(update_fields=["file", "is_active", "update_at"])
+    JobPostActivity.objects.create(
+        job_post=job_post,
+        user=job_seeker_user,
+        resume=resume,
+        is_deleted=False,
+    )
+
+    monkeypatch.setattr(
+        "common.views.CloudinaryService._get_presign_client",
+        lambda: FakePresignClient(),
+    )
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.get("/api/v1/common/presign/", {"publicId": "cv/submitted-inactive.pdf"})
+
+    assert response.status_code == 200
+    assert "X-Amz-Signature=test" in response.json()["data"]["url"]
+
+
 def test_validate_env_rejects_production_placeholders():
     with pytest.raises(ImproperlyConfigured, match="Invalid production secret settings"):
         validate_required_settings(

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { useDropzone, Accept } from 'react-dropzone';
-import { compressImageFiles } from '@/utils/imageCompression';
 
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
@@ -15,13 +14,15 @@ interface FileDropzoneProps {
   accept?: Accept;
   onDrop: (files: File[]) => void;
   values?: File[] | null;
+  multiple?: boolean;
 }
 
-const FileDropzone = ({ accept, onDrop, values }: FileDropzoneProps) => {
+const FileDropzone = ({ accept, onDrop, values, multiple = false }: FileDropzoneProps) => {
+
+  const hasFiles = Array.isArray(values) && values.length > 0;
 
   const handleDrop = async (files: File[]) => {
-    const compressed = await compressImageFiles(files);
-    onDrop(compressed);
+    onDrop(multiple ? files : files.slice(0, 1));
   };
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -29,6 +30,10 @@ const FileDropzone = ({ accept, onDrop, values }: FileDropzoneProps) => {
     accept,
 
     onDrop: handleDrop,
+
+    multiple,
+
+    maxFiles: multiple ? undefined : 1,
 
   });
 
@@ -80,7 +85,7 @@ const FileDropzone = ({ accept, onDrop, values }: FileDropzoneProps) => {
 
       >
 
-        {!values ? (
+        {!hasFiles ? (
 
           <>
 
@@ -206,7 +211,7 @@ const FileDropzone = ({ accept, onDrop, values }: FileDropzoneProps) => {
 
             >
 
-              {values.length >= 0 && values[0].name}
+              {values?.[0]?.name}
 
             </Typography>
 
@@ -249,9 +254,18 @@ interface BasicDropzoneProps<T extends FieldValues = FieldValues> {
   name: string;
   title?: string;
   showRequired?: boolean;
+  accept?: Accept;
+  multiple?: boolean;
 }
 
-const BasicDropzone = <T extends FieldValues = FieldValues>({ control, name, title = '', showRequired = false }: BasicDropzoneProps<T>) => {
+const BasicDropzone = <T extends FieldValues = FieldValues>({
+  control,
+  name,
+  title = '',
+  showRequired = false,
+  accept = { 'application/pdf': ['.pdf'] },
+  multiple = false,
+}: BasicDropzoneProps<T>) => {
 
   return (
 
@@ -297,7 +311,8 @@ const BasicDropzone = <T extends FieldValues = FieldValues>({ control, name, tit
 
               <FileDropzone
                 onDrop={field.onChange}
-                accept={{ 'image/*': [] }}
+                accept={accept}
+                multiple={multiple}
                 values={field.value}
               />
 

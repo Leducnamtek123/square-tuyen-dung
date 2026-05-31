@@ -1,6 +1,10 @@
-import requests
-import json
+import sys
 import time
+
+import requests
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 url = "http://localhost:8298/v1/audio/speech"
 payload = {

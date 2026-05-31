@@ -15,6 +15,7 @@ import { Chip } from "@mui/material";
 import QRCodeBox from "../../../../components/Common/QRCodeBox";
 import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
 import { salaryString } from "../../../../utils/customData";
+import { tConfig } from "../../../../utils/tConfig";
 import { ROUTES } from "../../../../configs/constants";
 import { formatRoute } from "../../../../utils/funcUtils";
 import JobDetailActions from "./JobDetailActions";
@@ -50,6 +51,8 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
   onOpenReport,
 }) => {
   const { t } = useTranslation(["public"]);
+  const employeeSizeLabel = tConfig(allConfig?.employeeSizeDict?.[String(jobPostDetail?.companyDict?.employeeSize)]);
+
   return (
     <div className="rounded-xl border border-border/60 bg-card px-4 py-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)] sm:px-6 lg:px-8">
       <div className="space-y-6">
@@ -84,7 +87,7 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
               )}
             </div>
             <p className="text-sm text-muted-foreground">
-              {allConfig?.employeeSizeDict?.[String(jobPostDetail?.companyDict?.employeeSize)] || (
+              {employeeSizeLabel || (
                 <span className="text-xs italic text-zinc-300">
                   {t("jobDetail.notUpdated")}
                 </span>

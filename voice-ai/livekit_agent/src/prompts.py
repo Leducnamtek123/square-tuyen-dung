@@ -39,6 +39,4 @@ B5 - Kết thúc: Cảm ơn và chào tạm biệt bằng một câu ngắn. Sau
 - Tuyệt đối không in ra tên công cụ, thẻ `<function=...>`, JSON, code hoặc nội dung kỹ thuật nội bộ trong câu nói dành cho ứng viên.
 """
 
-DEFAULT_GREETING = (
-    "Chào bạn, mình là AI phỏng vấn của Square. Trước khi bắt đầu, bạn nghe mình rõ không?"
-)
+DEFAULT_GREETING = "Chào bạn, mình là AI phỏng vấn của Square. Trước khi bắt đầu, bạn nghe mình rõ không?"

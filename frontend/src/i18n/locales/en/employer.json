@@ -193,6 +193,11 @@
       "addSuccess": "Job post added successfully.",
       "updateSuccess": "Job post updated successfully."
     },
+    "verificationRequired": {
+      "action": "Verify now",
+      "message": "Your company must be verified before creating new job posts. Approved profiles will regain posting access.",
+      "toast": "Please verify your employer profile before posting a job."
+    },
     "popupTitle": "Job Post",
     "manageSubtitle": "Manage your job postings"
   },
@@ -833,7 +838,23 @@
       "noScheduleYet": "No schedule yet",
       "waitingConfirmation": "Waiting for confirmation",
       "profileSaved": "Legal profile saved.",
-      "requestSubmitted": "Verification interview request submitted."
+      "requestSubmitted": "Verification interview request submitted.",
+      "fixRequiredFields": "Please complete the required information.",
+      "saveFailed": "Could not save the verification profile. Please try again.",
+      "requestFailed": "Could not submit the verification request. Please try again."
+    },
+    "summary": {
+      "companyProfile": "Company profile",
+      "legalProfile": "Legal profile",
+      "appointment": "Verification appointment",
+      "progress": "Completion progress",
+      "canPost": "Your company has been verified and can post jobs.",
+      "cannotPost": "Please complete the legal profile and submit a verification request before posting jobs."
+    },
+    "validation": {
+      "required": "This field is required.",
+      "email": "Invalid email address.",
+      "futureDate": "The time must be now or in the future."
     }
   },
   "profileDetailCard": {

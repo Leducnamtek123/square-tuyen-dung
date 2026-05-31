@@ -201,6 +201,7 @@ default_env TTS_PEAK_LIMIT "0.98"
 default_env TTS_PEAK_NORMALIZE_TARGET ""
 default_env STT_STARTUP_DELAY_SECONDS "30"
 default_env TTS_STARTUP_DELAY_SECONDS "60"
+default_env TTS_WAIT_FOR_LLM_SECONDS "300"
 
 if [ "${SQUARE_TTS_KEEP_LEGACY_TUNING:-0}" != "1" ]; then
   # Use VieNeu's documented GPU/LMDeploy fast path for interview quality.
@@ -249,6 +250,7 @@ TTS_PEAK_LIMIT="$TTS_PEAK_LIMIT"
 TTS_PEAK_NORMALIZE_TARGET="$TTS_PEAK_NORMALIZE_TARGET"
 STT_STARTUP_DELAY_SECONDS="$STT_STARTUP_DELAY_SECONDS"
 TTS_STARTUP_DELAY_SECONDS="$TTS_STARTUP_DELAY_SECONDS"
+TTS_WAIT_FOR_LLM_SECONDS="$TTS_WAIT_FOR_LLM_SECONDS"
 EOF
 
 ensure_venv "$VENV_ROOT/llm"
@@ -342,6 +344,29 @@ set -a
 source /models/square-ai/square-ai.env
 set +a
 sleep "${TTS_STARTUP_DELAY_SECONDS:-60}"
+
+wait_for_llm() {
+  local timeout="${TTS_WAIT_FOR_LLM_SECONDS:-300}"
+  if ! [[ "$timeout" =~ ^[0-9]+$ ]] || [ "$timeout" = "0" ]; then
+    return 0
+  fi
+
+  local deadline=$((SECONDS + timeout))
+  local curl_args=(-fsS -m 5)
+  if [[ -n "${API_TOKEN:-}" ]]; then
+    curl_args+=(-H "Authorization: Bearer $API_TOKEN")
+  fi
+
+  until curl "${curl_args[@]}" http://127.0.0.1:8000/v1/models >/dev/null; do
+    if (( SECONDS >= deadline )); then
+      echo "Timed out waiting for LLM health after ${timeout}s; starting TTS anyway." >&2
+      return 0
+    fi
+    sleep 5
+  done
+}
+
+wait_for_llm
 export PORT=8298
 exec /models/venvs/tts/bin/python /models/square-ai/tts_api.py
 EOF

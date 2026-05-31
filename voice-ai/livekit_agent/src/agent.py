@@ -1,10 +1,12 @@
 import asyncio
 import json
 import logging
+from collections.abc import Awaitable
+from typing import Any
 
 import httpx
+import openai as openai_lib
 from dotenv import load_dotenv
-
 from livekit.agents import (
     AgentServer,
     AgentSession,
@@ -15,11 +17,9 @@ from livekit.agents import (
     room_io,
 )
 from livekit.agents.job import get_job_context
-from livekit.agents.voice.events import CloseEvent
-from livekit.agents.voice.events import SessionUsageUpdatedEvent
 from livekit.agents.llm import ChatMessage
+from livekit.agents.voice.events import CloseEvent, SessionUsageUpdatedEvent
 from livekit.plugins import openai, silero
-import openai as openai_lib
 
 from .backend_auth import auth_event_hook
 from .config import config
@@ -35,6 +35,13 @@ logger.setLevel(logging.INFO)
 CHAT_TOPIC = "lk.chat"
 AI_CONTROL_TOPIC = "square.interview.ai_control"
 EMPLOYER_CONTROL_ROLES = {"employer", "observer"}
+_BACKGROUND_TASKS: set[asyncio.Task[Any]] = set()
+
+
+def _create_background_task(coro: Awaitable[Any]) -> None:
+    task = asyncio.create_task(coro)
+    _BACKGROUND_TASKS.add(task)
+    task.add_done_callback(_BACKGROUND_TASKS.discard)
 
 
 # --- Helper Functions ---
@@ -42,7 +49,9 @@ async def _update_backend_status(room_name: str, status: str) -> None:
     """Update the interview status in the central backend."""
     try:
         url = f"{config.BACKEND_API_URL}/v1/interview/compat/{room_name}/status"
-        async with httpx.AsyncClient(event_hooks={"request": [auth_event_hook()]}) as client:
+        async with httpx.AsyncClient(
+            event_hooks={"request": [auth_event_hook()]}
+        ) as client:
             await client.patch(url, json={"status": status}, timeout=5.0)
     except Exception as e:
         logger.warning(f"Failed to update backend status for {room_name}: {e}")
@@ -114,7 +123,11 @@ def _participant_role(participant, identity_hint: str = "") -> str:
 
     if identity.startswith("candidate-") or "candidate" in haystack:
         return "candidate"
-    if identity.startswith("employer-") or "employer" in haystack or "admin" in haystack:
+    if (
+        identity.startswith("employer-")
+        or "employer" in haystack
+        or "admin" in haystack
+    ):
         return "employer"
     if identity.startswith("observer-") or "observer" in haystack:
         return "observer"
@@ -153,9 +166,7 @@ async def entrypoint(ctx: JobContext) -> None:
         client=openai_lib.AsyncOpenAI(
             api_key=config.LLM_API_KEY,
             base_url=config.LLM_BASE_URL,
-            http_client=httpx.AsyncClient(
-                timeout=httpx.Timeout(600.0, connect=15.0)
-            ),
+            http_client=httpx.AsyncClient(timeout=httpx.Timeout(600.0, connect=15.0)),
         ),
         model=config.LLM_MODEL,
         temperature=config.LLM_TEMPERATURE,
@@ -190,7 +201,9 @@ async def entrypoint(ctx: JobContext) -> None:
     # Fetch pre-loaded questions from context endpoint
     try:
         url = f"{config.BACKEND_API_URL}/v1/interview/compat/{ctx.room.name}/context"
-        async with httpx.AsyncClient(event_hooks={"request": [auth_event_hook()]}) as client:
+        async with httpx.AsyncClient(
+            event_hooks={"request": [auth_event_hook()]}
+        ) as client:
             resp = await client.get(url, timeout=5.0)
         if resp.status_code == 200:
             data = resp.json()
@@ -234,7 +247,9 @@ async def entrypoint(ctx: JobContext) -> None:
     # 3. Create Interviewer Agent (greeting is handled in on_enter)
     interviewer = Interviewer(context=agent_context)
 
-    async def _wait_for_participant(participant_identity: str | None, timeout_seconds: float = 2.0):
+    async def _wait_for_participant(
+        participant_identity: str | None, timeout_seconds: float = 2.0
+    ):
         if not participant_identity:
             return None
 
@@ -354,7 +369,7 @@ async def entrypoint(ctx: JobContext) -> None:
             logger.debug("Could not make generated speech uninterruptible: %s", exc)
 
         def _finalize_when_completed(_speech_handle) -> None:
-            asyncio.create_task(interviewer.finalize_completed_interview())
+            _create_background_task(interviewer.finalize_completed_interview())
 
         try:
             speech_handle.add_done_callback(_finalize_when_completed)
@@ -378,25 +393,27 @@ async def entrypoint(ctx: JobContext) -> None:
 
         if role == "assistant":
             lowered = content.lower()
-            if "finish_interview" in lowered or "set_interview_stage" in lowered or "get_interview_progress" in lowered:
+            if (
+                "finish_interview" in lowered
+                or "set_interview_stage" in lowered
+                or "get_interview_progress" in lowered
+            ):
                 return
 
         role = "candidate" if role == "user" else "ai_agent"
-        asyncio.create_task(interviewer.record_transcript(role, content))
+        _create_background_task(interviewer.record_transcript(role, content))
 
     @session.on("close")
     def _on_close(ev: CloseEvent) -> None:
         close_reason = getattr(ev.reason, "value", ev.reason)
-        logger.info(
-            f"Session closed for room: {ctx.room.name}, reason: {close_reason}"
-        )
+        logger.info(f"Session closed for room: {ctx.room.name}, reason: {close_reason}")
         # Sync remaining transcript from session history
         for item in session.history.items:
             if item.type == "message":
                 role = "candidate" if item.role == "user" else "ai_agent"
                 content = item.text_content
                 if content and content.strip():
-                    asyncio.create_task(
+                    _create_background_task(
                         interviewer.record_transcript(role, content.strip())
                     )
 
@@ -435,7 +452,9 @@ async def entrypoint(ctx: JobContext) -> None:
         session_started = True
         # Mark interview as active only after the agent has a live room connection.
         await _update_backend_status(ctx.room.name, "in_progress")
-        participant_identity = str(agent_context.get("participantIdentity") or "").strip() or None
+        participant_identity = (
+            str(agent_context.get("participantIdentity") or "").strip() or None
+        )
         if participant_identity:
             participant = await _wait_for_participant(
                 participant_identity,

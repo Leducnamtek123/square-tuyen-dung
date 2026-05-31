@@ -81,7 +81,7 @@ const DateTimePickerCustom = <T extends FieldValues = FieldValues>({
 
                             <DateTimePicker
 
-                                value={parseDate(field.value)}
+                                value={parseDate(field.value) ?? null}
 
                                 onChange={(newValue) => {
 

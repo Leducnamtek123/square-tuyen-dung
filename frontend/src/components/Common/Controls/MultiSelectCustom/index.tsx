@@ -31,6 +31,14 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
+const valuesAsArray = (value: unknown): Array<string | number> => {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string | number => typeof item === 'string' || typeof item === 'number');
+};
+
+const optionMatchesValue = (optionId: string | number | null | undefined, valueId: string | number | null | undefined) =>
+  optionId !== null && optionId !== undefined && valueId !== null && valueId !== undefined && String(optionId) === String(valueId);
+
 const MultiSelectCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
@@ -76,6 +84,12 @@ const MultiSelectCustom = <T extends FieldValues = FieldValues>({
               options={options}
 
               disableCloseOnSelect
+
+              value={options.filter((option) =>
+                valuesAsArray(field.value).some((value) => optionMatchesValue(option.id, value))
+              )}
+
+              isOptionEqualToValue={(option, value) => optionMatchesValue(option.id, value.id)}
 
               onChange={(e, value) =>
 

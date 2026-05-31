@@ -83,7 +83,6 @@ const NotificationCard: React.FC = () => {
               borderRadius: 2,
               width: { xs: 'calc(100vw - 24px)', sm: 500 },
               maxWidth: 'calc(100vw - 24px)',
-              maxHeight: 500,
               '&:before': {
                 content: '""',
                 display: 'block',
@@ -98,12 +97,31 @@ const NotificationCard: React.FC = () => {
               },
             },
           },
+          list: {
+            sx: {
+              p: 0,
+            },
+          },
         }}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <Box sx={{ py: 2, px: 2 }}>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 1, pb: 1 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: { xs: 'calc(100vh - 88px)', sm: 'min(620px, calc(100vh - 96px))' },
+            overflow: 'hidden',
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+          }}
+        >
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            sx={{ flexShrink: 0, px: 3, pt: 2, pb: 1.25 }}
+          >
             <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
               {t('footer.notifications')}
             </Typography>
@@ -113,8 +131,8 @@ const NotificationCard: React.FC = () => {
               </Typography>
             )}
           </Stack>
-          <Box sx={{ overflowY: 'auto', maxHeight: 450 }}>
-            <Box sx={{ p: 1 }}>
+          <Box sx={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', px: 2, py: 1 }}>
+            <Stack spacing={1}>
               {isLoading && notifications.length === 0 ? (
                 <Stack direction="row" justifyContent="center" sx={{ py: 3 }}>
                   <CircularProgress size={24} />
@@ -128,21 +146,34 @@ const NotificationCard: React.FC = () => {
                   <NotificationCardItem key={value.key} value={value} onClickItem={handleClickItem} onRemove={handleRemove} />
                 ))
               )}
-            </Box>
+            </Stack>
           </Box>
 
-          <NotificationCardFooter
-            hasMore={hasMore}
-            isLoading={isLoading}
-            notificationsLength={notifications.length}
-            onLoadMore={loadMore}
-            onMarkAllRead={handleMakeAllRead}
-            onClearAll={handleRemoveAll}
-            onViewAll={allNotificationsPath ? () => {
-              handleClose();
-              push(allNotificationsPath);
-            } : undefined}
-          />
+          {(hasMore || notifications.length > 0) && (
+            <Box
+              sx={{
+                flexShrink: 0,
+                borderTop: '1px solid',
+                borderColor: 'divider',
+                px: 2,
+                py: 1.25,
+                bgcolor: 'background.paper',
+              }}
+            >
+              <NotificationCardFooter
+                hasMore={hasMore}
+                isLoading={isLoading}
+                notificationsLength={notifications.length}
+                onLoadMore={loadMore}
+                onMarkAllRead={handleMakeAllRead}
+                onClearAll={handleRemoveAll}
+                onViewAll={allNotificationsPath ? () => {
+                  handleClose();
+                  push(allNotificationsPath);
+                } : undefined}
+              />
+            </Box>
+          )}
         </Box>
       </Menu>
     </React.Fragment>

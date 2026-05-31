@@ -3,6 +3,7 @@ const path = require('path');
 
 const SRC_DIR = path.join(__dirname, 'src');
 const LOCALES_DIR = path.join(SRC_DIR, 'i18n', 'locales');
+const SERVER_I18N_FILE = path.join(SRC_DIR, 'utils', 'serverI18n.ts');
 const LANGS = ['en', 'vi'];
 const OUTPUT_FILE = path.join(__dirname, 'audit_output.md');
 const SOURCE_EXTS = new Set(['.ts', '.tsx', '.js', '.jsx']);
@@ -145,6 +146,53 @@ function findMatchingParen(content, openIndex) {
   return -1;
 }
 
+function findMatchingBrace(content, openIndex) {
+  let depth = 0;
+  let quote = null;
+  let escaped = false;
+
+  for (let i = openIndex; i < content.length; i += 1) {
+    const char = content[i];
+
+    if (quote) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === '\\') {
+        escaped = true;
+      } else if (char === quote) {
+        quote = null;
+      }
+      continue;
+    }
+
+    if (char === '"' || char === "'" || char === '`') {
+      quote = char;
+      continue;
+    }
+
+    if (char === '{') depth += 1;
+    if (char === '}') {
+      depth -= 1;
+      if (depth === 0) return i;
+    }
+  }
+
+  return -1;
+}
+
+function extractObjectLiteral(content, marker) {
+  const markerIndex = content.indexOf(marker);
+  if (markerIndex < 0) return '';
+
+  const openIndex = content.indexOf('{', markerIndex);
+  if (openIndex < 0) return '';
+
+  const closeIndex = findMatchingBrace(content, openIndex);
+  if (closeIndex < 0) return '';
+
+  return content.slice(openIndex + 1, closeIndex);
+}
+
 function readFirstStringArgument(args) {
   let index = 0;
   while (index < args.length && /\s/.test(args[index])) index += 1;
@@ -210,6 +258,41 @@ function extractTCalls(content, bindings) {
   return calls;
 }
 
+function extractBuildPageMetadataUsages(content) {
+  const calls = [];
+  const regex = /\bbuildPageMetadata\s*\(\s*(['"`])([^'"`]+)\1/g;
+  let match;
+
+  while ((match = regex.exec(content)) !== null) {
+    calls.push({ key: match[2] });
+  }
+
+  return calls;
+}
+
+function extractPageTitleEntries(content) {
+  const body = extractObjectLiteral(content, 'const PAGE_TITLES');
+  const entries = new Map();
+  const entryRegex = /^\s*['"`]([^'"`]+)['"`]\s*:\s*\{([^}]*)\}\s*,?/gm;
+  let match;
+
+  while ((match = entryRegex.exec(body)) !== null) {
+    const [, key, valueSource] = match;
+    const viMatch = valueSource.match(/\bvi\s*:\s*(['"`])([\s\S]*?)\1/);
+    const enMatch = valueSource.match(/\ben\s*:\s*(['"`])([\s\S]*?)\1/);
+
+    entries.set(key, {
+      key,
+      hasVi: Boolean(viMatch),
+      hasEn: Boolean(enMatch),
+      viValue: viMatch?.[2] ?? '',
+      enValue: enMatch?.[2] ?? '',
+    });
+  }
+
+  return entries;
+}
+
 function resolveCall(call) {
   if (call.rawKey.includes(':')) {
     const [namespace, ...keyParts] = call.rawKey.split(':');
@@ -235,9 +318,18 @@ function hasKey(lang, candidates) {
 const translations = Object.fromEntries(LANGS.map((lang) => [lang, loadTranslations(lang)]));
 const sourceFiles = getAllSourceFiles(SRC_DIR);
 const usages = [];
+const metadataUsages = [];
 
 for (const file of sourceFiles) {
   const content = fs.readFileSync(file, 'utf8');
+  const relPath = path.relative(SRC_DIR, file).replace(/\\/g, '/');
+
+  if (relPath.startsWith('app/')) {
+    for (const usage of extractBuildPageMetadataUsages(content)) {
+      metadataUsages.push({ ...usage, file: relPath });
+    }
+  }
+
   let bindings = extractTranslationBindings(content);
 
   if (bindings.size === 0) {
@@ -245,7 +337,6 @@ for (const file of sourceFiles) {
     bindings = new Map([['t', new Set(['*'])]]);
   }
 
-  const relPath = path.relative(SRC_DIR, file).replace(/\\/g, '/');
   for (const call of extractTCalls(content, bindings)) {
     usages.push({ ...call, file: relPath });
   }
@@ -287,10 +378,41 @@ for (const lang of LANGS) {
   }
 }
 
+const pageTitleEntries = fs.existsSync(SERVER_I18N_FILE)
+  ? extractPageTitleEntries(fs.readFileSync(SERVER_I18N_FILE, 'utf8'))
+  : new Map();
+
+const missingMetadataTitleMap = new Map();
+for (const usage of metadataUsages) {
+  if (pageTitleEntries.has(usage.key)) continue;
+
+  if (!missingMetadataTitleMap.has(usage.key)) {
+    missingMetadataTitleMap.set(usage.key, {
+      key: usage.key,
+      files: new Set(),
+    });
+  }
+  missingMetadataTitleMap.get(usage.key).files.add(usage.file);
+}
+
+const invalidPageTitleEntries = [];
+for (const entry of pageTitleEntries.values()) {
+  const issues = [];
+  if (!entry.hasVi || !entry.viValue.trim()) issues.push('missing vi');
+  if (!entry.hasEn || !entry.enValue.trim()) issues.push('missing en');
+  if (entry.viValue.trim() === entry.key) issues.push('vi equals key');
+  if (entry.enValue.trim() === entry.key) issues.push('en equals key');
+
+  if (issues.length > 0) {
+    invalidPageTitleEntries.push({ ...entry, issues });
+  }
+}
+
 log('# I18N Audit Report');
 log('');
 log(`- Source files scanned: ${sourceFiles.length}`);
 log(`- Static t() calls checked: ${usages.length}`);
+log(`- Server metadata calls checked: ${metadataUsages.length}`);
 log('');
 
 let hasFailures = false;
@@ -325,6 +447,39 @@ if (keyLikeValues.length === 0) {
   for (const item of keyLikeValues) {
     log(`| ${item.lang} | ${item.namespace} | \`${item.key}\` | \`${item.value}\` |`);
   }
+}
+log('');
+
+const missingMetadataTitleEntries = [...missingMetadataTitleMap.values()];
+if (missingMetadataTitleEntries.length > 0) hasFailures = true;
+log(`## Missing server metadata titles (${missingMetadataTitleEntries.length})`);
+log('');
+if (missingMetadataTitleEntries.length === 0) {
+  log('None.');
+} else {
+  log('| # | Key | Used In |');
+  log('|---|-----|---------|');
+  missingMetadataTitleEntries
+    .sort((a, b) => a.key.localeCompare(b.key))
+    .forEach((entry, index) => {
+      log(`| ${index + 1} | \`${entry.key}\` | ${[...entry.files].sort().join(', ')} |`);
+    });
+}
+log('');
+
+if (invalidPageTitleEntries.length > 0) hasFailures = true;
+log(`## Invalid server metadata title values (${invalidPageTitleEntries.length})`);
+log('');
+if (invalidPageTitleEntries.length === 0) {
+  log('None.');
+} else {
+  log('| # | Key | Issues |');
+  log('|---|-----|--------|');
+  invalidPageTitleEntries
+    .sort((a, b) => a.key.localeCompare(b.key))
+    .forEach((entry, index) => {
+      log(`| ${index + 1} | \`${entry.key}\` | ${entry.issues.join(', ')} |`);
+    });
 }
 log('');
 

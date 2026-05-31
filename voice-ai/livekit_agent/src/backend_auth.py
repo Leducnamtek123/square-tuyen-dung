@@ -22,7 +22,9 @@ async def sign_backend_request(request: httpx.Request) -> None:
     timestamp = str(int(time.time()))
     path = urlparse(str(request.url)).path
     body_digest = hashlib.sha256(body).hexdigest()
-    message = "\n".join([request.method.upper(), path, timestamp, body_digest]).encode("utf-8")
+    message = "\n".join([request.method.upper(), path, timestamp, body_digest]).encode(
+        "utf-8"
+    )
     signature = hmac.new(secret.encode("utf-8"), message, hashlib.sha256).hexdigest()
     request.headers["X-Square-Agent-Timestamp"] = timestamp
     request.headers["X-Square-Agent-Signature"] = signature

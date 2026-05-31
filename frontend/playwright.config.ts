@@ -3,6 +3,7 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const configDir = dirname(fileURLToPath(import.meta.url));
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000';
 
 export default defineConfig({
   testDir: './tests',
@@ -15,7 +16,7 @@ export default defineConfig({
 
   use: {
     /* Base URL is usually your local dev server */
-    baseURL: 'http://localhost:3000',
+    baseURL,
     trace: 'on-first-retry',
     /* Anthropic Best Practice: Wait for networkidle when doing visual tests */
     actionTimeout: 10000,
@@ -33,7 +34,7 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev',
     cwd: configDir,
-    url: 'http://localhost:3000',
+    url: baseURL,
     timeout: 120_000,
     reuseExistingServer: !process.env.CI,
   },

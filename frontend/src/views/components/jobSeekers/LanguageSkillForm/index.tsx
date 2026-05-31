@@ -42,7 +42,7 @@ const LanguageSkillFormContent = ({
     () =>
       yup.object().shape({
         language: yup.string().required(t('jobSeeker:profile.validation.languageRequired')).typeError(t('jobSeeker:profile.validation.languageRequired')),
-        level: yup.number().required(t('jobSeeker:profile.validation.levelRequired')),
+        level: yup.number().required(t('jobSeeker:profile.validation.levelRequired')).min(1, t('jobSeeker:profile.validation.levelRequired')),
       }),
     [t]
   );

@@ -28,9 +28,17 @@ import type { JobPostInput } from '../../../../services/jobService';
 import FilterBar from '@/components/Common/FilterBar';
 import { ROUTES } from '@/configs/constants';
 
-type JobPostEditData = Partial<JobPostFormValues> & { id?: string | number };
+type JobPostEditData = Partial<JobPostFormValues> & { id?: string | number; slug?: string };
 
 type FilterState = { kw: string; isUrgent: boolean | ''; statusId: string | number };
+
+const getSelectId = (
+  value: number | string | { id?: number | string | null } | null | undefined,
+) => (value && typeof value === 'object' ? value.id ?? '' : value ?? '');
+
+const toNullableNumber = (value: number | string | null | undefined) => (
+  value === undefined || value === null || value === '' ? null : Number(value)
+);
 
 type JobPostCardState = {
   filterData: FilterState;
@@ -114,7 +122,7 @@ const JobPostCard = () => {
       const resData = await jobService.getEmployerJobPostDetailById(slugOrId);
       const data: JobPostEditData = {
         ...resData,
-        career: resData.career?.id ?? '',
+        career: getSelectId(resData.career),
         position: resData.position ?? '',
         experience: resData.experience ?? '',
         typeOfWorkplace: resData.typeOfWorkplace ?? '',
@@ -125,8 +133,8 @@ const JobPostCard = () => {
         jobRequirement: createEditorStateFromHTMLString(resData.jobRequirement || ''),
         benefitsEnjoyed: createEditorStateFromHTMLString(resData.benefitsEnjoyed || ''),
         location: {
-          city: (typeof resData.location?.city === 'object' ? resData.location?.city?.id : resData.location?.city) ?? '',
-          district: (typeof resData.location?.district === 'object' ? resData.location?.district?.id : resData.location?.district) ?? '',
+          city: getSelectId(resData.location?.city),
+          district: getSelectId(resData.location?.district),
           address: resData.location?.address || '',
           lat: resData.location?.lat ?? '',
           lng: resData.location?.lng ?? '',
@@ -150,7 +158,7 @@ const JobPostCard = () => {
 
   const handleAddOrUpdate = async (formData: JobPostFormValues) => {
     dispatch({ type: 'setErrors', value: null });
-    const editId = state.editData?.id;
+    const editLookup = state.editData?.slug ?? state.editData?.id;
     const payload: JobPostInput = {
       jobName: formData.jobName || '',
       deadline: formData.deadline ? (typeof formData.deadline === 'string' ? formData.deadline : formData.deadline.toISOString()) : '',
@@ -177,14 +185,14 @@ const JobPostCard = () => {
         city: Number(formData.location.city),
         district: Number(formData.location.district),
         address: formData.location.address,
-        lat: null,
-        lng: null,
+        lat: toNullableNumber(formData.location.lat),
+        lng: toNullableNumber(formData.location.lng),
       },
     };
 
     try {
-      if (editId != null) {
-        await updateJobPost({ id: editId, data: payload });
+      if (editLookup != null) {
+        await updateJobPost({ id: editLookup, data: payload });
         toastMessages.success(t('jobPost.messages.updateSuccess'));
       } else {
         await addJobPost(payload);

@@ -36,7 +36,9 @@ def test_scripted_llm_node_asks_configured_questions() -> None:
         )
         recorded = []
 
-        async def fake_record_transcript(speaker_role, content, speech_duration_ms=None):
+        async def fake_record_transcript(
+            speaker_role, content, speech_duration_ms=None
+        ):
             recorded.append((speaker_role, content, speech_duration_ms))
 
         agent.record_transcript = fake_record_transcript
@@ -58,6 +60,7 @@ def test_scripted_llm_node_asks_configured_questions() -> None:
 
     asyncio.run(run())
 
+
 def test_scripted_llm_node_prompts_for_more_detail_before_advancing() -> None:
     async def run() -> None:
         agent = Interviewer(
@@ -70,15 +73,25 @@ def test_scripted_llm_node_prompts_for_more_detail_before_advancing() -> None:
         )
         recorded = []
 
-        async def fake_record_transcript(speaker_role, content, speech_duration_ms=None):
+        async def fake_record_transcript(
+            speaker_role, content, speech_duration_ms=None
+        ):
             recorded.append((speaker_role, content, speech_duration_ms))
 
         agent.record_transcript = fake_record_transcript
 
-        first = await agent.llm_node(DummyChatContext(DummyUserMessage("u1", "Xin chao")), [], None)
-        nudge = await agent.llm_node(DummyChatContext(DummyUserMessage("u2", "Toi la Linh")), [], None)
+        first = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u1", "Xin chao")), [], None
+        )
+        nudge = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u2", "Toi la Linh")), [], None
+        )
         second = await agent.llm_node(
-            DummyChatContext(DummyUserMessage("u3", "Toi co hon nam nam kinh nghiem giam sat cong trinh dan dung")),
+            DummyChatContext(
+                DummyUserMessage(
+                    "u3", "Toi co hon nam nam kinh nghiem giam sat cong trinh dan dung"
+                )
+            ),
             [],
             None,
         )
@@ -93,6 +106,7 @@ def test_scripted_llm_node_prompts_for_more_detail_before_advancing() -> None:
         assert [item[0] for item in recorded] == ["ai_agent", "ai_agent", "ai_agent"]
 
     asyncio.run(run())
+
 
 def test_scripted_question_strips_prompt_format_language() -> None:
     async def run() -> None:
@@ -109,12 +123,16 @@ def test_scripted_question_strips_prompt_format_language() -> None:
             }
         )
 
-        async def fake_record_transcript(speaker_role, content, speech_duration_ms=None):
+        async def fake_record_transcript(
+            speaker_role, content, speech_duration_ms=None
+        ):
             return None
 
         agent.record_transcript = fake_record_transcript
 
-        first = await agent.llm_node(DummyChatContext(DummyUserMessage("u1", "ok")), [], None)
+        first = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u1", "ok")), [], None
+        )
 
         assert "Bạn xử lý xung đột với đồng nghiệp như thế nào?" in first
         assert "trả lời theo" not in first
@@ -123,13 +141,16 @@ def test_scripted_question_strips_prompt_format_language() -> None:
 
     asyncio.run(run())
 
+
 def test_completed_scripted_interview_finalizes_status_and_session() -> None:
     async def run() -> None:
         agent = Interviewer(context={"questions": [{"text": "Cau hoi 1"}]})
         status_calls = []
         shutdown_calls = {"count": 0}
 
-        async def fake_record_transcript(speaker_role, content, speech_duration_ms=None):
+        async def fake_record_transcript(
+            speaker_role, content, speech_duration_ms=None
+        ):
             return None
 
         async def fake_update_backend_status(status: str) -> bool:
@@ -158,11 +179,14 @@ def test_completed_scripted_interview_finalizes_status_and_session() -> None:
 
     asyncio.run(run())
 
+
 def test_scripted_llm_node_ignores_duplicate_user_turn() -> None:
     async def run() -> None:
         agent = Interviewer(context={"questions": [{"text": "Cau hoi 1"}]})
 
-        async def fake_record_transcript(speaker_role, content, speech_duration_ms=None):
+        async def fake_record_transcript(
+            speaker_role, content, speech_duration_ms=None
+        ):
             return None
 
         agent.record_transcript = fake_record_transcript
@@ -176,13 +200,17 @@ def test_scripted_llm_node_ignores_duplicate_user_turn() -> None:
 
     asyncio.run(run())
 
+
 def test_employer_instruction_response_does_not_advance_question_cursor() -> None:
     agent = Interviewer(context={"questions": [{"text": "Cau hoi 1"}]})
 
-    response = agent.build_employer_instruction_response("Hoi sau hon ve kinh nghiem Revit")
+    response = agent.build_employer_instruction_response(
+        "Hoi sau hon ve kinh nghiem Revit"
+    )
 
     assert "Revit" in response
     assert agent._scripted_question_index == 0
+
 
 def test_parse_question_payload_done() -> None:
     payload = {
@@ -197,6 +225,7 @@ def test_parse_question_payload_done() -> None:
     assert result.index == 2
     assert result.total == 2
 
+
 def test_decide_next_action_question() -> None:
     payload = {
         "done": False,
@@ -207,6 +236,7 @@ def test_decide_next_action_question() -> None:
     action = decide_next_action(parse_question_payload(payload))
     assert action.kind == "ask_question"
     assert action.text == "Cau hoi 1"
+
 
 def test_decide_next_action_done() -> None:
     payload = {
@@ -219,9 +249,14 @@ def test_decide_next_action_done() -> None:
     assert action.kind == "closing"
     assert action.text is None
 
+
 def test_strip_punctuation_for_tts() -> None:
     text = "Cảm ơn bạn. Câu hỏi 2/2: Tại sao bạn ứng tuyển vào Square Group?"
-    assert strip_punctuation_for_tts(text) == "Cảm ơn bạn. Tại sao bạn ứng tuyển vào Square Group?"
+    assert (
+        strip_punctuation_for_tts(text)
+        == "Cảm ơn bạn. Tại sao bạn ứng tuyển vào Square Group?"
+    )
+
 
 def test_is_substantive_answer() -> None:
     assert is_substantive_answer("Toi la Linh", min_words=8, min_chars=28) is False
@@ -234,5 +269,9 @@ def test_is_substantive_answer() -> None:
         is True
     )
 
+
 def test_redact_question_progress_labels() -> None:
-    assert redact_question_progress_labels("Câu hỏi 1/2: Giới thiệu bản thân?") == "Giới thiệu bản thân?"
+    assert (
+        redact_question_progress_labels("Câu hỏi 1/2: Giới thiệu bản thân?")
+        == "Giới thiệu bản thân?"
+    )

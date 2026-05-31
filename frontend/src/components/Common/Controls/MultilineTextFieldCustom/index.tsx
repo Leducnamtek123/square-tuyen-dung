@@ -64,7 +64,7 @@ const MultilineTextFieldCustom = <T extends FieldValues>({
 
               id={field.name}
               placeholder={placeholder}
-              value={field.value}
+              value={field.value ?? ''}
               onChange={field.onChange}
 
               onBlur={field.onBlur}

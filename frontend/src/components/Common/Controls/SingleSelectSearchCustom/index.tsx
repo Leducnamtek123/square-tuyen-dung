@@ -13,6 +13,9 @@ import type { SelectOption } from '@/types/models';
 
 const EMPTY_OPTIONS: SelectOption[] = [];
 
+const optionMatchesValue = (optionId: string | number | null | undefined, valueId: string | number | null | undefined) =>
+  optionId !== null && optionId !== undefined && valueId !== null && valueId !== undefined && String(optionId) === String(valueId);
+
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
   control: Control<T>;
@@ -56,9 +59,11 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
 
           getOptionLabel={(option) => typeof option.name === 'string' ? t(`choices.${option.name}`, option.name) : option.name}
 
-          value={options.find((o) => o.id === field.value) || null}
+          value={options.find((o) => field.value !== undefined && field.value !== null && optionMatchesValue(o.id, field.value)) || null}
 
-          onChange={(e, value) => field.onChange(value?.id || '')}
+          isOptionEqualToValue={(option, value) => optionMatchesValue(option.id, value.id)}
+
+          onChange={(e, value) => field.onChange(value?.id ?? '')}
 
         renderInput={(params) => (
 

@@ -756,10 +756,25 @@ def _user_can_presign_resume_file(user, file_obj) -> bool:
         company = user.get_active_company()
     except Exception:
         company = None
-    if not company or not getattr(resume, "is_active", False):
+    if not company:
         return False
 
-    return perms_custom.user_has_company_permission(user, "manage_candidates", company)
+    if not perms_custom.user_has_company_permission(user, "manage_candidates", company):
+        return False
+
+    if getattr(resume, "is_active", False):
+        return True
+
+    try:
+        from apps.jobs.models import JobPostActivity
+
+        return JobPostActivity.objects.filter(
+            resume=resume,
+            is_deleted=False,
+            job_post__company=company,
+        ).exists()
+    except Exception:
+        return False
 
 
 def _user_can_presign_interview_object(user, object_path: str) -> bool:

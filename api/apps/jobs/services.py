@@ -10,6 +10,7 @@ from django.utils import timezone
 from typing import Optional, Dict, Any, Union
 
 from apps.jobs.models import JobPost, JobPostActivity
+from apps.locations.models import Location
 from apps.jobs.exceptions import (
     CompanyNotConfiguredError,
     CompanyNotVerifiedError,
@@ -40,6 +41,19 @@ JOB_POST_REVIEW_FIELDS = {
 
 class JobPostService:
     """Business logic for Job Posts."""
+
+    @staticmethod
+    def _save_location(location_data: Optional[Dict[str, Any]], instance: Optional[Location] = None) -> Optional[Location]:
+        if not location_data:
+            return instance
+
+        if instance:
+            for attr, value in location_data.items():
+                setattr(instance, attr, value)
+            instance.save()
+            return instance
+
+        return Location.objects.create(**location_data)
 
     @staticmethod
     def get_active_jobs(filters: Optional[Dict[str, Any]] = None, user: Any = None) -> QuerySet[JobPost]:
@@ -98,12 +112,16 @@ class JobPostService:
             )
 
         payload = dict(validated_data)
+        location_data = payload.pop("location", None)
+        location = JobPostService._save_location(location_data)
+
         if auto_approve_jobs_enabled():
             payload["status"] = var_sys.JobPostStatus.APPROVED
 
         job_post = JobPost.objects.create(
             user=user,
             company=company,
+            location=location,
             **payload
         )
         return job_post
@@ -114,6 +132,10 @@ class JobPostService:
         """Updates an existing job post."""
         old_status = job_post.status
         payload = dict(validated_data)
+        location_data = payload.pop("location", None)
+
+        if location_data is not None:
+            job_post.location = JobPostService._save_location(location_data, job_post.location)
 
         if set(payload.keys()) & JOB_POST_REVIEW_FIELDS:
             payload["status"] = (

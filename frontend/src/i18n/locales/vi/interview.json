@@ -236,7 +236,8 @@
     },
     "validation": {
       "selectJobPost": "Vui lòng chọn tin tuyển dụng",
-      "selectCandidate": "Vui lòng chọn ứng viên"
+      "selectCandidate": "Vui lòng chọn ứng viên",
+      "selectScheduleTime": "Vui lòng chọn thời gian phỏng vấn"
     },
     "helperText": {
       "selectaquestiongrouptoautomaticallyfillthequestions below": "Chọn nhóm câu hỏi để tự động điền câu hỏi"
@@ -355,7 +356,11 @@
       "noMessages": "Chưa có tin nhắn",
       "noMessagesDesc": "Hội thoại sẽ xuất hiện tại đây khi ai đó nói hoặc nhắn tin.",
       "placeholder": "Nhập tin nhắn...",
-      "send": "Gửi"
+      "send": "Gửi",
+      "chatMode": "Chat",
+      "aiControlMode": "AI nói",
+      "aiControlPlaceholder": "Nhập nội dung muốn AI hỏi hoặc nói...",
+      "aiControlSend": "AI nói"
     },
     "observingBar": {
       "hrObserving": "Bạn đang quan sát phiên phỏng vấn này",

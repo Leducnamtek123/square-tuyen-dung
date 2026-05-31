@@ -193,6 +193,11 @@
       "addSuccess": "Thêm tin tuyển dụng thành công.",
       "updateSuccess": "Cập nhật tin tuyển dụng thành công."
     },
+    "verificationRequired": {
+      "action": "Xác thực ngay",
+      "message": "Công ty cần được xác thực trước khi tạo tin tuyển dụng mới. Hồ sơ đã duyệt sẽ mở lại quyền đăng tin.",
+      "toast": "Vui lòng xác thực Nhà tuyển dụng trước khi đăng tin."
+    },
     "popupTitle": "Tin tuyển dụng",
     "manageSubtitle": "Quản lý các tin tuyển dụng"
   },
@@ -833,7 +838,23 @@
       "noScheduleYet": "Chưa có lịch",
       "waitingConfirmation": "Chờ xác nhận",
       "profileSaved": "Đã lưu hồ sơ pháp lý.",
-      "requestSubmitted": "Đã gửi yêu cầu lịch xác minh."
+      "requestSubmitted": "Đã gửi yêu cầu lịch xác minh.",
+      "fixRequiredFields": "Vui lòng bổ sung các thông tin bắt buộc.",
+      "saveFailed": "Không thể lưu hồ sơ xác thực. Vui lòng thử lại.",
+      "requestFailed": "Không thể gửi yêu cầu xác minh. Vui lòng thử lại."
+    },
+    "summary": {
+      "companyProfile": "Hồ sơ công ty",
+      "legalProfile": "Hồ sơ pháp lý",
+      "appointment": "Lịch xác minh",
+      "progress": "Mức độ hoàn thiện",
+      "canPost": "Công ty đã được xác thực và có thể đăng tin tuyển dụng.",
+      "cannotPost": "Vui lòng hoàn thiện hồ sơ pháp lý và gửi yêu cầu xác minh trước khi đăng tin."
+    },
+    "validation": {
+      "required": "Trường này là bắt buộc.",
+      "email": "Email không hợp lệ.",
+      "futureDate": "Thời gian phải ở hiện tại hoặc tương lai."
     }
   },
   "profileDetailCard": {

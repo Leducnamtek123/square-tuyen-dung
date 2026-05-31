@@ -236,7 +236,8 @@
     },
     "validation": {
       "selectJobPost": "Please select a job post",
-      "selectCandidate": "Please select a candidate"
+      "selectCandidate": "Please select a candidate",
+      "selectScheduleTime": "Please select interview time"
     },
     "helperText": {
       "selectaquestiongrouptoautomaticallyfillthequestions below": "Select a question group to auto-fill questions"
@@ -355,7 +356,11 @@
       "noMessages": "No messages yet",
       "noMessagesDesc": "Conversation will appear here when someone speaks or types.",
       "placeholder": "Write a message...",
-      "send": "Send"
+      "send": "Send",
+      "chatMode": "Chat",
+      "aiControlMode": "AI speaks",
+      "aiControlPlaceholder": "Tell AI what to ask or say...",
+      "aiControlSend": "AI say"
     },
     "observingBar": {
       "hrObserving": "You are observing this interview session",

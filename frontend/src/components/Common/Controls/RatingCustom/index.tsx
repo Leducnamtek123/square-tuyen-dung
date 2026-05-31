@@ -46,9 +46,9 @@ const RatingCustom = <T extends FieldValues = FieldValues>({ name, control, titl
 
               size="large"
 
-              value={field.value}
+              value={field.value ?? 0}
 
-              onChange={field.onChange}
+              onChange={(_event, value) => field.onChange(value ?? 0)}
 
               onChangeActive={onChangeActive}
 
@@ -95,4 +95,3 @@ const RatingCustom = <T extends FieldValues = FieldValues>({ name, control, titl
 };
 
 export default RatingCustom;
-

@@ -75,6 +75,32 @@
     "salaryInsightMax": "Max",
     "salaryInsightRange": "Typical range",
     "salaryInsightRelated": "Related jobs",
+    "salaryInsightScope": {
+      "sameCareerCity": "Same career in this location",
+      "sameCareer": "Same career nationwide",
+      "sameCity": "Same location",
+      "allActive": "All active jobs",
+      "none": "Not enough market data"
+    },
+    "salaryInsightConfidence": {
+      "high": "High confidence",
+      "medium": "Medium confidence",
+      "low": "Limited data",
+      "none": "Not enough data"
+    },
+    "salaryInsightPosition": {
+      "below": "Below market",
+      "within": "Within typical range",
+      "above": "Above market",
+      "unknown": "Not enough data to compare"
+    },
+    "salaryInsightMarketRange": "Market salary span",
+    "salaryInsightMedian": "Median",
+    "salaryInsightTypicalBand": "Typical band",
+    "salaryInsightCurrentOffer": "This offer",
+    "salaryInsightComparison": "Market comparison",
+    "salaryInsightInsufficient": "There are not enough comparable jobs to analyze salary yet.",
+    "salaryInsightAverageRange": "Average posted range",
     "reportCaption": "Trust & Safety",
     "reportJobTitle": "Report job post",
     "reportReasonLabel": "Reason",

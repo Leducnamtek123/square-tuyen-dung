@@ -492,17 +492,63 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
 
     @action(methods=["get"], detail=True, url_path="salary-insight", url_name="salary-insight")
     def salary_insight(self, request, slug):
+        def percentile(values, ratio):
+            if not values:
+                return None
+            ordered = sorted(float(value) for value in values)
+            if len(ordered) == 1:
+                return ordered[0]
+            position = (len(ordered) - 1) * ratio
+            lower_index = int(position)
+            upper_index = min(lower_index + 1, len(ordered) - 1)
+            weight = position - lower_index
+            return ordered[lower_index] + (ordered[upper_index] - ordered[lower_index]) * weight
+
+        def rounded(value):
+            return int(round(float(value))) if value is not None else None
+
         job_post = self.get_object()
         career_id = job_post.career_id
         city_id = job_post.location.city_id if job_post.location and job_post.location.city_id else None
 
-        queryset = self.get_queryset().filter(status=var_sys.JobPostStatus.APPROVED)
-        if career_id:
-            queryset = queryset.filter(career_id=career_id)
-        if city_id:
-            queryset = queryset.filter(location__city_id=city_id)
+        base_queryset = (
+            self.get_queryset()
+            .filter(salary_min__gt=0, salary_max__gt=0)
+            .exclude(pk=job_post.pk)
+        )
 
-        queryset = queryset.filter(salary_min__gt=0, salary_max__gt=0)
+        scope_candidates = []
+        if career_id and city_id:
+            scope_candidates.append((
+                "sameCareerCity",
+                base_queryset.filter(career_id=career_id, location__city_id=city_id),
+            ))
+        if career_id:
+            scope_candidates.append(("sameCareer", base_queryset.filter(career_id=career_id)))
+        if city_id:
+            scope_candidates.append(("sameCity", base_queryset.filter(location__city_id=city_id)))
+        scope_candidates.append(("allActive", base_queryset))
+
+        sample_threshold = 3
+        selected_scope = "none"
+        queryset = base_queryset.none()
+        best_count = 0
+
+        for scope_key, candidate_queryset in scope_candidates:
+            candidate_count = candidate_queryset.count()
+            if candidate_count >= sample_threshold:
+                selected_scope = scope_key
+                queryset = candidate_queryset
+                best_count = candidate_count
+                break
+            if candidate_count > best_count:
+                selected_scope = scope_key
+                queryset = candidate_queryset
+                best_count = candidate_count
+
+        if best_count == 0:
+            selected_scope = "none"
+
         aggregate = queryset.aggregate(
             count=Count('id'),
             minSalary=Min('salary_min'),
@@ -511,7 +557,43 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
             avgMaxSalary=Avg('salary_max'),
         )
 
-        related_jobs = queryset.select_related('company', 'company__logo')[:5]
+        salary_rows = list(queryset.values("salary_min", "salary_max"))
+        salary_midpoints = [
+            (row["salary_min"] + row["salary_max"]) / 2
+            for row in salary_rows
+            if row["salary_min"] and row["salary_max"]
+        ]
+        median_salary = percentile(salary_midpoints, 0.5)
+        p25_salary = percentile(salary_midpoints, 0.25)
+        p75_salary = percentile(salary_midpoints, 0.75)
+
+        current_mid_salary = None
+        salary_delta = None
+        salary_delta_percent = None
+        salary_position = "unknown"
+        if job_post.salary_min and job_post.salary_max:
+            current_mid_salary = (job_post.salary_min + job_post.salary_max) / 2
+            if median_salary:
+                salary_delta = current_mid_salary - median_salary
+                salary_delta_percent = (salary_delta / median_salary) * 100
+            if p25_salary is not None and p75_salary is not None:
+                if current_mid_salary < p25_salary:
+                    salary_position = "below"
+                elif current_mid_salary > p75_salary:
+                    salary_position = "above"
+                else:
+                    salary_position = "within"
+
+        sample_count = aggregate.get("count") or 0
+        confidence = "none"
+        if sample_count >= 20:
+            confidence = "high"
+        elif sample_count >= 5:
+            confidence = "medium"
+        elif sample_count > 0:
+            confidence = "low"
+
+        related_jobs = queryset.select_related('company', 'company__logo').order_by("-update_at", "-id")[:5]
         related_serializer = JobPostSerializer(
             related_jobs,
             many=True,
@@ -522,11 +604,23 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
             "careerId": career_id,
             "cityId": city_id,
             "jobPostId": job_post.id,
-            "count": aggregate.get("count") or 0,
+            "scope": selected_scope,
+            "sampleThreshold": sample_threshold,
+            "confidence": confidence,
+            "count": sample_count,
             "minSalary": aggregate.get("minSalary"),
             "maxSalary": aggregate.get("maxSalary"),
-            "avgMinSalary": aggregate.get("avgMinSalary"),
-            "avgMaxSalary": aggregate.get("avgMaxSalary"),
+            "avgMinSalary": rounded(aggregate.get("avgMinSalary")),
+            "avgMaxSalary": rounded(aggregate.get("avgMaxSalary")),
+            "medianSalary": rounded(median_salary),
+            "p25Salary": rounded(p25_salary),
+            "p75Salary": rounded(p75_salary),
+            "currentSalaryMin": job_post.salary_min,
+            "currentSalaryMax": job_post.salary_max,
+            "currentMidSalary": rounded(current_mid_salary),
+            "salaryDelta": rounded(salary_delta),
+            "salaryDeltaPercent": round(float(salary_delta_percent), 1) if salary_delta_percent is not None else None,
+            "salaryPosition": salary_position,
             "relatedJobs": related_serializer.data,
         })
 

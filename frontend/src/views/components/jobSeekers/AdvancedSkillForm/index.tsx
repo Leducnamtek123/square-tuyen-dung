@@ -59,7 +59,7 @@ const AdvancedSkillForm = ({
 
       .max(200, t('jobSeeker:profile.validation.skillNameMax')),
 
-    level: yup.number().required(t('jobSeeker:profile.validation.levelRequired')),
+    level: yup.number().required(t('jobSeeker:profile.validation.levelRequired')).min(1, t('jobSeeker:profile.validation.levelRequired')),
 
   });
 

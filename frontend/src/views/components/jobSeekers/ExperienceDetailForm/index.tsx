@@ -67,7 +67,11 @@ const ExperienceDetailFormContent = ({
         if (!value || !startDate) return true;
         return !(value <= startDate);
       }),
-    lastSalary: yup.number().nullable().min(0, t('jobSeeker:profile.validation.lastSalaryInvalid')),
+    lastSalary: yup
+      .number()
+      .nullable()
+      .transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value))
+      .min(0, t('jobSeeker:profile.validation.lastSalaryInvalid')),
     leaveReason: yup.string().max(255, t('jobSeeker:profile.validation.leaveReasonMax')),
     description: yup.string().nullable().max(1000, t('jobSeeker:profile.validation.descriptionMax')),
   });

@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+from collections.abc import Awaitable
 from enum import Enum, auto
 from typing import Any
 
@@ -53,17 +54,16 @@ def _sanitize_output_text(value: Any) -> str:
     if not text:
         return ""
 
-    text = (
-        text.replace("\u200b", " ")
-        .replace("\ufeff", " ")
-    )
+    text = text.replace("\u200b", " ").replace("\ufeff", " ")
     text = re.sub(r"<think>[\s\S]*?</think>", " ", text, flags=re.IGNORECASE)
     text = re.sub(r"<think>[\s\S]*", " ", text, flags=re.IGNORECASE)
     text = re.sub(r"</think>", " ", text, flags=re.IGNORECASE)
     text = re.sub(r"\bfinish_interview\b", " ", text, flags=re.IGNORECASE)
     text = re.sub(r"\bset_interview_stage\b", " ", text, flags=re.IGNORECASE)
     text = re.sub(r"\bget_interview_progress\b", " ", text, flags=re.IGNORECASE)
-    text = re.sub(r"<function=[^>]+>[\s\S]*?</function>", " ", text, flags=re.IGNORECASE)
+    text = re.sub(
+        r"<function=[^>]+>[\s\S]*?</function>", " ", text, flags=re.IGNORECASE
+    )
     text = re.sub(r"</?function[^>]*>", " ", text, flags=re.IGNORECASE)
     text = re.sub(r"```[\s\S]*?```", " ", text)
     text = re.sub(r"\{\s*\"stage_name\"\s*:\s*\"[^\"]+\"\s*\}", " ", text)
@@ -248,10 +248,13 @@ class Interviewer(Agent):
         self._room_name = self._context.get("roomName")
         self._completed = False
         self._finalizing = False
+        self._background_tasks: set[asyncio.Task[Any]] = set()
         self._current_stage = InterviewStage.INTRODUCTION
         self._recorded_transcripts: set[tuple[str, str]] = set()
         self._scripted_questions = [
-            text for text in (_question_text(q) for q in self._context.get("questions", [])) if text
+            text
+            for text in (_question_text(q) for q in self._context.get("questions", []))
+            if text
         ]
         self._scripted_question_index = 0
         self._backend_questions_available = (
@@ -264,11 +267,15 @@ class Interviewer(Agent):
 
         candidate_name = _brief_text(self._context.get("candidateName", "Ứng viên"), 80)
         job_title = _brief_text(self._context.get("jobTitle", "đang ứng tuyển"), 120)
-        interview_subject = _brief_text(self._context.get("interviewSubject", job_title), 180)
+        interview_subject = _brief_text(
+            self._context.get("interviewSubject", job_title), 180
+        )
         job_desc = _brief_text(self._context.get("jobDescription", ""), 600)
         job_req = _brief_text(self._context.get("jobRequirement", ""), 400)
         q_group_name = _brief_text(self._context.get("questionGroupName", ""), 120)
-        q_group_desc = _brief_text(self._context.get("questionGroupDescription", ""), 400)
+        q_group_desc = _brief_text(
+            self._context.get("questionGroupDescription", ""), 400
+        )
         notes = _brief_text(self._context.get("interviewNotes", ""), 240)
 
         instructions += (
@@ -293,10 +300,7 @@ class Interviewer(Agent):
             q_text = ""
             total_q = len(questions)
             for i, q in enumerate(questions, 1):
-                if isinstance(q, dict):
-                    question_text = q.get("text", "")
-                else:
-                    question_text = str(q)
+                question_text = q.get("text", "") if isinstance(q, dict) else str(q)
                 q_text += f"{i}. {_brief_text(question_text, 300)}\n"
             instructions += (
                 f"\nDANH SÁCH {total_q} CÂU HỎI BẮT BUỘC PHẢI HỎI THEO THỨ TỰ TỪ 1 ĐẾN {total_q}:\n{q_text}"
@@ -312,6 +316,11 @@ class Interviewer(Agent):
         )
 
         super().__init__(instructions=instructions)
+
+    def _create_background_task(self, coro: Awaitable[Any]) -> None:
+        task = asyncio.create_task(coro)
+        self._background_tasks.add(task)
+        task.add_done_callback(self._background_tasks.discard)
 
     @property
     def current_stage(self) -> InterviewStage:
@@ -437,7 +446,9 @@ class Interviewer(Agent):
             return None
         try:
             url = f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/next-question"
-            async with httpx.AsyncClient(event_hooks={"request": [auth_event_hook()]}) as client:
+            async with httpx.AsyncClient(
+                event_hooks={"request": [auth_event_hook()]}
+            ) as client:
                 resp = await client.post(url, json={"advance": True}, timeout=5.0)
             if resp.status_code == 200:
                 payload = resp.json()
@@ -451,7 +462,11 @@ class Interviewer(Agent):
                         payload.get("advance"),
                     )
                     return payload
-            logger.debug("next-question returned %d for room %s", resp.status_code, self._room_name)
+            logger.debug(
+                "next-question returned %d for room %s",
+                resp.status_code,
+                self._room_name,
+            )
         except Exception as exc:
             logger.warning("next-question failed for room %s: %s", self._room_name, exc)
         return None
@@ -492,13 +507,13 @@ class Interviewer(Agent):
         logger.info("Finishing interview for room: %s", self._room_name)
 
         def _after_playout(_: Any) -> None:
-            asyncio.create_task(self.finalize_completed_interview())
+            self._create_background_task(self.finalize_completed_interview())
 
         speech_handle = getattr(context, "speech_handle", None)
         if speech_handle is not None and hasattr(speech_handle, "add_done_callback"):
             speech_handle.add_done_callback(_after_playout)
         else:
-            asyncio.create_task(self.finalize_completed_interview())
+            self._create_background_task(self.finalize_completed_interview())
 
         return _closing_response()
 
@@ -533,8 +548,12 @@ class Interviewer(Agent):
         if not self._backend_api_url or not self._room_name:
             return False
         try:
-            url = f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/status"
-            async with httpx.AsyncClient(event_hooks={"request": [auth_event_hook()]}) as client:
+            url = (
+                f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/status"
+            )
+            async with httpx.AsyncClient(
+                event_hooks={"request": [auth_event_hook()]}
+            ) as client:
                 resp = await client.patch(url, json={"status": status}, timeout=5.0)
             if resp.status_code >= 400:
                 logger.warning(
@@ -586,7 +605,9 @@ class Interviewer(Agent):
             }
             if speech_duration_ms is not None:
                 payload["speech_duration_ms"] = int(speech_duration_ms)
-            async with httpx.AsyncClient(event_hooks={"request": [auth_event_hook()]}) as client:
+            async with httpx.AsyncClient(
+                event_hooks={"request": [auth_event_hook()]}
+            ) as client:
                 url = f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/append-transcription"
                 resp = await client.post(url, json=payload, timeout=5.0)
                 if resp.status_code != 201:

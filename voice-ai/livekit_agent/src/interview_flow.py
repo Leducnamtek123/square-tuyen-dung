@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Any, Literal
-import re
+
 
 @dataclass(frozen=True)
 class QuestionPayload:
@@ -11,10 +12,12 @@ class QuestionPayload:
     index: int | None
     total: int | None
 
+
 @dataclass(frozen=True)
 class InterviewAction:
     kind: Literal["ask_question", "closing", "noop"]
     text: str | None = None
+
 
 def parse_question_payload(payload: dict[str, Any]) -> QuestionPayload:
     done = bool(payload.get("done", False))
@@ -29,12 +32,14 @@ def parse_question_payload(payload: dict[str, Any]) -> QuestionPayload:
         total=total,
     )
 
+
 def decide_next_action(payload: QuestionPayload) -> InterviewAction:
     if payload.done:
         return InterviewAction(kind="closing")
     if payload.question_text:
         return InterviewAction(kind="ask_question", text=payload.question_text)
     return InterviewAction(kind="noop")
+
 
 def is_substantive_answer(text: str | None, *, min_words: int, min_chars: int) -> bool:
     normalized = " ".join((text or "").split())
@@ -43,6 +48,7 @@ def is_substantive_answer(text: str | None, *, min_words: int, min_chars: int) -
 
     words = [word for word in normalized.split(" ") if word]
     return len(words) >= min_words
+
 
 _QUESTION_PROGRESS_PATTERN = re.compile(
     r"\b(?:câu\s*hỏi|cau\s*hoi)\s*(?:số\s*)?\d+\s*/\s*\d+\s*:?\s*",
@@ -59,11 +65,13 @@ _EXTRA_SPACES_PATTERN = re.compile(r"\s+")
 _SPACE_BEFORE_PUNCTUATION_PATTERN = re.compile(r"\s+([,.;:!?…])")
 _MISSING_SPACE_AFTER_PUNCTUATION_PATTERN = re.compile(r"([,.;:!?…])(?=\S)")
 
+
 def redact_question_progress_labels(text: str) -> str:
     cleaned = _QUESTION_PROGRESS_PATTERN.sub(" ", text)
     cleaned = _NEXT_QUESTION_LABEL_PATTERN.sub(" ", cleaned)
     cleaned = _EXTRA_SPACES_PATTERN.sub(" ", cleaned)
     return cleaned.strip()
+
 
 def strip_punctuation_for_tts(text: str) -> str:
     cleaned = redact_question_progress_labels(text)

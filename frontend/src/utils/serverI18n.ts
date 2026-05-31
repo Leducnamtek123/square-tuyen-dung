@@ -65,6 +65,7 @@ const PAGE_TITLES: Record<string, Record<SupportedLocale, string>> = {
   'admin.banner-types':       { vi: 'Loại banner', en: 'Banner Types' },
   'admin.feedbacks':          { vi: 'Phản hồi', en: 'Feedbacks' },
   'admin.settings':           { vi: 'Cài đặt hệ thống', en: 'System Settings' },
+  'admin.audit-logs':         { vi: 'Nhật ký hệ thống', en: 'Audit Logs' },
   'admin.chat':               { vi: 'Hộp thư', en: 'Chat' },
   'admin.job-activity':       { vi: 'Nhật ký tin tuyển dụng', en: 'Job Activity' },
   'admin.job-notifications':  { vi: 'Thông báo việc làm', en: 'Job Notifications' },

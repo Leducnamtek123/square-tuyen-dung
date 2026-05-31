@@ -97,7 +97,7 @@ const TextFieldAutoCompleteCustom = <T extends FieldValues = FieldValues>({
 
               onChange={handleSelect}
 
-              inputValue={field.value}
+              inputValue={field.value ?? ''}
 
               onInputChange={(e, newValue) => field.onChange(newValue || '')}
 

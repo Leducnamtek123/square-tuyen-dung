@@ -75,11 +75,23 @@ type JobSalaryInsightResponse = {
   careerId?: number | null;
   cityId?: number | null;
   jobPostId?: number | null;
+  scope?: 'sameCareerCity' | 'sameCareer' | 'sameCity' | 'allActive' | 'none';
+  sampleThreshold?: number;
+  confidence?: 'high' | 'medium' | 'low' | 'none';
   count?: number;
   minSalary?: number | null;
   maxSalary?: number | null;
   avgMinSalary?: number | null;
   avgMaxSalary?: number | null;
+  medianSalary?: number | null;
+  p25Salary?: number | null;
+  p75Salary?: number | null;
+  currentSalaryMin?: number | null;
+  currentSalaryMax?: number | null;
+  currentMidSalary?: number | null;
+  salaryDelta?: number | null;
+  salaryDeltaPercent?: number | null;
+  salaryPosition?: 'below' | 'within' | 'above' | 'unknown';
   relatedJobs?: JobPost[];
 };
 

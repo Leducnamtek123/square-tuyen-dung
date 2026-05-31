@@ -189,7 +189,6 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             placeholder={t('form.addressPlaceholder')}
             control={control}
             options={locationOptions}
-            loading={true}
             handleSelect={handleSelectLocation}
             helperText={t('form.addressHelper')}
             sx={{
