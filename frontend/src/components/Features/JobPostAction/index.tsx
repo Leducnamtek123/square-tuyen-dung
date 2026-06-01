@@ -50,7 +50,8 @@ const JobPostAction = ({
   const { allConfig } = useConfig();
 
   const theme = useTheme();
-  const stackDirection = useMediaQuery(theme.breakpoints.down('sm')) ? 'column' : 'row';
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const stackDirection = isSmallScreen ? 'column' : 'row';
   const detailHref = `/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`;
 
   return (
@@ -307,7 +308,8 @@ const JobPostAction = ({
 
 const Loading = () => {
   const theme = useTheme();
-  const stackDirection = useMediaQuery(theme.breakpoints.down('sm')) ? 'column' : 'row';
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const stackDirection = isSmallScreen ? 'column' : 'row';
 
   return (
 

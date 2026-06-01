@@ -346,7 +346,7 @@ const AIAnalysisDrawerStatePanels = ({
         <SectionCard title={t('employer:appliedResume.ai.criteriaTitle', { defaultValue: 'Weighted criteria' })} icon={<CheckCircleIcon fontSize="small" />} iconColor={theme.palette.info.main}>
           <Stack spacing={1.25}>
             {criteriaResults.map((item, index) => (
-              <Paper key={`${textValue(item.key)}-${index}`} elevation={0} sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+              <Paper key={textValue(item.key || item.label || item.reason || item.evidence || JSON.stringify(item))} elevation={0} sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Stack direction="row" justifyContent="space-between" spacing={2} alignItems="flex-start">
                   <Box>
                     <Typography variant="subtitle2" sx={{ fontWeight: 900 }}>
@@ -368,7 +368,7 @@ const AIAnalysisDrawerStatePanels = ({
         <SectionCard title={t('employer:appliedResume.ai.evidenceTitle', { defaultValue: 'Evidence' })} icon={<AutoFixHighIcon fontSize="small" />} iconColor={theme.palette.primary.main}>
           <Stack spacing={1.25}>
             {evidence.map((item, index) => (
-              <Paper key={`${textValue(item.claim)}-${index}`} elevation={0} sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+              <Paper key={textValue(item.claim || item.source || item.quote || item.evidence || JSON.stringify(item))} elevation={0} sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 0.5 }}>
                   {textValue(item.claim || item.source || `Evidence ${index + 1}`)}
                 </Typography>

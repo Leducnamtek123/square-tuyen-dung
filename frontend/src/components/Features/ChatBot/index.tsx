@@ -193,7 +193,7 @@ const ChatBot = () => {
         <span className="sq-chatbot__launcher-ring" />
       </button>
 
-      <div className="sq-chatbot__panel" role="dialog" aria-label="Square AI Chat">
+      <dialog className="sq-chatbot__panel" open aria-label="Square AI Chat">
         <header className="sq-chatbot__header">
           <div className="sq-chatbot__title">
             <span className="sq-chatbot__badge">
@@ -239,6 +239,7 @@ const ChatBot = () => {
         <form className="sq-chatbot__composer" onSubmit={handleSend}>
           <input
             type="text"
+            aria-label={t('chat:chatbot.placeholder')}
             placeholder={t('chat:chatbot.placeholder')}
             value={state.input}
             onChange={(event) => dispatch({ type: 'set_input', value: event.target.value })}
@@ -259,7 +260,7 @@ const ChatBot = () => {
             )}
           </div>
         )}
-      </div>
+      </dialog>
     </div>
   );
 };

@@ -42,8 +42,15 @@ const useFireStoreGetChatRoom = (
   limitNum: number | null = null
 ): ChatRoomWithUser[] => {
   const [docs, setDocs] = React.useState<ChatRoomWithUser[]>([]);
+  const hasInvalidCondition = Boolean(
+    condition && (condition.compareValue === undefined || condition.compareValue === null)
+  );
 
   React.useEffect(() => {
+    if (hasInvalidCondition) {
+      return;
+    }
+
     const collectionRef = collection(db, 'chatRooms');
 
     const baseConstraints: QueryConstraint[] = [orderBy('createdAt', sort)];
@@ -54,11 +61,6 @@ const useFireStoreGetChatRoom = (
     let q = query(collectionRef, ...baseConstraints);
 
     if (condition) {
-      if (condition.compareValue === undefined || condition.compareValue === null) {
-        setDocs([]);
-        return;
-      }
-
       q = query(
         collectionRef,
         where(condition.fieldName, condition.operator, condition.compareValue),
@@ -122,9 +124,9 @@ const useFireStoreGetChatRoom = (
     });
 
     return unsubscribe;
-  }, [condition, sort, limitNum, userId]);
+  }, [condition, hasInvalidCondition, sort, limitNum, userId]);
 
-  return docs;
+  return hasInvalidCondition ? [] : docs;
 };
 
 export default useFireStoreGetChatRoom;

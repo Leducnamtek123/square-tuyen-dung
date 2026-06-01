@@ -56,8 +56,11 @@
   background: linear-gradient(180deg, #f4f8ff 0%, #ffffff 40%);
   box-shadow: 0 24px 60px rgba(16, 24, 40, 0.2);
   border: 1px solid rgba(30, 136, 229, 0.15);
+  color: inherit;
   display: none;
+  margin: 0;
   overflow: hidden;
+  padding: 0;
 }
 
 .sq-chatbot.is-open .sq-chatbot__panel {

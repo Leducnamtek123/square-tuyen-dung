@@ -78,6 +78,7 @@ export function ChatInput({
           <input
             ref={inputRef}
             type="text"
+            aria-label="Message"
             value={message}
             disabled={!chatOpen}
             placeholder="Type a message..."
@@ -91,6 +92,7 @@ export function ChatInput({
             type="submit"
             disabled={isDisabled}
             variant={isDisabled ? 'secondary' : 'primary'}
+            aria-label={isSending ? 'Sending message' : 'Send message'}
             title={isSending ? 'Sending...' : 'Send'}
             className="self-start rounded-[18px]"
           >

@@ -11,6 +11,7 @@ import { DEFAULT_PHONE_COUNTRY, toE164PhoneNumber } from './phoneNumberUtils';
 
 const RECAPTCHA_CONTAINER_ID = 'recaptcha-container';
 const OTP_CODE_LENGTH = 6;
+const OTP_INPUT_KEYS = Array.from({ length: OTP_CODE_LENGTH }, (_, index) => `otp-input-${index + 1}`);
 
 const getFirebaseAuthErrorMessage = (
   error: unknown,
@@ -135,9 +136,9 @@ const OtpCodeInput = ({ value, disabled, label, onChange, onEnter }: OtpCodeInpu
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, width: '100%' }}>
-      {digits.map((digit, index) => (
+      {OTP_INPUT_KEYS.map((inputKey, index) => (
         <Box
-          key={index}
+          key={inputKey}
           component="input"
           ref={(element: HTMLInputElement | null) => {
             inputRefs.current[index] = element;
@@ -146,7 +147,7 @@ const OtpCodeInput = ({ value, disabled, label, onChange, onEnter }: OtpCodeInpu
           inputMode="numeric"
           autoComplete={index === 0 ? 'one-time-code' : 'off'}
           aria-label={`${label} ${index + 1}`}
-          value={digit}
+          value={digits[index]}
           disabled={disabled}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleChange(index, event.target.value)}
           onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(index, event)}

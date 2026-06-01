@@ -83,6 +83,7 @@ const AIAnalysisDrawerResumeSection = ({
             title={t('appliedResume.ai.resumeTitle')}
             width="100%"
             height="100%"
+            sandbox="allow-downloads"
             style={{ border: 'none', opacity: isProcessing ? 0.7 : 1, transition: 'opacity 0.3s' }}
             referrerPolicy="no-referrer"
           />

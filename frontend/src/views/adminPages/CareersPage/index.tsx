@@ -189,6 +189,7 @@ const CareerFormDialog = ({
           <input
             ref={iconInputRef as React.RefObject<HTMLInputElement>}
             type="file"
+            aria-label={t('pages.careers.iconLabel')}
             accept="image/*"
             style={{ display: 'none' }}
             onChange={onIconChange}

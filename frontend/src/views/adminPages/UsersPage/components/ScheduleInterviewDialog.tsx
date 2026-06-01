@@ -156,16 +156,19 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                             />
                         )}
                         renderTags={(value, getTagProps) =>
-                            value.map((opt, idx) => (
-                                <Chip
-                                    {...getTagProps({ index: idx })}
-                                    key={opt.id}
-                                    label={opt.content || opt.text || `#${opt.id}`}
-                                    size="small"
-                                    color="primary"
-                                    variant="outlined"
-                                />
-                            ))
+                            value.map((opt, idx) => {
+                                const { key: tagKey, ...tagProps } = getTagProps({ index: idx });
+                                return (
+                                    <Chip
+                                        key={opt.id ?? tagKey}
+                                        {...tagProps}
+                                        label={opt.content || opt.text || `#${opt.id}`}
+                                        size="small"
+                                        color="primary"
+                                        variant="outlined"
+                                    />
+                                );
+                            })
                         }
                     />
 

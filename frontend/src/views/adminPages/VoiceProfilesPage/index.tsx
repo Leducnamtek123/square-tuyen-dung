@@ -414,7 +414,7 @@ const VoiceProfilesPage = () => {
                 <Alert severity="info">Upload a clean mp3/wav sample and paste the exact transcript for cloning.</Alert>
                 <Button variant="outlined" component="label" startIcon={<UploadFileIcon />}>
                   {createSampleFile ? createSampleFile.name : 'Choose mp3/wav'}
-                  <input hidden type="file" accept="audio/*,.mp3,.wav,.m4a,.flac,.ogg,.webm" onChange={(e) => setCreateSampleFile(e.target.files?.[0] ?? null)} />
+                  <input hidden type="file" aria-label="Create voice sample" accept="audio/*,.mp3,.wav,.m4a,.flac,.ogg,.webm" onChange={(e) => setCreateSampleFile(e.target.files?.[0] ?? null)} />
                 </Button>
                 <TextField label="Exact transcript" value={createSampleText} onChange={(e) => setCreateSampleText(e.target.value)} fullWidth multiline minRows={3} />
                 <FormControlLabel
@@ -504,7 +504,9 @@ const VoiceProfilesPage = () => {
               minRows={3}
             />
             {testAudioUrl ? (
-              <Box component="audio" src={testAudioUrl} controls autoPlay sx={{ width: '100%' }} />
+              <Box component="audio" src={testAudioUrl} controls autoPlay aria-label="Generated voice preview" sx={{ width: '100%' }}>
+                <track kind="captions" />
+              </Box>
             ) : null}
           </Stack>
         </DialogContent>
@@ -523,7 +525,7 @@ const VoiceProfilesPage = () => {
             <Alert severity="info">Use 10-30 seconds of clean speech and paste the exact transcript.</Alert>
             <Button variant="outlined" component="label" startIcon={<UploadFileIcon />}>
               {sampleFile ? sampleFile.name : 'Choose mp3/wav'}
-              <input hidden type="file" accept="audio/*,.mp3,.wav,.m4a,.flac,.ogg,.webm" onChange={(e) => setSampleFile(e.target.files?.[0] ?? null)} />
+              <input hidden type="file" aria-label="Upload voice sample" accept="audio/*,.mp3,.wav,.m4a,.flac,.ogg,.webm" onChange={(e) => setSampleFile(e.target.files?.[0] ?? null)} />
             </Button>
             <TextField label="Exact transcript" value={sampleText} onChange={(e) => setSampleText(e.target.value)} fullWidth multiline minRows={4} />
           </Stack>

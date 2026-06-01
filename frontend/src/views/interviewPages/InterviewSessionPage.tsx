@@ -102,7 +102,7 @@ const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number): Promise<
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type InterviewSessionPageProps = {
-  role?: 'jobseeker' | 'employer' | 'admin' | string;
+  participantRole?: 'jobseeker' | 'employer' | 'admin' | string;
 };
 
 type LiveKitConnectionDetails = {
@@ -222,7 +222,7 @@ function ActiveInterviewRoom({
   candidateLabel,
   statusClass,
   statusText,
-  role,
+  participantRole,
   formattedSchedule,
   timeLabel,
   onDisconnected,
@@ -234,7 +234,7 @@ function ActiveInterviewRoom({
   candidateLabel: string;
   statusClass: string;
   statusText: string;
-  role: string;
+  participantRole: string;
   formattedSchedule?: string | false;
   timeLabel: string;
   onDisconnected: () => void;
@@ -259,8 +259,8 @@ function ActiveInterviewRoom({
           token={connectionDetails.token}
           serverUrl={connectionDetails.serverUrl}
           connect={true}
-          video={role === 'jobseeker'}
-          audio={role === 'jobseeker' ? INTERVIEW_AUDIO_CAPTURE_OPTIONS : false}
+          video={participantRole === 'jobseeker'}
+          audio={participantRole === 'jobseeker' ? INTERVIEW_AUDIO_CAPTURE_OPTIONS : false}
           onDisconnected={onDisconnected}
           style={{ height: '100%' }}
         >
@@ -446,8 +446,8 @@ function InterviewWaitingRoom({
   );
 }
 
-const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps) => {
-  const normalizedRole = normalizeRole(role);
+const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessionPageProps) => {
+  const normalizedRole = normalizeRole(participantRole);
   const { id: routeId } = useParams<{ id?: string }>();
   const { push, back } = useRouter();
   const { t, i18n } = useTranslation(['interview', 'common']);
@@ -687,7 +687,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
         candidateLabel={candidateLabel}
         statusClass={statusClass}
         statusText={statusText}
-        role={normalizedRole}
+        participantRole={normalizedRole}
         formattedSchedule={formattedSchedule}
         timeLabel={t('common:labels.time')}
         onDisconnected={handleDisconnected}

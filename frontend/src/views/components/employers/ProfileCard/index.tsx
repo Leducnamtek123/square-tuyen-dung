@@ -79,8 +79,8 @@ const ProfileCardContent: React.FC = () => {
                     <Box>
                         {isLoading ? (
                             <Grid container spacing={3}>
-                                {Array.from(new Array(pageSize)).map((_, index) => (
-                                    <Grid key={index} size={{ xs: 12 }}>
+                                {Array.from({ length: pageSize }, (_, index) => `profile-skeleton-${index + 1}`).map((skeletonKey) => (
+                                    <Grid key={skeletonKey} size={{ xs: 12 }}>
                                         <JobSeekerProfile.Loading />
                                     </Grid>
                                 ))}

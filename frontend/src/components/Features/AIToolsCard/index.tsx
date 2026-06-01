@@ -188,7 +188,9 @@ const AIToolsCard = () => {
         </Stack>
         {state.ttsAudioUrl && (
           <Box>
-            <audio controls src={state.ttsAudioUrl} style={{ width: '100%' }} />
+            <audio controls src={state.ttsAudioUrl} aria-label={t('aiTools.tts.resultLabel')} style={{ width: '100%' }}>
+              <track kind="captions" />
+            </audio>
           </Box>
         )}
       </Stack>
@@ -206,6 +208,7 @@ const AIToolsCard = () => {
           <input
             type="file"
             hidden
+            aria-label={t('aiTools.transcribe.selectFile')}
             accept="audio/*"
             onChange={(e) => dispatch({ type: 'set_transcribe_file', payload: e.target.files?.[0] || null })}
           />

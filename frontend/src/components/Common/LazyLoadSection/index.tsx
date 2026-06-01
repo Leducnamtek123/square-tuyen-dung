@@ -1,5 +1,5 @@
- 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+'use client';
+import React, { useCallback, useRef, useState } from 'react';
 
 interface LazyLoadSectionProps {
   children: React.ReactNode;
@@ -9,35 +9,39 @@ interface LazyLoadSectionProps {
 
 const LazyLoadSection = ({ children, rootMargin = '200px', minHeight = '300px' }: LazyLoadSectionProps) => {
   const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  useEffect(() => {
-    // If IntersectionObserver is not supported, just render the content
-    if (!('IntersectionObserver' in window)) {
+  const setSectionRef = useCallback((node: HTMLDivElement | null) => {
+    observerRef.current?.disconnect();
+    observerRef.current = null;
+
+    if (!node || isVisible) {
+      return;
+    }
+
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
       setIsVisible(true);
       return;
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0]?.isIntersecting) {
           setIsVisible(true);
           observer.disconnect();
+          observerRef.current = null;
         }
       },
       { rootMargin }
     );
 
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => observer.disconnect();
-  }, [rootMargin]);
+    observer.observe(node);
+    observerRef.current = observer;
+  }, [isVisible, rootMargin]);
 
   // Once visible, maintain the children without the minHeight wrapper restriction if it's dynamic
   return (
-    <div ref={ref} style={{ minHeight: isVisible ? 'auto' : minHeight }}>
+    <div ref={setSectionRef} style={{ minHeight: isVisible ? 'auto' : minHeight }}>
       {isVisible ? children : null}
     </div>
   );

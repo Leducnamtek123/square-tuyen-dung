@@ -240,26 +240,26 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
 
       {/* Control bar */}
       <div className="flex items-center justify-center gap-3 border-t border-white/8 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl">
-        <button onClick={() => setMicOn(!micOn)}
+        <button type="button" aria-label={micOn ? 'Turn microphone off' : 'Turn microphone on'} onClick={() => setMicOn(!micOn)}
           className={`flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border transition-all
             ${micOn ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}>
           <FontAwesomeIcon icon={micOn ? faMicrophone : faMicrophoneSlash} />
         </button>
-        <button onClick={() => setCamOn(!camOn)}
+        <button type="button" aria-label={camOn ? 'Turn camera off' : 'Turn camera on'} onClick={() => setCamOn(!camOn)}
           className={`flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border transition-all
             ${camOn ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}>
           <FontAwesomeIcon icon={camOn ? faVideo : faVideoSlash} />
         </button>
-        <button className="flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border border-white/15 bg-white/8 text-white hover:bg-white/15 transition-all">
+        <button type="button" aria-label="Share screen" className="flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border border-white/15 bg-white/8 text-white hover:bg-white/15 transition-all">
           <FontAwesomeIcon icon={faDesktop} />
         </button>
-        <button onClick={() => setChatOpen(!chatOpen)}
+        <button type="button" aria-label={chatOpen ? 'Close chat' : 'Open chat'} onClick={() => setChatOpen(!chatOpen)}
           className={`flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border transition-all
             ${chatOpen ? 'border-cyan-400/40 bg-cyan-500/20 text-cyan-300' : 'border-white/15 bg-white/8 text-white hover:bg-white/15'}`}>
           <FontAwesomeIcon icon={faComment} />
         </button>
         <div className="mx-2 h-6 w-px bg-white/10" />
-        <button onClick={onEnd}
+        <button type="button" onClick={onEnd}
           className="flex h-11 items-center gap-2 rounded-[var(--sq-button-radius)] border border-rose-400/40 bg-rose-500/20 px-5 text-sm font-semibold text-rose-300 hover:bg-rose-500/30 transition-all">
           <FontAwesomeIcon icon={faPhoneSlash} />
           Kết thúc
@@ -299,7 +299,7 @@ export default function InterviewPreviewPage() {
       {/* Step switcher */}
       <div className="mb-4 flex gap-2 rounded-2xl border border-white/8 bg-zinc-900/40 p-2">
         {STEPS.map(s => (
-          <button key={s.key} onClick={() => setStep(s.key)}
+          <button key={s.key} type="button" onClick={() => setStep(s.key)}
             className={`flex-1 rounded-[var(--sq-button-radius)] px-3 py-2.5 text-left transition-all duration-200
               ${step === s.key ? 'bg-cyan-500/15 border border-cyan-400/30' : 'border border-transparent hover:bg-white/5'}`}>
             <p className={`text-xs font-semibold ${step === s.key ? 'text-cyan-300' : 'text-zinc-400'}`}>{s.label}</p>

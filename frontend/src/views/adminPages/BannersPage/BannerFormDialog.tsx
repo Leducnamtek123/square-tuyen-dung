@@ -209,7 +209,7 @@ const BannerFormDialog = ({
 
           <Typography variant="subtitle2" sx={{ mt: 1, fontWeight: 600 }}>{t('pages.banners.form.webImageLabel')}</Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <input ref={webInputRef} type="file" accept="image/*" hidden onChange={onFileSelect('web')} />
+            <input ref={webInputRef} type="file" aria-label={t('pages.banners.form.webImageLabel')} accept="image/*" hidden onChange={onFileSelect('web')} />
             <Button variant="outlined" startIcon={<UploadFileIcon />} onClick={onPickWebImage}>
               {webImage ? webImage.name : t('pages.banners.form.chooseWeb')}
             </Button>
@@ -225,7 +225,7 @@ const BannerFormDialog = ({
 
           <Typography variant="subtitle2" sx={{ mt: 1, fontWeight: 600 }}>{t('pages.banners.form.mobileImageLabel')}</Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <input ref={mobileInputRef} type="file" accept="image/*" hidden onChange={onFileSelect('mobile')} />
+            <input ref={mobileInputRef} type="file" aria-label={t('pages.banners.form.mobileImageLabel')} accept="image/*" hidden onChange={onFileSelect('mobile')} />
             <Button variant="outlined" startIcon={<UploadFileIcon />} onClick={onPickMobileImage}>
               {mobileImage ? mobileImage.name : t('pages.banners.form.chooseMobile')}
             </Button>

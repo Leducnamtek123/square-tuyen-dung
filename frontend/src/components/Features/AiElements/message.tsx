@@ -260,7 +260,6 @@ const MessageBranchSelector = ({
 
   return (
     <div
-      role="group"
       className={cn(
         "inline-flex gap-1 [&>*:not(:first-child)]:rounded-l-md [&>*:not(:last-child)]:rounded-r-md",
         className

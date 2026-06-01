@@ -337,6 +337,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
             <input
               ref={fileInputRef}
               type="file"
+              aria-label="Article thumbnail"
               accept="image/*"
               style={{ display: 'none' }}
               onChange={handleThumbnailChange}

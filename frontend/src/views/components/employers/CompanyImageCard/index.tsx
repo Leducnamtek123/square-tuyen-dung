@@ -247,6 +247,7 @@ const CompanyImageCard = () => {
       <input
         ref={fileInputRef}
         type="file"
+        aria-label={t('common:actions.upload')}
         accept="image/*"
         style={{ display: 'none' }}
         onChange={handleFileChange}

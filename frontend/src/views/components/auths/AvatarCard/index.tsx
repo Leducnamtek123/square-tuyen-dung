@@ -284,6 +284,7 @@ const AvatarCard = () => {
       <input
         ref={fileInputRef}
         type="file"
+        aria-label={t('account.avatar')}
         accept="image/*"
         style={{ display: 'none' }}
         onChange={handleFileChange}

@@ -141,6 +141,7 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
               <input
                 name={name}
                 hidden
+                aria-label={title || t('fileUpload.selectFile')}
                 accept=".pdf"
                 type="file"
                 ref={inputRef}

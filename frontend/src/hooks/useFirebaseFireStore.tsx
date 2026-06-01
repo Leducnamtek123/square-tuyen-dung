@@ -28,18 +28,18 @@ const useFirebaseFireStore = <T extends FirestoreDoc = FirestoreDoc>(
   limitNum: number = 50
 ): T[] => {
   const [docs, setDocs] = React.useState<T[]>([]);
+  const hasInvalidCondition = Boolean(condition && !condition.compareValue);
 
   React.useEffect(() => {
+    if (hasInvalidCondition) {
+      return;
+    }
+
     const collectionRef = collection(db, collectionName);
 
     let q = query(collectionRef, orderBy('createdAt', sort), fbLimit(limitNum));
 
     if (condition) {
-      if (!condition.compareValue) {
-        setDocs([]);
-        return;
-      }
-
       q = query(
         collectionRef,
         where(condition.fieldName, condition.operator, condition.compareValue),
@@ -57,9 +57,9 @@ const useFirebaseFireStore = <T extends FirestoreDoc = FirestoreDoc>(
     });
 
     return unsubscribe;
-  }, [collectionName, condition, limitNum, sort]);
+  }, [collectionName, condition, hasInvalidCondition, limitNum, sort]);
 
-  return docs;
+  return hasInvalidCondition ? [] : docs;
 };
 
 export default useFirebaseFireStore;

@@ -283,6 +283,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
             <input
               ref={fileInputRef}
               type="file"
+              aria-label="Blog thumbnail"
               accept="image/*"
               style={{ display: 'none' }}
               onChange={handleThumbnailChange}

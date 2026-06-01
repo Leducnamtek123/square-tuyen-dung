@@ -371,6 +371,7 @@ const CompanyCard = () => {
       <input
         ref={logoInputRef}
         type="file"
+        aria-label={t('companyProfile.labels.changeLogo')}
         accept="image/*"
         style={{ display: 'none' }}
         onChange={handleFileSelect('logo')}
@@ -378,6 +379,7 @@ const CompanyCard = () => {
       <input
         ref={coverInputRef}
         type="file"
+        aria-label={t('companyProfile.labels.changeCover')}
         accept="image/*"
         style={{ display: 'none' }}
         onChange={handleFileSelect('cover')}

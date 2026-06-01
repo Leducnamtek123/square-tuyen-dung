@@ -311,6 +311,7 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
                   ref={evidenceInputRef}
                   hidden
                   type="file"
+                  aria-label={t('feedback.evidenceImageLabel', { defaultValue: 'Evidence image' })}
                   accept="image/*"
                   onChange={handleEvidenceImageChange}
                 />

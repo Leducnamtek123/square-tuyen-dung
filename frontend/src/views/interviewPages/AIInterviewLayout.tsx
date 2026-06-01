@@ -69,6 +69,8 @@ function CustomControlBar({
   return (
     <div className="flex items-center justify-center gap-3 border-t border-white/8 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl">
       <button
+        type="button"
+        aria-label={isMicrophoneEnabled ? t('controls.muteMicrophone', 'Turn microphone off') : t('controls.unmuteMicrophone', 'Turn microphone on')}
         onClick={() => localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)}
         className={`flex size-11 items-center justify-center rounded-full border transition-all
           ${isMicrophoneEnabled ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}
@@ -76,6 +78,8 @@ function CustomControlBar({
         <FontAwesomeIcon icon={isMicrophoneEnabled ? faMicrophone : faMicrophoneSlash} />
       </button>
       <button
+        type="button"
+        aria-label={isCameraEnabled ? t('controls.turnCameraOff', 'Turn camera off') : t('controls.turnCameraOn', 'Turn camera on')}
         onClick={() => localParticipant.setCameraEnabled(!isCameraEnabled)}
         className={`flex size-11 items-center justify-center rounded-full border transition-all
           ${isCameraEnabled ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}
@@ -83,6 +87,8 @@ function CustomControlBar({
         <FontAwesomeIcon icon={isCameraEnabled ? faVideo : faVideoSlash} />
       </button>
       <button
+        type="button"
+        aria-label={isScreenShareEnabled ? t('controls.stopScreenShare', 'Stop screen share') : t('controls.startScreenShare', 'Start screen share')}
         onClick={() => localParticipant.setScreenShareEnabled(!isScreenShareEnabled)}
         className={`flex size-11 items-center justify-center rounded-full border transition-all
           ${isScreenShareEnabled ? 'border-cyan-400/40 bg-cyan-500/20 text-cyan-300' : 'border-white/15 bg-white/8 text-white hover:bg-white/15'}`}
@@ -90,6 +96,8 @@ function CustomControlBar({
         <FontAwesomeIcon icon={faDesktop} />
       </button>
       <button
+        type="button"
+        aria-label={chatOpen ? t('liveRoom.chat.close', 'Close chat') : t('liveRoom.chat.open', 'Open chat')}
         onClick={() => setChatOpen(!chatOpen)}
         className={`flex size-11 items-center justify-center rounded-full border transition-all
           ${chatOpen ? 'border-cyan-400/40 bg-cyan-500/20 text-cyan-300' : 'border-white/15 bg-white/8 text-white hover:bg-white/15'}`}
@@ -98,6 +106,7 @@ function CustomControlBar({
       </button>
       <div className="mx-2 h-6 w-px bg-white/10" />
       <button
+        type="button"
         onClick={async () => {
           if (ending) return;
           setEnding(true);
@@ -563,6 +572,7 @@ function ChatPanel({
             )}
             <Stack direction="row" spacing={1}>
               <input
+                aria-label={inputPlaceholder}
                 value={chatDraft}
                 onChange={(event) => setChatDraft(event.target.value)}
                 placeholder={inputPlaceholder}

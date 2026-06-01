@@ -57,15 +57,15 @@ export const ChatWindowComposer = ({
       bgcolor: 'background.paper',
     }}
   >
-    <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={onFileUpload} />
-    <IconButton size="small" sx={{ mr: 1 }} disabled={isUploading} onClick={onOpenFilePicker}>
+    <input type="file" ref={fileInputRef} aria-label="Attach file" style={{ display: 'none' }} onChange={onFileUpload} />
+    <IconButton size="small" aria-label="Attach file" sx={{ mr: 1 }} disabled={isUploading} onClick={onOpenFilePicker}>
       {isUploading ? (
         <CircularProgress size={20} variant="determinate" value={uploadProgress} />
       ) : (
         <AttachFileIcon fontSize="small" />
       )}
     </IconButton>
-    <IconButton size="small" sx={{ mr: 1 }} onClick={onEmojiClick}>
+    <IconButton size="small" aria-label="Choose emoji" sx={{ mr: 1 }} onClick={onEmojiClick}>
       <SentimentSatisfiedAltIcon fontSize="small" />
     </IconButton>
 
@@ -82,12 +82,14 @@ export const ChatWindowComposer = ({
     <InputBase
       sx={{ ml: 1, flex: 1, fontSize: 14 }}
       placeholder={placeholderText}
+      inputProps={{ 'aria-label': placeholderText }}
       value={inputValue}
       onChange={(event) => onInputChange(event.target.value)}
       inputRef={inputRef}
     />
     <IconButton
       type="submit"
+      aria-label="Send message"
       disabled={!inputValue.trim()}
       sx={{
         ml: 1,
