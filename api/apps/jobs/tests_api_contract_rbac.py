@@ -74,7 +74,7 @@ def test_jobseeker_profile_endpoint_blocks_access_to_other_user_profile(job_seek
 
 
 @pytest.mark.django_db
-def test_employer_send_email_nonexistent_activity_returns_404(employer_user):
+def test_employer_send_email_nonexistent_activity_returns_404(employer_user, company):
     client = APIClient()
     client.force_authenticate(user=employer_user)
 

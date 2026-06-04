@@ -23,6 +23,8 @@ import type { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-
 import { AppliedResumeFilterData } from '../AppliedResumeFilterForm';
 import AppliedResumeToolbar from './AppliedResumeToolbar';
 import EmployeeFromApplicationDialog from '../EmployeeFromApplicationDialog';
+import ManualCandidateForm from '../ManualCandidateForm';
+import type { ManualCandidateFormValues } from '../ManualCandidateForm';
 
 interface AppliedResumeCardProps {
   title: string;
@@ -43,6 +45,22 @@ const defaultFilterData: AppliedResumeFilterData = {
 };
 
 const hasFilterValue = (value: unknown) => value !== '' && value !== null && value !== undefined;
+const MANUAL_CANDIDATE_FORM_ID = 'manual-applied-candidate-form';
+
+const appendManualCandidateValue = (formData: FormData, key: string, value: unknown) => {
+  if (value == null || value === '') return;
+  if (value instanceof File) {
+    formData.append(key, value);
+    return;
+  }
+  formData.append(key, String(value));
+};
+
+const buildManualCandidateFormData = (data: ManualCandidateFormValues) => {
+  const formData = new FormData();
+  Object.entries(data).forEach(([key, value]) => appendManualCandidateValue(formData, key, value));
+  return formData;
+};
 
 type AppliedResumeState = {
   viewMode: 'table' | 'board';
@@ -124,6 +142,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initialState);
   const [employeeSourceActivity, setEmployeeSourceActivity] = React.useState<JobPostActivity | null>(null);
+  const [manualCandidatePopupOpen, setManualCandidatePopupOpen] = React.useState(false);
 
   const {
     page,
@@ -168,6 +187,15 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   const { data: queryData, isLoading } = useAppliedResumes(queryParams);
   const { deleteJobPostActivity, isMutating: isDeleting } = useDeleteJobPostActivity();
   const { updateStatus, isMutating: isUpdatingStatus } = useUpdateApplicationStatus();
+  const manualCandidateMutation = useMutation({
+    mutationFn: (payload: FormData) => jobPostActivityService.createManualAppliedCandidate(payload),
+    onSuccess: () => {
+      toastMessages.success(t('employer:manualCandidate.messages.createSuccess'));
+      setManualCandidatePopupOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
+    },
+    onError: (error) => errorHandling(error),
+  });
   const createEmployeeMutation = useMutation({
     mutationFn: (payload: EmployeeFromApplicationPayload) => hrmService.createEmployeeFromApplication(payload),
     onSuccess: () => {
@@ -243,6 +271,10 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     } finally {
       dispatch({ type: 'set_processing', payload: false });
     }
+  };
+
+  const handleCreateManualCandidate = async (data: ManualCandidateFormValues) => {
+    await manualCandidateMutation.mutateAsync(buildManualCandidateFormData(data));
   };
 
   const handleChangeApplicationStatus = async (id: string | number, value: string | number, callback: (result: boolean) => void) => {
@@ -325,6 +357,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
           numbersFilter={Object.values(state.filterData).filter(hasFilterValue).length}
           onResetFilterData={handleResetFilterData}
           onOpenFilterPopup={() => dispatch({ type: 'open_popup' })}
+          onOpenManualCandidatePopup={() => setManualCandidatePopupOpen(true)}
           onExport={handleExport}
         />
 
@@ -359,7 +392,23 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
           <AppliedResumeFilterForm handleFilter={handleFilter} filterData={state.filterData} />
         </FormPopup>
 
-        {(state.isProcessing || isDeleting || isUpdatingStatus) && <BackdropLoading />}
+        <FormPopup
+          title={t('employer:manualCandidate.appliedDialogTitle')}
+          openPopup={manualCandidatePopupOpen}
+          setOpenPopup={setManualCandidatePopupOpen}
+          buttonText={t('employer:manualCandidate.actions.save')}
+          isSubmitting={manualCandidateMutation.isPending}
+          formId={MANUAL_CANDIDATE_FORM_ID}
+        >
+          <ManualCandidateForm
+            formId={MANUAL_CANDIDATE_FORM_ID}
+            onSubmit={handleCreateManualCandidate}
+            jobPostOptions={jobPostOptions}
+            requireJobPost
+          />
+        </FormPopup>
+
+        {(state.isProcessing || isDeleting || isUpdatingStatus || manualCandidateMutation.isPending) && <BackdropLoading />}
       </Paper>
       <EmployeeFromApplicationDialog
         open={Boolean(employeeSourceActivity)}

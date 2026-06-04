@@ -21,6 +21,7 @@ import ViewKanbanIcon from '@mui/icons-material/ViewKanban';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import SpeedIcon from '@mui/icons-material/Speed';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { alpha, useTheme } from '@mui/material/styles';
 import type { TFunction } from 'i18next';
 import type { SelectOption, SystemConfig } from '@/types/models';
@@ -48,6 +49,7 @@ interface Props {
   numbersFilter: number;
   onResetFilterData: () => void;
   onOpenFilterPopup: () => void;
+  onOpenManualCandidatePopup: () => void;
   onExport: () => void;
 }
 
@@ -71,6 +73,7 @@ const AppliedResumeToolbar: React.FC<Props> = ({
   numbersFilter,
   onResetFilterData,
   onOpenFilterPopup,
+  onOpenManualCandidatePopup,
   onExport,
 }) => {
   const theme = useTheme();
@@ -186,6 +189,22 @@ const AppliedResumeToolbar: React.FC<Props> = ({
 
           <Button
             variant="contained"
+            color="secondary"
+            startIcon={<PersonAddIcon />}
+            onClick={onOpenManualCandidatePopup}
+            sx={{
+              px: 3,
+              py: 1.25,
+              fontWeight: 900,
+              textTransform: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {t('employer:manualCandidate.actions.add')}
+          </Button>
+
+          <Button
+            variant="contained"
             color="primary"
             startIcon={<FileDownloadOutlinedIcon />}
             onClick={onExport}
@@ -258,6 +277,7 @@ const AppliedResumeToolbar: React.FC<Props> = ({
               disablePortal
               size="small"
               options={jobPostOptions}
+              noOptionsText={t('common:noOptions')}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -286,6 +306,7 @@ const AppliedResumeToolbar: React.FC<Props> = ({
               disablePortal
               size="small"
               options={allConfig?.applicationStatusOptions || []}
+              noOptionsText={t('common:noOptions')}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -314,6 +335,7 @@ const AppliedResumeToolbar: React.FC<Props> = ({
               disablePortal
               size="small"
               options={aiAnalysisStatusOptions}
+              noOptionsText={t('common:noOptions')}
               renderInput={(params) => (
                 <TextField
                   {...params}

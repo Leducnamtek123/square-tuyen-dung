@@ -407,6 +407,37 @@ class QuestionBankPermissionTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertFalse(QuestionGroup.objects.filter(name="Invalid scoped group").exists())
 
+    def test_member_cannot_modify_or_delete_global_question_bank_items(self):
+        global_question = Question.objects.create(text="Global question")
+        global_group = QuestionGroup.objects.create(name="Global group")
+        global_group.questions.add(global_question)
+
+        question_update_response = self.client.patch(
+            f"/api/v1/interview/web/questions/{global_question.id}/",
+            data={"text": "Changed global question"},
+            format="json",
+        )
+        question_delete_response = self.client.delete(
+            f"/api/v1/interview/web/questions/{global_question.id}/",
+        )
+        group_update_response = self.client.patch(
+            f"/api/v1/interview/web/question-groups/{global_group.id}/",
+            data={"name": "Changed global group"},
+            format="json",
+        )
+        group_delete_response = self.client.delete(
+            f"/api/v1/interview/web/question-groups/{global_group.id}/",
+        )
+
+        self.assertEqual(question_update_response.status_code, 403)
+        self.assertEqual(question_delete_response.status_code, 403)
+        self.assertEqual(group_update_response.status_code, 403)
+        self.assertEqual(group_delete_response.status_code, 403)
+        global_question.refresh_from_db()
+        global_group.refresh_from_db()
+        self.assertEqual(global_question.text, "Global question")
+        self.assertEqual(global_group.name, "Global group")
+
 
 class InterviewSessionAPITests(TestCase):
     """Tests that the session API accepts snake_case fields and rejects camelCase."""
@@ -474,6 +505,27 @@ class InterviewSessionAPITests(TestCase):
             format="json",
         )
         self.assertEqual(response.status_code, 400)
+
+    def test_create_session_rejects_non_job_seeker_candidate(self):
+        other_employer = User.objects.create_user_with_role_name(
+            email="invalid-candidate-employer@example.com",
+            full_name="Invalid Candidate Employer",
+            role_name=var_sys.EMPLOYER,
+            password="password123",
+            has_company=True,
+        )
+
+        response = self.client.post(
+            "/api/v1/interview/web/sessions/",
+            data={
+                "candidate": other_employer.pk,
+                "type": "mixed",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(InterviewSession.objects.filter(candidate=other_employer).exists())
 
     def test_candidate_cannot_request_employer_monitoring_actions(self):
         session = InterviewSession.objects.create(

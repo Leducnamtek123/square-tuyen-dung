@@ -9,7 +9,7 @@ from rest_framework.test import APIClient
 from apps.profiles.models import (
     Resume, Company, CompanyFollowed,
     JobSeekerProfile, ResumeViewed, ResumeSaved,
-    EducationDetail, ExperienceDetail,
+    EducationDetail, ExperienceDetail, Certificate, LanguageSkill, AdvancedSkill,
     CompanyVerification, TrustReport, CompanyRole, CompanyMember
 )
 from apps.profiles.services import ResumeService, CompanyService, ensure_company_system_roles
@@ -149,6 +149,19 @@ class TestResumeService:
         assert created is False
         assert ResumeViewed.objects.filter(company=company, resume=resume).count() == 1
 
+    def test_saved_resume_export_handles_missing_profile_location(self, employer_user, company, resume):
+        resume.job_seeker_profile.location = None
+        resume.job_seeker_profile.save(update_fields=["location", "update_at"])
+        ResumeSaved.objects.create(company=company, resume=resume)
+
+        client = APIClient()
+        client.force_authenticate(user=employer_user)
+
+        response = client.get("/api/v1/info/web/resumes-saved/export/")
+
+        assert response.status_code == 200
+        assert response.data["data"]
+
 
 @pytest.mark.django_db
 class TestCompanyService:
@@ -215,6 +228,225 @@ def test_company_owner_member_me_returns_owner_system_role(employer_user, compan
     data = response.data["data"]
     assert data["isOwner"] is True
     assert data["role"]["code"] == "owner"
+
+
+@pytest.mark.django_db
+def test_employer_can_create_and_list_manual_candidate(employer_user, company, career, city):
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.post(
+        "/api/v1/info/web/employer-candidates/",
+        {
+            "fullName": "Nguyen Van A",
+            "email": "candidate-a@example.com",
+            "phone": "0901000001",
+            "title": "Frontend Developer",
+            "salaryMin": 12000000,
+            "salaryMax": 22000000,
+            "experience": 2,
+            "position": 3,
+            "academicLevel": 2,
+            "typeOfWorkplace": 1,
+            "jobType": 1,
+            "career": career.id,
+            "city": city.id,
+            "description": "Candidate added by HR.",
+            "skillsSummary": "React, TypeScript",
+            "note": "Met at career fair.",
+        },
+        format="json",
+    )
+
+    assert response.status_code == 201
+    created = response.data["data"]
+    assert created["fullName"] == "Nguyen Van A"
+    assert created["company"] == company.id
+    assert created["slug"]
+
+    list_response = client.get("/api/v1/info/web/employer-candidates/")
+
+    assert list_response.status_code == 200
+    results = list_response.data["results"]
+    assert [item["fullName"] for item in results] == ["Nguyen Van A"]
+
+
+@pytest.mark.django_db
+def test_employer_manual_candidates_are_scoped_to_active_company(
+    employer_user,
+    company,
+    location,
+):
+    from apps.accounts.models import User
+
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+    create_response = client.post(
+        "/api/v1/info/web/employer-candidates/",
+        {
+            "fullName": "Private Candidate",
+            "title": "Backend Developer",
+        },
+        format="json",
+    )
+    assert create_response.status_code == 201
+
+    other_user = User.objects.create_user_with_role_name(
+        email="other-employer@test.com",
+        full_name="Other Employer",
+        role_name=var_sys.EMPLOYER,
+        password="pass123",
+        is_active=True,
+        has_company=True,
+    )
+    Company.objects.create(
+        company_name="Other Company",
+        company_email="other-company@test.com",
+        company_phone="0902000000",
+        tax_code="9999999999",
+        user=other_user,
+        location=location,
+    )
+
+    client.force_authenticate(user=other_user)
+    list_response = client.get("/api/v1/info/web/employer-candidates/")
+
+    assert list_response.status_code == 200
+    assert list_response.data["results"] == []
+
+
+@pytest.mark.django_db
+def test_employer_can_delete_own_manual_candidate(employer_user, company):
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+    create_response = client.post(
+        "/api/v1/info/web/employer-candidates/",
+        {
+            "fullName": "Delete Me",
+            "title": "QA Engineer",
+        },
+        format="json",
+    )
+    slug = create_response.data["data"]["slug"]
+
+    delete_response = client.delete(f"/api/v1/info/web/employer-candidates/{slug}/")
+    list_response = client.get("/api/v1/info/web/employer-candidates/")
+
+    assert delete_response.status_code == 204
+    assert list_response.data["results"] == []
+
+
+@pytest.mark.django_db
+def test_job_seeker_cannot_create_manual_candidate(job_seeker_user):
+    client = APIClient()
+    client.force_authenticate(user=job_seeker_user)
+
+    response = client.post(
+        "/api/v1/info/web/employer-candidates/",
+        {
+            "fullName": "Blocked Candidate",
+            "title": "Designer",
+        },
+        format="json",
+    )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_job_seeker_cannot_create_resume_details_for_other_user_resume(
+    job_seeker_user,
+    location,
+    career,
+    city,
+):
+    other_user = job_seeker_user.__class__.objects.create_user_with_role_name(
+        email="other-resume-owner@test.com",
+        full_name="Other Resume Owner",
+        role_name=var_sys.JOB_SEEKER,
+        password="pass123",
+        is_active=True,
+    )
+    other_profile = JobSeekerProfile.objects.create(
+        user=other_user,
+        phone="0903000000",
+        location=location,
+    )
+    other_resume = Resume.objects.create(
+        title="Other Owner Resume",
+        description="Private resume",
+        salary_min=10000000,
+        salary_max=20000000,
+        experience=2,
+        is_active=True,
+        user=other_user,
+        job_seeker_profile=other_profile,
+        career=career,
+        city=city,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=job_seeker_user)
+
+    cases = [
+        (
+            "/api/v1/info/web/educations-detail/",
+            {
+                "degreeName": "Bachelor",
+                "major": "Software Engineering",
+                "trainingPlaceName": "University",
+                "startDate": "2020-01-01",
+                "resumeId": other_resume.id,
+            },
+            EducationDetail,
+        ),
+        (
+            "/api/v1/info/web/experiences-detail/",
+            {
+                "jobName": "Developer",
+                "companyName": "Private Company",
+                "startDate": "2020-01-01",
+                "endDate": "2021-01-01",
+                "resumeId": other_resume.id,
+            },
+            ExperienceDetail,
+        ),
+        (
+            "/api/v1/info/web/certificates-detail/",
+            {
+                "name": "Private Certificate",
+                "trainingPlace": "Private Center",
+                "startDate": "2020-01-01",
+                "resumeId": other_resume.id,
+            },
+            Certificate,
+        ),
+        (
+            "/api/v1/info/web/language-skills/",
+            {
+                "language": 2,
+                "level": 3,
+                "resumeId": other_resume.id,
+            },
+            LanguageSkill,
+        ),
+        (
+            "/api/v1/info/web/advanced-skills/",
+            {
+                "name": "Private Skill",
+                "level": 4,
+                "resumeId": other_resume.id,
+            },
+            AdvancedSkill,
+        ),
+    ]
+
+    for endpoint, payload, model in cases:
+        response = client.post(endpoint, payload, format="json")
+        assert response.status_code == 400, endpoint
+        assert not model.objects.filter(resume=other_resume).exists(), endpoint
+
+    assert not EducationDetail.objects.filter(resume=other_resume).exists()
 
 
 @pytest.mark.django_db
@@ -289,6 +521,211 @@ def test_company_member_update_cannot_change_user(employer_user, company):
     assert response.status_code == 400
     member.refresh_from_db()
     assert member.user_id == member_user.id
+
+
+@pytest.mark.django_db
+def test_company_member_and_role_actions_are_scoped_to_active_company(employer_user, company):
+    other_owner = company.user.__class__.objects.create_user_with_role_name(
+        email="other-scope-owner@test.com",
+        full_name="Other Scope Owner",
+        role_name=var_sys.EMPLOYER,
+        password="pass123",
+        is_active=True,
+        has_company=True,
+    )
+    other_member_user = company.user.__class__.objects.create_user_with_role_name(
+        email="other-scope-member@test.com",
+        full_name="Other Scope Member",
+        role_name=var_sys.JOB_SEEKER,
+        password="pass123",
+        is_active=True,
+    )
+    other_company = Company.objects.create(
+        company_name="Other Scope Company",
+        company_email="other-scope-company@test.com",
+        company_phone="0907000000",
+        tax_code="SCOPE0001",
+        user=other_owner,
+    )
+    other_role = CompanyRole.objects.create(
+        company=other_company,
+        code="other-hr",
+        name="Other HR",
+        permissions=["manage_members"],
+    )
+    other_member = CompanyMember.objects.create(
+        company=other_company,
+        user=other_member_user,
+        role=other_role,
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    list_response = client.get("/api/v1/info/web/company-members/")
+    assert list_response.status_code == 200
+    assert other_member.id not in [item["id"] for item in list_response.data["results"]]
+
+    member_update_response = client.patch(
+        f"/api/v1/info/web/company-members/{other_member.id}/",
+        {"status": CompanyMember.STATUS_DISABLED},
+        format="json",
+    )
+    member_delete_response = client.delete(f"/api/v1/info/web/company-members/{other_member.id}/")
+    role_update_response = client.patch(
+        f"/api/v1/info/web/company-roles/{other_role.id}/",
+        {"name": "Changed Other HR"},
+        format="json",
+    )
+    role_delete_response = client.delete(f"/api/v1/info/web/company-roles/{other_role.id}/")
+
+    assert member_update_response.status_code == 404
+    assert member_delete_response.status_code == 404
+    assert role_update_response.status_code == 404
+    assert role_delete_response.status_code == 404
+
+    other_member.refresh_from_db()
+    other_role.refresh_from_db()
+    assert other_member.status == CompanyMember.STATUS_ACTIVE
+    assert other_role.name == "Other HR"
+
+
+@pytest.mark.django_db
+def test_company_role_manager_cannot_grant_permissions_they_do_not_have(company):
+    role_manager_user = company.user.__class__.objects.create_user_with_role_name(
+        email="role-manager@test.com",
+        full_name="Role Manager",
+        role_name=var_sys.JOB_SEEKER,
+        password="pass123",
+        is_active=True,
+    )
+    role_manager = CompanyRole.objects.create(
+        company=company,
+        code="role-manager",
+        name="Role Manager",
+        permissions=["manage_roles"],
+    )
+    CompanyMember.objects.create(
+        company=company,
+        user=role_manager_user,
+        role=role_manager,
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=role_manager_user)
+
+    create_response = client.post(
+        "/api/v1/info/web/company-roles/",
+        {
+            "code": "escalated-role",
+            "name": "Escalated Role",
+            "permissions": ["manage_roles", "manage_members"],
+        },
+        format="json",
+    )
+    update_response = client.patch(
+        f"/api/v1/info/web/company-roles/{role_manager.id}/",
+        {"permissions": ["*"]},
+        format="json",
+    )
+
+    assert create_response.status_code == 403
+    assert update_response.status_code == 403
+    role_manager.refresh_from_db()
+    assert role_manager.permissions == ["manage_roles"]
+    assert not CompanyRole.objects.filter(company=company, code="escalated-role").exists()
+
+
+@pytest.mark.django_db
+def test_company_role_rejects_unknown_permission_key(employer_user, company):
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.post(
+        "/api/v1/info/web/company-roles/",
+        {
+            "code": "invalid-permission-role",
+            "name": "Invalid Permission Role",
+            "permissions": ["manage_members", "not_a_real_permission"],
+        },
+        format="json",
+    )
+
+    assert response.status_code == 400
+    assert not CompanyRole.objects.filter(company=company, code="invalid-permission-role").exists()
+
+
+@pytest.mark.django_db
+def test_company_system_role_permissions_cannot_be_changed(employer_user, company):
+    roles = ensure_company_system_roles(company)
+    owner_role = roles["owner"]
+
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.patch(
+        f"/api/v1/info/web/company-roles/{owner_role.id}/",
+        {"permissions": ["manage_members"]},
+        format="json",
+    )
+
+    assert response.status_code == 400
+    owner_role.refresh_from_db()
+    assert owner_role.permissions == ["*"]
+
+
+@pytest.mark.django_db
+def test_company_member_manager_cannot_assign_role_with_permissions_they_do_not_have(company):
+    roles = ensure_company_system_roles(company)
+    hr_user = company.user.__class__.objects.create_user_with_role_name(
+        email="hr-member-manager@test.com",
+        full_name="HR Member Manager",
+        role_name=var_sys.JOB_SEEKER,
+        password="pass123",
+        is_active=True,
+    )
+    target_user = company.user.__class__.objects.create_user_with_role_name(
+        email="target-owner-role@test.com",
+        full_name="Target Owner Role",
+        role_name=var_sys.JOB_SEEKER,
+        password="pass123",
+        is_active=True,
+    )
+    hr_member = CompanyMember.objects.create(
+        company=company,
+        user=hr_user,
+        role=roles["hr"],
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=hr_user)
+
+    create_response = client.post(
+        "/api/v1/info/web/company-members/",
+        {
+            "userId": target_user.id,
+            "roleId": roles["owner"].id,
+            "status": CompanyMember.STATUS_ACTIVE,
+        },
+        format="json",
+    )
+    update_response = client.patch(
+        f"/api/v1/info/web/company-members/{hr_member.id}/",
+        {"roleId": roles["owner"].id},
+        format="json",
+    )
+
+    assert create_response.status_code == 403
+    assert update_response.status_code == 403
+    hr_member.refresh_from_db()
+    assert hr_member.role_id == roles["hr"].id
+    assert not CompanyMember.objects.filter(company=company, user=target_user).exists()
 
 
 @pytest.mark.django_db

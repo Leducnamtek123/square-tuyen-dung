@@ -487,7 +487,7 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
 
 class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
-    userId = serializers.IntegerField(source="user.id", read_only=True)
+    userId = serializers.SerializerMethodField(method_name="get_user_id", read_only=True)
 
     fullName = serializers.CharField(source="full_name", required=True, max_length=100)
 
@@ -495,14 +495,16 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
 
     phone = serializers.CharField(required=True, max_length=15)
 
-    title = serializers.ReadOnlyField(source="resume.title")
+    title = serializers.SerializerMethodField(method_name="get_title", read_only=True)
 
-    type = serializers.ReadOnlyField(source="resume.type")
+    type = serializers.SerializerMethodField(method_name="get_type", read_only=True)
 
-    resumeSlug = serializers.ReadOnlyField(source="resume.slug")
+    resumeSlug = serializers.SerializerMethodField(method_name="get_resume_slug", read_only=True)
 
     jobName = serializers.ReadOnlyField(source="job_post.job_name")
     statusName = serializers.SerializerMethodField()
+    isManualCandidate = serializers.SerializerMethodField(method_name="get_is_manual_candidate", read_only=True)
+    manualCandidateProfile = serializers.IntegerField(source="manual_candidate_profile_id", read_only=True)
     hrmEmployeeId = serializers.CharField(source="frappe_employee_id", read_only=True)
     hrmUserId = serializers.CharField(source="frappe_user_id", read_only=True)
     hrmSyncStatus = serializers.CharField(source="frappe_sync_status", read_only=True)
@@ -555,9 +557,36 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
 
     resumeFileUrl = serializers.SerializerMethodField(method_name='get_resume_file_url', read_only=True)
 
+    def get_user_id(self, activity):
+        return activity.user_id
+
+    def get_title(self, activity):
+        if activity.resume:
+            return activity.resume.title
+        if activity.manual_candidate_profile:
+            return activity.manual_candidate_profile.title
+        return None
+
+    def get_type(self, activity):
+        if activity.resume:
+            return activity.resume.type
+        if activity.manual_candidate_profile:
+            return var_sys.CV_UPLOAD if activity.manual_candidate_profile.file else ""
+        return ""
+
+    def get_resume_slug(self, activity):
+        if activity.resume:
+            return activity.resume.slug
+        return None
+
+    def get_is_manual_candidate(self, activity):
+        return bool(activity.manual_candidate_profile_id)
+
     def get_resume_file_url(self, activity):
         if activity.resume and activity.resume.file:
             return activity.resume.file.get_full_url()
+        if activity.manual_candidate_profile and activity.manual_candidate_profile.file:
+            return activity.manual_candidate_profile.file.get_full_url()
         return None
 
     def get_ai_analysis_reviewed_by(self, activity):
@@ -593,6 +622,14 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
 
     def get_user_dict(self, activity):
         user = activity.user
+        if not user:
+            return {
+                "id": None,
+                "fullName": activity.full_name,
+                "email": activity.email,
+                "avatar": var_sys.AVATAR_DEFAULT["AVATAR"],
+                "phone": activity.phone,
+            }
         return {
             "id": user.id,
             "fullName": user.full_name,
@@ -644,7 +681,8 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
 
         fields = ("id", "userId", "fullName", "email", "phone", "title", "type",
 
-                  "resumeSlug", "jobName", "status", "statusName", "hrmEmployeeId", "hrmUserId",
+                  "resumeSlug", "jobName", "status", "statusName", "isManualCandidate", "manualCandidateProfile",
+                  "hrmEmployeeId", "hrmUserId",
                   "hrmSyncStatus", "hrmSyncError", "hrmSyncedAt", "hrmEmployeeUrl", "createAt", "isSentEmail",
 
                   "aiAnalysisScore", "aiAnalysisSummary", "aiAnalysisSkills", "aiAnalysisStatus", "aiAnalysisProgress", "aiAnalysisPros", "aiAnalysisCons", "aiAnalysisMatchingSkills", "aiAnalysisMissingSkills",
@@ -655,7 +693,7 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
 
 class EmployerJobPostActivityExportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
-    title = serializers.ReadOnlyField(source="resume.title")
+    title = serializers.SerializerMethodField(method_name="get_title")
 
     fullName = serializers.ReadOnlyField(source="full_name")
 
@@ -674,6 +712,13 @@ class EmployerJobPostActivityExportSerializer(DynamicFieldsMixin, serializers.Mo
     createAt = serializers.DateTimeField(source='create_at', read_only=True)
 
     statusApply = serializers.SerializerMethodField(method_name="get_status_apply")
+
+    def get_title(self, job_post_activity):
+        if job_post_activity.resume:
+            return job_post_activity.resume.title
+        if getattr(job_post_activity, "manual_candidate_profile", None):
+            return job_post_activity.manual_candidate_profile.title
+        return ""
 
 
 

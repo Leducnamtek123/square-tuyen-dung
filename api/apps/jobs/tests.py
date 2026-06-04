@@ -264,6 +264,217 @@ def test_recommended_jobs_orders_by_combined_relevance(job_seeker_user, employer
 
 
 @pytest.mark.django_db
+def test_employer_can_add_manual_candidate_to_applied_profiles(employer_user, job_post):
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.post(
+        "/api/v1/job/web/employer-job-posts-activity/manual-candidates/",
+        {
+            "jobPost": job_post.id,
+            "fullName": "Nguyen Van A",
+            "email": "candidate@example.com",
+            "phone": "0909000000",
+            "title": "Frontend Developer",
+            "note": "Nguon tu HR tu nhap",
+        },
+        format="json",
+    )
+
+    assert response.status_code == 201
+    created = response.data["data"]
+    assert created["fullName"] == "Nguyen Van A"
+    assert created["email"] == "candidate@example.com"
+    assert created["jobName"] == job_post.job_name
+    assert created["title"] == "Frontend Developer"
+    assert created["userId"] is None
+    assert created["resumeSlug"] is None
+    assert created["isManualCandidate"] is True
+
+    activity = JobPostActivity.objects.get(id=created["id"])
+    assert activity.job_post == job_post
+    assert activity.user is None
+    assert activity.resume is None
+    assert activity.manual_candidate_profile.full_name == "Nguyen Van A"
+
+    list_response = client.get("/api/v1/job/web/employer-job-posts-activity/")
+    results = list_response.data["results"]
+    list_item = next(item for item in results if item["id"] == created["id"])
+    assert list_item["jobPostDict"]["id"] == job_post.id
+    assert list_item["jobPostDict"]["jobName"] == job_post.job_name
+
+    export_response = client.get("/api/v1/job/web/employer-job-posts-activity/export/")
+    assert export_response.status_code == 200
+    assert export_response.data["data"]
+
+    chat_response = client.get("/api/v1/job/web/employer-job-posts-activity/chat/")
+    assert chat_response.status_code == 200
+    assert created["id"] not in [item["id"] for item in chat_response.data["results"]]
+
+
+@pytest.mark.django_db
+def test_private_job_post_options_returns_active_company_jobs_only(
+    employer_user,
+    company,
+    job_post,
+    career,
+    location,
+):
+    from apps.accounts.models import User
+    from apps.profiles.models import Company
+
+    other_owner = User.objects.create_user_with_role_name(
+        email="other-options-owner@test.com",
+        full_name="Other Options Owner",
+        role_name=var_sys.EMPLOYER,
+        password="pass123",
+        is_active=True,
+        is_verify_email=True,
+        has_company=True,
+    )
+    other_company = Company.objects.create(
+        company_name="Other Options Company",
+        company_email="other-options-company@test.com",
+        company_phone="0914000001",
+        tax_code="OPTIONS0001",
+        user=other_owner,
+        location=location,
+        is_verified=True,
+    )
+    other_job_post = JobPost.objects.create(
+        job_name="Other Company Option Job",
+        deadline=timezone.now().date() + timedelta(days=30),
+        quantity=1,
+        job_description="<p>Other job</p>",
+        position=4,
+        type_of_workplace=1,
+        experience=2,
+        academic_level=2,
+        job_type=1,
+        salary_min=10000000,
+        salary_max=20000000,
+        contact_person_name="Other HR",
+        contact_person_phone="0914000002",
+        contact_person_email="other-options-hr@test.com",
+        status=var_sys.JobPostStatus.APPROVED,
+        user=other_owner,
+        company=other_company,
+        career=career,
+        location=location,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.get("/api/v1/job/web/private-job-posts/job-posts-options/")
+
+    assert response.status_code == 200
+    options = response.data["data"]
+    assert {"id": job_post.id, "jobName": job_post.job_name} in options
+    assert other_job_post.id not in [item["id"] for item in options]
+    assert all(set(item.keys()) == {"id", "jobName"} for item in options)
+
+
+@pytest.mark.django_db
+def test_manual_candidate_serializer_rejects_non_pdf_file():
+    from django.core.files.uploadedfile import SimpleUploadedFile
+    from apps.profiles.serializers import EmployerCandidateProfileSerializer
+
+    serializer = EmployerCandidateProfileSerializer(
+        data={
+            "fullName": "Nguyen Van B",
+            "title": "Backend Developer",
+            "file": SimpleUploadedFile("candidate.txt", b"not a pdf", content_type="text/plain"),
+        },
+    )
+
+    assert serializer.is_valid() is False
+    assert "file" in serializer.errors
+
+
+@pytest.mark.django_db
+def test_manual_candidate_serializer_rejects_salary_over_model_limit():
+    from apps.profiles.serializers import EmployerCandidateProfileSerializer
+
+    serializer = EmployerCandidateProfileSerializer(
+        data={
+            "fullName": "Nguyen Van C",
+            "title": "Backend Developer",
+            "salaryMin": 10_000_000_000_000,
+        },
+    )
+
+    assert serializer.is_valid() is False
+    assert "salaryMin" in serializer.errors
+
+
+@pytest.mark.django_db
+def test_employer_cannot_add_manual_candidate_to_other_company_job(
+    employer_user,
+    career,
+    location,
+):
+    from apps.accounts.models import User
+    from apps.profiles.models import Company
+
+    other_owner = User.objects.create_user_with_role_name(
+        email="other-manual-owner@test.com",
+        full_name="Other Owner",
+        role_name=var_sys.EMPLOYER,
+        password="testpass123",
+        is_active=True,
+        is_verify_email=True,
+        has_company=True,
+    )
+    other_company = Company.objects.create(
+        company_name="Other Manual Company",
+        company_email="other-manual-company@test.com",
+        company_phone="0908000000",
+        tax_code="MANUAL-OTHER",
+        user=other_owner,
+        location=location,
+        is_verified=True,
+    )
+    other_job_post = JobPost.objects.create(
+        job_name="Other Company Job",
+        deadline=timezone.now().date() + timedelta(days=30),
+        quantity=1,
+        job_description="<p>Other job</p>",
+        position=4,
+        type_of_workplace=1,
+        experience=2,
+        academic_level=2,
+        job_type=1,
+        salary_min=10000000,
+        salary_max=20000000,
+        contact_person_name="Other HR",
+        contact_person_phone="0908000001",
+        contact_person_email="other-hr@test.com",
+        status=var_sys.JobPostStatus.APPROVED,
+        user=other_owner,
+        company=other_company,
+        career=career,
+        location=location,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.post(
+        "/api/v1/job/web/employer-job-posts-activity/manual-candidates/",
+        {
+            "jobPost": other_job_post.id,
+            "fullName": "Wrong Company Candidate",
+            "title": "Backend Developer",
+        },
+        format="json",
+    )
+
+    assert response.status_code == 403
+    assert JobPostActivity.objects.filter(job_post=other_job_post).count() == 0
+
+
+@pytest.mark.django_db
 def test_job_post_serializer_scopes_interview_template_to_active_company(employer_user, company):
     from apps.accounts.models import User
     from apps.interviews.models import QuestionGroup

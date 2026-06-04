@@ -41,6 +41,7 @@ import { formatRoute } from '@/utils/funcUtils';
 
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import SendEmailComponent from '../AppliedResumeTable/SendEmailComponent';
+import { getAppliedResumeJobPostId } from '../appliedResumeUtils';
 import pc from '@/utils/muiColors';
 
 interface AppliedResumeKanbanProps {
@@ -170,7 +171,11 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
                                                             (() => {
                                                                 const resumeType = item.type || item.resume?.type;
+                                                                const detailSlug = item.resumeSlug || item.resume?.slug || '';
+                                                                const isManualCandidate = Boolean(item.isManualCandidate);
                                                                 const isOnlineResume = resumeType === CV_TYPES.cvWebsite;
+                                                                const jobPostId = getAppliedResumeJobPostId(item);
+                                                                const canScheduleInterview = !blindMode && Boolean(item.userId) && Boolean(jobPostId);
                                                                 return (
                                                             <Card
                                                                 ref={provided.innerRef}
@@ -194,9 +199,15 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                             {item.fullName}
                                                                         </Typography>
                                                                         <Chip 
-                                                                            label={isOnlineResume ? 'Online' : 'File'} 
+                                                                            label={isManualCandidate ? t('manualCandidate.badge') : isOnlineResume ? 'Online' : 'File'} 
                                                                             size="small" 
-                                                                            sx={{ height: 20, fontSize: '10px', fontWeight: 800, bgcolor: isOnlineResume ? pc.primary( 0.1) : pc.error( 0.1), color: isOnlineResume ? 'primary.main' : 'error.main' }}
+                                                                            sx={{
+                                                                                height: 20,
+                                                                                fontSize: '10px',
+                                                                                fontWeight: 800,
+                                                                                bgcolor: isManualCandidate ? pc.secondary(0.1) : isOnlineResume ? pc.primary(0.1) : pc.error(0.1),
+                                                                                color: isManualCandidate ? 'secondary.main' : isOnlineResume ? 'primary.main' : 'error.main'
+                                                                            }}
                                                                         />
                                                                     </Stack>
                                                                     
@@ -222,20 +233,24 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                          </Box>
                                                                          <Stack direction="row" spacing={0.5}>
                                                                              <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
-                                                                                <IconButton size="small" disabled={blindMode} onClick={() => {
-                                                                                    if (blindMode) return;
-                                                                                    push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, item.resumeSlug || item.resume?.slug || '')}`);
-                                                                                }}>
-                                                                                    <RemoveRedEyeIcon fontSize="small" />
-                                                                                </IconButton>
+                                                                                <span>
+                                                                                    <IconButton size="small" disabled={blindMode || !detailSlug} onClick={() => {
+                                                                                        if (blindMode || !detailSlug) return;
+                                                                                        push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, detailSlug)}`);
+                                                                                    }}>
+                                                                                        <RemoveRedEyeIcon fontSize="small" />
+                                                                                    </IconButton>
+                                                                                </span>
                                                                              </Tooltip>
                                                                              <Tooltip title={t('appliedResume.table.tooltips.scheduleInterview', 'Schedule Interview')} arrow>
-                                                                                 <IconButton size="small" disabled={blindMode} onClick={() => {
-                                                                                     if (blindMode) return;
-                                                                                     push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}/create?candidate=${item.userId ?? ''}&jobPost=${item.jobPost?.id ?? ''}`);
-                                                                                 }}>
-                                                                                     <EventIcon fontSize="small" sx={{ color: 'info.main' }} />
-                                                                                 </IconButton>
+                                                                                 <span>
+                                                                                     <IconButton size="small" disabled={!canScheduleInterview} onClick={() => {
+                                                                                         if (!canScheduleInterview) return;
+                                                                                         push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}/create?candidate=${item.userId}&jobPost=${jobPostId}`);
+                                                                                     }}>
+                                                                                         <EventIcon fontSize="small" sx={{ color: 'info.main' }} />
+                                                                                     </IconButton>
+                                                                                 </span>
                                                                              </Tooltip>
                                                                              {!blindMode && (
                                                                                 <SendEmailComponent jobPostActivityId={String(item.id)} isSentEmail={item.isSentEmail || false} email={item.email || ''} fullName={item.fullName || ''} />

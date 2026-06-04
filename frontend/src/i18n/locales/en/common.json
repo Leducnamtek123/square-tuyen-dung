@@ -17,6 +17,7 @@
   "reset": "Reset",
   "loading": "Loading...",
   "noData": "No data",
+  "noOptions": "No options",
   "viewDetails": "View details",
   "id": "ID",
   "na": "N/A",
@@ -169,7 +170,8 @@
       "generate": "Generate Audio",
       "generating": "Generating...",
       "validation": "Please enter text to synthesize.",
-      "error": "Unable to generate audio right now."
+      "error": "Unable to generate audio right now.",
+      "resultLabel": "Generated audio"
     },
     "transcribe": {
       "title": "Speech-to-Text",

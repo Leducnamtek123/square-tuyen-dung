@@ -412,6 +412,20 @@ class QuestionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             raise PermissionDenied("Question bank management permission required.")
         self._audit_instance("create", question)
 
+    def _ensure_can_write_question(self, question):
+        if not _is_admin_user(self.request.user) and question.company_id is None:
+            raise PermissionDenied("Global question bank items can only be changed by admins.")
+
+    def perform_update(self, serializer):
+        self._ensure_can_write_question(serializer.instance)
+        question = serializer.save()
+        self._audit_instance("update", question)
+
+    def perform_destroy(self, instance):
+        self._ensure_can_write_question(instance)
+        self._audit_instance("delete", instance)
+        instance.delete()
+
 
 class QuestionGroupViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = QuestionGroup.objects.prefetch_related('questions', 'questions__career', 'questions__career__icon').select_related('company', 'author').all()
@@ -448,6 +462,20 @@ class QuestionGroupViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         else:
             raise PermissionDenied("Question bank management permission required.")
         self._audit_instance("create", group)
+
+    def _ensure_can_write_group(self, group):
+        if not _is_admin_user(self.request.user) and group.company_id is None:
+            raise PermissionDenied("Global question groups can only be changed by admins.")
+
+    def perform_update(self, serializer):
+        self._ensure_can_write_group(serializer.instance)
+        group = serializer.save()
+        self._audit_instance("update", group)
+
+    def perform_destroy(self, instance):
+        self._ensure_can_write_group(instance)
+        self._audit_instance("delete", instance)
+        instance.delete()
 
     def list(self, request, *args, **kwargs):
         try:

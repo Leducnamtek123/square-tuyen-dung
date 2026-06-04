@@ -88,15 +88,22 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
           {(() => {
             const resumeType = info.row.original.type || info.row.original.resume?.type;
             const resumeTitle = info.row.original.title || info.row.original.resume?.title;
+            const isManualCandidate = Boolean(info.row.original.isManualCandidate);
             // File URL for attached CV download
-            const cvFileUrl = info.row.original.resume?.fileUrl || '';
+            const cvFileUrl = info.row.original.resumeFileUrl || info.row.original.resume?.fileUrl || '';
             return (
               <>
                 <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'text.primary', mb: 0.75 }}>
                   {String(info.getValue() ?? '')}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {resumeType === CV_TYPES.cvWebsite ? (
+                  {isManualCandidate ? (
+                    <Chip
+                      size="small"
+                      label={t('manualCandidate.badge')}
+                      sx={{ height: 22, fontSize: '0.68rem', fontWeight: 900 }}
+                    />
+                  ) : resumeType === CV_TYPES.cvWebsite ? (
                     /* Online CV – informational only */
                     <Tooltip title={t('appliedResume.table.onlineResume')} arrow>
                       <Box sx={{ 
@@ -180,8 +187,9 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       header: t('appliedResume.table.profileType'),
       cell: (info) => {
         const resumeType = info.row.original.type || info.row.original.resume?.type;
+        const isManualCandidate = Boolean(info.row.original.isManualCandidate);
         const isOnline = resumeType === CV_TYPES.cvWebsite;
-        const cvFileUrl = info.row.original.resume?.fileUrl || '';
+        const cvFileUrl = info.row.original.resumeFileUrl || info.row.original.resume?.fileUrl || '';
         return (
           <Tooltip
             title={!isOnline && cvFileUrl ? (
@@ -194,16 +202,16 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             disableHoverListener={isOnline || !cvFileUrl}
           >
             <Chip 
-                label={isOnline ? t('appliedResume.table.onlineResume') : t('appliedResume.table.attachedResume')} 
+                label={isManualCandidate ? t('manualCandidate.badge') : isOnline ? t('appliedResume.table.onlineResume') : t('appliedResume.table.attachedResume')}
                 size="small" 
                 sx={{ 
                   fontWeight: 900, 
                   fontSize: '0.7rem',
                   borderRadius: 1.5,
-                  bgcolor: isOnline ? pc.primary( 0.08) : pc.error( 0.08),
-                  color: isOnline ? 'primary.main' : 'error.main',
+                  bgcolor: isManualCandidate ? pc.secondary(0.08) : isOnline ? pc.primary( 0.08) : pc.error( 0.08),
+                  color: isManualCandidate ? 'secondary.main' : isOnline ? 'primary.main' : 'error.main',
                   border: '1px solid',
-                  borderColor: isOnline ? pc.primary( 0.1) : pc.error( 0.1),
+                  borderColor: isManualCandidate ? pc.secondary(0.1) : isOnline ? pc.primary( 0.1) : pc.error( 0.1),
                   '& .MuiChip-label': { px: 1.5 },
                   cursor: !isOnline && cvFileUrl ? 'pointer' : 'default',
                 }}
@@ -245,24 +253,31 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       meta: { align: 'right' },
       cell: (info) => (
         <Stack direction="row" spacing={1} justifyContent="flex-end" alignItems="center">
+          {(() => {
+            const detailSlug = info.row.original.resumeSlug || info.row.original.resume?.slug || '';
+            return (
           <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
-            <IconButton
-              color="primary"
-              size="small"
-              disabled={blindMode}
-              onClick={() => {
-                if (blindMode) return;
-                push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || info.row.original.resume?.slug || '')}`);
-              }}
-              sx={{ 
-                bgcolor: pc.primary( 0.06),
-                
-                '&:hover': { bgcolor: pc.primary( 0.12) }
-              }}
-            >
-              <RemoveRedEyeIcon fontSize="small" />
-            </IconButton>
+            <span>
+              <IconButton
+                color="primary"
+                size="small"
+                disabled={blindMode || !detailSlug}
+                onClick={() => {
+                  if (blindMode || !detailSlug) return;
+                  push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, detailSlug)}`);
+                }}
+                sx={{ 
+                  bgcolor: pc.primary( 0.06),
+                  
+                  '&:hover': { bgcolor: pc.primary( 0.12) }
+                }}
+              >
+                <RemoveRedEyeIcon fontSize="small" />
+              </IconButton>
+            </span>
           </Tooltip>
+            );
+          })()}
           
           {!blindMode && (
             <SendEmailComponent

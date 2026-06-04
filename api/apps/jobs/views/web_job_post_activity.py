@@ -5,7 +5,7 @@ from django.db.utils import OperationalError, ProgrammingError
 from django.db.models import Case, CharField, F, Q, When
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, status, viewsets
+from rest_framework import generics, parsers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 import logging
@@ -13,7 +13,7 @@ from functools import lru_cache
 
 from apps.accounts import permissions as perms_custom
 from apps.files.models import File
-from apps.profiles.serializers import SendMailToJobSeekerSerializer
+from apps.profiles.serializers import EmployerCandidateProfileSerializer, SendMailToJobSeekerSerializer
 from console.jobs import queue_mail
 from shared import pagination as paginations
 from shared import renderers
@@ -29,7 +29,7 @@ from ..exceptions import (
     InvalidApplicationStatusTransitionError,
     JobsDomainError,
 )
-from ..models import JobPostActivity
+from ..models import JobPost, JobPostActivity
 from ..serializers import (
     EmployerJobPostActivityExportSerializer,
     EmployerJobPostActivitySerializer,
@@ -172,11 +172,20 @@ class EmployerJobPostActivityViewSet(
     generics.UpdateAPIView,
     generics.DestroyAPIView,
 ):
-    queryset = JobPostActivity.objects.select_related('user', 'resume', 'resume__file', 'job_post', 'job_post__company')
+    queryset = JobPostActivity.objects.select_related(
+        'user',
+        'resume',
+        'resume__file',
+        'manual_candidate_profile',
+        'manual_candidate_profile__file',
+        'job_post',
+        'job_post__company',
+    )
     serializer_class = EmployerJobPostActivitySerializer
     permission_classes = [perms_custom.CanManageCandidates]
     renderer_classes = [renderers.MyJSONRenderer]
     pagination_class = paginations.CustomPagination
+    parser_classes = [parsers.JSONParser, parsers.MultiPartParser, parsers.FormParser]
     filterset_class = EmployerJobPostActivityFilter
     filter_backends = [DjangoFilterBackend, AliasedOrderingFilter]
     ordering_fields = (
@@ -228,6 +237,8 @@ class EmployerJobPostActivityViewSet(
             "title",
             "type",
             "resumeSlug",
+            "isManualCandidate",
+            "manualCandidateProfile",
             "jobName",
             "resumeFileUrl",
             "aiAnalysisScore",
@@ -277,6 +288,8 @@ class EmployerJobPostActivityViewSet(
                 "email",
                 "title",
                 "resumeSlug",
+                "isManualCandidate",
+                "manualCandidateProfile",
                 "type",
                 "jobName",
                 "status",
@@ -290,6 +303,7 @@ class EmployerJobPostActivityViewSet(
                 "createAt",
                 "isSentEmail",
                 "resumeFileUrl",
+                "jobPostDict",
                 "aiAnalysisScore",
                 "aiAnalysisSummary",
                 "aiAnalysisSkills",
@@ -309,6 +323,68 @@ class EmployerJobPostActivityViewSet(
         serializer = self.get_serializer(queryset, many=True)
         return var_res.response_data(data=serializer.data)
 
+    @action(methods=["post"], detail=False, url_path="manual-candidates", url_name="manual-candidates")
+    def create_manual_candidate(self, request):
+        company = request.user.active_company
+        if not company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        data = request.data.copy() if hasattr(request.data, "copy") else dict(request.data)
+        job_post_id = data.pop("jobPost", None) or data.pop("job_post", None)
+        if isinstance(job_post_id, list):
+            job_post_id = job_post_id[0] if job_post_id else None
+        if not job_post_id:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"jobPost": ["This field is required."]},
+            )
+
+        try:
+            job_post = JobPost.objects.get(id=job_post_id, company=company)
+        except (JobPost.DoesNotExist, TypeError, ValueError):
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        candidate_serializer = EmployerCandidateProfileSerializer(
+            data=data,
+            context={"request": request},
+        )
+        candidate_serializer.is_valid(raise_exception=True)
+        candidate_profile = candidate_serializer.save()
+        job_post_activity = JobPostActivity.objects.create(
+            job_post=job_post,
+            user=None,
+            resume=None,
+            manual_candidate_profile=candidate_profile,
+            full_name=candidate_profile.full_name,
+            email=candidate_profile.email,
+            phone=candidate_profile.phone,
+        )
+        response_serializer = self.get_serializer(
+            job_post_activity,
+            fields=[
+                "id",
+                "userId",
+                "fullName",
+                "email",
+                "phone",
+                "title",
+                "type",
+                "resumeSlug",
+                "isManualCandidate",
+                "manualCandidateProfile",
+                "jobName",
+                "status",
+                "statusName",
+                "createAt",
+                "isSentEmail",
+                "resumeFileUrl",
+                "userDict",
+                "jobPostDict",
+            ],
+        )
+        record_audit_log(request=request, action="create_manual_candidate", instance=job_post_activity)
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=response_serializer.data)
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.is_deleted = True
@@ -322,7 +398,7 @@ class EmployerJobPostActivityViewSet(
         queryset = (
             self.filter_queryset(
                 self.get_queryset()
-                .filter(job_post__company=user.active_company, is_deleted=False)
+                .filter(job_post__company=user.active_company, is_deleted=False, user__isnull=False)
                 .annotate(
                     userId=F('user_id'),
                     fullName=F('user__full_name'),

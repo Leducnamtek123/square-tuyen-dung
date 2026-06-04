@@ -67,6 +67,8 @@ const MultiSelectSearchCustom = <T extends FieldValues = FieldValues>({
 
           options={options}
 
+          noOptionsText={t('noOptions')}
+
           disableCloseOnSelect
 
           value={options.filter((option) =>

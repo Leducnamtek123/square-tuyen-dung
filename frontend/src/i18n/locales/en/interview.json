@@ -33,7 +33,13 @@
     "chat": "Chat",
     "end": "End call",
     "ending": "Ending...",
-    "enableAudio": "Enable audio"
+    "enableAudio": "Enable audio",
+    "muteMicrophone": "Mute microphone",
+    "unmuteMicrophone": "Unmute microphone",
+    "turnCameraOn": "Turn camera on",
+    "turnCameraOff": "Turn camera off",
+    "startScreenShare": "Start screen share",
+    "stopScreenShare": "Stop screen share"
   },
   "agentView": {
     "technicalInterview": "Technical Interview",
@@ -357,6 +363,8 @@
       "noMessagesDesc": "Conversation will appear here when someone speaks or types.",
       "placeholder": "Write a message...",
       "send": "Send",
+      "open": "Open chat",
+      "close": "Close chat",
       "chatMode": "Chat",
       "aiControlMode": "AI speaks",
       "aiControlPlaceholder": "Tell AI what to ask or say...",

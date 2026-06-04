@@ -47,6 +47,9 @@ class JobPostService:
         if not location_data:
             return instance
 
+        if isinstance(location_data, Location):
+            return location_data
+
         if instance:
             for attr, value in location_data.items():
                 setattr(instance, attr, value)

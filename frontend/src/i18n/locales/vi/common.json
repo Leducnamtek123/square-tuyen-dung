@@ -54,6 +54,7 @@
   },
   "loading": "Đang tải...",
   "noData": "Không có dữ liệu",
+  "noOptions": "Không có lựa chọn",
   "viewDetails": "Xem chi tiết",
   "company": {
     "defaultDescription": "Môi trường làm việc năng động, sáng tạo với nhiều cơ hội thăng tiến và phát triển sự nghiệp.",
@@ -171,7 +172,8 @@
       "generate": "Tạo âm thanh",
       "generating": "Đang tạo...",
       "validation": "Vui lòng nhập nội dung cần đọc.",
-      "error": "Không thể tạo âm thanh lúc này."
+      "error": "Không thể tạo âm thanh lúc này.",
+      "resultLabel": "Âm thanh đã tạo"
     },
     "transcribe": {
       "title": "Giọng nói thành văn bản",

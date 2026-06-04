@@ -15,7 +15,7 @@ from apps.accounts.models import User
 from apps.locations.models import City, District, Location
 from common.models import Career
 
-from apps.profiles.models import Company, Resume
+from apps.profiles.models import Company, EmployerCandidateProfile, Resume
 
 def custom_slugify_function(value, model_instance):
 
@@ -178,9 +178,17 @@ class JobPostActivity(CommonBaseModel):
 
     job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE)
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, null=True)
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, null=True, blank=True)
+
+    manual_candidate_profile = models.ForeignKey(
+        EmployerCandidateProfile,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="job_post_activities",
+    )
 
     # AI Analysis Fields
 

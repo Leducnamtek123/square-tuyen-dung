@@ -33,6 +33,7 @@ from .resume_serializers import (  # noqa: F401
     ResumeViewedSerializer,
     ResumeSavedSerializer,
     ResumeSavedExportSerializer,
+    EmployerCandidateProfileSerializer,
     EducationSerializer,
     ExperienceSerializer,
     CertificateSerializer,

@@ -64,6 +64,8 @@ const SingleSelectCustom = <T extends FieldValues = FieldValues>({
 
               options={options}
 
+              noOptionsText={t('noOptions')}
+
               autoHighlight={false}
 
               getOptionLabel={(option) => typeof option.name === 'string' ? t(`choices.${option.name}`, option.name) : option.name}

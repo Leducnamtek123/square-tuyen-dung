@@ -33,7 +33,13 @@
     "chat": "Trò chuyện",
     "end": "Kết thúc",
     "ending": "Đang kết thúc...",
-    "enableAudio": "Bật âm thanh"
+    "enableAudio": "Bật âm thanh",
+    "muteMicrophone": "Tắt micrô",
+    "unmuteMicrophone": "Bật micrô",
+    "turnCameraOn": "Bật camera",
+    "turnCameraOff": "Tắt camera",
+    "startScreenShare": "Bắt đầu chia sẻ màn hình",
+    "stopScreenShare": "Dừng chia sẻ màn hình"
   },
   "agentView": {
     "technicalInterview": "Phỏng vấn chuyên môn",
@@ -357,6 +363,8 @@
       "noMessagesDesc": "Hội thoại sẽ xuất hiện tại đây khi ai đó nói hoặc nhắn tin.",
       "placeholder": "Nhập tin nhắn...",
       "send": "Gửi",
+      "open": "Mở trò chuyện",
+      "close": "Đóng trò chuyện",
       "chatMode": "Chat",
       "aiControlMode": "AI nói",
       "aiControlPlaceholder": "Nhập nội dung muốn AI hỏi hoặc nói...",

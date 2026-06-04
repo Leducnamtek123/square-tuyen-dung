@@ -33,6 +33,8 @@ web_router.register(r'resumes', web_views.ResumeViewSet, basename='resume')
 
 web_router.register(r'resumes-saved', web_views.ResumeSavedViewSet, basename='resume-saved')
 
+web_router.register(r'employer-candidates', web_views.EmployerCandidateProfileViewSet, basename='employer-candidate')
+
 web_router.register(r'experiences-detail', web_views.ExperienceDetailViewSet, basename='experience-detail')
 
 web_router.register(r'educations-detail', web_views.EducationDetailViewSet, basename='education-detail')

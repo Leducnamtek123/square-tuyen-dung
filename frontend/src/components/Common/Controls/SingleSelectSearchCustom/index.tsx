@@ -53,7 +53,7 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
 
           options={options}
 
-          {...(noOptionsText ? { noOptionsText } : {})}
+          noOptionsText={noOptionsText || t('noOptions')}
 
           autoHighlight={false}
 

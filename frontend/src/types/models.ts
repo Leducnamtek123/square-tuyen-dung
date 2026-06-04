@@ -205,6 +205,8 @@ export interface JobPostActivity {
   phone?: string;
   title?: string;
   type?: string;
+  isManualCandidate?: boolean;
+  manualCandidateProfile?: number | null;
   status: number;
   statusName?: string;
   hrmEmployeeId?: string;
@@ -216,8 +218,14 @@ export interface JobPostActivity {
   isSentEmail?: boolean;
   isDeleted?: boolean;
   jobPost?: JobPost;
+  jobPostDict?: {
+    id?: number | string;
+    jobName?: string;
+    slug?: string;
+  };
   jobName?: string;
   resumeSlug?: string;
+  resumeFileUrl?: string | null;
   resume?: Resume;
   createAt?: string;
   aiAnalysisScore?: number | null;
@@ -307,6 +315,33 @@ export type ResumeSaved = {
   resumeSlug?: string;
   createAt: string;
 };
+
+export interface EmployerManualCandidate {
+  id: number;
+  slug: string;
+  company: number;
+  createdBy?: number | null;
+  fullName: string;
+  email?: string | null;
+  phone?: string | null;
+  title: string;
+  description?: string | null;
+  salaryMin?: number;
+  salaryMax?: number;
+  expectedSalary?: number | null;
+  skillsSummary?: string | null;
+  note?: string | null;
+  position?: number | null;
+  experience?: number | null;
+  academicLevel?: number | null;
+  typeOfWorkplace?: number | null;
+  jobType?: number | null;
+  city?: number | null;
+  career?: number | null;
+  fileUrl?: string | null;
+  createAt?: string;
+  updateAt?: string;
+}
 
 export interface JobSeekerProfile {
   id: number;

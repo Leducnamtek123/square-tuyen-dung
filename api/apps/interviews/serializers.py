@@ -12,6 +12,7 @@ from .models import (
 )
 from apps.jobs.models import JobPost
 from common import serializers as common_serializers
+from shared.configs import variable_system as var_sys
 
 
 def _is_admin_user(user) -> bool:
@@ -522,6 +523,11 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
         _set_related_queryset(fields["question_ids"], _visible_questions_queryset(request))
         _set_related_queryset(fields["question_group"], _visible_question_groups_queryset(request))
         return fields
+
+    def validate_candidate(self, candidate):
+        if getattr(candidate, "role_name", None) != var_sys.JOB_SEEKER:
+            raise serializers.ValidationError("Interview candidate must be a job seeker.")
+        return candidate
 
     def create(self, validated_data):
         question_ids = validated_data.pop('question_ids', [])

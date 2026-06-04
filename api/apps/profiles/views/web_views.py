@@ -30,7 +30,7 @@ from rest_framework import permissions as perms_sys
 
 from apps.accounts import permissions as perms_custom
 
-from rest_framework import status
+from rest_framework import status, parsers
 
 from ..models import (
 
@@ -39,6 +39,7 @@ from ..models import (
     Resume, ResumeViewed,
 
     ResumeSaved,
+    EmployerCandidateProfile,
 
     EducationDetail, ExperienceDetail,
 
@@ -87,7 +88,9 @@ from ..serializers import (
 
     AdvancedSkillSerializer,
 
-    SendMailToJobSeekerSerializer
+    SendMailToJobSeekerSerializer,
+
+    EmployerCandidateProfileSerializer
 
 )
 
@@ -695,6 +698,57 @@ class ResumeViewSet(viewsets.ViewSet,
             )
 
         return var_res.response_data()
+
+
+class EmployerCandidateProfileViewSet(viewsets.ModelViewSet):
+    queryset = EmployerCandidateProfile.objects.select_related(
+        "company", "created_by", "file", "city", "career"
+    )
+    serializer_class = EmployerCandidateProfileSerializer
+    permission_classes = [perms_custom.CanManageCandidates]
+    renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
+    parser_classes = [parsers.JSONParser, parsers.MultiPartParser, parsers.FormParser]
+    lookup_field = "slug"
+
+    def get_queryset(self):
+        try:
+            company = self.request.user.get_active_company()
+        except Exception:
+            company = None
+        if not company:
+            return self.queryset.none()
+
+        queryset = self.queryset.filter(company=company)
+        kw = self.request.query_params.get("kw")
+        if kw:
+            queryset = queryset.filter(
+                Q(full_name__icontains=kw)
+                | Q(email__icontains=kw)
+                | Q(phone__icontains=kw)
+                | Q(title__icontains=kw)
+            )
+        return queryset.order_by("-create_at", "-id")
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return var_res.response_data(data=serializer.data, status=status.HTTP_201_CREATED)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class ResumeViewedAPIView(views.APIView):
 

@@ -597,6 +597,32 @@ class CompanyRoleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     createAt = serializers.DateTimeField(source="create_at", read_only=True)
     updateAt = serializers.DateTimeField(source="update_at", read_only=True)
 
+    def validate_permissions(self, value):
+        if value is None:
+            return []
+        if not isinstance(value, list):
+            raise serializers.ValidationError("Permissions must be a list.")
+
+        normalized_permissions = []
+        for permission in value:
+            if not isinstance(permission, str):
+                raise serializers.ValidationError("Permission keys must be strings.")
+            permission_key = permission.strip()
+            if permission_key:
+                normalized_permissions.append(permission_key)
+
+        allowed_permissions = set(var_sys.COMPANY_PERMISSION_KEYS) | {"*"}
+        invalid_permissions = [
+            permission for permission in normalized_permissions
+            if permission not in allowed_permissions
+        ]
+        if invalid_permissions:
+            raise serializers.ValidationError(
+                f"Invalid permission keys: {', '.join(invalid_permissions)}"
+            )
+
+        return list(dict.fromkeys(normalized_permissions))
+
     class Meta:
         model = CompanyRole
         fields = (

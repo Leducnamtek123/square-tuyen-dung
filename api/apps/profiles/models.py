@@ -103,6 +103,56 @@ class Resume(CommonBaseModel):
 
         return f"{self.title} - {self.user}"
 
+
+class EmployerCandidateProfile(CommonBaseModel):
+    company = models.ForeignKey(
+        "Company",
+        on_delete=models.CASCADE,
+        related_name="manual_candidate_profiles",
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_manual_candidate_profiles",
+    )
+    full_name = models.CharField(max_length=150)
+    email = models.EmailField(blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    title = models.CharField(max_length=200)
+    slug = AutoSlugField(populate_from='title', unique=True, unique_with=['id'], slugify=slugify)
+    description = models.TextField(blank=True, null=True)
+    salary_min = models.DecimalField(default=0, max_digits=12, decimal_places=0)
+    salary_max = models.DecimalField(default=0, max_digits=12, decimal_places=0)
+    expected_salary = models.DecimalField(max_digits=12, decimal_places=0, blank=True, null=True)
+    skills_summary = models.TextField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    position = models.SmallIntegerField(choices=var_sys.POSITION_CHOICES, null=True, blank=True)
+    experience = models.SmallIntegerField(choices=var_sys.EXPERIENCE_CHOICES, null=True, blank=True)
+    academic_level = models.SmallIntegerField(choices=var_sys.ACADEMIC_LEVEL, null=True, blank=True)
+    type_of_workplace = models.SmallIntegerField(choices=var_sys.TYPE_OF_WORKPLACE_CHOICES, null=True, blank=True)
+    job_type = models.SmallIntegerField(choices=var_sys.JOB_TYPE_CHOICES, null=True, blank=True)
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name="manual_candidate_profiles")
+    career = models.ForeignKey(Career, on_delete=models.SET_NULL, null=True, blank=True, related_name="manual_candidate_profiles")
+    file = models.OneToOneField(
+        File,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="manual_candidate_profile_file",
+    )
+
+    class Meta:
+        db_table = "project_info_employer_candidate_profile"
+        indexes = [
+            models.Index(fields=["company", "-create_at"], name="idx_emp_cand_company_created"),
+            models.Index(fields=["company", "full_name"], name="idx_emp_cand_company_name"),
+        ]
+
+    def __str__(self):
+        return f"{self.full_name} - {self.company}"
+
 class EducationDetail(CommonBaseModel):
     degree_name = models.CharField(max_length=200)
     major = models.CharField(max_length=255)

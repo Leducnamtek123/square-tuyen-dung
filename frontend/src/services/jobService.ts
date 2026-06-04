@@ -69,7 +69,10 @@ interface SuggestTitleResponse {
 
 type JobPostOptionsResponse = {
   statusOptions?: { id: number; name: string }[];
+  results?: { id: number; jobName?: string; name?: string }[];
+  data?: { id: number; jobName?: string; name?: string }[];
 };
+type JobPostOptionResponse = JobPostOptionsResponse | { id: number; jobName?: string; name?: string }[];
 
 type JobSalaryInsightResponse = {
   careerId?: number | null;
@@ -133,9 +136,9 @@ const jobService = {
     return httpRequest.delete(url) as Promise<void>;
   },
 
-  getJobPostOptions: (): Promise<JobPostOptionsResponse> => {
+  getJobPostOptions: (): Promise<JobPostOptionResponse> => {
     const url = 'job/web/private-job-posts/job-posts-options/';
-    return httpRequest.get(url) as Promise<JobPostOptionsResponse>;
+    return httpRequest.get(url) as Promise<JobPostOptionResponse>;
   },
 
   getJobPosts: (params: GetJobPostsParams = {}): Promise<PaginatedResponse<JobPost>> => {

@@ -12,17 +12,23 @@ from shared.configs.messages import ERROR_MESSAGES
 from shared.helpers.cloudinary_service import CloudinaryService
 
 from ..models import (
-    Resume, ResumeViewed, ResumeSaved,
+    Resume, ResumeViewed, ResumeSaved, EmployerCandidateProfile,
     EducationDetail, ExperienceDetail,
     Certificate, LanguageSkill, AdvancedSkill,
 )
 from apps.files.models import File
 from apps.jobs.models import JobPostActivity
 from apps.accounts import serializers as auth_serializers
+from apps.locations.models import City
+from common.models import Career
 
 # Import from sibling submodules
 from .profile_serializers import JobSeekerProfileSerializer
 from .company_serializers import CompanySerializer
+
+MAX_MANUAL_CANDIDATE_SALARY = 999_999_999_999
+MAX_MANUAL_CANDIDATE_CV_SIZE = 10 * 1024 * 1024
+PDF_CONTENT_TYPES = {"application/pdf", "application/x-pdf"}
 
 
 class CvSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
@@ -287,6 +293,120 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             return resume
 
 
+class EmployerCandidateProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    fullName = serializers.CharField(source="full_name", required=True, max_length=150)
+    salaryMin = serializers.IntegerField(source="salary_min", required=False, default=0)
+    salaryMax = serializers.IntegerField(source="salary_max", required=False, default=0)
+    expectedSalary = serializers.IntegerField(source="expected_salary", required=False, allow_null=True)
+    skillsSummary = serializers.CharField(source="skills_summary", required=False, allow_null=True, allow_blank=True)
+    academicLevel = serializers.IntegerField(source="academic_level", required=False, allow_null=True)
+    typeOfWorkplace = serializers.IntegerField(source="type_of_workplace", required=False, allow_null=True)
+    jobType = serializers.IntegerField(source="job_type", required=False, allow_null=True)
+    fileUrl = serializers.SerializerMethodField(method_name="get_file_url", read_only=True)
+    file = serializers.FileField(required=False, allow_null=True, write_only=True)
+    company = serializers.PrimaryKeyRelatedField(read_only=True)
+    createdBy = serializers.IntegerField(source="created_by_id", read_only=True)
+    createAt = serializers.DateTimeField(source="create_at", read_only=True)
+    updateAt = serializers.DateTimeField(source="update_at", read_only=True)
+    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all(), required=False, allow_null=True)
+    career = serializers.PrimaryKeyRelatedField(queryset=Career.objects.all(), required=False, allow_null=True)
+
+    class Meta:
+        model = EmployerCandidateProfile
+        fields = (
+            "id", "slug", "company", "createdBy", "fullName", "email", "phone",
+            "title", "description", "salaryMin", "salaryMax", "expectedSalary",
+            "skillsSummary", "note", "position", "experience", "academicLevel",
+            "typeOfWorkplace", "jobType", "city", "career", "file", "fileUrl",
+            "createAt", "updateAt",
+        )
+        read_only_fields = ("id", "slug", "company", "createdBy", "fileUrl", "createAt", "updateAt")
+
+    def get_file_url(self, profile):
+        if profile.file:
+            return profile.file.get_full_url()
+        return None
+
+    def validate_file(self, cv_file):
+        if cv_file is None:
+            return cv_file
+
+        file_name = (getattr(cv_file, "name", "") or "").lower()
+        content_type = (getattr(cv_file, "content_type", "") or "").lower()
+        file_size = getattr(cv_file, "size", 0) or 0
+
+        if not file_name.endswith(".pdf"):
+            raise serializers.ValidationError("Only PDF files are accepted.")
+        if content_type and content_type not in PDF_CONTENT_TYPES:
+            raise serializers.ValidationError("Only PDF files are accepted.")
+        if file_size > MAX_MANUAL_CANDIDATE_CV_SIZE:
+            raise serializers.ValidationError("PDF file must be 10MB or smaller.")
+
+        return cv_file
+
+    def _validate_salary_field(self, attrs, field_name, api_name):
+        value = attrs.get(field_name)
+        if value is None:
+            return
+        if value < 0:
+            raise serializers.ValidationError({api_name: ["Salary must be greater than or equal to 0."]})
+        if value > MAX_MANUAL_CANDIDATE_SALARY:
+            raise serializers.ValidationError({api_name: ["Salary exceeds the allowed limit."]})
+
+    def validate(self, attrs):
+        self._validate_salary_field(attrs, "salary_min", "salaryMin")
+        self._validate_salary_field(attrs, "salary_max", "salaryMax")
+        self._validate_salary_field(attrs, "expected_salary", "expectedSalary")
+        salary_min = attrs.get("salary_min")
+        salary_max = attrs.get("salary_max")
+        if salary_min is not None and salary_max is not None and salary_max and salary_min > salary_max:
+            raise serializers.ValidationError({"salaryMax": ["Maximum salary must be greater than minimum salary."]})
+        return attrs
+
+    def _active_company(self):
+        request = self.context.get("request")
+        if not request:
+            raise serializers.ValidationError({"errorMessage": ["Request context is required."]})
+        company = request.user.get_active_company()
+        if not company:
+            raise serializers.ValidationError({"errorMessage": ["User has no active company."]})
+        return company
+
+    def _save_cv_file(self, instance, cv_file):
+        upload_result = CloudinaryService.upload_file(
+            cv_file,
+            settings.CLOUDINARY_DIRECTORY["cv"],
+        )
+        instance.file = File.update_or_create_file_with_cloudinary(
+            instance.file,
+            upload_result,
+            File.CV_TYPE,
+        )
+        instance.save(update_fields=["file", "update_at"])
+        return instance
+
+    def create(self, validated_data):
+        cv_file = validated_data.pop("file", None)
+        request = self.context["request"]
+        profile = EmployerCandidateProfile.objects.create(
+            **validated_data,
+            company=self._active_company(),
+            created_by=request.user,
+        )
+        if cv_file:
+            profile = self._save_cv_file(profile, cv_file)
+        return profile
+
+    def update(self, instance, validated_data):
+        cv_file = validated_data.pop("file", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        if cv_file:
+            instance = self._save_cv_file(instance, cv_file)
+        return instance
+
+
 class ExperiencePdfSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     jobName = serializers.CharField(source='job_name', read_only=True)
     companyName = serializers.CharField(source='company_name', read_only=True)
@@ -423,6 +543,14 @@ class ResumeSavedExportSerializer(DynamicFieldsMixin, serializers.ModelSerialize
                   "gender", "birthday", "address", "createAt")
 
 
+def _validate_resume_owner_from_attrs(serializer, attrs):
+    resume = attrs.get('resume', None)
+    request = serializer.context.get('request')
+    if request and resume and resume.user != request.user:
+        raise serializers.ValidationError({"resumeId": ["You do not own this resume."]})
+    return resume
+
+
 class EducationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     degreeName = serializers.CharField(source='degree_name', required=True, max_length=200)
     major = serializers.CharField(required=True, max_length=255)
@@ -447,7 +575,7 @@ class EducationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return resume
 
     def validate(self, attrs):
-        resume = attrs.get('resume', None)
+        resume = _validate_resume_owner_from_attrs(self, attrs)
         if resume and EducationDetail.objects.filter(resume=resume).count() >= 10:
             raise serializers.ValidationError(
                 {'errorMessage': [ERROR_MESSAGES["MAXIMUM_EDUCATION"]]})
@@ -483,7 +611,7 @@ class ExperienceSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return resume
 
     def validate(self, attrs):
-        resume = attrs.get('resume', None)
+        resume = _validate_resume_owner_from_attrs(self, attrs)
         if resume and ExperienceDetail.objects.filter(resume=resume).count() >= 10:
             raise serializers.ValidationError(
                 {'errorMessage': [ERROR_MESSAGES["MAXIMUM_EXPERIENCE"]]})
@@ -515,7 +643,7 @@ class CertificateSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return resume
 
     def validate(self, attrs):
-        resume = attrs.get('resume', None)
+        resume = _validate_resume_owner_from_attrs(self, attrs)
         if resume and Certificate.objects.filter(resume=resume).count() >= 10:
             raise serializers.ValidationError(
                 {'errorMessage': [ERROR_MESSAGES["MAXIMUM_CERTIFICATE"]]})
@@ -539,6 +667,10 @@ class LanguageSkillSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             raise serializers.ValidationError("You do not own this resume.")
         return resume
 
+    def validate(self, attrs):
+        _validate_resume_owner_from_attrs(self, attrs)
+        return attrs
+
     class Meta:
         model = LanguageSkill
         fields = ('id', 'language', 'level', 'resume', 'resumeId')
@@ -558,7 +690,7 @@ class AdvancedSkillSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return resume
 
     def validate(self, attrs):
-        resume = attrs.get('resume', None)
+        resume = _validate_resume_owner_from_attrs(self, attrs)
         if resume and AdvancedSkill.objects.filter(resume=resume).count() >= 15:
             raise serializers.ValidationError(
                 {'errorMessage': [ERROR_MESSAGES["MAXIMUM_ADVANCED"]]})

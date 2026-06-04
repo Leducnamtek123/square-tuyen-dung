@@ -105,6 +105,13 @@ const jobPostActivityService = {
     return httpRequest.put(url, data) as Promise<JobPostActivity>;
   },
 
+  createManualAppliedCandidate: (data: FormData): Promise<JobPostActivity> => {
+    const url = 'job/web/employer-job-posts-activity/manual-candidates/';
+    return httpRequest.post(url, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }) as Promise<JobPostActivity>;
+  },
+
   deleteJobPostActivity: (id: IdType): Promise<void> => {
     const url = `job/web/employer-job-posts-activity/${id}/`;
     return httpRequest.delete(url);

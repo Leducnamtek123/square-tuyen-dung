@@ -55,21 +55,45 @@ const ProfileCardContent: React.FC = () => {
             <Grid size={{ xs: 12, lg: 9 }}>
                 <Stack spacing={5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Box sx={{ 
-                                p: 1, 
-                                borderRadius: 2, 
-                                bgcolor: 'primary.extralight', 
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 }, minWidth: 0 }}>
+                            <Box sx={{
+                                p: 1,
+                                borderRadius: 2,
+                                bgcolor: 'primary.extralight',
                                 color: 'primary.main',
-                                display: 'flex'
+                                display: 'flex',
+                                flexShrink: 0,
                             }}>
-                                <AssignmentIndIcon sx={{ fontSize: 28 }} />
+                                <AssignmentIndIcon sx={{ fontSize: { xs: 22, sm: 28 } }} />
                             </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
-                                <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px' }}>
+                            <Box sx={{
+                                display: 'flex',
+                                alignItems: { xs: 'flex-start', sm: 'baseline' },
+                                flexDirection: { xs: 'column', sm: 'row' },
+                                gap: { xs: 0.5, sm: 1.5 },
+                                minWidth: 0,
+                            }}>
+                                <Typography
+                                    variant="h4"
+                                    sx={{
+                                        fontWeight: 900,
+                                        color: 'text.primary',
+                                        fontSize: { xs: '1.65rem', sm: '2.125rem' },
+                                        lineHeight: { xs: 1.15, sm: 1.2 },
+                                    }}
+                                >
                                     {t('profileCard.label.resultsFound')}
                                 </Typography>
-                                <Typography component="span" variant="h3" color="primary" sx={{ fontWeight: 1000, lineHeight: 1 }}>
+                                <Typography
+                                    component="span"
+                                    variant="h3"
+                                    color="primary"
+                                    sx={{
+                                        fontWeight: 1000,
+                                        fontSize: { xs: '2.15rem', sm: '3rem' },
+                                        lineHeight: 1.05,
+                                    }}
+                                >
                                     {t('profileCard.label.profiles', { count })}
                                 </Typography>
                             </Box>

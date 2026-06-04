@@ -52,6 +52,25 @@ export type JobPostOption = {
   jobName: string;
 };
 
+type RawJobPostOption = {
+  id: string | number;
+  jobName?: string;
+  name?: string;
+};
+
+export const normalizeJobPostOptions = (response: RawJobPostOption[] | { results?: RawJobPostOption[]; data?: RawJobPostOption[]; statusOptions?: RawJobPostOption[] }): JobPostOption[] => {
+  const source = Array.isArray(response)
+    ? response
+    : response.results || response.data || response.statusOptions || [];
+
+  return source
+    .map((option) => ({
+      id: option.id,
+      jobName: option.jobName || option.name || '',
+    }))
+    .filter((option) => option.id !== undefined && option.id !== null && option.jobName);
+};
+
 // ─── Employer Statistics ─────────────────────────────────────
 export const useEmployerGeneralStatistics = (): UseEmployerGeneralStatsResult => {
   return useQuery({
@@ -132,6 +151,7 @@ export const useJobPostMutations = () => {
     mutationFn: (data: JobPostInput) => jobService.addJobPost(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerJobPosts'] });
+      queryClient.invalidateQueries({ queryKey: ['jobPostOptions'] });
     },
   });
 
@@ -139,6 +159,7 @@ export const useJobPostMutations = () => {
     mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPostInput> }) => jobService.updateJobPostById(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerJobPosts'] });
+      queryClient.invalidateQueries({ queryKey: ['jobPostOptions'] });
     },
   });
 
@@ -146,6 +167,7 @@ export const useJobPostMutations = () => {
     mutationFn: (id: string | number) => jobService.deleteJobPostById(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerJobPosts'] });
+      queryClient.invalidateQueries({ queryKey: ['jobPostOptions'] });
     },
   });
 
@@ -209,11 +231,7 @@ export const useJobPostOptions = () => {
     queryKey: ['jobPostOptions'],
     queryFn: async (): Promise<JobPostOption[]> => {
       const response = await jobService.getJobPostOptions();
-      const statusOptions = response.statusOptions || [];
-      return statusOptions.map((option) => ({
-        id: option.id,
-        jobName: option.name,
-      }));
+      return normalizeJobPostOptions(response);
     },
     staleTime: 5 * 60_000,
   });

@@ -4,11 +4,13 @@ import React, { useMemo, useState } from 'react';
 import {
   Box,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
+  FormControlLabel,
   IconButton,
   InputLabel,
   MenuItem,
@@ -41,7 +43,7 @@ type RoleForm = {
   code: string;
   name: string;
   description: string;
-  permissions: string;
+  permissions: string[];
 };
 
 type MemberForm = {
@@ -51,8 +53,18 @@ type MemberForm = {
   status: string;
 };
 
-const emptyRoleForm: RoleForm = { code: '', name: '', description: '', permissions: '' };
+const emptyRoleForm: RoleForm = { code: '', name: '', description: '', permissions: [] };
 const emptyMemberForm: MemberForm = { userId: '', roleId: '', status: 'ACTIVE' };
+
+const companyPermissionOptions = [
+  'manage_company_profile',
+  'manage_job_posts',
+  'manage_candidates',
+  'manage_interviews',
+  'manage_question_bank',
+  'manage_members',
+  'manage_roles',
+];
 
 const tableSx = {
   border: '1px solid',
@@ -81,6 +93,45 @@ const CompanyTeamCard = () => {
   const roles = useMemo(() => roleData?.results || [], [roleData]);
   const members = useMemo(() => memberData?.results || [], [memberData]);
 
+  const isSystemRole = (role: CompanyRole) => Boolean(role.isSystem || role.is_system);
+
+  const getPermissionLabel = (permission: string) => {
+    switch (permission) {
+      case '*':
+        return t('employer:company.team.permissionLabels.all', 'All permissions');
+      case 'manage_company_profile':
+        return t('employer:company.team.permissionLabels.manageCompanyProfile', 'Company profile');
+      case 'manage_job_posts':
+        return t('employer:company.team.permissionLabels.manageJobPosts', 'Job posts');
+      case 'manage_candidates':
+        return t('employer:company.team.permissionLabels.manageCandidates', 'Candidates');
+      case 'manage_interviews':
+        return t('employer:company.team.permissionLabels.manageInterviews', 'Interviews');
+      case 'manage_question_bank':
+        return t('employer:company.team.permissionLabels.manageQuestionBank', 'Question bank');
+      case 'manage_members':
+        return t('employer:company.team.permissionLabels.manageMembers', 'Members');
+      case 'manage_roles':
+        return t('employer:company.team.permissionLabels.manageRoles', 'Roles');
+      default:
+        return permission;
+    }
+  };
+
+  const formatPermissions = (permissions?: string[]) => {
+    if (!permissions?.length) return '---';
+    return permissions.map(getPermissionLabel).join(', ');
+  };
+
+  const toggleRolePermission = (permission: string) => {
+    setRoleForm((prev) => ({
+      ...prev,
+      permissions: prev.permissions.includes(permission)
+        ? prev.permissions.filter((item) => item !== permission)
+        : [...prev.permissions, permission],
+    }));
+  };
+
   const invalidateTeam = () => {
     queryClient.invalidateQueries({ queryKey: ['companyRoles'] });
     queryClient.invalidateQueries({ queryKey: ['companyMembers'] });
@@ -92,10 +143,7 @@ const CompanyTeamCard = () => {
         code: form.code.trim(),
         name: form.name.trim(),
         description: form.description.trim(),
-        permissions: form.permissions
-          .split(',')
-          .map((item) => item.trim())
-          .filter(Boolean),
+        permissions: form.permissions,
       };
       return form.id
         ? companyTeamService.updateRole(form.id, payload)
@@ -151,7 +199,7 @@ const CompanyTeamCard = () => {
       code: role.code || '',
       name: role.name || '',
       description: role.description || '',
-      permissions: role.permissions?.join(', ') || '',
+      permissions: role.permissions?.filter((permission) => permission !== '*') || [],
     });
     setRoleDialogOpen(true);
   };
@@ -228,14 +276,16 @@ const CompanyTeamCard = () => {
                 <TableRow key={role.id} hover>
                   <TableCell sx={{ fontWeight: 800 }}>{role.name}</TableCell>
                   <TableCell>{role.code || '---'}</TableCell>
-                  <TableCell>{role.permissions?.join(', ') || '---'}</TableCell>
+                  <TableCell>{formatPermissions(role.permissions)}</TableCell>
                   <TableCell align="right">
-                    <Tooltip title={t('common:actions.edit', 'Edit')}>
-                      <IconButton size="small" onClick={() => openEditRole(role)}><EditIcon fontSize="small" /></IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('common:actions.delete', 'Delete')}>
+                    <Tooltip title={isSystemRole(role) ? t('employer:company.team.systemRoleLocked', 'System role is locked') : t('common:actions.edit', 'Edit')}>
                       <span>
-                        <IconButton size="small" color="error" disabled={role.isSystem || role.is_system} onClick={() => handleDeleteRole(role)}>
+                        <IconButton size="small" disabled={isSystemRole(role)} onClick={() => openEditRole(role)}><EditIcon fontSize="small" /></IconButton>
+                      </span>
+                    </Tooltip>
+                    <Tooltip title={isSystemRole(role) ? t('employer:company.team.systemRoleLocked', 'System role is locked') : t('common:actions.delete', 'Delete')}>
+                      <span>
+                        <IconButton size="small" color="error" disabled={isSystemRole(role)} onClick={() => handleDeleteRole(role)}>
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </span>
@@ -312,7 +362,28 @@ const CompanyTeamCard = () => {
             <TextField label={t('employer:company.team.roleCode', 'Code')} value={roleForm.code} onChange={(event) => setRoleForm((prev) => ({ ...prev, code: event.target.value }))} fullWidth />
             <TextField label={t('employer:company.team.roleName', 'Role')} value={roleForm.name} onChange={(event) => setRoleForm((prev) => ({ ...prev, name: event.target.value }))} fullWidth />
             <TextField label={t('employer:company.team.description', 'Description')} value={roleForm.description} onChange={(event) => setRoleForm((prev) => ({ ...prev, description: event.target.value }))} fullWidth multiline minRows={2} />
-            <TextField label={t('employer:company.team.permissions', 'Permissions')} value={roleForm.permissions} onChange={(event) => setRoleForm((prev) => ({ ...prev, permissions: event.target.value }))} fullWidth helperText={t('employer:company.team.permissionsHint', 'Comma separated, for example: manage_members, manage_roles')} />
+            <FormControl component="fieldset">
+              <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 0.5 }}>
+                {t('employer:company.team.permissions', 'Permissions')}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
+                {t('employer:company.team.permissionsHint', 'Choose the permissions this role can use.')}
+              </Typography>
+              <Stack spacing={0.5}>
+                {companyPermissionOptions.map((permission) => (
+                  <FormControlLabel
+                    key={permission}
+                    control={(
+                      <Checkbox
+                        checked={roleForm.permissions.includes(permission)}
+                        onChange={() => toggleRolePermission(permission)}
+                      />
+                    )}
+                    label={getPermissionLabel(permission)}
+                  />
+                ))}
+              </Stack>
+            </FormControl>
           </Stack>
         </DialogContent>
         <DialogActions>

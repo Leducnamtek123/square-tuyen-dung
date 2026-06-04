@@ -54,7 +54,7 @@ from ..serializers import (
 from apps.jobs.models import JobPost
 from apps.jobs import serializers as job_serializers
 
-from .web_helpers import _get_user_company, _has_company_permission
+from .web_helpers import _get_user_company, _get_company_membership, _has_company_permission
 
 
 class CompanyView(viewsets.ViewSet):
@@ -659,6 +659,27 @@ class CompanyRoleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             return CompanyRole.objects.none()
         return self.queryset.filter(company=company).order_by("id")
 
+    def _permission_assignment_response(self, request, company, permissions):
+        requested_permissions = set(permissions or [])
+        if not requested_permissions or company.user_id == request.user.id:
+            return None
+
+        membership = _get_company_membership(request.user, company)
+        current_permissions = set((membership.role.permissions if membership and membership.role else []) or [])
+        if "*" in current_permissions:
+            return None
+
+        if "*" in requested_permissions or not requested_permissions.issubset(current_permissions):
+            return var_res.response_data(
+                status=status.HTTP_403_FORBIDDEN,
+                errors={
+                    "code": "FORBIDDEN",
+                    "message": "You cannot assign permissions you do not have.",
+                    "details": {"permissions": sorted(requested_permissions - current_permissions)},
+                },
+            )
+        return None
+
     def create(self, request, *args, **kwargs):
         company = self.get_company()
         if not company:
@@ -671,6 +692,13 @@ class CompanyRoleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        permission_error = self._permission_assignment_response(
+            request,
+            company,
+            serializer.validated_data.get("permissions"),
+        )
+        if permission_error:
+            return permission_error
         role = serializer.save(company=company)
         record_audit_log(request=request, action="create", instance=role)
         return var_res.response_data(status=status.HTTP_201_CREATED, data=serializer.data)
@@ -686,12 +714,26 @@ class CompanyRoleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
 
         instance = self.get_object()
-        if instance.is_system and ("code" in request.data or "is_system" in request.data):
+        if instance.is_system:
             return var_res.response_data(
                 status=status.HTTP_400_BAD_REQUEST,
-                errors={"errorMessage": ["System role cannot change code or system flag."]},
+                errors={"errorMessage": ["System role cannot be changed."]},
             )
-        return super().update(request, *args, **kwargs)
+        partial = kwargs.pop("partial", False)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        if "permissions" in serializer.validated_data:
+            permission_error = self._permission_assignment_response(
+                request,
+                company,
+                serializer.validated_data.get("permissions"),
+            )
+            if permission_error:
+                return permission_error
+
+        role = serializer.save()
+        record_audit_log(request=request, action="update", instance=role)
+        return var_res.response_data(status=status.HTTP_200_OK, data=serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         company = self.get_company()
@@ -733,6 +775,27 @@ class CompanyMemberViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             return CompanyMember.objects.none()
         return self.queryset.filter(company=company).order_by("id")
 
+    def _role_assignment_response(self, request, company, role):
+        if not role or company.user_id == request.user.id:
+            return None
+
+        membership = _get_company_membership(request.user, company)
+        current_permissions = set((membership.role.permissions if membership and membership.role else []) or [])
+        target_permissions = set(role.permissions or [])
+        if "*" in current_permissions:
+            return None
+
+        if "*" in target_permissions or not target_permissions.issubset(current_permissions):
+            return var_res.response_data(
+                status=status.HTTP_403_FORBIDDEN,
+                errors={
+                    "code": "FORBIDDEN",
+                    "message": "You cannot assign a role with permissions you do not have.",
+                    "details": {"roleId": role.id},
+                },
+            )
+        return None
+
     def list(self, request, *args, **kwargs):
         company = self.get_company()
         if not company:
@@ -766,6 +829,9 @@ class CompanyMemberViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
                 errors={"roleId": ["Role is invalid for this company."]},
             )
+        role_assignment_error = self._role_assignment_response(request, company, role)
+        if role_assignment_error:
+            return role_assignment_error
 
         user_id = serializer.validated_data["user_id"]
         member = CompanyMember.objects.filter(company=company, user_id=user_id).first()
@@ -823,6 +889,9 @@ class CompanyMemberViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST,
                     errors={"roleId": ["Role is invalid for this company."]},
                 )
+            role_assignment_error = self._role_assignment_response(request, company, role)
+            if role_assignment_error:
+                return role_assignment_error
 
         member = serializer.save()
         record_audit_log(request=request, action="update", instance=member)

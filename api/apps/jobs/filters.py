@@ -166,29 +166,29 @@ class AliasedOrderingFilter(OrderingFilter):
 
 class EmployerJobPostActivityFilter(django_filters.FilterSet):
 
-    cityId = django_filters.NumberFilter(field_name='resume__city')
+    cityId = django_filters.NumberFilter(method='filter_resume_or_manual_city')
 
-    careerId = django_filters.NumberFilter(field_name='resume__career')
+    careerId = django_filters.NumberFilter(method='filter_resume_or_manual_career')
 
     experienceId = django_filters.ChoiceFilter(choices=var_sys.EXPERIENCE_CHOICES,
 
-                                               field_name='resume__experience')
+                                               method='filter_resume_or_manual_experience')
 
     positionId = django_filters.ChoiceFilter(choices=var_sys.POSITION_CHOICES,
 
-                                             field_name='resume__position')
+                                             method='filter_resume_or_manual_position')
 
     academicLevelId = django_filters.ChoiceFilter(choices=var_sys.ACADEMIC_LEVEL,
 
-                                                  field_name='resume__academic_level')
+                                                  method='filter_resume_or_manual_academic_level')
 
     typeOfWorkplaceId = django_filters.ChoiceFilter(choices=var_sys.TYPE_OF_WORKPLACE_CHOICES,
 
-                                                    field_name='resume__type_of_workplace')
+                                                    method='filter_resume_or_manual_type_of_workplace')
 
     jobTypeId = django_filters.ChoiceFilter(choices=var_sys.JOB_TYPE_CHOICES,
 
-                                            field_name='resume__job_type')
+                                            method='filter_resume_or_manual_job_type')
 
     genderId = django_filters.ChoiceFilter(choices=var_sys.GENDER_CHOICES,
 
@@ -226,6 +226,30 @@ class EmployerJobPostActivityFilter(django_filters.FilterSet):
     aiScoreMin = django_filters.NumberFilter(field_name='ai_analysis_score', lookup_expr='gte')
     aiScoreMax = django_filters.NumberFilter(field_name='ai_analysis_score', lookup_expr='lte')
     hasAiAnalysis = django_filters.BooleanFilter(method='filter_has_ai_analysis')
+
+    def _filter_resume_or_manual(self, queryset, resume_field, manual_field, value):
+        return queryset.filter(Q(**{resume_field: value}) | Q(**{manual_field: value}))
+
+    def filter_resume_or_manual_city(self, queryset, name, value):
+        return self._filter_resume_or_manual(queryset, 'resume__city', 'manual_candidate_profile__city', value)
+
+    def filter_resume_or_manual_career(self, queryset, name, value):
+        return self._filter_resume_or_manual(queryset, 'resume__career', 'manual_candidate_profile__career', value)
+
+    def filter_resume_or_manual_experience(self, queryset, name, value):
+        return self._filter_resume_or_manual(queryset, 'resume__experience', 'manual_candidate_profile__experience', value)
+
+    def filter_resume_or_manual_position(self, queryset, name, value):
+        return self._filter_resume_or_manual(queryset, 'resume__position', 'manual_candidate_profile__position', value)
+
+    def filter_resume_or_manual_academic_level(self, queryset, name, value):
+        return self._filter_resume_or_manual(queryset, 'resume__academic_level', 'manual_candidate_profile__academic_level', value)
+
+    def filter_resume_or_manual_type_of_workplace(self, queryset, name, value):
+        return self._filter_resume_or_manual(queryset, 'resume__type_of_workplace', 'manual_candidate_profile__type_of_workplace', value)
+
+    def filter_resume_or_manual_job_type(self, queryset, name, value):
+        return self._filter_resume_or_manual(queryset, 'resume__job_type', 'manual_candidate_profile__job_type', value)
 
     def filter_has_ai_analysis(self, queryset, name, value):
         if value:

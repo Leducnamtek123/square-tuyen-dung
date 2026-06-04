@@ -51,6 +51,8 @@ from .models import (
 
     ResumeViewed,
 
+    EmployerCandidateProfile,
+
 )
 
 from django_admin_listfilter_dropdown.filters import (DropdownFilter, ChoiceDropdownFilter)
@@ -632,6 +634,14 @@ class ResumeViewedAdmin(admin.ModelAdmin):
 
     form = ResumeViewedForm
 
+class EmployerCandidateProfileAdmin(admin.ModelAdmin):
+    list_display = ("id", "full_name", "title", "company", "email", "phone", "create_at")
+    list_display_links = ("id", "full_name")
+    search_fields = ("id", "full_name", "title", "email", "phone", "company__company_name")
+    list_per_page = 25
+    raw_id_fields = ("company", "created_by", "city", "career", "file")
+    list_select_related = ("company", "created_by", "city", "career", "file")
+
 class CompanyFollowedAdmin(admin.ModelAdmin):
 
     list_display = ("id", "company", "user")
@@ -680,6 +690,8 @@ custom_admin_site.register(Company, CompanyAdmin)
 custom_admin_site.register(ResumeSaved, ResumeSavedAdmin)
 
 custom_admin_site.register(ResumeViewed, ResumeViewedAdmin)
+
+custom_admin_site.register(EmployerCandidateProfile, EmployerCandidateProfileAdmin)
 
 custom_admin_site.register(CompanyFollowed, CompanyFollowedAdmin)
 
