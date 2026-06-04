@@ -45,3 +45,6 @@ expect_cli_output*.txt
 # Python cache
 .pytest_cache/
 *.egg-info/
+
+# Local isolated worktrees
+.worktrees/
