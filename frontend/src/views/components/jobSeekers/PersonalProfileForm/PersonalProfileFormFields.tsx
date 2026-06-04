@@ -22,25 +22,25 @@ const PersonalProfileFormFields = ({ control, allConfig, districtOptions, t }: P
         <TextFieldCustom name="user.fullName" title={t('jobSeeker:profile.fields.fullName')} showRequired placeholder={t('jobSeeker:profile.placeholders.fullName')} control={control} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <TextFieldCustom name="phone" title="Phone Number" showRequired placeholder="Enter phone number" control={control} />
+        <TextFieldCustom name="phone" title={t('jobSeeker:profile.fields.phone')} showRequired placeholder={t('jobSeeker:profile.placeholders.phone')} control={control} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <DatePickerCustom name="birthday" control={control} title="Date of Birth" showRequired maxDate={DATE_OPTIONS.yesterday()} />
+        <DatePickerCustom name="birthday" control={control} title={t('jobSeeker:profile.fields.birthday')} showRequired maxDate={DATE_OPTIONS.yesterday()} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <SingleSelectCustom name="gender" control={control} options={allConfig?.genderOptions || []} title="Gender" showRequired placeholder="Select gender" />
+        <SingleSelectCustom name="gender" control={control} options={allConfig?.genderOptions || []} title={t('jobSeeker:profile.fields.gender')} showRequired placeholder={t('jobSeeker:profile.placeholders.selectGender')} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <SingleSelectCustom name="maritalStatus" control={control} options={allConfig?.maritalStatusOptions || []} title="Marital Status" showRequired placeholder="Select marital status" />
+        <SingleSelectCustom name="maritalStatus" control={control} options={allConfig?.maritalStatusOptions || []} title={t('jobSeeker:profile.fields.maritalStatus')} showRequired placeholder={t('jobSeeker:profile.placeholders.selectMaritalStatus')} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <SingleSelectCustom name="location.city" control={control} options={allConfig?.cityOptions || []} title="City/Province" showRequired placeholder="Select city/province" />
+        <SingleSelectCustom name="location.city" control={control} options={allConfig?.cityOptions || []} title={t('jobSeeker:profile.fields.city')} showRequired placeholder={t('jobSeeker:profile.placeholders.selectCity')} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <SingleSelectCustom name="location.district" control={control} options={districtOptions || []} title="District" showRequired placeholder="Select district" />
+        <SingleSelectCustom name="location.district" control={control} options={districtOptions || []} title={t('jobSeeker:profile.fields.district')} showRequired placeholder={t('jobSeeker:profile.placeholders.selectDistrict')} />
       </Grid>
       <Grid size={12}>
-        <TextFieldCustom name="location.address" title="Address" showRequired placeholder="Enter address" control={control} />
+        <TextFieldCustom name="location.address" title={t('jobSeeker:profile.fields.address')} showRequired placeholder={t('jobSeeker:profile.placeholders.address')} control={control} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextFieldCustom name="idCardNumber" title={t('jobSeeker:profile.fields.idCardNumber')} placeholder={t('jobSeeker:profile.placeholders.idCardNumber')} control={control} />

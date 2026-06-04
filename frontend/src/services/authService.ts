@@ -181,7 +181,7 @@ const authService = {
 
   forgotPassword: (data: { email: string; platform?: string }): Promise<ActionResponse> => {
     const url = 'auth/forgot-password/';
-    return httpRequest.post(url, data);
+    return httpRequest.post(url, { ...data, platform: data.platform || 'WEB' });
   },
 
   resetPassword: (data: ResetPasswordData): Promise<ActionResponse> => {

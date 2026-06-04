@@ -8,6 +8,7 @@ import { Grid2 as Grid } from '@mui/material';
 import { DATE_OPTIONS } from '../../../../configs/constants';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
+import type { TFunction } from 'i18next';
 
 export interface FormValues {
   name: string;
@@ -29,6 +30,31 @@ const initialValues: FormValues = {
   expirationDate: null,
 };
 
+export const createCertificateSchema = (t: TFunction<'jobSeeker', undefined>) =>
+  yup.object().shape({
+    name: yup
+      .string()
+      .required(t('jobSeeker:profile.validation.certificateNameRequired'))
+      .max(200, t('jobSeeker:profile.validation.certificateNameMax')),
+    trainingPlace: yup
+      .string()
+      .required(t('jobSeeker:profile.validation.trainingPlaceRequired'))
+      .max(255, t('jobSeeker:profile.validation.trainingPlaceMax')),
+    startDate: yup
+      .date()
+      .required(t('jobSeeker:profile.validation.startDateRequired'))
+      .typeError(t('jobSeeker:profile.validation.startDateRequired')),
+    expirationDate: yup.date().nullable().test(
+      'expiration-date-comparison',
+      t('jobSeeker:profile.validation.expirationDateComparison'),
+      function (value) {
+        const { startDate } = this.parent;
+        if (!value || !startDate) return true;
+        return !(value < startDate);
+      }
+    ),
+  });
+
 const CertificateFormContent = ({
   handleAddOrUpdate,
   serverErrors,
@@ -40,16 +66,7 @@ const CertificateFormContent = ({
 }) => {
   const { t } = useTranslation(['jobSeeker', 'common']);
 
-  const schema = React.useMemo(
-    () =>
-      yup.object().shape({
-        name: yup.string().required(t('jobSeeker:profile.validation.certificateNameRequired')).max(200, t('jobSeeker:profile.validation.certificateNameMax')),
-        trainingPlace: yup.string().required(t('jobSeeker:profile.validation.trainingPlaceRequired')).max(255, t('jobSeeker:profile.validation.trainingPlaceMax')),
-        startDate: yup.date().required(t('jobSeeker:profile.validation.startDateRequired')).typeError(t('jobSeeker:profile.validation.startDateRequired')),
-        expirationDate: yup.date().nullable(),
-      }),
-    [t]
-  );
+  const schema = React.useMemo(() => createCertificateSchema(t), [t]);
 
   const { control, setError, handleSubmit } = useForm<FormValues>({
     defaultValues: initialValues,
@@ -102,7 +119,6 @@ const CertificateFormContent = ({
             name="expirationDate"
             control={control}
             title={t('jobSeeker:profile.fields.expirationDate')}
-            maxDate={DATE_OPTIONS.today()}
           />
         </Grid>
       </Grid>

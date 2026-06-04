@@ -9,6 +9,8 @@ ERROR_MESSAGES = {
 
     'CONFIRM_PASSWORD_MISMATCH': 'Mật khẩu xác nhận không chính xác.',
 
+    'PASSWORD_COMPLEXITY': 'Mật khẩu phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
+
     'CURRENT_PASSWORD_INCORRECT': 'Mật khẩu hiện tại không chính xác.',
 
     'CODE_REQUIRED': 'code là bắt buộc.',

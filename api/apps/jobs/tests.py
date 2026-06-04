@@ -17,6 +17,7 @@ from apps.jobs.exceptions import CompanyNotVerifiedError
 from apps.jobs.ai_scoring_service import _fallback_scoring, build_scoring_prompt
 from apps.jobs.recommendation_service import get_recommended_jobs
 from apps.content.models import SystemSetting
+from common.serializers import LocationSerializer
 from shared.configs import variable_system as var_sys
 
 
@@ -179,6 +180,174 @@ def test_salary_insight_uses_market_fallback_and_excludes_current_job(
     assert data["p75Salary"] == 18000000
     assert data["salaryPosition"] == "above"
     assert job_post.slug not in [item["slug"] for item in data["relatedJobs"]]
+
+
+@pytest.mark.django_db
+def test_job_post_serializer_allows_today_deadline_and_rejects_past_deadline():
+    today_serializer = JobPostSerializer(
+        data={"deadline": timezone.localdate()},
+        partial=True,
+    )
+    past_serializer = JobPostSerializer(
+        data={"deadline": timezone.localdate() - timedelta(days=1)},
+        partial=True,
+    )
+
+    assert today_serializer.is_valid(), today_serializer.errors
+    assert not past_serializer.is_valid()
+    assert "deadline" in past_serializer.errors
+
+
+@pytest.mark.django_db
+def test_job_post_serializer_allows_job_name_up_to_model_limit():
+    valid_serializer = JobPostSerializer(
+        data={"jobName": "a" * 255},
+        partial=True,
+    )
+    invalid_serializer = JobPostSerializer(
+        data={"jobName": "a" * 256},
+        partial=True,
+    )
+
+    assert valid_serializer.is_valid(), valid_serializer.errors
+    assert not invalid_serializer.is_valid()
+    assert "jobName" in invalid_serializer.errors
+
+
+@pytest.mark.django_db
+def test_job_post_serializer_validates_partial_salary_against_existing_values(job_post):
+    min_above_existing_max = JobPostSerializer(
+        job_post,
+        data={"salaryMin": job_post.salary_max + 1},
+        partial=True,
+    )
+    max_below_existing_min = JobPostSerializer(
+        job_post,
+        data={"salaryMax": job_post.salary_min - 1},
+        partial=True,
+    )
+    negative_min = JobPostSerializer(
+        job_post,
+        data={"salaryMin": -1},
+        partial=True,
+    )
+    negative_max = JobPostSerializer(
+        job_post,
+        data={"salaryMax": -1},
+        partial=True,
+    )
+
+    assert not min_above_existing_max.is_valid()
+    assert "salaryMax" in min_above_existing_max.errors
+    assert not max_below_existing_min.is_valid()
+    assert "salaryMax" in max_below_existing_min.errors
+    assert not negative_min.is_valid()
+    assert "salaryMin" in negative_min.errors
+    assert not negative_max.is_valid()
+    assert "salaryMax" in negative_max.errors
+
+
+@pytest.mark.django_db
+def test_location_serializer_allows_manual_address_without_coordinates(city):
+    from apps.locations.models import District
+
+    district = District.objects.create(name="Quan 1", code="Q1-CONTRACT", city=city)
+    serializer = LocationSerializer(
+        data={
+            "city": city.id,
+            "district": district.id,
+            "address": "123 Nguyen Trai",
+        },
+    )
+
+    assert serializer.is_valid(), serializer.errors
+    assert "lat" not in serializer.validated_data
+    assert "lng" not in serializer.validated_data
+
+
+@pytest.mark.django_db
+def test_location_serializer_requires_city_and_district_for_writes(city):
+    from apps.locations.models import District
+
+    district = District.objects.create(name="Quan 1", code="Q1-REQUIRED-CONTRACT", city=city)
+    missing_city = LocationSerializer(
+        data={
+            "district": district.id,
+            "address": "123 Nguyen Trai",
+        },
+    )
+    missing_district = LocationSerializer(
+        data={
+            "city": city.id,
+            "address": "123 Nguyen Trai",
+        },
+    )
+
+    assert missing_city.is_valid() is False
+    assert "city" in missing_city.errors
+    assert missing_district.is_valid() is False
+    assert "district" in missing_district.errors
+
+
+@pytest.mark.django_db
+def test_location_serializer_rejects_district_outside_selected_city(city):
+    from apps.locations.models import City, District
+
+    other_city = City.objects.create(name="Ha Noi", code="HN-LOCATION-CONTRACT")
+    other_district = District.objects.create(name="Ba Dinh", code="BD-LOCATION-CONTRACT", city=other_city)
+
+    serializer = LocationSerializer(
+        data={
+            "city": city.id,
+            "district": other_district.id,
+            "address": "123 Nguyen Trai",
+        },
+    )
+
+    assert serializer.is_valid() is False
+    assert "district" in serializer.errors
+
+
+@pytest.mark.django_db
+def test_location_serializer_rejects_ward_outside_selected_district(city):
+    from apps.locations.models import District, Ward
+
+    selected_district = District.objects.create(name="Quan 1", code="Q1-WARD-CONTRACT", city=city)
+    other_district = District.objects.create(name="Quan 3", code="Q3-WARD-CONTRACT", city=city)
+    other_ward = Ward.objects.create(name="Phuong 1", code="P1-WARD-CONTRACT", district=other_district)
+
+    serializer = LocationSerializer(
+        data={
+            "city": city.id,
+            "district": selected_district.id,
+            "ward": other_ward.id,
+            "address": "123 Nguyen Trai",
+        },
+    )
+
+    assert serializer.is_valid() is False
+    assert "ward" in serializer.errors
+
+
+@pytest.mark.django_db
+def test_location_serializer_validates_partial_update_against_existing_location(location, city):
+    from apps.locations.models import City, District
+
+    existing_district = District.objects.create(name="Quan 1", code="Q1-PARTIAL-CONTRACT", city=city)
+    other_city = City.objects.create(name="Ha Noi", code="HN-PARTIAL-CONTRACT")
+    other_district = District.objects.create(name="Ba Dinh", code="BD-PARTIAL-CONTRACT", city=other_city)
+    location.city = city
+    location.district = existing_district
+    location.save(update_fields=["city", "district", "update_at"])
+
+    serializer = LocationSerializer(
+        location,
+        data={"district": other_district.id},
+        partial=True,
+    )
+
+    assert serializer.is_valid() is False
+    assert "district" in serializer.errors
 
 
 @pytest.mark.django_db
@@ -406,6 +575,23 @@ def test_manual_candidate_serializer_rejects_salary_over_model_limit():
 
     assert serializer.is_valid() is False
     assert "salaryMin" in serializer.errors
+
+
+@pytest.mark.django_db
+def test_manual_candidate_serializer_rejects_explicit_zero_max_below_min():
+    from apps.profiles.serializers import EmployerCandidateProfileSerializer
+
+    serializer = EmployerCandidateProfileSerializer(
+        data={
+            "fullName": "Nguyen Van D",
+            "title": "Backend Developer",
+            "salaryMin": 10_000_000,
+            "salaryMax": 0,
+        },
+    )
+
+    assert serializer.is_valid() is False
+    assert "salaryMax" in serializer.errors
 
 
 @pytest.mark.django_db

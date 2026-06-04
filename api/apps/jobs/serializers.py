@@ -235,11 +235,14 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     def validate(self, attrs):
         errors = {}
 
-        if 'salary_min' in attrs and 'salary_max' in attrs:
-            if attrs['salary_min'] < 0:
-                errors['salaryMin'] = "Lương tối thiểu không được nhỏ hơn 0."
-            if attrs['salary_min'] > attrs['salary_max']:
-                errors['salaryMax'] = "Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu."
+        salary_min = attrs.get('salary_min', getattr(self.instance, 'salary_min', None))
+        salary_max = attrs.get('salary_max', getattr(self.instance, 'salary_max', None))
+        if 'salary_min' in attrs and attrs['salary_min'] < 0:
+            errors['salaryMin'] = "Lương tối thiểu không được nhỏ hơn 0."
+        if 'salary_max' in attrs and attrs['salary_max'] < 0:
+            errors['salaryMax'] = "Lương tối đa không được nhỏ hơn 0."
+        if salary_min is not None and salary_max is not None and salary_min > salary_max:
+            errors['salaryMax'] = "Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu."
 
         if 'quantity' in attrs and attrs['quantity'] <= 0:
             errors['quantity'] = "Số lượng tuyển dụng phải lớn hơn 0."
@@ -383,11 +386,14 @@ class JobPostAroundSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         errors = {}
 
-        if 'salary_min' in attrs and 'salary_max' in attrs:
-            if attrs['salary_min'] < 0:
-                errors['salaryMin'] = "Lương tối thiểu không được nhỏ hơn 0."
-            if attrs['salary_min'] > attrs['salary_max']:
-                errors['salaryMax'] = "Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu."
+        salary_min = attrs.get('salary_min', getattr(self.instance, 'salary_min', None))
+        salary_max = attrs.get('salary_max', getattr(self.instance, 'salary_max', None))
+        if 'salary_min' in attrs and attrs['salary_min'] < 0:
+            errors['salaryMin'] = "Lương tối thiểu không được nhỏ hơn 0."
+        if 'salary_max' in attrs and attrs['salary_max'] < 0:
+            errors['salaryMax'] = "Lương tối đa không được nhỏ hơn 0."
+        if salary_min is not None and salary_max is not None and salary_min > salary_max:
+            errors['salaryMax'] = "Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu."
 
         if errors:
             raise serializers.ValidationError(errors)

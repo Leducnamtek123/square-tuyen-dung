@@ -148,11 +148,55 @@ class ProfileWardSerializers(serializers.ModelSerializer):
 
         fields = ('id', 'name')
 
+
+def get_location_validation_instance(serializer):
+    if getattr(serializer, "instance", None):
+        return serializer.instance
+
+    parent_instance = getattr(getattr(serializer, "parent", None), "instance", None)
+    return getattr(parent_instance, "location", None)
+
+
+def validate_location_hierarchy(attrs, instance=None):
+    city = attrs.get("city") if "city" in attrs else getattr(instance, "city", None)
+    district = attrs.get("district") if "district" in attrs else getattr(instance, "district", None)
+    ward = attrs.get("ward") if "ward" in attrs else getattr(instance, "ward", None)
+    address = attrs.get("address") if "address" in attrs else getattr(instance, "address", None)
+    errors = {}
+
+    if not city:
+        errors["city"] = ["City is required."]
+
+    if not district:
+        errors["district"] = ["District is required."]
+
+    if not str(address or "").strip():
+        errors["address"] = ["Address is required."]
+
+    if city and district and district.city_id != city.id:
+        errors["district"] = ["District does not belong to the selected city."]
+
+    if district and ward and ward.district_id != district.id:
+        errors["ward"] = ["Ward does not belong to the selected district."]
+
+    if city and ward and ward.district.city_id != city.id:
+        errors["ward"] = ["Ward does not belong to the selected city."]
+
+    if errors:
+        raise serializers.ValidationError(errors)
+
+    return attrs
+
+
 class ProfileLocationSerializer(serializers.ModelSerializer):
 
     districtDict = ProfileDistrictSerializers(source="district", read_only=True)
 
     wardDict = ProfileWardSerializers(source="ward", read_only=True)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        return validate_location_hierarchy(attrs, get_location_validation_instance(self))
 
     class Meta:
 
@@ -168,6 +212,10 @@ class LocationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     lng = serializers.FloatField(required=False, allow_null=True)
 
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        return validate_location_hierarchy(attrs, get_location_validation_instance(self))
 
 
     class Meta:

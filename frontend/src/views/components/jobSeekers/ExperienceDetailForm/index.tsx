@@ -9,6 +9,7 @@ import { DATE_OPTIONS } from '../../../../configs/constants';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import MultilineTextFieldCustom from '../../../../components/Common/Controls/MultilineTextFieldCustom';
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
+import type { TFunction } from 'i18next';
 
 export interface FormValues {
   jobName: string;
@@ -35,6 +36,38 @@ const initialValues: FormValues = {
   leaveReason: null,
 };
 
+export const createExperienceDetailSchema = (t: TFunction<'jobSeeker', undefined>) => yup.object().shape({
+  jobName: yup.string().required(t('jobSeeker:profile.validation.jobTitleRequired')).max(200, t('jobSeeker:profile.validation.jobTitleMax')),
+  companyName: yup.string().required(t('jobSeeker:profile.validation.companyNameRequired')).max(255, t('jobSeeker:profile.validation.companyNameMax')),
+  startDate: yup
+    .date()
+    .required(t('jobSeeker:profile.validation.startDateRequired'))
+    .typeError(t('jobSeeker:profile.validation.startDateRequired'))
+    .max(DATE_OPTIONS.yesterday(), t('jobSeeker:profile.validation.startDateYesterday'))
+    .test('start-date-comparison', t('jobSeeker:profile.validation.startDateComparison'), function (value) {
+      const endDate = this.parent.endDate;
+      if (!value || !endDate) return true;
+      return !(value > endDate);
+    }),
+  endDate: yup
+    .date()
+    .required(t('jobSeeker:profile.validation.endDateRequired'))
+    .typeError(t('jobSeeker:profile.validation.endDateRequired'))
+    .max(DATE_OPTIONS.today(), t('jobSeeker:profile.validation.endDateToday'))
+    .test('end-date-comparison', t('jobSeeker:profile.validation.endDateComparison'), function (value) {
+      const startDate = this.parent.startDate;
+      if (!value || !startDate) return true;
+      return !(value < startDate);
+    }),
+  lastSalary: yup
+    .number()
+    .nullable()
+    .transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value))
+    .min(0, t('jobSeeker:profile.validation.lastSalaryInvalid')),
+  leaveReason: yup.string().max(255, t('jobSeeker:profile.validation.leaveReasonMax')),
+  description: yup.string().nullable().max(1000, t('jobSeeker:profile.validation.descriptionMax')),
+});
+
 const ExperienceDetailFormContent = ({
   handleAddOrUpdate,
   initialValues,
@@ -44,37 +77,7 @@ const ExperienceDetailFormContent = ({
 }) => {
   const { t } = useTranslation(['jobSeeker']);
 
-  const schema = yup.object().shape({
-    jobName: yup.string().required(t('jobSeeker:profile.validation.jobTitleRequired')).max(200, t('jobSeeker:profile.validation.jobTitleMax')),
-    companyName: yup.string().required(t('jobSeeker:profile.validation.companyNameRequired')).max(255, t('jobSeeker:profile.validation.companyNameMax')),
-    startDate: yup
-      .date()
-      .required(t('jobSeeker:profile.validation.startDateRequired'))
-      .typeError(t('jobSeeker:profile.validation.startDateRequired'))
-      .max(DATE_OPTIONS.yesterday(), t('jobSeeker:profile.validation.startDateYesterday'))
-      .test('start-date-comparison', t('jobSeeker:profile.validation.startDateComparison'), function (value) {
-        const endDate = this.parent.endDate;
-        if (!value || !endDate) return true;
-        return !(value >= endDate);
-      }),
-    endDate: yup
-      .date()
-      .required(t('jobSeeker:profile.validation.endDateRequired'))
-      .typeError(t('jobSeeker:profile.validation.endDateRequired'))
-      .max(DATE_OPTIONS.today(), t('jobSeeker:profile.validation.endDateToday'))
-      .test('end-date-comparison', t('jobSeeker:profile.validation.endDateComparison'), function (value) {
-        const startDate = this.parent.startDate;
-        if (!value || !startDate) return true;
-        return !(value <= startDate);
-      }),
-    lastSalary: yup
-      .number()
-      .nullable()
-      .transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value))
-      .min(0, t('jobSeeker:profile.validation.lastSalaryInvalid')),
-    leaveReason: yup.string().max(255, t('jobSeeker:profile.validation.leaveReasonMax')),
-    description: yup.string().nullable().max(1000, t('jobSeeker:profile.validation.descriptionMax')),
-  });
+  const schema = React.useMemo(() => createExperienceDetailSchema(t), [t]);
 
   const { control, handleSubmit } = useForm<FormValues>({
     resolver: typedYupResolver(schema),

@@ -5,6 +5,7 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
 import TextFieldAutoCompleteCustom from '../../../../components/Common/Controls/TextFieldAutoCompleteCustom';
+import { DATE_OPTIONS } from '../../../../configs/constants';
 import type { Control } from 'react-hook-form';
 import type { TFunction } from 'i18next';
 import type { EmployerSignUpFormData } from './types';
@@ -97,6 +98,7 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             name="company.since"
             control={control}
             title={t('form.foundedDate')}
+            maxDate={DATE_OPTIONS.today()}
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: '10px',

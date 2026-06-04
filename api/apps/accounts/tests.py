@@ -9,7 +9,7 @@ from django.utils import timezone
 from rest_framework.test import APIClient
 
 from apps.accounts.models import User, ForgotPasswordToken
-from apps.accounts.serializers import UserSerializer
+from apps.accounts.serializers import CompanyRegisterSerializer, UserSerializer
 from apps.profiles.models import CompanyMember, CompanyRole
 from shared.configs import variable_system as var_sys
 from shared.permissions import (
@@ -164,6 +164,169 @@ class TestSocialAuthPipeline:
         result = custom_social_user(strategy=None, details={"email": "new@test.com"})
 
         assert result == {"is_new": True, "user": None}
+
+
+@pytest.mark.django_db
+def test_company_register_serializer_validates_company_contact_fields(city):
+    from apps.locations.models import District
+
+    district = District.objects.create(name="Quan 1", code="Q1-REGISTER", city=city)
+
+    def make_payload(**overrides):
+        payload = {
+            "companyName": "Register Validation Company",
+            "companyEmail": "register-validation@test.com",
+            "companyPhone": "0901234567",
+            "taxCode": "REGISTER-TAX-001",
+            "fieldOperation": "IT",
+            "since": timezone.localdate(),
+            "employeeSize": 1,
+            "websiteUrl": "https://example.com",
+            "location": {
+                "city": city.id,
+                "district": district.id,
+                "address": "123 Nguyen Hue",
+            },
+        }
+        payload.update(overrides)
+        return payload
+
+    future_date = timezone.localdate() + datetime.timedelta(days=1)
+
+    invalid_employee_size = CompanyRegisterSerializer(data=make_payload(employeeSize=999))
+    invalid_phone = CompanyRegisterSerializer(data=make_payload(companyPhone="not-a-phone"))
+    missing_phone = CompanyRegisterSerializer(data=make_payload(companyPhone=None))
+    future_founded_date = CompanyRegisterSerializer(data=make_payload(since=future_date))
+
+    assert invalid_employee_size.is_valid() is False
+    assert invalid_phone.is_valid() is False
+    assert missing_phone.is_valid() is False
+    assert future_founded_date.is_valid() is False
+
+    assert "employeeSize" in invalid_employee_size.errors
+    assert "companyPhone" in invalid_phone.errors
+    assert "companyPhone" in missing_phone.errors
+    assert "since" in future_founded_date.errors
+
+
+@pytest.mark.django_db
+def test_register_serializers_allow_passwords_up_to_frontend_limit(city):
+    from apps.accounts.serializers import EmployerRegisterSerializer, JobSeekerRegisterSerializer
+    from apps.locations.models import District
+
+    password_128 = "Aa1!" * 32
+    password_129 = f"{password_128}A"
+    district = District.objects.create(name="Quan 3", code="Q3-REGISTER", city=city)
+
+    job_seeker_data = {
+        "fullName": "Password Limit Candidate",
+        "email": "password-limit-candidate@test.com",
+        "password": password_128,
+        "confirmPassword": password_128,
+        "platform": "WEB",
+    }
+    employer_data = {
+        "fullName": "Password Limit Employer",
+        "email": "password-limit-employer@test.com",
+        "password": password_128,
+        "confirmPassword": password_128,
+        "platform": "WEB",
+        "company": {
+            "companyName": "Password Limit Company",
+            "companyEmail": "password-limit-company@test.com",
+            "companyPhone": "0901234568",
+            "taxCode": "REGISTER-TAX-002",
+            "fieldOperation": "IT",
+            "since": timezone.localdate(),
+            "employeeSize": 1,
+            "websiteUrl": "https://example.com",
+            "location": {
+                "city": city.id,
+                "district": district.id,
+                "address": "456 Le Loi",
+            },
+        },
+    }
+
+    assert JobSeekerRegisterSerializer(data=job_seeker_data).is_valid() is True
+    assert EmployerRegisterSerializer(data=employer_data).is_valid() is True
+
+    too_long_job_seeker = JobSeekerRegisterSerializer(data={**job_seeker_data, "password": password_129, "confirmPassword": password_129})
+    too_long_employer = EmployerRegisterSerializer(data={**employer_data, "password": password_129, "confirmPassword": password_129})
+
+    assert too_long_job_seeker.is_valid() is False
+    assert too_long_employer.is_valid() is False
+    assert "password" in too_long_job_seeker.errors
+    assert "password" in too_long_employer.errors
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("email", ["not-an-email", f"{'a' * 93}@test.com"])
+def test_email_exists_endpoint_validates_email_contract(email):
+    client = APIClient()
+
+    response = client.post("/api/v1/auth/email-exists/", {"email": email}, format="json")
+
+    assert response.status_code == 400
+    assert "email" in response.data["error"]["details"]
+
+
+@pytest.mark.django_db
+def test_password_creation_serializers_match_frontend_complexity_rule(city):
+    from apps.accounts.serializers import (
+        EmployerRegisterSerializer,
+        JobSeekerRegisterSerializer,
+        ResetPasswordSerializer,
+        UpdatePasswordSerializer,
+    )
+    from apps.locations.models import District
+
+    password_without_special = "SquareHire2026"
+    district = District.objects.create(name="Quan 4", code="Q4-REGISTER", city=city)
+
+    job_seeker = JobSeekerRegisterSerializer(data={
+        "fullName": "Weak Password Candidate",
+        "email": "weak-password-candidate@test.com",
+        "password": password_without_special,
+        "confirmPassword": password_without_special,
+        "platform": "WEB",
+    })
+    employer = EmployerRegisterSerializer(data={
+        "fullName": "Weak Password Employer",
+        "email": "weak-password-employer@test.com",
+        "password": password_without_special,
+        "confirmPassword": password_without_special,
+        "platform": "WEB",
+        "company": {
+            "companyName": "Weak Password Company",
+            "companyEmail": "weak-password-company@test.com",
+            "companyPhone": "0901234569",
+            "taxCode": "REGISTER-TAX-003",
+            "fieldOperation": "IT",
+            "since": timezone.localdate(),
+            "employeeSize": 1,
+            "websiteUrl": "https://example.com",
+            "location": {
+                "city": city.id,
+                "district": district.id,
+                "address": "789 Tran Hung Dao",
+            },
+        },
+    })
+    reset_password = ResetPasswordSerializer(data={
+        "platform": "WEB",
+        "token": "reset-token",
+        "newPassword": password_without_special,
+        "confirmPassword": password_without_special,
+    })
+    update_password = UpdatePasswordSerializer(data={
+        "oldPassword": "CurrentPassword1!",
+        "newPassword": password_without_special,
+        "confirmPassword": password_without_special,
+    })
+
+    for serializer in (job_seeker, employer, reset_password, update_password):
+        assert serializer.is_valid() is False
 
 
 @pytest.mark.django_db

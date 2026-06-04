@@ -385,7 +385,9 @@
       "automaticallyfilledifyouchooseasuggestedaddress": "Automatically filled if you choose a suggested address."
     },
     "validation": {
-      "companyNameRequired": "Company name is required"
+      "companyNameRequired": "Company name is required",
+      "foundedDateInFuture": "Founded date cannot be in the future.",
+      "employeeSizeInvalid": "Invalid company size."
     }
   },
   "statItem": {
@@ -532,14 +534,14 @@
       "genderrequirementisrequired": "Gender requirement is required.",
       "minimumsalaryisrequired": "Minimum salary is required.",
       "invalidminimumsalary": "Invalid minimum salary.",
-      "minSalaryLess": "Minimum salary must be less than maximum salary.",
+      "minSalaryLess": "Minimum salary must be less than or equal to maximum salary.",
       "maximumsalaryisrequired": "Maximum salary is required.",
       "invalidmaximumsalary": "Invalid maximum salary.",
-      "maxSalaryGreater": "Maximum salary must be greater than minimum salary.",
+      "maxSalaryGreater": "Maximum salary must be greater than or equal to minimum salary.",
       "academiclevelisrequired": "Academic level is required.",
       "applicationdeadlineisrequired": "Application deadline is required.",
       "invalidapplicationdeadline": "Invalid application deadline.",
-      "deadlinemustbeaftertoday": "Deadline must be after today.",
+      "deadlinemustbeaftertoday": "Deadline cannot be in the past.",
       "jobDescRequired": "Job description is required.",
       "jobReqRequired": "Job requirement is required.",
       "benefitsRequired": "Benefits are required.",

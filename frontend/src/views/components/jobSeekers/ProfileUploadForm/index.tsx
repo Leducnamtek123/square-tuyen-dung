@@ -29,7 +29,7 @@ interface ProfileUploadFormProps {
   handleAdd: (data: FormValues) => void;
 }
 
-const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
+export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
 
     file: yup
       .mixed<File[]>()
@@ -111,7 +111,7 @@ const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
 
         function (value) {
           const { salaryMax } = this.parent;
-          return !(salaryMax !== undefined && value !== undefined && value >= salaryMax);
+          return !(salaryMax !== undefined && value !== undefined && value > salaryMax);
 
         }
 
@@ -135,7 +135,7 @@ const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
 
         function (value) {
           const { salaryMin } = this.parent;
-          return !(salaryMin !== undefined && value !== undefined && value <= salaryMin);
+          return !(salaryMin !== undefined && value !== undefined && value < salaryMin);
 
         }
 

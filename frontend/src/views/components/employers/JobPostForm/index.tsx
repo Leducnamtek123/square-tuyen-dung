@@ -13,6 +13,7 @@ import { useConfig } from '@/hooks/useConfig';
 import { useQuestionGroups } from '../hooks/useEmployerQueries';
 import type { SelectOption } from '@/types/models';
 import { createEditorStateFromHTMLString } from '@/utils/editorUtils';
+import { shouldResetChildLocationValue } from '@/utils/locationForm';
 import { Alert, Stack } from '@mui/material';
 
 interface JobPostFormProps {
@@ -109,7 +110,7 @@ const JobPostFormContent = ({
           name: district.name,
         }));
 
-        if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
+        if (shouldResetChildLocationValue(prevCityIdRef.current, id)) {
           setValue('location.district', '');
         }
         dispatch({ type: 'setDistrictOptions', value: results });
@@ -121,6 +122,9 @@ const JobPostFormContent = ({
 
     if (cityId) void loadDistricts(cityId);
     else {
+      if (shouldResetChildLocationValue(prevCityIdRef.current, cityId)) {
+        setValue('location.district', '');
+      }
       dispatch({ type: 'setDistrictOptions', value: [] });
       prevCityIdRef.current = null;
     }

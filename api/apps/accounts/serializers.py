@@ -1,4 +1,6 @@
 
+import re
+
 from shared.configs import variable_system as var_sys
 from shared.configs.messages import ERROR_MESSAGES
 from shared.helpers import helper
@@ -8,6 +10,7 @@ from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password as django_validate_password
 from django.conf import settings
 from django.db import transaction
+from django.utils import timezone
 from console.jobs import queue_auth
 from .models import User
 from apps.profiles.models import (
@@ -20,10 +23,29 @@ from apps.files.models import File
 from common.serializers import LocationSerializer
 from shared.helpers.cloudinary_service import CloudinaryService
 
+PHONE_PATTERN = re.compile(
+    r"^((\+[1-9]{1,4}[ \-]*)|(\([0-9]{2,3}\)[ \-]*)|([0-9]{2,4})[ \-]*)*?[0-9]{3,4}?[ \-]*[0-9]{3,4}?$"
+)
+PASSWORD_COMPLEXITY_PATTERN = re.compile(
+    r"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%\^&\*]).+$"
+)
+
+
+def validate_auth_password(value):
+    django_validate_password(value)
+    if not PASSWORD_COMPLEXITY_PATTERN.fullmatch(value or ""):
+        raise serializers.ValidationError(ERROR_MESSAGES["PASSWORD_COMPLEXITY"])
+    return value
+
 class CheckCredsSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, max_length=100)
     roleName = serializers.CharField(required=False, max_length=10,
                                      allow_null=True, allow_blank=True)
+
+
+class EmailExistsSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True, max_length=100)
+
 
 class ForgotPasswordSerializer(PlatformValidationMixin, serializers.Serializer):
     email = serializers.EmailField(required=True, max_length=100)
@@ -43,8 +65,7 @@ class UpdatePasswordSerializer(PasswordConfirmMixin, serializers.Serializer):
     confirmPassword = serializers.CharField(required=True, max_length=128)
 
     def validate_newPassword(self, value):
-        django_validate_password(value)
-        return value
+        return validate_auth_password(value)
 
 class ResetPasswordSerializer(PlatformValidationMixin, PasswordConfirmMixin, DynamicFieldsMixin, serializers.Serializer):
     newPassword = serializers.CharField(required=True, max_length=128)
@@ -55,8 +76,7 @@ class ResetPasswordSerializer(PlatformValidationMixin, PasswordConfirmMixin, Dyn
     platform = serializers.CharField(required=True)
 
     def validate_newPassword(self, value):
-        django_validate_password(value)
-        return value
+        return validate_auth_password(value)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
@@ -74,13 +94,12 @@ class JobSeekerRegisterSerializer(PasswordConfirmMixin, serializers.Serializer):
     email = serializers.EmailField(required=True, max_length=100,
                                    validators=[UniqueValidator(queryset=User.objects.all(),
                                                                message=ERROR_MESSAGES['EMAIL_EXISTS'])])
-    password = serializers.CharField(required=True, max_length=100)
-    confirmPassword = serializers.CharField(required=True, max_length=100)
+    password = serializers.CharField(required=True, max_length=128)
+    confirmPassword = serializers.CharField(required=True, max_length=128)
     platform = serializers.CharField(required=True, max_length=3)
 
     def validate_password(self, value):
-        django_validate_password(value)
-        return value
+        return validate_auth_password(value)
 
 
     class Meta:
@@ -94,7 +113,7 @@ class CompanyRegisterSerializer(serializers.ModelSerializer):
     companyEmail = serializers.EmailField(source='company_email', required=True, max_length=100,
                                           validators=[UniqueValidator(Company.objects.all(),
                                                                       message=ERROR_MESSAGES['COMPANY_EMAIL_EXISTS'])])
-    companyPhone = serializers.CharField(source='company_phone', required=False, max_length=15,
+    companyPhone = serializers.CharField(source='company_phone', required=True, max_length=15,
                                          validators=[UniqueValidator(Company.objects.all(),
                                                                      message=ERROR_MESSAGES['COMPANY_PHONE_EXISTS'])])
     taxCode = serializers.CharField(source="tax_code", required=True, max_length=30,
@@ -108,7 +127,7 @@ class CompanyRegisterSerializer(serializers.ModelSerializer):
                                   input_formats=[var_sys.DATE_TIME_FORMAT["ISO8601"],
                                                  var_sys.DATE_TIME_FORMAT["Ymd"]],
                                   allow_null=True)
-    employeeSize = serializers.IntegerField(source="employee_size", required=True)
+    employeeSize = serializers.ChoiceField(source="employee_size", required=True, choices=var_sys.EMPLOYEE_SIZE_CHOICES)
     websiteUrl = serializers.URLField(source="website_url", required=False, max_length=300,
                                       allow_blank=True,
                                       allow_null=True)
@@ -123,18 +142,34 @@ class CompanyRegisterSerializer(serializers.ModelSerializer):
                   "websiteUrl", "description",
                   "location")
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        errors = {}
+        company_phone = attrs.get("company_phone")
+        since = attrs.get("since")
+
+        if company_phone and not PHONE_PATTERN.fullmatch(str(company_phone).strip()):
+            errors["companyPhone"] = ["Invalid phone number."]
+
+        if "since" in attrs and since and since > timezone.localdate():
+            errors["since"] = ["Founded date cannot be in the future."]
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return attrs
+
 class EmployerRegisterSerializer(PasswordConfirmMixin, serializers.Serializer):
     company = CompanyRegisterSerializer()
     fullName = serializers.CharField(source="full_name", required=True, max_length=100)
     email = serializers.EmailField(required=True, max_length=100,
                                    validators=[UniqueValidator(queryset=User.objects.all())])
-    password = serializers.CharField(required=True, max_length=100)
-    confirmPassword = serializers.CharField(required=True, max_length=100)
+    password = serializers.CharField(required=True, max_length=128)
+    confirmPassword = serializers.CharField(required=True, max_length=128)
     platform = serializers.CharField(required=True, max_length=3)
 
     def validate_password(self, value):
-        django_validate_password(value)
-        return value
+        return validate_auth_password(value)
 
     class Meta:
         model = User

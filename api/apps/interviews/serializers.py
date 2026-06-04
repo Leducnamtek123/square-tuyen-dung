@@ -205,6 +205,10 @@ class VoiceProfileGrantSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"target": "Grant requires a company or job post."})
         if job_post and not company:
             attrs["company"] = job_post.company
+        elif job_post and company and job_post.company_id != company.id:
+            raise serializers.ValidationError({
+                "jobPost": "Selected job post does not belong to the selected company."
+            })
         return attrs
 
 
@@ -528,6 +532,40 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
         if getattr(candidate, "role_name", None) != var_sys.JOB_SEEKER:
             raise serializers.ValidationError("Interview candidate must be a job seeker.")
         return candidate
+
+    def validate(self, attrs):
+        job_post = attrs.get("job_post")
+        question_group = attrs.get("question_group")
+        question_ids = attrs.get("question_ids") or []
+        job_company_id = getattr(job_post, "company_id", None)
+        errors = {}
+
+        if job_company_id:
+            if (
+                question_group
+                and question_group.company_id
+                and question_group.company_id != job_company_id
+            ):
+                errors["question_group"] = "Question group does not belong to the selected job post company."
+
+            if question_group:
+                has_out_of_scope_group_question = question_group.questions.exclude(
+                    Q(company__isnull=True) | Q(company_id=job_company_id)
+                ).exists()
+                if has_out_of_scope_group_question:
+                    errors["question_group"] = "Question group contains questions outside the selected job post company."
+
+            invalid_question_ids = [
+                question.id
+                for question in question_ids
+                if question.company_id and question.company_id != job_company_id
+            ]
+            if invalid_question_ids:
+                errors["question_ids"] = "Questions must be global or belong to the selected job post company."
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
 
     def create(self, validated_data):
         question_ids = validated_data.pop('question_ids', [])

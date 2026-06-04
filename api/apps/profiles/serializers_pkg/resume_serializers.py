@@ -27,8 +27,27 @@ from .profile_serializers import JobSeekerProfileSerializer
 from .company_serializers import CompanySerializer
 
 MAX_MANUAL_CANDIDATE_SALARY = 999_999_999_999
-MAX_MANUAL_CANDIDATE_CV_SIZE = 10 * 1024 * 1024
+MAX_CV_FILE_SIZE = 10 * 1024 * 1024
+MAX_MANUAL_CANDIDATE_CV_SIZE = MAX_CV_FILE_SIZE
 PDF_CONTENT_TYPES = {"application/pdf", "application/x-pdf"}
+
+
+def validate_pdf_cv_file(cv_file):
+    if cv_file is None:
+        return cv_file
+
+    file_name = (getattr(cv_file, "name", "") or "").lower()
+    content_type = (getattr(cv_file, "content_type", "") or "").lower()
+    file_size = getattr(cv_file, "size", 0) or 0
+
+    if not file_name.endswith(".pdf"):
+        raise serializers.ValidationError("Only PDF files are accepted.")
+    if content_type and content_type not in PDF_CONTENT_TYPES:
+        raise serializers.ValidationError("Only PDF files are accepted.")
+    if file_size > MAX_CV_FILE_SIZE:
+        raise serializers.ValidationError("PDF file must be 10MB or smaller.")
+
+    return cv_file
 
 
 class CvSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
@@ -48,6 +67,9 @@ class CvSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         if cv_file:
             return cv_file.get_full_url()
         return None
+
+    def validate_file(self, cv_file):
+        return validate_pdf_cv_file(cv_file)
 
     def update(self, instance, validated_data):
         pdf_file = validated_data.pop('file')
@@ -134,6 +156,9 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         if request and getattr(request, 'method', None) in ["PUT"]:
             fields['file'].required = False
         return fields
+
+    def validate_file(self, cv_file):
+        return validate_pdf_cv_file(cv_file)
 
     def get_view_number(self, resume):
         if hasattr(resume, "_prefetched_objects_cache") and "resumesaved_set" in resume._prefetched_objects_cache:
@@ -253,6 +278,24 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             skills.append({'id': skill.id, 'name': skill.name, 'level': skill.level})
         return skills
 
+    def validate(self, attrs):
+        errors = {}
+        salary_min = attrs.get("salary_min", getattr(self.instance, "salary_min", None))
+        salary_max = attrs.get("salary_max", getattr(self.instance, "salary_max", None))
+        expected_salary = attrs.get("expected_salary")
+
+        if "salary_min" in attrs and attrs["salary_min"] < 0:
+            errors["salaryMin"] = ["Salary must be greater than or equal to 0."]
+        if "salary_max" in attrs and attrs["salary_max"] < 0:
+            errors["salaryMax"] = ["Salary must be greater than or equal to 0."]
+        if "expected_salary" in attrs and expected_salary is not None and expected_salary < 0:
+            errors["expectedSalary"] = ["Expected salary must be greater than or equal to 0."]
+        if salary_min is not None and salary_max is not None and salary_min > salary_max:
+            errors["salaryMax"] = ["Maximum salary must be greater than or equal to minimum salary."]
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
     class Meta:
         model = Resume
         fields = ("id", "slug", "title", "description",
@@ -328,21 +371,7 @@ class EmployerCandidateProfileSerializer(DynamicFieldsMixin, serializers.ModelSe
         return None
 
     def validate_file(self, cv_file):
-        if cv_file is None:
-            return cv_file
-
-        file_name = (getattr(cv_file, "name", "") or "").lower()
-        content_type = (getattr(cv_file, "content_type", "") or "").lower()
-        file_size = getattr(cv_file, "size", 0) or 0
-
-        if not file_name.endswith(".pdf"):
-            raise serializers.ValidationError("Only PDF files are accepted.")
-        if content_type and content_type not in PDF_CONTENT_TYPES:
-            raise serializers.ValidationError("Only PDF files are accepted.")
-        if file_size > MAX_MANUAL_CANDIDATE_CV_SIZE:
-            raise serializers.ValidationError("PDF file must be 10MB or smaller.")
-
-        return cv_file
+        return validate_pdf_cv_file(cv_file)
 
     def _validate_salary_field(self, attrs, field_name, api_name):
         value = attrs.get(field_name)
@@ -359,8 +388,15 @@ class EmployerCandidateProfileSerializer(DynamicFieldsMixin, serializers.ModelSe
         self._validate_salary_field(attrs, "expected_salary", "expectedSalary")
         salary_min = attrs.get("salary_min")
         salary_max = attrs.get("salary_max")
-        if salary_min is not None and salary_max is not None and salary_max and salary_min > salary_max:
-            raise serializers.ValidationError({"salaryMax": ["Maximum salary must be greater than minimum salary."]})
+        provided_fields = set(getattr(self, "initial_data", {}) or {})
+        if (
+            "salaryMin" in provided_fields
+            and "salaryMax" in provided_fields
+            and salary_min is not None
+            and salary_max is not None
+            and salary_min > salary_max
+        ):
+            raise serializers.ValidationError({"salaryMax": ["Maximum salary must be greater than or equal to minimum salary."]})
         return attrs
 
     def _active_company(self):
@@ -551,6 +587,12 @@ def _validate_resume_owner_from_attrs(serializer, attrs):
     return resume
 
 
+def _effective_date(serializer, attrs, field_name):
+    if field_name in attrs:
+        return attrs[field_name]
+    return getattr(serializer.instance, field_name, None)
+
+
 class EducationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     degreeName = serializers.CharField(source='degree_name', required=True, max_length=200)
     major = serializers.CharField(required=True, max_length=255)
@@ -579,6 +621,12 @@ class EducationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         if resume and EducationDetail.objects.filter(resume=resume).count() >= 10:
             raise serializers.ValidationError(
                 {'errorMessage': [ERROR_MESSAGES["MAXIMUM_EDUCATION"]]})
+        start_date = _effective_date(self, attrs, 'start_date')
+        completed_date = _effective_date(self, attrs, 'completed_date')
+        if start_date and completed_date and completed_date < start_date:
+            raise serializers.ValidationError({
+                "completedDate": ["Completed date must be greater than or equal to start date."]
+            })
         return attrs
 
     class Meta:
@@ -615,6 +663,12 @@ class ExperienceSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         if resume and ExperienceDetail.objects.filter(resume=resume).count() >= 10:
             raise serializers.ValidationError(
                 {'errorMessage': [ERROR_MESSAGES["MAXIMUM_EXPERIENCE"]]})
+        start_date = _effective_date(self, attrs, 'start_date')
+        end_date = _effective_date(self, attrs, 'end_date')
+        if start_date and end_date and end_date < start_date:
+            raise serializers.ValidationError({
+                "endDate": ["End date must be greater than or equal to start date."]
+            })
         return attrs
 
     class Meta:
@@ -647,6 +701,12 @@ class CertificateSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         if resume and Certificate.objects.filter(resume=resume).count() >= 10:
             raise serializers.ValidationError(
                 {'errorMessage': [ERROR_MESSAGES["MAXIMUM_CERTIFICATE"]]})
+        start_date = _effective_date(self, attrs, 'start_date')
+        expiration_date = _effective_date(self, attrs, 'expiration_date')
+        if start_date and expiration_date and expiration_date < start_date:
+            raise serializers.ValidationError({
+                "expirationDate": ["Expiration date must be greater than or equal to start date."]
+            })
         return attrs
 
     class Meta:

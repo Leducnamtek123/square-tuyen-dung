@@ -58,10 +58,26 @@ type RawJobPostOption = {
   name?: string;
 };
 
-export const normalizeJobPostOptions = (response: RawJobPostOption[] | { results?: RawJobPostOption[]; data?: RawJobPostOption[]; statusOptions?: RawJobPostOption[] }): JobPostOption[] => {
+type RawJobPostOptionResponse =
+  | RawJobPostOption[]
+  | {
+      results?: RawJobPostOption[];
+      data?: RawJobPostOption[] | { results?: RawJobPostOption[] };
+      statusOptions?: RawJobPostOption[];
+    };
+
+export const normalizeJobPostOptions = (response: RawJobPostOptionResponse): JobPostOption[] => {
   const source = Array.isArray(response)
     ? response
-    : response.results || response.data || response.statusOptions || [];
+    : Array.isArray(response.results)
+      ? response.results
+      : Array.isArray(response.data)
+        ? response.data
+        : response.data && Array.isArray(response.data.results)
+          ? response.data.results
+          : Array.isArray(response.statusOptions)
+            ? response.statusOptions
+            : [];
 
   return source
     .map((option) => ({

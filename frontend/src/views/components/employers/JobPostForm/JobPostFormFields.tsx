@@ -138,7 +138,7 @@ function JobPostFormFields({
         <SingleSelectCustom name="academicLevel" control={control} options={(allConfig?.academicLevelOptions || []) as SelectOption[]} title={t('jobPostForm.title.academiclevel', 'Academic Level')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectacademiclevel', 'Select academic level')} sx={inputSx} />
       </Grid>
       <Grid size={6}>
-        <DatePickerCustom name="deadline" control={control} showRequired={true} title={t('jobPostForm.title.applicationdeadline', 'Application Deadline')} minDate={DATE_OPTIONS.tomorrow()} sx={inputSx} />
+        <DatePickerCustom name="deadline" control={control} showRequired={true} title={t('jobPostForm.title.applicationdeadline', 'Application Deadline')} minDate={DATE_OPTIONS.today()} sx={inputSx} />
       </Grid>
       <Grid size={12}>
         <SingleSelectCustom name="interviewTemplate" control={control} options={interviewTemplateOptions} title={t('jobPostForm.title.interviewtemplate', 'Interview Template')} showRequired={false} placeholder={t('jobPostForm.placeholder.selectinterviewtemplate', 'Select an interview template for automated preliminary assessment...')} sx={inputSx} />

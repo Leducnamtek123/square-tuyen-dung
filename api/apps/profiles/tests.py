@@ -39,6 +39,379 @@ class TestResumeModel:
 
 
 @pytest.mark.django_db
+def test_resume_serializer_allows_fixed_salary_and_rejects_min_above_max():
+    from apps.profiles.serializers import ResumeSerializer
+
+    fixed_salary_serializer = ResumeSerializer(
+        data={"salaryMin": 20000000, "salaryMax": 20000000},
+        partial=True,
+    )
+    invalid_range_serializer = ResumeSerializer(
+        data={"salaryMin": 25000000, "salaryMax": 20000000},
+        partial=True,
+    )
+
+    assert fixed_salary_serializer.is_valid(), fixed_salary_serializer.errors
+    assert not invalid_range_serializer.is_valid()
+    assert "salaryMax" in invalid_range_serializer.errors
+
+
+@pytest.mark.django_db
+def test_resume_serializer_validates_partial_salary_against_existing_values(resume):
+    from apps.profiles.serializers import ResumeSerializer
+
+    min_above_existing_max = ResumeSerializer(
+        resume,
+        data={"salaryMin": int(resume.salary_max) + 1},
+        partial=True,
+    )
+    max_below_existing_min = ResumeSerializer(
+        resume,
+        data={"salaryMax": int(resume.salary_min) - 1},
+        partial=True,
+    )
+    negative_min = ResumeSerializer(
+        resume,
+        data={"salaryMin": -1},
+        partial=True,
+    )
+    negative_max = ResumeSerializer(
+        resume,
+        data={"salaryMax": -1},
+        partial=True,
+    )
+    negative_expected = ResumeSerializer(
+        resume,
+        data={"expectedSalary": -1},
+        partial=True,
+    )
+
+    assert not min_above_existing_max.is_valid()
+    assert "salaryMax" in min_above_existing_max.errors
+    assert not max_below_existing_min.is_valid()
+    assert "salaryMax" in max_below_existing_min.errors
+    assert not negative_min.is_valid()
+    assert "salaryMin" in negative_min.errors
+    assert not negative_max.is_valid()
+    assert "salaryMax" in negative_max.errors
+    assert not negative_expected.is_valid()
+    assert "expectedSalary" in negative_expected.errors
+
+
+@pytest.mark.django_db
+def test_resume_serializer_rejects_non_pdf_cv_file():
+    from django.core.files.uploadedfile import SimpleUploadedFile
+    from apps.profiles.serializers import ResumeSerializer
+
+    serializer = ResumeSerializer(
+        data={
+            "file": SimpleUploadedFile("resume.txt", b"not a pdf", content_type="text/plain"),
+        },
+        partial=True,
+    )
+
+    assert serializer.is_valid() is False
+    assert "file" in serializer.errors
+
+
+@pytest.mark.django_db
+def test_cv_serializer_rejects_non_pdf_and_oversized_file(resume):
+    from django.core.files.uploadedfile import SimpleUploadedFile
+    from apps.profiles.serializers import CvSerializer
+
+    non_pdf_serializer = CvSerializer(
+        resume,
+        data={
+            "file": SimpleUploadedFile("resume.txt", b"not a pdf", content_type="text/plain"),
+        },
+        partial=True,
+    )
+    oversized_serializer = CvSerializer(
+        resume,
+        data={
+            "file": SimpleUploadedFile(
+                "resume.pdf",
+                b"x" * (10 * 1024 * 1024 + 1),
+                content_type="application/pdf",
+            ),
+        },
+        partial=True,
+    )
+
+    assert non_pdf_serializer.is_valid() is False
+    assert "file" in non_pdf_serializer.errors
+    assert oversized_serializer.is_valid() is False
+    assert "file" in oversized_serializer.errors
+
+
+@pytest.mark.django_db
+def test_resume_detail_serializers_reject_end_dates_before_start_dates(resume):
+    from apps.profiles.serializers import (
+        CertificateSerializer,
+        EducationSerializer,
+        ExperienceSerializer,
+    )
+
+    education_serializer = EducationSerializer(
+        data={
+            "degreeName": "Bachelor",
+            "major": "Software Engineering",
+            "trainingPlaceName": "Test University",
+            "startDate": "2022-01-01",
+            "completedDate": "2021-12-31",
+            "resumeId": resume.id,
+        },
+    )
+    experience_serializer = ExperienceSerializer(
+        data={
+            "jobName": "Developer",
+            "companyName": "Test Company",
+            "startDate": "2022-01-01",
+            "endDate": "2021-12-31",
+            "resumeId": resume.id,
+        },
+    )
+    certificate_serializer = CertificateSerializer(
+        data={
+            "name": "Certificate",
+            "trainingPlace": "Test Center",
+            "startDate": "2022-01-01",
+            "expirationDate": "2021-12-31",
+            "resumeId": resume.id,
+        },
+    )
+
+    assert education_serializer.is_valid() is False
+    assert "completedDate" in education_serializer.errors
+    assert experience_serializer.is_valid() is False
+    assert "endDate" in experience_serializer.errors
+    assert certificate_serializer.is_valid() is False
+    assert "expirationDate" in certificate_serializer.errors
+
+
+@pytest.mark.django_db
+def test_job_seeker_profile_serializer_rejects_future_dates_and_invalid_phone(job_seeker_profile):
+    from apps.profiles.serializers import JobSeekerProfileSerializer
+
+    tomorrow = timezone.localdate() + timedelta(days=1)
+    invalid_phone = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={"phone": "not-a-phone"},
+        partial=True,
+    )
+    future_birthday = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={"birthday": tomorrow},
+        partial=True,
+    )
+    future_id_issue_date = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={"idCardIssueDate": tomorrow},
+        partial=True,
+    )
+
+    assert invalid_phone.is_valid() is False
+    assert "phone" in invalid_phone.errors
+    assert future_birthday.is_valid() is False
+    assert "birthday" in future_birthday.errors
+    assert future_id_issue_date.is_valid() is False
+    assert "idCardIssueDate" in future_id_issue_date.errors
+
+
+@pytest.mark.django_db
+def test_job_seeker_profile_serializer_rejects_district_outside_selected_city(job_seeker_profile, city):
+    from apps.locations.models import City, District
+    from apps.profiles.serializers import JobSeekerProfileSerializer
+
+    other_city = City.objects.create(name="Ha Noi", code="HN-PROFILE-CONTRACT")
+    other_district = District.objects.create(name="Ba Dinh", code="BD-PROFILE-CONTRACT", city=other_city)
+
+    serializer = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={
+            "location": {
+                "city": city.id,
+                "district": other_district.id,
+                "address": "123 Nguyen Trai",
+            },
+        },
+        partial=True,
+    )
+
+    assert serializer.is_valid() is False
+    assert "location" in serializer.errors
+    assert "district" in serializer.errors["location"]
+
+
+@pytest.mark.django_db
+def test_job_seeker_profile_serializer_requires_location_city_and_district(job_seeker_profile, city):
+    from apps.locations.models import District
+    from apps.profiles.serializers import JobSeekerProfileSerializer
+
+    district = District.objects.create(name="Quan 1", code="Q1-PROFILE-REQUIRED", city=city)
+    job_seeker_profile.location = None
+    job_seeker_profile.save(update_fields=["location", "update_at"])
+    missing_city = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={
+            "location": {
+                "district": district.id,
+                "address": "123 Nguyen Trai",
+            },
+        },
+        partial=True,
+    )
+    missing_district = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={
+            "location": {
+                "city": city.id,
+                "address": "123 Nguyen Trai",
+            },
+        },
+        partial=True,
+    )
+    missing_address = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={
+            "location": {
+                "city": city.id,
+                "district": district.id,
+            },
+        },
+        partial=True,
+    )
+
+    assert missing_city.is_valid() is False
+    assert "location" in missing_city.errors
+    assert "city" in missing_city.errors["location"]
+    assert missing_district.is_valid() is False
+    assert "location" in missing_district.errors
+    assert "district" in missing_district.errors["location"]
+    assert missing_address.is_valid() is False
+    assert "location" in missing_address.errors
+    assert "address" in missing_address.errors["location"]
+
+
+@pytest.mark.django_db
+def test_job_seeker_profile_serializer_rejects_partial_location_district_outside_existing_city(job_seeker_profile, city):
+    from apps.locations.models import City, District
+    from apps.profiles.serializers import JobSeekerProfileSerializer
+
+    existing_district = District.objects.create(name="Quan 1", code="Q1-PROFILE-PARTIAL", city=city)
+    other_city = City.objects.create(name="Ha Noi", code="HN-PROFILE-PARTIAL")
+    other_district = District.objects.create(name="Ba Dinh", code="BD-PROFILE-PARTIAL", city=other_city)
+    job_seeker_profile.location.city = city
+    job_seeker_profile.location.district = existing_district
+    job_seeker_profile.location.save(update_fields=["city", "district", "update_at"])
+
+    serializer = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={
+            "location": {
+                "district": other_district.id,
+            },
+        },
+        partial=True,
+    )
+
+    assert serializer.is_valid() is False
+    assert "location" in serializer.errors
+    assert "district" in serializer.errors["location"]
+
+
+@pytest.mark.django_db
+def test_job_seeker_profile_serializer_updates_existing_location_ward(job_seeker_profile, city):
+    from apps.locations.models import District, Ward
+    from apps.profiles.serializers import JobSeekerProfileSerializer
+
+    district = District.objects.create(name="Quan 1", code="Q1-PROFILE-WARD", city=city)
+    ward = Ward.objects.create(name="Phuong Ben Nghe", code="BN-PROFILE-WARD", district=district)
+    job_seeker_profile.location.city = city
+    job_seeker_profile.location.district = district
+    job_seeker_profile.location.save(update_fields=["city", "district", "update_at"])
+
+    serializer = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={
+            "location": {
+                "ward": ward.id,
+            },
+        },
+        partial=True,
+    )
+
+    assert serializer.is_valid(), serializer.errors
+    serializer.save()
+    job_seeker_profile.location.refresh_from_db()
+    assert job_seeker_profile.location.ward == ward
+
+
+@pytest.mark.django_db
+def test_company_serializer_validates_contact_fields_and_founded_date(company):
+    from apps.profiles.serializers import CompanySerializer
+
+    tomorrow = timezone.localdate() + timedelta(days=1)
+    too_long_company_name = CompanySerializer(
+        company,
+        data={"companyName": "a" * 256},
+        partial=True,
+    )
+    invalid_employee_size = CompanySerializer(
+        company,
+        data={"employeeSize": 999},
+        partial=True,
+    )
+    invalid_email = CompanySerializer(
+        company,
+        data={"companyEmail": "not-an-email"},
+        partial=True,
+    )
+    invalid_phone = CompanySerializer(
+        company,
+        data={"companyPhone": "not-a-phone"},
+        partial=True,
+    )
+    future_founded_date = CompanySerializer(
+        company,
+        data={"since": tomorrow},
+        partial=True,
+    )
+
+    assert too_long_company_name.is_valid() is False
+    assert "companyName" in too_long_company_name.errors
+    assert invalid_employee_size.is_valid() is False
+    assert "employeeSize" in invalid_employee_size.errors
+    assert invalid_email.is_valid() is False
+    assert "companyEmail" in invalid_email.errors
+    assert invalid_phone.is_valid() is False
+    assert "companyPhone" in invalid_phone.errors
+    assert future_founded_date.is_valid() is False
+    assert "since" in future_founded_date.errors
+
+
+@pytest.mark.django_db
+def test_company_serializer_allows_manual_location_without_coordinates(company, city):
+    from apps.locations.models import District
+    from apps.profiles.serializers import CompanySerializer
+
+    district = District.objects.create(name="Quan 1", code="Q1-COMPANY-CONTRACT", city=city)
+    serializer = CompanySerializer(
+        company,
+        data={
+            "location": {
+                "city": city.id,
+                "district": district.id,
+                "address": "123 Nguyen Trai",
+            },
+        },
+        partial=True,
+    )
+
+    assert serializer.is_valid(), serializer.errors
+
+
+@pytest.mark.django_db
 class TestCompanyModel:
     """Tests for Company model."""
 

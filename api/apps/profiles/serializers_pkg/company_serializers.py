@@ -26,6 +26,7 @@ from apps.files.models import File
 from apps.locations.models import Location
 from apps.accounts import serializers as auth_serializers
 from common import serializers as common_serializers
+from .profile_serializers import PHONE_PATTERN
 
 
 class CompanyImageSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
@@ -110,11 +111,11 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                                     validators=[UniqueValidator(Company.objects.all(),
                                                                 message=ERROR_MESSAGES["COMPANY_TAX_CODE_EXISTS"])])
 
-    companyName = serializers.CharField(source="company_name", required=True,
+    companyName = serializers.CharField(source="company_name", required=True, max_length=255,
                                         validators=[UniqueValidator(Company.objects.all(),
                                                                     message=ERROR_MESSAGES["COMPANY_NAME_EXISTS"])])
 
-    employeeSize = serializers.IntegerField(source="employee_size", required=True)
+    employeeSize = serializers.ChoiceField(source="employee_size", required=True, choices=var_sys.EMPLOYEE_SIZE_CHOICES)
 
     isVerified = serializers.BooleanField(source="is_verified", read_only=True)
 
@@ -125,7 +126,7 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     since = serializers.DateField(required=True, allow_null=True, input_formats=[var_sys.DATE_TIME_FORMAT["ISO8601"],
                                                                                  var_sys.DATE_TIME_FORMAT["Ymd"]])
 
-    companyEmail = serializers.CharField(source="company_email", required=True,
+    companyEmail = serializers.EmailField(source="company_email", required=True,
                                          max_length=100, validators=[UniqueValidator(Company.objects.all(),
                                                                                      message=ERROR_MESSAGES["COMPANY_EMAIL_EXISTS"])])
 
@@ -230,17 +231,24 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     def validate(self, attrs):
         request = self.context.get("request")
+        errors = {}
+        since = attrs.get("since")
+        company_phone = attrs.get("company_phone")
+
+        if "since" in attrs and since and since > timezone.localdate():
+            errors["since"] = ["Founded date cannot be in the future."]
+        if "company_phone" in attrs and company_phone and not PHONE_PATTERN.fullmatch(str(company_phone).strip()):
+            errors["companyPhone"] = ["Invalid phone number."]
+
         if self.instance is None and request and getattr(request.user, "role_name", None) == var_sys.ADMIN:
             email = attrs.get("company_email")
             owner = User.objects.filter(email__iexact=email).first() if email else None
             if owner and Company.objects.filter(user=owner).exists():
-                raise serializers.ValidationError({
-                    "companyEmail": "This email already owns a company."
-                })
+                errors["companyEmail"] = ["This email already owns a company."]
             if owner and owner.role_name == var_sys.ADMIN:
-                raise serializers.ValidationError({
-                    "companyEmail": "Admin accounts cannot be assigned as company owners."
-                })
+                errors["companyEmail"] = ["Admin accounts cannot be assigned as company owners."]
+        if errors:
+            raise serializers.ValidationError(errors)
         return attrs
 
     def create(self, validated_data):

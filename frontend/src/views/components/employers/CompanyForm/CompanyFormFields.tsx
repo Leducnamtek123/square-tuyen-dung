@@ -5,6 +5,7 @@ import SingleSelectCustom from '../../../../components/Common/Controls/SingleSel
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
 import TextFieldAutoCompleteCustom from '../../../../components/Common/Controls/TextFieldAutoCompleteCustom';
 import RichTextEditorCustom from '../../../../components/Common/Controls/RichTextEditorCustom';
+import { DATE_OPTIONS } from '../../../../configs/constants';
 import type { Control } from "react-hook-form";
 import type { TFunction } from "i18next";
 import type { SystemConfig, SelectOption } from "../../../../types/models";
@@ -81,7 +82,7 @@ const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({
         <TextFieldCustom name="fieldOperation" title={t('companyForm.title.fieldofoperation', 'Field of Operation')} showRequired={true} placeholder={t('companyForm.placeholder.entercompanyfieldofoperation', 'Enter company field of operation')} control={control} sx={inputSx} />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
-        <DatePickerCustom name="since" control={control} title={t('companyForm.title.foundeddate', 'Founded Date')} sx={inputSx} />
+        <DatePickerCustom name="since" control={control} title={t('companyForm.title.foundeddate', 'Founded Date')} maxDate={DATE_OPTIONS.today()} sx={inputSx} />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
         <TextFieldCustom name="websiteUrl" title={t('companyForm.title.websiteurl', 'Website URL')} placeholder={t('companyForm.placeholder.entercompanywebsiteurl', 'Enter company website URL')} control={control} sx={inputSx} />
@@ -111,10 +112,10 @@ const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({
         <TextFieldAutoCompleteCustom name="location.address" title={t('companyForm.title.address', 'Address')} showRequired={true} placeholder={t('companyForm.placeholder.enteraddress', 'Enter address')} control={control} options={locationOptions} handleSelect={handleSelectLocation} sx={inputSx} />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
-        <TextFieldCustom name="location.lat" title={t('companyForm.title.latitude', 'Latitude')} showRequired={true} placeholder={t('companyForm.placeholder.enterlatitudecoordinateonthemap', 'Enter latitude coordinate on the map.')} helperText={t('companyForm.helperText.automaticallyfilledifyouchooseasuggestedaddress', 'Automatically filled if you choose a suggested address.')} control={control} sx={inputSx} />
+        <TextFieldCustom name="location.lat" title={t('companyForm.title.latitude', 'Latitude')} placeholder={t('companyForm.placeholder.enterlatitudecoordinateonthemap', 'Enter latitude coordinate on the map.')} helperText={t('companyForm.helperText.automaticallyfilledifyouchooseasuggestedaddress', 'Automatically filled if you choose a suggested address.')} control={control} sx={inputSx} />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
-        <TextFieldCustom name="location.lng" title={t('companyForm.title.longitude', 'Longitude')} showRequired={true} placeholder={t('companyForm.placeholder.enterlongitudecoordinateonthemap', 'Enter longitude coordinate on the map.')} helperText={t('companyForm.helperText.automaticallyfilledifyouchooseasuggestedaddress', 'Automatically filled if you choose a suggested address.')} control={control} sx={inputSx} />
+        <TextFieldCustom name="location.lng" title={t('companyForm.title.longitude', 'Longitude')} placeholder={t('companyForm.placeholder.enterlongitudecoordinateonthemap', 'Enter longitude coordinate on the map.')} helperText={t('companyForm.helperText.automaticallyfilledifyouchooseasuggestedaddress', 'Automatically filled if you choose a suggested address.')} control={control} sx={inputSx} />
       </Grid>
       <Grid size={12}>
         <Paper elevation={0} sx={{ p: { xs: 2, md: 2.5 }, borderRadius: 2.5, border: '1px solid', borderColor: pc.divider(0.95), bgcolor: 'background.paper' }}>

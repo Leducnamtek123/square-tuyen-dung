@@ -9,8 +9,8 @@ export interface CompanyFormValues {
     city: number | string;
     district: number | string;
     address: string;
-    lat: number | string;
-    lng: number | string;
+    lat: number | string | null;
+    lng: number | string | null;
   };
   since?: string | Date | null;
   companyEmail: string;

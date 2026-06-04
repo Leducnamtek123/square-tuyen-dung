@@ -98,9 +98,9 @@ describe('authService', () => {
       expect(httpRequest.post).toHaveBeenCalledWith('auth/email-exists/', { email: 'a@b.com' });
     });
 
-    it('forgotPassword calls post', async () => {
+    it('forgotPassword defaults platform to WEB', async () => {
       await authService.forgotPassword({ email: 'a@b.com' });
-      expect(httpRequest.post).toHaveBeenCalledWith('auth/forgot-password/', { email: 'a@b.com' });
+      expect(httpRequest.post).toHaveBeenCalledWith('auth/forgot-password/', { email: 'a@b.com', platform: 'WEB' });
     });
     
     it('getUserSettings calls get', async () => {

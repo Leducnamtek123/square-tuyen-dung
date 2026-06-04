@@ -9,6 +9,7 @@ Tests cover:
 """
 
 from unittest.mock import AsyncMock, patch
+from datetime import date
 from decimal import Decimal
 from types import SimpleNamespace
 import time
@@ -23,7 +24,9 @@ from apps.accounts.models import User
 from apps.interviews.models import (
     InterviewSession, Question, QuestionGroup,
     InterviewTranscript, InterviewEvaluation,
+    VoiceProfile, VoiceProfileGrant,
 )
+from apps.jobs.models import JobPost
 from apps.profiles.models import Company, CompanyMember, CompanyRole
 from shared.configs import variable_system as var_sys
 from apps.interviews.agent_auth import build_signature
@@ -439,6 +442,96 @@ class QuestionBankPermissionTests(TestCase):
         self.assertEqual(global_group.name, "Global group")
 
 
+class VoiceProfileGrantAdminTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.admin = User.objects.create_user_with_role_name(
+            email="voice-grant-admin@example.com",
+            full_name="Voice Grant Admin",
+            role_name=var_sys.ADMIN,
+            password="password123",
+            is_active=True,
+            is_staff=True,
+        )
+        self.company_owner = User.objects.create_user_with_role_name(
+            email="voice-company-owner@example.com",
+            full_name="Voice Company Owner",
+            role_name=var_sys.EMPLOYER,
+            password="password123",
+            has_company=True,
+            is_active=True,
+        )
+        self.other_owner = User.objects.create_user_with_role_name(
+            email="voice-other-owner@example.com",
+            full_name="Voice Other Owner",
+            role_name=var_sys.EMPLOYER,
+            password="password123",
+            has_company=True,
+            is_active=True,
+        )
+        self.company = Company.objects.create(
+            company_name="Voice Grant Company",
+            company_email="voice-grant-company@example.com",
+            company_phone="0913000001",
+            tax_code="VG000001",
+            user=self.company_owner,
+        )
+        self.other_company = Company.objects.create(
+            company_name="Voice Grant Other Company",
+            company_email="voice-grant-other-company@example.com",
+            company_phone="0913000002",
+            tax_code="VG000002",
+            user=self.other_owner,
+        )
+        self.other_job = JobPost.objects.create(
+            job_name="Other Company Interview Job",
+            deadline=date(2030, 1, 1),
+            quantity=1,
+            job_description="<p>Interview job</p>",
+            position=4,
+            type_of_workplace=1,
+            experience=2,
+            academic_level=2,
+            job_type=1,
+            salary_min=10000000,
+            salary_max=20000000,
+            contact_person_name="HR",
+            contact_person_phone="0901234567",
+            contact_person_email="hr@example.com",
+            user=self.other_owner,
+            company=self.other_company,
+        )
+        self.profile = VoiceProfile.objects.create(
+            name="Ready Interview Voice",
+            voice_type=VoiceProfile.TYPE_PRESET,
+            status=VoiceProfile.STATUS_READY,
+            preset_voice_id="vi-ready-voice",
+            created_by=self.admin,
+        )
+        self.client.force_authenticate(user=self.admin)
+
+    def test_admin_cannot_grant_voice_profile_to_company_with_other_company_job(self):
+        response = self.client.post(
+            "/api/v1/interview/admin/voice-profile-grants/",
+            data={
+                "profile": self.profile.id,
+                "company": self.company.id,
+                "jobPost": self.other_job.id,
+                "isDefault": True,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(
+            VoiceProfileGrant.objects.filter(
+                profile=self.profile,
+                company=self.company,
+                job_post=self.other_job,
+            ).exists()
+        )
+
+
 class InterviewSessionAPITests(TestCase):
     """Tests that the session API accepts snake_case fields and rejects camelCase."""
 
@@ -464,6 +557,26 @@ class InterviewSessionAPITests(TestCase):
             password="password123",
         )
         self.client.force_authenticate(user=self.employer)
+
+    def _create_job_post(self, owner, company, name="Interview Job"):
+        return JobPost.objects.create(
+            job_name=name,
+            deadline=date(2030, 1, 1),
+            quantity=1,
+            job_description="<p>Interview job</p>",
+            position=4,
+            type_of_workplace=1,
+            experience=2,
+            academic_level=2,
+            job_type=1,
+            salary_min=10000000,
+            salary_max=20000000,
+            contact_person_name="HR",
+            contact_person_phone="0901234567",
+            contact_person_email="hr@example.com",
+            user=owner,
+            company=company,
+        )
 
     def test_list_sessions_returns_200(self):
         InterviewSession.objects.create(candidate=self.candidate)
@@ -685,6 +798,108 @@ class InterviewSessionAPITests(TestCase):
         )
 
         self.assertEqual(response.status_code, 400)
+
+    def test_admin_create_session_rejects_company_group_for_other_company_job(self):
+        admin = User.objects.create_user_with_role_name(
+            email="session-admin@example.com",
+            full_name="Session Admin",
+            role_name=var_sys.ADMIN,
+            password="password123",
+            is_active=True,
+            is_staff=True,
+        )
+        other_owner = User.objects.create_user_with_role_name(
+            email="other-admin-session-owner@example.com",
+            full_name="Other Admin Session Owner",
+            role_name=var_sys.EMPLOYER,
+            password="password123",
+            is_active=True,
+            has_company=True,
+        )
+        other_company = Company.objects.create(
+            company_name="Other Admin Session Company",
+            company_email="other-admin-session-company@example.com",
+            company_phone="0912000004",
+            tax_code="IS000004",
+            user=other_owner,
+        )
+        other_job = self._create_job_post(other_owner, other_company, "Other company job")
+        company_group = QuestionGroup.objects.create(
+            name="Company scoped group",
+            company=self.company,
+        )
+        self.client.force_authenticate(user=admin)
+
+        response = self.client.post(
+            "/api/v1/interview/web/sessions/",
+            data={
+                "candidate": self.candidate.pk,
+                "job_post": other_job.id,
+                "question_group": company_group.id,
+                "type": "mixed",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(
+            InterviewSession.objects.filter(
+                candidate=self.candidate,
+                job_post=other_job,
+                question_group=company_group,
+            ).exists()
+        )
+
+    def test_admin_create_session_rejects_company_questions_for_other_company_job(self):
+        admin = User.objects.create_user_with_role_name(
+            email="session-question-admin@example.com",
+            full_name="Session Question Admin",
+            role_name=var_sys.ADMIN,
+            password="password123",
+            is_active=True,
+            is_staff=True,
+        )
+        other_owner = User.objects.create_user_with_role_name(
+            email="other-admin-session-question-owner@example.com",
+            full_name="Other Admin Session Question Owner",
+            role_name=var_sys.EMPLOYER,
+            password="password123",
+            is_active=True,
+            has_company=True,
+        )
+        other_company = Company.objects.create(
+            company_name="Other Admin Session Question Company",
+            company_email="other-admin-session-question-company@example.com",
+            company_phone="0912000005",
+            tax_code="IS000005",
+            user=other_owner,
+        )
+        other_job = self._create_job_post(other_owner, other_company, "Other company question job")
+        company_question = Question.objects.create(
+            text="Company scoped question",
+            company=self.company,
+        )
+        self.client.force_authenticate(user=admin)
+
+        response = self.client.post(
+            "/api/v1/interview/web/sessions/",
+            data={
+                "candidate": self.candidate.pk,
+                "job_post": other_job.id,
+                "question_ids": [company_question.id],
+                "type": "mixed",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(
+            InterviewSession.objects.filter(
+                candidate=self.candidate,
+                job_post=other_job,
+                questions=company_question,
+            ).exists()
+        )
 
 
 class InterviewEvaluationAPITests(TestCase):

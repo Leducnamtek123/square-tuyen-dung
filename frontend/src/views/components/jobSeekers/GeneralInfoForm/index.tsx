@@ -16,15 +16,31 @@ interface GeneralInfoFormProps {
   editData: Partial<GeneralInfoFormValues> | null;
 }
 
-const createGeneralInfoSchema = (t: TFunction<'jobSeeker', undefined>) => yup.object().shape({
+export const createGeneralInfoSchema = (t: TFunction<'jobSeeker', undefined>) => yup.object().shape({
   title: yup.string().required(t('jobSeeker:profile.validation.desiredPositionRequired')).max(200, t('jobSeeker:profile.validation.desiredPositionMax')),
   position: yup.number().required(t('jobSeeker:profile.validation.desiredLevelRequired')).typeError(t('jobSeeker:profile.validation.desiredLevelRequired')),
   academicLevel: yup.number().required(t('jobSeeker:profile.validation.academicLevelRequired')).typeError(t('jobSeeker:profile.validation.academicLevelRequired')),
   experience: yup.number().required(t('jobSeeker:profile.validation.experienceRequired')).typeError(t('jobSeeker:profile.validation.experienceRequired')),
   career: yup.number().required(t('jobSeeker:profile.validation.careerRequired')).typeError(t('jobSeeker:profile.validation.careerRequired')),
   city: yup.number().required(t('jobSeeker:profile.validation.cityRequired')).typeError(t('jobSeeker:profile.validation.cityRequired')),
-  salaryMin: yup.number().required(t('jobSeeker:profile.validation.salaryMinRequired')).typeError(t('jobSeeker:profile.validation.salaryMinInvalid')).min(0, t('jobSeeker:profile.validation.salaryMinInvalid')),
-  salaryMax: yup.number().required(t('jobSeeker:profile.validation.salaryMaxRequired')).typeError(t('jobSeeker:profile.validation.salaryMaxInvalid')).min(0, t('jobSeeker:profile.validation.salaryMaxInvalid')),
+  salaryMin: yup
+    .number()
+    .required(t('jobSeeker:profile.validation.salaryMinRequired'))
+    .typeError(t('jobSeeker:profile.validation.salaryMinInvalid'))
+    .min(0, t('jobSeeker:profile.validation.salaryMinInvalid'))
+    .test('minimum-wage-comparison', t('jobSeeker:profile.validation.salaryMinComparison'), function (value) {
+      const { salaryMax } = this.parent;
+      return !(salaryMax !== undefined && value !== undefined && value > salaryMax);
+    }),
+  salaryMax: yup
+    .number()
+    .required(t('jobSeeker:profile.validation.salaryMaxRequired'))
+    .typeError(t('jobSeeker:profile.validation.salaryMaxInvalid'))
+    .min(0, t('jobSeeker:profile.validation.salaryMaxInvalid'))
+    .test('maximum-wage-comparison', t('jobSeeker:profile.validation.salaryMaxComparison'), function (value) {
+      const { salaryMin } = this.parent;
+      return !(salaryMin !== undefined && value !== undefined && value < salaryMin);
+    }),
   expectedSalary: yup
     .number()
     .nullable()

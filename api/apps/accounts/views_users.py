@@ -53,6 +53,7 @@ from apps.profiles.models import CompanyMember
 
 from .serializers import (
     CheckCredsSerializer,
+    EmailExistsSerializer,
     ResendVerifyEmailSerializer,
     ForgotPasswordSerializer,
     UpdatePasswordSerializer,
@@ -130,13 +131,13 @@ def _log_user_info_perf(label, user_id, start_at):
 @api_view(http_method_names=["post"])
 @permission_classes([AllowAny])
 def check_email_exists(request):
-    data = request.data
-    email = data.get("email")
-    if not email:
+    serializer = EmailExistsSerializer(data=request.data)
+    if not serializer.is_valid():
         return response_data(
             status=status.HTTP_400_BAD_REQUEST,
-            errors={"email": ["Email là bắt buộc."]},
+            errors=serializer.errors,
         )
+    email = serializer.validated_data["email"]
     exists = User.objects.filter(email__iexact=email).exists()
     return response_data(status=status.HTTP_200_OK, data={"exists": exists})
 

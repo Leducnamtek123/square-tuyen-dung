@@ -20,6 +20,16 @@ interface ForgotPasswordFormData {
 interface ForgotPasswordFormProps {
   handleRequestResetPassword: (data: ForgotPasswordFormData) => void;
 }
+type ForgotPasswordT = ReturnType<typeof useTranslation>['t'];
+
+export const createForgotPasswordSchema = (t: ForgotPasswordT) =>
+  yup.object().shape({
+    email: yup
+      .string()
+      .required(t('validation.requiredEmail'))
+      .email(t('validation.invalidEmail'))
+      .max(100, t('validation.maxEmail')),
+  });
 
 
 
@@ -27,17 +37,7 @@ const ForgotPasswordForm = ({ handleRequestResetPassword }: ForgotPasswordFormPr
 
   const { t } = useTranslation('auth');
 
-  const schema = yup.object().shape({
-
-    email: yup
-
-      .string()
-
-      .required(t('validation.requiredEmail'))
-
-      .email(t('validation.invalidEmail')),
-
-  });
+  const schema = React.useMemo(() => createForgotPasswordSchema(t), [t]);
 
   const { control, handleSubmit } = useForm<ForgotPasswordFormData>({
 

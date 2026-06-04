@@ -2,6 +2,7 @@
 JobSeeker Profile serializers for the profiles app.
 Extracted from the monolithic serializers.py.
 """
+import re
 from datetime import date
 
 from django.db import transaction
@@ -15,6 +16,11 @@ from ..models import JobSeekerProfile
 from apps.locations.models import Location
 from apps.accounts import serializers as auth_serializers
 from common import serializers as common_serializers
+
+
+PHONE_PATTERN = re.compile(
+    r"^((\+[1-9]{1,4}[ \-]*)|(\([0-9]{2,3}\)[ \-]*)|([0-9]{2,4})[ \-]*)*?[0-9]{3,4}?[ \-]*[0-9]{3,4}?$"
+)
 
 
 class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
@@ -73,6 +79,24 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
             return age
         return None
 
+    def validate(self, attrs):
+        errors = {}
+        today = date.today()
+        phone = attrs.get("phone")
+        birthday = attrs.get("birthday")
+        id_card_issue_date = attrs.get("id_card_issue_date")
+
+        if "phone" in attrs and phone and not PHONE_PATTERN.fullmatch(str(phone).strip()):
+            errors["phone"] = ["Invalid phone number."]
+        if "birthday" in attrs and birthday and birthday >= today:
+            errors["birthday"] = ["Birthday must be before today."]
+        if "id_card_issue_date" in attrs and id_card_issue_date and id_card_issue_date > today:
+            errors["idCardIssueDate"] = ["ID card issue date cannot be in the future."]
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
     class Meta:
         model = JobSeekerProfile
         fields = ('id', 'phone', 'birthday',
@@ -106,6 +130,7 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
             if location_obj:
                 location_obj.city = location_data.get("city", location_obj.city)
                 location_obj.district = location_data.get("district", location_obj.district)
+                location_obj.ward = location_data.get("ward", location_obj.ward)
                 location_obj.address = location_data.get("address", location_obj.address)
                 location_obj.save()
             else:

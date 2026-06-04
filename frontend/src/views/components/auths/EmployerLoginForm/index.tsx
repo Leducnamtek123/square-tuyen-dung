@@ -24,6 +24,20 @@ interface EmployerLoginFormProps {
   onFacebookLogin?: (result: FacebookAuthResult) => void;
   onGoogleLogin: (result: Omit<CodeResponse, "error" | "error_description" | "error_uri">) => void;
 }
+type EmployerLoginT = ReturnType<typeof useTranslation>['t'];
+
+export const createEmployerLoginSchema = (t: EmployerLoginT) =>
+  yup.object().shape({
+    email: yup
+      .string()
+      .required(t('validation.requiredEmail'))
+      .email(t('validation.invalidEmail'))
+      .max(100, t('validation.maxEmail')),
+    password: yup
+      .string()
+      .required(t('validation.requiredPassword'))
+      .max(128, t('validation.passwordMax')),
+  });
 
 
 
@@ -105,35 +119,7 @@ const EmployerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: Employer
 
   const { t } = useTranslation('auth');
 
-  const schema = yup.object().shape({
-
-    email: yup
-
-      .string()
-
-      .required(t('validation.requiredEmail'))
-
-      .email(t('validation.invalidEmail')),
-
-    password: yup
-
-      .string()
-
-      .required(t('validation.requiredPassword'))
-
-      .min(8, t('validation.passwordMin'))
-
-      .max(128, t('validation.passwordMax'))
-
-      .matches(
-
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-
-        t('validation.passwordRule')
-
-      ),
-
-  });
+  const schema = React.useMemo(() => createEmployerLoginSchema(t), [t]);
 
   const { control, handleSubmit } = useForm<EmployerLoginFormData>({
     defaultValues: {

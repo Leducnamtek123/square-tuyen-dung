@@ -9,7 +9,7 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import { useTranslation } from 'react-i18next';
 import useDebounce from '../../../../hooks/useDebounce';
-import { REGEX_VALIDATE } from '../../../../configs/constants';
+import { DATE_OPTIONS, REGEX_VALIDATE } from '../../../../configs/constants';
 import errorHandling from '../../../../utils/errorHandling';
 import commonService from '../../../../services/commonService';
 import goongService from '../../../../services/goongService';
@@ -19,6 +19,7 @@ import type { AxiosError } from 'axios';
 import type { RoleName } from '../../../../types/auth';
 import type { RootState } from '../../../../redux/store';
 import type { SelectOption } from '@/types/models';
+import { shouldResetChildLocationValue } from '@/utils/locationForm';
 
 import AccountInfoStep from './AccountInfoStep';
 import CompanyInfoStep from './CompanyInfoStep';
@@ -57,6 +58,46 @@ interface EmployerSignUpFormProps {
 type NestedServerErrors = Record<string, string[] | Record<string, string[]>>;
 
 const EMPTY_SERVER_ERRORS: Record<string, string[] | NestedServerErrors> = {};
+type EmployerSignUpT = ReturnType<typeof useTranslation>['t'];
+
+export const createEmployerSignUpSchema = (t: EmployerSignUpT) =>
+  yup.object().shape({
+    fullName: yup.string().required(t('validation.requiredFullName')).max(100, t('validation.maxFullName')),
+    email: yup.string().required(t('validation.requiredEmail')).email(t('validation.invalidEmail')).max(100, t('validation.maxEmail')),
+    password: yup.string().required(t('validation.requiredPassword')).min(8, t('validation.passwordMin')).max(128, t('validation.passwordMax')).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/, t('validation.passwordRule')),
+    confirmPassword: yup.string().required(t('validation.requiredConfirmPassword')).oneOf([yup.ref('password')], t('validation.confirmPasswordMatch')),
+    company: yup.object().shape({
+      companyName: yup.string().required(t('validation.requiredCompanyName')).max(255, t('validation.maxCompanyName')),
+      companyEmail: yup.string().required(t('validation.requiredCompanyEmail')).email(t('validation.invalidCompanyEmail')).max(100, t('validation.maxCompanyEmail')),
+      companyPhone: yup.string().required(t('validation.requiredCompanyPhone')).matches(REGEX_VALIDATE.phoneRegExp, t('validation.invalidCompanyPhone')).max(15, t('validation.maxCompanyPhone')),
+      taxCode: yup.string().required(t('validation.requiredTaxCode')).max(30, t('validation.maxTaxCode')),
+      since: yup
+        .date()
+        .nullable()
+        .typeError(t('validation.invalidDate') || '')
+        .max(DATE_OPTIONS.today(), t('validation.foundedDateInFuture', 'Founded date cannot be in the future.')),
+      fieldOperation: yup.string().max(255, t('validation.maxFieldOperation')),
+      employeeSize: yup
+        .number()
+        .required(t('validation.requiredEmployeeSize'))
+        .typeError(t('validation.requiredEmployeeSize'))
+        .oneOf([1, 2, 3, 4], t('validation.employeeSizeInvalid', 'Invalid company size.')),
+      websiteUrl: yup
+        .string()
+        .transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value))
+        .nullable()
+        .notRequired()
+        .url(t('common:validation.invalidUrl', 'Please enter a valid URL.'))
+        .max(300, t('validation.maxWebsite')),
+      location: yup.object().shape({
+        city: yup.number().required(t('validation.requiredCity')).typeError(t('validation.requiredCity')),
+        district: yup.number().required(t('validation.requiredDistrict')).typeError(t('validation.requiredDistrict')),
+        address: yup.string().required(t('validation.requiredAddress')).max(255, t('validation.maxAddress')),
+        lat: yup.string().optional(),
+        lng: yup.string().optional(),
+      }),
+    }),
+  });
 
 const applyEmployerServerErrors = (
   serverErrors: Record<string, string[] | NestedServerErrors>,
@@ -151,29 +192,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
   const [districtOptions, setDistrictOptions] = React.useState<SelectOption[]>([]);
   const [locationOptions, setLocationOptions] = React.useState<SelectOption[]>([]);
 
-  const schema = yup.object().shape({
-    fullName: yup.string().required(t('validation.requiredFullName')).max(100, t('validation.maxCompanyName')),
-    email: yup.string().required(t('validation.requiredEmail')).email(t('validation.invalidEmail')).max(100, t('validation.maxEmail')),
-    password: yup.string().required(t('validation.requiredPassword')).min(8, t('validation.passwordMin')).max(128, t('validation.passwordMax')).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/, t('validation.passwordRule')),
-    confirmPassword: yup.string().required(t('validation.requiredConfirmPassword')).oneOf([yup.ref('password')], t('validation.confirmPasswordMatch')),
-    company: yup.object().shape({
-      companyName: yup.string().required(t('validation.requiredCompanyName')).max(255, t('validation.maxCompanyName')),
-      companyEmail: yup.string().required(t('validation.requiredCompanyEmail')).email(t('validation.invalidCompanyEmail')).max(100, t('validation.maxCompanyEmail')),
-      companyPhone: yup.string().required(t('validation.requiredCompanyPhone')).matches(REGEX_VALIDATE.phoneRegExp, t('validation.invalidCompanyPhone')).max(15, t('validation.maxCompanyPhone')),
-      taxCode: yup.string().required(t('validation.requiredTaxCode')).max(30, t('validation.maxTaxCode')),
-      since: yup.date().nullable().typeError(t('validation.invalidDate') || ''),
-      fieldOperation: yup.string().max(255, t('validation.maxFieldOperation')),
-      employeeSize: yup.number().required(t('validation.requiredEmployeeSize')).typeError(t('validation.requiredEmployeeSize')),
-      websiteUrl: yup.string().max(300, t('validation.maxWebsite')),
-      location: yup.object().shape({
-        city: yup.number().required(t('validation.requiredCity')).typeError(t('validation.requiredCity')),
-        district: yup.number().required(t('validation.requiredDistrict')).typeError(t('validation.requiredDistrict')),
-        address: yup.string().required(t('validation.requiredAddress')).max(255, t('validation.maxAddress')),
-        lat: yup.string().optional(),
-        lng: yup.string().optional(),
-      }),
-    }),
-  });
+  const schema = React.useMemo(() => createEmployerSignUpSchema(t), [t]);
 
   const { control, setError, clearErrors, setValue, getValues, handleSubmit } = useForm<EmployerSignUpFormData>({
     defaultValues: {
@@ -260,9 +279,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
       try {
         const resData = await commonService.getDistrictsByCityId(cityId);
         const nextDistrictOptions = resData.data?.map((d) => ({ id: d.id, name: d.name })) || [];
-        // Only clear district if the cityId has actually changed (user interaction)
-        // and it's not the initial load (prevCityIdRef.current is not null).
-        if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
+        if (shouldResetChildLocationValue(prevCityIdRef.current, cityId)) {
           setValue('company.location.district', '');
         }
         setDistrictOptions(nextDistrictOptions);
@@ -271,7 +288,15 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
         errorHandling(error);
       }
     };
-    if (cityId) loadDistricts(Number(cityId));
+    if (cityId) {
+      loadDistricts(Number(cityId));
+    } else {
+      if (shouldResetChildLocationValue(prevCityIdRef.current, cityId)) {
+        setValue('company.location.district', '');
+      }
+      setDistrictOptions([]);
+      prevCityIdRef.current = null;
+    }
   }, [cityId, setValue]);
 
   const handleSubmtNextSuccess = (data: EmployerSignUpFormData) => handleNext(data.email);

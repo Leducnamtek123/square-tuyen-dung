@@ -50,6 +50,12 @@ describe('normalizeJobPostOptions', () => {
       { id: 4, jobName: 'Product Manager' },
     ]);
   });
+
+  it('accepts nested data results response shape', () => {
+    expect(normalizeJobPostOptions({ data: { results: [{ id: 5, jobName: 'Site Supervisor' }] } })).toEqual([
+      { id: 5, jobName: 'Site Supervisor' },
+    ]);
+  });
 });
 
 describe('useJobPostMutations', () => {

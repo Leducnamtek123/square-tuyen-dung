@@ -12,7 +12,7 @@ import type { PersonalProfileFormProps, PersonalProfileFormValues } from './type
 export type { PersonalProfileFormValues } from './types';
 import { DATE_OPTIONS, REGEX_VALIDATE } from '../../../../configs/constants';
 
-const createPersonalProfileSchema = (t: TFunction) =>
+export const createPersonalProfileSchema = (t: TFunction) =>
   yup.object().shape({
     user: yup.object().shape({
       fullName: yup
@@ -45,7 +45,12 @@ const createPersonalProfileSchema = (t: TFunction) =>
       address: yup.string().required(t('jobSeeker:profile.validation.addressRequired')).max(255, t('jobSeeker:profile.validation.addressMax')),
     }),
     idCardNumber: yup.string().max(30, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.idCardNumber') })),
-    idCardIssueDate: yup.date().nullable(),
+    idCardIssueDate: yup
+      .date()
+      .nullable()
+      .transform((value, originalValue) => (originalValue ? new Date(originalValue) : null))
+      .typeError(t('jobSeeker:profile.validation.idCardIssueDateInvalid'))
+      .max(DATE_OPTIONS.today(), t('jobSeeker:profile.validation.idCardIssueDateInvalid')),
     idCardIssuePlace: yup.string().max(255, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.idCardIssuePlace') })),
     taxCode: yup.string().max(30, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.taxCode') })),
     socialInsuranceNo: yup.string().max(30, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.socialInsuranceNo') })),
@@ -60,7 +65,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
   const { allConfig } = useConfig();
   const schema = React.useMemo(() => createPersonalProfileSchema(t), [t]);
 
-  const { control, reset, handleSubmit } = useForm<PersonalProfileFormValues>({
+  const { control, reset, handleSubmit, setValue } = useForm<PersonalProfileFormValues>({
     resolver: typedYupResolver<PersonalProfileFormValues>(schema),
   });
 
@@ -89,7 +94,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
     }));
   }, [editData, reset]);
 
-  const districtOptions = usePersonalProfileDistrictOptions(control);
+  const districtOptions = usePersonalProfileDistrictOptions(control, setValue);
 
   return (
     <form id="modal-form" onSubmit={handleSubmit(handleUpdateProfile)}>

@@ -31,18 +31,11 @@ interface JobSeekerSignUpFormProps {
 }
 
 const EMPTY_SERVER_ERRORS: Record<string, string[]> = {};
+type JobSeekerSignUpT = ReturnType<typeof useTranslation>['t'];
 
-const JobSeekerSignUpForm = ({
-  onRegister,
-  onFacebookRegister,
-  onGoogleRegister,
-  serverErrors = EMPTY_SERVER_ERRORS,
-  checkCreds,
-}: JobSeekerSignUpFormProps) => {
-  const { t } = useTranslation('auth');
-
-  const schema = yup.object().shape({
-    fullName: yup.string().required(t('validation.requiredFullName')),
+export const createJobSeekerSignUpSchema = (t: JobSeekerSignUpT) =>
+  yup.object().shape({
+    fullName: yup.string().required(t('validation.requiredFullName')).max(100, t('validation.maxFullName')),
     email: yup
       .string()
       .required(t('validation.requiredEmail'))
@@ -59,6 +52,17 @@ const JobSeekerSignUpForm = ({
       .required(t('validation.requiredConfirmPassword'))
       .oneOf([yup.ref('password')], t('validation.confirmPasswordMatch')),
   });
+
+const JobSeekerSignUpForm = ({
+  onRegister,
+  onFacebookRegister,
+  onGoogleRegister,
+  serverErrors = EMPTY_SERVER_ERRORS,
+  checkCreds,
+}: JobSeekerSignUpFormProps) => {
+  const { t } = useTranslation('auth');
+
+  const schema = React.useMemo(() => createJobSeekerSignUpSchema(t), [t]);
 
   const { control, setError, clearErrors, handleSubmit } = useForm<JobSeekerSignUpFormData>({
     defaultValues: {

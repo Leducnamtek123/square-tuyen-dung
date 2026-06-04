@@ -18,6 +18,7 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 import MultilineTextFieldCustom from '../../../../components/Common/Controls/MultilineTextFieldCustom';
 
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
+import type { TFunction } from 'i18next';
 import type { Control as ReactHookFormControl } from 'react-hook-form';
 import type { FieldValues as ReactHookFormFieldValues } from 'react-hook-form';
 import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
@@ -48,49 +49,40 @@ const getDefaultValues = (editData: Partial<FormValues> | null): FormValues => (
   ...(editData || {}),
 });
 
+export const createEducationDetailSchema = (t: TFunction<'jobSeeker', undefined>) => yup.object().shape({
+  degreeName: yup
+    .string()
+    .required(t('jobSeeker:profile.validation.degreeNameRequired'))
+    .max(200, t('jobSeeker:profile.validation.degreeNameMax')),
+  major: yup
+    .string()
+    .required(t('jobSeeker:profile.validation.majorRequired'))
+    .max(255, t('jobSeeker:profile.validation.majorMax')),
+  trainingPlaceName: yup
+    .string()
+    .required(t('jobSeeker:profile.validation.trainingPlaceRequired'))
+    .max(255, t('jobSeeker:profile.validation.trainingPlaceMax')),
+  startDate: yup
+    .date()
+    .required(t('jobSeeker:profile.validation.startDateRequired'))
+    .typeError(t('jobSeeker:profile.validation.startDateRequired')),
+  completedDate: yup.date().nullable().test(
+    'completed-date-comparison',
+    t('jobSeeker:profile.validation.completedDateComparison'),
+    function (value) {
+      const { startDate } = this.parent;
+      if (!value || !startDate) return true;
+      return !(value < startDate);
+    }
+  ),
+  gradeOrRank: yup.string().max(100, t('jobSeeker:profile.validation.gradeOrRankMax')),
+});
+
 const EducationDetailFormContent = ({ handleAddOrUpdate, editData }: EducationDetailFormProps) => {
 
   const { t } = useTranslation(['jobSeeker']);
 
-  const schema = yup.object().shape({
-
-    degreeName: yup
-
-      .string()
-
-      .required(t('jobSeeker:profile.validation.degreeNameRequired'))
-
-      .max(200, t('jobSeeker:profile.validation.degreeNameMax')),
-
-    major: yup
-
-      .string()
-
-      .required(t('jobSeeker:profile.validation.majorRequired'))
-
-      .max(255, t('jobSeeker:profile.validation.majorMax')),
-
-    trainingPlaceName: yup
-
-      .string()
-
-      .required(t('jobSeeker:profile.validation.trainingPlaceRequired'))
-
-      .max(255, t('jobSeeker:profile.validation.trainingPlaceMax')),
-
-    startDate: yup
-
-      .date()
-
-      .required(t('jobSeeker:profile.validation.startDateRequired'))
-
-      .typeError(t('jobSeeker:profile.validation.startDateRequired')),
-
-    completedDate: yup.date().nullable(),
-
-    gradeOrRank: yup.string().max(100, t('jobSeeker:profile.validation.gradeOrRankMax')),
-
-  });
+  const schema = React.useMemo(() => createEducationDetailSchema(t), [t]);
 
   const { control, handleSubmit } = useForm<FormValues>({
     defaultValues: getDefaultValues(editData),

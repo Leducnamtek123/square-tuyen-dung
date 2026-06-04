@@ -385,7 +385,9 @@
       "automaticallyfilledifyouchooseasuggestedaddress": "Tự động điền nếu bạn chọn một địa chỉ gợi ý"
     },
     "validation": {
-      "companyNameRequired": "Tên công ty là bắt buộc"
+      "companyNameRequired": "Tên công ty là bắt buộc",
+      "foundedDateInFuture": "Ngày thành lập không được ở tương lai.",
+      "employeeSizeInvalid": "Quy mô công ty không hợp lệ."
     }
   },
   "statItem": {
@@ -532,14 +534,14 @@
       "genderrequirementisrequired": "Yêu cầu chọn giới tính",
       "minimumsalaryisrequired": "Yêu cầu mức lương tối thiểu",
       "invalidminimumsalary": "Mức lương tối thiểu không hợp lệ",
-      "minSalaryLess": "Lương tối thiểu phải nhỏ hơn lương tối đa",
+      "minSalaryLess": "Lương tối thiểu phải nhỏ hơn hoặc bằng lương tối đa",
       "maximumsalaryisrequired": "Yêu cầu mức lương tối đa",
       "invalidmaximumsalary": "Mức lương tối đa không hợp lệ",
-      "maxSalaryGreater": "Lương tối đa phải lớn hơn lương tối thiểu",
+      "maxSalaryGreater": "Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu",
       "academiclevelisrequired": "Yêu cầu trình độ học vấn",
       "applicationdeadlineisrequired": "Yêu cầu thời hạn ứng tuyển",
       "invalidapplicationdeadline": "Thời hạn không hợp lệ",
-      "deadlinemustbeaftertoday": "Thời hạn phải sau hôm nay",
+      "deadlinemustbeaftertoday": "Thời hạn không được trong quá khứ",
       "jobDescRequired": "Yêu cầu mô tả công việc",
       "jobReqRequired": "Yêu cầu yêu cầu công việc",
       "benefitsRequired": "Yêu cầu quyền lợi",
