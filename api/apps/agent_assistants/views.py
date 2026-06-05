@@ -65,6 +65,7 @@ class AgentThreadMessagesAPIView(APIView):
                 request,
                 thread,
                 request.data.get("content", ""),
+                attachments=request.data.get("attachments"),
             )
         except AgentAssistantError as exc:
             return response_data(

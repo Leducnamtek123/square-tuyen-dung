@@ -312,6 +312,107 @@ def test_agent_fallback_response_uses_vietnamese_diacritics_when_planner_is_malf
 
 
 @pytest.mark.django_db
+def test_agent_message_accepts_image_attachment_and_passes_it_to_planner(monkeypatch, employer_user, company):
+    calls = []
+    image_data_url = "data:image/png;base64,iVBORw0KGgo="
+
+    def fake_post_chat_completion(payload, *, default_model="", timeout=(10, 120)):
+        calls.append(payload)
+        return (
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": (
+                                "{"
+                                "\"toolName\":\"respond\","
+                                "\"arguments\":{},"
+                                "\"assistantText\":\"Tôi đã nhận ảnh và có thể phân tích nội dung trong ảnh.\""
+                                "}"
+                            ),
+                        }
+                    }
+                ],
+            },
+            AIEndpointCandidate(name="local", base_url="http://llm.test/v1", model=default_model),
+        )
+
+    monkeypatch.setattr(
+        "integrations.ai.client.post_chat_completion_requests",
+        fake_post_chat_completion,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+    thread_response = client.post("/api/v1/agent-assistants/threads/", data={"portal": "employer"}, format="json")
+    thread_id = thread_response.data["data"]["id"]
+
+    response = client.post(
+        f"/api/v1/agent-assistants/threads/{thread_id}/messages/",
+        data={
+            "content": "Phân tích ảnh ứng viên này giúp tôi",
+            "attachments": [
+                {
+                    "type": "image",
+                    "name": "candidate-screen.png",
+                    "mimeType": "image/png",
+                    "size": 8,
+                    "dataUrl": image_data_url,
+                }
+            ],
+        },
+        format="json",
+    )
+
+    assert response.status_code == 200
+    user_message = response.data["data"]["userMessage"]
+    assert user_message["parts"][0] == {"type": "text", "text": "Phân tích ảnh ứng viên này giúp tôi"}
+    assert user_message["parts"][1]["type"] == "image"
+    assert user_message["parts"][1]["mimeType"] == "image/png"
+    assert user_message["parts"][1]["name"] == "candidate-screen.png"
+    assert user_message["parts"][1]["dataUrl"] == image_data_url
+
+    assert calls, "planner should receive the multimodal user message"
+    planner_user_message = calls[0]["messages"][1]
+    assert isinstance(planner_user_message["content"], list)
+    assert planner_user_message["content"][0]["type"] == "text"
+    assert planner_user_message["content"][1] == {
+        "type": "image_url",
+        "image_url": {"url": image_data_url},
+    }
+    assert "Tôi đã nhận ảnh" in response.data["data"]["assistantMessage"]["content"]
+
+
+@pytest.mark.django_db
+def test_agent_message_rejects_non_image_attachment(employer_user, company):
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+    thread_response = client.post("/api/v1/agent-assistants/threads/", data={"portal": "employer"}, format="json")
+    thread_id = thread_response.data["data"]["id"]
+
+    response = client.post(
+        f"/api/v1/agent-assistants/threads/{thread_id}/messages/",
+        data={
+            "content": "Đọc file này",
+            "attachments": [
+                {
+                    "type": "file",
+                    "name": "resume.pdf",
+                    "mimeType": "application/pdf",
+                    "size": 12,
+                    "dataUrl": "data:application/pdf;base64,JVBERi0=",
+                }
+            ],
+        },
+        format="json",
+    )
+
+    assert response.status_code == 400
+    assert "Chỉ hỗ trợ ảnh" in response.data["error"]["message"]
+
+
+@pytest.mark.django_db
 def test_employer_agent_message_searches_candidate_resumes(employer_user, job_post, resume):
     resume.title = "Senior React Engineer"
     resume.skills_summary = "React, TypeScript, hiring platform"

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import base64
+import binascii
 import json
 import re
 import unicodedata
@@ -37,8 +39,69 @@ class AgentRunResult:
     tool_calls: list[AgentToolCall]
 
 
+MAX_AGENT_IMAGE_ATTACHMENTS = 5
+MAX_AGENT_IMAGE_BYTES = 2 * 1024 * 1024
+ALLOWED_AGENT_IMAGE_MIME_TYPES = {"image/png", "image/jpeg", "image/webp", "image/gif"}
+
+
 def _json_safe(value: Any) -> Any:
     return json.loads(json.dumps(value, default=str))
+
+
+def _attachment_name(value: Any) -> str:
+    name = re.sub(r"\s+", " ", str(value or "")).strip()
+    return name[:180] or "image"
+
+
+def _normalize_agent_attachments(content: str, attachments: Any) -> list[dict[str, Any]]:
+    parts: list[dict[str, Any]] = []
+    if content:
+        parts.append({"type": "text", "text": content})
+
+    if attachments in (None, ""):
+        return parts
+    if not isinstance(attachments, list):
+        raise AgentAssistantError("Định dạng tệp đính kèm không hợp lệ.")
+    if len(attachments) > MAX_AGENT_IMAGE_ATTACHMENTS:
+        raise AgentAssistantError(f"Chỉ hỗ trợ tối đa {MAX_AGENT_IMAGE_ATTACHMENTS} ảnh trong một tin nhắn.")
+
+    for attachment in attachments:
+        if not isinstance(attachment, dict):
+            raise AgentAssistantError("Định dạng tệp đính kèm không hợp lệ.")
+
+        attachment_type = str(attachment.get("type") or "").strip().lower()
+        mime_type = str(attachment.get("mimeType") or attachment.get("mime_type") or "").strip().lower()
+        if attachment_type != "image" or mime_type not in ALLOWED_AGENT_IMAGE_MIME_TYPES:
+            raise AgentAssistantError("Chỉ hỗ trợ ảnh PNG, JPG, WebP hoặc GIF trong Agent Assistants.")
+
+        data_url = str(attachment.get("dataUrl") or attachment.get("data_url") or "").strip()
+        expected_prefix = f"data:{mime_type};base64,"
+        if not data_url.lower().startswith(expected_prefix):
+            raise AgentAssistantError("Ảnh đính kèm không hợp lệ hoặc thiếu dữ liệu base64.")
+
+        encoded = data_url[len(expected_prefix) :]
+        try:
+            decoded = base64.b64decode(encoded, validate=True)
+        except (binascii.Error, ValueError):
+            raise AgentAssistantError("Ảnh đính kèm không hợp lệ hoặc thiếu dữ liệu base64.")
+
+        byte_size = len(decoded)
+        declared_size = _coerce_int(attachment.get("size"))
+        effective_size = declared_size or byte_size
+        if byte_size > MAX_AGENT_IMAGE_BYTES or effective_size > MAX_AGENT_IMAGE_BYTES:
+            raise AgentAssistantError("Ảnh đính kèm vượt quá giới hạn 2MB.")
+
+        parts.append(
+            {
+                "type": "image",
+                "name": _attachment_name(attachment.get("name")),
+                "mimeType": mime_type,
+                "size": byte_size,
+                "dataUrl": data_url,
+            }
+        )
+
+    return parts
 
 
 def _strip_accents(value: str) -> str:
@@ -549,25 +612,31 @@ class AgentAssistantService:
         return queryset.none()
 
     @staticmethod
-    def process_user_message(request, thread: AgentThread, content: str) -> AgentRunResult:
+    def process_user_message(
+        request,
+        thread: AgentThread,
+        content: str,
+        attachments: Any | None = None,
+    ) -> AgentRunResult:
         content = (content or "").strip()
-        if not content:
+        parts = _normalize_agent_attachments(content, attachments)
+        if not content and not parts:
             raise AgentAssistantError("Nội dung tin nhắn không được để trống.")
 
         user_message = AgentMessage.objects.create(
             thread=thread,
             role=AgentMessage.ROLE_USER,
             content=content,
-            parts=[{"type": "text", "text": content}],
+            parts=parts,
         )
 
         if thread.title == "Agent Assistants":
-            thread.title = content[:90]
+            thread.title = content[:90] if content else "Đã gửi ảnh"
         thread.last_message_at = timezone.now()
         thread.save(update_fields=["title", "last_message_at", "update_at"])
 
         planner_unavailable = None
-        planned_action = AgentPlanner.plan(request, thread, content)
+        planned_action = AgentPlanner.plan(request, thread, content, message_parts=parts)
         if isinstance(planned_action, AgentPlannerUnavailable):
             planner_unavailable = planned_action
             planned_action = None

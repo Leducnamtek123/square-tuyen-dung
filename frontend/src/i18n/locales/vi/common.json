@@ -909,6 +909,15 @@
     "loadError": "Không thể tải Agent Assistants. Vui lòng thử lại.",
     "sendError": "Agent chưa chạy được yêu cầu này. Vui lòng kiểm tra nội dung và thử lại.",
     "thinking": "Agent đang suy nghĩ...",
+    "attachments": {
+      "addImage": "Đính kèm ảnh",
+      "remove": "Xóa ảnh",
+      "threadTitle": "Đã gửi ảnh",
+      "limit": "Chỉ có thể đính kèm tối đa {{count}} ảnh.",
+      "unsupported": "Chỉ hỗ trợ ảnh PNG, JPG, WebP hoặc GIF.",
+      "tooLarge": "Mỗi ảnh cần nhỏ hơn 2MB.",
+      "readError": "Không thể đọc ảnh này. Vui lòng thử ảnh khác."
+    },
     "portals": {
       "admin": "Square Admin",
       "employer": "Square Employer"

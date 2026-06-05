@@ -132,7 +132,13 @@ def _recent_thread_messages(thread: AgentThread, limit: int = 8) -> list[dict[st
 
 class AgentPlanner:
     @staticmethod
-    def plan(request, thread: AgentThread, user_content: str) -> AgentPlannedAction | AgentPlannerUnavailable | None:
+    def plan(
+        request,
+        thread: AgentThread,
+        user_content: str,
+        *,
+        message_parts: list[dict[str, Any]] | None = None,
+    ) -> AgentPlannedAction | AgentPlannerUnavailable | None:
         allowed_tools = {tool["name"] for tool in TOOL_REGISTRY}
         allowed_tools.add(RESPOND_TOOL_NAME)
         model = getattr(settings, "AI_AGENT_ASSISTANT_MODEL", "") or getattr(settings, "AI_LLM_MODEL", "")
@@ -163,11 +169,25 @@ class AgentPlanner:
             "recentMessages": _recent_thread_messages(thread),
             "newestUserMessage": user_content,
         }
+        planner_user_content: str | list[dict[str, Any]] = json.dumps(user_context, ensure_ascii=False)
+        image_parts = [
+            {
+                "type": "image_url",
+                "image_url": {"url": str(part.get("dataUrl") or "")},
+            }
+            for part in (message_parts or [])
+            if isinstance(part, dict) and part.get("type") == "image" and part.get("dataUrl")
+        ]
+        if image_parts:
+            planner_user_content = [
+                {"type": "text", "text": json.dumps(user_context, ensure_ascii=False)},
+                *image_parts,
+            ]
         payload = {
             "model": model,
             "messages": [
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": json.dumps(user_context, ensure_ascii=False)},
+                {"role": "user", "content": planner_user_content},
             ],
             "temperature": 0.1,
             "max_tokens": 900,

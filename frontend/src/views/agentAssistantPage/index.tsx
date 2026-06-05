@@ -17,10 +17,13 @@ import {
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import AttachFileRoundedIcon from '@mui/icons-material/AttachFileRounded';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded';
+import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -30,6 +33,7 @@ import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import { useTranslation } from 'react-i18next';
 
 import agentAssistantService, {
+  type AgentMessageAttachment,
   type AgentMessage,
   type AgentPortal,
   type AgentThread,
@@ -49,6 +53,13 @@ type ThreadGroup = {
 type ThreadGroupKey = 'today' | 'yesterday' | 'thisWeek' | 'earlier';
 
 const DEFAULT_AGENT_THREAD_TITLE = 'Agent Assistants';
+const MAX_IMAGE_ATTACHMENTS = 5;
+const MAX_IMAGE_ATTACHMENT_BYTES = 2 * 1024 * 1024;
+const ALLOWED_IMAGE_MIME_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif']);
+
+type PendingAgentAttachment = AgentMessageAttachment & {
+  id: string;
+};
 
 const statusLabelKeys: Record<string, string> = {
   pending: 'common:agentAssistant.status.pending',
@@ -120,13 +131,37 @@ const groupThreads = (threads: AgentThread[]): ThreadGroup[] => {
     .filter((group) => group.threads.length > 0);
 };
 
-const createOptimisticMessage = (role: AgentMessage['role'], content: string, offset: number): AgentMessage => {
+const isImagePart = (value: unknown): value is AgentMessageAttachment => {
+  if (!value || typeof value !== 'object') return false;
+  const part = value as Partial<AgentMessageAttachment>;
+  return part.type === 'image' && typeof part.dataUrl === 'string' && typeof part.mimeType === 'string';
+};
+
+const toMessageParts = (content: string, attachments: AgentMessageAttachment[] = []) => [
+  ...(content ? [{ type: 'text', text: content }] : []),
+  ...attachments,
+];
+
+const readFileAsDataUrl = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(reader.error || new Error('read failed'));
+    reader.readAsDataURL(file);
+  });
+
+const createOptimisticMessage = (
+  role: AgentMessage['role'],
+  content: string,
+  offset: number,
+  attachments: AgentMessageAttachment[] = [],
+): AgentMessage => {
   const now = new Date().toISOString();
   return {
     id: -Date.now() - offset,
     role,
     content,
-    parts: [{ type: 'text', text: content }],
+    parts: toMessageParts(content, attachments),
     metadata: { optimistic: true },
     toolCalls: [],
     createAt: now,
@@ -398,6 +433,7 @@ const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
 const MessageBubble = ({ message }: { message: AgentMessage }) => {
   const isUser = message.role === 'user';
   const isOptimistic = Boolean(message.metadata?.optimistic);
+  const imageParts = (message.parts || []).filter(isImagePart);
 
   return (
     <Box sx={{ display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
@@ -417,6 +453,28 @@ const MessageBubble = ({ message }: { message: AgentMessage }) => {
         {message.toolCalls?.map((toolCall) => (
           <ToolStepCard key={toolCall.id} toolCall={toolCall} />
         ))}
+        {imageParts.length ? (
+          <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
+            {imageParts.map((part, index) => (
+              <Box
+                key={`${part.name}-${index}`}
+                component="img"
+                src={part.dataUrl}
+                alt={part.name || `attachment-${index + 1}`}
+                sx={{
+                  width: 144,
+                  maxWidth: '100%',
+                  aspectRatio: '4 / 3',
+                  objectFit: 'cover',
+                  borderRadius: 1,
+                  border: '1px solid',
+                  borderColor: isUser ? alpha('#fff', 0.3) : 'divider',
+                  bgcolor: isUser ? alpha('#fff', 0.08) : 'action.hover',
+                }}
+              />
+            ))}
+          </Stack>
+        ) : null}
         {message.content ? (
           <Stack direction="row" spacing={1} alignItems="flex-start">
             {!isUser && isOptimistic ? <CircularProgress size={15} sx={{ mt: 0.4 }} /> : null}
@@ -529,10 +587,12 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
   const [selectedThreadId, setSelectedThreadId] = useState<number | null>(null);
   const [messages, setMessages] = useState<AgentMessage[]>([]);
   const [input, setInput] = useState('');
+  const [attachments, setAttachments] = useState<PendingAgentAttachment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [deletingThreadId, setDeletingThreadId] = useState<number | null>(null);
   const [error, setError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const locale = i18n.language === 'en' ? 'en-US' : 'vi-VN';
 
@@ -641,27 +701,80 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
     scrollRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages]);
 
+  const handleSelectAttachments = async (files: FileList | null) => {
+    if (!files?.length) return;
+
+    const selectedFiles = Array.from(files);
+    const remainingSlots = MAX_IMAGE_ATTACHMENTS - attachments.length;
+    if (remainingSlots <= 0 || selectedFiles.length > remainingSlots) {
+      setError(t('common:agentAssistant.attachments.limit', { count: MAX_IMAGE_ATTACHMENTS }));
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    const nextAttachments: PendingAgentAttachment[] = [];
+    try {
+      for (const file of selectedFiles) {
+        if (!ALLOWED_IMAGE_MIME_TYPES.has(file.type)) {
+          setError(t('common:agentAssistant.attachments.unsupported'));
+          continue;
+        }
+        if (file.size > MAX_IMAGE_ATTACHMENT_BYTES) {
+          setError(t('common:agentAssistant.attachments.tooLarge'));
+          continue;
+        }
+
+        nextAttachments.push({
+          id: `${file.name}-${file.lastModified}-${crypto.randomUUID()}`,
+          type: 'image',
+          name: file.name,
+          mimeType: file.type,
+          size: file.size,
+          dataUrl: await readFileAsDataUrl(file),
+        });
+      }
+    } catch (err) {
+      setError(t('common:agentAssistant.attachments.readError'));
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+
+    if (nextAttachments.length) {
+      setError('');
+      setAttachments((current) => [...current, ...nextAttachments]);
+    }
+  };
+
+  const handleRemoveAttachment = (attachmentId: string) => {
+    setAttachments((current) => current.filter((attachment) => attachment.id !== attachmentId));
+  };
+
   const handleSend = async () => {
     const content = input.trim();
-    if (!content || isSending) return;
+    const attachmentSnapshot = attachments;
+    const attachmentPayload = attachmentSnapshot.map(({ id, ...attachment }) => attachment);
+    if ((!content && attachmentPayload.length === 0) || isSending) return;
 
     setIsSending(true);
     setError('');
     setInput('');
+    setAttachments([]);
 
     let optimisticUser: AgentMessage | null = null;
     let optimisticAssistant: AgentMessage | null = null;
 
     try {
       const thread = selectedThread ?? (await createThread());
-      optimisticUser = createOptimisticMessage('user', content, 1);
+      optimisticUser = createOptimisticMessage('user', content, 1, attachmentPayload);
       optimisticAssistant = createOptimisticMessage('assistant', t('common:agentAssistant.thinking'), 2);
 
       setMessages((current) => [...current, optimisticUser as AgentMessage, optimisticAssistant as AgentMessage]);
       setThreads((current) => {
         const optimisticThread = {
           ...thread,
-          title: thread.title === DEFAULT_AGENT_THREAD_TITLE ? content.slice(0, 90) : thread.title,
+          title: thread.title === DEFAULT_AGENT_THREAD_TITLE
+            ? (content || t('common:agentAssistant.attachments.threadTitle')).slice(0, 90)
+            : thread.title,
           lastMessageAt: new Date().toISOString(),
         };
         const withoutUpdated = current.filter((item) => item.id !== thread.id);
@@ -669,7 +782,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
       });
       setSelectedThreadId(thread.id);
 
-      const response = await agentAssistantService.sendMessage(thread.id, content);
+      const response = await agentAssistantService.sendMessage(thread.id, content, attachmentPayload);
       setMessages((current) => [
         ...current.filter((message) => message.id !== optimisticUser?.id && message.id !== optimisticAssistant?.id),
         response.userMessage,
@@ -682,6 +795,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
       setSelectedThreadId(response.thread.id);
     } catch (err) {
       setInput(content);
+      setAttachments(attachmentSnapshot);
       setMessages((current) =>
         current.filter((message) => message.id !== optimisticUser?.id && message.id !== optimisticAssistant?.id),
       );
@@ -877,52 +991,128 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
           </Box>
 
           <Box sx={{ p: 1.5, borderTop: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
-            <Stack direction="row" spacing={1} alignItems="flex-end">
-              <TextField
-                fullWidth
-                multiline
-                maxRows={5}
-                value={input}
-                disabled={isSending || Boolean(deletingThreadId)}
-                placeholder={t('common:agentAssistant.placeholder')}
-                onChange={(event) => setInput(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' && !event.shiftKey) {
-                    event.preventDefault();
-                    void handleSend();
-                  }
-                }}
-                size="small"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 1,
-                    bgcolor: alpha(theme.palette.text.primary, 0.015),
-                  },
-                }}
-              />
-              <Tooltip title={t('common:agentAssistant.send')}>
-                <span>
-                  <IconButton
-                    color="primary"
-                    disabled={!input.trim() || isSending || Boolean(deletingThreadId)}
-                    onClick={() => void handleSend()}
-                    sx={{
-                      width: 42,
-                      height: 42,
+            <Stack spacing={1}>
+              {attachments.length ? (
+                <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
+                  {attachments.map((attachment) => (
+                    <Box
+                      key={attachment.id}
+                      sx={{
+                        position: 'relative',
+                        width: 74,
+                        aspectRatio: '1 / 1',
+                        borderRadius: 1,
+                        overflow: 'hidden',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        bgcolor: 'action.hover',
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={attachment.dataUrl}
+                        alt={attachment.name}
+                        sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      />
+                      <Tooltip title={t('common:agentAssistant.attachments.remove')}>
+                        <IconButton
+                          size="small"
+                          aria-label={t('common:agentAssistant.attachments.remove')}
+                          disabled={isSending}
+                          onClick={() => handleRemoveAttachment(attachment.id)}
+                          sx={{
+                            position: 'absolute',
+                            top: 3,
+                            right: 3,
+                            width: 22,
+                            height: 22,
+                            borderRadius: 1,
+                            bgcolor: alpha('#000', 0.62),
+                            color: '#fff',
+                            '&:hover': { bgcolor: alpha('#000', 0.76) },
+                          }}
+                        >
+                          <CloseRoundedIcon sx={{ fontSize: 15 }} />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  ))}
+                </Stack>
+              ) : null}
+
+              <Stack direction="row" spacing={1} alignItems="flex-end">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  multiple
+                  hidden
+                  onChange={(event) => void handleSelectAttachments(event.target.files)}
+                />
+                <Tooltip title={t('common:agentAssistant.attachments.addImage')}>
+                  <span>
+                    <IconButton
+                      disabled={isSending || Boolean(deletingThreadId)}
+                      onClick={() => fileInputRef.current?.click()}
+                      sx={{
+                        width: 42,
+                        height: 42,
+                        borderRadius: 1,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        color: 'text.secondary',
+                      }}
+                    >
+                      {attachments.length ? <ImageOutlinedIcon fontSize="small" /> : <AttachFileRoundedIcon fontSize="small" />}
+                    </IconButton>
+                  </span>
+                </Tooltip>
+                <TextField
+                  fullWidth
+                  multiline
+                  maxRows={5}
+                  value={input}
+                  disabled={isSending || Boolean(deletingThreadId)}
+                  placeholder={t('common:agentAssistant.placeholder')}
+                  onChange={(event) => setInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                      event.preventDefault();
+                      void handleSend();
+                    }
+                  }}
+                  size="small"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
                       borderRadius: 1,
-                      bgcolor: 'primary.main',
-                      color: 'primary.contrastText',
-                      '&:hover': { bgcolor: 'primary.dark' },
-                      '&.Mui-disabled': {
-                        bgcolor: 'action.disabledBackground',
-                        color: 'action.disabled',
-                      },
-                    }}
-                  >
-                    {isSending ? <CircularProgress size={18} color="inherit" /> : <SendRoundedIcon fontSize="small" />}
-                  </IconButton>
-                </span>
-              </Tooltip>
+                      bgcolor: alpha(theme.palette.text.primary, 0.015),
+                    },
+                  }}
+                />
+                <Tooltip title={t('common:agentAssistant.send')}>
+                  <span>
+                    <IconButton
+                      color="primary"
+                      disabled={(!input.trim() && attachments.length === 0) || isSending || Boolean(deletingThreadId)}
+                      onClick={() => void handleSend()}
+                      sx={{
+                        width: 42,
+                        height: 42,
+                        borderRadius: 1,
+                        bgcolor: 'primary.main',
+                        color: 'primary.contrastText',
+                        '&:hover': { bgcolor: 'primary.dark' },
+                        '&.Mui-disabled': {
+                          bgcolor: 'action.disabledBackground',
+                          color: 'action.disabled',
+                        },
+                      }}
+                    >
+                      {isSending ? <CircularProgress size={18} color="inherit" /> : <SendRoundedIcon fontSize="small" />}
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </Stack>
             </Stack>
           </Box>
         </Box>

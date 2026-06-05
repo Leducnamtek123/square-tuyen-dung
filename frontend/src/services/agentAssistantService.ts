@@ -38,6 +38,14 @@ export type AgentMessage = {
   updateAt: string;
 };
 
+export type AgentMessageAttachment = {
+  type: "image";
+  name: string;
+  mimeType: string;
+  size: number;
+  dataUrl: string;
+};
+
 export type AgentThread = {
   id: number;
   title: string;
@@ -87,8 +95,13 @@ const agentAssistantService = {
     return httpRequest.get(`agent-assistants/threads/${threadId}/messages/`);
   },
 
-  sendMessage(threadId: number, content: string): Promise<SendMessageResponse> {
-    return httpRequest.post(`agent-assistants/threads/${threadId}/messages/`, { content }, { timeout: 120000 });
+  sendMessage(
+    threadId: number,
+    content: string,
+    attachments: AgentMessageAttachment[] = [],
+  ): Promise<SendMessageResponse> {
+    const payload = attachments.length ? { content, attachments } : { content };
+    return httpRequest.post(`agent-assistants/threads/${threadId}/messages/`, payload, { timeout: 120000 });
   },
 
   deleteThread(threadId: number): Promise<void> {

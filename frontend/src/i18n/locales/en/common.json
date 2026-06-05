@@ -917,6 +917,15 @@
     "loadError": "Could not load Agent Assistants. Please try again.",
     "sendError": "Agent could not process this request. Please check the content and try again.",
     "thinking": "Agent is thinking...",
+    "attachments": {
+      "addImage": "Attach image",
+      "remove": "Remove image",
+      "threadTitle": "Sent image",
+      "limit": "You can attach up to {{count}} images.",
+      "unsupported": "Only PNG, JPG, WebP, or GIF images are supported.",
+      "tooLarge": "Each image must be smaller than 2MB.",
+      "readError": "Could not read this image. Please try another image."
+    },
     "portals": {
       "admin": "Square Admin",
       "employer": "Square Employer"
