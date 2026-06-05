@@ -1,3 +1,6 @@
+from html import unescape
+
+from django.utils.html import strip_tags
 from rest_framework import serializers
 from shared.serializers import DynamicFieldsMixin
 
@@ -17,7 +20,7 @@ class FeedbackSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     content = serializers.CharField(max_length=500)
 
-    rating = serializers.IntegerField(default=5)
+    rating = serializers.IntegerField(default=5, min_value=1, max_value=5)
 
     isActive = serializers.BooleanField(source='is_active', default=False)
 
@@ -119,7 +122,7 @@ class AdminBannerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     imageUrl = serializers.SerializerMethodField(read_only=True)
     imageMobileUrl = serializers.SerializerMethodField(read_only=True)
 
-    button_link = serializers.CharField(
+    button_link = serializers.URLField(
         allow_blank=True, allow_null=True, required=False
     )
 
@@ -140,6 +143,13 @@ class AdminBannerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 attrs[bool_field] = val.lower() in ('true', '1', 'yes')
         if attrs.get('button_link') == '':
             attrs['button_link'] = None
+        if 'type' in attrs and not BannerType.objects.filter(
+            value=attrs['type'],
+            is_active=True,
+        ).exists():
+            raise serializers.ValidationError({
+                'type': ['Invalid banner type.'],
+            })
         return attrs
 
     def get_imageUrl(self, banner):
@@ -156,6 +166,7 @@ class AdminBannerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 class AdminFeedbackSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """Full admin serializer for Feedback management."""
     evidenceImageUrl = serializers.SerializerMethodField(read_only=True)
+    rating = serializers.IntegerField(min_value=1, max_value=5)
 
     userDict = auth_serializers.UserSerializer(
         source="user",
@@ -232,6 +243,11 @@ class ArticleDetailSerializer(ArticleListSerializer):
         fields = ArticleListSerializer.Meta.fields + ('content',)
 
 
+def _article_content_has_text(value):
+    text = unescape(strip_tags(value or '')).replace('\xa0', ' ').strip()
+    return bool(text)
+
+
 class AdminArticleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """Full CRUD serializer for admin."""
     thumbnailUrl = serializers.SerializerMethodField(read_only=True)
@@ -248,7 +264,7 @@ class AdminArticleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             'author', 'authorDict', 'viewCount', 'publishedAt',
             'tags', 'tagList', 'create_at', 'update_at',
         )
-        read_only_fields = ('id', 'viewCount', 'create_at', 'update_at', 'thumbnailUrl', 'authorDict', 'tagList')
+        read_only_fields = ('id', 'slug', 'viewCount', 'create_at', 'update_at', 'thumbnailUrl', 'authorDict', 'tagList')
 
     def get_thumbnailUrl(self, obj):
         if obj.thumbnail:
@@ -264,6 +280,11 @@ class AdminArticleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         if obj.tags:
             return [t.strip() for t in obj.tags.split(',') if t.strip()]
         return []
+
+    def validate_content(self, value):
+        if not _article_content_has_text(value):
+            raise serializers.ValidationError('Content is required.')
+        return value
 
 
 class EmployerArticleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
@@ -293,6 +314,11 @@ class EmployerArticleSerializer(DynamicFieldsMixin, serializers.ModelSerializer)
         if obj.tags:
             return [t.strip() for t in obj.tags.split(',') if t.strip()]
         return []
+
+    def validate_content(self, value):
+        if not _article_content_has_text(value):
+            raise serializers.ValidationError('Content is required.')
+        return value
 
     def create(self, validated_data):
         request = self.context['request']

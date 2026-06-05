@@ -1,6 +1,9 @@
 """
 Unit tests for the Jobs app — services, models, and API endpoints.
 """
+import json
+from types import SimpleNamespace
+
 import pytest
 from datetime import timedelta
 from unittest.mock import patch, MagicMock
@@ -11,14 +14,18 @@ from django.core.cache import cache
 from rest_framework.test import APIClient, APIRequestFactory
 
 from apps.jobs.models import JobPost, JobPostActivity
-from apps.jobs.serializers import JobPostSerializer, JobSeekerJobPostActivitySerializer
+from apps.jobs.serializers import (
+    JobPostNotificationSerializer,
+    JobPostSerializer,
+    JobSeekerJobPostActivitySerializer,
+)
 from apps.jobs.services import JobPostService, JobActivityService
 from apps.jobs.exceptions import CompanyNotVerifiedError
 from apps.jobs.ai_scoring_service import _fallback_scoring, build_scoring_prompt
 from apps.jobs.recommendation_service import get_recommended_jobs
 from apps.content.models import SystemSetting
 from common.serializers import LocationSerializer
-from shared.configs import variable_system as var_sys
+from shared.configs import table_export, variable_system as var_sys
 
 
 # ==================== Model Tests ====================
@@ -245,6 +252,84 @@ def test_job_post_serializer_validates_partial_salary_against_existing_values(jo
     assert "salaryMin" in negative_min.errors
     assert not negative_max.is_valid()
     assert "salaryMax" in negative_max.errors
+
+
+@pytest.mark.django_db
+def test_job_post_serializer_rejects_salary_over_integer_limit(job_post):
+    too_large = 2_147_483_648
+    serializer = JobPostSerializer(
+        job_post,
+        data={"salaryMin": too_large, "salaryMax": too_large},
+        partial=True,
+    )
+
+    assert not serializer.is_valid()
+    assert "salaryMin" in serializer.errors
+    assert "salaryMax" in serializer.errors
+
+
+@pytest.mark.django_db
+def test_job_post_serializer_rejects_choice_values_outside_model_choices():
+    serializer = JobPostSerializer(
+        data={
+            "position": 999,
+            "experience": 999,
+            "academicLevel": 999,
+            "typeOfWorkplace": 999,
+            "jobType": 999,
+            "genderRequired": "X",
+        },
+        partial=True,
+    )
+
+    assert not serializer.is_valid()
+    assert "position" in serializer.errors
+    assert "experience" in serializer.errors
+    assert "academicLevel" in serializer.errors
+    assert "typeOfWorkplace" in serializer.errors
+    assert "jobType" in serializer.errors
+    assert "genderRequired" in serializer.errors
+
+
+@pytest.mark.django_db
+def test_job_post_serializer_rejects_invalid_contact_person_phone(job_post):
+    serializer = JobPostSerializer(
+        job_post,
+        data={"contactPersonPhone": "not-a-phone"},
+        partial=True,
+    )
+
+    assert serializer.is_valid() is False
+    assert "contactPersonPhone" in serializer.errors
+
+
+@pytest.mark.parametrize("frequency", [1, 2, 3])
+def test_job_post_notification_serializer_accepts_model_frequency_choices(frequency):
+    serializer = JobPostNotificationSerializer(data={"frequency": frequency}, partial=True)
+
+    assert serializer.is_valid(), serializer.errors
+
+
+@pytest.mark.parametrize("frequency", [7, 30, 999])
+def test_job_post_notification_serializer_rejects_frequency_outside_model_choices(frequency):
+    serializer = JobPostNotificationSerializer(data={"frequency": frequency}, partial=True)
+
+    assert not serializer.is_valid()
+    assert "frequency" in serializer.errors
+
+
+def test_job_post_notification_serializer_rejects_choice_values_outside_model_choices():
+    serializer = JobPostNotificationSerializer(
+        data={
+            "position": 999,
+            "experience": 999,
+        },
+        partial=True,
+    )
+
+    assert not serializer.is_valid()
+    assert "position" in serializer.errors
+    assert "experience" in serializer.errors
 
 
 @pytest.mark.django_db
@@ -482,6 +567,137 @@ def test_employer_can_add_manual_candidate_to_applied_profiles(employer_user, jo
 
 
 @pytest.mark.django_db
+def test_manual_candidate_export_uses_manual_profile_city(employer_user, job_post, city):
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    create_response = client.post(
+        "/api/v1/job/web/employer-job-posts-activity/manual-candidates/",
+        {
+            "jobPost": job_post.id,
+            "fullName": "Manual Export Candidate",
+            "email": "manual-export@example.com",
+            "phone": "0909000001",
+            "title": "Manual Frontend Developer",
+            "city": city.id,
+        },
+        format="json",
+    )
+    assert create_response.status_code == 201
+
+    export_response = client.get("/api/v1/job/web/employer-job-posts-activity/export/")
+
+    assert export_response.status_code == 200
+    address_column = table_export.JOB_POST_ACTIVITY_FIELD["address"]
+    full_name_column = table_export.JOB_POST_ACTIVITY_FIELD["fullName"]
+    exported_candidate = next(
+        item for item in export_response.data["data"]
+        if item[full_name_column] == "Manual Export Candidate"
+    )
+    assert exported_candidate[address_column] == city.name
+
+
+@pytest.mark.django_db
+def test_ai_analysis_supports_manual_candidate_profile_without_resume(monkeypatch, employer_user, job_post):
+    from apps.profiles.models import EmployerCandidateProfile
+    from apps.jobs.tasks import analyze_resume_ai
+
+    profile = EmployerCandidateProfile.objects.create(
+        company=job_post.company,
+        created_by=employer_user,
+        full_name="Manual AI Candidate",
+        title="Frontend Developer",
+        description=(
+            "Frontend developer with React, TypeScript, REST API integration, "
+            "component testing, accessibility, and dashboard delivery experience."
+        ),
+        skills_summary="React, TypeScript, Material UI, REST API, Jest, accessibility",
+    )
+    activity = JobPostActivity.objects.create(
+        job_post=job_post,
+        manual_candidate_profile=profile,
+        full_name=profile.full_name,
+        email=profile.email,
+        phone=profile.phone,
+        status=var_sys.ApplicationStatus.INTERVIEWED,
+    )
+
+    def fake_post_chat_completion_httpx(*args, **kwargs):
+        return (
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "content": json.dumps(
+                                {
+                                    "score": 82,
+                                    "summary": "Ung vien thu cong phu hop voi vi tri frontend.",
+                                    "skills": ["React", "TypeScript", "Jest"],
+                                    "pros": ["Co kinh nghiem dashboard"],
+                                    "cons": ["Can phong van them ve domain"],
+                                    "matching_skills": ["React", "TypeScript"],
+                                    "missing_skills": ["Next.js"],
+                                    "criteria_results": [],
+                                    "evidence": [],
+                                }
+                            )
+                        }
+                    }
+                ]
+            },
+            SimpleNamespace(model="mock-model", name="mock-llm"),
+        )
+
+    monkeypatch.setattr("apps.jobs.tasks.post_chat_completion_httpx", fake_post_chat_completion_httpx)
+
+    analyze_resume_ai.run(activity.id)
+
+    activity.refresh_from_db()
+    assert activity.ai_analysis_status == "completed"
+    assert activity.ai_analysis_score == 82
+    assert activity.ai_analysis_source == "manual_profile:mock-llm"
+
+
+@pytest.mark.django_db
+def test_ai_analysis_uses_rule_based_fallback_when_llm_is_unavailable(monkeypatch, employer_user, job_post):
+    from apps.profiles.models import EmployerCandidateProfile
+    from apps.jobs.tasks import analyze_resume_ai
+    from integrations.ai.client import AIServiceUnavailable
+
+    profile = EmployerCandidateProfile.objects.create(
+        company=job_post.company,
+        created_by=employer_user,
+        full_name="Fallback AI Candidate",
+        title="Senior Python Developer",
+        description="Python developer with API, Django, dashboard, and backend delivery experience.",
+        skills_summary="Python, Django, REST API, SQL",
+        experience=3,
+    )
+    activity = JobPostActivity.objects.create(
+        job_post=job_post,
+        manual_candidate_profile=profile,
+        full_name=profile.full_name,
+        email=profile.email,
+        phone=profile.phone,
+        status=var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+    )
+
+    def unavailable_llm(*args, **kwargs):
+        raise AIServiceUnavailable("llm", ["primary: HTTP 503 no healthy upstream"])
+
+    monkeypatch.setattr("apps.jobs.tasks.post_chat_completion_httpx", unavailable_llm)
+
+    analyze_resume_ai.run(activity.id)
+
+    activity.refresh_from_db()
+    assert activity.ai_analysis_status == "completed"
+    assert activity.ai_analysis_progress == 100
+    assert activity.ai_analysis_score is not None
+    assert activity.ai_analysis_source == "manual_profile:fallback"
+    assert "AI" in activity.ai_analysis_summary
+
+
+@pytest.mark.django_db
 def test_private_job_post_options_returns_active_company_jobs_only(
     employer_user,
     company,
@@ -545,6 +761,125 @@ def test_private_job_post_options_returns_active_company_jobs_only(
 
 
 @pytest.mark.django_db
+def test_private_job_post_options_uses_selected_company_header(
+    company,
+    career,
+    location,
+):
+    from apps.accounts.models import User
+    from apps.profiles.models import Company, CompanyMember, CompanyRole
+
+    member = User.objects.create_user_with_role_name(
+        email="multi-company-member@test.com",
+        full_name="Multi Company Member",
+        role_name=var_sys.JOB_SEEKER,
+        password="pass123",
+        is_active=True,
+        is_verify_email=True,
+    )
+    first_role = CompanyRole.objects.create(
+        company=company,
+        code="first-job-manager",
+        name="First Job Manager",
+        permissions=["manage_job_posts"],
+    )
+    CompanyMember.objects.create(
+        company=company,
+        user=member,
+        role=first_role,
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+    first_job = JobPost.objects.create(
+        job_name="First Company Job",
+        deadline=timezone.now().date() + timedelta(days=30),
+        quantity=1,
+        job_description="<p>First company job</p>",
+        position=4,
+        type_of_workplace=1,
+        experience=2,
+        academic_level=2,
+        job_type=1,
+        salary_min=10000000,
+        salary_max=20000000,
+        contact_person_name="First HR",
+        contact_person_phone="0915000001",
+        contact_person_email="first-hr@test.com",
+        status=var_sys.JobPostStatus.APPROVED,
+        user=company.user,
+        company=company,
+        career=career,
+        location=location,
+    )
+
+    second_owner = User.objects.create_user_with_role_name(
+        email="second-options-owner@test.com",
+        full_name="Second Options Owner",
+        role_name=var_sys.EMPLOYER,
+        password="pass123",
+        is_active=True,
+        is_verify_email=True,
+        has_company=True,
+    )
+    second_company = Company.objects.create(
+        company_name="Second Options Company",
+        company_email="second-options-company@test.com",
+        company_phone="0915000002",
+        tax_code="OPTIONS0002",
+        user=second_owner,
+        location=location,
+        is_verified=True,
+    )
+    second_role = CompanyRole.objects.create(
+        company=second_company,
+        code="second-job-manager",
+        name="Second Job Manager",
+        permissions=["manage_job_posts"],
+    )
+    CompanyMember.objects.create(
+        company=second_company,
+        user=member,
+        role=second_role,
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+    second_job = JobPost.objects.create(
+        job_name="Second Company Job",
+        deadline=timezone.now().date() + timedelta(days=30),
+        quantity=1,
+        job_description="<p>Second company job</p>",
+        position=4,
+        type_of_workplace=1,
+        experience=2,
+        academic_level=2,
+        job_type=1,
+        salary_min=10000000,
+        salary_max=20000000,
+        contact_person_name="Second HR",
+        contact_person_phone="0915000003",
+        contact_person_email="second-hr@test.com",
+        status=var_sys.JobPostStatus.APPROVED,
+        user=second_owner,
+        company=second_company,
+        career=career,
+        location=location,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=member)
+
+    response = client.get(
+        "/api/v1/job/web/private-job-posts/job-posts-options/",
+        HTTP_X_ACTIVE_COMPANY_ID=str(second_company.id),
+    )
+
+    assert response.status_code == 200
+    options = response.data["data"]
+    assert {"id": second_job.id, "jobName": second_job.job_name} in options
+    assert first_job.id not in [item["id"] for item in options]
+
+
+@pytest.mark.django_db
 def test_manual_candidate_serializer_rejects_non_pdf_file():
     from django.core.files.uploadedfile import SimpleUploadedFile
     from apps.profiles.serializers import EmployerCandidateProfileSerializer
@@ -592,6 +927,46 @@ def test_manual_candidate_serializer_rejects_explicit_zero_max_below_min():
 
     assert serializer.is_valid() is False
     assert "salaryMax" in serializer.errors
+
+
+@pytest.mark.django_db
+def test_manual_candidate_serializer_rejects_invalid_phone():
+    from apps.profiles.serializers import EmployerCandidateProfileSerializer
+
+    serializer = EmployerCandidateProfileSerializer(
+        data={
+            "fullName": "Nguyen Van E",
+            "title": "Backend Developer",
+            "phone": "not-a-phone",
+        },
+    )
+
+    assert serializer.is_valid() is False
+    assert "phone" in serializer.errors
+
+
+@pytest.mark.django_db
+def test_manual_candidate_serializer_rejects_choice_values_outside_model_choices():
+    from apps.profiles.serializers import EmployerCandidateProfileSerializer
+
+    serializer = EmployerCandidateProfileSerializer(
+        data={
+            "fullName": "Nguyen Van F",
+            "title": "Backend Developer",
+            "position": 999999,
+            "experience": 999999,
+            "academicLevel": 999999,
+            "typeOfWorkplace": 999999,
+            "jobType": 999999,
+        },
+    )
+
+    assert serializer.is_valid() is False
+    assert "position" in serializer.errors
+    assert "experience" in serializer.errors
+    assert "academicLevel" in serializer.errors
+    assert "typeOfWorkplace" in serializer.errors
+    assert "jobType" in serializer.errors
 
 
 @pytest.mark.django_db
@@ -841,6 +1216,18 @@ class TestJobService:
 
         assert serializer.is_valid(), serializer.errors
         assert serializer.validated_data['job_post'] == job_post
+
+    def test_apply_serializer_rejects_invalid_phone(self, job_post, resume):
+        serializer = JobSeekerJobPostActivitySerializer(data={
+            'jobPost': job_post.id,
+            'resume': resume.id,
+            'fullName': 'Test Name',
+            'email': 'test@test.com',
+            'phone': 'not-a-phone',
+        })
+
+        assert serializer.is_valid() is False
+        assert "phone" in serializer.errors
 
     def test_apply_to_job_duplicate_reuses_existing_application(self, job_seeker_user, job_post, resume):
         """Should not create duplicate applications on double submit."""

@@ -61,7 +61,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
           </Typography>
           {unreadCount > 0 && (
             <Typography variant="body2" color="text.secondary">
-              {t('notification.unreadCount', { count: unreadCount, defaultValue: '{{count}} unread' })}
+              {t('notification.unreadCount', { count: unreadCount })}
             </Typography>
           )}
           <Stack direction="row" spacing={1}>
@@ -166,7 +166,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                     </Typography>
                     {!value?.is_read && (
                       <Box sx={{ px: 1, py: 0.25, backgroundColor: "error.main", color: "white", borderRadius: 1, fontSize: "0.7rem", fontWeight: "bold" }}>
-                        {t('notification.new', { defaultValue: 'New' })}
+                        {t('notification.new')}
                       </Box>
                     )}
                   </Stack>
@@ -187,7 +187,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
           {hasMore && (
             <Stack direction="row" justifyContent="center" sx={{ mt: 2 }}>
               <Button onClick={loadMore} variant="contained" disabled={isLoading}>
-                {isLoading ? <CircularProgress size={24} /> : t('notification.loadMore', { defaultValue: 'Load more' })}
+                {isLoading ? <CircularProgress size={24} /> : t('notification.loadMore')}
               </Button>
             </Stack>
           )}

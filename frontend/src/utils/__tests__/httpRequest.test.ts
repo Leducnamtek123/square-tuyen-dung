@@ -3,6 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import httpRequest, { refreshClient } from '../httpRequest';
 import tokenService from '../../services/tokenService';
 import { AUTH_CONFIG } from '../../configs/constants';
+import { ACTIVE_WORKSPACE_STORAGE_KEY } from '../storageKeys';
 
 jest.mock('../../services/tokenService', () => ({
   getAccessTokenFromCookie: jest.fn(),
@@ -15,16 +16,33 @@ jest.mock('../../services/tokenService', () => ({
 describe('httpRequest', () => {
   let mock: MockAdapter;
   let refreshMock: MockAdapter;
+  const storage = new Map<string, string>();
 
   beforeAll(() => {
     mock = new MockAdapter(httpRequest as any);
     refreshMock = new MockAdapter(refreshClient as any);
+    Object.defineProperty(global, 'localStorage', {
+      value: {
+        getItem: jest.fn((key: string) => storage.get(key) ?? null),
+        setItem: jest.fn((key: string, value: string) => {
+          storage.set(key, value);
+        }),
+        removeItem: jest.fn((key: string) => {
+          storage.delete(key);
+        }),
+        clear: jest.fn(() => {
+          storage.clear();
+        }),
+      },
+      configurable: true,
+    });
   });
 
   afterEach(() => {
     mock.reset();
     refreshMock.reset();
     jest.clearAllMocks();
+    localStorage.clear();
   });
 
   afterAll(() => {
@@ -42,6 +60,23 @@ describe('httpRequest', () => {
 
     const response = await httpRequest.get('/some-protected-endpoint');
     expect(response).toEqual({ success: true }); // Because of unwrapResponse / camelizeKeys
+  });
+
+  it('adds selected company header for authenticated company workspace requests', async () => {
+    (tokenService.getAccessTokenFromCookie as jest.Mock).mockReturnValue('mock-token');
+    localStorage.setItem(
+      ACTIVE_WORKSPACE_STORAGE_KEY,
+      JSON.stringify({ type: 'company', companyId: 22, label: 'Company 22' }),
+    );
+
+    mock.onGet('/company-scoped-endpoint').reply(config => {
+      expect(config.headers?.['X-Active-Company-Id']).toBe('22');
+      return [200, { data: { success: true } }];
+    });
+
+    const response = await httpRequest.get('/company-scoped-endpoint');
+
+    expect(response).toEqual({ success: true });
   });
 
   it('adds access token to public data endpoints when available', async () => {
@@ -166,11 +201,15 @@ describe('httpRequest', () => {
       // 1. The original request fails
       mock.onGet('/protected-refresh').replyOnce(401);
       // 2. The refresh request succeeds
-      refreshMock.onPost('auth/token/').replyOnce(200, {
+      refreshMock.onPost('auth/token/').replyOnce(config => {
+        const payload = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+        expect(payload).not.toHaveProperty('client_secret');
+        return [200, {
         data: {
           access_token: 'new-access',
           refresh_token: 'new-refresh'
         }
+        }];
       });
       // 3. The retried request succeeds
       mock.onGet('/protected-refresh').replyOnce(200, { data: { success: true } });
@@ -199,11 +238,15 @@ describe('httpRequest', () => {
       (tokenService.getRefreshTokenFromCookie as jest.Mock).mockReturnValue('valid-refresh');
 
       mock.onGet('/protected-refresh-legacy').replyOnce(401);
-      refreshMock.onPost('auth/token/').replyOnce(200, {
+      refreshMock.onPost('auth/token/').replyOnce(config => {
+        const payload = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+        expect(payload).not.toHaveProperty('client_secret');
+        return [200, {
         data: {
           accessToken: 'legacy-access',
           refreshToken: 'legacy-refresh'
         }
+        }];
       });
       mock.onGet('/protected-refresh-legacy').replyOnce(200, { data: { ok: true } });
 

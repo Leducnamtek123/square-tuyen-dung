@@ -13,6 +13,10 @@ import { useDataTable, useDebounce } from '../../../hooks';
 import { City } from '../../../types/models';
 import type { CityPayload } from '../../../services/adminManagementService';
 import FilterBar from '@/components/Common/FilterBar';
+import {
+  getLocationEntityFormValidationErrors,
+  type LocationEntityFormValidationErrors,
+} from '../locationFormValidation';
 
 type CitiesState = {
   searchTerm: string;
@@ -83,6 +87,16 @@ const CitiesPage = () => {
   } = useDataTable({ initialPageSize: 10 });
 
   const debouncedSearch = useDebounce(state.searchTerm, 500);
+  const validationErrors = useMemo(
+    () => getLocationEntityFormValidationErrors(state.formData),
+    [state.formData],
+  );
+  const hasValidationErrors = Object.keys(validationErrors).length > 0;
+  const getLocationValidationText = (field: keyof LocationEntityFormValidationErrors) => (
+    validationErrors[field]
+      ? t(`pages.locationValidation.${validationErrors[field]}`)
+      : undefined
+  );
 
   const { data, isLoading, createCity, updateCity, deleteCity, isMutating } = useCities({
     page: page + 1,
@@ -97,11 +111,18 @@ const CitiesPage = () => {
   };
 
   const handleSave = async () => {
+    if (hasValidationErrors) return;
+
+    const payload: CityPayload = {
+      name: state.formData.name.trim(),
+      code: state.formData.code.trim(),
+    };
+
     try {
       if (state.dialogMode === 'add') {
-        await createCity(state.formData);
+        await createCity(payload);
       } else if (state.currentCity) {
-        await updateCity({ id: state.currentCity.id, data: state.formData });
+        await updateCity({ id: state.currentCity.id, data: payload });
       }
       dispatch({ type: 'close-dialogs' });
     } catch (error) {
@@ -174,13 +195,13 @@ const CitiesPage = () => {
 
       <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
         <FilterBar
-          title={t('pages.cities.filter.title', 'Bộ lọc tỉnh/thành')}
+          title={t('pages.cities.filter.title')}
           searchValue={state.searchTerm}
           searchPlaceholder={t('pages.cities.searchPlaceholder')}
           onSearchChange={handleSearch}
           onReset={() => handleSearch('')}
           resetDisabled={!state.searchTerm}
-          resetLabel={t('common.clearFilters', 'Xóa lọc')}
+          resetLabel={t('common.clearFilters')}
         />
 
         <DataTable
@@ -205,6 +226,8 @@ const CitiesPage = () => {
               fullWidth
               value={state.formData.name}
               onChange={(e) => dispatch({ type: 'update-form', value: { name: e.target.value } })}
+              error={Boolean(validationErrors.name)}
+              helperText={getLocationValidationText('name')}
               required
             />
             <TextField
@@ -212,6 +235,8 @@ const CitiesPage = () => {
               fullWidth
               value={state.formData.code}
               onChange={(e) => dispatch({ type: 'update-form', value: { code: e.target.value } })}
+              error={Boolean(validationErrors.code)}
+              helperText={getLocationValidationText('code')}
               required
             />
           </Box>
@@ -220,7 +245,7 @@ const CitiesPage = () => {
           <Button onClick={() => dispatch({ type: 'close-dialogs' })} color="inherit">
             {t('pages.cities.cancel')}
           </Button>
-          <Button onClick={handleSave} variant="contained" disabled={isMutating || !state.formData.name || !state.formData.code}>
+          <Button onClick={handleSave} variant="contained" disabled={isMutating || hasValidationErrors}>
             {isMutating ? t('common.saving') : t('common.save')}
           </Button>
         </DialogActions>

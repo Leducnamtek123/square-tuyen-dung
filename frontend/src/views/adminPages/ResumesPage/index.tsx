@@ -148,13 +148,13 @@ const ResumesPage = () => {
 
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <FilterBar
-                    title={t('pages.resumes.filter.title', 'Bộ lọc CV')}
+                    title={t('pages.resumes.filter.title')}
                     searchValue={searchTerm}
                     searchPlaceholder={t('pages.resumes.searchPlaceholder')}
                     onSearchChange={handleSearch}
                     onReset={() => handleSearch('')}
                     resetDisabled={!searchTerm}
-                    resetLabel={t('common.clearFilters', 'Xóa lọc')}
+                    resetLabel={t('common.clearFilters')}
                 />
 
                 <DataTable

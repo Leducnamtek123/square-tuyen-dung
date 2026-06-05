@@ -244,10 +244,7 @@ export default function HomePage() {
             {t('home.topCompanies')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 760 }}>
-            {t(
-              'home.topCompaniesSubtitle',
-              'Khám phá doanh nghiệp đang tuyển và đi thẳng đến những cơ hội đáng chú ý nhất.'
-            )}
+            {t('home.topCompaniesSubtitle')}
           </Typography>
         </Stack>
         <TopCompanyCarousel />
@@ -256,13 +253,10 @@ export default function HomePage() {
       <Box sx={{ mt: 10 }}>
         <Stack spacing={1} sx={{ mb: 3 }}>
           <Typography variant="h5" sx={{ fontWeight: 800 }} gutterBottom>
-            {t('home.choosePathTitle', 'Bạn đang tìm gì?')}
+            {t('home.choosePathTitle')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 760 }}>
-            {t(
-              'home.choosePathDescription',
-              'Chọn đúng lối đi ngay từ đầu để rút ngắn thời gian tìm việc hoặc tuyển dụng.'
-            )}
+            {t('home.choosePathDescription')}
           </Typography>
         </Stack>
 
@@ -270,17 +264,14 @@ export default function HomePage() {
           <Grid size={{ xs: 12, md: 6 }}>
             <EntryPointCard
               icon={<SearchIcon />}
-              title={t('home.candidateTitle', 'Dành cho ứng viên')}
-              description={t(
-                'home.candidateDescription',
-                'Tìm công việc phù hợp theo nghề, thành phố và công ty trong vài thao tác.'
-              )}
+              title={t('home.candidateTitle')}
+              description={t('home.candidateDescription')}
               benefits={[
-                t('home.candidateBenefit1', 'Lọc theo ngành'),
-                t('home.candidateBenefit2', 'Lưu và theo dõi job'),
-                t('home.candidateBenefit3', 'Gợi ý phù hợp'),
+                t('home.candidateBenefit1'),
+                t('home.candidateBenefit2'),
+                t('home.candidateBenefit3'),
               ]}
-              ctaLabel={t('home.candidateCta', 'Khám phá việc làm')}
+              ctaLabel={t('home.candidateCta')}
               href={jobsHref}
               accent="#1e6bb8"
             />
@@ -288,17 +279,14 @@ export default function HomePage() {
           <Grid size={{ xs: 12, md: 6 }}>
             <EntryPointCard
               icon={<ApartmentIcon />}
-              title={t('home.employerTitle', 'Dành cho nhà tuyển dụng')}
-              description={t(
-                'home.employerDescription',
-                'Đăng tin, tìm hồ sơ và rút ngắn quy trình tuyển dụng với bộ công cụ dành cho doanh nghiệp.'
-              )}
+              title={t('home.employerTitle')}
+              description={t('home.employerDescription')}
               benefits={[
-                t('home.employerBenefit1', 'Đăng tin nhanh'),
-                t('home.employerBenefit2', 'Tìm hồ sơ phù hợp'),
-                t('home.employerBenefit3', 'Phỏng vấn hiệu quả'),
+                t('home.employerBenefit1'),
+                t('home.employerBenefit2'),
+                t('home.employerBenefit3'),
               ]}
-              ctaLabel={t('home.employerCta', 'Xem giải pháp')}
+              ctaLabel={t('home.employerCta')}
               href={employerIntroHref}
               accent="#2aa9e1"
             />
@@ -330,10 +318,7 @@ export default function HomePage() {
                   {t('home.exploreHeading')}
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.84)', mt: 1, maxWidth: 680 }}>
-                  {t(
-                    'home.exploreDescription',
-                    'Bắt đầu từ một nơi duy nhất để tìm việc, xem công ty, lọc theo ngành và đi nhanh đến hành động tiếp theo.'
-                  )}
+                  {t('home.exploreDescription')}
                 </Typography>
               </Box>
               <Button
@@ -393,10 +378,7 @@ export default function HomePage() {
             {t('home.keyCareers')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 760 }}>
-            {t(
-              'home.keyCareersSubtitle',
-              'Đi vào những nhóm nghề đang có nhu cầu cao để rút ngắn bước tìm kiếm.'
-            )}
+            {t('home.keyCareersSubtitle')}
           </Typography>
         </Stack>
         <LazyLoadSection minHeight="200px" rootMargin="200px">
@@ -450,10 +432,7 @@ export default function HomePage() {
             {t('home.userFeedback')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 760 }}>
-            {t(
-              'home.userFeedbackSubtitle',
-              'Đánh giá thật từ người dùng giúp landing page có thêm độ tin cậy.'
-            )}
+            {t('home.userFeedbackSubtitle')}
           </Typography>
         </Stack>
         <LazyLoadSection minHeight="300px" rootMargin="300px">

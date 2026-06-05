@@ -16,7 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import TimeAgo from '@/components/Common/TimeAgo';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
-import { salaryString } from '@/utils/customData';
+import { formatLocalizedSalaryRange } from '@/utils/customData';
 import { formatRoute } from '@/utils/funcUtils';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { ROUTES, IMAGES } from '@/configs/constants';
@@ -68,7 +68,7 @@ const JobPost = ({
 }: JobPostProps) => {
   const theme = useTheme();
   const { allConfig } = useConfig();
-  const { t, i18n } = useTranslation('public');
+  const { t, i18n } = useTranslation(['public', 'common']);
 
   const detailHref = localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language);
 
@@ -78,7 +78,7 @@ const JobPost = ({
       href={detailHref}
       prefetch
       variant="outlined"
-      aria-label={jobName || 'Job detail'}
+      aria-label={jobName || t('common:viewDetails')}
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -127,7 +127,7 @@ const JobPost = ({
       }}
     >
       {isHot && (
-        <Tooltip title="Hot" placement="top">
+        <Tooltip title={t('common:common.hot')} placement="top">
           <Box
             sx={{
               position: 'absolute',
@@ -144,7 +144,7 @@ const JobPost = ({
           >
             <FontAwesomeIcon icon={faFire} style={{ fontSize: 14, color: theme.palette.hot.main }} />
             <Typography sx={{ fontSize: 12, fontWeight: 'bold', color: theme.palette.hot.main, lineHeight: 1 }}>
-              HOT
+                {t('common:common.hot')}
             </Typography>
           </Box>
         </Tooltip>
@@ -223,7 +223,7 @@ const JobPost = ({
 
       <Box sx={{ display: 'flex', flexWrap: 'wrap', columnGap: 2, rowGap: 1, mt: 2 }}>
         <MetaItem icon={<FontAwesomeIcon icon={faCircleDollarToSlot} color={theme.palette.primary.main} />}>
-          {salaryString(salaryMin, salaryMax)}
+          {formatLocalizedSalaryRange(salaryMin, salaryMax, i18n.language)}
         </MetaItem>
         <MetaItem icon={<FontAwesomeIcon icon={faLocationDot} color={theme.palette.primary.main} />}>
           {tConfig(allConfig?.cityDict?.[cityId]) || <span style={{ fontStyle: 'italic', color: theme.palette.grey[500] }}>{t('common:labels.notUpdated')}</span>}
@@ -237,7 +237,7 @@ const JobPost = ({
 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <MetaItem icon={<FontAwesomeIcon icon={faClock} style={{ fontSize: 14 }} color={theme.palette.grey[400]} />}>
-          {t('jobPost.timeLeft', { defaultValue: 'Còn' })} <TimeAgo date={deadline} type="fromNow" />
+          {t('jobPost.timeLeft')} <TimeAgo date={deadline} type="fromNow" />
         </MetaItem>
       </Box>
     </Card>

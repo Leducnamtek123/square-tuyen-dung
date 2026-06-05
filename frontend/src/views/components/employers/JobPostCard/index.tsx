@@ -150,7 +150,7 @@ const JobPostCard = () => {
 
   const handleShowAdd = useCallback(() => {
     if (isCreateBlocked) {
-      toastMessages.warn(t('jobPost.verificationRequired.toast', 'Vui lòng xác thực Nhà tuyển dụng trước khi đăng tin.'));
+      toastMessages.warn(t('jobPost.verificationRequired.toast'));
       return;
     }
     dispatch({ type: 'openAdd' });
@@ -287,7 +287,7 @@ const JobPostCard = () => {
               {t('jobPost.title')}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-              {t('jobPost.manageSubtitle', 'Manage and monitor all your job postings in one place.')}
+              {t('jobPost.manageSubtitle')}
             </Typography>
           </Box>
           </Box>
@@ -334,14 +334,11 @@ const JobPostCard = () => {
             sx={{ mb: 3 }}
             action={
               <Button color="inherit" size="small" href={`/${ROUTES.EMPLOYER.VERIFICATION}`}>
-                {t('jobPost.verificationRequired.action', 'Xác thực ngay')}
+                {t('jobPost.verificationRequired.action')}
               </Button>
             }
           >
-            {t(
-              'jobPost.verificationRequired.message',
-              'Công ty cần được xác thực trước khi tạo tin tuyển dụng mới. Hồ sơ đã duyệt sẽ mở lại quyền đăng tin.',
-            )}
+            {t('jobPost.verificationRequired.message')}
           </Alert>
         ) : null}
 

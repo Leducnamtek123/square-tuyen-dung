@@ -6,6 +6,7 @@ import type { AdminListParams, CityPayload } from '../../../../services/adminMan
 import toastMessages from '../../../../utils/toastMessages';
 import { City } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
+import i18next from 'i18next';
 
 type UseCitiesResult = UseQueryResult<PaginatedResponse<City>> & {
     createCity: (data: CityPayload) => Promise<City>;
@@ -30,10 +31,10 @@ export const useCities = (params?: AdminListParams): UseCitiesResult => {
         mutationFn: (data: CityPayload) => adminManagementService.createCity(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-cities'] });
-            toastMessages.success('City added successfully');
+            toastMessages.success(i18next.t('admin:pages.cities.toast.addSuccess'));
         },
         onError: (err: Error) => {
-            toastMessages.error('An error occurred while adding the city');
+            toastMessages.error(i18next.t('admin:pages.cities.toast.addError'));
             console.error(err);
         }
     });
@@ -42,10 +43,10 @@ export const useCities = (params?: AdminListParams): UseCitiesResult => {
         mutationFn: ({ id, data }: { id: string | number; data: Partial<CityPayload> }) => adminManagementService.updateCity(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-cities'] });
-            toastMessages.success('City updated successfully');
+            toastMessages.success(i18next.t('admin:pages.cities.toast.updateSuccess'));
         },
         onError: (err: Error) => {
-            toastMessages.error('An error occurred while updating the city');
+            toastMessages.error(i18next.t('admin:pages.cities.toast.updateError'));
             console.error(err);
         }
     });
@@ -56,10 +57,10 @@ export const useCities = (params?: AdminListParams): UseCitiesResult => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-cities'] });
-            toastMessages.success('City deleted successfully');
+            toastMessages.success(i18next.t('admin:pages.cities.toast.deleteSuccess'));
         },
         onError: (err: Error) => {
-            toastMessages.error('An error occurred while deleting the city');
+            toastMessages.error(i18next.t('admin:pages.cities.toast.deleteError'));
             console.error(err);
         }
     });

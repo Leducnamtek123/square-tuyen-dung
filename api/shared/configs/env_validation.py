@@ -99,6 +99,10 @@ def _is_placeholder(value) -> bool:
     return normalized.upper().startswith("CHANGE_ME")
 
 
+def _uses_confidential_oauth_client(settings_source) -> bool:
+    return str(_get_setting(settings_source, "OAUTH_CLIENT_TYPE") or "public").strip().lower() == "confidential"
+
+
 def validate_required_settings(settings_dict):
     missing = []
     for setting_name in REQUIRED_SETTINGS:
@@ -115,6 +119,8 @@ def validate_required_settings(settings_dict):
 
     invalid = []
     for setting_name in PRODUCTION_SECRET_SETTINGS:
+        if setting_name == "CLIENT_SECRET" and not _uses_confidential_oauth_client(settings_dict):
+            continue
         value = _get_setting(settings_dict, setting_name)
         if value in (None, "", []) or _is_placeholder(value):
             invalid.append(setting_name)
@@ -128,9 +134,14 @@ def validate_required_settings(settings_dict):
     if len(secret_key) < 32:
         invalid.append("SECRET_KEY")
 
+    if not _is_truthy(_get_setting(settings_dict, "LIVEKIT_WEBHOOK_STRICT")):
+        invalid.append("LIVEKIT_WEBHOOK_STRICT")
+
     agent_secret = _get_setting(settings_dict, "INTERVIEW_AGENT_SHARED_SECRET")
     agent_auth_required = _is_truthy(_get_setting(settings_dict, "INTERVIEW_AGENT_AUTH_REQUIRED"))
-    if agent_auth_required and (not agent_secret or _is_placeholder(agent_secret) or len(str(agent_secret)) < 32):
+    if not agent_auth_required:
+        invalid.append("INTERVIEW_AGENT_AUTH_REQUIRED")
+    if not agent_secret or _is_placeholder(agent_secret) or len(str(agent_secret)) < 32:
         invalid.append("INTERVIEW_AGENT_SHARED_SECRET")
 
     if invalid:

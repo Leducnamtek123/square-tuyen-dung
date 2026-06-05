@@ -15,10 +15,10 @@ import {
 import { useJobSeekerActivityStatistics } from '../hooks/useJobSeekerQueries';
 
 const ActivityChartClient = () => {
-  const { t } = useTranslation('jobSeeker');
+  const { t, i18n } = useTranslation('jobSeeker');
   const theme = useTheme();
   const { data, isLoading } = useJobSeekerActivityStatistics();
-  const options = React.useMemo(() => createCartesianOptions(theme), [theme]);
+  const options = React.useMemo(() => createCartesianOptions(theme, { language: i18n.language }), [i18n.language, theme]);
 
   const dataOptions = React.useMemo(() => {
     const datasetMeta = [
@@ -69,7 +69,7 @@ const ActivityChartClient = () => {
     <Box sx={{ px: { xs: 0, sm: 1, md: 1, lg: 1, xl: 1 } }}>
       <Stack justifyContent="center" alignItems="center" sx={{ minHeight: 360 }}>
         {isLoading ? (
-          <ChartLoadingState height={330} label={t('activityChart.loading', { defaultValue: 'Loading chart' })} />
+          <ChartLoadingState height={330} label={t('activityChart.loading')} />
         ) : !hasChartData ? (
           <ChartEmptyState height={330} label={t('noDataForStatistics')} />
         ) : (

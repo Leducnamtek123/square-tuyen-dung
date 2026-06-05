@@ -58,7 +58,7 @@ const mapLiveMessages = (items: ReturnType<typeof useInterviewMessages>['message
           : role === 'employer'
             ? companyName || t('liveRoom.participants.employer')
             : role === 'observer'
-              ? t('liveRoom.participants.observer', 'Quan sát viên')
+              ? t('liveRoom.participants.observer')
               : role === 'candidate'
                 ? t('liveRoom.participants.candidate')
                 : participant?.name || participant?.identity || t('liveRoom.participants.guest'),
@@ -115,7 +115,7 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
             : role === 'employer'
               ? getParticipantCompanyName(message.from) || t('liveRoom.participants.employer')
               : role === 'observer'
-                ? t('liveRoom.participants.observer', 'Quan sát viên')
+                ? t('liveRoom.participants.observer')
                 : role === 'candidate'
                   ? t('liveRoom.participants.candidate')
                   : message.from?.name || message.from?.identity || t('liveRoom.participants.guest'),

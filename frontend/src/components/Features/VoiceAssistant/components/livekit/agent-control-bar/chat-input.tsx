@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { LazyMotion, m, domAnimation } from 'motion/react';
 import { PaperPlaneRightIcon, SpinnerIcon } from '@phosphor-icons/react/dist/ssr';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/Features/VoiceAssistant/components/livekit/button';
 import { cn } from '@/lib/utils';
 
@@ -37,6 +38,7 @@ export function ChatInput({
   isAgentAvailable = false,
   onSend = async () => {},
 }: ChatInputProps) {
+  const { t } = useTranslation('interview');
   const inputRef = useRef<HTMLInputElement>(null);
   const [isSending, setIsSending] = useState(false);
   const [message, setMessage] = useState<string>('');
@@ -78,10 +80,10 @@ export function ChatInput({
           <input
             ref={inputRef}
             type="text"
-            aria-label="Message"
+            aria-label={t('voiceAi.chat.messageInput')}
             value={message}
             disabled={!chatOpen}
-            placeholder="Type a message..."
+            placeholder={t('voiceAi.chat.placeholder')}
             onChange={(e) => setMessage(e.target.value)}
             className={cn(
               'h-11 flex-1 bg-transparent px-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
@@ -92,8 +94,8 @@ export function ChatInput({
             type="submit"
             disabled={isDisabled}
             variant={isDisabled ? 'secondary' : 'primary'}
-            aria-label={isSending ? 'Sending message' : 'Send message'}
-            title={isSending ? 'Sending...' : 'Send'}
+            aria-label={isSending ? t('voiceAi.chat.sendingMessage') : t('voiceAi.chat.sendMessage')}
+            title={isSending ? t('voiceAi.chat.sending') : t('voiceAi.chat.send')}
             className="self-start rounded-[18px]"
           >
             {isSending ? (

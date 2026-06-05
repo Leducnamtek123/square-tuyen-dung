@@ -18,6 +18,11 @@ import InterviewTranscriptPanel from './InterviewTranscriptPanel';
 import InterviewTranscriptPanelLive from './InterviewTranscriptPanelLive';
 import InterviewObserverDialog from './InterviewObserverDialog';
 import InterviewDetailHeader from './InterviewDetailHeader';
+import {
+  buildEvaluationPayload,
+  createEvaluationFormFromEvaluation,
+  getEvaluationFormValidationError,
+} from './evaluationFormValidation';
 import { useInterviewDetail, useInterviewMutations } from '../hooks/useEmployerQueries';
 import { useInterviewSSE } from '../../../employerPages/InterviewPages/hooks/useInterviewSSE';
 import interviewService from '../../../../services/interviewService';
@@ -27,14 +32,7 @@ import BackdropLoading from '../../../../components/Common/Loading/BackdropLoadi
 import type { AxiosError } from 'axios';
 import type { ApiError } from '../../../../types/api';
 import type { InterviewSession } from '../../../../types/models';
-
-interface EvalFormType {
-  attitude_score: number | string;
-  professional_score: number | string;
-  result: 'passed' | 'failed' | 'pending';
-  comments: string;
-  proposed_salary: number | string;
-}
+import type { EvalFormType } from './types';
 
 const ACTIVE_STATUSES = ['scheduled', 'calibration', 'in_progress'];
 
@@ -189,13 +187,7 @@ const InterviewDetailCard = () => {
     const lastEval = session.evaluations[session.evaluations.length - 1];
     dispatch({
       type: 'set_eval',
-      payload: {
-        attitude_score: lastEval.attitude_score || lastEval.attitudeScore || 0,
-        professional_score: lastEval.professional_score || lastEval.attitudeScore || 0,
-        result: lastEval.result || 'pending',
-        comments: lastEval.comments || '',
-        proposed_salary: lastEval.proposed_salary || lastEval.proposedSalary || 0,
-      },
+      payload: createEvaluationFormFromEvaluation(lastEval),
     });
   }, [session]);
 
@@ -245,16 +237,14 @@ const InterviewDetailCard = () => {
   };
 
   const submitHRInfo = async () => {
+    const validationError = getEvaluationFormValidationError(state.evalForm);
+    if (validationError) {
+      toastMessages.error(t(`interview:interviewDetail.messages.${validationError}`));
+      return;
+    }
+
     try {
-      await submitEvaluation({
-        interview: Number(id),
-        attitude_score: Number(state.evalForm.attitude_score),
-        professional_score: Number(state.evalForm.professional_score),
-        overall_score: (Number(state.evalForm.attitude_score) + Number(state.evalForm.professional_score)) / 2,
-        result: state.evalForm.result,
-        comments: state.evalForm.comments,
-        proposed_salary: Number(state.evalForm.proposed_salary),
-      });
+      await submitEvaluation(buildEvaluationPayload(Number(id), state.evalForm));
       toastMessages.success(t('interview:interviewDetail.messages.evaluationSuccess'));
     } catch {
       // mutation hook handles errors
@@ -283,10 +273,10 @@ const InterviewDetailCard = () => {
 
   const handleForceEndInterview = async () => {
     if (!session?.roomName) return;
-    if (!window.confirm(t('interview:interviewDetail.messages.confirmForceEnd', { defaultValue: 'Bạn có chắc chắn muốn kết thúc buổi phỏng vấn này ngay lập tức không?' }))) return;
+    if (!window.confirm(t('interview:interviewDetail.messages.confirmForceEnd'))) return;
     try {
       await interviewService.updateSessionStatus(session.roomName, 'completed');
-      toastMessages.success(t('interview:interviewDetail.messages.forceEndSuccess', { defaultValue: 'Đã yêu cầu kết thúc buổi phỏng vấn' }));
+      toastMessages.success(t('interview:interviewDetail.messages.forceEndSuccess'));
       queryClient.invalidateQueries({ queryKey: ['interviewDetail', id] });
     } catch (e) {
       errorHandling(e as AxiosError<{ errors?: ApiError }>);

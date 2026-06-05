@@ -61,7 +61,7 @@ const NotificationCard: React.FC = () => {
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-        <IconButton size="large" aria-label={t('notification.openMenu', { defaultValue: 'Open notifications' })} color="inherit" onClick={openNotificationsMenu}>
+        <IconButton size="large" aria-label={t('notification.openMenu')} color="inherit" onClick={openNotificationsMenu}>
           <Badge badgeContent={unreadCount} color="error">
             <NotificationsIcon />
           </Badge>
@@ -127,7 +127,7 @@ const NotificationCard: React.FC = () => {
             </Typography>
             {count > 0 && (
               <Typography variant="caption" color="text.secondary">
-                {t('notification.unreadCount', { count: unreadCount, defaultValue: '{{count}} unread' })}
+                {t('notification.unreadCount', { count: unreadCount })}
               </Typography>
             )}
           </Stack>

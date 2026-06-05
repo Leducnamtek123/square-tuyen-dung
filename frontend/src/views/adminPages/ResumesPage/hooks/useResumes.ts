@@ -6,6 +6,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import { Resume } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 import type { AdminListParams, ResumePayload } from '../../../../services/adminManagementService';
+import i18next from 'i18next';
 
 type UseResumesResult = UseQueryResult<PaginatedResponse<Resume>> & {
     createResume: (data: ResumePayload) => Promise<Resume>;
@@ -30,10 +31,10 @@ export const useResumes = (params?: AdminListParams): UseResumesResult => {
         mutationFn: (data: ResumePayload) => adminManagementService.createResume(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-resumes'] });
-            toastMessages.success('Resume added successfully');
+            toastMessages.success(i18next.t('admin:pages.resumes.toast.addSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while adding the resume');
+            toastMessages.error(i18next.t('admin:pages.resumes.toast.addError'));
             console.error(err);
         }
     });
@@ -42,10 +43,10 @@ export const useResumes = (params?: AdminListParams): UseResumesResult => {
         mutationFn: ({ id, data }: { id: string | number; data: ResumePayload }) => adminManagementService.updateResume(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-resumes'] });
-            toastMessages.success('Resume updated successfully');
+            toastMessages.success(i18next.t('admin:pages.resumes.toast.updateSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while updating the resume');
+            toastMessages.error(i18next.t('admin:pages.resumes.toast.updateError'));
             console.error(err);
         }
     });
@@ -54,10 +55,10 @@ export const useResumes = (params?: AdminListParams): UseResumesResult => {
         mutationFn: (id: string | number) => adminManagementService.deleteResume(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-resumes'] });
-            toastMessages.success('Resume deleted successfully');
+            toastMessages.success(i18next.t('admin:pages.resumes.toast.deleteSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while deleting the resume');
+            toastMessages.error(i18next.t('admin:pages.resumes.toast.deleteError'));
             console.error(err);
         }
     });

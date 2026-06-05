@@ -11,6 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ArticleIcon from '@mui/icons-material/Article';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import contentService, { Article, ArticleCategory, ArticleStatus } from '@/services/contentService';
 import DataTable from '@/components/Common/DataTable';
@@ -24,13 +25,6 @@ const STATUS_COLOR: Record<ArticleStatus, 'default' | 'warning' | 'success' | 'e
   pending: 'warning',
   published: 'success',
   archived: 'info',
-};
-
-const STATUS_LABEL: Record<ArticleStatus, string> = {
-  draft: 'Bản nháp',
-  pending: 'Chờ duyệt',
-  published: 'Đã đăng',
-  archived: 'Lưu trữ',
 };
 
 const statusFilterSx = [{ width: { xs: '100%', sm: 220 } }, filterControlSx] as SxProps<Theme>;
@@ -108,6 +102,7 @@ const adminArticlesReducer = (
 
 const AdminArticlesPage = () => {
   const { push } = useRouter();
+  const { t } = useTranslation('admin');
   const [state, dispatch] = useReducer(adminArticlesReducer, initialAdminArticlesState);
   const { category, statusFilter, search, searchInput, articles, total, isLoading, pagination } = state;
 
@@ -123,28 +118,31 @@ const AdminArticlesPage = () => {
       });
       dispatch({ type: 'loaded', articles: res.results || [], total: res.count || 0 });
     } catch {
-      toastMessages.error('Không thể tải danh sách bài viết');
+      toastMessages.error(t('pages.articles.messages.loadError'));
       dispatch({ type: 'failed' });
     }
-  }, [category, statusFilter, search, pagination]);
+  }, [category, statusFilter, search, pagination, t]);
 
   useEffect(() => { fetchArticles(); }, [fetchArticles]);
 
   const handleDelete = async (id: number, title: string) => {
-    if (!window.confirm(`Bạn có chắc muốn xóa "${title}"?`)) return;
+    if (!window.confirm(t('pages.articles.messages.deleteConfirm', { title }))) return;
     try {
       await contentService.adminDeleteArticle(id);
-      toastMessages.success('Đã xóa bài viết');
+      toastMessages.success(t('pages.articles.messages.deleteSuccess'));
       fetchArticles();
     } catch {
-      toastMessages.error('Không thể xóa bài viết');
+      toastMessages.error(t('pages.articles.messages.deleteError'));
     }
   };
+
+  const getStatusLabel = (status: ArticleStatus) => t(`pages.articles.statuses.${status}`);
+  const getCategoryLabel = (articleCategory: ArticleCategory) => t(`pages.articles.categories.${articleCategory}`);
 
   const columns: ColumnDef<Article>[] = [
     {
       accessorKey: 'title',
-      header: 'Tiêu đề',
+      header: t('pages.articles.table.title'),
       cell: ({ row }) => (
         <Box>
           <Typography variant="body2" fontWeight={700} sx={{ mb: 0.5 }}>
@@ -158,11 +156,11 @@ const AdminArticlesPage = () => {
     },
     {
       accessorKey: 'category',
-      header: 'Danh mục',
+      header: t('pages.articles.table.category'),
       cell: ({ row }) => (
         <Chip
           icon={row.original.category === 'news' ? <NewspaperIcon fontSize="small" /> : <ArticleIcon fontSize="small" />}
-          label={row.original.category === 'news' ? 'Tin tức' : 'Blog'}
+          label={getCategoryLabel(row.original.category)}
           size="small"
           variant="outlined"
           color={row.original.category === 'news' ? 'primary' : 'secondary'}
@@ -171,10 +169,10 @@ const AdminArticlesPage = () => {
     },
     {
       accessorKey: 'status',
-      header: 'Trạng thái',
+      header: t('pages.articles.table.status'),
       cell: ({ row }) => (
         <Chip
-          label={STATUS_LABEL[row.original.status]}
+          label={getStatusLabel(row.original.status)}
           size="small"
           color={STATUS_COLOR[row.original.status]}
         />
@@ -182,12 +180,12 @@ const AdminArticlesPage = () => {
     },
     {
       accessorKey: 'authorName',
-      header: 'Tác giả',
+      header: t('pages.articles.table.author'),
       cell: ({ row }) => <Typography variant="body2">{row.original.authorName || '—'}</Typography>,
     },
     {
       accessorKey: 'publishedAt',
-      header: 'Ngày đăng',
+      header: t('pages.articles.table.publishedAt'),
       cell: ({ row }) => (
         <Typography variant="body2">
           {row.original.publishedAt ? dayjs(row.original.publishedAt).format('DD/MM/YYYY HH:mm') : '—'}
@@ -196,20 +194,20 @@ const AdminArticlesPage = () => {
     },
     {
       accessorKey: 'viewCount',
-      header: 'Lượt xem',
+      header: t('pages.articles.table.viewCount'),
       cell: ({ row }) => <Typography variant="body2">{row.original.viewCount?.toLocaleString()}</Typography>,
     },
     {
       id: 'actions',
-      header: 'Thao tác',
+      header: t('pages.articles.table.actions'),
       cell: ({ row }) => (
         <Stack direction="row" spacing={0.5}>
-          <Tooltip title="Chỉnh sửa">
+          <Tooltip title={t('pages.articles.actions.edit')}>
             <IconButton size="small" onClick={() => push(`/admin/articles/${row.original.id}`)}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Xóa">
+          <Tooltip title={t('pages.articles.actions.delete')}>
             <IconButton size="small" color="error" onClick={() => handleDelete(row.original.id, row.original.title)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
@@ -225,10 +223,10 @@ const AdminArticlesPage = () => {
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
         <Box>
           <Typography variant="h4" fontWeight={900} letterSpacing="-0.5px">
-            Tin tức & Blog
+            {t('pages.articles.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary" mt={0.5}>
-            Quản lý bài viết tin tức và blog tuyển dụng
+            {t('pages.articles.subtitle')}
           </Typography>
         </Box>
         <Button
@@ -237,18 +235,18 @@ const AdminArticlesPage = () => {
           onClick={() => push('/admin/articles/create')}
           sx={{ fontWeight: 700, px: 3 }}
         >
-          Viết bài mới
+          {t('pages.articles.newArticle')}
         </Button>
       </Stack>
 
       <FilterBar
-        title="Bộ lọc bài viết"
+        title={t('pages.articles.filter.title')}
         searchValue={searchInput}
-        searchPlaceholder="Tìm kiếm bài viết..."
+        searchPlaceholder={t('pages.articles.filter.searchPlaceholder')}
         onSearchChange={(value) => dispatch({ type: 'patch', patch: { searchInput: value } })}
         onSearchSubmit={() => dispatch({ type: 'patch', patch: { search: searchInput.trim(), pagination: { ...pagination, pageIndex: 0 } } })}
         showSearchButton
-        searchButtonLabel="Tìm kiếm"
+        searchButtonLabel={t('pages.articles.actions.search')}
         activeFilterCount={[category !== 'all', statusFilter !== 'all', Boolean(search)].filter(Boolean).length}
         onReset={() => dispatch({
           type: 'patch',
@@ -261,15 +259,15 @@ const AdminArticlesPage = () => {
           },
         })}
         resetDisabled={category === 'all' && statusFilter === 'all' && !search && !searchInput}
-        resetLabel="Xóa lọc"
-        advancedLabel="Bộ lọc nâng cao"
+        resetLabel={t('pages.articles.actions.clearFilters')}
+        advancedLabel={t('pages.articles.actions.advancedFilters')}
         advancedDefaultOpen={statusFilter !== 'all'}
         advancedFilters={(
           <FormControl size="small" sx={statusFilterSx}>
-            <InputLabel>Trạng thái</InputLabel>
+            <InputLabel>{t('pages.articles.filter.status')}</InputLabel>
             <Select
               value={statusFilter}
-              label="Trạng thái"
+              label={t('pages.articles.filter.status')}
               onChange={(e) => dispatch({
                 type: 'patch',
                 patch: {
@@ -278,11 +276,11 @@ const AdminArticlesPage = () => {
                 },
               })}
             >
-              <MenuItem value="all">Tất cả</MenuItem>
-              <MenuItem value="draft">Bản nháp</MenuItem>
-              <MenuItem value="pending">Chờ duyệt</MenuItem>
-              <MenuItem value="published">Đã đăng</MenuItem>
-              <MenuItem value="archived">Lưu trữ</MenuItem>
+              <MenuItem value="all">{t('pages.articles.statuses.all')}</MenuItem>
+              <MenuItem value="draft">{t('pages.articles.statuses.draft')}</MenuItem>
+              <MenuItem value="pending">{t('pages.articles.statuses.pending')}</MenuItem>
+              <MenuItem value="published">{t('pages.articles.statuses.published')}</MenuItem>
+              <MenuItem value="archived">{t('pages.articles.statuses.archived')}</MenuItem>
             </Select>
           </FormControl>
         )}
@@ -304,9 +302,9 @@ const AdminArticlesPage = () => {
             },
           }}
         >
-          <ToggleButton value="all">Tất cả</ToggleButton>
-          <ToggleButton value="news">Tin tức</ToggleButton>
-          <ToggleButton value="blog">Blog</ToggleButton>
+          <ToggleButton value="all">{t('pages.articles.categories.all')}</ToggleButton>
+          <ToggleButton value="news">{t('pages.articles.categories.news')}</ToggleButton>
+          <ToggleButton value="blog">{t('pages.articles.categories.blog')}</ToggleButton>
         </ToggleButtonGroup>
       </FilterBar>
 

@@ -67,7 +67,7 @@ const CompanyInfoSection = ({
           <FontAwesomeIcon icon={faFontAwesome} style={{ width: 16, color: '#757575' }} />
           {fieldOperation || (
             <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
-              {t('company.notUpdated', 'Chưa cập nhật')}
+              {t('company.notUpdated')}
             </span>
           )}
         </Typography>
@@ -76,7 +76,7 @@ const CompanyInfoSection = ({
           <FontAwesomeIcon icon={faMapLocation} style={{ width: 16, color: '#757575' }} />
           {tConfig(companyConfig.cityDict?.[city]) || (
             <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
-              {t('company.notUpdated', 'Chưa cập nhật')}
+              {t('company.notUpdated')}
             </span>
           )}
         </Typography>
@@ -85,7 +85,7 @@ const CompanyInfoSection = ({
           <FontAwesomeIcon icon={faUser} style={{ width: 16, color: '#757575' }} />
           {tConfig(companyConfig.employeeSizeDict?.[employeeSize]) || (
             <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
-              {t('company.notUpdated', 'Chưa cập nhật')}
+              {t('company.notUpdated')}
             </span>
           )}
         </Typography>

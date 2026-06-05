@@ -28,6 +28,19 @@ type Props = {
   onLocationChange: (name: 'city' | 'district' | 'ward' | 'address' | 'lat' | 'lng', value: string) => void;
 };
 
+const isBlank = (value: string | null | undefined) => !String(value ?? '').trim();
+
+export const isCompanyFormSaveDisabled = (formData: CompanyFormData, isMutating: boolean) => (
+  isMutating ||
+  isBlank(formData.companyName) ||
+  isBlank(formData.taxCode) ||
+  isBlank(formData.companyEmail) ||
+  isBlank(formData.companyPhone) ||
+  Number(formData.employeeSize) <= 0 ||
+  isBlank(formData.fieldOperation) ||
+  isBlank(formData.location.address)
+);
+
 const CompanyFormDialog = ({
   open,
   mode,
@@ -79,25 +92,25 @@ const CompanyFormDialog = ({
             <TextField label={t('pages.companies.websiteLabel')} fullWidth name="websiteUrl" value={formData.websiteUrl || ''} onChange={(e) => onFieldChange('websiteUrl', e.target.value)} placeholder="https://..." />
           </Grid>
           <Grid size={12}>
-            <TextField label={t('pages.companies.form.since', 'Founded date')} fullWidth type="date" name="since" value={formData.since || ''} onChange={(e) => onFieldChange('since', e.target.value)} slotProps={{ inputLabel: { shrink: true } }} />
+            <TextField label={t('pages.companies.form.since')} fullWidth type="date" name="since" value={formData.since || ''} onChange={(e) => onFieldChange('since', e.target.value)} slotProps={{ inputLabel: { shrink: true } }} />
           </Grid>
           <Grid size={4}>
-            <TextField label={t('pages.companies.form.cityId', 'City ID')} fullWidth type="number" name="location.city" value={formData.location.city ?? ''} onChange={(e) => onLocationChange('city', e.target.value)} />
+            <TextField label={t('pages.companies.form.cityId')} fullWidth type="number" name="location.city" value={formData.location.city ?? ''} onChange={(e) => onLocationChange('city', e.target.value)} />
           </Grid>
           <Grid size={4}>
-            <TextField label={t('pages.companies.form.districtId', 'District ID')} fullWidth type="number" name="location.district" value={formData.location.district ?? ''} onChange={(e) => onLocationChange('district', e.target.value)} />
+            <TextField label={t('pages.companies.form.districtId')} fullWidth type="number" name="location.district" value={formData.location.district ?? ''} onChange={(e) => onLocationChange('district', e.target.value)} />
           </Grid>
           <Grid size={4}>
-            <TextField label={t('pages.companies.form.wardId', 'Ward ID')} fullWidth type="number" name="location.ward" value={formData.location.ward ?? ''} onChange={(e) => onLocationChange('ward', e.target.value)} />
+            <TextField label={t('pages.companies.form.wardId')} fullWidth type="number" name="location.ward" value={formData.location.ward ?? ''} onChange={(e) => onLocationChange('ward', e.target.value)} />
           </Grid>
           <Grid size={12}>
-            <TextField label={t('pages.companies.form.address', 'Address')} fullWidth name="location.address" value={formData.location.address} onChange={(e) => onLocationChange('address', e.target.value)} required />
+            <TextField label={t('pages.companies.form.address')} fullWidth name="location.address" value={formData.location.address} onChange={(e) => onLocationChange('address', e.target.value)} required />
           </Grid>
           <Grid size={6}>
-            <TextField label={t('pages.companies.form.latitude', 'Latitude')} fullWidth type="number" name="location.lat" value={formData.location.lat ?? ''} onChange={(e) => onLocationChange('lat', e.target.value)} />
+            <TextField label={t('pages.companies.form.latitude')} fullWidth type="number" name="location.lat" value={formData.location.lat ?? ''} onChange={(e) => onLocationChange('lat', e.target.value)} />
           </Grid>
           <Grid size={6}>
-            <TextField label={t('pages.companies.form.longitude', 'Longitude')} fullWidth type="number" name="location.lng" value={formData.location.lng ?? ''} onChange={(e) => onLocationChange('lng', e.target.value)} />
+            <TextField label={t('pages.companies.form.longitude')} fullWidth type="number" name="location.lng" value={formData.location.lng ?? ''} onChange={(e) => onLocationChange('lng', e.target.value)} />
           </Grid>
           <Grid size={12}>
             <TextField label={t('pages.companies.descriptionLabel')} fullWidth multiline rows={4} name="description" value={formData.description || ''} onChange={(e) => onFieldChange('description', e.target.value)} />
@@ -106,7 +119,7 @@ const CompanyFormDialog = ({
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 3 }}>
         <Button onClick={onClose} color="inherit">{t('pages.companies.cancelBtn')}</Button>
-        <Button onClick={onSave} variant="contained" disabled={isMutating || !formData.companyName || !formData.taxCode || !formData.location.address} sx={{ px: 4 }}>
+        <Button onClick={onSave} variant="contained" disabled={isCompanyFormSaveDisabled(formData, isMutating)} sx={{ px: 4 }}>
           {isMutating ? t('pages.companies.savingBtn') : t('pages.companies.saveBtn')}
         </Button>
       </DialogActions>

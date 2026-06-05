@@ -35,6 +35,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import adminJobService from '../../../services/adminJobService';
 import adminManagementService from '../../../services/adminManagementService';
 import aiService from '../../../services/aiService';
@@ -75,6 +76,7 @@ const getProfileType = (profile: VoiceProfile) => profile.voiceType || profile.v
 
 const VoiceProfilesPage = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation('admin');
   const [createOpen, setCreateOpen] = useState(false);
   const [editProfile, setEditProfile] = useState<VoiceProfile | null>(null);
   const [deleteProfile, setDeleteProfile] = useState<VoiceProfile | null>(null);
@@ -91,7 +93,7 @@ const VoiceProfilesPage = () => {
   const [grantCompany, setGrantCompany] = useState('');
   const [grantJob, setGrantJob] = useState('');
   const [grantDefault, setGrantDefault] = useState(true);
-  const [testText, setTestText] = useState('Xin chào, đây là giọng phỏng vấn AI của Square.');
+  const [testText, setTestText] = useState(() => t('pages.voiceProfiles.messages.defaultTestSentence'));
   const [testAudioUrl, setTestAudioUrl] = useState<string | null>(null);
 
   const { data, isLoading, error } = useQuery({
@@ -112,6 +114,21 @@ const VoiceProfilesPage = () => {
   const profiles = useMemo(() => data?.results ?? [], [data]);
   const companies = useMemo(() => companiesData?.results ?? [], [companiesData]);
   const jobs = useMemo(() => jobsData?.results ?? [], [jobsData]);
+
+  const getVoiceTypeLabel = (type?: string) => {
+    if (type === 'preset') return t('pages.voiceProfiles.voiceTypes.preset');
+    if (type === 'cloned') return t('pages.voiceProfiles.voiceTypes.cloned');
+    return type || '';
+  };
+
+  const getStatusLabel = (status?: string) => {
+    if (status === 'draft') return t('pages.voiceProfiles.statuses.draft');
+    if (status === 'processing') return t('pages.voiceProfiles.statuses.processing');
+    if (status === 'ready') return t('pages.voiceProfiles.statuses.ready');
+    if (status === 'disabled') return t('pages.voiceProfiles.statuses.disabled');
+    if (status === 'failed') return t('pages.voiceProfiles.statuses.failed');
+    return status || '';
+  };
 
   const resetCreateDialog = () => {
     setCreateOpen(false);
@@ -134,31 +151,35 @@ const VoiceProfilesPage = () => {
       return profile;
     },
     onSuccess: () => {
-      toastMessages.success(createForm.voiceType === 'cloned' ? 'Voice profile and sample created.' : 'Voice profile created.');
+      toastMessages.success(
+        createForm.voiceType === 'cloned'
+          ? t('pages.voiceProfiles.toast.createWithSampleSuccess')
+          : t('pages.voiceProfiles.toast.createSuccess')
+      );
       resetCreateDialog();
       queryClient.invalidateQueries({ queryKey: ['admin-voice-profiles'] });
     },
-    onError: () => toastMessages.error('Could not create voice profile.'),
+    onError: () => toastMessages.error(t('pages.voiceProfiles.toast.createError')),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: Partial<VoiceProfilePayload> & { status?: string } }) => voiceProfileService.updateVoiceProfile(id, payload),
     onSuccess: () => {
-      toastMessages.success('Voice profile updated.');
+      toastMessages.success(t('pages.voiceProfiles.toast.updateSuccess'));
       setEditProfile(null);
       queryClient.invalidateQueries({ queryKey: ['admin-voice-profiles'] });
     },
-    onError: () => toastMessages.error('Could not update voice profile.'),
+    onError: () => toastMessages.error(t('pages.voiceProfiles.toast.updateError')),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => voiceProfileService.deleteVoiceProfile(id),
     onSuccess: () => {
-      toastMessages.success('Voice profile deleted.');
+      toastMessages.success(t('pages.voiceProfiles.toast.deleteSuccess'));
       setDeleteProfile(null);
       queryClient.invalidateQueries({ queryKey: ['admin-voice-profiles'] });
     },
-    onError: () => toastMessages.error('Could not delete voice profile.'),
+    onError: () => toastMessages.error(t('pages.voiceProfiles.toast.deleteError')),
   });
 
   const testMutation = useMutation({
@@ -176,19 +197,19 @@ const VoiceProfilesPage = () => {
       const nextUrl = URL.createObjectURL(blob);
       setTestAudioUrl(nextUrl);
     },
-    onError: () => toastMessages.error('Could not generate voice preview.'),
+    onError: () => toastMessages.error(t('pages.voiceProfiles.toast.previewError')),
   });
 
   const sampleMutation = useMutation({
     mutationFn: ({ id, formData }: { id: number; formData: FormData }) => voiceProfileService.uploadSample(id, formData),
     onSuccess: () => {
-      toastMessages.success('Voice sample uploaded.');
+      toastMessages.success(t('pages.voiceProfiles.toast.sampleSuccess'));
       setSampleProfile(null);
       setSampleFile(null);
       setSampleText('');
       queryClient.invalidateQueries({ queryKey: ['admin-voice-profiles'] });
     },
-    onError: () => toastMessages.error('Could not upload voice sample.'),
+    onError: () => toastMessages.error(t('pages.voiceProfiles.toast.sampleError')),
   });
 
   const grantMutation = useMutation({
@@ -200,18 +221,18 @@ const VoiceProfilesPage = () => {
         isActive: true,
       }),
     onSuccess: () => {
-      toastMessages.success('Voice access granted.');
+      toastMessages.success(t('pages.voiceProfiles.toast.grantSuccess'));
       setGrantProfile(null);
       setGrantCompany('');
       setGrantJob('');
       queryClient.invalidateQueries({ queryKey: ['admin-voice-profiles'] });
     },
-    onError: () => toastMessages.error('Could not grant voice access.'),
+    onError: () => toastMessages.error(t('pages.voiceProfiles.toast.grantError')),
   });
 
   const submitCreate = () => {
     if (createForm.voiceType === 'cloned' && (!createSampleFile || !createSampleText.trim())) {
-      toastMessages.error('Audio file and exact transcript are required for cloned voices.');
+      toastMessages.error(t('pages.voiceProfiles.validation.cloneSampleRequired'));
       return;
     }
 
@@ -258,7 +279,7 @@ const VoiceProfilesPage = () => {
 
   const openTestDialog = (profile: VoiceProfile) => {
     if (profile.status !== 'ready') {
-      toastMessages.error('Voice must be ready before testing.');
+      toastMessages.error(t('pages.voiceProfiles.validation.voiceNotReady'));
       return;
     }
     if (testAudioUrl) {
@@ -278,7 +299,7 @@ const VoiceProfilesPage = () => {
 
   const submitTest = () => {
     if (!testProfile || !testText.trim()) {
-      toastMessages.error('Enter a sentence to test this voice.');
+      toastMessages.error(t('pages.voiceProfiles.validation.testSentenceRequired'));
       return;
     }
     testMutation.mutate({ id: testProfile.id, text: testText.trim() });
@@ -286,7 +307,7 @@ const VoiceProfilesPage = () => {
 
   const submitSample = () => {
     if (!sampleProfile || !sampleFile || !sampleText.trim()) {
-      toastMessages.error('Audio file and transcript are required.');
+      toastMessages.error(t('pages.voiceProfiles.validation.sampleRequired'));
       return;
     }
     const formData = new FormData();
@@ -298,11 +319,11 @@ const VoiceProfilesPage = () => {
   const submitGrant = () => {
     if (!grantProfile) return;
     if (grantTargetType === 'company' && !grantCompany) {
-      toastMessages.error('Select a company.');
+      toastMessages.error(t('pages.voiceProfiles.validation.companyRequired'));
       return;
     }
     if (grantTargetType === 'job' && !grantJob) {
-      toastMessages.error('Select a job post.');
+      toastMessages.error(t('pages.voiceProfiles.validation.jobRequired'));
       return;
     }
     grantMutation.mutate({ id: grantProfile.id });
@@ -313,19 +334,19 @@ const VoiceProfilesPage = () => {
       <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" gap={2} sx={{ mb: 3 }}>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>
-            Voice Profiles
+            {t('pages.voiceProfiles.title')}
           </Typography>
           <Breadcrumbs>
-            <Link underline="hover" color="inherit" href="/admin">Admin</Link>
-            <Typography color="text.primary">Voice Profiles</Typography>
+            <Link underline="hover" color="inherit" href="/admin">{t('pages.voiceProfiles.breadcrumbAdmin')}</Link>
+            <Typography color="text.primary">{t('pages.voiceProfiles.title')}</Typography>
           </Breadcrumbs>
         </Box>
         <Button variant="contained" startIcon={<GraphicEqIcon />} onClick={() => setCreateOpen(true)}>
-          New Voice
+          {t('pages.voiceProfiles.newVoice')}
         </Button>
       </Stack>
 
-      {error ? <Alert severity="error" sx={{ mb: 2 }}>Could not load voice profiles.</Alert> : null}
+      {error ? <Alert severity="error" sx={{ mb: 2 }}>{t('pages.voiceProfiles.loadError')}</Alert> : null}
 
       <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
         <CardContent sx={{ p: 0 }}>
@@ -335,14 +356,14 @@ const VoiceProfilesPage = () => {
             </Box>
           ) : (
             <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Samples</TableCell>
-                  <TableCell>Grants</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                <TableHead>
+                  <TableRow>
+                  <TableCell>{t('pages.voiceProfiles.table.name')}</TableCell>
+                  <TableCell>{t('pages.voiceProfiles.table.type')}</TableCell>
+                  <TableCell>{t('pages.voiceProfiles.table.status')}</TableCell>
+                  <TableCell>{t('pages.voiceProfiles.table.samples')}</TableCell>
+                  <TableCell>{t('pages.voiceProfiles.table.grants')}</TableCell>
+                  <TableCell align="right">{t('pages.voiceProfiles.table.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -352,19 +373,19 @@ const VoiceProfilesPage = () => {
                       <Typography fontWeight={700}>{profile.name}</Typography>
                       <Typography variant="caption" color="text.secondary">{profile.description || profile.presetVoiceId || profile.preset_voice_id}</Typography>
                     </TableCell>
-                    <TableCell>{getProfileType(profile)}</TableCell>
-                    <TableCell><Chip label={profile.status} color={statusColor(profile.status)} size="small" /></TableCell>
+                    <TableCell>{getVoiceTypeLabel(getProfileType(profile))}</TableCell>
+                    <TableCell><Chip label={getStatusLabel(profile.status)} color={statusColor(profile.status)} size="small" /></TableCell>
                     <TableCell>{profile.sampleCount ?? profile.samples?.length ?? 0}</TableCell>
                     <TableCell>{profile.grantCount ?? profile.grants?.length ?? 0}</TableCell>
                     <TableCell align="right">
-                      <Stack direction="row" gap={1} justifyContent="flex-end">
-                        <Button size="small" variant="outlined" startIcon={<EditIcon />} onClick={() => openEditDialog(profile)}>
-                          Edit
+                        <Stack direction="row" gap={1} justifyContent="flex-end">
+                          <Button size="small" variant="outlined" startIcon={<EditIcon />} onClick={() => openEditDialog(profile)}>
+                          {t('pages.voiceProfiles.actions.edit')}
                         </Button>
                         <IconButton
                           size="small"
                           color="primary"
-                          aria-label={`Test ${profile.name}`}
+                          aria-label={t('pages.voiceProfiles.messages.testActionAria', { name: profile.name })}
                           disabled={profile.status !== 'ready'}
                           onClick={() => openTestDialog(profile)}
                         >
@@ -372,14 +393,14 @@ const VoiceProfilesPage = () => {
                         </IconButton>
                         {getProfileType(profile) === 'cloned' ? (
                           <Button size="small" variant="outlined" startIcon={<UploadFileIcon />} onClick={() => setSampleProfile(profile)}>
-                            Sample
+                            {t('pages.voiceProfiles.actions.sample')}
                           </Button>
                         ) : null}
                         <Button size="small" variant="outlined" startIcon={<BusinessIcon />} onClick={() => setGrantProfile(profile)}>
-                          Grant
+                          {t('pages.voiceProfiles.actions.grant')}
                         </Button>
                         <Button size="small" color="error" variant="outlined" startIcon={<DeleteOutlineIcon />} onClick={() => setDeleteProfile(profile)}>
-                          Delete
+                          {t('pages.voiceProfiles.actions.delete')}
                         </Button>
                       </Stack>
                     </TableCell>
@@ -387,7 +408,7 @@ const VoiceProfilesPage = () => {
                 ))}
                 {profiles.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} align="center">No voice profiles yet.</TableCell>
+                    <TableCell colSpan={6} align="center">{t('pages.voiceProfiles.table.empty')}</TableCell>
                   </TableRow>
                 ) : null}
               </TableBody>
@@ -397,106 +418,106 @@ const VoiceProfilesPage = () => {
       </Card>
 
       <Dialog open={createOpen} onClose={resetCreateDialog} fullWidth maxWidth="sm">
-        <DialogTitle>New Voice Profile</DialogTitle>
+        <DialogTitle>{t('pages.voiceProfiles.dialogs.createTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField label="Name" value={createForm.name} onChange={(e) => setCreateForm((prev) => ({ ...prev, name: e.target.value }))} fullWidth />
-            <TextField label="Description" value={createForm.description} onChange={(e) => setCreateForm((prev) => ({ ...prev, description: e.target.value }))} fullWidth multiline minRows={2} />
-            <TextField select label="Type" value={createForm.voiceType} onChange={(e) => setCreateForm((prev) => ({ ...prev, voiceType: e.target.value as CreateForm['voiceType'] }))} fullWidth>
-              <MenuItem value="cloned">Cloned</MenuItem>
-              <MenuItem value="preset">Preset</MenuItem>
+            <TextField label={t('pages.voiceProfiles.fields.name')} value={createForm.name} onChange={(e) => setCreateForm((prev) => ({ ...prev, name: e.target.value }))} fullWidth />
+            <TextField label={t('pages.voiceProfiles.fields.description')} value={createForm.description} onChange={(e) => setCreateForm((prev) => ({ ...prev, description: e.target.value }))} fullWidth multiline minRows={2} />
+            <TextField select label={t('pages.voiceProfiles.fields.type')} value={createForm.voiceType} onChange={(e) => setCreateForm((prev) => ({ ...prev, voiceType: e.target.value as CreateForm['voiceType'] }))} fullWidth>
+              <MenuItem value="cloned">{t('pages.voiceProfiles.voiceTypes.cloned')}</MenuItem>
+              <MenuItem value="preset">{t('pages.voiceProfiles.voiceTypes.preset')}</MenuItem>
             </TextField>
-            <TextField label="Language" value={createForm.language} onChange={(e) => setCreateForm((prev) => ({ ...prev, language: e.target.value }))} fullWidth />
+            <TextField label={t('pages.voiceProfiles.fields.language')} value={createForm.language} onChange={(e) => setCreateForm((prev) => ({ ...prev, language: e.target.value }))} fullWidth />
             {createForm.voiceType === 'preset' ? (
-              <TextField label="Preset voice ID" value={createForm.presetVoiceId} onChange={(e) => setCreateForm((prev) => ({ ...prev, presetVoiceId: e.target.value }))} fullWidth />
+              <TextField label={t('pages.voiceProfiles.fields.presetVoiceId')} value={createForm.presetVoiceId} onChange={(e) => setCreateForm((prev) => ({ ...prev, presetVoiceId: e.target.value }))} fullWidth />
             ) : (
               <>
-                <Alert severity="info">Upload a clean mp3/wav sample and paste the exact transcript for cloning.</Alert>
+                <Alert severity="info">{t('pages.voiceProfiles.messages.cloneHint')}</Alert>
                 <Button variant="outlined" component="label" startIcon={<UploadFileIcon />}>
-                  {createSampleFile ? createSampleFile.name : 'Choose mp3/wav'}
-                  <input hidden type="file" aria-label="Create voice sample" accept="audio/*,.mp3,.wav,.m4a,.flac,.ogg,.webm" onChange={(e) => setCreateSampleFile(e.target.files?.[0] ?? null)} />
+                  {createSampleFile ? createSampleFile.name : t('pages.voiceProfiles.messages.chooseAudio')}
+                  <input hidden type="file" aria-label={t('pages.voiceProfiles.messages.createSampleAria')} accept="audio/*,.mp3,.wav,.m4a,.flac,.ogg,.webm" onChange={(e) => setCreateSampleFile(e.target.files?.[0] ?? null)} />
                 </Button>
-                <TextField label="Exact transcript" value={createSampleText} onChange={(e) => setCreateSampleText(e.target.value)} fullWidth multiline minRows={3} />
+                <TextField label={t('pages.voiceProfiles.fields.exactTranscript')} value={createSampleText} onChange={(e) => setCreateSampleText(e.target.value)} fullWidth multiline minRows={3} />
                 <FormControlLabel
                   control={<Switch checked={createForm.consentConfirmed} onChange={(e) => setCreateForm((prev) => ({ ...prev, consentConfirmed: e.target.checked }))} />}
-                  label="I confirm we have permission to clone and use this voice."
+                  label={t('pages.voiceProfiles.messages.permissionConfirm')}
                 />
               </>
             )}
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={resetCreateDialog}>Cancel</Button>
+          <Button onClick={resetCreateDialog}>{t('pages.voiceProfiles.actions.cancel')}</Button>
           <Button
             variant="contained"
             disabled={!createForm.name.trim() || createMutation.isPending}
             onClick={submitCreate}
           >
-            {createMutation.isPending ? <CircularProgress size={18} /> : createForm.voiceType === 'cloned' ? 'Create & Upload' : 'Create'}
+            {createMutation.isPending ? <CircularProgress size={18} /> : createForm.voiceType === 'cloned' ? t('pages.voiceProfiles.actions.createAndUpload') : t('pages.voiceProfiles.actions.create')}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={!!editProfile} onClose={() => setEditProfile(null)} fullWidth maxWidth="sm">
-        <DialogTitle>Edit Voice Profile</DialogTitle>
+        <DialogTitle>{t('pages.voiceProfiles.dialogs.editTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField label="Name" value={editForm.name} onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))} fullWidth />
-            <TextField label="Description" value={editForm.description} onChange={(e) => setEditForm((prev) => ({ ...prev, description: e.target.value }))} fullWidth multiline minRows={2} />
-            <TextField select label="Type" value={editForm.voiceType} onChange={(e) => setEditForm((prev) => ({ ...prev, voiceType: e.target.value as EditForm['voiceType'] }))} fullWidth>
-              <MenuItem value="cloned">Cloned</MenuItem>
-              <MenuItem value="preset">Preset</MenuItem>
+            <TextField label={t('pages.voiceProfiles.fields.name')} value={editForm.name} onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))} fullWidth />
+            <TextField label={t('pages.voiceProfiles.fields.description')} value={editForm.description} onChange={(e) => setEditForm((prev) => ({ ...prev, description: e.target.value }))} fullWidth multiline minRows={2} />
+            <TextField select label={t('pages.voiceProfiles.fields.type')} value={editForm.voiceType} onChange={(e) => setEditForm((prev) => ({ ...prev, voiceType: e.target.value as EditForm['voiceType'] }))} fullWidth>
+              <MenuItem value="cloned">{t('pages.voiceProfiles.voiceTypes.cloned')}</MenuItem>
+              <MenuItem value="preset">{t('pages.voiceProfiles.voiceTypes.preset')}</MenuItem>
             </TextField>
-            <TextField select label="Status" value={editForm.status} onChange={(e) => setEditForm((prev) => ({ ...prev, status: e.target.value }))} fullWidth>
-              <MenuItem value="draft">Draft</MenuItem>
-              <MenuItem value="processing">Processing</MenuItem>
-              <MenuItem value="ready">Ready</MenuItem>
-              <MenuItem value="disabled">Disabled</MenuItem>
-              <MenuItem value="failed">Failed</MenuItem>
+            <TextField select label={t('pages.voiceProfiles.fields.status')} value={editForm.status} onChange={(e) => setEditForm((prev) => ({ ...prev, status: e.target.value }))} fullWidth>
+              <MenuItem value="draft">{t('pages.voiceProfiles.statuses.draft')}</MenuItem>
+              <MenuItem value="processing">{t('pages.voiceProfiles.statuses.processing')}</MenuItem>
+              <MenuItem value="ready">{t('pages.voiceProfiles.statuses.ready')}</MenuItem>
+              <MenuItem value="disabled">{t('pages.voiceProfiles.statuses.disabled')}</MenuItem>
+              <MenuItem value="failed">{t('pages.voiceProfiles.statuses.failed')}</MenuItem>
             </TextField>
-            <TextField label="Language" value={editForm.language} onChange={(e) => setEditForm((prev) => ({ ...prev, language: e.target.value }))} fullWidth />
+            <TextField label={t('pages.voiceProfiles.fields.language')} value={editForm.language} onChange={(e) => setEditForm((prev) => ({ ...prev, language: e.target.value }))} fullWidth />
             {editForm.voiceType === 'preset' ? (
-              <TextField label="Preset voice ID" value={editForm.presetVoiceId} onChange={(e) => setEditForm((prev) => ({ ...prev, presetVoiceId: e.target.value }))} fullWidth />
+              <TextField label={t('pages.voiceProfiles.fields.presetVoiceId')} value={editForm.presetVoiceId} onChange={(e) => setEditForm((prev) => ({ ...prev, presetVoiceId: e.target.value }))} fullWidth />
             ) : (
               <FormControlLabel
                 control={<Switch checked={editForm.consentConfirmed} onChange={(e) => setEditForm((prev) => ({ ...prev, consentConfirmed: e.target.checked }))} />}
-                label="I confirm we have permission to clone and use this voice."
+                label={t('pages.voiceProfiles.messages.permissionConfirm')}
               />
             )}
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditProfile(null)}>Cancel</Button>
+          <Button onClick={() => setEditProfile(null)}>{t('pages.voiceProfiles.actions.cancel')}</Button>
           <Button variant="contained" disabled={!editForm.name.trim() || updateMutation.isPending} onClick={submitEdit}>
-            {updateMutation.isPending ? <CircularProgress size={18} /> : 'Save'}
+            {updateMutation.isPending ? <CircularProgress size={18} /> : t('pages.voiceProfiles.actions.save')}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={!!deleteProfile} onClose={() => setDeleteProfile(null)} fullWidth maxWidth="xs">
-        <DialogTitle>Delete Voice Profile</DialogTitle>
+        <DialogTitle>{t('pages.voiceProfiles.dialogs.deleteTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
-            Delete "{deleteProfile?.name}"? This also removes its samples and grants.
+            {t('pages.voiceProfiles.messages.deleteConfirm', { name: deleteProfile?.name || '' })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteProfile(null)}>Cancel</Button>
+          <Button onClick={() => setDeleteProfile(null)}>{t('pages.voiceProfiles.actions.cancel')}</Button>
           <Button color="error" variant="contained" disabled={deleteMutation.isPending || !deleteProfile} onClick={() => deleteProfile && deleteMutation.mutate(deleteProfile.id)}>
-            {deleteMutation.isPending ? <CircularProgress size={18} /> : 'Delete'}
+            {deleteMutation.isPending ? <CircularProgress size={18} /> : t('pages.voiceProfiles.actions.delete')}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={!!testProfile} onClose={closeTestDialog} fullWidth maxWidth="sm">
-        <DialogTitle>Test Voice</DialogTitle>
+        <DialogTitle>{t('pages.voiceProfiles.dialogs.testTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <Typography variant="body2" color="text.secondary">
               {testProfile?.name}
             </Typography>
             <TextField
-              label="Test sentence"
+              label={t('pages.voiceProfiles.fields.testSentence')}
               value={testText}
               onChange={(e) => setTestText(e.target.value)}
               fullWidth
@@ -504,67 +525,67 @@ const VoiceProfilesPage = () => {
               minRows={3}
             />
             {testAudioUrl ? (
-              <Box component="audio" src={testAudioUrl} controls autoPlay aria-label="Generated voice preview" sx={{ width: '100%' }}>
+              <Box component="audio" src={testAudioUrl} controls autoPlay aria-label={t('pages.voiceProfiles.messages.generatedPreviewAria')} sx={{ width: '100%' }}>
                 <track kind="captions" />
               </Box>
             ) : null}
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeTestDialog}>Close</Button>
+          <Button onClick={closeTestDialog}>{t('pages.voiceProfiles.actions.close')}</Button>
           <Button variant="contained" startIcon={<PlayCircleOutlineIcon />} disabled={testMutation.isPending || !testText.trim()} onClick={submitTest}>
-            {testMutation.isPending ? <CircularProgress size={18} /> : 'Generate & Play'}
+            {testMutation.isPending ? <CircularProgress size={18} /> : t('pages.voiceProfiles.actions.generateAndPlay')}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={!!sampleProfile} onClose={() => setSampleProfile(null)} fullWidth maxWidth="sm">
-        <DialogTitle>Upload Voice Sample</DialogTitle>
+        <DialogTitle>{t('pages.voiceProfiles.dialogs.sampleTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <Alert severity="info">Use 10-30 seconds of clean speech and paste the exact transcript.</Alert>
+            <Alert severity="info">{t('pages.voiceProfiles.messages.sampleHint')}</Alert>
             <Button variant="outlined" component="label" startIcon={<UploadFileIcon />}>
-              {sampleFile ? sampleFile.name : 'Choose mp3/wav'}
-              <input hidden type="file" aria-label="Upload voice sample" accept="audio/*,.mp3,.wav,.m4a,.flac,.ogg,.webm" onChange={(e) => setSampleFile(e.target.files?.[0] ?? null)} />
+              {sampleFile ? sampleFile.name : t('pages.voiceProfiles.messages.chooseAudio')}
+              <input hidden type="file" aria-label={t('pages.voiceProfiles.messages.uploadSampleAria')} accept="audio/*,.mp3,.wav,.m4a,.flac,.ogg,.webm" onChange={(e) => setSampleFile(e.target.files?.[0] ?? null)} />
             </Button>
-            <TextField label="Exact transcript" value={sampleText} onChange={(e) => setSampleText(e.target.value)} fullWidth multiline minRows={4} />
+            <TextField label={t('pages.voiceProfiles.fields.exactTranscript')} value={sampleText} onChange={(e) => setSampleText(e.target.value)} fullWidth multiline minRows={4} />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setSampleProfile(null)}>Cancel</Button>
+          <Button onClick={() => setSampleProfile(null)}>{t('pages.voiceProfiles.actions.cancel')}</Button>
           <Button variant="contained" disabled={sampleMutation.isPending} onClick={submitSample}>
-            {sampleMutation.isPending ? <CircularProgress size={18} /> : 'Upload'}
+            {sampleMutation.isPending ? <CircularProgress size={18} /> : t('pages.voiceProfiles.actions.upload')}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={!!grantProfile} onClose={() => setGrantProfile(null)} fullWidth maxWidth="sm">
-        <DialogTitle>Grant Voice Access</DialogTitle>
+        <DialogTitle>{t('pages.voiceProfiles.dialogs.grantTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField select label="Grant to" value={grantTargetType} onChange={(e) => setGrantTargetType(e.target.value as 'company' | 'job')} fullWidth>
-              <MenuItem value="company">Company</MenuItem>
-              <MenuItem value="job">Job post</MenuItem>
+            <TextField select label={t('pages.voiceProfiles.fields.grantTo')} value={grantTargetType} onChange={(e) => setGrantTargetType(e.target.value as 'company' | 'job')} fullWidth>
+              <MenuItem value="company">{t('pages.voiceProfiles.grantTargets.company')}</MenuItem>
+              <MenuItem value="job">{t('pages.voiceProfiles.grantTargets.job')}</MenuItem>
             </TextField>
             {grantTargetType === 'company' ? (
-              <TextField select label="Company" value={grantCompany} onChange={(e) => setGrantCompany(e.target.value)} fullWidth>
+              <TextField select label={t('pages.voiceProfiles.fields.company')} value={grantCompany} onChange={(e) => setGrantCompany(e.target.value)} fullWidth>
                 {companies.map((company) => <MenuItem key={company.id} value={company.id}>{company.companyName}</MenuItem>)}
               </TextField>
             ) : (
-              <TextField select label="Job post" value={grantJob} onChange={(e) => setGrantJob(e.target.value)} fullWidth>
+              <TextField select label={t('pages.voiceProfiles.fields.jobPost')} value={grantJob} onChange={(e) => setGrantJob(e.target.value)} fullWidth>
                 {jobs.map((job) => <MenuItem key={job.id} value={job.id}>{job.jobName}</MenuItem>)}
               </TextField>
             )}
             <FormControlLabel
               control={<Switch checked={grantDefault} onChange={(e) => setGrantDefault(e.target.checked)} />}
-              label="Use as default voice for this target"
+              label={t('pages.voiceProfiles.messages.defaultVoice')}
             />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setGrantProfile(null)}>Cancel</Button>
+          <Button onClick={() => setGrantProfile(null)}>{t('pages.voiceProfiles.actions.cancel')}</Button>
           <Button variant="contained" disabled={grantMutation.isPending} onClick={submitGrant}>
-            {grantMutation.isPending ? <CircularProgress size={18} /> : 'Grant'}
+            {grantMutation.isPending ? <CircularProgress size={18} /> : t('pages.voiceProfiles.actions.grant')}
           </Button>
         </DialogActions>
       </Dialog>

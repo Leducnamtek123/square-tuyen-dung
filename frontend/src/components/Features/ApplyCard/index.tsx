@@ -3,6 +3,7 @@
 import React from 'react';
 import { Stack, Typography } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
+import { useTranslation } from "react-i18next";
 import toastMessages from '@/utils/toastMessages';
 import errorHandling from '@/utils/errorHandling';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
@@ -28,6 +29,7 @@ const ApplyCard = ({
   setIsApplySuccess,
   onApplySuccess,
 }: ApplyCardProps) => {
+  const { t } = useTranslation("public");
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const submitLockRef = React.useRef(false);
   const formId = `apply-form-${String(jobPostId)}`;
@@ -43,7 +45,7 @@ const ApplyCard = ({
         jobPost: Number(jobPostId),
         resume: Number(data.resume),
       });
-      toastMessages.success('Applied successfully.');
+      toastMessages.success(t("applyCard.success"));
       setIsApplySuccess(true);
       onApplySuccess?.();
       setOpenPopup(false);
@@ -61,14 +63,14 @@ const ApplyCard = ({
         title={
           <Stack>
             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, fontSize: '0.875rem' }}>
-              Ứng tuyển vị trí
+              {t("applyCard.positionCaption")}
             </Typography>
             <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 700, mt: -0.5 }}>
               {title}
             </Typography>
           </Stack>
         }
-        buttonText="Ứng tuyển"
+        buttonText={t("applyCard.submit")}
         buttonIcon={<SendIcon />}
         isSubmitting={isFullScreenLoading}
         formId={formId}

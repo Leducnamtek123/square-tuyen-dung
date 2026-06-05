@@ -6,6 +6,7 @@ import type { AdminListParams, DistrictPayload } from '../../../../services/admi
 import toastMessages from '../../../../utils/toastMessages';
 import { District } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
+import i18next from 'i18next';
 
 type UseDistrictsResult = UseQueryResult<PaginatedResponse<District>> & {
     createDistrict: (data: DistrictPayload) => Promise<District>;
@@ -31,10 +32,10 @@ export const useDistricts = (params?: (AdminListParams & { city?: number })): Us
         mutationFn: (data: DistrictPayload) => adminManagementService.createDistrict(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-districts'] });
-            toastMessages.success('District added successfully');
+            toastMessages.success(i18next.t('admin:pages.districts.toast.addSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while adding the district');
+            toastMessages.error(i18next.t('admin:pages.districts.toast.addError'));
             console.error(err);
         }
     });
@@ -43,10 +44,10 @@ export const useDistricts = (params?: (AdminListParams & { city?: number })): Us
         mutationFn: ({ id, data }: { id: string | number; data: Partial<DistrictPayload> }) => adminManagementService.updateDistrict(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-districts'] });
-            toastMessages.success('District updated successfully');
+            toastMessages.success(i18next.t('admin:pages.districts.toast.updateSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while updating the district');
+            toastMessages.error(i18next.t('admin:pages.districts.toast.updateError'));
             console.error(err);
         }
     });
@@ -55,10 +56,10 @@ export const useDistricts = (params?: (AdminListParams & { city?: number })): Us
         mutationFn: (id: string | number) => adminManagementService.deleteDistrict(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-districts'] });
-            toastMessages.success('District deleted successfully');
+            toastMessages.success(i18next.t('admin:pages.districts.toast.deleteSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while deleting the district');
+            toastMessages.error(i18next.t('admin:pages.districts.toast.deleteError'));
             console.error(err);
         }
     });

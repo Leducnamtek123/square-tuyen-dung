@@ -68,6 +68,20 @@ def required_config(name):
     return value
 
 
+def get_oauth_client_config():
+    client_id = required_config("CLIENT_ID")
+    requested_client_type = config("OAUTH_CLIENT_TYPE", default=Application.CLIENT_PUBLIC).strip().lower()
+    client_type = (
+        Application.CLIENT_CONFIDENTIAL
+        if requested_client_type == Application.CLIENT_CONFIDENTIAL
+        else Application.CLIENT_PUBLIC
+    )
+    client_secret = config("CLIENT_SECRET", default="")
+    if client_type == Application.CLIENT_CONFIDENTIAL and not client_secret:
+        raise RuntimeError("CLIENT_SECRET is required for confidential OAuth2 application seed data.")
+    return client_id, client_secret, client_type
+
+
 def _upload_avatar(avatar_filename: str, username_slug: str) -> "File | None":
     path = os.path.join(_AVATAR_DIR, avatar_filename)
     if not os.path.exists(path):
@@ -96,24 +110,30 @@ def seed_accounts():
     """Seed system accounts for the Square-only demo dataset."""
     logger.info("Bắt đầu sinh dữ liệu tài khoản và cấu hình OAuth2...")
 
-    client_id = required_config("CLIENT_ID")
-    client_secret = required_config("CLIENT_SECRET")
+    client_id, client_secret, client_type = get_oauth_client_config()
 
     admin_user = User.objects.filter(is_superuser=True).first()
     app, created = Application.objects.get_or_create(
         client_id=client_id,
         defaults={
             "user": admin_user,
-            "client_type": "confidential",
+            "client_type": client_type,
             "authorization_grant_type": "password",
-            "client_secret": client_secret,
             "name": "Square Tuyen Dung Portal",
         },
     )
+    app.client_type = client_type
+    app.authorization_grant_type = "password"
+    if client_type == Application.CLIENT_CONFIDENTIAL:
+        app.hash_client_secret = True
+        app.client_secret = client_secret
+    else:
+        app.hash_client_secret = False
+        app.client_secret = ""
+    app.save()
     if created:
         logger.info(f"Đã tạo OAuth2 Application: {client_id}")
     else:
-        app.client_secret = client_secret
         app.save()
         logger.info(f"Đã cập nhật OAuth2 Application: {client_id}")
 

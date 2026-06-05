@@ -168,7 +168,7 @@ const TopSlide = () => {
               <Grid size={{ xs: 12, md: 6 }}>
                 <Stack spacing={2.25}>
                   <Chip
-                    label={t('home.heroEyebrow', 'Nền tảng tuyển dụng thông minh')}
+                    label={t('home.heroEyebrow')}
                     color="primary"
                     variant="outlined"
                     sx={{ width: 'fit-content', fontWeight: 700 }}
@@ -184,7 +184,7 @@ const TopSlide = () => {
                       fontSize: { xs: '2rem', sm: '2.35rem', md: '3rem' },
                     }}
                   >
-                    {t('home.heroTitle', 'Tìm việc phù hợp, tuyển đúng người nhanh hơn')}
+                    {t('home.heroTitle')}
                   </Typography>
                   <Typography
                     variant="body1"
@@ -195,10 +195,7 @@ const TopSlide = () => {
                       maxWidth: 620,
                     }}
                   >
-                    {t(
-                      'home.heroDescription',
-                      'Khám phá việc làm theo ngành, thành phố và công ty. Nhà tuyển dụng có thể tiếp cận ứng viên phù hợp nhanh hơn với bộ công cụ tìm kiếm, hồ sơ và phỏng vấn của Square.'
-                    )}
+                    {t('home.heroDescription')}
                   </Typography>
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
                     <Button
@@ -214,7 +211,7 @@ const TopSlide = () => {
                         justifyContent: 'center',
                       }}
                     >
-                      {t('home.heroPrimaryCta', 'Khám phá việc làm')}
+                      {t('home.heroPrimaryCta')}
                     </Button>
                     <Button
                       component={NextLink}
@@ -230,7 +227,7 @@ const TopSlide = () => {
                         backdropFilter: 'blur(10px)',
                       }}
                     >
-                      {t('home.heroSecondaryCta', 'Dành cho nhà tuyển dụng')}
+                      {t('home.heroSecondaryCta')}
                     </Button>
                   </Stack>
                   <Stack
@@ -247,15 +244,15 @@ const TopSlide = () => {
                     {[
                       {
                         icon: <SearchIcon fontSize="small" />,
-                        label: t('home.heroBenefit1', 'Lọc theo nghề, thành phố, công ty'),
+                        label: t('home.heroBenefit1'),
                       },
                       {
                         icon: <VerifiedUserIcon fontSize="small" />,
-                        label: t('home.heroBenefit2', 'Công ty nổi bật và tin tuyển dụng rõ ràng'),
+                        label: t('home.heroBenefit2'),
                       },
                       {
                         icon: <TipsAndUpdatesIcon fontSize="small" />,
-                        label: t('home.heroBenefit3', 'AI hỗ trợ gợi ý và tối ưu quy trình'),
+                        label: t('home.heroBenefit3'),
                       },
                     ].map((item) => (
                       <Chip
@@ -291,13 +288,10 @@ const TopSlide = () => {
                 >
                   <Stack spacing={1.5} sx={{ mb: 2 }}>
                     <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                      {t('home.searchHeading', 'Bắt đầu tìm kiếm ngay')}
+                      {t('home.searchHeading')}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {t(
-                        'home.searchDescription',
-                        'Nhập từ khóa, chọn nghề hoặc thành phố để tìm cơ hội phù hợp hơn.'
-                      )}
+                      {t('home.searchDescription')}
                     </Typography>
                   </Stack>
                   <HomeSearch />

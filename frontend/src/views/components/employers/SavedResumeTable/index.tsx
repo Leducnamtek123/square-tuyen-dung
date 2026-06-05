@@ -24,11 +24,12 @@ import { CV_TYPES, ROUTES } from '../../../../configs/constants';
 import DataTable from '../../../../components/Common/DataTable';
 import { formatRoute } from '@/utils/funcUtils';
 
-import { salaryString } from '../../../../utils/customData';
+import { formatLocalizedSalaryRange } from '../../../../utils/customData';
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import type { ResumeSaved } from '@/types/models';
 import pc from '@/utils/muiColors';
+import { getSavedResumeActionState } from './savedResumeActions';
 
 interface SavedResumeTableProps {
   rows: ResumeSaved[];
@@ -42,7 +43,7 @@ interface SavedResumeTableProps {
 }
 
 const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
-  const { t } = useTranslation(['employer', 'common']);
+  const { t, i18n } = useTranslation(['employer', 'common']);
   const { push } = useRouter();
   const { 
     rows, 
@@ -96,7 +97,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
       id: 'salary',
       header: t('employer:savedResumeTable.label.salary'),
       cell: (info) => {
-        const str = salaryString(info.row.original.resume?.salaryMin, info.row.original.resume?.salaryMax);
+        const str = formatLocalizedSalaryRange(info.row.original.resume?.salaryMin, info.row.original.resume?.salaryMax, i18n.language);
         return str ? (
             <Typography variant="body2" sx={{ fontWeight: 800, color: 'secondary.main' }}>
                 {str}
@@ -166,45 +167,59 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
       id: 'actions',
       header: t('employer:savedResumeTable.label.actions'),
       meta: { align: 'right' },
-      cell: (info) => (
-        <Stack direction="row" spacing={1} justifyContent="flex-end">
-          <Tooltip title={t('employer:savedResumeTable.title.viewprofile')} arrow>
-            <IconButton
-              size="small"
-              color="primary"
-              onClick={() => push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || info.row.original.resume?.slug || '')}`)}
-              sx={{ 
-                bgcolor: pc.primary( 0.06), 
-                
-                '&:hover': { bgcolor: pc.primary( 0.12) }
-              }}
-            >
-              <RemoveRedEyeIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={t('employer:savedResumeTable.label.unsave')} arrow>
-              <Button
-                size="small"
-                variant="contained"
-                color="error"
-                sx={{ 
-                    textTransform: 'none', 
-                    minWidth: 100, 
-                    
-                    fontWeight: 900,
-                    boxShadow: (theme) => theme.customShadows?.z1,
-                    '&:hover': { bgcolor: 'error.dark' }
-                }}
-                startIcon={<FavoriteIcon fontSize="small" />}
-                onClick={() => handleUnsave(info.row.original.resume?.slug || '')}
-              >
-                {t('employer:savedResumeTable.label.unsave')}
-              </Button>
-          </Tooltip>
-        </Stack>
-      ),
+      cell: (info) => {
+        const actionState = getSavedResumeActionState(info.row.original);
+
+        return (
+          <Stack direction="row" spacing={1} justifyContent="flex-end">
+            <Tooltip title={t('employer:savedResumeTable.title.viewprofile')} arrow>
+              <span>
+                <IconButton
+                  size="small"
+                  color="primary"
+                  disabled={!actionState.canView}
+                  onClick={() => {
+                    if (!actionState.canView) return;
+                    push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, actionState.slug)}`);
+                  }}
+                  sx={{
+                    bgcolor: pc.primary(0.06),
+                    '&:hover': { bgcolor: pc.primary( 0.12) }
+                  }}
+                >
+                  <RemoveRedEyeIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title={t('employer:savedResumeTable.label.unsave')} arrow>
+              <span>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="error"
+                  disabled={!actionState.canUnsave}
+                  sx={{
+                      textTransform: 'none',
+                      minWidth: 100,
+                      fontWeight: 900,
+                      boxShadow: (theme) => theme.customShadows?.z1,
+                      '&:hover': { bgcolor: 'error.dark' }
+                  }}
+                  startIcon={<FavoriteIcon fontSize="small" />}
+                  onClick={() => {
+                    if (!actionState.canUnsave) return;
+                    handleUnsave(actionState.slug);
+                  }}
+                >
+                  {t('employer:savedResumeTable.label.unsave')}
+                </Button>
+              </span>
+            </Tooltip>
+          </Stack>
+        );
+      },
     },
-  ], [allConfig, handleUnsave, push, t]);
+  ], [allConfig, handleUnsave, i18n.language, push, t]);
 
   return (
     <DataTable

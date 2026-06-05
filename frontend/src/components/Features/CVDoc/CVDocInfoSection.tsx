@@ -1,6 +1,6 @@
 import React from 'react';
 import i18next from 'i18next';
-import { salaryString } from '@/utils/customData';
+import { formatLocalizedSalaryRange } from '@/utils/customData';
 import type { ExtendedResume } from './types';
 import { Text, View } from './pdf';
 
@@ -29,7 +29,7 @@ const CVDocInfoSection = ({ resume, styles }: Props) => {
           </View>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>{i18next.t('common:cvDoc.labels.salary')}</Text>
-            <Text style={styles.infoValue}>{salaryString(resume.salaryMin || undefined, resume.salaryMax || undefined)}</Text>
+            <Text style={styles.infoValue}>{formatLocalizedSalaryRange(resume.salaryMin, resume.salaryMax, i18next.language)}</Text>
           </View>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>{i18next.t('common:cvDoc.labels.workplace')}</Text>

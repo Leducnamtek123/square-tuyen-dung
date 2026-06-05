@@ -92,6 +92,7 @@
   },
   "sidebar": {
     "systemOverview": "Tổng quan",
+    "agentAssistants": "Agent Assistants",
     "systemAndUsers": "Người dùng & HT",
     "usersAndPermissions": "Phân quyền",
     "systemConfiguration": "Cấu hình hệ thống",
@@ -123,7 +124,13 @@
     "squareHrmAdmin": "Mở Square HRM"
   },
   "aiHealth": {
-    "title": "Dịch vụ AI"
+    "title": "Dịch vụ AI",
+    "status": {
+      "online": "Đang hoạt động",
+      "offline": "Mất kết nối",
+      "notConfigured": "Chưa cấu hình",
+      "checking": "Đang kiểm tra..."
+    }
   },
   "pages": {
     "careers": {
@@ -169,6 +176,14 @@
       "form": {
         "name": "Tên ngành nghề"
       },
+      "toast": {
+        "addSuccess": "Đã thêm ngành nghề",
+        "addError": "Không thể thêm ngành nghề",
+        "updateSuccess": "Đã cập nhật ngành nghề",
+        "updateError": "Không thể cập nhật ngành nghề",
+        "deleteSuccess": "Đã xóa ngành nghề",
+        "deleteError": "Không thể xóa ngành nghề"
+      },
       "cancel": "Hủy",
       "deleteConfirm": "Bạn có chắc muốn xóa ngành nghề này?"
     },
@@ -209,6 +224,14 @@
       "form": {
         "name": "Tên",
         "code": "Mã"
+      },
+      "toast": {
+        "addSuccess": "Đã thêm tỉnh/thành",
+        "addError": "Không thể thêm tỉnh/thành",
+        "updateSuccess": "Đã cập nhật tỉnh/thành",
+        "updateError": "Không thể cập nhật tỉnh/thành",
+        "deleteSuccess": "Đã xóa tỉnh/thành",
+        "deleteError": "Không thể xóa tỉnh/thành"
       },
       "cancel": "Hủy",
       "deleteConfirm": "Bạn có chắc muốn xóa?"
@@ -256,6 +279,14 @@
         "city": "Thành phố",
         "name": "Tên",
         "code": "Mã"
+      },
+      "toast": {
+        "addSuccess": "Đã thêm quận/huyện",
+        "addError": "Không thể thêm quận/huyện",
+        "updateSuccess": "Đã cập nhật quận/huyện",
+        "updateError": "Không thể cập nhật quận/huyện",
+        "deleteSuccess": "Đã xóa quận/huyện",
+        "deleteError": "Không thể xóa quận/huyện"
       },
       "cancel": "Hủy",
       "deleteConfirm": "Xác nhận xóa?"
@@ -319,6 +350,14 @@
       "cancel": "Hủy",
       "deleteConfirm": "Xóa phường/xã này?"
     },
+    "locationValidation": {
+      "nameRequired": "Vui lòng nhập tên",
+      "nameMax": "Tên tối đa 255 ký tự",
+      "codeRequired": "Vui lòng nhập mã",
+      "codeMax": "Mã tối đa 20 ký tự",
+      "parentRequired": "Vui lòng chọn địa điểm cha",
+      "parentInvalid": "Vui lòng chọn địa điểm cha hợp lệ"
+    },
     "companies": {
       "addCompany": "Thêm công ty",
       "searchPlaceholder": "Tìm kiếm công ty...",
@@ -366,9 +405,23 @@
         "address": "Địa chỉ",
         "latitude": "Vĩ độ",
         "longitude": "Kinh độ"
+      },
+      "toast": {
+        "addSuccess": "Đã thêm công ty",
+        "addError": "Không thể thêm công ty",
+        "updateSuccess": "Đã cập nhật công ty",
+        "updateError": "Không thể cập nhật công ty",
+        "deleteSuccess": "Đã xóa công ty",
+        "deleteError": "Không thể xóa công ty"
       }
     },
     "jobActivity": {
+      "toast": {
+        "updateSuccess": "Đã cập nhật hoạt động ứng tuyển",
+        "updateError": "Không thể cập nhật hoạt động ứng tuyển",
+        "deleteSuccess": "Đã xóa hoạt động ứng tuyển",
+        "deleteError": "Không thể xóa hoạt động ứng tuyển"
+      },
       "title": "Lịch sử Ứng tuyển Tuyển dụng",
       "breadcrumbAdmin": "Admin",
       "breadcrumbJobs": "Việc làm & Phỏng vấn",
@@ -405,6 +458,16 @@
       }
     },
     "jobs": {
+      "toast": {
+        "updateSuccess": "Đã cập nhật tin tuyển dụng",
+        "updateError": "Không thể cập nhật tin tuyển dụng",
+        "approveSuccess": "Đã duyệt tin tuyển dụng",
+        "approveError": "Không thể duyệt tin tuyển dụng",
+        "rejectSuccess": "Đã từ chối tin tuyển dụng",
+        "rejectError": "Không thể từ chối tin tuyển dụng",
+        "deleteSuccess": "Đã xóa tin tuyển dụng",
+        "deleteError": "Không thể xóa tin tuyển dụng"
+      },
       "title": "Danh sách Tin tuyển dụng",
       "total": "tổng số",
       "showing": "Hiển thị",
@@ -482,6 +545,14 @@
       "deleteTitle": "Xóa tin"
     },
     "profiles": {
+      "toast": {
+        "addSuccess": "Đã thêm hồ sơ ứng viên",
+        "addError": "Không thể thêm hồ sơ ứng viên",
+        "updateSuccess": "Đã cập nhật hồ sơ",
+        "updateError": "Không thể cập nhật hồ sơ",
+        "deleteSuccess": "Đã xóa hồ sơ",
+        "deleteError": "Không thể xóa hồ sơ"
+      },
       "addCandidate": "Thêm ứng viên",
       "searchPlaceholder": "Tìm kiếm ứng viên...",
       "filter": {
@@ -585,6 +656,14 @@
       "deleteConfirm": "Xác nhận xóa nhóm này?"
     },
     "resumes": {
+      "toast": {
+        "addSuccess": "Đã thêm CV",
+        "addError": "Không thể thêm CV",
+        "updateSuccess": "Đã cập nhật CV",
+        "updateError": "Không thể cập nhật CV",
+        "deleteSuccess": "Đã xóa CV",
+        "deleteError": "Không thể xóa CV"
+      },
       "searchPlaceholder": "Tìm kiếm hồ sơ...",
       "filter": {
         "title": "Bộ lọc CV"
@@ -664,11 +743,14 @@
         "timeLabel": "Thời gian phỏng vấn",
         "questionsLabel": "Chọn câu hỏi",
         "questionsPlaceholder": "Tìm kiếm câu hỏi...",
+        "questionFallback": "Câu hỏi #{{id}}",
         "notesLabel": "Ghi chú",
         "notesPlaceholder": "Ghi chú thêm về cuộc phỏng vấn...",
         "cancelBtn": "Hủy",
         "submitBtn": "Đặt lịch phỏng vấn",
-        "schedulingBtn": "Đang đặt lịch..."
+        "schedulingBtn": "Đang đặt lịch...",
+        "success": "Đã đặt lịch phỏng vấn.",
+        "error": "Không thể đặt lịch phỏng vấn."
       },
       "roles": {
         "admin": "Quản trị viên",
@@ -852,6 +934,14 @@
       }
     },
     "jobNotifications": {
+      "toast": {
+        "createSuccess": "Đã tạo thông báo",
+        "createError": "Không thể tạo thông báo",
+        "updateSuccess": "Đã cập nhật thông báo",
+        "updateError": "Không thể cập nhật thông báo",
+        "deleteSuccess": "Đã xóa thông báo",
+        "deleteError": "Không thể xóa thông báo"
+      },
       "title": "Thông báo Việc làm",
       "breadcrumbAdmin": "Admin",
       "breadcrumbJobsInterviews": "Việc làm & Phỏng vấn",
@@ -897,6 +987,15 @@
         "careerId": "Lĩnh vực / Ngành nghề",
         "cityId": "Tỉnh / Thành phố",
         "isActive": "Đang hoạt động"
+      },
+      "validation": {
+        "jobNameRequired": "Vui lòng nhập tiêu đề",
+        "jobNameMax": "Tiêu đề tối đa 255 ký tự",
+        "numberInteger": "Vui lòng nhập số nguyên",
+        "salaryMin": "Mức lương không được âm",
+        "frequencyInvalid": "Vui lòng chọn tần suất thông báo hợp lệ",
+        "idInvalid": "Vui lòng nhập ID dương hoặc để trống",
+        "choiceInvalid": "Vui lòng chọn giá trị hợp lệ"
       },
       "cancel": "Hủy",
       "deleteTitle": "Xóa thông báo",
@@ -1005,12 +1104,38 @@
         "database": "Cơ sở dữ liệu",
         "redis": "Redis"
       },
+      "fptGpu": {
+        "title": "Container FPT GPU",
+        "controlEnabled": "Đã bật điều khiển",
+        "readOnly": "Chỉ xem",
+        "notConfigured": "Thêm FPT_GPU_BSS_ACCESS_TOKEN hoặc FPT_GPU_ACCESS_TOKEN ở backend để bật Start và Stop.",
+        "tenant": "Tenant",
+        "runningCost": "Chi phí khi chạy",
+        "stoppedDiskCost": "Chi phí ổ đĩa khi dừng",
+        "start": "Khởi động",
+        "stop": "Dừng",
+        "refresh": "Làm mới",
+        "openConsole": "Mở FPT",
+        "toast": {
+          "startSuccess": "Đã gửi yêu cầu khởi động FPT GPU.",
+          "stopSuccess": "Đã gửi yêu cầu dừng FPT GPU.",
+          "actionError": "Thao tác FPT GPU thất bại."
+        }
+      },
       "toast": {
         "saveSuccess": "Cài đặt đã được lưu thành công",
         "saveError": "Lỗi khi lưu cài đặt"
       }
     },
     "banners": {
+      "toast": {
+        "addSuccess": "Đã thêm banner",
+        "addError": "Không thể thêm banner",
+        "updateSuccess": "Đã cập nhật banner",
+        "updateError": "Không thể cập nhật banner",
+        "deleteSuccess": "Đã xóa banner",
+        "deleteError": "Không thể xóa banner"
+      },
       "title": "Quản lý Banner",
       "breadcrumbAdmin": "Admin",
       "breadcrumb": "Banner",
@@ -1027,6 +1152,9 @@
       "saving": "Đang lưu...",
       "delete": "Xóa",
       "deleting": "Đang xóa...",
+      "validation": {
+        "buttonLinkInvalid": "Liên kết nút phải là URL http hoặc https hợp lệ."
+      },
       "table": {
         "id": "ID",
         "webImage": "Ảnh Web",
@@ -1072,12 +1200,234 @@
       "noWebImage": "Chưa có ảnh web",
       "noMobileImage": "Chưa có ảnh mobile"
     },
+    "articles": {
+      "title": "Tin tức & Blog",
+      "subtitle": "Quản lý bài viết tin tức và blog tuyển dụng",
+      "newArticle": "Viết bài mới",
+      "filter": {
+        "title": "Bộ lọc bài viết",
+        "searchPlaceholder": "Tìm kiếm bài viết...",
+        "status": "Trạng thái"
+      },
+      "table": {
+        "title": "Tiêu đề",
+        "category": "Danh mục",
+        "status": "Trạng thái",
+        "author": "Tác giả",
+        "publishedAt": "Ngày đăng",
+        "viewCount": "Lượt xem",
+        "actions": "Thao tác"
+      },
+      "actions": {
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "search": "Tìm kiếm",
+        "clearFilters": "Xóa lọc",
+        "advancedFilters": "Bộ lọc nâng cao",
+        "saveDraft": "Lưu nháp",
+        "publish": "Đăng bài",
+        "saving": "Đang lưu...",
+        "changeImage": "Đổi ảnh",
+        "chooseImage": "Chọn ảnh đại diện",
+        "addTag": "Thêm"
+      },
+      "categories": {
+        "all": "Tất cả",
+        "news": "Tin tức",
+        "blog": "Blog tuyển dụng"
+      },
+      "statuses": {
+        "all": "Tất cả",
+        "draft": "Bản nháp",
+        "pending": "Chờ duyệt",
+        "published": "Đã đăng",
+        "archived": "Lưu trữ"
+      },
+      "form": {
+        "createTitle": "Viết bài mới",
+        "editTitle": "Chỉnh sửa bài viết",
+        "titleLabel": "Tiêu đề bài viết",
+        "titlePlaceholder": "Nhập tiêu đề hấp dẫn...",
+        "excerptLabel": "Mô tả ngắn",
+        "excerptPlaceholder": "Tóm tắt nội dung bài viết hiển thị trong danh sách...",
+        "contentTitle": "NỘI DUNG BÀI VIẾT",
+        "publishSettings": "THIẾT LẬP ĐĂNG BÀI",
+        "categoryLabel": "Danh mục",
+        "statusLabel": "Trạng thái",
+        "thumbnailTitle": "ẢNH ĐẠI DIỆN",
+        "thumbnailAria": "Ảnh đại diện bài viết",
+        "thumbnailAlt": "Xem trước ảnh đại diện bài viết",
+        "tagsTitle": "TAGS",
+        "tagPlaceholder": "Nhập tag..."
+      },
+      "validation": {
+        "titleRequired": "Vui lòng nhập tiêu đề.",
+        "contentRequired": "Vui lòng nhập nội dung."
+      },
+      "messages": {
+        "loadError": "Không thể tải danh sách bài viết.",
+        "deleteConfirm": "Bạn có chắc muốn xóa \"{{title}}\"?",
+        "deleteSuccess": "Đã xóa bài viết.",
+        "deleteError": "Không thể xóa bài viết.",
+        "formLoadError": "Không thể tải bài viết.",
+        "createSuccess": "Tạo bài viết thành công.",
+        "updateSuccess": "Lưu bài viết thành công.",
+        "saveError": "Không thể lưu bài viết."
+      }
+    },
+    "voiceProfiles": {
+      "title": "Hồ sơ giọng nói",
+      "breadcrumbAdmin": "Admin",
+      "newVoice": "Tạo giọng mới",
+      "loadError": "Không thể tải danh sách hồ sơ giọng nói.",
+      "table": {
+        "name": "Tên",
+        "type": "Loại",
+        "status": "Trạng thái",
+        "samples": "Mẫu",
+        "grants": "Phân quyền",
+        "actions": "Thao tác",
+        "empty": "Chưa có hồ sơ giọng nói."
+      },
+      "actions": {
+        "edit": "Sửa",
+        "sample": "Mẫu giọng",
+        "grant": "Cấp quyền",
+        "delete": "Xóa",
+        "cancel": "Hủy",
+        "create": "Tạo",
+        "createAndUpload": "Tạo và tải mẫu",
+        "save": "Lưu",
+        "close": "Đóng",
+        "generateAndPlay": "Tạo và phát",
+        "upload": "Tải lên"
+      },
+      "dialogs": {
+        "createTitle": "Tạo hồ sơ giọng nói",
+        "editTitle": "Sửa hồ sơ giọng nói",
+        "deleteTitle": "Xóa hồ sơ giọng nói",
+        "testTitle": "Thử giọng",
+        "sampleTitle": "Tải mẫu giọng",
+        "grantTitle": "Cấp quyền dùng giọng"
+      },
+      "fields": {
+        "name": "Tên",
+        "description": "Mô tả",
+        "type": "Loại",
+        "language": "Ngôn ngữ",
+        "presetVoiceId": "ID giọng preset",
+        "status": "Trạng thái",
+        "exactTranscript": "Transcript chính xác",
+        "testSentence": "Câu thử giọng",
+        "grantTo": "Cấp quyền cho",
+        "company": "Công ty",
+        "jobPost": "Tin tuyển dụng"
+      },
+      "voiceTypes": {
+        "cloned": "Giọng clone",
+        "preset": "Giọng preset"
+      },
+      "statuses": {
+        "draft": "Bản nháp",
+        "processing": "Đang xử lý",
+        "ready": "Sẵn sàng",
+        "disabled": "Đã tắt",
+        "failed": "Thất bại"
+      },
+      "grantTargets": {
+        "company": "Công ty",
+        "job": "Tin tuyển dụng"
+      },
+      "messages": {
+        "cloneHint": "Tải mẫu mp3/wav rõ tiếng và dán transcript chính xác để clone giọng.",
+        "sampleHint": "Dùng 10-30 giây giọng nói rõ và dán transcript chính xác.",
+        "permissionConfirm": "Tôi xác nhận hệ thống có quyền clone và sử dụng giọng nói này.",
+        "deleteConfirm": "Xóa \"{{name}}\"? Hành động này cũng xóa các mẫu giọng và phân quyền liên quan.",
+        "defaultVoice": "Dùng làm giọng mặc định cho đối tượng này",
+        "chooseAudio": "Chọn mp3/wav",
+        "createSampleAria": "Tạo mẫu giọng",
+        "uploadSampleAria": "Tải mẫu giọng",
+        "generatedPreviewAria": "Bản nghe thử giọng đã tạo",
+        "testActionAria": "Thử giọng {{name}}",
+        "defaultTestSentence": "Xin chào, đây là giọng phỏng vấn AI của Square."
+      },
+      "validation": {
+        "cloneSampleRequired": "Cần có file âm thanh và transcript chính xác cho giọng clone.",
+        "voiceNotReady": "Giọng phải ở trạng thái sẵn sàng trước khi thử.",
+        "testSentenceRequired": "Vui lòng nhập một câu để thử giọng này.",
+        "sampleRequired": "Vui lòng chọn file âm thanh và nhập transcript.",
+        "companyRequired": "Vui lòng chọn công ty.",
+        "jobRequired": "Vui lòng chọn tin tuyển dụng."
+      },
+      "toast": {
+        "createWithSampleSuccess": "Đã tạo hồ sơ giọng nói và mẫu giọng.",
+        "createSuccess": "Đã tạo hồ sơ giọng nói.",
+        "createError": "Không thể tạo hồ sơ giọng nói.",
+        "updateSuccess": "Đã cập nhật hồ sơ giọng nói.",
+        "updateError": "Không thể cập nhật hồ sơ giọng nói.",
+        "deleteSuccess": "Đã xóa hồ sơ giọng nói.",
+        "deleteError": "Không thể xóa hồ sơ giọng nói.",
+        "previewError": "Không thể tạo bản nghe thử.",
+        "sampleSuccess": "Đã tải mẫu giọng.",
+        "sampleError": "Không thể tải mẫu giọng.",
+        "grantSuccess": "Đã cấp quyền dùng giọng.",
+        "grantError": "Không thể cấp quyền dùng giọng."
+      }
+    },
     "bannerTypes": {
+      "title": "Quản lý loại banner",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbList": "Loại banner",
+      "addButton": "Thêm loại banner",
+      "addTitle": "Thêm loại banner",
+      "editTitle": "Sửa loại banner",
+      "deleteTitle": "Xóa loại banner",
+      "deleteConfirm": "Bạn có chắc muốn xóa loại banner {{name}}?",
+      "searchPlaceholder": "Tìm loại banner...",
       "filter": {
         "title": "Bộ lọc loại banner"
+      },
+      "toast": {
+        "addSuccess": "Đã thêm loại banner",
+        "addError": "Không thể thêm loại banner",
+        "updateSuccess": "Đã cập nhật loại banner",
+        "updateError": "Không thể cập nhật loại banner",
+        "deleteSuccess": "Đã xóa loại banner",
+        "deleteError": "Không thể xóa loại banner"
+      },
+      "table": {
+        "id": "ID",
+        "code": "Mã",
+        "name": "Tên",
+        "value": "Giá trị",
+        "webAspectRatio": "Tỷ lệ web",
+        "status": "Trạng thái"
+      },
+      "fields": {
+        "code": "Mã",
+        "name": "Tên",
+        "value": "Giá trị",
+        "webAspectRatio": "Tỷ lệ web",
+        "mobileAspectRatio": "Tỷ lệ mobile",
+        "isActive": "Đang hoạt động"
+      },
+      "validation": {
+        "codeRequired": "Vui lòng nhập mã",
+        "codeMax": "Mã tối đa 50 ký tự",
+        "nameRequired": "Vui lòng nhập tên",
+        "nameMax": "Tên tối đa 100 ký tự",
+        "valueInteger": "Giá trị phải là số nguyên",
+        "valuePositive": "Giá trị phải lớn hơn 0",
+        "aspectRatioMax": "Tỷ lệ khung hình tối đa 20 ký tự"
       }
     },
     "feedbacks": {
+      "toast": {
+        "updateSuccess": "Đã cập nhật đánh giá",
+        "updateError": "Không thể cập nhật đánh giá",
+        "deleteSuccess": "Đã xóa đánh giá",
+        "deleteError": "Không thể xóa đánh giá"
+      },
       "title": "Quản lý Đánh giá",
       "breadcrumbAdmin": "Admin",
       "breadcrumb": "Đánh giá",

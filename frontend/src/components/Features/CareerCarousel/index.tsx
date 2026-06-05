@@ -231,7 +231,7 @@ const CareerCarousel = () => {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {t("home.jobsCount", { count: value.jobPostTotal, defaultValue: "{{count}} Việc Làm" })}
+                    {t("home.jobsCount", { count: value.jobPostTotal })}
                   </Typography>
                 </Card>
               </SwiperSlide>

@@ -90,7 +90,8 @@ export const useBannersPageColumns = ({ typeOptions, onEdit, onDelete }: UseBann
         cell: (info) => typeOptions.find((opt) => opt.value === info.getValue())?.label || (info.getValue() as string | number),
       },
       {
-        accessorKey: 'is_active',
+        id: 'is_active',
+        accessorFn: (row) => row.isActive,
         header: t('pages.banners.table.status') as string,
         cell: (info) => (
           <Chip

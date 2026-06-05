@@ -245,6 +245,114 @@ def test_validate_env_rejects_production_placeholders():
         )
 
 
+def test_validate_env_requires_agent_secret_in_production(monkeypatch):
+    monkeypatch.delenv("INTERVIEW_AGENT_SHARED_SECRET", raising=False)
+
+    with pytest.raises(ImproperlyConfigured, match="INTERVIEW_AGENT_SHARED_SECRET"):
+        validate_required_settings(
+            {
+                "APP_ENV": "production",
+                "DEBUG": False,
+                "SECRET_KEY": "x" * 64,
+                "DATABASES": {
+                    "default": {
+                        "ENGINE": "django.db.backends.mysql",
+                        "NAME": "square_db",
+                        "USER": "app_user",
+                        "PASSWORD": "db-" + ("x" * 40),
+                        "HOST": "db",
+                        "PORT": "3306",
+                    }
+                },
+                "EMAIL_HOST": "smtp.example.com",
+                "EMAIL_PORT": "587",
+                "EMAIL_HOST_USER": "ops@example.com",
+                "EMAIL_HOST_PASSWORD": "mail-" + ("x" * 40),
+                "LIVEKIT_PUBLIC_URL": "wss://example.com/livekit",
+                "MINIO_ACCESS_KEY": "minio-access",
+                "MINIO_SECRET_KEY": "minio-" + ("x" * 40),
+                "CLIENT_SECRET": "client-" + ("x" * 40),
+                "LIVEKIT_API_KEY": "lk-api-key",
+                "LIVEKIT_API_SECRET": "lk-" + ("x" * 40),
+                "INTERVIEW_AGENT_AUTH_REQUIRED": False,
+                "INTERVIEW_AGENT_SHARED_SECRET": "",
+                "FRAPPE_HR_ADMIN_PASSWORD": "frappe-admin-" + ("x" * 40),
+                "FRAPPE_HR_DB_ROOT_PASSWORD": "frappe-root-" + ("x" * 40),
+            }
+        )
+
+
+def test_validate_env_requires_agent_auth_enabled_in_production():
+    with pytest.raises(ImproperlyConfigured, match="INTERVIEW_AGENT_AUTH_REQUIRED"):
+        validate_required_settings(
+            {
+                "APP_ENV": "production",
+                "DEBUG": False,
+                "SECRET_KEY": "x" * 64,
+                "DATABASES": {
+                    "default": {
+                        "ENGINE": "django.db.backends.mysql",
+                        "NAME": "square_db",
+                        "USER": "app_user",
+                        "PASSWORD": "db-" + ("x" * 40),
+                        "HOST": "db",
+                        "PORT": "3306",
+                    }
+                },
+                "EMAIL_HOST": "smtp.example.com",
+                "EMAIL_PORT": "587",
+                "EMAIL_HOST_USER": "ops@example.com",
+                "EMAIL_HOST_PASSWORD": "mail-" + ("x" * 40),
+                "LIVEKIT_PUBLIC_URL": "wss://example.com/livekit",
+                "MINIO_ACCESS_KEY": "minio-access",
+                "MINIO_SECRET_KEY": "minio-" + ("x" * 40),
+                "CLIENT_SECRET": "client-" + ("x" * 40),
+                "LIVEKIT_API_KEY": "lk-api-key",
+                "LIVEKIT_API_SECRET": "lk-" + ("x" * 40),
+                "INTERVIEW_AGENT_AUTH_REQUIRED": False,
+                "INTERVIEW_AGENT_SHARED_SECRET": "agent-" + ("x" * 40),
+                "FRAPPE_HR_ADMIN_PASSWORD": "frappe-admin-" + ("x" * 40),
+                "FRAPPE_HR_DB_ROOT_PASSWORD": "frappe-root-" + ("x" * 40),
+            }
+        )
+
+
+def test_validate_env_requires_livekit_webhook_strict_in_production():
+    with pytest.raises(ImproperlyConfigured, match="LIVEKIT_WEBHOOK_STRICT"):
+        validate_required_settings(
+            {
+                "APP_ENV": "production",
+                "DEBUG": False,
+                "SECRET_KEY": "x" * 64,
+                "DATABASES": {
+                    "default": {
+                        "ENGINE": "django.db.backends.mysql",
+                        "NAME": "square_db",
+                        "USER": "app_user",
+                        "PASSWORD": "db-" + ("x" * 40),
+                        "HOST": "db",
+                        "PORT": "3306",
+                    }
+                },
+                "EMAIL_HOST": "smtp.example.com",
+                "EMAIL_PORT": "587",
+                "EMAIL_HOST_USER": "ops@example.com",
+                "EMAIL_HOST_PASSWORD": "mail-" + ("x" * 40),
+                "LIVEKIT_PUBLIC_URL": "wss://example.com/livekit",
+                "MINIO_ACCESS_KEY": "minio-access",
+                "MINIO_SECRET_KEY": "minio-" + ("x" * 40),
+                "CLIENT_SECRET": "client-" + ("x" * 40),
+                "LIVEKIT_API_KEY": "lk-api-key",
+                "LIVEKIT_API_SECRET": "lk-" + ("x" * 40),
+                "LIVEKIT_WEBHOOK_STRICT": False,
+                "INTERVIEW_AGENT_AUTH_REQUIRED": True,
+                "INTERVIEW_AGENT_SHARED_SECRET": "agent-" + ("x" * 40),
+                "FRAPPE_HR_ADMIN_PASSWORD": "frappe-admin-" + ("x" * 40),
+                "FRAPPE_HR_DB_ROOT_PASSWORD": "frappe-root-" + ("x" * 40),
+            }
+        )
+
+
 def test_validate_env_accepts_production_secrets_from_database_settings():
     validate_required_settings(
         {
@@ -271,6 +379,44 @@ def test_validate_env_accepts_production_secrets_from_database_settings():
             "CLIENT_SECRET": "client-" + ("x" * 40),
             "LIVEKIT_API_KEY": "lk-api-key",
             "LIVEKIT_API_SECRET": "lk-" + ("x" * 40),
+            "LIVEKIT_WEBHOOK_STRICT": True,
+            "INTERVIEW_AGENT_AUTH_REQUIRED": True,
+            "INTERVIEW_AGENT_SHARED_SECRET": "agent-" + ("x" * 40),
+            "FRAPPE_HR_ADMIN_PASSWORD": "frappe-admin-" + ("x" * 40),
+            "FRAPPE_HR_DB_ROOT_PASSWORD": "frappe-root-" + ("x" * 40),
+        }
+    )
+
+
+def test_validate_env_allows_public_oauth_client_without_client_secret(monkeypatch):
+    monkeypatch.delenv("CLIENT_SECRET", raising=False)
+
+    validate_required_settings(
+        {
+            "APP_ENV": "production",
+            "DEBUG": False,
+            "OAUTH_CLIENT_TYPE": "public",
+            "SECRET_KEY": "x" * 64,
+            "DATABASES": {
+                "default": {
+                    "ENGINE": "django.db.backends.mysql",
+                    "NAME": "square_db",
+                    "USER": "app_user",
+                    "PASSWORD": "db-" + ("x" * 40),
+                    "HOST": "db",
+                    "PORT": "3306",
+                }
+            },
+            "EMAIL_HOST": "smtp.example.com",
+            "EMAIL_PORT": "587",
+            "EMAIL_HOST_USER": "ops@example.com",
+            "EMAIL_HOST_PASSWORD": "mail-" + ("x" * 40),
+            "LIVEKIT_PUBLIC_URL": "wss://example.com/livekit",
+            "MINIO_ACCESS_KEY": "minio-access",
+            "MINIO_SECRET_KEY": "minio-" + ("x" * 40),
+            "LIVEKIT_API_KEY": "lk-api-key",
+            "LIVEKIT_API_SECRET": "lk-" + ("x" * 40),
+            "LIVEKIT_WEBHOOK_STRICT": True,
             "INTERVIEW_AGENT_AUTH_REQUIRED": True,
             "INTERVIEW_AGENT_SHARED_SECRET": "agent-" + ("x" * 40),
             "FRAPPE_HR_ADMIN_PASSWORD": "frappe-admin-" + ("x" * 40),
@@ -284,6 +430,7 @@ def test_sync_oauth_client_updates_secret_from_environment(monkeypatch, admin_us
     monkeypatch.setenv("CLIENT_ID", "sync-test-client")
     monkeypatch.setenv("CLIENT_SECRET", "sync-test-secret-1")
     monkeypatch.setenv("OAUTH_CLIENT_NAME", "sync-test-app")
+    monkeypatch.setenv("OAUTH_CLIENT_TYPE", "confidential")
 
     Application.objects.create(
         user=admin_user,
@@ -299,3 +446,19 @@ def test_sync_oauth_client_updates_secret_from_environment(monkeypatch, admin_us
     app = Application.objects.get(client_id="sync-test-client")
     assert app.hash_client_secret is True
     assert check_password("sync-test-secret-1", app.client_secret)
+
+
+@pytest.mark.django_db
+def test_sync_oauth_client_supports_public_web_client_without_secret(monkeypatch, admin_user):
+    monkeypatch.setenv("CLIENT_ID", "sync-public-client")
+    monkeypatch.delenv("CLIENT_SECRET", raising=False)
+    monkeypatch.setenv("OAUTH_CLIENT_NAME", "sync-public-app")
+    monkeypatch.setenv("OAUTH_CLIENT_TYPE", "public")
+
+    call_command("sync_oauth_client")
+
+    app = Application.objects.get(client_id="sync-public-client")
+    assert app.client_type == Application.CLIENT_PUBLIC
+    assert app.authorization_grant_type == Application.GRANT_PASSWORD
+    assert app.hash_client_secret is False
+    assert app.client_secret == ""

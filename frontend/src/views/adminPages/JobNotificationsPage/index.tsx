@@ -13,7 +13,12 @@ import { useDataTable, useDebounce } from '../../../hooks';
 import { JobPostNotification } from '../../../types/models';
 import JobNotificationFormDialog from './JobNotificationFormDialog';
 import JobNotificationDeleteDialog from './JobNotificationDeleteDialog';
-import { createEmptyJobNotificationFormData, type JobNotificationsPageState, type JobNotificationsFormData } from './types';
+import {
+    createEmptyJobNotificationFormData,
+    normalizeJobNotificationFrequency,
+    type JobNotificationsPageState,
+    type JobNotificationsFormData,
+} from './types';
 import FilterBar from '@/components/Common/FilterBar';
 
 const initialState: JobNotificationsPageState = {
@@ -54,7 +59,7 @@ const reducer = (state: JobNotificationsPageState, action: Action): JobNotificat
                 formData: {
                     jobName: action.notification.jobName || '',
                     salary: action.notification.salary ?? null,
-                    frequency: action.notification.frequency ?? 7,
+                    frequency: normalizeJobNotificationFrequency(action.notification.frequency),
                     position: action.notification.position ?? null,
                     experience: action.notification.experience ?? null,
                     career: action.notification.career ?? null,
@@ -239,13 +244,13 @@ const JobNotificationsPage = () => {
 
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <FilterBar
-                    title={t('pages.jobNotifications.filter.title', 'Bộ lọc thông báo việc làm')}
+                    title={t('pages.jobNotifications.filter.title')}
                     searchValue={state.searchTerm}
                     searchPlaceholder={t('pages.jobNotifications.searchPlaceholder')}
                     onSearchChange={handleSearch}
                     onReset={() => handleSearch('')}
                     resetDisabled={!state.searchTerm}
-                    resetLabel={t('common.clearFilters', 'Xóa lọc')}
+                    resetLabel={t('common.clearFilters')}
                 />
 
                 <DataTable

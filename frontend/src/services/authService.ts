@@ -14,7 +14,6 @@ type TokenResponse = TokenPair;
 interface ConvertTokenPayload {
   grant_type: string;
   client_id: string;
-  client_secret: string;
   backend: AuthProvider;
   token: string;
   redirect_uri?: string;
@@ -36,7 +35,6 @@ const authService = {
     const data = {
       grant_type: AUTH_CONFIG.PASSWORD_KEY,
       client_id: AUTH_CONFIG.CLIENT_ID,
-      client_secret: AUTH_CONFIG.CLIENT_SECRET,
       username: email,
       password,
       role_name: roleName,
@@ -46,7 +44,6 @@ const authService = {
 
   convertToken: (
     clientId: string,
-    clientSecret: string,
     provider: AuthProvider,
     token: string,
     redirectUri?: string,
@@ -56,7 +53,6 @@ const authService = {
     const data: ConvertTokenPayload = {
       grant_type: AUTH_CONFIG.CONVERT_TOKEN_KEY,
       client_id: clientId,
-      client_secret: clientSecret,
       backend: provider,
       token,
     };
@@ -74,7 +70,6 @@ const authService = {
     const data = {
       grant_type: 'convert_token',
       client_id: AUTH_CONFIG.CLIENT_ID,
-      client_secret: AUTH_CONFIG.CLIENT_SECRET,
       token: idToken,
       role_name: roleName,
     };
@@ -85,7 +80,6 @@ const authService = {
     const url = 'auth/revoke-token/';
     const data = {
       client_id: AUTH_CONFIG.CLIENT_ID,
-      client_secret: AUTH_CONFIG.CLIENT_SECRET,
       token: accessToken,
       backend,
     };

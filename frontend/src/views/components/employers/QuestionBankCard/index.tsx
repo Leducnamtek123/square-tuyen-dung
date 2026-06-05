@@ -115,7 +115,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                     // Error handled by mutation hook
                 }
             },
-            t('interview:employer.questionBank.deleteTitle', 'Delete Question'),
+            t('interview:employer.questionBank.deleteTitle'),
             t('interview:employer.questionBank.deleteConfirm'),
             'warning'
         );
@@ -229,7 +229,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                             sx={inputSx}
                         />
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1.5, px: 1, fontWeight: 500 }}>
-                            {t('interview:employer.questionBank.hint', 'Enter clear and concise question content.')}
+                            {t('interview:employer.questionBank.hint')}
                         </Typography>
                     </Box>
                 </DialogContent>

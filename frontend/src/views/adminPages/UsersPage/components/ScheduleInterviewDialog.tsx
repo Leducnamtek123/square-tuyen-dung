@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import toastMessages from '../../../../utils/toastMessages';
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Chip, Autocomplete, CircularProgress, Alert } from "@mui/material";
 import { useTranslation, Trans } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
@@ -11,6 +11,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
+import interviewService from '../../../../services/interviewService';
 import questionService from '../../../../services/questionService';
 import { User as UserModel, Question } from '../../../../types/models';
 
@@ -20,13 +21,32 @@ interface ScheduleInterviewDialogProps {
     user: UserModel | null;
 }
 
+type ScheduleQuestionResponse = {
+    results?: Question[];
+    data?: Question[] | { results?: Question[] };
+};
+
+export const normalizeScheduleQuestionOptions = (response: unknown): Question[] => {
+    if (Array.isArray(response)) return response as Question[];
+    if (!response || typeof response !== 'object') return [];
+
+    const payload = response as ScheduleQuestionResponse;
+    if (Array.isArray(payload.results)) return payload.results;
+    if (Array.isArray(payload.data)) return payload.data;
+    if (payload.data && typeof payload.data === 'object' && Array.isArray(payload.data.results)) {
+        return payload.data.results;
+    }
+    return [];
+};
+
 const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialogProps) => {
-    const { t } = useTranslation('admin');
+    const { t } = useTranslation(['admin', 'common']);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const { data: loadedQuestions = [], isFetching: loadingQuestions } = useQuery({
         queryKey: ['schedule-interview-questions', open],
         queryFn: async () => {
             const res = await questionService.getQuestions({ pageSize: 100 });
-            return res?.results || [];
+            return normalizeScheduleQuestionOptions(res);
         },
         enabled: open,
         staleTime: 0,
@@ -75,24 +95,32 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
     }, [open]);
 
     const handleSubmit = async () => {
-        if (!state.scheduledAt || !user) return;
+        if (!state.scheduledAt || !user || isSubmitting) return;
+        const questionIds = state.selectedQuestions.map((question) => question.id);
         const payload = {
-            candidate: user.id,
-            candidate_name: user.fullName || user.email,
-            candidate_email: user.email,
+            candidate: Number(user.id),
             scheduled_at: state.scheduledAt.toISOString(),
-            interview_type: 'VETTING',
-            notes: state.notes,
-            question_ids: state.selectedQuestions.map(q => q.id),
+            type: 'mixed' as const,
+            notes: state.notes.trim() || undefined,
+            question_ids: questionIds,
         };
 
         try {
-            toastMessages.success('Under construction'); 
+            setIsSubmitting(true);
+            await interviewService.scheduleSession(payload);
+            toastMessages.success(t('pages.users.scheduleInterviewDialog.success'));
             onClose();
         } catch (err) {
+            toastMessages.error(t('pages.users.scheduleInterviewDialog.error'));
             console.error('Schedule interview error:', err);
+        } finally {
+            setIsSubmitting(false);
         }
     };
+
+    const getQuestionLabel = (question: Question) => (
+        question.content || question.text || t('pages.users.scheduleInterviewDialog.questionFallback', { id: question.id })
+    );
 
     if (!user) return null;
 
@@ -132,11 +160,16 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                         <Autocomplete
                             multiple
                         options={loadedQuestions}
-                            getOptionLabel={(opt) => opt.content || opt.text || `Question #${opt.id}`}
+                            getOptionLabel={getQuestionLabel}
                         value={state.selectedQuestions}
                             isOptionEqualToValue={(option, value) => option.id === value.id}
                         onChange={(_, v) => dispatch({ type: 'set_selected_questions', value: v })}
                         loading={loadingQuestions}
+                        noOptionsText={t('common:noOptions')}
+                        loadingText={t('common:loading')}
+                        openText={t('common:autocomplete.open')}
+                        closeText={t('common:autocomplete.close')}
+                        clearText={t('common:autocomplete.clear')}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -162,7 +195,7 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                                     <Chip
                                         key={opt.id ?? tagKey}
                                         {...tagProps}
-                                        label={opt.content || opt.text || `#${opt.id}`}
+                                        label={getQuestionLabel(opt)}
                                         size="small"
                                         color="primary"
                                         variant="outlined"
@@ -190,9 +223,11 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                     <Button
                         onClick={handleSubmit}
                         variant="contained"
-                    disabled={!state.scheduledAt}
+                    disabled={!state.scheduledAt || isSubmitting}
                     >
-                        {t('pages.users.scheduleInterviewDialog.submitBtn')}
+                        {isSubmitting
+                            ? t('pages.users.scheduleInterviewDialog.schedulingBtn')
+                            : t('pages.users.scheduleInterviewDialog.submitBtn')}
                     </Button>
             </DialogActions>
         </Dialog>

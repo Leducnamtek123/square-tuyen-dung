@@ -354,6 +354,7 @@ class TrustReportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     targetType = serializers.CharField(source="target_type", required=True)
     reason = serializers.CharField(required=True)
     message = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    status = serializers.CharField(read_only=True)
     company = serializers.IntegerField(required=False, allow_null=True, source="company_id")
     jobPost = serializers.IntegerField(required=False, allow_null=True, source="job_post_id")
     reporterDict = auth_serializers.UserSerializer(source='reporter', read_only=True, fields=['id', 'fullName', 'email', 'avatarUrl'])
@@ -438,6 +439,7 @@ class AdminTrustReportSerializer(TrustReportSerializer):
     targetType = serializers.CharField(source="target_type", read_only=True)
     reason = serializers.CharField(read_only=True)
     message = serializers.CharField(read_only=True)
+    status = serializers.ChoiceField(choices=TrustReport.STATUS_CHOICES, required=False)
     company = serializers.IntegerField(read_only=True, source="company_id")
     jobPost = serializers.IntegerField(read_only=True, source="job_post_id")
 
@@ -475,16 +477,16 @@ class CompanyVerificationSerializer(DynamicFieldsMixin, serializers.ModelSeriali
 
     companyId = serializers.IntegerField(source="company_id", read_only=True)
     companyDict = CompanySerializer(source="company", read_only=True, fields=["id", "slug", "companyName", "taxCode", "isVerified"])
-    companyName = serializers.CharField(source="legal_company_name", required=False, allow_blank=True)
-    taxCode = serializers.CharField(source="tax_code", required=False, allow_blank=True)
-    businessLicense = serializers.CharField(source="business_license", required=False, allow_blank=True)
-    representative = serializers.CharField(source="representative_name", required=False, allow_blank=True)
-    phone = serializers.CharField(source="contact_phone", required=False, allow_blank=True)
-    email = serializers.EmailField(source="contact_email", required=False, allow_blank=True)
-    website = serializers.URLField(required=False, allow_blank=True)
+    companyName = serializers.CharField(source="legal_company_name", required=False, allow_blank=True, max_length=255)
+    taxCode = serializers.CharField(source="tax_code", required=False, allow_blank=True, max_length=30)
+    businessLicense = serializers.CharField(source="business_license", required=False, allow_blank=True, max_length=255)
+    representative = serializers.CharField(source="representative_name", required=False, allow_blank=True, max_length=100)
+    phone = serializers.CharField(source="contact_phone", required=False, allow_blank=True, max_length=30)
+    email = serializers.EmailField(source="contact_email", required=False, allow_blank=True, max_length=100)
+    website = serializers.URLField(required=False, allow_blank=True, max_length=300)
     scheduledAt = serializers.DateTimeField(source="verification_scheduled_at", required=False, allow_null=True)
-    contactName = serializers.CharField(source="verification_contact_name", required=False, allow_blank=True)
-    contactPhone = serializers.CharField(source="verification_contact_phone", required=False, allow_blank=True)
+    contactName = serializers.CharField(source="verification_contact_name", required=False, allow_blank=True, max_length=100)
+    contactPhone = serializers.CharField(source="verification_contact_phone", required=False, allow_blank=True, max_length=30)
     notes = serializers.CharField(source="verification_notes", required=False, allow_blank=True)
     adminNote = serializers.CharField(source="admin_note", read_only=True)
     reviewedById = serializers.IntegerField(source="reviewed_by_id", read_only=True)
@@ -511,6 +513,14 @@ class CompanyVerificationSerializer(DynamicFieldsMixin, serializers.ModelSeriali
         scheduled_at = attrs.get("verification_scheduled_at")
         if scheduled_at and scheduled_at < timezone.now():
             errors["scheduledAt"] = ["Thời gian xác minh phải ở hiện tại hoặc tương lai."]
+
+        contact_phone = self._merged_value(attrs, "contact_phone")
+        if contact_phone and not PHONE_PATTERN.fullmatch(str(contact_phone).strip()):
+            errors["phone"] = ["Invalid phone number."]
+
+        verification_contact_phone = self._merged_value(attrs, "verification_contact_phone")
+        if verification_contact_phone and not PHONE_PATTERN.fullmatch(str(verification_contact_phone).strip()):
+            errors["contactPhone"] = ["Invalid phone number."]
 
         if scheduled_at:
             for model_field, api_field, message in (

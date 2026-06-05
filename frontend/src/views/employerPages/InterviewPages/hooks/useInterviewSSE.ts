@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 import tokenService from '../../../../services/tokenService';
+import { useAppSelector } from '../../../../hooks/useAppStore';
 
 /**
  * SSE event data types for realtime interview monitoring.
@@ -59,6 +60,25 @@ const initialInterviewSSEState: InterviewSSEState = {
   statusEvents: [],
 };
 
+export const buildInterviewSSEUrl = ({
+  apiBase,
+  sessionId,
+  token,
+  activeCompanyId,
+}: {
+  apiBase: string;
+  sessionId: string | number;
+  token: string;
+  activeCompanyId?: string | number | null;
+}) => {
+  const base = apiBase.replace(/\/$/, '');
+  const params = [`token=${encodeURIComponent(token)}`];
+  if (activeCompanyId !== null && activeCompanyId !== undefined && String(activeCompanyId).trim()) {
+    params.push(`activeCompanyId=${encodeURIComponent(String(activeCompanyId))}`);
+  }
+  return `${base}/interview/web/sessions/${encodeURIComponent(String(sessionId))}/stream/?${params.join('&')}`;
+};
+
 const interviewSSEReducer = (
   state: InterviewSSEState,
   action: InterviewSSEAction,
@@ -100,6 +120,8 @@ export function useInterviewSSE({
   enabled = true,
 }: UseInterviewSSEOptions): UseInterviewSSEReturn {
   const [state, dispatch] = useReducer(interviewSSEReducer, initialInterviewSSEState);
+  const activeWorkspace = useAppSelector((reduxState) => reduxState.user.activeWorkspace);
+  const activeCompanyId = activeWorkspace?.type === 'company' ? activeWorkspace.companyId : null;
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectAttempts = useRef(0);
@@ -127,7 +149,12 @@ export function useInterviewSSE({
     const base = (process.env.NEXT_PUBLIC_API_BASE || '/api').replace(/\/$/, '');
     const token = tokenService.getAccessTokenFromCookie?.() || '';
     // SSE with auth token as query param (EventSource doesn't support headers)
-    const url = `${base}/interview/web/sessions/${sessionId}/stream/?token=${encodeURIComponent(token)}`;
+    const url = buildInterviewSSEUrl({
+      apiBase: base,
+      sessionId,
+      token,
+      activeCompanyId,
+    });
 
     const es = new EventSource(url);
     eventSourceRef.current = es;
@@ -180,7 +207,7 @@ export function useInterviewSSE({
         dispatch({ type: 'connectionLost', error: 'SSE connection lost. Please refresh the page.' });
       }
     };
-  }, [sessionId, enabled, cleanup]);
+  }, [sessionId, enabled, cleanup, activeCompanyId]);
 
   useEffect(() => {
     connect(true);

@@ -60,7 +60,7 @@ const DashboardPage = () => {
 
           {/* Start: InterviewStatsChart */}
 
-          <InterviewStatsChart title={t('dashboard.interviewChart', 'Interview Statistics')} />
+          <InterviewStatsChart title={t('dashboard.interviewChart')} />
 
           {/* End: InterviewStatsChart */}
 

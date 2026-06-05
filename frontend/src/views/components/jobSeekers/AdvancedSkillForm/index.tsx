@@ -8,6 +8,7 @@ import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from 'yup';
 
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 import { Grid2 as Grid } from "@mui/material";
 
@@ -15,6 +16,7 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 
 import RatingCustom from '../../../../components/Common/Controls/RatingCustom';
 import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
+import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';
 
 export interface FormValues {
   name: string;
@@ -26,6 +28,19 @@ interface AdvancedSkillFormProps {
   editData: Partial<FormValues> | null;
   serverErrors?: Record<string, string[]> | null;
 }
+
+export const createAdvancedSkillSchema = (t: TFunction<string | string[], undefined>) =>
+  yup.object().shape({
+    name: yup
+      .string()
+      .required(t('jobSeeker:profile.validation.skillNameRequired'))
+      .max(200, t('jobSeeker:profile.validation.skillNameMax')),
+    level: yup
+      .number()
+      .required(t('jobSeeker:profile.validation.levelRequired'))
+      .min(1, t('jobSeeker:profile.validation.levelRequired'))
+      .oneOf(BACKEND_CHOICE_VALUES.languageLevel, t('jobSeeker:profile.validation.levelInvalid')),
+  });
 
 
 
@@ -49,19 +64,7 @@ const AdvancedSkillForm = ({
     [editData],
   );
 
-  const schema = yup.object().shape({
-
-    name: yup
-
-      .string()
-
-      .required(t('jobSeeker:profile.validation.skillNameRequired'))
-
-      .max(200, t('jobSeeker:profile.validation.skillNameMax')),
-
-    level: yup.number().required(t('jobSeeker:profile.validation.levelRequired')).min(1, t('jobSeeker:profile.validation.levelRequired')),
-
-  });
+  const schema = React.useMemo(() => createAdvancedSkillSchema(t), [t]);
 
   const { control, setError, handleSubmit } = useForm<FormValues>({
 

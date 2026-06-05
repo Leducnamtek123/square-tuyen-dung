@@ -6,6 +6,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import { JobPostActivity } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 import type { AdminListParams, JobPostActivityPayload } from '../../../../services/adminManagementService';
+import i18next from 'i18next';
 
 type UseJobActivitiesResult = UseQueryResult<PaginatedResponse<JobPostActivity>> & {
     updateJobActivity: (args: { id: string | number; data: JobPostActivityPayload }) => Promise<JobPostActivity>;
@@ -29,10 +30,10 @@ export const useJobActivities = (params: AdminListParams): UseJobActivitiesResul
         mutationFn: ({ id, data }: { id: string | number; data: JobPostActivityPayload }) => adminManagementService.updateJobActivity(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-activities'] });
-            toastMessages.success('Activity updated successfully');
+            toastMessages.success(i18next.t('admin:pages.jobActivity.toast.updateSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while updating the activity');
+            toastMessages.error(i18next.t('admin:pages.jobActivity.toast.updateError'));
             console.error(err);
         }
     });
@@ -41,10 +42,10 @@ export const useJobActivities = (params: AdminListParams): UseJobActivitiesResul
         mutationFn: (id: string | number) => adminManagementService.deleteJobActivity(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-activities'] });
-            toastMessages.success('Activity deleted successfully');
+            toastMessages.success(i18next.t('admin:pages.jobActivity.toast.deleteSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while deleting the activity');
+            toastMessages.error(i18next.t('admin:pages.jobActivity.toast.deleteError'));
             console.error(err);
         }
     });

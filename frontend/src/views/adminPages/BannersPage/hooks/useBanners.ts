@@ -6,6 +6,7 @@ import type { AdminBannerPayload, AdminListParams } from '../../../../services/a
 import toastMessages from '../../../../utils/toastMessages';
 import { Banner } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
+import i18next from 'i18next';
 
 type UseBannersResult = UseQueryResult<PaginatedResponse<Banner>> & {
     createBanner: (data: FormData | AdminBannerPayload) => Promise<Banner>;
@@ -30,10 +31,10 @@ export const useBanners = (params?: AdminListParams): UseBannersResult => {
         mutationFn: (data: FormData | AdminBannerPayload) => adminManagementService.createBanner(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-banners'] });
-            toastMessages.success('Banner added successfully');
+            toastMessages.success(i18next.t('admin:pages.banners.toast.addSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while adding the banner');
+            toastMessages.error(i18next.t('admin:pages.banners.toast.addError'));
             console.error(err);
         }
     });
@@ -43,10 +44,10 @@ export const useBanners = (params?: AdminListParams): UseBannersResult => {
             adminManagementService.updateBanner(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-banners'] });
-            toastMessages.success('Banner updated successfully');
+            toastMessages.success(i18next.t('admin:pages.banners.toast.updateSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while updating the banner');
+            toastMessages.error(i18next.t('admin:pages.banners.toast.updateError'));
             console.error(err);
         }
     });
@@ -55,10 +56,10 @@ export const useBanners = (params?: AdminListParams): UseBannersResult => {
         mutationFn: (id: string | number) => adminManagementService.deleteBanner(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-banners'] });
-            toastMessages.success('Banner deleted successfully');
+            toastMessages.success(i18next.t('admin:pages.banners.toast.deleteSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while deleting the banner');
+            toastMessages.error(i18next.t('admin:pages.banners.toast.deleteError'));
             console.error(err);
         }
     });

@@ -40,7 +40,7 @@ const MyInterviewsPage = () => {
             case 'cancelled': color = 'error'; break;
         }
         return <Chip 
-            label={t(`interview:interviewListCard.statuses.${status}`, { defaultValue: status.replaceAll('_', ' ').toUpperCase() })} 
+            label={t(`interview:interviewListCard.statuses.${status}`)}
             color={color} 
             size="small" 
         />;

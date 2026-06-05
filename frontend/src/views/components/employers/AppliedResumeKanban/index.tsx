@@ -199,7 +199,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                             {item.fullName}
                                                                         </Typography>
                                                                         <Chip 
-                                                                            label={isManualCandidate ? t('manualCandidate.badge') : isOnlineResume ? 'Online' : 'File'} 
+                                                                            label={isManualCandidate ? t('manualCandidate.badge') : isOnlineResume ? t('appliedResume.table.onlineResume') : t('appliedResume.table.attachedResume')}
                                                                             size="small" 
                                                                             sx={{
                                                                                 height: 20,
@@ -242,7 +242,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                                     </IconButton>
                                                                                 </span>
                                                                              </Tooltip>
-                                                                             <Tooltip title={t('appliedResume.table.tooltips.scheduleInterview', 'Schedule Interview')} arrow>
+                                                                             <Tooltip title={t('appliedResume.table.tooltips.scheduleInterview')} arrow>
                                                                                  <span>
                                                                                      <IconButton size="small" disabled={!canScheduleInterview} onClick={() => {
                                                                                          if (!canScheduleInterview) return;
@@ -256,7 +256,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                                 <SendEmailComponent jobPostActivityId={String(item.id)} isSentEmail={item.isSentEmail || false} email={item.email || ''} fullName={item.fullName || ''} />
                                                                              )}
                                                                              {!blindMode && item.hrmEmployeeId ? (
-                                                                                <Tooltip title={t('employees.hrm.convert.openEmployee', { defaultValue: 'Open HRM employee profile' })} arrow>
+                                                                                <Tooltip title={t('employees.hrm.convert.openEmployee')} arrow>
                                                                                    <IconButton size="small" color="primary" onClick={() => {
                                                                                        if (item.hrmEmployeeUrl) {
                                                                                            window.open(item.hrmEmployeeUrl, '_blank', 'noopener,noreferrer');

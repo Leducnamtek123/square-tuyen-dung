@@ -33,10 +33,10 @@ const AIAnalysisDrawerResumeSection = ({
           <DescriptionIcon sx={{ fontSize: 48, color: 'primary.main', opacity: 0.7 }} />
           <Box>
             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
-              {t('appliedResume.ai.onlineResumeLabel', { defaultValue: 'Hồ sơ trực tuyến' })}
+              {t('appliedResume.ai.onlineResumeLabel')}
             </Typography>
             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 2 }}>
-              {t('appliedResume.ai.onlineResumeHint', { defaultValue: 'AI sẽ phân tích hồ sơ trực tuyến của ứng viên.' })}
+              {t('appliedResume.ai.onlineResumeHint')}
             </Typography>
           </Box>
           <Button
@@ -48,7 +48,7 @@ const AIAnalysisDrawerResumeSection = ({
             startIcon={<OpenInNewIcon fontSize="small" />}
             sx={{ textTransform: 'none', fontSize: '0.8rem', fontWeight: 900 }}
           >
-            {t('appliedResume.ai.viewOnlineProfile', { defaultValue: 'Xem hồ sơ trực tuyến' })}
+            {t('appliedResume.ai.viewOnlineProfile')}
           </Button>
         </Stack>
       </SectionCard>

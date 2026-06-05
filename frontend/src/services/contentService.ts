@@ -27,9 +27,12 @@ type BannerListParams = {
 
 const toListData = <T>(raw: unknown): T[] => {
   if (Array.isArray(raw)) return raw as T[];
-  const obj = (raw || {}) as { results?: unknown[]; data?: unknown[] };
+  const obj = (raw || {}) as { results?: unknown[]; data?: unknown[] | { results?: unknown[] } };
   if (Array.isArray(obj.results)) return obj.results as T[];
   if (Array.isArray(obj.data)) return obj.data as T[];
+  if (obj.data && typeof obj.data === 'object' && Array.isArray(obj.data.results)) {
+    return obj.data.results as T[];
+  }
   return [];
 };
 

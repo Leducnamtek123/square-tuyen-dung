@@ -83,12 +83,10 @@ const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordi
             }}
           >
             <Typography variant="subtitle2" sx={{ fontWeight: 850, color: 'primary.main', mb: 0.75, letterSpacing: 0 }}>
-              {t('interviewDetail.messages.recordingPending', { defaultValue: 'Recording is being processed' })}
+              {t('interview:interviewDetail.messages.recordingPending')}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, lineHeight: 1.7 }}>
-              {t('interviewDetail.messages.recordingPendingDesc', {
-                defaultValue: t('common:interview.recordingWaiting'),
-              })}
+              {t('interview:interviewDetail.messages.recordingPendingDesc')}
             </Typography>
           </Box>
         )}

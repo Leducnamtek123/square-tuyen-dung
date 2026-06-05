@@ -13,6 +13,7 @@ import { PaginatedResponse } from '@/types/api';
 import { JobPost, Company, Resume } from '../../../../types/models';
 import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
+import i18next from 'i18next';
 import type { UserSettingsData } from '../../../../types/auth';
 
 // ─── Query Helpers ──────────────────────────────────────────
@@ -219,10 +220,10 @@ export const useUpdateUserSettings = () => {
         mutationFn: (data: UserSettingsData) => authService.updateUserSettings(data),
         onSuccess: (response: unknown) => {
             queryClient.setQueryData(['userSettings'], response);
-            toastMessages.success("Settings updated successfully.");
+            toastMessages.success(i18next.t('jobSeeker:settings.toast.updateSuccess'));
         },
         onError: () => {
-            toastMessages.error("Failed to update settings.");
+            toastMessages.error(i18next.t('jobSeeker:settings.toast.updateError'));
         },
     });
 };

@@ -23,7 +23,7 @@ const UserFilters = ({ search, role, onSearchChange, onRoleChange }: UserFilters
 
     return (
         <FilterBar
-            title={t('pages.users.filters.title', 'Bộ lọc người dùng')}
+            title={t('pages.users.filters.title')}
             searchValue={search}
             searchPlaceholder={t('pages.users.searchPlaceholder')}
             onSearchChange={onSearchChange}
@@ -33,7 +33,7 @@ const UserFilters = ({ search, role, onSearchChange, onRoleChange }: UserFilters
                 onRoleChange('');
             }}
             resetDisabled={!search && !role}
-            resetLabel={t('common.clearFilters', 'Xóa lọc')}
+            resetLabel={t('common.clearFilters')}
         >
             <FormControl size="small" sx={roleFilterSx}>
                 <InputLabel id="role-filter-label">{t('pages.users.filters.role')}</InputLabel>

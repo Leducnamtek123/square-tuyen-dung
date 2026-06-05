@@ -11,6 +11,7 @@ import { usePersonalProfileDistrictOptions } from './usePersonalProfileDistrictO
 import type { PersonalProfileFormProps, PersonalProfileFormValues } from './types';
 export type { PersonalProfileFormValues } from './types';
 import { DATE_OPTIONS, REGEX_VALIDATE } from '../../../../configs/constants';
+import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';
 
 export const createPersonalProfileSchema = (t: TFunction) =>
   yup.object().shape({
@@ -34,10 +35,12 @@ export const createPersonalProfileSchema = (t: TFunction) =>
     gender: yup
       .string()
       .required(t('jobSeeker:profile.validation.genderRequired'))
+      .oneOf(BACKEND_CHOICE_VALUES.gender, t('jobSeeker:profile.validation.choiceInvalid'))
       .max(1, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.gender') })),
     maritalStatus: yup
       .string()
       .required(t('jobSeeker:profile.validation.maritalStatusRequired'))
+      .oneOf(BACKEND_CHOICE_VALUES.maritalStatus, t('jobSeeker:profile.validation.choiceInvalid'))
       .max(1, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.maritalStatus') })),
     location: yup.object().shape({
       city: yup.number().required(t('jobSeeker:profile.validation.cityRequired')).typeError(t('jobSeeker:profile.validation.cityRequired')),
@@ -57,7 +60,13 @@ export const createPersonalProfileSchema = (t: TFunction) =>
     permanentAddress: yup.string().max(255, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.permanentAddress') })),
     contactAddress: yup.string().max(255, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.contactAddress') })),
     emergencyContactName: yup.string().max(100, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.emergencyContactName') })),
-    emergencyContactPhone: yup.string().max(20, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.emergencyContactPhone') })),
+    emergencyContactPhone: yup
+      .string()
+      .max(20, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.emergencyContactPhone') }))
+      .matches(REGEX_VALIDATE.phoneRegExp, {
+        message: t('jobSeeker:profile.validation.phoneInvalid'),
+        excludeEmptyString: true,
+      }),
   });
 
 const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileFormProps) => {

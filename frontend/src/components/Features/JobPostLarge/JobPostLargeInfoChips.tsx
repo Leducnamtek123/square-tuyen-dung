@@ -8,12 +8,13 @@ import {
   faCircleDollarToSlot,
   faLocationDot,
 } from '@fortawesome/free-solid-svg-icons';
-import { salaryString } from '@/utils/customData';
+import { formatLocalizedSalaryRange } from '@/utils/customData';
 
 type JobPostLargeInfoChipsProps = {
   theme: Theme;
   salaryMin?: number;
   salaryMax?: number;
+  salaryLanguage?: string;
   cityLabel: React.ReactNode;
   deadline: string | Date;
 };
@@ -38,6 +39,7 @@ export const JobPostLargeInfoChips = ({
   theme,
   salaryMin,
   salaryMax,
+  salaryLanguage,
   cityLabel,
   deadline,
 }: JobPostLargeInfoChipsProps) => (
@@ -48,7 +50,7 @@ export const JobPostLargeInfoChips = ({
         style={{ fontSize: '16px', color: theme.palette.primary.main }}
       />
       <Typography sx={labelSx(theme, 'primary')}>
-        {salaryString(salaryMin, salaryMax)}
+        {formatLocalizedSalaryRange(salaryMin, salaryMax, salaryLanguage)}
       </Typography>
     </Box>
 

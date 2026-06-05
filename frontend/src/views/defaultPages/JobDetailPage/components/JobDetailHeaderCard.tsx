@@ -14,7 +14,7 @@ import { Chip } from "@mui/material";
 
 import QRCodeBox from "../../../../components/Common/QRCodeBox";
 import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
-import { salaryString } from "../../../../utils/customData";
+import { formatLocalizedSalaryRange } from "../../../../utils/customData";
 import { tConfig } from "../../../../utils/tConfig";
 import { ROUTES } from "../../../../configs/constants";
 import { formatRoute } from "../../../../utils/funcUtils";
@@ -50,7 +50,7 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
   onOpenSharePopup,
   onOpenReport,
 }) => {
-  const { t } = useTranslation(["public"]);
+  const { t, i18n } = useTranslation(["public"]);
   const employeeSizeLabel = tConfig(allConfig?.employeeSizeDict?.[String(jobPostDetail?.companyDict?.employeeSize)]);
 
   return (
@@ -79,7 +79,7 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
               {jobPostDetail?.companyDict?.isVerified && (
                 <Chip
                   icon={<VerifiedIcon sx={{ fontSize: 16 }} />}
-                  label={t("companyDetail.verified", "Verified")}
+                  label={t("companyDetail.verified")}
                   size="small"
                   color="success"
                   variant="outlined"
@@ -145,9 +145,10 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
           <JobDetailInfoItem
             title={t("jobDetail.salary")}
-            value={salaryString(
+            value={formatLocalizedSalaryRange(
               jobPostDetail?.salaryMin,
-              jobPostDetail?.salaryMax
+              jobPostDetail?.salaryMax,
+              i18n.language
             )}
           />
           <JobDetailInfoItem

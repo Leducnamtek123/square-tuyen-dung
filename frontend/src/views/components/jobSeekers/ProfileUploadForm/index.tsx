@@ -7,9 +7,14 @@ import { useTranslation } from 'react-i18next';
 import { useConfig } from '@/hooks/useConfig';
 import type { TFunction } from 'i18next';
 import ProfileUploadFormFields from './ProfileUploadFormFields';
+import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';
+
+const MAX_CV_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_RESUME_SALARY = 999_999_999_999;
+const PDF_CONTENT_TYPES = new Set(['application/pdf', 'application/x-pdf']);
 
 export interface FormValues {
-  file: File[] | null;
+  file: File | File[] | null;
   title: string;
   position: number | string;
   academicLevel: number | string;
@@ -29,21 +34,41 @@ interface ProfileUploadFormProps {
   handleAdd: (data: FormValues) => void;
 }
 
+type CvFileValue = File | File[] | null | undefined;
+
+const getFirstCvFile = (value: CvFileValue) => (
+  Array.isArray(value) ? value[0] : value
+);
+
+const hasCvFile = (value: CvFileValue) => Boolean(getFirstCvFile(value));
+
+const isPdfCvFile = (value: CvFileValue) => {
+  const file = getFirstCvFile(value);
+  if (!file) return true;
+
+  const fileName = (file.name || '').toLowerCase();
+  const contentType = (file.type || '').toLowerCase();
+
+  return fileName.endsWith('.pdf') && (!contentType || PDF_CONTENT_TYPES.has(contentType));
+};
+
+const isAllowedCvFileSize = (value: CvFileValue) => {
+  const file = getFirstCvFile(value);
+  return !file || (file.size || 0) <= MAX_CV_FILE_SIZE;
+};
+
 export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
 
     file: yup
-      .mixed<File[]>()
+      .mixed<File | File[]>()
       .nullable()
       .test(
         'files empty',
         t('jobSeeker:profile.validation.fileRequired'),
-        (value) =>
-          !(
-            value === undefined ||
-            value === null ||
-            value.length === 0
-          )
-      ),
+        hasCvFile
+      )
+      .test('file-is-pdf', t('jobSeeker:profile.validation.filePdfOnly'), isPdfCvFile)
+      .test('file-max-size', t('jobSeeker:profile.validation.fileTooLarge'), isAllowedCvFileSize),
 
     title: yup
 
@@ -58,6 +83,7 @@ export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
       .number()
 
       .required(t('jobSeeker:profile.validation.desiredLevelRequired'))
+      .oneOf(BACKEND_CHOICE_VALUES.position, t('jobSeeker:profile.validation.choiceInvalid'))
 
       .typeError(t('jobSeeker:profile.validation.desiredLevelRequired')),
 
@@ -66,6 +92,7 @@ export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
       .number()
 
       .required(t('jobSeeker:profile.validation.academicLevelRequired'))
+      .oneOf(BACKEND_CHOICE_VALUES.academicLevel, t('jobSeeker:profile.validation.choiceInvalid'))
 
       .typeError(t('jobSeeker:profile.validation.academicLevelRequired')),
 
@@ -74,6 +101,7 @@ export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
       .number()
 
       .required(t('jobSeeker:profile.validation.experienceRequired'))
+      .oneOf(BACKEND_CHOICE_VALUES.experience, t('jobSeeker:profile.validation.choiceInvalid'))
 
       .typeError(t('jobSeeker:profile.validation.experienceRequired')),
 
@@ -102,6 +130,7 @@ export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
       .typeError(t('jobSeeker:profile.validation.salaryMinInvalid'))
 
       .min(0, t('jobSeeker:profile.validation.salaryMinInvalid'))
+      .max(MAX_RESUME_SALARY, t('jobSeeker:profile.validation.salaryTooLarge'))
 
       .test(
 
@@ -126,6 +155,7 @@ export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
       .typeError(t('jobSeeker:profile.validation.salaryMaxInvalid'))
 
       .min(0, t('jobSeeker:profile.validation.salaryMaxInvalid'))
+      .max(MAX_RESUME_SALARY, t('jobSeeker:profile.validation.salaryTooLarge'))
 
       .test(
 
@@ -145,13 +175,15 @@ export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
       .number()
       .nullable()
       .transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value))
-      .min(0, t('jobSeeker:profile.validation.expectedSalaryInvalid')),
+      .min(0, t('jobSeeker:profile.validation.expectedSalaryInvalid'))
+      .max(MAX_RESUME_SALARY, t('jobSeeker:profile.validation.salaryTooLarge')),
 
     typeOfWorkplace: yup
 
       .number()
 
       .required(t('jobSeeker:profile.validation.workplaceTypeRequired'))
+      .oneOf(BACKEND_CHOICE_VALUES.typeOfWorkplace, t('jobSeeker:profile.validation.choiceInvalid'))
 
       .typeError(t('jobSeeker:profile.validation.workplaceTypeRequired')),
 
@@ -160,6 +192,7 @@ export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
       .number()
 
       .required(t('jobSeeker:profile.validation.jobTypeRequired'))
+      .oneOf(BACKEND_CHOICE_VALUES.jobType, t('jobSeeker:profile.validation.choiceInvalid'))
 
       .typeError(t('jobSeeker:profile.validation.jobTypeRequired')),
 

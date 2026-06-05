@@ -230,9 +230,10 @@ class FrappeHRSyncService:
         return user
 
     def _employee_roles(self, requested_roles: list[str] | None = None) -> list[str]:
-        roles = set(settings.FRAPPE_HR_EMPLOYEE_ROLES)
+        allowed_roles = set(settings.FRAPPE_HR_EMPLOYEE_ROLES)
+        roles = set(allowed_roles)
         for role in requested_roles or []:
-            if role:
+            if role in allowed_roles:
                 roles.add(role)
         return sorted(roles)
 
@@ -300,17 +301,23 @@ class FrappeHRSyncService:
             raise serializers.ValidationError({"applicationId": ["Rejected applications cannot be sent to Frappe HR."]})
 
         company = activity.job_post.company
-        full_name = payload.get("full_name") or activity.full_name or activity.user.full_name
-        email = payload.get("email") or activity.email or activity.user.email
+        activity_user = activity.user
+        full_name = (
+            payload.get("full_name")
+            or activity.full_name
+            or getattr(activity_user, "full_name", "")
+            or "Employee"
+        )
+        email = (payload.get("email") or activity.email or getattr(activity_user, "email", "") or "").strip()
         phone = payload.get("phone") or activity.phone or ""
-        profile = getattr(activity.user, "job_seeker_profile", None)
+        profile = getattr(activity_user, "job_seeker_profile", None)
         gender = _frappe_gender(payload.get("gender") or getattr(profile, "gender", None))
         date_of_birth = payload.get("date_of_birth") or getattr(profile, "birthday", None) or settings.FRAPPE_HR_DEFAULT_DATE_OF_BIRTH
         job_title = payload.get("job_title") or activity.job_post.job_name
         department = payload.get("department") or settings.FRAPPE_HR_DEFAULT_DEPARTMENT
         start_date = payload.get("start_date") or timezone.localdate()
-        create_user_account = payload.get("create_user_account", True)
-        send_welcome_email = payload.get("send_welcome_email", False)
+        create_user_account = bool(payload.get("create_user_account", True) and email)
+        send_welcome_email = bool(payload.get("send_welcome_email", False) and create_user_account)
 
         activity.frappe_sync_status = JobPostActivity.FrappeSyncStatus.SYNCING
         activity.frappe_sync_error = ""

@@ -3,7 +3,7 @@ import { Box, Divider, Fab, Stack, Typography } from '@mui/material';
 import { Grid2 as Grid } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { Theme } from '@mui/material/styles';
-import { salaryString } from '../../../../utils/customData';
+import { formatLocalizedSalaryRange } from '../../../../utils/customData';
 import { tConfig } from '../../../../utils/tConfig';
 import type { ResumeDetail } from './types';
 
@@ -13,6 +13,7 @@ type GeneralInfoCardContentProps = {
   configDicts: Record<string, Record<string | number, string>> | null;
   resumeDetail: ResumeDetail;
   onEdit: () => void;
+  salaryLanguage?: string;
 };
 
 const GeneralInfoField = ({
@@ -53,6 +54,7 @@ const GeneralInfoCardContent = ({
   configDicts,
   resumeDetail,
   onEdit,
+  salaryLanguage,
 }: GeneralInfoCardContentProps) => (
   <>
     <Box>
@@ -102,12 +104,12 @@ const GeneralInfoCardContent = ({
         <Grid size={{ xs: 12, sm: 6 }}>
           <Stack spacing={1.5}>
             <GeneralInfoField itemTitle={t('jobSeeker:profile.fields.workLocation')} value={tConfig(configDicts?.cityDict?.[resumeDetail.city ?? ''])} t={t} />
-            <GeneralInfoField itemTitle={t('jobSeeker:profile.fields.desiredSalary')} value={salaryString(resumeDetail.salaryMin ?? null, resumeDetail.salaryMax ?? null)} t={t} />
+            <GeneralInfoField itemTitle={t('jobSeeker:profile.fields.desiredSalary')} value={formatLocalizedSalaryRange(resumeDetail.salaryMin ?? null, resumeDetail.salaryMax ?? null, salaryLanguage)} t={t} />
             <GeneralInfoField
               itemTitle={t('jobSeeker:profile.fields.expectedSalary')}
               value={
                 resumeDetail.expectedSalary
-                  ? salaryString(resumeDetail.expectedSalary, resumeDetail.expectedSalary)
+                  ? formatLocalizedSalaryRange(resumeDetail.expectedSalary, resumeDetail.expectedSalary, salaryLanguage)
                   : null
               }
               t={t}

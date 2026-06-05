@@ -124,8 +124,6 @@ const JobSeekerSignUp = () => {
 
     clientId: string,
 
-    clientSecrect: string,
-
     provider: AuthProvider,
 
     token: string
@@ -140,8 +138,6 @@ const JobSeekerSignUp = () => {
       const resData = (await authService.convertToken(
 
         clientId,
-
-        clientSecrect,
 
         provider,
 
@@ -206,8 +202,6 @@ const JobSeekerSignUp = () => {
 
         AUTH_CONFIG.CLIENT_ID || '',
 
-        AUTH_CONFIG.CLIENT_SECRET || '',
-
         AUTH_PROVIDER.FACEBOOK as AuthProvider,
 
         accessToken
@@ -226,8 +220,6 @@ const JobSeekerSignUp = () => {
       handleSocialRegister(
 
         AUTH_CONFIG.CLIENT_ID || '',
-
-        AUTH_CONFIG.CLIENT_SECRET || '',
 
         AUTH_PROVIDER.GOOGLE as AuthProvider,
 

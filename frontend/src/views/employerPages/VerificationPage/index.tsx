@@ -4,6 +4,8 @@ import { Box, Snackbar, Alert, Typography } from '@mui/material';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { TFunction } from 'i18next';
+import { REGEX_VALIDATE } from '@/configs/constants';
 import { TabTitle } from '../../../utils/generalFunction';
 import companyVerificationService, { type CompanyVerificationPayload } from '../../../services/companyVerificationService';
 import VerificationIntroCard from './components/VerificationIntroCard';
@@ -11,8 +13,8 @@ import VerificationLegalProfileForm, { type VerificationLegalProfile } from './c
 import VerificationInterviewRequestForm, { type VerificationInterviewRequest } from './components/VerificationInterviewRequestForm';
 import type { AlertColor, ChipProps } from '@mui/material';
 
-type LegalErrors = Partial<Record<keyof VerificationLegalProfile, string>>;
-type InterviewErrors = Partial<Record<keyof VerificationInterviewRequest, string>>;
+export type LegalErrors = Partial<Record<keyof VerificationLegalProfile, string>>;
+export type InterviewErrors = Partial<Record<keyof VerificationInterviewRequest, string>>;
 
 const REQUIRED_LEGAL_FIELDS: Array<keyof VerificationLegalProfile> = [
   'companyName',
@@ -22,6 +24,21 @@ const REQUIRED_LEGAL_FIELDS: Array<keyof VerificationLegalProfile> = [
   'phone',
   'email',
 ];
+
+const LEGAL_PROFILE_MAX_LENGTHS: Partial<Record<keyof VerificationLegalProfile, number>> = {
+  companyName: 255,
+  taxCode: 30,
+  businessLicense: 255,
+  representative: 100,
+  phone: 30,
+  email: 100,
+  website: 300,
+};
+
+const INTERVIEW_REQUEST_MAX_LENGTHS: Partial<Record<keyof VerificationInterviewRequest, number>> = {
+  contactName: 100,
+  contactPhone: 30,
+};
 
 const getStatusLabelKey = (status?: string) => {
   switch (status) {
@@ -42,6 +59,68 @@ const getStatusColor = (status?: string): ChipProps['color'] => {
   if (status === 'rejected') return 'error';
   if (status === 'reviewing') return 'warning';
   return 'info';
+};
+
+export const validateVerificationLegalProfile = (
+  legalProfile: VerificationLegalProfile,
+  t: TFunction,
+): LegalErrors => {
+  const errors: LegalErrors = {};
+  const requiredMessage = t('verification.validation.required');
+
+  REQUIRED_LEGAL_FIELDS.forEach((field) => {
+    if (!String(legalProfile[field] || '').trim()) {
+      errors[field] = requiredMessage;
+    }
+  });
+
+  Object.entries(LEGAL_PROFILE_MAX_LENGTHS).forEach(([field, maxLength]) => {
+    const profileField = field as keyof VerificationLegalProfile;
+    if (String(legalProfile[profileField] || '').length > maxLength) {
+      errors[profileField] = t('verification.validation.maxLength', { max: maxLength });
+    }
+  });
+
+  if (legalProfile.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(legalProfile.email.trim())) {
+    errors.email = t('verification.validation.email');
+  }
+
+  if (legalProfile.phone.trim() && !REGEX_VALIDATE.phoneRegExp.test(legalProfile.phone.trim())) {
+    errors.phone = t('verification.validation.phone');
+  }
+
+  if (legalProfile.website.trim() && !REGEX_VALIDATE.urlRegExp.test(legalProfile.website.trim())) {
+    errors.website = t('verification.validation.website');
+  }
+
+  return errors;
+};
+
+export const validateVerificationInterviewRequest = (
+  interviewRequest: VerificationInterviewRequest,
+  t: TFunction,
+): InterviewErrors => {
+  const errors: InterviewErrors = {};
+  const requiredMessage = t('verification.validation.required');
+
+  if (!interviewRequest.scheduledAt) {
+    errors.scheduledAt = requiredMessage;
+  } else if (interviewRequest.scheduledAt.isBefore(dayjs())) {
+    errors.scheduledAt = t('verification.validation.futureDate');
+  }
+  if (!interviewRequest.contactName.trim()) errors.contactName = requiredMessage;
+  if (!interviewRequest.contactPhone.trim()) errors.contactPhone = requiredMessage;
+  Object.entries(INTERVIEW_REQUEST_MAX_LENGTHS).forEach(([field, maxLength]) => {
+    const requestField = field as keyof VerificationInterviewRequest;
+    if (String(interviewRequest[requestField] || '').length > maxLength) {
+      errors[requestField] = t('verification.validation.maxLength', { max: maxLength });
+    }
+  });
+  if (interviewRequest.contactPhone.trim() && !REGEX_VALIDATE.phoneRegExp.test(interviewRequest.contactPhone.trim())) {
+    errors.contactPhone = t('verification.validation.phone');
+  }
+
+  return errors;
 };
 
 const VerificationPage = () => {
@@ -131,34 +210,14 @@ const VerificationPage = () => {
     setSnackbarOpen(true);
   };
 
-  const requiredMessage = t('verification.validation.required', { defaultValue: 'Trường này là bắt buộc.' });
-
   const validateLegalProfile = () => {
-    const nextErrors: LegalErrors = {};
-    REQUIRED_LEGAL_FIELDS.forEach((field) => {
-      if (!String(legalProfile[field] || '').trim()) {
-        nextErrors[field] = requiredMessage;
-      }
-    });
-
-    if (legalProfile.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(legalProfile.email.trim())) {
-      nextErrors.email = t('verification.validation.email', { defaultValue: 'Email không hợp lệ.' });
-    }
-
+    const nextErrors = validateVerificationLegalProfile(legalProfile, t);
     setLegalErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
 
   const validateInterviewRequest = () => {
-    const nextErrors: InterviewErrors = {};
-    if (!interviewRequest.scheduledAt) {
-      nextErrors.scheduledAt = requiredMessage;
-    } else if (interviewRequest.scheduledAt.isBefore(dayjs())) {
-      nextErrors.scheduledAt = t('verification.validation.futureDate', { defaultValue: 'Thời gian phải ở hiện tại hoặc tương lai.' });
-    }
-    if (!interviewRequest.contactName.trim()) nextErrors.contactName = requiredMessage;
-    if (!interviewRequest.contactPhone.trim()) nextErrors.contactPhone = requiredMessage;
-
+    const nextErrors = validateVerificationInterviewRequest(interviewRequest, t);
     setInterviewErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
@@ -178,7 +237,7 @@ const VerificationPage = () => {
   const handleSaveLegalProfile = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!validateLegalProfile()) {
-      showSnackbar(t('verification.messages.fixRequiredFields', { defaultValue: 'Vui lòng bổ sung các thông tin bắt buộc.' }), 'error');
+      showSnackbar(t('verification.messages.fixRequiredFields'), 'error');
       return;
     }
 
@@ -186,7 +245,7 @@ const VerificationPage = () => {
       await updateMutation.mutateAsync(legalProfile);
       showSnackbar(t('verification.messages.profileSaved'));
     } catch {
-      showSnackbar(t('verification.messages.saveFailed', { defaultValue: 'Không thể lưu hồ sơ xác thực. Vui lòng thử lại.' }), 'error');
+      showSnackbar(t('verification.messages.saveFailed'), 'error');
     }
   };
 
@@ -195,7 +254,7 @@ const VerificationPage = () => {
     const legalValid = validateLegalProfile();
     const interviewValid = validateInterviewRequest();
     if (!legalValid || !interviewValid || !interviewRequest.scheduledAt) {
-      showSnackbar(t('verification.messages.fixRequiredFields', { defaultValue: 'Vui lòng bổ sung các thông tin bắt buộc.' }), 'error');
+      showSnackbar(t('verification.messages.fixRequiredFields'), 'error');
       return;
     }
 
@@ -209,7 +268,7 @@ const VerificationPage = () => {
       });
       showSnackbar(t('verification.messages.requestSubmitted'));
     } catch {
-      showSnackbar(t('verification.messages.requestFailed', { defaultValue: 'Không thể gửi yêu cầu xác minh. Vui lòng thử lại.' }), 'error');
+      showSnackbar(t('verification.messages.requestFailed'), 'error');
     }
   };
 

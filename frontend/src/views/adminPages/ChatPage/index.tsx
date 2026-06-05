@@ -227,13 +227,13 @@ const AdminChatPage = () => {
       {/* Table */}
       <Paper sx={{ p: 2, borderRadius: '12px' }} elevation={0}>
         <FilterBar
-          title={t('chat.search.title', 'Bộ lọc hội thoại')}
+          title={t('chat.search.title')}
           searchValue={search}
           searchPlaceholder={t('chat.search.placeholder')}
           onSearchChange={setSearch}
           onReset={() => setSearch('')}
           resetDisabled={!search}
-          resetLabel={t('common.clearFilters', 'Xóa lọc')}
+          resetLabel={t('common.clearFilters')}
         />
 
         <DataTable
@@ -246,7 +246,7 @@ const AdminChatPage = () => {
       </Paper>
 
       <Dialog open={!!selectedConversation} onClose={() => setSelectedConversation(null)} fullWidth maxWidth="sm">
-        <DialogTitle>{t('chat.detail.title', 'Conversation detail')}</DialogTitle>
+        <DialogTitle>{t('chat.detail.title')}</DialogTitle>
         <DialogContent dividers>
           {selectedConversation && (
             <Stack spacing={2}>
@@ -270,7 +270,7 @@ const AdminChatPage = () => {
                 </Box>
               ) : messages.length === 0 ? (
                 <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
-                  {t('chat.detail.noMessages', 'No messages found.')}
+                  {t('chat.detail.noMessages')}
                 </Typography>
               ) : (
                 <Stack spacing={1.5} sx={{ maxHeight: 420, overflowY: 'auto' }}>
@@ -297,7 +297,7 @@ const AdminChatPage = () => {
                         </Typography>
                         {message.attachmentUrl && (
                           <Link href={message.attachmentUrl} target="_blank" rel="noreferrer" color="inherit" underline="always">
-                            {message.fileName || t('chat.detail.openAttachment', 'Open attachment')}
+                            {message.fileName || t('chat.detail.openAttachment')}
                           </Link>
                         )}
                       </Box>
@@ -309,7 +309,7 @@ const AdminChatPage = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setSelectedConversation(null)}>{t('common.close', 'Close')}</Button>
+          <Button onClick={() => setSelectedConversation(null)}>{t('common.close')}</Button>
         </DialogActions>
       </Dialog>
     </Box>

@@ -65,6 +65,10 @@ const SingleSelectCustom = <T extends FieldValues = FieldValues>({
               options={options}
 
               noOptionsText={t('noOptions')}
+              loadingText={t('loading')}
+              openText={t('autocomplete.open')}
+              closeText={t('autocomplete.close')}
+              clearText={t('autocomplete.clear')}
 
               autoHighlight={false}
 

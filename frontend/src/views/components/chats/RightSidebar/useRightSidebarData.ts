@@ -18,6 +18,47 @@ type RightSidebarAction<T> =
   | { type: 'loaded'; count: number; results: T[] }
   | { type: 'finished' };
 
+export type RightSidebarFetchResponse<T> =
+  | T[]
+  | {
+      count?: number;
+      results?: T[];
+      data?: T[] | { count?: number; results?: T[] };
+    }
+  | null
+  | undefined;
+
+const isRecord = (value: unknown): value is Record<string, unknown> => (
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+);
+
+export const normalizeRightSidebarResponse = <T,>(response: RightSidebarFetchResponse<T>): { count: number; results: T[] } => {
+  if (Array.isArray(response)) {
+    return { count: response.length, results: response };
+  }
+
+  if (!isRecord(response)) {
+    return { count: 0, results: [] };
+  }
+
+  const data = response.data;
+  const nestedData = isRecord(data) ? data : null;
+  const results = Array.isArray(response.results)
+    ? response.results
+    : Array.isArray(data)
+      ? data
+      : nestedData && Array.isArray(nestedData.results)
+        ? nestedData.results as T[]
+        : [];
+  const count = typeof response.count === 'number'
+    ? response.count
+    : nestedData && typeof nestedData.count === 'number'
+      ? nestedData.count
+      : results.length;
+
+  return { count, results };
+};
+
 const createInitialState = <T,>(): RightSidebarState<T> => ({
   isLoading: true,
   dataList: [],
@@ -40,7 +81,7 @@ const rightSidebarReducer = <T,>(
   }
 };
 
-export const useRightSidebarData = <T,>(fetchData: (params: { page: number; pageSize: number }) => Promise<{ count: number; results: T[] }>, pageSize: number = 12) => {
+export const useRightSidebarData = <T,>(fetchData: (params: { page: number; pageSize: number }) => Promise<RightSidebarFetchResponse<T>>, pageSize: number = 12) => {
   const context = React.use(ChatContext);
   const { currentUser } = useSelector((state: RootState) => state.user);
   const userId = currentUser?.id;
@@ -55,11 +96,11 @@ export const useRightSidebarData = <T,>(fetchData: (params: { page: number; page
       dispatch({ type: 'loading' });
       try {
         const resData = await fetchData({ page, pageSize });
-        const data = resData || { count: 0, results: [] };
+        const data = normalizeRightSidebarResponse<T>(resData);
         dispatch({
           type: 'loaded',
-          count: typeof data.count === 'number' ? data.count : 0,
-          results: Array.isArray(data.results) ? data.results : [],
+          count: data.count,
+          results: data.results,
         });
       } catch (error) {
         // Error handled silently
@@ -70,12 +111,13 @@ export const useRightSidebarData = <T,>(fetchData: (params: { page: number; page
   }, [page, fetchData, pageSize]);
 
   const handleAddRoom = async (partnerId: string, userData: UserDataPayload) => {
-    if (!userId || !setSelectedRoomId) return;
+    const normalizedPartnerId = String(partnerId || '').trim();
+    if (!userId || !setSelectedRoomId || !normalizedPartnerId) return;
 
     let allowCreateNewChatRoom = false;
-    const isExists = await checkExists('accounts', partnerId);
+    const isExists = await checkExists('accounts', normalizedPartnerId);
     if (!isExists) {
-      const createResult = await createUser('accounts', userData, partnerId);
+      const createResult = await createUser('accounts', userData, normalizedPartnerId);
       if (createResult) {
         allowCreateNewChatRoom = true;
       }
@@ -84,12 +126,12 @@ export const useRightSidebarData = <T,>(fetchData: (params: { page: number; page
     }
 
     if (allowCreateNewChatRoom) {
-      let chatRoomId = await checkChatRoomExists('chatRooms', userId, partnerId);
+      let chatRoomId = await checkChatRoomExists('chatRooms', userId, normalizedPartnerId);
       if (chatRoomId === null) {
         const newRoom: ChatRoomDocument = {
-          members: [`${userId}`, `${partnerId}`],
-          membersString: [`${userId}-${partnerId}`, `${partnerId}-${userId}`],
-          recipientId: `${partnerId}`,
+          members: [`${userId}`, normalizedPartnerId],
+          membersString: [`${userId}-${normalizedPartnerId}`, `${normalizedPartnerId}-${userId}`],
+          recipientId: normalizedPartnerId,
           createdBy: `${userId}`,
           unreadCount: 0
         };

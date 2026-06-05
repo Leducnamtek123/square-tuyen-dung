@@ -62,14 +62,14 @@ const buildInitialValues = (editData: Partial<CompanyFormValues> | null): Compan
 
 export const createCompanyFormSchema = (t: CompanyFormT) =>
   yup.object().shape({
-    companyName: yup.string().required(t('companyForm.validation.companyNameRequired', 'Company name is required.')).max(255, t('common:validation.max255')),
-    taxCode: yup.string().required(t('companyForm.placeholder.entercompanytaxcode', 'Tax code is required.')).max(30, t('common:validation.max30')),
+    companyName: yup.string().required(t('companyForm.validation.companyNameRequired')).max(255, t('common:validation.max255')),
+    taxCode: yup.string().required(t('companyForm.validation.taxCodeRequired')).max(30, t('common:validation.max30')),
     employeeSize: yup
       .number()
-      .required(t('companyForm.placeholder.selectcompanysize', 'Company size is required.'))
-      .typeError(t('companyForm.placeholder.selectcompanysize'))
-      .oneOf([1, 2, 3, 4], t('companyForm.validation.employeeSizeInvalid', 'Invalid company size.')),
-    fieldOperation: yup.string().required(t('companyForm.placeholder.entercompanyfieldofoperation', 'Field of operation is required.')).max(255, t('common:validation.max255')),
+      .required(t('companyForm.validation.employeeSizeRequired'))
+      .typeError(t('companyForm.validation.employeeSizeRequired'))
+      .oneOf([1, 2, 3, 4], t('companyForm.validation.employeeSizeInvalid')),
+    fieldOperation: yup.string().required(t('companyForm.validation.fieldOperationRequired')).max(255, t('common:validation.max255')),
     location: yup.object().shape({
       city: yup.number().required(t('jobPostForm.validation.cityprovinceisrequired')).typeError(t('jobPostForm.validation.cityprovinceisrequired')),
       district: yup.number().required(t('jobPostForm.validation.districtisrequired')).typeError(t('jobPostForm.validation.districtisrequired')),
@@ -80,13 +80,13 @@ export const createCompanyFormSchema = (t: CompanyFormT) =>
     since: yup
       .date()
       .nullable()
-      .max(DATE_OPTIONS.today(), t('companyForm.validation.foundedDateInFuture', 'Founded date cannot be in the future.')),
-    companyEmail: yup.string().required(t('jobPostForm.validation.contactpersonemailisrequired')).email(t('jobPostForm.validation.invalidemail')).max(100),
-    companyPhone: yup.string().required(t('jobPostForm.validation.contactpersonphoneisrequired')).matches(REGEX_VALIDATE.phoneRegExp, t('jobPostForm.validation.invalidphonenumber')).max(15),
-    websiteUrl: yup.string().transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value)).nullable().notRequired().url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
-    facebookUrl: yup.string().transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value)).nullable().notRequired().url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
-    youtubeUrl: yup.string().transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value)).nullable().notRequired().url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
-    linkedinUrl: yup.string().transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value)).nullable().notRequired().url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
+      .max(DATE_OPTIONS.today(), t('companyForm.validation.foundedDateInFuture')),
+    companyEmail: yup.string().required(t('companyForm.validation.companyEmailRequired')).email(t('companyForm.validation.companyEmailInvalid')).max(100, t('companyForm.validation.companyEmailMax')),
+    companyPhone: yup.string().required(t('companyForm.validation.companyPhoneRequired')).matches(REGEX_VALIDATE.phoneRegExp, t('companyForm.validation.companyPhoneInvalid')).max(15, t('companyForm.validation.companyPhoneMax')),
+    websiteUrl: yup.string().transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value)).nullable().notRequired().url(t('common:validation.invalidUrl')),
+    facebookUrl: yup.string().transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value)).nullable().notRequired().url(t('common:validation.invalidUrl')),
+    youtubeUrl: yup.string().transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value)).nullable().notRequired().url(t('common:validation.invalidUrl')),
+    linkedinUrl: yup.string().transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value)).nullable().notRequired().url(t('common:validation.invalidUrl')),
     description: yup.mixed().notRequired(),
   });
 

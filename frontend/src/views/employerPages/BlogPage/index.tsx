@@ -24,13 +24,6 @@ const STATUS_COLOR: Record<ArticleStatus, 'default' | 'warning' | 'success' | 'e
   archived: 'info',
 };
 
-const STATUS_LABEL: Record<ArticleStatus, string> = {
-  draft: 'Bản nháp',
-  pending: 'Chờ duyệt',
-  published: 'Đã đăng',
-  archived: 'Lưu trữ',
-};
-
 const statusFilterSx = [{ width: { xs: '100%', sm: 220 } }, filterControlSx] as SxProps<Theme>;
 
 type BlogListPagination = {
@@ -119,28 +112,30 @@ const EmployerBlogListPage = () => {
       });
       dispatch({ type: 'loaded', articles: res.results || [], total: res.count || 0 });
     } catch {
-      toastMessages.error('Không thể tải danh sách blog');
+      toastMessages.error(t('blog.messages.loadError'));
       dispatch({ type: 'failed' });
     }
-  }, [statusFilter, search, pagination]);
+  }, [statusFilter, search, pagination, t]);
 
   useEffect(() => { fetchArticles(); }, [fetchArticles]);
 
   const handleDelete = async (id: number, title: string) => {
-    if (!window.confirm(`Bạn có chắc muốn xóa "${title}"?`)) return;
+    if (!window.confirm(t('blog.messages.deleteConfirm', { title }))) return;
     try {
       await contentService.employerDeleteBlog(id);
-      toastMessages.success('Đã xóa bài viết');
+      toastMessages.success(t('blog.messages.deleteSuccess'));
       fetchArticles();
     } catch {
-      toastMessages.error('Không thể xóa bài viết');
+      toastMessages.error(t('blog.messages.deleteError'));
     }
   };
+
+  const getStatusLabel = (status: ArticleStatus) => t(`blog.statuses.${status}`);
 
   const columns = [
     {
       accessorKey: 'title',
-      header: 'Tiêu đề',
+      header: t('blog.table.title'),
       cell: ({ row }: { row: { original: Article } }) => (
         <Box>
           <Typography variant="body2" fontWeight={700} sx={{ mb: 0.5 }}>
@@ -155,10 +150,10 @@ const EmployerBlogListPage = () => {
     },
     {
       accessorKey: 'status',
-      header: 'Trạng thái',
+      header: t('blog.table.status'),
       cell: ({ row }: { row: { original: Article } }) => (
         <Chip
-          label={STATUS_LABEL[row.original.status]}
+          label={getStatusLabel(row.original.status)}
           size="small"
           color={STATUS_COLOR[row.original.status]}
         />
@@ -166,7 +161,7 @@ const EmployerBlogListPage = () => {
     },
     {
       accessorKey: 'publishedAt',
-      header: 'Ngày đăng',
+      header: t('blog.table.publishedAt'),
       cell: ({ row }: { row: { original: Article } }) => (
         <Typography variant="body2">
           {row.original.publishedAt ? dayjs(row.original.publishedAt).format('DD/MM/YYYY') : '—'}
@@ -175,22 +170,22 @@ const EmployerBlogListPage = () => {
     },
     {
       accessorKey: 'viewCount',
-      header: 'Lượt xem',
+      header: t('blog.table.viewCount'),
       cell: ({ row }: { row: { original: Article } }) => (
         <Typography variant="body2">{row.original.viewCount?.toLocaleString()}</Typography>
       ),
     },
     {
       id: 'actions',
-      header: 'Thao tác',
+      header: t('blog.table.actions'),
       cell: ({ row }: { row: { original: Article } }) => (
         <Stack direction="row" spacing={0.5}>
-          <Tooltip title="Chỉnh sửa">
+          <Tooltip title={t('blog.actions.edit')}>
             <IconButton size="small" onClick={() => push(`/employer/blog/${row.original.id}`)}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Xóa">
+          <Tooltip title={t('blog.actions.delete')}>
             <IconButton size="small" color="error" onClick={() => handleDelete(row.original.id, row.original.title)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
@@ -206,10 +201,10 @@ const EmployerBlogListPage = () => {
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
         <Box>
           <Typography variant="h4" fontWeight={900} letterSpacing="-0.5px">
-            Blog tuyển dụng
+            {t('blog.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary" mt={0.5}>
-            Chia sẻ kinh nghiệm, tips tuyển dụng của doanh nghiệp bạn
+            {t('blog.subtitle')}
           </Typography>
         </Box>
         <Button
@@ -218,24 +213,24 @@ const EmployerBlogListPage = () => {
           onClick={() => push('/employer/blog/create')}
           sx={{ fontWeight: 700, px: 3 }}
         >
-          Viết bài mới
+          {t('blog.newPost')}
         </Button>
       </Stack>
 
       {/* Info banner */}
       <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, bgcolor: 'info.main', color: 'white', p: 2, borderRadius: 2, mb: 3, fontSize: '0.85rem' }}>
         <LightbulbIcon sx={{ fontSize: 18, mt: 0.1, flexShrink: 0 }} />
-        Bài viết sẽ được gửi cho Admin duyệt trước khi hiển thị trên website. Thời gian duyệt thường trong 24 giờ.
+        {t('blog.reviewNotice')}
       </Box>
 
       <FilterBar
-        title={t('blog.filter.title', 'Bộ lọc blog')}
+        title={t('blog.filter.title')}
         searchValue={searchInput}
-        searchPlaceholder="Tìm kiếm bài viết..."
+        searchPlaceholder={t('blog.filter.searchPlaceholder')}
         onSearchChange={(value) => dispatch({ type: 'patch', patch: { searchInput: value } })}
         onSearchSubmit={() => dispatch({ type: 'patch', patch: { search: searchInput.trim(), pagination: { ...pagination, pageIndex: 0 } } })}
         showSearchButton
-        searchButtonLabel={t('common.search', 'Tìm kiếm')}
+        searchButtonLabel={t('blog.actions.search')}
         activeFilterCount={[statusFilter !== 'all', Boolean(search)].filter(Boolean).length}
         onReset={() => dispatch({
           type: 'patch',
@@ -247,15 +242,15 @@ const EmployerBlogListPage = () => {
           },
         })}
         resetDisabled={statusFilter === 'all' && !search && !searchInput}
-        resetLabel={t('common.clearFilters', 'Xóa lọc')}
-        advancedLabel={t('common.advancedFilters', 'Bộ lọc nâng cao')}
+        resetLabel={t('blog.actions.clearFilters')}
+        advancedLabel={t('blog.actions.advancedFilters')}
         advancedDefaultOpen={statusFilter !== 'all'}
         advancedFilters={(
           <FormControl size="small" sx={statusFilterSx}>
-            <InputLabel>Trạng thái</InputLabel>
+            <InputLabel>{t('blog.filter.status')}</InputLabel>
             <Select
               value={statusFilter}
-              label="Trạng thái"
+              label={t('blog.filter.status')}
               onChange={(e) => dispatch({
                 type: 'patch',
                 patch: {
@@ -264,10 +259,10 @@ const EmployerBlogListPage = () => {
                 },
               })}
             >
-              <MenuItem value="all">Tất cả</MenuItem>
-              <MenuItem value="draft">Bản nháp</MenuItem>
-              <MenuItem value="pending">Chờ duyệt</MenuItem>
-              <MenuItem value="published">Đã đăng</MenuItem>
+              <MenuItem value="all">{t('blog.statuses.all')}</MenuItem>
+              <MenuItem value="draft">{t('blog.statuses.draft')}</MenuItem>
+              <MenuItem value="pending">{t('blog.statuses.pending')}</MenuItem>
+              <MenuItem value="published">{t('blog.statuses.published')}</MenuItem>
             </Select>
           </FormControl>
         )}

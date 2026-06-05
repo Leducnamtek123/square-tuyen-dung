@@ -34,7 +34,7 @@ const CompanyFollowButton = ({ slug, isFollowed }: CompanyFollowButtonProps) => 
       setFollowOverride(resData.isFollowed);
 
       toastMessages.success(
-        resData.isFollowed ? 'Followed successfully.' : 'Unfollowed successfully.'
+        resData.isFollowed ? t('companyDetail.followedSuccessfully') : t('companyDetail.unfollowedSuccessfully')
       );
     } catch (error) {
       errorHandling(error);
@@ -61,9 +61,9 @@ const CompanyFollowButton = ({ slug, isFollowed }: CompanyFollowButtonProps) => 
       >
         <span>
           {followed ? (
-            <span style={{ color: 'white' }}>{t('company.following', 'Đang theo dõi')}</span>
+            <span style={{ color: 'white' }}>{t('company.following')}</span>
           ) : (
-            t('company.follow', 'Theo dõi')
+            t('company.follow')
           )}
         </span>
       </LoadingButton>

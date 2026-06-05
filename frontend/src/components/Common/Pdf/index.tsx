@@ -96,7 +96,7 @@ const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
                   onClick={props.onClick}
                   startIcon={<FileDownloadIcon />}
                 >
-                  {t('actions.download', { defaultValue: 'Tai xuong' })}
+                  {t('actions.download')}
                 </Button>
               )}
             </Download>

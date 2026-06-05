@@ -51,7 +51,7 @@ const CompanyPage = () => {
                     >
                         <Tab label={t("company.tabs.info")} value="0" />
                         <Tab label={t("company.tabs.multimedia")} value="1" />
-                        <Tab label={t("company.tabs.team", "Team")} value="2" />
+                        <Tab label={t("company.tabs.team")} value="2" />
                     </TabList>
                 </Box>
                 <TabPanel value="0" sx={{ px: 0, pt: 3, pb: 0 }}>

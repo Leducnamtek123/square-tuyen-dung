@@ -193,7 +193,7 @@ const CompanyVerificationsPage = () => {
                           disabled={updateMutation.isPending || !row.id}
                           onClick={() => handleUpdate(row, status, note)}
                         >
-                          {t('pages.companyVerifications.actions.update', { defaultValue: 'Cập nhật' })}
+                          {t('pages.companyVerifications.actions.update')}
                         </Button>
                       </Stack>
                     </TableCell>

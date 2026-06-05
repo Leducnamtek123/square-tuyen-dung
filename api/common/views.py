@@ -210,7 +210,7 @@ class AdminAuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = paginations.CustomPagination
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ["actor_email", "action", "resource_type", "resource_id", "resource_repr", "request_path"]
-    ordering_fields = ["create_at", "action", "resource_type"]
+    ordering_fields = ["id", "create_at", "action", "resource_type"]
 
     def _parse_boundary_datetime(self, value, *, end_of_day=False):
         if not value:

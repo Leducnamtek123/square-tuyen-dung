@@ -8,6 +8,50 @@
   return `${Math.trunc(n)}`;
 };
 
+const salaryFormatterCache = new Map<string, Intl.NumberFormat>();
+
+type SalaryValue = number | string | null | undefined;
+
+const resolveSalaryLocale = (language?: string | null): string => (
+  String(language || '').toLowerCase().startsWith('vi') ? 'vi-VN' : 'en-US'
+);
+
+const formatLocalizedMoney = (
+  value?: SalaryValue,
+  language?: string | null
+): string => {
+  const numericValue = Number(value);
+  if (value == null || !Number.isFinite(numericValue)) return '---';
+
+  const locale = resolveSalaryLocale(language);
+  const cachedFormatter = salaryFormatterCache.get(locale);
+  if (cachedFormatter) return cachedFormatter.format(numericValue);
+
+  const formatter = new Intl.NumberFormat(locale, {
+    maximumFractionDigits: 0,
+  });
+  salaryFormatterCache.set(locale, formatter);
+  return formatter.format(numericValue);
+};
+
+const hasDisplayableSalary = (value?: SalaryValue): boolean => {
+  const numericValue = Number(value);
+  return value != null && Number.isFinite(numericValue) && numericValue > 0;
+};
+
+const formatLocalizedSalaryRange = (
+  salaryFrom?: SalaryValue,
+  salaryTo?: SalaryValue,
+  language?: string | null
+): string => {
+  if (!hasDisplayableSalary(salaryFrom) && !hasDisplayableSalary(salaryTo)) return '---';
+
+  const fromText = hasDisplayableSalary(salaryFrom) ? formatLocalizedMoney(salaryFrom, language) : '?';
+  const toText = hasDisplayableSalary(salaryTo) ? formatLocalizedMoney(salaryTo, language) : '?';
+
+  return `${fromText} - ${toText}`;
+};
+
 const salaryString = (
   salaryFrom?: number | null,
   salaryTo?: number | null
@@ -37,4 +81,4 @@ const toSlug = (str?: string): string => {
 
 export default toSlug;
 
-export { convertMoney, salaryString };
+export { convertMoney, formatLocalizedSalaryRange, salaryString };

@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography, Box } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
@@ -33,6 +34,19 @@ interface FeedbackData {
 
 const MAX_EVIDENCE_IMAGE_SIZE = 5 * 1024 * 1024;
 
+export const createFeedbackSchema = (t: TFunction<'common', undefined>) =>
+  yup.object().shape({
+    rating: yup
+      .number()
+      .required(t('feedback.ratingRequired'))
+      .min(1, t('feedback.ratingRequired'))
+      .max(5, t('feedback.ratingInvalid')),
+    content: yup
+      .string()
+      .required(t('feedback.contentRequired'))
+      .max(500, t('feedback.contentMax')),
+  });
+
 const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, onOpenChange }: FeedbackProps) => {
   const { t } = useTranslation('common');
 
@@ -51,13 +65,7 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
     onOpenChange?.(nextOpen);
   }, [controlledOpen, onOpenChange]);
 
-  const schema = yup.object().shape({
-    rating: yup.number().required(t('feedback.ratingRequired')).min(1, t('feedback.ratingRequired')),
-    content: yup
-      .string()
-      .required(t('feedback.contentRequired'))
-      .max(500, t('feedback.contentMax')),
-  });
+  const schema = React.useMemo(() => createFeedbackSchema(t), [t]);
 
   const { control, handleSubmit, watch, reset } = useForm<FeedbackData>({
     defaultValues: {
@@ -90,13 +98,13 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toastMessages.error(t('feedback.evidenceImageInvalid', { defaultValue: 'Please choose an image file.' }));
+      toastMessages.error(t('feedback.evidenceImageInvalid'));
       event.target.value = '';
       return;
     }
 
     if (file.size > MAX_EVIDENCE_IMAGE_SIZE) {
-      toastMessages.error(t('feedback.evidenceImageTooLarge', { defaultValue: 'Image must be 5MB or smaller.' }));
+      toastMessages.error(t('feedback.evidenceImageTooLarge'));
       event.target.value = '';
       return;
     }
@@ -304,14 +312,14 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
             <Grid size={12}>
               <Box>
                 <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                  {t('feedback.evidenceImageLabel', { defaultValue: 'Evidence image' })}
+                  {t('feedback.evidenceImageLabel')}
                 </Typography>
 
                 <input
                   ref={evidenceInputRef}
                   hidden
                   type="file"
-                  aria-label={t('feedback.evidenceImageLabel', { defaultValue: 'Evidence image' })}
+                  aria-label={t('feedback.evidenceImageLabel')}
                   accept="image/*"
                   onChange={handleEvidenceImageChange}
                 />
@@ -324,7 +332,7 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
                     onClick={() => evidenceInputRef.current?.click()}
                     sx={{ textTransform: 'none', borderRadius: '10px' }}
                   >
-                    {t('feedback.evidenceImageUpload', { defaultValue: 'Upload image proof' })}
+                    {t('feedback.evidenceImageUpload')}
                   </Button>
                 ) : (
                   <Stack
@@ -366,7 +374,7 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
                       color="error"
                       disabled={isSubmitting}
                       onClick={handleClearEvidenceImage}
-                      aria-label={t('feedback.evidenceImageRemove', { defaultValue: 'Remove evidence image' })}
+                      aria-label={t('feedback.evidenceImageRemove')}
                     >
                       <DeleteOutlineIcon fontSize="small" />
                     </IconButton>
@@ -374,7 +382,7 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
                 )}
 
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.75 }}>
-                  {t('feedback.evidenceImageHint', { defaultValue: 'Optional. PNG, JPG, or WebP up to 5MB.' })}
+                  {t('feedback.evidenceImageHint')}
                 </Typography>
               </Box>
             </Grid>

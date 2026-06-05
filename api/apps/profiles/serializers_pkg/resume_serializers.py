@@ -23,13 +23,38 @@ from apps.locations.models import City
 from common.models import Career
 
 # Import from sibling submodules
-from .profile_serializers import JobSeekerProfileSerializer
+from .profile_serializers import JobSeekerProfileSerializer, PHONE_PATTERN
 from .company_serializers import CompanySerializer
 
-MAX_MANUAL_CANDIDATE_SALARY = 999_999_999_999
+MAX_RESUME_SALARY = 999_999_999_999
+MAX_MANUAL_CANDIDATE_SALARY = MAX_RESUME_SALARY
 MAX_CV_FILE_SIZE = 10 * 1024 * 1024
 MAX_MANUAL_CANDIDATE_CV_SIZE = MAX_CV_FILE_SIZE
 PDF_CONTENT_TYPES = {"application/pdf", "application/x-pdf"}
+RESUME_CHOICE_FIELD_MAP = {
+    "position": ("position", var_sys.POSITION_CHOICES),
+    "experience": ("experience", var_sys.EXPERIENCE_CHOICES),
+    "academic_level": ("academicLevel", var_sys.ACADEMIC_LEVEL),
+    "type_of_workplace": ("typeOfWorkplace", var_sys.TYPE_OF_WORKPLACE_CHOICES),
+    "job_type": ("jobType", var_sys.JOB_TYPE_CHOICES),
+}
+LANGUAGE_SKILL_CHOICE_FIELD_MAP = {
+    "language": ("language", var_sys.LANGUAGE_CHOICES),
+    "level": ("level", var_sys.LANGUAGE_LEVEL_CHOICES),
+}
+
+
+def _choice_values(choices):
+    return {choice[0] for choice in choices}
+
+
+def _validate_choice_fields(attrs, field_map):
+    errors = {}
+    for model_field, (api_field, choices) in field_map.items():
+        value = attrs.get(model_field)
+        if model_field in attrs and value is not None and value not in _choice_values(choices):
+            errors[api_field] = ["Invalid choice."]
+    return errors
 
 
 def validate_pdf_cv_file(cv_file):
@@ -280,16 +305,23 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     def validate(self, attrs):
         errors = {}
+        errors.update(_validate_choice_fields(attrs, RESUME_CHOICE_FIELD_MAP))
         salary_min = attrs.get("salary_min", getattr(self.instance, "salary_min", None))
         salary_max = attrs.get("salary_max", getattr(self.instance, "salary_max", None))
         expected_salary = attrs.get("expected_salary")
 
         if "salary_min" in attrs and attrs["salary_min"] < 0:
             errors["salaryMin"] = ["Salary must be greater than or equal to 0."]
+        if "salary_min" in attrs and attrs["salary_min"] > MAX_RESUME_SALARY:
+            errors["salaryMin"] = ["Salary exceeds the allowed limit."]
         if "salary_max" in attrs and attrs["salary_max"] < 0:
             errors["salaryMax"] = ["Salary must be greater than or equal to 0."]
+        if "salary_max" in attrs and attrs["salary_max"] > MAX_RESUME_SALARY:
+            errors["salaryMax"] = ["Salary exceeds the allowed limit."]
         if "expected_salary" in attrs and expected_salary is not None and expected_salary < 0:
             errors["expectedSalary"] = ["Expected salary must be greater than or equal to 0."]
+        if "expected_salary" in attrs and expected_salary is not None and expected_salary > MAX_RESUME_SALARY:
+            errors["expectedSalary"] = ["Salary exceeds the allowed limit."]
         if salary_min is not None and salary_max is not None and salary_min > salary_max:
             errors["salaryMax"] = ["Maximum salary must be greater than or equal to minimum salary."]
         if errors:
@@ -342,9 +374,9 @@ class EmployerCandidateProfileSerializer(DynamicFieldsMixin, serializers.ModelSe
     salaryMax = serializers.IntegerField(source="salary_max", required=False, default=0)
     expectedSalary = serializers.IntegerField(source="expected_salary", required=False, allow_null=True)
     skillsSummary = serializers.CharField(source="skills_summary", required=False, allow_null=True, allow_blank=True)
-    academicLevel = serializers.IntegerField(source="academic_level", required=False, allow_null=True)
-    typeOfWorkplace = serializers.IntegerField(source="type_of_workplace", required=False, allow_null=True)
-    jobType = serializers.IntegerField(source="job_type", required=False, allow_null=True)
+    academicLevel = serializers.ChoiceField(source="academic_level", choices=var_sys.ACADEMIC_LEVEL, required=False, allow_null=True)
+    typeOfWorkplace = serializers.ChoiceField(source="type_of_workplace", choices=var_sys.TYPE_OF_WORKPLACE_CHOICES, required=False, allow_null=True)
+    jobType = serializers.ChoiceField(source="job_type", choices=var_sys.JOB_TYPE_CHOICES, required=False, allow_null=True)
     fileUrl = serializers.SerializerMethodField(method_name="get_file_url", read_only=True)
     file = serializers.FileField(required=False, allow_null=True, write_only=True)
     company = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -386,6 +418,10 @@ class EmployerCandidateProfileSerializer(DynamicFieldsMixin, serializers.ModelSe
         self._validate_salary_field(attrs, "salary_min", "salaryMin")
         self._validate_salary_field(attrs, "salary_max", "salaryMax")
         self._validate_salary_field(attrs, "expected_salary", "expectedSalary")
+        phone = attrs.get("phone")
+        if "phone" in attrs and phone and not PHONE_PATTERN.fullmatch(str(phone).strip()):
+            raise serializers.ValidationError({"phone": ["Invalid phone number."]})
+
         salary_min = attrs.get("salary_min")
         salary_max = attrs.get("salary_max")
         provided_fields = set(getattr(self, "initial_data", {}) or {})
@@ -563,14 +599,47 @@ class ResumeSavedSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
 
 class ResumeSavedExportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    title = serializers.PrimaryKeyRelatedField(source="resume.title", read_only=True)
-    fullName = serializers.PrimaryKeyRelatedField(source="resume.user.full_name", read_only=True)
-    email = serializers.PrimaryKeyRelatedField(source="resume.user.email", read_only=True)
-    phone = serializers.PrimaryKeyRelatedField(source="resume.job_seeker_profile.phone", read_only=True)
-    gender = serializers.PrimaryKeyRelatedField(source="resume.job_seeker_profile.gender", read_only=True)
-    birthday = serializers.PrimaryKeyRelatedField(source="resume.job_seeker_profile.birthday", read_only=True)
-    address = serializers.PrimaryKeyRelatedField(source="resume.job_seeker_profile.location.city.name", read_only=True)
+    title = serializers.SerializerMethodField(method_name="get_title")
+    fullName = serializers.SerializerMethodField(method_name="get_full_name")
+    email = serializers.SerializerMethodField(method_name="get_email")
+    phone = serializers.SerializerMethodField(method_name="get_phone")
+    gender = serializers.SerializerMethodField(method_name="get_gender")
+    birthday = serializers.SerializerMethodField(method_name="get_birthday")
+    address = serializers.SerializerMethodField(method_name="get_address")
     createAt = serializers.DateTimeField(source='create_at', read_only=True)
+
+    def _resume(self, resume_saved):
+        return getattr(resume_saved, "resume", None)
+
+    def _profile(self, resume_saved):
+        resume = self._resume(resume_saved)
+        return getattr(resume, "job_seeker_profile", None)
+
+    def get_title(self, resume_saved):
+        return getattr(self._resume(resume_saved), "title", "") or ""
+
+    def get_full_name(self, resume_saved):
+        user = getattr(self._resume(resume_saved), "user", None)
+        return getattr(user, "full_name", "") or ""
+
+    def get_email(self, resume_saved):
+        user = getattr(self._resume(resume_saved), "user", None)
+        return getattr(user, "email", "") or ""
+
+    def get_phone(self, resume_saved):
+        return getattr(self._profile(resume_saved), "phone", "") or ""
+
+    def get_gender(self, resume_saved):
+        return getattr(self._profile(resume_saved), "gender", "") or ""
+
+    def get_birthday(self, resume_saved):
+        return getattr(self._profile(resume_saved), "birthday", "") or ""
+
+    def get_address(self, resume_saved):
+        profile = self._profile(resume_saved)
+        location = getattr(profile, "location", None)
+        city = getattr(location, "city", None)
+        return getattr(city, "name", "") or ""
 
 
     class Meta:
@@ -728,6 +797,9 @@ class LanguageSkillSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return resume
 
     def validate(self, attrs):
+        errors = _validate_choice_fields(attrs, LANGUAGE_SKILL_CHOICE_FIELD_MAP)
+        if errors:
+            raise serializers.ValidationError(errors)
         _validate_resume_owner_from_attrs(self, attrs)
         return attrs
 
@@ -750,6 +822,12 @@ class AdvancedSkillSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return resume
 
     def validate(self, attrs):
+        errors = _validate_choice_fields(
+            attrs,
+            {"level": ("level", var_sys.LANGUAGE_LEVEL_CHOICES)},
+        )
+        if errors:
+            raise serializers.ValidationError(errors)
         resume = _validate_resume_owner_from_attrs(self, attrs)
         if resume and AdvancedSkill.objects.filter(resume=resume).count() >= 15:
             raise serializers.ValidationError(

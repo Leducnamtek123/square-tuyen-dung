@@ -186,7 +186,7 @@ const CompanyCard = () => {
           lineHeight: 1.2,
         }}
       >
-        {t('companyProfile.title', 'Company Information')}
+        {t('companyProfile.title')}
       </Typography>
 
       <Stack spacing={4}>

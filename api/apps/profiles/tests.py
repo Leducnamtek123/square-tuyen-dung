@@ -6,6 +6,7 @@ from datetime import timedelta
 from django.utils import timezone
 from rest_framework.test import APIClient
 
+from apps.jobs.models import JobPost
 from apps.profiles.models import (
     Resume, Company, CompanyFollowed,
     JobSeekerProfile, ResumeViewed, ResumeSaved,
@@ -13,7 +14,7 @@ from apps.profiles.models import (
     CompanyVerification, TrustReport, CompanyRole, CompanyMember
 )
 from apps.profiles.services import ResumeService, CompanyService, ensure_company_system_roles
-from shared.configs import variable_system as var_sys
+from shared.configs import table_export, variable_system as var_sys
 
 
 # ==================== Model Tests ====================
@@ -96,6 +97,53 @@ def test_resume_serializer_validates_partial_salary_against_existing_values(resu
     assert "salaryMax" in negative_max.errors
     assert not negative_expected.is_valid()
     assert "expectedSalary" in negative_expected.errors
+
+
+@pytest.mark.django_db
+def test_resume_serializer_rejects_salary_over_model_limit(resume):
+    from apps.profiles.serializers import ResumeSerializer
+
+    too_large = 1_000_000_000_000
+
+    salary_range_serializer = ResumeSerializer(
+        resume,
+        data={"salaryMin": too_large, "salaryMax": too_large},
+        partial=True,
+    )
+    expected_salary_serializer = ResumeSerializer(
+        resume,
+        data={"expectedSalary": too_large},
+        partial=True,
+    )
+
+    assert not salary_range_serializer.is_valid()
+    assert "salaryMin" in salary_range_serializer.errors
+    assert "salaryMax" in salary_range_serializer.errors
+    assert not expected_salary_serializer.is_valid()
+    assert "expectedSalary" in expected_salary_serializer.errors
+
+
+@pytest.mark.django_db
+def test_resume_serializer_rejects_choice_values_outside_model_choices():
+    from apps.profiles.serializers import ResumeSerializer
+
+    serializer = ResumeSerializer(
+        data={
+            "position": 999,
+            "experience": 999,
+            "academicLevel": 999,
+            "typeOfWorkplace": 999,
+            "jobType": 999,
+        },
+        partial=True,
+    )
+
+    assert not serializer.is_valid()
+    assert "position" in serializer.errors
+    assert "experience" in serializer.errors
+    assert "academicLevel" in serializer.errors
+    assert "typeOfWorkplace" in serializer.errors
+    assert "jobType" in serializer.errors
 
 
 @pytest.mark.django_db
@@ -216,6 +264,67 @@ def test_job_seeker_profile_serializer_rejects_future_dates_and_invalid_phone(jo
     assert "birthday" in future_birthday.errors
     assert future_id_issue_date.is_valid() is False
     assert "idCardIssueDate" in future_id_issue_date.errors
+
+
+@pytest.mark.django_db
+def test_job_seeker_profile_serializer_rejects_invalid_nested_user_full_name(job_seeker_profile):
+    from apps.profiles.serializers import JobSeekerProfileSerializer
+
+    blank_full_name = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={"user": {"fullName": ""}},
+        partial=True,
+    )
+    too_long_full_name = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={"user": {"fullName": "a" * 101}},
+        partial=True,
+    )
+
+    assert blank_full_name.is_valid() is False
+    assert "user" in blank_full_name.errors
+    assert "fullName" in blank_full_name.errors["user"]
+    assert too_long_full_name.is_valid() is False
+    assert "user" in too_long_full_name.errors
+    assert "fullName" in too_long_full_name.errors["user"]
+
+
+@pytest.mark.django_db
+def test_job_seeker_profile_serializer_rejects_invalid_emergency_contact_phone(job_seeker_profile):
+    from apps.profiles.serializers import JobSeekerProfileSerializer
+
+    blank_phone = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={"emergencyContactPhone": ""},
+        partial=True,
+    )
+    invalid_phone = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={"emergencyContactPhone": "not-a-phone"},
+        partial=True,
+    )
+
+    assert blank_phone.is_valid(), blank_phone.errors
+    assert invalid_phone.is_valid() is False
+    assert "emergencyContactPhone" in invalid_phone.errors
+
+
+@pytest.mark.django_db
+def test_job_seeker_profile_serializer_rejects_gender_and_marital_status_outside_choices(job_seeker_profile):
+    from apps.profiles.serializers import JobSeekerProfileSerializer
+
+    serializer = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={
+            "gender": "X",
+            "maritalStatus": "Z",
+        },
+        partial=True,
+    )
+
+    assert serializer.is_valid() is False
+    assert "gender" in serializer.errors
+    assert "maritalStatus" in serializer.errors
 
 
 @pytest.mark.django_db
@@ -534,6 +643,9 @@ class TestResumeService:
 
         assert response.status_code == 200
         assert response.data["data"]
+        address_column = table_export.RESUMES_EXPORT_FIELD["address"]
+        assert address_column in response.data["data"][0]
+        assert response.data["data"][0][address_column] == ""
 
 
 @pytest.mark.django_db
@@ -575,6 +687,7 @@ class TestCompanyService:
         assert owner.permissions == ["*"]
         assert hr.is_system is True
         assert "manage_question_bank" in hr.permissions
+        assert "manage_employees" in hr.permissions
 
 
 @pytest.mark.django_db
@@ -823,6 +936,36 @@ def test_job_seeker_cannot_create_resume_details_for_other_user_resume(
 
 
 @pytest.mark.django_db
+def test_language_skill_serializer_rejects_choice_values_outside_model_choices():
+    from apps.profiles.serializers import LanguageSkillSerializer
+
+    serializer = LanguageSkillSerializer(
+        data={
+            "language": 999,
+            "level": 999,
+        },
+        partial=True,
+    )
+
+    assert not serializer.is_valid()
+    assert "language" in serializer.errors
+    assert "level" in serializer.errors
+
+
+@pytest.mark.django_db
+def test_advanced_skill_serializer_rejects_level_outside_rating_range():
+    from apps.profiles.serializers import AdvancedSkillSerializer
+
+    too_low = AdvancedSkillSerializer(data={"level": 0}, partial=True)
+    too_high = AdvancedSkillSerializer(data={"level": 999}, partial=True)
+
+    assert not too_low.is_valid()
+    assert "level" in too_low.errors
+    assert not too_high.is_valid()
+    assert "level" in too_high.errors
+
+
+@pytest.mark.django_db
 def test_company_member_without_profile_permission_can_read_company_info(company):
     member = company.user.__class__.objects.create_user_with_role_name(
         email="company-reader@test.com",
@@ -966,6 +1109,198 @@ def test_company_member_and_role_actions_are_scoped_to_active_company(employer_u
 
 
 @pytest.mark.django_db
+def test_company_member_list_uses_selected_company_header(company):
+    member = company.user.__class__.objects.create_user_with_role_name(
+        email="multi-company-list-member@test.com",
+        full_name="Multi Company List Member",
+        role_name=var_sys.JOB_SEEKER,
+        password="pass123",
+        is_active=True,
+    )
+    first_extra_user = company.user.__class__.objects.create_user_with_role_name(
+        email="first-company-extra-member@test.com",
+        full_name="First Extra Member",
+        role_name=var_sys.JOB_SEEKER,
+        password="pass123",
+        is_active=True,
+    )
+    first_role = CompanyRole.objects.create(
+        company=company,
+        code="first-member-reader",
+        name="First Member Reader",
+        permissions=["manage_members"],
+    )
+    CompanyMember.objects.create(
+        company=company,
+        user=member,
+        role=first_role,
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+    first_extra_member = CompanyMember.objects.create(
+        company=company,
+        user=first_extra_user,
+        role=first_role,
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+
+    second_owner = company.user.__class__.objects.create_user_with_role_name(
+        email="second-list-owner@test.com",
+        full_name="Second List Owner",
+        role_name=var_sys.EMPLOYER,
+        password="pass123",
+        is_active=True,
+        has_company=True,
+    )
+    second_company = Company.objects.create(
+        company_name="Second List Company",
+        company_email="second-list-company@test.com",
+        company_phone="0916000001",
+        tax_code="LIST0002",
+        user=second_owner,
+    )
+    second_extra_user = company.user.__class__.objects.create_user_with_role_name(
+        email="second-company-extra-member@test.com",
+        full_name="Second Extra Member",
+        role_name=var_sys.JOB_SEEKER,
+        password="pass123",
+        is_active=True,
+    )
+    second_role = CompanyRole.objects.create(
+        company=second_company,
+        code="second-member-reader",
+        name="Second Member Reader",
+        permissions=["manage_members"],
+    )
+    CompanyMember.objects.create(
+        company=second_company,
+        user=member,
+        role=second_role,
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+    second_extra_member = CompanyMember.objects.create(
+        company=second_company,
+        user=second_extra_user,
+        role=second_role,
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=member)
+
+    response = client.get(
+        "/api/v1/info/web/company-members/",
+        HTTP_X_ACTIVE_COMPANY_ID=str(second_company.id),
+    )
+
+    assert response.status_code == 200
+    result_ids = [item["id"] for item in response.data["results"]]
+    assert second_extra_member.id in result_ids
+    assert first_extra_member.id not in result_ids
+
+
+@pytest.mark.django_db
+def test_company_team_endpoints_reject_unowned_active_company_header(employer_user, company, location):
+    other_owner = employer_user.__class__.objects.create_user_with_role_name(
+        email="other-team-owner@test.com",
+        full_name="Other Team Owner",
+        role_name=var_sys.EMPLOYER,
+        password="testpass123",
+        is_active=True,
+        is_verify_email=True,
+        has_company=True,
+    )
+    other_company = Company.objects.create(
+        company_name="Other Team Company",
+        company_email="other-team-company@test.com",
+        company_phone="0903000001",
+        tax_code="3000000001",
+        user=other_owner,
+        location=location,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    for path in (
+        "/api/v1/info/web/company-members/",
+        "/api/v1/info/web/company-roles/",
+    ):
+        response = client.get(path, HTTP_X_ACTIVE_COMPANY_ID=str(other_company.id))
+        assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_company_job_post_detail_uses_selected_company_header(employer_user, company, career, location):
+    other_owner = employer_user.__class__.objects.create_user_with_role_name(
+        email="other-company-job-owner@test.com",
+        full_name="Other Company Job Owner",
+        role_name=var_sys.EMPLOYER,
+        password="testpass123",
+        is_active=True,
+        is_verify_email=True,
+        has_company=True,
+    )
+    other_company = Company.objects.create(
+        company_name="Other Company Job Detail",
+        company_email="other-company-job-detail@test.com",
+        company_phone="0903000002",
+        tax_code="3000000002",
+        user=other_owner,
+        location=location,
+    )
+    role = CompanyRole.objects.create(
+        company=other_company,
+        code="job-detail-reader",
+        name="Job Detail Reader",
+        permissions=["manage_job_posts"],
+    )
+    CompanyMember.objects.create(
+        company=other_company,
+        user=employer_user,
+        role=role,
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+    other_job = JobPost.objects.create(
+        job_name="Selected Company Job Detail",
+        deadline=timezone.now().date() + timedelta(days=30),
+        quantity=1,
+        job_description="<p>Selected company job</p>",
+        position=4,
+        type_of_workplace=1,
+        experience=2,
+        academic_level=2,
+        job_type=1,
+        salary_min=10000000,
+        salary_max=20000000,
+        contact_person_name="HR",
+        contact_person_phone="0901234567",
+        contact_person_email="hr@example.com",
+        status=var_sys.JobPostStatus.APPROVED,
+        user=other_owner,
+        company=other_company,
+        career=career,
+        location=location,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.get(
+        f"/api/v1/info/web/company/job-posts/{other_job.id}/",
+        HTTP_X_ACTIVE_COMPANY_ID=str(other_company.id),
+    )
+
+    assert response.status_code == 200
+    assert response.data["data"]["id"] == other_job.id
+    assert response.data["data"]["jobName"] == "Selected Company Job Detail"
+
+
+@pytest.mark.django_db
 def test_company_role_manager_cannot_grant_permissions_they_do_not_have(company):
     role_manager_user = company.user.__class__.objects.create_user_with_role_name(
         email="role-manager@test.com",
@@ -1030,6 +1365,26 @@ def test_company_role_rejects_unknown_permission_key(employer_user, company):
 
     assert response.status_code == 400
     assert not CompanyRole.objects.filter(company=company, code="invalid-permission-role").exists()
+
+
+@pytest.mark.django_db
+def test_company_role_allows_manage_employees_permission(employer_user, company):
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.post(
+        "/api/v1/info/web/company-roles/",
+        {
+            "code": "employee-manager",
+            "name": "Employee Manager",
+            "permissions": ["manage_employees"],
+        },
+        format="json",
+    )
+
+    assert response.status_code == 201
+    role = CompanyRole.objects.get(company=company, code="employee-manager")
+    assert role.permissions == ["manage_employees"]
 
 
 @pytest.mark.django_db
@@ -1102,6 +1457,63 @@ def test_company_member_manager_cannot_assign_role_with_permissions_they_do_not_
 
 
 @pytest.mark.django_db
+def test_company_member_manager_cannot_create_or_update_owner_membership(company):
+    member_manager_user = company.user.__class__.objects.create_user_with_role_name(
+        email="member-manager-owner@test.com",
+        full_name="Member Manager Owner",
+        role_name=var_sys.JOB_SEEKER,
+        password="pass123",
+        is_active=True,
+    )
+    member_manager_role = CompanyRole.objects.create(
+        company=company,
+        code="member-manager-owner",
+        name="Member Manager Owner",
+        permissions=["manage_members"],
+    )
+    CompanyMember.objects.create(
+        company=company,
+        user=member_manager_user,
+        role=member_manager_role,
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=member_manager_user)
+
+    create_response = client.post(
+        "/api/v1/info/web/company-members/",
+        {
+            "userId": company.user_id,
+            "roleId": member_manager_role.id,
+            "status": CompanyMember.STATUS_DISABLED,
+        },
+        format="json",
+    )
+
+    assert create_response.status_code == 400
+    assert not CompanyMember.objects.filter(company=company, user_id=company.user_id).exists()
+
+    owner_member = CompanyMember.objects.create(
+        company=company,
+        user_id=company.user_id,
+        role=member_manager_role,
+        status=CompanyMember.STATUS_ACTIVE,
+        is_active=True,
+    )
+    update_response = client.patch(
+        f"/api/v1/info/web/company-members/{owner_member.id}/",
+        {"status": CompanyMember.STATUS_DISABLED},
+        format="json",
+    )
+
+    assert update_response.status_code == 400
+    owner_member.refresh_from_db()
+    assert owner_member.status == CompanyMember.STATUS_ACTIVE
+
+
+@pytest.mark.django_db
 class TestCompanyVerificationAPI:
     def test_employer_can_submit_verification(self, employer_user, company):
         client = APIClient()
@@ -1131,6 +1543,66 @@ class TestCompanyVerificationAPI:
         assert data["status"] == CompanyVerification.STATUS_PENDING
         assert data["businessLicense"] == "BL-001"
         assert CompanyVerification.objects.filter(company=company).exists()
+
+    def test_employer_verification_rejects_invalid_phone_numbers(self, employer_user, company):
+        client = APIClient()
+        client.force_authenticate(user=employer_user)
+
+        scheduled_at = timezone.now() + timedelta(days=2)
+        response = client.put(
+            "/api/v1/info/web/company-verification/",
+            {
+                "companyName": "Verified Test Company",
+                "taxCode": "1234567890",
+                "businessLicense": "BL-001",
+                "representative": "HR Lead",
+                "phone": "not-a-phone",
+                "email": "verify@test.com",
+                "website": "https://example.com",
+                "scheduledAt": scheduled_at.isoformat(),
+                "contactName": "HR Lead",
+                "contactPhone": "also-not-a-phone",
+                "notes": "Please review.",
+            },
+            format="json",
+        )
+
+        assert response.status_code == 400
+        error_payload = response.data.get("error", {}).get("details", response.data.get("errors", response.data))
+        assert "phone" in error_payload
+        assert "contactPhone" in error_payload
+
+    def test_employer_verification_rejects_values_over_model_limits(self, employer_user, company):
+        client = APIClient()
+        client.force_authenticate(user=employer_user)
+
+        scheduled_at = timezone.now() + timedelta(days=2)
+        response = client.put(
+            "/api/v1/info/web/company-verification/",
+            {
+                "companyName": "a" * 256,
+                "taxCode": "1" * 31,
+                "businessLicense": "b" * 256,
+                "representative": "c" * 101,
+                "phone": "0901000000",
+                "email": f"{'e' * 64}@{'a' * 32}.com",
+                "website": "https://example.com",
+                "scheduledAt": scheduled_at.isoformat(),
+                "contactName": "d" * 101,
+                "contactPhone": "0901000000",
+                "notes": "Please review.",
+            },
+            format="json",
+        )
+
+        assert response.status_code == 400
+        error_payload = response.data.get("error", {}).get("details", response.data.get("errors", response.data))
+        assert "companyName" in error_payload
+        assert "taxCode" in error_payload
+        assert "businessLicense" in error_payload
+        assert "representative" in error_payload
+        assert "email" in error_payload
+        assert "contactName" in error_payload
 
     def test_admin_approval_marks_company_verified(self, admin_user, company):
         verification = CompanyVerification.objects.create(
@@ -1257,6 +1729,30 @@ class TestAdminCompanyAPI:
         assert not CompanyRole.objects.filter(id=role.id).exists()
         assert not CompanyMember.objects.filter(company_id=company.id).exists()
         assert employer_user.__class__.objects.filter(id=employer_user.id).exists()
+
+
+@pytest.mark.django_db
+class TestTrustReportAPI:
+    def test_user_cannot_set_trust_report_status_on_create(self, job_seeker_user, company):
+        client = APIClient()
+        client.force_authenticate(user=job_seeker_user)
+
+        response = client.post(
+            "/api/v1/info/web/trust-reports/",
+            {
+                "targetType": TrustReport.TARGET_COMPANY,
+                "company": company.id,
+                "reason": TrustReport.REASON_SCAM,
+                "message": "Suspicious company profile",
+                "status": TrustReport.STATUS_RESOLVED,
+            },
+            format="json",
+        )
+
+        assert response.status_code == 201
+        report = TrustReport.objects.get(reporter=job_seeker_user, company=company)
+        assert report.status == TrustReport.STATUS_OPEN
+        assert response.data["data"]["status"] == TrustReport.STATUS_OPEN
 
 
 @pytest.mark.django_db

@@ -104,7 +104,7 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
           className="border-amber-300 text-amber-700 hover:bg-amber-50"
         >
           <FlagIcon fontSize="small" className="mr-2" />
-          {t("jobDetail.actions.report", "Report")}
+          {t("jobDetail.actions.report")}
         </Button>
       )}
     </div>

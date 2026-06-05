@@ -66,9 +66,12 @@
       "endShort": "Kết thúc"
     },
     "chat": {
+      "messageInput": "Tin nhắn",
       "placeholder": "Nhập nội dung...",
       "sending": "Đang gửi...",
-      "send": "Gửi"
+      "send": "Gửi",
+      "sendingMessage": "Đang gửi tin nhắn",
+      "sendMessage": "Gửi tin nhắn"
     },
     "devices": {
       "select": "Chọn một {{kind}}",
@@ -89,6 +92,7 @@
     },
     "preconnect": "Trợ lý đang lắng nghe, hãy đặt câu hỏi",
     "aria": {
+      "controls": "Điều khiển trợ lý phỏng vấn",
       "toggleMicrophone": "Bật/Tắt microphone",
       "toggleCamera": "Bật/Tắt camera",
       "toggleScreenShare": "Bật/Tắt chia sẻ màn hình",
@@ -298,6 +302,8 @@
     },
     "messages": {
       "evaluationSuccess": "Lưu đánh giá thành công",
+      "scoreInvalid": "Điểm đánh giá phải nằm trong khoảng 0 đến 10.",
+      "proposedSalaryInvalid": "Lương đề xuất phải lớn hơn hoặc bằng 0.",
       "aiTriggerSuccess": "Bắt đầu đánh giá AI",
       "notFound": "Không tìm thấy phỏng vấn",
       "notFoundDesc": "Phỏng vấn bạn đang tìm không tồn tại",

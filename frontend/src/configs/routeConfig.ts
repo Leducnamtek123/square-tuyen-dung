@@ -55,6 +55,7 @@ export const SEGMENT_MAP = {
   'ho-tro': 'support',
   'blog-tuyen-dung': 'blog',
   'tin-tuyen-dung': 'job-posts',
+  'tro-ly-agent': 'agent-assistants',
   'ho-so-ung-tuyen': 'applied-profiles',
   'ho-so-da-luu': 'saved-profiles',
   'danh-sach-ung-vien': 'candidates',
@@ -95,6 +96,7 @@ export const SEGMENT_MAP = {
   'xac-thuc-cong-ty': 'company-verifications',
   'bao-cao-tin-cay': 'trust-reports',
   'nhat-ky-he-thong': 'audit-logs',
+  'tro-ly-agent-quan-tri': 'agent-assistants',
 
   // Interview (candidate)
   'phong-van': 'interview',
@@ -182,6 +184,7 @@ export const ROUTES = {
     BLOG_CREATE: 'employer/blog/create',
     BLOG_DETAIL: 'employer/blog/:id',
     DASHBOARD: 'employer/dashboard',
+    AGENT_ASSISTANTS: 'employer/agent-assistants',
     JOB_POST: 'employer/job-posts',
     APPLIED_PROFILE: 'employer/applied-profiles',
     SAVED_PROFILE: 'employer/saved-profiles',
@@ -220,6 +223,7 @@ export const ROUTES = {
   },
   ADMIN: {
     DASHBOARD: 'admin/dashboard',
+    AGENT_ASSISTANTS: 'admin/agent-assistants',
     USERS: 'admin/users',
     JOBS: 'admin/jobs',
     QUESTIONS: 'admin/questions',
@@ -311,6 +315,7 @@ export function generateRewrites(): RewriteRule[] {
     ['/nha-tuyen-dung/blog-tuyen-dung', '/employer/blog'],
     ['/nha-tuyen-dung', '/employer/dashboard'],
     ['/nha-tuyen-dung/bang-dieu-khien', '/employer/dashboard'],
+    ['/nha-tuyen-dung/tro-ly-agent', '/employer/agent-assistants'],
     ['/nha-tuyen-dung/tin-tuyen-dung', '/employer/job-posts'],
     ['/nha-tuyen-dung/ho-so-ung-tuyen', '/employer/applied-profiles'],
     ['/nha-tuyen-dung/ho-so-da-luu', '/employer/saved-profiles'],
@@ -345,6 +350,8 @@ export function generateRewrites(): RewriteRule[] {
   const adminRewrites: [string, string][] = [
     ['/admin/bang-dieu-khien', '/admin/dashboard'],
     ['/quan-tri/bang-dieu-khien', '/admin/dashboard'],
+    ['/quan-tri/tro-ly-agent', '/admin/agent-assistants'],
+    ['/quan-tri/tro-ly-agent-quan-tri', '/admin/agent-assistants'],
     ['/quan-tri/quan-ly-nguoi-dung', '/admin/users'],
     ['/quan-tri/quan-ly-tin-tuyen-dung', '/admin/jobs'],
     ['/quan-tri/kho-cau-hoi', '/admin/questions'],

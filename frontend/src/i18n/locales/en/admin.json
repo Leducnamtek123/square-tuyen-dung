@@ -92,6 +92,7 @@
   },
   "sidebar": {
     "systemOverview": "System Overview",
+    "agentAssistants": "Agent Assistants",
     "systemAndUsers": "System & Users",
     "usersAndPermissions": "Users & Permissions",
     "systemConfiguration": "System Configuration",
@@ -123,7 +124,13 @@
       "squareHrmAdmin": "Open Square HRM"
   },
   "aiHealth": {
-    "title": "AI services"
+    "title": "AI services",
+    "status": {
+      "online": "Online",
+      "offline": "Offline",
+      "notConfigured": "Not configured",
+      "checking": "Checking..."
+    }
   },
   "pages": {
     "careers": {
@@ -169,6 +176,14 @@
       "form": {
         "name": "Career Name"
       },
+      "toast": {
+        "addSuccess": "Career added successfully",
+        "addError": "Could not add career",
+        "updateSuccess": "Career updated successfully",
+        "updateError": "Could not update career",
+        "deleteSuccess": "Career deleted successfully",
+        "deleteError": "Could not delete career"
+      },
       "cancel": "Cancel",
       "deleteConfirm": "Are you sure you want to delete this career?"
     },
@@ -209,6 +224,14 @@
       "form": {
         "name": "Name",
         "code": "Code"
+      },
+      "toast": {
+        "addSuccess": "City added successfully",
+        "addError": "Could not add city",
+        "updateSuccess": "City updated successfully",
+        "updateError": "Could not update city",
+        "deleteSuccess": "City deleted successfully",
+        "deleteError": "Could not delete city"
       },
       "cancel": "Cancel",
       "deleteConfirm": "Are you sure you want to delete?"
@@ -256,6 +279,14 @@
         "city": "City",
         "name": "Name",
         "code": "Code"
+      },
+      "toast": {
+        "addSuccess": "District added successfully",
+        "addError": "Could not add district",
+        "updateSuccess": "District updated successfully",
+        "updateError": "Could not update district",
+        "deleteSuccess": "District deleted successfully",
+        "deleteError": "Could not delete district"
       },
       "cancel": "Cancel",
       "deleteConfirm": "Are you sure you want to delete?"
@@ -319,6 +350,14 @@
       "cancel": "Cancel",
       "deleteConfirm": "Delete this ward?"
     },
+    "locationValidation": {
+      "nameRequired": "Name is required",
+      "nameMax": "Name must be at most 255 characters",
+      "codeRequired": "Code is required",
+      "codeMax": "Code must be at most 20 characters",
+      "parentRequired": "Please choose a parent location",
+      "parentInvalid": "Please choose a valid parent location"
+    },
     "companies": {
       "addCompany": "Add Company",
       "searchPlaceholder": "Search companies...",
@@ -366,9 +405,23 @@
         "address": "Address",
         "latitude": "Latitude",
         "longitude": "Longitude"
+      },
+      "toast": {
+        "addSuccess": "Company added successfully",
+        "addError": "Could not add company",
+        "updateSuccess": "Company updated successfully",
+        "updateError": "Could not update company",
+        "deleteSuccess": "Company deleted successfully",
+        "deleteError": "Could not delete company"
       }
     },
     "jobActivity": {
+      "toast": {
+        "updateSuccess": "Application activity updated",
+        "updateError": "Could not update application activity",
+        "deleteSuccess": "Application activity deleted",
+        "deleteError": "Could not delete application activity"
+      },
       "title": "Job Post Activity Log",
       "breadcrumbAdmin": "Admin",
       "breadcrumbJobs": "Jobs & Interviews",
@@ -405,6 +458,16 @@
       }
     },
     "jobs": {
+      "toast": {
+        "updateSuccess": "Job post updated successfully",
+        "updateError": "Could not update job post",
+        "approveSuccess": "Job post approved",
+        "approveError": "Could not approve job post",
+        "rejectSuccess": "Job post rejected",
+        "rejectError": "Could not reject job post",
+        "deleteSuccess": "Job post deleted",
+        "deleteError": "Could not delete job post"
+      },
       "title": "Job Post List",
       "total": "total",
       "showing": "Showing",
@@ -482,6 +545,14 @@
       "deleteTitle": "Delete Job Post"
     },
     "profiles": {
+      "toast": {
+        "addSuccess": "Candidate profile added successfully",
+        "addError": "Could not add candidate profile",
+        "updateSuccess": "Profile updated",
+        "updateError": "Could not update profile",
+        "deleteSuccess": "Profile deleted",
+        "deleteError": "Could not delete profile"
+      },
       "addCandidate": "Add Candidate",
       "searchPlaceholder": "Search candidates...",
       "filter": {
@@ -585,6 +656,14 @@
       "deleteConfirm": "Delete this group?"
     },
     "resumes": {
+      "toast": {
+        "addSuccess": "Resume added successfully",
+        "addError": "Could not add resume",
+        "updateSuccess": "Resume updated successfully",
+        "updateError": "Could not update resume",
+        "deleteSuccess": "Resume deleted successfully",
+        "deleteError": "Could not delete resume"
+      },
       "searchPlaceholder": "Search resumes...",
       "filter": {
         "title": "Resume filters"
@@ -664,11 +743,14 @@
         "timeLabel": "Interview Time",
         "questionsLabel": "Select questions",
         "questionsPlaceholder": "Search questions...",
+        "questionFallback": "Question #{{id}}",
         "notesLabel": "Notes",
         "notesPlaceholder": "Additional notes about the interview...",
         "cancelBtn": "Cancel",
         "submitBtn": "Schedule Interview",
-        "schedulingBtn": "Scheduling..."
+        "schedulingBtn": "Scheduling...",
+        "success": "Interview scheduled successfully.",
+        "error": "Could not schedule interview."
       },
       "roles": {
         "admin": "Administrator",
@@ -852,6 +934,14 @@
       }
     },
     "jobNotifications": {
+      "toast": {
+        "createSuccess": "Notification created successfully",
+        "createError": "Could not create notification",
+        "updateSuccess": "Notification updated successfully",
+        "updateError": "Could not update notification",
+        "deleteSuccess": "Notification deleted successfully",
+        "deleteError": "Could not delete notification"
+      },
       "title": "Job Notifications",
       "breadcrumbAdmin": "Admin",
       "breadcrumbJobsInterviews": "Jobs & Interviews",
@@ -897,6 +987,15 @@
         "careerId": "Field / Career",
         "cityId": "City",
         "isActive": "Active"
+      },
+      "validation": {
+        "jobNameRequired": "Title is required",
+        "jobNameMax": "Title must be at most 255 characters",
+        "numberInteger": "Enter a whole number",
+        "salaryMin": "Salary cannot be negative",
+        "frequencyInvalid": "Choose a valid notification frequency",
+        "idInvalid": "Enter a positive ID or leave this field empty",
+        "choiceInvalid": "Choose a valid option"
       },
       "cancel": "Cancel",
       "deleteTitle": "Delete Notification",
@@ -1005,12 +1104,38 @@
         "database": "Database",
         "redis": "Redis"
       },
+      "fptGpu": {
+        "title": "FPT GPU Container",
+        "controlEnabled": "Control enabled",
+        "readOnly": "Read only",
+        "notConfigured": "Add FPT_GPU_BSS_ACCESS_TOKEN or FPT_GPU_ACCESS_TOKEN on the backend to enable Start and Stop.",
+        "tenant": "Tenant",
+        "runningCost": "Running cost",
+        "stoppedDiskCost": "Stopped disk cost",
+        "start": "Start",
+        "stop": "Stop",
+        "refresh": "Refresh",
+        "openConsole": "Open FPT",
+        "toast": {
+          "startSuccess": "FPT GPU start requested.",
+          "stopSuccess": "FPT GPU stop requested.",
+          "actionError": "FPT GPU action failed."
+        }
+      },
       "toast": {
         "saveSuccess": "Settings saved successfully",
         "saveError": "Error saving settings"
       }
     },
     "banners": {
+      "toast": {
+        "addSuccess": "Banner added successfully",
+        "addError": "Could not add banner",
+        "updateSuccess": "Banner updated successfully",
+        "updateError": "Could not update banner",
+        "deleteSuccess": "Banner deleted successfully",
+        "deleteError": "Could not delete banner"
+      },
       "title": "Banner Management",
       "breadcrumbAdmin": "Admin",
       "breadcrumb": "Banners",
@@ -1027,6 +1152,9 @@
       "saving": "Saving...",
       "delete": "Delete",
       "deleting": "Deleting...",
+      "validation": {
+        "buttonLinkInvalid": "Button link must be a valid http or https URL."
+      },
       "table": {
         "id": "ID",
         "webImage": "Web Image",
@@ -1072,12 +1200,234 @@
         }
       }
     },
+    "articles": {
+      "title": "News & Blog",
+      "subtitle": "Manage news articles and recruitment blog posts",
+      "newArticle": "New article",
+      "filter": {
+        "title": "Article filters",
+        "searchPlaceholder": "Search articles...",
+        "status": "Status"
+      },
+      "table": {
+        "title": "Title",
+        "category": "Category",
+        "status": "Status",
+        "author": "Author",
+        "publishedAt": "Published at",
+        "viewCount": "Views",
+        "actions": "Actions"
+      },
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "search": "Search",
+        "clearFilters": "Clear filters",
+        "advancedFilters": "Advanced filters",
+        "saveDraft": "Save draft",
+        "publish": "Publish",
+        "saving": "Saving...",
+        "changeImage": "Change image",
+        "chooseImage": "Choose thumbnail",
+        "addTag": "Add"
+      },
+      "categories": {
+        "all": "All",
+        "news": "News",
+        "blog": "Recruitment blog"
+      },
+      "statuses": {
+        "all": "All",
+        "draft": "Draft",
+        "pending": "Pending review",
+        "published": "Published",
+        "archived": "Archived"
+      },
+      "form": {
+        "createTitle": "Write new article",
+        "editTitle": "Edit article",
+        "titleLabel": "Article title",
+        "titlePlaceholder": "Enter an engaging title...",
+        "excerptLabel": "Short excerpt",
+        "excerptPlaceholder": "Summarize the article for the list view...",
+        "contentTitle": "ARTICLE CONTENT",
+        "publishSettings": "PUBLISH SETTINGS",
+        "categoryLabel": "Category",
+        "statusLabel": "Status",
+        "thumbnailTitle": "THUMBNAIL",
+        "thumbnailAria": "Article thumbnail",
+        "thumbnailAlt": "Article thumbnail preview",
+        "tagsTitle": "TAGS",
+        "tagPlaceholder": "Enter tag..."
+      },
+      "validation": {
+        "titleRequired": "Please enter a title.",
+        "contentRequired": "Please enter article content."
+      },
+      "messages": {
+        "loadError": "Could not load article list.",
+        "deleteConfirm": "Delete \"{{title}}\"?",
+        "deleteSuccess": "Article deleted.",
+        "deleteError": "Could not delete article.",
+        "formLoadError": "Could not load article.",
+        "createSuccess": "Article created successfully.",
+        "updateSuccess": "Article saved successfully.",
+        "saveError": "Could not save article."
+      }
+    },
+    "voiceProfiles": {
+      "title": "Voice Profiles",
+      "breadcrumbAdmin": "Admin",
+      "newVoice": "New Voice",
+      "loadError": "Could not load voice profiles.",
+      "table": {
+        "name": "Name",
+        "type": "Type",
+        "status": "Status",
+        "samples": "Samples",
+        "grants": "Grants",
+        "actions": "Actions",
+        "empty": "No voice profiles yet."
+      },
+      "actions": {
+        "edit": "Edit",
+        "sample": "Sample",
+        "grant": "Grant",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "create": "Create",
+        "createAndUpload": "Create & Upload",
+        "save": "Save",
+        "close": "Close",
+        "generateAndPlay": "Generate & Play",
+        "upload": "Upload"
+      },
+      "dialogs": {
+        "createTitle": "New Voice Profile",
+        "editTitle": "Edit Voice Profile",
+        "deleteTitle": "Delete Voice Profile",
+        "testTitle": "Test Voice",
+        "sampleTitle": "Upload Voice Sample",
+        "grantTitle": "Grant Voice Access"
+      },
+      "fields": {
+        "name": "Name",
+        "description": "Description",
+        "type": "Type",
+        "language": "Language",
+        "presetVoiceId": "Preset voice ID",
+        "status": "Status",
+        "exactTranscript": "Exact transcript",
+        "testSentence": "Test sentence",
+        "grantTo": "Grant to",
+        "company": "Company",
+        "jobPost": "Job post"
+      },
+      "voiceTypes": {
+        "cloned": "Cloned",
+        "preset": "Preset"
+      },
+      "statuses": {
+        "draft": "Draft",
+        "processing": "Processing",
+        "ready": "Ready",
+        "disabled": "Disabled",
+        "failed": "Failed"
+      },
+      "grantTargets": {
+        "company": "Company",
+        "job": "Job post"
+      },
+      "messages": {
+        "cloneHint": "Upload a clean mp3/wav sample and paste the exact transcript for cloning.",
+        "sampleHint": "Use 10-30 seconds of clean speech and paste the exact transcript.",
+        "permissionConfirm": "I confirm we have permission to clone and use this voice.",
+        "deleteConfirm": "Delete \"{{name}}\"? This also removes its samples and grants.",
+        "defaultVoice": "Use as default voice for this target",
+        "chooseAudio": "Choose mp3/wav",
+        "createSampleAria": "Create voice sample",
+        "uploadSampleAria": "Upload voice sample",
+        "generatedPreviewAria": "Generated voice preview",
+        "testActionAria": "Test {{name}}",
+        "defaultTestSentence": "Hello, this is Square's AI interview voice."
+      },
+      "validation": {
+        "cloneSampleRequired": "Audio file and exact transcript are required for cloned voices.",
+        "voiceNotReady": "Voice must be ready before testing.",
+        "testSentenceRequired": "Enter a sentence to test this voice.",
+        "sampleRequired": "Audio file and transcript are required.",
+        "companyRequired": "Select a company.",
+        "jobRequired": "Select a job post."
+      },
+      "toast": {
+        "createWithSampleSuccess": "Voice profile and sample created.",
+        "createSuccess": "Voice profile created.",
+        "createError": "Could not create voice profile.",
+        "updateSuccess": "Voice profile updated.",
+        "updateError": "Could not update voice profile.",
+        "deleteSuccess": "Voice profile deleted.",
+        "deleteError": "Could not delete voice profile.",
+        "previewError": "Could not generate voice preview.",
+        "sampleSuccess": "Voice sample uploaded.",
+        "sampleError": "Could not upload voice sample.",
+        "grantSuccess": "Voice access granted.",
+        "grantError": "Could not grant voice access."
+      }
+    },
     "bannerTypes": {
+      "title": "Banner Type Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbList": "Banner Types",
+      "addButton": "Add Banner Type",
+      "addTitle": "Add Banner Type",
+      "editTitle": "Edit Banner Type",
+      "deleteTitle": "Delete Banner Type",
+      "deleteConfirm": "Are you sure you want to delete banner type {{name}}?",
+      "searchPlaceholder": "Search banner types...",
       "filter": {
         "title": "Banner type filters"
+      },
+      "toast": {
+        "addSuccess": "Banner type added successfully",
+        "addError": "Could not add banner type",
+        "updateSuccess": "Banner type updated successfully",
+        "updateError": "Could not update banner type",
+        "deleteSuccess": "Banner type deleted successfully",
+        "deleteError": "Could not delete banner type"
+      },
+      "table": {
+        "id": "ID",
+        "code": "Code",
+        "name": "Name",
+        "value": "Value",
+        "webAspectRatio": "Web Aspect Ratio",
+        "status": "Status"
+      },
+      "fields": {
+        "code": "Code",
+        "name": "Name",
+        "value": "Value",
+        "webAspectRatio": "Web Aspect Ratio",
+        "mobileAspectRatio": "Mobile Aspect Ratio",
+        "isActive": "Active"
+      },
+      "validation": {
+        "codeRequired": "Code is required",
+        "codeMax": "Code must be at most 50 characters",
+        "nameRequired": "Name is required",
+        "nameMax": "Name must be at most 100 characters",
+        "valueInteger": "Value must be a whole number",
+        "valuePositive": "Value must be greater than 0",
+        "aspectRatioMax": "Aspect ratio must be at most 20 characters"
       }
     },
     "feedbacks": {
+      "toast": {
+        "updateSuccess": "Feedback updated successfully",
+        "updateError": "Could not update feedback",
+        "deleteSuccess": "Feedback deleted successfully",
+        "deleteError": "Could not delete feedback"
+      },
       "title": "Feedback Management",
       "breadcrumbAdmin": "Admin",
       "breadcrumb": "Feedbacks",

@@ -2,7 +2,17 @@ import { getJobPostSchema } from '../JobPostSchema';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-const t = (_key: string, defaultValue?: string) => defaultValue || _key;
+const t = (key: string, defaultValue?: string) => {
+  const translations: Record<string, string> = {
+    'jobPostForm.validation.jobnameexceededallowedlength': 'Job name exceeded allowed length.',
+    'jobPostForm.validation.minSalaryLess': 'Minimum salary must be less than or equal to maximum salary.',
+    'jobPostForm.validation.maxSalaryGreater': 'Maximum salary must be greater than or equal to minimum salary.',
+    'jobPostForm.validation.salaryTooLarge': 'Salary exceeds the allowed limit.',
+    'jobPostForm.validation.deadlinemustbeaftertoday': 'Deadline cannot be in the past.',
+  };
+
+  return translations[key] || defaultValue || key;
+};
 
 describe('getJobPostSchema', () => {
   afterEach(() => {
@@ -48,6 +58,49 @@ describe('getJobPostSchema', () => {
     );
     await expect(schema.validateAt('salaryMax', values)).rejects.toThrow(
       'Maximum salary must be greater than or equal to minimum salary.',
+    );
+  });
+
+  it('rejects salaries above the backend integer limit', async () => {
+    const schema = getJobPostSchema(t as never);
+    const tooLargeSalary = 2_147_483_648;
+
+    await expect(schema.validateAt('salaryMin', { salaryMin: tooLargeSalary })).rejects.toThrow(
+      'Salary exceeds the allowed limit.',
+    );
+    await expect(schema.validateAt('salaryMax', { salaryMax: tooLargeSalary })).rejects.toThrow(
+      'Salary exceeds the allowed limit.',
+    );
+  });
+
+  it('rejects choice values outside the backend option sets', async () => {
+    const schema = getJobPostSchema(t as never);
+    const values = {
+      position: 999,
+      experience: 999,
+      academicLevel: 999,
+      typeOfWorkplace: 999,
+      jobType: 999,
+      genderRequired: 'X',
+    };
+
+    await expect(schema.validateAt('position', values)).rejects.toThrow(
+      'jobPostForm.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('experience', values)).rejects.toThrow(
+      'jobPostForm.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('academicLevel', values)).rejects.toThrow(
+      'jobPostForm.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('typeOfWorkplace', values)).rejects.toThrow(
+      'jobPostForm.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('jobType', values)).rejects.toThrow(
+      'jobPostForm.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('genderRequired', values)).rejects.toThrow(
+      'jobPostForm.validation.choiceInvalid',
     );
   });
 
@@ -109,5 +162,24 @@ describe('getJobPostSchema', () => {
       lat: null,
       lng: null,
     });
+  });
+
+  it('does not hard-code English validation fallback messages', () => {
+    const tSpy = jest.fn((key: string) => key);
+
+    getJobPostSchema(tSpy as never);
+
+    const callsWithStringFallback = tSpy.mock.calls.filter(([, defaultValue]) => typeof defaultValue === 'string');
+    expect(callsWithStringFallback).toEqual([]);
+  });
+
+  it('does not hard-code fallback labels or placeholders in job post form fields', () => {
+    const fieldsSource = readFileSync(
+      join(__dirname, '../JobPostFormFields.tsx'),
+      'utf8',
+    );
+
+    expect(fieldsSource).not.toMatch(/t\('jobPostForm\.[^']+'\s*,\s*['"]/);
+    expect(fieldsSource).not.toContain('defaultValue');
   });
 });

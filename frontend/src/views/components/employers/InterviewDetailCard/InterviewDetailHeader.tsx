@@ -70,7 +70,6 @@ const InterviewDetailHeader = ({
 }: Props) => {
   const normalizedStatus = effectiveStatus ?? undefined;
   const themeStatus = getStatusColor(normalizedStatus);
-  const statusDefaultValue = effectiveStatus ? effectiveStatus.replaceAll('_', ' ').toUpperCase() : '';
   const statusTranslationKey = effectiveStatus ? `interview:interviewListCard.statuses.${effectiveStatus}` : undefined;
   const isInterrupted = normalizedStatus === 'interrupted';
   const chipColors = statusChipColors[themeStatus] ?? statusChipColors.default;
@@ -129,7 +128,7 @@ const InterviewDetailHeader = ({
         <Box sx={{ minWidth: 0 }}>
           <Stack direction="row" alignItems="center" spacing={1.25} sx={{ mb: 1.25, flexWrap: 'wrap' }}>
             <Chip
-              label={statusTranslationKey ? t(statusTranslationKey, { defaultValue: statusDefaultValue }) : statusDefaultValue}
+              label={statusTranslationKey ? t(statusTranslationKey) : ''}
               size="small"
               sx={{
                 height: 26,
@@ -147,7 +146,7 @@ const InterviewDetailHeader = ({
             />
             {isInterrupted && (
               <Chip
-                label={t('interview:interviewDetail.status.interruptedResume', { defaultValue: 'Interrupted, can resume' })}
+                label={t('interview:interviewDetail.status.interruptedResume')}
                 size="small"
                 sx={{
                   height: 26,
@@ -217,9 +216,7 @@ const InterviewDetailHeader = ({
 
           {isInterrupted && (
             <Typography variant="body2" sx={{ mt: 1.5, color: 'warning.main', fontWeight: 650 }}>
-              {t('interview:interviewDetail.messages.interruptedResumeHint', {
-                defaultValue: 'The interview was interrupted. The candidate may return shortly to continue.',
-              })}
+              {t('interview:interviewDetail.messages.interruptedResumeHint')}
             </Typography>
           )}
         </Box>
@@ -249,7 +246,7 @@ const InterviewDetailHeader = ({
           )}
 
           {canObserve && (
-            <Tooltip title={t('interview:interviewDetail.tooltips.observeHidden', { defaultValue: 'Observe silently' })} arrow placement="top">
+            <Tooltip title={t('interview:interviewDetail.tooltips.observeHidden')} arrow placement="top">
               <Button
                 variant="outlined"
                 onClick={onTriggerObserver}

@@ -95,7 +95,7 @@ const InterviewCreateCardQuestionSection = ({
           title={t('interview:interviewCreateCard.title.scheduledtime')}
           showRequired
           minDateTime={minDateTime}
-          rules={{ required: t('interview:interviewCreateCard.validation.selectScheduleTime', 'Please select interview time') }}
+          rules={{ required: t('interview:interviewCreateCard.validation.selectScheduleTime') }}
         />
       </Grid>
 

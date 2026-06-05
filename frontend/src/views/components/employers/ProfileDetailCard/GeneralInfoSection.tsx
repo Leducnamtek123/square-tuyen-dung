@@ -11,7 +11,7 @@ import SalaryIcon from '@mui/icons-material/MonetizationOn';
 import BuildingIcon from '@mui/icons-material/Business';
 import WorkerIcon from '@mui/icons-material/Engineering';
 import { tConfig } from '../../../../utils/tConfig';
-import { salaryString } from '../../../../utils/customData';
+import { formatLocalizedSalaryRange } from '../../../../utils/customData';
 import InfoItem from './InfoItem';
 import { useConfig } from '@/hooks/useConfig';
 import { JobSeekerProfile } from '../../../../types/models';
@@ -48,7 +48,7 @@ const resolveConfigText = (dict: ConfigDict | undefined, value: ConfigValue): st
 };
 
 const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }) => {
-    const { t } = useTranslation(['employer', 'common']);
+    const { t, i18n } = useTranslation(['employer', 'common']);
     const { allConfig } = useConfig();
 
     return (
@@ -118,7 +118,7 @@ const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.desiredSalary')}
-                        value={salaryString(profileDetail?.salaryMin as number, profileDetail?.salaryMax as number)}
+                        value={formatLocalizedSalaryRange(profileDetail?.salaryMin, profileDetail?.salaryMax, i18n.language)}
                         icon={<SalaryIcon />}
                     />
                 </Grid>

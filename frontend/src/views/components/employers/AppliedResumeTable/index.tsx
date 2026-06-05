@@ -194,7 +194,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
           <Tooltip
             title={!isOnline && cvFileUrl ? (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <span>{t('appliedResume.table.clickToDownload', { defaultValue: 'Nhấp để tải xuống' })}</span>
+                <span>{t('appliedResume.table.clickToDownload')}</span>
                 <DownloadIcon sx={{ fontSize: 13 }} />
               </Box>
             ) : ''}
@@ -289,7 +289,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
           )}
 
           {!blindMode && info.row.original.hrmEmployeeId ? (
-            <Tooltip title={t('employees.hrm.convert.openEmployee', { defaultValue: 'Open HRM employee profile' })} arrow>
+            <Tooltip title={t('employees.hrm.convert.openEmployee')} arrow>
               <IconButton
                 size="small"
                 color="primary"

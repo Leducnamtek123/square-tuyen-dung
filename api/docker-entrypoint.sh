@@ -26,11 +26,11 @@ else
 fi
 
 if [ "${SYNC_OAUTH_CLIENT:-1}" = "1" ]; then
-  if [ -n "${CLIENT_ID:-}" ] && [ -n "${CLIENT_SECRET:-}" ]; then
+  if [ -n "${CLIENT_ID:-}" ]; then
     echo "Syncing OAuth client from environment..."
     python manage.py sync_oauth_client
   else
-    echo "Skipping OAuth client sync because CLIENT_ID or CLIENT_SECRET is missing."
+    echo "Skipping OAuth client sync because CLIENT_ID is missing."
   fi
 else
   echo "SYNC_OAUTH_CLIENT disabled. Skipping OAuth client sync."

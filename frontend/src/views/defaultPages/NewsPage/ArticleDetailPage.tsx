@@ -43,10 +43,6 @@ const formatDate = (value?: string | null) => {
   return date.isValid() ? date.format('DD/MM/YYYY') : '';
 };
 
-const getCategoryLabel = (category?: Article['category']) => (
-  category === 'news' ? 'Tin tức' : 'Blog tuyển dụng'
-);
-
 const ArticleDetailSkeleton = () => (
   <Stack spacing={3}>
     <Skeleton variant="rectangular" height={360} sx={{ borderRadius: 3 }} />
@@ -106,6 +102,18 @@ const ArticleDetailPage = () => {
   const [state, dispatch] = React.useReducer(articleDetailReducer, initialArticleDetailState);
   const { article, isLoading } = state;
 
+  const categoryLabels = React.useMemo<Record<Article['category'], string>>(() => ({
+    news: t('news.category.news', { ns: 'public' }),
+    blog: t('news.category.blog', { ns: 'public' }),
+  }), [t]);
+
+  const getCategoryLabel = React.useCallback(
+    (category?: Article['category']) => (
+      category === 'news' ? categoryLabels.news : categoryLabels.blog
+    ),
+    [categoryLabels]
+  );
+
   React.useEffect(() => {
     let active = true;
 
@@ -152,7 +160,7 @@ const ArticleDetailPage = () => {
             type: 'BreadcrumbList' as const,
             items: [
               { name: t('seo.articleDetail.breadcrumb.home', { ns: 'public' }), url: typeof window !== 'undefined' ? window.location.origin : '' },
-              { name: 'Tin tức & Blog tuyển dụng', url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}` },
+              { name: t('seo.newsList.title', { ns: 'public' }), url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}` },
               { name: article.title, url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}/${slug}` },
             ],
           },
@@ -168,9 +176,9 @@ const ArticleDetailPage = () => {
     return (
       <Box sx={{ py: 4 }}>
         <NoDataCard
-          title="Không tìm thấy bài viết"
-          content="Bài viết có thể đã bị xoá hoặc đường dẫn đã thay đổi."
-          buttonText="Quay lại tin tức"
+          title={t('news.article.notFoundTitle', { ns: 'public' })}
+          content={t('news.article.notFoundContent', { ns: 'public' })}
+          buttonText={t('news.article.backToNews', { ns: 'public' })}
           onClick={() => push(`/${ROUTES.JOB_SEEKER.NEWS}`)}
         />
       </Box>
@@ -188,7 +196,7 @@ const ArticleDetailPage = () => {
         startIcon={<ArrowBackIcon />}
         sx={{ mb: 3 }}
       >
-        Quay về danh sách
+        {t('news.article.backToList', { ns: 'public' })}
       </Button>
 
       <Grid container spacing={3}>
@@ -234,7 +242,7 @@ const ArticleDetailPage = () => {
                   )}
                   <Stack direction="row" spacing={0.5} alignItems="center">
                     <VisibilityIcon sx={{ fontSize: 16 }} />
-                    <Typography variant="body2">{article.viewCount || 0} lượt xem</Typography>
+                    <Typography variant="body2">{t('news.views', { count: article.viewCount || 0, ns: 'public' })}</Typography>
                   </Stack>
                   {article.authorName && (
                     <Stack direction="row" spacing={0.5} alignItems="center">
@@ -252,7 +260,7 @@ const ArticleDetailPage = () => {
                   <HtmlContent
                     className="prose prose-slate max-w-none prose-headings:font-semibold prose-img:rounded-xl prose-img:shadow-md"
                     html={safeContent}
-                    emptyFallback={<Typography color="text.secondary">Nội dung đang được cập nhật.</Typography>}
+                    emptyFallback={<Typography color="text.secondary">{t('news.article.emptyContent', { ns: 'public' })}</Typography>}
                   />
                 </Box>
               </Stack>
@@ -269,7 +277,7 @@ const ArticleDetailPage = () => {
               <CardContent>
                 <Stack spacing={1.5}>
                   <Typography variant="h6" fontWeight={700}>
-                    Thông tin bài viết
+                    {t('news.article.infoTitle', { ns: 'public' })}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {article.excerpt || description}
@@ -291,17 +299,17 @@ const ArticleDetailPage = () => {
               <CardContent>
                 <Stack spacing={1.5}>
                   <Typography variant="h6" fontWeight={700}>
-                    Khám phá thêm
+                    {t('news.article.moreTitle', { ns: 'public' })}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Mở rộng góc nhìn với danh sách bài viết public dành cho ứng viên và nhà tuyển dụng.
+                    {t('news.article.moreDescription', { ns: 'public' })}
                   </Typography>
                   <Button
                     component={Link}
                     href={`/${ROUTES.JOB_SEEKER.NEWS}`}
                     variant="contained"
                   >
-                    Về trang tin tức
+                    {t('news.article.newsHomeCta', { ns: 'public' })}
                   </Button>
                 </Stack>
               </CardContent>

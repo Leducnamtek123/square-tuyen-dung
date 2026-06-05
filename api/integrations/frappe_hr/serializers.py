@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 
 
@@ -30,3 +31,12 @@ class FrappeEmployeeFromApplicationSerializer(serializers.Serializer):
         if "hrmRoles" in data and "frappeRoles" not in data:
             data["frappeRoles"] = data["hrmRoles"]
         return super().to_internal_value(data)
+
+    def validate_frappeRoles(self, value):
+        allowed_roles = set(settings.FRAPPE_HR_EMPLOYEE_ROLES or [])
+        invalid_roles = [role for role in value if role not in allowed_roles]
+        if invalid_roles:
+            raise serializers.ValidationError(
+                f"Unsupported Frappe HR employee roles: {', '.join(invalid_roles)}"
+            )
+        return list(dict.fromkeys(value))

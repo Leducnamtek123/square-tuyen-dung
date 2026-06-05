@@ -1,9 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useForm } from 'react-hook-form';
 import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from 'yup';
-import { Grid2 as Grid, Box, Paper, alpha, useTheme } from '@mui/material';
+import { Grid2 as Grid, Box, Paper } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import FormPopup from '../../../../components/Common/Controls/FormPopup';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
@@ -40,6 +41,27 @@ const EMPTY_VALUES: SendMailFormData = {
   isSendMe: false,
 };
 
+export const createSendMailSchema = (t: TFunction) => yup.object().shape({
+  email: yup
+    .string()
+    .required(t('sendMailCard.validation.emailRequired'))
+    .email(t('sendMailCard.validation.emailInvalid'))
+    .max(100, t('sendMailCard.validation.emailMax')),
+  fullName: yup
+    .string()
+    .required(t('sendMailCard.validation.recipientNameRequired'))
+    .max(100, t('sendMailCard.validation.recipientNameMax')),
+  title: yup
+    .string()
+    .required(t('sendMailCard.validation.subjectRequired'))
+    .max(200, t('sendMailCard.validation.subjectMax')),
+  content: yup.mixed<ReturnType<typeof createEditorStateFromHTMLString>>().test('content', t('sendMailCard.validation.contentRequired'), (value) => {
+    if (!value) return false;
+    return value.getCurrentContent().hasText();
+  }),
+  isSendMe: yup.boolean().default(false),
+});
+
 const SendMailCardContent = ({
   openPopup,
   setOpenPopup,
@@ -47,18 +69,7 @@ const SendMailCardContent = ({
   handleSendEmail,
 }: SendMailCardProps) => {
   const { t } = useTranslation('employer');
-  const theme = useTheme();
-
-  const schema = yup.object().shape({
-    email: yup.string().required('Recipient email is required.').email('Invalid recipient email.').max(100, 'Recipient email length exceeded.'),
-    fullName: yup.string().required('Recipient name is required.').max(100, 'Recipient name length exceeded.'),
-    title: yup.string().required('Email subject is required.').max(200, 'Email subject length exceeded.'),
-    content: yup.mixed<ReturnType<typeof createEditorStateFromHTMLString>>().test('content', 'Email content is required.', (value) => {
-      if (!value) return false;
-      return value.getCurrentContent().hasText();
-    }),
-    isSendMe: yup.boolean().default(false),
-  });
+  const schema = React.useMemo(() => createSendMailSchema(t), [t]);
 
   const initialValues = React.useMemo(
     () => ({
@@ -84,10 +95,10 @@ const SendMailCardContent = ({
 
   return (
     <FormPopup
-      title={t('sendMailCard.title.sendmail', 'Send Email to Candidate')}
+      title={t('sendMailCard.title.sendmail')}
       openPopup={openPopup}
       setOpenPopup={setOpenPopup}
-      buttonText="Send Email"
+      buttonText={t('sendMailCard.actions.send')}
       buttonIcon={<SendIcon />}
     >
       <form id="modal-form" onSubmit={handleSubmit(handleSendEmail)}>
@@ -95,9 +106,9 @@ const SendMailCardContent = ({
           <Grid size={12}>
             <TextFieldCustom
               name="fullName"
-              title={t('sendMailCard.title.recipientname', 'Recipient Name')}
+              title={t('sendMailCard.title.recipientname')}
               showRequired={true}
-              placeholder={t('sendMailCard.placeholder.enterrecipientname', 'Enter recipient name')}
+              placeholder={t('sendMailCard.placeholder.enterrecipientname')}
               control={control}
               disabled={true}
               sx={inputSx}
@@ -106,9 +117,9 @@ const SendMailCardContent = ({
           <Grid size={12}>
             <TextFieldCustom
               name="email"
-              title={t('sendMailCard.title.recipientemail', 'Recipient Email')}
+              title={t('sendMailCard.title.recipientemail')}
               showRequired={true}
-              placeholder={t('sendMailCard.placeholder.enterrecipientemail', 'Enter recipient email')}
+              placeholder={t('sendMailCard.placeholder.enterrecipientemail')}
               control={control}
               disabled={true}
               sx={inputSx}
@@ -117,16 +128,16 @@ const SendMailCardContent = ({
           <Grid size={12}>
             <TextFieldCustom
               name="title"
-              title={t('sendMailCard.title.subject', 'Email Subject')}
+              title={t('sendMailCard.title.subject')}
               showRequired={true}
-              placeholder={t('sendMailCard.placeholder.enteremailsubject', 'Enter email subject')}
+              placeholder={t('sendMailCard.placeholder.enteremailsubject')}
               control={control}
               sx={inputSx}
             />
           </Grid>
           <Grid size={12}>
             <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.neutral' }}>
-              <RichTextEditorCustom name="content" control={control} title={t('sendMailCard.title.emailcontent', 'Email Content')} showRequired={true} />
+              <RichTextEditorCustom name="content" control={control} title={t('sendMailCard.title.emailcontent')} showRequired={true} />
             </Paper>
           </Grid>
           <Grid size={12}>
@@ -142,7 +153,7 @@ const SendMailCardContent = ({
               <CheckboxCustom
                 name="isSendMe"
                 control={control}
-                title={t('sendMailCard.title.sendacopytomyemployeremailaddress', 'Send a copy to my employer email address.')}
+                title={t('sendMailCard.title.sendacopytomyemployeremailaddress')}
               />
             </Box>
           </Grid>

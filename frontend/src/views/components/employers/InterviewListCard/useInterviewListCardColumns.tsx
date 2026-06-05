@@ -101,9 +101,7 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
           const statusColor = getStatusColor(status);
           return (
             <Chip
-              label={t(`interview:interviewListCard.statuses.${status}`, {
-                defaultValue: status?.replaceAll('_', ' ')?.toUpperCase() || '---',
-              })}
+              label={status ? t(`interview:interviewListCard.statuses.${status}`) : '---'}
               size="small"
               sx={{
                 fontWeight: 900,

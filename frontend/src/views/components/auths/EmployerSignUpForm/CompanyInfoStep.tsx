@@ -172,8 +172,8 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             options={districtOptions}
             name="company.location.district"
             control={control}
-            title={t('form.district', 'Ward/Commune')}
-            placeholder={t('form.districtPlaceholder', 'Select ward/commune')}
+            title={t('form.district')}
+            placeholder={t('form.districtPlaceholder')}
             showRequired={true}
             sx={{
               '& .MuiOutlinedInput-root': {

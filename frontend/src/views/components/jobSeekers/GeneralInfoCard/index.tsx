@@ -68,7 +68,7 @@ const reducer = (state: GeneralInfoCardState, action: GeneralInfoCardAction): Ge
 };
 
 const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
-  const { t } = useTranslation(['jobSeeker', 'common']);
+  const { t, i18n } = useTranslation(['jobSeeker', 'common']);
   const { slug: resumeSlug } = useParams<{ slug: string }>();
   const { allConfig } = useConfig();
   const configDicts = allConfig as Record<string, Record<string | number, string>> | null;
@@ -161,6 +161,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
         t={t}
         configDicts={configDicts}
         resumeDetail={state.resumeDetail}
+        salaryLanguage={i18n.language}
         onEdit={() => dispatch({ type: 'open-popup' })}
       />
 

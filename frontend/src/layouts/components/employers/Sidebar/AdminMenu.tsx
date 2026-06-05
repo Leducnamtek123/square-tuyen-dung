@@ -3,6 +3,7 @@
 import React from 'react';
 import { Collapse, List, ListItem } from '@mui/material';
 import GridViewIcon from '@mui/icons-material/GridView';
+import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
@@ -23,6 +24,9 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
     <>
       <ListItem disablePadding>
         <MenuItem icon={GridViewIcon} text={t('admin:sidebar.systemOverview')} to={`/${ROUTES.ADMIN.DASHBOARD}`} state={{ selected: location.pathname === `/${ROUTES.ADMIN.DASHBOARD}` }} />
+      </ListItem>
+      <ListItem disablePadding>
+        <MenuItem icon={SmartToyOutlinedIcon} text={t('admin:sidebar.agentAssistants')} to={`/${ROUTES.ADMIN.AGENT_ASSISTANTS}`} state={{ selected: location.pathname === `/${ROUTES.ADMIN.AGENT_ASSISTANTS}` }} />
       </ListItem>
       <ListItem disablePadding>
         <MenuItem icon={AccountCircleOutlinedIcon} text={t('admin:sidebar.systemAndUsers')} kind="group" state={{ expanded: expandedItems.system }} onClick={() => handleExpand('system')} />

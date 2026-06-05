@@ -42,17 +42,17 @@ const VerificationIntroCard = ({
   const steps = [
     {
       icon: BusinessOutlinedIcon,
-      label: t('verification.summary.companyProfile', { defaultValue: 'Hồ sơ công ty' }),
+      label: t('verification.summary.companyProfile'),
       done: true,
     },
     {
       icon: AssignmentTurnedInOutlinedIcon,
-      label: t('verification.summary.legalProfile', { defaultValue: 'Hồ sơ pháp lý' }),
+      label: t('verification.summary.legalProfile'),
       done: legalReady,
     },
     {
       icon: EventAvailableOutlinedIcon,
-      label: t('verification.summary.appointment', { defaultValue: 'Lịch xác minh' }),
+      label: t('verification.summary.appointment'),
       done: scheduleReady,
     },
   ];
@@ -74,7 +74,7 @@ const VerificationIntroCard = ({
       <Box sx={{ mt: 3 }}>
         <Stack direction="row" justifyContent="space-between" spacing={2} sx={{ mb: 1 }}>
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            {t('verification.summary.progress', { defaultValue: 'Mức độ hoàn thiện' })}
+            {t('verification.summary.progress')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {completion}%
@@ -98,13 +98,8 @@ const VerificationIntroCard = ({
 
       <Alert severity={canPost ? 'success' : 'warning'} sx={{ mt: 3 }}>
         {canPost
-          ? t('verification.summary.canPost', { defaultValue: 'Công ty đã được xác thực và có thể đăng tin tuyển dụng.' })
-          : t('verification.summary.cannotPost', {
-              count: missingCount,
-              defaultValue: missingCount > 0
-                ? `Còn ${missingCount} thông tin pháp lý cần bổ sung trước khi gửi duyệt.`
-                : 'Hồ sơ đã đủ thông tin, vui lòng gửi yêu cầu xác minh và chờ admin duyệt.',
-            })}
+          ? t('verification.summary.canPost')
+          : t('verification.summary.cannotPost', { count: missingCount })}
       </Alert>
 
       <Box sx={{ mt: 2, display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>

@@ -75,19 +75,19 @@ export const createEmployerSignUpSchema = (t: EmployerSignUpT) =>
         .date()
         .nullable()
         .typeError(t('validation.invalidDate') || '')
-        .max(DATE_OPTIONS.today(), t('validation.foundedDateInFuture', 'Founded date cannot be in the future.')),
+        .max(DATE_OPTIONS.today(), t('validation.foundedDateInFuture')),
       fieldOperation: yup.string().max(255, t('validation.maxFieldOperation')),
       employeeSize: yup
         .number()
         .required(t('validation.requiredEmployeeSize'))
         .typeError(t('validation.requiredEmployeeSize'))
-        .oneOf([1, 2, 3, 4], t('validation.employeeSizeInvalid', 'Invalid company size.')),
+        .oneOf([1, 2, 3, 4], t('validation.employeeSizeInvalid')),
       websiteUrl: yup
         .string()
         .transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value))
         .nullable()
         .notRequired()
-        .url(t('common:validation.invalidUrl', 'Please enter a valid URL.'))
+        .url(t('common:validation.invalidUrl'))
         .max(300, t('validation.maxWebsite')),
       location: yup.object().shape({
         city: yup.number().required(t('validation.requiredCity')).typeError(t('validation.requiredCity')),

@@ -2,9 +2,10 @@
 import React from 'react';
 import Link from 'next/link';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 import { Box, Card, Skeleton, Stack, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
-import { salaryString } from '@/utils/customData';
+import { formatLocalizedSalaryRange } from '@/utils/customData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendarDays,
@@ -47,6 +48,7 @@ const JobPostAction = ({
   salaryMax,
   children,
 }: JobPostActionProps) => {
+  const { t, i18n } = useTranslation('common');
   const { allConfig } = useConfig();
 
   const theme = useTheme();
@@ -234,7 +236,7 @@ const JobPostAction = ({
 
                     <FontAwesomeIcon icon={faCircleDollarToSlot} />
 
-                    {salaryString(salaryMin, salaryMax)}
+                    {formatLocalizedSalaryRange(salaryMin, salaryMax, i18n.language)}
 
                   </Typography>
 
@@ -254,7 +256,7 @@ const JobPostAction = ({
 
                       }}>
 
-                        Chưa cập nhật
+                        {t('common:labels.notUpdated')}
 
                       </span>
 

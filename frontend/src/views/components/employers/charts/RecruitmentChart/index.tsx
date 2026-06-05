@@ -55,9 +55,9 @@ const colors = [
 ];
 
 const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
-  const { t } = useTranslation('employer');
+  const { t, i18n } = useTranslation('employer');
   const theme = useTheme();
-  const options = React.useMemo(() => createCartesianOptions(theme, { stacked: true }), [theme]);
+  const options = React.useMemo(() => createCartesianOptions(theme, { stacked: true, language: i18n.language }), [i18n.language, theme]);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[Dayjs | null, Dayjs | null]>([
     dayjs(new Date()).subtract(1, "month"),
@@ -135,7 +135,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
 
           <Box sx={chartAreaSx(320)}>
             {queryLoading ? (
-              <ChartLoadingState height="100%" label={t('recruitmentChart.loading', { defaultValue: 'Loading chart' })} />
+              <ChartLoadingState height="100%" label={t('recruitmentChart.loading')} />
             ) : !hasChartData ? (
               <ChartEmptyState height="100%" label={t('recruitmentChart.noData')} />
             ) : (

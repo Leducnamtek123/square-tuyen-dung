@@ -627,9 +627,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
       finalizeOnDisconnectRef.current = false;
       dispatch({
         type: 'set-error',
-        value: getErrorDetail(err) || tRef.current('errors.endSessionFailed', {
-          defaultValue: 'Khong the cap nhat trang thai ket thuc. Phien da duoc ngat khoi phong.',
-        }),
+        value: getErrorDetail(err) || tRef.current('errors.endSessionFailed'),
       });
     }
   }, [fetchSessionDetails, roomName, state.sessionInviteToken]);
@@ -660,7 +658,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
       ? 'in_progress'
       : statusKey;
   const isProcessing = statusKey === 'processing';
-  const statusText  = t(`interviewListCard.statuses.${displayStatusKey}`, { defaultValue: displayStatusKey.replaceAll('_', ' ') });
+  const statusText = t(`interviewListCard.statuses.${displayStatusKey}`);
   const statusClass = statusClassMap[displayStatusKey] || 'border-white/15 bg-white/10 text-zinc-200';
   const formattedSchedule = state.session?.scheduledAt
     ? new Date(state.session.scheduledAt).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US')
@@ -707,9 +705,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
         isJoinable,
       }}
       labels={{
-        interruptedResumeHint: t('interview:interviewDetail.messages.interruptedResumeHint', {
-          defaultValue: 'Kết nối vừa bị ngắt tạm thời. Bạn có thể bấm join lại để tiếp tục buổi phỏng vấn.',
-        }),
+        interruptedResumeHint: t('interview:interviewDetail.messages.interruptedResumeHint'),
         sessionTitle,
         jobLabel,
         candidateLabel,

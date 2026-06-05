@@ -103,13 +103,13 @@ const JobsPage = () => {
     const getStatusLabel = useCallback((status: JobPost['status'], isExpired?: boolean) => {
         const s = Number(status);
         if (isExpired && s === 3) {
-            return <Chip label={t('pages.jobs.status.expired', 'Expired')} size="small" color="default" />;
+            return <Chip label={t('pages.jobs.status.expired')} size="small" color="default" />;
         }
         switch (s) {
-            case 1: return <Chip label={t('pages.jobs.status.pending', 'Pending Review')} size="small" color="warning" />;
-            case 2: return <Chip label={t('pages.jobs.status.rejected', 'Rejected')} size="small" color="error" />;
-            case 3: return <Chip label={t('pages.jobs.status.approved', 'Approved')} size="small" color="success" />;
-            default: return <Chip label={t('pages.jobs.status.unknown', 'Unknown')} size="small" />;
+            case 1: return <Chip label={t('pages.jobs.status.pending')} size="small" color="warning" />;
+            case 2: return <Chip label={t('pages.jobs.status.rejected')} size="small" color="error" />;
+            case 3: return <Chip label={t('pages.jobs.status.approved')} size="small" color="success" />;
+            default: return <Chip label={t('pages.jobs.status.unknown')} size="small" />;
         }
     }, [t]);
 
@@ -152,19 +152,19 @@ const JobsPage = () => {
                 const job = info.row.original;
                 return (
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                        <Tooltip title={t('pages.jobs.table.view', 'View Job')}>
+                        <Tooltip title={t('pages.jobs.table.view')}>
                              <IconButton size="small" component="a" href={`/jobs/${job.slug}`} target="_blank" color="info">
                                 <VisibilityIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
                         {Number(job.status) === 1 && (
                             <>
-                                <Tooltip title={t('pages.jobs.table.approveAction', 'Approve')}>
+                                <Tooltip title={t('pages.jobs.table.approveAction')}>
                                     <IconButton size="small" onClick={() => handleApprove(job.id)} color="success">
                                         <CheckCircleIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title={t('pages.jobs.table.rejectAction', 'Reject')}>
+                                <Tooltip title={t('pages.jobs.table.rejectAction')}>
                                     <IconButton size="small" onClick={() => handleReject(job.id)} color="warning">
                                         <CancelIcon fontSize="small" />
                                     </IconButton>
@@ -172,7 +172,7 @@ const JobsPage = () => {
                             </>
                         )}
                         {Number(job.status) === 3 && (
-                            <Tooltip title={t('pages.jobs.table.rejectAction', 'Revoke/Reject')}>
+                            <Tooltip title={t('pages.jobs.table.rejectAction')}>
                                 <IconButton size="small" onClick={() => handleReject(job.id)} color="warning">
                                     <CancelIcon fontSize="small" />
                                 </IconButton>
@@ -208,7 +208,7 @@ const JobsPage = () => {
 
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <FilterBar
-                    title={t('pages.jobs.filter.title', 'Bộ lọc tin tuyển dụng')}
+                    title={t('pages.jobs.filter.title')}
                     searchValue={searchTerm}
                     searchPlaceholder={t('pages.jobs.searchPlaceholder')}
                     onSearchChange={handleSearch}
@@ -217,22 +217,22 @@ const JobsPage = () => {
                         setStatusFilter('');
                     }}
                     resetDisabled={!searchTerm && !statusFilter}
-                    resetLabel={t('common.clearFilters', 'Xóa lọc')}
+                    resetLabel={t('common.clearFilters')}
                     activeFilterCount={statusFilter ? 1 : 0}
                 >
                     <FormControl size="small" sx={[{ minWidth: 210 }, filterControlSx]}>
-                        <InputLabel id="job-status-filter-label">{t('common.status.label', 'Trạng thái')}</InputLabel>
+                        <InputLabel id="job-status-filter-label">{t('common.status.label')}</InputLabel>
                         <Select
                             labelId="job-status-filter-label"
                             value={statusFilter}
-                            label={t('common.status.label', 'Trạng thái')}
+                            label={t('common.status.label')}
                             onChange={(event) => handleStatusFilterChange(event.target.value)}
                         >
-                            <MenuItem value="">{t('common.all', 'Tất cả')}</MenuItem>
-                            <MenuItem value="1">{t('pages.jobs.status.pending', 'Pending Review')}</MenuItem>
-                            <MenuItem value="2">{t('pages.jobs.status.rejected', 'Rejected')}</MenuItem>
-                            <MenuItem value="3">{t('pages.jobs.status.approved', 'Approved')}</MenuItem>
-                            <MenuItem value="expired">{t('pages.jobs.status.expired', 'Expired')}</MenuItem>
+                            <MenuItem value="">{t('common.all')}</MenuItem>
+                            <MenuItem value="1">{t('pages.jobs.status.pending')}</MenuItem>
+                            <MenuItem value="2">{t('pages.jobs.status.rejected')}</MenuItem>
+                            <MenuItem value="3">{t('pages.jobs.status.approved')}</MenuItem>
+                            <MenuItem value="expired">{t('pages.jobs.status.expired')}</MenuItem>
                         </Select>
                     </FormControl>
                 </FilterBar>

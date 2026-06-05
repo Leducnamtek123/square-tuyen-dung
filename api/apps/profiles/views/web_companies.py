@@ -24,6 +24,7 @@ from rest_framework import permissions as perms_sys
 from rest_framework import status
 
 from apps.accounts import permissions as perms_custom
+from apps.accounts.active_company import apply_active_company_from_request
 
 from ..models import (
     Company,
@@ -61,7 +62,7 @@ class CompanyView(viewsets.ViewSet):
 
     def get_permissions(self):
 
-        if self.action in ["get_company_info"]:
+        if self.action in ["get_company_info", "get_job_post_detail"]:
 
             return [perms_custom.IsEmployerUser()]
 
@@ -647,10 +648,11 @@ class CompanyImageViewSet(AuditLogViewSetMixin, viewsets.ViewSet,
 class CompanyRoleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = CompanyRole.objects.all()
     serializer_class = CompanyRoleSerializer
-    permission_classes = [perms_sys.IsAuthenticated]
+    permission_classes = [perms_custom.IsEmployerUser]
     renderer_classes = [renderers.MyJSONRenderer]
 
     def get_company(self):
+        apply_active_company_from_request(self.request)
         return _get_user_company(self.request.user)
 
     def get_queryset(self):
@@ -762,11 +764,12 @@ class CompanyRoleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 class CompanyMemberViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     queryset = CompanyMember.objects.select_related("user", "role", "company")
     serializer_class = CompanyMemberSerializer
-    permission_classes = [perms_sys.IsAuthenticated]
+    permission_classes = [perms_custom.IsEmployerUser]
     renderer_classes = [renderers.MyJSONRenderer]
     pagination_class = paginations.CustomPagination
 
     def get_company(self):
+        apply_active_company_from_request(self.request)
         return _get_user_company(self.request.user)
 
     def get_queryset(self):
@@ -795,6 +798,14 @@ class CompanyMemberViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
                 },
             )
         return None
+
+    def _owner_membership_response(self, company, user_id):
+        if int(user_id) != company.user_id:
+            return None
+        return var_res.response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"userId": ["Company owner membership cannot be changed."]},
+        )
 
     def list(self, request, *args, **kwargs):
         company = self.get_company()
@@ -834,6 +845,10 @@ class CompanyMemberViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             return role_assignment_error
 
         user_id = serializer.validated_data["user_id"]
+        owner_membership_error = self._owner_membership_response(company, user_id)
+        if owner_membership_error:
+            return owner_membership_error
+
         member = CompanyMember.objects.filter(company=company, user_id=user_id).first()
         if member:
             member.role = role
@@ -866,6 +881,10 @@ class CompanyMemberViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
+        owner_membership_error = self._owner_membership_response(company, instance.user_id)
+        if owner_membership_error:
+            return owner_membership_error
+
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 

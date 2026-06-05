@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { cva } from 'class-variance-authority';
 import { LocalAudioTrack, LocalVideoTrack } from 'livekit-client';
 import { useMaybeRoomContext, useMediaDeviceSelect } from '@livekit/components-react';
+import { useTranslation } from 'react-i18next';
 import {
   Select,
   SelectContent,
@@ -37,6 +38,12 @@ const selectVariants = cva(
   }
 );
 
+const DEVICE_KIND_LABEL_KEYS: Partial<Record<MediaDeviceKind, string>> = {
+  audioinput: 'voiceAi.devices.microphone',
+  videoinput: 'voiceAi.devices.camera',
+  audiooutput: 'voiceAi.devices.speaker',
+};
+
 export function TrackDeviceSelect({
   kind,
   track,
@@ -46,6 +53,7 @@ export function TrackDeviceSelect({
   onActiveDeviceChange,
   ...props
 }: DeviceSelectProps) {
+  const { t } = useTranslation('interview');
   const room = useMaybeRoomContext();
   const [open, setOpen] = useState(false);
   const requestPermissionsState = requestPermissions || open;
@@ -63,6 +71,8 @@ export function TrackDeviceSelect({
   };
 
   const filteredDevices = useMemo(() => devices.filter((d) => d.deviceId !== ''), [devices]);
+  const deviceKindLabel = t(DEVICE_KIND_LABEL_KEYS[kind] || 'voiceAi.devices.microphone');
+  const devicePlaceholder = t('voiceAi.devices.select', { kind: deviceKindLabel });
 
   if (filteredDevices.length < 2) {
     return null;
@@ -77,7 +87,7 @@ export function TrackDeviceSelect({
     >
       <SelectTrigger className={cn(selectVariants({ size }), props.className)}>
         {size !== 'sm' && (
-          <SelectValue className="font-mono text-sm" placeholder={`Select a ${kind}`} />
+          <SelectValue className="font-mono text-sm" placeholder={devicePlaceholder} />
         )}
       </SelectTrigger>
       <SelectContent>

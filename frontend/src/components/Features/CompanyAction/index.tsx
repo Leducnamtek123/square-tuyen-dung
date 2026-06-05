@@ -7,6 +7,7 @@ import { useTheme } from '@mui/material/styles';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import { formatRoute } from '@/utils/funcUtils';
 import { ROUTES } from '@/configs/constants';
+import { useTranslation } from 'react-i18next';
 
 interface CompanyActionProps {
   id: string | number;
@@ -21,10 +22,12 @@ interface CompanyActionProps {
 
 const CompanyAction = ({ id, views, createAt, resume, company, children }: CompanyActionProps) => {
   const parentRef = React.useRef<HTMLDivElement>(null);
+  const { t } = useTranslation(['jobSeeker', 'common']);
 
   const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>('column');
 
   const theme = useTheme();
+  const resumeTitle = resume?.title || t('common:labels.notUpdated');
   const companyHref = company?.slug
     ? `/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company.slug as string)}`
     : '#';
@@ -171,7 +174,10 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 
                 >
 
-                  Đã xem hồ sơ {resume?.title} {views} lần
+                  {t('jobSeeker:myCompany.viewedCard.viewedProfile', {
+                    resumeTitle,
+                    views,
+                  })}
 
                 </Typography>
 
@@ -193,7 +199,9 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 
                 >
 
-                  Lần xem cuối {dayjs(createAt).format('DD/MM/YYYY HH:mm')}
+                  {t('jobSeeker:myCompany.viewedCard.lastViewed', {
+                    date: dayjs(createAt).format('DD/MM/YYYY HH:mm'),
+                  })}
 
                 </Typography>
 

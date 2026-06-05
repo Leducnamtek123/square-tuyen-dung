@@ -3,6 +3,7 @@
 import React from 'react';
 import { Collapse, List, ListItem } from '@mui/material';
 import GridViewIcon from '@mui/icons-material/GridView';
+import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
@@ -23,6 +24,10 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand }: EmployerMenu
     <>
       <ListItem disablePadding>
         <MenuItem icon={GridViewIcon} text={t('employer:sidebar.dashboard')} to={`/${ROUTES.EMPLOYER.DASHBOARD}`} state={{ selected: location.pathname === `/${ROUTES.EMPLOYER.DASHBOARD}` }} />
+      </ListItem>
+
+      <ListItem disablePadding>
+        <MenuItem icon={SmartToyOutlinedIcon} text={t('employer:sidebar.agentAssistants')} to={`/${ROUTES.EMPLOYER.AGENT_ASSISTANTS}`} state={{ selected: location.pathname === `/${ROUTES.EMPLOYER.AGENT_ASSISTANTS}` }} />
       </ListItem>
 
       <ListItem disablePadding>
@@ -77,5 +82,4 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand }: EmployerMenu
 };
 
 export default EmployerMenu;
-
 

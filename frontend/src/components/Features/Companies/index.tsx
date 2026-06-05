@@ -75,7 +75,7 @@ const CompaniesContent: React.FC<CompaniesContentProps> = ({ filterKey }) => {
               gap: 1,
             }}
           >
-            {t("home.topCompanies", "Công ty nổi bật")}
+            {t("home.topCompanies")}
             <Box
               component="span"
               sx={{
@@ -87,7 +87,7 @@ const CompaniesContent: React.FC<CompaniesContentProps> = ({ filterKey }) => {
                 fontSize: "0.9em",
               }}
             >
-              {t("home.companiesCount", { count: count, defaultValue: "{{count}} công ty" })}
+              {t("home.companiesCount", { count: count })}
             </Box>
           </Typography>
         </Box>
@@ -111,7 +111,7 @@ const CompaniesContent: React.FC<CompaniesContentProps> = ({ filterKey }) => {
           </Grid>
         ) : companies.length === 0 ? (
           <NoDataCard
-            title={t("home.noCompaniesFound", "Hiện chưa tìm công ty phù hợp với tiêu chí của bạn")}
+            title={t("home.noCompaniesFound")}
             svgKey="ImageSvg4"
           />
         ) : (

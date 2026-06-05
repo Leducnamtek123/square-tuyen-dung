@@ -26,10 +26,10 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageLis
           <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'success.50', border: '1px solid', borderColor: 'success.100' }}>
             <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'success.main', fontWeight: 700 }}>
               <VerifiedIcon fontSize="small" />
-              {t("companyDetail.verified", "Verified company")}
+              {t("companyDetail.verified")}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              {t("companyDetail.verifiedDescription", "This company has been manually reviewed and marked as trusted.")}
+              {t("companyDetail.verifiedDescription")}
             </Typography>
           </Box>
         )}

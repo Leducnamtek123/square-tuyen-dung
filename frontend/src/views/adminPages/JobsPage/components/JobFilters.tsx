@@ -11,13 +11,13 @@ const JobFilters = ({ searchTerm, onSearchChange }: JobFiltersProps) => {
     const { t } = useTranslation('admin');
     return (
         <FilterBar
-            title={t('pages.jobs.filter.title', 'Bộ lọc tin tuyển dụng')}
+            title={t('pages.jobs.filter.title')}
             searchValue={searchTerm}
             searchPlaceholder={t('pages.jobs.filter.searchPlaceholder')}
             onSearchChange={onSearchChange}
             onReset={() => onSearchChange('')}
             resetDisabled={!searchTerm}
-            resetLabel={t('common.clearFilters', 'Xóa lọc')}
+            resetLabel={t('common.clearFilters')}
         />
     );
 };

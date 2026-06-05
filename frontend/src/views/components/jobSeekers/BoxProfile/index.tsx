@@ -24,7 +24,7 @@ import BackdropLoading from "../../../../components/Common/Loading/BackdropLoadi
 import toastMessages from "../../../../utils/toastMessages";
 import errorHandling from "../../../../utils/errorHandling";
 import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
-import toSlug, { salaryString } from "../../../../utils/customData";
+import toSlug, { formatLocalizedSalaryRange } from "../../../../utils/customData";
 import NoDataCard from "../../../../components/Common/NoDataCard";
 import dynamic from "next/dynamic";
 import { PDFDownloadLink } from "../../../../components/Features/CVDoc/pdf";
@@ -83,7 +83,7 @@ interface BoxProfileProps {
 }
 
 const BoxProfile = ({ title }: BoxProfileProps) => {
-  const { t } = useTranslation(["jobSeeker", "common"]);
+  const { t, i18n } = useTranslation(["jobSeeker", "common"]);
   const dispatch = useDispatch();
   const { push } = useRouter();
 
@@ -302,7 +302,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                       {[
                         { icon: faMagicWandSparkles, label: t("jobSeeker:profile.summary.experience"), value: tConfig(allConfig?.experienceDict?.[String(resume.experience)]) },
                         { icon: faUser, label: t("jobSeeker:profile.summary.position"), value: tConfig(allConfig?.positionDict?.[String(resume.position)]) },
-                        { icon: faDollarSign, label: t("jobSeeker:profile.summary.desiredSalary"), value: salaryString(resume.salaryMin, resume.salaryMax) },
+                        { icon: faDollarSign, label: t("jobSeeker:profile.summary.desiredSalary"), value: formatLocalizedSalaryRange(resume.salaryMin, resume.salaryMax, i18n.language) },
                         { icon: faCalendar, label: t("jobSeeker:profile.summary.lastUpdated"), value: dayjs(resume.updateAt).format("DD/MM/YYYY HH:mm:ss") }
                       ].map((item) => (
                         <Box key={item.label} sx={{ display: "flex", alignItems: "center", color: "text.secondary", "& svg": { fontSize: "1.25rem", mr: 2, color: "primary.main" } }}>

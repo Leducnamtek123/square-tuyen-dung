@@ -28,4 +28,67 @@ describe('createProfileUploadSchema', () => {
       'jobSeeker:profile.validation.salaryMaxComparison',
     );
   });
+
+  it('rejects salaries above the backend storage limit', async () => {
+    const schema = createProfileUploadSchema(t as never);
+    const tooLargeSalary = 1_000_000_000_000;
+
+    await expect(schema.validateAt('salaryMin', { salaryMin: tooLargeSalary })).rejects.toThrow(
+      'jobSeeker:profile.validation.salaryTooLarge',
+    );
+    await expect(schema.validateAt('salaryMax', { salaryMax: tooLargeSalary })).rejects.toThrow(
+      'jobSeeker:profile.validation.salaryTooLarge',
+    );
+    await expect(schema.validateAt('expectedSalary', { expectedSalary: tooLargeSalary })).rejects.toThrow(
+      'jobSeeker:profile.validation.salaryTooLarge',
+    );
+  });
+
+  it('rejects choice values outside the backend option sets', async () => {
+    const schema = createProfileUploadSchema(t as never);
+    const values = {
+      position: 999,
+      experience: 999,
+      academicLevel: 999,
+      typeOfWorkplace: 999,
+      jobType: 999,
+    };
+
+    await expect(schema.validateAt('position', values)).rejects.toThrow(
+      'jobSeeker:profile.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('experience', values)).rejects.toThrow(
+      'jobSeeker:profile.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('academicLevel', values)).rejects.toThrow(
+      'jobSeeker:profile.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('typeOfWorkplace', values)).rejects.toThrow(
+      'jobSeeker:profile.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('jobType', values)).rejects.toThrow(
+      'jobSeeker:profile.validation.choiceInvalid',
+    );
+  });
+
+  it('rejects missing, non-PDF and oversized CV upload files', async () => {
+    const schema = createProfileUploadSchema(t as never);
+    const textFile = new File(['not a pdf'], 'resume.txt', { type: 'text/plain' });
+    const largePdf = new File([new Uint8Array((10 * 1024 * 1024) + 1)], 'resume.pdf', {
+      type: 'application/pdf',
+    });
+
+    await expect(schema.validateAt('file', { file: null })).rejects.toThrow(
+      'jobSeeker:profile.validation.fileRequired',
+    );
+    await expect(schema.validateAt('file', { file: textFile })).rejects.toThrow(
+      'jobSeeker:profile.validation.filePdfOnly',
+    );
+    await expect(schema.validateAt('file', { file: [textFile] })).rejects.toThrow(
+      'jobSeeker:profile.validation.filePdfOnly',
+    );
+    await expect(schema.validateAt('file', { file: largePdf })).rejects.toThrow(
+      'jobSeeker:profile.validation.fileTooLarge',
+    );
+  });
 });

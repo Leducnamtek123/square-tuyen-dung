@@ -85,8 +85,8 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
                 // error handling in hook
             }
         },
-        t('employer:savedResume.confirmUnsaveTitle', 'Unsave Candidate'),
-        t('employer:savedResume.confirmUnsaveMessage', 'Are you sure you want to remove this candidate from your saved list?'),
+        t('employer:savedResume.confirmUnsaveTitle'),
+        t('employer:savedResume.confirmUnsaveMessage'),
         'warning'
     );
   }, [toggleSaveResume, t]);
@@ -128,7 +128,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
               {title}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-              {t('employer:savedResume.manageSubtitle', 'Easily access and manage your collection of saved candidate profiles.')}
+              {t('employer:savedResume.manageSubtitle')}
             </Typography>
           </Box>
           <Button 

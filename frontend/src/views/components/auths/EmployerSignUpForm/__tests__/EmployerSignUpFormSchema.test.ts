@@ -2,7 +2,15 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { createEmployerSignUpSchema } from '../index';
 
-const t = (_key: string, defaultValue?: string) => defaultValue || _key;
+const t = (key: string, defaultValue?: string) => {
+  const translations: Record<string, string> = {
+    'validation.foundedDateInFuture': 'Founded date cannot be in the future.',
+    'validation.employeeSizeInvalid': 'Invalid company size.',
+    'common:validation.invalidUrl': 'Please enter a valid URL.',
+  };
+
+  return translations[key] || defaultValue || key;
+};
 
 describe('createEmployerSignUpSchema', () => {
   afterEach(() => {
@@ -42,5 +50,29 @@ describe('createEmployerSignUpSchema', () => {
 
     expect(fieldsSource).toContain('name="company.since"');
     expect(fieldsSource).toContain('maxDate={DATE_OPTIONS.today()}');
+  });
+
+  it('uses auth locale keys for district field labels without wrong ward fallbacks', () => {
+    const fieldsSource = readFileSync(join(__dirname, '../CompanyInfoStep.tsx'), 'utf8');
+    const vi = JSON.parse(readFileSync(join(__dirname, '../../../../../i18n/locales/vi/auth.json'), 'utf8'));
+    const en = JSON.parse(readFileSync(join(__dirname, '../../../../../i18n/locales/en/auth.json'), 'utf8'));
+
+    expect(fieldsSource).toContain("title={t('form.district')}");
+    expect(fieldsSource).toContain("placeholder={t('form.districtPlaceholder')}");
+    expect(fieldsSource).not.toContain('Ward/Commune');
+    expect(fieldsSource).not.toContain('Select ward/commune');
+    expect(vi.form.district).toEqual(expect.any(String));
+    expect(en.form.district).toEqual(expect.any(String));
+    expect(vi.form.districtPlaceholder).toEqual(expect.any(String));
+    expect(en.form.districtPlaceholder).toEqual(expect.any(String));
+  });
+
+  it('does not hard-code English validation fallback messages', () => {
+    const tSpy = jest.fn((key: string) => key);
+
+    createEmployerSignUpSchema(tSpy as never);
+
+    const callsWithStringFallback = tSpy.mock.calls.filter(([, defaultValue]) => typeof defaultValue === 'string');
+    expect(callsWithStringFallback).toEqual([]);
   });
 });

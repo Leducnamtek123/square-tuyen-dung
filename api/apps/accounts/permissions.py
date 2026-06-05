@@ -2,6 +2,7 @@
 from shared.configs import variable_system as var_sys
 
 from rest_framework import permissions
+from apps.accounts.active_company import active_company_header_failed, apply_active_company_from_request
 from apps.profiles.models import CompanyMember
 
 
@@ -84,6 +85,9 @@ class IsEmployerUser(permissions.IsAuthenticated):
         user = request.user
 
         if user.is_authenticated:
+            apply_active_company_from_request(request)
+            if active_company_header_failed(request):
+                return False
             if user.role_name == var_sys.EMPLOYER:
                 return True
             
@@ -100,6 +104,7 @@ class CompanyPermissionRequired(IsEmployerUser):
 
     def has_permission(self, request, view):
         user = request.user
+        apply_active_company_from_request(request)
         if (
             getattr(user, "is_authenticated", False)
             and (
@@ -109,6 +114,8 @@ class CompanyPermissionRequired(IsEmployerUser):
             )
         ):
             return True
+        if active_company_header_failed(request):
+            return False
         if not super().has_permission(request, view):
             return False
         if not self.permission_key:
@@ -206,11 +213,15 @@ class IsEmployerOrAdminUser(permissions.IsAuthenticated):
 
     def has_permission(self, request, view):
         user = request.user
+        apply_active_company_from_request(request)
         if not user.is_authenticated:
             return False
 
         if user.role_name == var_sys.ADMIN:
             return True
+
+        if active_company_header_failed(request):
+            return False
 
         if user.role_name == var_sys.EMPLOYER:
             return True
@@ -232,3 +243,7 @@ class CanManageInterviews(CompanyPermissionRequired):
 
 class CanManageQuestionBank(CompanyPermissionRequired):
     permission_key = "manage_question_bank"
+
+
+class CanManageEmployees(CompanyPermissionRequired):
+    permission_key = "manage_employees"

@@ -25,12 +25,19 @@ interface HttpServiceInstance extends Omit<AxiosInstance, 'get' | 'post' | 'put'
 import { cleanParams } from './params';
 import { camelizeKeys } from './camelCase';
 import { isMaintenanceModeError, notifyMaintenanceMode } from './maintenanceMode';
+import { ACTIVE_WORKSPACE_STORAGE_KEY, LEGACY_ACTIVE_WORKSPACE_STORAGE_KEY } from './storageKeys';
+
+type StoredWorkspace = {
+  type?: string;
+  companyId?: string | number | null;
+};
 
 // Prefix for API endpoints
 const prefix = 'api';
 
 // Use relative path to work with nginx proxy, allow override via env if needed
 const baseURL = process.env.NEXT_PUBLIC_API_BASE || `/${prefix}/`;
+const activeCompanyHeader = 'X-Active-Company-Id';
 
 const httpRequest = axios.create({
   baseURL,
@@ -107,6 +114,50 @@ const hasAuthorizationHeader = (config: AxiosRequestConfig | undefined) => {
   return Boolean(headers.Authorization || headers.authorization);
 };
 
+const readStoredWorkspace = (): StoredWorkspace | null => {
+  const storage =
+    typeof window !== 'undefined'
+      ? window.localStorage
+      : typeof globalThis !== 'undefined' && 'localStorage' in globalThis
+        ? (globalThis as typeof globalThis & { localStorage?: Storage }).localStorage
+        : undefined;
+
+  if (!storage) return null;
+
+  try {
+    const raw =
+      storage.getItem(ACTIVE_WORKSPACE_STORAGE_KEY) ||
+      storage.getItem(LEGACY_ACTIVE_WORKSPACE_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as StoredWorkspace) : null;
+  } catch {
+    return null;
+  }
+};
+
+const getActiveCompanyId = () => {
+  const workspace = readStoredWorkspace();
+  if (workspace?.type !== 'company') return null;
+  const companyId = String(workspace.companyId ?? '').trim();
+  return companyId ? companyId : null;
+};
+
+const setActiveCompanyHeader = (config: AxiosRequestConfig) => {
+  const companyId = getActiveCompanyId();
+  if (!companyId) return;
+
+  config.headers = config.headers ?? {};
+  const headers = config.headers as Record<string, unknown> & {
+    set?: (name: string, value: string) => void;
+  };
+
+  if (typeof headers.set === 'function') {
+    headers.set(activeCompanyHeader, companyId);
+    return;
+  }
+
+  headers[activeCompanyHeader] = companyId;
+};
+
 type RefreshTokenResponse = AxiosResponse<{ data?: unknown }>;
 let refreshPromise: Promise<RefreshTokenResponse> | null = null;
 
@@ -126,6 +177,7 @@ httpRequest.interceptors.request.use(
 
     if (accessToken && !isAuthTokenEndpoint(config.url)) {
       setAuthorizationHeader(config, accessToken);
+      setActiveCompanyHeader(config);
     }
     return config;
   },
@@ -210,7 +262,6 @@ httpRequest.interceptors.response.use(
       refreshPromise = refreshClient.post('auth/token/', {
         grant_type: AUTH_CONFIG.REFRESH_TOKEN_GRANT,
         client_id: AUTH_CONFIG.CLIENT_ID,
-        client_secret: AUTH_CONFIG.CLIENT_SECRET,
         refresh_token: refreshToken,
       });
     }

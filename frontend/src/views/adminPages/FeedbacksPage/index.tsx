@@ -43,7 +43,7 @@ const FeedbacksPage = () => {
 
   const handleToggleActive = useCallback(async (fb: Feedback) => {
     try {
-      await updateFeedback({ id: fb.id, data: { is_active: !fb.is_active } });
+      await updateFeedback({ id: fb.id, data: { is_active: !fb.isActive } });
     } catch (e) { console.error(e); }
   }, [updateFeedback]);
 
@@ -126,7 +126,8 @@ const FeedbacksPage = () => {
       cell: (info) => <Rating value={info.getValue() as number} readOnly size="small" />,
     },
     {
-      accessorKey: 'is_active',
+      id: 'is_active',
+      accessorFn: (row) => row.isActive,
       header: t('pages.feedbacks.table.status') as string,
       cell: (info) => (
         <Stack direction="row" spacing={0.5} alignItems="center">
@@ -143,7 +144,8 @@ const FeedbacksPage = () => {
       ),
     },
     {
-      accessorKey: 'create_at',
+      id: 'create_at',
+      accessorFn: (row) => row.createAt,
       header: t('pages.feedbacks.table.createdAt') as string,
       enableSorting: true,
       cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—',

@@ -30,7 +30,7 @@ import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 import TimeAgo from '../../../../components/Common/TimeAgo';
 import { CV_TYPES } from '../../../../configs/constants';
-import { salaryString } from '../../../../utils/customData';
+import { formatLocalizedSalaryRange } from '../../../../utils/customData';
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import type { ResumeDetailResponse } from '@/types/models';
@@ -218,7 +218,7 @@ const SidebarInfo = ({ icon, label, value, href }: SidebarInfoProps) => {
 };
 
 const ProfileDetailCard: React.FC = () => {
-  const { t } = useTranslation(['employer', 'common']);
+  const { t, i18n } = useTranslation(['employer', 'common']);
   const params = useParams();
   const slug = params?.slug as string;
   const { allConfig } = useConfig();
@@ -271,7 +271,7 @@ const ProfileDetailCard: React.FC = () => {
     profileDetail.userDict?.avatarUrl ||
     profileDetail.jobSeekerProfile?.userDict?.avatarUrl ||
     undefined;
-  const salaryText = salaryString(profileDetail.salaryMin, profileDetail.salaryMax);
+  const salaryText = formatLocalizedSalaryRange(profileDetail.salaryMin, profileDetail.salaryMax, i18n.language);
   const locationText =
     resolveConfigText(allConfig?.cityDict, profileDetail.city) ||
     resolveConfigText(allConfig?.cityDict, profileDetail.jobSeekerProfile?.location?.city);

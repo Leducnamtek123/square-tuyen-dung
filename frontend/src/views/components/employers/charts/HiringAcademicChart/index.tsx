@@ -30,9 +30,9 @@ interface HiringAcademicChartProps {
 }
 
 const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
-  const { t } = useTranslation('employer');
+  const { t, i18n } = useTranslation('employer');
   const theme = useTheme();
-  const options = React.useMemo(() => createDoughnutOptions(theme), [theme]);
+  const options = React.useMemo(() => createDoughnutOptions(theme, i18n.language), [i18n.language, theme]);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([
     dayjs(new Date()).subtract(1, 'month'),
@@ -114,7 +114,7 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
 
           <Box sx={chartAreaSx(320)}>
             {queryLoading ? (
-              <ChartLoadingState height="100%" label={t('hiringAcademicChart.loading', { defaultValue: 'Loading chart' })} />
+              <ChartLoadingState height="100%" label={t('hiringAcademicChart.loading')} />
             ) : !hasChartData ? (
               <ChartEmptyState height="100%" label={t('hiringAcademicChart.noData')} />
             ) : (

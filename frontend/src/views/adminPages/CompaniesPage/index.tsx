@@ -283,13 +283,13 @@ const CompaniesPage = () => {
 
       <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
         <FilterBar
-          title={t('pages.companies.filter.title', 'Bộ lọc công ty')}
+          title={t('pages.companies.filter.title')}
           searchValue={searchTerm}
           searchPlaceholder={t('pages.companies.searchPlaceholder')}
           onSearchChange={handleSearch}
           onReset={() => handleSearch('')}
           resetDisabled={!searchTerm}
-          resetLabel={t('common.clearFilters', 'Xóa lọc')}
+          resetLabel={t('common.clearFilters')}
         />
 
         <DataTable

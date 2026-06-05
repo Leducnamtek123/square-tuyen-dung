@@ -209,6 +209,7 @@ INSTALLED_APPS = [
     'apps.content',
     'apps.chatbot',
     'apps.interviews',
+    'apps.agent_assistants',
     'corsheaders',
     'django_celery_results',
     'timezone_field',

@@ -375,7 +375,7 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
     });
     syncActivityPatch(nextPatch);
     queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
-    toastMessages.success(t('appliedResume.ai.reviewSaved', { defaultValue: 'AI review saved.' }));
+    toastMessages.success(t('appliedResume.ai.reviewSaved'));
   };
 
   const status = state.data?.aiAnalysisStatus;

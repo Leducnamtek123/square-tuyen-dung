@@ -66,9 +66,12 @@
       "endShort": "End"
     },
     "chat": {
+      "messageInput": "Message",
       "placeholder": "Type something...",
       "sending": "Sending...",
-      "send": "Send"
+      "send": "Send",
+      "sendingMessage": "Sending message",
+      "sendMessage": "Send message"
     },
     "devices": {
       "select": "Select a {{kind}}",
@@ -89,6 +92,7 @@
     },
     "preconnect": "Agent is listening, ask it a question",
     "aria": {
+      "controls": "Voice assistant controls",
       "toggleMicrophone": "Toggle microphone",
       "toggleCamera": "Toggle camera",
       "toggleScreenShare": "Toggle screen share",
@@ -298,6 +302,8 @@
     },
     "messages": {
       "evaluationSuccess": "Evaluation saved successfully",
+      "scoreInvalid": "Scores must be between 0 and 10.",
+      "proposedSalaryInvalid": "Proposed salary must be zero or greater.",
       "aiTriggerSuccess": "AI evaluation started",
       "notFound": "Interview not found",
       "notFoundDesc": "The interview you are looking for does not exist",

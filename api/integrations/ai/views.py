@@ -1,11 +1,14 @@
 import json
 import logging
+import re
 import time
+import unicodedata
 from typing import Optional, List, Dict, Any
 from urllib.parse import urlsplit, urlunsplit
 
 import requests
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Q
 from django.http import (
     HttpRequest,
@@ -21,7 +24,10 @@ from rest_framework.request import Request as DRFRequest
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.throttling import AnonRateThrottle
 
+from apps.accounts.models import User
+from apps.accounts.active_company import apply_active_company_from_request
 from apps.accounts.permissions import IsAdminUser
+from shared.configs import variable_system as var_sys
 from shared.configs.variable_response import data_response
 from integrations.ai.client import (
     AIServiceUnavailable,
@@ -45,15 +51,18 @@ except ImportError:
 
 # Import models for tools
 try:
-    from apps.jobs.models import JobPost
+    from apps.jobs.models import JobPost, JobPostActivity
     from apps.profiles.models import Resume, JobSeekerProfile, Company
+    from apps.profiles.serializers import EmployerCandidateProfileSerializer
     from apps.interviews.models import InterviewSession
     from apps.interviews.tasks import send_interview_invitation
 except ImportError:
     JobPost = None
+    JobPostActivity = None
     Resume = None
     JobSeekerProfile = None
     Company = None
+    EmployerCandidateProfileSerializer = None
     InterviewSession = None
     send_interview_invitation = None
 
@@ -486,7 +495,7 @@ def _infer_container_status(checks: Dict[str, Any]) -> str:
 
 
 class AIHealthAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request: DRFRequest):
         checks = _ai_service_checks()
@@ -646,38 +655,329 @@ RECRUITMENT_TOOLS = [
 ]
 
 
-def _can_search_candidates(request: DRFRequest) -> bool:
+def _role_name(user) -> str:
+    return str(getattr(user, "role_name", "") or "").upper()
+
+
+def _can_use_recruitment_tools(request: DRFRequest) -> bool:
+    user = getattr(request, "user", None)
     return (
-        request.user.is_authenticated
-        and getattr(request.user, 'role_name', None) in ('employer', 'admin')
+        bool(user and user.is_authenticated)
+        and (
+            _role_name(user) in {var_sys.EMPLOYER, var_sys.ADMIN}
+            or bool(getattr(user, "is_staff", False))
+            or bool(getattr(user, "is_superuser", False))
+        )
     )
+
+
+def _can_search_candidates(request: DRFRequest) -> bool:
+    return _can_use_recruitment_tools(request)
 
 
 def _can_create_interview(request: DRFRequest) -> bool:
-    return (
-        request.user.is_authenticated
-        and getattr(request.user, 'role_name', None) in ('employer', 'admin')
+    return _can_use_recruitment_tools(request)
+
+
+def _apply_ai_active_company_context(request: DRFRequest):
+    return apply_active_company_from_request(request)
+
+
+def _user_can_use_job_post_for_ai_tool(request: DRFRequest, job_post) -> bool:
+    user = getattr(request, "user", None)
+    if not user or not getattr(user, "is_authenticated", False):
+        return False
+    if (
+        _role_name(user) == var_sys.ADMIN
+        or getattr(user, "is_staff", False)
+        or getattr(user, "is_superuser", False)
+    ):
+        return True
+    _apply_ai_active_company_context(request)
+    active_company = (
+        user.get_active_company()
+        if hasattr(user, "get_active_company")
+        else getattr(user, "active_company", None)
     )
+    return (
+        _role_name(user) == var_sys.EMPLOYER
+        and active_company is not None
+        and getattr(job_post, "company_id", None) == active_company.id
+    )
+
+
+def _parse_tool_arguments(tool_call) -> tuple[dict, Optional[str]]:
+    raw_args = tool_call.get("function", {}).get("arguments", "{}")
+    if raw_args in (None, ""):
+        return {}, None
+    if isinstance(raw_args, dict):
+        return raw_args, None
+    if not isinstance(raw_args, str):
+        return {}, "Lỗi: Tham số công cụ không hợp lệ."
+    try:
+        parsed = json.loads(raw_args)
+    except (TypeError, json.JSONDecodeError):
+        return {}, "Lỗi: Tham số công cụ không hợp lệ."
+    if not isinstance(parsed, dict):
+        return {}, "Lỗi: Tham số công cụ không hợp lệ."
+    return parsed, None
+
+
+def _coerce_tool_limit(value, default: int = 5, maximum: int = 20) -> int:
+    try:
+        limit = int(value)
+    except (TypeError, ValueError):
+        return default
+    return max(1, min(limit, maximum))
+
+
+def _is_tool_choice_rejection(exc: AIServiceUnavailable) -> bool:
+    detail = " ".join(str(attempt) for attempt in getattr(exc, "attempts", [])).lower()
+    return "tool" in detail and (
+        "http 400" in detail
+        or "http 422" in detail
+        or "badrequest" in detail
+        or "bad request" in detail
+    )
+
+
+def _strip_accents(value: str) -> str:
+    normalized = unicodedata.normalize("NFKD", value or "")
+    return "".join(ch for ch in normalized if not unicodedata.combining(ch))
+
+
+def _normalize_chat_text(value: str) -> str:
+    normalized = _strip_accents(value).lower()
+    normalized = re.sub(r"[^a-z0-9]+", " ", normalized)
+    return re.sub(r"\s+", " ", normalized).strip()
+
+
+def _recent_chat_text(messages: List[Dict[str, Any]], *, roles: Optional[set[str]] = None) -> str:
+    contents = []
+    for message in messages[-8:]:
+        role = message.get("role")
+        if role == "system":
+            continue
+        if roles and role not in roles:
+            continue
+        content = message.get("content")
+        if isinstance(content, str) and content.strip():
+            contents.append(content.strip())
+    return "\n".join(contents)
+
+
+VIETNAMESE_CHAT_INSTRUCTION = (
+    "Luôn trả lời bằng tiếng Việt có dấu, tự nhiên và dễ đọc. "
+    "Nếu người dùng viết tiếng Việt không dấu, vẫn trả lời lại bằng tiếng Việt có đầy đủ dấu. "
+    "Không dùng emoji trong câu trả lời."
+)
+
+
+def _with_vietnamese_chat_instruction(messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    normalized_messages = list(messages)
+    if not normalized_messages:
+        return [{"role": "system", "content": VIETNAMESE_CHAT_INSTRUCTION}]
+
+    first_message = normalized_messages[0]
+    if first_message.get("role") == "system":
+        content = str(first_message.get("content") or "").strip()
+        if VIETNAMESE_CHAT_INSTRUCTION not in content:
+            normalized_messages[0] = {
+                **first_message,
+                "content": f"{content}\n{VIETNAMESE_CHAT_INSTRUCTION}".strip(),
+            }
+        return normalized_messages
+
+    return [{"role": "system", "content": VIETNAMESE_CHAT_INSTRUCTION}, *normalized_messages]
+
+
+def _is_manual_candidate_create_intent(messages: List[Dict[str, Any]]) -> bool:
+    user_text = _recent_chat_text(messages, roles={"user"})
+    normalized = _normalize_chat_text(user_text)
+    if "tao" not in normalized:
+        return False
+    return (
+        ("ho so" in normalized and "ung vien" in normalized)
+        or "manual candidate" in normalized
+        or "candidate profile" in normalized
+    )
+
+
+def _clean_extracted_name(value: str) -> str:
+    name = re.sub(r"\s+", " ", value or "").strip(" ,.;:-")
+    name = re.sub(r"^(?:ten|tên|la|là)\s+", "", name, flags=re.IGNORECASE).strip(" ,.;:-")
+    return name[:150]
+
+
+def _extract_manual_candidate_name(text: str) -> str:
+    patterns = [
+        r"(?:ứng viên|ung vien)\s+(?P<name>.+?)(?=\s+(?:cho|vào|vao|ứng tuyển|ung tuyen|vị trí|vi tri|tin|job|email|sdt|sđt|phone|điện thoại|dien thoai)\b|[,.;]|\n|$)",
+        r"(?:tên|ten)\s+(?P<name>.+?)(?=\s+(?:cho|vào|vao|ứng tuyển|ung tuyen|vị trí|vi tri|tin|job|email|sdt|sđt|phone|điện thoại|dien thoai)\b|[,.;]|\n|$)",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, text, flags=re.IGNORECASE | re.DOTALL)
+        if match:
+            name = _clean_extracted_name(match.group("name"))
+            if len(name.split()) >= 2:
+                return name
+    return ""
+
+
+def _extract_email(text: str) -> str:
+    match = re.search(r"[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}", text or "")
+    return match.group(0)[:254] if match else ""
+
+
+def _extract_phone(text: str) -> str:
+    match = re.search(
+        r"(?:sdt|sđt|phone|điện thoại|dien thoai)\s*[:\-]?\s*(?P<phone>\+?\d[\d\s.\-]{7,18})",
+        text or "",
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return ""
+    phone = re.sub(r"[^\d+]", "", match.group("phone"))
+    return phone[:20]
+
+
+def _select_manual_candidate_job_post(request: DRFRequest, text: str):
+    if not JobPost:
+        return None, "Không thể truy cập dữ liệu tin tuyển dụng."
+    user = getattr(request, "user", None)
+    _apply_ai_active_company_context(request)
+    company = user.get_active_company() if user and hasattr(user, "get_active_company") else None
+    if not company:
+        return None, "Bạn cần chọn công ty đang hoạt động trước khi tạo hồ sơ ứng viên."
+
+    queryset = JobPost.objects.filter(company=company)
+    id_match = re.search(r"(?:jobpost|job_post|tin|job|#)\s*[:#]?\s*(?P<id>\d+)", _normalize_chat_text(text))
+    if id_match:
+        job_post = queryset.filter(id=int(id_match.group("id"))).first()
+        if job_post:
+            return job_post, ""
+
+    normalized_text = _normalize_chat_text(text)
+    matches = [
+        job_post
+        for job_post in queryset
+        if _normalize_chat_text(getattr(job_post, "job_name", "")) in normalized_text
+    ]
+    if matches:
+        return sorted(matches, key=lambda item: len(item.job_name), reverse=True)[0], ""
+
+    count = queryset.count()
+    if count == 1:
+        return queryset.first(), ""
+    return None, "Bạn cần cho biết tin tuyển dụng/vị trí muốn thêm hồ sơ ứng viên."
+
+
+def _create_manual_candidate_from_chat(request: DRFRequest, messages: List[Dict[str, Any]]):
+    if not _is_manual_candidate_create_intent(messages):
+        return None
+    if not _can_use_recruitment_tools(request):
+        return Response(
+            data_response(errors={}, data={"reply": "Bạn cần đăng nhập bằng tài khoản nhà tuyển dụng để tạo hồ sơ ứng viên."}),
+            status=200,
+        )
+    if not EmployerCandidateProfileSerializer or not JobPostActivity:
+        return Response(
+            data_response(errors={}, data={"reply": "Chức năng tạo hồ sơ ứng viên chưa sẵn sàng."}),
+            status=200,
+        )
+
+    conversation_text = _recent_chat_text(messages)
+    full_name = _extract_manual_candidate_name(conversation_text)
+    if not full_name:
+        return Response(
+            data_response(errors={}, data={"reply": "Bạn vui lòng cung cấp họ tên ứng viên để tôi tạo hồ sơ."}),
+            status=200,
+        )
+
+    job_post, job_error = _select_manual_candidate_job_post(request, conversation_text)
+    if job_error:
+        return Response(data_response(errors={}, data={"reply": job_error}), status=200)
+
+    candidate_data = {
+        "fullName": full_name,
+        "title": job_post.job_name,
+        "note": "Tạo từ Square AI chatbot.",
+    }
+    email = _extract_email(conversation_text)
+    phone = _extract_phone(conversation_text)
+    if email:
+        candidate_data["email"] = email
+    if phone:
+        candidate_data["phone"] = phone
+
+    candidate_serializer = EmployerCandidateProfileSerializer(
+        data=candidate_data,
+        context={"request": request},
+    )
+    try:
+        candidate_serializer.is_valid(raise_exception=True)
+        with transaction.atomic():
+            candidate_profile = candidate_serializer.save()
+            job_post_activity = JobPostActivity.objects.create(
+                job_post=job_post,
+                user=None,
+                resume=None,
+                manual_candidate_profile=candidate_profile,
+                full_name=candidate_profile.full_name,
+                email=candidate_profile.email,
+                phone=candidate_profile.phone,
+            )
+    except Exception as exc:
+        logger.warning("Could not create manual candidate from chat: %s", exc)
+        return Response(
+            data_response(errors={}, data={"reply": "Không thể tạo hồ sơ ứng viên từ nội dung này. Bạn kiểm tra lại tên, email, số điện thoại và tin tuyển dụng."}),
+            status=200,
+        )
+
+    return Response(
+        data_response(
+            errors={},
+            data={
+                "reply": f"Đã tạo hồ sơ ứng viên {candidate_profile.full_name} cho tin tuyển dụng {job_post.job_name}.",
+                "action": "create_manual_candidate",
+                "activityId": job_post_activity.id,
+                "manualCandidateProfileId": candidate_profile.id,
+            },
+        ),
+        status=200,
+    )
+
 
 def execute_tool_call(tool_call, request):
     """Thực thi một tool call và trả về kết quả."""
     name = tool_call.get("function", {}).get("name")
-    args = json.loads(tool_call.get("function", {}).get("arguments", "{}"))
+    args, parse_error = _parse_tool_arguments(tool_call)
+    if parse_error:
+        return parse_error
     
     if name == "search_candidates":
         if not _can_search_candidates(request):
             return "Lỗi: Bạn không có quyền tìm kiếm ứng viên."
-        query = args.get("query")
-        limit = args.get("limit", 5)
+        query = str(args.get("query") or "").strip()
+        if not query:
+            return "Lỗi: Từ khóa tìm kiếm không hợp lệ."
+        limit = _coerce_tool_limit(args.get("limit", 5))
         
         if not Resume:
             return "Lỗi: Không thể truy cập dữ liệu ứng viên."
             
-        resumes = Resume.objects.filter(
-            Q(title__icontains=query) | 
-            Q(skills_summary__icontains=query) |
-            Q(description__icontains=query)
-        ).select_related('user').distinct()[:limit]
+        resumes = (
+            Resume.objects.filter(
+                is_active=True,
+                user__role_name=var_sys.JOB_SEEKER,
+            )
+            .filter(
+                Q(title__icontains=query) |
+                Q(skills_summary__icontains=query) |
+                Q(description__icontains=query)
+            )
+            .select_related('user')
+            .distinct()[:limit]
+        )
         
         results = []
         for r in resumes:
@@ -705,15 +1005,26 @@ def execute_tool_call(tool_call, request):
             return "Lỗi: Không thể tạo buổi phỏng vấn."
             
         try:
-            job_post = JobPost.objects.get(id=job_post_id)
-            
-            session = InterviewSession.objects.create(
-                candidate_id=candidate_id,
-                job_post=job_post,
-                created_by=request.user if request.user.is_authenticated else job_post.user,
-                scheduled_at=scheduled_at,
-                status='scheduled'
+            job_post = JobPost.objects.select_related("company").get(id=job_post_id)
+            if not _user_can_use_job_post_for_ai_tool(request, job_post):
+                return "Lỗi: Tin tuyển dụng không thuộc công ty đang hoạt động của bạn."
+
+            if not User.objects.filter(id=candidate_id, role_name=var_sys.JOB_SEEKER).exists():
+                return "Lỗi: Ứng viên không hợp lệ."
+
+            from apps.interviews.serializers import InterviewSessionCreateSerializer
+
+            serializer = InterviewSessionCreateSerializer(
+                data={
+                    "candidate": candidate_id,
+                    "job_post": job_post.id,
+                    "scheduled_at": scheduled_at,
+                },
+                context={"request": request},
             )
+            if not serializer.is_valid():
+                return f"Lỗi khi tạo lời mời: {serializer.errors}"
+            session = serializer.save(created_by=request.user)
             
             # Kích hoạt task gửi email
             if send_interview_invitation:
@@ -740,6 +1051,7 @@ class ChatAPIView(APIView):
 
 
     def post(self, request: DRFRequest):
+        _apply_ai_active_company_context(request)
         body = request.data if isinstance(request.data, dict) else {}
         messages = body.get("messages")
 
@@ -753,7 +1065,12 @@ class ChatAPIView(APIView):
                 messages.append({"role": "system", "content": system_prompt})
             messages.append({"role": "user", "content": message})
 
+        messages = _with_vietnamese_chat_instruction(messages)
         model = body.get("model") or getattr(settings, "AI_LLM_MODEL", "gemma4:e4b")
+
+        manual_candidate_response = _create_manual_candidate_from_chat(request, messages)
+        if manual_candidate_response is not None:
+            return manual_candidate_response
 
         # Determine which tools to make available.
         # Only authenticated employers/admins can create interview invitations.
@@ -786,7 +1103,8 @@ class ChatAPIView(APIView):
         except (TypeError, ValueError):
             max_tool_rounds = 4
         max_tool_rounds = max(1, min(max_tool_rounds, 8))
-        try:
+
+        def run_completion_rounds(payload_base: Dict[str, Any]):
             upstream_json = {}
             active_model = model
             active_source = None
@@ -794,7 +1112,7 @@ class ChatAPIView(APIView):
 
             for _ in range(max_tool_rounds):
                 payload = {
-                    **base_payload,
+                    **payload_base,
                     "messages": current_messages,
                 }
                 upstream_json, candidate = post_chat_completion_requests(
@@ -823,6 +1141,26 @@ class ChatAPIView(APIView):
                             "content": result,
                         }
                     )
+
+            return upstream_json, active_model, active_source
+
+        try:
+            try:
+                upstream_json, active_model, active_source = run_completion_rounds(base_payload)
+            except AIServiceUnavailable as exc:
+                if "tools" not in base_payload or not _is_tool_choice_rejection(exc):
+                    raise
+
+                logger.warning(
+                    "LLM rejected chat tool payload; retrying without tools: %s",
+                    "; ".join(exc.attempts),
+                )
+                toolless_payload = {
+                    key: value
+                    for key, value in base_payload.items()
+                    if key not in {"tools", "tool_choice"}
+                }
+                upstream_json, active_model, active_source = run_completion_rounds(toolless_payload)
 
         except (requests.ConnectionError, requests.Timeout, AIServiceUnavailable):
             # LLM not reachable — return friendly fallback

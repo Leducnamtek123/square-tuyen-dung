@@ -124,6 +124,7 @@ COMPANY_PERMISSION_KEYS = (
     "manage_candidates",
     "manage_interviews",
     "manage_question_bank",
+    "manage_employees",
     "manage_members",
     "manage_roles",
 )
@@ -139,6 +140,7 @@ COMPANY_SYSTEM_ROLES = {
             "manage_candidates",
             "manage_interviews",
             "manage_question_bank",
+            "manage_employees",
             "manage_members",
         ],
     },

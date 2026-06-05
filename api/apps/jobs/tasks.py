@@ -13,9 +13,11 @@ from django.core.cache import cache
 from decouple import config
 from .models import JobPostActivity
 from integrations.ai.client import (
+    AIServiceUnavailable,
     post_chat_completion_httpx,
     post_ollama_native_chat_httpx,
 )
+from .ai_scoring_service import _fallback_scoring
 
 logger = logging.getLogger(__name__)
 RESUME_ANALYSIS_PROMPT_VERSION = "resume-screen-v2"
@@ -93,6 +95,27 @@ def _build_resume_profile_text(resume) -> str:
     except Exception:
         pass
 
+    return "\n".join(line for line in lines if line and line.strip())
+
+
+def _build_manual_candidate_profile_text(profile) -> str:
+    """Build analyzable text for employer-entered candidates without a Resume row."""
+    if not profile:
+        return ""
+
+    lines = [
+        f"Title: {profile.title or ''}",
+        f"Career: {getattr(profile.career, 'name', '') if profile.career else ''}",
+        f"City: {getattr(profile.city, 'name', '') if profile.city else ''}",
+        f"Position: {_display(profile, 'position')}",
+        f"Experience: {_display(profile, 'experience')}",
+        f"Academic level: {_display(profile, 'academic_level')}",
+        f"Workplace type: {_display(profile, 'type_of_workplace')}",
+        f"Job type: {_display(profile, 'job_type')}",
+        f"Expected salary: {profile.salary_min or 0} - {profile.salary_max or 0}",
+        f"Summary: {profile.description or ''}",
+        f"Skills summary: {profile.skills_summary or ''}",
+    ]
     return "\n".join(line for line in lines if line and line.strip())
 
 
@@ -340,6 +363,111 @@ def _normalize_analysis_result(result: dict) -> dict:
     }
 
 
+def _number_value(value) -> int:
+    try:
+        return int(float(value or 0))
+    except (TypeError, ValueError):
+        return 0
+
+
+def _important_words(value: str) -> set[str]:
+    words = re.findall(r"[\wÀ-ỹ]{3,}", (value or "").lower(), flags=re.UNICODE)
+    stopwords = {
+        "the",
+        "and",
+        "for",
+        "with",
+        "ban",
+        "can",
+        "cac",
+        "cho",
+        "cong",
+        "kinh",
+        "lam",
+        "mot",
+        "nang",
+        "nghiem",
+        "nhan",
+        "ung",
+        "vien",
+        "viec",
+        "yeu",
+    }
+    return {word for word in words if word not in stopwords}
+
+
+def _build_rule_based_analysis_result(activity: JobPostActivity, resume_text: str, criteria: list[dict]) -> dict:
+    candidate = activity.resume or activity.manual_candidate_profile
+    job = activity.job_post
+    candidate_title = str(getattr(candidate, "title", "") or activity.full_name or "").strip()
+    candidate_skills = str(getattr(candidate, "skills_summary", "") or "").strip()
+    candidate_description = str(getattr(candidate, "description", "") or resume_text or "").strip()
+    job_text = " ".join(
+        [
+            job.job_name or "",
+            _strip_html(job.job_description or ""),
+            _strip_html(job.job_requirement or ""),
+        ]
+    )
+
+    fallback = _fallback_scoring(
+        {
+            "title": candidate_title,
+            "skills": candidate_skills,
+            "description": candidate_description,
+            "experience": _number_value(getattr(candidate, "experience", 0)),
+            "salary_min": getattr(candidate, "salary_min", 0) or 0,
+            "salary_max": getattr(candidate, "salary_max", 0) or 0,
+        },
+        {
+            "job_name": job.job_name or "",
+            "description": job_text,
+            "experience": _number_value(getattr(job, "experience", 0)),
+            "salary_min": job.salary_min or 0,
+            "salary_max": job.salary_max or 0,
+        },
+    )
+    result = _normalize_analysis_result(fallback)
+    candidate_words = _important_words(" ".join([candidate_title, candidate_skills, candidate_description, resume_text]))
+    job_words = _important_words(job_text)
+    matching_words = sorted(candidate_words & job_words)[:8]
+    missing_words = sorted(job_words - candidate_words)[:8]
+    score = result["score"]
+
+    result.update(
+        {
+            "summary": (
+                "AI đang tạm thời không khả dụng; hệ thống đã dùng chấm điểm dự phòng "
+                "dựa trên hồ sơ ứng viên và tin tuyển dụng."
+            ),
+            "skills": matching_words[:5],
+            "pros": result["pros"] or ["Có dữ liệu hồ sơ để đối chiếu với tin tuyển dụng."],
+            "cons": result["cons"] or ["Cần HR xem lại vì đây là phân tích dự phòng khi LLM offline."],
+            "matching_skills": matching_words,
+            "missing_skills": missing_words,
+            "criteria_results": [
+                {
+                    "key": item.get("key", f"criterion_{index + 1}"),
+                    "score": score,
+                    "matched": score >= 60,
+                    "evidence": "Rule-based fallback used because the LLM service is unavailable.",
+                    "reason": "Điểm dự phòng dựa trên mức khớp tiêu đề, kinh nghiệm, lương và từ khóa.",
+                }
+                for index, item in enumerate(criteria)
+            ],
+            "evidence": [
+                {
+                    "claim": "LLM service unavailable",
+                    "source": "system",
+                    "quote": "Rule-based fallback",
+                    "confidence": 100,
+                }
+            ],
+        }
+    )
+    return result
+
+
 @shared_task(
     bind=True,
     autoretry_for=(Exception,),
@@ -447,7 +575,17 @@ def analyze_resume_ai(self, activity_id):
 
         activity = (
             JobPostActivity.objects
-            .select_related('job_post', 'resume', 'resume__file', 'resume__career', 'resume__city')
+            .select_related(
+                'job_post',
+                'resume',
+                'resume__file',
+                'resume__career',
+                'resume__city',
+                'manual_candidate_profile',
+                'manual_candidate_profile__file',
+                'manual_candidate_profile__career',
+                'manual_candidate_profile__city',
+            )
             .prefetch_related(
                 'resume__advanced_skills',
                 'resume__experience_details',
@@ -458,7 +596,9 @@ def analyze_resume_ai(self, activity_id):
             .get(id=activity_id)
         )
 
-        if not activity.resume:
+        resume = activity.resume
+        manual_profile = activity.manual_candidate_profile
+        if not resume and not manual_profile:
             activity.ai_analysis_status = 'failed'
             activity.ai_analysis_progress = 0
             activity.ai_analysis_summary = "Khong tim thay ho so ung vien de phan tich."
@@ -469,10 +609,10 @@ def analyze_resume_ai(self, activity_id):
         activity.ai_analysis_progress = 5
         activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'update_at'])
 
-        file_obj = activity.resume.file
+        file_obj = resume.file if resume else manual_profile.file
         file_format = file_obj.format.lower() if file_obj and file_obj.format else 'pdf'
         resume_text = ""
-        input_source = "profile"
+        input_source = "profile" if resume else "manual_profile"
 
         if file_obj:
             input_source = f"file:{file_format}"
@@ -535,7 +675,7 @@ def analyze_resume_ai(self, activity_id):
                 activity.ai_analysis_progress = 45
                 activity.save(update_fields=['ai_analysis_progress', 'update_at'])
 
-        profile_text = _build_resume_profile_text(activity.resume)
+        profile_text = _build_resume_profile_text(resume) if resume else _build_manual_candidate_profile_text(manual_profile)
         if profile_text:
             resume_text = f"{resume_text}\n\nStructured online profile:\n{profile_text}".strip()
             if not file_obj:
@@ -639,58 +779,67 @@ def analyze_resume_ai(self, activity_id):
         activity.ai_analysis_progress = 70
         activity.save(update_fields=['ai_analysis_progress', 'update_at'])
 
-        response_json, llm_candidate = post_chat_completion_httpx(
-            payload,
-            default_model=model_alias,
-            timeout_seconds=llm_timeout,
-            connect_timeout_seconds=llm_connect_timeout,
-        )
-        message = (response_json.get("choices") or [{}])[0].get("message") or {}
-        content = message.get("content") or ""
-        reasoning = message.get("reasoning") or ""
-        if isinstance(content, list):
-            content = "\n".join(
-                part.get("text", "") if isinstance(part, dict) else str(part)
-                for part in content
-            )
-
-        # Ollama + some reasoning models may return empty "content" on /v1/chat/completions.
-        # Fallback to native /api/chat to force JSON output when needed.
         try:
-            result = _parse_llm_json_content(content)
-        except Exception:
-            result = None
-            if reasoning:
-                try:
-                    result = _parse_llm_json_content(reasoning)
-                except Exception:
-                    result = None
-
-            if result is None and config("AI_RESUME_OLLAMA_FALLBACK_ENABLED", default=True, cast=bool):
-                native_payload = {
-                    "model": llm_candidate.model or model_alias,
-                    "messages": payload["messages"],
-                    "stream": False,
-                    "think": False,
-                    "format": "json",
-                    "options": {
-                        "temperature": llm_temperature,
-                    },
-                }
-                native_json = post_ollama_native_chat_httpx(
-                    llm_candidate,
-                    native_payload,
-                    timeout_seconds=llm_timeout,
-                    connect_timeout_seconds=llm_connect_timeout,
+            response_json, llm_candidate = post_chat_completion_httpx(
+                payload,
+                default_model=model_alias,
+                timeout_seconds=llm_timeout,
+                connect_timeout_seconds=llm_connect_timeout,
+            )
+        except AIServiceUnavailable as exc:
+            logger.warning("LLM unavailable for activity %s, using rule-based fallback: %s", activity_id, exc)
+            result = _build_rule_based_analysis_result(activity, resume_text, criteria)
+            analysis_model = "rule-based-fallback"
+            analysis_source = f"{input_source}:fallback"
+        else:
+            analysis_model = llm_candidate.model or model_alias
+            analysis_source = f"{input_source}:{llm_candidate.name}"
+            message = (response_json.get("choices") or [{}])[0].get("message") or {}
+            content = message.get("content") or ""
+            reasoning = message.get("reasoning") or ""
+            if isinstance(content, list):
+                content = "\n".join(
+                    part.get("text", "") if isinstance(part, dict) else str(part)
+                    for part in content
                 )
-                if native_json:
-                    native_content = (native_json.get("message") or {}).get("content") or ""
-                    result = _parse_llm_json_content(native_content)
 
-            if result is None:
-                raise ValueError("Model response does not contain valid JSON.")
+            # Ollama + some reasoning models may return empty "content" on /v1/chat/completions.
+            # Fallback to native /api/chat to force JSON output when needed.
+            try:
+                result = _parse_llm_json_content(content)
+            except Exception:
+                result = None
+                if reasoning:
+                    try:
+                        result = _parse_llm_json_content(reasoning)
+                    except Exception:
+                        result = None
 
-        result = _normalize_analysis_result(result)
+                if result is None and config("AI_RESUME_OLLAMA_FALLBACK_ENABLED", default=True, cast=bool):
+                    native_payload = {
+                        "model": llm_candidate.model or model_alias,
+                        "messages": payload["messages"],
+                        "stream": False,
+                        "think": False,
+                        "format": "json",
+                        "options": {
+                            "temperature": llm_temperature,
+                        },
+                    }
+                    native_json = post_ollama_native_chat_httpx(
+                        llm_candidate,
+                        native_payload,
+                        timeout_seconds=llm_timeout,
+                        connect_timeout_seconds=llm_connect_timeout,
+                    )
+                    if native_json:
+                        native_content = (native_json.get("message") or {}).get("content") or ""
+                        result = _parse_llm_json_content(native_content)
+
+                if result is None:
+                    raise ValueError("Model response does not contain valid JSON.")
+
+            result = _normalize_analysis_result(result)
         activity.ai_analysis_score = result.get('score', 0)
         activity.ai_analysis_summary = result.get('summary', '')
         activity.ai_analysis_skills = ", ".join(result.get('skills', []))
@@ -703,8 +852,8 @@ def analyze_resume_ai(self, activity_id):
             "criteria_results": result.get("criteria_results", []),
             "evidence": result.get("evidence", []),
         }
-        activity.ai_analysis_model = llm_candidate.model or model_alias
-        activity.ai_analysis_source = f"{input_source}:{llm_candidate.name}"
+        activity.ai_analysis_model = analysis_model
+        activity.ai_analysis_source = analysis_source
         activity.ai_analysis_prompt_version = RESUME_ANALYSIS_PROMPT_VERSION
         activity.ai_analysis_prompt_hash = prompt_hash
         activity.ai_analysis_review_status = 'ai_only'

@@ -13,8 +13,10 @@ import ArticleIcon from '@mui/icons-material/Article';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { useTranslation } from 'react-i18next';
 import contentService, { ArticlePayload, ArticleCategory, ArticleStatus } from '@/services/contentService';
 import toastMessages from '@/utils/toastMessages';
+import { hasArticleTextContent } from '@/utils/articleContent';
 
 import SimpleRichEditor from '@/components/Common/Controls/SimpleRichEditor';
 
@@ -137,6 +139,7 @@ const adminArticleFormReducer = (
 
 const AdminArticleFormPage = ({ mode, articleId }: Props) => {
   const { push } = useRouter();
+  const { t } = useTranslation('admin');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [state, dispatch] = useReducer(adminArticleFormReducer, initialAdminArticleFormState);
@@ -163,10 +166,10 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
         .then((article) => {
           dispatch({ type: 'loaded', article });
         })
-        .catch(() => toastMessages.error('Không thể tải bài viết'))
+        .catch(() => toastMessages.error(t('pages.articles.messages.formLoadError')))
         .finally(() => dispatch({ type: 'loadFailed' }));
     }
-  }, [mode, articleId]);
+  }, [mode, articleId, t]);
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -186,8 +189,8 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
   };
 
   const handleSave = async (targetStatus?: ArticleStatus) => {
-    if (!title.trim()) { toastMessages.error('Vui lòng nhập tiêu đề'); return; }
-    if (!content.trim()) { toastMessages.error('Vui lòng nhập nội dung'); return; }
+    if (!title.trim()) { toastMessages.error(t('pages.articles.validation.titleRequired')); return; }
+    if (!hasArticleTextContent(content)) { toastMessages.error(t('pages.articles.validation.contentRequired')); return; }
 
     dispatch({ type: 'patch', patch: { saving: true } });
     const payload: ArticlePayload = {
@@ -202,15 +205,15 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
     try {
       if (mode === 'create') {
         const created = await contentService.adminCreateArticle(payload, thumbnailFile || undefined);
-        toastMessages.success('Tạo bài viết thành công!');
+        toastMessages.success(t('pages.articles.messages.createSuccess'));
         push(`/admin/articles/${created.id}`);
       } else if (articleId) {
         await contentService.adminUpdateArticle(articleId, payload, thumbnailFile || undefined);
-        toastMessages.success('Lưu bài viết thành công!');
+        toastMessages.success(t('pages.articles.messages.updateSuccess'));
         if (targetStatus) dispatch({ type: 'patch', patch: { articleStatus: targetStatus } });
       }
     } catch {
-      toastMessages.error('Không thể lưu bài viết');
+      toastMessages.error(t('pages.articles.messages.saveError'));
     } finally {
       dispatch({ type: 'patch', patch: { saving: false } });
     }
@@ -233,7 +236,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
         </IconButton>
         <Box flex={1}>
           <Typography variant="h5" fontWeight={900}>
-            {mode === 'create' ? 'Viết bài mới' : 'Chỉnh sửa bài viết'}
+            {mode === 'create' ? t('pages.articles.form.createTitle') : t('pages.articles.form.editTitle')}
           </Typography>
         </Box>
         <Stack direction="row" spacing={1.5}>
@@ -244,7 +247,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
             disabled={saving}
             sx={{ fontWeight: 700 }}
           >
-            {saving ? 'Đang lưu...' : 'Lưu nháp'}
+            {saving ? t('pages.articles.actions.saving') : t('pages.articles.actions.saveDraft')}
           </Button>
           <Button
             variant="contained"
@@ -254,7 +257,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
             color="success"
             sx={{ fontWeight: 700 }}
           >
-            Đăng bài
+            {t('pages.articles.actions.publish')}
           </Button>
         </Stack>
       </Stack>
@@ -265,19 +268,19 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
           <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
             <TextField
               fullWidth
-              label="Tiêu đề bài viết"
+              label={t('pages.articles.form.titleLabel')}
               value={title}
               onChange={(e) => dispatch({ type: 'patch', patch: { title: e.target.value } })}
-              placeholder="Nhập tiêu đề hấp dẫn..."
+              placeholder={t('pages.articles.form.titlePlaceholder')}
               sx={{ mb: 2 }}
               slotProps={{ htmlInput: { style: { fontSize: '1.1rem', fontWeight: 700 } } }}
             />
             <TextField
               fullWidth
-              label="Mô tả ngắn (excerpt)"
+              label={t('pages.articles.form.excerptLabel')}
               value={excerpt}
               onChange={(e) => dispatch({ type: 'patch', patch: { excerpt: e.target.value } })}
-              placeholder="Tóm tắt nội dung bài viết (hiển thị trong danh sách)..."
+              placeholder={t('pages.articles.form.excerptPlaceholder')}
               multiline
               rows={2}
               slotProps={{ htmlInput: { maxLength: 500 } }}
@@ -288,7 +291,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
           {/* Rich Text Editor */}
           <Paper sx={{ p: 3, borderRadius: 2, minHeight: 500 }}>
             <Typography variant="subtitle2" fontWeight={700} mb={2} color="text.secondary">
-              NỘI DUNG BÀI VIẾT
+              {t('pages.articles.form.contentTitle')}
             </Typography>
             <SimpleRichEditor
               value={content}
@@ -303,28 +306,28 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
           {/* Publish Settings */}
           <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
             <Typography variant="subtitle2" fontWeight={800} mb={2}>
-              THIẾT LẬP ĐĂNG BÀI
+              {t('pages.articles.form.publishSettings')}
             </Typography>
 
             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-              <InputLabel>Danh mục</InputLabel>
-              <Select value={category} label="Danh mục" onChange={(e) => dispatch({ type: 'patch', patch: { category: e.target.value as ArticleCategory } })}>
+              <InputLabel>{t('pages.articles.form.categoryLabel')}</InputLabel>
+              <Select value={category} label={t('pages.articles.form.categoryLabel')} onChange={(e) => dispatch({ type: 'patch', patch: { category: e.target.value as ArticleCategory } })}>
                 <MenuItem value="news" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <ArticleIcon sx={{ fontSize: 16, color: 'text.secondary' }} /> Tin tức
+                  <ArticleIcon sx={{ fontSize: 16, color: 'text.secondary' }} /> {t('pages.articles.categories.news')}
                 </MenuItem>
                 <MenuItem value="blog" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <EditNoteIcon sx={{ fontSize: 16, color: 'text.secondary' }} /> Blog tuyển dụng
+                  <EditNoteIcon sx={{ fontSize: 16, color: 'text.secondary' }} /> {t('pages.articles.categories.blog')}
                 </MenuItem>
               </Select>
             </FormControl>
 
             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-              <InputLabel>Trạng thái</InputLabel>
-              <Select value={articleStatus} label="Trạng thái" onChange={(e) => dispatch({ type: 'patch', patch: { articleStatus: e.target.value as ArticleStatus } })}>
-                <MenuItem value="draft">Bản nháp</MenuItem>
-                <MenuItem value="pending">Chờ duyệt</MenuItem>
-                <MenuItem value="published">Đã đăng</MenuItem>
-                <MenuItem value="archived">Lưu trữ</MenuItem>
+              <InputLabel>{t('pages.articles.form.statusLabel')}</InputLabel>
+              <Select value={articleStatus} label={t('pages.articles.form.statusLabel')} onChange={(e) => dispatch({ type: 'patch', patch: { articleStatus: e.target.value as ArticleStatus } })}>
+                <MenuItem value="draft">{t('pages.articles.statuses.draft')}</MenuItem>
+                <MenuItem value="pending">{t('pages.articles.statuses.pending')}</MenuItem>
+                <MenuItem value="published">{t('pages.articles.statuses.published')}</MenuItem>
+                <MenuItem value="archived">{t('pages.articles.statuses.archived')}</MenuItem>
               </Select>
             </FormControl>
           </Paper>
@@ -332,12 +335,12 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
           {/* Thumbnail */}
           <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
             <Typography variant="subtitle2" fontWeight={800} mb={2}>
-              ẢNH ĐẠI DIỆN
+              {t('pages.articles.form.thumbnailTitle')}
             </Typography>
             <input
               ref={fileInputRef}
               type="file"
-              aria-label="Article thumbnail"
+              aria-label={t('pages.articles.form.thumbnailAria')}
               accept="image/*"
               style={{ display: 'none' }}
               onChange={handleThumbnailChange}
@@ -347,7 +350,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
                 <Box
                   component="img"
                   src={thumbnailPreview || existingThumbnailUrl!}
-                  alt="thumbnail"
+                  alt={t('pages.articles.form.thumbnailAlt')}
                   sx={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 1.5 }}
                 />
                 <IconButton
@@ -358,7 +361,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
                   <CloseIcon fontSize="small" />
                 </IconButton>
                 <Button size="small" fullWidth startIcon={<ImageIcon />} onClick={() => fileInputRef.current?.click()} sx={{ mt: 1 }}>
-                  Đổi ảnh
+                  {t('pages.articles.actions.changeImage')}
                 </Button>
               </Box>
             ) : (
@@ -369,7 +372,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
                 onClick={() => fileInputRef.current?.click()}
                 sx={{ height: 100, borderStyle: 'dashed' }}
               >
-                Chọn ảnh đại diện
+                {t('pages.articles.actions.chooseImage')}
               </Button>
             )}
           </Paper>
@@ -377,18 +380,18 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
           {/* Tags */}
           <Paper sx={{ p: 3, borderRadius: 2 }}>
             <Typography variant="subtitle2" fontWeight={800} mb={2}>
-              TAGS
+              {t('pages.articles.form.tagsTitle')}
             </Typography>
             <Stack direction="row" spacing={1} mb={1.5}>
               <TextField
                 size="small"
-                placeholder="Nhập tag..."
+                placeholder={t('pages.articles.form.tagPlaceholder')}
                 value={tagInput}
                 onChange={(e) => dispatch({ type: 'patch', patch: { tagInput: e.target.value } })}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
                 fullWidth
               />
-              <Button size="small" variant="outlined" onClick={addTag}>Thêm</Button>
+              <Button size="small" variant="outlined" onClick={addTag}>{t('pages.articles.actions.addTag')}</Button>
             </Stack>
             <Stack direction="row" flexWrap="wrap" gap={0.5}>
               {tagList.map((tag) => (

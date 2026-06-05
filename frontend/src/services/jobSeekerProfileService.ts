@@ -95,12 +95,21 @@ const jobSeekerProfileService = {
     }
 
     const obj = data ?? {};
+    const nestedData = obj.data && !Array.isArray(obj.data) && typeof obj.data === 'object'
+      ? obj.data
+      : null;
     const results = Array.isArray(obj.results)
       ? obj.results
       : Array.isArray(obj.data)
         ? obj.data
-        : [];
-    const count = typeof obj.count === 'number' ? obj.count : results.length;
+        : nestedData && Array.isArray(nestedData.results)
+          ? nestedData.results
+          : [];
+    const count = typeof obj.count === 'number'
+      ? obj.count
+      : nestedData && typeof nestedData.count === 'number'
+        ? nestedData.count
+        : results.length;
 
     return {
       count,
@@ -115,6 +124,6 @@ export default jobSeekerProfileService;
 type ResumeListResponse = {
   count?: number;
   results?: Resume[];
-  data?: Resume[];
+  data?: Resume[] | { results?: Resume[]; count?: number };
 };
 

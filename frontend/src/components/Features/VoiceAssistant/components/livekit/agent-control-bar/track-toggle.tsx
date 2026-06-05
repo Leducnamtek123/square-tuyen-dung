@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Track } from 'livekit-client';
 import { useTrackToggle } from '@livekit/components-react';
+import { useTranslation } from 'react-i18next';
 import {
   MicrophoneIcon,
   MicrophoneSlashIcon,
@@ -37,10 +38,12 @@ type TrackToggleProps = React.ComponentProps<typeof Toggle> & {
 };
 
 export function TrackToggle({ source, pressed, pending, className, ...props }: TrackToggleProps) {
+  const { t } = useTranslation('interview');
   const IconComponent = getSourceIcon(source, pressed ?? false, pending);
+  const ariaLabel = props['aria-label'] || t('voiceAi.aria.toggleGeneric', { target: source });
 
   return (
-    <Toggle pressed={pressed} aria-label={`Toggle ${source}`} className={cn(className)} {...props}>
+    <Toggle {...props} pressed={pressed} aria-label={ariaLabel} className={cn(className)}>
       <IconComponent weight="bold" className={cn(pending && 'animate-spin')} />
       {props.children}
     </Toggle>

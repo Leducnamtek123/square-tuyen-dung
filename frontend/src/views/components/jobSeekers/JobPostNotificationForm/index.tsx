@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { Grid2 as Grid } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 import { typedYupResolver } from '../../../../utils/formHelpers';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
@@ -11,6 +12,7 @@ import SingleSelectCustom from '../../../../components/Common/Controls/SingleSel
 import RadioCustom from '../../../../components/Common/Controls/RadioCustom';
 import { useConfig } from '@/hooks/useConfig';
 import type { SelectOption } from '@/types/models';
+import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';
 
 export interface JobPostNotificationFormValues {
   frequency: number | null;
@@ -28,40 +30,57 @@ interface JobPostNotificationFormProps {
   initialValues?: Partial<JobPostNotificationFormValues> | null;
 }
 
-const getDefaultFrequency = (options?: SelectOption[]) => {
+export const getDefaultFrequency = (options?: SelectOption[]): number | null => {
   if (!options || options.length === 0) return null;
-  return (options[0]?.id as number | null) ?? null;
+  const value = Number(options[0]?.id);
+  if (!Number.isFinite(value)) return null;
+  return BACKEND_CHOICE_VALUES.frequencyNotification.includes(value) ? value : null;
 };
+
+export const createJobPostNotificationSchema = (t: TFunction<string | string[], undefined>) =>
+  yup.object().shape({
+    jobName: yup
+      .string()
+      .required(t('jobSeeker:jobManagement.notifications.form.validation.keywordRequired'))
+      .max(200, t('jobSeeker:jobManagement.notifications.form.validation.keywordMax')),
+    career: yup
+      .number()
+      .required(t('jobSeeker:jobManagement.notifications.form.validation.careerRequired'))
+      .typeError(t('jobSeeker:jobManagement.notifications.form.validation.careerRequired'))
+      .moreThan(0, t('jobSeeker:jobManagement.notifications.form.validation.careerRequired')),
+    city: yup
+      .number()
+      .required(t('jobSeeker:jobManagement.notifications.form.validation.cityRequired'))
+      .typeError(t('jobSeeker:jobManagement.notifications.form.validation.cityRequired'))
+      .moreThan(0, t('jobSeeker:jobManagement.notifications.form.validation.cityRequired')),
+    position: yup
+      .number()
+      .nullable()
+      .notRequired()
+      .oneOf([...BACKEND_CHOICE_VALUES.position, null], t('jobSeeker:jobManagement.notifications.form.validation.choiceInvalid')),
+    experience: yup
+      .number()
+      .nullable()
+      .notRequired()
+      .oneOf([...BACKEND_CHOICE_VALUES.experience, null], t('jobSeeker:jobManagement.notifications.form.validation.choiceInvalid')),
+    salary: yup
+      .number()
+      .nullable()
+      .typeError(t('jobSeeker:jobManagement.notifications.form.validation.salaryInvalid'))
+      .transform((value, originalValue) => (originalValue === '' ? null : value)),
+    frequency: yup
+      .number()
+      .required(t('jobSeeker:jobManagement.notifications.form.validation.frequencyRequired'))
+      .oneOf(BACKEND_CHOICE_VALUES.frequencyNotification, t('jobSeeker:jobManagement.notifications.form.validation.frequencyInvalid'))
+      .typeError(t('jobSeeker:jobManagement.notifications.form.validation.frequencyRequired')),
+  });
 
 const JobPostNotificationForm = ({ handleAddOrUpdate, editData, initialValues }: JobPostNotificationFormProps) => {
   const { t } = useTranslation(['jobSeeker', 'common']);
   const { allConfig } = useConfig();
 
   const schema = React.useMemo(
-    () =>
-      yup.object().shape({
-        jobName: yup
-          .string()
-          .required(t('jobSeeker:jobManagement.notifications.form.validation.keywordRequired'))
-          .max(200, t('jobSeeker:jobManagement.notifications.form.validation.keywordMax')),
-        career: yup
-          .number()
-          .required(t('jobSeeker:jobManagement.notifications.form.validation.careerRequired'))
-          .typeError(t('jobSeeker:jobManagement.notifications.form.validation.careerRequired'))
-          .moreThan(0, t('jobSeeker:jobManagement.notifications.form.validation.careerRequired')),
-        city: yup
-          .number()
-          .required(t('jobSeeker:jobManagement.notifications.form.validation.cityRequired'))
-          .typeError(t('jobSeeker:jobManagement.notifications.form.validation.cityRequired'))
-          .moreThan(0, t('jobSeeker:jobManagement.notifications.form.validation.cityRequired')),
-        position: yup.number().notRequired().nullable(),
-        experience: yup.number().notRequired().nullable(),
-        salary: yup
-          .number()
-          .nullable()
-          .typeError(t('jobSeeker:jobManagement.notifications.form.validation.salaryInvalid'))
-          .transform((value, originalValue) => (originalValue === '' ? null : value)),
-      }),
+    () => createJobPostNotificationSchema(t),
     [t],
   );
 

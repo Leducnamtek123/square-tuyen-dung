@@ -174,14 +174,15 @@ export default function AuditLogsPage() {
         size: 72,
       },
       {
-        accessorKey: 'createAt',
-        header: t('pages.auditLogs.table.time', 'Thời gian') as string,
+        id: 'create_at',
+        accessorFn: (row) => row.createAt,
+        header: t('pages.auditLogs.table.time') as string,
         enableSorting: true,
         cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm:ss') : '---'),
       },
       {
         accessorKey: 'action',
-        header: t('pages.auditLogs.table.action', 'Hành động') as string,
+        header: t('pages.auditLogs.table.action') as string,
         enableSorting: true,
         cell: (info) => {
           const action = String(info.getValue() || '');
@@ -190,12 +191,12 @@ export default function AuditLogsPage() {
       },
       {
         accessorKey: 'actorEmail',
-        header: t('pages.auditLogs.table.actor', 'Người thao tác') as string,
+        header: t('pages.auditLogs.table.actor') as string,
         cell: (info) => info.getValue() || 'system',
       },
       {
         accessorKey: 'resourceType',
-        header: t('pages.auditLogs.table.resource', 'Đối tượng') as string,
+        header: t('pages.auditLogs.table.resource') as string,
         cell: (info) => (
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -209,7 +210,7 @@ export default function AuditLogsPage() {
       },
       {
         accessorKey: 'requestPath',
-        header: t('pages.auditLogs.table.request', 'Request') as string,
+        header: t('pages.auditLogs.table.request') as string,
         cell: (info) => (
           <Tooltip title={String(info.getValue() || '')}>
             <Stack spacing={0.25}>
@@ -236,60 +237,60 @@ export default function AuditLogsPage() {
     <Box>
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
-          {t('pages.auditLogs.title', 'Nhật ký hệ thống')}
+          {t('pages.auditLogs.title')}
         </Typography>
         <Breadcrumbs aria-label="breadcrumb">
           <Link underline="hover" color="inherit" href="/admin">
-            {t('pages.auditLogs.breadcrumbAdmin', 'Quản trị')}
+            {t('pages.auditLogs.breadcrumbAdmin')}
           </Link>
-          <Typography color="text.primary">{t('pages.auditLogs.breadcrumb', 'Nhật ký hệ thống')}</Typography>
+          <Typography color="text.primary">{t('pages.auditLogs.breadcrumb')}</Typography>
         </Breadcrumbs>
       </Box>
 
       <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
         <FilterBar
-          title={t('pages.auditLogs.filter.title', 'Bộ lọc nhật ký')}
+          title={t('pages.auditLogs.filter.title')}
           searchValue={state.searchTerm}
-          searchPlaceholder={t('pages.auditLogs.searchPlaceholder', 'Tìm email, hành động, đối tượng, request...')}
+          searchPlaceholder={t('pages.auditLogs.searchPlaceholder')}
           onSearchChange={handleSearch}
           onReset={() => {
             dispatch({ type: 'reset' });
             onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
           }}
           resetDisabled={!hasFilters}
-          resetLabel={t('common.clearFilters', 'Xóa lọc')}
+          resetLabel={t('common.clearFilters')}
           activeFilterCount={activeFilterCount}
-          advancedLabel={t('common.advancedFilters', 'Bộ lọc nâng cao')}
+          advancedLabel={t('common.advancedFilters')}
           actions={
             <Button variant="outlined" startIcon={<DownloadIcon />} onClick={handleExport} disabled={isLoading || isExporting}>
-              {isExporting ? t('pages.auditLogs.exportingCsv', 'Đang xuất...') : t('pages.auditLogs.exportCsv', 'Xuất CSV')}
+              {isExporting ? t('pages.auditLogs.exportingCsv') : t('pages.auditLogs.exportCsv')}
             </Button>
           }
           advancedFilters={
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.25} flexWrap="wrap">
               <TextField
-                label={t('pages.auditLogs.filter.actorEmail', 'Email người thao tác')}
+                label={t('pages.auditLogs.filter.actorEmail')}
                 size="small"
                 value={state.actorEmail}
                 onChange={(event) => handleFieldChange('actorEmail', event.target.value)}
                 sx={[{ minWidth: 220 }, filterControlSx]}
               />
               <TextField
-                label={t('pages.auditLogs.filter.resourceType', 'Loại đối tượng')}
+                label={t('pages.auditLogs.filter.resourceType')}
                 size="small"
                 value={state.resourceType}
                 onChange={(event) => handleFieldChange('resourceType', event.target.value)}
                 sx={[{ minWidth: 220 }, filterControlSx]}
               />
               <TextField
-                label={t('pages.auditLogs.filter.resourceId', 'ID đối tượng')}
+                label={t('pages.auditLogs.filter.resourceId')}
                 size="small"
                 value={state.resourceId}
                 onChange={(event) => handleFieldChange('resourceId', event.target.value)}
                 sx={[{ minWidth: 180 }, filterControlSx]}
               />
               <TextField
-                label={t('pages.auditLogs.filter.dateFrom', 'Từ ngày')}
+                label={t('pages.auditLogs.filter.dateFrom')}
                 type="date"
                 size="small"
                 value={state.dateFrom}
@@ -298,7 +299,7 @@ export default function AuditLogsPage() {
                 slotProps={{ inputLabel: { shrink: true } }}
               />
               <TextField
-                label={t('pages.auditLogs.filter.dateTo', 'Đến ngày')}
+                label={t('pages.auditLogs.filter.dateTo')}
                 type="date"
                 size="small"
                 value={state.dateTo}
@@ -310,14 +311,14 @@ export default function AuditLogsPage() {
           }
         >
             <FormControl size="small" sx={{ minWidth: 180 }}>
-              <InputLabel id="audit-action-filter-label">{t('pages.auditLogs.filter.action', 'Hành động')}</InputLabel>
+              <InputLabel id="audit-action-filter-label">{t('pages.auditLogs.filter.action')}</InputLabel>
               <Select
                 labelId="audit-action-filter-label"
                 value={state.action}
-                label={t('pages.auditLogs.filter.action', 'Hành động')}
+                label={t('pages.auditLogs.filter.action')}
                 onChange={(event) => handleActionChange(event.target.value)}
               >
-                <MenuItem value="">{t('pages.auditLogs.filter.allActions', 'Tất cả')}</MenuItem>
+                <MenuItem value="">{t('pages.auditLogs.filter.allActions')}</MenuItem>
                 {actions.map((action) => (
                   <MenuItem key={action} value={action}>
                     {t(`pages.auditLogs.actions.${action}`, action)}

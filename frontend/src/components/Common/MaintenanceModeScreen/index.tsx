@@ -59,7 +59,7 @@ const MaintenanceModeScreen = ({ detail }: MaintenanceModeScreenProps) => {
           </Box>
 
           <Chip
-            label={t('maintenanceMode.badge', 'Đang bảo trì')}
+            label={t('maintenanceMode.badge')}
             color="warning"
             variant="outlined"
             sx={{ fontWeight: 700, bgcolor: '#fff' }}
@@ -74,8 +74,8 @@ const MaintenanceModeScreen = ({ detail }: MaintenanceModeScreenProps) => {
                 fontWeight: 800,
                 letterSpacing: 0,
               }}
-            >
-              {t('maintenanceMode.title', 'Hệ thống đang bảo trì')}
+          >
+              {t('maintenanceMode.title')}
             </Typography>
             <Typography
               sx={{
@@ -85,10 +85,7 @@ const MaintenanceModeScreen = ({ detail }: MaintenanceModeScreenProps) => {
                 lineHeight: 1.7,
               }}
             >
-              {t(
-                'maintenanceMode.message',
-                'Square Tuyển Dụng đang nâng cấp hệ thống để phục vụ bạn tốt hơn. Vui lòng quay lại sau ít phút.',
-              )}
+              {t('maintenanceMode.message')}
             </Typography>
           </Stack>
 
@@ -104,7 +101,7 @@ const MaintenanceModeScreen = ({ detail }: MaintenanceModeScreenProps) => {
               onClick={handleReload}
               sx={{ px: 3, py: 1.25, fontWeight: 700 }}
             >
-              {t('maintenanceMode.reload', 'Tải lại trang')}
+              {t('maintenanceMode.reload')}
             </Button>
             <Stack
               direction="row"
@@ -118,14 +115,14 @@ const MaintenanceModeScreen = ({ detail }: MaintenanceModeScreenProps) => {
             >
               <AccessTimeIcon sx={{ fontSize: 18 }} />
               <Typography variant="body2">
-                {t('maintenanceMode.retryHint', 'Bạn có thể thử lại sau ít phút.')}
+                {t('maintenanceMode.retryHint')}
               </Typography>
             </Stack>
           </Stack>
 
           {detail?.status && (
             <Typography variant="caption" sx={{ color: '#6b7280' }}>
-              {t('maintenanceMode.statusCode', 'Mã trạng thái')}: {detail.status}
+              {t('maintenanceMode.statusCode')}: {detail.status}
             </Typography>
           )}
         </Stack>

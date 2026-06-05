@@ -155,7 +155,7 @@ const SubHeader = () => {
                   </Stack>
 
                   <IconButton
-                    aria-label={t('next', { defaultValue: 'Next' })}
+                    aria-label={t('next')}
                     onClick={handleScrollNext}
                     size="small"
                     sx={{

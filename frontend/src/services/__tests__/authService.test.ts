@@ -24,6 +24,7 @@ describe('authService', () => {
       (httpRequest.post as jest.Mock).mockResolvedValueOnce({ access_token: 'aaa' });
       const res = await authService.getToken('test@example.com', 'password', 'JOB_SEEKER');
       expect(httpRequest.post).toHaveBeenCalledWith('auth/token/', expect.any(Object));
+      expect((httpRequest.post as jest.Mock).mock.calls[0][1]).not.toHaveProperty('client_secret');
       expect(res).toEqual({ access_token: 'aaa' });
     });
   });
@@ -109,11 +110,10 @@ describe('authService', () => {
     });
 
     it('convertToken calls post with optional redirectUri and roleName', async () => {
-      await authService.convertToken('client', 'secret', 'google-oauth2', 'token', 'uri', 'EMPLOYER');
+      await authService.convertToken('client', 'google-oauth2', 'token', 'uri', 'EMPLOYER');
       expect(httpRequest.post).toHaveBeenCalledWith('auth/convert-token/', {
         grant_type: 'convert_token',
         client_id: 'client',
-        client_secret: 'secret',
         backend: 'google-oauth2',
         token: 'token',
         redirect_uri: 'uri',
@@ -124,11 +124,13 @@ describe('authService', () => {
     it('firebaseLogin calls post', async () => {
       await authService.firebaseLogin('token', 'JOB_SEEKER');
       expect(httpRequest.post).toHaveBeenCalledWith('auth/firebase-login/', expect.any(Object));
+      expect((httpRequest.post as jest.Mock).mock.calls[0][1]).not.toHaveProperty('client_secret');
     });
 
     it('revokeToken calls post', async () => {
       await authService.revokeToken('token', 'google');
       expect(httpRequest.post).toHaveBeenCalledWith('auth/revoke-token/', expect.any(Object));
+      expect((httpRequest.post as jest.Mock).mock.calls[0][1]).not.toHaveProperty('client_secret');
     });
 
     it('jobSeekerRegister calls post', async () => {

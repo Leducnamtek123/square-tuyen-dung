@@ -30,13 +30,13 @@ const JobPostLarge = ({
 }: JobPostLargeProps) => {
   const theme = useTheme();
   const { allConfig } = useConfig();
-  const { i18n } = useTranslation('public');
+  const { t, i18n } = useTranslation(['public', 'common']);
 
   const detailHref = localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language);
 
   const cityLabel =
     tConfig(allConfig?.cityDict?.[String(cityId)]) || (
-      <span style={{ fontStyle: 'italic', opacity: 0.7 }}>Chua cap nhat</span>
+      <span style={{ fontStyle: 'italic', opacity: 0.7 }}>{t('common:labels.notUpdated')}</span>
     );
 
   return (
@@ -87,7 +87,7 @@ const JobPostLarge = ({
               : theme.palette.grey[800],
         },
       }}
-      aria-label={jobName || 'Job detail'}
+      aria-label={jobName || t('common:viewDetails')}
     >
       <Stack spacing={1.5}>
         <Stack direction="row" spacing={2} alignItems="flex-start">
@@ -145,6 +145,7 @@ const JobPostLarge = ({
               theme={theme}
               salaryMin={salaryMin}
               salaryMax={salaryMax}
+              salaryLanguage={i18n.language}
               cityLabel={cityLabel}
               deadline={deadline}
             />

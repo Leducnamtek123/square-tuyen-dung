@@ -537,6 +537,24 @@ class UserViewSet(
                 Q(full_name__icontains=search) | Q(email__icontains=search)
             )
 
+        ordering = self.request.query_params.get("ordering")
+        ordering_map = {
+            "id": "id",
+            "fullName": "full_name",
+            "email": "email",
+            "roleName": "role_name",
+            "isActive": "is_active",
+            "isVerifyEmail": "is_verify_email",
+            "createAt": "create_at",
+            "updateAt": "update_at",
+        }
+        if ordering:
+            is_desc = ordering.startswith("-")
+            key = ordering[1:] if is_desc else ordering
+            mapped = ordering_map.get(key)
+            if mapped:
+                queryset = queryset.order_by(f"-{mapped}" if is_desc else mapped)
+
         return queryset
 
     def update(self, request, *args, **kwargs):

@@ -176,7 +176,7 @@ class EmployerRegisterSerializer(PasswordConfirmMixin, serializers.Serializer):
         fields = ("fullName", "email", "password", "confirmPassword", "company", "platform")
 
 class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    fullName = serializers.CharField(source="full_name", required=False, allow_blank=True)
+    fullName = serializers.CharField(source="full_name", required=False, allow_blank=False, max_length=100)
     email = serializers.EmailField(read_only=True)
     avatarUrl = serializers.SerializerMethodField(method_name="get_avatar_url", read_only=True)
     isActive = serializers.BooleanField(source='is_active', read_only=True)

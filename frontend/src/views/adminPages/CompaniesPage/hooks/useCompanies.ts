@@ -6,6 +6,7 @@ import type { AdminListParams } from '../../../../services/adminManagementServic
 import toastMessages from '../../../../utils/toastMessages';
 import { Company } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
+import i18next from 'i18next';
 
 export interface AdminCompanyPayload {
     companyName: string;
@@ -50,10 +51,10 @@ export const useCompanies = (params?: AdminListParams): UseCompaniesResult => {
         mutationFn: (data: AdminCompanyPayload) => adminManagementService.createCompany(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] });
-            toastMessages.success('Company added successfully');
+            toastMessages.success(i18next.t('admin:pages.companies.toast.addSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while adding the company');
+            toastMessages.error(i18next.t('admin:pages.companies.toast.addError'));
             console.error(err);
         }
     });
@@ -62,10 +63,10 @@ export const useCompanies = (params?: AdminListParams): UseCompaniesResult => {
         mutationFn: ({ id, data }: { id: string | number; data: Partial<AdminCompanyPayload> }) => adminManagementService.updateCompany(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] });
-            toastMessages.success('Company updated successfully');
+            toastMessages.success(i18next.t('admin:pages.companies.toast.updateSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while updating the company');
+            toastMessages.error(i18next.t('admin:pages.companies.toast.updateError'));
             console.error(err);
         }
     });
@@ -74,10 +75,10 @@ export const useCompanies = (params?: AdminListParams): UseCompaniesResult => {
         mutationFn: (id: string | number) => adminManagementService.deleteCompany(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] });
-            toastMessages.success('Company deleted successfully');
+            toastMessages.success(i18next.t('admin:pages.companies.toast.deleteSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while deleting the company');
+            toastMessages.error(i18next.t('admin:pages.companies.toast.deleteError'));
             console.error(err);
         }
     });

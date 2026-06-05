@@ -23,6 +23,10 @@ PHONE_PATTERN = re.compile(
 )
 
 
+def _choice_values(choices):
+    return {choice[0] for choice in choices}
+
+
 class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     phone = serializers.CharField(required=True, max_length=15)
     birthday = serializers.DateField(required=True,
@@ -83,15 +87,28 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
         errors = {}
         today = date.today()
         phone = attrs.get("phone")
+        emergency_contact_phone = attrs.get("emergency_contact_phone")
         birthday = attrs.get("birthday")
         id_card_issue_date = attrs.get("id_card_issue_date")
+        gender = attrs.get("gender")
+        marital_status = attrs.get("marital_status")
 
         if "phone" in attrs and phone and not PHONE_PATTERN.fullmatch(str(phone).strip()):
             errors["phone"] = ["Invalid phone number."]
+        if (
+            "emergency_contact_phone" in attrs
+            and emergency_contact_phone
+            and not PHONE_PATTERN.fullmatch(str(emergency_contact_phone).strip())
+        ):
+            errors["emergencyContactPhone"] = ["Invalid phone number."]
         if "birthday" in attrs and birthday and birthday >= today:
             errors["birthday"] = ["Birthday must be before today."]
         if "id_card_issue_date" in attrs and id_card_issue_date and id_card_issue_date > today:
             errors["idCardIssueDate"] = ["ID card issue date cannot be in the future."]
+        if "gender" in attrs and gender not in _choice_values(var_sys.GENDER_CHOICES):
+            errors["gender"] = ["Invalid choice."]
+        if "marital_status" in attrs and marital_status not in _choice_values(var_sys.MARITAL_STATUS_CHOICES):
+            errors["maritalStatus"] = ["Invalid choice."]
 
         if errors:
             raise serializers.ValidationError(errors)

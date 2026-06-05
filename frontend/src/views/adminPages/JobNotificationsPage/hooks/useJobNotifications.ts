@@ -6,6 +6,7 @@ import type { AdminListParams, JobPostNotificationPayload } from '../../../../se
 import toastMessages from '../../../../utils/toastMessages';
 import { JobPostNotification } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
+import i18next from 'i18next';
 
 type UseJobNotificationsResult = UseQueryResult<PaginatedResponse<JobPostNotification>> & {
     createJobNotification: (data: JobPostNotificationPayload) => Promise<JobPostNotification>;
@@ -30,10 +31,10 @@ export const useJobNotifications = (params?: AdminListParams): UseJobNotificatio
         mutationFn: (data: JobPostNotificationPayload) => adminManagementService.createJobNotification(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-notifications'] });
-            toastMessages.success('Notification created successfully');
+            toastMessages.success(i18next.t('admin:pages.jobNotifications.toast.createSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while creating the notification');
+            toastMessages.error(i18next.t('admin:pages.jobNotifications.toast.createError'));
             console.error(err);
         }
     });
@@ -42,10 +43,10 @@ export const useJobNotifications = (params?: AdminListParams): UseJobNotificatio
         mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPostNotificationPayload> }) => adminManagementService.updateJobNotification(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-notifications'] });
-            toastMessages.success('Notification updated successfully');
+            toastMessages.success(i18next.t('admin:pages.jobNotifications.toast.updateSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while updating the notification');
+            toastMessages.error(i18next.t('admin:pages.jobNotifications.toast.updateError'));
             console.error(err);
         }
     });
@@ -54,10 +55,10 @@ export const useJobNotifications = (params?: AdminListParams): UseJobNotificatio
         mutationFn: (id: string | number) => adminManagementService.deleteJobNotification(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-notifications'] });
-            toastMessages.success('Notification deleted successfully');
+            toastMessages.success(i18next.t('admin:pages.jobNotifications.toast.deleteSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while deleting the notification');
+            toastMessages.error(i18next.t('admin:pages.jobNotifications.toast.deleteError'));
             console.error(err);
         }
     });

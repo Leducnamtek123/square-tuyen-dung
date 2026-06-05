@@ -107,8 +107,8 @@ const NotificationCardItem = ({ value, onClickItem, onRemove }: Props) => {
               }}
             >
               {value?.is_read === true
-                ? t('notification.read', { defaultValue: 'Read' })
-                : t('notification.new', { defaultValue: 'New' })}
+                ? t('notification.read')
+                : t('notification.new')}
             </Typography>
           </Stack>
         </Stack>

@@ -13,6 +13,11 @@ import SingleSelectCustom from '../../../../components/Common/Controls/SingleSel
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import { typedYupResolver } from '../../../../utils/formHelpers';
 import { useConfig } from '@/hooks/useConfig';
+import { REGEX_VALIDATE } from '@/configs/constants';
+
+const MAX_MANUAL_CANDIDATE_CV_SIZE = 10 * 1024 * 1024;
+const MAX_MANUAL_CANDIDATE_SALARY = 999_999_999_999;
+const PDF_CONTENT_TYPES = new Set(['application/pdf', 'application/x-pdf']);
 
 export interface ManualCandidateFormValues {
   jobPost: number | string | null;
@@ -47,11 +52,28 @@ const emptyToNull = (value: unknown, originalValue: unknown) => (
   originalValue === '' || originalValue == null ? null : value
 );
 
-const createSchema = (t: TFunction, requireJobPost = false) => yup.object({
+const isPdfFile = (value: File | null | undefined) => {
+  if (!value) return true;
+
+  const fileName = (value.name || '').toLowerCase();
+  const contentType = (value.type || '').toLowerCase();
+
+  return fileName.endsWith('.pdf') && (!contentType || PDF_CONTENT_TYPES.has(contentType));
+};
+
+const isAllowedFileSize = (value: File | null | undefined) => (
+  !value || (value.size || 0) <= MAX_MANUAL_CANDIDATE_CV_SIZE
+);
+
+export const createManualCandidateSchema = (t: TFunction, requireJobPost = false) => yup.object({
   jobPost: requireJobPost
     ? yup.number().nullable().transform(emptyToNull).required(t('employer:manualCandidate.validation.jobPostRequired'))
     : yup.number().nullable().transform(emptyToNull),
-  file: yup.mixed<File>().nullable(),
+  file: yup
+    .mixed<File>()
+    .nullable()
+    .test('file-is-pdf', t('employer:manualCandidate.validation.filePdfOnly'), isPdfFile)
+    .test('file-max-size', t('employer:manualCandidate.validation.fileTooLarge'), isAllowedFileSize),
   fullName: yup
     .string()
     .required(t('employer:manualCandidate.validation.fullNameRequired'))
@@ -63,6 +85,10 @@ const createSchema = (t: TFunction, requireJobPost = false) => yup.object({
     .default(''),
   phone: yup
     .string()
+    .matches(REGEX_VALIDATE.phoneRegExp, {
+      message: t('employer:manualCandidate.validation.phoneInvalid'),
+      excludeEmptyString: true,
+    })
     .max(20, t('employer:manualCandidate.validation.phoneMax'))
     .default(''),
   title: yup
@@ -74,18 +100,29 @@ const createSchema = (t: TFunction, requireJobPost = false) => yup.object({
   experience: yup.number().nullable().transform(emptyToNull),
   career: yup.number().nullable().transform(emptyToNull),
   city: yup.number().nullable().transform(emptyToNull),
-  salaryMin: yup.number().nullable().transform(emptyToNull).min(0, t('employer:manualCandidate.validation.salaryInvalid')),
+  salaryMin: yup
+    .number()
+    .nullable()
+    .transform(emptyToNull)
+    .min(0, t('employer:manualCandidate.validation.salaryInvalid'))
+    .max(MAX_MANUAL_CANDIDATE_SALARY, t('employer:manualCandidate.validation.salaryTooLarge')),
   salaryMax: yup
     .number()
     .nullable()
     .transform(emptyToNull)
     .min(0, t('employer:manualCandidate.validation.salaryInvalid'))
+    .max(MAX_MANUAL_CANDIDATE_SALARY, t('employer:manualCandidate.validation.salaryTooLarge'))
     .test('salary-max-gte-min', t('employer:manualCandidate.validation.salaryRangeInvalid'), function (value) {
       const salaryMin = this.parent.salaryMin;
       if (value == null || salaryMin == null) return true;
       return Number(value) >= Number(salaryMin);
     }),
-  expectedSalary: yup.number().nullable().transform(emptyToNull).min(0, t('employer:manualCandidate.validation.salaryInvalid')),
+  expectedSalary: yup
+    .number()
+    .nullable()
+    .transform(emptyToNull)
+    .min(0, t('employer:manualCandidate.validation.salaryInvalid'))
+    .max(MAX_MANUAL_CANDIDATE_SALARY, t('employer:manualCandidate.validation.salaryTooLarge')),
   typeOfWorkplace: yup.number().nullable().transform(emptyToNull),
   jobType: yup.number().nullable().transform(emptyToNull),
   description: yup.string().max(800, t('employer:manualCandidate.validation.descriptionMax')).default(''),
@@ -101,7 +138,7 @@ const ManualCandidateForm = ({
 }: ManualCandidateFormProps) => {
   const { t } = useTranslation(['employer']);
   const { allConfig } = useConfig();
-  const schema = React.useMemo(() => createSchema(t, requireJobPost), [t, requireJobPost]);
+  const schema = React.useMemo(() => createManualCandidateSchema(t, requireJobPost), [t, requireJobPost]);
   const { control, handleSubmit } = useForm<ManualCandidateFormValues>({
     resolver: typedYupResolver(schema),
     defaultValues: {

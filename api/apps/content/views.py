@@ -281,6 +281,19 @@ def send_notification_demo(request):
 
 # ===== Admin ViewSets =====
 
+def _apply_admin_ordering(queryset, request, ordering_map):
+    ordering = request.GET.get('ordering')
+    if not ordering:
+        return queryset
+
+    is_desc = ordering.startswith('-')
+    key = ordering[1:] if is_desc else ordering
+    mapped = ordering_map.get(key)
+    if not mapped:
+        return queryset
+    return queryset.order_by(f"-{mapped}" if is_desc else mapped)
+
+
 class AdminBannerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     """Admin CRUD for Banners with MinIO image upload."""
     queryset = Banner.objects.all().select_related('image', 'image_mobile').order_by('-create_at')
@@ -318,6 +331,20 @@ class AdminBannerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             queryset = queryset.filter(type=banner_type)
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active in ['true', '1', 'True'])
+
+        queryset = _apply_admin_ordering(
+            queryset,
+            request,
+            {
+                "id": "id",
+                "description": "description",
+                "platform": "platform",
+                "type": "type",
+                "is_active": "is_active",
+                "createAt": "create_at",
+                "updateAt": "update_at",
+            },
+        )
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -402,6 +429,20 @@ class AdminFeedbackViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         if rating:
             queryset = queryset.filter(rating=int(rating))
 
+        queryset = _apply_admin_ordering(
+            queryset,
+            request,
+            {
+                "id": "id",
+                "userDict.fullName": "user__full_name",
+                "rating": "rating",
+                "is_active": "is_active",
+                "create_at": "create_at",
+                "createAt": "create_at",
+                "updateAt": "update_at",
+            },
+        )
+
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -429,8 +470,24 @@ class AdminBannerTypeViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             )
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active in ['true', '1', 'True'])
-        if ordering:
-            queryset = queryset.order_by(ordering)
+        queryset = _apply_admin_ordering(
+            queryset,
+            request,
+            {
+                "id": "id",
+                "code": "code",
+                "name": "name",
+                "value": "value",
+                "web_aspect_ratio": "web_aspect_ratio",
+                "webAspectRatio": "web_aspect_ratio",
+                "mobile_aspect_ratio": "mobile_aspect_ratio",
+                "mobileAspectRatio": "mobile_aspect_ratio",
+                "is_active": "is_active",
+                "isActive": "is_active",
+                "createAt": "create_at",
+                "updateAt": "update_at",
+            },
+        )
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

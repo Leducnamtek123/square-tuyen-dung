@@ -36,9 +36,9 @@ interface InterviewStatsChartProps {
 }
 
 const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
-  const { t } = useTranslation('employer');
+  const { t, i18n } = useTranslation('employer');
   const theme = useTheme();
-  const options = React.useMemo(() => createCartesianOptions(theme, { stacked: true }), [theme]);
+  const options = React.useMemo(() => createCartesianOptions(theme, { stacked: true, language: i18n.language }), [i18n.language, theme]);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[Dayjs | null, Dayjs | null]>([
     dayjs().subtract(6, 'month'),
@@ -60,7 +60,7 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
       labels: data?.labels || [],
       datasets: [
         {
-          label: t('interviewChart.labels.completed', 'Completed'),
+          label: t('interviewChart.labels.completed'),
           data: data?.completedData || [],
           backgroundColor: makeBarFill(chartColors.emerald),
           hoverBackgroundColor: chartColors.emerald,
@@ -72,7 +72,7 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
           stack: 'Stack 0',
         },
         {
-          label: t('interviewChart.labels.scheduled', 'Scheduled'),
+          label: t('interviewChart.labels.scheduled'),
           data: data?.scheduledData || [],
           backgroundColor: makeBarFill(chartColors.sky),
           hoverBackgroundColor: chartColors.sky,
@@ -84,7 +84,7 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
           stack: 'Stack 0',
         },
         {
-          label: t('interviewChart.labels.inProgress', 'In Progress'),
+          label: t('interviewChart.labels.inProgress'),
           data: data?.inProgressData || [],
           backgroundColor: makeBarFill(chartColors.amber),
           hoverBackgroundColor: chartColors.amber,
@@ -96,7 +96,7 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
           stack: 'Stack 0',
         },
         {
-          label: t('interviewChart.labels.cancelled', 'Cancelled'),
+          label: t('interviewChart.labels.cancelled'),
           data: data?.cancelledData || [],
           backgroundColor: makeBarFill(chartColors.red),
           hoverBackgroundColor: chartColors.red,
@@ -135,7 +135,7 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
             {title}
           </Typography>
           <MuiTooltip
-            title={t('interviewChart.tooltip', 'Interview performance breakdown by month')}
+            title={t('interviewChart.tooltip')}
             arrow
             placement="top"
           >
@@ -150,7 +150,7 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
           <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
             <Chip
               icon={<CheckCircleIcon sx={{ fontSize: 16 }} />}
-              label={`${t('interviewChart.passed', 'Passed')}: ${data.passedCount}`}
+              label={`${t('interviewChart.passed')}: ${data.passedCount}`}
               size="small"
               sx={{
                 fontWeight: 800,
@@ -162,7 +162,7 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
             />
             <Chip
               icon={<CancelIcon sx={{ fontSize: 16 }} />}
-              label={`${t('interviewChart.failed', 'Failed')}: ${data.failedCount}`}
+              label={`${t('interviewChart.failed')}: ${data.failedCount}`}
               size="small"
               sx={{
                 fontWeight: 800,
@@ -174,7 +174,7 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
             />
             <Chip
               icon={<HourglassEmptyIcon sx={{ fontSize: 16 }} />}
-              label={`${t('interviewChart.pending', 'Pending')}: ${data.pendingCount}`}
+              label={`${t('interviewChart.pending')}: ${data.pendingCount}`}
               size="small"
               sx={{
                 fontWeight: 800,
@@ -186,7 +186,7 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
             />
             <Chip
               icon={<TimerIcon sx={{ fontSize: 16 }} />}
-              label={`${t('interviewChart.avgDuration', 'Avg Duration')}: ${formatDuration(data.avgDurationSeconds)}`}
+              label={`${t('interviewChart.avgDuration')}: ${formatDuration(data.avgDurationSeconds)}`}
               size="small"
               sx={{
                 fontWeight: 800,
@@ -213,9 +213,9 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
 
           <Box sx={chartAreaSx(320)}>
             {isLoading ? (
-              <ChartLoadingState height="100%" label={t('interviewChart.loading', { defaultValue: 'Loading chart' })} />
+              <ChartLoadingState height="100%" label={t('interviewChart.loading')} />
             ) : !hasChartData ? (
-              <ChartEmptyState height="100%" label={t('interviewChart.noData', 'No interview data available')} />
+              <ChartEmptyState height="100%" label={t('interviewChart.noData')} />
             ) : (
               <BarChartClient options={options} data={chartData} height="100%" />
             )}

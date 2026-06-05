@@ -47,6 +47,8 @@
 
 .sq-chatbot__panel {
   position: absolute;
+  left: auto;
+  top: auto;
   right: 0;
   bottom: 76px;
   width: 360px;

@@ -24,7 +24,7 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import dayjs from 'dayjs';
-import { salaryString } from '@/utils/customData';
+import { formatLocalizedSalaryRange } from '@/utils/customData';
 import { CV_TYPES, ROUTES } from '@/configs/constants';
 import { formatRoute } from '@/utils/funcUtils';
 import { tConfig } from '@/utils/tConfig';
@@ -70,7 +70,7 @@ const JobSeekerProfile = ({
   lastViewedDate,
   handleSave,
 }: JobSeekerProfileProps) => {
-    const { t } = useTranslation(['employer', 'common']);
+    const { t, i18n } = useTranslation(['employer', 'common']);
     const { push } = useRouter();
     const theme = useTheme();
     const { allConfig } = useConfig();
@@ -78,6 +78,11 @@ const JobSeekerProfile = ({
     const handleNavigate = () => {
         push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, slug)}`);
     };
+
+    const lastViewedLabel = lastViewedDate
+        ? t('employer:profileCard.label.lastViewed', { date: dayjs(lastViewedDate).format('DD/MM/YYYY HH:mm') })
+        : '';
+    const updatedAtLabel = t('employer:profileCard.label.updatedAt', { date: dayjs(updateAt).format('DD/MM/YYYY') });
 
     return (
         <Card
@@ -136,7 +141,7 @@ const JobSeekerProfile = ({
                         {lastViewedDate && (
                             <Chip
                                 icon={<CheckCircleRoundedIcon sx={{ fontSize: '14px !important' }} />}
-                                label={`${t('employer:profileCard.label.lastViewed')}: ${dayjs(lastViewedDate).format('DD/MM/YYYY HH:mm')}`}
+                                label={lastViewedLabel}
                                 size="small"
                                 sx={{ 
                                     borderRadius: 1, 
@@ -174,7 +179,7 @@ const JobSeekerProfile = ({
                         <Chip
                             size="small"
                             icon={<MonetizationOnIcon sx={{ fontSize: '16px !important', color: 'inherit' }} />}
-                            label={salaryString(salaryMin, salaryMax) || t('common:labels.notUpdated')}
+                            label={formatLocalizedSalaryRange(salaryMin, salaryMax, i18n.language) || t('common:labels.notUpdated')}
                             sx={{ 
                                 fontWeight: 800, 
                                 bgcolor: pc.secondary( 0.08), 
@@ -265,7 +270,7 @@ const JobSeekerProfile = ({
 
                     <Stack spacing={1} alignItems={{ xs: 'flex-start', md: 'flex-end' }}>
                         <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5, opacity: 0.8 }}>
-                            {t('employer:profileCard.label.updatedAt')}: {dayjs(updateAt).format('DD/MM/YYYY')}
+                            {updatedAtLabel}
                         </Typography>
 
                         <Typography 

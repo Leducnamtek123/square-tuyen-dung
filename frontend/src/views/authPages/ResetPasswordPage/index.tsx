@@ -32,7 +32,7 @@ const ResetPasswordPage = () => {
         confirmPassword: data.confirmPassword,
         platform: 'WEB'
       });
-      push(`/${ROUTES.AUTH.LOGIN}?successMessage=Password updated successfully`);
+      push(`/${ROUTES.AUTH.LOGIN}?successMessageKey=passwordResetSuccess`);
     } catch (error) {
       setErrorMessage(t('messages.tryAgain') as string);
     }

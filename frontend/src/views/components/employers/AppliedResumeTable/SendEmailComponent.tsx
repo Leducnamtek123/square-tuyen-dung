@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { Button, Tooltip, alpha, useTheme } from '@mui/material';
+import { Button, Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
 import MarkEmailReadRoundedIcon from '@mui/icons-material/MarkEmailReadRounded';
-import { AxiosError } from 'axios';
-import { ApiError } from '../../../../types/api';
 
 import { convertEditorStateToHTMLString } from '../../../../utils/editorUtils';
 import SendMailCard, { SendMailData, SendMailFormData } from '../SendMailCard';
@@ -13,6 +11,7 @@ import jobPostActivityService from '../../../../services/jobPostActivityService'
 import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
 import pc from '@/utils/muiColors';
+import { getAppliedResumeEmailActionState } from './sendEmailAction';
 
 interface SendEmailComponentProps {
   jobPostActivityId: string;
@@ -28,14 +27,20 @@ const SendEmailComponent: React.FC<SendEmailComponentProps> = ({
   fullName,
 }) => {
   const { t } = useTranslation('employer');
-  const theme = useTheme();
   const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
   const [openSendMailPopup, setOpenSendMailPopup] = useState(false);
   const [sendMailData, setSendMailData] = useState<SendMailData | null>(null);
   const [didSendEmail, setDidSendEmail] = useState(false);
   const sentEmail = isSentEmail || didSendEmail;
+  const emailActionState = getAppliedResumeEmailActionState(email);
+  const tooltipTitle = emailActionState.canSend
+    ? sentEmail
+      ? t('appliedResume.email.resendTooltip')
+      : t('appliedResume.email.sendTooltip')
+    : t(emailActionState.reasonKey || 'appliedResume.email.missingCandidateEmail');
 
   const handleOpenSendMail = (email: string, fullName: string) => {
+    if (!emailActionState.canSend) return;
     setSendMailData({
       fullName: fullName,
       email: email,
@@ -63,49 +68,50 @@ const SendEmailComponent: React.FC<SendEmailComponentProps> = ({
 
   return (
     <>
-      <Tooltip title={sentEmail ? t('appliedResume.email.resendTooltip', 'Resend email to candidate') : t('appliedResume.email.sendTooltip', 'Send email to candidate')} arrow>
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => handleOpenSendMail(email, fullName)}
-          sx={{ 
-            textTransform: 'none', 
-            minWidth: 100,
-            
-            fontWeight: 900,
-            boxShadow: 'none',
-            fontSize: '0.7rem',
-            py: 0.6,
-            bgcolor: sentEmail ? pc.success( 0.1) : pc.secondary( 0.1),
-            color: sentEmail ? 'success.main' : 'secondary.main',
-            border: '1px solid',
-            borderColor: sentEmail ? pc.success( 0.1) : pc.secondary( 0.1),
-            '&:hover': {
-                bgcolor: sentEmail ? pc.success( 0.15) : pc.secondary( 0.15),
-                borderColor: sentEmail ? 'success.main' : 'secondary.main',
-                boxShadow: 'none'
-            },
-            '& .MuiButton-startIcon': { mr: 0.5 }
-          }}
-          startIcon={
-            sentEmail ? <MarkEmailReadRoundedIcon sx={{ fontSize: 16 }} /> : <ForwardToInboxIcon sx={{ fontSize: 16 }} />
-          }
-        >
-          {sentEmail ? t('appliedResume.email.resend').toUpperCase() : t('appliedResume.email.send').toUpperCase()}
-        </Button>
+      <Tooltip title={tooltipTitle} arrow>
+        <span>
+          <Button
+            variant="contained"
+            size="small"
+            disabled={!emailActionState.canSend}
+            onClick={() => handleOpenSendMail(email, fullName)}
+            sx={{
+              textTransform: 'none',
+              minWidth: 100,
+              fontWeight: 900,
+              boxShadow: 'none',
+              fontSize: '0.7rem',
+              py: 0.6,
+              bgcolor: sentEmail ? pc.success( 0.1) : pc.secondary( 0.1),
+              color: sentEmail ? 'success.main' : 'secondary.main',
+              border: '1px solid',
+              borderColor: sentEmail ? pc.success( 0.1) : pc.secondary( 0.1),
+              '&:hover': {
+                  bgcolor: sentEmail ? pc.success( 0.15) : pc.secondary( 0.15),
+                  borderColor: sentEmail ? 'success.main' : 'secondary.main',
+                  boxShadow: 'none'
+              },
+              '& .MuiButton-startIcon': { mr: 0.5 }
+            }}
+            startIcon={
+              sentEmail ? <MarkEmailReadRoundedIcon sx={{ fontSize: 16 }} /> : <ForwardToInboxIcon sx={{ fontSize: 16 }} />
+            }
+          >
+            {sentEmail ? t('appliedResume.email.resend').toUpperCase() : t('appliedResume.email.send').toUpperCase()}
+          </Button>
+        </span>
       </Tooltip>
-      
+
       <SendMailCard
         openPopup={openSendMailPopup}
         setOpenPopup={setOpenSendMailPopup}
         sendMailData={sendMailData}
         handleSendEmail={handleSendEmail}
       />
-      
+
       {isFullScreenLoading && <BackdropLoading />}
     </>
   );
 };
 
 export default SendEmailComponent;
-

@@ -434,7 +434,6 @@ class FirebaseLoginView(TokenView):
         id_token = request.data.get("token")
         role_name = request.data.get("role_name")
         client_id = request.data.get("client_id")
-        client_secret = request.data.get("client_secret")
 
         if not id_token or not role_name:
             return response_data(

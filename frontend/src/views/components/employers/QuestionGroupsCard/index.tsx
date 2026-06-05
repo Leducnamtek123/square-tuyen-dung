@@ -94,7 +94,7 @@ function reducer(state: State, action: Action): State {
 const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
   const { t } = useTranslation(['employer', 'interview', 'common']);
   const theme = useTheme();
-  const resolvedTitle = title || t('employer:questionGroupsCard.title', 'Question Groups Management');
+  const resolvedTitle = title || t('employer:questionGroupsCard.title');
 
   const inputSx = filterControlSx as Record<string, unknown>;
 
@@ -233,7 +233,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
       </Stack>
 
       <FilterBar
-        title={t('employer:questionGroupsCard.filters', 'Bộ lọc nhóm câu hỏi')}
+        title={t('employer:questionGroupsCard.filters')}
         searchValue={searchTerm}
         searchPlaceholder={t('employer:questionGroupsCard.placeholder.searchquestiongroups')}
         onSearchChange={handleSearchChange}

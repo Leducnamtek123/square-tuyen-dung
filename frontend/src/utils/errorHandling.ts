@@ -104,7 +104,7 @@ const errorHandling = (
   // If it's not an Axios error, show a generic network/unknown error
   if (!isAxiosError(error)) {
     console.error('[errorHandling] Non-Axios error:', error);
-    toastMessages.error(i18n.t('common:errors.networkError', 'Unable to connect to server, please check your network.'));
+    toastMessages.error(i18n.t('common:errors.networkError'));
     setError && setError({ detail: 'Network error' });
     return;
   }
@@ -113,7 +113,7 @@ const errorHandling = (
 
   // Network error or other non-response case
   if (!res) {
-    toastMessages.error(i18n.t('common:errors.networkError', 'Unable to connect to server, please check your network.'));
+    toastMessages.error(i18n.t('common:errors.networkError'));
     setError && setError({ detail: 'Network error' });
     return;
   }
@@ -124,31 +124,31 @@ const errorHandling = (
       if (message) {
         toastMessages.error(message);
       } else {
-        toastMessages.error(i18n.t('common:errors.generic', 'An error occurred, please try again.'));
+        toastMessages.error(i18n.t('common:errors.generic'));
       }
       setError && setError((res.data?.errors || res.data?.error || {}) as ApiError);
       break;
     }
     case 401:
-      toastMessages.error(i18n.t('common:errors.unauthorized', 'Your session has expired, please log in again.'));
+      toastMessages.error(i18n.t('common:errors.unauthorized'));
       break;
     case 403:
-      toastMessages.error(i18n.t('common:errors.forbidden', 'You do not have permission to perform this action.'));
+      toastMessages.error(i18n.t('common:errors.forbidden'));
       break;
     case 404:
-      toastMessages.error(i18n.t('common:errors.notFound', 'The requested resource was not found.'));
+      toastMessages.error(i18n.t('common:errors.notFound'));
       break;
     case 413:
-      toastMessages.error(i18n.t('common:errors.payloadTooLarge', 'The file is too large. Please use a smaller file.'));
+      toastMessages.error(i18n.t('common:errors.payloadTooLarge'));
       break;
     case 429:
-      toastMessages.error(i18n.t('common:errors.tooManyRequests', 'Too many requests, please try again later.'));
+      toastMessages.error(i18n.t('common:errors.tooManyRequests'));
       break;
     default:
       if (res.status >= 500) {
-        toastMessages.error(i18n.t('common:errors.serverError', 'Server error, please try again later.'));
+        toastMessages.error(i18n.t('common:errors.serverError'));
       } else {
-        toastMessages.error(extractApiErrorMessage(res.data) || i18n.t('common:errors.generic', 'An error occurred, please try again.'));
+        toastMessages.error(extractApiErrorMessage(res.data) || i18n.t('common:errors.generic'));
       }
   }
 };

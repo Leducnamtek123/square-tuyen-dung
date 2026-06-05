@@ -30,15 +30,11 @@ import { BannerType } from '../../../types/models';
 import { useDataTable, useDebounce } from '../../../hooks';
 import { useBannerTypes } from './hooks/useBannerTypes';
 import FilterBar from '@/components/Common/FilterBar';
-
-interface BannerTypeFormData {
-  code: string;
-  name: string;
-  value: number;
-  web_aspect_ratio: string;
-  mobile_aspect_ratio: string;
-  is_active: boolean;
-}
+import {
+  getBannerTypeFormValidationErrors,
+  type BannerTypeFormData,
+  type BannerTypeFormValidationErrors,
+} from './bannerTypeFormValidation';
 
 const defaultForm: BannerTypeFormData = {
   code: '',
@@ -96,9 +92,9 @@ const bannerTypesDialogReducer = (
           code: action.item.code || '',
           name: action.item.name || '',
           value: action.item.value || 1,
-          web_aspect_ratio: action.item.web_aspect_ratio || '',
-          mobile_aspect_ratio: action.item.mobile_aspect_ratio || '',
-          is_active: action.item.is_active !== false,
+          web_aspect_ratio: action.item.webAspectRatio || '',
+          mobile_aspect_ratio: action.item.mobileAspectRatio || '',
+          is_active: action.item.isActive !== false,
         },
       };
     case 'open-delete':
@@ -142,6 +138,16 @@ const BannerTypesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 500);
   const { openDialog, dialogMode, current, formData, openDelete } = dialogState;
+  const validationErrors = useMemo(
+    () => getBannerTypeFormValidationErrors(formData),
+    [formData],
+  );
+  const hasValidationErrors = Object.keys(validationErrors).length > 0;
+  const getValidationText = (field: keyof BannerTypeFormValidationErrors) => (
+    validationErrors[field]
+      ? t(`pages.bannerTypes.validation.${validationErrors[field]}`)
+      : undefined
+  );
 
   const {
     data,
@@ -175,6 +181,7 @@ const BannerTypesPage = () => {
   };
 
   const handleSave = async () => {
+    if (hasValidationErrors) return;
     const payload = {
       ...formData,
       code: formData.code.trim().toUpperCase(),
@@ -209,18 +216,20 @@ const BannerTypesPage = () => {
   };
 
   const columns = useMemo<ColumnDef<BannerType>[]>(() => [
-    { accessorKey: 'id', header: 'ID', enableSorting: true },
-    { accessorKey: 'code', header: 'Code', enableSorting: true },
-    { accessorKey: 'name', header: 'Name', enableSorting: true },
-    { accessorKey: 'value', header: 'Value', enableSorting: true },
+    { accessorKey: 'id', header: t('pages.bannerTypes.table.id'), enableSorting: true },
+    { accessorKey: 'code', header: t('pages.bannerTypes.table.code'), enableSorting: true },
+    { accessorKey: 'name', header: t('pages.bannerTypes.table.name'), enableSorting: true },
+    { accessorKey: 'value', header: t('pages.bannerTypes.table.value'), enableSorting: true },
     {
-      accessorKey: 'web_aspect_ratio',
-      header: 'Web Aspect Ratio',
+      id: 'web_aspect_ratio',
+      accessorFn: (row) => row.webAspectRatio,
+      header: t('pages.bannerTypes.table.webAspectRatio'),
       cell: (info) => (info.getValue() as string) || '-',
     },
     {
-      accessorKey: 'is_active',
-      header: 'Status',
+      id: 'is_active',
+      accessorFn: (row) => row.isActive,
+      header: t('pages.bannerTypes.table.status'),
       cell: (info) => (
         <Chip
           size="small"
@@ -255,26 +264,26 @@ const BannerTypesPage = () => {
     <Box>
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>Banner Types</Typography>
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>{t('pages.bannerTypes.title')}</Typography>
           <Breadcrumbs>
-            <Link underline="hover" color="inherit" href="/admin">Admin</Link>
-            <Typography color="text.primary">Banner Types</Typography>
+            <Link underline="hover" color="inherit" href="/admin">{t('pages.bannerTypes.breadcrumbAdmin')}</Link>
+            <Typography color="text.primary">{t('pages.bannerTypes.breadcrumbList')}</Typography>
           </Breadcrumbs>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}>
-          Add Banner Type
+          {t('pages.bannerTypes.addButton')}
         </Button>
       </Box>
 
       <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
         <FilterBar
-          title={t('pages.bannerTypes.filter.title', 'Banner type filters')}
+          title={t('pages.bannerTypes.filter.title')}
           searchValue={searchTerm}
-          searchPlaceholder="Search banner types..."
+          searchPlaceholder={t('pages.bannerTypes.searchPlaceholder')}
           onSearchChange={handleSearch}
           onReset={() => handleSearch('')}
           resetDisabled={!searchTerm}
-          resetLabel={t('common.clearFilters', 'Clear filters')}
+          resetLabel={t('common.clearFilters')}
         />
 
         <DataTable
@@ -292,42 +301,52 @@ const BannerTypesPage = () => {
 
       <Dialog open={openDialog} onClose={handleClose} fullWidth maxWidth="xs">
         <DialogTitle>
-          {dialogMode === 'add' ? 'Add Banner Type' : 'Edit Banner Type'}
+          {dialogMode === 'add' ? t('pages.bannerTypes.addTitle') : t('pages.bannerTypes.editTitle')}
         </DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
             <TextField
-              label="Code"
+              label={t('pages.bannerTypes.fields.code')}
               value={formData.code}
               onChange={(e) => dispatchDialog({ type: 'set-field', field: 'code', value: e.target.value })}
+              error={Boolean(validationErrors.code)}
+              helperText={getValidationText('code')}
               required
             />
             <TextField
-              label="Name"
+              label={t('pages.bannerTypes.fields.name')}
               value={formData.name}
               onChange={(e) => dispatchDialog({ type: 'set-field', field: 'name', value: e.target.value })}
+              error={Boolean(validationErrors.name)}
+              helperText={getValidationText('name')}
               required
             />
             <TextField
-              label="Value"
+              label={t('pages.bannerTypes.fields.value')}
               type="number"
               value={formData.value}
-              onChange={(e) => dispatchDialog({ type: 'set-field', field: 'value', value: Number(e.target.value) || 1 })}
+              onChange={(e) => dispatchDialog({ type: 'set-field', field: 'value', value: e.target.value === '' ? 0 : Number(e.target.value) })}
+              error={Boolean(validationErrors.value)}
+              helperText={getValidationText('value')}
               required
             />
             <TextField
-              label="Web Aspect Ratio"
+              label={t('pages.bannerTypes.fields.webAspectRatio')}
               value={formData.web_aspect_ratio}
               onChange={(e) => dispatchDialog({ type: 'set-field', field: 'web_aspect_ratio', value: e.target.value })}
+              error={Boolean(validationErrors.web_aspect_ratio)}
+              helperText={getValidationText('web_aspect_ratio')}
             />
             <TextField
-              label="Mobile Aspect Ratio"
+              label={t('pages.bannerTypes.fields.mobileAspectRatio')}
               value={formData.mobile_aspect_ratio}
               onChange={(e) => dispatchDialog({ type: 'set-field', field: 'mobile_aspect_ratio', value: e.target.value })}
+              error={Boolean(validationErrors.mobile_aspect_ratio)}
+              helperText={getValidationText('mobile_aspect_ratio')}
             />
             <FormControlLabel
               control={<Switch checked={formData.is_active} onChange={(e) => dispatchDialog({ type: 'set-field', field: 'is_active', value: e.target.checked })} />}
-              label="Active"
+              label={t('pages.bannerTypes.fields.isActive')}
             />
           </Box>
         </DialogContent>
@@ -336,7 +355,7 @@ const BannerTypesPage = () => {
           <Button
             onClick={handleSave}
             variant="contained"
-            disabled={isMutating || !formData.code.trim() || !formData.name.trim() || formData.value <= 0}
+            disabled={isMutating || hasValidationErrors}
           >
             {isMutating ? t('common.saving') : t('common.save')}
           </Button>
@@ -344,9 +363,9 @@ const BannerTypesPage = () => {
       </Dialog>
 
       <Dialog open={openDelete} onClose={handleClose}>
-        <DialogTitle>Delete Banner Type</DialogTitle>
+        <DialogTitle>{t('pages.bannerTypes.deleteTitle')}</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to delete banner type {current?.name}?</Typography>
+          <Typography>{t('pages.bannerTypes.deleteConfirm', { name: current?.name || '' })}</Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={handleClose} color="inherit">{t('common.cancel')}</Button>

@@ -229,13 +229,13 @@ const JobActivityPage = () => {
             </Box>
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <FilterBar
-                    title={t('pages.jobActivity.filter.title', 'Bộ lọc ứng tuyển')}
+                    title={t('pages.jobActivity.filter.title')}
                     searchValue={state.searchTerm}
                     searchPlaceholder={t('pages.jobActivity.searchPlaceholder')}
                     onSearchChange={handleSearch}
                     onReset={() => handleSearch('')}
                     resetDisabled={!state.searchTerm}
-                    resetLabel={t('common.clearFilters', 'Xóa lọc')}
+                    resetLabel={t('common.clearFilters')}
                 />
 
                 <DataTable

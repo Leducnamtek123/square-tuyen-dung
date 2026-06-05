@@ -38,29 +38,10 @@ type NewsCategory = 'all' | ArticleCategory;
 
 const PAGE_SIZE = 9;
 
-const categoryOptions: Array<{
+type CategoryOption = {
   value: NewsCategory;
   label: string;
   icon: React.ReactElement;
-}> = [
-  { value: 'all', label: 'Tất cả', icon: <ArticleIcon fontSize="small" /> },
-  { value: 'news', label: 'Tin tức', icon: <NewspaperIcon fontSize="small" /> },
-  { value: 'blog', label: 'Blog tuyển dụng', icon: <ArticleIcon fontSize="small" /> },
-];
-
-const topicOptions = [
-  'tuyển dụng',
-  'bất động sản',
-  'xây dựng',
-  'nội thất',
-  'kiến trúc',
-  'portfolio',
-  'kỹ năng',
-];
-
-const categoryLabelMap: Record<ArticleCategory, string> = {
-  news: 'Tin tức',
-  blog: 'Blog tuyển dụng',
 };
 
 const stripHtml = (html?: string | null) =>
@@ -79,14 +60,20 @@ const ArticleCard = ({
   article,
   featured = false,
   ctaLabel,
+  categoryLabels,
+  categoryFallbackLabel,
+  formatViews,
 }: {
   article: Article;
   featured?: boolean;
   ctaLabel: string;
+  categoryLabels: Record<ArticleCategory, string>;
+  categoryFallbackLabel: string;
+  formatViews: (count: number) => string;
 }) => {
   const href = `/${ROUTES.JOB_SEEKER.NEWS}/${article.slug}`;
   const publishedDate = formatDate(article.publishedAt || article.create_at || article.update_at);
-  const badgeLabel = categoryLabelMap[article.category] || 'Bài viết';
+  const badgeLabel = categoryLabels[article.category] || categoryFallbackLabel;
   const BadgeIcon = article.category === 'news' ? NewspaperIcon : ArticleIcon;
 
   return (
@@ -139,7 +126,7 @@ const ArticleCard = ({
               )}
               <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: 'text.secondary' }}>
                 <VisibilityIcon sx={{ fontSize: 16 }} />
-                <Typography variant="caption">{article.viewCount || 0} lượt xem</Typography>
+                <Typography variant="caption">{formatViews(article.viewCount || 0)}</Typography>
               </Stack>
             </Stack>
 
@@ -278,9 +265,35 @@ const newsReducer = (state: NewsState, action: NewsAction): NewsState => {
 };
 
 const NewsPage = () => {
-  const { t } = useTranslation(['common', 'public']);
+  const { t, i18n } = useTranslation(['common', 'public']);
   const [state, dispatch] = React.useReducer(newsReducer, initialNewsState);
   const { category, activeTag, inputValue, searchValue, page, articles, total, isLoading } = state;
+
+  const categoryLabels = React.useMemo<Record<ArticleCategory, string>>(() => ({
+    news: t('news.category.news', { ns: 'public' }),
+    blog: t('news.category.blog', { ns: 'public' }),
+  }), [t]);
+
+  const categoryOptions = React.useMemo<CategoryOption[]>(() => [
+    { value: 'all', label: t('news.category.all', { ns: 'public' }), icon: <ArticleIcon fontSize="small" /> },
+    { value: 'news', label: categoryLabels.news, icon: <NewspaperIcon fontSize="small" /> },
+    { value: 'blog', label: categoryLabels.blog, icon: <ArticleIcon fontSize="small" /> },
+  ], [categoryLabels, t]);
+
+  const topicOptions = React.useMemo(() => [
+    { value: 'tuyển dụng', label: t('news.topic.recruitment', { ns: 'public' }) },
+    { value: 'bất động sản', label: t('news.topic.realEstate', { ns: 'public' }) },
+    { value: 'xây dựng', label: t('news.topic.construction', { ns: 'public' }) },
+    { value: 'nội thất', label: t('news.topic.interior', { ns: 'public' }) },
+    { value: 'kiến trúc', label: t('news.topic.architecture', { ns: 'public' }) },
+    { value: 'portfolio', label: t('news.topic.portfolio', { ns: 'public' }) },
+    { value: 'kỹ năng', label: t('news.topic.skills', { ns: 'public' }) },
+  ], [t]);
+
+  const formatViews = React.useCallback(
+    (count: number) => t('news.views', { count, ns: 'public' }),
+    [t]
+  );
 
   const commitSearch = React.useCallback(() => {
     dispatch({ type: 'searchCommitted', searchValue: inputValue.trim() });
@@ -326,12 +339,13 @@ const NewsPage = () => {
   const remainingArticles = featuredArticle ? articles.slice(1) : articles;
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const ctaLabel = t('viewDetails', { ns: 'common' });
-  const selectedCategoryLabel = categoryOptions.find((option) => option.value === category)?.label || 'Tất cả';
+  const selectedCategoryLabel = categoryOptions.find((option) => option.value === category)?.label || t('news.category.all', { ns: 'public' });
   const activeFilterText = [
     selectedCategoryLabel,
     activeTag ? `#${activeTag}` : '',
     searchValue ? `"${searchValue}"` : '',
   ].filter(Boolean).join(' · ');
+  const numberLocale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
 
   useSEO({
     title: t('seo.newsList.title', { ns: 'public' }),
@@ -359,14 +373,14 @@ const NewsPage = () => {
       >
         <Stack spacing={2.5} sx={{ position: 'relative', maxWidth: 760 }}>
           <Chip
-            label="Tin tức & Blog tuyển dụng"
+            label={t('news.heroEyebrow', { ns: 'public' })}
             sx={{ alignSelf: 'flex-start', bgcolor: 'rgba(255,255,255,0.16)', color: 'common.white' }}
           />
           <Typography variant="h3" fontWeight={800} sx={{ fontSize: { xs: 34, md: 46 }, lineHeight: 1.08 }}>
-            Tin tức và blog tuyển dụng dành cho ứng viên, nhà tuyển dụng
+            {t('news.heroTitle', { ns: 'public' })}
           </Typography>
           <Typography variant="h6" sx={{ maxWidth: 720, color: 'rgba(255,255,255,0.9)', fontWeight: 400 }}>
-            Cập nhật xu hướng tuyển dụng, mẹo ứng tuyển và góc nhìn từ doanh nghiệp trong một trang công khai duy nhất.
+            {t('news.heroSubtitle', { ns: 'public' })}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
             <Button
@@ -376,7 +390,7 @@ const NewsPage = () => {
               color="secondary"
               size="large"
             >
-              Xem tất cả bài viết
+              {t('news.viewAllArticles', { ns: 'public' })}
             </Button>
             <Button
               component={Link}
@@ -385,7 +399,7 @@ const NewsPage = () => {
               size="large"
               sx={{ borderColor: 'rgba(255,255,255,0.55)', color: 'common.white' }}
             >
-              Khám phá việc làm
+              {t('news.exploreJobs', { ns: 'public' })}
             </Button>
           </Stack>
         </Stack>
@@ -433,7 +447,7 @@ const NewsPage = () => {
             onKeyDown={(event) => {
               if (event.key === 'Enter') commitSearch();
             }}
-            placeholder="Tìm bài viết, chủ đề hoặc từ khóa"
+            placeholder={t('news.searchPlaceholder', { ns: 'public' })}
             fullWidth
             size="small"
           />
@@ -443,13 +457,13 @@ const NewsPage = () => {
             onClick={commitSearch}
             sx={{ width: { xs: '100%', sm: 'auto' } }}
           >
-            Tìm
+            {t('news.searchButton', { ns: 'public' })}
           </Button>
         </Box>
 
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
           <Chip
-            label="Tất cả chủ đề"
+            label={t('news.topic.all', { ns: 'public' })}
             clickable
             color={!activeTag ? 'primary' : 'default'}
             variant={!activeTag ? 'filled' : 'outlined'}
@@ -457,12 +471,12 @@ const NewsPage = () => {
           />
           {topicOptions.map((tag) => (
             <Chip
-              key={tag}
-              label={tag}
+              key={tag.value}
+              label={tag.label}
               clickable
-              color={activeTag === tag ? 'primary' : 'default'}
-              variant={activeTag === tag ? 'filled' : 'outlined'}
-              onClick={() => dispatch({ type: 'tagChanged', tag })}
+              color={activeTag === tag.value ? 'primary' : 'default'}
+              variant={activeTag === tag.value ? 'filled' : 'outlined'}
+              onClick={() => dispatch({ type: 'tagChanged', tag: tag.value })}
             />
           ))}
         </Stack>
@@ -483,17 +497,32 @@ const NewsPage = () => {
             </Stack>
           ) : articles.length === 0 ? (
             <NoDataCard
-              title="Chưa có bài viết phù hợp"
-              content="Hãy thử đổi bộ lọc hoặc từ khóa tìm kiếm."
+              title={t('news.emptyTitle', { ns: 'public' })}
+              content={t('news.emptyContent', { ns: 'public' })}
             />
           ) : (
             <Stack spacing={3}>
-              {featuredArticle && <ArticleCard article={featuredArticle} featured ctaLabel={ctaLabel} />}
+              {featuredArticle && (
+                <ArticleCard
+                  article={featuredArticle}
+                  featured
+                  ctaLabel={ctaLabel}
+                  categoryLabels={categoryLabels}
+                  categoryFallbackLabel={t('news.categoryFallback', { ns: 'public' })}
+                  formatViews={formatViews}
+                />
+              )}
 
               <Grid container spacing={3}>
                 {remainingArticles.map((article) => (
                   <Grid key={article.id} size={{ xs: 12, md: 6 }}>
-                    <ArticleCard article={article} ctaLabel={ctaLabel} />
+                    <ArticleCard
+                      article={article}
+                      ctaLabel={ctaLabel}
+                      categoryLabels={categoryLabels}
+                      categoryFallbackLabel={t('news.categoryFallback', { ns: 'public' })}
+                      formatViews={formatViews}
+                    />
                   </Grid>
                 ))}
               </Grid>
@@ -526,13 +555,17 @@ const NewsPage = () => {
               <CardContent>
                 <Stack spacing={1.5}>
                   <Typography variant="h6" fontWeight={700}>
-                    Góc đọc nhanh
+                    {t('news.quickReadTitle', { ns: 'public' })}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {total.toLocaleString('vi-VN')} bài viết đang hiển thị trong kho nội dung công khai.
+                    {t('news.quickReadDescription', {
+                      count: total,
+                      total: total.toLocaleString(numberLocale),
+                      ns: 'public',
+                    })}
                   </Typography>
                   <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
-                    Bộ lọc hiện tại: {activeFilterText}
+                    {t('news.currentFilter', { filter: activeFilterText, ns: 'public' })}
                   </Typography>
                   <Stack spacing={1}>
                     {categoryOptions.map((option) => (
@@ -583,10 +616,10 @@ const NewsPage = () => {
               <CardContent>
                 <Stack spacing={1.5}>
                   <Typography variant="h6" fontWeight={700}>
-                    Dành cho ứng viên và nhà tuyển dụng
+                    {t('news.audienceTitle', { ns: 'public' })}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Bài viết được biên tập để hỗ trợ cả hai phía: tìm việc tốt hơn và tuyển người hiệu quả hơn.
+                    {t('news.audienceDescription', { ns: 'public' })}
                   </Typography>
                   <Button
                     component={Link}
@@ -594,7 +627,7 @@ const NewsPage = () => {
                     variant="contained"
                     endIcon={<ArrowForwardIcon />}
                   >
-                    Xem việc làm mới
+                    {t('news.newJobsCta', { ns: 'public' })}
                   </Button>
                 </Stack>
               </CardContent>

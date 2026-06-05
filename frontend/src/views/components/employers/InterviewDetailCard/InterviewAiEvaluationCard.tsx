@@ -73,7 +73,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
         action={
           isProcessing ? (
             <Chip
-              label={t('interviewDetail.messages.aiAnalyzing', { defaultValue: 'Analyzing' })}
+              label={t('interviewDetail.messages.aiAnalyzing')}
               size="small"
               sx={{ height: 24, fontWeight: 800, bgcolor: pc.info(0.08), color: 'info.main', borderRadius: 1.5 }}
             />
@@ -96,7 +96,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
           >
             <Box>
               <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, letterSpacing: 0 }}>
-                {t('interviewDetail.label.aiOverallQuality', { defaultValue: 'AI overall quality' })}
+                {t('interviewDetail.label.aiOverallQuality')}
               </Typography>
               <Typography variant="h3" color="primary" sx={{ fontWeight: 900, letterSpacing: 0, lineHeight: 1.05 }}>
                 {overallScore}<Box component="span" sx={{ fontSize: '1rem', fontWeight: 800, color: 'text.disabled', ml: 0.5 }}>/10</Box>

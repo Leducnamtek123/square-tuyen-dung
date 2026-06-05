@@ -86,7 +86,9 @@
       "resend": "Gửi lại",
       "send": "Gửi email",
       "resendTooltip": "Gửi lại email",
-      "sendTooltip": "Gửi email"
+      "sendTooltip": "Gửi email",
+      "missingCandidateEmail": "Hồ sơ này chưa có email ứng viên nên không thể gửi email.",
+      "invalidCandidateEmail": "Email ứng viên không hợp lệ nên không thể gửi email."
     },
     "status": {
       "updateTitle": "Cập nhật trạng thái ứng tuyển",
@@ -205,10 +207,14 @@
       "fullNameMax": "Tên ứng viên tối đa 150 ký tự.",
       "emailInvalid": "Email không hợp lệ.",
       "emailMax": "Email tối đa 254 ký tự.",
+      "phoneInvalid": "Số điện thoại không hợp lệ.",
       "phoneMax": "Số điện thoại tối đa 20 ký tự.",
+      "filePdfOnly": "Chỉ chấp nhận file PDF.",
+      "fileTooLarge": "File PDF phải nhỏ hơn hoặc bằng 10MB.",
       "titleRequired": "Vui lòng nhập vị trí/tiêu đề hồ sơ.",
       "titleMax": "Tiêu đề tối đa 200 ký tự.",
       "salaryInvalid": "Mức lương không hợp lệ.",
+      "salaryTooLarge": "Mức lương vượt quá giới hạn cho phép.",
       "salaryRangeInvalid": "Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu.",
       "descriptionMax": "Mô tả tối đa 800 ký tự.",
       "skillsSummaryMax": "Kỹ năng tối đa 2000 ký tự.",
@@ -321,7 +327,7 @@
       "postgraduate": "Sau đại học",
       "university": "Đại học",
       "college": "Cao đẳng",
-      "vocational/intermediate": "Trung cấp / Nghề",
+      "vocationalintermediate": "Trung cấp / Nghề",
       "highschool": "Trung học phổ thông",
       "certificate": "Chứng chỉ"
     }
@@ -386,6 +392,15 @@
     },
     "validation": {
       "companyNameRequired": "Tên công ty là bắt buộc",
+      "taxCodeRequired": "Mã số thuế là bắt buộc",
+      "employeeSizeRequired": "Quy mô công ty là bắt buộc",
+      "fieldOperationRequired": "Lĩnh vực hoạt động là bắt buộc",
+      "companyEmailRequired": "Email công ty là bắt buộc",
+      "companyEmailInvalid": "Email công ty không hợp lệ",
+      "companyEmailMax": "Email công ty tối đa 100 ký tự",
+      "companyPhoneRequired": "Số điện thoại công ty là bắt buộc",
+      "companyPhoneInvalid": "Số điện thoại công ty không hợp lệ",
+      "companyPhoneMax": "Số điện thoại công ty tối đa 15 ký tự",
       "foundedDateInFuture": "Ngày thành lập không được ở tương lai.",
       "employeeSizeInvalid": "Quy mô công ty không hợp lệ."
     }
@@ -537,6 +552,8 @@
       "minSalaryLess": "Lương tối thiểu phải nhỏ hơn hoặc bằng lương tối đa",
       "maximumsalaryisrequired": "Yêu cầu mức lương tối đa",
       "invalidmaximumsalary": "Mức lương tối đa không hợp lệ",
+      "salaryTooLarge": "Mức lương vượt quá giới hạn cho phép.",
+      "choiceInvalid": "Lựa chọn không hợp lệ.",
       "maxSalaryGreater": "Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu",
       "academiclevelisrequired": "Yêu cầu trình độ học vấn",
       "applicationdeadlineisrequired": "Yêu cầu thời hạn ứng tuyển",
@@ -744,10 +761,24 @@
       "enterrecipientname": "Nhập tên người nhận",
       "enterrecipientemail": "Nhập email người nhận",
       "enteremailsubject": "Nhập tiêu đề email"
+    },
+    "actions": {
+      "send": "Gửi email"
+    },
+    "validation": {
+      "emailRequired": "Vui lòng nhập email người nhận.",
+      "emailInvalid": "Email người nhận không hợp lệ.",
+      "emailMax": "Email người nhận tối đa 100 ký tự.",
+      "recipientNameRequired": "Vui lòng nhập tên người nhận.",
+      "recipientNameMax": "Tên người nhận tối đa 100 ký tự.",
+      "subjectRequired": "Vui lòng nhập tiêu đề email.",
+      "subjectMax": "Tiêu đề email tối đa 200 ký tự.",
+      "contentRequired": "Vui lòng nhập nội dung email."
     }
   },
   "sidebar": {
     "dashboard": "Bảng điều khiển",
+    "agentAssistants": "Agent Assistants",
     "jobPostList": "Danh sách tin TD",
     "candidateManagement": "Quản lý ứng viên",
     "appliedApplications": "Hồ sơ ứng tuyển",
@@ -932,6 +963,9 @@
     "validation": {
       "required": "Trường này là bắt buộc.",
       "email": "Email không hợp lệ.",
+      "phone": "Số điện thoại không hợp lệ.",
+      "website": "Website không hợp lệ.",
+      "maxLength": "Tối đa {{max}} ký tự.",
       "futureDate": "Thời gian phải ở hiện tại hoặc tương lai."
     }
   },
@@ -1040,10 +1074,12 @@
         "manageCandidates": "Ứng viên",
         "manageInterviews": "Phỏng vấn",
         "manageQuestionBank": "Ngân hàng câu hỏi",
+        "manageEmployees": "Nhân sự HRM",
         "manageMembers": "Thành viên",
         "manageRoles": "Vai trò"
       },
       "roleCode": "Mã vai trò",
+      "roleDescription": "Mô tả",
       "roleName": "Tên vai trò",
       "status": "Trạng thái",
       "statusActive": "Hoạt động",
@@ -1223,9 +1259,71 @@
   },
   "blog": {
     "title": "Blog tuyển dụng",
-    "subtitle": "Nơi cập nhật kiến thức và kinh nghiệm dành cho nhà tuyển dụng. Nội dung sẽ được bổ sung liên tục theo từng chủ đề.",
+    "subtitle": "Chia sẻ kinh nghiệm, tips tuyển dụng của doanh nghiệp bạn",
+    "newPost": "Viết bài mới",
+    "reviewNotice": "Bài viết sẽ được gửi cho Admin duyệt trước khi hiển thị trên website. Thời gian duyệt thường trong 24 giờ.",
     "filter": {
-      "title": "Bộ lọc blog"
+      "title": "Bộ lọc blog",
+      "searchPlaceholder": "Tìm kiếm bài viết...",
+      "status": "Trạng thái"
+    },
+    "table": {
+      "title": "Tiêu đề",
+      "status": "Trạng thái",
+      "publishedAt": "Ngày đăng",
+      "viewCount": "Lượt xem",
+      "actions": "Thao tác"
+    },
+    "actions": {
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa",
+      "search": "Tìm kiếm",
+      "clearFilters": "Xóa lọc",
+      "advancedFilters": "Bộ lọc nâng cao",
+      "saveDraft": "Lưu nháp",
+      "submitReview": "Gửi duyệt",
+      "submitting": "Đang gửi...",
+      "changeImage": "Đổi ảnh",
+      "chooseImage": "Chọn ảnh đại diện",
+      "addTag": "Thêm"
+    },
+    "statuses": {
+      "all": "Tất cả",
+      "draft": "Bản nháp",
+      "pending": "Chờ duyệt",
+      "published": "Đã đăng",
+      "archived": "Lưu trữ"
+    },
+    "form": {
+      "createTitle": "Viết bài blog",
+      "editTitle": "Chỉnh sửa bài blog",
+      "reviewHint": "Bài viết sẽ được Admin duyệt trước khi hiển thị công khai",
+      "titleLabel": "Tiêu đề bài viết",
+      "titlePlaceholder": "Chia sẻ kinh nghiệm tuyển dụng của bạn...",
+      "excerptLabel": "Mô tả ngắn",
+      "excerptPlaceholder": "Tóm tắt ngắn gọn nội dung bài viết...",
+      "contentTitle": "NỘI DUNG BÀI VIẾT",
+      "thumbnailTitle": "ẢNH ĐẠI DIỆN",
+      "thumbnailAria": "Ảnh đại diện blog",
+      "thumbnailAlt": "Xem trước ảnh đại diện blog",
+      "tagsTitle": "TAGS",
+      "tagPlaceholder": "Nhập tag..."
+    },
+    "validation": {
+      "titleRequired": "Vui lòng nhập tiêu đề.",
+      "contentRequired": "Vui lòng nhập nội dung."
+    },
+    "messages": {
+      "loadError": "Không thể tải danh sách blog.",
+      "deleteConfirm": "Bạn có chắc muốn xóa \"{{title}}\"?",
+      "deleteSuccess": "Đã xóa bài viết.",
+      "deleteError": "Không thể xóa bài viết.",
+      "formLoadError": "Không thể tải bài viết.",
+      "createDraftSuccess": "Đã lưu bản nháp.",
+      "createReviewSuccess": "Đã gửi bài viết chờ duyệt.",
+      "updateDraftSuccess": "Đã lưu thay đổi.",
+      "updateReviewSuccess": "Đã gửi bài viết chờ duyệt.",
+      "saveError": "Không thể lưu bài viết."
     },
     "placeholders": {
       "exp_title": "Chia sẻ kinh nghiệm tuyển dụng",

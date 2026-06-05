@@ -72,10 +72,10 @@ const InterviewsPage = () => {
   const handleUpdateStatus = React.useCallback(async (id: string | number, nextStatus: string) => {
     try {
       await updateInterviewStatus({ id, status: nextStatus });
-      toastMessages.success(t('pages.interviews.toast.statusUpdated', 'Interview status updated'));
+      toastMessages.success(t('pages.interviews.toast.statusUpdated'));
     } catch (error) {
       console.error(error);
-      toastMessages.error(t('pages.interviews.toast.statusUpdateError', 'Could not update interview status'));
+      toastMessages.error(t('pages.interviews.toast.statusUpdateError'));
     }
   }, [t, updateInterviewStatus]);
 
@@ -84,10 +84,10 @@ const InterviewsPage = () => {
     try {
       await deleteInterview(deleteTarget.id);
       setDeleteTarget(null);
-      toastMessages.success(t('pages.interviews.toast.deleteSuccess', 'Interview deleted'));
+      toastMessages.success(t('pages.interviews.toast.deleteSuccess'));
     } catch (error) {
       console.error(error);
-      toastMessages.error(t('pages.interviews.toast.deleteError', 'Could not delete interview'));
+      toastMessages.error(t('pages.interviews.toast.deleteError'));
     }
   };
 
@@ -133,28 +133,29 @@ const InterviewsPage = () => {
       },
     },
     {
-      accessorKey: 'scheduledAt',
+      id: 'scheduled_at',
+      accessorFn: (row) => row.scheduledAt,
       header: t('pages.interviews.table.scheduledAt') as string,
       enableSorting: true,
       cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '—',
     },
     {
       id: 'actions',
-      header: t('pages.interviews.table.actions', 'Actions') as string,
+      header: t('pages.interviews.table.actions') as string,
       meta: { align: 'right' },
       cell: (info) => {
         const interview = info.row.original;
         const status = String(interview.status || '').toLowerCase();
         return (
           <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-            <Tooltip title={t('pages.interviews.table.view', 'View details')}>
+            <Tooltip title={t('pages.interviews.table.view')}>
               <IconButton size="small" color="info" onClick={() => setSelectedInterview(interview)}>
                 <VisibilityIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             {status !== 'completed' && status !== 'cancelled' && (
               <>
-                <Tooltip title={t('pages.interviews.table.markCompleted', 'Mark completed')}>
+                <Tooltip title={t('pages.interviews.table.markCompleted')}>
                   <IconButton
                     size="small"
                     color="success"
@@ -164,7 +165,7 @@ const InterviewsPage = () => {
                     <CheckCircleIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title={t('pages.interviews.table.cancel', 'Cancel')}>
+                <Tooltip title={t('pages.interviews.table.cancel')}>
                   <IconButton
                     size="small"
                     color="warning"
@@ -176,7 +177,7 @@ const InterviewsPage = () => {
                 </Tooltip>
               </>
             )}
-            <Tooltip title={t('pages.interviews.table.delete', 'Delete')}>
+            <Tooltip title={t('pages.interviews.table.delete')}>
               <IconButton size="small" color="error" disabled={isMutating} onClick={() => setDeleteTarget(interview)}>
                 <DeleteIcon fontSize="small" />
               </IconButton>
@@ -200,13 +201,13 @@ const InterviewsPage = () => {
       <Paper sx={{ p: 0, borderRadius: '12px', overflow: 'hidden' }} elevation={0}>
         <Box sx={{ p: 2, pb: 0 }}>
           <FilterBar
-            title={t('pages.interviews.filter.title', 'Bộ lọc phỏng vấn')}
+            title={t('pages.interviews.filter.title')}
             searchValue={searchTerm}
-            searchPlaceholder={t('pages.interviews.searchPlaceholder', 'Search interviews...')}
+            searchPlaceholder={t('pages.interviews.searchPlaceholder')}
             onSearchChange={handleSearch}
             onReset={() => handleSearch('')}
             resetDisabled={!searchTerm}
-            resetLabel={t('common.clearFilters', 'Xóa lọc')}
+            resetLabel={t('common.clearFilters')}
           />
         </Box>
         <DataTable
@@ -223,7 +224,7 @@ const InterviewsPage = () => {
       </Paper>
 
       <Dialog open={!!selectedInterview} onClose={() => setSelectedInterview(null)} fullWidth maxWidth="sm">
-        <DialogTitle>{t('pages.interviews.detailTitle', 'Interview details')}</DialogTitle>
+        <DialogTitle>{t('pages.interviews.detailTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={1.25} sx={{ pt: 1 }}>
             <Typography variant="body2"><strong>{t('pages.interviews.table.room')}:</strong> {selectedInterview?.roomName || '—'}</Typography>
@@ -233,27 +234,27 @@ const InterviewsPage = () => {
             <Typography variant="body2"><strong>{t('pages.interviews.table.scheduledAt')}:</strong> {selectedInterview?.scheduledAt ? dayjs(selectedInterview.scheduledAt).format('DD/MM/YYYY HH:mm') : '—'}</Typography>
             {selectedInterview?.recordingUrl && (
               <Link href={selectedInterview.recordingUrl} target="_blank" rel="noreferrer">
-                {t('pages.interviews.recordingLink', 'Open recording')}
+                {t('pages.interviews.recordingLink')}
               </Link>
             )}
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setSelectedInterview(null)}>{t('common.close', 'Close')}</Button>
+          <Button onClick={() => setSelectedInterview(null)}>{t('common.close')}</Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)}>
-        <DialogTitle>{t('pages.interviews.deleteTitle', 'Delete interview')}</DialogTitle>
+        <DialogTitle>{t('pages.interviews.deleteTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
             {t('pages.interviews.deleteConfirm', { name: deleteTarget?.roomName || deleteTarget?.id || '' })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteTarget(null)} color="inherit">{t('common.cancel', 'Cancel')}</Button>
+          <Button onClick={() => setDeleteTarget(null)} color="inherit">{t('common.cancel')}</Button>
           <Button onClick={handleDelete} color="error" variant="contained" disabled={isMutating}>
-            {isMutating ? t('common.deleting', 'Deleting...') : t('common.delete', 'Delete')}
+            {isMutating ? t('common.deleting') : t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -64,9 +64,13 @@ const serviceColor = (status?: string): 'success' | 'error' | 'default' => {
   return 'default';
 };
 
-const formatVndPerHour = (value?: number): string => {
+const resolveSettingsNumberLocale = (language?: string | null): string => (
+  String(language || '').toLowerCase().startsWith('vi') ? 'vi-VN' : 'en-US'
+);
+
+const formatVndPerHour = (value?: number, language?: string | null): string => {
   if (!value) return 'N/A';
-  return `${new Intl.NumberFormat('vi-VN').format(value)} VND/h`;
+  return `${new Intl.NumberFormat(resolveSettingsNumberLocale(language)).format(value)} VND/h`;
 };
 
 const getApiErrorMessage = (error: unknown, fallback: string): string => {
@@ -91,6 +95,7 @@ const getApiErrorMessage = (error: unknown, fallback: string): string => {
 
 const FPTGpuControlCard = () => {
   const queryClient = useQueryClient();
+  const { t, i18n } = useTranslation('admin');
   const { data, isLoading, isFetching, error } = useQuery<FPTGpuControlStatus>({
     queryKey: ['fpt-gpu-control'],
     queryFn: fptGpuService.getStatus,
@@ -101,11 +106,11 @@ const FPTGpuControlCard = () => {
     mutationFn: (action: 'start' | 'stop') =>
       action === 'start' ? fptGpuService.start() : fptGpuService.stop(),
     onSuccess: (_result, action) => {
-      toastMessages.success(action === 'start' ? 'FPT GPU start requested.' : 'FPT GPU stop requested.');
+      toastMessages.success(t(action === 'start' ? 'pages.settings.fptGpu.toast.startSuccess' : 'pages.settings.fptGpu.toast.stopSuccess'));
       queryClient.invalidateQueries({ queryKey: ['fpt-gpu-control'] });
     },
     onError: (mutationError) => {
-      toastMessages.error(getApiErrorMessage(mutationError, 'FPT GPU action failed.'));
+      toastMessages.error(getApiErrorMessage(mutationError, t('pages.settings.fptGpu.toast.actionError')));
     },
   });
 
@@ -124,7 +129,7 @@ const FPTGpuControlCard = () => {
         <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" gap={2} sx={{ mb: 2 }}>
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              FPT GPU Container
+              {t('pages.settings.fptGpu.title')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {container?.name || 'square-ai-manual-1ivp1r2x'}
@@ -132,7 +137,11 @@ const FPTGpuControlCard = () => {
           </Box>
           <Stack direction="row" gap={1} flexWrap="wrap">
             <Chip label={status} color={statusColor(status)} size="small" />
-            <Chip label={control?.available ? 'Control enabled' : 'Read only'} size="small" variant="outlined" />
+            <Chip
+              label={control?.available ? t('pages.settings.fptGpu.controlEnabled') : t('pages.settings.fptGpu.readOnly')}
+              size="small"
+              variant="outlined"
+            />
           </Stack>
         </Stack>
 
@@ -150,22 +159,22 @@ const FPTGpuControlCard = () => {
         )}
         {!control?.configured && !isLoading && (
           <Alert severity="info" sx={{ mb: 2 }}>
-            Add FPT_GPU_BSS_ACCESS_TOKEN or FPT_GPU_ACCESS_TOKEN on the backend to enable Start and Stop.
+            {t('pages.settings.fptGpu.notConfigured')}
           </Alert>
         )}
 
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid size={{ xs: 12, md: 4 }}>
-            <Typography variant="caption" color="text.secondary">Tenant</Typography>
+            <Typography variant="caption" color="text.secondary">{t('pages.settings.fptGpu.tenant')}</Typography>
             <Typography variant="body2" fontWeight={600}>{container?.tenantId || 'N/A'}</Typography>
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
-            <Typography variant="caption" color="text.secondary">Running cost</Typography>
-            <Typography variant="body2" fontWeight={600}>{formatVndPerHour(container?.billing?.runningHourlyVnd)}</Typography>
+            <Typography variant="caption" color="text.secondary">{t('pages.settings.fptGpu.runningCost')}</Typography>
+            <Typography variant="body2" fontWeight={600}>{formatVndPerHour(container?.billing?.runningHourlyVnd, i18n.language)}</Typography>
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
-            <Typography variant="caption" color="text.secondary">Stopped disk cost</Typography>
-            <Typography variant="body2" fontWeight={600}>{formatVndPerHour(container?.billing?.stoppedHourlyVnd)}</Typography>
+            <Typography variant="caption" color="text.secondary">{t('pages.settings.fptGpu.stoppedDiskCost')}</Typography>
+            <Typography variant="body2" fontWeight={600}>{formatVndPerHour(container?.billing?.stoppedHourlyVnd, i18n.language)}</Typography>
           </Grid>
         </Grid>
 
@@ -189,7 +198,7 @@ const FPTGpuControlCard = () => {
             disabled={!canStart || actionMutation.isPending}
             onClick={() => actionMutation.mutate('start')}
           >
-            Start
+            {t('pages.settings.fptGpu.start')}
           </Button>
           <Button
             variant="outlined"
@@ -198,14 +207,14 @@ const FPTGpuControlCard = () => {
             disabled={!canStop || actionMutation.isPending}
             onClick={() => actionMutation.mutate('stop')}
           >
-            Stop
+            {t('pages.settings.fptGpu.stop')}
           </Button>
           <Button
             variant="outlined"
             startIcon={isFetching ? <CircularProgress size={18} /> : <RefreshIcon />}
             onClick={() => queryClient.invalidateQueries({ queryKey: ['fpt-gpu-control'] })}
           >
-            Refresh
+            {t('pages.settings.fptGpu.refresh')}
           </Button>
           {container?.consoleUrl && (
             <Button
@@ -215,7 +224,7 @@ const FPTGpuControlCard = () => {
               target="_blank"
               rel="noreferrer"
             >
-              Open FPT
+              {t('pages.settings.fptGpu.openConsole')}
             </Button>
           )}
         </Stack>

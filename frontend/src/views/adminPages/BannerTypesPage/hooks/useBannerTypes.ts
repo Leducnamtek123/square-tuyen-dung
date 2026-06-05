@@ -5,6 +5,7 @@ import adminManagementService, { AdminBannerTypePayload, AdminListParams } from 
 import { BannerType } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 import toastMessages from '../../../../utils/toastMessages';
+import i18next from 'i18next';
 
 type UseBannerTypesResult = UseQueryResult<PaginatedResponse<BannerType>> & {
   createBannerType: (data: AdminBannerTypePayload) => Promise<BannerType>;
@@ -26,10 +27,10 @@ export const useBannerTypes = (params?: AdminListParams): UseBannerTypesResult =
     mutationFn: (data) => adminManagementService.createBannerType(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-banner-types'] });
-      toastMessages.success('Banner type added successfully');
+      toastMessages.success(i18next.t('admin:pages.bannerTypes.toast.addSuccess'));
     },
     onError: (err) => {
-      toastMessages.error('An error occurred while adding the banner type');
+      toastMessages.error(i18next.t('admin:pages.bannerTypes.toast.addError'));
       console.error(err);
     },
   });
@@ -38,10 +39,10 @@ export const useBannerTypes = (params?: AdminListParams): UseBannerTypesResult =
     mutationFn: ({ id, data }) => adminManagementService.updateBannerType(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-banner-types'] });
-      toastMessages.success('Banner type updated successfully');
+      toastMessages.success(i18next.t('admin:pages.bannerTypes.toast.updateSuccess'));
     },
     onError: (err) => {
-      toastMessages.error('An error occurred while updating the banner type');
+      toastMessages.error(i18next.t('admin:pages.bannerTypes.toast.updateError'));
       console.error(err);
     },
   });
@@ -50,10 +51,10 @@ export const useBannerTypes = (params?: AdminListParams): UseBannerTypesResult =
     mutationFn: (id) => adminManagementService.deleteBannerType(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-banner-types'] });
-      toastMessages.success('Banner type deleted successfully');
+      toastMessages.success(i18next.t('admin:pages.bannerTypes.toast.deleteSuccess'));
     },
     onError: (err) => {
-      toastMessages.error('An error occurred while deleting the banner type');
+      toastMessages.error(i18next.t('admin:pages.bannerTypes.toast.deleteError'));
       console.error(err);
     },
   });

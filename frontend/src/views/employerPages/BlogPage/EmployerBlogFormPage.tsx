@@ -10,8 +10,10 @@ import SendIcon from '@mui/icons-material/Send';
 import ImageIcon from '@mui/icons-material/Image';
 import CloseIcon from '@mui/icons-material/Close';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import contentService, { ArticlePayload } from '@/services/contentService';
 import toastMessages from '@/utils/toastMessages';
+import { hasArticleTextContent } from '@/utils/articleContent';
 import SimpleRichEditor from '@/components/Common/Controls/SimpleRichEditor';
 
 interface Props {
@@ -122,6 +124,7 @@ const blogFormReducer = (state: BlogFormState, action: BlogFormAction): BlogForm
 
 const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
   const { push } = useRouter();
+  const { t } = useTranslation('employer');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [state, dispatch] = useReducer(blogFormReducer, initialBlogFormState);
@@ -146,10 +149,10 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
         .then((article) => {
           dispatch({ type: 'loaded', article });
         })
-        .catch(() => toastMessages.error('Không thể tải bài viết'))
+        .catch(() => toastMessages.error(t('blog.messages.formLoadError')))
         .finally(() => dispatch({ type: 'loadFailed' }));
     }
-  }, [mode, articleId]);
+  }, [mode, articleId, t]);
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -169,8 +172,8 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
   };
 
   const handleSave = async (submitForReview = false) => {
-    if (!title.trim()) { toastMessages.error('Vui lòng nhập tiêu đề'); return; }
-    if (!content.trim()) { toastMessages.error('Vui lòng nhập nội dung'); return; }
+    if (!title.trim()) { toastMessages.error(t('blog.validation.titleRequired')); return; }
+    if (!hasArticleTextContent(content)) { toastMessages.error(t('blog.validation.contentRequired')); return; }
 
     dispatch({ type: 'patch', patch: { saving: true } });
     const payload: ArticlePayload = {
@@ -183,14 +186,14 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
     try {
       if (mode === 'create') {
         await contentService.employerCreateBlog(payload, thumbnailFile || undefined);
-        toastMessages.success(submitForReview ? 'Đã gửi bài viết chờ duyệt!' : 'Đã lưu bản nháp!');
+        toastMessages.success(t(submitForReview ? 'blog.messages.createReviewSuccess' : 'blog.messages.createDraftSuccess'));
         push('/employer/blog');
       } else if (articleId) {
         await contentService.employerUpdateBlog(articleId, payload, thumbnailFile || undefined);
-        toastMessages.success(submitForReview ? 'Đã gửi bài viết chờ duyệt!' : 'Đã lưu thay đổi!');
+        toastMessages.success(t(submitForReview ? 'blog.messages.updateReviewSuccess' : 'blog.messages.updateDraftSuccess'));
       }
     } catch {
-      toastMessages.error('Không thể lưu bài viết');
+      toastMessages.error(t('blog.messages.saveError'));
     } finally {
       dispatch({ type: 'patch', patch: { saving: false } });
     }
@@ -213,10 +216,10 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
         </IconButton>
         <Box flex={1}>
           <Typography variant="h5" fontWeight={900}>
-            {mode === 'create' ? 'Viết bài blog' : 'Chỉnh sửa bài blog'}
+            {mode === 'create' ? t('blog.form.createTitle') : t('blog.form.editTitle')}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Bài viết sẽ được Admin duyệt trước khi hiển thị công khai
+            {t('blog.form.reviewHint')}
           </Typography>
         </Box>
         <Stack direction="row" spacing={1.5}>
@@ -227,7 +230,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
             disabled={saving}
             sx={{ fontWeight: 700 }}
           >
-            Lưu nháp
+            {t('blog.actions.saveDraft')}
           </Button>
           <Button
             variant="contained"
@@ -236,7 +239,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
             disabled={saving}
             sx={{ fontWeight: 700 }}
           >
-            {saving ? 'Đang gửi...' : 'Gửi duyệt'}
+            {saving ? t('blog.actions.submitting') : t('blog.actions.submitReview')}
           </Button>
         </Stack>
       </Stack>
@@ -247,19 +250,19 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
           <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
             <TextField
               fullWidth
-              label="Tiêu đề bài viết"
+              label={t('blog.form.titleLabel')}
               value={title}
               onChange={(e) => dispatch({ type: 'patch', patch: { title: e.target.value } })}
-              placeholder="Chia sẻ kinh nghiệm tuyển dụng của bạn..."
+              placeholder={t('blog.form.titlePlaceholder')}
               sx={{ mb: 2 }}
               slotProps={{ htmlInput: { style: { fontSize: '1.1rem', fontWeight: 700 } } }}
             />
             <TextField
               fullWidth
-              label="Mô tả ngắn"
+              label={t('blog.form.excerptLabel')}
               value={excerpt}
               onChange={(e) => dispatch({ type: 'patch', patch: { excerpt: e.target.value } })}
-              placeholder="Tóm tắt ngắn gọn nội dung bài viết..."
+              placeholder={t('blog.form.excerptPlaceholder')}
               multiline
               rows={2}
               slotProps={{ htmlInput: { maxLength: 500 } }}
@@ -269,7 +272,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
 
           <Paper sx={{ p: 3, borderRadius: 2, minHeight: 500 }}>
             <Typography variant="subtitle2" fontWeight={700} mb={2} color="text.secondary">
-              NỘI DUNG BÀI VIẾT
+              {t('blog.form.contentTitle')}
             </Typography>
             <SimpleRichEditor value={content} onChange={(nextContent) => dispatch({ type: 'patch', patch: { content: nextContent } })} minHeight={350} />
           </Paper>
@@ -279,18 +282,18 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
         <Box sx={{ width: { xs: '100%', lg: 300 } }}>
           {/* Thumbnail */}
           <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
-            <Typography variant="subtitle2" fontWeight={800} mb={2}>ẢNH ĐẠI DIỆN</Typography>
+            <Typography variant="subtitle2" fontWeight={800} mb={2}>{t('blog.form.thumbnailTitle')}</Typography>
             <input
               ref={fileInputRef}
               type="file"
-              aria-label="Blog thumbnail"
+              aria-label={t('blog.form.thumbnailAria')}
               accept="image/*"
               style={{ display: 'none' }}
               onChange={handleThumbnailChange}
             />
             {(thumbnailPreview || existingThumbnailUrl) ? (
               <Box sx={{ position: 'relative' }}>
-                <Box component="img" src={thumbnailPreview || existingThumbnailUrl!} alt="thumbnail"
+                <Box component="img" src={thumbnailPreview || existingThumbnailUrl!} alt={t('blog.form.thumbnailAlt')}
                   sx={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 1.5 }} />
                 <IconButton size="small"
                   sx={{ position: 'absolute', top: 4, right: 4, bgcolor: 'rgba(0,0,0,0.5)', color: 'white' }}
@@ -298,29 +301,29 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
                   <CloseIcon fontSize="small" />
                 </IconButton>
                 <Button size="small" fullWidth startIcon={<ImageIcon />} onClick={() => fileInputRef.current?.click()} sx={{ mt: 1 }}>
-                  Đổi ảnh
+                  {t('blog.actions.changeImage')}
                 </Button>
               </Box>
             ) : (
               <Button variant="outlined" fullWidth startIcon={<ImageIcon />}
                 onClick={() => fileInputRef.current?.click()}
                 sx={{ height: 100, borderStyle: 'dashed' }}>
-                Chọn ảnh đại diện
+                {t('blog.actions.chooseImage')}
               </Button>
             )}
           </Paper>
 
           {/* Tags */}
           <Paper sx={{ p: 3, borderRadius: 2 }}>
-            <Typography variant="subtitle2" fontWeight={800} mb={2}>TAGS</Typography>
+            <Typography variant="subtitle2" fontWeight={800} mb={2}>{t('blog.form.tagsTitle')}</Typography>
             <Stack direction="row" spacing={1} mb={1.5}>
               <TextField
-                size="small" placeholder="Nhập tag..." value={tagInput}
+                size="small" placeholder={t('blog.form.tagPlaceholder')} value={tagInput}
                 onChange={(e) => dispatch({ type: 'patch', patch: { tagInput: e.target.value } })}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
                 fullWidth
               />
-              <Button size="small" variant="outlined" onClick={addTag}>Thêm</Button>
+              <Button size="small" variant="outlined" onClick={addTag}>{t('blog.actions.addTag')}</Button>
             </Stack>
             <Stack direction="row" flexWrap="wrap" gap={0.5}>
               {tagList.map((tag) => (

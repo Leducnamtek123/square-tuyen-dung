@@ -33,6 +33,10 @@ import type { Ward, District, City } from '../../../types/models';
 import type { WardPayload } from '../../../services/adminManagementService';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import type { SxProps, Theme } from '@mui/material/styles';
+import {
+  getLocationEntityFormValidationErrors,
+  type LocationEntityFormValidationErrors,
+} from '../locationFormValidation';
 
 type WardFormData = Partial<WardPayload>;
 const cityFilterSx = [{ width: { xs: '100%', sm: 220 } }, filterControlSx] as SxProps<Theme>;
@@ -138,7 +142,7 @@ const WardFilters = ({
   onDistrictChange: (value: string | number) => void;
 }) => (
   <FilterBar
-    title={t('pages.wards.filter.title', 'Bộ lọc phường/xã')}
+    title={t('pages.wards.filter.title')}
     searchValue={searchTerm}
     searchPlaceholder={t('pages.wards.searchPlaceholder')}
     onSearchChange={onSearchChange}
@@ -149,8 +153,8 @@ const WardFilters = ({
       onDistrictChange('');
     }}
     resetDisabled={!searchTerm && !cityFilter && !districtFilter}
-    resetLabel={t('common.clearFilters', 'Xóa lọc')}
-    advancedLabel={t('common.advancedFilters', 'Bộ lọc nâng cao')}
+    resetLabel={t('common.clearFilters')}
+    advancedLabel={t('common.advancedFilters')}
     advancedDefaultOpen={Boolean(cityFilter || districtFilter)}
     advancedFilters={(
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
@@ -198,6 +202,9 @@ const WardDialogs = ({
   currentWard,
   formData,
   districts,
+  validationErrors,
+  hasValidationErrors,
+  getLocationValidationText,
   isMutating,
   onClose,
   onSave,
@@ -211,6 +218,9 @@ const WardDialogs = ({
   currentWard: Ward | null;
   formData: WardFormData;
   districts: District[];
+  validationErrors: LocationEntityFormValidationErrors;
+  hasValidationErrors: boolean;
+  getLocationValidationText: (field: keyof LocationEntityFormValidationErrors) => string | undefined;
   isMutating: boolean;
   onClose: () => void;
   onSave: () => void;
@@ -228,6 +238,8 @@ const WardDialogs = ({
             fullWidth
             value={formData.district || ''}
             onChange={(e) => onFormDataChange({ ...formData, district: Number(e.target.value) })}
+            error={Boolean(validationErrors.district)}
+            helperText={getLocationValidationText('district')}
             required
           >
             {districts.map((district) => (
@@ -241,6 +253,8 @@ const WardDialogs = ({
             fullWidth
             value={formData.name}
             onChange={(e) => onFormDataChange({ ...formData, name: e.target.value })}
+            error={Boolean(validationErrors.name)}
+            helperText={getLocationValidationText('name')}
             required
           />
           <TextField
@@ -248,6 +262,8 @@ const WardDialogs = ({
             fullWidth
             value={formData.code}
             onChange={(e) => onFormDataChange({ ...formData, code: e.target.value })}
+            error={Boolean(validationErrors.code)}
+            helperText={getLocationValidationText('code')}
             required
           />
         </Box>
@@ -256,7 +272,7 @@ const WardDialogs = ({
         <Button onClick={onClose} color="inherit">
           {t('pages.wards.cancel')}
         </Button>
-        <Button onClick={onSave} variant="contained" disabled={isMutating || !formData.name || !formData.code || !formData.district}>
+        <Button onClick={onSave} variant="contained" disabled={isMutating || hasValidationErrors}>
           {isMutating ? t('common.saving') : t('common.save')}
         </Button>
       </DialogActions>
@@ -286,6 +302,23 @@ const WardsPage = () => {
   const { page, pageSize, sorting, onSortingChange, ordering, pagination, onPaginationChange } = useDataTable({ initialPageSize: 10 });
 
   const debouncedSearch = useDebounce(uiState.searchTerm, 500);
+  const validationErrors = React.useMemo(
+    () => getLocationEntityFormValidationErrors(
+      {
+        name: uiState.formData.name,
+        code: uiState.formData.code,
+        parentId: uiState.formData.district,
+      },
+      { parentField: 'district' },
+    ),
+    [uiState.formData],
+  );
+  const hasValidationErrors = Object.keys(validationErrors).length > 0;
+  const getLocationValidationText = (field: keyof LocationEntityFormValidationErrors) => (
+    validationErrors[field]
+      ? t(`pages.locationValidation.${validationErrors[field]}`)
+      : undefined
+  );
 
   const { data, isLoading, createWard, updateWard, deleteWard, isMutating } = useWards({
     page: page + 1,
@@ -338,11 +371,11 @@ const WardsPage = () => {
   };
 
   const handleSave = async () => {
-    if (!uiState.formData.name || !uiState.formData.code || !uiState.formData.district) return;
+    if (hasValidationErrors) return;
 
     const payload: WardPayload = {
-      name: uiState.formData.name,
-      code: uiState.formData.code,
+      name: uiState.formData.name?.trim() || '',
+      code: uiState.formData.code?.trim() || '',
       district: Number(uiState.formData.district),
     };
 
@@ -487,6 +520,9 @@ const WardsPage = () => {
         currentWard={uiState.currentWard}
         formData={uiState.formData}
         districts={districts}
+        validationErrors={validationErrors}
+        hasValidationErrors={hasValidationErrors}
+        getLocationValidationText={getLocationValidationText}
         isMutating={isMutating}
         onClose={handleCloseDialog}
         onSave={handleSave}

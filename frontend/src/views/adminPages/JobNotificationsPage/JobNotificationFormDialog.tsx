@@ -1,7 +1,13 @@
 import React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Box, TextField, MenuItem } from '@mui/material';
 import type { TFunction } from 'i18next';
-import type { JobNotificationsDialogMode, JobNotificationsFormData } from './types';
+import {
+  getJobNotificationFormValidationErrors,
+  JOB_NOTIFICATION_FREQUENCY_OPTIONS,
+  type JobNotificationFormValidationErrors,
+  type JobNotificationsDialogMode,
+  type JobNotificationsFormData,
+} from './types';
 
 type JobNotificationFormDialogProps = {
   open: boolean;
@@ -24,6 +30,17 @@ const JobNotificationFormDialog = ({
   onSave,
   onChange,
 }: JobNotificationFormDialogProps) => {
+  const validationErrors = React.useMemo(
+    () => getJobNotificationFormValidationErrors(formData),
+    [formData],
+  );
+  const hasValidationErrors = Object.keys(validationErrors).length > 0;
+  const getValidationText = (field: keyof JobNotificationFormValidationErrors) => (
+    validationErrors[field]
+      ? t(`pages.jobNotifications.validation.${validationErrors[field]}`)
+      : undefined
+  );
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>
@@ -36,6 +53,8 @@ const JobNotificationFormDialog = ({
             fullWidth
             value={formData.jobName}
             onChange={(e) => onChange({ ...formData, jobName: e.target.value })}
+            error={Boolean(validationErrors.jobName)}
+            helperText={getValidationText('jobName')}
             required
           />
           <TextField
@@ -44,6 +63,8 @@ const JobNotificationFormDialog = ({
             type="number"
             value={formData.salary ?? ''}
             onChange={(e) => onChange({ ...formData, salary: e.target.value ? Number(e.target.value) : null })}
+            error={Boolean(validationErrors.salary)}
+            helperText={getValidationText('salary')}
           />
           <TextField
             label={t('pages.jobNotifications.form.frequency')}
@@ -51,11 +72,13 @@ const JobNotificationFormDialog = ({
             select
             value={formData.frequency}
             onChange={(e) => onChange({ ...formData, frequency: Number(e.target.value) })}
+            error={Boolean(validationErrors.frequency)}
+            helperText={getValidationText('frequency')}
             required
           >
-            <MenuItem value={1}>1</MenuItem>
-            <MenuItem value={7}>7</MenuItem>
-            <MenuItem value={30}>30</MenuItem>
+            {JOB_NOTIFICATION_FREQUENCY_OPTIONS.map((frequency) => (
+              <MenuItem key={frequency} value={frequency}>{frequency}</MenuItem>
+            ))}
           </TextField>
           <TextField
             label={t('pages.jobNotifications.form.position')}
@@ -63,6 +86,8 @@ const JobNotificationFormDialog = ({
             type="number"
             value={formData.position ?? ''}
             onChange={(e) => onChange({ ...formData, position: e.target.value ? Number(e.target.value) : null })}
+            error={Boolean(validationErrors.position)}
+            helperText={getValidationText('position')}
           />
           <TextField
             label={t('pages.jobNotifications.form.experience')}
@@ -70,6 +95,8 @@ const JobNotificationFormDialog = ({
             type="number"
             value={formData.experience ?? ''}
             onChange={(e) => onChange({ ...formData, experience: e.target.value ? Number(e.target.value) : null })}
+            error={Boolean(validationErrors.experience)}
+            helperText={getValidationText('experience')}
           />
           <TextField
             label={t('pages.jobNotifications.form.careerId')}
@@ -77,6 +104,8 @@ const JobNotificationFormDialog = ({
             type="number"
             value={formData.career ?? ''}
             onChange={(e) => onChange({ ...formData, career: e.target.value ? Number(e.target.value) : null })}
+            error={Boolean(validationErrors.career)}
+            helperText={getValidationText('career')}
           />
           <TextField
             label={t('pages.jobNotifications.form.cityId')}
@@ -84,6 +113,8 @@ const JobNotificationFormDialog = ({
             type="number"
             value={formData.city ?? ''}
             onChange={(e) => onChange({ ...formData, city: e.target.value ? Number(e.target.value) : null })}
+            error={Boolean(validationErrors.city)}
+            helperText={getValidationText('city')}
           />
           <TextField
             label={t('pages.jobNotifications.form.isActive')}
@@ -101,7 +132,7 @@ const JobNotificationFormDialog = ({
         <Button onClick={onClose} color="inherit">
           {t('pages.jobNotifications.cancel')}
         </Button>
-        <Button onClick={onSave} variant="contained" disabled={isMutating || !formData.jobName || !formData.frequency}>
+        <Button onClick={onSave} variant="contained" disabled={isMutating || hasValidationErrors}>
           {isMutating ? t('common.saving') : t('common.save')}
         </Button>
       </DialogActions>

@@ -154,6 +154,8 @@
       "salaryMaxInvalid": "Invalid maximum salary.",
       "salaryMaxComparison": "Maximum salary must be greater than or equal to minimum salary.",
       "expectedSalaryInvalid": "Expected salary must be a positive number.",
+      "salaryTooLarge": "Salary exceeds the allowed limit.",
+      "choiceInvalid": "Invalid selection.",
       "workplaceTypeRequired": "Workplace type is required.",
       "jobTypeRequired": "Job type is required.",
       "objectiveRequired": "Career objective is required.",
@@ -184,9 +186,12 @@
       "certificateNameMax": "Certificate name exceeds allowed length.",
       "languageRequired": "Language is required.",
       "levelRequired": "Level is required.",
+      "levelInvalid": "Invalid level.",
       "skillNameRequired": "Skill name is required.",
       "skillNameMax": "Skill name exceeds allowed length.",
       "fileRequired": "File is required.",
+      "filePdfOnly": "Only PDF files are accepted.",
+      "fileTooLarge": "PDF file must be 10MB or smaller.",
       "fieldMax": "{{field}} exceeds allowed length.",
       "descriptionMax": "Description must not exceed 1000 characters"
     },
@@ -292,6 +297,12 @@
     "changePassword": "Change Password",
     "deactivate": "Deactivate Account"
   },
+  "settings": {
+    "toast": {
+      "updateSuccess": "Settings updated successfully.",
+      "updateError": "Failed to update settings."
+    }
+  },
   "onlineProfile": {
     "pageTitle": "Update Online Profile",
     "sidebar": {
@@ -348,7 +359,11 @@
     "messages": {
       "unfollowSuccess": "Unfollowed successfully."
     },
-    "savedProfile": "Saved your profile"
+    "savedProfile": "Saved your profile",
+    "viewedCard": {
+      "viewedProfile": "Viewed resume {{resumeTitle}} {{views}} times",
+      "lastViewed": "Last viewed {{date}}"
+    }
   },
   "myInterviews": {
     "defaultRoomName": "Interview room",
@@ -421,6 +436,9 @@
           "keywordMax": "Keyword is too long.",
           "careerRequired": "Career is required.",
           "cityRequired": "City/Province is required.",
+          "choiceInvalid": "Invalid selection.",
+          "frequencyRequired": "Notification frequency is required.",
+          "frequencyInvalid": "Invalid notification frequency.",
           "salaryInvalid": "Invalid desired salary."
         }
       }

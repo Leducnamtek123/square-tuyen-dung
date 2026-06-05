@@ -17,6 +17,7 @@ type CartesianOptionsConfig = {
   stacked?: boolean;
   displayLegend?: boolean;
   yStacked?: boolean;
+  language?: string | null;
 };
 
 const chartSize = (size?: ChartSize) => {
@@ -97,7 +98,21 @@ export const makeBarFill = (color: string) => {
   return makeVerticalGradient(rgba(color, 0.92), rgba(color, 0.58), rgba(color, 0.82));
 };
 
-const compactNumber = (value: number) => new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 1 }).format(value);
+const chartFormatterCache = new Map<string, Intl.NumberFormat>();
+
+const resolveChartLocale = (language?: string | null) => (
+  String(language || '').toLowerCase().startsWith('vi') ? 'vi-VN' : 'en-US'
+);
+
+const compactNumber = (value: number, language?: string | null) => {
+  const locale = resolveChartLocale(language);
+  const cachedFormatter = chartFormatterCache.get(locale);
+  if (cachedFormatter) return cachedFormatter.format(value);
+
+  const formatter = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
+  chartFormatterCache.set(locale, formatter);
+  return formatter.format(value);
+};
 
 const tooltipValue = (context: any) => {
   const parsed = context.parsed;
@@ -109,6 +124,7 @@ const tooltipValue = (context: any) => {
 
 export const createCartesianOptions = (theme: Theme, config: CartesianOptionsConfig = {}) => {
   const stacked = config.stacked ?? false;
+  const language = config.language;
 
   return {
     responsive: true,
@@ -175,7 +191,7 @@ export const createCartesianOptions = (theme: Theme, config: CartesianOptionsCon
         callbacks: {
           label: (context: any) => {
             const label = context.dataset?.label ? `${context.dataset.label}: ` : '';
-            return `${label}${compactNumber(tooltipValue(context))}`;
+            return `${label}${compactNumber(tooltipValue(context), language)}`;
           },
         },
       },
@@ -213,14 +229,14 @@ export const createCartesianOptions = (theme: Theme, config: CartesianOptionsCon
             size: 12,
             weight: 700,
           },
-          callback: (value: string | number) => compactNumber(Number(value)),
+          callback: (value: string | number) => compactNumber(Number(value), language),
         },
       },
     },
   };
 };
 
-export const createDoughnutOptions = (theme: Theme) => ({
+export const createDoughnutOptions = (theme: Theme, language?: string | null) => ({
   responsive: true,
   maintainAspectRatio: false,
   cutout: '66%',
@@ -268,7 +284,7 @@ export const createDoughnutOptions = (theme: Theme) => ({
           const values = Array.isArray(context.dataset?.data) ? context.dataset.data : [];
           const total = values.reduce((sum: number, item: unknown) => sum + Number(item || 0), 0);
           const percent = total > 0 ? Math.round((value / total) * 100) : 0;
-          return `${context.label}: ${compactNumber(value)} (${percent}%)`;
+          return `${context.label}: ${compactNumber(value, language)} (${percent}%)`;
         },
       },
     },

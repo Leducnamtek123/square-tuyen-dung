@@ -1,6 +1,11 @@
+'use client';
+
 import { Box, CircularProgress, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 export default function Loading() {
+  const { t } = useTranslation('common');
+
   return (
     <Box
       sx={{
@@ -14,7 +19,7 @@ export default function Loading() {
     >
       <CircularProgress size={48} />
       <Typography variant="body2" color="text.secondary">
-        Đang tải…
+        {t('loading')}
       </Typography>
     </Box>
   );

@@ -6,6 +6,7 @@ import type { AdminListParams, CareerPayload } from '../../../../services/adminM
 import toastMessages from '../../../../utils/toastMessages';
 import { Career } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
+import i18next from 'i18next';
 
 type UseCareersResult = UseQueryResult<PaginatedResponse<Career>> & {
     createCareer: (data: CareerPayload | FormData) => Promise<Career>;
@@ -30,10 +31,10 @@ export const useCareers = (params?: AdminListParams): UseCareersResult => {
         mutationFn: (data: CareerPayload | FormData) => adminManagementService.createCareer(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-careers'] });
-            toastMessages.success('Career added successfully');
+            toastMessages.success(i18next.t('admin:pages.careers.toast.addSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while adding the career');
+            toastMessages.error(i18next.t('admin:pages.careers.toast.addError'));
             console.error(err);
         }
     });
@@ -42,10 +43,10 @@ export const useCareers = (params?: AdminListParams): UseCareersResult => {
         mutationFn: ({ id, data }: { id: string | number; data: Partial<CareerPayload> | FormData }) => adminManagementService.updateCareer(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-careers'] });
-            toastMessages.success('Career updated successfully');
+            toastMessages.success(i18next.t('admin:pages.careers.toast.updateSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while updating the career');
+            toastMessages.error(i18next.t('admin:pages.careers.toast.updateError'));
             console.error(err);
         }
     });
@@ -54,10 +55,10 @@ export const useCareers = (params?: AdminListParams): UseCareersResult => {
         mutationFn: (id: string | number) => adminManagementService.deleteCareer(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-careers'] });
-            toastMessages.success('Career deleted successfully');
+            toastMessages.success(i18next.t('admin:pages.careers.toast.deleteSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while deleting the career');
+            toastMessages.error(i18next.t('admin:pages.careers.toast.deleteError'));
             console.error(err);
         }
     });

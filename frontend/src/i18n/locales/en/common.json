@@ -18,6 +18,11 @@
   "loading": "Loading...",
   "noData": "No data",
   "noOptions": "No options",
+  "autocomplete": {
+    "clear": "Clear",
+    "open": "Open",
+    "close": "Close"
+  },
   "viewDetails": "View details",
   "id": "ID",
   "na": "N/A",
@@ -200,6 +205,7 @@
     "placeholder": "Share your experience...",
     "submit": "Submit Feedback",
     "ratingRequired": "Please select a rating.",
+    "ratingInvalid": "Rating must be between 1 and 5 stars.",
     "contentRequired": "Please enter your feedback.",
     "contentMax": "Feedback content exceeds allowed length.",
     "success": "Feedback submitted successfully.",
@@ -381,6 +387,9 @@
   "loadPreviousMessages": "Load previous messages",
   "typeAMessage": "Type a message...",
   "chatRooms": "Chat Rooms",
+  "chatCard": {
+    "openChat": "Open chat"
+  },
   "appliedResume": {
     "ai": {
       "viewAnalysis": "View AI Analysis",
@@ -855,6 +864,7 @@
   },
   "systemError": {
     "occurred": "An error occurred.",
+    "requestFailed": "The request could not be processed.",
     "tryAgain": "Please try again later.",
     "reload": "Reload page."
   },
@@ -892,6 +902,71 @@
   "interview": {
     "forceEndSuccess": "Interview end requested",
     "recordingWaiting": "The interview has ended, the system is waiting for the recording to sync before displaying here."
+  },
+  "agentAssistant": {
+    "title": "Agent Assistants",
+    "recents": "Recents",
+    "newChat": "New chat",
+    "ready": "Ready",
+    "empty": "Agent is ready",
+    "placeholder": "Message the agent...",
+    "send": "Send",
+    "deleteHistory": "Delete chat history",
+    "deleteCurrentHistory": "Delete current chat history",
+    "deleteError": "Could not delete this chat history. Please try again.",
+    "loadError": "Could not load Agent Assistants. Please try again.",
+    "sendError": "Agent could not process this request. Please check the content and try again.",
+    "thinking": "Agent is thinking...",
+    "portals": {
+      "admin": "Square Admin",
+      "employer": "Square Employer"
+    },
+    "threadGroups": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "thisWeek": "This week",
+      "earlier": "Earlier"
+    },
+    "status": {
+      "pending": "Pending",
+      "running": "Running",
+      "succeeded": "Completed",
+      "failed": "Failed"
+    },
+    "tools": {
+      "create_manual_candidate": "Create candidate profile",
+      "search_candidates": "Search candidates",
+      "update_application_status": "Update application status",
+      "list_job_posts": "List job posts",
+      "list_applications": "List applications",
+      "list_companies": "List companies",
+      "review_job_post": "Review job post",
+      "create_question": "Create question",
+      "list_questions": "List questions",
+      "create_question_group": "Create question group",
+      "list_question_groups": "List question groups",
+      "list_interviews": "List interviews"
+    },
+    "rows": {
+      "candidate": "Candidate",
+      "email": "Email",
+      "phone": "Phone",
+      "jobPost": "Job post",
+      "company": "Company",
+      "status": "Status",
+      "question": "Question",
+      "questionGroup": "Question group",
+      "questionsCount": "Questions count",
+      "interviewId": "Interview ID",
+      "applicationId": "Application ID",
+      "jobPostId": "Job post ID"
+    },
+    "results": {
+      "title": "Results",
+      "fallback": "Result {{index}}",
+      "more": "And {{count}} more results.",
+      "openRecord": "Open record"
+    }
   },
   "sidebarHeader": {
     "backToHome": "Back to Home",

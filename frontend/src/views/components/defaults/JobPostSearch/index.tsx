@@ -24,7 +24,10 @@ import { SelectOption } from '../../../../types/models';
 import type { JobPostSearchFormValues } from './types';
 import { useJobPostSearchLocationOptions } from './useJobPostSearchLocationOptions';
 import JobPostSearchAdvancedFilters from './JobPostSearchAdvancedFilters';
-import JobPostNotificationForm, { type JobPostNotificationFormValues } from '../../jobSeekers/JobPostNotificationForm';
+import JobPostNotificationForm, {
+  getDefaultFrequency,
+  type JobPostNotificationFormValues,
+} from '../../jobSeekers/JobPostNotificationForm';
 import jobPostNotificationService from '@/services/jobPostNotificationService';
 import errorHandling from '@/utils/errorHandling';
 import toastMessages from '@/utils/toastMessages';
@@ -161,13 +164,13 @@ const JobPostSearch = () => {
     }
     const values = getValues();
     setSaveAlertValues({
-      jobName: values.kw || t('jobSearch.savedAlert.defaultName', 'Saved search'),
+      jobName: values.kw || t('jobSearch.savedAlert.defaultName'),
       career: Number(values.careerId) || 0,
       city: Number(values.cityId) || 0,
       position: values.positionId ? Number(values.positionId) : null,
       experience: values.experienceId ? Number(values.experienceId) : null,
       salary: null,
-      frequency: (allConfig?.frequencyNotificationOptions?.[0]?.id as number | undefined) ?? 7,
+      frequency: getDefaultFrequency(allConfig?.frequencyNotificationOptions),
     });
     setOpenSaveAlert(true);
   };
@@ -176,14 +179,14 @@ const JobPostSearch = () => {
     try {
       await jobPostNotificationService.addJobPostNotification({
         jobName: data.jobName,
-        frequency: Number(data.frequency || 7),
+        frequency: Number(data.frequency),
         career: Number(data.career),
         city: Number(data.city),
         position: data.position ?? null,
         experience: data.experience ?? null,
         salary: data.salary ?? null,
       });
-      toastMessages.success(t('jobSearch.savedAlert.success', 'Search alert saved.'));
+      toastMessages.success(t('jobSearch.savedAlert.success'));
       setOpenSaveAlert(false);
     } catch (error) {
       errorHandling(error);
@@ -293,7 +296,7 @@ const JobPostSearch = () => {
                 startIcon={<BookmarkAddIcon />}
                 onClick={handleOpenSaveAlert}
               >
-                {t('jobSearch.saveSearch', 'Save search')}
+                {t('jobSearch.saveSearch')}
               </Button>
               <Button
                 variant="contained"
@@ -334,10 +337,10 @@ const JobPostSearch = () => {
       ) : null}
 
       <FormPopup
-        title={t('jobSearch.saveSearch', 'Save search')}
+        title={t('jobSearch.saveSearch')}
         openPopup={openSaveAlert}
         setOpenPopup={setOpenSaveAlert}
-        buttonText={t('jobSearch.saveSearch', 'Save search')}
+        buttonText={t('jobSearch.saveSearch')}
         buttonIcon={null}
       >
         <JobPostNotificationForm

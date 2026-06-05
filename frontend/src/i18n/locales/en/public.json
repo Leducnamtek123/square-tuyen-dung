@@ -249,6 +249,11 @@
     },
     "note": "Please provide accurate full name, email, and phone number so employers can contact you."
   },
+  "applyCard": {
+    "positionCaption": "Apply for position",
+    "submit": "Apply",
+    "success": "Applied successfully."
+  },
   "company": {
     "following": "Following",
     "follow": "Follow",
@@ -259,6 +264,51 @@
   "jobPost": {
     "remaining": "{{days}} days remaining",
     "timeLeft": "Remaining"
+  },
+  "news": {
+    "category": {
+      "all": "All",
+      "news": "News",
+      "blog": "Recruitment blog"
+    },
+    "categoryFallback": "Article",
+    "topic": {
+      "all": "All topics",
+      "recruitment": "Recruitment",
+      "realEstate": "Real estate",
+      "construction": "Construction",
+      "interior": "Interior",
+      "architecture": "Architecture",
+      "portfolio": "Portfolio",
+      "skills": "Skills"
+    },
+    "views": "{{count}} views",
+    "heroEyebrow": "News & Recruitment Blog",
+    "heroTitle": "Recruitment news and blog for candidates and employers",
+    "heroSubtitle": "Stay up to date with recruitment trends, application tips, and company perspectives in one public destination.",
+    "viewAllArticles": "View all articles",
+    "exploreJobs": "Explore jobs",
+    "searchPlaceholder": "Search articles, topics, or keywords",
+    "searchButton": "Search",
+    "emptyTitle": "No matching articles yet",
+    "emptyContent": "Try changing the filters or search keyword.",
+    "quickReadTitle": "Quick reads",
+    "quickReadDescription": "{{total}} articles are currently visible in the public content library.",
+    "currentFilter": "Current filter: {{filter}}",
+    "audienceTitle": "For candidates and employers",
+    "audienceDescription": "Articles are edited to support both sides: finding better jobs and hiring more effectively.",
+    "newJobsCta": "View new jobs",
+    "article": {
+      "notFoundTitle": "Article not found",
+      "notFoundContent": "This article may have been deleted or the link has changed.",
+      "backToNews": "Back to news",
+      "backToList": "Back to list",
+      "emptyContent": "Content is being updated.",
+      "infoTitle": "Article information",
+      "moreTitle": "Explore more",
+      "moreDescription": "Expand your perspective with the public article list for candidates and employers.",
+      "newsHomeCta": "Go to news"
+    }
   },
   "seo": {
     "home": {

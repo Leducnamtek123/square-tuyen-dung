@@ -30,9 +30,9 @@ interface CandidateChartProps {
 }
 
 const CandidateChart = ({ title }: CandidateChartProps) => {
-  const { t } = useTranslation('employer');
+  const { t, i18n } = useTranslation('employer');
   const theme = useTheme();
-  const options = React.useMemo(() => createCartesianOptions(theme), [theme]);
+  const options = React.useMemo(() => createCartesianOptions(theme, { language: i18n.language }), [i18n.language, theme]);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([
     dayjs(new Date()).subtract(1, 'month'),
@@ -128,7 +128,7 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
 
           <Box sx={chartAreaSx(320)}>
             {queryLoading ? (
-              <ChartLoadingState height="100%" label={t('candidateChart.loading', { defaultValue: 'Loading chart' })} />
+              <ChartLoadingState height="100%" label={t('candidateChart.loading')} />
             ) : !hasChartData ? (
               <ChartEmptyState height="100%" label={t('candidateChart.noData')} />
             ) : (

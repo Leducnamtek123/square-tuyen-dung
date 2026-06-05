@@ -13,17 +13,12 @@ import BannerFormDialog from './BannerFormDialog';
 import BannerDeleteDialog from './BannerDeleteDialog';
 import { useBannersPageColumns } from './useBannersPageColumns';
 import { compressImageFile } from '../../../utils/imageCompression';
-
-interface BannerFormData {
-  description: string;
-  button_text: string;
-  button_link: string;
-  is_show_button: boolean;
-  is_active: boolean;
-  platform: string;
-  type: number;
-  description_location: number;
-}
+import {
+  getBannerFormValidationErrors,
+  normalizeBannerFormChoices,
+  type BannerFormData,
+} from './bannerFormChoices';
+import toastMessages from '../../../utils/toastMessages';
 
 type BannersPageState = {
   openDialog: boolean;
@@ -95,13 +90,13 @@ function reducer(state: BannersPageState, action: BannersPageAction): BannersPag
         current: action.banner,
         formData: {
           description: action.banner.description || '',
-          button_text: action.banner.button_text || '',
-          button_link: action.banner.button_link || '',
-          is_show_button: !!action.banner.is_show_button,
-          is_active: !!action.banner.is_active,
+          button_text: action.banner.buttonText || '',
+          button_link: action.banner.buttonLink || '',
+          is_show_button: !!action.banner.isShowButton,
+          is_active: !!action.banner.isActive,
           platform: action.banner.platform || 'WEB',
           type: action.banner.type ?? 1,
-          description_location: action.banner.description_location ?? 3,
+          description_location: action.banner.descriptionLocation ?? 3,
         },
         webImage: null,
         mobileImage: null,
@@ -161,11 +156,11 @@ const BannersPageContent = () => {
 
   const TYPE_OPTIONS = useMemo(() => {
     const apiTypes = (bannerTypesData?.results || []).flatMap((item) => {
-      if (item.is_active === false) return [];
+      if (item.isActive === false) return [];
       return [{
         value: item.value,
         label: item.name || item.code,
-        webAspectRatio: item.web_aspect_ratio || '',
+        webAspectRatio: item.webAspectRatio || '',
       }];
     });
 
@@ -215,15 +210,26 @@ const BannersPageContent = () => {
   const banners = data?.results || [];
 
   const handleSave = async () => {
+    const normalizedFormData = normalizeBannerFormChoices(state.formData, {
+      platformOptions: PLATFORM_OPTIONS,
+      typeOptions: TYPE_OPTIONS,
+      descriptionLocations: DESCRIPTION_LOCATIONS,
+    });
+    const validationErrors = getBannerFormValidationErrors(normalizedFormData);
+    if (validationErrors.button_link) {
+      toastMessages.error(t(`pages.banners.validation.${validationErrors.button_link}`));
+      return;
+    }
+    const buttonLink = normalizedFormData.button_link.trim();
     const formData = new FormData();
-    formData.append('description', state.formData.description);
-    formData.append('button_text', state.formData.button_text);
-    if (state.formData.button_link) formData.append('button_link', state.formData.button_link);
-    formData.append('is_show_button', String(state.formData.is_show_button));
-    formData.append('is_active', String(state.formData.is_active));
-    formData.append('platform', state.formData.platform);
-    formData.append('type', String(state.formData.type));
-    formData.append('description_location', String(state.formData.description_location));
+    formData.append('description', normalizedFormData.description);
+    formData.append('button_text', normalizedFormData.button_text);
+    if (buttonLink) formData.append('button_link', buttonLink);
+    formData.append('is_show_button', String(normalizedFormData.is_show_button));
+    formData.append('is_active', String(normalizedFormData.is_active));
+    formData.append('platform', normalizedFormData.platform);
+    formData.append('type', String(normalizedFormData.type));
+    formData.append('description_location', String(normalizedFormData.description_location));
     if (state.webImage) formData.append('imageFile', state.webImage);
     if (state.mobileImage) formData.append('imageMobileFile', state.mobileImage);
 

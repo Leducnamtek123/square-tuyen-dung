@@ -692,6 +692,11 @@ export interface BannerType {
   code: string;
   name: string;
   value: number;
+  webAspectRatio?: string;
+  mobileAspectRatio?: string;
+  isActive?: boolean;
+  createAt?: string;
+  updateAt?: string;
   web_aspect_ratio?: string;
   mobile_aspect_ratio?: string;
   is_active?: boolean;

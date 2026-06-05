@@ -309,13 +309,13 @@ const InterviewHistoryPage = () => {
       </Stack>
 
       <FilterBar
-        title={t('employer:interviewHistory.filterTitle', 'Bộ lọc lịch sử phỏng vấn')}
+        title={t('employer:interviewHistory.filterTitle')}
         searchValue={state.searchTerm}
         searchPlaceholder={t('employer:interviewHistory.searchPlaceholder')}
         onSearchChange={(value) => dispatch({ type: 'set-search-term', value })}
         onReset={() => dispatch({ type: 'set-search-term', value: '' })}
         resetDisabled={!state.searchTerm}
-        resetLabel={t('common:reset', 'Xóa lọc')}
+        resetLabel={t('common:reset')}
         sx={{ mb: 4 }}
       >
           <FormControl size="small" sx={viewModeFilterSx}>

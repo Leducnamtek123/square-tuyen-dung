@@ -41,12 +41,17 @@ const JobSeekerLogin = () => {
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
+    const successMessageKey = params.get('successMessageKey');
     const successMsg = params.get('successMessage');
     const errorMsg = params.get('errorMessage');
 
-    if (successMsg !== null) setSuccessMessage(successMsg);
+    if (successMessageKey === 'passwordResetSuccess') {
+      setSuccessMessage(t('messages.passwordResetSuccess'));
+    } else if (successMsg !== null) {
+      setSuccessMessage(successMsg);
+    }
     setErrorMessage(errorMsg);
-  }, []);
+  }, [t]);
 
   const navigateHome = async () => {
     await dispatch(getUserInfo()).unwrap();
@@ -106,14 +111,13 @@ const JobSeekerLogin = () => {
     void run();
   };
 
-  const handleSocialLogin = async (clientId: string, clientSecrect: string, provider: AuthProvider, token: string) => {
+  const handleSocialLogin = async (clientId: string, provider: AuthProvider, token: string) => {
     const redirectUri = typeof window !== 'undefined' ? window.location.origin : '';
     setIsFullScreenLoading(true);
 
     try {
       const resData = await authService.convertToken(
         clientId,
-        clientSecrect,
         provider,
         token,
         redirectUri,
@@ -146,7 +150,6 @@ const JobSeekerLogin = () => {
     if (!result?.code) return;
     void handleSocialLogin(
       AUTH_CONFIG.CLIENT_ID || '',
-      AUTH_CONFIG.CLIENT_SECRET || '',
       AUTH_PROVIDER.GOOGLE as AuthProvider,
       result.code,
     );

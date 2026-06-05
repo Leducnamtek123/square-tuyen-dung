@@ -1,4 +1,6 @@
 // Jest globals: describe, it, expect
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { ROUTES, HOST_NAME, ROLES_NAME, AUTH_CONFIG } from '../../configs/constants';
 
 describe('Application Constants', () => {
@@ -51,6 +53,17 @@ describe('Application Constants', () => {
   describe('AUTH_CONFIG', () => {
     it('should have auth configuration', () => {
       expect(AUTH_CONFIG).toBeDefined();
+    });
+
+    it('does not expose secret-like values to the browser bundle', () => {
+      expect(AUTH_CONFIG).not.toHaveProperty('CLIENT_SECRET');
+      expect(AUTH_CONFIG).not.toHaveProperty('FACEBOOK_CLIENT_SECRET');
+      expect(AUTH_CONFIG).not.toHaveProperty('GOOGLE_CLIENT_SECRET');
+
+      const source = readFileSync(join(__dirname, '../constants.ts'), 'utf8');
+      expect(source).not.toContain('NEXT_PUBLIC_PROJECT_SERVER_CLIENT_SECRET');
+      expect(source).not.toContain('NEXT_PUBLIC_FACEBOOK_CLIENT_SECRET');
+      expect(source).not.toContain('NEXT_PUBLIC_GOOGLE_CLIENT_SECRET');
     });
   });
 });

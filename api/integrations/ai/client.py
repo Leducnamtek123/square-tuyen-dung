@@ -106,6 +106,26 @@ def apply_llm_request_defaults(payload: Dict[str, Any]) -> Dict[str, Any]:
     return next_payload
 
 
+def _is_local_ollama_candidate(candidate: AIEndpointCandidate) -> bool:
+    base_url = candidate.normalized_base_url.lower()
+    return candidate.name == "local" or "11434" in base_url or "ollama" in base_url
+
+
+def _candidate_payload(candidate: AIEndpointCandidate, payload: Dict[str, Any]) -> Dict[str, Any]:
+    next_payload = apply_llm_request_defaults(payload)
+    if _is_local_ollama_candidate(candidate):
+        # These are vLLM/server-template extensions used by FPT. Ollama's OpenAI
+        # compatibility endpoint can reject them, so strip them only for local fallback.
+        for key in (
+            "top_k",
+            "min_p",
+            "repetition_penalty",
+            "chat_template_kwargs",
+        ):
+            next_payload.pop(key, None)
+    return candidate.payload(next_payload)
+
+
 def _add_candidate(
     candidates: List[AIEndpointCandidate],
     seen: set[tuple[str, str, str]],
@@ -227,7 +247,7 @@ def post_chat_completion_requests(
         try:
             response = requests.post(
                 url,
-                json=candidate.payload(apply_llm_request_defaults(payload)),
+                json=_candidate_payload(candidate, payload),
                 headers=candidate.headers(),
                 timeout=timeout,
             )
@@ -273,7 +293,7 @@ def post_chat_completion_httpx(
             try:
                 response = client.post(
                     url,
-                    json=candidate.payload(apply_llm_request_defaults(payload)),
+                    json=_candidate_payload(candidate, payload),
                     headers=candidate.headers(),
                 )
             except (httpx.TimeoutException, httpx.ConnectError) as exc:

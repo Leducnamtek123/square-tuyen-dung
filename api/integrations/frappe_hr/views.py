@@ -38,7 +38,7 @@ def _sync_payload(activity: JobPostActivity, result=None) -> dict:
 
 
 class FrappeEmployeeBridgeViewSet(viewsets.ViewSet):
-    permission_classes = [perms_custom.IsEmployerUser]
+    permission_classes = [perms_custom.CanManageEmployees]
 
     def _get_company_activity(self, application_id: int, request) -> JobPostActivity:
         activity = (

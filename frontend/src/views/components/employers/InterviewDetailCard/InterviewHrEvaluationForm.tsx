@@ -120,7 +120,7 @@ const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({
         fullWidth
         value={evalForm.comments}
         onChange={onChange}
-        placeholder={t('interviewDetail.actions.commentsPlaceholder', { defaultValue: 'Add HR notes and final assessment...' })}
+        placeholder={t('interviewDetail.actions.commentsPlaceholder')}
         sx={inputSx}
         slotProps={{ input: { sx: { lineHeight: 1.7 } } }}
       />
@@ -142,6 +142,7 @@ const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({
           },
         }}
         slotProps={{
+          htmlInput: { min: 0, step: 100000 },
           input: {
             startAdornment: (
               <InputAdornment position="start">

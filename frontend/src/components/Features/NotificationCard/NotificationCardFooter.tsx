@@ -36,7 +36,7 @@ const NotificationCardFooter = ({
     >
       {hasMore ? (
         <Button size="small" onClick={onLoadMore} disabled={isLoading}>
-          {t('notification.loadMore', { defaultValue: 'Load more' })}
+          {t('notification.loadMore')}
         </Button>
       ) : (
         <Box />
@@ -46,7 +46,7 @@ const NotificationCardFooter = ({
         <Stack direction="row" spacing={1} justifyContent="flex-end" flexWrap="wrap" useFlexGap>
           {onViewAll && (
             <Button size="small" startIcon={<OpenInFullIcon />} onClick={onViewAll}>
-              {t('notification.viewAll', { defaultValue: 'View all' })}
+              {t('notification.viewAll')}
             </Button>
           )}
           <Button size="small" startIcon={<DoneAllIcon />} onClick={onMarkAllRead} disabled={isLoading}>

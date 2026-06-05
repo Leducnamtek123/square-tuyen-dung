@@ -1,5 +1,5 @@
 export interface FormValues {
-  file: File[] | null;
+  file: File | File[] | null;
   title: string;
   position: number | string;
   academicLevel: number | string;

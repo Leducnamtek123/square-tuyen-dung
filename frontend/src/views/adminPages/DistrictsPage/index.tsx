@@ -31,6 +31,10 @@ import { District, City } from '../../../types/models';
 import type { DistrictPayload } from '../../../services/adminManagementService';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import type { SxProps, Theme } from '@mui/material/styles';
+import {
+  getLocationEntityFormValidationErrors,
+  type LocationEntityFormValidationErrors,
+} from '../locationFormValidation';
 
 const EMPTY_FORM: Partial<DistrictPayload> = {
   name: '',
@@ -106,6 +110,23 @@ const DistrictsPage = () => {
   } = useDataTable({ initialPageSize: 10 });
 
   const debouncedSearch = useDebounce(state.searchTerm, 500);
+  const validationErrors = useMemo(
+    () => getLocationEntityFormValidationErrors(
+      {
+        name: state.formData.name,
+        code: state.formData.code,
+        parentId: state.formData.city,
+      },
+      { parentField: 'city' },
+    ),
+    [state.formData],
+  );
+  const hasValidationErrors = Object.keys(validationErrors).length > 0;
+  const getLocationValidationText = (field: keyof LocationEntityFormValidationErrors) => (
+    validationErrors[field]
+      ? t(`pages.locationValidation.${validationErrors[field]}`)
+      : undefined
+  );
 
   const {
     data,
@@ -163,11 +184,11 @@ const DistrictsPage = () => {
   };
 
   const handleSave = async () => {
-    if (!state.formData.name || !state.formData.code || !state.formData.city) return;
+    if (hasValidationErrors) return;
 
     const payload: DistrictPayload = {
-      name: state.formData.name,
-      code: state.formData.code,
+      name: state.formData.name?.trim() || '',
+      code: state.formData.code?.trim() || '',
       city: Number(state.formData.city),
     };
 
@@ -248,7 +269,7 @@ const DistrictsPage = () => {
 
       <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
         <FilterBar
-          title={t('pages.districts.filter.title', 'Bộ lọc quận/huyện')}
+          title={t('pages.districts.filter.title')}
           searchValue={state.searchTerm}
           searchPlaceholder={t('pages.districts.searchPlaceholder')}
           onSearchChange={handleSearch}
@@ -258,8 +279,8 @@ const DistrictsPage = () => {
             handleCityFilterChange('');
           }}
           resetDisabled={!state.searchTerm && !state.cityFilter}
-          resetLabel={t('common.clearFilters', 'Xóa lọc')}
-          advancedLabel={t('common.advancedFilters', 'Bộ lọc nâng cao')}
+          resetLabel={t('common.clearFilters')}
+          advancedLabel={t('common.advancedFilters')}
           advancedDefaultOpen={Boolean(state.cityFilter)}
           advancedFilters={(
             <TextField
@@ -296,12 +317,16 @@ const DistrictsPage = () => {
             label={t('pages.districts.table.name')}
             value={state.formData.name || ''}
             onChange={(e) => dispatch({ type: 'set_form_data', value: { ...state.formData, name: e.target.value } })}
+            error={Boolean(validationErrors.name)}
+            helperText={getLocationValidationText('name')}
             fullWidth
           />
           <TextField
             label={t('pages.districts.table.code')}
             value={state.formData.code || ''}
             onChange={(e) => dispatch({ type: 'set_form_data', value: { ...state.formData, code: e.target.value } })}
+            error={Boolean(validationErrors.code)}
+            helperText={getLocationValidationText('code')}
             fullWidth
           />
           <TextField
@@ -309,6 +334,8 @@ const DistrictsPage = () => {
             label={t('pages.districts.filterByCity')}
             value={state.formData.city || ''}
             onChange={(e) => dispatch({ type: 'set_form_data', value: { ...state.formData, city: e.target.value ? Number(e.target.value) : undefined } })}
+            error={Boolean(validationErrors.city)}
+            helperText={getLocationValidationText('city')}
             fullWidth
           >
             <MenuItem value="">{t('common.all')}</MenuItem>
@@ -317,7 +344,7 @@ const DistrictsPage = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>{t('common.cancel')}</Button>
-          <Button variant="contained" onClick={handleSave} disabled={isMutating}>{t('common.save')}</Button>
+          <Button variant="contained" onClick={handleSave} disabled={isMutating || hasValidationErrors}>{t('common.save')}</Button>
         </DialogActions>
       </Dialog>
 

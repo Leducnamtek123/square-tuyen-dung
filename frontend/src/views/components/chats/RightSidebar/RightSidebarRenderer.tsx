@@ -4,7 +4,7 @@ import { Box, Chip, Pagination, Skeleton, Stack, Tooltip, Typography, Theme, But
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 import { useRightSidebarData } from './useRightSidebarData';
-import type { UserDataPayload } from './useRightSidebarData';
+import type { RightSidebarFetchResponse, UserDataPayload } from './useRightSidebarData';
 
 const LoadingComponentItem = () => (
   <Stack direction="row" spacing={1} alignItems="center">
@@ -24,7 +24,7 @@ const LoadingComponentItem = () => (
 interface RightSidebarRendererProps<T> {
   titleKey: string;
   noDataKey: string;
-  fetchData: (params: { page: number; pageSize: number }) => Promise<{ count: number; results: T[] }>;
+  fetchData: (params: { page: number; pageSize: number }) => Promise<RightSidebarFetchResponse<T>>;
   mapDataToUI: (item: T) => {
     id: string;
     imageUrl: string;
@@ -101,6 +101,7 @@ const RightSidebarRenderer = <T,>({ titleKey, noDataKey, fetchData, mapDataToUI 
           <Stack spacing={1.5}>
             {dataList.map((value) => {
               const mapped = mapDataToUI(value);
+              const canStartChat = Boolean(String(mapped.partnerId || '').trim());
               return (
                 <Box
                   key={mapped.id}
@@ -164,7 +165,11 @@ const RightSidebarRenderer = <T,>({ titleKey, noDataKey, fetchData, mapDataToUI 
                         variant="contained"
                         size="small"
                         disableElevation
-                        onClick={() => handleAddRoom(mapped.partnerId, mapped.userDataWrapper)}
+                        disabled={!canStartChat}
+                        onClick={() => {
+                          if (!canStartChat) return;
+                          handleAddRoom(mapped.partnerId, mapped.userDataWrapper);
+                        }}
                         sx={{
                           borderRadius: 2,
                           textTransform: 'none',

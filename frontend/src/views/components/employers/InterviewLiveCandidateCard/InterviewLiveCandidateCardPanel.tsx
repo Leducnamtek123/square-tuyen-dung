@@ -62,9 +62,7 @@ const InterviewLiveCandidateCardPanel = ({
   const theme = useTheme();
   const { t } = useTranslation(['employer', 'interview', 'common']);
   const normalizedStatus = normalizeStatus(session.status);
-  const statusLabel = t(`interview:interviewListCard.statuses.${session.status}`, {
-    defaultValue: normalizedStatus?.replaceAll('_', ' ')?.toUpperCase(),
-  });
+  const statusLabel = normalizedStatus ? t(`interview:interviewListCard.statuses.${normalizedStatus}`) : '';
 
   // ── Fullscreen HR Presence dialog ──────────────────────────────────────────
   if (hrPresenceDetails) {

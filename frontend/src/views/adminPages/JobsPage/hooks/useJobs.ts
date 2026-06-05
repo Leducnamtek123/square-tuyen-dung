@@ -6,6 +6,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import { JobPost } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 import type { AdminListParams } from '../../../../services/adminManagementService';
+import i18next from 'i18next';
 
 type UseJobsResult = UseQueryResult<PaginatedResponse<JobPost>> & {
     updateJob: (args: { id: string | number; data: Partial<JobPost> }) => Promise<JobPost>;
@@ -31,37 +32,37 @@ export const useJobs = (params: AdminListParams): UseJobsResult => {
         mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPost> }) =>
             adminJobService.updateJob(id, data),
         onSuccess: () => {
-            toastMessages.success('Job post updated successfully');
+            toastMessages.success(i18next.t('admin:pages.jobs.toast.updateSuccess'));
             queryClient.invalidateQueries({ queryKey: ['admin-jobs'] });
         },
-        onError: () => toastMessages.error('Error updating job post'),
+        onError: () => toastMessages.error(i18next.t('admin:pages.jobs.toast.updateError')),
     });
 
     const approveMutation = useMutation({
         mutationFn: (id: string | number) => adminJobService.approveJob(id),
         onSuccess: () => {
-            toastMessages.success('Job post approved');
+            toastMessages.success(i18next.t('admin:pages.jobs.toast.approveSuccess'));
             queryClient.invalidateQueries({ queryKey: ['admin-jobs'] });
         },
-        onError: () => toastMessages.error('Error approving job post'),
+        onError: () => toastMessages.error(i18next.t('admin:pages.jobs.toast.approveError')),
     });
 
     const rejectMutation = useMutation({
         mutationFn: (id: string | number) => adminJobService.rejectJob(id),
         onSuccess: () => {
-            toastMessages.success('Job post rejected');
+            toastMessages.success(i18next.t('admin:pages.jobs.toast.rejectSuccess'));
             queryClient.invalidateQueries({ queryKey: ['admin-jobs'] });
         },
-        onError: () => toastMessages.error('Error rejecting job post'),
+        onError: () => toastMessages.error(i18next.t('admin:pages.jobs.toast.rejectError')),
     });
 
     const deleteMutation = useMutation({
         mutationFn: (id: string | number) => adminJobService.deleteJob(id),
         onSuccess: () => {
-            toastMessages.success('Job post deleted');
+            toastMessages.success(i18next.t('admin:pages.jobs.toast.deleteSuccess'));
             queryClient.invalidateQueries({ queryKey: ['admin-jobs'] });
         },
-        onError: () => toastMessages.error('Error deleting job post'),
+        onError: () => toastMessages.error(i18next.t('admin:pages.jobs.toast.deleteError')),
     });
 
     return {

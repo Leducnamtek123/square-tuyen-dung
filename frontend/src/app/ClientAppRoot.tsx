@@ -3,6 +3,7 @@
 import "sweetalert2/dist/sweetalert2.min.css";
 import * as React from "react";
 import { usePathname } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { getUserInfo, removeUserInfo } from "../redux/userSlice";
 import { useConfig } from "@/hooks/useConfig";
@@ -26,6 +27,7 @@ import {
 } from "../utils/maintenanceMode";
 
 export default function ClientAppRoot({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation('common');
   const hasMounted = React.useSyncExternalStore(
     () => () => {},
     () => true,
@@ -42,6 +44,30 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
 
   const pathname = usePathname() || "/";
   const isAdminPortal = isAdminPortalPath(pathname);
+  const employerPublicPaths = [
+    '/employer/login',
+    '/nha-tuyen-dung/login',
+    '/employer/forgot-password',
+    '/nha-tuyen-dung/quen-mat-khau',
+    '/nha-tuyen-dung/forgot-password',
+    '/employer/reset-password',
+    '/nha-tuyen-dung/cap-nhat-mat-khau',
+    '/nha-tuyen-dung/reset-password',
+    '/employer/register',
+    '/nha-tuyen-dung/dang-ky',
+    '/nha-tuyen-dung/register',
+    '/employer/introduce',
+    '/nha-tuyen-dung/gioi-thieu',
+    '/employer/service',
+    '/nha-tuyen-dung/dich-vu',
+    '/employer/pricing',
+    '/nha-tuyen-dung/bao-gia',
+    '/employer/support',
+    '/nha-tuyen-dung/ho-tro',
+  ];
+  const isEmployerPath = pathname.startsWith('/employer') || pathname.startsWith('/nha-tuyen-dung');
+  const isEmployerPublicPath = employerPublicPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+  const isEmployerPortal = isEmployerPath && !isEmployerPublicPath;
   const isChatPage =
     pathname.startsWith(`/${ROUTES.JOB_SEEKER.CHAT}`) ||
     pathname.startsWith(`/${ROUTES.EMPLOYER.CHAT}`);
@@ -55,7 +81,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     pathname.startsWith(`/${ROUTES.EMPLOYER.INTERVIEW_LIVE}`) ||
     pathname.startsWith(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', '')}`);
   
-  const canShowChatBot = !isAdminPortal && !isChatPage && !isInterviewPage;
+  const canShowChatBot = !isAdminPortal && !isEmployerPortal && !isChatPage && !isInterviewPage;
   const isMaintenanceMode =
     !!effectiveMaintenanceDetail || !!allConfig?.systemSettings?.maintenanceMode;
   const shouldShowMaintenanceMode = isMaintenanceMode && !isAdminPortal;
@@ -94,7 +120,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
       lastErrorToast = now;
       toast.error(
         <div style={{ textAlign: "left" }}>
-          <strong>Đã có lỗi xảy ra.</strong> Vui lòng thử lại sau.
+          <strong>{t('systemError.occurred')}</strong> {t('systemError.tryAgain')}
         </div>,
         {
           autoClose: 8000,
@@ -117,7 +143,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
       lastErrorToast = now;
       toast.error(
         <div style={{ textAlign: "left" }}>
-          <strong>Yêu cầu chưa thể xử lý.</strong> Vui lòng thử lại sau.
+          <strong>{t('systemError.requestFailed')}</strong> {t('systemError.tryAgain')}
         </div>,
         { autoClose: 6000 }
       );
@@ -147,7 +173,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
       window.removeEventListener("auth:expired", handleAuthExpired as EventListener);
       window.removeEventListener(MAINTENANCE_MODE_EVENT, handleMaintenanceMode as EventListener);
     };
-  }, [dispatch]);
+  }, [dispatch, t]);
 
   if (hasMounted && shouldShowMaintenanceMode) {
     return <MaintenanceModeScreen detail={effectiveMaintenanceDetail} />;

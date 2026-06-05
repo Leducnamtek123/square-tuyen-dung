@@ -78,10 +78,10 @@ const AppliedResumeToolbar: React.FC<Props> = ({
 }) => {
   const theme = useTheme();
   const aiAnalysisStatusOptions: SelectOption[] = [
-    { id: 'pending', name: t('employer:appliedResume.ai.status.pending', { defaultValue: 'Chưa phân tích' }) },
-    { id: 'processing', name: t('employer:appliedResume.ai.status.processing', { defaultValue: 'Đang phân tích' }) },
-    { id: 'completed', name: t('employer:appliedResume.ai.status.completed', { defaultValue: 'Đã phân tích' }) },
-    { id: 'failed', name: t('employer:appliedResume.ai.status.failed', { defaultValue: 'Lỗi phân tích' }) },
+    { id: 'pending', name: t('employer:appliedResume.ai.status.pending') },
+    { id: 'processing', name: t('employer:appliedResume.ai.status.processing') },
+    { id: 'completed', name: t('employer:appliedResume.ai.status.completed') },
+    { id: 'failed', name: t('employer:appliedResume.ai.status.failed') },
   ];
   const quickFilterCount =
     (jobPostIdSelect ? 1 : 0) +
@@ -278,6 +278,10 @@ const AppliedResumeToolbar: React.FC<Props> = ({
               size="small"
               options={jobPostOptions}
               noOptionsText={t('common:noOptions')}
+              loadingText={t('common:loading')}
+              openText={t('common:autocomplete.open')}
+              closeText={t('common:autocomplete.close')}
+              clearText={t('common:autocomplete.clear')}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -307,6 +311,10 @@ const AppliedResumeToolbar: React.FC<Props> = ({
               size="small"
               options={allConfig?.applicationStatusOptions || []}
               noOptionsText={t('common:noOptions')}
+              loadingText={t('common:loading')}
+              openText={t('common:autocomplete.open')}
+              closeText={t('common:autocomplete.close')}
+              clearText={t('common:autocomplete.clear')}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -336,10 +344,14 @@ const AppliedResumeToolbar: React.FC<Props> = ({
               size="small"
               options={aiAnalysisStatusOptions}
               noOptionsText={t('common:noOptions')}
+              loadingText={t('common:loading')}
+              openText={t('common:autocomplete.open')}
+              closeText={t('common:autocomplete.close')}
+              clearText={t('common:autocomplete.clear')}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  placeholder={t('employer:appliedResume.ai.allStatuses', { defaultValue: 'Trạng thái AI' })}
+                  placeholder={t('employer:appliedResume.ai.allStatuses')}
                   slotProps={{
                     input: {
                       ...params.InputProps,
@@ -362,7 +374,7 @@ const AppliedResumeToolbar: React.FC<Props> = ({
               onChange={(event) => onAiScoreMinChange(event.target.value)}
               type="number"
               size="small"
-              placeholder={t('employer:appliedResume.ai.scoreMin', { defaultValue: 'Điểm AI từ' })}
+              placeholder={t('employer:appliedResume.ai.scoreMin')}
               slotProps={{
                 input: {
                   startAdornment: (
@@ -401,7 +413,7 @@ const AppliedResumeToolbar: React.FC<Props> = ({
               }}
             >
               <VisibilityOffIcon sx={{ fontSize: 20 }} />
-              {t('employer:appliedResume.ai.blindMode', { defaultValue: 'Blind mode' })}
+              {t('employer:appliedResume.ai.blindMode')}
             </ToggleButton>
           </Grid>
         </Grid>

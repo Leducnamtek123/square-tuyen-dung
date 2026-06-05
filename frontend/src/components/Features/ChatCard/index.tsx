@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import db from '@/configs/firebase-config';
 import { ROUTES } from '@/configs/constants';
+import { useTranslation } from 'react-i18next';
 
 interface ChatCardProps {
   // Add specific props if needed
@@ -24,6 +25,7 @@ const chatRoomCollectionRef = collection(db, 'chatRooms');
 const ChatCard = (_props: ChatCardProps) => {
   const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
   const { push } = useRouter();
+  const { t } = useTranslation('common');
   const [count, setCount] = React.useState(0);
 
   const isEmployer = React.useMemo(() => {
@@ -67,7 +69,7 @@ const ChatCard = (_props: ChatCardProps) => {
     <IconButton
       onClick={handleRedirect}
       size="large"
-      aria-label="show new notifications"
+      aria-label={t('chatCard.openChat')}
       color="inherit"
     >
       <Badge badgeContent={count} color="error">

@@ -92,7 +92,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
               {companyDetail.isVerified && (
                 <Chip
                   icon={<VerifiedIcon sx={{ fontSize: 16 }} />}
-                  label={t("companyDetail.verified", "Verified company")}
+                  label={t("companyDetail.verified")}
                   size="small"
                   color="success"
                   variant="outlined"
@@ -168,7 +168,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
                 onClick={() => setOpenReportPopup(true)}
                 sx={{ minWidth: 160, borderRadius: 2, boxShadow: "none" }}
               >
-                {t("companyDetail.report", "Report")}
+                {t("companyDetail.report")}
               </Button>
             )}
           </Stack>

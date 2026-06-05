@@ -91,7 +91,7 @@ class Banner(ProjectBaseModel):
 
     platform = models.CharField(max_length=3, choices=var_sys.PLATFORM_CHOICES,
 
-                                default=var_sys.DescriptionLocation.TOP_LEFT)
+                                default=var_sys.Platform.WEB)
 
     type = models.IntegerField(default=var_sys.BannerType.HOME, db_index=True)
 

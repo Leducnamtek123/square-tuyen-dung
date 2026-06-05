@@ -63,10 +63,10 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
               sx={{ fontSize: 80, color: 'error.main', mb: 2, opacity: 0.8 }}
             />
             <Typography variant="h5" gutterBottom fontWeight={600}>
-              {i18next.t('common:errorBoundary.title', 'Đã xảy ra lỗi')}
+              {i18next.t('common:errorBoundary.title')}
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 400 }}>
-              {i18next.t('common:errorBoundary.message', 'Ứng dụng gặp sự cố không mong muốn. Vui lòng thử lại hoặc tải lại trang.')}
+              {i18next.t('common:errorBoundary.message')}
             </Typography>
             {this.state.error && (
               <Box
@@ -96,20 +96,20 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                   variant="text"
                   size="small"
                   onClick={() => {
-                    const errMsg = this.state.error?.message || i18next.t('common:errorBoundary.unknownError', 'Unknown error');
+                    const errMsg = this.state.error?.message || i18next.t('common:errorBoundary.unknownError');
                     const errStack = this.state.error?.stack || '';
                     const compStack = this.state.componentStack || '';
                     navigator.clipboard.writeText(`Error: ${errMsg}\n${errStack}\n\nComponent Stack:${compStack}`);
                   }}
                 >
-                  {i18next.t('common:errorBoundary.copyError', 'Copy lỗi')}
+                  {i18next.t('common:errorBoundary.copyError')}
                 </Button>
               )}
               <Button variant="outlined" onClick={this.handleReset}>
-                {i18next.t('common:errorBoundary.retry', 'Thử lại')}
+                {i18next.t('common:errorBoundary.retry')}
               </Button>
               <Button variant="contained" onClick={this.handleReload}>
-                {i18next.t('common:errorBoundary.reload', 'Tải lại trang')}
+                {i18next.t('common:errorBoundary.reload')}
               </Button>
             </Stack>
           </Box>

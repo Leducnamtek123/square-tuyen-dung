@@ -255,32 +255,32 @@ const DashboardPage = () => {
     ], [t, totalAdmins, totalEmployers, totalJobSeekers]);
 
     const jobStateItems = useMemo<ChartItem[]>(() => [
-        { name: t('dashboard.jobStates.active', 'Active'), value: totalJobPostsActive, color: chartColors.emerald },
-        { name: t('dashboard.jobStates.pending', 'Pending'), value: totalJobPostsPending, color: chartColors.amber },
-        { name: t('dashboard.jobStates.rejected', 'Rejected'), value: totalJobPostsRejected, color: chartColors.red },
-        { name: t('dashboard.jobStates.expired', 'Expired'), value: totalJobPostsExpired, color: chartColors.slate },
+        { name: t('dashboard.jobStates.active'), value: totalJobPostsActive, color: chartColors.emerald },
+        { name: t('dashboard.jobStates.pending'), value: totalJobPostsPending, color: chartColors.amber },
+        { name: t('dashboard.jobStates.rejected'), value: totalJobPostsRejected, color: chartColors.red },
+        { name: t('dashboard.jobStates.expired'), value: totalJobPostsExpired, color: chartColors.slate },
     ], [t, totalJobPostsActive, totalJobPostsExpired, totalJobPostsPending, totalJobPostsRejected]);
 
     const applicationItems = useMemo<ChartItem[]>(() => [
-        { name: t('dashboard.applicationStates.pending', 'Pending'), value: n(stats?.totalApplicationsPending), color: chartColors.amber },
-        { name: t('dashboard.applicationStates.contacted', 'Contacted'), value: n(stats?.totalApplicationsContacted), color: chartColors.sky },
-        { name: t('dashboard.applicationStates.tested', 'Tested'), value: n(stats?.totalApplicationsTested), color: chartColors.cyan },
-        { name: t('dashboard.applicationStates.interviewed', 'Interviewed'), value: n(stats?.totalApplicationsInterviewed), color: chartColors.violet },
-        { name: t('dashboard.applicationStates.hired', 'Hired'), value: n(stats?.totalApplicationsHired), color: chartColors.emerald },
-        { name: t('dashboard.applicationStates.notSelected', 'Not selected'), value: n(stats?.totalApplicationsNotSelected), color: chartColors.red },
+        { name: t('dashboard.applicationStates.pending'), value: n(stats?.totalApplicationsPending), color: chartColors.amber },
+        { name: t('dashboard.applicationStates.contacted'), value: n(stats?.totalApplicationsContacted), color: chartColors.sky },
+        { name: t('dashboard.applicationStates.tested'), value: n(stats?.totalApplicationsTested), color: chartColors.cyan },
+        { name: t('dashboard.applicationStates.interviewed'), value: n(stats?.totalApplicationsInterviewed), color: chartColors.violet },
+        { name: t('dashboard.applicationStates.hired'), value: n(stats?.totalApplicationsHired), color: chartColors.emerald },
+        { name: t('dashboard.applicationStates.notSelected'), value: n(stats?.totalApplicationsNotSelected), color: chartColors.red },
     ], [stats, t]);
 
     const interviewItems = useMemo<ChartItem[]>(() => [
-        { name: t('dashboard.interviewStates.draft', 'Draft'), value: n(stats?.totalInterviewsDraft), color: chartColors.slate },
-        { name: t('dashboard.interviewStates.scheduled', 'Scheduled'), value: totalInterviewsScheduled, color: chartColors.sky },
-        { name: t('dashboard.interviewStates.inProgress', 'In progress'), value: totalInterviewsInProgress, color: chartColors.amber },
-        { name: t('dashboard.interviewStates.completed', 'Completed'), value: totalInterviewsCompleted, color: chartColors.emerald },
-        { name: t('dashboard.interviewStates.cancelled', 'Cancelled'), value: totalInterviewsCancelled, color: chartColors.red },
+        { name: t('dashboard.interviewStates.draft'), value: n(stats?.totalInterviewsDraft), color: chartColors.slate },
+        { name: t('dashboard.interviewStates.scheduled'), value: totalInterviewsScheduled, color: chartColors.sky },
+        { name: t('dashboard.interviewStates.inProgress'), value: totalInterviewsInProgress, color: chartColors.amber },
+        { name: t('dashboard.interviewStates.completed'), value: totalInterviewsCompleted, color: chartColors.emerald },
+        { name: t('dashboard.interviewStates.cancelled'), value: totalInterviewsCancelled, color: chartColors.red },
     ], [stats, t, totalInterviewsCancelled, totalInterviewsCompleted, totalInterviewsInProgress, totalInterviewsScheduled]);
 
-    const doughnutOptions = useMemo(() => createDoughnutOptions(theme), [theme]);
+    const doughnutOptions = useMemo(() => createDoughnutOptions(theme, i18n.language), [i18n.language, theme]);
     const barOptions = useMemo(() => {
-        const base = createCartesianOptions(theme, { displayLegend: false }) as any;
+        const base = createCartesianOptions(theme, { displayLegend: false, language: i18n.language }) as any;
         return {
             ...base,
             indexAxis: 'y' as const,
@@ -305,7 +305,7 @@ const DashboardPage = () => {
                 },
             },
         };
-    }, [theme]);
+    }, [i18n.language, theme]);
 
     return (
         <Box sx={{ pb: 3 }}>
@@ -328,7 +328,7 @@ const DashboardPage = () => {
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                     <StatCard
-                        title={t('dashboard.companies', 'Companies')}
+                        title={t('dashboard.companies')}
                         value={totalCompanies}
                         loading={isLoading}
                         icon={<BusinessIcon />}
@@ -338,7 +338,7 @@ const DashboardPage = () => {
                             pending: formatNumber(totalCompanyVerificationsPending + totalCompanyVerificationsReviewing),
                         })}
                         progress={percent(totalCompaniesVerified, totalCompanies)}
-                        footerLabel={t('dashboard.verifiedRate', 'Verified rate')}
+                        footerLabel={t('dashboard.verifiedRate')}
                         footerValue={`${percent(totalCompaniesVerified, totalCompanies)}%`}
                     />
                 </Grid>
@@ -354,7 +354,7 @@ const DashboardPage = () => {
                             pending: formatNumber(totalJobPostsPending),
                         })}
                         progress={percent(totalJobPostsActive, totalJobPosts)}
-                        footerLabel={t('dashboard.activeRate', 'Active rate')}
+                        footerLabel={t('dashboard.activeRate')}
                         footerValue={`${percent(totalJobPostsActive, totalJobPosts)}%`}
                     />
                 </Grid>
@@ -370,13 +370,13 @@ const DashboardPage = () => {
                             hired: formatNumber(totalApplicationsHired),
                         })}
                         progress={percent(totalApplicationsHired, totalApplications)}
-                        footerLabel={t('dashboard.hiringRate', 'Hiring rate')}
+                        footerLabel={t('dashboard.hiringRate')}
                         footerValue={`${percent(totalApplicationsHired, totalApplications)}%`}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                     <StatCard
-                        title={t('dashboard.interviews', 'Interviews')}
+                        title={t('dashboard.interviews')}
                         value={totalInterviews}
                         loading={isLoading}
                         icon={<EventAvailableIcon />}
@@ -386,13 +386,13 @@ const DashboardPage = () => {
                             completed: formatNumber(totalInterviewsCompleted),
                         })}
                         progress={percent(totalInterviewsCompleted, totalInterviews)}
-                        footerLabel={t('dashboard.completionRate', 'Completion rate')}
+                        footerLabel={t('dashboard.completionRate')}
                         footerValue={`${percent(totalInterviewsCompleted, totalInterviews)}%`}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                     <StatCard
-                        title={t('dashboard.resumes', 'Resumes')}
+                        title={t('dashboard.resumes')}
                         value={totalResumes}
                         loading={isLoading}
                         icon={<DescriptionIcon />}
@@ -402,7 +402,7 @@ const DashboardPage = () => {
                             profiles: formatNumber(n(stats?.totalJobSeekerProfiles)),
                         })}
                         progress={percent(totalActiveResumes, totalResumes)}
-                        footerLabel={t('dashboard.activeProfileRate', 'Active CV rate')}
+                        footerLabel={t('dashboard.activeProfileRate')}
                         footerValue={`${percent(totalActiveResumes, totalResumes)}%`}
                     />
                 </Grid>
@@ -423,7 +423,7 @@ const DashboardPage = () => {
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                     <StatCard
-                        title={t('dashboard.last30Days', 'Last 30 days')}
+                        title={t('dashboard.last30Days')}
                         value={n(stats?.newUsers30d)}
                         loading={isLoading}
                         icon={<ManageAccountsIcon />}
@@ -432,7 +432,7 @@ const DashboardPage = () => {
                             employers: formatNumber(n(stats?.newEmployers30d)),
                             jobSeekers: formatNumber(n(stats?.newJobSeekers30d)),
                         })}
-                        footerLabel={t('dashboard.newApplications30d', 'New applications')}
+                        footerLabel={t('dashboard.newApplications30d')}
                         footerValue={formatNumber(n(stats?.newApplications30d))}
                     />
                 </Grid>
@@ -447,9 +447,9 @@ const DashboardPage = () => {
                     >
                         <Box sx={{ position: 'relative', height: 300 }}>
                             {isLoading ? (
-                                <ChartLoadingState height="100%" label={t('dashboard.loadingChart', { defaultValue: 'Loading chart' })} />
+                                <ChartLoadingState height="100%" label={t('dashboard.loadingChart')} />
                             ) : !hasValues(roleItems) ? (
-                                <ChartEmptyState height="100%" label={t('dashboard.noUserData', { defaultValue: 'No user data yet' })} />
+                                <ChartEmptyState height="100%" label={t('dashboard.noUserData')} />
                             ) : (
                                 <PieChartClient data={makeDoughnutData(roleItems)} options={doughnutOptions} height="100%" />
                             )}
@@ -457,12 +457,12 @@ const DashboardPage = () => {
                     </DashboardPanel>
                 </Grid>
                 <Grid size={{ xs: 12, lg: 4 }}>
-                    <DashboardPanel title={t('dashboard.jobPostStatus', 'Job post status')} accentColor={chartColors.emerald}>
+                    <DashboardPanel title={t('dashboard.jobPostStatus')} accentColor={chartColors.emerald}>
                         <Box sx={{ height: 300 }}>
                             {isLoading ? (
-                                <ChartLoadingState height="100%" label={t('dashboard.loadingChart', { defaultValue: 'Loading chart' })} />
+                                <ChartLoadingState height="100%" label={t('dashboard.loadingChart')} />
                             ) : !hasValues(jobStateItems) ? (
-                                <ChartEmptyState height="100%" label={t('dashboard.noJobPostData', { defaultValue: 'No job post data yet' })} />
+                                <ChartEmptyState height="100%" label={t('dashboard.noJobPostData')} />
                             ) : (
                                 <BarChartClient data={makeBarData(jobStateItems)} options={barOptions} height="100%" />
                             )}
@@ -470,12 +470,12 @@ const DashboardPage = () => {
                     </DashboardPanel>
                 </Grid>
                 <Grid size={{ xs: 12, lg: 4 }}>
-                    <DashboardPanel title={t('dashboard.applicationPipeline', 'Application pipeline')} accentColor={chartColors.violet}>
+                    <DashboardPanel title={t('dashboard.applicationPipeline')} accentColor={chartColors.violet}>
                         <Box sx={{ height: 300 }}>
                             {isLoading ? (
-                                <ChartLoadingState height="100%" label={t('dashboard.loadingChart', { defaultValue: 'Loading chart' })} />
+                                <ChartLoadingState height="100%" label={t('dashboard.loadingChart')} />
                             ) : !hasValues(applicationItems) ? (
-                                <ChartEmptyState height="100%" label={t('dashboard.noApplicationData', { defaultValue: 'No application data yet' })} />
+                                <ChartEmptyState height="100%" label={t('dashboard.noApplicationData')} />
                             ) : (
                                 <BarChartClient data={makeBarData(applicationItems)} options={barOptions} height="100%" />
                             )}
@@ -486,12 +486,12 @@ const DashboardPage = () => {
 
             <Grid container spacing={2.5}>
                 <Grid size={{ xs: 12, lg: 4 }}>
-                    <DashboardPanel title={t('dashboard.interviewStatus', 'Interview status')} accentColor={chartColors.cyan}>
+                    <DashboardPanel title={t('dashboard.interviewStatus')} accentColor={chartColors.cyan}>
                         <Box sx={{ height: 300 }}>
                             {isLoading ? (
-                                <ChartLoadingState height="100%" label={t('dashboard.loadingChart', { defaultValue: 'Loading chart' })} />
+                                <ChartLoadingState height="100%" label={t('dashboard.loadingChart')} />
                             ) : !hasValues(interviewItems) ? (
-                                <ChartEmptyState height="100%" label={t('dashboard.noInterviewData', { defaultValue: 'No interview data yet' })} />
+                                <ChartEmptyState height="100%" label={t('dashboard.noInterviewData')} />
                             ) : (
                                 <PieChartClient data={makeDoughnutData(interviewItems)} options={doughnutOptions} height="100%" />
                             )}
@@ -499,10 +499,10 @@ const DashboardPage = () => {
                     </DashboardPanel>
                 </Grid>
                 <Grid size={{ xs: 12, lg: 4 }}>
-                    <DashboardPanel title={t('dashboard.profileCompanyStats', 'Profiles & companies')} accentColor={chartColors.sky}>
+                    <DashboardPanel title={t('dashboard.profileCompanyStats')} accentColor={chartColors.sky}>
                         <Stack spacing={1.75}>
                             <ProgressRow
-                                label={t('dashboard.verifiedCompanies', 'Verified companies')}
+                                label={t('dashboard.verifiedCompanies')}
                                 value={totalCompaniesVerified}
                                 total={totalCompanies}
                                 color={chartColors.sky}
@@ -510,7 +510,7 @@ const DashboardPage = () => {
                                 loading={isLoading}
                             />
                             <ProgressRow
-                                label={t('dashboard.activeResumes', 'Active resumes')}
+                                label={t('dashboard.activeResumes')}
                                 value={totalActiveResumes}
                                 total={totalResumes}
                                 color={chartColors.gold}
@@ -519,28 +519,28 @@ const DashboardPage = () => {
                             />
                             <Divider />
                             <InfoRow
-                                label={t('dashboard.savedJobs', 'Saved jobs')}
+                                label={t('dashboard.savedJobs')}
                                 value={formatNumber(totalSavedJobPosts)}
                                 icon={<BookmarkAddedIcon />}
                                 color={chartColors.emerald}
                                 loading={isLoading}
                             />
                             <InfoRow
-                                label={t('dashboard.savedResumes', 'Saved resumes')}
+                                label={t('dashboard.savedResumes')}
                                 value={formatNumber(totalSavedResumes)}
                                 icon={<DescriptionIcon />}
                                 color={chartColors.violet}
                                 loading={isLoading}
                             />
                             <InfoRow
-                                label={t('dashboard.companyFollowers', 'Company followers')}
+                                label={t('dashboard.companyFollowers')}
                                 value={formatNumber(totalCompanyFollowers)}
                                 icon={<VerifiedUserIcon />}
                                 color={chartColors.cyan}
                                 loading={isLoading}
                             />
                             <InfoRow
-                                label={t('dashboard.resumeViews', 'Resume views')}
+                                label={t('dashboard.resumeViews')}
                                 value={formatNumber(totalResumeViews)}
                                 icon={<VisibilityIcon />}
                                 color={chartColors.amber}
@@ -550,24 +550,24 @@ const DashboardPage = () => {
                     </DashboardPanel>
                 </Grid>
                 <Grid size={{ xs: 12, lg: 4 }}>
-                    <DashboardPanel title={t('dashboard.operatingStats', 'Operating stats')} accentColor={chartColors.amber}>
+                    <DashboardPanel title={t('dashboard.operatingStats')} accentColor={chartColors.amber}>
                         <Stack spacing={1.75}>
                             <InfoRow
-                                label={t('dashboard.avgApplicationsPerJob', 'Avg applications / job')}
+                                label={t('dashboard.avgApplicationsPerJob')}
                                 value={formatDecimal(applicationPerJobPost)}
                                 icon={<AssessmentIcon />}
                                 color={chartColors.violet}
                                 loading={isLoading}
                             />
                             <InfoRow
-                                label={t('dashboard.questionBank', 'Question bank')}
+                                label={t('dashboard.questionBank')}
                                 value={formatNumber(totalQuestions)}
                                 icon={<HelpOutlineIcon />}
                                 color={chartColors.navy}
                                 loading={isLoading}
                             />
                             <InfoRow
-                                label={t('dashboard.questionGroups', 'Question groups')}
+                                label={t('dashboard.questionGroups')}
                                 value={formatNumber(totalQuestionGroups)}
                                 icon={<QuestionAnswerIcon />}
                                 color={chartColors.sky}
@@ -575,21 +575,21 @@ const DashboardPage = () => {
                             />
                             <Divider />
                             <InfoRow
-                                label={t('dashboard.newJobPosts30d', 'New job posts')}
+                                label={t('dashboard.newJobPosts30d')}
                                 value={formatNumber(n(stats?.newJobPosts30d))}
                                 icon={<WorkIcon />}
                                 color={chartColors.emerald}
                                 loading={isLoading}
                             />
                             <InfoRow
-                                label={t('dashboard.newApplications30d', 'New applications')}
+                                label={t('dashboard.newApplications30d')}
                                 value={formatNumber(n(stats?.newApplications30d))}
                                 icon={<AssessmentIcon />}
                                 color={chartColors.violet}
                                 loading={isLoading}
                             />
                             <InfoRow
-                                label={t('dashboard.newInterviews30d', 'New interviews')}
+                                label={t('dashboard.newInterviews30d')}
                                 value={formatNumber(n(stats?.newInterviews30d))}
                                 icon={<EventAvailableIcon />}
                                 color={chartColors.cyan}

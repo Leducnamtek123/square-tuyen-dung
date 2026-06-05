@@ -67,9 +67,9 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
   const { allConfig } = useConfig();
   const { control, handleSubmit, reset } = useForm<AppliedResumeFilterData>();
   const aiReviewStatusOptions = React.useMemo(() => ([
-    { id: 'ai_only', name: t('ai.reviewStatus.aiOnly', { defaultValue: 'AI only' }) },
-    { id: 'reviewed', name: t('ai.reviewStatus.reviewed', { defaultValue: 'Đã rà soát' }) },
-    { id: 'overridden', name: t('ai.reviewStatus.overridden', { defaultValue: 'Đã override' }) },
+    { id: 'ai_only', name: t('ai.reviewStatus.aiOnly') },
+    { id: 'reviewed', name: t('ai.reviewStatus.reviewed') },
+    { id: 'overridden', name: t('ai.reviewStatus.overridden') },
   ]), [t]);
 
   React.useEffect(() => {
@@ -197,19 +197,19 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
             <Grid container spacing={2}>
               <Grid size={6}>
                 <Box>
-                  <SectionHeader icon={<FactCheckIcon />} title={t('ai.reviewStatus.label', { defaultValue: 'Rà soát AI' })} />
+                  <SectionHeader icon={<FactCheckIcon />} title={t('ai.reviewStatus.label')} />
                   <SingleSelectCustom
                     name="aiReviewStatus"
                     control={control}
                     options={aiReviewStatusOptions}
-                    placeholder={t('ai.reviewStatus.all', { defaultValue: 'Tất cả trạng thái' })}
+                    placeholder={t('ai.reviewStatus.all')}
                     sx={inputSx}
                   />
                 </Box>
               </Grid>
               <Grid size={6}>
                 <Box>
-                  <SectionHeader icon={<SpeedIcon />} title={t('ai.scoreMax', { defaultValue: 'Điểm AI tối đa' })} />
+                  <SectionHeader icon={<SpeedIcon />} title={t('ai.scoreMax')} />
                   <Controller
                     name="aiScoreMax"
                     control={control}

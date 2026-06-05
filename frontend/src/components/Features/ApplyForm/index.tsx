@@ -71,20 +71,21 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
   const schema = yup.object().shape({
     fullName: yup
       .string()
-      .required(t("applyForm.validation.fullNameRequired", { defaultValue: "Ho va ten la bat buoc." }))
-      .max(100, t("applyForm.validation.fullNameMax", { defaultValue: "Ho va ten vuot qua do dai cho phep." })),
+      .required(t("applyForm.validation.fullNameRequired"))
+      .max(100, t("applyForm.validation.fullNameMax")),
     email: yup
       .string()
-      .required(t("applyForm.validation.emailRequired", { defaultValue: "Email la bat buoc." }))
-      .email(t("applyForm.validation.emailInvalid", { defaultValue: "Email khong hop le." }))
-      .max(100, t("applyForm.validation.emailMax", { defaultValue: "Email vuot qua do dai cho phep." })),
+      .required(t("applyForm.validation.emailRequired"))
+      .email(t("applyForm.validation.emailInvalid"))
+      .max(100, t("applyForm.validation.emailMax")),
     phone: yup
       .string()
-      .required(t("applyForm.validation.phoneRequired", { defaultValue: "So dien thoai la bat buoc." }))
-      .matches(REGEX_VALIDATE.phoneRegExp, t("applyForm.validation.phoneInvalid", { defaultValue: "So dien thoai khong hop le." })),
+      .required(t("applyForm.validation.phoneRequired"))
+      .matches(REGEX_VALIDATE.phoneRegExp, t("applyForm.validation.phoneInvalid"))
+      .max(15, t("applyForm.validation.phoneMax")),
     resume: yup
       .string()
-      .required(t("applyForm.validation.resumeRequired", { defaultValue: "Vui long chon ho so." })),
+      .required(t("applyForm.validation.resumeRequired")),
   });
 
   const {
@@ -156,10 +157,10 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                   }}
                 >
                   <Typography variant="body1" color="error" sx={{ fontWeight: 600, mb: 1 }}>
-                    {t("applyForm.resume.empty", { defaultValue: "Ban chua co ho so nao." })}
+                    {t("applyForm.resume.empty")}
                   </Typography>
                   <Typography variant="body2" sx={{ mb: 2 }}>
-                    {t("applyForm.resume.pleaseUpload", { defaultValue: "Vui long tai len hoac tao ho so de ung tuyen." })}
+                    {t("applyForm.resume.pleaseUpload")}
                   </Typography>
                   <Button
                     variant="contained"
@@ -168,7 +169,7 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                     onClick={() => push(`/${ROUTES.JOB_SEEKER.PROFILE}`)}
                     sx={{ textTransform: "none" }}
                   >
-                    {t("applyForm.resume.createNow", { defaultValue: "Tao ho so ngay" })}
+                    {t("applyForm.resume.createNow")}
                   </Button>
                 </Card>
               ) : (
@@ -256,9 +257,9 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
           <Grid size={12}>
             <TextFieldCustom
               name="fullName"
-              title={t("applyForm.fields.fullName", { defaultValue: "Ho va ten" })}
+              title={t("applyForm.fields.fullName")}
               showRequired={true}
-              placeholder={t("applyForm.placeholders.fullName", { defaultValue: "Nhap ho va ten" })}
+              placeholder={t("applyForm.placeholders.fullName")}
               control={control}
             />
           </Grid>
@@ -266,9 +267,9 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
           <Grid size={12}>
             <TextFieldCustom
               name="email"
-              title={t("applyForm.fields.email", { defaultValue: "Email" })}
+              title={t("applyForm.fields.email")}
               showRequired={true}
-              placeholder={t("applyForm.placeholders.email", { defaultValue: "Nhap email" })}
+              placeholder={t("applyForm.placeholders.email")}
               control={control}
             />
           </Grid>
@@ -276,18 +277,16 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
           <Grid size={12}>
             <TextFieldCustom
               name="phone"
-              title={t("applyForm.fields.phone", { defaultValue: "So dien thoai" })}
+              title={t("applyForm.fields.phone")}
               showRequired={true}
-              placeholder={t("applyForm.placeholders.phone", { defaultValue: "Nhap so dien thoai" })}
+              placeholder={t("applyForm.placeholders.phone")}
               control={control}
             />
           </Grid>
 
           <Grid size={12}>
             <Typography color="GrayText" variant="caption">
-              {t("applyForm.note", {
-                defaultValue: "Luu y: Ho ten, email va so dien thoai can chinh xac de nha tuyen dung lien he voi ban.",
-              })}
+              {t("applyForm.note")}
             </Typography>
           </Grid>
         </Grid>

@@ -635,7 +635,7 @@ class AdminJobPostViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, AliasedOrderingFilter, SearchFilter]
     filterset_class = JobPostFilter
     search_fields = ['job_name', 'company__company_name']
-    ordering_fields = ['create_at', 'deadline', 'views']
+    ordering_fields = ['id', ('jobName', 'job_name'), 'create_at', 'deadline', 'views']
 
     def get_queryset(self):
         queryset = super().get_queryset()

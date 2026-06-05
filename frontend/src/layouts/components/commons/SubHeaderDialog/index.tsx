@@ -39,7 +39,7 @@ const DesktopContent = (
           edge="start"
           color="inherit"
           onClick={() => setOpen(false)}
-          aria-label="close"
+          aria-label={t('actions.close')}
           sx={{ mr: 0.5 }}
         >
           <CloseIcon />
@@ -143,7 +143,7 @@ const MobileContent = (
           edge="start"
           color="inherit"
           onClick={() => setOpen(false)}
-          aria-label="close"
+          aria-label={t('actions.close')}
           sx={{ mr: 0.5 }}
         >
           <CloseIcon />
@@ -174,7 +174,7 @@ const MobileContent = (
               >
                 {career?.name}{' '}
                 {career.isHot && (
-                  <Chip label={t('common.hot', { defaultValue: 'Hot' })} size="small" color="error" />
+                  <Chip label={t('common.hot')} size="small" color="error" />
                 )}
               </Typography>
             </Grid>

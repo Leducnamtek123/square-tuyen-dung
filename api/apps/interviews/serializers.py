@@ -2,6 +2,8 @@
 Interview Module — DRF Serializers
 """
 
+from decimal import Decimal
+
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
@@ -294,6 +296,27 @@ class InterviewTranscriptSerializer(serializers.ModelSerializer):
 
 class InterviewEvaluationSerializer(serializers.ModelSerializer):
     evaluator_name = serializers.CharField(source='evaluator.full_name', read_only=True)
+    attitude_score = serializers.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        min_value=Decimal("0"),
+        max_value=Decimal("10"),
+        required=False,
+        allow_null=True,
+    )
+    professional_score = serializers.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        min_value=Decimal("0"),
+        max_value=Decimal("10"),
+        required=False,
+        allow_null=True,
+    )
+    proposed_salary = serializers.IntegerField(
+        min_value=0,
+        required=False,
+        allow_null=True,
+    )
 
     class Meta:
         model = InterviewEvaluation

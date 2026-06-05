@@ -660,6 +660,95 @@ class InterviewSessionAPITests(TestCase):
         response = self.client.get(f"/api/v1/interview/web/sessions/{session.pk}/live-metrics/")
         self.assertEqual(response.status_code, 403)
 
+    def test_evaluation_list_uses_selected_company_header(self):
+        member = User.objects.create_user_with_role_name(
+            email="evaluation-member@example.com",
+            full_name="Evaluation Member",
+            role_name=var_sys.JOB_SEEKER,
+            password="password123",
+            is_active=True,
+        )
+        first_role = CompanyRole.objects.create(
+            company=self.company,
+            code="first-interview-manager",
+            name="First Interview Manager",
+            permissions=["manage_interviews"],
+        )
+        CompanyMember.objects.create(
+            company=self.company,
+            user=member,
+            role=first_role,
+            status=CompanyMember.STATUS_ACTIVE,
+            is_active=True,
+        )
+
+        other_owner = User.objects.create_user_with_role_name(
+            email="evaluation-other-owner@example.com",
+            full_name="Evaluation Other Owner",
+            role_name=var_sys.EMPLOYER,
+            password="password123",
+            has_company=True,
+            is_active=True,
+        )
+        other_company = Company.objects.create(
+            company_name="Evaluation Other Company",
+            company_email="evaluation-other-company@example.com",
+            company_phone="0912000099",
+            tax_code="EA000099",
+            user=other_owner,
+        )
+        second_role = CompanyRole.objects.create(
+            company=other_company,
+            code="second-interview-manager",
+            name="Second Interview Manager",
+            permissions=["manage_interviews"],
+        )
+        CompanyMember.objects.create(
+            company=other_company,
+            user=member,
+            role=second_role,
+            status=CompanyMember.STATUS_ACTIVE,
+            is_active=True,
+        )
+
+        first_job = self._create_job_post(self.employer, self.company, "First evaluation job")
+        second_job = self._create_job_post(other_owner, other_company, "Second evaluation job")
+        first_session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            created_by=self.employer,
+            job_post=first_job,
+        )
+        second_session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            created_by=other_owner,
+            job_post=second_job,
+        )
+        first_evaluation = InterviewEvaluation.objects.create(
+            interview=first_session,
+            evaluator=self.employer,
+            result="passed",
+        )
+        second_evaluation = InterviewEvaluation.objects.create(
+            interview=second_session,
+            evaluator=other_owner,
+            result="passed",
+        )
+
+        self.client.force_authenticate(user=member)
+        response = self.client.get(
+            "/api/v1/interview/web/evaluations/",
+            HTTP_X_ACTIVE_COMPANY_ID=str(other_company.id),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        items = payload.get("data", payload)
+        if isinstance(items, dict):
+            items = items.get("results", [])
+        result_ids = {item["id"] for item in items}
+        self.assertIn(second_evaluation.id, result_ids)
+        self.assertNotIn(first_evaluation.id, result_ids)
+
     def test_sse_stream_permission_requires_session_scope(self):
         from apps.interviews.sse_views import _user_can_stream_session
 
@@ -679,6 +768,71 @@ class InterviewSessionAPITests(TestCase):
         self.assertTrue(_user_can_stream_session(self.employer, session))
         self.assertFalse(_user_can_stream_session(other_employer, session))
 
+    def test_sse_stream_permission_uses_selected_company_query_param(self):
+        from apps.interviews.sse_views import _user_can_stream_session
+
+        member = User.objects.create_user_with_role_name(
+            email="sse-member@example.com",
+            full_name="SSE Member",
+            role_name=var_sys.JOB_SEEKER,
+            password="password123",
+            is_active=True,
+        )
+        first_role = CompanyRole.objects.create(
+            company=self.company,
+            code="first-sse-manager",
+            name="First SSE Manager",
+            permissions=["manage_interviews"],
+        )
+        CompanyMember.objects.create(
+            company=self.company,
+            user=member,
+            role=first_role,
+            status=CompanyMember.STATUS_ACTIVE,
+            is_active=True,
+        )
+        other_owner = User.objects.create_user_with_role_name(
+            email="other-sse-owner@example.com",
+            full_name="Other SSE Owner",
+            role_name=var_sys.EMPLOYER,
+            password="password123",
+            has_company=True,
+            is_active=True,
+        )
+        other_company = Company.objects.create(
+            company_name="Other SSE Company",
+            company_email="other-sse-company@example.com",
+            company_phone="0912000199",
+            tax_code="SSE000199",
+            user=other_owner,
+        )
+        second_role = CompanyRole.objects.create(
+            company=other_company,
+            code="second-sse-manager",
+            name="Second SSE Manager",
+            permissions=["manage_interviews"],
+        )
+        CompanyMember.objects.create(
+            company=other_company,
+            user=member,
+            role=second_role,
+            status=CompanyMember.STATUS_ACTIVE,
+            is_active=True,
+        )
+        second_job = self._create_job_post(other_owner, other_company, "Second SSE job")
+        session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            created_by=other_owner,
+            job_post=second_job,
+        )
+        request = RequestFactory().get(
+            f"/api/v1/interview/web/sessions/{session.id}/stream/",
+            {"activeCompanyId": str(other_company.id)},
+        )
+        request.user = member
+
+        self.assertTrue(_user_can_stream_session(member, session, request))
+
 
 # ─── NEW: Evaluation API Tests ─────────────────────────────────────────────
 
@@ -690,6 +844,7 @@ class InterviewSessionAPITests(TestCase):
     def test_update_status_by_room_completes_without_async_orm_error(self, mock_delay, mock_thread):
         session = InterviewSession.objects.create(
             candidate=self.candidate,
+            created_by=self.employer,
             status="scheduled",
         )
 
@@ -705,6 +860,29 @@ class InterviewSessionAPITests(TestCase):
         self.assertEqual(session.status, "processing")
         mock_delay.assert_called_once_with(session.id)
         mock_thread.assert_called_once()
+
+    @patch(
+        "apps.interviews.views.run_django_sync_in_thread",
+        side_effect=lambda func, *args, **kwargs: func(*args, **kwargs),
+    )
+    def test_anonymous_status_update_without_invite_token_is_rejected_when_agent_auth_disabled(self, mock_thread):
+        anonymous_client = APIClient()
+        session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            created_by=self.employer,
+            status="scheduled",
+        )
+
+        response = anonymous_client.patch(
+            f"/api/v1/interview/web/sessions/{session.room_name}/status/",
+            data={"status": "calibration"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 401)
+        session.refresh_from_db()
+        self.assertEqual(session.status, "scheduled")
+        mock_thread.assert_not_called()
 
     @override_settings(INTERVIEW_AGENT_SHARED_SECRET="agent-secret", INTERVIEW_AGENT_AUTH_REQUIRED=True)
     @patch(
@@ -932,6 +1110,26 @@ class InterviewEvaluationAPITests(TestCase):
         )
         self.client.force_authenticate(user=self.employer)
 
+    def _create_job_post(self, owner, company, name):
+        return JobPost.objects.create(
+            job_name=name,
+            deadline=date(2030, 1, 1),
+            quantity=1,
+            job_description="<p>Interview evaluation job</p>",
+            position=4,
+            type_of_workplace=1,
+            experience=2,
+            academic_level=2,
+            job_type=1,
+            salary_min=10000000,
+            salary_max=20000000,
+            contact_person_name="HR",
+            contact_person_phone="0901234567",
+            contact_person_email="hr@example.com",
+            user=owner,
+            company=company,
+        )
+
     def test_submit_evaluation_with_snake_case(self):
         """Frontend sends snake_case keys matching Django serializer."""
         payload = {
@@ -1033,6 +1231,44 @@ class SerializerValidationTests(TestCase):
         })
         self.assertTrue(serializer.is_valid(), serializer.errors)
         self.assertEqual(serializer.validated_data["overall_score"], 8.0)
+
+    def test_evaluation_serializer_rejects_scores_outside_ten_point_scale(self):
+        session = InterviewSession.objects.create(candidate=self.candidate)
+
+        invalid_score_cases = [
+            ("attitude_score", -0.1),
+            ("attitude_score", 10.1),
+            ("professional_score", -0.1),
+            ("professional_score", 10.1),
+        ]
+
+        for field_name, value in invalid_score_cases:
+            with self.subTest(field_name=field_name, value=value):
+                payload = {
+                    "interview": session.pk,
+                    "attitude_score": 5,
+                    "professional_score": 5,
+                    field_name: value,
+                    "result": "passed",
+                }
+                serializer = InterviewEvaluationSerializer(data=payload)
+
+                self.assertFalse(serializer.is_valid())
+                self.assertIn(field_name, serializer.errors)
+
+    def test_evaluation_serializer_rejects_negative_proposed_salary(self):
+        session = InterviewSession.objects.create(candidate=self.candidate)
+
+        serializer = InterviewEvaluationSerializer(data={
+            "interview": session.pk,
+            "attitude_score": 8,
+            "professional_score": 7,
+            "result": "passed",
+            "proposed_salary": -1,
+        })
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("proposed_salary", serializer.errors)
 
 
 # ─── NEW: Status Transition Tests ──────────────────────────────────────────

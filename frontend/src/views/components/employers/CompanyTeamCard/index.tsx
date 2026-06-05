@@ -62,6 +62,7 @@ const companyPermissionOptions = [
   'manage_candidates',
   'manage_interviews',
   'manage_question_bank',
+  'manage_employees',
   'manage_members',
   'manage_roles',
 ];
@@ -98,21 +99,23 @@ const CompanyTeamCard = () => {
   const getPermissionLabel = (permission: string) => {
     switch (permission) {
       case '*':
-        return t('employer:company.team.permissionLabels.all', 'All permissions');
+        return t('employer:company.team.permissionLabels.all');
       case 'manage_company_profile':
-        return t('employer:company.team.permissionLabels.manageCompanyProfile', 'Company profile');
+        return t('employer:company.team.permissionLabels.manageCompanyProfile');
       case 'manage_job_posts':
-        return t('employer:company.team.permissionLabels.manageJobPosts', 'Job posts');
+        return t('employer:company.team.permissionLabels.manageJobPosts');
       case 'manage_candidates':
-        return t('employer:company.team.permissionLabels.manageCandidates', 'Candidates');
+        return t('employer:company.team.permissionLabels.manageCandidates');
       case 'manage_interviews':
-        return t('employer:company.team.permissionLabels.manageInterviews', 'Interviews');
+        return t('employer:company.team.permissionLabels.manageInterviews');
       case 'manage_question_bank':
-        return t('employer:company.team.permissionLabels.manageQuestionBank', 'Question bank');
+        return t('employer:company.team.permissionLabels.manageQuestionBank');
+      case 'manage_employees':
+        return t('employer:company.team.permissionLabels.manageEmployees');
       case 'manage_members':
-        return t('employer:company.team.permissionLabels.manageMembers', 'Members');
+        return t('employer:company.team.permissionLabels.manageMembers');
       case 'manage_roles':
-        return t('employer:company.team.permissionLabels.manageRoles', 'Roles');
+        return t('employer:company.team.permissionLabels.manageRoles');
       default:
         return permission;
     }
@@ -152,7 +155,7 @@ const CompanyTeamCard = () => {
     onSuccess: () => {
       invalidateTeam();
       setRoleDialogOpen(false);
-      toastMessages.success(t('common:messages.saveSuccess', 'Saved successfully'));
+      toastMessages.success(t('common:messages.saveSuccess'));
     },
     onError: (error) => errorHandling(error),
   });
@@ -171,7 +174,7 @@ const CompanyTeamCard = () => {
     onSuccess: () => {
       invalidateTeam();
       setMemberDialogOpen(false);
-      toastMessages.success(t('common:messages.saveSuccess', 'Saved successfully'));
+      toastMessages.success(t('common:messages.saveSuccess'));
     },
     onError: (error) => errorHandling(error),
   });
@@ -222,8 +225,8 @@ const CompanyTeamCard = () => {
   const handleDeleteRole = (role: CompanyRole) => {
     confirmModal(
       () => deleteRoleMutation.mutateAsync(role.id),
-      t('employer:company.team.deleteRoleTitle', 'Delete role'),
-      t('employer:company.team.deleteRoleConfirm', { name: role.name, defaultValue: 'Delete this role?' }),
+      t('employer:company.team.deleteRoleTitle'),
+      t('employer:company.team.deleteRoleConfirm', { name: role.name }),
       'warning',
     );
   };
@@ -231,8 +234,8 @@ const CompanyTeamCard = () => {
   const handleDeleteMember = (member: CompanyMember) => {
     confirmModal(
       () => deleteMemberMutation.mutateAsync(member.id),
-      t('employer:company.team.deleteMemberTitle', 'Remove member'),
-      t('employer:company.team.deleteMemberConfirm', 'Remove this member from the company?'),
+      t('employer:company.team.deleteMemberTitle'),
+      t('employer:company.team.deleteMemberConfirm'),
       'warning',
     );
   };
@@ -245,32 +248,32 @@ const CompanyTeamCard = () => {
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent="space-between" mb={2}>
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 900 }}>
-              {t('employer:company.team.rolesTitle', 'Company roles')}
+              {t('employer:company.team.rolesTitle')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {t('employer:company.team.rolesSubtitle', 'Define permissions for people who can work inside this company workspace.')}
+              {t('employer:company.team.rolesSubtitle')}
             </Typography>
           </Box>
           <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateRole} sx={{ textTransform: 'none', fontWeight: 800 }}>
-            {t('employer:company.team.addRole', 'Add role')}
+            {t('employer:company.team.addRole')}
           </Button>
         </Stack>
         <TableContainer sx={tableSx}>
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>{t('employer:company.team.roleName', 'Role')}</TableCell>
-                <TableCell>{t('employer:company.team.roleCode', 'Code')}</TableCell>
-                <TableCell>{t('employer:company.team.permissions', 'Permissions')}</TableCell>
-                <TableCell align="right">{t('common:actions.title', 'Actions')}</TableCell>
+                <TableCell>{t('employer:company.team.roleName')}</TableCell>
+                <TableCell>{t('employer:company.team.roleCode')}</TableCell>
+                <TableCell>{t('employer:company.team.permissions')}</TableCell>
+                <TableCell align="right">{t('common:actions.title')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {rolesLoading && (
-                <TableRow><TableCell colSpan={4}>{t('common:loading', 'Loading...')}</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4}>{t('common:loading')}</TableCell></TableRow>
               )}
               {!rolesLoading && roles.length === 0 && (
-                <TableRow><TableCell colSpan={4}>{t('employer:company.team.noRoles', 'No roles yet')}</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4}>{t('employer:company.team.noRoles')}</TableCell></TableRow>
               )}
               {roles.map((role) => (
                 <TableRow key={role.id} hover>
@@ -278,12 +281,12 @@ const CompanyTeamCard = () => {
                   <TableCell>{role.code || '---'}</TableCell>
                   <TableCell>{formatPermissions(role.permissions)}</TableCell>
                   <TableCell align="right">
-                    <Tooltip title={isSystemRole(role) ? t('employer:company.team.systemRoleLocked', 'System role is locked') : t('common:actions.edit', 'Edit')}>
+                    <Tooltip title={isSystemRole(role) ? t('employer:company.team.systemRoleLocked') : t('common:actions.edit')}>
                       <span>
                         <IconButton size="small" disabled={isSystemRole(role)} onClick={() => openEditRole(role)}><EditIcon fontSize="small" /></IconButton>
                       </span>
                     </Tooltip>
-                    <Tooltip title={isSystemRole(role) ? t('employer:company.team.systemRoleLocked', 'System role is locked') : t('common:actions.delete', 'Delete')}>
+                    <Tooltip title={isSystemRole(role) ? t('employer:company.team.systemRoleLocked') : t('common:actions.delete')}>
                       <span>
                         <IconButton size="small" color="error" disabled={isSystemRole(role)} onClick={() => handleDeleteRole(role)}>
                           <DeleteIcon fontSize="small" />
@@ -302,32 +305,32 @@ const CompanyTeamCard = () => {
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent="space-between" mb={2}>
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 900 }}>
-              {t('employer:company.team.membersTitle', 'Company members')}
+              {t('employer:company.team.membersTitle')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {t('employer:company.team.membersSubtitle', 'Manage users who can access this employer workspace.')}
+              {t('employer:company.team.membersSubtitle')}
             </Typography>
           </Box>
           <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateMember} disabled={roles.length === 0} sx={{ textTransform: 'none', fontWeight: 800 }}>
-            {t('employer:company.team.addMember', 'Add member')}
+            {t('employer:company.team.addMember')}
           </Button>
         </Stack>
         <TableContainer sx={tableSx}>
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>{t('employer:company.team.member', 'Member')}</TableCell>
-                <TableCell>{t('employer:company.team.roleName', 'Role')}</TableCell>
-                <TableCell>{t('employer:company.team.status', 'Status')}</TableCell>
-                <TableCell align="right">{t('common:actions.title', 'Actions')}</TableCell>
+                <TableCell>{t('employer:company.team.member')}</TableCell>
+                <TableCell>{t('employer:company.team.roleName')}</TableCell>
+                <TableCell>{t('employer:company.team.status')}</TableCell>
+                <TableCell align="right">{t('common:actions.title')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {membersLoading && (
-                <TableRow><TableCell colSpan={4}>{t('common:loading', 'Loading...')}</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4}>{t('common:loading')}</TableCell></TableRow>
               )}
               {!membersLoading && members.length === 0 && (
-                <TableRow><TableCell colSpan={4}>{t('employer:company.team.noMembers', 'No members yet')}</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4}>{t('employer:company.team.noMembers')}</TableCell></TableRow>
               )}
               {members.map((member) => (
                 <TableRow key={member.id} hover>
@@ -337,10 +340,10 @@ const CompanyTeamCard = () => {
                   <TableCell>{member.role?.name || member.roleId || '---'}</TableCell>
                   <TableCell>{member.status || '---'}</TableCell>
                   <TableCell align="right">
-                    <Tooltip title={t('common:actions.edit', 'Edit')}>
+                    <Tooltip title={t('common:actions.edit')}>
                       <IconButton size="small" onClick={() => openEditMember(member)}><EditIcon fontSize="small" /></IconButton>
                     </Tooltip>
-                    <Tooltip title={t('common:actions.delete', 'Delete')}>
+                    <Tooltip title={t('common:actions.delete')}>
                       <IconButton size="small" color="error" onClick={() => handleDeleteMember(member)}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
@@ -355,19 +358,19 @@ const CompanyTeamCard = () => {
 
       <Dialog open={roleDialogOpen} onClose={() => setRoleDialogOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle sx={{ fontWeight: 900 }}>
-          {roleForm.id ? t('employer:company.team.editRole', 'Edit role') : t('employer:company.team.createRole', 'Create role')}
+          {roleForm.id ? t('employer:company.team.editRole') : t('employer:company.team.createRole')}
         </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
-            <TextField label={t('employer:company.team.roleCode', 'Code')} value={roleForm.code} onChange={(event) => setRoleForm((prev) => ({ ...prev, code: event.target.value }))} fullWidth />
-            <TextField label={t('employer:company.team.roleName', 'Role')} value={roleForm.name} onChange={(event) => setRoleForm((prev) => ({ ...prev, name: event.target.value }))} fullWidth />
-            <TextField label={t('employer:company.team.description', 'Description')} value={roleForm.description} onChange={(event) => setRoleForm((prev) => ({ ...prev, description: event.target.value }))} fullWidth multiline minRows={2} />
+            <TextField label={t('employer:company.team.roleCode')} value={roleForm.code} onChange={(event) => setRoleForm((prev) => ({ ...prev, code: event.target.value }))} fullWidth />
+            <TextField label={t('employer:company.team.roleName')} value={roleForm.name} onChange={(event) => setRoleForm((prev) => ({ ...prev, name: event.target.value }))} fullWidth />
+            <TextField label={t('employer:company.team.roleDescription')} value={roleForm.description} onChange={(event) => setRoleForm((prev) => ({ ...prev, description: event.target.value }))} fullWidth multiline minRows={2} />
             <FormControl component="fieldset">
               <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 0.5 }}>
-                {t('employer:company.team.permissions', 'Permissions')}
+                {t('employer:company.team.permissions')}
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
-                {t('employer:company.team.permissionsHint', 'Choose the permissions this role can use.')}
+                {t('employer:company.team.permissionsHint')}
               </Typography>
               <Stack spacing={0.5}>
                 {companyPermissionOptions.map((permission) => (
@@ -387,42 +390,42 @@ const CompanyTeamCard = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRoleDialogOpen(false)}>{t('common:actions.cancel', 'Cancel')}</Button>
+          <Button onClick={() => setRoleDialogOpen(false)}>{t('common:actions.cancel')}</Button>
           <Button variant="contained" disabled={!roleForm.code.trim() || !roleForm.name.trim() || isSaving} onClick={() => roleMutation.mutate(roleForm)}>
-            {t('common:actions.save', 'Save')}
+            {t('common:actions.save')}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={memberDialogOpen} onClose={() => setMemberDialogOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle sx={{ fontWeight: 900 }}>
-          {memberForm.id ? t('employer:company.team.editMember', 'Edit member') : t('employer:company.team.createMember', 'Add member')}
+          {memberForm.id ? t('employer:company.team.editMember') : t('employer:company.team.createMember')}
         </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
-            <TextField label={t('employer:company.team.userId', 'User ID')} type="number" value={memberForm.userId} disabled={Boolean(memberForm.id)} onChange={(event) => setMemberForm((prev) => ({ ...prev, userId: event.target.value }))} fullWidth />
+            <TextField label={t('employer:company.team.userId')} type="number" value={memberForm.userId} disabled={Boolean(memberForm.id)} onChange={(event) => setMemberForm((prev) => ({ ...prev, userId: event.target.value }))} fullWidth />
             <FormControl fullWidth>
-              <InputLabel>{t('employer:company.team.roleName', 'Role')}</InputLabel>
-              <Select label={t('employer:company.team.roleName', 'Role')} value={memberForm.roleId} onChange={(event) => setMemberForm((prev) => ({ ...prev, roleId: event.target.value }))}>
+              <InputLabel>{t('employer:company.team.roleName')}</InputLabel>
+              <Select label={t('employer:company.team.roleName')} value={memberForm.roleId} onChange={(event) => setMemberForm((prev) => ({ ...prev, roleId: event.target.value }))}>
                 {roles.map((role) => (
                   <MenuItem key={role.id} value={String(role.id)}>{role.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
             <FormControl fullWidth>
-              <InputLabel>{t('employer:company.team.status', 'Status')}</InputLabel>
-              <Select label={t('employer:company.team.status', 'Status')} value={memberForm.status} onChange={(event) => setMemberForm((prev) => ({ ...prev, status: event.target.value }))}>
-                <MenuItem value="ACTIVE">{t('employer:company.team.statusActive', 'Active')}</MenuItem>
-                <MenuItem value="INVITED">{t('employer:company.team.statusInvited', 'Invited')}</MenuItem>
-                <MenuItem value="DISABLED">{t('employer:company.team.statusDisabled', 'Disabled')}</MenuItem>
+              <InputLabel>{t('employer:company.team.status')}</InputLabel>
+              <Select label={t('employer:company.team.status')} value={memberForm.status} onChange={(event) => setMemberForm((prev) => ({ ...prev, status: event.target.value }))}>
+                <MenuItem value="ACTIVE">{t('employer:company.team.statusActive')}</MenuItem>
+                <MenuItem value="INVITED">{t('employer:company.team.statusInvited')}</MenuItem>
+                <MenuItem value="DISABLED">{t('employer:company.team.statusDisabled')}</MenuItem>
               </Select>
             </FormControl>
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setMemberDialogOpen(false)}>{t('common:actions.cancel', 'Cancel')}</Button>
+          <Button onClick={() => setMemberDialogOpen(false)}>{t('common:actions.cancel')}</Button>
           <Button variant="contained" disabled={!memberForm.userId || !memberForm.roleId || isSaving} onClick={() => memberMutation.mutate(memberForm)}>
-            {t('common:actions.save', 'Save')}
+            {t('common:actions.save')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -2,11 +2,12 @@
 import base64
 
 import pytest
+from django.db.models import Max
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from apps.content.models import Article, Feedback
+from apps.content.models import Article, Banner, BannerType, Feedback
 from shared.helpers.cloudinary_service import CloudinaryService
 
 
@@ -21,6 +22,25 @@ def _article_payload(response):
 
 @pytest.mark.django_db
 class TestFeedbackAPI:
+    def test_feedback_serializers_reject_rating_outside_star_range(self):
+        from apps.content.serializers import AdminFeedbackSerializer, FeedbackSerializer
+
+        public_feedback = FeedbackSerializer(
+            data={
+                "rating": 6,
+                "content": "Rating is out of range",
+            }
+        )
+        admin_feedback = AdminFeedbackSerializer(
+            data={"rating": 0},
+            partial=True,
+        )
+
+        assert public_feedback.is_valid() is False
+        assert "rating" in public_feedback.errors
+        assert admin_feedback.is_valid() is False
+        assert "rating" in admin_feedback.errors
+
     def test_create_feedback_accepts_evidence_image_and_admin_can_view_it(
         self,
         monkeypatch,
@@ -81,6 +101,125 @@ class TestFeedbackAPI:
             item for item in admin_payload["results"] if item["id"] == feedback.id
         )
         assert admin_feedback["evidenceImageUrl"]
+
+
+@pytest.mark.django_db
+class TestBannerAdminValidation:
+    def test_banner_model_default_platform_matches_platform_choices(self):
+        if not BannerType.objects.filter(is_active=True).exists():
+            next_value = (BannerType.objects.aggregate(max_value=Max("value"))["max_value"] or 0) + 1
+            BannerType.objects.create(
+                code="HOME_TEST",
+                name="Trang chủ",
+                value=next_value,
+                is_active=True,
+            )
+        banner_type = BannerType.objects.filter(is_active=True).order_by("value").first()
+
+        banner = Banner.objects.create(type=banner_type.value)
+
+        assert banner.platform == "WEB"
+
+    def test_admin_banner_serializer_rejects_type_outside_active_banner_types(self):
+        from apps.content.serializers import AdminBannerSerializer
+
+        if not BannerType.objects.filter(is_active=True).exists():
+            next_value = (BannerType.objects.aggregate(max_value=Max("value"))["max_value"] or 0) + 1
+            BannerType.objects.create(
+                code="HOME_TEST",
+                name="Trang chủ",
+                value=next_value,
+                is_active=True,
+            )
+        invalid_type = (BannerType.objects.aggregate(max_value=Max("value"))["max_value"] or 0) + 1000
+
+        serializer = AdminBannerSerializer(
+            data={"type": invalid_type},
+            partial=True,
+        )
+
+        assert serializer.is_valid() is False
+        assert "type" in serializer.errors
+
+    def test_admin_banner_serializer_rejects_invalid_button_link(self):
+        from apps.content.serializers import AdminBannerSerializer
+
+        serializer = AdminBannerSerializer(
+            data={"button_link": "not-a-url"},
+            partial=True,
+        )
+
+        assert serializer.is_valid() is False
+        assert "button_link" in serializer.errors
+
+    def test_admin_banner_type_ordering_ignores_invalid_fields_and_keeps_valid_sort(self, admin_user):
+        BannerType.objects.all().delete()
+        BannerType.objects.create(
+            code="ALPHA",
+            name="Alpha banner",
+            value=10,
+            is_active=True,
+        )
+        BannerType.objects.create(
+            code="OMEGA",
+            name="Omega banner",
+            value=20,
+            is_active=True,
+        )
+
+        client = APIClient()
+        client.force_authenticate(user=admin_user)
+
+        invalid_response = client.get("/api/content/web/admin/banner-types/?ordering=not_a_model_field")
+        valid_response = client.get("/api/content/web/admin/banner-types/?ordering=-name")
+
+        assert invalid_response.status_code == 200
+        assert valid_response.status_code == 200
+        valid_payload = _article_payload(valid_response)
+        assert [item["name"] for item in valid_payload["results"][:2]] == [
+            "Omega banner",
+            "Alpha banner",
+        ]
+
+
+@pytest.mark.django_db
+class TestArticleValidation:
+    def test_admin_article_serializer_allows_missing_slug_for_auto_generation(self):
+        from apps.content.serializers import AdminArticleSerializer
+
+        serializer = AdminArticleSerializer(
+            data={
+                "title": "Auto generated slug",
+                "content": "<p>Article content</p>",
+                "category": Article.CATEGORY_NEWS,
+                "status": Article.STATUS_DRAFT,
+            },
+        )
+
+        assert serializer.is_valid() is True
+
+    def test_article_serializers_reject_html_without_text_content(self):
+        from apps.content.serializers import AdminArticleSerializer, EmployerArticleSerializer
+
+        admin_article = AdminArticleSerializer(
+            data={
+                "title": "Empty article",
+                "content": "<p><br></p>",
+                "category": Article.CATEGORY_NEWS,
+                "status": Article.STATUS_DRAFT,
+            },
+        )
+        employer_article = EmployerArticleSerializer(
+            data={
+                "title": "Empty employer blog",
+                "content": "<p>&nbsp;</p>",
+            },
+        )
+
+        assert admin_article.is_valid() is False
+        assert "content" in admin_article.errors
+        assert employer_article.is_valid() is False
+        assert "content" in employer_article.errors
 
 
 @pytest.mark.django_db

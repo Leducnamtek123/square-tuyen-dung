@@ -55,6 +55,11 @@
   "loading": "Đang tải...",
   "noData": "Không có dữ liệu",
   "noOptions": "Không có lựa chọn",
+  "autocomplete": {
+    "clear": "Xóa lựa chọn",
+    "open": "Mở danh sách",
+    "close": "Đóng danh sách"
+  },
   "viewDetails": "Xem chi tiết",
   "company": {
     "defaultDescription": "Môi trường làm việc năng động, sáng tạo với nhiều cơ hội thăng tiến và phát triển sự nghiệp.",
@@ -278,6 +283,7 @@
     "placeholder": "Chia sẻ trải nghiệm của bạn...",
     "submit": "Gửi phản hồi",
     "ratingRequired": "Vui lòng chọn mức đánh giá.",
+    "ratingInvalid": "Mức đánh giá phải từ 1 đến 5 sao.",
     "contentRequired": "Vui lòng nhập nội dung phản hồi.",
     "contentMax": "Nội dung phản hồi vượt quá độ dài cho phép.",
     "success": "Gửi phản hồi thành công.",
@@ -358,6 +364,9 @@
   "loadPreviousMessages": "Tải tin nhắn cũ hơn",
   "typeAMessage": "Gõ tin nhắn...",
   "chatRooms": "Các cuộc trò chuyện",
+  "chatCard": {
+    "openChat": "Mở tin nhắn"
+  },
   "appliedResume": {
     "ai": {
       "viewAnalysis": "Xem phân tích AI",
@@ -851,6 +860,7 @@
   },
   "systemError": {
     "occurred": "Đã có lỗi xảy ra.",
+    "requestFailed": "Yêu cầu chưa thể xử lý.",
     "tryAgain": "Vui lòng thử lại sau.",
     "reload": "Tải lại trang."
   },
@@ -884,6 +894,71 @@
   "interview": {
     "forceEndSuccess": "Đã yêu cầu kết thúc buổi phỏng vấn",
     "recordingWaiting": "Buổi phỏng vấn đã kết thúc, hệ thống đang chờ video ghi hình đồng bộ về để hiển thị tại đây."
+  },
+  "agentAssistant": {
+    "title": "Agent Assistants",
+    "recents": "Gần đây",
+    "newChat": "Đoạn chat mới",
+    "ready": "Sẵn sàng",
+    "empty": "Agent đang sẵn sàng",
+    "placeholder": "Nhắn cho agent...",
+    "send": "Gửi",
+    "deleteHistory": "Xóa lịch sử chat",
+    "deleteCurrentHistory": "Xóa lịch sử chat đang mở",
+    "deleteError": "Không thể xóa lịch sử chat này. Vui lòng thử lại.",
+    "loadError": "Không thể tải Agent Assistants. Vui lòng thử lại.",
+    "sendError": "Agent chưa chạy được yêu cầu này. Vui lòng kiểm tra nội dung và thử lại.",
+    "thinking": "Agent đang suy nghĩ...",
+    "portals": {
+      "admin": "Square Admin",
+      "employer": "Square Employer"
+    },
+    "threadGroups": {
+      "today": "Hôm nay",
+      "yesterday": "Hôm qua",
+      "thisWeek": "Tuần này",
+      "earlier": "Trước đó"
+    },
+    "status": {
+      "pending": "Chờ chạy",
+      "running": "Đang chạy",
+      "succeeded": "Hoàn tất",
+      "failed": "Lỗi"
+    },
+    "tools": {
+      "create_manual_candidate": "Tạo hồ sơ ứng viên",
+      "search_candidates": "Tìm ứng viên",
+      "update_application_status": "Cập nhật trạng thái hồ sơ",
+      "list_job_posts": "Liệt kê tin tuyển dụng",
+      "list_applications": "Liệt kê hồ sơ ứng tuyển",
+      "list_companies": "Liệt kê công ty",
+      "review_job_post": "Duyệt tin tuyển dụng",
+      "create_question": "Tạo câu hỏi",
+      "list_questions": "Liệt kê câu hỏi",
+      "create_question_group": "Tạo bộ câu hỏi",
+      "list_question_groups": "Liệt kê bộ câu hỏi",
+      "list_interviews": "Liệt kê phỏng vấn"
+    },
+    "rows": {
+      "candidate": "Ứng viên",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "jobPost": "Tin tuyển dụng",
+      "company": "Công ty",
+      "status": "Trạng thái",
+      "question": "Câu hỏi",
+      "questionGroup": "Bộ câu hỏi",
+      "questionsCount": "Số câu hỏi",
+      "interviewId": "Mã phỏng vấn",
+      "applicationId": "Mã hồ sơ",
+      "jobPostId": "Mã tin"
+    },
+    "results": {
+      "title": "Kết quả",
+      "fallback": "Kết quả {{index}}",
+      "more": "Và {{count}} kết quả khác.",
+      "openRecord": "Mở bản ghi"
+    }
   },
   "sidebarHeader": {
     "backToHome": "Về trang chủ",

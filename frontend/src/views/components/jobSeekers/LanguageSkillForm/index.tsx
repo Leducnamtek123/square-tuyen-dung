@@ -4,11 +4,13 @@ import { useForm } from 'react-hook-form';
 import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { Grid2 as Grid } from '@mui/material';
 
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import RatingCustom from '../../../../components/Common/Controls/RatingCustom';
 import { useConfig } from '@/hooks/useConfig';
+import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';
 
 export interface FormValues {
   language: number | string;
@@ -26,6 +28,20 @@ const initialValues: FormValues = {
   level: 0,
 };
 
+export const createLanguageSkillSchema = (t: TFunction<string | string[], undefined>) =>
+  yup.object().shape({
+    language: yup
+      .number()
+      .required(t('jobSeeker:profile.validation.languageRequired'))
+      .oneOf(BACKEND_CHOICE_VALUES.language, t('jobSeeker:profile.validation.choiceInvalid'))
+      .typeError(t('jobSeeker:profile.validation.languageRequired')),
+    level: yup
+      .number()
+      .required(t('jobSeeker:profile.validation.levelRequired'))
+      .min(1, t('jobSeeker:profile.validation.levelRequired'))
+      .oneOf(BACKEND_CHOICE_VALUES.languageLevel, t('jobSeeker:profile.validation.levelInvalid')),
+  });
+
 const LanguageSkillFormContent = ({
   handleAddOrUpdate,
   serverErrors,
@@ -39,11 +55,7 @@ const LanguageSkillFormContent = ({
   const { allConfig } = useConfig();
 
   const schema = React.useMemo(
-    () =>
-      yup.object().shape({
-        language: yup.string().required(t('jobSeeker:profile.validation.languageRequired')).typeError(t('jobSeeker:profile.validation.languageRequired')),
-        level: yup.number().required(t('jobSeeker:profile.validation.levelRequired')).min(1, t('jobSeeker:profile.validation.levelRequired')),
-      }),
+    () => createLanguageSkillSchema(t),
     [t]
   );
 

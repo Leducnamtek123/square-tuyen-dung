@@ -76,7 +76,7 @@ const FeedbackCarousel = () => {
             ))}
           </Swiper>
         ) : feedbacks.length === 0 ? (
-          <NoDataCard title={t("home.noFeedbacks", "Chưa có người dùng nào đánh giá")} />
+          <NoDataCard title={t("home.noFeedbacks")} />
         ) : (
           <Swiper
             slidesPerView={col}

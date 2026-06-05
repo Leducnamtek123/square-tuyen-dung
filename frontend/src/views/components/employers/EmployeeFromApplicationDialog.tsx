@@ -13,6 +13,11 @@ import {
 import type { TFunction } from 'i18next';
 import type { JobPostActivity } from '@/types/models';
 import type { EmployeeFromApplicationPayload } from '@/services/hrmService';
+import {
+  buildEmployeeFromApplicationPayload,
+  hasEmployeeAccountEmail,
+  type EmployeeFromApplicationFormState,
+} from './employeeFromApplicationDialogState';
 
 type Props = {
   open: boolean;
@@ -26,7 +31,7 @@ type Props = {
 const today = () => new Date().toISOString().slice(0, 10);
 
 const EmployeeFromApplicationDialog = ({ open, activity, loading, onClose, onSubmit, t }: Props) => {
-  const [form, setForm] = React.useState({
+  const [form, setForm] = React.useState<EmployeeFromApplicationFormState>({
     fullName: '',
     email: '',
     phone: '',
@@ -41,14 +46,16 @@ const EmployeeFromApplicationDialog = ({ open, activity, loading, onClose, onSub
 
   React.useEffect(() => {
     if (!activity) return;
+    const activityEmail = activity.email || '';
+    const canCreateHrmAccount = hasEmployeeAccountEmail(activityEmail);
     setForm({
       fullName: activity.fullName || '',
-      email: activity.email || '',
+      email: activityEmail,
       phone: activity.phone || '',
       jobTitle: activity.jobName || activity.jobPost?.jobName || '',
       department: '',
       startDate: today(),
-      createHrmAccount: true,
+      createHrmAccount: canCreateHrmAccount,
       sendWelcomeEmail: false,
       hrmRoles: 'Employee',
       notes: '',
@@ -56,6 +63,7 @@ const EmployeeFromApplicationDialog = ({ open, activity, loading, onClose, onSub
   }, [activity]);
 
   if (!activity) return null;
+  const hasEmail = hasEmployeeAccountEmail(form.email);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -63,28 +71,34 @@ const EmployeeFromApplicationDialog = ({ open, activity, loading, onClose, onSub
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           <TextField label={t('employer:employees.hrm.fields.fullName')} value={form.fullName} onChange={(e) => setForm((prev) => ({ ...prev, fullName: e.target.value }))} fullWidth required />
-          <TextField label={t('employer:employees.hrm.fields.email')} value={form.email} onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))} fullWidth />
+          <TextField
+            label={t('employer:employees.hrm.fields.email')}
+            value={form.email}
+            onChange={(e) => {
+              const email = e.target.value;
+              setForm((prev) => ({
+                ...prev,
+                email,
+                createHrmAccount: hasEmployeeAccountEmail(email) ? prev.createHrmAccount : false,
+                sendWelcomeEmail: hasEmployeeAccountEmail(email) ? prev.sendWelcomeEmail : false,
+              }));
+            }}
+            fullWidth
+          />
           <TextField label={t('employer:employees.hrm.fields.phone')} value={form.phone} onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))} fullWidth />
           <TextField label={t('employer:employees.hrm.fields.jobTitle')} value={form.jobTitle} onChange={(e) => setForm((prev) => ({ ...prev, jobTitle: e.target.value }))} fullWidth required />
           <TextField label={t('employer:employees.hrm.fields.department')} value={form.department} onChange={(e) => setForm((prev) => ({ ...prev, department: e.target.value }))} fullWidth />
           <TextField type="date" label={t('employer:employees.hrm.fields.startDate')} value={form.startDate} onChange={(e) => setForm((prev) => ({ ...prev, startDate: e.target.value }))} fullWidth slotProps={{ inputLabel: { shrink: true } }} />
           <Stack>
             <FormControlLabel
-              control={<Checkbox checked={form.createHrmAccount} onChange={(e) => setForm((prev) => ({ ...prev, createHrmAccount: e.target.checked }))} />}
-              label={t('employer:employees.hrm.convert.createHrmAccount', { defaultValue: 'Create HRM account' })}
+              control={<Checkbox checked={form.createHrmAccount} disabled={!hasEmail} onChange={(e) => setForm((prev) => ({ ...prev, createHrmAccount: e.target.checked, sendWelcomeEmail: e.target.checked ? prev.sendWelcomeEmail : false }))} />}
+              label={t('employer:employees.hrm.convert.createHrmAccount')}
             />
             <FormControlLabel
               control={<Checkbox checked={form.sendWelcomeEmail} disabled={!form.createHrmAccount} onChange={(e) => setForm((prev) => ({ ...prev, sendWelcomeEmail: e.target.checked }))} />}
-              label={t('employer:employees.hrm.convert.sendWelcomeEmail', { defaultValue: 'Send HRM welcome email' })}
+              label={t('employer:employees.hrm.convert.sendWelcomeEmail')}
             />
           </Stack>
-          <TextField
-            label={t('employer:employees.hrm.convert.roles', { defaultValue: 'HRM roles' })}
-            value={form.hrmRoles}
-            onChange={(e) => setForm((prev) => ({ ...prev, hrmRoles: e.target.value }))}
-            fullWidth
-            disabled={!form.createHrmAccount}
-          />
           <TextField label={t('employer:employees.hrm.fields.notes')} value={form.notes} onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))} fullWidth multiline minRows={3} />
         </Stack>
       </DialogContent>
@@ -93,19 +107,7 @@ const EmployeeFromApplicationDialog = ({ open, activity, loading, onClose, onSub
         <Button
           variant="contained"
           disabled={loading || !form.fullName.trim() || !form.jobTitle.trim()}
-          onClick={() => onSubmit({
-            applicationId: activity.id,
-            fullName: form.fullName.trim(),
-            email: form.email.trim() || undefined,
-            phone: form.phone.trim() || undefined,
-            jobTitle: form.jobTitle.trim(),
-            department: form.department.trim() || undefined,
-            startDate: form.startDate || null,
-            createHrmAccount: form.createHrmAccount,
-            sendWelcomeEmail: form.createHrmAccount && form.sendWelcomeEmail,
-            hrmRoles: form.createHrmAccount ? form.hrmRoles.split(',').map((role) => role.trim()).filter(Boolean) : [],
-            notes: form.notes.trim() || undefined,
-          })}
+          onClick={() => onSubmit(buildEmployeeFromApplicationPayload(activity.id, form))}
         >
           {t('employer:employees.hrm.convert.submit')}
         </Button>

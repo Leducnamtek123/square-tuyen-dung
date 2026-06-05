@@ -82,7 +82,7 @@ const JobPostFilterForm = ({ handleFilter }: JobPostFilterFormProps) => {
           >
             <Tooltip title={t('jobPost.filters.reset')} arrow>
               <IconButton
-                aria-label={t('jobPostFilterForm.label.refresh', 'refresh')}
+                aria-label={t('jobPostFilterForm.label.refresh')}
                 onClick={() => {
                   reset();
                   handleFilter(defaultValues as JobPostFilterFormValues);

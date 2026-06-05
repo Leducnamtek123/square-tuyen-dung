@@ -26,11 +26,11 @@ type Props = {
 };
 
 const REPORT_REASONS = [
-  { value: 'scam', label: 'jobDetail.reportReasons.scam', fallback: 'Scam or fraud' },
-  { value: 'wrong_info', label: 'jobDetail.reportReasons.wrongInfo', fallback: 'Wrong or misleading information' },
-  { value: 'spam', label: 'jobDetail.reportReasons.spam', fallback: 'Spam' },
-  { value: 'duplicate', label: 'jobDetail.reportReasons.duplicate', fallback: 'Duplicate post' },
-  { value: 'other', label: 'jobDetail.reportReasons.other', fallback: 'Other' },
+  { value: 'scam', label: 'jobDetail.reportReasons.scam' },
+  { value: 'wrong_info', label: 'jobDetail.reportReasons.wrongInfo' },
+  { value: 'spam', label: 'jobDetail.reportReasons.spam' },
+  { value: 'duplicate', label: 'jobDetail.reportReasons.duplicate' },
+  { value: 'other', label: 'jobDetail.reportReasons.other' },
 ];
 
 const REPORT_FORM_DEFAULT_VALUES: TrustReportFormValues = {
@@ -65,7 +65,7 @@ const TrustReportDialogContent = ({
         company: companyId ?? null,
       };
       await trustReportService.createTrustReport(payload);
-      toastMessages.success(t('public:jobDetail.reportSuccess', 'Report sent successfully.'));
+      toastMessages.success(t('public:jobDetail.reportSuccess'));
       shouldClose = true;
     } catch (error) {
       errorHandling(error);
@@ -85,8 +85,8 @@ const TrustReportDialogContent = ({
   };
 
   const title = targetType === 'job'
-    ? t('public:jobDetail.reportJobTitle', 'Report job post')
-    : t('public:companyDetail.reportCompanyTitle', 'Report company');
+    ? t('public:jobDetail.reportJobTitle')
+    : t('public:companyDetail.reportCompanyTitle');
 
   return (
     <>
@@ -94,7 +94,7 @@ const TrustReportDialogContent = ({
         title={(
           <Stack spacing={0.5}>
             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-              {t('public:jobDetail.reportCaption', 'Trust & Safety')}
+              {t('public:jobDetail.reportCaption')}
             </Typography>
             <Typography variant="h6">{title}</Typography>
             {targetName ? (
@@ -106,7 +106,7 @@ const TrustReportDialogContent = ({
         ) as React.ReactElement}
         openPopup={openPopup}
         setOpenPopup={handleOpenPopupChange}
-        buttonText={t('common:actions.submit', 'Submit')}
+        buttonText={t('common:actions.submit')}
         buttonIcon={null}
         isSubmitting={isSubmitting}
       >
@@ -120,11 +120,11 @@ const TrustReportDialogContent = ({
                   {...field}
                   select
                   fullWidth
-                  label={t('public:jobDetail.reportReasonLabel', 'Reason')}
+                  label={t('public:jobDetail.reportReasonLabel')}
                 >
                   {REPORT_REASONS.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
-                      {t(`public:${option.label}`, option.fallback)}
+                      {t(`public:${option.label}`)}
                     </MenuItem>
                   ))}
                 </TextField>
@@ -139,8 +139,8 @@ const TrustReportDialogContent = ({
                   fullWidth
                   multiline
                   minRows={4}
-                  label={t('public:jobDetail.reportMessageLabel', 'Additional details')}
-                  placeholder={t('public:jobDetail.reportMessagePlaceholder', 'Tell us what looks wrong or misleading.')}
+                  label={t('public:jobDetail.reportMessageLabel')}
+                  placeholder={t('public:jobDetail.reportMessagePlaceholder')}
                 />
               )}
             />

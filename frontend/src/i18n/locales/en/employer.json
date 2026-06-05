@@ -86,7 +86,9 @@
       "resend": "Resend",
       "send": "Send email",
       "resendTooltip": "Resend email",
-      "sendTooltip": "Send email"
+      "sendTooltip": "Send email",
+      "missingCandidateEmail": "This profile has no candidate email, so email cannot be sent.",
+      "invalidCandidateEmail": "This candidate email is invalid, so email cannot be sent."
     },
     "status": {
       "updateTitle": "Update application status",
@@ -205,10 +207,14 @@
       "fullNameMax": "Candidate name must be at most 150 characters.",
       "emailInvalid": "Email is invalid.",
       "emailMax": "Email must be at most 254 characters.",
+      "phoneInvalid": "Phone number is invalid.",
       "phoneMax": "Phone must be at most 20 characters.",
+      "filePdfOnly": "Only PDF files are accepted.",
+      "fileTooLarge": "PDF file must be 10MB or smaller.",
       "titleRequired": "Please enter role/profile title.",
       "titleMax": "Title must be at most 200 characters.",
       "salaryInvalid": "Salary is invalid.",
+      "salaryTooLarge": "Salary exceeds the allowed limit.",
       "salaryRangeInvalid": "Maximum salary must be greater than or equal to minimum salary.",
       "descriptionMax": "Description must be at most 800 characters.",
       "skillsSummaryMax": "Skills must be at most 2000 characters.",
@@ -321,7 +327,7 @@
       "postgraduate": "Postgraduate",
       "university": "University",
       "college": "College",
-      "vocational/intermediate": "Vocational / Intermediate",
+      "vocationalintermediate": "Vocational / Intermediate",
       "highschool": "High School",
       "certificate": "Certificate"
     }
@@ -386,6 +392,15 @@
     },
     "validation": {
       "companyNameRequired": "Company name is required",
+      "taxCodeRequired": "Tax code is required",
+      "employeeSizeRequired": "Company size is required",
+      "fieldOperationRequired": "Field of operation is required",
+      "companyEmailRequired": "Company email is required",
+      "companyEmailInvalid": "Company email is invalid",
+      "companyEmailMax": "Company email must be at most 100 characters",
+      "companyPhoneRequired": "Company phone is required",
+      "companyPhoneInvalid": "Company phone is invalid",
+      "companyPhoneMax": "Company phone must be at most 15 characters",
       "foundedDateInFuture": "Founded date cannot be in the future.",
       "employeeSizeInvalid": "Invalid company size."
     }
@@ -537,6 +552,8 @@
       "minSalaryLess": "Minimum salary must be less than or equal to maximum salary.",
       "maximumsalaryisrequired": "Maximum salary is required.",
       "invalidmaximumsalary": "Invalid maximum salary.",
+      "salaryTooLarge": "Salary exceeds the allowed limit.",
+      "choiceInvalid": "Invalid selection.",
       "maxSalaryGreater": "Maximum salary must be greater than or equal to minimum salary.",
       "academiclevelisrequired": "Academic level is required.",
       "applicationdeadlineisrequired": "Application deadline is required.",
@@ -744,10 +761,24 @@
       "enterrecipientname": "Enter recipient name",
       "enterrecipientemail": "Enter recipient email",
       "enteremailsubject": "Enter email subject"
+    },
+    "actions": {
+      "send": "Send email"
+    },
+    "validation": {
+      "emailRequired": "Recipient email is required.",
+      "emailInvalid": "Recipient email is invalid.",
+      "emailMax": "Recipient email must be at most 100 characters.",
+      "recipientNameRequired": "Recipient name is required.",
+      "recipientNameMax": "Recipient name must be at most 100 characters.",
+      "subjectRequired": "Email subject is required.",
+      "subjectMax": "Email subject must be at most 200 characters.",
+      "contentRequired": "Email content is required."
     }
   },
   "sidebar": {
     "dashboard": "Dashboard",
+    "agentAssistants": "Agent Assistants",
     "jobPostList": "Job Post List",
     "candidateManagement": "Candidate Management",
     "appliedApplications": "Applied Applications",
@@ -932,6 +963,9 @@
     "validation": {
       "required": "This field is required.",
       "email": "Invalid email address.",
+      "phone": "Invalid phone number.",
+      "website": "Invalid website URL.",
+      "maxLength": "Maximum {{max}} characters.",
       "futureDate": "The time must be now or in the future."
     }
   },
@@ -1040,10 +1074,12 @@
         "manageCandidates": "Candidates",
         "manageInterviews": "Interviews",
         "manageQuestionBank": "Question bank",
+        "manageEmployees": "HRM employees",
         "manageMembers": "Members",
         "manageRoles": "Roles"
       },
       "roleCode": "Role code",
+      "roleDescription": "Description",
       "roleName": "Role name",
       "status": "Status",
       "statusActive": "Active",
@@ -1223,9 +1259,71 @@
   },
   "blog": {
     "title": "Recruitment Blog",
-    "subtitle": "A place to update knowledge and experience for employers. Content will be added continuously according to each topic.",
+    "subtitle": "Share hiring experience and recruitment tips from your company",
+    "newPost": "Write new post",
+    "reviewNotice": "Posts are sent to Admin for review before appearing on the website. Review usually takes up to 24 hours.",
     "filter": {
-      "title": "Blog filters"
+      "title": "Blog filters",
+      "searchPlaceholder": "Search blog posts...",
+      "status": "Status"
+    },
+    "table": {
+      "title": "Title",
+      "status": "Status",
+      "publishedAt": "Published at",
+      "viewCount": "Views",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "search": "Search",
+      "clearFilters": "Clear filters",
+      "advancedFilters": "Advanced filters",
+      "saveDraft": "Save draft",
+      "submitReview": "Submit for review",
+      "submitting": "Submitting...",
+      "changeImage": "Change image",
+      "chooseImage": "Choose thumbnail",
+      "addTag": "Add"
+    },
+    "statuses": {
+      "all": "All",
+      "draft": "Draft",
+      "pending": "Pending review",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "form": {
+      "createTitle": "Write blog post",
+      "editTitle": "Edit blog post",
+      "reviewHint": "Posts are reviewed by Admin before public display",
+      "titleLabel": "Post title",
+      "titlePlaceholder": "Share your recruitment experience...",
+      "excerptLabel": "Short excerpt",
+      "excerptPlaceholder": "Summarize the post briefly...",
+      "contentTitle": "POST CONTENT",
+      "thumbnailTitle": "THUMBNAIL",
+      "thumbnailAria": "Blog thumbnail",
+      "thumbnailAlt": "Blog thumbnail preview",
+      "tagsTitle": "TAGS",
+      "tagPlaceholder": "Enter tag..."
+    },
+    "validation": {
+      "titleRequired": "Please enter a title.",
+      "contentRequired": "Please enter post content."
+    },
+    "messages": {
+      "loadError": "Could not load blog list.",
+      "deleteConfirm": "Delete \"{{title}}\"?",
+      "deleteSuccess": "Article deleted.",
+      "deleteError": "Could not delete article.",
+      "formLoadError": "Could not load blog post.",
+      "createDraftSuccess": "Draft saved.",
+      "createReviewSuccess": "Post submitted for review.",
+      "updateDraftSuccess": "Changes saved.",
+      "updateReviewSuccess": "Post submitted for review.",
+      "saveError": "Could not save blog post."
     },
     "placeholders": {
       "exp_title": "Sharing recruitment experience",

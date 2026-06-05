@@ -249,6 +249,11 @@
     },
     "note": "Vui lòng cung cấp chính xác họ tên, email và số điện thoại để nhà tuyển dụng có thể liên hệ với bạn."
   },
+  "applyCard": {
+    "positionCaption": "Ứng tuyển vị trí",
+    "submit": "Ứng tuyển",
+    "success": "Ứng tuyển thành công."
+  },
   "company": {
     "following": "Đang theo dõi",
     "follow": "Theo dõi",
@@ -259,6 +264,51 @@
   "jobPost": {
     "remaining": "Còn {{days}} ngày",
     "timeLeft": "Còn"
+  },
+  "news": {
+    "category": {
+      "all": "Tất cả",
+      "news": "Tin tức",
+      "blog": "Blog tuyển dụng"
+    },
+    "categoryFallback": "Bài viết",
+    "topic": {
+      "all": "Tất cả chủ đề",
+      "recruitment": "Tuyển dụng",
+      "realEstate": "Bất động sản",
+      "construction": "Xây dựng",
+      "interior": "Nội thất",
+      "architecture": "Kiến trúc",
+      "portfolio": "Portfolio",
+      "skills": "Kỹ năng"
+    },
+    "views": "{{count}} lượt xem",
+    "heroEyebrow": "Tin tức & Blog tuyển dụng",
+    "heroTitle": "Tin tức và blog tuyển dụng dành cho ứng viên, nhà tuyển dụng",
+    "heroSubtitle": "Cập nhật xu hướng tuyển dụng, mẹo ứng tuyển và góc nhìn từ doanh nghiệp trong một trang công khai duy nhất.",
+    "viewAllArticles": "Xem tất cả bài viết",
+    "exploreJobs": "Khám phá việc làm",
+    "searchPlaceholder": "Tìm bài viết, chủ đề hoặc từ khóa",
+    "searchButton": "Tìm",
+    "emptyTitle": "Chưa có bài viết phù hợp",
+    "emptyContent": "Hãy thử đổi bộ lọc hoặc từ khóa tìm kiếm.",
+    "quickReadTitle": "Góc đọc nhanh",
+    "quickReadDescription": "{{total}} bài viết đang hiển thị trong kho nội dung công khai.",
+    "currentFilter": "Bộ lọc hiện tại: {{filter}}",
+    "audienceTitle": "Dành cho ứng viên và nhà tuyển dụng",
+    "audienceDescription": "Bài viết được biên tập để hỗ trợ cả hai phía: tìm việc tốt hơn và tuyển người hiệu quả hơn.",
+    "newJobsCta": "Xem việc làm mới",
+    "article": {
+      "notFoundTitle": "Không tìm thấy bài viết",
+      "notFoundContent": "Bài viết có thể đã bị xoá hoặc đường dẫn đã thay đổi.",
+      "backToNews": "Quay lại tin tức",
+      "backToList": "Quay về danh sách",
+      "emptyContent": "Nội dung đang được cập nhật.",
+      "infoTitle": "Thông tin bài viết",
+      "moreTitle": "Khám phá thêm",
+      "moreDescription": "Mở rộng góc nhìn với danh sách bài viết public dành cho ứng viên và nhà tuyển dụng.",
+      "newsHomeCta": "Về trang tin tức"
+    }
   },
   "seo": {
     "home": {

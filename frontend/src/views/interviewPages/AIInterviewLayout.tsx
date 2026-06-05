@@ -70,7 +70,7 @@ function CustomControlBar({
     <div className="flex items-center justify-center gap-3 border-t border-white/8 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl">
       <button
         type="button"
-        aria-label={isMicrophoneEnabled ? t('controls.muteMicrophone', 'Turn microphone off') : t('controls.unmuteMicrophone', 'Turn microphone on')}
+        aria-label={isMicrophoneEnabled ? t('controls.muteMicrophone') : t('controls.unmuteMicrophone')}
         onClick={() => localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)}
         className={`flex size-11 items-center justify-center rounded-full border transition-all
           ${isMicrophoneEnabled ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}
@@ -79,7 +79,7 @@ function CustomControlBar({
       </button>
       <button
         type="button"
-        aria-label={isCameraEnabled ? t('controls.turnCameraOff', 'Turn camera off') : t('controls.turnCameraOn', 'Turn camera on')}
+        aria-label={isCameraEnabled ? t('controls.turnCameraOff') : t('controls.turnCameraOn')}
         onClick={() => localParticipant.setCameraEnabled(!isCameraEnabled)}
         className={`flex size-11 items-center justify-center rounded-full border transition-all
           ${isCameraEnabled ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}
@@ -88,7 +88,7 @@ function CustomControlBar({
       </button>
       <button
         type="button"
-        aria-label={isScreenShareEnabled ? t('controls.stopScreenShare', 'Stop screen share') : t('controls.startScreenShare', 'Start screen share')}
+        aria-label={isScreenShareEnabled ? t('controls.stopScreenShare') : t('controls.startScreenShare')}
         onClick={() => localParticipant.setScreenShareEnabled(!isScreenShareEnabled)}
         className={`flex size-11 items-center justify-center rounded-full border transition-all
           ${isScreenShareEnabled ? 'border-cyan-400/40 bg-cyan-500/20 text-cyan-300' : 'border-white/15 bg-white/8 text-white hover:bg-white/15'}`}
@@ -97,7 +97,7 @@ function CustomControlBar({
       </button>
       <button
         type="button"
-        aria-label={chatOpen ? t('liveRoom.chat.close', 'Close chat') : t('liveRoom.chat.open', 'Open chat')}
+        aria-label={chatOpen ? t('liveRoom.chat.close') : t('liveRoom.chat.open')}
         onClick={() => setChatOpen(!chatOpen)}
         className={`flex size-11 items-center justify-center rounded-full border transition-all
           ${chatOpen ? 'border-cyan-400/40 bg-cyan-500/20 text-cyan-300' : 'border-white/15 bg-white/8 text-white hover:bg-white/15'}`}
@@ -124,7 +124,7 @@ function CustomControlBar({
         }`}
       >
         <FontAwesomeIcon icon={ending ? faSpinner : faPhoneSlash} className={ending ? 'animate-spin' : undefined} />
-        {ending ? t('controls.ending', 'Dang ket thuc...') : t('controls.end', 'Kết thúc')}
+        {ending ? t('controls.ending') : t('controls.end')}
       </button>
     </div>
   );
@@ -171,7 +171,7 @@ function AIParticipantTile({
   else if (isSelf) displayName = t('liveRoom.participants.you');
   else if (!displayName) {
     if (variant === 'candidate') displayName = candidateLabel;
-    else if (role === 'observer') displayName = t('liveRoom.participants.observer', 'Quan sát viên');
+    else if (role === 'observer') displayName = t('liveRoom.participants.observer');
     else displayName = t('liveRoom.participants.guest');
   }
 
@@ -306,7 +306,7 @@ function TimelineMessage({
           : participantRole === 'candidate'
             ? t('liveRoom.participants.candidate')
             : participantRole === 'observer'
-              ? t('liveRoom.participants.observer', 'Quan sát viên')
+              ? t('liveRoom.participants.observer')
               : entry.from?.name || entry.from?.identity || t('liveRoom.participants.guest');
   const isEmployer = participantRole === 'employer';
   const isCandidate = participantRole === 'candidate';
@@ -448,11 +448,11 @@ function ChatPanel({
   const sending = composerMode === 'aiControl' ? isControlSending : isSending;
   const inputPlaceholder =
     composerMode === 'aiControl'
-      ? t('liveRoom.chat.aiControlPlaceholder', 'Tell AI what to ask or say...')
+      ? t('liveRoom.chat.aiControlPlaceholder')
       : t('liveRoom.chat.placeholder');
   const sendLabel =
     composerMode === 'aiControl'
-      ? t('liveRoom.chat.aiControlSend', 'AI say')
+      ? t('liveRoom.chat.aiControlSend')
       : t('liveRoom.chat.send');
 
   useEffect(() => {
@@ -466,7 +466,7 @@ function ChatPanel({
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-sm font-bold text-white">{t('liveRoom.chat.title')}</p>
-            <p className="mt-0.5 text-xs text-zinc-500">{t('liveRoom.chat.subtitle', 'Voice and messages share the same timeline.')}</p>
+            <p className="mt-0.5 text-xs text-zinc-500">{t('liveRoom.chat.subtitle')}</p>
           </div>
           <Stack direction="row" spacing={1} alignItems="center">
             {agentState && ['thinking', 'connecting', 'initializing', 'pre-connect-buffering'].includes(agentState) && (
@@ -562,11 +562,11 @@ function ChatPanel({
               >
                 <ToggleButton value="chat">
                   <FontAwesomeIcon icon={faComment} />
-                  {t('liveRoom.chat.chatMode', 'Chat')}
+                  {t('liveRoom.chat.chatMode')}
                 </ToggleButton>
                 <ToggleButton value="aiControl">
                   <FontAwesomeIcon icon={faMicrophone} />
-                  {t('liveRoom.chat.aiControlMode', 'AI speaks')}
+                  {t('liveRoom.chat.aiControlMode')}
                 </ToggleButton>
               </ToggleButtonGroup>
             )}

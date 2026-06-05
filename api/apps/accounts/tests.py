@@ -6,6 +6,7 @@ import datetime
 import pytest
 from django.test import override_settings
 from django.utils import timezone
+from oauth2_provider.models import Application
 from rest_framework.test import APIClient
 
 from apps.accounts.models import User, ForgotPasswordToken
@@ -370,6 +371,35 @@ class TestFirebasePhoneLoginMapping:
 
         assert user is None
         assert "nhiều tài khoản" in error
+
+
+@pytest.mark.django_db
+def test_password_token_endpoint_accepts_public_client_without_secret(job_seeker_user, admin_user):
+    Application.objects.create(
+        user=admin_user,
+        name="Public Web Client",
+        client_id="public-web-client",
+        client_secret="",
+        hash_client_secret=False,
+        client_type=Application.CLIENT_PUBLIC,
+        authorization_grant_type=Application.GRANT_PASSWORD,
+    )
+
+    response = APIClient().post(
+        "/api/v1/auth/token/",
+        {
+            "grant_type": "password",
+            "client_id": "public-web-client",
+            "username": job_seeker_user.email,
+            "password": "testpass123",
+            "role_name": var_sys.JOB_SEEKER,
+        },
+        format="json",
+    )
+
+    assert response.status_code == 200
+    assert response.data["data"]["access_token"]
+    assert response.data["data"]["refresh_token"]
 
 
 @pytest.mark.django_db

@@ -6,6 +6,7 @@ import type { AdminFeedbackPayload, AdminListParams } from '../../../../services
 import toastMessages from '../../../../utils/toastMessages';
 import { Feedback } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
+import i18next from 'i18next';
 
 type UseFeedbacksResult = UseQueryResult<PaginatedResponse<Feedback>> & {
     updateFeedback: (args: { id: string | number; data: Partial<AdminFeedbackPayload> }) => Promise<Feedback>;
@@ -29,10 +30,10 @@ export const useFeedbacks = (params?: AdminListParams): UseFeedbacksResult => {
         mutationFn: ({ id, data }) => adminManagementService.updateFeedback(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-feedbacks'] });
-            toastMessages.success('Feedback updated successfully');
+            toastMessages.success(i18next.t('admin:pages.feedbacks.toast.updateSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while updating the feedback');
+            toastMessages.error(i18next.t('admin:pages.feedbacks.toast.updateError'));
             console.error(err);
         }
     });
@@ -41,10 +42,10 @@ export const useFeedbacks = (params?: AdminListParams): UseFeedbacksResult => {
         mutationFn: (id: string | number) => adminManagementService.deleteFeedback(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-feedbacks'] });
-            toastMessages.success('Feedback deleted successfully');
+            toastMessages.success(i18next.t('admin:pages.feedbacks.toast.deleteSuccess'));
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while deleting the feedback');
+            toastMessages.error(i18next.t('admin:pages.feedbacks.toast.deleteError'));
             console.error(err);
         }
     });

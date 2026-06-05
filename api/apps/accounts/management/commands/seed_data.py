@@ -22,6 +22,20 @@ def required_env(name):
     return value
 
 
+def get_oauth_client_config():
+    client_id = required_env('CLIENT_ID')
+    requested_client_type = os.getenv('OAUTH_CLIENT_TYPE', Application.CLIENT_PUBLIC).strip().lower()
+    client_type = (
+        Application.CLIENT_CONFIDENTIAL
+        if requested_client_type == Application.CLIENT_CONFIDENTIAL
+        else Application.CLIENT_PUBLIC
+    )
+    client_secret = os.getenv('CLIENT_SECRET', '')
+    if client_type == Application.CLIENT_CONFIDENTIAL and not client_secret:
+        raise RuntimeError("CLIENT_SECRET is required for confidential OAuth2 application seed data.")
+    return client_id, client_secret, client_type
+
+
 class Command(BaseCommand):
     help = 'Seed initial data for development - Construction & Design Industry'
 
@@ -52,8 +66,7 @@ class Command(BaseCommand):
             Career.objects.get_or_create(name='Cơ khí')
 
             # 2.5. OAuth Application
-            client_id = required_env('CLIENT_ID')
-            client_secret = required_env('CLIENT_SECRET')
+            client_id, client_secret, client_type = get_oauth_client_config()
 
             admin_user = User.objects.filter(is_superuser=True).first()
             if not admin_user:
@@ -66,13 +79,20 @@ class Command(BaseCommand):
             app, created = Application.objects.get_or_create(
                 client_id=client_id,
                 defaults={
-                    'client_type': Application.CLIENT_CONFIDENTIAL,
+                    'client_type': client_type,
                     'authorization_grant_type': Application.GRANT_PASSWORD,
                     'name': 'Project Web App',
                     'user': admin_user
                 }
             )
-            app.client_secret = client_secret
+            app.client_type = client_type
+            app.authorization_grant_type = Application.GRANT_PASSWORD
+            if client_type == Application.CLIENT_CONFIDENTIAL:
+                app.hash_client_secret = True
+                app.client_secret = client_secret
+            else:
+                app.hash_client_secret = False
+                app.client_secret = ''
             app.user = admin_user
             app.save()
 

@@ -31,6 +31,35 @@ from common import serializers as common_serializers
 from apps.profiles import serializers as info_serializers
 
 from apps.accounts import serializers as auth_serializers
+from apps.profiles.serializers_pkg.profile_serializers import PHONE_PATTERN
+
+MAX_JOB_POST_SALARY = 2_147_483_647
+JOB_POST_CHOICE_FIELD_MAP = {
+    "position": ("position", var_sys.POSITION_CHOICES),
+    "experience": ("experience", var_sys.EXPERIENCE_CHOICES),
+    "academic_level": ("academicLevel", var_sys.ACADEMIC_LEVEL),
+    "type_of_workplace": ("typeOfWorkplace", var_sys.TYPE_OF_WORKPLACE_CHOICES),
+    "job_type": ("jobType", var_sys.JOB_TYPE_CHOICES),
+    "gender_required": ("genderRequired", var_sys.GENDER_CHOICES),
+}
+JOB_POST_NOTIFICATION_CHOICE_FIELD_MAP = {
+    "position": ("position", var_sys.POSITION_CHOICES),
+    "experience": ("experience", var_sys.EXPERIENCE_CHOICES),
+    "frequency": ("frequency", var_sys.FREQUENCY_NOTIFICATION),
+}
+
+
+def _choice_values(choices):
+    return {choice[0] for choice in choices}
+
+
+def _validate_choice_fields(attrs, field_map):
+    errors = {}
+    for model_field, (api_field, choices) in field_map.items():
+        value = attrs.get(model_field)
+        if model_field in attrs and value is not None and value not in _choice_values(choices):
+            errors[api_field] = "Invalid choice."
+    return errors
 
 class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
@@ -234,13 +263,18 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     def validate(self, attrs):
         errors = {}
+        errors.update(_validate_choice_fields(attrs, JOB_POST_CHOICE_FIELD_MAP))
 
         salary_min = attrs.get('salary_min', getattr(self.instance, 'salary_min', None))
         salary_max = attrs.get('salary_max', getattr(self.instance, 'salary_max', None))
         if 'salary_min' in attrs and attrs['salary_min'] < 0:
             errors['salaryMin'] = "Lương tối thiểu không được nhỏ hơn 0."
+        if 'salary_min' in attrs and attrs['salary_min'] > MAX_JOB_POST_SALARY:
+            errors['salaryMin'] = "Salary exceeds the allowed limit."
         if 'salary_max' in attrs and attrs['salary_max'] < 0:
             errors['salaryMax'] = "Lương tối đa không được nhỏ hơn 0."
+        if 'salary_max' in attrs and attrs['salary_max'] > MAX_JOB_POST_SALARY:
+            errors['salaryMax'] = "Salary exceeds the allowed limit."
         if salary_min is not None and salary_max is not None and salary_min > salary_max:
             errors['salaryMax'] = "Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu."
 
@@ -249,6 +283,14 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
         if 'deadline' in attrs and attrs['deadline'] < timezone.localdate():
             errors['deadline'] = "Hạn nộp hồ sơ không được trong quá khứ."
+
+        contact_person_phone = attrs.get('contact_person_phone')
+        if (
+            'contact_person_phone' in attrs
+            and contact_person_phone
+            and not PHONE_PATTERN.fullmatch(str(contact_person_phone).strip())
+        ):
+            errors['contactPersonPhone'] = "Invalid phone number."
 
         if errors:
             raise serializers.ValidationError(errors)
@@ -461,6 +503,10 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
         return super().to_internal_value(data)
 
     def validate(self, attrs):
+        phone = attrs.get('phone')
+        if phone and not PHONE_PATTERN.fullmatch(str(phone).strip()):
+            raise serializers.ValidationError({"phone": "Invalid phone number."})
+
         job_post = attrs.get('job_post')
         if job_post:
             if job_post.status != var_sys.JobPostStatus.APPROVED:
@@ -707,11 +753,11 @@ class EmployerJobPostActivityExportSerializer(DynamicFieldsMixin, serializers.Mo
 
     phone = serializers.ReadOnlyField()
 
-    gender = serializers.ReadOnlyField(source="resume.job_seeker_profile.gender")
+    gender = serializers.SerializerMethodField(method_name="get_gender")
 
-    birthday = serializers.ReadOnlyField(source="resume.job_seeker_profile.birthday")
+    birthday = serializers.SerializerMethodField(method_name="get_birthday")
 
-    address = serializers.ReadOnlyField(source="resume.job_seeker_profile.location.city.name")
+    address = serializers.SerializerMethodField(method_name="get_address")
 
     jobName = serializers.ReadOnlyField(source="job_post.job_name")
 
@@ -725,6 +771,27 @@ class EmployerJobPostActivityExportSerializer(DynamicFieldsMixin, serializers.Mo
         if getattr(job_post_activity, "manual_candidate_profile", None):
             return job_post_activity.manual_candidate_profile.title
         return ""
+
+    def _profile(self, job_post_activity):
+        resume = getattr(job_post_activity, "resume", None)
+        return getattr(resume, "job_seeker_profile", None)
+
+    def get_gender(self, job_post_activity):
+        return getattr(self._profile(job_post_activity), "gender", "") or ""
+
+    def get_birthday(self, job_post_activity):
+        return getattr(self._profile(job_post_activity), "birthday", "") or ""
+
+    def get_address(self, job_post_activity):
+        profile = self._profile(job_post_activity)
+        location = getattr(profile, "location", None)
+        city = getattr(location, "city", None)
+        if city:
+            return getattr(city, "name", "") or ""
+
+        manual_profile = getattr(job_post_activity, "manual_candidate_profile", None)
+        manual_city = getattr(manual_profile, "city", None)
+        return getattr(manual_city, "name", "") or ""
 
 
 
@@ -781,8 +848,7 @@ class JobPostNotificationSerializer(DynamicFieldsMixin, serializers.ModelSeriali
             if attrs['salary'] < 0:
                 errors['salary'] = "Mức lương không được nhỏ hơn 0."
 
-        if 'frequency' in attrs and attrs['frequency'] not in [1, 7, 30]:
-            errors['frequency'] = "Tần suất thông báo không hợp lệ."
+        errors.update(_validate_choice_fields(attrs, JOB_POST_NOTIFICATION_CHOICE_FIELD_MAP))
 
         if errors:
             raise serializers.ValidationError(errors)

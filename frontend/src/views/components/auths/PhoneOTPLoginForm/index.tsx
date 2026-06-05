@@ -21,23 +21,13 @@ const getFirebaseAuthErrorMessage = (
 
   switch (firebaseError.code) {
     case 'auth/operation-not-allowed':
-      return t('login.phoneProviderDisabled', {
-        defaultValue:
-          'Phone sign-in is not enabled for this Firebase project, or SMS is blocked by the Firebase SMS region policy.',
-      });
+      return t('login.phoneProviderDisabled');
     case 'auth/billing-not-enabled':
-      return t('login.phoneBillingNotEnabled', {
-        defaultValue:
-          'Firebase requires Cloud Billing for real SMS phone sign-in. For testing, use a Firebase test phone number and fixed OTP code.',
-      });
+      return t('login.phoneBillingNotEnabled');
     case 'auth/too-many-requests':
-      return t('login.phoneTooManyRequests', {
-        defaultValue: 'Too many OTP requests. Please try again later.',
-      });
+      return t('login.phoneTooManyRequests');
     case 'auth/unauthorized-domain':
-      return t('login.unauthorizedDomain', {
-        defaultValue: 'This domain is not authorized for Firebase Authentication.',
-      });
+      return t('login.unauthorizedDomain');
     default:
       return firebaseError.message || t('login.phoneSendFailed');
   }
@@ -285,7 +275,7 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
     if (!normalizedPhoneNumber) {
       dispatch({
         type: 'set-error',
-        value: t('login.phoneInvalid', { defaultValue: 'Số điện thoại không hợp lệ.' }),
+        value: t('login.phoneInvalid'),
       });
       return;
     }
@@ -368,7 +358,7 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
             disabled={state.otpCode.length !== OTP_CODE_LENGTH || isLoading}
             startIcon={<VerifiedUserIcon />}
           >
-            {t('actions.verifyOTP', 'Xác thực & Đăng nhập')}
+            {t('actions.verifyOTP')}
           </StyledButton>
           <Button
             fullWidth
@@ -381,14 +371,11 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
             disabled={isLoading}
             size="small"
           >
-            {t('actions.changePhone', 'Thay đổi số điện thoại')}
+            {t('actions.changePhone')}
           </Button>
           {state.resendTimer > 0 ? (
             <Typography variant="caption" align="center" display="block">
-              {t('login.resendIn', {
-                seconds: state.resendTimer,
-                defaultValue: `Gửi lại sau ${state.resendTimer}s`,
-              })}
+              {t('login.resendIn', { seconds: state.resendTimer })}
             </Typography>
           ) : (
             <Button
@@ -398,7 +385,7 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
               disabled={isLoading}
               size="small"
             >
-              {t('actions.resendOTP', 'Gửi lại mã')}
+              {t('actions.resendOTP')}
             </Button>
           )}
           <Box id={RECAPTCHA_CONTAINER_ID} sx={{ mt: 1, display: 'flex', justifyContent: 'center' }}></Box>

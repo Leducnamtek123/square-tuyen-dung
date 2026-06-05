@@ -104,50 +104,50 @@ const EmployerQuantityStatistics = () => {
 
   const statItems = [
     {
-      title: t('statItem.title.totaljobposts', 'Total Job Posts'),
+      title: t('statItem.title.totaljobposts'),
       value: data?.totalJobPost,
       color: '#3f8600',
       Icon: DescriptionOutlinedIcon,
     },
     {
-      title: t('statItem.title.pendingjobposts', 'Pending Job Posts'),
+      title: t('statItem.title.pendingjobposts'),
       value: data?.totalJobPostingPendingApproval,
       color: '#ff9800',
       Icon: AccessTimeOutlinedIcon,
     },
     {
-      title: t('statItem.title.expiredjobposts', 'Expired Job Posts'),
+      title: t('statItem.title.expiredjobposts'),
       value: data?.totalJobPostExpired,
       color: '#cf1322',
       Icon: HighlightOffOutlinedIcon,
     },
     {
-      title: t('statItem.title.totalapplications', 'Total Applications'),
+      title: t('statItem.title.totalapplications'),
       value: data?.totalApply,
       color: '#00b0ff',
       Icon: GroupsOutlinedIcon,
     },
     {
-      title: t('statItem.title.totalinterviews', 'Total Interviews'),
+      title: t('statItem.title.totalinterviews'),
       value: data?.totalInterviews,
       color: '#7c4dff',
       Icon: VideocamOutlinedIcon,
     },
     {
-      title: t('statItem.title.completedinterviews', 'Completed Interviews'),
+      title: t('statItem.title.completedinterviews'),
       value: data?.totalInterviewsCompleted,
       color: '#00c853',
       Icon: CheckCircleOutlineIcon,
     },
     {
-      title: t('statItem.title.conversionrate', 'Conversion Rate'),
+      title: t('statItem.title.conversionrate'),
       value: data?.conversionRate,
       suffix: '%',
       color: '#ff6d00',
       Icon: TrendingUpOutlinedIcon,
     },
     {
-      title: t('statItem.title.avgaiscore', 'Avg AI Score'),
+      title: t('statItem.title.avgaiscore'),
       value: data?.avgAiOverallScore ? data.avgAiOverallScore.toFixed(1) : '0',
       suffix: '/10',
       color: '#0091ea',

@@ -16,6 +16,8 @@ from django.views.decorators.csrf import csrf_exempt
 import redis
 from django.conf import settings
 
+from apps.accounts.active_company import apply_active_company_from_request
+
 logger = logging.getLogger(__name__)
 
 
@@ -132,7 +134,7 @@ def _is_admin_user(user) -> bool:
     return role == "ADMIN" or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False)
 
 
-def _user_can_stream_session(user, session) -> bool:
+def _user_can_stream_session(user, session, request=None) -> bool:
     if not getattr(user, "is_authenticated", False):
         return False
     if _is_admin_user(user):
@@ -140,6 +142,8 @@ def _user_can_stream_session(user, session) -> bool:
     if session.created_by_id == user.id:
         return True
 
+    if request is not None:
+        apply_active_company_from_request(request)
     try:
         company = user.get_active_company()
     except Exception:
@@ -180,6 +184,7 @@ def interview_event_stream(request, session_id):
     user = _authenticate_from_token(request)
     if not user:
         return JsonResponse({"detail": "Authentication required."}, status=401)
+    request.user = user
 
     try:
         session = InterviewSession.objects.select_related(
@@ -191,7 +196,7 @@ def interview_event_stream(request, session_id):
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Session not found."}, status=404)
 
-    if not _user_can_stream_session(user, session):
+    if not _user_can_stream_session(user, session, request):
         return JsonResponse({"detail": "Forbidden."}, status=403)
 
     response = StreamingHttpResponse(

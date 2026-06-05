@@ -58,6 +58,20 @@ const AIServiceHealthBanner: React.FC = () => {
   const [services, setServices] = useState<ServiceItem[]>(initialServices);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const getStatusLabel = useCallback((status: ServiceStatus) => {
+    switch (status) {
+      case 'online':
+        return t('aiHealth.status.online');
+      case 'offline':
+        return t('aiHealth.status.offline');
+      case 'not_configured':
+        return t('aiHealth.status.notConfigured');
+      case 'checking':
+      default:
+        return t('aiHealth.status.checking');
+    }
+  }, [t]);
+
   const probe = useCallback(async () => {
     setServices((items) =>
       items.map((item) => ({ ...item, state: { ...item.state, status: 'checking' } })),
@@ -101,41 +115,42 @@ const AIServiceHealthBanner: React.FC = () => {
         fontWeight={600}
         sx={{ color: 'text.secondary', mr: 0.5, whiteSpace: 'nowrap' }}
       >
-        {t('aiHealth.title', 'AI services')}
+        {t('aiHealth.title')}
       </Typography>
 
-      {services.map(({ label, state }) => (
-        <Tooltip
-          key={label}
-          title={
-            state.status === 'online'
-              ? `${label}: Online${state.latencyMs != null ? ` (${state.latencyMs}ms)` : ''}`
-              : state.status === 'not_configured'
-                ? `${label}: Not configured`
+      {services.map(({ label, state }) => {
+        const statusLabel = getStatusLabel(state.status);
+        return (
+          <Tooltip
+            key={label}
+            title={
+              state.status === 'online'
+                ? `${label}: ${statusLabel}${state.latencyMs != null ? ` (${state.latencyMs}ms)` : ''}`
                 : state.status === 'offline'
-                  ? `${label}: Offline${state.detail ? ` - ${state.detail}` : ''}`
-                  : `${label}: Checking...`
-          }
-          placement="bottom"
-        >
-          <Chip
-            size="small"
-            icon={
-              state.status === 'checking' ? (
-                <CircularProgress size={10} sx={{ ml: '4px' }} />
-              ) : (
-                <FiberManualRecordIcon
-                  sx={{ fontSize: '10px !important', color: statusDotColor(state.status) }}
-                />
-              )
+                  ? `${label}: ${statusLabel}${state.detail ? ` - ${state.detail}` : ''}`
+                  : `${label}: ${statusLabel}`
             }
-            label={label}
-            color={statusColor(state.status)}
-            variant="outlined"
-            sx={{ fontWeight: 500, fontSize: '0.72rem' }}
-          />
-        </Tooltip>
-      ))}
+            placement="bottom"
+          >
+            <Chip
+              size="small"
+              icon={
+                state.status === 'checking' ? (
+                  <CircularProgress size={10} sx={{ ml: '4px' }} />
+                ) : (
+                  <FiberManualRecordIcon
+                    sx={{ fontSize: '10px !important', color: statusDotColor(state.status) }}
+                  />
+                )
+              }
+              label={label}
+              color={statusColor(state.status)}
+              variant="outlined"
+              sx={{ fontWeight: 500, fontSize: '0.72rem' }}
+            />
+          </Tooltip>
+        );
+      })}
     </Box>
   );
 };
