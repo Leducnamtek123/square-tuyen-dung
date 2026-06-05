@@ -3,6 +3,8 @@ import {
   normalizeBannerFormChoices,
   type BannerFormData,
 } from '../bannerFormChoices';
+import fs from 'fs';
+import path from 'path';
 
 const baseFormData: BannerFormData = {
   description: 'Hero banner',
@@ -53,6 +55,20 @@ describe('normalizeBannerFormChoices', () => {
 });
 
 describe('getBannerFormValidationErrors', () => {
+  const choiceOptions = {
+    platformOptions: [
+      { value: 'WEB', label: 'Website' },
+      { value: 'APP', label: 'Application' },
+    ],
+    typeOptions: [
+      { value: 10, label: 'Home' },
+    ],
+    descriptionLocations: [
+      { value: 1, label: 'Top left' },
+      { value: 3, label: 'Bottom left' },
+    ],
+  };
+
   it('allows an empty button link because the field is optional', () => {
     expect(
       getBannerFormValidationErrors({
@@ -80,5 +96,53 @@ describe('getBannerFormValidationErrors', () => {
         button_link: 'https://tuyendung.square.vn/jobs',
       }),
     ).toEqual({});
+  });
+
+  it('rejects banner fields that backend model and serializer would reject', () => {
+    expect(
+      getBannerFormValidationErrors({
+        ...baseFormData,
+        description: 'D'.repeat(101),
+        button_text: 'B'.repeat(21),
+        button_link: 'not-a-url',
+      }),
+    ).toEqual({
+      description: 'descriptionMax',
+      button_text: 'buttonTextMax',
+      button_link: 'buttonLinkInvalid',
+    });
+  });
+
+  it('rejects stale choices before submitting banner payload', () => {
+    expect(
+      getBannerFormValidationErrors(
+        {
+          ...baseFormData,
+          platform: 'MOBILE',
+          type: 999,
+          description_location: 99,
+        },
+        choiceOptions,
+      ),
+    ).toEqual({
+      platform: 'platformInvalid',
+      type: 'typeInvalid',
+      description_location: 'descriptionLocationInvalid',
+    });
+  });
+
+  it('wires validation into the banner form dialog', () => {
+    const dialogSource = fs.readFileSync(path.join(__dirname, '../BannerFormDialog.tsx'), 'utf8');
+    const pageSource = fs.readFileSync(path.join(__dirname, '../index.tsx'), 'utf8');
+
+    expect(dialogSource).toContain('getBannerFormValidationErrors');
+    expect(dialogSource).toContain("getBannerValidationText('description')");
+    expect(dialogSource).toContain("getBannerValidationText('button_text')");
+    expect(dialogSource).toContain("getBannerValidationText('button_link')");
+    expect(dialogSource).toContain("getBannerValidationText('platform')");
+    expect(dialogSource).toContain("getBannerValidationText('type')");
+    expect(dialogSource).toContain("getBannerValidationText('description_location')");
+    expect(dialogSource).toContain('disabled={isMutating || hasValidationErrors}');
+    expect(pageSource).toContain('getBannerValidationMessage');
   });
 });

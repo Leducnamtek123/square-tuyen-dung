@@ -17,6 +17,7 @@ import {
   getBannerFormValidationErrors,
   normalizeBannerFormChoices,
   type BannerFormData,
+  type BannerFormValidationErrors,
 } from './bannerFormChoices';
 import toastMessages from '../../../utils/toastMessages';
 
@@ -164,13 +165,8 @@ const BannersPageContent = () => {
       }];
     });
 
-    return apiTypes.length > 0
-      ? apiTypes
-      : [
-          { value: 1, label: t('pages.banners.form.typeOptions.home'), webAspectRatio: '16:5' },
-          { value: 2, label: t('pages.banners.form.typeOptions.mainJobRight'), webAspectRatio: '1:1' },
-        ];
-  }, [bannerTypesData?.results, t]);
+    return apiTypes;
+  }, [bannerTypesData?.results]);
 
   const DESCRIPTION_LOCATIONS = useMemo(
     () => [
@@ -209,15 +205,26 @@ const BannersPageContent = () => {
 
   const banners = data?.results || [];
 
+  const getBannerValidationMessage = (validationErrors: BannerFormValidationErrors) => {
+    const firstValidationKey = Object.values(validationErrors)[0];
+    return firstValidationKey ? t(`pages.banners.validation.${firstValidationKey}`) : null;
+  };
+
   const handleSave = async () => {
+    const choiceOptions = {
+      platformOptions: PLATFORM_OPTIONS,
+      typeOptions: TYPE_OPTIONS,
+      descriptionLocations: DESCRIPTION_LOCATIONS,
+    };
     const normalizedFormData = normalizeBannerFormChoices(state.formData, {
       platformOptions: PLATFORM_OPTIONS,
       typeOptions: TYPE_OPTIONS,
       descriptionLocations: DESCRIPTION_LOCATIONS,
     });
-    const validationErrors = getBannerFormValidationErrors(normalizedFormData);
-    if (validationErrors.button_link) {
-      toastMessages.error(t(`pages.banners.validation.${validationErrors.button_link}`));
+    const validationErrors = getBannerFormValidationErrors(normalizedFormData, choiceOptions);
+    const validationMessage = getBannerValidationMessage(validationErrors);
+    if (validationMessage) {
+      toastMessages.error(validationMessage);
       return;
     }
     const buttonLink = normalizedFormData.button_link.trim();

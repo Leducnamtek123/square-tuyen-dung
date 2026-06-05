@@ -176,6 +176,10 @@
       "form": {
         "name": "Career Name"
       },
+      "validation": {
+        "nameRequired": "Career name is required",
+        "nameMax": "Career name must be at most 150 characters"
+      },
       "toast": {
         "addSuccess": "Career added successfully",
         "addError": "Could not add career",
@@ -405,6 +409,32 @@
         "address": "Address",
         "latitude": "Latitude",
         "longitude": "Longitude"
+      },
+      "validation": {
+        "companyNameRequired": "Company name is required.",
+        "companyNameMax": "Company name must be at most 255 characters.",
+        "taxCodeRequired": "Tax code is required.",
+        "taxCodeMax": "Tax code must be at most 30 characters.",
+        "companyEmailRequired": "Company email is required.",
+        "companyEmailMax": "Company email must be at most 100 characters.",
+        "companyEmailInvalid": "Enter a valid company email.",
+        "companyPhoneRequired": "Company phone is required.",
+        "companyPhoneMax": "Company phone must be at most 15 characters.",
+        "companyPhoneInvalid": "Enter a valid company phone number.",
+        "employeeSizeInvalid": "Choose a valid employee size.",
+        "fieldOperationRequired": "Field of operation is required.",
+        "fieldOperationMax": "Field of operation must be at most 255 characters.",
+        "websiteUrlMax": "Website URL must be at most 300 characters.",
+        "websiteUrlInvalid": "Enter a valid website URL.",
+        "sinceInvalid": "Enter a valid founded date.",
+        "sinceFuture": "Founded date cannot be in the future.",
+        "cityRequired": "City is required.",
+        "cityInvalid": "Choose a valid city.",
+        "districtRequired": "District is required.",
+        "districtInvalid": "Choose a valid district.",
+        "wardInvalid": "Choose a valid ward.",
+        "addressRequired": "Address is required.",
+        "addressMax": "Address must be at most 255 characters."
       },
       "toast": {
         "addSuccess": "Company added successfully",
@@ -1153,7 +1183,12 @@
       "delete": "Delete",
       "deleting": "Deleting...",
       "validation": {
-        "buttonLinkInvalid": "Button link must be a valid http or https URL."
+        "descriptionMax": "Description must be at most 100 characters.",
+        "buttonTextMax": "Button text must be at most 20 characters.",
+        "buttonLinkInvalid": "Button link must be a valid http or https URL.",
+        "platformInvalid": "Choose a valid platform.",
+        "typeInvalid": "Choose an active banner type.",
+        "descriptionLocationInvalid": "Choose a valid description position."
       },
       "table": {
         "id": "ID",
@@ -1262,7 +1297,12 @@
       },
       "validation": {
         "titleRequired": "Please enter a title.",
-        "contentRequired": "Please enter article content."
+        "titleMax": "Article title must be at most 255 characters.",
+        "excerptMax": "Short excerpt must be at most 500 characters.",
+        "contentRequired": "Please enter article content.",
+        "categoryInvalid": "Choose a valid category.",
+        "statusInvalid": "Choose a valid status.",
+        "tagsMax": "Tags must be at most 500 characters."
       },
       "messages": {
         "loadError": "Could not load article list.",
@@ -1352,6 +1392,13 @@
         "defaultTestSentence": "Hello, this is Square's AI interview voice."
       },
       "validation": {
+        "nameRequired": "Voice profile name is required.",
+        "nameMax": "Voice profile name must be at most 160 characters.",
+        "languageRequired": "Language is required.",
+        "languageMax": "Language must be at most 16 characters.",
+        "presetVoiceIdRequired": "Preset voice ID is required for preset profiles.",
+        "presetVoiceIdMax": "Preset voice ID must be at most 255 characters.",
+        "consentRequired": "Consent confirmation is required for cloned voices.",
         "cloneSampleRequired": "Audio file and exact transcript are required for cloned voices.",
         "voiceNotReady": "Voice must be ready before testing.",
         "testSentenceRequired": "Enter a sentence to test this voice.",

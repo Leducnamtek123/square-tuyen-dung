@@ -176,6 +176,10 @@
       "form": {
         "name": "Tên ngành nghề"
       },
+      "validation": {
+        "nameRequired": "Vui lòng nhập tên ngành nghề",
+        "nameMax": "Tên ngành nghề tối đa 150 ký tự"
+      },
       "toast": {
         "addSuccess": "Đã thêm ngành nghề",
         "addError": "Không thể thêm ngành nghề",
@@ -405,6 +409,32 @@
         "address": "Địa chỉ",
         "latitude": "Vĩ độ",
         "longitude": "Kinh độ"
+      },
+      "validation": {
+        "companyNameRequired": "Vui lòng nhập tên công ty.",
+        "companyNameMax": "Tên công ty tối đa 255 ký tự.",
+        "taxCodeRequired": "Vui lòng nhập mã số thuế.",
+        "taxCodeMax": "Mã số thuế tối đa 30 ký tự.",
+        "companyEmailRequired": "Vui lòng nhập email công ty.",
+        "companyEmailMax": "Email công ty tối đa 100 ký tự.",
+        "companyEmailInvalid": "Vui lòng nhập email công ty hợp lệ.",
+        "companyPhoneRequired": "Vui lòng nhập số điện thoại công ty.",
+        "companyPhoneMax": "Số điện thoại công ty tối đa 15 ký tự.",
+        "companyPhoneInvalid": "Vui lòng nhập số điện thoại công ty hợp lệ.",
+        "employeeSizeInvalid": "Vui lòng chọn quy mô nhân sự hợp lệ.",
+        "fieldOperationRequired": "Vui lòng nhập lĩnh vực hoạt động.",
+        "fieldOperationMax": "Lĩnh vực hoạt động tối đa 255 ký tự.",
+        "websiteUrlMax": "Website tối đa 300 ký tự.",
+        "websiteUrlInvalid": "Vui lòng nhập website hợp lệ.",
+        "sinceInvalid": "Vui lòng nhập ngày thành lập hợp lệ.",
+        "sinceFuture": "Ngày thành lập không được ở tương lai.",
+        "cityRequired": "Vui lòng chọn tỉnh/thành.",
+        "cityInvalid": "Vui lòng chọn tỉnh/thành hợp lệ.",
+        "districtRequired": "Vui lòng chọn quận/huyện.",
+        "districtInvalid": "Vui lòng chọn quận/huyện hợp lệ.",
+        "wardInvalid": "Vui lòng chọn phường/xã hợp lệ.",
+        "addressRequired": "Vui lòng nhập địa chỉ.",
+        "addressMax": "Địa chỉ tối đa 255 ký tự."
       },
       "toast": {
         "addSuccess": "Đã thêm công ty",
@@ -1153,7 +1183,12 @@
       "delete": "Xóa",
       "deleting": "Đang xóa...",
       "validation": {
-        "buttonLinkInvalid": "Liên kết nút phải là URL http hoặc https hợp lệ."
+        "descriptionMax": "Mô tả tối đa 100 ký tự.",
+        "buttonTextMax": "Nội dung nút tối đa 20 ký tự.",
+        "buttonLinkInvalid": "Liên kết nút phải là URL http hoặc https hợp lệ.",
+        "platformInvalid": "Vui lòng chọn nền tảng hợp lệ.",
+        "typeInvalid": "Vui lòng chọn loại banner đang hoạt động.",
+        "descriptionLocationInvalid": "Vui lòng chọn vị trí mô tả hợp lệ."
       },
       "table": {
         "id": "ID",
@@ -1262,7 +1297,12 @@
       },
       "validation": {
         "titleRequired": "Vui lòng nhập tiêu đề.",
-        "contentRequired": "Vui lòng nhập nội dung."
+        "titleMax": "Tiêu đề bài viết tối đa 255 ký tự.",
+        "excerptMax": "Mô tả ngắn tối đa 500 ký tự.",
+        "contentRequired": "Vui lòng nhập nội dung.",
+        "categoryInvalid": "Vui lòng chọn danh mục hợp lệ.",
+        "statusInvalid": "Vui lòng chọn trạng thái hợp lệ.",
+        "tagsMax": "Tags tối đa 500 ký tự."
       },
       "messages": {
         "loadError": "Không thể tải danh sách bài viết.",
@@ -1352,6 +1392,13 @@
         "defaultTestSentence": "Xin chào, đây là giọng phỏng vấn AI của Square."
       },
       "validation": {
+        "nameRequired": "Vui lòng nhập tên hồ sơ giọng nói.",
+        "nameMax": "Tên hồ sơ giọng nói tối đa 160 ký tự.",
+        "languageRequired": "Vui lòng nhập ngôn ngữ.",
+        "languageMax": "Ngôn ngữ tối đa 16 ký tự.",
+        "presetVoiceIdRequired": "Vui lòng nhập ID giọng preset.",
+        "presetVoiceIdMax": "ID giọng preset tối đa 255 ký tự.",
+        "consentRequired": "Vui lòng xác nhận quyền sử dụng giọng clone.",
         "cloneSampleRequired": "Cần có file âm thanh và transcript chính xác cho giọng clone.",
         "voiceNotReady": "Giọng phải ở trạng thái sẵn sàng trước khi thử.",
         "testSentenceRequired": "Vui lòng nhập một câu để thử giọng này.",

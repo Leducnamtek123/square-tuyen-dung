@@ -8,6 +8,7 @@ import {
   DialogTitle,
   FormControl,
   FormControlLabel,
+  FormHelperText,
   InputLabel,
   MenuItem,
   Select,
@@ -20,23 +21,12 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ImageCropDialog from '../../../components/Common/ImageCropDialog';
 import { IMAGES } from '../../../configs/constants';
 import type { Banner } from '../../../types/models';
-
-type Option = {
-  value: string | number;
-  label: string;
-  webAspectRatio?: string;
-};
-
-type BannerFormData = {
-  description: string;
-  button_text: string;
-  button_link: string;
-  is_show_button: boolean;
-  is_active: boolean;
-  platform: string;
-  type: number;
-  description_location: number;
-};
+import {
+  getBannerFormValidationErrors,
+  type BannerChoiceOption,
+  type BannerFormData,
+  type BannerFormValidationErrors,
+} from './bannerFormChoices';
 
 type BannerFormDialogProps = {
   open: boolean;
@@ -58,9 +48,9 @@ type BannerFormDialogProps = {
   onFileSelect: (target: 'web' | 'mobile') => (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCropConfirm: (croppedFile: File, previewUrl: string) => Promise<void>;
   onCropCancel: () => void;
-  platformOptions: Option[];
-  typeOptions: Option[];
-  descriptionLocations: Option[];
+  platformOptions: BannerChoiceOption[];
+  typeOptions: BannerChoiceOption[];
+  descriptionLocations: BannerChoiceOption[];
   webInputRef: React.RefObject<HTMLInputElement>;
   mobileInputRef: React.RefObject<HTMLInputElement>;
   t: (key: string, params?: Record<string, unknown>) => string;
@@ -177,32 +167,78 @@ const BannerFormDialog = ({
   t,
   onPickWebImage,
   onPickMobileImage,
-}: BannerFormDialogProps) => (
-  <>
+}: BannerFormDialogProps) => {
+  const validationErrors = React.useMemo(
+    () => getBannerFormValidationErrors(formData, {
+      platformOptions,
+      typeOptions,
+      descriptionLocations,
+    }),
+    [descriptionLocations, formData, platformOptions, typeOptions],
+  );
+  const hasValidationErrors = Object.keys(validationErrors).length > 0;
+  const getBannerValidationText = (field: keyof BannerFormValidationErrors) => (
+    validationErrors[field]
+      ? t(`pages.banners.validation.${validationErrors[field]}`)
+      : undefined
+  );
+
+  return (
+    <>
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>{dialogMode === 'add' ? t('pages.banners.addTitle') : t('pages.banners.editTitle')}</DialogTitle>
       <DialogContent>
         <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <TextField label={t('pages.banners.form.description')} fullWidth value={formData.description} onChange={(e) => onInputChange('description', e.target.value)} />
-          <TextField label={t('pages.banners.form.buttonText')} fullWidth value={formData.button_text} onChange={(e) => onInputChange('button_text', e.target.value)} />
-          <TextField label={t('pages.banners.form.buttonLink')} fullWidth value={formData.button_link} onChange={(e) => onInputChange('button_link', e.target.value)} />
-          <FormControl fullWidth size="small">
+          <TextField
+            label={t('pages.banners.form.description')}
+            fullWidth
+            value={formData.description}
+            onChange={(e) => onInputChange('description', e.target.value)}
+            error={Boolean(validationErrors.description)}
+            helperText={getBannerValidationText('description')}
+          />
+          <TextField
+            label={t('pages.banners.form.buttonText')}
+            fullWidth
+            value={formData.button_text}
+            onChange={(e) => onInputChange('button_text', e.target.value)}
+            error={Boolean(validationErrors.button_text)}
+            helperText={getBannerValidationText('button_text')}
+          />
+          <TextField
+            label={t('pages.banners.form.buttonLink')}
+            fullWidth
+            value={formData.button_link}
+            onChange={(e) => onInputChange('button_link', e.target.value)}
+            error={Boolean(validationErrors.button_link)}
+            helperText={getBannerValidationText('button_link')}
+          />
+          <FormControl fullWidth size="small" error={Boolean(validationErrors.platform)}>
             <InputLabel>{t('pages.banners.form.platform')}</InputLabel>
             <Select value={formData.platform} label={t('pages.banners.form.platform')} onChange={(e) => onInputChange('platform', e.target.value)}>
               {platformOptions.map((o) => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
             </Select>
+            {validationErrors.platform ? (
+              <FormHelperText>{getBannerValidationText('platform')}</FormHelperText>
+            ) : null}
           </FormControl>
-          <FormControl fullWidth size="small">
+          <FormControl fullWidth size="small" error={Boolean(validationErrors.type)}>
             <InputLabel>{t('pages.banners.form.bannerType')}</InputLabel>
             <Select value={formData.type} label={t('pages.banners.form.bannerType')} onChange={(e) => onInputChange('type', Number(e.target.value))}>
               {typeOptions.map((o) => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
             </Select>
+            {validationErrors.type ? (
+              <FormHelperText>{getBannerValidationText('type')}</FormHelperText>
+            ) : null}
           </FormControl>
-          <FormControl fullWidth size="small">
+          <FormControl fullWidth size="small" error={Boolean(validationErrors.description_location)}>
             <InputLabel>{t('pages.banners.form.descLocation')}</InputLabel>
             <Select value={formData.description_location} label={t('pages.banners.form.descLocation')} onChange={(e) => onInputChange('description_location', Number(e.target.value))}>
               {descriptionLocations.map((o) => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
             </Select>
+            {validationErrors.description_location ? (
+              <FormHelperText>{getBannerValidationText('description_location')}</FormHelperText>
+            ) : null}
           </FormControl>
           <FormControlLabel control={<Switch checked={formData.is_show_button} onChange={(e) => onInputChange('is_show_button', e.target.checked)} />} label={t('pages.banners.form.showButton')} />
           <FormControlLabel control={<Switch checked={formData.is_active} onChange={(e) => onInputChange('is_active', e.target.checked)} color="success" />} label={t('pages.banners.form.activeLabel')} />
@@ -243,7 +279,7 @@ const BannerFormDialog = ({
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onClose} color="inherit">{t('pages.banners.cancel')}</Button>
-        <Button onClick={onSave} variant="contained" disabled={isMutating}>
+        <Button onClick={onSave} variant="contained" disabled={isMutating || hasValidationErrors}>
           {isMutating ? t('pages.banners.saving') : t('pages.banners.save')}
         </Button>
       </DialogActions>
@@ -258,7 +294,8 @@ const BannerFormDialog = ({
       onConfirm={onCropConfirm}
       onCancel={onCropCancel}
     />
-  </>
-);
+    </>
+  );
+};
 
 export default BannerFormDialog;

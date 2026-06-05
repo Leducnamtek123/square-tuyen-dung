@@ -3,6 +3,7 @@ import React, { useEffect, useReducer, useRef } from 'react';
 import {
   Box, Button, TextField, Stack, Typography, MenuItem, Select,
   FormControl, InputLabel, Chip, Paper, CircularProgress, IconButton,
+  FormHelperText,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
@@ -16,7 +17,10 @@ import dynamic from 'next/dynamic';
 import { useTranslation } from 'react-i18next';
 import contentService, { ArticlePayload, ArticleCategory, ArticleStatus } from '@/services/contentService';
 import toastMessages from '@/utils/toastMessages';
-import { hasArticleTextContent } from '@/utils/articleContent';
+import {
+  getAdminArticleFormValidationErrors,
+  type AdminArticleFormValidationErrors,
+} from './articleFormValidation';
 
 import SimpleRichEditor from '@/components/Common/Controls/SimpleRichEditor';
 
@@ -75,6 +79,16 @@ const initialAdminArticleFormState: AdminArticleFormState = {
   thumbnailFile: null,
   thumbnailPreview: null,
   existingThumbnailUrl: null,
+};
+
+const ARTICLE_VALIDATION_I18N_KEYS: Record<string, string> = {
+  titleRequired: 'pages.articles.validation.titleRequired',
+  titleMax: 'pages.articles.validation.titleMax',
+  excerptMax: 'pages.articles.validation.excerptMax',
+  contentRequired: 'pages.articles.validation.contentRequired',
+  categoryInvalid: 'pages.articles.validation.categoryInvalid',
+  statusInvalid: 'pages.articles.validation.statusInvalid',
+  tagsMax: 'pages.articles.validation.tagsMax',
 };
 
 const adminArticleFormReducer = (
@@ -159,6 +173,23 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
     existingThumbnailUrl,
   } = state;
 
+  const validationErrors = React.useMemo(
+    () => getAdminArticleFormValidationErrors({
+      title,
+      excerpt,
+      content,
+      category,
+      articleStatus,
+      tags,
+    }),
+    [articleStatus, category, content, excerpt, tags, title],
+  );
+  const hasValidationErrors = Object.keys(validationErrors).length > 0;
+  const getArticleValidationText = (field: keyof AdminArticleFormValidationErrors) => {
+    const validationKey = validationErrors[field];
+    return validationKey ? t(ARTICLE_VALIDATION_I18N_KEYS[validationKey]) : undefined;
+  };
+
   useEffect(() => {
     if (mode === 'edit' && articleId) {
       dispatch({ type: 'patch', patch: { loading: true } });
@@ -189,8 +220,20 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
   };
 
   const handleSave = async (targetStatus?: ArticleStatus) => {
-    if (!title.trim()) { toastMessages.error(t('pages.articles.validation.titleRequired')); return; }
-    if (!hasArticleTextContent(content)) { toastMessages.error(t('pages.articles.validation.contentRequired')); return; }
+    const submitStatus = targetStatus || articleStatus;
+    const submitValidationErrors = getAdminArticleFormValidationErrors({
+      title,
+      excerpt,
+      content,
+      category,
+      articleStatus: submitStatus,
+      tags,
+    });
+    const firstValidationKey = Object.values(submitValidationErrors)[0];
+    if (firstValidationKey) {
+      toastMessages.error(t(ARTICLE_VALIDATION_I18N_KEYS[firstValidationKey]));
+      return;
+    }
 
     dispatch({ type: 'patch', patch: { saving: true } });
     const payload: ArticlePayload = {
@@ -198,7 +241,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
       excerpt: excerpt.trim(),
       content,
       category,
-      status: targetStatus || articleStatus,
+      status: submitStatus,
       tags,
     };
 
@@ -244,7 +287,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
             variant="outlined"
             startIcon={<SaveIcon />}
             onClick={() => handleSave()}
-            disabled={saving}
+            disabled={saving || hasValidationErrors}
             sx={{ fontWeight: 700 }}
           >
             {saving ? t('pages.articles.actions.saving') : t('pages.articles.actions.saveDraft')}
@@ -253,7 +296,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
             variant="contained"
             startIcon={<PublishIcon />}
             onClick={() => handleSave('published')}
-            disabled={saving}
+            disabled={saving || hasValidationErrors}
             color="success"
             sx={{ fontWeight: 700 }}
           >
@@ -272,6 +315,8 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
               value={title}
               onChange={(e) => dispatch({ type: 'patch', patch: { title: e.target.value } })}
               placeholder={t('pages.articles.form.titlePlaceholder')}
+              error={Boolean(validationErrors.title)}
+              helperText={getArticleValidationText('title')}
               sx={{ mb: 2 }}
               slotProps={{ htmlInput: { style: { fontSize: '1.1rem', fontWeight: 700 } } }}
             />
@@ -284,7 +329,8 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
               multiline
               rows={2}
               slotProps={{ htmlInput: { maxLength: 500 } }}
-              helperText={`${excerpt.length}/500`}
+              error={Boolean(validationErrors.excerpt)}
+              helperText={getArticleValidationText('excerpt') || `${excerpt.length}/500`}
             />
           </Paper>
 
@@ -298,6 +344,9 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
               onChange={(nextContent) => dispatch({ type: 'patch', patch: { content: nextContent } })}
               minHeight={400}
             />
+            {validationErrors.content ? (
+              <FormHelperText error>{getArticleValidationText('content')}</FormHelperText>
+            ) : null}
           </Paper>
         </Box>
 
@@ -309,7 +358,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
               {t('pages.articles.form.publishSettings')}
             </Typography>
 
-            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+            <FormControl fullWidth size="small" sx={{ mb: 2 }} error={Boolean(validationErrors.category)}>
               <InputLabel>{t('pages.articles.form.categoryLabel')}</InputLabel>
               <Select value={category} label={t('pages.articles.form.categoryLabel')} onChange={(e) => dispatch({ type: 'patch', patch: { category: e.target.value as ArticleCategory } })}>
                 <MenuItem value="news" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -319,9 +368,12 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
                   <EditNoteIcon sx={{ fontSize: 16, color: 'text.secondary' }} /> {t('pages.articles.categories.blog')}
                 </MenuItem>
               </Select>
+              {validationErrors.category ? (
+                <FormHelperText>{getArticleValidationText('category')}</FormHelperText>
+              ) : null}
             </FormControl>
 
-            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+            <FormControl fullWidth size="small" sx={{ mb: 2 }} error={Boolean(validationErrors.articleStatus)}>
               <InputLabel>{t('pages.articles.form.statusLabel')}</InputLabel>
               <Select value={articleStatus} label={t('pages.articles.form.statusLabel')} onChange={(e) => dispatch({ type: 'patch', patch: { articleStatus: e.target.value as ArticleStatus } })}>
                 <MenuItem value="draft">{t('pages.articles.statuses.draft')}</MenuItem>
@@ -329,6 +381,9 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
                 <MenuItem value="published">{t('pages.articles.statuses.published')}</MenuItem>
                 <MenuItem value="archived">{t('pages.articles.statuses.archived')}</MenuItem>
               </Select>
+              {validationErrors.articleStatus ? (
+                <FormHelperText>{getArticleValidationText('articleStatus')}</FormHelperText>
+              ) : null}
             </FormControl>
           </Paper>
 
@@ -389,6 +444,8 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
                 value={tagInput}
                 onChange={(e) => dispatch({ type: 'patch', patch: { tagInput: e.target.value } })}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
+                error={Boolean(validationErrors.tags)}
+                helperText={getArticleValidationText('tags')}
                 fullWidth
               />
               <Button size="small" variant="outlined" onClick={addTag}>{t('pages.articles.actions.addTag')}</Button>

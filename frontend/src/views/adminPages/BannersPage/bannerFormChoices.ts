@@ -21,7 +21,10 @@ type BannerChoiceOptions = {
   descriptionLocations: BannerChoiceOption[];
 };
 
-type BannerFormValidationErrors = Partial<Record<'button_link', string>>;
+export type BannerFormValidationErrors = Partial<Record<
+  'description' | 'button_text' | 'button_link' | 'platform' | 'type' | 'description_location',
+  string
+>>;
 
 const hasOptionValue = (options: BannerChoiceOption[], value: string | number) =>
   options.some((option) => String(option.value) === String(value));
@@ -70,10 +73,38 @@ const isValidHttpUrl = (value: string) => {
 
 export const getBannerFormValidationErrors = (
   formData: BannerFormData,
+  options?: BannerChoiceOptions,
 ): BannerFormValidationErrors => {
+  const errors: BannerFormValidationErrors = {};
+  const description = formData.description.trim();
+  const buttonText = formData.button_text.trim();
   const buttonLink = formData.button_link.trim();
-  if (buttonLink && !isValidHttpUrl(buttonLink)) {
-    return { button_link: 'buttonLinkInvalid' };
+
+  if (description.length > 100) {
+    errors.description = 'descriptionMax';
   }
-  return {};
+
+  if (buttonText.length > 20) {
+    errors.button_text = 'buttonTextMax';
+  }
+
+  if (buttonLink && !isValidHttpUrl(buttonLink)) {
+    errors.button_link = 'buttonLinkInvalid';
+  }
+
+  if (options) {
+    if (!hasOptionValue(options.platformOptions, formData.platform)) {
+      errors.platform = 'platformInvalid';
+    }
+
+    if (!hasOptionValue(options.typeOptions, formData.type)) {
+      errors.type = 'typeInvalid';
+    }
+
+    if (!hasOptionValue(options.descriptionLocations, formData.description_location)) {
+      errors.description_location = 'descriptionLocationInvalid';
+    }
+  }
+
+  return errors;
 };

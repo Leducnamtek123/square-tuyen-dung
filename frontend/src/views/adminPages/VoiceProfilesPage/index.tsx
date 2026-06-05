@@ -15,6 +15,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControlLabel,
+  FormHelperText,
   IconButton,
   Link,
   MenuItem,
@@ -42,6 +43,10 @@ import aiService from '../../../services/aiService';
 import voiceProfileService, { type VoiceProfilePayload } from '../../../services/voiceProfileService';
 import type { VoiceProfile } from '../../../types/models';
 import toastMessages from '../../../utils/toastMessages';
+import {
+  getVoiceProfileFormValidationErrors,
+  type VoiceProfileFormValidationErrors,
+} from './voiceProfileFormValidation';
 
 type CreateForm = {
   name: string;
@@ -114,6 +119,24 @@ const VoiceProfilesPage = () => {
   const profiles = useMemo(() => data?.results ?? [], [data]);
   const companies = useMemo(() => companiesData?.results ?? [], [companiesData]);
   const jobs = useMemo(() => jobsData?.results ?? [], [jobsData]);
+  const createValidationErrors = useMemo(
+    () => getVoiceProfileFormValidationErrors(createForm),
+    [createForm],
+  );
+  const editValidationErrors = useMemo(
+    () => getVoiceProfileFormValidationErrors(editForm),
+    [editForm],
+  );
+  const hasCreateValidationErrors = Object.keys(createValidationErrors).length > 0;
+  const hasEditValidationErrors = Object.keys(editValidationErrors).length > 0;
+  const getVoiceProfileValidationText = (
+    errors: VoiceProfileFormValidationErrors,
+    field: keyof VoiceProfileFormValidationErrors,
+  ) => (
+    errors[field]
+      ? t(`pages.voiceProfiles.validation.${errors[field]}`)
+      : undefined
+  );
 
   const getVoiceTypeLabel = (type?: string) => {
     if (type === 'preset') return t('pages.voiceProfiles.voiceTypes.preset');
@@ -231,6 +254,10 @@ const VoiceProfilesPage = () => {
   });
 
   const submitCreate = () => {
+    if (hasCreateValidationErrors) {
+      return;
+    }
+
     if (createForm.voiceType === 'cloned' && (!createSampleFile || !createSampleText.trim())) {
       toastMessages.error(t('pages.voiceProfiles.validation.cloneSampleRequired'));
       return;
@@ -262,6 +289,10 @@ const VoiceProfilesPage = () => {
 
   const submitEdit = () => {
     if (!editProfile) return;
+    if (hasEditValidationErrors) {
+      return;
+    }
+
     updateMutation.mutate({
       id: editProfile.id,
       payload: {
@@ -421,15 +452,36 @@ const VoiceProfilesPage = () => {
         <DialogTitle>{t('pages.voiceProfiles.dialogs.createTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField label={t('pages.voiceProfiles.fields.name')} value={createForm.name} onChange={(e) => setCreateForm((prev) => ({ ...prev, name: e.target.value }))} fullWidth />
+            <TextField
+              label={t('pages.voiceProfiles.fields.name')}
+              value={createForm.name}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, name: e.target.value }))}
+              error={Boolean(createValidationErrors.name)}
+              helperText={getVoiceProfileValidationText(createValidationErrors, 'name')}
+              fullWidth
+            />
             <TextField label={t('pages.voiceProfiles.fields.description')} value={createForm.description} onChange={(e) => setCreateForm((prev) => ({ ...prev, description: e.target.value }))} fullWidth multiline minRows={2} />
             <TextField select label={t('pages.voiceProfiles.fields.type')} value={createForm.voiceType} onChange={(e) => setCreateForm((prev) => ({ ...prev, voiceType: e.target.value as CreateForm['voiceType'] }))} fullWidth>
               <MenuItem value="cloned">{t('pages.voiceProfiles.voiceTypes.cloned')}</MenuItem>
               <MenuItem value="preset">{t('pages.voiceProfiles.voiceTypes.preset')}</MenuItem>
             </TextField>
-            <TextField label={t('pages.voiceProfiles.fields.language')} value={createForm.language} onChange={(e) => setCreateForm((prev) => ({ ...prev, language: e.target.value }))} fullWidth />
+            <TextField
+              label={t('pages.voiceProfiles.fields.language')}
+              value={createForm.language}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, language: e.target.value }))}
+              error={Boolean(createValidationErrors.language)}
+              helperText={getVoiceProfileValidationText(createValidationErrors, 'language')}
+              fullWidth
+            />
             {createForm.voiceType === 'preset' ? (
-              <TextField label={t('pages.voiceProfiles.fields.presetVoiceId')} value={createForm.presetVoiceId} onChange={(e) => setCreateForm((prev) => ({ ...prev, presetVoiceId: e.target.value }))} fullWidth />
+              <TextField
+                label={t('pages.voiceProfiles.fields.presetVoiceId')}
+                value={createForm.presetVoiceId}
+                onChange={(e) => setCreateForm((prev) => ({ ...prev, presetVoiceId: e.target.value }))}
+                error={Boolean(createValidationErrors.presetVoiceId)}
+                helperText={getVoiceProfileValidationText(createValidationErrors, 'presetVoiceId')}
+                fullWidth
+              />
             ) : (
               <>
                 <Alert severity="info">{t('pages.voiceProfiles.messages.cloneHint')}</Alert>
@@ -442,6 +494,11 @@ const VoiceProfilesPage = () => {
                   control={<Switch checked={createForm.consentConfirmed} onChange={(e) => setCreateForm((prev) => ({ ...prev, consentConfirmed: e.target.checked }))} />}
                   label={t('pages.voiceProfiles.messages.permissionConfirm')}
                 />
+                {createValidationErrors.consentConfirmed ? (
+                  <FormHelperText error>
+                    {getVoiceProfileValidationText(createValidationErrors, 'consentConfirmed')}
+                  </FormHelperText>
+                ) : null}
               </>
             )}
           </Stack>
@@ -450,7 +507,7 @@ const VoiceProfilesPage = () => {
           <Button onClick={resetCreateDialog}>{t('pages.voiceProfiles.actions.cancel')}</Button>
           <Button
             variant="contained"
-            disabled={!createForm.name.trim() || createMutation.isPending}
+            disabled={hasCreateValidationErrors || createMutation.isPending}
             onClick={submitCreate}
           >
             {createMutation.isPending ? <CircularProgress size={18} /> : createForm.voiceType === 'cloned' ? t('pages.voiceProfiles.actions.createAndUpload') : t('pages.voiceProfiles.actions.create')}
@@ -462,7 +519,14 @@ const VoiceProfilesPage = () => {
         <DialogTitle>{t('pages.voiceProfiles.dialogs.editTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField label={t('pages.voiceProfiles.fields.name')} value={editForm.name} onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))} fullWidth />
+            <TextField
+              label={t('pages.voiceProfiles.fields.name')}
+              value={editForm.name}
+              onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))}
+              error={Boolean(editValidationErrors.name)}
+              helperText={getVoiceProfileValidationText(editValidationErrors, 'name')}
+              fullWidth
+            />
             <TextField label={t('pages.voiceProfiles.fields.description')} value={editForm.description} onChange={(e) => setEditForm((prev) => ({ ...prev, description: e.target.value }))} fullWidth multiline minRows={2} />
             <TextField select label={t('pages.voiceProfiles.fields.type')} value={editForm.voiceType} onChange={(e) => setEditForm((prev) => ({ ...prev, voiceType: e.target.value as EditForm['voiceType'] }))} fullWidth>
               <MenuItem value="cloned">{t('pages.voiceProfiles.voiceTypes.cloned')}</MenuItem>
@@ -475,20 +539,41 @@ const VoiceProfilesPage = () => {
               <MenuItem value="disabled">{t('pages.voiceProfiles.statuses.disabled')}</MenuItem>
               <MenuItem value="failed">{t('pages.voiceProfiles.statuses.failed')}</MenuItem>
             </TextField>
-            <TextField label={t('pages.voiceProfiles.fields.language')} value={editForm.language} onChange={(e) => setEditForm((prev) => ({ ...prev, language: e.target.value }))} fullWidth />
+            <TextField
+              label={t('pages.voiceProfiles.fields.language')}
+              value={editForm.language}
+              onChange={(e) => setEditForm((prev) => ({ ...prev, language: e.target.value }))}
+              error={Boolean(editValidationErrors.language)}
+              helperText={getVoiceProfileValidationText(editValidationErrors, 'language')}
+              fullWidth
+            />
             {editForm.voiceType === 'preset' ? (
-              <TextField label={t('pages.voiceProfiles.fields.presetVoiceId')} value={editForm.presetVoiceId} onChange={(e) => setEditForm((prev) => ({ ...prev, presetVoiceId: e.target.value }))} fullWidth />
-            ) : (
-              <FormControlLabel
-                control={<Switch checked={editForm.consentConfirmed} onChange={(e) => setEditForm((prev) => ({ ...prev, consentConfirmed: e.target.checked }))} />}
-                label={t('pages.voiceProfiles.messages.permissionConfirm')}
+              <TextField
+                label={t('pages.voiceProfiles.fields.presetVoiceId')}
+                value={editForm.presetVoiceId}
+                onChange={(e) => setEditForm((prev) => ({ ...prev, presetVoiceId: e.target.value }))}
+                error={Boolean(editValidationErrors.presetVoiceId)}
+                helperText={getVoiceProfileValidationText(editValidationErrors, 'presetVoiceId')}
+                fullWidth
               />
+            ) : (
+              <>
+                <FormControlLabel
+                  control={<Switch checked={editForm.consentConfirmed} onChange={(e) => setEditForm((prev) => ({ ...prev, consentConfirmed: e.target.checked }))} />}
+                  label={t('pages.voiceProfiles.messages.permissionConfirm')}
+                />
+                {editValidationErrors.consentConfirmed ? (
+                  <FormHelperText error>
+                    {getVoiceProfileValidationText(editValidationErrors, 'consentConfirmed')}
+                  </FormHelperText>
+                ) : null}
+              </>
             )}
           </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditProfile(null)}>{t('pages.voiceProfiles.actions.cancel')}</Button>
-          <Button variant="contained" disabled={!editForm.name.trim() || updateMutation.isPending} onClick={submitEdit}>
+          <Button variant="contained" disabled={hasEditValidationErrors || updateMutation.isPending} onClick={submitEdit}>
             {updateMutation.isPending ? <CircularProgress size={18} /> : t('pages.voiceProfiles.actions.save')}
           </Button>
         </DialogActions>

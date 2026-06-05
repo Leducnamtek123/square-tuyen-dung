@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useReducer, useRef } from 'react';
+import React, { useMemo, useReducer, useRef } from 'react';
 import {
   Avatar,
   Box,
@@ -33,6 +33,10 @@ import { Career } from '../../../types/models';
 import type { CareerPayload } from '../../../services/adminManagementService';
 import { useCareers } from './hooks/useCareers';
 import FilterBar from '@/components/Common/FilterBar';
+import {
+  getCareerFormValidationErrors,
+  type CareerFormValidationErrors,
+} from './careerFormValidation';
 
 type CareersPageState = {
   searchTerm: string;
@@ -141,6 +145,9 @@ type CareerFormDialogProps = {
   iconFile: File | null;
   iconPreview: string | null;
   existingIconUrl: string | null;
+  validationErrors: CareerFormValidationErrors;
+  hasValidationErrors: boolean;
+  getCareerValidationText: (field: keyof CareerFormValidationErrors) => string | undefined;
   iconInputRef: React.RefObject<HTMLInputElement | null>;
   isMutating: boolean;
   onClose: () => void;
@@ -158,6 +165,9 @@ const CareerFormDialog = ({
   iconFile,
   iconPreview,
   existingIconUrl,
+  validationErrors,
+  hasValidationErrors,
+  getCareerValidationText,
   iconInputRef,
   isMutating,
   onClose,
@@ -178,6 +188,8 @@ const CareerFormDialog = ({
           fullWidth
           value={formData.name}
           onChange={(event) => onNameChange(event.target.value)}
+          error={Boolean(validationErrors.name)}
+          helperText={getCareerValidationText('name')}
           required
         />
 
@@ -263,7 +275,7 @@ const CareerFormDialog = ({
       <Button
         onClick={onSave}
         variant="contained"
-        disabled={isMutating || !formData.name.trim()}
+        disabled={isMutating || hasValidationErrors}
       >
         {isMutating ? t('pages.careers.savingBtn') : t('pages.careers.saveBtn')}
       </Button>
@@ -327,6 +339,16 @@ const CareersPage = () => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const debouncedSearch = useDebounce(state.searchTerm, 500);
+  const validationErrors = useMemo(
+    () => getCareerFormValidationErrors(state.formData),
+    [state.formData],
+  );
+  const hasValidationErrors = Object.keys(validationErrors).length > 0;
+  const getCareerValidationText = (field: keyof CareerFormValidationErrors) => (
+    validationErrors[field]
+      ? t(`pages.careers.validation.${validationErrors[field]}`)
+      : undefined
+  );
 
   const {
     data,
@@ -376,7 +398,7 @@ const CareersPage = () => {
 
   const handleSave = async () => {
     const name = state.formData.name.trim();
-    if (!name) {
+    if (hasValidationErrors) {
       return;
     }
 
@@ -551,6 +573,9 @@ const CareersPage = () => {
         iconFile={state.iconFile}
         iconPreview={state.iconPreview}
         existingIconUrl={state.existingIconUrl}
+        validationErrors={validationErrors}
+        hasValidationErrors={hasValidationErrors}
+        getCareerValidationText={getCareerValidationText}
         iconInputRef={iconInputRef}
         isMutating={isMutating}
         onClose={handleCloseDialog}

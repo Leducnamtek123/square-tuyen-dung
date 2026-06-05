@@ -226,7 +226,6 @@ const ToolStatusIcon = ({ status }: { status: AgentToolCall['status'] }) => {
 const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
   const theme = useTheme();
   const { t } = useTranslation('common');
-  const [expanded, setExpanded] = useState(false);
   const output = asRecord(toolCall.output);
   const record = asRecord(output.record);
   const recordUrl = typeof record.url === 'string' ? record.url : '';
@@ -234,6 +233,7 @@ const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
   const rows = businessRows(toolCall);
   const results = Array.isArray(output.results) ? output.results : [];
   const hasDetails = Boolean(toolCall.errorMessage || recordUrl || rows.length || results.length);
+  const [expanded, setExpanded] = useState(hasDetails);
   const color =
     toolCall.status === 'succeeded'
       ? theme.palette.success.main
