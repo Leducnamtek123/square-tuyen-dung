@@ -72,6 +72,21 @@ describe('contentService', () => {
     await expect(contentService.sendNotificationDemo()).resolves.toEqual({ success: true });
   });
 
+  it('unwraps nested content action response messages', async () => {
+    (httpRequest.post as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: { message: 'SMS download link queued' } } })
+      .mockResolvedValueOnce({ data: { data: { message: 'Demo notification queued' } } });
+
+    await expect(contentService.sendSMSDownloadApp({ phone: '0901234567' })).resolves.toEqual({
+      sent: true,
+      message: 'SMS download link queued',
+    });
+    await expect(contentService.sendNotificationDemo()).resolves.toEqual({
+      success: true,
+      message: 'Demo notification queued',
+    });
+  });
+
   it('unwraps nested content create and update response envelopes', async () => {
     const feedback = { id: 21, content: 'Great hiring experience', rating: 5 };
     const adminCreated = { id: 22, title: 'Admin created', slug: 'admin-created' };

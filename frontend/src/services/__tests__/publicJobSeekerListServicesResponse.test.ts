@@ -46,6 +46,22 @@ describe('public and job seeker list services response normalization', () => {
     await expect(jobService.getJobPostsSaved({ page: 4 })).resolves.toEqual({ count: 1, results: [savedJob] });
   });
 
+  it('unwraps nested employer job post export responses', async () => {
+    const exportRows = [
+      {
+        jobName: 'Frontend Developer',
+        views: 12,
+        appliedNumber: 3,
+      },
+    ];
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: exportRows } });
+
+    await expect(jobService.exportEmployerJobPosts({ status: 2 })).resolves.toEqual(exportRows);
+    expect(httpRequest.get).toHaveBeenCalledWith('job/web/private-job-posts/export/', {
+      params: { status: 2 },
+    });
+  });
+
   it('normalizes job title suggestion responses to a stable results object', async () => {
     (httpRequest.get as jest.Mock)
       .mockResolvedValueOnce(['Frontend Developer'])
@@ -66,6 +82,20 @@ describe('public and job seeker list services response normalization', () => {
 
     await expect(companyService.getCompanies({ page: 1 })).resolves.toEqual({ count: 1, results: [company] });
     await expect(companyImageService.getCompanyImages()).resolves.toEqual({ count: 1, results: [image] });
+  });
+
+  it('unwraps company image upload responses as an image array', async () => {
+    const uploadedImages = [{ id: 7, imageUrl: 'http://minio.test/company-1.png' }];
+    (httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: uploadedImages } });
+
+    await expect(companyImageService.addCompanyImage(new FormData())).resolves.toEqual(uploadedImages);
+    expect(httpRequest.post).toHaveBeenCalledWith(
+      'info/web/company-images/',
+      expect.any(FormData),
+      expect.objectContaining({
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }),
+    );
   });
 
   it('normalizes top company carousel responses to a stable company array', async () => {

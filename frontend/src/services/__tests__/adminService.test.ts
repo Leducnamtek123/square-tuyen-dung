@@ -46,4 +46,14 @@ describe('adminService', () => {
     expect(presignInObject).toHaveBeenCalledWith(mockData);
     expect(result).toBe(mockData);
   });
+
+  it('getStats unwraps nested admin statistics responses after presign', async () => {
+    const stats = { totalUsers: 100, totalApplications: 25 };
+    const mockData = { data: { data: stats } };
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce(mockData);
+
+    await expect(adminService.getStats()).resolves.toEqual(stats);
+    expect(httpRequest.get).toHaveBeenCalledWith('interview/web/statistics/admin-general-statistics/');
+    expect(presignInObject).toHaveBeenCalledWith(mockData);
+  });
 });

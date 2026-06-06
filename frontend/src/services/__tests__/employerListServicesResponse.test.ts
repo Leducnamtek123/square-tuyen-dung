@@ -51,6 +51,22 @@ describe('employer and job seeker list services response normalization', () => {
     expect(result).toEqual({ count: 1, results: [savedResume] });
   });
 
+  it('unwraps nested saved resume export responses', async () => {
+    const exportRows = [
+      {
+        candidateName: 'Nguyen Van A',
+        email: 'a@example.com',
+        title: 'Senior Frontend Developer',
+      },
+    ];
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: exportRows } });
+
+    await expect(resumeSavedService.exportResumesSaved({ cityId: 79 })).resolves.toEqual(exportRows);
+    expect(httpRequest.get).toHaveBeenCalledWith('info/web/resumes-saved/export/', {
+      params: { cityId: 79 },
+    });
+  });
+
   it('normalizes company team role and member list responses', async () => {
     const role = { id: 4, name: 'HR' };
     const member = { id: 8, invitedEmail: 'member@square.vn' };

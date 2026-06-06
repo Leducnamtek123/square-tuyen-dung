@@ -1,6 +1,6 @@
 import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 
 import type { CompanyImage } from '../types/models';
 import type { PaginatedResponse } from '../types/api';
@@ -14,14 +14,14 @@ const companyImageService = {
     return normalizePaginatedResponse<CompanyImage>(await presignInObject(data));
   },
 
-  addCompanyImage: async (data: FormData): Promise<CompanyImage> => {
+  addCompanyImage: async (data: FormData): Promise<CompanyImage[]> => {
     const url = 'info/web/company-images/';
-    const resData = await httpRequest.post<CompanyImage>(url, data, {
+    const resData = await httpRequest.post<CompanyImage[]>(url, data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return presignInObject(resData);
+    return unwrapDataResponse<CompanyImage[]>(await presignInObject(resData));
   },
 
   deleteCompanyImage: (id: IdType): Promise<void> => {

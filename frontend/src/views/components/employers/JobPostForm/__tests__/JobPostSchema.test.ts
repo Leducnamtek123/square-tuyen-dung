@@ -73,6 +73,20 @@ describe('getJobPostSchema', () => {
     );
   });
 
+  it('rejects decimal quantity and salaries before submitting to backend integer fields', async () => {
+    const schema = getJobPostSchema(t as never);
+
+    await expect(schema.validateAt('quantity', { quantity: 1.5 })).rejects.toThrow(
+      'jobPostForm.validation.invalidnumberofvacancies',
+    );
+    await expect(schema.validateAt('salaryMin', { salaryMin: 1000.5 })).rejects.toThrow(
+      'jobPostForm.validation.invalidminimumsalary',
+    );
+    await expect(schema.validateAt('salaryMax', { salaryMax: 1000.5 })).rejects.toThrow(
+      'jobPostForm.validation.invalidmaximumsalary',
+    );
+  });
+
   it('rejects choice values outside the backend option sets', async () => {
     const schema = getJobPostSchema(t as never);
     const values = {

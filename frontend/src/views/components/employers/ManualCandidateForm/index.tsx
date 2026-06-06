@@ -14,6 +14,7 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 import { typedYupResolver } from '../../../../utils/formHelpers';
 import { useConfig } from '@/hooks/useConfig';
 import { REGEX_VALIDATE } from '@/configs/constants';
+import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';
 
 const MAX_MANUAL_CANDIDATE_CV_SIZE = 10 * 1024 * 1024;
 const MAX_MANUAL_CANDIDATE_SALARY = 999_999_999_999;
@@ -100,21 +101,38 @@ export const createManualCandidateSchema = (t: TFunction, requireJobPost = false
     .trim()
     .required(t('employer:manualCandidate.validation.titleRequired'))
     .max(200, t('employer:manualCandidate.validation.titleMax')),
-  position: yup.number().nullable().transform(emptyToNull),
-  academicLevel: yup.number().nullable().transform(emptyToNull),
-  experience: yup.number().nullable().transform(emptyToNull),
+  position: yup
+    .number()
+    .nullable()
+    .transform(emptyToNull)
+    .oneOf([...BACKEND_CHOICE_VALUES.position, null], t('employer:manualCandidate.validation.choiceInvalid'))
+    .typeError(t('employer:manualCandidate.validation.choiceInvalid')),
+  academicLevel: yup
+    .number()
+    .nullable()
+    .transform(emptyToNull)
+    .oneOf([...BACKEND_CHOICE_VALUES.academicLevel, null], t('employer:manualCandidate.validation.choiceInvalid'))
+    .typeError(t('employer:manualCandidate.validation.choiceInvalid')),
+  experience: yup
+    .number()
+    .nullable()
+    .transform(emptyToNull)
+    .oneOf([...BACKEND_CHOICE_VALUES.experience, null], t('employer:manualCandidate.validation.choiceInvalid'))
+    .typeError(t('employer:manualCandidate.validation.choiceInvalid')),
   career: yup.number().nullable().transform(emptyToNull),
   city: yup.number().nullable().transform(emptyToNull),
   salaryMin: yup
     .number()
     .nullable()
     .transform(emptyToNull)
+    .integer(t('employer:manualCandidate.validation.salaryInvalid'))
     .min(0, t('employer:manualCandidate.validation.salaryInvalid'))
     .max(MAX_MANUAL_CANDIDATE_SALARY, t('employer:manualCandidate.validation.salaryTooLarge')),
   salaryMax: yup
     .number()
     .nullable()
     .transform(emptyToNull)
+    .integer(t('employer:manualCandidate.validation.salaryInvalid'))
     .min(0, t('employer:manualCandidate.validation.salaryInvalid'))
     .max(MAX_MANUAL_CANDIDATE_SALARY, t('employer:manualCandidate.validation.salaryTooLarge'))
     .test('salary-max-gte-min', t('employer:manualCandidate.validation.salaryRangeInvalid'), function (value) {
@@ -126,10 +144,21 @@ export const createManualCandidateSchema = (t: TFunction, requireJobPost = false
     .number()
     .nullable()
     .transform(emptyToNull)
+    .integer(t('employer:manualCandidate.validation.salaryInvalid'))
     .min(0, t('employer:manualCandidate.validation.salaryInvalid'))
     .max(MAX_MANUAL_CANDIDATE_SALARY, t('employer:manualCandidate.validation.salaryTooLarge')),
-  typeOfWorkplace: yup.number().nullable().transform(emptyToNull),
-  jobType: yup.number().nullable().transform(emptyToNull),
+  typeOfWorkplace: yup
+    .number()
+    .nullable()
+    .transform(emptyToNull)
+    .oneOf([...BACKEND_CHOICE_VALUES.typeOfWorkplace, null], t('employer:manualCandidate.validation.choiceInvalid'))
+    .typeError(t('employer:manualCandidate.validation.choiceInvalid')),
+  jobType: yup
+    .number()
+    .nullable()
+    .transform(emptyToNull)
+    .oneOf([...BACKEND_CHOICE_VALUES.jobType, null], t('employer:manualCandidate.validation.choiceInvalid'))
+    .typeError(t('employer:manualCandidate.validation.choiceInvalid')),
   description: yup.string().max(800, t('employer:manualCandidate.validation.descriptionMax')).default(''),
   skillsSummary: yup.string().max(2000, t('employer:manualCandidate.validation.skillsSummaryMax')).default(''),
   note: yup.string().max(1000, t('employer:manualCandidate.validation.noteMax')).default(''),

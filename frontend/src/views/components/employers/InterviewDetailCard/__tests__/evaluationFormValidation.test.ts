@@ -39,6 +39,15 @@ describe('Interview HR evaluation form validation', () => {
     ).toBe('proposedSalaryInvalid');
   });
 
+  it('rejects decimal proposed salary before submitting to the backend integer field', () => {
+    expect(
+      getEvaluationFormValidationError({
+        ...baseForm,
+        proposed_salary: 1000.5,
+      }),
+    ).toBe('proposedSalaryInvalid');
+  });
+
   it('builds a normalized snake_case payload with calculated overall score', () => {
     expect(buildEvaluationPayload(42, baseForm)).toEqual({
       interview: 42,

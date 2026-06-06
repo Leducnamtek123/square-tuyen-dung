@@ -74,6 +74,19 @@ describe('commonService location options', () => {
     await expect(commonService.getAllCareersSimple()).resolves.toEqual(careers);
   });
 
+  it('unwraps nested common config responses after presign', async () => {
+    const config = {
+      cityOptions: [{ id: 1, name: 'TP HCM' }],
+      careerOptions: [{ id: 5, name: 'IT' }],
+      systemSettings: { maintenanceMode: false },
+    };
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: config } });
+
+    await expect(commonService.getConfigs()).resolves.toEqual(config);
+    expect(httpRequest.get).toHaveBeenCalledWith('common/configs/');
+    expect(presignInObject).toHaveBeenCalledWith({ data: { data: config } });
+  });
+
   it('unwraps nested upload file responses', async () => {
     const uploadedFile = {
       id: 9,

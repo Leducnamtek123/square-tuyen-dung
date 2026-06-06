@@ -38,7 +38,7 @@ const commonService = {
   getConfigs: async (): Promise<SystemConfig> => {
     const url = 'common/configs/';
     const data = (await httpRequest.get(url)) as SystemConfig;
-    return (await presignInObject(data)) as SystemConfig;
+    return unwrapDataResponse<SystemConfig>(await presignInObject(data));
   },
 
   getDistrictsByCityId: async (cityId: CityInput): Promise<DistrictsResponse> => {

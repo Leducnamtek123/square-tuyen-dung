@@ -122,7 +122,8 @@ const jobService = {
 
   exportEmployerJobPosts: (params: GetJobPostsParams = {}): Promise<ExportTableRow[]> => {
     const url = 'job/web/private-job-posts/export/';
-    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<ExportTableRow[]>;
+    return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>)
+      .then(unwrapDataResponse<ExportTableRow[]>);
   },
 
   getEmployerJobPostDetailById: (slug: IdType): Promise<JobPost> => {

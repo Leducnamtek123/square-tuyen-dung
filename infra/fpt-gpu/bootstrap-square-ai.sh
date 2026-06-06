@@ -399,22 +399,67 @@ cat > "$INSTALL_ROOT/start-on-boot.sh" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
-mkdir -p /models/logs/square-ai
+LOG_ROOT=/models/logs/square-ai
+INSTALL_ROOT=/models/square-ai
+mkdir -p "$LOG_ROOT" "$INSTALL_ROOT"
 
-if [ -x /usr/sbin/sshd ]; then
-  mkdir -p /run/sshd
-  ssh-keygen -A >/dev/null 2>&1 || true
-  pgrep -x sshd >/dev/null 2>&1 || /usr/sbin/sshd || true
-fi
+log() {
+  printf '[%s] %s\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" "$*" >> "$LOG_ROOT/start-on-boot.log"
+}
 
-if [ -x /models/square-ai/bootstrap-square-ai.sh ]; then
-  /models/square-ai/bootstrap-square-ai.sh >> /models/logs/square-ai/bootstrap.log 2>&1 || true
-elif [ -x /models/bootstrap-square-ai.sh ]; then
-  /models/bootstrap-square-ai.sh >> /models/logs/square-ai/bootstrap.log 2>&1 || true
-else
-  echo "Missing Square AI bootstrap script on /models." >&2
-fi
+ensure_sshd() {
+  if [ ! -x /usr/sbin/sshd ] && command -v apt-get >/dev/null 2>&1; then
+    export DEBIAN_FRONTEND=noninteractive
+    log "Installing openssh-server."
+    apt-get update >> "$LOG_ROOT/start-on-boot.log" 2>&1 || true
+    apt-get install -y --no-install-recommends openssh-server >> "$LOG_ROOT/start-on-boot.log" 2>&1 || true
+  fi
 
+  if [ -x /usr/sbin/sshd ]; then
+    mkdir -p /run/sshd
+    ssh-keygen -A >/dev/null 2>&1 || true
+    if ! pgrep -x sshd >/dev/null 2>&1; then
+      /usr/sbin/sshd >> "$LOG_ROOT/start-on-boot.log" 2>&1 || true
+    fi
+  else
+    log "openssh-server is unavailable; continuing without SSHD."
+  fi
+}
+
+start_bootstrap_background() {
+  nohup /bin/bash -lc '
+    set -euo pipefail
+    LOG_ROOT=/models/logs/square-ai
+    LOCK_DIR="$LOG_ROOT/bootstrap.lock"
+    mkdir -p "$LOG_ROOT"
+    if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+      echo "Another Square AI bootstrap is already running."
+      exit 0
+    fi
+    trap "rmdir \"$LOCK_DIR\" 2>/dev/null || true" EXIT
+
+    if [ -f /models/square-ai/bootstrap-env.sh ]; then
+      set -a
+      source /models/square-ai/bootstrap-env.sh
+      set +a
+    fi
+    export SQUARE_TTS_KEEP_LEGACY_TUNING="${SQUARE_TTS_KEEP_LEGACY_TUNING:-1}"
+
+    if [ -x /models/square-ai/bootstrap-square-ai.sh ]; then
+      exec /models/square-ai/bootstrap-square-ai.sh
+    elif [ -x /models/bootstrap-square-ai.sh ]; then
+      exec /models/bootstrap-square-ai.sh
+    fi
+
+    echo "Missing Square AI bootstrap script on /models."
+    exit 1
+  ' >> "$LOG_ROOT/bootstrap.detached.log" 2>&1 &
+  echo "$!" > "$LOG_ROOT/bootstrap.detached.pid"
+  log "Bootstrap started in background with pid $(cat "$LOG_ROOT/bootstrap.detached.pid")."
+}
+
+ensure_sshd
+start_bootstrap_background
 exec sleep infinity
 EOF
 

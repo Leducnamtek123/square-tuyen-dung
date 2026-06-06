@@ -56,14 +56,12 @@ interface ActionResponse {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 
-const normalizeActionResponse = (raw: unknown, fallback: ActionResponse): ActionResponse =>
-  isRecord(raw)
-    ? isRecord(raw.data)
-      ? { ...fallback, ...raw.data }
-      : 'data' in raw
-        ? fallback
-        : { ...fallback, ...raw }
+const normalizeActionResponse = (raw: unknown, fallback: ActionResponse): ActionResponse => {
+  const value = unwrapDataResponse<unknown>(raw);
+  return isRecord(value)
+    ? { ...fallback, ...value }
     : fallback;
+};
 
 const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
   const data = await promise;
@@ -122,7 +120,8 @@ const jobPostActivityService = {
 
   exportAppliedResume: (params: JobPostActivityListParams = {}): Promise<ExportTableRow[]> => {
     const url = 'job/web/employer-job-posts-activity/export/';
-    return withPresign(httpRequest.get(url, { params: cleanParams(params) })) as Promise<ExportTableRow[]>;
+    return (withPresign(httpRequest.get(url, { params: cleanParams(params) })) as Promise<unknown>)
+      .then(unwrapDataResponse<ExportTableRow[]>);
   },
 
   changeApplicationStatus: (id: IdType, data: ChangeApplicationStatusPayload): Promise<JobPostActivity> => {

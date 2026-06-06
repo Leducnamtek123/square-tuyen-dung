@@ -64,14 +64,14 @@ export const getJobPostSchema = (t: TFunction<string | string[], undefined>) =>
       .required(t('jobPostForm.validation.jobtypeisrequired'))
       .oneOf(BACKEND_CHOICE_VALUES.jobType, t('jobPostForm.validation.choiceInvalid'))
       .typeError(t('jobPostForm.validation.jobtypeisrequired')),
-    quantity: yup.number().required(t('jobPostForm.validation.numberofvacanciesisrequired')).typeError(t('jobPostForm.validation.invalidnumberofvacancies')).min(1, t('jobPostForm.validation.atleastonevacancyisrequired')),
+    quantity: yup.number().required(t('jobPostForm.validation.numberofvacanciesisrequired')).typeError(t('jobPostForm.validation.invalidnumberofvacancies')).integer(t('jobPostForm.validation.invalidnumberofvacancies')).min(1, t('jobPostForm.validation.atleastonevacancyisrequired')),
     genderRequired: yup
       .string()
       .required(t('jobPostForm.validation.genderrequirementisrequired'))
       .oneOf(BACKEND_CHOICE_VALUES.gender, t('jobPostForm.validation.choiceInvalid'))
       .typeError(t('jobPostForm.validation.genderrequirementisrequired')),
-    salaryMin: yup.number().required(t('jobPostForm.validation.minimumsalaryisrequired')).typeError(t('jobPostForm.validation.invalidminimumsalary')).min(0, t('jobPostForm.validation.invalidminimumsalary')).max(MAX_JOB_POST_SALARY, t('jobPostForm.validation.salaryTooLarge')).test('minimum-wage-comparison', t('jobPostForm.validation.minSalaryLess'), function (value) { return !(value > this.parent.salaryMax); }),
-    salaryMax: yup.number().required(t('jobPostForm.validation.maximumsalaryisrequired')).typeError(t('jobPostForm.validation.invalidmaximumsalary')).min(0, t('jobPostForm.validation.invalidmaximumsalary')).max(MAX_JOB_POST_SALARY, t('jobPostForm.validation.salaryTooLarge')).test('maximum-wage-comparison', t('jobPostForm.validation.maxSalaryGreater'), function (value) { return !(value < this.parent.salaryMin); }),
+    salaryMin: yup.number().required(t('jobPostForm.validation.minimumsalaryisrequired')).typeError(t('jobPostForm.validation.invalidminimumsalary')).integer(t('jobPostForm.validation.invalidminimumsalary')).min(0, t('jobPostForm.validation.invalidminimumsalary')).max(MAX_JOB_POST_SALARY, t('jobPostForm.validation.salaryTooLarge')).test('minimum-wage-comparison', t('jobPostForm.validation.minSalaryLess'), function (value) { return !(value > this.parent.salaryMax); }),
+    salaryMax: yup.number().required(t('jobPostForm.validation.maximumsalaryisrequired')).typeError(t('jobPostForm.validation.invalidmaximumsalary')).integer(t('jobPostForm.validation.invalidmaximumsalary')).min(0, t('jobPostForm.validation.invalidmaximumsalary')).max(MAX_JOB_POST_SALARY, t('jobPostForm.validation.salaryTooLarge')).test('maximum-wage-comparison', t('jobPostForm.validation.maxSalaryGreater'), function (value) { return !(value < this.parent.salaryMin); }),
     academicLevel: yup
       .number()
       .required(t('jobPostForm.validation.academiclevelisrequired'))

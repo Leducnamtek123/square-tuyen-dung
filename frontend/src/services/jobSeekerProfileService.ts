@@ -1,5 +1,5 @@
 import httpRequest from '../utils/httpRequest';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 import { presignInObject } from '../utils/presignUrl';
 import type { Resume, JobSeekerProfile, Location } from '../types/models';
 import type { PaginatedResponse } from '../types/api';
@@ -68,13 +68,13 @@ const jobSeekerProfileService = {
   getProfile: async (): Promise<JobSeekerProfile> => {
     const url = 'info/profile/';
     const data = await httpRequest.get<JobSeekerProfile>(url);
-    return presignInObject(data);
+    return unwrapDataResponse<JobSeekerProfile>(await presignInObject(data));
   },
 
   updateProfile: async (data: JobSeekerProfileUpdatePayload): Promise<JobSeekerProfile> => {
     const url = 'info/profile/';
     const resData = await httpRequest.put<JobSeekerProfile>(url, normalizeProfilePayload(data));
-    return presignInObject(resData);
+    return unwrapDataResponse<JobSeekerProfile>(await presignInObject(resData));
   },
 
   getResumes: async (

@@ -67,4 +67,38 @@ describe('createManualCandidateSchema', () => {
       'employer:manualCandidate.validation.salaryTooLarge',
     );
   });
+
+  it('rejects decimal salaries before submitting to the backend integer fields', async () => {
+    const schema = createManualCandidateSchema(t as never);
+
+    await expect(schema.validateAt('salaryMin', { salaryMin: 1000.5 })).rejects.toThrow(
+      'employer:manualCandidate.validation.salaryInvalid',
+    );
+    await expect(schema.validateAt('salaryMax', { salaryMax: 1000.5 })).rejects.toThrow(
+      'employer:manualCandidate.validation.salaryInvalid',
+    );
+    await expect(schema.validateAt('expectedSalary', { expectedSalary: 1000.5 })).rejects.toThrow(
+      'employer:manualCandidate.validation.salaryInvalid',
+    );
+  });
+
+  it('rejects stale choice values before submitting to the backend', async () => {
+    const schema = createManualCandidateSchema(t as never);
+
+    await expect(schema.validateAt('position', { position: 999 })).rejects.toThrow(
+      'employer:manualCandidate.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('academicLevel', { academicLevel: 999 })).rejects.toThrow(
+      'employer:manualCandidate.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('experience', { experience: 999 })).rejects.toThrow(
+      'employer:manualCandidate.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('typeOfWorkplace', { typeOfWorkplace: 999 })).rejects.toThrow(
+      'employer:manualCandidate.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('jobType', { jobType: 999 })).rejects.toThrow(
+      'employer:manualCandidate.validation.choiceInvalid',
+    );
+  });
 });

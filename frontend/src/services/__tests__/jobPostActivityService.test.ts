@@ -61,6 +61,31 @@ describe('jobPostActivityService', () => {
     });
   });
 
+  it('unwraps nested apply job action responses and preserves application data', async () => {
+    (httpRequest.post as jest.Mock).mockResolvedValueOnce({
+      data: {
+        data: {
+          id: 100,
+          status: 1,
+          resume: 6,
+        },
+      },
+    });
+
+    await expect(jobPostActivityService.applyJob({
+      jobPost: 13,
+      resume: 6,
+      fullName: 'Tran Van B',
+      email: 'b@example.com',
+      phone: '0912345678',
+    })).resolves.toEqual({
+      success: true,
+      id: 100,
+      status: 1,
+      resume: 6,
+    });
+  });
+
   it('unwraps nested applied profile detail responses after presign', async () => {
     const activity = { id: 44, candidateName: 'Le Duc Nam' };
     (httpRequest.get as jest.Mock).mockResolvedValueOnce({
@@ -102,5 +127,22 @@ describe('jobPostActivityService', () => {
       formData,
       { headers: { 'Content-Type': 'multipart/form-data' } },
     );
+  });
+
+  it('unwraps nested applied resume export responses after presign', async () => {
+    const exportRows = [
+      {
+        candidateName: 'Le Duc Nam',
+        Email: 'nam@example.com',
+        jobName: 'Frontend Developer',
+      },
+    ];
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: exportRows } });
+
+    await expect(jobPostActivityService.exportAppliedResume({ jobPost: 7 })).resolves.toEqual(exportRows);
+    expect(httpRequest.get).toHaveBeenCalledWith('job/web/employer-job-posts-activity/export/', {
+      params: { jobPost: 7 },
+    });
+    expect(presignInObject).toHaveBeenCalledWith({ data: { data: exportRows } });
   });
 });

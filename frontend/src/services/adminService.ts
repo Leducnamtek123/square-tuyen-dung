@@ -1,7 +1,7 @@
 import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 import { cleanParams } from '../utils/params';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 import type { PaginatedResponse } from '../types/api';
 import type { User } from '../types/models';
 import type { AdminGeneralStats } from './statisticService';
@@ -9,7 +9,7 @@ import type { AdminGeneralStats } from './statisticService';
 
 const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
   const data = await promise;
-  return presignInObject(data) as T;
+  return unwrapDataResponse<T>(await presignInObject(data));
 };
 
 type AdminUserListParams = {

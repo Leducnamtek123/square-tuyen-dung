@@ -11,6 +11,20 @@ describe('jobSeekerProfileService', () => {
     jest.clearAllMocks();
   });
 
+  it('unwraps nested profile detail and update responses after presign', async () => {
+    const profile = { id: 3, user: { fullName: 'Candidate One' } };
+    const updatedProfile = { id: 3, user: { fullName: 'Candidate Updated' } };
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: profile } });
+    (httpRequest.put as jest.Mock).mockResolvedValueOnce({ data: { data: updatedProfile } });
+
+    await expect(jobSeekerProfileService.getProfile()).resolves.toEqual(profile);
+    await expect(jobSeekerProfileService.updateProfile({ user: { fullName: 'Candidate Updated' } })).resolves.toEqual(
+      updatedProfile,
+    );
+    expect(httpRequest.get).toHaveBeenCalledWith('info/profile/');
+    expect(httpRequest.put).toHaveBeenCalledWith('info/profile/', { user: { fullName: 'Candidate Updated' } });
+  });
+
   it('normalizes nested data.results resume list responses', async () => {
     const resume = { id: 7, title: 'Frontend CV' };
     (httpRequest.get as jest.Mock).mockResolvedValueOnce({

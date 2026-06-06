@@ -1,5 +1,5 @@
 import httpRequest from '../utils/httpRequest';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 import { presignInObject } from '../utils/presignUrl';
 import type { Banner, Feedback } from '../types/models';
 import type { PaginatedResponse } from '../types/api';
@@ -34,14 +34,12 @@ const toListData = <T>(raw: unknown): T[] => {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 
-const normalizeActionResponse = <T extends Record<string, unknown>>(raw: unknown, fallback: T): T =>
-  isRecord(raw)
-    ? isRecord(raw.data)
-      ? ({ ...fallback, ...raw.data } as T)
-      : 'data' in raw
-        ? fallback
-        : ({ ...fallback, ...raw } as T)
+const normalizeActionResponse = <T extends Record<string, unknown>>(raw: unknown, fallback: T): T => {
+  const value = unwrapDataResponse<unknown>(raw);
+  return isRecord(value)
+    ? ({ ...fallback, ...value } as T)
     : fallback;
+};
 
 const unwrapDetailResponse = <T>(raw: unknown): T => {
   let value = raw;

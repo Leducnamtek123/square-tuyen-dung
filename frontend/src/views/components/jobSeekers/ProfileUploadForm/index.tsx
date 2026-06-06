@@ -128,6 +128,7 @@ export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
       .required(t('jobSeeker:profile.validation.salaryMinRequired'))
 
       .typeError(t('jobSeeker:profile.validation.salaryMinInvalid'))
+      .integer(t('jobSeeker:profile.validation.salaryMinInvalid'))
 
       .min(0, t('jobSeeker:profile.validation.salaryMinInvalid'))
       .max(MAX_RESUME_SALARY, t('jobSeeker:profile.validation.salaryTooLarge'))
@@ -153,6 +154,7 @@ export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
       .required(t('jobSeeker:profile.validation.salaryMaxRequired'))
 
       .typeError(t('jobSeeker:profile.validation.salaryMaxInvalid'))
+      .integer(t('jobSeeker:profile.validation.salaryMaxInvalid'))
 
       .min(0, t('jobSeeker:profile.validation.salaryMaxInvalid'))
       .max(MAX_RESUME_SALARY, t('jobSeeker:profile.validation.salaryTooLarge'))
@@ -175,6 +177,7 @@ export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
       .number()
       .nullable()
       .transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value))
+      .integer(t('jobSeeker:profile.validation.expectedSalaryInvalid'))
       .min(0, t('jobSeeker:profile.validation.expectedSalaryInvalid'))
       .max(MAX_RESUME_SALARY, t('jobSeeker:profile.validation.salaryTooLarge')),
 

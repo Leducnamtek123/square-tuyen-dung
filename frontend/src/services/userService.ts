@@ -11,7 +11,7 @@ export type UserStatusResponse = { isActive: boolean };
 
 const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
   const data = await promise;
-  return presignInObject(data);
+  return unwrapDataResponse<T>(await presignInObject(data));
 };
 
 const userService = {

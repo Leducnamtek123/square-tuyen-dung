@@ -44,6 +44,20 @@ describe('createProfileUploadSchema', () => {
     );
   });
 
+  it('rejects decimal salaries before submitting to backend integer fields', async () => {
+    const schema = createProfileUploadSchema(t as never);
+
+    await expect(schema.validateAt('salaryMin', { salaryMin: 1000.5 })).rejects.toThrow(
+      'jobSeeker:profile.validation.salaryMinInvalid',
+    );
+    await expect(schema.validateAt('salaryMax', { salaryMax: 1000.5 })).rejects.toThrow(
+      'jobSeeker:profile.validation.salaryMaxInvalid',
+    );
+    await expect(schema.validateAt('expectedSalary', { expectedSalary: 1000.5 })).rejects.toThrow(
+      'jobSeeker:profile.validation.expectedSalaryInvalid',
+    );
+  });
+
   it('rejects choice values outside the backend option sets', async () => {
     const schema = createProfileUploadSchema(t as never);
     const values = {

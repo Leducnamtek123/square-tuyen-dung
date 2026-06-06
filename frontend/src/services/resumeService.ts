@@ -69,6 +69,7 @@ interface ResumeCV {
 }
 
 export type ResumeActiveStatusResponse = { isActive: boolean };
+type ActionSuccessResponse = { success: boolean };
 
 const normalizeListResponse = <T>(raw: unknown): T[] =>
   normalizePaginatedResponse<T>(raw).results;
@@ -76,14 +77,12 @@ const normalizeListResponse = <T>(raw: unknown): T[] =>
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 
-const normalizeSuccessAction = <T extends Record<string, unknown>>(raw: unknown, fallback: T): T =>
-  isRecord(raw)
-    ? isRecord(raw.data)
-      ? ({ ...fallback, ...raw.data } as T)
-      : 'data' in raw
-        ? fallback
-        : ({ ...fallback, ...raw } as T)
+const normalizeSuccessAction = <T extends Record<string, unknown>>(raw: unknown, fallback: T): T => {
+  const value = unwrapDataResponse<unknown>(raw);
+  return isRecord(value)
+    ? ({ ...fallback, ...value } as T)
     : fallback;
+};
 
 /* ── Service ──────────────────────────────────────────────────────────── */
 
@@ -104,7 +103,7 @@ const resumeService = {
   getResumeDetail: async (resumeSlug: IdType): Promise<Resume> => {
     const url = `info/web/resumes/${resumeSlug}/`;
     const data = (await httpRequest.get(url)) as unknown;
-    return (await presignInObject(data)) as Resume;
+    return unwrapDataResponse<Resume>(await presignInObject(data));
   },
 
   saveResume: (slug: IdType): Promise<{ isSaved: boolean }> => {
@@ -122,21 +121,21 @@ const resumeService = {
   getResumeOwner: async (resumeSlug: IdType): Promise<ResumeOwner> => {
     const url = `info/web/private-resumes/${resumeSlug}/resume-owner/`;
     const data = (await httpRequest.get(url)) as unknown;
-    return (await presignInObject(data)) as ResumeOwner;
+    return unwrapDataResponse<ResumeOwner>(await presignInObject(data));
   },
 
   getCv: async (resumeSlug: IdType): Promise<ResumeCV> => {
     const url = `info/web/private-resumes/${resumeSlug}/cv/`;
     const data = (await httpRequest.get(url)) as unknown;
-    return (await presignInObject(data)) as ResumeCV;
+    return unwrapDataResponse<ResumeCV>(await presignInObject(data));
   },
 
-  updateCV: async (resumeSlug: IdType, formData: FormData): Promise<ResumeCV> => {
+  updateCV: async (resumeSlug: IdType, formData: FormData): Promise<ActionSuccessResponse> => {
     const url = `info/web/private-resumes/${resumeSlug}/cv/`;
     const resData = (await httpRequest.put(url, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })) as unknown;
-    return (await presignInObject(resData)) as ResumeCV;
+    return normalizeSuccessAction(resData, { success: true });
   },
 
   addResume: async (data: FormData): Promise<Resume> => {
@@ -144,13 +143,13 @@ const resumeService = {
     const resData = (await httpRequest.post(url, data, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })) as unknown;
-    return (await presignInObject(resData)) as Resume;
+    return unwrapDataResponse<Resume>(await presignInObject(resData));
   },
 
   updateResume: async (resumeSlug: IdType, data: ResumeInput): Promise<Resume> => {
     const url = `info/web/private-resumes/${resumeSlug}/`;
     const resData = (await httpRequest.put(url, data)) as unknown;
-    return (await presignInObject(resData)) as Resume;
+    return unwrapDataResponse<Resume>(await presignInObject(resData));
   },
 
   deleteResume: (resumeSlug: IdType): Promise<void> => {

@@ -79,6 +79,14 @@ describe('admin list services response normalization', () => {
     expect(result).toEqual({ count: 1, results: [user] });
   });
 
+  it('unwraps nested admin user update responses after presign', async () => {
+    const user = { id: 9, email: 'hr@square.vn', roleName: 'ADMIN' };
+    (httpRequest.patch as jest.Mock).mockResolvedValueOnce({ data: { data: user } });
+
+    await expect(userService.updateUser(9, { roleName: 'ADMIN' } as any)).resolves.toEqual(user);
+    expect(httpRequest.patch).toHaveBeenCalledWith('auth/users/9/', { roleName: 'ADMIN' });
+  });
+
   it('keeps admin user toggle status typed as the backend status payload', () => {
     const serviceSource = fs.readFileSync(path.join(process.cwd(), 'src/services/userService.ts'), 'utf8');
     const hookSource = fs.readFileSync(path.join(process.cwd(), 'src/views/adminPages/UsersPage/hooks/useUsers.ts'), 'utf8');

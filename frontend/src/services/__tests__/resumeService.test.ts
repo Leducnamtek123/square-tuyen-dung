@@ -62,6 +62,36 @@ describe('resumeService', () => {
     expect(httpRequest.get).toHaveBeenCalledWith('info/web/private-resumes/cv-a/resume-active/');
   });
 
+  it('unwraps nested resume detail and mutation responses after presign', async () => {
+    const detail = { id: 10, slug: 'cv-a', title: 'Public Resume Detail' };
+    const owner = { id: 10, slug: 'cv-a', title: 'Private Resume Owner' };
+    const cv = { id: 10, slug: 'cv-a', fileUrl: 'cv-a.pdf' };
+    const created = { id: 11, slug: 'cv-b', title: 'Created Resume' };
+    const updated = { id: 10, slug: 'cv-a', title: 'Updated Resume' };
+
+    (httpRequest.get as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: detail } })
+      .mockResolvedValueOnce({ data: { data: owner } })
+      .mockResolvedValueOnce({ data: { data: cv } });
+    (httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: created } });
+    (httpRequest.put as jest.Mock).mockResolvedValueOnce({ data: { data: updated } });
+
+    await expect(resumeService.getResumeDetail('cv-a')).resolves.toEqual(detail);
+    await expect(resumeService.getResumeOwner('cv-a')).resolves.toEqual(owner);
+    await expect(resumeService.getCv('cv-a')).resolves.toEqual(cv);
+    await expect(resumeService.addResume(new FormData())).resolves.toEqual(created);
+    await expect(resumeService.updateResume('cv-a', { title: 'Updated Resume' })).resolves.toEqual(updated);
+  });
+
+  it('normalizes update CV success responses instead of returning an empty CV object', async () => {
+    (httpRequest.put as jest.Mock).mockResolvedValueOnce({ data: null });
+
+    await expect(resumeService.updateCV('cv-a', new FormData())).resolves.toEqual({ success: true });
+    expect(httpRequest.put).toHaveBeenCalledWith('info/web/private-resumes/cv-a/cv/', expect.any(FormData), {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  });
+
   it('keeps active resume typed as the backend status payload', () => {
     const serviceSource = fs.readFileSync(path.join(process.cwd(), 'src/services/resumeService.ts'), 'utf8');
 

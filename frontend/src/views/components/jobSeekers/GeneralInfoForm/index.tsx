@@ -30,6 +30,7 @@ export const createGeneralInfoSchema = (t: TFunction<'jobSeeker', undefined>) =>
     .number()
     .required(t('jobSeeker:profile.validation.salaryMinRequired'))
     .typeError(t('jobSeeker:profile.validation.salaryMinInvalid'))
+    .integer(t('jobSeeker:profile.validation.salaryMinInvalid'))
     .min(0, t('jobSeeker:profile.validation.salaryMinInvalid'))
     .max(MAX_RESUME_SALARY, t('jobSeeker:profile.validation.salaryTooLarge'))
     .test('minimum-wage-comparison', t('jobSeeker:profile.validation.salaryMinComparison'), function (value) {
@@ -40,6 +41,7 @@ export const createGeneralInfoSchema = (t: TFunction<'jobSeeker', undefined>) =>
     .number()
     .required(t('jobSeeker:profile.validation.salaryMaxRequired'))
     .typeError(t('jobSeeker:profile.validation.salaryMaxInvalid'))
+    .integer(t('jobSeeker:profile.validation.salaryMaxInvalid'))
     .min(0, t('jobSeeker:profile.validation.salaryMaxInvalid'))
     .max(MAX_RESUME_SALARY, t('jobSeeker:profile.validation.salaryTooLarge'))
     .test('maximum-wage-comparison', t('jobSeeker:profile.validation.salaryMaxComparison'), function (value) {
@@ -50,6 +52,7 @@ export const createGeneralInfoSchema = (t: TFunction<'jobSeeker', undefined>) =>
     .number()
     .nullable()
     .transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value))
+    .integer(t('jobSeeker:profile.validation.expectedSalaryInvalid'))
     .min(0, t('jobSeeker:profile.validation.expectedSalaryInvalid'))
     .max(MAX_RESUME_SALARY, t('jobSeeker:profile.validation.salaryTooLarge')),
   typeOfWorkplace: yup.number().required(t('jobSeeker:profile.validation.workplaceTypeRequired')).oneOf(BACKEND_CHOICE_VALUES.typeOfWorkplace, t('jobSeeker:profile.validation.choiceInvalid')).typeError(t('jobSeeker:profile.validation.workplaceTypeRequired')),
