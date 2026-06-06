@@ -21,6 +21,14 @@ describe('AIInterviewLayout i18n', () => {
       'liveRoom.chat.close',
       'liveRoom.chat.open',
       'liveRoom.chat.subtitle',
+      'liveRoom.chat.takeoverAcquire',
+      'liveRoom.chat.takeoverActive',
+      'liveRoom.chat.takeoverHint',
+      'liveRoom.chat.takeoverInactive',
+      'liveRoom.chat.takeoverMode',
+      'liveRoom.chat.takeoverRelease',
+      'liveRoom.chat.takeoverSending',
+      'liveRoom.chat.takeoverTitle',
       'liveRoom.participants.observer',
     ];
 
@@ -32,5 +40,15 @@ describe('AIInterviewLayout i18n', () => {
         expect(line).not.toMatch(new RegExp(`t\\('${key.replaceAll('.', '\\.')}'\\s*,\\s*['"]`));
       }
     }
+  });
+
+  it('declares an employer takeover mode and LiveKit control topic', () => {
+    const source = readFileSync(join(__dirname, '../AIInterviewLayout.tsx'), 'utf8');
+
+    expect(source).toContain("const AI_TAKEOVER_TOPIC = 'square.interview.ai_takeover'");
+    expect(source).toContain("type ChatComposerMode = 'chat' | 'aiControl' | 'takeover'");
+    expect(source).toContain('sendTakeoverControl');
+    expect(source).toContain('StartAudio');
+    expect(source).toContain("value=\"takeover\"");
   });
 });

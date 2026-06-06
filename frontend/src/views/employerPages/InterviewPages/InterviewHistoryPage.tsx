@@ -26,6 +26,8 @@ import pc from '@/utils/muiColors';
 import dayjs from '@/configs/dayjs-config';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import type { SxProps, Theme } from '@mui/material/styles';
+import { localizeRoutePath } from '../../../configs/routeLocalization';
+import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
 interface VideoCardProps {
   session: InterviewSession;
@@ -34,8 +36,13 @@ const viewModeFilterSx = [{ minWidth: 180 }, filterControlSx] as SxProps<Theme>;
 
 const VideoCard = ({ session }: VideoCardProps) => {
   const theme = useTheme();
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const recordingUrl = session.recordingUrl || session.recording_url;
+  const safeRecordingUrl = getSafeResourceUrl(recordingUrl);
+  const detailHref = localizeRoutePath(
+    `/${ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', session.id.toString())}`,
+    i18n.language
+  );
 
   return (
     <Paper
@@ -68,10 +75,10 @@ const VideoCard = ({ session }: VideoCardProps) => {
           position: 'relative',
         }}
       >
-        {recordingUrl ? (
+        {safeRecordingUrl ? (
           <Box
             component="video"
-            src={recordingUrl}
+            src={safeRecordingUrl}
             preload="metadata"
             sx={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }}
           />
@@ -88,7 +95,7 @@ const VideoCard = ({ session }: VideoCardProps) => {
             bgcolor: 'rgba(0,0,0,0.3)',
           }}
           component={Link}
-          href={`/${ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', session.id.toString())}`}
+          href={detailHref}
         >
           <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
             <VisibilityIcon />
@@ -111,13 +118,13 @@ const VideoCard = ({ session }: VideoCardProps) => {
         <Typography variant="caption" color="text.disabled" sx={{ fontWeight: 600 }}>
           {session.endTime ? dayjs(session.endTime).format('DD/MM/YYYY') : '---'}
         </Typography>
-        {recordingUrl && (
+        {safeRecordingUrl && (
           <Button
             size="small"
             variant="outlined"
             startIcon={<DownloadIcon />}
             component="a"
-            href={recordingUrl}
+            href={safeRecordingUrl}
             download
             sx={{ fontWeight: 800, textTransform: 'none' }}
           >
@@ -183,7 +190,7 @@ const reducer = (
 };
 
 const InterviewHistoryPage = () => {
-  const { t } = useTranslation(['employer', 'interview', 'common']);
+  const { t, i18n } = useTranslation(['employer', 'interview', 'common']);
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const debouncedSearch = useDebounce(state.searchTerm, 500);
 
@@ -248,15 +255,16 @@ const InterviewHistoryPage = () => {
         accessorKey: 'recordingUrl',
         cell: ({ row }: ReactTableCellContext<InterviewSession, unknown>) => {
           const url = row.original.recordingUrl || row.original.recording_url;
-          if (!url) return <Typography variant="caption" color="text.disabled">{t('employer:interviewHistory.noRecording')}</Typography>;
+          const safeUrl = getSafeResourceUrl(url);
+          if (!safeUrl) return <Typography variant="caption" color="text.disabled">{t('employer:interviewHistory.noRecording')}</Typography>;
           return (
             <Button
               size="small"
               startIcon={<DownloadIcon />}
               component="a"
-              href={url}
+              href={safeUrl}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               sx={{ fontWeight: 800, textTransform: 'none' }}
             >
               {t('common:actions.download')}
@@ -267,22 +275,29 @@ const InterviewHistoryPage = () => {
       {
         header: '',
         id: 'actions',
-        cell: ({ row }: ReactTableCellContext<InterviewSession, unknown>) => (
-          <Tooltip title={t('common:actions.details')}>
-            <IconButton
-              component={Link}
-              href={`/${ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', row.original.id.toString())}`}
-              color="primary"
-              size="small"
-              sx={{ bgcolor: pc.primary( 0.08) }}
-            >
-              <VisibilityIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        ),
+        cell: ({ row }: ReactTableCellContext<InterviewSession, unknown>) => {
+          const detailHref = localizeRoutePath(
+            `/${ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', row.original.id.toString())}`,
+            i18n.language
+          );
+
+          return (
+            <Tooltip title={t('common:actions.details')}>
+              <IconButton
+                component={Link}
+                href={detailHref}
+                color="primary"
+                size="small"
+                sx={{ bgcolor: pc.primary( 0.08) }}
+              >
+                <VisibilityIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          );
+        },
       },
     ],
-    [t]
+    [i18n.language, t]
   );
 
   return (

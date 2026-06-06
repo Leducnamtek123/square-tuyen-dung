@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { unwrapDataResponse } from '../utils/apiResponse';
 
 export type EmployeeFromApplicationPayload = {
   applicationId: number;
@@ -38,15 +39,21 @@ export type HRMIntegrationStatus = {
 
 const hrmService = {
   createEmployeeFromApplication: (data: EmployeeFromApplicationPayload): Promise<EmployeeSyncResult> => {
-    return httpRequest.post<EmployeeSyncResult>('hrm/web/employees/from-application/', data);
+    return (httpRequest.post('hrm/web/employees/from-application/', data) as Promise<unknown>).then(
+      unwrapDataResponse<EmployeeSyncResult>,
+    );
   },
 
   provisionCurrentUser: (): Promise<{ userId: string; companyId: string }> => {
-    return httpRequest.post<{ userId: string; companyId: string }>('hrm/web/employees/provision-current-user/', {});
+    return (httpRequest.post('hrm/web/employees/provision-current-user/', {}) as Promise<unknown>).then(
+      unwrapDataResponse<{ userId: string; companyId: string }>,
+    );
   },
 
   getIntegrationStatus: (): Promise<HRMIntegrationStatus> => {
-    return httpRequest.get<HRMIntegrationStatus>('hrm/web/integration-status/');
+    return (httpRequest.get('hrm/web/integration-status/') as Promise<unknown>).then(
+      unwrapDataResponse<HRMIntegrationStatus>,
+    );
   },
 };
 

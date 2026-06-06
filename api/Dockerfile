@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     curl \
     netcat-traditional \
+    openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user

@@ -36,6 +36,21 @@ describe('adminJobService', () => {
     expect(httpRequest.patch).toHaveBeenCalledWith('job/web/admin-job-posts/1/reject/');
   });
 
+  it('unwraps nested update approve and reject responses', async () => {
+    const updatedJob = { id: '1', jobName: 'Senior Developer' };
+    const approvedJob = { id: '1', status: 'approved' };
+    const rejectedJob = { id: '1', status: 'rejected' };
+
+    (httpRequest.patch as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: updatedJob } })
+      .mockResolvedValueOnce({ data: { data: approvedJob } })
+      .mockResolvedValueOnce({ data: { data: rejectedJob } });
+
+    await expect(adminJobService.updateJob('1', { jobName: 'Senior Developer' })).resolves.toEqual(updatedJob);
+    await expect(adminJobService.approveJob('1')).resolves.toEqual(approvedJob);
+    await expect(adminJobService.rejectJob('1')).resolves.toEqual(rejectedJob);
+  });
+
   it('deleteJob calls delete endpoint', async () => {
     (httpRequest.delete as jest.Mock).mockResolvedValueOnce({});
     await adminJobService.deleteJob('1');

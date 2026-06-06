@@ -36,6 +36,7 @@ import { useConfig } from '@/hooks/useConfig';
 import type { ResumeDetailResponse } from '@/types/models';
 import pc from '@/utils/muiColors';
 import { useResumeDetail } from '../hooks/useEmployerQueries';
+import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
 import PersonalInfoSection from './PersonalInfoSection';
 import GeneralInfoSection from './GeneralInfoSection';
@@ -252,6 +253,13 @@ const ProfileDetailCard: React.FC = () => {
   const profileDetail = data as ResumeDetailResponse;
   const isOnlineCv = profileDetail.type === CV_TYPES.cvWebsite;
   const fileUrl = profileDetail.fileUrl || '';
+  const safeFileUrl = getSafeResourceUrl(fileUrl);
+  const openFileButtonProps = safeFileUrl
+    ? ({ href: safeFileUrl, target: '_blank', rel: 'noopener noreferrer' } as const)
+    : {};
+  const downloadFileButtonProps = safeFileUrl
+    ? ({ href: safeFileUrl, download: true } as const)
+    : {};
   const notUpdated = t('common:labels.notUpdated');
   const candidateName =
     profileDetail.user?.fullName ||
@@ -549,10 +557,8 @@ const ProfileDetailCard: React.FC = () => {
                       size="small"
                       variant="outlined"
                       startIcon={<OpenInNewIcon fontSize="small" />}
-                      href={fileUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      disabled={!fileUrl}
+                      disabled={!safeFileUrl}
+                      {...openFileButtonProps}
                       sx={{ fontWeight: 900, textTransform: 'none' }}
                     >
                       {t('common:actions.openNewTab')}
@@ -561,9 +567,8 @@ const ProfileDetailCard: React.FC = () => {
                       size="small"
                       variant="contained"
                       startIcon={<DownloadIcon fontSize="small" />}
-                      href={fileUrl}
-                      download
-                      disabled={!fileUrl}
+                      disabled={!safeFileUrl}
+                      {...downloadFileButtonProps}
                       sx={{
                         
                         fontWeight: 900,
@@ -576,7 +581,7 @@ const ProfileDetailCard: React.FC = () => {
                   </Stack>
                 </Stack>
 
-                {fileUrl ? (
+                {safeFileUrl ? (
                   <Box sx={{ minHeight: { xs: 560, md: 760 }, bgcolor: '#f8fafc' }}>
                     <Suspense
                       fallback={
@@ -589,8 +594,8 @@ const ProfileDetailCard: React.FC = () => {
                       }
                     >
                       <LazyPdf
-                        key={`${fileUrl}-${profileDetail.updateAt || ''}`}
-                        fileUrl={fileUrl}
+                        key={`${safeFileUrl}-${profileDetail.updateAt || ''}`}
+                        fileUrl={safeFileUrl}
                         title={profileDetail.title || ''}
                       />
                     </Suspense>
@@ -685,10 +690,8 @@ const ProfileDetailCard: React.FC = () => {
                       fullWidth
                       variant="contained"
                       startIcon={<OpenInNewIcon />}
-                      href={fileUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      disabled={!fileUrl}
+                      disabled={!safeFileUrl}
+                      {...openFileButtonProps}
                       sx={{
                         
                         py: 1.15,
@@ -703,9 +706,8 @@ const ProfileDetailCard: React.FC = () => {
                       fullWidth
                       variant="outlined"
                       startIcon={<DownloadIcon />}
-                      href={fileUrl}
-                      download
-                      disabled={!fileUrl}
+                      disabled={!safeFileUrl}
+                      {...downloadFileButtonProps}
                       sx={{ py: 1.15, fontWeight: 900, textTransform: 'none' }}
                     >
                       {t('common:actions.download')}

@@ -40,6 +40,7 @@ import agentAssistantService, {
   type AgentToolCall,
 } from '@/services/agentAssistantService';
 import { TabTitle } from '@/utils/generalFunction';
+import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 
 type AgentAssistantPageProps = {
   portal: AgentPortal;
@@ -264,10 +265,11 @@ const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
   const output = asRecord(toolCall.output);
   const record = asRecord(output.record);
   const recordUrl = typeof record.url === 'string' ? record.url : '';
+  const safeRecordUrl = getSafeExternalOpenUrl(recordUrl);
   const message = asString(output.message) || toolCall.errorMessage;
   const rows = businessRows(toolCall);
   const results = Array.isArray(output.results) ? output.results : [];
-  const hasDetails = Boolean(toolCall.errorMessage || recordUrl || rows.length || results.length);
+  const hasDetails = Boolean(toolCall.errorMessage || safeRecordUrl || rows.length || results.length);
   const [expanded, setExpanded] = useState(hasDetails);
   const color =
     toolCall.status === 'succeeded'
@@ -413,12 +415,14 @@ const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
             </Stack>
           ) : null}
 
-          {recordUrl ? (
+          {safeRecordUrl ? (
             <Button
               size="small"
               variant="outlined"
               endIcon={<OpenInNewIcon fontSize="small" />}
-              href={recordUrl}
+              href={safeRecordUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               sx={{ alignSelf: 'flex-start', textTransform: 'none', borderRadius: 1 }}
             >
               {t('common:agentAssistant.results.openRecord')}

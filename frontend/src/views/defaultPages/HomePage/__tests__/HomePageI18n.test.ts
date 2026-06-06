@@ -15,6 +15,8 @@ const fixedHomeKeys = [
   'home.heroBenefit1',
   'home.heroBenefit2',
   'home.heroBenefit3',
+  'home.urgentJobsAria',
+  'home.suggestedJobsAria',
   'home.searchHeading',
   'home.searchDescription',
   'home.topCompaniesSubtitle',
@@ -41,6 +43,8 @@ describe('Home page i18n', () => {
   it('does not hide missing public home keys with hard-coded fallback copy', () => {
     expect(homeSources).not.toMatch(/t\(\s*['"]home\.[^'"]+['"]\s*,\s*['"]/);
     expect(homeSources).not.toMatch(/t\(\s*['"]home\.[^'"]+['"]\s*,\s*\{[\s\S]*?defaultValue/);
+    expect(homeSources).not.toContain('aria-label="urgent jobs"');
+    expect(homeSources).not.toContain('aria-label="suggested jobs"');
 
     fixedHomeKeys.forEach((key) => {
       expect(homeSources).toContain(`'${key}'`);

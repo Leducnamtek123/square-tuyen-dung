@@ -5,6 +5,7 @@ import { formatMessageDate } from "../../../../utils/dateHelper";
 import defaultTheme from "../../../../themeConfigs/defaultTheme";
 import { useTranslation } from 'react-i18next';
 import { useChatContext } from "../../../../context/ChatProvider";
+import { getSafeResourceUrl, openResourceUrlSafely } from '@/utils/safeExternalUrl';
 
 interface MessageProps {
   userId: string | number;
@@ -26,6 +27,7 @@ const Message = ({ userId, text, avatarUrl, createdAt, attachmentUrl, attachment
   const { currentUserChat } = useChatContext();
 
   const isMe = `${currentUserChat?.userId}` === `${userId}`;
+  const safeAttachmentUrl = getSafeResourceUrl(attachmentUrl);
 
   return (
     <Box
@@ -64,22 +66,22 @@ const Message = ({ userId, text, avatarUrl, createdAt, attachmentUrl, attachment
           {text}
         </Typography>
         
-        {attachmentUrl && (
+        {safeAttachmentUrl && (
           <Box sx={{ mb: 1, p: 0.5, bgcolor: isMe ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)", borderRadius: 1 }}>
             {attachmentType === 'image' ? (
               <Image
-                src={attachmentUrl}
+                src={safeAttachmentUrl}
                 alt={t('message.attachmentImageAlt')}
                 width={800}
                 height={200}
                 unoptimized
                 style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 8, cursor: 'pointer' }}
-                onClick={() => window.open(attachmentUrl, '_blank')}
+                onClick={() => openResourceUrlSafely(safeAttachmentUrl)}
               />
             ) : (
               <Box 
                 sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', color: isMe ? 'white' : 'primary.main' }}
-                onClick={() => window.open(attachmentUrl, '_blank')}
+                onClick={() => openResourceUrlSafely(safeAttachmentUrl)}
               >
                 <FileDownloadOutlinedIcon sx={{ mr: 1 }} />
                 <Typography variant="body2" sx={{ textDecoration: 'underline' }}>

@@ -4,9 +4,11 @@
     "topCompanies": "Công ty nổi bật",
     "topCompaniesSubtitle": "Khám phá doanh nghiệp đang tuyển và đi thẳng đến những cơ hội đáng chú ý nhất.",
     "urgentJobs": "Việc làm tuyển gấp",
+    "urgentJobsAria": "Việc làm tuyển gấp",
     "keyCareers": "Ngành nghề trọng điểm",
     "keyCareersSubtitle": "Khám phá các nhóm nghề đang có nhu cầu cao để rút ngắn bước tìm kiếm.",
     "suggestedJobs": "Việc làm đề xuất",
+    "suggestedJobsAria": "Việc làm đề xuất",
     "exploreHeading": "Bạn cần tìm công việc phù hợp với mình?",
     "exploreDescription": "Bắt đầu từ một nơi duy nhất để tìm việc, xem công ty, lọc theo ngành và đi nhanh đến hành động tiếp theo.",
     "startExploring": "Bắt đầu khám phá",
@@ -143,6 +145,8 @@
     "allGenders": "Tất cả giới tính",
     "selectCityFirst": "Vui lòng chọn tỉnh/thành trước",
     "selectDistrictFirst": "Vui lòng chọn quận/huyện trước",
+    "resetFiltersAria": "Đặt lại bộ lọc việc làm nâng cao",
+    "closeAdvancedFiltersAria": "Đóng bộ lọc việc làm nâng cao",
     "searchResults": "Kết quả tìm kiếm",
     "posts": "tin tuyển dụng",
     "noJobsFound": "Không tìm thấy việc làm phù hợp với tiêu chí của bạn",
@@ -180,7 +184,8 @@
     "exploreSubtitle": "Tìm hiểu văn hóa công ty và chọn cho bạn nơi làm việc phù hợp nhất",
     "searchPlaceholder": "Nhập tên công ty hoặc lĩnh vực cần tìm kiếm",
     "allCities": "Tất cả tỉnh thành",
-    "searchButton": "Tìm kiếm"
+    "searchButton": "Tìm kiếm",
+    "resetFiltersAria": "Đặt lại bộ lọc tìm công ty"
   },
   "jobsByCategoryPage": {
     "careerTitle": "Việc làm theo ngành nghề",

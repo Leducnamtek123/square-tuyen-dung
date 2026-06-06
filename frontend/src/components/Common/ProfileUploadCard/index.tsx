@@ -13,7 +13,9 @@ import DownloadIcon from '@mui/icons-material/Download';
 import DeleteForever from '@mui/icons-material/DeleteForever';
 import downloadPdf, { formatRoute } from '@/utils/funcUtils';
 import { IMAGES, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import defaultTheme from '@/themeConfigs/defaultTheme';
+import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
 interface ProfileUploadCardProps {
   resumeImage: string;
@@ -33,7 +35,8 @@ interface ProfileUploadImageProps {
 
 const ProfileUploadImage = ({ resumeImage }: ProfileUploadImageProps) => {
   const [hasImageError, setHasImageError] = React.useState(false);
-  const cardImageSrc = !hasImageError && resumeImage ? resumeImage : IMAGES.coverImageDefault;
+  const safeResumeImage = getSafeResourceUrl(resumeImage);
+  const cardImageSrc = !hasImageError && safeResumeImage ? safeResumeImage : IMAGES.coverImageDefault;
 
   return (
     <Image
@@ -60,8 +63,12 @@ const ProfileUploadCard = ({
 }: ProfileUploadCardProps) => {
 
   const { push } = useRouter();
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const formattedUpdatedAt = dayjs(updateAt).format('DD/MM/YYYY HH:mm:ss');
+  const safeFileUrl = getSafeResourceUrl(fileUrl);
+  const attachedProfileHref = slug
+    ? localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.ATTACHED_PROFILE, slug)}`, i18n.language)
+    : undefined;
 
   return (
 
@@ -265,7 +272,13 @@ const ProfileUploadCard = ({
 
                 size="small"
 
-                onClick={() => push(`/${formatRoute(ROUTES.JOB_SEEKER.ATTACHED_PROFILE, slug)}`)}
+                disabled={!attachedProfileHref}
+
+                onClick={() => {
+                  if (attachedProfileHref) {
+                    push(attachedProfileHref);
+                  }
+                }}
 
               >
 
@@ -307,7 +320,9 @@ const ProfileUploadCard = ({
 
                 label={t('profileUpload.download')}
 
-                onClick={() => downloadPdf(fileUrl, title)}
+                disabled={!safeFileUrl}
+
+                onClick={safeFileUrl ? () => downloadPdf(safeFileUrl, title) : undefined}
 
               />
 

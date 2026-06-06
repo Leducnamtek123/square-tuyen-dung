@@ -15,6 +15,7 @@ import {
 import db from '@/configs/firebase-config';
 import { ROUTES } from '@/configs/constants';
 import { useTranslation } from 'react-i18next';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 interface ChatCardProps {
   // Add specific props if needed
@@ -25,7 +26,7 @@ const chatRoomCollectionRef = collection(db, 'chatRooms');
 const ChatCard = (_props: ChatCardProps) => {
   const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
   const { push } = useRouter();
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const [count, setCount] = React.useState(0);
 
   const isEmployer = React.useMemo(() => {
@@ -58,11 +59,7 @@ const ChatCard = (_props: ChatCardProps) => {
   }, [currentUser]);
 
   const handleRedirect = () => {
-    if (isEmployer) {
-      push(`/${ROUTES.EMPLOYER.CHAT}`);
-    } else {
-      push(`/${ROUTES.JOB_SEEKER.CHAT}`);
-    }
+    push(localizeRoutePath(isEmployer ? `/${ROUTES.EMPLOYER.CHAT}` : `/${ROUTES.JOB_SEEKER.CHAT}`, i18n.language));
   };
 
   return (

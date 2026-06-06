@@ -27,6 +27,18 @@ describe('authService', () => {
       expect((httpRequest.post as jest.Mock).mock.calls[0][1]).not.toHaveProperty('client_secret');
       expect(res).toEqual({ access_token: 'aaa' });
     });
+
+    it('unwraps nested token response envelopes', async () => {
+      const token = { accessToken: 'access', refreshToken: 'refresh', tokenType: 'Bearer' };
+      (httpRequest.post as jest.Mock)
+        .mockResolvedValueOnce({ data: { data: token } })
+        .mockResolvedValueOnce({ data: { data: token } })
+        .mockResolvedValueOnce({ data: { data: token } });
+
+      await expect(authService.getToken('test@example.com', 'password', 'JOB_SEEKER')).resolves.toEqual(token);
+      await expect(authService.convertToken('client', 'google-oauth2', 'provider-token')).resolves.toEqual(token);
+      await expect(authService.firebaseLogin('firebase-token', 'JOB_SEEKER')).resolves.toEqual(token);
+    });
   });
 
   describe('getUserInfo', () => {
@@ -97,6 +109,46 @@ describe('authService', () => {
     it('emailExists calls post', async () => {
       await authService.emailExists('a@b.com');
       expect(httpRequest.post).toHaveBeenCalledWith('auth/email-exists/', { email: 'a@b.com' });
+    });
+
+    it('unwraps nested auth object response envelopes', async () => {
+      const creds = { exists: true, email: 'a@b.com', emailVerified: false };
+      const emailExists = { exists: true };
+      const user = { id: 1, email: 'a@b.com', avatarUrl: 'avatar.jpg' };
+      const workspaces = { id: 1, activeCompany: { id: 9 } };
+      const updatedUser = { id: 1, fullName: 'New Name', avatarUrl: 'updated.jpg' };
+      const avatar = { avatarUrl: 'avatar-new.jpg' };
+      const deletedAvatar = { avatarUrl: null };
+      const settings = { emailNotificationActive: true, smsNotificationActive: false };
+      const updatedSettings = { emailNotificationActive: false, smsNotificationActive: true };
+
+      (httpRequest.post as jest.Mock)
+        .mockResolvedValueOnce({ data: { data: creds } })
+        .mockResolvedValueOnce({ data: { data: emailExists } });
+      (httpRequest.get as jest.Mock)
+        .mockResolvedValueOnce({ data: { data: user } })
+        .mockResolvedValueOnce({ data: { data: workspaces } })
+        .mockResolvedValueOnce({ data: { data: settings } });
+      (httpRequest.patch as jest.Mock).mockResolvedValueOnce({ data: { data: updatedUser } });
+      (httpRequest.put as jest.Mock)
+        .mockResolvedValueOnce({ data: { data: avatar } })
+        .mockResolvedValueOnce({ data: { data: updatedSettings } });
+      (httpRequest.delete as jest.Mock).mockResolvedValueOnce({ data: { data: deletedAvatar } });
+
+      await expect(authService.checkCreds('a@b.com', 'JOB_SEEKER')).resolves.toEqual(creds);
+      await expect(authService.emailExists('a@b.com')).resolves.toEqual(emailExists);
+      await expect(authService.getUserInfo()).resolves.toEqual({ ...user, avatarUrl: 'presigned-avatar.jpg' });
+      await expect(authService.getUserWorkspaces()).resolves.toEqual(workspaces);
+      await expect(authService.updateUser({ fullName: 'New Name' })).resolves.toEqual({
+        ...updatedUser,
+        avatarUrl: 'presigned-updated.jpg',
+      });
+
+      const formData = new FormData();
+      await expect(authService.updateAvatar(formData)).resolves.toEqual({ avatarUrl: 'presigned-avatar-new.jpg' });
+      await expect(authService.deleteAvatar()).resolves.toEqual(deletedAvatar);
+      await expect(authService.getUserSettings()).resolves.toEqual(settings);
+      await expect(authService.updateUserSettings(updatedSettings)).resolves.toEqual(updatedSettings);
     });
 
     it('forgotPassword defaults platform to WEB', async () => {

@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useMemo, useReducer } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, Button, Tooltip, IconButton, Stack } from "@mui/material";
+import { Box, Typography, Paper, Button, Tooltip, IconButton, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
@@ -230,12 +230,6 @@ const JobNotificationsPage = () => {
                     <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
                         {t('pages.jobNotifications.title')}
                     </Typography>
-                    <Breadcrumbs aria-label="breadcrumb">
-                        <Link underline="hover" color="inherit" href="/admin">
-                            {t('pages.jobNotifications.breadcrumbAdmin')}
-                        </Link>
-                        <Typography color="text.primary">{t('pages.jobNotifications.breadcrumbNotifications')}</Typography>
-                    </Breadcrumbs>
                 </Box>
                 <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}>
                     {t('pages.jobNotifications.addNotification')}

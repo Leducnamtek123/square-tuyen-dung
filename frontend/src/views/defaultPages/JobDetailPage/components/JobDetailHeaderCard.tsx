@@ -17,6 +17,7 @@ import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
 import { formatLocalizedSalaryRange } from "../../../../utils/customData";
 import { tConfig } from "../../../../utils/tConfig";
 import { ROUTES } from "../../../../configs/constants";
+import { localizeRoutePath } from "../../../../configs/routeLocalization";
 import { formatRoute } from "../../../../utils/funcUtils";
 import JobDetailActions from "./JobDetailActions";
 import JobDetailInfoItem from "./JobDetailInfoItem";
@@ -52,6 +53,12 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
 }) => {
   const { t, i18n } = useTranslation(["public"]);
   const employeeSizeLabel = tConfig(allConfig?.employeeSizeDict?.[String(jobPostDetail?.companyDict?.employeeSize)]);
+  const companyDetailHref = jobPostDetail?.companyDict?.slug
+    ? localizeRoutePath(
+      `/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, jobPostDetail.companyDict.slug)}`,
+      i18n.language
+    )
+    : undefined;
 
   return (
     <div className="rounded-xl border border-border/60 bg-card px-4 py-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)] sm:px-6 lg:px-8">
@@ -70,12 +77,18 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
           />
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <Link
-                href={`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, jobPostDetail?.companyDict?.slug || '')}`}
-                className="text-lg font-semibold text-foreground hover:underline"
-              >
-                {jobPostDetail?.companyDict?.companyName}
-              </Link>
+              {companyDetailHref ? (
+                <Link
+                  href={companyDetailHref}
+                  className="text-lg font-semibold text-foreground hover:underline"
+                >
+                  {jobPostDetail?.companyDict?.companyName}
+                </Link>
+              ) : (
+                <span className="text-lg font-semibold text-foreground">
+                  {jobPostDetail?.companyDict?.companyName}
+                </span>
+              )}
               {jobPostDetail?.companyDict?.isVerified && (
                 <Chip
                   icon={<VerifiedIcon sx={{ fontSize: 16 }} />}

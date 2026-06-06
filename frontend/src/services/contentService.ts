@@ -43,6 +43,15 @@ const normalizeActionResponse = <T extends Record<string, unknown>>(raw: unknown
         : ({ ...fallback, ...raw } as T)
     : fallback;
 
+const unwrapDetailResponse = <T>(raw: unknown): T => {
+  let value = raw;
+  for (let depth = 0; depth < 3; depth += 1) {
+    if (!isRecord(value) || !('data' in value)) break;
+    value = value.data;
+  }
+  return value as T;
+};
+
 // ─── Article Types ────────────────────────────────────────────────────────────
 
 export type ArticleCategory = 'news' | 'blog';
@@ -123,9 +132,9 @@ const contentService = {
     if (data.evidenceImageFile) {
       formData.append('evidenceImageFile', data.evidenceImageFile);
     }
-    return httpRequest.post(url, formData, {
+    return (httpRequest.post(url, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
-    }) as Promise<Feedback>;
+    }) as Promise<unknown>).then(unwrapDetailResponse<Feedback>);
   },
 
   sendSMSDownloadApp: (data: SMSDownloadAppPayload): Promise<{ sent?: boolean; message?: string }> => {
@@ -159,9 +168,7 @@ const contentService = {
 
   getPublicArticleBySlug: async (slug: string): Promise<Article> => {
     const response = await httpRequest.get(`content/web/articles/${slug}/`);
-    const raw = response as Article & { data?: Article };
-    if (raw && typeof raw === 'object' && 'data' in raw) return (raw as { data: Article }).data;
-    return raw as Article;
+    return unwrapDetailResponse<Article>(response);
   },
 
   // ─── Admin Article API ───────────────────────────────────────────────────
@@ -175,9 +182,7 @@ const contentService = {
 
   adminGetArticle: async (id: number): Promise<Article> => {
     const response = await httpRequest.get(`content/web/admin/articles/${id}/`);
-    const raw = response as Article & { data?: Article };
-    if (raw && typeof raw === 'object' && 'data' in raw) return (raw as { data: Article }).data;
-    return raw as Article;
+    return unwrapDetailResponse<Article>(response);
   },
 
   adminCreateArticle: (data: ArticlePayload, thumbnailFile?: File): Promise<Article> => {
@@ -186,7 +191,8 @@ const contentService = {
       if (v !== undefined && v !== null) form.append(k, String(v));
     });
     if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
-    return httpRequest.post('content/web/admin/articles/', form) as Promise<Article>;
+    return (httpRequest.post('content/web/admin/articles/', form) as Promise<unknown>)
+      .then(unwrapDetailResponse<Article>);
   },
 
   adminUpdateArticle: (id: number, data: Partial<ArticlePayload>, thumbnailFile?: File): Promise<Article> => {
@@ -195,7 +201,8 @@ const contentService = {
       if (v !== undefined && v !== null) form.append(k, String(v));
     });
     if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
-    return httpRequest.patch(`content/web/admin/articles/${id}/`, form) as Promise<Article>;
+    return (httpRequest.patch(`content/web/admin/articles/${id}/`, form) as Promise<unknown>)
+      .then(unwrapDetailResponse<Article>);
   },
 
   adminDeleteArticle: (id: number): Promise<void> => {
@@ -213,9 +220,7 @@ const contentService = {
 
   employerGetBlog: async (id: number): Promise<Article> => {
     const response = await httpRequest.get(`content/web/employer/articles/${id}/`);
-    const raw = response as Article & { data?: Article };
-    if (raw && typeof raw === 'object' && 'data' in raw) return (raw as { data: Article }).data;
-    return raw as Article;
+    return unwrapDetailResponse<Article>(response);
   },
 
   employerCreateBlog: (data: ArticlePayload, thumbnailFile?: File): Promise<Article> => {
@@ -224,7 +229,8 @@ const contentService = {
       if (v !== undefined && v !== null) form.append(k, String(v));
     });
     if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
-    return httpRequest.post('content/web/employer/articles/', form) as Promise<Article>;
+    return (httpRequest.post('content/web/employer/articles/', form) as Promise<unknown>)
+      .then(unwrapDetailResponse<Article>);
   },
 
   employerUpdateBlog: (id: number, data: Partial<ArticlePayload>, thumbnailFile?: File): Promise<Article> => {
@@ -233,7 +239,8 @@ const contentService = {
       if (v !== undefined && v !== null) form.append(k, String(v));
     });
     if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
-    return httpRequest.patch(`content/web/employer/articles/${id}/`, form) as Promise<Article>;
+    return (httpRequest.patch(`content/web/employer/articles/${id}/`, form) as Promise<unknown>)
+      .then(unwrapDetailResponse<Article>);
   },
 
   employerDeleteBlog: (id: number): Promise<void> => {

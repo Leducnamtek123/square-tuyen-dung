@@ -1,6 +1,6 @@
 'use client';
 import React, { useCallback, useMemo, useReducer } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Button, Stack, Paper, useTheme, IconButton } from '@mui/material';
+import { Box, Typography, Button, Stack, Paper, useTheme, IconButton } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -221,11 +221,6 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
           <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mb: 1, letterSpacing: '-0.5px' }}>
             {resolvedTitle}
           </Typography>
-          <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/employer/dashboard" sx={{ fontSize: '0.875rem', fontWeight: 500 }}>{t('common:breadcrumbs.employer')}</Link>
-            <Typography color="text.secondary" sx={{ fontSize: '0.875rem', fontWeight: 500 }}>{t('employer:questionGroupsCard.onlineInterview')}</Typography>
-            <Typography color="text.primary" sx={{ fontSize: '0.875rem', fontWeight: 700 }}>{t('employer:questionGroupsCard.questionGroups')}</Typography>
-          </Breadcrumbs>
         </Box>
         <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleOpenAdd} sx={{ px: 3, py: 1, boxShadow: 'none', fontWeight: 700, textTransform: 'none' }}>
           {t('employer:questionGroupsCard.actions.addGroup')}

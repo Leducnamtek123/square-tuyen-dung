@@ -6,6 +6,7 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
@@ -845,6 +846,26 @@ class InterviewEvaluationViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             return self.queryset.all()
         # Job seeker: only evaluations on their own interviews
         return self.queryset.filter(interview__candidate=user)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        interview = serializer.validated_data.get("interview")
+        _deny_if_cannot_manage_session(request.user, interview, request)
+
+        existing = self.get_queryset().filter(interview=interview).order_by("-create_at").first()
+        if existing:
+            update_serializer = self.get_serializer(existing, data=request.data, partial=True)
+            update_serializer.is_valid(raise_exception=True)
+            evaluation = update_serializer.save(evaluator=request.user)
+            self._audit_instance("update", evaluation)
+            return Response(update_serializer.data, status=status.HTTP_200_OK)
+
+        evaluation = serializer.save(evaluator=request.user)
+        self._audit_instance("create", evaluation)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_create(self, serializer):
         user = self.request.user

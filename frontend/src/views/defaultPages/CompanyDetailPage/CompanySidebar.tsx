@@ -11,6 +11,7 @@ import type { Theme as StylesTheme } from '@mui/material/styles';
 import type { Company } from '@/types/models';
 import type { TFunction } from 'i18next';
 import type { CompanyDetailProps } from './types';
+import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 
 interface CompanySidebarProps {
   companyDetail: CompanyDetailProps;
@@ -19,6 +20,11 @@ interface CompanySidebarProps {
 }
 
 const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageList, t }) => {
+  const safeWebsiteUrl = getSafeExternalOpenUrl(companyDetail.websiteUrl);
+  const safeFacebookUrl = getSafeExternalOpenUrl(companyDetail.facebookUrl);
+  const safeYoutubeUrl = getSafeExternalOpenUrl(companyDetail.youtubeUrl);
+  const safeLinkedinUrl = getSafeExternalOpenUrl(companyDetail.linkedinUrl);
+
   return (
     <Card sx={{ p: 3, boxShadow: (theme: StylesTheme) => theme.customShadows?.small || 1 }}>
       <Stack spacing={3}>
@@ -40,10 +46,12 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageLis
           </Typography>
           <Typography sx={{ display: "flex", alignItems: "center", gap: 1, color: "text.secondary", "& svg": { color: "primary.main" } }}>
             <FontAwesomeIcon icon={faGlobe} />
-            {companyDetail.websiteUrl ? (
-              <Link target="_blank" href={companyDetail.websiteUrl} sx={{ color: "primary.main", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}>
+            {safeWebsiteUrl ? (
+              <Link target="_blank" rel="noopener noreferrer" href={safeWebsiteUrl} sx={{ color: "primary.main", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}>
                 {companyDetail.websiteUrl}
               </Link>
+            ) : companyDetail.websiteUrl ? (
+              <span>{companyDetail.websiteUrl}</span>
             ) : (
               t("companyDetail.notUpdated")
             )}
@@ -55,18 +63,18 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageLis
             {t("companyDetail.followAt")}
           </Typography>
           <Stack direction="row" spacing={1} sx={{ "& .MuiIconButton-root": { bgcolor: "grey.50", transition: "all 0.2s", "&:hover": { transform: "translateY(-2px)" } } }}>
-            {companyDetail?.facebookUrl && (
-              <IconButton component="a" color="primary" aria-label="facebook" href={companyDetail.facebookUrl} target="_blank">
+            {safeFacebookUrl && (
+              <IconButton component="a" color="primary" aria-label="facebook" href={safeFacebookUrl} target="_blank" rel="noopener noreferrer">
                 <FacebookIcon size={30} />
               </IconButton>
             )}
-            {companyDetail?.youtubeUrl && (
-              <IconButton component="a" color="primary" aria-label="youtube" href={companyDetail.youtubeUrl} target="_blank">
+            {safeYoutubeUrl && (
+              <IconButton component="a" color="primary" aria-label="youtube" href={safeYoutubeUrl} target="_blank" rel="noopener noreferrer">
                 <YoutubeIcon size={30} />
               </IconButton>
             )}
-            {companyDetail?.linkedinUrl && (
-              <IconButton component="a" color="primary" aria-label="linkedin" href={companyDetail.linkedinUrl} target="_blank">
+            {safeLinkedinUrl && (
+              <IconButton component="a" color="primary" aria-label="linkedin" href={safeLinkedinUrl} target="_blank" rel="noopener noreferrer">
                 <LinkedinIcon size={30} />
               </IconButton>
             )}

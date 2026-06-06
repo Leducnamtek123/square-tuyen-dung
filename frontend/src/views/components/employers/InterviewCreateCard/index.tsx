@@ -38,6 +38,7 @@ import InterviewCreateCardForm from './InterviewCreateCardForm';
 import type { FormValues } from './types';
 import type { JobPostActivity, Question, QuestionGroup, VoiceProfile } from '../../../../types/models';
 import pc from '@/utils/muiColors';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 
 interface InterviewCreateCardProps {
   title?: string;
@@ -89,8 +90,9 @@ const InterviewCreateCardInner = ({
   isLoadingJobs,
 }: InterviewCreateCardInnerProps) => {
   const { push, back } = useRouter();
-  const { t } = useTranslation(['employer', 'interview', 'common']);
+  const { t, i18n } = useTranslation(['employer', 'interview', 'common']);
   const theme = useTheme();
+  const interviewListHref = localizeRoutePath(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`, i18n.language);
   const { scheduleSession, updateSession, isMutating: isInterviewMutating } = useInterviewMutations();
   const { createQuestion, updateQuestion, isMutating: isQuestionMutating } = useQuestionMutations();
   const { data: voiceProfileData, isLoading: isLoadingVoiceProfiles } = useEmployerVoiceProfiles();
@@ -190,13 +192,13 @@ const InterviewCreateCardInner = ({
         await scheduleSession(payload);
         toastMessages.success(t('interview:interviewCreateCard.messages.scheduleSuccess'));
       }
-      push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`);
+      push(interviewListHref);
     } catch (error) {
       errorHandling(error);
     } finally {
       setIsLoadingSessionSave(false);
     }
-  }, [sessionId, updateSession, scheduleSession, t, push]);
+  }, [interviewListHref, sessionId, updateSession, scheduleSession, t, push]);
 
   const handleOpenAddQuestion = useCallback(() => {
     setEditingQuestionId(null);

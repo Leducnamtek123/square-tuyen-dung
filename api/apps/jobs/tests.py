@@ -567,6 +567,31 @@ def test_employer_can_add_manual_candidate_to_applied_profiles(employer_user, jo
 
 
 @pytest.mark.django_db
+def test_employer_manual_candidate_rejects_values_exceeding_activity_storage_limits(employer_user, job_post):
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.post(
+        "/api/v1/job/web/employer-job-posts-activity/manual-candidates/",
+        {
+            "jobPost": job_post.id,
+            "fullName": "A" * 101,
+            "email": f"{'a' * 92}@example.com",
+            "phone": "0909000000123456",
+            "title": "Frontend Developer",
+        },
+        format="json",
+    )
+
+    assert response.status_code == 400
+    errors = response.data["error"]["details"]
+    assert "fullName" in errors
+    assert "email" in errors
+    assert "phone" in errors
+    assert JobPostActivity.objects.filter(job_post=job_post, full_name="A" * 101).count() == 0
+
+
+@pytest.mark.django_db
 def test_manual_candidate_export_uses_manual_profile_city(employer_user, job_post, city):
     client = APIClient()
     client.force_authenticate(user=employer_user)
@@ -695,6 +720,219 @@ def test_ai_analysis_uses_rule_based_fallback_when_llm_is_unavailable(monkeypatc
     assert activity.ai_analysis_score is not None
     assert activity.ai_analysis_source == "manual_profile:fallback"
     assert "AI" in activity.ai_analysis_summary
+
+
+@pytest.mark.django_db
+def test_ai_analysis_flags_pdf_candidate_name_mismatch(monkeypatch, employer_user, job_post):
+    from apps.files.models import File
+    from apps.profiles.models import EmployerCandidateProfile
+    from apps.jobs.tasks import analyze_resume_ai
+
+    file = File.objects.create(
+        public_id="square/cv/name-mismatch.pdf",
+        format="pdf",
+        resource_type="raw",
+        file_type=File.CV_TYPE,
+        uploaded_at=timezone.now(),
+    )
+    profile = EmployerCandidateProfile.objects.create(
+        company=job_post.company,
+        created_by=employer_user,
+        full_name="Huỳnh Tiến Linh",
+        title="Họa viên kiến trúc",
+        description="Ứng viên do nhà tuyển dụng nhập thủ công.",
+        skills_summary="AutoCAD, Revit",
+        file=file,
+    )
+    activity = JobPostActivity.objects.create(
+        job_post=job_post,
+        manual_candidate_profile=profile,
+        full_name="Huỳnh Tiến Linh",
+        email="candidate-name-mismatch@test.com",
+        phone="0909000999",
+        status=var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+    )
+
+    class FakeResponse:
+        status_code = 200
+        content = b"%PDF-1.4"
+
+    class FakeClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def get(self, url):
+            return FakeResponse()
+
+    def fake_post_chat_completion_httpx(*args, **kwargs):
+        return (
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "content": json.dumps(
+                                {
+                                    "score": 65,
+                                    "summary": "Ứng viên có một số kỹ năng phù hợp.",
+                                    "skills": ["AutoCAD", "Revit"],
+                                    "pros": ["Có kinh nghiệm bản vẽ kỹ thuật"],
+                                    "cons": ["Cần xác minh thêm hồ sơ"],
+                                    "matching_skills": ["AutoCAD"],
+                                    "missing_skills": ["Shop drawing"],
+                                    "criteria_results": [],
+                                    "evidence": [],
+                                },
+                                ensure_ascii=False,
+                            )
+                        }
+                    }
+                ]
+            },
+            SimpleNamespace(model="gemma3:12b", name="local"),
+        )
+
+    monkeypatch.setattr("shared.helpers.cloudinary_service.CloudinaryService._get_client", lambda: (_ for _ in ()).throw(Exception("no minio")))
+    monkeypatch.setattr("apps.jobs.tasks.httpx.Client", FakeClient)
+    monkeypatch.setattr(
+        "apps.jobs.tasks.extract_text_from_pdf",
+        lambda path: (
+            "NGÔ TÙNG TRI\n"
+            "HỌA VIÊN KIẾN TRÚC\n"
+            "Kinh nghiệm làm bản vẽ thi công, AutoCAD, Revit và triển khai hồ sơ kỹ thuật."
+        ),
+    )
+    monkeypatch.setattr("apps.jobs.tasks.post_chat_completion_httpx", fake_post_chat_completion_httpx)
+
+    analyze_resume_ai.run(activity.id)
+
+    activity.refresh_from_db()
+    warnings = activity.ai_analysis_evidence.get("identity_warnings", [])
+    assert warnings
+    assert warnings[0]["application_name"] == "Huỳnh Tiến Linh"
+    assert warnings[0]["resume_name"] == "NGÔ TÙNG TRI"
+    assert "Tên trong CV" in activity.ai_analysis_cons
+
+
+@pytest.mark.django_db
+def test_ai_analysis_flags_image_only_pdf_candidate_name_mismatch(monkeypatch, employer_user, job_post):
+    from apps.files.models import File
+    from apps.profiles.models import EmployerCandidateProfile
+    from apps.jobs.tasks import analyze_resume_ai
+
+    file = File.objects.create(
+        public_id="square/cv/image-only-name-mismatch.pdf",
+        format="pdf",
+        resource_type="raw",
+        file_type=File.CV_TYPE,
+        uploaded_at=timezone.now(),
+    )
+    profile = EmployerCandidateProfile.objects.create(
+        company=job_post.company,
+        created_by=employer_user,
+        full_name="Hu\u1ef3nh Ti\u1ebfn Linh",
+        title="Hoa vien kien truc",
+        description="Ung vien do nha tuyen dung nhap thu cong.",
+        skills_summary="AutoCAD, Revit",
+        file=file,
+    )
+    activity = JobPostActivity.objects.create(
+        job_post=job_post,
+        manual_candidate_profile=profile,
+        full_name="Hu\u1ef3nh Ti\u1ebfn Linh",
+        email="candidate-image-only-name-mismatch@test.com",
+        phone="0909000888",
+        status=var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+    )
+
+    class FakeResponse:
+        status_code = 200
+        content = b"%PDF-1.4"
+
+    class FakeClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def get(self, url):
+            return FakeResponse()
+
+    def fake_post_chat_completion_httpx(*args, **kwargs):
+        return (
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "content": json.dumps(
+                                {
+                                    "score": 65,
+                                    "summary": "Ung vien co mot so ky nang phu hop.",
+                                    "skills": ["AutoCAD", "Revit"],
+                                    "pros": ["Co kinh nghiem ban ve ky thuat"],
+                                    "cons": [],
+                                    "matching_skills": ["AutoCAD"],
+                                    "missing_skills": ["Shop drawing"],
+                                    "criteria_results": [],
+                                    "evidence": [],
+                                }
+                            )
+                        }
+                    }
+                ]
+            },
+            SimpleNamespace(model="gemma3:12b", name="local"),
+        )
+
+    monkeypatch.setattr("shared.helpers.cloudinary_service.CloudinaryService._get_client", lambda: (_ for _ in ()).throw(Exception("no minio")))
+    monkeypatch.setattr("apps.jobs.tasks.httpx.Client", FakeClient)
+    monkeypatch.setattr("apps.jobs.tasks.extract_text_from_pdf", lambda path: "")
+    monkeypatch.setattr("apps.jobs.tasks._extract_candidate_name_from_pdf_image", lambda path: "NG\u00d4 T\u00d9NG TRI", raising=False)
+    monkeypatch.setattr("apps.jobs.tasks.post_chat_completion_httpx", fake_post_chat_completion_httpx)
+
+    analyze_resume_ai.run(activity.id)
+
+    activity.refresh_from_db()
+    warnings = activity.ai_analysis_evidence.get("identity_warnings", [])
+    assert warnings
+    assert warnings[0]["application_name"] == "Hu\u1ef3nh Ti\u1ebfn Linh"
+    assert warnings[0]["resume_name"] == "NG\u00d4 T\u00d9NG TRI"
+
+
+@pytest.mark.django_db
+def test_employer_activity_detail_hides_ai_implementation_metadata(employer_user, job_post):
+    activity = JobPostActivity.objects.create(
+        job_post=job_post,
+        full_name="Metadata Hidden Candidate",
+        email="metadata-hidden@test.com",
+        phone="0909000111",
+        status=var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+        ai_analysis_status="completed",
+        ai_analysis_score=70,
+        ai_analysis_model="gemma3:12b",
+        ai_analysis_source="file:pdf:local",
+        ai_analysis_prompt_version="resume-screen-v2",
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.get(f"/api/v1/job/web/employer-job-posts-activity/{activity.id}/")
+
+    assert response.status_code == 200
+    payload = response.data["data"]
+    assert "aiAnalysisModel" not in payload
+    assert "aiAnalysisSource" not in payload
+    assert "aiAnalysisPromptVersion" not in payload
 
 
 @pytest.mark.django_db

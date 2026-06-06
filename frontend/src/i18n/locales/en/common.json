@@ -196,6 +196,10 @@
       "error": "Unable to transcribe audio right now."
     }
   },
+  "aiElements": {
+    "previousBranch": "Previous branch",
+    "nextBranch": "Next branch"
+  },
   "ai": {
     "reviewStatus": {
       "label": "AI review",
@@ -331,6 +335,8 @@
     "actionFailed": "Unable to perform this action right now. Please try again."
   },
   "breadcrumbs": {
+    "label": "Breadcrumb",
+    "admin": "Admin",
     "employer": "Employer"
   },
   "buttons": {

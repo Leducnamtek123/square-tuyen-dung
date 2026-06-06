@@ -350,7 +350,7 @@ export default function HomePage() {
         <Card variant="outlined" sx={{ boxShadow: 0 }}>
           <CardHeader
             avatar={
-              <Avatar sx={{ bgcolor: 'white' }} aria-label="urgent jobs">
+              <Avatar sx={{ bgcolor: 'white' }} aria-label={t('home.urgentJobsAria')}>
                 <AccessTimeIcon color="secondary" />
               </Avatar>
             }
@@ -391,7 +391,7 @@ export default function HomePage() {
           <Card variant="outlined">
             <CardHeader
               avatar={
-                <Avatar sx={{ bgcolor: 'white' }} aria-label="suggested jobs">
+                <Avatar sx={{ bgcolor: 'white' }} aria-label={t('home.suggestedJobsAria')}>
                   <TipsAndUpdatesIcon color="secondary" />
                 </Avatar>
               }

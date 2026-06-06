@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, Tooltip, IconButton, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import { Box, Typography, Paper, Tooltip, IconButton, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
@@ -13,6 +13,7 @@ import { useDataTable, useDebounce } from '../../../hooks';
 import { Resume } from '../../../types/models';
 import dayjs from '../../../configs/dayjs-config';
 import FilterBar from '@/components/Common/FilterBar';
+import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
 const ResumesPage = () => {
     const { t } = useTranslation('admin');
@@ -106,15 +107,17 @@ const ResumesPage = () => {
             meta: { align: 'right' },
             cell: (info) => {
                 const resume = info.row.original;
+                const fileUrl = resume.fileUrl || '';
+                const safeFileUrl = getSafeResourceUrl(fileUrl);
                 return (
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                         <Tooltip title={t('pages.resumes.table.view')}>
-                             <IconButton size="small" component="a" href={resume.fileUrl || '#'} target="_blank" color="info">
+                             <IconButton size="small" component="a" href={safeFileUrl} target="_blank" rel="noopener noreferrer" color="info" disabled={!safeFileUrl}>
                                 <VisibilityIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title={t('pages.resumes.table.download')}>
-                             <IconButton size="small" component="a" href={resume.fileUrl || '#'} download color="primary">
+                             <IconButton size="small" component="a" href={safeFileUrl} download color="primary" disabled={!safeFileUrl}>
                                 <DownloadIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
@@ -136,13 +139,6 @@ const ResumesPage = () => {
                     <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
                         {t('pages.resumes.title')}
                     </Typography>
-                    <Breadcrumbs aria-label="breadcrumb">
-                        <Link underline="hover" color="inherit" href="/admin">
-                            {t('pages.resumes.breadcrumbAdmin')}
-                        </Link>
-                        <Typography color="text.primary">{t('pages.resumes.breadcrumbResources')}</Typography>
-                        <Typography color="text.primary">{t('pages.resumes.breadcrumbResumes')}</Typography>
-                    </Breadcrumbs>
                 </Box>
             </Box>
 

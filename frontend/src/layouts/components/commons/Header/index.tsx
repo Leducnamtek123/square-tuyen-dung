@@ -47,11 +47,11 @@ const Header = (_props: HeaderProps) => {
       { id: '4', label: t('nav.aboutUs'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.ABOUT_US}`, i18n.language) },
     ],
     [HOST_NAME.EMPLOYER_PROJECT]: [
-      { id: '1', label: t('nav.introduction'), path: `/${ROUTES.EMPLOYER.INTRODUCE}` },
-      { id: '2', label: t('nav.services'), path: `/${ROUTES.EMPLOYER.SERVICE}` },
-      { id: '3', label: t('nav.pricing'), path: `/${ROUTES.EMPLOYER.PRICING}` },
-      { id: '4', label: t('nav.support'), path: `/${ROUTES.EMPLOYER.SUPPORT}` },
-      { id: '5', label: t('nav.blog'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language) },
+      { id: '1', label: t('nav.introduction'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.INTRODUCE}`, i18n.language) },
+      { id: '2', label: t('nav.services'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SERVICE}`, i18n.language) },
+      { id: '3', label: t('nav.pricing'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language) },
+      { id: '4', label: t('nav.support'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SUPPORT}`, i18n.language) },
+      { id: '5', label: t('nav.blog'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.BLOG}`, i18n.language) },
     ],
   }), [t, i18n.language]);
 

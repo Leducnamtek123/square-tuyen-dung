@@ -4,8 +4,6 @@ import React, { useMemo, useReducer } from 'react';
 import {
   Box,
   Typography,
-  Breadcrumbs,
-  Link,
   Paper,
   TextField,
   Button,
@@ -256,11 +254,6 @@ const DistrictsPage = () => {
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
             {t('pages.districts.title')}
           </Typography>
-          <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/admin">{t('pages.districts.breadcrumbAdmin')}</Link>
-            <Typography color="text.primary">{t('pages.districts.breadcrumbLocations')}</Typography>
-            <Typography color="text.primary">{t('pages.districts.breadcrumbDistricts')}</Typography>
-          </Breadcrumbs>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}>
           {t('pages.districts.add')}

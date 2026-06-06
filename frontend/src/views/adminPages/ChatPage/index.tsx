@@ -4,7 +4,6 @@ import React from 'react';
 import {
   Box,
   Typography,
-  Breadcrumbs,
   Link,
   Paper,
   Avatar,
@@ -32,6 +31,7 @@ import { useDataTable } from '../../../hooks';
 import { useChat, useChatMessages } from './hooks/useChat';
 import dayjs from '../../../configs/dayjs-config';
 import FilterBar from '@/components/Common/FilterBar';
+import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
 const AdminChatPage = () => {
   const { t } = useTranslation('admin');
@@ -174,12 +174,6 @@ const AdminChatPage = () => {
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
           {t('chat.title')}
         </Typography>
-        <Breadcrumbs>
-          <Link underline="hover" color="inherit" href="/admin">
-            {t('chat.breadcrumb')}
-          </Link>
-          <Typography color="text.primary">{t('chat.title')}</Typography>
-        </Breadcrumbs>
       </Box>
 
       {/* Stats Cards */}
@@ -276,6 +270,7 @@ const AdminChatPage = () => {
                 <Stack spacing={1.5} sx={{ maxHeight: 420, overflowY: 'auto' }}>
                   {messages.map((message) => {
                     const isCandidate = String(message.senderId) === String(selectedConversation.jobSeekerId);
+                    const safeAttachmentUrl = getSafeResourceUrl(message.attachmentUrl);
                     return (
                       <Box
                         key={message.id}
@@ -295,8 +290,8 @@ const AdminChatPage = () => {
                         <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: 'pre-wrap' }}>
                           {message.text || message.fileName || '—'}
                         </Typography>
-                        {message.attachmentUrl && (
-                          <Link href={message.attachmentUrl} target="_blank" rel="noreferrer" color="inherit" underline="always">
+                        {safeAttachmentUrl && (
+                          <Link href={safeAttachmentUrl} target="_blank" rel="noopener noreferrer" color="inherit" underline="always">
                             {message.fileName || t('chat.detail.openAttachment')}
                           </Link>
                         )}

@@ -8,14 +8,17 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import type { Theme as StylesTheme } from '@mui/material/styles';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import { openExternalUrlSafely } from '@/utils/safeExternalUrl';
 
 interface AppIntroductionCardProps {
   // Add specific props if needed, otherwise use an empty interface or React.FC
 }
 
 const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const { push } = useRouter();
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
 
   return (
     <Card sx={{ p: 4, position: 'relative', overflow: 'hidden' }}>
@@ -36,7 +39,7 @@ const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
             variant="contained"
             color="primary"
             size="large"
-            onClick={() => push(`/${ROUTES.JOB_SEEKER.JOBS}`)}
+            onClick={() => push(jobsHref)}
             sx={{ borderRadius: 2, px: 4 }}
           >
             Tìm việc ngay
@@ -45,7 +48,7 @@ const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
             variant="outlined"
             color="primary"
             size="large"
-            onClick={() => window.open(`https://${HOST_NAME.EMPLOYER_PROJECT}`, '_blank')}
+            onClick={() => openExternalUrlSafely(`https://${HOST_NAME.EMPLOYER_PROJECT}`)}
             sx={{ borderRadius: 2, px: 4 }}
           >
             Dành cho Nhà tuyển dụng

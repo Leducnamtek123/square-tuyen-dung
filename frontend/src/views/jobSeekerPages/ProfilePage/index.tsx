@@ -6,13 +6,15 @@ import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid } from "@mui/material";
 import { TabTitle } from "../../../utils/generalFunction";
 import { APP_NAME, ROUTES } from "../../../configs/constants";
+import { localizeRoutePath } from "../../../configs/routeLocalization";
 import BoxProfile from "../../components/jobSeekers/BoxProfile";
 import ProfileUpload from "../../components/jobSeekers/ProfileUpload";
 import CompanyViewedCard from "../../components/jobSeekers/CompanyViewedCard";
 
 const ProfilePage = () => {
 
-    const { t } = useTranslation(['jobSeeker', 'common']);
+    const { t, i18n } = useTranslation(['jobSeeker', 'common']);
+    const myCompanyHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.MY_COMPANY}`, i18n.language);
 
     TabTitle(t('jobSeeker:profile.title'));
 
@@ -116,7 +118,7 @@ const ProfilePage = () => {
 
                                         component={Link}
 
-                                        href={`/${ROUTES.JOB_SEEKER.MY_COMPANY}`}
+                                        href={myCompanyHref}
 
                                     >
 

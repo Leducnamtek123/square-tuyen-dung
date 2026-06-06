@@ -3,7 +3,7 @@ import { Avatar, Box, Chip, CircularProgress, Stack, Typography, alpha } from '@
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import PersonIcon from '@mui/icons-material/Person';
 import WorkIcon from '@mui/icons-material/Work';
-import { LiveKitRoom, BarVisualizer, VideoTrack, useTracks } from '@livekit/components-react';
+import { BarVisualizer, RoomAudioRenderer, StartAudio, VideoTrack, useTracks } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { useTranslation } from 'react-i18next';
 import interviewService from '../../../../services/interviewService';
@@ -219,6 +219,8 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
           </Box>
         </Stack>
       )}
+      <RoomAudioRenderer />
+      <StartAudio label={t('interview:controls.enableAudio')} />
     </Box>
   );
 };

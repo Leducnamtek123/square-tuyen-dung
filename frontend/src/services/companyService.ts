@@ -1,7 +1,7 @@
 import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 import { cleanParams } from '../utils/params';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 
 import type { PaginatedResponse } from '../types/api';
 import type { Company, JobPost } from '../types/models';
@@ -42,13 +42,13 @@ const companyService = {
   getCompany: async (): Promise<Company> => {
     const url = 'info/web/company/';
     const data = await httpRequest.get<Company>(url);
-    return presignInObject(data);
+    return unwrapDataResponse<Company>(await presignInObject(data));
   },
 
   updateCompany: async (id: IdType, data: CompanyUpdatePayload): Promise<Company> => {
     const url = `info/web/private-companies/${id}/`;
     const resData = await httpRequest.put<Company>(url, data);
-    return presignInObject(resData);
+    return unwrapDataResponse<Company>(await presignInObject(resData));
   },
 
   updateCompanyImageUrl: async (data: FormData): Promise<Company> => {
@@ -58,7 +58,7 @@ const companyService = {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return presignInObject(resData);
+    return unwrapDataResponse<Company>(await presignInObject(resData));
   },
 
   updateCompanyCoverImageUrl: async (data: FormData): Promise<Company> => {
@@ -68,7 +68,7 @@ const companyService = {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return presignInObject(resData);
+    return unwrapDataResponse<Company>(await presignInObject(resData));
   },
 
   // public
@@ -84,24 +84,24 @@ const companyService = {
   getCompanyDetailById: async (slug: IdType): Promise<Company> => {
     const url = `info/web/companies/${slug}/`;
     const data = await httpRequest.get<Company>(url);
-    return presignInObject(data);
+    return unwrapDataResponse<Company>(await presignInObject(data));
   },
 
   getCompanyJobPostDetailById: async (id: IdType): Promise<JobPost | null> => {
     const url = `info/web/company/job-posts/${id}/`;
     const data = await httpRequest.get<JobPost | null>(url);
-    return presignInObject(data);
+    return unwrapDataResponse<JobPost | null>(await presignInObject(data));
   },
 
   followCompany: (slug: IdType): Promise<{ isFollowed: boolean }> => {
     const url = `info/web/companies/${slug}/followed/`;
-    return httpRequest.post(url) as Promise<{ isFollowed: boolean }>;
+    return (httpRequest.post(url) as Promise<unknown>).then(unwrapDataResponse<{ isFollowed: boolean }>);
   },
 
   getTopCompanies: async (): Promise<Company[]> => {
     const url = `info/web/companies/top/`;
-    const data = await httpRequest.get<Company[]>(url);
-    return presignInObject(data);
+    const data = await httpRequest.get<unknown>(url);
+    return normalizePaginatedResponse<Company>(await presignInObject(data)).results;
   },
 };
 

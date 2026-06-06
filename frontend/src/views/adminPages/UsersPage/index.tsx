@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
-import { Box, Paper, Typography, Button, Breadcrumbs, Link } from "@mui/material";
+import { Box, Paper, Typography, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { useDataTable } from '../../../hooks';
 import { PAGINATION } from '../../../configs/constants';
@@ -96,10 +96,6 @@ const UsersPage = () => {
                 <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
                     {t('pages.users.title')}
                 </Typography>
-                <Breadcrumbs>
-                    <Link underline="hover" color="inherit" href="/admin">{t('pages.users.breadcrumbAdmin')}</Link>
-                    <Typography color="text.primary">{t('pages.users.breadcrumbList')}</Typography>
-                </Breadcrumbs>
             </Box>
 
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>

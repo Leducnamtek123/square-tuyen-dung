@@ -13,6 +13,20 @@ const asItems = <T>(value: unknown): T[] | null =>
 const asCount = (value: unknown): number | null =>
   typeof value === 'number' && Number.isFinite(value) ? value : null;
 
+export const unwrapDataResponse = <T>(raw: unknown, maxDepth = 3): T => {
+  let value = raw;
+
+  for (let depth = 0; depth < maxDepth; depth += 1) {
+    if (!isObject(value) || !Object.prototype.hasOwnProperty.call(value, 'data')) {
+      break;
+    }
+
+    value = value.data;
+  }
+
+  return value as T;
+};
+
 export const normalizePaginatedResponse = <T>(raw: unknown): PaginatedResponse<T> => {
   const directItems = asItems<T>(raw);
   if (directItems) {
@@ -25,6 +39,7 @@ export const normalizePaginatedResponse = <T>(raw: unknown): PaginatedResponse<T
 
   const obj = raw as PaginatedLike<T>;
   const nested = isObject(obj.data) ? obj.data : null;
+  const nestedItems = nested ? asItems<T>((nested as { data?: unknown }).data) : null;
   const nestedData = nested && isObject((nested as { data?: unknown }).data)
     ? (nested as { data?: unknown }).data
     : null;
@@ -33,6 +48,7 @@ export const normalizePaginatedResponse = <T>(raw: unknown): PaginatedResponse<T
     asItems<T>(obj.results) ||
     asItems<T>(obj.data) ||
     (nested ? asItems<T>((nested as Partial<PaginatedResponse<T>>).results) : null) ||
+    nestedItems ||
     (nestedData ? asItems<T>((nestedData as Partial<PaginatedResponse<T>>).results) : null) ||
     [];
 

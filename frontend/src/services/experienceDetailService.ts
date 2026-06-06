@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { unwrapDataResponse } from '../utils/apiResponse';
 import type { ExperienceDetail } from '../types/models';
 
 type IdType = string | number;
@@ -18,17 +19,17 @@ interface ExperienceDetailInput {
 const experienceDetailService = {
   addExperienceDetail: (data: ExperienceDetailInput): Promise<ExperienceDetail> => {
     const url = `info/web/experiences-detail/`;
-    return httpRequest.post(url, data);
+    return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<ExperienceDetail>);
   },
 
   getExperienceDetailById: (id: IdType): Promise<ExperienceDetail> => {
     const url = `info/web/experiences-detail/${id}/`;
-    return httpRequest.get(url);
+    return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<ExperienceDetail>);
   },
 
   updateExperienceDetailById: (id: IdType, data: ExperienceDetailInput): Promise<ExperienceDetail> => {
     const url = `info/web/experiences-detail/${id}/`;
-    return httpRequest.put(url, data);
+    return (httpRequest.put(url, data) as Promise<unknown>).then(unwrapDataResponse<ExperienceDetail>);
   },
 
   deleteExperienceDetailById: (id: IdType): Promise<void> => {

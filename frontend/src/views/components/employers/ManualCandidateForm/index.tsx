@@ -17,6 +17,9 @@ import { REGEX_VALIDATE } from '@/configs/constants';
 
 const MAX_MANUAL_CANDIDATE_CV_SIZE = 10 * 1024 * 1024;
 const MAX_MANUAL_CANDIDATE_SALARY = 999_999_999_999;
+const MAX_APPLIED_PROFILE_FULL_NAME_LENGTH = 100;
+const MAX_APPLIED_PROFILE_EMAIL_LENGTH = 100;
+const MAX_APPLIED_PROFILE_PHONE_LENGTH = 15;
 const PDF_CONTENT_TYPES = new Set(['application/pdf', 'application/x-pdf']);
 
 export interface ManualCandidateFormValues {
@@ -76,12 +79,13 @@ export const createManualCandidateSchema = (t: TFunction, requireJobPost = false
     .test('file-max-size', t('employer:manualCandidate.validation.fileTooLarge'), isAllowedFileSize),
   fullName: yup
     .string()
+    .trim()
     .required(t('employer:manualCandidate.validation.fullNameRequired'))
-    .max(150, t('employer:manualCandidate.validation.fullNameMax')),
+    .max(MAX_APPLIED_PROFILE_FULL_NAME_LENGTH, t('employer:manualCandidate.validation.fullNameMax')),
   email: yup
     .string()
     .email(t('employer:manualCandidate.validation.emailInvalid'))
-    .max(254, t('employer:manualCandidate.validation.emailMax'))
+    .max(MAX_APPLIED_PROFILE_EMAIL_LENGTH, t('employer:manualCandidate.validation.emailMax'))
     .default(''),
   phone: yup
     .string()
@@ -89,10 +93,11 @@ export const createManualCandidateSchema = (t: TFunction, requireJobPost = false
       message: t('employer:manualCandidate.validation.phoneInvalid'),
       excludeEmptyString: true,
     })
-    .max(20, t('employer:manualCandidate.validation.phoneMax'))
+    .max(MAX_APPLIED_PROFILE_PHONE_LENGTH, t('employer:manualCandidate.validation.phoneMax'))
     .default(''),
   title: yup
     .string()
+    .trim()
     .required(t('employer:manualCandidate.validation.titleRequired'))
     .max(200, t('employer:manualCandidate.validation.titleMax')),
   position: yup.number().nullable().transform(emptyToNull),

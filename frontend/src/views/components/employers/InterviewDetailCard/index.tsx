@@ -3,7 +3,7 @@
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Box, Button, Grid2 as Grid, Paper, Skeleton, Stack, Typography } from '@mui/material';
-import { LiveKitRoom, SessionProvider, useSession } from '@livekit/components-react';
+import { LiveKitRoom, RoomAudioRenderer, SessionProvider, useSession } from '@livekit/components-react';
 import { TokenSource } from 'livekit-client';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
@@ -91,6 +91,34 @@ const initialState: State = {
   hrConnectionDetails: null,
   hrLoading: false,
   hrConnected: false,
+};
+
+const getLocalLiveKitUrl = () => {
+  if (typeof window === 'undefined') return '';
+  const envUrl = (process.env.NEXT_PUBLIC_LIVEKIT_URL || '').trim();
+  if (!envUrl) return '';
+  if (envUrl.startsWith('ws')) return envUrl.replace(/\/$/, '');
+  try {
+    const url = new URL(envUrl);
+    url.protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return url.toString().replace(/\/$/, '');
+  } catch {
+    return envUrl;
+  }
+};
+
+const resolveLiveKitServerUrl = (details: { serverUrl?: string; server_url?: string; url?: string }) => {
+  const localUrl = getLocalLiveKitUrl();
+
+  if (
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
+    localUrl
+  ) {
+    return localUrl;
+  }
+
+  return details.serverUrl || details.server_url || details.url || localUrl;
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -210,7 +238,7 @@ const InterviewDetailCard = () => {
       dispatch({ type: 'set_observer_loading', payload: true });
       try {
         const details = await interviewService.getObserverToken(session.id);
-        const serverUrl = details.serverUrl || details.server_url || process.env.NEXT_PUBLIC_LIVEKIT_URL || '';
+        const serverUrl = resolveLiveKitServerUrl(details);
         dispatch({ type: 'set_connection_details', payload: { token: details.token, serverUrl } });
         if (openAfterConnect) {
           dispatch({ type: 'set_observer_open', payload: true });
@@ -288,7 +316,7 @@ const InterviewDetailCard = () => {
     dispatch({ type: 'set_hr_loading', payload: true });
     try {
       const details = await interviewService.getHrPresenceToken(session.id);
-      const serverUrl = details.serverUrl || details.server_url || process.env.NEXT_PUBLIC_LIVEKIT_URL || '';
+      const serverUrl = resolveLiveKitServerUrl(details);
       dispatch({ type: 'set_hr_connection_details', payload: { token: details.token, serverUrl } });
       dispatch({ type: 'set_hr_connected', payload: true });
     } catch (e) {
@@ -343,6 +371,7 @@ const InterviewDetailCard = () => {
                 dispatch({ type: 'set_hr_connection_details', payload: null });
               }}
             />
+            <RoomAudioRenderer />
           </InterviewSessionBridge>
         </LiveKitRoom>
       </Paper>

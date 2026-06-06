@@ -12,7 +12,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         build-essential libssl-dev libffi-dev \
         libopenblas-dev default-libmysqlclient-dev \
-        pkg-config curl netcat-traditional && \
+        pkg-config curl netcat-traditional openssh-client && \
     rm -rf /var/lib/apt/lists/*
 
 # Create non-root user

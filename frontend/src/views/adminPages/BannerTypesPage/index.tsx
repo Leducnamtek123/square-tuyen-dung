@@ -4,8 +4,6 @@ import React, { useMemo, useReducer, useState } from 'react';
 import {
   Box,
   Typography,
-  Breadcrumbs,
-  Link,
   Paper,
   TextField,
   Button,
@@ -265,10 +263,6 @@ const BannerTypesPage = () => {
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>{t('pages.bannerTypes.title')}</Typography>
-          <Breadcrumbs>
-            <Link underline="hover" color="inherit" href="/admin">{t('pages.bannerTypes.breadcrumbAdmin')}</Link>
-            <Typography color="text.primary">{t('pages.bannerTypes.breadcrumbList')}</Typography>
-          </Breadcrumbs>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}>
           {t('pages.bannerTypes.addButton')}

@@ -2,7 +2,7 @@ import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 import { PaginatedResponse } from '../types/api';
 import { cleanParams } from '../utils/params';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 import {
   Career,
   City,
@@ -125,9 +125,10 @@ export type JobSeekerProfilePayload = Partial<JobSeekerProfile>;
 export type ResumePayload = Partial<Resume>;
 export type JobPostActivityPayload = Partial<JobPostActivity>;
 
-const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
+const withPresign = async <T>(promise: Promise<unknown>): Promise<T> => {
   const data = await promise;
-  return presignInObject(data) as T;
+  const signedData = await presignInObject(data);
+  return unwrapDataResponse<T>(signedData);
 };
 
 const withPaginatedPresign = async <T>(promise: Promise<unknown>): Promise<PaginatedResponse<T>> => {
@@ -139,6 +140,11 @@ const withPaginatedPresign = async <T>(promise: Promise<unknown>): Promise<Pagin
 const normalizePaginated = async <T>(promise: Promise<unknown>): Promise<PaginatedResponse<T>> => {
   const data = await promise;
   return normalizePaginatedResponse<T>(data);
+};
+
+const unwrapEntity = async <T>(promise: Promise<unknown>): Promise<T> => {
+  const data = await promise;
+  return unwrapDataResponse<T>(data);
 };
 
 const adminManagementService = {
@@ -220,12 +226,12 @@ const adminManagementService = {
 
   createWard: (data: WardPayload): Promise<Ward> => {
     const url = 'common/admin/wards/';
-    return httpRequest.post<Ward>(url, data);
+    return unwrapEntity<Ward>(httpRequest.post(url, data));
   },
 
   updateWard: (id: string | number, data: Partial<WardPayload>): Promise<Ward> => {
     const url = `common/admin/wards/${id}/`;
-    return httpRequest.patch<Ward>(url, data);
+    return unwrapEntity<Ward>(httpRequest.patch(url, data));
   },
 
   deleteWard: (id: string | number): Promise<void> => {
@@ -265,7 +271,7 @@ const adminManagementService = {
 
   updateCompanyVerification: (id: IdType, data: Pick<CompanyVerification, 'status'> & { adminNote?: string }): Promise<CompanyVerification> => {
     const url = `info/web/admin/company-verifications/${id}/`;
-    return httpRequest.patch<CompanyVerification>(url, data);
+    return unwrapEntity<CompanyVerification>(httpRequest.patch(url, data));
   },
 
   getTrustReports: (params: AdminListParams = {}): Promise<PaginatedResponse<TrustReport>> => {
@@ -288,7 +294,7 @@ const adminManagementService = {
 
   updateTrustReport: (id: IdType, data: Pick<TrustReport, 'status'>): Promise<TrustReport> => {
     const url = `info/web/admin/trust-reports/${id}/`;
-    return httpRequest.patch<TrustReport>(url, data);
+    return unwrapEntity<TrustReport>(httpRequest.patch(url, data));
   },
 
   getBanners: (params: AdminListParams = {}): Promise<PaginatedResponse<Banner>> => {
@@ -407,12 +413,12 @@ const adminManagementService = {
 
   createJobActivity: (data: JobPostActivityPayload): Promise<JobPostActivity> => {
     const url = 'job/web/admin/job-posts-activity/';
-    return httpRequest.post<JobPostActivity>(url, data);
+    return unwrapEntity<JobPostActivity>(httpRequest.post(url, data));
   },
 
   updateJobActivity: (id: IdType, data: JobPostActivityPayload): Promise<JobPostActivity> => {
     const url = `job/web/admin/job-posts-activity/${id}/`;
-    return httpRequest.patch<JobPostActivity>(url, data);
+    return unwrapEntity<JobPostActivity>(httpRequest.patch(url, data));
   },
 
   deleteJobActivity: (id: IdType): Promise<void> => {
@@ -427,12 +433,12 @@ const adminManagementService = {
 
   createJobNotification: (data: JobPostNotificationPayload): Promise<JobPostNotification> => {
     const url = 'job/web/admin/job-post-notifications/';
-    return httpRequest.post<JobPostNotification>(url, data);
+    return unwrapEntity<JobPostNotification>(httpRequest.post(url, data));
   },
 
   updateJobNotification: (id: IdType, data: Partial<JobPostNotificationPayload>): Promise<JobPostNotification> => {
     const url = `job/web/admin/job-post-notifications/${id}/`;
-    return httpRequest.patch<JobPostNotification>(url, data);
+    return unwrapEntity<JobPostNotification>(httpRequest.patch(url, data));
   },
 
   deleteJobNotification: (id: IdType): Promise<void> => {
@@ -447,12 +453,12 @@ const adminManagementService = {
 
   createQuestionGroup: (data: QuestionGroupPayload): Promise<QuestionGroup> => {
     const url = 'interview/web/question-groups/';
-    return httpRequest.post<QuestionGroup>(url, data);
+    return unwrapEntity<QuestionGroup>(httpRequest.post(url, data));
   },
 
   updateQuestionGroup: (id: string | number, data: Partial<QuestionGroupPayload>): Promise<QuestionGroup> => {
     const url = `interview/web/question-groups/${id}/`;
-    return httpRequest.patch<QuestionGroup>(url, data);
+    return unwrapEntity<QuestionGroup>(httpRequest.patch(url, data));
   },
 
   deleteQuestionGroup: (id: string | number): Promise<void> => {
@@ -468,12 +474,12 @@ const adminManagementService = {
 
   createQuestion: (data: QuestionPayload): Promise<Question> => {
     const url = 'interview/web/questions/';
-    return httpRequest.post<Question>(url, data);
+    return unwrapEntity<Question>(httpRequest.post(url, data));
   },
 
   updateQuestion: (id: string | number, data: Partial<QuestionPayload>): Promise<Question> => {
     const url = `interview/web/questions/${id}/`;
-    return httpRequest.patch<Question>(url, data);
+    return unwrapEntity<Question>(httpRequest.patch(url, data));
   },
 
   deleteQuestion: (id: string | number): Promise<void> => {

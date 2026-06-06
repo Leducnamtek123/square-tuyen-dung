@@ -4,8 +4,6 @@ import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
-  Breadcrumbs,
-  Link,
   Paper,
   Grid2 as Grid,
   Switch,
@@ -33,6 +31,7 @@ import { useSystemSettings, SystemSettings } from './hooks/useSystemSettings';
 import fptGpuService, { type FPTGpuControlStatus } from '../../../services/fptGpuService';
 import adminSettingsService, { type SystemHealthPayload } from '../../../services/adminSettingsService';
 import toastMessages from '../../../utils/toastMessages';
+import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 
 const INITIAL_SETTINGS: SystemSettings = {
   maintenanceMode: false,
@@ -102,11 +101,25 @@ const FPTGpuControlCard = () => {
     refetchInterval: 30000,
   });
 
+  type FptGpuAction = 'start' | 'stop' | 'bootstrap' | 'start-bootstrap';
+
   const actionMutation = useMutation({
-    mutationFn: (action: 'start' | 'stop') =>
-      action === 'start' ? fptGpuService.start() : fptGpuService.stop(),
+    mutationFn: (action: FptGpuAction) => {
+      if (action === 'start') return fptGpuService.start();
+      if (action === 'stop') return fptGpuService.stop();
+      if (action === 'bootstrap') return fptGpuService.bootstrap();
+      return fptGpuService.startAndBootstrap();
+    },
     onSuccess: (_result, action) => {
-      toastMessages.success(t(action === 'start' ? 'pages.settings.fptGpu.toast.startSuccess' : 'pages.settings.fptGpu.toast.stopSuccess'));
+      const toastKey =
+        action === 'stop'
+          ? 'pages.settings.fptGpu.toast.stopSuccess'
+          : action === 'bootstrap'
+            ? 'pages.settings.fptGpu.toast.bootstrapSuccess'
+            : action === 'start-bootstrap'
+              ? 'pages.settings.fptGpu.toast.startBootstrapSuccess'
+              : 'pages.settings.fptGpu.toast.startSuccess';
+      toastMessages.success(t(toastKey));
       queryClient.invalidateQueries({ queryKey: ['fpt-gpu-control'] });
     },
     onError: (mutationError) => {
@@ -115,11 +128,15 @@ const FPTGpuControlCard = () => {
   });
 
   const container = data?.container;
+  const safeConsoleUrl = getSafeExternalOpenUrl(container?.consoleUrl);
   const control = data?.control;
   const status = normalizeStatus(container?.status);
+  const bootstrapConfigured = !!data?.bootstrap?.configured;
   const isBusy = ['CREATING', 'PROCESSING', 'DELETING', 'INITIALIZING'].includes(status);
   const canStart = !!control?.available && !isBusy && ['STOPPED', 'FAILED', 'ERROR', 'UNKNOWN'].includes(status);
   const canStop = !!control?.available && !isBusy && status === 'RUNNING';
+  const canStartBootstrap = canStart && bootstrapConfigured;
+  const canBootstrap = bootstrapConfigured && !isBusy && ['RUNNING', 'DEGRADED', 'UNKNOWN', 'FAILED', 'ERROR'].includes(status);
   const checks = Object.entries(data?.ai.checks || {});
   const queryError = error instanceof Error ? error.message : '';
 
@@ -162,6 +179,11 @@ const FPTGpuControlCard = () => {
             {t('pages.settings.fptGpu.notConfigured')}
           </Alert>
         )}
+        {!bootstrapConfigured && !isLoading && (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            {t('pages.settings.fptGpu.bootstrapNotConfigured')}
+          </Alert>
+        )}
 
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid size={{ xs: 12, md: 4 }}>
@@ -195,6 +217,23 @@ const FPTGpuControlCard = () => {
             variant="contained"
             color="success"
             startIcon={actionMutation.isPending ? <CircularProgress color="inherit" size={18} /> : <PlayArrowIcon />}
+            disabled={!canStartBootstrap || actionMutation.isPending}
+            onClick={() => actionMutation.mutate('start-bootstrap')}
+          >
+            {t('pages.settings.fptGpu.startBootstrap')}
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={actionMutation.isPending ? <CircularProgress size={18} /> : <RefreshIcon />}
+            disabled={!canBootstrap || actionMutation.isPending}
+            onClick={() => actionMutation.mutate('bootstrap')}
+          >
+            {t('pages.settings.fptGpu.bootstrap')}
+          </Button>
+          <Button
+            variant="outlined"
+            color="success"
+            startIcon={actionMutation.isPending ? <CircularProgress color="inherit" size={18} /> : <PlayArrowIcon />}
             disabled={!canStart || actionMutation.isPending}
             onClick={() => actionMutation.mutate('start')}
           >
@@ -216,13 +255,13 @@ const FPTGpuControlCard = () => {
           >
             {t('pages.settings.fptGpu.refresh')}
           </Button>
-          {container?.consoleUrl && (
+          {safeConsoleUrl && (
             <Button
               variant="text"
               endIcon={<OpenInNewIcon />}
-              href={container.consoleUrl}
+              href={safeConsoleUrl}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               {t('pages.settings.fptGpu.openConsole')}
             </Button>
@@ -285,12 +324,6 @@ const SettingsForm = ({ initialSettings, onSave, isMutating }: SettingsFormProps
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
           {t('pages.settings.title')}
         </Typography>
-        <Breadcrumbs>
-          <Link underline="hover" color="inherit" href="/admin">
-            {t('pages.settings.breadcrumbAdmin')}
-          </Link>
-          <Typography color="text.primary">{t('pages.settings.breadcrumb')}</Typography>
-        </Breadcrumbs>
       </Box>
 
       <Grid container spacing={3}>

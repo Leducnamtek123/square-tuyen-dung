@@ -1,6 +1,6 @@
 import httpRequest from '../utils/httpRequest';
 import { cleanParams } from '../utils/params';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 
 import type { PaginatedResponse } from '../types/api';
 import type { CompanyRole, CompanyMember } from '../types/models';
@@ -56,10 +56,12 @@ const companyTeamService = {
       .then((data) => normalizePaginatedResponse<CompanyRole>(data));
   },
   createRole: (data: CompanyRolePayload): Promise<CompanyRole> => {
-    return httpRequest.post<CompanyRole>('info/web/company-roles/', data);
+    return (httpRequest.post('info/web/company-roles/', data) as Promise<unknown>)
+      .then(unwrapDataResponse<CompanyRole>);
   },
   updateRole: (id: IdType, data: Partial<CompanyRolePayload>): Promise<CompanyRole> => {
-    return httpRequest.patch<CompanyRole>(`info/web/company-roles/${id}/`, data);
+    return (httpRequest.patch(`info/web/company-roles/${id}/`, data) as Promise<unknown>)
+      .then(unwrapDataResponse<CompanyRole>);
   },
   deleteRole: (id: IdType): Promise<void> => {
     return httpRequest.delete<void>(`info/web/company-roles/${id}/`);
@@ -70,16 +72,19 @@ const companyTeamService = {
       .then((data) => normalizePaginatedResponse<CompanyMember>(data));
   },
   createMember: (data: CompanyMemberPayload): Promise<CompanyMember> => {
-    return httpRequest.post<CompanyMember>('info/web/company-members/', normalizeMemberPayload(data));
+    return (httpRequest.post('info/web/company-members/', normalizeMemberPayload(data)) as Promise<unknown>)
+      .then(unwrapDataResponse<CompanyMember>);
   },
   updateMember: (id: IdType, data: CompanyMemberUpdatePayload): Promise<CompanyMember> => {
-    return httpRequest.patch<CompanyMember>(`info/web/company-members/${id}/`, normalizeMemberPayload(data));
+    return (httpRequest.patch(`info/web/company-members/${id}/`, normalizeMemberPayload(data)) as Promise<unknown>)
+      .then(unwrapDataResponse<CompanyMember>);
   },
   deleteMember: (id: IdType): Promise<void> => {
     return httpRequest.delete<void>(`info/web/company-members/${id}/`);
   },
   getMyMembership: (): Promise<CompanyMember | null> => {
-    return httpRequest.get<CompanyMember | null>('info/web/company-members/me/');
+    return (httpRequest.get('info/web/company-members/me/') as Promise<unknown>)
+      .then(unwrapDataResponse<CompanyMember | null>);
   },
 };
 

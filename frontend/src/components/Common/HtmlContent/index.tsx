@@ -9,6 +9,28 @@ type Props = {
   emptyFallback?: React.ReactNode;
 };
 
+const SAFE_LINK_PROTOCOLS = new Set(['http:', 'https:', 'mailto:', 'tel:']);
+const SAFE_IMAGE_PROTOCOLS = new Set(['http:', 'https:']);
+
+const getSafeHtmlUrl = (value: string | null, allowedProtocols: Set<string>): string | undefined => {
+  const trimmedValue = value?.trim();
+  if (!trimmedValue) return undefined;
+
+  const compactValue = trimmedValue.replace(/[\u0000-\u001F\u007F\s]+/g, '').toLowerCase();
+  const protocolMatch = compactValue.match(/^([a-z][a-z0-9+.-]*:)/);
+  if (protocolMatch && !allowedProtocols.has(protocolMatch[1])) {
+    return undefined;
+  }
+
+  return trimmedValue;
+};
+
+export const getSafeHtmlHref = (href: string | null): string | undefined =>
+  getSafeHtmlUrl(href, SAFE_LINK_PROTOCOLS);
+
+export const getSafeHtmlImageSrc = (src: string | null): string | undefined =>
+  getSafeHtmlUrl(src, SAFE_IMAGE_PROTOCOLS);
+
 const stripTags = (html: string) =>
   html
     .replace(/<br\s*\/?>/gi, '\n')
@@ -37,7 +59,7 @@ const renderNode = (node: Node, key: string): React.ReactNode => {
     case 'br':
       return <br key={key} />;
     case 'img': {
-      const src = element.getAttribute('src') || '';
+      const src = getSafeHtmlImageSrc(element.getAttribute('src'));
       if (!src) return null;
 
       return (
@@ -69,10 +91,15 @@ const renderNode = (node: Node, key: string): React.ReactNode => {
     case 'em':
       return <em key={key}>{children}</em>;
     case 'a':
+      const href = getSafeHtmlHref(element.getAttribute('href'));
+      if (!href) {
+        return <span key={key}>{children}</span>;
+      }
+
       return (
         <a
           key={key}
-          href={element.getAttribute('href') || '#'}
+          href={href}
           target="_blank"
           rel="noopener noreferrer"
         >

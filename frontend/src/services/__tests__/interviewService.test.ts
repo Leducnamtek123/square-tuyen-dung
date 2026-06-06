@@ -7,6 +7,7 @@
 
 import interviewService from '../interviewService';
 import httpRequest from '../../utils/httpRequest';
+import { presignInObject } from '../../utils/presignUrl';
 import type { ScheduleSessionInput, SubmitEvaluationInput } from '../interviewService';
 import fs from 'fs';
 import path from 'path';
@@ -25,6 +26,7 @@ jest.mock('../../utils/presignUrl', () => ({
 describe('interviewService response contracts', () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    (presignInObject as jest.Mock).mockImplementation((data) => Promise.resolve(data));
   });
 
   it('returns the evaluate-ai detail payload from the backend', async () => {
@@ -50,6 +52,77 @@ describe('interviewService response contracts', () => {
     expect(serviceSource).toContain('companyName?: string | null');
     expect(serviceSource).toContain('getHrPresenceToken: (sessionId: IdType): Promise<HrPresenceTokenResponse>');
     expect(serviceSource).not.toContain('participant_name: string');
+  });
+
+  it('unwraps nested interview session detail response envelopes after presign', async () => {
+    const session = { id: 22, status: 'scheduled' };
+    const inviteSession = { id: 23, status: 'waiting' };
+    (httpRequest.get as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: session } })
+      .mockResolvedValueOnce({ data: { data: inviteSession } });
+
+    await expect(interviewService.getSessionDetail(22)).resolves.toEqual(session);
+    await expect(interviewService.getSessionDetailByInviteToken('invite-token')).resolves.toEqual(inviteSession);
+  });
+
+  it('unwraps nested interview session mutation response envelopes after presign', async () => {
+    const updatedSession = { id: 24, status: 'scheduled', notes: 'Updated notes' };
+    const statusSession = { id: 25, status: 'completed' };
+    (httpRequest.patch as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: updatedSession } })
+      .mockResolvedValueOnce({ data: { data: statusSession } });
+
+    await expect(interviewService.updateSession(24, { notes: 'Updated notes' })).resolves.toEqual(updatedSession);
+    await expect(interviewService.updateSessionStatus(25, 'completed')).resolves.toEqual(statusSession);
+  });
+
+  it('unwraps nested interview create and evaluation response envelopes', async () => {
+    const scheduledSession = { id: 26, status: 'scheduled', type: 'mixed' };
+    const evaluation = { id: 27, result: 'passed', overallScore: 8.5 };
+    (httpRequest.post as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: scheduledSession } })
+      .mockResolvedValueOnce({ data: { data: evaluation } });
+
+    await expect(interviewService.scheduleSession({
+      candidate: 1,
+      job_post: 2,
+      type: 'mixed',
+    })).resolves.toEqual(scheduledSession);
+    await expect(interviewService.submitEvaluation({
+      interview: 26,
+      overall_score: 8.5,
+      result: 'passed',
+    })).resolves.toEqual(evaluation);
+  });
+
+  it('unwraps nested live token and session metrics response envelopes', async () => {
+    const liveKitToken = { token: 'candidate-token', roomName: 'room-1', serverUrl: 'wss://live.test' };
+    const observerToken = { token: 'observer-token', roomName: 'room-1', mode: 'observer' };
+    const hrToken = { token: 'hr-token', roomName: 'room-1', mode: 'hr', participantName: 'Square HR' };
+    const metrics = {
+      sessionId: 26,
+      status: 'live',
+      startTime: null,
+      endTime: null,
+      elapsedSeconds: 30,
+      duration: null,
+      questionCursor: 2,
+      totalQuestions: 5,
+      transcriptCount: 4,
+      candidateName: 'Nguyen Van A',
+      jobName: 'Frontend Developer',
+    };
+    (httpRequest.get as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: liveKitToken } })
+      .mockResolvedValueOnce({ data: { data: metrics } });
+    (httpRequest.post as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: observerToken } })
+      .mockResolvedValueOnce({ data: { data: hrToken } });
+
+    await expect(interviewService.getLiveKitToken('invite-token')).resolves.toEqual(liveKitToken);
+    await expect(interviewService.getObserverToken(26)).resolves.toEqual(observerToken);
+    await expect(interviewService.getHrPresenceToken(26)).resolves.toEqual(hrToken);
+    await expect(interviewService.getSessionMetrics(26)).resolves.toEqual(metrics);
   });
 });
 

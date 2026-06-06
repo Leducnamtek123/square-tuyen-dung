@@ -4,6 +4,7 @@ import PublishIcon from '@mui/icons-material/Publish';
 import NoDataCard from '../../../../components/Common/NoDataCard';
 import ProfileUploadCard from '../../../../components/Common/ProfileUploadCard';
 import type { TFunction } from 'i18next';
+import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
 type Resume = {
   id: string | number;
@@ -88,24 +89,28 @@ const ProfileUploadResumeGrid = ({ resumes, isLoadingResumes, title, t, onOpenPo
           <NoDataCard title={t('jobSeeker:profile.messages.noResumeData')} svgKey="ImageSvg2" />
         ) : (
           <Grid container spacing={2}>
-            {resumes.map((value) => (
-              <Grid
-                key={value.id}
-                size={{ xs: 12, sm: 12, md: 6, lg: 4, xl: 4 }}
-              >
-                <ProfileUploadCard
-                  resumeImage={value.imageUrl || ''}
-                  fileUrl={value.fileUrl}
-                  title={value.title}
-                  updateAt={value.updateAt}
-                  slug={value.slug}
-                  id={value.id}
-                  isActive={value.isActive}
-                  handleDelete={onDelete}
-                  handleActive={onActive}
-                />
-              </Grid>
-            ))}
+            {resumes.map((value) => {
+              const safeFileUrl = getSafeResourceUrl(value.fileUrl);
+
+              return (
+                <Grid
+                  key={value.id}
+                  size={{ xs: 12, sm: 12, md: 6, lg: 4, xl: 4 }}
+                >
+                  <ProfileUploadCard
+                    resumeImage={value.imageUrl || ''}
+                    fileUrl={safeFileUrl || ''}
+                    title={value.title}
+                    updateAt={value.updateAt}
+                    slug={value.slug}
+                    id={value.id}
+                    isActive={value.isActive}
+                    handleDelete={onDelete}
+                    handleActive={onActive}
+                  />
+                </Grid>
+              );
+            })}
           </Grid>
         )}
       </Box>

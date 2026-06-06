@@ -22,6 +22,7 @@ import {
   readVersionedJson,
   writeVersionedJson,
 } from '@/utils/storageKeys';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
@@ -79,13 +80,14 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
   location = 'HOME',
 }: Props<T>) => {
   const theme = useTheme();
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const inputSearchRef = React.useRef<HTMLDivElement | null>(null);
   const { push } = useRouter();
   const dispatch = useDispatch();
   const [state, dispatchSearch] = React.useReducer(reducer, initialState);
   const debounced = useDebounce(state.searchValue, 300);
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
 
   React.useEffect(() => {
     try {
@@ -153,7 +155,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
     }
 
     if (location === 'HOME') {
-      push(`/${ROUTES.JOB_SEEKER.JOBS}`);
+      push(jobsHref);
     }
   };
 

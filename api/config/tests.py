@@ -1,10 +1,32 @@
 import pytest
+import re
 from datetime import timedelta
+from pathlib import Path
 from django.utils import timezone
 from oauth2_provider.models import AccessToken
 from rest_framework.test import APIClient
 
 from apps.content.models import SystemSetting
+
+
+EMAIL_TEMPLATE_DIR = Path(__file__).resolve().parent / "templates" / "emails"
+UNSAFE_EMAIL_LINK_PATTERNS = (
+    re.compile(r"""href\s*=\s*["']\s*["']""", re.IGNORECASE),
+    re.compile(r"""href\s*=\s*["']\s*javascript:""", re.IGNORECASE),
+)
+
+
+def test_email_templates_do_not_use_empty_or_javascript_links():
+    offenders: list[str] = []
+
+    for template_path in sorted(EMAIL_TEMPLATE_DIR.glob("*.html")):
+        template = template_path.read_text(encoding="utf-8")
+        for pattern in UNSAFE_EMAIL_LINK_PATTERNS:
+            for match in pattern.finditer(template):
+                line_number = template.count("\n", 0, match.start()) + 1
+                offenders.append(f"{template_path.name}:{line_number}:{match.group(0)}")
+
+    assert offenders == []
 
 
 @pytest.mark.django_db

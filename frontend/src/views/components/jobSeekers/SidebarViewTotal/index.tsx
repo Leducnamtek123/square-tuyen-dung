@@ -7,11 +7,13 @@ import { Avatar, Box, Button, CircularProgress, Stack, Typography } from "@mui/m
 import { useJobSeekerTotalView } from "../hooks/useJobSeekerQueries";
 import { ROUTES } from "../../../../configs/constants";
 import type { Theme as MaterialTheme } from '@mui/material';
+import { localizeRoutePath } from "../../../../configs/routeLocalization";
 
 const SidebarViewTotal = () => {
-  const { t } = useTranslation('jobSeeker');
+  const { t, i18n } = useTranslation('jobSeeker');
   const { push } = useRouter();
   const { data, isLoading } = useJobSeekerTotalView();
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
 
   return (
     <Box>
@@ -72,7 +74,7 @@ const SidebarViewTotal = () => {
         <Button
           variant="contained"
           size="medium"
-          onClick={() => push(`/${ROUTES.JOB_SEEKER.JOBS}`)}
+          onClick={() => push(jobsHref)}
           sx={{
             background: (theme: MaterialTheme) => theme.palette.primary.main,
             px: 3,

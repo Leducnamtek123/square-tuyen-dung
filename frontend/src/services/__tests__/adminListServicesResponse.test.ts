@@ -43,6 +43,30 @@ describe('admin list services response normalization', () => {
     expect(result).toEqual({ count: 1, results: [interview] });
   });
 
+  it('unwraps nested admin interview detail responses', async () => {
+    const interview = { id: 6, status: 'completed' };
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({
+      data: { data: interview },
+    });
+
+    const result = await adminInterviewService.getInterviewDetail(6);
+
+    expect(httpRequest.get).toHaveBeenCalledWith('interview/admin/sessions/6/');
+    expect(result).toEqual(interview);
+  });
+
+  it('unwraps nested admin interview status update responses', async () => {
+    const interview = { id: 7, status: 'cancelled' };
+    (httpRequest.patch as jest.Mock).mockResolvedValueOnce({
+      data: { data: interview },
+    });
+
+    const result = await adminInterviewService.updateInterviewStatus(7, 'cancelled');
+
+    expect(httpRequest.patch).toHaveBeenCalledWith('interview/admin/sessions/7/', { status: 'cancelled' });
+    expect(result).toEqual(interview);
+  });
+
   it('normalizes nested admin users responses after presign', async () => {
     const user = { id: 9, email: 'hr@square.vn' };
     (httpRequest.get as jest.Mock).mockResolvedValueOnce({
@@ -63,5 +87,20 @@ describe('admin list services response normalization', () => {
     expect(serviceSource).toContain('toggleUserStatus: (id: IdType): Promise<UserStatusResponse>');
     expect(hookSource).toContain("import userService, { type UserStatusResponse }");
     expect(hookSource).toContain('toggleUserStatus: (user: UserModel) => Promise<UserStatusResponse>;');
+  });
+
+  it('unwraps nested admin user status action responses', async () => {
+    (httpRequest.post as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: { isActive: false } } })
+      .mockResolvedValueOnce({ data: { data: { updated: 2, isActive: true } } });
+
+    await expect(userService.toggleUserStatus(9)).resolves.toEqual({ isActive: false });
+    await expect(userService.bulkStatus([9, 10], true)).resolves.toEqual({ updated: 2, isActive: true });
+
+    expect(httpRequest.post).toHaveBeenNthCalledWith(1, 'auth/users/9/toggle-active/');
+    expect(httpRequest.post).toHaveBeenNthCalledWith(2, 'auth/users/bulk-status/', {
+      ids: [9, 10],
+      isActive: true,
+    });
   });
 });

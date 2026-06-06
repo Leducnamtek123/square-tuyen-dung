@@ -25,6 +25,7 @@ from shared.configs.messages import APPLICATION_STATUS_MESSAGES
 from shared.helpers import helper, utils
 
 from ..filters import AliasedOrderingFilter, EmployerJobPostActivityFilter
+from ..manual_candidate_validation import validate_manual_candidate_activity_storage
 from ..exceptions import (
     InvalidApplicationStatusTransitionError,
     JobsDomainError,
@@ -251,9 +252,6 @@ class EmployerJobPostActivityViewSet(
             "aiAnalysisMissingSkills",
             "aiAnalysisCriteria",
             "aiAnalysisEvidence",
-            "aiAnalysisModel",
-            "aiAnalysisSource",
-            "aiAnalysisPromptVersion",
             "aiAnalysisReviewStatus",
             "aiAnalysisHrOverrideScore",
             "aiAnalysisHrOverrideNote",
@@ -343,6 +341,13 @@ class EmployerJobPostActivityViewSet(
             job_post = JobPost.objects.get(id=job_post_id, company=company)
         except (JobPost.DoesNotExist, TypeError, ValueError):
             return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        activity_storage_errors = validate_manual_candidate_activity_storage(data)
+        if activity_storage_errors:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors=activity_storage_errors,
+            )
 
         candidate_serializer = EmployerCandidateProfileSerializer(
             data=data,

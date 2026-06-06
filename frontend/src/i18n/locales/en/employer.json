@@ -74,6 +74,8 @@
       "saveReview": "Save review",
       "criteriaTitle": "Weighted criteria",
       "evidenceTitle": "Evidence",
+      "identityWarningTitle": "CV name mismatch warning",
+      "identityWarningBody": "The system profile name is {{applicationName}}, but the name read from the CV is {{resumeName}}. HR should verify this before contacting the candidate or making a decision.",
       "status": {
         "pending": "Not analyzed",
         "processing": "Analyzing",
@@ -204,11 +206,11 @@
     "validation": {
       "jobPostRequired": "Please select a job post.",
       "fullNameRequired": "Please enter candidate name.",
-      "fullNameMax": "Candidate name must be at most 150 characters.",
+      "fullNameMax": "Candidate name must be at most 100 characters.",
       "emailInvalid": "Email is invalid.",
-      "emailMax": "Email must be at most 254 characters.",
+      "emailMax": "Email must be at most 100 characters.",
       "phoneInvalid": "Phone number is invalid.",
-      "phoneMax": "Phone must be at most 20 characters.",
+      "phoneMax": "Phone must be at most 15 characters.",
       "filePdfOnly": "Only PDF files are accepted.",
       "fileTooLarge": "PDF file must be 10MB or smaller.",
       "titleRequired": "Please enter role/profile title.",
@@ -917,56 +919,31 @@
       "saveBtn": "Save Legal Documents",
       "statusPending": "Status: Pending Approval"
     },
-    "step3": {
-      "title": "Step 3: Register for Online Interview",
-      "description": "Admin will confirm the interview schedule and send room participation information.",
-      "timeLabel": "Desired Time",
-      "contactPerson": "Contact Person",
-      "contactName": "Contact Person",
-      "contactPhone": "Contact Phone Number",
-      "notes": "Notes",
-      "sendRequestBtn": "Send Interview Request",
-      "requestBtn": "Send Interview Request",
-      "statusLabel": "Status: {{status}}"
-    },
     "status": {
       "pending": "Pending review",
       "reviewing": "Reviewing",
       "approved": "Approved",
       "rejected": "Rejected"
     },
-    "submittedSchedules": {
-      "title": "Submitted Interview Schedules",
-      "noRequests": "No interview requests yet.",
-      "proposedTime": "Proposed Time: {{time}}",
-      "contact": "Contact: {{phone}}",
-      "notes": "Notes: {{notes}}"
-    },
     "messages": {
       "infoRecorded": "Information recorded.",
-      "noScheduleYet": "No schedule yet",
-      "waitingConfirmation": "Waiting for confirmation",
       "profileSaved": "Legal profile saved.",
-      "requestSubmitted": "Verification interview request submitted.",
       "fixRequiredFields": "Please complete the required information.",
-      "saveFailed": "Could not save the verification profile. Please try again.",
-      "requestFailed": "Could not submit the verification request. Please try again."
+      "saveFailed": "Could not save the verification profile. Please try again."
     },
     "summary": {
       "companyProfile": "Company profile",
       "legalProfile": "Legal profile",
-      "appointment": "Verification appointment",
       "progress": "Completion progress",
       "canPost": "Your company has been verified and can post jobs.",
-      "cannotPost": "Please complete the legal profile and submit a verification request before posting jobs."
+      "cannotPost": "Please complete the legal profile and wait for admin verification before posting jobs."
     },
     "validation": {
       "required": "This field is required.",
       "email": "Invalid email address.",
       "phone": "Invalid phone number.",
       "website": "Invalid website URL.",
-      "maxLength": "Maximum {{max}} characters.",
-      "futureDate": "The time must be now or in the future."
+      "maxLength": "Maximum {{max}} characters."
     }
   },
   "profileDetailCard": {
@@ -1042,6 +1019,7 @@
   },
   "company": {
     "tabs": {
+      "ariaLabel": "Company profile tabs",
       "info": "Company Information",
       "multimedia": "Multimedia",
       "team": "Team"

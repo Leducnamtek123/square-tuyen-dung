@@ -6,6 +6,7 @@ import { join } from 'path';
 jest.mock('../../utils/httpRequest', () => ({
   get: jest.fn(),
   post: jest.fn(),
+  patch: jest.fn(),
 }));
 
 describe('contentService', () => {
@@ -48,6 +49,20 @@ describe('contentService', () => {
     });
   });
 
+  it('unwraps nested article detail envelopes for public, admin, and employer detail pages', async () => {
+    const publicArticle = { id: 11, title: 'Public detail', slug: 'public-detail' };
+    const adminArticle = { id: 12, title: 'Admin detail', slug: 'admin-detail' };
+    const employerBlog = { id: 13, title: 'Employer detail', slug: 'employer-detail' };
+    (httpRequest.get as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: publicArticle } })
+      .mockResolvedValueOnce({ data: { data: adminArticle } })
+      .mockResolvedValueOnce({ data: { data: employerBlog } });
+
+    await expect(contentService.getPublicArticleBySlug('public-detail')).resolves.toEqual(publicArticle);
+    await expect(contentService.adminGetArticle(12)).resolves.toEqual(adminArticle);
+    await expect(contentService.employerGetBlog(13)).resolves.toEqual(employerBlog);
+  });
+
   it('normalizes empty successful content action responses', async () => {
     (httpRequest.post as jest.Mock)
       .mockResolvedValueOnce(null)
@@ -55,6 +70,28 @@ describe('contentService', () => {
 
     await expect(contentService.sendSMSDownloadApp({ phone: '0901234567' })).resolves.toEqual({ sent: true });
     await expect(contentService.sendNotificationDemo()).resolves.toEqual({ success: true });
+  });
+
+  it('unwraps nested content create and update response envelopes', async () => {
+    const feedback = { id: 21, content: 'Great hiring experience', rating: 5 };
+    const adminCreated = { id: 22, title: 'Admin created', slug: 'admin-created' };
+    const employerCreated = { id: 23, title: 'Employer created', slug: 'employer-created' };
+    const adminUpdated = { id: 22, title: 'Admin updated', slug: 'admin-created' };
+    const employerUpdated = { id: 23, title: 'Employer updated', slug: 'employer-created' };
+
+    (httpRequest.post as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: feedback } })
+      .mockResolvedValueOnce({ data: { data: adminCreated } })
+      .mockResolvedValueOnce({ data: { data: employerCreated } });
+    (httpRequest.patch as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: adminUpdated } })
+      .mockResolvedValueOnce({ data: { data: employerUpdated } });
+
+    await expect(contentService.createFeedback({ rating: 5, content: 'Great hiring experience' })).resolves.toEqual(feedback);
+    await expect(contentService.adminCreateArticle({ title: 'Admin created', content: 'Body' })).resolves.toEqual(adminCreated);
+    await expect(contentService.employerCreateBlog({ title: 'Employer created', content: 'Body' })).resolves.toEqual(employerCreated);
+    await expect(contentService.adminUpdateArticle(22, { title: 'Admin updated' })).resolves.toEqual(adminUpdated);
+    await expect(contentService.employerUpdateBlog(23, { title: 'Employer updated' })).resolves.toEqual(employerUpdated);
   });
 
   it('keeps article timestamp fields aligned with camelized API responses', () => {

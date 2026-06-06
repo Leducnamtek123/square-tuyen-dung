@@ -13,14 +13,16 @@ import BackdropLoading from '../../../../components/Common/Loading/BackdropLoadi
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
 import { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
 import { useInterviewListCardColumns } from './useInterviewListCardColumns';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 
 interface InterviewListCardProps {
   title?: string;
 }
 
 const InterviewListCard = ({ title }: InterviewListCardProps) => {
-  const { t } = useTranslation(['interview', 'common', 'employer']);
+  const { t, i18n } = useTranslation(['interview', 'common', 'employer']);
   const displayTitle = title || t('interview:interviewListCard.title');
+  const createHref = localizeRoutePath(`/${ROUTES.EMPLOYER.INTERVIEW_CREATE}`, i18n.language);
 
   const {
     page,
@@ -126,7 +128,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
           color="primary"
           startIcon={<AddIcon />}
           component={Link}
-          href={`/${ROUTES.EMPLOYER.INTERVIEW_CREATE}`}
+          href={createHref}
           sx={{
             
             px: 4,

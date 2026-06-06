@@ -378,7 +378,15 @@
       "chatMode": "Chat",
       "aiControlMode": "AI nói",
       "aiControlPlaceholder": "Nhập nội dung muốn AI hỏi hoặc nói...",
-      "aiControlSend": "AI nói"
+      "aiControlSend": "AI nói",
+      "takeoverMode": "Giữ quyền AI",
+      "takeoverTitle": "Nhà tuyển dụng trực tiếp",
+      "takeoverActive": "Đang giữ quyền",
+      "takeoverInactive": "AI đang dẫn",
+      "takeoverHint": "Khi giữ quyền, AI tạm im để bạn nói chuyện trực tiếp với ứng viên. Bấm trả quyền để AI tiếp tục.",
+      "takeoverAcquire": "Giữ quyền AI",
+      "takeoverRelease": "Trả quyền AI",
+      "takeoverSending": "Đang cập nhật..."
     },
     "observingBar": {
       "hrObserving": "Bạn đang quan sát phiên phỏng vấn này",

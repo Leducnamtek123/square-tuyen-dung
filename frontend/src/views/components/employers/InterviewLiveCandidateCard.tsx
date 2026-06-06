@@ -45,6 +45,20 @@ const initialState: InterviewLiveCandidateCardState = {
   hrPresenceLoading: false,
 };
 
+const resolveLiveKitServerUrl = (details: { serverUrl?: string; server_url?: string; url?: string }) => {
+  const localUrl = getSafeLiveKitUrl();
+
+  if (
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
+    localUrl
+  ) {
+    return localUrl;
+  }
+
+  return details.serverUrl || details.server_url || details.url || localUrl;
+};
+
 const reducer = (
   state: InterviewLiveCandidateCardState,
   action: InterviewLiveCandidateCardAction
@@ -108,7 +122,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
         const details = await interviewService.getObserverToken(session.id);
         if (!alive) return;
 
-        const serverUrl = details.serverUrl || details.server_url || details.url || getSafeLiveKitUrl();
+        const serverUrl = resolveLiveKitServerUrl(details);
         dispatch({ type: 'set_connection_details', value: { token: details.token, serverUrl } });
       } catch (err) {
         if (!alive) return;
@@ -137,7 +151,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
     dispatch({ type: 'set_hr_presence_loading', value: true });
     try {
       const details = await interviewService.getHrPresenceToken(session.id);
-      const serverUrl = details.serverUrl || details.server_url || getSafeLiveKitUrl();
+      const serverUrl = resolveLiveKitServerUrl(details);
       dispatch({ type: 'set_hr_presence_details', value: { token: details.token, serverUrl } });
     } catch (err) {
       console.error('HR presence token error', err);

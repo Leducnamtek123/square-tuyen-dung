@@ -14,6 +14,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import { ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import { formatRoute } from '@/utils/funcUtils';
 import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
@@ -54,7 +55,9 @@ const JobPostAction = ({
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const stackDirection = isSmallScreen ? 'column' : 'row';
-  const detailHref = `/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`;
+  const detailHref = slug
+    ? localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language)
+    : undefined;
 
   return (
 
@@ -136,16 +139,16 @@ const JobPostAction = ({
 
                     <Typography
 
-                      component={Link}
+                      component={detailHref ? Link : 'span'}
                       href={detailHref}
-                      prefetch
+                      prefetch={Boolean(detailHref)}
                       variant="h6"
 
                       sx={{
 
                         fontSize: 16,
 
-                        cursor: 'pointer',
+                        cursor: detailHref ? 'pointer' : 'default',
 
                         color: theme.palette.primary.main,
                         textDecoration: 'none',

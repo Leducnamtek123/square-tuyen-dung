@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Button } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
 import DataTable from '../../../components/Common/DataTable';
@@ -283,12 +283,6 @@ const BannersPageContent = () => {
           <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
             {t('pages.banners.title')}
           </Typography>
-          <Breadcrumbs>
-            <Link underline="hover" color="inherit" href="/admin">
-              {t('pages.banners.breadcrumbAdmin')}
-            </Link>
-            <Typography color="text.primary">{t('pages.banners.breadcrumb')}</Typography>
-          </Breadcrumbs>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={() => dispatch({ type: 'open-add' })} sx={{ textTransform: 'none' }}>
           {t('pages.banners.addBtn')}

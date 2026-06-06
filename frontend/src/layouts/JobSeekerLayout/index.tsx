@@ -8,7 +8,6 @@ import Header from "../components/commons/Header";
 import TabBar from "../components/jobSeekers/TabBar";
 import Footer from "../components/commons/Footer";
 import { ROUTES, ROLES_NAME } from "@/configs/constants";
-import { buildPortalPath } from "@/configs/portalRouting";
 import { localizeRoutePath } from "@/configs/routeLocalization";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { getUserInfo, setActiveWorkspace } from "@/redux/userSlice";
@@ -68,12 +67,12 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
 
       if (!canAccessJobSeekerPortal(user)) {
         if (user?.roleName === ROLES_NAME.ADMIN) {
-          redirectTo(buildPortalPath("admin", "/dashboard", i18n.language));
+          redirectTo(localizeRoutePath(`/${ROUTES.ADMIN.DASHBOARD}`, i18n.language));
           return;
         }
 
         if (user?.roleName === ROLES_NAME.EMPLOYER || user?.canAccessEmployerPortal) {
-          redirectTo(buildPortalPath("employer", "/dashboard", i18n.language));
+          redirectTo(localizeRoutePath(`/${ROUTES.EMPLOYER.DASHBOARD}`, i18n.language));
           return;
         }
 

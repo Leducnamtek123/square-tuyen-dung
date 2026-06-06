@@ -18,7 +18,8 @@ import { removeUserInfo } from "../../../../redux/userSlice";
 import { setActiveWorkspace } from "../../../../redux/userSlice";
 
 import { HOST_NAME, ROLES_NAME, ROUTES } from "../../../../configs/constants";
-import { buildPortalPath, isAdminPortalPath } from "../../../../configs/portalRouting";
+import { isAdminPortalPath } from "../../../../configs/portalRouting";
+import { localizeRoutePath } from "../../../../configs/routeLocalization";
 import tokenService from "../../../../services/tokenService";
 import type { Workspace } from '@/types/models';
 import type { ApiError } from '../../../../types/api';
@@ -67,22 +68,22 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
 
   const workspaces = useMemo(() => (currentUser?.workspaces || []) as WorkspaceItem[], [currentUser?.workspaces]);
 
-  const openPortal = (toEmployer = false, path = "") => {
+  const openPortal = React.useCallback((toEmployer = false, path = "") => {
     const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
     const protocol = window.location.protocol;
     const port = window.location.port ? `:${window.location.port}` : "";
-    const targetPath = toEmployer
-      ? normalizedPath || `/${ROUTES.EMPLOYER.DASHBOARD}`
-      : normalizedPath;
-    window.location.href = `${protocol}//${HOST_NAME.PROJECT}${port}${targetPath}`;
-  };
+    const employerFallbackPath = `/${ROUTES.EMPLOYER.DASHBOARD}`;
+    const targetPath = toEmployer && !normalizedPath ? employerFallbackPath : normalizedPath;
+    const localizedPath = targetPath ? localizeRoutePath(targetPath, i18n.language) : "";
+    window.location.href = `${protocol}//${HOST_NAME.PROJECT}${port}${localizedPath}`;
+  }, [i18n.language]);
 
-  const openAdminPortal = () => {
+  const openAdminPortal = React.useCallback(() => {
     const protocol = window.location.protocol;
     const port = window.location.port ? `:${window.location.port}` : "";
-    const adminPath = buildPortalPath("admin", "/dashboard", i18n.language);
+    const adminPath = localizeRoutePath(`/${ROUTES.ADMIN.DASHBOARD}`, i18n.language);
     window.location.href = `${protocol}//${HOST_NAME.PROJECT}${port}${adminPath}`;
-  };
+  }, [i18n.language]);
 
   const menuItems = React.useMemo(() => {
     const items: MenuItem[] = [];
@@ -116,7 +117,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
       });
     });
     return items;
-  }, [activeWorkspace, dispatch, t, workspaces]);
+  }, [activeWorkspace, dispatch, openPortal, t, workspaces]);
 
   const handleLogout = () => {
     const accessToken = tokenService.getAccessTokenFromCookie() || '';

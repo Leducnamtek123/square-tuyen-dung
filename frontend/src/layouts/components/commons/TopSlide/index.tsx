@@ -121,13 +121,19 @@ const TopSlide = () => {
                 />
               </SwiperSlide>
             ) : banners.length > 0 ? (
-              banners.map((value) => (
-                <SwiperSlide key={value.id} style={{ cursor: 'pointer' }}>
-                  <Link href={value?.buttonLink} target="_blank" rel="noreferrer">
-                    <RenderItem item={value} />
-                  </Link>
-                </SwiperSlide>
-              ))
+              banners.map((value) => {
+                const bannerContent = <RenderItem item={value} />;
+
+                return (
+                  <SwiperSlide key={value.id} style={{ cursor: value.buttonLink ? 'pointer' : 'default' }}>
+                    {value.buttonLink ? (
+                      <Link href={value.buttonLink} target="_blank" rel="noopener noreferrer">
+                        {bannerContent}
+                      </Link>
+                    ) : bannerContent}
+                  </SwiperSlide>
+                );
+              })
             ) : (
               <SwiperSlide>
                 <MuiImageCustom

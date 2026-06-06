@@ -1,7 +1,7 @@
 import { JobPost } from '../types/models';
 import { PaginatedResponse } from '../types/api';
 import httpRequest from '../utils/httpRequest';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 import { cleanParams } from '../utils/params';
 import type { AdminListParams } from './adminManagementService';
 
@@ -13,13 +13,16 @@ const adminJobService = {
     return normalizePaginatedResponse<JobPost>(data);
   },
   updateJob: (id: IdType, data: Partial<JobPost>): Promise<JobPost> => {
-    return httpRequest.patch<JobPost>(`job/web/admin-job-posts/${id}/`, data);
+    return (httpRequest.patch(`job/web/admin-job-posts/${id}/`, data) as Promise<unknown>)
+      .then(unwrapDataResponse<JobPost>);
   },
   approveJob: (id: IdType): Promise<JobPost> => {
-    return httpRequest.patch<JobPost>(`job/web/admin-job-posts/${id}/approve/`);
+    return (httpRequest.patch(`job/web/admin-job-posts/${id}/approve/`) as Promise<unknown>)
+      .then(unwrapDataResponse<JobPost>);
   },
   rejectJob: (id: IdType): Promise<JobPost> => {
-    return httpRequest.patch<JobPost>(`job/web/admin-job-posts/${id}/reject/`);
+    return (httpRequest.patch(`job/web/admin-job-posts/${id}/reject/`) as Promise<unknown>)
+      .then(unwrapDataResponse<JobPost>);
   },
   deleteJob: (id: IdType): Promise<void> => {
     return httpRequest.delete(`job/web/admin-job-posts/${id}/`);

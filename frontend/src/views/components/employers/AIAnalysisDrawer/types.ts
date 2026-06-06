@@ -17,10 +17,9 @@ export type AIAnalysisData = {
   aiAnalysisEvidence?: {
     criteria_results?: Array<Record<string, unknown>>;
     evidence?: Array<Record<string, unknown>>;
+    identity_warnings?: Array<Record<string, unknown>>;
+    identityWarnings?: Array<Record<string, unknown>>;
   } | Array<Record<string, unknown>>;
-  aiAnalysisModel?: string;
-  aiAnalysisSource?: string;
-  aiAnalysisPromptVersion?: string;
   aiAnalysisReviewStatus?: 'ai_only' | 'reviewed' | 'overridden' | string;
   aiAnalysisHrOverrideScore?: number | null;
   aiAnalysisHrOverrideNote?: string | null;

@@ -31,4 +31,29 @@ describe('AIAnalysisDrawer i18n', () => {
     expectNoDefaultValue(panelsSource, 'employer:appliedResume.ai.criteriaTitle');
     expectNoDefaultValue(panelsSource, 'employer:appliedResume.ai.evidenceTitle');
   });
+
+  it('renders attached PDF resumes with the internal PDF viewer instead of a cross-origin iframe', () => {
+    const source = readFileSync(join(__dirname, '../AIAnalysisDrawerResumeSection.tsx'), 'utf8');
+
+    expect(source).toContain("from '@/components/Common/Pdf'");
+    expect(source).toContain('<Pdf');
+    expect(source).not.toContain('<iframe');
+  });
+
+  it('does not expose AI implementation metadata in the employer drawer', () => {
+    const source = readFileSync(join(__dirname, '../AIAnalysisDrawerStatePanels.tsx'), 'utf8');
+
+    expect(source).not.toContain('Model:');
+    expect(source).not.toContain('Prompt:');
+    expect(source).not.toContain('aiAnalysisModel');
+    expect(source).not.toContain('aiAnalysisPromptVersion');
+  });
+
+  it('has user-facing identity mismatch warning copy', () => {
+    const source = readFileSync(join(__dirname, '../AIAnalysisDrawerStatePanels.tsx'), 'utf8');
+
+    expect(source).toContain('identityWarnings');
+    expect(source).toContain('appliedResume.ai.identityWarningTitle');
+    expect(source).toContain('appliedResume.ai.identityWarningBody');
+  });
 });

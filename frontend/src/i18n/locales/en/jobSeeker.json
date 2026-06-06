@@ -9,7 +9,8 @@
     "myInterviews": "My Interviews",
     "notifications": "Notifications",
     "accountSettings": "Account & Settings",
-    "myDashboard": "My {{appName}}"
+    "myDashboard": "My {{appName}}",
+    "tabsAria": "Job seeker navigation tabs"
   },
   "profile": {
     "title": "My Profile",

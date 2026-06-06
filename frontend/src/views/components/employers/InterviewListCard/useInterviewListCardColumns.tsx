@@ -8,6 +8,7 @@ import BlockIcon from '@mui/icons-material/Block';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../../../configs/constants';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 import { formatRoute } from '../../../../utils/funcUtils';
 import dayjs from '@/configs/dayjs-config';
 import type { InterviewSession } from '@/types/models';
@@ -52,7 +53,7 @@ const STATUS_BG_COLORS: Record<StatusColor, { bg: string; border: string; text: 
 };
 
 export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseInterviewListCardColumnsArgs) => {
-  const { t } = useTranslation(['interview', 'common', 'employer']);
+  const { t, i18n } = useTranslation(['interview', 'common', 'employer']);
 
   return React.useMemo<ColumnDef<InterviewSession>[]>(
     () => [
@@ -151,13 +152,21 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
           const session = row.original;
           const canEdit = ['draft', 'scheduled'].includes(session.status);
           const canCancel = session.status === 'scheduled';
+          const detailHref = localizeRoutePath(
+            `/${formatRoute(ROUTES.EMPLOYER.INTERVIEW_DETAIL, String(session.id), ':id')}`,
+            i18n.language
+          );
+          const editHref = localizeRoutePath(
+            `/${formatRoute(ROUTES.EMPLOYER.INTERVIEW_EDIT, String(session.id), ':id')}`,
+            i18n.language
+          );
 
           return (
             <Stack direction="row" spacing={1} justifyContent="flex-end">
               <Tooltip title={t('common:view')} arrow>
                 <IconButton
                   component={Link}
-                  href={`/${formatRoute(ROUTES.EMPLOYER.INTERVIEW_DETAIL, String(session.id), ':id')}`}
+                  href={detailHref}
                   color="primary"
                   size="small"
                   sx={{
@@ -174,7 +183,7 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
                 <Tooltip title={t('interview:interviewListCard.editInterview')} arrow>
                   <IconButton
                     component={Link}
-                    href={`/${formatRoute(ROUTES.EMPLOYER.INTERVIEW_EDIT, String(session.id), ':id')}`}
+                    href={editHref}
                     color="info"
                     size="small"
                     sx={{
@@ -224,6 +233,6 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
         },
       },
     ],
-    [onCancel, onDelete, t]
+    [onCancel, onDelete, t, i18n.language]
   );
 };

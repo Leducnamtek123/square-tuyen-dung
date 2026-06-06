@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { useTranslation } from "react-i18next";
 import {
   createContext,
   lazy,
@@ -277,11 +278,12 @@ const MessageBranchPrevious = ({
   children,
   ...props
 }: MessageBranchNavProps) => {
+  const { t } = useTranslation('common');
   const { goToPrevious, totalBranches } = useMessageBranch();
 
   return (
     <Button
-      aria-label="Previous branch"
+      aria-label={t('aiElements.previousBranch')}
       disabled={totalBranches <= 1}
       onClick={goToPrevious}
       size="icon-sm"
@@ -296,11 +298,12 @@ const MessageBranchNext = ({
   children,
   ...props
 }: MessageBranchNavProps) => {
+  const { t } = useTranslation('common');
   const { goToNext, totalBranches } = useMessageBranch();
 
   return (
     <Button
-      aria-label="Next branch"
+      aria-label={t('aiElements.nextBranch')}
       disabled={totalBranches <= 1}
       onClick={goToNext}
       size="icon-sm"

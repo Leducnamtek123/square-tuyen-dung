@@ -1,4 +1,5 @@
 import asyncio
+import unicodedata
 
 from livekit_agent.interview_flow import (
     decide_next_action,
@@ -24,6 +25,11 @@ class DummyChatContext:
         self.items = list(items)
 
 
+def _strip_accents(value: str) -> str:
+    normalized = unicodedata.normalize("NFD", value)
+    return "".join(char for char in normalized if unicodedata.category(char) != "Mn")
+
+
 def test_scripted_llm_node_asks_configured_questions() -> None:
     async def run() -> None:
         agent = Interviewer(
@@ -45,7 +51,12 @@ def test_scripted_llm_node_asks_configured_questions() -> None:
 
         first = await agent.llm_node(None, [], None)
         second = await agent.llm_node(None, [], None)
-        closing = await agent.llm_node(None, [], None)
+        qna_prompt = await agent.llm_node(None, [], None)
+        closing = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u1", "Khong co cau hoi them")),
+            [],
+            None,
+        )
 
         assert "Gioi thieu ban than" in first
         assert "Ly do ung tuyen" in second
@@ -56,7 +67,16 @@ def test_scripted_llm_node_asks_configured_questions() -> None:
         assert "bối cảnh" not in first
         assert "vai trò" not in first
         assert "kết thúc" in closing.lower()
-        assert [item[0] for item in recorded] == ["ai_agent", "ai_agent", "ai_agent"]
+        normalized_qna = _strip_accents(qna_prompt).lower()
+        assert "cau hoi" in normalized_qna
+        assert "cong ty" in normalized_qna
+        assert "ket thuc" in _strip_accents(closing).lower()
+        assert [item[0] for item in recorded] == [
+            "ai_agent",
+            "ai_agent",
+            "ai_agent",
+            "ai_agent",
+        ]
 
     asyncio.run(run())
 
@@ -165,10 +185,17 @@ def test_completed_scripted_interview_finalizes_status_and_session() -> None:
         agent._shutdown_session = fake_shutdown_session  # type: ignore[assignment]
 
         first = await agent.llm_node(None, [], None)
-        closing = await agent.llm_node(None, [], None)
+        qna_prompt = await agent.llm_node(None, [], None)
+        closing = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u1", "Khong co cau hoi them")),
+            [],
+            None,
+        )
 
         assert "Cau hoi 1" in first
         assert "kết thúc" in closing.lower()
+        assert "cong ty" in _strip_accents(qna_prompt).lower()
+        assert "ket thuc" in _strip_accents(closing).lower()
         assert agent.completed is True
 
         await agent.finalize_completed_interview()
@@ -176,6 +203,52 @@ def test_completed_scripted_interview_finalizes_status_and_session() -> None:
 
         assert status_calls == ["completed"]
         assert shutdown_calls["count"] == 1
+
+    asyncio.run(run())
+
+
+def test_scripted_llm_node_acknowledges_candidate_question_before_closing() -> None:
+    async def run() -> None:
+        agent = Interviewer(context={"questions": [{"text": "Cau hoi 1"}]})
+
+        async def fake_record_transcript(
+            speaker_role, content, speech_duration_ms=None
+        ):
+            return None
+
+        agent.record_transcript = fake_record_transcript
+
+        first = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u1", "Xin chao")), [], None
+        )
+        qna_prompt = await agent.llm_node(
+            DummyChatContext(
+                DummyUserMessage(
+                    "u2",
+                    "Toi co hon nam nam kinh nghiem giam sat cong trinh dan dung",
+                )
+            ),
+            [],
+            None,
+        )
+        closing = await agent.llm_node(
+            DummyChatContext(
+                DummyUserMessage(
+                    "u3",
+                    "Cho em hoi sau buoi phong van thi cong ty se phan hoi trong bao lau?",
+                )
+            ),
+            [],
+            None,
+        )
+
+        assert "Cau hoi 1" in first
+        assert "cong ty" in _strip_accents(qna_prompt).lower()
+        normalized_closing = _strip_accents(closing).lower()
+        assert "ghi nhan cau hoi" in normalized_closing
+        assert "bo phan tuyen dung" in normalized_closing
+        assert "ket thuc" in normalized_closing
+        assert agent.completed is True
 
     asyncio.run(run())
 
@@ -210,6 +283,94 @@ def test_employer_instruction_response_does_not_advance_question_cursor() -> Non
 
     assert "Revit" in response
     assert agent._scripted_question_index == 0
+
+
+def test_employer_takeover_pauses_scripted_replies_until_released() -> None:
+    async def run() -> None:
+        agent = Interviewer(context={"questions": [{"text": "Cau hoi 1"}]})
+        recorded = []
+
+        async def fake_record_transcript(
+            speaker_role, content, speech_duration_ms=None
+        ):
+            recorded.append((speaker_role, content, speech_duration_ms))
+
+        agent.record_transcript = fake_record_transcript
+
+        agent.pause_for_employer_takeover("HR User")
+        paused = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u1", "Xin chao")), [], None
+        )
+
+        assert paused is None
+        assert agent.employer_takeover_active is True
+        assert recorded == []
+
+        agent.resume_from_employer_takeover("HR User")
+        resumed = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u1", "Xin chao")), [], None
+        )
+
+        assert "Cau hoi 1" in resumed
+        assert agent.employer_takeover_active is False
+        assert recorded == [("ai_agent", resumed, None)]
+
+    asyncio.run(run())
+
+
+def test_employer_instruction_is_queued_until_before_candidate_qna() -> None:
+    async def run() -> None:
+        agent = Interviewer(context={"questions": [{"text": "Cau hoi 1"}]})
+        recorded = []
+
+        async def fake_record_transcript(
+            speaker_role, content, speech_duration_ms=None
+        ):
+            recorded.append((speaker_role, content, speech_duration_ms))
+
+        agent.record_transcript = fake_record_transcript
+
+        queued = await agent.handle_employer_instruction(
+            "Hoi sau hon ve kinh nghiem Revit"
+        )
+        first = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u1", "Xin chao")), [], None
+        )
+        follow_up = await agent.llm_node(
+            DummyChatContext(
+                DummyUserMessage(
+                    "u2",
+                    "Toi co hon nam nam kinh nghiem giam sat cong trinh dan dung",
+                )
+            ),
+            [],
+            None,
+        )
+        qna_prompt = await agent.llm_node(
+            DummyChatContext(
+                DummyUserMessage(
+                    "u3",
+                    "Toi da dung Revit de phoi hop ban ve ket cau va kien truc trong nhieu du an",
+                )
+            ),
+            [],
+            None,
+        )
+
+        assert queued is None
+        assert recorded == [
+            ("ai_agent", first, None),
+            ("ai_agent", follow_up, None),
+            ("ai_agent", qna_prompt, None),
+        ]
+        assert "Cau hoi 1" in first
+        assert "Revit" in follow_up
+        normalized_qna = _strip_accents(qna_prompt).lower()
+        assert "cau hoi" in normalized_qna
+        assert "cong ty" in normalized_qna
+        assert agent.completed is False
+
+    asyncio.run(run())
 
 
 def test_parse_question_payload_done() -> None:

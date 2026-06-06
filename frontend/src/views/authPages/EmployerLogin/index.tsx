@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
 import { AUTH_CONFIG, AUTH_PROVIDER, ROLES_NAME, ROUTES } from '../../../configs/constants';
+import { localizeRoutePath } from '../../../configs/routeLocalization';
 import toastMessages from '../../../utils/toastMessages';
 import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
 import { updateVerifyEmail } from '../../../redux/authSlice';
@@ -50,15 +51,15 @@ const StyledLink = styled(Link)(({ theme }) => ({
   },
 }));
 
-const getCompanyPortalPath = () => {
-  return `/${ROUTES.EMPLOYER.DASHBOARD}`;
+const getCompanyPortalPath = (language: string) => {
+  return localizeRoutePath(`/${ROUTES.EMPLOYER.DASHBOARD}`, language);
 };
 
 const getCompanyWorkspace = (user?: User | null) =>
   ((user?.workspaces || []) as Workspace[]).find((workspace) => workspace.type === 'company');
 
 const EmployerLogin = () => {
-  const { t } = useTranslation('auth');
+  const { t, i18n } = useTranslation('auth');
   TabTitle(t('login.employerTitle'));
 
   const dispatch = useAppDispatch();
@@ -67,6 +68,8 @@ const EmployerLogin = () => {
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
+  const forgotPasswordHref = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.FORGOT_PASSWORD}`, i18n.language);
+  const registerHref = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language);
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -106,7 +109,7 @@ const EmployerLogin = () => {
               if (companyWorkspace) {
                 dispatch(setActiveWorkspace(companyWorkspace));
               }
-              push(getCompanyPortalPath());
+              push(getCompanyPortalPath(i18n.language));
             })
             .catch(() => {
               toastMessages.error(t('messages.loginError'));
@@ -197,7 +200,7 @@ const EmployerLogin = () => {
             if (companyWorkspace) {
               dispatch(setActiveWorkspace(companyWorkspace));
             }
-            push(getCompanyPortalPath());
+            push(getCompanyPortalPath(i18n.language));
           })
           .catch(() => {
             toastMessages.error(t('messages.loginError'));
@@ -337,7 +340,7 @@ const EmployerLogin = () => {
                 sm: 6,
               }}
             >
-              <StyledLink href={`/${ROUTES.AUTH.FORGOT_PASSWORD}`}>
+              <StyledLink href={forgotPasswordHref}>
                 {t('login.forgotPassword')}
               </StyledLink>
             </Grid>
@@ -351,7 +354,7 @@ const EmployerLogin = () => {
                 sm: 6,
               }}
             >
-              <StyledLink href={`/${ROUTES.AUTH.REGISTER}`}>
+              <StyledLink href={registerHref}>
                 {t('login.noAccount')} {t('login.signUp')}
               </StyledLink>
             </Grid>

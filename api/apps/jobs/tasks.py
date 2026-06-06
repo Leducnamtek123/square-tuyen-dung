@@ -1,12 +1,16 @@
 import logging
+import base64
 import hashlib
 import httpx
+import io
 import json
 import os
 import re
 import tempfile
+import unicodedata
 import fitz  # PyMuPDF
 import docx
+from PIL import Image
 from bs4 import BeautifulSoup
 from celery import shared_task
 from django.core.cache import cache
@@ -20,7 +24,7 @@ from integrations.ai.client import (
 from .ai_scoring_service import _fallback_scoring
 
 logger = logging.getLogger(__name__)
-RESUME_ANALYSIS_PROMPT_VERSION = "resume-screen-v2"
+RESUME_ANALYSIS_PROMPT_VERSION = "resume-screen-v3"
 
 
 def _strip_html(value: str) -> str:
@@ -212,6 +216,219 @@ def _truncate_text(value: str, max_chars: int) -> str:
     return f"{truncated}\n...[truncated]"
 
 
+def _strip_name_accents(value: str) -> str:
+    text = str(value or "").replace("đ", "d").replace("Đ", "D")
+    normalized = unicodedata.normalize("NFKD", text)
+    return "".join(ch for ch in normalized if not unicodedata.combining(ch))
+
+
+def _clean_person_name(value: str) -> str:
+    text = str(value or "").replace("\ufeff", " ").replace("\u200b", " ")
+    text = re.sub(r"\s+", " ", text).strip(" -:|•\t\r\n")
+    text = re.sub(
+        r"^(?:họ\s*(?:và\s*)?tên|ho\s*(?:va\s*)?ten|tên\s*ứng\s*viên|ten\s*ung\s*vien|full\s*name|candidate\s*name|name)\s*[:\-]\s*",
+        "",
+        text,
+        flags=re.IGNORECASE,
+    )
+    return re.sub(r"\s+", " ", text).strip()[:120]
+
+
+def _normalize_person_name(value: str) -> str:
+    text = _strip_name_accents(_clean_person_name(value)).lower()
+    text = re.sub(r"[^a-z\s]", " ", text)
+    tokens = [token for token in text.split() if len(token) > 1]
+    return " ".join(tokens)
+
+
+_NON_NAME_LINES = {
+    "cv",
+    "resume",
+    "curriculum vitae",
+    "ho so ung vien",
+    "ung vien",
+    "thong tin ca nhan",
+    "muc tieu nghe nghiep",
+    "muc tieu",
+    "hoc van",
+    "kinh nghiem",
+    "kinh nghiem lam viec",
+    "ky nang",
+    "tin hoc",
+    "ngoai ngu",
+    "nguoi tham chieu",
+    "lien he",
+    "contact",
+    "profile",
+    "education",
+    "experience",
+    "skills",
+    "objective",
+    "summary",
+    "about me",
+    "references",
+}
+
+_ROLE_NAME_TERMS = (
+    "developer",
+    "engineer",
+    "designer",
+    "architect",
+    "manager",
+    "leader",
+    "intern",
+    "nhan vien",
+    "chuyen vien",
+    "ky su",
+    "kien truc",
+    "hoa vien",
+    "giam sat",
+    "thi cong",
+    "lap trinh",
+    "ke toan",
+    "marketing",
+    "sales",
+    "tuyen dung",
+)
+
+_NAME_LABELS = (
+    "ho ten",
+    "ho va ten",
+    "ten ung vien",
+    "full name",
+    "candidate name",
+    "name",
+)
+
+
+def _looks_like_person_name(value: str) -> bool:
+    cleaned = _clean_person_name(value)
+    if not cleaned or re.search(r"\d|@|https?://|www\.|\.com", cleaned, flags=re.IGNORECASE):
+        return False
+
+    normalized = _normalize_person_name(cleaned)
+    tokens = normalized.split()
+    if not (2 <= len(tokens) <= 5):
+        return False
+
+    if normalized in _NON_NAME_LINES:
+        return False
+    if any(normalized.startswith(f"{line} ") for line in _NON_NAME_LINES):
+        return False
+    if any(term in normalized for term in _ROLE_NAME_TERMS):
+        return False
+
+    alpha_count = sum(1 for ch in cleaned if ch.isalpha())
+    return alpha_count >= 4
+
+
+def _extract_labeled_candidate_name(line: str) -> str:
+    normalized = _normalize_person_name(line)
+    for label in _NAME_LABELS:
+        if normalized == label or normalized.startswith(f"{label} "):
+            if ":" in line:
+                return _clean_person_name(line.split(":", 1)[1])
+            if "-" in line:
+                return _clean_person_name(line.split("-", 1)[1])
+            words = line.split()
+            return _clean_person_name(" ".join(words[len(label.split()):]))
+    return ""
+
+
+def _extract_candidate_name_from_resume_text(resume_text: str) -> str:
+    lines = [
+        re.sub(r"\s+", " ", line).strip()
+        for line in str(resume_text or "").splitlines()
+        if line and line.strip()
+    ]
+
+    for line in lines[:35]:
+        candidate = _extract_labeled_candidate_name(line)
+        if _looks_like_person_name(candidate):
+            return candidate
+
+    for line in lines[:25]:
+        candidate = _clean_person_name(line)
+        if _looks_like_person_name(candidate):
+            return candidate
+
+    return ""
+
+
+def _application_candidate_name(activity: JobPostActivity) -> str:
+    resume = getattr(activity, "resume", None)
+    manual_profile = getattr(activity, "manual_candidate_profile", None)
+    values = [
+        getattr(activity, "full_name", ""),
+        getattr(manual_profile, "full_name", ""),
+        getattr(getattr(resume, "user", None), "full_name", ""),
+    ]
+    for value in values:
+        candidate = _clean_person_name(value)
+        if candidate:
+            return candidate
+    return ""
+
+
+def _build_identity_warnings(
+    activity: JobPostActivity,
+    file_resume_text: str,
+    model_candidate_name: str = "",
+    visual_candidate_name: str = "",
+) -> list[dict]:
+    application_name = _application_candidate_name(activity)
+    text_name = _extract_candidate_name_from_resume_text(file_resume_text)
+    visual_name = _clean_person_name(visual_candidate_name)
+    model_name = _clean_person_name(model_candidate_name)
+    resume_name = (
+        text_name
+        or (visual_name if _looks_like_person_name(visual_name) else "")
+        or (model_name if _looks_like_person_name(model_name) else "")
+    )
+
+    if not application_name or not resume_name:
+        return []
+
+    if _normalize_person_name(application_name) == _normalize_person_name(resume_name):
+        return []
+
+    message = (
+        f"Tên trong CV là {resume_name}, khác với tên hồ sơ trong hệ thống là {application_name}. "
+        "HR nên xác minh lại trước khi liên hệ hoặc ra quyết định."
+    )
+    return [
+        {
+            "type": "name_mismatch",
+            "severity": "warning",
+            "application_name": application_name,
+            "resume_name": resume_name,
+            "message": message,
+        }
+    ]
+
+
+def _merge_identity_warnings(*values) -> list[dict]:
+    merged = []
+    seen = set()
+    for value in values:
+        for item in _coerce_dict_list(value, max_items=4):
+            warning_type = str(item.get("type") or "identity_warning")
+            application_name = str(item.get("application_name") or item.get("applicationName") or "")
+            resume_name = str(item.get("resume_name") or item.get("resumeName") or "")
+            message = str(item.get("message") or "").strip()
+            key = (
+                warning_type,
+                _normalize_person_name(application_name),
+                _normalize_person_name(resume_name),
+                message,
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            merged.append(item)
+    return merged[:4]
+
+
 def _acquire_analysis_slot(activity_id: int, max_slots: int, ttl_seconds: int) -> str | None:
     if max_slots <= 0:
         return None
@@ -310,6 +527,102 @@ def _parse_llm_json_content(raw_text: str) -> dict:
     raise ValueError("Model response does not contain valid JSON.")
 
 
+def _pdf_first_page_image_data_url(file_path: str) -> str:
+    doc = None
+    try:
+        doc = fitz.open(file_path)
+        if doc.page_count <= 0:
+            return ""
+
+        page = doc.load_page(0)
+        pix = page.get_pixmap(matrix=fitz.Matrix(3, 3), alpha=False)
+        image = Image.open(io.BytesIO(pix.tobytes("png"))).convert("RGB")
+        width, height = image.size
+        image = image.crop((0, 0, width, max(int(height * 0.45), 1)))
+        image.thumbnail((1800, 1200))
+        buffer = io.BytesIO()
+        image.save(buffer, format="JPEG", quality=86, optimize=True)
+        encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
+        return f"data:image/jpeg;base64,{encoded}"
+    except Exception as exc:
+        logger.info("Could not render first PDF page for visual name extraction: %s", exc)
+        return ""
+    finally:
+        if doc is not None:
+            try:
+                doc.close()
+            except Exception:
+                pass
+
+
+def _extract_candidate_name_from_pdf_image(file_path: str) -> str:
+    data_url = _pdf_first_page_image_data_url(file_path)
+    if not data_url:
+        return ""
+
+    model_alias = config(
+        "AI_RESUME_VISION_MODEL",
+        default=config(
+            "AI_VISION_LLM_MODEL",
+            default=config(
+                "AI_LLM_LOCAL_MODEL",
+                default=config("AI_RESUME_LLM_MODEL", default=config("AI_LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma3:12b"))),
+            ),
+        ),
+    )
+    payload = {
+        "model": model_alias,
+        "messages": [
+            {
+                "role": "system",
+                "content": "Return only valid JSON.",
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": (
+                            "Copy exactly the complete large uppercase person name in the CV header. "
+                            "Return JSON {\"candidate_name\":\"...\"}. Include every word in that name line. "
+                            "Do not use the job title, company name, email, phone, or reference names."
+                        ),
+                    },
+                    {"type": "image_url", "image_url": {"url": data_url}},
+                ],
+            },
+        ],
+        "temperature": 0,
+        "top_p": 0.8,
+        "max_tokens": 120,
+        "stream": False,
+        "think": False,
+        "response_format": {"type": "json_object"},
+    }
+
+    try:
+        response_json, _ = post_chat_completion_httpx(
+            payload,
+            default_model=model_alias,
+            timeout_seconds=config("AI_RESUME_VISION_TIMEOUT_SECONDS", default=120.0, cast=float),
+            connect_timeout_seconds=config("AI_RESUME_VISION_CONNECT_TIMEOUT_SECONDS", default=10.0, cast=float),
+        )
+        message = (response_json.get("choices") or [{}])[0].get("message") or {}
+        content = message.get("content") or ""
+        if isinstance(content, list):
+            content = "\n".join(
+                part.get("text", "") if isinstance(part, dict) else str(part)
+                for part in content
+            )
+        parsed = _parse_llm_json_content(content)
+    except Exception as exc:
+        logger.info("Visual candidate-name extraction skipped: %s", exc)
+        return ""
+
+    candidate_name = _clean_person_name(parsed.get("candidate_name") or parsed.get("name") or "")
+    return candidate_name if _looks_like_person_name(candidate_name) else ""
+
+
 def _coerce_list(value) -> list[str]:
     if isinstance(value, list):
         return [str(item).strip() for item in value if str(item).strip()][:8]
@@ -360,6 +673,8 @@ def _normalize_analysis_result(result: dict) -> dict:
         "missing_skills": _coerce_list(result.get("missing_skills")),
         "criteria_results": _coerce_dict_list(result.get("criteria_results")),
         "evidence": _coerce_dict_list(result.get("evidence") or result.get("source_evidence")),
+        "candidate_name": _clean_person_name(result.get("candidate_name") or result.get("cv_candidate_name") or ""),
+        "identity_warnings": _coerce_dict_list(result.get("identity_warnings") or result.get("identityWarnings"), max_items=4),
     }
 
 
@@ -578,6 +893,7 @@ def analyze_resume_ai(self, activity_id):
             .select_related(
                 'job_post',
                 'resume',
+                'resume__user',
                 'resume__file',
                 'resume__career',
                 'resume__city',
@@ -612,6 +928,8 @@ def analyze_resume_ai(self, activity_id):
         file_obj = resume.file if resume else manual_profile.file
         file_format = file_obj.format.lower() if file_obj and file_obj.format else 'pdf'
         resume_text = ""
+        file_resume_text = ""
+        visual_resume_candidate_name = ""
         input_source = "profile" if resume else "manual_profile"
 
         if file_obj:
@@ -671,6 +989,14 @@ def analyze_resume_ai(self, activity_id):
                 else:
                     with open(temp_file, 'r', errors='ignore') as f:
                         resume_text = f.read()
+                file_resume_text = resume_text
+                if file_format == 'pdf' and not _extract_candidate_name_from_resume_text(file_resume_text):
+                    visual_resume_candidate_name = _extract_candidate_name_from_pdf_image(temp_file)
+                    if visual_resume_candidate_name:
+                        resume_text = (
+                            f"Visually detected CV candidate name: {visual_resume_candidate_name}\n"
+                            f"{resume_text}"
+                        ).strip()
 
                 activity.ai_analysis_progress = 45
                 activity.save(update_fields=['ai_analysis_progress', 'update_at'])
@@ -699,11 +1025,13 @@ def analyze_resume_ai(self, activity_id):
         resume_excerpt = _truncate_text(resume_text, max_resume_chars)
         criteria = _normalize_criteria(activity.ai_analysis_criteria) or _build_default_screening_criteria(activity)
         criteria_json = json.dumps(criteria, ensure_ascii=False)
+        application_candidate_name = _application_candidate_name(activity)
 
         prompt = f"""
         Analyze candidate CV fit for this role using the weighted screening criteria.
         Return ONLY one compact valid JSON object.
 
+        Application candidate name in system: {application_candidate_name or "Unknown"}
         Job title: {activity.job_post.job_name}
         Job description: {_strip_html(job_description)}
         Job requirements: {_strip_html(job_requirement)}
@@ -717,6 +1045,7 @@ def analyze_resume_ai(self, activity_id):
         Required JSON schema:
         {{
           "score": 0-100 integer,
+          "candidate_name": "person name visible in the CV if available",
           "summary": "short Vietnamese summary",
           "skills": ["..."],
           "pros": ["..."],
@@ -739,6 +1068,15 @@ def analyze_resume_ai(self, activity_id):
               "quote": "short quote",
               "confidence": 0-100
             }}
+          ],
+          "identity_warnings": [
+            {{
+              "type": "name_mismatch",
+              "severity": "warning",
+              "application_name": "name from system",
+              "resume_name": "name visible in CV",
+              "message": "Vietnamese warning for HR"
+            }}
           ]
         }}
 
@@ -747,6 +1085,8 @@ def analyze_resume_ai(self, activity_id):
         - each list max 5 short items.
         - criteria_results must include every criterion key.
         - evidence quotes must be short and grounded in the provided CV/JD text.
+        - candidate_name must be extracted from the CV text, not from the system name.
+        - if candidate_name and system candidate name are different people, add one identity_warnings item.
         - do not infer protected attributes such as age, gender, marital status, race, religion, disability, or family status.
         - no markdown, no extra text outside JSON.
         - no <think> block, no explanation.
@@ -840,6 +1180,26 @@ def analyze_resume_ai(self, activity_id):
                     raise ValueError("Model response does not contain valid JSON.")
 
             result = _normalize_analysis_result(result)
+        identity_warnings = _merge_identity_warnings(
+            result.get("identity_warnings"),
+            _build_identity_warnings(
+                activity,
+                file_resume_text,
+                result.get("candidate_name"),
+                visual_resume_candidate_name,
+            ),
+        )
+        if identity_warnings:
+            result["identity_warnings"] = identity_warnings
+            warning_messages = [
+                str(item.get("message") or "").strip()
+                for item in identity_warnings
+                if str(item.get("message") or "").strip()
+            ]
+            existing_cons = result.get("cons", [])
+            result["cons"] = (warning_messages + [item for item in existing_cons if item not in warning_messages])[:8]
+            if result.get("summary") and "ten" not in _strip_name_accents(result["summary"]).lower():
+                result["summary"] = f"Lưu ý: tên trong CV có dấu hiệu không khớp với hồ sơ ứng tuyển. {result['summary']}"
         activity.ai_analysis_score = result.get('score', 0)
         activity.ai_analysis_summary = result.get('summary', '')
         activity.ai_analysis_skills = ", ".join(result.get('skills', []))
@@ -851,6 +1211,7 @@ def analyze_resume_ai(self, activity_id):
         activity.ai_analysis_evidence = {
             "criteria_results": result.get("criteria_results", []),
             "evidence": result.get("evidence", []),
+            "identity_warnings": result.get("identity_warnings", []),
         }
         activity.ai_analysis_model = analysis_model
         activity.ai_analysis_source = analysis_source

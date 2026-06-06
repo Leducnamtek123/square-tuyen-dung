@@ -12,11 +12,11 @@ import {
 } from '@mui/material';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
-import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
 import { ROUTES } from '../../../../configs/constants';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import type { ChipProps } from '@mui/material';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 
 interface Props {
   statusLabel: string;
@@ -25,7 +25,6 @@ interface Props {
   missingCount: number;
   canPost: boolean;
   legalReady: boolean;
-  scheduleReady: boolean;
 }
 
 const VerificationIntroCard = ({
@@ -35,10 +34,10 @@ const VerificationIntroCard = ({
   missingCount,
   canPost,
   legalReady,
-  scheduleReady,
 }: Props) => {
   const { push } = useRouter();
-  const { t } = useTranslation('employer');
+  const { t, i18n } = useTranslation('employer');
+  const companyHref = localizeRoutePath(`/${ROUTES.EMPLOYER.COMPANY}`, i18n.language);
   const steps = [
     {
       icon: BusinessOutlinedIcon,
@@ -49,11 +48,6 @@ const VerificationIntroCard = ({
       icon: AssignmentTurnedInOutlinedIcon,
       label: t('verification.summary.legalProfile'),
       done: legalReady,
-    },
-    {
-      icon: EventAvailableOutlinedIcon,
-      label: t('verification.summary.appointment'),
-      done: scheduleReady,
     },
   ];
 
@@ -103,7 +97,7 @@ const VerificationIntroCard = ({
       </Alert>
 
       <Box sx={{ mt: 2, display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-        <Button variant="outlined" onClick={() => push(`/${ROUTES.EMPLOYER.COMPANY}`)}>
+        <Button variant="outlined" onClick={() => push(companyHref)}>
           {t('verification.step1.openBtn')}
         </Button>
       </Box>

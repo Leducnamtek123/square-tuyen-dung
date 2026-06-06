@@ -1,5 +1,5 @@
 import httpRequest from '../utils/httpRequest';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 import { cleanParams } from '../utils/params';
 import type { JobPost } from '../types/models';
 import type { ExportTableRow, PaginatedResponse } from '../types/api';
@@ -127,17 +127,17 @@ const jobService = {
 
   getEmployerJobPostDetailById: (slug: IdType): Promise<JobPost> => {
     const url = `job/web/private-job-posts/${slug}/`;
-    return httpRequest.get(url) as Promise<JobPost>;
+    return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<JobPost>);
   },
 
   addJobPost: (data: JobPostInput): Promise<JobPost> => {
     const url = 'job/web/private-job-posts/';
-    return httpRequest.post(url, data) as Promise<JobPost>;
+    return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<JobPost>);
   },
 
   updateJobPostById: (slug: IdType, data: Partial<JobPostInput>): Promise<JobPost> => {
     const url = `job/web/private-job-posts/${slug}/`;
-    return httpRequest.put(url, data) as Promise<JobPost>;
+    return (httpRequest.put(url, data) as Promise<unknown>).then(unwrapDataResponse<JobPost>);
   },
 
   deleteJobPostById: (slug: IdType): Promise<void> => {
@@ -159,7 +159,7 @@ const jobService = {
 
   getJobPostDetailById: (slug: IdType): Promise<JobPost> => {
     const url = `job/web/job-posts/${slug}/`;
-    return httpRequest.get(url) as Promise<JobPost>;
+    return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<JobPost>);
   },
 
   getSuggestedJobPosts: (params: GetJobPostsParams = {}): Promise<PaginatedResponse<JobPost>> => {
@@ -178,12 +178,12 @@ const jobService = {
 
   saveJobPost: (slug: IdType): Promise<{ isSaved: boolean }> => {
     const url = `job/web/job-posts/${slug}/save/`;
-    return httpRequest.post(url) as Promise<{ isSaved: boolean }>;
+    return (httpRequest.post(url) as Promise<unknown>).then(unwrapDataResponse<{ isSaved: boolean }>);
   },
 
   getJobSalaryInsightBySlug: (slug: IdType): Promise<JobSalaryInsightResponse> => {
     const url = `job/web/job-posts/${slug}/salary-insight/`;
-    return httpRequest.get(url) as Promise<JobSalaryInsightResponse>;
+    return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<JobSalaryInsightResponse>);
   },
 };
 

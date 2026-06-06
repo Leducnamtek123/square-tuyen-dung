@@ -73,4 +73,25 @@ describe('commonService location options', () => {
 
     await expect(commonService.getAllCareersSimple()).resolves.toEqual(careers);
   });
+
+  it('unwraps nested upload file responses', async () => {
+    const uploadedFile = {
+      id: 9,
+      url: 'https://cdn.example.com/chat_attachments/image.png',
+      name: 'image.png',
+    };
+    const file = new File(['image'], 'image.png', { type: 'image/png' });
+    (httpRequest.post as jest.Mock).mockResolvedValueOnce({
+      data: { data: uploadedFile },
+    });
+
+    await expect(commonService.uploadFile(file, 'OTHER')).resolves.toEqual(uploadedFile);
+    expect(httpRequest.post).toHaveBeenCalledWith(
+      'common/upload-file/',
+      expect.any(FormData),
+      expect.objectContaining({
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }),
+    );
+  });
 });

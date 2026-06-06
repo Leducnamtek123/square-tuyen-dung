@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useCallback, useState, useMemo } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, Tooltip, IconButton, Stack, Chip, Dialog, DialogTitle, DialogContent, DialogActions, Button, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { Box, Typography, Paper, Tooltip, IconButton, Stack, Chip, Dialog, DialogTitle, DialogContent, DialogActions, Button, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
@@ -14,9 +14,12 @@ import { useDataTable, useDebounce } from '../../../hooks';
 import { JobPost } from '../../../types/models';
 import dayjs from '../../../configs/dayjs-config';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
+import { ROUTES } from '../../../configs/routeConfig';
+import { localizeRoutePath } from '../../../configs/routeLocalization';
+import { formatRoute } from '../../../utils/funcUtils';
 
 const JobsPage = () => {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation('admin');
     
     const {
         page,
@@ -150,10 +153,13 @@ const JobsPage = () => {
             meta: { align: 'right' },
             cell: (info) => {
                 const job = info.row.original;
+                const detailHref = job.slug
+                    ? localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, job.slug)}`, i18n.language)
+                    : undefined;
                 return (
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                         <Tooltip title={t('pages.jobs.table.view')}>
-                             <IconButton size="small" component="a" href={`/jobs/${job.slug}`} target="_blank" color="info">
+                             <IconButton size="small" component="a" href={detailHref} target={detailHref ? '_blank' : undefined} rel={detailHref ? 'noopener noreferrer' : undefined} color="info" disabled={!detailHref}>
                                 <VisibilityIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
@@ -187,7 +193,7 @@ const JobsPage = () => {
                 );
             },
         },
-    ], [getStatusLabel, handleApprove, handleOpenDelete, handleReject, t]);
+    ], [getStatusLabel, handleApprove, handleOpenDelete, handleReject, i18n.language, t]);
 
     return (
         <Box>
@@ -196,13 +202,6 @@ const JobsPage = () => {
                     <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
                         {t('pages.jobs.title')}
                     </Typography>
-                    <Breadcrumbs aria-label="breadcrumb">
-                        <Link underline="hover" color="inherit" href="/admin">
-                            {t('pages.jobs.breadcrumbAdmin')}
-                        </Link>
-                        <Typography color="text.primary">{t('pages.jobs.breadcrumbListings')}</Typography>
-                        <Typography color="text.primary">{t('pages.jobs.breadcrumbJobs')}</Typography>
-                    </Breadcrumbs>
                 </Box>
             </Box>
 

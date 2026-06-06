@@ -22,12 +22,14 @@ import {
   readVersionedJson,
   writeVersionedJson,
 } from '@/utils/storageKeys';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 
 const HomeSearch = () => {
-  const { t } = useTranslation(['common']);
+  const { t, i18n } = useTranslation(['common']);
   const dispatch = useDispatch();
   const { push } = useRouter();
   const { allConfig } = useConfig();
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
 
   const { jobPostFilter } = useAppSelector((state) => state.filter);
 
@@ -66,7 +68,7 @@ const HomeSearch = () => {
   const handleFilter = (data: { kw: string; cityId: string; careerId: string }) => {
     handleSaveKeyworLocalStorage(data?.kw);
     dispatch(searchJobPost({ ...jobPostFilter, ...data } as JobPostFilter));
-    push(`/${ROUTES.JOB_SEEKER.JOBS}`);
+    push(jobsHref);
   };
 
   return (

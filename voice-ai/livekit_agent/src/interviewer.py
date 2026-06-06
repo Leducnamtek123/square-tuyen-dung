@@ -210,8 +210,61 @@ def _format_detail_nudge(question: str, user_text: str) -> str:
     return "Bạn nói thêm một chút được không? Mình muốn hiểu ví dụ hoặc kinh nghiệm thực tế của bạn."
 
 
+def _looks_like_no_candidate_question(text: str) -> bool:
+    normalized = _normalize_text(text).lower()
+    if not normalized or len(normalized) > 120:
+        return False
+
+    normalized = re.sub(r"[^\wÀ-ỹ\s]", " ", normalized, flags=re.IGNORECASE)
+    normalized = " ".join(normalized.split())
+    no_question_phrases = (
+        "không có",
+        "khong co",
+        "không ạ",
+        "khong a",
+        "không hỏi",
+        "khong hoi",
+        "chưa có",
+        "chua co",
+        "em không",
+        "em khong",
+        "mình không",
+        "minh khong",
+        "không cần",
+        "khong can",
+        "hết rồi",
+        "het roi",
+        "cảm ơn",
+        "cam on",
+        "dạ không",
+        "da khong",
+    )
+    return any(phrase in normalized for phrase in no_question_phrases)
+
+
+def _candidate_question_prompt() -> str:
+    return (
+        "Cảm ơn bạn, mình đã ghi nhận các phần trả lời. "
+        "Trước khi kết thúc, bạn có câu hỏi nào muốn gửi tới công ty hoặc bộ phận tuyển dụng không?"
+    )
+
+
 def _closing_response() -> str:
-    return "Cảm ơn bạn, mình đã ghi nhận phần trao đổi hôm nay. Buổi phỏng vấn kết thúc tại đây nhé."
+    return (
+        "Cảm ơn bạn đã dành thời gian trao đổi hôm nay. "
+        "Mình đã ghi nhận đầy đủ phần trả lời của bạn để bộ phận tuyển dụng xem xét tiếp. "
+        "Chúc bạn một ngày tốt lành, buổi phỏng vấn kết thúc tại đây nhé."
+    )
+
+
+def _candidate_question_closing_response(user_text: str) -> str:
+    if _looks_like_no_candidate_question(user_text):
+        return _closing_response()
+
+    return (
+        "Cảm ơn bạn, mình đã ghi nhận câu hỏi của bạn để bộ phận tuyển dụng phản hồi thêm nếu cần. "
+        f"{_closing_response()}"
+    )
 
 
 def _format_employer_instruction_response(instruction: str) -> str:
@@ -264,6 +317,10 @@ class Interviewer(Agent):
         self._last_handled_user_turn_id: str | None = None
         self._last_asked_question_text: str | None = None
         self._short_answer_prompted_for: str | None = None
+        self._candidate_question_prompted = False
+        self._awaiting_candidate_questions = False
+        self._employer_takeover_active = False
+        self._pending_employer_followups: list[str] = []
 
         candidate_name = _brief_text(self._context.get("candidateName", "Ứng viên"), 80)
         job_title = _brief_text(self._context.get("jobTitle", "đang ứng tuyển"), 120)
@@ -330,6 +387,18 @@ class Interviewer(Agent):
     def completed(self) -> bool:
         return self._completed
 
+    @property
+    def employer_takeover_active(self) -> bool:
+        return self._employer_takeover_active
+
+    def pause_for_employer_takeover(self, speaker_name: str | None = None) -> None:
+        del speaker_name
+        self._employer_takeover_active = True
+
+    def resume_from_employer_takeover(self, speaker_name: str | None = None) -> None:
+        del speaker_name
+        self._employer_takeover_active = False
+
     def build_employer_instruction_response(self, instruction: str) -> str:
         return _format_employer_instruction_response(instruction)
 
@@ -339,18 +408,21 @@ class Interviewer(Agent):
         *,
         speaker_name: str | None = None,
     ) -> str | None:
-        if self._completed:
+        if self._completed or self._employer_takeover_active:
             return None
 
         response = self.build_employer_instruction_response(instruction)
         if not response:
             return None
 
-        await self.record_transcript("ai_agent", response)
-        session = getattr(self, "session", None)
-        if session is not None:
-            await session.say(response, allow_interruptions=False)
-        return response
+        self._pending_employer_followups.append(response)
+        logger.info(
+            "Queued employer follow-up for room %s from %s: queue_size=%s",
+            self._room_name,
+            speaker_name or "employer",
+            len(self._pending_employer_followups),
+        )
+        return None
 
     async def on_enter(self) -> None:
         """Called when the agent joins the session."""
@@ -372,6 +444,10 @@ class Interviewer(Agent):
         return super().llm_node(chat_ctx, tools, model_settings)
 
     async def _scripted_llm_response(self, chat_ctx: Any = None) -> str | None:
+        if self._employer_takeover_active:
+            logger.info("Skipping AI reply while employer takeover is active for room %s", self._room_name)
+            return None
+
         user_turn_id, user_text = _latest_user_turn(chat_ctx)
         if user_turn_id and user_turn_id == self._last_handled_user_turn_id:
             logger.info("Skipping duplicate user turn for room %s", self._room_name)
@@ -403,7 +479,12 @@ class Interviewer(Agent):
         self._short_answer_prompted_for = self._last_asked_question_text
         return True
 
-    async def _build_scripted_response(self, *, user_text: str = "") -> str:
+    async def _build_scripted_response(self, *, user_text: str = "") -> str | None:
+        if self._awaiting_candidate_questions:
+            if not user_text:
+                return None
+            return self._finish_after_candidate_question(user_text)
+
         if self._needs_more_answer_detail(user_text):
             return _format_detail_nudge(self._last_asked_question_text or "", user_text)
 
@@ -420,8 +501,7 @@ class Interviewer(Agent):
                     user_text=user_text,
                 )
             if action.kind == "closing":
-                self._mark_completed()
-                return _closing_response()
+                return self._offer_pending_followup_or_candidate_question()
 
         if self._scripted_question_index < len(self._scripted_questions):
             question = self._scripted_questions[self._scripted_question_index]
@@ -434,8 +514,32 @@ class Interviewer(Agent):
                 user_text=user_text,
             )
 
+        return self._offer_pending_followup_or_candidate_question()
+
+    def _offer_pending_followup_or_candidate_question(self) -> str:
+        if self._pending_employer_followups:
+            followup = self._pending_employer_followups.pop(0)
+            self._last_asked_question_text = followup
+            self._short_answer_prompted_for = None
+            return followup
+
+        return self._offer_candidate_question_turn()
+
+    def _offer_candidate_question_turn(self) -> str:
+        if not self._candidate_question_prompted:
+            self._candidate_question_prompted = True
+            self._awaiting_candidate_questions = True
+            self._last_asked_question_text = None
+            self._short_answer_prompted_for = None
+            return _candidate_question_prompt()
+
         self._mark_completed()
         return _closing_response()
+
+    def _finish_after_candidate_question(self, user_text: str) -> str:
+        self._awaiting_candidate_questions = False
+        self._mark_completed()
+        return _candidate_question_closing_response(user_text)
 
     def _mark_completed(self) -> None:
         self._completed = True

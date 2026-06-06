@@ -3,12 +3,10 @@
 import React, { useMemo, useReducer, useState } from 'react';
 import {
   Box,
-  Breadcrumbs,
   Button,
   Chip,
   FormControl,
   InputLabel,
-  Link,
   MenuItem,
   Paper,
   Select,
@@ -239,12 +237,6 @@ export default function AuditLogsPage() {
         <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
           {t('pages.auditLogs.title')}
         </Typography>
-        <Breadcrumbs aria-label="breadcrumb">
-          <Link underline="hover" color="inherit" href="/admin">
-            {t('pages.auditLogs.breadcrumbAdmin')}
-          </Link>
-          <Typography color="text.primary">{t('pages.auditLogs.breadcrumb')}</Typography>
-        </Breadcrumbs>
       </Box>
 
       <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>

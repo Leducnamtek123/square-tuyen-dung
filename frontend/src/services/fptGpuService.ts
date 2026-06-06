@@ -29,6 +29,9 @@ export type FPTGpuControlStatus = {
     configured: boolean;
     error?: string;
   };
+  bootstrap?: {
+    configured: boolean;
+  };
   ai: {
     status: 'ready' | 'degraded';
     checks: Record<string, FPTGpuHealthCheck>;
@@ -36,7 +39,7 @@ export type FPTGpuControlStatus = {
 };
 
 export type FPTGpuActionResponse = {
-  action: 'START' | 'STOP' | 'RESTART';
+  action: 'START' | 'STOP' | 'RESTART' | 'BOOTSTRAP' | 'START_BOOTSTRAP';
   result?: unknown;
 };
 
@@ -51,6 +54,14 @@ const fptGpuService = {
 
   stop: (): Promise<FPTGpuActionResponse> => {
     return httpRequest.post<FPTGpuActionResponse>('ai/gpu-control/stop/');
+  },
+
+  bootstrap: (): Promise<FPTGpuActionResponse> => {
+    return httpRequest.post<FPTGpuActionResponse>('ai/gpu-control/bootstrap/');
+  },
+
+  startAndBootstrap: (): Promise<FPTGpuActionResponse> => {
+    return httpRequest.post<FPTGpuActionResponse>('ai/gpu-control/start-bootstrap/');
   },
 };
 

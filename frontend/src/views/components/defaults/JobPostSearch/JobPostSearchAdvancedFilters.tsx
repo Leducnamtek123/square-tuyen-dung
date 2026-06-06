@@ -190,7 +190,7 @@ const JobPostSearchAdvancedFilters = ({
           <Stack direction="row" justifyContent={{ xs: 'flex-end', lg: 'center', xl: 'center' }}>
             <IconButton
               color="primary"
-              aria-label="reset"
+              aria-label={t('jobSearch.resetFiltersAria')}
               onClick={onReset}
               sx={{
                 bgcolor: 'rgba(16, 185, 129, 0.1)',
@@ -202,7 +202,7 @@ const JobPostSearchAdvancedFilters = ({
             </IconButton>
             <IconButton
               color="primary"
-              aria-label="clear"
+              aria-label={t('jobSearch.closeAdvancedFiltersAria')}
               onClick={onToggleAdvancedFilter}
               sx={{
                 bgcolor: 'rgba(220, 38, 38, 0.08)',

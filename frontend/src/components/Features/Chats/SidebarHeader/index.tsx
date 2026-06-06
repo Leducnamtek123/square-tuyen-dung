@@ -9,6 +9,7 @@ import { IMAGES, ROUTES } from '@/configs/constants';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import LanguageSwitcher from '@/layouts/components/commons/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 interface SidebarHeaderProps {
   // Add specific props if needed
@@ -17,18 +18,14 @@ interface SidebarHeaderProps {
 const SidebarHeader = (_props: SidebarHeaderProps) => {
   const { activeWorkspace } = useAppSelector((state) => state.user);
   const { push } = useRouter();
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
 
   const isEmployer = React.useMemo(() => {
     return activeWorkspace?.type === "company";
   }, [activeWorkspace]);
 
   const handleRedirect = () => {
-    if (isEmployer) {
-      push(`/${ROUTES.EMPLOYER.DASHBOARD}`);
-    } else {
-      push(`/${ROUTES.JOB_SEEKER.HOME}`);
-    }
+    push(localizeRoutePath(isEmployer ? `/${ROUTES.EMPLOYER.DASHBOARD}` : '/', i18n.language));
   };
 
   return (

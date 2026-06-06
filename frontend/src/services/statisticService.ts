@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { unwrapDataResponse } from '../utils/apiResponse';
 import { cleanParams } from '../utils/params';
 
 // --- INTERFACES: Job Seeker Statistics ---
@@ -146,52 +147,62 @@ export type EmployerStatsParams = {
 const statisticService = {
   employerGeneralStatistics: (): Promise<EmployerGeneralStats> => {
     const url = 'job/web/statistics/employer/';
-    return httpRequest.get(url, { params: { type: 'general' } });
+    return (httpRequest.get(url, { params: { type: 'general' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<EmployerGeneralStats>);
   },
 
   employerRecruitmentStatisticsByRank: (data: EmployerStatsParams = {}): Promise<EmployerRecruitmentByRankStats> => {
     const url = 'job/web/statistics/employer/';
-    return httpRequest.post(url, cleanParams(data), { params: { type: 'recruitment-by-rank' } });
+    return (httpRequest.post(url, cleanParams(data), { params: { type: 'recruitment-by-rank' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<EmployerRecruitmentByRankStats>);
   },
 
   employerApplicationStatistics: (data: EmployerStatsParams = {}): Promise<EmployerApplicationStats> => {
     const url = 'job/web/statistics/employer/';
-    return httpRequest.post(url, cleanParams(data), { params: { type: 'application' } });
+    return (httpRequest.post(url, cleanParams(data), { params: { type: 'application' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<EmployerApplicationStats>);
   },
 
   employerCandidateStatistics: (data: EmployerStatsParams = {}): Promise<EmployerCandidateStats> => {
     const url = 'job/web/statistics/employer/';
-    return httpRequest.post(url, cleanParams(data), { params: { type: 'candidate' } });
+    return (httpRequest.post(url, cleanParams(data), { params: { type: 'candidate' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<EmployerCandidateStats>);
   },
 
   employerRecruitmentStatistics: (data: EmployerStatsParams = {}): Promise<EmployerRecruitmentStatItem[]> => {
     const url = 'job/web/statistics/employer/';
-    return httpRequest.post(url, cleanParams(data), { params: { type: 'recruitment' } });
+    return (httpRequest.post(url, cleanParams(data), { params: { type: 'recruitment' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<EmployerRecruitmentStatItem[]>);
   },
 
   employerInterviewStatistics: (data: EmployerStatsParams = {}): Promise<EmployerInterviewStats> => {
     const url = 'job/web/statistics/employer/';
-    return httpRequest.post(url, cleanParams(data), { params: { type: 'interview' } });
+    return (httpRequest.post(url, cleanParams(data), { params: { type: 'interview' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<EmployerInterviewStats>);
   },
 
   jobSeekerGeneralStatistics: (): Promise<JobSeekerGeneralStats> => {
     const url = 'job/web/statistics/job-seeker/';
-    return httpRequest.get(url, { params: { type: 'general' } });
+    return (httpRequest.get(url, { params: { type: 'general' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<JobSeekerGeneralStats>);
   },
 
   jobSeekerTotalView: (): Promise<JobSeekerTotalViewStats> => {
     const url = 'job/web/statistics/job-seeker/';
-    return httpRequest.get(url, { params: { type: 'total-view' } });
+    return (httpRequest.get(url, { params: { type: 'total-view' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<JobSeekerTotalViewStats>);
   },
 
   jobSeekerActivityStatistics: (): Promise<JobSeekerActivityStats> => {
     const url = 'job/web/statistics/job-seeker/';
-    return httpRequest.get(url, { params: { type: 'activity' } });
+    return (httpRequest.get(url, { params: { type: 'activity' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<JobSeekerActivityStats>);
   },
 
   adminGeneralStatistics: (): Promise<AdminGeneralStats> => {
     const url = 'job/web/statistics/admin/';
-    return httpRequest.get(url, { params: { type: 'general' } });
+    return (httpRequest.get(url, { params: { type: 'general' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<AdminGeneralStats>);
   },
 };
 

@@ -5,6 +5,7 @@ import { Badge, Box, CircularProgress, IconButton, Menu, Stack, Typography } fro
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useTranslation } from 'react-i18next';
 import { ROLES_NAME, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import { useAppSelector } from '@/hooks/useAppStore';
 import { useNotifications } from '@/hooks/useNotifications';
 import { getNotificationTargetPath, isExternalNotificationTarget } from '@/utils/notificationRouting';
@@ -16,7 +17,7 @@ const PAGE_SIZE = 5;
 
 const NotificationCard: React.FC = () => {
   const { push } = useRouter();
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const { currentUser } = useAppSelector((state) => state.user);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -38,15 +39,19 @@ const NotificationCard: React.FC = () => {
   const handleClose = () => setAnchorEl(null);
 
   const allNotificationsPath = React.useMemo(() => {
-    if (currentUser?.roleName === ROLES_NAME.EMPLOYER) return `/${ROUTES.EMPLOYER.NOTIFICATION}`;
-    if (currentUser?.roleName === ROLES_NAME.JOB_SEEKER) return `/${ROUTES.JOB_SEEKER.NOTIFICATION}`;
+    if (currentUser?.roleName === ROLES_NAME.EMPLOYER) {
+      return localizeRoutePath(`/${ROUTES.EMPLOYER.NOTIFICATION}`, i18n.language);
+    }
+    if (currentUser?.roleName === ROLES_NAME.JOB_SEEKER) {
+      return localizeRoutePath(`/${ROUTES.JOB_SEEKER.NOTIFICATION}`, i18n.language);
+    }
     return null;
-  }, [currentUser?.roleName]);
+  }, [currentUser?.roleName, i18n.language]);
 
   const handleClickItem = async (item: AppNotification) => {
     await handleRead(item.key);
 
-    const targetPath = getNotificationTargetPath(item, currentUser?.roleName);
+    const targetPath = getNotificationTargetPath(item, currentUser?.roleName, i18n.language);
     if (targetPath) {
       if (isExternalNotificationTarget(targetPath)) {
         window.location.assign(targetPath);

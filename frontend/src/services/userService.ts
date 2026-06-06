@@ -3,7 +3,7 @@ import { presignInObject } from '../utils/presignUrl';
 import { User as UserModel } from '../types/models';
 import { PaginatedResponse } from '../types/api';
 import { cleanParams } from '../utils/params';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 import type { AdminListParams } from './adminManagementService';
 
 type IdType = string | number;
@@ -26,11 +26,13 @@ const userService = {
   },
   toggleUserStatus: (id: IdType): Promise<UserStatusResponse> => {
     const url = `auth/users/${id}/toggle-active/`;
-    return httpRequest.post(url) as Promise<UserStatusResponse>;
+    return (httpRequest.post(url) as Promise<unknown>).then(unwrapDataResponse<UserStatusResponse>);
   },
   bulkStatus: (ids: IdType[], isActive: boolean): Promise<{ updated: number; isActive: boolean }> => {
     const url = 'auth/users/bulk-status/';
-    return httpRequest.post(url, { ids, isActive }) as Promise<{ updated: number; isActive: boolean }>;
+    return (httpRequest.post(url, { ids, isActive }) as Promise<unknown>).then(
+      unwrapDataResponse<{ updated: number; isActive: boolean }>,
+    );
   },
   deleteUser: (id: IdType): Promise<void> => {
     const url = `auth/users/${id}/`;

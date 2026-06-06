@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { unwrapDataResponse } from '../utils/apiResponse';
 
 interface TTSPayload {
   text: string;
@@ -63,20 +64,22 @@ const aiService = {
     formData.append('audio', file);
     if (params.model) formData.append('model', String(params.model));
     if (params.language) formData.append('language', String(params.language));
-    const response = await httpRequest.post<TranscribeResponse>(url, formData, {
+    const response = await httpRequest.post<unknown>(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return response ?? {};
+    return unwrapDataResponse<TranscribeResponse | null | undefined>(response) ?? {};
   },
 
   getScreeningResult: async (id: string | number): Promise<ScreeningResult> => {
-    return httpRequest.get<ScreeningResult>(`interview/web/screening-results/${id}/`);
+    const response = await httpRequest.get<unknown>(`interview/web/screening-results/${id}/`);
+    return unwrapDataResponse<ScreeningResult>(response);
   },
 
   getHealth: async (): Promise<AIHealthResponse> => {
-    return httpRequest.get<AIHealthResponse>('ai/health/');
+    const response = await httpRequest.get<unknown>('ai/health/');
+    return unwrapDataResponse<AIHealthResponse>(response);
   },
 };
 

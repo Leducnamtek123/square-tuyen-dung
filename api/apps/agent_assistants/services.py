@@ -14,6 +14,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from apps.interviews.models import InterviewSession, Question, QuestionGroup
+from apps.jobs.manual_candidate_validation import validate_manual_candidate_activity_storage
 from apps.jobs.models import JobPost, JobPostActivity
 from apps.jobs.services import JobActivityService
 from apps.profiles.models import Company, Resume
@@ -1599,6 +1600,13 @@ class AgentAssistantService:
             candidate_data["email"] = email
         if phone:
             candidate_data["phone"] = phone
+
+        activity_storage_errors = validate_manual_candidate_activity_storage(candidate_data)
+        if activity_storage_errors:
+            raise AgentAssistantError(
+                "Không thể tạo hồ sơ ứng viên từ nội dung này. Bạn kiểm tra lại tên, email, số điện thoại và tin tuyển dụng.",
+                details={"errors": activity_storage_errors},
+            )
 
         serializer = EmployerCandidateProfileSerializer(
             data=candidate_data,

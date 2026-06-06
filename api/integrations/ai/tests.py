@@ -97,6 +97,10 @@ def test_image_payload_tries_local_ollama_before_primary(settings, monkeypatch):
     response_json, candidate = post_chat_completion_requests(
         {
             "model": "qwen-text",
+            "temperature": 0,
+            "top_p": 0.8,
+            "max_tokens": 120,
+            "response_format": {"type": "json_object"},
             "messages": [
                 {
                     "role": "user",
@@ -114,6 +118,10 @@ def test_image_payload_tries_local_ollama_before_primary(settings, monkeypatch):
     assert candidate.name == "local"
     assert native_calls[0]["candidate"] == "local"
     assert native_calls[0]["payload"]["model"] == "gemma3:12b"
+    assert native_calls[0]["payload"]["format"] == "json"
+    assert native_calls[0]["payload"]["options"]["temperature"] == 0
+    assert native_calls[0]["payload"]["options"]["top_p"] == 0.8
+    assert native_calls[0]["payload"]["options"]["num_predict"] == 120
     assert native_calls[0]["payload"]["messages"][0]["images"] == ["aGVsbG8="]
 
 
@@ -285,6 +293,48 @@ def test_authenticated_employer_chat_can_create_manual_candidate_profile(
     assert activity.phone == "0909000000"
     assert activity.manual_candidate_profile.full_name == "Nguyen Van A"
     assert activity.manual_candidate_profile.title == job_post.job_name
+
+
+@pytest.mark.django_db
+def test_ai_chat_manual_candidate_rejects_values_exceeding_activity_storage_limits(
+    monkeypatch,
+    employer_user,
+    job_post,
+):
+    long_name = f"Long {'A' * 96}"
+    long_email = f"{'a' * 92}@example.com"
+    long_phone = "0909000000123456"
+
+    def fail_if_llm_called(*args, **kwargs):
+        raise AssertionError("manual candidate creation should not call the LLM")
+
+    monkeypatch.setattr(
+        "integrations.ai.views.post_chat_completion_requests",
+        fail_if_llm_called,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+    response = client.post(
+        "/api/v1/ai/chat/",
+        data={
+            "messages": [
+                {
+                    "role": "user",
+                    "content": (
+                        f"Tao ho so ung vien {long_name} cho vi tri "
+                        f"{job_post.job_name}, email {long_email}, sdt {long_phone}"
+                    ),
+                },
+            ]
+        },
+        format="json",
+    )
+
+    assert response.status_code == 200
+    assert "action" not in response.data["data"]
+    assert "Không thể tạo hồ sơ ứng viên" in response.data["data"]["reply"]
+    assert JobPostActivity.objects.filter(job_post=job_post, email=long_email, is_deleted=False).count() == 0
 
 
 @pytest.mark.django_db
@@ -647,3 +697,68 @@ def test_fpt_gpu_control_action_posts_to_fpt(admin_user, settings, monkeypatch):
     mock_request.assert_called_once()
     assert mock_request.call_args.kwargs["json"] == {"action": "START"}
     assert mock_request.call_args.kwargs["headers"]["Authorization"] == "Bearer test-bss-token"
+
+
+@pytest.mark.django_db
+def test_fpt_gpu_bootstrap_action_runs_ssh(admin_user, monkeypatch):
+    bootstrap_calls = []
+
+    def fake_bootstrap():
+        bootstrap_calls.append(True)
+        return {"returnCode": 0, "stdout": "ok", "stderr": ""}
+
+    monkeypatch.setattr(
+        "integrations.ai.views._run_fpt_gpu_bootstrap_ssh",
+        fake_bootstrap,
+        raising=False,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=admin_user)
+
+    response = client.post("/api/v1/ai/gpu-control/bootstrap/")
+
+    assert response.status_code == 200
+    assert response.data["action"] == "BOOTSTRAP"
+    assert response.data["result"]["returnCode"] == 0
+    assert bootstrap_calls == [True]
+
+
+@pytest.mark.django_db
+def test_fpt_gpu_start_bootstrap_posts_start_then_runs_ssh(admin_user, settings, monkeypatch):
+    settings.FPT_GPU_BSS_ACCESS_TOKEN = "test-bss-token"
+    settings.FPT_GPU_TENANT_ID = "tenant-1"
+    settings.FPT_GPU_CONTAINER_ID = "container-1"
+
+    fpt_calls = []
+
+    def fake_fpt_request(method, path, payload=None):
+        fpt_calls.append((method, path, payload))
+        return {"status": "accepted"}
+
+    def fake_bootstrap():
+        return {"returnCode": 0, "stdout": "ok", "stderr": ""}
+
+    monkeypatch.setattr("integrations.ai.views._fpt_gpu_request", fake_fpt_request)
+    monkeypatch.setattr(
+        "integrations.ai.views._run_fpt_gpu_bootstrap_ssh",
+        fake_bootstrap,
+        raising=False,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=admin_user)
+
+    response = client.post("/api/v1/ai/gpu-control/start-bootstrap/")
+
+    assert response.status_code == 200
+    assert response.data["action"] == "START_BOOTSTRAP"
+    assert response.data["result"]["start"]["status"] == "accepted"
+    assert response.data["result"]["bootstrap"]["returnCode"] == 0
+    assert fpt_calls == [
+        (
+            "POST",
+            "/api/v1/xplat/gpu-container/common/tenants/tenant-1/gpu-containers/container-1/actions",
+            {"action": "START"},
+        )
+    ]

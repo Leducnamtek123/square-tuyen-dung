@@ -233,7 +233,7 @@ class LiveKitService:
         """
         Tạo JWT token cho HR tham gia hiện diện.
         hidden=False: ứng viên thấy HR trong danh sách participant.
-        can_publish=False: HR không publish audio/video (không làm rối AI agent).
+        can_publish=True: HR có thể publish audio/video khi giữ quyền AI.
         can_publish_data=True: HR gửi được chat message.
         can_subscribe=True: HR nghe/xem được toàn bộ phòng.
         """
@@ -245,7 +245,7 @@ class LiveKitService:
                 room_join=True,
                 room=room_name,
                 room_admin=False,
-                can_publish=False,
+                can_publish=True,
                 can_publish_data=True,
                 can_subscribe=True,
                 hidden=False,

@@ -6,8 +6,6 @@ const hookSource = readFileSync(join(__dirname, '../hooks/useBannerTypes.ts'), '
 
 const fixedKeys = [
   'pages.bannerTypes.title',
-  'pages.bannerTypes.breadcrumbAdmin',
-  'pages.bannerTypes.breadcrumbList',
   'pages.bannerTypes.addButton',
   'pages.bannerTypes.addTitle',
   'pages.bannerTypes.editTitle',

@@ -811,13 +811,12 @@
     },
     "companyVerifications": {
       "title": "Xác thực công ty",
-      "subtitle": "Rà soát hồ sơ pháp lý và yêu cầu lịch xác minh.",
+      "subtitle": "Rà soát hồ sơ pháp lý và cập nhật trạng thái xác thực.",
       "empty": "Chưa có yêu cầu xác minh.",
       "reviewNotePlaceholder": "Ghi chú rà soát",
       "table": {
         "company": "Công ty",
         "legalProfile": "Hồ sơ pháp lý",
-        "appointment": "Lịch hẹn",
         "adminNote": "Ghi chú admin",
         "status": "Trạng thái"
       },
@@ -1142,14 +1141,19 @@
         "controlEnabled": "Đã bật điều khiển",
         "readOnly": "Chỉ xem",
         "notConfigured": "Thêm FPT_GPU_BSS_ACCESS_TOKEN hoặc FPT_GPU_ACCESS_TOKEN ở backend để bật Start và Stop.",
+        "bootstrapNotConfigured": "Thêm cấu hình SSH FPT GPU ở backend để bật bootstrap.",
         "tenant": "Tenant",
         "runningCost": "Chi phí khi chạy",
         "stoppedDiskCost": "Chi phí ổ đĩa khi dừng",
+        "startBootstrap": "Bật & chạy AI",
+        "bootstrap": "Chạy AI",
         "start": "Khởi động",
         "stop": "Dừng",
         "refresh": "Làm mới",
         "openConsole": "Mở FPT",
         "toast": {
+          "startBootstrapSuccess": "Đã gửi yêu cầu khởi động và chạy AI trên FPT GPU.",
+          "bootstrapSuccess": "Đã gửi yêu cầu chạy AI trên FPT GPU.",
           "startSuccess": "Đã gửi yêu cầu khởi động FPT GPU.",
           "stopSuccess": "Đã gửi yêu cầu dừng FPT GPU.",
           "actionError": "Thao tác FPT GPU thất bại."
@@ -1353,6 +1357,12 @@
       "connected": {
         "aiInterviewer": "Người phỏng vấn AI",
         "chatTitle": "Tin nhắn",
+        "chatMessages": {
+          "aiGreeting": "Xin chào! Tôi là trợ lý phỏng vấn AI. Hãy bắt đầu nhé.",
+          "candidateReady": "Dạ, tôi sẵn sàng ạ.",
+          "reactQuestion": "Bạn có thể mô tả kinh nghiệm làm việc với React.js của mình không?",
+          "reactExperience": "Tôi đã có 3 năm kinh nghiệm với React, chủ yếu làm việc tại các startup..."
+        },
         "messageInput": "Nhập tin nhắn...",
         "observerNotice": "Nhà tuyển dụng đang quan sát phiên phỏng vấn này",
         "you": "Bạn",

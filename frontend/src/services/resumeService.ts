@@ -1,5 +1,5 @@
 import httpRequest from '../utils/httpRequest';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 import { presignInObject } from '../utils/presignUrl';
 import type {
   Resume,
@@ -109,7 +109,7 @@ const resumeService = {
 
   saveResume: (slug: IdType): Promise<{ isSaved: boolean }> => {
     const url = `info/web/resumes/${slug}/resume-saved/`;
-    return httpRequest.post(url) as Promise<{ isSaved: boolean }>;
+    return (httpRequest.post(url) as Promise<unknown>).then(unwrapDataResponse<{ isSaved: boolean }>);
   },
 
   viewResume: (slug: IdType): Promise<{ viewed: boolean }> => {
@@ -160,7 +160,7 @@ const resumeService = {
 
   activeResume: async (resumeSlug: IdType): Promise<ResumeActiveStatusResponse> => {
     const url = `info/web/private-resumes/${resumeSlug}/resume-active/`;
-    return httpRequest.get(url) as Promise<ResumeActiveStatusResponse>;
+    return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<ResumeActiveStatusResponse>);
   },
 
   getExperiencesDetail: (resumeSlug: IdType): Promise<ExperienceDetail[]> => {

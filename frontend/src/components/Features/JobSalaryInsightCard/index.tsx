@@ -8,6 +8,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { useTranslation } from 'react-i18next';
 
 import { ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import jobService from '@/services/jobService';
 import { formatRoute } from '@/utils/funcUtils';
 import type { JobPost } from '@/types/models';
@@ -199,16 +200,22 @@ const JobSalaryInsightCard = ({ slug }: Props) => {
                 {t('jobDetail.salaryInsightRelated')}
               </Typography>
               <Stack spacing={1}>
-                {data.relatedJobs.slice(0, 3).map((job) => (
-                  <Box key={job.id} component={Link} href={`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, job.slug || '')}`} sx={{ p: 1.5, borderRadius: 2, bgcolor: 'grey.50', color: 'inherit', textDecoration: 'none', display: 'block', '&:hover': { bgcolor: 'grey.100' } }}>
-                    <Typography variant="body2" sx={{ fontWeight: 800 }}>
-                      {job.jobName}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {job.companyDict?.companyName} - {formatSalaryInsightRange(job.salaryMin, job.salaryMax, language)}
-                    </Typography>
-                  </Box>
-                ))}
+                {data.relatedJobs.slice(0, 3).map((job) => {
+                  const detailHref = job.slug
+                    ? localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, job.slug)}`, language)
+                    : undefined;
+
+                  return (
+                    <Box key={job.id} component={detailHref ? Link : 'div'} href={detailHref} sx={{ p: 1.5, borderRadius: 2, bgcolor: 'grey.50', color: 'inherit', textDecoration: 'none', display: 'block', '&:hover': { bgcolor: detailHref ? 'grey.100' : 'grey.50' } }}>
+                      <Typography variant="body2" sx={{ fontWeight: 800 }}>
+                        {job.jobName}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {job.companyDict?.companyName} - {formatSalaryInsightRange(job.salaryMin, job.salaryMax, language)}
+                      </Typography>
+                    </Box>
+                  );
+                })}
               </Stack>
             </Stack>
           )}

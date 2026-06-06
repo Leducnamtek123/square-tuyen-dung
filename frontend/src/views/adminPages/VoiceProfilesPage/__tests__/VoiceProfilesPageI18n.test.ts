@@ -5,7 +5,6 @@ const source = readFileSync(join(__dirname, '../index.tsx'), 'utf8');
 
 const fixedKeys = [
   'pages.voiceProfiles.title',
-  'pages.voiceProfiles.breadcrumbAdmin',
   'pages.voiceProfiles.newVoice',
   'pages.voiceProfiles.loadError',
   'pages.voiceProfiles.table.name',

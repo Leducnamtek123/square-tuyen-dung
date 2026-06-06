@@ -20,7 +20,7 @@ interface NotificationCardProps {
 
 const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
   const { push } = useRouter();
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const { currentUser } = useAppSelector((state) => state.user);
   const {
     isLoading,
@@ -37,7 +37,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
   const handleClickItem = async (item: typeof notifications[0]) => {
     await handleRead(item.key);
 
-    const targetPath = getNotificationTargetPath(item, currentUser?.roleName);
+    const targetPath = getNotificationTargetPath(item, currentUser?.roleName, i18n.language);
     if (targetPath) {
       if (isExternalNotificationTarget(targetPath)) {
         window.location.assign(targetPath);

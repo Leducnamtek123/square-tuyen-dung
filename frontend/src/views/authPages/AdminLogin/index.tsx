@@ -25,7 +25,8 @@ import AdminLoginForm from '../../components/auths/JobSeekerLoginForm';
 import authService from '../../../services/authService';
 import tokenService from '../../../services/tokenService';
 import type { RoleName } from '../../../types/auth';
-import { getPreferredLanguage, buildPortalPath } from '../../../configs/portalRouting';
+import { getPreferredLanguage } from '../../../configs/portalRouting';
+import { localizeRoutePath } from '../../../configs/routeLocalization';
 
 const INTERVAL_MS = 5000;
 
@@ -161,7 +162,7 @@ const AdminLogin: React.FC = () => {
             .unwrap()
             .then(() => {
               const lang = getPreferredLanguage();
-              const dashboardPath = buildPortalPath('admin', '/dashboard', lang);
+              const dashboardPath = localizeRoutePath(`/${ROUTES.ADMIN.DASHBOARD}`, lang);
               push(dashboardPath);
             })
             .catch(() => toastMessages.error(t('auth:messages.loginError')));
@@ -264,7 +265,7 @@ const AdminLogin: React.FC = () => {
             sx={{ mt: 4, textAlign: 'center', color: 'text.disabled' }}
           >
             {t('auth:login.visitPage')}&nbsp;
-            <Link href="https://square.vn" target="_blank" sx={{ color: '#1a73e8' }}>{t('common:auto.index_wwwsquarevn_9a21', `www.square.vn`)}</Link>
+            <Link href="https://square.vn" target="_blank" rel="noopener noreferrer" sx={{ color: '#1a73e8' }}>{t('common:auto.index_wwwsquarevn_9a21', `www.square.vn`)}</Link>
           </Typography>
         </LeftPanel>
 

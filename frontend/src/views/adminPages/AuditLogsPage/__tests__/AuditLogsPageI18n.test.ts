@@ -8,8 +8,6 @@ describe('AuditLogsPage i18n', () => {
     const keys = [
       'common.advancedFilters',
       'common.clearFilters',
-      'pages.auditLogs.breadcrumb',
-      'pages.auditLogs.breadcrumbAdmin',
       'pages.auditLogs.exportCsv',
       'pages.auditLogs.exportingCsv',
       'pages.auditLogs.filter.action',

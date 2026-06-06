@@ -32,10 +32,9 @@ export type AIAnalysisData = {
   aiAnalysisEvidence?: {
     criteria_results?: Array<Record<string, unknown>>;
     evidence?: Array<Record<string, unknown>>;
+    identity_warnings?: Array<Record<string, unknown>>;
+    identityWarnings?: Array<Record<string, unknown>>;
   } | Array<Record<string, unknown>>;
-  aiAnalysisModel?: string;
-  aiAnalysisSource?: string;
-  aiAnalysisPromptVersion?: string;
   aiAnalysisReviewStatus?: 'ai_only' | 'reviewed' | 'overridden' | string;
   aiAnalysisHrOverrideScore?: number | null;
   aiAnalysisHrOverrideNote?: string | null;
@@ -62,14 +61,6 @@ interface AIAnalysisDrawerProps {
   initialData?: AIAnalysisData | null;
   onAnalysisStateChange?: (nextState: Partial<JobPostActivity>) => void;
 }
-
-const EMBEDDABLE_HOSTS = new Set([
-  'tuyendung.square.vn',
-  's3.tuyendung.square.vn',
-  'res.cloudinary.com',
-  'firebasestorage.googleapis.com',
-  'localhost',
-]);
 
 const toSkillArray = (skills: unknown): string[] => {
   if (Array.isArray(skills)) {
@@ -132,9 +123,6 @@ const toAIAnalysisData = (activity: JobPostActivity): AIAnalysisData => {
     aiAnalysisEffectiveScore: typeof activity.aiAnalysisEffectiveScore === 'number' ? activity.aiAnalysisEffectiveScore : undefined,
     aiAnalysisCriteria: Array.isArray(raw.aiAnalysisCriteria) ? raw.aiAnalysisCriteria : undefined,
     aiAnalysisEvidence: raw.aiAnalysisEvidence,
-    aiAnalysisModel: activity.aiAnalysisModel,
-    aiAnalysisSource: activity.aiAnalysisSource,
-    aiAnalysisPromptVersion: activity.aiAnalysisPromptVersion,
     aiAnalysisReviewStatus: activity.aiAnalysisReviewStatus,
     aiAnalysisHrOverrideScore: activity.aiAnalysisHrOverrideScore,
     aiAnalysisHrOverrideNote: activity.aiAnalysisHrOverrideNote,
@@ -160,9 +148,6 @@ const toJobPostActivityPatch = (data: AIAnalysisData | null): Partial<JobPostAct
   if (data.aiAnalysisMissingSkills !== undefined) patch.aiAnalysisMissingSkills = data.aiAnalysisMissingSkills;
   if (data.aiAnalysisCriteria !== undefined) patch.aiAnalysisCriteria = data.aiAnalysisCriteria;
   if (data.aiAnalysisEvidence !== undefined) patch.aiAnalysisEvidence = data.aiAnalysisEvidence;
-  if (typeof data.aiAnalysisModel === 'string') patch.aiAnalysisModel = data.aiAnalysisModel;
-  if (typeof data.aiAnalysisSource === 'string') patch.aiAnalysisSource = data.aiAnalysisSource;
-  if (typeof data.aiAnalysisPromptVersion === 'string') patch.aiAnalysisPromptVersion = data.aiAnalysisPromptVersion;
   if (typeof data.aiAnalysisReviewStatus === 'string') patch.aiAnalysisReviewStatus = data.aiAnalysisReviewStatus;
   if (data.aiAnalysisHrOverrideScore !== undefined) patch.aiAnalysisHrOverrideScore = data.aiAnalysisHrOverrideScore;
   if (data.aiAnalysisHrOverrideNote !== undefined) patch.aiAnalysisHrOverrideNote = data.aiAnalysisHrOverrideNote;
@@ -180,17 +165,6 @@ const mergeDefinedAIAnalysisData = (current: AIAnalysisData | null, next: AIAnal
     }
   });
   return merged;
-};
-
-const canEmbedUrl = (url: string): boolean => {
-  if (!url || typeof window === 'undefined') return false;
-
-  try {
-    const parsed = new URL(url, window.location.origin);
-    return EMBEDDABLE_HOSTS.has(parsed.hostname) || parsed.hostname === window.location.hostname;
-  } catch {
-    return false;
-  }
 };
 
 type AIAnalysisDrawerState = {
@@ -393,7 +367,6 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
 
   const resumeFileUrl = typeof state.data?.resumeFileUrl === 'string' ? state.data.resumeFileUrl : '';
   const onlineProfileUrl = typeof state.data?.onlineProfileUrl === 'string' ? state.data.onlineProfileUrl : '';
-  const canEmbedResume = React.useMemo(() => canEmbedUrl(resumeFileUrl), [resumeFileUrl]);
   const stats = React.useMemo(
     () => ({
       matchingSkills: toSkillArray(state.data?.aiAnalysisMatchingSkills).length,
@@ -416,7 +389,6 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
         loading: state.loading,
         analyzing: state.analyzing,
         phase: isProcessing ? 'processing' : isCompleted ? 'completed' : isFailed ? 'failed' : 'idle',
-        canEmbedResume,
       }}
       stats={stats}
       onAnalyze={handleAnalyze}

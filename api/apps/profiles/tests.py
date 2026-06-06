@@ -193,6 +193,19 @@ def test_cv_serializer_rejects_non_pdf_and_oversized_file(resume):
 
 
 @pytest.mark.django_db
+def test_web_active_resume_returns_status_payload(job_seeker_user, resume):
+    client = APIClient()
+    client.force_authenticate(user=job_seeker_user)
+
+    response = client.get(f"/api/v1/info/web/private-resumes/{resume.slug}/resume-active/")
+
+    assert response.status_code == 200
+    assert response.data["data"] == {"isActive": False}
+    resume.refresh_from_db()
+    assert resume.is_active is False
+
+
+@pytest.mark.django_db
 def test_resume_detail_serializers_reject_end_dates_before_start_dates(resume):
     from apps.profiles.serializers import (
         CertificateSerializer,

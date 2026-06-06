@@ -2,7 +2,7 @@ import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 import type { InterviewSession, InterviewEvaluation } from '../types/models';
 import type { PaginatedResponse } from '../types/api';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 
 type IdType = string | number;
 
@@ -112,22 +112,32 @@ const interviewService = {
 
   getSessionDetail: (id: IdType): Promise<InterviewSession> => {
     const url = `interview/web/sessions/${id}/`;
-    return httpRequest.get(url).then((res) => presignInObject(res)) as Promise<InterviewSession>;
+    return httpRequest
+      .get(url)
+      .then((res) => presignInObject(res))
+      .then(unwrapDataResponse<InterviewSession>);
   },
 
   getSessionDetailByInviteToken: (inviteToken: string): Promise<InterviewSession> => {
     const url = `interview/web/sessions/invite/${inviteToken}/`;
-    return httpRequest.get(url).then((res) => presignInObject(res)) as Promise<InterviewSession>;
+    return httpRequest
+      .get(url)
+      .then((res) => presignInObject(res))
+      .then(unwrapDataResponse<InterviewSession>);
   },
 
   scheduleSession: (data: ScheduleSessionInput): Promise<InterviewSession> => {
     const url = 'interview/web/sessions/';
-    return httpRequest.post(url, data) as Promise<InterviewSession>;
+    return (httpRequest.post(url, data) as Promise<unknown>)
+      .then(unwrapDataResponse<InterviewSession>);
   },
 
   updateSession: (id: IdType, data: Partial<ScheduleSessionInput>): Promise<InterviewSession> => {
     const url = `interview/web/sessions/${id}/`;
-    return httpRequest.patch(url, data).then((res) => presignInObject(res)) as Promise<InterviewSession>;
+    return httpRequest
+      .patch(url, data)
+      .then((res) => presignInObject(res))
+      .then(unwrapDataResponse<InterviewSession>);
   },
 
   deleteSession: (id: IdType): Promise<void> => {
@@ -147,12 +157,16 @@ const interviewService = {
     const payload = options.inviteToken
       ? { status, invite_token: options.inviteToken }
       : { status };
-    return httpRequest.patch(url, payload).then((res) => presignInObject(res)) as Promise<InterviewSession>;
+    return httpRequest
+      .patch(url, payload)
+      .then((res) => presignInObject(res))
+      .then(unwrapDataResponse<InterviewSession>);
   },
 
   getLiveKitToken: (inviteToken: string): Promise<LiveKitTokenResponse> => {
     const url = `interview/web/sessions/invite/${inviteToken}/livekit-token/`;
-    return httpRequest.get(url) as Promise<LiveKitTokenResponse>;
+    return (httpRequest.get(url) as Promise<unknown>)
+      .then(unwrapDataResponse<LiveKitTokenResponse>);
   },
 
   triggerAiEvaluation: (id: IdType): Promise<TriggerAiEvaluationResponse> => {
@@ -162,7 +176,8 @@ const interviewService = {
 
   submitEvaluation: (data: SubmitEvaluationInput): Promise<InterviewEvaluation> => {
     const url = 'interview/web/evaluations/';
-    return httpRequest.post(url, data) as Promise<InterviewEvaluation>;
+    return (httpRequest.post(url, data) as Promise<unknown>)
+      .then(unwrapDataResponse<InterviewEvaluation>);
   },
 
   getEvaluations: (sessionId: IdType): Promise<PaginatedResponse<InterviewEvaluation>> => {
@@ -174,17 +189,20 @@ const interviewService = {
 
   getObserverToken: (sessionId: IdType): Promise<LiveKitTokenResponse & { mode: string }> => {
     const url = `interview/web/sessions/${sessionId}/observer-token/`;
-    return httpRequest.post(url) as Promise<LiveKitTokenResponse & { mode: string }>;
+    return (httpRequest.post(url) as Promise<unknown>)
+      .then(unwrapDataResponse<LiveKitTokenResponse & { mode: string }>);
   },
 
   getHrPresenceToken: (sessionId: IdType): Promise<HrPresenceTokenResponse> => {
     const url = `interview/web/sessions/${sessionId}/hr-token/`;
-    return httpRequest.post(url) as Promise<HrPresenceTokenResponse>;
+    return (httpRequest.post(url) as Promise<unknown>)
+      .then(unwrapDataResponse<HrPresenceTokenResponse>);
   },
 
   getSessionMetrics: (sessionId: IdType): Promise<SessionMetrics> => {
     const url = `interview/web/sessions/${sessionId}/live-metrics/`;
-    return httpRequest.get(url) as Promise<SessionMetrics>;
+    return (httpRequest.get(url) as Promise<unknown>)
+      .then(unwrapDataResponse<SessionMetrics>);
   },
 
   getSSEUrl: (sessionId: IdType): string => {

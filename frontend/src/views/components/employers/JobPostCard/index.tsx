@@ -27,6 +27,7 @@ import type { ApiError } from '../../../../types/api';
 import type { JobPostInput } from '../../../../services/jobService';
 import FilterBar from '@/components/Common/FilterBar';
 import { ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 type JobPostEditData = Partial<JobPostFormValues> & { id?: string | number; slug?: string };
 
@@ -84,7 +85,8 @@ function reducer(state: JobPostCardState, action: JobPostCardAction): JobPostCar
 }
 
 const JobPostCard = () => {
-  const { t } = useTranslation('employer');
+  const { t, i18n } = useTranslation('employer');
+  const verificationHref = localizeRoutePath(`/${ROUTES.EMPLOYER.VERIFICATION}`, i18n.language);
 
   const {
     page,
@@ -333,7 +335,7 @@ const JobPostCard = () => {
             severity="warning"
             sx={{ mb: 3 }}
             action={
-              <Button color="inherit" size="small" href={`/${ROUTES.EMPLOYER.VERIFICATION}`}>
+              <Button color="inherit" size="small" href={verificationHref}>
                 {t('jobPost.verificationRequired.action')}
               </Button>
             }

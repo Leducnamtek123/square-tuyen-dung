@@ -9,14 +9,20 @@ import ZoomInOutlinedIcon from '@mui/icons-material/ZoomInOutlined';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useTranslation } from 'react-i18next';
 import toSlug from '@/utils/customData';
-import type { Theme } from '@mui/material/styles';
+import type { SxProps, Theme } from '@mui/material/styles';
 
 interface PdfProps {
   fileUrl: string;
   title?: string;
+  containerSx?: SxProps<Theme>;
+  toolbarSx?: SxProps<Theme>;
+  viewerSx?: SxProps<Theme>;
 }
 
-const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
+const mergeSx = (base: SxProps<Theme>, extra?: SxProps<Theme>): SxProps<Theme> =>
+  ([base, ...(Array.isArray(extra) ? extra : extra ? [extra] : [])] as SxProps<Theme>);
+
+const Pdf = ({ fileUrl, title = '', containerSx, toolbarSx, viewerSx }: PdfProps) => {
   const { t } = useTranslation('common');
 
   if (!fileUrl) return null;
@@ -33,14 +39,20 @@ const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
     <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
       <Stack
         spacing={0}
-        sx={{ border: 1, borderColor: '#e0e0e0', borderRadius: 2, overflow: 'hidden' }}
+        sx={mergeSx(
+          { border: 1, borderColor: '#e0e0e0', borderRadius: 2, overflow: 'hidden' },
+          containerSx
+        )}
       >
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
           justifyContent="space-between"
           alignItems={{ xs: 'stretch', sm: 'center' }}
           spacing={1}
-          sx={{ bgcolor: '#441da0', px: 2, py: 1.25 }}
+          sx={mergeSx(
+            { bgcolor: '#441da0', px: 2, py: 1.25 },
+            toolbarSx
+          )}
         >
           <Stack
             direction="row"
@@ -104,12 +116,15 @@ const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
         </Stack>
 
         <Box
-          sx={{
-            height: 'min(80vh, 900px)',
-            minHeight: 520,
-            overflow: 'auto',
-            bgcolor: '#fff',
-          }}
+          sx={mergeSx(
+            {
+              height: 'min(80vh, 900px)',
+              minHeight: 520,
+              overflow: 'auto',
+              bgcolor: '#fff',
+            },
+            viewerSx
+          )}
         >
           <Viewer
             fileUrl={fileUrl}

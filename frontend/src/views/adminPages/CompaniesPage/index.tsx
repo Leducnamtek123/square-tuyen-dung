@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useCallback, useMemo, useReducer } from 'react';
-import { Box, Paper, Button, Typography, Avatar, Chip, Tooltip, IconButton, Breadcrumbs, Link } from '@mui/material';
+import { Box, Paper, Button, Typography, Avatar, Chip, Tooltip, IconButton } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import type { ColumnDef } from '@tanstack/react-table';
 import AddIcon from '@mui/icons-material/Add';
@@ -17,6 +17,9 @@ import CompanyFormDialog from './CompanyFormDialog';
 import CompanyDeleteDialog from './CompanyDeleteDialog';
 import { createEmptyCompanyFormData, type CompanyFormData } from './types';
 import FilterBar from '@/components/Common/FilterBar';
+import { ROUTES } from '../../../configs/routeConfig';
+import { localizeRoutePath } from '../../../configs/routeLocalization';
+import { formatRoute } from '../../../utils/funcUtils';
 
 type CompanyPageState = {
   dialogOpen: boolean;
@@ -124,7 +127,7 @@ function reducer(state: CompanyPageState, action: CompanyPageAction): CompanyPag
 }
 
 const CompaniesPage = () => {
-  const { t } = useTranslation('admin');
+  const { t, i18n } = useTranslation('admin');
   const {
     page,
     pageSize,
@@ -242,27 +245,34 @@ const CompaniesPage = () => {
       id: 'actions',
       header: t('pages.companies.table.actions'),
       meta: { align: 'right' },
-      cell: (info) => (
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-          <Tooltip title={t('pages.companies.table.viewDetails')}>
-            <IconButton size="small" component="a" href={`/companies/${info.row.original.slug}`} target="_blank">
-              <VisibilityIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={t('pages.companies.table.edit')}>
-            <IconButton size="small" color="primary" onClick={() => handleOpenEdit(info.row.original)}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={t('pages.companies.table.delete')}>
-            <IconButton size="small" color="error" onClick={() => handleOpenDelete(info.row.original)}>
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      ),
+      cell: (info) => {
+        const company = info.row.original;
+        const detailHref = company.slug
+          ? localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company.slug)}`, i18n.language)
+          : undefined;
+
+        return (
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+            <Tooltip title={t('pages.companies.table.viewDetails')}>
+              <IconButton size="small" component="a" href={detailHref} target={detailHref ? '_blank' : undefined} rel={detailHref ? 'noopener noreferrer' : undefined} disabled={!detailHref}>
+                <VisibilityIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t('pages.companies.table.edit')}>
+              <IconButton size="small" color="primary" onClick={() => handleOpenEdit(company)}>
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t('pages.companies.table.delete')}>
+              <IconButton size="small" color="error" onClick={() => handleOpenDelete(company)}>
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        );
+      },
     },
-  ], [handleOpenDelete, handleOpenEdit, t]);
+  ], [handleOpenDelete, handleOpenEdit, i18n.language, t]);
 
   return (
     <Box>
@@ -271,10 +281,6 @@ const CompaniesPage = () => {
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
             {t('pages.companies.title')}
           </Typography>
-          <Breadcrumbs>
-            <Link underline="hover" color="inherit" href="/admin">{t('pages.companies.breadcrumbAdmin')}</Link>
-            <Typography color="text.primary">{t('pages.companies.breadcrumbList')}</Typography>
-          </Breadcrumbs>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd} sx={{ textTransform: 'none' }}>
           {t('pages.companies.addCompany')}

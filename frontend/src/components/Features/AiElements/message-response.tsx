@@ -57,7 +57,7 @@ const simpleMdToHtml = (md: string): string => {
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.+?)\*/g, "<em>$1</em>")
     // Links
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
     // Unordered list items
     .replace(/^\s*[-*] (.+)$/gm, "<li>$1</li>")
     // Ordered list items

@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { unwrapDataResponse } from '../utils/apiResponse';
 import type { CompanyVerification } from '../types/models';
 
 export type CompanyVerificationPayload = Partial<
@@ -20,10 +21,12 @@ export type CompanyVerificationPayload = Partial<
 
 const companyVerificationService = {
   getVerification: (): Promise<CompanyVerification> => {
-    return httpRequest.get<CompanyVerification>('info/web/company-verification/');
+    return (httpRequest.get('info/web/company-verification/') as Promise<unknown>)
+      .then(unwrapDataResponse<CompanyVerification>);
   },
   updateVerification: (data: CompanyVerificationPayload): Promise<CompanyVerification> => {
-    return httpRequest.put<CompanyVerification>('info/web/company-verification/', data);
+    return (httpRequest.put('info/web/company-verification/', data) as Promise<unknown>)
+      .then(unwrapDataResponse<CompanyVerification>);
   },
 };
 

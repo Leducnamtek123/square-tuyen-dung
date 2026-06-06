@@ -6,6 +6,7 @@ import type { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
 import InterviewDetailSectionHeader from './InterviewDetailSectionHeader';
 import { interviewDetailCardSx, interviewDetailPanelSx } from './sectionStyles';
+import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
 interface InterviewRecordingCardProps {
   recordingUrl: string | null;
@@ -14,14 +15,15 @@ interface InterviewRecordingCardProps {
 }
 
 const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordingUrl, isCompleted = false, t }) => {
-  if (!recordingUrl && !isCompleted) return null;
+  const safeRecordingUrl = getSafeResourceUrl(recordingUrl);
+  if (!safeRecordingUrl && !isCompleted) return null;
 
   return (
     <Paper elevation={0} sx={interviewDetailCardSx}>
       <InterviewDetailSectionHeader icon={<VideoLibraryIcon />} title={t('interviewDetail.subtitle.recording')} />
 
       <Stack spacing={2}>
-        {recordingUrl ? (
+        {safeRecordingUrl ? (
           <>
             <Box
               sx={{
@@ -39,7 +41,7 @@ const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordi
             >
               <Box
                 component="video"
-                src={recordingUrl}
+                src={safeRecordingUrl}
                 controls
                 preload="metadata"
                 sx={{
@@ -53,9 +55,9 @@ const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordi
               variant="outlined"
               color="primary"
               component="a"
-              href={recordingUrl}
+              href={safeRecordingUrl}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               startIcon={<OpenInNewIcon />}
               sx={{
                 alignSelf: 'flex-start',

@@ -1,5 +1,6 @@
 ﻿import httpRequest from '../utils/httpRequest';
 import { AUTH_CONFIG } from '../configs/constants';
+import { unwrapDataResponse } from '../utils/apiResponse';
 import { ensurePresignedUrl } from '../utils/presignUrl';
 import type { AuthProvider, RoleName, TokenPair, CheckCredsResponse, EmailExistsResponse } from '../types/auth';
 import type { User } from '../types/models';
@@ -32,17 +33,13 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
 const normalizeActionResponse = (raw: unknown): ActionResponse => {
-  if (!isRecord(raw)) {
+  const value = unwrapDataResponse<unknown>(raw);
+
+  if (!isRecord(value)) {
     return { success: true };
   }
 
-  if ('data' in raw) {
-    return isRecord(raw.data)
-      ? { success: true, ...raw.data }
-      : { success: true };
-  }
-
-  return { success: true, ...raw };
+  return { success: true, ...value };
 };
 
 const authService = {
@@ -59,7 +56,7 @@ const authService = {
       password,
       role_name: roleName,
     };
-    return httpRequest.post(url, data);
+    return Promise.resolve(httpRequest.post(url, data)).then(unwrapDataResponse<TokenResponse>);
   },
 
   convertToken: (
@@ -82,7 +79,7 @@ const authService = {
     if (roleName) {
       data.role_name = roleName;
     }
-    return httpRequest.post(url, data);
+    return Promise.resolve(httpRequest.post(url, data)).then(unwrapDataResponse<TokenResponse>);
   },
 
   firebaseLogin: (idToken: string, roleName: RoleName): Promise<TokenResponse> => {
@@ -93,7 +90,7 @@ const authService = {
       token: idToken,
       role_name: roleName,
     };
-    return httpRequest.post(url, data);
+    return Promise.resolve(httpRequest.post(url, data)).then(unwrapDataResponse<TokenResponse>);
   },
 
   revokeToken: (accessToken: string, backend?: AuthProvider): Promise<ActionResponse> => {
@@ -108,12 +105,16 @@ const authService = {
 
   checkCreds: (email: string, roleName: RoleName): Promise<CheckCredsResponse> => {
     const url = 'auth/check-creds/';
-    return httpRequest.post(url, { email, roleName });
+    return Promise.resolve(httpRequest.post(url, { email, roleName })).then(
+      unwrapDataResponse<CheckCredsResponse>,
+    );
   },
 
   emailExists: (email: string): Promise<EmailExistsResponse> => {
     const url = 'auth/email-exists/';
-    return httpRequest.post(url, { email });
+    return Promise.resolve(httpRequest.post(url, { email })).then(
+      unwrapDataResponse<EmailExistsResponse>,
+    );
   },
 
   jobSeekerRegister: (data: JobSeekerRegisterData): Promise<ActionResponse> => {
@@ -138,7 +139,7 @@ const authService = {
 
     userInfoInFlight = (async () => {
       const url = 'auth/user-info-basic/';
-      const data = (await httpRequest.get(url)) as UserResponse;
+      const data = unwrapDataResponse<UserResponse>(await httpRequest.get(url));
       if (data?.avatarUrl) {
         data.avatarUrl = await ensurePresignedUrl(data.avatarUrl);
       }
@@ -154,12 +155,12 @@ const authService = {
 
   getUserWorkspaces: async (): Promise<UserResponse> => {
     const url = 'auth/user-workspaces/';
-    return (await httpRequest.get(url)) as UserResponse;
+    return unwrapDataResponse<UserResponse>(await httpRequest.get(url));
   },
 
   updateUser: async (data: Partial<User>): Promise<UserResponse> => {
     const url = 'auth/update-user/';
-    const resData = (await httpRequest.patch(url, data)) as UserResponse;
+    const resData = unwrapDataResponse<UserResponse>(await httpRequest.patch(url, data));
     if (resData?.avatarUrl) {
       resData.avatarUrl = await ensurePresignedUrl(resData.avatarUrl);
     }
@@ -168,11 +169,11 @@ const authService = {
 
   updateAvatar: async (data: FormData): Promise<UserResponse> => {
     const url = 'auth/avatar/';
-    const resData = (await httpRequest.put(url, data, {
+    const resData = unwrapDataResponse<UserResponse>(await httpRequest.put(url, data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-    })) as UserResponse;
+    }));
     if (resData?.avatarUrl) {
       resData.avatarUrl = await ensurePresignedUrl(resData.avatarUrl);
     }
@@ -181,7 +182,7 @@ const authService = {
 
   deleteAvatar: async (): Promise<UserResponse> => {
     const url = 'auth/avatar/';
-    const resData = (await httpRequest.delete(url)) as UserResponse;
+    const resData = unwrapDataResponse<UserResponse>(await httpRequest.delete(url));
     if (resData?.avatarUrl) {
       resData.avatarUrl = await ensurePresignedUrl(resData.avatarUrl);
     }
@@ -205,12 +206,12 @@ const authService = {
 
   getUserSettings: (): Promise<UserSettingsData> => {
     const url = 'auth/settings/';
-    return httpRequest.get(url);
+    return Promise.resolve(httpRequest.get(url)).then(unwrapDataResponse<UserSettingsData>);
   },
 
   updateUserSettings: (data: UserSettingsData): Promise<UserSettingsData> => {
     const url = 'auth/settings/';
-    return httpRequest.put(url, data);
+    return Promise.resolve(httpRequest.put(url, data)).then(unwrapDataResponse<UserSettingsData>);
   },
 };
 

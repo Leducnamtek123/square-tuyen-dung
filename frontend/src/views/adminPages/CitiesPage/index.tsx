@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useMemo } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton, Stack } from '@mui/material';
+import { Box, Typography, Paper, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton, Stack } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
@@ -180,13 +180,6 @@ const CitiesPage = () => {
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
             {t('pages.cities.title')}
           </Typography>
-          <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/admin">
-              {t('pages.cities.breadcrumbAdmin')}
-            </Link>
-            <Typography color="text.primary">{t('pages.cities.breadcrumbLocations')}</Typography>
-            <Typography color="text.primary">{t('pages.cities.breadcrumbCities')}</Typography>
-          </Breadcrumbs>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={() => dispatch({ type: 'open-add' })}>
           {t('pages.cities.add')}

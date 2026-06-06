@@ -185,11 +185,29 @@ def _ollama_native_payload_from_openai(
             next_message["images"] = images
         messages.append(next_message)
 
-    return {
+    native_payload: Dict[str, Any] = {
         "model": candidate.model or str(payload.get("model") or ""),
         "messages": messages,
         "stream": False,
     }
+    response_format = payload.get("response_format")
+    if isinstance(response_format, dict) and response_format.get("type") == "json_object":
+        native_payload["format"] = "json"
+
+    options: Dict[str, Any] = {}
+    for key in ("temperature", "top_p", "top_k", "min_p", "repeat_penalty"):
+        if key in payload:
+            options[key] = payload[key]
+    if "repetition_penalty" in payload:
+        options["repeat_penalty"] = payload["repetition_penalty"]
+    max_tokens = payload.get("max_tokens") or payload.get("max_completion_tokens")
+    if max_tokens:
+        options["num_predict"] = max_tokens
+    if "think" in payload:
+        native_payload["think"] = payload["think"]
+    if options:
+        native_payload["options"] = options
+    return native_payload
 
 
 def _openai_response_from_ollama_native(response_json: Dict[str, Any]) -> Dict[str, Any]:

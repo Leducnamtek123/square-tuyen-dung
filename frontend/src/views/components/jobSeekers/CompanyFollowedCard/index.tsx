@@ -8,6 +8,7 @@ import CompanyActionLoading from '../../../../components/Features/CompanyAction/
 import toastMessages from '../../../../utils/toastMessages';
 import { useTranslation } from 'react-i18next';
 import { useCompaniesFollowed, useToggleFollowCompany } from '../hooks/useJobSeekerQueries';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 
 const pageSize = 10;
 
@@ -19,8 +20,9 @@ interface CompanyFollowed {
 }
 
 const CompanyFollowedCard = () => {
-  const { t } = useTranslation(['jobSeeker', 'common']);
+  const { t, i18n } = useTranslation(['jobSeeker', 'common']);
   const [page, setPage] = React.useState(1);
+  const companiesHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.COMPANY}`, i18n.language);
 
   const { data, isLoading } = useCompaniesFollowed({ pageSize, page });
   const companies = data?.results || [];
@@ -58,7 +60,7 @@ const CompanyFollowedCard = () => {
               variant="contained"
               color="primary"
               component={Link}
-              href={`/${ROUTES.JOB_SEEKER.COMPANY}`}
+              href={companiesHref}
             >
               {t('jobSeeker:myCompany.actions.findCompanies')}
             </Button>

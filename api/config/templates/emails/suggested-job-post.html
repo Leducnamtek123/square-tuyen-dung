@@ -560,7 +560,7 @@
                                                                                             id="esd-menu-id-0"
                                                                                             style="Margin:0;padding-left:5px;padding-right:5px;padding-top:10px;padding-bottom:10px;border:0">
                                                                                             <a target="_blank"
-                                                                                               href="javascript:void(0)"
+                                                                                               href="{{ job_post_url }}"
                                                                                                style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#5C68E2;font-size:14px">
                                                                                                 {% if job_post.career__name %}
                                                                                                     {{ job_post.career__name }}
@@ -574,7 +574,7 @@
                                                                                             id="esd-menu-id-1"
                                                                                             style="Margin:0;padding-left:5px;padding-right:5px;padding-top:10px;padding-bottom:10px;border:0">
                                                                                             <a target="_blank"
-                                                                                               href="javascript:void(0)"
+                                                                                               href="{{ job_post_url }}"
                                                                                                style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#5C68E2;font-size:14px">
                                                                                                 {% if job_post.location__city__name %}
                                                                                                     {{ job_post.location__city__name }}
@@ -588,7 +588,7 @@
                                                                                             bgcolor="transparent"
                                                                                             style="Margin:0;padding-left:5px;padding-right:5px;padding-top:10px;padding-bottom:10px;border:0">
                                                                                             <a target="_blank"
-                                                                                               href="javascript:void(0)"
+                                                                                               href="{{ job_post_url }}"
                                                                                                style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:none;display:block;font-family:arial, 'helvetica neue', helvetica, sans-serif;color:#e69138;font-size:14px">{{ job_post.salary_min|floatformat:"0g" }}
                                                                                                 VND
                                                                                                 - {{ job_post.salary_max|floatformat:"0g" }}
@@ -631,7 +631,7 @@
                                                                                  <v:roundrect
                                                                                          xmlns:v="urn:schemas-microsoft-com:vml"
                                                                                          xmlns:w="urn:schemas-microsoft-com:office:word"
-                                                                                         esdevVmlButton href=""
+                                                                                         esdevVmlButton href="{{ job_post_link }}"
                                                                                          style="height:44px; v-text-anchor:middle; width:279px"
                                                                                          arcsize="11%"
                                                                                          strokecolor="#441da0"
@@ -673,7 +673,7 @@
                                                                                  <v:roundrect
                                                                                          xmlns:v="urn:schemas-microsoft-com:vml"
                                                                                          xmlns:w="urn:schemas-microsoft-com:office:word"
-                                                                                         esdevVmlButton href=""
+                                                                                         esdevVmlButton href="{{ job_post_notification_link }}"
                                                                                          style="height:44px; v-text-anchor:middle; width:279px"
                                                                                          arcsize="11%"
                                                                                          strokecolor="#441da0"

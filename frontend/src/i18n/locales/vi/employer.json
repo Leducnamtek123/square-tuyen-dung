@@ -74,6 +74,8 @@
       "saveReview": "Lưu rà soát",
       "criteriaTitle": "Tiêu chí có trọng số",
       "evidenceTitle": "Bằng chứng",
+      "identityWarningTitle": "Cảnh báo tên CV không khớp",
+      "identityWarningBody": "Tên hồ sơ trong hệ thống là {{applicationName}}, nhưng tên đọc được trong CV là {{resumeName}}. HR nên xác minh lại trước khi liên hệ hoặc ra quyết định.",
       "status": {
         "pending": "Chưa phân tích",
         "processing": "Đang phân tích",
@@ -204,11 +206,11 @@
     "validation": {
       "jobPostRequired": "Vui lòng chọn tin tuyển dụng.",
       "fullNameRequired": "Vui lòng nhập tên ứng viên.",
-      "fullNameMax": "Tên ứng viên tối đa 150 ký tự.",
+      "fullNameMax": "Tên ứng viên tối đa 100 ký tự.",
       "emailInvalid": "Email không hợp lệ.",
-      "emailMax": "Email tối đa 254 ký tự.",
+      "emailMax": "Email tối đa 100 ký tự.",
       "phoneInvalid": "Số điện thoại không hợp lệ.",
-      "phoneMax": "Số điện thoại tối đa 20 ký tự.",
+      "phoneMax": "Số điện thoại tối đa 15 ký tự.",
       "filePdfOnly": "Chỉ chấp nhận file PDF.",
       "fileTooLarge": "File PDF phải nhỏ hơn hoặc bằng 10MB.",
       "titleRequired": "Vui lòng nhập vị trí/tiêu đề hồ sơ.",
@@ -917,56 +919,31 @@
       "saveBtn": "Lưu tài liệu pháp lý",
       "statusPending": "Trạng thái: Chờ phê duyệt"
     },
-    "step3": {
-      "title": "Bước 3: Đăng ký Phỏng vấn trực tuyến",
-      "description": "Admin sẽ xác nhận lịch phỏng vấn và gửi thông tin tham gia phòng.",
-      "timeLabel": "Thời gian mong muốn",
-      "contactPerson": "Người liên hệ",
-      "contactName": "Người liên hệ",
-      "contactPhone": "Số điện thoại liên hệ",
-      "notes": "Ghi chú",
-      "sendRequestBtn": "Gửi yêu cầu phỏng vấn",
-      "requestBtn": "Gửi yêu cầu phỏng vấn",
-      "statusLabel": "Trạng thái: {{status}}"
-    },
     "status": {
       "pending": "Chờ duyệt",
       "reviewing": "Đang xem xét",
       "approved": "Đã duyệt",
       "rejected": "Từ chối"
     },
-    "submittedSchedules": {
-      "title": "Lịch phỏng vấn đã gửi",
-      "noRequests": "Chưa có yêu cầu phỏng vấn nào.",
-      "proposedTime": "Thời gian đề xuất: {{time}}",
-      "contact": "Liên hệ: {{phone}}",
-      "notes": "Ghi chú: {{notes}}"
-    },
     "messages": {
       "infoRecorded": "Thông tin đã được ghi lại.",
-      "noScheduleYet": "Chưa có lịch",
-      "waitingConfirmation": "Chờ xác nhận",
       "profileSaved": "Đã lưu hồ sơ pháp lý.",
-      "requestSubmitted": "Đã gửi yêu cầu lịch xác minh.",
       "fixRequiredFields": "Vui lòng bổ sung các thông tin bắt buộc.",
-      "saveFailed": "Không thể lưu hồ sơ xác thực. Vui lòng thử lại.",
-      "requestFailed": "Không thể gửi yêu cầu xác minh. Vui lòng thử lại."
+      "saveFailed": "Không thể lưu hồ sơ xác thực. Vui lòng thử lại."
     },
     "summary": {
       "companyProfile": "Hồ sơ công ty",
       "legalProfile": "Hồ sơ pháp lý",
-      "appointment": "Lịch xác minh",
       "progress": "Mức độ hoàn thiện",
       "canPost": "Công ty đã được xác thực và có thể đăng tin tuyển dụng.",
-      "cannotPost": "Vui lòng hoàn thiện hồ sơ pháp lý và gửi yêu cầu xác minh trước khi đăng tin."
+      "cannotPost": "Vui lòng hoàn thiện hồ sơ pháp lý và chờ admin xác thực trước khi đăng tin."
     },
     "validation": {
       "required": "Trường này là bắt buộc.",
       "email": "Email không hợp lệ.",
       "phone": "Số điện thoại không hợp lệ.",
       "website": "Website không hợp lệ.",
-      "maxLength": "Tối đa {{max}} ký tự.",
-      "futureDate": "Thời gian phải ở hiện tại hoặc tương lai."
+      "maxLength": "Tối đa {{max}} ký tự."
     }
   },
   "profileDetailCard": {
@@ -1042,6 +1019,7 @@
   },
   "company": {
     "tabs": {
+      "ariaLabel": "Các tab hồ sơ công ty",
       "info": "Thông tin công ty",
       "multimedia": "Đa phương tiện",
       "team": "Đội ngũ"

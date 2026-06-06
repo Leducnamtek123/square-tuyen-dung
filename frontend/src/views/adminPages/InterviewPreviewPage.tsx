@@ -12,6 +12,8 @@ import {
   faCheckCircle, faExclamationTriangle, faEye,
 } from '@fortawesome/free-solid-svg-icons';
 import { IMAGES } from '@/configs/images';
+import { ROUTES } from '@/configs/routeConfig';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 // ─── Fake data ────────────────────────────────────────────────────────────────
 const FAKE_SESSION = {
@@ -206,10 +208,10 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
   const FAKE_MESSAGES = [
-    { from: 'AI', text: 'Xin chào! Tôi là trợ lý phỏng vấn AI. Hãy bắt đầu nhé.' },
-    { from: 'candidate', text: 'Dạ, tôi sẵn sàng ạ.' },
-    { from: 'AI', text: 'Bạn có thể mô tả kinh nghiệm làm việc với React.js của mình không?' },
-    { from: 'candidate', text: 'Tôi đã có 3 năm kinh nghiệm với React, chủ yếu làm việc tại các startup…' },
+    { from: 'AI', textKey: 'pages.interviewPreview.connected.chatMessages.aiGreeting' },
+    { from: 'candidate', textKey: 'pages.interviewPreview.connected.chatMessages.candidateReady' },
+    { from: 'AI', textKey: 'pages.interviewPreview.connected.chatMessages.reactQuestion' },
+    { from: 'candidate', textKey: 'pages.interviewPreview.connected.chatMessages.reactExperience' },
   ];
 
   return (
@@ -238,14 +240,14 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
             </div>
             <div className="flex-1 overflow-y-auto p-3 space-y-3">
               {FAKE_MESSAGES.map((m) => (
-                <div key={`${m.from}-${m.text}`} className={`flex gap-2 ${m.from === 'candidate' ? 'flex-row-reverse' : ''}`}>
+                <div key={`${m.from}-${m.textKey}`} className={`flex gap-2 ${m.from === 'candidate' ? 'flex-row-reverse' : ''}`}>
                   <div className={`flex size-7 flex-shrink-0 items-center justify-center rounded-full text-xs
                     ${m.from === 'AI' ? 'bg-violet-500/20 text-violet-300' : 'bg-cyan-500/20 text-cyan-300'}`}>
                     <FontAwesomeIcon icon={m.from === 'AI' ? faRobot : faUser} />
                   </div>
                   <div className={`max-w-[200px] rounded-xl px-3 py-2 text-xs text-zinc-200
-                    ${m.from === 'Candidate' ? 'bg-cyan-500/15 border border-cyan-400/15' : 'bg-white/5 border border-white/8'}`}>
-                    {m.text}
+                    ${m.from === 'candidate' ? 'bg-cyan-500/15 border border-cyan-400/15' : 'bg-white/5 border border-white/8'}`}>
+                    {t(m.textKey)}
                   </div>
                 </div>
               ))}
@@ -290,8 +292,9 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
 
 // ─── Main Preview Page ────────────────────────────────────────────────────────
 export default function InterviewPreviewPage() {
-  const { t } = useTranslation('admin');
+  const { t, i18n } = useTranslation('admin');
   const [step, setStep] = useState<Step>('waiting');
+  const previewRoute = localizeRoutePath(`/${ROUTES.ADMIN.INTERVIEW_PREVIEW}`, i18n.language);
 
   const statusChip = {
     waiting: { label: t('pages.interviewPreview.status.waiting'), color: '#0ea5e9' },
@@ -364,7 +367,7 @@ export default function InterviewPreviewPage() {
       {/* Footer note */}
       <p className="mt-3 text-center text-[10px] text-zinc-600">
         {t('pages.interviewPreview.footerNote')}{' '}
-        <code className="text-zinc-500">/admin/interview-preview</code>
+        <code className="text-zinc-500">{previewRoute}</code>
       </p>
     </div>
   );

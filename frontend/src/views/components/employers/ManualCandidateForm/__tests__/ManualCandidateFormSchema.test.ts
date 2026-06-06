@@ -3,6 +3,31 @@ import { createManualCandidateSchema } from '../index';
 const t = (key: string) => key;
 
 describe('createManualCandidateSchema', () => {
+  it('rejects whitespace-only required identity fields before submitting to the backend', async () => {
+    const schema = createManualCandidateSchema(t as never);
+
+    await expect(schema.validateAt('fullName', { fullName: '   ' })).rejects.toThrow(
+      'employer:manualCandidate.validation.fullNameRequired',
+    );
+    await expect(schema.validateAt('title', { title: '   ' })).rejects.toThrow(
+      'employer:manualCandidate.validation.titleRequired',
+    );
+  });
+
+  it('rejects identity fields that exceed applied-profile activity storage limits', async () => {
+    const schema = createManualCandidateSchema(t as never);
+
+    await expect(schema.validateAt('fullName', { fullName: 'A'.repeat(101) })).rejects.toThrow(
+      'employer:manualCandidate.validation.fullNameMax',
+    );
+    await expect(schema.validateAt('email', { email: `${'a'.repeat(92)}@example.com` })).rejects.toThrow(
+      'employer:manualCandidate.validation.emailMax',
+    );
+    await expect(schema.validateAt('phone', { phone: '0909000000123456' })).rejects.toThrow(
+      'employer:manualCandidate.validation.phoneMax',
+    );
+  });
+
   it('allows blank phone but rejects invalid phone text', async () => {
     const schema = createManualCandidateSchema(t as never);
 

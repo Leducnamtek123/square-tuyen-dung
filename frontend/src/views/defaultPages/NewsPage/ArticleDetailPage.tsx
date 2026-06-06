@@ -30,6 +30,8 @@ import useSEO from '@/hooks/useSEO';
 import useStructuredData from '@/hooks/useStructuredData';
 import errorHandling from '@/utils/errorHandling';
 import { ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import { formatRoute } from '@/utils/funcUtils';
 
 const stripHtml = (html?: string | null) =>
   (html || '')
@@ -42,6 +44,9 @@ const formatDate = (value?: string | null) => {
   const date = dayjs(value);
   return date.isValid() ? date.format('DD/MM/YYYY') : '';
 };
+
+const buildAbsoluteUrl = (path: string) =>
+  `${typeof window !== 'undefined' ? window.location.origin : ''}${path}`;
 
 const ArticleDetailSkeleton = () => (
   <Stack spacing={3}>
@@ -98,7 +103,7 @@ const initialArticleDetailState: ArticleDetailState = {
 const ArticleDetailPage = () => {
   const { push } = useRouter();
   const { slug } = useParams<{ slug: string }>();
-  const { t } = useTranslation(['common', 'public']);
+  const { t, i18n } = useTranslation(['common', 'public']);
   const [state, dispatch] = React.useReducer(articleDetailReducer, initialArticleDetailState);
   const { article, isLoading } = state;
 
@@ -143,12 +148,16 @@ const ArticleDetailPage = () => {
     () => article?.excerpt || stripHtml(article?.content || ''),
     [article?.content, article?.excerpt]
   );
+  const newsListHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language);
+  const articleHref = localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.NEWS_DETAIL, slug)}`, i18n.language);
+  const absoluteNewsListUrl = buildAbsoluteUrl(newsListHref);
+  const absoluteArticleUrl = buildAbsoluteUrl(articleHref);
 
   useSEO({
     title: article?.title,
     description: article ? description : t('seo.articleDetail.description', { ns: 'public' }),
     image: article?.thumbnailUrl || undefined,
-    url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}/${slug}`,
+    url: absoluteArticleUrl,
     type: 'article',
     keywords: article ? `${article.title}, ${getCategoryLabel(article.category)}` : undefined,
   });
@@ -160,8 +169,8 @@ const ArticleDetailPage = () => {
             type: 'BreadcrumbList' as const,
             items: [
               { name: t('seo.articleDetail.breadcrumb.home', { ns: 'public' }), url: typeof window !== 'undefined' ? window.location.origin : '' },
-              { name: t('seo.newsList.title', { ns: 'public' }), url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}` },
-              { name: article.title, url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}/${slug}` },
+              { name: t('seo.newsList.title', { ns: 'public' }), url: absoluteNewsListUrl },
+              { name: article.title, url: absoluteArticleUrl },
             ],
           },
         ]
@@ -179,7 +188,7 @@ const ArticleDetailPage = () => {
           title={t('news.article.notFoundTitle', { ns: 'public' })}
           content={t('news.article.notFoundContent', { ns: 'public' })}
           buttonText={t('news.article.backToNews', { ns: 'public' })}
-          onClick={() => push(`/${ROUTES.JOB_SEEKER.NEWS}`)}
+          onClick={() => push(newsListHref)}
         />
       </Box>
     );
@@ -192,7 +201,7 @@ const ArticleDetailPage = () => {
     <Box sx={{ py: { xs: 3, md: 6 } }}>
       <Button
         component={Link}
-        href={`/${ROUTES.JOB_SEEKER.NEWS}`}
+        href={newsListHref}
         startIcon={<ArrowBackIcon />}
         sx={{ mb: 3 }}
       >
@@ -306,7 +315,7 @@ const ArticleDetailPage = () => {
                   </Typography>
                   <Button
                     component={Link}
-                    href={`/${ROUTES.JOB_SEEKER.NEWS}`}
+                    href={newsListHref}
                     variant="contained"
                   >
                     {t('news.article.newsHomeCta', { ns: 'public' })}

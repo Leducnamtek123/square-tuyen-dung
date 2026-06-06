@@ -1,8 +1,13 @@
 import json
 import logging
+import os
 import re
+import socket
+import subprocess
+import tempfile
 import time
 import unicodedata
+from pathlib import Path
 from typing import Optional, List, Dict, Any
 from urllib.parse import urlsplit, urlunsplit
 
@@ -52,6 +57,7 @@ except ImportError:
 # Import models for tools
 try:
     from apps.jobs.models import JobPost, JobPostActivity
+    from apps.jobs.manual_candidate_validation import validate_manual_candidate_activity_storage
     from apps.profiles.models import Resume, JobSeekerProfile, Company
     from apps.profiles.serializers import EmployerCandidateProfileSerializer
     from apps.interviews.models import InterviewSession
@@ -59,6 +65,7 @@ try:
 except ImportError:
     JobPost = None
     JobPostActivity = None
+    validate_manual_candidate_activity_storage = None
     Resume = None
     JobSeekerProfile = None
     Company = None
@@ -371,6 +378,16 @@ def _fpt_control_credentials_configured() -> bool:
     )
 
 
+def _fpt_bootstrap_configured() -> bool:
+    return bool(
+        getattr(settings, "FPT_GPU_SSH_HOST", "")
+        and getattr(settings, "FPT_GPU_SSH_PORT", 0)
+        and getattr(settings, "FPT_GPU_SSH_USER", "")
+        and getattr(settings, "FPT_GPU_SSH_KEY_PATH", "")
+        and getattr(settings, "FPT_GPU_BOOTSTRAP_COMMAND", "")
+    )
+
+
 class FPTGPUControlError(Exception):
     def __init__(self, message: str, status_code: int = 502):
         super().__init__(message)
@@ -383,6 +400,111 @@ class FPTGPUControlNotConfigured(FPTGPUControlError):
             "FPT GPU control token is not configured. Set FPT_GPU_BSS_ACCESS_TOKEN or FPT_GPU_ACCESS_TOKEN.",
             status_code=503,
         )
+
+
+class FPTGPUBootstrapNotConfigured(FPTGPUControlError):
+    def __init__(self):
+        super().__init__(
+            "FPT GPU SSH bootstrap is not configured. Set FPT_GPU_SSH_HOST, FPT_GPU_SSH_PORT, "
+            "FPT_GPU_SSH_USER, FPT_GPU_SSH_KEY_PATH, and FPT_GPU_BOOTSTRAP_COMMAND.",
+            status_code=503,
+        )
+
+
+def _wait_for_tcp_port(host: str, port: int, timeout_seconds: int) -> None:
+    deadline = time.monotonic() + max(timeout_seconds, 1)
+    last_error = ""
+    while time.monotonic() < deadline:
+        try:
+            with socket.create_connection((host, port), timeout=5):
+                return
+        except OSError as exc:
+            last_error = str(exc)
+            time.sleep(5)
+
+    raise FPTGPUControlError(
+        f"Timed out waiting for FPT GPU SSH port {host}:{port}. Last error: {last_error}",
+        status_code=504,
+    )
+
+
+def _tail_text(value: str, limit: int = 4000) -> str:
+    if not value:
+        return ""
+    return value[-limit:]
+
+
+def _copy_ssh_key_for_strict_permissions(source_path: str) -> str:
+    expanded = os.path.expandvars(os.path.expanduser(source_path))
+    source = Path(expanded)
+    if not source.is_file():
+        raise FPTGPUControlError(f"FPT GPU SSH key file was not found at {source}.", status_code=503)
+
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", delete=False) as key_file:
+        key_file.write(source.read_text(encoding="utf-8"))
+        temp_path = key_file.name
+
+    os.chmod(temp_path, 0o600)
+    return temp_path
+
+
+def _run_fpt_gpu_bootstrap_ssh() -> Dict[str, Any]:
+    if not _fpt_bootstrap_configured():
+        raise FPTGPUBootstrapNotConfigured()
+
+    host = str(getattr(settings, "FPT_GPU_SSH_HOST", "")).strip()
+    port = int(getattr(settings, "FPT_GPU_SSH_PORT", 22))
+    user = str(getattr(settings, "FPT_GPU_SSH_USER", "root")).strip()
+    command = str(getattr(settings, "FPT_GPU_BOOTSTRAP_COMMAND", "")).strip()
+    tcp_wait_seconds = int(getattr(settings, "FPT_GPU_BOOTSTRAP_TCP_WAIT_SECONDS", 240))
+    command_timeout_seconds = int(getattr(settings, "FPT_GPU_BOOTSTRAP_TIMEOUT_SECONDS", 900))
+
+    _wait_for_tcp_port(host, port, tcp_wait_seconds)
+
+    temp_key_path = _copy_ssh_key_for_strict_permissions(getattr(settings, "FPT_GPU_SSH_KEY_PATH", ""))
+    try:
+        completed = subprocess.run(
+            [
+                "ssh",
+                "-o",
+                "BatchMode=yes",
+                "-o",
+                "StrictHostKeyChecking=accept-new",
+                "-o",
+                "ConnectTimeout=15",
+                "-p",
+                str(port),
+                "-i",
+                temp_key_path,
+                f"{user}@{host}",
+                command,
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=command_timeout_seconds,
+        )
+    except FileNotFoundError as exc:
+        raise FPTGPUControlError("OpenSSH client is not installed on the backend container.", status_code=503) from exc
+    except subprocess.TimeoutExpired as exc:
+        raise FPTGPUControlError(f"FPT GPU bootstrap timed out after {command_timeout_seconds}s.", status_code=504) from exc
+    finally:
+        try:
+            os.unlink(temp_key_path)
+        except OSError:
+            pass
+
+    result = {
+        "returnCode": completed.returncode,
+        "stdout": _tail_text(completed.stdout),
+        "stderr": _tail_text(completed.stderr),
+    }
+    if completed.returncode != 0:
+        raise FPTGPUControlError(
+            f"FPT GPU bootstrap failed with exit code {completed.returncode}: {_tail_text(completed.stderr, 1000)}",
+            status_code=502,
+        )
+    return result
 
 
 def _get_fpt_bss_access_token() -> str:
@@ -549,6 +671,9 @@ class FPTGPUControlStatusAPIView(APIView):
                     "configured": _fpt_control_credentials_configured(),
                     "error": control_error,
                 },
+                "bootstrap": {
+                    "configured": _fpt_bootstrap_configured(),
+                },
                 "ai": {
                     "status": "ready" if all_ready else "degraded",
                     "checks": checks,
@@ -568,7 +693,44 @@ class FPTGPUControlActionAPIView(APIView):
     }
 
     def post(self, request: DRFRequest, action: str):
-        normalized_action = self.ACTIONS.get(action.lower())
+        requested_action = action.lower()
+        if requested_action == "bootstrap":
+            try:
+                bootstrap_result = _run_fpt_gpu_bootstrap_ssh()
+            except FPTGPUControlError as exc:
+                return Response({"detail": str(exc)}, status=exc.status_code)
+
+            return Response(
+                {
+                    "action": "BOOTSTRAP",
+                    "result": bootstrap_result,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        if requested_action == "start-bootstrap":
+            try:
+                start_result = _fpt_gpu_request(
+                    "POST",
+                    _fpt_gpu_path("/actions"),
+                    payload={"action": "START"},
+                )
+                bootstrap_result = _run_fpt_gpu_bootstrap_ssh()
+            except FPTGPUControlError as exc:
+                return Response({"detail": str(exc)}, status=exc.status_code)
+
+            return Response(
+                {
+                    "action": "START_BOOTSTRAP",
+                    "result": {
+                        "start": start_result,
+                        "bootstrap": bootstrap_result,
+                    },
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        normalized_action = self.ACTIONS.get(requested_action)
         if not normalized_action:
             return Response({"detail": "Unsupported FPT GPU action."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -879,7 +1041,7 @@ def _create_manual_candidate_from_chat(request: DRFRequest, messages: List[Dict[
             data_response(errors={}, data={"reply": "Bạn cần đăng nhập bằng tài khoản nhà tuyển dụng để tạo hồ sơ ứng viên."}),
             status=200,
         )
-    if not EmployerCandidateProfileSerializer or not JobPostActivity:
+    if not EmployerCandidateProfileSerializer or not JobPostActivity or not validate_manual_candidate_activity_storage:
         return Response(
             data_response(errors={}, data={"reply": "Chức năng tạo hồ sơ ứng viên chưa sẵn sàng."}),
             status=200,
@@ -908,6 +1070,14 @@ def _create_manual_candidate_from_chat(request: DRFRequest, messages: List[Dict[
         candidate_data["email"] = email
     if phone:
         candidate_data["phone"] = phone
+
+    activity_storage_errors = validate_manual_candidate_activity_storage(candidate_data)
+    if activity_storage_errors:
+        logger.warning("Manual candidate from chat exceeds activity storage limits: %s", activity_storage_errors)
+        return Response(
+            data_response(errors={}, data={"reply": "Không thể tạo hồ sơ ứng viên từ nội dung này. Bạn kiểm tra lại tên, email, số điện thoại và tin tuyển dụng."}),
+            status=200,
+        )
 
     candidate_serializer = EmployerCandidateProfileSerializer(
         data=candidate_data,

@@ -1,5 +1,5 @@
 import httpRequest from '../utils/httpRequest';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 import { presignInObject } from '../utils/presignUrl';
 import type { SystemConfig, Career, District } from '../types/models';
 
@@ -153,7 +153,7 @@ const commonService = {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('file_type', fileType);
-    return httpRequest.post(url, formData, {
+    return (httpRequest.post(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -167,7 +167,7 @@ const commonService = {
         const progress = Math.round((event.loaded / event.total) * 100);
         options.onUploadProgress(progress);
       },
-    }) as Promise<{ id: number; url: string; name: string }>;
+    }) as Promise<unknown>).then(unwrapDataResponse<{ id: number; url: string; name: string }>);
   },
 };
 

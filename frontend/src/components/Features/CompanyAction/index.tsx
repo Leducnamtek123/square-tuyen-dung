@@ -7,6 +7,7 @@ import { useTheme } from '@mui/material/styles';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import { formatRoute } from '@/utils/funcUtils';
 import { ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import { useTranslation } from 'react-i18next';
 
 interface CompanyActionProps {
@@ -22,15 +23,15 @@ interface CompanyActionProps {
 
 const CompanyAction = ({ id, views, createAt, resume, company, children }: CompanyActionProps) => {
   const parentRef = React.useRef<HTMLDivElement>(null);
-  const { t } = useTranslation(['jobSeeker', 'common']);
+  const { t, i18n } = useTranslation(['jobSeeker', 'common']);
 
   const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>('column');
 
   const theme = useTheme();
   const resumeTitle = resume?.title || t('common:labels.notUpdated');
   const companyHref = company?.slug
-    ? `/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company.slug as string)}`
-    : '#';
+    ? localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company.slug as string)}`, i18n.language)
+    : undefined;
 
   React.useEffect(() => {
     const el = parentRef.current;
@@ -120,16 +121,16 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 
                 <Typography
 
-                  component={Link}
+                  component={companyHref ? Link : 'span'}
                   href={companyHref}
-                  prefetch={Boolean(company?.slug)}
+                  prefetch={Boolean(companyHref)}
                   variant="h6"
 
                   sx={{
 
                     fontSize: 16,
 
-                    cursor: 'pointer',
+                    cursor: companyHref ? 'pointer' : 'default',
 
                     color: theme.palette.primary.main,
                     textDecoration: 'none',

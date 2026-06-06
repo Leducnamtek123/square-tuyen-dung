@@ -4,8 +4,6 @@ import React from 'react';
 import {
   Box,
   Typography,
-  Breadcrumbs,
-  Link,
   Paper,
   TextField,
   Button,
@@ -463,13 +461,6 @@ const WardsPage = () => {
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
             {t('pages.wards.title')}
           </Typography>
-          <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/admin">
-              {t('pages.wards.breadcrumbAdmin')}
-            </Link>
-            <Typography color="text.primary">{t('pages.wards.breadcrumbLocations')}</Typography>
-            <Typography color="text.primary">{t('pages.wards.breadcrumbWards')}</Typography>
-          </Breadcrumbs>
         </Box>
 
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}>

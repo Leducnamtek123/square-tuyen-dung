@@ -1,5 +1,5 @@
 import httpRequest from '../utils/httpRequest';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 import type { PaginatedResponse } from '../types/api';
 import { cleanParams } from '../utils/params';
 
@@ -40,7 +40,7 @@ export type JobPostNotificationStatusResponse = { isActive: boolean };
 const jobPostNotificationService = {
   addJobPostNotification: (data: JobPostNotificationPayload): Promise<JobPostNotification> => {
     const url = 'job/web/job-post-notifications/';
-    return httpRequest.post(url, data) as Promise<JobPostNotification>;
+    return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<JobPostNotification>);
   },
 
   getJobPostNotifications: (params: JobPostNotificationListParams = {}): Promise<PaginatedResponse<JobPostNotification>> => {
@@ -52,12 +52,12 @@ const jobPostNotificationService = {
 
   updateJobPostNotificationById: (id: IdType, data: Partial<JobPostNotificationPayload>): Promise<JobPostNotification> => {
     const url = `job/web/job-post-notifications/${id}/`;
-    return httpRequest.put(url, data) as Promise<JobPostNotification>;
+    return (httpRequest.put(url, data) as Promise<unknown>).then(unwrapDataResponse<JobPostNotification>);
   },
 
   getJobPostNotificationDetailById: (id: IdType): Promise<JobPostNotification> => {
     const url = `job/web/job-post-notifications/${id}/`;
-    return httpRequest.get(url) as Promise<JobPostNotification>;
+    return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<JobPostNotification>);
   },
 
   deleteJobPostNotificationDetailById: (id: IdType): Promise<void> => {
@@ -67,7 +67,7 @@ const jobPostNotificationService = {
 
   active: (id: IdType): Promise<JobPostNotificationStatusResponse> => {
     const url = `job/web/job-post-notifications/${id}/`;
-    return httpRequest.patch(url, {}) as Promise<JobPostNotificationStatusResponse>;
+    return (httpRequest.patch(url, {}) as Promise<unknown>).then(unwrapDataResponse<JobPostNotificationStatusResponse>);
   },
 };
 

@@ -22,7 +22,6 @@ import {
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import dayjs from 'dayjs';
 import adminManagementService from '../../../services/adminManagementService';
 import toastMessages from '../../../utils/toastMessages';
 import type { CompanyVerification } from '../../../types/models';
@@ -67,12 +66,6 @@ const CompanyVerificationsPage = () => {
     }, { pending: 0, reviewing: 0, approved: 0, rejected: 0 });
   }, [rows]);
 
-  const formatDate = (value?: string | null) => {
-    if (!value) return emptyValue;
-    const date = dayjs(value);
-    return date.isValid() ? date.format('DD/MM/YYYY HH:mm') : value;
-  };
-
   const getStatusLabel = (status: VerificationStatus) => {
     switch (status) {
       case 'reviewing':
@@ -116,12 +109,11 @@ const CompanyVerificationsPage = () => {
 
       <Paper elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, overflow: 'hidden' }}>
         <TableContainer>
-          <Table sx={{ minWidth: 1080 }}>
+          <Table sx={{ minWidth: 900 }}>
             <TableHead>
               <TableRow>
                 <TableCell>{t('pages.companyVerifications.table.company')}</TableCell>
                 <TableCell>{t('pages.companyVerifications.table.legalProfile')}</TableCell>
-                <TableCell>{t('pages.companyVerifications.table.appointment')}</TableCell>
                 <TableCell>{t('pages.companyVerifications.table.adminNote')}</TableCell>
                 <TableCell>{t('pages.companyVerifications.table.status')}</TableCell>
               </TableRow>
@@ -150,12 +142,6 @@ const CompanyVerificationsPage = () => {
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {t('pages.companyVerifications.legal.representative', { value: row.representative || emptyValue })}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ minWidth: 210 }}>
-                      <Typography variant="body2">{formatDate(row.scheduledAt)}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {row.contactName || emptyValue} {row.contactPhone ? `- ${row.contactPhone}` : ''}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ minWidth: 240 }}>
@@ -202,7 +188,7 @@ const CompanyVerificationsPage = () => {
               })}
               {!isLoading && rows.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                  <TableCell colSpan={4} align="center" sx={{ py: 6, color: 'text.secondary' }}>
                     {t('pages.companyVerifications.empty')}
                   </TableCell>
                 </TableRow>

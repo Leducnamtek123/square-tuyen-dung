@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import {
-  Box, Typography, Breadcrumbs, Link, Paper,
+  Box, Typography, Link, Paper,
   Chip, Stack, Tooltip, IconButton, Dialog, DialogTitle,
   DialogContent, DialogActions, Button
 } from '@mui/material';
@@ -19,6 +19,7 @@ import { useInterviews } from './hooks/useInterviews';
 import dayjs from '../../../configs/dayjs-config';
 import toastMessages from '../../../utils/toastMessages';
 import FilterBar from '@/components/Common/FilterBar';
+import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
 const STATUS_CHIP_COLORS: Record<string, "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"> = {
   'scheduled': 'info',
@@ -47,6 +48,7 @@ const InterviewsPage = () => {
   } = useDataTable({ initialPageSize: 10 });
 
   const [selectedInterview, setSelectedInterview] = React.useState<InterviewSession | null>(null);
+  const safeSelectedRecordingUrl = getSafeResourceUrl(selectedInterview?.recordingUrl);
   const [deleteTarget, setDeleteTarget] = React.useState<InterviewSession | null>(null);
 
   const {
@@ -192,10 +194,6 @@ const InterviewsPage = () => {
     <Box>
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>{t('pages.interviews.title')}</Typography>
-        <Breadcrumbs>
-          <Link underline="hover" color="inherit" href="/admin">{t('pages.interviews.breadcrumbAdmin')}</Link>
-          <Typography color="text.primary">{t('pages.interviews.breadcrumb')}</Typography>
-        </Breadcrumbs>
       </Box>
 
       <Paper sx={{ p: 0, borderRadius: '12px', overflow: 'hidden' }} elevation={0}>
@@ -232,8 +230,8 @@ const InterviewsPage = () => {
             <Typography variant="body2"><strong>{t('pages.interviews.table.jobPost')}:</strong> {selectedInterview?.jobName || '—'}</Typography>
             <Typography variant="body2"><strong>{t('pages.interviews.table.status')}:</strong> {selectedInterview?.status || '—'}</Typography>
             <Typography variant="body2"><strong>{t('pages.interviews.table.scheduledAt')}:</strong> {selectedInterview?.scheduledAt ? dayjs(selectedInterview.scheduledAt).format('DD/MM/YYYY HH:mm') : '—'}</Typography>
-            {selectedInterview?.recordingUrl && (
-              <Link href={selectedInterview.recordingUrl} target="_blank" rel="noreferrer">
+            {safeSelectedRecordingUrl && (
+              <Link href={safeSelectedRecordingUrl} target="_blank" rel="noopener noreferrer">
                 {t('pages.interviews.recordingLink')}
               </Link>
             )}

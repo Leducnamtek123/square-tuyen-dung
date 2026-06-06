@@ -589,12 +589,6 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
 
     aiAnalysisEvidence = serializers.JSONField(source='ai_analysis_evidence', read_only=True)
 
-    aiAnalysisModel = serializers.CharField(source='ai_analysis_model', read_only=True)
-
-    aiAnalysisSource = serializers.CharField(source='ai_analysis_source', read_only=True)
-
-    aiAnalysisPromptVersion = serializers.CharField(source='ai_analysis_prompt_version', read_only=True)
-
     aiAnalysisReviewStatus = serializers.CharField(source='ai_analysis_review_status', read_only=True)
 
     aiAnalysisHrOverrideScore = serializers.IntegerField(source='ai_analysis_hr_override_score', read_only=True)
@@ -738,7 +732,7 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
                   "hrmSyncStatus", "hrmSyncError", "hrmSyncedAt", "hrmEmployeeUrl", "createAt", "isSentEmail",
 
                   "aiAnalysisScore", "aiAnalysisSummary", "aiAnalysisSkills", "aiAnalysisStatus", "aiAnalysisProgress", "aiAnalysisPros", "aiAnalysisCons", "aiAnalysisMatchingSkills", "aiAnalysisMissingSkills",
-                  "aiAnalysisCriteria", "aiAnalysisEvidence", "aiAnalysisModel", "aiAnalysisSource", "aiAnalysisPromptVersion",
+                  "aiAnalysisCriteria", "aiAnalysisEvidence",
                   "aiAnalysisReviewStatus", "aiAnalysisHrOverrideScore", "aiAnalysisHrOverrideNote",
                   "aiAnalysisReviewedAt", "aiAnalysisReviewedBy", "aiAnalysisEffectiveScore",
                   "resumeFileUrl", "userDict", "jobPostDict", "companyDict")

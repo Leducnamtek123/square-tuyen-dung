@@ -8,7 +8,8 @@ Tests cover:
 4. Status transitions (state machine guards)
 """
 
-from unittest.mock import AsyncMock, patch
+import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
 from datetime import date
 from decimal import Decimal
 from types import SimpleNamespace
@@ -245,7 +246,37 @@ class LiveKitWebhookTests(TestCase):
         self.assertEqual(self.session.status, "processing")
 
 
-class LiveKitServiceTests(TestCase):
+class LiveKitServiceTests(unittest.TestCase):
+    @patch("apps.interviews.livekit_service.api.VideoGrants")
+    @patch("apps.interviews.livekit_service.api.AccessToken")
+    def test_create_hr_presence_token_allows_media_publish(self, mock_access_token_cls, mock_video_grants):
+        token_builder = MagicMock()
+        token_builder.with_identity.return_value = token_builder
+        token_builder.with_name.return_value = token_builder
+        token_builder.with_grants.return_value = token_builder
+        token_builder.with_metadata.return_value = token_builder
+        token_builder.with_attributes.return_value = token_builder
+        token_builder.to_jwt.return_value = "jwt-token"
+        mock_access_token_cls.return_value = token_builder
+
+        token = LiveKitService.create_hr_presence_token(
+            room_name="room-1",
+            hr_identity="employer-7",
+            hr_name="HR User",
+            company_name="Square Tech",
+        )
+
+        self.assertEqual(token, "jwt-token")
+        mock_video_grants.assert_called_once_with(
+            room_join=True,
+            room="room-1",
+            room_admin=False,
+            can_publish=True,
+            can_publish_data=True,
+            can_subscribe=True,
+            hidden=False,
+        )
+
     @patch("apps.interviews.livekit_service.api.LiveKitAPI")
     def test_ensure_room_with_agent_dispatches_agent_for_existing_room(self, mock_livekit_api_cls):
         mock_api = mock_livekit_api_cls.return_value
@@ -1165,6 +1196,40 @@ class InterviewEvaluationAPITests(TestCase):
         # (8 + 6) / 2 = 7.0
         overall = float(data.get("overall_score", 0))
         self.assertEqual(overall, 7.0)
+
+    def test_submit_evaluation_updates_existing_interview_evaluation(self):
+        existing = InterviewEvaluation.objects.create(
+            interview=self.session,
+            evaluator=self.employer,
+            attitude_score=Decimal("3.00"),
+            professional_score=Decimal("4.00"),
+            overall_score=Decimal("3.50"),
+            result="failed",
+            comments="Old evaluation",
+            proposed_salary=10000000,
+        )
+        payload = {
+            "interview": self.session.pk,
+            "attitude_score": 10,
+            "professional_score": 5,
+            "result": "passed",
+            "comments": "Updated evaluation",
+            "proposed_salary": 50000000,
+        }
+
+        response = self.client.post(
+            "/api/v1/interview/web/evaluations/",
+            data=payload,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.session.evaluations.count(), 1)
+        existing.refresh_from_db()
+        self.assertEqual(existing.result, "passed")
+        self.assertEqual(existing.comments, "Updated evaluation")
+        self.assertEqual(existing.proposed_salary, 50000000)
+        self.assertEqual(existing.overall_score, Decimal("7.50"))
 
     def test_candidate_cannot_submit_evaluation_for_own_interview(self):
         self.client.force_authenticate(user=self.candidate)

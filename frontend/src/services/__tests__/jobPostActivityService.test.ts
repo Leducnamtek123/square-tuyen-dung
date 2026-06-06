@@ -1,5 +1,6 @@
 import jobPostActivityService from '../jobPostActivityService';
 import httpRequest from '../../utils/httpRequest';
+import { presignInObject } from '../../utils/presignUrl';
 
 jest.mock('../../utils/httpRequest', () => ({
   get: jest.fn(),
@@ -15,6 +16,7 @@ jest.mock('../../utils/presignUrl', () => ({
 describe('jobPostActivityService', () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    (presignInObject as jest.Mock).mockImplementation((data) => Promise.resolve(data));
   });
 
   it('normalizes empty successful send email responses', async () => {
@@ -57,5 +59,48 @@ describe('jobPostActivityService', () => {
       status: 1,
       resume: 5,
     });
+  });
+
+  it('unwraps nested applied profile detail responses after presign', async () => {
+    const activity = { id: 44, candidateName: 'Le Duc Nam' };
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({
+      data: { data: activity },
+    });
+
+    await expect(jobPostActivityService.getJobPostActivityDetail(44)).resolves.toEqual(activity);
+  });
+
+  it('unwraps nested applied profile mutation responses', async () => {
+    const statusActivity = { id: 45, status: 3 };
+    const reviewedActivity = { id: 46, aiReviewStatus: 'reviewed' };
+    (httpRequest.put as jest.Mock).mockResolvedValueOnce({
+      data: { data: statusActivity },
+    });
+    (httpRequest.post as jest.Mock).mockResolvedValueOnce({
+      data: { data: reviewedActivity },
+    });
+
+    await expect(jobPostActivityService.changeApplicationStatus(45, { status: 3 })).resolves.toEqual(statusActivity);
+    await expect(jobPostActivityService.reviewAIAnalysis(46, { reviewStatus: 'reviewed' })).resolves.toEqual(reviewedActivity);
+  });
+
+  it('unwraps nested manual candidate create responses', async () => {
+    const manualActivity = {
+      id: 47,
+      fullName: 'Tran Thi B',
+      isManualCandidate: true,
+      jobName: 'Frontend Developer',
+    };
+    const formData = new FormData();
+    (httpRequest.post as jest.Mock).mockResolvedValueOnce({
+      data: { data: manualActivity },
+    });
+
+    await expect(jobPostActivityService.createManualAppliedCandidate(formData)).resolves.toEqual(manualActivity);
+    expect(httpRequest.post).toHaveBeenCalledWith(
+      'job/web/employer-job-posts-activity/manual-candidates/',
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    );
   });
 });

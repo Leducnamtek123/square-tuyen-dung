@@ -811,13 +811,12 @@
     },
     "companyVerifications": {
       "title": "Company Verifications",
-      "subtitle": "Review legal profiles and verification appointment requests.",
+      "subtitle": "Review legal profiles and update verification status.",
       "empty": "No verification requests.",
       "reviewNotePlaceholder": "Review note",
       "table": {
         "company": "Company",
         "legalProfile": "Legal profile",
-        "appointment": "Appointment",
         "adminNote": "Admin note",
         "status": "Status"
       },
@@ -1142,14 +1141,19 @@
         "controlEnabled": "Control enabled",
         "readOnly": "Read only",
         "notConfigured": "Add FPT_GPU_BSS_ACCESS_TOKEN or FPT_GPU_ACCESS_TOKEN on the backend to enable Start and Stop.",
+        "bootstrapNotConfigured": "Add FPT GPU SSH settings on the backend to enable bootstrap.",
         "tenant": "Tenant",
         "runningCost": "Running cost",
         "stoppedDiskCost": "Stopped disk cost",
+        "startBootstrap": "Start & Bootstrap",
+        "bootstrap": "Bootstrap",
         "start": "Start",
         "stop": "Stop",
         "refresh": "Refresh",
         "openConsole": "Open FPT",
         "toast": {
+          "startBootstrapSuccess": "FPT GPU start and bootstrap requested.",
+          "bootstrapSuccess": "FPT GPU bootstrap requested.",
           "startSuccess": "FPT GPU start requested.",
           "stopSuccess": "FPT GPU stop requested.",
           "actionError": "FPT GPU action failed."
@@ -1353,6 +1357,12 @@
       "connected": {
         "aiInterviewer": "AI Interviewer",
         "chatTitle": "Chat",
+        "chatMessages": {
+          "aiGreeting": "Hello! I am the AI interview assistant. Let's begin.",
+          "candidateReady": "Yes, I am ready.",
+          "reactQuestion": "Can you describe your experience working with React.js?",
+          "reactExperience": "I have 3 years of React experience, mainly working at startups..."
+        },
         "messageInput": "Type a message...",
         "observerNotice": "Employer is observing this interview session",
         "you": "You",

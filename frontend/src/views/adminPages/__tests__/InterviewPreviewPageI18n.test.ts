@@ -22,6 +22,10 @@ const fixedKeys = [
   'pages.interviewPreview.actions.joinRoom',
   'pages.interviewPreview.connected.aiInterviewer',
   'pages.interviewPreview.connected.chatTitle',
+  'pages.interviewPreview.connected.chatMessages.aiGreeting',
+  'pages.interviewPreview.connected.chatMessages.candidateReady',
+  'pages.interviewPreview.connected.chatMessages.reactQuestion',
+  'pages.interviewPreview.connected.chatMessages.reactExperience',
   'pages.interviewPreview.connected.messageInput',
   'pages.interviewPreview.connected.observerNotice',
   'pages.interviewPreview.connected.you',
@@ -62,12 +66,28 @@ describe('InterviewPreviewPage i18n', () => {
     expect(source).not.toContain('aria-label="Share screen"');
     expect(source).not.toContain("'Close chat'");
     expect(source).not.toContain("'Open chat'");
+    expect(source).not.toContain('Xin chào!');
+    expect(source).not.toContain('Dạ, tôi sẵn sàng');
+    expect(source).not.toContain('Bạn có thể mô tả kinh nghiệm');
+    expect(source).not.toContain('Tôi đã có 3 năm kinh nghiệm');
   });
 
   it('uses admin locale keys for fixed copy', () => {
     fixedKeys.forEach((key) => {
       expect(source).toContain(`'${key}'`);
     });
+  });
+
+  it('shows the localized preview route instead of a hard-coded canonical route', () => {
+    expect(source).toContain('localizeRoutePath');
+    expect(source).toContain('ROUTES.ADMIN.INTERVIEW_PREVIEW');
+    expect(source).toContain('i18n.language');
+    expect(source).not.toContain('>/admin/interview-preview<');
+  });
+
+  it('uses the same candidate sender value for alignment and bubble styling', () => {
+    expect(source).toContain("m.from === 'candidate' ? 'bg-cyan-500/15 border border-cyan-400/15'");
+    expect(source).not.toContain("m.from === 'Candidate'");
   });
 
   it('has Vietnamese and English locale entries for fixed copy', () => {

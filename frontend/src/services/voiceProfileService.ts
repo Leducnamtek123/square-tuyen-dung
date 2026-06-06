@@ -1,5 +1,5 @@
 import httpRequest from '../utils/httpRequest';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 import { cleanParams } from '../utils/params';
 import type { PaginatedResponse } from '../types/api';
 import type { VoiceProfile, VoiceProfileGrant, VoiceProfileSample } from '../types/models';
@@ -36,11 +36,13 @@ const voiceProfileService = {
   },
 
   createVoiceProfile: (data: VoiceProfilePayload): Promise<VoiceProfile> => {
-    return httpRequest.post<VoiceProfile>('interview/web/voice-profiles/', data);
+    return (httpRequest.post('interview/web/voice-profiles/', data) as Promise<unknown>)
+      .then(unwrapDataResponse<VoiceProfile>);
   },
 
   updateVoiceProfile: (id: IdType, data: Partial<VoiceProfilePayload>): Promise<VoiceProfile> => {
-    return httpRequest.patch<VoiceProfile>(`interview/web/voice-profiles/${id}/`, data);
+    return (httpRequest.patch(`interview/web/voice-profiles/${id}/`, data) as Promise<unknown>)
+      .then(unwrapDataResponse<VoiceProfile>);
   },
 
   deleteVoiceProfile: (id: IdType): Promise<void> => {
@@ -48,11 +50,13 @@ const voiceProfileService = {
   },
 
   uploadSample: (id: IdType, data: FormData): Promise<VoiceProfileSample> => {
-    return httpRequest.post<VoiceProfileSample>(`interview/web/voice-profiles/${id}/samples/`, data, multipartConfig);
+    return (httpRequest.post(`interview/web/voice-profiles/${id}/samples/`, data, multipartConfig) as Promise<unknown>)
+      .then(unwrapDataResponse<VoiceProfileSample>);
   },
 
   createGrant: (id: IdType, data: VoiceProfileGrantPayload): Promise<VoiceProfileGrant> => {
-    return httpRequest.post<VoiceProfileGrant>(`interview/web/voice-profiles/${id}/grants/`, data);
+    return (httpRequest.post(`interview/web/voice-profiles/${id}/grants/`, data) as Promise<unknown>)
+      .then(unwrapDataResponse<VoiceProfileGrant>);
   },
 
   deleteGrant: (id: IdType): Promise<void> => {

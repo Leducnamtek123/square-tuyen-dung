@@ -198,6 +198,10 @@
       "error": "Không thể chuyển âm thanh lúc này."
     }
   },
+  "aiElements": {
+    "previousBranch": "Nhánh trước",
+    "nextBranch": "Nhánh tiếp theo"
+  },
   "ai": {
     "reviewStatus": {
       "label": "Rà soát AI",
@@ -665,6 +669,8 @@
     "actionFailed": "Không thể thao tác lúc này. Vui lòng thử lại."
   },
   "breadcrumbs": {
+    "label": "Điều hướng breadcrumb",
+    "admin": "Quản trị",
     "employer": "Nhà tuyển dụng"
   },
   "buttons": {

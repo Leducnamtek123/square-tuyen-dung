@@ -1,6 +1,6 @@
 import { ROLES_NAME, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import type { AppNotification } from '@/hooks/useNotifications';
-import { formatRoute } from './funcUtils';
 
 export const isExternalNotificationTarget = (target: string) => /^https?:\/\//i.test(target);
 
@@ -10,38 +10,50 @@ const normalizePath = (path?: string | null) => {
   return path.startsWith('/') ? path : `/${path}`;
 };
 
+const localizeNotificationPath = (path: string | null, language?: string | null) => {
+  if (!path || isExternalNotificationTarget(path)) return path;
+  return localizeRoutePath(path, language || 'vi');
+};
+
+const routePath = (route: string, language?: string | null) =>
+  localizeNotificationPath(`/${route}`, language);
+
+const buildRoute = (route: string, value: string, paramKey = ':slug') =>
+  route.replace(new RegExp(`${paramKey}`, 'g'), value);
+
 export const getNotificationTargetPath = (
   notification: AppNotification,
-  roleName?: string
+  roleName?: string,
+  language?: string | null
 ): string | null => {
   const explicitPath = normalizePath(notification.link || notification.url);
-  if (explicitPath) return explicitPath;
+  if (explicitPath) return localizeNotificationPath(explicitPath, language);
 
   switch (notification.type) {
     case 'SYSTEM':
-      if (roleName === ROLES_NAME.ADMIN) return `/${ROUTES.ADMIN.DASHBOARD}`;
-      if (roleName === ROLES_NAME.EMPLOYER) return `/${ROUTES.EMPLOYER.DASHBOARD}`;
+      if (roleName === ROLES_NAME.ADMIN) return routePath(ROUTES.ADMIN.DASHBOARD, language);
+      if (roleName === ROLES_NAME.EMPLOYER) return routePath(ROUTES.EMPLOYER.DASHBOARD, language);
       return '/';
     case 'EMPLOYER_VIEWED_RESUME':
     case 'EMPLOYER_SAVED_RESUME':
-      return `/${ROUTES.JOB_SEEKER.MY_COMPANY}`;
+      return routePath(ROUTES.JOB_SEEKER.MY_COMPANY, language);
     case 'APPLY_STATUS':
-      return `/${ROUTES.JOB_SEEKER.MY_JOB}`;
+      return routePath(ROUTES.JOB_SEEKER.MY_JOB, language);
     case 'COMPANY_FOLLOWED':
-      return `/${ROUTES.EMPLOYER.PROFILE}`;
+      return routePath(ROUTES.EMPLOYER.PROFILE, language);
     case 'POST_VERIFY_RESULT':
-      return `/${ROUTES.EMPLOYER.JOB_POST}`;
+      return routePath(ROUTES.EMPLOYER.JOB_POST, language);
     case 'POST_VERIFY_REQUIRED':
-      return `/${ROUTES.ADMIN.JOBS}`;
+      return routePath(ROUTES.ADMIN.JOBS, language);
     case 'APPLY_JOB': {
       const resumeSlug = notification.APPLY_JOB?.resume_slug;
-      if (!resumeSlug) return `/${ROUTES.EMPLOYER.APPLIED_PROFILE}`;
-      return `/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, resumeSlug)}`;
+      if (!resumeSlug) return routePath(ROUTES.EMPLOYER.APPLIED_PROFILE, language);
+      return routePath(buildRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, resumeSlug), language);
     }
     case 'NEW_MESSAGE':
-      if (roleName === ROLES_NAME.EMPLOYER) return `/${ROUTES.EMPLOYER.CHAT}`;
-      if (roleName === ROLES_NAME.ADMIN) return `/${ROUTES.ADMIN.CHAT}`;
-      return `/${ROUTES.JOB_SEEKER.CHAT}`;
+      if (roleName === ROLES_NAME.EMPLOYER) return routePath(ROUTES.EMPLOYER.CHAT, language);
+      if (roleName === ROLES_NAME.ADMIN) return routePath(ROUTES.ADMIN.CHAT, language);
+      return routePath(ROUTES.JOB_SEEKER.CHAT, language);
     default:
       return null;
   }

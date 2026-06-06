@@ -193,7 +193,7 @@ const ChatBot = () => {
         <span className="sq-chatbot__launcher-ring" />
       </button>
 
-      <dialog className="sq-chatbot__panel" open aria-label="Square AI Chat">
+      <dialog className="sq-chatbot__panel" open aria-label={t('chat:chatbot.panelAria')}>
         <header className="sq-chatbot__header">
           <div className="sq-chatbot__title">
             <span className="sq-chatbot__badge">
@@ -255,7 +255,7 @@ const ChatBot = () => {
             <span>{state.error}</span>
             {state.canRetry && (
               <button type="button" className="sq-chatbot__retry-btn" onClick={handleRetry} disabled={state.isSending}>
-                {t('chat:chatbot.retry') || 'Thử lại'}
+                {t('chat:chatbot.retry')}
               </button>
             )}
           </div>

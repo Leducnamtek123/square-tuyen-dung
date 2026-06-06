@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, Tooltip, IconButton, Stack, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import { Box, Typography, Link, Paper, Tooltip, IconButton, Stack, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
@@ -121,7 +121,7 @@ const ProfilesPage = () => {
                 return (
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                         <Tooltip title={t('pages.profiles.table.view')}>
-                             <IconButton size="small" component={Link} href={`/profiles/${profile.id}`} target="_blank" color="info">
+                             <IconButton size="small" component={Link} href={`/profiles/${profile.id}`} target="_blank" rel="noopener noreferrer" color="info">
                                 <VisibilityIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
@@ -143,13 +143,6 @@ const ProfilesPage = () => {
                     <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
                         {t('pages.profiles.title')}
                     </Typography>
-                    <Breadcrumbs aria-label="breadcrumb">
-                        <Link underline="hover" color="inherit" href="/admin">
-                            {t('pages.profiles.breadcrumbAdmin')}
-                        </Link>
-                        <Typography color="text.primary">{t('pages.profiles.breadcrumbResources')}</Typography>
-                        <Typography color="text.primary">{t('pages.profiles.breadcrumbProfiles')}</Typography>
-                    </Breadcrumbs>
                 </Box>
             </Box>
 

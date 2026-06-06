@@ -21,6 +21,7 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import type { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
 
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 import DataTable from '../../../../components/Common/DataTable';
 import { formatRoute } from '@/utils/funcUtils';
 
@@ -169,6 +170,9 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
       meta: { align: 'right' },
       cell: (info) => {
         const actionState = getSavedResumeActionState(info.row.original);
+        const detailHref = actionState.canView
+          ? localizeRoutePath(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, actionState.slug)}`, i18n.language)
+          : undefined;
 
         return (
           <Stack direction="row" spacing={1} justifyContent="flex-end">
@@ -179,8 +183,8 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
                   color="primary"
                   disabled={!actionState.canView}
                   onClick={() => {
-                    if (!actionState.canView) return;
-                    push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, actionState.slug)}`);
+                    if (!detailHref) return;
+                    push(detailHref);
                   }}
                   sx={{
                     bgcolor: pc.primary(0.06),

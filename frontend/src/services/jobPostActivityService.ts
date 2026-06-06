@@ -2,7 +2,7 @@ import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 import type { ExportTableRow, PaginatedResponse } from '../types/api';
 import type { JobPostActivity } from '../types/models';
-import { normalizePaginatedResponse } from '../utils/apiResponse';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 import { cleanParams } from '../utils/params';
 
 
@@ -127,14 +127,15 @@ const jobPostActivityService = {
 
   changeApplicationStatus: (id: IdType, data: ChangeApplicationStatusPayload): Promise<JobPostActivity> => {
     const url = `job/web/employer-job-posts-activity/${id}/application-status/`;
-    return httpRequest.put(url, data) as Promise<JobPostActivity>;
+    return (httpRequest.put(url, data) as Promise<unknown>)
+      .then(unwrapDataResponse<JobPostActivity>);
   },
 
   createManualAppliedCandidate: (data: FormData): Promise<JobPostActivity> => {
     const url = 'job/web/employer-job-posts-activity/manual-candidates/';
-    return httpRequest.post(url, data, {
+    return (httpRequest.post(url, data, {
       headers: { 'Content-Type': 'multipart/form-data' },
-    }) as Promise<JobPostActivity>;
+    }) as Promise<unknown>).then(unwrapDataResponse<JobPostActivity>);
   },
 
   deleteJobPostActivity: (id: IdType): Promise<void> => {
@@ -144,7 +145,8 @@ const jobPostActivityService = {
 
   getJobPostActivityDetail: (id: IdType): Promise<JobPostActivity> => {
     const url = `job/web/employer-job-posts-activity/${id}/`;
-    return withPresign(httpRequest.get(url)) as Promise<JobPostActivity>;
+    return (withPresign(httpRequest.get(url)) as Promise<unknown>)
+      .then(unwrapDataResponse<JobPostActivity>);
   },
 
   analyzeResume: (id: IdType, payload?: { onlineProfileUrl?: string; criteria?: Array<Record<string, unknown>> }): Promise<ActionResponse> => {
@@ -156,7 +158,8 @@ const jobPostActivityService = {
 
   reviewAIAnalysis: (id: IdType, payload: AIAnalysisReviewPayload): Promise<JobPostActivity> => {
     const url = `job/web/employer-job-posts-activity/${id}/ai-analysis-review/`;
-    return httpRequest.post(url, payload) as Promise<JobPostActivity>;
+    return (httpRequest.post(url, payload) as Promise<unknown>)
+      .then(unwrapDataResponse<JobPostActivity>);
   },
 };
 

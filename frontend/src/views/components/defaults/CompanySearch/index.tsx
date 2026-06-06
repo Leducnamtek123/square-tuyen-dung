@@ -168,7 +168,7 @@ const CompanySearch = () => {
 
               </Button>
 
-              <IconButton aria-label="delete" onClick={handleReset}>
+              <IconButton aria-label={t('companySearch.resetFiltersAria')} onClick={handleReset}>
 
                 <DeleteForeverIcon color="secondary" />
 

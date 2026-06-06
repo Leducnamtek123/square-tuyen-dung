@@ -102,9 +102,9 @@ const Footer = () => {
                 {t('footer.forEmployers')}
               </Typography>
               {[
-                { label: t('footer.postJob'), route: `/${ROUTES.EMPLOYER.JOB_POST}` },
-                { label: t('footer.searchResumes'), route: `/${ROUTES.EMPLOYER.PROFILE}` },
-                { label: t('footer.employerDashboard'), route: `/${ROUTES.EMPLOYER.DASHBOARD}` },
+                { label: t('footer.postJob'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.JOB_POST}`, lang) },
+                { label: t('footer.searchResumes'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.PROFILE}`, lang) },
+                { label: t('footer.employerDashboard'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.DASHBOARD}`, lang) },
               ].map((item) => (
                 <Button
                   key={item.label}
@@ -150,7 +150,7 @@ const Footer = () => {
                     key={social.link}
                     href={social.link}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     sx={{
                       display: 'flex',
                       alignItems: 'center',

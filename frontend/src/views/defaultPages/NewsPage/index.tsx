@@ -33,6 +33,8 @@ import useSEO from '@/hooks/useSEO';
 import errorHandling from '@/utils/errorHandling';
 import NoDataCard from '@/components/Common/NoDataCard';
 import { ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import { formatRoute } from '@/utils/funcUtils';
 
 type NewsCategory = 'all' | ArticleCategory;
 
@@ -56,6 +58,9 @@ const formatDate = (value?: string | null) => {
   return date.isValid() ? date.format('DD/MM/YYYY') : '';
 };
 
+const buildAbsoluteUrl = (path: string) =>
+  `${typeof window !== 'undefined' ? window.location.origin : ''}${path}`;
+
 const ArticleCard = ({
   article,
   featured = false,
@@ -63,6 +68,7 @@ const ArticleCard = ({
   categoryLabels,
   categoryFallbackLabel,
   formatViews,
+  language,
 }: {
   article: Article;
   featured?: boolean;
@@ -70,8 +76,9 @@ const ArticleCard = ({
   categoryLabels: Record<ArticleCategory, string>;
   categoryFallbackLabel: string;
   formatViews: (count: number) => string;
+  language: string;
 }) => {
-  const href = `/${ROUTES.JOB_SEEKER.NEWS}/${article.slug}`;
+  const href = localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.NEWS_DETAIL, article.slug)}`, language);
   const publishedDate = formatDate(article.publishedAt || article.createAt || article.updateAt);
   const badgeLabel = categoryLabels[article.category] || categoryFallbackLabel;
   const BadgeIcon = article.category === 'news' ? NewspaperIcon : ArticleIcon;
@@ -346,11 +353,13 @@ const NewsPage = () => {
     searchValue ? `"${searchValue}"` : '',
   ].filter(Boolean).join(' · ');
   const numberLocale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
+  const newsListHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language);
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
 
   useSEO({
     title: t('seo.newsList.title', { ns: 'public' }),
     description: t('seo.newsList.description', { ns: 'public' }),
-    url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}`,
+    url: buildAbsoluteUrl(newsListHref),
     keywords: t('seo.newsList.keywords', { ns: 'public' }),
   });
 
@@ -385,7 +394,7 @@ const NewsPage = () => {
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
             <Button
               component={Link}
-              href={`/${ROUTES.JOB_SEEKER.NEWS}`}
+              href={newsListHref}
               variant="contained"
               color="secondary"
               size="large"
@@ -394,7 +403,7 @@ const NewsPage = () => {
             </Button>
             <Button
               component={Link}
-              href={`/${ROUTES.JOB_SEEKER.JOBS}`}
+              href={jobsHref}
               variant="outlined"
               size="large"
               sx={{ borderColor: 'rgba(255,255,255,0.55)', color: 'common.white' }}
@@ -510,6 +519,7 @@ const NewsPage = () => {
                   categoryLabels={categoryLabels}
                   categoryFallbackLabel={t('news.categoryFallback', { ns: 'public' })}
                   formatViews={formatViews}
+                  language={i18n.language}
                 />
               )}
 
@@ -519,12 +529,13 @@ const NewsPage = () => {
                     <ArticleCard
                       article={article}
                       ctaLabel={ctaLabel}
-                      categoryLabels={categoryLabels}
-                      categoryFallbackLabel={t('news.categoryFallback', { ns: 'public' })}
-                      formatViews={formatViews}
-                    />
-                  </Grid>
-                ))}
+                        categoryLabels={categoryLabels}
+                        categoryFallbackLabel={t('news.categoryFallback', { ns: 'public' })}
+                        formatViews={formatViews}
+                        language={i18n.language}
+                      />
+                    </Grid>
+                  ))}
               </Grid>
 
               {pageCount > 1 && (
@@ -623,7 +634,7 @@ const NewsPage = () => {
                   </Typography>
                   <Button
                     component={Link}
-                    href={`/${ROUTES.JOB_SEEKER.JOBS}`}
+                    href={jobsHref}
                     variant="contained"
                     endIcon={<ArrowForwardIcon />}
                   >

@@ -4,7 +4,6 @@ import React, { useMemo, useState } from 'react';
 import {
   Alert,
   Box,
-  Breadcrumbs,
   Button,
   Card,
   CardContent,
@@ -17,7 +16,6 @@ import {
   FormControlLabel,
   FormHelperText,
   IconButton,
-  Link,
   MenuItem,
   Stack,
   Switch,
@@ -367,10 +365,6 @@ const VoiceProfilesPage = () => {
           <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>
             {t('pages.voiceProfiles.title')}
           </Typography>
-          <Breadcrumbs>
-            <Link underline="hover" color="inherit" href="/admin">{t('pages.voiceProfiles.breadcrumbAdmin')}</Link>
-            <Typography color="text.primary">{t('pages.voiceProfiles.title')}</Typography>
-          </Breadcrumbs>
         </Box>
         <Button variant="contained" startIcon={<GraphicEqIcon />} onClick={() => setCreateOpen(true)}>
           {t('pages.voiceProfiles.newVoice')}

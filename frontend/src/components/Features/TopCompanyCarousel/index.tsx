@@ -90,12 +90,7 @@ const TopCompanyCarousel = () => {
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['top-companies'],
     queryFn: async () => {
-      const resData = await companyService.getTopCompanies();
-      // httpRequest interceptor already unwraps response.data.data
-      // so resData is the companies array directly
-      if (Array.isArray(resData)) return resData as Company[];
-      const fallback = resData as { data?: Company[]; results?: Company[] };
-      return fallback?.data || fallback?.results || [];
+      return companyService.getTopCompanies();
     },
     staleTime: 5 * 60_000,
   });

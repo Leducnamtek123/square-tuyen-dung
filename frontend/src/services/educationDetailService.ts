@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { unwrapDataResponse } from '../utils/apiResponse';
 import type { EducationDetail } from '../types/models';
 
 type IdType = string | number;
@@ -18,17 +19,17 @@ interface EducationDetailInput {
 const educationDetailService = {
   addEducationsDetail: (data: EducationDetailInput): Promise<EducationDetail> => {
     const url = `info/web/educations-detail/`;
-    return httpRequest.post(url, data);
+    return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<EducationDetail>);
   },
 
   getEducationDetailById: (id: IdType): Promise<EducationDetail> => {
     const url = `info/web/educations-detail/${id}/`;
-    return httpRequest.get(url);
+    return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<EducationDetail>);
   },
 
   updateEducationDetailById: (id: IdType, data: EducationDetailInput): Promise<EducationDetail> => {
     const url = `info/web/educations-detail/${id}/`;
-    return httpRequest.put(url, data);
+    return (httpRequest.put(url, data) as Promise<unknown>).then(unwrapDataResponse<EducationDetail>);
   },
 
   deleteEducationDetailById: (id: IdType): Promise<void> => {

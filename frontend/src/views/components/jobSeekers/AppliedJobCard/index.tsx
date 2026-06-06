@@ -12,6 +12,7 @@ import jobPostActivityService from '../../../../services/jobPostActivityService'
 import type { JobPostActivity } from '../../../../types/models';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 
 const pageSize = 10;
 
@@ -41,8 +42,9 @@ interface AppliedJobActivityItem {
 }
 
 const AppliedJobCard = () => {
-  const { t } = useTranslation(['jobSeeker', 'common']);
+  const { t, i18n } = useTranslation(['jobSeeker', 'common']);
   const [page, setPage] = React.useState(1);
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
 
   const { data, isLoading } = useQuery({
     queryKey: ['applied-jobs', page],
@@ -108,11 +110,11 @@ const AppliedJobCard = () => {
             title={t("jobSeeker:jobManagement.empty.applied")}
             svgKey="ImageSvg5"
           >
-            <Button
-              component={Link}
-              href={`/${ROUTES.JOB_SEEKER.JOBS}`}
-              variant="contained"
-              color="primary"
+              <Button
+                component={Link}
+                href={jobsHref}
+                variant="contained"
+                color="primary"
               sx={{ textTransform: 'inherit' }}
             >
               {t("jobSeeker:jobManagement.actions.searchJobs")}

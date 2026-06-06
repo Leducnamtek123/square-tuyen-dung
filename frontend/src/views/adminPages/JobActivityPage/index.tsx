@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useMemo, useReducer } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Tooltip, IconButton, Chip, Stack } from "@mui/material";
+import { Box, Typography, Paper, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Tooltip, IconButton, Chip, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
@@ -219,13 +219,6 @@ const JobActivityPage = () => {
                 <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
                     {t('pages.jobActivity.title')}
                 </Typography>
-                <Breadcrumbs aria-label="breadcrumb">
-                    <Link underline="hover" color="inherit" href="/admin">
-                        {t('pages.jobActivity.breadcrumbAdmin')}
-                    </Link>
-                    <Typography color="text.primary">{t('pages.jobActivity.breadcrumbJobs')}</Typography>
-                    <Typography color="text.primary">{t('pages.jobActivity.breadcrumbActivity')}</Typography>
-                </Breadcrumbs>
             </Box>
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <FilterBar

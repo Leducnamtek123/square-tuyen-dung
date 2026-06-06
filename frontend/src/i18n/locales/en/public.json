@@ -4,9 +4,11 @@
     "topCompanies": "Top Companies",
     "topCompaniesSubtitle": "Discover employers that are actively hiring and get closer to the most relevant opportunities.",
     "urgentJobs": "Urgent Jobs",
+    "urgentJobsAria": "Urgent jobs",
     "keyCareers": "Key Careers",
     "keyCareersSubtitle": "Explore high-demand career groups to narrow your search faster.",
     "suggestedJobs": "Suggested Jobs",
+    "suggestedJobsAria": "Suggested jobs",
     "exploreHeading": "Need to find the right job for you?",
     "exploreDescription": "Start from one place to search jobs, view companies, filter by industry, and move quickly to your next step.",
     "startExploring": "Start exploring",
@@ -143,6 +145,8 @@
     "allGenders": "All genders",
     "selectCityFirst": "Please select a city first",
     "selectDistrictFirst": "Please select a district first",
+    "resetFiltersAria": "Reset advanced job filters",
+    "closeAdvancedFiltersAria": "Close advanced job filters",
     "searchResults": "Search Results",
     "posts": "posts",
     "noJobsFound": "No jobs found matching your criteria",
@@ -180,7 +184,8 @@
     "exploreSubtitle": "Learn about company culture and choose the workplace that suits you best",
     "searchPlaceholder": "Enter company name or field to search",
     "allCities": "All cities",
-    "searchButton": "Search"
+    "searchButton": "Search",
+    "resetFiltersAria": "Reset company search filters"
   },
   "jobsByCategoryPage": {
     "careerTitle": "Jobs by Career",

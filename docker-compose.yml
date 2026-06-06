@@ -77,6 +77,13 @@ services:
     command: ${BACKEND_COMMAND:-sh docker-entrypoint.sh gunicorn --bind 0.0.0.0:8000 --workers 3 --worker-class gevent --timeout 120 config.wsgi:application}
     env_file:
       - .env
+    volumes:
+      - type: bind
+        source: ${FPT_GPU_SSH_KEY_SOURCE:-./.secrets/fpt_gpu_ssh_key}
+        target: /run/secrets/fpt_gpu_ssh_key
+        read_only: true
+        bind:
+          create_host_path: false
     expose:
       - "8000"
     restart: always

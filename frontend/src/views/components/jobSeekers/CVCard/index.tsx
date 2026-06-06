@@ -10,6 +10,7 @@ import errorHandling from '../../../../utils/errorHandling';
 import FormPopup from '../../../../components/Common/Controls/FormPopup';
 import resumeService from '../../../../services/resumeService';
 import toastMessages from '../../../../utils/toastMessages';
+import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
 const LazyPdf = lazy(() => import('../../../../components/Common/Pdf'));
 
@@ -67,6 +68,7 @@ const CVCard = ({ title }: CVCardProps) => {
   const { t } = useTranslation(['jobSeeker', 'common']);
   const { slug: resumeSlug } = useParams<{ slug: string }>();
   const [state, dispatch] = React.useReducer(reducer, initialState);
+  const safeCvFileUrl = getSafeResourceUrl(state.cv?.fileUrl);
 
   React.useEffect(() => {
     const getResumeDetail = async (slug: string | undefined) => {
@@ -157,7 +159,7 @@ const CVCard = ({ title }: CVCardProps) => {
                 {t('jobSeeker:profile.cv.loading')}
               </Typography>
             </Stack>
-          ) : state.cv === null ? (
+          ) : state.cv === null || !safeCvFileUrl ? (
             <Stack
               alignItems="center"
               justifyContent="center"
@@ -193,9 +195,9 @@ const CVCard = ({ title }: CVCardProps) => {
                   }
                 >
                   <LazyPdf
-                    key={`${state.cv.fileUrl}-${state.cv.updateAt || ''}`}
+                    key={`${safeCvFileUrl}-${state.cv.updateAt || ''}`}
                     title={state.cv.title}
-                    fileUrl={state.cv.fileUrl}
+                    fileUrl={safeCvFileUrl}
                   />
                 </Suspense>
               </Box>

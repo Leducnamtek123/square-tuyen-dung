@@ -23,8 +23,10 @@ import type { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tans
 
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 import DataTable from '../../../../components/Common/DataTable';
 import { formatRoute } from '@/utils/funcUtils';
+import { openExternalUrlSafely } from '@/utils/safeExternalUrl';
 
 import SendEmailComponent from './SendEmailComponent';
 import AppliedStatusComponent from './AppliedStatusComponent';
@@ -49,7 +51,7 @@ interface AppliedResumeTableProps {
 }
 
 const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
-  const { t } = useTranslation(['employer', 'common']);
+  const { t, i18n } = useTranslation(['employer', 'common']);
   const { push } = useRouter();
   const { 
     rows, 
@@ -255,6 +257,9 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
         <Stack direction="row" spacing={1} justifyContent="flex-end" alignItems="center">
           {(() => {
             const detailSlug = info.row.original.resumeSlug || info.row.original.resume?.slug || '';
+            const detailHref = detailSlug
+              ? localizeRoutePath(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, detailSlug)}`, i18n.language)
+              : undefined;
             return (
           <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
             <span>
@@ -263,8 +268,8 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                 size="small"
                 disabled={blindMode || !detailSlug}
                 onClick={() => {
-                  if (blindMode || !detailSlug) return;
-                  push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, detailSlug)}`);
+                  if (blindMode || !detailHref) return;
+                  push(detailHref);
                 }}
                 sx={{ 
                   bgcolor: pc.primary( 0.06),
@@ -295,7 +300,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                 color="primary"
                 onClick={() => {
                   if (info.row.original.hrmEmployeeUrl) {
-                    window.open(info.row.original.hrmEmployeeUrl, '_blank', 'noopener,noreferrer');
+                    openExternalUrlSafely(info.row.original.hrmEmployeeUrl);
                   }
                 }}
                 sx={{
@@ -341,7 +346,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
         </Stack>
       ),
     },
-  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, onCreateEmployee, push, blindMode]);
+  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, onCreateEmployee, push, blindMode, i18n.language]);
 
   return (
     <>

@@ -322,7 +322,7 @@ class PrivateResumeViewSet(PermissionActionMapMixin, viewsets.ViewSet,
 
             resume.save()
 
-        return var_res.response_data()
+        return var_res.response_data(data={"isActive": resume.is_active})
 
     @action(methods=["get"], detail=True,
 

@@ -35,6 +35,15 @@ describe('Public detail action i18n', () => {
     expect(jobDetailHeaderSource).toContain('i18n.language');
   });
 
+  it('guards company external website and social links before rendering hrefs', () => {
+    expect(companySidebarSource).toContain('getSafeExternalOpenUrl');
+    expect(companySidebarSource).toContain('safeWebsiteUrl');
+    expect(companySidebarSource).not.toContain('href={companyDetail.websiteUrl}');
+    expect(companySidebarSource).not.toContain('href={companyDetail.facebookUrl}');
+    expect(companySidebarSource).not.toContain('href={companyDetail.youtubeUrl}');
+    expect(companySidebarSource).not.toContain('href={companyDetail.linkedinUrl}');
+  });
+
   it('has Vietnamese and English locale entries for public detail action copy', () => {
     const vi = JSON.parse(readFileSync(join(__dirname, '../../../i18n/locales/vi/public.json'), 'utf8'));
     const en = JSON.parse(readFileSync(join(__dirname, '../../../i18n/locales/en/public.json'), 'utf8'));

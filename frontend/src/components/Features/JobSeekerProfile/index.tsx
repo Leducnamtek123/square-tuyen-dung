@@ -26,6 +26,7 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import dayjs from 'dayjs';
 import { formatLocalizedSalaryRange } from '@/utils/customData';
 import { CV_TYPES, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import { formatRoute } from '@/utils/funcUtils';
 import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
@@ -74,9 +75,14 @@ const JobSeekerProfile = ({
     const { push } = useRouter();
     const theme = useTheme();
     const { allConfig } = useConfig();
+    const profileDetailHref = slug
+        ? localizeRoutePath(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, slug)}`, i18n.language)
+        : undefined;
 
     const handleNavigate = () => {
-        push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, slug)}`);
+        if (profileDetailHref) {
+            push(profileDetailHref);
+        }
     };
 
     const lastViewedLabel = lastViewedDate

@@ -18,6 +18,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import PsychologyIcon from '@mui/icons-material/Psychology';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { ScoreGauge } from './ScoreGauge';
 import { SkillChipList } from './SkillChipList';
 import { SectionCard } from './SectionCard';
@@ -58,6 +59,14 @@ const getEvidenceArrays = (value: AIAnalysisData['aiAnalysisEvidence']) => {
   return { criteriaResults: [], evidence: [] };
 };
 
+const getIdentityWarnings = (value: AIAnalysisData['aiAnalysisEvidence']) => {
+  if (!value || Array.isArray(value) || typeof value !== 'object') {
+    return [];
+  }
+  const record = value as { identity_warnings?: unknown; identityWarnings?: unknown };
+  return toRecordArray(record.identity_warnings ?? record.identityWarnings);
+};
+
 const textValue = (value: unknown): string => (value == null ? '' : String(value));
 
 const AIAnalysisDrawerStatePanels = ({
@@ -83,6 +92,7 @@ const AIAnalysisDrawerStatePanels = ({
   }, [data?.id, data?.aiAnalysisHrOverrideScore, data?.aiAnalysisHrOverrideNote]);
 
   const { criteriaResults, evidence } = getEvidenceArrays(data?.aiAnalysisEvidence);
+  const identityWarnings = getIdentityWarnings(data?.aiAnalysisEvidence);
 
   const handleSaveReview = async () => {
     setSavingReview(true);
@@ -289,6 +299,45 @@ const AIAnalysisDrawerStatePanels = ({
         <ScoreGauge score={data?.aiAnalysisEffectiveScore ?? data?.aiAnalysisScore ?? 0} />
       </Paper>
 
+      {identityWarnings.length > 0 && (
+        <SectionCard
+          title={t('employer:appliedResume.ai.identityWarningTitle')}
+          icon={<WarningAmberIcon fontSize="small" />}
+          iconColor={theme.palette.warning.main}
+        >
+          <Stack spacing={1.25}>
+            {identityWarnings.map((item, index) => {
+              const applicationName = textValue(item.application_name || item.applicationName);
+              const resumeName = textValue(item.resume_name || item.resumeName);
+              const warningText = applicationName || resumeName
+                ? t('employer:appliedResume.ai.identityWarningBody', {
+                    applicationName: applicationName || '-',
+                    resumeName: resumeName || '-',
+                  })
+                : textValue(item.message);
+
+              return (
+                <Paper
+                  key={textValue(item.type || item.message || `${applicationName}-${resumeName}-${index}`)}
+                  elevation={0}
+                  sx={{
+                    p: 1.5,
+                    border: '1px solid',
+                    borderColor: pc.warning(0.35),
+                    borderRadius: 2,
+                    bgcolor: pc.warning(0.08),
+                  }}
+                >
+                  <Typography variant="body2" sx={{ color: 'warning.dark', fontWeight: 800, lineHeight: 1.65 }}>
+                    {warningText}
+                  </Typography>
+                </Paper>
+              );
+            })}
+          </Stack>
+        </SectionCard>
+      )}
+
       <SectionCard title={t('employer:appliedResume.ai.reviewTitle')} icon={<PsychologyIcon fontSize="small" />} iconColor={theme.palette.info.main}>
         <Stack spacing={2}>
           <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
@@ -299,12 +348,6 @@ const AIAnalysisDrawerStatePanels = ({
               })}
               sx={{ fontWeight: 800, borderRadius: 1.5 }}
             />
-            {data?.aiAnalysisModel && (
-              <Chip size="small" label={`Model: ${data.aiAnalysisModel}`} sx={{ fontWeight: 800, borderRadius: 1.5 }} />
-            )}
-            {data?.aiAnalysisPromptVersion && (
-              <Chip size="small" label={`Prompt: ${data.aiAnalysisPromptVersion}`} sx={{ fontWeight: 800, borderRadius: 1.5 }} />
-            )}
           </Stack>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
             <TextField

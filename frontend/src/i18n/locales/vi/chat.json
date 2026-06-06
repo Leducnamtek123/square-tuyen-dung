@@ -27,6 +27,7 @@
   "candidates": "ỨNG VIÊN ỨNG TUYỂN",
   "chatbot": {
     "launcherAria": "Mở trợ lý Square AI",
+    "panelAria": "Trò chuyện với Square AI",
     "closeAria": "Đóng chat",
     "status": "Đang sẵn sàng",
     "placeholder": "Nhập tin nhắn...",

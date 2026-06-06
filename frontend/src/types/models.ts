@@ -243,9 +243,6 @@ export interface JobPostActivity {
     criteria_results?: Array<Record<string, unknown>>;
     evidence?: Array<Record<string, unknown>>;
   } | Array<Record<string, unknown>> | null;
-  aiAnalysisModel?: string;
-  aiAnalysisSource?: string;
-  aiAnalysisPromptVersion?: string;
   aiAnalysisReviewStatus?: 'ai_only' | 'reviewed' | 'overridden' | string;
   aiAnalysisHrOverrideScore?: number | null;
   aiAnalysisHrOverrideNote?: string | null;

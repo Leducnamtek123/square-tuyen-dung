@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import {
-  Box, Typography, Breadcrumbs, Link, Paper, IconButton,
+  Box, Typography, Paper, IconButton,
   Chip, Switch, Dialog, DialogTitle, DialogContent, DialogActions,
   Button, Tooltip, Rating, Stack
 } from '@mui/material';
@@ -168,10 +168,6 @@ const FeedbacksPage = () => {
     <Box>
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>{t('pages.feedbacks.title')}</Typography>
-        <Breadcrumbs>
-          <Link underline="hover" color="inherit" href="/admin">{t('pages.feedbacks.breadcrumbAdmin')}</Link>
-          <Typography color="text.primary">{t('pages.feedbacks.breadcrumb')}</Typography>
-        </Breadcrumbs>
       </Box>
 
       <Paper sx={{ p: 2, borderRadius: '12px' }} elevation={0}>

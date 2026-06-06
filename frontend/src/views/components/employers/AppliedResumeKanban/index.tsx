@@ -37,7 +37,9 @@ import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import type { JobPostActivity } from '@/types/models';
 import { useConfig } from '@/hooks/useConfig';
 import { ROUTES, CV_TYPES } from '../../../../configs/constants';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 import { formatRoute } from '@/utils/funcUtils';
+import { openExternalUrlSafely } from '@/utils/safeExternalUrl';
 
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import SendEmailComponent from '../AppliedResumeTable/SendEmailComponent';
@@ -55,7 +57,7 @@ interface AppliedResumeKanbanProps {
 }
 
 const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoading, handleChangeApplicationStatus, handleDelete, onCreateEmployee, onAnalysisStateChange, blindMode = false }) => {
-    const { t } = useTranslation(['employer', 'common']);
+    const { t, i18n } = useTranslation(['employer', 'common']);
     const { allConfig } = useConfig();
     const { push } = useRouter();
     const theme = useTheme();
@@ -176,6 +178,12 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                 const isOnlineResume = resumeType === CV_TYPES.cvWebsite;
                                                                 const jobPostId = getAppliedResumeJobPostId(item);
                                                                 const canScheduleInterview = !blindMode && Boolean(item.userId) && Boolean(jobPostId);
+                                                                const detailHref = detailSlug
+                                                                    ? localizeRoutePath(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, detailSlug)}`, i18n.language)
+                                                                    : undefined;
+                                                                const scheduleHref = canScheduleInterview
+                                                                    ? localizeRoutePath(`/${ROUTES.EMPLOYER.INTERVIEW_CREATE}?candidate=${item.userId}&jobPost=${jobPostId}`, i18n.language)
+                                                                    : undefined;
                                                                 return (
                                                             <Card
                                                                 ref={provided.innerRef}
@@ -235,8 +243,8 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                              <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
                                                                                 <span>
                                                                                     <IconButton size="small" disabled={blindMode || !detailSlug} onClick={() => {
-                                                                                        if (blindMode || !detailSlug) return;
-                                                                                        push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, detailSlug)}`);
+                                                                                        if (blindMode || !detailHref) return;
+                                                                                        push(detailHref);
                                                                                     }}>
                                                                                         <RemoveRedEyeIcon fontSize="small" />
                                                                                     </IconButton>
@@ -245,8 +253,8 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                              <Tooltip title={t('appliedResume.table.tooltips.scheduleInterview')} arrow>
                                                                                  <span>
                                                                                      <IconButton size="small" disabled={!canScheduleInterview} onClick={() => {
-                                                                                         if (!canScheduleInterview) return;
-                                                                                         push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}/create?candidate=${item.userId}&jobPost=${jobPostId}`);
+                                                                                         if (!scheduleHref) return;
+                                                                                         push(scheduleHref);
                                                                                      }}>
                                                                                          <EventIcon fontSize="small" sx={{ color: 'info.main' }} />
                                                                                      </IconButton>
@@ -259,7 +267,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                                 <Tooltip title={t('employees.hrm.convert.openEmployee')} arrow>
                                                                                    <IconButton size="small" color="primary" onClick={() => {
                                                                                        if (item.hrmEmployeeUrl) {
-                                                                                           window.open(item.hrmEmployeeUrl, '_blank', 'noopener,noreferrer');
+                                                                                           openExternalUrlSafely(item.hrmEmployeeUrl);
                                                                                        }
                                                                                    }}>
                                                                                        <PersonAddAltIcon fontSize="small" />

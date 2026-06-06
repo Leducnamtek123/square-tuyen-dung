@@ -280,6 +280,28 @@ install_if_version_lt "$VENV_ROOT/tts/bin/python" "vieneu" "2.7.0" \
   "numpy" \
   "transformers>=4.45.0,<5.0" \
   "torchao==0.12.0"
+
+# VieNeu's dependency resolver can pull newer CUDA 13 torch wheels on this
+# image. FPT's NVIDIA PyTorch 25.03 image is CUDA 12.x, so force the CUDA 12.8
+# torch stack after installing VieNeu.
+if ! "$VENV_ROOT/tts/bin/python" - <<'PY' >/dev/null 2>&1
+import pyarrow
+import torch
+import torchaudio
+import torchvision
+
+assert torch.__version__ == "2.7.1+cu128", torch.__version__
+assert torchaudio.__version__ == "2.7.1+cu128", torchaudio.__version__
+assert torchvision.__version__ == "0.22.1+cu128", torchvision.__version__
+assert hasattr(pyarrow, "json_"), pyarrow.__version__
+PY
+then
+  uv pip install --python "$VENV_ROOT/tts/bin/python" --no-cache --force-reinstall \
+    "torch==2.7.1" "torchaudio==2.7.1" "torchvision==0.22.1" \
+    --index-url https://download.pytorch.org/whl/cu128
+  uv pip install --python "$VENV_ROOT/tts/bin/python" --no-cache --force-reinstall \
+    "pyarrow==24.0.0"
+fi
 install_if_missing "$VENV_ROOT/tts/bin/python" "lmdeploy" "lmdeploy"
 install_if_missing "$VENV_ROOT/tts/bin/python" "neucodec" "neucodec>=0.0.4"
 

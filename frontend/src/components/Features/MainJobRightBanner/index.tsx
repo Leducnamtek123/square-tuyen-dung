@@ -49,62 +49,70 @@ const MainJobRightBanner = () => {
         px: { xs: 2, md: 0 },
       }}
     >
-      {rightBanners?.map((banner) => (
-        <Box key={banner.id} sx={{ position: 'relative' }}>
-          <StyledBannerLink
-            href={banner.buttonLink || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <StyledBannerImage
-              src={banner.imageUrl}
-              alt={banner.description || "Banner"}
-              loading="lazy"
-            />
-          </StyledBannerLink>
-          {banner.isShowButton && banner.buttonLink && (
-            <Box 
-              sx={{ 
-                position: 'absolute',
-                bottom: '20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: theme.zIndex.appBar + 1
-              }}
-            >
-              <Button
-                variant="outlined"
+      {rightBanners?.map((banner) => {
+        const bannerImage = (
+          <StyledBannerImage
+            src={banner.imageUrl}
+            alt={banner.description || "Banner"}
+            loading="lazy"
+          />
+        );
+
+        return (
+          <Box key={banner.id} sx={{ position: 'relative' }}>
+            {banner.buttonLink ? (
+              <StyledBannerLink
                 href={banner.buttonLink}
                 target="_blank"
                 rel="noopener noreferrer"
+              >
+                {bannerImage}
+              </StyledBannerLink>
+            ) : bannerImage}
+            {banner.isShowButton && banner.buttonLink && (
+              <Box
                 sx={{
-                  minWidth: '180px',
-                  height: '44px',
-                  borderRadius: '22px',
-                  color: theme.palette.common.white,
-                  borderColor: theme.palette.common.white,
-                  borderWidth: '2px',
-                  backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                  backdropFilter: 'blur(8px)',
-                  ...theme.typography.subtitle1,
-                  fontWeight: 500,
-                  transition: theme.transitions.create(['transform', 'box-shadow']),
-                  '&:hover': {
-                    borderWidth: '2px',
-                    borderColor: theme.palette.common.white,
-                    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                    color: theme.palette.common.white,
-                    transform: 'translateY(-2px)',
-                    boxShadow: theme.customShadows.medium
-                  }
+                  position: 'absolute',
+                  bottom: '20px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  zIndex: theme.zIndex.appBar + 1
                 }}
               >
-                {banner.buttonText || t('viewDetails')}
-              </Button>
-            </Box>
-          )}
-        </Box>
-      ))}
+                <Button
+                  variant="outlined"
+                  href={banner.buttonLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    minWidth: '180px',
+                    height: '44px',
+                    borderRadius: '22px',
+                    color: theme.palette.common.white,
+                    borderColor: theme.palette.common.white,
+                    borderWidth: '2px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                    backdropFilter: 'blur(8px)',
+                    ...theme.typography.subtitle1,
+                    fontWeight: 500,
+                    transition: theme.transitions.create(['transform', 'box-shadow']),
+                    '&:hover': {
+                      borderWidth: '2px',
+                      borderColor: theme.palette.common.white,
+                      backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                      color: theme.palette.common.white,
+                      transform: 'translateY(-2px)',
+                      boxShadow: theme.customShadows.medium
+                    }
+                  }}
+                >
+                  {banner.buttonText || t('viewDetails')}
+                </Button>
+              </Box>
+            )}
+          </Box>
+        );
+      })}
     </Stack>
   );
 };

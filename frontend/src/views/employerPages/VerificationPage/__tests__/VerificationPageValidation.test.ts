@@ -1,16 +1,14 @@
-import dayjs from 'dayjs';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
 import {
-  validateVerificationInterviewRequest,
   validateVerificationLegalProfile,
 } from '../index';
 
 const t = (key: string) => key;
 
 describe('verification page validation', () => {
-  it('rejects invalid legal and interview contact phone numbers', () => {
+  it('rejects invalid legal profile phone numbers', () => {
     const legalErrors = validateVerificationLegalProfile(
       {
         companyName: 'Square Test',
@@ -23,18 +21,8 @@ describe('verification page validation', () => {
       },
       t as never,
     );
-    const interviewErrors = validateVerificationInterviewRequest(
-      {
-        scheduledAt: dayjs().add(1, 'day'),
-        contactName: 'HR Lead',
-        contactPhone: 'also-not-a-phone',
-        notes: '',
-      },
-      t as never,
-    );
 
     expect(legalErrors.phone).toBe('verification.validation.phone');
-    expect(interviewErrors.contactPhone).toBe('verification.validation.phone');
   });
 
   it('allows blank website but rejects invalid website URLs', () => {
@@ -79,22 +67,12 @@ describe('verification page validation', () => {
       },
       t as never,
     );
-    const interviewErrors = validateVerificationInterviewRequest(
-      {
-        scheduledAt: dayjs().add(1, 'day'),
-        contactName: 'd'.repeat(101),
-        contactPhone: '0901234567',
-        notes: '',
-      },
-      t as never,
-    );
 
     expect(legalErrors.companyName).toBe('verification.validation.maxLength');
     expect(legalErrors.taxCode).toBe('verification.validation.maxLength');
     expect(legalErrors.businessLicense).toBe('verification.validation.maxLength');
     expect(legalErrors.representative).toBe('verification.validation.maxLength');
     expect(legalErrors.email).toBe('verification.validation.maxLength');
-    expect(interviewErrors.contactName).toBe('verification.validation.maxLength');
   });
 
   it('does not hard-code fallback text in validation helpers', () => {
@@ -109,15 +87,6 @@ describe('verification page validation', () => {
         phone: 'not-a-phone',
         email: 'invalid-email',
         website: 'not-a-url',
-      },
-      tSpy as never,
-    );
-    validateVerificationInterviewRequest(
-      {
-        scheduledAt: dayjs().subtract(1, 'day'),
-        contactName: '',
-        contactPhone: 'not-a-phone',
-        notes: '',
       },
       tSpy as never,
     );
@@ -148,5 +117,15 @@ describe('verification page validation', () => {
     for (const call of summaryCalls) {
       expect(call).not.toContain('defaultValue');
     }
+  });
+
+  it('keeps employer verification focused on legal verification without interview scheduling', () => {
+    const pageSource = readFileSync(join(__dirname, '../index.tsx'), 'utf8');
+    const introSource = readFileSync(join(__dirname, '../components/VerificationIntroCard.tsx'), 'utf8');
+
+    expect(pageSource).not.toContain('<VerificationInterviewRequestForm');
+    expect(pageSource).not.toContain('handleRequestInterview');
+    expect(introSource).not.toContain('verification.summary.appointment');
+    expect(introSource).not.toContain('scheduleReady');
   });
 });

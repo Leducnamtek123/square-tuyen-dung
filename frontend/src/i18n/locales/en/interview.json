@@ -376,9 +376,17 @@
       "open": "Open chat",
       "close": "Close chat",
       "chatMode": "Chat",
-      "aiControlMode": "AI speaks",
-      "aiControlPlaceholder": "Tell AI what to ask or say...",
-      "aiControlSend": "AI say"
+      "aiControlMode": "AI says",
+      "aiControlPlaceholder": "Type what you want the AI to ask or say...",
+      "aiControlSend": "AI says",
+      "takeoverMode": "Hold AI",
+      "takeoverTitle": "Employer live",
+      "takeoverActive": "Holding AI",
+      "takeoverInactive": "AI-led",
+      "takeoverHint": "While holding AI, the AI pauses so you can speak directly with the candidate. Release control when the AI should continue.",
+      "takeoverAcquire": "Hold AI",
+      "takeoverRelease": "Release AI",
+      "takeoverSending": "Updating..."
     },
     "observingBar": {
       "hrObserving": "You are observing this interview session",

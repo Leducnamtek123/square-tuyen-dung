@@ -13,6 +13,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useResumes } from "../hooks/useJobSeekerQueries";
 import { Theme } from "@mui/material/styles";
 import { Resume } from "../../../../types/models";
+import { localizeRoutePath } from "../../../../configs/routeLocalization";
 
 interface JobApplicationExt extends Omit<Resume, 'type'> {
   isActive?: boolean;
@@ -21,9 +22,10 @@ interface JobApplicationExt extends Omit<Resume, 'type'> {
 }
 
 const JobApplicationCard = () => {
-  const { t } = useTranslation(['jobSeeker', 'common']);
+  const { t, i18n } = useTranslation(['jobSeeker', 'common']);
   const { push } = useRouter();
   const { currentUser } = useAppSelector((state) => state.user);
+  const profileHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.PROFILE}`, i18n.language);
   
   const profileId = currentUser?.jobSeekerProfile?.id || currentUser?.jobSeekerProfileId;
 
@@ -49,7 +51,7 @@ const JobApplicationCard = () => {
           aria-label={t('jobSeeker:jobApplication.aria.navigateToProfile')}
           size="medium"
           onClick={() =>
-            push(`/${ROUTES.JOB_SEEKER.PROFILE}`)
+            push(profileHref)
           }
           sx={{
             "&:hover": {

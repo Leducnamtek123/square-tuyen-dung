@@ -27,3 +27,13 @@ def test_build_session_kwargs() -> None:
         kwargs["turn_handling"]["interruption"]["min_words"]
         == config.MIN_INTERRUPTION_WORDS
     )
+
+
+def test_default_turn_timing_allows_candidate_thinking_pause() -> None:
+    kwargs = build_session_kwargs()
+
+    assert kwargs["turn_handling"]["endpointing"]["min_delay"] >= 2.0
+    assert kwargs["turn_handling"]["endpointing"]["max_delay"] >= 4.5
+    assert kwargs["min_consecutive_speech_delay"] >= 1.0
+    assert kwargs["turn_handling"]["interruption"]["min_duration"] >= 2.0
+    assert kwargs["turn_handling"]["interruption"]["min_words"] >= 5

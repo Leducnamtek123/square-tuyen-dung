@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBriefcase, faFontAwesome, faUsers } from '@fortawesome/free-solid-svg-icons';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import { ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import { formatRoute } from '@/utils/funcUtils';
 import type { Company } from '@/types/models';
 import { useTranslation } from 'react-i18next';
@@ -17,13 +18,13 @@ interface CompanyActionFollowProps {
 }
 
 const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) => {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const followRef = React.useRef<HTMLDivElement>(null);
   const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>('column');
   const theme = useTheme();
   const companyHref = company?.slug
-    ? `/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company.slug)}`
-    : '#';
+    ? localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company.slug)}`, i18n.language)
+    : undefined;
 
   React.useEffect(() => {
     const el = followRef.current;
@@ -71,13 +72,13 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                 <Box>
                   <Tooltip followCursor title={company?.companyName}>
                     <Typography
-                      component={Link}
+                      component={companyHref ? Link : 'span'}
                       href={companyHref}
-                      prefetch={Boolean(company?.slug)}
+                      prefetch={Boolean(companyHref)}
                       variant="h6"
                       sx={{
                         fontSize: 16,
-                        cursor: 'pointer',
+                        cursor: companyHref ? 'pointer' : 'default',
                         color: theme.palette.primary.main,
                         textDecoration: 'none',
                         transition: 'color 0.2s ease',

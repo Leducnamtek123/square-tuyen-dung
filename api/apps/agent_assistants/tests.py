@@ -228,6 +228,65 @@ def test_employer_agent_uses_llm_planner_for_natural_create_candidate_command(
 
 
 @pytest.mark.django_db
+def test_employer_agent_rejects_manual_candidate_values_exceeding_activity_storage_limits(
+    monkeypatch,
+    employer_user,
+    job_post,
+):
+    long_name = f"Long {'A' * 96}"
+    long_email = f"{'a' * 92}@example.com"
+
+    def fake_post_chat_completion(payload, *, default_model="", timeout=(10, 120)):
+        return (
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": (
+                                "{"
+                                "\"toolName\":\"create_manual_candidate\","
+                                "\"arguments\":{"
+                                f"\"fullName\":\"{long_name}\","
+                                f"\"email\":\"{long_email}\","
+                                "\"phone\":\"0909000000123456\","
+                                f"\"jobPostName\":\"{job_post.job_name}\""
+                                "},"
+                                "\"assistantText\":\"Toi se tao ho so ung vien.\""
+                                "}"
+                            ),
+                        }
+                    }
+                ],
+            },
+            AIEndpointCandidate(name="primary", base_url="http://llm.test/v1", model=default_model),
+        )
+
+    monkeypatch.setattr(
+        "integrations.ai.client.post_chat_completion_requests",
+        fake_post_chat_completion,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+    thread_response = client.post("/api/v1/agent-assistants/threads/", data={"portal": "employer"}, format="json")
+    thread_id = thread_response.data["data"]["id"]
+
+    response = client.post(
+        f"/api/v1/agent-assistants/threads/{thread_id}/messages/",
+        data={"content": f"Them ung vien qua dai cho vi tri {job_post.job_name}"},
+        format="json",
+    )
+
+    assert response.status_code == 200
+    tool_call = response.data["data"]["toolCalls"][0]
+    assert tool_call["toolName"] == "create_manual_candidate"
+    assert tool_call["status"] == "failed"
+    assert "Không thể tạo hồ sơ ứng viên" in tool_call["output"]["message"]
+    assert JobPostActivity.objects.filter(job_post=job_post, email=long_email, is_deleted=False).count() == 0
+
+
+@pytest.mark.django_db
 def test_employer_agent_fallback_handles_add_to_application_list_when_llm_is_unavailable(
     employer_user,
     job_post,

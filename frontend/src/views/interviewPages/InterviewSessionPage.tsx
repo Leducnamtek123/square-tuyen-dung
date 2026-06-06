@@ -29,16 +29,11 @@ import { IMAGES } from '@/configs/images';
 
 const getSafeLiveKitUrl = (preferLocal = false) => {
   if (typeof window === 'undefined') return '';
-  if (preferLocal) {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
-    return `${protocol}//${host}/livekit`.replace(/\/$/, '');
-  }
   const envUrl = (process.env.NEXT_PUBLIC_LIVEKIT_URL || '').trim();
+
   if (envUrl.startsWith('wss://')) return envUrl.replace(/\/$/, '');
 
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const host = window.location.host;
 
   if (envUrl && (envUrl.startsWith('http') || envUrl.startsWith('ws'))) {
     try {
@@ -48,7 +43,13 @@ const getSafeLiveKitUrl = (preferLocal = false) => {
     } catch {}
   }
 
+  if (preferLocal) {
+    const host = window.location.host;
+    return `${protocol}//${host}/livekit`.replace(/\/$/, '');
+  }
+
   const path = envUrl && envUrl.startsWith('/') ? envUrl : envUrl || '/livekit';
+  const host = window.location.host;
   return `${protocol}//${host}${path.startsWith('/') ? path : `/${path}`}`.replace(/\/$/, '');
 };
 

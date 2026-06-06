@@ -13,54 +13,55 @@ import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlin
 import VideoCameraFrontIcon from "@mui/icons-material/VideoCameraFront";
 import { useTranslation } from 'react-i18next';
 import { ROUTES, APP_NAME } from "../../../../configs/constants";
+import { getLocalizedRouteVariants, localizeRoutePath } from "../../../../configs/routeLocalization";
 
 const TabBar = () => {
   const pathname = usePathname();
   const { push } = useRouter();
-  const { t } = useTranslation(['jobSeeker', 'common']);
+  const { t, i18n } = useTranslation(['jobSeeker', 'common']);
 
   const tabItems = [
-    { id: 1, label: t('jobSeeker:nav.myDashboard', { appName: APP_NAME }), icon: <DashboardIcon />, path: `/${ROUTES.JOB_SEEKER.DASHBOARD}` },
+    { id: 1, label: t('jobSeeker:nav.myDashboard', { appName: APP_NAME }), icon: <DashboardIcon />, path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.DASHBOARD}`, i18n.language) },
     {
       id: 2,
       label: t('jobSeeker:nav.profile'),
       icon: <AssignmentIndIcon />,
-      path: `/${ROUTES.JOB_SEEKER.PROFILE}`,
+      path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.PROFILE}`, i18n.language),
     },
     {
       id: 3,
       label: t('jobSeeker:nav.jobs'),
       icon: <WorkIcon />,
-      path: `/${ROUTES.JOB_SEEKER.MY_JOB}`,
+      path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.MY_JOB}`, i18n.language),
     },
     {
       id: 4,
       label: t('jobSeeker:nav.myCompany'),
       icon: <ApartmentIcon />,
-      path: `/${ROUTES.JOB_SEEKER.MY_COMPANY}`,
+      path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.MY_COMPANY}`, i18n.language),
     },
     {
       id: 5,
       label: t('jobSeeker:nav.myInterviews'),
       icon: <VideoCameraFrontIcon />,
-      path: `/${ROUTES.JOB_SEEKER.MY_INTERVIEWS}`,
+      path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.MY_INTERVIEWS}`, i18n.language),
     },
     {
       id: 6,
       label: t('jobSeeker:nav.notifications'),
       icon: <CircleNotificationsIcon />,
-      path: `/${ROUTES.JOB_SEEKER.NOTIFICATION}`,
+      path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NOTIFICATION}`, i18n.language),
     },
     {
       id: 7,
       label: t('jobSeeker:nav.accountSettings'),
       icon: <ManageAccountsOutlinedIcon />,
-      path: `/${ROUTES.JOB_SEEKER.ACCOUNT}`,
+      path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.ACCOUNT}`, i18n.language),
     },
   ];
 
   const activeTabIndex = tabItems.findLastIndex((tab) =>
-    pathname.includes(tab.path)
+    getLocalizedRouteVariants(tab.path).some((path) => pathname.includes(path))
   );
 
   const [value, setValue] = React.useState(activeTabIndex !== -1 ? activeTabIndex : 0);
@@ -90,7 +91,7 @@ const TabBar = () => {
         variant="scrollable"
         scrollButtons
         allowScrollButtonsMobile
-        aria-label="nav tabs job seeker"
+        aria-label={t('jobSeeker:nav.tabsAria')}
         sx={{
           minHeight: '60px',
           '& .MuiTabs-scroller': {

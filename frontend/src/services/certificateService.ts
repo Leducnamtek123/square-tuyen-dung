@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { unwrapDataResponse } from '../utils/apiResponse';
 import type { Certificate } from '../types/models';
 
 type IdType = string | number;
@@ -18,17 +19,17 @@ interface CertificateInput {
 const certificateService = {
   addCertificates: (data: CertificateInput): Promise<Certificate> => {
     const url = `info/web/certificates-detail/`;
-    return httpRequest.post(url, data);
+    return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<Certificate>);
   },
 
   getCertificateById: (id: IdType): Promise<Certificate> => {
     const url = `info/web/certificates-detail/${id}/`;
-    return httpRequest.get(url);
+    return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<Certificate>);
   },
 
   updateCertificateById: (id: IdType, data: CertificateInput): Promise<Certificate> => {
     const url = `info/web/certificates-detail/${id}/`;
-    return httpRequest.put(url, data);
+    return (httpRequest.put(url, data) as Promise<unknown>).then(unwrapDataResponse<Certificate>);
   },
 
   deleteCertificateById: (id: IdType): Promise<void> => {

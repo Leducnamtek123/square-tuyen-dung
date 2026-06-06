@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Box, Divider, List, Toolbar, useTheme } from "@mui/material";
 import { IMAGES, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import Link from 'next/link';
 import AdminMenu from './AdminMenu';
 import EmployerMenu from './EmployerMenu';
@@ -12,10 +13,14 @@ import EmployerMenu from './EmployerMenu';
 const shellHeaderHeight = { xs: 56, sm: 64 };
 
 const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
-  const { t } = useTranslation(['admin', 'employer']);
+  const { t, i18n } = useTranslation(['admin', 'employer']);
   const pathname = usePathname();
   const location = { pathname, search: '', state: null, key: '' };
   const theme = useTheme();
+  const dashboardHref = localizeRoutePath(
+    `/${isAdmin ? ROUTES.ADMIN.DASHBOARD : ROUTES.EMPLOYER.DASHBOARD}`,
+    i18n.language
+  );
 
   const [expandedItems, setExpandedItems] = useState({
     candidates: true,
@@ -41,7 +46,7 @@ const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
       <Toolbar disableGutters sx={{ px: 2, py: 0, minHeight: shellHeaderHeight, height: shellHeaderHeight, flexShrink: 0 }}>
         <Box
           component={Link}
-          href={`/${isAdmin ? ROUTES.ADMIN.DASHBOARD : ROUTES.EMPLOYER.DASHBOARD}`}
+          href={dashboardHref}
           sx={{
             width: '100%',
             display: 'flex',
@@ -61,9 +66,9 @@ const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
       <Box sx={{ px: 1.5, py: 1.5, flexGrow: 1, overflowY: 'auto' }}>
         <List component="nav" disablePadding>
           {isAdmin ? (
-            <AdminMenu t={t} location={location} expandedItems={expandedItems} handleExpand={handleExpand} />
+            <AdminMenu t={t} location={location} expandedItems={expandedItems} handleExpand={handleExpand} language={i18n.language} />
           ) : (
-            <EmployerMenu t={t} location={location} expandedItems={expandedItems} handleExpand={handleExpand} />
+            <EmployerMenu t={t} location={location} expandedItems={expandedItems} handleExpand={handleExpand} language={i18n.language} />
           )}
           <Divider sx={{ my: 2, borderColor: 'grey.300' }} />
         </List>

@@ -38,4 +38,29 @@ describe('hrmService', () => {
     await hrmService.getIntegrationStatus();
     expect(httpRequest.get).toHaveBeenCalledWith('hrm/web/integration-status/');
   });
+
+  it('unwraps nested HRM bridge response payloads', async () => {
+    const syncResult = {
+      id: 10,
+      applicationId: 10,
+      hrmEmployeeId: 'HR-EMP-0001',
+      hrmUserId: 'candidate@example.com',
+      hrmSyncStatus: 'SYNCED',
+    };
+    const provisionResult = { userId: 'hr@example.com', companyId: 'Square' };
+    const integrationStatus = {
+      enabled: true,
+      baseUrl: 'https://hrm.square.vn',
+      siteName: 'Square HRM',
+    };
+
+    (httpRequest.post as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: syncResult } })
+      .mockResolvedValueOnce({ data: { data: provisionResult } });
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: integrationStatus } });
+
+    await expect(hrmService.createEmployeeFromApplication({ applicationId: 10 })).resolves.toEqual(syncResult);
+    await expect(hrmService.provisionCurrentUser()).resolves.toEqual(provisionResult);
+    await expect(hrmService.getIntegrationStatus()).resolves.toEqual(integrationStatus);
+  });
 });

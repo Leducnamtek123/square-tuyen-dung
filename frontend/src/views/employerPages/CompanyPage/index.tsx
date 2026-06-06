@@ -32,7 +32,7 @@ const CompanyPage = () => {
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <TabList
                         onChange={selectCompanyTab}
-                        aria-label="company tabs"
+                        aria-label={t("company.tabs.ariaLabel")}
                         sx={{
                             minHeight: 44,
                             '& .MuiTabs-indicator': {

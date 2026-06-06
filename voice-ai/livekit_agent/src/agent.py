@@ -34,6 +34,7 @@ logger.setLevel(logging.INFO)
 
 CHAT_TOPIC = "lk.chat"
 AI_CONTROL_TOPIC = "square.interview.ai_control"
+AI_TAKEOVER_TOPIC = "square.interview.ai_takeover"
 EMPLOYER_CONTROL_ROLES = {"employer", "observer"}
 _BACKGROUND_TASKS: set[asyncio.Task[Any]] = set()
 
@@ -146,6 +147,27 @@ def _participant_display_name(participant, fallback: str = "") -> str:
         or str(metadata.get("company_name", "") or "")
         or fallback
     ).strip()
+
+
+def _takeover_action_from_text(text: str) -> str | None:
+    normalized = (text or "").strip()
+    if not normalized:
+        return None
+
+    try:
+        payload = json.loads(normalized)
+    except Exception:
+        payload = None
+
+    if isinstance(payload, dict):
+        normalized = str(payload.get("action") or "").strip()
+
+    action = normalized.lower()
+    if action in {"acquire", "hold", "takeover", "start"}:
+        return "acquire"
+    if action in {"release", "resume", "stop", "end"}:
+        return "release"
+    return None
 
 
 @server.rtc_session(agent_name="square-ai-interviewer")
@@ -330,16 +352,53 @@ async def entrypoint(ctx: JobContext) -> None:
             ctx.room.name,
             participant_identity,
             text,
-        )
-        try:
-            await session.interrupt(force=True)
-        except Exception as exc:
-            logger.info(
-                "Skipping interrupt before employer control reply for room %s: %s",
-                ctx.room.name,
-                exc,
             )
         await interviewer.handle_employer_instruction(text, speaker_name=speaker_name)
+
+    async def _handle_employer_takeover_stream(reader, participant_identity) -> None:
+        participant_identity = _participant_identity(participant_identity)
+        text = (await reader.read_all()).strip()
+        action = _takeover_action_from_text(text)
+        if action is None:
+            logger.info(
+                "Ignoring unknown AI takeover control in room %s from %s: %s",
+                ctx.room.name,
+                participant_identity,
+                text,
+            )
+            return
+
+        participant = await _wait_for_participant(participant_identity)
+        participant_role = _participant_role(participant, participant_identity)
+        if participant_role not in EMPLOYER_CONTROL_ROLES:
+            logger.info(
+                "Ignoring AI takeover control in room %s from %s role=%s",
+                ctx.room.name,
+                participant_identity,
+                participant_role,
+            )
+            return
+
+        speaker_name = _participant_display_name(participant, "Nhà tuyển dụng")
+        logger.info(
+            "Received employer takeover %s for room %s from %s",
+            action,
+            ctx.room.name,
+            participant_identity,
+        )
+        if action == "acquire":
+            try:
+                await session.interrupt(force=True)
+            except Exception as exc:
+                logger.info(
+                    "Skipping interrupt before employer takeover for room %s: %s",
+                    ctx.room.name,
+                    exc,
+                )
+            interviewer.pause_for_employer_takeover(speaker_name)
+            return
+
+        interviewer.resume_from_employer_takeover(speaker_name)
 
     # 4. Setup Session (Standard 1.5.x Pattern)
     session = AgentSession(
@@ -444,6 +503,12 @@ async def entrypoint(ctx: JobContext) -> None:
         AI_CONTROL_TOPIC,
         lambda reader, participant_identity: asyncio.create_task(
             _handle_employer_control_stream(reader, participant_identity)
+        ),
+    )
+    ctx.room.register_text_stream_handler(
+        AI_TAKEOVER_TOPIC,
+        lambda reader, participant_identity: asyncio.create_task(
+            _handle_employer_takeover_stream(reader, participant_identity)
         ),
     )
 

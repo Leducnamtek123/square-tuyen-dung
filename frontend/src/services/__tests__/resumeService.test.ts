@@ -51,6 +51,17 @@ describe('resumeService', () => {
     await expect(resumeService.viewResume('cv-a')).resolves.toEqual({ viewed: true });
   });
 
+  it('unwraps nested resume save and active status responses', async () => {
+    (httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: { isSaved: true } } });
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: { isActive: false } } });
+
+    await expect(resumeService.saveResume('cv-a')).resolves.toEqual({ isSaved: true });
+    await expect(resumeService.activeResume('cv-a')).resolves.toEqual({ isActive: false });
+
+    expect(httpRequest.post).toHaveBeenCalledWith('info/web/resumes/cv-a/resume-saved/');
+    expect(httpRequest.get).toHaveBeenCalledWith('info/web/private-resumes/cv-a/resume-active/');
+  });
+
   it('keeps active resume typed as the backend status payload', () => {
     const serviceSource = fs.readFileSync(path.join(process.cwd(), 'src/services/resumeService.ts'), 'utf8');
 

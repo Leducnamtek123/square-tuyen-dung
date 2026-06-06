@@ -4,7 +4,6 @@ import React, { useMemo, useReducer, useRef } from 'react';
 import {
   Avatar,
   Box,
-  Breadcrumbs,
   Button,
   Chip,
   Dialog,
@@ -13,7 +12,6 @@ import {
   DialogTitle,
   FormHelperText,
   IconButton,
-  Link,
   Paper,
   Stack,
   TextField,
@@ -529,13 +527,6 @@ const CareersPage = () => {
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
             {t('pages.careers.title')}
           </Typography>
-          <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/admin">
-              {t('pages.careers.breadcrumbAdmin')}
-            </Link>
-            <Typography color="text.primary">{t('pages.careers.breadcrumbResources')}</Typography>
-            <Typography color="text.primary">{t('pages.careers.breadcrumbCareers')}</Typography>
-          </Breadcrumbs>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}>
           {t('pages.careers.add')}

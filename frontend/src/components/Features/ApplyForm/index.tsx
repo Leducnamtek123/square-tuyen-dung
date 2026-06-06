@@ -15,6 +15,7 @@ import errorHandling from "@/utils/errorHandling";
 import { CV_TYPES, REGEX_VALIDATE, ROUTES } from "@/configs/constants";
 import TextFieldCustom from "@/components/Common/Controls/TextFieldCustom";
 import jobSeekerProfileService from "@/services/jobSeekerProfileService";
+import { localizeRoutePath } from "@/configs/routeLocalization";
 import { formatRoute } from "@/utils/funcUtils";
 import { useAppSelector } from "@/hooks/useAppStore";
 import type { Resume } from "@/types/models";
@@ -61,7 +62,7 @@ const applyFormReducer = (state: ApplyFormState, action: ApplyFormAction): Apply
 };
 
 const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) => {
-  const { t } = useTranslation("public");
+  const { t, i18n } = useTranslation("public");
   const theme = useTheme();
   const { push } = useRouter();
   const { currentUser } = useAppSelector((state) => state.user);
@@ -125,6 +126,16 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
   }, [jobSeekerProfileId]);
 
   const selectedResumeId = watch("resume");
+  const profileHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.PROFILE}`, i18n.language);
+  const getResumePreviewHref = (resume: Resume) => localizeRoutePath(
+    `/${formatRoute(
+      resume.type === CV_TYPES.cvWebsite
+        ? ROUTES.JOB_SEEKER.STEP_PROFILE
+        : ROUTES.JOB_SEEKER.ATTACHED_PROFILE,
+      resume.slug,
+    )}`,
+    i18n.language,
+  );
 
   React.useEffect(() => {
     if (state.resumes.length === 0) return;
@@ -166,7 +177,7 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                     variant="contained"
                     color="primary"
                     size="small"
-                    onClick={() => push(`/${ROUTES.JOB_SEEKER.PROFILE}`)}
+                    onClick={() => push(profileHref)}
                     sx={{ textTransform: "none" }}
                   >
                     {t("applyForm.resume.createNow")}
@@ -227,11 +238,8 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                           />
                           <Link
                             target="_blank"
-                            href={
-                              value.type === CV_TYPES.cvWebsite
-                                ? `/${formatRoute(ROUTES.JOB_SEEKER.STEP_PROFILE, value.slug)}`
-                                : `/${formatRoute(ROUTES.JOB_SEEKER.ATTACHED_PROFILE, value.slug)}`
-                            }
+                            rel="noopener noreferrer"
+                            href={getResumePreviewHref(value)}
                             sx={{
                               textDecoration: "none",
                               color: "primary.main",

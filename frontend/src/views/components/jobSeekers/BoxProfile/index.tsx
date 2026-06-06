@@ -34,6 +34,7 @@ import { reloadResume } from "../../../../redux/profileSlice";
 import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
 import resumeService from "../../../../services/resumeService";
 import { formatRoute } from "../../../../utils/funcUtils";
+import { localizeRoutePath } from "@/configs/routeLocalization";
 import ColorPickerDialog from '../../../../components/Common/ColorPickerDialog';
 import { useTranslation } from "react-i18next";
 import { tConfig } from '../../../../utils/tConfig';
@@ -111,6 +112,9 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
   const resume = React.useMemo(() => {
     return (resumes && resumes.length > 0 ? resumes[0] : null);
   }, [resumes]);
+  const resumeEditHref = resume?.slug
+    ? localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.STEP_PROFILE, resume.slug)}`, i18n.language)
+    : undefined;
 
   // Sync Redux reloadCounter invalidation
   React.useEffect(() => {
@@ -332,7 +336,12 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                   <Button
                     variant="contained"
                     startIcon={<EditIcon />}
-                    onClick={() => push(`/${formatRoute(ROUTES.JOB_SEEKER.STEP_PROFILE, resume.slug)}`)}
+                    disabled={!resumeEditHref}
+                    onClick={() => {
+                      if (resumeEditHref) {
+                        push(resumeEditHref);
+                      }
+                    }}
                     sx={{
                       px: 4, py: 1, fontSize: "1rem",
                       background: (theme) => theme.palette.primary.main,

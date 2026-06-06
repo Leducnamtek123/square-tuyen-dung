@@ -58,6 +58,57 @@ describe('localizeRoutePath', () => {
     expect(result).toContain('#section');
   });
 
+  it('uses employer-specific localized chat route instead of the job seeker chat segment', () => {
+    expect(localizeRoutePath('/employer/chat', 'vi')).toBe('/nha-tuyen-dung/ket-noi-voi-ung-vien');
+    expect(localizeRoutePath('/chat', 'vi')).toBe('/ket-noi-voi-nha-tuyen-dung');
+  });
+
+  it('uses full rewrite patterns for compound employer routes', () => {
+    expect(localizeRoutePath('/employer/interviews/create?candidate=1', 'vi')).toBe(
+      '/nha-tuyen-dung/len-lich-phong-van?candidate=1'
+    );
+    expect(localizeRoutePath('/employer/interviews/live', 'vi')).toBe(
+      '/nha-tuyen-dung/phong-van-ung-vien-truc-tiep'
+    );
+    expect(localizeRoutePath('/employer/interviews/history', 'vi')).toBe(
+      '/nha-tuyen-dung/thu-vien-video-phong-van'
+    );
+  });
+
+  it('translates contextual VI employer routes back to canonical EN routes', () => {
+    expect(localizeRoutePath('/nha-tuyen-dung/ket-noi-voi-ung-vien', 'en')).toBe('/employer/chat');
+    expect(localizeRoutePath('/nha-tuyen-dung/len-lich-phong-van?candidate=1', 'en')).toBe(
+      '/employer/interviews/create?candidate=1'
+    );
+    expect(localizeRoutePath('/nha-tuyen-dung/thu-vien-video-phong-van', 'en')).toBe(
+      '/employer/interviews/history'
+    );
+  });
+
+  it('uses localized VI slugs for admin content routes', () => {
+    expect(localizeRoutePath('/admin/banners', 'vi')).toBe('/quan-tri/quan-ly-banner');
+    expect(localizeRoutePath('/admin/feedbacks', 'vi')).toBe('/quan-tri/quan-ly-danh-gia');
+    expect(localizeRoutePath('/admin/articles', 'vi')).toBe('/quan-tri/tin-tuc-blog');
+    expect(localizeRoutePath('/admin/articles/create', 'vi')).toBe('/quan-tri/tin-tuc-blog/tao-moi');
+    expect(localizeRoutePath('/admin/articles/:id', 'vi')).toBe('/quan-tri/tin-tuc-blog/:id');
+    expect(localizeRoutePath('/admin/chat', 'vi')).toBe('/quan-tri/ket-noi-voi-nha-tuyen-dung');
+    expect(localizeRoutePath('/admin/interview-preview', 'vi')).toBe(
+      '/quan-tri/xem-truoc-giao-dien-phong-van'
+    );
+  });
+
+  it('translates localized VI admin content routes back to canonical EN routes', () => {
+    expect(localizeRoutePath('/quan-tri/quan-ly-banner', 'en')).toBe('/admin/banners');
+    expect(localizeRoutePath('/quan-tri/quan-ly-danh-gia', 'en')).toBe('/admin/feedbacks');
+    expect(localizeRoutePath('/quan-tri/tin-tuc-blog', 'en')).toBe('/admin/articles');
+    expect(localizeRoutePath('/quan-tri/tin-tuc-blog/tao-moi', 'en')).toBe('/admin/articles/create');
+    expect(localizeRoutePath('/quan-tri/tin-tuc-blog/:id', 'en')).toBe('/admin/articles/:id');
+    expect(localizeRoutePath('/quan-tri/ket-noi-voi-nha-tuyen-dung', 'en')).toBe('/admin/chat');
+    expect(localizeRoutePath('/quan-tri/xem-truoc-giao-dien-phong-van', 'en')).toBe(
+      '/admin/interview-preview'
+    );
+  });
+
   it('handles empty path', () => {
     expect(localizeRoutePath('', 'vi')).toBe('');
   });
@@ -109,6 +160,31 @@ describe('generateRewrites', () => {
     expect(hasEmployerRule).toBe(true);
     expect(hasAdminRule).toBe(true);
     expect(hasInterviewRule).toBe(true);
+  });
+
+  it('includes the employer interview history localized route', () => {
+    const rewrites = generateRewrites();
+
+    expect(rewrites).toContainEqual({
+      source: '/nha-tuyen-dung/thu-vien-video-phong-van',
+      destination: '/employer/interviews/history',
+    });
+  });
+
+  it('includes explicit admin content localized routes instead of relying on catch-all rewrites', () => {
+    const rewrites = generateRewrites();
+
+    expect(rewrites).toEqual(
+      expect.arrayContaining([
+        { source: '/quan-tri/quan-ly-banner', destination: '/admin/banners' },
+        { source: '/quan-tri/quan-ly-danh-gia', destination: '/admin/feedbacks' },
+        { source: '/quan-tri/tin-tuc-blog', destination: '/admin/articles' },
+        { source: '/quan-tri/tin-tuc-blog/tao-moi', destination: '/admin/articles/create' },
+        { source: '/quan-tri/tin-tuc-blog/:id', destination: '/admin/articles/:id' },
+        { source: '/quan-tri/ket-noi-voi-nha-tuyen-dung', destination: '/admin/chat' },
+        { source: '/quan-tri/xem-truoc-giao-dien-phong-van', destination: '/admin/interview-preview' },
+      ])
+    );
   });
 });
 

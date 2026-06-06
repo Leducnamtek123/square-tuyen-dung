@@ -19,7 +19,7 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
-import { LiveKitRoom } from '@livekit/components-react';
+import { LiveKitRoom, RoomAudioRenderer } from '@livekit/components-react';
 import { useTranslation } from 'react-i18next';
 import { type InterviewSession } from '../../../../types/models';
 import { ElapsedTimer, LiveObserverVisualizer, normalizeStatus } from './InterviewLiveCandidateCardPresence';
@@ -122,6 +122,7 @@ const InterviewLiveCandidateCardPanel = ({
               style={{ height: '100%', width: '100%' }}
             >
               <AIInterviewLayout onEndSession={onLeaveHR} />
+              <RoomAudioRenderer />
             </LiveKitRoom>
           </Box>
         </DialogContent>

@@ -41,6 +41,7 @@
     },
     "status": "Ready",
     "placeholder": "Type a message...",
+    "panelAria": "Square AI chat",
     "launcherAria": "Open Square AI assistant",
     "closeAria": "Close chat",
     "retry": "Retry"

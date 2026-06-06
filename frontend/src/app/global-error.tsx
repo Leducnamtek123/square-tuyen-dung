@@ -4,6 +4,11 @@ import { useEffect } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import i18n from '@/i18n';
 
+const getDocumentLanguage = () => {
+  const language = (i18n.language || 'vi').split('-')[0].split('_')[0].toLowerCase();
+  return language === 'en' ? 'en' : 'vi';
+};
+
 export default function GlobalError({
   error,
   reset,
@@ -16,7 +21,7 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html lang="vi">
+    <html lang={getDocumentLanguage()}>
       <body>
         <Box
           sx={{

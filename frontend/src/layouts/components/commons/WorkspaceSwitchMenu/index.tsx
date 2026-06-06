@@ -7,6 +7,8 @@ import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import { HOST_NAME, ROUTES } from "../../../../configs/constants";
+import { localizeRoutePath } from "../../../../configs/routeLocalization";
+import { getPreferredLanguage } from "../../../../configs/portalRouting";
 import { setActiveWorkspace } from "../../../../redux/userSlice";
 
 type WorkspaceItem = {
@@ -40,9 +42,10 @@ const WorkspaceSwitchMenu = () => {
     const protocol = window.location.protocol;
     const port = window.location.port ? `:${window.location.port}` : "";
     const mainHost = HOST_NAME.PROJECT;
-    const targetUrl = toEmployer
-      ? `${protocol}//${mainHost}${port}${normalizedPath || `/${ROUTES.EMPLOYER.DASHBOARD}`}`
-      : `${protocol}//${mainHost}${port}${normalizedPath}`;
+    const employerFallbackPath = `/${ROUTES.EMPLOYER.DASHBOARD}`;
+    const targetPath = toEmployer && !normalizedPath ? employerFallbackPath : normalizedPath;
+    const localizedPath = targetPath ? localizeRoutePath(targetPath, getPreferredLanguage()) : "";
+    const targetUrl = `${protocol}//${mainHost}${port}${localizedPath}`;
     window.location.href = targetUrl;
   };
 
@@ -100,4 +103,3 @@ const WorkspaceSwitchMenu = () => {
 };
 
 export default WorkspaceSwitchMenu;
-

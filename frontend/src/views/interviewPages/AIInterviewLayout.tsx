@@ -8,6 +8,7 @@ import {
   useRoomContext,
   useTracks,
   useVoiceAssistant,
+  StartAudio,
   VideoTrack,
   type AgentState,
   type ReceivedMessage,
@@ -37,8 +38,9 @@ import {
 import { useInterviewMessages } from './useInterviewMessages';
 
 const AI_CONTROL_TOPIC = 'square.interview.ai_control';
+const AI_TAKEOVER_TOPIC = 'square.interview.ai_takeover';
 
-type ChatComposerMode = 'chat' | 'aiControl';
+type ChatComposerMode = 'chat' | 'aiControl' | 'takeover';
 
 function useLiveTimer() {
   const [time, setTime] = useState(0);
@@ -430,6 +432,10 @@ function ChatPanel({
   setComposerMode,
   canControlAI,
   isControlSending,
+  takeoverActive,
+  isTakeoverSending,
+  onTakeoverAcquire,
+  onTakeoverRelease,
   agentState,
 }: {
   messages: ReceivedMessage[];
@@ -441,6 +447,10 @@ function ChatPanel({
   setComposerMode: (value: ChatComposerMode) => void;
   canControlAI: boolean;
   isControlSending: boolean;
+  takeoverActive: boolean;
+  isTakeoverSending: boolean;
+  onTakeoverAcquire: () => void;
+  onTakeoverRelease: () => void;
   agentState?: AgentState;
 }) {
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -524,6 +534,7 @@ function ChatPanel({
             component="form"
             onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
               event.preventDefault();
+              if (composerMode === 'takeover') return;
               onSend();
             }}
             sx={{
@@ -568,33 +579,93 @@ function ChatPanel({
                   <FontAwesomeIcon icon={faMicrophone} />
                   {t('liveRoom.chat.aiControlMode')}
                 </ToggleButton>
+                <ToggleButton value="takeover">
+                  <FontAwesomeIcon icon={faVideo} />
+                  {t('liveRoom.chat.takeoverMode')}
+                </ToggleButton>
               </ToggleButtonGroup>
             )}
-            <Stack direction="row" spacing={1}>
-              <input
-                aria-label={inputPlaceholder}
-                value={chatDraft}
-                onChange={(event) => setChatDraft(event.target.value)}
-                placeholder={inputPlaceholder}
-                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40 focus:bg-white/8"
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={!chatDraft.trim() || sending}
+            {composerMode === 'takeover' ? (
+              <Paper
+                elevation={0}
                 sx={{
+                  p: 1.5,
                   borderRadius: 2.5,
-                  minWidth: 76,
-                  fontWeight: 800,
-                  textTransform: 'none',
-                  bgcolor: '#38bdf8',
-                  '&:hover': { bgcolor: '#0ea5e9' },
-                  '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.35)' },
+                  border: '1px solid',
+                  borderColor: takeoverActive ? alpha('#22c55e', 0.28) : alpha('#f59e0b', 0.22),
+                  bgcolor: takeoverActive ? alpha('#22c55e', 0.08) : alpha('#f59e0b', 0.08),
                 }}
               >
-                {sendLabel}
-              </Button>
-            </Stack>
+                <Stack spacing={1.25}>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Chip
+                      label={takeoverActive ? t('liveRoom.chat.takeoverActive') : t('liveRoom.chat.takeoverInactive')}
+                      size="small"
+                      sx={{
+                        height: 22,
+                        fontSize: '0.62rem',
+                        fontWeight: 900,
+                        bgcolor: takeoverActive ? alpha('#22c55e', 0.16) : alpha('#f59e0b', 0.16),
+                        color: takeoverActive ? '#86efac' : '#fbbf24',
+                        border: '1px solid',
+                        borderColor: takeoverActive ? alpha('#22c55e', 0.28) : alpha('#f59e0b', 0.28),
+                      }}
+                    />
+                    <Typography variant="caption" sx={{ color: '#fff', fontWeight: 900 }}>
+                      {t('liveRoom.chat.takeoverTitle')}
+                    </Typography>
+                  </Stack>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.65)', lineHeight: 1.6 }}>
+                    {t('liveRoom.chat.takeoverHint')}
+                  </Typography>
+                  <Button
+                    type="button"
+                    variant="contained"
+                    disabled={isTakeoverSending}
+                    onClick={takeoverActive ? onTakeoverRelease : onTakeoverAcquire}
+                    sx={{
+                      borderRadius: 2.5,
+                      fontWeight: 850,
+                      textTransform: 'none',
+                      bgcolor: takeoverActive ? '#ef4444' : '#22c55e',
+                      '&:hover': { bgcolor: takeoverActive ? '#dc2626' : '#16a34a' },
+                    }}
+                  >
+                    {isTakeoverSending
+                      ? t('liveRoom.chat.takeoverSending')
+                      : takeoverActive
+                        ? t('liveRoom.chat.takeoverRelease')
+                        : t('liveRoom.chat.takeoverAcquire')}
+                  </Button>
+                </Stack>
+              </Paper>
+            ) : (
+              <Stack direction="row" spacing={1}>
+                <input
+                  aria-label={inputPlaceholder}
+                  value={chatDraft}
+                  onChange={(event) => setChatDraft(event.target.value)}
+                  placeholder={inputPlaceholder}
+                  className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40 focus:bg-white/8"
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={!chatDraft.trim() || sending}
+                  sx={{
+                    borderRadius: 2.5,
+                    minWidth: 76,
+                    fontWeight: 800,
+                    textTransform: 'none',
+                    bgcolor: '#38bdf8',
+                    '&:hover': { bgcolor: '#0ea5e9' },
+                    '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.35)' },
+                  }}
+                >
+                  {sendLabel}
+                </Button>
+              </Stack>
+            )}
           </Box>
         </Box>
       </div>
@@ -611,6 +682,8 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   const [chatDraft, setChatDraft] = useState('');
   const [composerMode, setComposerMode] = useState<ChatComposerMode>('chat');
   const [isControlSending, setIsControlSending] = useState(false);
+  const [takeoverActive, setTakeoverActive] = useState(false);
+  const [isTakeoverSending, setIsTakeoverSending] = useState(false);
   const timeFormatted = useLiveTimer();
   const participants = useParticipants();
   const { localParticipant } = useLocalParticipant();
@@ -631,7 +704,8 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
     { updateOnlyOn: [], onlySubscribed: false },
   );
 
-  const isLocalEmployer = getParticipantRole(localParticipant) === 'employer';
+  const localParticipantRole = getParticipantRole(localParticipant);
+  const isLocalEmployer = localParticipantRole === 'employer';
   const otherEmployerCount = participants.filter((participant) => !participant.isLocal && getParticipantRole(participant) === 'employer').length;
   const candidatePresent = participants.some((participant) => getParticipantRole(participant) === 'candidate');
 
@@ -647,7 +721,8 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   }
 
   const candidateTrack =
-    finalTracks.find((track) => track.participant?.isLocal || getParticipantRole(track.participant) === 'candidate') ?? undefined;
+    finalTracks.find((track) => getParticipantRole(track.participant) === 'candidate') ??
+    (!isLocalEmployer ? finalTracks.find((track) => track.participant?.isLocal) : undefined);
   const agentTrack =
     finalTracks.find((track) => {
       const role = getParticipantRole(track.participant);
@@ -659,6 +734,8 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   if (employerWithCamera) {
     finalTracks = finalTracks.filter((track) => !isLiveKitAgentParticipant(track.participant));
   }
+  const secondaryTrack = takeoverActive && employerWithCamera ? employerWithCamera : agentTrack;
+  const secondaryVariant: 'agent' | 'candidate' = takeoverActive && employerWithCamera ? 'candidate' : 'agent';
 
   let showObservingBar = false;
   let observingMessage = '';
@@ -674,10 +751,33 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   }
 
   useEffect(() => {
-    if (!isLocalEmployer && composerMode === 'aiControl') {
+    if (!isLocalEmployer && (composerMode === 'aiControl' || composerMode === 'takeover')) {
       setComposerMode('chat');
     }
-  }, [composerMode, isLocalEmployer]);
+    if (!isLocalEmployer && takeoverActive) {
+      setTakeoverActive(false);
+    }
+  }, [composerMode, isLocalEmployer, takeoverActive]);
+
+  const sendTakeoverControl = React.useCallback(async (action: 'acquire' | 'release') => {
+    if (!isLocalEmployer) return;
+    setIsTakeoverSending(true);
+    try {
+      await room.localParticipant.sendText(JSON.stringify({ action }), {
+        topic: AI_TAKEOVER_TOPIC,
+        attributes: { kind: 'employer_takeover', action },
+      });
+      if (action === 'acquire') {
+        setTakeoverActive(true);
+        await localParticipant.setMicrophoneEnabled(true);
+      } else {
+        setTakeoverActive(false);
+        await localParticipant.setMicrophoneEnabled(false);
+      }
+    } finally {
+      setIsTakeoverSending(false);
+    }
+  }, [isLocalEmployer, localParticipant, room.localParticipant]);
 
   return (
     <div className="relative flex h-full w-full overflow-hidden bg-[#020617]">
@@ -696,12 +796,12 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
                 agentSid={agentSid}
               />
               <AIParticipantTile
-                variant="agent"
+                variant={secondaryVariant}
                 candidateLabel={candidateLabel}
-                trackRef={agentTrack}
-                audioTrack={voiceAssistant.audioTrack}
+                trackRef={secondaryTrack}
+                audioTrack={secondaryVariant === 'agent' ? voiceAssistant.audioTrack : undefined}
                 hasAgentTranscript={hasAgentTranscript}
-                hasDetectedAgent={Boolean(agentParticipant)}
+                hasDetectedAgent={secondaryVariant === 'agent' && Boolean(agentParticipant)}
                 agentState={voiceAssistant.state}
                 agentIdentity={agentIdentity}
                 agentSid={agentSid}
@@ -766,8 +866,17 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
           setComposerMode={setComposerMode}
           canControlAI={isLocalEmployer}
           isControlSending={isControlSending}
+          takeoverActive={takeoverActive}
+          isTakeoverSending={isTakeoverSending}
+          onTakeoverAcquire={() => {
+            void sendTakeoverControl('acquire');
+          }}
+          onTakeoverRelease={() => {
+            void sendTakeoverControl('release');
+          }}
         />
       )}
+      <StartAudio label={t('controls.enableAudio')} />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import JobPostAction from '../../../../components/Features/JobPostAction';
 import toastMessages from '../../../../utils/toastMessages';
 import { useTranslation } from 'react-i18next';
 import { useSavedJobs, useToggleSaveJob } from '../hooks/useJobSeekerQueries';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 
 interface JobPost {
   id: string | number;
@@ -30,8 +31,9 @@ interface JobPost {
 const pageSize = 10;
 
 const SavedJobCard = () => {
-  const { t } = useTranslation(['jobSeeker', 'common']);
+  const { t, i18n } = useTranslation(['jobSeeker', 'common']);
   const [page, setPage] = React.useState(1);
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
 
   const { data, isLoading } = useSavedJobs({ pageSize, page });
   const jobPosts = (data?.results || []) as Array<JobPost>;
@@ -68,11 +70,11 @@ const SavedJobCard = () => {
             title={t('jobSeeker:jobManagement.empty.saved')}
             svgKey="ImageSvg5"
           >
-            <Button
-              component={Link}
-              href={`/${ROUTES.JOB_SEEKER.JOBS}`}
-              variant="contained"
-              color="primary"
+              <Button
+                component={Link}
+                href={jobsHref}
+                variant="contained"
+                color="primary"
               sx={{ textTransform: 'inherit' }}
             >
               {t('jobSeeker:jobManagement.actions.searchJobs')}

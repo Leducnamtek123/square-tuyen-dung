@@ -18,7 +18,6 @@ type Props = {
     loading: boolean;
     analyzing: boolean;
     phase: 'idle' | 'processing' | 'completed' | 'failed';
-    canEmbedResume: boolean;
   };
   stats: { matchingSkills: number; missingSkills: number; totalSkills: number };
   onAnalyze: () => void;
@@ -42,7 +41,7 @@ const AIAnalysisDrawerView = ({
   onSaveReview,
   t,
 }: Props) => {
-  const { loading, analyzing, canEmbedResume } = analysisState;
+  const { loading, analyzing } = analysisState;
   const isProcessing = analysisState.phase === 'processing';
   const isCompleted = analysisState.phase === 'completed';
   const isFailed = analysisState.phase === 'failed';
@@ -85,7 +84,6 @@ const AIAnalysisDrawerView = ({
           <AIAnalysisDrawerResumeSection
             resumeFileUrl={resumeFileUrl}
             onlineProfileUrl={onlineProfileUrl}
-            canEmbedResume={canEmbedResume}
             isProcessing={isProcessing}
             scanLinePosition={scanLinePosition}
             t={t}
