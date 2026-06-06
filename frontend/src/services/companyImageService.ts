@@ -1,5 +1,6 @@
 import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 
 import type { CompanyImage } from '../types/models';
 import type { PaginatedResponse } from '../types/api';
@@ -10,7 +11,7 @@ const companyImageService = {
   getCompanyImages: async (): Promise<PaginatedResponse<CompanyImage>> => {
     const url = 'info/web/company-images/';
     const data = await httpRequest.get<PaginatedResponse<CompanyImage>>(url);
-    return presignInObject(data);
+    return normalizePaginatedResponse<CompanyImage>(await presignInObject(data));
   },
 
   addCompanyImage: async (data: FormData): Promise<CompanyImage> => {

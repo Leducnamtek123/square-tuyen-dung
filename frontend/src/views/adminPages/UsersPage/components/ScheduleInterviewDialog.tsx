@@ -13,6 +13,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import interviewService from '../../../../services/interviewService';
 import questionService from '../../../../services/questionService';
+import { normalizePaginatedResponse } from '../../../../utils/apiResponse';
 import { User as UserModel, Question } from '../../../../types/models';
 
 interface ScheduleInterviewDialogProps {
@@ -23,20 +24,11 @@ interface ScheduleInterviewDialogProps {
 
 type ScheduleQuestionResponse = {
     results?: Question[];
-    data?: Question[] | { results?: Question[] };
+    data?: Question[] | { results?: Question[] } | { data?: { count?: number; results?: Question[] } };
 };
 
 export const normalizeScheduleQuestionOptions = (response: unknown): Question[] => {
-    if (Array.isArray(response)) return response as Question[];
-    if (!response || typeof response !== 'object') return [];
-
-    const payload = response as ScheduleQuestionResponse;
-    if (Array.isArray(payload.results)) return payload.results;
-    if (Array.isArray(payload.data)) return payload.data;
-    if (payload.data && typeof payload.data === 'object' && Array.isArray(payload.data.results)) {
-        return payload.data.results;
-    }
-    return [];
+    return normalizePaginatedResponse<Question>(response as ScheduleQuestionResponse).results;
 };
 
 const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialogProps) => {

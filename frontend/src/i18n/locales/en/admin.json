@@ -118,9 +118,12 @@
     "jobNotifications": "Job Notifications",
     "contentManagement": "Content Management",
     "bannersManagement": "Banners Management",
+    "bannerTypes": "Banner Types",
     "feedbacksManagement": "Feedbacks Management",
     "articlesManagement": "News & Blog",
       "chatWithEmployers": "Chat with Employers",
+      "voiceProfiles": "AI Voice Profiles",
+      "interviewPreview": "Interview UI Preview",
       "squareHrmAdmin": "Open Square HRM"
   },
   "aiHealth": {
@@ -1314,6 +1317,72 @@
         "updateSuccess": "Article saved successfully.",
         "saveError": "Could not save article."
       }
+    },
+    "interviewPreview": {
+      "steps": {
+        "waiting": {
+          "label": "1. Waiting room",
+          "desc": "Before device check"
+        },
+        "preflight": {
+          "label": "2. Device check",
+          "desc": "Check microphone / camera"
+        },
+        "connected": {
+          "label": "3. Interview room",
+          "desc": "Live interview interface"
+        }
+      },
+      "waiting": {
+        "title": "Ready to start the interview",
+        "description": "Check your devices before joining the interview room with AI and the employer.",
+        "start": "Check devices & enter room",
+        "scheduled": "Scheduled: {{time}}"
+      },
+      "preflight": {
+        "title": "Device check",
+        "description": "Make sure microphone and camera work before entering the room.",
+        "microphone": "Microphone",
+        "cameraPreview": "Camera preview"
+      },
+      "actions": {
+        "back": "Back",
+        "joinRoom": "Enter interview room",
+        "jumpToRoom": "Jump to interview room ->"
+      },
+      "connected": {
+        "aiInterviewer": "AI Interviewer",
+        "chatTitle": "Chat",
+        "messageInput": "Type a message...",
+        "observerNotice": "Employer is observing this interview session",
+        "you": "You",
+        "end": "End"
+      },
+      "aria": {
+        "turnMicrophoneOff": "Turn microphone off",
+        "turnMicrophoneOn": "Turn microphone on",
+        "turnCameraOff": "Turn camera off",
+        "turnCameraOn": "Turn camera on",
+        "shareScreen": "Share screen",
+        "closeChat": "Close chat",
+        "openChat": "Open chat"
+      },
+      "header": {
+        "eyebrow": "Admin preview",
+        "title": "Interview flow, fake data",
+        "previewMode": "Preview mode"
+      },
+      "status": {
+        "waiting": "Waiting to enter",
+        "preflight": "Checking devices",
+        "connected": "Interviewing"
+      },
+      "session": {
+        "position": "Position",
+        "candidate": "Candidate",
+        "room": "Room"
+      },
+      "footerNote": "All data is fake and only for UI preview. Access:"
     },
     "voiceProfiles": {
       "title": "Voice Profiles",

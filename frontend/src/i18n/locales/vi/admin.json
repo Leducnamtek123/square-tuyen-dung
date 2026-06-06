@@ -118,9 +118,12 @@
     "jobNotifications": "Thông báo việc làm",
     "contentManagement": "Quản lý nội dung",
     "bannersManagement": "Quản lý Banner",
+    "bannerTypes": "Loại banner",
     "feedbacksManagement": "Quản lý Đánh giá",
     "articlesManagement": "Tin tức & Blog",
     "chatWithEmployers": "Kết nối với nhà tuyển dụng",
+    "voiceProfiles": "Hồ sơ giọng nói AI",
+    "interviewPreview": "Xem trước giao diện phỏng vấn",
     "squareHrmAdmin": "Mở Square HRM"
   },
   "aiHealth": {
@@ -1314,6 +1317,72 @@
         "updateSuccess": "Lưu bài viết thành công.",
         "saveError": "Không thể lưu bài viết."
       }
+    },
+    "interviewPreview": {
+      "steps": {
+        "waiting": {
+          "label": "1. Phòng chờ",
+          "desc": "Trước khi kiểm tra thiết bị"
+        },
+        "preflight": {
+          "label": "2. Kiểm tra thiết bị",
+          "desc": "Kiểm tra mic / camera"
+        },
+        "connected": {
+          "label": "3. Trong phòng PV",
+          "desc": "Giao diện phỏng vấn live"
+        }
+      },
+      "waiting": {
+        "title": "Sẵn sàng bắt đầu phỏng vấn",
+        "description": "Kiểm tra thiết bị của bạn trước khi tham gia phòng phỏng vấn với AI và nhà tuyển dụng.",
+        "start": "Kiểm tra thiết bị & vào phòng",
+        "scheduled": "Đã lên lịch: {{time}}"
+      },
+      "preflight": {
+        "title": "Kiểm tra thiết bị",
+        "description": "Đảm bảo micro và camera hoạt động trước khi vào phòng.",
+        "microphone": "Micro",
+        "cameraPreview": "Xem trước camera"
+      },
+      "actions": {
+        "back": "Quay lại",
+        "joinRoom": "Vào phòng phỏng vấn",
+        "jumpToRoom": "Nhảy đến phòng PV ->"
+      },
+      "connected": {
+        "aiInterviewer": "Người phỏng vấn AI",
+        "chatTitle": "Tin nhắn",
+        "messageInput": "Nhập tin nhắn...",
+        "observerNotice": "Nhà tuyển dụng đang quan sát phiên phỏng vấn này",
+        "you": "Bạn",
+        "end": "Kết thúc"
+      },
+      "aria": {
+        "turnMicrophoneOff": "Tắt micro",
+        "turnMicrophoneOn": "Bật micro",
+        "turnCameraOff": "Tắt camera",
+        "turnCameraOn": "Bật camera",
+        "shareScreen": "Chia sẻ màn hình",
+        "closeChat": "Đóng khung chat",
+        "openChat": "Mở khung chat"
+      },
+      "header": {
+        "eyebrow": "Xem trước admin",
+        "title": "Luồng phỏng vấn, dữ liệu giả",
+        "previewMode": "Chế độ xem trước"
+      },
+      "status": {
+        "waiting": "Chờ vào phòng",
+        "preflight": "Kiểm tra thiết bị",
+        "connected": "Đang phỏng vấn"
+      },
+      "session": {
+        "position": "Vị trí",
+        "candidate": "Ứng viên",
+        "room": "Phòng"
+      },
+      "footerNote": "Dữ liệu hoàn toàn là giả, chỉ để xem giao diện. Truy cập:"
     },
     "voiceProfiles": {
       "title": "Hồ sơ giọng nói",

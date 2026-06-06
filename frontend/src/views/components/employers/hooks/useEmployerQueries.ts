@@ -10,6 +10,7 @@ import questionService from '../../../../services/questionService';
 import questionGroupService from '../../../../services/questionGroupService';
 import companyService from '../../../../services/companyService';
 import companyImageService from '../../../../services/companyImageService';
+import { normalizePaginatedResponse } from '../../../../utils/apiResponse';
 import { PaginatedResponse } from '@/types/api';
 import { JobPost, JobPostActivity, Resume, ResumeSaved, InterviewSession, Question, QuestionGroup, CompanyImage, VoiceProfile } from '@/types/models';
 import type { ScheduleSessionInput } from '../../../../services/interviewService';
@@ -62,22 +63,19 @@ type RawJobPostOptionResponse =
   | RawJobPostOption[]
   | {
       results?: RawJobPostOption[];
-      data?: RawJobPostOption[] | { results?: RawJobPostOption[] };
+      data?: RawJobPostOption[] | { results?: RawJobPostOption[] } | { data?: { count?: number; results?: RawJobPostOption[] } };
       statusOptions?: RawJobPostOption[];
     };
 
 export const normalizeJobPostOptions = (response: RawJobPostOptionResponse): JobPostOption[] => {
-  const source = Array.isArray(response)
-    ? response
-    : Array.isArray(response.results)
-      ? response.results
-      : Array.isArray(response.data)
-        ? response.data
-        : response.data && Array.isArray(response.data.results)
-          ? response.data.results
-          : Array.isArray(response.statusOptions)
-            ? response.statusOptions
-            : [];
+  const paginatedOptions = normalizePaginatedResponse<RawJobPostOption>(response).results;
+  const legacyOptions = !paginatedOptions.length
+    && response
+    && !Array.isArray(response)
+    && Array.isArray(response.statusOptions)
+    ? response.statusOptions
+    : [];
+  const source = paginatedOptions.length ? paginatedOptions : legacyOptions;
 
   return source
     .map((option) => ({

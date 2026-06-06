@@ -16,5 +16,8 @@ describe('default NotificationCard i18n', () => {
       expect(call).toContain(`t('${key}'`);
       expect(call).not.toContain('defaultValue');
     }
+
+    expect(source).not.toContain('aria-label="delete"');
+    expect(source).toContain("t('actions.delete')");
   });
 });

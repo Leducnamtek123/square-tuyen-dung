@@ -20,5 +20,8 @@ describe('NotificationCard i18n', () => {
     expectNotificationKeyHasNoFallback(itemSource, 'notification.new');
     expectNotificationKeyHasNoFallback(footerSource, 'notification.loadMore');
     expectNotificationKeyHasNoFallback(footerSource, 'notification.viewAll');
+
+    expect(itemSource).not.toContain('aria-label="delete"');
+    expect(itemSource).toContain("t('actions.delete')");
   });
 });

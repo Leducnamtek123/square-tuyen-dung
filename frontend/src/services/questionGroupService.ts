@@ -2,6 +2,7 @@ import httpRequest from '../utils/httpRequest';
 import type { PaginatedResponse } from '../types/api';
 import type { QuestionGroup } from '../types/models';
 import { cleanParams } from '../utils/params';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 
 
 type IdType = string | number;
@@ -22,7 +23,8 @@ export interface QuestionGroupPayload {
 const questionGroupService = {
   getQuestionGroups: (params: QuestionGroupListParams = {}): Promise<PaginatedResponse<QuestionGroup>> => {
     return httpRequest
-      .get('interview/web/question-groups/', { params: cleanParams(params) });
+      .get('interview/web/question-groups/', { params: cleanParams(params) })
+      .then((data) => normalizePaginatedResponse<QuestionGroup>(data));
   },
   getQuestionGroupDetail: (id: IdType): Promise<QuestionGroup> => {
     return httpRequest

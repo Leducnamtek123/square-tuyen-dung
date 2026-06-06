@@ -5,7 +5,53 @@
  * This catches the camelCase vs snake_case mismatch bugs.
  */
 
+import interviewService from '../interviewService';
+import httpRequest from '../../utils/httpRequest';
 import type { ScheduleSessionInput, SubmitEvaluationInput } from '../interviewService';
+import fs from 'fs';
+import path from 'path';
+
+jest.mock('../../utils/httpRequest', () => ({
+  get: jest.fn(),
+  post: jest.fn(),
+  patch: jest.fn(),
+  delete: jest.fn(),
+}));
+
+jest.mock('../../utils/presignUrl', () => ({
+  presignInObject: jest.fn((data) => Promise.resolve(data)),
+}));
+
+describe('interviewService response contracts', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('returns the evaluate-ai detail payload from the backend', async () => {
+    (httpRequest.post as jest.Mock).mockResolvedValueOnce({
+      detail: 'AI evaluation task has been queued.',
+    });
+
+    const result = await interviewService.triggerAiEvaluation(7);
+
+    expect(httpRequest.post).toHaveBeenCalledWith('interview/web/sessions/7/evaluate-ai/');
+    expect(result).toEqual({
+      status: 'queued',
+      detail: 'AI evaluation task has been queued.',
+    });
+  });
+
+  it('types HR presence token response with camelized participant fields', () => {
+    const serviceSource = fs.readFileSync(path.join(process.cwd(), 'src/services/interviewService.ts'), 'utf8');
+
+    expect(serviceSource).toContain('export type HrPresenceTokenResponse');
+    expect(serviceSource).toContain('participantName: string');
+    expect(serviceSource).toContain('participantIdentity?: string');
+    expect(serviceSource).toContain('companyName?: string | null');
+    expect(serviceSource).toContain('getHrPresenceToken: (sessionId: IdType): Promise<HrPresenceTokenResponse>');
+    expect(serviceSource).not.toContain('participant_name: string');
+  });
+});
 
 describe('ScheduleSessionInput type validation', () => {
   it('uses snake_case for job_post (not jobPostId or jobPost)', () => {

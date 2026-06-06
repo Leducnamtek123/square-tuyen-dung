@@ -58,7 +58,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
       <Collapse in={expandedItems.content} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           <MenuItem text={t('admin:sidebar.bannersManagement')} to={`/${ROUTES.ADMIN.BANNERS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.BANNERS}` }} />
-          <MenuItem text="Banner Types" to={`/${ROUTES.ADMIN.BANNER_TYPES}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.BANNER_TYPES}` }} />
+          <MenuItem text={t('admin:sidebar.bannerTypes')} to={`/${ROUTES.ADMIN.BANNER_TYPES}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.BANNER_TYPES}` }} />
           <MenuItem text={t('admin:sidebar.feedbacksManagement')} to={`/${ROUTES.ADMIN.FEEDBACKS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.FEEDBACKS}` }} />
           <MenuItem text={t('admin:sidebar.articlesManagement')} to={`/${ROUTES.ADMIN.ARTICLES}`} kind="child" state={{ selected: location.pathname?.startsWith(`/${ROUTES.ADMIN.ARTICLES}`) ?? false }} />
           <MenuItem text={t('admin:sidebar.chatWithEmployers')} to={`/${ROUTES.ADMIN.CHAT}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.CHAT}` }} />
@@ -88,9 +88,9 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
           <MenuItem text={t('admin:sidebar.trustReports')} to={`/${ROUTES.ADMIN.TRUST_REPORTS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.TRUST_REPORTS}` }} />
           <MenuItem text={t('admin:sidebar.activityLogs')} to={`/${ROUTES.ADMIN.JOB_ACTIVITY}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.JOB_ACTIVITY}` }} />
           <MenuItem text={t('admin:sidebar.interviewSchedule')} to={`/${ROUTES.ADMIN.INTERVIEWS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.INTERVIEWS}` }} />
-          <MenuItem icon={RecordVoiceOverOutlinedIcon} text="AI Voice Profiles" to={`/${ROUTES.ADMIN.VOICE_PROFILES}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.VOICE_PROFILES}` }} />
+          <MenuItem icon={RecordVoiceOverOutlinedIcon} text={t('admin:sidebar.voiceProfiles')} to={`/${ROUTES.ADMIN.VOICE_PROFILES}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.VOICE_PROFILES}` }} />
           <MenuItem text={t('admin:sidebar.jobNotifications')} to={`/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.JOB_NOTIFICATIONS}` }} />
-          <MenuItem icon={VideoLibraryIcon} text="Interview UI Preview" to="/admin/interview-preview" kind="child" state={{ selected: location.pathname === '/admin/interview-preview' }} />
+          <MenuItem icon={VideoLibraryIcon} text={t('admin:sidebar.interviewPreview')} to="/admin/interview-preview" kind="child" state={{ selected: location.pathname === '/admin/interview-preview' }} />
         </List>
       </Collapse>
 

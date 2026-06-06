@@ -181,7 +181,7 @@ const CompanyImageCard = () => {
               <Box
                 component="img"
                 src={file.url}
-                alt="Company"
+                alt={t('companyImage.imageAlt')}
                 loading="lazy"
                 sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
@@ -259,7 +259,7 @@ const CompanyImageCard = () => {
           <Box
             component="img"
             src={state.previewImage}
-            alt="Preview"
+            alt={t('companyImage.previewAlt')}
             sx={{ width: '100%', borderRadius: 2, boxShadow: (theme) => theme.customShadows?.z8 }}
           />
         </DialogContent>

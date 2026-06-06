@@ -3,6 +3,7 @@ import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Image from 'next/image';
 import { LOADING_IMAGES } from '@/configs/constants';
+import { useTranslation } from 'react-i18next';
 
 interface BackdropLoadingProps {
   bgColor?: string;
@@ -10,6 +11,7 @@ interface BackdropLoadingProps {
 }
 
 const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }: BackdropLoadingProps) => {
+  const { t } = useTranslation('common');
 
   return (
 
@@ -45,7 +47,7 @@ const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }: Backdr
       >
         <Image
           src={LOADING_IMAGES.LOADING_SPINNER}
-          alt="Loading ..."
+          alt={t('loading')}
           width={100}
           height={100}
           style={{

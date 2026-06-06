@@ -125,7 +125,7 @@ const RangePickerCustom = ({
 
       </Stack>
 
-      <IconButton aria-label="refresh" size="small" onClick={refreshFilter}>
+      <IconButton aria-label={t('actions.refresh')} size="small" onClick={refreshFilter}>
 
         <RefreshIcon fontSize="small" />
 

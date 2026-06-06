@@ -14,6 +14,30 @@ export type SystemHealthPayload = {
   redis?: string;
 };
 
+type ActionResponse = {
+  success: boolean;
+  message?: string;
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+const normalizeActionResponse = (raw: unknown): ActionResponse => {
+  if (!isRecord(raw)) {
+    return { success: true };
+  }
+
+  if (isRecord(raw.data)) {
+    return { success: true, ...raw.data };
+  }
+
+  if ('data' in raw) {
+    return { success: true };
+  }
+
+  return { success: true, ...raw };
+};
+
 const adminSettingsService = {
   getSystemSettings: (): Promise<SystemSettingsPayload> => {
     const url = 'admin/web/system-settings/';
@@ -23,14 +47,14 @@ const adminSettingsService = {
     const url = 'admin/web/system-settings/';
     return httpRequest.put<SystemSettingsPayload>(url, data);
   },
-  sendNotificationDemo: (): Promise<void> => {
+  sendNotificationDemo: (): Promise<ActionResponse> => {
     const url = 'content/send-noti-demo/';
-    return httpRequest.post(url, {
+    return (httpRequest.post(url, {
       title: 'System notification test',
       content: 'System notification delivery test',
       type: 'SYSTEM',
       userList: [],
-    });
+    }) as Promise<unknown>).then(normalizeActionResponse);
   },
   healthCheck: (): Promise<SystemHealthPayload> => {
     const url = 'common/health/';

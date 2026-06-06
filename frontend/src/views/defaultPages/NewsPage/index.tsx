@@ -72,7 +72,7 @@ const ArticleCard = ({
   formatViews: (count: number) => string;
 }) => {
   const href = `/${ROUTES.JOB_SEEKER.NEWS}/${article.slug}`;
-  const publishedDate = formatDate(article.publishedAt || article.create_at || article.update_at);
+  const publishedDate = formatDate(article.publishedAt || article.createAt || article.updateAt);
   const badgeLabel = categoryLabels[article.category] || categoryFallbackLabel;
   const BadgeIcon = article.category === 'news' ? NewspaperIcon : ArticleIcon;
 

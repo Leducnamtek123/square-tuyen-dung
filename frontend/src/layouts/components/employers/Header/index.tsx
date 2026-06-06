@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useAppSelector } from '@/redux/hooks';
+import { useTranslation } from 'react-i18next';
 import { AppBar, Avatar, Box, Card, IconButton, Stack, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import UserMenu from '../../commons/UserMenu';
@@ -18,6 +19,7 @@ interface HeaderProps {
 const shellHeaderHeight = { xs: 56, sm: 64 };
 
 const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
+  const { t } = useTranslation('common');
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -77,7 +79,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
         <Toolbar sx={{ minHeight: shellHeaderHeight }}>
           <IconButton
             color="inherit"
-            aria-label="open drawer"
+            aria-label={t('actions.openDrawer')}
             edge="start"
             onClick={handleDrawerToggle}
             sx={{ mr: 2, display: { xl: 'none' } }}

@@ -115,7 +115,7 @@ const NotificationCardItem = ({ value, onClickItem, onRemove }: Props) => {
       </Box>
 
       <Box>
-        <IconButton aria-label="delete" color="error" size="small" onClick={() => onRemove(value.key)}>
+        <IconButton aria-label={t('actions.delete')} color="error" size="small" onClick={() => onRemove(value.key)}>
           <ClearIcon fontSize="small" />
         </IconButton>
       </Box>

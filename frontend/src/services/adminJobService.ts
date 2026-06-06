@@ -1,14 +1,16 @@
 import { JobPost } from '../types/models';
 import { PaginatedResponse } from '../types/api';
 import httpRequest from '../utils/httpRequest';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 import { cleanParams } from '../utils/params';
 import type { AdminListParams } from './adminManagementService';
 
 type IdType = string | number;
 
 const adminJobService = {
-  getAllJobs: (params: AdminListParams = {}): Promise<PaginatedResponse<JobPost>> => {
-    return httpRequest.get<PaginatedResponse<JobPost>>('job/web/admin-job-posts/', { params: cleanParams(params) });
+  getAllJobs: async (params: AdminListParams = {}): Promise<PaginatedResponse<JobPost>> => {
+    const data = await httpRequest.get('job/web/admin-job-posts/', { params: cleanParams(params) });
+    return normalizePaginatedResponse<JobPost>(data);
   },
   updateJob: (id: IdType, data: Partial<JobPost>): Promise<JobPost> => {
     return httpRequest.patch<JobPost>(`job/web/admin-job-posts/${id}/`, data);

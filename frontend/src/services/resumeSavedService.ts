@@ -2,6 +2,7 @@ import httpRequest from '../utils/httpRequest';
 import type { ExportTableRow, PaginatedResponse } from '../types/api';
 import type { ResumeSaved } from '../types/models';
 import { cleanParams } from '../utils/params';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 
 export type ResumeSavedListParams = {
   page?: number;
@@ -16,7 +17,9 @@ export type ResumeSavedListParams = {
 const resumeSavedService = {
   getResumesSaved: (params: ResumeSavedListParams = {}): Promise<PaginatedResponse<ResumeSaved>> => {
     const url = 'info/web/resumes-saved/';
-    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<ResumeSaved>>;
+    return httpRequest
+      .get(url, { params: cleanParams(params) })
+      .then((data) => normalizePaginatedResponse<ResumeSaved>(data));
   },
 
   exportResumesSaved: (params: ResumeSavedListParams = {}): Promise<ExportTableRow[]> => {

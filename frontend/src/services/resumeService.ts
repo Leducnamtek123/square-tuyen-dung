@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 import { presignInObject } from '../utils/presignUrl';
 import type {
   Resume,
@@ -67,18 +68,37 @@ interface ResumeCV {
   type?: string;
 }
 
+export type ResumeActiveStatusResponse = { isActive: boolean };
+
+const normalizeListResponse = <T>(raw: unknown): T[] =>
+  normalizePaginatedResponse<T>(raw).results;
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+const normalizeSuccessAction = <T extends Record<string, unknown>>(raw: unknown, fallback: T): T =>
+  isRecord(raw)
+    ? isRecord(raw.data)
+      ? ({ ...fallback, ...raw.data } as T)
+      : 'data' in raw
+        ? fallback
+        : ({ ...fallback, ...raw } as T)
+    : fallback;
+
 /* ── Service ──────────────────────────────────────────────────────────── */
 
 const resumeService = {
   sendEmail: (slug: IdType, data: SendEmailInput): Promise<{ sent: boolean }> => {
     const url = `info/web/resumes/${slug}/send-email/`;
-    return httpRequest.post(url, data) as Promise<{ sent: boolean }>;
+    return (httpRequest.post(url, data) as Promise<unknown>).then((response) =>
+      normalizeSuccessAction(response, { sent: true })
+    );
   },
 
   getResumes: async (params: GetResumesParams = {}): Promise<PaginatedResponse<Resume>> => {
     const url = 'info/web/resumes/';
     const data = (await httpRequest.get(url, { params })) as unknown;
-    return (await presignInObject(data)) as PaginatedResponse<Resume>;
+    return normalizePaginatedResponse<Resume>(await presignInObject(data));
   },
 
   getResumeDetail: async (resumeSlug: IdType): Promise<Resume> => {
@@ -94,7 +114,9 @@ const resumeService = {
 
   viewResume: (slug: IdType): Promise<{ viewed: boolean }> => {
     const url = `info/web/resumes/${slug}/view-resume/`;
-    return httpRequest.post(url) as Promise<{ viewed: boolean }>;
+    return (httpRequest.post(url) as Promise<unknown>).then((response) =>
+      normalizeSuccessAction(response, { viewed: true })
+    );
   },
 
   getResumeOwner: async (resumeSlug: IdType): Promise<ResumeOwner> => {
@@ -136,35 +158,34 @@ const resumeService = {
     return httpRequest.delete(url) as Promise<void>;
   },
 
-  activeResume: async (resumeSlug: IdType): Promise<Resume> => {
+  activeResume: async (resumeSlug: IdType): Promise<ResumeActiveStatusResponse> => {
     const url = `info/web/private-resumes/${resumeSlug}/resume-active/`;
-    const data = (await httpRequest.get(url)) as unknown;
-    return (await presignInObject(data)) as Resume;
+    return httpRequest.get(url) as Promise<ResumeActiveStatusResponse>;
   },
 
   getExperiencesDetail: (resumeSlug: IdType): Promise<ExperienceDetail[]> => {
     const url = `info/web/private-resumes/${resumeSlug}/experiences-detail/`;
-    return httpRequest.get(url) as Promise<ExperienceDetail[]>;
+    return (httpRequest.get(url) as Promise<unknown>).then(normalizeListResponse<ExperienceDetail>);
   },
 
   getEducationsDetail: (resumeSlug: IdType): Promise<EducationDetail[]> => {
     const url = `info/web/private-resumes/${resumeSlug}/educations-detail/`;
-    return httpRequest.get(url) as Promise<EducationDetail[]>;
+    return (httpRequest.get(url) as Promise<unknown>).then(normalizeListResponse<EducationDetail>);
   },
 
   getCertificates: (resumeSlug: IdType): Promise<Certificate[]> => {
     const url = `info/web/private-resumes/${resumeSlug}/certificates-detail/`;
-    return httpRequest.get(url) as Promise<Certificate[]>;
+    return (httpRequest.get(url) as Promise<unknown>).then(normalizeListResponse<Certificate>);
   },
 
   getLanguageSkills: (resumeSlug: IdType): Promise<LanguageSkill[]> => {
     const url = `info/web/private-resumes/${resumeSlug}/language-skills/`;
-    return httpRequest.get(url) as Promise<LanguageSkill[]>;
+    return (httpRequest.get(url) as Promise<unknown>).then(normalizeListResponse<LanguageSkill>);
   },
 
   getAdvancedSkills: (resumeSlug: IdType): Promise<AdvancedSkill[]> => {
     const url = `info/web/private-resumes/${resumeSlug}/advanced-skills/`;
-    return httpRequest.get(url) as Promise<AdvancedSkill[]>;
+    return (httpRequest.get(url) as Promise<unknown>).then(normalizeListResponse<AdvancedSkill>);
   },
 };
 

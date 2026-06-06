@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 import { cleanParams } from '../utils/params';
 import type { PaginatedResponse } from '../types/api';
 import type { VoiceProfile, VoiceProfileGrant, VoiceProfileSample } from '../types/models';
@@ -29,9 +30,9 @@ const multipartConfig = { headers: { 'Content-Type': 'multipart/form-data' } };
 
 const voiceProfileService = {
   getVoiceProfiles: (params: AdminListParams = {}): Promise<PaginatedResponse<VoiceProfile>> => {
-    return httpRequest.get<PaginatedResponse<VoiceProfile>>('interview/web/voice-profiles/', {
+    return (httpRequest.get('interview/web/voice-profiles/', {
       params: cleanParams(params),
-    });
+    }) as Promise<unknown>).then((data) => normalizePaginatedResponse<VoiceProfile>(data));
   },
 
   createVoiceProfile: (data: VoiceProfilePayload): Promise<VoiceProfile> => {

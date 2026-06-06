@@ -185,7 +185,7 @@ const ArticleDetailPage = () => {
     );
   }
 
-  const publishedDate = formatDate(article.publishedAt || article.create_at || article.update_at);
+  const publishedDate = formatDate(article.publishedAt || article.createAt || article.updateAt);
   const categoryLabel = getCategoryLabel(article.category);
 
   return (

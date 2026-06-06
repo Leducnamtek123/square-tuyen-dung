@@ -8,6 +8,7 @@ import unicodedata
 from dataclasses import dataclass
 from typing import Any
 
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
@@ -17,6 +18,7 @@ from apps.jobs.models import JobPost, JobPostActivity
 from apps.jobs.services import JobActivityService
 from apps.profiles.models import Company, Resume
 from apps.profiles.serializers import EmployerCandidateProfileSerializer
+from integrations.ai import client as ai_client
 from shared.audit import record_audit_log
 from shared.configs import variable_system as var_sys
 
@@ -46,6 +48,22 @@ ALLOWED_AGENT_IMAGE_MIME_TYPES = {"image/png", "image/jpeg", "image/webp", "imag
 
 def _json_safe(value: Any) -> Any:
     return json.loads(json.dumps(value, default=str))
+
+
+def _extract_assistant_content(response_json: dict[str, Any]) -> str:
+    try:
+        content = response_json["choices"][0]["message"]["content"]
+    except (KeyError, IndexError, TypeError):
+        return ""
+    if isinstance(content, str):
+        return content.strip()
+    if isinstance(content, list):
+        return "\n".join(
+            str(item.get("text") or "").strip()
+            for item in content
+            if isinstance(item, dict) and item.get("text")
+        ).strip()
+    return ""
 
 
 def _attachment_name(value: Any) -> str:
@@ -106,13 +124,18 @@ def _normalize_agent_attachments(content: str, attachments: Any) -> list[dict[st
 
 def _strip_accents(value: str) -> str:
     normalized = unicodedata.normalize("NFKD", value or "")
-    return "".join(ch for ch in normalized if not unicodedata.combining(ch))
+    stripped = "".join(ch for ch in normalized if not unicodedata.combining(ch))
+    return stripped.replace("đ", "d").replace("Đ", "D")
 
 
 def _normalize_text(value: str) -> str:
     normalized = _strip_accents(value).lower()
     normalized = re.sub(r"[^a-z0-9]+", " ", normalized)
     return re.sub(r"\s+", " ", normalized).strip()
+
+
+def _has_normalized_word(normalized: str, word: str) -> bool:
+    return f" {word} " in f" {normalized} "
 
 
 def _clean_name(value: str) -> str:
@@ -245,6 +268,79 @@ def _is_list_interviews_intent(text: str) -> bool:
         "phong van" in normalized
         or "interview" in normalized
     ) and any(token in normalized for token in ("live", "dang", "lich", "list", "liet ke", "xem", "ai"))
+
+
+def _is_visual_question(text: str, *, has_image_context: bool = False) -> bool:
+    normalized = _normalize_text(text)
+    if not normalized:
+        return False
+    if any(_has_normalized_word(normalized, token) for token in ("hinh", "image", "photo", "picture", "screenshot")):
+        return True
+    if _has_normalized_word(normalized, "anh"):
+        image_phrases = (
+            "anh gi",
+            "anh la gi",
+            "anh nay",
+            "anh day",
+            "anh do",
+            "buc anh",
+            "tam anh",
+            "file anh",
+            "trong anh",
+            "gui anh",
+            "anh toi gui",
+            "anh minh gui",
+            "anh vua gui",
+            "anh da gui",
+            "upload anh",
+            "phan tich anh",
+            "mo ta anh",
+            "doc anh",
+            "kiem tra anh",
+            "check anh",
+        )
+        if any(phrase in normalized for phrase in image_phrases):
+            return True
+        if has_image_context and any(
+            _has_normalized_word(normalized, token)
+            for token in ("gi", "day", "nay", "do")
+        ):
+            return True
+    if has_image_context and any(
+        phrase in normalized
+        for phrase in ("check lai", "kiem tra lai", "xem lai", "cai nay", "noi dung nay")
+    ):
+        return True
+    return False
+
+
+def _image_parts_from_message_parts(parts: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
+    return [
+        part
+        for part in (parts or [])
+        if isinstance(part, dict) and part.get("type") == "image" and part.get("dataUrl")
+    ]
+
+
+def _recent_image_parts(thread: AgentThread, *, limit_messages: int = 8, limit_images: int = 3) -> list[dict[str, Any]]:
+    image_parts: list[dict[str, Any]] = []
+    messages = list(thread.messages.filter(role=AgentMessage.ROLE_USER).order_by("-create_at", "-id")[:limit_messages])
+    for message in messages:
+        for part in message.parts or []:
+            if not isinstance(part, dict) or part.get("type") != "image" or not part.get("dataUrl"):
+                continue
+            image_parts.append(part)
+            if len(image_parts) >= limit_images:
+                return image_parts
+    return image_parts
+
+
+def _image_url_content_parts(image_parts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {"type": "image_url", "image_url": {"url": str(part.get("dataUrl") or "")}}
+        for part in image_parts
+        if part.get("dataUrl")
+    ]
 
 
 def _extract_question_text(text: str) -> str:
@@ -635,6 +731,16 @@ class AgentAssistantService:
         thread.last_message_at = timezone.now()
         thread.save(update_fields=["title", "last_message_at", "update_at"])
 
+        vision_parts = _image_parts_from_message_parts(parts)
+        visual_question = _is_visual_question(content, has_image_context=bool(vision_parts))
+        if not vision_parts and _is_visual_question(content, has_image_context=True):
+            vision_parts = _recent_image_parts(thread)
+            visual_question = _is_visual_question(content, has_image_context=bool(vision_parts))
+        if vision_parts and (not content or visual_question):
+            visual_result = AgentAssistantService._run_visual_response(thread, user_message, content, vision_parts)
+            if visual_result:
+                return visual_result
+
         planner_unavailable = None
         planned_action = AgentPlanner.plan(request, thread, content, message_parts=parts)
         if isinstance(planned_action, AgentPlannerUnavailable):
@@ -710,6 +816,66 @@ class AgentAssistantService:
         thread.last_message_at = assistant_message.create_at
         thread.save(update_fields=["last_message_at", "update_at"])
         return AgentRunResult(user_message=user_message, assistant_message=assistant_message, tool_calls=[])
+
+    @staticmethod
+    def _run_visual_response(
+        thread: AgentThread,
+        user_message: AgentMessage,
+        content: str,
+        image_parts: list[dict[str, Any]],
+    ) -> AgentRunResult | None:
+        if not image_parts:
+            return None
+
+        model = getattr(settings, "AI_AGENT_ASSISTANT_MODEL", "") or getattr(settings, "AI_LLM_MODEL", "")
+        user_text = content or "Mô tả ngắn gọn ảnh này bằng tiếng Việt và cho biết bạn thấy gì."
+        payload = {
+            "model": model,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": (
+                        "Bạn là Square Agent Assistants trong hệ thống tuyển dụng. "
+                        "Hãy trả lời tiếng Việt có dấu, ngắn gọn, dựa trực tiếp trên ảnh được gửi. "
+                        "Không nói rằng bạn không thể xử lý hình ảnh khi ảnh đã được đính kèm."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": user_text},
+                        *_image_url_content_parts(image_parts),
+                    ],
+                },
+            ],
+            "temperature": 0.1,
+            "max_tokens": 700,
+        }
+
+        try:
+            response_json, candidate = ai_client.post_chat_completion_requests(
+                payload,
+                default_model=model,
+                timeout=(5, 60),
+            )
+        except ai_client.AIServiceUnavailable as exc:
+            return AgentAssistantService._create_text_response(
+                thread,
+                user_message,
+                "AI xử lý hình ảnh hiện chưa sẵn sàng. Vui lòng thử lại sau ít phút.",
+                metadata={"visionUnavailable": {"message": str(exc), "attempts": exc.attempts}},
+            )
+
+        assistant_content = _extract_assistant_content(response_json)
+        if not assistant_content:
+            return None
+
+        return AgentAssistantService._create_text_response(
+            thread,
+            user_message,
+            assistant_content,
+            metadata={"vision": {"candidate": getattr(candidate, "name", "")}},
+        )
 
     @staticmethod
     def _create_tool_response(

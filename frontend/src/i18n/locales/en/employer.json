@@ -1617,7 +1617,9 @@
     "deleteTitle": "Delete Image",
     "deleteConfirm": "This image will be permanently deleted and cannot be restored. Are you sure?",
     "upload": "Upload",
-    "preview": "Preview"
+    "preview": "Preview",
+    "imageAlt": "Company image",
+    "previewAlt": "Company image preview"
   },
   "imageCrop": {
     "title": "Crop Image",

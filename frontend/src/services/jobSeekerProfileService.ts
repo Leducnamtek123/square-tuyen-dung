@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 import { presignInObject } from '../utils/presignUrl';
 import type { Resume, JobSeekerProfile, Location } from '../types/models';
 import type { PaginatedResponse } from '../types/api';
@@ -84,46 +85,11 @@ const jobSeekerProfileService = {
       return { count: 0, results: [] };
     }
     const url = `info/web/job-seeker-profiles/${jobSeekerProfileId}/resumes/`;
-    const raw = await httpRequest.get<ResumeListResponse | Resume[]>(url, { params: cleanParams(params) });
+    const raw = await httpRequest.get<unknown>(url, { params: cleanParams(params) });
     const data = await presignInObject(raw);
-
-    if (Array.isArray(data)) {
-      return {
-        count: data.length,
-        results: data,
-      };
-    }
-
-    const obj = data ?? {};
-    const nestedData = obj.data && !Array.isArray(obj.data) && typeof obj.data === 'object'
-      ? obj.data
-      : null;
-    const results = Array.isArray(obj.results)
-      ? obj.results
-      : Array.isArray(obj.data)
-        ? obj.data
-        : nestedData && Array.isArray(nestedData.results)
-          ? nestedData.results
-          : [];
-    const count = typeof obj.count === 'number'
-      ? obj.count
-      : nestedData && typeof nestedData.count === 'number'
-        ? nestedData.count
-        : results.length;
-
-    return {
-      count,
-      results,
-    };
+    return normalizePaginatedResponse<Resume>(data);
   },
 };
 
 export default jobSeekerProfileService;
-
-
-type ResumeListResponse = {
-  count?: number;
-  results?: Resume[];
-  data?: Resume[] | { results?: Resume[]; count?: number };
-};
 

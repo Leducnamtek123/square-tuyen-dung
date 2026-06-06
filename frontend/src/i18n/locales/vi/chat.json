@@ -10,6 +10,16 @@
   "typeYourMessage": "Nhập tin nhắn của bạn ở đây...",
   "send": "Gửi",
   "sendMessage": "Nhắn tin",
+  "composer": {
+    "attachFile": "Đính kèm tệp",
+    "chooseEmoji": "Chọn biểu tượng cảm xúc",
+    "sendMessage": "Gửi tin nhắn"
+  },
+  "message": {
+    "avatarAlt": "Ảnh đại diện cuộc trò chuyện",
+    "attachmentImageAlt": "Tệp đính kèm trong tin nhắn",
+    "downloadFile": "Tải tệp"
+  },
   "noCandidates": "Chưa có ứng viên nào ứng tuyển",
   "sending": "Đang gửi ...",
   "appliedJobs": "TIN TUYỂN DỤNG ĐÃ ỨNG TUYỂN",

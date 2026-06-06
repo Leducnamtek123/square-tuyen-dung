@@ -2,6 +2,7 @@ import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 import type { ExportTableRow, PaginatedResponse } from '../types/api';
 import type { JobPostActivity } from '../types/models';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 import { cleanParams } from '../utils/params';
 
 
@@ -48,7 +49,21 @@ interface AIAnalysisReviewPayload {
 interface ActionResponse {
   success?: boolean;
   message?: string;
+  status?: string;
+  detail?: string;
 }
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+const normalizeActionResponse = (raw: unknown, fallback: ActionResponse): ActionResponse =>
+  isRecord(raw)
+    ? isRecord(raw.data)
+      ? { ...fallback, ...raw.data }
+      : 'data' in raw
+        ? fallback
+        : { ...fallback, ...raw }
+    : fallback;
 
 const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
   const data = await promise;
@@ -59,40 +74,50 @@ const jobPostActivityService = {
   // job seeker
   applyJob: ({ jobPost, resume, fullName, email, phone }: ApplyJobPayload): Promise<ActionResponse> => {
     const url = 'job/web/job-seeker-job-posts-activity/';
-    return httpRequest.post(url, {
+    return (httpRequest.post(url, {
       job_post: jobPost,
       resume,
       fullName,
       email,
       phone,
-    });
+    }) as Promise<unknown>).then((response) =>
+      normalizeActionResponse(response, { success: true })
+    );
   },
 
   getJobPostActivity: (params: JobPostActivityListParams = {}): Promise<PaginatedResponse<JobPostActivity>> => {
     const url = 'job/web/job-seeker-job-posts-activity/';
-    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<JobPostActivity>>;
+    return httpRequest
+      .get(url, { params: cleanParams(params) })
+      .then((data) => normalizePaginatedResponse<JobPostActivity>(data));
   },
 
   getJobPostChatActivity: <T = JobPostActivity>(params: JobPostActivityListParams = {}): Promise<PaginatedResponse<T>> => {
     const url = 'job/web/job-seeker-job-posts-activity/chat/';
-    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<T>>;
+    return httpRequest
+      .get(url, { params: cleanParams(params) })
+      .then((data) => normalizePaginatedResponse<T>(data));
   },
 
   // employer
 
   sendEmail: (id: IdType, data: SendEmailPayload): Promise<ActionResponse> => {
     const url = `job/web/employer-job-posts-activity/${id}/send-email/`;
-    return httpRequest.post(url, data);
+    return (httpRequest.post(url, data) as Promise<unknown>).then((response) =>
+      normalizeActionResponse(response, { success: true })
+    );
   },
 
   getAppliedResume: (params: JobPostActivityListParams = {}): Promise<PaginatedResponse<JobPostActivity>> => {
     const url = 'job/web/employer-job-posts-activity/';
-    return withPresign(httpRequest.get(url, { params: cleanParams(params) })) as Promise<PaginatedResponse<JobPostActivity>>;
+    return withPresign(httpRequest.get(url, { params: cleanParams(params) }))
+      .then((data) => normalizePaginatedResponse<JobPostActivity>(data));
   },
 
   getAppliedResumeChat: <T = JobPostActivity>(params: JobPostActivityListParams = {}): Promise<PaginatedResponse<T>> => {
     const url = 'job/web/employer-job-posts-activity/chat/';
-    return withPresign(httpRequest.get(url, { params: cleanParams(params) })) as Promise<PaginatedResponse<T>>;
+    return withPresign(httpRequest.get(url, { params: cleanParams(params) }))
+      .then((data) => normalizePaginatedResponse<T>(data));
   },
 
   exportAppliedResume: (params: JobPostActivityListParams = {}): Promise<ExportTableRow[]> => {
@@ -124,7 +149,9 @@ const jobPostActivityService = {
 
   analyzeResume: (id: IdType, payload?: { onlineProfileUrl?: string; criteria?: Array<Record<string, unknown>> }): Promise<ActionResponse> => {
     const url = `job/web/employer-job-posts-activity/${id}/analyze-resume/`;
-    return httpRequest.post(url, payload || {});
+    return (httpRequest.post(url, payload || {}) as Promise<unknown>).then((response) =>
+      normalizeActionResponse(response, { success: true, status: 'queued' })
+    );
   },
 
   reviewAIAnalysis: (id: IdType, payload: AIAnalysisReviewPayload): Promise<JobPostActivity> => {

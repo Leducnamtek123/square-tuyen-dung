@@ -8,7 +8,13 @@ from rest_framework.test import APIClient
 
 from apps.interviews.models import InterviewSession
 from apps.jobs.models import JobPostActivity
-from integrations.ai.client import AIEndpointCandidate, AIServiceUnavailable, _candidate_payload, get_llm_candidates
+from integrations.ai.client import (
+    AIEndpointCandidate,
+    AIServiceUnavailable,
+    _candidate_payload,
+    get_llm_candidates,
+    post_chat_completion_requests,
+)
 from integrations.ai.views import execute_tool_call
 from integrations.ai.views import _http_probe_url, _probe_http_service
 from shared.configs import variable_system as var_sys
@@ -69,6 +75,46 @@ def test_local_ollama_payload_strips_vllm_only_parameters(settings):
     assert "repetition_penalty" not in payload
     assert "chat_template_kwargs" not in payload
     assert "temperature" in payload
+
+
+def test_image_payload_tries_local_ollama_before_primary(settings, monkeypatch):
+    settings.AI_LLM_BASE_URL = "http://primary.test/v1"
+    settings.AI_LLM_API_KEY = ""
+    settings.AI_LLM_LOCAL_BASE_URL = "http://host.docker.internal:11434/v1"
+    settings.AI_LLM_LOCAL_MODEL = "gemma3:12b"
+    settings.AI_LLM_LOCAL_API_KEY = ""
+    settings.AI_LLM_FALLBACK_BASE_URLS = ""
+    settings.AI_LLM_FALLBACK_MODELS = ""
+    settings.AI_LLM_FALLBACK_API_KEYS = ""
+    native_calls = []
+
+    def fake_native_chat(candidate, payload, *, timeout_seconds, connect_timeout_seconds):
+        native_calls.append({"candidate": candidate.name, "payload": payload})
+        return {"message": {"role": "assistant", "content": "{}"}}
+
+    monkeypatch.setattr("integrations.ai.client.post_ollama_native_chat_httpx", fake_native_chat)
+
+    response_json, candidate = post_chat_completion_requests(
+        {
+            "model": "qwen-text",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "Ảnh này là gì?"},
+                        {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,aGVsbG8="}},
+                    ],
+                }
+            ],
+        },
+        default_model="qwen-text",
+    )
+
+    assert response_json["choices"][0]["message"]["content"] == "{}"
+    assert candidate.name == "local"
+    assert native_calls[0]["candidate"] == "local"
+    assert native_calls[0]["payload"]["model"] == "gemma3:12b"
+    assert native_calls[0]["payload"]["messages"][0]["images"] == ["aGVsbG8="]
 
 
 @pytest.mark.django_db

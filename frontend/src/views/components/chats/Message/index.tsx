@@ -41,7 +41,7 @@ const Message = ({ userId, text, avatarUrl, createdAt, attachmentUrl, attachment
       {!isMe && (
         <Avatar
           src={avatarUrl}
-          alt="avatar 1"
+          alt={t('message.avatarAlt')}
           sx={{ width: 50, height: 50, mr: 2 }}
         />
       )}
@@ -69,7 +69,7 @@ const Message = ({ userId, text, avatarUrl, createdAt, attachmentUrl, attachment
             {attachmentType === 'image' ? (
               <Image
                 src={attachmentUrl}
-                alt="attachment"
+                alt={t('message.attachmentImageAlt')}
                 width={800}
                 height={200}
                 unoptimized
@@ -83,7 +83,7 @@ const Message = ({ userId, text, avatarUrl, createdAt, attachmentUrl, attachment
               >
                 <FileDownloadOutlinedIcon sx={{ mr: 1 }} />
                 <Typography variant="body2" sx={{ textDecoration: 'underline' }}>
-                  {fileName || 'Download File'}
+                  {fileName || t('message.downloadFile')}
                 </Typography>
               </Box>
             )}
@@ -99,7 +99,7 @@ const Message = ({ userId, text, avatarUrl, createdAt, attachmentUrl, attachment
       {isMe && (
         <Avatar
           src={avatarUrl}
-          alt="avatar 1"
+          alt={t('message.avatarAlt')}
           sx={{ width: 50, height: 50, ml: 2 }}
         />
       )}

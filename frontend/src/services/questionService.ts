@@ -2,6 +2,7 @@ import httpRequest from '../utils/httpRequest';
 import type { PaginatedResponse } from '../types/api';
 import type { Question } from '../types/models';
 import { cleanParams } from '../utils/params';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 
 
 type IdType = string | number;
@@ -21,14 +22,16 @@ export interface QuestionPayload {
 const questionService = {
   getQuestions: (params: QuestionListParams = {}): Promise<PaginatedResponse<Question>> => {
     return httpRequest
-      .get('interview/web/questions/', { params: cleanParams(params) });
+      .get('interview/web/questions/', { params: cleanParams(params) })
+      .then((data) => normalizePaginatedResponse<Question>(data));
   },
 
   // Alias for better clarity in Admin contexts
 
   getAllQuestions: (params: QuestionListParams = {}): Promise<PaginatedResponse<Question>> => {
     return httpRequest
-      .get('interview/web/questions/', { params: cleanParams(params) });
+      .get('interview/web/questions/', { params: cleanParams(params) })
+      .then((data) => normalizePaginatedResponse<Question>(data));
   },
 
   getQuestionDetail: (id: IdType): Promise<Question> => {

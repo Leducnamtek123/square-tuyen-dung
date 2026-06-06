@@ -56,6 +56,12 @@ describe('normalizeJobPostOptions', () => {
       { id: 5, jobName: 'Site Supervisor' },
     ]);
   });
+
+  it('accepts deeply nested data results response shape', () => {
+    expect(normalizeJobPostOptions({ data: { data: { count: 1, results: [{ id: 6, jobName: 'Project Manager' }] } } })).toEqual([
+      { id: 6, jobName: 'Project Manager' },
+    ]);
+  });
 });
 
 describe('useJobPostMutations', () => {

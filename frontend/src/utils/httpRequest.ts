@@ -62,8 +62,16 @@ export const refreshClient = axios.create({
   timeout: 30000,
 });
 
-const unwrapResponse = (response: { data?: { data?: unknown } }) =>
-  response?.data?.data ?? response?.data;
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const unwrapEnvelopeData = (payload: unknown) =>
+  isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, 'data')
+    ? payload.data
+    : payload;
+
+const unwrapResponse = (response: { data?: unknown }) =>
+  unwrapEnvelopeData(response?.data);
 
 const dispatchAuthExpired = () => {
   if (typeof window !== 'undefined') {
@@ -190,7 +198,7 @@ httpRequest.interceptors.response.use(
   (response) => {
     // Backend wraps payload in { data, errors } via MyJSONRenderer.
     // Return payload directly; fall back to raw response for legacy endpoints.
-    const payload = response.data?.data ?? response.data;
+    const payload = unwrapEnvelopeData(response.data);
 
     // Auto-transform snake_case keys → camelCase
     return camelizeKeys(payload);

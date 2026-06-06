@@ -7,6 +7,7 @@ import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import SettingForm from "../SettingForm";
 import { useUserSettings, useUpdateUserSettings } from "../../jobSeekers/hooks/useJobSeekerQueries";
 import type { FormValues as SettingformFormValues } from '../SettingForm';
+import { useTranslation } from 'react-i18next';
 
 interface SettingCardProps {
   title: React.ReactNode;
@@ -34,6 +35,7 @@ const Loading = (
 );
 
 const SettingCard = ({ title, sx }: SettingCardProps) => {
+  const { t } = useTranslation();
   const { data: editData, isLoading } = useUserSettings();
   const updateSettings = useUpdateUserSettings();
 
@@ -106,7 +108,7 @@ const SettingCard = ({ title, sx }: SettingCardProps) => {
                       },
                     }}
                   >
-                    Update
+                    {t('common:actions.saveChanges')}
                   </Button>
                 </Stack>
               </Grid>

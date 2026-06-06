@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { ChatContext } from '../../../../context/ChatProvider';
 import { addDocument, checkChatRoomExists, checkExists, createUser } from '../../../../services/firebaseService';
 import { RootState } from '../../../../redux/store';
+import { normalizePaginatedResponse } from '../../../../utils/apiResponse';
 import type { ChatAccountData, ChatRoomDocument } from '../../../../services/firebaseService';
 
 export type UserDataPayload = ChatAccountData;
@@ -23,40 +24,13 @@ export type RightSidebarFetchResponse<T> =
   | {
       count?: number;
       results?: T[];
-      data?: T[] | { count?: number; results?: T[] };
+      data?: T[] | { count?: number; results?: T[]; data?: { count?: number; results?: T[] } };
     }
   | null
   | undefined;
 
-const isRecord = (value: unknown): value is Record<string, unknown> => (
-  Boolean(value) && typeof value === 'object' && !Array.isArray(value)
-);
-
 export const normalizeRightSidebarResponse = <T,>(response: RightSidebarFetchResponse<T>): { count: number; results: T[] } => {
-  if (Array.isArray(response)) {
-    return { count: response.length, results: response };
-  }
-
-  if (!isRecord(response)) {
-    return { count: 0, results: [] };
-  }
-
-  const data = response.data;
-  const nestedData = isRecord(data) ? data : null;
-  const results = Array.isArray(response.results)
-    ? response.results
-    : Array.isArray(data)
-      ? data
-      : nestedData && Array.isArray(nestedData.results)
-        ? nestedData.results as T[]
-        : [];
-  const count = typeof response.count === 'number'
-    ? response.count
-    : nestedData && typeof nestedData.count === 'number'
-      ? nestedData.count
-      : results.length;
-
-  return { count, results };
+  return normalizePaginatedResponse<T>(response);
 };
 
 const createInitialState = <T,>(): RightSidebarState<T> => ({

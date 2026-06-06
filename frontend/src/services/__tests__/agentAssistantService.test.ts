@@ -9,7 +9,7 @@ jest.mock('../../utils/httpRequest', () => ({
 
 describe('agentAssistantService', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   it('sendMessage posts text and image attachments to the agent endpoint', async () => {
@@ -34,5 +34,38 @@ describe('agentAssistantService', () => {
       },
       { timeout: 120000 },
     );
+  });
+
+  it('normalizes nested tools, threads, and messages responses', async () => {
+    const tool = { name: 'list_job_posts', displayName: 'List jobs' };
+    const thread = { id: 1, title: 'Thread' };
+    const message = { id: 2, role: 'assistant', content: 'Xin chao' };
+    (httpRequest.get as jest.Mock)
+      .mockResolvedValueOnce({ data: { tools: [tool] } })
+      .mockResolvedValueOnce({ data: { threads: [thread] } })
+      .mockResolvedValueOnce({ data: { messages: [message] } });
+
+    await expect(agentAssistantService.getTools()).resolves.toEqual({ tools: [tool] });
+    await expect(agentAssistantService.listThreads()).resolves.toEqual({ threads: [thread] });
+    await expect(agentAssistantService.listMessages(1)).resolves.toEqual({ messages: [message] });
+  });
+
+  it('normalizes nested create thread responses', async () => {
+    const thread = { id: 14, title: 'New thread', portal: 'employer' };
+    (httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: thread });
+
+    await expect(agentAssistantService.createThread('employer')).resolves.toEqual(thread);
+  });
+
+  it('normalizes nested send message responses', async () => {
+    const payload = {
+      thread: { id: 12 },
+      userMessage: { id: 20, role: 'user', content: 'Hi' },
+      assistantMessage: { id: 21, role: 'assistant', content: 'Hello' },
+      toolCalls: [],
+    };
+    (httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: payload });
+
+    await expect(agentAssistantService.sendMessage(12, 'Hi')).resolves.toEqual(payload);
   });
 });

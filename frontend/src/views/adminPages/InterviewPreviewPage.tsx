@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
+import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faMicrophone, faMicrophoneSlash, faVideo, faVideoSlash,
@@ -24,10 +25,22 @@ const FAKE_SESSION = {
 type Step = 'waiting' | 'preflight' | 'connected';
 
 // ─── Step labels ──────────────────────────────────────────────────────────────
-const STEPS: { key: Step; label: string; desc: string }[] = [
-  { key: 'waiting',   label: '1. Phòng chờ',        desc: 'Trước khi kiểm tra thiết bị' },
-  { key: 'preflight', label: '2. Kiểm tra thiết bị', desc: 'Kiểm tra mic / camera' },
-  { key: 'connected', label: '3. Trong phòng PV',    desc: 'Giao diện phỏng vấn live' },
+const STEPS: { key: Step; labelKey: string; descKey: string }[] = [
+  {
+    key: 'waiting',
+    labelKey: 'pages.interviewPreview.steps.waiting.label',
+    descKey: 'pages.interviewPreview.steps.waiting.desc',
+  },
+  {
+    key: 'preflight',
+    labelKey: 'pages.interviewPreview.steps.preflight.label',
+    descKey: 'pages.interviewPreview.steps.preflight.desc',
+  },
+  {
+    key: 'connected',
+    labelKey: 'pages.interviewPreview.steps.connected.label',
+    descKey: 'pages.interviewPreview.steps.connected.desc',
+  },
 ];
 
 import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
@@ -36,6 +49,8 @@ import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-vis
 function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
   name: string; isAI?: boolean; isSelf?: boolean; speaking?: boolean;
 }) {
+  const { t } = useTranslation('admin');
+
   return (
     <div className={`relative flex flex-col items-center justify-center rounded-2xl border bg-[#0f172a] overflow-hidden aspect-video
       ${speaking ? 'border-cyan-400/60 shadow-[0_0_0_2px_rgba(14,165,233,0.3)]' : 'border-white/8'}`}>
@@ -64,7 +79,7 @@ function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
         <div className="flex items-center gap-1.5">
           {isAI && <span className="rounded bg-violet-500/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-violet-300">AI</span>}
-          {isSelf && <span className="rounded bg-cyan-500/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-cyan-300">Bạn</span>}
+          {isSelf && <span className="rounded bg-cyan-500/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-cyan-300">{t('pages.interviewPreview.connected.you')}</span>}
           <span className="text-xs font-semibold text-white">{name}</span>
           {speaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
         </div>
@@ -75,6 +90,8 @@ function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
 
 // ─── Step: Waiting ────────────────────────────────────────────────────────────
 function WaitingStep({ onNext }: { onNext: () => void }) {
+  const { t } = useTranslation('admin');
+
   return (
     <div className="relative flex h-full min-h-[520px] items-center justify-center px-6 py-10">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_52%)]" />
@@ -93,17 +110,17 @@ function WaitingStep({ onNext }: { onNext: () => void }) {
           </div>
         </div>
         <div className="space-y-4">
-          <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Sẵn sàng bắt đầu phỏng vấn</h2>
+          <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">{t('pages.interviewPreview.waiting.title')}</h2>
           <p className="mx-auto max-w-md text-sm leading-relaxed text-zinc-400">
-            Kiểm tra thiết bị của bạn trước khi tham gia phòng phỏng vấn với AI và nhà tuyển dụng.
+            {t('pages.interviewPreview.waiting.description')}
           </p>
         </div>
         <div className="flex flex-col items-center gap-3">
           <Button variant="contained" onClick={onNext}
             sx={{ height: 56, background: '#0ea5e9', px: 6, fontSize: '0.8rem', fontWeight: 900, letterSpacing: '0.2em', textTransform: 'uppercase', boxShadow: '0 0 30px rgba(14,165,233,0.3)', '&:hover': { background: '#38bdf8' } }}>
-            Kiểm tra thiết bị &amp; Vào phòng
+            {t('pages.interviewPreview.waiting.start')}
           </Button>
-          <p className="text-[11px] text-zinc-500">Đã lên lịch: 25/04/2026, 14:00</p>
+          <p className="text-[11px] text-zinc-500">{t('pages.interviewPreview.waiting.scheduled', { time: '25/04/2026, 14:00' })}</p>
         </div>
       </div>
     </div>
@@ -112,6 +129,7 @@ function WaitingStep({ onNext }: { onNext: () => void }) {
 
 // ─── Step: Preflight ──────────────────────────────────────────────────────────
 function PreflightStep({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+  const { t } = useTranslation('admin');
   const [micOk] = useState(true);
   const [camOk] = useState(true);
   const volume = 45;
@@ -120,8 +138,8 @@ function PreflightStep({ onNext, onBack }: { onNext: () => void; onBack: () => v
     <div className="relative flex h-full min-h-[520px] items-center justify-center px-6 py-10">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.15),transparent_52%)]" />
       <div className="relative z-10 mx-auto w-full max-w-[560px] rounded-[2rem] border border-cyan-400/20 bg-[#020617]/90 p-8 text-center shadow-[0_0_50px_rgba(56,189,248,0.1)]">
-        <h2 className="mb-1 text-2xl font-semibold uppercase tracking-widest text-white">Kiểm tra thiết bị</h2>
-        <p className="mb-8 text-sm text-zinc-400">Đảm bảo micro và camera hoạt động trước khi vào phòng.</p>
+        <h2 className="mb-1 text-2xl font-semibold uppercase tracking-widest text-white">{t('pages.interviewPreview.preflight.title')}</h2>
+        <p className="mb-8 text-sm text-zinc-400">{t('pages.interviewPreview.preflight.description')}</p>
 
         <div className="mb-8 flex flex-col gap-4">
           {/* Mic */}
@@ -130,7 +148,7 @@ function PreflightStep({ onNext, onBack }: { onNext: () => void; onBack: () => v
               <FontAwesomeIcon icon={micOk ? faMicrophone : faMicrophoneSlash} />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-sm font-semibold text-white">Microphone</p>
+              <p className="text-sm font-semibold text-white">{t('pages.interviewPreview.preflight.microphone')}</p>
               <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
                 <div className="h-full rounded-full bg-cyan-400 transition-all" style={{ width: `${volume}%` }} />
               </div>
@@ -148,7 +166,7 @@ function PreflightStep({ onNext, onBack }: { onNext: () => void; onBack: () => v
               {/* Fake camera preview */}
               <div className="aspect-video w-full overflow-hidden rounded-xl bg-zinc-800">
                 <div className="flex h-full items-center justify-center text-zinc-500 text-xs">
-                  <FontAwesomeIcon icon={faUser} className="mr-2" /> Camera preview
+                  <FontAwesomeIcon icon={faUser} className="mr-2" /> {t('pages.interviewPreview.preflight.cameraPreview')}
                 </div>
               </div>
             </div>
@@ -160,11 +178,11 @@ function PreflightStep({ onNext, onBack }: { onNext: () => void; onBack: () => v
         <div className="flex justify-center gap-3">
           <Button variant="outlined" onClick={onBack}
             sx={{ borderColor: 'rgba(255,255,255,0.2)', color: 'white', px: 4, '&:hover': { borderColor: 'white', background: 'rgba(255,255,255,0.05)' } }}>
-            Quay lại
+            {t('pages.interviewPreview.actions.back')}
           </Button>
           <Button variant="contained" onClick={onNext}
             sx={{ background: 'linear-gradient(135deg,#0ea5e9,#2563eb)', fontWeight: 900, px: 5, boxShadow: '0 4px 20px rgba(14,165,233,0.4)', '&:hover': { background: 'linear-gradient(135deg,#38bdf8,#3b82f6)' } }}>
-            Vào phòng phỏng vấn
+            {t('pages.interviewPreview.actions.joinRoom')}
           </Button>
         </div>
       </div>
@@ -174,6 +192,7 @@ function PreflightStep({ onNext, onBack }: { onNext: () => void; onBack: () => v
 
 // ─── Step: Connected (mock VideoConference) ───────────────────────────────────
 function ConnectedStep({ onEnd }: { onEnd: () => void }) {
+  const { t } = useTranslation('admin');
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
@@ -188,9 +207,9 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
 
   const FAKE_MESSAGES = [
     { from: 'AI', text: 'Xin chào! Tôi là trợ lý phỏng vấn AI. Hãy bắt đầu nhé.' },
-    { from: 'Candidate', text: 'Dạ, tôi sẵn sàng ạ.' },
+    { from: 'candidate', text: 'Dạ, tôi sẵn sàng ạ.' },
     { from: 'AI', text: 'Bạn có thể mô tả kinh nghiệm làm việc với React.js của mình không?' },
-    { from: 'Candidate', text: 'Tôi đã có 3 năm kinh nghiệm với React, chủ yếu làm việc tại các startup…' },
+    { from: 'candidate', text: 'Tôi đã có 3 năm kinh nghiệm với React, chủ yếu làm việc tại các startup…' },
   ];
 
   return (
@@ -198,11 +217,11 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
       {/* Video grid */}
       <div className={`flex flex-1 gap-2 p-3 ${chatOpen ? 'pr-[320px]' : ''} transition-all duration-300`}>
         <div className="grid flex-1 grid-cols-2 gap-2 content-center">
-          <MockTile name="AI Interviewer" isAI speaking />
+          <MockTile name={t('pages.interviewPreview.connected.aiInterviewer')} isAI speaking />
           <MockTile name={FAKE_SESSION.candidateName} isSelf />
           <div className="col-span-2 rounded-2xl border border-white/5 bg-[#0b1221] p-4 flex items-center gap-3">
             <FontAwesomeIcon icon={faEye} className="text-zinc-500" />
-            <span className="text-xs text-zinc-500">Nhà tuyển dụng đang quan sát phiên phỏng vấn này</span>
+            <span className="text-xs text-zinc-500">{t('pages.interviewPreview.connected.observerNotice')}</span>
             <div className="ml-auto flex items-center gap-1.5">
               <div className="size-2 animate-pulse rounded-full bg-emerald-400" />
               <span className="text-[10px] font-semibold text-emerald-400">LIVE</span>
@@ -215,11 +234,11 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
         {chatOpen && (
           <div className="absolute right-0 top-0 bottom-0 w-[312px] border-l border-white/8 bg-[#0b1120] flex flex-col">
             <div className="border-b border-white/8 px-4 py-3">
-              <p className="text-sm font-semibold text-white">Chat</p>
+              <p className="text-sm font-semibold text-white">{t('pages.interviewPreview.connected.chatTitle')}</p>
             </div>
             <div className="flex-1 overflow-y-auto p-3 space-y-3">
               {FAKE_MESSAGES.map((m) => (
-                <div key={`${m.from}-${m.text}`} className={`flex gap-2 ${m.from === 'Candidate' ? 'flex-row-reverse' : ''}`}>
+                <div key={`${m.from}-${m.text}`} className={`flex gap-2 ${m.from === 'candidate' ? 'flex-row-reverse' : ''}`}>
                   <div className={`flex size-7 flex-shrink-0 items-center justify-center rounded-full text-xs
                     ${m.from === 'AI' ? 'bg-violet-500/20 text-violet-300' : 'bg-cyan-500/20 text-cyan-300'}`}>
                     <FontAwesomeIcon icon={m.from === 'AI' ? faRobot : faUser} />
@@ -232,7 +251,7 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
               ))}
             </div>
             <div className="border-t border-white/8 p-3">
-              <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-zinc-500">Nhập tin nhắn…</div>
+              <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-zinc-500">{t('pages.interviewPreview.connected.messageInput')}</div>
             </div>
           </div>
         )}
@@ -240,20 +259,20 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
 
       {/* Control bar */}
       <div className="flex items-center justify-center gap-3 border-t border-white/8 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl">
-        <button type="button" aria-label={micOn ? 'Turn microphone off' : 'Turn microphone on'} onClick={() => setMicOn(!micOn)}
+        <button type="button" aria-label={micOn ? t('pages.interviewPreview.aria.turnMicrophoneOff') : t('pages.interviewPreview.aria.turnMicrophoneOn')} onClick={() => setMicOn(!micOn)}
           className={`flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border transition-all
             ${micOn ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}>
           <FontAwesomeIcon icon={micOn ? faMicrophone : faMicrophoneSlash} />
         </button>
-        <button type="button" aria-label={camOn ? 'Turn camera off' : 'Turn camera on'} onClick={() => setCamOn(!camOn)}
+        <button type="button" aria-label={camOn ? t('pages.interviewPreview.aria.turnCameraOff') : t('pages.interviewPreview.aria.turnCameraOn')} onClick={() => setCamOn(!camOn)}
           className={`flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border transition-all
             ${camOn ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}>
           <FontAwesomeIcon icon={camOn ? faVideo : faVideoSlash} />
         </button>
-        <button type="button" aria-label="Share screen" className="flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border border-white/15 bg-white/8 text-white hover:bg-white/15 transition-all">
+        <button type="button" aria-label={t('pages.interviewPreview.aria.shareScreen')} className="flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border border-white/15 bg-white/8 text-white hover:bg-white/15 transition-all">
           <FontAwesomeIcon icon={faDesktop} />
         </button>
-        <button type="button" aria-label={chatOpen ? 'Close chat' : 'Open chat'} onClick={() => setChatOpen(!chatOpen)}
+        <button type="button" aria-label={chatOpen ? t('pages.interviewPreview.aria.closeChat') : t('pages.interviewPreview.aria.openChat')} onClick={() => setChatOpen(!chatOpen)}
           className={`flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border transition-all
             ${chatOpen ? 'border-cyan-400/40 bg-cyan-500/20 text-cyan-300' : 'border-white/15 bg-white/8 text-white hover:bg-white/15'}`}>
           <FontAwesomeIcon icon={faComment} />
@@ -262,7 +281,7 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
         <button type="button" onClick={onEnd}
           className="flex h-11 items-center gap-2 rounded-[var(--sq-button-radius)] border border-rose-400/40 bg-rose-500/20 px-5 text-sm font-semibold text-rose-300 hover:bg-rose-500/30 transition-all">
           <FontAwesomeIcon icon={faPhoneSlash} />
-          Kết thúc
+          {t('pages.interviewPreview.connected.end')}
         </button>
       </div>
     </div>
@@ -271,12 +290,13 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
 
 // ─── Main Preview Page ────────────────────────────────────────────────────────
 export default function InterviewPreviewPage() {
+  const { t } = useTranslation('admin');
   const [step, setStep] = useState<Step>('waiting');
 
   const statusChip = {
-    waiting:   { label: 'Chờ vào phòng', color: '#0ea5e9' },
-    preflight: { label: 'Kiểm tra thiết bị', color: '#f59e0b' },
-    connected: { label: 'Đang phỏng vấn', color: '#10b981' },
+    waiting: { label: t('pages.interviewPreview.status.waiting'), color: '#0ea5e9' },
+    preflight: { label: t('pages.interviewPreview.status.preflight'), color: '#f59e0b' },
+    connected: { label: t('pages.interviewPreview.status.connected'), color: '#10b981' },
   }[step];
 
   return (
@@ -284,12 +304,12 @@ export default function InterviewPreviewPage() {
       {/* Admin top bar */}
       <div className="mb-4 flex items-center justify-between rounded-2xl border border-white/8 bg-zinc-900/50 px-4 py-3 backdrop-blur-xl">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Admin Preview</p>
-          <h1 className="text-base font-semibold text-white">Interview Flow, Fake Data</h1>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">{t('pages.interviewPreview.header.eyebrow')}</p>
+          <h1 className="text-base font-semibold text-white">{t('pages.interviewPreview.header.title')}</h1>
         </div>
         <div className="flex items-center gap-2">
           <span className="rounded-lg border border-amber-400/30 bg-amber-500/15 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-amber-200">
-            Preview Mode
+            {t('pages.interviewPreview.header.previewMode')}
           </span>
           <Chip label={statusChip.label} size="small"
             sx={{ bgcolor: `${statusChip.color}22`, color: statusChip.color, border: `1px solid ${statusChip.color}44`, fontWeight: 700, fontSize: '0.7rem' }} />
@@ -302,8 +322,8 @@ export default function InterviewPreviewPage() {
           <button key={s.key} type="button" onClick={() => setStep(s.key)}
             className={`flex-1 rounded-[var(--sq-button-radius)] px-3 py-2.5 text-left transition-all duration-200
               ${step === s.key ? 'bg-cyan-500/15 border border-cyan-400/30' : 'border border-transparent hover:bg-white/5'}`}>
-            <p className={`text-xs font-semibold ${step === s.key ? 'text-cyan-300' : 'text-zinc-400'}`}>{s.label}</p>
-            <p className="text-[10px] text-zinc-500 mt-0.5">{s.desc}</p>
+            <p className={`text-xs font-semibold ${step === s.key ? 'text-cyan-300' : 'text-zinc-400'}`}>{t(s.labelKey)}</p>
+            <p className="text-[10px] text-zinc-500 mt-0.5">{t(s.descKey)}</p>
           </button>
         ))}
       </div>
@@ -311,24 +331,24 @@ export default function InterviewPreviewPage() {
       {/* Session info bar */}
       <div className="mb-3 flex flex-wrap items-center gap-3 rounded-2xl border border-white/5 bg-zinc-900/40 px-4 py-3 backdrop-blur-xl">
         <div>
-          <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Vị trí</p>
+          <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{t('pages.interviewPreview.session.position')}</p>
           <p className="text-sm font-semibold text-white">{FAKE_SESSION.jobName}</p>
         </div>
         <div className="h-6 w-px bg-white/10" />
         <div>
-          <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Ứng viên</p>
+          <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{t('pages.interviewPreview.session.candidate')}</p>
           <p className="text-sm font-semibold text-white">{FAKE_SESSION.candidateName}</p>
         </div>
         <div className="h-6 w-px bg-white/10" />
         <div>
-          <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Phòng</p>
+          <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{t('pages.interviewPreview.session.room')}</p>
           <p className="text-sm font-mono font-semibold text-cyan-300">{FAKE_SESSION.roomCode}</p>
         </div>
         <div className="ml-auto">
           {step !== 'connected' && (
             <Button variant="contained" size="small" onClick={() => setStep('connected')}
               sx={{ background: '#0ea5e9', fontWeight: 700, fontSize: '0.7rem', '&:hover': { background: '#38bdf8' } }}>
-              Nhảy đến phòng PV →
+              {t('pages.interviewPreview.actions.jumpToRoom')}
             </Button>
           )}
         </div>
@@ -343,7 +363,7 @@ export default function InterviewPreviewPage() {
 
       {/* Footer note */}
       <p className="mt-3 text-center text-[10px] text-zinc-600">
-        Dữ liệu hoàn toàn là fake, chỉ để xem giao diện. Truy cập:{' '}
+        {t('pages.interviewPreview.footerNote')}{' '}
         <code className="text-zinc-500">/admin/interview-preview</code>
       </p>
     </div>

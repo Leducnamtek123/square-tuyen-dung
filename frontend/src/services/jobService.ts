@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 import { cleanParams } from '../utils/params';
 import type { JobPost } from '../types/models';
 import type { ExportTableRow, PaginatedResponse } from '../types/api';
@@ -98,17 +99,25 @@ type JobSalaryInsightResponse = {
   relatedJobs?: JobPost[];
 };
 
+const normalizeJobTitleSuggestions = (raw: unknown): SuggestTitleResponse => ({
+  results: normalizePaginatedResponse<string>(raw).results.filter(
+    (item): item is string => typeof item === 'string',
+  ),
+});
+
 /* ── Service ──────────────────────────────────────────────────────────── */
 
 const jobService = {
   searchJobSuggestTitle: (kw: string): Promise<SuggestTitleResponse> => {
     const url = 'job/web/search/job-suggest-title/';
-    return httpRequest.get(url, { params: { q: kw } }) as Promise<SuggestTitleResponse>;
+    return (httpRequest.get(url, { params: { q: kw } }) as Promise<unknown>).then(normalizeJobTitleSuggestions);
   },
 
   getEmployerJobPost: (params: GetJobPostsParams = {}): Promise<PaginatedResponse<JobPost>> => {
     const url = 'job/web/private-job-posts/';
-    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<JobPost>>;
+    return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>).then((data) =>
+      normalizePaginatedResponse<JobPost>(data)
+    );
   },
 
   exportEmployerJobPosts: (params: GetJobPostsParams = {}): Promise<ExportTableRow[]> => {
@@ -143,7 +152,9 @@ const jobService = {
 
   getJobPosts: (params: GetJobPostsParams = {}): Promise<PaginatedResponse<JobPost>> => {
     const url = 'job/web/job-posts/';
-    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<JobPost>>;
+    return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>).then((data) =>
+      normalizePaginatedResponse<JobPost>(data)
+    );
   },
 
   getJobPostDetailById: (slug: IdType): Promise<JobPost> => {
@@ -153,12 +164,16 @@ const jobService = {
 
   getSuggestedJobPosts: (params: GetJobPostsParams = {}): Promise<PaginatedResponse<JobPost>> => {
     const url = 'job/web/private-job-posts/suggested-job-posts/';
-    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<JobPost>>;
+    return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>).then((data) =>
+      normalizePaginatedResponse<JobPost>(data)
+    );
   },
 
   getJobPostsSaved: (params: GetJobPostsParams = {}): Promise<PaginatedResponse<JobPost>> => {
     const url = `job/web/job-posts/job-posts-saved/`;
-    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<JobPost>>;
+    return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>).then((data) =>
+      normalizePaginatedResponse<JobPost>(data)
+    );
   },
 
   saveJobPost: (slug: IdType): Promise<{ isSaved: boolean }> => {

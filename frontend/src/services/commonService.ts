@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 import { presignInObject } from '../utils/presignUrl';
 import type { SystemConfig, Career, District } from '../types/models';
 
@@ -15,21 +16,20 @@ interface WardsResponse {
   data: { id: number; name: string; district?: District }[];
 }
 
-interface PaginatedLike<T> {
-  count?: number;
-  results?: T[];
-  data?: T[] | { results?: T[] };
-}
-
 const extractResults = <T>(raw: unknown): T[] => {
-  if (Array.isArray(raw)) return raw as T[];
-  const obj = (raw || {}) as PaginatedLike<T>;
-  if (Array.isArray(obj.results)) return obj.results;
-  if (Array.isArray(obj.data)) return obj.data;
-  if (obj.data && Array.isArray((obj.data as { results?: T[] }).results)) {
-    return (obj.data as { results?: T[] }).results || [];
-  }
-  return [];
+  return normalizePaginatedResponse<T>(raw).results;
+};
+
+const extractExplicitCount = (raw: unknown): number | null => {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const obj = raw as { count?: unknown; data?: unknown };
+  if (typeof obj.count === 'number') return obj.count;
+  if (!obj.data || typeof obj.data !== 'object' || Array.isArray(obj.data)) return null;
+  const nested = obj.data as { count?: unknown; data?: unknown };
+  if (typeof nested.count === 'number') return nested.count;
+  if (!nested.data || typeof nested.data !== 'object' || Array.isArray(nested.data)) return null;
+  const nestedData = nested.data as { count?: unknown };
+  return typeof nestedData.count === 'number' ? nestedData.count : null;
 };
 
 /* ── Service ──────────────────────────────────────────────────────────── */
@@ -100,10 +100,10 @@ const commonService = {
     const pageSize = Number(params.pageSize || 1000);
     const kw = params.kw;
     const startPage = Number(params.page || 1);
-    const fetchPage = async (page: number): Promise<PaginatedLike<Career>> => {
-      return (await httpRequest.get(url, {
+    const fetchPage = async (page: number): Promise<unknown> => {
+      return httpRequest.get(url, {
         params: { page, pageSize, kw },
-      })) as PaginatedLike<Career>;
+      });
     };
 
     const fetchUntilShortPage = async (page: number, collected: Career[]): Promise<Career[]> => {
@@ -119,7 +119,7 @@ const commonService = {
 
     const firstPage = await fetchPage(startPage);
     const firstPageResults = extractResults<Career>(firstPage);
-    const total = typeof firstPage?.count === 'number' ? firstPage.count : null;
+    const total = extractExplicitCount(firstPage);
 
     let results: Career[];
     if (total) {

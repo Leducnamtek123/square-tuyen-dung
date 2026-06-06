@@ -111,6 +111,103 @@ def _is_local_ollama_candidate(candidate: AIEndpointCandidate) -> bool:
     return candidate.name == "local" or "11434" in base_url or "ollama" in base_url
 
 
+def _payload_has_image_input(payload: Dict[str, Any]) -> bool:
+    messages = payload.get("messages")
+    if not isinstance(messages, list):
+        return False
+
+    for message in messages:
+        if not isinstance(message, dict):
+            continue
+        images = message.get("images")
+        if isinstance(images, list) and images:
+            return True
+        content = message.get("content")
+        if not isinstance(content, list):
+            continue
+        for part in content:
+            if not isinstance(part, dict):
+                continue
+            if part.get("type") == "image_url" or part.get("image_url"):
+                return True
+    return False
+
+
+def _prioritize_vision_candidates(
+    candidates: List[AIEndpointCandidate],
+    payload: Dict[str, Any],
+) -> List[AIEndpointCandidate]:
+    if not _payload_has_image_input(payload):
+        return candidates
+    return [
+        *[candidate for candidate in candidates if _is_local_ollama_candidate(candidate)],
+        *[candidate for candidate in candidates if not _is_local_ollama_candidate(candidate)],
+    ]
+
+
+def _image_url_to_ollama_image(value: str) -> str:
+    value = str(value or "").strip()
+    if value.startswith("data:") and "," in value:
+        return value.split(",", 1)[1]
+    return value
+
+
+def _ollama_native_payload_from_openai(
+    candidate: AIEndpointCandidate,
+    payload: Dict[str, Any],
+) -> Dict[str, Any]:
+    messages: List[Dict[str, Any]] = []
+    for message in payload.get("messages", []):
+        if not isinstance(message, dict):
+            continue
+        role = message.get("role") or "user"
+        content = message.get("content")
+        images: List[str] = []
+        text_parts: List[str] = []
+
+        if isinstance(content, list):
+            for part in content:
+                if not isinstance(part, dict):
+                    continue
+                if part.get("type") == "text" and part.get("text"):
+                    text_parts.append(str(part.get("text")))
+                image_url = part.get("image_url")
+                if isinstance(image_url, dict) and image_url.get("url"):
+                    images.append(_image_url_to_ollama_image(str(image_url.get("url"))))
+        elif content:
+            text_parts.append(str(content))
+
+        next_message: Dict[str, Any] = {
+            "role": str(role),
+            "content": "\n".join(text_parts) or "Analyze the attached image.",
+        }
+        if images:
+            next_message["images"] = images
+        messages.append(next_message)
+
+    return {
+        "model": candidate.model or str(payload.get("model") or ""),
+        "messages": messages,
+        "stream": False,
+    }
+
+
+def _openai_response_from_ollama_native(response_json: Dict[str, Any]) -> Dict[str, Any]:
+    message = response_json.get("message") if isinstance(response_json, dict) else {}
+    content = message.get("content") if isinstance(message, dict) else ""
+    return {
+        "choices": [
+            {
+                "message": {
+                    "role": "assistant",
+                    "content": content or "",
+                }
+            }
+        ],
+        "usage": response_json.get("usage", {}) if isinstance(response_json, dict) else {},
+    }
+
+
 def _candidate_payload(candidate: AIEndpointCandidate, payload: Dict[str, Any]) -> Dict[str, Any]:
     next_payload = apply_llm_request_defaults(payload)
     if _is_local_ollama_candidate(candidate):
@@ -242,7 +339,17 @@ def post_chat_completion_requests(
     attempts: List[str] = []
     last_transient: Optional[requests.RequestException] = None
 
-    for candidate in get_llm_candidates(default_model=default_model):
+    for candidate in _prioritize_vision_candidates(get_llm_candidates(default_model=default_model), payload):
+        if _is_local_ollama_candidate(candidate) and _payload_has_image_input(payload):
+            native_response = post_ollama_native_chat_httpx(
+                candidate,
+                _ollama_native_payload_from_openai(candidate, payload),
+                timeout_seconds=timeout[1],
+                connect_timeout_seconds=timeout[0],
+            )
+            if native_response is not None:
+                return _openai_response_from_ollama_native(native_response), candidate
+
         url = f"{candidate.normalized_base_url}/chat/completions"
         try:
             response = requests.post(
@@ -288,7 +395,17 @@ def post_chat_completion_httpx(
     timeout = httpx.Timeout(timeout=timeout_seconds, connect=connect_timeout_seconds)
 
     with httpx.Client(timeout=timeout) as client:
-        for candidate in get_llm_candidates(default_model=default_model):
+        for candidate in _prioritize_vision_candidates(get_llm_candidates(default_model=default_model), payload):
+            if _is_local_ollama_candidate(candidate) and _payload_has_image_input(payload):
+                native_response = post_ollama_native_chat_httpx(
+                    candidate,
+                    _ollama_native_payload_from_openai(candidate, payload),
+                    timeout_seconds=timeout_seconds,
+                    connect_timeout_seconds=connect_timeout_seconds,
+                )
+                if native_response is not None:
+                    return _openai_response_from_ollama_native(native_response), candidate
+
             url = f"{candidate.normalized_base_url}/chat/completions"
             try:
                 response = client.post(

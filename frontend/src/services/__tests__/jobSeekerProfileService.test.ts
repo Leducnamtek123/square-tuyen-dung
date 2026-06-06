@@ -26,4 +26,15 @@ describe('jobSeekerProfileService', () => {
     );
     expect(result).toEqual({ count: 1, results: [resume] });
   });
+
+  it('normalizes deeply nested resume list responses', async () => {
+    const resume = { id: 8, title: 'Backend CV' };
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({
+      data: { data: { count: 1, results: [resume] } },
+    });
+
+    const result = await jobSeekerProfileService.getResumes(12);
+
+    expect(result).toEqual({ count: 1, results: [resume] });
+  });
 });

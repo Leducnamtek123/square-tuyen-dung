@@ -1,5 +1,6 @@
 import commonService from '../commonService';
 import httpRequest from '../../utils/httpRequest';
+import { presignInObject } from '../../utils/presignUrl';
 
 jest.mock('../../utils/httpRequest', () => ({
   get: jest.fn(),
@@ -12,7 +13,8 @@ jest.mock('../../utils/presignUrl', () => ({
 
 describe('commonService location options', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
+    (presignInObject as jest.Mock).mockImplementation((value) => Promise.resolve(value));
   });
 
   it('normalizes districts returned as a raw option array', async () => {
@@ -50,5 +52,25 @@ describe('commonService location options', () => {
 
     expect(httpRequest.get).toHaveBeenCalledWith('common/wards/?districtId=1');
     expect(res).toEqual({ data: wards });
+  });
+
+  it('normalizes deeply nested district and ward option responses', async () => {
+    const districts = [{ id: 3, name: 'Quan 3' }];
+    const wards = [{ id: 30, name: 'Phuong 3' }];
+    (httpRequest.get as jest.Mock)
+      .mockResolvedValueOnce({ data: { data: { count: 1, results: districts } } })
+      .mockResolvedValueOnce({ data: { data: { count: 1, results: wards } } });
+
+    await expect(commonService.getDistrictsByCityId(79)).resolves.toEqual({ data: districts });
+    await expect(commonService.getWardsByDistrictId(3)).resolves.toEqual({ data: wards });
+  });
+
+  it('normalizes deeply nested career list responses', async () => {
+    const careers = [{ id: 5, name: 'Architecture' }];
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({
+      data: { data: { count: 1, results: careers } },
+    });
+
+    await expect(commonService.getAllCareersSimple()).resolves.toEqual(careers);
   });
 });

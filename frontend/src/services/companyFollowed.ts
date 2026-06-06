@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 import type { PaginatedResponse } from '../types/api';
 import type { Company } from '../types/models';
 import { cleanParams } from '../utils/params';
@@ -12,7 +13,9 @@ export type CompanyFollowedListParams = {
 const companyFollowed = {
   getCompaniesFollowed: (params: CompanyFollowedListParams = {}): Promise<PaginatedResponse<{ id: number, company: Company }>> => {
     const url = 'info/web/companies-follow/';
-    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<{ id: number, company: Company }>>;
+    return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>).then((data) =>
+      normalizePaginatedResponse<{ id: number, company: Company }>(data)
+    );
   },
 };
 

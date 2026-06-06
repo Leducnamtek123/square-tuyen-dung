@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 import type { PaginatedResponse } from '../types/api';
 import { cleanParams } from '../utils/params';
 
@@ -34,6 +35,7 @@ export type JobPostNotificationListParams = {
 };
 
 type IdType = string | number;
+export type JobPostNotificationStatusResponse = { isActive: boolean };
 
 const jobPostNotificationService = {
   addJobPostNotification: (data: JobPostNotificationPayload): Promise<JobPostNotification> => {
@@ -43,9 +45,9 @@ const jobPostNotificationService = {
 
   getJobPostNotifications: (params: JobPostNotificationListParams = {}): Promise<PaginatedResponse<JobPostNotification>> => {
     const url = 'job/web/job-post-notifications/';
-    return httpRequest.get(url, {
+    return (httpRequest.get(url, {
       params: cleanParams(params),
-    }) as Promise<PaginatedResponse<JobPostNotification>>;
+    }) as Promise<unknown>).then((data) => normalizePaginatedResponse<JobPostNotification>(data));
   },
 
   updateJobPostNotificationById: (id: IdType, data: Partial<JobPostNotificationPayload>): Promise<JobPostNotification> => {
@@ -63,9 +65,9 @@ const jobPostNotificationService = {
     return httpRequest.delete(url) as Promise<void>;
   },
 
-  active: (id: IdType): Promise<JobPostNotification> => {
+  active: (id: IdType): Promise<JobPostNotificationStatusResponse> => {
     const url = `job/web/job-post-notifications/${id}/`;
-    return httpRequest.patch(url, {}) as Promise<JobPostNotification>;
+    return httpRequest.patch(url, {}) as Promise<JobPostNotificationStatusResponse>;
   },
 };
 

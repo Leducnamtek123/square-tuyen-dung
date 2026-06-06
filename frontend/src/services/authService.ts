@@ -22,8 +22,28 @@ interface ConvertTokenPayload {
 interface ActionResponse {
   success?: boolean;
   message?: string;
+  successMessage?: string;
+  redirectLoginUrl?: string;
+  emailVerified?: boolean;
 }
 let userInfoInFlight: Promise<UserResponse> | null = null;
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const normalizeActionResponse = (raw: unknown): ActionResponse => {
+  if (!isRecord(raw)) {
+    return { success: true };
+  }
+
+  if ('data' in raw) {
+    return isRecord(raw.data)
+      ? { success: true, ...raw.data }
+      : { success: true };
+  }
+
+  return { success: true, ...raw };
+};
 
 const authService = {
   getToken: (
@@ -83,7 +103,7 @@ const authService = {
       token: accessToken,
       backend,
     };
-    return httpRequest.post(url, data);
+    return Promise.resolve(httpRequest.post(url, data)).then(normalizeActionResponse);
   },
 
   checkCreds: (email: string, roleName: RoleName): Promise<CheckCredsResponse> => {
@@ -96,19 +116,19 @@ const authService = {
     return httpRequest.post(url, { email });
   },
 
-  jobSeekerRegister: (data: JobSeekerRegisterData): Promise<TokenResponse> => {
+  jobSeekerRegister: (data: JobSeekerRegisterData): Promise<ActionResponse> => {
     const url = 'auth/job-seeker/register/';
-    return httpRequest.post(url, data);
+    return Promise.resolve(httpRequest.post(url, data)).then(normalizeActionResponse);
   },
 
-  employerRegister: (data: EmployerRegisterData): Promise<{ message?: string }> => {
+  employerRegister: (data: EmployerRegisterData): Promise<ActionResponse> => {
     const url = 'auth/employer/register/';
-    return httpRequest.post(url, data);
+    return Promise.resolve(httpRequest.post(url, data)).then(normalizeActionResponse);
   },
 
   sendVerifyEmail: (email: string, platform = 'WEB'): Promise<ActionResponse> => {
     const url = 'auth/send-verify-email/';
-    return httpRequest.post(url, { email, platform });
+    return Promise.resolve(httpRequest.post(url, { email, platform })).then(normalizeActionResponse);
   },
 
   getUserInfo: async (): Promise<UserResponse> => {
@@ -170,17 +190,17 @@ const authService = {
 
   changePassword: (data: ChangePasswordData): Promise<ActionResponse> => {
     const url = 'auth/change-password/';
-    return httpRequest.put(url, data);
+    return Promise.resolve(httpRequest.put(url, data)).then(normalizeActionResponse);
   },
 
   forgotPassword: (data: { email: string; platform?: string }): Promise<ActionResponse> => {
     const url = 'auth/forgot-password/';
-    return httpRequest.post(url, { ...data, platform: data.platform || 'WEB' });
+    return Promise.resolve(httpRequest.post(url, { ...data, platform: data.platform || 'WEB' })).then(normalizeActionResponse);
   },
 
   resetPassword: (data: ResetPasswordData): Promise<ActionResponse> => {
     const url = 'auth/reset-password/';
-    return httpRequest.post(url, data);
+    return Promise.resolve(httpRequest.post(url, data)).then(normalizeActionResponse);
   },
 
   getUserSettings: (): Promise<UserSettingsData> => {

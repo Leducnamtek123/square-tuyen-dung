@@ -239,6 +239,9 @@
       "basicInfo": "Basic Information",
       "selectjobpost": "Select Job Post",
       "selectcandidate": "Select Candidate",
+      "aiVoice": "AI voice",
+      "autoDefaultVoice": "Auto/default voice",
+      "defaultVoiceSuffix": "default",
       "questions": "Questions",
       "selectquestiongroupoptional": "Select Question Group (Optional)",
       "selectinterviewquestions": "Select Interview Questions",
@@ -250,7 +253,8 @@
       "selectScheduleTime": "Please select interview time"
     },
     "helperText": {
-      "selectaquestiongrouptoautomaticallyfillthequestions below": "Select a question group to auto-fill questions"
+      "selectaquestiongrouptoautomaticallyfillthequestions below": "Select a question group to auto-fill questions",
+      "voiceProfileAuto": "Leave auto to use the default voice granted for this job or company."
     },
     "scheduleNow": "Schedule Now",
     "noCandidates": "No candidates have applied for this position"

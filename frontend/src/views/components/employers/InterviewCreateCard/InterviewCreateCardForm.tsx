@@ -245,18 +245,18 @@ const InterviewCreateCardForm = ({
                     onChange={(e) => field.onChange(e.target.value === 'auto' ? '' : e.target.value)}
                     select
                     fullWidth
-                    label="AI voice"
+                    label={t('interview:interviewCreateCard.label.aiVoice')}
                     disabled={isLoadingVoiceProfiles}
-                    helperText="Leave auto to use the default voice granted for this job or company."
+                    helperText={t('interview:interviewCreateCard.helperText.voiceProfileAuto')}
                     sx={inputSx}
                     slotProps={voiceProfileSlotProps}
                   >
                     <MenuItem value="auto" sx={{ fontWeight: 600 }}>
-                      <em>Auto/default voice</em>
+                      <em>{t('interview:interviewCreateCard.label.autoDefaultVoice')}</em>
                     </MenuItem>
                     {voiceProfiles.map((profile) => (
                       <MenuItem key={profile.id} value={profile.id} sx={{ fontWeight: 600 }}>
-                        {profile.name}{isDefaultVoiceProfile(profile) ? ' (default)' : ''}
+                        {profile.name}{isDefaultVoiceProfile(profile) ? ` (${t('interview:interviewCreateCard.label.defaultVoiceSuffix')})` : ''}
                       </MenuItem>
                     ))}
                   </TextField>

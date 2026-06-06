@@ -3,9 +3,11 @@ import { presignInObject } from '../utils/presignUrl';
 import { User as UserModel } from '../types/models';
 import { PaginatedResponse } from '../types/api';
 import { cleanParams } from '../utils/params';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 import type { AdminListParams } from './adminManagementService';
 
 type IdType = string | number;
+export type UserStatusResponse = { isActive: boolean };
 
 const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
   const data = await promise;
@@ -13,17 +15,18 @@ const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
 };
 
 const userService = {
-  getAllUsers: (params: AdminListParams = {}): Promise<PaginatedResponse<UserModel>> => {
+  getAllUsers: async (params: AdminListParams = {}): Promise<PaginatedResponse<UserModel>> => {
     const url = 'auth/users/';
-    return withPresign(httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<UserModel>>);
+    const data = await withPresign(httpRequest.get(url, { params: cleanParams(params) }));
+    return normalizePaginatedResponse<UserModel>(data);
   },
   updateUser: (id: IdType, data: Partial<UserModel>): Promise<UserModel> => {
     const url = `auth/users/${id}/`;
     return withPresign(httpRequest.patch(url, data) as Promise<UserModel>);
   },
-  toggleUserStatus: (id: IdType): Promise<UserModel> => {
+  toggleUserStatus: (id: IdType): Promise<UserStatusResponse> => {
     const url = `auth/users/${id}/toggle-active/`;
-    return httpRequest.post(url) as Promise<UserModel>;
+    return httpRequest.post(url) as Promise<UserStatusResponse>;
   },
   bulkStatus: (ids: IdType[], isActive: boolean): Promise<{ updated: number; isActive: boolean }> => {
     const url = 'auth/users/bulk-status/';

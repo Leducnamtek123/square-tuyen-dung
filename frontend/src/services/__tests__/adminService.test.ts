@@ -22,7 +22,19 @@ describe('adminService', () => {
     const result = await adminService.getUsers({ page: 1 });
     expect(httpRequest.get).toHaveBeenCalledWith('auth/users/', { params: { page: 1 } });
     expect(presignInObject).toHaveBeenCalledWith(mockData);
-    expect(result).toBe(mockData);
+    expect(result).toEqual({ count: 0, results: [] });
+  });
+
+  it('getUsers normalizes nested presigned list responses', async () => {
+    const user = { id: 12, email: 'admin@square.vn' };
+    const mockData = { data: { count: 1, results: [user] } };
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce(mockData);
+
+    const result = await adminService.getUsers({ page: 2 });
+
+    expect(httpRequest.get).toHaveBeenCalledWith('auth/users/', { params: { page: 2 } });
+    expect(presignInObject).toHaveBeenCalledWith(mockData);
+    expect(result).toEqual({ count: 1, results: [user] });
   });
 
   it('getStats calls admin-general-statistics and presigns', async () => {

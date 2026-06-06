@@ -239,6 +239,9 @@
       "basicInfo": "Thông tin cơ bản",
       "selectjobpost": "Chọn tin tuyển dụng",
       "selectcandidate": "Chọn ứng viên",
+      "aiVoice": "Giọng AI",
+      "autoDefaultVoice": "Tự động/giọng mặc định",
+      "defaultVoiceSuffix": "mặc định",
       "questions": "Câu hỏi",
       "selectquestiongroupoptional": "Chọn nhóm câu hỏi (Tùy chọn)",
       "selectinterviewquestions": "Chọn câu hỏi phỏng vấn",
@@ -250,7 +253,8 @@
       "selectScheduleTime": "Vui lòng chọn thời gian phỏng vấn"
     },
     "helperText": {
-      "selectaquestiongrouptoautomaticallyfillthequestions below": "Chọn nhóm câu hỏi để tự động điền câu hỏi"
+      "selectaquestiongrouptoautomaticallyfillthequestions below": "Chọn nhóm câu hỏi để tự động điền câu hỏi",
+      "voiceProfileAuto": "Giữ tự động để dùng giọng mặc định đã cấp cho tin tuyển dụng hoặc công ty này."
     },
     "scheduleNow": "Lên lịch ngay",
     "noCandidates": "Không có ứng viên nào đã ứng tuyển vị trí này"

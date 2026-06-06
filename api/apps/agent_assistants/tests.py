@@ -413,6 +413,137 @@ def test_agent_message_rejects_non_image_attachment(employer_user, company):
 
 
 @pytest.mark.django_db
+def test_agent_follow_up_about_previous_image_passes_recent_image_to_planner(monkeypatch, employer_user, company):
+    calls = []
+    image_data_url = "data:image/jpeg;base64,aGVsbG8="
+
+    def fake_post_chat_completion(payload, *, default_model="", timeout=(10, 120)):
+        calls.append(payload)
+        return (
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": (
+                                "{"
+                                "\"toolName\":\"respond\","
+                                "\"arguments\":{},"
+                                "\"assistantText\":\"Tôi sẽ xem ảnh gần nhất trong đoạn chat.\""
+                                "}"
+                            ),
+                        }
+                    }
+                ],
+            },
+            AIEndpointCandidate(name="local", base_url="http://llm.test/v1", model=default_model),
+        )
+
+    monkeypatch.setattr(
+        "integrations.ai.client.post_chat_completion_requests",
+        fake_post_chat_completion,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+    thread_response = client.post("/api/v1/agent-assistants/threads/", data={"portal": "employer"}, format="json")
+    thread_id = thread_response.data["data"]["id"]
+
+    image_response = client.post(
+        f"/api/v1/agent-assistants/threads/{thread_id}/messages/",
+        data={
+            "content": "",
+            "attachments": [
+                {
+                    "type": "image",
+                    "name": "candidate.jpg",
+                    "mimeType": "image/jpeg",
+                    "size": 5,
+                    "dataUrl": image_data_url,
+                }
+            ],
+        },
+        format="json",
+    )
+    assert image_response.status_code == 200
+    calls.clear()
+
+    follow_up_response = client.post(
+        f"/api/v1/agent-assistants/threads/{thread_id}/messages/",
+        data={"content": "Hình tôi gửi là gì?"},
+        format="json",
+    )
+
+    assert follow_up_response.status_code == 200
+    assert calls, "follow-up planner call should include recent image context"
+    planner_user_message = calls[0]["messages"][1]
+    assert isinstance(planner_user_message["content"], list)
+    assert planner_user_message["content"][1] == {
+        "type": "image_url",
+        "image_url": {"url": image_data_url},
+    }
+
+
+@pytest.mark.django_db
+def test_agent_image_question_using_vietnamese_anh_word_uses_direct_vision(monkeypatch, employer_user, company):
+    calls = []
+    image_data_url = "data:image/jpeg;base64,aGVsbG8="
+    answer = "\u0110\u00e2y l\u00e0 \u1ea3nh ch\u00e2n dung."
+
+    def fake_post_chat_completion(payload, *, default_model="", timeout=(10, 120)):
+        calls.append(payload)
+        return (
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "role": "assistant",
+                            "content": answer,
+                        }
+                    }
+                ],
+            },
+            AIEndpointCandidate(name="local", base_url="http://llm.test/v1", model=default_model),
+        )
+
+    monkeypatch.setattr(
+        "integrations.ai.client.post_chat_completion_requests",
+        fake_post_chat_completion,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+    thread_response = client.post("/api/v1/agent-assistants/threads/", data={"portal": "employer"}, format="json")
+    thread_id = thread_response.data["data"]["id"]
+
+    response = client.post(
+        f"/api/v1/agent-assistants/threads/{thread_id}/messages/",
+        data={
+            "content": "\u1ea3nh g\u00ec \u0111\u00e2y",
+            "attachments": [
+                {
+                    "type": "image",
+                    "name": "candidate.jpg",
+                    "mimeType": "image/jpeg",
+                    "size": 5,
+                    "dataUrl": image_data_url,
+                }
+            ],
+        },
+        format="json",
+    )
+
+    assert response.status_code == 200
+    assistant_message = response.data["data"]["assistantMessage"]
+    assert assistant_message["content"] == answer
+    assert assistant_message["metadata"]["vision"]["candidate"] == "local"
+    assert calls[0]["messages"][1]["content"][1] == {
+        "type": "image_url",
+        "image_url": {"url": image_data_url},
+    }
+
+
+@pytest.mark.django_db
 def test_employer_agent_message_searches_candidate_resumes(employer_user, job_post, resume):
     resume.title = "Senior React Engineer"
     resume.skills_summary = "React, TypeScript, hiring platform"

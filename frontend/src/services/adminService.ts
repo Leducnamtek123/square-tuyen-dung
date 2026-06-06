@@ -1,6 +1,7 @@
 import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 import { cleanParams } from '../utils/params';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 import type { PaginatedResponse } from '../types/api';
 import type { User } from '../types/models';
 import type { AdminGeneralStats } from './statisticService';
@@ -26,7 +27,8 @@ const adminService = {
     // the same `auth/users/` viewset is used and guarded by IsAdminUser
     // so we call the regular users endpoint.
     const url = 'auth/users/';
-    return withPresign(httpRequest.get<PaginatedResponse<User>>(url, { params: cleanParams(params) }));
+    return withPresign(httpRequest.get(url, { params: cleanParams(params) }))
+      .then((data) => normalizePaginatedResponse<User>(data));
   },
 
   getStats: (): Promise<AdminGeneralStats> => {

@@ -29,6 +29,7 @@
     "backHome": "Quay lại trang chủ",
     "joinNow": "Tham gia ngay",
     "openNewTab": "Mở tab mới",
+    "openDrawer": "Mở menu điều hướng",
     "refresh": "Làm mới",
     "retry": "Thử lại",
     "details": "Chi tiết",
@@ -42,6 +43,8 @@
     "apply": "Áp dụng",
     "add": "Thêm",
     "download": "Tải xuống",
+    "zoomOut": "Thu nhỏ",
+    "zoomIn": "Phóng to",
     "upload": "Tải lên",
     "sendOTP": "Gửi OTP",
     "verifyOTP": "Xác nhận",
@@ -51,6 +54,10 @@
     "saveChanges": "Lưu thay đổi",
     "preview": "Xem trước",
     "back": "Quay lại"
+  },
+  "userSettings": {
+    "emailNotifications": "Bật thông báo qua email",
+    "smsNotifications": "Bật thông báo qua SMS"
   },
   "loading": "Đang tải...",
   "noData": "Không có dữ liệu",
@@ -887,8 +894,12 @@
     "viewAll": "Xem tất cả"
   },
   "profileUpload": {
+    "allowSearch": "Cho phép tìm kiếm",
+    "searchHelp": "Bật \"Cho phép tìm kiếm\" sẽ giúp nhà tuyển dụng tìm thấy hồ sơ của bạn và họ có thể liên hệ với bạn về công việc mới. Chỉ có duy nhất một hồ sơ được bật trạng thái \"cho phép tìm kiếm\" trong tất cả hồ sơ của bạn.",
     "lastUpdated": "Cập nhật lần cuối: {{date}}",
     "download": "Tải xuống",
+    "editResume": "Chỉnh sửa hồ sơ",
+    "deleteResume": "Xóa hồ sơ",
     "previewColor": "Xem trước màu đã chọn"
   },
   "interview": {

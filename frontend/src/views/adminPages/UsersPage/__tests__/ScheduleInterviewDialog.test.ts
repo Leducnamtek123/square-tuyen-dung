@@ -19,6 +19,7 @@ describe('ScheduleInterviewDialog', () => {
     expect(normalizeScheduleQuestionOptions({ results: [question] })).toEqual([question]);
     expect(normalizeScheduleQuestionOptions({ data: [question] })).toEqual([question]);
     expect(normalizeScheduleQuestionOptions({ data: { results: [question] } })).toEqual([question]);
+    expect(normalizeScheduleQuestionOptions({ data: { data: { count: 1, results: [question] } } })).toEqual([question]);
     expect(normalizeScheduleQuestionOptions(null)).toEqual([]);
   });
 

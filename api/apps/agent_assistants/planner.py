@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import unicodedata
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -117,6 +118,87 @@ def _normalize_tool_name(value: Any) -> str:
     return aliases.get(normalized, normalized)
 
 
+def _strip_accents(value: str) -> str:
+    normalized = unicodedata.normalize("NFKD", value or "")
+    stripped = "".join(ch for ch in normalized if not unicodedata.combining(ch))
+    return stripped.replace("đ", "d").replace("Đ", "D")
+
+
+def _normalize_text(value: str) -> str:
+    normalized = _strip_accents(value).lower()
+    normalized = re.sub(r"[^a-z0-9]+", " ", normalized)
+    return re.sub(r"\s+", " ", normalized).strip()
+
+
+def _has_normalized_word(normalized: str, word: str) -> bool:
+    return f" {word} " in f" {normalized} "
+
+
+def _asks_about_image(value: str) -> bool:
+    normalized = _normalize_text(value)
+    if not normalized:
+        return False
+    if any(_has_normalized_word(normalized, token) for token in ("hinh", "image", "photo", "picture", "screenshot")):
+        return True
+    if _has_normalized_word(normalized, "anh"):
+        image_phrases = (
+            "anh gi",
+            "anh la gi",
+            "anh nay",
+            "anh day",
+            "anh do",
+            "buc anh",
+            "tam anh",
+            "file anh",
+            "trong anh",
+            "gui anh",
+            "anh toi gui",
+            "anh minh gui",
+            "anh vua gui",
+            "anh da gui",
+            "upload anh",
+            "phan tich anh",
+            "mo ta anh",
+            "doc anh",
+            "kiem tra anh",
+            "check anh",
+        )
+        if any(phrase in normalized for phrase in image_phrases):
+            return True
+        if any(_has_normalized_word(normalized, token) for token in ("gi", "day", "nay", "do")):
+            return True
+    return any(phrase in normalized for phrase in ("check lai", "kiem tra lai", "xem lai", "cai nay", "noi dung nay"))
+
+
+def _image_url_parts_from_message_parts(parts: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
+    return [
+        {
+            "type": "image_url",
+            "image_url": {"url": str(part.get("dataUrl") or "")},
+        }
+        for part in (parts or [])
+        if isinstance(part, dict) and part.get("type") == "image" and part.get("dataUrl")
+    ]
+
+
+def _recent_image_url_parts(thread: AgentThread, *, limit_messages: int = 8, limit_images: int = 3) -> list[dict[str, Any]]:
+    image_parts: list[dict[str, Any]] = []
+    messages = list(thread.messages.filter(role="user").order_by("-create_at", "-id")[:limit_messages])
+    for message in messages:
+        for part in message.parts or []:
+            if not isinstance(part, dict) or part.get("type") != "image" or not part.get("dataUrl"):
+                continue
+            image_parts.append(
+                {
+                    "type": "image_url",
+                    "image_url": {"url": str(part.get("dataUrl") or "")},
+                }
+            )
+            if len(image_parts) >= limit_images:
+                return image_parts
+    return image_parts
+
+
 def _recent_thread_messages(thread: AgentThread, limit: int = 8) -> list[dict[str, str]]:
     messages = list(thread.messages.order_by("-create_at", "-id")[:limit])
     messages.reverse()
@@ -155,6 +237,7 @@ class AgentPlanner:
             "Do not use emoji. "
             "Use a tool when the user asks to create or update real recruiting data. "
             "Use respond only for questions, clarification, or unsupported tasks. "
+            "If image input is present, inspect the image and answer based on it; do not claim you cannot process images. "
             "Do not invent IDs. For job posts, prefer jobPostName if the user gives a position name. "
             "For question bank requests, use create_question, list_questions, create_question_group, or list_question_groups. "
             "For live interview or interview schedule requests, use list_interviews; use liveOnly=true for live interviews. "
@@ -162,22 +245,20 @@ class AgentPlanner:
             "2 contacted, 3 tested, 4 interviewed, 5 hired, 6 not selected. "
             "For interview status use draft, scheduled, calibration, in_progress, processing, completed, cancelled, or interrupted."
         )
+        image_parts = _image_url_parts_from_message_parts(message_parts)
+        if not image_parts and _asks_about_image(user_content):
+            image_parts = _recent_image_url_parts(thread)
+
         user_context = {
             "portal": thread.portal,
             "companyId": thread.company_id,
             "tools": _compact_tool_schema(),
             "recentMessages": _recent_thread_messages(thread),
-            "newestUserMessage": user_content,
+            "newestUserMessage": user_content or ("Người dùng vừa gửi ảnh." if image_parts else ""),
         }
+        if image_parts:
+            user_context["imageContext"] = "Ảnh được đính kèm trong message này hoặc là ảnh gần nhất trong đoạn chat."
         planner_user_content: str | list[dict[str, Any]] = json.dumps(user_context, ensure_ascii=False)
-        image_parts = [
-            {
-                "type": "image_url",
-                "image_url": {"url": str(part.get("dataUrl") or "")},
-            }
-            for part in (message_parts or [])
-            if isinstance(part, dict) and part.get("type") == "image" and part.get("dataUrl")
-        ]
         if image_parts:
             planner_user_content = [
                 {"type": "text", "text": json.dumps(user_context, ensure_ascii=False)},

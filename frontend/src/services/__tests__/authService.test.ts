@@ -103,6 +103,48 @@ describe('authService', () => {
       await authService.forgotPassword({ email: 'a@b.com' });
       expect(httpRequest.post).toHaveBeenCalledWith('auth/forgot-password/', { email: 'a@b.com', platform: 'WEB' });
     });
+
+    it('normalizes empty successful auth action responses', async () => {
+      (httpRequest.post as jest.Mock)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce('');
+      (httpRequest.put as jest.Mock).mockResolvedValueOnce({ data: null });
+
+      await expect(authService.forgotPassword({ email: 'a@b.com' })).resolves.toEqual({ success: true });
+      await expect(authService.changePassword({ new_password: 'pass' } as any)).resolves.toEqual({ success: true });
+      await expect(authService.revokeToken('token')).resolves.toEqual({ success: true });
+    });
+
+    it('normalizes verify-email action responses and preserves emailVerified', async () => {
+      (httpRequest.post as jest.Mock).mockResolvedValueOnce({ emailVerified: false });
+
+      await expect(authService.sendVerifyEmail('a@b.com')).resolves.toEqual({
+        success: true,
+        emailVerified: false,
+      });
+    });
+
+    it('normalizes empty successful register responses', async () => {
+      (httpRequest.post as jest.Mock)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({ data: null });
+
+      await expect(authService.jobSeekerRegister({ email: 'a@b.com' } as any)).resolves.toEqual({ success: true });
+      await expect(authService.employerRegister({ email: 'hr@b.com' } as any)).resolves.toEqual({ success: true });
+    });
+
+    it('normalizes reset-password responses and preserves backend success payload', async () => {
+      (httpRequest.post as jest.Mock).mockResolvedValueOnce({
+        redirectLoginUrl: '/login',
+        successMessage: 'Password reset successfully.',
+      });
+
+      await expect(authService.resetPassword({ token: 'reset-token' } as any)).resolves.toEqual({
+        success: true,
+        redirectLoginUrl: '/login',
+        successMessage: 'Password reset successfully.',
+      });
+    });
     
     it('getUserSettings calls get', async () => {
       await authService.getUserSettings();

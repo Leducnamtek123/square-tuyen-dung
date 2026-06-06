@@ -2,6 +2,7 @@ import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 import type { InterviewSession, InterviewEvaluation } from '../types/models';
 import type { PaginatedResponse } from '../types/api';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 
 type IdType = string | number;
 
@@ -52,6 +53,13 @@ interface LiveKitTokenResponse {
   roomName: string;
 }
 
+export type HrPresenceTokenResponse = LiveKitTokenResponse & {
+  mode: string;
+  participantName: string;
+  participantIdentity?: string;
+  companyName?: string | null;
+};
+
 interface SessionMetrics {
   sessionId: number;
   status: string;
@@ -66,12 +74,40 @@ interface SessionMetrics {
   jobName: string | null;
 }
 
+interface TriggerAiEvaluationResponse {
+  status: string;
+  detail?: string;
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const normalizeTriggerAiEvaluationResponse = (raw: unknown): TriggerAiEvaluationResponse => {
+  if (!isRecord(raw)) {
+    return { status: 'queued' };
+  }
+
+  const status = typeof raw.status === 'string' && raw.status.trim()
+    ? raw.status
+    : 'queued';
+  const detail = typeof raw.detail === 'string'
+    ? raw.detail
+    : typeof raw.message === 'string'
+      ? raw.message
+      : undefined;
+
+  return detail ? { status, detail } : { status };
+};
+
 /* ── Service ──────────────────────────────────────────────────────────── */
 
 const interviewService = {
   getSessions: (params: GetSessionsParams = {}): Promise<PaginatedResponse<InterviewSession>> => {
     const url = 'interview/web/sessions/';
-    return httpRequest.get(url, { params }).then((res) => presignInObject(res)) as Promise<PaginatedResponse<InterviewSession>>;
+    return httpRequest
+      .get(url, { params })
+      .then((res) => presignInObject(res))
+      .then((data) => normalizePaginatedResponse<InterviewSession>(data));
   },
 
   getSessionDetail: (id: IdType): Promise<InterviewSession> => {
@@ -119,9 +155,9 @@ const interviewService = {
     return httpRequest.get(url) as Promise<LiveKitTokenResponse>;
   },
 
-  triggerAiEvaluation: (id: IdType): Promise<{ status: string }> => {
+  triggerAiEvaluation: (id: IdType): Promise<TriggerAiEvaluationResponse> => {
     const url = `interview/web/sessions/${id}/evaluate-ai/`;
-    return httpRequest.post(url) as Promise<{ status: string }>;
+    return Promise.resolve(httpRequest.post(url)).then(normalizeTriggerAiEvaluationResponse);
   },
 
   submitEvaluation: (data: SubmitEvaluationInput): Promise<InterviewEvaluation> => {
@@ -131,7 +167,9 @@ const interviewService = {
 
   getEvaluations: (sessionId: IdType): Promise<PaginatedResponse<InterviewEvaluation>> => {
     const url = `interview/web/evaluations/`;
-    return httpRequest.get(url, { params: { interview: sessionId } }) as Promise<PaginatedResponse<InterviewEvaluation>>;
+    return httpRequest
+      .get(url, { params: { interview: sessionId } })
+      .then((data) => normalizePaginatedResponse<InterviewEvaluation>(data));
   },
 
   getObserverToken: (sessionId: IdType): Promise<LiveKitTokenResponse & { mode: string }> => {
@@ -139,9 +177,9 @@ const interviewService = {
     return httpRequest.post(url) as Promise<LiveKitTokenResponse & { mode: string }>;
   },
 
-  getHrPresenceToken: (sessionId: IdType): Promise<LiveKitTokenResponse & { mode: string; participant_name: string }> => {
+  getHrPresenceToken: (sessionId: IdType): Promise<HrPresenceTokenResponse> => {
     const url = `interview/web/sessions/${sessionId}/hr-token/`;
-    return httpRequest.post(url) as Promise<LiveKitTokenResponse & { mode: string; participant_name: string }>;
+    return httpRequest.post(url) as Promise<HrPresenceTokenResponse>;
   },
 
   getSessionMetrics: (sessionId: IdType): Promise<SessionMetrics> => {

@@ -93,6 +93,7 @@
     "backHome": "Back to home",
     "joinNow": "Join now",
     "openNewTab": "Open in new tab",
+    "openDrawer": "Open navigation menu",
     "refresh": "Refresh",
     "retry": "Retry",
     "details": "Details",
@@ -106,6 +107,8 @@
     "apply": "Apply",
     "add": "Add",
     "download": "Download",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in",
     "upload": "Upload",
     "change": "Change",
     "saveChanges": "Save Changes",
@@ -115,6 +118,10 @@
     "verifyOTP": "Verify OTP",
     "changePhone": "Change Phone",
     "resendOTP": "Resend OTP"
+  },
+  "userSettings": {
+    "emailNotifications": "Enable email notifications",
+    "smsNotifications": "Enable SMS notifications"
   },
   "status": {
     "pending": "Pending",
@@ -895,8 +902,12 @@
     "jobsCount": "{{count}} jobs"
   },
   "profileUpload": {
+    "allowSearch": "Allow search",
+    "searchHelp": "Turning on \"Allow search\" helps employers find your resume and contact you about new jobs. Only one of your resumes can have search enabled at a time.",
     "lastUpdated": "Last updated: {{date}}",
     "download": "Download",
+    "editResume": "Edit resume",
+    "deleteResume": "Delete resume",
     "previewColor": "Preview selected color"
   },
   "interview": {

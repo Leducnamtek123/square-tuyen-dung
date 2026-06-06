@@ -7,6 +7,7 @@ import { typedYupResolver } from '../../../../utils/formHelpers';
 import { Grid2 as Grid } from "@mui/material";
 import CheckboxCustom from '../../../../components/Common/Controls/CheckboxCustom';
 import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 export type FormValues = {
   emailNotificationActive: boolean;
@@ -19,6 +20,7 @@ interface SettingFormProps {
 }
 
 const SettingForm = ({ editData, handleUpdate }: SettingFormProps) => {
+  const { t } = useTranslation();
   const schema = yup.object().shape({
     emailNotificationActive: yup.boolean().default(false),
     smsNotificationActive: yup.boolean().default(false),
@@ -39,14 +41,14 @@ const SettingForm = ({ editData, handleUpdate }: SettingFormProps) => {
           <CheckboxCustom
             name="emailNotificationActive"
             control={control}
-            title="Enable email notifications"
+            title={t('common:userSettings.emailNotifications')}
           />
         </Grid>
         <Grid size={12}>
           <CheckboxCustom
             name="smsNotificationActive"
             control={control}
-            title="Enable SMS notifications"
+            title={t('common:userSettings.smsNotifications')}
           />
         </Grid>
       </Grid>

@@ -3,7 +3,7 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 
-import userService from '../../../../services/userService';
+import userService, { type UserStatusResponse } from '../../../../services/userService';
 import toastMessages from '../../../../utils/toastMessages';
 import i18n from '../../../../i18n';
 import { User as UserModel } from '../../../../types/models';
@@ -16,7 +16,7 @@ import type { TOptions } from 'i18next';
 const translateAdmin = (key: string, options?: TOptions) => i18n.t(key, { ns: 'admin', ...options });
 
 type UseUsersResult = UseQueryResult<PaginatedResponse<UserModel>> & {
-    toggleUserStatus: (user: UserModel) => Promise<UserModel>;
+    toggleUserStatus: (user: UserModel) => Promise<UserStatusResponse>;
     bulkDisableUsers: (ids: Array<string | number>) => Promise<{ updated: number; isActive: boolean }>;
     updateUserRole: (args: { userId: string | number; roleName: RoleName }) => Promise<UserModel>;
     deleteUser: (id: string | number) => Promise<void>;
@@ -104,5 +104,4 @@ export const useUsers = (params: AdminListParams): UseUsersResult => {
         isMutating: toggleStatusMutation.isPending || updateRoleMutation.isPending || bulkDisableMutation.isPending || deleteMutation.isPending
     } as UseUsersResult;
 };
-
 

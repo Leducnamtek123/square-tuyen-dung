@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useAppSelector } from '@/redux/hooks';
+import { useTranslation } from 'react-i18next';
 
 import { usePathname } from 'next/navigation';
 
@@ -48,6 +49,8 @@ const createInitialExpanded = (items: NavItem[]) => {
 };
 
 const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
+
+  const { t } = useTranslation('common');
 
   const pathname = usePathname();
 
@@ -126,7 +129,7 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
               color="inherit"
 
-              aria-label="open drawer"
+              aria-label={t('actions.openDrawer')}
 
               edge="start"
 

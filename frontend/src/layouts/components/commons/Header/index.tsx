@@ -151,7 +151,7 @@ const Header = (_props: HeaderProps) => {
             {/* ── Mobile: Hamburger icon TRƯỚC logo (chuẩn MUI) ── */}
             <IconButton
               color="inherit"
-              aria-label="open drawer"
+              aria-label={t('actions.openDrawer')}
               edge="start"
               onClick={handleDrawerToggle}
               sx={{ mr: 1, display: { md: "none" } }}

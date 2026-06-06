@@ -1,5 +1,6 @@
 import httpRequest from '../utils/httpRequest';
 import { cleanParams } from '../utils/params';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 
 import type { PaginatedResponse } from '../types/api';
 import type { CompanyRole, CompanyMember } from '../types/models';
@@ -50,7 +51,9 @@ const normalizeMemberPayload = <T extends CompanyMemberPayload | CompanyMemberUp
 
 const companyTeamService = {
   getRoles: (params: CompanyTeamListParams = {}): Promise<PaginatedResponse<CompanyRole>> => {
-    return httpRequest.get<PaginatedResponse<CompanyRole>>('info/web/company-roles/', { params: cleanParams(params) });
+    return httpRequest
+      .get('info/web/company-roles/', { params: cleanParams(params) })
+      .then((data) => normalizePaginatedResponse<CompanyRole>(data));
   },
   createRole: (data: CompanyRolePayload): Promise<CompanyRole> => {
     return httpRequest.post<CompanyRole>('info/web/company-roles/', data);
@@ -62,7 +65,9 @@ const companyTeamService = {
     return httpRequest.delete<void>(`info/web/company-roles/${id}/`);
   },
   getMembers: (params: CompanyTeamListParams = {}): Promise<PaginatedResponse<CompanyMember>> => {
-    return httpRequest.get<PaginatedResponse<CompanyMember>>('info/web/company-members/', { params: cleanParams(params) });
+    return httpRequest
+      .get('info/web/company-members/', { params: cleanParams(params) })
+      .then((data) => normalizePaginatedResponse<CompanyMember>(data));
   },
   createMember: (data: CompanyMemberPayload): Promise<CompanyMember> => {
     return httpRequest.post<CompanyMember>('info/web/company-members/', normalizeMemberPayload(data));
@@ -73,8 +78,8 @@ const companyTeamService = {
   deleteMember: (id: IdType): Promise<void> => {
     return httpRequest.delete<void>(`info/web/company-members/${id}/`);
   },
-  getMyMembership: (): Promise<CompanyMember> => {
-    return httpRequest.get<CompanyMember>('info/web/company-members/me/');
+  getMyMembership: (): Promise<CompanyMember | null> => {
+    return httpRequest.get<CompanyMember | null>('info/web/company-members/me/');
   },
 };
 

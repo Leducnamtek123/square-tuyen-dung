@@ -10,6 +10,16 @@
   "typeYourMessage": "Type your message here...",
   "send": "Send",
   "sendMessage": "Message",
+  "composer": {
+    "attachFile": "Attach file",
+    "chooseEmoji": "Choose emoji",
+    "sendMessage": "Send message"
+  },
+  "message": {
+    "avatarAlt": "Chat avatar",
+    "attachmentImageAlt": "Message attachment",
+    "downloadFile": "Download file"
+  },
   "noCandidates": "No candidates have applied",
   "sending": "Sending ...",
   "appliedJobs": "APPLIED JOB POSTS",

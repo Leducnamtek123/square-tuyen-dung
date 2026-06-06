@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import { Box, IconButton, Typography, Stack, Chip, Skeleton, Tooltip, Theme } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 import HelpIcon from '@mui/icons-material/Help';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
 import StarIcon from '@mui/icons-material/Star';
@@ -41,7 +42,7 @@ const ProfileUploadImage = ({ resumeImage }: ProfileUploadImageProps) => {
       fill
       sizes="100vw"
       style={{ objectFit: 'cover', position: 'absolute', inset: 0, zIndex: 1 }}
-      alt="BG"
+      alt=""
     />
   );
 };
@@ -59,6 +60,8 @@ const ProfileUploadCard = ({
 }: ProfileUploadCardProps) => {
 
   const { push } = useRouter();
+  const { t } = useTranslation('common');
+  const formattedUpdatedAt = dayjs(updateAt).format('DD/MM/YYYY HH:mm:ss');
 
   return (
 
@@ -138,7 +141,7 @@ const ProfileUploadCard = ({
 
               icon={<StarIcon sx={{ color: 'warning.main' }} />}
 
-              label="Cho phép tìm kiếm"
+              label={t('profileUpload.allowSearch')}
 
               onClick={() => handleActive(slug)}
 
@@ -167,7 +170,7 @@ const ProfileUploadCard = ({
 
               icon={<StarOutlineIcon sx={{ color: 'warning.main' }} />}
 
-              label="Cho phép tìm kiếm"
+              label={t('profileUpload.allowSearch')}
 
               onClick={() => handleActive(slug)}
 
@@ -177,7 +180,7 @@ const ProfileUploadCard = ({
 
           <Tooltip
 
-            title={`Bật "Cho phép tìm kiếm" sẽ giúp nhà tuyển dụng tìm thấy hồ sơ của bạn và họ có thể liên hệ với bạn về công việc mới. Chỉ có duy nhất một hồ sơ được bật trạng thái "cho phép tìm kiếm" trong tất cả hồ sơ của bạn.`}
+            title={t('profileUpload.searchHelp')}
 
             arrow
 
@@ -241,7 +244,7 @@ const ProfileUploadCard = ({
 
               <IconButton
 
-                aria-label="edit resume"
+                aria-label={t('profileUpload.editResume')}
                 sx={{
 
                   width: 38,
@@ -274,7 +277,7 @@ const ProfileUploadCard = ({
 
             <Typography variant="caption" sx={{ opacity: 0.8 }}>
 
-              Cập nhật lần cuối: {dayjs(updateAt).format('DD/MM/YYYY HH:mm:ss')}
+              {t('profileUpload.lastUpdated', { date: formattedUpdatedAt })}
 
             </Typography>
 
@@ -302,7 +305,7 @@ const ProfileUploadCard = ({
 
                 icon={<DownloadIcon sx={{ color: defaultTheme.palette.secondary.main }} />}
 
-                label="Tải xuống"
+                label={t('profileUpload.download')}
 
                 onClick={() => downloadPdf(fileUrl, title)}
 
@@ -310,7 +313,7 @@ const ProfileUploadCard = ({
 
               <IconButton
 
-                aria-label="delete resume"
+                aria-label={t('profileUpload.deleteResume')}
                 sx={{
 
                   width: 38,

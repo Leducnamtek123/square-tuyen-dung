@@ -25,11 +25,13 @@ describe('camelCase utilities', () => {
       expect(camelizeKeys(snake)).toEqual(camel);
     });
 
-    it('ignores Date, File, and Blob objects', () => {
+    it('ignores Date, File, Blob, and ArrayBuffer objects', () => {
       const date = new Date();
-      const snake = { created_at: date };
+      const audio = new ArrayBuffer(4);
+      const snake = { created_at: date, audio_bytes: audio };
       const result = camelizeKeys<any>(snake);
       expect(result.createdAt).toBe(date);
+      expect(result.audioBytes).toBe(audio);
     });
 
     it('ignores primitives', () => {
@@ -62,11 +64,13 @@ describe('camelCase utilities', () => {
       expect(snakizeKeys(camel)).toEqual(snake);
     });
 
-    it('ignores Date, File, Blob, and FormData objects', () => {
+    it('ignores Date, File, Blob, FormData, and ArrayBuffer objects', () => {
       const date = new Date();
-      const camel = { createdAt: date };
+      const audio = new ArrayBuffer(4);
+      const camel = { createdAt: date, audioBytes: audio };
       const result = snakizeKeys<any>(camel);
       expect(result.created_at).toBe(date);
+      expect(result.audio_bytes).toBe(audio);
     });
 
     it('ignores primitives', () => {

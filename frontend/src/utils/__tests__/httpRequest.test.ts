@@ -138,6 +138,18 @@ describe('httpRequest', () => {
     expect(response).toEqual({ firstName: 'John', lastName: 'Doe' });
   });
 
+  it('unwraps successful response envelopes even when data is null', async () => {
+    mock.onGet('/empty-success-endpoint').reply(200, {
+      success: true,
+      data: null,
+      error: null,
+    });
+
+    const response = await httpRequest.get('/empty-success-endpoint');
+
+    expect(response).toBeNull();
+  });
+
   describe('error interceptor & token refresh logic', () => {
     it('retries on 5xx errors for GET requests', async () => {
       mock.onGet('/500-endpoint').replyOnce(500);

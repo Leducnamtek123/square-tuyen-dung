@@ -50,7 +50,7 @@ const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
           >
             <ZoomOut>
               {(props: { onClick: () => void }) => (
-                <IconButton aria-label="zoom-out" color="warning" onClick={props.onClick}>
+                <IconButton aria-label={t('actions.zoomOut')} color="warning" onClick={props.onClick}>
                   <ZoomOutOutlinedIcon />
                 </IconButton>
               )}
@@ -70,7 +70,7 @@ const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
 
             <ZoomIn>
               {(props: { onClick: () => void }) => (
-                <IconButton aria-label="zoom-in" color="warning" onClick={props.onClick}>
+                <IconButton aria-label={t('actions.zoomIn')} color="warning" onClick={props.onClick}>
                   <ZoomInOutlinedIcon />
                 </IconButton>
               )}

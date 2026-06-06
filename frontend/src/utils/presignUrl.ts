@@ -29,8 +29,15 @@ const getBaseUrl = (): string => {
   return process.env.NEXT_PUBLIC_API_BASE || '/api/';
 };
 
-const unwrapResponse = (response: { data?: { data?: unknown } }): unknown =>
-  response?.data?.data ?? response?.data;
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const unwrapResponse = (response: { data?: unknown }): unknown => {
+  const payload = response?.data;
+  return isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, 'data')
+    ? payload.data
+    : payload;
+};
 
 const requestPresign = async (url: string): Promise<string | null> => {
   const accessToken = tokenService.getAccessTokenFromCookie();

@@ -1617,7 +1617,9 @@
     "deleteTitle": "Xóa hình ảnh",
     "deleteConfirm": "Hình ảnh này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?",
     "upload": "Tải lên",
-    "preview": "Xem trước"
+    "preview": "Xem trước",
+    "imageAlt": "Ảnh công ty",
+    "previewAlt": "Xem trước ảnh công ty"
   },
   "imageCrop": {
     "title": "Cắt ảnh",

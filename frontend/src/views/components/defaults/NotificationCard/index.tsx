@@ -173,7 +173,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                 </Stack>
               </Box>
               <Box sx={{ position: { xs: "absolute", sm: "relative" }, top: { xs: 8, sm: "auto" }, right: { xs: 8, sm: "auto" } }}>
-                <IconButton aria-label="delete" color="error" onClick={() => handleRemove(value.key)} sx={{ "&:hover": { backgroundColor: "error.light", color: "white" } }}>
+                <IconButton aria-label={t('actions.delete')} color="error" onClick={() => handleRemove(value.key)} sx={{ "&:hover": { backgroundColor: "error.light", color: "white" } }}>
                   <ClearIcon />
                 </IconButton>
               </Box>

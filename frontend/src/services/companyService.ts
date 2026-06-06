@@ -1,6 +1,7 @@
 import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 import { cleanParams } from '../utils/params';
+import { normalizePaginatedResponse } from '../utils/apiResponse';
 
 import type { PaginatedResponse } from '../types/api';
 import type { Company, JobPost } from '../types/models';
@@ -77,7 +78,7 @@ const companyService = {
     const data = await httpRequest.get<PaginatedResponse<Company>>(url, {
       params: cleanParams(params),
     });
-    return presignInObject(data);
+    return normalizePaginatedResponse<Company>(await presignInObject(data));
   },
 
   getCompanyDetailById: async (slug: IdType): Promise<Company> => {
@@ -86,9 +87,9 @@ const companyService = {
     return presignInObject(data);
   },
 
-  getCompanyJobPostDetailById: async (id: IdType): Promise<JobPost> => {
+  getCompanyJobPostDetailById: async (id: IdType): Promise<JobPost | null> => {
     const url = `info/web/company/job-posts/${id}/`;
-    const data = await httpRequest.get<JobPost>(url);
+    const data = await httpRequest.get<JobPost | null>(url);
     return presignInObject(data);
   },
 

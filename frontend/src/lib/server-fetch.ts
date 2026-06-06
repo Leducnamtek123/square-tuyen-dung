@@ -8,6 +8,12 @@ import { existsSync } from 'node:fs';
 const DEFAULT_SERVER_FETCH_TIMEOUT_MS = 2500;
 
 const stripTrailingSlash = (value = '') => value.replace(/\/+$/, '');
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+const unwrapEnvelopeData = (payload: unknown) =>
+  isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, 'data')
+    ? payload.data
+    : payload;
 
 const ensureApiBase = (value: string) => {
   const normalized = stripTrailingSlash(value);
@@ -71,7 +77,7 @@ export async function serverFetch<T = unknown>(
 
     const json = await res.json();
     // Backend wraps payload in { data } via MyJSONRenderer
-    return (json?.data ?? json) as T;
+    return unwrapEnvelopeData(json) as T;
   } catch (error) {
     if (process.env.NODE_ENV !== 'production') {
       console.warn(`[serverFetch] ${path} failed`, error);
