@@ -8,6 +8,7 @@ export type EvaluationFormValidationError =
 
 const SCORE_MIN = 0;
 const SCORE_MAX = 10;
+const SCORE_DECIMAL_PLACES = 2;
 
 const toFiniteNumber = (value: number | string): number => {
   if (value === '') return 0;
@@ -15,7 +16,16 @@ const toFiniteNumber = (value: number | string): number => {
 };
 
 const isScoreValid = (value: number): boolean =>
-  Number.isFinite(value) && value >= SCORE_MIN && value <= SCORE_MAX;
+  Number.isFinite(value)
+  && value >= SCORE_MIN
+  && value <= SCORE_MAX
+  && Number(value.toFixed(SCORE_DECIMAL_PLACES)) === value;
+
+const toBackendScoreDecimal = (value: number): number =>
+  Number(value.toFixed(SCORE_DECIMAL_PLACES));
+
+const isProposedSalaryValid = (value: number): boolean =>
+  Number.isInteger(value) && value >= 0;
 
 const firstDefined = <T>(...values: Array<T | null | undefined>): T | undefined =>
   values.find((value): value is T => value !== null && value !== undefined);
@@ -41,7 +51,7 @@ export const getEvaluationFormValidationError = (
     return 'scoreInvalid';
   }
 
-  if (!Number.isFinite(proposedSalary) || proposedSalary < 0) {
+  if (!isProposedSalaryValid(proposedSalary)) {
     return 'proposedSalaryInvalid';
   }
 
@@ -57,9 +67,9 @@ export const buildEvaluationPayload = (
 
   return {
     interview: interviewId,
-    attitude_score: attitudeScore,
-    professional_score: professionalScore,
-    overall_score: (attitudeScore + professionalScore) / 2,
+    attitude_score: toBackendScoreDecimal(attitudeScore),
+    professional_score: toBackendScoreDecimal(professionalScore),
+    overall_score: toBackendScoreDecimal((attitudeScore + professionalScore) / 2),
     result: form.result,
     comments: form.comments.trim(),
     proposed_salary: toFiniteNumber(form.proposed_salary),

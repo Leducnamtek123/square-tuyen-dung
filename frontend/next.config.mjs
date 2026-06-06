@@ -112,6 +112,7 @@ const nextConfig = {
       { source: '/nha-tuyen-dung/blog-tuyen-dung', destination: '/employer/blog' },
       { source: '/nha-tuyen-dung', destination: '/employer/dashboard' },
       { source: '/nha-tuyen-dung/bang-dieu-khien', destination: '/employer/dashboard' },
+      { source: '/nha-tuyen-dung/tro-ly-agent', destination: '/employer/agent-assistants' },
       { source: '/nha-tuyen-dung/tin-tuyen-dung', destination: '/employer/job-posts' },
       { source: '/nha-tuyen-dung/ho-so-ung-tuyen', destination: '/employer/applied-profiles' },
       { source: '/nha-tuyen-dung/ho-so-da-luu', destination: '/employer/saved-profiles' },

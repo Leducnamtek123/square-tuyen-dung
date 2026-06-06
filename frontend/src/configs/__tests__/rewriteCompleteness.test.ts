@@ -191,5 +191,12 @@ describe('Rewrite Completeness — Prevents 404 in Production', () => {
       );
       expect(covered).toBe(true);
     });
+
+    it('Agent assistants has an explicit VI rewrite to the canonical employer page', () => {
+      expect(rewrites).toContainEqual({
+        source: '/nha-tuyen-dung/tro-ly-agent',
+        destination: '/employer/agent-assistants',
+      });
+    });
   });
 });
