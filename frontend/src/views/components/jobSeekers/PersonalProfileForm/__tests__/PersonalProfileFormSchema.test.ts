@@ -33,4 +33,21 @@ describe('createPersonalProfileSchema', () => {
       'jobSeeker:profile.validation.choiceInvalid',
     );
   });
+
+  it('rejects invalid location relation ids before submitting to backend primary key fields', async () => {
+    const schema = createPersonalProfileSchema(t as never);
+
+    await expect(schema.validateAt('location.city', { location: { city: 0 } })).rejects.toThrow(
+      'jobSeeker:profile.validation.cityRequired',
+    );
+    await expect(schema.validateAt('location.city', { location: { city: 1.5 } })).rejects.toThrow(
+      'jobSeeker:profile.validation.cityRequired',
+    );
+    await expect(schema.validateAt('location.district', { location: { district: 0 } })).rejects.toThrow(
+      'jobSeeker:profile.validation.districtRequired',
+    );
+    await expect(schema.validateAt('location.district', { location: { district: 1.5 } })).rejects.toThrow(
+      'jobSeeker:profile.validation.districtRequired',
+    );
+  });
 });

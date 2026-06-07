@@ -80,6 +80,8 @@ const InterviewCreateCardForm = ({
     return Boolean(profile.grants?.some((grant) => grant.isDefault ?? grant.is_default));
   }, []);
 
+  const hasSelectValue = React.useCallback((value: unknown) => value !== '' && value != null, []);
+
   const jobPostSlotProps = React.useMemo(() => ({
     input: {
       startAdornment: (
@@ -172,26 +174,40 @@ const InterviewCreateCardForm = ({
                 name="job_post"
                 control={control}
                 rules={{ required: t('interview:interviewCreateCard.validation.selectJobPost') }}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    onChange={(e) => onJobPostChange(e.target.value)}
-                    select
-                    fullWidth
-                    label={t('interview:interviewCreateCard.label.selectjobpost')}
-                    error={!!errors.job_post}
-                    helperText={errors.job_post?.message}
-                    disabled={isLoadingJobs}
-                    sx={inputSx}
-                    slotProps={jobPostSlotProps}
-                  >
-                    {jobs.map((job) => (
-                      <MenuItem key={job.id} value={job.id} sx={{ fontWeight: 600 }}>
-                        {job.jobName}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
+                render={({ field }) => {
+                  const jobValueHasOption = jobs.some((job) => String(job.id) === String(field.value));
+                  const shouldRenderSelectedJobFallback = hasSelectValue(field.value) && !jobValueHasOption;
+
+                  return (
+                    <TextField
+                      {...field}
+                      onChange={(e) => onJobPostChange(e.target.value)}
+                      select
+                      fullWidth
+                      label={t('interview:interviewCreateCard.label.selectjobpost')}
+                      error={!!errors.job_post}
+                      helperText={errors.job_post?.message}
+                      disabled={isLoadingJobs}
+                      sx={inputSx}
+                      slotProps={jobPostSlotProps}
+                    >
+                      {shouldRenderSelectedJobFallback ? (
+                        <MenuItem disabled value={field.value} sx={{ fontWeight: 600 }}>
+                          <em>
+                            {isLoadingJobs
+                              ? t('interview:interviewCreateCard.loadingSelectedJobPost')
+                              : t('interview:interviewCreateCard.missingSelectedJobPost', { id: field.value })}
+                          </em>
+                        </MenuItem>
+                      ) : null}
+                      {jobs.map((job) => (
+                        <MenuItem key={job.id} value={job.id} sx={{ fontWeight: 600 }}>
+                          {job.jobName}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  );
+                }}
               />
             </Grid>
 
@@ -200,35 +216,52 @@ const InterviewCreateCardForm = ({
                 name="candidate"
                 control={control}
                 rules={{ required: t('interview:interviewCreateCard.validation.selectCandidate') }}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    select
-                    fullWidth
-                    label={t('interview:interviewCreateCard.label.selectcandidate')}
-                    disabled={!selectedJobPostId || isLoadingCandidates}
-                    error={!!errors.candidate}
-                    helperText={errors.candidate?.message}
-                    sx={inputSx}
-                    slotProps={candidateSlotProps}
-                  >
-                    {candidates.length === 0 && !isLoadingCandidates && selectedJobPostId ? (
-                      <MenuItem disabled value="">
-                        <em>{t('interview:interviewCreateCard.noCandidates')}</em>
-                      </MenuItem>
-                    ) : null}
-                    {candidates.map((candidate) => {
-                      const candidateUserId = getCandidateUserId(candidate);
-                      if (candidateUserId == null) return null;
+                render={({ field }) => {
+                  const candidateValueHasOption = candidates.some((candidate) => {
+                    const candidateUserId = getCandidateUserId(candidate);
+                    return candidateUserId != null && String(candidateUserId) === String(field.value);
+                  });
+                  const shouldRenderSelectedCandidateFallback = hasSelectValue(field.value) && !candidateValueHasOption;
 
-                      return (
-                        <MenuItem key={candidateUserId} value={candidateUserId} sx={{ fontWeight: 600 }}>
-                          {getCandidateLabel(candidate)}
+                  return (
+                    <TextField
+                      {...field}
+                      select
+                      fullWidth
+                      label={t('interview:interviewCreateCard.label.selectcandidate')}
+                      disabled={!selectedJobPostId || isLoadingCandidates}
+                      error={!!errors.candidate}
+                      helperText={errors.candidate?.message}
+                      sx={inputSx}
+                      slotProps={candidateSlotProps}
+                    >
+                      {shouldRenderSelectedCandidateFallback ? (
+                        <MenuItem disabled value={field.value} sx={{ fontWeight: 600 }}>
+                          <em>
+                            {isLoadingCandidates
+                              ? t('interview:interviewCreateCard.loadingSelectedCandidate')
+                              : t('interview:interviewCreateCard.missingSelectedCandidate', { id: field.value })}
+                          </em>
                         </MenuItem>
-                      );
-                    })}
-                  </TextField>
-                )}
+                      ) : null}
+                      {candidates.length === 0 && !isLoadingCandidates && selectedJobPostId ? (
+                        <MenuItem disabled value="">
+                          <em>{t('interview:interviewCreateCard.noCandidates')}</em>
+                        </MenuItem>
+                      ) : null}
+                      {candidates.map((candidate) => {
+                        const candidateUserId = getCandidateUserId(candidate);
+                        if (candidateUserId == null) return null;
+
+                        return (
+                          <MenuItem key={candidateUserId} value={candidateUserId} sx={{ fontWeight: 600 }}>
+                            {getCandidateLabel(candidate)}
+                          </MenuItem>
+                        );
+                      })}
+                    </TextField>
+                  );
+                }}
               />
             </Grid>
 

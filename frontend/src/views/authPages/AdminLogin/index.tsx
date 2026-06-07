@@ -226,7 +226,6 @@ const AdminLogin: React.FC = () => {
               alt="Square Logo"
               width={160}
               height={42}
-              style={{ height: 42, width: 'auto' }}
             />
           </Box>
 

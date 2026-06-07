@@ -55,6 +55,15 @@ def _update_interview_status_by_room(room_name: str, new_status: str) -> str:
     return update_interview_status(session, new_status)
 
 
+def _get_status_update_session(room_name: str) -> InterviewSession:
+    return InterviewSession.objects.select_related(
+        "candidate",
+        "job_post",
+        "job_post__company",
+        "created_by",
+    ).get(room_name=room_name)
+
+
 INVITE_TOKEN_STATUS_UPDATES = {"calibration", "in_progress", "completed", "interrupted"}
 
 
@@ -125,6 +134,10 @@ def _request_has_verified_agent_auth(request, auth_error) -> bool:
         and getattr(settings, "INTERVIEW_AGENT_AUTH_REQUIRED", False)
         and getattr(settings, "INTERVIEW_AGENT_SHARED_SECRET", "")
     )
+
+
+def _request_has_invite_token(request) -> bool:
+    return bool(request.data.get("invite_token") or request.data.get("inviteToken"))
 
 
 def _user_can_update_status(user, session: InterviewSession, request=None) -> bool:
@@ -499,6 +512,29 @@ class QuestionGroupViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
+    def perform_authentication(self, request):
+        public_token_actions = {
+            'retrieve_by_invite_token',
+            'livekit_token_by_invite_token',
+            'context',
+            'append_transcription',
+        }
+        action = getattr(self, "action", None)
+        skip_authentication = action in public_token_actions
+        if action == 'update_status':
+            skip_authentication = _request_has_agent_auth_headers(request)
+            if not skip_authentication:
+                try:
+                    skip_authentication = _request_has_invite_token(request)
+                except Exception:
+                    skip_authentication = False
+
+        if skip_authentication:
+            request._not_authenticated()
+            return
+
+        return super().perform_authentication(request)
+
     def get_permissions(self):
         # Agent-facing endpoints are AllowAny (secured by room_name/invite_token)
         if self.action in [
@@ -659,14 +695,19 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         serializer = UpdateStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         requested_status = serializer.validated_data['status']
+        has_agent_auth_headers = _request_has_agent_auth_headers(request)
+        has_invite_token = _request_has_invite_token(request)
+        has_authenticated_user = getattr(request.user, "is_authenticated", False)
+        if not has_agent_auth_headers and not has_invite_token and not has_authenticated_user:
+            if auth_error is not None:
+                return auth_error
+            return response_data(
+                status=status.HTTP_401_UNAUTHORIZED,
+                errors={"detail": ["Authentication credentials were not provided."]},
+            )
 
         try:
-            session = InterviewSession.objects.select_related(
-                "candidate",
-                "job_post",
-                "job_post__company",
-                "created_by",
-            ).get(room_name=room_name)
+            session = run_django_sync_in_thread(_get_status_update_session, room_name)
         except InterviewSession.DoesNotExist:
             return response_data(
                 status=status.HTTP_404_NOT_FOUND,
@@ -677,7 +718,7 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         auth_mode = "agent"
         if not agent_allowed:
             invite_allowed = _invite_token_can_update_status(request, session, requested_status)
-            user_allowed = _user_can_update_status(request.user, session, request)
+            user_allowed = False if invite_allowed else run_django_sync_in_thread(_user_can_update_status, request.user, session, request)
             if not invite_allowed and not user_allowed:
                 if auth_error is not None:
                     return auth_error
@@ -704,7 +745,8 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
                 errors={"detail": [str(exc)]},
             )
 
-        record_audit_log(
+        run_django_sync_in_thread(
+            record_audit_log,
             request=request,
             action="status_change",
             resource_type="interviews.InterviewSession",

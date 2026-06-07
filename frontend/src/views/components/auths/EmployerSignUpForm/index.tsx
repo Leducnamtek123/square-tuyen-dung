@@ -44,8 +44,8 @@ export interface EmployerSignUpFormData {
       city: string | number;
       district: string | number;
       address: string;
-      lat: string;
-      lng: string;
+      lat: number | string | null;
+      lng: number | string | null;
     };
   };
 }
@@ -90,11 +90,11 @@ export const createEmployerSignUpSchema = (t: EmployerSignUpT) =>
         .url(t('common:validation.invalidUrl'))
         .max(300, t('validation.maxWebsite')),
       location: yup.object().shape({
-        city: yup.number().required(t('validation.requiredCity')).typeError(t('validation.requiredCity')),
-        district: yup.number().required(t('validation.requiredDistrict')).typeError(t('validation.requiredDistrict')),
+        city: yup.number().required(t('validation.requiredCity')).integer(t('validation.requiredCity')).moreThan(0, t('validation.requiredCity')).typeError(t('validation.requiredCity')),
+        district: yup.number().required(t('validation.requiredDistrict')).integer(t('validation.requiredDistrict')).moreThan(0, t('validation.requiredDistrict')).typeError(t('validation.requiredDistrict')),
         address: yup.string().required(t('validation.requiredAddress')).max(255, t('validation.maxAddress')),
-        lat: yup.string().optional(),
-        lng: yup.string().optional(),
+        lat: yup.number().nullable().transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value)).typeError(t('validation.invalidLatitude')),
+        lng: yup.number().nullable().transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value)).typeError(t('validation.invalidLongitude')),
       }),
     }),
   });

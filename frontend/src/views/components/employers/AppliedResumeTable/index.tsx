@@ -26,7 +26,7 @@ import { CV_TYPES, ROUTES } from '../../../../configs/constants';
 import { localizeRoutePath } from '../../../../configs/routeLocalization';
 import DataTable from '../../../../components/Common/DataTable';
 import { formatRoute } from '@/utils/funcUtils';
-import { openExternalUrlSafely } from '@/utils/safeExternalUrl';
+import { getSafeResourceUrl, openExternalUrlSafely } from '@/utils/safeExternalUrl';
 
 import SendEmailComponent from './SendEmailComponent';
 import AppliedStatusComponent from './AppliedStatusComponent';
@@ -93,6 +93,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             const isManualCandidate = Boolean(info.row.original.isManualCandidate);
             // File URL for attached CV download
             const cvFileUrl = info.row.original.resumeFileUrl || info.row.original.resume?.fileUrl || '';
+            const safeCvFileUrl = getSafeResourceUrl(cvFileUrl);
             return (
               <>
                 <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'text.primary', mb: 0.75 }}>
@@ -122,7 +123,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                     /* Attached CV – click or hover to download */
                     <Tooltip
                       title={
-                        cvFileUrl ? (
+                        safeCvFileUrl ? (
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                             <span>{t('appliedResume.table.attachedResume')}</span>
                             <DownloadIcon sx={{ fontSize: 13 }} />
@@ -138,14 +139,14 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                           borderRadius: 1, 
                           bgcolor: pc.error( 0.08), 
                           color: 'error.main',
-                          cursor: cvFileUrl ? 'pointer' : 'default',
+                          cursor: safeCvFileUrl ? 'pointer' : 'default',
                           textDecoration: 'none',
-                          '&:hover': cvFileUrl ? { bgcolor: pc.error( 0.16) } : {},
+                          '&:hover': safeCvFileUrl ? { bgcolor: pc.error( 0.16) } : {},
                           transition: 'background-color 0.15s',
                         }}
-                        {...(cvFileUrl ? {
+                        {...(safeCvFileUrl ? {
                           component: 'a' as const,
-                          href: cvFileUrl,
+                          href: safeCvFileUrl,
                           download: true,
                           onClick: (e: React.MouseEvent) => e.stopPropagation(),
                         } : {})}
@@ -192,16 +193,17 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
         const isManualCandidate = Boolean(info.row.original.isManualCandidate);
         const isOnline = resumeType === CV_TYPES.cvWebsite;
         const cvFileUrl = info.row.original.resumeFileUrl || info.row.original.resume?.fileUrl || '';
+        const safeCvFileUrl = getSafeResourceUrl(cvFileUrl);
         return (
           <Tooltip
-            title={!isOnline && cvFileUrl ? (
+            title={!isOnline && safeCvFileUrl ? (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <span>{t('appliedResume.table.clickToDownload')}</span>
                 <DownloadIcon sx={{ fontSize: 13 }} />
               </Box>
             ) : ''}
             arrow
-            disableHoverListener={isOnline || !cvFileUrl}
+            disableHoverListener={isOnline || !safeCvFileUrl}
           >
             <Chip 
                 label={isManualCandidate ? t('manualCandidate.badge') : isOnline ? t('appliedResume.table.onlineResume') : t('appliedResume.table.attachedResume')}
@@ -215,11 +217,11 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                   border: '1px solid',
                   borderColor: isManualCandidate ? pc.secondary(0.1) : isOnline ? pc.primary( 0.1) : pc.error( 0.1),
                   '& .MuiChip-label': { px: 1.5 },
-                  cursor: !isOnline && cvFileUrl ? 'pointer' : 'default',
+                  cursor: !isOnline && safeCvFileUrl ? 'pointer' : 'default',
                 }}
-                {...(!isOnline && cvFileUrl ? {
+                {...(!isOnline && safeCvFileUrl ? {
                   component: 'a' as const,
-                  href: cvFileUrl,
+                  href: safeCvFileUrl,
                   download: true,
                   onClick: (e: React.MouseEvent) => e.stopPropagation(),
                 } : {})}

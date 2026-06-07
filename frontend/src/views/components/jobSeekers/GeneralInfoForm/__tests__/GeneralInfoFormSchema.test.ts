@@ -84,4 +84,21 @@ describe('createGeneralInfoSchema', () => {
       'jobSeeker:profile.validation.choiceInvalid',
     );
   });
+
+  it('rejects invalid relation ids before submitting to backend primary key fields', async () => {
+    const schema = createGeneralInfoSchema(t as never);
+
+    await expect(schema.validateAt('career', { career: 0 })).rejects.toThrow(
+      'jobSeeker:profile.validation.careerRequired',
+    );
+    await expect(schema.validateAt('career', { career: 1.5 })).rejects.toThrow(
+      'jobSeeker:profile.validation.careerRequired',
+    );
+    await expect(schema.validateAt('city', { city: 0 })).rejects.toThrow(
+      'jobSeeker:profile.validation.cityRequired',
+    );
+    await expect(schema.validateAt('city', { city: 1.5 })).rejects.toThrow(
+      'jobSeeker:profile.validation.cityRequired',
+    );
+  });
 });

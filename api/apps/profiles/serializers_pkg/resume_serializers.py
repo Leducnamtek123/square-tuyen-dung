@@ -672,7 +672,7 @@ class EducationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     completedDate = serializers.DateField(source='completed_date', required=False, allow_null=True,
                                           input_formats=[var_sys.DATE_TIME_FORMAT["ISO8601"],
                                                          var_sys.DATE_TIME_FORMAT["Ymd"]])
-    description = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    description = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=500)
     gradeOrRank = serializers.CharField(source='grade_or_rank', required=False,
                                         allow_blank=True, allow_null=True, max_length=100)
     resume = serializers.SlugRelatedField(required=False, slug_field="slug", queryset=Resume.objects.all())
@@ -713,7 +713,7 @@ class ExperienceSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     endDate = serializers.DateField(source='end_date', required=True,
                                     input_formats=[var_sys.DATE_TIME_FORMAT["ISO8601"],
                                                    var_sys.DATE_TIME_FORMAT["Ymd"]])
-    description = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    description = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=500)
     lastSalary = serializers.IntegerField(source='last_salary', required=False, allow_null=True)
     leaveReason = serializers.CharField(source='leave_reason', required=False,
                                         allow_blank=True, allow_null=True, max_length=255)

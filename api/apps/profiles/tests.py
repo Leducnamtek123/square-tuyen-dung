@@ -251,6 +251,38 @@ def test_resume_detail_serializers_reject_end_dates_before_start_dates(resume):
 
 
 @pytest.mark.django_db
+def test_resume_detail_serializers_reject_descriptions_over_model_limit(resume):
+    from apps.profiles.serializers import EducationSerializer, ExperienceSerializer
+
+    too_long_description = "x" * 501
+    education_serializer = EducationSerializer(
+        data={
+            "degreeName": "Bachelor",
+            "major": "Software Engineering",
+            "trainingPlaceName": "Test University",
+            "startDate": "2022-01-01",
+            "description": too_long_description,
+            "resumeId": resume.id,
+        },
+    )
+    experience_serializer = ExperienceSerializer(
+        data={
+            "jobName": "Developer",
+            "companyName": "Test Company",
+            "startDate": "2022-01-01",
+            "endDate": "2023-01-01",
+            "description": too_long_description,
+            "resumeId": resume.id,
+        },
+    )
+
+    assert education_serializer.is_valid() is False
+    assert "description" in education_serializer.errors
+    assert experience_serializer.is_valid() is False
+    assert "description" in experience_serializer.errors
+
+
+@pytest.mark.django_db
 def test_job_seeker_profile_serializer_rejects_future_dates_and_invalid_phone(job_seeker_profile):
     from apps.profiles.serializers import JobSeekerProfileSerializer
 

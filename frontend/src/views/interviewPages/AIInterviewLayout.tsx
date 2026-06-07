@@ -42,6 +42,26 @@ const AI_TAKEOVER_TOPIC = 'square.interview.ai_takeover';
 
 type ChatComposerMode = 'chat' | 'aiControl' | 'takeover';
 
+type TakeoverControlPayload = {
+  action?: 'acquire' | 'release';
+};
+
+const isEmployerIdentity = (identity?: string | null) =>
+  Boolean(identity?.toLowerCase().startsWith('employer-'));
+
+const parseTakeoverControlPayload = (value: string): TakeoverControlPayload | null => {
+  try {
+    const parsed = JSON.parse(value);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed as TakeoverControlPayload;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+};
+
 function useLiveTimer() {
   const [time, setTime] = useState(0);
 
@@ -682,7 +702,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   const [chatDraft, setChatDraft] = useState('');
   const [composerMode, setComposerMode] = useState<ChatComposerMode>('chat');
   const [isControlSending, setIsControlSending] = useState(false);
-  const [takeoverActive, setTakeoverActive] = useState(false);
+  const [takeoverOwnerIdentity, setTakeoverOwnerIdentity] = useState<string | null>(null);
   const [isTakeoverSending, setIsTakeoverSending] = useState(false);
   const timeFormatted = useLiveTimer();
   const participants = useParticipants();
@@ -706,6 +726,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
 
   const localParticipantRole = getParticipantRole(localParticipant);
   const isLocalEmployer = localParticipantRole === 'employer';
+  const takeoverActive = Boolean(takeoverOwnerIdentity);
   const otherEmployerCount = participants.filter((participant) => !participant.isLocal && getParticipantRole(participant) === 'employer').length;
   const candidatePresent = participants.some((participant) => getParticipantRole(participant) === 'candidate');
 
@@ -730,7 +751,13 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
       return role === 'agent' || identity === agentIdentity || track.participant?.sid === agentSid;
     }) ?? undefined;
 
-  const employerWithCamera = finalTracks.find((track) => getParticipantRole(track.participant) === 'employer' && track.publication);
+  const employerWithCamera =
+    finalTracks.find((track) => (
+      getParticipantRole(track.participant) === 'employer' &&
+      track.publication &&
+      (!takeoverOwnerIdentity || track.participant.identity === takeoverOwnerIdentity)
+    )) ??
+    finalTracks.find((track) => getParticipantRole(track.participant) === 'employer' && track.publication);
   if (employerWithCamera) {
     finalTracks = finalTracks.filter((track) => !isLiveKitAgentParticipant(track.participant));
   }
@@ -754,10 +781,46 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
     if (!isLocalEmployer && (composerMode === 'aiControl' || composerMode === 'takeover')) {
       setComposerMode('chat');
     }
-    if (!isLocalEmployer && takeoverActive) {
-      setTakeoverActive(false);
+  }, [composerMode, isLocalEmployer]);
+
+  useEffect(() => {
+    const handleTakeoverControl = async (
+      reader: { readAll: () => Promise<string> },
+      participantInfo: { identity: string },
+    ) => {
+      if (!isEmployerIdentity(participantInfo.identity)) return;
+
+      const payload = parseTakeoverControlPayload(await reader.readAll());
+      if (payload?.action === 'acquire') {
+        setTakeoverOwnerIdentity(participantInfo.identity);
+      } else if (payload?.action === 'release') {
+        setTakeoverOwnerIdentity((currentIdentity) => (
+          !currentIdentity || currentIdentity === participantInfo.identity ? null : currentIdentity
+        ));
+      }
+    };
+
+    try {
+      room.registerTextStreamHandler(AI_TAKEOVER_TOPIC, handleTakeoverControl);
+    } catch {
+      room.unregisterTextStreamHandler(AI_TAKEOVER_TOPIC);
+      room.registerTextStreamHandler(AI_TAKEOVER_TOPIC, handleTakeoverControl);
     }
-  }, [composerMode, isLocalEmployer, takeoverActive]);
+
+    return () => {
+      room.unregisterTextStreamHandler(AI_TAKEOVER_TOPIC);
+    };
+  }, [room]);
+
+  useEffect(() => {
+    if (!takeoverOwnerIdentity) return;
+    const takeoverOwnerStillPresent =
+      takeoverOwnerIdentity === localParticipant.identity ||
+      participants.some((participant) => participant.identity === takeoverOwnerIdentity);
+    if (!takeoverOwnerStillPresent) {
+      setTakeoverOwnerIdentity(null);
+    }
+  }, [localParticipant.identity, participants, takeoverOwnerIdentity]);
 
   const sendTakeoverControl = React.useCallback(async (action: 'acquire' | 'release') => {
     if (!isLocalEmployer) return;
@@ -768,10 +831,10 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
         attributes: { kind: 'employer_takeover', action },
       });
       if (action === 'acquire') {
-        setTakeoverActive(true);
+        setTakeoverOwnerIdentity(localParticipant.identity);
         await localParticipant.setMicrophoneEnabled(true);
       } else {
-        setTakeoverActive(false);
+        setTakeoverOwnerIdentity(null);
         await localParticipant.setMicrophoneEnabled(false);
       }
     } finally {

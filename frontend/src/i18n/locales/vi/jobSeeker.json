@@ -194,7 +194,7 @@
       "filePdfOnly": "Chỉ chấp nhận file PDF.",
       "fileTooLarge": "File PDF phải nhỏ hơn hoặc bằng 10MB.",
       "fieldMax": "{{field}} vượt quá độ dài cho phép.",
-      "descriptionMax": "Mô tả không được vượt quá 1000 ký tự"
+      "descriptionMax": "Mô tả không được vượt quá 500 ký tự"
     },
     "messages": {
       "personalUpdateSuccess": "Cập nhật thông tin cá nhân thành công",

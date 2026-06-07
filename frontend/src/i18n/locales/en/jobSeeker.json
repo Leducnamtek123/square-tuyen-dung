@@ -194,7 +194,7 @@
       "filePdfOnly": "Only PDF files are accepted.",
       "fileTooLarge": "PDF file must be 10MB or smaller.",
       "fieldMax": "{{field}} exceeds allowed length.",
-      "descriptionMax": "Description must not exceed 1000 characters"
+      "descriptionMax": "Description must not exceed 500 characters"
     },
     "messages": {
       "personalUpdateSuccess": "Personal information updated successfully",

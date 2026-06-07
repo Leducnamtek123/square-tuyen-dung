@@ -48,7 +48,10 @@ describe('AIInterviewLayout i18n', () => {
     expect(source).toContain("const AI_TAKEOVER_TOPIC = 'square.interview.ai_takeover'");
     expect(source).toContain("type ChatComposerMode = 'chat' | 'aiControl' | 'takeover'");
     expect(source).toContain('sendTakeoverControl');
+    expect(source).toContain('registerTextStreamHandler(AI_TAKEOVER_TOPIC');
+    expect(source).toContain('setTakeoverOwnerIdentity(participantInfo.identity)');
     expect(source).toContain('StartAudio');
     expect(source).toContain("value=\"takeover\"");
+    expect(source).not.toContain('!isLocalEmployer && takeoverActive');
   });
 });

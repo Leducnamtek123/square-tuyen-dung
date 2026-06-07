@@ -76,6 +76,7 @@ export const createEducationDetailSchema = (t: TFunction<'jobSeeker', undefined>
     }
   ),
   gradeOrRank: yup.string().max(100, t('jobSeeker:profile.validation.gradeOrRankMax')),
+  description: yup.string().nullable().max(500, t('jobSeeker:profile.validation.descriptionMax')),
 });
 
 const EducationDetailFormContent = ({ handleAddOrUpdate, editData }: EducationDetailFormProps) => {

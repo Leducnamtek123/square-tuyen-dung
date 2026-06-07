@@ -374,39 +374,42 @@ const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800 }}>
                 {t('common:agentAssistant.results.title')}
               </Typography>
-              {results.slice(0, 4).map((item, index) => (
-                <Box
-                  key={`${resultTitle(item)}-${index}`}
-                  component={resultUrl(item) ? 'a' : 'div'}
-                  {...(resultUrl(item) ? { href: resultUrl(item) } : {})}
-                  sx={{
-                    minWidth: 0,
-                    p: 1,
-                    borderRadius: 1,
-                    bgcolor: alpha(theme.palette.text.primary, 0.035),
-                    color: 'text.primary',
-                    cursor: resultUrl(item) ? 'pointer' : 'default',
-                    display: 'block',
-                    textDecoration: 'none',
-                    ...(resultUrl(item)
-                      ? {
-                          '&:hover': {
-                            bgcolor: alpha(theme.palette.primary.main, 0.08),
-                          },
-                        }
-                      : {}),
-                  }}
-                >
-                  <Typography variant="body2" sx={{ fontWeight: 750, overflowWrap: 'anywhere' }}>
-                    {resultTitle(item) || t('common:agentAssistant.results.fallback', { index: index + 1 })}
-                  </Typography>
-                  {resultSubtitle(item) ? (
-                    <Typography variant="caption" sx={{ color: 'text.secondary', overflowWrap: 'anywhere' }}>
-                      {resultSubtitle(item)}
+              {results.slice(0, 4).map((item, index) => {
+                const safeResultUrl = getSafeExternalOpenUrl(resultUrl(item));
+                return (
+                  <Box
+                    key={`${resultTitle(item)}-${index}`}
+                    component={safeResultUrl ? 'a' : 'div'}
+                    {...(safeResultUrl ? { href: safeResultUrl } : {})}
+                    sx={{
+                      minWidth: 0,
+                      p: 1,
+                      borderRadius: 1,
+                      bgcolor: alpha(theme.palette.text.primary, 0.035),
+                      color: 'text.primary',
+                      cursor: safeResultUrl ? 'pointer' : 'default',
+                      display: 'block',
+                      textDecoration: 'none',
+                      ...(safeResultUrl
+                        ? {
+                            '&:hover': {
+                              bgcolor: alpha(theme.palette.primary.main, 0.08),
+                            },
+                          }
+                        : {}),
+                    }}
+                  >
+                    <Typography variant="body2" sx={{ fontWeight: 750, overflowWrap: 'anywhere' }}>
+                      {resultTitle(item) || t('common:agentAssistant.results.fallback', { index: index + 1 })}
                     </Typography>
-                  ) : null}
-                </Box>
-              ))}
+                    {resultSubtitle(item) ? (
+                      <Typography variant="caption" sx={{ color: 'text.secondary', overflowWrap: 'anywhere' }}>
+                        {resultSubtitle(item)}
+                      </Typography>
+                    ) : null}
+                  </Box>
+                );
+              })}
               {results.length > 4 ? (
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                   {t('common:agentAssistant.results.more', { count: results.length - 4 })}

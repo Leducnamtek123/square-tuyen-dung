@@ -63,9 +63,11 @@ export const createExperienceDetailSchema = (t: TFunction<'jobSeeker', undefined
     .number()
     .nullable()
     .transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value))
+    .typeError(t('jobSeeker:profile.validation.lastSalaryInvalid'))
+    .integer(t('jobSeeker:profile.validation.lastSalaryInvalid'))
     .min(0, t('jobSeeker:profile.validation.lastSalaryInvalid')),
   leaveReason: yup.string().max(255, t('jobSeeker:profile.validation.leaveReasonMax')),
-  description: yup.string().nullable().max(1000, t('jobSeeker:profile.validation.descriptionMax')),
+  description: yup.string().nullable().max(500, t('jobSeeker:profile.validation.descriptionMax')),
 });
 
 const ExperienceDetailFormContent = ({

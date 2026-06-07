@@ -234,10 +234,24 @@ const failOnBrowserErrors = (page: Page) => {
   return failures;
 };
 
+const waitForLoginForm = async (page: Page, path: string) => {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await safeGoto(page, path);
+    try {
+      await page.locator('#email').waitFor({ state: 'visible', timeout: 30_000 });
+      await page.locator('#password').waitFor({ state: 'visible', timeout: 30_000 });
+      return;
+    } catch (error) {
+      if (attempt === 1) throw error;
+      await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+    }
+  }
+};
+
 const login = async (page: Page, path: string, email: string, password: string) => {
-  await safeGoto(page, path);
-  await page.locator('#email').fill(email);
-  await page.locator('#password').fill(password);
+  await waitForLoginForm(page, path);
+  await page.locator('#email').fill(email, { timeout: 30_000 });
+  await page.locator('#password').fill(password, { timeout: 30_000 });
   await Promise.all([
     page.waitForResponse((response) => response.url().includes('/api/auth/token/') && response.status() === 200),
     page.locator('button[type="submit"]').first().click(),
@@ -246,10 +260,19 @@ const login = async (page: Page, path: string, email: string, password: string) 
 };
 
 const safeGoto = async (page: Page, path: string) => {
-  try {
-    await page.goto(path, { waitUntil: 'domcontentloaded' });
-  } catch (error) {
-    if (!String(error).includes('ERR_ABORTED')) throw error;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      await page.goto(path, { waitUntil: 'domcontentloaded', timeout: 45_000 });
+      return;
+    } catch (error) {
+      const message = String(error);
+      if (message.includes('ERR_ABORTED')) return;
+      if (attempt === 0 && /Timeout|Execution context was destroyed/i.test(message)) {
+        await page.waitForLoadState('domcontentloaded', { timeout: 10_000 }).catch(() => undefined);
+        continue;
+      }
+      throw error;
+    }
   }
 };
 
@@ -259,28 +282,74 @@ const expectBodyToContainClean = async (page: Page, pattern: RegExp, timeout = 3
     .toMatch(pattern);
 };
 
+const isNavigationContextError = (error: unknown) =>
+  /Execution context was destroyed|Cannot find context|Frame was detached/i.test(String(error));
+
+const visibleClickableByCleanTextScript = ({ source, click }: { source: string; click: boolean }) => {
+  const clean = (value: string) =>
+    (value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[\u0111\u0110]/g, 'd')
+      .toLowerCase();
+  const re = new RegExp(source, 'i');
+  const isVisible = (node: Element) => {
+    const element = node as HTMLElement;
+    const style = window.getComputedStyle(element);
+    return (
+      style.visibility !== 'hidden' &&
+      style.display !== 'none' &&
+      style.pointerEvents !== 'none' &&
+      element.getClientRects().length > 0 &&
+      !element.closest('[aria-hidden="true"]')
+    );
+  };
+  const target = Array.from(document.querySelectorAll('button, a, [role="button"]')).find(
+    (node) =>
+      re.test(clean(node.textContent || node.getAttribute('aria-label') || '')) &&
+      !(node as HTMLButtonElement).disabled &&
+      isVisible(node),
+  );
+  if (!target) return false;
+  if (click) {
+    (target as HTMLElement).scrollIntoView({ block: 'center', inline: 'center' });
+    (target as HTMLElement).click();
+  }
+  return true;
+};
+
+const hasVisibleClickableByCleanText = async (page: Page, pattern: RegExp) => {
+  try {
+    return await page.evaluate(visibleClickableByCleanTextScript, { source: pattern.source, click: false });
+  } catch (error) {
+    if (!isNavigationContextError(error)) throw error;
+    await page.waitForLoadState('domcontentloaded').catch(() => undefined);
+    return false;
+  }
+};
+
 const clickByCleanText = async (page: Page, pattern: RegExp, timeout = 30_000) => {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
-    const clicked = await page.evaluate((source) => {
-      const clean = (value: string) =>
-        (value || '')
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/[\u0111\u0110]/g, 'd')
-          .toLowerCase();
-      const re = new RegExp(source, 'i');
-      const target = Array.from(document.querySelectorAll('button, a, [role="button"]')).find(
-        (node) => re.test(clean(node.textContent || node.getAttribute('aria-label') || '')) && !(node as HTMLButtonElement).disabled,
-      );
-      if (!target) return false;
-      (target as HTMLElement).click();
-      return true;
-    }, pattern.source);
-    if (clicked) return;
+    try {
+      const clicked = await page.evaluate(visibleClickableByCleanTextScript, { source: pattern.source, click: true });
+      if (clicked) {
+        await page.waitForLoadState('domcontentloaded').catch(() => undefined);
+        return;
+      }
+    } catch (error) {
+      if (!isNavigationContextError(error)) throw error;
+      await page.waitForLoadState('domcontentloaded').catch(() => undefined);
+    }
     await page.waitForTimeout(300);
   }
   throw new Error(`No clickable element matched ${pattern.source}`);
+};
+
+const openPortalDrawerIfNeeded = async (page: Page, targetPattern: RegExp) => {
+  if (await hasVisibleClickableByCleanText(page, targetPattern)) return;
+  await clickByCleanText(page, /mo menu dieu huong|open navigation|open drawer/);
+  await expect.poll(() => hasVisibleClickableByCleanText(page, targetPattern), { timeout: 10_000 }).toBe(true);
 };
 
 test.describe('Live recruitment flow', () => {
@@ -381,6 +450,7 @@ test.describe('Live recruitment flow', () => {
       const adminPage = await adminContext.newPage();
       failures = failOnBrowserErrors(adminPage);
       await login(adminPage, '/admin/login', data.adminEmail, data.password);
+      await openPortalDrawerIfNeeded(adminPage, /lich phong van/);
       await clickByCleanText(adminPage, /lich phong van/);
       await expect(adminPage.locator('body')).toContainText(String(session.id), { timeout: 30_000 });
       await expect(adminPage.locator('body')).toContainText(data.jobName, { timeout: 30_000 });

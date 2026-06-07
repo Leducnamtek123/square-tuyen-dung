@@ -13,6 +13,10 @@ import { useJobActivities } from './hooks/useJobActivities';
 import { useDataTable, useDebounce } from '../../../hooks';
 import { JobPostActivity } from '../../../types/models';
 import FilterBar from '@/components/Common/FilterBar';
+import {
+    JOB_ACTIVITY_STATUS_OPTIONS,
+    getJobActivityStatusOption,
+} from './applicationStatus';
 
 const JobActivityPage = () => {
     const { t } = useTranslation('admin');
@@ -173,15 +177,13 @@ const JobActivityPage = () => {
             enableSorting: true,
             cell: (info) => {
                 const status = info.getValue() as number;
+                const statusOption = getJobActivityStatusOption(status);
                 return (
                     <Chip
-                        label={t(`pages.jobActivity.statusOptions.${status === 1 ? 'applied' : status === 2 ? 'pending' : status === 3 ? 'accepted' : 'rejected'}`)}
+                        label={t(`pages.jobActivity.statusOptions.${statusOption.i18nKey}`)}
                         size="small"
-                        color={
-                            status === 3 ? 'success' :
-                                status === 4 ? 'error' : 'default'
-                        }
-                        variant={status === 1 ? 'outlined' : 'filled'}
+                        color={statusOption.color}
+                        variant={statusOption.variant}
                     />
                 );
             },
@@ -255,10 +257,16 @@ const JobActivityPage = () => {
                             value={state.statusValue}
                             onChange={(e) => dispatch({ type: 'set-status', value: Number(e.target.value) })}
                         >
-                            <MenuItem value={1}>{t('pages.jobActivity.statusOptions.applied')}</MenuItem>
-                            <MenuItem value={2}>{t('pages.jobActivity.statusOptions.pending')}</MenuItem>
-                            <MenuItem value={3}>{t('pages.jobActivity.statusOptions.accepted')}</MenuItem>
-                            <MenuItem value={4}>{t('pages.jobActivity.statusOptions.rejected')}</MenuItem>
+                            {!JOB_ACTIVITY_STATUS_OPTIONS.some((option) => option.id === state.statusValue) && (
+                                <MenuItem value={state.statusValue} disabled>
+                                    {t('pages.jobActivity.statusOptions.unknown')}
+                                </MenuItem>
+                            )}
+                            {JOB_ACTIVITY_STATUS_OPTIONS.map((option) => (
+                                <MenuItem key={option.id} value={option.id}>
+                                    {t(`pages.jobActivity.statusOptions.${option.i18nKey}`)}
+                                </MenuItem>
+                            ))}
                         </TextField>
                     </Box>
                 </DialogContent>

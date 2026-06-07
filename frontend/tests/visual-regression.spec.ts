@@ -50,6 +50,14 @@ test.describe('Global UI Resiliency & Layouts', () => {
       });
     });
 
+    await page.route(/\/api\/interview\/web\/sessions\/\?.*/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ count: 0, results: [] }),
+      });
+    });
+
     await page.route('**/api/interview/web/sessions/42/', async (route) => {
       await route.fulfill({
         status: 200,

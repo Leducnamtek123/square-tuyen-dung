@@ -257,7 +257,11 @@
       "voiceProfileAuto": "Giữ tự động để dùng giọng mặc định đã cấp cho tin tuyển dụng hoặc công ty này."
     },
     "scheduleNow": "Lên lịch ngay",
-    "noCandidates": "Không có ứng viên nào đã ứng tuyển vị trí này"
+    "noCandidates": "Không có ứng viên nào đã ứng tuyển vị trí này",
+    "loadingSelectedJobPost": "Đang tải tin tuyển dụng đã chọn...",
+    "missingSelectedJobPost": "Tin tuyển dụng #{{id}} không còn khả dụng",
+    "loadingSelectedCandidate": "Đang tải ứng viên đã chọn...",
+    "missingSelectedCandidate": "Ứng viên #{{id}} không còn khả dụng"
   },
   "interviewDetail": {
     "title": "Chi tiết phỏng vấn",

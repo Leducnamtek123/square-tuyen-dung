@@ -36,6 +36,36 @@ describe('createEmployerSignUpSchema', () => {
     );
   });
 
+  it('rejects invalid company location relation ids', async () => {
+    const schema = createEmployerSignUpSchema(t as never);
+
+    await expect(schema.validateAt('company.location.city', { company: { location: { city: 0 } } })).rejects.toThrow(
+      'validation.requiredCity',
+    );
+    await expect(schema.validateAt('company.location.city', { company: { location: { city: 1.5 } } })).rejects.toThrow(
+      'validation.requiredCity',
+    );
+    await expect(schema.validateAt('company.location.district', { company: { location: { district: 0 } } })).rejects.toThrow(
+      'validation.requiredDistrict',
+    );
+    await expect(schema.validateAt('company.location.district', { company: { location: { district: 1.5 } } })).rejects.toThrow(
+      'validation.requiredDistrict',
+    );
+  });
+
+  it('normalizes blank coordinates to null and rejects non-numeric coordinates', async () => {
+    const schema = createEmployerSignUpSchema(t as never);
+
+    await expect(schema.validateAt('company.location.lat', { company: { location: { lat: '' } } })).resolves.toBeNull();
+    await expect(schema.validateAt('company.location.lng', { company: { location: { lng: '' } } })).resolves.toBeNull();
+    await expect(schema.validateAt('company.location.lat', { company: { location: { lat: 'not-a-number' } } })).rejects.toThrow(
+      'validation.invalidLatitude',
+    );
+    await expect(schema.validateAt('company.location.lng', { company: { location: { lng: 'not-a-number' } } })).rejects.toThrow(
+      'validation.invalidLongitude',
+    );
+  });
+
   it('rejects invalid company website URLs but allows blank values', async () => {
     const schema = createEmployerSignUpSchema(t as never);
 

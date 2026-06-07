@@ -43,8 +43,8 @@ export const createPersonalProfileSchema = (t: TFunction) =>
       .oneOf(BACKEND_CHOICE_VALUES.maritalStatus, t('jobSeeker:profile.validation.choiceInvalid'))
       .max(1, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.maritalStatus') })),
     location: yup.object().shape({
-      city: yup.number().required(t('jobSeeker:profile.validation.cityRequired')).typeError(t('jobSeeker:profile.validation.cityRequired')),
-      district: yup.number().required(t('jobSeeker:profile.validation.districtRequired')).typeError(t('jobSeeker:profile.validation.districtRequired')),
+      city: yup.number().required(t('jobSeeker:profile.validation.cityRequired')).integer(t('jobSeeker:profile.validation.cityRequired')).moreThan(0, t('jobSeeker:profile.validation.cityRequired')).typeError(t('jobSeeker:profile.validation.cityRequired')),
+      district: yup.number().required(t('jobSeeker:profile.validation.districtRequired')).integer(t('jobSeeker:profile.validation.districtRequired')).moreThan(0, t('jobSeeker:profile.validation.districtRequired')).typeError(t('jobSeeker:profile.validation.districtRequired')),
       address: yup.string().required(t('jobSeeker:profile.validation.addressRequired')).max(255, t('jobSeeker:profile.validation.addressMax')),
     }),
     idCardNumber: yup.string().max(30, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.idCardNumber') })),

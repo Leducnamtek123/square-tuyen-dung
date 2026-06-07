@@ -42,8 +42,8 @@ export interface JobPostFormValues {
 export const getJobPostSchema = (t: TFunction<string | string[], undefined>) => 
   yup.object().shape({
     jobName: yup.string().required(t('jobPostForm.validation.jobnameisrequired')).max(255, t('jobPostForm.validation.jobnameexceededallowedlength')),
-    interviewTemplate: yup.number().nullable().typeError(t('jobPostForm.validation.interviewtemplateinvalid')),
-    career: yup.number().required(t('jobPostForm.validation.careerisrequired')).typeError(t('jobPostForm.validation.careerisrequired')),
+    interviewTemplate: yup.number().nullable().integer(t('jobPostForm.validation.interviewtemplateinvalid')).moreThan(0, t('jobPostForm.validation.interviewtemplateinvalid')).typeError(t('jobPostForm.validation.interviewtemplateinvalid')),
+    career: yup.number().required(t('jobPostForm.validation.careerisrequired')).integer(t('jobPostForm.validation.careerisrequired')).moreThan(0, t('jobPostForm.validation.careerisrequired')).typeError(t('jobPostForm.validation.careerisrequired')),
     position: yup
       .number()
       .required(t('jobPostForm.validation.positionisrequired'))
@@ -82,8 +82,8 @@ export const getJobPostSchema = (t: TFunction<string | string[], undefined>) =>
     jobRequirement: yup.mixed().test('editorContent', t('jobPostForm.validation.jobReqRequired'), (value) => (value as EditorState)?.getCurrentContent?.()?.hasText?.()),
     benefitsEnjoyed: yup.mixed().test('editorContent', t('jobPostForm.validation.benefitsRequired'), (value) => (value as EditorState)?.getCurrentContent?.()?.hasText?.()),
     location: yup.object().shape({
-      city: yup.number().required(t('jobPostForm.validation.cityprovinceisrequired')).typeError(t('jobPostForm.validation.cityprovinceisrequired')),
-      district: yup.number().required(t('jobPostForm.validation.districtisrequired')).typeError(t('jobPostForm.validation.districtisrequired')),
+      city: yup.number().required(t('jobPostForm.validation.cityprovinceisrequired')).integer(t('jobPostForm.validation.cityprovinceisrequired')).moreThan(0, t('jobPostForm.validation.cityprovinceisrequired')).typeError(t('jobPostForm.validation.cityprovinceisrequired')),
+      district: yup.number().required(t('jobPostForm.validation.districtisrequired')).integer(t('jobPostForm.validation.districtisrequired')).moreThan(0, t('jobPostForm.validation.districtisrequired')).typeError(t('jobPostForm.validation.districtisrequired')),
       address: yup.string().required(t('jobPostForm.validation.addressisrequired')).max(255, t('jobPostForm.validation.addressexceededallowedlength')),
       lat: yup.number().nullable().transform((value, originalValue) => originalValue === '' ? null : value).typeError(t('jobPostForm.validation.invalidlatitude')),
       lng: yup.number().nullable().transform((value, originalValue) => originalValue === '' ? null : value).typeError(t('jobPostForm.validation.invalidlongitude')),

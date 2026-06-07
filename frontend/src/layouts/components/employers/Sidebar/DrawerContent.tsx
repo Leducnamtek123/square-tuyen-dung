@@ -12,7 +12,7 @@ import EmployerMenu from './EmployerMenu';
 
 const shellHeaderHeight = { xs: 56, sm: 64 };
 
-const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
+const DrawerContent = ({ isAdmin, liveInterviewCount = 0 }: { isAdmin?: boolean; liveInterviewCount?: number }) => {
   const { t, i18n } = useTranslation(['admin', 'employer']);
   const pathname = usePathname();
   const location = { pathname, search: '', state: null, key: '' };
@@ -68,7 +68,7 @@ const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
           {isAdmin ? (
             <AdminMenu t={t} location={location} expandedItems={expandedItems} handleExpand={handleExpand} language={i18n.language} />
           ) : (
-            <EmployerMenu t={t} location={location} expandedItems={expandedItems} handleExpand={handleExpand} language={i18n.language} />
+            <EmployerMenu t={t} location={location} expandedItems={expandedItems} handleExpand={handleExpand} language={i18n.language} liveInterviewCount={liveInterviewCount} />
           )}
           <Divider sx={{ my: 2, borderColor: 'grey.300' }} />
         </List>

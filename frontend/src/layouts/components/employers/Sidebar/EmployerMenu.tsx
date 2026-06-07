@@ -19,9 +19,10 @@ interface EmployerMenuProps {
   expandedItems: Record<string, boolean>;
   handleExpand: (section: string) => void;
   language: string;
+  liveInterviewCount?: number;
 }
 
-const EmployerMenu = ({ t, location, expandedItems, handleExpand, language }: EmployerMenuProps) => {
+const EmployerMenu = ({ t, location, expandedItems, handleExpand, language, liveInterviewCount = 0 }: EmployerMenuProps) => {
   const routePath = (route: string) => localizeRoutePath(`/${route}`, language);
   const isSelected = (route: string) => {
     const pathname = location.pathname || '';
@@ -59,7 +60,7 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand, language }: Em
       <Collapse in={expandedItems.interviews} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           <MenuItem text={t('employer:sidebar.interviewList')} to={routePath(ROUTES.EMPLOYER.INTERVIEW_LIST)} kind="child" state={{ selected: isSelected(ROUTES.EMPLOYER.INTERVIEW_LIST) }} />
-          <MenuItem text={t('employer:sidebar.interviewLive')} to={routePath(ROUTES.EMPLOYER.INTERVIEW_LIVE)} kind="child" state={{ selected: isSelected(ROUTES.EMPLOYER.INTERVIEW_LIVE) }} />
+          <MenuItem text={t('employer:sidebar.interviewLive')} to={routePath(ROUTES.EMPLOYER.INTERVIEW_LIVE)} kind="child" badgeContent={liveInterviewCount} state={{ selected: isSelected(ROUTES.EMPLOYER.INTERVIEW_LIVE) }} />
           <MenuItem text={t('employer:sidebar.questionBank')} to={routePath(ROUTES.EMPLOYER.QUESTION_BANK)} kind="child" state={{ selected: isSelected(ROUTES.EMPLOYER.QUESTION_BANK) }} />
           <MenuItem text={t('employer:sidebar.questionSets')} to={routePath(ROUTES.EMPLOYER.QUESTION_GROUPS)} kind="child" state={{ selected: isSelected(ROUTES.EMPLOYER.QUESTION_GROUPS) }} />
         </List>

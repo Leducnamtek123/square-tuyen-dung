@@ -101,4 +101,38 @@ describe('createManualCandidateSchema', () => {
       'employer:manualCandidate.validation.choiceInvalid',
     );
   });
+
+  it('allows blank optional relations but rejects invalid relation ids', async () => {
+    const schema = createManualCandidateSchema(t as never);
+
+    await expect(schema.validateAt('career', { career: null })).resolves.toBeNull();
+    await expect(schema.validateAt('city', { city: null })).resolves.toBeNull();
+    await expect(schema.validateAt('career', { career: 0 })).rejects.toThrow(
+      'employer:manualCandidate.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('career', { career: 1.5 })).rejects.toThrow(
+      'employer:manualCandidate.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('city', { city: 0 })).rejects.toThrow(
+      'employer:manualCandidate.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('city', { city: 1.5 })).rejects.toThrow(
+      'employer:manualCandidate.validation.choiceInvalid',
+    );
+  });
+
+  it('requires a valid job post id when creating an applied profile', async () => {
+    const schema = createManualCandidateSchema(t as never, true);
+
+    await expect(schema.validateAt('jobPost', { jobPost: null })).rejects.toThrow(
+      'employer:manualCandidate.validation.jobPostRequired',
+    );
+    await expect(schema.validateAt('jobPost', { jobPost: 0 })).rejects.toThrow(
+      'employer:manualCandidate.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('jobPost', { jobPost: 1.5 })).rejects.toThrow(
+      'employer:manualCandidate.validation.choiceInvalid',
+    );
+    await expect(schema.validateAt('jobPost', { jobPost: 7 })).resolves.toBe(7);
+  });
 });

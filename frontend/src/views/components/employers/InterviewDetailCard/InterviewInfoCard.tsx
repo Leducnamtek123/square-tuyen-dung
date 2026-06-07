@@ -1,7 +1,6 @@
 import React from 'react';
-import { Box, Chip, Paper, Stack, Typography } from '@mui/material';
+import { Box, Paper, Stack, Typography } from '@mui/material';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import CategoryIcon from '@mui/icons-material/Category';
 import EmailIcon from '@mui/icons-material/Email';
 import EventIcon from '@mui/icons-material/Event';
 import PersonIcon from '@mui/icons-material/Person';
@@ -62,7 +61,6 @@ const InfoRow = ({ icon, label, children }: InfoRowProps) => (
 
 const InterviewInfoCard: React.FC<InterviewInfoCardProps> = ({ session, t, i18n }) => {
   const schedule = session.scheduledAt || session.scheduled_at;
-  const type = session.type || session.interview_type || 'N/A';
 
   return (
     <Paper elevation={0} sx={interviewDetailCardSx}>
@@ -85,24 +83,6 @@ const InterviewInfoCard: React.FC<InterviewInfoCardProps> = ({ session, t, i18n 
           <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.5 }}>
             {session.jobName || 'N/A'}
           </Typography>
-        </InfoRow>
-
-        <InfoRow icon={<CategoryIcon />} label={t('interviewDetail.label.type')}>
-          <Chip
-            label={String(type).toUpperCase()}
-            size="small"
-            sx={{
-              height: 24,
-              fontWeight: 800,
-              borderRadius: 1.5,
-              bgcolor: pc.info(0.08),
-              color: 'info.main',
-              fontSize: '0.72rem',
-              border: '1px solid',
-              borderColor: pc.info(0.16),
-              letterSpacing: 0,
-            }}
-          />
         </InfoRow>
 
         <InfoRow icon={<EventIcon />} label={t('interviewDetail.label.schedule')}>

@@ -48,6 +48,23 @@ describe('createCompanyFormSchema', () => {
     });
   });
 
+  it('rejects invalid company location relation ids', async () => {
+    const schema = createCompanyFormSchema(t as never);
+
+    await expect(schema.validateAt('location.city', { location: { city: 0 } })).rejects.toThrow(
+      'jobPostForm.validation.cityprovinceisrequired',
+    );
+    await expect(schema.validateAt('location.city', { location: { city: 1.5 } })).rejects.toThrow(
+      'jobPostForm.validation.cityprovinceisrequired',
+    );
+    await expect(schema.validateAt('location.district', { location: { district: 0 } })).rejects.toThrow(
+      'jobPostForm.validation.districtisrequired',
+    );
+    await expect(schema.validateAt('location.district', { location: { district: 1.5 } })).rejects.toThrow(
+      'jobPostForm.validation.districtisrequired',
+    );
+  });
+
   it('rejects future founded dates', async () => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date(2026, 5, 4, 12, 0, 0).getTime());

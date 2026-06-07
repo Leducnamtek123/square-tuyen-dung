@@ -42,16 +42,18 @@ export const createJobPostNotificationSchema = (t: TFunction<string | string[], 
     jobName: yup
       .string()
       .required(t('jobSeeker:jobManagement.notifications.form.validation.keywordRequired'))
-      .max(200, t('jobSeeker:jobManagement.notifications.form.validation.keywordMax')),
+      .max(255, t('jobSeeker:jobManagement.notifications.form.validation.keywordMax')),
     career: yup
       .number()
       .required(t('jobSeeker:jobManagement.notifications.form.validation.careerRequired'))
       .typeError(t('jobSeeker:jobManagement.notifications.form.validation.careerRequired'))
+      .integer(t('jobSeeker:jobManagement.notifications.form.validation.careerRequired'))
       .moreThan(0, t('jobSeeker:jobManagement.notifications.form.validation.careerRequired')),
     city: yup
       .number()
       .required(t('jobSeeker:jobManagement.notifications.form.validation.cityRequired'))
       .typeError(t('jobSeeker:jobManagement.notifications.form.validation.cityRequired'))
+      .integer(t('jobSeeker:jobManagement.notifications.form.validation.cityRequired'))
       .moreThan(0, t('jobSeeker:jobManagement.notifications.form.validation.cityRequired')),
     position: yup
       .number()
@@ -67,7 +69,9 @@ export const createJobPostNotificationSchema = (t: TFunction<string | string[], 
       .number()
       .nullable()
       .typeError(t('jobSeeker:jobManagement.notifications.form.validation.salaryInvalid'))
-      .transform((value, originalValue) => (originalValue === '' ? null : value)),
+      .transform((value, originalValue) => (originalValue === '' ? null : value))
+      .integer(t('jobSeeker:jobManagement.notifications.form.validation.salaryInvalid'))
+      .min(0, t('jobSeeker:jobManagement.notifications.form.validation.salaryInvalid')),
     frequency: yup
       .number()
       .required(t('jobSeeker:jobManagement.notifications.form.validation.frequencyRequired'))

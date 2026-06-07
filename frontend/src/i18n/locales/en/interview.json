@@ -257,7 +257,11 @@
       "voiceProfileAuto": "Leave auto to use the default voice granted for this job or company."
     },
     "scheduleNow": "Schedule Now",
-    "noCandidates": "No candidates have applied for this position"
+    "noCandidates": "No candidates have applied for this position",
+    "loadingSelectedJobPost": "Loading selected job post...",
+    "missingSelectedJobPost": "Selected job post #{{id}} is no longer available",
+    "loadingSelectedCandidate": "Loading selected candidate...",
+    "missingSelectedCandidate": "Selected candidate #{{id}} is no longer available"
   },
   "interviewDetail": {
     "title": "Interview Details",

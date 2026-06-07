@@ -110,6 +110,8 @@ export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
       .number()
 
       .required(t('jobSeeker:profile.validation.careerRequired'))
+      .integer(t('jobSeeker:profile.validation.careerRequired'))
+      .moreThan(0, t('jobSeeker:profile.validation.careerRequired'))
 
       .typeError(t('jobSeeker:profile.validation.careerRequired')),
 
@@ -118,6 +120,8 @@ export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
       .number()
 
       .required(t('jobSeeker:profile.validation.cityRequired'))
+      .integer(t('jobSeeker:profile.validation.cityRequired'))
+      .moreThan(0, t('jobSeeker:profile.validation.cityRequired'))
 
       .typeError(t('jobSeeker:profile.validation.cityRequired')),
 

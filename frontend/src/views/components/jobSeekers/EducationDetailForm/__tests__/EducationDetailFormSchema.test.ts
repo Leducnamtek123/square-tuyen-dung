@@ -25,4 +25,12 @@ describe('createEducationDetailSchema', () => {
       'jobSeeker:profile.validation.completedDateComparison',
     );
   });
+
+  it('rejects descriptions longer than the backend model limit', async () => {
+    const schema = createEducationDetailSchema(t as never);
+
+    await expect(
+      schema.validateAt('description', { description: 'x'.repeat(501) }),
+    ).rejects.toThrow('jobSeeker:profile.validation.descriptionMax');
+  });
 });

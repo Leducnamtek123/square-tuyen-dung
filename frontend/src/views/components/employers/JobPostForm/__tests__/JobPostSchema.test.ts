@@ -118,6 +118,35 @@ describe('getJobPostSchema', () => {
     );
   });
 
+  it('rejects invalid relation ids before submitting to backend primary key fields', async () => {
+    const schema = getJobPostSchema(t as never);
+
+    await expect(schema.validateAt('career', { career: 0 })).rejects.toThrow(
+      'jobPostForm.validation.careerisrequired',
+    );
+    await expect(schema.validateAt('career', { career: 1.5 })).rejects.toThrow(
+      'jobPostForm.validation.careerisrequired',
+    );
+    await expect(schema.validateAt('interviewTemplate', { interviewTemplate: 0 })).rejects.toThrow(
+      'jobPostForm.validation.interviewtemplateinvalid',
+    );
+    await expect(schema.validateAt('interviewTemplate', { interviewTemplate: 1.5 })).rejects.toThrow(
+      'jobPostForm.validation.interviewtemplateinvalid',
+    );
+    await expect(schema.validateAt('location.city', { location: { city: 0 } })).rejects.toThrow(
+      'jobPostForm.validation.cityprovinceisrequired',
+    );
+    await expect(schema.validateAt('location.city', { location: { city: 1.5 } })).rejects.toThrow(
+      'jobPostForm.validation.cityprovinceisrequired',
+    );
+    await expect(schema.validateAt('location.district', { location: { district: 0 } })).rejects.toThrow(
+      'jobPostForm.validation.districtisrequired',
+    );
+    await expect(schema.validateAt('location.district', { location: { district: 1.5 } })).rejects.toThrow(
+      'jobPostForm.validation.districtisrequired',
+    );
+  });
+
   it('allows today as an application deadline', async () => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date(2026, 5, 4, 12, 0, 0).getTime());

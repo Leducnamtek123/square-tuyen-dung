@@ -71,8 +71,8 @@ export const createCompanyFormSchema = (t: CompanyFormT) =>
       .oneOf([1, 2, 3, 4], t('companyForm.validation.employeeSizeInvalid')),
     fieldOperation: yup.string().required(t('companyForm.validation.fieldOperationRequired')).max(255, t('common:validation.max255')),
     location: yup.object().shape({
-      city: yup.number().required(t('jobPostForm.validation.cityprovinceisrequired')).typeError(t('jobPostForm.validation.cityprovinceisrequired')),
-      district: yup.number().required(t('jobPostForm.validation.districtisrequired')).typeError(t('jobPostForm.validation.districtisrequired')),
+      city: yup.number().required(t('jobPostForm.validation.cityprovinceisrequired')).integer(t('jobPostForm.validation.cityprovinceisrequired')).moreThan(0, t('jobPostForm.validation.cityprovinceisrequired')).typeError(t('jobPostForm.validation.cityprovinceisrequired')),
+      district: yup.number().required(t('jobPostForm.validation.districtisrequired')).integer(t('jobPostForm.validation.districtisrequired')).moreThan(0, t('jobPostForm.validation.districtisrequired')).typeError(t('jobPostForm.validation.districtisrequired')),
       address: yup.string().required(t('jobPostForm.validation.addressisrequired')).max(255, t('common:validation.max255')),
       lat: yup.number().nullable().transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value)).typeError(t('jobPostForm.validation.invalidlatitude')),
       lng: yup.number().nullable().transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value)).typeError(t('jobPostForm.validation.invalidlongitude')),

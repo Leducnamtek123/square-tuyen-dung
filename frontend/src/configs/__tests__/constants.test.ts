@@ -55,6 +55,30 @@ describe('Application Constants', () => {
       expect(AUTH_CONFIG).toBeDefined();
     });
 
+    it('falls back to legacy Vite client id env when Next public client id is missing', async () => {
+      const previousNextClientId = process.env.NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID;
+      const previousViteClientId = process.env.VITE_PROJECT_SERVER_CLIENT_ID;
+
+      delete process.env.NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID;
+      process.env.VITE_PROJECT_SERVER_CLIENT_ID = 'legacy-vite-client-id';
+      jest.resetModules();
+
+      const { AUTH_CONFIG: reloadedAuthConfig } = await import('../../configs/constants');
+      expect(reloadedAuthConfig.CLIENT_ID).toBe('legacy-vite-client-id');
+
+      if (previousNextClientId === undefined) {
+        delete process.env.NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID;
+      } else {
+        process.env.NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID = previousNextClientId;
+      }
+      if (previousViteClientId === undefined) {
+        delete process.env.VITE_PROJECT_SERVER_CLIENT_ID;
+      } else {
+        process.env.VITE_PROJECT_SERVER_CLIENT_ID = previousViteClientId;
+      }
+      jest.resetModules();
+    });
+
     it('does not expose secret-like values to the browser bundle', () => {
       expect(AUTH_CONFIG).not.toHaveProperty('CLIENT_SECRET');
       expect(AUTH_CONFIG).not.toHaveProperty('FACEBOOK_CLIENT_SECRET');

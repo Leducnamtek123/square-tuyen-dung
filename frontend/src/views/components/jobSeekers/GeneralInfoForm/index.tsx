@@ -24,8 +24,8 @@ export const createGeneralInfoSchema = (t: TFunction<'jobSeeker', undefined>) =>
   position: yup.number().required(t('jobSeeker:profile.validation.desiredLevelRequired')).oneOf(BACKEND_CHOICE_VALUES.position, t('jobSeeker:profile.validation.choiceInvalid')).typeError(t('jobSeeker:profile.validation.desiredLevelRequired')),
   academicLevel: yup.number().required(t('jobSeeker:profile.validation.academicLevelRequired')).oneOf(BACKEND_CHOICE_VALUES.academicLevel, t('jobSeeker:profile.validation.choiceInvalid')).typeError(t('jobSeeker:profile.validation.academicLevelRequired')),
   experience: yup.number().required(t('jobSeeker:profile.validation.experienceRequired')).oneOf(BACKEND_CHOICE_VALUES.experience, t('jobSeeker:profile.validation.choiceInvalid')).typeError(t('jobSeeker:profile.validation.experienceRequired')),
-  career: yup.number().required(t('jobSeeker:profile.validation.careerRequired')).typeError(t('jobSeeker:profile.validation.careerRequired')),
-  city: yup.number().required(t('jobSeeker:profile.validation.cityRequired')).typeError(t('jobSeeker:profile.validation.cityRequired')),
+  career: yup.number().required(t('jobSeeker:profile.validation.careerRequired')).integer(t('jobSeeker:profile.validation.careerRequired')).moreThan(0, t('jobSeeker:profile.validation.careerRequired')).typeError(t('jobSeeker:profile.validation.careerRequired')),
+  city: yup.number().required(t('jobSeeker:profile.validation.cityRequired')).integer(t('jobSeeker:profile.validation.cityRequired')).moreThan(0, t('jobSeeker:profile.validation.cityRequired')).typeError(t('jobSeeker:profile.validation.cityRequired')),
   salaryMin: yup
     .number()
     .required(t('jobSeeker:profile.validation.salaryMinRequired'))

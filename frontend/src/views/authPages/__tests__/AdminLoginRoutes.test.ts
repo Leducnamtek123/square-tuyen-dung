@@ -9,4 +9,8 @@ describe('admin login routes', () => {
     expect(source).toContain('ROUTES.ADMIN.DASHBOARD');
     expect(source).not.toContain("buildPortalPath('admin', '/dashboard'");
   });
+
+  it('does not override only one Next Image logo dimension with CSS', () => {
+    expect(source).not.toContain("style={{ height: 42, width: 'auto' }}");
+  });
 });

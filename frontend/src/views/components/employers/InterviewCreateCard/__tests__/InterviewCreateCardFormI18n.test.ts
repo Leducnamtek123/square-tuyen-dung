@@ -8,6 +8,10 @@ const fixedKeys = [
   'interviewCreateCard.label.autoDefaultVoice',
   'interviewCreateCard.label.defaultVoiceSuffix',
   'interviewCreateCard.helperText.voiceProfileAuto',
+  'interviewCreateCard.loadingSelectedJobPost',
+  'interviewCreateCard.missingSelectedJobPost',
+  'interviewCreateCard.loadingSelectedCandidate',
+  'interviewCreateCard.missingSelectedCandidate',
 ];
 
 describe('InterviewCreateCardForm i18n', () => {
@@ -24,6 +28,19 @@ describe('InterviewCreateCardForm i18n', () => {
       "t('interview:interviewCreateCard.label.autoDefaultVoice')",
       "t('interview:interviewCreateCard.label.defaultVoiceSuffix')",
       "t('interview:interviewCreateCard.helperText.voiceProfileAuto')",
+    ].forEach((snippet) => {
+      expect(source).toContain(snippet);
+    });
+  });
+
+  it('keeps preselected async select values mounted while options load', () => {
+    [
+      'jobValueHasOption',
+      'candidateValueHasOption',
+      "t('interview:interviewCreateCard.loadingSelectedJobPost')",
+      "t('interview:interviewCreateCard.missingSelectedJobPost'",
+      "t('interview:interviewCreateCard.loadingSelectedCandidate')",
+      "t('interview:interviewCreateCard.missingSelectedCandidate'",
     ].forEach((snippet) => {
       expect(source).toContain(snippet);
     });

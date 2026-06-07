@@ -466,10 +466,13 @@
       "editStatusTitle": "Update Application Status",
       "statusLabel": "Status",
       "statusOptions": {
-        "applied": "Applied",
-        "pending": "Pending",
-        "accepted": "Accepted",
-        "rejected": "Rejected"
+        "pendingConfirmation": "Pending confirmation",
+        "contacted": "Contacted",
+        "tested": "Tested",
+        "interviewed": "Interviewed",
+        "hired": "Hired",
+        "notSelected": "Not selected",
+        "unknown": "Unknown"
       },
       "cancelBtn": "Cancel",
       "saveBtn": "Save",

@@ -15,6 +15,7 @@ interface MenuItemProps {
   external?: boolean;
   onClick?: () => void;
   kind?: 'item' | 'group' | 'child';
+  badgeContent?: number;
   state?: {
     selected?: boolean;
     expanded?: boolean;
@@ -58,12 +59,16 @@ const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementT
   },
 }));
 
-const MenuItem = ({ icon: Icon, text, to, external = false, onClick, kind = 'item', state }: MenuItemProps) => {
+const MenuItem = ({ icon: Icon, text, to, external = false, onClick, kind = 'item', badgeContent, state }: MenuItemProps) => {
   const pathname = usePathname();
   const isChild = kind === 'child';
   const hasChildren = kind === 'group';
   const isExpanded = state?.expanded ?? false;
   const isActive = to && !external ? pathname === to || pathname.startsWith(to + '/') : false;
+  const visibleBadgeContent = typeof badgeContent === 'number' && badgeContent >= 0
+    ? badgeContent > 99 ? '99+' : String(badgeContent)
+    : null;
+  const hasActiveBadge = typeof badgeContent === 'number' && badgeContent > 0;
 
   return (
     <StyledListItemButton
@@ -104,6 +109,29 @@ const MenuItem = ({ icon: Icon, text, to, external = false, onClick, kind = 'ite
           }
         }}
       />
+      {visibleBadgeContent && (
+        <Box
+          component="span"
+          sx={{
+            ml: 1,
+            minWidth: 18,
+            height: 18,
+            px: 0.75,
+            borderRadius: 999,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: hasActiveBadge ? 'error.main' : 'grey.400',
+            color: hasActiveBadge ? 'error.contrastText' : 'common.white',
+            fontSize: '0.7rem',
+            fontWeight: 800,
+            lineHeight: 1,
+            flexShrink: 0,
+          }}
+        >
+          {visibleBadgeContent}
+        </Box>
+      )}
       {hasChildren && (
         <Box component="span" sx={{ ml: 'auto' }}>
           {isExpanded ? <ArrowDropDownIcon fontSize="small" /> : <ArrowRightIcon fontSize="small" />}

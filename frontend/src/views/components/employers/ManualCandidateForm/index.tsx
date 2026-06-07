@@ -71,7 +71,14 @@ const isAllowedFileSize = (value: File | null | undefined) => (
 
 export const createManualCandidateSchema = (t: TFunction, requireJobPost = false) => yup.object({
   jobPost: requireJobPost
-    ? yup.number().nullable().transform(emptyToNull).required(t('employer:manualCandidate.validation.jobPostRequired'))
+    ? yup
+      .number()
+      .nullable()
+      .transform(emptyToNull)
+      .typeError(t('employer:manualCandidate.validation.choiceInvalid'))
+      .integer(t('employer:manualCandidate.validation.choiceInvalid'))
+      .moreThan(0, t('employer:manualCandidate.validation.choiceInvalid'))
+      .required(t('employer:manualCandidate.validation.jobPostRequired'))
     : yup.number().nullable().transform(emptyToNull),
   file: yup
     .mixed<File>()
@@ -119,8 +126,8 @@ export const createManualCandidateSchema = (t: TFunction, requireJobPost = false
     .transform(emptyToNull)
     .oneOf([...BACKEND_CHOICE_VALUES.experience, null], t('employer:manualCandidate.validation.choiceInvalid'))
     .typeError(t('employer:manualCandidate.validation.choiceInvalid')),
-  career: yup.number().nullable().transform(emptyToNull),
-  city: yup.number().nullable().transform(emptyToNull),
+  career: yup.number().nullable().transform(emptyToNull).integer(t('employer:manualCandidate.validation.choiceInvalid')).moreThan(0, t('employer:manualCandidate.validation.choiceInvalid')),
+  city: yup.number().nullable().transform(emptyToNull).integer(t('employer:manualCandidate.validation.choiceInvalid')).moreThan(0, t('employer:manualCandidate.validation.choiceInvalid')),
   salaryMin: yup
     .number()
     .nullable()

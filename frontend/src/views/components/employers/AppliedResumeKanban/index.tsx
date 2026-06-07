@@ -17,6 +17,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { tConfig } from '../../../../utils/tConfig';
+import { errorModal } from '../../../../utils/sweetalert2Modal';
 import {
     DragDropContext,
     Droppable,
@@ -40,6 +41,7 @@ import { ROUTES, CV_TYPES } from '../../../../configs/constants';
 import { localizeRoutePath } from '../../../../configs/routeLocalization';
 import { formatRoute } from '@/utils/funcUtils';
 import { openExternalUrlSafely } from '@/utils/safeExternalUrl';
+import { canTransitionApplicationStatus } from '../applicationStatusTransitions';
 
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import SendEmailComponent from '../AppliedResumeTable/SendEmailComponent';
@@ -98,6 +100,19 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
 
         const newStatusId = destination.droppableId;
         const candidateId = draggableId;
+        const currentStatusId = Number(source.droppableId);
+        const nextStatusId = Number(newStatusId);
+
+        if (!canTransitionApplicationStatus(currentStatusId, nextStatusId)) {
+            errorModal(
+                t('appliedResume.status.errorTitle'),
+                t('appliedResume.status.errorMsg', {
+                    fromStatus: tConfig(allConfig?.applicationStatusDict?.[currentStatusId]) || '---',
+                    toStatus: tConfig(allConfig?.applicationStatusDict?.[nextStatusId]) || '---',
+                })
+            );
+            return;
+        }
 
         // Optimistically update or just trigger the API
         // In this implementation, the API triggers a refetch from Tanstack Query which will auto-update the UI.

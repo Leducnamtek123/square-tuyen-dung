@@ -466,10 +466,13 @@
       "editStatusTitle": "Cập nhật Trạng thái Ứng tuyển",
       "statusLabel": "Trạng thái",
       "statusOptions": {
-        "applied": "Đã ứng tuyển",
-        "pending": "Đang chờ",
-        "accepted": "Tham gia",
-        "rejected": "Từ chối"
+        "pendingConfirmation": "Chờ xác nhận",
+        "contacted": "Đã liên hệ",
+        "tested": "Đã kiểm tra",
+        "interviewed": "Đã phỏng vấn",
+        "hired": "Đã tuyển",
+        "notSelected": "Không phù hợp",
+        "unknown": "Không xác định"
       },
       "cancelBtn": "Hủy",
       "saveBtn": "Lưu",

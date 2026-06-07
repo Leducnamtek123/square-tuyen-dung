@@ -5,6 +5,11 @@ import { confirmModal, errorModal } from '../../../../utils/sweetalert2Modal';
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import { SelectOption } from '@/types/models';
+import {
+  canTransitionApplicationStatus,
+  getAllowedApplicationStatusTargets,
+} from '../applicationStatusTransitions';
+import { getAppliedStatusTone } from './applicationStatusPresentation';
 
 interface AppliedStatusComponentProps {
   options: SelectOption[];
@@ -23,18 +28,9 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
   const { allConfig } = useConfig();
   const theme = useTheme();
   const applyStatus = defaultStatus;
-  const allowedTransitions: Record<number, number[]> = {
-    1: [2, 6],
-    2: [3, 6],
-    3: [4, 6],
-    4: [5, 6],
-    5: [],
-    6: [],
-  };
 
   const canChooseStatus = (statusId: number) => {
-    if (statusId === applyStatus) return true;
-    return (allowedTransitions[applyStatus] || []).includes(statusId);
+    return canTransitionApplicationStatus(applyStatus, statusId);
   };
 
   const handleChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,9 +60,12 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
   };
 
   const getStatusColor = () => {
-    if (applyStatus >= 4) return theme.palette.success; // Hired/Selected
-    if (applyStatus === 3) return theme.palette.warning; // Interviewing
-    if (applyStatus === 2) return theme.palette.info; // Pre-screened
+    const tone = getAppliedStatusTone(applyStatus);
+    if (tone === 'success') return theme.palette.success;
+    if (tone === 'error') return theme.palette.error;
+    if (tone === 'primary') return theme.palette.primary;
+    if (tone === 'warning') return theme.palette.warning;
+    if (tone === 'info') return theme.palette.info;
     return { main: theme.palette.text.secondary, light: theme.palette.divider };
   };
 
@@ -81,7 +80,7 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
             select
             value={applyStatus}
             onChange={handleChangeValue}
-            disabled={(allowedTransitions[applyStatus] || []).length === 0}
+            disabled={getAllowedApplicationStatusTargets(applyStatus).length === 0}
             sx={{
                 '& .MuiOutlinedInput-root': {
                     borderRadius: 2,
@@ -126,4 +125,3 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
 };
 
 export default AppliedStatusComponent;
-

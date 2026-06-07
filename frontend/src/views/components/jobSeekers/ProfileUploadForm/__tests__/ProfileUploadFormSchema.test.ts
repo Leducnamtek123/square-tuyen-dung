@@ -85,6 +85,23 @@ describe('createProfileUploadSchema', () => {
     );
   });
 
+  it('rejects invalid relation ids before submitting to backend primary key fields', async () => {
+    const schema = createProfileUploadSchema(t as never);
+
+    await expect(schema.validateAt('career', { career: 0 })).rejects.toThrow(
+      'jobSeeker:profile.validation.careerRequired',
+    );
+    await expect(schema.validateAt('career', { career: 1.5 })).rejects.toThrow(
+      'jobSeeker:profile.validation.careerRequired',
+    );
+    await expect(schema.validateAt('city', { city: 0 })).rejects.toThrow(
+      'jobSeeker:profile.validation.cityRequired',
+    );
+    await expect(schema.validateAt('city', { city: 1.5 })).rejects.toThrow(
+      'jobSeeker:profile.validation.cityRequired',
+    );
+  });
+
   it('rejects missing, non-PDF and oversized CV upload files', async () => {
     const schema = createProfileUploadSchema(t as never);
     const textFile = new File(['not a pdf'], 'resume.txt', { type: 'text/plain' });

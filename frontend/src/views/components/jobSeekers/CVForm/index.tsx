@@ -11,7 +11,10 @@ import { Grid2 as Grid } from "@mui/material";
 import BasicDropzone from '../../../../components/Common/Controls/BasicDropzone';
 
 import { useTranslation } from 'react-i18next';
-import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
+import type { TFunction } from 'i18next';
+
+const MAX_CV_FILE_SIZE = 10 * 1024 * 1024;
+const PDF_CONTENT_TYPES = new Set(['application/pdf', 'application/x-pdf']);
 
 export interface FormValues {
   files: File[] | null;
@@ -21,35 +24,48 @@ interface CVFormProps {
   handleUpdate: (data: FormValues) => void;
 }
 
+type CvFileValue = File[] | null | undefined;
 
+const getFirstCvFile = (value: CvFileValue) => (
+  Array.isArray(value) ? value[0] : undefined
+);
 
-const CVForm = ({ handleUpdate }: CVFormProps) => {
+const hasCvFile = (value: CvFileValue) => Boolean(getFirstCvFile(value));
 
-  const { t } = useTranslation(['jobSeeker']);
+const isPdfCvFile = (value: CvFileValue) => {
+  const file = getFirstCvFile(value);
+  if (!file) return true;
 
+  const fileName = (file.name || '').toLowerCase();
+  const contentType = (file.type || '').toLowerCase();
 
+  return fileName.endsWith('.pdf') && (!contentType || PDF_CONTENT_TYPES.has(contentType));
+};
 
-  const schema = yup.object().shape({
+const isAllowedCvFileSize = (value: CvFileValue) => {
+  const file = getFirstCvFile(value);
+  return !file || (file.size || 0) <= MAX_CV_FILE_SIZE;
+};
 
-
-
+export const createCVFormSchema = (t: TFunction<'jobSeeker', undefined>) =>
+  yup.object().shape({
     files: yup
       .mixed<File[]>()
       .nullable()
       .test(
         'files empty',
         t('jobSeeker:profile.validation.fileRequired'),
-        (value) =>
-          !(
-            value === undefined ||
-            value === null ||
-            value.length === 0
-          )
-      ),
-
-
-
+        hasCvFile,
+      )
+      .test('file-is-pdf', t('jobSeeker:profile.validation.filePdfOnly'), isPdfCvFile)
+      .test('file-max-size', t('jobSeeker:profile.validation.fileTooLarge'), isAllowedCvFileSize),
   });
+
+const CVForm = ({ handleUpdate }: CVFormProps) => {
+
+  const { t } = useTranslation(['jobSeeker']);
+
+  const schema = React.useMemo(() => createCVFormSchema(t), [t]);
 
 
 

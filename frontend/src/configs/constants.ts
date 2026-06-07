@@ -74,8 +74,14 @@ const AUTH_PROVIDER = {
   GOOGLE: 'google-oauth2',
 } as const;
 
+const getProjectServerClientId = () =>
+  process.env.NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID ||
+  process.env.VITE_PROJECT_SERVER_CLIENT_ID ||
+  process.env.CLIENT_ID ||
+  '';
+
 const AUTH_CONFIG = {
-  CLIENT_ID: process.env.NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID,
+  CLIENT_ID: getProjectServerClientId(),
   BACKEND_KEY: 'backend',
   ACCESS_TOKEN_KEY: 'access_token',
   REFRESH_TOKEN_KEY: 'refresh_token',

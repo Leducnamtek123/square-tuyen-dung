@@ -18,8 +18,8 @@ export interface EmployerSignUpFormData {
       city: string | number;
       district: string | number;
       address: string;
-      lat: string;
-      lng: string;
+      lat: number | string | null;
+      lng: number | string | null;
     };
   };
 }

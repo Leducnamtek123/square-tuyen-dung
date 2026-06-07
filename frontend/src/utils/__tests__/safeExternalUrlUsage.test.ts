@@ -32,6 +32,15 @@ describe('safe external URL usage', () => {
         const line = source.slice(0, match.index).split('\n').length;
         offenders.push(`${relative(SOURCE_ROOT, filePath)}:${line}:href={${expression}}`);
       }
+
+      const objectHrefMatches = source.matchAll(/\bhref:\s*([^,\n}]*[Uu]rl[^,\n}]*)/g);
+      for (const match of objectHrefMatches) {
+        const expression = match[1].trim();
+        if (/safe|getSafeExternalOpenUrl|getSafeResourceUrl/.test(expression)) continue;
+
+        const line = source.slice(0, match.index).split('\n').length;
+        offenders.push(`${relative(SOURCE_ROOT, filePath)}:${line}:href: ${expression}`);
+      }
     }
 
     expect(offenders).toEqual([]);

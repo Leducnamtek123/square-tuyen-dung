@@ -3,32 +3,24 @@
 import React, { useCallback, useEffect, useMemo, useReducer } from 'react';
 import {
   Alert,
-  Avatar,
   Box,
   Button,
   LinearProgress,
   Paper,
   Stack,
   Typography,
-  alpha,
   useTheme,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import ScheduleIcon from '@mui/icons-material/Schedule';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
 import interviewService from '../../../services/interviewService';
 import { type InterviewSession } from '../../../types/models';
 import InterviewLiveCandidateCard from '../../../views/components/employers/InterviewLiveCandidateCard';
 import AIServiceHealthBanner from '../../../components/Features/AIServiceHealthBanner';
 import pc from '@/utils/muiColors';
-
-const ACTIVE_STATUSES = new Set(['in_progress', 'calibration', 'connecting', 'active', 'interrupted']);
-
-const normalizeStatus = (status: string) => status.trim().toLowerCase();
+import { getLiveInterviewSessions } from './liveInterviewSessions';
 
 type InterviewLivePageState = {
   allSessions: InterviewSession[];
@@ -84,17 +76,8 @@ const InterviewLivePage = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const activeSessions = useMemo(
-    () => state.allSessions.filter((session) => ACTIVE_STATUSES.has(normalizeStatus(session.status))),
+    () => getLiveInterviewSessions(state.allSessions),
     [state.allSessions],
-  );
-
-  const stats = useMemo(
-    () => ({
-      active: activeSessions.length,
-      scheduled: state.allSessions.filter((session) => normalizeStatus(session.status) === 'scheduled').length,
-      completed: state.allSessions.filter((session) => normalizeStatus(session.status) === 'completed').length,
-    }),
-    [activeSessions.length, state.allSessions],
   );
 
   const fetchSessions = useCallback(async (opts?: { silent?: boolean }) => {
@@ -211,50 +194,6 @@ const InterviewLivePage = () => {
           {state.error}
         </Alert>
       )}
-
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mb={4}>
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: pc.primary( 0.15), bgcolor: pc.primary( 0.04), flex: 1, minWidth: 160 }}>
-          <Stack direction="row" alignItems="center" spacing={1.5} mb={1.5}>
-            <Avatar sx={{ width: 36, height: 36, bgcolor: pc.primary( 0.12), color: theme.palette.primary.main }}>
-              <TrendingUpIcon sx={{ fontSize: 20 }} />
-            </Avatar>
-            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
-              {t('interviewLive.stats.inProgressLabel')}
-            </Typography>
-          </Stack>
-          <Typography variant="h3" sx={{ fontWeight: 900, color: theme.palette.primary.main }}>
-            {stats.active}
-          </Typography>
-        </Paper>
-
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: pc.info( 0.15), bgcolor: pc.info( 0.04), flex: 1, minWidth: 160 }}>
-          <Stack direction="row" alignItems="center" spacing={1.5} mb={1.5}>
-            <Avatar sx={{ width: 36, height: 36, bgcolor: pc.info( 0.12), color: theme.palette.info.main }}>
-              <ScheduleIcon sx={{ fontSize: 20 }} />
-            </Avatar>
-            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
-              {t('interviewLive.stats.scheduledLabel')}
-            </Typography>
-          </Stack>
-          <Typography variant="h3" sx={{ fontWeight: 900, color: theme.palette.info.main }}>
-            {stats.scheduled}
-          </Typography>
-        </Paper>
-
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: pc.success( 0.15), bgcolor: pc.success( 0.04), flex: 1, minWidth: 160 }}>
-          <Stack direction="row" alignItems="center" spacing={1.5} mb={1.5}>
-            <Avatar sx={{ width: 36, height: 36, bgcolor: pc.success( 0.12), color: theme.palette.success.main }}>
-              <CheckCircleIcon sx={{ fontSize: 20 }} />
-            </Avatar>
-            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
-              {t('interviewLive.stats.completedLabel')}
-            </Typography>
-          </Stack>
-          <Typography variant="h3" sx={{ fontWeight: 900, color: theme.palette.success.main }}>
-            {stats.completed}
-          </Typography>
-        </Paper>
-      </Stack>
 
       {state.loading && (
         <Box sx={{ width: '100%', mb: 2 }}>

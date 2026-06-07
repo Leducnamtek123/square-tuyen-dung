@@ -9,6 +9,7 @@ import type { Theme as StylesTheme } from '@mui/material/styles';
 interface SidebarProps {
   drawerWidth: number;
   isAdmin?: boolean;
+  liveInterviewCount?: number;
 }
 
 interface MobileSidebarProps extends SidebarProps {
@@ -17,7 +18,7 @@ interface MobileSidebarProps extends SidebarProps {
   handleDrawerToggle: () => void;
 }
 
-const Sidebar = ({ drawerWidth, isAdmin }: SidebarProps) => {
+const Sidebar = ({ drawerWidth, isAdmin, liveInterviewCount }: SidebarProps) => {
   const theme = useTheme();
 
   return (
@@ -43,7 +44,7 @@ const Sidebar = ({ drawerWidth, isAdmin }: SidebarProps) => {
       open
     >
       <Suspense fallback={null}>
-        <DrawerContent isAdmin={isAdmin} />
+        <DrawerContent isAdmin={isAdmin} liveInterviewCount={liveInterviewCount} />
       </Suspense>
     </Drawer>
   );
@@ -55,6 +56,7 @@ const MobileSidebar = ({
   mobileOpen,
   handleDrawerToggle,
   isAdmin,
+  liveInterviewCount,
 }: MobileSidebarProps) => {
   const theme = useTheme();
 
@@ -86,7 +88,7 @@ const MobileSidebar = ({
       }}
     >
       <Suspense fallback={null}>
-        <DrawerContent isAdmin={isAdmin} />
+        <DrawerContent isAdmin={isAdmin} liveInterviewCount={liveInterviewCount} />
       </Suspense>
     </Drawer>
   );

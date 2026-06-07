@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faFile, faFilePdf } from "@fortawesome/free-regular-svg-icons";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@mui/material/styles";
+import type { TFunction } from "i18next";
 import pc from "@/utils/muiColors";
 import errorHandling from "@/utils/errorHandling";
 import { CV_TYPES, REGEX_VALIDATE, ROUTES } from "@/configs/constants";
@@ -32,6 +33,38 @@ export interface ApplyFormValues {
   phone: string;
   resume: string;
 }
+
+const isPositiveIntegerIdString = (value?: string | null) => {
+  if (!value) return false;
+  if (!/^\d+$/.test(value)) return false;
+  return Number(value) > 0;
+};
+
+export const createApplyFormSchema = (t: TFunction<"public", undefined>) =>
+  yup.object().shape({
+    fullName: yup
+      .string()
+      .required(t("applyForm.validation.fullNameRequired"))
+      .max(100, t("applyForm.validation.fullNameMax")),
+    email: yup
+      .string()
+      .required(t("applyForm.validation.emailRequired"))
+      .email(t("applyForm.validation.emailInvalid"))
+      .max(100, t("applyForm.validation.emailMax")),
+    phone: yup
+      .string()
+      .required(t("applyForm.validation.phoneRequired"))
+      .matches(REGEX_VALIDATE.phoneRegExp, t("applyForm.validation.phoneInvalid"))
+      .max(15, t("applyForm.validation.phoneMax")),
+    resume: yup
+      .string()
+      .required(t("applyForm.validation.resumeRequired"))
+      .test(
+        "resume-positive-integer-id",
+        t("applyForm.validation.resumeRequired"),
+        isPositiveIntegerIdString,
+      ),
+  });
 
 type ApplyFormState = {
   isLoadingResumes: boolean;
@@ -69,25 +102,7 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
   const [state, dispatch] = React.useReducer(applyFormReducer, initialState);
   const jobSeekerProfileId = (currentUser as { jobSeekerProfileId?: number | string })?.jobSeekerProfileId;
 
-  const schema = yup.object().shape({
-    fullName: yup
-      .string()
-      .required(t("applyForm.validation.fullNameRequired"))
-      .max(100, t("applyForm.validation.fullNameMax")),
-    email: yup
-      .string()
-      .required(t("applyForm.validation.emailRequired"))
-      .email(t("applyForm.validation.emailInvalid"))
-      .max(100, t("applyForm.validation.emailMax")),
-    phone: yup
-      .string()
-      .required(t("applyForm.validation.phoneRequired"))
-      .matches(REGEX_VALIDATE.phoneRegExp, t("applyForm.validation.phoneInvalid"))
-      .max(15, t("applyForm.validation.phoneMax")),
-    resume: yup
-      .string()
-      .required(t("applyForm.validation.resumeRequired")),
-  });
+  const schema = React.useMemo(() => createApplyFormSchema(t), [t]);
 
   const {
     control,

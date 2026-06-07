@@ -216,6 +216,7 @@
       "titleRequired": "Please enter role/profile title.",
       "titleMax": "Title must be at most 200 characters.",
       "salaryInvalid": "Salary is invalid.",
+      "choiceInvalid": "Invalid selection.",
       "salaryTooLarge": "Salary exceeds the allowed limit.",
       "salaryRangeInvalid": "Maximum salary must be greater than or equal to minimum salary.",
       "descriptionMax": "Description must be at most 800 characters.",

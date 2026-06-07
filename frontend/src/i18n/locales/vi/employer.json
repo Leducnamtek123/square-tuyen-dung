@@ -216,6 +216,7 @@
       "titleRequired": "Vui lòng nhập vị trí/tiêu đề hồ sơ.",
       "titleMax": "Tiêu đề tối đa 200 ký tự.",
       "salaryInvalid": "Mức lương không hợp lệ.",
+      "choiceInvalid": "Lựa chọn không hợp lệ.",
       "salaryTooLarge": "Mức lương vượt quá giới hạn cho phép.",
       "salaryRangeInvalid": "Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu.",
       "descriptionMax": "Mô tả tối đa 800 ký tự.",

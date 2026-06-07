@@ -9,6 +9,7 @@ import { Box } from "@mui/material";
 import Header from '../components/employers/Header';
 
 import Sidebar from '../components/employers/Sidebar';
+import { useLiveInterviewCount } from '@/views/employerPages/InterviewPages/useLiveInterviewCount';
 
 interface EmployerLayoutProps {
   window?: () => Window;
@@ -24,6 +25,7 @@ function EmployerLayout(props: EmployerLayoutProps) {
   const { window, children } = props;
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const liveInterviewCount = useLiveInterviewCount();
 
   const handleDrawerToggle = () => {
 
@@ -61,13 +63,14 @@ function EmployerLayout(props: EmployerLayoutProps) {
 
         {/* Start: Sidebar */}
 
-        <Sidebar drawerWidth={drawerWidth} isAdmin={false} />
+        <Sidebar drawerWidth={drawerWidth} isAdmin={false} liveInterviewCount={liveInterviewCount} />
         <Sidebar.MobileSidebar
           drawerWidth={drawerWidth}
           container={container}
           mobileOpen={mobileOpen}
           handleDrawerToggle={handleDrawerToggle}
           isAdmin={false}
+          liveInterviewCount={liveInterviewCount}
         />
 
         {/* End: Sidebar */}
