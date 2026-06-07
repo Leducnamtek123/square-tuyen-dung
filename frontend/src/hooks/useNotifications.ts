@@ -13,33 +13,21 @@ import {
   writeBatch,
   type CollectionReference,
   type DocumentData,
-  type DocumentSnapshot,
   type QueryDocumentSnapshot,
 } from 'firebase/firestore';
 import db from '../configs/firebase-config';
 import { useAppSelector } from './useAppStore';
+import {
+  initialNotificationsState,
+  notificationsReducer,
+  type AppNotification,
+} from './notificationsState';
+
+export type { AppNotification } from './notificationsState';
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_MAX_NOTIFICATIONS = 50;
 const FIRESTORE_BATCH_LIMIT = 450;
-
-export interface AppNotification {
-  key: string;
-  title?: string;
-  content?: string;
-  imageUrl?: string | null;
-  image?: string | null;
-  type?: string;
-  is_read?: boolean;
-  is_deleted?: boolean;
-  time?: { seconds: number; nanoseconds?: number } | null;
-  link?: string;
-  url?: string;
-  APPLY_JOB?: { resume_id?: string | number; resume_slug?: string };
-  NEW_MESSAGE?: { chatRoomId?: string; text?: string };
-  POST_VERIFY_REQUIRED?: { job_post_id?: string | number };
-  [key: string]: unknown;
-}
 
 interface UseNotificationsOptions {
   pageSize?: number;
@@ -59,119 +47,6 @@ interface UseNotificationsReturn {
   handleMakeAllRead: () => Promise<void>;
   handleRemoveAll: () => Promise<void>;
 }
-
-type NotificationsState = {
-  count: number;
-  unreadCount: number;
-  isLoading: boolean;
-  notifications: AppNotification[];
-  lastKey: DocumentSnapshot | null;
-};
-
-type NotificationsAction =
-  | { type: 'loading' }
-  | { type: 'reset' }
-  | { type: 'countLoaded'; count: number }
-  | { type: 'unreadCountLoaded'; count: number }
-  | { type: 'initialLoaded'; notifications: AppNotification[]; lastKey: DocumentSnapshot | null }
-  | { type: 'loadMoreLoaded'; notifications: AppNotification[]; lastKey: DocumentSnapshot | null; maxNotifications: number }
-  | { type: 'notificationRead'; key: string }
-  | { type: 'notificationRemoved'; key: string }
-  | { type: 'allRead' }
-  | { type: 'allRemoved' }
-  | { type: 'finishedLoading' };
-
-const initialNotificationsState: NotificationsState = {
-  count: 0,
-  unreadCount: 0,
-  isLoading: false,
-  notifications: [],
-  lastKey: null,
-};
-
-const notificationsReducer = (
-  state: NotificationsState,
-  action: NotificationsAction
-): NotificationsState => {
-  switch (action.type) {
-    case 'loading':
-      return {
-        ...state,
-        isLoading: true,
-      };
-    case 'reset':
-      return initialNotificationsState;
-    case 'countLoaded':
-      return {
-        ...state,
-        count: action.count,
-      };
-    case 'unreadCountLoaded':
-      return {
-        ...state,
-        unreadCount: action.count,
-      };
-    case 'initialLoaded':
-      return {
-        ...state,
-        isLoading: false,
-        notifications: action.notifications,
-        lastKey: action.lastKey,
-      };
-    case 'loadMoreLoaded': {
-      const existingKeys = new Set(state.notifications.map((notification) => notification.key));
-      const combined = [
-        ...state.notifications,
-        ...action.notifications.filter((notification) => !existingKeys.has(notification.key)),
-      ];
-
-      return {
-        ...state,
-        isLoading: false,
-        notifications: combined.slice(0, action.maxNotifications),
-        lastKey: action.lastKey,
-      };
-    }
-    case 'notificationRead':
-      return {
-        ...state,
-        notifications: state.notifications.map((notification) =>
-          notification.key === action.key ? { ...notification, is_read: true } : notification
-        ),
-        unreadCount: Math.max(
-          0,
-          state.unreadCount -
-          (state.notifications.find((notification) => notification.key === action.key)?.is_read === false ? 1 : 0)
-        ),
-      };
-    case 'notificationRemoved':
-      return {
-        ...state,
-        notifications: state.notifications.filter((notification) => notification.key !== action.key),
-      };
-    case 'allRead':
-      return {
-        ...state,
-        unreadCount: 0,
-        notifications: state.notifications.map((notification) => ({ ...notification, is_read: true })),
-      };
-    case 'allRemoved':
-      return {
-        ...state,
-        notifications: [],
-        count: 0,
-        unreadCount: 0,
-        lastKey: null,
-      };
-    case 'finishedLoading':
-      return {
-        ...state,
-        isLoading: false,
-      };
-    default:
-      return state;
-  }
-};
 
 const commitUpdatesInChunks = async (
   docs: QueryDocumentSnapshot<DocumentData>[],
@@ -318,25 +193,41 @@ export const useNotifications = ({
 
   const handleRead = async (key: string) => {
     if (!userId) return;
+    const wasUnread = state.notifications.find((notification) => notification.key === key)?.is_read === false;
+
+    dispatch({ type: 'notificationRead', key });
     try {
       await updateDoc(doc(db, 'users', userId, 'notifications', key), {
         is_read: true,
       });
-      dispatch({ type: 'notificationRead', key });
     } catch {
-      // Ignored
+      if (wasUnread) {
+        dispatch({ type: 'notificationReadFailed', key });
+      }
     }
   };
 
   const handleRemove = async (key: string) => {
     if (!userId) return;
+    const removedIndex = state.notifications.findIndex((notification) => notification.key === key);
+    const removedNotification = removedIndex >= 0 ? state.notifications[removedIndex] : null;
+
+    if (removedNotification) {
+      dispatch({ type: 'notificationRemoved', key });
+    }
+
     try {
       await updateDoc(doc(db, 'users', userId, 'notifications', key), {
         is_deleted: true,
       });
-      dispatch({ type: 'notificationRemoved', key });
     } catch {
-      // Ignored
+      if (removedNotification) {
+        dispatch({
+          type: 'notificationRestored',
+          notification: removedNotification,
+          index: removedIndex,
+        });
+      }
     }
   };
 

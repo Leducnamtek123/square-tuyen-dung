@@ -21,13 +21,16 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ArticleIcon from '@mui/icons-material/Article';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { ABOUT_IMAGES, IMAGES } from '@/configs/constants';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import contentService, { type Article, type ArticleCategory } from '@/services/contentService';
 import useSEO from '@/hooks/useSEO';
 import errorHandling from '@/utils/errorHandling';
@@ -35,6 +38,11 @@ import NoDataCard from '@/components/Common/NoDataCard';
 import { ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { formatRoute } from '@/utils/funcUtils';
+import {
+  BLOG_IMAGES,
+  getArticleImage,
+  withArticleImages,
+} from './blogImages';
 
 type NewsCategory = 'all' | ArticleCategory;
 
@@ -82,32 +90,69 @@ const ArticleCard = ({
   const publishedDate = formatDate(article.publishedAt || article.createAt || article.updateAt);
   const badgeLabel = categoryLabels[article.category] || categoryFallbackLabel;
   const BadgeIcon = article.category === 'news' ? NewspaperIcon : ArticleIcon;
+  const imageSrc = getArticleImage(article);
 
   return (
     <Card
       elevation={0}
       sx={{
         height: '100%',
-        borderRadius: 3,
+        borderRadius: 2,
         overflow: 'hidden',
         border: '1px solid',
-        borderColor: 'divider',
-        transition: 'transform 160ms ease, box-shadow 160ms ease',
+        borderColor: alpha('#0f3f7f', 0.12),
+        bgcolor: 'common.white',
+        boxShadow: featured ? '0 22px 60px rgba(15, 57, 127, 0.12)' : '0 14px 34px rgba(15, 57, 127, 0.08)',
+        transition: 'transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease',
         '&:hover': {
-          transform: 'translateY(-3px)',
-          boxShadow: '0 16px 40px rgba(15, 57, 127, 0.12)',
+          transform: 'translateY(-4px)',
+          borderColor: alpha('#17488a', 0.24),
+          boxShadow: '0 24px 58px rgba(15, 57, 127, 0.16)',
         },
       }}
     >
-      <CardActionArea component={Link} href={href} sx={{ height: '100%', alignItems: 'stretch' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <Box sx={{ position: 'relative' }}>
+      <CardActionArea
+        component={Link}
+        href={href}
+        sx={{
+          height: '100%',
+          alignItems: 'stretch',
+          display: 'flex',
+          flexDirection: { xs: 'column', md: featured ? 'row' : 'column' },
+        }}
+      >
+        <Box
+          sx={{
+            position: 'relative',
+            width: { xs: '100%', md: featured ? '48%' : '100%' },
+            minHeight: { xs: featured ? 270 : 220, md: featured ? 390 : 220 },
+            flexShrink: 0,
+            overflow: 'hidden',
+            bgcolor: '#dbe7f4',
+          }}
+        >
             <CardMedia
               component="img"
-              height={featured ? 320 : 220}
-              image={article.thumbnailUrl || IMAGES.coverImageDefault}
+              image={imageSrc}
               alt={article.title}
-              sx={{ objectFit: 'cover' }}
+              sx={{
+                width: '100%',
+                height: '100%',
+                minHeight: 'inherit',
+                objectFit: 'cover',
+                display: 'block',
+                transition: 'transform 360ms ease',
+                '.MuiCardActionArea-root:hover &': {
+                  transform: 'scale(1.035)',
+                },
+              }}
+            />
+            <Box
+              sx={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(180deg, rgba(4, 18, 38, 0.04) 40%, rgba(4, 18, 38, 0.56) 100%)',
+              }}
             />
             <Chip
               label={badgeLabel}
@@ -117,49 +162,92 @@ const ArticleCard = ({
                 position: 'absolute',
                 top: 16,
                 left: 16,
-                bgcolor: 'rgba(15, 23, 42, 0.88)',
+                height: 30,
+                borderRadius: 1.5,
+                bgcolor: 'rgba(15, 23, 42, 0.82)',
                 color: 'common.white',
+                fontWeight: 700,
                 '& .MuiChip-icon': { color: 'common.white' },
               }}
             />
           </Box>
-          <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, flexGrow: 1, p: 3 }}>
+          <CardContent
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1.5,
+              flexGrow: 1,
+              p: { xs: 2.25, md: featured ? 3.5 : 2.5 },
+            }}
+          >
             <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
               {publishedDate && (
-                <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: 'text.secondary' }}>
+                <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: '#64748b' }}>
                   <AccessTimeIcon sx={{ fontSize: 16 }} />
-                  <Typography variant="caption">{publishedDate}</Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 600 }}>{publishedDate}</Typography>
                 </Stack>
               )}
-              <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: 'text.secondary' }}>
+              <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: '#64748b' }}>
                 <VisibilityIcon sx={{ fontSize: 16 }} />
-                <Typography variant="caption">{formatViews(article.viewCount || 0)}</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 600 }}>{formatViews(article.viewCount || 0)}</Typography>
               </Stack>
             </Stack>
 
-            <Typography variant={featured ? 'h4' : 'h6'} fontWeight={700} lineHeight={1.25}>
+            <Typography
+              variant={featured ? 'h4' : 'h6'}
+              fontWeight={800}
+              sx={{
+                color: '#102f5e',
+                lineHeight: 1.18,
+                fontSize: featured ? { xs: 28, md: 36 } : { xs: 21, md: 22 },
+                letterSpacing: 0,
+              }}
+            >
               {article.title}
             </Typography>
 
-            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7, display: '-webkit-box', WebkitLineClamp: featured ? 4 : 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#53657e',
+                lineHeight: 1.75,
+                fontSize: featured ? 16 : 14.5,
+                display: '-webkit-box',
+                WebkitLineClamp: featured ? 4 : 3,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
               {article.excerpt || stripHtml(article.content || '')}
             </Typography>
 
             {article.tagList?.length > 0 && (
               <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 'auto' }}>
                 {article.tagList.slice(0, 4).map((tag) => (
-                  <Chip key={tag} label={tag} size="small" variant="outlined" />
+                  <Chip
+                    key={tag}
+                    label={tag}
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      borderRadius: 1.5,
+                      borderColor: alpha('#17488a', 0.18),
+                      bgcolor: alpha('#dbeafe', 0.34),
+                      color: '#17488a',
+                      fontWeight: 650,
+                    }}
+                  />
                 ))}
               </Stack>
             )}
 
-            <Box sx={{ pt: 0.5 }}>
-              <Typography variant="body2" fontWeight={600} color="primary.main">
+            <Stack direction="row" spacing={0.75} alignItems="center" sx={{ pt: 0.5, color: '#17488a' }}>
+              <Typography variant="body2" fontWeight={800}>
                 {ctaLabel}
               </Typography>
-            </Box>
+              <ArrowForwardIcon sx={{ fontSize: 18 }} />
+            </Stack>
           </CardContent>
-        </Box>
       </CardActionArea>
     </Card>
   );
@@ -322,9 +410,10 @@ const NewsPage = () => {
 
         if (!active) return;
 
+        const apiArticles = response.results || [];
         dispatch({
           type: 'loaded',
-          articles: response.results || [],
+          articles: withArticleImages(apiArticles),
           total: response.count || 0,
         });
       } catch (error) {
@@ -370,25 +459,57 @@ const NewsPage = () => {
           position: 'relative',
           overflow: 'hidden',
           borderRadius: 2,
-          px: { xs: 3, md: 5 },
-          py: { xs: 4, md: 5 },
+          minHeight: { xs: 520, md: 470 },
+          px: { xs: 2.5, sm: 4, md: 6 },
+          py: { xs: 4, md: 6 },
           mb: 4,
           color: 'common.white',
-          backgroundImage: `linear-gradient(90deg, rgba(10, 37, 82, 0.94) 0%, rgba(15, 68, 130, 0.82) 48%, rgba(20, 121, 177, 0.62) 100%), url(${ABOUT_IMAGES.JOB_POST})`,
+          backgroundImage: `linear-gradient(90deg, rgba(7, 24, 52, 0.92) 0%, rgba(12, 50, 94, 0.78) 48%, rgba(12, 50, 94, 0.22) 100%), url(${BLOG_IMAGES.hero})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          boxShadow: '0 24px 60px rgba(15, 57, 127, 0.24)',
+          boxShadow: '0 28px 70px rgba(15, 57, 127, 0.22)',
+          display: 'flex',
+          alignItems: 'center',
         }}
       >
-        <Stack spacing={2.5} sx={{ position: 'relative', maxWidth: 760 }}>
+        <Stack spacing={2.75} sx={{ position: 'relative', maxWidth: 720 }}>
           <Chip
             label={t('news.heroEyebrow', { ns: 'public' })}
-            sx={{ alignSelf: 'flex-start', bgcolor: 'rgba(255,255,255,0.16)', color: 'common.white' }}
+            icon={<AutoStoriesIcon fontSize="small" />}
+            sx={{
+              alignSelf: 'flex-start',
+              height: 34,
+              borderRadius: 1.5,
+              bgcolor: 'rgba(255,255,255,0.14)',
+              color: 'common.white',
+              fontWeight: 800,
+              border: '1px solid rgba(255,255,255,0.24)',
+              '& .MuiChip-icon': { color: 'common.white' },
+            }}
           />
-          <Typography variant="h3" fontWeight={800} sx={{ fontSize: { xs: 34, md: 46 }, lineHeight: 1.08 }}>
+          <Typography
+            variant="h3"
+            fontWeight={900}
+            sx={{
+              fontSize: { xs: 38, sm: 48, md: 62 },
+              lineHeight: 0.98,
+              letterSpacing: 0,
+              textWrap: 'balance',
+              maxWidth: 680,
+            }}
+          >
             {t('news.heroTitle', { ns: 'public' })}
           </Typography>
-          <Typography variant="h6" sx={{ maxWidth: 720, color: 'rgba(255,255,255,0.9)', fontWeight: 400 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              maxWidth: 650,
+              color: 'rgba(255,255,255,0.9)',
+              fontWeight: 450,
+              lineHeight: 1.65,
+              fontSize: { xs: 17, md: 20 },
+            }}
+          >
             {t('news.heroSubtitle', { ns: 'public' })}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
@@ -396,8 +517,16 @@ const NewsPage = () => {
               component={Link}
               href={newsListHref}
               variant="contained"
-              color="secondary"
               size="large"
+              startIcon={<AutoStoriesIcon />}
+              sx={{
+                borderRadius: 1.5,
+                bgcolor: '#f97316',
+                color: 'common.white',
+                fontWeight: 850,
+                px: 2.5,
+                '&:hover': { bgcolor: '#ea580c' },
+              }}
             >
               {t('news.viewAllArticles', { ns: 'public' })}
             </Button>
@@ -406,10 +535,40 @@ const NewsPage = () => {
               href={jobsHref}
               variant="outlined"
               size="large"
-              sx={{ borderColor: 'rgba(255,255,255,0.55)', color: 'common.white' }}
+              startIcon={<WorkOutlineIcon />}
+              sx={{
+                borderRadius: 1.5,
+                borderColor: 'rgba(255,255,255,0.58)',
+                color: 'common.white',
+                fontWeight: 800,
+                px: 2.5,
+                backdropFilter: 'blur(8px)',
+                '&:hover': {
+                  borderColor: 'rgba(255,255,255,0.85)',
+                  bgcolor: 'rgba(255,255,255,0.10)',
+                },
+              }}
             >
               {t('news.exploreJobs', { ns: 'public' })}
             </Button>
+          </Stack>
+          <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ pt: 1 }}>
+            {topicOptions.slice(1, 5).map((topic) => (
+              <Chip
+                key={topic.value}
+                label={topic.label}
+                onClick={() => dispatch({ type: 'tagChanged', tag: topic.value })}
+                sx={{
+                  borderRadius: 1.5,
+                  bgcolor: 'rgba(255,255,255,0.13)',
+                  color: 'common.white',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  fontWeight: 750,
+                  cursor: 'pointer',
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.22)' },
+                }}
+              />
+            ))}
           </Stack>
         </Stack>
       </Box>
@@ -423,7 +582,31 @@ const NewsPage = () => {
           variant="scrollable"
           scrollButtons="auto"
           sx={{
-            '& .MuiTab-root': { fontWeight: 700, textTransform: 'none' },
+            minHeight: 48,
+            '& .MuiTabs-flexContainer': {
+              width: { xs: '100%', sm: 'auto' },
+            },
+            '& .MuiTabs-indicator': { display: 'none' },
+            '& .MuiTab-root': {
+              minHeight: 42,
+              minWidth: 0,
+              flex: { xs: '1 1 0', sm: '0 0 auto' },
+              mr: { xs: 0.75, sm: 1 },
+              px: { xs: 1, sm: 2 },
+              borderRadius: 1.5,
+              fontWeight: 800,
+              fontSize: { xs: 13, sm: 14 },
+              textTransform: 'none',
+              color: '#39516f',
+              border: '1px solid',
+              borderColor: alpha('#17488a', 0.12),
+              bgcolor: 'common.white',
+              '&.Mui-selected': {
+                color: 'common.white',
+                bgcolor: '#17488a',
+                borderColor: '#17488a',
+              },
+            },
           }}
         >
           {categoryOptions.map((option) => (
@@ -444,10 +627,11 @@ const NewsPage = () => {
             gap: 1.5,
             alignItems: 'center',
             p: 1.5,
-            borderRadius: 3,
+            borderRadius: 2,
             border: '1px solid',
-            borderColor: 'divider',
+            borderColor: alpha('#17488a', 0.14),
             bgcolor: 'background.paper',
+            boxShadow: '0 18px 44px rgba(15, 57, 127, 0.08)',
           }}
         >
           <TextField
@@ -459,12 +643,26 @@ const NewsPage = () => {
             placeholder={t('news.searchPlaceholder', { ns: 'public' })}
             fullWidth
             size="small"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 1.5,
+                bgcolor: alpha('#eff6ff', 0.62),
+                '& fieldset': { borderColor: alpha('#17488a', 0.12) },
+              },
+            }}
           />
           <Button
             variant="contained"
             startIcon={<SearchIcon />}
             onClick={commitSearch}
-            sx={{ width: { xs: '100%', sm: 'auto' } }}
+            sx={{
+              width: { xs: '100%', sm: 'auto' },
+              minWidth: 124,
+              borderRadius: 1.5,
+              fontWeight: 850,
+              bgcolor: '#17488a',
+              '&:hover': { bgcolor: '#0f3f7f' },
+            }}
           >
             {t('news.searchButton', { ns: 'public' })}
           </Button>
@@ -477,6 +675,7 @@ const NewsPage = () => {
             color={!activeTag ? 'primary' : 'default'}
             variant={!activeTag ? 'filled' : 'outlined'}
             onClick={() => dispatch({ type: 'tagCleared' })}
+            sx={{ borderRadius: 1.5, fontWeight: 750 }}
           />
           {topicOptions.map((tag) => (
             <Chip
@@ -486,6 +685,7 @@ const NewsPage = () => {
               color={activeTag === tag.value ? 'primary' : 'default'}
               variant={activeTag === tag.value ? 'filled' : 'outlined'}
               onClick={() => dispatch({ type: 'tagChanged', tag: tag.value })}
+              sx={{ borderRadius: 1.5, fontWeight: 750 }}
             />
           ))}
         </Stack>
@@ -557,25 +757,51 @@ const NewsPage = () => {
             <Card
               elevation={0}
               sx={{
-                borderRadius: 3,
+                borderRadius: 2,
                 border: '1px solid',
-                borderColor: 'divider',
+                borderColor: alpha('#17488a', 0.14),
                 bgcolor: 'background.paper',
+                boxShadow: '0 18px 48px rgba(15, 57, 127, 0.08)',
               }}
             >
-              <CardContent>
-                <Stack spacing={1.5}>
-                  <Typography variant="h6" fontWeight={700}>
-                    {t('news.quickReadTitle', { ns: 'public' })}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
+              <CardContent sx={{ p: 2.5 }}>
+                <Stack spacing={2}>
+                  <Stack direction="row" spacing={1.25} alignItems="center">
+                    <Box
+                      sx={{
+                        width: 38,
+                        height: 38,
+                        borderRadius: 1.5,
+                        display: 'grid',
+                        placeItems: 'center',
+                        color: '#17488a',
+                        bgcolor: alpha('#dbeafe', 0.9),
+                      }}
+                    >
+                      <TrendingUpIcon />
+                    </Box>
+                    <Typography variant="h6" fontWeight={850} sx={{ color: '#102f5e' }}>
+                      {t('news.quickReadTitle', { ns: 'public' })}
+                    </Typography>
+                  </Stack>
+                  <Typography variant="body2" sx={{ color: '#53657e', lineHeight: 1.7 }}>
                     {t('news.quickReadDescription', {
                       count: total,
                       total: total.toLocaleString(numberLocale),
                       ns: 'public',
                     })}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 800,
+                      color: '#17488a',
+                      bgcolor: alpha('#dbeafe', 0.7),
+                      borderRadius: 1.25,
+                      px: 1.25,
+                      py: 0.75,
+                    }}
+                  >
                     {t('news.currentFilter', { filter: activeFilterText, ns: 'public' })}
                   </Typography>
                   <Stack spacing={1}>
@@ -595,11 +821,18 @@ const NewsPage = () => {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          p: 1.5,
-                          borderRadius: 2,
-                          bgcolor: category === option.value ? 'primary.light' : 'action.hover',
-                          color: category === option.value ? 'primary.contrastText' : 'text.primary',
+                          p: 1.35,
+                          borderRadius: 1.5,
+                          border: '1px solid',
+                          borderColor: category === option.value ? '#17488a' : alpha('#17488a', 0.10),
+                          bgcolor: category === option.value ? '#17488a' : alpha('#f8fafc', 0.96),
+                          color: category === option.value ? 'common.white' : '#243b5a',
                           cursor: 'pointer',
+                          transition: 'background 160ms ease, color 160ms ease, border-color 160ms ease',
+                          '&:hover': {
+                            borderColor: category === option.value ? '#17488a' : alpha('#17488a', 0.24),
+                            bgcolor: category === option.value ? '#17488a' : alpha('#dbeafe', 0.46),
+                          },
                         }}
                       >
                         <Stack direction="row" spacing={1} alignItems="center">
@@ -618,18 +851,24 @@ const NewsPage = () => {
             <Card
               elevation={0}
               sx={{
-                borderRadius: 3,
+                borderRadius: 2,
+                overflow: 'hidden',
                 border: '1px solid',
-                borderColor: 'divider',
-                bgcolor: 'background.paper',
+                borderColor: alpha('#f97316', 0.24),
+                color: 'common.white',
+                bgcolor: '#0f2f59',
+                backgroundImage: `linear-gradient(135deg, rgba(15, 47, 89, 0.95), rgba(23, 72, 138, 0.78)), url(${BLOG_IMAGES.skills})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                boxShadow: '0 18px 48px rgba(15, 57, 127, 0.14)',
               }}
             >
-              <CardContent>
-                <Stack spacing={1.5}>
-                  <Typography variant="h6" fontWeight={700}>
+              <CardContent sx={{ p: 2.5 }}>
+                <Stack spacing={1.75}>
+                  <Typography variant="h6" fontWeight={900} sx={{ lineHeight: 1.2 }}>
                     {t('news.audienceTitle', { ns: 'public' })}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.86)', lineHeight: 1.7 }}>
                     {t('news.audienceDescription', { ns: 'public' })}
                   </Typography>
                   <Button
@@ -637,6 +876,14 @@ const NewsPage = () => {
                     href={jobsHref}
                     variant="contained"
                     endIcon={<ArrowForwardIcon />}
+                    sx={{
+                      alignSelf: 'flex-start',
+                      borderRadius: 1.5,
+                      bgcolor: '#f97316',
+                      color: 'common.white',
+                      fontWeight: 850,
+                      '&:hover': { bgcolor: '#ea580c' },
+                    }}
                   >
                     {t('news.newJobsCta', { ns: 'public' })}
                   </Button>

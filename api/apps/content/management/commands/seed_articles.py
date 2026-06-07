@@ -17,6 +17,9 @@ AUTHOR_EMAIL = "ceohub.hostmaster@gmail.com"
 
 
 def _upload_thumbnail(image_path: Path, public_id: str) -> File | None:
+    if not image_path.exists():
+        return None
+
     result = CloudinaryService.upload_image(str(image_path), "articles", public_id=public_id)
     if not result:
         return None
@@ -25,7 +28,7 @@ def _upload_thumbnail(image_path: Path, public_id: str) -> File | None:
         public_id=result["public_id"],
         defaults={
             "version": result.get("version", ""),
-            "format": result.get("format", "svg"),
+            "format": result.get("format", "webp"),
             "resource_type": result.get("resource_type", "image"),
             "file_type": File.OTHER_TYPE,
             "uploaded_at": result.get("created_at") or timezone.now(),
@@ -37,130 +40,94 @@ def _upload_thumbnail(image_path: Path, public_id: str) -> File | None:
 
 ARTICLE_SEEDS = [
     {
-        "title": "10 xu hướng tuyển dụng bất động sản nổi bật trong 2026",
-        "industry": "Bất động sản",
-        "thumbnail": ARTICLE_ROOT / "real_estate.svg",
-        "tags": "bất động sản,tuyển dụng,sales,dự án",
-        "excerpt": "Thị trường bất động sản đang dịch chuyển sang mô hình tuyển dụng thiên về dữ liệu, tư vấn dự án và chăm sóc khách hàng chất lượng cao.",
+        "title": "Tuyển tư vấn bất động sản: nhìn vào năng lực tư vấn thay vì chỉ KPI",
+        "category": Article.CATEGORY_BLOG,
+        "thumbnail": ARTICLE_ROOT / "real_estate.jpg",
+        "tags": "square-editorial,tuyển dụng,bất động sản,sales,dự án",
+        "excerpt": "Một khung đánh giá giúp nhà tuyển dụng chọn đúng tư vấn viên cho dự án, từ cách đọc nhu cầu đến xử lý phản đối.",
         "content": """
-            <p>Năm 2026, doanh nghiệp bất động sản không chỉ tìm người bán hàng giỏi, mà cần đội ngũ hiểu dự án, hiểu pháp lý và biết xây dựng niềm tin với khách hàng.</p>
-            <p>Các vị trí nổi bật gồm chuyên viên tư vấn dự án, marketing dự án, telesales, chăm sóc khách hàng sau bán và quản lý sàn phân phối.</p>
-            <p>Ứng viên có lợi thế thường sở hữu kỹ năng giao tiếp, hiểu quy trình bán hàng và biết khai thác công cụ số để theo dõi nguồn lead.</p>
+            <p>Thị trường bất động sản cần đội ngũ tư vấn viên biết đọc nhu cầu, hiểu sản phẩm và giữ nhịp chăm sóc khách hàng dài hơi. Một JD tốt nên nói rõ phân khúc dự án, nguồn lead, quy trình đào tạo và tiêu chí chốt giao dịch.</p>
+            <h2>Những năng lực nên ưu tiên</h2>
+            <p>Hãy đánh giá khả năng giao tiếp, kỷ luật follow-up, hiểu biết pháp lý cơ bản và tinh thần làm việc với dữ liệu CRM. Ứng viên mạnh thường có ví dụ cụ thể về cách xử lý phản đối, giữ lịch hẹn và phối hợp cùng marketing.</p>
+            <h2>Cách phỏng vấn thực tế</h2>
+            <p>Thay vì chỉ hỏi kinh nghiệm bán hàng, nhà tuyển dụng nên đưa một tình huống khách hàng thật: ngân sách, nhu cầu, khu vực và lý do còn lưỡng lự. Câu trả lời sẽ cho thấy tư duy tư vấn, không chỉ kỹ năng nói.</p>
         """,
     },
     {
-        "title": "Bất động sản dự án: 5 kỹ năng nhà tuyển dụng ưu tiên nhất",
-        "industry": "Bất động sản",
-        "thumbnail": ARTICLE_ROOT / "real_estate.svg",
-        "tags": "bất động sản,kỹ năng,pipeline,lead",
-        "excerpt": "Nhà tuyển dụng đánh giá cao ứng viên có tư duy tư vấn, kỷ luật làm việc và khả năng chốt deal theo từng giai đoạn dự án.",
+        "title": "Checklist tuyển nhân sự công trường cho dự án xây dựng",
+        "category": Article.CATEGORY_NEWS,
+        "thumbnail": ARTICLE_ROOT / "construction.jpg",
+        "tags": "square-editorial,xây dựng,tuyển dụng,công trường,dự án",
+        "excerpt": "Từ an toàn, tiến độ đến phối hợp đội nhóm, đây là các tín hiệu nên kiểm tra trước khi nhận người vào dự án.",
         "content": """
-            <p>Đối với khối dự án, 5 kỹ năng quan trọng nhất là hiểu sản phẩm, lập kế hoạch chăm sóc khách, phân tích nhu cầu, theo đuổi cơ hội và chốt giao dịch.</p>
-            <p>Ứng viên cần biết phối hợp với marketing, pháp lý và vận hành để tạo trải nghiệm liền mạch cho khách hàng.</p>
-            <p>Những hồ sơ có số liệu hiệu quả bán hàng, kinh nghiệm dự án thực tế và khả năng xử lý phản đối thường được ưu tiên hơn.</p>
+            <p>Tuyển nhân sự công trường không chỉ là tìm người có chứng chỉ. Doanh nghiệp cần người giữ được an toàn, tiến độ và giao tiếp rõ với thiết kế, vật tư, nhà thầu phụ.</p>
+            <h2>Đọc hồ sơ theo năng lực dự án</h2>
+            <p>CV nên được nhìn qua loại công trình, quy mô đội nhóm, phạm vi phụ trách và các mốc bàn giao. Những chi tiết này quan trọng hơn một danh sách kỹ năng chung chung.</p>
+            <h2>Phỏng vấn bằng case</h2>
+            <p>Một case tốt có thể là thiếu vật tư sát ngày nghiệm thu, xung đột giữa thiết kế và hiện trường, hoặc yêu cầu thay đổi từ chủ đầu tư. Ứng viên tốt sẽ nêu được thứ tự ưu tiên và cách cập nhật rủi ro.</p>
         """,
     },
     {
-        "title": "Xây dựng công trình: checklist tuyển dụng cho vị trí hiện trường",
-        "industry": "Xây dựng",
-        "thumbnail": ARTICLE_ROOT / "construction.svg",
-        "tags": "xây dựng,công trình,site,qa/qc",
-        "excerpt": "Tuyển dụng ngành xây dựng cần nhìn vào kinh nghiệm hiện trường, kỷ luật an toàn và khả năng phối hợp nhiều bên trên công trình.",
+        "title": "Đọc portfolio nội thất sao cho không tuyển nhầm người",
+        "category": Article.CATEGORY_BLOG,
+        "thumbnail": ARTICLE_ROOT / "interior.jpg",
+        "tags": "square-editorial,nội thất,portfolio,kỹ năng,designer",
+        "excerpt": "Portfolio đẹp cần đi kèm vai trò thật, quy trình làm việc và khả năng chuyển ý tưởng thành bản triển khai.",
         "content": """
-            <p>Với vị trí hiện trường, nhà tuyển dụng thường kiểm tra kinh nghiệm giám sát tiến độ, quản lý thầu phụ, hồ sơ nghiệm thu và xử lý phát sinh tại công trường.</p>
-            <p>Ứng viên mạnh không chỉ nắm chuyên môn kỹ thuật mà còn biết làm việc với chủ đầu tư, tư vấn giám sát và đội thi công.</p>
-            <p>Bộ hồ sơ tốt nên thể hiện rõ công trình đã tham gia, vai trò cụ thể và các chỉ số như tiến độ, chất lượng, an toàn lao động.</p>
+            <p>Trong ngành nội thất, portfolio đẹp là điểm bắt đầu nhưng chưa đủ. Nhà tuyển dụng cần kiểm tra khả năng hiểu brief, phối hợp vật liệu, quản lý kỳ vọng khách hàng và chuyển giao cho đội thi công.</p>
+            <h2>Tiêu chí xem portfolio</h2>
+            <p>Hãy yêu cầu ứng viên giải thích vai trò của họ trong từng dự án: concept, bản vẽ, chọn vật liệu, làm việc với khách hàng hay giám sát thi công. Điều này giúp tránh đánh giá nhầm giữa thẩm mỹ và năng lực triển khai.</p>
+            <h2>Điểm cộng khi tuyển</h2>
+            <p>Ứng viên có thói quen ghi chú quyết định thiết kế, biết cân bằng ngân sách và có cách trình bày phương án rõ ràng sẽ phù hợp hơn với môi trường dự án thực tế.</p>
         """,
     },
     {
-        "title": "Kỹ sư xây dựng cần chuẩn bị gì để vào dự án lớn?",
-        "industry": "Xây dựng",
-        "thumbnail": ARTICLE_ROOT / "construction.svg",
-        "tags": "xây dựng,kỹ sư,công trình,bim",
-        "excerpt": "Muốn vào dự án lớn, kỹ sư xây dựng cần vững hồ sơ, mạnh phối hợp và hiểu quy trình kiểm soát chất lượng từ đầu đến cuối.",
+        "title": "Phỏng vấn kiến trúc sư trẻ: hỏi gì để thấy tư duy thiết kế",
+        "category": Article.CATEGORY_BLOG,
+        "thumbnail": ARTICLE_ROOT / "architecture.jpg",
+        "tags": "square-editorial,kiến trúc,phỏng vấn,portfolio,thiết kế",
+        "excerpt": "Một bộ câu hỏi ngắn giúp HR đánh giá cách ứng viên giải quyết ràng buộc, nhận phản hồi và bảo vệ phương án.",
         "content": """
-            <p>Dự án lớn thường yêu cầu kỹ sư có khả năng đọc bản vẽ, bóc tách khối lượng, kiểm soát vật tư và cập nhật tiến độ mỗi ngày.</p>
-            <p>Ngoài kỹ năng chuyên môn, bạn cần rèn thói quen ghi chép hiện trường, báo cáo ngắn gọn và xử lý xung đột nhanh trong đội thi công.</p>
-            <p>Nếu có thêm kinh nghiệm BIM hoặc phần mềm quản lý dự án, hồ sơ của bạn sẽ nổi bật hơn đáng kể.</p>
+            <p>Kiến trúc sư trẻ thường có nhiều đồ án học thuật, nhưng doanh nghiệp cần nhìn thêm cách họ chuyển ý tưởng thành hồ sơ có thể phối hợp với kỹ thuật, khách hàng và tiến độ dự án.</p>
+            <h2>Câu hỏi nên dùng</h2>
+            <p>Hãy chọn một dự án trong portfolio và hỏi: vấn đề thiết kế là gì, ràng buộc nào khó nhất, ứng viên đã thử các phương án nào và vì sao chọn phương án cuối cùng.</p>
+            <h2>Dấu hiệu ứng viên phù hợp</h2>
+            <p>Ứng viên tốt không chỉ bảo vệ ý tưởng, mà còn biết nói về giới hạn, phản hồi nhận được và cách họ cải thiện bản vẽ sau mỗi vòng góp ý.</p>
         """,
     },
     {
-        "title": "Nội thất: 7 tiêu chí tuyển designer cho dự án nhà ở và thương mại",
-        "industry": "Nội thất",
-        "thumbnail": ARTICLE_ROOT / "interior.svg",
-        "tags": "nội thất,designer,3d,render",
-        "excerpt": "Tuyển designer nội thất không chỉ nhìn portfolio đẹp mà còn phải đánh giá tư duy công năng, vật liệu và khả năng triển khai thi công.",
+        "title": "Khi nào HR nên giữ quyền AI trong buổi phỏng vấn?",
+        "category": Article.CATEGORY_NEWS,
+        "thumbnail": ARTICLE_ROOT / "ai_interview.jpg",
+        "tags": "square-editorial,tuyển dụng,phỏng vấn,AI,kỹ năng",
+        "excerpt": "AI giúp hỏi nhất quán, còn HR tham gia trực tiếp khi cần đào sâu tín hiệu quan trọng từ ứng viên.",
         "content": """
-            <p>Trong nội thất, nhà tuyển dụng quan tâm đến khả năng diễn giải concept, dựng layout, phối vật liệu và phối hợp với đội thi công để ra sản phẩm cuối cùng.</p>
-            <p>Portfolio nên có cả bản vẽ concept, hình ảnh render, mặt bằng và ảnh công trình hoàn thiện để chứng minh năng lực triển khai thực tế.</p>
-            <p>Ứng viên hiểu ngân sách, hiểu vật liệu và biết làm việc với khách hàng sẽ có lợi thế rõ rệt.</p>
+            <p>AI interview giúp chuẩn hóa câu hỏi, ghi nhận transcript và hỗ trợ đánh giá nhanh hơn. Nhưng nhà tuyển dụng vẫn nên có quyền tham gia trực tiếp khi cần đào sâu hoặc kiểm chứng tín hiệu quan trọng.</p>
+            <h2>Khi nào HR nên giữ quyền AI</h2>
+            <p>Nên tham gia trực tiếp khi câu trả lời quá ngắn, ứng viên có kinh nghiệm nổi bật cần khai thác thêm, hoặc vị trí yêu cầu đánh giá giao tiếp với khách hàng.</p>
+            <h2>Quy trình chuyên nghiệp</h2>
+            <p>AI hỏi nền tảng, HR hỏi case, sau đó hệ thống lưu transcript và trạng thái ứng tuyển. Cách kết hợp này giúp phỏng vấn nhất quán mà vẫn giữ được sự tinh tế của người tuyển dụng.</p>
         """,
     },
     {
-        "title": "Cách chọn vật liệu nội thất phù hợp cho căn hộ và showroom",
-        "industry": "Nội thất",
-        "thumbnail": ARTICLE_ROOT / "interior.svg",
-        "tags": "nội thất,vật liệu,showroom,căn hộ",
-        "excerpt": "Mỗi không gian cần một bộ vật liệu khác nhau để tối ưu độ bền, chi phí và trải nghiệm thẩm mỹ.",
+        "title": "Ứng viên ngành dự án nên trình bày kỹ năng thế nào?",
+        "category": Article.CATEGORY_BLOG,
+        "thumbnail": ARTICLE_ROOT / "candidate_skills.jpg",
+        "tags": "square-editorial,kỹ năng,portfolio,ứng viên,dự án",
+        "excerpt": "Cách biến kinh nghiệm, bản vẽ, case khách hàng và kết quả dự án thành một hồ sơ dễ được chọn phỏng vấn.",
         "content": """
-            <p>Căn hộ ưu tiên vật liệu dễ vệ sinh, bền màu và tối ưu diện tích; showroom lại cần vật liệu tạo cảm giác thương hiệu mạnh hơn.</p>
-            <p>Khi tuyển ứng viên nội thất, doanh nghiệp thường hỏi cách họ cân bằng giữa đẹp, bền và chi phí thi công.</p>
-            <p>Điểm cộng lớn là khả năng đề xuất phương án thay thế khi nguồn cung vật liệu thay đổi.</p>
-        """,
-    },
-    {
-        "title": "Kiến trúc: cách xây portfolio khiến nhà tuyển dụng chú ý ngay",
-        "industry": "Kiến trúc",
-        "thumbnail": ARTICLE_ROOT / "architecture.svg",
-        "tags": "kiến trúc,portfolio,bim,concept",
-        "excerpt": "Portfolio kiến trúc cần kể câu chuyện thiết kế rõ ràng, không chỉ là bộ ảnh render đẹp mắt.",
-        "content": """
-            <p>Nhà tuyển dụng kiến trúc đánh giá cao portfolio có logic: bài toán, concept, phát triển ý tưởng, mặt bằng, mặt đứng và hình ảnh công trình.</p>
-            <p>Nên thể hiện rõ vai trò của bạn trong từng dự án, đặc biệt nếu bạn tham gia concept, triển khai kỹ thuật hay BIM.</p>
-            <p>Một portfolio tốt giúp người xem hiểu bạn nghĩ như thế nào, không chỉ nhìn thấy sản phẩm cuối cùng.</p>
-        """,
-    },
-    {
-        "title": "Kiến trúc sư trẻ cần thành thạo gì trong giai đoạn 2026?",
-        "industry": "Kiến trúc",
-        "thumbnail": ARTICLE_ROOT / "architecture.svg",
-        "tags": "kiến trúc,sinh viên,bim,phát triển nghề nghiệp",
-        "excerpt": "Kiến trúc sư trẻ cần kết hợp tư duy thiết kế, khả năng triển khai và giao tiếp với các bên liên quan trong dự án.",
-        "content": """
-            <p>Ở giai đoạn 2026, kỹ năng quan trọng gồm tư duy concept, quản lý hồ sơ, BIM cơ bản và làm việc nhóm đa chuyên môn.</p>
-            <p>Nhà tuyển dụng cũng đánh giá cao kiến trúc sư trẻ biết phản biện, biết điều chỉnh thiết kế theo hiện trạng và mục tiêu kinh doanh.</p>
-            <p>Đây là thời điểm tốt để học thêm trình bày, thuyết phục và tổ chức ý tưởng thành bộ tài liệu rõ ràng.</p>
-        """,
-    },
-    {
-        "title": "Tuyển dụng liên ngành: khi bất động sản, xây dựng và nội thất phải đi cùng nhau",
-        "industry": "Bất động sản",
-        "thumbnail": ARTICLE_ROOT / "real_estate.svg",
-        "tags": "liên ngành,bất động sản,xây dựng,nội thất",
-        "excerpt": "Một dự án tốt cần phối hợp sớm giữa kinh doanh, thiết kế và thi công để giảm rủi ro và tăng tốc triển khai.",
-        "content": """
-            <p>Trong các dự án lớn, bộ phận kinh doanh, kỹ thuật và thiết kế cần ngồi cùng nhau ngay từ giai đoạn đầu để chốt phạm vi và kỳ vọng.</p>
-            <p>Cách tuyển dụng liên ngành hiệu quả là tìm ứng viên có tư duy phối hợp, hiểu quy trình và giao tiếp rõ ràng giữa các phòng ban.</p>
-            <p>Đây cũng là lý do Square tập trung vào 4 ngành trọng điểm: bất động sản, xây dựng, nội thất và kiến trúc.</p>
-        """,
-    },
-    {
-        "title": "Lộ trình nghề nghiệp cho designer nội thất muốn chuyển sang kiến trúc",
-        "industry": "Nội thất",
-        "thumbnail": ARTICLE_ROOT / "interior.svg",
-        "tags": "nội thất,kiến trúc,lộ trình nghề nghiệp,portfolio",
-        "excerpt": "Nhiều designer nội thất chuyển sang kiến trúc bằng cách nâng cấp kỹ năng concept, BIM và hiểu sâu quy trình dự án.",
-        "content": """
-            <p>Việc chuyển từ nội thất sang kiến trúc thường bắt đầu từ việc học lại tư duy tổng thể không gian, cấu trúc và hồ sơ kỹ thuật.</p>
-            <p>Ứng viên nên xây portfolio thể hiện khả năng làm việc ở cả hai phía: concept thẩm mỹ và triển khai thực tế.</p>
-            <p>Lộ trình sẽ thuận lợi hơn nếu bạn có mentor hoặc tham gia các dự án đa ngành.</p>
+            <p>Ứng viên trong nhóm ngành dự án nên trình bày năng lực bằng bằng chứng: portfolio, bản vẽ, ảnh công trình, case xử lý khách hàng hoặc kết quả vận hành.</p>
+            <h2>Hồ sơ nên có gì</h2>
+            <p>Một hồ sơ mạnh cần tóm tắt vai trò, công cụ sử dụng, phạm vi trách nhiệm và kết quả đo được. Với vị trí tư vấn, hãy thêm ví dụ về chăm sóc khách hàng. Với vị trí kỹ thuật, hãy thêm bối cảnh dự án.</p>
+            <h2>Cách nổi bật hơn</h2>
+            <p>Đừng chỉ liệt kê phần mềm hay kỹ năng mềm. Hãy kể một tình huống cụ thể, quyết định bạn đã đưa ra và tác động của quyết định đó với dự án hoặc khách hàng.</p>
         """,
     },
 ]
 
 
 class Command(BaseCommand):
-    help = "Seed 10 blog articles with images for Square's 4 core industries"
+    help = "Seed Square public news and recruitment blog articles with realistic thumbnails."
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -191,28 +158,38 @@ def seed_articles(stdout=None, stderr=None):
         write_error("Không tìm thấy tác giả phù hợp. Hãy chạy seed_accounts trước.")
         return
 
-    Article.objects.filter(category=Article.CATEGORY_BLOG).delete()
-
-    created = 0
     now = timezone.now()
+    created = 0
+    updated = 0
 
     for index, item in enumerate(ARTICLE_SEEDS):
+        slug = slugify_vi(item["title"])
         thumbnail = _upload_thumbnail(
             item["thumbnail"],
-            public_id=f"{slugify_vi(item['industry'])}-{index + 1}",
+            public_id=f"square-editorial/{slug}",
         )
-        article = Article.objects.create(
-            title=item["title"],
-            excerpt=item["excerpt"],
-            content=item["content"].strip(),
-            category=Article.CATEGORY_BLOG,
-            status=Article.STATUS_PUBLISHED,
-            author=author,
-            tags=item["tags"],
-            thumbnail=thumbnail,
-            published_at=now - timedelta(days=index * 2),
-        )
-        created += 1
-        write(f"✓ {article.title}")
 
-    write(f"Done! Seeded {created} blog articles with thumbnails.")
+        defaults = {
+            "title": item["title"],
+            "excerpt": item["excerpt"],
+            "content": item["content"].strip(),
+            "category": item["category"],
+            "status": Article.STATUS_PUBLISHED,
+            "author": author,
+            "tags": item["tags"],
+            "published_at": now - timedelta(days=index * 2),
+        }
+        if thumbnail:
+            defaults["thumbnail"] = thumbnail
+
+        article, was_created = Article.objects.update_or_create(
+            slug=slug,
+            defaults=defaults,
+        )
+
+        created += int(was_created)
+        updated += int(not was_created)
+        action = "created" if was_created else "updated"
+        write(f"{action}: {article.title}")
+
+    write(f"Done. Created {created}, updated {updated} public articles.")

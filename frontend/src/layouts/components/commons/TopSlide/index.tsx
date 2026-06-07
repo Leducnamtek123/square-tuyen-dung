@@ -12,7 +12,6 @@ import {
   CardContent,
   Chip,
   Grid2 as Grid,
-  Link,
   Skeleton,
   Stack,
   Typography,
@@ -23,7 +22,6 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import HomeSearch from '../../../../views/components/defaults/HomeSearch';
-import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 import contentService from '../../../../services/contentService';
 import { BANNER_TYPES, IMAGES, ROUTES } from '../../../../configs/constants';
 import { localizeRoutePath } from '../../../../configs/routeLocalization';
@@ -46,24 +44,57 @@ const styles = {
 };
 
 const RenderItem = ({ item }: { item: Banner }) => {
+  const imageUrl = item.imageUrl || IMAGES.coverImageDefault;
+  const mobileImageUrl = item.imageMobileUrl || imageUrl;
+
   return (
     <Box
-      component="img"
-      src={item.imageUrl}
-      alt={item.description || 'Banner'}
-      loading="lazy"
-      onError={(e) => {
-        (e.target as HTMLImageElement).src = IMAGES.coverImageDefault;
-        (e.target as HTMLImageElement).onerror = null;
-      }}
       sx={{
         width: '100%',
         height: '100%',
-        objectFit: 'cover',
+        position: 'relative',
+        overflow: 'hidden',
         borderRadius: 1.5,
-        display: 'block',
+        bgcolor: '#071832',
+        boxShadow: '0 18px 44px rgba(15, 57, 127, 0.14)',
       }}
-    />
+    >
+      <Box
+        component="picture"
+        sx={{
+          display: 'block',
+          width: '100%',
+          height: '100%',
+        }}
+      >
+        <source media="(max-width: 599px)" srcSet={mobileImageUrl} />
+        <Box
+          component="img"
+          src={imageUrl}
+          alt={item.description || 'Banner'}
+          loading="lazy"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = IMAGES.coverImageDefault;
+            (e.target as HTMLImageElement).onerror = null;
+          }}
+          sx={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center center',
+            display: 'block',
+          }}
+        />
+      </Box>
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(180deg, rgba(7, 24, 50, 0) 58%, rgba(7, 24, 50, 0.24) 100%)',
+          pointerEvents: 'none',
+        }}
+      />
+    </Box>
   );
 };
 
@@ -92,7 +123,8 @@ const TopSlide = () => {
     <Box>
       <Box
         sx={{
-          height: { xs: 200, sm: 280, md: 320 },
+          aspectRatio: { xs: '1 / 1', sm: '16 / 5' },
+          maxHeight: { xs: 340, sm: 380, md: 430, lg: 450 },
           position: 'relative',
         }}
       >
@@ -103,6 +135,8 @@ const TopSlide = () => {
               clickable: true,
               dynamicBullets: true,
             }}
+            preventClicks={false}
+            preventClicksPropagation={false}
             autoplay={{
               delay: 6000,
               disableOnInteraction: false,
@@ -122,28 +156,25 @@ const TopSlide = () => {
               </SwiperSlide>
             ) : banners.length > 0 ? (
               banners.map((value) => {
-                const bannerContent = <RenderItem item={value} />;
-
                 return (
-                  <SwiperSlide key={value.id} style={{ cursor: value.buttonLink ? 'pointer' : 'default' }}>
-                    {value.buttonLink ? (
-                      <Link href={value.buttonLink} target="_blank" rel="noopener noreferrer">
-                        {bannerContent}
-                      </Link>
-                    ) : bannerContent}
+                  <SwiperSlide key={value.id}>
+                    <RenderItem item={value} />
                   </SwiperSlide>
                 );
               })
             ) : (
               <SwiperSlide>
-                <MuiImageCustom
-                  width="100%"
-                  height="100%"
+                <Box
+                  component="img"
                   src={IMAGES.coverImageDefault}
+                  alt="Banner"
                   sx={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
                     borderRadius: 1.5,
+                    display: 'block',
                   }}
-                  fit="cover"
                 />
               </SwiperSlide>
             )}
@@ -153,7 +184,7 @@ const TopSlide = () => {
 
       <Box
         sx={{
-          mt: { xs: -4, sm: -5, md: -8 },
+          mt: { xs: -3, sm: -4, md: -5 },
           position: 'relative',
           zIndex: 1,
           px: { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },

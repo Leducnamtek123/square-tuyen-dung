@@ -198,7 +198,7 @@ def get_web_banner(request):
             banner_queryset = banner_queryset.filter(type=banner_type)
 
         serializer = BannerSerializer(banner_queryset, many=True, fields=[
-            "id", "imageUrl", "buttonText", "description",
+            "id", "imageUrl", "imageMobileUrl", "buttonText", "description",
             "buttonLink", "isShowButton", "descriptionLocation"
         ])
         return serializer.data

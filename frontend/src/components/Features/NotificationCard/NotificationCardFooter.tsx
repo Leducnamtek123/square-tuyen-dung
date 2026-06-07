@@ -28,27 +28,33 @@ const NotificationCardFooter = ({
 
   return (
     <Stack
-      direction={{ xs: 'column', sm: 'row' }}
-      alignItems={{ xs: 'stretch', sm: 'center' }}
-      justifyContent="space-between"
       spacing={1}
-      sx={{ px: 1, pt: 1 }}
+      sx={{
+        px: 1,
+        pt: 1,
+        '& .MuiButton-root': {
+          whiteSpace: 'nowrap',
+        },
+      }}
     >
-      {hasMore ? (
-        <Button size="small" onClick={onLoadMore} disabled={isLoading}>
-          {t('notification.loadMore')}
-        </Button>
-      ) : (
-        <Box />
-      )}
+      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+        {hasMore ? (
+          <Button size="small" onClick={onLoadMore} disabled={isLoading}>
+            {t('notification.loadMore')}
+          </Button>
+        ) : (
+          <Box />
+        )}
+
+        {onViewAll && notificationsLength > 0 && (
+          <Button size="small" startIcon={<OpenInFullIcon />} onClick={onViewAll}>
+            {t('notification.viewAll')}
+          </Button>
+        )}
+      </Stack>
 
       {notificationsLength > 0 && (
         <Stack direction="row" spacing={1} justifyContent="flex-end" flexWrap="wrap" useFlexGap>
-          {onViewAll && (
-            <Button size="small" startIcon={<OpenInFullIcon />} onClick={onViewAll}>
-              {t('notification.viewAll')}
-            </Button>
-          )}
           <Button size="small" startIcon={<DoneAllIcon />} onClick={onMarkAllRead} disabled={isLoading}>
             {t('notification.markAllRead')}
           </Button>

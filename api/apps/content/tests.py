@@ -8,6 +8,7 @@ from django.utils import timezone
 from rest_framework.test import APIClient
 
 from apps.content.models import Article, Banner, BannerType, Feedback
+from apps.files.models import File
 from shared.helpers.cloudinary_service import CloudinaryService
 
 
@@ -101,6 +102,41 @@ class TestFeedbackAPI:
             item for item in admin_payload["results"] if item["id"] == feedback.id
         )
         assert admin_feedback["evidenceImageUrl"]
+
+
+@pytest.mark.django_db(transaction=True)
+class TestBannerPublicAPI:
+    def test_web_banner_response_includes_mobile_image_url(self, settings):
+        settings.MINIO_USE_PRESIGNED = False
+        web_file = File.objects.create(
+            public_id="banners/web/home.webp",
+            format="webp",
+            resource_type="image",
+            file_type=File.WEB_BANNER_TYPE,
+            uploaded_at=timezone.now(),
+        )
+        mobile_file = File.objects.create(
+            public_id="banners/mobile/home.webp",
+            format="webp",
+            resource_type="image",
+            file_type=File.MOBILE_BANNER_TYPE,
+            uploaded_at=timezone.now(),
+        )
+        Banner.objects.create(
+            image=web_file,
+            image_mobile=mobile_file,
+            is_active=True,
+            platform="WEB",
+            description="Responsive home banner",
+        )
+
+        response = APIClient().get("/api/content/web/banner/")
+
+        assert response.status_code == 200
+        payload = _article_payload(response)
+        assert payload[0]["imageUrl"]
+        assert payload[0]["imageMobileUrl"]
+        assert "banners/mobile/home.webp" in payload[0]["imageMobileUrl"]
 
 
 @pytest.mark.django_db
