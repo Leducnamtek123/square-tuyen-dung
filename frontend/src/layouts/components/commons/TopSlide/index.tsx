@@ -126,6 +126,7 @@ const TopSlide = () => {
           aspectRatio: { xs: '1 / 1', sm: '16 / 5' },
           maxHeight: { xs: 340, sm: 380, md: 430, lg: 450 },
           position: 'relative',
+          mx: 'auto',
         }}
       >
         <Box sx={{ ...styles, height: '100%' }}>
