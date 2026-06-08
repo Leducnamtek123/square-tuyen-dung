@@ -15,15 +15,24 @@ from minio.error import S3Error
 
 class CloudinaryService:
     @staticmethod
-    def _process_image(file_obj):
+    def _process_image(file_obj, options: dict | None = None):
         try:
+            options = options or {}
             img = Image.open(file_obj)
             if img.mode in ('RGBA', 'P'):
                 img = img.convert('RGB')
-            MAX_SIZE = (1200, 1200)
-            img.thumbnail(MAX_SIZE, Image.LANCZOS)
+
+            max_size = options.get("max_size", (1200, 1200))
+            if not isinstance(max_size, (tuple, list)) or len(max_size) != 2:
+                max_size = (1200, 1200)
+            max_size = (int(max_size[0]), int(max_size[1]))
+
+            quality = int(options.get("quality", 85))
+            quality = max(1, min(quality, 100))
+
+            img.thumbnail(max_size, Image.LANCZOS)
             output = io.BytesIO()
-            img.save(output, format='WEBP', quality=85, method=6)
+            img.save(output, format='WEBP', quality=quality, method=6)
             output.seek(0)
             return output, output.getbuffer().nbytes, 'image/webp', 'webp'
         except Exception: return None, None, None, None
@@ -144,7 +153,7 @@ class CloudinaryService:
         return file, size, name, getattr(file, "content_type", None)
 
     @staticmethod
-    def upload_image(file, folder: str, public_id: str = None, options: dict = {}):
+    def upload_image(file, folder: str, public_id: str = None, options: dict | None = None):
         """
         Upload image to MinIO
         
@@ -166,6 +175,7 @@ class CloudinaryService:
 
         try:
 
+            options = options or {}
             client = CloudinaryService._get_client()
             bucket = settings.MINIO_BUCKET
             CloudinaryService._ensure_bucket(client, bucket)
@@ -174,7 +184,7 @@ class CloudinaryService:
             ext, resource_type = CloudinaryService._detect_format_and_type(filename, content_type)
             # 🎨 Auto-Optimization for Images
             if resource_type == 'image' and ext.lower() not in ['gif', 'svg']:
-                opt_file, opt_size, opt_ct, opt_ext = CloudinaryService._process_image(file_obj)
+                opt_file, opt_size, opt_ct, opt_ext = CloudinaryService._process_image(file_obj, options)
                 if opt_file:
                     file_obj, size, content_type, ext = opt_file, opt_size, opt_ct, opt_ext
             object_name = CloudinaryService._normalize_object_name(folder, public_id, ext)

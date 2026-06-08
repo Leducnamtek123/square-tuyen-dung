@@ -7,7 +7,6 @@ export interface GeneralInfoFormValues {
   city: string;
   salaryMin: string;
   salaryMax: string;
-  expectedSalary: string;
   typeOfWorkplace: string;
   jobType: string;
   description: string;

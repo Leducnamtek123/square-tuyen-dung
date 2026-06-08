@@ -417,6 +417,9 @@ class QuestionBankPermissionTests(TestCase):
         self.assertIn(global_question.id, ids)
         self.assertIn(company_question.id, ids)
         self.assertNotIn(other_question.id, ids)
+        permissions_by_id = {item["id"]: item.get("canWrite") for item in results}
+        self.assertIs(permissions_by_id[global_question.id], True)
+        self.assertIs(permissions_by_id[company_question.id], True)
 
     def test_member_created_question_is_scoped_to_active_company(self):
         response = self.client.post(
@@ -442,36 +445,34 @@ class QuestionBankPermissionTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertFalse(QuestionGroup.objects.filter(name="Invalid scoped group").exists())
 
-    def test_member_cannot_modify_or_delete_global_question_bank_items(self):
-        global_question = Question.objects.create(text="Global question")
-        global_group = QuestionGroup.objects.create(name="Global group")
-        global_group.questions.add(global_question)
+    def test_member_can_manage_legacy_unscoped_question_bank_items(self):
+        legacy_question = Question.objects.create(text="Legacy question")
+        legacy_group = QuestionGroup.objects.create(name="Legacy group")
+        legacy_group.questions.add(legacy_question)
 
         question_update_response = self.client.patch(
-            f"/api/v1/interview/web/questions/{global_question.id}/",
-            data={"text": "Changed global question"},
+            f"/api/v1/interview/web/questions/{legacy_question.id}/",
+            data={"text": "Changed legacy question"},
             format="json",
         )
         question_delete_response = self.client.delete(
-            f"/api/v1/interview/web/questions/{global_question.id}/",
+            f"/api/v1/interview/web/questions/{legacy_question.id}/",
         )
         group_update_response = self.client.patch(
-            f"/api/v1/interview/web/question-groups/{global_group.id}/",
-            data={"name": "Changed global group"},
+            f"/api/v1/interview/web/question-groups/{legacy_group.id}/",
+            data={"name": "Changed legacy group"},
             format="json",
         )
         group_delete_response = self.client.delete(
-            f"/api/v1/interview/web/question-groups/{global_group.id}/",
+            f"/api/v1/interview/web/question-groups/{legacy_group.id}/",
         )
 
-        self.assertEqual(question_update_response.status_code, 403)
-        self.assertEqual(question_delete_response.status_code, 403)
-        self.assertEqual(group_update_response.status_code, 403)
-        self.assertEqual(group_delete_response.status_code, 403)
-        global_question.refresh_from_db()
-        global_group.refresh_from_db()
-        self.assertEqual(global_question.text, "Global question")
-        self.assertEqual(global_group.name, "Global group")
+        self.assertEqual(question_update_response.status_code, 200)
+        self.assertEqual(question_delete_response.status_code, 204)
+        self.assertEqual(group_update_response.status_code, 200)
+        self.assertEqual(group_delete_response.status_code, 204)
+        self.assertFalse(Question.objects.filter(id=legacy_question.id).exists())
+        self.assertFalse(QuestionGroup.objects.filter(id=legacy_group.id).exists())
 
 
 class VoiceProfileGrantAdminTests(TestCase):

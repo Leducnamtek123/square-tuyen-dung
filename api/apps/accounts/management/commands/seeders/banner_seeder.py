@@ -8,6 +8,10 @@ from shared.helpers.cloudinary_service import CloudinaryService
 
 
 BANNER_ROOT = Path(__file__).resolve().parents[5] / "data" / "seed_images" / "banners"
+BANNER_UPLOAD_OPTIONS = {
+    "web": {"max_size": (2400, 2400), "quality": 92},
+    "mobile": {"max_size": (1600, 1600), "quality": 92},
+}
 
 
 def _img(filename: str) -> Path | None:
@@ -15,11 +19,17 @@ def _img(filename: str) -> Path | None:
     return path if path.exists() else None
 
 
-def _upload_local_image(filepath: Path | None, folder: str, object_name: str, file_type: str) -> File | None:
+def _upload_local_image(
+    filepath: Path | None,
+    folder: str,
+    object_name: str,
+    file_type: str,
+    options: dict | None = None,
+) -> File | None:
     if not filepath:
         return None
 
-    result = CloudinaryService.upload_image(str(filepath), folder, public_id=object_name)
+    result = CloudinaryService.upload_image(str(filepath), folder, public_id=object_name, options=options)
     if not result:
         return None
 
@@ -153,12 +163,14 @@ def seed_banners():
             folder="banners/web",
             object_name=f"square_{data['id']}_web",
             file_type=File.WEB_BANNER_TYPE,
+            options=BANNER_UPLOAD_OPTIONS["web"],
         )
         mobile_file = _upload_local_image(
             _img(data["mobile_img"]),
             folder="banners/mobile",
             object_name=f"square_{data['id']}_mobile",
             file_type=File.MOBILE_BANNER_TYPE,
+            options=BANNER_UPLOAD_OPTIONS["mobile"],
         )
 
         defaults = {

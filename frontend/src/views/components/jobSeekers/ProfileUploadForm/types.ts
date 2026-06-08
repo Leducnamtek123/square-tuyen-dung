@@ -8,7 +8,6 @@ export interface FormValues {
   city: number | string;
   salaryMin: number;
   salaryMax: number;
-  expectedSalary: number | null;
   typeOfWorkplace: number | string;
   jobType: number | string;
   description: string;

@@ -9,7 +9,6 @@ export interface ResumeDetail {
   city: string;
   salaryMin: number | null;
   salaryMax: number | null;
-  expectedSalary: number | null;
   typeOfWorkplace: string;
   jobType: string;
 }

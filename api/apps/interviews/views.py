@@ -437,8 +437,16 @@ class QuestionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         self._audit_instance("create", question)
 
     def _ensure_can_write_question(self, question):
-        if not _is_admin_user(self.request.user) and question.company_id is None:
-            raise PermissionDenied("Global question bank items can only be changed by admins.")
+        user = self.request.user
+        if _is_admin_user(user):
+            return
+        company = self._resolve_company(user)
+        if not (
+            company
+            and perms_custom.user_has_company_permission(user, "manage_question_bank", company)
+            and (question.company_id is None or question.company_id == company.id)
+        ):
+            raise PermissionDenied("Question bank management permission required.")
 
     def perform_update(self, serializer):
         self._ensure_can_write_question(serializer.instance)
@@ -488,8 +496,16 @@ class QuestionGroupViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         self._audit_instance("create", group)
 
     def _ensure_can_write_group(self, group):
-        if not _is_admin_user(self.request.user) and group.company_id is None:
-            raise PermissionDenied("Global question groups can only be changed by admins.")
+        user = self.request.user
+        if _is_admin_user(user):
+            return
+        company = self._resolve_company(user)
+        if not (
+            company
+            and perms_custom.user_has_company_permission(user, "manage_question_bank", company)
+            and (group.company_id is None or group.company_id == company.id)
+        ):
+            raise PermissionDenied("Question bank management permission required.")
 
     def perform_update(self, serializer):
         self._ensure_can_write_group(serializer.instance)

@@ -15,6 +15,7 @@ from .models import (
 from apps.jobs.models import JobPost
 from common import serializers as common_serializers
 from shared.configs import variable_system as var_sys
+from apps.accounts.permissions import user_has_company_permission
 
 
 def _is_admin_user(user) -> bool:
@@ -61,15 +62,30 @@ def _set_related_queryset(field, queryset):
         field.queryset = queryset
 
 
+def _can_user_write_company_scoped_item(user, item, request):
+    if not user or not getattr(user, "is_authenticated", False):
+        return False
+    if _is_admin_user(user):
+        return True
+
+    company = _request_active_company(request)
+    if not company or not user_has_company_permission(user, "manage_question_bank", company):
+        return False
+
+    item_company_id = getattr(item, "company_id", None)
+    return item_company_id is None or item_company_id == company.id
+
+
 class QuestionSerializer(serializers.ModelSerializer):
     questionText = serializers.CharField(source="text", read_only=True)
     careerDict = serializers.SerializerMethodField()
+    canWrite = serializers.SerializerMethodField()
 
     class Meta:
         model = Question
         fields = [
             'id', 'text', 'questionText', 'difficulty',
-            'career', 'careerDict', 'sort_order', 'author', 'company', 'create_at', 'update_at'
+            'career', 'careerDict', 'sort_order', 'author', 'company', 'canWrite', 'create_at', 'update_at'
         ]
         read_only_fields = ['id', 'author', 'company', 'create_at', 'update_at']
 
@@ -85,9 +101,15 @@ class QuestionSerializer(serializers.ModelSerializer):
             return None
         return common_serializers.CareerSerializer(career).data
 
+    def get_canWrite(self, obj):
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        return _can_user_write_company_scoped_item(user, obj, request)
+
 class QuestionGroupSerializer(serializers.ModelSerializer):
     questions = serializers.SerializerMethodField()
     questions_count = serializers.SerializerMethodField()
+    canWrite = serializers.SerializerMethodField()
     evaluation_rubric = serializers.SerializerMethodField()
     evaluation_rubric_input = serializers.JSONField(
         write_only=True, required=False, allow_null=True
@@ -101,7 +123,7 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
         model = QuestionGroup
         fields = [
             'id', 'name', 'description', 'evaluation_rubric', 'questions', 'questions_count',
-            'evaluation_rubric_input', 'question_ids', 'author', 'company', 'create_at', 'update_at'
+            'evaluation_rubric_input', 'question_ids', 'author', 'company', 'canWrite', 'create_at', 'update_at'
         ]
         read_only_fields = ['id', 'author', 'company', 'create_at', 'update_at']
 
@@ -115,6 +137,11 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
 
     def get_questions_count(self, obj):
         return obj.questions.count()
+
+    def get_canWrite(self, obj):
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        return _can_user_write_company_scoped_item(user, obj, request)
 
     def get_questions(self, obj):
         items = []

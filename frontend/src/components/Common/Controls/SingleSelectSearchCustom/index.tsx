@@ -22,6 +22,7 @@ interface Props<T extends FieldValues = FieldValues> {
   placeholder?: string;
   options?: SelectOption[];
   noOptionsText?: string;
+  variant?: 'default' | 'hero';
 }
 
 const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
@@ -30,10 +31,12 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
   control,
   options = EMPTY_OPTIONS,
   noOptionsText,
+  variant = 'default',
 }: Props<T>) => {
 
   const theme = useTheme();
   const { t } = useTranslation('common');
+  const isHero = variant === 'hero';
 
   return (
 
@@ -80,16 +83,16 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
               placeholder={placeholder}
 
               sx={{
-                backgroundColor: theme.palette.mode === 'light' ? 'white' : '#121212',
-                borderRadius: 999,
-                boxShadow: '0 10px 26px rgba(26, 64, 125, 0.08)',
+                backgroundColor: isHero ? '#f4f7fb' : theme.palette.mode === 'light' ? 'white' : '#121212',
+                borderRadius: isHero ? 2 : 999,
+                boxShadow: isHero ? 'none' : '0 10px 26px rgba(26, 64, 125, 0.08)',
                 '& .MuiOutlinedInput-root': {
                   minHeight: 48,
-                  borderRadius: 999,
-                  backgroundColor: theme.palette.mode === 'light' ? 'white' : '#121212',
+                  borderRadius: isHero ? 2 : 999,
+                  backgroundColor: isHero ? '#f4f7fb' : theme.palette.mode === 'light' ? 'white' : '#121212',
                   transition: 'box-shadow 180ms ease, border-color 180ms ease',
                   '& fieldset': {
-                    borderColor: 'rgba(26, 64, 125, 0.14)',
+                    borderColor: isHero ? 'rgba(8, 29, 60, 0.08)' : 'rgba(26, 64, 125, 0.14)',
                   },
                   '&:hover fieldset': {
                     borderColor: 'rgba(26, 64, 125, 0.35)',
@@ -105,10 +108,11 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
                 '& .MuiInputBase-input': {
                   px: 1.5,
                   fontWeight: 600,
+                  fontSize: isHero ? 14 : undefined,
                   color: 'text.primary',
                   '&::placeholder': {
-                    color: 'text.secondary',
-                    opacity: 0.78,
+                    color: isHero ? 'rgba(8, 29, 60, 0.42)' : 'text.secondary',
+                    opacity: isHero ? 1 : 0.78,
                   },
                 },
               }}

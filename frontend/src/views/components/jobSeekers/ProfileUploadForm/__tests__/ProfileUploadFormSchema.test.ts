@@ -39,9 +39,6 @@ describe('createProfileUploadSchema', () => {
     await expect(schema.validateAt('salaryMax', { salaryMax: tooLargeSalary })).rejects.toThrow(
       'jobSeeker:profile.validation.salaryTooLarge',
     );
-    await expect(schema.validateAt('expectedSalary', { expectedSalary: tooLargeSalary })).rejects.toThrow(
-      'jobSeeker:profile.validation.salaryTooLarge',
-    );
   });
 
   it('rejects decimal salaries before submitting to backend integer fields', async () => {
@@ -52,9 +49,6 @@ describe('createProfileUploadSchema', () => {
     );
     await expect(schema.validateAt('salaryMax', { salaryMax: 1000.5 })).rejects.toThrow(
       'jobSeeker:profile.validation.salaryMaxInvalid',
-    );
-    await expect(schema.validateAt('expectedSalary', { expectedSalary: 1000.5 })).rejects.toThrow(
-      'jobSeeker:profile.validation.expectedSalaryInvalid',
     );
   });
 

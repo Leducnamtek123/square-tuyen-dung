@@ -106,17 +106,6 @@ const GeneralInfoFormFields = ({ control, t, allConfig }: GeneralInfoFormFieldsP
     </Grid>
 
     <Grid size={{ xs: 12, sm: 6 }}>
-      <TextFieldCustom
-        name="expectedSalary"
-        title={t('jobSeeker:profile.fields.expectedSalary')}
-        placeholder={t('jobSeeker:profile.placeholders.expectedSalary')}
-        control={control}
-        icon={'VND'}
-        type="number"
-      />
-    </Grid>
-
-    <Grid size={{ xs: 12, sm: 6 }}>
       <SingleSelectCustom
         name="typeOfWorkplace"
         control={control}

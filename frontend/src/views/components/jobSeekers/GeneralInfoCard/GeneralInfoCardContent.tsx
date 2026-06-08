@@ -105,15 +105,6 @@ const GeneralInfoCardContent = ({
           <Stack spacing={1.5}>
             <GeneralInfoField itemTitle={t('jobSeeker:profile.fields.workLocation')} value={tConfig(configDicts?.cityDict?.[resumeDetail.city ?? ''])} t={t} />
             <GeneralInfoField itemTitle={t('jobSeeker:profile.fields.desiredSalary')} value={formatLocalizedSalaryRange(resumeDetail.salaryMin ?? null, resumeDetail.salaryMax ?? null, salaryLanguage)} t={t} />
-            <GeneralInfoField
-              itemTitle={t('jobSeeker:profile.fields.expectedSalary')}
-              value={
-                resumeDetail.expectedSalary
-                  ? formatLocalizedSalaryRange(resumeDetail.expectedSalary, resumeDetail.expectedSalary, salaryLanguage)
-                  : null
-              }
-              t={t}
-            />
             <GeneralInfoField itemTitle={t('jobSeeker:profile.fields.workplaceType')} value={tConfig(configDicts?.typeOfWorkplaceDict?.[resumeDetail.typeOfWorkplace ?? ''])} t={t} />
             <GeneralInfoField itemTitle={t('jobSeeker:profile.fields.jobType')} value={tConfig(configDicts?.jobTypeDict?.[resumeDetail.jobType ?? ''])} t={t} />
           </Stack>

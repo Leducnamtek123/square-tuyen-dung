@@ -11,10 +11,8 @@ import {
   DialogActions, 
   TextField, 
   Stack, 
-  Divider,
   Tooltip,
   Paper,
-  alpha,
   Theme
 } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
@@ -28,8 +26,6 @@ import DataTable from '../../../../components/Common/DataTable';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 import { useDataTable } from '../../../../hooks';
 import { useEmployerQuestions, useQuestionMutations } from '../hooks/useEmployerQueries';
-import type { AxiosError } from 'axios';
-import type { ApiError } from '../../../../types/api';
 import type { Question } from '../../../../types/models';
 import pc from '@/utils/muiColors';
 
@@ -148,24 +144,28 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
             cell: ({ row }: { row: { original: Question } }) => (
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
                     <Tooltip title={t('common:actions.edit')} arrow>
-                        <IconButton 
-                            size="small" 
-                            onClick={() => handleOpen(row.original)} 
-                            color="primary"
-                            sx={{ bgcolor: pc.primary( 0.08), '&:hover': { bgcolor: pc.primary( 0.15) } }}
-                        >
-                            <EditIcon fontSize="small" />
-                        </IconButton>
+                        <span>
+                            <IconButton
+                                size="small"
+                                onClick={() => handleOpen(row.original)}
+                                color="primary"
+                                sx={{ bgcolor: pc.primary( 0.08), '&:hover': { bgcolor: pc.primary( 0.15) } }}
+                            >
+                                <EditIcon fontSize="small" />
+                            </IconButton>
+                        </span>
                     </Tooltip>
                     <Tooltip title={t('common:actions.delete')} arrow>
-                        <IconButton 
-                            size="small" 
-                            onClick={() => handleDelete(row.original.id)} 
-                            color="error"
-                            sx={{ bgcolor: pc.error( 0.08), '&:hover': { bgcolor: pc.error( 0.15) } }}
-                        >
-                            <DeleteIcon fontSize="small" />
-                        </IconButton>
+                        <span>
+                            <IconButton
+                                size="small"
+                                onClick={() => handleDelete(row.original.id)}
+                                color="error"
+                                sx={{ bgcolor: pc.error( 0.08), '&:hover': { bgcolor: pc.error( 0.15) } }}
+                            >
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </span>
                     </Tooltip>
                 </Stack>
             ),

@@ -311,7 +311,11 @@ class AdminBannerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         from apps.files.models import File
 
         folder = 'banners'
-        upload_result = CloudinaryService.upload_image(file_obj, folder)
+        upload_options = {
+            File.WEB_BANNER_TYPE: {"max_size": (2400, 2400), "quality": 92},
+            File.MOBILE_BANNER_TYPE: {"max_size": (1600, 1600), "quality": 92},
+        }.get(file_type)
+        upload_result = CloudinaryService.upload_image(file_obj, folder, options=upload_options)
         if not upload_result:
             return None
 

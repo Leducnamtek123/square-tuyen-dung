@@ -1,10 +1,13 @@
 
 import base64
+import io
+from pathlib import Path
 
 import pytest
 from django.db.models import Max
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
+from PIL import Image
 from rest_framework.test import APIClient
 
 from apps.content.models import Article, Banner, BannerType, Feedback
@@ -137,6 +140,67 @@ class TestBannerPublicAPI:
         assert payload[0]["imageUrl"]
         assert payload[0]["imageMobileUrl"]
         assert "banners/mobile/home.webp" in payload[0]["imageMobileUrl"]
+
+
+@pytest.mark.django_db
+class TestBannerImageProcessing:
+    def test_seed_web_banner_sources_are_retina_ready(self):
+        banner_root = Path(__file__).resolve().parents[2] / "data" / "seed_images" / "banners"
+        web_banner_files = sorted(banner_root.glob("*_web.jpg"))
+
+        assert web_banner_files
+
+        for banner_file in web_banner_files:
+            with Image.open(banner_file) as image:
+                assert image.width >= 2400, f"{banner_file.name} is only {image.width}px wide"
+                assert image.height >= 750, f"{banner_file.name} is only {image.height}px tall"
+
+    def test_banner_upload_options_preserve_large_desktop_banner_width(self, monkeypatch, settings):
+        settings.MINIO_BUCKET = "square"
+        settings.MINIO_PUBLIC_URL = "https://s3.example.test"
+        settings.MINIO_USE_PRESIGNED = False
+
+        source = io.BytesIO()
+        Image.new("RGB", (1600, 500), color=(34, 92, 147)).save(source, format="JPEG")
+        image_file = SimpleUploadedFile(
+            "home-banner.jpg",
+            source.getvalue(),
+            content_type="image/jpeg",
+        )
+
+        captured = {}
+
+        class FakeMinioClient:
+            def put_object(self, bucket, object_name, file_obj, length, content_type):
+                captured["bucket"] = bucket
+                captured["object_name"] = object_name
+                captured["content"] = file_obj.read()
+                captured["content_type"] = content_type
+
+        monkeypatch.setattr(
+            CloudinaryService,
+            "_get_client",
+            staticmethod(lambda endpoint_override=None: FakeMinioClient()),
+        )
+        monkeypatch.setattr(
+            CloudinaryService,
+            "_ensure_bucket",
+            staticmethod(lambda client, bucket: None),
+        )
+
+        result = CloudinaryService.upload_image(
+            image_file,
+            "banners/web",
+            public_id="square_home_web",
+            options={"max_size": (2400, 2400), "quality": 92},
+        )
+
+        output = Image.open(io.BytesIO(captured["content"]))
+
+        assert result["public_id"] == "banners/web/square_home_web.webp"
+        assert captured["bucket"] == "square"
+        assert captured["content_type"] == "image/webp"
+        assert output.size == (1600, 500)
 
 
 @pytest.mark.django_db

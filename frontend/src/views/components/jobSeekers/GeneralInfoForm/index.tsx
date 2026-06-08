@@ -48,13 +48,6 @@ export const createGeneralInfoSchema = (t: TFunction<'jobSeeker', undefined>) =>
       const { salaryMin } = this.parent;
       return !(salaryMin !== undefined && value !== undefined && value < salaryMin);
     }),
-  expectedSalary: yup
-    .number()
-    .nullable()
-    .transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value))
-    .integer(t('jobSeeker:profile.validation.expectedSalaryInvalid'))
-    .min(0, t('jobSeeker:profile.validation.expectedSalaryInvalid'))
-    .max(MAX_RESUME_SALARY, t('jobSeeker:profile.validation.salaryTooLarge')),
   typeOfWorkplace: yup.number().required(t('jobSeeker:profile.validation.workplaceTypeRequired')).oneOf(BACKEND_CHOICE_VALUES.typeOfWorkplace, t('jobSeeker:profile.validation.choiceInvalid')).typeError(t('jobSeeker:profile.validation.workplaceTypeRequired')),
   jobType: yup.number().required(t('jobSeeker:profile.validation.jobTypeRequired')).oneOf(BACKEND_CHOICE_VALUES.jobType, t('jobSeeker:profile.validation.choiceInvalid')).typeError(t('jobSeeker:profile.validation.jobTypeRequired')),
   description: yup.string().required(t('jobSeeker:profile.validation.objectiveRequired')).max(800, t('jobSeeker:profile.validation.objectiveMax')),
@@ -77,7 +70,6 @@ const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
       city: '',
       salaryMin: '',
       salaryMax: '',
-      expectedSalary: '',
       typeOfWorkplace: '',
       jobType: '',
       description: '',

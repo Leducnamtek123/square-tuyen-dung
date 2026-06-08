@@ -23,7 +23,6 @@ export interface FormValues {
   city: number | string;
   salaryMin: number;
   salaryMax: number;
-  expectedSalary: number | null;
   typeOfWorkplace: number | string;
   jobType: number | string;
   description: string;
@@ -176,14 +175,6 @@ export const createProfileUploadSchema = (t: TFunction) => yup.object().shape({
         }
 
       ),
-
-    expectedSalary: yup
-      .number()
-      .nullable()
-      .transform((value, originalValue) => (originalValue === '' || originalValue === null ? null : value))
-      .integer(t('jobSeeker:profile.validation.expectedSalaryInvalid'))
-      .min(0, t('jobSeeker:profile.validation.expectedSalaryInvalid'))
-      .max(MAX_RESUME_SALARY, t('jobSeeker:profile.validation.salaryTooLarge')),
 
     typeOfWorkplace: yup
 

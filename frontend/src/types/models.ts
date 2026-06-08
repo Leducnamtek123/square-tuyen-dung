@@ -451,6 +451,8 @@ export interface Question {
   difficulty?: string;
   career?: number | null;
   category?: string;
+  company?: number | null;
+  canWrite?: boolean;
   questionType?: string;
   // Fallbacks for raw API response or transformer mapped fields
   content?: string;
@@ -468,6 +470,7 @@ export interface QuestionGroup {
   questions?: Question[];
   questionIds?: number[];
   question_ids?: number[]; // Raw API payload field
+  canWrite?: boolean;
   createAt?: string;
   updateAt?: string;
 }

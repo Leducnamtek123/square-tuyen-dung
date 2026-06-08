@@ -30,6 +30,7 @@ interface Props<T extends FieldValues = FieldValues> {
   placeholder?: string;
   showSubmitButton?: boolean;
   location?: 'HOME' | string;
+  variant?: 'default' | 'hero';
 }
 
 type SearchState = {
@@ -78,8 +79,10 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
   placeholder,
   showSubmitButton = false,
   location = 'HOME',
+  variant = 'default',
 }: Props<T>) => {
   const theme = useTheme();
+  const isHero = variant === 'hero';
   const { t, i18n } = useTranslation('common');
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const inputSearchRef = React.useRef<HTMLDivElement | null>(null);
@@ -164,16 +167,16 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
       <div ref={inputSearchRef}>
         <Box
           sx={{
-            minHeight: showSubmitButton ? 54 : 48,
-            boxShadow: '0 10px 26px rgba(26, 64, 125, 0.08)',
-            borderRadius: 999,
-            p: '4px',
+            minHeight: isHero ? 48 : showSubmitButton ? 54 : 48,
+            boxShadow: isHero ? 'none' : '0 10px 26px rgba(26, 64, 125, 0.08)',
+            borderRadius: isHero ? 2 : 999,
+            p: isHero ? 0 : '4px',
             display: 'flex',
             alignItems: 'center',
             width: '100%',
-            backgroundColor: theme.palette.mode === 'light' ? 'white' : '#121212',
+            backgroundColor: isHero ? '#f4f7fb' : theme.palette.mode === 'light' ? 'white' : '#121212',
             border: '1px solid',
-            borderColor: 'rgba(26, 64, 125, 0.14)',
+            borderColor: isHero ? 'rgba(8, 29, 60, 0.08)' : 'rgba(26, 64, 125, 0.14)',
             transition: 'border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease',
             '&:focus-within': {
               borderColor: theme.palette.primary.main,
@@ -183,13 +186,13 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
         >
           <Box
             sx={{
-              width: 38,
-              height: 38,
+              width: isHero ? 44 : 38,
+              height: isHero ? 46 : 38,
               display: 'grid',
               placeItems: 'center',
-              borderRadius: '50%',
-              color: 'primary.main',
-              bgcolor: 'rgba(42, 169, 225, 0.09)',
+              borderRadius: isHero ? 2 : '50%',
+              color: isHero ? 'rgba(8, 29, 60, 0.38)' : 'primary.main',
+              bgcolor: isHero ? 'transparent' : 'rgba(42, 169, 225, 0.09)',
               flexShrink: 0,
             }}
           >
@@ -203,15 +206,17 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                 inputRef={inputRef}
                 id={field.name}
                 sx={{
-                  ml: 1.25,
+                  ml: isHero ? 0 : 1.25,
                   flex: 1,
                   minWidth: 0,
                   '& .MuiInputBase-input': {
                     fontWeight: 600,
                     color: 'text.primary',
+                    fontSize: isHero ? 14 : undefined,
+                    py: isHero ? 1.4 : undefined,
                     '&::placeholder': {
-                      color: 'text.secondary',
-                      opacity: 0.78,
+                      color: isHero ? 'rgba(8, 29, 60, 0.42)' : 'text.secondary',
+                      opacity: isHero ? 1 : 0.78,
                     },
                   },
                 }}
