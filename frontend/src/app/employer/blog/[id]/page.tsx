@@ -1,8 +1,8 @@
 import EmployerBlogFormPage from '@/views/employerPages/BlogPage/EmployerBlogFormPage';
 
 export const metadata = {
-  title: 'Quáº£n lÃ½ blog tuyá»ƒn dá»¥ng | Employer',
-  description: 'Chá»‰nh sá»­a bÃ i viáº¿t blog tuyá»ƒn dá»¥ng.',
+  title: 'Quản lý blog tuyển dụng | Employer',
+  description: 'Chỉnh sửa bài viết blog tuyển dụng.',
 };
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {

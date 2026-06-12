@@ -96,7 +96,7 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
               </Typography>
             </>
           ) : (
-            /* Custom file chip Ã¢â‚¬â€ avoids MUI Alert's internal alpha() on success color */
+            /* Custom file chip - avoids MUI Alert's internal alpha() on success color */
             <Box
               sx={{
                 display: 'flex',

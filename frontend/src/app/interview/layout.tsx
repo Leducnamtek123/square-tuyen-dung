@@ -1,7 +1,7 @@
 /**
  * Layout for /interview/* pages.
  *
- * This is a deliberately ISOLATED layout â€” it intentionally does NOT
+ * This is a deliberately ISOLATED layout - it intentionally does NOT
  * include the global DefaultLayout / EmployerLayout. Interview rooms are
  * full-screen, standalone experiences. The layout's sole responsibilities
  * are:
@@ -12,7 +12,7 @@ import './livekit.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Interview Room | Square Tuyá»ƒn Dá»¥ng',
+  title: 'Interview Room | Square Tuyển Dụng',
   description: 'Join your online interview session.',
 };
 

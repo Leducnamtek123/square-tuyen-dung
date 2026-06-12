@@ -1,11 +1,11 @@
-// Server Component â€” can export metadata
+// Server Component - can export metadata
 import type { Metadata } from 'next';
 import EmployerSectionClient from './EmployerSectionClient';
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Square Tuyá»ƒn Dá»¥ng',
-    default: 'NhÃ  tuyá»ƒn dá»¥ng | Square Tuyá»ƒn Dá»¥ng',
+    template: '%s | Square Tuyển Dụng',
+    default: 'Nhà tuyển dụng | Square Tuyển Dụng',
   },
 };
 

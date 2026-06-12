@@ -1,6 +1,6 @@
 'use client';
 /**
- * SimpleRichEditor â€” standalone wrapper around react-draft-wysiwyg
+ * SimpleRichEditor - standalone wrapper around react-draft-wysiwyg
  * that accepts value (HTML string) / onChange (HTML string).
  * Used by Admin article form and Employer blog form.
  */

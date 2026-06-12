@@ -36,7 +36,7 @@ const MapContent: any = dynamic(() => import('./MapContent'), {
         }}
       >
         <LocationOnIcon fontSize="small" />
-        Äang táº£i báº£n Ä‘á»“...
+        Đang tải bản đồ...
       </Typography>
     </Box>
   ),

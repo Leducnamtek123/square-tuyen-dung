@@ -1,11 +1,11 @@
-// Server Component Ã¢â‚¬â€ can export metadata
+// Server Component - can export metadata
 import type { Metadata } from 'next';
 import AdminSectionClient from './AdminSectionClient';
 
 export const metadata: Metadata = {
   title: {
     template: '%s | Square Admin',
-    default: 'QuÃ¡ÂºÂ£n trÃ¡Â»â€¹ | Square Admin',
+    default: 'Quản trị | Square Admin',
   },
 };
 
