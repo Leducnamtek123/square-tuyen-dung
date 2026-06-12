@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +6,7 @@ import CropperImport, { Area } from 'react-easy-crop';
 
 // Handle ESM/CJS interop: in production builds the default import can resolve
 // to the module wrapper object instead of the component function.
-const Cropper = (CropperImport as { default?: typeof CropperImport }).default || CropperImport;
+const CropperAny: any = (CropperImport as any).default || CropperImport;
 import {
   Dialog,
   DialogTitle,
@@ -143,7 +143,7 @@ const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
             overflow: 'hidden',
           }}
         >
-          <Cropper
+          <CropperAny
             image={imageSrc}
             crop={crop}
             zoom={zoom}

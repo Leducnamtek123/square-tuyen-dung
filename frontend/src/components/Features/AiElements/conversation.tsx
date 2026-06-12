@@ -17,9 +17,11 @@ export type ConversationMessage = {
   parts?: ConversationMessagePart[];
 };
 
-type ConversationProps = ComponentProps<typeof StickToBottom> & {
+type ConversationProps = {
   className?: string;
   children?: ReactNode;
+  initial?: "smooth" | "instant";
+  resize?: "smooth" | "instant";
 };
 
 export const Conversation = ({
@@ -38,7 +40,7 @@ export const Conversation = ({
   </StickToBottom>
 );
 
-type ConversationContentProps = ComponentProps<typeof StickToBottom.Content> & {
+type ConversationContentProps = {
   className?: string;
   children?: ReactNode;
 };
@@ -179,4 +181,3 @@ export const ConversationDownload = ({
     </Button>
   );
 };
-

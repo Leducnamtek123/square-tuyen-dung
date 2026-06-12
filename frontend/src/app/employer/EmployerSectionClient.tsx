@@ -81,6 +81,14 @@ const DEFAULT_LAYOUT_PATHS = [
   '/nha-tuyen-dung/bao-gia',
   '/employer/support',
   '/nha-tuyen-dung/ho-tro',
+  '/employer/contact',
+  '/nha-tuyen-dung/lien-he',
+  '/employer/faq',
+  '/nha-tuyen-dung/cau-hoi-thuong-gap',
+  '/employer/terms-of-service',
+  '/nha-tuyen-dung/dieu-khoan-dich-vu',
+  '/employer/privacy-policy',
+  '/nha-tuyen-dung/chinh-sach-bao-mat',
   // /employer/blog is protected; public readers use /blog or /tin-tuc.
 ];
 
@@ -114,7 +122,7 @@ function AuthLoadingScreen() {
 export default function EmployerSectionClient({
   children,
 }: {
-  children: React.ReactNode;
+  children: any;
 }) {
   const pathname = usePathname() || '';
   const dispatch = useAppDispatch();
@@ -149,6 +157,7 @@ export default function EmployerSectionClient({
             try {
               user = await dispatch(getUserInfo()).unwrap();
             } catch {
+              window.location.replace(loginPath);
               return;
             }
           }

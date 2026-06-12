@@ -91,9 +91,17 @@ class ResetPasswordSerializer(PlatformValidationMixin, PasswordConfirmMixin, Dyn
 
 class JobSeekerRegisterSerializer(PasswordConfirmMixin, serializers.Serializer):
     fullName = serializers.CharField(source="full_name", required=True, max_length=100)
-    email = serializers.EmailField(required=True, max_length=100,
-                                   validators=[UniqueValidator(queryset=User.objects.all(),
-                                                               message=ERROR_MESSAGES['EMAIL_EXISTS'])])
+    email = serializers.EmailField(
+        required=True,
+        max_length=100,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                lookup='iexact',
+                message=ERROR_MESSAGES['EMAIL_EXISTS'],
+            )
+        ],
+    )
     password = serializers.CharField(required=True, max_length=128)
     confirmPassword = serializers.CharField(required=True, max_length=128)
     platform = serializers.CharField(required=True, max_length=3)
@@ -101,24 +109,56 @@ class JobSeekerRegisterSerializer(PasswordConfirmMixin, serializers.Serializer):
     def validate_password(self, value):
         return validate_auth_password(value)
 
-
     class Meta:
         model = User
         fields = ("fullName", "email", "password", "confirmPassword", "platform")
 
 class CompanyRegisterSerializer(serializers.ModelSerializer):
-    companyName = serializers.CharField(source="company_name", required=True, max_length=255,
-                                        validators=[UniqueValidator(Company.objects.all(),
-                                                                    message=ERROR_MESSAGES['COMPANY_NAME_EXISTS'])])
-    companyEmail = serializers.EmailField(source='company_email', required=True, max_length=100,
-                                          validators=[UniqueValidator(Company.objects.all(),
-                                                                      message=ERROR_MESSAGES['COMPANY_EMAIL_EXISTS'])])
-    companyPhone = serializers.CharField(source='company_phone', required=True, max_length=15,
-                                         validators=[UniqueValidator(Company.objects.all(),
-                                                                     message=ERROR_MESSAGES['COMPANY_PHONE_EXISTS'])])
-    taxCode = serializers.CharField(source="tax_code", required=True, max_length=30,
-                                    validators=[UniqueValidator(Company.objects.all(),
-                                                                message=ERROR_MESSAGES['COMPANY_TAX_CODE_EXISTS'])])
+    companyName = serializers.CharField(
+        source="company_name",
+        required=True,
+        max_length=255,
+        validators=[
+            UniqueValidator(
+                Company.objects.all(),
+                message=ERROR_MESSAGES['COMPANY_NAME_EXISTS'],
+            )
+        ],
+    )
+    companyEmail = serializers.EmailField(
+        source='company_email',
+        required=True,
+        max_length=100,
+        validators=[
+            UniqueValidator(
+                Company.objects.all(),
+                lookup='iexact',
+                message=ERROR_MESSAGES['COMPANY_EMAIL_EXISTS'],
+            )
+        ],
+    )
+    companyPhone = serializers.CharField(
+        source='company_phone',
+        required=True,
+        max_length=15,
+        validators=[
+            UniqueValidator(
+                Company.objects.all(),
+                message=ERROR_MESSAGES['COMPANY_PHONE_EXISTS'],
+            )
+        ],
+    )
+    taxCode = serializers.CharField(
+        source="tax_code",
+        required=True,
+        max_length=30,
+        validators=[
+            UniqueValidator(
+                Company.objects.all(),
+                message=ERROR_MESSAGES['COMPANY_TAX_CODE_EXISTS'],
+            )
+        ],
+    )
     fieldOperation = serializers.CharField(source="field_operation", required=False,
                                            max_length=255,
                                            allow_null=True,
@@ -162,8 +202,17 @@ class CompanyRegisterSerializer(serializers.ModelSerializer):
 class EmployerRegisterSerializer(PasswordConfirmMixin, serializers.Serializer):
     company = CompanyRegisterSerializer()
     fullName = serializers.CharField(source="full_name", required=True, max_length=100)
-    email = serializers.EmailField(required=True, max_length=100,
-                                   validators=[UniqueValidator(queryset=User.objects.all())])
+    email = serializers.EmailField(
+        required=True,
+        max_length=100,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                lookup='iexact',
+                message=ERROR_MESSAGES['EMAIL_EXISTS'],
+            )
+        ],
+    )
     password = serializers.CharField(required=True, max_length=128)
     confirmPassword = serializers.CharField(required=True, max_length=128)
     platform = serializers.CharField(required=True, max_length=3)

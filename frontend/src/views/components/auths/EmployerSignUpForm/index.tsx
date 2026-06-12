@@ -222,12 +222,8 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
   });
 
   const cityId = useWatch({ control, name: 'company.location.city' });
-  const email = useWatch({ control, name: 'email' });
   const address = useWatch({ control, name: 'company.location.address' });
-  const emailDebounce = useDebounce(email, 500);
   const addressDebounce = useDebounce(address, 500);
-
-  const emailExistsErrorRef = React.useRef(false);
 
   React.useEffect(() => {
     applyEmployerServerErrors(serverErrors, setError);
@@ -236,32 +232,6 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
   React.useEffect(() => {
     void syncLocationOptions(addressDebounce, setLocationOptions);
   }, [addressDebounce]);
-
-  React.useEffect(() => {
-    const normalizedEmail = String(emailDebounce || '').trim();
-    if (!normalizedEmail || !normalizedEmail.includes('@')) {
-      if (emailExistsErrorRef.current) {
-        clearErrors('email');
-        emailExistsErrorRef.current = false;
-      }
-      return;
-    }
-    const checkEmail = async () => {
-      try {
-        const resData = (await authService.emailExists(normalizedEmail)) as { exists?: boolean };
-        if (resData?.exists === true) {
-          setError('email', { type: 'manual', message: t('validation.emailExists') });
-          emailExistsErrorRef.current = true;
-        } else if (emailExistsErrorRef.current) {
-          clearErrors('email');
-          emailExistsErrorRef.current = false;
-        }
-      } catch {
-        /* ignore */
-      }
-    };
-    checkEmail();
-  }, [emailDebounce, clearErrors, setError, t]);
 
   const handleSelectLocation = async (e: React.SyntheticEvent, value: string | SelectOption | null) => {
     if (!value || typeof value !== 'object' || !value.place_id) return;

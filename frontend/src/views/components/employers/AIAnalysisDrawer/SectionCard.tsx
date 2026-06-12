@@ -5,7 +5,7 @@ import pc from '@/utils/muiColors';
 export const SectionCard: React.FC<{
   title: string;
   icon: React.ReactNode;
-  children: React.ReactNode;
+  children: any;
   iconColor?: string;
 }> = ({ title, icon, children, iconColor }) => {
   const theme = useTheme();

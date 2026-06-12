@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface ShimmerTextProps {
-  children: React.ReactNode;
+  children: any;
   className?: string;
 }
 

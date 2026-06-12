@@ -3,7 +3,6 @@
 import React from 'react';
 import { Box, Container } from "@mui/material";
 import Header from '../components/commons/Header';
-import SubHeader from '../components/commons/SubHeader';
 import TopSlide from '../components/commons/TopSlide';
 import Footer from '../components/commons/Footer';
 
@@ -11,11 +10,9 @@ const HomeLayout = ({ children }: { children?: React.ReactNode }) => {
 
   return (
 
-    <Box>
+    <Box sx={{ bgcolor: '#f8f9ff' }}>
 
       <Header />
-
-      <SubHeader />
 
       <Container
         maxWidth="xl"

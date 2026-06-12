@@ -8,6 +8,7 @@ import { SxProps, Theme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import ValidationError from '../ValidationError';
 import type { SelectOption } from '@/types/models';
+const ControllerAny = Controller as any;
 
 const EMPTY_SX = {};
 interface Props<T extends FieldValues = FieldValues> {
@@ -55,13 +56,13 @@ const TextFieldAutoCompleteCustom = <T extends FieldValues = FieldValues>({
 
       )}
 
-      <Controller
+      <ControllerAny
 
         control={control}
 
         name={name as Path<T>}
 
-        render={({ field, fieldState }) => (
+        render={({ field, fieldState }: any) => (
 
           <>
 

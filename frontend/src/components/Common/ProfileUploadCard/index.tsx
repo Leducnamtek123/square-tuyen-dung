@@ -1,6 +1,7 @@
 'use client';
 import * as React from 'react';
 import Image from 'next/image';
+const ImageAny: any = Image;
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import { Box, IconButton, Typography, Stack, Chip, Skeleton, Tooltip, Theme } from "@mui/material";
@@ -39,7 +40,7 @@ const ProfileUploadImage = ({ resumeImage }: ProfileUploadImageProps) => {
   const cardImageSrc = !hasImageError && safeResumeImage ? safeResumeImage : IMAGES.coverImageDefault;
 
   return (
-    <Image
+    <ImageAny
       src={cardImageSrc}
       onError={() => setHasImageError(true)}
       fill

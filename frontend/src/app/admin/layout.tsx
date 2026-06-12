@@ -1,18 +1,18 @@
-// Server Component — can export metadata
+// Server Component Ã¢â‚¬â€ can export metadata
 import type { Metadata } from 'next';
 import AdminSectionClient from './AdminSectionClient';
 
 export const metadata: Metadata = {
   title: {
     template: '%s | Square Admin',
-    default: 'Quản trị | Square Admin',
+    default: 'QuÃ¡ÂºÂ£n trÃ¡Â»â€¹ | Square Admin',
   },
 };
 
 export default function AdminSectionLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: any;
 }) {
   return <AdminSectionClient>{children}</AdminSectionClient>;
 }

@@ -23,6 +23,7 @@ import {
   faMicrophoneSlash,
   faPhoneSlash,
   faSpinner,
+  faXmark,
   faVideo,
   faVideoSlash,
 } from '@fortawesome/free-solid-svg-icons';
@@ -456,7 +457,10 @@ function ChatPanel({
   isTakeoverSending,
   onTakeoverAcquire,
   onTakeoverRelease,
+  onCloseChat,
+  onEndSession,
   agentState,
+  isCompactChatView,
 }: {
   messages: ReceivedMessage[];
   onSend: () => void;
@@ -471,7 +475,10 @@ function ChatPanel({
   isTakeoverSending: boolean;
   onTakeoverAcquire: () => void;
   onTakeoverRelease: () => void;
+  onCloseChat: () => void;
+  onEndSession?: () => Promise<void> | void;
   agentState?: AgentState;
+  isCompactChatView: boolean;
 }) {
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const { t } = useTranslation(['interview']);
@@ -491,32 +498,51 @@ function ChatPanel({
   }, [messages.length]);
 
   return (
-    <div className="absolute right-0 top-0 bottom-0 z-30 flex h-full w-[352px] flex-col overflow-hidden border-l border-white/8 bg-[#0b1120] shadow-[-10px_0_30px_rgba(0,0,0,0.5)] md:w-[380px]">
+    <div
+      className={`absolute z-30 flex w-full flex-col overflow-hidden border-white/8 bg-[#0b1120] shadow-[-10px_0_30px_rgba(0,0,0,0.5)] sm:left-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-[352px] md:w-[380px] ${
+        isCompactChatView
+          ? 'inset-x-0 bottom-0 h-[58dvh] rounded-t-[32px] border-t border-l-0 shadow-[0_-18px_48px_rgba(0,0,0,0.6)]'
+          : 'inset-0 h-full border-l'
+      }`}
+    >
+      {isCompactChatView && <div className="flex justify-center border-b border-white/8 px-4 pt-3"><div className="h-1.5 w-14 rounded-full bg-white/15" /></div>}
       <div className="shrink-0 border-b border-white/8 bg-[#0b1120]/96 px-4 py-3 backdrop-blur-xl">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-bold text-white">{t('liveRoom.chat.title')}</p>
-            <p className="mt-0.5 text-xs text-zinc-500">{t('liveRoom.chat.subtitle')}</p>
+        <div className="flex items-start justify-between gap-3">
+          <div className={isCompactChatView ? 'min-w-0 max-w-[168px]' : 'min-w-0'}>
+            <p className={`text-sm font-bold text-white ${isCompactChatView ? 'truncate' : ''}`}>{t('liveRoom.chat.title')}</p>
+            <p className={`mt-0.5 text-xs text-zinc-500 ${isCompactChatView ? 'hidden' : ''}`}>{t('liveRoom.chat.subtitle')}</p>
           </div>
-          <Stack direction="row" spacing={1} alignItems="center">
-            {agentState && ['thinking', 'connecting', 'initializing', 'pre-connect-buffering'].includes(agentState) && (
-              <BarVisualizer state={agentState} barCount={4} style={{ height: 24, width: 64 }} options={{ minHeight: 30, maxHeight: 100 }} />
-            )}
-            <Chip
-              label={t('liveRoom.chat.messagesCount', { count: messages.length })}
-              size="small"
-              sx={{
-                fontWeight: 900,
-                bgcolor: alpha('#0ea5e9', 0.16),
-                color: '#7dd3fc',
-                border: '1px solid',
-                borderColor: alpha('#0ea5e9', 0.28),
-              }}
-            />
-          </Stack>
+          <div className="flex shrink-0 items-center gap-2 sm:hidden">
+            <button
+              type="button"
+              aria-label={t('liveRoom.chat.close')}
+              onClick={onCloseChat}
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 text-xs font-bold text-white transition-colors hover:bg-white/10"
+            >
+              <FontAwesomeIcon icon={faXmark} className="text-[11px]" />
+              <span>{t('liveRoom.chat.close')}</span>
+            </button>
+          </div>
+          {!isCompactChatView && (
+            <Stack direction="row" spacing={1} alignItems="center" className="hidden sm:flex">
+              {agentState && ['thinking', 'connecting', 'initializing', 'pre-connect-buffering'].includes(agentState) && (
+                <BarVisualizer state={agentState} barCount={4} style={{ height: 24, width: 64 }} options={{ minHeight: 30, maxHeight: 100 }} />
+              )}
+              <Chip
+                label={t('liveRoom.chat.messagesCount', { count: messages.length })}
+                size="small"
+                sx={{
+                  fontWeight: 900,
+                  bgcolor: alpha('#0ea5e9', 0.16),
+                  color: '#7dd3fc',
+                  border: '1px solid',
+                  borderColor: alpha('#0ea5e9', 0.28),
+                }}
+              />
+            </Stack>
+          )}
         </div>
       </div>
-
       <div className="min-h-0 flex-1 overflow-hidden">
         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <Box
@@ -704,6 +730,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   const [isControlSending, setIsControlSending] = useState(false);
   const [takeoverOwnerIdentity, setTakeoverOwnerIdentity] = useState<string | null>(null);
   const [isTakeoverSending, setIsTakeoverSending] = useState(false);
+  const [isCompactChatView, setIsCompactChatView] = useState(false);
   const timeFormatted = useLiveTimer();
   const participants = useParticipants();
   const { localParticipant } = useLocalParticipant();
@@ -712,6 +739,14 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   const { messages, send, isSending } = useInterviewMessages();
   const { t } = useTranslation(['interview']);
   const candidateLabel = t('liveRoom.participants.candidate');
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(max-width: 639px)');
+    const update = () => setIsCompactChatView(mediaQuery.matches);
+    update();
+    mediaQuery.addEventListener('change', update);
+    return () => mediaQuery.removeEventListener('change', update);
+  }, []);
   const hasAgentTranscript = messages.some((message) => message.type === 'agentTranscript');
   const agentIdentity = voiceAssistant.agent?.identity;
   const agentSid = voiceAssistant.agent?.sid;
@@ -844,7 +879,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
 
   return (
     <div className="relative flex h-full w-full overflow-hidden bg-[#020617]">
-      <div className={`flex flex-1 flex-col h-full transition-all duration-300 ${chatOpen ? 'pr-[312px] md:pr-[320px]' : ''}`}>
+      <div className={`flex flex-1 flex-col h-full transition-all duration-300 ${chatOpen ? 'sm:pr-[352px] md:pr-[380px]' : ''} ${chatOpen && isCompactChatView ? 'pb-[58dvh]' : ''}`}>
         <div className="flex flex-1 flex-col gap-2 min-h-0 p-2">
           <div className="min-h-0 flex-1">
             <div className="grid h-full min-h-0 grid-cols-1 gap-2 lg:grid-cols-2">
@@ -902,6 +937,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
         <ChatPanel
           messages={messages}
           agentState={voiceAssistant.state}
+          isCompactChatView={isCompactChatView}
           onSend={async () => {
             const text = chatDraft.trim();
             if (!text) return;
@@ -937,6 +973,8 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
           onTakeoverRelease={() => {
             void sendTakeoverControl('release');
           }}
+          onCloseChat={() => setChatOpen(false)}
+          onEndSession={onEndSession}
         />
       )}
       <StartAudio label={t('controls.enableAudio')} />

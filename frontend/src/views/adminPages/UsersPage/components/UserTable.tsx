@@ -1,8 +1,9 @@
 ﻿'use client';
 
 import React, { useCallback, useMemo } from 'react';
-import { Chip, Tooltip, Switch, Typography, Stack, Select, MenuItem, SelectChangeEvent, Avatar, Box } from "@mui/material";
+import { Chip, Tooltip, Switch, Typography, Stack, Select, MenuItem, SelectChangeEvent, Avatar, Box, IconButton } from "@mui/material";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
 import { ROLES_NAME } from '../../../../configs/constants';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
@@ -21,6 +22,7 @@ interface UserTableProps {
     rowSelection?: RowSelectionState;
     onRowSelectionChange?: OnChangeFn<RowSelectionState>;
     onToggleStatus: (user: UserModel) => void;
+    onDeleteUser: (user: UserModel) => void;
     onRoleChange: (user: UserModel, roleName: RoleName) => void;
     currentUserId: string | number;
     disableRoleActions?: boolean;
@@ -37,6 +39,7 @@ const UserTable = ({
     rowSelection,
     onRowSelectionChange,
     onToggleStatus, 
+    onDeleteUser,
     onRoleChange, 
     currentUserId, 
     disableRoleActions 
@@ -154,10 +157,23 @@ const UserTable = ({
                             disabled={disableRoleActions || info.row.original.id === currentUserId}
                         />
                     </Tooltip>
+                    <Tooltip title={t('pages.users.table.delete') as string}>
+                        <span>
+                            <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => onDeleteUser(info.row.original)}
+                                disabled={disableRoleActions || info.row.original.id === currentUserId}
+                                aria-label={t('pages.users.table.delete') as string}
+                            >
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
                 </Stack>
             ),
         },
-    ], [currentUserId, disableRoleActions, getRoleColor, getRoleLabel, onRoleChange, onToggleStatus, t]);
+    ], [currentUserId, disableRoleActions, getRoleColor, getRoleLabel, onDeleteUser, onRoleChange, onToggleStatus, t]);
 
     return (
         <DataTable

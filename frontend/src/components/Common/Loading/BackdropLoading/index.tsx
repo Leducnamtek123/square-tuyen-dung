@@ -2,6 +2,7 @@ import * as React from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Image from 'next/image';
+const ImageAny: any = Image;
 import { LOADING_IMAGES } from '@/configs/constants';
 import { useTranslation } from 'react-i18next';
 
@@ -45,7 +46,7 @@ const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }: Backdr
           },
         }}
       >
-        <Image
+        <ImageAny
           src={LOADING_IMAGES.LOADING_SPINNER}
           alt={t('loading')}
           width={100}

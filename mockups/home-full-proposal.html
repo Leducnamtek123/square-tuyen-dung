@@ -1,0 +1,982 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Square - Full Home Mockup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8f9ff;
+      --ink: #0b1c30;
+      --muted: #596375;
+      --primary: #043068;
+      --primary-2: #0058be;
+      --cyan: #2aa9e1;
+      --line: #d9e2f0;
+      --soft: #eff4ff;
+      --green: #15b883;
+      --card: #fff;
+      --shadow: 0 18px 42px rgba(4, 48, 104, 0.07);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      height: 64px;
+      background: linear-gradient(135deg, #1e6bb8 0%, #1a407d 45%, #0f2d5e 100%);
+      box-shadow: 0 2px 20px rgba(15, 57, 127, 0.35);
+    }
+
+    .nav {
+      max-width: 1500px;
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      color: #fff;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-right: 18px;
+      border-right: 1px solid rgba(255, 255, 255, 0.28);
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #2aa9e1 0 50%, #1a407d 50%);
+      box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.12);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      font-size: 14px;
+      font-weight: 800;
+      flex: 1;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .btn {
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 12px;
+      padding: 10px 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .btn.white {
+      background: #fff;
+      color: var(--primary);
+      border-color: #fff;
+    }
+
+    .hero {
+      position: relative;
+      min-height: calc(100svh - 64px);
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(4, 48, 104, 0.95) 0%, rgba(4, 48, 104, 0.70) 47%, rgba(4, 48, 104, 0.08) 100%),
+        url("assets/cover-image-default.webp") center / cover no-repeat;
+      color: #fff;
+    }
+
+    .hero-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 88px 24px 64px;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary-2);
+    }
+
+    .hero h1 {
+      max-width: 820px;
+      margin: 28px 0 24px;
+      font-size: clamp(42px, 5vw, 72px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      max-width: 720px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 18px;
+      line-height: 1.62;
+      font-weight: 600;
+    }
+
+    .search {
+      max-width: 900px;
+      margin-top: 34px;
+      padding: 8px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 26px 58px rgba(3, 18, 38, 0.28);
+      display: grid;
+      grid-template-columns: 1.45fr 1fr 220px;
+      align-items: center;
+      color: var(--ink);
+    }
+
+    .field {
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 18px;
+      color: #8a94a7;
+      font-weight: 700;
+    }
+
+    .field + .field {
+      border-left: 1px solid rgba(116, 119, 129, 0.22);
+    }
+
+    .search button {
+      height: 56px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+    }
+
+    .section {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 72px 24px 0;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.1;
+      font-weight: 800;
+    }
+
+    .section-head p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-weight: 500;
+      line-height: 1.55;
+    }
+
+    .link {
+      color: var(--primary);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .surface {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .featured {
+      padding: 24px;
+    }
+
+    .company-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .company {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      min-height: 118px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: linear-gradient(180deg, #fff, #fafdff);
+    }
+
+    .logo,
+    .mini-logo {
+      flex: 0 0 auto;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #2aa9e1 0 50%, #1a407d 50%);
+      box-shadow: inset 0 0 0 6px #eef7ff;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+    }
+
+    .company h3,
+    .job h3,
+    .compact-job h4,
+    .blog h3 {
+      margin: 0;
+      color: var(--ink);
+    }
+
+    .company p,
+    .job p,
+    .compact-job p {
+      margin: 6px 0;
+      color: #4771c8;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .stars {
+      color: #174486;
+      font-size: 15px;
+    }
+
+    .quick {
+      display: grid;
+      gap: 14px;
+    }
+
+    .path {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 16px;
+      align-items: start;
+      padding: 22px;
+    }
+
+    .ico {
+      height: 56px;
+      border-radius: 14px;
+      background: #edf7ff;
+      display: grid;
+      place-items: center;
+      color: var(--primary-2);
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .path h3 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    .path p {
+      margin: 0 0 14px;
+      color: #4771c8;
+      font-weight: 500;
+      line-height: 1.45;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid #c7e7fb;
+      background: #f8fdff;
+      border-radius: 999px;
+      padding: 5px 10px;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 16px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .band {
+      margin-top: 44px;
+      padding: 34px 38px;
+      border-radius: 18px;
+      background:
+        linear-gradient(110deg, rgba(4, 48, 104, 0.97), rgba(31, 104, 194, 0.94)),
+        url("assets/banner-explore-pc.webp") center / cover no-repeat;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      box-shadow: 0 22px 48px rgba(4, 48, 104, 0.18);
+    }
+
+    .band h2 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.2;
+    }
+
+    .band p {
+      max-width: 650px;
+      margin: 8px 0 0;
+      color: rgba(255, 255, 255, 0.84);
+      line-height: 1.55;
+    }
+
+    .band .btn {
+      background: #fff;
+      color: var(--primary);
+      border-color: #fff;
+    }
+
+    .urgent {
+      padding: 28px;
+    }
+
+    .urgent-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .urgent-head h2 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.15;
+    }
+
+    .badge {
+      background: #fff1d6;
+      color: #9b5500;
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .jobs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .job {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--green);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .job-title {
+      display: flex;
+      gap: 14px;
+    }
+
+    .mini-logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      box-shadow: none;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+      color: #5b6680;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .career-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .career {
+      padding: 26px;
+      text-align: center;
+    }
+
+    .career-icon {
+      width: 66px;
+      height: 66px;
+      margin: 0 auto 14px;
+      border-radius: 18px;
+      background: #eff8ff;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      color: var(--primary);
+    }
+
+    .career h3 {
+      margin: 0 0 8px;
+    }
+
+    .career span {
+      display: inline-block;
+      background: #eff8ff;
+      color: #1e6bb8;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .jobs-preview {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 22px;
+    }
+
+    .tabs {
+      padding: 18px;
+    }
+
+    .tabs button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border: 0;
+      background: transparent;
+      border-radius: 10px;
+      font: inherit;
+      font-weight: 800;
+      color: #44516a;
+    }
+
+    .tabs button.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .list {
+      padding: 18px;
+    }
+
+    .list-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .list-head h3 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .list-grid,
+    .blog-grid,
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .list-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .compact-job {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .compact-job h4 {
+      color: var(--primary);
+    }
+
+    .compact-job .meta {
+      grid-template-columns: 1fr;
+      margin-top: 12px;
+    }
+
+    .blog {
+      overflow: hidden;
+    }
+
+    .blog-media {
+      height: 168px;
+      background:
+        linear-gradient(135deg, rgba(4, 48, 104, 0.2), rgba(42, 169, 225, 0.28)),
+        url("assets/banner-explore-pc.webp") center / cover no-repeat;
+    }
+
+    .blog-body {
+      padding: 20px;
+    }
+
+    .blog small {
+      color: #4771c8;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .blog h3 {
+      margin-top: 10px;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    .blog p,
+    .quote p {
+      color: var(--muted);
+      line-height: 1.55;
+      font-weight: 500;
+    }
+
+    .quote {
+      padding: 24px;
+    }
+
+    .quote strong {
+      display: block;
+      margin-top: 18px;
+      color: var(--primary);
+    }
+
+    .final-cta {
+      margin-top: 72px;
+      padding: 56px 32px;
+      text-align: center;
+      border-radius: 26px;
+      background: linear-gradient(135deg, #043068, #0058be);
+      color: #fff;
+      box-shadow: 0 24px 64px rgba(4, 48, 104, 0.22);
+    }
+
+    .final-cta h2 {
+      margin: 0;
+      font-size: 42px;
+      line-height: 1.15;
+    }
+
+    .final-cta p {
+      max-width: 700px;
+      margin: 14px auto 26px;
+      color: rgba(255, 255, 255, 0.82);
+      line-height: 1.6;
+    }
+
+    .footer {
+      margin-top: 72px;
+      background: #d3e4fe;
+      border-top: 1px solid #c4c6d1;
+    }
+
+    .footer-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 52px 24px 28px;
+      display: grid;
+      grid-template-columns: 1.2fr repeat(3, 1fr);
+      gap: 36px;
+    }
+
+    .footer h3,
+    .footer h4 {
+      margin: 0 0 16px;
+      color: var(--primary);
+    }
+
+    .footer p,
+    .footer a {
+      color: #434750;
+      line-height: 1.7;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .copyright {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 18px 24px 28px;
+      color: #596375;
+      font-size: 13px;
+      font-weight: 700;
+      border-top: 1px solid rgba(116, 119, 129, 0.25);
+    }
+
+    .chat {
+      position: fixed;
+      right: 28px;
+      bottom: 28px;
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: #2c95ff;
+      color: #fff;
+      font-size: 26px;
+      box-shadow: 0 16px 36px rgba(44, 149, 255, 0.32);
+    }
+
+    @media (max-width: 900px) {
+      .nav {
+        padding: 0 18px;
+      }
+
+      .nav-links,
+      .nav-actions .desktop-only {
+        display: none;
+      }
+
+      .brand {
+        border-right: 0;
+      }
+
+      .hero {
+        min-height: calc(100svh - 56px);
+      }
+
+      .hero-inner {
+        padding: 48px 24px 56px;
+      }
+
+      .hero h1 {
+        font-size: 42px;
+      }
+
+      .search {
+        grid-template-columns: 1fr;
+      }
+
+      .field + .field {
+        border-left: 0;
+        border-top: 1px solid rgba(116, 119, 129, 0.16);
+      }
+
+      .intro-grid,
+      .jobs-preview,
+      .footer-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .company-row,
+      .jobs,
+      .career-grid,
+      .list-grid,
+      .blog-grid,
+      .testimonial-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding-top: 52px;
+      }
+
+      .section-head,
+      .band {
+        display: block;
+      }
+
+      .section-head h2 {
+        font-size: 31px;
+      }
+
+      .featured,
+      .urgent {
+        padding: 20px;
+      }
+
+      .band .btn {
+        margin-top: 18px;
+        width: 100%;
+      }
+
+      .final-cta h2 {
+        font-size: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav class="nav">
+      <a class="brand" href="#"><span class="mark"></span><span>Square</span></a>
+      <div class="nav-links">
+        <a href="#">Việc làm</a>
+        <a href="#">Công ty</a>
+        <a href="#">Blog tuyển dụng</a>
+        <a href="#">Về chúng tôi</a>
+      </div>
+      <div class="nav-actions">
+        <span>🌐 VI</span>
+        <a class="btn desktop-only" href="#">Đăng nhập</a>
+        <a class="btn white desktop-only" href="#">Đăng ký</a>
+        <a class="btn desktop-only" href="#">💼 Nhà tuyển dụng</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow"><span class="dot"></span>Nền tảng tuyển dụng thông minh</div>
+      <h1>Tìm việc phù hợp, tuyển đúng người nhanh hơn</h1>
+      <p>Khám phá hàng ngàn cơ hội nghề nghiệp trong lĩnh vực Bất động sản, Xây dựng và Nội thất với hệ thống lọc thông minh.</p>
+      <form class="search">
+        <div class="field">⌕ Tìm kiếm việc làm...</div>
+        <div class="field">📍 Tất cả tỉnh thành</div>
+        <button type="button">⌕ Tìm kiếm</button>
+      </form>
+    </div>
+  </section>
+
+  <main>
+    <section class="section">
+      <div class="intro-grid">
+        <div class="featured surface">
+          <div class="section-head">
+            <div>
+              <h2>Công ty nổi bật</h2>
+              <p>Những doanh nghiệp đang tuyển dụng và có hồ sơ đáng chú ý.</p>
+            </div>
+            <a class="link" href="#">Xem tất cả -></a>
+          </div>
+
+          <div class="company-row">
+            <article class="company"><div class="logo"></div><div><h3>Square Construction & Design</h3><p>12 việc làm đang mở</p><div class="stars">★★★★★</div></div></article>
+            <article class="company"><div class="logo"></div><div><h3>Novaland Group</h3><p>8 việc làm đang mở</p><div class="stars">★★★★★</div></div></article>
+            <article class="company"><div class="logo"></div><div><h3>Coteccons</h3><p>15 việc làm đang mở</p><div class="stars">★★★★★</div></div></article>
+            <article class="company"><div class="logo"></div><div><h3>Sun Group</h3><p>5 việc làm đang mở</p><div class="stars">★★★★☆</div></div></article>
+          </div>
+        </div>
+
+        <div class="quick">
+          <article class="path surface">
+            <div class="ico">⌕</div>
+            <div>
+              <h3>Dành cho ứng viên</h3>
+              <p>Lọc việc theo ngành, thành phố và công ty trong vài thao tác.</p>
+              <div class="chips"><span class="chip">Lọc theo ngành</span><span class="chip">Theo dõi job</span></div>
+              <a class="cta" href="#">Khám phá việc làm -></a>
+            </div>
+          </article>
+
+          <article class="path surface">
+            <div class="ico">▦</div>
+            <div>
+              <h3>Dành cho nhà tuyển dụng</h3>
+              <p>Đăng tin, tìm hồ sơ và rút ngắn quy trình tuyển dụng.</p>
+              <div class="chips"><span class="chip">Đăng tin nhanh</span><span class="chip">Tìm hồ sơ</span></div>
+              <a class="cta" style="background:#2aa9e1" href="#">Xem giải pháp -></a>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <section class="band">
+        <div>
+          <h2>Bạn cần tìm công việc phù hợp với mình?</h2>
+          <p>Bắt đầu từ một nơi duy nhất để tìm việc, xem công ty, lọc theo ngành và đi nhanh đến hành động tiếp theo.</p>
+        </div>
+        <a class="btn" href="#">Bắt đầu khám phá -></a>
+      </section>
+    </section>
+
+    <section class="section">
+      <div class="urgent surface">
+        <div class="urgent-head">
+          <h2>Việc làm tuyển gấp</h2>
+          <span class="badge">Cập nhật mới</span>
+        </div>
+        <div class="jobs">
+          <article class="job"><div class="job-title"><div class="mini-logo"></div><div><h3>Giám sát thi công</h3><p>Square Construction & Design</p></div></div><div class="meta"><span>10 - 15 triệu</span><span>TP. Hồ Chí Minh</span><span>Còn 4 tháng</span><span>Toàn thời gian</span></div></article>
+          <article class="job"><div class="job-title"><div class="mini-logo"></div><div><h3>Kỹ sư QS</h3><p>Square Construction & Design</p></div></div><div class="meta"><span>10 - 15 triệu</span><span>TP. Hồ Chí Minh</span><span>Còn 4 tháng</span><span>Toàn thời gian</span></div></article>
+          <article class="job"><div class="job-title"><div class="mini-logo"></div><div><h3>Kiến trúc sư</h3><p>Square Construction & Design</p></div></div><div class="meta"><span>18 - 36 triệu</span><span>TP. Hồ Chí Minh</span><span>Còn 9 ngày</span><span>Toàn thời gian</span></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Ngành nghề trọng điểm</h2>
+          <p>Chọn ngành trước, xem ngay nhóm job liên quan ở cùng một vùng.</p>
+        </div>
+        <a class="link" href="#">Xem tất cả ngành -></a>
+      </div>
+
+      <div class="career-grid">
+        <article class="career surface"><div class="career-icon">⌂</div><h3>Bất động sản</h3><span>1 việc làm</span></article>
+        <article class="career surface"><div class="career-icon">⚒</div><h3>Xây dựng</h3><span>1 việc làm</span></article>
+        <article class="career surface"><div class="career-icon">▣</div><h3>Nội thất</h3><span>1 việc làm</span></article>
+        <article class="career surface"><div class="career-icon">△</div><h3>Kiến trúc</h3><span>1 việc làm</span></article>
+      </div>
+
+      <div class="jobs-preview">
+        <aside class="tabs surface">
+          <button class="active">Bất động sản</button>
+          <button>Xây dựng</button>
+          <button>Nội thất</button>
+          <button>Kiến trúc</button>
+        </aside>
+        <div class="list surface">
+          <div class="list-head"><h3>Việc làm Bất động sản</h3><a class="link" href="#">Xem tất cả -></a></div>
+          <div class="list-grid">
+            <article class="compact-job"><h4>Chuyên viên Kinh doanh BĐS</h4><p>Square Construction & Design</p><div class="meta"><span>15 - 30 triệu · TP. Hồ Chí Minh</span></div></article>
+            <article class="compact-job"><h4>Quản lý dự án</h4><p>Square Construction & Design</p><div class="meta"><span>15 - 30 triệu · TP. Hồ Chí Minh</span></div></article>
+            <article class="compact-job"><h4>Sales Admin</h4><p>Square Construction & Design</p><div class="meta"><span>12 - 18 triệu · TP. Hồ Chí Minh</span></div></article>
+            <article class="compact-job"><h4>Tư vấn đầu tư</h4><p>Square Construction & Design</p><div class="meta"><span>15 - 25 triệu · TP. Hồ Chí Minh</span></div></article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Blog tuyển dụng mới nhất</h2>
+          <p>Cập nhật xu hướng thị trường và kinh nghiệm phát triển sự nghiệp.</p>
+        </div>
+        <a class="link" href="#">Xem blog -></a>
+      </div>
+      <div class="blog-grid">
+        <article class="blog surface"><div class="blog-media"></div><div class="blog-body"><small>Kinh nghiệm</small><h3>10 câu hỏi phỏng vấn cho kỹ sư xây dựng</h3><p>Chuẩn bị tốt hơn cho buổi phỏng vấn tiếp theo với những câu hỏi thường gặp.</p></div></article>
+        <article class="blog surface"><div class="blog-media"></div><div class="blog-body"><small>Xu hướng</small><h3>Báo cáo mức lương ngành nội thất</h3><p>Khám phá khoảng thu nhập và các phúc lợi phổ biến trong ngành sáng tạo không gian.</p></div></article>
+        <article class="blog surface"><div class="blog-media"></div><div class="blog-body"><small>Sự nghiệp</small><h3>Cách xây portfolio cho ứng viên mới</h3><p>Trình bày dự án chuyên nghiệp hơn để thu hút sự chú ý từ nhà tuyển dụng.</p></div></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Đánh giá từ người dùng</h2>
+          <p>Phản hồi thật giúp trải nghiệm tuyển dụng thêm tin cậy.</p>
+        </div>
+      </div>
+      <div class="testimonial-grid">
+        <article class="quote surface"><p>"Square giúp tôi tìm thấy cơ hội phù hợp chỉ sau vài ngày cập nhật hồ sơ."</p><strong>Nguyễn Minh Anh</strong></article>
+        <article class="quote surface"><p>"Giao diện dễ dùng, tin tuyển dụng trong ngành xây dựng được lọc rõ ràng."</p><strong>Lê Thu Thảo</strong></article>
+        <article class="quote surface"><p>"Tôi tìm được ứng viên nhanh hơn nhờ dữ liệu hồ sơ và bộ lọc tuyển dụng."</p><strong>Trần Hoàng Long</strong></article>
+      </div>
+
+      <div class="final-cta">
+        <h2>Sẵn sàng cho bước tiếp theo?</h2>
+        <p>Hàng ngàn cơ hội nghề nghiệp đang chờ bạn. Tạo hồ sơ hoặc bắt đầu đăng tin tuyển dụng ngay hôm nay.</p>
+        <a class="btn white" href="#">Tạo hồ sơ miễn phí</a>
+        <a class="btn" href="#">Dành cho nhà tuyển dụng</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <h3>Square</h3>
+        <p>Nền tảng kết nối nhân tài và doanh nghiệp trong lĩnh vực bất động sản, xây dựng, nội thất và kiến trúc.</p>
+      </div>
+      <div>
+        <h4>Ứng viên</h4>
+        <a href="#">Việc làm mới nhất</a>
+        <a href="#">Tạo CV chuyên nghiệp</a>
+        <a href="#">Cẩm nang nghề nghiệp</a>
+      </div>
+      <div>
+        <h4>Doanh nghiệp</h4>
+        <a href="#">Đăng tin tuyển dụng</a>
+        <a href="#">Tìm kiếm ứng viên</a>
+        <a href="#">Giải pháp HR</a>
+      </div>
+      <div>
+        <h4>Hỗ trợ</h4>
+        <a href="#">Chính sách bảo mật</a>
+        <a href="#">Điều khoản dịch vụ</a>
+        <a href="#">Liên hệ chúng tôi</a>
+      </div>
+    </div>
+    <div class="copyright">© 2026 Square Recruitment Platform. All rights reserved.</div>
+  </footer>
+
+  <div class="chat">☻</div>
+</body>
+</html>

@@ -181,7 +181,7 @@ const MessageResponseInner = memo(({
     );
   }
 
-  const Streamdown = streamdownState.Streamdown as React.ElementType;
+  const Streamdown = streamdownState.Streamdown as React.ComponentType<{ className?: string; children?: ReactNode; [key: string]: unknown }>;
 
   return (
     <Streamdown

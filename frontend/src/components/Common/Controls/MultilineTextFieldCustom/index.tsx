@@ -7,6 +7,7 @@ import { TextField, Typography } from "@mui/material";
 import ValidationError from '../ValidationError';
 
 import type { SxProps, Theme } from '@mui/material/styles';
+const ControllerAny = Controller as any;
 
 interface Props<T extends FieldValues> {
   name: Path<T>;
@@ -46,13 +47,13 @@ const MultilineTextFieldCustom = <T extends FieldValues>({
 
       )}
 
-      <Controller
+      <ControllerAny
 
         name={name}
 
         control={control}
 
-        render={({ field, fieldState }) => (
+        render={({ field, fieldState }: any) => (
 
           <>
 

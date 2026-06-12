@@ -10,6 +10,7 @@ import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import errorHandling from '@/utils/errorHandling';
 import toastMessages from '@/utils/toastMessages';
 import trustReportService, { type TrustReportPayload, type TrustReportTargetType } from '@/services/trustReportService';
+const ControllerAny = Controller as any;
 
 type TrustReportFormValues = {
   reason: string;
@@ -112,10 +113,10 @@ const TrustReportDialogContent = ({
       >
         <Box component="form" id="modal-form" onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={2}>
-            <Controller
+            <ControllerAny
               control={control}
               name="reason"
-              render={({ field }) => (
+              render={({ field }: any) => (
                 <TextField
                   {...field}
                   select
@@ -130,10 +131,10 @@ const TrustReportDialogContent = ({
                 </TextField>
               )}
             />
-            <Controller
+            <ControllerAny
               control={control}
               name="message"
-              render={({ field }) => (
+              render={({ field }: any) => (
                 <TextField
                   {...field}
                   fullWidth

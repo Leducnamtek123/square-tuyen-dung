@@ -30,6 +30,7 @@ import type { FormValues } from './types';
 import type { Question, QuestionGroup } from '../../../../types/models';
 import type { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
+const ControllerAny = Controller as any;
 
 type Props = {
   t: TFunction;
@@ -110,10 +111,10 @@ const InterviewCreateCardQuestionSection = ({
       </Grid>
 
       <Grid size={12}>
-        <Controller
+        <ControllerAny
           name="selected_group"
           control={control}
-          render={({ field }) => (
+          render={({ field }: any) => (
             <TextField
               {...field}
               select
@@ -141,10 +142,10 @@ const InterviewCreateCardQuestionSection = ({
       <Grid size={12}>
         <FormControl fullWidth error={!!errors.selected_questions} sx={inputSx}>
           <InputLabel sx={{ fontWeight: 600 }}>{t('interview:interviewCreateCard.label.selectinterviewquestions')}</InputLabel>
-          <Controller
+          <ControllerAny
             name="selected_questions"
             control={control}
-            render={({ field }) => (
+            render={({ field }: any) => (
               <Select
                 {...field}
                 multiple

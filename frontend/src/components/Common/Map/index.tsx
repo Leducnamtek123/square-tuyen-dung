@@ -11,7 +11,7 @@ interface MapProps {
   longitude?: number;
 }
 
-const MapContent = dynamic(() => import('./MapContent'), {
+const MapContent: any = dynamic(() => import('./MapContent'), {
   ssr: false,
   loading: () => (
     <Box
@@ -36,7 +36,7 @@ const MapContent = dynamic(() => import('./MapContent'), {
         }}
       >
         <LocationOnIcon fontSize="small" />
-        Đang tải bản đồ...
+        Äang táº£i báº£n Ä‘á»“...
       </Typography>
     </Box>
   ),

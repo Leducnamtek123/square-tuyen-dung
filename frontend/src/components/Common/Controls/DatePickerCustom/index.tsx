@@ -11,6 +11,7 @@ import { Typography } from "@mui/material";
 import { SxProps, Theme } from '@mui/material/styles';
 import type { Dayjs } from 'dayjs';
 import ValidationError from '../ValidationError';
+const ControllerAny = Controller as any;
 
 const EMPTY_SX: SxProps<Theme> = {};
 
@@ -82,13 +83,13 @@ const DatePickerCustom = <T extends FieldValues = FieldValues>({
 
       )}
 
-      <Controller
+      <ControllerAny
 
         name={name as Path<T>}
 
         control={control}
 
-        render={({ field, fieldState }) => (
+        render={({ field, fieldState }: any) => (
 
           <>
 

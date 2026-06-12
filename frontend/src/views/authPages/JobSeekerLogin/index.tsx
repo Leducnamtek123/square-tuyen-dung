@@ -1,22 +1,30 @@
-'use client';
+﻿'use client';
 import * as React from 'react';
+
 import { useRouter } from 'next/navigation';
+
 import { useTranslation } from 'react-i18next';
+
 import { TabTitle } from '../../../utils/generalFunction';
-import {
-  AUTH_CONFIG,
-  AUTH_PROVIDER,
-  ROLES_NAME,
-  ROUTES,
-} from '../../../configs/constants';
+
+import { AUTH_CONFIG, AUTH_PROVIDER, ROLES_NAME, ROUTES } from '../../../configs/constants';
+
 import toastMessages from '../../../utils/toastMessages';
+
 import { updateVerifyEmail } from '../../../redux/authSlice';
+
 import { getUserInfo } from '../../../redux/userSlice';
+
 import authService from '../../../services/authService';
+
 import tokenService from '../../../services/tokenService';
+
 import { useAppDispatch } from '../../../hooks/useAppStore';
+
 import type { RoleName, AuthProvider } from '../../../types/auth';
+
 import type { AxiosError } from 'axios';
+
 import JobSeekerLoginView from './JobSeekerLoginView';
 
 type LoginErrorPayload = {
@@ -25,6 +33,8 @@ type LoginErrorPayload = {
     token?: string[];
   };
 };
+
+const SOCIAL_AUTH_COOLDOWN_MS = 2500;
 
 const JobSeekerLogin = () => {
   const { t } = useTranslation('auth');
@@ -37,6 +47,8 @@ const JobSeekerLogin = () => {
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
   const [loginMode, setLoginMode] = React.useState<'email' | 'phone'>('email');
+  const socialAuthInFlightRef = React.useRef(false);
+  const lastSocialAuthAttemptAtRef = React.useRef(0);
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -112,7 +124,17 @@ const JobSeekerLogin = () => {
   };
 
   const handleSocialLogin = async (clientId: string, provider: AuthProvider, token: string) => {
+    const now = Date.now();
+    if (
+      socialAuthInFlightRef.current ||
+      now - lastSocialAuthAttemptAtRef.current < SOCIAL_AUTH_COOLDOWN_MS
+    ) {
+      return;
+    }
+
     const redirectUri = typeof window !== 'undefined' ? window.location.origin : '';
+    lastSocialAuthAttemptAtRef.current = now;
+    socialAuthInFlightRef.current = true;
     setIsFullScreenLoading(true);
 
     try {
@@ -143,6 +165,7 @@ const JobSeekerLogin = () => {
       }
     } finally {
       setIsFullScreenLoading(false);
+      socialAuthInFlightRef.current = false;
     }
   };
 

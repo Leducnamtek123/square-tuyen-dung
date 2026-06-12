@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useReducer } from 'react';
+import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { Box, CircularProgress } from '@mui/material';
 import AdminLayout from '@/layouts/AdminLayout';
@@ -86,7 +87,7 @@ function AuthLoadingScreen() {
 export default function AdminSectionClient({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const pathname = usePathname() || '';
   const dispatch = useAppDispatch();

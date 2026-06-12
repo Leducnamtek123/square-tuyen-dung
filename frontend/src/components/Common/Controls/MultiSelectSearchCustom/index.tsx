@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import type { SelectOption } from '@/types/models';
 
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+const ControllerAny = Controller as any;
 
 const EMPTY_OPTIONS: SelectOption[] = [];
 
@@ -49,13 +50,13 @@ const MultiSelectSearchCustom = <T extends FieldValues = FieldValues>({
 
   return (
 
-    <Controller
+    <ControllerAny
 
       name={name as Path<T>}
 
       control={control}
 
-      render={({ field }) => (
+      render={({ field }: any) => (
 
         <Autocomplete
 
@@ -91,7 +92,7 @@ const MultiSelectSearchCustom = <T extends FieldValues = FieldValues>({
 
           renderOption={(props, option, { selected }) => (
 
-            <li {...props}>
+            <li {...(props as any)}>
 
               <Checkbox
 

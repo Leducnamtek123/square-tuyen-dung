@@ -18,16 +18,16 @@ const beVietnamPro = Be_Vietnam_Pro({
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Square Tuyển Dụng',
-    default: 'Square | Tìm việc nhanh, tuyển dụng hiệu quả',
+    template: '%s | Square Tuyá»ƒn Dá»¥ng',
+    default: 'Square | TÃ¬m viá»‡c nhanh, tuyá»ƒn dá»¥ng hiá»‡u quáº£',
   },
-  description: 'Square - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín. Ứng tuyển nhanh chóng, hiệu quả',
-  keywords: 'tìm việc, tuyển dụng, việc làm, ứng tuyển, nhà tuyển dụng, CV, hồ sơ xin việc, Square, tuyển dụng Việt Nam',
+  description: 'Square - Ná»n táº£ng tuyá»ƒn dá»¥ng hÃ ng Ä‘áº§u Viá»‡t Nam. TÃ¬m kiáº¿m hÃ ng nghÃ¬n viá»‡c lÃ m phÃ¹ há»£p, káº¿t ná»‘i vá»›i cÃ¡c nhÃ  tuyá»ƒn dá»¥ng uy tÃ­n. á»¨ng tuyá»ƒn nhanh chÃ³ng, hiá»‡u quáº£',
+  keywords: 'tÃ¬m viá»‡c, tuyá»ƒn dá»¥ng, viá»‡c lÃ m, á»©ng tuyá»ƒn, nhÃ  tuyá»ƒn dá»¥ng, CV, há»“ sÆ¡ xin viá»‡c, Square, tuyá»ƒn dá»¥ng Viá»‡t Nam',
   openGraph: {
-    title: 'Square | Tìm việc nhanh, tuyển dụng hiệu quả',
-    description: 'Square - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín.',
+    title: 'Square | TÃ¬m viá»‡c nhanh, tuyá»ƒn dá»¥ng hiá»‡u quáº£',
+    description: 'Square - Ná»n táº£ng tuyá»ƒn dá»¥ng hÃ ng Ä‘áº§u Viá»‡t Nam. TÃ¬m kiáº¿m hÃ ng nghÃ¬n viá»‡c lÃ m phÃ¹ há»£p, káº¿t ná»‘i vá»›i cÃ¡c nhÃ  tuyá»ƒn dá»¥ng uy tÃ­n.',
     url: 'https://sqstudio.vn/',
-    siteName: 'Square Tuyển Dụng',
+    siteName: 'Square Tuyá»ƒn Dá»¥ng',
     locale: 'vi_VN',
     type: 'website',
   },
@@ -40,7 +40,7 @@ export const viewport: Viewport = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: any;
 }) {
   return (
     <html lang="vi" className={`${beVietnamPro.variable}`} suppressHydrationWarning>

@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import React, { useState } from 'react';
+import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { useAppSelector } from '@/redux/hooks';
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -30,6 +31,7 @@ const UsersPage = () => {
     } = useDataTable();
     
     const [roleFilter, setRoleFilter] = useState('');
+    const [deleteTarget, setDeleteTarget] = useState<UserModel | null>(null);
     
     const currentUserId = useAppSelector((state) => state.user?.currentUser?.id);
     const resolvedPageSize = pageSize === -1 ? PAGINATION.ADMIN_MAX_PAGE_SIZE : pageSize;
@@ -40,6 +42,7 @@ const UsersPage = () => {
         toggleUserStatus, 
         bulkDisableUsers,
         updateUserRole,
+        deleteUser,
         isMutating 
     } = useUsers({
         page: page + 1,
@@ -70,6 +73,20 @@ const UsersPage = () => {
         }
         try {
             await updateUserRole({ userId: user.id, roleName });
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const handleDeleteUser = (user: UserModel) => {
+        setDeleteTarget(user);
+    };
+
+    const confirmDeleteUser = async () => {
+        if (!deleteTarget) return;
+        try {
+            await deleteUser(deleteTarget.id);
+            setDeleteTarget(null);
         } catch (e) {
             console.error(e);
         }
@@ -134,11 +151,31 @@ const UsersPage = () => {
                     rowSelection={rowSelection}
                     onRowSelectionChange={onRowSelectionChange}
                     onToggleStatus={handleToggleStatus}
+                    onDeleteUser={handleDeleteUser}
                     onRoleChange={handleRoleChange}
                     currentUserId={currentUserId || ''}
                     disableRoleActions={isMutating}
                 />
             </Paper>
+
+            <Dialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)} maxWidth="xs" fullWidth>
+                <DialogTitle>{t('pages.users.deleteTitle')}</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        {t('pages.users.deleteConfirm', {
+                            name: deleteTarget?.fullName || deleteTarget?.email || deleteTarget?.id || '',
+                        })}
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button onClick={() => setDeleteTarget(null)} color="inherit">
+                        {t('pages.users.cancel') }
+                    </Button>
+                    <Button onClick={() => void confirmDeleteUser()} color="error" variant="contained" disabled={isMutating}>
+                        {t('pages.users.deleteBtn')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };

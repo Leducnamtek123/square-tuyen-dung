@@ -271,6 +271,49 @@ def test_email_exists_endpoint_validates_email_contract(email):
     assert response.status_code == 400
     assert "email" in response.data["error"]["details"]
 
+@pytest.mark.django_db
+def test_register_serializers_reject_case_insensitive_duplicate_emails(job_seeker_user, city):
+    from apps.accounts.serializers import EmployerRegisterSerializer, JobSeekerRegisterSerializer
+    from apps.locations.models import District
+
+    district = District.objects.create(name="Quan CI", code="Q-CI-REGISTER", city=city)
+
+    job_seeker_serializer = JobSeekerRegisterSerializer(data={
+        "fullName": "Case Duplicate Candidate",
+        "email": job_seeker_user.email.upper(),
+        "password": "SquarePass123!",
+        "confirmPassword": "SquarePass123!",
+        "platform": "WEB",
+    })
+
+    employer_serializer = EmployerRegisterSerializer(data={
+        "fullName": "Case Duplicate Employer",
+        "email": job_seeker_user.email.upper(),
+        "password": "SquarePass123!",
+        "confirmPassword": "SquarePass123!",
+        "platform": "WEB",
+        "company": {
+            "companyName": "Case Duplicate Company",
+            "companyEmail": "case-duplicate-company@test.com",
+            "companyPhone": "0901234599",
+            "taxCode": "CASE-DUP-TAX-001",
+            "fieldOperation": "IT",
+            "since": timezone.localdate(),
+            "employeeSize": 1,
+            "websiteUrl": "https://example.com",
+            "location": {
+                "city": city.id,
+                "district": district.id,
+                "address": "123 Case Street",
+            },
+        },
+    })
+
+    assert job_seeker_serializer.is_valid() is False
+    assert "email" in job_seeker_serializer.errors
+    assert employer_serializer.is_valid() is False
+    assert "email" in employer_serializer.errors
+
 
 @pytest.mark.django_db
 def test_password_creation_serializers_match_frontend_complexity_rule(city):

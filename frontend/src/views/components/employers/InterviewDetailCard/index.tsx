@@ -41,7 +41,7 @@ function InterviewSessionBridge({
   children,
 }: {
   connectionDetails: { token: string; serverUrl: string };
-  children: React.ReactNode;
+  children: any;
 }) {
   const tokenSource = React.useMemo(() => {
     return TokenSource.custom(async () => ({
@@ -348,7 +348,7 @@ const InterviewDetailCard = () => {
   const recordingUrl = session.recordingUrl || session.recording_url || null;
   const liveKitReady = Boolean(isSessionActive && state.connectionDetails);
 
-  // ── HR Presence fullscreen session ──────────────────────────────────────
+  // â”€â”€ HR Presence fullscreen session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (state.hrConnected && state.hrConnectionDetails) {
     return (
       <Paper elevation={0} sx={{ position: 'fixed', inset: 0, zIndex: 1300, borderRadius: 0, bgcolor: '#020617' }}>

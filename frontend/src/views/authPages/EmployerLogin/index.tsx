@@ -1,8 +1,10 @@
-'use client';
+﻿'use client';
 import * as React from 'react';
+
 import { useRouter } from 'next/navigation';
+
 import { Alert, AlertTitle, Avatar, Box, Card, Container, Typography, styled } from '@mui/material';
-import { Grid2 as Grid } from "@mui/material";
+import { Grid2 as Grid } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +24,7 @@ import type { User, Workspace } from '../../../types/models';
 import type { AxiosError } from 'axios';
 import type { CodeResponse } from '@react-oauth/google';
 
-
+const SOCIAL_AUTH_COOLDOWN_MS = 2500;
 
 const StyledCard = styled(Card)(({ theme }) => ({
   background: 'rgba(255, 255, 255, 0.9)',
@@ -70,6 +72,8 @@ const EmployerLogin = () => {
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
   const forgotPasswordHref = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.FORGOT_PASSWORD}`, i18n.language);
   const registerHref = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language);
+  const socialAuthInFlightRef = React.useRef(false);
+  const lastSocialAuthAttemptAtRef = React.useRef(0);
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -173,7 +177,17 @@ const EmployerLogin = () => {
   };
 
   const handleSocialLogin = async (clientId: string, provider: AuthProvider, token: string) => {
+    const now = Date.now();
+    if (
+      socialAuthInFlightRef.current ||
+      now - lastSocialAuthAttemptAtRef.current < SOCIAL_AUTH_COOLDOWN_MS
+    ) {
+      return;
+    }
+
     const redirectUri = (typeof window !== 'undefined' ? window.location.origin : '');
+    lastSocialAuthAttemptAtRef.current = now;
+    socialAuthInFlightRef.current = true;
     setIsFullScreenLoading(true);
 
     try {
@@ -224,6 +238,7 @@ const EmployerLogin = () => {
       }
     } finally {
       setIsFullScreenLoading(false);
+      socialAuthInFlightRef.current = false;
     }
   };
 
@@ -231,7 +246,7 @@ const EmployerLogin = () => {
     const code = result?.code;
 
     if (code) {
-      handleSocialLogin(
+      void handleSocialLogin(
         AUTH_CONFIG.CLIENT_ID || '',
         AUTH_PROVIDER.GOOGLE as AuthProvider,
         code

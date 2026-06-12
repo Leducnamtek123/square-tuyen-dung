@@ -73,7 +73,7 @@ const FileDropzone = ({ accept, onDrop, values, multiple = false }: FileDropzone
 
     >
 
-      <input {...getInputProps()} />
+      <input {...(getInputProps() as any)} />
 
       <Stack
 
@@ -131,13 +131,13 @@ const FileDropzone = ({ accept, onDrop, values, multiple = false }: FileDropzone
 
             >
 
-              Kéo hồ sơ của bạn vào đây
+              KÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©o hÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ sÃƒÆ’Ã¢â‚¬Â Ãƒâ€šÃ‚Â¡ cÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€šÃ‚Â§a bÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¡n vÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â o ÃƒÆ’Ã¢â‚¬Å¾ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢y
 
             </Typography>
 
             <Typography variant="body2" color="text.secondary">
 
-              Hoặc bạn có thể
+              HoÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â·c bÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¡n cÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³ thÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€ Ã¢â‚¬â„¢
 
             </Typography>
 
@@ -169,7 +169,7 @@ const FileDropzone = ({ accept, onDrop, values, multiple = false }: FileDropzone
 
             >
 
-              Chọn hồ sơ từ máy bạn
+              ChÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€šÃ‚Ân hÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ sÃƒÆ’Ã¢â‚¬Â Ãƒâ€šÃ‚Â¡ tÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€šÃ‚Â« mÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡y bÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¡n
 
             </Button>
 
@@ -187,7 +187,7 @@ const FileDropzone = ({ accept, onDrop, values, multiple = false }: FileDropzone
 
             >
 
-              Hỗ trợ định dạng .pdf
+              HÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â trÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€šÃ‚Â£ ÃƒÆ’Ã¢â‚¬Å¾ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹nh dÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¡ng .pdf
 
             </Typography>
 
@@ -233,7 +233,7 @@ const FileDropzone = ({ accept, onDrop, values, multiple = false }: FileDropzone
 
             >
 
-              Đổi tập tin
+              ÃƒÆ’Ã¢â‚¬Å¾Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢i tÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â­p tin
 
             </Button>
 
@@ -257,6 +257,8 @@ interface BasicDropzoneProps<T extends FieldValues = FieldValues> {
   accept?: Accept;
   multiple?: boolean;
 }
+
+const ControllerAny = Controller as unknown as React.ComponentType<any>;
 
 const BasicDropzone = <T extends FieldValues = FieldValues>({
   control,
@@ -299,13 +301,13 @@ const BasicDropzone = <T extends FieldValues = FieldValues>({
 
       <Stack spacing={1} direction="column">
 
-        <Controller
+        <ControllerAny
 
           name={name as Path<T>}
 
           control={control}
 
-          render={({ field, fieldState }) => (
+          render={({ field, fieldState }: any) => (
 
             <>
 

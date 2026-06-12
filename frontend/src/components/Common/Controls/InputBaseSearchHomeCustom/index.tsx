@@ -11,6 +11,7 @@ import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 import { Box, ClickAwayListener, List, ListItem, ListItemIcon, ListItemText, Popper, Stack, Typography, CircularProgress, IconButton, InputAdornment } from '@mui/material';
+const PopperAny = Popper as unknown as React.ComponentType<any>;
 import { useDebounce } from '@/hooks';
 import { searchJobPostWithKeyword } from '@/redux/filterSlice';
 import jobService from '@/services/jobService';
@@ -23,6 +24,7 @@ import {
   writeVersionedJson,
 } from '@/utils/storageKeys';
 import { localizeRoutePath } from '@/configs/routeLocalization';
+const ControllerAny = Controller as any;
 
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
@@ -167,41 +169,41 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
       <div ref={inputSearchRef}>
         <Box
           sx={{
-            minHeight: isHero ? 48 : showSubmitButton ? 54 : 48,
+            minHeight: isHero ? 56 : showSubmitButton ? 54 : 48,
             boxShadow: isHero ? 'none' : '0 10px 26px rgba(26, 64, 125, 0.08)',
-            borderRadius: isHero ? 2 : 999,
+            borderRadius: isHero ? 1 : 999,
             p: isHero ? 0 : '4px',
             display: 'flex',
             alignItems: 'center',
             width: '100%',
-            backgroundColor: isHero ? '#f4f7fb' : theme.palette.mode === 'light' ? 'white' : '#121212',
+            backgroundColor: isHero ? 'transparent' : theme.palette.mode === 'light' ? 'white' : '#121212',
             border: '1px solid',
-            borderColor: isHero ? 'rgba(8, 29, 60, 0.08)' : 'rgba(26, 64, 125, 0.14)',
+            borderColor: isHero ? 'transparent' : 'rgba(26, 64, 125, 0.14)',
             transition: 'border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease',
             '&:focus-within': {
-              borderColor: theme.palette.primary.main,
-              boxShadow: '0 0 0 4px rgba(42, 169, 225, 0.16), 0 16px 34px rgba(26, 64, 125, 0.12)',
+              borderColor: isHero ? 'transparent' : theme.palette.primary.main,
+              boxShadow: isHero ? 'none' : '0 0 0 4px rgba(42, 169, 225, 0.16), 0 16px 34px rgba(26, 64, 125, 0.12)',
             },
           }}
         >
           <Box
             sx={{
               width: isHero ? 44 : 38,
-              height: isHero ? 46 : 38,
+              height: isHero ? 56 : 38,
               display: 'grid',
               placeItems: 'center',
-              borderRadius: isHero ? 2 : '50%',
-              color: isHero ? 'rgba(8, 29, 60, 0.38)' : 'primary.main',
+              borderRadius: isHero ? 1 : '50%',
+              color: isHero ? 'rgba(4, 48, 104, 0.42)' : 'primary.main',
               bgcolor: isHero ? 'transparent' : 'rgba(42, 169, 225, 0.09)',
               flexShrink: 0,
             }}
           >
             <SearchIcon fontSize="small" />
           </Box>
-          <Controller
+          <ControllerAny
             name={name as Path<T>}
             control={control}
-            render={({ field }) => (
+            render={({ field }: any) => (
               <InputBase
                 inputRef={inputRef}
                 id={field.name}
@@ -215,7 +217,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                     fontSize: isHero ? 14 : undefined,
                     py: isHero ? 1.4 : undefined,
                     '&::placeholder': {
-                      color: isHero ? 'rgba(8, 29, 60, 0.42)' : 'text.secondary',
+                      color: isHero ? 'rgba(67, 71, 80, 0.62)' : 'text.secondary',
                       opacity: isHero ? 1 : 0.78,
                     },
                   },
@@ -275,7 +277,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
           )}
         </Box>
 
-        <Popper
+        <PopperAny
           open={state.showResult}
           anchorEl={inputSearchRef.current}
           placement="bottom-start"
@@ -365,7 +367,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
               )}
             </Stack>
           </Box>
-        </Popper>
+        </PopperAny>
       </div>
     </ClickAwayListener>
   );

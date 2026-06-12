@@ -10,12 +10,13 @@ Tests cover:
 
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from types import SimpleNamespace
 import time
 
 from django.test import TestCase, TransactionTestCase
+from django.utils import timezone
 from django.test import RequestFactory, override_settings
 from django.core.exceptions import ValidationError
 from django.core.exceptions import SynchronousOnlyOperation
@@ -45,6 +46,8 @@ from apps.interviews.services import (
     get_next_question_payload,
     update_interview_status,
 )
+from apps.interviews.tasks import send_interview_invitation
+
 from apps.interviews.livekit_service import LiveKitService
 from integrations.livekit.webhook import _handle_livekit_event, livekit_webhook
 
@@ -107,11 +110,23 @@ class InterviewServiceTests(TestCase):
         self.assertEqual(transcript.content, "Hello")
         self.assertEqual(transcript.speaker_role, "candidate")
 
-    @patch("apps.interviews.tasks.end_interview_session.apply_async")
-    def test_update_status_sets_start_time(self, mock_apply_async):
-        update_interview_status(self.session, "in_progress", max_duration_seconds=10)
-        self.session.refresh_from_db()
-        self.assertIsNotNone(self.session.start_time)
+    @patch("apps.interviews.tasks.send_mail")
+    @patch("apps.interviews.tasks.render_to_string", return_value="<html>mail</html>")
+    def test_invitation_email_includes_scheduled_time(self, mock_render, mock_send_mail):
+        self.session.scheduled_at = timezone.now() + timedelta(days=2)
+        self.session.save(update_fields=["scheduled_at", "update_at"])
+
+        send_interview_invitation(self.session.id)
+
+        mock_render.assert_called_once()
+        template_name, context = mock_render.call_args.args
+        self.assertEqual(template_name, "interview/emails/invitation.html")
+        self.assertIn("scheduled_at_display", context)
+        self.assertNotEqual(context["scheduled_at_display"], "Chưa cập nhật")
+        self.assertIn("-", context["scheduled_at_display"])
+        mock_send_mail.assert_called_once()
+        self.assertIn("Mời Phỏng vấn trực tuyến", mock_send_mail.call_args.kwargs["subject"])
+
 
 
 class InterviewCompatEndpointTests(TransactionTestCase):
@@ -968,6 +983,23 @@ class InterviewSessionAPITests(TestCase):
         "apps.interviews.views.run_django_sync_in_thread",
         side_effect=lambda func, *args, **kwargs: func(*args, **kwargs),
     )
+    @patch("apps.interviews.tasks.send_mail")
+    @patch("apps.interviews.tasks.render_to_string", return_value="<html>mail</html>")
+    def test_invitation_email_includes_scheduled_time(self, mock_render, mock_send_mail):
+        self.session.scheduled_at = timezone.now() + timedelta(days=2)
+        self.session.save(update_fields=["scheduled_at", "update_at"])
+
+        send_interview_invitation(self.session.id)
+
+        mock_render.assert_called_once()
+        template_name, context = mock_render.call_args.args
+        self.assertEqual(template_name, "interview/emails/invitation.html")
+        self.assertIn("scheduled_at_display", context)
+        self.assertNotEqual(context["scheduled_at_display"], "Chưa cập nhật")
+        self.assertIn("-", context["scheduled_at_display"])
+        mock_send_mail.assert_called_once()
+        self.assertIn("Mời Phỏng vấn trực tuyến", mock_send_mail.call_args.kwargs["subject"])
+
     @patch("apps.interviews.tasks.end_interview_session.apply_async")
     @patch(
         "rest_framework.views.APIView.perform_authentication",

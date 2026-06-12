@@ -1,13 +1,11 @@
 'use client';
 import React from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from 'yup';
 import { Box } from '@mui/material';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useTranslation } from 'react-i18next';
-import useDebounce from '../../../../hooks/useDebounce';
-import authService from '../../../../services/authService';
 import type { RoleName } from '../../../../types/auth';
 import type { CodeResponse } from '@react-oauth/google';
 import JobSeekerSignUpFormFields from './JobSeekerSignUpFormFields';
@@ -74,53 +72,12 @@ const JobSeekerSignUpForm = ({
     resolver: typedYupResolver(schema),
   });
 
-  const email = useWatch({ control, name: 'email' });
-  const emailDebounce = useDebounce(email, 500);
-  const emailExistsErrorRef = React.useRef(false);
-
   React.useEffect(() => {
     for (const err in serverErrors) {
       setError(err as keyof JobSeekerSignUpFormData, { type: 'manual', message: serverErrors[err]?.join(' ') });
     }
   }, [serverErrors, setError]);
 
-  React.useEffect(() => {
-    const normalizedEmail = String(emailDebounce || '').trim();
-    if (!normalizedEmail || !normalizedEmail.includes('@')) {
-      if (emailExistsErrorRef.current) {
-        clearErrors('email');
-        emailExistsErrorRef.current = false;
-      }
-      return;
-    }
-
-    const checkEmail = async () => {
-      try {
-        if (checkCreds) {
-          const canContinue = await checkCreds(normalizedEmail, 'JOB_SEEKER' as RoleName);
-          if (canContinue) {
-            return;
-          }
-        }
-
-        const resData = (await authService.emailExists(normalizedEmail)) as { exists: boolean };
-        if (resData?.exists === true) {
-          setError('email', {
-            type: 'manual',
-            message: t('validation.emailExists'),
-          });
-          emailExistsErrorRef.current = true;
-        } else if (emailExistsErrorRef.current) {
-          clearErrors('email');
-          emailExistsErrorRef.current = false;
-        }
-      } catch {
-        // ignore email existence errors
-      }
-    };
-
-    checkEmail();
-  }, [emailDebounce, clearErrors, setError, t, checkCreds]);
 
   const googleRegister = useGoogleLogin({
     onSuccess: onGoogleRegister,
@@ -133,6 +90,7 @@ const JobSeekerSignUpForm = ({
     <Box
       component="form"
       onSubmit={handleSubmit(onRegister)}
+
       sx={{
         width: '100%',
         '& .MuiTextField-root': {

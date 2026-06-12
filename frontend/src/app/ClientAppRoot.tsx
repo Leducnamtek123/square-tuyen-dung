@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { getUserInfo, removeUserInfo } from "../redux/userSlice";
 import { useConfig } from "@/hooks/useConfig";
 import { toast, ToastContainer, Bounce } from "react-toastify";
+const ToastContainerAny = ToastContainer as unknown as React.ComponentType<any>;
 import "react-toastify/dist/ReactToastify.css";
 import ChatBot from "../components/Features/ChatBot";
 import ScrollToTop from "../components/Common/ScrollToTop";
@@ -26,7 +27,7 @@ import {
   type MaintenanceModeDetail,
 } from "../utils/maintenanceMode";
 
-export default function ClientAppRoot({ children }: { children: React.ReactNode }) {
+export default function ClientAppRoot({ children }: { children: any }) {
   const { t } = useTranslation('common');
   const hasMounted = React.useSyncExternalStore(
     () => () => {},
@@ -64,6 +65,14 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     '/nha-tuyen-dung/bao-gia',
     '/employer/support',
     '/nha-tuyen-dung/ho-tro',
+    '/employer/contact',
+    '/nha-tuyen-dung/lien-he',
+    '/employer/faq',
+    '/nha-tuyen-dung/cau-hoi-thuong-gap',
+    '/employer/terms-of-service',
+    '/nha-tuyen-dung/dieu-khoan-dich-vu',
+    '/employer/privacy-policy',
+    '/nha-tuyen-dung/chinh-sach-bao-mat',
   ];
   const isEmployerPath = pathname.startsWith('/employer') || pathname.startsWith('/nha-tuyen-dung');
   const isEmployerPublicPath = employerPublicPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
@@ -187,7 +196,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     <ErrorBoundary>
       <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
           {children}
-          <ToastContainer autoClose={1300} transition={Bounce} position="top-right" theme="colored" />
+          <ToastContainerAny autoClose={1300} transition={Bounce} position="top-right" theme="colored" />
           {canShowChatBot && <ChatBot />}
       </GoogleOAuthProvider>
       <ScrollToTop />

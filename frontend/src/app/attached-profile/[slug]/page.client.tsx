@@ -1,12 +1,7 @@
 'use client';
 
 import DefaultLayout from '@/layouts/DefaultLayout';
-import dynamic from 'next/dynamic';
-
-const AttachedProfilePage = dynamic(
-  () => import('@/views/jobSeekerPages/AttachedProfilePage'),
-  { ssr: false }
-);
+import AttachedProfilePage from '@/views/jobSeekerPages/AttachedProfilePage';
 
 export default function AttachedProfilePageClient() {
   return (

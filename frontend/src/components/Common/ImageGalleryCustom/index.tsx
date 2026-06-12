@@ -2,6 +2,7 @@ import React from 'react';
 import 'react-image-gallery/styles/css/image-gallery.css';
 // @ts-ignore
 import ImageGallery from 'react-image-gallery';
+const ImageGalleryAny: any = ImageGallery;
 
 interface ImageGalleryCustomProps {
   images: { original: string; thumbnail?: string }[];
@@ -11,7 +12,7 @@ const ImageGalleryCustom = ({ images }: ImageGalleryCustomProps) => {
   if (!images || images.length === 0) return null;
 
   return (
-    <ImageGallery
+    <ImageGalleryAny
       items={images}
       showPlayButton={false}
       showFullscreenButton={true}

@@ -20,7 +20,7 @@ interface InterviewInfoCardProps {
 type InfoRowProps = {
   icon: React.ReactNode;
   label: React.ReactNode;
-  children: React.ReactNode;
+  children: any;
 };
 
 const InfoRow = ({ icon, label, children }: InfoRowProps) => (

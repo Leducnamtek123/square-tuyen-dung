@@ -1,29 +1,29 @@
- 'use client';
+﻿'use client';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Pagination, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Box } from "@mui/material";
-import { useTranslation } from "react-i18next";
+import { Box } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import FeedbackCard from '@/components/Features/FeedbackCard';
 import contentService from '@/services/contentService';
 import NoDataCard from '@/components/Common/NoDataCard';
 import type { Feedback } from '@/types/models';
 
 const styles = {
-  ".swiper-pagination": {
-    bottom: "-5px !important",
+  '.swiper-pagination': {
+    bottom: '-5px !important',
   },
-  ".swiper-wrapper": {
-    paddingBottom: "30px",
+  '.swiper-wrapper': {
+    paddingBottom: '30px',
   },
-  ".swiper-pagination-bullet": {
+  '.swiper-pagination-bullet': {
     width: 15,
     height: 15,
     opacity: 0.5,
-    backgroundColor: "#8b6bd4",
+    backgroundColor: '#8b6bd4',
   },
-  ".swiper-pagination-bullet-active": {
+  '.swiper-pagination-bullet-active': {
     width: 15,
     height: 15,
     opacity: 1,
@@ -38,7 +38,7 @@ const FeedbackCarousel = () => {
   const { data: feedbacks = [], isLoading } = useQuery({
     queryKey: ['feedbacks'],
     queryFn: () => contentService.getFeedbacks(),
-    staleTime: 10 * 60_000, // feedbacks change rarely, cache 10 min
+    staleTime: 10 * 60_000,
   });
 
   React.useEffect(() => {
@@ -60,9 +60,7 @@ const FeedbackCarousel = () => {
           <Swiper
             slidesPerView={col}
             spaceBetween={30}
-            pagination={{
-              clickable: true,
-            }}
+            pagination={{ clickable: true }}
             autoplay={{
               delay: 2500,
               disableOnInteraction: true,
@@ -76,14 +74,12 @@ const FeedbackCarousel = () => {
             ))}
           </Swiper>
         ) : feedbacks.length === 0 ? (
-          <NoDataCard title={t("home.noFeedbacks")} />
+          <NoDataCard title={t('home.noFeedbacks')} />
         ) : (
           <Swiper
             slidesPerView={col}
             spaceBetween={30}
-            pagination={{
-              clickable: true,
-            }}
+            pagination={{ clickable: true }}
             autoplay={{
               delay: 2500,
               disableOnInteraction: true,
@@ -93,6 +89,7 @@ const FeedbackCarousel = () => {
             {feedbacks.map((value: Feedback) => (
               <SwiperSlide key={value.id}>
                 <FeedbackCard
+                  id={value.id}
                   avatarUrl={value?.userDict?.avatarUrl}
                   fullName={value?.userDict?.fullName}
                   content={value?.content}
@@ -107,5 +104,3 @@ const FeedbackCarousel = () => {
 };
 
 export default FeedbackCarousel;
-
-

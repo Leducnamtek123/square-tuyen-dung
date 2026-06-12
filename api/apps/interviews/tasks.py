@@ -203,12 +203,16 @@ def send_interview_invitation(session_id):
 
         web_url = config("WEB_CLIENT_URL", default="http://localhost:3002")
         interview_url = f"{web_url}/phong-van/{session.invite_token}"
+        scheduled_at_display = "Chưa cập nhật"
+        if session.scheduled_at:
+            scheduled_at_display = tz.localtime(session.scheduled_at).strftime("%H:%M - %d/%m/%Y")
 
         context = {
             "candidate_name": candidate.full_name,
             "job_title": session.job_post.job_name if session.job_post else "Vị trí tuyển dụng",
             "interview_url": interview_url,
             "invite_token": session.invite_token,
+            "scheduled_at_display": scheduled_at_display,
         }
 
         html_message = render_to_string("interview/emails/invitation.html", context)
@@ -225,7 +229,6 @@ def send_interview_invitation(session_id):
         logger.info("Invitation email sent to %s for session %s", candidate.email, session_id)
     except Exception as e:
         logger.error("Error sending invitation email for session %s: %s", session_id, e)
-
 
 @shared_task
 def send_evaluation_report(session_id):

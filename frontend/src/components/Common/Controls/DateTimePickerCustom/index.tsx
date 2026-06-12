@@ -14,6 +14,7 @@ import { Typography, Box, SxProps, Theme } from "@mui/material";
 
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import type { Dayjs } from 'dayjs';
+const ControllerAny = Controller as any;
 
 const EMPTY_SX: SxProps<Theme> = {};
 
@@ -67,7 +68,7 @@ const DateTimePickerCustom = <T extends FieldValues = FieldValues>({
 
                 )}
 
-                <Controller
+                <ControllerAny
 
                     name={name as Path<T>}
 
@@ -75,7 +76,7 @@ const DateTimePickerCustom = <T extends FieldValues = FieldValues>({
 
                     rules={rules}
 
-                    render={({ field, fieldState }) => (
+                    render={({ field, fieldState }: any) => (
 
                         <>
 

@@ -16,7 +16,7 @@ interface CompanyActionProps {
   createAt: string;
   resume: Partial<Resume> | null;
   company: Partial<Company> | null;
-  children: React.ReactNode;
+  children: any;
 }
 
 
@@ -243,7 +243,7 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 interface CompanyActionFollowProps {
   id: string | number;
   company: Partial<Company> | null;
-  children: React.ReactNode;
+  children: any;
 }
 
 import CompanyActionFollow from './CompanyActionFollow';

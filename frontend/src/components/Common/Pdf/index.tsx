@@ -1,5 +1,6 @@
 import React from 'react';
 import { Viewer, Worker, SpecialZoomLevel } from '@react-pdf-viewer/core';
+const ViewerAny: any = Viewer;
 import { getFilePlugin } from '@react-pdf-viewer/get-file';
 import { zoomPlugin } from '@react-pdf-viewer/zoom';
 import Button from '@mui/material/Button';
@@ -10,6 +11,8 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useTranslation } from 'react-i18next';
 import toSlug from '@/utils/customData';
 import type { SxProps, Theme } from '@mui/material/styles';
+
+const WorkerAny: any = Worker;
 
 interface PdfProps {
   fileUrl: string;
@@ -33,10 +36,14 @@ const Pdf = ({ fileUrl, title = '', containerSx, toolbarSx, viewerSx }: PdfProps
   });
 
   const { Download } = getFilePluginInstance;
+  const DownloadAny = Download as any;
   const { ZoomIn, ZoomOut, Zoom } = zoomPluginInstance;
+  const ZoomInAny = ZoomIn as any;
+  const ZoomOutAny = ZoomOut as any;
+  const ZoomAny = Zoom as any;
 
   return (
-    <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+    <WorkerAny workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
       <Stack
         spacing={0}
         sx={mergeSx(
@@ -60,15 +67,15 @@ const Pdf = ({ fileUrl, title = '', containerSx, toolbarSx, viewerSx }: PdfProps
             justifyContent={{ xs: 'center', sm: 'flex-start' }}
             spacing={0.5}
           >
-            <ZoomOut>
+            <ZoomOutAny>
               {(props: { onClick: () => void }) => (
                 <IconButton aria-label={t('actions.zoomOut')} color="warning" onClick={props.onClick}>
                   <ZoomOutOutlinedIcon />
                 </IconButton>
               )}
-            </ZoomOut>
+            </ZoomOutAny>
 
-            <Zoom>
+            <ZoomAny>
               {(props: { onZoom: (scale: number | SpecialZoomLevel) => void }) => (
                 <Chip
                   sx={{ color: 'white', maxWidth: 130 }}
@@ -78,19 +85,19 @@ const Pdf = ({ fileUrl, title = '', containerSx, toolbarSx, viewerSx }: PdfProps
                   color="warning"
                 />
               )}
-            </Zoom>
+            </ZoomAny>
 
-            <ZoomIn>
+            <ZoomInAny>
               {(props: { onClick: () => void }) => (
                 <IconButton aria-label={t('actions.zoomIn')} color="warning" onClick={props.onClick}>
                   <ZoomInOutlinedIcon />
                 </IconButton>
               )}
-            </ZoomIn>
+            </ZoomInAny>
           </Stack>
 
           <Stack direction="row" justifyContent={{ xs: 'center', sm: 'flex-end' }}>
-            <Download>
+            <DownloadAny>
               {(props: { onClick: () => void }) => (
                 <Button
                   sx={{
@@ -111,7 +118,7 @@ const Pdf = ({ fileUrl, title = '', containerSx, toolbarSx, viewerSx }: PdfProps
                   {t('actions.download')}
                 </Button>
               )}
-            </Download>
+            </DownloadAny>
           </Stack>
         </Stack>
 
@@ -126,14 +133,14 @@ const Pdf = ({ fileUrl, title = '', containerSx, toolbarSx, viewerSx }: PdfProps
             viewerSx
           )}
         >
-          <Viewer
+          <ViewerAny
             fileUrl={fileUrl}
             plugins={[zoomPluginInstance, getFilePluginInstance]}
             defaultScale={SpecialZoomLevel.PageFit}
           />
         </Box>
       </Stack>
-    </Worker>
+    </WorkerAny>
   );
 };
 

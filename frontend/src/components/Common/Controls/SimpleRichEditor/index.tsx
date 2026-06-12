@@ -1,6 +1,6 @@
 'use client';
 /**
- * SimpleRichEditor — standalone wrapper around react-draft-wysiwyg
+ * SimpleRichEditor â€” standalone wrapper around react-draft-wysiwyg
  * that accepts value (HTML string) / onChange (HTML string).
  * Used by Admin article form and Employer blog form.
  */
@@ -9,22 +9,17 @@ import dynamic from 'next/dynamic';
 import { Box, CircularProgress } from '@mui/material';
 import { createEditorStateFromHTMLString, convertEditorStateToHTMLString } from '@/utils/editorUtils';
 import commonService from '@/services/commonService';
-import type { EditorProps } from 'react-draft-wysiwyg';
 
 type DraftJsModule = typeof import('draft-js');
 type EditorState = import('draft-js').EditorState;
 
 const loadDraftJs = () => import('draft-js') as Promise<DraftJsModule>;
 
-const DraftEditor = dynamic(
-  async () => {
-    const mod = await import('react-draft-wysiwyg');
-    const Editor = mod.Editor || (mod as unknown as { default?: { Editor?: React.ComponentType<EditorProps> } | React.ComponentType<EditorProps> }).default || mod;
-    return Editor as React.ComponentType<EditorProps>;
-  },
-  { ssr: false }
-);
-
+const DraftEditor: any = dynamic((async () => {
+  const mod: any = await import('react-draft-wysiwyg');
+  const Editor: any = mod.Editor || mod.default || mod;
+  return { default: Editor };
+}) as any, { ssr: false }) as any;
 interface SimpleRichEditorProps {
   value: string;
   onChange: (html: string) => void;

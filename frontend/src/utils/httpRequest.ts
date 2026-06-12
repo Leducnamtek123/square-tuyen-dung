@@ -65,6 +65,35 @@ export const refreshClient = axios.create({
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
+const extractApiErrorLogMessage = (data: unknown): string | null => {
+  if (!isRecord(data)) return null;
+
+  const error = data.error;
+  if (isRecord(error)) {
+    const details = error.details;
+    if (isRecord(details)) {
+      const errorMessage = details.errorMessage;
+      if (Array.isArray(errorMessage)) {
+        const message = errorMessage.map((item) => String(item).trim()).filter(Boolean).join(' ');
+        if (message) return message;
+      }
+      if (typeof errorMessage === 'string' && errorMessage.trim()) {
+        return errorMessage.trim();
+      }
+    }
+
+    if (typeof error.message === 'string' && error.message.trim()) {
+      return error.message.trim();
+    }
+  }
+
+  if (typeof data.message === 'string' && data.message.trim()) {
+    return data.message.trim();
+  }
+
+  return null;
+};
+
 const unwrapEnvelopeData = (payload: unknown) =>
   isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, 'data')
     ? payload.data
@@ -178,7 +207,7 @@ httpRequest.interceptors.request.use(
 
     // NOTE: Do NOT auto-convert to snake_case here.
     // The Django backend serializers use camelCase field names with explicit
-    // source= mappings (e.g. companyName → source="company_name").
+    // source= mappings (e.g. companyName â†’ source="company_name").
     // Converting to snake_case breaks the API (400 Bad Request).
 
     const accessToken = tokenService.getAccessTokenFromCookie();
@@ -200,7 +229,7 @@ httpRequest.interceptors.response.use(
     // Return payload directly; fall back to raw response for legacy endpoints.
     const payload = unwrapEnvelopeData(response.data);
 
-    // Auto-transform snake_case keys → camelCase
+    // Auto-transform snake_case keys â†’ camelCase
     return camelizeKeys(payload);
   },
 

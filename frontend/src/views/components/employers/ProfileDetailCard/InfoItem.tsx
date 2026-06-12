@@ -38,7 +38,7 @@ const InfoItem: React.FC<InfoItemProps> = ({ label, value, icon }) => {
               '& svg': { fontSize: 18 },
             }}
           >
-            {React.cloneElement(icon as React.ReactElement, { sx: { fontSize: 18 } })}
+            {React.cloneElement(icon as React.ReactElement, { sx: { fontSize: 18 } } as Record<string, unknown>)}
           </Box>
         )}
         <Box sx={{ minWidth: 0 }}>

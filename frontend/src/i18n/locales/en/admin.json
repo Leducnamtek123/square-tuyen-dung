@@ -766,6 +766,8 @@
         "scheduleInterview": "Schedule Interview",
         "blockAccount": "Block account",
         "unblockAccount": "Unblock account",
+        "delete": "Delete",
+        "delete": "Delete",
         "noUsers": "No users found"
       },
       "filter": {
@@ -808,6 +810,10 @@
         "role": "Role",
         "allRoles": "All"
       },
+      "deleteTitle": "Confirm Delete User",
+      "deleteConfirm": "Are you sure you want to delete user <strong>{{name}}</strong>? This action cannot be undone.",
+      "deleteBtn": "Delete",
+      "cancel": "Cancel",
       "title": "User Management",
       "breadcrumbAdmin": "Admin",
       "breadcrumbList": "List"

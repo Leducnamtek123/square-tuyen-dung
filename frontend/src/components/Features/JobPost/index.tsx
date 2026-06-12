@@ -42,7 +42,7 @@ const MetaItem = ({
   children,
 }: {
   icon: React.ReactNode;
-  children: React.ReactNode;
+  children: any;
 }) => (
   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: 'text.secondary', minWidth: 0 }}>
     <Box component="span" sx={{ display: 'inline-flex', flexShrink: 0 }}>
@@ -275,3 +275,4 @@ const Loading = () => (
 const MemoizedJobPost = Object.assign(React.memo(JobPost), { Loading });
 
 export default MemoizedJobPost;
+

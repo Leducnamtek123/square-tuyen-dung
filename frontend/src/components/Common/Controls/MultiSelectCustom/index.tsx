@@ -16,6 +16,7 @@ import { Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import ValidationError from '../ValidationError';
 import type { SelectOption } from '@/types/models';
+const ControllerAny = Controller as any;
 
 const EMPTY_OPTIONS: SelectOption[] = [];
 interface Props<T extends FieldValues = FieldValues> {
@@ -63,13 +64,13 @@ const MultiSelectCustom = <T extends FieldValues = FieldValues>({
 
       )}
 
-      <Controller
+      <ControllerAny
 
         name={name as Path<T>}
 
         control={control}
 
-        render={({ field, fieldState }) => (
+        render={({ field, fieldState }: any) => (
 
           <>
 
@@ -107,7 +108,7 @@ const MultiSelectCustom = <T extends FieldValues = FieldValues>({
 
               renderOption={(props, option, { selected }) => (
 
-                <li {...props}>
+                <li {...(props as any)}>
 
                   <Checkbox
 

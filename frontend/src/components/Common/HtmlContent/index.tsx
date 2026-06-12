@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import Image from 'next/image';
+const ImageAny = Image as unknown as React.ComponentType<any>;
 
 type Props = {
   html: string;
@@ -63,7 +64,7 @@ const renderNode = (node: Node, key: string): React.ReactNode => {
       if (!src) return null;
 
       return (
-        <Image
+        <ImageAny
           key={key}
           src={src}
           alt={element.getAttribute('alt') || ''}

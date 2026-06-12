@@ -8,6 +8,7 @@ import React from 'react';
 import {
   EmailIcon as ShareEmailIcon,
 } from 'react-share';
+const ShareEmailIconAny: any = ShareEmailIcon;
 import XIconMui from '@mui/icons-material/X';
 import { Box } from '@mui/material';
 import { ICONS } from '@/configs/constants';
@@ -67,7 +68,7 @@ export const XIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
 );
 
 export const EmailIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
-  <ShareEmailIcon
+  <ShareEmailIconAny
     size={size}
     round
     bgStyle={{ fill: '#EA4335' }}

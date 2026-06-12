@@ -6,7 +6,6 @@ import { Autoplay } from 'swiper/modules';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
-  Chip,
   Skeleton,
   Stack,
   Typography,
@@ -16,29 +15,8 @@ import contentService from '../../../../services/contentService';
 import { BANNER_TYPES, IMAGES } from '../../../../configs/constants';
 import type { Banner } from '../../../../types/models';
 
-const styles = {
-  '.swiper-pagination-bullet': {
-    width: 10,
-    height: 10,
-    opacity: 0.5,
-    backgroundColor: '#2aa9e1',
-  },
-  '.swiper-pagination-bullet-active': {
-    width: 22,
-    height: 10,
-    opacity: 1,
-    borderRadius: 999,
-    backgroundColor: '#1a407d',
-  },
-};
-
-const HERO_FRAME_MAX_WIDTH = { xs: 340, sm: 1216, md: 1376, lg: 1440 };
-
-const heroFrameSx = {
-  width: '100%',
-  maxWidth: HERO_FRAME_MAX_WIDTH,
-  mx: 'auto',
-};
+const HERO_CONTAINER_MAX_WIDTH = 1280;
+const HERO_HEADER_OFFSET = { xs: '56px', sm: '64px' };
 
 const RenderItem = ({ item }: { item: Banner }) => {
   const imageUrl = item.imageUrl || IMAGES.coverImageDefault;
@@ -51,9 +29,7 @@ const RenderItem = ({ item }: { item: Banner }) => {
         height: '100%',
         position: 'relative',
         overflow: 'hidden',
-        borderRadius: 1.5,
-        bgcolor: '#071832',
-        boxShadow: '0 18px 44px rgba(15, 57, 127, 0.14)',
+        bgcolor: '#043068',
       }}
     >
       <Box
@@ -87,10 +63,7 @@ const RenderItem = ({ item }: { item: Banner }) => {
         sx={{
           position: 'absolute',
           inset: 0,
-          background: [
-            'linear-gradient(90deg, rgba(4, 22, 49, 0.88) 0%, rgba(4, 22, 49, 0.72) 38%, rgba(4, 22, 49, 0.20) 72%, rgba(4, 22, 49, 0.08) 100%)',
-            'linear-gradient(180deg, rgba(4, 22, 49, 0.28) 0%, rgba(4, 22, 49, 0.12) 44%, rgba(4, 22, 49, 0.36) 100%)',
-          ].join(', '),
+          background: 'linear-gradient(90deg, rgba(4, 48, 104, 0.95) 0%, rgba(4, 48, 104, 0.68) 48%, rgba(4, 48, 104, 0.08) 100%)',
           pointerEvents: 'none',
         }}
       />
@@ -118,19 +91,27 @@ const TopSlide = () => {
   }, []);
 
   return (
-    <Box>
-      <Box sx={heroFrameSx}>
+    <Box
+      sx={{
+        width: '100vw',
+        mx: 'calc(50% - 50vw)',
+        bgcolor: '#043068',
+        fontFamily: "'Plus Jakarta Sans', var(--font-be-vietnam-pro), sans-serif",
+      }}
+    >
         <Box
           sx={{
-            height: { xs: 700, sm: 560, md: 500, lg: 540 },
+            height: {
+              xs: `calc(100svh - ${HERO_HEADER_OFFSET.xs})`,
+              sm: `calc(100svh - ${HERO_HEADER_OFFSET.sm})`,
+            },
+            minHeight: { xs: 560, md: 650 },
             position: 'relative',
             overflow: 'hidden',
-            borderRadius: { xs: 1.5, md: 1.5 },
-            bgcolor: '#071832',
-            boxShadow: '0 26px 70px rgba(4, 22, 49, 0.22)',
+            bgcolor: '#043068',
           }}
         >
-          <Box sx={{ ...styles, height: '100%', '& .swiper-pagination': { display: 'none' } }}>
+          <Box sx={{ height: '100%', '& .swiper-pagination': { display: 'none' } }}>
             <Swiper
               spaceBetween={30}
               preventClicks={false}
@@ -149,7 +130,7 @@ const TopSlide = () => {
                     variant="rectangular"
                     width="100%"
                     height="100%"
-                    sx={{ borderRadius: 1.5, display: 'block', transform: 'none' }}
+                    sx={{ display: 'block', transform: 'none' }}
                   />
                 </SwiperSlide>
               ) : banners.length > 0 ? (
@@ -162,18 +143,7 @@ const TopSlide = () => {
                 })
               ) : (
                 <SwiperSlide>
-                  <Box
-                    component="img"
-                    src={IMAGES.coverImageDefault}
-                    alt="Banner"
-                    sx={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      borderRadius: 1.5,
-                      display: 'block',
-                    }}
-                  />
+                  <RenderItem item={{ id: 0, imageUrl: IMAGES.coverImageDefault, description: 'Banner' } as Banner} />
                 </SwiperSlide>
               )}
             </Swiper>
@@ -185,46 +155,62 @@ const TopSlide = () => {
               inset: 0,
               zIndex: 1,
               display: 'flex',
-              alignItems: 'center',
-              px: { xs: 2.5, sm: 4, md: 5, lg: 6 },
-              py: { xs: 4, md: 5 },
+              alignItems: 'flex-start',
               pointerEvents: 'none',
             }}
           >
             <Stack
-              spacing={{ xs: 2, md: 2.3 }}
+              spacing={{ xs: 2, md: 2.6 }}
               sx={{
                 width: '100%',
-                maxWidth: { xs: '100%', md: 880 },
+                maxWidth: HERO_CONTAINER_MAX_WIDTH,
+                mx: 'auto',
+                px: { xs: 3, sm: 4, md: 8, lg: 10 },
+                pt: { xs: 5, sm: 7, md: 9, lg: 10 },
                 pointerEvents: 'auto',
               }}
             >
-              <Chip
-                label={t('home.heroEyebrow')}
+              <Box
                 sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 1,
                   width: 'fit-content',
-                  height: 24,
-                  px: 0.25,
-                  bgcolor: 'rgba(255,255,255,0.18)',
-                  color: 'rgba(255,255,255,0.92)',
-                  border: '1px solid rgba(255,255,255,0.20)',
+                  px: 1.35,
+                  py: 0.55,
+                  borderRadius: 999,
+                  bgcolor: 'rgba(255,255,255,0.10)',
+                  color: '#fff',
                   fontWeight: 800,
                   fontSize: 10,
-                  letterSpacing: '0.02em',
+                  letterSpacing: '0.08em',
                   textTransform: 'uppercase',
+                  backdropFilter: 'blur(8px)',
                 }}
-              />
+              >
+                <Box
+                  component="span"
+                  sx={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    bgcolor: '#0058be',
+                    display: 'inline-block',
+                  }}
+                />
+                {t('home.heroEyebrow')}
+              </Box>
               <Typography
                 variant="h3"
                 component="h1"
                 sx={{
-                  maxWidth: 700,
-                  fontWeight: 500,
-                  lineHeight: 0.98,
+                  maxWidth: 820,
+                  fontWeight: 800,
+                  lineHeight: 1.08,
                   letterSpacing: 0,
                   color: '#fff',
-                  textShadow: '0 8px 28px rgba(0,0,0,0.22)',
-                  fontSize: { xs: '2.4rem', sm: '3.35rem', md: '4rem', lg: '4.35rem' },
+                  textShadow: '0 10px 30px rgba(0,0,0,0.24)',
+                  fontSize: { xs: '2.45rem', sm: '3.4rem', md: '4rem', lg: '4.5rem' },
                 }}
               >
                 {t('home.heroTitle')}
@@ -232,22 +218,21 @@ const TopSlide = () => {
               <Typography
                 variant="body1"
                 sx={{
-                  maxWidth: { xs: '100%', md: 640 },
-                  color: 'rgba(255,255,255,0.9)',
-                  fontSize: { xs: '0.98rem', md: '1.05rem' },
-                  lineHeight: 1.55,
+                  maxWidth: { xs: '100%', md: 720 },
+                  color: 'rgba(255,255,255,0.82)',
+                  fontSize: { xs: '1rem', md: '1.18rem' },
+                  lineHeight: 1.62,
                   textShadow: '0 4px 18px rgba(0,0,0,0.22)',
                 }}
               >
                 {t('home.heroDescription')}
               </Typography>
-              <Box sx={{ width: '100%', maxWidth: { xs: '100%', md: 900 }, pt: { xs: 1, md: 1.5 } }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: '100%', md: 900 }, pt: { xs: 1.5, md: 2 } }}>
                 <HomeSearch variant="hero" />
               </Box>
             </Stack>
           </Box>
         </Box>
-      </Box>
     </Box>
   );
 };

@@ -39,7 +39,7 @@ type ChartItem = {
 
 type DashboardPanelProps = {
     title: string;
-    children: React.ReactNode;
+    children: any;
     accentColor?: string;
     action?: React.ReactNode;
 };

@@ -85,7 +85,7 @@ const Loading = () => {
 const TopCompanyCarousel = () => {
   const { i18n, t } = useTranslation('common');
   const [parentWidth, setParentWidth] = React.useState(0);
-  const col = parentWidth < 600 ? 2 : parentWidth < 900 ? 3 : parentWidth < 1200 ? 4 : 5;
+  const col = parentWidth < 600 ? 1 : parentWidth < 900 ? 2 : parentWidth < 1200 ? 3 : 4;
 
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['top-companies'],
@@ -146,11 +146,11 @@ const TopCompanyCarousel = () => {
                       mb: 0.5,
                       mt: 1,
                       cursor: 'pointer',
-                      minHeight: 220,
-                      borderRadius: 3,
+                      minHeight: 260,
+                      borderRadius: 2,
                       transition: 'all 0.3s ease',
                       border: '1px solid',
-                      borderColor: 'grey.200',
+                      borderColor: 'rgba(196, 198, 209, 0.55)',
                       bgcolor: 'background.paper',
                       display: 'flex',
                       flexDirection: 'column',
@@ -158,7 +158,7 @@ const TopCompanyCarousel = () => {
                       textDecoration: 'none',
                       '&:hover': {
                         transform: 'translateY(-4px)',
-                        boxShadow: (theme: Theme & { customShadows?: { medium?: string } }) => theme.customShadows?.medium || 'none',
+                        boxShadow: '0 18px 34px rgba(4, 48, 104, 0.14)',
                         borderColor: 'primary.main',
                         '& .company-name': {
                           color: 'primary.main',

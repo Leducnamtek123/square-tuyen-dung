@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 
@@ -6,6 +6,8 @@ import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import { Checkbox, FormControlLabel } from "@mui/material";
 import ValidationError from '../ValidationError';
+
+const ControllerAny = Controller as any;
 
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
@@ -20,13 +22,13 @@ const CheckboxCustom = <T extends FieldValues = FieldValues>({ name, control, ti
 
     <div>
 
-      <Controller
+      <ControllerAny
 
         name={name as Path<T>}
 
         control={control}
 
-        render={({ field, fieldState }) => (
+        render={({ field, fieldState }: any) => (
 
           <>
 

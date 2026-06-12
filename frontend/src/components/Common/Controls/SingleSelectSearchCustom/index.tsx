@@ -6,10 +6,12 @@ import { useTheme } from '@mui/material/styles';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import { useTranslation } from 'react-i18next';
 import type { SelectOption } from '@/types/models';
+const ControllerAny = Controller as any;
 
 const EMPTY_OPTIONS: SelectOption[] = [];
 
@@ -23,6 +25,7 @@ interface Props<T extends FieldValues = FieldValues> {
   options?: SelectOption[];
   noOptionsText?: string;
   variant?: 'default' | 'hero';
+  startIcon?: React.ReactNode;
 }
 
 const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
@@ -32,6 +35,7 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
   options = EMPTY_OPTIONS,
   noOptionsText,
   variant = 'default',
+  startIcon,
 }: Props<T>) => {
 
   const theme = useTheme();
@@ -40,13 +44,13 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
 
   return (
 
-    <Controller
+    <ControllerAny
 
       name={name as Path<T>}
 
       control={control}
 
-      render={({ field }) => (
+      render={({ field }: any) => (
 
         <Autocomplete
 
@@ -81,28 +85,44 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
               size="small"
 
               placeholder={placeholder}
+              slotProps={{
+                input: {
+                  ...params.InputProps,
+                  startAdornment: startIcon ? (
+                    <InputAdornment
+                      position="start"
+                      sx={{
+                        color: isHero ? 'rgba(4, 48, 104, 0.42)' : 'text.secondary',
+                        ml: isHero ? 0.5 : 0,
+                      }}
+                    >
+                      {startIcon}
+                    </InputAdornment>
+                  ) : params.InputProps.startAdornment,
+                },
+              }}
 
               sx={{
-                backgroundColor: isHero ? '#f4f7fb' : theme.palette.mode === 'light' ? 'white' : '#121212',
-                borderRadius: isHero ? 2 : 999,
+                backgroundColor: isHero ? 'transparent' : theme.palette.mode === 'light' ? 'white' : '#121212',
+                borderRadius: isHero ? 1 : 999,
                 boxShadow: isHero ? 'none' : '0 10px 26px rgba(26, 64, 125, 0.08)',
                 '& .MuiOutlinedInput-root': {
-                  minHeight: 48,
-                  borderRadius: isHero ? 2 : 999,
-                  backgroundColor: isHero ? '#f4f7fb' : theme.palette.mode === 'light' ? 'white' : '#121212',
+                  minHeight: isHero ? 56 : 48,
+                  borderRadius: isHero ? 1 : 999,
+                  backgroundColor: isHero ? 'transparent' : theme.palette.mode === 'light' ? 'white' : '#121212',
                   transition: 'box-shadow 180ms ease, border-color 180ms ease',
                   '& fieldset': {
-                    borderColor: isHero ? 'rgba(8, 29, 60, 0.08)' : 'rgba(26, 64, 125, 0.14)',
+                    borderColor: isHero ? 'transparent' : 'rgba(26, 64, 125, 0.14)',
                   },
                   '&:hover fieldset': {
-                    borderColor: 'rgba(26, 64, 125, 0.35)',
+                    borderColor: isHero ? 'transparent' : 'rgba(26, 64, 125, 0.35)',
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: isHero ? 'transparent' : theme.palette.primary.main,
                     borderWidth: 1,
                   },
                   '&.Mui-focused': {
-                    boxShadow: '0 0 0 4px rgba(42, 169, 225, 0.16), 0 16px 34px rgba(26, 64, 125, 0.12)',
+                    boxShadow: isHero ? 'none' : '0 0 0 4px rgba(42, 169, 225, 0.16), 0 16px 34px rgba(26, 64, 125, 0.12)',
                   },
                 },
                 '& .MuiInputBase-input': {
@@ -111,7 +131,7 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
                   fontSize: isHero ? 14 : undefined,
                   color: 'text.primary',
                   '&::placeholder': {
-                    color: isHero ? 'rgba(8, 29, 60, 0.42)' : 'text.secondary',
+                    color: isHero ? 'rgba(67, 71, 80, 0.62)' : 'text.secondary',
                     opacity: isHero ? 1 : 0.78,
                   },
                 },

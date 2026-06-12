@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Provider } from 'react-redux';
@@ -31,7 +31,7 @@ function makeQueryClient() {
   });
 }
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: { children: any }) {
   // Use useRef instead of module-level singleton to avoid shared state
   // between SSR requests in Next.js App Router.
   const queryClientRef = React.useRef<QueryClient | null>(null);

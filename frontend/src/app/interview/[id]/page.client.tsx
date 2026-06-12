@@ -1,11 +1,6 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-
-const InterviewRoomPage = dynamic(
-  () => import('@/views/jobSeekerPages/InterviewRoomPage'),
-  { ssr: false }
-);
+import InterviewRoomPage from '@/views/jobSeekerPages/InterviewRoomPage';
 
 export default function InterviewRoomPageClient() {
   return <InterviewRoomPage />;

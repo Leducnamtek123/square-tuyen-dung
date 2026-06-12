@@ -54,7 +54,7 @@ const SectionHeader = ({ icon, title }: SectionHeaderProps) => (
         color: 'primary.main',
       }}
     >
-      {React.cloneElement(icon, { fontSize: 'small' })}
+      {React.cloneElement(icon, { fontSize: 'small' } as React.HTMLAttributes<unknown>)}
     </Box>
     <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
       {title}

@@ -27,7 +27,7 @@ import MuiShellNavList, { type NavItem } from './MuiShellNavList';
 interface MuiShellLayoutProps {
   title?: string;
   navItems: NavItem[];
-  children: React.ReactNode;
+  children: any;
 }
 const drawerWidth = 240;
 

@@ -1,4 +1,4 @@
-import copy
+﻿import copy
 import json
 import logging
 import re
@@ -142,7 +142,7 @@ class CustomTokenView(TokenView):
                     if not allow_login:
                         return response_data(
                             status=status.HTTP_400_BAD_REQUEST,
-                            errors={"errorMessage": ["Tài khoản hoặc mật khẩu không chính xác."]}
+                            errors={"errorMessage": ["TÃ i khoáº£n hoáº·c máº­t kháº©u khÃ´ng chÃ­nh xÃ¡c."]}
                         )
 
             return response_data(status=stt, data=json.loads(body))
@@ -197,17 +197,25 @@ class CustomConvertTokenView(ConvertTokenView):
                 allowed.append(normalized)
         return allowed
 
-    def get_google_access_token(self, code, redirect_uri=None):
+    def get_google_access_token(self, code, redirect_uri=None, request_origin=None):
         """
         Get access token from Google OAuth2 by authorization code
         """
         try:
             normalized_redirect_uri = self._normalize_redirect_uri(redirect_uri)
             allowed_redirect_uris = self._get_allowed_redirect_uris()
+
+            normalized_request_origin = self._normalize_redirect_uri(request_origin)
+            if normalized_request_origin and normalized_request_origin not in allowed_redirect_uris:
+                if normalized_request_origin.startswith(("http://localhost", "https://localhost", "http://127.0.0.1", "https://127.0.0.1")):
+                    allowed_redirect_uris.append(normalized_request_origin)
+
             if normalized_redirect_uri:
                 if normalized_redirect_uri not in allowed_redirect_uris:
-                    raise BadRequest("redirect_uri không hợp lệ")
+                    raise BadRequest("redirect_uri invalid")
                 redirect_uri_value = normalized_redirect_uri
+            elif normalized_request_origin and normalized_request_origin in allowed_redirect_uris:
+                redirect_uri_value = normalized_request_origin
             else:
                 redirect_uri_value = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI
 
@@ -227,7 +235,15 @@ class CustomConvertTokenView(ConvertTokenView):
 
             # Check response status
             if response.status_code != 200:
-                raise BadRequest("Xác thực thất bại")
+                error_message = "Authentication failed"
+                try:
+                    response_json = response.json()
+                    error_message = response_json.get("error_description") or response_json.get("error") or error_message
+                except Exception:
+                    raw_body = (response.text or "").strip()
+                    if raw_body:
+                        error_message = raw_body
+                raise BadRequest(error_message)
 
             # Parse response JSON
             response_data = response.json()
@@ -235,13 +251,15 @@ class CustomConvertTokenView(ConvertTokenView):
             access_token = response_data.get("access_token")
 
             if not access_token:
-                raise BadRequest("Xác thực thất bại")
+                raise BadRequest("Authentication failed")
 
             return access_token
 
+        except BadRequest:
+            raise
         except Exception as ex:
             helper.print_log_error("get_google_access_token", ex)
-            raise BadRequest("Xác thực thất bại")
+            raise BadRequest("Authentication failed")
 
     def post(self, request, *args, **kwargs):
         try:
@@ -259,6 +277,7 @@ class CustomConvertTokenView(ConvertTokenView):
                 request_data["token"] = self.get_google_access_token(
                     request_data.get("token"),
                     redirect_uri=redirect_uri,
+                    request_origin=request.headers.get("Origin"),
                 )
 
             oauth_request = _build_oauth_request(request, request_data)
@@ -421,7 +440,7 @@ class FirebaseLoginView(TokenView):
 
         unique_users = {user.id: user for user in matched_users}
         if len(unique_users) > 1:
-            return None, "Số điện thoại này đang liên kết với nhiều tài khoản. Vui lòng đăng nhập bằng email hoặc liên hệ hỗ trợ."
+            return None, "Sá»‘ Ä‘iá»‡n thoáº¡i nÃ y Ä‘ang liÃªn káº¿t vá»›i nhiá»u tÃ i khoáº£n. Vui lÃ²ng Ä‘Äƒng nháº­p báº±ng email hoáº·c liÃªn há»‡ há»— trá»£."
 
         user = next(iter(unique_users.values()), None)
         if user and not user.phone_number:
@@ -438,7 +457,7 @@ class FirebaseLoginView(TokenView):
         if not id_token or not role_name:
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
-                errors={"token": ["Token và role_name là bắt buộc."]},
+                errors={"token": ["Token vÃ  role_name lÃ  báº¯t buá»™c."]},
             )
 
         # Validate role_name - NEVER allow ADMIN via Firebase login
@@ -448,7 +467,7 @@ class FirebaseLoginView(TokenView):
             )
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
-                errors={"role_name": ["Role không hợp lệ."]},
+                errors={"role_name": ["Role khÃ´ng há»£p lá»‡."]},
             )
 
         decoded_token = verify_id_token(id_token)
@@ -456,7 +475,7 @@ class FirebaseLoginView(TokenView):
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
                 errors={
-                    "token": ["Token không hợp lệ hoặc đã hết hạn."]
+                    "token": ["Token khÃ´ng há»£p lá»‡ hoáº·c Ä‘Ã£ háº¿t háº¡n."]
                 },
             )
 
@@ -464,7 +483,7 @@ class FirebaseLoginView(TokenView):
         if not phone_number:
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
-                errors={"token": ["Token không chứa số điện thoại."]},
+                errors={"token": ["Token khÃ´ng chá»©a sá»‘ Ä‘iá»‡n thoáº¡i."]},
             )
 
         # Find or create user. Prefer linking phone login to an existing account
@@ -524,7 +543,7 @@ class FirebaseLoginView(TokenView):
         except Application.DoesNotExist:
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
-                errors={"client_id": ["Application không tồn tại."]},
+                errors={"client_id": ["Application khÃ´ng tá»“n táº¡i."]},
             )
 
         # Generate tokens
@@ -558,3 +577,4 @@ class FirebaseLoginView(TokenView):
         }
 
         return response_data(status=status.HTTP_200_OK, data=res_data)
+

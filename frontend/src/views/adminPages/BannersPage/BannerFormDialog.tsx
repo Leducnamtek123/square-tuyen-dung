@@ -51,8 +51,8 @@ type BannerFormDialogProps = {
   platformOptions: BannerChoiceOption[];
   typeOptions: BannerChoiceOption[];
   descriptionLocations: BannerChoiceOption[];
-  webInputRef: React.RefObject<HTMLInputElement>;
-  mobileInputRef: React.RefObject<HTMLInputElement>;
+  webInputRef: React.RefObject<HTMLInputElement | null>;
+  mobileInputRef: React.RefObject<HTMLInputElement | null>;
   t: (key: string, params?: Record<string, unknown>) => string;
   onPickWebImage: () => void;
   onPickMobileImage: () => void;

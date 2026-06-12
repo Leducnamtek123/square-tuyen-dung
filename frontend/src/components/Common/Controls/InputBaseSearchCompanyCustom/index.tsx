@@ -15,6 +15,7 @@ import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 import { Box } from "@mui/material";
 import { IconButton, InputAdornment } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+const ControllerAny = Controller as any;
 
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
@@ -67,13 +68,13 @@ const InputBaseSearchCompanyCustom = <T extends FieldValues = FieldValues>({
 
         <SearchIcon color="disabled" />
 
-        <Controller
+        <ControllerAny
 
           name={name as Path<T>}
 
           control={control}
 
-          render={({ field }) => (
+          render={({ field }: any) => (
 
             <InputBase
 

@@ -6,6 +6,7 @@ import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 import { InputAdornment, TextField, Typography } from "@mui/material";
 import { SxProps, Theme } from '@mui/material/styles';
 import ValidationError from '../ValidationError';
+const ControllerAny = Controller as any;
 
 const EMPTY_SX: SxProps<Theme> = {};
 
@@ -52,11 +53,11 @@ const TextFieldCustom = <T extends FieldValues = FieldValues>({
         </Typography>
       )}
 
-      <Controller
+      <ControllerAny
         name={name as Path<T>}
         control={control}
 
-        render={({ field, fieldState }) => (
+        render={({ field, fieldState }: any) => (
 
           <>
 

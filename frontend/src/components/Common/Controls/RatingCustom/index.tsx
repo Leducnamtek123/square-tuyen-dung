@@ -2,10 +2,12 @@
 import React from 'react';
 import { Controller, Control, FieldValues, Path, PathValue } from 'react-hook-form';
 import Rating from '@mui/material/Rating';
+const RatingAny = Rating as unknown as React.ComponentType<any>;
 import Typography from '@mui/material/Typography';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+const ControllerAny = Controller as any;
 
-type RatingBaseProps = Omit<React.ComponentProps<typeof Rating>, 'name' | 'value' | 'onChange' | 'defaultValue' | 'title'>;
+type RatingBaseProps = Record<string, any>;
 
 type RatingCustomProps<T extends FieldValues = FieldValues> = RatingBaseProps & {
   name: string;
@@ -30,7 +32,7 @@ const RatingCustom = <T extends FieldValues = FieldValues>({ name, control, titl
 
       )}
 
-      <Controller
+      <ControllerAny
 
         defaultValue={5 as PathValue<T, Path<T>>}
 
@@ -38,17 +40,17 @@ const RatingCustom = <T extends FieldValues = FieldValues>({ name, control, titl
 
         control={control}
 
-        render={({ field, fieldState }) => (
+        render={({ field, fieldState }: any) => (
 
           <>
 
-            <Rating
+            <RatingAny
 
               size="large"
 
               value={field.value ?? 0}
 
-              onChange={(_event, value) => field.onChange(value ?? 0)}
+              onChange={(_event: any, value: number | null) => field.onChange(value ?? 0)}
 
               onChangeActive={onChangeActive}
 

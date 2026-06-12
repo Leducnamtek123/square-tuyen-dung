@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import ValidationError from '../ValidationError';
 
 import type { SelectOption } from '@/types/models';
+const ControllerAny = Controller as any;
 
 const EMPTY_SX: SxProps<Theme> = {};
 const EMPTY_OPTIONS: SelectOption[] = [];
@@ -46,11 +47,11 @@ const SingleSelectCustom = <T extends FieldValues = FieldValues>({
 
       )}
 
-      <Controller
+      <ControllerAny
         name={name as Path<T>}
         control={control}
 
-        render={({ field, fieldState }) => (
+        render={({ field, fieldState }: any) => (
 
           <>
 

@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Grid2 as Grid } from "@mui/material";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import SearchIcon from '@mui/icons-material/Search';
 import InputBaseSearchHomeCustom from '../../../../components/Common/Controls/InputBaseSearchHomeCustom';
 import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
@@ -81,16 +82,34 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
       component="form"
       onSubmit={handleSubmit(handleFilter)}
       sx={{
-        borderRadius: isHero ? { xs: 2.5, md: 3 } : 3.5,
-        p: isHero ? { xs: 1.25, md: 1.5 } : { xs: 1.25, sm: 1.5, md: 2 },
-        backgroundColor: isHero ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.72)',
-        border: isHero ? '1px solid rgba(255,255,255,0.5)' : '1px solid rgba(26, 64, 125, 0.1)',
-        boxShadow: isHero ? '0 22px 48px rgba(3, 18, 38, 0.22)' : 'inset 0 1px 0 rgba(255,255,255,0.8)',
-        backdropFilter: isHero ? 'blur(10px)' : 'blur(14px)',
+        borderRadius: isHero ? 1.5 : 3.5,
+        p: isHero ? 1 : { xs: 1.25, sm: 1.5, md: 2 },
+        backgroundColor: isHero ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.72)',
+        border: isHero ? '1px solid rgba(255,255,255,0.32)' : '1px solid rgba(26, 64, 125, 0.1)',
+        boxShadow: isHero ? '0 26px 58px rgba(3, 18, 38, 0.28)' : 'inset 0 1px 0 rgba(255,255,255,0.8)',
+        backdropFilter: isHero ? 'blur(12px)' : 'blur(14px)',
       }}
     >
-      <Grid container spacing={isHero ? { xs: 1, md: 1.25 } : 1.5} alignItems="center">
-        <Grid size={isHero ? { xs: 12, md: 6 } : { xs: 12 }}>
+      <Grid container spacing={isHero ? { xs: 1, md: 0 } : 1.5} alignItems="center">
+        <Grid
+          size={isHero ? { xs: 12, md: 5.5 } : { xs: 12 }}
+          sx={{
+            position: 'relative',
+            ...(isHero && {
+              pr: { md: 1 },
+              '&::after': {
+                content: '""',
+                display: { xs: 'none', md: 'block' },
+                position: 'absolute',
+                top: 10,
+                right: 0,
+                bottom: 10,
+                width: '1px',
+                bgcolor: 'rgba(116, 119, 129, 0.22)',
+              },
+            }),
+          }}
+        >
           <InputBaseSearchHomeCustom
             name="kw"
             control={control}
@@ -110,27 +129,39 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
           />
         </Grid>
         )}
-        <Grid size={isHero ? { xs: 12, md: 3.5 } : { xs: 12, md: 6 }}>
+        <Grid
+          size={isHero ? { xs: 12, md: 3.5 } : { xs: 12, md: 6 }}
+          sx={isHero ? { px: { md: 1 } } : undefined}
+        >
           <SingleSelectSearchCustom
             name="cityId"
             placeholder={isHero ? t('common:placeholders.allCities', 'Tất cả địa điểm') : t("common:placeholders.selectCity")}
             control={control}
             options={allConfig?.cityOptions || []}
             variant={variant}
+            startIcon={isHero ? <LocationOnIcon fontSize="small" /> : undefined}
           />
         </Grid>
         {isHero && (
-          <Grid size={{ xs: 12, md: 2.5 }}>
+          <Grid size={{ xs: 12, md: 3 }} sx={{ pl: { md: 1 } }}>
             <Button
               type="submit"
               variant="contained"
               startIcon={<SearchIcon />}
               fullWidth
               sx={{
-                minHeight: 48,
-                borderRadius: 2,
+                minHeight: 56,
+                borderRadius: 1,
+                bgcolor: '#043068',
+                px: 3,
                 fontWeight: 800,
-                boxShadow: '0 12px 26px rgba(4, 31, 71, 0.22)',
+                fontSize: 14,
+                textTransform: 'none',
+                boxShadow: '0 14px 30px rgba(4, 48, 104, 0.28)',
+                '&:hover': {
+                  bgcolor: '#0058be',
+                  boxShadow: '0 16px 34px rgba(0, 88, 190, 0.28)',
+                },
               }}
             >
               {t('common:search.button')}

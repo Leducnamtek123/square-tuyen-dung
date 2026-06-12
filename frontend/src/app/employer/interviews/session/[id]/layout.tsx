@@ -8,7 +8,7 @@ import '@/app/interview/livekit.css';
 export default function EmployerInterviewSessionLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: any;
 }) {
   return <>{children}</>;
 }

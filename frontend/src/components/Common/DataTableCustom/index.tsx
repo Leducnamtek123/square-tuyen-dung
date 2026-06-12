@@ -19,6 +19,7 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 
 import { visuallyHidden } from '@mui/utils';
+const visuallyHiddenAny = visuallyHidden as any;
 
 import { Skeleton, Stack } from "@mui/material";
 
@@ -94,7 +95,7 @@ function EnhancedTableHead({ headCells = EMPTY_HEAD_CELLS, order, orderBy, onReq
 
               {orderBy === headCell.id ? (
 
-                <Box component="span" sx={visuallyHidden}>
+                <Box component="span" sx={visuallyHiddenAny}>
 
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
 

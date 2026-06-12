@@ -1,18 +1,18 @@
-// Server Component — can export metadata
+// Server Component â€” can export metadata
 import type { Metadata } from 'next';
 import EmployerSectionClient from './EmployerSectionClient';
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Square Tuyển Dụng',
-    default: 'Nhà tuyển dụng | Square Tuyển Dụng',
+    template: '%s | Square Tuyá»ƒn Dá»¥ng',
+    default: 'NhÃ  tuyá»ƒn dá»¥ng | Square Tuyá»ƒn Dá»¥ng',
   },
 };
 
 export default function EmployerSectionLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: any;
 }) {
   return <EmployerSectionClient>{children}</EmployerSectionClient>;
 }

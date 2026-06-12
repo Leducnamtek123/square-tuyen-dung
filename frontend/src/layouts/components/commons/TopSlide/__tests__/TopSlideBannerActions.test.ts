@@ -16,16 +16,18 @@ describe('TopSlide banner actions', () => {
     expect(source).toContain('component="picture"');
   });
 
-  it('keeps the hero card aligned with the banner frame', () => {
-    expect(source).toContain('const HERO_FRAME_MAX_WIDTH');
-    expect(source).toContain('maxWidth: HERO_FRAME_MAX_WIDTH');
-    expect(source).toContain('<Box sx={heroFrameSx}>');
+  it('keeps the hero as a full-bleed mockup section with constrained content', () => {
+    expect(source).toContain('const HERO_CONTAINER_MAX_WIDTH = 1280');
+    expect(source).toContain("width: '100vw'");
+    expect(source).toContain("mx: 'calc(50% - 50vw)'");
     expect(source).not.toContain('px: { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 }');
   });
 
   it('renders the hero copy and search as an overlay on the banner image', () => {
-    expect(source).toContain('height: { xs: 700, sm: 560, md: 500, lg: 540 }');
-    expect(source).toContain('rgba(4, 22, 49, 0.88)');
+    expect(source).toContain('const HERO_HEADER_OFFSET');
+    expect(source).toContain('calc(100svh - ${HERO_HEADER_OFFSET.xs})');
+    expect(source).toContain('minHeight: { xs: 560, md: 650 }');
+    expect(source).toContain('rgba(4, 48, 104, 0.95)');
     expect(source).toContain('<HomeSearch variant="hero" />');
     expect(source).not.toContain('<Card');
     expect(source).not.toContain('heroPrimaryCta');

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -10,6 +10,7 @@ import {
   faMicrophone, faMicrophoneSlash, faVideo, faVideoSlash,
   faPhoneSlash, faDesktop, faComment, faUser, faRobot,
   faCheckCircle, faExclamationTriangle, faEye,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { IMAGES } from '@/configs/images';
 import { ROUTES } from '@/configs/routeConfig';
@@ -198,6 +199,7 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
+  const [isCompactChatView, setIsCompactChatView] = useState(false);
   const [time, setTime] = useState(0);
 
   React.useEffect(() => {
@@ -206,6 +208,15 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
   }, []);
 
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(max-width: 639px)');
+    const update = () => setIsCompactChatView(mediaQuery.matches);
+    update();
+    mediaQuery.addEventListener('change', update);
+    return () => mediaQuery.removeEventListener('change', update);
+  }, []);
 
   const FAKE_MESSAGES = [
     { from: 'AI', textKey: 'pages.interviewPreview.connected.chatMessages.aiGreeting' },
@@ -217,7 +228,8 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
   return (
     <div className="flex h-full min-h-[600px] flex-col bg-[#020617]">
       {/* Video grid */}
-      <div className={`flex flex-1 gap-2 p-3 ${chatOpen ? 'pr-[320px]' : ''} transition-all duration-300`}>
+      <div className={`flex flex-1 gap-2 p-3 ${chatOpen ? 'sm:pr-[312px]' : ''} transition-all duration-300`}>
+        {!(chatOpen && isCompactChatView) && (
         <div className="grid flex-1 grid-cols-2 gap-2 content-center">
           <MockTile name={t('pages.interviewPreview.connected.aiInterviewer')} isAI speaking />
           <MockTile name={FAKE_SESSION.candidateName} isSelf />
@@ -230,13 +242,36 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
               <span className="ml-3 text-[11px] text-zinc-500 font-mono">{fmt(time)}</span>
             </div>
           </div>
-        </div>
+          </div>
+        )}
 
         {/* Chat panel */}
         {chatOpen && (
-          <div className="absolute right-0 top-0 bottom-0 w-[312px] border-l border-white/8 bg-[#0b1120] flex flex-col">
+          <div className="absolute inset-0 w-full border-l border-white/8 bg-[#0b1120] flex flex-col sm:left-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-[312px]">
             <div className="border-b border-white/8 px-4 py-3">
-              <p className="text-sm font-semibold text-white">{t('pages.interviewPreview.connected.chatTitle')}</p>
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-sm font-semibold text-white">{t('pages.interviewPreview.connected.chatTitle')}</p>
+                <div className="flex shrink-0 items-center gap-2 sm:hidden">
+                  <button
+                    type="button"
+                    aria-label={t('pages.interviewPreview.aria.closeChat')}
+                    onClick={() => setChatOpen(false)}
+                    className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 text-xs font-semibold text-white transition-colors hover:bg-white/10"
+                  >
+                    <FontAwesomeIcon icon={faXmark} className="text-[11px]" />
+                    <span>{t('pages.interviewPreview.aria.closeChat')}</span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={t('pages.interviewPreview.connected.end')}
+                    onClick={onEnd}
+                    className="inline-flex h-9 items-center gap-1.5 rounded-full border border-rose-400/40 bg-rose-500/20 px-3 text-xs font-semibold text-rose-300 transition-colors hover:bg-rose-500/30"
+                  >
+                    <FontAwesomeIcon icon={faPhoneSlash} className="text-[11px]" />
+                    <span>{t('pages.interviewPreview.connected.end')}</span>
+                  </button>
+                </div>
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto p-3 space-y-3">
               {FAKE_MESSAGES.map((m) => (
@@ -260,7 +295,7 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
       </div>
 
       {/* Control bar */}
-      <div className="flex items-center justify-center gap-3 border-t border-white/8 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl">
+      <div className={`flex items-center justify-center gap-3 border-t border-white/8 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl ${chatOpen && isCompactChatView ? 'hidden' : ''}`}>
         <button type="button" aria-label={micOn ? t('pages.interviewPreview.aria.turnMicrophoneOff') : t('pages.interviewPreview.aria.turnMicrophoneOn')} onClick={() => setMicOn(!micOn)}
           className={`flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border transition-all
             ${micOn ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}>

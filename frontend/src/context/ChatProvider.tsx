@@ -12,7 +12,7 @@ import type { RootState } from '../redux/store';
 import type { User } from '../types/models';
 
 interface ChatProviderProps {
-  children: React.ReactNode;
+  children: any;
 }
 
 interface ChatUser {

@@ -15,6 +15,7 @@ import { FormLabel, Typography } from "@mui/material";
 
 import FormControl from '@mui/material/FormControl';
 import ValidationError from '../ValidationError';
+const ControllerAny = Controller as any;
 
 const EMPTY_OPTIONS: SelectOption[] = [];
 
@@ -39,13 +40,13 @@ const RadioCustom = <T extends FieldValues = FieldValues>({
 
     <div>
 
-      <Controller
+      <ControllerAny
 
         name={name as Path<T>}
 
         control={control}
 
-        render={({ field, fieldState }) => (
+        render={({ field, fieldState }: any) => (
 
           <>
 

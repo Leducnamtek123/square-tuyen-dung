@@ -2,7 +2,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 
 interface LazyLoadSectionProps {
-  children: React.ReactNode;
+  children: any;
   rootMargin?: string;
   minHeight?: number | string;
 }

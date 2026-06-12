@@ -1,7 +1,7 @@
 /**
  * Layout for /interview/* pages.
  *
- * This is a deliberately ISOLATED layout — it intentionally does NOT
+ * This is a deliberately ISOLATED layout â€” it intentionally does NOT
  * include the global DefaultLayout / EmployerLayout. Interview rooms are
  * full-screen, standalone experiences. The layout's sole responsibilities
  * are:
@@ -12,14 +12,14 @@ import './livekit.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Interview Room | Square Tuyển Dụng',
+  title: 'Interview Room | Square Tuyá»ƒn Dá»¥ng',
   description: 'Join your online interview session.',
 };
 
 export default function InterviewLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: any;
 }) {
   // data-lk-theme is required for @livekit/components-styles selectors to apply
   return <div data-lk-theme="default" style={{ minHeight: '100svh' }}>{children}</div>;

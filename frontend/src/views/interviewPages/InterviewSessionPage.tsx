@@ -25,7 +25,7 @@ import { AIInterviewLayout } from './AIInterviewLayout';
 import { cn } from '@/lib/utils';
 import { IMAGES } from '@/configs/images';
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const getSafeLiveKitUrl = (preferLocal = false) => {
   if (typeof window === 'undefined') return '';
@@ -100,7 +100,7 @@ const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number): Promise<
   }
 };
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type InterviewSessionPageProps = {
   participantRole?: 'jobseeker' | 'employer' | 'admin' | string;
@@ -168,7 +168,7 @@ function InterviewSessionBridge({
   children,
 }: {
   connectionDetails: LiveKitConnectionDetails;
-  children: React.ReactNode;
+  children: any;
 }) {
   const tokenSource = React.useMemo(() => {
     return TokenSource.custom(async () => ({
@@ -182,7 +182,7 @@ function InterviewSessionBridge({
   return <SessionProvider session={session}>{children}</SessionProvider>;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function InterviewSessionLoading({ label }: { label: string }) {
   return (
@@ -464,7 +464,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
   const isJoinable = !!state.session && JOINABLE_STATUSES.includes(state.session.status);
   const isInterrupted = state.session?.status === 'interrupted';
 
-  // ── Fetch session ────────────────────────────────────────────────────────
+  // â”€â”€ Fetch session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const fetchSessionDetails = React.useCallback(async (options: FetchSessionDetailsOptions = {}) => {
     const showLoading = options.showLoading ?? true;
@@ -523,7 +523,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
     return () => window.clearInterval(intervalId);
   }, [fetchSessionDetails, state.session?.status]);
 
-  // ── Start / terminate session ─────────────────────────────────────────────
+  // â”€â”€ Start / terminate session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const initiateInterviewSession = React.useCallback(async () => {
     const translate = tRef.current;
@@ -633,13 +633,13 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
     }
   }, [fetchSessionDetails, roomName, state.sessionInviteToken]);
 
-  // ── Loading state ─────────────────────────────────────────────────────────
+  // â”€â”€ Loading state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   if (state.loading) {
     return <InterviewSessionLoading label={t('loading')} />;
   }
 
-  // ── Error (no session) ────────────────────────────────────────────────────
+  // â”€â”€ Error (no session) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   if (state.error && !state.session) {
     return (
@@ -651,7 +651,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
     );
   }
 
-  // ── Derived display values ─────────────────────────────────────────────────
+  // â”€â”€ Derived display values â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const statusKey = (state.session?.status || 'scheduled').toLowerCase();
   const displayStatusKey =
@@ -675,7 +675,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
       ? t('processingTitle')
       : t('unavailableTitle');
 
-  // ─── Active video conference (LiveKit VideoConference) ────────────────────
+  // â”€â”€â”€ Active video conference (LiveKit VideoConference) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   if (state.connectRoom && state.connectionDetails) {
     return (
@@ -695,7 +695,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
     );
   }
 
-  // ─── Preflight / waiting room ─────────────────────────────────────────────
+  // â”€â”€â”€ Preflight / waiting room â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   return (
     <InterviewWaitingRoom

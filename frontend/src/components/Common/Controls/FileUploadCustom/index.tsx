@@ -6,6 +6,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import { useTranslation } from 'react-i18next';
+const ControllerAny = Controller as any;
 
 interface Props<T extends FieldValues = FieldValues> {
   control: Control<T>;
@@ -95,7 +96,7 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
               </Typography>
             </>
           ) : (
-            /* Custom file chip — avoids MUI Alert's internal alpha() on success color */
+            /* Custom file chip Ã¢â‚¬â€ avoids MUI Alert's internal alpha() on success color */
             <Box
               sx={{
                 display: 'flex',
@@ -130,10 +131,10 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
         </Box>
       </Stack>
 
-      <Controller
+      <ControllerAny
         name={name as Path<T>}
         control={control}
-        render={({ field, fieldState }) => {
+        render={({ field, fieldState }: any) => {
           formOnChangeRef.current = field.onChange;
 
           return (

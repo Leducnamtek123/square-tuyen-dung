@@ -13,8 +13,8 @@ import EmojiPicker from 'emoji-picker-react';
 import { useTranslation } from 'react-i18next';
 
 type ChatWindowComposerProps = {
-  inputRef: React.RefObject<HTMLInputElement>;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   inputValue: string;
   isUploading: boolean;
   uploadProgress: number;

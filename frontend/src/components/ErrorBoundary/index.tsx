@@ -4,7 +4,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import i18next from 'i18next';
 
 interface ErrorBoundaryProps {
-  children: React.ReactNode;
+  children: any;
   fallback?: React.ReactNode;
 }
 

@@ -6,6 +6,11 @@ import {
   TwitterShareButton,
   LinkedinShareButton,
 } from 'react-share';
+const FacebookShareButtonAny: any = FacebookShareButton;
+const FacebookMessengerShareButtonAny: any = FacebookMessengerShareButton;
+const EmailShareButtonAny: any = EmailShareButton;
+const TwitterShareButtonAny: any = TwitterShareButton;
+const LinkedinShareButtonAny: any = LinkedinShareButton;
 import CloseIcon from '@mui/icons-material/Close';
 import { useTranslation } from 'react-i18next';
 import {
@@ -143,7 +148,7 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
             width="100%"
           >
             {facebook && (
-              <FacebookShareButton
+              <FacebookShareButtonAny
                 url={facebook?.url || ''}
                 quote={facebook?.quote || ''}
                 hashtag={facebook?.hashtag || ''}
@@ -163,11 +168,11 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
                     Facebook
                   </Typography>
                 </Box>
-              </FacebookShareButton>
+              </FacebookShareButtonAny>
             )}
 
             {facebookMessenger && (
-              <FacebookMessengerShareButton
+              <FacebookMessengerShareButtonAny
                 url={facebookMessenger?.url || ''}
                 appId=""
                 redirectUri={facebookMessenger?.url || ''}
@@ -187,11 +192,11 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
                     Messenger
                   </Typography>
                 </Box>
-              </FacebookMessengerShareButton>
+              </FacebookMessengerShareButtonAny>
             )}
 
             {linkedin && (
-              <LinkedinShareButton
+              <LinkedinShareButtonAny
                 url={linkedin?.url || ''}
                 title={linkedin?.title || ''}
                 summary={linkedin?.summary || ''}
@@ -212,11 +217,11 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
                     LinkedIn
                   </Typography>
                 </Box>
-              </LinkedinShareButton>
+              </LinkedinShareButtonAny>
             )}
 
             {twitter && (
-              <TwitterShareButton
+              <TwitterShareButtonAny
                 url={twitter?.url || ''}
                 title={twitter?.title || ''}
                 via={twitter?.via || ''}
@@ -238,11 +243,11 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
                     X
                   </Typography>
                 </Box>
-              </TwitterShareButton>
+              </TwitterShareButtonAny>
             )}
 
             {email && (
-              <EmailShareButton
+              <EmailShareButtonAny
                 url={email?.url || ""}
                 subject={email?.subject || ""}
                 body={email?.body || ""}
@@ -262,7 +267,7 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
                     Email
                   </Typography>
                 </Box>
-              </EmailShareButton>
+              </EmailShareButtonAny>
             )}
           </Stack>
         </ListItem>

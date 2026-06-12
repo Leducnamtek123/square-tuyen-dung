@@ -235,7 +235,7 @@ const theme = createTheme(baseTheme, {
   },
 });
 
-export default function ThemeRegistry({ children }: { children: React.ReactNode }) {
+export default function ThemeRegistry({ children }: { children: any }) {
   return (
     <NextAppDirEmotionCacheProvider options={{ key: 'mui' }}>
       <ThemeProvider theme={theme}>

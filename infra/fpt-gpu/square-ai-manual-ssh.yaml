@@ -86,5 +86,13 @@ advanced_settings:
         value: "main"
 
    startup_commands:
-      cmd:
+      cmd: /bin/bash
       args:
+        - -lc
+        - |
+          set -euo pipefail
+          if [ ! -x /models/bootstrap-square-ai.sh ]; then
+            curl -fsSL https://raw.githubusercontent.com/Leducnamtek123/square-tuyen-dung/main/infra/fpt-gpu/bootstrap-square-ai.sh -o /models/bootstrap-square-ai.sh
+            chmod +x /models/bootstrap-square-ai.sh
+          fi
+          exec /models/bootstrap-square-ai.sh

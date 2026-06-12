@@ -1,7 +1,7 @@
- 'use client';
+﻿'use client';
 import * as React from 'react';
 
-import { Box, Button, Card, Container, Typography } from "@mui/material";
+import { Box, Button, Card, Container, Typography } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
 
@@ -15,8 +15,9 @@ import toastMessages from '../../../utils/toastMessages';
 
 import { useAppSelector } from '../../../hooks/useAppStore';
 
-const EmailVerificationRequiredPage = () => {
+const RESEND_EMAIL_COOLDOWN_MS = 2500;
 
+const EmailVerificationRequiredPage = () => {
   const { t } = useTranslation('auth');
 
   TabTitle(t('verification.pageTitle'));
@@ -24,89 +25,77 @@ const EmailVerificationRequiredPage = () => {
   const { email } = useAppSelector((state) => state.auth);
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
+  const resendInFlightRef = React.useRef(false);
+  const lastResendAttemptAtRef = React.useRef(0);
 
   const handleResendEmail = async () => {
+    const normalizedEmail = String(email || '').trim();
+    const now = Date.now();
 
+    if (
+      !normalizedEmail ||
+      resendInFlightRef.current ||
+      now - lastResendAttemptAtRef.current < RESEND_EMAIL_COOLDOWN_MS
+    ) {
+      return;
+    }
+
+    lastResendAttemptAtRef.current = now;
+    resendInFlightRef.current = true;
     setIsFullScreenLoading(true);
 
     try {
-
-      await authService.sendVerifyEmail(email);
-
+      await authService.sendVerifyEmail(normalizedEmail);
       toastMessages.success(t('login.successTitle'));
-
     } catch (error) {
-
       toastMessages.error(t('messages.tryAgain'));
-
     } finally {
-
       setIsFullScreenLoading(false);
-
+      resendInFlightRef.current = false;
     }
-
   };
 
   return (
-
     <>
-
       <Container maxWidth="sm" sx={{ mt: 6 }}>
-
         <Card sx={{ p: 4 }}>
-
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-
             {t('verification.heading')}
-
           </Typography>
 
           <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-
             {t('verification.subheading')}
-
           </Typography>
 
           <Typography variant="body2" sx={{ mb: 1 }}>
-
             {t('verification.emailSentTo')}
-
           </Typography>
 
           <Typography variant="body1" sx={{ fontWeight: 600, mb: 2 }}>
-
             {email}
-
           </Typography>
 
           <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-
             {t('verification.instruction')}
-
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-
             <Typography variant="body2">{t('verification.noEmail')}</Typography>
 
-            <Button variant="outlined" onClick={handleResendEmail}>
-
+            <Button
+              variant="outlined"
+              onClick={handleResendEmail}
+              disabled={isFullScreenLoading || !String(email || '').trim()}
+            >
               {t('verification.resend')}
-
             </Button>
-
           </Box>
-
         </Card>
-
       </Container>
 
       {isFullScreenLoading && <BackdropLoading />}
-
     </>
-
   );
-
 };
 
 export default EmailVerificationRequiredPage;

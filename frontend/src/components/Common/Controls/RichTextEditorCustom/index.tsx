@@ -7,24 +7,18 @@ import { Box, CircularProgress, Typography } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { createEditorStateFromHTMLString } from '@/utils/editorUtils';
 import commonService from '@/services/commonService';
-import type { EditorProps } from 'react-draft-wysiwyg';
+const ControllerAny = Controller as any;
 
 type DraftJsModule = typeof import('draft-js');
 type EditorState = import('draft-js').EditorState;
 
 const loadDraftJs = () => import('draft-js') as Promise<DraftJsModule>;
 
-const DraftEditor = dynamic(
-  async () => {
-    const mod = await import('react-draft-wysiwyg');
-    // Handle ESM/CJS interop: in production builds the named export
-    // "Editor" may live under mod.default.Editor or just mod.default
-    const Editor = mod.Editor || (mod as { default?: { Editor?: React.ComponentType<EditorProps> } | React.ComponentType<EditorProps> }).default || mod;
-    return Editor as React.ComponentType<EditorProps>;
-  },
-  { ssr: false }
-);
-
+const DraftEditor: any = dynamic((async () => {
+  const mod: any = await import('react-draft-wysiwyg');
+  const Editor: any = mod.Editor || mod.default || mod;
+  return { default: Editor };
+}) as any, { ssr: false }) as any;
 interface Props<T extends FieldValues = FieldValues> {
   control: Control<T>;
   name: string;
@@ -157,11 +151,11 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
         </Typography>
       )}
 
-      <Controller
+      <ControllerAny
         control={control}
         name={name as Path<T>}
         defaultValue={createEditorStateFromHTMLString('') as PathValue<T, Path<T>>}
-        render={({ field, fieldState }) => {
+        render={({ field, fieldState }: any) => {
           const safeEditorState = field.value?.getCurrentContent
             ? field.value
             : typeof field.value === 'string'
@@ -287,7 +281,7 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
                   >
                     <CircularProgress size={26} />
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      Đang tải ảnh {uploadState.fileName ? `: ${uploadState.fileName}` : ''} ({uploadState.progress}%)
+                      ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âang tÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£i ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£nh {uploadState.fileName ? `: ${uploadState.fileName}` : ''} ({uploadState.progress}%)
                     </Typography>
                   </Box>
                 )}

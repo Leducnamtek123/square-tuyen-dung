@@ -7,6 +7,7 @@ import { Box, InputAdornment, OutlinedInput, Typography } from "@mui/material";
 import { SxProps, Theme } from '@mui/material/styles';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import ValidationError from '../ValidationError';
+const ControllerAny = Controller as any;
 
 const EMPTY_SX = {};
 
@@ -50,13 +51,13 @@ const PasswordTextFieldCustom = <T extends FieldValues = FieldValues>({
 
       )}
 
-      <Controller
+      <ControllerAny
 
         name={name as Path<T>}
 
         control={control}
 
-        render={({ field, fieldState }) => (
+        render={({ field, fieldState }: any) => (
 
           <>
 

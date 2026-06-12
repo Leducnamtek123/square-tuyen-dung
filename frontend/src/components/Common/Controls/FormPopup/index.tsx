@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import {
   Dialog,
@@ -24,7 +24,7 @@ interface Props {
   buttonIcon?: React.ReactNode;
   isSubmitting?: boolean;
   formId?: string;
-  children: React.ReactNode;
+  children: any;
 }
 
 const Popup = ({
