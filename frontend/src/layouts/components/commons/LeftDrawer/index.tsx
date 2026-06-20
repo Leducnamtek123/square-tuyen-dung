@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Button, Drawer, Stack, Avatar, Divider, List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
+import { Box, Button, Drawer, Stack, Divider, List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/redux/hooks';
@@ -106,7 +106,19 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
             flexShrink: 0,
           }}
         >
-          <Avatar src={IMAGES.getTextLogo('dark')} sx={{ width: 'auto', height: 36 }} variant="square" alt="LOGO" />
+          <Box
+            component="img"
+            src={IMAGES.getTextLogo('dark')}
+            alt="Square Logo"
+            sx={{
+              display: 'block',
+              width: { xs: 92, sm: 120 },
+              height: 'auto',
+              maxWidth: '100%',
+              objectFit: 'contain',
+              objectPosition: 'center',
+            }}
+          />
         </Box>
 
         <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
