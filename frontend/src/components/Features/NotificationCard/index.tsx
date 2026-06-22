@@ -67,7 +67,7 @@ const NotificationCard: React.FC = () => {
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
         <IconButton size="large" aria-label={t('notification.openMenu')} color="inherit" onClick={openNotificationsMenu}>
-          <Badge badgeContent={unreadCount} color="error">
+          <Badge badgeContent={unreadCount} color="info">
             <NotificationsIcon />
           </Badge>
         </IconButton>

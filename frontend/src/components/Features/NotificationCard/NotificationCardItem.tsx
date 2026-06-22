@@ -35,8 +35,8 @@ const NotificationCardItem = ({ value, onClickItem, onRemove }: Props) => {
         p: 1.5,
         borderRadius: 2,
         border: '1px solid',
-        borderColor: value.is_read ? 'divider' : 'error.light',
-        bgcolor: value.is_read ? 'background.paper' : 'rgba(211, 47, 47, 0.04)',
+        borderColor: value.is_read ? 'divider' : 'info.light',
+        bgcolor: value.is_read ? 'background.paper' : 'rgba(2, 136, 209, 0.04)',
         transition: 'all 0.2s ease-in-out',
         '&:hover': {
           boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
@@ -102,7 +102,7 @@ const NotificationCardItem = ({ value, onClickItem, onRemove }: Props) => {
             <Typography
               variant="caption"
               sx={{
-                color: value?.is_read ? 'text.disabled' : 'error.main',
+                color: value?.is_read ? 'text.disabled' : 'info.main',
                 fontWeight: value?.is_read ? 400 : 500,
               }}
             >

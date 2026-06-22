@@ -119,8 +119,8 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                 p: { xs: 2, sm: 2.5 },
                 borderRadius: 3,
                 border: "1px solid",
-                borderColor: value?.is_read === true ? "divider" : "error.light",
-                backgroundColor: value?.is_read === true ? "transparent" : "error.50",
+                borderColor: value?.is_read === true ? "divider" : "info.light",
+                backgroundColor: value?.is_read === true ? "transparent" : "rgba(2, 136, 209, 0.04)",
                 position: "relative",
                 transition: "all 0.2s ease-in-out",
                 "&:hover": {
@@ -165,7 +165,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                       <TimeAgo date={(value?.time?.seconds || 0) * 1000} type="fromNow" />
                     </Typography>
                     {!value?.is_read && (
-                      <Box sx={{ px: 1, py: 0.25, backgroundColor: "error.main", color: "white", borderRadius: 1, fontSize: "0.7rem", fontWeight: "bold" }}>
+                      <Box sx={{ px: 1, py: 0.25, backgroundColor: "info.main", color: "white", borderRadius: 1, fontSize: "0.7rem", fontWeight: "bold" }}>
                         {t('notification.new')}
                       </Box>
                     )}

@@ -32,6 +32,12 @@ type LoginErrorPayload = {
     errorMessage?: string[];
     token?: string[];
   };
+  error?: {
+    message?: string;
+    details?: {
+      errorMessage?: string[];
+    };
+  };
 };
 
 const SOCIAL_AUTH_COOLDOWN_MS = 2500;
@@ -156,9 +162,16 @@ const JobSeekerLogin = () => {
       const axiosError = error as AxiosError<LoginErrorPayload>;
       const res = axiosError?.response;
       if (res?.status === 400) {
-        const errors = res?.data?.errors;
-        if (errors?.errorMessage) {
-          setErrorMessage(errors.errorMessage.join(' '));
+        const v2Details = res?.data?.error?.details;
+        const v2ErrorMessage = v2Details?.errorMessage;
+        const v1Errors = res?.data?.errors;
+        const v1ErrorMessage = v1Errors?.errorMessage;
+        if (Array.isArray(v2ErrorMessage)) {
+          setErrorMessage(v2ErrorMessage.join(' '));
+        } else if (Array.isArray(v1ErrorMessage)) {
+           setErrorMessage(v1ErrorMessage.join(' '));
+        } else if (typeof res?.data?.error?.message === 'string') {
+          setErrorMessage(res.data.error.message);
         } else {
           toastMessages.error(t('messages.tryAgain'));
         }
@@ -193,17 +206,23 @@ const JobSeekerLogin = () => {
       const axiosError = error as AxiosError<LoginErrorPayload>;
       const res = axiosError?.response;
       if (res?.status === 400) {
-        const errors = res?.data?.errors;
-        if (errors?.errorMessage) {
-          setErrorMessage(errors.errorMessage.join(' '));
-        } else if (errors?.token) {
-          setErrorMessage(errors.token.join(' '));
+        const v2Details = res?.data?.error?.details;
+        const v2ErrorMessage = v2Details?.errorMessage;
+        const v1Errors = res?.data?.errors;
+        const v1ErrorMessage = v1Errors?.errorMessage;
+        if (Array.isArray(v2ErrorMessage)) {
+          setErrorMessage(v2ErrorMessage.join(' '));
+        } else if (Array.isArray(v1ErrorMessage)) {
+          setErrorMessage(v1ErrorMessage.join(' '));
+        } else if (typeof res?.data?.error?.message === 'string') {
+          setErrorMessage(res.data.error.message);
         } else {
           toastMessages.error(t('messages.tryAgain'));
         }
       }
     } finally {
       setIsFullScreenLoading(false);
+      socialAuthInFlightRef.current = false;
     }
   };
 

@@ -327,12 +327,18 @@ class CustomConvertTokenView(ConvertTokenView):
                         )
 
                     if not allow_login:
+                        user_role = token.user.role_name
+                        if user_role == var_sys.JOB_SEEKER and role_name_input == var_sys.EMPLOYER:
+                            error_msg = "Tài khoản Google này đã đăng ký với vai trò Người tìm việc. Vui lòng đăng nhập với vai trò Người tìm việc."
+                        elif user_role == var_sys.EMPLOYER and role_name_input == var_sys.JOB_SEEKER:
+                            error_msg = "Tài khoản Google này đã đăng ký với vai trò Nhà tuyển dụng. Vui lòng đăng nhập với vai trò Nhà tuyển dụng."
+                        else:
+                            error_msg = ERROR_MESSAGES["LOGIN_ERROR"]
+
                         return response_data(
                             status=status.HTTP_400_BAD_REQUEST,
                             errors={
-                                "errorMessage": [
-                                    ERROR_MESSAGES["LOGIN_ERROR"]
-                                ]
+                                "errorMessage": [error_msg]
                             },
                         )
 

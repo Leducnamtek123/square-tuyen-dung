@@ -60,6 +60,14 @@ const getCompanyPortalPath = (language: string) => {
 const getCompanyWorkspace = (user?: User | null) =>
   ((user?.workspaces || []) as Workspace[]).find((workspace) => workspace.type === 'company');
 
+type ApiErrorPayload = {
+  errors?: Record<string, string[]>;
+  error?: {
+    message?: string;
+    details?: Record<string, string[]>;
+  };
+};
+
 const EmployerLogin = () => {
   const { t, i18n } = useTranslation('auth');
   TabTitle(t('login.employerTitle'));
@@ -90,6 +98,29 @@ const EmployerLogin = () => {
 
     setErrorMessage(errorMsg);
   }, [t]);
+
+  const extractErrorMessage = (res: { data?: ApiErrorPayload } | undefined): string | null => {
+    if (!res?.data) return null;
+
+    // V2 envelope: { success: false, error: { details: { errorMessage: [...] }, message: '...' } }
+    const v2Details = res.data.error?.details;
+    const v2ErrorMsg = v2Details?.errorMessage;
+
+    // V1 format: { errors: { errorMessage: [...] } }
+    const v1Errors = res.data.errors;
+    const v1ErrorMsg = v1Errors?.errorMessage;
+
+    if (Array.isArray(v2ErrorMsg) && v2ErrorMsg.length > 0) {
+      return v2ErrorMsg.join(' ');
+    }
+    if (Array.isArray(v1ErrorMsg) && v1ErrorMsg.length > 0) {
+      return v1ErrorMsg.join(' ');
+    }
+    if (typeof res.data.error?.message === 'string' && res.data.error.message) {
+      return res.data.error.message;
+    }
+    return null;
+  };
 
   const handleLogin = (data: EmployerLoginFormData) => {
     const getAccessToken = async (email: string, password: string, roleName: RoleName) => {
@@ -122,15 +153,13 @@ const EmployerLogin = () => {
           toastMessages.error(t('messages.loginError'));
         }
       } catch (error) {
-        const axiosError = error as AxiosError<{ errors?: Record<string, string[]> }>;
+        const axiosError = error as AxiosError<ApiErrorPayload>;
         const res = axiosError?.response;
 
         if (res?.status === 400) {
-          const errors = res?.data?.errors;
-
-          if (errors && 'errorMessage' in errors) {
-            const errMsg = errors.errorMessage;
-            setErrorMessage(Array.isArray(errMsg) ? errMsg.join(' ') : String(errMsg));
+          const errMsg = extractErrorMessage(res);
+          if (errMsg) {
+            setErrorMessage(errMsg);
           } else {
             toastMessages.error(t('messages.tryAgain'));
           }
@@ -223,15 +252,13 @@ const EmployerLogin = () => {
         toastMessages.error(t('messages.loginError'));
       }
     } catch (error) {
-      const axiosError = error as AxiosError<{ errors?: Record<string, string[]> }>;
+      const axiosError = error as AxiosError<ApiErrorPayload>;
       const res = axiosError?.response;
 
       if (res?.status === 400) {
-        const errors = res?.data?.errors;
-
-        if (errors && 'errorMessage' in errors) {
-          const errMsg = errors.errorMessage;
-          setErrorMessage(Array.isArray(errMsg) ? errMsg.join(' ') : String(errMsg));
+        const errMsg = extractErrorMessage(res);
+        if (errMsg) {
+          setErrorMessage(errMsg);
         } else {
           toastMessages.error(t('messages.tryAgain'));
         }
