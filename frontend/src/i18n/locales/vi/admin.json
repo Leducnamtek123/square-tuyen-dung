@@ -109,7 +109,7 @@
     "resumeManagement": "Hồ sơ đính kèm",
     "recruitmentAndInterviews": "Tuyển dụng",
     "jobPosts": "Tin tuyển dụng",
-    "trustReports": "Báo cáo tin cậy",
+    "trustReports": "Báo cáo vi phạm",
     "activityLogs": "Lịch sử hoạt động",
     "questionBank": "Ngân hàng câu hỏi",
     "interviewQuestionSets": "Bộ câu hỏi",
@@ -119,7 +119,8 @@
     "contentManagement": "Quản lý nội dung",
     "bannersManagement": "Quản lý Banner",
     "bannerTypes": "Loại banner",
-    "feedbacksManagement": "Quản lý Đánh giá",
+    "feedbacksManagement": "Quản lý đánh giá người dùng",
+    "contactMessages": "Báo lỗi & tin nhắn liên hệ",
     "articlesManagement": "Tin tức & Blog",
     "chatWithEmployers": "Kết nối với nhà tuyển dụng",
     "voiceProfiles": "Hồ sơ giọng nói AI",
@@ -843,9 +844,25 @@
       }
     },
     "trustReports": {
-      "title": "Báo cáo tin cậy",
-      "subtitle": "Rà soát báo cáo về tin tuyển dụng và hồ sơ công ty.",
-      "empty": "Chưa có báo cáo.",
+      "title": "Báo cáo vi phạm",
+      "subtitle": "Rà soát các báo cáo vi phạm về tin tuyển dụng và hồ sơ công ty.",
+      "searchPlaceholder": "Tìm kiếm báo cáo vi phạm...",
+      "empty": "Chưa có báo cáo vi phạm.",
+      "filter": {
+        "title": "Bộ lọc báo cáo vi phạm",
+        "description": "Tìm theo lý do, nội dung, công ty, tin tuyển dụng hoặc người báo cáo.",
+        "reset": "Xóa bộ lọc",
+        "advanced": "Bộ lọc nâng cao",
+        "reporter": "Người báo cáo",
+        "reporterPlaceholder": "Tên hoặc email người báo cáo",
+        "status": "Trạng thái",
+        "targetType": "Loại đối tượng",
+        "all": "Tất cả"
+      },
+      "targetType": {
+        "job": "Tin tuyển dụng",
+        "company": "Công ty"
+      },
       "table": {
         "id": "ID",
         "target": "Đối tượng",
@@ -1552,14 +1569,36 @@
     },
     "feedbacks": {
       "toast": {
+        "addSuccess": "Đã tạo đánh giá",
+        "addError": "Không thể tạo đánh giá",
         "updateSuccess": "Đã cập nhật đánh giá",
         "updateError": "Không thể cập nhật đánh giá",
         "deleteSuccess": "Đã xóa đánh giá",
         "deleteError": "Không thể xóa đánh giá"
       },
-      "title": "Quản lý Đánh giá",
+      "title": "Quản lý đánh giá người dùng",
+      "addBtn": "Thêm đánh giá",
+      "addTitle": "Thêm đánh giá",
+      "editTitle": "Sửa đánh giá",
       "breadcrumbAdmin": "Admin",
-      "breadcrumb": "Đánh giá",
+      "breadcrumb": "Đánh giá người dùng",
+      "searchPlaceholder": "Tìm kiếm đánh giá người dùng...",
+      "filter": {
+        "title": "Bộ lọc đánh giá",
+        "description": "Tìm theo nội dung, người dùng, trạng thái hoặc bằng chứng.",
+        "reset": "Xóa bộ lọc",
+        "advanced": "Bộ lọc nâng cao",
+        "user": "Người dùng",
+        "userPlaceholder": "Tên, email hoặc ID người dùng",
+        "status": "Trạng thái",
+        "evidence": "Bằng chứng",
+        "rating": "Đánh giá",
+        "all": "Tất cả",
+        "active": "Hiển thị",
+        "hidden": "Ẩn",
+        "withEvidence": "Có bằng chứng",
+        "withoutEvidence": "Không có bằng chứng"
+      },
       "deleteTitle": "Xóa Đánh giá",
       "deleteConfirm": "Bạn có chắc muốn xóa đánh giá của {{name}}?",
       "empty": "Chưa có đánh giá nào",
@@ -1567,9 +1606,15 @@
       "hide": "Ẩn",
       "cancel": "Hủy",
       "delete": "Xóa",
+      "save": "Lưu",
+      "saving": "Đang lưu...",
       "deleting": "Đang xóa...",
       "close": "Đóng",
       "evidencePreviewTitle": "Ảnh bằng chứng - {{name}}",
+      "validation": {
+        "contentRequired": "Vui lòng nhập nội dung",
+        "ratingInvalid": "Đánh giá phải từ 1 đến 5"
+      },
       "table": {
         "id": "ID",
         "user": "Người dùng",
@@ -1580,7 +1625,68 @@
         "status": "Trạng thái",
         "createdAt": "Ngày tạo",
         "actions": "Thao tác",
+        "deleteTooltip": "Xóa",
+        "editTooltip": "Sửa"
+      },
+      "form": {
+        "userId": "ID người dùng",
+        "userIdHelp": "Để trống nếu muốn lưu đánh giá ẩn danh.",
+        "content": "Nội dung",
+        "rating": "Đánh giá",
+        "isActive": "Hiển thị cho người dùng",
+        "evidenceImage": "Ảnh bằng chứng",
+        "evidenceHint": "Tải ảnh lên nếu cần ảnh chụp màn hình hoặc bằng chứng.",
+        "noFile": "Chưa chọn file"
+      }
+    },
+    "contactMessages": {
+      "title": "Báo lỗi & tin nhắn liên hệ",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Báo lỗi & tin nhắn liên hệ",
+      "searchPlaceholder": "Tìm báo lỗi hoặc tin nhắn...",
+      "filter": {
+        "title": "Bộ lọc báo lỗi",
+        "description": "Tìm theo tiêu đề, URL trang, người gửi hoặc nội dung.",
+        "reset": "Xóa bộ lọc",
+        "advanced": "Bộ lọc nâng cao",
+        "category": "Loại",
+        "readStatus": "Trạng thái đọc"
+      },
+      "categories": {
+        "bug_report": "Báo lỗi",
+        "feedback": "Góp ý",
+        "support": "Liên hệ hỗ trợ"
+      },
+      "deleteTitle": "Xóa tin nhắn",
+      "deleteConfirm": "Bạn có chắc muốn xóa tin nhắn từ {{name}}?",
+      "empty": "Chưa có tin nhắn nào",
+      "read": "Đã đọc",
+      "unread": "Chưa đọc",
+      "markAsRead": "Đánh dấu đã đọc",
+      "cancel": "Hủy",
+      "delete": "Xóa",
+      "deleting": "Đang xóa...",
+      "close": "Đóng",
+      "detailTitle": "Chi tiết tin nhắn",
+      "table": {
+        "id": "ID",
+        "category": "Loại",
+        "subject": "Tiêu đề",
+        "name": "Tên",
+        "email": "Email",
+        "phone": "Điện thoại",
+        "pageUrl": "URL trang",
+        "content": "Nội dung",
+        "status": "Trạng thái",
+        "createdAt": "Gửi lúc",
+        "actions": "Thao tác",
         "deleteTooltip": "Xóa"
+      },
+      "toast": {
+        "markAsReadSuccess": "Đã đánh dấu đã đọc",
+        "markAsReadError": "Không thể đánh dấu đã đọc",
+        "deleteSuccess": "Đã xóa tin nhắn",
+        "deleteError": "Không thể xóa tin nhắn"
       }
     }
   },

@@ -2,8 +2,8 @@ import DefaultLayout from '@/layouts/DefaultLayout';
 import StaticInfoPage from '@/views/defaultPages/StaticInfoPage';
 
 export const metadata = {
-  title: 'Contact',
-  description: 'Contact Square recruitment support.',
+  title: 'Báo lỗi & liên hệ',
+  description: 'Gửi báo lỗi, góp ý hoặc liên hệ với Square.',
 };
 
 export default function Page() {

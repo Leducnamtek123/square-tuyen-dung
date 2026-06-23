@@ -9,7 +9,8 @@ import { PaginatedResponse } from '../../../../types/api';
 import i18next from 'i18next';
 
 type UseFeedbacksResult = UseQueryResult<PaginatedResponse<Feedback>> & {
-    updateFeedback: (args: { id: string | number; data: Partial<AdminFeedbackPayload> }) => Promise<Feedback>;
+    createFeedback: (data: FormData | Partial<AdminFeedbackPayload>) => Promise<Feedback>;
+    updateFeedback: (args: { id: string | number; data: Partial<AdminFeedbackPayload> | FormData }) => Promise<Feedback>;
     deleteFeedback: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
@@ -26,7 +27,19 @@ export const useFeedbacks = (params?: AdminListParams): UseFeedbacksResult => {
         placeholderData: keepPreviousData,
     });
 
-    const updateMutation = useMutation<Feedback, Error, { id: string | number; data: Partial<AdminFeedbackPayload> }>({
+    const createMutation = useMutation<Feedback, Error, FormData | Partial<AdminFeedbackPayload>>({
+        mutationFn: (data) => adminManagementService.createFeedback(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin-feedbacks'] });
+            toastMessages.success(i18next.t('admin:pages.feedbacks.toast.addSuccess'));
+        },
+        onError: (err: Error | unknown) => {
+            toastMessages.error(i18next.t('admin:pages.feedbacks.toast.addError'));
+            console.error(err);
+        }
+    });
+
+    const updateMutation = useMutation<Feedback, Error, { id: string | number; data: Partial<AdminFeedbackPayload> | FormData }>({
         mutationFn: ({ id, data }) => adminManagementService.updateFeedback(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-feedbacks'] });
@@ -52,8 +65,9 @@ export const useFeedbacks = (params?: AdminListParams): UseFeedbacksResult => {
 
     return {
         ...query,
+        createFeedback: createMutation.mutateAsync,
         updateFeedback: updateMutation.mutateAsync,
         deleteFeedback: deleteMutation.mutateAsync,
-        isMutating: updateMutation.isPending || deleteMutation.isPending
+        isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
     } as UseFeedbacksResult;
 };

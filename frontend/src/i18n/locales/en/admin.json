@@ -109,7 +109,7 @@
     "resumeManagement": "CV/Resume Management",
     "recruitmentAndInterviews": "Recruitment & Interviews",
     "jobPosts": "Job Posts",
-    "trustReports": "Trust Reports",
+    "trustReports": "Violation Reports",
     "activityLogs": "Activity Logs",
     "questionBank": "Question Bank",
     "interviewQuestionSets": "Interview Question Sets",
@@ -119,7 +119,8 @@
     "contentManagement": "Content Management",
     "bannersManagement": "Banners Management",
     "bannerTypes": "Banner Types",
-    "feedbacksManagement": "Feedbacks Management",
+    "feedbacksManagement": "User Reviews",
+    "contactMessages": "Bug Reports & Contact Messages",
     "articlesManagement": "News & Blog",
       "chatWithEmployers": "Chat with Employers",
       "voiceProfiles": "AI Voice Profiles",
@@ -849,9 +850,25 @@
       }
     },
     "trustReports": {
-      "title": "Trust Reports",
+      "title": "Violation Reports",
       "subtitle": "Review reports for job posts and company profiles.",
-      "empty": "No trust reports.",
+      "searchPlaceholder": "Search violation reports...",
+      "empty": "No violation reports.",
+      "filter": {
+        "title": "Violation report filters",
+        "description": "Search by reason, message, company, job post, or reporter.",
+        "reset": "Clear filters",
+        "advanced": "Advanced filters",
+        "reporter": "Reporter",
+        "reporterPlaceholder": "Reporter name or email",
+        "status": "Status",
+        "targetType": "Target type",
+        "all": "All"
+      },
+      "targetType": {
+        "job": "Job post",
+        "company": "Company"
+      },
       "table": {
         "id": "ID",
         "target": "Target",
@@ -1558,24 +1575,52 @@
     },
     "feedbacks": {
       "toast": {
+        "addSuccess": "Feedback created successfully",
+        "addError": "Could not create feedback",
         "updateSuccess": "Feedback updated successfully",
         "updateError": "Could not update feedback",
         "deleteSuccess": "Feedback deleted successfully",
         "deleteError": "Could not delete feedback"
       },
-      "title": "Feedback Management",
+      "title": "User Reviews",
+      "addBtn": "Add Review",
+      "addTitle": "Add Review",
+      "editTitle": "Edit Review",
       "breadcrumbAdmin": "Admin",
-      "breadcrumb": "Feedbacks",
-      "deleteTitle": "Delete Feedback",
-      "deleteConfirm": "Are you sure you want to delete feedback from {{name}}?",
-      "empty": "No feedbacks yet",
+      "breadcrumb": "User Reviews",
+      "searchPlaceholder": "Search user reviews...",
+      "filter": {
+        "title": "Review filters",
+        "description": "Search by content, user, rating, status, or evidence.",
+        "reset": "Clear filters",
+        "advanced": "Advanced filters",
+        "user": "User",
+        "userPlaceholder": "User name, email, or ID",
+        "status": "Status",
+        "evidence": "Evidence",
+        "rating": "Rating",
+        "all": "All",
+        "active": "Active",
+        "hidden": "Hidden",
+        "withEvidence": "With evidence",
+        "withoutEvidence": "Without evidence"
+      },
+      "deleteTitle": "Delete Review",
+      "deleteConfirm": "Are you sure you want to delete review from {{name}}?",
+      "empty": "No reviews yet",
       "show": "Show",
       "hide": "Hide",
       "cancel": "Cancel",
       "delete": "Delete",
+      "save": "Save",
+      "saving": "Saving...",
       "deleting": "Deleting...",
       "close": "Close",
       "evidencePreviewTitle": "Evidence image - {{name}}",
+      "validation": {
+        "contentRequired": "Content is required",
+        "ratingInvalid": "Rating must be between 1 and 5"
+      },
       "table": {
         "id": "ID",
         "user": "User",
@@ -1586,7 +1631,68 @@
         "status": "Status",
         "createdAt": "Created At",
         "actions": "Actions",
+        "deleteTooltip": "Delete",
+        "editTooltip": "Edit"
+      },
+      "form": {
+        "userId": "User ID",
+        "userIdHelp": "Leave blank to keep review anonymous.",
+        "content": "Content",
+        "rating": "Rating",
+        "isActive": "Visible to users",
+        "evidenceImage": "Evidence image",
+        "evidenceHint": "Upload an image if this review needs proof or a screenshot.",
+        "noFile": "No file selected"
+      }
+    },
+    "contactMessages": {
+      "title": "Bug Reports & Contact Messages",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Bug Reports & Contact Messages",
+      "searchPlaceholder": "Search bug reports or messages...",
+      "filter": {
+        "title": "Bug report filters",
+        "description": "Search by subject, page URL, sender, or message content.",
+        "reset": "Clear filters",
+        "advanced": "Advanced filters",
+        "category": "Category",
+        "readStatus": "Read status"
+      },
+      "categories": {
+        "bug_report": "Bug report",
+        "feedback": "Feedback",
+        "support": "Support"
+      },
+      "deleteTitle": "Delete Message",
+      "deleteConfirm": "Are you sure you want to delete message from {{name}}?",
+      "empty": "No messages yet",
+      "read": "Read",
+      "unread": "Unread",
+      "markAsRead": "Mark as read",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "close": "Close",
+      "detailTitle": "Message Detail",
+      "table": {
+        "id": "ID",
+        "category": "Category",
+        "subject": "Subject",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "pageUrl": "Page URL",
+        "content": "Content",
+        "status": "Status",
+        "createdAt": "Sent At",
+        "actions": "Actions",
         "deleteTooltip": "Delete"
+      },
+      "toast": {
+        "markAsReadSuccess": "Marked as read",
+        "markAsReadError": "Could not mark as read",
+        "deleteSuccess": "Message deleted",
+        "deleteError": "Could not delete message"
       }
     }
   },

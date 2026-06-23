@@ -84,4 +84,26 @@ describe('admin table ordering contract', () => {
     expect(feedbackViewSetSource).toContain('"rating": "rating"');
     expect(feedbackViewSetSource).toContain('"create_at": "create_at"');
   });
+
+  it('upgrades admin feedback list to server pagination with moderation filters', () => {
+    const pageSource = readAdminSource('FeedbacksPage/index.tsx');
+
+    expect(pageSource).toContain('paginationMode="visible"');
+    expect(pageSource).toContain('pagination={pagination}');
+    expect(pageSource).toContain('onPaginationChange={onPaginationChange}');
+    expect(pageSource).toContain('FilterBar');
+    expect(pageSource).toContain('hasEvidence');
+    expect(pageSource).toContain('searchTerm');
+  });
+
+  it('upgrades admin trust report list to server pagination with moderation filters', () => {
+    const pageSource = readAdminSource('TrustReportsPage/index.tsx');
+
+    expect(pageSource).toContain('DataTable');
+    expect(pageSource).toContain('paginationMode="visible"');
+    expect(pageSource).toContain('pagination={pagination}');
+    expect(pageSource).toContain('FilterBar');
+    expect(pageSource).toContain('targetType');
+    expect(pageSource).toContain('reporter');
+  });
 });

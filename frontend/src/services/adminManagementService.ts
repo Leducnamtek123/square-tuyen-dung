@@ -31,8 +31,18 @@ export type AdminListParams = {
   ordering?: string;
   kw?: string;
   search?: string;
+  user?: string | number;
+  userId?: string | number;
+  reporter?: string | number;
+  reporterId?: string | number;
   roleName?: string;
   status?: string;
+  category?: string;
+  is_read?: boolean | string;
+  isRead?: boolean | string;
+  isActive?: boolean | string;
+  hasEvidence?: boolean | string;
+  rating?: number | string;
   action?: string;
   actorEmail?: string;
   targetType?: string;
@@ -86,6 +96,9 @@ export interface AdminFeedbackPayload {
   rating?: number;
   is_active?: boolean;
   user?: number;
+  userId?: number;
+  isActive?: boolean;
+  evidenceImageFile?: File | null;
 }
 
 export interface AdminBannerTypePayload {
@@ -342,9 +355,14 @@ const adminManagementService = {
     return withPaginatedPresign<Feedback>(httpRequest.get(url, { params: cleanParams(params) }));
   },
 
-  updateFeedback: (id: IdType, data: Partial<AdminFeedbackPayload>): Promise<Feedback> => {
+  createFeedback: (data: Partial<AdminFeedbackPayload> | FormData): Promise<Feedback> => {
+    const url = 'content/web/admin/feedbacks/';
+    return withPresign(httpRequest.post<Feedback>(url, data, adminManagementService.buildMultipartConfig(data)));
+  },
+
+  updateFeedback: (id: IdType, data: Partial<AdminFeedbackPayload> | FormData): Promise<Feedback> => {
     const url = `content/web/admin/feedbacks/${id}/`;
-    return withPresign(httpRequest.patch<Feedback>(url, data));
+    return withPresign(httpRequest.patch<Feedback>(url, data, adminManagementService.buildMultipartConfig(data)));
   },
 
   deleteFeedback: (id: IdType): Promise<void> => {

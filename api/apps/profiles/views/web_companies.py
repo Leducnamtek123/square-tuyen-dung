@@ -58,6 +58,23 @@ from apps.jobs import serializers as job_serializers
 from .web_helpers import _get_user_company, _get_company_membership, _has_company_permission
 
 
+def _parse_optional_bool(value):
+    if value in (None, ""):
+        return None
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _parse_optional_int(value):
+    if value in (None, ""):
+        return None
+    try:
+        return int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
 class CompanyView(viewsets.ViewSet):
 
     def get_permissions(self):
@@ -436,7 +453,16 @@ class TrustReportViewSet(
     permission_classes = [perms_sys.IsAuthenticated]
 
     def get_queryset(self):
-        return self.request.user.trust_reports.select_related("company", "job_post", "reporter").order_by("-create_at")
+        queryset = self.request.user.trust_reports.select_related("company", "job_post", "reporter").order_by("-create_at")
+        search = self.request.query_params.get("kw") or self.request.query_params.get("search")
+        if search:
+            queryset = queryset.filter(
+                Q(reason__icontains=search)
+                | Q(message__icontains=search)
+                | Q(company__company_name__icontains=search)
+                | Q(job_post__job_name__icontains=search)
+            )
+        return queryset
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -481,10 +507,30 @@ class AdminTrustReportViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         queryset = self.queryset.order_by("-create_at")
         status_filter = self.request.query_params.get("status")
         target_type = self.request.query_params.get("targetType")
+        reporter_filter = self.request.query_params.get("reporter") or self.request.query_params.get("reporterId")
+        search = self.request.query_params.get("kw") or self.request.query_params.get("search")
         if status_filter:
             queryset = queryset.filter(status=status_filter)
         if target_type:
             queryset = queryset.filter(target_type=target_type)
+        if reporter_filter:
+            reporter_text = str(reporter_filter).strip()
+            if reporter_text.isdigit():
+                queryset = queryset.filter(reporter_id=int(reporter_text))
+            else:
+                queryset = queryset.filter(
+                    Q(reporter__full_name__icontains=reporter_text)
+                    | Q(reporter__email__icontains=reporter_text)
+                )
+        if search:
+            queryset = queryset.filter(
+                Q(reason__icontains=search)
+                | Q(message__icontains=search)
+                | Q(company__company_name__icontains=search)
+                | Q(job_post__job_name__icontains=search)
+                | Q(reporter__full_name__icontains=search)
+                | Q(reporter__email__icontains=search)
+            )
         return queryset
 
 

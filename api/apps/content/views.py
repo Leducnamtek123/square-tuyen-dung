@@ -29,6 +29,7 @@ from .models import (
     Banner,
     BannerType,
     Article,
+    ContactMessage,
 )
 
 from .serializers import (
@@ -39,6 +40,8 @@ from .serializers import (
     ArticleDetailSerializer,
     AdminArticleSerializer,
     EmployerArticleSerializer,
+    ContactMessageSerializer,
+    AdminContactMessageSerializer,
 )
 from apps.accounts import permissions as perms_custom
 
@@ -118,11 +121,28 @@ def _apply_article_search(queryset, raw_search, fields=ARTICLE_SEARCH_FIELDS):
     )
 
 
+def _parse_optional_bool(value):
+    if value in (None, ""):
+        return None
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _parse_optional_int(value):
+    if value in (None, ""):
+        return None
+    try:
+        return int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
 class FeedbackViewSet(viewsets.ViewSet,
+                      generics.ListAPIView,
+                      generics.CreateAPIView):
 
-                      generics.CreateAPIView,
-
-                      generics.ListAPIView):
+    """Public read-only: only shows active feedbacks (admin creates via AdminFeedbackViewSet)."""
 
     queryset = Feedback.objects.all().select_related('user', 'evidence_image')
 
@@ -130,13 +150,7 @@ class FeedbackViewSet(viewsets.ViewSet,
 
     renderer_classes = [renderers.MyJSONRenderer]
 
-    def get_permissions(self):
-
-        if self.action in ["create"]:
-
-            return [perms_sys.IsAuthenticated()]
-
-        return [perms_sys.AllowAny()]
+    permission_classes = [perms_sys.AllowAny]
 
     def list(self, request, *args, **kwargs):
 
@@ -149,6 +163,13 @@ class FeedbackViewSet(viewsets.ViewSet,
                                          fields=['id', 'content', 'rating', 'isActive', 'userDict'])
 
         return var_res.response_data(data=serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        feedback = serializer.save()
+        output = self.get_serializer(feedback)
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=output.data)
 
 
 @api_view(http_method_names=['post'])
@@ -425,13 +446,37 @@ class AdminFeedbackViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        is_active = request.GET.get('is_active', None)
-        rating = request.GET.get('rating', None)
+        search = request.GET.get('kw') or request.GET.get('search')
+        user_filter = request.GET.get('user') or request.GET.get('userId')
+        is_active = _parse_optional_bool(request.GET.get('is_active'))
+        rating = _parse_optional_int(request.GET.get('rating'))
+        has_evidence = _parse_optional_bool(
+            request.GET.get('hasEvidence') if request.GET.get('hasEvidence') is not None else request.GET.get('has_evidence')
+        )
 
+        if search:
+            queryset = queryset.filter(
+                models.Q(content__icontains=search)
+                | models.Q(user__full_name__icontains=search)
+                | models.Q(user__email__icontains=search)
+            )
+        if user_filter:
+            user_text = str(user_filter).strip()
+            if user_text.isdigit():
+                queryset = queryset.filter(user_id=int(user_text))
+            else:
+                queryset = queryset.filter(
+                    models.Q(user__full_name__icontains=user_text)
+                    | models.Q(user__email__icontains=user_text)
+                )
         if is_active is not None:
-            queryset = queryset.filter(is_active=is_active in ['true', '1', 'True'])
-        if rating:
-            queryset = queryset.filter(rating=int(rating))
+            queryset = queryset.filter(is_active=is_active)
+        if rating is not None:
+            queryset = queryset.filter(rating=rating)
+        if has_evidence is True:
+            queryset = queryset.filter(evidence_image__isnull=False)
+        elif has_evidence is False:
+            queryset = queryset.filter(evidence_image__isnull=True)
 
         queryset = _apply_admin_ordering(
             queryset,
@@ -439,8 +484,10 @@ class AdminFeedbackViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             {
                 "id": "id",
                 "userDict.fullName": "user__full_name",
+                "userDict.email": "user__email",
                 "rating": "rating",
                 "is_active": "is_active",
+                "evidenceImageUrl": "evidence_image__id",
                 "create_at": "create_at",
                 "createAt": "create_at",
                 "updateAt": "update_at",
@@ -524,6 +571,85 @@ def system_settings_view(request):
 
 
 # ===== Article ViewSets =====
+
+class EmployerArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
+    """Employer CRUD for their own blog posts."""
+    permission_classes = [perms_custom.IsEmployerUser]
+    renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
+    serializer_class = EmployerArticleSerializer
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        qs = Article.objects.filter(
+            category=Article.CATEGORY_BLOG,
+            author=self.request.user
+        ).select_related('thumbnail').order_by('-create_at')
+        status_filter = self.request.GET.get('status')
+        search = self.request.GET.get('search') or self.request.GET.get('kw')
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+        if search:
+            qs = _apply_article_search(qs, search)
+        return qs
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        article = serializer.save()
+        self._handle_thumbnail(request, article)
+        article.refresh_from_db()
+        record_audit_log(request=request, action="create", instance=article)
+        return var_res.response_data(data=self.get_serializer(article).data)
+
+    def update(self, request, *args, **kwargs):
+        article = self.get_object()
+        if article.author != request.user:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+        serializer = self.get_serializer(article, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        self._handle_thumbnail(request, article)
+        article.refresh_from_db()
+        record_audit_log(request=request, action="update", instance=article)
+        return var_res.response_data(data=self.get_serializer(article).data)
+
+    def destroy(self, request, *args, **kwargs):
+        article = self.get_object()
+        if article.author != request.user:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+        record_audit_log(request=request, action="delete", instance=article)
+        article.delete()
+        return var_res.response_data()
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return var_res.response_data(data=serializer.data)
+
+    def _handle_thumbnail(self, request, article):
+        from shared.helpers.cloudinary_service import CloudinaryService
+        from apps.files.models import File
+        thumb_file = request.FILES.get('thumbnailFile')
+        if thumb_file:
+            upload_result = CloudinaryService.upload_image(thumb_file, 'articles')
+            if upload_result:
+                file_record = File.update_or_create_file_with_cloudinary(
+                    article.thumbnail, upload_result, 'ARTICLE_THUMBNAIL'
+                )
+                if file_record:
+                    article.thumbnail = file_record
+                    article.save()
+
 
 class ArticlePublicViewSet(viewsets.ReadOnlyModelViewSet):
     """Public read-only access to published articles."""
@@ -638,80 +764,69 @@ class AdminArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
                     article.save()
 
 
-class EmployerArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
-    """Employer CRUD for their own blog posts."""
-    permission_classes = [perms_custom.IsEmployerUser]
+# ===== ContactMessage ViewSets =====
+
+class ContactMessageViewSet(viewsets.ViewSet,
+                            generics.CreateAPIView,
+                            generics.ListAPIView):
+    """Public: visitors can submit contact messages, no auth required.
+    List is restricted to active feedback (no sensitive data exposed)."""
+    queryset = ContactMessage.objects.all()
+    serializer_class = ContactMessageSerializer
+    renderer_classes = [renderers.MyJSONRenderer]
+    permission_classes = [perms_sys.AllowAny]
+
+    def list(self, request, *args, **kwargs):
+        return var_res.response_data(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class AdminContactMessageViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
+    """Admin CRUD for managing contact messages from visitors."""
+    queryset = ContactMessage.objects.all().order_by('-create_at')
+    permission_classes = [perms_sys.IsAdminUser]
     renderer_classes = [renderers.MyJSONRenderer]
     pagination_class = paginations.CustomPagination
-    serializer_class = EmployerArticleSerializer
-    lookup_field = 'pk'
+    serializer_class = AdminContactMessageSerializer
 
     def get_queryset(self):
-        qs = Article.objects.filter(
-            category=Article.CATEGORY_BLOG,
-            author=self.request.user
-        ).select_related('thumbnail').order_by('-create_at')
-        status_filter = self.request.GET.get('status')
-        search = self.request.GET.get('search') or self.request.GET.get('kw')
-        if status_filter:
-            qs = qs.filter(status=status_filter)
-        if search:
-            qs = _apply_article_search(qs, search)
+        qs = super().get_queryset()
+        is_read = self.request.GET.get('is_read')
+        category = self.request.GET.get('category')
+        kw = self.request.GET.get('kw') or self.request.GET.get('search')
+        if is_read is not None:
+            qs = qs.filter(is_read=is_read in ['true', '1', 'True'])
+        if category:
+            qs = qs.filter(category=category)
+        if kw:
+            qs = qs.filter(
+                models.Q(name__icontains=kw) |
+                models.Q(email__icontains=kw) |
+                models.Q(subject__icontains=kw) |
+                models.Q(content__icontains=kw) |
+                models.Q(page_url__icontains=kw)
+            )
         return qs
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
+        queryset = _apply_admin_ordering(
+            queryset,
+            request,
+            {
+                "id": "id",
+                "name": "name",
+                "email": "email",
+                "category": "category",
+                "subject": "subject",
+                "is_read": "is_read",
+                "create_at": "create_at",
+                "createAt": "create_at",
+                "updateAt": "update_at",
+            },
+        )
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return var_res.response_data(data=serializer.data)
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        article = serializer.save()
-        self._handle_thumbnail(request, article)
-        article.refresh_from_db()
-        record_audit_log(request=request, action="create", instance=article)
-        return var_res.response_data(data=self.get_serializer(article).data)
-
-    def update(self, request, *args, **kwargs):
-        article = self.get_object()
-        if article.author != request.user:
-            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
-        serializer = self.get_serializer(article, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        self._handle_thumbnail(request, article)
-        article.refresh_from_db()
-        record_audit_log(request=request, action="update", instance=article)
-        return var_res.response_data(data=self.get_serializer(article).data)
-
-    def destroy(self, request, *args, **kwargs):
-        article = self.get_object()
-        if article.author != request.user:
-            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
-        record_audit_log(request=request, action="delete", instance=article)
-        article.delete()
-        return var_res.response_data()
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return var_res.response_data(data=serializer.data)
-
-    def _handle_thumbnail(self, request, article):
-        from shared.helpers.cloudinary_service import CloudinaryService
-        from apps.files.models import File
-        thumb_file = request.FILES.get('thumbnailFile')
-        if thumb_file:
-            upload_result = CloudinaryService.upload_image(thumb_file, 'articles')
-            if upload_result:
-                file_record = File.update_or_create_file_with_cloudinary(
-                    article.thumbnail, upload_result, 'ARTICLE_THUMBNAIL'
-                )
-                if file_record:
-                    article.thumbnail = file_record
-                    article.save()

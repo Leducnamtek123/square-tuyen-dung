@@ -11,12 +11,14 @@ web_router = DefaultRouter()
 
 web_router.register(r'feedbacks', views.FeedbackViewSet, basename='feedback')
 web_router.register(r'articles', views.ArticlePublicViewSet, basename='article-public')
+web_router.register(r'contact-messages', views.ContactMessageViewSet, basename='contact-message')
 
 admin_router = DefaultRouter()
 admin_router.register(r'banners', views.AdminBannerViewSet, basename='admin-banner')
 admin_router.register(r'feedbacks', views.AdminFeedbackViewSet, basename='admin-feedback')
 admin_router.register(r'banner-types', views.AdminBannerTypeViewSet, basename='admin-banner-type')
 admin_router.register(r'articles', views.AdminArticleViewSet, basename='admin-article')
+admin_router.register(r'contact-messages', views.AdminContactMessageViewSet, basename='admin-contact-message')
 
 employer_router = DefaultRouter()
 employer_router.register(r'articles', views.EmployerArticleViewSet, basename='employer-article')

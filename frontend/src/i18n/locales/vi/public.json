@@ -376,8 +376,8 @@
   },
   "static": {
     "contact": {
-      "title": "Liên hệ",
-      "subtitle": "Kết nối với đội ngũ hỗ trợ tuyển dụng Square.",
+      "title": "Báo lỗi & liên hệ",
+      "subtitle": "Báo lỗi, gửi góp ý hoặc liên hệ với đội ngũ hỗ trợ Square.",
       "sections": [
         {
           "title": "Email hỗ trợ",
@@ -387,7 +387,30 @@
           "title": "Giờ làm việc",
           "body": "Hỗ trợ hoạt động từ thứ Hai đến thứ Sáu trong giờ hành chính."
         }
-      ]
+      ],
+      "categories": {
+        "bugReport": "Báo lỗi",
+        "feedback": "Góp ý",
+        "support": "Yêu cầu hỗ trợ"
+      },
+      "form": {
+        "title": "Gửi báo cáo",
+        "subtitle": "Vui lòng cung cấp đủ ngữ cảnh để chúng tôi có thể tái hiện và xử lý nhanh hơn.",
+        "category": "Loại",
+        "subject": "Tiêu đề",
+        "pageUrl": "URL trang",
+        "name": "Họ và tên",
+        "email": "Email",
+        "phone": "Điện thoại",
+        "content": "Chi tiết",
+        "sending": "Đang gửi...",
+        "submit": "Gửi báo cáo"
+      },
+      "validation": {
+        "required": "Vui lòng nhập họ tên, email và nội dung."
+      },
+      "success": "Đã gửi tin nhắn thành công.",
+      "error": "Không thể gửi tin nhắn. Vui lòng thử lại."
     },
     "faq": {
       "title": "Câu hỏi thường gặp",

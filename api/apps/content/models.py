@@ -56,7 +56,7 @@ class Feedback(ProjectBaseModel):
 
     is_active = models.BooleanField(default=False)
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="feedbacks")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="feedbacks", null=True, blank=True)
 
     evidence_image = models.ForeignKey(
         File,
@@ -209,3 +209,37 @@ class Article(ProjectBaseModel):
         if self.status == self.STATUS_PUBLISHED and not self.published_at:
             self.published_at = timezone.now()
         super().save(*args, **kwargs)
+
+
+class ContactMessage(ProjectBaseModel):
+    """Contact messages from site visitors (public form)."""
+
+    CATEGORY_BUG_REPORT = "bug_report"
+    CATEGORY_FEEDBACK = "feedback"
+    CATEGORY_SUPPORT = "support"
+    CATEGORY_CHOICES = [
+        (CATEGORY_BUG_REPORT, "Báo lỗi"),
+        (CATEGORY_FEEDBACK, "Góp ý"),
+        (CATEGORY_SUPPORT, "Liên hệ hỗ trợ"),
+    ]
+
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        default=CATEGORY_BUG_REPORT,
+        db_index=True,
+    )
+    subject = models.CharField(max_length=150, blank=True, default="")
+    page_url = models.URLField(max_length=500, blank=True, default="")
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True)
+    content = models.TextField(max_length=2000)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "project_contact_message"
+        ordering = ["-create_at"]
+
+    def __str__(self):
+        return f"{self.name} - {self.content[:50]}"

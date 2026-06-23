@@ -9,9 +9,11 @@ from .models import (
     Banner,
     BannerType,
     Article,
+    ContactMessage,
 )
 
 from apps.accounts import serializers as auth_serializers
+from apps.accounts.models import User
 from apps.files.models import File
 from shared.helpers.cloudinary_service import CloudinaryService
 
@@ -66,9 +68,10 @@ class FeedbackSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     'evidenceImageFile': ['Upload failed.'],
                 })
+        user = request.user if getattr(request, "user", None) and request.user.is_authenticated else None
         feedback = Feedback.objects.create(
             **validated_data,
-            user=request.user,
+            user=user,
             evidence_image=evidence_image,
         )
         return feedback
@@ -167,6 +170,18 @@ class AdminFeedbackSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """Full admin serializer for Feedback management."""
     evidenceImageUrl = serializers.SerializerMethodField(read_only=True)
     rating = serializers.IntegerField(min_value=1, max_value=5)
+    isActive = serializers.BooleanField(source='is_active', required=False)
+    userId = serializers.PrimaryKeyRelatedField(
+        source='user',
+        queryset=User.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+    evidenceImageFile = serializers.ImageField(
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
 
     userDict = auth_serializers.UserSerializer(
         source="user",
@@ -179,17 +194,59 @@ class AdminFeedbackSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             return feedback.evidence_image.get_full_url()
         return None
 
+    def _upload_evidence_image(self, image_file):
+        upload_result = CloudinaryService.upload_image(
+            image_file,
+            'feedback-evidence',
+        )
+        if not upload_result:
+            return None
+        return File.update_or_create_file_with_cloudinary(
+            None,
+            upload_result,
+            File.OTHER_TYPE,
+        )
+
+    def _save_feedback_evidence(self, feedback, validated_data):
+        evidence_image_file = validated_data.pop('evidenceImageFile', None)
+        if evidence_image_file:
+            evidence_image = self._upload_evidence_image(evidence_image_file)
+            if not evidence_image:
+                raise serializers.ValidationError({
+                    'evidenceImageFile': ['Upload failed.'],
+                })
+            feedback.evidence_image = evidence_image
+
     class Meta:
         model = Feedback
         fields = (
-            'id', 'content', 'rating', 'is_active',
-            'user', 'userDict', 'evidence_image', 'evidenceImageUrl',
+            'id', 'content', 'rating', 'isActive',
+            'userId', 'userDict', 'evidenceImageFile', 'evidenceImageUrl',
             'create_at', 'update_at',
         )
         read_only_fields = (
             'id', 'create_at', 'update_at',
             'userDict', 'evidenceImageUrl',
         )
+
+    def create(self, validated_data):
+        evidence_image_file = validated_data.pop('evidenceImageFile', None)
+        evidence_image = None
+        if evidence_image_file:
+            evidence_image = self._upload_evidence_image(evidence_image_file)
+            if not evidence_image:
+                raise serializers.ValidationError({
+                    'evidenceImageFile': ['Upload failed.'],
+                })
+        feedback = Feedback.objects.create(
+            **validated_data,
+            evidence_image=evidence_image,
+        )
+        return feedback
+
+    def update(self, instance, validated_data):
+        self._save_feedback_evidence(instance, validated_data)
+        return super().update(instance, validated_data)
 
 
 class AdminBannerTypeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
@@ -333,3 +390,52 @@ class EmployerArticleSerializer(DynamicFieldsMixin, serializers.ModelSerializer)
             if instance.status == Article.STATUS_PUBLISHED:
                 validated_data['status'] = Article.STATUS_PENDING
         return super().update(instance, validated_data)
+
+
+# ─── ContactMessage Serializers ─────────────────────────────────────────────────
+
+class ContactMessageSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    """Public serializer for creating contact messages (no auth required)."""
+
+    category = serializers.ChoiceField(
+        choices=ContactMessage.CATEGORY_CHOICES,
+        required=False,
+        default=ContactMessage.CATEGORY_BUG_REPORT,
+    )
+    subject = serializers.CharField(required=False, allow_blank=True, max_length=150)
+    pageUrl = serializers.URLField(
+        source='page_url',
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+    )
+
+    class Meta:
+        model = ContactMessage
+        fields = (
+            'id', 'category', 'subject', 'pageUrl', 'name', 'email', 'phone', 'content',
+            'create_at',
+        )
+        read_only_fields = ('id', 'create_at')
+
+
+class AdminContactMessageSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    """Admin serializer for managing contact messages."""
+
+    category = serializers.ChoiceField(
+        choices=ContactMessage.CATEGORY_CHOICES,
+        required=False,
+    )
+    subject = serializers.CharField(required=False, allow_blank=True, max_length=150)
+    pageUrl = serializers.URLField(source='page_url', required=False, allow_blank=True, allow_null=True)
+
+    class Meta:
+        model = ContactMessage
+        fields = (
+            'id', 'category', 'subject', 'pageUrl', 'name', 'email', 'phone', 'content',
+            'is_read', 'create_at', 'update_at',
+        )
+        read_only_fields = (
+            'id', 'create_at', 'update_at',
+            'name', 'email', 'phone', 'content',
+        )

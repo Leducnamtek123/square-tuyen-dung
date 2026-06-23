@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Menu, Stack, Typography } from "@mui/material";
 
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import BugReportOutlinedIcon from "@mui/icons-material/BugReportOutlined";
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
 import LogoutIcon from "@mui/icons-material/Logout";
 import Feedback from '@/components/Features/Feedback';
@@ -18,7 +19,7 @@ import { removeUserInfo } from "../../../../redux/userSlice";
 import { setActiveWorkspace } from "../../../../redux/userSlice";
 
 import { HOST_NAME, ROLES_NAME, ROUTES } from "../../../../configs/constants";
-import { isAdminPortalPath } from "../../../../configs/portalRouting";
+import { isAdminPortalPath, isEmployerPortalPath } from "../../../../configs/portalRouting";
 import { localizeRoutePath } from "../../../../configs/routeLocalization";
 import tokenService from "../../../../services/tokenService";
 import type { Workspace } from '@/types/models';
@@ -63,6 +64,9 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
   const isAdminPortal =
     isAdminPortalPath(pathname) ||
     (typeof window !== "undefined" && window.location.hostname === HOST_NAME.ADMIN_PROJECT);
+  const isEmployerPortal =
+    isEmployerPortalPath(pathname) ||
+    (typeof window !== "undefined" && window.location.hostname.startsWith("employer."));
   const shouldShowAdminPortalLink =
     currentUser?.roleName === ROLES_NAME.ADMIN && !isAdminPortal;
 
@@ -141,6 +145,15 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
     event.stopPropagation();
     openFeedbackAfterMenuCloseRef.current = true;
     handleCloseUserMenu();
+  };
+
+  const handleOpenBugReport = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    handleCloseUserMenu();
+
+    const contactPath = isEmployerPortal ? ROUTES.EMPLOYER.CONTACT : ROUTES.JOB_SEEKER.CONTACT;
+    push(localizeRoutePath(`/${contactPath}`, i18n.language));
   };
 
   const handleMenuExited = () => {
@@ -240,6 +253,18 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
               onClick={handleOpenFeedback}
             >
               <Typography marginRight="auto">{t('feedback.button')}</Typography>
+            </Button>
+          )}
+          {canSubmitFeedback && (
+            <Button
+              startIcon={<BugReportOutlinedIcon style={{ marginLeft: 4 }} />}
+              variant="text"
+              color="primary"
+              sx={{ textTransform: "inherit" }}
+              fullWidth
+              onClick={handleOpenBugReport}
+            >
+              <Typography marginRight="auto">{t('nav.reportBug')}</Typography>
             </Button>
           )}
           <Button

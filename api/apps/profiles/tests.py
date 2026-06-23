@@ -1823,3 +1823,61 @@ class TestAdminTrustReportAPI:
         assert response.status_code == 200
         report.refresh_from_db()
         assert report.status == TrustReport.STATUS_REVIEWING
+
+    def test_admin_trust_report_list_filters_by_status_target_and_reporter(
+        self,
+        admin_user,
+        job_seeker_user,
+        company,
+        job_post,
+    ):
+        other_user = job_seeker_user.__class__.objects.create_user_with_role_name(
+            email="report-filter@test.com",
+            full_name="Report Filter",
+            role_name=var_sys.JOB_SEEKER,
+            password="testpass123",
+            is_active=True,
+            is_verify_email=True,
+        )
+        target_report = TrustReport.objects.create(
+            target_type=TrustReport.TARGET_COMPANY,
+            reason=TrustReport.REASON_SCAM,
+            message="Suspicious profile",
+            status=TrustReport.STATUS_REVIEWING,
+            company=company,
+            reporter=job_seeker_user,
+        )
+        TrustReport.objects.create(
+            target_type=TrustReport.TARGET_COMPANY,
+            reason=TrustReport.REASON_SCAM,
+            message="Different reporter",
+            status=TrustReport.STATUS_REVIEWING,
+            company=company,
+            reporter=other_user,
+        )
+        TrustReport.objects.create(
+            target_type=TrustReport.TARGET_JOB,
+            reason=TrustReport.REASON_SPAM,
+            message="Wrong target type",
+            status=TrustReport.STATUS_REVIEWING,
+            job_post=job_post,
+            reporter=job_seeker_user,
+        )
+
+        client = APIClient()
+        client.force_authenticate(user=admin_user)
+
+        response = client.get(
+            "/api/v1/info/web/admin/trust-reports/",
+            {
+                "status": TrustReport.STATUS_REVIEWING,
+                "targetType": TrustReport.TARGET_COMPANY,
+                "reporter": str(job_seeker_user.id),
+                "search": "Suspicious",
+            },
+        )
+
+        assert response.status_code == 200
+        payload = response.json()
+        results = payload.get("data", payload).get("results", payload.get("results", []))
+        assert [item["id"] for item in results] == [target_report.id]

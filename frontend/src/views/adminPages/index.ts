@@ -23,3 +23,4 @@ export { default as FeedbacksPage } from './FeedbacksPage';
 export { default as TrustReportsPage } from './TrustReportsPage';
 export { default as ChatPage } from './ChatPage';
 export { default as ArticlesPage } from './ArticlesPage';
+export { default as ContactMessagesPage } from './ContactMessagesPage';

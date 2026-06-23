@@ -660,7 +660,9 @@ export interface Feedback {
   evidenceImage?: number | null;
   evidence_image?: number | null;
   evidenceImageUrl?: string | null;
+  userId?: number | null;
   userDict?: {
+    id?: number;
     fullName?: string;
     avatarUrl?: string;
     email?: string;
@@ -685,6 +687,22 @@ export interface Banner {
   platform?: string;
   type?: number;
   description_location?: number;
+}
+
+export interface ContactMessage {
+  id: number;
+  category?: 'bug_report' | 'feedback' | 'support';
+  subject?: string;
+  pageUrl?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  content: string;
+  is_read?: boolean;
+  isRead?: boolean;
+  createAt?: string;
+  create_at?: string;
+  updateAt?: string;
 }
 
 export interface BannerType {

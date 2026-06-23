@@ -10,7 +10,7 @@ from django.utils import timezone
 from PIL import Image
 from rest_framework.test import APIClient
 
-from apps.content.models import Article, Banner, BannerType, Feedback
+from apps.content.models import Article, Banner, BannerType, ContactMessage, Feedback
 from apps.files.models import File
 from shared.helpers.cloudinary_service import CloudinaryService
 
@@ -105,6 +105,191 @@ class TestFeedbackAPI:
             item for item in admin_payload["results"] if item["id"] == feedback.id
         )
         assert admin_feedback["evidenceImageUrl"]
+
+    def test_admin_feedback_list_filters_by_user_status_and_evidence(
+        self,
+        admin_user,
+        job_seeker_user,
+    ):
+        other_user = job_seeker_user.__class__.objects.create_user_with_role_name(
+            email="feedback-filter@test.com",
+            full_name="Filter Target",
+            role_name="JOB_SEEKER",
+            password="testpass123",
+            is_active=True,
+            is_verify_email=True,
+        )
+        evidence_file = File.objects.create(
+            public_id="feedback-evidence/filter-proof.webp",
+            format="webp",
+            resource_type="image",
+            file_type=File.OTHER_TYPE,
+            uploaded_at=timezone.now(),
+        )
+        target_feedback = Feedback.objects.create(
+            content="This should match the filtered list",
+            rating=4,
+            is_active=True,
+            user=job_seeker_user,
+            evidence_image=evidence_file,
+        )
+        Feedback.objects.create(
+            content="No evidence here",
+            rating=4,
+            is_active=True,
+            user=job_seeker_user,
+        )
+        Feedback.objects.create(
+            content="Different user",
+            rating=4,
+            is_active=True,
+            user=other_user,
+            evidence_image=evidence_file,
+        )
+
+        client = APIClient()
+        client.force_authenticate(user=admin_user)
+
+        response = client.get(
+            "/api/content/web/admin/feedbacks/",
+            {
+                "user": str(job_seeker_user.id),
+                "is_active": "true",
+                "hasEvidence": "true",
+                "search": "filtered list",
+            },
+        )
+
+        assert response.status_code == 200
+        payload = _article_payload(response)
+        assert payload["count"] == 1
+        assert [item["id"] for item in payload["results"]] == [target_feedback.id]
+
+    def test_admin_feedback_can_create_update_and_delete_feedback(
+        self,
+        admin_user,
+        job_seeker_user,
+    ):
+        client = APIClient()
+        client.force_authenticate(user=admin_user)
+
+        create_response = client.post(
+            "/api/content/web/admin/feedbacks/",
+            {
+                "content": "Admin created feedback",
+                "rating": 5,
+                "isActive": True,
+                "userId": job_seeker_user.id,
+            },
+            format="json",
+        )
+
+        assert create_response.status_code in (200, 201)
+        create_payload = _article_payload(create_response)
+        feedback_id = create_payload["id"]
+        assert create_payload["content"] == "Admin created feedback"
+        assert create_payload["rating"] == 5
+        assert create_payload["isActive"] is True
+        assert create_payload["userId"] == job_seeker_user.id
+
+        update_response = client.patch(
+            f"/api/content/web/admin/feedbacks/{feedback_id}/",
+            {
+                "content": "Admin updated feedback",
+                "rating": 4,
+                "isActive": False,
+            },
+            format="json",
+        )
+
+        assert update_response.status_code in (200, 201)
+        update_payload = _article_payload(update_response)
+        assert update_payload["content"] == "Admin updated feedback"
+        assert update_payload["rating"] == 4
+        assert update_payload["isActive"] is False
+
+        delete_response = client.delete(f"/api/content/web/admin/feedbacks/{feedback_id}/")
+        assert delete_response.status_code in (200, 204)
+        assert not Feedback.objects.filter(id=feedback_id).exists()
+
+
+@pytest.mark.django_db
+class TestContactMessageAPI:
+    def test_public_contact_message_list_is_not_exposed(self):
+        response = APIClient().get("/api/content/web/contact-messages/")
+
+        assert response.status_code == 405
+
+    def test_public_contact_message_accepts_bug_report_fields(self):
+        client = APIClient()
+
+        response = client.post(
+            "/api/content/web/contact-messages/",
+            {
+                "category": "bug_report",
+                "subject": "Login page error",
+                "pageUrl": "https://example.com/login",
+                "name": "Test User",
+                "email": "tester@example.com",
+                "phone": "0900000000",
+                "content": "The login button does not respond.",
+            },
+            format="json",
+        )
+
+        assert response.status_code in (200, 201)
+        payload = _article_payload(response)
+        assert payload["category"] == "bug_report"
+        assert payload["subject"] == "Login page error"
+        assert payload["pageUrl"] == "https://example.com/login"
+
+        saved = ContactMessage.objects.get(id=payload["id"])
+        assert saved.category == "bug_report"
+        assert saved.subject == "Login page error"
+        assert saved.page_url == "https://example.com/login"
+
+    def test_admin_contact_message_filters_by_category_and_read_status(
+        self,
+        admin_user,
+    ):
+        ContactMessage.objects.create(
+            category=ContactMessage.CATEGORY_BUG_REPORT,
+            subject="Bug",
+            page_url="https://example.com/jobs",
+            name="Reporter",
+            email="reporter@example.com",
+            phone="0900000001",
+            content="A bug happened on the jobs page.",
+            is_read=False,
+        )
+        ContactMessage.objects.create(
+            category=ContactMessage.CATEGORY_SUPPORT,
+            subject="Help",
+            page_url="https://example.com/contact",
+            name="Support User",
+            email="support@example.com",
+            phone="0900000002",
+            content="Need support for account access.",
+            is_read=True,
+        )
+
+        client = APIClient()
+        client.force_authenticate(user=admin_user)
+
+        response = client.get(
+            "/api/content/web/admin/contact-messages/",
+            {
+                "category": "bug_report",
+                "is_read": "false",
+                "search": "jobs page",
+            },
+        )
+
+        assert response.status_code == 200
+        payload = _article_payload(response)
+        assert payload["count"] == 1
+        assert payload["results"][0]["category"] == "bug_report"
+        assert payload["results"][0]["subject"] == "Bug"
 
 
 @pytest.mark.django_db(transaction=True)

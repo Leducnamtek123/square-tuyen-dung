@@ -1,8 +1,8 @@
 import StaticInfoPage from '@/views/defaultPages/StaticInfoPage';
 
 export const metadata = {
-  title: 'Employer Contact',
-  description: 'Contact Square employer support.',
+  title: 'Báo lỗi & liên hệ nhà tuyển dụng',
+  description: 'Gửi báo lỗi, góp ý hoặc liên hệ hỗ trợ cho khu vực nhà tuyển dụng.',
 };
 
 export default function Page() {

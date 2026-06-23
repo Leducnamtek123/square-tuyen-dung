@@ -68,6 +68,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language }: Admin
           <MenuItem text={t('admin:sidebar.bannersManagement')} to={routePath(ROUTES.ADMIN.BANNERS)} kind="child" state={{ selected: isSelected(ROUTES.ADMIN.BANNERS) }} />
           <MenuItem text={t('admin:sidebar.bannerTypes')} to={routePath(ROUTES.ADMIN.BANNER_TYPES)} kind="child" state={{ selected: isSelected(ROUTES.ADMIN.BANNER_TYPES) }} />
           <MenuItem text={t('admin:sidebar.feedbacksManagement')} to={routePath(ROUTES.ADMIN.FEEDBACKS)} kind="child" state={{ selected: isSelected(ROUTES.ADMIN.FEEDBACKS) }} />
+          <MenuItem text={t('admin:sidebar.contactMessages')} to={routePath(ROUTES.ADMIN.CONTACT_MESSAGES)} kind="child" state={{ selected: isSelected(ROUTES.ADMIN.CONTACT_MESSAGES) }} />
           <MenuItem text={t('admin:sidebar.articlesManagement')} to={routePath(ROUTES.ADMIN.ARTICLES)} kind="child" state={{ selected: isSelected(ROUTES.ADMIN.ARTICLES) }} />
           <MenuItem text={t('admin:sidebar.chatWithEmployers')} to={routePath(ROUTES.ADMIN.CHAT)} kind="child" state={{ selected: isSelected(ROUTES.ADMIN.CHAT) }} />
         </List>

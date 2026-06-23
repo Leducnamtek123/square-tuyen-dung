@@ -376,8 +376,8 @@
   },
   "static": {
     "contact": {
-      "title": "Contact",
-      "subtitle": "Reach the Square recruitment support team.",
+      "title": "Bug reports & contact",
+      "subtitle": "Report an issue, share feedback, or reach the Square support team.",
       "sections": [
         {
           "title": "Support email",
@@ -387,7 +387,30 @@
           "title": "Business hours",
           "body": "Support is available Monday to Friday during business hours."
         }
-      ]
+      ],
+      "categories": {
+        "bugReport": "Bug report",
+        "feedback": "Feedback",
+        "support": "Support request"
+      },
+      "form": {
+        "title": "Send a report",
+        "subtitle": "Please include enough context so we can reproduce and fix the issue faster.",
+        "category": "Type",
+        "subject": "Subject",
+        "pageUrl": "Page URL",
+        "name": "Full name",
+        "email": "Email",
+        "phone": "Phone",
+        "content": "Details",
+        "sending": "Sending...",
+        "submit": "Send report"
+      },
+      "validation": {
+        "required": "Please fill in your name, email, and details."
+      },
+      "success": "Your message has been sent.",
+      "error": "Could not send your message. Please try again."
     },
     "faq": {
       "title": "Frequently Asked Questions",

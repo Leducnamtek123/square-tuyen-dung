@@ -251,6 +251,7 @@ export const ROUTES = {
     BANNERS: 'admin/banners',
     BANNER_TYPES: 'admin/banner-types',
     FEEDBACKS: 'admin/feedbacks',
+    CONTACT_MESSAGES: 'admin/contact-messages',
     CHAT: 'admin/chat',
     ARTICLES: 'admin/articles',
     ARTICLE_CREATE: 'admin/articles/create',
