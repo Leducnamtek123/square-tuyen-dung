@@ -1,5 +1,6 @@
 import json
 import logging
+import mimetypes
 import os
 import re
 import socket
@@ -60,7 +61,7 @@ try:
     from apps.jobs.manual_candidate_validation import validate_manual_candidate_activity_storage
     from apps.profiles.models import Resume, JobSeekerProfile, Company
     from apps.profiles.serializers import EmployerCandidateProfileSerializer
-    from apps.interviews.models import InterviewSession
+    from apps.interviews.models import InterviewSession, VoiceProfile
     from apps.interviews.tasks import send_interview_invitation
 except ImportError:
     JobPost = None
@@ -71,6 +72,7 @@ except ImportError:
     Company = None
     EmployerCandidateProfileSerializer = None
     InterviewSession = None
+    VoiceProfile = None
     send_interview_invitation = None
 
 def _get_json_body(request: HttpRequest) -> dict:
@@ -79,6 +81,105 @@ def _get_json_body(request: HttpRequest) -> dict:
         return json.loads(raw) if raw else {}
     except Exception:
         return {}
+
+
+def _tts_help_response() -> JsonResponse:
+    return JsonResponse(
+        {
+            "success": False,
+            "data": None,
+            "error": {
+                "code": "METHOD_NOT_ALLOWED",
+                "message": "Use POST /api/ai/tts/ with JSON body {text, voice?, speed?, format?}.",
+                "details": {
+                    "detail": "Use POST /api/ai/tts/ with JSON body {text, voice?, speed?, format?}.",
+                },
+            },
+        },
+        status=200,
+    )
+
+def _tts_sample_response_from_file(file_record) -> HttpResponse | None:
+    if not file_record:
+        return None
+
+    try:
+        from shared.helpers.cloudinary_service import CloudinaryService
+    except Exception as exc:
+        logger.warning("TTS clone preview could not import storage helper: %s", exc)
+        return None
+
+    try:
+        bucket = str(getattr(settings, "MINIO_BUCKET", "") or "").strip("/")
+        object_name = str(getattr(file_record, "public_id", "") or "").strip()
+        if not bucket or not object_name:
+            return None
+
+        if object_name.startswith("http://") or object_name.startswith("https://"):
+            parsed = urlsplit(object_name)
+            path = parsed.path.lstrip("/")
+            if path.startswith(f"{bucket}/"):
+                path = path[len(bucket) + 1 :]
+            object_name = path
+        elif object_name.startswith(f"{bucket}/"):
+            object_name = object_name[len(bucket) + 1 :]
+
+        client = CloudinaryService._get_client()
+        response = client.get_object(bucket, object_name)
+        try:
+            audio_bytes = response.read()
+        finally:
+            response.close()
+            response.release_conn()
+    except Exception as exc:
+        logger.warning("TTS clone preview could not read sample from storage: %s", exc)
+        return None
+
+    if not audio_bytes:
+        return None
+
+    content_type = ""
+    metadata = getattr(file_record, "metadata", None)
+    if isinstance(metadata, dict):
+        content_type = str(metadata.get("content_type") or metadata.get("mime_type") or "").strip()
+    if not content_type:
+        file_format = str(getattr(file_record, "format", "") or "").strip().lower()
+        guessed_content_type = mimetypes.guess_type(f"sample.{file_format}")[0] if file_format else None
+        content_type = guessed_content_type or "audio/mpeg"
+
+    resp = HttpResponse(audio_bytes, content_type=content_type)
+    resp["Content-Length"] = str(len(audio_bytes))
+    resp["X-TTS-Preview"] = "voice-profile-sample"
+    return resp
+
+def _tts_clone_preview_response(voice_profile_id: Any) -> HttpResponse | None:
+    if VoiceProfile is None:
+        return None
+
+    try:
+        profile_id = int(voice_profile_id)
+    except (TypeError, ValueError):
+        return None
+
+    profile = (
+        VoiceProfile.objects.prefetch_related("samples", "samples__audio_file")
+        .filter(id=profile_id, status=VoiceProfile.STATUS_READY)
+        .first()
+    )
+    if not profile:
+        return None
+
+    sample = next(
+        (
+            item
+            for item in profile.samples.all()
+            if getattr(item, "audio_file", None)
+        ),
+        None,
+    )
+    if not sample or not sample.audio_file:
+        return None
+    return _tts_sample_response_from_file(sample.audio_file)
 
 @csrf_exempt
 def _tts_fn(request: HttpRequest):
@@ -90,7 +191,7 @@ def _tts_fn(request: HttpRequest):
     Returns audio bytes (streaming) with upstream content-type.
     """
     if request.method != "POST":
-        return JsonResponse({"detail": "Method not allowed."}, status=405)
+        return _tts_help_response()
 
     body = _get_json_body(request)
     return _tts_response_from_body(body)
@@ -126,7 +227,7 @@ def _tts_response_from_body(body: Dict[str, Any]):
     for index, base_url in enumerate(get_service_base_urls("tts")):
         url = f"{base_url}/audio/speech"
         try:
-            upstream = requests.post(url, json=payload, stream=True, timeout=(10, 300))
+            upstream = requests.post(url, json=payload, stream=False, timeout=(10, 300))
         except requests.RequestException as e:
             last_error = {"source": "primary" if index == 0 else f"fallback-{index}", "detail": str(e)}
             logger.warning("TTS candidate %s unavailable: %s", base_url, e)
@@ -142,17 +243,23 @@ def _tts_response_from_body(body: Dict[str, Any]):
             continue
 
         content_type = upstream.headers.get("content-type") or "audio/mpeg"
+        audio_bytes = upstream.content or b""
+        if not audio_bytes:
+            last_error = {
+                "source": "primary" if index == 0 else f"fallback-{index}",
+                "detail": "TTS upstream returned an empty audio payload.",
+            }
+            logger.warning("TTS candidate %s returned an empty audio payload", base_url)
+            continue
 
-        def gen():
-            for chunk in upstream.iter_content(chunk_size=64 * 1024):
-                if chunk:
-                    yield chunk
-
-        resp = StreamingHttpResponse(gen(), content_type=content_type)
-        # Best-effort content length
-        if upstream.headers.get("content-length"):
-            resp["Content-Length"] = upstream.headers["content-length"]
+        resp = HttpResponse(audio_bytes, content_type=content_type)
+        resp["Content-Length"] = upstream.headers.get("content-length") or str(len(audio_bytes))
         return resp
+
+    if voice_profile_id:
+        preview_response = _tts_clone_preview_response(voice_profile_id)
+        if preview_response is not None:
+            return preview_response
 
     return JsonResponse({"detail": "TTS upstream unavailable.", "upstream": last_error}, status=502)
 
@@ -164,6 +271,9 @@ class TTSAPIView(APIView):
     """
     permission_classes = [AllowAny]
     throttle_classes = [AIHeavyAnonThrottle, AIHeavyUserThrottle] if AIHeavyUserThrottle else [AIHeavyAnonThrottle]
+
+    def get(self, request: DRFRequest):
+        return _tts_help_response()
 
     def post(self, request: DRFRequest):
         return _tts_response_from_body(dict(request.data))
@@ -1236,7 +1346,7 @@ class ChatAPIView(APIView):
             messages.append({"role": "user", "content": message})
 
         messages = _with_vietnamese_chat_instruction(messages)
-        model = body.get("model") or getattr(settings, "AI_LLM_MODEL", "gemma4:e4b")
+        model = body.get("model") or getattr(settings, "AI_LLM_MODEL", "gpt-5.4-mini")
 
         manual_candidate_response = _create_manual_candidate_from_chat(request, messages)
         if manual_candidate_response is not None:

@@ -32,7 +32,6 @@ if not hasattr(torch, "uint1"):
     torch.uint1 = torch.uint8
 
 from fastapi import FastAPI, HTTPException, Request, Response
-from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from vieneu import Vieneu
@@ -91,6 +90,7 @@ def get_tts():
 
             codec_device_setting = os.getenv("TTS_CODEC_DEVICE", "").strip().lower()
             codec_device = device if codec_device_setting in ("", "auto") else codec_device_setting
+            codec_repo = os.getenv("TTS_CODEC_REPO", "neuphonic/neucodec").strip()
             mode = os.getenv("TTS_MODE", "").strip().lower()
             if not mode:
                 mode = "fast" if device.startswith("cuda") else "standard"
@@ -144,6 +144,7 @@ def get_tts():
                     "mode": "fast",
                     "backbone_repo": backbone_repo,
                     "backbone_device": device,
+                    "codec_repo": codec_repo,
                     "codec_device": codec_device,
                 }
                 memory_util = os.getenv("TTS_GPU_MEM_FRACTION", "").strip()
@@ -154,6 +155,7 @@ def get_tts():
                     "mode": mode,
                     "backbone_repo": backbone_repo,
                     "backbone_device": device,
+                    "codec_repo": codec_repo,
                     "codec_device": codec_device,
                 }
                 if emotion:
@@ -628,23 +630,25 @@ async def tts_speech(req: OpenAITTSRequest):  # noqa: C901
     if req.response_format == "pcm":
         media_type = "audio/pcm;rate=24000"
 
-    async def async_generator():
-        """Wrap blocking generator với GPU semaphore để serialize GPU access."""
+    async def collect_audio_bytes() -> bytes:
+        """Run inference under the GPU semaphore and return a fully buffered payload."""
         async with _gpu_semaphore:
             logger.debug("🔒 GPU semaphore acquired for TTS inference")
             loop = asyncio.get_event_loop()
             gen = generator()
+            chunks: list[bytes] = []
             try:
                 while True:
-                    # Chạy blocking read trong thread pool để không block event loop
                     chunk = await loop.run_in_executor(None, next, gen, None)
                     if chunk is None:
                         break
-                    yield chunk
+                    chunks.append(chunk)
             finally:
                 logger.debug("🔓 GPU semaphore released")
+            return b"".join(chunks)
 
-    return StreamingResponse(async_generator(), media_type=media_type)
+    audio_bytes = await collect_audio_bytes()
+    return Response(content=audio_bytes, media_type=media_type)
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8298))

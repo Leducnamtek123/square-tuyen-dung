@@ -71,6 +71,12 @@ class InterviewServiceTests(TestCase):
         self.assertEqual(context["candidateEmail"], self.candidate.email)
         self.assertEqual(len(context["questions"]), 2)
         self.assertIn("interviewSubject", context)
+        self.assertIn("ttsSpeed", context)
+        self.assertIn("interviewQuestionGapSeconds", context)
+        self.assertIn("interviewMinimumSilenceSeconds", context)
+        self.assertGreaterEqual(float(context["ttsSpeed"]), 0.5)
+        self.assertGreaterEqual(float(context["interviewQuestionGapSeconds"]), 0)
+        self.assertGreaterEqual(float(context["interviewMinimumSilenceSeconds"]), 0)
 
     def test_build_interview_context_includes_topic_details(self):
         group = QuestionGroup.objects.create(name="Backend screening", description="<p>Test the backend stack</p>")
@@ -578,6 +584,37 @@ class VoiceProfileGrantAdminTests(TestCase):
                 job_post=self.other_job,
             ).exists()
         )
+
+    def test_admin_can_filter_voice_profiles_by_search_status_and_type(self):
+        matching_profile = VoiceProfile.objects.create(
+            name="Ready Clone Voice",
+            description="Matches search",
+            voice_type=VoiceProfile.TYPE_PRESET,
+            status=VoiceProfile.STATUS_READY,
+            preset_voice_id="ready-clone-voice",
+            created_by=self.admin,
+        )
+        VoiceProfile.objects.create(
+            name="Draft Clone Voice",
+            description="Should not match",
+            voice_type=VoiceProfile.TYPE_CLONED,
+            status=VoiceProfile.STATUS_DRAFT,
+            consent_confirmed=True,
+            created_by=self.admin,
+        )
+
+        response = self.client.get(
+            "/api/v1/interview/web/voice-profiles/",
+            data={
+                "search": "ready-clone",
+                "status": VoiceProfile.STATUS_READY,
+                "voiceType": VoiceProfile.TYPE_PRESET,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], matching_profile.id)
 
 
 class InterviewSessionAPITests(TestCase):

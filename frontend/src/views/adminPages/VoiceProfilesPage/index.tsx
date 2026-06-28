@@ -5,8 +5,6 @@ import {
   Alert,
   Box,
   Button,
-  Card,
-  CardContent,
   Chip,
   CircularProgress,
   Dialog,
@@ -19,11 +17,6 @@ import {
   MenuItem,
   Stack,
   Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
 } from '@mui/material';
@@ -33,6 +26,7 @@ import BusinessIcon from '@mui/icons-material/Business';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import { ColumnDef } from '@tanstack/react-table';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import adminJobService from '../../../services/adminJobService';
@@ -41,6 +35,9 @@ import aiService from '../../../services/aiService';
 import voiceProfileService, { type VoiceProfilePayload } from '../../../services/voiceProfileService';
 import type { VoiceProfile } from '../../../types/models';
 import toastMessages from '../../../utils/toastMessages';
+import { useDataTable } from '../../../hooks';
+import DataTable from '../../../components/Common/DataTable';
+import FilterBar, { filterControlSx } from '../../../components/Common/FilterBar';
 import {
   getVoiceProfileFormValidationErrors,
   type VoiceProfileFormValidationErrors,
@@ -57,6 +54,7 @@ type CreateForm = {
 
 type EditForm = CreateForm & {
   status: string;
+  sampleCount: number;
 };
 
 const EMPTY_CREATE_FORM: CreateForm = {
@@ -80,6 +78,23 @@ const getProfileType = (profile: VoiceProfile) => profile.voiceType || profile.v
 const VoiceProfilesPage = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation('admin');
+  const {
+    page,
+    pageSize,
+    sorting,
+    onSortingChange,
+    ordering,
+    pagination,
+    onPaginationChange,
+    searchTerm,
+    debouncedSearchTerm,
+    onSearchChange,
+    setPage,
+  } = useDataTable({
+    initialPageSize: 10,
+    initialSorting: [{ id: 'name', desc: false }],
+    debounceMs: 350,
+  });
   const [createOpen, setCreateOpen] = useState(false);
   const [editProfile, setEditProfile] = useState<VoiceProfile | null>(null);
   const [deleteProfile, setDeleteProfile] = useState<VoiceProfile | null>(null);
@@ -87,7 +102,7 @@ const VoiceProfilesPage = () => {
   const [sampleProfile, setSampleProfile] = useState<VoiceProfile | null>(null);
   const [grantProfile, setGrantProfile] = useState<VoiceProfile | null>(null);
   const [createForm, setCreateForm] = useState<CreateForm>(EMPTY_CREATE_FORM);
-  const [editForm, setEditForm] = useState<EditForm>({ ...EMPTY_CREATE_FORM, status: 'ready' });
+  const [editForm, setEditForm] = useState<EditForm>({ ...EMPTY_CREATE_FORM, status: 'ready', sampleCount: 0 });
   const [createSampleFile, setCreateSampleFile] = useState<File | null>(null);
   const [createSampleText, setCreateSampleText] = useState('');
   const [sampleFile, setSampleFile] = useState<File | null>(null);
@@ -98,10 +113,20 @@ const VoiceProfilesPage = () => {
   const [grantDefault, setGrantDefault] = useState(true);
   const [testText, setTestText] = useState(() => t('pages.voiceProfiles.messages.defaultTestSentence'));
   const [testAudioUrl, setTestAudioUrl] = useState<string | null>(null);
+  const [preparingProfileId, setPreparingProfileId] = useState<number | null>(null);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [voiceTypeFilter, setVoiceTypeFilter] = useState('all');
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['admin-voice-profiles'],
-    queryFn: () => voiceProfileService.getVoiceProfiles({ page: 1, pageSize: 100 }),
+    queryKey: ['admin-voice-profiles', page, pageSize, debouncedSearchTerm, statusFilter, voiceTypeFilter, ordering],
+    queryFn: () => voiceProfileService.getVoiceProfiles({
+      page: page + 1,
+      pageSize,
+      search: debouncedSearchTerm || undefined,
+      status: statusFilter === 'all' ? undefined : statusFilter,
+      voiceType: voiceTypeFilter === 'all' ? undefined : voiceTypeFilter,
+      ordering,
+    }),
   });
 
   const { data: companiesData } = useQuery({
@@ -115,6 +140,7 @@ const VoiceProfilesPage = () => {
   });
 
   const profiles = useMemo(() => data?.results ?? [], [data]);
+  const totalProfiles = data?.count ?? 0;
   const companies = useMemo(() => companiesData?.results ?? [], [companiesData]);
   const jobs = useMemo(() => jobsData?.results ?? [], [jobsData]);
   const createValidationErrors = useMemo(
@@ -142,6 +168,34 @@ const VoiceProfilesPage = () => {
     return type || '';
   };
 
+  const activeFilterCount = [
+    Boolean(searchTerm.trim()),
+    statusFilter !== 'all',
+    voiceTypeFilter !== 'all',
+  ].filter(Boolean).length;
+
+  const handleSearchChange = (value: string) => {
+    onSearchChange(value);
+    setPage(0);
+  };
+
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value);
+    setPage(0);
+  };
+
+  const handleVoiceTypeFilterChange = (value: string) => {
+    setVoiceTypeFilter(value);
+    setPage(0);
+  };
+
+  const resetFilters = () => {
+    handleSearchChange('');
+    setStatusFilter('all');
+    setVoiceTypeFilter('all');
+    setPage(0);
+  };
+
   const getStatusLabel = (status?: string) => {
     if (status === 'draft') return t('pages.voiceProfiles.statuses.draft');
     if (status === 'processing') return t('pages.voiceProfiles.statuses.processing');
@@ -150,6 +204,16 @@ const VoiceProfilesPage = () => {
     if (status === 'failed') return t('pages.voiceProfiles.statuses.failed');
     return status || '';
   };
+
+  const getProfileSampleCount = (profile?: VoiceProfile | null) => profile?.sampleCount ?? profile?.samples?.length ?? 0;
+  const getProfileTotalDuration = (profile?: VoiceProfile | null) => Number(profile?.totalDurationSeconds ?? 0);
+  const getProfileReadyFlag = (profile?: VoiceProfile | null) => Boolean(
+    profile?.isReadyForTts
+    ?? (
+      profile?.status === 'ready'
+      && (getProfileType(profile as VoiceProfile) === 'preset' || getProfileSampleCount(profile) > 0)
+    )
+  );
 
   const resetCreateDialog = () => {
     setCreateOpen(false);
@@ -181,6 +245,29 @@ const VoiceProfilesPage = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-voice-profiles'] });
     },
     onError: () => toastMessages.error(t('pages.voiceProfiles.toast.createError')),
+  });
+
+  const prepareMutation = useMutation({
+    mutationFn: (id: number) => voiceProfileService.prepareVoiceProfile(id),
+    onMutate: (id) => {
+      setPreparingProfileId(id);
+    },
+    onSuccess: (prepared) => {
+      if (editProfile && editProfile.id === prepared.id) {
+        setEditProfile(prepared);
+        setEditForm((prev) => ({
+          ...prev,
+          status: prepared.status || prev.status,
+          sampleCount: prepared.sampleCount ?? prev.sampleCount,
+        }));
+      }
+      toastMessages.success(t('pages.voiceProfiles.toast.prepareSuccess'));
+      queryClient.invalidateQueries({ queryKey: ['admin-voice-profiles'] });
+    },
+    onError: () => toastMessages.error(t('pages.voiceProfiles.toast.prepareError')),
+    onSettled: () => {
+      setPreparingProfileId(null);
+    },
   });
 
   const updateMutation = useMutation({
@@ -282,6 +369,7 @@ const VoiceProfilesPage = () => {
       presetVoiceId: profile.presetVoiceId || profile.preset_voice_id || '',
       consentConfirmed: Boolean(profile.consentConfirmed ?? profile.consent_confirmed),
       status: profile.status || 'ready',
+      sampleCount: getProfileSampleCount(profile),
     });
   };
 
@@ -307,7 +395,7 @@ const VoiceProfilesPage = () => {
   };
 
   const openTestDialog = (profile: VoiceProfile) => {
-    if (profile.status !== 'ready') {
+    if (!getProfileReadyFlag(profile)) {
       toastMessages.error(t('pages.voiceProfiles.validation.voiceNotReady'));
       return;
     }
@@ -345,6 +433,11 @@ const VoiceProfilesPage = () => {
     sampleMutation.mutate({ id: sampleProfile.id, formData });
   };
 
+  const submitPrepareProfile = () => {
+    if (!editProfile) return;
+    prepareMutation.mutate(editProfile.id);
+  };
+
   const submitGrant = () => {
     if (!grantProfile) return;
     if (grantTargetType === 'company' && !grantCompany) {
@@ -357,6 +450,81 @@ const VoiceProfilesPage = () => {
     }
     grantMutation.mutate({ id: grantProfile.id });
   };
+
+  const columns = useMemo<ColumnDef<VoiceProfile>[]>(() => ([
+    {
+      accessorKey: 'name',
+      header: t('pages.voiceProfiles.table.name') as string,
+      cell: (info) => {
+        const profile = info.row.original;
+        return (
+          <Box>
+            <Typography fontWeight={700}>{profile.name}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              {profile.description || profile.presetVoiceId || profile.preset_voice_id || '—'}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      accessorKey: 'voiceType',
+      header: t('pages.voiceProfiles.table.type') as string,
+      cell: (info) => getVoiceTypeLabel(getProfileType(info.row.original)),
+    },
+    {
+      accessorKey: 'status',
+      header: t('pages.voiceProfiles.table.status') as string,
+      cell: (info) => (
+        <Chip label={getStatusLabel(info.row.original.status)} color={statusColor(info.row.original.status)} size="small" />
+      ),
+    },
+    {
+      id: 'samples',
+      header: t('pages.voiceProfiles.table.samples') as string,
+      cell: (info) => info.row.original.sampleCount ?? info.row.original.samples?.length ?? 0,
+    },
+    {
+      id: 'grants',
+      header: t('pages.voiceProfiles.table.grants') as string,
+      cell: (info) => info.row.original.grantCount ?? info.row.original.grants?.length ?? 0,
+    },
+    {
+      id: 'actions',
+      header: t('pages.voiceProfiles.table.actions') as string,
+      meta: { align: 'right' as const },
+      cell: (info) => {
+        const profile = info.row.original;
+        return (
+          <Stack direction="row" gap={1} justifyContent="flex-end" flexWrap="wrap">
+            <Button size="small" variant="outlined" startIcon={<EditIcon />} onClick={() => openEditDialog(profile)}>
+              {t('pages.voiceProfiles.actions.edit')}
+            </Button>
+            <IconButton
+              size="small"
+              color="primary"
+              aria-label={t('pages.voiceProfiles.messages.testActionAria', { name: profile.name })}
+              disabled={profile.status !== 'ready'}
+              onClick={() => openTestDialog(profile)}
+            >
+              <PlayCircleOutlineIcon fontSize="small" />
+            </IconButton>
+            {getProfileType(profile) === 'cloned' ? (
+              <Button size="small" variant="outlined" startIcon={<UploadFileIcon />} onClick={() => setSampleProfile(profile)}>
+                {t('pages.voiceProfiles.actions.sample')}
+              </Button>
+            ) : null}
+            <Button size="small" variant="outlined" startIcon={<BusinessIcon />} onClick={() => setGrantProfile(profile)}>
+              {t('pages.voiceProfiles.actions.grant')}
+            </Button>
+            <Button size="small" color="error" variant="outlined" startIcon={<DeleteOutlineIcon />} onClick={() => setDeleteProfile(profile)}>
+              {t('pages.voiceProfiles.actions.delete')}
+            </Button>
+          </Stack>
+        );
+      },
+    },
+  ]), [getStatusLabel, getVoiceTypeLabel, openEditDialog, openTestDialog, t]);
 
   return (
     <Box>
@@ -373,74 +541,59 @@ const VoiceProfilesPage = () => {
 
       {error ? <Alert severity="error" sx={{ mb: 2 }}>{t('pages.voiceProfiles.loadError')}</Alert> : null}
 
-      <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
-        <CardContent sx={{ p: 0 }}>
-          {isLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Table>
-                <TableHead>
-                  <TableRow>
-                  <TableCell>{t('pages.voiceProfiles.table.name')}</TableCell>
-                  <TableCell>{t('pages.voiceProfiles.table.type')}</TableCell>
-                  <TableCell>{t('pages.voiceProfiles.table.status')}</TableCell>
-                  <TableCell>{t('pages.voiceProfiles.table.samples')}</TableCell>
-                  <TableCell>{t('pages.voiceProfiles.table.grants')}</TableCell>
-                  <TableCell align="right">{t('pages.voiceProfiles.table.actions')}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {profiles.map((profile) => (
-                  <TableRow key={profile.id} hover>
-                    <TableCell>
-                      <Typography fontWeight={700}>{profile.name}</Typography>
-                      <Typography variant="caption" color="text.secondary">{profile.description || profile.presetVoiceId || profile.preset_voice_id}</Typography>
-                    </TableCell>
-                    <TableCell>{getVoiceTypeLabel(getProfileType(profile))}</TableCell>
-                    <TableCell><Chip label={getStatusLabel(profile.status)} color={statusColor(profile.status)} size="small" /></TableCell>
-                    <TableCell>{profile.sampleCount ?? profile.samples?.length ?? 0}</TableCell>
-                    <TableCell>{profile.grantCount ?? profile.grants?.length ?? 0}</TableCell>
-                    <TableCell align="right">
-                        <Stack direction="row" gap={1} justifyContent="flex-end">
-                          <Button size="small" variant="outlined" startIcon={<EditIcon />} onClick={() => openEditDialog(profile)}>
-                          {t('pages.voiceProfiles.actions.edit')}
-                        </Button>
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          aria-label={t('pages.voiceProfiles.messages.testActionAria', { name: profile.name })}
-                          disabled={profile.status !== 'ready'}
-                          onClick={() => openTestDialog(profile)}
-                        >
-                          <PlayCircleOutlineIcon fontSize="small" />
-                        </IconButton>
-                        {getProfileType(profile) === 'cloned' ? (
-                          <Button size="small" variant="outlined" startIcon={<UploadFileIcon />} onClick={() => setSampleProfile(profile)}>
-                            {t('pages.voiceProfiles.actions.sample')}
-                          </Button>
-                        ) : null}
-                        <Button size="small" variant="outlined" startIcon={<BusinessIcon />} onClick={() => setGrantProfile(profile)}>
-                          {t('pages.voiceProfiles.actions.grant')}
-                        </Button>
-                        <Button size="small" color="error" variant="outlined" startIcon={<DeleteOutlineIcon />} onClick={() => setDeleteProfile(profile)}>
-                          {t('pages.voiceProfiles.actions.delete')}
-                        </Button>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {profiles.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center">{t('pages.voiceProfiles.table.empty')}</TableCell>
-                  </TableRow>
-                ) : null}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+      <FilterBar
+        title={t('pages.voiceProfiles.filter.title')}
+        description={t('pages.voiceProfiles.filter.description')}
+        searchValue={searchTerm}
+        searchPlaceholder={t('pages.voiceProfiles.searchPlaceholder')}
+        onSearchChange={handleSearchChange}
+        filtersLabel={t('pages.voiceProfiles.filter.title')}
+        advancedLabel={t('pages.voiceProfiles.filter.advanced')}
+        activeFilterCount={activeFilterCount}
+        onReset={resetFilters}
+        resetLabel={t('pages.voiceProfiles.filter.reset')}
+      >
+        <TextField
+          select
+          size="small"
+          label={t('pages.voiceProfiles.filter.status')}
+          value={statusFilter}
+          onChange={(e) => handleStatusFilterChange(e.target.value)}
+          sx={filterControlSx}
+        >
+          <MenuItem value="all">{t('pages.voiceProfiles.filter.all')}</MenuItem>
+          <MenuItem value="draft">{t('pages.voiceProfiles.statuses.draft')}</MenuItem>
+          <MenuItem value="processing">{t('pages.voiceProfiles.statuses.processing')}</MenuItem>
+          <MenuItem value="ready">{t('pages.voiceProfiles.statuses.ready')}</MenuItem>
+          <MenuItem value="disabled">{t('pages.voiceProfiles.statuses.disabled')}</MenuItem>
+          <MenuItem value="failed">{t('pages.voiceProfiles.statuses.failed')}</MenuItem>
+        </TextField>
+        <TextField
+          select
+          size="small"
+          label={t('pages.voiceProfiles.filter.type')}
+          value={voiceTypeFilter}
+          onChange={(e) => handleVoiceTypeFilterChange(e.target.value)}
+          sx={filterControlSx}
+        >
+          <MenuItem value="all">{t('pages.voiceProfiles.filter.all')}</MenuItem>
+          <MenuItem value="cloned">{t('pages.voiceProfiles.voiceTypes.cloned')}</MenuItem>
+          <MenuItem value="preset">{t('pages.voiceProfiles.voiceTypes.preset')}</MenuItem>
+        </TextField>
+      </FilterBar>
+
+      <DataTable
+        columns={columns}
+        data={profiles}
+        isLoading={isLoading}
+        rowCount={totalProfiles}
+        pagination={pagination}
+        onPaginationChange={onPaginationChange}
+        enableSorting
+        sorting={sorting}
+        onSortingChange={onSortingChange}
+        emptyMessage={t('pages.voiceProfiles.table.empty')}
+      />
 
       <Dialog open={createOpen} onClose={resetCreateDialog} fullWidth maxWidth="sm">
         <DialogTitle>{t('pages.voiceProfiles.dialogs.createTitle')}</DialogTitle>
@@ -533,6 +686,22 @@ const VoiceProfilesPage = () => {
               <MenuItem value="disabled">{t('pages.voiceProfiles.statuses.disabled')}</MenuItem>
               <MenuItem value="failed">{t('pages.voiceProfiles.statuses.failed')}</MenuItem>
             </TextField>
+            {getVoiceProfileValidationText(editValidationErrors, 'sampleCount') ? (
+              <FormHelperText error>
+                {getVoiceProfileValidationText(editValidationErrors, 'sampleCount')}
+              </FormHelperText>
+            ) : null}
+            {editForm.voiceType === 'cloned' ? (
+              <Alert severity={getProfileReadyFlag(editProfile) ? 'success' : 'info'}>
+                {t('pages.voiceProfiles.messages.preparationSummary', {
+                  sampleCount: editForm.sampleCount,
+                  totalDurationSeconds: getProfileTotalDuration(editProfile).toFixed(2),
+                  readyLabel: getProfileReadyFlag(editProfile)
+                    ? t('pages.voiceProfiles.messages.readyForReuse')
+                    : t('pages.voiceProfiles.messages.needsPrepare'),
+                })}
+              </Alert>
+            ) : null}
             <TextField
               label={t('pages.voiceProfiles.fields.language')}
               value={editForm.language}
@@ -567,6 +736,16 @@ const VoiceProfilesPage = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditProfile(null)}>{t('pages.voiceProfiles.actions.cancel')}</Button>
+          {editForm.voiceType === 'cloned' ? (
+            <Button
+              variant="outlined"
+              startIcon={<GraphicEqIcon />}
+              disabled={prepareMutation.isPending || !editProfile}
+              onClick={submitPrepareProfile}
+            >
+              {prepareMutation.isPending && preparingProfileId === editProfile?.id ? <CircularProgress size={18} /> : t('pages.voiceProfiles.actions.prepareVoice')}
+            </Button>
+          ) : null}
           <Button variant="contained" disabled={hasEditValidationErrors || updateMutation.isPending} onClick={submitEdit}>
             {updateMutation.isPending ? <CircularProgress size={18} /> : t('pages.voiceProfiles.actions.save')}
           </Button>

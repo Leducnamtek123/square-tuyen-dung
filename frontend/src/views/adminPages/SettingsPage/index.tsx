@@ -17,6 +17,7 @@ import {
   CircularProgress,
   Alert,
   Chip,
+  MenuItem,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -37,6 +38,40 @@ const INITIAL_SETTINGS: SystemSettings = {
   maintenanceMode: false,
   autoApproveJobs: false,
   emailNotifications: true,
+  ttsSpeed: '0.92',
+  interviewQuestionGapSeconds: '2.0',
+  interviewMinimumSilenceSeconds: '1.2',
+};
+
+const INTERVIEW_PACING_PRESETS = [
+  {
+    value: 'balanced',
+    speed: '0.92',
+    gap: '2.0',
+    silence: '1.2',
+  },
+  {
+    value: 'natural',
+    speed: '0.86',
+    gap: '2.5',
+    silence: '1.5',
+  },
+  {
+    value: 'snappy',
+    speed: '1.02',
+    gap: '1.4',
+    silence: '0.9',
+  },
+] as const;
+
+const resolveInterviewPacingPreset = (formData: SystemSettings): string => {
+  const speed = String(formData.ttsSpeed || '');
+  const gap = String(formData.interviewQuestionGapSeconds || '');
+  const silence = String(formData.interviewMinimumSilenceSeconds || '');
+  const matched = INTERVIEW_PACING_PRESETS.find(
+    (preset) => preset.speed === speed && preset.gap === gap && preset.silence === silence,
+  );
+  return matched?.value || 'custom';
 };
 
 const serviceLabels: Record<string, string> = {
@@ -310,6 +345,17 @@ const SettingsForm = ({ initialSettings, onSave, isMutating }: SettingsFormProps
     setFormData((prev) => ({ ...prev, [name]: event.target.value }));
   };
 
+  const handlePresetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const preset = INTERVIEW_PACING_PRESETS.find((item) => item.value === event.target.value);
+    if (!preset) return;
+    setFormData((prev) => ({
+      ...prev,
+      ttsSpeed: preset.speed,
+      interviewQuestionGapSeconds: preset.gap,
+      interviewMinimumSilenceSeconds: preset.silence,
+    }));
+  };
+
   const handleSave = async () => {
     try {
       await onSave(formData);
@@ -377,6 +423,88 @@ const SettingsForm = ({ initialSettings, onSave, isMutating }: SettingsFormProps
                         </Typography>
                       </Box>
                     }
+                  />
+                </Stack>
+              </CardContent>
+            </Card>
+
+            <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid', borderColor: 'divider' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
+                  {t('pages.settings.interviewAi.pacingTitle')}
+                </Typography>
+                <Divider sx={{ mb: 3 }} />
+
+                <Stack spacing={2}>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('pages.settings.interviewAi.pacingDescription')}
+                  </Typography>
+                  <TextField
+                    select
+                    label={t('pages.settings.interviewAi.preset.label')}
+                    value={resolveInterviewPacingPreset(formData)}
+                    onChange={handlePresetChange}
+                    size="small"
+                    fullWidth
+                    helperText={t('pages.settings.interviewAi.preset.helper')}
+                  >
+                    <MenuItem value="balanced">
+                      {t('pages.settings.interviewAi.preset.options.balanced')}
+                    </MenuItem>
+                    <MenuItem value="natural">
+                      {t('pages.settings.interviewAi.preset.options.natural')}
+                    </MenuItem>
+                    <MenuItem value="snappy">
+                      {t('pages.settings.interviewAi.preset.options.snappy')}
+                    </MenuItem>
+                    <MenuItem value="custom">
+                      {t('pages.settings.interviewAi.preset.options.custom')}
+                    </MenuItem>
+                  </TextField>
+                  <TextField
+                    label={t('pages.settings.interviewAi.questionGap.label')}
+                    value={formData.interviewQuestionGapSeconds || ''}
+                    onChange={handleInputChange('interviewQuestionGapSeconds')}
+                    type="number"
+                    size="small"
+                    fullWidth
+                    inputProps={{ step: 0.5, min: 0, max: 10 }}
+                    helperText={t('pages.settings.interviewAi.questionGap.helper')}
+                  />
+                  <TextField
+                    label={t('pages.settings.interviewAi.silenceThreshold.label')}
+                    value={formData.interviewMinimumSilenceSeconds || ''}
+                    onChange={handleInputChange('interviewMinimumSilenceSeconds')}
+                    type="number"
+                    size="small"
+                    fullWidth
+                    inputProps={{ step: 0.1, min: 0, max: 10 }}
+                    helperText={t('pages.settings.interviewAi.silenceThreshold.helper')}
+                  />
+                </Stack>
+              </CardContent>
+            </Card>
+
+            <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid', borderColor: 'divider' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
+                  {t('pages.settings.interviewAi.ttsTitle')}
+                </Typography>
+                <Divider sx={{ mb: 3 }} />
+
+                <Stack spacing={2}>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('pages.settings.interviewAi.ttsDescription')}
+                  </Typography>
+                  <TextField
+                    label={t('pages.settings.interviewAi.ttsSpeed.label')}
+                    value={formData.ttsSpeed || ''}
+                    onChange={handleInputChange('ttsSpeed')}
+                    type="number"
+                    size="small"
+                    fullWidth
+                    inputProps={{ step: 0.05, min: 0.5, max: 2 }}
+                    helperText={t('pages.settings.interviewAi.ttsSpeed.helper')}
                   />
                 </Stack>
               </CardContent>

@@ -1,6 +1,7 @@
 import asyncio
 import unicodedata
 
+from livekit_agent import interviewer as interviewer_module
 from livekit_agent.interview_flow import (
     decide_next_action,
     is_substantive_answer,
@@ -127,6 +128,75 @@ def test_scripted_llm_node_prompts_for_more_detail_before_advancing() -> None:
 
     asyncio.run(run())
 
+
+def test_scripted_llm_node_waits_before_next_question(monkeypatch) -> None:
+    async def run() -> None:
+        agent = Interviewer(
+            context={
+                "questions": [
+                    {"text": "Gioi thieu ban than"},
+                ],
+                "interviewQuestionGapSeconds": "1.75",
+            }
+        )
+        sleep_calls: list[float] = []
+
+        async def fake_sleep(seconds: float) -> None:
+            sleep_calls.append(seconds)
+
+        async def fake_record_transcript(
+            speaker_role, content, speech_duration_ms=None
+        ):
+            return None
+
+        agent.record_transcript = fake_record_transcript
+        monkeypatch.setattr(interviewer_module.asyncio, "sleep", fake_sleep)
+
+        first = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u1", "Xin chao")),
+            [],
+            None,
+        )
+
+        assert "Gioi thieu ban than" in first
+        assert sleep_calls == [1.75]
+
+    asyncio.run(run())
+
+def test_scripted_llm_node_uses_larger_silence_threshold(monkeypatch) -> None:
+    async def run() -> None:
+        agent = Interviewer(
+            context={
+                "questions": [
+                    {"text": "Gioi thieu ban than"},
+                ],
+                "interviewQuestionGapSeconds": "0.75",
+                "interviewMinimumSilenceSeconds": "1.5",
+            }
+        )
+        sleep_calls: list[float] = []
+
+        async def fake_sleep(seconds: float) -> None:
+            sleep_calls.append(seconds)
+
+        async def fake_record_transcript(
+            speaker_role, content, speech_duration_ms=None
+        ):
+            return None
+
+        agent.record_transcript = fake_record_transcript
+        monkeypatch.setattr(interviewer_module.asyncio, "sleep", fake_sleep)
+
+        first = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u1", "Xin chao")),
+            [],
+            None,
+        )
+
+        assert "Gioi thieu ban than" in first
+        assert sleep_calls == [1.5]
+
+    asyncio.run(run())
 
 def test_scripted_question_strips_prompt_format_language() -> None:
     async def run() -> None:

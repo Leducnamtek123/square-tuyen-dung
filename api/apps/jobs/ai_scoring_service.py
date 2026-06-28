@@ -79,7 +79,7 @@ def score_resume_job_fit(resume_data, job_data, resume_id=None, job_id=None):
         api_key = getattr(settings, 'OPENAI_API_KEY', '') or \
                   getattr(settings, 'AI_API_KEY', '')
         api_url = getattr(settings, 'OPENAI_API_URL', 'https://api.openai.com/v1/chat/completions')
-        model = getattr(settings, 'AI_MODEL', 'gpt-4o-mini')
+        model = getattr(settings, 'AI_MODEL', 'gpt-5.4-mini')
 
         if not api_key:
             logger.warning("AI scoring skipped: no API key configured")

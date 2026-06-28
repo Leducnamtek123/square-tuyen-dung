@@ -3,12 +3,19 @@ from __future__ import annotations
 import json
 import logging
 import re
+from decimal import Decimal
 from typing import Dict, Iterable, Optional
 
 from django.conf import settings
 from django.utils import timezone
 from django.utils.html import strip_tags
+from django.core.exceptions import ValidationError
 
+from apps.content.system_settings import (
+    get_interview_minimum_silence_seconds,
+    get_interview_question_gap_seconds,
+    get_tts_speed,
+)
 from .livekit_service import LiveKitService
 from .models import InterviewSession, InterviewTranscript, Question, VoiceProfile, VoiceProfileGrant
 
@@ -119,6 +126,7 @@ def build_tts_voice_profile_payload(profile: VoiceProfile | None) -> dict | None
         return None
 
     samples = []
+    total_duration = Decimal("0")
     for sample in profile.samples.all():
         audio_url = ""
         try:
@@ -127,6 +135,8 @@ def build_tts_voice_profile_payload(profile: VoiceProfile | None) -> dict | None
             audio_url = ""
         if not audio_url:
             continue
+        if sample.duration_seconds is not None:
+            total_duration += sample.duration_seconds
         samples.append(
             {
                 "id": sample.id,
@@ -146,7 +156,76 @@ def build_tts_voice_profile_payload(profile: VoiceProfile | None) -> dict | None
         "presetEngine": profile.preset_engine,
         "presetVoiceId": profile.preset_voice_id,
         "samples": samples,
+        "sampleCount": len(samples),
+        "totalDurationSeconds": float(total_duration),
+        "isReadyForTts": True,
     }
+
+def get_voice_profile_preparation_summary(profile: VoiceProfile, *, status: str | None = None) -> dict:
+    samples = list(profile.samples.all())
+    total_duration = Decimal("0")
+    sample_count = len(samples)
+    for sample in samples:
+        if sample.duration_seconds is not None:
+            total_duration += sample.duration_seconds
+
+    metadata = dict(profile.metadata or {})
+    resolved_status = status or profile.status
+    is_ready_for_tts = resolved_status == VoiceProfile.STATUS_READY
+    if profile.voice_type == VoiceProfile.TYPE_CLONED:
+        is_ready_for_tts = is_ready_for_tts and sample_count > 0
+    metadata.update({
+        "sampleCount": sample_count,
+        "totalDurationSeconds": float(total_duration),
+        "isReadyForTts": is_ready_for_tts,
+    })
+    return metadata
+
+def validate_voice_profile_samples(profile: VoiceProfile) -> None:
+    if profile.voice_type != VoiceProfile.TYPE_CLONED:
+        return
+
+    samples = list(profile.samples.all())
+    if not samples:
+        raise ValidationError({"samples": "At least one reference sample is required."})
+
+    missing_transcript_ids = [sample.id for sample in samples if not str(sample.reference_text or "").strip()]
+    if missing_transcript_ids:
+        raise ValidationError({"samples": "Every sample needs a transcript before preparation."})
+
+def prepare_voice_profile(profile: VoiceProfile, *, prepared_by=None) -> VoiceProfile:
+    if profile.voice_type == VoiceProfile.TYPE_PRESET:
+        if not profile.preset_voice_id:
+            raise ValidationError({"presetVoiceId": "Preset voice id is required for preset profiles."})
+        profile.status = VoiceProfile.STATUS_READY
+        profile.metadata = get_voice_profile_preparation_summary(profile, status=VoiceProfile.STATUS_READY)
+        profile.save(update_fields=["status", "metadata", "update_at"])
+        return profile
+
+    profile.status = VoiceProfile.STATUS_PROCESSING
+    profile.save(update_fields=["status", "update_at"])
+
+    try:
+        validate_voice_profile_samples(profile)
+        profile.status = VoiceProfile.STATUS_READY
+        profile.metadata = get_voice_profile_preparation_summary(profile, status=VoiceProfile.STATUS_READY)
+        profile.metadata["preparedById"] = getattr(prepared_by, "id", None)
+        profile.metadata["preparedAt"] = timezone.now().isoformat()
+        profile.metadata["lastError"] = ""
+        profile.save(update_fields=["status", "metadata", "update_at"])
+        return profile
+    except ValidationError:
+        profile.status = VoiceProfile.STATUS_DRAFT
+        profile.metadata = get_voice_profile_preparation_summary(profile, status=VoiceProfile.STATUS_DRAFT)
+        profile.metadata["lastError"] = "Voice profile validation failed."
+        profile.save(update_fields=["status", "metadata", "update_at"])
+        raise
+    except Exception as exc:
+        profile.status = VoiceProfile.STATUS_FAILED
+        profile.metadata = get_voice_profile_preparation_summary(profile, status=VoiceProfile.STATUS_FAILED)
+        profile.metadata["lastError"] = str(exc)
+        profile.save(update_fields=["status", "metadata", "update_at"])
+        raise
 
 
 def build_interview_context(session: InterviewSession) -> Dict[str, object]:
@@ -184,6 +263,9 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
             for q in questions
         ],
         "interviewType": session.type,
+        "ttsSpeed": get_tts_speed(),
+        "interviewQuestionGapSeconds": get_interview_question_gap_seconds(),
+        "interviewMinimumSilenceSeconds": get_interview_minimum_silence_seconds(),
     }
     if voice_profile_payload:
         payload["ttsVoice"] = f"profile:{voice_profile_payload['id']}"

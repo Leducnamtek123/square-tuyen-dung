@@ -232,6 +232,7 @@ describe('public and job seeker list services response normalization', () => {
     const createdProfile = { id: 20, name: 'Recruiter voice', status: 'ready' };
     const updatedProfile = { id: 20, name: 'Recruiter voice', status: 'disabled' };
     const uploadedSample = { id: 21, profile: 20, referenceText: 'Xin chao' };
+    const preparedProfile = { id: 20, name: 'Recruiter voice', status: 'ready', sampleCount: 1 };
     const createdGrant = { id: 22, profile: 20, company: 5, isActive: true };
     const sampleData = new FormData();
     sampleData.append('referenceText', 'Xin chao');
@@ -239,18 +240,21 @@ describe('public and job seeker list services response normalization', () => {
     (httpRequest.post as jest.Mock)
       .mockResolvedValueOnce({ data: { data: createdProfile } })
       .mockResolvedValueOnce({ data: { data: uploadedSample } })
+      .mockResolvedValueOnce({ data: { data: preparedProfile } })
       .mockResolvedValueOnce({ data: { data: createdGrant } });
     (httpRequest.patch as jest.Mock).mockResolvedValueOnce({ data: { data: updatedProfile } });
 
     await expect(voiceProfileService.createVoiceProfile({ name: 'Recruiter voice' })).resolves.toEqual(createdProfile);
     await expect(voiceProfileService.updateVoiceProfile(20, { status: 'disabled' })).resolves.toEqual(updatedProfile);
     await expect(voiceProfileService.uploadSample(20, sampleData)).resolves.toEqual(uploadedSample);
+    await expect(voiceProfileService.prepareVoiceProfile(20)).resolves.toEqual(preparedProfile);
     await expect(voiceProfileService.createGrant(20, { company: 5, isActive: true })).resolves.toEqual(createdGrant);
 
     expect(httpRequest.post).toHaveBeenNthCalledWith(1, 'interview/web/voice-profiles/', { name: 'Recruiter voice' });
     expect(httpRequest.patch).toHaveBeenCalledWith('interview/web/voice-profiles/20/', { status: 'disabled' });
     expect(httpRequest.post).toHaveBeenNthCalledWith(2, 'interview/web/voice-profiles/20/samples/', sampleData, { headers: { 'Content-Type': 'multipart/form-data' } });
-    expect(httpRequest.post).toHaveBeenNthCalledWith(3, 'interview/web/voice-profiles/20/grants/', { company: 5, isActive: true });
+    expect(httpRequest.post).toHaveBeenNthCalledWith(3, 'interview/web/voice-profiles/20/prepare/', {});
+    expect(httpRequest.post).toHaveBeenNthCalledWith(4, 'interview/web/voice-profiles/20/grants/', { company: 5, isActive: true });
   });
 
   it('keeps job notification active toggle typed as the backend status payload', () => {

@@ -38,6 +38,7 @@ from .services import (
     create_livekit_participant_token,
     append_transcript,
     update_interview_status,
+    prepare_voice_profile,
     queue_invitation_email,
     queue_ai_evaluation,
     create_observer_livekit_token,
@@ -351,12 +352,30 @@ class VoiceProfileViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             created_by=request.user,
         )
 
-        if profile.voice_type == VoiceProfile.TYPE_CLONED and profile.status in {VoiceProfile.STATUS_DRAFT, VoiceProfile.STATUS_PROCESSING, VoiceProfile.STATUS_FAILED}:
-            profile.status = VoiceProfile.STATUS_READY
+        if profile.voice_type == VoiceProfile.TYPE_CLONED and profile.status != VoiceProfile.STATUS_PROCESSING:
+            profile.status = VoiceProfile.STATUS_DRAFT
             profile.save(update_fields=["status", "update_at"])
 
         self._audit_instance("create", sample)
         return response_data(status=status.HTTP_201_CREATED, data=VoiceProfileSampleSerializer(sample, context={"request": request}).data)
+
+    @action(detail=True, methods=["post"], url_path="prepare")
+    def prepare(self, request, pk=None):
+        admin_error = self._ensure_admin(request)
+        if admin_error:
+            return admin_error
+
+        profile = self.get_object()
+        try:
+            prepared = prepare_voice_profile(profile, prepared_by=request.user)
+        except DjangoValidationError as exc:
+            details = exc.message_dict if hasattr(exc, "message_dict") else {"detail": exc.messages}
+            return response_data(status=status.HTTP_400_BAD_REQUEST, errors=details)
+        except Exception as exc:
+            return response_data(status=status.HTTP_502_BAD_GATEWAY, errors={"detail": [str(exc)]})
+
+        self._audit_instance("update", prepared)
+        return response_data(data=VoiceProfileSerializer(prepared, context={"request": request}).data)
 
     @action(detail=True, methods=["get", "post"], url_path="grants")
     def grants(self, request, pk=None):

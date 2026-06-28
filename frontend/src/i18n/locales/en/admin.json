@@ -1140,6 +1140,34 @@
         "description": "Send system notifications via email to administrators",
         "desc": "Send system notifications via email to administrators"
       },
+    "interviewAi": {
+      "pacingTitle": "Interview AI Pacing",
+      "pacingDescription": "Tune how quickly the interviewer speaks and how long it waits before asking the next question.",
+      "preset": {
+        "label": "Pacing preset",
+        "helper": "Choose a preset to fill all timing values, or switch to Custom and adjust manually.",
+        "options": {
+          "balanced": "Balanced",
+          "natural": "Natural",
+          "snappy": "Snappy",
+          "custom": "Custom"
+        }
+      },
+      "questionGap": {
+        "label": "Gap before next question (seconds)",
+        "helper": "Increase this if the AI interrupts candidates too quickly."
+      },
+      "silenceThreshold": {
+        "label": "Minimum silence threshold (seconds)",
+        "helper": "Keep this above zero if you want the AI to feel less eager to jump in."
+      },
+      "ttsTitle": "TTS Speed",
+      "ttsDescription": "Control how fast the AI voice speaks during the interview.",
+      "ttsSpeed": {
+        "label": "Voice speed",
+        "helper": "1.0 is normal. Lower values sound calmer; higher values sound faster."
+      }
+    },
       "apiTitle": "API & External Services",
       "googleApiKey": "Google API Key",
       "supportEmail": "Support Email",
@@ -1425,6 +1453,16 @@
       "breadcrumbAdmin": "Admin",
       "newVoice": "New Voice",
       "loadError": "Could not load voice profiles.",
+      "searchPlaceholder": "Search voice profiles...",
+      "filter": {
+        "title": "Voice profile filters",
+        "description": "Search by name, status, or voice type.",
+        "reset": "Clear filters",
+        "advanced": "Advanced filters",
+        "status": "Status",
+        "type": "Type",
+        "all": "All"
+      },
       "table": {
         "name": "Name",
         "type": "Type",
@@ -1445,7 +1483,8 @@
         "save": "Save",
         "close": "Close",
         "generateAndPlay": "Generate & Play",
-        "upload": "Upload"
+        "upload": "Upload",
+        "prepareVoice": "Prepare voice"
       },
       "dialogs": {
         "createTitle": "New Voice Profile",
@@ -1486,6 +1525,9 @@
       "messages": {
         "cloneHint": "Upload a clean mp3/wav sample and paste the exact transcript for cloning.",
         "sampleHint": "Use 10-30 seconds of clean speech and paste the exact transcript.",
+        "preparationSummary": "Samples: {{sampleCount}} | Total duration: {{totalDurationSeconds}}s | {{readyLabel}}",
+        "readyForReuse": "Ready to reuse",
+        "needsPrepare": "Needs prepare",
         "permissionConfirm": "I confirm we have permission to clone and use this voice.",
         "deleteConfirm": "Delete \"{{name}}\"? This also removes its samples and grants.",
         "defaultVoice": "Use as default voice for this target",
@@ -1522,6 +1564,8 @@
         "previewError": "Could not generate voice preview.",
         "sampleSuccess": "Voice sample uploaded.",
         "sampleError": "Could not upload voice sample.",
+        "prepareSuccess": "Voice profile prepared and ready to reuse.",
+        "prepareError": "Could not prepare voice profile.",
         "grantSuccess": "Voice access granted.",
         "grantError": "Could not grant voice access."
       }

@@ -1134,6 +1134,34 @@
         "description": "Gửi thông báo hệ thống qua email cho quản trị viên",
         "desc": "Gửi thông báo hệ thống qua email cho quản trị viên"
       },
+    "interviewAi": {
+      "pacingTitle": "Nhịp phỏng vấn AI",
+      "pacingDescription": "Tinh chỉnh tốc độ nói của AI và thời gian chờ trước khi hỏi câu tiếp theo.",
+      "preset": {
+        "label": "Mẫu nhịp",
+        "helper": "Chọn một mẫu để điền sẵn các giá trị timing, hoặc chọn Tùy chỉnh để sửa tay.",
+        "options": {
+          "balanced": "Cân bằng",
+          "natural": "Tự nhiên",
+          "snappy": "Nhanh",
+          "custom": "Tùy chỉnh"
+        }
+      },
+      "questionGap": {
+        "label": "Khoảng chờ trước câu tiếp theo (giây)",
+        "helper": "Tăng giá trị này nếu AI hỏi quá nhanh khi ứng viên còn đang suy nghĩ."
+      },
+      "silenceThreshold": {
+        "label": "Ngưỡng im lặng tối thiểu (giây)",
+        "helper": "Giữ giá trị này lớn hơn 0 nếu muốn AI bớt chen vào quá sớm."
+      },
+      "ttsTitle": "Tốc độ TTS",
+      "ttsDescription": "Điều chỉnh tốc độ giọng AI khi phỏng vấn.",
+      "ttsSpeed": {
+        "label": "Tốc độ giọng",
+        "helper": "1.0 là bình thường. Giá trị thấp hơn sẽ chậm và dịu hơn, cao hơn sẽ nhanh hơn."
+      }
+    },
       "apiTitle": "API & Dịch vụ bên ngoài",
       "googleApiKey": "Google API Key",
       "supportEmail": "Email hỗ trợ",
@@ -1419,6 +1447,16 @@
       "breadcrumbAdmin": "Admin",
       "newVoice": "Tạo giọng mới",
       "loadError": "Không thể tải danh sách hồ sơ giọng nói.",
+      "searchPlaceholder": "Tìm hồ sơ giọng nói...",
+      "filter": {
+        "title": "Bộ lọc hồ sơ giọng nói",
+        "description": "Tìm theo tên, trạng thái hoặc loại giọng.",
+        "reset": "Xóa bộ lọc",
+        "advanced": "Bộ lọc nâng cao",
+        "status": "Trạng thái",
+        "type": "Loại",
+        "all": "Tất cả"
+      },
       "table": {
         "name": "Tên",
         "type": "Loại",
@@ -1439,7 +1477,8 @@
         "save": "Lưu",
         "close": "Đóng",
         "generateAndPlay": "Tạo và phát",
-        "upload": "Tải lên"
+        "upload": "Tải lên",
+        "prepareVoice": "Chuẩn bị giọng"
       },
       "dialogs": {
         "createTitle": "Tạo hồ sơ giọng nói",
@@ -1480,6 +1519,9 @@
       "messages": {
         "cloneHint": "Tải mẫu mp3/wav rõ tiếng và dán transcript chính xác để clone giọng.",
         "sampleHint": "Dùng 10-30 giây giọng nói rõ và dán transcript chính xác.",
+        "preparationSummary": "Số mẫu: {{sampleCount}} | Tổng thời lượng: {{totalDurationSeconds}}s | {{readyLabel}}",
+        "readyForReuse": "Sẵn sàng tái sử dụng",
+        "needsPrepare": "Cần chuẩn bị",
         "permissionConfirm": "Tôi xác nhận hệ thống có quyền clone và sử dụng giọng nói này.",
         "deleteConfirm": "Xóa \"{{name}}\"? Hành động này cũng xóa các mẫu giọng và phân quyền liên quan.",
         "defaultVoice": "Dùng làm giọng mặc định cho đối tượng này",
@@ -1516,6 +1558,8 @@
         "previewError": "Không thể tạo bản nghe thử.",
         "sampleSuccess": "Đã tải mẫu giọng.",
         "sampleError": "Không thể tải mẫu giọng.",
+        "prepareSuccess": "Đã chuẩn bị hồ sơ giọng nói và sẵn sàng tái sử dụng.",
+        "prepareError": "Không thể chuẩn bị hồ sơ giọng nói.",
         "grantSuccess": "Đã cấp quyền dùng giọng.",
         "grantError": "Không thể cấp quyền dùng giọng."
       }

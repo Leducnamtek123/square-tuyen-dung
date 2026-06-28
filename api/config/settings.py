@@ -75,9 +75,15 @@ AI_STT_MODEL = config("AI_STT_MODEL", default=config("STT_MODEL", default="opena
 AI_STT_LANGUAGE = config("AI_STT_LANGUAGE", default=config("STT_LANGUAGE", default="vi"))
 AI_LLM_BASE_URL = config(
     "AI_LLM_BASE_URL",
-    default=config("LLM_BASE_URL", default=config("OLLAMA_BASE_URL", default="http://ollama:11434/v1")),
+    default=config(
+        "LLM_BASE_URL",
+        default=config("OLLAMA_BASE_URL", default="https://token.nodelee.tech/v1"),
+    ),
 )
-AI_LLM_MODEL = config("AI_LLM_MODEL", default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b")))
+AI_LLM_MODEL = config(
+    "AI_LLM_MODEL",
+    default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gpt-5.4-mini")),
+)
 AI_LLM_API_KEY = config("AI_LLM_API_KEY", default=config("LLM_API_KEY", default=config("GROQ_API_KEY", default="")))
 AI_LLM_LOCAL_BASE_URL = config("AI_LLM_LOCAL_BASE_URL", default="")
 AI_LLM_LOCAL_MODEL = config("AI_LLM_LOCAL_MODEL", default=AI_LLM_MODEL)

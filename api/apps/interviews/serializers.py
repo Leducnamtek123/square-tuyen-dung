@@ -249,6 +249,10 @@ class VoiceProfileSerializer(serializers.ModelSerializer):
     samples = VoiceProfileSampleSerializer(many=True, read_only=True)
     grants = serializers.SerializerMethodField()
     sampleCount = serializers.SerializerMethodField()
+    totalDurationSeconds = serializers.SerializerMethodField()
+    isReadyForTts = serializers.SerializerMethodField()
+    preparationNote = serializers.SerializerMethodField()
+    lastError = serializers.SerializerMethodField()
     grantCount = serializers.SerializerMethodField()
     createdBy = serializers.IntegerField(source="created_by_id", read_only=True)
 
@@ -258,7 +262,8 @@ class VoiceProfileSerializer(serializers.ModelSerializer):
             "id", "name", "description", "language", "voice_type", "voiceType",
             "status", "preset_engine", "presetEngine", "preset_voice_id",
             "presetVoiceId", "consent_confirmed", "consentConfirmed",
-            "metadata", "samples", "grants", "sampleCount", "grantCount",
+            "metadata", "samples", "grants", "sampleCount", "totalDurationSeconds",
+            "isReadyForTts", "preparationNote", "lastError", "grantCount",
             "created_by", "createdBy", "create_at", "update_at",
         ]
         read_only_fields = ["id", "samples", "grants", "sampleCount", "grantCount", "created_by", "createdBy", "create_at", "update_at"]
@@ -268,6 +273,34 @@ class VoiceProfileSerializer(serializers.ModelSerializer):
             return obj.samples.count()
         except Exception:
             return 0
+
+    def get_totalDurationSeconds(self, obj):
+        try:
+            total = 0
+            for sample in obj.samples.all():
+                if sample.duration_seconds is not None:
+                    total += float(sample.duration_seconds)
+            return total
+        except Exception:
+            return 0
+
+    def get_isReadyForTts(self, obj):
+        try:
+            if obj.status != VoiceProfile.STATUS_READY:
+                return False
+            if obj.voice_type == VoiceProfile.TYPE_PRESET:
+                return True
+            return obj.samples.exists()
+        except Exception:
+            return False
+
+    def get_preparationNote(self, obj):
+        metadata = getattr(obj, "metadata", None) or {}
+        return metadata.get("preparationNote") or metadata.get("lastError") or ""
+
+    def get_lastError(self, obj):
+        metadata = getattr(obj, "metadata", None) or {}
+        return metadata.get("lastError") or ""
 
     def _visible_grants_queryset(self, obj):
         qs = obj.grants.select_related("company", "job_post", "profile")
@@ -313,6 +346,11 @@ class VoiceProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"presetVoiceId": "Preset voice id is required for preset profiles."})
         if voice_type == VoiceProfile.TYPE_CLONED and not consent_confirmed:
             raise serializers.ValidationError({"consentConfirmed": "Consent confirmation is required for cloned voices."})
+        if attrs.get("status", getattr(self.instance, "status", VoiceProfile.STATUS_DRAFT)) == VoiceProfile.STATUS_READY and voice_type == VoiceProfile.TYPE_CLONED:
+            profile = self.instance
+            has_samples = bool(profile and profile.samples.exists())
+            if not has_samples:
+                raise serializers.ValidationError({"status": "Cloned voice profiles must be prepared before they can be marked ready."})
         return attrs
 
 class InterviewTranscriptSerializer(serializers.ModelSerializer):

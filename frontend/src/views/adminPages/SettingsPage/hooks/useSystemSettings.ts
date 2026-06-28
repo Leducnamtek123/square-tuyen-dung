@@ -11,6 +11,9 @@ export interface SystemSettings extends SystemSettingsPayload {
     maintenanceMode: boolean;
     autoApproveJobs: boolean;
     emailNotifications: boolean;
+    ttsSpeed: string;
+    interviewQuestionGapSeconds: string;
+    interviewMinimumSilenceSeconds: string;
 }
 
 type UseSystemSettingsResult = UseQueryResult<SystemSettings> & {
@@ -24,6 +27,9 @@ const normalizeSettings = (res: Partial<SystemSettingsPayload> = {}): SystemSett
     emailNotifications: res.emailNotifications ?? true,
     googleApiKey: res.googleApiKey || '',
     supportEmail: res.supportEmail || '',
+    ttsSpeed: res.ttsSpeed || '0.92',
+    interviewQuestionGapSeconds: res.interviewQuestionGapSeconds || '2.0',
+    interviewMinimumSilenceSeconds: res.interviewMinimumSilenceSeconds || '1.2',
 });
 
 export const useSystemSettings = (): UseSystemSettingsResult => {

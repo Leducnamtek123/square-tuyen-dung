@@ -598,6 +598,11 @@ export interface VoiceProfile {
   consent_confirmed?: boolean;
   consentConfirmed?: boolean;
   sampleCount?: number;
+  totalDurationSeconds?: number;
+  isReadyForTts?: boolean;
+  preparationNote?: string;
+  lastError?: string;
+  metadata?: Record<string, unknown> | null;
   grantCount?: number;
   samples?: VoiceProfileSample[];
   grants?: VoiceProfileGrant[];

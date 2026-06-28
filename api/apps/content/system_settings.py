@@ -14,6 +14,9 @@ SYSTEM_SETTING_DEFAULTS: Dict[str, Any] = {
     "emailNotifications": getattr(settings, "EMAIL_NOTIFICATIONS", True),
     "googleApiKey": getattr(settings, "GOOGLE_API_KEY", ""),
     "supportEmail": getattr(settings, "SUPPORT_CONTACT_EMAIL", ""),
+    "ttsSpeed": "0.92",
+    "interviewQuestionGapSeconds": "2.0",
+    "interviewMinimumSilenceSeconds": "1.2",
 }
 
 BOOLEAN_SYSTEM_SETTINGS = {
@@ -90,3 +93,21 @@ def email_notifications_enabled() -> bool:
 
 def get_support_email() -> str:
     return str(get_system_setting("supportEmail", getattr(settings, "SUPPORT_CONTACT_EMAIL", "")))
+
+def get_interview_question_gap_seconds(default: float = 2.0) -> float:
+    try:
+        return max(0.0, float(get_system_setting("interviewQuestionGapSeconds", default)))
+    except (TypeError, ValueError):
+        return default
+
+def get_interview_minimum_silence_seconds(default: float = 1.2) -> float:
+    try:
+        return max(0.0, float(get_system_setting("interviewMinimumSilenceSeconds", default)))
+    except (TypeError, ValueError):
+        return default
+
+def get_tts_speed(default: float = 0.92) -> float:
+    try:
+        return max(0.5, min(2.0, float(get_system_setting("ttsSpeed", default))))
+    except (TypeError, ValueError):
+        return default

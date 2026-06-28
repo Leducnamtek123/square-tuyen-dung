@@ -53,13 +53,11 @@ class Config:
     LIVEKIT_API_SECRET: str = os.getenv("LIVEKIT_API_SECRET", "")
 
     # LLM
-    LLM_MODEL: str = os.getenv("LLM_MODEL") or os.getenv("AI_LLM_MODEL", "gemma4:e4b")
+    LLM_MODEL: str = os.getenv("LLM_MODEL") or os.getenv("AI_LLM_MODEL", "gpt-5.4-mini")
     LLM_BASE_URL: str = os.getenv("LLM_BASE_URL") or os.getenv(
-        "AI_LLM_BASE_URL", "http://ollama:11434/v1"
+        "AI_LLM_BASE_URL", "https://token.nodelee.tech/v1"
     )
-    LLM_API_KEY: str = os.getenv("LLM_API_KEY") or os.getenv(
-        "AI_LLM_API_KEY", "no-key-needed"
-    )
+    LLM_API_KEY: str = os.getenv("LLM_API_KEY") or os.getenv("AI_LLM_API_KEY", "")
     LLM_TEMPERATURE: float = _get_float(
         "LLM_TEMPERATURE", _get_float("AI_LLM_TEMPERATURE", 0.7)
     )

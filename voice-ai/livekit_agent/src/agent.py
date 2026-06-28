@@ -148,6 +148,25 @@ def _participant_display_name(participant, fallback: str = "") -> str:
         or fallback
     ).strip()
 
+def _parse_optional_float(value: Any) -> float | None:
+    if value in (None, ""):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+def _clamp_tts_speed(value: float | None) -> float | None:
+    if value is None:
+        return None
+    return max(0.5, min(2.0, value))
+
+def resolve_tts_speed(agent_context: dict[str, Any]) -> float | None:
+    context_speed = _parse_optional_float(agent_context.get("ttsSpeed"))
+    if context_speed is not None:
+        return _clamp_tts_speed(context_speed)
+    return _clamp_tts_speed(config.TTS_SPEED)
+
 
 def _takeover_action_from_text(text: str) -> str | None:
     normalized = (text or "").strip()
@@ -244,6 +263,9 @@ async def entrypoint(ctx: JobContext) -> None:
 
     tts_voice = str(agent_context.get("ttsVoice") or config.TTS_VOICE)
     logger.info("Using TTS voice for room %s: %s", ctx.room.name, tts_voice)
+    tts_speed = resolve_tts_speed(agent_context)
+    if tts_speed is not None:
+        logger.info("Using TTS speed for room %s: %s", ctx.room.name, tts_speed)
 
     tts_kwargs = {
         "client": openai_lib.AsyncOpenAI(
@@ -262,8 +284,8 @@ async def entrypoint(ctx: JobContext) -> None:
         "model": config.TTS_MODEL,
         "voice": tts_voice,
     }
-    if config.TTS_SPEED is not None:
-        tts_kwargs["speed"] = config.TTS_SPEED
+    if tts_speed is not None:
+        tts_kwargs["speed"] = tts_speed
     tts_model = openai.TTS(**tts_kwargs)
 
     # 3. Create Interviewer Agent (greeting is handled in on_enter)

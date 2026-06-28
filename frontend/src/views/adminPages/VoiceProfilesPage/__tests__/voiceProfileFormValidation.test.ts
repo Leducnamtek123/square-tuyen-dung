@@ -12,6 +12,8 @@ const validClonedForm: VoiceProfileFormValidationData = {
   voiceType: 'cloned',
   presetVoiceId: '',
   consentConfirmed: true,
+  status: 'draft',
+  sampleCount: 0,
 };
 
 const validPresetForm: VoiceProfileFormValidationData = {
@@ -78,6 +80,16 @@ describe('getVoiceProfileFormValidationErrors', () => {
       }),
     ).toEqual({
       consentConfirmed: 'consentRequired',
+    });
+
+    expect(
+      getVoiceProfileFormValidationErrors({
+        ...validClonedForm,
+        status: 'ready',
+        sampleCount: 0,
+      }),
+    ).toEqual({
+      sampleCount: 'sampleRequired',
     });
   });
 

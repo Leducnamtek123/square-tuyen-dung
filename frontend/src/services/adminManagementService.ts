@@ -37,6 +37,7 @@ export type AdminListParams = {
   reporterId?: string | number;
   roleName?: string;
   status?: string;
+  voiceType?: string;
   category?: string;
   is_read?: boolean | string;
   isRead?: boolean | string;

@@ -90,6 +90,7 @@ services:
     environment:
       - DEBUG=${DEBUG:-False}
       - AUTO_MIGRATE=${AUTO_MIGRATE:-1}
+      - AI_TTS_FALLBACK_BASE_URLS=http://vieneu-tts:8298/v1
       - INTERVIEW_AGENT_SHARED_SECRET=${INTERVIEW_AGENT_SHARED_SECRET:?Set INTERVIEW_AGENT_SHARED_SECRET in .env and share it with livekit-agent}
       - INTERVIEW_AGENT_AUTH_REQUIRED=${INTERVIEW_AGENT_AUTH_REQUIRED:-True}
       - INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS=${INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS:-300}
@@ -640,6 +641,33 @@ services:
     networks:
       - app-net
       - data-net
+
+  vieneu-tts:
+    container_name: tuyendung-studio-vieneu-tts
+    build:
+      context: ./voice-ai/inference/vieneu-text-to-speech
+    env_file:
+      - .env
+    environment:
+      - PORT=8298
+      - TTS_DEVICE=cpu
+      - TTS_MODE=turbo
+      - TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS-v2-Turbo-GGUF
+      - TTS_GGUF_FILENAME=vieneu-tts-v2-turbo.gguf
+      - HF_HOME=/models/huggingface
+    expose:
+      - "8298"
+    ports:
+      - "8298:8298"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8298/health > /dev/null"]
+      interval: 20s
+      timeout: 10s
+      retries: 20
+      start_period: 2m
+    networks:
+      - app-net
 
   # ---------------------------------------------------------------------------
   # MinIO (Object Storage)

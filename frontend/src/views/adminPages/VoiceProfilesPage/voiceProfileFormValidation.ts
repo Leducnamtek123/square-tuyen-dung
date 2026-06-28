@@ -1,5 +1,5 @@
 export type VoiceProfileFormValidationErrors = Partial<Record<
-  'name' | 'language' | 'presetVoiceId' | 'consentConfirmed',
+  'name' | 'language' | 'presetVoiceId' | 'consentConfirmed' | 'status' | 'sampleCount',
   string
 >>;
 
@@ -9,6 +9,8 @@ export interface VoiceProfileFormValidationData {
   voiceType?: string | null;
   presetVoiceId?: string | null;
   consentConfirmed?: boolean | null;
+  status?: string | null;
+  sampleCount?: number | null;
 }
 
 export const getVoiceProfileFormValidationErrors = (
@@ -42,6 +44,10 @@ export const getVoiceProfileFormValidationErrors = (
 
   if (voiceType === 'cloned' && !formData.consentConfirmed) {
     errors.consentConfirmed = 'consentRequired';
+  }
+
+  if (voiceType === 'cloned' && formData.status === 'ready' && (formData.sampleCount ?? 0) < 1) {
+    errors.sampleCount = 'sampleRequired';
   }
 
   return errors;

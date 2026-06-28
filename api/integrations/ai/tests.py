@@ -3,6 +3,8 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 import pytest
+import requests
+from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework.test import APIClient
 
@@ -17,6 +19,7 @@ from integrations.ai.client import (
 )
 from integrations.ai.views import execute_tool_call
 from integrations.ai.views import _http_probe_url, _probe_http_service
+from integrations.ai.views import _tts_response_from_body
 from shared.configs import variable_system as var_sys
 
 
@@ -35,6 +38,83 @@ def test_probe_http_service_uses_http_url_for_wss(monkeypatch):
     assert result["status"] == "online"
     mock_get.assert_called_once()
     assert mock_get.call_args.args[0] == "https://tuyendung.square.vn/livekit/"
+
+def test_tts_proxy_buffers_audio_before_returning_response(monkeypatch, settings):
+    settings.AI_TTS_BASE_URL = "http://primary.test/v1"
+    settings.AI_TTS_FALLBACK_BASE_URLS = "http://fallback.test/v1"
+
+    class FakeUpstream:
+        status_code = 200
+        headers = {"content-type": "audio/mpeg", "content-length": "3"}
+        content = b"abc"
+        text = ""
+
+        def json(self):
+            return {}
+
+        def close(self):
+            return None
+
+    post_calls = []
+
+    def fake_post(url, json, stream, timeout):
+        post_calls.append({"url": url, "stream": stream, "timeout": timeout})
+        return FakeUpstream()
+
+    monkeypatch.setattr("integrations.ai.views.requests.post", fake_post)
+
+    response = _tts_response_from_body(
+        {"text": "Xin chao", "voice": "Ly", "model": "tts-1", "response_format": "mp3"}
+    )
+
+    assert isinstance(response, HttpResponse)
+    assert not getattr(response, "streaming", False)
+    assert response.content == b"abc"
+    assert response["Content-Length"] == "3"
+    assert post_calls == [
+        {
+            "url": "http://primary.test/v1/audio/speech",
+            "stream": False,
+            "timeout": (10, 300),
+        }
+    ]
+
+def test_tts_falls_back_to_clone_preview_audio_when_synthesis_fails(monkeypatch, settings):
+    settings.AI_TTS_BASE_URL = "http://primary.test/v1"
+    settings.AI_TTS_FALLBACK_BASE_URLS = "http://fallback.test/v1"
+
+    def fake_post(*args, **kwargs):
+        raise requests.RequestException("upstream failed")
+
+    preview_response = HttpResponse(b"preview-audio", content_type="audio/mpeg")
+    preview_response["Content-Length"] = "13"
+
+    monkeypatch.setattr("integrations.ai.views.requests.post", fake_post)
+    monkeypatch.setattr(
+        "integrations.ai.views._tts_clone_preview_response",
+        lambda voice_profile_id: preview_response,
+    )
+
+    response = _tts_response_from_body(
+        {
+            "text": "Xin chao",
+            "voiceProfileId": 123,
+            "model": "tts-1",
+            "response_format": "mp3",
+        }
+    )
+
+    assert isinstance(response, HttpResponse)
+    assert response.content == b"preview-audio"
+    assert response["Content-Length"] == "13"
+
+def test_tts_get_returns_helpful_message(client):
+    response = client.get("/api/ai/tts/")
+    payload = response.json()
+
+    assert response.status_code == 200
+    assert payload["error"]["code"] == "METHOD_NOT_ALLOWED"
+    assert "Use POST /api/ai/tts/" in payload["error"]["message"]
 
 
 def test_llm_candidates_keep_same_base_url_with_different_model(settings):

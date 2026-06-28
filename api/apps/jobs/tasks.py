@@ -566,7 +566,13 @@ def _extract_candidate_name_from_pdf_image(file_path: str) -> str:
             "AI_VISION_LLM_MODEL",
             default=config(
                 "AI_LLM_LOCAL_MODEL",
-                default=config("AI_RESUME_LLM_MODEL", default=config("AI_LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma3:12b"))),
+                default=config(
+                    "AI_RESUME_LLM_MODEL",
+                    default=config(
+                        "AI_LLM_MODEL",
+                        default=config("OLLAMA_MODEL", default="gpt-5.4-mini"),
+                    ),
+                ),
             ),
         ),
     )
@@ -1095,7 +1101,10 @@ def analyze_resume_ai(self, activity_id):
 
         model_alias = config(
             "AI_RESUME_LLM_MODEL",
-            default=config("AI_LLM_MODEL", default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b"))),
+            default=config(
+                "AI_LLM_MODEL",
+                default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gpt-5.4-mini")),
+            ),
         )
         llm_temperature = config("AI_RESUME_LLM_TEMPERATURE", default=0.1, cast=float)
         llm_top_p = config("AI_RESUME_LLM_TOP_P", default=0.9, cast=float)

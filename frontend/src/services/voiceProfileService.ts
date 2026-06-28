@@ -54,6 +54,11 @@ const voiceProfileService = {
       .then(unwrapDataResponse<VoiceProfileSample>);
   },
 
+  prepareVoiceProfile: (id: IdType): Promise<VoiceProfile> => {
+    return (httpRequest.post(`interview/web/voice-profiles/${id}/prepare/`, {}) as Promise<unknown>)
+      .then(unwrapDataResponse<VoiceProfile>);
+  },
+
   createGrant: (id: IdType, data: VoiceProfileGrantPayload): Promise<VoiceProfileGrant> => {
     return (httpRequest.post(`interview/web/voice-profiles/${id}/grants/`, data) as Promise<unknown>)
       .then(unwrapDataResponse<VoiceProfileGrant>);

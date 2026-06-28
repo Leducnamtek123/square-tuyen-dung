@@ -267,6 +267,18 @@ def _candidate_question_closing_response(user_text: str) -> str:
     )
 
 
+def _parse_question_gap_seconds(value: Any, default: float = 2.5) -> float:
+    try:
+        return max(0.0, float(value))
+    except (TypeError, ValueError):
+        return default
+
+def _parse_silence_threshold_seconds(value: Any, default: float = 1.0) -> float:
+    try:
+        return max(0.0, float(value))
+    except (TypeError, ValueError):
+        return default
+
 def _format_employer_instruction_response(instruction: str) -> str:
     instruction = _brief_text(_sanitize_output_text(instruction), 280).rstrip(" .!?")
     if not instruction:
@@ -321,6 +333,18 @@ class Interviewer(Agent):
         self._awaiting_candidate_questions = False
         self._employer_takeover_active = False
         self._pending_employer_followups: list[str] = []
+        self._question_gap_seconds = _parse_question_gap_seconds(
+            self._context.get("interviewQuestionGapSeconds"),
+            default=2.5,
+        )
+        self._minimum_silence_seconds = _parse_silence_threshold_seconds(
+            self._context.get("interviewMinimumSilenceSeconds"),
+            default=1.0,
+        )
+        self._reply_delay_seconds = max(
+            self._question_gap_seconds,
+            self._minimum_silence_seconds,
+        )
 
         candidate_name = _brief_text(self._context.get("candidateName", "Ứng viên"), 80)
         job_title = _brief_text(self._context.get("jobTitle", "đang ứng tuyển"), 120)
@@ -487,6 +511,9 @@ class Interviewer(Agent):
 
         if self._needs_more_answer_detail(user_text):
             return _format_detail_nudge(self._last_asked_question_text or "", user_text)
+
+        if user_text and self._reply_delay_seconds > 0:
+            await asyncio.sleep(self._reply_delay_seconds)
 
         backend_payload = await self._fetch_next_question_payload()
         if backend_payload is not None:

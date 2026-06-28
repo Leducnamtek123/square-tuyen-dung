@@ -7,6 +7,9 @@ export type SystemSettingsPayload = {
   emailNotifications?: boolean;
   googleApiKey?: string;
   supportEmail?: string;
+  ttsSpeed?: string;
+  interviewQuestionGapSeconds?: string;
+  interviewMinimumSilenceSeconds?: string;
 };
 
 export type SystemHealthPayload = {

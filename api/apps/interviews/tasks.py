@@ -203,13 +203,13 @@ def send_interview_invitation(session_id):
 
         web_url = config("WEB_CLIENT_URL", default="http://localhost:3002")
         interview_url = f"{web_url}/phong-van/{session.invite_token}"
-        scheduled_at_display = "Chưa cập nhật"
+        scheduled_at_display = "ChÃÂ°a cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t"
         if session.scheduled_at:
             scheduled_at_display = tz.localtime(session.scheduled_at).strftime("%H:%M - %d/%m/%Y")
 
         context = {
             "candidate_name": candidate.full_name,
-            "job_title": session.job_post.job_name if session.job_post else "Vị trí tuyển dụng",
+            "job_title": session.job_post.job_name if session.job_post else "VÃ¡Â»â¹ trÃÂ­ tuyÃ¡Â»Æn dÃ¡Â»Â¥ng",
             "interview_url": interview_url,
             "invite_token": session.invite_token,
             "scheduled_at_display": scheduled_at_display,
@@ -219,7 +219,7 @@ def send_interview_invitation(session_id):
         plain_message = strip_tags(html_message)
 
         send_mail(
-            subject=f"[TuyenDungSquare] Mời Phỏng vấn trực tuyến - {context['job_title']}",
+            subject=f"[TuyenDungSquare] MÃ¡Â»Âi PhÃ¡Â»Âng vÃ¡ÂºÂ¥n trÃ¡Â»Â±c tuyÃ¡ÂºÂ¿n - {context['job_title']}",
             message=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[candidate.email],
@@ -248,7 +248,7 @@ def send_evaluation_report(session_id):
 
         context = {
             "candidate_name": session.candidate.full_name,
-            "job_title": session.job_post.job_name if session.job_post else "Vị trí tuyển dụng",
+            "job_title": session.job_post.job_name if session.job_post else "VÃ¡Â»â¹ trÃÂ­ tuyÃ¡Â»Æn dÃ¡Â»Â¥ng",
             "overall_score": session.ai_overall_score,
             "summary": session.ai_summary,
             "report_url": report_url,
@@ -258,7 +258,7 @@ def send_evaluation_report(session_id):
         plain_message = strip_tags(html_message)
 
         send_mail(
-            subject=f"[TuyenDungSquare] Đã có kết quả Phỏng vấn trực tuyến - {session.candidate.full_name}",
+            subject=f"[TuyenDungSquare] ÃÂÃÂ£ cÃÂ³ kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ PhÃ¡Â»Âng vÃ¡ÂºÂ¥n trÃ¡Â»Â±c tuyÃ¡ÂºÂ¿n - {session.candidate.full_name}",
             message=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[employer.email],
@@ -288,38 +288,41 @@ def evaluate_interview_session(self, session_id):
 
         history_text = ""
         for transcript in transcripts:
-            role = "Người phỏng vấn" if transcript.speaker_role == "ai_agent" else "Ứng viên"
+            role = "NgÃÂ°Ã¡Â»Âi phÃ¡Â»Âng vÃ¡ÂºÂ¥n" if transcript.speaker_role == "ai_agent" else "Ã¡Â»Â¨ng viÃÂªn"
             history_text += f"{role}: {transcript.content}\n"
 
         prompt = f"""
-Bạn là một chuyên gia tuyển dụng chuyên nghiệp. Hãy phân tích nội dung buổi phỏng vấn sau đây và đưa ra đánh giá khách quan.
+BÃ¡ÂºÂ¡n lÃÂ  mÃ¡Â»â¢t chuyÃÂªn gia tuyÃ¡Â»Æn dÃ¡Â»Â¥ng chuyÃÂªn nghiÃ¡Â»â¡p. HÃÂ£y phÃÂ¢n tÃÂ­ch nÃ¡Â»â¢i dung buÃ¡Â»â¢i phÃ¡Â»Âng vÃ¡ÂºÂ¥n sau ÃâÃÂ¢y vÃÂ  ÃâÃÂ°a ra ÃâÃÂ¡nh giÃÂ¡ khÃÂ¡ch quan.
 
-NỘI DUNG BUỔI PHỎNG VẤN:
+NÃ¡Â»ËI DUNG BUÃ¡Â»âI PHÃ¡Â»Å½NG VÃ¡ÂºÂ¤N:
 {history_text}
 
-Hãy trả về kết quả DƯỚI DẠNG JSON với các trường:
-- overall_score: điểm tổng quát (1-10)
-- technical_score: điểm kiến thức chuyên môn (1-10)
-- communication_score: điểm giao tiếp (1-10)
-- summary: tóm tắt ngắn gọn (dưới 100 từ)
-- strengths: danh sách 3-5 điểm mạnh (list string)
-- weaknesses: danh sách 2-3 điểm cần cải thiện (list string)
-- detailed_feedback: object gồm:
+HÃÂ£y trÃ¡ÂºÂ£ vÃ¡Â»Â kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ DÃÂ¯Ã¡Â»Å¡I DÃ¡ÂºÂ NG JSON vÃ¡Â»âºi cÃÂ¡c trÃÂ°Ã¡Â»Âng:
+- overall_score: ÃâiÃ¡Â»Æm tÃ¡Â»â¢ng quÃÂ¡t (1-10)
+- technical_score: ÃâiÃ¡Â»Æm kiÃ¡ÂºÂ¿n thÃ¡Â»Â©c chuyÃÂªn mÃÂ´n (1-10)
+- communication_score: ÃâiÃ¡Â»Æm giao tiÃ¡ÂºÂ¿p (1-10)
+- summary: tÃÂ³m tÃ¡ÂºÂ¯t ngÃ¡ÂºÂ¯n gÃ¡Â»Ân (dÃÂ°Ã¡Â»âºi 100 tÃ¡Â»Â«)
+- strengths: danh sÃÂ¡ch 3-5 ÃâiÃ¡Â»Æm mÃ¡ÂºÂ¡nh (list string)
+- weaknesses: danh sÃÂ¡ch 2-3 ÃâiÃ¡Â»Æm cÃ¡ÂºÂ§n cÃ¡ÂºÂ£i thiÃ¡Â»â¡n (list string)
+- detailed_feedback: object gÃ¡Â»âm:
   - question_performance: list object {{question: string, feedback: string, score: 1-10}}
   - soft_skills: {{confidence: 1-10, clarity: 1-10, tone: string}}
   - cultural_fit: string
 
-Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
+LÃÂ°u ÃÂ½: chÃ¡Â»â° trÃ¡ÂºÂ£ vÃ¡Â»Â 1 JSON object hÃ¡Â»Â£p lÃ¡Â»â¡, khÃÂ´ng thÃÂªm giÃ¡ÂºÂ£i thÃÂ­ch.
 """
 
-        model_alias = config("AI_LLM_MODEL", default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b")))
+        model_alias = config(
+            "AI_LLM_MODEL",
+            default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gpt-5.4-mini")),
+        )
 
         payload = {
             "model": model_alias,
             "messages": [
                 {
                     "role": "system",
-                "content": "Bạn là một AI hỗ trợ đánh giá phỏng vấn tuyển dụng chuyên nghiệp. Hãy trả lời bằng JSON.",
+                    "content": "You are a professional recruitment interview evaluation AI. Return only valid JSON.",
                 },
                 {"role": "user", "content": prompt},
             ],
@@ -443,3 +446,4 @@ def auto_schedule_screening_interview(activity_id: int):
         logger.info(f"Auto-scheduled screening AI interview for candidate {candidate.id} on job {job_post.id}")
     except Exception as e:
         logger.error(f"Failed to auto-schedule screening interview: {e}")
+
