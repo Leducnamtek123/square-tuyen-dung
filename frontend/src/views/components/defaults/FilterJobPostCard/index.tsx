@@ -25,7 +25,9 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import CheckIcon from '@mui/icons-material/Check';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useConfig } from '../../../../hooks/useConfig';
 import jobService from '../../../../services/jobService';
 import type { JobPost as ModelsJobPost } from '../../../../types/models';
 import type { GetJobPostsParams } from '../../../../services/jobService';
@@ -39,22 +41,31 @@ interface FilterJobPostCardProps {
 
 const pageSize = 9; // 3x3 grid as shown in screenshot
 
-const CITIES_LIST = [
-  { id: 'all', name: 'Tất cả' },
-  { id: 1, name: 'TP.HCM' },
-  { id: 2, name: 'Hà Nội' },
-  { id: 3, name: 'Đà Nẵng' },
-  { id: 4, name: 'An Giang' },
-  { id: 5, name: 'Bà Rịa - Vũng Tàu' },
-  { id: 6, name: 'Bạc Liêu' },
-  { id: 7, name: 'Bến Tre' },
-  { id: 8, name: 'Bình Dương' },
-  { id: 9, name: 'Lâm Đồng' },
+type FilterDimension = 'city' | 'salary' | 'experience' | 'career';
+
+const FILTER_DIMENSIONS: { id: FilterDimension; label: string }[] = [
+  { id: 'city', label: 'Địa điểm' },
+  { id: 'salary', label: 'Mức lương' },
+  { id: 'experience', label: 'Kinh nghiệm' },
+  { id: 'career', label: 'Ngành nghề' },
+];
+
+const SALARY_RANGES = [
+  { id: 'all', label: 'Tất cả' },
+  { id: '1-3', label: '1 - 3 triệu', min: 1000000, max: 3000000 },
+  { id: '3-5', label: '3 - 5 triệu', min: 3000000, max: 5000000 },
+  { id: '5-7', label: '5 - 7 triệu', min: 5000000, max: 7000000 },
+  { id: '7-10', label: '7 - 10 triệu', min: 7000000, max: 10000000 },
+  { id: '10-15', label: '10 - 15 triệu', min: 10000000, max: 15000000 },
+  { id: '15-20', label: '15 - 20 triệu', min: 15000000, max: 20000000 },
+  { id: '20+', label: 'Trên 20 triệu', min: 20000000, max: undefined },
 ];
 
 const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {} }) => {
+  const { allConfig } = useConfig();
   const [page, setPage] = useState(1);
-  const [selectedCityId, setSelectedCityId] = useState<string | number>('all');
+  const [currentDimension, setCurrentDimension] = useState<FilterDimension>('city');
+  const [selectedSubItem, setSelectedSubItem] = useState<string | number>('all');
   const [favorites, setFavorites] = useState<Record<number, boolean>>({});
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -78,19 +89,69 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleCitySelect = (cityId: string | number) => {
-    setSelectedCityId(cityId);
+  const handleDimensionSelect = (dimId: FilterDimension) => {
+    setCurrentDimension(dimId);
+    setSelectedSubItem('all');
     setPage(1);
     setAnchorEl(null);
   };
 
+  const handleSubItemSelect = (id: string | number) => {
+    setSelectedSubItem(id);
+    setPage(1);
+  };
+
+  // Compute sub-items list dynamically from real API data
+  const subItems = React.useMemo(() => {
+    if (currentDimension === 'city') {
+      const citiesFromApi = allConfig?.cityOptions || [];
+      return [{ id: 'all', label: 'Tất cả' }, ...citiesFromApi.map((c) => ({ id: c.id, label: c.name }))];
+    }
+    if (currentDimension === 'salary') {
+      return SALARY_RANGES;
+    }
+    if (currentDimension === 'experience') {
+      const expFromApi = allConfig?.experienceOptions || [];
+      if (expFromApi.length > 0) {
+        return [{ id: 'all', label: 'Tất cả' }, ...expFromApi.map((e) => ({ id: e.id, label: e.name }))];
+      }
+      return [
+        { id: 'all', label: 'Tất cả' },
+        { id: '0', label: 'Chưa có kinh nghiệm' },
+        { id: '1', label: 'Dưới 1 năm' },
+        { id: '2', label: '1 - 2 năm' },
+        { id: '3', label: '2 - 3 năm' },
+        { id: '4', label: '3 - 5 năm' },
+        { id: '5', label: 'Trên 5 năm' },
+      ];
+    }
+    if (currentDimension === 'career') {
+      const careersFromApi = allConfig?.careerOptions || [];
+      return [{ id: 'all', label: 'Tất cả' }, ...careersFromApi.map((c) => ({ id: c.id, label: c.name }))];
+    }
+    return [{ id: 'all', label: 'Tất cả' }];
+  }, [currentDimension, allConfig]);
+
   const resolvedParams = React.useMemo<GetJobPostsParams>(() => {
     const base = { ...params };
-    if (selectedCityId !== 'all') {
-      base.cityId = selectedCityId;
+    if (selectedSubItem === 'all') {
+      return base;
+    }
+    if (currentDimension === 'city') {
+      base.cityId = selectedSubItem;
+    } else if (currentDimension === 'career') {
+      base.careerId = selectedSubItem;
+    } else if (currentDimension === 'experience') {
+      base.experienceId = selectedSubItem;
+    } else if (currentDimension === 'salary') {
+      const foundSalary = SALARY_RANGES.find((s) => s.id === selectedSubItem);
+      if (foundSalary) {
+        if (foundSalary.min) base.salaryMin = foundSalary.min;
+        if (foundSalary.max) base.salaryMax = foundSalary.max;
+      }
     }
     return base;
-  }, [params, selectedCityId]);
+  }, [params, currentDimension, selectedSubItem]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['filtered-job-posts', resolvedParams, page],
@@ -131,6 +192,8 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
     return diff > 0 ? `Còn ${diff} ngày` : 'Hết hạn';
   };
 
+  const activeDimensionLabel = FILTER_DIMENSIONS.find((d) => d.id === currentDimension)?.label || 'Địa điểm';
+
   return (
     <Box id="filter-job-post-card" sx={{ width: '100%' }}>
       {/* ── Section Header Row ───────────────────────────────────────── */}
@@ -150,9 +213,9 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
         </Link>
       </Stack>
 
-      {/* ── Filter Bar (Location dropdown + Scrollable City Pills) ───── */}
+      {/* ── Filter Bar (Filter Mode dropdown + Scrollable Sub-item Pills) ───── */}
       <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3, width: '100%', overflow: 'hidden' }}>
-        {/* Location Dropdown */}
+        {/* Filter Dimension Dropdown Button */}
         <Button
           variant="outlined"
           onClick={(e) => setAnchorEl(e.currentTarget)}
@@ -163,33 +226,61 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
             borderColor: '#e2e8f0',
             color: '#334155',
             textTransform: 'none',
-            fontWeight: 500,
+            fontWeight: 600,
             fontSize: '0.875rem',
             px: 2,
             py: 0.8,
             backgroundColor: '#ffffff',
             flexShrink: 0,
+            boxShadow: '0 2px 6px rgba(15, 23, 42, 0.04)',
             '&:hover': { borderColor: '#cbd5e1', backgroundColor: '#f8fafc' },
           }}
         >
-          Lọc theo: Địa điểm
+          Lọc theo: {activeDimensionLabel}
         </Button>
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={() => setAnchorEl(null)}
-          PaperProps={{ sx: { borderRadius: '12px', mt: 1, minWidth: 160 } }}
+          PaperProps={{
+            sx: {
+              borderRadius: '12px',
+              mt: 1,
+              minWidth: 180,
+              p: 0.5,
+              boxShadow: '0 16px 36px rgba(15, 23, 42, 0.12)',
+              border: '1px solid #e2e8f0',
+            },
+          }}
         >
-          {CITIES_LIST.map((city) => (
-            <MenuItem
-              key={city.id}
-              selected={selectedCityId === city.id}
-              onClick={() => handleCitySelect(city.id)}
-              sx={{ fontSize: '0.875rem', fontWeight: selectedCityId === city.id ? 700 : 400 }}
-            >
-              {city.name}
-            </MenuItem>
-          ))}
+          {FILTER_DIMENSIONS.map((dim) => {
+            const isSelected = currentDimension === dim.id;
+            return (
+              <MenuItem
+                key={dim.id}
+                selected={isSelected}
+                onClick={() => handleDimensionSelect(dim.id)}
+                sx={{
+                  fontSize: '0.875rem',
+                  fontWeight: isSelected ? 700 : 500,
+                  borderRadius: '8px',
+                  py: 1,
+                  px: 1.5,
+                  display: 'flex',
+                  justify: 'space-between',
+                  alignItems: 'center',
+                  color: isSelected ? '#e11d48' : '#334155',
+                  '&.Mui-selected': {
+                    backgroundColor: 'rgba(225, 29, 72, 0.08)',
+                    '&:hover': { backgroundColor: 'rgba(225, 29, 72, 0.12)' },
+                  },
+                }}
+              >
+                {dim.label}
+                {isSelected && <CheckIcon sx={{ fontSize: 18, color: '#e11d48', ml: 1 }} />}
+              </MenuItem>
+            );
+          })}
         </Menu>
 
         {/* Scroll Left Button */}
@@ -223,12 +314,12 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
             scrollbarWidth: 'none',
           }}
         >
-          {CITIES_LIST.map((city) => {
-            const isActive = selectedCityId === city.id;
+          {subItems.map((item) => {
+            const isActive = String(selectedSubItem) === String(item.id);
             return (
               <Box
-                key={city.id}
-                onClick={() => handleCitySelect(city.id)}
+                key={String(item.id)}
+                onClick={() => handleSubItemSelect(item.id)}
                 sx={{
                   px: 2.2,
                   py: 0.75,
@@ -247,7 +338,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
                   },
                 }}
               >
-                {city.name}
+                {item.label}
               </Box>
             );
           })}
