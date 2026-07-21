@@ -31,6 +31,7 @@ import useStructuredData from '../../../hooks/useStructuredData';
 import TopCompanyCarousel from '../../../components/Features/TopCompanyCarousel';
 import CareerCarousel from '../../../components/Features/CareerCarousel';
 import FeedbackCarousel from '../../../components/Features/FeedbackCarousel';
+import CareerHandbookSection from '../../../components/Features/CareerHandbookSection';
 import JobByCategory from '../../components/defaults/JobByCategory';
 import FilterJobPostCard from '../../components/defaults/FilterJobPostCard';
 import SuggestedJobPostCard from '../../components/defaults/SuggestedJobPostCard';
@@ -239,79 +240,12 @@ export default function HomePage() {
 
   return (
     <>
-      <Box sx={{ mt: 10 }}>
-        <Stack spacing={1} sx={{ mb: 2.5 }}>
-          <Stack direction="row" spacing={1.25} alignItems="center">
-            <Avatar sx={{ bgcolor: '#0f172a', color: '#ffffff', width: 38, height: 38 }} aria-label={t('home.urgentJobsAria')}>
-              <BoltIcon fontSize="small" />
-            </Avatar>
-            <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 800 }}>
-              {t('home.urgentJobs')}
-            </Typography>
-          </Stack>
-          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 760, pl: 6.25 }}>
-            Tuyển nhanh các vị trí cần lấp đầy sớm, ưu tiên hiển thị trước để ứng viên dễ thấy.
-          </Typography>
-        </Stack>
-        <Box sx={{ p: { xs: 0, sm: 0, md: 0, lg: 1, xl: 1 } }}>
-          <FilterJobPostCard params={{ isUrgent: true }} />
-        </Box>
+      <Box sx={{ mt: 8 }}>
+        <FilterJobPostCard params={{ isUrgent: true }} />
       </Box>
 
       <Box sx={{ mt: 6 }}>
-        <Stack spacing={1} sx={{ mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 800 }} gutterBottom>
-            {t('home.topCompanies')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 760 }}>
-            {t('home.topCompaniesSubtitle')}
-          </Typography>
-        </Stack>
         <TopCompanyCarousel />
-      </Box>
-
-      <Box sx={{ mt: 10 }}>
-        <Stack spacing={1} sx={{ mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 800 }} gutterBottom>
-            {t('home.choosePathTitle')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 760 }}>
-            {t('home.choosePathDescription')}
-          </Typography>
-        </Stack>
-
-        <Grid container spacing={3}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <EntryPointCard
-              icon={<SearchIcon />}
-              title={t('home.candidateTitle')}
-              description={t('home.candidateDescription')}
-              benefits={[
-                t('home.candidateBenefit1'),
-                t('home.candidateBenefit2'),
-                t('home.candidateBenefit3'),
-              ]}
-              ctaLabel={t('home.candidateCta')}
-              href={jobsHref}
-              accent="#0f172a"
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <EntryPointCard
-              icon={<ApartmentIcon />}
-              title={t('home.employerTitle')}
-              description={t('home.employerDescription')}
-              benefits={[
-                t('home.employerBenefit1'),
-                t('home.employerBenefit2'),
-                t('home.employerBenefit3'),
-              ]}
-              ctaLabel={t('home.employerCta')}
-              href={employerIntroHref}
-              accent="#334155"
-            />
-          </Grid>
-        </Grid>
       </Box>
 
       <Box sx={{ mt: 10 }}>
@@ -347,78 +281,56 @@ export default function HomePage() {
                 prefetch
                 variant="contained"
                 color="primary"
-                  size="large"
-                  startIcon={<SearchIcon />}
-                  endIcon={<ArrowForwardIcon />}
-                  sx={{
-                    bgcolor: '#0f172a',
-                    color: '#ffffff',
-                    width: { xs: '100%', sm: 'auto' },
-                    justifyContent: 'center',
-                    boxShadow: '0 18px 38px rgba(15,23,42,0.18)',
-                    '&:hover': { bgcolor: '#111827' },
-                  }}
-                >
-                  {t('home.startExploring')}
+                size="large"
+                startIcon={<SearchIcon />}
+                endIcon={<ArrowForwardIcon />}
+                sx={{
+                  bgcolor: '#0f172a',
+                  color: '#ffffff',
+                  width: { xs: '100%', sm: 'auto' },
+                  justifyContent: 'center',
+                  boxShadow: '0 18px 38px rgba(15,23,42,0.18)',
+                  '&:hover': { bgcolor: '#111827' },
+                }}
+              >
+                {t('home.startExploring')}
               </Button>
             </Stack>
           </CardContent>
         </Card>
       </Box>
 
-      <Box sx={{ mt: 10 }}>
-        <Stack spacing={1} sx={{ mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 800 }} gutterBottom>
-            {t('home.keyCareers')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 760 }}>
-            {t('home.keyCareersSubtitle')}
-          </Typography>
-        </Stack>
-        <LazyLoadSection minHeight="200px" rootMargin="200px">
-          <CareerCarousel />
-        </LazyLoadSection>
-      </Box>
-
       {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
         <Box sx={{ mt: 10 }}>
           <Card variant="outlined">
-          <CardHeader
-            avatar={
-              <Avatar sx={{ bgcolor: 'rgba(15, 23, 42, 0.06)', color: '#0f172a' }} aria-label={t('home.suggestedJobsAria')}>
-                <TipsAndUpdatesIcon color="inherit" />
-              </Avatar>
-            }
-            title={
-              <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 800 }}>
-                {t('home.suggestedJobs')}
-              </Typography>
-            }
-            sx={{
-              backgroundColor: 'rgba(15, 23, 42, 0.04)',
-              borderBottom: '1px solid',
-              borderColor: 'rgba(15, 23, 42, 0.10)',
-              p: { xs: 0.75, sm: 1, md: 1.5, lg: 1.5, xl: 1.5 },
-            }}
-          />
-          <CardContent sx={{ backgroundColor: 'rgba(248, 250, 252, 0.82)' }}>
-            <Box sx={{ p: { xs: 0, sm: 0, md: 0, lg: 2, xl: 2 } }}>
-              <LazyLoadSection minHeight="400px">
-                <SuggestedJobPostCard />
+            <CardHeader
+              avatar={
+                <Avatar sx={{ bgcolor: 'rgba(15, 23, 42, 0.06)', color: '#0f172a' }} aria-label={t('home.suggestedJobsAria')}>
+                  <TipsAndUpdatesIcon color="inherit" />
+                </Avatar>
+              }
+              title={
+                <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 800 }}>
+                  {t('home.suggestedJobs')}
+                </Typography>
+              }
+              sx={{
+                backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                borderBottom: '1px solid',
+                borderColor: 'rgba(15, 23, 42, 0.10)',
+                p: { xs: 0.75, sm: 1, md: 1.5, lg: 1.5, xl: 1.5 },
+              }}
+            />
+            <CardContent sx={{ backgroundColor: 'rgba(248, 250, 252, 0.82)' }}>
+              <Box sx={{ p: { xs: 0, sm: 0, md: 0, lg: 2, xl: 2 } }}>
+                <LazyLoadSection minHeight="400px">
+                  <SuggestedJobPostCard />
                 </LazyLoadSection>
               </Box>
             </CardContent>
           </Card>
         </Box>
       )}
-
-      {careerSections.map((career, index) => (
-        <Box sx={{ mt: index === 0 ? 6 : 10 }} key={career.id}>
-          <LazyLoadSection minHeight="400px" rootMargin="300px">
-            <CareerJobSection career={career} t={t} />
-          </LazyLoadSection>
-        </Box>
-      ))}
 
       <Box sx={{ mt: 10 }}>
         <Stack spacing={1} sx={{ mb: 3 }}>
@@ -434,12 +346,11 @@ export default function HomePage() {
         </LazyLoadSection>
       </Box>
 
-      <Box sx={{ mt: 10 }}>
-        <Box sx={{ backgroundColor: 'background.paper', borderRadius: 2 }}>
-          <LazyLoadSection minHeight="500px" rootMargin="400px">
-            <JobByCategory />
-          </LazyLoadSection>
-        </Box>
+      {/* ── Cẩm nang nghề nghiệp (Articles / Handbook Section) ────────────── */}
+      <Box sx={{ mt: 10, mb: 8 }}>
+        <LazyLoadSection minHeight="400px" rootMargin="300px">
+          <CareerHandbookSection />
+        </LazyLoadSection>
       </Box>
     </>
   );

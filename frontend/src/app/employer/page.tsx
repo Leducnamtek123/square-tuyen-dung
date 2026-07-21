@@ -6,6 +6,6 @@ export const metadata = {
 };
 
 export default function EmployerRootPage() {
-  redirect('/employer/dashboard');
+  redirect('/employer/introduce');
 }
 

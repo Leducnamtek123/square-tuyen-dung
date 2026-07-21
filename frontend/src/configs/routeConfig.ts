@@ -59,6 +59,7 @@ export const SEGMENT_MAP = {
   'ho-so-ung-tuyen': 'applied-profiles',
   'ho-so-da-luu': 'saved-profiles',
   'danh-sach-ung-vien': 'candidates',
+  'tim-ung-vien': 'candidates',
   'chi-tiet-ung-vien': 'candidate-detail',
   'cai-dat': 'settings',
   'ket-noi-voi-ung-vien': 'chat',

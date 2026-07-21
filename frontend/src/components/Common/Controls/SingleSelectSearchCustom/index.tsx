@@ -76,7 +76,49 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
 
           onChange={(e, value) => field.onChange(value?.id ?? '')}
 
-        renderInput={(params) => (
+          slotProps={{
+            paper: {
+              sx: {
+                width: 'max-content',
+                minWidth: isHero ? { xs: 280, sm: 440, md: 540 } : 280,
+                maxWidth: 620,
+                mt: 1,
+                p: 0.5,
+                boxShadow: '0 22px 50px rgba(15, 23, 42, 0.18)',
+                border: '1px solid rgba(226, 232, 240, 0.95)',
+                borderRadius: 3,
+              },
+            },
+            listbox: {
+              sx: {
+                display: 'grid',
+                gridTemplateColumns: isHero ? { xs: '1fr', sm: 'repeat(2, 1fr)' } : '1fr',
+                gap: '4px 8px',
+                p: 1,
+                maxHeight: 380,
+                overflowY: 'auto',
+                '& .MuiAutocomplete-option': {
+                  borderRadius: 2,
+                  py: 1,
+                  px: 1.5,
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  color: '#334155',
+                  transition: 'all 0.15s ease',
+                  '&:hover, &.Mui-focused': {
+                    backgroundColor: 'rgba(124, 58, 237, 0.08)',
+                    color: '#7c3aed',
+                  },
+                  '&[aria-selected="true"]': {
+                    backgroundColor: 'rgba(124, 58, 237, 0.14)',
+                    color: '#7c3aed',
+                    fontWeight: 700,
+                  },
+                },
+              },
+            },
+          }}
+          renderInput={(params) => (
 
             <TextField
 

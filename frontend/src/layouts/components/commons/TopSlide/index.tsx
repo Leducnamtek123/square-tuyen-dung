@@ -110,19 +110,18 @@ const TopSlide = () => {
   return (
     <Box
       sx={{
-        width: '100vw',
-        mx: 'calc(50% - 50vw)',
+        width: '100%',
+        mt: 3,
+        borderRadius: { xs: '16px', md: '24px' },
+        overflow: 'hidden',
+        boxShadow: '0 16px 36px rgba(15, 23, 42, 0.10)',
         bgcolor: '#0f172a',
         fontFamily: "'Plus Jakarta Sans', var(--font-be-vietnam-pro), sans-serif",
       }}
     >
       <Box
         sx={{
-          height: {
-            xs: `calc(100svh - ${HERO_HEADER_OFFSET.xs})`,
-            sm: `calc(100svh - ${HERO_HEADER_OFFSET.sm})`,
-          },
-          minHeight: { xs: 560, md: 650 },
+          minHeight: { xs: 420, md: 460 },
           position: 'relative',
           overflow: 'hidden',
           bgcolor: '#0f172a',
@@ -180,103 +179,6 @@ const TopSlide = () => {
           >
             <Stack spacing={2.5}>
               <HomeSearch variant="hero" />
-
-              <Grid container spacing={1.5}>
-                {HERO_STATS.map((stat) => {
-                  const Icon = stat.icon;
-                  return (
-                    <Grid key={stat.title} size={{ xs: 12, sm: 4 }}>
-                      <Card
-                        sx={{
-                          height: '100%',
-                          bgcolor: 'rgba(255, 255, 255, 0.14)',
-                          color: '#ffffff',
-                          border: '1px solid rgba(255, 255, 255, 0.16)',
-                          backdropFilter: 'blur(10px)',
-                          boxShadow: '0 18px 42px rgba(15, 23, 42, 0.22)',
-                        }}
-                      >
-                        <CardContent sx={{ p: 2.25, '&:last-child': { pb: 2.25 } }}>
-                          <Stack direction="row" spacing={1.5} alignItems="flex-start">
-                            <Avatar
-                              sx={{
-                                bgcolor: 'rgba(255,255,255,0.16)',
-                                color: '#ffffff',
-                                width: 42,
-                                height: 42,
-                              }}
-                            >
-                              <Icon fontSize="small" />
-                            </Avatar>
-                            <Box>
-                              <Typography variant="subtitle1" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
-                                {stat.title}
-                              </Typography>
-                              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.82)', mt: 0.5, lineHeight: 1.55 }}>
-                                {stat.description}
-                              </Typography>
-                            </Box>
-                          </Stack>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  );
-                })}
-              </Grid>
-
-              <Card
-                sx={{
-                  bgcolor: 'rgba(255, 255, 255, 0.12)',
-                  color: '#ffffff',
-                  border: '1px solid rgba(255, 255, 255, 0.16)',
-                  backdropFilter: 'blur(12px)',
-                  boxShadow: '0 22px 48px rgba(15, 23, 42, 0.24)',
-                }}
-              >
-                <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 }, '&:last-child': { pb: { xs: 2, sm: 2.5, md: 3 } } }}>
-                  <Stack spacing={1.75}>
-                    <Stack direction="row" spacing={1.25} alignItems="center">
-                      <Avatar
-                        sx={{
-                          bgcolor: '#ffffff',
-                          color: '#0f172a',
-                          width: 36,
-                          height: 36,
-                        }}
-                      >
-                        <TipsAndUpdatesIcon fontSize="small" />
-                      </Avatar>
-                      <Box>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
-                          Tìm việc và đăng tin trên cùng một màn hình
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.82)', mt: 0.25 }}>
-                          Chỉ cần gõ từ khóa, chọn địa điểm, rồi đi thẳng tới kết quả phù hợp.
-                        </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-                      {['Lọc theo nghề', 'Theo thành phố', 'Theo công ty', 'Tin tuyển dụng rõ ràng'].map((label) => (
-                        <Box
-                          key={label}
-                          sx={{
-                            px: 1.5,
-                            py: 0.75,
-                            borderRadius: 999,
-                            border: '1px solid rgba(255,255,255,0.18)',
-                            bgcolor: 'rgba(255,255,255,0.08)',
-                            fontSize: 13,
-                            fontWeight: 700,
-                            lineHeight: 1,
-                          }}
-                        >
-                          {label}
-                        </Box>
-                      ))}
-                    </Stack>
-                  </Stack>
-                </CardContent>
-              </Card>
             </Stack>
           </Box>
         </Box>

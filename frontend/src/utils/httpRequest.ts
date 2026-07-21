@@ -26,6 +26,7 @@ import { cleanParams } from './params';
 import { camelizeKeys } from './camelCase';
 import { isMaintenanceModeError, notifyMaintenanceMode } from './maintenanceMode';
 import { ACTIVE_WORKSPACE_STORAGE_KEY, LEGACY_ACTIVE_WORKSPACE_STORAGE_KEY } from './storageKeys';
+import { initMockAdapter } from '../mocks/initMock';
 
 type StoredWorkspace = {
   type?: string;
@@ -52,6 +53,10 @@ const httpRequest = axios.create({
   withCredentials: true,
   timeout: 30000,
 }) as HttpServiceInstance;
+
+if (process.env.NEXT_PUBLIC_USE_MOCK === 'true') {
+  initMockAdapter(httpRequest as any);
+}
 
 export const refreshClient = axios.create({
   baseURL,

@@ -67,8 +67,9 @@ const nextConfig = {
     ];
   },
   async rewrites() {
+    const isMock = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
     return [
-      { source: '/api/:path*', destination: `${apiProxyOrigin}/api/:path*/` },
+      ...(isMock ? [] : [{ source: '/api/:path*', destination: `${apiProxyOrigin}/api/:path*/` }]),
 
       // ── Job Seeker (root level) ──
       { source: '/dang-nhap', destination: '/login' },
@@ -103,21 +104,26 @@ const nextConfig = {
 
       // ── Employer (/nha-tuyen-dung → /employer) ──
       { source: '/nha-tuyen-dung/login', destination: '/employer/login' },
+      { source: '/nha-tuyen-dung/dang-nhap', destination: '/employer/login' },
       { source: '/nha-tuyen-dung/register', destination: '/employer/register' },
+      { source: '/nha-tuyen-dung/dang-ky', destination: '/employer/register' },
       { source: '/nha-tuyen-dung/forgot-password', destination: '/employer/forgot-password' },
+      { source: '/nha-tuyen-dung/quen-mat-khau', destination: '/employer/forgot-password' },
       { source: '/nha-tuyen-dung/reset-password/:path*', destination: '/employer/reset-password/:path*' },
+      { source: '/nha-tuyen-dung/cap-nhat-mat-khau/:path*', destination: '/employer/reset-password/:path*' },
       { source: '/nha-tuyen-dung/gioi-thieu', destination: '/employer/introduce' },
       { source: '/nha-tuyen-dung/dich-vu', destination: '/employer/service' },
       { source: '/nha-tuyen-dung/bao-gia', destination: '/employer/pricing' },
       { source: '/nha-tuyen-dung/ho-tro', destination: '/employer/support' },
       { source: '/nha-tuyen-dung/blog-tuyen-dung', destination: '/employer/blog' },
-      { source: '/nha-tuyen-dung', destination: '/employer/dashboard' },
+      { source: '/nha-tuyen-dung', destination: '/employer/introduce' },
       { source: '/nha-tuyen-dung/bang-dieu-khien', destination: '/employer/dashboard' },
       { source: '/nha-tuyen-dung/tro-ly-agent', destination: '/employer/agent-assistants' },
       { source: '/nha-tuyen-dung/tin-tuyen-dung', destination: '/employer/job-posts' },
       { source: '/nha-tuyen-dung/ho-so-ung-tuyen', destination: '/employer/applied-profiles' },
       { source: '/nha-tuyen-dung/ho-so-da-luu', destination: '/employer/saved-profiles' },
       { source: '/nha-tuyen-dung/danh-sach-ung-vien', destination: '/employer/candidates' },
+      { source: '/nha-tuyen-dung/tim-ung-vien', destination: '/employer/candidates' },
       { source: '/nha-tuyen-dung/danh-sach-ung-vien/:slug', destination: '/employer/candidates/:slug' },
       { source: '/nha-tuyen-dung/chi-tiet-ung-vien/:slug', destination: '/employer/candidates/:slug' },
       { source: '/employer/candidate-detail/:slug', destination: '/employer/candidates/:slug' },

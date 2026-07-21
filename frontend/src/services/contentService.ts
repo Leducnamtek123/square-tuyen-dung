@@ -50,10 +50,20 @@ const unwrapDetailResponse = <T>(raw: unknown): T => {
   return value as T;
 };
 
-// ─── Article Types ────────────────────────────────────────────────────────────
+// ─── Article & Category Types ──────────────────────────────────────────────────
 
-export type ArticleCategory = 'news' | 'blog';
+export type ArticleCategory = string;
 export type ArticleStatus = 'draft' | 'pending' | 'published' | 'archived';
+
+export interface ArticleCategoryInfo {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  iconName?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+}
 
 export interface Article {
   id: number;
@@ -62,6 +72,9 @@ export interface Article {
   excerpt: string;
   thumbnailUrl: string | null;
   category: ArticleCategory;
+  categoryId?: number;
+  categorySlug?: string;
+  categoryName?: string;
   status: ArticleStatus;
   statusDisplay?: string;
   authorName: string | null;
@@ -73,6 +86,15 @@ export interface Article {
   thumbnail?: number | null;
   createAt?: string;
   updateAt?: string;
+}
+
+export interface ArticleCategoryPayload {
+  name: string;
+  slug?: string;
+  description?: string;
+  iconName?: string;
+  sortOrder?: number;
+  isActive?: boolean;
 }
 
 interface ArticleListParams {
@@ -153,6 +175,36 @@ const contentService = {
     return (httpRequest.post(url) as Promise<unknown>).then((response) =>
       normalizeActionResponse(response, { success: true })
     );
+  },
+
+  // ─── Public Article Category API ─────────────────────────────────────────
+
+  getPublicArticleCategories: async (): Promise<ArticleCategoryInfo[]> => {
+    const url = 'content/web/article-categories/';
+    const response = await httpRequest.get(url);
+    return toListData<ArticleCategoryInfo>(response);
+  },
+
+  // ─── Admin Article Category CMS API ──────────────────────────────────────
+
+  adminGetArticleCategories: async (): Promise<ArticleCategoryInfo[]> => {
+    const url = 'content/web/admin/article-categories/';
+    const response = await httpRequest.get(url);
+    return toListData<ArticleCategoryInfo>(response);
+  },
+
+  adminCreateArticleCategory: (data: ArticleCategoryPayload): Promise<ArticleCategoryInfo> => {
+    return (httpRequest.post('content/web/admin/article-categories/', data) as Promise<unknown>)
+      .then(unwrapDetailResponse<ArticleCategoryInfo>);
+  },
+
+  adminUpdateArticleCategory: (id: number, data: Partial<ArticleCategoryPayload>): Promise<ArticleCategoryInfo> => {
+    return (httpRequest.patch(`content/web/admin/article-categories/${id}/`, data) as Promise<unknown>)
+      .then(unwrapDetailResponse<ArticleCategoryInfo>);
+  },
+
+  adminDeleteArticleCategory: (id: number): Promise<void> => {
+    return httpRequest.delete(`content/web/admin/article-categories/${id}/`) as Promise<void>;
   },
 
   // ─── Public Article API ──────────────────────────────────────────────────
