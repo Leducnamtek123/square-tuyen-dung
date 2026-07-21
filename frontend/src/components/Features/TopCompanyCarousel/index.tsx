@@ -20,22 +20,35 @@ import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import companyService from '@/services/companyService';
+import commonService from '@/services/commonService';
 import { IMAGES } from '@/configs/constants';
 import type { Company } from '@/types/models';
 
-const CATEGORIES_LIST = [
+const DEFAULT_CATEGORIES = [
   { id: 'all', name: 'Tất cả' },
   { id: '1', name: 'Hậu cần và dịch vụ giao nhận' },
   { id: '2', name: 'Giáo dục và đào tạo' },
-  { id: '3', name: 'Dịch vụ lưu trú, nhà hàng, khách sạn và du lịch' },
-  { id: '4', name: 'Lĩnh vực hoạt động khác' },
-  { id: '5', name: 'Sản xuất và phân phối dược phẩm' },
-  { id: '6', name: 'Bán lẻ và bán sỉ' },
+  { id: '3', name: 'Dịch vụ lưu trú, nhà hàng, khách sạn' },
+  { id: '4', name: 'Sản xuất và phân phối dược phẩm' },
+  { id: '5', name: 'Bán lẻ và bán sỉ' },
 ];
 
 const TopCompanyCarousel = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const { data: dynamicCareers = [] } = useQuery({
+    queryKey: ['top-careers-carousel'],
+    queryFn: async () => {
+      const res = await commonService.getTop10Careers();
+      return res || [];
+    },
+    staleTime: 5 * 60_000,
+  });
+
+  const categoriesList = dynamicCareers.length > 0
+    ? [{ id: 'all', name: 'Tất cả' }, ...dynamicCareers.map((c) => ({ id: String(c.id), name: c.name }))]
+    : DEFAULT_CATEGORIES;
 
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['top-companies'],
@@ -114,7 +127,7 @@ const TopCompanyCarousel = () => {
             scrollbarWidth: 'none',
           }}
         >
-          {CATEGORIES_LIST.map((cat) => {
+          {categoriesList.map((cat) => {
             const isActive = selectedCategory === cat.id;
             return (
               <Box
