@@ -19,13 +19,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { HOST_NAME, ROUTES } from '../../../../configs/constants';
-import { buildPortalPath, getPreferredLanguage, isEmployerPortalPath } from '../../../../configs/portalRouting';
+import { getPreferredLanguage, isEmployerPortalPath } from '../../../../configs/portalRouting';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 
 interface AccountSwitchMenuProps {
   isShowButton?: boolean;
 }
-
-
 
 const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => {
 
@@ -36,7 +35,6 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
   const isEmployerPortal = isEmployerPortalPath(pathname) || hostName.startsWith("employer.");
 
   const openPortal = (toEmployer = false, path = "") => {
-    const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
     const protocol = window.location.protocol;
     const port = window.location.port ? `:${window.location.port}` : "";
     const language = getPreferredLanguage();
@@ -45,10 +43,12 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
     let targetUrl = "";
 
     if (toEmployer) {
-      const employerPath = normalizedPath && normalizedPath !== '/' ? normalizedPath : ROUTES.EMPLOYER.INTRODUCE;
-      targetUrl = `${protocol}//${mainHost}${port}${buildPortalPath("employer", employerPath, language)}`;
+      const employerPath = path && path !== '/' ? path : ROUTES.EMPLOYER.INTRODUCE;
+      const localizedPath = localizeRoutePath(employerPath.startsWith('/') ? employerPath : `/${employerPath}`, language);
+      targetUrl = `${protocol}//${mainHost}${port}${localizedPath}`;
     } else {
-      targetUrl = `${protocol}//${mainHost}${port}${normalizedPath}`;
+      const localizedPath = path ? localizeRoutePath(path.startsWith('/') ? path : `/${path}`, language) : '/';
+      targetUrl = `${protocol}//${mainHost}${port}${localizedPath}`;
     }
 
     window.location.href = targetUrl;

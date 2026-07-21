@@ -547,28 +547,35 @@ const NewsContent = () => {
             Từ khoá nổi bật
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ gap: 1 }}>
-            {popularKeywords.map((tag) => (
-              <Chip
-                key={tag}
-                label={tag}
-                clickable
-                component={Link}
-                href={jobsHref}
-                sx={{
-                  bgcolor: '#f1f5f9',
-                  color: '#475569',
-                  fontWeight: 600,
-                  fontSize: '0.8rem',
-                  borderRadius: '8px',
-                  border: '1px solid #e2e8f0',
-                  '&:hover': {
-                    bgcolor: '#ffffff',
-                    color: '#e11d48',
-                    borderColor: '#e11d48',
-                  },
-                }}
-              />
-            ))}
+            {popularKeywords.map((item, index) => {
+              const labelText = typeof item === 'string' ? item : item.title || item.kw || '';
+              const itemKey = typeof item === 'string' ? `${item}-${index}` : item.id || index;
+              const kwQuery = typeof item === 'string' ? item : item.kw || item.title || '';
+              const searchHref = `${jobsHref}?kw=${encodeURIComponent(kwQuery)}`;
+
+              return (
+                <Chip
+                  key={itemKey}
+                  label={labelText}
+                  clickable
+                  component={Link}
+                  href={searchHref}
+                  sx={{
+                    bgcolor: '#f1f5f9',
+                    color: '#475569',
+                    fontWeight: 600,
+                    fontSize: '0.8rem',
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0',
+                    '&:hover': {
+                      bgcolor: '#ffffff',
+                      color: '#e11d48',
+                      borderColor: '#e11d48',
+                    },
+                  }}
+                />
+              );
+            })}
           </Stack>
         </Card>
       </Container>

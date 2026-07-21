@@ -37,9 +37,10 @@ import { IMAGES } from '../../../../configs/constants';
 
 interface FilterJobPostCardProps {
   params?: GetJobPostsParams;
+  compact?: boolean;
+  hideHeader?: boolean;
+  hideFilterBar?: boolean;
 }
-
-const pageSize = 9; // 3x3 grid as shown in screenshot
 
 type FilterDimension = 'city' | 'salary' | 'experience' | 'career';
 
@@ -61,8 +62,59 @@ const SALARY_RANGES = [
   { id: '20+', label: 'Trên 20 triệu', min: 20000000, max: undefined },
 ];
 
-const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {} }) => {
+const DEFAULT_VIETNAM_CITIES = [
+  { id: 1, name: 'TP.HCM' },
+  { id: 2, name: 'Hà Nội' },
+  { id: 3, name: 'Đà Nẵng' },
+  { id: 4, name: 'Bình Dương' },
+  { id: 5, name: 'Đồng Nai' },
+  { id: 6, name: 'Cần Thơ' },
+  { id: 7, name: 'An Giang' },
+  { id: 8, name: 'Bà Rịa - Vũng Tàu' },
+  { id: 9, name: 'Bạc Liêu' },
+  { id: 10, name: 'Bến Tre' },
+  { id: 11, name: 'Lâm Đồng' },
+  { id: 12, name: 'Hải Phòng' },
+  { id: 13, name: 'Khánh Hòa' },
+  { id: 14, name: 'Quảng Ninh' },
+  { id: 15, name: 'Nghệ An' },
+  { id: 16, name: 'Thanh Hóa' },
+  { id: 17, name: 'Thừa Thiên Huế' },
+  { id: 18, name: 'Quảng Nam' },
+  { id: 19, name: 'Bình Định' },
+  { id: 20, name: 'Kiên Giang' },
+  { id: 21, name: 'Tiền Giang' },
+  { id: 22, name: 'Long An' },
+  { id: 23, name: 'Tây Ninh' },
+  { id: 24, name: 'Bình Thuận' },
+  { id: 25, name: 'Đắk Lắk' },
+  { id: 26, name: 'Gia Lai' },
+  { id: 27, name: 'Phú Yên' },
+  { id: 28, name: 'Thái Nguyên' },
+  { id: 29, name: 'Bắc Ninh' },
+  { id: 30, name: 'Hải Dương' },
+  { id: 31, name: 'Hưng Yên' },
+  { id: 32, name: 'Nam Định' },
+  { id: 33, name: 'Ninh Bình' },
+  { id: 34, name: 'Vĩnh Phúc' },
+];
+
+const DEFAULT_CAREERS = [
+  { id: 1, name: 'Bán hàng / Kinh doanh' },
+  { id: 2, name: 'IT - Phần mềm' },
+  { id: 3, name: 'Kế toán / Kiểm toán' },
+  { id: 4, name: 'Marketing / PR' },
+  { id: 5, name: 'Hành chính / Nhân sự' },
+  { id: 6, name: 'Dịch vụ khách hàng' },
+  { id: 7, name: 'Xây dựng / Kiến trúc' },
+  { id: 8, name: 'Cơ khí / Tự động hóa' },
+  { id: 9, name: 'Tài chính / Ngân hàng' },
+  { id: 10, name: 'Lao động phổ thông' },
+];
+
+const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {}, compact = false, hideHeader = false, hideFilterBar = false }) => {
   const { allConfig } = useConfig();
+  const pageSize = compact ? 6 : 9;
   const [page, setPage] = useState(1);
   const [currentDimension, setCurrentDimension] = useState<FilterDimension>('city');
   const [selectedSubItem, setSelectedSubItem] = useState<string | number>('all');
@@ -101,11 +153,16 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
     setPage(1);
   };
 
-  // Compute sub-items list dynamically from real API data
+  // Compute sub-items list dynamically from real API data with complete fallbacks
   const subItems = React.useMemo(() => {
     if (currentDimension === 'city') {
-      const citiesFromApi = allConfig?.cityOptions || [];
-      return [{ id: 'all', label: 'Tất cả' }, ...citiesFromApi.map((c) => ({ id: c.id, label: c.name }))];
+      const citiesFromApi =
+        allConfig?.cityOptions && allConfig.cityOptions.length > 0
+          ? allConfig.cityOptions
+          : allConfig?.cities && allConfig.cities.length > 0
+          ? allConfig.cities
+          : DEFAULT_VIETNAM_CITIES;
+      return [{ id: 'all', label: 'Tất cả' }, ...citiesFromApi.map((c: any) => ({ id: c.id, label: c.name }))];
     }
     if (currentDimension === 'salary') {
       return SALARY_RANGES;
@@ -113,7 +170,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
     if (currentDimension === 'experience') {
       const expFromApi = allConfig?.experienceOptions || [];
       if (expFromApi.length > 0) {
-        return [{ id: 'all', label: 'Tất cả' }, ...expFromApi.map((e) => ({ id: e.id, label: e.name }))];
+        return [{ id: 'all', label: 'Tất cả' }, ...expFromApi.map((e: any) => ({ id: e.id, label: e.name }))];
       }
       return [
         { id: 'all', label: 'Tất cả' },
@@ -126,8 +183,13 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
       ];
     }
     if (currentDimension === 'career') {
-      const careersFromApi = allConfig?.careerOptions || [];
-      return [{ id: 'all', label: 'Tất cả' }, ...careersFromApi.map((c) => ({ id: c.id, label: c.name }))];
+      const careersFromApi =
+        allConfig?.careerOptions && allConfig.careerOptions.length > 0
+          ? allConfig.careerOptions
+          : allConfig?.careers && allConfig.careers.length > 0
+          ? allConfig.careers
+          : DEFAULT_CAREERS;
+      return [{ id: 'all', label: 'Tất cả' }, ...careersFromApi.map((c: any) => ({ id: c.id, label: c.name }))];
     }
     return [{ id: 'all', label: 'Tất cả' }];
   }, [currentDimension, allConfig]);
@@ -197,175 +259,179 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
   return (
     <Box id="filter-job-post-card" sx={{ width: '100%' }}>
       {/* ── Section Header Row ───────────────────────────────────────── */}
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5 }}>
-        <Stack direction="row" spacing={1} alignItems="center">
-          <LocalFireDepartmentIcon sx={{ color: '#ea580c', fontSize: 26 }} />
-          <Typography variant="h5" sx={{ fontWeight: 800, color: '#ea580c', letterSpacing: '-0.01em' }}>
-            Việc làm tuyển gấp
-          </Typography>
-        </Stack>
-
-        <Link href="/viec-lam" style={{ textDecoration: 'none' }}>
-          <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: '#e11d48', cursor: 'pointer', '&:hover': { opacity: 0.85 } }}>
-            <Typography sx={{ fontWeight: 600, fontSize: '0.925rem' }}>Xem thêm</Typography>
-            <ArrowForwardIcon sx={{ fontSize: 16 }} />
+      {!hideHeader && (
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5 }}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <LocalFireDepartmentIcon sx={{ color: '#ea580c', fontSize: 26 }} />
+            <Typography variant="h5" sx={{ fontWeight: 800, color: '#ea580c', letterSpacing: '-0.01em' }}>
+              Việc làm tuyển gấp
+            </Typography>
           </Stack>
-        </Link>
-      </Stack>
+
+          <Link href="/viec-lam" style={{ textDecoration: 'none' }}>
+            <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: '#e11d48', cursor: 'pointer', '&:hover': { opacity: 0.85 } }}>
+              <Typography sx={{ fontWeight: 600, fontSize: '0.925rem' }}>Xem thêm</Typography>
+              <ArrowForwardIcon sx={{ fontSize: 16 }} />
+            </Stack>
+          </Link>
+        </Stack>
+      )}
 
       {/* ── Filter Bar (Filter Mode dropdown + Scrollable Sub-item Pills) ───── */}
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3, width: '100%', overflow: 'hidden' }}>
-        {/* Filter Dimension Dropdown Button */}
-        <Button
-          variant="outlined"
-          onClick={(e) => setAnchorEl(e.currentTarget)}
-          startIcon={<FilterListIcon sx={{ color: '#64748b', fontSize: 18 }} />}
-          endIcon={<KeyboardArrowDownIcon sx={{ fontSize: 18, color: '#64748b' }} />}
-          sx={{
-            borderRadius: '24px',
-            borderColor: '#e2e8f0',
-            color: '#334155',
-            textTransform: 'none',
-            fontWeight: 600,
-            fontSize: '0.875rem',
-            px: 2,
-            py: 0.8,
-            backgroundColor: '#ffffff',
-            flexShrink: 0,
-            boxShadow: '0 2px 6px rgba(15, 23, 42, 0.04)',
-            '&:hover': { borderColor: '#cbd5e1', backgroundColor: '#f8fafc' },
-          }}
-        >
-          Lọc theo: {activeDimensionLabel}
-        </Button>
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={() => setAnchorEl(null)}
-          PaperProps={{
-            sx: {
-              borderRadius: '12px',
-              mt: 1,
-              minWidth: 180,
-              p: 0.5,
-              boxShadow: '0 16px 36px rgba(15, 23, 42, 0.12)',
+      {!hideFilterBar && (
+        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3, width: '100%', overflow: 'hidden' }}>
+          {/* Filter Dimension Dropdown Button */}
+          <Button
+            variant="outlined"
+            onClick={(e) => setAnchorEl(e.currentTarget)}
+            startIcon={<FilterListIcon sx={{ color: '#64748b', fontSize: 18 }} />}
+            endIcon={<KeyboardArrowDownIcon sx={{ fontSize: 18, color: '#64748b' }} />}
+            sx={{
+              borderRadius: '24px',
+              borderColor: '#e2e8f0',
+              color: '#334155',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              px: 2,
+              py: 0.8,
+              backgroundColor: '#ffffff',
+              flexShrink: 0,
+              boxShadow: '0 2px 6px rgba(15, 23, 42, 0.04)',
+              '&:hover': { borderColor: '#cbd5e1', backgroundColor: '#f8fafc' },
+            }}
+          >
+            Lọc theo: {activeDimensionLabel}
+          </Button>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={() => setAnchorEl(null)}
+            PaperProps={{
+              sx: {
+                borderRadius: '12px',
+                mt: 1,
+                minWidth: 180,
+                p: 0.5,
+                boxShadow: '0 16px 36px rgba(15, 23, 42, 0.12)',
+                border: '1px solid #e2e8f0',
+              },
+            }}
+          >
+            {FILTER_DIMENSIONS.map((dim) => {
+              const isSelected = currentDimension === dim.id;
+              return (
+                <MenuItem
+                  key={dim.id}
+                  selected={isSelected}
+                  onClick={() => handleDimensionSelect(dim.id)}
+                  sx={{
+                    fontSize: '0.875rem',
+                    fontWeight: isSelected ? 700 : 500,
+                    borderRadius: '8px',
+                    py: 1,
+                    px: 1.5,
+                    display: 'flex',
+                    justify: 'space-between',
+                    alignItems: 'center',
+                    color: isSelected ? '#e11d48' : '#334155',
+                    '&.Mui-selected': {
+                      backgroundColor: 'rgba(225, 29, 72, 0.08)',
+                      '&:hover': { backgroundColor: 'rgba(225, 29, 72, 0.12)' },
+                    },
+                  }}
+                >
+                  {dim.label}
+                  {isSelected && <CheckIcon sx={{ fontSize: 18, color: '#e11d48', ml: 1 }} />}
+                </MenuItem>
+              );
+            })}
+          </Menu>
+
+          {/* Scroll Left Button */}
+          <IconButton
+            size="small"
+            onClick={handleScrollLeft}
+            sx={{
               border: '1px solid #e2e8f0',
-            },
-          }}
-        >
-          {FILTER_DIMENSIONS.map((dim) => {
-            const isSelected = currentDimension === dim.id;
-            return (
-              <MenuItem
-                key={dim.id}
-                selected={isSelected}
-                onClick={() => handleDimensionSelect(dim.id)}
-                sx={{
-                  fontSize: '0.875rem',
-                  fontWeight: isSelected ? 700 : 500,
-                  borderRadius: '8px',
-                  py: 1,
-                  px: 1.5,
-                  display: 'flex',
-                  justify: 'space-between',
-                  alignItems: 'center',
-                  color: isSelected ? '#e11d48' : '#334155',
-                  '&.Mui-selected': {
-                    backgroundColor: 'rgba(225, 29, 72, 0.08)',
-                    '&:hover': { backgroundColor: 'rgba(225, 29, 72, 0.12)' },
-                  },
-                }}
-              >
-                {dim.label}
-                {isSelected && <CheckIcon sx={{ fontSize: 18, color: '#e11d48', ml: 1 }} />}
-              </MenuItem>
-            );
-          })}
-        </Menu>
+              backgroundColor: '#ffffff',
+              width: 32,
+              height: 32,
+              flexShrink: 0,
+              '&:hover': { backgroundColor: '#f1f5f9' },
+            }}
+          >
+            <KeyboardArrowLeftIcon sx={{ fontSize: 18, color: '#64748b' }} />
+          </IconButton>
 
-        {/* Scroll Left Button */}
-        <IconButton
-          size="small"
-          onClick={handleScrollLeft}
-          sx={{
-            border: '1px solid #e2e8f0',
-            backgroundColor: '#ffffff',
-            width: 32,
-            height: 32,
-            flexShrink: 0,
-            '&:hover': { backgroundColor: '#f1f5f9' },
-          }}
-        >
-          <KeyboardArrowLeftIcon sx={{ fontSize: 18, color: '#64748b' }} />
-        </IconButton>
+          {/* Scrollable Pills Container */}
+          <Box
+            ref={scrollRef}
+            sx={{
+              display: 'flex',
+              gap: 1,
+              overflowX: 'auto',
+              scrollBehavior: 'smooth',
+              py: 0.5,
+              flex: 1,
+              '&::-webkit-scrollbar': { display: 'none' },
+              msOverflowStyle: 'none',
+              scrollbarWidth: 'none',
+            }}
+          >
+            {subItems.map((item) => {
+              const isActive = String(selectedSubItem) === String(item.id);
+              return (
+                <Box
+                  key={String(item.id)}
+                  onClick={() => handleSubItemSelect(item.id)}
+                  sx={{
+                    px: 2.2,
+                    py: 0.75,
+                    borderRadius: '20px',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    fontSize: '0.85rem',
+                    fontWeight: isActive ? 700 : 500,
+                    color: isActive ? '#ffffff' : '#475569',
+                    backgroundColor: isActive ? '#e11d48' : '#f1f5f9',
+                    transition: 'all 0.2s ease',
+                    userSelect: 'none',
+                    flexShrink: 0,
+                    '&:hover': {
+                      backgroundColor: isActive ? '#be123c' : '#e2e8f0',
+                    },
+                  }}
+                >
+                  {item.label}
+                </Box>
+              );
+            })}
+          </Box>
 
-        {/* Scrollable Pills Container */}
-        <Box
-          ref={scrollRef}
-          sx={{
-            display: 'flex',
-            gap: 1,
-            overflowX: 'auto',
-            scrollBehavior: 'smooth',
-            py: 0.5,
-            flex: 1,
-            '&::-webkit-scrollbar': { display: 'none' },
-            msOverflowStyle: 'none',
-            scrollbarWidth: 'none',
-          }}
-        >
-          {subItems.map((item) => {
-            const isActive = String(selectedSubItem) === String(item.id);
-            return (
-              <Box
-                key={String(item.id)}
-                onClick={() => handleSubItemSelect(item.id)}
-                sx={{
-                  px: 2.2,
-                  py: 0.75,
-                  borderRadius: '20px',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  fontSize: '0.85rem',
-                  fontWeight: isActive ? 700 : 500,
-                  color: isActive ? '#ffffff' : '#475569',
-                  backgroundColor: isActive ? '#e11d48' : '#f1f5f9',
-                  transition: 'all 0.2s ease',
-                  userSelect: 'none',
-                  flexShrink: 0,
-                  '&:hover': {
-                    backgroundColor: isActive ? '#be123c' : '#e2e8f0',
-                  },
-                }}
-              >
-                {item.label}
-              </Box>
-            );
-          })}
-        </Box>
+          {/* Scroll Right Button */}
+          <IconButton
+            size="small"
+            onClick={handleScrollRight}
+            sx={{
+              border: '1px solid #e2e8f0',
+              backgroundColor: '#ffffff',
+              width: 32,
+              height: 32,
+              flexShrink: 0,
+              '&:hover': { backgroundColor: '#f1f5f9' },
+            }}
+          >
+            <KeyboardArrowRightIcon sx={{ fontSize: 18, color: '#64748b' }} />
+          </IconButton>
+        </Stack>
+      )}
 
-        {/* Scroll Right Button */}
-        <IconButton
-          size="small"
-          onClick={handleScrollRight}
-          sx={{
-            border: '1px solid #e2e8f0',
-            backgroundColor: '#ffffff',
-            width: 32,
-            height: 32,
-            flexShrink: 0,
-            '&:hover': { backgroundColor: '#f1f5f9' },
-          }}
-        >
-          <KeyboardArrowRightIcon sx={{ fontSize: 18, color: '#64748b' }} />
-        </IconButton>
-      </Stack>
-
-      {/* ── Cards Grid (3 Columns x 3 Rows) ─────────────────────────── */}
+      {/* ── Cards Grid (3 Columns or 1 Column in compact mode) ─────── */}
       {isLoading && !data ? (
         <Grid container spacing={2.5}>
-          {Array.from(Array(9).keys()).map((i) => (
-            <Grid key={i} size={{ xs: 12, sm: 6, md: 4 }}>
+          {Array.from(Array(compact ? 6 : 9).keys()).map((i) => (
+            <Grid key={i} size={compact ? { xs: 12 } : { xs: 12, sm: 6, md: 4 }}>
               <Skeleton variant="rounded" height={160} sx={{ borderRadius: '16px' }} />
             </Grid>
           ))}
@@ -384,7 +450,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
               const salaryDisplay = formatSalary(job.salaryMin, job.salaryMax);
 
               return (
-                <Grid key={job.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                <Grid key={job.id} size={compact ? { xs: 12 } : { xs: 12, sm: 6, md: 4 }}>
                   <Box
                     component={Link}
                     href={`/viec-lam/${job.slug}`}

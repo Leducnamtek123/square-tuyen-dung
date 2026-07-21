@@ -11,10 +11,11 @@ export const useConfig = () => {
   const query = useQuery<SystemConfig>({
     queryKey: CONFIG_QUERY_KEY,
     queryFn: async () => {
-      // Fire both requests in parallel
-      const [resData, careersRes] = await Promise.all([
+      // Fire all requests in parallel
+      const [resData, careersRes, citiesRes] = await Promise.all([
         commonService.getConfigs(),
         commonService.getAllCareersSimple().catch(() => [] as Career[]),
+        commonService.getAllCitiesSimple().catch(() => [] as { id: number; name: string }[]),
       ]);
 
       let merged = { ...(resData as SystemConfig) };
@@ -26,6 +27,17 @@ export const useConfig = () => {
           careerOptions: careersRes.map((career: Career) => ({
             id: career.id,
             name: career.name,
+          })),
+        };
+      }
+
+      if (Array.isArray(citiesRes) && citiesRes.length > 0) {
+        merged = {
+          ...merged,
+          cities: citiesRes.map((c) => ({ id: Number(c.id), name: c.name })),
+          cityOptions: citiesRes.map((c) => ({
+            id: c.id,
+            name: c.name,
           })),
         };
       }

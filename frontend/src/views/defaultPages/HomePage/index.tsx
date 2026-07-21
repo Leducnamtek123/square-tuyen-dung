@@ -248,58 +248,6 @@ export default function HomePage() {
         <TopCompanyCarousel />
       </Box>
 
-      <Box sx={{ mt: 10 }}>
-        <Card
-          variant="outlined"
-          sx={{
-            boxShadow: 0,
-            borderRadius: 4,
-            overflow: 'hidden',
-            backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.18) 0%, rgba(15,23,42,0.42) 100%), url(${bannerExplorePc})`,
-            backgroundSize: 'cover',
-            backgroundRepeat: 'no-repeat',
-          }}
-        >
-          <CardContent sx={{ p: { xs: 3, sm: 4, md: 5 } }}>
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              justifyContent="space-between"
-              spacing={2}
-              alignItems={{ xs: 'flex-start', sm: 'center' }}
-            >
-              <Box>
-                <Typography fontSize={{ xs: 24, sm: 28, md: 32 }} fontWeight={800} color="white">
-                  {t('home.exploreHeading')}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.84)', mt: 1, maxWidth: 680 }}>
-                  {t('home.exploreDescription')}
-                </Typography>
-              </Box>
-              <Button
-                component={Link}
-                href={jobsHref}
-                prefetch
-                variant="contained"
-                color="primary"
-                size="large"
-                startIcon={<SearchIcon />}
-                endIcon={<ArrowForwardIcon />}
-                sx={{
-                  bgcolor: '#0f172a',
-                  color: '#ffffff',
-                  width: { xs: '100%', sm: 'auto' },
-                  justifyContent: 'center',
-                  boxShadow: '0 18px 38px rgba(15,23,42,0.18)',
-                  '&:hover': { bgcolor: '#111827' },
-                }}
-              >
-                {t('home.startExploring')}
-              </Button>
-            </Stack>
-          </CardContent>
-        </Card>
-      </Box>
-
       {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
         <Box sx={{ mt: 10 }}>
           <Card variant="outlined">

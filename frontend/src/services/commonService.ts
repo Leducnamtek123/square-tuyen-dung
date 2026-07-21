@@ -101,6 +101,14 @@ const commonService = {
     return extractResults<Career>(res);
   },
 
+  getAllCitiesSimple: async (params: { pageSize?: number } = {}): Promise<{ id: number; name: string }[]> => {
+    const url = 'common/cities/';
+    const res = await httpRequest.get(url, {
+      params: { page: 1, pageSize: Number(params.pageSize || 1000) },
+    });
+    return extractResults<{ id: number; name: string }>(res);
+  },
+
   getAllCareers: async (params: { page?: number; pageSize?: number; kw?: string } = {}): Promise<Career[]> => {
     const url = 'common/all-careers/';
     const pageSize = Number(params.pageSize || 1000);
