@@ -21,6 +21,8 @@ export type GetJobPostsParams = {
   typeOfWorkplaceId?: string | number;
   jobTypeId?: string | number;
   genderId?: string | number;
+  salaryMin?: number;
+  salaryMax?: number;
   page?: number;
   pageSize?: number;
   ordering?: string;
