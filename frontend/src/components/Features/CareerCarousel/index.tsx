@@ -36,7 +36,7 @@ const styles = {
     width: 8,
     height: 8,
     opacity: 0.5,
-    backgroundColor: (theme: Theme) => theme.palette.primary.main,
+    backgroundColor: '#0f172a',
     transition: "all 0.3s ease",
   },
   ".swiper-pagination-bullet-active": {
@@ -54,7 +54,7 @@ const CAREER_ICON_MAP: Record<string, SvgIconComponent> = {
   architecture: ArchitectureIcon,
 };
 
-const CAREER_ACCENTS = ['#1e6bb8', '#2aa9e1', '#0f9d7a', '#8c6df2'];
+const CAREER_ACCENTS = ['#0f172a', '#334155', '#475569', '#64748b'];
 
 const Loading = (
   <Card
@@ -136,7 +136,7 @@ const CareerArtwork = ({ career }: { career: Career }) => {
         borderRadius: 3,
         display: 'grid',
         placeItems: 'center',
-        background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.background} 0%, rgba(255,255,255,0.92) 100%)`,
+        background: 'linear-gradient(135deg, rgba(15,23,42,0.06) 0%, rgba(255,255,255,0.92) 100%)',
         border: '1px solid rgba(196, 198, 209, 0.35)',
       }}
     >
@@ -146,7 +146,7 @@ const CareerArtwork = ({ career }: { career: Career }) => {
           height: 78,
           bgcolor: 'white',
           boxShadow: '0 12px 24px rgba(15,57,127,0.12)',
-          color: 'primary.main',
+          color: '#0f172a',
         }}
         aria-label={career.name}
       >
@@ -245,7 +245,7 @@ const CareerCarousel = () => {
                         boxShadow: '0 18px 34px rgba(4, 48, 104, 0.14)',
                         borderColor: accent,
                         "& .career-name": {
-                          color: (theme: Theme) => theme.palette.primary.main,
+                          color: '#0f172a',
                         },
                       },
                     }}

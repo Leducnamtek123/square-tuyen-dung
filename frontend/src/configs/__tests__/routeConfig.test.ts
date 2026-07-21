@@ -91,6 +91,7 @@ describe('localizeRoutePath', () => {
     expect(localizeRoutePath('/admin/articles', 'vi')).toBe('/quan-tri/tin-tuc-blog');
     expect(localizeRoutePath('/admin/articles/create', 'vi')).toBe('/quan-tri/tin-tuc-blog/tao-moi');
     expect(localizeRoutePath('/admin/articles/:id', 'vi')).toBe('/quan-tri/tin-tuc-blog/:id');
+    expect(localizeRoutePath('/admin/profiles/:id', 'vi')).toBe('/quan-tri/quan-ly-ho-so-ung-vien/:id');
     expect(localizeRoutePath('/admin/chat', 'vi')).toBe('/quan-tri/ket-noi-voi-nha-tuyen-dung');
     expect(localizeRoutePath('/admin/interview-preview', 'vi')).toBe(
       '/quan-tri/xem-truoc-giao-dien-phong-van'
@@ -103,6 +104,7 @@ describe('localizeRoutePath', () => {
     expect(localizeRoutePath('/quan-tri/tin-tuc-blog', 'en')).toBe('/admin/articles');
     expect(localizeRoutePath('/quan-tri/tin-tuc-blog/tao-moi', 'en')).toBe('/admin/articles/create');
     expect(localizeRoutePath('/quan-tri/tin-tuc-blog/:id', 'en')).toBe('/admin/articles/:id');
+    expect(localizeRoutePath('/quan-tri/quan-ly-ho-so-ung-vien/:id', 'en')).toBe('/admin/profiles/:id');
     expect(localizeRoutePath('/quan-tri/ket-noi-voi-nha-tuyen-dung', 'en')).toBe('/admin/chat');
     expect(localizeRoutePath('/quan-tri/xem-truoc-giao-dien-phong-van', 'en')).toBe(
       '/admin/interview-preview'
@@ -123,6 +125,10 @@ describe('ROUTES constants have valid paths', () => {
 
   it('INTERVIEW_DETAIL uses :id param', () => {
     expect(ROUTES.EMPLOYER.INTERVIEW_DETAIL).toContain(':id');
+  });
+
+  it('ADMIN.PROFILE_DETAIL uses :id param', () => {
+    expect(ROUTES.ADMIN.PROFILE_DETAIL).toContain(':id');
   });
 
   it('INTERVIEW_EDIT uses :id param', () => {

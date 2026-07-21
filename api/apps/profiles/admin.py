@@ -46,6 +46,7 @@ from .models import (
     CompanyRole,
     CompanyMember,
     TrustReport,
+    ResumeImportJob,
 
     ResumeSaved,
 
@@ -356,6 +357,13 @@ class ResumeAdmin(admin.ModelAdmin):
             except Exception as ex:
 
                 helper.print_log_error("resume_save_model", ex)
+
+@admin.register(ResumeImportJob)
+class ResumeImportJobAdmin(admin.ModelAdmin):
+    list_display = ("id", "status", "progress", "source_account", "created_count", "updated_count", "skipped_count", "create_at", "update_at")
+    list_filter = ("status", "create_at")
+    search_fields = ("id", "source_account", "source_url", "error_message")
+    readonly_fields = ("create_at", "update_at", "started_at", "finished_at", "task_id", "result_payload", "source_payload")
 
 class CompanyAdmin(admin.ModelAdmin):
 

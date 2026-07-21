@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 
 from apps.accounts.models import User
 from apps.locations.models import City, District, Location
-from apps.profiles.models import Company, JobSeekerProfile, Resume
+from apps.profiles.models import Company
 from shared.configs import variable_system as var_sys
 
 
@@ -59,28 +59,5 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"✓ Created employer: {employer_email}"))
         else:
             self.stdout.write(f"  Skipped (exists): {employer_email}")
-
-        js_email = "candidate2@project.com"
-        if not User.objects.filter(email=js_email).exists():
-            js_user = User.objects.create_user_with_role_name(
-                email=js_email,
-                full_name="Active Candidate 2",
-                password="Password123!",
-                role_name=var_sys.JOB_SEEKER
-            )
-            js_user.is_active = True
-            js_user.is_verify_email = True
-            js_user.save()
-
-            profile = JobSeekerProfile.objects.create(user=js_user, phone="0123456782")
-            Resume.objects.create(
-                job_seeker_profile=profile,
-                user=js_user,
-                type=var_sys.CV_WEBSITE,
-                title="Architect"
-            )
-            self.stdout.write(self.style.SUCCESS(f"✓ Created job seeker: {js_email}"))
-        else:
-            self.stdout.write(f"  Skipped (exists): {js_email}")
 
         self.stdout.write(self.style.SUCCESS("Done! Đã tạo xong."))

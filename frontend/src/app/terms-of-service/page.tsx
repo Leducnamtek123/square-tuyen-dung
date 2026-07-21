@@ -3,7 +3,7 @@ import StaticInfoPage from '@/views/defaultPages/StaticInfoPage';
 
 export const metadata = {
   title: 'Terms of Service',
-  description: 'Square recruitment terms of service.',
+  description: 'InfoHR recruitment terms of service.',
 };
 
 export default function Page() {
@@ -13,3 +13,4 @@ export default function Page() {
     </DefaultLayout>
   );
 }
+

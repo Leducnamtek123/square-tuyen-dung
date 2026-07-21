@@ -109,7 +109,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
           <Box
             component="img"
             src={IMAGES.getTextLogo('dark')}
-            alt="Square Logo"
+            alt="InfoHR Logo"
             sx={{
               display: 'block',
               width: { xs: 92, sm: 120 },

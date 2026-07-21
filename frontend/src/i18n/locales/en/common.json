@@ -81,7 +81,7 @@
     "candidateDashboard": "Candidate Dashboard",
     "employerDashboard": "Employer Dashboard",
     "connectWith": "Connect with {{appName}}",
-    "rightsReserved": "© {{year}} {{appName}}. All Rights Reserved.",
+    "rightsReserved": "Â© {{year}} {{appName}}. All Rights Reserved.",
     "forJobSeekers": "For Job Seekers"
   },
   "next": "Next",
@@ -857,7 +857,7 @@
     }
   },
   "auto": {
-    "index_wwwsquarevn_9a21": "www.square.vn"
+    "index_wwwInfoHRvn_9a21": "www.InfoHR.vn"
   },
   "fileUpload": {
     "dragDropOrSelect": "Drag and drop file here or",
@@ -885,13 +885,13 @@
   "maintenanceMode": {
     "badge": "Under maintenance",
     "title": "System maintenance in progress",
-    "message": "Square Recruitment is upgrading the system to serve you better. Please come back in a few minutes.",
+    "message": "InfoHR Recruitment is upgrading the system to serve you better. Please come back in a few minutes.",
     "reload": "Reload page",
     "retryHint": "You can try again in a few minutes.",
     "statusCode": "Status code"
   },
   "language": {
-    "vietnamese": "Tiếng Việt",
+    "vietnamese": "Tiáº¿ng Viá»‡t",
     "english": "English"
   },
   "notification": {
@@ -945,8 +945,8 @@
       "readError": "Could not read this image. Please try another image."
     },
     "portals": {
-      "admin": "Square Admin",
-      "employer": "Square Employer"
+      "admin": "InfoHR Admin",
+      "employer": "InfoHR Employer"
     },
     "threadGroups": {
       "today": "Today",
@@ -1000,4 +1000,5 @@
     "backToAdmin": "Back to Admin"
   }
 }
+
 

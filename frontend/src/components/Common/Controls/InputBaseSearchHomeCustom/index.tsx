@@ -170,7 +170,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
         <Box
           sx={{
             minHeight: isHero ? 56 : showSubmitButton ? 54 : 48,
-            boxShadow: isHero ? 'none' : '0 10px 26px rgba(26, 64, 125, 0.08)',
+            boxShadow: isHero ? 'none' : '0 10px 26px rgba(15, 23, 42, 0.08)',
             borderRadius: isHero ? 1 : 999,
             p: isHero ? 0 : '4px',
             display: 'flex',
@@ -178,26 +178,26 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
             width: '100%',
             backgroundColor: isHero ? 'transparent' : theme.palette.mode === 'light' ? 'white' : '#121212',
             border: '1px solid',
-            borderColor: isHero ? 'transparent' : 'rgba(26, 64, 125, 0.14)',
+            borderColor: isHero ? 'transparent' : 'rgba(226, 232, 240, 0.95)',
             transition: 'border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease',
             '&:focus-within': {
-              borderColor: isHero ? 'transparent' : theme.palette.primary.main,
-              boxShadow: isHero ? 'none' : '0 0 0 4px rgba(42, 169, 225, 0.16), 0 16px 34px rgba(26, 64, 125, 0.12)',
+              borderColor: isHero ? 'transparent' : '#0f172a',
+              boxShadow: isHero ? 'none' : '0 0 0 4px rgba(15, 23, 42, 0.08), 0 16px 34px rgba(15, 23, 42, 0.08)',
             },
           }}
         >
           <Box
-            sx={{
-              width: isHero ? 44 : 38,
-              height: isHero ? 56 : 38,
-              display: 'grid',
-              placeItems: 'center',
-              borderRadius: isHero ? 1 : '50%',
-              color: isHero ? 'rgba(4, 48, 104, 0.42)' : 'primary.main',
-              bgcolor: isHero ? 'transparent' : 'rgba(42, 169, 225, 0.09)',
-              flexShrink: 0,
-            }}
-          >
+              sx={{
+                width: isHero ? 44 : 38,
+                height: isHero ? 56 : 38,
+                display: 'grid',
+                placeItems: 'center',
+                borderRadius: isHero ? 1 : '50%',
+              color: '#0f172a',
+                bgcolor: isHero ? 'transparent' : 'rgba(15, 23, 42, 0.06)',
+                flexShrink: 0,
+              }}
+            >
             <SearchIcon fontSize="small" />
           </Box>
           <ControllerAny
@@ -217,7 +217,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                     fontSize: isHero ? 14 : undefined,
                     py: isHero ? 1.4 : undefined,
                     '&::placeholder': {
-                      color: isHero ? 'rgba(67, 71, 80, 0.62)' : 'text.secondary',
+                      color: isHero ? 'rgba(15, 23, 42, 0.55)' : 'text.secondary',
                       opacity: isHero ? 1 : 0.78,
                     },
                   },
@@ -267,6 +267,10 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                 minHeight: 44,
                 minWidth: { xs: 44, sm: 112 },
                 px: { xs: 1.5, sm: 2.5 },
+                bgcolor: '#0f172a',
+                '&:hover': {
+                  bgcolor: '#111827',
+                },
                 '& .MuiButton-startIcon': {
                   display: { xs: 'none', sm: 'inherit' },
                 },
@@ -288,8 +292,8 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
               backgroundColor: 'white',
               py: 2,
               px: 2,
-              boxShadow: '0 22px 50px rgba(15, 57, 127, 0.18)',
-              border: '1px solid rgba(26, 64, 125, 0.1)',
+              boxShadow: '0 22px 50px rgba(15, 23, 42, 0.16)',
+              border: '1px solid rgba(226, 232, 240, 0.95)',
               borderRadius: 3,
               maxHeight: '60vh',
               overflowY: 'auto',
@@ -297,7 +301,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
           >
             <Stack>
               <Box>
-                <Typography fontWeight={800} fontSize={15} color="primary.main">
+              <Typography fontWeight={800} fontSize={15} color="#0f172a">
                   {t('search.suggestions')}
                 </Typography>
                 <Stack>
@@ -316,7 +320,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                           key={value}
                           sx={{
                             '&:hover': {
-                              backgroundColor: 'rgba(42, 169, 225, 0.08)',
+                              backgroundColor: 'rgba(15, 23, 42, 0.04)',
                             },
                             cursor: 'pointer',
                             borderRadius: 2,
@@ -325,7 +329,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                           onClick={() => handleClickItem(value)}
                         >
                           <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
-                            <LightbulbOutlinedIcon sx={{ color: '#FCC67B' }} />
+                            <LightbulbOutlinedIcon sx={{ color: '#f59e0b' }} />
                           </ListItemIcon>
                           <ListItemText primary={`${value}`} secondary={null} />
                         </ListItem>
@@ -337,7 +341,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
 
               {state.recentSearch.length > 0 && (
                 <Box>
-                  <Typography fontWeight={800} fontSize={15} color="primary.main">
+                  <Typography fontWeight={800} fontSize={15} color="#0f172a">
                     {t('search.recent')}
                   </Typography>
                   <Stack>
@@ -347,7 +351,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                           key={value}
                           sx={{
                             '&:hover': {
-                              backgroundColor: 'rgba(42, 169, 225, 0.08)',
+                              backgroundColor: 'rgba(15, 23, 42, 0.04)',
                             },
                             cursor: 'pointer',
                             borderRadius: 2,
@@ -356,7 +360,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                           onClick={() => handleClickItem(value)}
                         >
                           <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
-                            <QueryBuilderIcon sx={{ color: '#2C95FF' }} />
+                            <QueryBuilderIcon sx={{ color: '#0f172a' }} />
                           </ListItemIcon>
                           <ListItemText primary={`${value}`} secondary={null} />
                         </ListItem>

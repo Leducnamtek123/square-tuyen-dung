@@ -5,13 +5,21 @@ import adminManagementService from '../../../../services/adminManagementService'
 import toastMessages from '../../../../utils/toastMessages';
 import { JobSeekerProfile } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
-import type { AdminListParams, JobSeekerProfilePayload } from '../../../../services/adminManagementService';
+import type {
+    AdminListParams,
+    JobSeekerProfilePayload,
+    Vieclam24hImportJob,
+    Vieclam24hImportPayload,
+} from '../../../../services/adminManagementService';
 import i18next from 'i18next';
 
 type UseProfilesResult = UseQueryResult<PaginatedResponse<JobSeekerProfile>> & {
     createProfile: (data: JobSeekerProfilePayload) => Promise<JobSeekerProfile>;
     updateProfile: (args: { id: string | number; data: JobSeekerProfilePayload }) => Promise<JobSeekerProfile>;
     deleteProfile: (id: string | number) => Promise<void>;
+    bulkDeleteProfiles: (ids: Array<string | number>) => Promise<{ deleted: number }>;
+    importCandidates: (data: Vieclam24hImportPayload) => Promise<Vieclam24hImportJob>;
+    isImporting: boolean;
     isMutating: boolean;
 };
 
@@ -57,11 +65,48 @@ export const useProfiles = (params?: AdminListParams): UseProfilesResult => {
         onError: () => toastMessages.error(i18next.t('admin:pages.profiles.toast.deleteError')),
     });
 
+    const bulkDeleteMutation = useMutation<{ deleted: number }, Error, Array<string | number>>({
+        mutationFn: (ids: Array<string | number>) => adminManagementService.bulkDeleteProfiles(ids),
+        onSuccess: (result) => {
+            toastMessages.success(
+                i18next.t('admin:pages.profiles.toast.bulkDeleteSuccess', {
+                    count: result.deleted,
+                    defaultValue: `Đã xóa ${result.deleted} hồ sơ.`,
+                })
+            );
+            queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
+        },
+        onError: (err: Error | unknown) => {
+            toastMessages.error(i18next.t('admin:pages.profiles.toast.deleteError'));
+            console.error(err);
+        },
+    });
+
+    const importMutation = useMutation<Vieclam24hImportJob, Error, Vieclam24hImportPayload>({
+        mutationFn: (data) => adminManagementService.importVieclam24hCandidates(data),
+        onSuccess: () => {
+            toastMessages.success(
+                i18next.t('admin:pages.profiles.toast.importQueued', {
+                    defaultValue: 'Đã tạo tác vụ lấy ứng viên. Hệ thống đang xử lý nền.',
+                })
+            );
+        },
+        onError: (err: Error | unknown) => {
+            toastMessages.error(i18next.t('admin:pages.profiles.toast.importError', {
+                defaultValue: 'Không thể lấy ứng viên từ Vieclam24h.',
+            }));
+            console.error(err);
+        },
+    });
+
     return {
         ...query,
         createProfile: createMutation.mutateAsync,
         updateProfile: updateMutation.mutateAsync,
         deleteProfile: deleteMutation.mutateAsync,
-        isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending,
+        bulkDeleteProfiles: bulkDeleteMutation.mutateAsync,
+        importCandidates: importMutation.mutateAsync,
+        isImporting: importMutation.isPending,
+        isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending || bulkDeleteMutation.isPending || importMutation.isPending,
     };
 };

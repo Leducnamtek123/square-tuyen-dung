@@ -804,7 +804,7 @@
     "hrmEmployees": "Hồ sơ nhân sự",
     "hrmRoles": "Vai trò & quyền",
     "hrmMembers": "Thành viên công ty",
-    "squareHrmAdmin": "Mở Square HRM"
+    "squareHrmAdmin": "Mở InfoHR HRM"
   },
   "interviewHistory": {
     "title": "Thư viện Video",
@@ -1013,7 +1013,7 @@
   "common": {
     "notUpdated": "Chưa cập nhật",
     "present": "Hiện tại",
-    "appName": "Square Tuyển Dụng",
+    "appName": "InfoHR Tuyển Dụng",
     "search": "Tìm kiếm",
     "clearFilters": "Xóa bộ lọc",
     "advancedFilters": "Bộ lọc nâng cao"

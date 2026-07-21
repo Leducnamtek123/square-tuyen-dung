@@ -208,7 +208,7 @@ function InterviewSessionError({
     <main className="grid min-h-screen place-items-center bg-[#020617] px-6">
       <section className="w-full max-w-lg rounded-2xl border border-rose-400/30 bg-rose-500/10 p-8 text-center text-rose-100">
         <p className="mb-6 text-lg font-medium">{message}</p>
-        <Button variant="contained" sx={{ bgcolor: '#e11d48', '&:hover': { bgcolor: '#be123c' } }} onClick={onBackHome}>
+      <Button variant="contained" sx={{ bgcolor: '#0f172a', '&:hover': { bgcolor: '#111827' } }} onClick={onBackHome}>
           {actionLabel}
         </Button>
       </section>
@@ -370,7 +370,7 @@ function InterviewWaitingRoom({
                   <div className="relative z-10 flex h-[96px] w-[240px] max-w-[70vw] items-center justify-center opacity-90 transition-all duration-1000 group-hover:opacity-100 md:h-[120px] md:w-[320px]">
                     <Image
                       src={IMAGES.getTextLogo('light')}
-                      alt="Square"
+                      alt="InfoHR"
                       width={320}
                       height={107}
                       style={{ width: '100%', height: 'auto', objectFit: 'contain' }}

@@ -154,6 +154,7 @@ const breadcrumbRoutes: BreadcrumbRoute[] = [
   adminRoute(ROUTES.ADMIN.COMPANIES, item('admin', 'sidebar.companyManagement'), adminProfiles),
   adminRoute(ROUTES.ADMIN.COMPANY_VERIFICATIONS, item('admin', 'sidebar.companyVerifications'), adminProfiles),
   adminRoute(ROUTES.ADMIN.PROFILES, item('admin', 'sidebar.candidateProfiles'), adminProfiles),
+  adminRoute(ROUTES.ADMIN.PROFILE_DETAIL, item('admin', 'sidebar.candidateProfiles'), adminProfiles),
   adminRoute(ROUTES.ADMIN.RESUMES, item('admin', 'sidebar.resumeManagement'), adminProfiles),
   adminRoute(ROUTES.ADMIN.JOBS, item('admin', 'sidebar.jobPosts'), adminRecruitment),
   adminRoute(ROUTES.ADMIN.QUESTIONS, item('admin', 'sidebar.questionBank'), adminRecruitment),

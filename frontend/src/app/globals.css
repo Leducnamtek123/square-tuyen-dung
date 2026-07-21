@@ -103,76 +103,75 @@ code {
 }
 
 :root {
-  /* Base — Square Brand Colors (from logo SVG) */
-  /* #2aa9e1 = sky blue (logo fill), #1a407d = navy (logo shadow), #0f397f = deep navy (logo text) */
-  --background: #f0f7ff;              /* light blue tint */
-  --foreground: #0f397f;              /* deep navy text */
+  /* Base — InfoHR Brand Colors (white-first UI with pink accents) */
+  --background: #ffffff;
+  --foreground: #0f172a;
   --card: #ffffff;
-  --card-foreground: #0f397f;
+  --card-foreground: #0f172a;
   --popover: #ffffff;
-  --popover-foreground: #0f397f;
-  --primary: #1a407d;                 /* navy blue — logo shadow */
+  --popover-foreground: #0f172a;
+  --primary: #0f172a;
   --primary-foreground: #ffffff;
   --secondary: #10b981;               /* emerald green */
   --secondary-foreground: #ffffff;
-  --muted: #e1effe;                   /* light blue muted */
-  --muted-foreground: #2b5ea7;
-  --accent: #2aa9e1;                  /* sky blue — logo main */
+  --muted: #f8fafc;
+  --muted-foreground: #475569;
+  --accent: #0f172a;
   --accent-foreground: #ffffff;
   --destructive: oklch(0.58 0.22 27);
-  --border: #c3ddfd;
-  --input: #e1effe;
-  --ring: #2aa9e1;                    /* sky blue ring */
-  --chart-1: #2aa9e1;                 /* sky blue */
-  --chart-2: #1a407d;                 /* navy */
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #0f172a;
+  --chart-1: #0f172a;
+  --chart-2: #475569;
   --chart-3: #10b981;                 /* emerald */
   --chart-4: #f59e0b;                 /* amber */
-  --chart-5: #0f397f;                 /* deep navy */
+  --chart-5: #334155;
   --radius: 0.625rem;
   --sq-button-radius: 12px;
-  --sidebar: #f0f7ff;
-  --sidebar-foreground: #0f397f;
-  --sidebar-primary: #1a407d;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #0f172a;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e1effe;
-  --sidebar-accent-foreground: #1a407d;
-  --sidebar-border: #c3ddfd;
-  --sidebar-ring: #2aa9e1;
+  --sidebar-accent: #f8fafc;
+  --sidebar-accent-foreground: #475569;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #0f172a;
 }
 
 .dark {
-  /* Dark mode — Square brand on dark bg */
-  --background: #0a1628;              /* very dark navy */
-  --foreground: #e1effe;
-  --card: #0f2040;
-  --card-foreground: #e1effe;
-  --popover: #0f2040;
-  --popover-foreground: #e1effe;
-  --primary: #2aa9e1;                 /* sky blue on dark */
+  /* Dark mode — InfoHR brand on dark bg */
+  --background: #180812;              /* deep plum */
+  --foreground: #ffeaf1;
+  --card: #250d1c;
+  --card-foreground: #ffeaf1;
+  --popover: #250d1c;
+  --popover-foreground: #ffeaf1;
+  --primary: #cbd5e1;
   --primary-foreground: #ffffff;
   --secondary: #10b981;
   --secondary-foreground: #ffffff;
-  --muted: #1a3260;
-  --muted-foreground: #76a9fa;
-  --accent: #2aa9e1;
+  --muted: #3a1627;
+  --muted-foreground: #94a3b8;
+  --accent: #cbd5e1;
   --accent-foreground: #ffffff;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: rgba(42, 169, 225, 0.15);
-  --input: rgba(42, 169, 225, 0.12);
-  --ring: #2aa9e1;
-  --chart-1: #38bdf8;
-  --chart-2: #2aa9e1;
+  --border: rgba(148, 163, 184, 0.15);
+  --input: rgba(148, 163, 184, 0.12);
+  --ring: #cbd5e1;
+  --chart-1: #cbd5e1;
+  --chart-2: #94a3b8;
   --chart-3: #34d399;
   --chart-4: #fbbf24;
-  --chart-5: #76a9fa;
-  --sidebar: #0a1628;
-  --sidebar-foreground: #e1effe;
-  --sidebar-primary: #2aa9e1;
+  --chart-5: #ffb3c8;
+  --sidebar: #180812;
+  --sidebar-foreground: #ffeaf1;
+  --sidebar-primary: #cbd5e1;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1a3260;
-  --sidebar-accent-foreground: #e1effe;
-  --sidebar-border: rgba(42, 169, 225, 0.12);
-  --sidebar-ring: #2aa9e1;
+  --sidebar-accent: #3a1627;
+  --sidebar-accent-foreground: #ffeaf1;
+  --sidebar-border: rgba(148, 163, 184, 0.12);
+  --sidebar-ring: #cbd5e1;
 }
 
 @theme inline {
@@ -245,8 +244,8 @@ h1, h2, h3, h4, h5, .display-text {
   pointer-events: none;
   background-color: var(--background);
   background-image: 
-    radial-gradient(at 0% 0%, rgba(42, 169, 225, 0.1) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(26, 64, 125, 0.05) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(15, 23, 42, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(51, 65, 85, 0.04) 0px, transparent 50%);
 }
 
 .dark .bg-atmosphere {

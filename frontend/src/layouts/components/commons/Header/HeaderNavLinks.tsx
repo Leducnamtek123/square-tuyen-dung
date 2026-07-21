@@ -27,19 +27,19 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
             sx={{
               my: 1,
               mr: 0.75,
-              color: "white",
+              color: '#0f172a',
               display: "block",
               whiteSpace: "nowrap",
               textDecoration: "none",
-              
+              fontWeight: 700,
               px: 2,
               py: 0.85,
-              backgroundColor: activePathname.startsWith(page.path) ? "rgba(255, 255, 255, 0.12)" : "transparent",
+              backgroundColor: activePathname.startsWith(page.path) ? 'rgba(15, 23, 42, 0.06)' : 'transparent',
               border: "1px solid",
-              borderColor: activePathname.startsWith(page.path) ? "rgba(255, 255, 255, 0.22)" : "transparent",
+              borderColor: activePathname.startsWith(page.path) ? 'rgba(15, 23, 42, 0.10)' : 'transparent',
               '&:hover': {
-                backgroundColor: "rgba(255, 255, 255, 0.08)",
-                borderColor: "rgba(255, 255, 255, 0.15)",
+                backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                borderColor: 'rgba(15, 23, 42, 0.10)',
                 textDecoration: "none",
               },
               '&:focus, &:active': {

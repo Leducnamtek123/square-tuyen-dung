@@ -13,8 +13,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!company) {
     return {
-      title: 'Công ty | Square Tuyển Dụng',
-      description: 'Thông tin công ty trên Square Tuyển Dụng',
+      title: 'Công ty | InfoHR Tuyển Dụng',
+      description: 'Thông tin công ty trên InfoHR Tuyển Dụng',
     };
   }
 
@@ -22,13 +22,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const fieldOperation = company.fieldOperation || '';
   const employeeSize = company.employeeSize || '';
 
-  const title = `${companyName} - Tuyển dụng & Việc làm | Square`;
+  const title = `${companyName} - Tuyển dụng & Việc làm | InfoHR`;
 
   const description = [
     `${companyName}`,
     fieldOperation && `Lĩnh vực: ${fieldOperation}`,
     employeeSize && `Quy mô: ${employeeSize} nhân viên`,
-    'Xem thông tin công ty và các vị trí đang tuyển trên Square Tuyển Dụng.',
+    'Xem thông tin công ty và các vị trí đang tuyển trên InfoHR Tuyển Dụng.',
   ]
     .filter(Boolean)
     .join('. ');
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: 'website',
       url: `/cong-ty/${slug}`,
-      siteName: 'Square Tuyển Dụng',
+      siteName: 'InfoHR Tuyển Dụng',
       locale: 'vi_VN',
       ...(company.companyImageUrl && {
         images: [{ url: company.companyImageUrl }],

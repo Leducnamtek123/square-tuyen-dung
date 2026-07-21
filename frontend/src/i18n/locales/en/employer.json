@@ -804,7 +804,7 @@
     "hrmEmployees": "Employee records",
     "hrmRoles": "Roles & permissions",
       "hrmMembers": "Company members",
-      "squareHrmAdmin": "Open Square HRM"
+      "squareHrmAdmin": "Open InfoHR HRM"
   },
   "interviewHistory": {
     "title": "Video Library",
@@ -893,7 +893,7 @@
       "noConnectionDetails": "No connection details available for fullscreen.",
       "joinPresence": "Join as Present",
       "joinPresenceLoading": "Connecting...",
-      "joinPresenceTooltip": "Join the room as Employer — candidate will see you",
+      "joinPresenceTooltip": "Join the room as Employer â€” candidate will see you",
       "presenceTitle": "Present in Room",
       "presenceSubtitle": "You are joining as Employer. The candidate can see your presence.",
       "presenceExit": "Leave room"
@@ -1013,7 +1013,7 @@
   "common": {
     "notUpdated": "Not updated",
     "present": "Present",
-    "appName": "Square Tuyển Dụng",
+    "appName": "InfoHR Tuyá»ƒn Dá»¥ng",
     "search": "Search",
     "clearFilters": "Clear filters",
     "advancedFilters": "Advanced filters"
@@ -1451,7 +1451,7 @@
         "status": "Status",
         "portal": "Portal",
         "training": "Training",
-        "trainingProgress": "{{progress}}% done • {{overdue}} overdue",
+        "trainingProgress": "{{progress}}% done â€¢ {{overdue}} overdue",
         "viewDetail": "View employee detail",
         "enablePortal": "Enable employee portal",
         "empty": "No employees yet"
@@ -1647,3 +1647,4 @@
     "hint": "Keep the question clear and concise."
   }
 }
+

@@ -67,16 +67,8 @@ const imgSrc = (img: string | { src?: string; default?: { src?: string } } | nul
 };
 
 export const IMAGES = {
-  getLogo: (mode: 'dark' | 'light' = 'dark') => {
-    return mode === 'light'
-      ? '/square-icons/logo square svg-white.svg'
-      : '/square-icons/logo square svg-black.svg';
-  },
-  getTextLogo: (mode: 'dark' | 'light' = 'dark') => {
-    return mode === 'light'
-      ? '/square-icons/logo square svg-white.svg'
-      : '/square-icons/logo square svg-black.svg';
-  },
+  getLogo: (_mode: 'dark' | 'light' = 'dark') => '/infohr-icons/logo-brand.png',
+  getTextLogo: (_mode: 'dark' | 'light' = 'dark') => '/infohr-icons/logo-brand.png',
   coverImageDefault: imgSrc(coverImageDefault),
   chPlayDownload: imgSrc(chPlayDownload),
   appStoreDownload: imgSrc(appStoreDownload),
@@ -122,7 +114,7 @@ export const FEEDBACK_IMAGES = {
 } as const;
 
 export const LOGO_IMAGES = {
-  LOGO_WITH_BG: '/square-icons/logo.svg',
+  LOGO_WITH_BG: '/infohr-icons/icon.svg',
 } as const;
 
 export const SVG_IMAGES = {

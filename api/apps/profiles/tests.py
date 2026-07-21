@@ -1881,3 +1881,46 @@ class TestAdminTrustReportAPI:
         payload = response.json()
         results = payload.get("data", payload).get("results", payload.get("results", []))
         assert [item["id"] for item in results] == [target_report.id]
+
+
+@pytest.mark.django_db
+def test_admin_resume_list_filters_by_job_seeker_profile_id(admin_user, job_seeker_user, job_seeker_profile, resume, city, career):
+    other_user = job_seeker_user.__class__.objects.create_user_with_role_name(
+        email="resume-filter@test.com",
+        full_name="Resume Filter",
+        role_name=var_sys.JOB_SEEKER,
+        password="testpass123",
+        is_active=True,
+        is_verify_email=True,
+    )
+    other_profile = JobSeekerProfile.objects.create(
+        user=other_user,
+        phone="0912345678",
+        location=job_seeker_profile.location,
+    )
+    other_resume = Resume.objects.create(
+        title="Other Candidate Resume",
+        description="Different profile",
+        salary_min=12000000,
+        salary_max=18000000,
+        experience=2,
+        is_active=True,
+        user=other_user,
+        job_seeker_profile=other_profile,
+        career=career,
+        city=city,
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=admin_user)
+
+    response = client.get(
+        "/api/v1/info/web/admin/resumes/",
+        {"jobSeekerProfileId": job_seeker_profile.id},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    results = payload.get("data", payload).get("results", payload.get("results", []))
+    assert [item["id"] for item in results] == [resume.id]
+    assert other_resume.id not in [item["id"] for item in results]

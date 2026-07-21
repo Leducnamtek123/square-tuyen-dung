@@ -26,7 +26,7 @@ http://localhost:8081
 Production gateway URL:
 
 ```text
-https://hrm.square.vn
+https://hrm.infohr.vn
 ```
 
 ## Required Env
@@ -34,9 +34,9 @@ https://hrm.square.vn
 Set these values in `.env`:
 
 ```env
-FRAPPE_HR_SITE_NAME=hrm.tuyendung.square.vn
-FRAPPE_HR_PUBLIC_URL=https://hrm.square.vn
-NEXT_PUBLIC_FRAPPE_HR_PUBLIC_URL=https://hrm.square.vn
+FRAPPE_HR_SITE_NAME=hrm.infohr.vn
+FRAPPE_HR_PUBLIC_URL=https://hrm.infohr.vn
+NEXT_PUBLIC_FRAPPE_HR_PUBLIC_URL=https://hrm.infohr.vn
 FRAPPE_HR_BASE_URL=http://frappe-hrms-frontend:8080
 FRAPPE_HR_IMAGE=square/frappe-hrms:custom
 FRAPPE_HR_FRAPPE_BRANCH=version-16

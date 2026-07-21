@@ -103,7 +103,7 @@ const buildSchema = (data: StructuredDataSchema): JsonLdObject => {
       if (data.companyName || data.companyUrl || data.companyLogoUrl) {
         schema.hiringOrganization = {
           '@type': 'Organization',
-          name: data.companyName || 'Square',
+          name: data.companyName || 'InfoHR',
           ...(data.companyUrl && { sameAs: data.companyUrl }),
           ...(data.companyLogoUrl && { logo: data.companyLogoUrl }),
         };

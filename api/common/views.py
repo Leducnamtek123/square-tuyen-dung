@@ -504,13 +504,10 @@ def get_all_careers(request):
 
     kw = request.query_params.get("kw", None)
 
-    def _build_queryset():
-        queryset = Career.objects.all()
-        if kw:
-            queryset = queryset.filter(name__icontains=kw)
-        return list(queryset.order_by('id'))
-
-    queryset = _run_blocking(_build_queryset)
+    queryset = Career.objects.all()
+    if kw:
+        queryset = queryset.filter(name__icontains=kw)
+    queryset = queryset.order_by('id')
     page = paginator.paginate_queryset(queryset, request)
 
     if page is not None:

@@ -11,10 +11,10 @@ interface SEOProps {
   noIndex?: boolean;
 }
 
-const SITE_NAME = 'Square Tuyển Dụng';
-const DEFAULT_IMAGE = 'https://sqstudio.vn/square-icons/logo.svg';
+const SITE_NAME = 'InfoHR Tuyển Dụng';
+const DEFAULT_IMAGE = 'https://sqstudio.vn/infohr-icons/icon.svg';
 const DEFAULT_DESCRIPTION =
-  'Square - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín.';
+  'InfoHR - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín.';
 
 /** Upsert a <meta> tag by name or property attribute */
 const upsertMeta = (attrName: string, attrValue: string, content: string) => {
@@ -54,7 +54,7 @@ const useSEO = ({
   noIndex = false,
 }: SEOProps = {}) => {
   useEffect(() => {
-    const resolvedTitle = title ? `${title} | Square` : 'Square | Tìm việc nhanh, tuyển dụng hiệu quả';
+    const resolvedTitle = title ? `${title} | InfoHR` : 'InfoHR | Tìm việc nhanh, tuyển dụng hiệu quả';
     const resolvedDesc = description || DEFAULT_DESCRIPTION;
     const resolvedImage = image || DEFAULT_IMAGE;
     const resolvedUrl = url || window.location.href;

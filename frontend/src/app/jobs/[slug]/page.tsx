@@ -14,8 +14,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!job) {
     return {
-      title: 'Việc làm | Square Tuyển Dụng',
-      description: 'Chi tiết việc làm trên Square Tuyển Dụng',
+      title: 'Việc làm | InfoHR Tuyển Dụng',
+      description: 'Chi tiết việc làm trên InfoHR Tuyển Dụng',
     };
   }
 
@@ -27,15 +27,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : 'Thỏa thuận';
 
   const title = companyName
-    ? `${jobTitle} - ${companyName} | Square`
-    : `${jobTitle} | Square`;
+    ? `${jobTitle} - ${companyName} | InfoHR`
+    : `${jobTitle} | InfoHR`;
 
   const description = [
     jobTitle,
     companyName && `tại ${companyName}`,
     location && `ở ${location}`,
     `Mức lương: ${salary}`,
-    'Ứng tuyển ngay trên Square Tuyển Dụng.',
+    'Ứng tuyển ngay trên InfoHR Tuyển Dụng.',
   ]
     .filter(Boolean)
     .join('. ');
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: 'article',
       url: `/viec-lam/${slug}`,
-      siteName: 'Square Tuyển Dụng',
+      siteName: 'InfoHR Tuyển Dụng',
       locale: 'vi_VN',
       ...(job.company?.companyImageUrl && {
         images: [{ url: job.company.companyImageUrl }],

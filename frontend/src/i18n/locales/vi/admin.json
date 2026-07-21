@@ -125,7 +125,7 @@
     "chatWithEmployers": "Kết nối với nhà tuyển dụng",
     "voiceProfiles": "Hồ sơ giọng nói AI",
     "interviewPreview": "Xem trước giao diện phỏng vấn",
-    "squareHrmAdmin": "Mở Square HRM"
+    "squareHrmAdmin": "Mở InfoHR HRM"
   },
   "aiHealth": {
     "title": "Dịch vụ AI",
@@ -1530,7 +1530,7 @@
         "uploadSampleAria": "Tải mẫu giọng",
         "generatedPreviewAria": "Bản nghe thử giọng đã tạo",
         "testActionAria": "Thử giọng {{name}}",
-        "defaultTestSentence": "Xin chào, đây là giọng phỏng vấn AI của Square."
+        "defaultTestSentence": "Xin chào, đây là giọng phỏng vấn AI của InfoHR."
       },
       "validation": {
         "nameRequired": "Vui lòng nhập tên hồ sơ giọng nói.",

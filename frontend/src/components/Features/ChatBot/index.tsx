@@ -189,7 +189,7 @@ const ChatBot = () => {
         onClick={() => dispatch({ type: 'toggle_open' })}
         aria-label={t('chat:chatbot.launcherAria')}
       >
-        <Image src={isEmployer ? CHATBOT_ICONS.EMPLOYER : CHATBOT_ICONS.JOB_SEEKER} alt="Square AI" width={28} height={28} />
+        <Image src={isEmployer ? CHATBOT_ICONS.EMPLOYER : CHATBOT_ICONS.JOB_SEEKER} alt="InfoHR AI" width={28} height={28} />
         <span className="sq-chatbot__launcher-ring" />
       </button>
 
@@ -197,10 +197,10 @@ const ChatBot = () => {
         <header className="sq-chatbot__header">
           <div className="sq-chatbot__title">
             <span className="sq-chatbot__badge">
-              <Image src={LOGO_IMAGES.LOGO_WITH_BG} alt="Square" width={28} height={28} style={{ borderRadius: 6, objectFit: 'contain' }} />
+              <Image src={LOGO_IMAGES.LOGO_WITH_BG} alt="InfoHR" width={28} height={28} style={{ borderRadius: 6, objectFit: 'contain' }} />
             </span>
             <div>
-              <div className="sq-chatbot__name">{botConfig.CHAT_TITLE || 'Square AI'}</div>
+              <div className="sq-chatbot__name">{botConfig.CHAT_TITLE || 'InfoHR AI'}</div>
               <div className="sq-chatbot__status">
                 <span className="sq-chatbot__status-dot" />
                 {t('chat:chatbot.status')}

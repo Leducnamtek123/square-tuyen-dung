@@ -11,6 +11,7 @@ export { default as CitiesPage } from './CitiesPage';
 export { default as CompaniesPage } from './CompaniesPage';
 export { default as CompanyVerificationsPage } from './CompanyVerificationsPage';
 export { default as ProfilesPage } from './ProfilesPage';
+export { default as ProfileDetailPage } from './ProfileDetailPage';
 export { default as ResumesPage } from './ResumesPage';
 export { default as JobActivityPage } from './JobActivityPage';
 export { default as JobNotificationsPage } from './JobNotificationsPage';

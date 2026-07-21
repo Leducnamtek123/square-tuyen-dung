@@ -3,8 +3,8 @@ import { Be_Vietnam_Pro } from 'next/font/google';
 import ThemeRegistry from '../components/ThemeRegistry/ThemeRegistry';
 import { Providers } from './providers';
 import ClientAppRoot from './ClientAppRoot';
-import './globals.css';           // Global CSS (Tailwind + design tokens)
-import './app-overrides.css';     // App-level overrides
+import './globals.css';
+import './app-overrides.css';
 
 const beVietnamPro = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
@@ -14,27 +14,28 @@ const beVietnamPro = Be_Vietnam_Pro({
   variable: '--font-be-vietnam-pro',
 });
 
-
-
 export const metadata: Metadata = {
   title: {
-    template: '%s | Square Tuyển Dụng',
-    default: 'Square | Tìm việc nhanh, tuyển dụng hiệu quả',
+    template: '%s | InfoHR Tuyển Dụng',
+    default: 'InfoHR | Tìm việc nhanh, tuyển dụng hiệu quả',
   },
-  description: 'Square - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín. Ứng tuyển nhanh chóng, hiệu quả',
-  keywords: 'tìm việc, tuyển dụng, việc làm, ứng tuyển, nhà tuyển dụng, CV, hồ sơ xin việc, Square, tuyển dụng Việt Nam',
+  description:
+    'InfoHR - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín. Ứng tuyển nhanh chóng, hiệu quả',
+  keywords:
+    'tìm việc, tuyển dụng, việc làm, ứng tuyển, nhà tuyển dụng, CV, hồ sơ xin việc, InfoHR, tuyển dụng Việt Nam',
   openGraph: {
-    title: 'Square | Tìm việc nhanh, tuyển dụng hiệu quả',
-    description: 'Square - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín.',
+    title: 'InfoHR | Tìm việc nhanh, tuyển dụng hiệu quả',
+    description:
+      'InfoHR - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín.',
     url: 'https://sqstudio.vn/',
-    siteName: 'Square Tuyển Dụng',
+    siteName: 'InfoHR Tuyển Dụng',
     locale: 'vi_VN',
     type: 'website',
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#1976d2',
+  themeColor: '#0f172a',
 };
 
 export default function RootLayout({
@@ -45,21 +46,16 @@ export default function RootLayout({
   return (
     <html lang="vi" className={`${beVietnamPro.variable}`} suppressHydrationWarning>
       <head>
-        <link rel="icon" type="image/svg+xml" href="/square-icons/icon.svg" />
+        <link rel="icon" type="image/png" href="/infohr-icons/logo-brand.png" />
       </head>
       <body style={{ fontFamily: 'var(--font-be-vietnam-pro), sans-serif' }} suppressHydrationWarning>
-        {/* Background Atmosphere Layer (Optimized) */}
         <div className="bg-atmosphere" />
-        
         <ThemeRegistry>
           <Providers>
-            <ClientAppRoot>
-              {children}
-            </ClientAppRoot>
+            <ClientAppRoot>{children}</ClientAppRoot>
           </Providers>
         </ThemeRegistry>
       </body>
     </html>
   );
 }
-

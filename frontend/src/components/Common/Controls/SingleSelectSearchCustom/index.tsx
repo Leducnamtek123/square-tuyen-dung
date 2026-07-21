@@ -92,7 +92,7 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
                     <InputAdornment
                       position="start"
                       sx={{
-                        color: isHero ? 'rgba(4, 48, 104, 0.42)' : 'text.secondary',
+                        color: isHero ? 'rgba(71, 85, 105, 0.55)' : 'text.secondary',
                         ml: isHero ? 0.5 : 0,
                       }}
                     >
@@ -105,24 +105,24 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
               sx={{
                 backgroundColor: isHero ? 'transparent' : theme.palette.mode === 'light' ? 'white' : '#121212',
                 borderRadius: isHero ? 1 : 999,
-                boxShadow: isHero ? 'none' : '0 10px 26px rgba(26, 64, 125, 0.08)',
+                boxShadow: isHero ? 'none' : '0 10px 26px rgba(15, 23, 42, 0.08)',
                 '& .MuiOutlinedInput-root': {
                   minHeight: isHero ? 56 : 48,
                   borderRadius: isHero ? 1 : 999,
                   backgroundColor: isHero ? 'transparent' : theme.palette.mode === 'light' ? 'white' : '#121212',
                   transition: 'box-shadow 180ms ease, border-color 180ms ease',
                   '& fieldset': {
-                    borderColor: isHero ? 'transparent' : 'rgba(26, 64, 125, 0.14)',
+                    borderColor: isHero ? 'transparent' : 'rgba(226, 232, 240, 0.95)',
                   },
                   '&:hover fieldset': {
-                    borderColor: isHero ? 'transparent' : 'rgba(26, 64, 125, 0.35)',
+                    borderColor: isHero ? 'transparent' : 'rgba(15, 23, 42, 0.26)',
                   },
                   '&.Mui-focused fieldset': {
                     borderColor: isHero ? 'transparent' : theme.palette.primary.main,
                     borderWidth: 1,
                   },
                   '&.Mui-focused': {
-                    boxShadow: isHero ? 'none' : '0 0 0 4px rgba(42, 169, 225, 0.16), 0 16px 34px rgba(26, 64, 125, 0.12)',
+                    boxShadow: isHero ? 'none' : '0 0 0 4px rgba(15, 23, 42, 0.14), 0 16px 34px rgba(15, 23, 42, 0.08)',
                   },
                 },
                 '& .MuiInputBase-input': {
@@ -131,7 +131,7 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
                   fontSize: isHero ? 14 : undefined,
                   color: 'text.primary',
                   '&::placeholder': {
-                    color: isHero ? 'rgba(67, 71, 80, 0.62)' : 'text.secondary',
+                    color: isHero ? 'rgba(71, 85, 105, 0.62)' : 'text.secondary',
                     opacity: isHero ? 1 : 0.78,
                   },
                 },

@@ -1,18 +1,17 @@
 const mode = 'light';
 
-// Define colors — extracted from Square logo SVG (public/square-icons/logo.svg)
-// Logo colors: #2aa9e1 (sky blue fill), #1a407d (navy shadow), #0f397f (deep navy text)
+// Neutral-first UI palette. Pink is reserved for the logo asset only.
 const colors = {
   primary: {
-    light: '#2aa9e1',    // Sky blue — logo main square fill
-    main: '#1a407d',     // Navy blue — logo shadow/depth
-    dark: '#0f397f',     // Deep navy — logo text color
+    light: '#334155',
+    main: '#0f172a',
+    dark: '#111827',
     contrastText: '#ffffff',
-    background: 'rgba(42, 169, 225, 0.07)',
-    gradient: 'linear-gradient(45deg, #2aa9e1 30%, #1a407d 90%)',
+    background: 'rgba(15, 23, 42, 0.06)',
+    gradient: 'linear-gradient(45deg, #0f172a 30%, #334155 90%)',
   },
   secondary: {
-    main: '#10b981',     // Emerald — growth & opportunity
+    main: '#10b981',
     light: '#34d399',
     dark: '#059669',
     contrastText: '#ffffff',
@@ -21,7 +20,7 @@ const colors = {
     gradient: 'linear-gradient(45deg, #10b981 30%, #34d399 90%)',
   },
   hot: {
-    main: '#f59e0b',     // Amber — urgent jobs badge
+    main: '#f59e0b',
     light: '#fcd34d',
     dark: '#d97706',
     background: 'rgba(245, 158, 11, 0.1)',
@@ -49,62 +48,61 @@ const colors = {
     contrastText: '#ffffff',
   },
   info: {
-    main: '#2aa9e1',     // matches primary.light — cohesive
-    light: '#38bdf8',
-    dark: '#1a407d',
+    main: '#0f172a',
+    light: '#334155',
+    dark: '#111827',
     contrastText: '#ffffff',
-    background: 'rgba(42, 169, 225, 0.06)',
+    background: 'rgba(15, 23, 42, 0.06)',
   },
   grey: {
-    50:  '#f0f7ff',
-    100: '#e1effe',
-    200: '#c3ddfd',
-    300: '#a4cafe',
-    400: '#76a9fa',
-    500: '#3f83f8',
-    600: '#1c64f2',
-    700: '#1a56db',
-    800: '#1e429f',
-    900: '#0f397f',
+    50:  '#ffffff',
+    100: '#f8fafc',
+    200: '#e2e8f0',
+    300: '#cbd5e1',
+    400: '#94a3b8',
+    500: '#64748b',
+    600: '#475569',
+    700: '#334155',
+    800: '#1f2937',
+    900: '#0f172a',
   },
   text: {
-    primary: '#0f397f',
-    secondary: '#3f6fc6',
-    disabled: '#a4cafe',
-    placeholder: '#a4cafe',
+    primary: '#0f172a',
+    secondary: '#475569',
+    disabled: '#94a3b8',
+    placeholder: '#94a3b8',
     italic: { fontStyle: 'italic' },
   },
   background: {
-    default: '#f0f7ff',
+    default: '#ffffff',
     paper: '#ffffff',
   },
   feedback: {
     button: {
-      background: 'linear-gradient(135deg, #2aa9e1 0%, #1a407d 100%)',
-      hover: 'linear-gradient(135deg, #1a407d 0%, #0f397f 100%)',
-      shadow: 'rgba(42, 169, 225, 0.35)',
-      gradient: 'linear-gradient(135deg, #2aa9e1 0%, #1a407d 100%)',
+      background: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
+      hover: 'linear-gradient(135deg, #111827 0%, #0f172a 100%)',
+      shadow: 'rgba(15, 23, 42, 0.22)',
+      gradient: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
     },
     dialog: {
-      border: 'rgba(42, 169, 225, 0.15)',
-      gradient: 'linear-gradient(135deg, #2aa9e1 0%, #1a407d 100%)',
+      border: 'rgba(15, 23, 42, 0.12)',
+      gradient: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
     }
   },
 } as const;
 
 const customShadows = {
-  small:    '0px 2px 8px rgba(26, 64, 125, 0.04), 0px 1px 2px rgba(26, 64, 125, 0.02)',
-  medium:   '0px 8px 24px rgba(26, 64, 125, 0.06), 0px 2px 8px rgba(26, 64, 125, 0.04)',
-  large:    '0px 24px 48px rgba(26, 64, 125, 0.08), 0px 12px 24px rgba(26, 64, 125, 0.06)',
-  card:     '0px 12px 32px rgba(26, 64, 125, 0.06), 0px 4px 12px rgba(26, 64, 125, 0.04), inset 0px 1px 0px rgba(255, 255, 255, 0.6)',
-  feedback: '0 16px 48px rgba(42, 169, 225, 0.15), 0 8px 24px rgba(26, 64, 125, 0.1)',
-  // Standard elevation levels for premium components
-  z1:  '0px 4px 12px rgba(26, 64, 125, 0.04)',
-  z8:  '0px 12px 24px rgba(26, 64, 125, 0.06)',
-  z12: '0px 16px 32px rgba(26, 64, 125, 0.08)',
-  z16: '0px 24px 48px rgba(26, 64, 125, 0.1)',
-  z20: '0px 32px 64px rgba(26, 64, 125, 0.12)',
-  z24: '0px 40px 80px rgba(26, 64, 125, 0.14)',
+  small:    '0px 2px 8px rgba(15, 23, 42, 0.04), 0px 1px 2px rgba(15, 23, 42, 0.02)',
+  medium:   '0px 8px 24px rgba(15, 23, 42, 0.06), 0px 2px 8px rgba(15, 23, 42, 0.04)',
+  large:    '0px 24px 48px rgba(15, 23, 42, 0.08), 0px 12px 24px rgba(15, 23, 42, 0.06)',
+  card:     '0px 12px 32px rgba(15, 23, 42, 0.06), 0px 4px 12px rgba(15, 23, 42, 0.04), inset 0px 1px 0px rgba(255, 255, 255, 0.8)',
+  feedback: '0 16px 48px rgba(15, 23, 42, 0.10), 0 8px 24px rgba(15, 23, 42, 0.08)',
+  z1:  '0px 4px 12px rgba(15, 23, 42, 0.04)',
+  z8:  '0px 12px 24px rgba(15, 23, 42, 0.06)',
+  z12: '0px 16px 32px rgba(15, 23, 42, 0.08)',
+  z16: '0px 24px 48px rgba(15, 23, 42, 0.1)',
+  z20: '0px 32px 64px rgba(15, 23, 42, 0.12)',
+  z24: '0px 40px 80px rgba(15, 23, 42, 0.14)',
 } as const;
 
 const defaultTheme = {

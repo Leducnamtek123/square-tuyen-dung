@@ -23,11 +23,12 @@ const ensureApiBase = (value: string) => {
 const isAbsoluteHttpUrl = (value = '') => /^https?:\/\//i.test(value);
 const isDockerRuntime = existsSync('/.dockerenv');
 const isDockerBackendHost = (value = '') => /^https?:\/\/backend(?::|\/|$)/i.test(value);
+const dockerHostApiProxyOrigin = `http://host.docker.internal:${process.env.NGINX_PORT || '8080'}`;
 
 const resolveBackendBaseUrl = () => {
   const backendUrl = process.env.BACKEND_API_URL || '';
 
-  if (backendUrl && (!isDockerBackendHost(backendUrl) || isDockerRuntime)) {
+  if (backendUrl && !isDockerBackendHost(backendUrl)) {
     return ensureApiBase(backendUrl);
   }
 
@@ -39,6 +40,10 @@ const resolveBackendBaseUrl = () => {
   const publicApiBase = process.env.NEXT_PUBLIC_API_BASE || '';
   if (isAbsoluteHttpUrl(publicApiBase)) {
     return ensureApiBase(publicApiBase);
+  }
+
+  if (isDockerRuntime) {
+    return ensureApiBase(dockerHostApiProxyOrigin);
   }
 
   if (!isDockerRuntime) {

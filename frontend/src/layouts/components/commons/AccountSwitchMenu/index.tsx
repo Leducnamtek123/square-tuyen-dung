@@ -219,8 +219,8 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
             />
           }
           sx={{
-            backgroundColor: 'rgba(255, 255, 255, 0.15)',
-            color: 'white',
+            backgroundColor: '#ffffff',
+            color: '#0f172a',
             
             px: 1.5,
             py: 0.6,
@@ -229,13 +229,13 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
             textTransform: 'none',
             whiteSpace: 'nowrap',
             boxShadow: 'none',
-            border: '1px solid rgba(255,255,255,0.3)',
+            border: '1px solid rgba(15, 23, 42, 0.16)',
             backdropFilter: 'blur(8px)',
             transition: 'all 0.25s ease',
             '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.25)',
-              borderColor: 'rgba(255,255,255,0.55)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              backgroundColor: 'rgba(15, 23, 42, 0.04)',
+              borderColor: 'rgba(15, 23, 42, 0.24)',
+              boxShadow: '0 2px 8px rgba(15, 23, 42, 0.08)',
               transform: 'translateY(-1px)',
             },
           }}

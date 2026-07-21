@@ -29,9 +29,9 @@ const Footer = () => {
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
   const lang = i18n.language;
 
-  const brandNavy = '#1a407d';
-  const brandSky = '#2aa9e1';
-  const brandLight = '#e1effe';
+  const brandNavy = '#0f172a';
+  const brandSky = '#0f172a';
+  const brandLight = '#e2e8f0';
   const currentYear = React.useSyncExternalStore(
     subscribeToStaticYear,
     getCurrentYearSnapshot,
@@ -46,10 +46,10 @@ const Footer = () => {
     color: brandNavy,
     textTransform: 'none',
     fontWeight: 500,
-    '&:hover': {
-      color: brandSky,
-      backgroundColor: 'transparent',
-    },
+      '&:hover': {
+        color: '#111827',
+        backgroundColor: 'transparent',
+      },
   } as const;
 
   const candidateLinks = [
@@ -63,8 +63,8 @@ const Footer = () => {
   return (
     <Box
       sx={{
-        backgroundColor: '#f0f7ff',
-        borderTop: `3px solid ${brandSky}`,
+        backgroundColor: '#ffffff',
+        borderTop: `1px solid ${brandLight}`,
         pt: 6,
         pb: 0,
       }}
@@ -162,7 +162,7 @@ const Footer = () => {
                       color: brandNavy,
                       transition: 'all 0.2s',
                       '&:hover': {
-                        backgroundColor: brandSky,
+                        backgroundColor: '#0f172a',
                         color: 'white',
                         transform: 'scale(1.08)',
                       },

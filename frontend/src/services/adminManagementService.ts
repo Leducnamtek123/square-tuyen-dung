@@ -31,6 +31,15 @@ export type AdminListParams = {
   ordering?: string;
   kw?: string;
   search?: string;
+  cityId?: string | number;
+  careerId?: string | number;
+  experienceId?: string | number;
+  positionId?: string | number;
+  academicLevelId?: string | number;
+  typeOfWorkplaceId?: string | number;
+  jobTypeId?: string | number;
+  genderId?: string | number;
+  maritalStatusId?: string | number;
   user?: string | number;
   userId?: string | number;
   reporter?: string | number;
@@ -49,6 +58,7 @@ export type AdminListParams = {
   targetType?: string;
   resourceType?: string;
   resourceId?: string;
+  jobSeekerProfileId?: string | number;
   dateFrom?: string;
   dateTo?: string;
   statusId?: string | number;
@@ -138,6 +148,48 @@ interface QuestionGroupPayload {
 export type JobSeekerProfilePayload = Partial<JobSeekerProfile>;
 export type ResumePayload = Partial<Resume>;
 export type JobPostActivityPayload = Partial<JobPostActivity>;
+
+export type Vieclam24hImportPayload = {
+  sourceUrl: string;
+  account: string;
+  password: string;
+  occupationIds?: number[];
+};
+
+export type Vieclam24hImportJob = {
+  id: number;
+  status: 'pending' | 'processing' | 'completed' | 'failed' | string;
+  progress: number;
+  createdCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  sourceUrl: string;
+  sourceAccount: string;
+  targetCityId?: number | null;
+  targetDistrictId?: number | null;
+  sourcePayload?: Record<string, unknown> | null;
+  resultPayload?: Record<string, unknown> | null;
+  errorMessage?: string;
+  startedAt?: string | null;
+  finishedAt?: string | null;
+};
+
+export type Vieclam24hSourceOccupation = {
+  id: number;
+  name: string;
+  slug?: string | null;
+  jobFieldIds?: number[];
+  isTop?: boolean;
+};
+
+export type Vieclam24hCatalogResponse = {
+  origin: string;
+  occupations: Vieclam24hSourceOccupation[];
+  topOccupations: Vieclam24hSourceOccupation[];
+  provinces: Array<{ id: number; name: string; slug?: string | null }>;
+  provincesAll: Array<{ id: number; name: string; slug?: string | null }>;
+  recommendedOccupationIds: number[];
+};
 
 const withPresign = async <T>(promise: Promise<unknown>): Promise<T> => {
   const data = await promise;
@@ -398,9 +450,19 @@ const adminManagementService = {
     return httpRequest.delete(url);
   },
 
+  bulkDeleteProfiles: (ids: Array<string | number>): Promise<{ deleted: number }> => {
+    const url = 'info/web/admin/job-seeker-profiles/bulk-delete/';
+    return unwrapEntity<{ deleted: number }>(httpRequest.post(url, { ids }));
+  },
+
   getResumes: (params: AdminListParams = {}): Promise<PaginatedResponse<Resume>> => {
     const url = 'info/web/admin/resumes/';
     return withPaginatedPresign<Resume>(httpRequest.get(url, { params: cleanParams(params) }));
+  },
+
+  getVieclam24hCatalog: (params: { sourceUrl?: string } = {}): Promise<Vieclam24hCatalogResponse> => {
+    const url = 'info/web/admin/resumes/vieclam24h-catalog/';
+    return unwrapEntity<Vieclam24hCatalogResponse>(httpRequest.get(url, { params: cleanParams(params) }));
   },
 
   getResumeDetail: (id: string | number): Promise<Resume> => {
@@ -421,6 +483,18 @@ const adminManagementService = {
   deleteResume: (id: string | number): Promise<void> => {
     const url = `info/web/admin/resumes/${id}/`;
     return httpRequest.delete(url);
+  },
+
+  importVieclam24hCandidates: (data: Vieclam24hImportPayload): Promise<Vieclam24hImportJob> => {
+    const url = 'info/web/admin/resumes/import-vieclam24h/';
+    return unwrapEntity<Vieclam24hImportJob>(
+      httpRequest.post(url, data, { timeout: 180000 })
+    );
+  },
+
+  getVieclam24hImportJob: (id: string | number): Promise<Vieclam24hImportJob> => {
+    const url = `info/web/admin/resume-import-jobs/${id}/`;
+    return unwrapEntity<Vieclam24hImportJob>(httpRequest.get(url));
   },
 
   // Job Activity

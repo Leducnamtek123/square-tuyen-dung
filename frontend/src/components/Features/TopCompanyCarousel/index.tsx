@@ -32,7 +32,7 @@ const styles = {
     width: 12,
     height: 12,
     opacity: 0.5,
-    backgroundColor: (theme: Theme) => theme.palette.primary.main,
+    backgroundColor: '#0f172a',
     transition: "all 0.3s ease",
   },
   ".swiper-pagination-bullet-active": {
@@ -159,9 +159,9 @@ const TopCompanyCarousel = () => {
                       '&:hover': {
                         transform: 'translateY(-4px)',
                         boxShadow: '0 18px 34px rgba(4, 48, 104, 0.14)',
-                        borderColor: 'primary.main',
+                        borderColor: 'rgba(15, 23, 42, 0.18)',
                         '& .company-name': {
-                          color: 'primary.main',
+                          color: '#0f172a',
                         }
                       },
                     }}
@@ -243,7 +243,7 @@ const TopCompanyCarousel = () => {
                     >
                       <Stack direction="row" spacing={0.3}>
                         {STAR_KEYS.map((key) => (
-                          <StarIcon key={key} sx={{ color: 'primary.main', fontSize: 18 }} />
+                          <StarIcon key={key} sx={{ color: 'warning.main', fontSize: 18 }} />
                         ))}
                       </Stack>
                       <Button
@@ -257,6 +257,8 @@ const TopCompanyCarousel = () => {
                           textTransform: 'none', 
                           fontWeight: 600,
                           fontSize: '0.85rem',
+                          bgcolor: '#0f172a',
+                          '&:hover': { bgcolor: '#111827' },
                         }}
                       >
                         {t('viewDetails')}

@@ -52,3 +52,4 @@ faker
 pytest
 pytest-django
 sentry-sdk[django]>=2.0.0
+playwright==1.49.1

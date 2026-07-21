@@ -23,7 +23,7 @@ export {
 export { ROUTES } from './routeConfig';
 
 const PLATFORM = 'WEB';
-const APP_NAME = 'Square';
+const APP_NAME = 'InfoHR';
 
 const getBaseHostname = (): string => {
   if (typeof window === 'undefined') return 'localhost';
@@ -49,7 +49,7 @@ const HOST_NAME = {
     : `admin.${BASE_HOSTNAME}`,
 } as const;
 
-const getSquareHrmPublicUrl = (): string => {
+const getInfoHrmPublicUrl = (): string => {
   const configured = process.env.NEXT_PUBLIC_HRM_PUBLIC_URL?.trim().replace(/\/$/, '');
   if (configured) return configured;
 
@@ -57,16 +57,16 @@ const getSquareHrmPublicUrl = (): string => {
     return 'http://localhost:8081';
   }
 
-  if (BASE_HOSTNAME === 'tuyendung.square.vn') {
-    return 'https://hrm.square.vn';
+  if (BASE_HOSTNAME === 'infohr.vn') {
+    return 'https://hrm.infohr.vn';
   }
 
   return `https://hrm.${BASE_HOSTNAME}`;
 };
 
 const SQUARE_HRM = {
-  PUBLIC_URL: getSquareHrmPublicUrl(),
-  ADMIN_URL: `${getSquareHrmPublicUrl()}/app`,
+  PUBLIC_URL: getInfoHrmPublicUrl(),
+  ADMIN_URL: `${getInfoHrmPublicUrl()}/app`,
 } as const;
 
 const AUTH_PROVIDER = {
@@ -93,11 +93,11 @@ const AUTH_CONFIG = {
   GOONGAPI_KEY: process.env.NEXT_PUBLIC_GOONGAPI_KEY,
   JOB_SEEKER_BOT: {
     AGENT_ID: process.env.NEXT_PUBLIC_JOB_SEEKER_BOT_AGENT_ID || '',
-    CHAT_TITLE: 'Square AI',
+    CHAT_TITLE: 'InfoHR AI',
   },
   EMPLOYER_BOT: {
     AGENT_ID: process.env.NEXT_PUBLIC_EMPLOYER_BOT_AGENT_ID || '',
-    CHAT_TITLE: 'Square AI',
+    CHAT_TITLE: 'InfoHR AI',
   },
   BOT_RENDER_MODE: process.env.NEXT_PUBLIC_BOT_RENDER_MODE || 'chat',
 } as const;

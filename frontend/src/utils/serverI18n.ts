@@ -38,7 +38,7 @@ async function getServerLocale(): Promise<SupportedLocale> {
 
 const PAGE_TITLES: Record<string, Record<SupportedLocale, string>> = {
   // Root
-  'home':                     { vi: 'Square Tuyển Dụng - Tìm việc nhanh, tuyển dụng hiệu quả', en: 'Square Jobs - Find jobs fast, recruit efficiently' },
+  'home':                     { vi: 'InfoHR Tuyển Dụng - Tìm việc nhanh, tuyển dụng hiệu quả', en: 'InfoHR Jobs - Find jobs fast, recruit efficiently' },
 
   // Auth
   'admin.login':              { vi: 'Đăng nhập quản trị', en: 'Admin Login' },

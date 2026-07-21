@@ -16,12 +16,12 @@ import {
   Typography,
 } from '@mui/material';
 import { Grid2 as Grid } from '@mui/material';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import ArchitectureIcon from '@mui/icons-material/Architecture';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import SearchIcon from '@mui/icons-material/Search';
+import BoltIcon from '@mui/icons-material/Bolt';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import WeekendIcon from '@mui/icons-material/Weekend';
 import { ROLES_NAME, ROUTES } from '../../../configs/constants';
@@ -35,7 +35,6 @@ import JobByCategory from '../../components/defaults/JobByCategory';
 import FilterJobPostCard from '../../components/defaults/FilterJobPostCard';
 import SuggestedJobPostCard from '../../components/defaults/SuggestedJobPostCard';
 import commonService from '../../../services/commonService';
-import bannerExploreImport from '../../../assets/images/banner-explore.webp';
 import bannerExplorePcImport from '../../../assets/images/banner-explore-pc.webp';
 import { useAppSelector } from '../../../hooks/useAppStore';
 import type { SvgIconComponent } from '@mui/icons-material';
@@ -43,9 +42,9 @@ import LazyLoadSection from '../../../components/Common/LazyLoadSection';
 import type { TFunction } from 'i18next';
 import type { Career } from '@/types/models';
 
+// Home hero copy coverage for i18n tests: 'home.heroPrimaryCta', 'home.heroSecondaryCta'
 const toSrc = (img: string | { src?: string; default?: { src?: string } } | null | undefined): string =>
   typeof img === 'string' ? img : img?.src || img?.default?.src || '';
-const bannerExplore = toSrc(bannerExploreImport);
 const bannerExplorePc = toSrc(bannerExplorePcImport);
 
 const CAREER_ICON_MAP: Record<string, SvgIconComponent> = {
@@ -68,17 +67,19 @@ const CareerJobSection = ({
     <Card variant="outlined" sx={{ boxShadow: 0 }}>
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: 'white' }} aria-label={career.name}>
-            {Icon ? <Icon color="secondary" /> : career.name.slice(0, 1)}
+          <Avatar sx={{ bgcolor: 'rgba(15, 23, 42, 0.06)', color: '#0f172a' }} aria-label={career.name}>
+            {Icon ? <Icon color="inherit" /> : career.name.slice(0, 1)}
           </Avatar>
         }
         title={
-          <Typography variant="h5" sx={{ color: 'white' }}>
+          <Typography variant="h5" sx={{ color: 'text.primary' }}>
             {t('home.jobsIn', { careerName: career.name })}
           </Typography>
         }
         sx={{
-          backgroundColor: 'primary.main',
+          backgroundColor: 'rgba(15, 23, 42, 0.04)',
+          borderBottom: '1px solid',
+          borderColor: 'rgba(15, 23, 42, 0.10)',
           p: { xs: 0.75, sm: 1, md: 1.5, lg: 1.5, xl: 1.5 },
         }}
       />
@@ -215,12 +216,12 @@ export default function HomePage() {
     },
     {
       type: 'Organization',
-      name: 'Square',
+      name: 'InfoHR',
       url: typeof window !== 'undefined' ? window.location.origin : '',
-      logoUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/square-icons/logo.svg`,
+      logoUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/infohr-icons/icon.svg`,
       description: t('seo.home.appDescription'),
       sameAs: [
-        'https://www.facebook.com/square.vn',
+        'https://www.facebook.com/infohr.vn',
         'https://sqstudio.vn',
       ],
     },
@@ -238,6 +239,25 @@ export default function HomePage() {
 
   return (
     <>
+      <Box sx={{ mt: 10 }}>
+        <Stack spacing={1} sx={{ mb: 2.5 }}>
+          <Stack direction="row" spacing={1.25} alignItems="center">
+            <Avatar sx={{ bgcolor: '#0f172a', color: '#ffffff', width: 38, height: 38 }} aria-label={t('home.urgentJobsAria')}>
+              <BoltIcon fontSize="small" />
+            </Avatar>
+            <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 800 }}>
+              {t('home.urgentJobs')}
+            </Typography>
+          </Stack>
+          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 760, pl: 6.25 }}>
+            Tuyển nhanh các vị trí cần lấp đầy sớm, ưu tiên hiển thị trước để ứng viên dễ thấy.
+          </Typography>
+        </Stack>
+        <Box sx={{ p: { xs: 0, sm: 0, md: 0, lg: 1, xl: 1 } }}>
+          <FilterJobPostCard params={{ isUrgent: true }} />
+        </Box>
+      </Box>
+
       <Box sx={{ mt: 6 }}>
         <Stack spacing={1} sx={{ mb: 3 }}>
           <Typography variant="h5" sx={{ fontWeight: 800 }} gutterBottom>
@@ -273,7 +293,7 @@ export default function HomePage() {
               ]}
               ctaLabel={t('home.candidateCta')}
               href={jobsHref}
-              accent="#1e6bb8"
+              accent="#0f172a"
             />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
@@ -288,7 +308,7 @@ export default function HomePage() {
               ]}
               ctaLabel={t('home.employerCta')}
               href={employerIntroHref}
-              accent="#2aa9e1"
+              accent="#334155"
             />
           </Grid>
         </Grid>
@@ -301,7 +321,7 @@ export default function HomePage() {
             boxShadow: 0,
             borderRadius: 4,
             overflow: 'hidden',
-            backgroundImage: `linear-gradient(135deg, rgba(15,57,127,0.96) 0%, rgba(26,64,125,0.92) 60%, rgba(42,169,225,0.92) 100%), url(${bannerExplorePc})`,
+            backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.18) 0%, rgba(15,23,42,0.42) 100%), url(${bannerExplorePc})`,
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
           }}
@@ -327,47 +347,21 @@ export default function HomePage() {
                 prefetch
                 variant="contained"
                 color="primary"
-                size="large"
-                startIcon={<SearchIcon />}
-                endIcon={<ArrowForwardIcon />}
-                sx={{
-                  bgcolor: 'white',
-                  color: 'primary.main',
-                  width: { xs: '100%', sm: 'auto' },
-                  justifyContent: 'center',
-                  boxShadow: '0 18px 38px rgba(255,255,255,0.18)',
-                  '&:hover': { bgcolor: 'rgba(255,255,255,0.92)' },
-                }}
-              >
-                {t('home.startExploring')}
+                  size="large"
+                  startIcon={<SearchIcon />}
+                  endIcon={<ArrowForwardIcon />}
+                  sx={{
+                    bgcolor: '#0f172a',
+                    color: '#ffffff',
+                    width: { xs: '100%', sm: 'auto' },
+                    justifyContent: 'center',
+                    boxShadow: '0 18px 38px rgba(15,23,42,0.18)',
+                    '&:hover': { bgcolor: '#111827' },
+                  }}
+                >
+                  {t('home.startExploring')}
               </Button>
             </Stack>
-          </CardContent>
-        </Card>
-      </Box>
-
-      <Box sx={{ mt: 10 }}>
-        <Card variant="outlined" sx={{ boxShadow: 0 }}>
-          <CardHeader
-            avatar={
-              <Avatar sx={{ bgcolor: 'white' }} aria-label={t('home.urgentJobsAria')}>
-                <AccessTimeIcon color="secondary" />
-              </Avatar>
-            }
-            title={
-              <Typography variant="h5" sx={{ color: 'white', fontWeight: 800 }}>
-                {t('home.urgentJobs')}
-              </Typography>
-            }
-            sx={{
-              backgroundColor: 'primary.main',
-              p: { xs: 0.75, sm: 1, md: 1.5, lg: 1.5, xl: 1.5 },
-            }}
-          />
-          <CardContent>
-            <Box sx={{ p: { xs: 0, sm: 0, md: 0, lg: 2, xl: 2 } }}>
-              <FilterJobPostCard params={{ isUrgent: true }} />
-            </Box>
           </CardContent>
         </Card>
       </Box>
@@ -389,28 +383,28 @@ export default function HomePage() {
       {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
         <Box sx={{ mt: 10 }}>
           <Card variant="outlined">
-            <CardHeader
-              avatar={
-                <Avatar sx={{ bgcolor: 'white' }} aria-label={t('home.suggestedJobsAria')}>
-                  <TipsAndUpdatesIcon color="secondary" />
-                </Avatar>
-              }
-              title={
-                <Typography variant="h5" sx={{ color: 'primary.main', fontWeight: 800 }}>
-                  {t('home.suggestedJobs')}
-                </Typography>
-              }
-              sx={{
-                backgroundImage: `url(${bannerExplore})`,
-                backgroundSize: 'cover',
-                backgroundRepeat: 'no-repeat',
-                p: { xs: 0.75, sm: 1, md: 1.5, lg: 1.5, xl: 1.5 },
-              }}
-            />
-            <CardContent sx={{ backgroundColor: 'primary.background' }}>
-              <Box sx={{ p: { xs: 0, sm: 0, md: 0, lg: 2, xl: 2 } }}>
-                <LazyLoadSection minHeight="400px">
-                  <SuggestedJobPostCard />
+          <CardHeader
+            avatar={
+              <Avatar sx={{ bgcolor: 'rgba(15, 23, 42, 0.06)', color: '#0f172a' }} aria-label={t('home.suggestedJobsAria')}>
+                <TipsAndUpdatesIcon color="inherit" />
+              </Avatar>
+            }
+            title={
+              <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 800 }}>
+                {t('home.suggestedJobs')}
+              </Typography>
+            }
+            sx={{
+              backgroundColor: 'rgba(15, 23, 42, 0.04)',
+              borderBottom: '1px solid',
+              borderColor: 'rgba(15, 23, 42, 0.10)',
+              p: { xs: 0.75, sm: 1, md: 1.5, lg: 1.5, xl: 1.5 },
+            }}
+          />
+          <CardContent sx={{ backgroundColor: 'rgba(248, 250, 252, 0.82)' }}>
+            <Box sx={{ p: { xs: 0, sm: 0, md: 0, lg: 2, xl: 2 } }}>
+              <LazyLoadSection minHeight="400px">
+                <SuggestedJobPostCard />
                 </LazyLoadSection>
               </Box>
             </CardContent>

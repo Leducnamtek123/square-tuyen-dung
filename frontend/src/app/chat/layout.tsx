@@ -4,8 +4,8 @@ import ChatLayout from '@/layouts/ChatLayout';
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Square Tuyển Dụng',
-    default: 'Tin nhắn | Square Tuyển Dụng',
+    template: '%s | InfoHR Tuyá»ƒn Dá»¥ng',
+    default: 'Tin nháº¯n | InfoHR Tuyá»ƒn Dá»¥ng',
   },
 };
 
@@ -16,3 +16,4 @@ export default function ChatSectionLayout({
 }) {
   return <ChatLayout>{children}</ChatLayout>;
 }
+

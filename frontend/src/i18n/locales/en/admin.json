@@ -59,14 +59,14 @@
     "noApplicationData": "No application data yet",
     "noInterviewData": "No interview data yet",
     "cardHelpers": {
-      "userMix": "{{employers}} employers · {{jobSeekers}} job seekers",
-      "verifiedCompanies": "{{verified}} verified · {{pending}} pending",
-      "jobPostMix": "{{active}} active · {{pending}} pending",
-      "applicationMix": "{{pending}} pending · {{hired}} hired",
-      "interviewMix": "{{scheduled}} scheduled · {{completed}} completed",
-      "resumeMix": "{{active}} active · {{profiles}} profiles",
-      "pendingMix": "{{posts}} posts · {{companies}} company verifications",
-      "recentUsers": "{{employers}} employers · {{jobSeekers}} job seekers"
+      "userMix": "{{employers}} employers Â· {{jobSeekers}} job seekers",
+      "verifiedCompanies": "{{verified}} verified Â· {{pending}} pending",
+      "jobPostMix": "{{active}} active Â· {{pending}} pending",
+      "applicationMix": "{{pending}} pending Â· {{hired}} hired",
+      "interviewMix": "{{scheduled}} scheduled Â· {{completed}} completed",
+      "resumeMix": "{{active}} active Â· {{profiles}} profiles",
+      "pendingMix": "{{posts}} posts Â· {{companies}} company verifications",
+      "recentUsers": "{{employers}} employers Â· {{jobSeekers}} job seekers"
     },
     "jobStates": {
       "active": "Active",
@@ -125,7 +125,7 @@
       "chatWithEmployers": "Chat with Employers",
       "voiceProfiles": "AI Voice Profiles",
       "interviewPreview": "Interview UI Preview",
-      "squareHrmAdmin": "Open Square HRM"
+      "squareHrmAdmin": "Open InfoHR HRM"
   },
   "aiHealth": {
     "title": "AI services",
@@ -588,12 +588,14 @@
         "updateSuccess": "Profile updated",
         "updateError": "Could not update profile",
         "deleteSuccess": "Profile deleted",
-        "deleteError": "Could not delete profile"
+        "deleteError": "Could not delete profile",
+        "importSuccess": "Imported {{created}} new candidates, updated {{updated}} profiles, skipped {{skipped}}.",
+        "importError": "Could not import candidates from Vieclam24h."
       },
       "addCandidate": "Add Candidate",
       "searchPlaceholder": "Search candidates...",
       "filter": {
-        "title": "Candidate profile filters"
+        "title": "Candidate pool filters"
       },
       "addTitle": "Add New Candidate Profile",
       "editTitle": "Edit Candidate Profile",
@@ -621,6 +623,18 @@
       "deleteText": "Are you sure you want to delete profile of <strong>{{name}}</strong>? This action cannot be undone.",
       "deleteBtn": "Confirm Delete",
       "deletingBtn": "Deleting...",
+      "import": {
+        "openButton": "Import candidates",
+        "dialogTitle": "Import candidates from Vieclam24h",
+        "sourceUrlLabel": "Recruitment link",
+        "accountLabel": "Account",
+        "passwordLabel": "Password",
+        "careerLabel": "Target industry",
+        "careerPlaceholder": "Select the industry to import",
+        "cancel": "Cancel",
+        "confirm": "Import candidates",
+        "importing": "Importing..."
+      },
       "table": {
         "avatar": "Avatar",
         "fullName": "Full Name",
@@ -638,12 +652,63 @@
         "createdAt": "Created At",
         "view": "View"
       },
-      "title": "Candidate Profiles",
+      "title": "Candidate Pool",
       "breadcrumbAdmin": "Admin",
       "breadcrumbResources": "Resources",
       "breadcrumbProfiles": "Profiles",
       "deleteConfirm": "This will be permanently deleted, continue?",
       "cancel": "Cancel"
+    },
+    "profileDetail": {
+      "title": "Candidate Profile Detail",
+      "subtitle": "Review profile data, contact details, and related CVs.",
+      "back": "Back to list",
+      "deleteTitle": "Confirm profile deletion",
+      "deleteConfirm": "Are you sure you want to delete the profile of <strong>{{name}}</strong>? This action cannot be undone.",
+      "deleteBtn": "Delete profile",
+      "deletingBtn": "Deleting...",
+      "sections": {
+        "summary": "Overview",
+        "contact": "Contact information",
+        "details": "Profile details",
+        "resumes": "Related CVs"
+      },
+      "labels": {
+        "fullName": "Full name",
+        "email": "Email",
+        "phone": "Phone",
+        "birthday": "Date of birth",
+        "gender": "Gender",
+        "maritalStatus": "Marital status",
+        "location": "City/Province",
+        "district": "District",
+        "address": "Address",
+        "profileId": "Profile ID",
+        "source": "Data source",
+        "createdAt": "Created at",
+        "updatedAt": "Last updated",
+        "noData": "No data",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "table": {
+        "title": "CV Title",
+        "resumeType": "CV type",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "actions": "Actions",
+        "view": "View",
+        "download": "Download",
+        "openOnline": "Open online profile",
+        "noData": "No related CVs",
+        "attached": "Attached CV",
+        "online": "Online profile"
+      },
+      "messages": {
+        "loading": "Loading profile...",
+        "notFound": "Candidate profile not found.",
+        "noResumes": "This profile has no CVs yet."
+      }
     },
     "questionGroups": {
       "title": "Question Group Management",
@@ -1536,7 +1601,7 @@
         "uploadSampleAria": "Upload voice sample",
         "generatedPreviewAria": "Generated voice preview",
         "testActionAria": "Test {{name}}",
-        "defaultTestSentence": "Hello, this is Square's AI interview voice."
+        "defaultTestSentence": "Hello, this is InfoHR's AI interview voice."
       },
       "validation": {
         "nameRequired": "Voice profile name is required.",
@@ -1828,3 +1893,4 @@
     }
   }
 }
+

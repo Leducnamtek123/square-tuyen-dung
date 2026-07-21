@@ -39,17 +39,17 @@ services:
       dockerfile: ${FRONTEND_DOCKERFILE:-Dockerfile.prod}
       args:
         NEXT_PUBLIC_NODE_ENV: ${NEXT_PUBLIC_NODE_ENV:-production}
-        NEXT_PUBLIC_PROJECT_HOST_NAME: ${NEXT_PUBLIC_PROJECT_HOST_NAME:-tuyendung.square.vn}
-        NEXT_PUBLIC_ADMIN_PROJECT_HOST_NAME: ${NEXT_PUBLIC_ADMIN_PROJECT_HOST_NAME:-admin.tuyendung.square.vn}
-        NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME: ${NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME:-employer.tuyendung.square.vn}
+        NEXT_PUBLIC_PROJECT_HOST_NAME: ${NEXT_PUBLIC_PROJECT_HOST_NAME:-infohr.vn}
+        NEXT_PUBLIC_ADMIN_PROJECT_HOST_NAME: ${NEXT_PUBLIC_ADMIN_PROJECT_HOST_NAME:-admin.infohr.vn}
+        NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME: ${NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME:-employer.infohr.vn}
         NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID: ${NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID:-${CLIENT_ID}}
         NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
         NEXT_PUBLIC_FACEBOOK_CLIENT_ID: ${NEXT_PUBLIC_FACEBOOK_CLIENT_ID:-}
         NEXT_PUBLIC_GOONGAPI_KEY: ${NEXT_PUBLIC_GOONGAPI_KEY}
         NEXT_PUBLIC_GOONGAPI_ACCESS_TOKEN: ${NEXT_PUBLIC_GOONGAPI_ACCESS_TOKEN:-}
-        NEXT_PUBLIC_MINIO_PUBLIC_URL: ${NEXT_PUBLIC_MINIO_PUBLIC_URL:-https://s3.tuyendung.square.vn:4433}
-        NEXT_PUBLIC_LIVEKIT_URL: ${NEXT_PUBLIC_LIVEKIT_URL:-wss://tuyendung.square.vn/livekit}
-        NEXT_PUBLIC_HRM_PUBLIC_URL: ${NEXT_PUBLIC_HRM_PUBLIC_URL:-https://hrm.square.vn}
+        NEXT_PUBLIC_MINIO_PUBLIC_URL: ${NEXT_PUBLIC_MINIO_PUBLIC_URL:-https://s3.infohr.vn:4433}
+        NEXT_PUBLIC_LIVEKIT_URL: ${NEXT_PUBLIC_LIVEKIT_URL:-wss://infohr.vn/livekit}
+        NEXT_PUBLIC_HRM_PUBLIC_URL: ${NEXT_PUBLIC_HRM_PUBLIC_URL:-https://hrm.infohr.vn}
         NEXT_PUBLIC_FIREBASE_API_KEY: ${NEXT_PUBLIC_FIREBASE_API_KEY}
         NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
         NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
@@ -340,7 +340,7 @@ services:
         bench --site "$${FRAPPE_SITE_NAME}" execute frappe.db.set_default --args "['desktop:home_page','workspace']";
         bench --site "$${FRAPPE_SITE_NAME}" clear-cache;
     environment:
-      FRAPPE_SITE_NAME: ${FRAPPE_HR_SITE_NAME:-hrm.tuyendung.square.vn}
+      FRAPPE_SITE_NAME: ${FRAPPE_HR_SITE_NAME:-hrm.infohr.vn}
       ADMIN_PASSWORD: ${FRAPPE_HR_ADMIN_PASSWORD:?Set FRAPPE_HR_ADMIN_PASSWORD in .env}
       DB_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:?Set FRAPPE_HR_DB_ROOT_PASSWORD in .env}
     volumes:
@@ -384,7 +384,7 @@ services:
       - nginx-entrypoint.sh
     environment:
       BACKEND: frappe-hrms-backend:8000
-      FRAPPE_SITE_NAME_HEADER: ${FRAPPE_HR_SITE_NAME:-hrm.tuyendung.square.vn}
+      FRAPPE_SITE_NAME_HEADER: ${FRAPPE_HR_SITE_NAME:-hrm.infohr.vn}
       SOCKETIO: frappe-hrms-websocket:9000
       UPSTREAM_REAL_IP_ADDRESS: 127.0.0.1
       UPSTREAM_REAL_IP_HEADER: X-Forwarded-For
@@ -406,7 +406,6 @@ services:
       proxy-net:
         aliases:
           - frappe-hrms
-          - hrm.tuyendung.square.vn
       app-net:
         aliases:
           - frappe-hrms-frontend
@@ -694,7 +693,6 @@ services:
         aliases:
           - minio
           - minio-s3
-          - s3.tuyendung.square.vn
       app-net:
         aliases:
           - minio

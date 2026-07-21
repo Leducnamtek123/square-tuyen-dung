@@ -318,25 +318,25 @@
   "seo": {
     "home": {
       "title": "Fast job search, effective recruitment",
-      "description": "Square - Vietnam's leading recruitment platform. Search thousands of matching jobs, apply quickly, and connect with trusted employers.",
-      "keywords": "job search, recruitment, jobs, apply, employers, Square",
-      "appName": "Square Recruitment",
+      "description": "InfoHR - Vietnam's leading recruitment platform. Search thousands of matching jobs, apply quickly, and connect with trusted employers.",
+      "keywords": "job search, recruitment, jobs, apply, employers, InfoHR",
+      "appName": "InfoHR Recruitment",
       "appDescription": "A leading online recruitment platform in Vietnam"
     },
     "jobsByCareer": {
-      "description": "Explore jobs by industry at Square. Choose the industry you love and find a suitable job today.",
+      "description": "Explore jobs by industry at InfoHR. Choose the industry you love and find a suitable job today.",
       "keywords": "jobs by industry, IT jobs, accounting jobs, marketing jobs, recruitment"
     },
     "jobsByJobType": {
-      "description": "Search jobs by type: full-time, part-time, internship, contract. Many quality job opportunities at Square.",
+      "description": "Search jobs by type: full-time, part-time, internship, contract. Many quality job opportunities at InfoHR.",
       "keywords": "full-time jobs, part-time jobs, internship, contract, remote"
     },
     "jobsByCity": {
-      "description": "Search jobs by city and province across the country at Square. Jobs in Hanoi, Ho Chi Minh City, and other provinces.",
+      "description": "Search jobs by city and province across the country at InfoHR. Jobs in Hanoi, Ho Chi Minh City, and other provinces.",
       "keywords": "jobs in Hanoi, jobs in Ho Chi Minh City, jobs by city, local recruitment"
     },
     "jobList": {
-      "description": "Search thousands of the latest jobs at Square. Filter by industry, salary, and location. Apply quickly and easily.",
+      "description": "Search thousands of the latest jobs at InfoHR. Filter by industry, salary, and location. Apply quickly and easily.",
       "keywords": "job search, latest jobs, recruitment, online application, good jobs"
     },
     "jobDetail": {
@@ -350,7 +350,7 @@
       }
     },
     "companySearch": {
-      "description": "Discover hundreds of leading employers at Square. Learn about company culture, see open roles, and apply now.",
+      "description": "Discover hundreds of leading employers at InfoHR. Learn about company culture, see open roles, and apply now.",
       "keywords": "recruiting companies, reputable employers, hiring businesses, company profiles"
     },
     "companyDetail": {
@@ -364,11 +364,11 @@
     },
     "newsList": {
       "title": "News & Recruitment Blog",
-      "description": "Stay up to date with recruitment trends, application tips, and company insights on Square.",
+      "description": "Stay up to date with recruitment trends, application tips, and company insights on InfoHR.",
       "keywords": "recruitment news, recruitment blog, job search tips, hiring trends"
     },
     "articleDetail": {
-      "description": "Detailed article on Square Recruitment.",
+      "description": "Detailed article on InfoHR Recruitment.",
       "breadcrumb": {
         "home": "Home"
       }
@@ -377,11 +377,11 @@
   "static": {
     "contact": {
       "title": "Bug reports & contact",
-      "subtitle": "Report an issue, share feedback, or reach the Square support team.",
+      "subtitle": "Report an issue, share feedback, or reach the InfoHR support team.",
       "sections": [
         {
           "title": "Support email",
-          "body": "For account, job post, verification, or interview issues, contact support@square.vn."
+          "body": "For account, job post, verification, or interview issues, contact support@InfoHR.vn."
         },
         {
           "title": "Business hours",
@@ -432,7 +432,7 @@
     },
     "terms": {
       "title": "Terms of Service",
-      "subtitle": "Baseline terms for using Square recruitment services.",
+      "subtitle": "Baseline terms for using InfoHR recruitment services.",
       "sections": [
         {
           "title": "Account responsibility",
@@ -444,17 +444,17 @@
         },
         {
           "title": "Platform operations",
-          "body": "Square may moderate content, suspend abusive activity, and adjust service availability to protect users."
+          "body": "InfoHR may moderate content, suspend abusive activity, and adjust service availability to protect users."
         }
       ]
     },
     "privacy": {
       "title": "Privacy Policy",
-      "subtitle": "How Square handles recruitment data.",
+      "subtitle": "How InfoHR handles recruitment data.",
       "sections": [
         {
           "title": "Data collected",
-          "body": "Square stores account data, profile data, company data, applications, saved profiles, and interview records needed to operate recruitment workflows."
+          "body": "InfoHR stores account data, profile data, company data, applications, saved profiles, and interview records needed to operate recruitment workflows."
         },
         {
           "title": "Data use",
@@ -468,3 +468,4 @@
     }
   }
 }
+

@@ -85,8 +85,8 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
         borderRadius: isHero ? 1.5 : 3.5,
         p: isHero ? 1 : { xs: 1.25, sm: 1.5, md: 2 },
         backgroundColor: isHero ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.72)',
-        border: isHero ? '1px solid rgba(255,255,255,0.32)' : '1px solid rgba(26, 64, 125, 0.1)',
-        boxShadow: isHero ? '0 26px 58px rgba(3, 18, 38, 0.28)' : 'inset 0 1px 0 rgba(255,255,255,0.8)',
+        border: isHero ? '1px solid rgba(15, 23, 42, 0.12)' : '1px solid rgba(226, 232, 240, 0.95)',
+        boxShadow: isHero ? '0 26px 58px rgba(15, 23, 42, 0.18)' : 'inset 0 1px 0 rgba(255,255,255,0.8)',
         backdropFilter: isHero ? 'blur(12px)' : 'blur(14px)',
       }}
     >
@@ -150,20 +150,20 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
               startIcon={<SearchIcon />}
               fullWidth
               sx={{
-                minHeight: 56,
-                borderRadius: 1,
-                bgcolor: '#043068',
-                px: 3,
-                fontWeight: 800,
-                fontSize: 14,
-                textTransform: 'none',
-                boxShadow: '0 14px 30px rgba(4, 48, 104, 0.28)',
-                '&:hover': {
-                  bgcolor: '#0058be',
-                  boxShadow: '0 16px 34px rgba(0, 88, 190, 0.28)',
-                },
-              }}
-            >
+              minHeight: 56,
+              borderRadius: 1,
+              bgcolor: '#0f172a',
+              px: 3,
+              fontWeight: 800,
+              fontSize: 14,
+              textTransform: 'none',
+              boxShadow: '0 14px 30px rgba(15, 23, 42, 0.18)',
+              '&:hover': {
+                bgcolor: '#111827',
+                boxShadow: '0 16px 34px rgba(15, 23, 42, 0.22)',
+              },
+            }}
+          >
               {t('common:search.button')}
             </Button>
           </Grid>

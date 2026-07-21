@@ -256,6 +256,7 @@ export const ROUTES = {
     ARTICLES: 'admin/articles',
     ARTICLE_CREATE: 'admin/articles/create',
     ARTICLE_DETAIL: 'admin/articles/:id',
+    PROFILE_DETAIL: 'admin/profiles/:id',
     INTERVIEW_PREVIEW: 'admin/interview-preview',
   },
 } as const;
@@ -373,6 +374,10 @@ export function generateRewrites(): RewriteRule[] {
     ['/quan-tri/quan-ly-phuong-xa', '/admin/wards'],
     ['/quan-tri/quan-ly-cong-ty', '/admin/companies'],
     ['/quan-tri/quan-ly-ho-so-ung-vien', '/admin/profiles'],
+    ['/quan-tri/quan-ly-ho-so-ung-vien/:id', '/admin/profiles/:id'],
+    ['/quan-tri/quan-tri/quan-ly-ho-so-ung-vien', '/admin/profiles'],
+    ['/quan-tri/quan-tri/quan-ly-ho-so-ung-vien/:id', '/admin/profiles/:id'],
+    ['/profiles/:id', '/admin/profiles/:id'],
     ['/quan-tri/quan-ly-cv-resume', '/admin/resumes'],
     ['/quan-tri/nhat-ky-tin-tuyen-dung', '/admin/job-activity'],
     ['/quan-tri/thong-bao-viec-lam', '/admin/job-notifications'],

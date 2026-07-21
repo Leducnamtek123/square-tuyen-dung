@@ -93,7 +93,7 @@ describe('getBannerFormValidationErrors', () => {
     expect(
       getBannerFormValidationErrors({
         ...baseFormData,
-        button_link: 'https://tuyendung.square.vn/jobs',
+      button_link: 'https://infohr.vn/jobs',
       }),
     ).toEqual({});
   });

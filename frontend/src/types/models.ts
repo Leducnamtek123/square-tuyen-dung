@@ -288,6 +288,12 @@ export interface Resume {
   fileUrl?: string | null;
   city?: City | null;
   career?: Career | null;
+  sourcePlatform?: string | null;
+  sourceUrl?: string | null;
+  sourceAccount?: string | null;
+  sourceRef?: string | null;
+  sourcePayload?: Record<string, unknown> | null;
+  isImported?: boolean;
   createAt?: string;
   updateAt?: string;
   isSaved?: boolean;

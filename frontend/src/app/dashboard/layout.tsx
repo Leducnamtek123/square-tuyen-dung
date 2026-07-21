@@ -4,8 +4,8 @@ import JobSeekerLayout from '@/layouts/JobSeekerLayout';
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Square Tuyển Dụng',
-    default: 'Trang cá nhân | Square Tuyển Dụng',
+    template: '%s | InfoHR Tuyá»ƒn Dá»¥ng',
+    default: 'Trang cÃ¡ nhÃ¢n | InfoHR Tuyá»ƒn Dá»¥ng',
   },
 };
 
@@ -16,3 +16,4 @@ export default function DashboardSectionLayout({
 }) {
   return <JobSeekerLayout>{children}</JobSeekerLayout>;
 }
+

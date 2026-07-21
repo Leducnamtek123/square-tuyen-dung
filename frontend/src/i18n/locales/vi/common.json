@@ -881,7 +881,7 @@
   "maintenanceMode": {
     "badge": "Đang bảo trì",
     "title": "Hệ thống đang bảo trì",
-    "message": "Square Tuyển Dụng đang nâng cấp hệ thống để phục vụ bạn tốt hơn. Vui lòng quay lại sau ít phút.",
+    "message": "InfoHR Tuyển Dụng đang nâng cấp hệ thống để phục vụ bạn tốt hơn. Vui lòng quay lại sau ít phút.",
     "reload": "Tải lại trang",
     "retryHint": "Bạn có thể thử lại sau ít phút.",
     "statusCode": "Mã trạng thái"
@@ -937,8 +937,8 @@
       "readError": "Không thể đọc ảnh này. Vui lòng thử ảnh khác."
     },
     "portals": {
-      "admin": "Square Admin",
-      "employer": "Square Employer"
+      "admin": "InfoHR Admin",
+      "employer": "InfoHR Employer"
     },
     "threadGroups": {
       "today": "Hôm nay",

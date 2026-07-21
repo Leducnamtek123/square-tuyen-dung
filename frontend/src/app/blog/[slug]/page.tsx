@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: 'article',
       url: `/blog/${slug}`,
-      siteName: 'Square Tuyển Dụng',
+      siteName: 'InfoHR Tuyển Dụng',
       locale: 'vi_VN',
       ...(article.thumbnailUrl && {
         images: [{ url: article.thumbnailUrl }],

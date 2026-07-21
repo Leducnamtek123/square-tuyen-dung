@@ -77,6 +77,13 @@ class Resume(CommonBaseModel):
 
     type = models.CharField(max_length=10, default=var_sys.CV_UPLOAD)
 
+    source_platform = models.CharField(max_length=50, blank=True, null=True, db_index=True)
+    source_url = models.URLField(blank=True, null=True)
+    source_account = models.CharField(max_length=255, blank=True, null=True)
+    source_ref = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    source_payload = models.JSONField(blank=True, null=True)
+    is_imported = models.BooleanField(default=False, db_index=True)
+
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, related_name="resumes")
 
     career = models.ForeignKey(Career, on_delete=models.SET_NULL, null=True, related_name="resumes")
@@ -152,6 +159,58 @@ class EmployerCandidateProfile(CommonBaseModel):
 
     def __str__(self):
         return f"{self.full_name} - {self.company}"
+
+class ResumeImportJob(CommonBaseModel):
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        PROCESSING = "processing", "Processing"
+        COMPLETED = "completed", "Completed"
+        FAILED = "failed", "Failed"
+
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING, db_index=True)
+    progress = models.PositiveSmallIntegerField(default=0)
+    source_url = models.URLField()
+    source_account = models.CharField(max_length=255)
+    occupation_ids = models.JSONField(default=list, blank=True)
+    target_city = models.ForeignKey(
+        City,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vieclam24h_import_jobs",
+    )
+    target_district = models.ForeignKey(
+        "locations.District",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vieclam24h_import_jobs",
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vieclam24h_import_jobs",
+    )
+    created_count = models.PositiveIntegerField(default=0)
+    updated_count = models.PositiveIntegerField(default=0)
+    skipped_count = models.PositiveIntegerField(default=0)
+    error_message = models.TextField(blank=True, default="")
+    source_payload = models.JSONField(blank=True, null=True)
+    result_payload = models.JSONField(blank=True, null=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
+    task_id = models.CharField(max_length=255, blank=True, default="")
+
+    class Meta:
+        db_table = "project_info_resume_import_job"
+        indexes = [
+            models.Index(fields=["status", "-create_at"], name="idx_resimp_status_ctd"),
+        ]
+
+    def __str__(self):
+        return f"Vieclam24h import #{self.id} - {self.status}"
 
 class EducationDetail(CommonBaseModel):
     degree_name = models.CharField(max_length=200)

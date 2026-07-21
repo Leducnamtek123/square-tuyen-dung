@@ -50,7 +50,7 @@ describe('hrmService', () => {
     const provisionResult = { userId: 'hr@example.com', companyId: 'Square' };
     const integrationStatus = {
       enabled: true,
-      baseUrl: 'https://hrm.square.vn',
+    baseUrl: 'https://hrm.infohr.vn',
       siteName: 'Square HRM',
     };
 

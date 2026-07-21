@@ -41,6 +41,18 @@ describe('adminManagementService list response normalization', () => {
     expect(result).toEqual({ count: 1, results: [activity] });
   });
 
+  it('passes resume profile filters through to the admin resumes endpoint', async () => {
+    const resume = { id: 77, title: 'Frontend CV' };
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({ count: 1, results: [resume] });
+
+    const result = await adminManagementService.getResumes({ jobSeekerProfileId: 160 });
+
+    expect(httpRequest.get).toHaveBeenCalledWith('info/web/admin/resumes/', {
+      params: { jobSeekerProfileId: 160 },
+    });
+    expect(result).toEqual({ count: 1, results: [resume] });
+  });
+
   it('unwraps nested admin company detail and mutation responses after presign', async () => {
     const company = { id: 42, companyName: 'Square Group HR' };
     const createdCompany = { id: 43, companyName: 'Square New' };
@@ -102,5 +114,38 @@ describe('adminManagementService list response normalization', () => {
     await expect(adminManagementService.createJobNotification({ jobName: 'Frontend Developer', frequency: 1 })).resolves.toEqual(notification);
     await expect(adminManagementService.createQuestionGroup({ name: 'Screening' })).resolves.toEqual(questionGroup);
     await expect(adminManagementService.createQuestion({ text: 'Tell me about React' })).resolves.toEqual(question);
+  });
+
+  it('uses an extended timeout for Vieclam24h imports', async () => {
+    (httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: { createdCount: 1, updatedCount: 0, skippedCount: 0 } } });
+
+    await adminManagementService.importVieclam24hCandidates({
+      sourceUrl: 'https://ntd.vieclam24h.vn/employer/search/seeker',
+      account: 'hr@example.com',
+      password: 'secret',
+      occupationIds: [31, 13],
+    });
+
+    expect(httpRequest.post).toHaveBeenCalledWith(
+      'info/web/admin/resumes/import-vieclam24h/',
+      {
+        sourceUrl: 'https://ntd.vieclam24h.vn/employer/search/seeker',
+        account: 'hr@example.com',
+        password: 'secret',
+        occupationIds: [31, 13],
+      },
+      { timeout: 180000 }
+    );
+  });
+
+  it('calls the bulk delete profiles endpoint', async () => {
+    (httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: { deleted: 3 } } });
+
+    await expect(adminManagementService.bulkDeleteProfiles([201, 202, 203])).resolves.toEqual({ deleted: 3 });
+
+    expect(httpRequest.post).toHaveBeenCalledWith(
+      'info/web/admin/job-seeker-profiles/bulk-delete/',
+      { ids: [201, 202, 203] }
+    );
   });
 });

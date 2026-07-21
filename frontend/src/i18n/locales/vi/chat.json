@@ -26,18 +26,18 @@
   "noAppliedJobs": "Bạn chưa ứng tuyển vị trí nào",
   "candidates": "ỨNG VIÊN ỨNG TUYỂN",
   "chatbot": {
-    "launcherAria": "Mở trợ lý Square AI",
-    "panelAria": "Trò chuyện với Square AI",
+    "launcherAria": "Mở trợ lý InfoHR AI",
+    "panelAria": "Trò chuyện với InfoHR AI",
     "closeAria": "Đóng chat",
     "status": "Đang sẵn sàng",
     "placeholder": "Nhập tin nhắn...",
     "greeting": {
-      "employer": "Chào bạn! Tôi là Square AI, trợ lý tuyển dụng của bạn. Tôi có thể giúp gì cho quý đối tác hôm nay? (Ví dụ: tìm ứng viên tiềm năng, soạn tin nhắn mời phỏng vấn...)",
-      "jobSeeker": "Chào bạn! Tôi là Square AI, trợ lý sự nghiệp của bạn. Bạn cần tìm việc làm hay tư vấn gì không?"
+      "employer": "Chào bạn! Tôi là InfoHR AI, trợ lý tuyển dụng của bạn. Tôi có thể giúp gì cho quý đối tác hôm nay? (Ví dụ: tìm ứng viên tiềm năng, soạn tin nhắn mời phỏng vấn...)",
+      "jobSeeker": "Chào bạn! Tôi là InfoHR AI, trợ lý sự nghiệp của bạn. Bạn cần tìm việc làm hay tư vấn gì không?"
     },
     "systemPrompt": {
-      "employer": "Bạn là Square AI, trợ lý AI thông minh dành cho nhà tuyển dụng trên nền tảng Square-Tuyen-Dung. Bạn am hiểu về thị trường lao động, cách viết JD, và quy trình phỏng vấn chuyên nghiệp.",
-      "jobSeeker": "Bạn là Square AI, trợ lý AI thông minh dành cho người tìm việc trên nền tảng Square-Tuyen-Dung. Bạn giúp họ tìm việc, tư vấn sửa CV và chuẩn bị phỏng vấn."
+      "employer": "Bạn là InfoHR AI, trợ lý AI thông minh dành cho nhà tuyển dụng trên nền tảng InfoHR-Tuyen-Dung. Bạn am hiểu về thị trường lao động, cách viết JD, và quy trình phỏng vấn chuyên nghiệp.",
+      "jobSeeker": "Bạn là InfoHR AI, trợ lý AI thông minh dành cho người tìm việc trên nền tảng InfoHR-Tuyen-Dung. Bạn giúp họ tìm việc, tư vấn sửa CV và chuẩn bị phỏng vấn."
     },
     "error": {
       "apology": "Xin lỗi, tôi gặp chút trục trặc khi xử lý câu hỏi này.",

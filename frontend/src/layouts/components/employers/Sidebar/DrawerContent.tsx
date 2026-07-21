@@ -58,7 +58,7 @@ const DrawerContent = ({ isAdmin, liveInterviewCount = 0 }: { isAdmin?: boolean;
             component="img"
             src={IMAGES.getTextLogo(theme.palette.mode === 'light' ? 'dark' : 'light')}
             sx={{ display: 'block', height: { xs: 36, sm: 40 }, width: 'auto', maxWidth: '100%', objectFit: 'contain' }}
-            alt="Square"
+            alt="InfoHR"
           />
         </Box>
       </Toolbar>

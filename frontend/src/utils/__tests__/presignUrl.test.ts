@@ -45,6 +45,20 @@ describe('presignUrl utility', () => {
       expect(result).toBe('http://localhost/minio/bucket/file.jpg?X-Amz-Signature=123');
     });
 
+    it('sets a timeout on the presign request', async () => {
+      (axios.get as jest.Mock).mockResolvedValueOnce({
+        data: { data: { url: 'http://localhost/minio/bucket/file.jpg?X-Amz-Signature=123' } }
+      });
+
+      const url = 'http://localhost/minio/bucket/file.jpg';
+      await ensurePresignedUrl(url);
+
+      expect(axios.get).toHaveBeenCalledWith('/api/common/presign/', expect.objectContaining({
+        params: { url },
+        timeout: 10000,
+      }));
+    });
+
     it('returns original url if presign api fails', async () => {
       (axios.get as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
       

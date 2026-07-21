@@ -19,10 +19,11 @@ const isDockerRuntime = existsSync('/.dockerenv');
 const explicitApiProxyOrigin = stripApiSuffix(process.env.API_PROXY_ORIGIN || '');
 const backendApiOrigin = stripApiSuffix(process.env.BACKEND_API_URL || '');
 const backendApiUsesDockerHost = /^https?:\/\/backend(?::|\/|$)/.test(backendApiOrigin);
+const dockerHostApiProxyOrigin = `http://host.docker.internal:${process.env.NGINX_PORT || '8080'}`;
 const apiProxyOrigin =
   explicitApiProxyOrigin ||
-  (backendApiOrigin && (!backendApiUsesDockerHost || isDockerRuntime) ? backendApiOrigin : '') ||
-  `http://localhost:${process.env.NGINX_PORT || '8080'}`;
+  (backendApiOrigin && (!backendApiUsesDockerHost || !isDockerRuntime) ? backendApiOrigin : '') ||
+  (isDockerRuntime ? dockerHostApiProxyOrigin : `http://localhost:${process.env.NGINX_PORT || '8080'}`);
 
 const nextConfig = {
   reactStrictMode: true,
@@ -162,6 +163,10 @@ const nextConfig = {
       { source: '/quan-tri/quan-ly-phuong-xa', destination: '/admin/wards' },
       { source: '/quan-tri/quan-ly-cong-ty', destination: '/admin/companies' },
       { source: '/quan-tri/quan-ly-ho-so-ung-vien', destination: '/admin/profiles' },
+      { source: '/quan-tri/quan-ly-ho-so-ung-vien/:id', destination: '/admin/profiles/:id' },
+      { source: '/quan-tri/quan-tri/quan-ly-ho-so-ung-vien', destination: '/admin/profiles' },
+      { source: '/quan-tri/quan-tri/quan-ly-ho-so-ung-vien/:id', destination: '/admin/profiles/:id' },
+      { source: '/profiles/:id', destination: '/admin/profiles/:id' },
       { source: '/quan-tri/quan-ly-cv-resume', destination: '/admin/resumes' },
       { source: '/quan-tri/nhat-ky-tin-tuyen-dung', destination: '/admin/job-activity' },
       { source: '/quan-tri/thong-bao-viec-lam', destination: '/admin/job-notifications' },
@@ -186,10 +191,10 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: 's3.tuyendung.square.vn' },
+      { protocol: 'https', hostname: 's3.infohr.vn' },
       { protocol: 'http', hostname: 'minio' },
       { protocol: 'http', hostname: 'localhost', port: '9000' },
-      { protocol: 'https', hostname: 'tuyendung.square.vn' },
+      { protocol: 'https', hostname: 'infohr.vn' },
       { protocol: 'https', hostname: '*.firebasestorage.app' },
       { protocol: 'https', hostname: 'firebasestorage.googleapis.com' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },

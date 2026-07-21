@@ -1,6 +1,8 @@
 import axios from 'axios';
 import tokenService from '../services/tokenService';
 
+const PRESIGN_REQUEST_TIMEOUT_MS = 10_000;
+
 const isPresigned = (url: string | null | undefined): boolean => {
   if (!url || typeof url !== 'string') return false;
   return url.includes('X-Amz-Signature=') || url.includes('X-Amz-Algorithm=');
@@ -46,6 +48,7 @@ const requestPresign = async (url: string): Promise<string | null> => {
     params: { url },
     headers,
     withCredentials: true,
+    timeout: PRESIGN_REQUEST_TIMEOUT_MS,
   });
   const data = unwrapResponse(response) as { url?: string } | null;
   return data?.url || null;

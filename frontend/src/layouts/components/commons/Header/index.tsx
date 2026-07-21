@@ -51,7 +51,8 @@ const Header = (_props: HeaderProps) => {
       { id: '2', label: t('nav.services'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SERVICE}`, i18n.language) },
       { id: '3', label: t('nav.pricing'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language) },
       { id: '4', label: t('nav.support'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SUPPORT}`, i18n.language) },
-      { id: '5', label: t('nav.blog'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.BLOG}`, i18n.language) },
+      // Public readers should land on the public blog, not the protected employer editor.
+      { id: '5', label: t('nav.blog'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language) },
     ],
   }), [t, i18n.language]);
 
@@ -139,8 +140,11 @@ const Header = (_props: HeaderProps) => {
         position="sticky"
         id="common-header"
         sx={{
-          boxShadow: '0 2px 20px rgba(15, 57, 127, 0.35)',
-          background: 'linear-gradient(135deg, #1e6bb8 0%, #1a407d 45%, #0f2d5e 100%)',
+          boxShadow: '0 2px 18px rgba(15, 23, 42, 0.08)',
+          background: 'rgba(255, 255, 255, 0.92)',
+          color: '#1f2937',
+          backdropFilter: 'blur(14px)',
+          borderBottom: '1px solid rgba(226, 232, 240, 0.9)',
         }}
       >
 
@@ -175,7 +179,7 @@ const Header = (_props: HeaderProps) => {
               <Box
                 component="img"
                 src={IMAGES.getTextLogo("light")}
-                alt="Square Logo"
+                alt="InfoHR Logo"
                 sx={{
                   height: { xs: 28, md: 34 },
                   width: 'auto',
@@ -193,7 +197,7 @@ const Header = (_props: HeaderProps) => {
               variant="middle"
               sx={{
                 mx: 1.5,
-                borderColor: "rgba(255,255,255,0.3)",
+                borderColor: 'rgba(226, 232, 240, 0.9)',
                 display: { xs: "none", md: "flex" },
               }}
             />

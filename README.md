@@ -122,11 +122,11 @@ npm run start
 
 | Portal | URL (Production) | Mô tả |
 |--------|-------------------|--------|
-| Job Seeker | `https://tuyendung.square.vn` | Tìm việc, nộp CV, phỏng vấn AI |
-| Employer | `https://tuyendung.square.vn/employer/` | Đăng tin, quản lý ứng viên |
-| Admin | `https://tuyendung.square.vn/admin/` | Quản trị hệ thống |
-| API Docs | `https://tuyendung.square.vn/swagger/` | Swagger UI |
-| MinIO Console | `https://tuyendung.square.vn/minio-console/` | Object storage UI |
+| Job Seeker | `https://infohr.vn` | Tìm việc, nộp CV, phỏng vấn AI |
+| Employer | `https://infohr.vn/employer/` | Đăng tin, quản lý ứng viên |
+| Admin | `https://infohr.vn/admin/` | Quản trị hệ thống |
+| API Docs | `https://infohr.vn/swagger/` | Swagger UI |
+| MinIO Console | `https://infohr.vn/minio-console/` | Object storage UI |
 
 ## CI/CD
 

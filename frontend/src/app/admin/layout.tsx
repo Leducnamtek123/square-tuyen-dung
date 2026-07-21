@@ -4,8 +4,8 @@ import AdminSectionClient from './AdminSectionClient';
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Square Admin',
-    default: 'Quản trị | Square Admin',
+    template: '%s | InfoHR Admin',
+    default: 'Quáº£n trá»‹ | InfoHR Admin',
   },
 };
 
@@ -16,3 +16,4 @@ export default function AdminSectionLayout({
 }) {
   return <AdminSectionClient>{children}</AdminSectionClient>;
 }
+

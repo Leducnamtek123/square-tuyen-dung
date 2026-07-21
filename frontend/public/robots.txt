@@ -1,4 +1,4 @@
-# robots.txt - Square Tuyển Dụng
+# robots.txt - InfoHR Tuyển Dụng
 # https://www.robotstxt.org/robotstxt.html
 
 User-agent: *

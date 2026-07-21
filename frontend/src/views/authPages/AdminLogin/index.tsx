@@ -38,7 +38,7 @@ const Card = styled(Box)(() => ({
   minHeight: 560,
   borderRadius: 20,
   overflow: 'hidden',
-  boxShadow: '0 24px 64px rgba(0,0,0,.35)',
+  boxShadow: '0 24px 64px rgba(15, 23, 42, .16)',
 }));
 
 const LeftPanel = styled(Box)(({ theme }) => ({
@@ -47,7 +47,7 @@ const LeftPanel = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   justifyContent: 'center',
   padding: theme.spacing(5, 5),
-  background: '#fff',
+  background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
   [theme.breakpoints.down('md')]: {
     flex: '1 1 100%',
     padding: theme.spacing(4, 3),
@@ -74,7 +74,7 @@ const SlideImage = styled('img')({
 const SlideOverlay = styled(Box)({
   position: 'absolute',
   inset: 0,
-  background: 'linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,.65) 100%)',
+  background: 'linear-gradient(180deg, rgba(15,23,42,0.06) 10%, rgba(15,23,42,.62) 100%)',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-end',
@@ -87,7 +87,7 @@ const Dot = styled('button')<{ active: boolean }>(({ active }) => ({
   height: 8,
   border: 'none',
   borderRadius: 4,
-  background: active ? '#fff' : 'rgba(255,255,255,.45)',
+  background: active ? '#0f172a' : 'rgba(255,255,255,.45)',
   cursor: 'pointer',
   padding: 0,
 }));
@@ -222,8 +222,8 @@ const AdminLogin: React.FC = () => {
         <LeftPanel>
           <Box sx={{ mb: 1 }}>
             <Image
-              src="/square-icons/logo square svg-black.svg"
-              alt="Square Logo"
+              src="/infohr-icons/logo-brand.png"
+              alt="InfoHR Logo"
               width={160}
               height={42}
             />
@@ -232,8 +232,8 @@ const AdminLogin: React.FC = () => {
           <Typography
             variant="h5"
             sx={{
-              fontWeight: 700,
-              color: '#1a73e8',
+              fontWeight: 800,
+              color: '#0f172a',
               mb: 0.5,
               letterSpacing: '-.3px',
             }}
@@ -264,7 +264,7 @@ const AdminLogin: React.FC = () => {
             sx={{ mt: 4, textAlign: 'center', color: 'text.disabled' }}
           >
             {t('auth:login.visitPage')}&nbsp;
-            <Link href="https://square.vn" target="_blank" rel="noopener noreferrer" sx={{ color: '#1a73e8' }}>{t('common:auto.index_wwwsquarevn_9a21', `www.square.vn`)}</Link>
+            <Link href="https://sqstudio.vn" target="_blank" rel="noopener noreferrer" sx={{ color: '#0f172a' }}>{t('common:auto.index_wwwsquarevn_9a21', `www.infohr.vn`)}</Link>
           </Typography>
         </LeftPanel>
 
@@ -299,7 +299,7 @@ const AdminLogin: React.FC = () => {
             <Typography
               variant="body2"
               sx={{
-                color: 'rgba(255,255,255,.85)',
+                color: 'rgba(255,255,255,.86)',
                 mb: 3,
                 lineHeight: 1.6,
                 textShadow: '0 1px 4px rgba(0,0,0,.3)',

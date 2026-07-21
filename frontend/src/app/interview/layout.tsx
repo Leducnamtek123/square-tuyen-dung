@@ -12,7 +12,7 @@ import './livekit.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Interview Room | Square Tuyển Dụng',
+  title: 'Interview Room | InfoHR Tuyá»ƒn Dá»¥ng',
   description: 'Join your online interview session.',
 };
 
@@ -24,3 +24,4 @@ export default function InterviewLayout({
   // data-lk-theme is required for @livekit/components-styles selectors to apply
   return <div data-lk-theme="default" style={{ minHeight: '100svh' }}>{children}</div>;
 }
+

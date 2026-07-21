@@ -104,7 +104,7 @@ function WaitingStep({ onNext }: { onNext: () => void }) {
           <div className="relative z-10 flex h-[96px] w-[240px] max-w-[70vw] items-center justify-center opacity-90 transition-opacity group-hover:opacity-100 md:h-[120px] md:w-[320px]">
             <Image
               src={IMAGES.getTextLogo('light')}
-              alt="Square"
+              alt="InfoHR"
               width={320}
               height={107}
               style={{ width: '100%', height: 'auto', objectFit: 'contain' }}

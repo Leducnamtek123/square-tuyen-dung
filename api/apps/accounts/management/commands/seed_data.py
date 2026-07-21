@@ -123,6 +123,11 @@ class Command(BaseCommand):
                 }
             )
 
+            seed_demo_candidates = os.getenv('SEED_DEMO_CANDIDATES', '').strip().lower() in {'1', 'true', 'yes', 'on'}
+            if not seed_demo_candidates:
+                self.stdout.write(self.style.SUCCESS('Core company seed completed. Demo candidate seeding is skipped by default.'))
+                return
+
             # Data for 10 seeds with role-specific questions
             seeds_data = [
                 {

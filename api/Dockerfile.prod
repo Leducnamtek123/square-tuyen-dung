@@ -1,7 +1,7 @@
 # =============================================================================
 # api/Dockerfile.prod — Production (optimized)
 # =============================================================================
-FROM public.ecr.aws/docker/library/python:3.11-slim
+FROM mcr.microsoft.com/playwright/python:v1.49.1-jammy
 
 # Prevent .pyc files and enable unbuffered output
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -10,14 +10,10 @@ ENV PYTHONUNBUFFERED=1
 # Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        build-essential libssl-dev libffi-dev \
+        build-essential python3-dev libssl-dev libffi-dev \
         libopenblas-dev default-libmysqlclient-dev \
         pkg-config curl netcat-traditional openssh-client && \
     rm -rf /var/lib/apt/lists/*
-
-# Create non-root user
-RUN groupadd --gid 1000 appuser \
-    && useradd --uid 1000 --gid appuser --create-home appuser
 
 WORKDIR /app
 
@@ -32,11 +28,11 @@ COPY . .
 # Ensure STATIC_ROOT exists to avoid WhiteNoise warnings
 RUN mkdir -p /app/staticfiles
 
-# Ownership for non-root user
-RUN chown -R appuser:appuser /app
+# Ownership for the preconfigured non-root user in the Playwright base image
+RUN chown -R pwuser:pwuser /app
 
 # Switch to non-root user
-USER appuser
+USER pwuser
 
 EXPOSE 8000
 

@@ -61,6 +61,8 @@ web_router.register(r'admin/job-seeker-profiles', web_views.AdminJobSeekerProfil
 
 web_router.register(r'admin/resumes', web_views.AdminResumeViewSet, basename='admin-resumes')
 
+web_router.register(r'admin/resume-import-jobs', web_views.ResumeImportJobViewSet, basename='admin-resume-import-jobs')
+
 web_router.register(r'admin/company-verifications', web_views.AdminCompanyVerificationViewSet, basename='admin-company-verifications')
 
 web_router.register(r'admin/trust-reports', web_views.AdminTrustReportViewSet, basename='admin-trust-reports')

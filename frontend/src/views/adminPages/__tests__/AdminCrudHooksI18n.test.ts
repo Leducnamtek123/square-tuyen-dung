@@ -112,13 +112,14 @@ const cases = [
   {
     file: '../ProfilesPage/hooks/useProfiles.ts',
     namespace: 'profiles',
+    toastKeys: ['addSuccess', 'addError', 'updateSuccess', 'updateError', 'deleteSuccess', 'deleteError', 'importSuccess', 'importError'],
     hardCoded: [
       'Candidate profile added successfully',
-      'An error occurred while adding the candidate profile',
+      'Could not add candidate profile',
       'Profile updated',
-      'Error updating profile',
+      'Could not update profile',
       'Profile deleted',
-      'Error deleting profile',
+      'Could not delete profile',
     ],
   },
   {

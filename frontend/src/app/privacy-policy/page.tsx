@@ -3,7 +3,7 @@ import StaticInfoPage from '@/views/defaultPages/StaticInfoPage';
 
 export const metadata = {
   title: 'Privacy Policy',
-  description: 'Square recruitment privacy policy.',
+  description: 'InfoHR recruitment privacy policy.',
 };
 
 export default function Page() {
@@ -13,3 +13,4 @@ export default function Page() {
     </DefaultLayout>
   );
 }
+

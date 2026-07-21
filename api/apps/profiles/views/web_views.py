@@ -113,6 +113,7 @@ from .web_admin import (
     AdminCompanyViewSet,
     AdminJobSeekerProfileViewSet,
     AdminResumeViewSet,
+    ResumeImportJobViewSet,
 )
 
 class JobSeekerProfileViewSet(viewsets.ViewSet,

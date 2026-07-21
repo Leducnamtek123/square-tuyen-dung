@@ -1,19 +1,19 @@
 {
-  "short_name": "Square",
-  "name": "Square Tuyển Dụng",
+  "short_name": "InfoHR",
+  "name": "InfoHR Tuyển Dụng",
   "description": "Nền tảng tuyển dụng hàng đầu Việt Nam - Tìm việc nhanh chóng, tuyển dụng hiệu quả",
   "lang": "vi",
   "icons": [
     {
-      "src": "/square-icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/infohr-icons/logo-brand.png",
+      "sizes": "581x159",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#1976d2",
+  "theme_color": "#0f172a",
   "background_color": "#ffffff",
   "categories": ["jobs", "recruitment", "career"],
   "scope": "/"
