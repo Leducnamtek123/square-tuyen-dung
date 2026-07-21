@@ -75,6 +75,11 @@ function reducer(state: SearchState, action: SearchAction): SearchState {
   }
 }
 
+import { useQuery } from '@tanstack/react-query';
+import commonService from '@/services/commonService';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+
 const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
@@ -93,6 +98,24 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
   const [state, dispatchSearch] = React.useReducer(reducer, initialState);
   const debounced = useDebounce(state.searchValue, 300);
   const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
+
+  const { data: popularKeywords = [] } = useQuery({
+    queryKey: ['popular-keywords-popup'],
+    queryFn: async () => {
+      const res = await commonService.getPopularKeywords();
+      return res || [];
+    },
+    staleTime: 5 * 60_000,
+  });
+
+  const { data: topCareers = [] } = useQuery({
+    queryKey: ['top-careers-popup'],
+    queryFn: async () => {
+      const res = await commonService.getTop10Careers();
+      return res || [];
+    },
+    staleTime: 5 * 60_000,
+  });
 
   React.useEffect(() => {
     try {
@@ -187,17 +210,17 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
           }}
         >
           <Box
-              sx={{
-                width: isHero ? 44 : 38,
-                height: isHero ? 56 : 38,
-                display: 'grid',
-                placeItems: 'center',
-                borderRadius: isHero ? 1 : '50%',
+            sx={{
+              width: isHero ? 44 : 38,
+              height: isHero ? 56 : 38,
+              display: 'grid',
+              placeItems: 'center',
+              borderRadius: isHero ? 1 : '50%',
               color: '#0f172a',
-                bgcolor: isHero ? 'transparent' : 'rgba(15, 23, 42, 0.06)',
-                flexShrink: 0,
-              }}
-            >
+              bgcolor: isHero ? 'transparent' : 'rgba(15, 23, 42, 0.06)',
+              flexShrink: 0,
+            }}
+          >
             <SearchIcon fontSize="small" />
           </Box>
           <ControllerAny
@@ -285,7 +308,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
           open={state.showResult}
           anchorEl={inputSearchRef.current}
           placement="bottom-start"
-          style={{ zIndex: 20, width: inputSearchRef.current?.offsetWidth }}
+          style={{ zIndex: 20, width: inputSearchRef.current?.offsetWidth || 360 }}
         >
           <Box
             sx={{
@@ -299,75 +322,134 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
               overflowY: 'auto',
             }}
           >
-            <Stack>
-              <Box>
-              <Typography fontWeight={800} fontSize={15} color="#0f172a">
-                  {t('search.suggestions')}
-                </Typography>
-                <Stack>
+            <Stack spacing={2}>
+              {/* ── Active Search Results when typing ─────────────────── */}
+              {state.searchValue.trim() !== '' ? (
+                <Box>
+                  <Typography fontWeight={800} fontSize={14} color="#0f172a" sx={{ mb: 1 }}>
+                    {t('search.suggestions', { defaultValue: 'Gợi ý tìm kiếm' })}
+                  </Typography>
                   {state.isLoading ? (
                     <Stack sx={{ py: 2 }} justifyContent="center" alignItems="center">
                       <CircularProgress size={20} />
                     </Stack>
                   ) : state.searchResult.length === 0 ? (
-                    <Typography my={1} textAlign="center" color="#bdbdbd" variant="caption">
-                      {t('search.noResults')}
+                    <Typography my={1.5} textAlign="center" color="#94a3b8" variant="body2">
+                      Không tìm thấy gợi ý phù hợp
                     </Typography>
                   ) : (
-                    <List>
+                    <List disablePadding>
                       {state.searchResult.map((value) => (
                         <ListItem
                           key={value}
                           sx={{
-                            '&:hover': {
-                              backgroundColor: 'rgba(15, 23, 42, 0.04)',
-                            },
+                            '&:hover': { backgroundColor: 'rgba(15, 23, 42, 0.04)' },
                             cursor: 'pointer',
                             borderRadius: 2,
-                            px: 1,
+                            px: 1.5,
+                            py: 1,
                           }}
                           onClick={() => handleClickItem(value)}
                         >
-                          <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
-                            <LightbulbOutlinedIcon sx={{ color: '#f59e0b' }} />
+                          <ListItemIcon sx={{ minWidth: 0, mr: 1.5 }}>
+                            <LightbulbOutlinedIcon sx={{ color: '#f59e0b', fontSize: 18 }} />
                           </ListItemIcon>
-                          <ListItemText primary={`${value}`} secondary={null} />
+                          <ListItemText primary={value} primaryTypographyProps={{ fontSize: '0.9rem', fontWeight: 600 }} />
                         </ListItem>
                       ))}
                     </List>
                   )}
-                </Stack>
-              </Box>
-
-              {state.recentSearch.length > 0 && (
-                <Box>
-                  <Typography fontWeight={800} fontSize={15} color="#0f172a">
-                    {t('search.recent')}
-                  </Typography>
-                  <Stack>
-                    <List>
-                      {state.recentSearch.map((value) => (
-                        <ListItem
-                          key={value}
-                          sx={{
-                            '&:hover': {
-                              backgroundColor: 'rgba(15, 23, 42, 0.04)',
-                            },
-                            cursor: 'pointer',
-                            borderRadius: 2,
-                            px: 1,
-                          }}
-                          onClick={() => handleClickItem(value)}
-                        >
-                          <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
-                            <QueryBuilderIcon sx={{ color: '#0f172a' }} />
-                          </ListItemIcon>
-                          <ListItemText primary={`${value}`} secondary={null} />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Stack>
                 </Box>
+              ) : (
+                /* ── Default Popup when Input is Empty ──────────────────── */
+                <>
+                  {/* 1. Từ khóa phổ biến */}
+                  {popularKeywords.length > 0 && (
+                    <Box>
+                      <Typography fontWeight={800} fontSize={13} color="#0f172a" sx={{ mb: 1, letterSpacing: '-0.01em' }}>
+                        Từ khóa phổ biến
+                      </Typography>
+                      <List disablePadding>
+                        {popularKeywords.slice(0, 5).map((item) => (
+                          <ListItem
+                            key={item.id}
+                            sx={{
+                              '&:hover': { backgroundColor: 'rgba(124, 58, 237, 0.06)' },
+                              cursor: 'pointer',
+                              borderRadius: 2,
+                              px: 1.25,
+                              py: 0.75,
+                            }}
+                            onClick={() => handleClickItem(item.kw || item.title)}
+                          >
+                            <ListItemIcon sx={{ minWidth: 0, mr: 1.5 }}>
+                              <TrendingUpIcon sx={{ color: '#7c3aed', fontSize: 18 }} />
+                            </ListItemIcon>
+                            <ListItemText primary={item.title} primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }} />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Box>
+                  )}
+
+                  {/* 2. Ngành nghề nổi bật */}
+                  {topCareers.length > 0 && (
+                    <Box>
+                      <Typography fontWeight={800} fontSize={13} color="#0f172a" sx={{ mb: 1, letterSpacing: '-0.01em' }}>
+                        Ngành nghề nổi bật
+                      </Typography>
+                      <List disablePadding>
+                        {topCareers.slice(0, 5).map((career) => (
+                          <ListItem
+                            key={career.id}
+                            sx={{
+                              '&:hover': { backgroundColor: 'rgba(37, 99, 235, 0.06)' },
+                              cursor: 'pointer',
+                              borderRadius: 2,
+                              px: 1.25,
+                              py: 0.75,
+                            }}
+                            onClick={() => handleClickItem(career.name)}
+                          >
+                            <ListItemIcon sx={{ minWidth: 0, mr: 1.5 }}>
+                              <WorkOutlineIcon sx={{ color: '#2563eb', fontSize: 18 }} />
+                            </ListItemIcon>
+                            <ListItemText primary={career.name} primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }} />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Box>
+                  )}
+
+                  {/* 3. Lịch sử tìm kiếm gần đây */}
+                  {state.recentSearch.length > 0 && (
+                    <Box>
+                      <Typography fontWeight={800} fontSize={13} color="#0f172a" sx={{ mb: 1, letterSpacing: '-0.01em' }}>
+                        {t('search.recent', { defaultValue: 'Tìm kiếm gần đây' })}
+                      </Typography>
+                      <List disablePadding>
+                        {state.recentSearch.map((value) => (
+                          <ListItem
+                            key={value}
+                            sx={{
+                              '&:hover': { backgroundColor: 'rgba(15, 23, 42, 0.04)' },
+                              cursor: 'pointer',
+                              borderRadius: 2,
+                              px: 1.25,
+                              py: 0.75,
+                            }}
+                            onClick={() => handleClickItem(value)}
+                          >
+                            <ListItemIcon sx={{ minWidth: 0, mr: 1.5 }}>
+                              <QueryBuilderIcon sx={{ color: '#64748b', fontSize: 18 }} />
+                            </ListItemIcon>
+                            <ListItemText primary={value} primaryTypographyProps={{ fontSize: '0.875rem', color: '#64748b' }} />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Box>
+                  )}
+                </>
               )}
             </Stack>
           </Box>

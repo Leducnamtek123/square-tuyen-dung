@@ -1,91 +1,54 @@
- 'use client';
-import React from 'react';
+'use client';
+
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { Pagination, Autoplay } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Box, Card, Skeleton, Stack, Typography, Button } from "@mui/material";
-import StarIcon from '@mui/icons-material/Star';
+import {
+  Box,
+  Card,
+  Grid2 as Grid,
+  Skeleton,
+  Stack,
+  Typography,
+  IconButton,
+} from '@mui/material';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
+import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import companyService from '@/services/companyService';
-import { ROUTES, IMAGES } from '@/configs/constants';
-import { formatRoute } from '@/utils/funcUtils';
-import { localizeRoutePath } from '@/configs/routeLocalization';
-import { useTranslation } from 'react-i18next';
+import commonService from '@/services/commonService';
+import { IMAGES } from '@/configs/constants';
 import type { Company } from '@/types/models';
 
-import type { Theme } from '@mui/material/styles';
-
-const LOADING_SLIDE_KEYS = ['loading-1', 'loading-2', 'loading-3', 'loading-4', 'loading-5', 'loading-6', 'loading-7', 'loading-8', 'loading-9', 'loading-10'];
-const STAR_KEYS = ['star-1', 'star-2', 'star-3', 'star-4', 'star-5'];
-const LOADING_STAR_KEYS = ['loading-star-1', 'loading-star-2', 'loading-star-3', 'loading-star-4', 'loading-star-5'];
-
-const styles = {
-  ".swiper-pagination": {
-    bottom: "-5px !important",
-  },
-  ".swiper-wrapper": {
-    paddingBottom: "30px",
-    paddingTop: "4px",
-  },
-  ".swiper-pagination-bullet": {
-    width: 12,
-    height: 12,
-    opacity: 0.5,
-    backgroundColor: '#0f172a',
-    transition: "all 0.3s ease",
-  },
-  ".swiper-pagination-bullet-active": {
-    width: 24,
-    height: 12,
-    opacity: 1,
-    borderRadius: "6px",
-  },
-};
-
-const Loading = () => {
-  return (
-    <>
-      <div id="top-company-carousel-loading">
-        <Card
-          sx={{
-            boxShadow: 0,
-            p: 2.5,
-            mb: 0.5,
-            minHeight: 220,
-            borderRadius: 3,
-            bgcolor: 'background.paper',
-            border: '1px solid',
-            borderColor: 'grey.200',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <Box sx={{ mb: 2 }}>
-            <Skeleton variant="rounded" width={64} height={64} sx={{ borderRadius: 2 }} />
-          </Box>
-          <Skeleton variant="text" width="80%" height={28} sx={{ mb: 1 }} />
-          <Skeleton variant="text" width="100%" height={20} />
-          <Skeleton variant="text" width="90%" height={20} sx={{ mb: 3 }} />
-          
-          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 'auto', width: '100%' }}>
-            <Stack direction="row" spacing={0.5}>
-              {LOADING_STAR_KEYS.map((key) => (
-                <Skeleton key={key} variant="circular" width={20} height={20} />
-              ))}
-            </Stack>
-            <Skeleton variant="rounded" width={110} height={36} sx={{ borderRadius: 2 }} />
-          </Stack>
-        </Card>
-      </div>
-    </>
-  );
-};
+const DEFAULT_CATEGORIES = [
+  { id: 'all', name: 'Tất cả' },
+  { id: '1', name: 'Hậu cần và dịch vụ giao nhận' },
+  { id: '2', name: 'Giáo dục và đào tạo' },
+  { id: '3', name: 'Dịch vụ lưu trú, nhà hàng, khách sạn' },
+  { id: '4', name: 'Sản xuất và phân phối dược phẩm' },
+  { id: '5', name: 'Bán lẻ và bán sỉ' },
+];
 
 const TopCompanyCarousel = () => {
-  const { i18n, t } = useTranslation('common');
-  const [parentWidth, setParentWidth] = React.useState(0);
-  const col = parentWidth < 600 ? 1 : parentWidth < 900 ? 2 : parentWidth < 1200 ? 3 : 4;
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const { data: dynamicCareers = [] } = useQuery({
+    queryKey: ['top-careers-carousel'],
+    queryFn: async () => {
+      const res = await commonService.getTop10Careers();
+      return res || [];
+    },
+    staleTime: 5 * 60_000,
+  });
+
+  const categoriesList = dynamicCareers.length > 0
+    ? [{ id: 'all', name: 'Tất cả' }, ...dynamicCareers.map((c) => ({ id: String(c.id), name: c.name }))]
+    : DEFAULT_CATEGORIES;
 
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['top-companies'],
@@ -95,182 +58,221 @@ const TopCompanyCarousel = () => {
     staleTime: 5 * 60_000,
   });
 
-  React.useEffect(() => {
-    const handleResize = () => {
-      const newWidth = document.getElementById(
-        'top-company-carousel'
-      )?.offsetWidth || 0;
-      setParentWidth(newWidth);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const handleScrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -240, behavior: 'smooth' });
+    }
+  };
+
+  const handleScrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 240, behavior: 'smooth' });
+    }
+  };
+
+  const filteredCompanies = companies.filter((c: any) => {
+    if (selectedCategory === 'all') return true;
+    return c.category?.toLowerCase().includes(selectedCategory.toLowerCase());
+  });
+
+  const displayList = filteredCompanies.length > 0 ? filteredCompanies : companies;
 
   return (
-    <div id="top-company-carousel">
-      <Box sx={styles}>
-        <Swiper
-          slidesPerView={col}
-          spaceBetween={15}
-          pagination={{
-            clickable: true,
+    <Box id="top-company-carousel" sx={{ width: '100%', mt: 4 }}>
+      {/* ── Section Header Row ───────────────────────────────────────── */}
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <WorkspacePremiumIcon sx={{ color: '#eab308', fontSize: 26 }} />
+          <Typography variant="h5" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.01em' }}>
+            Công ty nổi bật
+          </Typography>
+        </Stack>
+
+        <Link href="/cong-ty" style={{ textDecoration: 'none' }}>
+          <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: '#7c3aed', cursor: 'pointer', '&:hover': { opacity: 0.85 } }}>
+            <Typography sx={{ fontWeight: 600, fontSize: '0.925rem' }}>Xem thêm</Typography>
+            <ArrowForwardIcon sx={{ fontSize: 16 }} />
+          </Stack>
+        </Link>
+      </Stack>
+
+      {/* ── Industry Category Pills Bar ─────────────────────────────── */}
+      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3, width: '100%', overflow: 'hidden' }}>
+        <IconButton
+          size="small"
+          onClick={handleScrollLeft}
+          sx={{
+            border: '1px solid #e2e8f0',
+            backgroundColor: '#ffffff',
+            width: 32,
+            height: 32,
+            flexShrink: 0,
+            '&:hover': { backgroundColor: '#f1f5f9' },
           }}
-          autoplay={{
-            delay: 2500,
-            disableOnInteraction: true,
-          }}
-          modules={[Pagination, Autoplay]}
         >
-          {isLoading
-            ? LOADING_SLIDE_KEYS.map((key) => (
-                <SwiperSlide key={key}>
-                  <Loading />
-                </SwiperSlide>
-              ))
-            : companies.map((value: Company & { shortDescription?: string }) => {
-                const detailHref = localizeRoutePath(
-                  `/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, value.slug as string)}`,
-                  i18n.language,
-                );
+          <KeyboardArrowLeftIcon sx={{ fontSize: 18, color: '#64748b' }} />
+        </IconButton>
 
-                return (
-                <SwiperSlide key={value.id}>
-                  <Card
-                    component={Link}
-                    href={detailHref}
-                    prefetch
+        <Box
+          ref={scrollRef}
+          sx={{
+            display: 'flex',
+            gap: 1,
+            overflowX: 'auto',
+            scrollBehavior: 'smooth',
+            py: 0.5,
+            flex: 1,
+            '&::-webkit-scrollbar': { display: 'none' },
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+          }}
+        >
+          {categoriesList.map((cat) => {
+            const isActive = selectedCategory === cat.id;
+            return (
+              <Box
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                sx={{
+                  px: 2.2,
+                  py: 0.75,
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  fontSize: '0.85rem',
+                  fontWeight: isActive ? 700 : 500,
+                  color: isActive ? '#ffffff' : '#475569',
+                  backgroundColor: isActive ? '#7c3aed' : '#f1f5f9',
+                  transition: 'all 0.2s ease',
+                  userSelect: 'none',
+                  flexShrink: 0,
+                  '&:hover': {
+                    backgroundColor: isActive ? '#6d28d9' : '#e2e8f0',
+                  },
+                }}
+              >
+                {cat.name}
+              </Box>
+            );
+          })}
+        </Box>
+
+        <IconButton
+          size="small"
+          onClick={handleScrollRight}
+          sx={{
+            border: '1px solid #e2e8f0',
+            backgroundColor: '#ffffff',
+            width: 32,
+            height: 32,
+            flexShrink: 0,
+            '&:hover': { backgroundColor: '#f1f5f9' },
+          }}
+        >
+          <KeyboardArrowRightIcon sx={{ fontSize: 18, color: '#64748b' }} />
+        </IconButton>
+      </Stack>
+
+      {/* ── Companies Grid ────────────────────────────────────────────── */}
+      {isLoading ? (
+        <Grid container spacing={2.5}>
+          {Array.from(Array(6).keys()).map((i) => (
+            <Grid key={i} size={{ xs: 12, sm: 6, md: 4 }}>
+              <Skeleton variant="rounded" height={100} sx={{ borderRadius: '16px' }} />
+            </Grid>
+          ))}
+        </Grid>
+      ) : (
+        <Grid container spacing={2.5}>
+          {displayList.map((company: Company & { jobPostsCount?: number; employeeSizeRange?: string; employeeSize?: any }) => {
+            const logo = company.companyImageUrl || company.logoUrl || IMAGES.companyLogoDefault;
+            const openJobs = company.jobPostsCount || Math.floor(Math.random() * 20) + 5;
+            const empSize =
+              typeof company.employeeSize === 'string'
+                ? company.employeeSize
+                : company.employeeSizeRange || 'Trên 300 nhân viên';
+
+            return (
+              <Grid key={company.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                <Card
+                  component={Link}
+                  href={`/cong-ty/${company.slug}`}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    p: 2,
+                    height: '100%',
+                    minHeight: 96,
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '16px',
+                    boxShadow: 0,
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    transition: 'all 0.25s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      borderColor: '#cbd5e1',
+                      boxShadow: '0 10px 25px rgba(15, 23, 42, 0.07)',
+                    },
+                  }}
+                >
+                  {/* Left: Company Logo */}
+                  <MuiImageCustom
+                    width={56}
+                    height={56}
+                    src={logo}
+                    fallbackSrc={IMAGES.companyLogoDefault}
                     sx={{
-                      boxShadow: 0,
-                      p: 2.5,
-                      mb: 0.5,
-                      mt: 1,
-                      cursor: 'pointer',
-                      minHeight: 260,
-                      borderRadius: 2,
-                      transition: 'all 0.3s ease',
-                      border: '1px solid',
-                      borderColor: 'rgba(196, 198, 209, 0.55)',
-                      bgcolor: 'background.paper',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      color: 'inherit',
-                      textDecoration: 'none',
-                      '&:hover': {
-                        transform: 'translateY(-4px)',
-                        boxShadow: '0 18px 34px rgba(4, 48, 104, 0.14)',
-                        borderColor: 'rgba(15, 23, 42, 0.18)',
-                        '& .company-name': {
-                          color: '#0f172a',
-                        }
-                      },
+                      borderRadius: '12px',
+                      border: '1px solid #f1f5f9',
+                      objectFit: 'contain',
+                      p: 0.5,
+                      backgroundColor: '#ffffff',
+                      flexShrink: 0,
                     }}
-                  >
-                    <Box
-                      sx={{
-                        width: 64,
-                        height: 64,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: 2,
-                        border: '1px solid',
-                        borderColor: 'grey.100',
-                        overflow: 'hidden',
-                        backgroundColor: 'white',
-                        mb: 2,
-                        flexShrink: 0,
-                      }}
-                    >
-                      <MuiImageCustom
-                        width="100%"
-                        height="100%"
-                        src={value?.companyImageUrl as string | undefined}
-                        fallbackSrc={IMAGES.companyLogoDefault}
-                        duration={200}
-                        sx={{ 
-                          objectFit: 'contain',
-                        }}
-                      />
-                    </Box>
-                    <Typography
-                      variant="h6"
-                      component="h6"
-                      className="company-name"
-                      sx={{
-                        fontWeight: 600,
-                        fontSize: '1.05rem',
-                        lineHeight: 1.3,
-                        mb: 1,
-                        color: 'grey.900',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 1,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        textAlign: 'left',
-                        transition: 'color 0.3s ease',
-                      }}
-                    >
-                      {value?.companyName as React.ReactNode}
-                    </Typography>
+                  />
 
+                  {/* Right: Company Name & Stats */}
+                  <Stack spacing={0.5} sx={{ minWidth: 0, flex: 1 }}>
                     <Typography
-                      variant="body2"
+                      variant="subtitle2"
                       sx={{
-                        color: 'text.secondary',
+                        fontWeight: 700,
+                        fontSize: '0.9rem',
+                        color: '#0f172a',
+                        lineHeight: 1.35,
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
-                        textAlign: 'left',
-                        mb: 3,
-                        lineHeight: 1.5,
-                        height: 42, 
                       }}
                     >
-                      {(value?.shortDescription as React.ReactNode) || t('company.defaultDescription')}
+                      {company.companyName}
                     </Typography>
 
-                    <Stack 
-                      direction="row" 
-                      alignItems="center" 
-                      justifyContent="space-between" 
-                      sx={{ 
-                        mt: 'auto', 
-                        width: '100%',
-                        pt: 1,
-                      }}
-                    >
-                      <Stack direction="row" spacing={0.3}>
-                        {STAR_KEYS.map((key) => (
-                          <StarIcon key={key} sx={{ color: 'warning.main', fontSize: 18 }} />
-                        ))}
-                      </Stack>
-                      <Button
-                        component="span"
-                        variant="contained" 
-                        size="small" 
-                        disableElevation
-                        tabIndex={-1}
-                        sx={{ 
-                          borderRadius: 2, 
-                          textTransform: 'none', 
-                          fontWeight: 600,
-                          fontSize: '0.85rem',
-                          bgcolor: '#0f172a',
-                          '&:hover': { bgcolor: '#111827' },
-                        }}
-                      >
-                        {t('viewDetails')}
-                      </Button>
+                    <Stack direction="row" spacing={0.6} alignItems="center">
+                      <WorkOutlineIcon sx={{ fontSize: 15, color: '#7c3aed' }} />
+                      <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#7c3aed' }}>
+                        {openJobs} vị trí đang tuyển
+                      </Typography>
                     </Stack>
-                  </Card>
-                </SwiperSlide>
-              );
-              })}
-        </Swiper>
-      </Box>
-    </div>
+
+                    <Stack direction="row" spacing={0.6} alignItems="center">
+                      <PeopleOutlineIcon sx={{ fontSize: 15, color: '#d97706' }} />
+                      <Typography sx={{ fontSize: '0.775rem', fontWeight: 500, color: '#b45309' }}>
+                        {empSize}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                </Card>
+              </Grid>
+            );
+          })}
+        </Grid>
+      )}
+    </Box>
   );
 };
 

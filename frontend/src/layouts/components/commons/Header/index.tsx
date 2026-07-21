@@ -29,32 +29,96 @@ import { localizeRoutePath } from "../../../../configs/routeLocalization";
 import HeaderNavLinks from "./HeaderNavLinks";
 import HeaderAuthArea from "./HeaderAuthArea";
 
+import { useQuery } from '@tanstack/react-query';
+import contentService from '../../../../services/contentService';
+
 interface HeaderProps {
-  className?: string;
-  style?: React.CSSProperties;
+  window?: () => Window;
 }
 
 const Header = (_props: HeaderProps) => {
 
   const { t, i18n } = useTranslation('common');
 
+  const { data: dynamicCategories = [] } = useQuery({
+    queryKey: ['public-article-categories'],
+    queryFn: async () => {
+      const res = await contentService.getPublicArticleCategories();
+      return res || [];
+    },
+    staleTime: 5 * 60_000,
+  });
+
+  const infoChildren = React.useMemo(() => {
+    if (dynamicCategories.length > 0) {
+      return dynamicCategories.map((cat) => ({
+        id: String(cat.id),
+        label: cat.name,
+        description: cat.description || '',
+        path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=${cat.slug}`, i18n.language),
+        iconName: cat.iconName || 'book',
+      }));
+    }
+
+    return [
+      {
+        id: 'info-1',
+        label: 'Cẩm nang nghề nghiệp',
+        description: 'Kinh nghiệm và định hướng phát triển sự nghiệp',
+        path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=cam-nang`, i18n.language),
+        iconName: 'book',
+      },
+      {
+        id: 'info-2',
+        label: 'Thủ tục & Quyền lợi lao động',
+        description: 'BHXH, hợp đồng lao động và chế độ người lao động',
+        path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=thu-tuc-lao-dong`, i18n.language),
+        iconName: 'gavel',
+      },
+      {
+        id: 'info-3',
+        label: 'Thuế & Quyết toán TNCN',
+        description: 'Hướng dẫn kê khai và quyết toán thuế thu nhập',
+        path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=thue-tncn`, i18n.language),
+        iconName: 'tax',
+      },
+      {
+        id: 'info-4',
+        label: 'Bí quyết viết CV & Phỏng vấn',
+        description: 'Mẫu CV chuẩn và kỹ năng phỏng vấn thành công',
+        path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=bi-quyet-cv`, i18n.language),
+        iconName: 'cv',
+      },
+      {
+        id: 'info-5',
+        label: 'Báo cáo & Xu hướng tuyển dụng',
+        description: 'Cập nhật báo cáo và thông tin thị trường nhân sự',
+        path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=xu-huong`, i18n.language),
+        iconName: 'trend',
+      },
+    ];
+  }, [dynamicCategories, i18n.language]);
+
   const pages = React.useMemo(() => ({
 
     [HOST_NAME.PROJECT]: [
       { id: '1', label: t('nav.jobs'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language) },
       { id: '2', label: t('nav.companies'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.COMPANY}`, i18n.language) },
-      { id: '3', label: t('nav.blog'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language) },
+      {
+        id: '3',
+        label: 'Thông tin',
+        path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language),
+        children: infoChildren,
+      },
       { id: '4', label: t('nav.aboutUs'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.ABOUT_US}`, i18n.language) },
     ],
     [HOST_NAME.EMPLOYER_PROJECT]: [
-      { id: '1', label: t('nav.introduction'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.INTRODUCE}`, i18n.language) },
-      { id: '2', label: t('nav.services'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SERVICE}`, i18n.language) },
-      { id: '3', label: t('nav.pricing'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language) },
-      { id: '4', label: t('nav.support'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SUPPORT}`, i18n.language) },
-      // Public readers should land on the public blog, not the protected employer editor.
-      { id: '5', label: t('nav.blog'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language) },
+      { id: '1', label: 'Giới thiệu & Dịch vụ', path: localizeRoutePath(`/${ROUTES.EMPLOYER.INTRODUCE}`, i18n.language) },
+      { id: '2', label: 'Tìm ứng viên', path: localizeRoutePath(`/${ROUTES.EMPLOYER.PROFILE}`, i18n.language), requireAuth: true },
+      { id: '3', label: t('nav.pricing', { defaultValue: 'Bảng giá' }), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language) },
+      { id: '4', label: t('nav.support', { defaultValue: 'Hỗ trợ' }), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SUPPORT}`, i18n.language) },
     ],
-  }), [t, i18n.language]);
+  }), [t, i18n.language, infoChildren]);
 
   const theme = useTheme();
 

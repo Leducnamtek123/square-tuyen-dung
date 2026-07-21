@@ -1,12 +1,14 @@
-'use client';
 import React from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
-import { Box, Button, Grid2 as Grid } from "@mui/material";
+import { useQuery } from '@tanstack/react-query';
+import { Box, Button, Chip, Stack, Grid2 as Grid } from "@mui/material";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import SearchIcon from '@mui/icons-material/Search';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import InputBaseSearchHomeCustom from '../../../../components/Common/Controls/InputBaseSearchHomeCustom';
 import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +18,7 @@ import {
 } from '../../../../redux/filterSlice';
 import { ROUTES } from '../../../../configs/constants';
 import { useConfig } from '@/hooks/useConfig';
+import commonService from '../../../../services/commonService';
 import type { JobPostFilter } from '../../../../redux/filterSlice';
 import {
   PROJECT_SEARCH_HISTORY_STORAGE_KEY,
@@ -39,12 +42,21 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
 
   const { jobPostFilter } = useAppSelector((state) => state.filter);
 
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, setValue } = useForm({
     defaultValues: {
       kw: '',
       cityId: '',
       careerId: '',
     },
+  });
+
+  const { data: popularKeywords = [] } = useQuery({
+    queryKey: ['popular-keywords'],
+    queryFn: async () => {
+      const res = await commonService.getPopularKeywords();
+      return res || [];
+    },
+    staleTime: 5 * 60_000,
   });
 
   React.useEffect(() => {
@@ -77,98 +89,175 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
     push(jobsHref);
   };
 
+  const handlePillClick = (item: { title: string; kw?: string; cityId?: number | string; careerId?: number | string }) => {
+    const kw = item.kw || '';
+    const cityId = item.cityId ? String(item.cityId) : '';
+    const careerId = item.careerId ? String(item.careerId) : '';
+
+    setValue('kw', kw);
+    setValue('cityId', cityId);
+    setValue('careerId', careerId);
+
+    handleSaveKeyworLocalStorage(kw);
+    dispatch(searchJobPost({ ...jobPostFilter, kw, cityId, careerId } as JobPostFilter));
+    push(jobsHref);
+  };
+
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit(handleFilter)}
-      sx={{
-        borderRadius: isHero ? 1.5 : 3.5,
-        p: isHero ? 1 : { xs: 1.25, sm: 1.5, md: 2 },
-        backgroundColor: isHero ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.72)',
-        border: isHero ? '1px solid rgba(15, 23, 42, 0.12)' : '1px solid rgba(226, 232, 240, 0.95)',
-        boxShadow: isHero ? '0 26px 58px rgba(15, 23, 42, 0.18)' : 'inset 0 1px 0 rgba(255,255,255,0.8)',
-        backdropFilter: isHero ? 'blur(12px)' : 'blur(14px)',
-      }}
-    >
-      <Grid container spacing={isHero ? { xs: 1, md: 0 } : 1.5} alignItems="center">
-        <Grid
-          size={isHero ? { xs: 12, md: 5.5 } : { xs: 12 }}
-          sx={{
-            position: 'relative',
-            ...(isHero && {
-              pr: { md: 1 },
-              '&::after': {
-                content: '""',
-                display: { xs: 'none', md: 'block' },
-                position: 'absolute',
-                top: 10,
-                right: 0,
-                bottom: 10,
-                width: '1px',
-                bgcolor: 'rgba(116, 119, 129, 0.22)',
-              },
-            }),
-          }}
-        >
-          <InputBaseSearchHomeCustom
-            name="kw"
-            control={control}
-            placeholder={isHero ? t('common:jobSearch.searchPlaceholder', 'Vị trí tuyển dụng, kỹ năng...') : t("common:search.button")}
-            showSubmitButton={!isHero}
-            location='HOME'
-            variant={variant}
-          />
-        </Grid>
-        {!isHero && (
-        <Grid size={{ xs: 12, md: 6 }}>
-          <SingleSelectSearchCustom
-            name="careerId"
-            placeholder={t("common:placeholders.fieldOperation.all")}
-            control={control}
-            options={allConfig?.careerOptions || []}
-          />
-        </Grid>
-        )}
-        <Grid
-          size={isHero ? { xs: 12, md: 3.5 } : { xs: 12, md: 6 }}
-          sx={isHero ? { px: { md: 1 } } : undefined}
-        >
-          <SingleSelectSearchCustom
-            name="cityId"
-            placeholder={isHero ? t('common:placeholders.allCities', 'Tất cả địa điểm') : t("common:placeholders.selectCity")}
-            control={control}
-            options={allConfig?.cityOptions || []}
-            variant={variant}
-            startIcon={isHero ? <LocationOnIcon fontSize="small" /> : undefined}
-          />
-        </Grid>
-        {isHero && (
-          <Grid size={{ xs: 12, md: 3 }} sx={{ pl: { md: 1 } }}>
-            <Button
-              type="submit"
-              variant="contained"
-              startIcon={<SearchIcon />}
-              fullWidth
-              sx={{
-              minHeight: 56,
-              borderRadius: 1,
-              bgcolor: '#0f172a',
-              px: 3,
-              fontWeight: 800,
-              fontSize: 14,
-              textTransform: 'none',
-              boxShadow: '0 14px 30px rgba(15, 23, 42, 0.18)',
-              '&:hover': {
-                bgcolor: '#111827',
-                boxShadow: '0 16px 34px rgba(15, 23, 42, 0.22)',
-              },
+    <Box sx={{ width: '100%' }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit(handleFilter)}
+        sx={{
+          borderRadius: isHero ? 2 : 3.5,
+          p: isHero ? 1 : { xs: 1.25, sm: 1.5, md: 2 },
+          backgroundColor: isHero ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.72)',
+          border: isHero ? '1px solid rgba(15, 23, 42, 0.12)' : '1px solid rgba(226, 232, 240, 0.95)',
+          boxShadow: isHero ? '0 26px 58px rgba(15, 23, 42, 0.18)' : 'inset 0 1px 0 rgba(255,255,255,0.8)',
+          backdropFilter: isHero ? 'blur(12px)' : 'blur(14px)',
+        }}
+      >
+        <Grid container spacing={isHero ? { xs: 1, md: 0 } : 1.5} alignItems="center">
+          <Grid
+            size={isHero ? { xs: 12, md: 4 } : { xs: 12 }}
+            sx={{
+              position: 'relative',
+              ...(isHero && {
+                pr: { md: 1 },
+                '&::after': {
+                  content: '""',
+                  display: { xs: 'none', md: 'block' },
+                  position: 'absolute',
+                  top: 10,
+                  right: 0,
+                  bottom: 10,
+                  width: '1px',
+                  bgcolor: 'rgba(116, 119, 129, 0.22)',
+                },
+              }),
             }}
           >
-              {t('common:search.button')}
-            </Button>
+            <InputBaseSearchHomeCustom
+              name="kw"
+              control={control}
+              placeholder={isHero ? t('common:jobSearch.searchPlaceholder', 'Vị trí tuyển dụng, kỹ năng...') : t("common:search.button")}
+              showSubmitButton={!isHero}
+              location='HOME'
+              variant={variant}
+            />
           </Grid>
-        )}
-      </Grid>
+
+          <Grid
+            size={isHero ? { xs: 12, md: 3 } : { xs: 12, md: 6 }}
+            sx={{
+              position: 'relative',
+              ...(isHero && {
+                px: { md: 1 },
+                '&::after': {
+                  content: '""',
+                  display: { xs: 'none', md: 'block' },
+                  position: 'absolute',
+                  top: 10,
+                  right: 0,
+                  bottom: 10,
+                  width: '1px',
+                  bgcolor: 'rgba(116, 119, 129, 0.22)',
+                },
+              }),
+            }}
+          >
+            <SingleSelectSearchCustom
+              name="careerId"
+              placeholder={isHero ? 'Tất cả ngành nghề' : t("common:placeholders.fieldOperation.all")}
+              control={control}
+              options={allConfig?.careerOptions || []}
+              variant={variant}
+              startIcon={isHero ? <WorkOutlineIcon fontSize="small" /> : undefined}
+            />
+          </Grid>
+
+          <Grid
+            size={isHero ? { xs: 12, md: 3 } : { xs: 12, md: 6 }}
+            sx={isHero ? { px: { md: 1 } } : undefined}
+          >
+            <SingleSelectSearchCustom
+              name="cityId"
+              placeholder={isHero ? t('common:placeholders.allCities', 'Tất cả địa điểm') : t("common:placeholders.selectCity")}
+              control={control}
+              options={allConfig?.cityOptions || []}
+              variant={variant}
+              startIcon={isHero ? <LocationOnIcon fontSize="small" /> : undefined}
+            />
+          </Grid>
+
+          {isHero && (
+            <Grid size={{ xs: 12, md: 2 }} sx={{ pl: { md: 1 } }}>
+              <Button
+                type="submit"
+                variant="contained"
+                startIcon={<SearchIcon />}
+                fullWidth
+                sx={{
+                  minHeight: 56,
+                  borderRadius: 1.5,
+                  bgcolor: '#7c3aed',
+                  color: '#ffffff',
+                  px: 2.5,
+                  fontWeight: 800,
+                  fontSize: 15,
+                  textTransform: 'none',
+                  boxShadow: '0 10px 24px rgba(124, 58, 237, 0.35)',
+                  '&:hover': {
+                    bgcolor: '#6d28d9',
+                    boxShadow: '0 14px 28px rgba(124, 58, 237, 0.45)',
+                  },
+                }}
+              >
+                {t('common:search.button', { defaultValue: 'Tìm việc' })}
+              </Button>
+            </Grid>
+          )}
+        </Grid>
+      </Box>
+
+      {/* ── Popular Keywords Pills (Tương tự Vieclam24h) ────────────────── */}
+      {isHero && popularKeywords.length > 0 && (
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          flexWrap="wrap"
+          sx={{ mt: 2, gap: 1, px: 0.5 }}
+        >
+          {popularKeywords.map((item) => (
+            <Chip
+              key={item.id}
+              icon={<TrendingUpIcon sx={{ fontSize: '15px !important', color: '#7c3aed' }} />}
+              label={item.title}
+              clickable
+              onClick={() => handlePillClick(item)}
+              sx={{
+                backgroundColor: 'rgba(255, 255, 255, 0.90)',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255, 255, 255, 0.6)',
+                fontWeight: 600,
+                fontSize: '0.85rem',
+                color: '#0f172a',
+                py: 0.5,
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.06)',
+                transition: 'all 0.25s ease',
+                '&:hover': {
+                  backgroundColor: '#ffffff',
+                  color: '#7c3aed',
+                  borderColor: '#7c3aed',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 16px rgba(124, 58, 237, 0.18)',
+                },
+              }}
+            />
+          ))}
+        </Stack>
+      )}
     </Box>
   );
 };

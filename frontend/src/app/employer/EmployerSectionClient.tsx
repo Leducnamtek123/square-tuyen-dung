@@ -64,6 +64,7 @@ const getInitialAuthGateState = (isPublicPage: boolean): AuthGateState => {
 const DEFAULT_LAYOUT_PATHS = [
   '/employer/login',
   '/nha-tuyen-dung/login',
+  '/nha-tuyen-dung/dang-nhap',
   '/employer/forgot-password',
   '/nha-tuyen-dung/quen-mat-khau',
   '/nha-tuyen-dung/forgot-password',
@@ -87,9 +88,7 @@ const DEFAULT_LAYOUT_PATHS = [
   '/nha-tuyen-dung/cau-hoi-thuong-gap',
   '/employer/terms-of-service',
   '/nha-tuyen-dung/dieu-khoan-dich-vu',
-  '/employer/privacy-policy',
-  '/nha-tuyen-dung/chinh-sach-bao-mat',
-  // /employer/blog is protected; public readers use /blog or /tin-tuc.
+  // /employer/candidates & /employer/blog are protected routes requiring employer login.
 ];
 
 const CHAT_LAYOUT_PATHS = ['/employer/chat', '/nha-tuyen-dung/ket-noi-voi-ung-vien', '/nha-tuyen-dung/chat'];

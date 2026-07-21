@@ -98,6 +98,7 @@
   },
   "scripts": {
     "dev": "next dev --webpack",
+    "dev:mock": "NEXT_PUBLIC_USE_MOCK=true next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint src --ext .ts,.tsx",

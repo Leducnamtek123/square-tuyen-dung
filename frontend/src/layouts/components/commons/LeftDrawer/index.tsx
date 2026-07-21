@@ -26,6 +26,14 @@ interface PageItem {
   id: string;
   path: string;
   label: string;
+  requireAuth?: boolean;
+  children?: {
+    id: string;
+    path: string;
+    label: string;
+    description?: string;
+    iconName?: string;
+  }[];
 }
 
 interface LeftDrawerProps {
@@ -44,6 +52,11 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
   const dispatch = useDispatch();
   const { push } = useRouter();
   const { isAuthenticated } = useAppSelector((state) => state.user);
+  const [openSubMenus, setOpenSubMenus] = React.useState<Record<string, boolean>>({});
+
+  const toggleSubMenu = (pageId: string) => {
+    setOpenSubMenus((prev) => ({ ...prev, [pageId]: !prev[pageId] }));
+  };
 
   const container = window !== undefined ? () => window().document.body : undefined;
   const pathname = globalThis?.window?.location?.pathname || '';
@@ -68,15 +81,36 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
       });
   };
 
+  const { i18n } = useTranslation('common');
+
+  const handleItemClick = (e: React.MouseEvent, page: PageItem) => {
+    if (page.children && page.children.length > 0) {
+      e.preventDefault();
+      toggleSubMenu(page.id);
+      return;
+    }
+
+    handleDrawerToggle();
+    if (page.requireAuth) {
+      const hasToken = Boolean(tokenService.getAccessTokenFromCookie());
+      if (!hasToken || !isAuthenticated) {
+        e.preventDefault();
+        push(localizeRoutePath('/nha-tuyen-dung/login', i18n.language));
+      }
+    }
+  };
+
   return (
     <Drawer
       container={container}
       variant="temporary"
       open={mobileOpen}
       onClose={handleDrawerToggle}
-      ModalProps={{ keepMounted: true }}
+      ModalProps={{
+        keepMounted: true, // Better open performance on mobile.
+      }}
       sx={{
-        display: { xs: 'block', sm: 'block', md: 'none' },
+        display: { xs: 'block', md: 'none' },
         '& .MuiDrawer-paper': {
           boxSizing: 'border-box',
           width: { xs: DRAWER_WIDTH_XS, sm: DRAWER_WIDTH_SM },
@@ -88,74 +122,109 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
         },
       }}
     >
-      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <Box
-          component={Link}
-          href="/"
-          onClick={handleDrawerToggle}
           sx={{
+            px: 2.5,
+            py: 2,
             display: 'flex',
-            justifyContent: 'center',
             alignItems: 'center',
-            py: 2.5,
-            px: 2,
+            justifyContent: 'space-between',
             borderBottom: '1px solid',
             borderColor: 'divider',
-            backgroundColor: 'background.paper',
-            textDecoration: 'none',
             flexShrink: 0,
           }}
         >
           <Box
-            component="img"
-            src={IMAGES.getTextLogo('dark')}
-            alt="InfoHR Logo"
-            sx={{
-              display: 'block',
-              width: { xs: 92, sm: 120 },
-              height: 'auto',
-              maxWidth: '100%',
-              objectFit: 'contain',
-              objectPosition: 'center',
-            }}
-          />
+            component={Link}
+            href="/"
+            onClick={handleDrawerToggle}
+            sx={{ display: 'flex', alignItems: 'center', gap: 1, textDecoration: 'none' }}
+          >
+            <Box
+              component="img"
+              src={IMAGES.squareSquareLogo}
+              alt="Logo"
+              sx={{ width: 32, height: 32, objectFit: 'contain' }}
+            />
+            <Typography variant="h6" fontWeight={700} color="primary.main">
+              INFO HR
+            </Typography>
+          </Box>
         </Box>
 
         <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
           <List sx={{ py: 1.5 }}>
-            {pages.map((page) => (
-              <ListItem
-                key={page.id}
-                component={Link}
-                href={page.path}
-                className={pathname.startsWith(page.path) ? 'active' : ''}
-                disablePadding
-                onClick={handleDrawerToggle}
-                sx={{ mb: 0.5, mx: 1, width: 'auto' }}
-              >
-                <ListItemButton
-                  sx={{
-                    textAlign: 'left',
-                    borderRadius: 2,
-                    transition: 'all 0.2s ease-in-out',
-                    color: 'text.primary',
-                    '&.active': {
-                      backgroundColor: 'primary.main',
-                      color: 'white',
-                      '& .MuiListItemText-primary': {
-                        fontWeight: 700,
-                      },
-                    },
-                    '&:hover': {
-                      backgroundColor: (theme) => (theme.palette.mode === 'light' ? 'grey.100' : 'grey.800'),
-                      paddingLeft: '20px',
-                    },
-                  }}
-                >
-                  <ListItemText primary={page.label} slotProps={{ primary: { fontSize: '0.9rem' } }} />
-                </ListItemButton>
-              </ListItem>
-            ))}
+            {pages.map((page) => {
+              const hasSubItems = Boolean(page.children && page.children.length > 0);
+              const isSubOpen = Boolean(openSubMenus[page.id]);
+
+              return (
+                <React.Fragment key={page.id}>
+                  <ListItem
+                    component={hasSubItems ? 'div' : Link}
+                    href={hasSubItems ? undefined : page.path}
+                    className={pathname.startsWith(page.path) ? 'active' : ''}
+                    disablePadding
+                    onClick={(e) => handleItemClick(e, page)}
+                    sx={{ mb: 0.5, mx: 1, width: 'auto', cursor: 'pointer' }}
+                  >
+                    <ListItemButton
+                      sx={{
+                        textAlign: 'left',
+                        borderRadius: 2,
+                        transition: 'all 0.2s ease-in-out',
+                        color: 'text.primary',
+                        justifyContent: 'space-between',
+                        '&.active': {
+                          backgroundColor: 'primary.main',
+                          color: 'white',
+                          '& .MuiListItemText-primary': {
+                            fontWeight: 700,
+                          },
+                        },
+                        '&:hover': {
+                          backgroundColor: (theme) => (theme.palette.mode === 'light' ? 'grey.100' : 'grey.800'),
+                        },
+                      }}
+                    >
+                      <ListItemText primary={page.label} slotProps={{ primary: { fontSize: '0.9rem', fontWeight: 600 } }} />
+                      {hasSubItems && (
+                        <Typography variant="caption" sx={{ color: 'text.secondary', ml: 1 }}>
+                          {isSubOpen ? '▲' : '▼'}
+                        </Typography>
+                      )}
+                    </ListItemButton>
+                  </ListItem>
+
+                  {hasSubItems && isSubOpen && (
+                    <List disablePadding sx={{ pl: 2, pr: 1, mb: 1 }}>
+                      {page.children?.map((child) => (
+                        <ListItem
+                          key={child.id}
+                          component={Link}
+                          href={child.path}
+                          disablePadding
+                          onClick={() => handleDrawerToggle()}
+                          sx={{ mb: 0.5 }}
+                        >
+                          <ListItemButton sx={{ borderRadius: 1.5, py: 0.75 }}>
+                            <ListItemText
+                              primary={child.label}
+                              secondary={child.description}
+                              slotProps={{
+                                primary: { fontSize: '0.825rem', fontWeight: 600, color: '#334155' },
+                                secondary: { fontSize: '0.725rem', color: '#64748b' },
+                              }}
+                            />
+                          </ListItemButton>
+                        </ListItem>
+                      ))}
+                    </List>
+                  )}
+                </React.Fragment>
+              );
+            })}
           </List>
 
           {showPublicActions && !isAuthenticated && (

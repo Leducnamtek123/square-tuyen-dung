@@ -82,6 +82,12 @@ const commonService = {
     return extractResults<Career>(signedData);
   },
 
+  getPopularKeywords: async (): Promise<{ id: number; title: string; kw?: string; cityId?: number | string; careerId?: number | string }[]> => {
+    const url = 'common/popular-keywords/';
+    const data = await httpRequest.get(url);
+    return extractResults(data);
+  },
+
   /**
    * Single-request career fetch for app initialization.
    * No while-loop pagination, no presignInObject (careers have no MinIO URLs).

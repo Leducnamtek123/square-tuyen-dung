@@ -14,7 +14,7 @@ describe('common employer navigation routes', () => {
     expect(source).not.toContain("path: `/${ROUTES.EMPLOYER.SERVICE}`");
     expect(source).not.toContain("path: `/${ROUTES.EMPLOYER.PRICING}`");
     expect(source).not.toContain("path: `/${ROUTES.EMPLOYER.SUPPORT}`");
-    expect(source).toContain('localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language)');
+    expect(source).toContain('localizeRoutePath(`/${ROUTES.EMPLOYER.INTRODUCE}`, i18n.language)');
   });
 
   it('localizes employer links in the common footer', () => {

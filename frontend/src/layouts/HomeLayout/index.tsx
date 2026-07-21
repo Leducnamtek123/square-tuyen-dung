@@ -17,33 +17,15 @@ const HomeLayout = ({ children }: { children?: React.ReactNode }) => {
       <Container
         maxWidth="xl"
         sx={{
-          paddingLeft: 0,
-          paddingRight: 0,
+          px: { xs: 2, sm: 3, md: 4, lg: 6, xl: 6 },
         }}
       >
-
         <section>
-
           <TopSlide />
-
         </section>
-
-      </Container>
-
-      <Container
-        maxWidth="xl"
-        sx={{
-          paddingLeft: { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
-          paddingRight: { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
-        }}
-      >
-
         <section>
-
           {children}
-
         </section>
-
       </Container>
 
       <Box
