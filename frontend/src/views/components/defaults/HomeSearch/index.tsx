@@ -200,27 +200,27 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
                 sx={{
                   minHeight: 56,
                   borderRadius: 1.5,
-                  bgcolor: '#7c3aed',
+                  bgcolor: '#e11d48',
                   color: '#ffffff',
                   px: 2.5,
                   fontWeight: 800,
                   fontSize: 15,
                   textTransform: 'none',
-                  boxShadow: '0 10px 24px rgba(124, 58, 237, 0.35)',
+                  boxShadow: '0 10px 24px rgba(225, 29, 72, 0.35)',
                   '&:hover': {
-                    bgcolor: '#6d28d9',
-                    boxShadow: '0 14px 28px rgba(124, 58, 237, 0.45)',
+                    bgcolor: '#be123c',
+                    boxShadow: '0 14px 28px rgba(225, 29, 72, 0.45)',
                   },
                 }}
               >
-                {t('common:search.button', { defaultValue: 'Tìm việc' })}
+                {t('common:search.button', { defaultValue: 'Tìm kiếm' })}
               </Button>
             </Grid>
           )}
         </Grid>
       </Box>
 
-      {/* ── Popular Keywords Pills (Tương tự Vieclam24h) ────────────────── */}
+      {/* ── Popular Keywords Pills ────────────────── */}
       {isHero && popularKeywords.length > 0 && (
         <Stack
           direction="row"
@@ -232,7 +232,7 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
           {popularKeywords.map((item) => (
             <Chip
               key={item.id}
-              icon={<TrendingUpIcon sx={{ fontSize: '15px !important', color: '#7c3aed' }} />}
+              icon={<TrendingUpIcon sx={{ fontSize: '15px !important', color: '#e11d48' }} />}
               label={item.title}
               clickable
               onClick={() => handlePillClick(item)}
@@ -248,10 +248,10 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
                 transition: 'all 0.25s ease',
                 '&:hover': {
                   backgroundColor: '#ffffff',
-                  color: '#7c3aed',
-                  borderColor: '#7c3aed',
+                  color: '#e11d48',
+                  borderColor: '#e11d48',
                   transform: 'translateY(-2px)',
-                  boxShadow: '0 6px 16px rgba(124, 58, 237, 0.18)',
+                  boxShadow: '0 6px 16px rgba(225, 29, 72, 0.18)',
                 },
               }}
             />

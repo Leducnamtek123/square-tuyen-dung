@@ -374,7 +374,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                           <ListItem
                             key={item.id}
                             sx={{
-                              '&:hover': { backgroundColor: 'rgba(124, 58, 237, 0.06)' },
+                              '&:hover': { backgroundColor: 'rgba(225, 29, 72, 0.06)' },
                               cursor: 'pointer',
                               borderRadius: 2,
                               px: 1.25,
@@ -383,7 +383,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                             onClick={() => handleClickItem(item.kw || item.title)}
                           >
                             <ListItemIcon sx={{ minWidth: 0, mr: 1.5 }}>
-                              <TrendingUpIcon sx={{ color: '#7c3aed', fontSize: 18 }} />
+                              <TrendingUpIcon sx={{ color: '#e11d48', fontSize: 18 }} />
                             </ListItemIcon>
                             <ListItemText primary={item.title} primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: 600, color: '#334155' }} />
                           </ListItem>

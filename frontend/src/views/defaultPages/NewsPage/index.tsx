@@ -105,17 +105,17 @@ const SubHeaderCategoryBar = ({
                 sx={{
                   fontWeight: isSelected ? 800 : 600,
                   fontSize: '0.875rem',
-                  color: isSelected ? '#7c3aed' : '#475569',
+                  color: isSelected ? '#e11d48' : '#475569',
                   px: 2.5,
                   py: 0.85,
                   borderRadius: '999px',
-                  backgroundColor: isSelected ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
+                  backgroundColor: isSelected ? 'rgba(225, 29, 72, 0.08)' : 'transparent',
                   whiteSpace: 'nowrap',
                   textTransform: 'none',
                   flexShrink: 0,
                   '&:hover': {
-                    backgroundColor: 'rgba(124, 58, 237, 0.06)',
-                    color: '#7c3aed',
+                    backgroundColor: 'rgba(225, 29, 72, 0.06)',
+                    color: '#e11d48',
                   },
                 }}
               >
@@ -249,7 +249,7 @@ const NewsContent = () => {
                           '&:hover': {
                             transform: 'translateY(-2px)',
                             boxShadow: '0 12px 28px rgba(15, 23, 42, 0.08)',
-                            borderColor: '#7c3aed',
+                            borderColor: '#e11d48',
                           },
                         }}
                       >
@@ -268,8 +268,8 @@ const NewsContent = () => {
                                 height: 22,
                                 fontSize: '0.675rem',
                                 fontWeight: 800,
-                                bgcolor: 'rgba(124, 58, 237, 0.10)',
-                                color: '#7c3aed',
+                                bgcolor: 'rgba(225, 29, 72, 0.10)',
+                                color: '#e11d48',
                                 mb: 1,
                               }}
                             />
@@ -295,7 +295,7 @@ const NewsContent = () => {
                       overflow: 'hidden',
                       border: '1px solid #e2e8f0',
                       backgroundColor: '#ffffff',
-                      boxShadow: '0 16px 36px rgba(124, 58, 237, 0.12)',
+                      boxShadow: '0 16px 36px rgba(225, 29, 72, 0.14)',
                       display: 'flex',
                       flexDirection: 'column',
                     }}
@@ -311,7 +311,7 @@ const NewsContent = () => {
                         alt={mainFeaturedArticle.title}
                         sx={{ height: 260, objectFit: 'cover' }}
                       />
-                      <Box sx={{ p: 3, bgcolor: '#7c3aed', color: '#ffffff', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                      <Box sx={{ p: 3, bgcolor: '#e11d48', color: '#ffffff', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                         <Chip
                           label={mainFeaturedArticle.categoryName || 'LA BÀN SỰ NGHIỆP'}
                           size="small"
@@ -356,11 +356,11 @@ const NewsContent = () => {
                 sx={{
                   fontWeight: 800,
                   fontSize: '0.75rem',
-                  bgcolor: activeCategorySlug === 'all' ? '#7c3aed' : 'transparent',
+                  bgcolor: activeCategorySlug === 'all' ? '#e11d48' : 'transparent',
                   color: activeCategorySlug === 'all' ? '#ffffff' : '#64748b',
                   border: '1px solid',
-                  borderColor: activeCategorySlug === 'all' ? '#7c3aed' : '#cbd5e1',
-                  '&:hover': { bgcolor: activeCategorySlug === 'all' ? '#6d28d9' : 'rgba(124, 58, 237, 0.08)' },
+                  borderColor: activeCategorySlug === 'all' ? '#e11d48' : '#cbd5e1',
+                  '&:hover': { bgcolor: activeCategorySlug === 'all' ? '#be123c' : 'rgba(225, 29, 72, 0.08)' },
                 }}
               />
               {categories.slice(0, 5).map((cat) => {
@@ -374,11 +374,11 @@ const NewsContent = () => {
                     sx={{
                       fontWeight: 800,
                       fontSize: '0.75rem',
-                      bgcolor: isSelected ? '#7c3aed' : 'transparent',
+                      bgcolor: isSelected ? '#e11d48' : 'transparent',
                       color: isSelected ? '#ffffff' : '#64748b',
                       border: '1px solid',
-                      borderColor: isSelected ? '#7c3aed' : '#cbd5e1',
-                      '&:hover': { bgcolor: isSelected ? '#6d28d9' : 'rgba(124, 58, 237, 0.08)' },
+                      borderColor: isSelected ? '#e11d48' : '#cbd5e1',
+                      '&:hover': { bgcolor: isSelected ? '#be123c' : 'rgba(225, 29, 72, 0.08)' },
                     }}
                   />
                 );
@@ -418,7 +418,7 @@ const NewsContent = () => {
                         '&:hover': {
                           transform: 'translateY(-4px)',
                           boxShadow: '0 16px 36px rgba(15, 23, 42, 0.10)',
-                          borderColor: '#7c3aed',
+                          borderColor: '#e11d48',
                         },
                       }}
                     >
@@ -446,7 +446,7 @@ const NewsContent = () => {
                               WebkitLineClamp: 2,
                               WebkitBoxOrient: 'vertical',
                               overflow: 'hidden',
-                              '&:hover': { color: '#7c3aed' },
+                              '&:hover': { color: '#e11d48' },
                             }}
                           >
                             {article.title}
@@ -488,7 +488,7 @@ const NewsContent = () => {
                 color="primary"
                 sx={{
                   '& .MuiPaginationItem-root.Mui-selected': {
-                    bgcolor: '#7c3aed',
+                    bgcolor: '#e11d48',
                     color: '#ffffff',
                   },
                 }}
@@ -527,14 +527,14 @@ const NewsContent = () => {
             variant="contained"
             endIcon={<ArrowForwardIcon />}
             sx={{
-              bgcolor: '#7c3aed',
+              bgcolor: '#e11d48',
               color: '#ffffff',
               fontWeight: 800,
               px: 3,
               py: 1.25,
               borderRadius: '12px',
               whiteSpace: 'nowrap',
-              '&:hover': { bgcolor: '#6d28d9' },
+              '&:hover': { bgcolor: '#be123c' },
             }}
           >
             Tìm việc ngay
@@ -563,8 +563,8 @@ const NewsContent = () => {
                   border: '1px solid #e2e8f0',
                   '&:hover': {
                     bgcolor: '#ffffff',
-                    color: '#7c3aed',
-                    borderColor: '#7c3aed',
+                    color: '#e11d48',
+                    borderColor: '#e11d48',
                   },
                 }}
               />

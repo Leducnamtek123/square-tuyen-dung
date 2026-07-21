@@ -45,7 +45,8 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
     let targetUrl = "";
 
     if (toEmployer) {
-      targetUrl = `${protocol}//${mainHost}${port}${buildPortalPath("employer", normalizedPath, language)}`;
+      const employerPath = normalizedPath && normalizedPath !== '/' ? normalizedPath : ROUTES.EMPLOYER.INTRODUCE;
+      targetUrl = `${protocol}//${mainHost}${port}${buildPortalPath("employer", employerPath, language)}`;
     } else {
       targetUrl = `${protocol}//${mainHost}${port}${normalizedPath}`;
     }
@@ -54,7 +55,7 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
   };
 
   const switchWorkspacePortal = () => {
-    openPortal(!isEmployerPortal);
+    openPortal(!isEmployerPortal, !isEmployerPortal ? ROUTES.EMPLOYER.INTRODUCE : "");
   };
 
   const handleClickAuth = (isLogin = false) => {

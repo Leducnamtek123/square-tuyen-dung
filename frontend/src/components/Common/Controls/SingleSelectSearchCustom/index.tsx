@@ -106,12 +106,12 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
                   color: '#334155',
                   transition: 'all 0.15s ease',
                   '&:hover, &.Mui-focused': {
-                    backgroundColor: 'rgba(124, 58, 237, 0.08)',
-                    color: '#7c3aed',
+                    backgroundColor: 'rgba(225, 29, 72, 0.08)',
+                    color: '#e11d48',
                   },
                   '&[aria-selected="true"]': {
-                    backgroundColor: 'rgba(124, 58, 237, 0.14)',
-                    color: '#7c3aed',
+                    backgroundColor: 'rgba(225, 29, 72, 0.14)',
+                    color: '#e11d48',
                     fontWeight: 700,
                   },
                 },

@@ -41,7 +41,7 @@ type HeaderNavLinksProps = {
 const getNavIcon = (iconName?: string) => {
   switch (iconName) {
     case 'book':
-      return <MenuBookOutlinedIcon fontSize="small" sx={{ color: '#7c3aed' }} />;
+      return <MenuBookOutlinedIcon fontSize="small" sx={{ color: '#e11d48' }} />;
     case 'gavel':
       return <GavelOutlinedIcon fontSize="small" sx={{ color: '#2563eb' }} />;
     case 'tax':
@@ -51,7 +51,7 @@ const getNavIcon = (iconName?: string) => {
     case 'trend':
       return <InsightsOutlinedIcon fontSize="small" sx={{ color: '#dc2626' }} />;
     default:
-      return <MenuBookOutlinedIcon fontSize="small" sx={{ color: '#7c3aed' }} />;
+      return <MenuBookOutlinedIcon fontSize="small" sx={{ color: '#e11d48' }} />;
   }
 };
 
@@ -225,8 +225,8 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                       mb: 0.5,
                       whiteSpace: 'normal',
                       '&:hover': {
-                        backgroundColor: 'rgba(124, 58, 237, 0.08)',
-                        '& .MuiTypography-root': { color: '#7c3aed' },
+                        backgroundColor: 'rgba(225, 29, 72, 0.08)',
+                        '& .MuiTypography-root': { color: '#e11d48' },
                       },
                     }}
                   >

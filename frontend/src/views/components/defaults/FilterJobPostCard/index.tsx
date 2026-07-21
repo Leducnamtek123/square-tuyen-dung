@@ -143,7 +143,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
         </Stack>
 
         <Link href="/viec-lam" style={{ textDecoration: 'none' }}>
-          <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: '#7c3aed', cursor: 'pointer', '&:hover': { opacity: 0.85 } }}>
+          <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: '#e11d48', cursor: 'pointer', '&:hover': { opacity: 0.85 } }}>
             <Typography sx={{ fontWeight: 600, fontSize: '0.925rem' }}>Xem thêm</Typography>
             <ArrowForwardIcon sx={{ fontSize: 16 }} />
           </Stack>
@@ -238,12 +238,12 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
                   fontSize: '0.85rem',
                   fontWeight: isActive ? 700 : 500,
                   color: isActive ? '#ffffff' : '#475569',
-                  backgroundColor: isActive ? '#7c3aed' : '#f1f5f9',
+                  backgroundColor: isActive ? '#e11d48' : '#f1f5f9',
                   transition: 'all 0.2s ease',
                   userSelect: 'none',
                   flexShrink: 0,
                   '&:hover': {
-                    backgroundColor: isActive ? '#6d28d9' : '#e2e8f0',
+                    backgroundColor: isActive ? '#be123c' : '#e2e8f0',
                   },
                 }}
               >
@@ -419,12 +419,12 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               sx={{
-                border: '1px solid #7c3aed',
-                color: '#7c3aed',
+                border: '1px solid #e11d48',
+                color: '#e11d48',
                 width: 36,
                 height: 36,
                 '&.Mui-disabled': { borderColor: '#e2e8f0', color: '#cbd5e1' },
-                '&:hover': { backgroundColor: '#f3e8ff' },
+                '&:hover': { backgroundColor: 'rgba(225, 29, 72, 0.08)' },
               }}
             >
               <KeyboardArrowLeftIcon sx={{ fontSize: 20 }} />
@@ -438,12 +438,12 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               sx={{
-                border: '1px solid #7c3aed',
-                color: '#7c3aed',
+                border: '1px solid #e11d48',
+                color: '#e11d48',
                 width: 36,
                 height: 36,
                 '&.Mui-disabled': { borderColor: '#e2e8f0', color: '#cbd5e1' },
-                '&:hover': { backgroundColor: '#f3e8ff' },
+                '&:hover': { backgroundColor: 'rgba(225, 29, 72, 0.08)' },
               }}
             >
               <KeyboardArrowRightIcon sx={{ fontSize: 20 }} />

@@ -177,7 +177,38 @@ const TopSlide = () => {
               pointerEvents: 'auto',
             }}
           >
-            <Stack spacing={2.5}>
+            <Stack spacing={2}>
+              <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    fontWeight: 900,
+                    fontSize: { xs: '1.4rem', sm: '1.85rem', md: '2.25rem' },
+                    color: '#ffffff',
+                    lineHeight: 1.25,
+                    textShadow: '0 2px 10px rgba(0, 0, 0, 0.45)',
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  Chắp cánh sự nghiệp của bạn cùng{' '}
+                  <Box component="span" sx={{ color: '#f43f5e' }}>
+                    InfoHR!
+                  </Box>
+                </Typography>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: { xs: '0.95rem', sm: '1.15rem' },
+                    color: '#f8fafc',
+                    opacity: 0.95,
+                    mt: 0.5,
+                    textShadow: '0 1px 6px rgba(0, 0, 0, 0.4)',
+                  }}
+                >
+                  Kết nối ứng viên & nhà tuyển dụng nhanh nhất.
+                </Typography>
+              </Box>
               <HomeSearch variant="hero" />
             </Stack>
           </Box>

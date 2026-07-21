@@ -82,8 +82,8 @@ const CareerHandbookSection = () => {
                     '&:hover': {
                       transform: 'translateY(-4px)',
                       boxShadow: '0 16px 36px rgba(15, 23, 42, 0.10)',
-                      borderColor: '#7c3aed',
-                      '& .article-title': { color: '#7c3aed' },
+                      borderColor: '#e11d48',
+                      '& .article-title': { color: '#e11d48' },
                     },
                   }}
                 >
@@ -111,7 +111,7 @@ const CareerHandbookSection = () => {
                         height: 24,
                         fontSize: '0.675rem',
                         fontWeight: 800,
-                        bgcolor: 'rgba(124, 58, 237, 0.90)',
+                        bgcolor: 'rgba(225, 29, 72, 0.90)',
                         color: '#ffffff',
                       }}
                     />
@@ -173,7 +173,7 @@ const CareerHandbookSection = () => {
           variant="contained"
           endIcon={<ArrowForwardIcon />}
           sx={{
-            backgroundColor: '#7c3aed',
+            backgroundColor: '#e11d48',
             color: '#ffffff',
             fontWeight: 800,
             fontSize: '0.9rem',
@@ -181,10 +181,10 @@ const CareerHandbookSection = () => {
             px: 3.5,
             py: 1.2,
             textTransform: 'none',
-            boxShadow: '0 8px 20px rgba(124, 58, 237, 0.25)',
+            boxShadow: '0 8px 20px rgba(225, 29, 72, 0.28)',
             '&:hover': {
-              backgroundColor: '#6d28d9',
-              boxShadow: '0 10px 24px rgba(124, 58, 237, 0.35)',
+              backgroundColor: '#be123c',
+              boxShadow: '0 10px 24px rgba(225, 29, 72, 0.38)',
             },
           }}
         >

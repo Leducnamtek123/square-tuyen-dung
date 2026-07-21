@@ -120,16 +120,17 @@ const HeaderAuthArea = ({
           size="small"
           sx={{
             color: '#ffffff',
-            backgroundColor: '#0f172a',
+            backgroundColor: '#e11d48',
             px: { xs: 1.5, sm: 2.5 },
             py: 0.75,
             fontSize: { xs: "0.72rem", sm: "0.85rem" },
-            boxShadow: '0 10px 22px rgba(15, 23, 42, 0.18)',
+            fontWeight: 700,
+            boxShadow: '0 8px 20px rgba(225, 29, 72, 0.28)',
             transition: "all 0.3s ease",
             "&:hover": {
-              backgroundColor: '#111827',
+              backgroundColor: '#be123c',
               transform: "translateY(-1px)",
-              boxShadow: '0 12px 24px rgba(15, 23, 42, 0.22)',
+              boxShadow: '0 10px 24px rgba(225, 29, 72, 0.38)',
             },
           }}
           onClick={onSignUp}
