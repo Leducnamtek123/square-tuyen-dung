@@ -1,4 +1,5 @@
 {
+  "appName": "Tuyen Dung",
   "city": "Tỉnh/Thành phố",
   "career": "Ngành nghề",
   "experience": "Kinh nghiệm",
@@ -12,22 +13,100 @@
   "lastModified": "Cập nhật lần cuối",
   "all": "Tất cả",
   "select": "Chọn",
-  "search": "Tìm kiếm",
+  "search": {
+    "button": "Tìm kiếm",
+    "suggestions": "Gợi ý tìm kiếm",
+    "recent": "Tìm kiếm gần đây",
+    "noResults": "Không có dữ liệu"
+  },
   "reset": "Đặt lại",
+  "actionsLabel": "Thao tác",
   "actions": {
+    "title": "Thao tác",
     "start": "Bắt đầu",
     "close": "Đóng",
+    "submit": "Gửi",
     "backHome": "Quay lại trang chủ",
     "joinNow": "Tham gia ngay",
+    "openNewTab": "Mở tab mới",
+    "openDrawer": "Mở menu điều hướng",
+    "refresh": "Làm mới",
+    "retry": "Thử lại",
+    "details": "Chi tiết",
+    "stop": "Kết thúc",
+    "observe": "Quan sát",
     "cancel": "Hủy",
     "save": "Lưu",
     "delete": "Xóa",
     "edit": "Chỉnh sửa",
-    "confirm": "Xác nhận"
+    "confirm": "Xác nhận",
+    "apply": "Áp dụng",
+    "add": "Thêm",
+    "download": "Tải xuống",
+    "zoomOut": "Thu nhỏ",
+    "zoomIn": "Phóng to",
+    "upload": "Tải lên",
+    "sendOTP": "Gửi OTP",
+    "verifyOTP": "Xác nhận",
+    "changePhone": "Đổi số C.T",
+    "resendOTP": "Gửi lại OTP",
+    "change": "Thay đổi",
+    "saveChanges": "Lưu thay đổi",
+    "preview": "Xem trước",
+    "back": "Quay lại"
+  },
+  "userSettings": {
+    "emailNotifications": "Bật thông báo qua email",
+    "smsNotifications": "Bật thông báo qua SMS"
   },
   "loading": "Đang tải...",
   "noData": "Không có dữ liệu",
+  "noOptions": "Không có lựa chọn",
+  "autocomplete": {
+    "clear": "Xóa lựa chọn",
+    "open": "Mở danh sách",
+    "close": "Đóng danh sách"
+  },
   "viewDetails": "Xem chi tiết",
+  "company": {
+    "defaultDescription": "Môi trường làm việc năng động, sáng tạo với nhiều cơ hội thăng tiến và phát triển sự nghiệp.",
+    "notUpdated": "Chưa cập nhật",
+    "jobCount": "{{count}} việc làm",
+    "followers": "{{count}} người theo dõi"
+  },
+  "nav": {
+    "jobs": "Việc làm",
+    "companies": "Công ty",
+    "news": "Tin tức",
+    "aboutUs": "Về chúng tôi",
+    "introduction": "Giới thiệu",
+    "services": "Dịch vụ",
+    "pricing": "Bảng giá",
+    "support": "Hỗ trợ",
+    "blog": "Blog tuyển dụng",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "accountManagement": "Quản lý tài khoản",
+    "reportBug": "Báo lỗi",
+    "logout": "Đăng xuất",
+    "logoutConfirm": "Bạn có chắc chắn muốn đăng xuất không?",
+    "logoutTitle": "Đăng xuất tài khoản",
+    "switch": {
+      "forEmployers": "Dành cho nhà tuyển dụng",
+      "postFreeJob": "Đăng tin miễn phí",
+      "forJobSeekers": "Dành cho ứng viên",
+      "switch": "Chuyển",
+      "candidateLogin": "Đăng nhập Ứng viên",
+      "employerLogin": "Đăng nhập Nhà tuyển dụng",
+      "candidateRegister": "Đăng ký Ứng viên",
+      "employerRegister": "Đăng ký Nhà tuyển dụng"
+    },
+    "careers": {
+      "allCareersList": "Danh sách tất cả nghề nghiệp",
+      "topCareers": "Top 10 nghề nghiệp",
+      "otherCareers": "Ngành nghề khác"
+    }
+  },
   "status": {
     "pending": "Đang chờ",
     "active": "Đang hoạt động",
@@ -42,51 +121,29 @@
   "labels": {
     "time": "Thời gian",
     "job": "Công việc",
-    "uncategorized": "Chưa phân loại"
+    "uncategorized": "Chưa phân loại",
+    "notUpdated": "Chưa cập nhật",
+    "present": "Hiện tại",
+    "viewAttachedResume": "Xem hồ sơ đính kèm",
+    "email": "Email",
+    "back": "Quay lại",
+    "messages": "Tin nhắn",
+    "attachedResume": "Hồ sơ đính kèm"
   },
   "placeholders": {
     "selectCity": "Chọn Tỉnh/Thành phố",
+    "allCareers": "Tất cả ngành nghề",
     "fieldOperation": {
       "all": "Tất cả ngành nghề"
     },
     "allExperiences": "Tất cả kinh nghiệm",
     "allPositions": "Tất cả cấp bậc",
-    "allAcademicLevels": "Tất cả học vấn",
+    "allAcademicLevels": "Tất cả trình độ học vấn",
     "allWorkplaces": "Tất cả nơi làm việc",
     "allJobTypes": "Tất cả hình thức làm việc",
     "allGenders": "Tất cả giới tính",
-    "allMaritalStatuses": "Tất cả tình trạng hôn nhân"
-  },
-  "nav": {
-    "jobs": "Việc làm",
-    "companies": "Công ty",
-    "aboutUs": "Về chúng tôi",
-    "introduction": "Giới thiệu",
-    "services": "Dịch vụ",
-    "pricing": "Bảng giá",
-    "support": "Hỗ trợ",
-    "blog": "Blog tuyển dụng",
-    "login": "Đăng nhập",
-    "register": "Đăng ký",
-    "accountManagement": "Quản lý tài khoản",
-    "logout": "Đăng xuất",
-    "logoutConfirm": "Bạn có chắc chắn muốn đăng xuất?",
-    "logoutTitle": "Đăng xuất tài khoản",
-    "switch": {
-      "forEmployers": "Dành cho Nhà tuyển dụng",
-      "postFreeJob": "Đăng tin tuyển dụng miễn phí ngay",
-      "forJobSeekers": "Dành cho Người tìm việc",
-      "switch": "Chuyển sang",
-      "candidateLogin": "Đăng nhập Ứng viên",
-      "employerLogin": "Đăng nhập Nhà tuyển dụng",
-      "candidateRegister": "Đăng ký Ứng viên",
-      "employerRegister": "Đăng ký Nhà tuyển dụng"
-    },
-    "careers": {
-      "allCareersList": "Danh sách tất cả nghề nghiệp",
-      "topCareers": "Top 10 nghề nghiệp",
-      "otherCareers": "Ngành nghề khác"
-    }
+    "allMaritalStatuses": "Tất cả tình trạng hôn nhân",
+    "allCities": "Tất cả tỉnh thành"
   },
   "footer": {
     "aboutApp": "Về {{appName}}",
@@ -101,10 +158,840 @@
     "messages": "Tin nhắn",
     "notifications": "Thông báo",
     "forCandidates": "Dành cho ứng viên",
+    "forJobSeekers": "Dành cho ứng viên",
     "candidateDashboard": "Bảng điều khiển ứng viên",
     "employerDashboard": "Bảng điều khiển nhà tuyển dụng",
-    "mobileApps": "Ứng dụng di động",
     "connectWith": "Kết nối với {{appName}}",
-    "rightsReserved": "© {{year}} {{appName}}. Bảo lưu mọi quyền."
-  }
+    "rightsReserved": "© {{year}} {{appName}}. Bản quyền được bảo lưu."
+  },
+  "quickSearch": "Tìm kiếm nhanh",
+  "notUpdated": "Chưa cập nhật",
+  "notificationTitle": "{{appName}} thông báo",
+  "selectedJobs": "Tin đã chọn: {{count}}",
+  "selectedProfiles": "Hồ sơ đã chọn: {{count}}",
+  "clearAll": "Xóa tất cả",
+  "cityProvince": "Tỉnh, thành phố",
+  "jobsCount": "Việc làm: {{count}}",
+  "shareVia": "Chia sẻ qua",
+  "aiTools": {
+    "title": "Công cụ AI",
+    "tts": {
+      "title": "Văn bản thành giọng nói",
+      "textLabel": "Nội dung",
+      "textPlaceholder": "Nhập nội dung để tạo giọng nói...",
+      "voiceLabel": "Giọng đọc (tuỳ chọn)",
+      "voicePlaceholder": "Ví dụ: Ly",
+      "speedLabel": "Tốc độ",
+      "generate": "Tạo âm thanh",
+      "generating": "Đang tạo...",
+      "validation": "Vui lòng nhập nội dung cần đọc.",
+      "error": "Không thể tạo âm thanh lúc này.",
+      "resultLabel": "Âm thanh đã tạo"
+    },
+    "transcribe": {
+      "title": "Giọng nói thành văn bản",
+      "selectFile": "Chọn file âm thanh",
+      "changeFile": "Đổi file âm thanh",
+      "run": "Chuyển thành văn bản",
+      "transcribing": "Đang chuyển...",
+      "resultLabel": "Kết quả chuyển đổi",
+      "validation": "Vui lòng chọn file âm thanh.",
+      "error": "Không thể chuyển âm thanh lúc này."
+    }
+  },
+  "aiElements": {
+    "previousBranch": "Nhánh trước",
+    "nextBranch": "Nhánh tiếp theo"
+  },
+  "ai": {
+    "reviewStatus": {
+      "label": "Rà soát AI",
+      "all": "Tất cả trạng thái",
+      "aiOnly": "Chỉ AI",
+      "reviewed": "Đã rà soát",
+      "overridden": "Đã ghi đè"
+    },
+    "scoreMax": "Điểm AI tối đa"
+  },
+  "choices": {
+    "Male": "Nam",
+    "Female": "Nữ",
+    "Other": "Khác",
+    "Single": "Độc thân",
+    "Married": "Đã kết hôn",
+    "Vietnamese": "Tiếng Việt",
+    "English": "Tiếng Anh",
+    "Japanese": "Tiếng Nhật",
+    "French": "Tiếng Pháp",
+    "Chinese": "Tiếng Trung",
+    "Russian": "Tiếng Nga",
+    "Korean": "Tiếng Hàn",
+    "German": "Tiếng Đức",
+    "Italian": "Tiếng Ý",
+    "Arabic": "Tiếng Ả rập",
+    "Level 1": "Mức 1",
+    "Level 2": "Mức 2",
+    "Level 3": "Mức 3",
+    "Level 4": "Mức 4",
+    "Level 5": "Mức 5",
+    "Senior Management": "Quản lý cấp cao",
+    "Middle Management": "Quản lý cấp trung",
+    "Team Leader - Supervisor": "Trưởng nhóm / Giám sát",
+    "Specialist": "Chuyên gia",
+    "Staff / Employee": "Nhân viên",
+    "Collaborator": "Cộng tác viên",
+    "Office-based": "Tại văn phòng",
+    "Hybrid": "Linh hoạt (Hybrid)",
+    "Remote / Work from home": "Làm việc từ xa / Tại nhà",
+    "Full-time Permanent": "Toàn thời gian cố định",
+    "Full-time Temporary": "Toàn thời gian tạm thời",
+    "Part-time Permanent": "Bán thời gian cố định",
+    "Part-time Temporary": "Bán thời gian tạm thời",
+    "Consultancy Contract": "Hợp đồng tư vấn",
+    "Internship": "Thực tập",
+    "No experience": "Chưa có kinh nghiệm",
+    "Under 1 year": "Dưới 1 năm",
+    "1 year": "1 năm",
+    "2 years": "2 năm",
+    "3 years": "3 năm",
+    "4 years": "4 năm",
+    "5 years": "5 năm",
+    "Over 5 years": "Trên 5 năm",
+    "Postgraduate": "Sau đại học",
+    "University": "Đại học",
+    "College": "Cao đẳng",
+    "Vocational / Intermediate": "Trung cấp / Nghề",
+    "High School": "Phổ thông trung học",
+    "Certificate": "Chứng chỉ",
+    "Under 10 employees": "Dưới 10 nhân viên",
+    "10 - 150 employees": "Từ 10 - 150 nhân viên",
+    "150 - 300 employees": "Từ 150 - 300 nhân viên",
+    "Over 300 employees": "Trên 300 nhân viên",
+    "Pending Confirmation": "Chờ xác nhận",
+    "Contacted": "Đã liên hệ",
+    "Tested": "Đã làm bài test",
+    "Interviewed": "Đã phỏng vấn",
+    "Hired": "Đã tuyển dụng",
+    "Not Selected": "Không được chọn",
+    "Pending": "Chờ duyệt",
+    "Rejected": "Từ chối",
+    "Approved": "Đã duyệt",
+    "pending": "Đang chờ",
+    "processing": "Đang xử lý",
+    "completed": "Hoàn thành",
+    "failed": "Thất bại",
+    "Administrator": "Quản trị viên",
+    "Employer": "Nhà tuyển dụng",
+    "Job Seeker": "Người tìm việc",
+    "Website": "Website",
+    "Application": "Ứng dụng",
+    "Daily": "Hàng ngày",
+    "Every 3 Days": "3 ngày một lần",
+    "Weekly": "Hàng tuần"
+  },
+  "feedback": {
+    "button": "Đánh giá",
+    "title": "Đánh giá của bạn",
+    "placeholder": "Chia sẻ đánh giá của bạn...",
+    "submit": "Gửi đánh giá",
+    "ratingRequired": "Vui lòng chọn mức đánh giá.",
+    "ratingInvalid": "Mức đánh giá phải từ 1 đến 5 sao.",
+    "contentRequired": "Vui lòng nhập nội dung đánh giá.",
+    "contentMax": "Nội dung đánh giá vượt quá độ dài cho phép.",
+    "success": "Gửi đánh giá thành công.",
+    "evidenceImageLabel": "Ảnh bằng chứng",
+    "evidenceImageUpload": "Tải ảnh bằng chứng",
+    "evidenceImageRemove": "Xóa ảnh bằng chứng",
+    "evidenceImageHint": "Không bắt buộc. Hỗ trợ PNG, JPG hoặc WebP tối đa 5MB.",
+    "evidenceImageInvalid": "Vui lòng chọn tệp ảnh.",
+    "evidenceImageTooLarge": "Ảnh không được vượt quá 5MB."
+  },
+  "employerViewedProfile": "Nhà tuyển dụng xem hồ sơ",
+  "errorBoundary": {
+    "title": "Đã xảy ra lỗi",
+    "message": "Ứng dụng gặp sự cố không mong muốn. Vui lòng thử lại hoặc tải lại trang.",
+    "copyError": "Copy lỗi",
+    "retry": "Thử lại",
+    "reload": "Tải lại trang",
+    "unknownError": "Lỗi không xác định"
+  },
+  "saving": "Đang lưu...",
+  "save": "Lưu",
+  "deleting": "Đang xóa...",
+  "delete": "Xóa",
+  "yes": "Có",
+  "no": "Không",
+  "saveChanges": "Lưu các thay đổi",
+  "successMessage": "Thành công!",
+  "errorMessage": "Đã xảy ra lỗi!",
+  "login": {
+    "phone": "Số điện thoại",
+    "phoneIntro": "Vui lòng nhập số điện thoại để tiếp tục",
+    "otpIntro": "Nhập mã OTP vừa gửi tới máy của bạn",
+    "resendIn": "Gửi lại mã sau...",
+    "title": "Tiêu đề",
+    "body": "Nội dung",
+    "label": "Nhãn"
+  },
+  "validation": {
+    "invalidDate": "Ngày không hợp lệ",
+    "max255": "Tối đa 255 ký tự",
+    "max30": "Tối đa 30 ký tự",
+    "invalidUrl": "Vui lòng nhập URL hợp lệ."
+  },
+  "form": {
+    "phoneNumber": "Số điện thoại của bạn",
+    "otpCode": "Mã OTP",
+    "fullName": "Họ và tên",
+    "fullNamePlaceholder": "Nhập họ và tên",
+    "email": "Email",
+    "emailPlaceholder": "Nhập địa chỉ email",
+    "password": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+    "companyName": "Tên công ty",
+    "companyNamePlaceholder": "Nhập tên công ty",
+    "companyEmail": "Email công ty",
+    "companyEmailPlaceholder": "Nhập email công ty",
+    "companyPhone": "Số điện thoại công ty",
+    "companyPhonePlaceholder": "Nhập số điện thoại công ty",
+    "taxCode": "Mã số thuế",
+    "taxCodePlaceholder": "Nhập mã số thuế",
+    "foundedDate": "Ngày thành lập",
+    "fieldOperation": "Lĩnh vực hoạt động",
+    "fieldOperationPlaceholder": "Nhập lĩnh vực hoạt động",
+    "employeeSize": "Quy mô nhân sự",
+    "employeeSizePlaceholder": "Chọn quy mô nhân sự",
+    "website": "Website",
+    "websitePlaceholder": "Nhập địa chỉ website",
+    "city": "Tỉnh/Thành phố",
+    "cityPlaceholder": "Chọn tỉnh/thành phố",
+    "district": "Quận/Huyện",
+    "districtPlaceholder": "Chọn quận/huyện",
+    "address": "Địa chỉ",
+    "addressPlaceholder": "Nhập địa chỉ",
+    "addressHelper": "Tự động điền nếu chọn địa chỉ gợi ý"
+  },
+  "loadPreviousMessages": "Tải tin nhắn cũ hơn",
+  "typeAMessage": "Gõ tin nhắn...",
+  "chatRooms": "Các cuộc trò chuyện",
+  "chatCard": {
+    "openChat": "Mở tin nhắn"
+  },
+  "appliedResume": {
+    "ai": {
+      "viewAnalysis": "Xem phân tích AI",
+      "failed": "Phân tích thất bại"
+    },
+    "email": {
+      "resendTooltip": "Gửi lại mail",
+      "sendTooltip": "Gửi phản hồi"
+    },
+    "table": {
+      "profileName": "Tên ứng viên",
+      "onlineResume": "Hồ sơ Trực tuyến",
+      "attachedResume": "Hồ sơ Đính kèm",
+      "notUpdated": "Chưa cập nhật",
+      "appliedPosition": "Vị trí ứng tuyển",
+      "appliedDate": "Ngày ứng tuyển",
+      "profileType": "Loại hồ sơ",
+      "aiAnalysis": "Phân tích AI",
+      "status": "Trạng thái tuyển dụng",
+      "actions": "Thao tác",
+      "tooltips": {
+        "view": "Xem hồ sơ",
+        "delete": "Xóa hồ sơ"
+      },
+      "noCandidates": "Chưa có ứng viên nào ứng tuyển"
+    }
+  },
+  "companyProfile": {
+    "title": "Hồ sơ công ty"
+  },
+  "logo": "Logo",
+  "cover": "Ảnh bìa",
+  "companyForm": {
+    "validation": {
+      "companyNameRequired": "Tên công ty là bắt buộc"
+    },
+    "title": {
+      "companyname": "Tên công ty",
+      "taxcode": "Mã số thuế",
+      "companysize": "Quy mô công ty",
+      "fieldofoperation": "Lĩnh vực hoạt động",
+      "foundeddate": "Ngày thành lập",
+      "websiteurl": "Địa chỉ Website",
+      "facebookurl": "Địa chỉ Facebook",
+      "youtubeurl": "Địa chỉ Youtube",
+      "linkedinurl": "Địa chỉ Linkedin",
+      "companyemail": "Email công ty",
+      "phonenumber": "Số điện thoại",
+      "cityprovince": "Tỉnh/Thành phố",
+      "district": "Quận/Huyện",
+      "address": "Địa chỉ",
+      "latitude": "Vĩ độ",
+      "longitude": "Kinh độ",
+      "additionaldescription": "Mô tả bổ sung"
+    },
+    "placeholder": {
+      "entercompanyname": "Nhập tên công ty",
+      "entercompanytaxcode": "Nhập mã số thuế",
+      "selectcompanysize": "Chọn quy mô công ty",
+      "entercompanyfieldofoperation": "Nhập lĩnh vực hoạt động của công ty",
+      "entercompanywebsiteurl": "Nhập địa chỉ website",
+      "enterfacebookurl": "Nhập địa chỉ Facebook",
+      "enteryoutubeurl": "Nhập địa chỉ Youtube",
+      "enterlinkedinurl": "Nhập địa chỉ Linkedin",
+      "entercompanyemail": "Nhập email công ty",
+      "entercompanyphonenumber": "Nhập số điện thoại công ty",
+      "selectcityprovince": "Chọn Tỉnh/Thành phố",
+      "selectdistrict": "Chọn Quận/Huyện",
+      "enteraddress": "Nhập địa chỉ",
+      "enterlatitudecoordinateonthemap": "Nhập vĩ độ trên bản đồ",
+      "enterlongitudecoordinateonthemap": "Nhập kinh độ trên bản đồ"
+    },
+    "helperText": {
+      "automaticallyfilledifyouchooseasuggestedaddress": "Tự động điền nếu bạn chọn một địa chỉ gợi ý"
+    }
+  },
+  "interviewDetail": {
+    "messages": {
+      "aiAnalyzingDesc": "AI đang tiến hành phân tích hồ sơ...",
+      "aiNeedsTrigger": "Cần khởi tạo AI phân tích",
+      "noData": "Không có dữ liệu",
+      "noDetails": "Không có chi tiết",
+      "noQuestions": "Không có danh sách câu hỏi",
+      "noTranscript": "Không có bản ghi",
+      "noTranscriptDesc": "Chưa có cuộc hội thoại nào để ghi lại.",
+      "aiGenerating": "Kết quả đánh giá AI đang được khởi tạo",
+      "aiAnalyzing": "AI đang phân tích cuộc trò chuyện...",
+      "notEnded": "Buổi phỏng vấn chưa kết thúc"
+    },
+    "actions": {
+      "triggerAi": "Kích hoạt Phân Tích",
+      "retryAi": "Phân tích lại bằng AI",
+      "hrEvaluation": "Đánh giá của Nhà tuyển dụng",
+      "attitudeScore": "Điểm thái độ",
+      "professionalScore": "Điểm chuyên môn",
+      "resultLabel": "Kết quả cuối cùng",
+      "pending": "Chờ xem xét",
+      "passed": "Chấp nhận (Đạt)",
+      "failed": "Từ chối (Không đạt)",
+      "comments": "Nhận xét chi tiết",
+      "proposedSalary": "Lương đề xuất (VNĐ)",
+      "submitEvaluation": "Gửi đánh giá cuối cùng",
+      "openRecording": "Mở ghi hình"
+    },
+    "subtitle": {
+      "analysis": "Kết quả Phân Tích",
+      "questions": "Câu hỏi gợi ý",
+      "transcript": "Bản ghi cuộc hội thoại",
+      "aiEvaluation": "Kết quả đánh giá AI",
+      "info": "Thông tin Phỏng vấn",
+      "recording": "Ghi hình phỏng vấn"
+    },
+    "label": {
+      "detailedFeedback": "Đánh giá chi tiết",
+      "interviewer": "Người phỏng vấn",
+      "technicalScore": "Điểm kỹ thuật",
+      "communicationScore": "Điểm giao tiếp",
+      "strengths": "Điểm mạnh",
+      "weaknesses": "Điểm yếu",
+      "candidate": "ỨNG VIÊN",
+      "position": "VỊ TRÍ",
+      "type": "LOẠI PHỎNG VẤN",
+      "schedule": "LỊCH TRÌNH"
+    },
+    "title": "Chi tiết Phỏng vấn Online"
+  },
+  "jobPost": {
+    "urgentHiring": "Tuyển gấp",
+    "jobsCount": "{{count}} việc làm"
+  },
+  "jobPostForm": {
+    "section": {
+      "basicInfo": "Thông tin cơ bản",
+      "location": "Khu vực làm việc",
+      "contact": "Thông tin liên hệ"
+    },
+    "warning": "Khi cập nhật, bài viết sẽ ở trạng thái chờ duyệt!",
+    "title": {
+      "jobtitle": "Tiêu đề công việc",
+      "career": "Ngành nghề",
+      "position": "Cấp bậc",
+      "experience": "Kinh nghiệm",
+      "workplace": "Nơi làm việc",
+      "jobtype": "Hình thức làm việc",
+      "numberofvacancies": "Số lượng cần tuyển",
+      "genderrequirement": "Yêu cầu giới tính",
+      "minimumsalary": "Lương tối thiểu",
+      "maximumsalary": "Lương tối đa",
+      "academiclevel": "Trình độ học vấn",
+      "applicationdeadline": "Hạn chót ứng tuyển",
+      "jobdescription": "Mô tả công việc",
+      "jobrequirement": "Yêu cầu công việc",
+      "benefits": "Quyền lợi",
+      "cityprovince": "Tỉnh/Thành phố",
+      "district": "Quận/Huyện",
+      "address": "Địa chỉ",
+      "contactpersonname": "Tên người liên hệ",
+      "contactpersonphone": "SĐT liên hệ",
+      "contactpersonemail": "Email liên hệ"
+    },
+    "placeholder": {
+      "enterjobtitle": "Nhập tiêu đề C.V",
+      "selectcareer": "Chọn ngành nghề",
+      "selectposition": "Chọn cấp bậc",
+      "selectrequiredexperience": "Chọn kinh nghiệm",
+      "selectworkplace": "Chọn nơi làm việc",
+      "selectjobtype": "Chọn hình thức LV",
+      "enternumberofvacancies": "Nhập số lượng",
+      "selectgenderrequirement": "Chọn yêu cầu GT",
+      "enterminimumsalary": "Nhập lương tối thiểu",
+      "entermaximumsalary": "Nhập lương tối đa",
+      "selectacademiclevel": "Chọn trình độ HV",
+      "selectcityprovince": "Chọn Tỉnh/Thành phố",
+      "selectdistrict": "Chọn Quận/Huyện",
+      "enteraddress": "Nhập địa chỉ",
+      "entercontactpersonname": "Nhập người liên hệ",
+      "entercontactpersonphone": "Nhập SĐT liên hệ",
+      "entercontactpersonemail": "Nhập email liên hệ"
+    },
+    "label": {
+      "isUrgent": "Tuyển gấp"
+    },
+    "validation": {
+      "jobnameisrequired": "Yêu cầu nhập tên công việc",
+      "jobnameexceededallowedlength": "Tên công việc vượt quá độ dài",
+      "careerisrequired": "Yêu cầu chọn ngành nghề",
+      "positionisrequired": "Yêu cầu chọn cấp bậc",
+      "experienceisrequired": "Yêu cầu kinh nghiệm",
+      "workplaceisrequired": "Yêu cầu nơi làm việc",
+      "jobtypeisrequired": "Yêu cầu hình thức làm việc",
+      "numberofvacanciesisrequired": "Yêu cầu nhập lượng tuyển",
+      "invalidnumberofvacancies": "Số lượng tuyển không hợp lệ",
+      "atleastonevacancyisrequired": "Tối thiểu 1 vị trí",
+      "genderrequirementisrequired": "Yêu cầu chọn giới tính",
+      "minimumsalaryisrequired": "Yêu cầu mức lương tối thiểu",
+      "invalidminimumsalary": "Mức lương tối thiểu không hợp lệ",
+      "minSalaryLess": "Lương tối thiểu phải nhỏ hơn hoặc bằng lương tối đa",
+      "maximumsalaryisrequired": "Yêu cầu mức lương tối đa",
+      "invalidmaximumsalary": "Mức lương tối đa không hợp lệ",
+      "maxSalaryGreater": "Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu",
+      "academiclevelisrequired": "Yêu cầu trình độ học vấn",
+      "applicationdeadlineisrequired": "Yêu cầu thời hạn ứng tuyển",
+      "invalidapplicationdeadline": "Thời hạn không hợp lệ",
+      "deadlinemustbeaftertoday": "Thời hạn không được trong quá khứ",
+      "jobDescRequired": "Yêu cầu mô tả công việc",
+      "jobReqRequired": "Yêu cầu yêu cầu công việc",
+      "benefitsRequired": "Yêu cầu quyền lợi",
+      "cityprovinceisrequired": "Yêu cầu Tỉnh/Thành phố",
+      "districtisrequired": "Yêu cầu Quận/Huyện",
+      "addressisrequired": "Yêu cầu địa chỉ",
+      "addressexceededallowedlength": "Địa chỉ quá dài",
+      "latitudeisrequired": "Yêu cầu vĩ độ",
+      "invalidlatitude": "Vĩ độ không hợp lệ",
+      "longitudeisrequired": "Yêu cầu kinh độ",
+      "invalidlongitude": "Kinh độ không hợp lệ",
+      "contactpersonnameisrequired": "Yêu cầu liên hệ",
+      "contactpersonnameexceededallowedlength": "Liên hệ quá dài",
+      "contactpersonphoneisrequired": "Yêu cầu SĐT",
+      "invalidphonenumber": "SĐT không hợp lệ",
+      "contactpersonphoneexceededallowedlength": "SĐT quá dài",
+      "contactpersonemailisrequired": "Yêu cầu email",
+      "invalidemail": "Email không hợp lệ",
+      "contactpersonemailexceededallowedlength": "Email quá dài"
+    }
+  },
+  "minimum-wage-comparison": "Lương tối thiểu",
+  "maximum-wage-comparison": "Lương tối đa",
+  "editorContent": "Nội dung",
+  "profileDetailCard": {
+    "label": {
+      "issuedDate": "Ngày cấp",
+      "major": "Chuyên ngành",
+      "desiredPosition": "Vị trí mong muốn",
+      "desiredLevel": "Cấp bậc mong muốn",
+      "educationLevel": "Trình độ học vấn",
+      "experience": "Kinh nghiệm",
+      "career": "Ngành nghề",
+      "workLocation": "Địa điểm làm việc",
+      "desiredSalary": "Mức lương mong muốn",
+      "workplaceType": "Loại hình làm việc",
+      "jobType": "Hình thức làm việc",
+      "phone": "Số điện thoại",
+      "gender": "Giới tính",
+      "dob": "Ngày sinh",
+      "maritalStatus": "Tình trạng hôn nhân",
+      "cityProvince": "Tỉnh/Thành phố",
+      "district": "Quận/Huyện",
+      "address": "Địa chỉ"
+    },
+    "title": {
+      "advancedSkills": "Kỹ năng chuyên môn",
+      "careerGoals": "Mục tiêu nghề nghiệp",
+      "certificates": "Chứng chỉ",
+      "education": "Học vấn",
+      "workExperience": "Kinh nghiệm làm việc",
+      "generalInfo": "Thông tin chung",
+      "languages": "Ngôn ngữ",
+      "personalInfo": "Thông tin cá nhân"
+    },
+    "messages": {
+      "noAttachedFile": "Không có tệp đính kèm."
+    }
+  },
+  "content": "Nội dung",
+  "start-date-comparison": "Ngày bắt đầu",
+  "end-date-comparison": "Ngày kết thúc",
+  "questionGroupsCard": {
+    "label": {
+      "questionCount": "Số câu"
+    },
+    "table": {
+      "noData": "Chưa có dữ liệu"
+    }
+  },
+  "common": {
+    "hot": "Nổi bật",
+    "status": {
+      "unknown": "Không xác định"
+    },
+    "na": "N/A",
+    "table": {
+      "noData": "Không có dữ liệu"
+    }
+  },
+  "messages": {
+    "loadingPdf": "Đang tải PDF...",
+    "saveSuccess": "Đã lưu thành công.",
+    "loadFailed": "Không thể tải dữ liệu. Vui lòng thử lại.",
+    "actionFailed": "Không thể thao tác lúc này. Vui lòng thử lại."
+  },
+  "breadcrumbs": {
+    "label": "Điều hướng breadcrumb",
+    "admin": "Quản trị",
+    "employer": "Nhà tuyển dụng"
+  },
+  "buttons": {
+    "back": "Quay lại"
+  },
+  "cancel": "Hủy",
+  "none": "Không có",
+  "view": "Xem",
+  "pagination": {
+    "rowsPerPage": "Số dòng mỗi trang"
+  },
+  "errors": {
+    "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",
+    "unauthorized": "Không có quyền. Vui lòng đăng nhập lại.",
+    "forbidden": "Bạn không có quyền truy cập tài nguyên này.",
+    "notFound": "Không tìm thấy tài nguyên yêu cầu.",
+    "payloadTooLarge": "Tệp tải lên quá lớn.",
+    "tooManyRequests": "Quá nhiều yêu cầu. Vui lòng thử lại sau.",
+    "serverError": "Lỗi máy chủ. Vui lòng thử lại sau.",
+    "generic": "Đã xảy ra lỗi không xác định.",
+    "missingInvite": "Thiếu lời mời",
+    "missingSessionId": "Thiếu ID phiên",
+    "invalidSession": "Phiên không hợp lệ",
+    "tokenMissing": "Thiếu token xác thực"
+  },
+  "pages": {
+    "interviews": {
+      "type": {
+        "vetting": "Sơ vấn",
+        "recruitment": "Tuyển dụng"
+      }
+    },
+    "users": {
+      "toast": {
+        "blockSuccess": "Đã khóa tài khoản",
+        "unblockSuccess": "Đã mở khóa tài khoản",
+        "actionFailed": "Thao tác thất bại",
+        "roleUpdated": "Đã cập nhật vai trò",
+        "roleUpdateFailed": "Cập nhật vai trò thất bại"
+      }
+    }
+  },
+  "interviewAdminPage": {
+    "candidateEmployer": "Ứng viên / Nhà tuyển dụng",
+    "jobPost": "Tin tuyển dụng",
+    "type": "Loại",
+    "time": "Thời gian",
+    "status": "Trạng thái",
+    "actions": "Thao tác",
+    "viewDetails": "Xem chi tiết",
+    "markCompleted": "Đánh dấu hoàn thành",
+    "cancelInterview": "Hủy phỏng vấn",
+    "delete": "Xóa"
+  },
+  "jobSearch": {
+    "searchPlaceholder": "Tìm kiếm việc làm...",
+    "allCareers": "Tất cả ngành nghề",
+    "allCities": "Tất cả tỉnh thành",
+    "searchButton": "Tìm kiếm",
+    "advancedFilter": "Lọc nâng cao",
+    "allPositions": "Tất cả cấp bậc",
+    "allExperiences": "Tất cả kinh nghiệm",
+    "allDistricts": "Tất cả quận/huyện",
+    "selectCityFirst": "Vui lòng chọn tỉnh/thành trước",
+    "allWards": "Tất cả phường/xã",
+    "selectDistrictFirst": "Vui lòng chọn quận/huyện trước",
+    "allJobTypes": "Tất cả hình thức",
+    "allWorkplaces": "Tất cả nơi làm việc",
+    "allGenders": "Tất cả giới tính",
+    "tabTitle": "Tìm việc làm",
+    "recommendedJobs": "Việc làm đề xuất"
+  },
+  "profile": {
+    "messages": {
+      "educationAddSuccess": "Thêm học vấn thành công",
+      "educationUpdateSuccess": "Cập nhật học vấn thành công",
+      "educationDeleteSuccess": "Xóa học vấn thành công",
+      "deleteConfirmTitle": "Xác nhận xóa",
+      "deleteConfirmWarning": "Bạn có chắc muốn xóa mục này?",
+      "noEducationData": "Chưa có thông tin học vấn"
+    },
+    "sections": {
+      "education": "Học vấn"
+    },
+    "fields": {
+      "present": "Hiện tại",
+      "description": "Mô tả"
+    }
+  },
+  "companyDetail": {
+    "about": "Giới thiệu",
+    "notUpdated": "Chưa cập nhật",
+    "since": "Thành lập từ",
+    "shareWithQr": "Chia sẻ qua QR",
+    "followed": "Đã theo dõi",
+    "follow": "Theo dõi",
+    "share": "Chia sẻ",
+    "website": "Website",
+    "followAt": "Theo dõi tại",
+    "generalInfo": "Thông tin chung",
+    "map": "Bản đồ",
+    "images": "Hình ảnh"
+  },
+  "jobDetail": {
+    "actions": {
+      "applied": "Đã ứng tuyển",
+      "apply": "Ứng tuyển ngay",
+      "saved": "Đã lưu",
+      "save": "Lưu tin",
+      "share": "Chia sẻ"
+    },
+    "contactInfo": "Thông tin liên hệ",
+    "contactPerson": "Người liên hệ",
+    "notUpdated": "Chưa cập nhật",
+    "contactEmail": "Email liên hệ",
+    "contactPhone": "Điện thoại liên hệ",
+    "address": "Địa chỉ",
+    "map": "Bản đồ",
+    "description": "Mô tả công việc",
+    "requirements": "Yêu cầu công việc",
+    "benefits": "Quyền lợi",
+    "career": "Ngành nghề",
+    "workplaceType": "Hình thức làm việc",
+    "academicLevel": "Trình độ học vấn",
+    "quantity": "Số lượng tuyển",
+    "location": "Địa điểm",
+    "genderRequired": "Yêu cầu giới tính",
+    "deadline": "Hạn nộp hồ sơ",
+    "views": "Lượt xem",
+    "postedDate": "Ngày đăng",
+    "salary": "Mức lương",
+    "experience": "Kinh nghiệm",
+    "position": "Cấp bậc",
+    "jobType": "Hình thức",
+    "similarJobs": "Việc làm tương tự",
+    "savedSuccess": "Đã lưu tin thành công",
+    "unsavedSuccess": "Đã bỏ lưu tin",
+    "noData": "Không có dữ liệu"
+  },
+  "unavailableTitle": "Phòng không khả dụng",
+  "readyTitle": "Sẵn sàng tham gia",
+  "interviewListCard": {
+    "candidate": "Ứng viên",
+    "statuses": {
+      "draft": "Bản nháp",
+      "scheduled": "Đã lên lịch",
+      "calibration": "Kiểm tra thiết bị",
+      "in_progress": "Đang phỏng vấn",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy",
+      "interrupted": "Bị gián đoạn",
+      "processing": "Đang xử lý"
+    }
+  },
+  "controls": {
+    "end": "Kết thúc"
+  },
+  "sessionNotJoinable": "Phiên phỏng vấn không thể tham gia",
+  "readyBody": "Nhấn bên dưới để tham gia vào buổi phỏng vấn của bạn.",
+  "sessionNotJoinableBody": "Phiên phỏng vấn này hiện không thể tham gia. Vui lòng liên hệ nhà tuyển dụng.",
+  "startInterview": "Bắt đầu phỏng vấn",
+  "cvDoc": {
+    "labels": {
+      "email": "Email:",
+      "phone": "SĐT:",
+      "updatedAt": "Cập nhật:",
+      "position": "Vị trí:",
+      "experience": "Kinh nghiệm:",
+      "education": "Học vấn:",
+      "salary": "Mức lương:",
+      "workplace": "Nơi làm việc:",
+      "jobType": "Hình thức:",
+      "present": "Hiện tại",
+      "major": "Chuyên ngành:",
+      "languagePrefix": "Tiếng ",
+      "noExpiration": "Không thời hạn"
+    },
+    "sections": {
+      "generalInfo": "THÔNG TIN CHUNG",
+      "workExperience": "KINH NGHIỆM LÀM VIỆC",
+      "education": "HỌC VẤN",
+      "skills": "KỸ NĂNG CHUYÊN MÔN",
+      "languages": "NGOẠI NGỮ",
+      "certificates": "CHỨNG CHỈ"
+    }
+  },
+  "auto": {
+    "index_wwwsquarevn_9a21": "www.square.vn"
+  },
+  "fileUpload": {
+    "dragDropOrSelect": "Kéo thả file vào đây hoặc",
+    "selectFile": "Chọn file",
+    "pdfOnly": "Chỉ chấp nhận file PDF",
+    "delete": "Xóa"
+  },
+  "notFound": {
+    "title": "Trang không tồn tại",
+    "message": "Đường dẫn có thể đã bị thay đổi hoặc trang đã bị xóa. Vui lòng kiểm tra lại URL hoặc quay về trang chủ.",
+    "backHome": "Quay về trang chủ"
+  },
+  "systemError": {
+    "occurred": "Đã có lỗi xảy ra.",
+    "requestFailed": "Yêu cầu chưa thể xử lý.",
+    "tryAgain": "Vui lòng thử lại sau.",
+    "reload": "Tải lại trang."
+  },
+  "maintenanceMode": {
+    "badge": "Đang bảo trì",
+    "title": "Hệ thống đang bảo trì",
+    "message": "InfoHR Tuyển Dụng đang nâng cấp hệ thống để phục vụ bạn tốt hơn. Vui lòng quay lại sau ít phút.",
+    "reload": "Tải lại trang",
+    "retryHint": "Bạn có thể thử lại sau ít phút.",
+    "statusCode": "Mã trạng thái"
+  },
+  "language": {
+    "vietnamese": "Tiếng Việt",
+    "english": "English"
+  },
+  "notification": {
+    "markAllRead": "Đánh dấu tất cả là đã đọc",
+    "empty": "Không có thông báo mới",
+    "loadMore": "Tải thêm",
+    "new": "Mới",
+    "openMenu": "Mở thông báo",
+    "read": "Đã đọc",
+    "unreadCount": "{{count}} chưa đọc",
+    "viewAll": "Xem tất cả"
+  },
+  "profileUpload": {
+    "allowSearch": "Cho phép tìm kiếm",
+    "searchHelp": "Bật \"Cho phép tìm kiếm\" sẽ giúp nhà tuyển dụng tìm thấy hồ sơ của bạn và họ có thể liên hệ với bạn về công việc mới. Chỉ có duy nhất một hồ sơ được bật trạng thái \"cho phép tìm kiếm\" trong tất cả hồ sơ của bạn.",
+    "lastUpdated": "Cập nhật lần cuối: {{date}}",
+    "download": "Tải xuống",
+    "editResume": "Chỉnh sửa hồ sơ",
+    "deleteResume": "Xóa hồ sơ",
+    "previewColor": "Xem trước màu đã chọn"
+  },
+  "interview": {
+    "forceEndSuccess": "Đã yêu cầu kết thúc buổi phỏng vấn",
+    "recordingWaiting": "Buổi phỏng vấn đã kết thúc, hệ thống đang chờ video ghi hình đồng bộ về để hiển thị tại đây."
+  },
+  "agentAssistant": {
+    "title": "Agent Assistants",
+    "recents": "Gần đây",
+    "newChat": "Đoạn chat mới",
+    "ready": "Sẵn sàng",
+    "empty": "Agent đang sẵn sàng",
+    "placeholder": "Nhắn cho agent...",
+    "send": "Gửi",
+    "deleteHistory": "Xóa lịch sử chat",
+    "deleteCurrentHistory": "Xóa lịch sử chat đang mở",
+    "deleteError": "Không thể xóa lịch sử chat này. Vui lòng thử lại.",
+    "loadError": "Không thể tải Agent Assistants. Vui lòng thử lại.",
+    "sendError": "Agent chưa chạy được yêu cầu này. Vui lòng kiểm tra nội dung và thử lại.",
+    "thinking": "Agent đang suy nghĩ...",
+    "attachments": {
+      "addImage": "Đính kèm ảnh",
+      "remove": "Xóa ảnh",
+      "threadTitle": "Đã gửi ảnh",
+      "limit": "Chỉ có thể đính kèm tối đa {{count}} ảnh.",
+      "unsupported": "Chỉ hỗ trợ ảnh PNG, JPG, WebP hoặc GIF.",
+      "tooLarge": "Mỗi ảnh cần nhỏ hơn 2MB.",
+      "readError": "Không thể đọc ảnh này. Vui lòng thử ảnh khác."
+    },
+    "portals": {
+      "admin": "InfoHR Admin",
+      "employer": "InfoHR Employer"
+    },
+    "threadGroups": {
+      "today": "Hôm nay",
+      "yesterday": "Hôm qua",
+      "thisWeek": "Tuần này",
+      "earlier": "Trước đó"
+    },
+    "status": {
+      "pending": "Chờ chạy",
+      "running": "Đang chạy",
+      "succeeded": "Hoàn tất",
+      "failed": "Lỗi"
+    },
+    "tools": {
+      "create_manual_candidate": "Tạo hồ sơ ứng viên",
+      "search_candidates": "Tìm ứng viên",
+      "update_application_status": "Cập nhật trạng thái hồ sơ",
+      "list_job_posts": "Liệt kê tin tuyển dụng",
+      "list_applications": "Liệt kê hồ sơ ứng tuyển",
+      "list_companies": "Liệt kê công ty",
+      "review_job_post": "Duyệt tin tuyển dụng",
+      "create_question": "Tạo câu hỏi",
+      "list_questions": "Liệt kê câu hỏi",
+      "create_question_group": "Tạo bộ câu hỏi",
+      "list_question_groups": "Liệt kê bộ câu hỏi",
+      "list_interviews": "Liệt kê phỏng vấn"
+    },
+    "rows": {
+      "candidate": "Ứng viên",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "jobPost": "Tin tuyển dụng",
+      "company": "Công ty",
+      "status": "Trạng thái",
+      "question": "Câu hỏi",
+      "questionGroup": "Bộ câu hỏi",
+      "questionsCount": "Số câu hỏi",
+      "interviewId": "Mã phỏng vấn",
+      "applicationId": "Mã hồ sơ",
+      "jobPostId": "Mã tin"
+    },
+    "results": {
+      "title": "Kết quả",
+      "fallback": "Kết quả {{index}}",
+      "more": "Và {{count}} kết quả khác.",
+      "openRecord": "Mở bản ghi"
+    }
+  },
+  "sidebarHeader": {
+    "backToHome": "Về trang chủ",
+    "backToAdmin": "Về trang quản trị"
+  },
+  "next": "Tiếp",
+  "id": "ID",
+  "na": "N/A"
 }

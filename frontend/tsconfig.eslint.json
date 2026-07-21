@@ -1,9 +1,10 @@
 {
-  "extends": "./jsconfig.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "allowJs": true,
+    "allowJs": false,
     "checkJs": false,
     "noEmit": true
   },
-  "include": ["src/**/*.js", "src/**/*.jsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "cypress"]
 }

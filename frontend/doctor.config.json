@@ -1,0 +1,32 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "ignore": {
+    "tags": ["test-noise"],
+    "files": [
+      "audit_i18n.cjs",
+      "fix-window.cjs",
+      "fix_all_i18n.cjs",
+      "fix_i18n.cjs",
+      "fix_ns.cjs",
+      "fix_parity.cjs",
+      "inject_missing_keys.cjs",
+      "tools-*.mjs",
+      "tools/**/*.cjs",
+      "tools/**/*.mjs"
+    ],
+    "overrides": [
+      {
+        "files": ["package.json"],
+        "rules": [
+          "deslop/unused-dependency",
+          "deslop/unused-dev-dependency"
+        ]
+      }
+    ]
+  },
+  "rules": {
+    "react-doctor/jsx-no-jsx-as-prop": "off",
+    "react-doctor/no-multi-comp": "off",
+    "react-doctor/only-export-components": "off"
+  }
+}

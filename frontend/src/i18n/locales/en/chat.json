@@ -9,14 +9,30 @@
   "noConversationSelected": "You haven't selected any conversation...",
   "typeYourMessage": "Type your message here...",
   "send": "Send",
+  "sendMessage": "Message",
+  "composer": {
+    "attachFile": "Attach file",
+    "chooseEmoji": "Choose emoji",
+    "sendMessage": "Send message"
+  },
+  "message": {
+    "avatarAlt": "Chat avatar",
+    "attachmentImageAlt": "Message attachment",
+    "downloadFile": "Download file"
+  },
+  "noCandidates": "No candidates have applied",
+  "sending": "Sending ...",
+  "appliedJobs": "APPLIED JOB POSTS",
+  "noAppliedJobs": "You haven't applied for any position",
+  "candidates": "CANDIDATES",
   "chatbot": {
     "greeting": {
-      "employer": "Hello! I am Square AI, your recruitment assistant. How can I help you today? (e.g., finding candidates, drafting interview invitations...)",
-      "jobSeeker": "Hello! I am Square AI, your career assistant. Are you looking for a job or need any advice?"
+      "employer": "Hello! I am InfoHR AI, your recruitment assistant. How can I help you today? (e.g., finding candidates, drafting interview invitations...)",
+      "jobSeeker": "Hello! I am InfoHR AI, your career assistant. Are you looking for a job or need any advice?"
     },
     "systemPrompt": {
-      "employer": "You are Square AI, an intelligent AI assistant for employers on the Square-Tuyen-Dung platform. You are knowledgeable about the labor market, JD writing, and professional interview processes.",
-      "jobSeeker": "You are Square AI, an intelligent AI assistant for job seekers on the Square-Tuyen-Dung platform. You help them find jobs, advise on CV editing, and interview preparation."
+      "employer": "You are InfoHR AI, an intelligent AI assistant for employers on the InfoHR-Tuyen-Dung platform. You are knowledgeable about the labor market, JD writing, and professional interview processes.",
+      "jobSeeker": "You are InfoHR AI, an intelligent AI assistant for job seekers on the InfoHR-Tuyen-Dung platform. You help them find jobs, advise on CV editing, and interview preparation."
     },
     "error": {
       "apology": "Sorry, I encountered a slight problem processing this question.",
@@ -25,7 +41,17 @@
     },
     "status": "Ready",
     "placeholder": "Type a message...",
-    "launcherAria": "Open Square AI assistant",
-    "closeAria": "Close chat"
-  }
+    "panelAria": "InfoHR AI chat",
+    "launcherAria": "Open InfoHR AI assistant",
+    "closeAria": "Close chat",
+    "retry": "Retry"
+  },
+  "loadPreviousMessages": "Load previous messages",
+  "typeAMessage": "Type a message...",
+  "auto": {
+    "index_chn_mt_cuc_hi_thoi_danh_sch_bn_5d32": "Choose a conversation from the list on the left to start messaging"
+  },
+  "slogan": "New way to follow your chance.",
+  "sloganSub": "More engage, more success"
 }
+

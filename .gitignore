@@ -1,8 +1,50 @@
+# Environment
 .env
 .env.*
+!.env.example
+
+# Database dumps
 *.sql
 api/data/*.sql
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Node
 node_modules/
 dist/
+
+# Build output
+frontend/build/
+frontend/.next/
+frontend/tsconfig.tsbuildinfo
+
+# OS files
 .DS_Store
 Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Temp / debug files
+full_diff.txt
+*.log
+tsc_output*.txt
+tsc_errors*.txt
+ts_errors*.txt
+ts_validation*.txt
+temp_tsc_errors*.txt
+audit_result*.txt
+build_err*.txt
+expect_output*.txt
+expect_cli_output*.txt
+
+# Python cache
+.pytest_cache/
+*.egg-info/
+
+# Local isolated worktrees
+.worktrees/

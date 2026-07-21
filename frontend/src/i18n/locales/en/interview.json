@@ -4,7 +4,19 @@
   "redirectCta": "If you are not redirected, click here",
   "readyTitle": "Ready to start the interview",
   "readyBody": "Click start to connect. Camera and microphone will only turn on when you choose them in the toolbar.",
+  "unavailableTitle": "Session Unavailable",
+  "sessionNotJoinable": "This interview session has already ended or been cancelled.",
+  "sessionNotJoinableBody": "This interview session has already ended or been cancelled. Please contact the employer for details.",
+  "processingTitle": "Processing interview results",
+  "processingBody": "This interview has ended. The system is preparing the transcript and evaluation, so please check again in a few minutes.",
   "startInterview": "Start interview",
+  "preflight": {
+    "title": "Device check",
+    "subtitle": "Make sure your microphone works before starting the AI interview.",
+    "mic_ready": "Microphone is ready",
+    "join": "Join interview",
+    "mic_denied": "Microphone permission was denied. Please allow microphone access to continue."
+  },
   "transcriptTitle": "Transcript",
   "noMessages": "No messages yet.",
   "chatPlaceholder": "Type a message...",
@@ -19,12 +31,29 @@
     "camera": "Camera",
     "share": "Share",
     "chat": "Chat",
-    "end": "End call"
+    "end": "End call",
+    "ending": "Ending...",
+    "enableAudio": "Enable audio",
+    "muteMicrophone": "Mute microphone",
+    "unmuteMicrophone": "Unmute microphone",
+    "turnCameraOn": "Turn camera on",
+    "turnCameraOff": "Turn camera off",
+    "startScreenShare": "Start screen share",
+    "stopScreenShare": "Stop screen share"
+  },
+  "agentView": {
+    "technicalInterview": "Technical Interview",
+    "candidate": "Candidate",
+    "agentSpeaking": "AI is speaking",
+    "agentThinking": "AI is thinking",
+    "listening": "Listening",
+    "ready": "Ready",
+    "transcript": "Chat Transcript"
   },
   "voiceAi": {
-    "pageTitle": "LiveKit Voice Agent",
-    "pageDescription": "A voice agent built with LiveKit",
-    "companyName": "LiveKit",
+    "pageTitle": "Interview Assistant",
+    "pageDescription": "Virtual interview assistant",
+    "companyName": "Interview System",
     "startCall": "Start call",
     "startAudio": "Start audio",
     "welcome": {
@@ -37,9 +66,12 @@
       "endShort": "End"
     },
     "chat": {
+      "messageInput": "Message",
       "placeholder": "Type something...",
       "sending": "Sending...",
-      "send": "Send"
+      "send": "Send",
+      "sendingMessage": "Sending message",
+      "sendMessage": "Send message"
     },
     "devices": {
       "select": "Select a {{kind}}",
@@ -60,6 +92,7 @@
     },
     "preconnect": "Agent is listening, ask it a question",
     "aria": {
+      "controls": "Voice assistant controls",
       "toggleMicrophone": "Toggle microphone",
       "toggleCamera": "Toggle camera",
       "toggleScreenShare": "Toggle screen share",
@@ -67,11 +100,23 @@
       "toggleGeneric": "Toggle {{target}}"
     }
   },
-  "loading": "Connecting to interview room...",
+  "stages": {
+    "INTRODUCTION": "Introduction",
+    "EXPERIENCE": "Work Experience",
+    "TECHNICAL": "Technical Knowledge",
+    "BEHAVIORAL": "Behavioral Questions",
+    "CLOSING": "Closing",
+    "currentQuestion": "Question {{current}} / {{total}}"
+  },
+  "loading": "Waiting for system...",
   "errors": {
     "missingInvite": "Missing interview invite code.",
+    "missingSessionId": "Missing interview session ID.",
     "tokenMissing": "Unable to fetch token to join the interview.",
-    "invalidSession": "Connection error or invalid interview session."
+    "invalidSession": "Connection error or invalid interview session.",
+    "sessionNotReadyForJoin": "Cannot join this room right now because the session is currently {{status}}.",
+    "endSessionFailed": "Unable to update the end status. The room has been disconnected.",
+    "mic_denied": "Microphone permission was denied. Please allow microphone access to continue."
   },
   "employer": {
     "questions": {
@@ -104,18 +149,255 @@
       "deleteError": "Could not delete this question.",
       "columns": {
         "text": "Question Content"
-      }
+      },
+      "deleteTitle": "Delete Question",
+      "noData": "No questions yet",
+      "hint": "Create questions to use in interviews"
     }
   },
   "interviewListCard": {
     "title": "Online Interview List",
+    "scheduleInterview": "Schedule Interview",
+    "noInterviews": "No interview sessions created yet.",
+    "deleteInterview": "Delete Interview",
+    "editInterview": "Edit Interview",
+    "cancelInterview": "Cancel Interview",
+    "confirmDeleteTitle": "Confirm Delete",
+    "confirmDeleteMessage": "Are you sure you want to delete this interview session? This action cannot be undone.",
+    "confirmCancelTitle": "Confirm Cancel",
+    "confirmCancelMessage": "Are you sure you want to cancel this interview session?",
+    "grading": "Grading...",
+    "messages": {
+      "deleteSuccess": "Interview session deleted successfully",
+      "deleteError": "Failed to delete interview session",
+      "cancelSuccess": "Interview session cancelled successfully",
+      "cancelError": "Failed to cancel interview session"
+    },
+    "candidate": "Candidate",
+    "position": "Position",
+    "time": "Time",
+    "status": "Status",
+    "aiScore": "AI Score",
+    "markCompleted": "Mark as completed",
+    "statuses": {
+      "scheduled": "Scheduled",
+      "in_progress": "In Progress",
+      "processing": "Processing",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "draft": "Draft",
+      "calibration": "Calibration",
+      "interrupted": "Interrupted",
+      "connecting": "Connecting",
+      "active": "Active"
+    },
+    "description": "View scheduled interviews"
+  },
+  "interviewAdminPage": {
+    "title": "Interview Management",
+    "cardTitle": "All Interview List",
+    "confirmDelete": "Are you sure you want to delete this interview?",
+    "candidateEmployer": "Candidate / Employer",
+    "jobPost": "Job Post",
+    "type": "Type",
     "time": "Time",
     "status": "Status",
     "actions": "Actions",
     "viewDetails": "View details",
     "markCompleted": "Mark as completed",
     "cancelInterview": "Cancel interview",
-    "delete": "Delete",
-    "confirmDelete": "Are you sure you want to delete this interview?"
+    "delete": "Delete"
+  },
+  "common": {
+    "na": "N/A",
+    "status": {
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "scheduled": "Scheduled",
+      "cancelled": "Cancelled",
+      "pending": "Pending",
+      "unknown": "Unknown"
+    },
+    "table": {
+      "noData": "No data found"
+    }
+  },
+  "interviewCreateCard": {
+    "messages": {
+      "updateSuccess": "Interview updated successfully",
+      "scheduleSuccess": "Interview scheduled successfully"
+    },
+    "title": {
+      "editOnlineInterview": "Edit Online Interview",
+      "scheduleOnlineInterview": "Schedule Online Interview",
+      "scheduledtime": "Scheduled Time"
+    },
+    "description": {
+      "schedulingHelper": "Fill in the details below to schedule an interview"
+    },
+    "label": {
+      "basicInfo": "Basic Information",
+      "selectjobpost": "Select Job Post",
+      "selectcandidate": "Select Candidate",
+      "aiVoice": "AI voice",
+      "autoDefaultVoice": "Auto/default voice",
+      "defaultVoiceSuffix": "default",
+      "questions": "Questions",
+      "selectquestiongroupoptional": "Select Question Group (Optional)",
+      "selectinterviewquestions": "Select Interview Questions",
+      "selectquestions": "Select Questions"
+    },
+    "validation": {
+      "selectJobPost": "Please select a job post",
+      "selectCandidate": "Please select a candidate",
+      "selectScheduleTime": "Please select interview time"
+    },
+    "helperText": {
+      "selectaquestiongrouptoautomaticallyfillthequestions below": "Select a question group to auto-fill questions",
+      "voiceProfileAuto": "Leave auto to use the default voice granted for this job or company."
+    },
+    "scheduleNow": "Schedule Now",
+    "noCandidates": "No candidates have applied for this position",
+    "loadingSelectedJobPost": "Loading selected job post...",
+    "missingSelectedJobPost": "Selected job post #{{id}} is no longer available",
+    "loadingSelectedCandidate": "Loading selected candidate...",
+    "missingSelectedCandidate": "Selected candidate #{{id}} is no longer available"
+  },
+  "interviewDetail": {
+    "title": "Interview Details",
+    "subtitle": {
+      "info": "Interview Information",
+      "aiEvaluation": "AI Evaluation Result",
+      "analysis": "AI Analysis",
+      "history": "Conversation History",
+      "recording": "Interview Recording",
+      "transcript": "Conversation Transcript",
+      "questions": "Question List"
+    },
+    "label": {
+      "roomCode": "Room Code",
+      "id": "ID",
+      "candidate": "CANDIDATE",
+      "position": "POSITION",
+      "type": "INTERVIEW TYPE",
+      "schedule": "SCHEDULE",
+      "liveMonitoring": "LIVE MONITORING",
+      "aiInterviewer": "AI Interviewer",
+      "interviewer": "Interviewer",
+      "candidateSmall": "Candidate",
+      "technicalScore": "Technical Score",
+      "communicationScore": "Communication Score",
+      "detailedAnalysis": "Detailed AI Analysis",
+      "detailedFeedback": "Detailed Feedback",
+      "strengths": "Strengths",
+      "weaknesses": "Weaknesses",
+      "feedback": "Detailed Feedback",
+      "softSkills": "Soft skills",
+      "confidence": "Confidence",
+      "clarity": "Clarity",
+      "tone": "Tone",
+      "culturalFit": "Cultural fit",
+      "questionPerformance": "Question performance",
+      "question": "Question"
+    },
+    "tooltips": {
+      "cannotJoin": "Cannot join at this time",
+      "forceEndNow": "End this interview immediately",
+      "observeHidden": "Observe without joining the room"
+    },
+    "status": {
+      "interruptedResume": "Interrupted - can resume"
+    },
+    "messages": {
+      "evaluationSuccess": "Evaluation saved successfully",
+      "scoreInvalid": "Scores must be between 0 and 10.",
+      "proposedSalaryInvalid": "Proposed salary must be zero or greater.",
+      "aiTriggerSuccess": "AI evaluation started",
+      "notFound": "Interview not found",
+      "notFoundDesc": "The interview you are looking for does not exist",
+      "recordingPending": "Video is being processed",
+      "recordingPendingDesc": "The recording will appear here once processing is complete",
+      "confirmForceEnd": "Are you sure you want to end this interview session immediately?",
+      "forceEndSuccess": "Interview end requested",
+      "aiGenerating": "AI evaluation results are being generated",
+      "aiAnalyzing": "AI is analyzing the conversation...",
+      "aiAnalyzingDesc": "AI is analyzing the profile...",
+      "aiNeedsTrigger": "AI analysis needs to be triggered",
+      "notEnded": "Interview has not ended",
+      "noHistory": "No conversation data available",
+      "noData": "No data",
+      "noDetails": "No details available",
+      "noQuestions": "No interview questions",
+      "noTranscript": "No transcript",
+      "noTranscriptDesc": "No conversation has been recorded yet.",
+      "interruptedResumeHint": "The connection was interrupted temporarily. You can join again to continue the interview."
+    },
+    "actions": {
+      "triggerAi": "Trigger AI Evaluation",
+      "backToList": "Back to List",
+      "viewReport": "View detailed report",
+      "openRecording": "Open recording",
+      "retryAi": "Re-analyze with AI",
+      "questionList": "Interview Questions List",
+      "hrEvaluation": "HR Evaluation",
+      "attitudeScore": "Attitude Score",
+      "professionalScore": "Professional Score",
+      "overallScore": "Overall Score",
+      "resultLabel": "Final Result",
+      "comments": "Detailed Comments",
+      "proposedSalary": "Proposed Salary (VND)",
+      "submitEvaluation": "Submit Final Evaluation",
+      "evalSuccess": "Evaluation submitted successfully!",
+      "passed": "Accepted (Pass)",
+      "failed": "Rejected (Fail)",
+      "pending": "Pending Review",
+      "joinAsHrLoading": "Connecting..."
+    }
+  },
+  "liveRoom": {
+    "participants": {
+      "aiInterviewer": "AI Interviewer",
+      "employer": "Employer",
+      "you": "You",
+      "candidate": "Candidate",
+      "guest": "Guest",
+      "observer": "Observer"
+    },
+    "chips": {
+      "ai": "AI",
+      "you": "YOU",
+      "employer": "HR",
+      "live": "LIVE"
+    },
+    "chat": {
+      "title": "Conversation",
+      "subtitle": "Voice and messages share the same timeline.",
+      "messagesCount": "{{count}} messages",
+      "noMessages": "No messages yet",
+      "noMessagesDesc": "Conversation will appear here when someone speaks or types.",
+      "placeholder": "Write a message...",
+      "send": "Send",
+      "open": "Open chat",
+      "close": "Close chat",
+      "chatMode": "Chat",
+      "aiControlMode": "AI says",
+      "aiControlPlaceholder": "Type what you want the AI to ask or say...",
+      "aiControlSend": "AI says",
+      "takeoverMode": "Hold AI",
+      "takeoverTitle": "Employer live",
+      "takeoverActive": "Holding AI",
+      "takeoverInactive": "AI-led",
+      "takeoverHint": "While holding AI, the AI pauses so you can speak directly with the candidate. Release control when the AI should continue.",
+      "takeoverAcquire": "Hold AI",
+      "takeoverRelease": "Release AI",
+      "takeoverSending": "Updating..."
+    },
+    "observingBar": {
+      "hrObserving": "You are observing this interview session",
+      "hrWaiting": "Waiting for candidate to join the room...",
+      "employerObserving": "Employer is observing this interview session",
+      "live": "LIVE",
+      "waiting": "WAITING"
+    }
   }
 }

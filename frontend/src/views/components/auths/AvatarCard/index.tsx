@@ -1,0 +1,309 @@
+import React from 'react';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+
+import { Box, Stack, IconButton, Typography } from "@mui/material";
+
+import { useTranslation } from 'react-i18next';
+
+import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
+
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+
+import { confirmModal } from '../../../../utils/sweetalert2Modal';
+
+import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
+
+import toastMessages from '../../../../utils/toastMessages';
+
+import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
+
+import { deleteAvatar, updateAvatar } from '../../../../redux/userSlice';
+import { compressImageFile } from '../../../../utils/imageCompression';
+import ImageCropDialog from '../../../../components/Common/ImageCropDialog';
+
+const AvatarCard = () => {
+
+  const { t } = useTranslation('auth');
+
+  const dispatch = useAppDispatch();
+
+  const { currentUser } = useAppSelector((state) => state.user);
+
+  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
+
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const [cropOpen, setCropOpen] = React.useState(false);
+  const [cropImageSrc, setCropImageSrc] = React.useState('');
+  const [cropFileName, setCropFileName] = React.useState('');
+
+  const handleCropConfirm = async (croppedFile: File, previewUrl: string) => {
+    setCropOpen(false);
+    const compressed = await compressImageFile(croppedFile);
+    await handleUpload(compressed);
+  };
+
+  const handleCropCancel = () => {
+    setCropOpen(false);
+    if (cropImageSrc) URL.revokeObjectURL(cropImageSrc);
+    setCropImageSrc('');
+  };
+
+  const handleUpload = async (file: File) => {
+
+    const formData = new FormData();
+
+    formData.append('file', file);
+
+    setIsFullScreenLoading(true);
+
+    dispatch(updateAvatar(formData))
+
+      .unwrap()
+
+      .then(() => {
+
+        toastMessages.success(t('account.avatarUpdateSuccess'));
+
+      })
+
+      .catch(() => {
+
+        toastMessages.error(t('messages.tryAgain'));
+
+      })
+
+      .finally(() => setIsFullScreenLoading(false));
+
+  };
+
+  const handleDelete = () => {
+
+    const del = async () => {
+
+      setIsFullScreenLoading(true);
+
+      dispatch(deleteAvatar())
+
+        .unwrap()
+
+        .then(() => {
+
+          toastMessages.success(t('account.avatarDeleteSuccess'));
+
+        })
+
+        .catch(() => {
+
+          toastMessages.error(t('messages.genericError'));
+
+        })
+
+        .finally(() => setIsFullScreenLoading(false));
+
+    };
+
+    confirmModal(
+
+      () => del(),
+
+      t('account.avatar'),
+
+      t('account.avatarDeleteConfirm'),
+
+      'warning'
+
+    );
+
+  };
+
+  const handlePickFile = () => {
+
+    fileInputRef.current?.click();
+
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setCropFileName(file.name);
+    setCropImageSrc(URL.createObjectURL(file));
+    setCropOpen(true);
+    event.target.value = '';
+  };
+
+  return (
+
+    <>
+
+      <Stack alignItems="center">
+
+        <Box
+
+          sx={{
+
+            position: 'relative',
+
+            width: 120,
+
+            height: 120,
+
+            padding: '4px',
+
+            borderRadius: '50%',
+
+            background: 'linear-gradient(45deg, #441da0, #6b4fd1)',
+
+            boxShadow: '0 4px 14px 0 rgba(68, 29, 160, 0.15)',
+
+            '&:hover .avatar-actions': {
+
+              opacity: 1,
+
+            },
+
+          }}
+
+        >
+
+          <MuiImageCustom
+
+            src={currentUser?.avatarUrl}
+
+            width="100%"
+
+            height="100%"
+
+            sx={{
+
+              borderRadius: '50%',
+
+              objectFit: 'cover',
+
+              border: '2px solid white',
+
+            }}
+
+          />
+
+          <Box
+
+            className="avatar-actions"
+
+            sx={{
+
+              position: 'absolute',
+
+              top: 0,
+
+              left: 0,
+
+              right: 0,
+
+              bottom: 0,
+
+              borderRadius: '50%',
+
+              backgroundColor: 'rgba(0, 0, 0, 0.3)',
+
+              display: 'flex',
+
+              justifyContent: 'center',
+
+              alignItems: 'center',
+
+              opacity: 0,
+
+              transition: 'opacity 0.2s ease',
+
+            }}
+
+          >
+
+            <Stack direction="row" spacing={1}>
+
+              <IconButton
+
+                size="small"
+
+                sx={{
+
+                  bgcolor: 'white',
+
+                  '&:hover': { bgcolor: 'white', opacity: 0.9 },
+
+                }}
+
+                onClick={handlePickFile}
+
+              >
+
+                <ModeEditOutlineOutlinedIcon sx={{ fontSize: 18, color: '#fca34d' }} />
+
+              </IconButton>
+
+              {currentUser?.avatarUrl && (
+
+                <IconButton
+
+                  size="small"
+
+                  onClick={handleDelete}
+
+                  sx={{
+
+                    bgcolor: 'white',
+
+                    '&:hover': { bgcolor: 'white', opacity: 0.9 },
+
+                  }}
+
+                >
+
+                  <HighlightOffIcon sx={{ fontSize: 18, color: '#d32f2f' }} />
+
+                </IconButton>
+
+              )}
+
+            </Stack>
+
+          </Box>
+
+        </Box>
+
+        <Typography variant="subtitle2" gutterBottom sx={{ mt: 1 }}>
+
+          {t('account.avatar')}
+
+        </Typography>
+
+      </Stack>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        aria-label={t('account.avatar')}
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+
+      <BackdropLoading open={isFullScreenLoading} />
+
+      <ImageCropDialog
+        open={cropOpen}
+        imageSrc={cropImageSrc}
+        fileName={cropFileName}
+        aspectRatio={1}
+        aspectLabel="1:1"
+        onConfirm={handleCropConfirm}
+        onCancel={handleCropCancel}
+      />
+    </>
+  );
+
+};
+
+export default React.memo(AvatarCard);

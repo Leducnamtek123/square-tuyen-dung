@@ -5,16 +5,18 @@
     "dashboard": "Bảng điều khiển",
     "myDashboard": "Trang chủ {{appName}}",
     "profile": "Hồ sơ của tôi",
-    "myJobs": "Việc làm của tôi",
+    "jobs": "Việc làm",
     "myCompany": "Công ty của tôi",
     "myInterviews": "Phỏng vấn của tôi",
     "notifications": "Thông báo",
-    "accountSettings": "Tài khoản & Thiết lập"
+    "accountSettings": "Tài khoản & Thiết lập",
+    "tabsAria": "Các tab điều hướng người tìm việc"
   },
   "profile": {
     "sections": {
       "personal": "Thông tin cá nhân",
       "general": "Thông tin chung",
+      "generalInfo": "Thông tin chung",
       "experience": "Kinh nghiệm làm việc",
       "education": "Học vấn",
       "skills": "Kỹ năng chuyên môn",
@@ -76,7 +78,12 @@
       "degreeName": "Tên bằng cấp/Chứng chỉ",
       "major": "Chuyên ngành",
       "completedDate": "Ngày hoàn thành",
-      "gradeOrRank": "Xếp loại/Điểm số"
+      "gradeOrRank": "Xếp loại/Điểm số",
+      "salaryMin": "Lương tối thiểu",
+      "salaryMax": "Lương tối đa",
+      "skillName": "Tên kỹ năng",
+      "certificateName": "Tên chứng chỉ",
+      "expirationDate": "Ngày hết hạn"
     },
     "placeholders": {
       "fullName": "Nhập họ và tên",
@@ -115,7 +122,10 @@
       "degreeName": "VD: Cử nhân Công nghệ thông tin",
       "major": "Nhập chuyên ngành",
       "trainingPlace": "Nhập tên trường/trung tâm đào tạo",
-      "gradeOrRank": "Nhập xếp loại/điểm số"
+      "gradeOrRank": "Nhập xếp loại/điểm số",
+      "selectLanguage": "Chọn ngoại ngữ",
+      "skillName": "Nhập tên kỹ năng",
+      "certificateName": "Nhập tên chứng chỉ"
     },
     "validation": {
       "fullNameRequired": "Vui lòng nhập họ và tên.",
@@ -125,6 +135,7 @@
       "phoneMax": "Số điện thoại vượt quá độ dài cho phép.",
       "birthdayRequired": "Vui lòng chọn ngày sinh.",
       "birthdayInvalid": "Ngày sinh không hợp lệ.",
+      "idCardIssueDateInvalid": "Ngày cấp CMND/CCCD không được ở tương lai.",
       "genderRequired": "Vui lòng chọn giới tính.",
       "maritalStatusRequired": "Vui lòng chọn tình trạng hôn nhân.",
       "cityRequired": "Vui lòng chọn tỉnh/thành phố.",
@@ -139,11 +150,13 @@
       "careerRequired": "Vui lòng chọn ngành nghề.",
       "salaryMinRequired": "Vui lòng nhập mức lương tối thiểu.",
       "salaryMinInvalid": "Mức lương tối thiểu không hợp lệ.",
-      "salaryMinComparison": "Mức lương tối thiểu phải nhỏ hơn mức lương tối đa.",
+      "salaryMinComparison": "Mức lương tối thiểu phải nhỏ hơn hoặc bằng mức lương tối đa.",
       "salaryMaxRequired": "Vui lòng nhập mức lương tối đa.",
       "salaryMaxInvalid": "Mức lương tối đa không hợp lệ.",
-      "salaryMaxComparison": "Mức lương tối đa phải lớn hơn mức lương tối thiểu.",
+      "salaryMaxComparison": "Mức lương tối đa phải lớn hơn hoặc bằng mức lương tối thiểu.",
       "expectedSalaryInvalid": "Lương mong đợi phải là số dương.",
+      "salaryTooLarge": "Mức lương vượt quá giới hạn cho phép.",
+      "choiceInvalid": "Lựa chọn không hợp lệ.",
       "workplaceTypeRequired": "Vui lòng chọn loại nơi làm việc.",
       "jobTypeRequired": "Vui lòng chọn hình thức làm việc.",
       "objectiveRequired": "Vui lòng nhập mục tiêu nghề nghiệp.",
@@ -155,10 +168,12 @@
       "companyNameMax": "Tên công ty vượt quá độ dài cho phép.",
       "startDateRequired": "Vui lòng chọn ngày bắt đầu.",
       "startDateYesterday": "Ngày bắt đầu phải trước ngày hôm nay.",
-      "startDateComparison": "Ngày bắt đầu phải trước ngày kết thúc.",
+      "startDateComparison": "Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.",
       "endDateRequired": "Vui lòng chọn ngày kết thúc.",
       "endDateToday": "Ngày kết thúc phải là hôm nay hoặc trước đó.",
-      "endDateComparison": "Ngày kết thúc phải sau ngày bắt đầu.",
+      "endDateComparison": "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.",
+      "completedDateComparison": "Ngày hoàn thành phải sau hoặc bằng ngày bắt đầu.",
+      "expirationDateComparison": "Ngày hết hạn phải sau hoặc bằng ngày bắt đầu.",
       "lastSalaryInvalid": "Lương cuối cùng phải là số dương.",
       "leaveReasonMax": "Lý do nghỉ việc vượt quá độ dài cho phép.",
       "degreeNameRequired": "Vui lòng nhập tên bằng cấp/chứng chỉ.",
@@ -172,10 +187,14 @@
       "certificateNameMax": "Tên chứng chỉ vượt quá độ dài cho phép.",
       "languageRequired": "Vui lòng chọn ngoại ngữ.",
       "levelRequired": "Vui lòng chọn mức độ.",
+      "levelInvalid": "Mức độ không hợp lệ.",
       "skillNameRequired": "Vui lòng nhập tên kỹ năng.",
       "skillNameMax": "Tên kỹ năng vượt quá độ dài cho phép.",
       "fileRequired": "Vui lòng chọn tệp tin.",
-      "fieldMax": "{{field}} vượt quá độ dài cho phép."
+      "filePdfOnly": "Chỉ chấp nhận file PDF.",
+      "fileTooLarge": "File PDF phải nhỏ hơn hoặc bằng 10MB.",
+      "fieldMax": "{{field}} vượt quá độ dài cho phép.",
+      "descriptionMax": "Mô tả không được vượt quá 500 ký tự"
     },
     "messages": {
       "personalUpdateSuccess": "Cập nhật thông tin cá nhân thành công",
@@ -206,7 +225,34 @@
       "noCertificateData": "Vui lòng thêm chứng chỉ để nhà tuyển dụng tham khảo",
       "noLanguageData": "Vui lòng thêm ngoại ngữ để nhà tuyển dụng tham khảo",
       "noResumeData": "Chưa có CV nào được tải lên",
-      "notFound": "Không tìm thấy thông tin hồ sơ"
+      "notFound": "Không tìm thấy thông tin hồ sơ",
+      "profileCompletionWarning": "Vui lòng bổ sung đầy đủ thông tin để hoàn thiện hồ sơ của bạn."
+    },
+    "aria": {
+      "advancedSkillsTable": "Bảng kỹ năng nâng cao",
+      "languageSkillsTable": "Bảng kỹ năng ngoại ngữ"
+    },
+    "summary": {
+      "experience": "Kinh nghiệm",
+      "position": "Vị trí",
+      "desiredSalary": "Mức lương mong muốn",
+      "lastUpdated": "Cập nhật lần cuối"
+    },
+    "actions": {
+      "editProfile": "Chỉnh sửa hồ sơ",
+      "uploadCv": "Tải lên CV",
+      "updateCv": "Cập nhật CV",
+      "generatingPdf": "Đang tạo PDF..."
+    },
+    "cv": {
+      "loading": "Đang tải CV...",
+      "emptyTitle": "Chưa có CV nào được tải lên",
+      "emptySubtitle": "Nhấn nút tải lên để thêm CV của bạn",
+      "loadingPreview": "Đang tải bản xem trước...",
+      "updateTitle": "Cập nhật CV"
+    },
+    "tooltips": {
+      "searchable": "Bật \"Có thể tìm kiếm\" sẽ giúp nhà tuyển dụng tìm thấy hồ sơ và liên hệ với bạn về các cơ hội mới. Chỉ một hồ sơ có thể được tìm kiếm tại một thời điểm."
     }
   },
   "account": {
@@ -217,6 +263,12 @@
     "title": "Thiết lập tài khoản",
     "changePassword": "Đổi mật khẩu",
     "deactivate": "Vô hiệu hóa tài khoản"
+  },
+  "settings": {
+    "toast": {
+      "updateSuccess": "Đã cập nhật cài đặt.",
+      "updateError": "Không thể cập nhật cài đặt."
+    }
   },
   "onlineProfile": {
     "pageTitle": "Cập nhật Hồ sơ Trực tuyến",
@@ -259,6 +311,25 @@
     "tabs": {
       "viewed": "Nhà tuyển dụng xem hồ sơ",
       "followed": "Công ty đang theo dõi"
+    },
+    "aria": {
+      "tabs": "Các tab công ty của tôi"
+    },
+    "empty": {
+      "viewed": "Chưa có nhà tuyển dụng nào xem hồ sơ của bạn",
+      "followed": "Bạn chưa theo dõi nhà tuyển dụng nào"
+    },
+    "actions": {
+      "findCompanies": "Tìm công ty",
+      "unfollow": "Bỏ theo dõi"
+    },
+    "messages": {
+      "unfollowSuccess": "Đã bỏ theo dõi thành công."
+    },
+    "savedProfile": "Đã lưu hồ sơ của bạn",
+    "viewedCard": {
+      "viewedProfile": "Đã xem hồ sơ {{resumeTitle}} {{views}} lần",
+      "lastViewed": "Lần xem cuối {{date}}"
     }
   },
   "myInterviews": {
@@ -269,7 +340,10 @@
   "jobApplication": {
     "title": "Hồ sơ ứng tuyển",
     "onlineProfile": "Hồ sơ trực tuyến",
-    "attachedResume": "CV đính kèm"
+    "attachedResume": "CV đính kèm",
+    "aria": {
+      "navigateToProfile": "Đi đến hồ sơ của tôi"
+    }
   },
   "jobManagement": {
     "title": "Quản lý việc làm của tôi",
@@ -281,6 +355,134 @@
     "notes": {
       "expired": "Lưu ý: Bạn không thể xem các việc làm đã hết hạn hoặc tạm dừng nhận hồ sơ."
     },
-    "suitableJobs": "Việc làm phù hợp"
+    "suitableJobs": "Việc làm đề xuất",
+    "aria": {
+      "tabs": "Các tab việc làm của tôi"
+    },
+    "empty": {
+      "saved": "Bạn chưa lưu việc làm nào",
+      "applied": "Bạn chưa ứng tuyển việc làm nào"
+    },
+    "actions": {
+      "searchJobs": "Tìm việc",
+      "unsave": "Bỏ lưu"
+    },
+    "appliedOn": "Ứng tuyển vào: {{date}}",
+    "messages": {
+      "saved": "Đã lưu việc làm thành công.",
+      "unsaved": "Đã bỏ lưu việc làm."
+    },
+    "notifications": {
+      "title": "Thông báo việc làm",
+      "subtitle": "Tối đa 3 thông báo việc làm có thể được bật",
+      "empty": "Bạn chưa có thông báo việc làm nào",
+      "create": "Tạo thông báo",
+      "createNow": "Tạo thông báo ngay",
+      "modalTitle": "Tạo thông báo việc làm",
+      "addedSuccess": "Tạo thông báo việc làm thành công.",
+      "updatedSuccess": "Cập nhật thông báo việc làm thành công.",
+      "deletedSuccess": "Xóa thông báo việc làm thành công.",
+      "deleteTitle": "Xóa thông báo việc làm",
+      "deleteWarning": "Thông báo việc làm này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?",
+      "form": {
+        "keyword": "Từ khóa",
+        "keywordPlaceholder": "Nhập tên công việc hoặc từ khóa liên quan bạn đang tìm kiếm.",
+        "career": "Ngành nghề",
+        "careerPlaceholder": "Chọn ngành nghề",
+        "city": "Tỉnh/Thành phố",
+        "cityPlaceholder": "Chọn tỉnh/thành phố",
+        "position": "Vị trí/Cấp bậc",
+        "positionPlaceholder": "Chọn vị trí/cấp bậc",
+        "experience": "Kinh nghiệm",
+        "experiencePlaceholder": "Chọn kinh nghiệm yêu cầu",
+        "salary": "Mức lương mong muốn",
+        "salaryPlaceholder": "Nhập mức lương mong muốn",
+        "frequency": "Tần suất thông báo",
+        "validation": {
+          "keywordRequired": "Vui lòng nhập từ khóa.",
+          "keywordMax": "Từ khóa quá dài.",
+          "careerRequired": "Vui lòng chọn ngành nghề.",
+          "cityRequired": "Vui lòng chọn tỉnh/thành phố.",
+          "choiceInvalid": "Lựa chọn không hợp lệ.",
+          "frequencyRequired": "Vui lòng chọn tần suất thông báo.",
+          "frequencyInvalid": "Tần suất thông báo không hợp lệ.",
+          "salaryInvalid": "Mức lương mong muốn không hợp lệ."
+        }
+      }
+    }
+  },
+  "dashboard": {
+    "pageTitle": "Bảng điều khiển ứng viên",
+    "yourActivity": "Hoạt động của bạn",
+    "suggestedJobs": "Việc làm gợi ý"
+  },
+  "sidebarViewTotal": {
+    "title": "CV của bạn đã đủ tốt chưa?",
+    "subtitle": "Có bao nhiêu nhà tuyển dụng quan tâm hồ sơ của bạn?",
+    "description": "Mỗi lượt xem CV từ nhà tuyển dụng đều là một cơ hội để bạn tiến gần hơn tới công việc phù hợp.",
+    "button": "Khám phá ngay"
+  },
+  "noDataForStatistics": "Không có dữ liệu thống kê",
+  "educationAddedSuccess": "Thêm thông tin học vấn thành công.",
+  "educationUpdatedSuccess": "Cập nhật thông tin học vấn thành công.",
+  "activityChart": {
+    "loading": "Đang tải biểu đồ hoạt động...",
+    "labels": {
+      "appliedjobs": "Việc đã ứng tuyển",
+      "savedjobs": "Việc đã lưu",
+      "companiesfollowed": "Công ty đang theo dõi"
+    }
+  },
+  "educationDeletedSuccess": "Xóa thông tin học vấn thành công.",
+  "deleteEducationTitle": "Xóa thông tin học vấn",
+  "deleteEducationWarning": "Thông tin học vấn này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?",
+  "pleaseAddEducationInfo": "Vui lòng thêm thông tin học vấn để nhà tuyển dụng tham khảo",
+  "presenterationPlaceholder": "Nhập nội dung trình bày",
+  "detailedDescription": "Mô tả chi tiết",
+  "notUpdatedzePlaceholder": "Chưa cập nhật",
+  "education": "Học vấn",
+  "present": "Hiện tại",
+  "notUpdated": "Chưa cập nhật",
+  "appliedJobs": "Việc làm đã ứng tuyển",
+  "savedJobs": "Việc làm đã lưu",
+  "employersViewedProfile": "Nhà tuyển dụng đã xem hồ sơ",
+  "followedCompanies": "Công ty đang theo dõi",
+  "applyForm": {
+    "resume": {
+      "empty": "Hồ sơ của bạn đang trống",
+      "pleaseUpload": "Xin hãy đính kèm CV hoặc tạo mới.",
+      "createNow": "Tạo hồ sơ ngay"
+    }
+  },
+  "company": {
+    "following": "Đang theo dõi",
+    "follow": "Theo dõi",
+    "followers": "người theo dõi",
+    "notUpdated": "Chưa cập nhật thông tin",
+    "jobCount": "việc làm"
+  },
+  "home": {
+    "topCompanies": "Công ty nổi bật",
+    "noCompaniesFound": "Hiện chưa tìm công ty phù hợp với tiêu chí của bạn",
+    "noFeedbacks": "Chưa có người dùng nào đánh giá"
+  },
+  "jobPost": {
+    "timeLeft": "Còn"
+  },
+  "login": {
+    "phone": "Số điện thoại",
+    "phoneIntro": "Nhập số điện thoại của bạn để nhận mã xác thực.",
+    "otpIntro": "Nhập mã 6 chữ số đã được gửi đến điện thoại của bạn.",
+    "resendIn": "Gửi lại sau"
+  },
+  "actions": {
+    "sendOTP": "Gửi mã OTP",
+    "verifyOTP": "Xác thực & Đăng nhập",
+    "changePhone": "Thay đổi số điện thoại",
+    "resendOTP": "Gửi lại mã"
+  },
+  "form": {
+    "phoneNumber": "Số điện thoại",
+    "otpCode": "Mã OTP"
   }
 }

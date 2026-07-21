@@ -1,0 +1,276 @@
+﻿'use client';
+
+import React, { useCallback, useState, useMemo } from 'react';
+import { Box, Typography, Paper, Tooltip, IconButton, Stack, Chip, Dialog, DialogTitle, DialogContent, DialogActions, Button, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
+import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import { useJobs } from './hooks/useJobs';
+import { useDataTable, useDebounce } from '../../../hooks';
+import { JobPost } from '../../../types/models';
+import dayjs from '../../../configs/dayjs-config';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
+import { ROUTES } from '../../../configs/routeConfig';
+import { localizeRoutePath } from '../../../configs/routeLocalization';
+import { formatRoute } from '../../../utils/funcUtils';
+
+const JobsPage = () => {
+    const { t, i18n } = useTranslation('admin');
+    
+    const {
+        page,
+        pageSize,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange
+    } = useDataTable({ initialPageSize: 10 });
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+    const debouncedSearch = useDebounce(searchTerm, 500);
+    const statusParams = useMemo(() => {
+        if (!statusFilter) return {};
+        if (statusFilter === 'expired') return { isExpired: true };
+        return { statusId: statusFilter };
+    }, [statusFilter]);
+
+    const {
+        data,
+        isLoading,
+        approveJob,
+        rejectJob,
+        deleteJob,
+        isMutating
+    } = useJobs({
+        page: page + 1,
+        pageSize,
+        kw: debouncedSearch,
+        ...statusParams,
+        ordering
+    });
+
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [currentJob, setCurrentJob] = useState<JobPost | null>(null);
+
+    const handleSearch = (value: string) => {
+        setSearchTerm(value);
+        onPaginationChange({ pageIndex: 0, pageSize: pageSize });
+    };
+
+    const handleStatusFilterChange = (value: string) => {
+        setStatusFilter(value);
+        onPaginationChange({ pageIndex: 0, pageSize });
+    };
+
+    const handleApprove = useCallback(async (id: string | number) => {
+        try {
+            await approveJob(id);
+        } catch (error) {
+            console.error(error);
+        }
+    }, [approveJob]);
+
+    const handleReject = useCallback(async (id: string | number) => {
+        try {
+            await rejectJob(id);
+        } catch (error) {
+            console.error(error);
+        }
+    }, [rejectJob]);
+
+    const handleOpenDelete = useCallback((job: JobPost) => {
+        setCurrentJob(job);
+        setOpenDeleteDialog(true);
+    }, []);
+
+    const handleCloseDialog = () => {
+        setOpenDeleteDialog(false);
+    };
+
+    const handleDelete = async () => {
+        if (!currentJob) return;
+        try {
+            await deleteJob(currentJob.id);
+            handleCloseDialog();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const getStatusLabel = useCallback((status: JobPost['status'], isExpired?: boolean) => {
+        const s = Number(status);
+        if (isExpired && s === 3) {
+            return <Chip label={t('pages.jobs.status.expired')} size="small" color="default" />;
+        }
+        switch (s) {
+            case 1: return <Chip label={t('pages.jobs.status.pending')} size="small" color="warning" />;
+            case 2: return <Chip label={t('pages.jobs.status.rejected')} size="small" color="error" />;
+            case 3: return <Chip label={t('pages.jobs.status.approved')} size="small" color="success" />;
+            default: return <Chip label={t('pages.jobs.status.unknown')} size="small" />;
+        }
+    }, [t]);
+
+    const columns = useMemo<ColumnDef<JobPost>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: t('common:id') as string,
+            enableSorting: true,
+        },
+        {
+            accessorKey: 'jobName',
+            header: t('pages.jobs.table.title') as string,
+            enableSorting: true,
+            cell: (info) => (
+                <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {info.getValue() as string}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                        {info.row.original.companyDict?.companyName || info.row.original.company?.companyName || '—'}
+                    </Typography>
+                </Box>
+            ),
+        },
+        {
+            accessorKey: 'status',
+            header: t('pages.jobs.table.statusCol') as string,
+            cell: (info) => getStatusLabel(info.getValue() as JobPost['status'], info.row.original.isExpired),
+        },
+        {
+            accessorKey: 'createAt',
+            header: t('pages.jobs.table.createdAt') as string,
+            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—',
+        },
+        {
+            id: 'actions',
+            header: t('pages.jobs.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => {
+                const job = info.row.original;
+                const detailHref = job.slug
+                    ? localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, job.slug)}`, i18n.language)
+                    : undefined;
+                return (
+                    <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                        <Tooltip title={t('pages.jobs.table.view')}>
+                             <IconButton size="small" component="a" href={detailHref} target={detailHref ? '_blank' : undefined} rel={detailHref ? 'noopener noreferrer' : undefined} color="info" disabled={!detailHref}>
+                                <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                        {Number(job.status) === 1 && (
+                            <>
+                                <Tooltip title={t('pages.jobs.table.approveAction')}>
+                                    <IconButton size="small" onClick={() => handleApprove(job.id)} color="success">
+                                        <CheckCircleIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title={t('pages.jobs.table.rejectAction')}>
+                                    <IconButton size="small" onClick={() => handleReject(job.id)} color="warning">
+                                        <CancelIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        )}
+                        {Number(job.status) === 3 && (
+                            <Tooltip title={t('pages.jobs.table.rejectAction')}>
+                                <IconButton size="small" onClick={() => handleReject(job.id)} color="warning">
+                                    <CancelIcon fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                        <Tooltip title={t('pages.jobs.table.delete')}>
+                            <IconButton size="small" onClick={() => handleOpenDelete(job)} color="error">
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    </Stack>
+                );
+            },
+        },
+    ], [getStatusLabel, handleApprove, handleOpenDelete, handleReject, i18n.language, t]);
+
+    return (
+        <Box>
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+                        {t('pages.jobs.title')}
+                    </Typography>
+                </Box>
+            </Box>
+
+            <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
+                <FilterBar
+                    title={t('pages.jobs.filter.title')}
+                    searchValue={searchTerm}
+                    searchPlaceholder={t('pages.jobs.searchPlaceholder')}
+                    onSearchChange={handleSearch}
+                    onReset={() => {
+                        handleSearch('');
+                        setStatusFilter('');
+                    }}
+                    resetDisabled={!searchTerm && !statusFilter}
+                    resetLabel={t('common.clearFilters')}
+                    activeFilterCount={statusFilter ? 1 : 0}
+                >
+                    <FormControl size="small" sx={[{ minWidth: 210 }, filterControlSx]}>
+                        <InputLabel id="job-status-filter-label">{t('common.status.label')}</InputLabel>
+                        <Select
+                            labelId="job-status-filter-label"
+                            value={statusFilter}
+                            label={t('common.status.label')}
+                            onChange={(event) => handleStatusFilterChange(event.target.value)}
+                        >
+                            <MenuItem value="">{t('common.all')}</MenuItem>
+                            <MenuItem value="1">{t('pages.jobs.status.pending')}</MenuItem>
+                            <MenuItem value="2">{t('pages.jobs.status.rejected')}</MenuItem>
+                            <MenuItem value="3">{t('pages.jobs.status.approved')}</MenuItem>
+                            <MenuItem value="expired">{t('pages.jobs.status.expired')}</MenuItem>
+                        </Select>
+                    </FormControl>
+                </FilterBar>
+
+                <DataTable
+                    columns={columns}
+                    data={data?.results || []}
+                    isLoading={isLoading}
+                    rowCount={data?.count || 0}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
+                    enableSorting
+                    sorting={sorting}
+                    onSortingChange={onSortingChange}
+                />
+            </Paper>
+
+            {/* Delete Confirmation */}
+            <Dialog open={openDeleteDialog} onClose={handleCloseDialog}>
+                <DialogTitle>{t('pages.jobs.deleteTitle')}</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        {t('pages.jobs.deleteConfirm', { name: currentJob?.jobName })}
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.jobs.cancel')}</Button>
+                    <Button
+                        onClick={handleDelete}
+                        color="error"
+                        variant="contained"
+                        disabled={isMutating}
+                    >
+                        {isMutating ? t('common.deleting') : t('common.delete')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
+    );
+};
+
+export default JobsPage;

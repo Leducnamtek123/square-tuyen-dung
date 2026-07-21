@@ -1,0 +1,204 @@
+'use client';
+import React, { useMemo } from 'react';
+import { useAppSelector } from '@/redux/hooks';
+import { useTranslation } from 'react-i18next';
+import { Box, Card, Pagination, Stack, Typography, Grid2 as Grid, Paper, alpha, useTheme } from "@mui/material";
+import SearchOffIcon from '@mui/icons-material/SearchOff';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import NoDataCard from '../../../../components/Common/NoDataCard';
+import toastMessages from '../../../../utils/toastMessages';
+import ProfileSearch from '../ProfileSearch';
+import JobSeekerProfile from '../../../../components/Features/JobSeekerProfile';
+import { useEmployerResumes, useToggleSaveResumeOptimistic } from '../hooks/useEmployerQueries';
+import type { Resume } from '@/types/models';
+import pc from '@/utils/muiColors';
+
+const ProfileCardContent: React.FC = () => {
+    const { t } = useTranslation('employer');
+    const theme = useTheme();
+    const { resumeFilter } = useAppSelector((state) => state.filter);
+    const { pageSize } = resumeFilter;
+    const [page, setPage] = React.useState(1);
+
+    const queryParams = useMemo(() => ({
+        ...resumeFilter,
+        page,
+    }), [resumeFilter, page]);
+
+    const { data: queryData, isLoading } = useEmployerResumes(queryParams);
+    const resumes: Resume[] = queryData?.results || [];
+    const count = queryData?.count || 0;
+
+    const { mutate: toggleSave } = useToggleSaveResumeOptimistic();
+
+    const handleChangePage = (_: React.ChangeEvent<unknown>, newPage: number) => {
+        setPage(newPage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleSave = (slug: string) => {
+        toggleSave(slug, {
+            onSuccess: (resData: { isSaved?: boolean }) => {
+                const isSaved = resData.isSaved;
+                toastMessages.success(
+                    isSaved ? t('profileCard.messages.saveSuccess') : t('profileCard.messages.unsaveSuccess')
+                );
+            },
+        });
+    };
+
+    const totalPages = Math.ceil(count / pageSize);
+
+    return (
+        <Grid container spacing={4}>
+            <ProfileSearch />
+            <Grid size={{ xs: 12, lg: 9 }}>
+                <Stack spacing={5}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 }, minWidth: 0 }}>
+                            <Box sx={{
+                                p: 1,
+                                borderRadius: 2,
+                                bgcolor: 'primary.extralight',
+                                color: 'primary.main',
+                                display: 'flex',
+                                flexShrink: 0,
+                            }}>
+                                <AssignmentIndIcon sx={{ fontSize: { xs: 22, sm: 28 } }} />
+                            </Box>
+                            <Box sx={{
+                                display: 'flex',
+                                alignItems: { xs: 'flex-start', sm: 'baseline' },
+                                flexDirection: { xs: 'column', sm: 'row' },
+                                gap: { xs: 0.5, sm: 1.5 },
+                                minWidth: 0,
+                            }}>
+                                <Typography
+                                    variant="h4"
+                                    sx={{
+                                        fontWeight: 900,
+                                        color: 'text.primary',
+                                        fontSize: { xs: '1.65rem', sm: '2.125rem' },
+                                        lineHeight: { xs: 1.15, sm: 1.2 },
+                                    }}
+                                >
+                                    {t('profileCard.label.resultsFound')}
+                                </Typography>
+                                <Typography
+                                    component="span"
+                                    variant="h3"
+                                    color="primary"
+                                    sx={{
+                                        fontWeight: 1000,
+                                        fontSize: { xs: '2.15rem', sm: '3rem' },
+                                        lineHeight: 1.05,
+                                    }}
+                                >
+                                    {t('profileCard.label.profiles', { count })}
+                                </Typography>
+                            </Box>
+                        </Box>
+                    </Box>
+
+                    <Box>
+                        {isLoading ? (
+                            <Grid container spacing={3}>
+                                {Array.from({ length: pageSize }, (_, index) => `profile-skeleton-${index + 1}`).map((skeletonKey) => (
+                                    <Grid key={skeletonKey} size={{ xs: 12 }}>
+                                        <JobSeekerProfile.Loading />
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        ) : resumes.length === 0 ? (
+                            <Paper 
+                                elevation={0} 
+                                sx={{ 
+                                    textAlign: 'center', 
+                                    py: 15, 
+                                    borderRadius: 4, 
+                                    bgcolor: pc.actionDisabled( 0.04),
+                                    border: '2px dashed',
+                                    borderColor: pc.divider( 0.6)
+                                }}
+                            >
+                                <SearchOffIcon sx={{ fontSize: 80, color: 'text.disabled', mb: 3, opacity: 0.3 }} />
+                                <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.secondary', letterSpacing: '-0.5px' }}>
+                                    {t('profileCard.title.noresultsfound')}
+                                </Typography>
+                                <Typography variant="body1" color="text.secondary" sx={{ mt: 1.5, fontWeight: 600, maxWidth: 400, mx: 'auto', opacity: 0.7 }}>{t('employer:auto.index_try_adjusting_your_search_filt_5ec9', `Try adjusting your search filters or keywords to discover more talented candidates.`)}</Typography>
+                            </Paper>
+                        ) : (
+                            <Stack spacing={5}>
+                                <Grid container spacing={3}>
+                                    {resumes.map((resume) => (
+                                        <Grid key={resume.id} size={{ xs: 12 }}>
+                                            <JobSeekerProfile
+                                                id={resume.id}
+                                                slug={resume.slug}
+                                                title={resume.title || ''}
+                                                salaryMin={resume.salaryMin ?? undefined}
+                                                salaryMax={resume.salaryMax ?? undefined}
+                                                experience={resume.experience ?? 0}
+                                                updateAt={resume.updateAt || ''}
+                                                isSaved={resume.isSaved || false}
+                                                viewEmployerNumber={resume.viewEmployerNumber || 0}
+                                                user={resume.userDict}
+                                                city={resume.city?.id ?? ''}
+                                                jobSeekerProfile={resume.jobSeekerProfileDict || {}}
+                                                type={resume.type?.toString()}
+                                                lastViewedDate={resume.lastViewedDate ?? undefined}
+                                                handleSave={handleSave}
+                                            />
+                                        </Grid>
+                                    ))}
+                                </Grid>
+
+                                {totalPages > 1 && (
+                                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+                                        <Pagination
+                                            color="primary"
+                                            shape="rounded"
+                                            variant="outlined"
+                                            count={totalPages}
+                                            page={page}
+                                            onChange={handleChangePage}
+                                            sx={{
+                                                '& .MuiPaginationItem-root': {
+                                                    backgroundColor: 'background.paper',
+                                                    fontWeight: 800,
+                                                    borderRadius: 2,
+                                                    borderColor: pc.divider( 0.8),
+                                                    height: 44,
+                                                    minWidth: 44,
+                                                    '&.Mui-selected': {
+                                                        boxShadow: (theme) => theme.customShadows?.primary,
+                                                        border: 'none',
+                                                        color: '#fff',
+                                                        fontWeight: 1000
+                                                    },
+                                                    '&:hover': {
+                                                        bgcolor: pc.primary( 0.04),
+                                                        borderColor: 'primary.main'
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                    </Box>
+                                )}
+                            </Stack>
+                        )}
+                    </Box>
+                </Stack>
+            </Grid>
+        </Grid>
+    );
+};
+
+const ProfileCard: React.FC = () => {
+    const { resumeFilter } = useAppSelector((state) => state.filter);
+    const filterKey = useMemo(() => JSON.stringify(resumeFilter), [resumeFilter]);
+
+    return <ProfileCardContent key={filterKey} />;
+};
+
+export default ProfileCard;

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#07111f"/>
+      <stop offset="55%" stop-color="#12304b"/>
+      <stop offset="100%" stop-color="#1d5c86"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1310" cy="180" r="210" fill="#38bdf822" />
+  <circle cx="260" cy="760" r="280" fill="#0ea5e91a" />
+  <rect x="120" y="150" width="420" height="610" rx="34" fill="#0b2036" fill-opacity="0.86" stroke="#ffffff18"/>
+  <rect x="180" y="235" width="150" height="150" rx="18" fill="url(#accent)" opacity="0.94"/>
+  <rect x="360" y="235" width="100" height="420" rx="16" fill="#ffffff10"/>
+  <rect x="180" y="410" width="150" height="100" rx="18" fill="#ffffff12"/>
+  <rect x="180" y="530" width="280" height="120" rx="24" fill="#ffffff10"/>
+  <path d="M180 350L405 220L510 300V720H180Z" fill="#ffffff10" stroke="#ffffff22" stroke-width="8"/>
+  <path d="M205 330L405 255L475 310V700H205Z" fill="#0f172a" opacity="0.8"/>
+  <text x="700" y="330" fill="#ffffff" font-size="78" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="4">REAL ESTATE</text>
+  <text x="700" y="398" fill="#cbd5e1" font-size="34" font-family="Arial, Helvetica, sans-serif" letter-spacing="2">Property sales, leasing and project growth</text>
+  <rect x="700" y="460" width="320" height="10" rx="5" fill="url(#accent)"/>
+  <text x="700" y="540" fill="#e2e8f0" font-size="56" font-family="Arial, Helvetica, sans-serif" font-weight="700">Square Insights</text>
+  <text x="700" y="610" fill="#94a3b8" font-size="30" font-family="Arial, Helvetica, sans-serif">Bất động sản</text>
+</svg>

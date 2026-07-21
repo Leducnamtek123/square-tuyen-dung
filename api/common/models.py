@@ -1,212 +1,74 @@
-
+from django.conf import settings
 from django.db import models
 
-from django.conf import settings
+from apps.files.models import File
+from shared.models import CommonBaseModel
 
-class CommonBaseModel(models.Model):
-
-    class Meta:
-
-        abstract = True
-
-    create_at = models.DateTimeField(auto_now_add=True)
-
-    update_at = models.DateTimeField(auto_now=True)
-
-class City(CommonBaseModel):
-
-    name = models.CharField(max_length=30)
-
-    class Meta:
-
-        db_table = "myjob_common_city"
-
-        verbose_name_plural = "Cities"
-
-    def __str__(self):
-
-        return self.name
-
-class District(CommonBaseModel):
-
-    name = models.CharField(max_length=50)
-
-    city = models.ForeignKey('City', on_delete=models.CASCADE, related_name="districts")
-
-    class Meta:
-
-        db_table = "myjob_common_district"
-
-    def __str__(self):
-
-        return self.name
-
-class Location(CommonBaseModel):
-
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True,
-
-                             related_name="locations")
-
-    district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True,
-
-                                 related_name="locations")
-
-    address = models.CharField(max_length=255, blank=True, null=True)
-
-    lat = models.FloatField(null=True, blank=True)
-
-    lng = models.FloatField(null=True, blank=True)
-
-    class Meta:
-
-        db_table = "myjob_common_location"
-
-    def __str__(self):
-
-        return f"City: {self.city.name if self.city else '---'} / District: {self.district.name if self.district else '---'} / Address: {self.address} / Location: ({self.lat}:{self.lng})"
 
 class Career(CommonBaseModel):
-
     name = models.CharField(max_length=150)
-
     app_icon_name = models.CharField(max_length=50, null=True)
-
-    icon = models.OneToOneField("File", on_delete=models.SET_NULL, null=True)
+    is_hot = models.BooleanField(default=False)
+    icon = models.OneToOneField(File, on_delete=models.SET_NULL, null=True)
 
     class Meta:
-
-        db_table = "myjob_common_career"
+        db_table = "project_common_career"
 
     def __str__(self):
-
         return self.name
 
-class File(CommonBaseModel):
 
-    AVATAR_TYPE = 'AVATAR'
+class AuditLog(CommonBaseModel):
+    ACTION_CREATE = "create"
+    ACTION_UPDATE = "update"
+    ACTION_DELETE = "delete"
+    ACTION_APPROVE = "approve"
+    ACTION_REJECT = "reject"
+    ACTION_STATUS_CHANGE = "status_change"
+    ACTION_BULK_STATUS = "bulk_status"
+    ACTION_AGENT_ACCESS = "agent_access"
+    ACTION_EXPORT = "export"
 
-    CV_TYPE = 'CV'
-
-    LOGO_TYPE = 'LOGO'
-
-    COVER_IMAGE_TYPE = 'COVER_IMAGE'
-
-    COMPANY_IMAGE_TYPE = 'COMPANY_IMAGE'
-
-    CAREER_IMAGE_TYPE = 'CAREER_IMAGE'
-
-    WEB_BANNER_TYPE = 'WEB_BANNER'
-
-    MOBILE_BANNER_TYPE = 'MOBILE_BANNER'
-
-    SYSTEM_TYPE = 'SYSTEM'
-
-    OTHER_TYPE = 'OTHER'
-
-    FILE_TYPES = [
-
-        (AVATAR_TYPE, 'Avatar'),
-
-        (CV_TYPE, 'CV'),
-
-        (LOGO_TYPE, 'Logo'),
-
-        (COVER_IMAGE_TYPE, 'Cover Image'),
-
-        (COMPANY_IMAGE_TYPE, 'Company Image'),
-
-        (CAREER_IMAGE_TYPE, 'Career Image'),
-
-        (WEB_BANNER_TYPE, 'Web Banner'),
-
-        (MOBILE_BANNER_TYPE, 'Mobile Banner'),
-
-        (SYSTEM_TYPE, 'System'),
-
-        (OTHER_TYPE, 'Other')
-
+    ACTION_CHOICES = [
+        (ACTION_CREATE, "Create"),
+        (ACTION_UPDATE, "Update"),
+        (ACTION_DELETE, "Delete"),
+        (ACTION_APPROVE, "Approve"),
+        (ACTION_REJECT, "Reject"),
+        (ACTION_STATUS_CHANGE, "Status change"),
+        (ACTION_BULK_STATUS, "Bulk status"),
+        (ACTION_AGENT_ACCESS, "Agent access"),
+        (ACTION_EXPORT, "Export"),
     ]
 
-    RESOURCE_TYPES = [
-
-        ('image', 'Image'),
-
-        ('video', 'Video'),
-
-        ('raw', 'Raw File'),
-
-    ]
-
-    public_id = models.CharField(max_length=255)
-
-    version = models.CharField(max_length=20, null=True, blank=True)
-
-    format = models.CharField(max_length=50)
-
-    resource_type = models.CharField(max_length=50, choices=RESOURCE_TYPES)
-
-    file_type = models.CharField(max_length=50, choices=FILE_TYPES, default=OTHER_TYPE)
-
-    uploaded_at = models.DateTimeField(null=False, blank=False)
-
-    metadata = models.JSONField(blank=True, null=True)
-
-    def get_full_url(self):
-
-        from helpers.cloudinary_service import CloudinaryService
-
-        url, _ = CloudinaryService.get_url_from_public_id(self.public_id, {
-
-            'version': self.version,
-
-            'format': self.format,
-
-            'resource_type': self.resource_type,
-
-        })
-
-        return url
-
-    @staticmethod
-
-    def update_or_create_file_with_cloudinary(file, cloudinary_upload_result, file_type: str = OTHER_TYPE):
-
-        file_data = {
-
-            "public_id": cloudinary_upload_result.get("public_id"),
-
-            "version": cloudinary_upload_result.get("version"),
-
-            "format": cloudinary_upload_result.get("format"),
-
-            "resource_type": cloudinary_upload_result.get("resource_type"),
-
-            "uploaded_at": cloudinary_upload_result.get("created_at"),
-
-            "metadata": cloudinary_upload_result,
-
-            "file_type": file_type
-
-        }
-
-        if file:
-
-            # Update file
-
-            for key, value in file_data.items():
-
-                setattr(file, key, value)
-
-            file.save()
-
-        else:
-
-            file = File.objects.create(**file_data)
-
-        return file
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="audit_logs",
+    )
+    actor_email = models.EmailField(blank=True, default="")
+    action = models.CharField(max_length=40, choices=ACTION_CHOICES, db_index=True)
+    resource_type = models.CharField(max_length=120, db_index=True)
+    resource_id = models.CharField(max_length=80, blank=True, default="", db_index=True)
+    resource_repr = models.CharField(max_length=255, blank=True, default="")
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True, default="")
+    request_method = models.CharField(max_length=12, blank=True, default="")
+    request_path = models.CharField(max_length=500, blank=True, default="")
+    metadata = models.JSONField(default=dict, blank=True)
 
     class Meta:
+        db_table = "project_common_audit_log"
+        ordering = ["-create_at"]
+        indexes = [
+            models.Index(fields=["resource_type", "resource_id"], name="project_com_resourc_bdcf28_idx"),
+            models.Index(fields=["actor", "create_at"], name="project_com_actor_i_3c30e8_idx"),
+            models.Index(fields=["action", "create_at"], name="project_com_action_ddc99e_idx"),
+        ]
 
-        db_table = "myjob_files"
+    def __str__(self):
+        return f"{self.actor_email or 'system'} {self.action} {self.resource_type}:{self.resource_id}"
 
-        ordering = ['-create_at']
+

@@ -1,5 +1,5 @@
 {
-  "appName": "MyJob",
+  "appName": "Project",
   "city": "City/Province",
   "career": "Industry",
   "experience": "Experience",
@@ -17,7 +17,21 @@
   "reset": "Reset",
   "loading": "Loading...",
   "noData": "No data",
+  "noOptions": "No options",
+  "autocomplete": {
+    "clear": "Clear",
+    "open": "Open",
+    "close": "Close"
+  },
   "viewDetails": "View details",
+  "id": "ID",
+  "na": "N/A",
+  "company": {
+    "defaultDescription": "A dynamic, creative workplace with many opportunities for advancement and career growth.",
+    "notUpdated": "Not updated",
+    "jobCount": "{{count}} jobs",
+    "followers": "{{count}} followers"
+  },
   "nav": {
     "jobs": "Jobs",
     "companies": "Companies",
@@ -26,10 +40,12 @@
     "services": "Services",
     "pricing": "Pricing",
     "support": "Support",
+    "news": "News",
     "blog": "Recruitment Blog",
     "login": "Login",
     "register": "Register",
     "accountManagement": "Account Management",
+    "reportBug": "Report a bug",
     "logout": "Logout",
     "logoutConfirm": "Are you sure you want to logout?",
     "logoutTitle": "Logout Account",
@@ -64,20 +80,49 @@
     "forCandidates": "For Candidates",
     "candidateDashboard": "Candidate Dashboard",
     "employerDashboard": "Employer Dashboard",
-    "mobileApps": "Mobile Apps",
     "connectWith": "Connect with {{appName}}",
-    "rightsReserved": "© {{year}} {{appName}}. All rights reserved."
+    "rightsReserved": "Â© {{year}} {{appName}}. All Rights Reserved.",
+    "forJobSeekers": "For Job Seekers"
   },
+  "next": "Next",
+  "actionsLabel": "Actions",
   "actions": {
+    "title": "Actions",
     "start": "Start",
     "close": "Close",
+    "submit": "Submit",
     "backHome": "Back to home",
     "joinNow": "Join now",
+    "openNewTab": "Open in new tab",
+    "openDrawer": "Open navigation menu",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "details": "Details",
+    "stop": "Stop",
+    "observe": "Observe",
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "apply": "Apply",
+    "add": "Add",
+    "download": "Download",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in",
+    "upload": "Upload",
+    "change": "Change",
+    "saveChanges": "Save Changes",
+    "preview": "Preview",
+    "back": "Back",
+    "sendOTP": "Send OTP",
+    "verifyOTP": "Verify OTP",
+    "changePhone": "Change Phone",
+    "resendOTP": "Resend OTP"
+  },
+  "userSettings": {
+    "emailNotifications": "Enable email notifications",
+    "smsNotifications": "Enable SMS notifications"
   },
   "status": {
     "pending": "Pending",
@@ -93,7 +138,14 @@
   "labels": {
     "time": "Time",
     "job": "Job",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "present": "Present",
+    "viewAttachedResume": "View Attached Resume",
+    "email": "Email",
+    "back": "Back",
+    "notUpdated": "Not updated",
+    "messages": "Messages",
+    "attachedResume": "Attached Resume"
   },
   "placeholders": {
     "selectCity": "Select City/Province",
@@ -104,6 +156,849 @@
     "allWorkplaces": "All workplaces",
     "allJobTypes": "All job types",
     "allGenders": "All genders",
-    "allMaritalStatuses": "All marital statuses"
+    "allMaritalStatuses": "All marital statuses",
+    "fieldOperation": {
+      "all": "All industries"
+    },
+    "allCities": "All cities/provinces"
+  },
+  "quickSearch": "Quick search",
+  "notUpdated": "Not updated",
+  "notificationTitle": "{{appName}} Notifications",
+  "selectedJobs": "Selected jobs: {{count}}",
+  "selectedProfiles": "Selected profiles: {{count}}",
+  "clearAll": "Clear all",
+  "cityProvince": "City, Province",
+  "jobsCount": "Jobs: {{count}}",
+  "shareVia": "Share via",
+  "aiTools": {
+    "title": "AI Tools",
+    "tts": {
+      "title": "Text-to-Speech",
+      "textLabel": "Text",
+      "textPlaceholder": "Enter text to synthesize...",
+      "voiceLabel": "Voice (optional)",
+      "voicePlaceholder": "e.g. Ly",
+      "speedLabel": "Speed",
+      "generate": "Generate Audio",
+      "generating": "Generating...",
+      "validation": "Please enter text to synthesize.",
+      "error": "Unable to generate audio right now.",
+      "resultLabel": "Generated audio"
+    },
+    "transcribe": {
+      "title": "Speech-to-Text",
+      "selectFile": "Select audio file",
+      "changeFile": "Change audio file",
+      "run": "Transcribe",
+      "transcribing": "Transcribing...",
+      "resultLabel": "Transcription",
+      "validation": "Please select an audio file.",
+      "error": "Unable to transcribe audio right now."
+    }
+  },
+  "aiElements": {
+    "previousBranch": "Previous branch",
+    "nextBranch": "Next branch"
+  },
+  "ai": {
+    "reviewStatus": {
+      "label": "AI review",
+      "all": "All review statuses",
+      "aiOnly": "AI only",
+      "reviewed": "Reviewed",
+      "overridden": "Overridden"
+    },
+    "scoreMax": "Max AI score"
+  },
+  "feedback": {
+    "button": "Review",
+    "title": "Your Review",
+    "placeholder": "Share your review...",
+    "submit": "Submit Review",
+    "ratingRequired": "Please select a rating.",
+    "ratingInvalid": "Rating must be between 1 and 5 stars.",
+    "contentRequired": "Please enter your review.",
+    "contentMax": "Review content exceeds allowed length.",
+    "success": "Review submitted successfully.",
+    "evidenceImageLabel": "Evidence image",
+    "evidenceImageUpload": "Upload image proof",
+    "evidenceImageRemove": "Remove evidence image",
+    "evidenceImageHint": "Optional. PNG, JPG, or WebP up to 5MB.",
+    "evidenceImageInvalid": "Please choose an image file.",
+    "evidenceImageTooLarge": "Image must be 5MB or smaller."
+  },
+  "choices": {
+    "Male": "Male",
+    "Female": "Female",
+    "Other": "Other",
+    "Single": "Single",
+    "Married": "Married",
+    "Vietnamese": "Vietnamese",
+    "English": "English",
+    "Japanese": "Japanese",
+    "French": "French",
+    "Chinese": "Chinese",
+    "Russian": "Russian",
+    "Korean": "Korean",
+    "German": "German",
+    "Italian": "Italian",
+    "Arabic": "Arabic",
+    "Level 1": "Level 1",
+    "Level 2": "Level 2",
+    "Level 3": "Level 3",
+    "Level 4": "Level 4",
+    "Level 5": "Level 5",
+    "Senior Management": "Senior Management",
+    "Middle Management": "Middle Management",
+    "Team Leader - Supervisor": "Team Leader - Supervisor",
+    "Specialist": "Specialist",
+    "Staff / Employee": "Staff / Employee",
+    "Collaborator": "Collaborator",
+    "Office-based": "Office-based",
+    "Hybrid": "Hybrid",
+    "Remote / Work from home": "Remote / Work from home",
+    "Full-time Permanent": "Full-time Permanent",
+    "Full-time Temporary": "Full-time Temporary",
+    "Part-time Permanent": "Part-time Permanent",
+    "Part-time Temporary": "Part-time Temporary",
+    "Consultancy Contract": "Consultancy Contract",
+    "Internship": "Internship",
+    "No experience": "No experience",
+    "Under 1 year": "Under 1 year",
+    "1 year": "1 year",
+    "2 years": "2 years",
+    "3 years": "3 years",
+    "4 years": "4 years",
+    "5 years": "5 years",
+    "Over 5 years": "Over 5 years",
+    "Postgraduate": "Postgraduate",
+    "University": "University",
+    "College": "College",
+    "Vocational / Intermediate": "Vocational / Intermediate",
+    "High School": "High School",
+    "Certificate": "Certificate",
+    "Under 10 employees": "Under 10 employees",
+    "10 - 150 employees": "10 - 150 employees",
+    "150 - 300 employees": "150 - 300 employees",
+    "Over 300 employees": "Over 300 employees",
+    "Pending Confirmation": "Pending Confirmation",
+    "Contacted": "Contacted",
+    "Tested": "Tested",
+    "Interviewed": "Interviewed",
+    "Hired": "Hired",
+    "Not Selected": "Not Selected",
+    "Pending": "Pending",
+    "Rejected": "Rejected",
+    "Approved": "Approved",
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Completed",
+    "failed": "Failed",
+    "Administrator": "Administrator",
+    "Employer": "Employer",
+    "Job Seeker": "Job Seeker",
+    "Website": "Website",
+    "Application": "Application",
+    "Daily": "Daily",
+    "Every 3 Days": "Every 3 Days",
+    "Weekly": "Weekly"
+  },
+  "employerViewedProfile": "Employers viewed your profile",
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "message": "The application encountered an unexpected error. Please try again or reload the page.",
+    "copyError": "Copy error",
+    "retry": "Retry",
+    "reload": "Reload page",
+    "unknownError": "Unknown error"
+  },
+  "common": {
+    "hot": "Hot",
+    "status": {
+      "unknown": "Unknown"
+    },
+    "na": "N/A",
+    "table": {
+      "noData": "No data"
+    }
+  },
+  "validation": {
+    "max255": "Maximum 255 characters",
+    "max30": "Maximum 30 characters",
+    "invalidDate": "Invalid date",
+    "invalidUrl": "Please enter a valid URL."
+  },
+  "messages": {
+    "loadingPdf": "Loading PDF...",
+    "saveSuccess": "Saved successfully.",
+    "loadFailed": "Unable to load data. Please try again.",
+    "actionFailed": "Unable to perform this action right now. Please try again."
+  },
+  "breadcrumbs": {
+    "label": "Breadcrumb",
+    "admin": "Admin",
+    "employer": "Employer"
+  },
+  "buttons": {
+    "back": "Back"
+  },
+  "cancel": "Cancel",
+  "none": "None",
+  "view": "View",
+  "saving": "Saving...",
+  "save": "Save",
+  "deleting": "Deleting...",
+  "delete": "Delete",
+  "yes": "Yes",
+  "no": "No",
+  "saveChanges": "Save Changes",
+  "successMessage": "Success!",
+  "errorMessage": "An error occurred!",
+  "login": {
+    "phone": "Phone Number",
+    "phoneIntro": "Please enter your phone number to continue",
+    "otpIntro": "Enter the OTP code sent to your phone",
+    "resendIn": "Resend code in...",
+    "title": "Title",
+    "body": "Body",
+    "label": "Label"
+  },
+  "form": {
+    "phoneNumber": "Your phone number",
+    "otpCode": "OTP Code",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Full Name Placeholder",
+    "email": "Email",
+    "emailPlaceholder": "Email Placeholder",
+    "password": "Password",
+    "passwordPlaceholder": "Password Placeholder",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm Password Placeholder",
+    "companyName": "Company Name",
+    "companyNamePlaceholder": "Company Name Placeholder",
+    "companyEmail": "Company Email",
+    "companyEmailPlaceholder": "Company Email Placeholder",
+    "companyPhone": "Company Phone",
+    "companyPhonePlaceholder": "Company Phone Placeholder",
+    "taxCode": "Tax Code",
+    "taxCodePlaceholder": "Tax Code Placeholder",
+    "foundedDate": "Founded Date",
+    "fieldOperation": "Field Operation",
+    "fieldOperationPlaceholder": "Field Operation Placeholder",
+    "employeeSize": "Employee Size",
+    "employeeSizePlaceholder": "Employee Size Placeholder",
+    "website": "Website",
+    "websitePlaceholder": "Website Placeholder",
+    "city": "City",
+    "cityPlaceholder": "City Placeholder",
+    "district": "District",
+    "districtPlaceholder": "District Placeholder",
+    "address": "Address",
+    "addressPlaceholder": "Address Placeholder",
+    "addressHelper": "Address Helper"
+  },
+  "loadPreviousMessages": "Load previous messages",
+  "typeAMessage": "Type a message...",
+  "chatRooms": "Chat Rooms",
+  "chatCard": {
+    "openChat": "Open chat"
+  },
+  "appliedResume": {
+    "ai": {
+      "viewAnalysis": "View AI Analysis",
+      "failed": "AI analysis failed"
+    },
+    "email": {
+      "resendTooltip": "Resend email",
+      "sendTooltip": "Send email"
+    },
+    "table": {
+      "profileName": "Profile Name",
+      "onlineResume": "Online Resume",
+      "attachedResume": "Attached Resume",
+      "notUpdated": "Not updated",
+      "appliedPosition": "Applied Position",
+      "appliedDate": "Applied Date",
+      "profileType": "Profile Type",
+      "aiAnalysis": "AI Analysis",
+      "status": "Recruitment Status",
+      "actions": "Actions",
+      "tooltips": {
+        "view": "View profile",
+        "delete": "Delete profile"
+      },
+      "noCandidates": "No candidates have applied yet"
+    }
+  },
+  "companyProfile": {
+    "title": "Company Profile"
+  },
+  "logo": "Logo",
+  "cover": "Cover Image",
+  "companyForm": {
+    "validation": {
+      "companyNameRequired": "Company name is required"
+    },
+    "title": {
+      "companyname": "Company Name",
+      "taxcode": "Tax Code",
+      "companysize": "Company Size",
+      "fieldofoperation": "Field of Operation",
+      "foundeddate": "Founded Date",
+      "websiteurl": "Website URL",
+      "facebookurl": "Facebook URL",
+      "youtubeurl": "Youtube URL",
+      "linkedinurl": "Linkedin URL",
+      "companyemail": "Company Email",
+      "phonenumber": "Phone Number",
+      "cityprovince": "City/Province",
+      "district": "District",
+      "address": "Address",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "additionaldescription": "Additional Description"
+    },
+    "placeholder": {
+      "entercompanyname": "Enter company name",
+      "entercompanytaxcode": "Enter company tax code",
+      "selectcompanysize": "Select company size",
+      "entercompanyfieldofoperation": "Enter company field of operation",
+      "entercompanywebsiteurl": "Enter company website URL",
+      "enterfacebookurl": "Enter Facebook URL",
+      "enteryoutubeurl": "Enter Youtube URL",
+      "enterlinkedinurl": "Enter Linkedin URL",
+      "entercompanyemail": "Enter company email",
+      "entercompanyphonenumber": "Enter company phone number",
+      "selectcityprovince": "Select city/province",
+      "selectdistrict": "Select district",
+      "enteraddress": "Enter address",
+      "enterlatitudecoordinateonthemap": "Enter latitude coordinate on the map.",
+      "enterlongitudecoordinateonthemap": "Enter longitude coordinate on the map."
+    },
+    "helperText": {
+      "automaticallyfilledifyouchooseasuggestedaddress": "Automatically filled if you choose a suggested address."
+    }
+  },
+  "interviewDetail": {
+    "messages": {
+      "aiAnalyzingDesc": "AI is analyzing the profile...",
+      "aiNeedsTrigger": "AI analysis needs to be triggered",
+      "noData": "No data",
+      "noDetails": "No details available",
+      "noQuestions": "No interview questions",
+      "noTranscript": "No transcript",
+      "noTranscriptDesc": "No conversation has been recorded yet.",
+      "aiGenerating": "AI evaluation results are being generated",
+      "aiAnalyzing": "AI is analyzing the conversation...",
+      "notEnded": "Interview has not ended"
+    },
+    "actions": {
+      "triggerAi": "Trigger Analysis",
+      "retryAi": "Re-analyze with AI",
+      "hrEvaluation": "HR Evaluation",
+      "attitudeScore": "Attitude Score",
+      "professionalScore": "Professional Score",
+      "resultLabel": "Final Result",
+      "pending": "Pending Review",
+      "passed": "Accepted (Pass)",
+      "failed": "Rejected (Fail)",
+      "comments": "Detailed Comments",
+      "proposedSalary": "Proposed Salary (VND)",
+      "submitEvaluation": "Submit Final Evaluation",
+      "openRecording": "Open recording"
+    },
+    "subtitle": {
+      "analysis": "AI Analysis",
+      "questions": "Question List",
+      "transcript": "Conversation Transcript",
+      "aiEvaluation": "AI Evaluation Result",
+      "info": "Interview Information",
+      "recording": "Interview Recording"
+    },
+    "label": {
+      "detailedFeedback": "Detailed Feedback",
+      "interviewer": "Interviewer",
+      "technicalScore": "Technical Score",
+      "communicationScore": "Communication Score",
+      "strengths": "Strengths",
+      "weaknesses": "Weaknesses",
+      "candidate": "CANDIDATE",
+      "position": "POSITION",
+      "type": "INTERVIEW TYPE",
+      "schedule": "SCHEDULE"
+    },
+    "title": "Online Interview Details"
+  },
+  "jobPost": {
+    "manageSubtitle": "Manage post details",
+    "remaining": "Remaining"
+  },
+  "jobPostForm": {
+    "section": {
+      "basicInfo": "Basic Information",
+      "location": "Work Area",
+      "contact": "Contact Information"
+    },
+    "warning": "When you update the post, it will be pending approval!",
+    "title": {
+      "jobtitle": "Job Title",
+      "career": "Career",
+      "position": "Position",
+      "experience": "Experience",
+      "workplace": "Workplace",
+      "jobtype": "Job Type",
+      "numberofvacancies": "Number of Vacancies",
+      "genderrequirement": "Gender Requirement",
+      "minimumsalary": "Minimum Salary",
+      "maximumsalary": "Maximum Salary",
+      "academiclevel": "Academic Level",
+      "applicationdeadline": "Application Deadline",
+      "jobdescription": "Job Description",
+      "jobrequirement": "Job Requirement",
+      "benefits": "Benefits",
+      "cityprovince": "City/Province",
+      "district": "District",
+      "address": "Address",
+      "contactpersonname": "Contact Person Name",
+      "contactpersonphone": "Contact Person Phone",
+      "contactpersonemail": "Contact Person Email"
+    },
+    "placeholder": {
+      "enterjobtitle": "Enter job title",
+      "selectcareer": "Select career",
+      "selectposition": "Select position",
+      "selectrequiredexperience": "Select required experience",
+      "selectworkplace": "Select workplace",
+      "selectjobtype": "Select job type",
+      "enternumberofvacancies": "Enter number of vacancies",
+      "selectgenderrequirement": "Select gender requirement",
+      "enterminimumsalary": "Enter minimum salary",
+      "entermaximumsalary": "Enter maximum salary",
+      "selectacademiclevel": "Select academic level",
+      "selectcityprovince": "Select city/province",
+      "selectdistrict": "Select district",
+      "enteraddress": "Enter address",
+      "entercontactpersonname": "Enter contact person name",
+      "entercontactpersonphone": "Enter contact person phone",
+      "entercontactpersonemail": "Enter contact person email"
+    },
+    "label": {
+      "isUrgent": "Urgent Hiring"
+    },
+    "validation": {
+      "jobnameisrequired": "Job name is required.",
+      "jobnameexceededallowedlength": "Job name exceeded allowed length.",
+      "careerisrequired": "Career is required.",
+      "positionisrequired": "Position is required.",
+      "experienceisrequired": "Experience is required.",
+      "workplaceisrequired": "Workplace is required.",
+      "jobtypeisrequired": "Job type is required.",
+      "numberofvacanciesisrequired": "Number of vacancies is required.",
+      "invalidnumberofvacancies": "Invalid number of vacancies.",
+      "atleastonevacancyisrequired": "At least one vacancy is required.",
+      "genderrequirementisrequired": "Gender requirement is required.",
+      "minimumsalaryisrequired": "Minimum salary is required.",
+      "invalidminimumsalary": "Invalid minimum salary.",
+      "minSalaryLess": "Minimum salary must be less than or equal to maximum salary.",
+      "maximumsalaryisrequired": "Maximum salary is required.",
+      "invalidmaximumsalary": "Invalid maximum salary.",
+      "maxSalaryGreater": "Maximum salary must be greater than or equal to minimum salary.",
+      "academiclevelisrequired": "Academic level is required.",
+      "applicationdeadlineisrequired": "Application deadline is required.",
+      "invalidapplicationdeadline": "Invalid application deadline.",
+      "deadlinemustbeaftertoday": "Deadline cannot be in the past.",
+      "jobDescRequired": "Job description is required.",
+      "jobReqRequired": "Job requirement is required.",
+      "benefitsRequired": "Benefits are required.",
+      "cityprovinceisrequired": "City/Province is required.",
+      "districtisrequired": "District is required.",
+      "addressisrequired": "Address is required.",
+      "addressexceededallowedlength": "Address exceeded allowed length.",
+      "latitudeisrequired": "Latitude is required.",
+      "invalidlatitude": "Invalid latitude.",
+      "longitudeisrequired": "Longitude is required.",
+      "invalidlongitude": "Invalid longitude.",
+      "contactpersonnameisrequired": "Contact person name is required.",
+      "contactpersonnameexceededallowedlength": "Contact person name exceeded allowed length.",
+      "contactpersonphoneisrequired": "Contact person phone is required.",
+      "invalidphonenumber": "Invalid phone number.",
+      "contactpersonphoneexceededallowedlength": "Contact person phone exceeded allowed length.",
+      "contactpersonemailisrequired": "Contact person email is required.",
+      "invalidemail": "Invalid email.",
+      "contactpersonemailexceededallowedlength": "Contact person email exceeded allowed length."
+    }
+  },
+  "minimum-wage-comparison": "Minimum wage",
+  "maximum-wage-comparison": "Maximum wage",
+  "editorContent": "Content",
+  "profileDetailCard": {
+    "label": {
+      "issuedDate": "Issued Date",
+      "major": "Major",
+      "desiredPosition": "Desired Position",
+      "desiredLevel": "Desired Level",
+      "educationLevel": "Education Level",
+      "experience": "Experience",
+      "career": "Career",
+      "workLocation": "Work Location",
+      "desiredSalary": "Desired Salary",
+      "workplaceType": "Workplace Type",
+      "jobType": "Job Type",
+      "phone": "Phone",
+      "gender": "Gender",
+      "dob": "Date of Birth",
+      "maritalStatus": "Marital Status",
+      "cityProvince": "City/Province",
+      "district": "District",
+      "address": "Address"
+    },
+    "title": {
+      "advancedSkills": "Advanced Skills",
+      "careerGoals": "Career Goals",
+      "certificates": "Certificates",
+      "education": "Education",
+      "workExperience": "Work Experience",
+      "generalInfo": "General Information",
+      "languages": "Languages",
+      "personalInfo": "Personal Information"
+    },
+    "messages": {
+      "noAttachedFile": "No attached file"
+    }
+  },
+  "content": "Content",
+  "start-date-comparison": "Start date",
+  "end-date-comparison": "End date",
+  "questionGroupsCard": {
+    "label": {
+      "questionCount": "Question count"
+    },
+    "table": {
+      "noData": "No data"
+    }
+  },
+  "pagination": {
+    "rowsPerPage": "Rows per page"
+  },
+  "errors": {
+    "networkError": "Network error. Please check your connection.",
+    "unauthorized": "Unauthorized. Please log in again.",
+    "forbidden": "You do not have permission to access this resource.",
+    "notFound": "The requested resource was not found.",
+    "payloadTooLarge": "The uploaded file is too large.",
+    "tooManyRequests": "Too many requests. Please try again later.",
+    "serverError": "Server error. Please try again later.",
+    "generic": "An unexpected error occurred.",
+    "missingInvite": "Missing invitation",
+    "missingSessionId": "Missing session ID",
+    "invalidSession": "Invalid session",
+    "tokenMissing": "Authentication token missing"
+  },
+  "pages": {
+    "interviews": {
+      "type": {
+        "vetting": "Vetting",
+        "recruitment": "Recruitment"
+      }
+    },
+    "users": {
+      "toast": {
+        "blockSuccess": "Block Success",
+        "unblockSuccess": "Unblock Success",
+        "actionFailed": "Action Failed",
+        "roleUpdated": "Role Updated",
+        "roleUpdateFailed": "Role Update Failed"
+      }
+    }
+  },
+  "interviewAdminPage": {
+    "candidateEmployer": "Candidate Employer",
+    "jobPost": "Job Post",
+    "type": "Type",
+    "time": "Time",
+    "status": "Status",
+    "actions": "Actions",
+    "viewDetails": "View Details",
+    "markCompleted": "Mark Completed",
+    "cancelInterview": "Cancel Interview",
+    "delete": "Delete"
+  },
+  "jobSearch": {
+    "searchPlaceholder": "Search Placeholder",
+    "allCareers": "All Careers",
+    "allCities": "All Cities",
+    "searchButton": "Search Button",
+    "advancedFilter": "Advanced Filter",
+    "allPositions": "All Positions",
+    "allExperiences": "All Experiences",
+    "allDistricts": "All Districts",
+    "selectCityFirst": "Select City First",
+    "allWards": "All Wards",
+    "selectDistrictFirst": "Select District First",
+    "allJobTypes": "All Job Types",
+    "allWorkplaces": "All Workplaces",
+    "allGenders": "All Genders",
+    "tabTitle": "Tab Title",
+    "recommendedJobs": "Recommended Jobs"
+  },
+  "profile": {
+    "messages": {
+      "educationAddSuccess": "Education Add Success",
+      "educationUpdateSuccess": "Education Update Success",
+      "educationDeleteSuccess": "Education Delete Success",
+      "deleteConfirmTitle": "Delete Confirm Title",
+      "deleteConfirmWarning": "Delete Confirm Warning",
+      "noEducationData": "No Education Data"
+    },
+    "sections": {
+      "education": "Education"
+    },
+    "fields": {
+      "present": "Present",
+      "description": "Description"
+    }
+  },
+  "companyDetail": {
+    "about": "About",
+    "notUpdated": "Not Updated",
+    "since": "Since",
+    "shareWithQr": "Share With Qr",
+    "followed": "Followed",
+    "follow": "Follow",
+    "share": "Share",
+    "website": "Website",
+    "followAt": "Follow At",
+    "generalInfo": "General Info",
+    "map": "Map",
+    "images": "Images"
+  },
+  "jobDetail": {
+    "actions": {
+      "applied": "Applied",
+      "apply": "Apply",
+      "saved": "Saved",
+      "save": "Save",
+      "share": "Share"
+    },
+    "contactInfo": "Contact Info",
+    "contactPerson": "Contact Person",
+    "notUpdated": "Not Updated",
+    "contactEmail": "Contact Email",
+    "contactPhone": "Contact Phone",
+    "address": "Address",
+    "map": "Map",
+    "description": "Description",
+    "requirements": "Requirements",
+    "benefits": "Benefits",
+    "career": "Career",
+    "workplaceType": "Workplace Type",
+    "academicLevel": "Academic Level",
+    "quantity": "Quantity",
+    "location": "Location",
+    "genderRequired": "Gender Required",
+    "deadline": "Deadline",
+    "views": "Views",
+    "postedDate": "Posted Date",
+    "salary": "Salary",
+    "experience": "Experience",
+    "position": "Position",
+    "jobType": "Job Type",
+    "similarJobs": "Similar Jobs",
+    "savedSuccess": "Saved Success",
+    "unsavedSuccess": "Unsaved Success",
+    "noData": "No Data"
+  },
+  "unavailableTitle": "Unavailable Title",
+  "readyTitle": "Ready Title",
+  "interviewListCard": {
+    "candidate": "Candidate",
+    "statuses": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "calibration": "Calibration",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "interrupted": "Interrupted",
+      "processing": "Processing"
+    }
+  },
+  "controls": {
+    "end": "End"
+  },
+  "sessionNotJoinable": "Session Not Joinable",
+  "readyBody": "Ready Body",
+  "sessionNotJoinableBody": "Session Not Joinable Body",
+  "startInterview": "Start Interview",
+  "cvDoc": {
+    "labels": {
+      "email": "Email:",
+      "phone": "Phone:",
+      "updatedAt": "Updated:",
+      "position": "Position:",
+      "experience": "Experience:",
+      "education": "Education:",
+      "salary": "Salary:",
+      "workplace": "Workplace:",
+      "jobType": "Job Type:",
+      "present": "Present",
+      "major": "Major:",
+      "languagePrefix": "",
+      "noExpiration": "No Expiration"
+    },
+    "sections": {
+      "generalInfo": "GENERAL INFORMATION",
+      "workExperience": "WORK EXPERIENCE",
+      "education": "EDUCATION",
+      "skills": "PROFESSIONAL SKILLS",
+      "languages": "LANGUAGES",
+      "certificates": "CERTIFICATES"
+    }
+  },
+  "auto": {
+    "index_wwwInfoHRvn_9a21": "www.InfoHR.vn"
+  },
+  "fileUpload": {
+    "dragDropOrSelect": "Drag and drop file here or",
+    "selectFile": "Select file",
+    "pdfOnly": "Only PDF files accepted",
+    "delete": "Delete"
+  },
+  "search": {
+    "button": "Search",
+    "suggestions": "Search suggestions",
+    "recent": "Recent searches",
+    "noResults": "No results found"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "message": "The URL may have changed or the page has been deleted. Please check the URL or return to home.",
+    "backHome": "Back to home"
+  },
+  "systemError": {
+    "occurred": "An error occurred.",
+    "requestFailed": "The request could not be processed.",
+    "tryAgain": "Please try again later.",
+    "reload": "Reload page."
+  },
+  "maintenanceMode": {
+    "badge": "Under maintenance",
+    "title": "System maintenance in progress",
+    "message": "InfoHR Recruitment is upgrading the system to serve you better. Please come back in a few minutes.",
+    "reload": "Reload page",
+    "retryHint": "You can try again in a few minutes.",
+    "statusCode": "Status code"
+  },
+  "language": {
+    "vietnamese": "Tiáº¿ng Viá»‡t",
+    "english": "English"
+  },
+  "notification": {
+    "markAllRead": "Mark all as read",
+    "empty": "No new notifications",
+    "loadMore": "Load more",
+    "new": "New",
+    "openMenu": "Open notifications",
+    "read": "Read",
+    "unreadCount": "{{count}} unread",
+    "viewAll": "View all"
+  },
+  "jobPost": {
+    "urgentHiring": "Urgent Hiring",
+    "jobsCount": "{{count}} jobs"
+  },
+  "profileUpload": {
+    "allowSearch": "Allow search",
+    "searchHelp": "Turning on \"Allow search\" helps employers find your resume and contact you about new jobs. Only one of your resumes can have search enabled at a time.",
+    "lastUpdated": "Last updated: {{date}}",
+    "download": "Download",
+    "editResume": "Edit resume",
+    "deleteResume": "Delete resume",
+    "previewColor": "Preview selected color"
+  },
+  "interview": {
+    "forceEndSuccess": "Interview end requested",
+    "recordingWaiting": "The interview has ended, the system is waiting for the recording to sync before displaying here."
+  },
+  "agentAssistant": {
+    "title": "Agent Assistants",
+    "recents": "Recents",
+    "newChat": "New chat",
+    "ready": "Ready",
+    "empty": "Agent is ready",
+    "placeholder": "Message the agent...",
+    "send": "Send",
+    "deleteHistory": "Delete chat history",
+    "deleteCurrentHistory": "Delete current chat history",
+    "deleteError": "Could not delete this chat history. Please try again.",
+    "loadError": "Could not load Agent Assistants. Please try again.",
+    "sendError": "Agent could not process this request. Please check the content and try again.",
+    "thinking": "Agent is thinking...",
+    "attachments": {
+      "addImage": "Attach image",
+      "remove": "Remove image",
+      "threadTitle": "Sent image",
+      "limit": "You can attach up to {{count}} images.",
+      "unsupported": "Only PNG, JPG, WebP, or GIF images are supported.",
+      "tooLarge": "Each image must be smaller than 2MB.",
+      "readError": "Could not read this image. Please try another image."
+    },
+    "portals": {
+      "admin": "InfoHR Admin",
+      "employer": "InfoHR Employer"
+    },
+    "threadGroups": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "thisWeek": "This week",
+      "earlier": "Earlier"
+    },
+    "status": {
+      "pending": "Pending",
+      "running": "Running",
+      "succeeded": "Completed",
+      "failed": "Failed"
+    },
+    "tools": {
+      "create_manual_candidate": "Create candidate profile",
+      "search_candidates": "Search candidates",
+      "update_application_status": "Update application status",
+      "list_job_posts": "List job posts",
+      "list_applications": "List applications",
+      "list_companies": "List companies",
+      "review_job_post": "Review job post",
+      "create_question": "Create question",
+      "list_questions": "List questions",
+      "create_question_group": "Create question group",
+      "list_question_groups": "List question groups",
+      "list_interviews": "List interviews"
+    },
+    "rows": {
+      "candidate": "Candidate",
+      "email": "Email",
+      "phone": "Phone",
+      "jobPost": "Job post",
+      "company": "Company",
+      "status": "Status",
+      "question": "Question",
+      "questionGroup": "Question group",
+      "questionsCount": "Questions count",
+      "interviewId": "Interview ID",
+      "applicationId": "Application ID",
+      "jobPostId": "Job post ID"
+    },
+    "results": {
+      "title": "Results",
+      "fallback": "Result {{index}}",
+      "more": "And {{count}} more results.",
+      "openRecord": "Open record"
+    }
+  },
+  "sidebarHeader": {
+    "backToHome": "Back to Home",
+    "backToAdmin": "Back to Admin"
   }
 }
+
+

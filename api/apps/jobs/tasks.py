@@ -1,0 +1,1271 @@
+import logging
+import base64
+import hashlib
+import httpx
+import io
+import json
+import os
+import re
+import tempfile
+import unicodedata
+import fitz  # PyMuPDF
+import docx
+from PIL import Image
+from bs4 import BeautifulSoup
+from celery import shared_task
+from django.core.cache import cache
+from decouple import config
+from .models import JobPostActivity
+from integrations.ai.client import (
+    AIServiceUnavailable,
+    post_chat_completion_httpx,
+    post_ollama_native_chat_httpx,
+)
+from .ai_scoring_service import _fallback_scoring
+
+logger = logging.getLogger(__name__)
+RESUME_ANALYSIS_PROMPT_VERSION = "resume-screen-v3"
+
+
+def _strip_html(value: str) -> str:
+    text = BeautifulSoup(value or "", "html.parser").get_text(" ")
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _display(instance, field_name: str) -> str:
+    getter = getattr(instance, f"get_{field_name}_display", None)
+    if callable(getter):
+        try:
+            return str(getter() or "").strip()
+        except Exception:
+            return ""
+    return str(getattr(instance, field_name, "") or "").strip()
+
+
+def _build_resume_profile_text(resume) -> str:
+    """Build analyzable text for online CVs and as a fallback to file text."""
+    if not resume:
+        return ""
+
+    lines = [
+        f"Title: {resume.title or ''}",
+        f"Career: {getattr(resume.career, 'name', '') if resume.career else ''}",
+        f"City: {getattr(resume.city, 'name', '') if resume.city else ''}",
+        f"Position: {_display(resume, 'position')}",
+        f"Experience: {_display(resume, 'experience')}",
+        f"Academic level: {_display(resume, 'academic_level')}",
+        f"Workplace type: {_display(resume, 'type_of_workplace')}",
+        f"Job type: {_display(resume, 'job_type')}",
+        f"Expected salary: {resume.salary_min or 0} - {resume.salary_max or 0}",
+        f"Summary: {resume.description or ''}",
+        f"Skills summary: {resume.skills_summary or ''}",
+    ]
+
+    try:
+        for item in resume.advanced_skills.all():
+            lines.append(f"Skill: {item.name} level {item.level}")
+    except Exception:
+        pass
+
+    try:
+        for item in resume.experience_details.all():
+            lines.append(
+                "Experience detail: "
+                f"{item.job_name} at {item.company_name}, "
+                f"{item.start_date} - {item.end_date}. {item.description or ''}"
+            )
+    except Exception:
+        pass
+
+    try:
+        for item in resume.education_details.all():
+            lines.append(
+                "Education: "
+                f"{item.degree_name}, {item.major}, {item.training_place_name}. "
+                f"{item.description or ''}"
+            )
+    except Exception:
+        pass
+
+    try:
+        for item in resume.certificates.all():
+            lines.append(f"Certificate: {item.name} from {item.training_place}")
+    except Exception:
+        pass
+
+    try:
+        for item in resume.language_skills.all():
+            lines.append(f"Language: {item.get_language_display()} - {item.get_level_display()}")
+    except Exception:
+        pass
+
+    return "\n".join(line for line in lines if line and line.strip())
+
+
+def _build_manual_candidate_profile_text(profile) -> str:
+    """Build analyzable text for employer-entered candidates without a Resume row."""
+    if not profile:
+        return ""
+
+    lines = [
+        f"Title: {profile.title or ''}",
+        f"Career: {getattr(profile.career, 'name', '') if profile.career else ''}",
+        f"City: {getattr(profile.city, 'name', '') if profile.city else ''}",
+        f"Position: {_display(profile, 'position')}",
+        f"Experience: {_display(profile, 'experience')}",
+        f"Academic level: {_display(profile, 'academic_level')}",
+        f"Workplace type: {_display(profile, 'type_of_workplace')}",
+        f"Job type: {_display(profile, 'job_type')}",
+        f"Expected salary: {profile.salary_min or 0} - {profile.salary_max or 0}",
+        f"Summary: {profile.description or ''}",
+        f"Skills summary: {profile.skills_summary or ''}",
+    ]
+    return "\n".join(line for line in lines if line and line.strip())
+
+
+def _build_default_screening_criteria(activity: JobPostActivity) -> list[dict]:
+    job = activity.job_post
+    return [
+        {
+            "key": "must_have_requirements",
+            "label": "Must-have requirements from the JD",
+            "category": "requirements",
+            "weight": 35,
+            "required": True,
+            "description": _strip_html(job.job_requirement or "")[:700],
+        },
+        {
+            "key": "role_experience",
+            "label": "Relevant role and experience level",
+            "category": "experience",
+            "weight": 25,
+            "required": True,
+            "description": f"Role: {job.job_name}. Expected experience: {_display(job, 'experience')}.",
+        },
+        {
+            "key": "core_skills",
+            "label": "Core skills and work history evidence",
+            "category": "skills",
+            "weight": 20,
+            "required": False,
+            "description": _strip_html(job.job_description or "")[:700],
+        },
+        {
+            "key": "education_and_certifications",
+            "label": "Education and certifications",
+            "category": "education",
+            "weight": 10,
+            "required": False,
+            "description": f"Academic level: {_display(job, 'academic_level')}.",
+        },
+        {
+            "key": "compensation_and_working_model",
+            "label": "Compensation and working model fit",
+            "category": "logistics",
+            "weight": 10,
+            "required": False,
+            "description": (
+                f"Salary range: {job.salary_min} - {job.salary_max}. "
+                f"Workplace: {_display(job, 'type_of_workplace')}. Job type: {_display(job, 'job_type')}."
+            ),
+        },
+    ]
+
+
+def _normalize_criteria(criteria) -> list[dict]:
+    if not isinstance(criteria, list):
+        return []
+
+    normalized = []
+    for idx, item in enumerate(criteria[:12]):
+        if not isinstance(item, dict):
+            continue
+        label = str(item.get("label") or item.get("name") or item.get("key") or "").strip()
+        if not label:
+            continue
+        try:
+            weight = int(float(item.get("weight", 0)))
+        except (TypeError, ValueError):
+            weight = 0
+        normalized.append(
+            {
+                "key": str(item.get("key") or f"criterion_{idx + 1}").strip()[:80],
+                "label": label[:180],
+                "category": str(item.get("category") or "custom").strip()[:60],
+                "weight": max(0, min(100, weight)),
+                "required": bool(item.get("required", False)),
+                "description": str(item.get("description") or "").strip()[:900],
+            }
+        )
+
+    total_weight = sum(item["weight"] for item in normalized)
+    if normalized and total_weight <= 0:
+        equal_weight = max(1, int(100 / len(normalized)))
+        for item in normalized:
+            item["weight"] = equal_weight
+
+    return normalized
+
+
+def _truncate_text(value: str, max_chars: int) -> str:
+    text = (value or "").strip()
+    if max_chars <= 0 or len(text) <= max_chars:
+        return text
+
+    truncated = text[:max_chars].rsplit(" ", 1)[0].strip()
+    return f"{truncated}\n...[truncated]"
+
+
+def _strip_name_accents(value: str) -> str:
+    text = str(value or "").replace("đ", "d").replace("Đ", "D")
+    normalized = unicodedata.normalize("NFKD", text)
+    return "".join(ch for ch in normalized if not unicodedata.combining(ch))
+
+
+def _clean_person_name(value: str) -> str:
+    text = str(value or "").replace("\ufeff", " ").replace("\u200b", " ")
+    text = re.sub(r"\s+", " ", text).strip(" -:|•\t\r\n")
+    text = re.sub(
+        r"^(?:họ\s*(?:và\s*)?tên|ho\s*(?:va\s*)?ten|tên\s*ứng\s*viên|ten\s*ung\s*vien|full\s*name|candidate\s*name|name)\s*[:\-]\s*",
+        "",
+        text,
+        flags=re.IGNORECASE,
+    )
+    return re.sub(r"\s+", " ", text).strip()[:120]
+
+
+def _normalize_person_name(value: str) -> str:
+    text = _strip_name_accents(_clean_person_name(value)).lower()
+    text = re.sub(r"[^a-z\s]", " ", text)
+    tokens = [token for token in text.split() if len(token) > 1]
+    return " ".join(tokens)
+
+
+_NON_NAME_LINES = {
+    "cv",
+    "resume",
+    "curriculum vitae",
+    "ho so ung vien",
+    "ung vien",
+    "thong tin ca nhan",
+    "muc tieu nghe nghiep",
+    "muc tieu",
+    "hoc van",
+    "kinh nghiem",
+    "kinh nghiem lam viec",
+    "ky nang",
+    "tin hoc",
+    "ngoai ngu",
+    "nguoi tham chieu",
+    "lien he",
+    "contact",
+    "profile",
+    "education",
+    "experience",
+    "skills",
+    "objective",
+    "summary",
+    "about me",
+    "references",
+}
+
+_ROLE_NAME_TERMS = (
+    "developer",
+    "engineer",
+    "designer",
+    "architect",
+    "manager",
+    "leader",
+    "intern",
+    "nhan vien",
+    "chuyen vien",
+    "ky su",
+    "kien truc",
+    "hoa vien",
+    "giam sat",
+    "thi cong",
+    "lap trinh",
+    "ke toan",
+    "marketing",
+    "sales",
+    "tuyen dung",
+)
+
+_NAME_LABELS = (
+    "ho ten",
+    "ho va ten",
+    "ten ung vien",
+    "full name",
+    "candidate name",
+    "name",
+)
+
+
+def _looks_like_person_name(value: str) -> bool:
+    cleaned = _clean_person_name(value)
+    if not cleaned or re.search(r"\d|@|https?://|www\.|\.com", cleaned, flags=re.IGNORECASE):
+        return False
+
+    normalized = _normalize_person_name(cleaned)
+    tokens = normalized.split()
+    if not (2 <= len(tokens) <= 5):
+        return False
+
+    if normalized in _NON_NAME_LINES:
+        return False
+    if any(normalized.startswith(f"{line} ") for line in _NON_NAME_LINES):
+        return False
+    if any(term in normalized for term in _ROLE_NAME_TERMS):
+        return False
+
+    alpha_count = sum(1 for ch in cleaned if ch.isalpha())
+    return alpha_count >= 4
+
+
+def _extract_labeled_candidate_name(line: str) -> str:
+    normalized = _normalize_person_name(line)
+    for label in _NAME_LABELS:
+        if normalized == label or normalized.startswith(f"{label} "):
+            if ":" in line:
+                return _clean_person_name(line.split(":", 1)[1])
+            if "-" in line:
+                return _clean_person_name(line.split("-", 1)[1])
+            words = line.split()
+            return _clean_person_name(" ".join(words[len(label.split()):]))
+    return ""
+
+
+def _extract_candidate_name_from_resume_text(resume_text: str) -> str:
+    lines = [
+        re.sub(r"\s+", " ", line).strip()
+        for line in str(resume_text or "").splitlines()
+        if line and line.strip()
+    ]
+
+    for line in lines[:35]:
+        candidate = _extract_labeled_candidate_name(line)
+        if _looks_like_person_name(candidate):
+            return candidate
+
+    for line in lines[:25]:
+        candidate = _clean_person_name(line)
+        if _looks_like_person_name(candidate):
+            return candidate
+
+    return ""
+
+
+def _application_candidate_name(activity: JobPostActivity) -> str:
+    resume = getattr(activity, "resume", None)
+    manual_profile = getattr(activity, "manual_candidate_profile", None)
+    values = [
+        getattr(activity, "full_name", ""),
+        getattr(manual_profile, "full_name", ""),
+        getattr(getattr(resume, "user", None), "full_name", ""),
+    ]
+    for value in values:
+        candidate = _clean_person_name(value)
+        if candidate:
+            return candidate
+    return ""
+
+
+def _build_identity_warnings(
+    activity: JobPostActivity,
+    file_resume_text: str,
+    model_candidate_name: str = "",
+    visual_candidate_name: str = "",
+) -> list[dict]:
+    application_name = _application_candidate_name(activity)
+    text_name = _extract_candidate_name_from_resume_text(file_resume_text)
+    visual_name = _clean_person_name(visual_candidate_name)
+    model_name = _clean_person_name(model_candidate_name)
+    resume_name = (
+        text_name
+        or (visual_name if _looks_like_person_name(visual_name) else "")
+        or (model_name if _looks_like_person_name(model_name) else "")
+    )
+
+    if not application_name or not resume_name:
+        return []
+
+    if _normalize_person_name(application_name) == _normalize_person_name(resume_name):
+        return []
+
+    message = (
+        f"Tên trong CV là {resume_name}, khác với tên hồ sơ trong hệ thống là {application_name}. "
+        "HR nên xác minh lại trước khi liên hệ hoặc ra quyết định."
+    )
+    return [
+        {
+            "type": "name_mismatch",
+            "severity": "warning",
+            "application_name": application_name,
+            "resume_name": resume_name,
+            "message": message,
+        }
+    ]
+
+
+def _merge_identity_warnings(*values) -> list[dict]:
+    merged = []
+    seen = set()
+    for value in values:
+        for item in _coerce_dict_list(value, max_items=4):
+            warning_type = str(item.get("type") or "identity_warning")
+            application_name = str(item.get("application_name") or item.get("applicationName") or "")
+            resume_name = str(item.get("resume_name") or item.get("resumeName") or "")
+            message = str(item.get("message") or "").strip()
+            key = (
+                warning_type,
+                _normalize_person_name(application_name),
+                _normalize_person_name(resume_name),
+                message,
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            merged.append(item)
+    return merged[:4]
+
+
+def _acquire_analysis_slot(activity_id: int, max_slots: int, ttl_seconds: int) -> str | None:
+    if max_slots <= 0:
+        return None
+
+    for idx in range(max_slots):
+        slot_key = f"ai:resume-analysis:slot:{idx}"
+        if cache.add(slot_key, str(activity_id), timeout=ttl_seconds):
+            return slot_key
+
+    return None
+
+
+def _release_analysis_slot(slot_key: str | None):
+    if slot_key:
+        cache.delete(slot_key)
+
+
+def _strip_code_fences(text: str) -> str:
+    value = (text or "").strip()
+    if "```json" in value:
+        value = value.split("```json", 1)[1].split("```", 1)[0].strip()
+    elif "```" in value:
+        value = value.split("```", 1)[1].split("```", 1)[0].strip()
+    return value
+
+
+def _strip_reasoning_blocks(text: str) -> str:
+    value = (text or "").strip()
+    value = value.replace("\ufeff", "").replace("\u200b", " ")
+    value = re.sub(r"<think>[\s\S]*?</think>", " ", value, flags=re.IGNORECASE)
+    value = re.sub(r"<think>[\s\S]*", " ", value, flags=re.IGNORECASE)
+    value = re.sub(r"</think>", " ", value, flags=re.IGNORECASE)
+    return value.strip()
+
+
+def _json_object_candidates(text: str):
+    """Yield balanced JSON-object substrings from model output."""
+    value = text or ""
+    for start, char in enumerate(value):
+        if char != "{":
+            continue
+
+        depth = 0
+        in_string = False
+        escape = False
+        for idx in range(start, len(value)):
+            current = value[idx]
+            if in_string:
+                if escape:
+                    escape = False
+                elif current == "\\":
+                    escape = True
+                elif current == '"':
+                    in_string = False
+                continue
+
+            if current == '"':
+                in_string = True
+            elif current == "{":
+                depth += 1
+            elif current == "}":
+                depth -= 1
+                if depth == 0:
+                    yield value[start:idx + 1]
+                    break
+
+
+def _parse_llm_json_content(raw_text: str) -> dict:
+    cleaned = _strip_reasoning_blocks(_strip_code_fences(raw_text))
+    if not cleaned:
+        raise ValueError("Empty model content")
+
+    try:
+        parsed = json.loads(cleaned)
+        if isinstance(parsed, dict):
+            return parsed
+    except json.JSONDecodeError:
+        pass
+
+    decoder = json.JSONDecoder()
+    try:
+        parsed, _ = decoder.raw_decode(cleaned)
+        if isinstance(parsed, dict):
+            return parsed
+    except json.JSONDecodeError:
+        pass
+
+    for candidate in _json_object_candidates(cleaned):
+        try:
+            parsed = json.loads(candidate)
+            if isinstance(parsed, dict):
+                return parsed
+        except json.JSONDecodeError:
+            continue
+
+    raise ValueError("Model response does not contain valid JSON.")
+
+
+def _pdf_first_page_image_data_url(file_path: str) -> str:
+    doc = None
+    try:
+        doc = fitz.open(file_path)
+        if doc.page_count <= 0:
+            return ""
+
+        page = doc.load_page(0)
+        pix = page.get_pixmap(matrix=fitz.Matrix(3, 3), alpha=False)
+        image = Image.open(io.BytesIO(pix.tobytes("png"))).convert("RGB")
+        width, height = image.size
+        image = image.crop((0, 0, width, max(int(height * 0.45), 1)))
+        image.thumbnail((1800, 1200))
+        buffer = io.BytesIO()
+        image.save(buffer, format="JPEG", quality=86, optimize=True)
+        encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
+        return f"data:image/jpeg;base64,{encoded}"
+    except Exception as exc:
+        logger.info("Could not render first PDF page for visual name extraction: %s", exc)
+        return ""
+    finally:
+        if doc is not None:
+            try:
+                doc.close()
+            except Exception:
+                pass
+
+
+def _extract_candidate_name_from_pdf_image(file_path: str) -> str:
+    data_url = _pdf_first_page_image_data_url(file_path)
+    if not data_url:
+        return ""
+
+    model_alias = config(
+        "AI_RESUME_VISION_MODEL",
+        default=config(
+            "AI_VISION_LLM_MODEL",
+            default=config(
+                "AI_LLM_LOCAL_MODEL",
+                default=config(
+                    "AI_RESUME_LLM_MODEL",
+                    default=config(
+                        "AI_LLM_MODEL",
+                        default=config("OLLAMA_MODEL", default="gpt-5.4-mini"),
+                    ),
+                ),
+            ),
+        ),
+    )
+    payload = {
+        "model": model_alias,
+        "messages": [
+            {
+                "role": "system",
+                "content": "Return only valid JSON.",
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": (
+                            "Copy exactly the complete large uppercase person name in the CV header. "
+                            "Return JSON {\"candidate_name\":\"...\"}. Include every word in that name line. "
+                            "Do not use the job title, company name, email, phone, or reference names."
+                        ),
+                    },
+                    {"type": "image_url", "image_url": {"url": data_url}},
+                ],
+            },
+        ],
+        "temperature": 0,
+        "top_p": 0.8,
+        "max_tokens": 120,
+        "stream": False,
+        "think": False,
+        "response_format": {"type": "json_object"},
+    }
+
+    try:
+        response_json, _ = post_chat_completion_httpx(
+            payload,
+            default_model=model_alias,
+            timeout_seconds=config("AI_RESUME_VISION_TIMEOUT_SECONDS", default=120.0, cast=float),
+            connect_timeout_seconds=config("AI_RESUME_VISION_CONNECT_TIMEOUT_SECONDS", default=10.0, cast=float),
+        )
+        message = (response_json.get("choices") or [{}])[0].get("message") or {}
+        content = message.get("content") or ""
+        if isinstance(content, list):
+            content = "\n".join(
+                part.get("text", "") if isinstance(part, dict) else str(part)
+                for part in content
+            )
+        parsed = _parse_llm_json_content(content)
+    except Exception as exc:
+        logger.info("Visual candidate-name extraction skipped: %s", exc)
+        return ""
+
+    candidate_name = _clean_person_name(parsed.get("candidate_name") or parsed.get("name") or "")
+    return candidate_name if _looks_like_person_name(candidate_name) else ""
+
+
+def _coerce_list(value) -> list[str]:
+    if isinstance(value, list):
+        return [str(item).strip() for item in value if str(item).strip()][:8]
+    if isinstance(value, str):
+        parts = [part.strip(" -•\t\r\n") for part in value.split(",")]
+        return [part for part in parts if part][:8]
+    return []
+
+
+def _coerce_dict_list(value, max_items: int = 12) -> list[dict]:
+    if not isinstance(value, list):
+        return []
+
+    items = []
+    for raw in value[:max_items]:
+        if not isinstance(raw, dict):
+            continue
+        clean = {}
+        for key, item_value in raw.items():
+            if item_value is None:
+                continue
+            if isinstance(item_value, (str, int, float, bool)):
+                clean[str(key)] = item_value
+            elif isinstance(item_value, list):
+                clean[str(key)] = _coerce_list(item_value)
+            else:
+                clean[str(key)] = str(item_value)[:500]
+        if clean:
+            items.append(clean)
+    return items
+
+
+def _normalize_analysis_result(result: dict) -> dict:
+    score = result.get("score", result.get("overall_score", 0))
+    try:
+        score = int(float(score))
+    except (TypeError, ValueError):
+        score = 0
+    score = max(0, min(100, score))
+
+    return {
+        "score": score,
+        "summary": str(result.get("summary") or result.get("recommendation") or "").strip(),
+        "skills": _coerce_list(result.get("skills")),
+        "pros": _coerce_list(result.get("pros") or result.get("strengths")),
+        "cons": _coerce_list(result.get("cons") or result.get("gaps")),
+        "matching_skills": _coerce_list(result.get("matching_skills")),
+        "missing_skills": _coerce_list(result.get("missing_skills")),
+        "criteria_results": _coerce_dict_list(result.get("criteria_results")),
+        "evidence": _coerce_dict_list(result.get("evidence") or result.get("source_evidence")),
+        "candidate_name": _clean_person_name(result.get("candidate_name") or result.get("cv_candidate_name") or ""),
+        "identity_warnings": _coerce_dict_list(result.get("identity_warnings") or result.get("identityWarnings"), max_items=4),
+    }
+
+
+def _number_value(value) -> int:
+    try:
+        return int(float(value or 0))
+    except (TypeError, ValueError):
+        return 0
+
+
+def _important_words(value: str) -> set[str]:
+    words = re.findall(r"[\wÀ-ỹ]{3,}", (value or "").lower(), flags=re.UNICODE)
+    stopwords = {
+        "the",
+        "and",
+        "for",
+        "with",
+        "ban",
+        "can",
+        "cac",
+        "cho",
+        "cong",
+        "kinh",
+        "lam",
+        "mot",
+        "nang",
+        "nghiem",
+        "nhan",
+        "ung",
+        "vien",
+        "viec",
+        "yeu",
+    }
+    return {word for word in words if word not in stopwords}
+
+
+def _build_rule_based_analysis_result(activity: JobPostActivity, resume_text: str, criteria: list[dict]) -> dict:
+    candidate = activity.resume or activity.manual_candidate_profile
+    job = activity.job_post
+    candidate_title = str(getattr(candidate, "title", "") or activity.full_name or "").strip()
+    candidate_skills = str(getattr(candidate, "skills_summary", "") or "").strip()
+    candidate_description = str(getattr(candidate, "description", "") or resume_text or "").strip()
+    job_text = " ".join(
+        [
+            job.job_name or "",
+            _strip_html(job.job_description or ""),
+            _strip_html(job.job_requirement or ""),
+        ]
+    )
+
+    fallback = _fallback_scoring(
+        {
+            "title": candidate_title,
+            "skills": candidate_skills,
+            "description": candidate_description,
+            "experience": _number_value(getattr(candidate, "experience", 0)),
+            "salary_min": getattr(candidate, "salary_min", 0) or 0,
+            "salary_max": getattr(candidate, "salary_max", 0) or 0,
+        },
+        {
+            "job_name": job.job_name or "",
+            "description": job_text,
+            "experience": _number_value(getattr(job, "experience", 0)),
+            "salary_min": job.salary_min or 0,
+            "salary_max": job.salary_max or 0,
+        },
+    )
+    result = _normalize_analysis_result(fallback)
+    candidate_words = _important_words(" ".join([candidate_title, candidate_skills, candidate_description, resume_text]))
+    job_words = _important_words(job_text)
+    matching_words = sorted(candidate_words & job_words)[:8]
+    missing_words = sorted(job_words - candidate_words)[:8]
+    score = result["score"]
+
+    result.update(
+        {
+            "summary": (
+                "AI đang tạm thời không khả dụng; hệ thống đã dùng chấm điểm dự phòng "
+                "dựa trên hồ sơ ứng viên và tin tuyển dụng."
+            ),
+            "skills": matching_words[:5],
+            "pros": result["pros"] or ["Có dữ liệu hồ sơ để đối chiếu với tin tuyển dụng."],
+            "cons": result["cons"] or ["Cần HR xem lại vì đây là phân tích dự phòng khi LLM offline."],
+            "matching_skills": matching_words,
+            "missing_skills": missing_words,
+            "criteria_results": [
+                {
+                    "key": item.get("key", f"criterion_{index + 1}"),
+                    "score": score,
+                    "matched": score >= 60,
+                    "evidence": "Rule-based fallback used because the LLM service is unavailable.",
+                    "reason": "Điểm dự phòng dựa trên mức khớp tiêu đề, kinh nghiệm, lương và từ khóa.",
+                }
+                for index, item in enumerate(criteria)
+            ],
+            "evidence": [
+                {
+                    "claim": "LLM service unavailable",
+                    "source": "system",
+                    "quote": "Rule-based fallback",
+                    "confidence": 100,
+                }
+            ],
+        }
+    )
+    return result
+
+
+@shared_task(
+    bind=True,
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 3},
+    ignore_result=True,
+)
+def es_index_job_post(self, job_post_id: int):
+    """
+    Asynchronously index (create or update) a single JobPost document in Elasticsearch.
+    Called by the post_save signal in signals.py.
+    """
+    try:
+        from .models import JobPost
+        from django_elasticsearch_dsl.registries import registry
+
+        instance = JobPost.objects.get(pk=job_post_id)
+        registry.update(instance)
+        logger.debug("ES: indexed JobPost id=%s", job_post_id)
+    except JobPost.DoesNotExist:
+        logger.warning("ES index skipped: JobPost id=%s not found (deleted?)", job_post_id)
+    except Exception as exc:
+        logger.error("ES index failed for JobPost id=%s: %s", job_post_id, exc)
+        raise  # let Celery retry
+
+
+@shared_task(
+    bind=True,
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 3},
+    ignore_result=True,
+)
+def es_delete_job_post(self, job_post_id: int):
+    """
+    Asynchronously remove a JobPost document from Elasticsearch.
+    Called by the post_delete signal in signals.py.
+    """
+    try:
+        from django_elasticsearch_dsl.registries import registry
+        from .documents import JobPostDocument
+
+        # Build a fake object with just the pk so the registry can remove it
+        class _Stub:
+            pk = job_post_id
+
+        JobPostDocument().delete(doc_id=job_post_id, ignore=404)
+        logger.debug("ES: deleted JobPost id=%s", job_post_id)
+    except Exception as exc:
+        logger.error("ES delete failed for JobPost id=%s: %s", job_post_id, exc)
+        raise
+
+
+def extract_text_from_pdf(file_path):
+    """Extract text from PDF file."""
+    text = ""
+    try:
+        doc = fitz.open(file_path)
+        for page in doc:
+            text += page.get_text()
+        doc.close()
+    except Exception as e:
+        logger.error(f"Error extracting PDF: {e}")
+    return text
+
+def extract_text_from_docx(file_path):
+    """Extract text from DOCX file."""
+    text = ""
+    try:
+        doc = docx.Document(file_path)
+        for para in doc.paragraphs:
+            text += para.text + "\n"
+    except Exception as e:
+        logger.error(f"Error extracting DOCX: {e}")
+    return text
+
+@shared_task(bind=True, autoretry_for=(httpx.TimeoutException, httpx.ConnectError),
+             retry_backoff=True, retry_kwargs={'max_retries': 3})
+def analyze_resume_ai(self, activity_id):
+    """
+    Task phan tich CV bang AI.
+    Tu dong retry toi da 3 lan voi exponential backoff khi LLM timeout/connect error.
+    """
+    temp_file = None
+    slot_key = None
+
+    try:
+        max_slots = config("AI_RESUME_ANALYSIS_MAX_CONCURRENCY", default=2, cast=int)
+        slot_wait_seconds = config("AI_RESUME_ANALYSIS_SLOT_WAIT_SECONDS", default=20, cast=int)
+        slot_ttl_seconds = config("AI_RESUME_ANALYSIS_SLOT_TTL_SECONDS", default=1800, cast=int)
+
+        slot_key = _acquire_analysis_slot(
+            activity_id=activity_id,
+            max_slots=max_slots,
+            ttl_seconds=slot_ttl_seconds,
+        )
+        if max_slots > 0 and not slot_key:
+            logger.info(
+                "Activity %s waiting AI slot (limit=%s), retry in %ss",
+                activity_id,
+                max_slots,
+                slot_wait_seconds,
+            )
+            raise self.retry(countdown=slot_wait_seconds)
+
+        activity = (
+            JobPostActivity.objects
+            .select_related(
+                'job_post',
+                'resume',
+                'resume__user',
+                'resume__file',
+                'resume__career',
+                'resume__city',
+                'manual_candidate_profile',
+                'manual_candidate_profile__file',
+                'manual_candidate_profile__career',
+                'manual_candidate_profile__city',
+            )
+            .prefetch_related(
+                'resume__advanced_skills',
+                'resume__experience_details',
+                'resume__education_details',
+                'resume__certificates',
+                'resume__language_skills',
+            )
+            .get(id=activity_id)
+        )
+
+        resume = activity.resume
+        manual_profile = activity.manual_candidate_profile
+        if not resume and not manual_profile:
+            activity.ai_analysis_status = 'failed'
+            activity.ai_analysis_progress = 0
+            activity.ai_analysis_summary = "Khong tim thay ho so ung vien de phan tich."
+            activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
+            return
+
+        activity.ai_analysis_status = 'processing'
+        activity.ai_analysis_progress = 5
+        activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'update_at'])
+
+        file_obj = resume.file if resume else manual_profile.file
+        file_format = file_obj.format.lower() if file_obj and file_obj.format else 'pdf'
+        resume_text = ""
+        file_resume_text = ""
+        visual_resume_candidate_name = ""
+        input_source = "profile" if resume else "manual_profile"
+
+        if file_obj:
+            input_source = f"file:{file_format}"
+            # Strategy 1: direct MinIO fetch inside Docker network
+            try:
+                from shared.helpers.cloudinary_service import CloudinaryService
+                from django.conf import settings as django_settings
+
+                minio_client = CloudinaryService._get_client()
+                bucket = django_settings.MINIO_BUCKET
+                object_name = file_obj.public_id.lstrip('/')
+
+                if object_name.startswith("http://") or object_name.startswith("https://"):
+                    from urllib.parse import urlparse
+                    parsed = urlparse(object_name)
+                    object_name = parsed.path.lstrip("/")
+                    if object_name.startswith(f"{bucket}/"):
+                        object_name = object_name[len(bucket) + 1:]
+
+                logger.info("Downloading CV from MinIO: bucket=%s, object=%s", bucket, object_name)
+
+                response = minio_client.get_object(bucket, object_name)
+                with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
+                    for chunk in response.stream(1024 * 32):
+                        tf.write(chunk)
+                    temp_file = tf.name
+                response.close()
+                response.release_conn()
+
+                activity.ai_analysis_progress = 25
+                activity.save(update_fields=['ai_analysis_progress', 'update_at'])
+
+            except Exception as minio_err:
+                logger.warning("MinIO direct download failed: %s. Falling back to HTTP URL.", minio_err)
+
+                resume_url = file_obj.get_full_url()
+                logger.info("Downloading CV from URL: %s", resume_url)
+                with httpx.Client(timeout=30.0) as client:
+                    response = client.get(resume_url)
+                    if response.status_code != 200:
+                        raise Exception(f"Failed to download resume file: HTTP {response.status_code}")
+
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
+                        tf.write(response.content)
+                        temp_file = tf.name
+
+                activity.ai_analysis_progress = 25
+                activity.save(update_fields=['ai_analysis_progress', 'update_at'])
+
+            # Extract text from downloaded file
+            if temp_file:
+                if file_format == 'pdf':
+                    resume_text = extract_text_from_pdf(temp_file)
+                elif file_format in ['docx', 'doc']:
+                    resume_text = extract_text_from_docx(temp_file)
+                else:
+                    with open(temp_file, 'r', errors='ignore') as f:
+                        resume_text = f.read()
+                file_resume_text = resume_text
+                if file_format == 'pdf' and not _extract_candidate_name_from_resume_text(file_resume_text):
+                    visual_resume_candidate_name = _extract_candidate_name_from_pdf_image(temp_file)
+                    if visual_resume_candidate_name:
+                        resume_text = (
+                            f"Visually detected CV candidate name: {visual_resume_candidate_name}\n"
+                            f"{resume_text}"
+                        ).strip()
+
+                activity.ai_analysis_progress = 45
+                activity.save(update_fields=['ai_analysis_progress', 'update_at'])
+
+        profile_text = _build_resume_profile_text(resume) if resume else _build_manual_candidate_profile_text(manual_profile)
+        if profile_text:
+            resume_text = f"{resume_text}\n\nStructured online profile:\n{profile_text}".strip()
+            if not file_obj:
+                activity.ai_analysis_progress = 45
+                activity.save(update_fields=['ai_analysis_progress', 'update_at'])
+
+        if not resume_text or len(resume_text.strip()) < 50:
+            activity.ai_analysis_status = 'failed'
+            activity.ai_analysis_progress = 0
+            activity.ai_analysis_summary = "Khong the doc duoc noi dung CV hoac ho so truc tuyen."
+            activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
+            return
+
+        # Compact prompt to reduce token use and improve throughput
+        max_resume_chars = config("AI_RESUME_PROMPT_MAX_CV_CHARS", default=2600, cast=int)
+        max_jd_chars = config("AI_RESUME_PROMPT_MAX_JD_CHARS", default=900, cast=int)
+        max_req_chars = config("AI_RESUME_PROMPT_MAX_REQUIREMENT_CHARS", default=700, cast=int)
+
+        job_description = _truncate_text(activity.job_post.job_description or "", max_jd_chars)
+        job_requirement = _truncate_text(activity.job_post.job_requirement or "", max_req_chars)
+        resume_excerpt = _truncate_text(resume_text, max_resume_chars)
+        criteria = _normalize_criteria(activity.ai_analysis_criteria) or _build_default_screening_criteria(activity)
+        criteria_json = json.dumps(criteria, ensure_ascii=False)
+        application_candidate_name = _application_candidate_name(activity)
+
+        prompt = f"""
+        Analyze candidate CV fit for this role using the weighted screening criteria.
+        Return ONLY one compact valid JSON object.
+
+        Application candidate name in system: {application_candidate_name or "Unknown"}
+        Job title: {activity.job_post.job_name}
+        Job description: {_strip_html(job_description)}
+        Job requirements: {_strip_html(job_requirement)}
+
+        Weighted screening criteria:
+        {criteria_json}
+
+        Candidate CV:
+        {resume_excerpt}
+
+        Required JSON schema:
+        {{
+          "score": 0-100 integer,
+          "candidate_name": "person name visible in the CV if available",
+          "summary": "short Vietnamese summary",
+          "skills": ["..."],
+          "pros": ["..."],
+          "cons": ["..."],
+          "matching_skills": ["..."],
+          "missing_skills": ["..."],
+          "criteria_results": [
+            {{
+              "key": "criterion key",
+              "score": 0-100,
+              "matched": true,
+              "evidence": "short exact or near-exact evidence from CV/JD",
+              "reason": "short Vietnamese reason"
+            }}
+          ],
+          "evidence": [
+            {{
+              "claim": "short claim",
+              "source": "cv|jd",
+              "quote": "short quote",
+              "confidence": 0-100
+            }}
+          ],
+          "identity_warnings": [
+            {{
+              "type": "name_mismatch",
+              "severity": "warning",
+              "application_name": "name from system",
+              "resume_name": "name visible in CV",
+              "message": "Vietnamese warning for HR"
+            }}
+          ]
+        }}
+
+        Constraints:
+        - summary max 70 words.
+        - each list max 5 short items.
+        - criteria_results must include every criterion key.
+        - evidence quotes must be short and grounded in the provided CV/JD text.
+        - candidate_name must be extracted from the CV text, not from the system name.
+        - if candidate_name and system candidate name are different people, add one identity_warnings item.
+        - do not infer protected attributes such as age, gender, marital status, race, religion, disability, or family status.
+        - no markdown, no extra text outside JSON.
+        - no <think> block, no explanation.
+        """
+        prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+
+        model_alias = config(
+            "AI_RESUME_LLM_MODEL",
+            default=config(
+                "AI_LLM_MODEL",
+                default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gpt-5.4-mini")),
+            ),
+        )
+        llm_temperature = config("AI_RESUME_LLM_TEMPERATURE", default=0.1, cast=float)
+        llm_top_p = config("AI_RESUME_LLM_TOP_P", default=0.9, cast=float)
+        llm_max_tokens = config("AI_RESUME_LLM_MAX_TOKENS", default=900, cast=int)
+        llm_timeout = config("AI_RESUME_LLM_TIMEOUT_SECONDS", default=240.0, cast=float)
+        llm_connect_timeout = config("AI_RESUME_LLM_CONNECT_TIMEOUT_SECONDS", default=10.0, cast=float)
+
+        payload = {
+            "model": model_alias,
+            "messages": [
+                {"role": "system", "content": "Ban la AI tuyen dung. Chi tra ve dung mot JSON object hop le, khong markdown, khong giai thich, khong <think>."},
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": llm_temperature,
+            "top_p": llm_top_p,
+            "max_tokens": llm_max_tokens,
+            "stream": False,
+            "response_format": {"type": "json_object"},
+        }
+
+        activity.ai_analysis_progress = 70
+        activity.save(update_fields=['ai_analysis_progress', 'update_at'])
+
+        try:
+            response_json, llm_candidate = post_chat_completion_httpx(
+                payload,
+                default_model=model_alias,
+                timeout_seconds=llm_timeout,
+                connect_timeout_seconds=llm_connect_timeout,
+            )
+        except AIServiceUnavailable as exc:
+            logger.warning("LLM unavailable for activity %s, using rule-based fallback: %s", activity_id, exc)
+            result = _build_rule_based_analysis_result(activity, resume_text, criteria)
+            analysis_model = "rule-based-fallback"
+            analysis_source = f"{input_source}:fallback"
+        else:
+            analysis_model = llm_candidate.model or model_alias
+            analysis_source = f"{input_source}:{llm_candidate.name}"
+            message = (response_json.get("choices") or [{}])[0].get("message") or {}
+            content = message.get("content") or ""
+            reasoning = message.get("reasoning") or ""
+            if isinstance(content, list):
+                content = "\n".join(
+                    part.get("text", "") if isinstance(part, dict) else str(part)
+                    for part in content
+                )
+
+            # Ollama + some reasoning models may return empty "content" on /v1/chat/completions.
+            # Fallback to native /api/chat to force JSON output when needed.
+            try:
+                result = _parse_llm_json_content(content)
+            except Exception:
+                result = None
+                if reasoning:
+                    try:
+                        result = _parse_llm_json_content(reasoning)
+                    except Exception:
+                        result = None
+
+                if result is None and config("AI_RESUME_OLLAMA_FALLBACK_ENABLED", default=True, cast=bool):
+                    native_payload = {
+                        "model": llm_candidate.model or model_alias,
+                        "messages": payload["messages"],
+                        "stream": False,
+                        "think": False,
+                        "format": "json",
+                        "options": {
+                            "temperature": llm_temperature,
+                        },
+                    }
+                    native_json = post_ollama_native_chat_httpx(
+                        llm_candidate,
+                        native_payload,
+                        timeout_seconds=llm_timeout,
+                        connect_timeout_seconds=llm_connect_timeout,
+                    )
+                    if native_json:
+                        native_content = (native_json.get("message") or {}).get("content") or ""
+                        result = _parse_llm_json_content(native_content)
+
+                if result is None:
+                    raise ValueError("Model response does not contain valid JSON.")
+
+            result = _normalize_analysis_result(result)
+        identity_warnings = _merge_identity_warnings(
+            result.get("identity_warnings"),
+            _build_identity_warnings(
+                activity,
+                file_resume_text,
+                result.get("candidate_name"),
+                visual_resume_candidate_name,
+            ),
+        )
+        if identity_warnings:
+            result["identity_warnings"] = identity_warnings
+            warning_messages = [
+                str(item.get("message") or "").strip()
+                for item in identity_warnings
+                if str(item.get("message") or "").strip()
+            ]
+            existing_cons = result.get("cons", [])
+            result["cons"] = (warning_messages + [item for item in existing_cons if item not in warning_messages])[:8]
+            if result.get("summary") and "ten" not in _strip_name_accents(result["summary"]).lower():
+                result["summary"] = f"Lưu ý: tên trong CV có dấu hiệu không khớp với hồ sơ ứng tuyển. {result['summary']}"
+        activity.ai_analysis_score = result.get('score', 0)
+        activity.ai_analysis_summary = result.get('summary', '')
+        activity.ai_analysis_skills = ", ".join(result.get('skills', []))
+        activity.ai_analysis_pros = ", ".join(result.get('pros', []))
+        activity.ai_analysis_cons = ", ".join(result.get('cons', []))
+        activity.ai_analysis_matching_skills = result.get('matching_skills', [])
+        activity.ai_analysis_missing_skills = result.get('missing_skills', [])
+        activity.ai_analysis_criteria = criteria
+        activity.ai_analysis_evidence = {
+            "criteria_results": result.get("criteria_results", []),
+            "evidence": result.get("evidence", []),
+            "identity_warnings": result.get("identity_warnings", []),
+        }
+        activity.ai_analysis_model = analysis_model
+        activity.ai_analysis_source = analysis_source
+        activity.ai_analysis_prompt_version = RESUME_ANALYSIS_PROMPT_VERSION
+        activity.ai_analysis_prompt_hash = prompt_hash
+        activity.ai_analysis_review_status = 'ai_only'
+        activity.ai_analysis_hr_override_score = None
+        activity.ai_analysis_hr_override_note = ""
+        activity.ai_analysis_reviewed_by = None
+        activity.ai_analysis_reviewed_at = None
+        activity.ai_analysis_status = 'completed'
+        activity.ai_analysis_progress = 100
+        activity.save()
+
+        logger.info("AI Analysis completed for Activity %s. Score: %s", activity_id, activity.ai_analysis_score)
+
+    except (httpx.TimeoutException, httpx.ConnectError) as exc:
+        max_r = 3  # matches retry_kwargs['max_retries']
+        if (self.request.retries or 0) >= max_r:
+            try:
+                act = JobPostActivity.objects.get(id=activity_id)
+                act.ai_analysis_status = 'failed'
+                act.ai_analysis_progress = 0
+                act.ai_analysis_summary = f"LLM khong phan hoi sau nhieu lan thu: {str(exc)[:300]}"
+                act.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
+            except Exception:
+                logger.error("Failed to update activity %s after final retry", activity_id)
+        raise
+
+    except Exception as e:
+        logger.error("Error in analyze_resume_ai for activity %s: %s", activity_id, e)
+        try:
+            activity = JobPostActivity.objects.get(id=activity_id)
+            activity.ai_analysis_status = 'failed'
+            activity.ai_analysis_progress = 0
+            activity.ai_analysis_summary = str(e)[:500]
+            activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
+        except Exception:
+            logger.error("Failed to update activity %s status after error", activity_id)
+
+    finally:
+        _release_analysis_slot(slot_key)
+
+        if temp_file and os.path.exists(temp_file):
+            try:
+                os.unlink(temp_file)
+            except OSError:
+                pass

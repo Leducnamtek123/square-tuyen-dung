@@ -1,31 +1,36 @@
-version: '3.8'
+# =============================================================================
+# frontend/docker-compose.yaml — STANDALONE frontend dev server
+# NOTE: Prefer the root docker-compose.yml for full-stack development.
+#       This file is kept for frontend-only development.
+#       Config is loaded from root .env (single source of truth).
+# =============================================================================
 
 services:
   frontend_dev:
     build: 
       context: .
       dockerfile: Dockerfile
-    container_name: myjob-frontend-container
+    container_name: project-frontend-container
     volumes:
-      - .:/myjob_web_app
-      - /myjob_web_app/node_modules
+      - .:/project_web_app
+      - /project_web_app/node_modules
     ports:
       - "3000:3000"
     environment:
       - CHOKIDAR_USEPOLLING=true
     env_file:
-      - .env
+      - ../.env
     networks:
-      - myjob-network
+      - project-network
 
   frontend_nginx:
     image: nginx:1.24.0-alpine
-    container_name: myjob-frontend-nginx-container
+    container_name: project-frontend-nginx-container
     restart: unless-stopped
     env_file:
-      - .env
+      - ../.env
     networks:
-      - myjob-network
+      - project-network
     ports:
       - "443:443"
     volumes:
@@ -35,5 +40,5 @@ services:
       - frontend_dev
 
 networks:
-  myjob-network:
-    name: myjob-network
+  project-network:
+    name: project-network

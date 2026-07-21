@@ -1,11 +1,10 @@
 
 from celery import shared_task
 
-from firebase_admin import firestore
+from shared.helpers import helper
+from common.firebase import get_firestore_client
 
-from helpers import helper
-
-from configs import variable_system as var_sys
+from shared.configs import variable_system as var_sys
 
 @shared_task
 
@@ -15,7 +14,9 @@ def update_avatar(user_id, avatar_url):
 
         avatar_url = var_sys.AVATAR_DEFAULT["AVATAR"]
 
-    database = firestore.client()
+    database = get_firestore_client()
+    if not database:
+        return
 
     account_ref = database.collection("accounts").document(str(user_id))
 
@@ -47,7 +48,9 @@ def update_avatar(user_id, avatar_url):
 
 def update_info(user_id, name):
 
-    database = firestore.client()
+    database = get_firestore_client()
+    if not database:
+        return
 
     account_ref = database.collection("accounts").document(str(user_id))
 

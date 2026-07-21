@@ -139,8 +139,8 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=<Client Secret>
 3. **Create OAuth 2.0 Client ID**:
    - Go to **APIs & Services → Credentials → Create credentials → OAuth client ID**
    - Select **Application type**: Web application
-   - **Authorized JavaScript origins**: `https://www.myjob.com`
-   - **Authorized redirect URIs**: `https://www.myjob.com`
+   - **Authorized JavaScript origins**: `https://www.project.com`
+   - **Authorized redirect URIs**: `https://www.project.com`
 4. **Save credentials**: Copy Client ID and Client Secret to `.env`
 
 ---
@@ -345,8 +345,8 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=<Client Secret>
 3. **Tạo OAuth 2.0 Client ID**:
    - Vào **APIs & Services → Credentials → Create credentials → OAuth client ID**
    - Chọn **Application type**: Web application
-   - **Authorized JavaScript origins**: `https://www.myjob.com`
-   - **Authorized redirect URIs**: `https://www.myjob.com`
+   - **Authorized JavaScript origins**: `https://www.project.com`
+   - **Authorized redirect URIs**: `https://www.project.com`
 4. **Lưu thông tin**: Copy Client ID và Client Secret vào `.env`
 
 ---

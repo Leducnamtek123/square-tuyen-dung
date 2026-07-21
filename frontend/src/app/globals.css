@@ -1,0 +1,398 @@
+/* TailwindCSS v4 — selective import to avoid Preflight conflicting with MUI */
+/* DO NOT use @import "tailwindcss" — its CSS reset breaks MUI components */
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/utilities" layer(utilities);
+@import "tw-animate-css";
+/* @import "@livekit/components-styles"; -- loaded in interview pages only */
+
+/* Swiper carousel CSS */
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
+@import 'swiper/css/autoplay';
+@import 'swiper/css/grid';
+@import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+@import '@react-pdf-viewer/core/lib/styles/index.css';
+
+/* Swiper sets its wrapper to content-box; keep slide content aligned with MUI sizing. */
+.swiper-slide,
+.swiper-slide * {
+  box-sizing: border-box;
+}
+
+/* PDF viewer fallback: keep the selectable text layer over the canvas and invisible.
+   Without these rules the PDF text can flow below the canvas, looking like a duplicated CV. */
+.rpv-core__page-layer {
+  position: relative;
+}
+
+.rpv-core__canvas-layer,
+.rpv-core__text-layer {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+}
+
+.rpv-core__canvas-layer {
+  overflow: hidden;
+}
+
+.rpv-core__text-layer {
+  width: 100% !important;
+  height: 100% !important;
+  line-height: 1 !important;
+  z-index: 1;
+}
+
+.rpv-core__text-layer-text {
+  color: transparent !important;
+  position: absolute !important;
+  transform-origin: 0 0 !important;
+  white-space: pre !important;
+}
+
+.rpv-core__text-layer span::selection {
+  color: transparent !important;
+}
+
+@font-face {
+  font-family: 'Geist Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("../../node_modules/@fontsource-variable/geist/files/geist-cyrillic-wght-normal.woff2") format('woff2-variations');
+  unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;
+}
+
+@font-face {
+  font-family: 'Geist Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("../../node_modules/@fontsource-variable/geist/files/geist-latin-ext-wght-normal.woff2") format('woff2-variations');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Geist Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("../../node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2") format('woff2-variations');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  font-family: var(--font-be-vietnam-pro), 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+:root {
+  /* Base — InfoHR Brand Colors (white-first UI with pink accents) */
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #0f172a;
+  --primary-foreground: #ffffff;
+  --secondary: #10b981;               /* emerald green */
+  --secondary-foreground: #ffffff;
+  --muted: #f8fafc;
+  --muted-foreground: #475569;
+  --accent: #0f172a;
+  --accent-foreground: #ffffff;
+  --destructive: oklch(0.58 0.22 27);
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #0f172a;
+  --chart-1: #0f172a;
+  --chart-2: #475569;
+  --chart-3: #10b981;                 /* emerald */
+  --chart-4: #f59e0b;                 /* amber */
+  --chart-5: #334155;
+  --radius: 0.625rem;
+  --sq-button-radius: 12px;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #0f172a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f8fafc;
+  --sidebar-accent-foreground: #475569;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #0f172a;
+}
+
+.dark {
+  /* Dark mode — InfoHR brand on dark bg */
+  --background: #180812;              /* deep plum */
+  --foreground: #ffeaf1;
+  --card: #250d1c;
+  --card-foreground: #ffeaf1;
+  --popover: #250d1c;
+  --popover-foreground: #ffeaf1;
+  --primary: #cbd5e1;
+  --primary-foreground: #ffffff;
+  --secondary: #10b981;
+  --secondary-foreground: #ffffff;
+  --muted: #3a1627;
+  --muted-foreground: #94a3b8;
+  --accent: #cbd5e1;
+  --accent-foreground: #ffffff;
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: rgba(148, 163, 184, 0.15);
+  --input: rgba(148, 163, 184, 0.12);
+  --ring: #cbd5e1;
+  --chart-1: #cbd5e1;
+  --chart-2: #94a3b8;
+  --chart-3: #34d399;
+  --chart-4: #fbbf24;
+  --chart-5: #ffb3c8;
+  --sidebar: #180812;
+  --sidebar-foreground: #ffeaf1;
+  --sidebar-primary: #cbd5e1;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #3a1627;
+  --sidebar-accent-foreground: #ffeaf1;
+  --sidebar-border: rgba(148, 163, 184, 0.12);
+  --sidebar-ring: #cbd5e1;
+}
+
+@theme inline {
+  --font-sans: var(--font-be-vietnam-pro), 'Be Vietnam Pro', sans-serif;
+  --font-display: var(--font-be-vietnam-pro), 'Be Vietnam Pro', sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* SweetAlert2: remove default icon border for custom iconHtml */
+.swal2-icon.swal2-no-border {
+  border: none !important;
+  box-shadow: none !important;
+  margin-bottom: 0 !important;
+}
+.swal2-icon.swal2-no-border::before,
+.swal2-icon.swal2-no-border::after {
+  display: none !important;
+}
+
+/* === ENHANCED AESTHETICS & MOTION === */
+
+/* Topography & Fonts */
+h1, h2, h3, h4, h5, .display-text {
+  font-family: var(--font-be-vietnam-pro), 'Be Vietnam Pro', sans-serif !important;
+  letter-spacing: -0.01em;
+}
+
+/* Optimized Background Atmosphere — using fewer gradients for better perf */
+.bg-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-color: var(--background);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(15, 23, 42, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(51, 65, 85, 0.04) 0px, transparent 50%);
+}
+
+.dark .bg-atmosphere {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(42, 169, 225, 0.1) 0px, transparent 40%),
+    radial-gradient(at 100% 100%, rgba(42, 169, 225, 0.08) 0px, transparent 50%);
+}
+
+/* Rich text editor images — override inline width/height set by the editor insert dialog */
+.rdw-editor-main img,
+.rdw-editor-main .public-DraftStyleDefault-block img,
+.rdw-editor-main .public-DraftEditor-content img {
+  display: block !important;
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 12px 0;
+  border-radius: 6px;
+}
+
+/* Figure wrapper also gets inline width — must override */
+.rdw-editor-main figure,
+.rdw-editor-main .rdw-image-alignment {
+  display: block !important;
+  max-width: 100% !important;
+  width: auto !important;
+  margin: 12px 0 !important;
+}
+
+.rdw-editor-main .rdw-image-center {
+  justify-content: center;
+}
+
+.rdw-editor-main .rdw-image-left {
+  justify-content: flex-start;
+}
+
+.rdw-editor-main .rdw-image-right {
+  justify-content: flex-end;
+}
+
+/* Removed SVG Noise Filter as it is extremely expensive for rendering */
+.bg-noise {
+  display: none;
+}
+
+/* Refined Glassmorphism Cards — optimized blur intensity */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 30px rgba(26, 64, 125, 0.05);
+}
+
+.dark .glass-panel {
+  background: rgba(15, 32, 64, 0.6);
+  border: 1px solid rgba(42, 169, 225, 0.12);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Animations: Staggered Fade Up */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.anim-delay-100 { animation-delay: 100ms; }
+.anim-delay-200 { animation-delay: 200ms; }
+.anim-delay-300 { animation-delay: 300ms; }
+.anim-delay-400 { animation-delay: 400ms; }
+.anim-delay-500 { animation-delay: 500ms; }
+
+/* Interactive Hover States */
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 32px rgba(42, 169, 225, 0.15);
+}
+
+/* Diagonal Layout Highlight / Accent Ribbon */
+.diagonal-ribbon {
+  position: relative;
+  overflow: hidden;
+}
+.diagonal-ribbon::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(115deg, transparent 40%, rgba(42, 169, 225, 0.08) 50%, transparent 60%);
+  transform: translate(-100%, -100%) rotate(45deg);
+  transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+  pointer-events: none;
+}
+.diagonal-ribbon:hover::after {
+  transform: translate(100%, 100%) rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-loading-indicator="true"],
+  [data-loading-indicator="true"] *,
+  .MuiCircularProgress-indeterminate,
+  .MuiCircularProgress-circleIndeterminate,
+  .MuiLinearProgress-indeterminate,
+  .MuiLinearProgress-bar1Indeterminate,
+  .MuiLinearProgress-bar2Indeterminate,
+  .MuiSkeleton-pulse,
+  .MuiSkeleton-wave::after,
+  .animate-spin {
+    animation-iteration-count: infinite !important;
+  }
+
+  [data-loading-indicator="true"],
+  [data-loading-indicator="true"] *,
+  .MuiCircularProgress-indeterminate,
+  .MuiCircularProgress-circleIndeterminate,
+  .MuiSkeleton-pulse,
+  .MuiSkeleton-wave::after {
+    animation-duration: var(--sq-loading-animation-duration, 1.4s) !important;
+  }
+
+  .MuiLinearProgress-indeterminate,
+  .MuiLinearProgress-bar1Indeterminate,
+  .MuiLinearProgress-bar2Indeterminate {
+    animation-duration: var(--sq-loading-animation-duration, 2.1s) !important;
+  }
+
+  .animate-spin {
+    animation-duration: var(--sq-loading-animation-duration, 1s) !important;
+  }
+}

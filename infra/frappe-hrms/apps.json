@@ -1,0 +1,14 @@
+[
+  {
+    "url": "/opt/frappe/local/erpnext",
+    "branch": "version-16"
+  },
+  {
+    "url": "/opt/frappe/local/hrms",
+    "branch": "version-16"
+  },
+  {
+    "url": "/opt/frappe/local/square_hrm_branding",
+    "branch": "main"
+  }
+]

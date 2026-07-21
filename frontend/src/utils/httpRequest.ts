@@ -1,0 +1,359 @@
+import axios from 'axios';
+import queryString from 'query-string';
+import tokenService from '../services/tokenService';
+import { AUTH_CONFIG } from '../configs/constants';
+import { isPublicEndpoint, isAuthTokenEndpoint } from '../configs/apiEndpoints';
+import type { RetryAxiosRequestConfig } from '../types/api';
+import type { TokenPair } from '../types/auth';
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import type { ParamsRecord } from './params';
+
+type RefreshTokenPayload = Partial<TokenPair> & {
+  access_token?: string;
+  refresh_token?: string;
+};
+
+interface HttpServiceInstance extends Omit<AxiosInstance, 'get' | 'post' | 'put' | 'patch' | 'delete'> {
+  (config: AxiosRequestConfig): Promise<any>;
+  (url: string, config?: AxiosRequestConfig): Promise<any>;
+  get<T = any, R = T, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+  post<T = any, R = T, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
+  put<T = any, R = T, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
+  patch<T = any, R = T, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
+  delete<T = any, R = T, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+}
+import { cleanParams } from './params';
+import { camelizeKeys } from './camelCase';
+import { isMaintenanceModeError, notifyMaintenanceMode } from './maintenanceMode';
+import { ACTIVE_WORKSPACE_STORAGE_KEY, LEGACY_ACTIVE_WORKSPACE_STORAGE_KEY } from './storageKeys';
+
+type StoredWorkspace = {
+  type?: string;
+  companyId?: string | number | null;
+};
+
+// Prefix for API endpoints
+const prefix = 'api';
+
+// Use relative path to work with nginx proxy, allow override via env if needed
+const baseURL = process.env.NEXT_PUBLIC_API_BASE || `/${prefix}/`;
+const activeCompanyHeader = 'X-Active-Company-Id';
+
+const httpRequest = axios.create({
+  baseURL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  paramsSerializer: {
+    serialize: (params) => {
+      return queryString.stringify(params, { arrayFormat: 'none' });
+    },
+  },
+  withCredentials: true,
+  timeout: 30000,
+}) as HttpServiceInstance;
+
+export const refreshClient = axios.create({
+  baseURL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true,
+  timeout: 30000,
+});
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const extractApiErrorLogMessage = (data: unknown): string | null => {
+  if (!isRecord(data)) return null;
+
+  const error = data.error;
+  if (isRecord(error)) {
+    const details = error.details;
+    if (isRecord(details)) {
+      const errorMessage = details.errorMessage;
+      if (Array.isArray(errorMessage)) {
+        const message = errorMessage.map((item) => String(item).trim()).filter(Boolean).join(' ');
+        if (message) return message;
+      }
+      if (typeof errorMessage === 'string' && errorMessage.trim()) {
+        return errorMessage.trim();
+      }
+    }
+
+    if (typeof error.message === 'string' && error.message.trim()) {
+      return error.message.trim();
+    }
+  }
+
+  if (typeof data.message === 'string' && data.message.trim()) {
+    return data.message.trim();
+  }
+
+  return null;
+};
+
+const unwrapEnvelopeData = (payload: unknown) =>
+  isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, 'data')
+    ? payload.data
+    : payload;
+
+const unwrapResponse = (response: { data?: unknown }) =>
+  unwrapEnvelopeData(response?.data);
+
+const dispatchAuthExpired = () => {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('auth:expired'));
+  }
+};
+
+const setAuthorizationHeader = (config: AxiosRequestConfig, accessToken: string) => {
+  config.headers = config.headers ?? {};
+  const headers = config.headers as Record<string, unknown> & {
+    set?: (name: string, value: string) => void;
+  };
+
+  if (typeof headers.set === 'function') {
+    headers.set('Authorization', `Bearer ${accessToken}`);
+    return;
+  }
+
+  headers.Authorization = `Bearer ${accessToken}`;
+};
+
+const removeAuthorizationHeader = (config: AxiosRequestConfig) => {
+  const headers = config.headers as (Record<string, unknown> & {
+    delete?: (name: string) => void;
+  }) | undefined;
+
+  if (!headers) return;
+
+  if (typeof headers.delete === 'function') {
+    headers.delete('Authorization');
+    headers.delete('authorization');
+    return;
+  }
+
+  delete headers.Authorization;
+  delete headers.authorization;
+};
+
+const hasAuthorizationHeader = (config: AxiosRequestConfig | undefined) => {
+  const headers = config?.headers as (Record<string, unknown> & {
+    has?: (name: string) => boolean;
+    get?: (name: string) => unknown;
+  }) | undefined;
+
+  if (!headers) return false;
+  if (typeof headers.has === 'function') return headers.has('Authorization');
+  if (typeof headers.get === 'function') return Boolean(headers.get('Authorization'));
+  return Boolean(headers.Authorization || headers.authorization);
+};
+
+const readStoredWorkspace = (): StoredWorkspace | null => {
+  const storage =
+    typeof window !== 'undefined'
+      ? window.localStorage
+      : typeof globalThis !== 'undefined' && 'localStorage' in globalThis
+        ? (globalThis as typeof globalThis & { localStorage?: Storage }).localStorage
+        : undefined;
+
+  if (!storage) return null;
+
+  try {
+    const raw =
+      storage.getItem(ACTIVE_WORKSPACE_STORAGE_KEY) ||
+      storage.getItem(LEGACY_ACTIVE_WORKSPACE_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as StoredWorkspace) : null;
+  } catch {
+    return null;
+  }
+};
+
+const getActiveCompanyId = () => {
+  const workspace = readStoredWorkspace();
+  if (workspace?.type !== 'company') return null;
+  const companyId = String(workspace.companyId ?? '').trim();
+  return companyId ? companyId : null;
+};
+
+const setActiveCompanyHeader = (config: AxiosRequestConfig) => {
+  const companyId = getActiveCompanyId();
+  if (!companyId) return;
+
+  config.headers = config.headers ?? {};
+  const headers = config.headers as Record<string, unknown> & {
+    set?: (name: string, value: string) => void;
+  };
+
+  if (typeof headers.set === 'function') {
+    headers.set(activeCompanyHeader, companyId);
+    return;
+  }
+
+  headers[activeCompanyHeader] = companyId;
+};
+
+type RefreshTokenResponse = AxiosResponse<{ data?: unknown }>;
+let refreshPromise: Promise<RefreshTokenResponse> | null = null;
+
+httpRequest.interceptors.request.use(
+  (config) => {
+    const retryConfig = config as RetryAxiosRequestConfig;
+    if (retryConfig.params && !retryConfig.keepEmptyParams) {
+      retryConfig.params = cleanParams(retryConfig.params as ParamsRecord);
+    }
+
+    // NOTE: Do NOT auto-convert to snake_case here.
+    // The Django backend serializers use camelCase field names with explicit
+    // source= mappings (e.g. companyName â†’ source="company_name").
+    // Converting to snake_case breaks the API (400 Bad Request).
+
+    const accessToken = tokenService.getAccessTokenFromCookie();
+
+    if (accessToken && !isAuthTokenEndpoint(config.url)) {
+      setAuthorizationHeader(config, accessToken);
+      setActiveCompanyHeader(config);
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
+httpRequest.interceptors.response.use(
+  (response) => {
+    // Backend wraps payload in { data, errors } via MyJSONRenderer.
+    // Return payload directly; fall back to raw response for legacy endpoints.
+    const payload = unwrapEnvelopeData(response.data);
+
+    // Auto-transform snake_case keys â†’ camelCase
+    return camelizeKeys(payload);
+  },
+
+  async (error) => {
+    const originalConfig = error.config as RetryAxiosRequestConfig;
+    const status = error.response?.status;
+    const method = String(originalConfig?.method || 'get').toLowerCase();
+    const publicEndpoint = isPublicEndpoint(originalConfig?.url);
+    const requestHadAuthorization = hasAuthorizationHeader(originalConfig);
+
+    if (isMaintenanceModeError(error)) {
+      notifyMaintenanceMode(error);
+      return Promise.reject(error);
+    }
+
+    if (
+      originalConfig &&
+      method === 'get' &&
+      typeof status === 'number' &&
+      status >= 500 &&
+      status < 600 &&
+      !originalConfig._serverRetry
+    ) {
+      originalConfig._serverRetry = true;
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return httpRequest(originalConfig);
+    }
+
+    if (status !== 401 || !originalConfig) {
+      if (status && status >= 400) {
+        console.error(`[API Error] ${method.toUpperCase()} ${originalConfig?.url}`, {
+          status,
+          params: originalConfig?.params,
+          data: error.response?.data,
+        });
+      }
+      return Promise.reject(error);
+    }
+
+    if (publicEndpoint && !requestHadAuthorization) {
+      return Promise.reject(error);
+    }
+
+    const retryPublicWithoutAuth = () => {
+      originalConfig._retryWithoutAuth = true;
+      removeAuthorizationHeader(originalConfig);
+      return httpRequest(originalConfig);
+    };
+
+    if (originalConfig._retry || originalConfig._retryWithoutAuth || isAuthTokenEndpoint(originalConfig.url)) {
+      tokenService.removeAccessTokenAndRefreshTokenFromCookie();
+      dispatchAuthExpired();
+      return Promise.reject(error);
+    }
+
+    const refreshToken = tokenService.getRefreshTokenFromCookie();
+    if (!refreshToken) {
+      tokenService.removeAccessTokenAndRefreshTokenFromCookie();
+      dispatchAuthExpired();
+      if (publicEndpoint && requestHadAuthorization) {
+        return retryPublicWithoutAuth();
+      }
+      return Promise.reject(error);
+    }
+
+    if (!refreshPromise) {
+      refreshPromise = refreshClient.post('auth/token/', {
+        grant_type: AUTH_CONFIG.REFRESH_TOKEN_GRANT,
+        client_id: AUTH_CONFIG.CLIENT_ID,
+        refresh_token: refreshToken,
+      });
+    }
+
+    try {
+      const refreshResponse = await refreshPromise;
+      refreshPromise = null;
+
+      const refreshData = unwrapResponse(
+        refreshResponse as { data?: { data?: unknown } },
+      ) as RefreshTokenPayload;
+      const accessToken =
+        refreshData.access_token ||
+        refreshData.accessToken ||
+        null;
+      const newRefreshToken =
+        refreshData.refresh_token ||
+        refreshData.refreshToken ||
+        refreshToken;
+
+      if (!accessToken) {
+        tokenService.removeAccessTokenAndRefreshTokenFromCookie();
+        dispatchAuthExpired();
+        if (publicEndpoint && requestHadAuthorization) {
+          return retryPublicWithoutAuth();
+        }
+        return Promise.reject(error);
+      }
+
+      tokenService.saveAccessTokenAndRefreshTokenToCookie(
+        accessToken,
+        newRefreshToken,
+        tokenService.getProviderFromCookie(),
+      );
+
+      originalConfig._retry = true;
+      setAuthorizationHeader(originalConfig, accessToken);
+      return httpRequest(originalConfig);
+    } catch (refreshError: unknown) {
+      const refreshErrorResponse = (refreshError as { response?: { status?: number; data?: unknown } }).response;
+      console.error(`[Auth Error] Refresh token failed for ${originalConfig.url}`, {
+        status: refreshErrorResponse?.status,
+        data: refreshErrorResponse?.data,
+      });
+      refreshPromise = null;
+      tokenService.removeAccessTokenAndRefreshTokenFromCookie();
+      dispatchAuthExpired();
+      if (publicEndpoint && requestHadAuthorization) {
+        return retryPublicWithoutAuth();
+      }
+      return Promise.reject(refreshError);
+    }
+  },
+);
+
+export default httpRequest;
+
+

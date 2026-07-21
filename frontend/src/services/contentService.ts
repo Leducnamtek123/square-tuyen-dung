@@ -1,0 +1,249 @@
+import httpRequest from '../utils/httpRequest';
+import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
+import { presignInObject } from '../utils/presignUrl';
+import type { Banner, Feedback } from '../types/models';
+import type { PaginatedResponse } from '../types/api';
+import { cleanParams } from '../utils/params';
+
+
+const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
+  const data = await promise;
+  return presignInObject(data) as T;
+};
+
+interface FeedbackPayload {
+  rating: number;
+  content: string;
+  evidenceImageFile?: File | null;
+}
+
+interface SMSDownloadAppPayload {
+  phone: string;
+}
+
+type BannerListParams = {
+  type?: number | string;
+  platform?: string;
+  isActive?: boolean;
+};
+
+const toListData = <T>(raw: unknown): T[] => {
+  return normalizePaginatedResponse<T>(raw).results;
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+const normalizeActionResponse = <T extends Record<string, unknown>>(raw: unknown, fallback: T): T => {
+  const value = unwrapDataResponse<unknown>(raw);
+  return isRecord(value)
+    ? ({ ...fallback, ...value } as T)
+    : fallback;
+};
+
+const unwrapDetailResponse = <T>(raw: unknown): T => {
+  let value = raw;
+  for (let depth = 0; depth < 3; depth += 1) {
+    if (!isRecord(value) || !('data' in value)) break;
+    value = value.data;
+  }
+  return value as T;
+};
+
+// ─── Article Types ────────────────────────────────────────────────────────────
+
+export type ArticleCategory = 'news' | 'blog';
+export type ArticleStatus = 'draft' | 'pending' | 'published' | 'archived';
+
+export interface Article {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  thumbnailUrl: string | null;
+  category: ArticleCategory;
+  status: ArticleStatus;
+  statusDisplay?: string;
+  authorName: string | null;
+  publishedAt: string | null;
+  viewCount: number;
+  tagList: string[];
+  content?: string;
+  tags?: string;
+  thumbnail?: number | null;
+  createAt?: string;
+  updateAt?: string;
+}
+
+interface ArticleListParams {
+  category?: ArticleCategory;
+  status?: ArticleStatus;
+  search?: string;
+  tag?: string;
+  page?: number;
+  page_size?: number;
+  pageSize?: number;
+  [key: string]: string | number | undefined;
+}
+
+export interface ArticlePayload {
+  title: string;
+  excerpt?: string;
+  content: string;
+  category?: ArticleCategory;
+  status?: ArticleStatus;
+  tags?: string;
+  thumbnail?: number | null;
+  slug?: string;
+}
+
+type PaginatedArticles = PaginatedResponse<Article> & {
+  next?: string | null;
+  previous?: string | null;
+};
+
+const normalizeArticleListResponse = (raw: unknown): PaginatedArticles =>
+  normalizePaginatedResponse<Article>(raw);
+
+// ─── Content Service ──────────────────────────────────────────────────────────
+
+const contentService = {
+  normalizeArticleListParams: (params: ArticleListParams = {}): Record<string, string | number | undefined> => {
+    const { page_size, pageSize, ...rest } = params;
+    return {
+      ...rest,
+      pageSize: pageSize ?? page_size,
+    };
+  },
+
+  getFeedbacks: async (): Promise<Feedback[]> => {
+    const url = 'content/web/feedbacks/';
+    const response = await httpRequest.get(url);
+    return toListData<Feedback>(response);
+  },
+
+  createFeedback: (data: FeedbackPayload): Promise<Feedback> => {
+    const url = 'content/web/feedbacks/';
+    const formData = new FormData();
+    formData.append('rating', String(data.rating));
+    formData.append('content', data.content);
+    if (data.evidenceImageFile) {
+      formData.append('evidenceImageFile', data.evidenceImageFile);
+    }
+    return (httpRequest.post(url, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }) as Promise<unknown>).then(unwrapDetailResponse<Feedback>);
+  },
+
+  sendSMSDownloadApp: (data: SMSDownloadAppPayload): Promise<{ sent?: boolean; message?: string }> => {
+    const url = 'content/web/sms-download-app/';
+    return (httpRequest.post(url, data) as Promise<unknown>).then((response) =>
+      normalizeActionResponse(response, { sent: true })
+    );
+  },
+
+  getBanners: async (params: BannerListParams = {}): Promise<Banner[]> => {
+    const url = 'content/web/banner/';
+    const response = await withPresign(httpRequest.get(url, { params: cleanParams(params) }));
+    return toListData<Banner>(response);
+  },
+
+  sendNotificationDemo: (): Promise<{ success?: boolean; message?: string }> => {
+    const url = 'content/send-noti-demo/';
+    return (httpRequest.post(url) as Promise<unknown>).then((response) =>
+      normalizeActionResponse(response, { success: true })
+    );
+  },
+
+  // ─── Public Article API ──────────────────────────────────────────────────
+
+  getPublicArticles: async (params: ArticleListParams = {}): Promise<PaginatedArticles> => {
+    const response = await httpRequest.get('content/web/articles/', {
+      params: cleanParams(contentService.normalizeArticleListParams(params)),
+    });
+    return normalizeArticleListResponse(response);
+  },
+
+  getPublicArticleBySlug: async (slug: string): Promise<Article> => {
+    const response = await httpRequest.get(`content/web/articles/${slug}/`);
+    return unwrapDetailResponse<Article>(response);
+  },
+
+  // ─── Admin Article API ───────────────────────────────────────────────────
+
+  adminGetArticles: async (params: ArticleListParams = {}): Promise<PaginatedArticles> => {
+    const response = await httpRequest.get('content/web/admin/articles/', {
+      params: cleanParams(contentService.normalizeArticleListParams(params)),
+    });
+    return normalizeArticleListResponse(response);
+  },
+
+  adminGetArticle: async (id: number): Promise<Article> => {
+    const response = await httpRequest.get(`content/web/admin/articles/${id}/`);
+    return unwrapDetailResponse<Article>(response);
+  },
+
+  adminCreateArticle: (data: ArticlePayload, thumbnailFile?: File): Promise<Article> => {
+    const form = new FormData();
+    Object.entries(data).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) form.append(k, String(v));
+    });
+    if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
+    return (httpRequest.post('content/web/admin/articles/', form) as Promise<unknown>)
+      .then(unwrapDetailResponse<Article>);
+  },
+
+  adminUpdateArticle: (id: number, data: Partial<ArticlePayload>, thumbnailFile?: File): Promise<Article> => {
+    const form = new FormData();
+    Object.entries(data).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) form.append(k, String(v));
+    });
+    if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
+    return (httpRequest.patch(`content/web/admin/articles/${id}/`, form) as Promise<unknown>)
+      .then(unwrapDetailResponse<Article>);
+  },
+
+  adminDeleteArticle: (id: number): Promise<void> => {
+    return httpRequest.delete(`content/web/admin/articles/${id}/`) as Promise<void>;
+  },
+
+  // ─── Employer Article (Blog) API ─────────────────────────────────────────
+
+  employerGetBlogs: async (params: ArticleListParams = {}): Promise<PaginatedArticles> => {
+    const response = await httpRequest.get('content/web/employer/articles/', {
+      params: cleanParams(contentService.normalizeArticleListParams(params)),
+    });
+    return normalizeArticleListResponse(response);
+  },
+
+  employerGetBlog: async (id: number): Promise<Article> => {
+    const response = await httpRequest.get(`content/web/employer/articles/${id}/`);
+    return unwrapDetailResponse<Article>(response);
+  },
+
+  employerCreateBlog: (data: ArticlePayload, thumbnailFile?: File): Promise<Article> => {
+    const form = new FormData();
+    Object.entries(data).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) form.append(k, String(v));
+    });
+    if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
+    return (httpRequest.post('content/web/employer/articles/', form) as Promise<unknown>)
+      .then(unwrapDetailResponse<Article>);
+  },
+
+  employerUpdateBlog: (id: number, data: Partial<ArticlePayload>, thumbnailFile?: File): Promise<Article> => {
+    const form = new FormData();
+    Object.entries(data).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) form.append(k, String(v));
+    });
+    if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
+    return (httpRequest.patch(`content/web/employer/articles/${id}/`, form) as Promise<unknown>)
+      .then(unwrapDetailResponse<Article>);
+  },
+
+  employerDeleteBlog: (id: number): Promise<void> => {
+    return httpRequest.delete(`content/web/employer/articles/${id}/`) as Promise<void>;
+  },
+};
+
+export default contentService;

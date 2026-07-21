@@ -1,15 +1,22 @@
+from shared import pagination as paginations
 
-from configs import variable_system as var_sys
+from shared.configs import variable_system as var_sys
 
-from helpers import utils, helper
+from shared.helpers import utils, helper
 
-from configs import variable_response as var_res, paginations
+from shared.configs import variable_response as var_res
+from shared.audit import AuditLogViewSetMixin, record_audit_log
 
-from django.db.models import Count
+from django.db.models import Count, Q
+from django.http import HttpResponse
+from django.utils import timezone
+from django.utils.dateparse import parse_date, parse_datetime
+import csv
+import json
 
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from rest_framework import status
 
@@ -17,430 +24,871 @@ from rest_framework.response import Response
 
 from django.db import connections
 
-from django.db.utils import OperationalError
-
 from redis import Redis
 
 from django.conf import settings
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+from urllib.parse import urlparse
 
-from .models import (
-
-    Career,
-
-    City,
-
-    District,
-
-)
+from django.core.cache import cache as django_cache
+from apps.locations.models import City, District, Ward
+from .models import AuditLog, Career
 
 from .serializers import (
+    AuditLogSerializer,
 
     CareerSerializer,
 
     CitySerializer,
 
-    DistrictSerializer
+    DistrictSerializer,
+
+    WardSerializer,
+
+    FileUploadSerializer
 
 )
 
-from authentication import permissions as perms_custom
+from apps.accounts import permissions as perms_custom
+from shared.helpers.cloudinary_service import CloudinaryService
 
 from rest_framework import viewsets
+from rest_framework.filters import OrderingFilter, SearchFilter
 
-class AdminCareerViewSet(viewsets.ModelViewSet):
+
+def _admin_search_order_queryset(queryset, request, search_fields, ordering_map):
+    search = request.query_params.get("kw") or request.query_params.get("search")
+    if search:
+        query = Q()
+        for field in search_fields:
+            query |= Q(**{f"{field}__icontains": search})
+        queryset = queryset.filter(query)
+
+    ordering = request.query_params.get("ordering")
+    if ordering:
+        is_desc = ordering.startswith("-")
+        key = ordering[1:] if is_desc else ordering
+        mapped = ordering_map.get(key)
+        if mapped:
+            queryset = queryset.order_by(f"-{mapped}" if is_desc else mapped)
+
+    return queryset
+
+class AdminCareerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
     queryset = Career.objects.all().order_by('id')
 
     serializer_class = CareerSerializer
 
-    permission_classes = [perms_custom.IsAdminUser]
+    def get_permissions(self):
+        return [perms_custom.IsAdminUser()]
+
+    pagination_class = paginations.CustomPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        ordering = self.request.query_params.get("ordering", "")
+        if "jobPostTotal" in ordering:
+            queryset = queryset.annotate(job_post_total=Count("job_posts"))
+        return _admin_search_order_queryset(
+            queryset,
+            self.request,
+            ["name", "app_icon_name"],
+            {
+                "id": "id",
+                "name": "name",
+                "appIconName": "app_icon_name",
+                "isHot": "is_hot",
+                "jobPostTotal": "job_post_total",
+                "createAt": "create_at",
+                "updateAt": "update_at",
+            },
+        )
 
     def get_serializer(self, *args, **kwargs):
 
         if self.action in ['list', 'retrieve']:
 
-            kwargs['fields'] = ['id', 'name', 'appIconName', 'jobPostTotal', 'createAt', 'updateAt']
+            kwargs['fields'] = ['id', 'name', 'iconUrl', 'appIconName', 'isHot', 'jobPostTotal', 'createAt', 'updateAt']
 
         return super().get_serializer(*args, **kwargs)
 
-class AdminCityViewSet(viewsets.ModelViewSet):
+class AdminCityViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
     queryset = City.objects.all().order_by('id')
 
     serializer_class = CitySerializer
 
-    permission_classes = [perms_custom.IsAdminUser]
+    def get_permissions(self):
+        return [perms_custom.IsAdminUser()]
 
-class AdminDistrictViewSet(viewsets.ModelViewSet):
+    pagination_class = paginations.CustomPagination
+
+    def get_queryset(self):
+        return _admin_search_order_queryset(
+            super().get_queryset(),
+            self.request,
+            ["name", "code"],
+            {
+                "id": "id",
+                "name": "name",
+                "code": "code",
+                "createAt": "create_at",
+                "updateAt": "update_at",
+            },
+        )
+
+class AdminDistrictViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
     queryset = District.objects.select_related('city').all().order_by('id')
 
     serializer_class = DistrictSerializer
 
-    permission_classes = [perms_custom.IsAdminUser]
+    def get_permissions(self):
+        return [perms_custom.IsAdminUser()]
+
+    pagination_class = paginations.CustomPagination
 
     filterset_fields = ['city']
 
-@api_view(http_method_names=["GET"])
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        city = self.request.query_params.get("city")
+        if city:
+            queryset = queryset.filter(city_id=city)
+        return _admin_search_order_queryset(
+            queryset,
+            self.request,
+            ["name", "code", "city__name"],
+            {
+                "id": "id",
+                "name": "name",
+                "code": "code",
+                "city": "city__name",
+                "createAt": "create_at",
+                "updateAt": "update_at",
+            },
+        )
 
+class AdminWardViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
+
+    queryset = Ward.objects.select_related('district').all().order_by('id')
+
+    serializer_class = WardSerializer
+
+    def get_permissions(self):
+        return [perms_custom.IsAdminUser()]
+
+    pagination_class = paginations.CustomPagination
+
+    filterset_fields = ['district']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        district = self.request.query_params.get("district")
+        if district:
+            queryset = queryset.filter(district_id=district)
+        return _admin_search_order_queryset(
+            queryset,
+            self.request,
+            ["name", "code", "district__name"],
+            {
+                "id": "id",
+                "name": "name",
+                "code": "code",
+                "district": "district__name",
+                "createAt": "create_at",
+                "updateAt": "update_at",
+            },
+        )
+
+
+class AdminAuditLogViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = AuditLog.objects.select_related("actor").all().order_by("-create_at")
+    serializer_class = AuditLogSerializer
+    permission_classes = [perms_custom.IsAdminUser]
+    pagination_class = paginations.CustomPagination
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ["actor_email", "action", "resource_type", "resource_id", "resource_repr", "request_path"]
+    ordering_fields = ["id", "create_at", "action", "resource_type"]
+
+    def _parse_boundary_datetime(self, value, *, end_of_day=False):
+        if not value:
+            return None
+
+        raw_value = str(value).strip()
+        parsed_date = parse_date(raw_value)
+        if parsed_date is not None and "T" not in raw_value and " " not in raw_value:
+            boundary_time = timezone.datetime.max.time() if end_of_day else timezone.datetime.min.time()
+            parsed = timezone.datetime.combine(parsed_date, boundary_time)
+        else:
+            parsed = parse_datetime(raw_value)
+        if parsed is None:
+            parsed_date = parse_date(raw_value)
+            if parsed_date is None:
+                return None
+            boundary_time = timezone.datetime.max.time() if end_of_day else timezone.datetime.min.time()
+            parsed = timezone.datetime.combine(parsed_date, boundary_time)
+
+        if timezone.is_naive(parsed):
+            parsed = timezone.make_aware(parsed, timezone.get_current_timezone())
+        return parsed
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        action = self.request.query_params.get("action")
+        resource_type = self.request.query_params.get("resourceType") or self.request.query_params.get("resource_type")
+        resource_id = self.request.query_params.get("resourceId") or self.request.query_params.get("resource_id")
+        actor_id = self.request.query_params.get("actor")
+        actor_email = self.request.query_params.get("actorEmail") or self.request.query_params.get("actor_email")
+        date_from = self._parse_boundary_datetime(
+            self.request.query_params.get("dateFrom") or self.request.query_params.get("date_from"),
+        )
+        date_to = self._parse_boundary_datetime(
+            self.request.query_params.get("dateTo") or self.request.query_params.get("date_to"),
+            end_of_day=True,
+        )
+
+        if action:
+            queryset = queryset.filter(action=action)
+        if resource_type:
+            queryset = queryset.filter(resource_type__icontains=resource_type)
+        if resource_id:
+            queryset = queryset.filter(resource_id=str(resource_id))
+        if actor_id:
+            queryset = queryset.filter(actor_id=actor_id)
+        if actor_email:
+            queryset = queryset.filter(actor_email__icontains=actor_email)
+        if date_from:
+            queryset = queryset.filter(create_at__gte=date_from)
+        if date_to:
+            queryset = queryset.filter(create_at__lte=date_to)
+        return queryset
+
+    @action(detail=False, methods=["get"], url_path="export")
+    def export(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        max_rows = 20000
+        total_count = queryset.count()
+
+        response = HttpResponse(content_type="text/csv; charset=utf-8")
+        response["Content-Disposition"] = 'attachment; filename="audit-logs.csv"'
+        response.write("\ufeff")
+
+        writer = csv.writer(response)
+        writer.writerow([
+            "id",
+            "created_at",
+            "action",
+            "actor_email",
+            "resource_type",
+            "resource_id",
+            "resource_repr",
+            "request_method",
+            "request_path",
+            "ip_address",
+            "metadata",
+        ])
+
+        rows_written = 0
+        for log in queryset[:max_rows]:
+            rows_written += 1
+            writer.writerow([
+                log.id,
+                timezone.localtime(log.create_at).isoformat() if log.create_at else "",
+                log.action,
+                log.actor_email,
+                log.resource_type,
+                log.resource_id,
+                log.resource_repr,
+                log.request_method,
+                log.request_path,
+                log.ip_address or "",
+                json.dumps(log.metadata or {}, ensure_ascii=False),
+            ])
+
+        record_audit_log(
+            request=request,
+            action=AuditLog.ACTION_EXPORT,
+            resource_type="common.AuditLog",
+            metadata={"rows": rows_written, "truncated": total_count > max_rows},
+        )
+        return response
+
+def _run_blocking(func, timeout: int = 5):
+    # Keep ORM/cache work out of the ASGI event loop.
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(func)
+        try:
+            return future.result(timeout=timeout)
+        except (FuturesTimeoutError, Exception):
+            raise
+
+@api_view(http_method_names=["GET"])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def get_all_config(request):
+
+    CACHE_KEY = 'common_all_config'
+    CACHE_TTL = 300  # 5 minutes
+
+    cached = django_cache.get(CACHE_KEY)
+    if cached is not None:
+        return var_res.response_data(data=cached)
 
     exclude_city_name = 'Toàn quốc'
 
-    try:
-
-        # system
-
-        gender_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.GENDER_CHOICES)
-
-        marital_status_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.MARITAL_STATUS_CHOICES)
-
-        language_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.LANGUAGE_CHOICES)
-
-        language_level_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.LANGUAGE_LEVEL_CHOICES)
-
-        position_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.POSITION_CHOICES)
-
-        type_of_workplace_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.TYPE_OF_WORKPLACE_CHOICES)
-
-        job_type_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.JOB_TYPE_CHOICES)
-
-        academic_level_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.ACADEMIC_LEVEL)
-
-        experience_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.EXPERIENCE_CHOICES)
-
-        employee_size_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.EMPLOYEE_SIZE_CHOICES)
-
-        application_status_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.APPLICATION_STATUS)
-
-        frequency_notification_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.FREQUENCY_NOTIFICATION)
-
-        job_post_status_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.JOB_POST_STATUS)
-
-        # database
-
-        cities = City.objects.exclude(
-
-            name__icontains=exclude_city_name).values_list("id", "name")
-
-        careers = Career.objects.values_list("id", "name")
-
-        city_tuple = utils.convert_tuple_or_list_to_options(cities)
-
-        career_tuple = utils.convert_tuple_or_list_to_options(careers)
-
-        gender_options = gender_tuple[0]
-
-        marital_status_options = marital_status_tuple[0]
-
-        language_options = language_tuple[0]
-
-        language_level_options = language_level_tuple[0]
-
-        position_options = position_tuple[0]
-
-        type_of_workplace_options = type_of_workplace_tuple[0]
-
-        job_type_options = job_type_tuple[0]
-
-        experience_options = experience_tuple[0]
-
-        academic_level_options = academic_level_tuple[0]
-
-        employee_size_options = employee_size_tuple[0]
-
-        application_status_options = application_status_tuple[0]
-
-        city_options = city_tuple[0]
-
-        career_options = career_tuple[0]
-
-        frequency_notification_options = frequency_notification_tuple[0]
-
-        job_post_status_options = job_post_status_tuple[0]
-
-        gender_dict = gender_tuple[1]
-
-        marital_status_dict = marital_status_tuple[1]
-
-        language_dict = language_tuple[1]
-
-        language_level_dict = language_level_tuple[1]
-
-        position_dict = position_tuple[1]
-
-        type_of_workplace_dict = type_of_workplace_tuple[1]
-
-        job_type_dict = job_type_tuple[1]
-
-        experience_dict = experience_tuple[1]
-
-        academic_level_dict = academic_level_tuple[1]
-
-        employee_size_dict = employee_size_tuple[1]
-
-        application_status_dict = application_status_tuple[1]
-
-        city_dict = city_tuple[1]
-
-        career_dict = career_tuple[1]
-
-        frequency_notification_dict = frequency_notification_tuple[1]
-
-        job_post_status_dict = job_post_status_tuple[1]
-
-        res_data = {
-
-            "genderOptions": gender_options,
-
-            "maritalStatusOptions": marital_status_options,
-
-            "languageOptions": language_options,
-
-            "languageLevelOptions": language_level_options,
-
-            "positionOptions": position_options,
-
-            "typeOfWorkplaceOptions": type_of_workplace_options,
-
-            "jobTypeOptions": job_type_options,
-
-            "experienceOptions": experience_options,
-
-            "academicLevelOptions": academic_level_options,
-
-            "employeeSizeOptions": employee_size_options,
-
-            "applicationStatusOptions": application_status_options,
-
-            "cityOptions": city_options,
-
-            "careerOptions": career_options,
-
-            "frequencyNotificationOptions": frequency_notification_options,
-
-            "jobPostStatusOptions": job_post_status_options,
-
-            "genderDict": gender_dict,
-
-            "maritalStatusDict": marital_status_dict,
-
-            "languageDict": language_dict,
-
-            "languageLevelDict": language_level_dict,
-
-            "positionDict": position_dict,
-
-            "typeOfWorkplaceDict": type_of_workplace_dict,
-
-            "jobTypeDict": job_type_dict,
-
-            "experienceDict": experience_dict,
-
-            "academicLevelDict": academic_level_dict,
-
-            "employeeSizeDict": employee_size_dict,
-
-            "applicationStatusDict": application_status_dict,
-
-            "cityDict": city_dict,
-
-            "careerDict": career_dict,
-
-            "frequencyNotificationDict": frequency_notification_dict,
-
-            "jobPostStatusDict": job_post_status_dict
-
-        }
-
-    except Exception as ex:
-
-        helper.print_log_error(func_name="get_all_config", error=ex)
-
-        return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-
-                                     data=None)
-
-    else:
-
-        return var_res.response_data(data=res_data)
+    # system
+    gender_tuple = utils.convert_tuple_or_list_to_options(var_sys.GENDER_CHOICES)
+    marital_status_tuple = utils.convert_tuple_or_list_to_options(var_sys.MARITAL_STATUS_CHOICES)
+    language_tuple = utils.convert_tuple_or_list_to_options(var_sys.LANGUAGE_CHOICES)
+    language_level_tuple = utils.convert_tuple_or_list_to_options(var_sys.LANGUAGE_LEVEL_CHOICES)
+    position_tuple = utils.convert_tuple_or_list_to_options(var_sys.POSITION_CHOICES)
+    type_of_workplace_tuple = utils.convert_tuple_or_list_to_options(var_sys.TYPE_OF_WORKPLACE_CHOICES)
+    job_type_tuple = utils.convert_tuple_or_list_to_options(var_sys.JOB_TYPE_CHOICES)
+    academic_level_tuple = utils.convert_tuple_or_list_to_options(var_sys.ACADEMIC_LEVEL)
+    experience_tuple = utils.convert_tuple_or_list_to_options(var_sys.EXPERIENCE_CHOICES)
+    employee_size_tuple = utils.convert_tuple_or_list_to_options(var_sys.EMPLOYEE_SIZE_CHOICES)
+    application_status_tuple = utils.convert_tuple_or_list_to_options(var_sys.APPLICATION_STATUS)
+    frequency_notification_tuple = utils.convert_tuple_or_list_to_options(var_sys.FREQUENCY_NOTIFICATION)
+    job_post_status_tuple = utils.convert_tuple_or_list_to_options(var_sys.JOB_POST_STATUS)
+
+    # database
+    cities = _run_blocking(lambda: list(City.objects.exclude(name__icontains=exclude_city_name).values_list("id", "name")))
+    careers = _run_blocking(lambda: list(Career.objects.values_list("id", "name")))
+    city_tuple = utils.convert_tuple_or_list_to_options(cities)
+    career_tuple = utils.convert_tuple_or_list_to_options(careers)
+    from apps.content.system_settings import load_system_settings
+
+    system_settings = load_system_settings()
+    company_info = {
+        **var_sys.COMPANY_INFO,
+        "EMAIL": system_settings.get("supportEmail") or var_sys.COMPANY_INFO.get("EMAIL", ""),
+    }
+
+    res_data = {
+        "systemSettings": {
+            "maintenanceMode": bool(system_settings.get("maintenanceMode")),
+        },
+        "companyInfo": company_info,
+        "genderOptions": gender_tuple[0],
+        "maritalStatusOptions": marital_status_tuple[0],
+        "languageOptions": language_tuple[0],
+        "languageLevelOptions": language_level_tuple[0],
+        "positionOptions": position_tuple[0],
+        "typeOfWorkplaceOptions": type_of_workplace_tuple[0],
+        "jobTypeOptions": job_type_tuple[0],
+        "experienceOptions": experience_tuple[0],
+        "academicLevelOptions": academic_level_tuple[0],
+        "employeeSizeOptions": employee_size_tuple[0],
+        "applicationStatusOptions": application_status_tuple[0],
+        "cityOptions": city_tuple[0],
+        "careerOptions": career_tuple[0],
+        "frequencyNotificationOptions": frequency_notification_tuple[0],
+        "jobPostStatusOptions": job_post_status_tuple[0],
+        "genderDict": gender_tuple[1],
+        "maritalStatusDict": marital_status_tuple[1],
+        "languageDict": language_tuple[1],
+        "languageLevelDict": language_level_tuple[1],
+        "positionDict": position_tuple[1],
+        "typeOfWorkplaceDict": type_of_workplace_tuple[1],
+        "jobTypeDict": job_type_tuple[1],
+        "experienceDict": experience_tuple[1],
+        "academicLevelDict": academic_level_tuple[1],
+        "employeeSizeDict": employee_size_tuple[1],
+        "applicationStatusDict": application_status_tuple[1],
+        "cityDict": city_tuple[1],
+        "careerDict": career_tuple[1],
+        "frequencyNotificationDict": frequency_notification_tuple[1],
+        "jobPostStatusDict": job_post_status_tuple[1],
+    }
+
+    django_cache.set(CACHE_KEY, res_data, CACHE_TTL)
+    return var_res.response_data(data=res_data)
 
 @api_view(http_method_names=["GET"])
-
+@authentication_classes([])
+@permission_classes([AllowAny])
 def get_districts(request):
 
     params = request.query_params
 
-    city_id = params.get('cityId', None)
+    city_id_raw = params.get('cityId', None)
 
     try:
+        def _build_districts():
+            queryset = District.objects.all()
+            if city_id_raw not in (None, ""):
+                city_id = int(str(city_id_raw).strip())
+                queryset = queryset.filter(city_id=city_id)
+            districts = list(queryset.values_list("id", "name"))
+            return utils.convert_tuple_or_list_to_options(districts)[0]
 
-        district_queryset = District.objects
+        district_options = _run_blocking(_build_districts)
+    except (TypeError, ValueError):
 
-        if city_id:
-
-            district_queryset = district_queryset.filter(city_id=city_id)
-
-        districts = district_queryset.values_list("id", "name")
-
-        district_options = utils.convert_tuple_or_list_to_options(districts)[0]
-
+        # Invalid cityId should not break dependent forms.
+        return var_res.response_data(data=[])
     except Exception as ex:
+        helper.print_log_error("get_districts", ex)
+        return var_res.response_data(data=[])
 
-        helper.print_log_error(func_name="get_districts", error=ex)
-
-        return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-
-                                     data=None)
-
-    else:
-
-        return var_res.response_data(data=district_options)
+    return var_res.response_data(data=district_options)
 
 @api_view(http_method_names=["GET"])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def get_wards(request):
 
-def get_top_10_careers(request):
+    params = request.query_params
+
+    district_id_raw = params.get('districtId', None)
 
     try:
+        def _build_wards():
+            queryset = Ward.objects.all()
+            if district_id_raw not in (None, ""):
+                district_id = int(str(district_id_raw).strip())
+                queryset = queryset.filter(district_id=district_id)
+            wards = list(queryset.values_list("id", "name"))
+            return utils.convert_tuple_or_list_to_options(wards)[0]
 
-        queryset = Career.objects.annotate(num_job_posts=Count(
+        ward_options = _run_blocking(_build_wards)
+    except (TypeError, ValueError):
 
-            'job_posts')).order_by('-num_job_posts')[:10]
-
-        serializer = CareerSerializer(queryset, many=True, fields=[
-
-                                      'id', 'name', 'iconUrl', 'jobPostTotal'])
-
+        return var_res.response_data(data=[])
     except Exception as ex:
+        helper.print_log_error("get_wards", ex)
+        return var_res.response_data(data=[])
 
-        helper.print_log_error("get_top_careers", ex)
+    return var_res.response_data(data=ward_options)
 
-        return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+@api_view(http_method_names=["GET"])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def get_top_10_careers(request):
+    try:
+        hot_qs = _run_blocking(lambda: list(
+            Career.objects.filter(is_hot=True).annotate(
+                num_job_posts=Count('job_posts')
+            ).order_by('-num_job_posts', 'id')
+        ))
+        hot_ids = [item.id for item in hot_qs]
+
+        remaining = max(0, 10 - len(hot_ids))
+        normal_qs = _run_blocking(lambda: list(
+            Career.objects.exclude(id__in=hot_ids).annotate(
+                num_job_posts=Count('job_posts')
+            ).order_by('-num_job_posts', 'id')[:remaining]
+        ))
+
+        queryset = hot_qs[:10] + normal_qs
+    except Exception as ex:
+        helper.print_log_error("get_top_careers_fallback", ex)
+        # Fallback path to keep homepage usable when aggregate query fails.
+        queryset = _run_blocking(lambda: list(Career.objects.all().order_by('id')[:10]))
+
+    serializer = CareerSerializer(
+        queryset,
+        many=True,
+        fields=['id', 'name', 'iconUrl', 'isHot', 'jobPostTotal']
+    )
 
     return var_res.response_data(data=serializer.data)
 
 @api_view(http_method_names=["GET"])
-
+@authentication_classes([])
+@permission_classes([AllowAny])
 def get_all_careers(request):
+    paginator = paginations.CustomPagination()
 
-    try:
+    kw = request.query_params.get("kw", None)
 
-        paginator = paginations.CustomPagination()
+    queryset = Career.objects.all()
+    if kw:
+        queryset = queryset.filter(name__icontains=kw)
+    queryset = queryset.order_by('id')
+    page = paginator.paginate_queryset(queryset, request)
 
-        queryset = Career.objects
+    if page is not None:
+        serializer = CareerSerializer(page, many=True, fields=[
+            'id', 'name', 'appIconName', 'isHot', 'jobPostTotal'
+        ])
+        return paginator.get_paginated_response(serializer.data)
 
-        kw = request.query_params.get("kw", None)
-
-        if kw:
-
-            queryset = queryset.filter(name__icontains=kw)
-
-        queryset = queryset.all().order_by('id')
-
-        page = paginator.paginate_queryset(queryset, request)
-
-        if page is not None:
-
-            serializer = CareerSerializer(page, many=True, fields=[
-
-                                          'id', 'name', 'appIconName', 'jobPostTotal'])
-
-            return paginator.get_paginated_response(serializer.data)
-
-        serializer = CareerSerializer(queryset, many=True, fields=[
-
-                                      'id', 'name', 'appIconName', 'jobPostTotal'])
-
-        return var_res.response_data(data=serializer.data)
-
-    except Exception as ex:
-
-        helper.print_log_error("get_all_careers", ex)
-
-        return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    serializer = CareerSerializer(queryset, many=True, fields=[
+        'id', 'name', 'appIconName', 'isHot', 'jobPostTotal'
+    ])
+    return var_res.response_data(data=serializer.data)
 
 @api_view(['GET'])
-
+@authentication_classes([])
 @permission_classes([AllowAny])
-
 def health_check(request):
 
-    # Check database connection
+    def _check_database():
+        try:
+            db_conn = connections['default']
+            with db_conn.cursor() as cursor:
+                cursor.execute("SELECT 1")
+            return True
+        except Exception:
+            return False
 
-    try:
+    def _check_redis():
+        try:
+            redis_client = Redis(
+                host=settings.SERVICE_REDIS_HOST,
+                port=settings.SERVICE_REDIS_PORT,
+                db=settings.SERVICE_REDIS_DB,
+                password=settings.SERVICE_REDIS_PASSWORD or None,
+            )
+            return bool(redis_client.ping())
+        except Exception:
+            return False
 
-        db_conn = connections['default']
+    def _run_check(check_func, timeout=3):
+        # Run blocking I/O checks in a worker thread to avoid async-context
+        # safety errors when this sync endpoint is served under ASGI workers.
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(check_func)
+            try:
+                return bool(future.result(timeout=timeout))
+            except (FuturesTimeoutError, Exception):
+                return False
 
-        db_conn.cursor()
-
-        db_status = True
-
-    except OperationalError:
-
-        db_status = False
-
-    # Test Redis connection
-
-    try:
-
-        redis_client = Redis(
-
-            host=settings.SERVICE_REDIS_HOST,
-
-            port=settings.SERVICE_REDIS_PORT,
-
-            db=settings.SERVICE_REDIS_DB,
-
-            password=settings.SERVICE_REDIS_PASSWORD,
-
-        )
-
-        redis_status = redis_client.ping()
-
-    except:
-
-        redis_status = False
-
-    # Overall status
+    db_status = _run_check(_check_database)
+    redis_status = _run_check(_check_redis)
 
     is_healthy = all([db_status, redis_status])
-
     response_data = {
-
         "status": "healthy" if is_healthy else "unhealthy",
-
         "database": "connected" if db_status else "disconnected",
-
         "redis": "connected" if redis_status else "disconnected",
-
     }
-
     status_code = status.HTTP_200_OK if is_healthy else status.HTTP_503_SERVICE_UNAVAILABLE
-
     return Response(response_data, status=status_code)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def presign_url(request):
+    """
+    Return a presigned URL for a MinIO object.
+    Accepts either `url` (full URL) or `publicId` (object key).
+
+    This endpoint ALWAYS generates a presigned URL, regardless of the
+    MINIO_USE_PRESIGNED setting, because generating a presigned URL is
+    exactly what it is supposed to do.
+    """
+    url = request.query_params.get("url", None)
+    public_id = request.query_params.get("publicId", None)
+
+    if not url and not public_id:
+        return var_res.response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"errorMessage": ["Missing url or publicId."]},
+            data=None,
+        )
+
+    target = url or public_id
+    bucket = settings.MINIO_BUCKET
+    base_url = getattr(settings, "MINIO_PUBLIC_URL", "").rstrip("/")
+    expires = getattr(settings, "MINIO_PRESIGN_EXPIRES", 3600)
+
+    try:
+        object_path = None
+
+        if isinstance(target, str) and (target.startswith("http://") or target.startswith("https://")):
+            parsed = urlparse(target)
+            # Extract object path from public URL (e.g. https://s3.domain.com/bucket/path)
+            if base_url and target.startswith(f"{base_url}/"):
+                object_path = target[len(base_url) + 1:]
+                if object_path.startswith(f"{bucket}/"):
+                    object_path = object_path[len(bucket) + 1:]
+            else:
+                # Try internal host match
+                internal_host = str(getattr(settings, "MINIO_ENDPOINT", "minio")).replace("http://", "").replace("https://", "").split("/")[0]
+                internal_host = internal_host.split(":")[0] if internal_host else "minio"
+                if parsed.hostname in ("minio", internal_host):
+                    object_path = parsed.path.lstrip("/")
+                    if object_path.startswith(f"{bucket}/"):
+                        object_path = object_path[len(bucket) + 1:]
+        else:
+            # Plain public_id
+            object_path = str(target).lstrip("/") if target else None
+
+        if object_path:
+            object_path = _normalize_presign_object_path(object_path)
+
+        if not object_path:
+            if url and _is_allowed_public_minio_url(url):
+                return var_res.response_data(data={"url": url})
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["Unable to generate presigned URL. Path identify failed."]},
+                data=None,
+            )
+
+        if not _can_presign_object(request, object_path):
+            return var_res.response_data(
+                status=status.HTTP_403_FORBIDDEN,
+                errors={"errorMessage": ["You do not have permission to access this file."]},
+                data=None,
+            )
+
+        from datetime import timedelta
+        # Ensure expires is an int to prevent TypeError
+        try:
+            val_expires = int(expires)
+        except (TypeError, ValueError):
+            val_expires = 3600
+            
+        client = CloudinaryService._get_presign_client()
+        presigned = client.presigned_get_object(
+            bucket,
+            object_path,
+            expires=timedelta(seconds=val_expires),
+        )
+        presigned = CloudinaryService._rewrite_presigned_url(presigned)
+        return var_res.response_data(data={"url": presigned})
+
+    except Exception as e:
+        helper.print_log_error(func_name="presign_url", error=e)
+        # Fallback to original approach
+        try:
+            presigned, _ = CloudinaryService.get_url_from_public_id(target, {})
+            if presigned:
+                return var_res.response_data(data={"url": presigned})
+        except Exception as e2:
+            helper.print_log_error(func_name="presign_url_fallback", error=e2)
+
+        if url and _is_allowed_public_minio_url(url):
+            return var_res.response_data(data={"url": url})
+            
+        return var_res.response_data(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            errors={"errorMessage": ["Internal error generating presigned URL."]},
+            data=None,
+        )
+
+
+def _is_allowed_public_minio_url(value: str) -> bool:
+    try:
+        parsed = urlparse(value)
+        if parsed.scheme not in ("http", "https"):
+            return False
+
+        public_base = getattr(settings, "MINIO_PUBLIC_URL", "").rstrip("/")
+        if public_base and value.startswith(f"{public_base}/"):
+            return True
+
+        server_url = getattr(settings, "MINIO_SERVER_URL", "").rstrip("/")
+        if server_url and value.startswith(f"{server_url}/"):
+            return True
+
+        return False
+    except Exception:
+        return False
+
+
+def _normalize_presign_object_path(object_path: str) -> str:
+    path = str(object_path or "").lstrip("/")
+    bucket = str(getattr(settings, "MINIO_BUCKET", "") or "").strip("/")
+    if bucket and path.startswith(f"{bucket}/"):
+        path = path[len(bucket) + 1:]
+    return path
+
+
+def _path_has_prefix(path: str, prefixes) -> bool:
+    for prefix in prefixes:
+        normalized = str(prefix or "").strip("/")
+        if normalized and (path == normalized or path.startswith(f"{normalized}/")):
+            return True
+    return False
+
+
+def _public_presign_prefixes():
+    directories = getattr(settings, "CLOUDINARY_DIRECTORY", {}) or {}
+    return (
+        directories.get("avatar", "avatar/"),
+        "avatars/",
+        directories.get("logo", "logo/"),
+        directories.get("cover_image", "cover_image/"),
+        directories.get("company_image", "company_image/"),
+        directories.get("career_image", "career_image/"),
+        directories.get("web_banner", "banners/web_banners/"),
+        directories.get("mobile_banner", "banners/mobile_banners/"),
+        "banners/",
+        "articles/",
+        directories.get("system", "system/"),
+        directories.get("icons", "icons/"),
+        directories.get("about_us", "about_us/"),
+    )
+
+
+def _is_public_presign_path(object_path: str) -> bool:
+    return _path_has_prefix(object_path, _public_presign_prefixes())
+
+
+def _is_private_presign_path(object_path: str) -> bool:
+    return _path_has_prefix(object_path, ("cv/", "interviews/", "chat_attachments/"))
+
+
+def _user_can_presign_resume_file(user, file_obj) -> bool:
+    if not getattr(user, "is_authenticated", False):
+        return False
+
+    if getattr(user, "role_name", None) == var_sys.ADMIN or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+        return True
+
+    try:
+        resume = file_obj.resume_file
+    except Exception:
+        return True
+
+    if resume.user_id == user.id:
+        return True
+
+    try:
+        company = user.get_active_company()
+    except Exception:
+        company = None
+    if not company:
+        return False
+
+    if not perms_custom.user_has_company_permission(user, "manage_candidates", company):
+        return False
+
+    if getattr(resume, "is_active", False):
+        return True
+
+    try:
+        from apps.jobs.models import JobPostActivity
+
+        return JobPostActivity.objects.filter(
+            resume=resume,
+            is_deleted=False,
+            job_post__company=company,
+        ).exists()
+    except Exception:
+        return False
+
+
+def _user_can_presign_interview_object(user, object_path: str) -> bool:
+    if not getattr(user, "is_authenticated", False):
+        return False
+
+    parts = object_path.split("/")
+    if len(parts) < 2 or parts[0] != "interviews":
+        return False
+    room_name = parts[1]
+
+    try:
+        from apps.interviews.models import InterviewSession
+
+        session = InterviewSession.objects.select_related(
+            "candidate",
+            "created_by",
+            "job_post",
+            "job_post__company",
+            "question_group",
+        ).filter(room_name=room_name).first()
+    except Exception:
+        session = None
+
+    if not session:
+        return False
+
+    if getattr(user, "role_name", None) == var_sys.ADMIN or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+        return True
+    if session.candidate_id == user.id or session.created_by_id == user.id:
+        return True
+
+    try:
+        company = user.get_active_company()
+    except Exception:
+        company = None
+    if not company:
+        return False
+
+    session_company_id = None
+    if session.job_post_id and session.job_post:
+        session_company_id = session.job_post.company_id
+    elif session.question_group_id and session.question_group:
+        session_company_id = session.question_group.company_id
+
+    return bool(
+        session_company_id
+        and session_company_id == company.id
+        and perms_custom.user_has_company_permission(user, "manage_interviews", company)
+    )
+
+
+def _can_presign_object(request, object_path: str) -> bool:
+    object_path = _normalize_presign_object_path(object_path)
+    if _is_public_presign_path(object_path):
+        return True
+
+    user = getattr(request, "user", None)
+    if not getattr(user, "is_authenticated", False):
+        return False
+
+    try:
+        from apps.files.models import File
+
+        file_obj = File.objects.filter(public_id=object_path).first()
+    except Exception:
+        file_obj = None
+
+    if file_obj and getattr(file_obj, "file_type", None) == "CV":
+        return _user_can_presign_resume_file(user, file_obj)
+
+    if _path_has_prefix(object_path, ("cv/",)):
+        return _user_can_presign_resume_file(user, file_obj) if file_obj else False
+    if _path_has_prefix(object_path, ("interviews/",)):
+        return _user_can_presign_interview_object(user, object_path)
+    if _is_private_presign_path(object_path):
+        return True
+
+    return True
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def upload_file(request):
+    serializer = FileUploadSerializer(data=request.data)
+    if serializer.is_valid():
+        from apps.files.models import File
+        from django.conf import settings
+        from rest_framework import status
+        
+        file_obj = serializer.validated_data['file']
+        file_type = serializer.validated_data['file_type']
+        
+        # Determine folder based on file type
+        folder = "chat_attachments"
+        if file_type == File.AVATAR_TYPE:
+            folder = settings.CLOUDINARY_DIRECTORY.get("avatar", "avatar/")
+        elif file_type == File.CV_TYPE:
+            folder = settings.CLOUDINARY_DIRECTORY.get("cv", "cv/")
+        elif file_type == File.LOGO_TYPE:
+            folder = settings.CLOUDINARY_DIRECTORY.get("logo", "logo/")
+            
+        upload_result = CloudinaryService.upload_file(file_obj, folder)
+        
+        if upload_result:
+            file_instance = File.update_or_create_file_with_cloudinary(
+                None,
+                upload_result,
+                file_type
+            )
+            return var_res.response_data(data={
+                "id": file_instance.id,
+                "url": file_instance.get_full_url(),
+                "name": file_obj.name,
+                "format": upload_result.get("format"),
+                "bytes": upload_result.get("bytes")
+            })
+        return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR, errors={"errorMessage": ["Upload failed."]})
+    
+    return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors=serializer.errors)

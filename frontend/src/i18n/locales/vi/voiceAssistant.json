@@ -1,0 +1,10 @@
+{
+  "connectingTitle": "Đang kết nối voice AI",
+  "connectingDescription": "Đang vào phòng phỏng vấn, đồng bộ mic, chat và visualizer theo kiểu Agent Session View.",
+  "startAudio": "Bật âm thanh",
+  "welcomeMessage": "Trò chuyện trực tiếp với trợ lý voice AI của bạn",
+  "startCall": "Bắt đầu cuộc gọi",
+  "setupHelpPrefix": "Cần trợ giúp để thiết lập? Xem",
+  "setupHelpLink": "hướng dẫn Voice AI quickstart",
+  "preconnectMessage": "Agent đang lắng nghe, hãy đặt câu hỏi"
+}

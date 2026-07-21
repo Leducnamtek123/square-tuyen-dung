@@ -1,0 +1,68 @@
+import * as React from 'react';
+import Backdrop from '@mui/material/Backdrop';
+import Box from '@mui/material/Box';
+import Image from 'next/image';
+const ImageAny: any = Image;
+import { LOADING_IMAGES } from '@/configs/constants';
+import { useTranslation } from 'react-i18next';
+
+interface BackdropLoadingProps {
+  bgColor?: string;
+  open?: boolean;
+}
+
+const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }: BackdropLoadingProps) => {
+  const { t } = useTranslation('common');
+
+  return (
+
+    <Backdrop
+
+      sx={{
+        color: '#fff',
+        backgroundColor: bgColor,
+        position: 'fixed',
+        zIndex: (theme) => theme.zIndex.modal + 1,
+      }}
+      open={open}
+      transitionDuration={300}
+    >
+
+      <Box
+        data-loading-indicator="true"
+        sx={{
+          width: 100,
+          height: 100,
+          display: 'grid',
+          placeItems: 'center',
+          '--sq-loading-animation-duration': '900ms',
+          animation: 'sq-backdrop-spin 900ms linear infinite',
+          animationDuration: '900ms !important',
+          animationIterationCount: 'infinite !important',
+          animationTimingFunction: 'linear !important',
+          '@keyframes sq-backdrop-spin': {
+            from: { transform: 'rotate(0deg)' },
+            to: { transform: 'rotate(360deg)' },
+          },
+        }}
+      >
+        <ImageAny
+          src={LOADING_IMAGES.LOADING_SPINNER}
+          alt={t('loading')}
+          width={100}
+          height={100}
+          style={{
+            width: '100px',
+            height: 'auto',
+            display: 'block',
+          }}
+        />
+      </Box>
+
+    </Backdrop>
+
+  );
+
+};
+
+export default React.memo(BackdropLoading);

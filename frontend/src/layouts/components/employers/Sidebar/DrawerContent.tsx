@@ -1,0 +1,80 @@
+'use client';
+
+import React, { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
+import { Box, Divider, List, Toolbar, useTheme } from "@mui/material";
+import { IMAGES, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import Link from 'next/link';
+import AdminMenu from './AdminMenu';
+import EmployerMenu from './EmployerMenu';
+
+const shellHeaderHeight = { xs: 56, sm: 64 };
+
+const DrawerContent = ({ isAdmin, liveInterviewCount = 0 }: { isAdmin?: boolean; liveInterviewCount?: number }) => {
+  const { t, i18n } = useTranslation(['admin', 'employer']);
+  const pathname = usePathname();
+  const location = { pathname, search: '', state: null, key: '' };
+  const theme = useTheme();
+  const dashboardHref = localizeRoutePath(
+    `/${isAdmin ? ROUTES.ADMIN.DASHBOARD : ROUTES.EMPLOYER.DASHBOARD}`,
+    i18n.language
+  );
+
+  const [expandedItems, setExpandedItems] = useState({
+    candidates: true,
+    interviews: true,
+    account: true,
+    hrm: true,
+    system: true,
+    categories: true,
+    profiles: true,
+    recruitment: true,
+    content: true,
+  });
+
+  const handleExpand = (section: string) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [section]: !prev[section as keyof typeof prev]
+    }));
+  };
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      <Toolbar disableGutters sx={{ px: 2, py: 0, minHeight: shellHeaderHeight, height: shellHeaderHeight, flexShrink: 0 }}>
+        <Box
+          component={Link}
+          href={dashboardHref}
+          sx={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Box
+            component="img"
+            src={IMAGES.getTextLogo(theme.palette.mode === 'light' ? 'dark' : 'light')}
+            sx={{ display: 'block', height: { xs: 36, sm: 40 }, width: 'auto', maxWidth: '100%', objectFit: 'contain' }}
+            alt="InfoHR"
+          />
+        </Box>
+      </Toolbar>
+      <Divider sx={{ borderColor: 'grey.500', flexShrink: 0 }} />
+      <Box sx={{ px: 1.5, py: 1.5, flexGrow: 1, overflowY: 'auto' }}>
+        <List component="nav" disablePadding>
+          {isAdmin ? (
+            <AdminMenu t={t} location={location} expandedItems={expandedItems} handleExpand={handleExpand} language={i18n.language} />
+          ) : (
+            <EmployerMenu t={t} location={location} expandedItems={expandedItems} handleExpand={handleExpand} language={i18n.language} liveInterviewCount={liveInterviewCount} />
+          )}
+          <Divider sx={{ my: 2, borderColor: 'grey.300' }} />
+        </List>
+      </Box>
+    </Box>
+  );
+};
+
+export default DrawerContent;

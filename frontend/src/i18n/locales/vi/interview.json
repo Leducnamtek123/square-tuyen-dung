@@ -4,7 +4,19 @@
   "redirectCta": "Nếu bạn không được tự động chuyển hướng, hãy nhấn vào đây",
   "readyTitle": "Sẵn sàng bắt đầu phỏng vấn",
   "readyBody": "Nhấn bắt đầu để kết nối. Camera và microphone sẽ chỉ bật lên khi bạn chọn chúng trên thanh công cụ.",
+  "unavailableTitle": "Phỏng vấn không khả dụng",
+  "sessionNotJoinable": "Buổi phỏng vấn này đã kết thúc hoặc đã bị hủy.",
+  "sessionNotJoinableBody": "Buổi phỏng vấn này đã kết thúc hoặc đã bị hủy. Vui lòng liên hệ nhà tuyển dụng để biết thêm chi tiết.",
+  "processingTitle": "Đang xử lý kết quả phỏng vấn",
+  "processingBody": "Buổi phỏng vấn đã kết thúc. Hệ thống đang tổng hợp transcript và chấm điểm, bạn có thể quay lại sau ít phút.",
   "startInterview": "Bắt đầu phỏng vấn",
+  "preflight": {
+    "title": "Kiểm tra thiết bị",
+    "subtitle": "Hãy đảm bảo microphone của bạn hoạt động trước khi bắt đầu buổi phỏng vấn AI.",
+    "mic_ready": "Microphone sẵn sàng",
+    "join": "Tham gia phỏng vấn",
+    "mic_denied": "Quyền truy cập microphone bị từ chối. Vui lòng cho phép truy cập microphone để tiếp tục."
+  },
   "transcriptTitle": "Bản ghi âm",
   "noMessages": "Chưa có tin nhắn nào.",
   "chatPlaceholder": "Nhập tin nhắn...",
@@ -15,16 +27,33 @@
   "cameraPreview": "Xem trước Camera",
   "cameraHint": "Bật camera để xem trước hình ảnh của bạn.",
   "controls": {
-    "mic": "Microphone",
-    "camera": "Camera",
+    "mic": "Micrô",
+    "camera": "Máy ảnh",
     "share": "Chia sẻ",
-    "chat": "Chat",
-    "end": "Kết thúc"
+    "chat": "Trò chuyện",
+    "end": "Kết thúc",
+    "ending": "Đang kết thúc...",
+    "enableAudio": "Bật âm thanh",
+    "muteMicrophone": "Tắt micrô",
+    "unmuteMicrophone": "Bật micrô",
+    "turnCameraOn": "Bật camera",
+    "turnCameraOff": "Tắt camera",
+    "startScreenShare": "Bắt đầu chia sẻ màn hình",
+    "stopScreenShare": "Dừng chia sẻ màn hình"
+  },
+  "agentView": {
+    "technicalInterview": "Phỏng vấn chuyên môn",
+    "candidate": "Ứng viên",
+    "agentSpeaking": "AI đang nói",
+    "agentThinking": "AI đang suy nghĩ",
+    "listening": "Đang lắng nghe",
+    "ready": "Sẵn sàng",
+    "transcript": "Bản ghi cuộc hội thoại"
   },
   "voiceAi": {
-    "pageTitle": "Trợ lý Phỏng vấn Voice AI",
-    "pageDescription": "Trợ lý phỏng vấn ảo được xây dựng bởi LiveKit",
-    "companyName": "Square AI",
+    "pageTitle": "Trợ lý phỏng vấn",
+    "pageDescription": "Trợ lý phỏng vấn trực tuyến",
+    "companyName": "InfoHR AI",
     "startCall": "Bắt đầu cuộc gọi",
     "startAudio": "Bật âm thanh",
     "welcome": {
@@ -37,14 +66,17 @@
       "endShort": "Kết thúc"
     },
     "chat": {
+      "messageInput": "Tin nhắn",
       "placeholder": "Nhập nội dung...",
       "sending": "Đang gửi...",
-      "send": "Gửi"
+      "send": "Gửi",
+      "sendingMessage": "Đang gửi tin nhắn",
+      "sendMessage": "Gửi tin nhắn"
     },
     "devices": {
       "select": "Chọn một {{kind}}",
-      "microphone": "microphone",
-      "camera": "camera",
+      "microphone": "micrô",
+      "camera": "máy ảnh",
       "speaker": "loa"
     },
     "theme": {
@@ -60,6 +92,7 @@
     },
     "preconnect": "Trợ lý đang lắng nghe, hãy đặt câu hỏi",
     "aria": {
+      "controls": "Điều khiển trợ lý phỏng vấn",
       "toggleMicrophone": "Bật/Tắt microphone",
       "toggleCamera": "Bật/Tắt camera",
       "toggleScreenShare": "Bật/Tắt chia sẻ màn hình",
@@ -67,11 +100,23 @@
       "toggleGeneric": "Bật/Tắt {{target}}"
     }
   },
-  "loading": "Đang kết nối đến phòng phỏng vấn...",
+  "stages": {
+    "INTRODUCTION": "Giới thiệu",
+    "EXPERIENCE": "Kinh nghiệm làm việc",
+    "TECHNICAL": "Kiến thức chuyên môn",
+    "BEHAVIORAL": "Câu hỏi tình huống",
+    "CLOSING": "Kết thúc",
+    "currentQuestion": "Câu hỏi {{current}} / {{total}}"
+  },
+  "loading": "Đang chờ hệ thống...",
   "errors": {
     "missingInvite": "Thiếu mã mời phỏng vấn.",
+    "missingSessionId": "Thiếu ID phiên phỏng vấn.",
     "tokenMissing": "Không thể lấy token để tham gia phỏng vấn.",
-    "invalidSession": "Lỗi kết nối hoặc phiên phỏng vấn không hợp lệ."
+    "invalidSession": "Lỗi kết nối hoặc phiên phỏng vấn không hợp lệ.",
+    "sessionNotReadyForJoin": "Không thể vào phòng lúc này vì phiên đang ở trạng thái {{status}}.",
+    "endSessionFailed": "Không thể cập nhật trạng thái kết thúc. Phiên đã được ngắt khỏi phòng.",
+    "mic_denied": "Quyền truy cập microphone bị từ chối. Vui lòng cho phép truy cập microphone để tiếp tục."
   },
   "employer": {
     "questions": {
@@ -104,18 +149,255 @@
       "deleteError": "Không thể xóa câu hỏi này.",
       "columns": {
         "text": "Nội dung câu hỏi"
-      }
+      },
+      "deleteTitle": "Xóa câu hỏi",
+      "noData": "Chưa có câu hỏi nào",
+      "hint": "Tạo câu hỏi để sử dụng trong phỏng vấn"
     }
   },
   "interviewListCard": {
     "title": "Danh sách Phỏng vấn Online",
+    "scheduleInterview": "Lên lịch phỏng vấn",
+    "noInterviews": "Chưa có buổi phỏng vấn nào được tạo.",
+    "deleteInterview": "Xóa buổi phỏng vấn",
+    "editInterview": "Sửa buổi phỏng vấn",
+    "cancelInterview": "Hủy buổi phỏng vấn",
+    "confirmDeleteTitle": "Xác nhận xóa",
+    "confirmDeleteMessage": "Bạn có chắc chắn muốn xóa buổi phỏng vấn này không? Hành động này không thể hoàn tác.",
+    "confirmCancelTitle": "Xác nhận hủy",
+    "confirmCancelMessage": "Bạn có chắc chắn muốn hủy buổi phỏng vấn này không?",
+    "grading": "Đang đánh giá",
+    "messages": {
+      "deleteSuccess": "Xóa buổi phỏng vấn thành công",
+      "deleteError": "Xóa buổi phỏng vấn thất bại",
+      "cancelSuccess": "Hủy buổi phỏng vấn thành công",
+      "cancelError": "Hủy buổi phỏng vấn thất bại"
+    },
+    "candidate": "Ứng viên",
+    "position": "Vị trí",
+    "time": "Thời gian",
+    "status": "Trạng thái",
+    "aiScore": "Điểm AI",
+    "markCompleted": "Đánh dấu hoàn thành",
+    "statuses": {
+      "scheduled": "Đã lên lịch",
+      "in_progress": "Đang diễn ra",
+      "processing": "Đang xử lý",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy",
+      "draft": "Bản nháp",
+      "calibration": "Kiểm tra thiết bị",
+      "interrupted": "Bị gián đoạn",
+      "connecting": "Đang kết nối",
+      "active": "Hoạt động"
+    },
+    "description": "Xem lịch phỏng vấn"
+  },
+  "interviewAdminPage": {
+    "title": "Quản lý Phỏng vấn",
+    "cardTitle": "Danh sách tất cả các cuộc phỏng vấn",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa cuộc phỏng vấn này không?",
+    "candidateEmployer": "Ứng viên / Nhà tuyển dụng",
+    "jobPost": "Tin tuyển dụng",
+    "type": "Loại",
     "time": "Thời gian",
     "status": "Trạng thái",
     "actions": "Thao tác",
     "viewDetails": "Xem chi tiết",
     "markCompleted": "Đánh dấu hoàn thành",
     "cancelInterview": "Hủy phỏng vấn",
-    "delete": "Xóa",
-    "confirmDelete": "Bạn có chắc chắn muốn xóa phỏng vấn này?"
+    "delete": "Xóa"
+  },
+  "common": {
+    "na": "N/A",
+    "status": {
+      "completed": "Hoàn thành",
+      "inProgress": "Đang diễn ra",
+      "scheduled": "Đã lên lịch",
+      "cancelled": "Đã hủy",
+      "pending": "Chờ xử lý",
+      "unknown": "Không xác định"
+    },
+    "table": {
+      "noData": "Không có dữ liệu"
+    }
+  },
+  "interviewCreateCard": {
+    "messages": {
+      "updateSuccess": "Cập nhật phỏng vấn thành công",
+      "scheduleSuccess": "Lên lịch phỏng vấn thành công"
+    },
+    "title": {
+      "editOnlineInterview": "Chỉnh sửa phỏng vấn trực tuyến",
+      "scheduleOnlineInterview": "Lên lịch phỏng vấn trực tuyến",
+      "scheduledtime": "Thời gian phỏng vấn"
+    },
+    "description": {
+      "schedulingHelper": "Điền thông tin bên dưới để lên lịch phỏng vấn"
+    },
+    "label": {
+      "basicInfo": "Thông tin cơ bản",
+      "selectjobpost": "Chọn tin tuyển dụng",
+      "selectcandidate": "Chọn ứng viên",
+      "aiVoice": "Giọng AI",
+      "autoDefaultVoice": "Tự động/giọng mặc định",
+      "defaultVoiceSuffix": "mặc định",
+      "questions": "Câu hỏi",
+      "selectquestiongroupoptional": "Chọn nhóm câu hỏi (Tùy chọn)",
+      "selectinterviewquestions": "Chọn câu hỏi phỏng vấn",
+      "selectquestions": "Chọn câu hỏi"
+    },
+    "validation": {
+      "selectJobPost": "Vui lòng chọn tin tuyển dụng",
+      "selectCandidate": "Vui lòng chọn ứng viên",
+      "selectScheduleTime": "Vui lòng chọn thời gian phỏng vấn"
+    },
+    "helperText": {
+      "selectaquestiongrouptoautomaticallyfillthequestions below": "Chọn nhóm câu hỏi để tự động điền câu hỏi",
+      "voiceProfileAuto": "Giữ tự động để dùng giọng mặc định đã cấp cho tin tuyển dụng hoặc công ty này."
+    },
+    "scheduleNow": "Lên lịch ngay",
+    "noCandidates": "Không có ứng viên nào đã ứng tuyển vị trí này",
+    "loadingSelectedJobPost": "Đang tải tin tuyển dụng đã chọn...",
+    "missingSelectedJobPost": "Tin tuyển dụng #{{id}} không còn khả dụng",
+    "loadingSelectedCandidate": "Đang tải ứng viên đã chọn...",
+    "missingSelectedCandidate": "Ứng viên #{{id}} không còn khả dụng"
+  },
+  "interviewDetail": {
+    "title": "Chi tiết phỏng vấn",
+    "subtitle": {
+      "info": "Thông tin Phỏng vấn",
+      "aiEvaluation": "Kết quả đánh giá AI",
+      "analysis": "Phân tích AI",
+      "history": "Lịch sử cuộc trò chuyện",
+      "recording": "Ghi hình phỏng vấn",
+      "transcript": "Bản ghi cuộc trò chuyện",
+      "questions": "Danh sách câu hỏi"
+    },
+    "label": {
+      "roomCode": "Mã phòng",
+      "id": "ID",
+      "candidate": "ỨNG VIÊN",
+      "position": "VỊ TRÍ",
+      "type": "LOẠI PHỎNG VẤN",
+      "schedule": "LỊCH TRÌNH",
+      "liveMonitoring": "THEO DÕI TRỰC TIẾP",
+      "aiInterviewer": "Người phỏng vấn AI",
+      "interviewer": "Người phỏng vấn",
+      "candidateSmall": "Ứng viên",
+      "technicalScore": "Điểm kỹ thuật",
+      "communicationScore": "Điểm giao tiếp",
+      "detailedAnalysis": "Phân tích chi tiết AI",
+      "detailedFeedback": "Nhận xét chi tiết",
+      "strengths": "Điểm mạnh",
+      "weaknesses": "Điểm yếu",
+      "feedback": "Nhận xét chi tiết",
+      "softSkills": "Kỹ năng mềm",
+      "confidence": "Độ tự tin",
+      "clarity": "Độ rõ ràng",
+      "tone": "Giọng điệu",
+      "culturalFit": "Mức độ phù hợp văn hoá",
+      "questionPerformance": "Hiệu suất câu hỏi",
+      "question": "Câu hỏi"
+    },
+    "tooltips": {
+      "cannotJoin": "Chưa thể tham gia lúc này",
+      "forceEndNow": "Kết thúc ngay lập tức buổi phỏng vấn này",
+      "observeHidden": "Quan sát ẩn không tham gia phòng"
+    },
+    "status": {
+      "interruptedResume": "Bị gián đoạn - có thể tiếp tục"
+    },
+    "messages": {
+      "evaluationSuccess": "Lưu đánh giá thành công",
+      "scoreInvalid": "Điểm đánh giá phải nằm trong khoảng 0 đến 10.",
+      "proposedSalaryInvalid": "Lương đề xuất phải lớn hơn hoặc bằng 0.",
+      "aiTriggerSuccess": "Bắt đầu đánh giá AI",
+      "notFound": "Không tìm thấy phỏng vấn",
+      "notFoundDesc": "Phỏng vấn bạn đang tìm không tồn tại",
+      "recordingPending": "Video đang được xử lý",
+      "recordingPendingDesc": "Bản ghi video sẽ hiển thị ở đây sau khi xử lý xong",
+      "confirmForceEnd": "Bạn có chắc chắn muốn kết thúc buổi phỏng vấn này ngay lập tức không?",
+      "forceEndSuccess": "Đã yêu cầu kết thúc buổi phỏng vấn",
+      "aiGenerating": "Kết quả đánh giá AI đang được khởi tạo",
+      "aiAnalyzing": "AI đang phân tích cuộc trò chuyện...",
+      "aiAnalyzingDesc": "AI đang tiến hành phân tích hồ sơ...",
+      "aiNeedsTrigger": "Cần khởi tạo AI phân tích",
+      "notEnded": "Buổi phỏng vấn chưa kết thúc",
+      "noHistory": "Không có dữ liệu cuộc trò chuyện",
+      "noData": "Không có dữ liệu",
+      "noDetails": "Không có thông tin chi tiết",
+      "noQuestions": "Không có danh sách câu hỏi",
+      "noTranscript": "Không có bản ghi",
+      "noTranscriptDesc": "Chưa có cuộc hội thoại nào để ghi lại.",
+      "interruptedResumeHint": "Kết nối vừa bị ngắt tạm thời. Bạn có thể tham gia lại để tiếp tục buổi phỏng vấn."
+    },
+    "actions": {
+      "triggerAi": "Kích hoạt AI đánh giá",
+      "backToList": "Quay lại danh sách",
+      "viewReport": "Xem báo cáo chi tiết",
+      "openRecording": "Mở ghi hình",
+      "retryAi": "Phân tích lại bằng AI",
+      "questionList": "Danh sách câu hỏi phỏng vấn",
+      "hrEvaluation": "Đánh giá của Nhà tuyển dụng",
+      "attitudeScore": "Điểm thái độ",
+      "professionalScore": "Điểm chuyên môn",
+      "overallScore": "Điểm tổng quan",
+      "resultLabel": "Kết quả cuối cùng",
+      "comments": "Nhận xét chi tiết",
+      "proposedSalary": "Lương đề xuất (VNĐ)",
+      "submitEvaluation": "Gửi đánh giá cuối cùng",
+      "evalSuccess": "Gửi đánh giá thành công!",
+      "passed": "Chấp nhận (Đạt)",
+      "failed": "Từ chối (Không đạt)",
+      "pending": "Chờ xem xét",
+      "joinAsHrLoading": "Đang kết nối..."
+    }
+  },
+  "liveRoom": {
+    "participants": {
+      "aiInterviewer": "AI Phỏng vấn",
+      "employer": "Nhà tuyển dụng",
+      "you": "Bạn",
+      "candidate": "Ứng viên",
+      "guest": "Khách",
+      "observer": "Quan sát viên"
+    },
+    "chips": {
+      "ai": "AI",
+      "you": "BẠN",
+      "employer": "NTD",
+      "live": "TRỰC TIẾP"
+    },
+    "chat": {
+      "title": "Hội thoại",
+      "subtitle": "Giọng nói và tin nhắn dùng chung một dòng thời gian.",
+      "messagesCount": "{{count}} tin nhắn",
+      "noMessages": "Chưa có tin nhắn",
+      "noMessagesDesc": "Hội thoại sẽ xuất hiện tại đây khi ai đó nói hoặc nhắn tin.",
+      "placeholder": "Nhập tin nhắn...",
+      "send": "Gửi",
+      "open": "Mở trò chuyện",
+      "close": "Đóng trò chuyện",
+      "chatMode": "Chat",
+      "aiControlMode": "AI nói",
+      "aiControlPlaceholder": "Nhập nội dung muốn AI hỏi hoặc nói...",
+      "aiControlSend": "AI nói",
+      "takeoverMode": "Giữ quyền AI",
+      "takeoverTitle": "Nhà tuyển dụng trực tiếp",
+      "takeoverActive": "Đang giữ quyền",
+      "takeoverInactive": "AI đang dẫn",
+      "takeoverHint": "Khi giữ quyền, AI tạm im để bạn nói chuyện trực tiếp với ứng viên. Bấm trả quyền để AI tiếp tục.",
+      "takeoverAcquire": "Giữ quyền AI",
+      "takeoverRelease": "Trả quyền AI",
+      "takeoverSending": "Đang cập nhật..."
+    },
+    "observingBar": {
+      "hrObserving": "Bạn đang quan sát phiên phỏng vấn này",
+      "hrWaiting": "Đang chờ ứng viên tham gia phòng...",
+      "employerObserving": "Nhà tuyển dụng đang quan sát phiên phỏng vấn này",
+      "live": "TRỰC TIẾP",
+      "waiting": "CHỜ"
+    }
   }
 }

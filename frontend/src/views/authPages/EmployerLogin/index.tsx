@@ -1,0 +1,412 @@
+﻿'use client';
+import * as React from 'react';
+
+import { useRouter } from 'next/navigation';
+
+import { Alert, AlertTitle, Avatar, Box, Card, Container, Typography, styled } from '@mui/material';
+import { Grid2 as Grid } from '@mui/material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+import { TabTitle } from '../../../utils/generalFunction';
+import { AUTH_CONFIG, AUTH_PROVIDER, ROLES_NAME, ROUTES } from '../../../configs/constants';
+import { localizeRoutePath } from '../../../configs/routeLocalization';
+import toastMessages from '../../../utils/toastMessages';
+import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
+import { updateVerifyEmail } from '../../../redux/authSlice';
+import { getUserInfo, setActiveWorkspace } from '../../../redux/userSlice';
+import EmployerLoginForm, { EmployerLoginFormData } from '../../components/auths/EmployerLoginForm';
+import authService from '../../../services/authService';
+import tokenService from '../../../services/tokenService';
+import { useAppDispatch } from '../../../hooks/useAppStore';
+import type { RoleName, AuthProvider } from '../../../types/auth';
+import type { User, Workspace } from '../../../types/models';
+import type { AxiosError } from 'axios';
+import type { CodeResponse } from '@react-oauth/google';
+
+const SOCIAL_AUTH_COOLDOWN_MS = 2500;
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  background: 'rgba(255, 255, 255, 0.9)',
+  backdropFilter: 'blur(10px)',
+  borderRadius: '16px',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+  transition: 'all 0.3s ease',
+}));
+
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  margin: '16px',
+  width: '56px',
+  height: '56px',
+  backgroundColor: theme.palette.primary.main,
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+}));
+
+const StyledLink = styled(Link)(({ theme }) => ({
+  textDecoration: 'none',
+  color: theme.palette.primary.main,
+  fontWeight: 500,
+  transition: 'all 0.2s ease',
+  '&:hover': {
+    color: theme.palette.primary.dark,
+    textDecoration: 'underline',
+  },
+}));
+
+const getCompanyPortalPath = (language: string) => {
+  return localizeRoutePath(`/${ROUTES.EMPLOYER.DASHBOARD}`, language);
+};
+
+const getCompanyWorkspace = (user?: User | null) =>
+  ((user?.workspaces || []) as Workspace[]).find((workspace) => workspace.type === 'company');
+
+type ApiErrorPayload = {
+  errors?: Record<string, string[]>;
+  error?: {
+    message?: string;
+    details?: Record<string, string[]>;
+  };
+};
+
+const EmployerLogin = () => {
+  const { t, i18n } = useTranslation('auth');
+  TabTitle(t('login.employerTitle'));
+
+  const dispatch = useAppDispatch();
+  const { push } = useRouter();
+
+  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
+  const forgotPasswordHref = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.FORGOT_PASSWORD}`, i18n.language);
+  const registerHref = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language);
+  const socialAuthInFlightRef = React.useRef(false);
+  const lastSocialAuthAttemptAtRef = React.useRef(0);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const successMessageKey = params.get('successMessageKey');
+    const successMsg = params.get('successMessage');
+    const errorMsg = params.get('errorMessage');
+
+    if (successMessageKey === 'passwordResetSuccess') {
+      setSuccessMessage(t('messages.passwordResetSuccess'));
+    } else if (successMsg !== null) {
+      setSuccessMessage(successMsg);
+    }
+
+    setErrorMessage(errorMsg);
+  }, [t]);
+
+  const extractErrorMessage = (res: { data?: ApiErrorPayload } | undefined): string | null => {
+    if (!res?.data) return null;
+
+    // V2 envelope: { success: false, error: { details: { errorMessage: [...] }, message: '...' } }
+    const v2Details = res.data.error?.details;
+    const v2ErrorMsg = v2Details?.errorMessage;
+
+    // V1 format: { errors: { errorMessage: [...] } }
+    const v1Errors = res.data.errors;
+    const v1ErrorMsg = v1Errors?.errorMessage;
+
+    if (Array.isArray(v2ErrorMsg) && v2ErrorMsg.length > 0) {
+      return v2ErrorMsg.join(' ');
+    }
+    if (Array.isArray(v1ErrorMsg) && v1ErrorMsg.length > 0) {
+      return v1ErrorMsg.join(' ');
+    }
+    if (typeof res.data.error?.message === 'string' && res.data.error.message) {
+      return res.data.error.message;
+    }
+    return null;
+  };
+
+  const handleLogin = (data: EmployerLoginFormData) => {
+    const getAccessToken = async (email: string, password: string, roleName: RoleName) => {
+      setIsFullScreenLoading(true);
+
+      try {
+        const resData = await authService.getToken(email, password, roleName);
+        const { accessToken, refreshToken, backend } = resData;
+
+        const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
+          accessToken,
+          refreshToken,
+          backend
+        );
+
+        if (isSaveTokenToCookie) {
+          dispatch(getUserInfo())
+            .unwrap()
+            .then((user) => {
+              const companyWorkspace = getCompanyWorkspace(user);
+              if (companyWorkspace) {
+                dispatch(setActiveWorkspace(companyWorkspace));
+              }
+              push(getCompanyPortalPath(i18n.language));
+            })
+            .catch(() => {
+              toastMessages.error(t('messages.loginError'));
+            });
+        } else {
+          toastMessages.error(t('messages.loginError'));
+        }
+      } catch (error) {
+        const axiosError = error as AxiosError<ApiErrorPayload>;
+        const res = axiosError?.response;
+
+        if (res?.status === 400) {
+          const errMsg = extractErrorMessage(res);
+          if (errMsg) {
+            setErrorMessage(errMsg);
+          } else {
+            toastMessages.error(t('messages.tryAgain'));
+          }
+        }
+      } finally {
+        setIsFullScreenLoading(false);
+      }
+    };
+
+    const checkCreds = async (email: string, password: string, roleName: RoleName) => {
+      setIsFullScreenLoading(true);
+
+      try {
+        const resData = await authService.checkCreds(email, roleName);
+        const { exists, email: resEmail, emailVerified } = resData;
+
+        if (exists === true && emailVerified === false) {
+          dispatch(
+            updateVerifyEmail({
+              isAllowVerifyEmail: true,
+              email: email,
+              roleName: roleName,
+            })
+          );
+
+          push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
+          return;
+        }
+
+        if (exists === false) {
+          setErrorMessage(t('messages.noEmployerAccount'));
+          return;
+        }
+
+        getAccessToken(resEmail, password, roleName);
+      } catch (error) {
+        toastMessages.error(t('messages.loginError'));
+      } finally {
+        setIsFullScreenLoading(false);
+      }
+    };
+
+    checkCreds(data.email || '', data.password || '', ROLES_NAME.EMPLOYER as RoleName);
+  };
+
+  const handleSocialLogin = async (clientId: string, provider: AuthProvider, token: string) => {
+    const now = Date.now();
+    if (
+      socialAuthInFlightRef.current ||
+      now - lastSocialAuthAttemptAtRef.current < SOCIAL_AUTH_COOLDOWN_MS
+    ) {
+      return;
+    }
+
+    const redirectUri = (typeof window !== 'undefined' ? window.location.origin : '');
+    lastSocialAuthAttemptAtRef.current = now;
+    socialAuthInFlightRef.current = true;
+    setIsFullScreenLoading(true);
+
+    try {
+      const resData = await authService.convertToken(
+        clientId,
+        provider,
+        token,
+        redirectUri,
+        ROLES_NAME.EMPLOYER as RoleName
+      );
+      const { accessToken, refreshToken, backend } = resData;
+
+      const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
+        accessToken,
+        refreshToken,
+        backend
+      );
+
+      if (isSaveTokenToCookie) {
+        dispatch(getUserInfo())
+          .unwrap()
+          .then((user) => {
+            const companyWorkspace = getCompanyWorkspace(user);
+            if (companyWorkspace) {
+              dispatch(setActiveWorkspace(companyWorkspace));
+            }
+            push(getCompanyPortalPath(i18n.language));
+          })
+          .catch(() => {
+            toastMessages.error(t('messages.loginError'));
+          });
+      } else {
+        toastMessages.error(t('messages.loginError'));
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiErrorPayload>;
+      const res = axiosError?.response;
+
+      if (res?.status === 400) {
+        const errMsg = extractErrorMessage(res);
+        if (errMsg) {
+          setErrorMessage(errMsg);
+        } else {
+          toastMessages.error(t('messages.tryAgain'));
+        }
+      }
+    } finally {
+      setIsFullScreenLoading(false);
+      socialAuthInFlightRef.current = false;
+    }
+  };
+
+  const handleGoogleLogin = (result: Omit<CodeResponse, "error" | "error_description" | "error_uri">) => {
+    const code = result?.code;
+
+    if (code) {
+      void handleSocialLogin(
+        AUTH_CONFIG.CLIENT_ID || '',
+        AUTH_PROVIDER.GOOGLE as AuthProvider,
+        code
+      );
+    }
+  };
+
+  return (
+    <>
+      <Container
+        maxWidth="sm"
+        sx={{
+          marginTop: { xs: 0, sm: 2, md: 3 },
+          p: { xs: 0, sm: 3 },
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <StyledCard
+          sx={{
+            p: { xs: 2, sm: 4, md: 5 },
+            width: '100%',
+            borderRadius: { xs: 0, sm: '16px' },
+            boxShadow: { xs: 'none', sm: '0 8px 32px rgba(0, 0, 0, 0.1)' },
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              mb: 4,
+            }}
+          >
+            <StyledAvatar>
+              <LockOutlinedIcon sx={{ fontSize: 28 }} />
+            </StyledAvatar>
+            <Typography
+              component="h1"
+              variant="h4"
+              align="center"
+              sx={{
+                fontWeight: 600,
+                color: 'primary.main',
+                mb: 1,
+              }}
+            >
+              {t('login.heading')}
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              align="center"
+              sx={{
+                color: 'text.secondary',
+                mb: 2,
+              }}
+            >
+              {t('login.welcomeBack')}
+            </Typography>
+          </Box>
+
+          {errorMessage && (
+            <Alert
+              severity="error"
+              sx={{
+                mb: 3,
+                borderRadius: '8px',
+              }}
+            >
+              <AlertTitle>{t('login.errorTitle')}</AlertTitle>
+              {errorMessage}
+            </Alert>
+          )}
+
+          {successMessage && (
+            <Alert
+              severity="success"
+              sx={{
+                mb: 3,
+                borderRadius: '8px',
+              }}
+            >
+              <AlertTitle>{t('login.successTitle')}</AlertTitle>
+              {successMessage}
+            </Alert>
+          )}
+
+          <Box sx={{ mt: 2 }}>
+            <EmployerLoginForm onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} />
+          </Box>
+
+          <Grid
+            container
+            spacing={2}
+            sx={{
+              mt: 4,
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6,
+              }}
+            >
+              <StyledLink href={forgotPasswordHref}>
+                {t('login.forgotPassword')}
+              </StyledLink>
+            </Grid>
+
+            <Grid
+              sx={{
+                textAlign: { xs: 'left', sm: 'right' },
+              }}
+              size={{
+                xs: 12,
+                sm: 6,
+              }}
+            >
+              <StyledLink href={registerHref}>
+                {t('login.noAccount')} {t('login.signUp')}
+              </StyledLink>
+            </Grid>
+          </Grid>
+        </StyledCard>
+      </Container>
+
+      {isFullScreenLoading && <BackdropLoading />}
+    </>
+  );
+};
+
+export default EmployerLogin;

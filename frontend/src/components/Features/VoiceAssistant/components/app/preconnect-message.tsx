@@ -1,0 +1,63 @@
+'use client';
+
+import { AnimatePresence, LazyMotion, domAnimation, m } from 'motion/react';
+import { type ReceivedMessage } from '@livekit/components-react';
+import { useTranslation } from 'react-i18next';
+import { ShimmerText } from '@/components/Features/VoiceAssistant/components/livekit/shimmer-text';
+import { cn } from '@/lib/utils';
+
+const MotionMessage = m.p;
+const EMPTY_MESSAGES: ReceivedMessage[] = [];
+
+import type { HTMLMotionProps } from 'motion/react';
+
+const VIEW_MOTION_PROPS: HTMLMotionProps<"p"> = {
+  variants: {
+    visible: {
+      opacity: 1,
+      transition: {
+        ease: 'easeIn',
+        duration: 0.5,
+        delay: 0.8,
+      },
+    },
+    hidden: {
+      opacity: 0,
+      transition: {
+        ease: 'easeIn',
+        duration: 0.5,
+        delay: 0,
+      },
+    },
+  },
+  initial: 'hidden',
+  animate: 'visible',
+  exit: 'hidden',
+};
+
+interface PreConnectMessageProps {
+  messages?: ReceivedMessage[];
+  className?: string;
+}
+
+export function PreConnectMessage({ className, messages = EMPTY_MESSAGES }: PreConnectMessageProps) {
+  const { t } = useTranslation('voiceAssistant');
+
+  return (
+    <LazyMotion features={domAnimation}>
+      <AnimatePresence>
+        {messages.length === 0 && (
+          <MotionMessage
+            {...VIEW_MOTION_PROPS}
+            aria-hidden={messages.length > 0}
+            className={cn('pointer-events-none text-center text-white/80', className)}
+          >
+            <ShimmerText className="text-xs font-black uppercase tracking-[0.28em]">
+              {t('preconnectMessage')}
+            </ShimmerText>
+          </MotionMessage>
+        )}
+      </AnimatePresence>
+    </LazyMotion>
+  );
+}

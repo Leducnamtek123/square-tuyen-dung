@@ -1,0 +1,120 @@
+Login,Đăng nhập
+Logout,Đăng xuất
+Home,Trang chủ
+Search,Tìm kiếm
+Language,Ngôn ngữ
+Edit Profile,Chỉnh sửa hồ sơ
+Toggle Theme,Đổi giao diện
+About,Giới thiệu
+Frappe Support,Hỗ trợ Square HRM
+Square HRM Support,Hỗ trợ Square HRM
+Reset Desktop Layout,Đặt lại bố cục
+Desktop,Màn hình chính
+Workspaces,Không gian làm việc
+Website,Website
+Edit Sidebar,Sửa thanh bên
+Session Defaults,Mặc định phiên
+Reload,Tải lại
+Toggle Full Width,Đổi chế độ toàn chiều rộng
+Help,Trợ giúp
+Notification,Thông báo
+Notifications,Thông báo
+Dashboard,Bảng điều khiển
+Settings,Cài đặt
+Setup,Thiết lập
+Expenses,Chi phí
+Expense Claims,Yêu cầu thanh toán chi phí
+Expense Claim,Yêu cầu thanh toán chi phí
+Expense Claim Type,Loại yêu cầu chi phí
+Employee Advance,Tạm ứng nhân viên
+Travel,Công tác
+Purpose of Travel,Mục đích công tác
+Travel Request,Yêu cầu công tác
+Vehicle Log,Nhật ký xe
+Accounting Entries,Bút toán kế toán
+Reports,Báo cáo
+Masters & Reports,Danh mục & Báo cáo
+Masters and Reports,Danh mục & Báo cáo
+Claims,Yêu cầu
+Advances,Tạm ứng
+Accounting Reports,Báo cáo kế toán
+Fleet Management,Quản lý đội xe
+Payment Entry,Phiếu thanh toán
+Journal Entry,Bút toán nhật ký
+Additional Salary,Lương bổ sung
+Employee Advance Summary,Tổng hợp tạm ứng nhân viên
+Unpaid Expense Claim,Yêu cầu chi phí chưa thanh toán
+Vehicle Expenses,Chi phí xe
+Accounts Receivable,Phải thu
+Accounts Payable,Phải trả
+General Ledger,Sổ cái
+Vehicle,Xe
+Driver,Tài xế
+Vehicle Service Item,Hạng mục dịch vụ xe
+Last synced just now,Vừa đồng bộ
+Last Year,Năm trước
+Monthly,Hàng tháng
+Filter,Bộ lọc
+New,Tạo mới
+Save,Lưu
+Submit,Gửi duyệt
+Cancel,Hủy
+Delete,Xóa
+Duplicate,Nhân bản
+Print,In
+Email,Email
+Export,Xuất dữ liệu
+Import,Nhập dữ liệu
+Refresh,Làm mới
+Upload,Tải lên
+Download,Tải xuống
+Sort,Sắp xếp
+List,Danh sách
+Report,Báo cáo
+Calendar,Lịch
+Kanban,Kanban
+Gantt,Gantt
+Assign,Giao việc
+Share,Chia sẻ
+Tags,Thẻ
+Comments,Bình luận
+Activity,Hoạt động
+Timeline,Dòng thời gian
+Details,Chi tiết
+Created,Đã tạo
+Modified,Đã sửa
+Owner,Người sở hữu
+Status,Trạng thái
+Open,Mở
+Closed,Đã đóng
+Draft,Nháp
+Submitted,Đã gửi duyệt
+Cancelled,Đã hủy
+Approved,Đã duyệt
+Rejected,Từ chối
+Pending,Đang chờ
+Active,Đang hoạt động
+Disabled,Đã tắt
+Enabled,Đã bật
+Employee,Nhân viên
+Employees,Nhân viên
+Company,Công ty
+Department,Phòng ban
+Designation,Chức danh
+Branch,Chi nhánh
+Leave,Nghỉ phép
+Leaves,Nghỉ phép
+Attendance,Chấm công
+Payroll,Bảng lương
+Recruitment,Tuyển dụng
+Performance,Hiệu suất
+Shift & Attendance,Ca làm & Chấm công
+HR Setup,Thiết lập nhân sự
+Salary Slip,Phiếu lương
+Salary Structure,Cơ cấu lương
+Leave Application,Đơn nghỉ phép
+Attendance Request,Yêu cầu chấm công
+Shift Assignment,Phân ca
+Job Opening,Vị trí tuyển dụng
+Job Applicant,Ứng viên
+Interview,Phỏng vấn

@@ -9,29 +9,19 @@ from django.conf import settings
 
 from django.db import transaction
 
-from helpers import helper
+from shared.helpers import helper
 
-from configs import variable_system as var_sys
+from shared.configs import variable_system as var_sys
 
-from myjob_api.admin import custom_admin_site
+from config.admin import custom_admin_site
 
-from .models import (
-
-    City,
-
-    District,
-
-    Location,
-
-    Career,
-
-    File
-
-)
+from apps.files.models import File
+from apps.locations.models import City, District, Location, Ward
+from .models import AuditLog, Career
 
 from django_admin_listfilter_dropdown.filters import (RelatedDropdownFilter)
 
-from helpers.cloudinary_service import CloudinaryService
+from shared.helpers.cloudinary_service import CloudinaryService
 
 class LocationForm(forms.ModelForm):
 
@@ -93,13 +83,31 @@ class DistrictAdmin(admin.ModelAdmin):
 
     list_select_related = ('city',)
 
+class WardAdmin(admin.ModelAdmin):
+
+    list_display = ("id", "name", 'district')
+
+    list_display_links = ("id", "name",)
+
+    search_fields = ("name",)
+
+    readonly_fields = ('district',)
+
+    ordering = ("id", 'name',)
+
+    list_per_page = 25
+
+    autocomplete_fields = ('district',)
+
+    list_select_related = ('district',)
+
 class LocationAdmin(admin.ModelAdmin):
 
-    list_display = ("id", "city", 'district', 'lat', 'lng', 'address')
+    list_display = ("id", "city", 'district', 'ward', 'lat', 'lng', 'address')
 
     list_display_links = ("id", "city",)
 
-    search_fields = ("address", "city__name", "district__name")
+    search_fields = ("address", "city__name", "district__name", "ward__name")
 
     list_filter = [
 
@@ -107,15 +115,17 @@ class LocationAdmin(admin.ModelAdmin):
 
         ("district", RelatedDropdownFilter),
 
+        ("ward", RelatedDropdownFilter),
+
     ]
 
     ordering = ("id", 'address',)
 
     list_per_page = 25
 
-    autocomplete_fields = ('city', 'district')
+    autocomplete_fields = ('city', 'district', 'ward')
 
-    list_select_related = ('city',)
+    list_select_related = ('city', 'district', 'ward')
 
     form = LocationForm
 
@@ -207,6 +217,42 @@ custom_admin_site.register(City, CityAdmin)
 
 custom_admin_site.register(District, DistrictAdmin)
 
+custom_admin_site.register(Ward, WardAdmin)
+
 custom_admin_site.register(Location, LocationAdmin)
 
 custom_admin_site.register(Career, CareerAdmin)
+
+
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display = ("id", "actor_email", "action", "resource_type", "resource_id", "create_at")
+    list_filter = ("action", "resource_type")
+    search_fields = ("actor_email", "resource_type", "resource_id", "resource_repr", "request_path")
+    readonly_fields = (
+        "actor",
+        "actor_email",
+        "action",
+        "resource_type",
+        "resource_id",
+        "resource_repr",
+        "ip_address",
+        "user_agent",
+        "request_method",
+        "request_path",
+        "metadata",
+        "create_at",
+        "update_at",
+    )
+    ordering = ("-create_at",)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+custom_admin_site.register(AuditLog, AuditLogAdmin)

@@ -1,0 +1,383 @@
+'use client';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { 
+  Box, 
+  IconButton, 
+  Stack, 
+  Tooltip, 
+  Typography,
+  Chip,
+  alpha,
+  useTheme
+} from "@mui/material";
+import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DescriptionIcon from '@mui/icons-material/Description';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import DownloadIcon from '@mui/icons-material/Download';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import type { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
+
+import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
+import { CV_TYPES, ROUTES } from '../../../../configs/constants';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import DataTable from '../../../../components/Common/DataTable';
+import { formatRoute } from '@/utils/funcUtils';
+import { getSafeResourceUrl, openExternalUrlSafely } from '@/utils/safeExternalUrl';
+
+import SendEmailComponent from './SendEmailComponent';
+import AppliedStatusComponent from './AppliedStatusComponent';
+import AIAnalysisComponent from './AIAnalysisComponent';
+import { useConfig } from '@/hooks/useConfig';
+import type { JobPostActivity } from '@/types/models';
+import pc from '@/utils/muiColors';
+
+interface AppliedResumeTableProps {
+  rows: JobPostActivity[];
+  isLoading: boolean;
+  handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;
+  handleDelete: (id: string | number) => void;
+  onCreateEmployee?: (activity: JobPostActivity) => void;
+  onAnalysisStateChange?: (id: string | number, nextState: Partial<JobPostActivity>) => void;
+  blindMode?: boolean;
+  rowCount: number;
+  pagination: PaginationState;
+  onPaginationChange: OnChangeFn<PaginationState>;
+  sorting: SortingState;
+  onSortingChange: OnChangeFn<SortingState>;
+}
+
+const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
+  const { t, i18n } = useTranslation(['employer', 'common']);
+  const { push } = useRouter();
+  const { 
+    rows, 
+    isLoading, 
+    handleChangeApplicationStatus, 
+    handleDelete,
+    onCreateEmployee,
+    onAnalysisStateChange,
+    blindMode = false,
+    rowCount,
+    pagination,
+    onPaginationChange,
+    sorting,
+    onSortingChange
+  } = props;
+  const { allConfig } = useConfig();
+  const [openDrawerId, setOpenDrawerId] = useState<string | number | null>(null);
+
+  const selectedActivityInfo = useMemo(() => {
+    if (!openDrawerId) return null;
+    return rows.find(r => r.id === openDrawerId);
+  }, [openDrawerId, rows]);
+
+  const handleDrawerAnalysisStateChange = useCallback((nextState: Partial<JobPostActivity>) => {
+    if (!openDrawerId || !onAnalysisStateChange) return;
+    onAnalysisStateChange(openDrawerId, nextState);
+  }, [openDrawerId, onAnalysisStateChange]);
+
+  const columns = useMemo<ColumnDef<JobPostActivity>[]>(() => [
+    {
+      accessorKey: 'fullName',
+      header: t('appliedResume.table.profileName'),
+      enableSorting: true,
+      cell: (info) => (
+        <Box sx={{ py: 0.5 }}>
+          {(() => {
+            const resumeType = info.row.original.type || info.row.original.resume?.type;
+            const resumeTitle = info.row.original.title || info.row.original.resume?.title;
+            const isManualCandidate = Boolean(info.row.original.isManualCandidate);
+            // File URL for attached CV download
+            const cvFileUrl = info.row.original.resumeFileUrl || info.row.original.resume?.fileUrl || '';
+            const safeCvFileUrl = getSafeResourceUrl(cvFileUrl);
+            return (
+              <>
+                <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'text.primary', mb: 0.75 }}>
+                  {String(info.getValue() ?? '')}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {isManualCandidate ? (
+                    <Chip
+                      size="small"
+                      label={t('manualCandidate.badge')}
+                      sx={{ height: 22, fontSize: '0.68rem', fontWeight: 900 }}
+                    />
+                  ) : resumeType === CV_TYPES.cvWebsite ? (
+                    /* Online CV – informational only */
+                    <Tooltip title={t('appliedResume.table.onlineResume')} arrow>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        p: 0.5, 
+                        borderRadius: 1, 
+                        bgcolor: pc.primary( 0.08), 
+                        color: 'primary.main' 
+                      }}>
+                        <DescriptionIcon sx={{ fontSize: 14 }} />
+                      </Box>
+                    </Tooltip>
+                  ) : (
+                    /* Attached CV – click or hover to download */
+                    <Tooltip
+                      title={
+                        safeCvFileUrl ? (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <span>{t('appliedResume.table.attachedResume')}</span>
+                            <DownloadIcon sx={{ fontSize: 13 }} />
+                          </Box>
+                        ) : t('appliedResume.table.attachedResume')
+                      }
+                      arrow
+                    >
+                      <Box
+                        sx={{ 
+                          display: 'flex', 
+                          p: 0.5, 
+                          borderRadius: 1, 
+                          bgcolor: pc.error( 0.08), 
+                          color: 'error.main',
+                          cursor: safeCvFileUrl ? 'pointer' : 'default',
+                          textDecoration: 'none',
+                          '&:hover': safeCvFileUrl ? { bgcolor: pc.error( 0.16) } : {},
+                          transition: 'background-color 0.15s',
+                        }}
+                        {...(safeCvFileUrl ? {
+                          component: 'a' as const,
+                          href: safeCvFileUrl,
+                          download: true,
+                          onClick: (e: React.MouseEvent) => e.stopPropagation(),
+                        } : {})}
+                      >
+                        <PictureAsPdfIcon sx={{ fontSize: 14 }} />
+                      </Box>
+                    </Tooltip>
+                  )}
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.2px' }}>
+                    {resumeTitle || t('appliedResume.table.notUpdated')}
+                  </Typography>
+                </Box>
+              </>
+            );
+          })()}
+        </Box>
+      ),
+    },
+    {
+      accessorKey: 'jobName',
+      header: t('appliedResume.table.appliedPosition'),
+      enableSorting: true,
+      cell: (info) => (
+        <Typography variant="body2" noWrap sx={{ fontWeight: 800, color: 'primary.main', maxWidth: 200 }}>
+            {info.row.original.jobName ? String(info.row.original.jobName) : '---'}
+        </Typography>
+      ),
+    },
+    {
+      accessorKey: 'createAt',
+      header: t('appliedResume.table.appliedDate'),
+      enableSorting: true,
+      cell: (info) => (
+        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+            {info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '---'}
+        </Typography>
+      ),
+    },
+    {
+      id: 'type',
+      header: t('appliedResume.table.profileType'),
+      cell: (info) => {
+        const resumeType = info.row.original.type || info.row.original.resume?.type;
+        const isManualCandidate = Boolean(info.row.original.isManualCandidate);
+        const isOnline = resumeType === CV_TYPES.cvWebsite;
+        const cvFileUrl = info.row.original.resumeFileUrl || info.row.original.resume?.fileUrl || '';
+        const safeCvFileUrl = getSafeResourceUrl(cvFileUrl);
+        return (
+          <Tooltip
+            title={!isOnline && safeCvFileUrl ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <span>{t('appliedResume.table.clickToDownload')}</span>
+                <DownloadIcon sx={{ fontSize: 13 }} />
+              </Box>
+            ) : ''}
+            arrow
+            disableHoverListener={isOnline || !safeCvFileUrl}
+          >
+            <Chip 
+                label={isManualCandidate ? t('manualCandidate.badge') : isOnline ? t('appliedResume.table.onlineResume') : t('appliedResume.table.attachedResume')}
+                size="small" 
+                sx={{ 
+                  fontWeight: 900, 
+                  fontSize: '0.7rem',
+                  borderRadius: 1.5,
+                  bgcolor: isManualCandidate ? pc.secondary(0.08) : isOnline ? pc.primary( 0.08) : pc.error( 0.08),
+                  color: isManualCandidate ? 'secondary.main' : isOnline ? 'primary.main' : 'error.main',
+                  border: '1px solid',
+                  borderColor: isManualCandidate ? pc.secondary(0.1) : isOnline ? pc.primary( 0.1) : pc.error( 0.1),
+                  '& .MuiChip-label': { px: 1.5 },
+                  cursor: !isOnline && safeCvFileUrl ? 'pointer' : 'default',
+                }}
+                {...(!isOnline && safeCvFileUrl ? {
+                  component: 'a' as const,
+                  href: safeCvFileUrl,
+                  download: true,
+                  onClick: (e: React.MouseEvent) => e.stopPropagation(),
+                } : {})}
+            />
+          </Tooltip>
+        );
+      },
+    },
+    {
+      accessorKey: 'aiAnalysisScore',
+      id: 'aiAnalysisScore',
+      header: t('appliedResume.table.aiAnalysis'),
+      meta: { align: 'center' },
+      enableSorting: true,
+      cell: (info) => <AIAnalysisComponent row={info.row.original} onOpenDrawer={() => setOpenDrawerId(info.row.original.id)} />,
+    },
+    {
+      accessorKey: 'status',
+      header: t('appliedResume.table.status'),
+      meta: { align: 'right' },
+      cell: (info) => (
+        <AppliedStatusComponent
+          options={allConfig?.applicationStatusOptions || []}
+          defaultStatus={Number(info.getValue() ?? 0)}
+          id={String(info.row.original.id)}
+          handleChangeApplicationStatus={handleChangeApplicationStatus}
+        />
+      ),
+    },
+    {
+      id: 'actions',
+      header: t('appliedResume.table.actions'),
+      meta: { align: 'right' },
+      cell: (info) => (
+        <Stack direction="row" spacing={1} justifyContent="flex-end" alignItems="center">
+          {(() => {
+            const detailSlug = info.row.original.resumeSlug || info.row.original.resume?.slug || '';
+            const detailHref = detailSlug
+              ? localizeRoutePath(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, detailSlug)}`, i18n.language)
+              : undefined;
+            return (
+          <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
+            <span>
+              <IconButton
+                color="primary"
+                size="small"
+                disabled={blindMode || !detailSlug}
+                onClick={() => {
+                  if (blindMode || !detailHref) return;
+                  push(detailHref);
+                }}
+                sx={{ 
+                  bgcolor: pc.primary( 0.06),
+                  
+                  '&:hover': { bgcolor: pc.primary( 0.12) }
+                }}
+              >
+                <RemoveRedEyeIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+            );
+          })()}
+          
+          {!blindMode && (
+            <SendEmailComponent
+              jobPostActivityId={String(info.row.original.id)}
+              isSentEmail={info.row.original.isSentEmail || false}
+              email={info.row.original.email || ''}
+              fullName={info.row.original.fullName || ''}
+            />
+          )}
+
+          {!blindMode && info.row.original.hrmEmployeeId ? (
+            <Tooltip title={t('employees.hrm.convert.openEmployee')} arrow>
+              <IconButton
+                size="small"
+                color="primary"
+                onClick={() => {
+                  if (info.row.original.hrmEmployeeUrl) {
+                    openExternalUrlSafely(info.row.original.hrmEmployeeUrl);
+                  }
+                }}
+                sx={{
+                  bgcolor: pc.primary(0.06),
+                  
+                  '&:hover': { bgcolor: pc.primary(0.12) }
+                }}
+              >
+                <PersonAddAltIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          ) : (!blindMode && [4, 5].includes(Number(info.row.original.status)) && onCreateEmployee && (
+            <Tooltip title={t('employees.hrm.convert.action')} arrow>
+              <IconButton
+                size="small"
+                color="success"
+                onClick={() => onCreateEmployee(info.row.original)}
+                sx={{
+                  bgcolor: pc.success(0.06),
+                  
+                  '&:hover': { bgcolor: pc.success(0.12) }
+                }}
+              >
+                <PersonAddAltIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          ))}
+
+          <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>
+            <IconButton
+              size="small"
+              color="error"
+              onClick={() => handleDelete(info.row.original.id)}
+              sx={{ 
+                bgcolor: pc.error( 0.06),
+                
+                '&:hover': { bgcolor: pc.error( 0.12) }
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+      ),
+    },
+  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, onCreateEmployee, push, blindMode, i18n.language]);
+
+  return (
+    <>
+      {openDrawerId && selectedActivityInfo && (
+        <AIAnalysisDrawer
+          open={Boolean(openDrawerId)}
+          onClose={() => setOpenDrawerId(null)}
+          activityId={openDrawerId}
+          onAnalysisStateChange={handleDrawerAnalysisStateChange}
+          initialData={{
+            ...selectedActivityInfo,
+            aiAnalysisSummary: selectedActivityInfo.aiAnalysisSummary ?? undefined
+          } as AIAnalysisData}
+        />
+      )}
+      <DataTable
+        columns={columns}
+        data={rows}
+        isLoading={isLoading}
+        rowCount={rowCount}
+        pagination={pagination}
+        onPaginationChange={onPaginationChange}
+        enableSorting
+        sorting={sorting}
+        onSortingChange={onSortingChange}
+        emptyMessage={t('appliedResume.table.noCandidates')}
+      />
+    </>
+  );
+};
+
+export default AppliedResumeTable;

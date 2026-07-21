@@ -1,4 +1,12 @@
 {
+  "login": {
+    "slide1Title": "FIND THE BRIGHTEST TALENTS FOR YOUR BUSINESS",
+    "slide1Subtitle": "Search talented candidates from thousands of online resumes in our database.",
+    "slide2Title": "SMART AND EFFICIENT RECRUITMENT MANAGEMENT",
+    "slide2Subtitle": "Optimize your hiring process with a modern and intuitive management system.",
+    "slide3Title": "ADVANCED RECRUITMENT MANAGEMENT SYSTEM",
+    "slide3Subtitle": "Leverage AI to analyze, evaluate, and connect the most suitable candidates."
+  },
   "dashboard": {
     "totalUsers": "Total Users",
     "jobPosts": "Job Posts",
@@ -12,35 +20,121 @@
     "jobSeekers": "Job Seekers:",
     "status": "Status:",
     "statusActive": "Active",
+    "loadingChart": "Loading chart...",
+    "noUserData": "No user data yet",
     "pendingPosts": "Pending Posts:",
     "users": "users",
     "roles": {
       "employer": "Employer",
       "jobSeeker": "Job Seeker",
       "admin": "Admin"
+    },
+    "companies": "Companies",
+    "interviews": "Interviews",
+    "resumes": "Resumes",
+    "last30Days": "Last 30 days",
+    "verifiedRate": "Verified rate",
+    "activeRate": "Active rate",
+    "hiringRate": "Hiring rate",
+    "completionRate": "Completion rate",
+    "activeProfileRate": "Active CV rate",
+    "newApplications30d": "New applications",
+    "jobPostStatus": "Job post status",
+    "applicationPipeline": "Application pipeline",
+    "interviewStatus": "Interview status",
+    "profileCompanyStats": "Profiles & companies",
+    "operatingStats": "Operating stats",
+    "verifiedCompanies": "Verified companies",
+    "activeResumes": "Active resumes",
+    "savedJobs": "Saved jobs",
+    "savedResumes": "Saved resumes",
+    "companyFollowers": "Company followers",
+    "resumeViews": "Resume views",
+    "avgApplicationsPerJob": "Avg applications / job",
+    "questionBank": "Question bank",
+    "questionGroups": "Question groups",
+    "newJobPosts30d": "New job posts",
+    "newInterviews30d": "New interviews",
+    "noJobPostData": "No job post data yet",
+    "noApplicationData": "No application data yet",
+    "noInterviewData": "No interview data yet",
+    "cardHelpers": {
+      "userMix": "{{employers}} employers Â· {{jobSeekers}} job seekers",
+      "verifiedCompanies": "{{verified}} verified Â· {{pending}} pending",
+      "jobPostMix": "{{active}} active Â· {{pending}} pending",
+      "applicationMix": "{{pending}} pending Â· {{hired}} hired",
+      "interviewMix": "{{scheduled}} scheduled Â· {{completed}} completed",
+      "resumeMix": "{{active}} active Â· {{profiles}} profiles",
+      "pendingMix": "{{posts}} posts Â· {{companies}} company verifications",
+      "recentUsers": "{{employers}} employers Â· {{jobSeekers}} job seekers"
+    },
+    "jobStates": {
+      "active": "Active",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "applicationStates": {
+      "pending": "Pending",
+      "contacted": "Contacted",
+      "tested": "Tested",
+      "interviewed": "Interviewed",
+      "hired": "Hired",
+      "notSelected": "Not selected"
+    },
+    "interviewStates": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "inProgress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
     }
   },
   "sidebar": {
     "systemOverview": "System Overview",
+    "agentAssistants": "Agent Assistants",
     "systemAndUsers": "System & Users",
     "usersAndPermissions": "Users & Permissions",
     "systemConfiguration": "System Configuration",
+    "auditLogs": "Audit Logs",
     "generalCategories": "General Categories",
     "careersManagement": "Careers Management",
     "citiesManagement": "Cities Management",
     "districtsManagement": "Districts Management",
+    "wardsManagement": "Wards Management",
     "infoAndProfiles": "Info & Profiles",
     "companyManagement": "Company Management",
+    "companyVerifications": "Company Verifications",
     "candidateProfiles": "Candidate Profiles",
     "resumeManagement": "CV/Resume Management",
     "recruitmentAndInterviews": "Recruitment & Interviews",
     "jobPosts": "Job Posts",
+    "trustReports": "Violation Reports",
     "activityLogs": "Activity Logs",
     "questionBank": "Question Bank",
     "interviewQuestionSets": "Interview Question Sets",
     "interviewSchedule": "Interview Schedule",
     "interviewLive": "Direct Company Interviews",
-    "jobNotifications": "Job Notifications"
+    "jobNotifications": "Job Notifications",
+    "contentManagement": "Content Management",
+    "bannersManagement": "Banners Management",
+    "bannerTypes": "Banner Types",
+    "feedbacksManagement": "User Reviews",
+    "contactMessages": "Bug Reports & Contact Messages",
+    "articlesManagement": "News & Blog",
+      "chatWithEmployers": "Chat with Employers",
+      "voiceProfiles": "AI Voice Profiles",
+      "interviewPreview": "Interview UI Preview",
+      "squareHrmAdmin": "Open InfoHR HRM"
+  },
+  "aiHealth": {
+    "title": "AI services",
+    "status": {
+      "online": "Online",
+      "offline": "Offline",
+      "notConfigured": "Not configured",
+      "checking": "Checking..."
+    }
   },
   "pages": {
     "careers": {
@@ -50,10 +144,18 @@
       "breadcrumbCareers": "Careers",
       "addCareer": "Add Career",
       "searchPlaceholder": "Search careers...",
+      "filter": {
+        "title": "Career filters"
+      },
       "addConfirmTitle": "Add New Career",
       "editConfirmTitle": "Edit Career",
       "careerNameLabel": "Career Name",
       "iconLabel": "Icon (App)",
+      "keyCareerLabel": "Key Career",
+      "keyCareerBadge": "Key",
+      "uploadIconBtn": "Upload Icon",
+      "noIconSelected": "No file selected",
+      "existingIconHint": "The current image will be kept if you do not upload a new file.",
       "cancelBtn": "Cancel",
       "saveBtn": "Save",
       "savingBtn": "Saving...",
@@ -69,8 +171,29 @@
         "actions": "Actions",
         "edit": "Edit",
         "delete": "Delete",
-        "noData": "No data found"
-      }
+        "noData": "No data found",
+        "name": "Career Name"
+      },
+      "breadcrumbResources": "Resources",
+      "add": "Add Career",
+      "edit": "Edit",
+      "form": {
+        "name": "Career Name"
+      },
+      "validation": {
+        "nameRequired": "Career name is required",
+        "nameMax": "Career name must be at most 150 characters"
+      },
+      "toast": {
+        "addSuccess": "Career added successfully",
+        "addError": "Could not add career",
+        "updateSuccess": "Career updated successfully",
+        "updateError": "Could not update career",
+        "deleteSuccess": "Career deleted successfully",
+        "deleteError": "Could not delete career"
+      },
+      "cancel": "Cancel",
+      "deleteConfirm": "Are you sure you want to delete this career?"
     },
     "cities": {
       "title": "City Management",
@@ -78,9 +201,13 @@
       "breadcrumbGeneral": "General Config",
       "breadcrumbCities": "Cities",
       "addCity": "Add City",
+      "filter": {
+        "title": "City filters"
+      },
       "addConfirmTitle": "Add New City",
       "editConfirmTitle": "Edit City",
       "cityNameLabel": "City Name",
+      "cityCodeLabel": "City Code",
       "cancelBtn": "Cancel",
       "saveBtn": "Save",
       "savingBtn": "Saving...",
@@ -91,11 +218,31 @@
       "table": {
         "id": "ID",
         "cityName": "City Name",
+        "code": "Code",
         "actions": "Actions",
         "edit": "Edit",
         "delete": "Delete",
-        "noData": "No data found"
-      }
+        "noData": "No data found",
+        "name": "City Name"
+      },
+      "breadcrumbLocations": "Locations",
+      "add": "Add",
+      "searchPlaceholder": "Search...",
+      "edit": "Edit",
+      "form": {
+        "name": "Name",
+        "code": "Code"
+      },
+      "toast": {
+        "addSuccess": "City added successfully",
+        "addError": "Could not add city",
+        "updateSuccess": "City updated successfully",
+        "updateError": "Could not update city",
+        "deleteSuccess": "City deleted successfully",
+        "deleteError": "Could not delete city"
+      },
+      "cancel": "Cancel",
+      "deleteConfirm": "Are you sure you want to delete?"
     },
     "districts": {
       "title": "District Management",
@@ -104,10 +251,14 @@
       "breadcrumbDistricts": "Districts",
       "addDistrict": "Add District",
       "filterCityPlaceholder": "Select city to filter",
+      "filter": {
+        "title": "District filters"
+      },
       "addConfirmTitle": "Add New District",
       "editConfirmTitle": "Edit District",
       "cityLabel": "City",
       "districtNameLabel": "District Name",
+      "districtCodeLabel": "District Code",
       "cancelBtn": "Cancel",
       "saveBtn": "Save",
       "savingBtn": "Saving...",
@@ -118,16 +269,109 @@
       "table": {
         "id": "ID",
         "districtName": "District Name",
+        "code": "Code",
         "actions": "Actions",
         "edit": "Edit",
         "delete": "Delete",
         "noData": "No data found for this city",
-        "noCitySelected": "Please select a city to see the district list"
-      }
+        "noCitySelected": "Please select a city to see the district list",
+        "name": "Name",
+        "city": "City"
+      },
+      "breadcrumbLocations": "Locations",
+      "add": "Add",
+      "searchPlaceholder": "Search...",
+      "filterByCity": "Filter by City",
+      "edit": "Edit",
+      "form": {
+        "city": "City",
+        "name": "Name",
+        "code": "Code"
+      },
+      "toast": {
+        "addSuccess": "District added successfully",
+        "addError": "Could not add district",
+        "updateSuccess": "District updated successfully",
+        "updateError": "Could not update district",
+        "deleteSuccess": "District deleted successfully",
+        "deleteError": "Could not delete district"
+      },
+      "cancel": "Cancel",
+      "deleteConfirm": "Are you sure you want to delete?"
+    },
+    "wards": {
+      "title": "Ward Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbGeneral": "General Config",
+      "breadcrumbWards": "Wards",
+      "addWard": "Add Ward",
+      "filterCityPlaceholder": "Select city",
+      "filterDistrictPlaceholder": "Select district to filter",
+      "filter": {
+        "title": "Ward filters"
+      },
+      "addConfirmTitle": "Add New Ward",
+      "editConfirmTitle": "Edit Ward",
+      "districtLabel": "District",
+      "wardNameLabel": "Ward Name",
+      "wardCodeLabel": "Ward Code",
+      "cancelBtn": "Cancel",
+      "saveBtn": "Save",
+      "savingBtn": "Saving...",
+      "deleteTitle": "Confirm Delete",
+      "deleteText": "Are you sure you want to delete ward <strong>{{name}}</strong>? This action cannot be undone.",
+      "deleteBtn": "Confirm Delete",
+      "deletingBtn": "Deleting...",
+      "table": {
+        "id": "ID",
+        "wardName": "Ward Name",
+        "code": "Code",
+        "districtName": "District",
+        "actions": "Actions",
+        "edit": "Edit",
+        "delete": "Delete",
+        "noData": "No data found for this district",
+        "noDistrictSelected": "Please select a district to see the ward list",
+        "name": "Ward",
+        "district": "District",
+        "city": "City"
+      },
+      "toast": {
+        "addSuccess": "Ward added successfully",
+        "addError": "An error occurred while adding the ward",
+        "updateSuccess": "Ward updated successfully",
+        "updateError": "An error occurred while updating the ward",
+        "deleteSuccess": "Ward deleted successfully",
+        "deleteError": "An error occurred while deleting the ward"
+      },
+      "breadcrumbLocations": "Locations",
+      "add": "Add",
+      "searchPlaceholder": "Search...",
+      "filterByCity": "City",
+      "filterByDistrict": "District",
+      "edit": "Edit",
+      "form": {
+        "district": "District",
+        "name": "Ward Name",
+        "code": "Code"
+      },
+      "cancel": "Cancel",
+      "deleteConfirm": "Delete this ward?"
+    },
+    "locationValidation": {
+      "nameRequired": "Name is required",
+      "nameMax": "Name must be at most 255 characters",
+      "codeRequired": "Code is required",
+      "codeMax": "Code must be at most 20 characters",
+      "parentRequired": "Please choose a parent location",
+      "parentInvalid": "Please choose a valid parent location"
     },
     "companies": {
       "addCompany": "Add Company",
       "searchPlaceholder": "Search companies...",
+      "filter": {
+        "title": "Company filters"
+      },
       "addConfirmTitle": "Add New Company",
       "editConfirmTitle": "Edit Company Information",
       "companyNameLabel": "Company Name",
@@ -156,21 +400,80 @@
         "viewDetails": "View details",
         "edit": "Edit",
         "delete": "Delete"
+      },
+      "title": "Company List",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbList": "List",
+      "descriptionLabel": "Description",
+      "form": {
+        "since": "Founded date",
+        "cityId": "City ID",
+        "districtId": "District ID",
+        "wardId": "Ward ID",
+        "address": "Address",
+        "latitude": "Latitude",
+        "longitude": "Longitude"
+      },
+      "validation": {
+        "companyNameRequired": "Company name is required.",
+        "companyNameMax": "Company name must be at most 255 characters.",
+        "taxCodeRequired": "Tax code is required.",
+        "taxCodeMax": "Tax code must be at most 30 characters.",
+        "companyEmailRequired": "Company email is required.",
+        "companyEmailMax": "Company email must be at most 100 characters.",
+        "companyEmailInvalid": "Enter a valid company email.",
+        "companyPhoneRequired": "Company phone is required.",
+        "companyPhoneMax": "Company phone must be at most 15 characters.",
+        "companyPhoneInvalid": "Enter a valid company phone number.",
+        "employeeSizeInvalid": "Choose a valid employee size.",
+        "fieldOperationRequired": "Field of operation is required.",
+        "fieldOperationMax": "Field of operation must be at most 255 characters.",
+        "websiteUrlMax": "Website URL must be at most 300 characters.",
+        "websiteUrlInvalid": "Enter a valid website URL.",
+        "sinceInvalid": "Enter a valid founded date.",
+        "sinceFuture": "Founded date cannot be in the future.",
+        "cityRequired": "City is required.",
+        "cityInvalid": "Choose a valid city.",
+        "districtRequired": "District is required.",
+        "districtInvalid": "Choose a valid district.",
+        "wardInvalid": "Choose a valid ward.",
+        "addressRequired": "Address is required.",
+        "addressMax": "Address must be at most 255 characters."
+      },
+      "toast": {
+        "addSuccess": "Company added successfully",
+        "addError": "Could not add company",
+        "updateSuccess": "Company updated successfully",
+        "updateError": "Could not update company",
+        "deleteSuccess": "Company deleted successfully",
+        "deleteError": "Could not delete company"
       }
     },
     "jobActivity": {
+      "toast": {
+        "updateSuccess": "Application activity updated",
+        "updateError": "Could not update application activity",
+        "deleteSuccess": "Application activity deleted",
+        "deleteError": "Could not delete application activity"
+      },
       "title": "Job Post Activity Log",
       "breadcrumbAdmin": "Admin",
       "breadcrumbJobs": "Jobs & Interviews",
       "breadcrumbActivity": "Job Post Activities",
       "searchPlaceholder": "Search activities...",
+      "filter": {
+        "title": "Application filters"
+      },
       "editStatusTitle": "Update Application Status",
       "statusLabel": "Status",
       "statusOptions": {
-        "applied": "Applied",
-        "pending": "Pending",
-        "accepted": "Accepted",
-        "rejected": "Rejected"
+        "pendingConfirmation": "Pending confirmation",
+        "contacted": "Contacted",
+        "tested": "Tested",
+        "interviewed": "Interviewed",
+        "hired": "Hired",
+        "notSelected": "Not selected",
+        "unknown": "Unknown"
       },
       "cancelBtn": "Cancel",
       "saveBtn": "Save",
@@ -192,6 +495,16 @@
       }
     },
     "jobs": {
+      "toast": {
+        "updateSuccess": "Job post updated successfully",
+        "updateError": "Could not update job post",
+        "approveSuccess": "Job post approved",
+        "approveError": "Could not approve job post",
+        "rejectSuccess": "Job post rejected",
+        "rejectError": "Could not reject job post",
+        "deleteSuccess": "Job post deleted",
+        "deleteError": "Could not delete job post"
+      },
       "title": "Job Post List",
       "total": "total",
       "showing": "Showing",
@@ -216,6 +529,11 @@
       "cancel": "Cancel",
       "save": "Save",
       "deleteConfirm": "Are you sure you want to delete this job post?",
+      "bulkSelect": {
+        "selectedCount": "{{count}} job post(s) selected",
+        "deleteConfirm": "Are you sure you want to delete the selected job posts? This action cannot be undone.",
+        "deleteBtn": "Delete Selected"
+      },
       "table": {
         "status": {
           "pending": "Pending",
@@ -232,15 +550,53 @@
         "edit": "Edit",
         "approveAction": "Approve",
         "rejectAction": "Reject",
-        "delete": "Delete"
+        "delete": "Delete",
+        "title": "Title",
+        "verified": "Payment Verified?",
+        "createdAt": "Created At",
+        "view": "View",
+        "unverify": "Unverify",
+        "verify": "Verify Payment"
       },
       "filter": {
+        "title": "Job post filters",
         "searchPlaceholder": "Search by job title or company..."
-      }
+      },
+      "status": {
+        "draft": "Draft",
+        "active": "Active",
+        "expired": "Expired",
+        "pending": "Pending Review",
+        "rejected": "Rejected",
+        "approved": "Approved",
+        "unknown": "Unknown"
+      },
+      "verified": {
+        "yes": "Yes",
+        "no": "No"
+      },
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbListings": "Listings",
+      "breadcrumbJobs": "Job Posts",
+      "searchPlaceholder": "Search...",
+      "deleteTitle": "Delete Job Post"
     },
     "profiles": {
+      "toast": {
+        "addSuccess": "Candidate profile added successfully",
+        "addError": "Could not add candidate profile",
+        "updateSuccess": "Profile updated",
+        "updateError": "Could not update profile",
+        "deleteSuccess": "Profile deleted",
+        "deleteError": "Could not delete profile",
+        "importSuccess": "Imported {{created}} new candidates, updated {{updated}} profiles, skipped {{skipped}}.",
+        "importError": "Could not import candidates from Vieclam24h."
+      },
       "addCandidate": "Add Candidate",
       "searchPlaceholder": "Search candidates...",
+      "filter": {
+        "title": "Candidate pool filters"
+      },
       "addTitle": "Add New Candidate Profile",
       "editTitle": "Edit Candidate Profile",
       "fullNameLabel": "Full Name",
@@ -267,6 +623,18 @@
       "deleteText": "Are you sure you want to delete profile of <strong>{{name}}</strong>? This action cannot be undone.",
       "deleteBtn": "Confirm Delete",
       "deletingBtn": "Deleting...",
+      "import": {
+        "openButton": "Import candidates",
+        "dialogTitle": "Import candidates from Vieclam24h",
+        "sourceUrlLabel": "Recruitment link",
+        "accountLabel": "Account",
+        "passwordLabel": "Password",
+        "careerLabel": "Target industry",
+        "careerPlaceholder": "Select the industry to import",
+        "cancel": "Cancel",
+        "confirm": "Import candidates",
+        "importing": "Importing..."
+      },
       "table": {
         "avatar": "Avatar",
         "fullName": "Full Name",
@@ -278,7 +646,68 @@
         "viewDetails": "View details",
         "edit": "Edit",
         "delete": "Delete",
-        "noData": "No data found"
+        "noData": "No data found",
+        "candidate": "Candidate",
+        "title": "Title",
+        "createdAt": "Created At",
+        "view": "View"
+      },
+      "title": "Candidate Pool",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbResources": "Resources",
+      "breadcrumbProfiles": "Profiles",
+      "deleteConfirm": "This will be permanently deleted, continue?",
+      "cancel": "Cancel"
+    },
+    "profileDetail": {
+      "title": "Candidate Profile Detail",
+      "subtitle": "Review profile data, contact details, and related CVs.",
+      "back": "Back to list",
+      "deleteTitle": "Confirm profile deletion",
+      "deleteConfirm": "Are you sure you want to delete the profile of <strong>{{name}}</strong>? This action cannot be undone.",
+      "deleteBtn": "Delete profile",
+      "deletingBtn": "Deleting...",
+      "sections": {
+        "summary": "Overview",
+        "contact": "Contact information",
+        "details": "Profile details",
+        "resumes": "Related CVs"
+      },
+      "labels": {
+        "fullName": "Full name",
+        "email": "Email",
+        "phone": "Phone",
+        "birthday": "Date of birth",
+        "gender": "Gender",
+        "maritalStatus": "Marital status",
+        "location": "City/Province",
+        "district": "District",
+        "address": "Address",
+        "profileId": "Profile ID",
+        "source": "Data source",
+        "createdAt": "Created at",
+        "updatedAt": "Last updated",
+        "noData": "No data",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "table": {
+        "title": "CV Title",
+        "resumeType": "CV type",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "actions": "Actions",
+        "view": "View",
+        "download": "Download",
+        "openOnline": "Open online profile",
+        "noData": "No related CVs",
+        "attached": "Attached CV",
+        "online": "Online profile"
+      },
+      "messages": {
+        "loading": "Loading profile...",
+        "notFound": "Candidate profile not found.",
+        "noResumes": "This profile has no CVs yet."
       }
     },
     "questionGroups": {
@@ -312,11 +741,35 @@
         "questionCount": "Question Count",
         "actions": "Actions",
         "edit": "Edit",
-        "delete": "Delete"
-      }
+        "delete": "Delete",
+        "name": "Name",
+        "questionsCount": "Questions Count"
+      },
+      "breadcrumbContent": "Content",
+      "add": "Add",
+      "edit": "Edit",
+      "form": {
+        "name": "Group Name",
+        "description": "Description",
+        "questions": "Questions",
+        "questionsPlaceholder": "Select questions"
+      },
+      "cancel": "Cancel",
+      "deleteConfirm": "Delete this group?"
     },
     "resumes": {
+      "toast": {
+        "addSuccess": "Resume added successfully",
+        "addError": "Could not add resume",
+        "updateSuccess": "Resume updated successfully",
+        "updateError": "Could not update resume",
+        "deleteSuccess": "Resume deleted successfully",
+        "deleteError": "Could not delete resume"
+      },
       "searchPlaceholder": "Search resumes...",
+      "filter": {
+        "title": "Resume filters"
+      },
       "editTitle": "Edit Resume",
       "resumeTitleLabel": "Resume Title",
       "minSalaryLabel": "Min Salary",
@@ -342,10 +795,28 @@
         "inactive": "Inactive",
         "viewDetails": "View details",
         "delete": "Delete",
-        "noData": "No data found"
-      }
+        "noData": "No data found",
+        "title": "Resume Title",
+        "default": "Default",
+        "createdAt": "Created At",
+        "view": "View Resume",
+        "download": "Download CV"
+      },
+      "title": "Resume Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbResources": "Resources",
+      "breadcrumbResumes": "Resumes",
+      "deleteConfirm": "Delete this resume?",
+      "cancel": "Cancel"
     },
     "users": {
+      "bulkSelect": {
+        "selectedCount": "{{count}} user(s) selected",
+        "deleteConfirm": "Are you sure you want to delete the selected users? This action cannot be undone.",
+        "deleteBtn": "Delete Selected",
+        "disableConfirm": "Block all selected users? Your own account will be skipped.",
+        "disableBtn": "Block Selected"
+      },
       "table": {
         "id": "ID",
         "fullName": "Full Name",
@@ -361,6 +832,8 @@
         "scheduleInterview": "Schedule Interview",
         "blockAccount": "Block account",
         "unblockAccount": "Unblock account",
+        "delete": "Delete",
+        "delete": "Delete",
         "noUsers": "No users found"
       },
       "filter": {
@@ -374,11 +847,14 @@
         "timeLabel": "Interview Time",
         "questionsLabel": "Select questions",
         "questionsPlaceholder": "Search questions...",
+        "questionFallback": "Question #{{id}}",
         "notesLabel": "Notes",
         "notesPlaceholder": "Additional notes about the interview...",
         "cancelBtn": "Cancel",
         "submitBtn": "Schedule Interview",
-        "schedulingBtn": "Scheduling..."
+        "schedulingBtn": "Scheduling...",
+        "success": "Interview scheduled successfully.",
+        "error": "Could not schedule interview."
       },
       "roles": {
         "admin": "Administrator",
@@ -388,9 +864,129 @@
       "toast": {
         "blockSuccess": "Account blocked.",
         "unblockSuccess": "Account unblocked.",
+        "deleteSuccess": "User deleted successfully.",
+        "bulkDisableSuccess": "Blocked {{count}} user(s).",
         "actionFailed": "Operation failed.",
         "roleUpdated": "Role updated.",
         "roleUpdateFailed": "Role update failed."
+      },
+      "searchPlaceholder": "Search name/email...",
+      "filters": {
+        "title": "User filters",
+        "role": "Role",
+        "allRoles": "All"
+      },
+      "deleteTitle": "Confirm Delete User",
+      "deleteConfirm": "Are you sure you want to delete user <strong>{{name}}</strong>? This action cannot be undone.",
+      "deleteBtn": "Delete",
+      "cancel": "Cancel",
+      "title": "User Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbList": "List"
+    },
+    "companyVerifications": {
+      "title": "Company Verifications",
+      "subtitle": "Review legal profiles and update verification status.",
+      "empty": "No verification requests.",
+      "reviewNotePlaceholder": "Review note",
+      "table": {
+        "company": "Company",
+        "legalProfile": "Legal profile",
+        "adminNote": "Admin note",
+        "status": "Status"
+      },
+      "legal": {
+        "tax": "Tax: {{value}}",
+        "license": "License: {{value}}",
+        "representative": "Representative: {{value}}"
+      },
+      "status": {
+        "pending": "Pending",
+        "reviewing": "Reviewing",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "actions": {
+        "update": "Update"
+      },
+      "toast": {
+        "updateSuccess": "Verification status updated.",
+        "updateError": "Could not update verification status."
+      }
+    },
+    "trustReports": {
+      "title": "Violation Reports",
+      "subtitle": "Review reports for job posts and company profiles.",
+      "searchPlaceholder": "Search violation reports...",
+      "empty": "No violation reports.",
+      "filter": {
+        "title": "Violation report filters",
+        "description": "Search by reason, message, company, job post, or reporter.",
+        "reset": "Clear filters",
+        "advanced": "Advanced filters",
+        "reporter": "Reporter",
+        "reporterPlaceholder": "Reporter name or email",
+        "status": "Status",
+        "targetType": "Target type",
+        "all": "All"
+      },
+      "targetType": {
+        "job": "Job post",
+        "company": "Company"
+      },
+      "table": {
+        "id": "ID",
+        "target": "Target",
+        "reason": "Reason",
+        "reporter": "Reporter",
+        "message": "Message",
+        "status": "Status"
+      },
+      "status": {
+        "open": "Open",
+        "reviewing": "Reviewing",
+        "resolved": "Resolved",
+        "rejected": "Rejected"
+      },
+      "toast": {
+        "updateSuccess": "Report status updated.",
+        "updateError": "Could not update report status."
+      }
+    },
+    "auditLogs": {
+      "title": "Audit Logs",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Audit Logs",
+      "searchPlaceholder": "Search email, action, resource, request...",
+      "exportCsv": "Export CSV",
+      "exportingCsv": "Exporting...",
+      "filter": {
+        "title": "Audit log filters",
+        "action": "Action",
+        "allActions": "All",
+        "actorEmail": "Actor email",
+        "resourceType": "Resource type",
+        "resourceId": "Resource ID",
+        "dateFrom": "From date",
+        "dateTo": "To date"
+      },
+      "actions": {
+        "create": "Create",
+        "update": "Update",
+        "delete": "Delete",
+        "approve": "Approve",
+        "reject": "Reject",
+        "status_change": "Status change",
+        "bulk_status": "Bulk status",
+        "agent_access": "Agent access",
+        "export": "Export"
+      },
+      "table": {
+        "time": "Time",
+        "action": "Action",
+        "actor": "Actor",
+        "resource": "Resource",
+        "request": "Request"
       }
     },
     "questions": {
@@ -407,6 +1003,11 @@
       "cancelBtn": "Cancel",
       "saveBtn": "Save",
       "savingBtn": "Saving...",
+      "bulkSelect": {
+        "selectedCount": "{{count}} question(s) selected",
+        "deleteConfirm": "Are you sure you want to delete the selected questions? This action cannot be undone.",
+        "deleteBtn": "Delete Selected"
+      },
       "difficulty": {
         "easy": "Easy",
         "medium": "Medium",
@@ -419,8 +1020,24 @@
         "actions": "Actions",
         "general": "General",
         "edit": "Edit",
-        "delete": "Delete"
-      }
+        "delete": "Delete",
+        "text": "Content",
+        "type": "Type",
+        "category": "Category"
+      },
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbContent": "Content",
+      "breadcrumbQuestions": "Questions",
+      "add": "Add Question",
+      "searchPlaceholder": "Search...",
+      "edit": "Update",
+      "form": {
+        "text": "Content",
+        "type": "Type",
+        "category": "Category"
+      },
+      "cancel": "Cancel",
+      "deleteTitle": "Delete Question"
     },
     "interviewLive": {
       "title": "Live Company Interviews",
@@ -440,11 +1057,22 @@
       }
     },
     "jobNotifications": {
+      "toast": {
+        "createSuccess": "Notification created successfully",
+        "createError": "Could not create notification",
+        "updateSuccess": "Notification updated successfully",
+        "updateError": "Could not update notification",
+        "deleteSuccess": "Notification deleted successfully",
+        "deleteError": "Could not delete notification"
+      },
       "title": "Job Notifications",
       "breadcrumbAdmin": "Admin",
       "breadcrumbJobsInterviews": "Jobs & Interviews",
       "addBtn": "Create Notification",
       "searchPlaceholder": "Search notifications...",
+      "filter": {
+        "title": "Job notification filters"
+      },
       "addTitle": "Create New Notification",
       "editTitle": "Edit Notification",
       "labelTitle": "Title",
@@ -464,54 +1092,805 @@
         "actions": "Actions",
         "edit": "Edit",
         "delete": "Delete",
-        "noData": "No data found"
-      }
+        "noData": "No data found",
+        "image": "Image",
+        "createdAt": "Created At"
+      },
+      "breadcrumbNotifications": "Notifications",
+      "addNotification": "Add Notification",
+      "editNotification": "Update",
+      "form": {
+        "title": "Title",
+        "imageUrl": "Image URL",
+        "content": "Content",
+        "salary": "Expected Salary",
+        "frequency": "Notification Frequency (days)",
+        "position": "Position / Job Title",
+        "experience": "Experience (years)",
+        "careerId": "Field / Career",
+        "cityId": "City",
+        "isActive": "Active"
+      },
+      "validation": {
+        "jobNameRequired": "Title is required",
+        "jobNameMax": "Title must be at most 255 characters",
+        "numberInteger": "Enter a whole number",
+        "salaryMin": "Salary cannot be negative",
+        "frequencyInvalid": "Choose a valid notification frequency",
+        "idInvalid": "Enter a positive ID or leave this field empty",
+        "choiceInvalid": "Choose a valid option"
+      },
+      "cancel": "Cancel",
+      "deleteTitle": "Delete Notification",
+      "deleteConfirm": "Are you sure you want to delete this notification?"
     },
     "interviews": {
+      "bulkSelect": {
+        "selectedCount": "{{count}} interview(s) selected",
+        "deleteConfirm": "Are you sure you want to delete the selected interviews? This action cannot be undone.",
+        "deleteBtn": "Delete Selected"
+      },
       "type": {
         "vetting": "Vetting",
         "recruitment": "Recruitment"
-      }
+      },
+      "status": {
+        "scheduled": "Scheduled",
+        "in_progress": "In Progress",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "calibration": "Calibration",
+        "processing": "Processing",
+        "expired": "Expired",
+        "draft": "Draft",
+        "interrupted": "Interrupted",
+        "connecting": "Connecting",
+        "active": "Active"
+      },
+      "table": {
+        "room": "Room",
+        "jobPost": "Job Post",
+        "candidate": "Candidate",
+        "status": "Status",
+        "scheduledAt": "Scheduled At",
+        "actions": "Actions",
+        "view": "View details",
+        "markCompleted": "Mark completed",
+        "cancel": "Cancel",
+        "editStatus": "Edit Status",
+        "delete": "Delete"
+      },
+      "title": "Interview Schedule",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Interviews",
+      "searchPlaceholder": "Search interviews...",
+      "filter": {
+        "title": "Interview filters"
+      },
+      "detailTitle": "Interview details",
+      "recordingLink": "Open recording",
+      "toast": {
+        "statusUpdated": "Interview status updated",
+        "statusUpdateError": "Could not update interview status",
+        "deleteSuccess": "Interview deleted",
+        "deleteError": "Could not delete interview"
+      },
+      "editStatusTitle": "Change Interview Status",
+      "form": {
+        "status": "Status"
+      },
+      "cancel": "Cancel",
+      "save": "Save",
+      "deleteTitle": "Delete Interview",
+      "deleteConfirm": "Are you sure you want to delete?",
+      "delete": "Delete"
     },
     "settings": {
       "title": "System Settings",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Settings",
       "generalTitle": "General Settings",
       "maintenanceMode": {
         "label": "System Maintenance",
-        "description": "Stop all user activities for maintenance"
+        "description": "Stop all user activities for maintenance",
+        "desc": "Stop all user activities for maintenance"
       },
       "autoApproveJobs": {
         "label": "Auto-approve Job Posts",
-        "description": "Allow job posts to be approved automatically"
+        "description": "Allow job posts to be approved automatically",
+        "desc": "Allow job posts to be approved automatically"
       },
       "emailNotifications": {
         "label": "Email Notifications",
-        "description": "Send system notifications via email to administrators"
+        "description": "Send system notifications via email to administrators",
+        "desc": "Send system notifications via email to administrators"
       },
-      "saveBtn": "Save Changes"
+    "interviewAi": {
+      "pacingTitle": "Interview AI Pacing",
+      "pacingDescription": "Tune how quickly the interviewer speaks and how long it waits before asking the next question.",
+      "preset": {
+        "label": "Pacing preset",
+        "helper": "Choose a preset to fill all timing values, or switch to Custom and adjust manually.",
+        "options": {
+          "balanced": "Balanced",
+          "natural": "Natural",
+          "snappy": "Snappy",
+          "custom": "Custom"
+        }
+      },
+      "questionGap": {
+        "label": "Gap before next question (seconds)",
+        "helper": "Increase this if the AI interrupts candidates too quickly."
+      },
+      "silenceThreshold": {
+        "label": "Minimum silence threshold (seconds)",
+        "helper": "Keep this above zero if you want the AI to feel less eager to jump in."
+      },
+      "ttsTitle": "TTS Speed",
+      "ttsDescription": "Control how fast the AI voice speaks during the interview.",
+      "ttsSpeed": {
+        "label": "Voice speed",
+        "helper": "1.0 is normal. Lower values sound calmer; higher values sound faster."
+      }
+    },
+      "apiTitle": "API & External Services",
+      "googleApiKey": "Google API Key",
+      "supportEmail": "Support Email",
+      "summary": "Configuration Summary",
+      "summaryText": "Please review all configuration settings carefully before saving. Changes may affect the entire system immediately.",
+      "saveBtn": "Save Changes",
+      "notificationDemo": {
+        "title": "Notification Demo",
+        "description": "Send a demo notification to verify delivery settings.",
+        "send": "Send demo notification",
+        "sending": "Sending...",
+        "success": "Demo notification sent.",
+        "error": "Failed to send demo notification."
+      },
+      "healthCheck": {
+        "title": "System Health",
+        "description": "Check database and cache connectivity.",
+        "check": "Check health",
+        "checking": "Checking...",
+        "database": "Database",
+        "redis": "Redis"
+      },
+      "fptGpu": {
+        "title": "FPT GPU Container",
+        "controlEnabled": "Control enabled",
+        "readOnly": "Read only",
+        "notConfigured": "Add FPT_GPU_BSS_ACCESS_TOKEN or FPT_GPU_ACCESS_TOKEN on the backend to enable Start and Stop.",
+        "bootstrapNotConfigured": "Add FPT GPU SSH settings on the backend to enable bootstrap.",
+        "tenant": "Tenant",
+        "runningCost": "Running cost",
+        "stoppedDiskCost": "Stopped disk cost",
+        "startBootstrap": "Start & Bootstrap",
+        "bootstrap": "Bootstrap",
+        "start": "Start",
+        "stop": "Stop",
+        "refresh": "Refresh",
+        "openConsole": "Open FPT",
+        "toast": {
+          "startBootstrapSuccess": "FPT GPU start and bootstrap requested.",
+          "bootstrapSuccess": "FPT GPU bootstrap requested.",
+          "startSuccess": "FPT GPU start requested.",
+          "stopSuccess": "FPT GPU stop requested.",
+          "actionError": "FPT GPU action failed."
+        }
+      },
+      "toast": {
+        "saveSuccess": "Settings saved successfully",
+        "saveError": "Error saving settings"
+      }
+    },
+    "banners": {
+      "toast": {
+        "addSuccess": "Banner added successfully",
+        "addError": "Could not add banner",
+        "updateSuccess": "Banner updated successfully",
+        "updateError": "Could not update banner",
+        "deleteSuccess": "Banner deleted successfully",
+        "deleteError": "Could not delete banner"
+      },
+      "title": "Banner Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Banners",
+      "addBtn": "Add Banner",
+      "editTitle": "Edit Banner",
+      "addTitle": "Add Banner",
+      "deleteTitle": "Delete Banner",
+      "deleteConfirm": "Are you sure you want to delete banner #{{id}}?",
+      "empty": "No banners yet",
+      "active": "Active",
+      "inactive": "Inactive",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "validation": {
+        "descriptionMax": "Description must be at most 100 characters.",
+        "buttonTextMax": "Button text must be at most 20 characters.",
+        "buttonLinkInvalid": "Button link must be a valid http or https URL.",
+        "platformInvalid": "Choose a valid platform.",
+        "typeInvalid": "Choose an active banner type.",
+        "descriptionLocationInvalid": "Choose a valid description position."
+      },
+      "table": {
+        "id": "ID",
+        "webImage": "Web Image",
+        "mobileImage": "Mobile Image",
+        "description": "Description",
+        "platform": "Platform",
+        "type": "Type",
+        "status": "Status",
+        "actions": "Actions",
+        "edit": "Edit",
+        "deleteTooltip": "Delete",
+        "editTooltip": "Edit"
+      },
+      "errorLoadingImage": "Error loading image",
+      "noWebImage": "No web image",
+      "noMobileImage": "No mobile image",
+      "form": {
+        "description": "Description",
+        "buttonText": "Button Text",
+        "buttonLink": "Button Link",
+        "platform": "Platform",
+        "bannerType": "Banner Type",
+        "descLocation": "Description Position",
+        "showButton": "Show Button",
+        "activeLabel": "Active",
+        "webImageLabel": "Web Banner Image",
+        "mobileImageLabel": "Mobile Banner Image",
+        "chooseWeb": "Choose web image",
+        "chooseMobile": "Choose mobile image",
+        "platformOptions": {
+          "web": "Web",
+          "app": "Mobile App"
+        },
+        "typeOptions": {
+          "home": "Home",
+          "mainJobRight": "Main Job Right"
+        },
+        "descLocationOptions": {
+          "topLeft": "Top Left",
+          "topRight": "Top Right",
+          "bottomLeft": "Bottom Left",
+          "bottomRight": "Bottom Right"
+        }
+      }
+    },
+    "articles": {
+      "title": "News & Blog",
+      "subtitle": "Manage news articles and recruitment blog posts",
+      "newArticle": "New article",
+      "filter": {
+        "title": "Article filters",
+        "searchPlaceholder": "Search articles...",
+        "status": "Status"
+      },
+      "table": {
+        "title": "Title",
+        "category": "Category",
+        "status": "Status",
+        "author": "Author",
+        "publishedAt": "Published at",
+        "viewCount": "Views",
+        "actions": "Actions"
+      },
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "search": "Search",
+        "clearFilters": "Clear filters",
+        "advancedFilters": "Advanced filters",
+        "saveDraft": "Save draft",
+        "publish": "Publish",
+        "saving": "Saving...",
+        "changeImage": "Change image",
+        "chooseImage": "Choose thumbnail",
+        "addTag": "Add"
+      },
+      "categories": {
+        "all": "All",
+        "news": "News",
+        "blog": "Recruitment blog"
+      },
+      "statuses": {
+        "all": "All",
+        "draft": "Draft",
+        "pending": "Pending review",
+        "published": "Published",
+        "archived": "Archived"
+      },
+      "form": {
+        "createTitle": "Write new article",
+        "editTitle": "Edit article",
+        "titleLabel": "Article title",
+        "titlePlaceholder": "Enter an engaging title...",
+        "excerptLabel": "Short excerpt",
+        "excerptPlaceholder": "Summarize the article for the list view...",
+        "contentTitle": "ARTICLE CONTENT",
+        "publishSettings": "PUBLISH SETTINGS",
+        "categoryLabel": "Category",
+        "statusLabel": "Status",
+        "thumbnailTitle": "THUMBNAIL",
+        "thumbnailAria": "Article thumbnail",
+        "thumbnailAlt": "Article thumbnail preview",
+        "tagsTitle": "TAGS",
+        "tagPlaceholder": "Enter tag..."
+      },
+      "validation": {
+        "titleRequired": "Please enter a title.",
+        "titleMax": "Article title must be at most 255 characters.",
+        "excerptMax": "Short excerpt must be at most 500 characters.",
+        "contentRequired": "Please enter article content.",
+        "categoryInvalid": "Choose a valid category.",
+        "statusInvalid": "Choose a valid status.",
+        "tagsMax": "Tags must be at most 500 characters."
+      },
+      "messages": {
+        "loadError": "Could not load article list.",
+        "deleteConfirm": "Delete \"{{title}}\"?",
+        "deleteSuccess": "Article deleted.",
+        "deleteError": "Could not delete article.",
+        "formLoadError": "Could not load article.",
+        "createSuccess": "Article created successfully.",
+        "updateSuccess": "Article saved successfully.",
+        "saveError": "Could not save article."
+      }
+    },
+    "interviewPreview": {
+      "steps": {
+        "waiting": {
+          "label": "1. Waiting room",
+          "desc": "Before device check"
+        },
+        "preflight": {
+          "label": "2. Device check",
+          "desc": "Check microphone / camera"
+        },
+        "connected": {
+          "label": "3. Interview room",
+          "desc": "Live interview interface"
+        }
+      },
+      "waiting": {
+        "title": "Ready to start the interview",
+        "description": "Check your devices before joining the interview room with AI and the employer.",
+        "start": "Check devices & enter room",
+        "scheduled": "Scheduled: {{time}}"
+      },
+      "preflight": {
+        "title": "Device check",
+        "description": "Make sure microphone and camera work before entering the room.",
+        "microphone": "Microphone",
+        "cameraPreview": "Camera preview"
+      },
+      "actions": {
+        "back": "Back",
+        "joinRoom": "Enter interview room",
+        "jumpToRoom": "Jump to interview room ->"
+      },
+      "connected": {
+        "aiInterviewer": "AI Interviewer",
+        "chatTitle": "Chat",
+        "chatMessages": {
+          "aiGreeting": "Hello! I am the AI interview assistant. Let's begin.",
+          "candidateReady": "Yes, I am ready.",
+          "reactQuestion": "Can you describe your experience working with React.js?",
+          "reactExperience": "I have 3 years of React experience, mainly working at startups..."
+        },
+        "messageInput": "Type a message...",
+        "observerNotice": "Employer is observing this interview session",
+        "you": "You",
+        "end": "End"
+      },
+      "aria": {
+        "turnMicrophoneOff": "Turn microphone off",
+        "turnMicrophoneOn": "Turn microphone on",
+        "turnCameraOff": "Turn camera off",
+        "turnCameraOn": "Turn camera on",
+        "shareScreen": "Share screen",
+        "closeChat": "Close chat",
+        "openChat": "Open chat"
+      },
+      "header": {
+        "eyebrow": "Admin preview",
+        "title": "Interview flow, fake data",
+        "previewMode": "Preview mode"
+      },
+      "status": {
+        "waiting": "Waiting to enter",
+        "preflight": "Checking devices",
+        "connected": "Interviewing"
+      },
+      "session": {
+        "position": "Position",
+        "candidate": "Candidate",
+        "room": "Room"
+      },
+      "footerNote": "All data is fake and only for UI preview. Access:"
+    },
+    "voiceProfiles": {
+      "title": "Voice Profiles",
+      "breadcrumbAdmin": "Admin",
+      "newVoice": "New Voice",
+      "loadError": "Could not load voice profiles.",
+      "searchPlaceholder": "Search voice profiles...",
+      "filter": {
+        "title": "Voice profile filters",
+        "description": "Search by name, status, or voice type.",
+        "reset": "Clear filters",
+        "advanced": "Advanced filters",
+        "status": "Status",
+        "type": "Type",
+        "all": "All"
+      },
+      "table": {
+        "name": "Name",
+        "type": "Type",
+        "status": "Status",
+        "samples": "Samples",
+        "grants": "Grants",
+        "actions": "Actions",
+        "empty": "No voice profiles yet."
+      },
+      "actions": {
+        "edit": "Edit",
+        "sample": "Sample",
+        "grant": "Grant",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "create": "Create",
+        "createAndUpload": "Create & Upload",
+        "save": "Save",
+        "close": "Close",
+        "generateAndPlay": "Generate & Play",
+        "upload": "Upload",
+        "prepareVoice": "Prepare voice"
+      },
+      "dialogs": {
+        "createTitle": "New Voice Profile",
+        "editTitle": "Edit Voice Profile",
+        "deleteTitle": "Delete Voice Profile",
+        "testTitle": "Test Voice",
+        "sampleTitle": "Upload Voice Sample",
+        "grantTitle": "Grant Voice Access"
+      },
+      "fields": {
+        "name": "Name",
+        "description": "Description",
+        "type": "Type",
+        "language": "Language",
+        "presetVoiceId": "Preset voice ID",
+        "status": "Status",
+        "exactTranscript": "Exact transcript",
+        "testSentence": "Test sentence",
+        "grantTo": "Grant to",
+        "company": "Company",
+        "jobPost": "Job post"
+      },
+      "voiceTypes": {
+        "cloned": "Cloned",
+        "preset": "Preset"
+      },
+      "statuses": {
+        "draft": "Draft",
+        "processing": "Processing",
+        "ready": "Ready",
+        "disabled": "Disabled",
+        "failed": "Failed"
+      },
+      "grantTargets": {
+        "company": "Company",
+        "job": "Job post"
+      },
+      "messages": {
+        "cloneHint": "Upload a clean mp3/wav sample and paste the exact transcript for cloning.",
+        "sampleHint": "Use 10-30 seconds of clean speech and paste the exact transcript.",
+        "preparationSummary": "Samples: {{sampleCount}} | Total duration: {{totalDurationSeconds}}s | {{readyLabel}}",
+        "readyForReuse": "Ready to reuse",
+        "needsPrepare": "Needs prepare",
+        "permissionConfirm": "I confirm we have permission to clone and use this voice.",
+        "deleteConfirm": "Delete \"{{name}}\"? This also removes its samples and grants.",
+        "defaultVoice": "Use as default voice for this target",
+        "chooseAudio": "Choose mp3/wav",
+        "createSampleAria": "Create voice sample",
+        "uploadSampleAria": "Upload voice sample",
+        "generatedPreviewAria": "Generated voice preview",
+        "testActionAria": "Test {{name}}",
+        "defaultTestSentence": "Hello, this is InfoHR's AI interview voice."
+      },
+      "validation": {
+        "nameRequired": "Voice profile name is required.",
+        "nameMax": "Voice profile name must be at most 160 characters.",
+        "languageRequired": "Language is required.",
+        "languageMax": "Language must be at most 16 characters.",
+        "presetVoiceIdRequired": "Preset voice ID is required for preset profiles.",
+        "presetVoiceIdMax": "Preset voice ID must be at most 255 characters.",
+        "consentRequired": "Consent confirmation is required for cloned voices.",
+        "cloneSampleRequired": "Audio file and exact transcript are required for cloned voices.",
+        "voiceNotReady": "Voice must be ready before testing.",
+        "testSentenceRequired": "Enter a sentence to test this voice.",
+        "sampleRequired": "Audio file and transcript are required.",
+        "companyRequired": "Select a company.",
+        "jobRequired": "Select a job post."
+      },
+      "toast": {
+        "createWithSampleSuccess": "Voice profile and sample created.",
+        "createSuccess": "Voice profile created.",
+        "createError": "Could not create voice profile.",
+        "updateSuccess": "Voice profile updated.",
+        "updateError": "Could not update voice profile.",
+        "deleteSuccess": "Voice profile deleted.",
+        "deleteError": "Could not delete voice profile.",
+        "previewError": "Could not generate voice preview.",
+        "sampleSuccess": "Voice sample uploaded.",
+        "sampleError": "Could not upload voice sample.",
+        "prepareSuccess": "Voice profile prepared and ready to reuse.",
+        "prepareError": "Could not prepare voice profile.",
+        "grantSuccess": "Voice access granted.",
+        "grantError": "Could not grant voice access."
+      }
+    },
+    "bannerTypes": {
+      "title": "Banner Type Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbList": "Banner Types",
+      "addButton": "Add Banner Type",
+      "addTitle": "Add Banner Type",
+      "editTitle": "Edit Banner Type",
+      "deleteTitle": "Delete Banner Type",
+      "deleteConfirm": "Are you sure you want to delete banner type {{name}}?",
+      "searchPlaceholder": "Search banner types...",
+      "filter": {
+        "title": "Banner type filters"
+      },
+      "toast": {
+        "addSuccess": "Banner type added successfully",
+        "addError": "Could not add banner type",
+        "updateSuccess": "Banner type updated successfully",
+        "updateError": "Could not update banner type",
+        "deleteSuccess": "Banner type deleted successfully",
+        "deleteError": "Could not delete banner type"
+      },
+      "table": {
+        "id": "ID",
+        "code": "Code",
+        "name": "Name",
+        "value": "Value",
+        "webAspectRatio": "Web Aspect Ratio",
+        "status": "Status"
+      },
+      "fields": {
+        "code": "Code",
+        "name": "Name",
+        "value": "Value",
+        "webAspectRatio": "Web Aspect Ratio",
+        "mobileAspectRatio": "Mobile Aspect Ratio",
+        "isActive": "Active"
+      },
+      "validation": {
+        "codeRequired": "Code is required",
+        "codeMax": "Code must be at most 50 characters",
+        "nameRequired": "Name is required",
+        "nameMax": "Name must be at most 100 characters",
+        "valueInteger": "Value must be a whole number",
+        "valuePositive": "Value must be greater than 0",
+        "aspectRatioMax": "Aspect ratio must be at most 20 characters"
+      }
+    },
+    "feedbacks": {
+      "toast": {
+        "addSuccess": "Feedback created successfully",
+        "addError": "Could not create feedback",
+        "updateSuccess": "Feedback updated successfully",
+        "updateError": "Could not update feedback",
+        "deleteSuccess": "Feedback deleted successfully",
+        "deleteError": "Could not delete feedback"
+      },
+      "title": "User Reviews",
+      "addBtn": "Add Review",
+      "addTitle": "Add Review",
+      "editTitle": "Edit Review",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "User Reviews",
+      "searchPlaceholder": "Search user reviews...",
+      "filter": {
+        "title": "Review filters",
+        "description": "Search by content, user, rating, status, or evidence.",
+        "reset": "Clear filters",
+        "advanced": "Advanced filters",
+        "user": "User",
+        "userPlaceholder": "User name, email, or ID",
+        "status": "Status",
+        "evidence": "Evidence",
+        "rating": "Rating",
+        "all": "All",
+        "active": "Active",
+        "hidden": "Hidden",
+        "withEvidence": "With evidence",
+        "withoutEvidence": "Without evidence"
+      },
+      "deleteTitle": "Delete Review",
+      "deleteConfirm": "Are you sure you want to delete review from {{name}}?",
+      "empty": "No reviews yet",
+      "show": "Show",
+      "hide": "Hide",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "save": "Save",
+      "saving": "Saving...",
+      "deleting": "Deleting...",
+      "close": "Close",
+      "evidencePreviewTitle": "Evidence image - {{name}}",
+      "validation": {
+        "contentRequired": "Content is required",
+        "ratingInvalid": "Rating must be between 1 and 5"
+      },
+      "table": {
+        "id": "ID",
+        "user": "User",
+        "content": "Content",
+        "evidence": "Evidence",
+        "viewEvidence": "View image",
+        "rating": "Rating",
+        "status": "Status",
+        "createdAt": "Created At",
+        "actions": "Actions",
+        "deleteTooltip": "Delete",
+        "editTooltip": "Edit"
+      },
+      "form": {
+        "userId": "User ID",
+        "userIdHelp": "Leave blank to keep review anonymous.",
+        "content": "Content",
+        "rating": "Rating",
+        "isActive": "Visible to users",
+        "evidenceImage": "Evidence image",
+        "evidenceHint": "Upload an image if this review needs proof or a screenshot.",
+        "noFile": "No file selected"
+      }
+    },
+    "contactMessages": {
+      "title": "Bug Reports & Contact Messages",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Bug Reports & Contact Messages",
+      "searchPlaceholder": "Search bug reports or messages...",
+      "filter": {
+        "title": "Bug report filters",
+        "description": "Search by subject, page URL, sender, or message content.",
+        "reset": "Clear filters",
+        "advanced": "Advanced filters",
+        "category": "Category",
+        "readStatus": "Read status"
+      },
+      "categories": {
+        "bug_report": "Bug report",
+        "feedback": "Feedback",
+        "support": "Support"
+      },
+      "deleteTitle": "Delete Message",
+      "deleteConfirm": "Are you sure you want to delete message from {{name}}?",
+      "empty": "No messages yet",
+      "read": "Read",
+      "unread": "Unread",
+      "markAsRead": "Mark as read",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "close": "Close",
+      "detailTitle": "Message Detail",
+      "table": {
+        "id": "ID",
+        "category": "Category",
+        "subject": "Subject",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "pageUrl": "Page URL",
+        "content": "Content",
+        "status": "Status",
+        "createdAt": "Sent At",
+        "actions": "Actions",
+        "deleteTooltip": "Delete"
+      },
+      "toast": {
+        "markAsReadSuccess": "Marked as read",
+        "markAsReadError": "Could not mark as read",
+        "deleteSuccess": "Message deleted",
+        "deleteError": "Could not delete message"
+      }
     }
   },
   "common": {
-    "pagination": {
-      "rowsPerPage": "Rows per page:",
-      "displayedRows": "{{from}}-{{to}} of {{count}}",
-      "all": "All"
-    },
-    "breadcrumb": "Breadcrumb",
-    "table": {
-      "noData": "No data available",
-      "loading": "Loading data..."
-    },
+    "saving": "Saving...",
+    "save": "Save",
+    "deleting": "Deleting...",
+    "delete": "Delete",
+    "all": "All",
+    "yes": "Yes",
+    "no": "No",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "search": "Search",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "reset": "Reset",
+    "clearFilters": "Clear filters",
+    "advancedFilters": "Advanced filters",
+    "actions": "Actions",
     "status": {
       "completed": "Completed",
-      "pending": "Pending",
-      "inProgress": "In progress",
+      "inProgress": "In Progress",
       "scheduled": "Scheduled",
       "cancelled": "Cancelled",
-      "unknown": "Unknown"
+      "pending": "Pending",
+      "unknown": "Unknown",
+      "label": "Status"
     },
+    "active": "Active",
+    "inactive": "Inactive",
+    "enable": "Enable",
+    "disable": "Disable",
+    "noData": "No data found",
+    "error": "Error",
+    "success": "Success",
     "na": "N/A",
     "system": "System",
-    "hot": "Hot"
+    "table": {
+      "noData": "No data found",
+      "sortTooltip": "Sort"
+    },
+    "pagination": {
+      "rowsPerPage": "Rows per page",
+      "displayedRows": "{{from}}-{{to}} of {{count}}"
+    }
+  },
+  "chat": {
+    "title": "Chat with Employers",
+    "breadcrumb": "Admin",
+    "stats": {
+      "totalConversations": "Total conversations",
+      "candidatesJoined": "Candidates joined",
+      "employersJoined": "Employers joined"
+    },
+    "search": {
+      "title": "Conversation filters",
+      "placeholder": "Search candidate or employer..."
+    },
+    "table": {
+      "candidate": "Candidate",
+      "employer": "Employer",
+      "lastMessage": "Last message",
+      "status": "Status",
+      "time": "Time",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "ended": "Ended"
+    },
+    "empty": {
+      "noConversations": "No conversations yet",
+      "noResults": "No matching results"
+    },
+    "tooltip": {
+      "viewDetail": "View detail"
+    },
+    "detail": {
+      "title": "Conversation detail",
+      "noMessages": "No messages found.",
+      "openAttachment": "Open attachment"
+    }
   }
 }
+

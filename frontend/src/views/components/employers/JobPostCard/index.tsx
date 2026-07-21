@@ -1,0 +1,379 @@
+'use client';
+import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Alert, Box, Button, Stack, Typography, Paper, Theme } from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
+import {
+  convertEditorStateToHTMLString,
+  createEditorStateFromHTMLString,
+} from '../../../../utils/editorUtils';
+import toastMessages from '../../../../utils/toastMessages';
+import errorHandling from '../../../../utils/errorHandling';
+import { confirmModal } from '../../../../utils/sweetalert2Modal';
+import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
+import xlsxUtils from '../../../../utils/xlsxUtils';
+import type { AxiosError } from 'axios';
+import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import JobPostFilterForm from '../JobPostFilterForm';
+import JobPostForm from '../JobPostForm';
+import type { JobPostFormValues } from '../JobPostForm/JobPostSchema';
+import jobService from '../../../../services/jobService';
+import JobPostsTable from '../JobPostsTable';
+import { useDataTable } from '../../../../hooks';
+import { useCompanyProfile, useEmployerJobPosts, useJobPostMutations } from '../hooks/useEmployerQueries';
+import type { ApiError } from '../../../../types/api';
+import type { JobPostInput } from '../../../../services/jobService';
+import FilterBar from '@/components/Common/FilterBar';
+import { ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+
+type JobPostEditData = Partial<JobPostFormValues> & { id?: string | number; slug?: string };
+
+type FilterState = { kw: string; isUrgent: boolean | ''; statusId: string | number };
+
+const getSelectId = (
+  value: number | string | { id?: number | string | null } | null | undefined,
+) => (value && typeof value === 'object' ? value.id ?? '' : value ?? '');
+
+const toNullableNumber = (value: number | string | null | undefined) => (
+  value === undefined || value === null || value === '' ? null : Number(value)
+);
+
+type JobPostCardState = {
+  filterData: FilterState;
+  openPopup: boolean;
+  editData: JobPostEditData | null;
+  serverErrors: Record<string, string[]> | null;
+  isProcessing: boolean;
+};
+
+type JobPostCardAction =
+  | { type: 'setFilter'; value: FilterState }
+  | { type: 'openAdd' }
+  | { type: 'openEdit'; value: JobPostEditData }
+  | { type: 'closePopup' }
+  | { type: 'setErrors'; value: Record<string, string[]> | null }
+  | { type: 'setProcessing'; value: boolean };
+
+const initialState: JobPostCardState = {
+  filterData: { kw: '', isUrgent: '', statusId: '' },
+  openPopup: false,
+  editData: null,
+  serverErrors: null,
+  isProcessing: false,
+};
+
+function reducer(state: JobPostCardState, action: JobPostCardAction): JobPostCardState {
+  switch (action.type) {
+    case 'setFilter':
+      return { ...state, filterData: action.value };
+    case 'openAdd':
+      return { ...state, openPopup: true, editData: null, serverErrors: null };
+    case 'openEdit':
+      return { ...state, openPopup: true, editData: action.value };
+    case 'closePopup':
+      return { ...state, openPopup: false };
+    case 'setErrors':
+      return { ...state, serverErrors: action.value };
+    case 'setProcessing':
+      return { ...state, isProcessing: action.value };
+    default:
+      return state;
+  }
+}
+
+const JobPostCard = () => {
+  const { t, i18n } = useTranslation('employer');
+  const verificationHref = localizeRoutePath(`/${ROUTES.EMPLOYER.VERIFICATION}`, i18n.language);
+
+  const {
+    page,
+    pageSize,
+    sorting,
+    onSortingChange,
+    ordering,
+    pagination,
+    onPaginationChange,
+  } = useDataTable({ 
+    initialSorting: [{ id: 'createAt', desc: true }],
+    initialPageSize: 10
+  });
+
+  const [state, dispatch] = React.useReducer(reducer, initialState);
+
+  // Data Fetching & Mutations
+  const { data, isLoading } = useEmployerJobPosts({
+    page: page + 1,
+    pageSize,
+    ordering,
+    kw: state.filterData.kw,
+    isUrgent: state.filterData.isUrgent === '' ? undefined : state.filterData.isUrgent,
+    status: state.filterData.statusId === '' ? undefined : state.filterData.statusId,
+  });
+
+  const { addJobPost, updateJobPost, deleteJobPost, isMutating } = useJobPostMutations();
+  const { data: companyProfile } = useCompanyProfile();
+  const isCompanyVerified = Boolean(companyProfile?.isVerified);
+  const isCreateBlocked = Boolean(companyProfile) && !isCompanyVerified;
+
+  const handleShowUpdate = useCallback(async (slugOrId: string | number) => {
+    dispatch({ type: 'setProcessing', value: true });
+    try {
+      const resData = await jobService.getEmployerJobPostDetailById(slugOrId);
+      const data: JobPostEditData = {
+        ...resData,
+        career: getSelectId(resData.career),
+        position: resData.position ?? '',
+        experience: resData.experience ?? '',
+        typeOfWorkplace: resData.typeOfWorkplace ?? '',
+        jobType: resData.jobType ?? '',
+        academicLevel: resData.academicLevel ?? '',
+        genderRequired: resData.genderRequired ?? '',
+        jobDescription: createEditorStateFromHTMLString(resData.jobDescription || ''),
+        jobRequirement: createEditorStateFromHTMLString(resData.jobRequirement || ''),
+        benefitsEnjoyed: createEditorStateFromHTMLString(resData.benefitsEnjoyed || ''),
+        location: {
+          city: getSelectId(resData.location?.city),
+          district: getSelectId(resData.location?.district),
+          address: resData.location?.address || '',
+          lat: resData.location?.lat ?? '',
+          lng: resData.location?.lng ?? '',
+        },
+      };
+      dispatch({ type: 'openEdit', value: data });
+    } catch (error) {
+      errorHandling(error);
+    } finally {
+      dispatch({ type: 'setProcessing', value: false });
+    }
+  }, []);
+
+  const handleShowAdd = useCallback(() => {
+    if (isCreateBlocked) {
+      toastMessages.warn(t('jobPost.verificationRequired.toast'));
+      return;
+    }
+    dispatch({ type: 'openAdd' });
+  }, [isCreateBlocked, t]);
+
+  const handleAddOrUpdate = async (formData: JobPostFormValues) => {
+    dispatch({ type: 'setErrors', value: null });
+    const editLookup = state.editData?.slug ?? state.editData?.id;
+    const payload: JobPostInput = {
+      jobName: formData.jobName || '',
+      deadline: formData.deadline ? (typeof formData.deadline === 'string' ? formData.deadline : formData.deadline.toISOString()) : '',
+      quantity: Number(formData.quantity),
+      salaryMin: Number(formData.salaryMin),
+      salaryMax: Number(formData.salaryMax),
+      isHot: formData.isHot,
+      isUrgent: formData.isUrgent,
+      career: Number(formData.career),
+      position: Number(formData.position),
+      experience: Number(formData.experience),
+      academicLevel: Number(formData.academicLevel),
+      jobType: Number(formData.jobType),
+      interviewTemplate: formData.interviewTemplate ? Number(formData.interviewTemplate) : null,
+      typeOfWorkplace: Number(formData.typeOfWorkplace),
+      genderRequired: formData.genderRequired,
+      jobDescription: convertEditorStateToHTMLString(formData.jobDescription as ReturnType<typeof createEditorStateFromHTMLString>),
+      jobRequirement: convertEditorStateToHTMLString(formData.jobRequirement as ReturnType<typeof createEditorStateFromHTMLString>),
+      benefitsEnjoyed: convertEditorStateToHTMLString(formData.benefitsEnjoyed as ReturnType<typeof createEditorStateFromHTMLString>),
+      contactPersonName: formData.contactPersonName,
+      contactPersonPhone: formData.contactPersonPhone,
+      contactPersonEmail: formData.contactPersonEmail,
+      location: {
+        city: Number(formData.location.city),
+        district: Number(formData.location.district),
+        address: formData.location.address,
+        lat: toNullableNumber(formData.location.lat),
+        lng: toNullableNumber(formData.location.lng),
+      },
+    };
+
+    try {
+      if (editLookup != null) {
+        await updateJobPost({ id: editLookup, data: payload });
+        toastMessages.success(t('jobPost.messages.updateSuccess'));
+      } else {
+        await addJobPost(payload);
+        toastMessages.success(t('jobPost.messages.addSuccess'));
+      }
+      dispatch({ type: 'closePopup' });
+    } catch (error) {
+      errorHandling(error, (errs) => dispatch({ type: 'setErrors', value: errs as Record<string, string[]> }));
+    }
+  };
+
+  const handleDelete = useCallback((slugOrId: string | number) => {
+    confirmModal(
+      async () => {
+        try {
+          await deleteJobPost(slugOrId);
+          toastMessages.success(t('jobPost.delete.success'));
+        } catch (error) {
+          // Error handled by mutation hook
+        }
+      },
+      t('jobPost.delete.title'),
+      t('jobPost.delete.confirm'),
+      'warning'
+    );
+  }, [deleteJobPost, t]);
+
+    const handleFilter = useCallback((data: { kw: string, isUrgent: number | string, statusId: string | number }) => {
+    dispatch({
+      type: 'setFilter',
+      value: {
+      kw: data.kw,
+      isUrgent: data.isUrgent === 1 ? true : data.isUrgent === 2 ? false : '',
+      statusId: data.statusId,
+      },
+    });
+    onPaginationChange({ pageIndex: 0, pageSize });
+  }, [onPaginationChange, pageSize]);
+
+  const handleExport = async () => {
+    dispatch({ type: 'setProcessing', value: true });
+    try {
+      const params = {
+        page: page + 1,
+        pageSize,
+        ordering,
+        kw: state.filterData.kw,
+        isUrgent: state.filterData.isUrgent === '' ? undefined : state.filterData.isUrgent,
+        status: state.filterData.statusId === '' ? undefined : state.filterData.statusId,
+      };
+      const resData = await jobService.exportEmployerJobPosts(params);
+      xlsxUtils.exportToXLSX(resData, 'JobList');
+    } catch (error) {
+      errorHandling(error);
+    } finally {
+      dispatch({ type: 'setProcessing', value: false });
+    }
+  };
+
+  return (
+    <Box sx={{ p: { xs: 2, md: 4 } }}>
+      <Paper 
+        elevation={0}
+        sx={{ 
+          p: { xs: 3, md: 5 }, 
+          borderRadius: 4, 
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: (theme: Theme) => theme.customShadows?.z1,
+          bgcolor: 'background.paper'
+        }}
+      >
+        <Stack 
+          direction={{ xs: 'column', sm: 'row' }} 
+          alignItems={{ xs: 'flex-start', sm: 'center' }} 
+          justifyContent="space-between" 
+          spacing={3} 
+          mb={5}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ 
+              p: 1, 
+              borderRadius: 2, 
+              bgcolor: 'primary.extralight', 
+              color: 'primary.main',
+              display: 'flex'
+            }}>
+              <WorkOutlineIcon sx={{ fontSize: 28 }} />
+            </Box>
+            <Box>
+            <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px', mb: 0.5 }}>
+              {t('jobPost.title')}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+              {t('jobPost.manageSubtitle')}
+            </Typography>
+          </Box>
+          </Box>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} width={{ xs: '100%', sm: 'auto' }}>
+            <Button 
+              variant="outlined" 
+              color="inherit" 
+              startIcon={<FileDownloadOutlinedIcon />} 
+              onClick={handleExport} 
+              sx={{ 
+                 
+                px: 3, 
+                py: 1,
+                fontWeight: 800, 
+                textTransform: 'none',
+                borderStyle: 'dashed'
+              }}
+            >
+              {t('jobPost.exportList')}
+            </Button>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              startIcon={<AddIcon />} 
+              onClick={handleShowAdd} 
+              disabled={isCreateBlocked}
+              sx={{ 
+                 
+                px: 4, 
+                py: 1.25,
+                boxShadow: (theme: Theme) => theme.customShadows?.primary, 
+                fontWeight: 900,
+                textTransform: 'none'
+              }}
+            >
+              {t('jobPost.createNew')}
+            </Button>
+          </Stack>
+        </Stack>
+
+        {isCreateBlocked ? (
+          <Alert
+            severity="warning"
+            sx={{ mb: 3 }}
+            action={
+              <Button color="inherit" size="small" href={verificationHref}>
+                {t('jobPost.verificationRequired.action')}
+              </Button>
+            }
+          >
+            {t('jobPost.verificationRequired.message')}
+          </Alert>
+        ) : null}
+
+        <FilterBar title={t('jobPost.filter')} sx={{ mb: 5 }}>
+          <Box sx={{ width: '100%', minWidth: 0 }}>
+            <JobPostFilterForm handleFilter={handleFilter} />
+          </Box>
+        </FilterBar>
+
+        <JobPostsTable
+          rows={data?.results || []}
+          isLoading={isLoading}
+          rowCount={data?.count || 0}
+          pagination={pagination}
+          onPaginationChange={onPaginationChange}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
+          handleDelete={handleDelete}
+          handleUpdate={handleShowUpdate}
+        />
+
+        <FormPopup
+          title={t('jobPost.popupTitle')}
+          openPopup={state.openPopup}
+          setOpenPopup={(open) => dispatch({ type: open ? 'openAdd' : 'closePopup' })}
+        >
+          <JobPostForm handleAddOrUpdate={handleAddOrUpdate} editData={state.editData} serverErrors={state.serverErrors} />
+        </FormPopup>
+
+        {(state.isProcessing || isMutating) && <BackdropLoading />}
+      </Paper>
+    </Box>
+  );
+};
+
+export default JobPostCard;

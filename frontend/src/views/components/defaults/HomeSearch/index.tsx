@@ -1,0 +1,176 @@
+'use client';
+import React from 'react';
+import { useAppSelector } from '@/redux/hooks';
+import { useDispatch } from 'react-redux';
+import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import { Box, Button, Grid2 as Grid } from "@mui/material";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import SearchIcon from '@mui/icons-material/Search';
+import InputBaseSearchHomeCustom from '../../../../components/Common/Controls/InputBaseSearchHomeCustom';
+import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
+import { useTranslation } from 'react-i18next';
+import {
+  resetSearchJobPostFilter,
+  searchJobPost,
+} from '../../../../redux/filterSlice';
+import { ROUTES } from '../../../../configs/constants';
+import { useConfig } from '@/hooks/useConfig';
+import type { JobPostFilter } from '../../../../redux/filterSlice';
+import {
+  PROJECT_SEARCH_HISTORY_STORAGE_KEY,
+  LEGACY_PROJECT_SEARCH_HISTORY_STORAGE_KEY,
+  readVersionedJson,
+  writeVersionedJson,
+} from '@/utils/storageKeys';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
+
+type HomeSearchProps = {
+  variant?: 'default' | 'hero';
+};
+
+const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
+  const { t, i18n } = useTranslation(['common']);
+  const isHero = variant === 'hero';
+  const dispatch = useDispatch();
+  const { push } = useRouter();
+  const { allConfig } = useConfig();
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
+
+  const { jobPostFilter } = useAppSelector((state) => state.filter);
+
+  const { control, handleSubmit } = useForm({
+    defaultValues: {
+      kw: '',
+      cityId: '',
+      careerId: '',
+    },
+  });
+
+  React.useEffect(() => {
+    dispatch(resetSearchJobPostFilter());
+  }, [dispatch]);
+
+  const handleSaveKeyworLocalStorage = (kw: string) => {
+    try {
+      if (kw) {
+        const keywordList = readVersionedJson<string[]>(
+          PROJECT_SEARCH_HISTORY_STORAGE_KEY,
+          [LEGACY_PROJECT_SEARCH_HISTORY_STORAGE_KEY]
+        ) ?? [];
+        if (!keywordList.includes(kw)) {
+          const nextKeywords =
+            keywordList.length >= 5
+              ? [kw, ...keywordList.slice(0, keywordList.length - 1)]
+              : [kw, ...keywordList];
+          writeVersionedJson(PROJECT_SEARCH_HISTORY_STORAGE_KEY, nextKeywords);
+        }
+      }
+    } catch {
+      // localStorage access may fail in private browsing
+    }
+  };
+
+  const handleFilter = (data: { kw: string; cityId: string; careerId: string }) => {
+    handleSaveKeyworLocalStorage(data?.kw);
+    dispatch(searchJobPost({ ...jobPostFilter, ...data } as JobPostFilter));
+    push(jobsHref);
+  };
+
+  return (
+    <Box
+      component="form"
+      onSubmit={handleSubmit(handleFilter)}
+      sx={{
+        borderRadius: isHero ? 1.5 : 3.5,
+        p: isHero ? 1 : { xs: 1.25, sm: 1.5, md: 2 },
+        backgroundColor: isHero ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.72)',
+        border: isHero ? '1px solid rgba(15, 23, 42, 0.12)' : '1px solid rgba(226, 232, 240, 0.95)',
+        boxShadow: isHero ? '0 26px 58px rgba(15, 23, 42, 0.18)' : 'inset 0 1px 0 rgba(255,255,255,0.8)',
+        backdropFilter: isHero ? 'blur(12px)' : 'blur(14px)',
+      }}
+    >
+      <Grid container spacing={isHero ? { xs: 1, md: 0 } : 1.5} alignItems="center">
+        <Grid
+          size={isHero ? { xs: 12, md: 5.5 } : { xs: 12 }}
+          sx={{
+            position: 'relative',
+            ...(isHero && {
+              pr: { md: 1 },
+              '&::after': {
+                content: '""',
+                display: { xs: 'none', md: 'block' },
+                position: 'absolute',
+                top: 10,
+                right: 0,
+                bottom: 10,
+                width: '1px',
+                bgcolor: 'rgba(116, 119, 129, 0.22)',
+              },
+            }),
+          }}
+        >
+          <InputBaseSearchHomeCustom
+            name="kw"
+            control={control}
+            placeholder={isHero ? t('common:jobSearch.searchPlaceholder', 'Vị trí tuyển dụng, kỹ năng...') : t("common:search.button")}
+            showSubmitButton={!isHero}
+            location='HOME'
+            variant={variant}
+          />
+        </Grid>
+        {!isHero && (
+        <Grid size={{ xs: 12, md: 6 }}>
+          <SingleSelectSearchCustom
+            name="careerId"
+            placeholder={t("common:placeholders.fieldOperation.all")}
+            control={control}
+            options={allConfig?.careerOptions || []}
+          />
+        </Grid>
+        )}
+        <Grid
+          size={isHero ? { xs: 12, md: 3.5 } : { xs: 12, md: 6 }}
+          sx={isHero ? { px: { md: 1 } } : undefined}
+        >
+          <SingleSelectSearchCustom
+            name="cityId"
+            placeholder={isHero ? t('common:placeholders.allCities', 'Tất cả địa điểm') : t("common:placeholders.selectCity")}
+            control={control}
+            options={allConfig?.cityOptions || []}
+            variant={variant}
+            startIcon={isHero ? <LocationOnIcon fontSize="small" /> : undefined}
+          />
+        </Grid>
+        {isHero && (
+          <Grid size={{ xs: 12, md: 3 }} sx={{ pl: { md: 1 } }}>
+            <Button
+              type="submit"
+              variant="contained"
+              startIcon={<SearchIcon />}
+              fullWidth
+              sx={{
+              minHeight: 56,
+              borderRadius: 1,
+              bgcolor: '#0f172a',
+              px: 3,
+              fontWeight: 800,
+              fontSize: 14,
+              textTransform: 'none',
+              boxShadow: '0 14px 30px rgba(15, 23, 42, 0.18)',
+              '&:hover': {
+                bgcolor: '#111827',
+                boxShadow: '0 16px 34px rgba(15, 23, 42, 0.22)',
+              },
+            }}
+          >
+              {t('common:search.button')}
+            </Button>
+          </Grid>
+        )}
+      </Grid>
+    </Box>
+  );
+};
+
+export default HomeSearch;

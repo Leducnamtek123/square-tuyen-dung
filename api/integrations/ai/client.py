@@ -1,0 +1,484 @@
+import logging
+from dataclasses import dataclass
+from typing import Any, Dict, Iterable, List, Optional, Tuple
+
+import httpx
+import requests
+from django.conf import settings
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class AIEndpointCandidate:
+    name: str
+    base_url: str
+    api_key: str = ""
+    model: str = ""
+
+    @property
+    def normalized_base_url(self) -> str:
+        return self.base_url.rstrip("/")
+
+    def headers(self) -> Dict[str, str]:
+        if not self.api_key:
+            return {}
+        return {"Authorization": f"Bearer {self.api_key}"}
+
+    def payload(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        if not self.model:
+            return payload
+        next_payload = dict(payload)
+        next_payload["model"] = self.model
+        return next_payload
+
+
+class AIServiceUnavailable(Exception):
+    def __init__(self, service: str, attempts: Iterable[str]):
+        self.service = service
+        self.attempts = list(attempts)
+        super().__init__(f"{service} service unavailable after fallback attempts: {'; '.join(self.attempts)}")
+
+
+def _setting(name: str, default: str = "") -> str:
+    value = getattr(settings, name, default)
+    if value is None:
+        return ""
+    return str(value).strip()
+
+def _setting_bool(name: str, default: bool = False) -> bool:
+    value = getattr(settings, name, default)
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "on", "y", "t"}
+
+
+def _setting_float(name: str, default: float) -> float:
+    value = getattr(settings, name, default)
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _setting_int(name: str, default: int) -> int:
+    value = getattr(settings, name, default)
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _split_csv(value: str) -> List[str]:
+    if not value or not str(value).strip():
+        return []
+    return [item.strip() for item in str(value).split(",")]
+
+
+def apply_llm_request_defaults(payload: Dict[str, Any]) -> Dict[str, Any]:
+    next_payload = dict(payload)
+
+    if "temperature" not in next_payload:
+        next_payload["temperature"] = _setting_float("AI_LLM_TEMPERATURE", 0.7)
+    if "top_p" not in next_payload:
+        next_payload["top_p"] = _setting_float("AI_LLM_TOP_P", 0.8)
+    if "max_tokens" not in next_payload and "max_completion_tokens" not in next_payload:
+        max_tokens = _setting_int("AI_LLM_MAX_TOKENS", 2048)
+        if max_tokens > 0:
+            next_payload["max_tokens"] = max_tokens
+
+    if _setting_bool("AI_LLM_USE_VLLM_PARAMS", False):
+        next_payload.setdefault("top_k", _setting_int("AI_LLM_TOP_K", 20))
+        next_payload.setdefault("min_p", _setting_float("AI_LLM_MIN_P", 0.0))
+        next_payload.setdefault(
+            "presence_penalty",
+            _setting_float("AI_LLM_PRESENCE_PENALTY", 1.5),
+        )
+        next_payload.setdefault(
+            "repetition_penalty",
+            _setting_float("AI_LLM_REPETITION_PENALTY", 1.0),
+        )
+        next_payload.setdefault(
+            "chat_template_kwargs",
+            {"enable_thinking": _setting_bool("AI_LLM_ENABLE_THINKING", False)},
+        )
+
+    return next_payload
+
+
+def _is_local_ollama_candidate(candidate: AIEndpointCandidate) -> bool:
+    base_url = candidate.normalized_base_url.lower()
+    return candidate.name == "local" or "11434" in base_url or "ollama" in base_url
+
+
+def _payload_has_image_input(payload: Dict[str, Any]) -> bool:
+    messages = payload.get("messages")
+    if not isinstance(messages, list):
+        return False
+
+    for message in messages:
+        if not isinstance(message, dict):
+            continue
+        images = message.get("images")
+        if isinstance(images, list) and images:
+            return True
+        content = message.get("content")
+        if not isinstance(content, list):
+            continue
+        for part in content:
+            if not isinstance(part, dict):
+                continue
+            if part.get("type") == "image_url" or part.get("image_url"):
+                return True
+    return False
+
+
+def _prioritize_vision_candidates(
+    candidates: List[AIEndpointCandidate],
+    payload: Dict[str, Any],
+) -> List[AIEndpointCandidate]:
+    if not _payload_has_image_input(payload):
+        return candidates
+    return [
+        *[candidate for candidate in candidates if _is_local_ollama_candidate(candidate)],
+        *[candidate for candidate in candidates if not _is_local_ollama_candidate(candidate)],
+    ]
+
+
+def _image_url_to_ollama_image(value: str) -> str:
+    value = str(value or "").strip()
+    if value.startswith("data:") and "," in value:
+        return value.split(",", 1)[1]
+    return value
+
+
+def _ollama_native_payload_from_openai(
+    candidate: AIEndpointCandidate,
+    payload: Dict[str, Any],
+) -> Dict[str, Any]:
+    messages: List[Dict[str, Any]] = []
+    for message in payload.get("messages", []):
+        if not isinstance(message, dict):
+            continue
+        role = message.get("role") or "user"
+        content = message.get("content")
+        images: List[str] = []
+        text_parts: List[str] = []
+
+        if isinstance(content, list):
+            for part in content:
+                if not isinstance(part, dict):
+                    continue
+                if part.get("type") == "text" and part.get("text"):
+                    text_parts.append(str(part.get("text")))
+                image_url = part.get("image_url")
+                if isinstance(image_url, dict) and image_url.get("url"):
+                    images.append(_image_url_to_ollama_image(str(image_url.get("url"))))
+        elif content:
+            text_parts.append(str(content))
+
+        next_message: Dict[str, Any] = {
+            "role": str(role),
+            "content": "\n".join(text_parts) or "Analyze the attached image.",
+        }
+        if images:
+            next_message["images"] = images
+        messages.append(next_message)
+
+    native_payload: Dict[str, Any] = {
+        "model": candidate.model or str(payload.get("model") or ""),
+        "messages": messages,
+        "stream": False,
+    }
+    response_format = payload.get("response_format")
+    if isinstance(response_format, dict) and response_format.get("type") == "json_object":
+        native_payload["format"] = "json"
+
+    options: Dict[str, Any] = {}
+    for key in ("temperature", "top_p", "top_k", "min_p", "repeat_penalty"):
+        if key in payload:
+            options[key] = payload[key]
+    if "repetition_penalty" in payload:
+        options["repeat_penalty"] = payload["repetition_penalty"]
+    max_tokens = payload.get("max_tokens") or payload.get("max_completion_tokens")
+    if max_tokens:
+        options["num_predict"] = max_tokens
+    if "think" in payload:
+        native_payload["think"] = payload["think"]
+    if options:
+        native_payload["options"] = options
+    return native_payload
+
+
+def _openai_response_from_ollama_native(response_json: Dict[str, Any]) -> Dict[str, Any]:
+    message = response_json.get("message") if isinstance(response_json, dict) else {}
+    content = message.get("content") if isinstance(message, dict) else ""
+    return {
+        "choices": [
+            {
+                "message": {
+                    "role": "assistant",
+                    "content": content or "",
+                }
+            }
+        ],
+        "usage": response_json.get("usage", {}) if isinstance(response_json, dict) else {},
+    }
+
+
+def _candidate_payload(candidate: AIEndpointCandidate, payload: Dict[str, Any]) -> Dict[str, Any]:
+    next_payload = apply_llm_request_defaults(payload)
+    if _is_local_ollama_candidate(candidate):
+        # These are vLLM/server-template extensions used by FPT. Ollama's OpenAI
+        # compatibility endpoint can reject them, so strip them only for local fallback.
+        for key in (
+            "top_k",
+            "min_p",
+            "repetition_penalty",
+            "chat_template_kwargs",
+        ):
+            next_payload.pop(key, None)
+    return candidate.payload(next_payload)
+
+
+def _add_candidate(
+    candidates: List[AIEndpointCandidate],
+    seen: set[tuple[str, str, str]],
+    candidate: AIEndpointCandidate,
+    *,
+    default_model: str = "",
+) -> None:
+    base_url = candidate.normalized_base_url
+    effective_model = candidate.model or default_model
+    dedupe_key = (base_url, candidate.api_key, effective_model)
+    if not base_url or dedupe_key in seen:
+        return
+    candidates.append(
+        AIEndpointCandidate(
+            name=candidate.name,
+            base_url=base_url,
+            api_key=candidate.api_key,
+            model=candidate.model,
+        )
+    )
+    seen.add(dedupe_key)
+
+
+def get_llm_candidates(default_model: str = "") -> List[AIEndpointCandidate]:
+    candidates: List[AIEndpointCandidate] = []
+    seen: set[tuple[str, str, str]] = set()
+
+    # settings.AI_LLM_API_KEY already applies the legacy LLM_API_KEY/GROQ_API_KEY
+    # fallback when AI_LLM_API_KEY is not configured. Reading only the resolved
+    # setting here lets deployments intentionally leave the text LLM key empty
+    # for local OpenAI-compatible servers such as Ollama.
+    primary_api_key = _setting("AI_LLM_API_KEY")
+    _add_candidate(
+        candidates,
+        seen,
+        AIEndpointCandidate(
+            name="primary",
+            base_url=_setting("AI_LLM_BASE_URL", _setting("LLM_BASE_URL", _setting("OLLAMA_BASE_URL", ""))),
+            api_key=primary_api_key,
+            model="",
+        ),
+        default_model=default_model,
+    )
+
+    local_base_url = _setting("AI_LLM_LOCAL_BASE_URL")
+    if local_base_url:
+        _add_candidate(
+            candidates,
+            seen,
+            AIEndpointCandidate(
+                name="local",
+                base_url=local_base_url,
+                api_key=_setting("AI_LLM_LOCAL_API_KEY"),
+                model=_setting("AI_LLM_LOCAL_MODEL", default_model),
+            ),
+            default_model=default_model,
+        )
+
+    fallback_urls = _split_csv(_setting("AI_LLM_FALLBACK_BASE_URLS"))
+    fallback_api_keys = _split_csv(_setting("AI_LLM_FALLBACK_API_KEYS"))
+    fallback_models = _split_csv(_setting("AI_LLM_FALLBACK_MODELS"))
+    for index, base_url in enumerate(fallback_urls):
+        _add_candidate(
+            candidates,
+            seen,
+            AIEndpointCandidate(
+                name=f"fallback-{index + 1}",
+                base_url=base_url,
+                api_key=fallback_api_keys[index] if index < len(fallback_api_keys) else "",
+                model=fallback_models[index] if index < len(fallback_models) else default_model,
+            ),
+            default_model=default_model,
+        )
+
+    return candidates
+
+
+def get_service_base_urls(service: str) -> List[str]:
+    service = service.lower()
+    if service == "stt":
+        primary = _setting("AI_STT_BASE_URL", _setting("STT_BASE_URL", ""))
+        fallbacks = _split_csv(_setting("AI_STT_FALLBACK_BASE_URLS"))
+    elif service == "tts":
+        primary = _setting("AI_TTS_BASE_URL", _setting("TTS_BASE_URL", ""))
+        fallbacks = _split_csv(_setting("AI_TTS_FALLBACK_BASE_URLS"))
+    else:
+        raise ValueError(f"Unsupported AI service: {service}")
+
+    urls: List[str] = []
+    seen: set[str] = set()
+    for url in [primary, *fallbacks]:
+        normalized = (url or "").rstrip("/")
+        if normalized and normalized not in seen:
+            urls.append(normalized)
+            seen.add(normalized)
+    return urls
+
+
+def _response_error(label: str, response: Any) -> str:
+    text = ""
+    try:
+        text = response.text[:300]
+    except Exception:
+        text = ""
+    return f"{label}: HTTP {response.status_code} {text}".strip()
+
+
+def post_chat_completion_requests(
+    payload: Dict[str, Any],
+    *,
+    default_model: str = "",
+    timeout: Tuple[float, float] = (10, 120),
+) -> Tuple[Dict[str, Any], AIEndpointCandidate]:
+    attempts: List[str] = []
+    last_transient: Optional[requests.RequestException] = None
+
+    for candidate in _prioritize_vision_candidates(get_llm_candidates(default_model=default_model), payload):
+        if _is_local_ollama_candidate(candidate) and _payload_has_image_input(payload):
+            native_response = post_ollama_native_chat_httpx(
+                candidate,
+                _ollama_native_payload_from_openai(candidate, payload),
+                timeout_seconds=timeout[1],
+                connect_timeout_seconds=timeout[0],
+            )
+            if native_response is not None:
+                return _openai_response_from_ollama_native(native_response), candidate
+
+        url = f"{candidate.normalized_base_url}/chat/completions"
+        try:
+            response = requests.post(
+                url,
+                json=_candidate_payload(candidate, payload),
+                headers=candidate.headers(),
+                timeout=timeout,
+            )
+        except (requests.ConnectionError, requests.Timeout) as exc:
+            last_transient = exc
+            attempts.append(f"{candidate.name}: {exc}")
+            logger.warning("LLM candidate %s unavailable: %s", candidate.name, exc)
+            continue
+        except requests.RequestException as exc:
+            attempts.append(f"{candidate.name}: {exc}")
+            logger.warning("LLM candidate %s request failed: %s", candidate.name, exc)
+            continue
+
+        if response.status_code < 400:
+            try:
+                return response.json(), candidate
+            except ValueError as exc:
+                attempts.append(f"{candidate.name}: invalid JSON response")
+                logger.warning("LLM candidate %s returned invalid JSON: %s", candidate.name, exc)
+                continue
+        attempts.append(_response_error(candidate.name, response))
+        logger.warning("LLM candidate %s returned HTTP %s", candidate.name, response.status_code)
+
+    if last_transient and attempts and all("HTTP" not in attempt for attempt in attempts):
+        raise last_transient
+    raise AIServiceUnavailable("llm", attempts)
+
+
+def post_chat_completion_httpx(
+    payload: Dict[str, Any],
+    *,
+    default_model: str = "",
+    timeout_seconds: float = 120.0,
+    connect_timeout_seconds: float = 15.0,
+) -> Tuple[Dict[str, Any], AIEndpointCandidate]:
+    attempts: List[str] = []
+    last_transient: Optional[Exception] = None
+    timeout = httpx.Timeout(timeout=timeout_seconds, connect=connect_timeout_seconds)
+
+    with httpx.Client(timeout=timeout) as client:
+        for candidate in _prioritize_vision_candidates(get_llm_candidates(default_model=default_model), payload):
+            if _is_local_ollama_candidate(candidate) and _payload_has_image_input(payload):
+                native_response = post_ollama_native_chat_httpx(
+                    candidate,
+                    _ollama_native_payload_from_openai(candidate, payload),
+                    timeout_seconds=timeout_seconds,
+                    connect_timeout_seconds=connect_timeout_seconds,
+                )
+                if native_response is not None:
+                    return _openai_response_from_ollama_native(native_response), candidate
+
+            url = f"{candidate.normalized_base_url}/chat/completions"
+            try:
+                response = client.post(
+                    url,
+                    json=_candidate_payload(candidate, payload),
+                    headers=candidate.headers(),
+                )
+            except (httpx.TimeoutException, httpx.ConnectError) as exc:
+                last_transient = exc
+                attempts.append(f"{candidate.name}: {exc}")
+                logger.warning("LLM candidate %s unavailable: %s", candidate.name, exc)
+                continue
+            except httpx.HTTPError as exc:
+                attempts.append(f"{candidate.name}: {exc}")
+                logger.warning("LLM candidate %s request failed: %s", candidate.name, exc)
+                continue
+
+            if response.status_code < 400:
+                try:
+                    return response.json(), candidate
+                except ValueError as exc:
+                    attempts.append(f"{candidate.name}: invalid JSON response")
+                    logger.warning("LLM candidate %s returned invalid JSON: %s", candidate.name, exc)
+                    continue
+            attempts.append(_response_error(candidate.name, response))
+            logger.warning("LLM candidate %s returned HTTP %s", candidate.name, response.status_code)
+
+    if last_transient and attempts and all("HTTP" not in attempt for attempt in attempts):
+        raise last_transient
+    raise AIServiceUnavailable("llm", attempts)
+
+
+def post_ollama_native_chat_httpx(
+    candidate: AIEndpointCandidate,
+    payload: Dict[str, Any],
+    *,
+    timeout_seconds: float,
+    connect_timeout_seconds: float,
+) -> Optional[Dict[str, Any]]:
+    native_base = candidate.normalized_base_url
+    if native_base.endswith("/v1"):
+        native_base = native_base[:-3]
+
+    try:
+        with httpx.Client(timeout=httpx.Timeout(timeout=timeout_seconds, connect=connect_timeout_seconds)) as client:
+            response = client.post(
+                f"{native_base}/api/chat",
+                json=payload,
+                headers=candidate.headers(),
+            )
+    except httpx.HTTPError as exc:
+        logger.info("Ollama native fallback for %s skipped: %s", candidate.name, exc)
+        return None
+
+    if response.status_code != 200:
+        logger.info("Ollama native fallback for %s returned HTTP %s", candidate.name, response.status_code)
+        return None
+    return response.json()

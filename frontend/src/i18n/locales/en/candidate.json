@@ -1,1 +1,17 @@
-{}
+{
+  "login": {
+    "title": "Join Interview",
+    "body": "Please enter the provided interview room ID to join your online interview.",
+    "label": "Interview Room ID"
+  },
+  "interview": {
+    "welcome": "Welcome to the interview room",
+    "connecting": "Connecting...",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "startInterview": "Start Interview",
+    "endInterview": "End Interview",
+    "roomNotFound": "Interview room not found",
+    "noAccess": "You do not have access to this room"
+  }
+}

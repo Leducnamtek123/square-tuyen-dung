@@ -1,0 +1,257 @@
+import '@mui/material/styles';
+
+declare module '@mui/material/styles' {
+  interface Palette {
+    hot: Palette['primary'];
+    feedback: {
+      button: {
+        background: string;
+        shadow: string;
+        hover: string;
+      };
+      dialog: {
+        border: string;
+      };
+    };
+  }
+  interface PaletteOptions {
+    hot?: PaletteOptions['primary'];
+    feedback?: {
+      button: {
+        background: string;
+        shadow: string;
+        hover: string;
+      };
+      dialog: {
+        border: string;
+      };
+    };
+  }
+  interface PaletteColor {
+    background?: string;
+    backgroundHover?: string;
+    gradient?: string;
+  }
+  interface SimplePaletteColorOptions {
+    background?: string;
+    backgroundHover?: string;
+    gradient?: string;
+  }
+  interface TypeText {
+    placeholder?: string;
+    italic?: React.CSSProperties | object;
+  }
+  interface Theme {
+    customShadows: {
+      small: string;
+      medium: string;
+      large: string;
+      card: string;
+      feedback: string;
+      primary: string;
+      secondary: string;
+      info: string;
+      success: string;
+      warning: string;
+      error: string;
+      z1: string;
+      z8: string;
+      z12: string;
+      z16: string;
+      z20: string;
+      z24: string;
+    };
+  }
+  interface ThemeOptions {
+    customShadows?: {
+      small?: string;
+      medium?: string;
+      large?: string;
+      card?: string;
+      feedback?: string;
+      primary?: string;
+      secondary?: string;
+      info?: string;
+      success?: string;
+      warning?: string;
+      error?: string;
+      z1?: string;
+      z8?: string;
+      z12?: string;
+      z16?: string;
+      z20?: string;
+      z24?: string;
+    };
+  }
+}
+
+declare module 'js-cookie' {
+  export interface CookieAttributes {
+    expires?: number | Date;
+    path?: string;
+    domain?: string;
+    secure?: boolean;
+    sameSite?: 'strict' | 'lax' | 'none';
+  }
+
+  const Cookies: {
+    get: (name: string) => string | undefined;
+    set: (name: string, value: string, options?: CookieAttributes) => void;
+    remove: (name: string, options?: CookieAttributes) => void;
+  };
+
+  export default Cookies;
+}
+
+declare module 'draft-js' {
+  import type { ComponentType } from 'react';
+  export interface EditorState {
+    getCurrentContent(): ContentState;
+    getSelection(): SelectionState;
+  }
+  export interface ContentState {
+    getPlainText(delimiter?: string): string;
+    hasText(): boolean;
+    createEntity(type: string, mutability: string, data?: Record<string, unknown>): ContentState;
+    getLastCreatedEntityKey(): string;
+    mergeEntityData(key: string, toMerge: Record<string, unknown>): ContentState;
+  }
+  export interface SelectionState {
+    isCollapsed(): boolean;
+  }
+  export const EditorState: {
+    createEmpty(): EditorState;
+    createWithContent(content: ContentState): EditorState;
+    push(editorState: EditorState, contentState: ContentState, changeType: string): EditorState;
+    set(editorState: EditorState, props: { currentContent?: ContentState }): EditorState;
+  };
+  export const ContentState: {
+    createFromText(text: string): ContentState;
+    createFromBlockArray(blocks: unknown[], entityMap?: unknown): ContentState;
+  };
+  export function convertFromHTML(html: string): { contentBlocks: unknown[]; entityMap: unknown };
+  export function convertToRaw(contentState: ContentState): object;
+  export const AtomicBlockUtils: {
+    insertAtomicBlock(editorState: EditorState, entityKey: string, character: string): EditorState;
+  };
+}
+
+declare module 'draftjs-to-html' {
+  const draftToHtml: (raw: object) => string;
+  export default draftToHtml;
+}
+
+declare module 'react-color' {
+  import type { ComponentType } from 'react';
+  interface ColorResult {
+    hex: string;
+    rgb: { r: number; g: number; b: number; a: number };
+    hsl: { h: number; s: number; l: number; a: number };
+  }
+  interface ColorPickerProps {
+    color?: string | { r: number; g: number; b: number; a?: number };
+    onChange?: (color: ColorResult) => void;
+    onChangeComplete?: (color: ColorResult) => void;
+    disableAlpha?: boolean;
+    width?: string | number;
+    className?: string;
+    styles?: object;
+  }
+  export const SketchPicker: ComponentType<ColorPickerProps>;
+  export const ChromePicker: ComponentType<ColorPickerProps>;
+  export const CompactPicker: ComponentType<ColorPickerProps>;
+  export const BlockPicker: ComponentType<ColorPickerProps>;
+}
+
+declare module 'mui-file-dropzone' {
+  import type { ComponentType } from 'react';
+  interface MuiFileDropzoneProps {
+    acceptedFiles?: string[];
+    maxFileSize?: number;
+    filesLimit?: number;
+    onChange?: (files: File[]) => void;
+    onDelete?: (file: File) => void;
+    showPreviews?: boolean;
+    showPreviewsInDropzone?: boolean;
+  }
+  export const MuiFileDropzone: ComponentType<MuiFileDropzoneProps>;
+}
+
+declare module 'react-draft-wysiwyg' {
+  import type { ComponentType } from 'react';
+  interface EditorProps {
+    editorState?: unknown;
+    onEditorStateChange?: (state: unknown) => void;
+    handlePastedFiles?: (files: Blob[]) => 'handled' | 'not-handled';
+    handleDroppedFiles?: (selection: unknown, files: Blob[]) => 'handled' | 'not-handled';
+    uploadCallback?: (file: File) => Promise<{ data: { link?: string } }>;
+    toolbar?: object;
+    wrapperClassName?: string;
+    editorClassName?: string;
+    toolbarClassName?: string;
+    placeholder?: string;
+    readOnly?: boolean;
+  }
+  export const Editor: ComponentType<EditorProps>;
+}
+
+declare module 'mui-image' {
+  import type { ComponentType } from 'react';
+  interface MuiImageProps {
+    src: string;
+    alt?: string;
+    width?: string | number;
+    height?: string | number;
+    fit?: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
+    duration?: number;
+    easing?: string;
+    showLoading?: boolean;
+    errorIcon?: boolean;
+    shift?: 'top' | 'bottom' | 'left' | 'right' | null;
+    shiftDuration?: number;
+    className?: string;
+    style?: React.CSSProperties;
+  }
+  const Image: ComponentType<MuiImageProps>;
+  export default Image;
+}
+
+
+declare module '@fortawesome/react-fontawesome' {
+  import type { ComponentType } from 'react';
+  import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+  interface FontAwesomeIconProps {
+    icon: IconDefinition;
+    size?: 'xs' | 'sm' | 'lg' | '1x' | '2x' | '3x' | '4x' | '5x';
+    color?: string;
+    className?: string;
+    spin?: boolean;
+    pulse?: boolean;
+    fixedWidth?: boolean;
+    style?: React.CSSProperties;
+  }
+  export const FontAwesomeIcon: ComponentType<FontAwesomeIconProps>;
+}
+
+declare module '@fortawesome/free-solid-svg-icons' {
+  import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+  export const faEye: IconDefinition;
+  export const faFile: IconDefinition;
+  export const faFilePdf: IconDefinition;
+  export const faCalendarDays: IconDefinition;
+  export const faCircleDollarToSlot: IconDefinition;
+  export const faLocationDot: IconDefinition;
+  export const faFire: IconDefinition;
+  export const faBolt: IconDefinition;
+  export const faClock: IconDefinition;
+}
+
+declare module '@fortawesome/fontawesome-svg-core' {
+  export interface IconDefinition {
+    prefix: string;
+    iconName: string;
+    icon: [number, number, string[], string, string | string[]];
+  }
+}
+
+

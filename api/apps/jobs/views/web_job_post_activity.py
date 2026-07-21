@@ -1,0 +1,679 @@
+from django.conf import settings
+from datetime import timedelta
+from django.db import IntegrityError, connection
+from django.db.utils import OperationalError, ProgrammingError
+from django.db.models import Case, CharField, F, Q, When
+from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics, parsers, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+import logging
+from functools import lru_cache
+
+from apps.accounts import permissions as perms_custom
+from apps.files.models import File
+from apps.profiles.serializers import EmployerCandidateProfileSerializer, SendMailToJobSeekerSerializer
+from console.jobs import queue_mail
+from shared import pagination as paginations
+from shared import renderers
+from shared.audit import AuditLogViewSetMixin, record_audit_log
+from shared.configs import table_export
+from shared.configs import variable_response as var_res
+from shared.configs import variable_system as var_sys
+from shared.configs.messages import APPLICATION_STATUS_MESSAGES
+from shared.helpers import helper, utils
+
+from ..filters import AliasedOrderingFilter, EmployerJobPostActivityFilter
+from ..manual_candidate_validation import validate_manual_candidate_activity_storage
+from ..exceptions import (
+    InvalidApplicationStatusTransitionError,
+    JobsDomainError,
+)
+from ..models import JobPost, JobPostActivity
+from ..serializers import (
+    EmployerJobPostActivityExportSerializer,
+    EmployerJobPostActivitySerializer,
+    JobSeekerJobPostActivitySerializer,
+)
+
+logger = logging.getLogger(__name__)
+AI_PROCESSING_TIMEOUT_MINUTES = 20
+
+
+def _is_truthy(value) -> bool:
+    return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+@lru_cache(maxsize=1)
+def has_ai_analysis_progress_column() -> bool:
+    try:
+        with connection.cursor() as cursor:
+            columns = {
+                col.name if hasattr(col, "name") else col[0]
+                for col in connection.introspection.get_table_description(cursor, JobPostActivity._meta.db_table)
+            }
+            return "ai_analysis_progress" in columns
+    except (OperationalError, ProgrammingError):
+        logger.exception("Could not introspect ai_analysis_progress column.")
+        return False
+
+
+class JobSeekerJobPostActivityViewSet(
+    AuditLogViewSetMixin,
+    viewsets.ViewSet,
+    generics.ListAPIView,
+    generics.CreateAPIView,
+):
+    queryset = JobPostActivity.objects.select_related('job_post', 'job_post__company', 'job_post__location', 'resume')
+    serializer_class = JobSeekerJobPostActivitySerializer
+    permission_classes = [perms_custom.IsJobSeekerUser]
+    renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
+
+    def list(self, request, *args, **kwargs):
+        user = request.user
+        queryset = user.jobpostactivity_set.filter(is_deleted=False).order_by('-create_at', '-update_at')
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(
+                page,
+                many=True,
+                fields=[
+                    "id",
+                    "createAt",
+                    "jobPostDict",
+                    "resumeDict",
+                ],
+            )
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
+
+    @action(methods=["get"], detail=False, url_path="chat", url_name="job-seeker-job-posts-activity-chat")
+    def job_seeker_job_posts_activity_chat(self, request):
+        user = request.user
+        queryset = (
+            user.jobpostactivity_set.filter(is_deleted=False).order_by('-create_at', '-update_at')
+            .annotate(
+                userId=F('job_post__company__user_id'),
+                fullName=F('job_post__company__user__full_name'),
+                userEmail=F('job_post__company__user__email'),
+                companyId=F('job_post__company_id'),
+                companyName=F('job_post__company__company_name'),
+                companySlug=F('job_post__company__slug'),
+                companyImageId=F('job_post__company__logo__id'),
+                jobPostTitle=F('job_post__job_name'),
+            )
+            .values(
+                'id',
+                'userId',
+                'fullName',
+                'userEmail',
+                'companyId',
+                "companyName",
+                "companySlug",
+                'companyImageId',
+                'jobPostTitle',
+            )
+        )
+
+        page = self.paginate_queryset(queryset)
+        res_data = page
+        if page is not None:
+            res_data = list(page)
+            # Batch fetch all File objects to avoid N+1
+            logo_ids = [item.get("companyImageId") for item in res_data if item.get("companyImageId")]
+            logos_map = {f.id: f for f in File.objects.filter(id__in=logo_ids)} if logo_ids else {}
+            for item in res_data:
+                logo_id = item.pop("companyImageId", None)
+                logo = logos_map.get(logo_id) if logo_id else None
+                item["companyImageUrl"] = (
+                    logo.get_full_url() if logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+                )
+
+            return self.get_paginated_response(res_data)
+
+        return var_res.response_data(data=res_data)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            from shared.helpers import helper
+            helper.print_log_error("JobApplicationValidationError", serializer.errors)
+            serializer.is_valid(raise_exception=True)
+
+        from rest_framework.exceptions import ValidationError
+        from ..services import JobActivityService
+        try:
+            job_post_activity = JobActivityService.apply_to_job(
+                user=request.user,
+                validated_data=serializer.validated_data
+            )
+        except IntegrityError:
+            # Handles race condition (double-click / concurrent requests) on DB unique constraint.
+            raise ValidationError({"errorMessage": ["Bạn đã ứng tuyển vào vị trí này rồi."]})
+        except JobsDomainError as e:
+            raise ValidationError({"errorMessage": [str(e)]})
+
+        response_serializer = self.get_serializer(job_post_activity)
+        headers = self.get_success_headers(response_serializer.data)
+        record_audit_log(request=request, action="create", instance=job_post_activity)
+
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=response_serializer.data, headers=headers)
+
+
+class EmployerJobPostActivityViewSet(
+    AuditLogViewSetMixin,
+    viewsets.ViewSet,
+    generics.ListAPIView,
+    generics.RetrieveAPIView,
+    generics.UpdateAPIView,
+    generics.DestroyAPIView,
+):
+    queryset = JobPostActivity.objects.select_related(
+        'user',
+        'resume',
+        'resume__file',
+        'manual_candidate_profile',
+        'manual_candidate_profile__file',
+        'job_post',
+        'job_post__company',
+    )
+    serializer_class = EmployerJobPostActivitySerializer
+    permission_classes = [perms_custom.CanManageCandidates]
+    renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
+    parser_classes = [parsers.JSONParser, parsers.MultiPartParser, parsers.FormParser]
+    filterset_class = EmployerJobPostActivityFilter
+    filter_backends = [DjangoFilterBackend, AliasedOrderingFilter]
+    ordering_fields = (
+        ('createAt', 'create_at'),
+        ('status', 'status'),
+        ('fullName', 'full_name'),
+        ('aiAnalysisScore', 'ai_analysis_score'),
+        ('aiAnalysisStatus', 'ai_analysis_status'),
+        ('aiReviewStatus', 'ai_analysis_review_status'),
+    )
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["blind_screening"] = _is_truthy(self.request.query_params.get("blind"))
+        return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+        company = user.active_company if hasattr(user, 'active_company') else None
+        if company:
+            queryset = queryset.filter(job_post__company=company, is_deleted=False)
+        else:
+            queryset = queryset.none()
+
+        # Self-heal stale AI jobs that were left in "processing" due to worker/broker issues.
+        stale_before = timezone.now() - timedelta(minutes=AI_PROCESSING_TIMEOUT_MINUTES)
+        queryset.filter(
+            ai_analysis_status='processing',
+            update_at__lt=stale_before,
+        ).update(
+            ai_analysis_status='failed',
+            ai_analysis_progress=0,
+            ai_analysis_summary="Phân tích AI quá thời gian xử lý. Vui lòng thử lại.",
+        )
+
+        if not has_ai_analysis_progress_column():
+            return queryset.defer('ai_analysis_progress')
+        return queryset
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.job_post.company != request.user.active_company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+        fields = [
+            "id",
+            "fullName",
+            "email",
+            "title",
+            "type",
+            "resumeSlug",
+            "isManualCandidate",
+            "manualCandidateProfile",
+            "jobName",
+            "resumeFileUrl",
+            "aiAnalysisScore",
+            "aiAnalysisSummary",
+            "aiAnalysisSkills",
+            "aiAnalysisStatus",
+            "aiAnalysisPros",
+            "aiAnalysisCons",
+            "aiAnalysisMatchingSkills",
+            "aiAnalysisMissingSkills",
+            "aiAnalysisCriteria",
+            "aiAnalysisEvidence",
+            "aiAnalysisReviewStatus",
+            "aiAnalysisHrOverrideScore",
+            "aiAnalysisHrOverrideNote",
+            "aiAnalysisReviewedAt",
+            "aiAnalysisReviewedBy",
+            "aiAnalysisEffectiveScore",
+        ]
+        if has_ai_analysis_progress_column():
+            fields.append("aiAnalysisProgress")
+        serializer = self.get_serializer(
+            instance,
+            fields=fields,
+        )
+        return var_res.response_data(data=serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        user = request.user
+        queryset = (
+            self.filter_queryset(
+                self.get_queryset()
+                .filter(job_post__company=user.active_company, is_deleted=False)
+                .order_by('-id', 'create_at')
+            )
+        )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            fields = [
+                "id",
+                "userId",
+                "fullName",
+                "email",
+                "title",
+                "resumeSlug",
+                "isManualCandidate",
+                "manualCandidateProfile",
+                "type",
+                "jobName",
+                "status",
+                "statusName",
+                "hrmEmployeeId",
+                "hrmUserId",
+                "hrmSyncStatus",
+                "hrmSyncError",
+                "hrmSyncedAt",
+                "hrmEmployeeUrl",
+                "createAt",
+                "isSentEmail",
+                "resumeFileUrl",
+                "jobPostDict",
+                "aiAnalysisScore",
+                "aiAnalysisSummary",
+                "aiAnalysisSkills",
+                "aiAnalysisStatus",
+                "aiAnalysisReviewStatus",
+                "aiAnalysisEffectiveScore",
+            ]
+            if has_ai_analysis_progress_column():
+                fields.append("aiAnalysisProgress")
+            serializer = self.get_serializer(
+                page,
+                many=True,
+                fields=fields,
+            )
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
+
+    @action(methods=["post"], detail=False, url_path="manual-candidates", url_name="manual-candidates")
+    def create_manual_candidate(self, request):
+        company = request.user.active_company
+        if not company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        data = request.data.copy() if hasattr(request.data, "copy") else dict(request.data)
+        job_post_id = data.pop("jobPost", None) or data.pop("job_post", None)
+        if isinstance(job_post_id, list):
+            job_post_id = job_post_id[0] if job_post_id else None
+        if not job_post_id:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"jobPost": ["This field is required."]},
+            )
+
+        try:
+            job_post = JobPost.objects.get(id=job_post_id, company=company)
+        except (JobPost.DoesNotExist, TypeError, ValueError):
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        activity_storage_errors = validate_manual_candidate_activity_storage(data)
+        if activity_storage_errors:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors=activity_storage_errors,
+            )
+
+        candidate_serializer = EmployerCandidateProfileSerializer(
+            data=data,
+            context={"request": request},
+        )
+        candidate_serializer.is_valid(raise_exception=True)
+        candidate_profile = candidate_serializer.save()
+        job_post_activity = JobPostActivity.objects.create(
+            job_post=job_post,
+            user=None,
+            resume=None,
+            manual_candidate_profile=candidate_profile,
+            full_name=candidate_profile.full_name,
+            email=candidate_profile.email,
+            phone=candidate_profile.phone,
+        )
+        response_serializer = self.get_serializer(
+            job_post_activity,
+            fields=[
+                "id",
+                "userId",
+                "fullName",
+                "email",
+                "phone",
+                "title",
+                "type",
+                "resumeSlug",
+                "isManualCandidate",
+                "manualCandidateProfile",
+                "jobName",
+                "status",
+                "statusName",
+                "createAt",
+                "isSentEmail",
+                "resumeFileUrl",
+                "userDict",
+                "jobPostDict",
+            ],
+        )
+        record_audit_log(request=request, action="create_manual_candidate", instance=job_post_activity)
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=response_serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_deleted = True
+        instance.save(update_fields=["is_deleted", "update_at"])
+        record_audit_log(request=request, action="delete", instance=instance, metadata={"softDelete": True})
+        return var_res.response_data(status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=["get"], detail=False, url_path="chat", url_name="employer-job-posts-activity-chat")
+    def employer_job_posts_activity_chat(self, request):
+        user = request.user
+        queryset = (
+            self.filter_queryset(
+                self.get_queryset()
+                .filter(job_post__company=user.active_company, is_deleted=False, user__isnull=False)
+                .annotate(
+                    userId=F('user_id'),
+                    fullName=F('user__full_name'),
+                    userEmail=F('user__email'),
+                    avatarUrl=Case(
+                        When(user__avatar__isnull=False, then=F('user__avatar__id')),
+                        default=None,
+                        output_field=CharField(),
+                    ),
+                    jobPostTitle=F('job_post__job_name'),
+                )
+                .values('id', 'userId', "fullName", 'userEmail', "avatarUrl", 'jobPostTitle')
+                .order_by('-id', 'create_at')
+            )
+        )
+
+        page = self.paginate_queryset(queryset)
+        res_data = page
+        if page is not None:
+            # Batch fetch all File objects to avoid N+1
+            avatar_ids = [item['avatarUrl'] for item in res_data if item.get('avatarUrl')]
+            avatars_map = {f.id: f for f in File.objects.filter(id__in=avatar_ids)} if avatar_ids else {}
+            for item in res_data:
+                avatar_id = item.get('avatarUrl')
+                avatar = avatars_map.get(avatar_id) if avatar_id else None
+                item['avatarUrl'] = (
+                    avatar.get_full_url() if avatar else var_sys.AVATAR_DEFAULT["AVATAR"]
+                )
+            return self.get_paginated_response(res_data)
+        return var_res.response_data(data=res_data)
+
+    @action(methods=["get"], detail=False, url_path="export", url_name="job-posts-activity-export")
+    def export_job_posts_activity(self, request):
+        user = request.user
+        queryset = (
+            self.filter_queryset(
+                self.get_queryset().filter(job_post__company=user.active_company, is_deleted=False).order_by('-id', 'create_at')
+            )
+        )
+
+        serializer = EmployerJobPostActivityExportSerializer(
+            queryset,
+            many=True,
+            fields=[
+                "title",
+                "fullName",
+                "email",
+                "phone",
+                "gender",
+                "birthday",
+                "address",
+                "jobName",
+                "createAt",
+                "statusApply",
+            ],
+        )
+
+        export_data = list(serializer.data)
+        if _is_truthy(request.query_params.get("blind")):
+            for item, activity in zip(export_data, queryset):
+                item["fullName"] = f"Candidate #{activity.id}"
+                item["email"] = ""
+                item["phone"] = ""
+                item["gender"] = ""
+                item["birthday"] = ""
+                item["address"] = ""
+
+        result_data = utils.convert_data_with_en_key_to_vn_kew(
+            export_data,
+            table_export.JOB_POST_ACTIVITY_FIELD,
+        )
+
+        return var_res.response_data(data=result_data)
+
+    @action(methods=["put"], detail=True, url_path="application-status", url_name="application-status")
+    def change_application_status(self, request, pk):
+        data = request.data
+        if data.get("status", None):
+            try:
+                stt = int(data["status"])
+            except ValueError:
+                return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
+                
+            job_post_activity = self.get_object()
+            if job_post_activity.job_post.company != request.user.active_company:
+                return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+            from ..services import JobActivityService
+            try:
+                job_post_activity = JobActivityService.change_application_status(job_post_activity, stt)
+                serializer = self.get_serializer(
+                    job_post_activity,
+                    fields=[
+                        "id",
+                        "status",
+                        "statusName",
+                        "hrmEmployeeId",
+                        "hrmUserId",
+                        "hrmSyncStatus",
+                        "hrmEmployeeUrl",
+                    ],
+                )
+                record_audit_log(
+                    request=request,
+                    action="status_change",
+                    instance=job_post_activity,
+                    metadata={"status": stt},
+                )
+                return var_res.response_data(status=status.HTTP_200_OK, data=serializer.data)
+            except InvalidApplicationStatusTransitionError as exc:
+                return var_res.response_data(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    errors={"errorMessage": [str(exc)]},
+                )
+
+        return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=["post"], detail=True, url_path="send-email", url_name="send-email")
+    def send_email(self, request, pk):
+        serializer = SendMailToJobSeekerSerializer(data=request.data)
+        if not serializer.is_valid():
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors=serializer.errors,
+            )
+
+        from ..services import JobActivityService
+        activity = self.get_object()
+        if activity.job_post.company != request.user.active_company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+        JobActivityService.send_email_to_job_seeker(
+            activity=activity,
+            user=request.user,
+            validated_data=serializer.validated_data
+        )
+        return var_res.response_data()
+
+
+    @action(methods=["post"], detail=True, url_path="analyze-resume", url_name="analyze-resume")
+    def analyze_resume(self, request, pk):
+        if not has_ai_analysis_progress_column():
+            return var_res.response_data(
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                errors={"errorMessage": ["Database schema is outdated. Please run migrations first."]},
+            )
+
+        job_post_activity = self.get_object()
+        if job_post_activity.job_post.company != request.user.active_company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        from ..services import JobActivityService
+        try:
+            criteria = request.data.get("criteria") if isinstance(request.data, dict) else None
+            JobActivityService.trigger_ai_analysis(job_post_activity, criteria=criteria)
+        except Exception:
+            logger.exception("Failed to queue AI analysis for activity id=%s", job_post_activity.id)
+            return var_res.response_data(
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                errors={"errorMessage": ["Không thể khởi tạo phân tích AI lúc này. Vui lòng thử lại sau."]},
+            )
+
+        return var_res.response_data(data={"detail": "AI analysis task has been queued."}, status=status.HTTP_202_ACCEPTED)
+
+    @action(methods=["post"], detail=True, url_path="ai-analysis-review", url_name="ai-analysis-review")
+    def ai_analysis_review(self, request, pk):
+        activity = self.get_object()
+        if activity.job_post.company != request.user.active_company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        payload = request.data if isinstance(request.data, dict) else {}
+        review_status = payload.get("reviewStatus") or payload.get("review_status") or "reviewed"
+        override_score = payload.get("overrideScore", payload.get("override_score"))
+        note = str(payload.get("note") or payload.get("overrideNote") or "").strip()
+
+        if override_score in ("", None):
+            activity.ai_analysis_hr_override_score = None
+            review_status = "reviewed" if review_status != "ai_only" else "ai_only"
+        else:
+            try:
+                override_score = int(float(override_score))
+            except (TypeError, ValueError):
+                return var_res.response_data(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    errors={"errorMessage": ["Override score must be a number from 0 to 100."]},
+                )
+            if override_score < 0 or override_score > 100:
+                return var_res.response_data(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    errors={"errorMessage": ["Override score must be between 0 and 100."]},
+                )
+            activity.ai_analysis_hr_override_score = override_score
+            review_status = "overridden"
+
+        if review_status not in {"ai_only", "reviewed", "overridden"}:
+            review_status = "reviewed"
+
+        activity.ai_analysis_review_status = review_status
+        activity.ai_analysis_hr_override_note = note[:2000]
+        activity.ai_analysis_reviewed_by = request.user if review_status != "ai_only" else None
+        activity.ai_analysis_reviewed_at = timezone.now() if review_status != "ai_only" else None
+        activity.save(update_fields=[
+            "ai_analysis_review_status",
+            "ai_analysis_hr_override_score",
+            "ai_analysis_hr_override_note",
+            "ai_analysis_reviewed_by",
+            "ai_analysis_reviewed_at",
+            "update_at",
+        ])
+
+        record_audit_log(
+            request=request,
+            action="ai_analysis_review",
+            instance=activity,
+            metadata={
+                "reviewStatus": activity.ai_analysis_review_status,
+                "overrideScore": activity.ai_analysis_hr_override_score,
+            },
+        )
+
+        serializer = self.get_serializer(activity, fields=[
+            "id",
+            "aiAnalysisScore",
+            "aiAnalysisEffectiveScore",
+            "aiAnalysisReviewStatus",
+            "aiAnalysisHrOverrideScore",
+            "aiAnalysisHrOverrideNote",
+            "aiAnalysisReviewedAt",
+            "aiAnalysisReviewedBy",
+        ])
+        return var_res.response_data(status=status.HTTP_200_OK, data=serializer.data)
+
+
+
+class AdminJobPostActivityViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
+    queryset = JobPostActivity.objects.select_related('user', 'job_post', 'job_post__company', 'resume').all().order_by('id')
+    serializer_class = EmployerJobPostActivitySerializer
+    permission_classes = [perms_custom.IsAdminUser]
+    pagination_class = paginations.CustomPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.query_params.get("kw") or self.request.query_params.get("search")
+        if search:
+            queryset = queryset.filter(
+                Q(full_name__icontains=search)
+                | Q(email__icontains=search)
+                | Q(phone__icontains=search)
+                | Q(user__full_name__icontains=search)
+                | Q(user__email__icontains=search)
+                | Q(job_post__job_name__icontains=search)
+                | Q(job_post__company__company_name__icontains=search)
+            )
+
+        ordering = self.request.query_params.get("ordering")
+        ordering_map = {
+            "id": "id",
+            "fullName": "full_name",
+            "email": "email",
+            "jobName": "job_post__job_name",
+            "status": "status",
+            "createAt": "create_at",
+            "updateAt": "update_at",
+            "aiAnalysisScore": "ai_analysis_score",
+            "aiAnalysisStatus": "ai_analysis_status",
+            "aiReviewStatus": "ai_analysis_review_status",
+        }
+        if ordering:
+            is_desc = ordering.startswith("-")
+            key = ordering[1:] if is_desc else ordering
+            mapped = ordering_map.get(key)
+            if mapped:
+                queryset = queryset.order_by(f"-{mapped}" if is_desc else mapped)
+        return queryset

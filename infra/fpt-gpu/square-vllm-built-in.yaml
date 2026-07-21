@@ -1,0 +1,36 @@
+# Lightweight FPT GPU Container import using FPT built-in vLLM template.
+# Use this when you want to create the FPT container first without building
+# and pushing the heavy all-in-one custom image.
+name: square-ai-llm
+gpu_instance: "1xH100"
+
+image_setting:
+  template_name: vllm-openai-v0.10.1
+
+access_container:
+  tcp_ports:
+  http_ports:
+    - 8000
+
+advanced_settings:
+  persistent_disk:
+    mount_capacity: 200
+    mount_path: /models
+
+  environment_variables:
+    - key: MODEL
+      value: Qwen/Qwen3-14B
+    - key: API_TOKEN
+      value: "<token-tu-dat>"
+    - key: HF_HOME
+      value: /models/huggingface
+    - key: GPU_MEMORY_UTILIZATION
+      value: "0.75"
+    - key: MAX_MODEL_LEN
+      value: "8192"
+    - key: MAX_NUM_SEQS
+      value: "16"
+
+  startup_commands:
+    cmd:
+    args:

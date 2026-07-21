@@ -1,0 +1,308 @@
+﻿'use client';
+
+import React, { useMemo, useReducer } from 'react';
+import { Box, Typography, Paper, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Tooltip, IconButton, Chip, Stack } from "@mui/material";
+import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import dayjs from '../../../configs/dayjs-config';
+
+import { useJobActivities } from './hooks/useJobActivities';
+import { useDataTable, useDebounce } from '../../../hooks';
+import { JobPostActivity } from '../../../types/models';
+import FilterBar from '@/components/Common/FilterBar';
+import {
+    JOB_ACTIVITY_STATUS_OPTIONS,
+    getJobActivityStatusOption,
+} from './applicationStatus';
+
+const JobActivityPage = () => {
+    const { t } = useTranslation('admin');
+    
+    const {
+        page,
+        pageSize: rowsPerPage,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange
+    } = useDataTable({ initialPageSize: 10 });
+
+    type JobActivityPageState = {
+        searchTerm: string;
+        openEditDialog: boolean;
+        openDeleteDialog: boolean;
+        currentActivity: JobPostActivity | null;
+        statusValue: number;
+    };
+
+    type JobActivityPageAction =
+        | { type: 'set-search-term'; value: string }
+        | { type: 'open-edit'; activity: JobPostActivity }
+        | { type: 'open-delete'; activity: JobPostActivity }
+        | { type: 'close-dialogs' }
+        | { type: 'set-status'; value: number };
+
+    const [state, dispatch] = useReducer(
+        (current: JobActivityPageState, action: JobActivityPageAction): JobActivityPageState => {
+            switch (action.type) {
+                case 'set-search-term':
+                    return { ...current, searchTerm: action.value };
+                case 'open-edit':
+                    return {
+                        ...current,
+                        openEditDialog: true,
+                        currentActivity: action.activity,
+                        statusValue: action.activity.status || 0,
+                    };
+                case 'open-delete':
+                    return {
+                        ...current,
+                        openDeleteDialog: true,
+                        currentActivity: action.activity,
+                    };
+                case 'close-dialogs':
+                    return {
+                        ...current,
+                        openEditDialog: false,
+                        openDeleteDialog: false,
+                    };
+                case 'set-status':
+                    return { ...current, statusValue: action.value };
+                default:
+                    return current;
+            }
+        },
+        {
+            searchTerm: '',
+            openEditDialog: false,
+            openDeleteDialog: false,
+            currentActivity: null,
+            statusValue: 0,
+        }
+    );
+
+    const debouncedSearch = useDebounce(state.searchTerm, 500);
+
+    const {
+        data,
+        isLoading,
+        updateJobActivity,
+        deleteJobActivity,
+        isMutating
+    } = useJobActivities({
+        page: page + 1,
+        pageSize: rowsPerPage,
+        kw: debouncedSearch,
+        ordering
+    });
+
+    const handleSearch = (value: string) => {
+        dispatch({ type: 'set-search-term', value });
+        onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
+    };
+
+    const handleOpenEdit = (activity: JobPostActivity) => {
+        dispatch({ type: 'open-edit', activity });
+    };
+
+    const handleOpenDelete = (activity: JobPostActivity) => {
+        dispatch({ type: 'open-delete', activity });
+    };
+
+    const handleCloseDialogs = () => {
+        dispatch({ type: 'close-dialogs' });
+    };
+
+    const handleSaveStatus = async () => {
+        if (!state.currentActivity) return;
+        try {
+            await updateJobActivity({
+                id: state.currentActivity.id,
+                data: { status: state.statusValue }
+            });
+            handleCloseDialogs();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!state.currentActivity) return;
+        try {
+            await deleteJobActivity(state.currentActivity.id);
+            handleCloseDialogs();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const columns = useMemo<ColumnDef<JobPostActivity>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: 'ID',
+            enableSorting: true,
+        },
+        {
+            accessorKey: 'fullName',
+            header: t('pages.jobActivity.table.candidate') as string,
+            enableSorting: true,
+            cell: (info) => (
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                      {info.getValue() as string || '---'}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                      {info.row.original.email}
+                  </Typography>
+                </Box>
+            ),
+        },
+        {
+            accessorKey: 'jobName',
+            header: t('pages.jobActivity.table.jobPost') as string,
+            cell: (info) => info.getValue() as string || '---',
+        },
+        {
+            accessorKey: 'companyDict.companyName',
+            header: t('pages.jobActivity.table.company') as string,
+            cell: (info) => info.getValue() as string || '---',
+        },
+        {
+            accessorKey: 'status',
+            header: t('pages.jobActivity.table.status') as string,
+            enableSorting: true,
+            cell: (info) => {
+                const status = info.getValue() as number;
+                const statusOption = getJobActivityStatusOption(status);
+                return (
+                    <Chip
+                        label={t(`pages.jobActivity.statusOptions.${statusOption.i18nKey}`)}
+                        size="small"
+                        color={statusOption.color}
+                        variant={statusOption.variant}
+                    />
+                );
+            },
+        },
+        {
+            accessorKey: 'createAt',
+            header: t('pages.jobActivity.table.updatedAt') as string,
+            enableSorting: true,
+            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '—',
+        },
+        {
+            id: 'actions',
+            header: t('pages.jobActivity.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                    <Tooltip title={t('pages.jobActivity.table.updateStatus')}>
+                        <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.jobActivity.table.delete')}>
+                        <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+            ),
+        },
+    ], [t]);
+
+    return (
+        <Box>
+            <Box sx={{ mb: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+                    {t('pages.jobActivity.title')}
+                </Typography>
+            </Box>
+            <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
+                <FilterBar
+                    title={t('pages.jobActivity.filter.title')}
+                    searchValue={state.searchTerm}
+                    searchPlaceholder={t('pages.jobActivity.searchPlaceholder')}
+                    onSearchChange={handleSearch}
+                    onReset={() => handleSearch('')}
+                    resetDisabled={!state.searchTerm}
+                    resetLabel={t('common.clearFilters')}
+                />
+
+                <DataTable
+                    columns={columns}
+                    data={data?.results || []}
+                    isLoading={isLoading}
+                    rowCount={data?.count || 0}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
+                    enableSorting
+                    sorting={sorting}
+                    onSortingChange={onSortingChange}
+                />
+            </Paper>
+            {/* Edit Status Dialog */}
+            <Dialog open={state.openEditDialog} onClose={handleCloseDialogs} fullWidth maxWidth="xs">
+                <DialogTitle>{t('pages.jobActivity.editStatusTitle')}</DialogTitle>
+                <DialogContent>
+                    <Box sx={{ pt: 1 }}>
+                        <TextField
+                            select
+                            fullWidth
+                            label={t('pages.jobActivity.statusLabel')}
+                            value={state.statusValue}
+                            onChange={(e) => dispatch({ type: 'set-status', value: Number(e.target.value) })}
+                        >
+                            {!JOB_ACTIVITY_STATUS_OPTIONS.some((option) => option.id === state.statusValue) && (
+                                <MenuItem value={state.statusValue} disabled>
+                                    {t('pages.jobActivity.statusOptions.unknown')}
+                                </MenuItem>
+                            )}
+                            {JOB_ACTIVITY_STATUS_OPTIONS.map((option) => (
+                                <MenuItem key={option.id} value={option.id}>
+                                    {t(`pages.jobActivity.statusOptions.${option.i18nKey}`)}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button onClick={handleCloseDialogs} color="inherit">{t('pages.jobActivity.cancelBtn')}</Button>
+                    <Button
+                        onClick={handleSaveStatus}
+                        variant="contained"
+                        disabled={isMutating}
+                    >
+                        {isMutating ? t('pages.jobActivity.savingBtn') : t('pages.jobActivity.saveBtn')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {/* Delete Confirmation */}
+            <Dialog open={state.openDeleteDialog} onClose={handleCloseDialogs}>
+                <DialogTitle>{t('pages.jobActivity.deleteTitle')}</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        {t('pages.jobActivity.deleteText', { name: state.currentActivity?.fullName })}
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button onClick={handleCloseDialogs} color="inherit">{t('pages.jobActivity.cancelBtn')}</Button>
+                    <Button
+                        onClick={handleDelete}
+                        color="error"
+                        variant="contained"
+                        disabled={isMutating}
+                    >
+                        {isMutating ? t('pages.jobActivity.deletingBtn') : t('pages.jobActivity.deleteBtn')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
+    );
+};
+
+export default JobActivityPage;

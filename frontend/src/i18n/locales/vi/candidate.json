@@ -1,1 +1,17 @@
-{}
+{
+  "login": {
+    "title": "Tham gia Phỏng vấn",
+    "body": "Vui lòng nhập ID phòng phỏng vấn được cung cấp để tham gia buổi phỏng vấn trực tuyến.",
+    "label": "ID Phòng Phỏng vấn"
+  },
+  "interview": {
+    "welcome": "Chào mừng bạn đến với phòng phỏng vấn",
+    "connecting": "Đang kết nối...",
+    "connected": "Đã kết nối",
+    "disconnected": "Đã ngắt kết nối",
+    "startInterview": "Bắt đầu phỏng vấn",
+    "endInterview": "Kết thúc phỏng vấn",
+    "roomNotFound": "Không tìm thấy phòng phỏng vấn",
+    "noAccess": "Bạn không có quyền truy cập vào phòng này"
+  }
+}

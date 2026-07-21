@@ -1,0 +1,211 @@
+import httpRequest from '../utils/httpRequest';
+import { unwrapDataResponse } from '../utils/apiResponse';
+import { cleanParams } from '../utils/params';
+
+// --- INTERFACES: Job Seeker Statistics ---
+interface JobSeekerGeneralStats {
+  totalApply: number;
+  totalSave: number;
+  totalView: number;
+  totalFollow: number;
+}
+
+export interface JobSeekerTotalViewStats {
+  totalView: number;
+}
+
+export interface JobSeekerActivityStats {
+  title1: string;
+  title2: string;
+  title3: string;
+  labels: string[];
+  data1: number[];
+  data2: number[];
+  data3: number[];
+}
+
+// --- INTERFACES: Employer Statistics ---
+export interface EmployerGeneralStats {
+  totalJobPost: number;
+  totalJobPostingPendingApproval: number;
+  totalJobPostExpired: number;
+  totalApply: number;
+  totalFollowers: number;
+  totalSavedProfiles: number;
+  totalInterviews: number;
+  totalInterviewsCompleted: number;
+  totalInterviewsInProgress: number;
+  avgAiOverallScore: number;
+  avgAiTechnicalScore: number;
+  avgAiCommunicationScore: number;
+  conversionRate: number;
+}
+
+export interface EmployerRecruitmentStatItem {
+  label: string;
+  data: number[];
+}
+
+export interface EmployerCandidateStats {
+  title1: string | number;
+  title2: string | number;
+  labels: string[];
+  data1: number[];
+  data2: number[];
+  borderColor1: string;
+  backgroundColor1: string;
+  borderColor2: string;
+  backgroundColor2: string;
+}
+
+export interface EmployerApplicationStats {
+  title1: string;
+  title2: string;
+  labels: string[];
+  data1: number[];
+  data2: number[];
+  backgroundColor1: string;
+  backgroundColor2: string;
+}
+
+export interface EmployerRecruitmentByRankStats {
+  data: number[];
+  labels: string[];
+  backgroundColor: string[];
+}
+
+export interface EmployerInterviewStats {
+  labels: string[];
+  completedData: number[];
+  scheduledData: number[];
+  cancelledData: number[];
+  inProgressData: number[];
+  avgScoreData: number[];
+  passedCount: number;
+  failedCount: number;
+  pendingCount: number;
+  avgDurationSeconds: number;
+}
+
+// --- INTERFACES: Admin Statistics ---
+export interface AdminGeneralStats {
+  totalUsers: number;
+  totalEmployers: number;
+  totalJobSeekers: number;
+  totalAdmins: number;
+  totalJobPosts: number;
+  totalJobPostsPending: number;
+  totalJobPostsRejected?: number;
+  totalJobPostsApproved?: number;
+  totalJobPostsActive?: number;
+  totalJobPostsExpired?: number;
+  totalApplications: number;
+  totalApplicationsPending?: number;
+  totalApplicationsContacted?: number;
+  totalApplicationsTested?: number;
+  totalApplicationsInterviewed?: number;
+  totalApplicationsHired?: number;
+  totalApplicationsNotSelected?: number;
+  totalInterviews?: number;
+  totalInterviewsDraft?: number;
+  totalInterviewsScheduled?: number;
+  totalInterviewsInProgress?: number;
+  totalInterviewsCompleted?: number;
+  totalInterviewsCancelled?: number;
+  totalCompanies?: number;
+  totalCompaniesVerified?: number;
+  totalCompaniesUnverified?: number;
+  totalCompanyVerifications?: number;
+  totalCompanyVerificationsPending?: number;
+  totalCompanyVerificationsReviewing?: number;
+  totalCompanyVerificationsRejected?: number;
+  totalJobSeekerProfiles?: number;
+  totalResumes?: number;
+  totalActiveResumes?: number;
+  totalSavedJobPosts?: number;
+  totalSavedResumes?: number;
+  totalCompanyFollowers?: number;
+  totalResumeViews?: number;
+  totalQuestions?: number;
+  totalQuestionGroups?: number;
+  newUsers30d?: number;
+  newEmployers30d?: number;
+  newJobSeekers30d?: number;
+  newJobPosts30d?: number;
+  newApplications30d?: number;
+  newInterviews30d?: number;
+}
+
+export type EmployerStatsParams = {
+  startDate?: string;
+  endDate?: string;
+  jobPost?: string | number;
+  position?: string | number;
+  career?: string | number;
+};
+
+const statisticService = {
+  employerGeneralStatistics: (): Promise<EmployerGeneralStats> => {
+    const url = 'job/web/statistics/employer/';
+    return (httpRequest.get(url, { params: { type: 'general' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<EmployerGeneralStats>);
+  },
+
+  employerRecruitmentStatisticsByRank: (data: EmployerStatsParams = {}): Promise<EmployerRecruitmentByRankStats> => {
+    const url = 'job/web/statistics/employer/';
+    return (httpRequest.post(url, cleanParams(data), { params: { type: 'recruitment-by-rank' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<EmployerRecruitmentByRankStats>);
+  },
+
+  employerApplicationStatistics: (data: EmployerStatsParams = {}): Promise<EmployerApplicationStats> => {
+    const url = 'job/web/statistics/employer/';
+    return (httpRequest.post(url, cleanParams(data), { params: { type: 'application' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<EmployerApplicationStats>);
+  },
+
+  employerCandidateStatistics: (data: EmployerStatsParams = {}): Promise<EmployerCandidateStats> => {
+    const url = 'job/web/statistics/employer/';
+    return (httpRequest.post(url, cleanParams(data), { params: { type: 'candidate' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<EmployerCandidateStats>);
+  },
+
+  employerRecruitmentStatistics: (data: EmployerStatsParams = {}): Promise<EmployerRecruitmentStatItem[]> => {
+    const url = 'job/web/statistics/employer/';
+    return (httpRequest.post(url, cleanParams(data), { params: { type: 'recruitment' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<EmployerRecruitmentStatItem[]>);
+  },
+
+  employerInterviewStatistics: (data: EmployerStatsParams = {}): Promise<EmployerInterviewStats> => {
+    const url = 'job/web/statistics/employer/';
+    return (httpRequest.post(url, cleanParams(data), { params: { type: 'interview' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<EmployerInterviewStats>);
+  },
+
+  jobSeekerGeneralStatistics: (): Promise<JobSeekerGeneralStats> => {
+    const url = 'job/web/statistics/job-seeker/';
+    return (httpRequest.get(url, { params: { type: 'general' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<JobSeekerGeneralStats>);
+  },
+
+  jobSeekerTotalView: (): Promise<JobSeekerTotalViewStats> => {
+    const url = 'job/web/statistics/job-seeker/';
+    return (httpRequest.get(url, { params: { type: 'total-view' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<JobSeekerTotalViewStats>);
+  },
+
+  jobSeekerActivityStatistics: (): Promise<JobSeekerActivityStats> => {
+    const url = 'job/web/statistics/job-seeker/';
+    return (httpRequest.get(url, { params: { type: 'activity' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<JobSeekerActivityStats>);
+  },
+
+  adminGeneralStatistics: (): Promise<AdminGeneralStats> => {
+    const url = 'job/web/statistics/admin/';
+    return (httpRequest.get(url, { params: { type: 'general' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<AdminGeneralStats>);
+  },
+};
+
+export default statisticService;
+
+

@@ -1,0 +1,106 @@
+"""
+Custom permission classes for object-level access control (IDOR protection).
+"""
+from rest_framework import permissions as drf_permissions
+from rest_framework.permissions import BasePermission
+
+from shared.configs import variable_system as var_sys
+
+
+class IsOwnerOrReadOnly(BasePermission):
+    """
+    Object-level permission: only the owner can modify.
+    Expects the object to have a `user` attribute.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in ('GET', 'HEAD', 'OPTIONS'):
+            return True
+        owner = getattr(obj, 'user', None)
+        if owner is None:
+            return False
+        return obj.user == request.user
+
+
+class IsResumeOwner(BasePermission):
+    """
+    Ensures only the resume owner can view/edit their resume.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user
+
+
+class IsCompanyOwnerOrMember(BasePermission):
+    """
+    Ensures the user is the owner or a member of the company
+    before allowing modification.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        company = getattr(obj, 'company', obj)
+
+        # Use active_company which handles both owner and member lookup
+        user_company = getattr(user, 'active_company', None)
+        if user_company and user_company == company:
+            return True
+
+        return False
+
+
+class IsJobPostCompanyOwner(BasePermission):
+    """
+    Ensures only the company that created the job post can modify it.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in ('GET', 'HEAD', 'OPTIONS'):
+            return True
+        user = request.user
+        if user.role_name != var_sys.EMPLOYER:
+            return False
+        return obj.company == getattr(user, 'active_company', None)
+
+
+class IsEmployer(BasePermission):
+    """Check that the user has employer role."""
+
+    def has_permission(self, request, view):
+        return (
+            request.user
+            and request.user.is_authenticated
+            and request.user.role_name == var_sys.EMPLOYER
+        )
+
+
+class IsJobSeeker(BasePermission):
+    """Check that the user has job seeker role."""
+
+    def has_permission(self, request, view):
+        return (
+            request.user
+            and request.user.is_authenticated
+            and request.user.role_name == var_sys.JOB_SEEKER
+        )
+
+
+class PermissionActionMapMixin:
+    """
+    Map DRF actions to permission classes in one place to avoid typo-prone
+    if/else permission logic spread across views.
+    """
+
+    permission_action_map = {}
+    default_permission_classes = None
+
+    def get_permissions(self):
+        action_perms = self.permission_action_map.get(getattr(self, "action", None))
+        if action_perms is None:
+            # Keep DRF action-level overrides from @action(permission_classes=[...]).
+            action_perms = getattr(self, "permission_classes", None)
+        if action_perms is None:
+            action_perms = self.default_permission_classes
+        if not action_perms:
+            action_perms = [drf_permissions.AllowAny]
+        return [perm() for perm in action_perms]

@@ -1,6 +1,8 @@
-# Override for Apple Silicon Macs - builds native ARM64 llama-server
-services:
-  llama_cpp:
-    build:
-      context: ./inference/llama
-    image: local-voice-ai-llama-server:arm64
+# Local Apple Silicon llama-server override is disabled because inference runs on FPT GPU.
+# Uncomment this file only when intentionally running the LLM locally.
+#
+# services:
+#   llama_cpp:
+#     build:
+#       context: ./inference/llama
+#     image: local-voice-ai-llama-server:arm64

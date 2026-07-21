@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#07111f"/>
+      <stop offset="55%" stop-color="#0f2a3d"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1310" cy="170" r="220" fill="#38bdf822" />
+  <circle cx="250" cy="740" r="300" fill="#a855f716" />
+  <rect x="120" y="150" width="460" height="610" rx="34" fill="#0b2036" fill-opacity="0.9" stroke="#ffffff18"/>
+  <path d="M200 680L310 300L420 680Z" fill="url(#accent)" opacity="0.9"/>
+  <path d="M305 300L490 680" stroke="#ffffff22" stroke-width="14" stroke-linecap="round"/>
+  <rect x="470" y="250" width="70" height="430" rx="16" fill="#ffffff12"/>
+  <rect x="180" y="720" width="360" height="30" rx="12" fill="#ffffff18"/>
+  <text x="700" y="330" fill="#ffffff" font-size="78" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="4">ARCHITECTURE</text>
+  <text x="700" y="398" fill="#cbd5e1" font-size="34" font-family="Arial, Helvetica, sans-serif" letter-spacing="2">Concept, BIM and design leadership</text>
+  <rect x="700" y="460" width="320" height="10" rx="5" fill="url(#accent)"/>
+  <text x="700" y="540" fill="#e2e8f0" font-size="56" font-family="Arial, Helvetica, sans-serif" font-weight="700">Square Insights</text>
+  <text x="700" y="610" fill="#94a3b8" font-size="30" font-family="Arial, Helvetica, sans-serif">Kiến trúc</text>
+</svg>

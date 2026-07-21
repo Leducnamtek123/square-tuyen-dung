@@ -1,0 +1,401 @@
+'use client';
+
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import type { AxiosError } from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
+import jobPostActivityService from '../../../../services/jobPostActivityService';
+import toastMessages from '../../../../utils/toastMessages';
+import errorHandling from '../../../../utils/errorHandling';
+import type { JobPostActivity } from '@/types/models';
+import type { PaginatedResponse } from '@/types/api';
+import AIAnalysisDrawerView from './AIAnalysisDrawerView';
+
+export type AIAnalysisData = {
+  id?: string | number;
+  fullName?: string;
+  jobName?: string;
+  aiAnalysisStatus?: 'processing' | 'completed' | 'failed' | 'idle' | string;
+  aiAnalysisProgress?: number;
+  resumeFileUrl?: string;
+  onlineProfileUrl?: string;
+  resumeType?: string;
+  aiAnalysisMatchingSkills?: string | string[];
+  aiAnalysisMissingSkills?: string | string[];
+  aiAnalysisSkills?: string | string[];
+  aiAnalysisSummary?: string;
+  aiAnalysisPros?: string | string[];
+  aiAnalysisCons?: string | string[];
+  aiAnalysisScore?: number;
+  aiAnalysisEffectiveScore?: number;
+  aiAnalysisCriteria?: Array<Record<string, unknown>>;
+  aiAnalysisEvidence?: {
+    criteria_results?: Array<Record<string, unknown>>;
+    evidence?: Array<Record<string, unknown>>;
+    identity_warnings?: Array<Record<string, unknown>>;
+    identityWarnings?: Array<Record<string, unknown>>;
+  } | Array<Record<string, unknown>>;
+  aiAnalysisReviewStatus?: 'ai_only' | 'reviewed' | 'overridden' | string;
+  aiAnalysisHrOverrideScore?: number | null;
+  aiAnalysisHrOverrideNote?: string | null;
+  aiAnalysisReviewedAt?: string | null;
+  aiAnalysisReviewedBy?: { id?: number; fullName?: string; email?: string } | null;
+};
+
+type ActivityRawFields = JobPostActivity & {
+  jobPostDict?: { jobName?: string };
+  resumeFileUrl?: string;
+  aiAnalysisMatchingSkills?: string | string[];
+  aiAnalysisMissingSkills?: string | string[];
+  aiAnalysisSkills?: string | string[];
+  aiAnalysisPros?: string | string[];
+  aiAnalysisCons?: string | string[];
+  aiAnalysisCriteria?: Array<Record<string, unknown>>;
+  aiAnalysisEvidence?: AIAnalysisData['aiAnalysisEvidence'];
+};
+
+interface AIAnalysisDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  activityId: string | number | null;
+  initialData?: AIAnalysisData | null;
+  onAnalysisStateChange?: (nextState: Partial<JobPostActivity>) => void;
+}
+
+const toSkillArray = (skills: unknown): string[] => {
+  if (Array.isArray(skills)) {
+    return skills.flatMap((item) => {
+      const text = String(item || '').trim();
+      return text ? [text] : [];
+    });
+  }
+
+  if (typeof skills === 'string') {
+    return skills.split(',').flatMap((item) => {
+      const text = item.trim();
+      return text ? [text] : [];
+    });
+  }
+
+  return [];
+};
+
+const normalizeAiStatus = (status: unknown): JobPostActivity['aiAnalysisStatus'] => {
+  if (status === 'pending' || status === 'processing' || status === 'completed' || status === 'failed') {
+    return status;
+  }
+  return undefined;
+};
+
+const toStringOrStringArray = (value: unknown): string | string[] | undefined => {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) return value.flatMap((item) => String(item));
+  return undefined;
+};
+
+const toAIAnalysisData = (activity: JobPostActivity): AIAnalysisData => {
+  const raw = activity as ActivityRawFields;
+  const jobPostDict = raw.jobPostDict || {};
+  const aiAnalysisScoreRaw = raw.aiAnalysisScore;
+  const resumeSlug = activity.resume?.slug || activity.resumeSlug;
+  const resumeType = activity.type || activity.resume?.type;
+  // Build online profile URL from slug
+  const onlineProfileUrl = resumeSlug
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/ho-so-truc-tuyen/${resumeSlug}`
+    : undefined;
+
+  return {
+    id: activity.id,
+    fullName: activity.fullName,
+    jobName: activity.jobPost?.jobName || jobPostDict.jobName,
+    aiAnalysisStatus: activity.aiAnalysisStatus,
+    aiAnalysisProgress: activity.aiAnalysisProgress,
+    resumeFileUrl: typeof raw.resumeFileUrl === 'string' ? raw.resumeFileUrl : undefined,
+    onlineProfileUrl,
+    resumeType,
+    aiAnalysisMatchingSkills: toStringOrStringArray(raw.aiAnalysisMatchingSkills),
+    aiAnalysisMissingSkills: toStringOrStringArray(raw.aiAnalysisMissingSkills),
+    aiAnalysisSkills: toStringOrStringArray(raw.aiAnalysisSkills),
+    aiAnalysisSummary: typeof activity.aiAnalysisSummary === 'string' ? activity.aiAnalysisSummary : undefined,
+    aiAnalysisPros: toStringOrStringArray(raw.aiAnalysisPros),
+    aiAnalysisCons: toStringOrStringArray(raw.aiAnalysisCons),
+    aiAnalysisScore: typeof aiAnalysisScoreRaw === 'number' ? aiAnalysisScoreRaw : undefined,
+    aiAnalysisEffectiveScore: typeof activity.aiAnalysisEffectiveScore === 'number' ? activity.aiAnalysisEffectiveScore : undefined,
+    aiAnalysisCriteria: Array.isArray(raw.aiAnalysisCriteria) ? raw.aiAnalysisCriteria : undefined,
+    aiAnalysisEvidence: raw.aiAnalysisEvidence,
+    aiAnalysisReviewStatus: activity.aiAnalysisReviewStatus,
+    aiAnalysisHrOverrideScore: activity.aiAnalysisHrOverrideScore,
+    aiAnalysisHrOverrideNote: activity.aiAnalysisHrOverrideNote,
+    aiAnalysisReviewedAt: activity.aiAnalysisReviewedAt,
+    aiAnalysisReviewedBy: activity.aiAnalysisReviewedBy,
+  };
+};
+
+const toJobPostActivityPatch = (data: AIAnalysisData | null): Partial<JobPostActivity> => {
+  if (!data) return {};
+
+  const patch: Partial<JobPostActivity> = {};
+  const status = normalizeAiStatus(data.aiAnalysisStatus);
+  if (status) patch.aiAnalysisStatus = status;
+  if (typeof data.aiAnalysisProgress === 'number') patch.aiAnalysisProgress = data.aiAnalysisProgress;
+  if (typeof data.aiAnalysisScore === 'number') patch.aiAnalysisScore = data.aiAnalysisScore;
+  if (typeof data.aiAnalysisEffectiveScore === 'number') patch.aiAnalysisEffectiveScore = data.aiAnalysisEffectiveScore;
+  if (typeof data.aiAnalysisSummary === 'string') patch.aiAnalysisSummary = data.aiAnalysisSummary;
+  if (data.aiAnalysisSkills !== undefined) patch.aiAnalysisSkills = data.aiAnalysisSkills;
+  if (data.aiAnalysisPros !== undefined) patch.aiAnalysisPros = data.aiAnalysisPros;
+  if (data.aiAnalysisCons !== undefined) patch.aiAnalysisCons = data.aiAnalysisCons;
+  if (data.aiAnalysisMatchingSkills !== undefined) patch.aiAnalysisMatchingSkills = data.aiAnalysisMatchingSkills;
+  if (data.aiAnalysisMissingSkills !== undefined) patch.aiAnalysisMissingSkills = data.aiAnalysisMissingSkills;
+  if (data.aiAnalysisCriteria !== undefined) patch.aiAnalysisCriteria = data.aiAnalysisCriteria;
+  if (data.aiAnalysisEvidence !== undefined) patch.aiAnalysisEvidence = data.aiAnalysisEvidence;
+  if (typeof data.aiAnalysisReviewStatus === 'string') patch.aiAnalysisReviewStatus = data.aiAnalysisReviewStatus;
+  if (data.aiAnalysisHrOverrideScore !== undefined) patch.aiAnalysisHrOverrideScore = data.aiAnalysisHrOverrideScore;
+  if (data.aiAnalysisHrOverrideNote !== undefined) patch.aiAnalysisHrOverrideNote = data.aiAnalysisHrOverrideNote;
+  if (data.aiAnalysisReviewedAt !== undefined) patch.aiAnalysisReviewedAt = data.aiAnalysisReviewedAt;
+  if (data.aiAnalysisReviewedBy !== undefined) patch.aiAnalysisReviewedBy = data.aiAnalysisReviewedBy;
+
+  return patch;
+};
+
+const mergeDefinedAIAnalysisData = (current: AIAnalysisData | null, next: AIAnalysisData): AIAnalysisData => {
+  const merged: AIAnalysisData = { ...(current || {}) };
+  Object.entries(next).forEach(([key, value]) => {
+    if (value !== undefined) {
+      (merged as Record<string, unknown>)[key] = value;
+    }
+  });
+  return merged;
+};
+
+type AIAnalysisDrawerState = {
+  data: AIAnalysisData | null;
+  loading: boolean;
+  analyzing: boolean;
+  scanLinePosition: number;
+};
+
+type AIAnalysisDrawerAction =
+  | { type: 'set-data'; value: AIAnalysisData | null }
+  | { type: 'set-loading'; value: boolean }
+  | { type: 'set-analyzing'; value: boolean }
+  | { type: 'set-scan-line'; value: number }
+  | { type: 'sync-initial-data'; value: AIAnalysisData | null };
+
+const initialState: AIAnalysisDrawerState = {
+  data: null,
+  loading: false,
+  analyzing: false,
+  scanLinePosition: -12,
+};
+
+function reducer(state: AIAnalysisDrawerState, action: AIAnalysisDrawerAction): AIAnalysisDrawerState {
+  switch (action.type) {
+    case 'set-data':
+      return { ...state, data: action.value };
+    case 'set-loading':
+      return { ...state, loading: action.value };
+    case 'set-analyzing':
+      return { ...state, analyzing: action.value };
+    case 'set-scan-line':
+      return { ...state, scanLinePosition: action.value };
+    case 'sync-initial-data':
+      return {
+        ...state,
+        data: !state.data || action.value?.id !== state.data.id ? action.value : state.data,
+      };
+    default:
+      return state;
+  }
+}
+
+const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisStateChange }: AIAnalysisDrawerProps) => {
+  const { t } = useTranslation('employer');
+  const queryClient = useQueryClient();
+  const [state, dispatch] = React.useReducer(reducer, {
+    ...initialState,
+    data: initialData || null,
+  });
+
+  const syncActivityPatch = React.useCallback((patch: Partial<JobPostActivity>) => {
+    if (!activityId || !Object.keys(patch).length) return;
+
+    onAnalysisStateChange?.(patch);
+    queryClient.setQueriesData<PaginatedResponse<JobPostActivity>>(
+      { queryKey: ['appliedResumes'] },
+      (oldData) => {
+        if (!oldData?.results?.length) return oldData;
+
+        let changed = false;
+        const results = oldData.results.map((row) => {
+          if (String(row.id) !== String(activityId)) return row;
+          changed = true;
+          return { ...row, ...patch };
+        });
+
+        return changed ? { ...oldData, results } : oldData;
+      }
+    );
+  }, [activityId, onAnalysisStateChange, queryClient]);
+
+  React.useEffect(() => {
+    if (!open || !initialData) return;
+    dispatch({ type: 'sync-initial-data', value: initialData });
+  }, [initialData, open]);
+
+  React.useEffect(() => {
+    if (!open || !activityId) return;
+
+    const fetchDetail = async () => {
+      dispatch({ type: 'set-loading', value: true });
+      try {
+        const res = await jobPostActivityService.getJobPostActivityDetail(activityId);
+        const nextData = res ? toAIAnalysisData(res) : null;
+        dispatch({ type: 'set-data', value: nextData });
+        syncActivityPatch(toJobPostActivityPatch(nextData));
+      } catch {
+        // keep current data
+      } finally {
+        dispatch({ type: 'set-loading', value: false });
+      }
+    };
+
+    fetchDetail();
+  }, [open, activityId, syncActivityPatch]);
+
+  React.useEffect(() => {
+    if (!open || !activityId || state.data?.aiAnalysisStatus !== 'processing') return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await jobPostActivityService.getJobPostActivityDetail(activityId);
+        const newData = toAIAnalysisData(res);
+        if (newData) {
+          dispatch({ type: 'set-data', value: newData });
+          syncActivityPatch(toJobPostActivityPatch(newData));
+        }
+        if (newData && newData.aiAnalysisStatus !== 'processing') {
+          dispatch({ type: 'set-analyzing', value: false });
+          clearInterval(interval);
+        }
+      } catch {
+        // ignore polling errors
+      }
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [open, activityId, state.data?.aiAnalysisStatus, syncActivityPatch]);
+
+  React.useEffect(() => {
+    if (!open || state.data?.aiAnalysisStatus !== 'processing') {
+      if (state.data?.aiAnalysisStatus !== 'completed') {
+        dispatch({ type: 'set-scan-line', value: -12 });
+      }
+      return;
+    }
+
+    let isActive = true;
+    let rafId = 0;
+    const startAt = performance.now();
+    const cycleMs = 2600;
+
+    const animateScanLine = (now: number) => {
+      if (!isActive) return;
+      const phase = ((now - startAt) % cycleMs) / cycleMs;
+      dispatch({ type: 'set-scan-line', value: -12 + phase * 124 });
+      rafId = requestAnimationFrame(animateScanLine);
+    };
+
+    rafId = requestAnimationFrame(animateScanLine);
+
+    return () => {
+      isActive = false;
+      cancelAnimationFrame(rafId);
+    };
+  }, [open, state.data?.aiAnalysisStatus]);
+
+  const handleAnalyze = async () => {
+    if (!activityId) return;
+    try {
+      dispatch({ type: 'set-analyzing', value: true });
+      dispatch({
+        type: 'set-data',
+        value: { ...(state.data || {}), aiAnalysisStatus: 'processing', aiAnalysisProgress: 5 },
+      });
+      syncActivityPatch({ aiAnalysisStatus: 'processing', aiAnalysisProgress: 5 });
+      // For online CVs, pass the online profile URL so backend can scrape it
+      const payload: { onlineProfileUrl?: string } = {};
+      if (state.data?.onlineProfileUrl && !state.data?.resumeFileUrl) {
+        payload.onlineProfileUrl = state.data.onlineProfileUrl;
+      }
+      await jobPostActivityService.analyzeResume(activityId, payload);
+      queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
+      toastMessages.success(t('appliedResume.ai.analysisStarted'));
+    } catch (err: unknown) {
+      errorHandling(err as AxiosError);
+      dispatch({ type: 'set-analyzing', value: false });
+      dispatch({ type: 'set-data', value: { ...(state.data || {}), aiAnalysisStatus: 'failed' } });
+      syncActivityPatch({ aiAnalysisStatus: 'failed', aiAnalysisProgress: 0 });
+    }
+  };
+
+  const handleSaveReview = async (payload: { overrideScore?: number | string | null; note?: string; reviewStatus?: string }) => {
+    if (!activityId) return;
+    const res = await jobPostActivityService.reviewAIAnalysis(activityId, payload);
+    const nextData = toAIAnalysisData(res);
+    const nextPatch = toJobPostActivityPatch(nextData);
+    dispatch({
+      type: 'set-data',
+      value: mergeDefinedAIAnalysisData(state.data, nextData),
+    });
+    syncActivityPatch(nextPatch);
+    queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
+    toastMessages.success(t('appliedResume.ai.reviewSaved'));
+  };
+
+  const status = state.data?.aiAnalysisStatus;
+  const isCompleted = status === 'completed';
+  const isProcessing = status === 'processing';
+  const isFailed = status === 'failed';
+  const scanProgress = React.useMemo(() => {
+    if (isCompleted) return 100;
+    const progress = Number(state.data?.aiAnalysisProgress);
+    if (Number.isFinite(progress)) {
+      return Math.max(0, Math.min(100, Math.round(progress)));
+    }
+    return 0;
+  }, [state.data?.aiAnalysisProgress, isCompleted]);
+
+  const resumeFileUrl = typeof state.data?.resumeFileUrl === 'string' ? state.data.resumeFileUrl : '';
+  const onlineProfileUrl = typeof state.data?.onlineProfileUrl === 'string' ? state.data.onlineProfileUrl : '';
+  const stats = React.useMemo(
+    () => ({
+      matchingSkills: toSkillArray(state.data?.aiAnalysisMatchingSkills).length,
+      missingSkills: toSkillArray(state.data?.aiAnalysisMissingSkills).length,
+      totalSkills: toSkillArray(state.data?.aiAnalysisSkills).length,
+    }),
+    [state.data?.aiAnalysisMatchingSkills, state.data?.aiAnalysisMissingSkills, state.data?.aiAnalysisSkills]
+  );
+
+  return (
+    <AIAnalysisDrawerView
+      open={open}
+      onClose={onClose}
+      data={state.data}
+      scanLinePosition={state.scanLinePosition}
+      scanProgress={scanProgress}
+      resumeFileUrl={resumeFileUrl}
+      onlineProfileUrl={onlineProfileUrl}
+      analysisState={{
+        loading: state.loading,
+        analyzing: state.analyzing,
+        phase: isProcessing ? 'processing' : isCompleted ? 'completed' : isFailed ? 'failed' : 'idle',
+      }}
+      stats={stats}
+      onAnalyze={handleAnalyze}
+      onSaveReview={handleSaveReview}
+      t={t}
+    />
+  );
+};
+
+export default AIAnalysisDrawer;

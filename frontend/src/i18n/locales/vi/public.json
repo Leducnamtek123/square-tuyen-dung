@@ -2,13 +2,47 @@
   "home": {
     "tabTitle": "Tìm việc nhanh, tuyển dụng hiệu quả tại {{appName}}",
     "topCompanies": "Công ty nổi bật",
+    "topCompaniesSubtitle": "Khám phá doanh nghiệp đang tuyển và đi thẳng đến những cơ hội đáng chú ý nhất.",
     "urgentJobs": "Việc làm tuyển gấp",
+    "urgentJobsAria": "Việc làm tuyển gấp",
     "keyCareers": "Ngành nghề trọng điểm",
-    "suggestedJobs": "Việc làm gợi ý",
+    "keyCareersSubtitle": "Khám phá các nhóm nghề đang có nhu cầu cao để rút ngắn bước tìm kiếm.",
+    "suggestedJobs": "Việc làm đề xuất",
+    "suggestedJobsAria": "Việc làm đề xuất",
     "exploreHeading": "Bạn cần tìm công việc phù hợp với mình?",
+    "exploreDescription": "Bắt đầu từ một nơi duy nhất để tìm việc, xem công ty, lọc theo ngành và đi nhanh đến hành động tiếp theo.",
     "startExploring": "Bắt đầu khám phá",
     "userFeedback": "Đánh giá từ người dùng",
-    "jobsIn": "Việc làm {{careerName}}"
+    "userFeedbackSubtitle": "Đánh giá thật từ người dùng giúp trải nghiệm tuyển dụng thêm tin cậy.",
+    "noFeedbacks": "Chưa có người dùng nào đánh giá",
+    "noCompaniesFound": "Hiện chưa tìm công ty phù hợp với tiêu chí của bạn",
+    "jobsCount": "{{count}} Việc Làm",
+    "companiesCount": "{{count}} công ty",
+    "jobsIn": "Việc làm {{careerName}}",
+    "heroEyebrow": "Nền tảng tuyển dụng thông minh",
+    "heroTitle": "Tìm việc phù hợp, tuyển đúng người nhanh hơn",
+    "heroDescription": "Khám phá hàng ngàn cơ hội nghề nghiệp trong lĩnh vực Bất động sản, Xây dựng và Nội thất với hệ thống lọc thông minh.",
+    "heroPrimaryCta": "Khám phá việc làm",
+    "heroSecondaryCta": "Dành cho nhà tuyển dụng",
+    "heroBenefit1": "Lọc theo nghề, thành phố, công ty",
+    "heroBenefit2": "Công ty nổi bật và tin tuyển dụng rõ ràng",
+    "heroBenefit3": "AI hỗ trợ gợi ý và tối ưu quy trình",
+    "searchHeading": "Bắt đầu tìm kiếm ngay",
+    "searchDescription": "Nhập từ khóa, chọn nghề hoặc thành phố để tìm cơ hội phù hợp hơn.",
+    "choosePathTitle": "Bạn đang tìm gì?",
+    "choosePathDescription": "Chọn đúng lộ trình ngay từ đầu để rút ngắn thời gian tìm việc hoặc tuyển dụng.",
+    "candidateTitle": "Dành cho ứng viên",
+    "candidateDescription": "Tìm công việc phù hợp theo nghề, thành phố và công ty trong vài thao tác.",
+    "candidateBenefit1": "Lọc theo ngành",
+    "candidateBenefit2": "Lưu và theo dõi job",
+    "candidateBenefit3": "Gợi ý phù hợp",
+    "candidateCta": "Khám phá việc làm",
+    "employerTitle": "Dành cho nhà tuyển dụng",
+    "employerDescription": "Đăng tin, tìm hồ sơ và rút ngắn quy trình tuyển dụng với bộ công cụ dành cho doanh nghiệp.",
+    "employerBenefit1": "Đăng tin nhanh",
+    "employerBenefit2": "Tìm hồ sơ phù hợp",
+    "employerBenefit3": "Phỏng vấn hiệu quả",
+    "employerCta": "Xem giải pháp"
   },
   "jobDetail": {
     "deadline": "Hạn nộp",
@@ -36,8 +70,401 @@
     "map": "Bản đồ",
     "similarJobs": "Việc làm tương tự",
     "notUpdated": "Chưa cập nhật",
+    "salaryInsightTitle": "Phân tích lương",
+    "salaryInsightSubtitle": "Tổng quan thị trường nhanh từ các tin tuyển dụng đang hoạt động tương tự.",
+    "salaryInsightListings": "Số tin",
+    "salaryInsightMin": "Thấp nhất",
+    "salaryInsightMax": "Cao nhất",
+    "salaryInsightRange": "Khoảng điển hình",
+    "salaryInsightRelated": "Việc làm liên quan",
+    "salaryInsightScope": {
+      "sameCareerCity": "Cùng ngành tại khu vực này",
+      "sameCareer": "Cùng ngành trên toàn quốc",
+      "sameCity": "Cùng khu vực",
+      "allActive": "Toàn bộ tin đang hoạt động",
+      "none": "Chưa đủ dữ liệu thị trường"
+    },
+    "salaryInsightConfidence": {
+      "high": "Độ tin cậy cao",
+      "medium": "Độ tin cậy vừa",
+      "low": "Dữ liệu còn ít",
+      "none": "Chưa đủ dữ liệu"
+    },
+    "salaryInsightPosition": {
+      "below": "Thấp hơn mặt bằng",
+      "within": "Trong khoảng phổ biến",
+      "above": "Cao hơn mặt bằng",
+      "unknown": "Chưa đủ dữ liệu để so sánh"
+    },
+    "salaryInsightMarketRange": "Biên lương thị trường",
+    "salaryInsightMedian": "Trung vị",
+    "salaryInsightTypicalBand": "Khoảng phổ biến",
+    "salaryInsightCurrentOffer": "Tin này đang trả",
+    "salaryInsightComparison": "So với thị trường",
+    "salaryInsightInsufficient": "Chưa có đủ tin tương đồng để phân tích mức lương.",
+    "salaryInsightAverageRange": "Khoảng lương trung bình",
+    "reportCaption": "Tin cậy & An toàn",
+    "reportJobTitle": "Báo cáo tin tuyển dụng",
+    "reportReasonLabel": "Lý do",
+    "reportMessageLabel": "Chi tiết bổ sung",
+    "reportMessagePlaceholder": "Hãy cho chúng tôi biết nội dung nào không đúng hoặc gây hiểu lầm.",
+    "reportSuccess": "Gửi báo cáo thành công.",
+    "reportReasons": {
+      "scam": "Lừa đảo hoặc gian lận",
+      "wrongInfo": "Thông tin sai hoặc gây hiểu lầm",
+      "spam": "Spam",
+      "duplicate": "Tin trùng lặp",
+      "other": "Khác"
+    },
     "savedSuccess": "Lưu thành công.",
     "unsavedSuccess": "Bỏ lưu thành công.",
-    "noData": "Không có dữ liệu."
+    "noData": "Không có dữ liệu.",
+    "actions": {
+      "apply": "Nộp hồ sơ",
+      "applied": "Đã ứng tuyển",
+      "save": "Lưu tin",
+      "saved": "Đã lưu",
+      "share": "Chia sẻ",
+      "report": "Báo cáo"
+    }
+  },
+  "jobSearch": {
+    "tabTitle": "Kết quả tìm kiếm việc làm",
+    "recommendedJobs": "Việc làm đề xuất",
+    "searchPlaceholder": "Tìm kiếm cơ hội việc làm",
+    "allCareers": "Tất cả ngành nghề",
+    "allCities": "Tất cả tỉnh thành",
+    "allDistricts": "Tất cả quận/huyện",
+    "allWards": "Tất cả phường/xã",
+    "searchButton": "Tìm kiếm",
+    "advancedFilter": "Bộ lọc nâng cao",
+    "allPositions": "Tất cả cấp bậc",
+    "allExperiences": "Tất cả kinh nghiệm",
+    "allJobTypes": "Tất cả hình thức",
+    "allWorkplaces": "Tất cả nơi làm việc",
+    "allGenders": "Tất cả giới tính",
+    "selectCityFirst": "Vui lòng chọn tỉnh/thành trước",
+    "selectDistrictFirst": "Vui lòng chọn quận/huyện trước",
+    "resetFiltersAria": "Đặt lại bộ lọc việc làm nâng cao",
+    "closeAdvancedFiltersAria": "Đóng bộ lọc việc làm nâng cao",
+    "searchResults": "Kết quả tìm kiếm",
+    "posts": "tin tuyển dụng",
+    "noJobsFound": "Không tìm thấy việc làm phù hợp với tiêu chí của bạn",
+    "jobTypeOptions": {
+      "1": "Toàn thời gian cố định",
+      "2": "Toàn thời gian tạm thời",
+      "3": "Bán thời gian cố định",
+      "4": "Bán thời gian tạm thời",
+      "5": "Hợp đồng tư vấn",
+      "6": "Thực tập",
+      "7": "Khác"
+    },
+    "workplaceOptions": {
+      "1": "Tại văn phòng",
+      "2": "Kết hợp",
+      "3": "Từ xa"
+    },
+    "saveSearch": "Lưu tìm kiếm",
+    "savedAlert": {
+      "defaultName": "Tìm kiếm đã lưu",
+      "success": "Đã lưu cảnh báo tìm kiếm."
+    }
+  },
+  "jobByCategory": {
+    "jobsByCareer": "Việc làm theo ngành nghề",
+    "jobsByCity": "Việc làm theo tỉnh thành",
+    "jobsByJobType": "Việc làm theo hình thức",
+    "viewAllCareers": "Xem tất cả ngành nghề",
+    "viewAllCities": "Xem tất cả tỉnh thành",
+    "viewAllJobTypes": "Xem tất cả hình thức"
+  },
+  "companySearch": {
+    "tabTitle": "Kết quả tìm kiếm nhà tuyển dụng",
+    "exploreHeading": "Khám Phá Văn Hóa Công ty",
+    "exploreSubtitle": "Tìm hiểu văn hóa công ty và chọn cho bạn nơi làm việc phù hợp nhất",
+    "searchPlaceholder": "Nhập tên công ty hoặc lĩnh vực cần tìm kiếm",
+    "allCities": "Tất cả tỉnh thành",
+    "searchButton": "Tìm kiếm",
+    "resetFiltersAria": "Đặt lại bộ lọc tìm công ty"
+  },
+  "jobsByCategoryPage": {
+    "careerTitle": "Việc làm theo ngành nghề",
+    "cityTitle": "Việc làm theo tỉnh thành",
+    "jobTypeTitle": "Việc làm theo hình thức làm việc"
+  },
+  "jobPostForm": {
+    "label": {
+      "isUrgent": "Gấp"
+    }
+  },
+  "companyDetail": {
+    "verified": "Công ty đã xác minh",
+    "verifiedDescription": "Công ty này đã được kiểm duyệt thủ công và được đánh dấu là đáng tin cậy.",
+    "report": "Báo cáo",
+    "reportCompanyTitle": "Báo cáo công ty",
+    "since": "Thành lập năm {{year}}",
+    "employeeSize": "{{size}} nhân viên",
+    "notUpdated": "Chưa cập nhật",
+    "follow": "Theo dõi",
+    "followed": "Đang theo dõi",
+    "share": "Chia sẻ",
+    "shareWithQr": "Chia sẻ bằng QR",
+    "about": "Về công ty",
+    "hiring": "Việc làm đang tuyển",
+    "contact": "Thông tin liên hệ",
+    "address": "Địa chỉ",
+    "website": "Website",
+    "taxCode": "Mã số thuế",
+    "followedSuccessfully": "Theo dõi thành công.",
+    "unfollowedSuccessfully": "Bỏ theo dõi thành công.",
+    "followAt": "Theo dõi tại",
+    "generalInfo": "Thông tin chung",
+    "map": "Bản đồ",
+    "images": "Hình ảnh"
+  },
+  "applyForm": {
+    "resume": {
+      "online": "Hồ sơ trực tuyến",
+      "attached": "CV đính kèm",
+      "preview": "Xem trước hồ sơ",
+      "empty": "Bạn chưa tải lên hồ sơ",
+      "pleaseUpload": "Vui lòng tải lên hồ sơ để ứng tuyển",
+      "createNow": "Tạo hồ sơ ngay"
+    },
+    "fields": {
+      "fullName": "Họ và tên",
+      "email": "Email",
+      "phone": "Số điện thoại"
+    },
+    "placeholders": {
+      "fullName": "Nhập họ và tên",
+      "email": "Nhập email",
+      "phone": "Nhập số điện thoại"
+    },
+    "validation": {
+      "fullNameRequired": "Vui lòng nhập họ và tên.",
+      "fullNameMax": "Họ và tên vượt quá độ dài cho phép.",
+      "emailRequired": "Vui lòng nhập email.",
+      "emailInvalid": "Email không hợp lệ.",
+      "emailMax": "Email vượt quá độ dài cho phép.",
+      "phoneRequired": "Vui lòng nhập số điện thoại.",
+      "phoneInvalid": "Số điện thoại không hợp lệ.",
+      "phoneMax": "Số điện thoại vượt quá độ dài cho phép.",
+      "resumeRequired": "Vui lòng chọn hồ sơ."
+    },
+    "note": "Vui lòng cung cấp chính xác họ tên, email và số điện thoại để nhà tuyển dụng có thể liên hệ với bạn."
+  },
+  "applyCard": {
+    "positionCaption": "Ứng tuyển vị trí",
+    "submit": "Ứng tuyển",
+    "success": "Ứng tuyển thành công."
+  },
+  "company": {
+    "following": "Đang theo dõi",
+    "follow": "Theo dõi",
+    "followers": "{{count}} người theo dõi",
+    "notUpdated": "Chưa cập nhật",
+    "jobCount": "{{count}} việc làm"
+  },
+  "jobPost": {
+    "remaining": "Còn {{days}} ngày",
+    "timeLeft": "Còn"
+  },
+  "news": {
+    "category": {
+      "all": "Tất cả",
+      "news": "Tin tức",
+      "blog": "Blog tuyển dụng"
+    },
+    "categoryFallback": "Bài viết",
+    "topic": {
+      "all": "Tất cả chủ đề",
+      "recruitment": "Tuyển dụng",
+      "realEstate": "Bất động sản",
+      "construction": "Xây dựng",
+      "interior": "Nội thất",
+      "architecture": "Kiến trúc",
+      "portfolio": "Portfolio",
+      "skills": "Kỹ năng"
+    },
+    "views": "{{count}} lượt xem",
+    "heroEyebrow": "Tin tức & Blog tuyển dụng",
+    "heroTitle": "Tin tức và blog tuyển dụng dành cho ứng viên, nhà tuyển dụng",
+    "heroSubtitle": "Cập nhật xu hướng tuyển dụng, mẹo ứng tuyển và góc nhìn từ doanh nghiệp trong một trang công khai duy nhất.",
+    "viewAllArticles": "Xem tất cả bài viết",
+    "exploreJobs": "Khám phá việc làm",
+    "searchPlaceholder": "Tìm bài viết, chủ đề hoặc từ khóa",
+    "searchButton": "Tìm",
+    "emptyTitle": "Chưa có bài viết phù hợp",
+    "emptyContent": "Hãy thử đổi bộ lọc hoặc từ khóa tìm kiếm.",
+    "quickReadTitle": "Góc đọc nhanh",
+    "quickReadDescription": "{{total}} bài viết đang hiển thị trong kho nội dung công khai.",
+    "currentFilter": "Bộ lọc hiện tại: {{filter}}",
+    "audienceTitle": "Dành cho ứng viên và nhà tuyển dụng",
+    "audienceDescription": "Bài viết được biên tập để hỗ trợ cả hai phía: tìm việc tốt hơn và tuyển người hiệu quả hơn.",
+    "newJobsCta": "Xem việc làm mới",
+    "article": {
+      "notFoundTitle": "Không tìm thấy bài viết",
+      "notFoundContent": "Bài viết có thể đã bị xoá hoặc đường dẫn đã thay đổi.",
+      "backToNews": "Quay lại tin tức",
+      "backToList": "Quay về danh sách",
+      "emptyContent": "Nội dung đang được cập nhật.",
+      "infoTitle": "Thông tin bài viết",
+      "moreTitle": "Khám phá thêm",
+      "moreDescription": "Mở rộng góc nhìn với danh sách bài viết public dành cho ứng viên và nhà tuyển dụng.",
+      "newsHomeCta": "Về trang tin tức"
+    }
+  },
+  "seo": {
+    "home": {
+      "title": "Tìm việc nhanh, tuyển dụng hiệu quả",
+      "description": "InfoHR - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, ứng tuyển nhanh chóng và kết nối với nhà tuyển dụng uy tín.",
+      "keywords": "tìm việc, tuyển dụng, việc làm, ứng tuyển, nhà tuyển dụng, InfoHR",
+      "appName": "InfoHR Tuyển Dụng",
+      "appDescription": "Nền tảng tuyển dụng trực tuyến hàng đầu Việt Nam"
+    },
+    "jobsByCareer": {
+      "description": "Khám phá việc làm theo ngành nghề tại InfoHR. Chọn ngành nghề bạn yêu thích và tìm công việc phù hợp ngay hôm nay.",
+      "keywords": "việc làm theo ngành nghề, ngành IT, ngành kế toán, ngành marketing, tuyển dụng"
+    },
+    "jobsByJobType": {
+      "description": "Tìm kiếm việc làm theo hình thức: toàn thời gian, bán thời gian, thực tập, hợp đồng. Nhiều cơ hội việc làm chất lượng tại InfoHR.",
+      "keywords": "việc làm toàn thời gian, việc làm bán thời gian, thực tập, hợp đồng, remote"
+    },
+    "jobsByCity": {
+      "description": "Tìm kiếm việc làm theo tỉnh thành trên toàn quốc tại InfoHR. Việc làm tại Hà Nội, TP.HCM và các tỉnh thành khác.",
+      "keywords": "việc làm Hà Nội, việc làm TP.HCM, việc làm theo tỉnh thành, tuyển dụng địa phương"
+    },
+    "jobList": {
+      "description": "Tìm kiếm hàng nghìn việc làm mới nhất tại InfoHR. Lọc theo ngành nghề, mức lương, địa điểm. Ứng tuyển nhanh chóng, dễ dàng.",
+      "keywords": "tìm việc làm, việc làm mới nhất, tuyển dụng, ứng tuyển online, việc làm tốt"
+    },
+    "jobDetail": {
+      "titlePrefix": "Tuyển dụng",
+      "at": "tại",
+      "reputableCompany": "công ty uy tín",
+      "keywordsSuffix": "tuyển dụng, việc làm",
+      "breadcrumb": {
+        "home": "Trang chủ",
+        "jobs": "Việc làm"
+      }
+    },
+    "companySearch": {
+      "description": "Khám phá hàng trăm công ty hàng đầu tuyển dụng tại InfoHR. Tìm hiểu văn hóa doanh nghiệp, xem việc làm đang tuyển và ứng tuyển ngay.",
+      "keywords": "công ty tuyển dụng, nhà tuyển dụng uy tín, doanh nghiệp tuyển dụng, hồ sơ công ty"
+    },
+    "companyDetail": {
+      "recruitingCompany": "Công ty tuyển dụng",
+      "hiringLabel": "Xem việc làm đang tuyển.",
+      "keywordsSuffix": "tuyển dụng, việc làm",
+      "breadcrumb": {
+        "home": "Trang chủ",
+        "company": "Công ty"
+      }
+    },
+    "newsList": {
+      "title": "Tin tức & Blog tuyển dụng",
+      "description": "Cập nhật xu hướng tuyển dụng, kinh nghiệm ứng tuyển và chia sẻ từ doanh nghiệp trên InfoHR.",
+      "keywords": "tin tức tuyển dụng, blog tuyển dụng, kinh nghiệm xin việc, xu hướng tuyển dụng"
+    },
+    "articleDetail": {
+      "description": "Bài viết chi tiết trên InfoHR Tuyển Dụng.",
+      "breadcrumb": {
+        "home": "Trang chủ"
+      }
+    }
+  },
+  "static": {
+    "contact": {
+      "title": "Báo lỗi & liên hệ",
+      "subtitle": "Báo lỗi, gửi góp ý hoặc liên hệ với đội ngũ hỗ trợ InfoHR.",
+      "sections": [
+        {
+          "title": "Email hỗ trợ",
+          "body": "Với vấn đề tài khoản, tin tuyển dụng, xác thực hoặc phỏng vấn, hãy liên hệ support@square.vn."
+        },
+        {
+          "title": "Giờ làm việc",
+          "body": "Hỗ trợ hoạt động từ thứ Hai đến thứ Sáu trong giờ hành chính."
+        }
+      ],
+      "categories": {
+        "bugReport": "Báo lỗi",
+        "feedback": "Góp ý",
+        "support": "Yêu cầu hỗ trợ"
+      },
+      "form": {
+        "title": "Gửi báo cáo",
+        "subtitle": "Vui lòng cung cấp đủ ngữ cảnh để chúng tôi có thể tái hiện và xử lý nhanh hơn.",
+        "category": "Loại",
+        "subject": "Tiêu đề",
+        "pageUrl": "URL trang",
+        "name": "Họ và tên",
+        "email": "Email",
+        "phone": "Điện thoại",
+        "content": "Chi tiết",
+        "sending": "Đang gửi...",
+        "submit": "Gửi báo cáo"
+      },
+      "validation": {
+        "required": "Vui lòng nhập họ tên, email và nội dung."
+      },
+      "success": "Đã gửi tin nhắn thành công.",
+      "error": "Không thể gửi tin nhắn. Vui lòng thử lại."
+    },
+    "faq": {
+      "title": "Câu hỏi thường gặp",
+      "subtitle": "Các câu trả lời phổ biến dành cho ứng viên và nhà tuyển dụng.",
+      "sections": [
+        {
+          "title": "Ứng viên ứng tuyển như thế nào?",
+          "body": "Ứng viên có thể tạo hồ sơ, tải CV và ứng tuyển trực tiếp từ trang chi tiết tin tuyển dụng."
+        },
+        {
+          "title": "Nhà tuyển dụng xác thực công ty như thế nào?",
+          "body": "Nhà tuyển dụng gửi thông tin hồ sơ pháp lý và yêu cầu lịch xác minh từ cổng nhà tuyển dụng."
+        },
+        {
+          "title": "Báo cáo được xử lý như thế nào?",
+          "body": "Báo cáo tin cậy được admin rà soát và chuyển qua các trạng thái mới, đang xem xét, đã xử lý hoặc từ chối."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Điều khoản dịch vụ",
+      "subtitle": "Điều khoản cơ bản khi sử dụng dịch vụ tuyển dụng InfoHR.",
+      "sections": [
+        {
+          "title": "Trách nhiệm tài khoản",
+          "body": "Người dùng chịu trách nhiệm giữ thông tin tài khoản chính xác và bảo vệ thông tin đăng nhập."
+        },
+        {
+          "title": "Nội dung tuyển dụng",
+          "body": "Tin tuyển dụng, hồ sơ công ty, CV và nội dung phỏng vấn phải chính xác, hợp pháp và tôn trọng người dùng."
+        },
+        {
+          "title": "Vận hành nền tảng",
+          "body": "InfoHR có thể kiểm duyệt nội dung, tạm dừng hành vi lạm dụng và điều chỉnh khả dụng dịch vụ để bảo vệ người dùng."
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Chính sách bảo mật",
+      "subtitle": "Cách InfoHR xử lý dữ liệu tuyển dụng.",
+      "sections": [
+        {
+          "title": "Dữ liệu thu thập",
+          "body": "InfoHR lưu dữ liệu tài khoản, hồ sơ, công ty, ứng tuyển, hồ sơ đã lưu và bản ghi phỏng vấn cần thiết cho quy trình tuyển dụng."
+        },
+        {
+          "title": "Mục đích sử dụng",
+          "body": "Dữ liệu được dùng để cung cấp tìm việc, tuyển dụng, gợi ý phù hợp, phỏng vấn, thông báo và hỗ trợ."
+        },
+        {
+          "title": "Quyền kiểm soát",
+          "body": "Người dùng có thể cập nhật thông tin tài khoản và hồ sơ từ dashboard, đồng thời liên hệ hỗ trợ cho yêu cầu về quyền riêng tư."
+        }
+      ]
+    }
   }
 }

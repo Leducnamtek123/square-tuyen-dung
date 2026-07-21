@@ -1,0 +1,423 @@
+'use client';
+import React from 'react';
+import Link from 'next/link';
+import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
+import { Box, Card, Skeleton, Stack, Tooltip, Typography, useMediaQuery } from "@mui/material";
+import { useTheme } from '@mui/material/styles';
+import { formatLocalizedSalaryRange } from '@/utils/customData';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCalendarDays,
+  faCircleDollarToSlot,
+  faLocationDot,
+} from '@fortawesome/free-solid-svg-icons';
+import MuiImageCustom from '@/components/Common/MuiImageCustom';
+import { ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import { formatRoute } from '@/utils/funcUtils';
+import { tConfig } from '@/utils/tConfig';
+import { useConfig } from '@/hooks/useConfig';
+
+interface JobPostActionProps {
+  id?: string | number;
+  slug: string;
+  companyImageUrl?: string;
+  companyName: string;
+  jobName: string;
+  cityId: string | number | undefined;
+  deadline: string | Date;
+  isUrgent?: boolean;
+  isHot?: boolean;
+  salaryMin?: number;
+  salaryMax?: number;
+  children?: React.ReactNode;
+}
+
+
+
+const JobPostAction = ({
+  slug,
+  companyImageUrl,
+  companyName,
+  jobName,
+  cityId,
+  deadline,
+  isUrgent,
+  isHot,
+  salaryMin,
+  salaryMax,
+  children,
+}: JobPostActionProps) => {
+  const { t, i18n } = useTranslation('common');
+  const { allConfig } = useConfig();
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const stackDirection = isSmallScreen ? 'column' : 'row';
+  const detailHref = slug
+    ? localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language)
+    : undefined;
+
+  return (
+
+    <div id="job-post-action">
+
+      <Card
+
+        variant="outlined"
+
+        sx={{
+
+          p: 2,
+
+          transition: 'all 0.3s ease',
+
+          border: `1px solid ${theme.palette.grey[100]}`,
+
+          boxShadow: 0,
+
+          '&:hover': {
+
+            borderColor: theme.palette.primary.main,
+
+            boxShadow: theme.customShadows.small,
+
+            transform: 'translateY(-2px)'
+
+          },
+
+        }}
+
+      >
+
+        <Stack direction={stackDirection} spacing={2}>
+
+          <Box width={stackDirection === "row" ? "70%" : "100%"}>
+
+            <Stack direction="row" spacing={2}>
+
+              <Stack direction="row" justifyContent="center">
+
+                <MuiImageCustom
+
+                  width={70}
+
+                  height={70}
+
+                  src={companyImageUrl || ''}
+
+                  sx={{
+
+                    borderRadius: 2,
+
+                    border: `1px solid ${theme.palette.grey[200]}`,
+
+                    p: 0.5,
+
+                    backgroundColor: 'white',
+
+                  }}
+
+                />
+
+              </Stack>
+
+              <Stack
+
+                flex={1}
+
+                justifyContent="space-between"
+
+                style={{ overflow: 'hidden' }}
+
+              >
+
+                <Box>
+
+                  <Tooltip followCursor title={jobName}>
+
+                    <Typography
+
+                      component={detailHref ? Link : 'span'}
+                      href={detailHref}
+                      prefetch={Boolean(detailHref)}
+                      variant="h6"
+
+                      sx={{
+
+                        fontSize: 16,
+
+                        cursor: detailHref ? 'pointer' : 'default',
+
+                        color: theme.palette.primary.main,
+                        textDecoration: 'none',
+
+                        transition: 'color 0.2s ease',
+
+                        mb: 0.5,
+
+                        '&:hover': {
+
+                          color: theme.palette.primary.dark
+
+                        }
+
+                      }}
+
+                      noWrap
+
+                    >
+
+                      {jobName}
+
+                    </Typography>
+
+                  </Tooltip>
+
+                  <Tooltip followCursor title={companyName}>
+
+                    <Typography
+
+                      variant="body2"
+
+                      sx={{
+
+                        color: theme.palette.text.secondary,
+
+                        fontWeight: 500,
+
+                      }}
+
+                      noWrap
+
+                    >
+
+                      {companyName}
+
+                    </Typography>
+
+                  </Tooltip>
+
+                </Box>
+
+                <Stack
+
+                  direction="row"
+
+                  spacing={2}
+
+                  sx={{
+
+                    '& .info-item': {
+
+                      display: 'flex',
+
+                      alignItems: 'center',
+
+                      gap: 1,
+
+                      color: theme.palette.text.secondary,
+
+                      fontSize: '0.875rem',
+
+                      '& svg': {
+
+                        fontSize: 14,
+
+                        color: theme.palette.grey[400]
+
+                      }
+
+                    }
+
+                  }}
+
+                >
+
+                  <Typography className="info-item">
+
+                    <FontAwesomeIcon icon={faCircleDollarToSlot} />
+
+                    {formatLocalizedSalaryRange(salaryMin, salaryMax, i18n.language)}
+
+                  </Typography>
+
+                  <Typography className="info-item">
+
+                    <FontAwesomeIcon icon={faLocationDot} />
+
+                    {tConfig(cityId ? allConfig?.cityDict?.[String(cityId)] : undefined) || (
+
+                      <span style={{
+
+                        color: theme.palette.grey[400],
+
+                        fontStyle: 'italic',
+
+                        fontSize: 13
+
+                      }}>
+
+                        {t('common:labels.notUpdated')}
+
+                      </span>
+
+                    )}
+
+                  </Typography>
+
+                  <Typography className="info-item">
+
+                    <FontAwesomeIcon icon={faCalendarDays} />
+
+                    {dayjs(deadline).format('DD/MM/YYYY')}
+
+                  </Typography>
+
+                </Stack>
+
+              </Stack>
+
+            </Stack>
+
+          </Box>
+
+          <Stack
+
+            direction="row"
+
+            justifyContent="flex-end"
+
+            alignItems="center"
+
+            flex={1}
+
+            spacing={2}
+
+          >
+
+            {children}
+
+          </Stack>
+
+        </Stack>
+
+      </Card>
+
+    </div>
+
+  );
+
+};
+
+const Loading = () => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const stackDirection = isSmallScreen ? 'column' : 'row';
+
+  return (
+
+    <div id="job-post-action-loading">
+
+      <Card
+
+        variant="outlined"
+
+        sx={{
+
+          p: 2,
+
+          border: `1px solid ${theme.palette.grey[100]}`,
+
+          boxShadow: 0
+
+        }}
+
+      >
+
+        <Stack direction={stackDirection} spacing={2}>
+
+          <Box flex={1}>
+
+            <Stack direction="row" spacing={2}>
+
+              <Stack direction="row" justifyContent="center">
+
+                <Skeleton 
+
+                  variant="rounded" 
+
+                  width={70} 
+
+                  height={70}
+
+                  sx={{ borderRadius: 2 }}
+
+                />
+
+              </Stack>
+
+              <Stack flex={1} justifyContent="space-between">
+
+                <Box>
+
+                  <Typography variant="h6" gutterBottom>
+
+                    <Skeleton height={30} width="80%" />
+
+                  </Typography>
+
+                  <Typography variant="body2">
+
+                    <Skeleton width="60%" />
+
+                  </Typography>
+
+                </Box>
+
+                <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+
+                  <Skeleton width={100} height={24} />
+
+                  <Skeleton width={100} height={24} />
+
+                  <Skeleton width={100} height={24} />
+
+                </Stack>
+
+              </Stack>
+
+            </Stack>
+
+          </Box>
+
+          <Stack
+
+            direction="row"
+
+            justifyContent="flex-end"
+
+            alignItems="center"
+
+            spacing={2}
+
+          >
+
+            <Skeleton height={36} width={100} />
+
+          </Stack>
+
+        </Stack>
+
+      </Card>
+
+    </div>
+
+  );
+
+};
+
+JobPostAction.Loading = Loading;
+
+export default JobPostAction;

@@ -1,0 +1,118 @@
+/* ─────────────────────────────────────────────────────────────────
+   LiveKit Components Styles — scoped to /interview/* pages only.
+   Using a local vendor copy of @livekit/components-styles to bypass
+   Turbopack's "style" condition resolution issue with the package.
+   ───────────────────────────────────────────────────────────────── */
+@import "./livekit-vendor.css";
+
+/* ── Custom theme: override LiveKit CSS variables ── */
+:root {
+  /* Brand colours */
+  --lk-bg: #020617;
+  --lk-bg2: #0f172a;
+  --lk-fg: #f8fafc;
+  --lk-fg2: #94a3b8;
+  --lk-border-color: rgba(255, 255, 255, 0.08);
+
+  /* Accent */
+  --lk-accent: #0ea5e9;
+  --lk-accent-bg: rgba(14, 165, 233, 0.15);
+  --lk-danger: #f43f5e;
+
+  /* Control bar */
+  --lk-control-bar-bg: rgba(2, 6, 23, 0.85);
+  --lk-control-bar-fg: #f8fafc;
+  --lk-control-bar-height: 68px;
+  --lk-control-bar-padding: 0 1rem;
+  --lk-button-bg: rgba(255, 255, 255, 0.07);
+  --lk-button-fg: #f8fafc;
+  --lk-button-hover-bg: rgba(255, 255, 255, 0.14);
+  --lk-button-active-bg: rgba(14, 165, 233, 0.3);
+  --lk-button-active-fg: #38bdf8;
+
+  /* Participant tile */
+  --lk-participant-placeholder-bg: #0f172a;
+  --lk-participant-metadata-bg: rgba(2, 6, 23, 0.75);
+
+  /* Chat */
+  --lk-chat-bg: #0b1120;
+  --lk-chat-message-bg: rgba(14, 165, 233, 0.1);
+
+  /* Focus ring */
+  --lk-focus-ring: 0 0 0 2px #0ea5e9;
+}
+
+/* ── Layout overrides ── */
+.lk-room-container {
+  background: linear-gradient(180deg, #020617 0%, #020617 100%);
+  border-radius: 0;
+  height: 100%;
+}
+
+/* Control bar: glassmorphism look */
+.lk-control-bar {
+  background: rgba(2, 6, 23, 0.85) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+  padding: 0 1.5rem;
+}
+
+/* Participant tiles: rounded cards */
+.lk-participant-tile {
+  border-radius: 1rem !important;
+  overflow: hidden;
+  background: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Active speaker highlight */
+.lk-participant-tile[data-lk-speaking="true"] {
+  border-color: rgba(14, 165, 233, 0.6) !important;
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3) !important;
+}
+
+/* Metadata bar at bottom of tile */
+.lk-participant-metadata {
+  background: linear-gradient(to top, rgba(2, 6, 23, 0.9), transparent) !important;
+  backdrop-filter: none;
+}
+
+/* Chat panel */
+.lk-chat {
+  background: #0b1120 !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+.lk-chat-messages {
+  background: transparent !important;
+}
+
+.lk-message-body {
+  background: rgba(14, 165, 233, 0.1) !important;
+  border: 1px solid rgba(14, 165, 233, 0.15) !important;
+  border-radius: 0.75rem !important;
+  color: #e2e8f0 !important;
+}
+
+/* Focus ring */
+.lk-button:focus-visible {
+  box-shadow: var(--lk-focus-ring) !important;
+  outline: none !important;
+}
+
+/* Ensure video fills tiles correctly */
+.lk-participant-tile video {
+  object-fit: cover;
+}
+
+/* Grid layout: tighter gap */
+.lk-grid-layout {
+  gap: 0.5rem !important;
+  padding: 0.5rem !important;
+}
+
+/* Pre-join / prejoin screen */
+.lk-prejoin {
+  background: #020617 !important;
+}

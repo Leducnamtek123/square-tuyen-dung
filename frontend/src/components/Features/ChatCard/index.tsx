@@ -1,0 +1,79 @@
+'use client';
+import React from 'react';
+import { useAppSelector } from '@/redux/hooks';
+import { useRouter } from 'next/navigation';
+import { Badge, IconButton } from "@mui/material";
+import ForumIcon from '@mui/icons-material/Forum';
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  QueryDocumentSnapshot,
+  DocumentData,
+} from 'firebase/firestore';
+import db from '@/configs/firebase-config';
+import { ROUTES } from '@/configs/constants';
+import { useTranslation } from 'react-i18next';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+
+interface ChatCardProps {
+  // Add specific props if needed
+}
+
+const chatRoomCollectionRef = collection(db, 'chatRooms');
+
+const ChatCard = (_props: ChatCardProps) => {
+  const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
+  const { push } = useRouter();
+  const { t, i18n } = useTranslation('common');
+  const [count, setCount] = React.useState(0);
+
+  const isEmployer = React.useMemo(() => {
+    return activeWorkspace?.type === "company";
+  }, [activeWorkspace]);
+
+  React.useEffect(() => {
+    if (!currentUser?.id) return;
+
+    const q = query(
+      chatRoomCollectionRef,
+      where('recipientId', '==', `${currentUser.id}`),
+      where('unreadCount', '>', 0)
+    );
+
+    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+      let total = 0;
+      querySnapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+        const documentData = doc.data();
+        const unreadCount = documentData.unreadCount || 0;
+        total += unreadCount;
+      });
+      setCount(total);
+      // total unread messages loaded
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [currentUser]);
+
+  const handleRedirect = () => {
+    push(localizeRoutePath(isEmployer ? `/${ROUTES.EMPLOYER.CHAT}` : `/${ROUTES.JOB_SEEKER.CHAT}`, i18n.language));
+  };
+
+  return (
+    <IconButton
+      onClick={handleRedirect}
+      size="large"
+      aria-label={t('chatCard.openChat')}
+      color="inherit"
+    >
+      <Badge badgeContent={count} color="error">
+        <ForumIcon />
+      </Badge>
+    </IconButton>
+  );
+};
+
+export default ChatCard;

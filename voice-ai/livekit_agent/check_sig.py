@@ -1,5 +1,6 @@
-import livekit.agents
 import inspect
+
+import livekit.agents
 
 sig = inspect.signature(livekit.agents.AgentSession.__init__)
 print(f"AgentSession.__init__ signature: {sig}")

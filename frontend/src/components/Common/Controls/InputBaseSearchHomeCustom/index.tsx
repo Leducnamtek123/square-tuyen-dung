@@ -1,0 +1,380 @@
+'use client';
+import * as React from 'react';
+import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import { useTheme } from '@mui/material/styles';
+import InputBase from '@mui/material/InputBase';
+import Button from '@mui/material/Button';
+import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
+import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
+import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { Box, ClickAwayListener, List, ListItem, ListItemIcon, ListItemText, Popper, Stack, Typography, CircularProgress, IconButton, InputAdornment } from '@mui/material';
+const PopperAny = Popper as unknown as React.ComponentType<any>;
+import { useDebounce } from '@/hooks';
+import { searchJobPostWithKeyword } from '@/redux/filterSlice';
+import jobService from '@/services/jobService';
+import { ROUTES } from '@/configs/constants';
+import { useTranslation } from 'react-i18next';
+import {
+  RECENT_SEARCH_STORAGE_KEY,
+  LEGACY_RECENT_SEARCH_STORAGE_KEY,
+  readVersionedJson,
+  writeVersionedJson,
+} from '@/utils/storageKeys';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+const ControllerAny = Controller as any;
+
+interface Props<T extends FieldValues = FieldValues> {
+  name: string;
+  control: Control<T>;
+  placeholder?: string;
+  showSubmitButton?: boolean;
+  location?: 'HOME' | string;
+  variant?: 'default' | 'hero';
+}
+
+type SearchState = {
+  showResult: boolean;
+  searchValue: string;
+  searchResult: string[];
+  recentSearch: string[];
+  isLoading: boolean;
+};
+
+type SearchAction =
+  | { type: 'show_result'; value: boolean }
+  | { type: 'set_search_value'; value: string }
+  | { type: 'set_search_result'; value: string[] }
+  | { type: 'set_recent_search'; value: string[] }
+  | { type: 'set_loading'; value: boolean };
+
+const initialState: SearchState = {
+  showResult: false,
+  searchValue: '',
+  searchResult: [],
+  recentSearch: [],
+  isLoading: false,
+};
+
+function reducer(state: SearchState, action: SearchAction): SearchState {
+  switch (action.type) {
+    case 'show_result':
+      return { ...state, showResult: action.value };
+    case 'set_search_value':
+      return { ...state, searchValue: action.value };
+    case 'set_search_result':
+      return { ...state, searchResult: action.value };
+    case 'set_recent_search':
+      return { ...state, recentSearch: action.value };
+    case 'set_loading':
+      return { ...state, isLoading: action.value };
+    default:
+      return state;
+  }
+}
+
+const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
+  name,
+  control,
+  placeholder,
+  showSubmitButton = false,
+  location = 'HOME',
+  variant = 'default',
+}: Props<T>) => {
+  const theme = useTheme();
+  const isHero = variant === 'hero';
+  const { t, i18n } = useTranslation('common');
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const inputSearchRef = React.useRef<HTMLDivElement | null>(null);
+  const { push } = useRouter();
+  const dispatch = useDispatch();
+  const [state, dispatchSearch] = React.useReducer(reducer, initialState);
+  const debounced = useDebounce(state.searchValue, 300);
+  const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
+
+  React.useEffect(() => {
+    try {
+      const parsed = readVersionedJson<unknown[]>(
+        RECENT_SEARCH_STORAGE_KEY,
+        [LEGACY_RECENT_SEARCH_STORAGE_KEY]
+      );
+      if (!parsed) return;
+      dispatchSearch({
+        type: 'set_recent_search',
+        value: Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [],
+      });
+    } catch {
+      dispatchSearch({ type: 'set_recent_search', value: [] });
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (!debounced) {
+      dispatchSearch({ type: 'set_loading', value: false });
+      return;
+    }
+
+    let active = true;
+    dispatchSearch({ type: 'set_loading', value: true });
+
+    const loadSuggestions = async () => {
+      try {
+        const resData = await jobService.searchJobSuggestTitle(debounced);
+        const data = Array.isArray(resData)
+          ? resData
+          : ((resData as { results?: string[] })?.results || (resData as { data?: string[] })?.data || []);
+        if (active) {
+          dispatchSearch({ type: 'set_search_result', value: data.flat() });
+        }
+      } catch (error) {
+        console.error('Search failed: ', error);
+      } finally {
+        if (active) {
+          dispatchSearch({ type: 'set_loading', value: false });
+        }
+      }
+    };
+
+    loadSuggestions();
+
+    return () => {
+      active = false;
+    };
+  }, [debounced]);
+
+  const handleHideResult = () => {
+    dispatchSearch({ type: 'show_result', value: false });
+  };
+
+  const handleClickItem = (kw: string) => {
+    dispatch(searchJobPostWithKeyword({ kw }));
+    const nextRecent = [kw, ...state.recentSearch.filter((item) => item !== kw)].slice(0, 6);
+    dispatchSearch({ type: 'set_recent_search', value: nextRecent });
+    dispatchSearch({ type: 'show_result', value: false });
+    try {
+      writeVersionedJson(RECENT_SEARCH_STORAGE_KEY, nextRecent);
+    } catch {
+      // ignore storage errors
+    }
+
+    if (location === 'HOME') {
+      push(jobsHref);
+    }
+  };
+
+  return (
+    <ClickAwayListener onClickAway={handleHideResult}>
+      <div ref={inputSearchRef}>
+        <Box
+          sx={{
+            minHeight: isHero ? 56 : showSubmitButton ? 54 : 48,
+            boxShadow: isHero ? 'none' : '0 10px 26px rgba(15, 23, 42, 0.08)',
+            borderRadius: isHero ? 1 : 999,
+            p: isHero ? 0 : '4px',
+            display: 'flex',
+            alignItems: 'center',
+            width: '100%',
+            backgroundColor: isHero ? 'transparent' : theme.palette.mode === 'light' ? 'white' : '#121212',
+            border: '1px solid',
+            borderColor: isHero ? 'transparent' : 'rgba(226, 232, 240, 0.95)',
+            transition: 'border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease',
+            '&:focus-within': {
+              borderColor: isHero ? 'transparent' : '#0f172a',
+              boxShadow: isHero ? 'none' : '0 0 0 4px rgba(15, 23, 42, 0.08), 0 16px 34px rgba(15, 23, 42, 0.08)',
+            },
+          }}
+        >
+          <Box
+              sx={{
+                width: isHero ? 44 : 38,
+                height: isHero ? 56 : 38,
+                display: 'grid',
+                placeItems: 'center',
+                borderRadius: isHero ? 1 : '50%',
+              color: '#0f172a',
+                bgcolor: isHero ? 'transparent' : 'rgba(15, 23, 42, 0.06)',
+                flexShrink: 0,
+              }}
+            >
+            <SearchIcon fontSize="small" />
+          </Box>
+          <ControllerAny
+            name={name as Path<T>}
+            control={control}
+            render={({ field }: any) => (
+              <InputBase
+                inputRef={inputRef}
+                id={field.name}
+                sx={{
+                  ml: isHero ? 0 : 1.25,
+                  flex: 1,
+                  minWidth: 0,
+                  '& .MuiInputBase-input': {
+                    fontWeight: 600,
+                    color: 'text.primary',
+                    fontSize: isHero ? 14 : undefined,
+                    py: isHero ? 1.4 : undefined,
+                    '&::placeholder': {
+                      color: isHero ? 'rgba(15, 23, 42, 0.55)' : 'text.secondary',
+                      opacity: isHero ? 1 : 0.78,
+                    },
+                  },
+                }}
+                placeholder={placeholder}
+                slotProps={{ input: { 'aria-label': 'search' } }}
+                value={field.value ?? ''}
+                onFocus={() => dispatchSearch({ type: 'show_result', value: true })}
+                onChange={(e) => {
+                  const textValue = e.target.value;
+                  field.onChange(textValue);
+                  dispatchSearch({ type: 'set_search_result', value: [] });
+                  dispatchSearch({ type: 'set_search_value', value: textValue });
+                  dispatchSearch({ type: 'set_loading', value: true });
+                }}
+                onBlur={field.onBlur}
+                endAdornment={
+                  <InputAdornment
+                    position="end"
+                    sx={{
+                      visibility: field.value !== '' && field.value !== null ? 'visible' : 'hidden',
+                    }}
+                  >
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        field.onChange('');
+                        dispatchSearch({ type: 'set_search_value', value: '' });
+                        inputRef.current?.focus();
+                      }}
+                    >
+                      <ClearIcon fontSize="inherit" />
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            )}
+          />
+          {showSubmitButton && (
+            <Button
+              variant="contained"
+              type="submit"
+              color="primary"
+              startIcon={<SearchIcon />}
+              sx={{
+                flexShrink: 0,
+                minHeight: 44,
+                minWidth: { xs: 44, sm: 112 },
+                px: { xs: 1.5, sm: 2.5 },
+                bgcolor: '#0f172a',
+                '&:hover': {
+                  bgcolor: '#111827',
+                },
+                '& .MuiButton-startIcon': {
+                  display: { xs: 'none', sm: 'inherit' },
+                },
+              }}
+            >
+              {t('search.button')}
+            </Button>
+          )}
+        </Box>
+
+        <PopperAny
+          open={state.showResult}
+          anchorEl={inputSearchRef.current}
+          placement="bottom-start"
+          style={{ zIndex: 20, width: inputSearchRef.current?.offsetWidth }}
+        >
+          <Box
+            sx={{
+              backgroundColor: 'white',
+              py: 2,
+              px: 2,
+              boxShadow: '0 22px 50px rgba(15, 23, 42, 0.16)',
+              border: '1px solid rgba(226, 232, 240, 0.95)',
+              borderRadius: 3,
+              maxHeight: '60vh',
+              overflowY: 'auto',
+            }}
+          >
+            <Stack>
+              <Box>
+              <Typography fontWeight={800} fontSize={15} color="#0f172a">
+                  {t('search.suggestions')}
+                </Typography>
+                <Stack>
+                  {state.isLoading ? (
+                    <Stack sx={{ py: 2 }} justifyContent="center" alignItems="center">
+                      <CircularProgress size={20} />
+                    </Stack>
+                  ) : state.searchResult.length === 0 ? (
+                    <Typography my={1} textAlign="center" color="#bdbdbd" variant="caption">
+                      {t('search.noResults')}
+                    </Typography>
+                  ) : (
+                    <List>
+                      {state.searchResult.map((value) => (
+                        <ListItem
+                          key={value}
+                          sx={{
+                            '&:hover': {
+                              backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                            },
+                            cursor: 'pointer',
+                            borderRadius: 2,
+                            px: 1,
+                          }}
+                          onClick={() => handleClickItem(value)}
+                        >
+                          <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
+                            <LightbulbOutlinedIcon sx={{ color: '#f59e0b' }} />
+                          </ListItemIcon>
+                          <ListItemText primary={`${value}`} secondary={null} />
+                        </ListItem>
+                      ))}
+                    </List>
+                  )}
+                </Stack>
+              </Box>
+
+              {state.recentSearch.length > 0 && (
+                <Box>
+                  <Typography fontWeight={800} fontSize={15} color="#0f172a">
+                    {t('search.recent')}
+                  </Typography>
+                  <Stack>
+                    <List>
+                      {state.recentSearch.map((value) => (
+                        <ListItem
+                          key={value}
+                          sx={{
+                            '&:hover': {
+                              backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                            },
+                            cursor: 'pointer',
+                            borderRadius: 2,
+                            px: 1,
+                          }}
+                          onClick={() => handleClickItem(value)}
+                        >
+                          <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
+                            <QueryBuilderIcon sx={{ color: '#0f172a' }} />
+                          </ListItemIcon>
+                          <ListItemText primary={`${value}`} secondary={null} />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Stack>
+                </Box>
+              )}
+            </Stack>
+          </Box>
+        </PopperAny>
+      </div>
+    </ClickAwayListener>
+  );
+};
+
+export default InputBaseSearchHomeCustom;

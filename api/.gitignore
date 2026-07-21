@@ -139,3 +139,6 @@ staticfiles
 .DS_Store
 
 .agent
+
+# Node (should not be in Python project)
+node_modules/

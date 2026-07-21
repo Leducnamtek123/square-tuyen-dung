@@ -1,148 +1,149 @@
-# SquareAI - The Intelligent Recruitment Ecosystem
+# Square Tuyển Dụng
 
-[License: MIT](https://opensource.org/licenses/MIT)
-[Python: 3.10+](https://www.python.org/)
-[Node: 20+](https://nodejs.org/)
-[Docker: Supported](https://www.docker.com/)
+Nền tảng tuyển dụng thông minh với AI phỏng vấn tự động — xây dựng cho ngành Xây dựng & Thiết kế.
 
-SquareAI is a comprehensive, AI-powered recruitment platform designed to bridge the gap between employers and job seekers. Beyond traditional job portal features, it integrates a cutting-edge Autonomous AI Voice Interviewer to automate and enhance the screening process.
+## Kiến Trúc Tổng Quan
 
----
-
-## Table of Contents
-
-- [Key Features](#key-features)
-- [System Architecture](#system-architecture)
-- [Tech Stack](#tech-stack)
-- [Quick Start](#quick-start)
-- [Project Structure](#project-structure)
-- [Configuration](#configuration)
-- [Contributing](#contributing)
-
----
-
-## Key Features
-
-### For Job Seekers
-- Smart Job Search: Filter and find jobs based on skills, location, and salary.
-- AI Interview Practice: Engage with voice-based AI to prepare for real-world scenarios.
-- Application Tracking: Real-time updates on application status and interview results.
-- Integrated Chat: Communicate directly with employers through a built-in messaging system.
-
-### For Employers
-- Talent Management: Streamlined dashboard for posting jobs and managing applicants.
-- AI Interviewer: Deploy autonomous voice agents to conduct initial screenings.
-- Real-time Evaluation: AI-generated transcripts and candidate scores immediately after interviews.
-- Advanced Admin Panel: Modern MUI-based interface for system-wide configuration.
-
----
-
-## System Architecture
-
-```mermaid
-graph TD
-    User((User/Candidate)) <--> Frontend[React/MUI Frontend]
-    Admin((Admin/Employer)) <--> Frontend
-    
-    Frontend <--> API[Django REST API]
-    API <--> DB[(MySQL)]
-    API <--> Cache[(Redis)]
-    API <--> Task[Celery Worker]
-    
-    Frontend <--> LiveKit[LiveKit Media Server]
-    LiveKit <--> Agent[Python Voice AI Agent]
-    
-    subgraph "AI Inference Stack"
-        Agent <--> STT[Whisper/Nemotron STT]
-        Agent <--> LLM[llama.cpp LLM]
-        Agent <--> TTS[Vieneu/Kokoro TTS]
-    end
 ```
-
----
+┌─────────────────────────────────────────────────────────┐
+│                   Nginx Gateway (:80)                   │
+│              (SSL termination, routing)                 │
+├────────────┬────────────┬───────────┬───────────────────┤
+│  Frontend  │  Backend   │  LiveKit  │  MinIO (S3)       │
+│ React/Vite │ Django/DRF │  WebRTC   │  Object Storage   │
+│   (:80)    │  (:8000)   │  (:7880)  │  (:9000/:9001)    │
+└─────┬──────┴─────┬──────┴─────┬─────┴───────────────────┘
+      │            │            │
+      │     ┌──────┴──────┐    │
+      │     │   Celery     │    │
+      │     │ Worker+Beat  │    │
+      │     └──────┬──────┘    │
+      │            │            │
+┌─────┴────────────┴────────────┴─────┐
+│            Data Layer               │
+│  MySQL 8.0 │ Redis 7 │ Elasticsearch│
+└─────────────────────────────────────┘
+      │
+┌─────┴──────────────────────────┐
+│         AI Pipeline (GPU)      │
+│  llama.cpp │ Whisper │ TTS     │
+│  (Qwen2.5) │  (STT)  │(ViệtNam)│
+│            │         │         │
+│       LiveKit Agent            │
+│   (Voice Interview Bot)       │
+└────────────────────────────────┘
+```
 
 ## Tech Stack
 
-- Core Backend: [Django 4.2](https://www.djangoproject.com/) & [Django REST Framework](https://www.django-rest-framework.org/)
-- Core Frontend: [React 18](https://reactjs.org/), [MUI 6](https://mui.com/), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/)
-- Real-time Media: [LiveKit](https://livekit.io/)
-- AI/ML:
-  - LLM: llama.cpp (Qwen/Llama models)
-  - STT: NVIDIA Nemotron / OpenAI Whisper
-  - TTS: Vieneu-TTS (Vietnamese) / Kokoro
-- Data Persistence: MySQL 8.0, Redis 7
-- DevOps: Docker & Docker Compose
+| Layer | Công nghệ |
+|-------|-----------|
+| **Frontend** | React 18, Vite 8, MUI 6, Redux Toolkit, TypeScript |
+| **Backend** | Django 4.x, DRF, Celery, drf-social-oauth2 |
+| **Database** | MySQL 8.0, Redis 7, Elasticsearch 7.17 |
+| **AI** | Qwen 2.5-14B (llama.cpp), Whisper Large v3, ViệtNam TTS |
+| **Realtime** | LiveKit (WebRTC), Firebase Realtime DB |
+| **Storage** | MinIO (S3-compatible) |
+| **Infra** | Docker Compose, Nginx, GitHub Actions CI |
 
----
+## Yêu Cầu Hệ Thống
 
-## Quick Start
+- Docker & Docker Compose v2+
+- NVIDIA GPU + CUDA drivers (cho AI services)
+- Tối thiểu 16GB RAM, 50GB disk
+- Domain với SSL certificate (production)
 
-### Prerequisites
-- Docker & Docker Compose installed.
-- NVIDIA GPU (Optional but highly recommended for Voice-AI inference).
-- RAM: Minimum 12GB+ (16GB+ recommended).
+## Cấu Trúc Thư Mục
 
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Square/square-ai-platform.git
-   cd square-ai-platform
-   ```
-
-2. Setup Environment Variables:
-   Follow the detailed instructions in the [Configuration](#configuration) section.
-
-3. Launch the platform:
-   ```bash
-   # Standard launch (CPU/Mixed)
-   docker-compose up -d --build
-   ```
-
-4. Access the services:
-   - Job Seeker Portal: http://localhost:3005
-   - Employer Portal: http://employer.localhost:3005
-   - API Admin: http://localhost:8010/admin/
-   - API Docs: http://localhost:8010/swagger/
-
----
-
-## Project Structure
-
-```text
-.
-├── api/             # Django Backend System
-├── frontend/        # React Web Application
-├── voice-ai/        # AI Interview Agent & Inference Services
-│   ├── inference/   # ML Model Services (LLM, STT, TTS)
-│   └── livekit_agent/# Python Voice Orchestrator
-├── docker-compose.yml # Main orchestration
-└── README.md        # You are here
+```
+├── api/                    # Django backend
+│   ├── apps/               # Django apps (accounts, jobs, profiles, interviews, ...)
+│   ├── config/             # Settings, URLs, Celery, Admin
+│   ├── common/             # Shared models, serializers
+│   ├── shared/             # Utilities, permissions, helpers
+│   └── integrations/       # AI & LiveKit integrations
+├── frontend/               # React SPA
+│   └── src/
+│       ├── components/     # Reusable UI components
+│       ├── pages/          # Page-level components
+│       ├── services/       # API service layer
+│       ├── redux/          # State management
+│       └── routes/         # Routing configuration
+├── voice-ai/               # AI voice interview services
+│   ├── inference/          # Whisper, TTS model servers
+│   └── livekit_agent/      # LiveKit voice agent
+├── nginx-gateway/          # Nginx reverse proxy config
+├── docker-compose.yml      # Production orchestration
+└── .github/workflows/      # CI/CD pipelines
 ```
 
----
+## Khởi Chạy Nhanh
 
-## Configuration
+### 1. Clone & cấu hình
 
-The platform requires several third-party service configurations to be fully functional. Please refer to the READMEs in each sub-directory for detailed setup:
+```bash
+git clone <repo-url>
+cd square-tuyen-dung
 
-1. [Backend Configuration](./api/README.md): Cloudinary, Firebase, Social Auth (Google/Facebook).
-2. [Frontend Configuration](./frontend/README.md): GOONG Maps, Firebase Client.
-3. [Voice-AI Configuration](./voice-ai/README.md): LiveKit, Model selection (llama-cpp, whisper).
+# Copy và chỉnh sửa file .env
+cp api/.env.example .env
+# Sửa các giá trị: DB_PASSWORD, SECRET_KEY, MINIO_*, ...
+```
 
----
+### 2. Chạy với Docker Compose
 
-## Tieng Viet (Vietnamese)
+```bash
+# Build và khởi động tất cả services
+docker compose up -d --build
 
-### Tong quan
-SquareAI la mot he sinh thai tuyen dung thong minh, ket hop giua cong thong tin viec lam truyen thong va cong nghe AI Voice Interviewer tien tien. He thong giup tu dong hoa quy trinh phong van so loai, mang lai trai nghiem hien dai cho ca ung vien va nha tuyen dung.
+# Chạy migrations (lần đầu)
+docker compose run --rm migrate
 
-### Diem noi bat
-- Phong van bang giong noi AI: Tu dong hoa vong so loai voi AI Agent thong minh.
-- Bao cao & Danh gia tuc thi: Chuyen doi giong noi thanh van ban va cham diem ung vien bang AI.
-- Kien truc Microservices: De dang mo rong va tuy chinh cac dich vu inference (LLM, STT, TTS).
-- Giao dien hien dai: Su dung Material UI (MUI) phien ban moi nhat cho trai nghiem nguoi dung muot ma.
+# Seed dữ liệu mẫu
+docker compose exec backend python manage.py seed_all
+```
 
----
+### 3. Development (không Docker)
 
-Built with Love by SQ Studio
+```bash
+# Backend
+cd api
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+
+# Frontend
+cd frontend
+npm install
+npm run start
+```
+
+## Portals
+
+| Portal | URL (Production) | Mô tả |
+|--------|-------------------|--------|
+| Job Seeker | `https://infohr.vn` | Tìm việc, nộp CV, phỏng vấn AI |
+| Employer | `https://infohr.vn/employer/` | Đăng tin, quản lý ứng viên |
+| Admin | `https://infohr.vn/admin/` | Quản trị hệ thống |
+| API Docs | `https://infohr.vn/swagger/` | Swagger UI |
+| MinIO Console | `https://infohr.vn/minio-console/` | Object storage UI |
+
+## CI/CD
+
+- **Lint**: flake8 + isort (backend), ESLint (frontend)
+- **Test**: pytest + coverage (backend), vitest (frontend)
+- **Build**: Docker image build verification
+- **Migration Check**: `makemigrations --check --dry-run`
+
+## Tài Liệu Bổ Sung
+
+- [Backend API README](api/README.md)
+- [Frontend README](frontend/README.md)
+- [Voice AI README](voice-ai/README.md)
+- [LiveKit Agent Docs](LIVIKIT_AGENTS_DOCS.md)
+- [Migration Guide](MIGRATIONS.md)
+- [Start Guide](START_GUIDE.md)
+
+## License
+
+Proprietary — © Square Group Vietnam

@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.5
-ARG MIRROR_PREFIX=nvidia
+ARG MIRROR_PREFIX=docker.io/nvidia
 ARG WHISPER_BASE=${MIRROR_PREFIX}/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 FROM ${WHISPER_BASE}
 
@@ -20,10 +20,11 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-# Install vox-box using uv with cache
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --system --no-cache-dir "setuptools<82.0" wheel \
-    && uv pip install --system --no-build-isolation vox-box
+# Install vox-box using pip to avoid wheel metadata issues with uv
+# We must upgrade pip first to fix the resolvelib AssertionError bug in old pip versions
+RUN pip3 install --no-cache-dir --upgrade pip \
+    && pip3 install --no-cache-dir "setuptools<82.0" wheel \
+    && pip3 install --no-cache-dir --no-build-isolation vox-box
 
 ENV DATA_DIR=/data
 

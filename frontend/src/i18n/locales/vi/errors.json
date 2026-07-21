@@ -1,6 +1,14 @@
 {
   "notFoundTitle": "Không tìm thấy trang",
+  "notFoundBody": "Trang bạn đang tìm kiếm không tồn tại hoặc đã được di chuyển.",
+  "notFoundCode": "404",
   "forbiddenTitle": "Truy cập bị từ chối",
+  "forbiddenBody": "Bạn không có quyền truy cập vào trang này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là lỗi.",
+  "forbiddenCode": "403",
   "systemErrorTitle": "Đã có lỗi xảy ra",
-  "systemErrorBody": "Vui lòng thử lại sau."
+  "systemErrorBody": "Hệ thống đang gặp sự cố. Vui lòng thử lại sau.",
+  "systemErrorCode": "500",
+  "backHome": "Về trang chủ",
+  "tryAgain": "Thử lại",
+  "or": "hoặc"
 }

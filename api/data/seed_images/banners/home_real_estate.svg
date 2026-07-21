@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="500" viewBox="0 0 1600 500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#07111f"/>
+      <stop offset="55%" stop-color="#14324f"/>
+      <stop offset="100%" stop-color="#1f6d8c"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fb7185"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="500" fill="url(#bg)"/>
+  <circle cx="1320" cy="110" r="170" fill="#38bdf822"/>
+  <circle cx="240" cy="420" r="210" fill="#0ea5e91a"/>
+  <rect x="110" y="90" width="520" height="320" rx="28" fill="#07111fcc" stroke="#ffffff18"/>
+  <rect x="170" y="160" width="110" height="200" rx="10" fill="#ffffff14"/>
+  <rect x="300" y="120" width="90" height="240" rx="10" fill="#ffffff12"/>
+  <rect x="410" y="180" width="120" height="180" rx="10" fill="#ffffff16"/>
+  <path d="M160 350L360 220L540 350V400H160Z" fill="#ffffff10" stroke="#ffffff22" stroke-width="4"/>
+  <circle cx="470" cy="170" r="44" fill="url(#accent)"/>
+  <path d="M470 132c-29 0-52 23-52 52 0 30 52 86 52 86s52-56 52-86c0-29-23-52-52-52zm0 78a26 26 0 1 1 0-52 26 26 0 0 1 0 52z" fill="#0b1220" opacity="0.95"/>
+  <text x="700" y="150" fill="#f8fafc" font-size="62" font-family="Arial, Helvetica, sans-serif" font-weight="700">BẤT ĐỘNG SẢN SQUARE</text>
+  <text x="700" y="210" fill="#dbeafe" font-size="34" font-family="Arial, Helvetica, sans-serif">Tuyển đúng người cho đúng dự án</text>
+  <text x="700" y="265" fill="#cbd5e1" font-size="24" font-family="Arial, Helvetica, sans-serif">Tư vấn dự án · Sales · Chăm sóc khách hàng</text>
+  <rect x="700" y="305" width="290" height="10" rx="5" fill="url(#accent)"/>
+  <text x="700" y="392" fill="#ffffff" font-size="28" font-family="Arial, Helvetica, sans-serif" font-weight="700">Khám phá việc làm trong 4 ngành trọng điểm</text>
+</svg>

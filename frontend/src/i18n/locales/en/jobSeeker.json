@@ -4,12 +4,13 @@
   "nav": {
     "dashboard": "My Dashboard",
     "profile": "My Profile",
-    "myJobs": "My Jobs",
+    "jobs": "Jobs",
     "myCompany": "My Company",
     "myInterviews": "My Interviews",
     "notifications": "Notifications",
     "accountSettings": "Account & Settings",
-    "myDashboard": "My {{appName}}"
+    "myDashboard": "My {{appName}}",
+    "tabsAria": "Job seeker navigation tabs"
   },
   "profile": {
     "title": "My Profile",
@@ -19,12 +20,14 @@
     "sections": {
       "personal": "Personal Information",
       "general": "General Information",
+      "generalInfo": "General Information",
       "experience": "Work Experience",
       "education": "Education",
       "skills": "Professional Skills",
       "certificates": "Certificates",
       "language": "Language",
-      "resume": "Resume Information"
+      "resume": "Resume Information",
+      "advancedSkills": "Advanced Skills"
     },
     "fields": {
       "fullName": "Full Name",
@@ -64,7 +67,23 @@
       "language": "Language",
       "trainingPlace": "Training Place",
       "noExpiration": "No Expiration",
-      "cvFile": "Choose your CV file"
+      "cvFile": "Choose your CV file",
+      "salaryMin": "Minimum Salary",
+      "salaryMax": "Maximum Salary",
+      "skillName": "Skill Name",
+      "jobTitle": "Job Title",
+      "companyName": "Company Name",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "additionalDescription": "Additional Description",
+      "lastSalary": "Last Salary",
+      "leaveReason": "Reason for Leaving",
+      "degreeName": "Degree Name",
+      "major": "Major",
+      "completedDate": "Completion Date",
+      "gradeOrRank": "Grade / Rank",
+      "certificateName": "Certificate Name",
+      "expirationDate": "Expiration Date"
     },
     "placeholders": {
       "fullName": "Enter full name",
@@ -81,7 +100,32 @@
       "selectGender": "Select gender",
       "selectMaritalStatus": "Select marital status",
       "selectCity": "Select city/province",
-      "selectDistrict": "Select district"
+      "selectDistrict": "Select district",
+      "selectLanguage": "Select language",
+      "skillName": "Enter skill name",
+      "salaryMin": "Enter minimum salary",
+      "salaryMax": "Enter maximum salary",
+      "address": "Enter address",
+      "desiredPosition": "Enter desired position",
+      "selectLevel": "Select level",
+      "selectAcademicLevel": "Select academic level",
+      "selectExperience": "Select experience",
+      "selectCareer": "Select career",
+      "expectedSalary": "Enter expected salary",
+      "selectWorkplaceType": "Select workplace type",
+      "selectJobType": "Select job type",
+      "objective": "Enter career objective",
+      "skillsSummary": "Describe your skills",
+      "jobTitle": "Enter job title",
+      "companyName": "Enter company name",
+      "additionalDescription": "Enter additional description",
+      "lastSalary": "Enter last salary",
+      "leaveReason": "Enter reason for leaving",
+      "degreeName": "Enter degree name",
+      "major": "Enter major",
+      "trainingPlace": "Enter training institution",
+      "gradeOrRank": "Enter grade or rank",
+      "certificateName": "Enter certificate name"
     },
     "validation": {
       "fullNameRequired": "Full name is required.",
@@ -91,6 +135,7 @@
       "phoneMax": "Phone number exceeds allowed length.",
       "birthdayRequired": "Date of birth is required.",
       "birthdayInvalid": "Invalid date of birth.",
+      "idCardIssueDateInvalid": "ID card issue date cannot be in the future.",
       "genderRequired": "Gender is required.",
       "maritalStatusRequired": "Marital status is required.",
       "cityRequired": "City/Province is required.",
@@ -105,11 +150,13 @@
       "careerRequired": "Career is required.",
       "salaryMinRequired": "Minimum desired salary is required.",
       "salaryMinInvalid": "Invalid minimum salary.",
-      "salaryMinComparison": "Minimum salary must be less than maximum salary.",
+      "salaryMinComparison": "Minimum salary must be less than or equal to maximum salary.",
       "salaryMaxRequired": "Maximum desired salary is required.",
       "salaryMaxInvalid": "Invalid maximum salary.",
-      "salaryMaxComparison": "Maximum salary must be greater than minimum salary.",
+      "salaryMaxComparison": "Maximum salary must be greater than or equal to minimum salary.",
       "expectedSalaryInvalid": "Expected salary must be a positive number.",
+      "salaryTooLarge": "Salary exceeds the allowed limit.",
+      "choiceInvalid": "Invalid selection.",
       "workplaceTypeRequired": "Workplace type is required.",
       "jobTypeRequired": "Job type is required.",
       "objectiveRequired": "Career objective is required.",
@@ -121,10 +168,12 @@
       "companyNameMax": "Company name exceeds allowed length.",
       "startDateRequired": "Start date is required.",
       "startDateYesterday": "Start date must be before today.",
-      "startDateComparison": "Start date must be before end date.",
+      "startDateComparison": "Start date must be before or equal to end date.",
       "endDateRequired": "End date is required.",
       "endDateToday": "End date must be before or on today.",
-      "endDateComparison": "End date must be after start date.",
+      "endDateComparison": "End date must be after or equal to start date.",
+      "completedDateComparison": "Completion date must be after or equal to start date.",
+      "expirationDateComparison": "Expiration date must be after or equal to start date.",
       "lastSalaryInvalid": "Last salary must be a positive number.",
       "leaveReasonMax": "Reason exceeds allowed length.",
       "degreeNameRequired": "Degree/Certificate name is required.",
@@ -138,10 +187,14 @@
       "certificateNameMax": "Certificate name exceeds allowed length.",
       "languageRequired": "Language is required.",
       "levelRequired": "Level is required.",
+      "levelInvalid": "Invalid level.",
       "skillNameRequired": "Skill name is required.",
       "skillNameMax": "Skill name exceeds allowed length.",
       "fileRequired": "File is required.",
-      "fieldMax": "{{field}} exceeds allowed length."
+      "filePdfOnly": "Only PDF files are accepted.",
+      "fileTooLarge": "PDF file must be 10MB or smaller.",
+      "fieldMax": "{{field}} exceeds allowed length.",
+      "descriptionMax": "Description must not exceed 500 characters"
     },
     "messages": {
       "personalUpdateSuccess": "Personal information updated successfully",
@@ -172,12 +225,47 @@
       "noCertificateData": "Please add your certificates for employers to reference",
       "noLanguageData": "Please add your language skills for employers to reference",
       "noResumeData": "No resumes uploaded yet",
-      "notFound": "Profile information not found"
+      "notFound": "Profile information not found",
+      "profileCompletionWarning": "Please add all necessary information to complete your profile."
+    },
+    "aria": {
+      "advancedSkillsTable": "Advanced skills table",
+      "languageSkillsTable": "Language skills table"
+    },
+    "summary": {
+      "experience": "Experience",
+      "position": "Position",
+      "desiredSalary": "Desired Salary",
+      "lastUpdated": "Last Updated"
+    },
+    "actions": {
+      "editProfile": "Edit Profile",
+      "uploadCv": "Upload CV",
+      "updateCv": "Update CV",
+      "generatingPdf": "Generating PDF..."
+    },
+    "cv": {
+      "loading": "Loading CV...",
+      "emptyTitle": "No CV has been uploaded yet",
+      "emptySubtitle": "Click the upload button to add your CV",
+      "loadingPreview": "Loading preview...",
+      "updateTitle": "Update CV"
+    },
+    "tooltips": {
+      "searchable": "Enabling \"Searchable\" will help employers find your profile and contact you about new opportunities. Only one profile can be searchable at a time."
     }
   },
   "noDataForStatistics": "No data available for statistics",
   "educationAddedSuccess": "Education information added successfully.",
   "educationUpdatedSuccess": "Education information updated successfully.",
+  "activityChart": {
+    "loading": "Loading activity chart...",
+    "labels": {
+      "appliedjobs": "Applied Jobs",
+      "savedjobs": "Saved Jobs",
+      "companiesfollowed": "Companies Followed"
+    }
+  },
   "educationDeletedSuccess": "Education information deleted successfully.",
   "deleteEducationTitle": "Delete Education Information",
   "deleteEducationWarning": "This education information will be permanently deleted and cannot be restored. Are you sure?",
@@ -209,6 +297,12 @@
     "title": "Account Settings",
     "changePassword": "Change Password",
     "deactivate": "Deactivate Account"
+  },
+  "settings": {
+    "toast": {
+      "updateSuccess": "Settings updated successfully.",
+      "updateError": "Failed to update settings."
+    }
   },
   "onlineProfile": {
     "pageTitle": "Update Online Profile",
@@ -251,6 +345,25 @@
     "tabs": {
       "viewed": "Employers Viewed Profile",
       "followed": "Followed Companies"
+    },
+    "aria": {
+      "tabs": "My company tabs"
+    },
+    "empty": {
+      "viewed": "No employers have viewed your profile yet",
+      "followed": "You haven't followed any employers yet"
+    },
+    "actions": {
+      "findCompanies": "Find companies",
+      "unfollow": "Unfollow"
+    },
+    "messages": {
+      "unfollowSuccess": "Unfollowed successfully."
+    },
+    "savedProfile": "Saved your profile",
+    "viewedCard": {
+      "viewedProfile": "Viewed resume {{resumeTitle}} {{views}} times",
+      "lastViewed": "Last viewed {{date}}"
     }
   },
   "myInterviews": {
@@ -261,7 +374,10 @@
   "jobApplication": {
     "title": "Application Resumes",
     "onlineProfile": "Online Profile",
-    "attachedResume": "Attached Resume"
+    "attachedResume": "Attached Resume",
+    "aria": {
+      "navigateToProfile": "Go to my profile"
+    }
   },
   "jobManagement": {
     "title": "My Job Management",
@@ -273,6 +389,100 @@
     "notes": {
       "expired": "Note: You cannot view jobs that have expired or are temporarily suspended from receiving applications."
     },
-    "suitableJobs": "Suitable Jobs"
+    "suitableJobs": "Suitable Jobs",
+    "aria": {
+      "tabs": "My job tabs"
+    },
+    "empty": {
+      "saved": "You haven't saved any jobs yet",
+      "applied": "You haven't applied for any jobs yet"
+    },
+    "actions": {
+      "searchJobs": "Search Jobs",
+      "unsave": "Unsave"
+    },
+    "appliedOn": "Applied on: {{date}}",
+    "messages": {
+      "saved": "Job saved successfully.",
+      "unsaved": "Job removed from saved successfully."
+    },
+    "notifications": {
+      "title": "Job Notifications",
+      "subtitle": "Maximum 3 job notifications can be enabled",
+      "empty": "You don't have any job notifications yet",
+      "create": "Create Notification",
+      "createNow": "Create Notification Now",
+      "modalTitle": "Create Job Notification",
+      "addedSuccess": "Job notification added successfully.",
+      "updatedSuccess": "Job notification updated successfully.",
+      "deletedSuccess": "Job notification deleted successfully.",
+      "deleteTitle": "Delete Job Notification",
+      "deleteWarning": "This job notification will be permanently deleted and cannot be restored. Are you sure?",
+      "form": {
+        "keyword": "Keyword",
+        "keywordPlaceholder": "Enter job name or related keywords you are searching for.",
+        "career": "Career",
+        "careerPlaceholder": "Select career",
+        "city": "City/Province",
+        "cityPlaceholder": "Select city/province",
+        "position": "Position/Level",
+        "positionPlaceholder": "Select position/level",
+        "experience": "Experience",
+        "experiencePlaceholder": "Select required experience",
+        "salary": "Desired Salary",
+        "salaryPlaceholder": "Enter your desired salary",
+        "frequency": "Notification Frequency",
+        "validation": {
+          "keywordRequired": "Keyword is required.",
+          "keywordMax": "Keyword is too long.",
+          "careerRequired": "Career is required.",
+          "cityRequired": "City/Province is required.",
+          "choiceInvalid": "Invalid selection.",
+          "frequencyRequired": "Notification frequency is required.",
+          "frequencyInvalid": "Invalid notification frequency.",
+          "salaryInvalid": "Invalid desired salary."
+        }
+      }
+    }
+  },
+  "presenterationPlaceholder": "Enter your self-introduction",
+  "notUpdatedzePlaceholder": "Not updated",
+  "applyForm": {
+    "resume": {
+      "empty": "Your resume is empty",
+      "pleaseUpload": "Please attach a CV or create a new one.",
+      "createNow": "Create resume now"
+    }
+  },
+  "company": {
+    "following": "Following",
+    "follow": "Follow",
+    "followers": "followers",
+    "notUpdated": "Information not updated",
+    "jobCount": "jobs"
+  },
+  "home": {
+    "topCompanies": "Featured companies",
+    "noCompaniesFound": "No companies match your criteria yet",
+    "noFeedbacks": "No user feedback yet"
+  },
+  "jobPost": {
+    "timeLeft": "Left"
+  },
+  "login": {
+    "phone": "Phone number",
+    "phoneIntro": "Enter your phone number to receive a verification code.",
+    "otpIntro": "Enter the 6-digit code sent to your phone.",
+    "resendIn": "Resend in"
+  },
+  "actions": {
+    "sendOTP": "Send OTP code",
+    "verifyOTP": "Verify & Sign In",
+    "changePhone": "Change phone number",
+    "resendOTP": "Resend code"
+  },
+  "form": {
+    "phoneNumber": "Phone number",
+    "otpCode": "OTP code"
   }
 }

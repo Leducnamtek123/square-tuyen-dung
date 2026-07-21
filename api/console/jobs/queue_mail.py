@@ -1,27 +1,28 @@
 
-from configs import variable_system as var_sys
+from shared.configs import variable_system as var_sys
 
 from django.conf import settings
 
 from datetime import datetime
 
-from helpers import utils, helper
+from shared.helpers import utils, helper
+from shared.helpers.cloudinary_service import CloudinaryService
 
 from celery import shared_task
 
-from configs.messages import MAIL_MESSAGES
+from shared.configs.messages import MAIL_MESSAGES
 
 from django.template.loader import render_to_string
 
 from django.utils.html import strip_tags
 
-from authentication.models import (
+from apps.accounts.models import (
 
     User
 
 )
 
-from job.models import (
+from apps.jobs.models import (
 
     JobPost,
 
@@ -321,7 +322,7 @@ def send_email_for_user(user_id, full_name, to_email, frequency):
 
                 query = JobPost.objects.filter(
 
-                    status=var_sys.JOB_POST_STATUS[2][0],
+                    status=var_sys.JobPostStatus.APPROVED,
 
                     deadline__gte=datetime.now().date(),
 
@@ -353,7 +354,7 @@ def send_email_for_user(user_id, full_name, to_email, frequency):
 
                                         "salary_max", "company__company_name",
 
-                                        "company__company_image_url",
+                                        "company__logo__public_id",
 
                                         "company__slug",
 
@@ -384,6 +385,11 @@ def send_email_for_user(user_id, full_name, to_email, frequency):
             else:
 
                 domain = settings.DOMAIN_CLIENT["employer"]
+
+            for item in job_post_list:
+                public_id = item.pop("company__logo__public_id", None)
+                url, _ = CloudinaryService.get_url_from_public_id(public_id, {}) if public_id else (None, None)
+                item["company__company_image_url"] = url or var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
 
             data = {
 
@@ -422,3 +428,4 @@ def send_email_for_user(user_id, full_name, to_email, frequency):
         helper.print_log_error("send_email_for_user", ex)
 
         return f'Send job notification email to {to_email} has errors.'
+
