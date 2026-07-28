@@ -162,9 +162,10 @@ const Footer = () => {
                       color: brandNavy,
                       transition: 'all 0.2s',
                       '&:hover': {
-                        backgroundColor: '#0f172a',
-                        color: 'white',
-                        transform: 'scale(1.08)',
+                        backgroundColor: '#f1f5f9',
+                        borderColor: '#2563eb',
+                        color: '#2563eb',
+                        transform: 'scale(1.05)',
                       },
                     }}
                   >

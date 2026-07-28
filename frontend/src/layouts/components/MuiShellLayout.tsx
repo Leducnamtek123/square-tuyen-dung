@@ -19,6 +19,7 @@ import NotificationCard from '../../components/Features/NotificationCard';
 import ChatCard from '../../components/Features/ChatCard';
 
 import LanguageSwitcher from './commons/LanguageSwitcher';
+import ManagementFooter from './commons/ManagementFooter';
 
 import { IMAGES } from '../../configs/constants';
 
@@ -245,12 +246,22 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
       </Box>
 
-      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
-
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh',
+          p: 3,
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+        }}
+      >
         <Toolbar />
-
-        {children}
-
+        <Box sx={{ flexGrow: 1 }}>
+          {children}
+        </Box>
+        <ManagementFooter />
       </Box>
 
     </Box>

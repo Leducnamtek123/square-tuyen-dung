@@ -134,6 +134,73 @@ def test_public_job_posts_exclude_unverified_company(job_post):
 
 
 @pytest.mark.django_db
+def test_public_job_posts_filter_by_salary_band(employer_user, company, career, location):
+    company.is_verified = True
+    company.save(update_fields=["is_verified", "update_at"])
+
+    matching_job = JobPost.objects.create(
+        job_name="Matching Salary Job",
+        deadline=timezone.now().date() + timedelta(days=30),
+        quantity=1,
+        job_description="<p>Salary match</p>",
+        position=4,
+        type_of_workplace=1,
+        experience=2,
+        academic_level=2,
+        job_type=1,
+        salary_min=16000000,
+        salary_max=30000000,
+        contact_person_name="HR",
+        contact_person_phone="0901234567",
+        contact_person_email="hr@test.com",
+        status=var_sys.JobPostStatus.APPROVED,
+        user=employer_user,
+        company=company,
+        career=career,
+        location=location,
+    )
+    non_matching_job = JobPost.objects.create(
+        job_name="Low Salary Job",
+        deadline=timezone.now().date() + timedelta(days=30),
+        quantity=1,
+        job_description="<p>Salary miss</p>",
+        position=4,
+        type_of_workplace=1,
+        experience=2,
+        academic_level=2,
+        job_type=1,
+        salary_min=1000000,
+        salary_max=2000000,
+        contact_person_name="HR",
+        contact_person_phone="0901234567",
+        contact_person_email="hr@test.com",
+        status=var_sys.JobPostStatus.APPROVED,
+        user=employer_user,
+        company=company,
+        career=career,
+        location=location,
+    )
+
+    client = APIClient()
+    response = client.get(
+        "/api/v1/job/web/job-posts/",
+        {
+            "salaryMin": 15000000,
+            "salaryMax": 20000000,
+            "pageSize": 50,
+            "cacheBust": matching_job.id,
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    data = payload.get("data", payload)
+    results = data.get("results", data if isinstance(data, list) else [])
+    result_ids = [item["id"] for item in results]
+    assert matching_job.id in result_ids
+    assert non_matching_job.id not in result_ids
+
+@pytest.mark.django_db
 def test_salary_insight_uses_market_fallback_and_excludes_current_job(
     employer_user,
     company,

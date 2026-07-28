@@ -129,7 +129,7 @@ const CompanyDetailPage = () => {
                       <Typography variant="h5" gutterBottom sx={{ color: "primary.main", fontWeight: 600, mb: 3 }}>
                         {t("companyDetail.hiring")}
                       </Typography>
-                      <FilterJobPostCard params={{ companyId: companyDetail.id }} />
+                      <FilterJobPostCard params={{ companyId: companyDetail.id }} hideHeader />
                     </Box>
                   </Stack>
                 </Card>

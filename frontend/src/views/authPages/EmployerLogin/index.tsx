@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import * as React from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -307,12 +307,9 @@ const EmployerLogin = () => {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              mb: 4,
+              mb: 3,
             }}
           >
-            <StyledAvatar>
-              <LockOutlinedIcon sx={{ fontSize: 28 }} />
-            </StyledAvatar>
             <Typography
               component="h1"
               variant="h4"

@@ -48,19 +48,37 @@ class CloudinaryService:
 
     @staticmethod
     def _get_client(endpoint_override: str = None):
-        endpoint = endpoint_override or settings.MINIO_ENDPOINT
+        endpoint = endpoint_override or getattr(settings, "MINIO_ENDPOINT", "minio:9000")
+        if not endpoint_override:
+            try:
+                import socket
+                host = endpoint.replace("http://", "").replace("https://", "").split("/")[0].split(":")[0]
+                socket.gethostbyname(host)
+            except Exception:
+                public_url = getattr(settings, "MINIO_PUBLIC_URL", "")
+                if public_url:
+                    endpoint = public_url
+
         endpoint, secure = CloudinaryService._resolve_endpoint(
             endpoint, settings.MINIO_SECURE
         )
         # 🔑 Explicitly set region to avoid network calls for auto-detection
         # which can cause hangs and 502 timeouts in containerized environments.
         region = getattr(settings, "MINIO_REGION", "us-east-1")
+
+        http_client = None
+        if secure:
+            import urllib3
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+            http_client = urllib3.PoolManager(cert_reqs='CERT_NONE')
+
         return Minio(
             endpoint=endpoint,
             access_key=settings.MINIO_ACCESS_KEY,
             secret_key=settings.MINIO_SECRET_KEY,
             secure=secure,
-            region=region
+            region=region,
+            http_client=http_client
         )
 
     @staticmethod

@@ -255,13 +255,9 @@ const EmployerSignUp = () => {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              mb: 4,
+              mb: 3,
             }}
           >
-            <StyledAvatar>
-              <LockOutlinedIcon sx={{ fontSize: 28 }} />
-            </StyledAvatar>
-
             <Typography
               component="h1"
               variant="h4"

@@ -8,6 +8,36 @@ from django.db.utils import DatabaseError, OperationalError, ProgrammingError
 from .models import SystemSetting
 
 
+DEFAULT_EMPLOYER_GREETING = (
+    "Chào bạn! Tôi là InfoHR AI, trợ lý tuyển dụng của bạn. Tôi có thể giúp gì cho bạn?\n\n"
+    "**Bạn có thể hỏi tôi về:**\n"
+    "- Tìm kiếm ứng viên tiềm năng\n"
+    "- Soạn tin nhắn mời phỏng vấn\n"
+    "- Gợi ý mô tả công việc\n"
+    "- Thống kê thị trường tuyển dụng"
+)
+
+DEFAULT_JOBSEEKER_GREETING = (
+    "Chào bạn! Tôi là InfoHR AI, trợ lý tư vấn nghề nghiệp của bạn. Tôi có thể giúp gì cho bạn?\n\n"
+    "**Bạn có thể hỏi tôi về:**\n"
+    "- Tìm kiếm việc làm phù hợp\n"
+    "- Soạn và tối ưu hóa CV\n"
+    "- Mẹo trả lời phỏng vấn ấn tượng\n"
+    "- Thông tin mức lương thị trường"
+)
+
+DEFAULT_EMPLOYER_SUGGESTIONS = json.dumps([
+    "Tìm ứng viên cho vị trí thiết kế",
+    "Soạn tin mời phỏng vấn",
+    "Mức lương thị trường hiện nay"
+], ensure_ascii=False)
+
+DEFAULT_JOBSEEKER_SUGGESTIONS = json.dumps([
+    "Tìm việc làm vị trí Frontend",
+    "Tải mẫu CV tiếng Anh",
+    "Cách trả lời phỏng vấn về mức lương"
+], ensure_ascii=False)
+
 SYSTEM_SETTING_DEFAULTS: Dict[str, Any] = {
     "maintenanceMode": getattr(settings, "MAINTENANCE_MODE", False),
     "autoApproveJobs": getattr(settings, "AUTO_APPROVE_JOBS", False),
@@ -17,6 +47,16 @@ SYSTEM_SETTING_DEFAULTS: Dict[str, Any] = {
     "ttsSpeed": "0.92",
     "interviewQuestionGapSeconds": "2.0",
     "interviewMinimumSilenceSeconds": "1.2",
+    "chatbotTitle": "InfoHR AI",
+    "chatbotSubtitle": "Trợ lý tuyển dụng thông minh",
+    "chatbotEmployerGreeting": DEFAULT_EMPLOYER_GREETING,
+    "chatbotJobSeekerGreeting": DEFAULT_JOBSEEKER_GREETING,
+    "chatbotEmployerSuggestions": DEFAULT_EMPLOYER_SUGGESTIONS,
+    "chatbotJobSeekerSuggestions": DEFAULT_JOBSEEKER_SUGGESTIONS,
+    "vieclam24hSharedUsername": getattr(settings, "VIECLAM24H_SHARED_USERNAME", ""),
+    "vieclam24hSharedPassword": getattr(settings, "VIECLAM24H_SHARED_PASSWORD", ""),
+    "vieclam24hAutoIngestEnabled": True,
+    "vieclam24hAutoIngestIntervalHours": "6",
 }
 
 BOOLEAN_SYSTEM_SETTINGS = {

@@ -972,7 +972,9 @@
       "list_questions": "List questions",
       "create_question_group": "Create question group",
       "list_question_groups": "List question groups",
-      "list_interviews": "List interviews"
+      "list_interviews": "List interviews",
+      "query_notebook_knowledge": "Query NotebookLM Knowledge Base",
+      "evaluate_cv_with_notebook": "Evaluate CV with NotebookLM"
     },
     "rows": {
       "candidate": "Candidate",

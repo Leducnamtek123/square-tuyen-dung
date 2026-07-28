@@ -251,8 +251,18 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
         toastMessages.success(t('pages.articles.messages.createSuccess'));
         push(`/admin/articles/${created.id}`);
       } else if (articleId) {
-        await contentService.adminUpdateArticle(articleId, payload, thumbnailFile || undefined);
+        const updated = await contentService.adminUpdateArticle(articleId, payload, thumbnailFile || undefined);
         toastMessages.success(t('pages.articles.messages.updateSuccess'));
+        if (updated?.thumbnailUrl) {
+          dispatch({
+            type: 'patch',
+            patch: {
+              existingThumbnailUrl: updated.thumbnailUrl,
+              thumbnailFile: null,
+              thumbnailPreview: null,
+            },
+          });
+        }
         if (targetStatus) dispatch({ type: 'patch', patch: { articleStatus: targetStatus } });
       }
     } catch {

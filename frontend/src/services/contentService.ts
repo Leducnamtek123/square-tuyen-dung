@@ -241,7 +241,9 @@ const contentService = {
       if (v !== undefined && v !== null) form.append(k, String(v));
     });
     if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
-    return (httpRequest.post('content/web/admin/articles/', form) as Promise<unknown>)
+    return (httpRequest.post('content/web/admin/articles/', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }) as Promise<unknown>)
       .then(unwrapDetailResponse<Article>);
   },
 
@@ -251,7 +253,9 @@ const contentService = {
       if (v !== undefined && v !== null) form.append(k, String(v));
     });
     if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
-    return (httpRequest.patch(`content/web/admin/articles/${id}/`, form) as Promise<unknown>)
+    return (httpRequest.patch(`content/web/admin/articles/${id}/`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }) as Promise<unknown>)
       .then(unwrapDetailResponse<Article>);
   },
 
@@ -279,7 +283,9 @@ const contentService = {
       if (v !== undefined && v !== null) form.append(k, String(v));
     });
     if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
-    return (httpRequest.post('content/web/employer/articles/', form) as Promise<unknown>)
+    return (httpRequest.post('content/web/employer/articles/', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }) as Promise<unknown>)
       .then(unwrapDetailResponse<Article>);
   },
 
@@ -289,7 +295,9 @@ const contentService = {
       if (v !== undefined && v !== null) form.append(k, String(v));
     });
     if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
-    return (httpRequest.patch(`content/web/employer/articles/${id}/`, form) as Promise<unknown>)
+    return (httpRequest.patch(`content/web/employer/articles/${id}/`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }) as Promise<unknown>)
       .then(unwrapDetailResponse<Article>);
   },
 

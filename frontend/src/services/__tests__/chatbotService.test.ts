@@ -2,6 +2,7 @@ import chatbotService from '../chatbotService';
 import httpRequest from '../../utils/httpRequest';
 
 jest.mock('../../utils/httpRequest', () => ({
+  get: jest.fn(),
   post: jest.fn(),
 }));
 
@@ -24,5 +25,18 @@ describe('chatbotService', () => {
       { messages: [{ role: 'user', content: 'Hello' }] },
       { timeout: 120000 },
     );
+  });
+
+  it('fetches chatbot configuration', async () => {
+    const config = {
+      title: 'InfoHR AI',
+      subtitle: 'Trợ lý tuyển dụng thông minh',
+      employerGreeting: 'Chào bạn',
+      employerSuggestions: ['Gợi ý 1', 'Gợi ý 2'],
+    };
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: config } });
+
+    await expect(chatbotService.getChatbotConfig()).resolves.toEqual(config);
+    expect(httpRequest.get).toHaveBeenCalledWith('ai/chatbot/config/');
   });
 });

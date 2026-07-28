@@ -1,8 +1,9 @@
 'use client';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Badge, Box, CircularProgress, IconButton, Menu, Stack, Typography } from '@mui/material';
+import { Badge, Box, Button, CircularProgress, IconButton, Menu, Stack, Typography } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 import { useTranslation } from 'react-i18next';
 import { ROLES_NAME, ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
@@ -67,7 +68,7 @@ const NotificationCard: React.FC = () => {
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
         <IconButton size="large" aria-label={t('notification.openMenu')} color="inherit" onClick={openNotificationsMenu}>
-          <Badge badgeContent={unreadCount} color="info">
+          <Badge badgeContent={unreadCount} color="error">
             <NotificationsIcon />
           </Badge>
         </IconButton>
@@ -83,10 +84,10 @@ const NotificationCard: React.FC = () => {
             elevation: 0,
             sx: {
               overflow: 'visible',
-              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+              filter: 'drop-shadow(0px 8px 24px rgba(15, 23, 42, 0.12))',
               mt: 1.5,
-              borderRadius: 2,
-              width: { xs: 'calc(100vw - 24px)', sm: 500 },
+              borderRadius: 3,
+              width: { xs: 'calc(100vw - 24px)', sm: 460 },
               maxWidth: 'calc(100vw - 24px)',
               '&:before': {
                 content: '""',
@@ -115,35 +116,64 @@ const NotificationCard: React.FC = () => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            maxHeight: { xs: 'calc(100vh - 88px)', sm: 'min(620px, calc(100vh - 96px))' },
+            maxHeight: { xs: 'calc(100vh - 88px)', sm: 'min(600px, calc(100vh - 96px))' },
             overflow: 'hidden',
             bgcolor: 'background.paper',
-            borderRadius: 2,
+            borderRadius: 3,
           }}
         >
           <Stack
             direction="row"
             alignItems="center"
             justifyContent="space-between"
-            sx={{ flexShrink: 0, px: 3, pt: 2, pb: 1.25 }}
+            sx={{
+              flexShrink: 0,
+              px: 2.5,
+              py: 1.75,
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+            }}
           >
-            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-              {t('footer.notifications')}
-            </Typography>
-            {count > 0 && (
-              <Typography variant="caption" color="text.secondary">
-                {t('notification.unreadCount', { count: unreadCount })}
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, fontSize: '0.95rem' }}>
+                {t('footer.notifications')}
               </Typography>
+              {count > 0 && (
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                  {t('notification.unreadCount', { count: unreadCount })}
+                </Typography>
+              )}
+            </Stack>
+
+            {unreadCount > 0 && (
+              <Button
+                size="small"
+                startIcon={<DoneAllIcon sx={{ fontSize: 16 }} />}
+                onClick={() => void handleMakeAllRead()}
+                disabled={isLoading}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  color: 'primary.main',
+                  px: 1,
+                  py: 0.25,
+                  borderRadius: 1.5,
+                  '&:hover': { bgcolor: 'rgba(37, 99, 235, 0.08)' },
+                }}
+              >
+                {t('notification.markAllRead')}
+              </Button>
             )}
           </Stack>
-          <Box sx={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', px: 2, py: 1 }}>
-            <Stack spacing={1}>
+          <Box sx={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', px: 2, py: 1.5 }}>
+            <Stack spacing={1.25}>
               {isLoading && notifications.length === 0 ? (
                 <Stack direction="row" justifyContent="center" sx={{ py: 3 }}>
                   <CircularProgress size={24} />
                 </Stack>
               ) : notifications.length === 0 ? (
-                <Typography textAlign="center" variant="body2" color="text.secondary" sx={{ py: 2 }}>
+                <Typography textAlign="center" variant="body2" color="text.secondary" sx={{ py: 3 }}>
                   {t('notification.empty')}
                 </Typography>
               ) : (

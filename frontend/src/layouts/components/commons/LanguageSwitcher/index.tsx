@@ -27,7 +27,7 @@ const languages = [
   }
 ];
 
-const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
+const LanguageSwitcher = ({ color = 'inherit' }: LanguageSwitcherProps) => {
   const { i18n } = useTranslation();
   const navigate = useRouter();
   const theme = useTheme();

@@ -60,3 +60,11 @@ export const normalizePaginatedResponse = <T>(raw: unknown): PaginatedResponse<T
 
   return { count, results };
 };
+
+export const getApiErrorMessage = (error: unknown, fallbackMessage: string): string => {
+  if (error && typeof error === 'object') {
+    const errObj = error as { response?: { data?: { detail?: string; message?: string } }; message?: string };
+    return errObj.response?.data?.detail || errObj.response?.data?.message || errObj.message || fallbackMessage;
+  }
+  return fallbackMessage;
+};

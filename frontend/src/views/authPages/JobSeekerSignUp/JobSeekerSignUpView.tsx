@@ -81,13 +81,9 @@ const JobSeekerSignUpView = ({
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              mb: 4,
+              mb: 3,
             }}
           >
-            <StyledAvatar>
-              <LockOutlinedIcon sx={{ fontSize: 28 }} />
-            </StyledAvatar>
-
             <Typography component="h1" variant="h4" align="center" sx={{ fontWeight: 600, color: 'primary.main', mb: 1 }}>
               {t('signup.heading')}
             </Typography>

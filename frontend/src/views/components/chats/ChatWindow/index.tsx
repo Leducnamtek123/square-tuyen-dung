@@ -335,7 +335,13 @@ const ChatWindow = () => {
   }, [state.messages]);
 
   return (
-    <Stack sx={{ height: '100%', bgcolor: 'background.paper' }}>
+    <Stack
+      sx={{
+        height: '100%',
+        bgcolor: '#f8fafc',
+        backgroundImage: 'linear-gradient(180deg, rgba(248, 250, 252, 0.96) 0%, rgba(255, 255, 255, 1) 100%)',
+      }}
+    >
       <ChatWindowMessagePanel
         showEmptyState={!currentUserChat || !selectedRoomId}
         isLoading={state.isLoading}
@@ -344,12 +350,12 @@ const ChatWindow = () => {
         onLoadMore={handleLoadMore}
         messageListRef={messageListRef}
         noConversationSelectedText={t('noConversationSelected')}
-        chooseConversationText={t(
-          'auto.index_chn_mt_cuc_hi_thoi_danh_sch_bn_5d32',
-          'Chon mot cuoc hoi thoai o danh sach ben trai de bat dau nhan tin',
-        )}
-        loadPreviousMessagesText={t('loadPreviousMessages')}
-      />
+          chooseConversationText={t(
+            'auto.index_chn_mt_cuc_hi_thoi_danh_sch_bn_5d32',
+            'Chon mot cuoc hoi thoai o danh sach ben trai de bat dau nhan tin',
+          )}
+          loadPreviousMessagesText={t('loadPreviousMessages')}
+        />
 
       {currentUserChat && selectedRoomId && (
         <ChatWindowComposer

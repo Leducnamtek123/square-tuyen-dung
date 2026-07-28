@@ -57,7 +57,7 @@ const Pdf = ({ fileUrl, title = '', containerSx, toolbarSx, viewerSx }: PdfProps
           alignItems={{ xs: 'stretch', sm: 'center' }}
           spacing={1}
           sx={mergeSx(
-            { bgcolor: '#441da0', px: 2, py: 1.25 },
+            { bgcolor: '#0f172a', px: 2, py: 1.25 },
             toolbarSx
           )}
         >

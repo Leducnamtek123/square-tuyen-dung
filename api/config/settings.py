@@ -485,13 +485,13 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details'
 )
 
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT', cast=int)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'noreply@tuyendung.studio'
 
 CELERY_BROKER_URL = f"redis://{SERVICE_REDIS_USERNAME}:{SERVICE_REDIS_PASSWORD}@{SERVICE_REDIS_HOST}:{SERVICE_REDIS_PORT}/{SERVICE_REDIS_DB}"
 CELERY_RESULT_BACKEND = f"redis://{SERVICE_REDIS_USERNAME}:{SERVICE_REDIS_PASSWORD}@{SERVICE_REDIS_HOST}:{SERVICE_REDIS_PORT}/{SERVICE_REDIS_DB}"
@@ -506,6 +506,14 @@ CELERY_TASK_REJECT_ON_WORKER_LOST = config('CELERY_TASK_REJECT_ON_WORKER_LOST', 
 CELERY_WORKER_MAX_TASKS_PER_CHILD = config('CELERY_WORKER_MAX_TASKS_PER_CHILD', default=20, cast=int)
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'scheduled_vieclam24h_data_lake_ingestion': {
+        'task': 'apps.profiles.tasks.scheduled_vieclam24h_data_lake_ingestion_task',
+        'schedule': crontab(minute=0, hour='*/6'),
+    },
+}
 
 MINIO_ENDPOINT = config('MINIO_ENDPOINT', default='minio:9000')
 MINIO_ACCESS_KEY = config('MINIO_ACCESS_KEY', default='admin')
@@ -680,3 +688,8 @@ SECURE_HSTS_PRELOAD = config("SECURE_HSTS_PRELOAD", default=IS_PRODUCTION, cast=
 # === Database Connection Persistence ===
 CONN_MAX_AGE = 600  # Keep DB connections alive for 10 minutes
 CONN_HEALTH_CHECKS = True  # Verify connections before reuse (Django 4.1+)
+
+# === NotebookLM MCP Integration ===
+NOTEBOOKLM_MCP_URL = config('NOTEBOOKLM_MCP_URL', default='http://host.docker.internal:8085/mcp')
+DEFAULT_NOTEBOOKLM_NOTEBOOK_ID = config('DEFAULT_NOTEBOOKLM_NOTEBOOK_ID', default='0a469926-b901-426d-afe5-843096613137')
+

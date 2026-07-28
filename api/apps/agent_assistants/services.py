@@ -20,6 +20,7 @@ from apps.jobs.services import JobActivityService
 from apps.profiles.models import Company, Resume
 from apps.profiles.serializers import EmployerCandidateProfileSerializer
 from integrations.ai import client as ai_client
+from integrations.notebooklm_mcp import mcp_client as notebooklm_client, NotebookLMMCPError
 from shared.audit import record_audit_log
 from shared.configs import variable_system as var_sys
 
@@ -268,7 +269,30 @@ def _is_list_interviews_intent(text: str) -> bool:
     return (
         "phong van" in normalized
         or "interview" in normalized
-    ) and any(token in normalized for token in ("live", "dang", "lich", "list", "liet ke", "xem", "ai"))
+    )
+
+
+def _is_evaluate_cv_notebook_intent(text: str) -> bool:
+    normalized = _normalize_text(text)
+    if "notebook" in normalized or "notebooklm" in normalized:
+        return any(k in normalized for k in ("danh gia", "cv", "loc", "ung vien", "profile", "ho so"))
+    return False
+
+
+def _is_notebooklm_intent(text: str) -> bool:
+    normalized = _normalize_text(text)
+    keywords = (
+        "notebooklm",
+        "notebook",
+        "mtcv",
+        "bo chuan",
+        "tieu chuan",
+        "mo ta cong viec",
+        "mo ta vi tri",
+        "chuan nhan su",
+        "jd",
+    )
+    return any(k in normalized for k in keywords)
 
 
 def _is_visual_question(text: str, *, has_image_context: bool = False) -> bool:
@@ -661,6 +685,110 @@ def _select_job_post(user, text: str, parsed_input: dict[str, Any] | None = None
     raise AgentAssistantError("Bạn cần nói rõ tin tuyển dụng hoặc vị trí muốn thêm hồ sơ ứng viên.")
 
 
+def _fix_mojibake(text: str) -> str:
+    if not text:
+        return text
+    try:
+        if any(c in text for c in ("Ã", "Â", "áº", "áº¥", "á»", "Ä", "Ã\xad", "Ã\xa0", "Ã´")):
+            return text.encode("latin1").decode("utf-8")
+    except Exception:
+        pass
+    return text
+
+
+def _clean_notebooklm_answer(answer_text: str) -> str:
+    if not answer_text:
+        return ""
+    answer_text = _fix_mojibake(answer_text)
+    disclaimer_pattern = r"^\[AI-GENERATED via Gemini 2\.5 \(NotebookLM\)[^\]]*\]\s*"
+    answer_text = re.sub(disclaimer_pattern, "", answer_text, flags=re.IGNORECASE).strip()
+    if answer_text.startswith("Thoughts\n"):
+        answer_text = answer_text[len("Thoughts\n"):].strip()
+    elif "\nThoughts\n" in answer_text:
+        answer_text = answer_text.split("\nThoughts\n", 1)[1].strip()
+
+    answer_text = re.sub(r"\[\d+\]", "", answer_text)
+    lines = answer_text.split("\n")
+    cleaned_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if re.match(r"^\d+[\.\:\,]?$", stripped) or stripped in (".", ":", ","):
+            continue
+        cleaned_lines.append(line)
+    answer_text = "\n".join(cleaned_lines)
+    answer_text = re.sub(r"\n\s*(\d+\.\s+[^\n]+)", r"\n\n### \1", answer_text)
+    answer_text = re.sub(r"\n{3,}", "\n\n", answer_text)
+    return _fix_mojibake(answer_text.strip())
+
+
+def _extract_mcp_text(res: dict[str, Any]) -> str:
+    if not isinstance(res, dict):
+        return _clean_notebooklm_answer(str(res))
+
+    content = res.get("content")
+    raw_str = ""
+    if isinstance(content, str):
+        raw_str = content.strip()
+    elif isinstance(content, list):
+        text_parts = [
+            str(item.get("text")).strip()
+            for item in content
+            if isinstance(item, dict) and item.get("text")
+        ]
+        raw_str = "\n".join(text_parts).strip()
+    else:
+        raw_str = str(res.get("answer") or res.get("response") or res.get("text") or res)
+
+    raw_str = _fix_mojibake(raw_str)
+
+    if "data:" in raw_str:
+        for line in raw_str.split("\n"):
+            line = line.strip()
+            if line.startswith("data:"):
+                json_part = line[5:].strip()
+                try:
+                    parsed_sse = json.loads(json_part)
+                    inner_content = parsed_sse.get("result", {}).get("content", [])
+                    if isinstance(inner_content, list) and inner_content:
+                        inner_text = inner_content[0].get("text", "")
+                        inner_text = _fix_mojibake(inner_text)
+                        try:
+                            inner_json = json.loads(inner_text)
+                            if isinstance(inner_json, dict):
+                                if not inner_json.get("success", True) and "error" in inner_json:
+                                    return f"Thông báo từ Google NotebookLM: {_fix_mojibake(str(inner_json['error']))}"
+
+                                extracted_ans = (
+                                    inner_json.get("response")
+                                    or inner_json.get("answer")
+                                    or (inner_json.get("data", {}).get("answer") if isinstance(inner_json.get("data"), dict) else None)
+                                    or inner_json.get("text")
+                                )
+                                if extracted_ans:
+                                    return _clean_notebooklm_answer(str(extracted_ans))
+                        except Exception:
+                            pass
+                        return _clean_notebooklm_answer(inner_text)
+                except Exception:
+                    pass
+
+    if raw_str.startswith("{") and raw_str.endswith("}"):
+        try:
+            parsed = json.loads(raw_str)
+            if isinstance(parsed, dict):
+                extracted_ans = (
+                    parsed.get("response")
+                    or parsed.get("answer")
+                    or (parsed.get("data", {}).get("answer") if isinstance(parsed.get("data"), dict) else None)
+                )
+                if extracted_ans:
+                    return _clean_notebooklm_answer(str(extracted_ans))
+        except Exception:
+            pass
+
+    return _clean_notebooklm_answer(raw_str)
+
+
 class AgentAssistantService:
     @staticmethod
     def tool_registry() -> list[dict[str, Any]]:
@@ -742,6 +870,15 @@ class AgentAssistantService:
             if visual_result:
                 return visual_result
 
+        if _is_evaluate_cv_notebook_intent(content):
+            return AgentAssistantService._run_evaluate_cv_with_notebook(
+                request, thread, user_message, planned_input={"cvContent": content}
+            )
+        if _is_notebooklm_intent(content):
+            return AgentAssistantService._run_query_notebook_knowledge(
+                request, thread, user_message, planned_input={"query": content}
+            )
+
         planner_unavailable = None
         planned_action = AgentPlanner.plan(request, thread, content, message_parts=parts)
         if isinstance(planned_action, AgentPlannerUnavailable):
@@ -774,6 +911,14 @@ class AgentAssistantService:
             return AgentAssistantService._run_list_questions(request, thread, user_message, content)
         if _is_list_interviews_intent(content):
             return AgentAssistantService._run_list_interviews(request, thread, user_message, content)
+        if _is_evaluate_cv_notebook_intent(content):
+            return AgentAssistantService._run_evaluate_cv_with_notebook(
+                request, thread, user_message, planned_input={"cvContent": content}
+            )
+        if _is_notebooklm_intent(content):
+            return AgentAssistantService._run_query_notebook_knowledge(
+                request, thread, user_message, planned_input={"query": content}
+            )
 
         if planner_unavailable:
             assistant_content = (
@@ -937,6 +1082,15 @@ class AgentAssistantService:
         planned_action: AgentPlannedAction,
     ) -> AgentRunResult | None:
         if planned_action.tool_name == RESPOND_TOOL_NAME:
+            if _is_evaluate_cv_notebook_intent(content):
+                return AgentAssistantService._run_evaluate_cv_with_notebook(
+                    request, thread, user_message, planned_input={"cvContent": content}
+                )
+            if _is_notebooklm_intent(content):
+                return AgentAssistantService._run_query_notebook_knowledge(
+                    request, thread, user_message, planned_input={"query": content}
+                )
+
             assistant_content = planned_action.assistant_text or (
                 "Tôi có thể hỗ trợ tạo hồ sơ ứng viên, tìm ứng viên và cập nhật pipeline bằng tool nội bộ."
             )
@@ -1048,6 +1202,22 @@ class AgentAssistantService:
                 thread,
                 user_message,
                 content,
+                planned_input=planned_action.arguments,
+                metadata={"source": "planner", "planner": planned_action.raw_response},
+            )
+        if planned_action.tool_name == "query_notebook_knowledge":
+            return AgentAssistantService._run_query_notebook_knowledge(
+                request,
+                thread,
+                user_message,
+                planned_input=planned_action.arguments,
+                metadata={"source": "planner", "planner": planned_action.raw_response},
+            )
+        if planned_action.tool_name == "evaluate_cv_with_notebook":
+            return AgentAssistantService._run_evaluate_cv_with_notebook(
+                request,
+                thread,
+                user_message,
                 planned_input=planned_action.arguments,
                 metadata={"source": "planner", "planner": planned_action.raw_response},
             )
@@ -2151,4 +2321,99 @@ class AgentAssistantService:
                 "companyName": job_post.company.company_name if job_post.company_id else "",
                 "url": f"/admin/jobs?id={job_post.id}",
             },
+        }
+
+    @staticmethod
+    def _run_query_notebook_knowledge(
+        request,
+        thread: AgentThread,
+        user_message: AgentMessage,
+        planned_input: dict[str, Any] | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> AgentRunResult:
+        planned_input = planned_input or {}
+        query = _string_arg(planned_input.get("query") or planned_input.get("question") or user_message.content)
+        notebook_id = _string_arg(planned_input.get("notebookId") or planned_input.get("notebook_id"))
+        tool_call = AgentToolCall.objects.create(
+            thread=thread,
+            tool_name="query_notebook_knowledge",
+            display_name=_tool_display_name("query_notebook_knowledge"),
+            status=AgentToolCall.STATUS_RUNNING,
+            input_payload={"query": query, "notebookId": notebook_id},
+            metadata=metadata or {},
+        )
+        try:
+            output = AgentAssistantService._query_notebook_knowledge(query=query, notebook_id=notebook_id)
+        except (AgentAssistantError, NotebookLMMCPError) as exc:
+            msg = str(getattr(exc, "message", exc))
+            tool_call.status = AgentToolCall.STATUS_FAILED
+            tool_call.error_message = msg
+            tool_call.output_payload = {"message": msg}
+            assistant_content = msg
+        else:
+            tool_call.status = AgentToolCall.STATUS_SUCCEEDED
+            tool_call.output_payload = output
+            assistant_content = output["message"]
+        return AgentAssistantService._create_tool_response(thread, user_message, tool_call, assistant_content)
+
+
+
+    @staticmethod
+    def _query_notebook_knowledge(query: str, notebook_id: str | None = None) -> dict[str, Any]:
+        if not query:
+            raise AgentAssistantError("Bạn cần cung cấp câu hỏi tra cứu cho NotebookLM.")
+        res = notebooklm_client.query_notebook(notebook_id=notebook_id, query=query)
+        answer = _extract_mcp_text(res)
+        return {
+            "message": answer,
+            "rawResult": _json_safe(res),
+        }
+
+    @staticmethod
+    def _run_evaluate_cv_with_notebook(
+        request,
+        thread: AgentThread,
+        user_message: AgentMessage,
+        planned_input: dict[str, Any] | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> AgentRunResult:
+        planned_input = planned_input or {}
+        cv_content = _string_arg(planned_input.get("cvContent") or planned_input.get("cv_content") or user_message.content)
+        job_title = _string_arg(planned_input.get("jobTitle") or planned_input.get("job_title"))
+        notebook_id = _string_arg(planned_input.get("notebookId") or planned_input.get("notebook_id"))
+        tool_call = AgentToolCall.objects.create(
+            thread=thread,
+            tool_name="evaluate_cv_with_notebook",
+            display_name=_tool_display_name("evaluate_cv_with_notebook"),
+            status=AgentToolCall.STATUS_RUNNING,
+            input_payload={"cvContent": cv_content, "jobTitle": job_title, "notebookId": notebook_id},
+            metadata=metadata or {},
+        )
+        try:
+            output = AgentAssistantService._evaluate_cv_with_notebook(
+                cv_content=cv_content, job_title=job_title, notebook_id=notebook_id
+            )
+        except (AgentAssistantError, NotebookLMMCPError) as exc:
+            msg = str(getattr(exc, "message", exc))
+            tool_call.status = AgentToolCall.STATUS_FAILED
+            tool_call.error_message = msg
+            tool_call.output_payload = {"message": msg}
+            assistant_content = msg
+        else:
+            tool_call.status = AgentToolCall.STATUS_SUCCEEDED
+            tool_call.output_payload = output
+            assistant_content = output["message"]
+        return AgentAssistantService._create_tool_response(thread, user_message, tool_call, assistant_content)
+
+    @staticmethod
+    def _evaluate_cv_with_notebook(
+        cv_content: str, job_title: str | None = None, notebook_id: str | None = None
+    ) -> dict[str, Any]:
+        if not cv_content:
+            raise AgentAssistantError("Cần cung cấp nội dung CV ứng viên để đối soát với NotebookLM.")
+        res = notebooklm_client.evaluate_cv(cv_content=cv_content, job_title=job_title, notebook_id=notebook_id)
+        answer = _extract_mcp_text(res)
+        return {
+            "message": f"Kết quả đối soát & đánh giá CV từ NotebookLM:\n\n{answer}",
+            "rawResult": _json_safe(res),
         }

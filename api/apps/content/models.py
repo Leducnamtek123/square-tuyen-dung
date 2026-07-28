@@ -148,9 +148,19 @@ class Article(ProjectBaseModel):
 
     CATEGORY_NEWS = 'news'
     CATEGORY_BLOG = 'blog'
+    CATEGORY_CAM_NANG = 'cam-nang'
+    CATEGORY_THU_TUC = 'thu-tuc-lao-dong'
+    CATEGORY_THUE = 'thue-tncn'
+    CATEGORY_CV = 'bi-quyet-cv'
+    CATEGORY_XU_HUONG = 'xu-huong'
     CATEGORY_CHOICES = [
         (CATEGORY_NEWS, 'Tin tức'),
         (CATEGORY_BLOG, 'Blog tuyển dụng'),
+        (CATEGORY_CAM_NANG, 'Cẩm nang nghề nghiệp'),
+        (CATEGORY_THU_TUC, 'Thủ tục & Quyền lợi lao động'),
+        (CATEGORY_THUE, 'Thuế & Quyết toán TNCN'),
+        (CATEGORY_CV, 'Bí quyết viết CV & Phỏng vấn'),
+        (CATEGORY_XU_HUONG, 'Báo cáo & Xu hướng tuyển dụng'),
     ]
 
     STATUS_DRAFT = 'draft'
@@ -173,7 +183,7 @@ class Article(ProjectBaseModel):
         related_name='article_thumbnail'
     )
     category = models.CharField(
-        max_length=10, choices=CATEGORY_CHOICES,
+        max_length=50, choices=CATEGORY_CHOICES,
         default=CATEGORY_NEWS, db_index=True
     )
     status = models.CharField(

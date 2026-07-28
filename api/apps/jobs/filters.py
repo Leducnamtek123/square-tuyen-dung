@@ -64,6 +64,11 @@ class JobPostFilter(django_filters.FilterSet):
     genderId = django_filters.ChoiceFilter(choices=var_sys.GENDER_CHOICES, field_name='gender_required')
     genderIds = ChoiceInFilter(choices=var_sys.GENDER_CHOICES, field_name='gender_required', lookup_expr='in')
 
+    # Salary filters accept the selected band from the UI and return jobs whose
+    # stored salary range overlaps that band.
+    salaryMin = django_filters.NumberFilter(field_name='salary_max', lookup_expr='gte')
+    salaryMax = django_filters.NumberFilter(field_name='salary_min', lookup_expr='lte')
+
     isUrgent = django_filters.BooleanFilter(field_name='is_urgent')
 
     statusId = django_filters.ChoiceFilter(choices=var_sys.JOB_POST_STATUS, field_name="status")
@@ -81,7 +86,7 @@ class JobPostFilter(django_filters.FilterSet):
 
                   'experienceId', 'typeOfWorkplaceId', 'jobTypeId',
 
-                  'genderId', 'isUrgent', 'statusId', 'excludeSlug', 'companyId',
+                  'genderId', 'salaryMin', 'salaryMax', 'isUrgent', 'statusId', 'excludeSlug', 'companyId',
                   'careerIds', 'cityIds', 'districtIds', 'wardIds', 'positionIds',
                   'experienceIds', 'typeOfWorkplaceIds', 'jobTypeIds', 'genderIds',
                   'statusIds']

@@ -109,6 +109,14 @@ class JobPost(CommonBaseModel):
 
     interview_template = models.ForeignKey('interview.QuestionGroup', on_delete=models.SET_NULL, null=True, blank=True, related_name='linked_job_posts')
 
+    is_auto_sourcing_enabled = models.BooleanField(default=True)
+
+    auto_sourcing_limit = models.PositiveIntegerField(default=10)
+
+    auto_interview_enabled = models.BooleanField(default=True)
+
+    min_screening_score = models.IntegerField(default=70)
+
     class Meta:
 
         db_table = "project_job_job_post"

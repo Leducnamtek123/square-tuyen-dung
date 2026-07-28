@@ -82,7 +82,7 @@ const CategoryCard = ({ options, type }: CategoryCardProps) => {
             width: '100%',
             backgroundColor: 'white',
             border: 1,
-            borderColor: '#441da0',
+            borderColor: '#cbd5e1',
             maxWidth: { xs: '100%', md: '30%' },
             mb: 1,
           }}

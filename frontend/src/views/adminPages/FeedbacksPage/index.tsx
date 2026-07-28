@@ -2,8 +2,10 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  Avatar,
   Box,
   Button,
+
   Chip,
   Dialog,
   DialogActions,
@@ -267,15 +269,13 @@ const FeedbacksPage = () => {
         const user = info.row.original.userDict;
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Box
-              component="img"
-              src={user?.avatarUrl || ''}
-              alt=""
-              onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                e.currentTarget.style.display = 'none';
-              }}
-              sx={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: '1px solid', borderColor: 'divider' }}
-            />
+            <Avatar
+              src={user?.avatarUrl || undefined}
+              alt={user?.fullName || ''}
+              sx={{ width: 34, height: 34, fontSize: '0.875rem', bgcolor: '#3b82f6' }}
+            >
+              {user?.fullName?.charAt(0)?.toUpperCase() || '?'}
+            </Avatar>
             <Box>
               <Typography variant="body2" fontWeight={600}>{user?.fullName || '—'}</Typography>
               <Typography variant="caption" color="text.secondary">{user?.email || ''}</Typography>

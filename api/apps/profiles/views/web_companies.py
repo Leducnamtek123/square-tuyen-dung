@@ -341,7 +341,8 @@ class CompanyViewSet(viewsets.ViewSet,
         serializer = CompanySerializer(
             queryset,
             many=True,
-            fields=['id', 'slug', 'companyName', 'companyImageUrl'],
+            fields=['id', 'slug', 'companyName', 'companyImageUrl', 'employeeSize', 'jobPostNumber', 'followNumber', 'isFollowed'],
+            context={"request": request},
         )
 
         return var_res.response_data(data=serializer.data)

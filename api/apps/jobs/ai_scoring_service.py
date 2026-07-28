@@ -162,3 +162,31 @@ def _fallback_scoring(resume_data, job_data):
         "gaps": [],
         "recommendation": "Điểm được tính bằng thuật toán cơ bản (AI không khả dụng)."
     }
+
+
+def score_job_application(activity):
+    """Convenience wrapper to score a JobPostActivity instance."""
+    resume = activity.resume
+    job = activity.job_post
+    resume_data = {
+        "title": resume.title if resume else activity.full_name or "",
+        "skills": getattr(resume, "skills_summary", "") if resume else "",
+        "experience": getattr(resume, "experience", 0) or 0,
+        "academic_level": getattr(resume, "academic_level", 0) or 0,
+        "salary_min": getattr(resume, "salary_min", 0) if resume else 0,
+        "salary_max": getattr(resume, "salary_max", 0) if resume else 0,
+    }
+    job_data = {
+        "job_name": getattr(job, "job_name", ""),
+        "description": getattr(job, "job_description", ""),
+        "experience": getattr(job, "experience", 0),
+        "salary_min": getattr(job, "salary_min", 0),
+        "salary_max": getattr(job, "salary_max", 0),
+    }
+    res = score_resume_job_fit(resume_data, job_data, resume_id=resume.id if resume else None, job_id=job.id if job else None)
+    if isinstance(res, dict):
+        return {
+            "score": res.get("overall_score", 70),
+            "summary": res.get("recommendation", ""),
+        }
+    return {"score": 70, "summary": ""}

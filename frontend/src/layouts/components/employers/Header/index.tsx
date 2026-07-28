@@ -40,23 +40,33 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
   const authArea = (
     <Box sx={{ flexGrow: 0, ml: 1 }}>
       <Card
-        variant="outlined"
+        elevation={0}
         onClick={handleOpenUserMenu}
         sx={{
-          p: 0.5,
-          borderRadius: 50,
-          backgroundColor: 'transparent',
-          borderColor: '#7e57c2',
+          p: '3px 12px 3px 3px',
+          borderRadius: '30px',
+          backgroundColor: '#f8fafc',
+          border: '1px solid #e2e8f0',
           cursor: 'pointer',
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            backgroundColor: '#f1f5f9',
+            borderColor: '#cbd5e1',
+          },
         }}
       >
-        <Stack direction="row" justifyContent="center" alignItems="center">
-          <Avatar alt={currentUser?.fullName} src={currentUser?.avatarUrl ?? undefined} />
+        <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
+          <Avatar
+            alt={currentUser?.fullName}
+            src={currentUser?.avatarUrl ?? undefined}
+            sx={{ width: 32, height: 32, fontSize: '0.875rem' }}
+          />
           <Typography
-            variant="subtitle1"
+            variant="subtitle2"
             sx={{
-              px: 1,
-              color: 'white',
+              color: '#0f172a',
+              fontWeight: 600,
+              fontSize: '0.85rem',
               display: { xs: 'none', sm: 'block' },
             }}
           >
@@ -75,10 +85,16 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
   return (
     <AppBar
       position="fixed"
+      elevation={0}
       sx={{
-        width: { xl: `calc(100% - ${drawerWidth}px)` },
-        ml: { sm: `${drawerWidth}px` },
+        width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
+        ml: { xs: 0, md: `${drawerWidth}px` },
+        transition: 'all 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
         minHeight: shellHeaderHeight,
+        backgroundColor: '#ffffff',
+        color: '#1e293b',
+        borderBottom: '1px solid #f1f5f9',
+        boxShadow: '0 2px 10px rgba(15, 23, 42, 0.03)',
       }}
     >
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ minHeight: shellHeaderHeight, minWidth: 0 }}>
@@ -88,7 +104,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
             aria-label={t('actions.openDrawer')}
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { xl: 'none' } }}
+            sx={{ mr: 2, display: { md: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
@@ -101,7 +117,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
               sx={{
                 display: { xs: 'none', sm: 'flex' },
                 minWidth: 0,
-                color: 'rgba(255,255,255,0.65)',
+                color: '#64748b',
                 '& .MuiBreadcrumbs-ol': {
                   flexWrap: 'nowrap',
                   minWidth: 0,
@@ -111,7 +127,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
                 },
                 '& .MuiBreadcrumbs-separator': {
                   mx: 1,
-                  color: 'rgba(255,255,255,0.55)',
+                  color: '#94a3b8',
                 },
               }}
             >
@@ -130,7 +146,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
-                        color: 'common.white',
+                        color: '#0f172a',
                         fontWeight: 700,
                       }}
                     >
@@ -153,6 +169,10 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
                       whiteSpace: 'nowrap',
                       fontSize: '0.875rem',
                       fontWeight: 600,
+                      color: '#64748b',
+                      '&:hover': {
+                        color: '#0f172a',
+                      },
                     }}
                   >
                     {label}
@@ -163,7 +183,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
           )}
         </Toolbar>
         <Toolbar sx={{ minHeight: shellHeaderHeight, flexShrink: 0 }}>
-          <LanguageSwitcher />
+          <LanguageSwitcher color="inherit" />
           {isAuthenticated && (
             <React.Suspense fallback={<Box width={40} />}>
               <NotificationCard />

@@ -15,7 +15,7 @@ interface Props {
 
 const DEFAULT_COLORS = [
 
-  defaultTheme.palette.primary.main, // Purple
+  defaultTheme.palette.primary.main, // Primary Dark
 
   '#2196f3', // Blue
 

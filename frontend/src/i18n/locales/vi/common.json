@@ -964,7 +964,9 @@
       "list_questions": "Liệt kê câu hỏi",
       "create_question_group": "Tạo bộ câu hỏi",
       "list_question_groups": "Liệt kê bộ câu hỏi",
-      "list_interviews": "Liệt kê phỏng vấn"
+      "list_interviews": "Liệt kê phỏng vấn",
+      "query_notebook_knowledge": "Tra cứu NotebookLM Knowledge Base",
+      "evaluate_cv_with_notebook": "Đánh giá CV với NotebookLM"
     },
     "rows": {
       "candidate": "Ứng viên",

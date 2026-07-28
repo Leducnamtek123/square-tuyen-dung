@@ -121,7 +121,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
                 <FontAwesomeIcon icon={faUsers} />
                 {tConfig(allConfig?.employeeSizeDict?.[String(companyDetail.employeeSize)]) || (
                   <span style={{ color: "#e0e0e0", fontStyle: "italic", fontSize: 13 }}>
-                    {t("companyDetail.notUpdated")}
+                    0
                   </span>
                 )}
               </Typography>

@@ -46,8 +46,18 @@ def connect_signals():
     def on_job_post_save(sender, instance, **kwargs):
         _index_job_post_async(instance.pk)
 
+    @receiver(post_save, sender=JobPost, weak=False, dispatch_uid="jobs_auto_pipeline_on_save")
+    def on_job_post_auto_pipeline(sender, instance, **kwargs):
+        from shared.configs import variable_system as var_sys
+        if getattr(instance, "is_auto_sourcing_enabled", True) and instance.status == var_sys.JobPostStatus.APPROVED:
+            try:
+                from .tasks import run_job_auto_pipeline_task
+                run_job_auto_pipeline_task.delay(instance.pk)
+            except Exception as exc:
+                logger.warning("Could not queue run_job_auto_pipeline_task(id=%s): %s", instance.pk, exc)
+
     @receiver(post_delete, sender=JobPost, weak=False, dispatch_uid="jobs_es_delete_on_delete")
     def on_job_post_delete(sender, instance, **kwargs):
         _delete_job_post_async(instance.pk)
 
-    logger.debug("Jobs ES signals connected.")
+    logger.debug("Jobs ES and Auto-Pipeline signals connected.")

@@ -112,7 +112,7 @@ const InterviewObserverDialogTranscript = ({ t }: Props) => {
                             ? alpha('#64748b', 0.2)
                             : isCandidate
                               ? alpha('#22c55e', 0.2)
-                              : alpha('#a855f7', 0.2),
+                              : alpha('#2563eb', 0.2),
                       border: '1.5px solid',
                       borderColor: isAI
                         ? alpha('#0ea5e9', 0.3)
@@ -122,7 +122,7 @@ const InterviewObserverDialogTranscript = ({ t }: Props) => {
                             ? alpha('#64748b', 0.3)
                             : isCandidate
                               ? alpha('#22c55e', 0.3)
-                              : alpha('#a855f7', 0.3),
+                              : alpha('#2563eb', 0.3),
                     }}
                   >
                     {isAI ? (
@@ -131,7 +131,7 @@ const InterviewObserverDialogTranscript = ({ t }: Props) => {
                       <PersonIcon
                         sx={{
                           fontSize: 18,
-                          color: isEmployer ? '#f59e0b' : isObserver ? '#94a3b8' : isCandidate ? '#22c55e' : '#a855f7',
+                          color: isEmployer ? '#f59e0b' : isObserver ? '#94a3b8' : isCandidate ? '#22c55e' : '#2563eb',
                         }}
                       />
                     )}
@@ -151,7 +151,7 @@ const InterviewObserverDialogTranscript = ({ t }: Props) => {
                                 ? '#94a3b8'
                                 : isCandidate
                                   ? '#22c55e'
-                                  : '#a855f7',
+                                  : '#2563eb',
                           textTransform: 'uppercase',
                           fontSize: '0.65rem',
                           letterSpacing: 1.5,
@@ -176,7 +176,7 @@ const InterviewObserverDialogTranscript = ({ t }: Props) => {
                               ? alpha('#64748b', 0.06)
                               : isCandidate
                                 ? alpha('#22c55e', 0.06)
-                                : alpha('#a855f7', 0.06),
+                                : alpha('#2563eb', 0.06),
                         borderRadius: '0 12px 12px 12px',
                         border: '1px solid',
                         borderColor: isAI
@@ -187,7 +187,7 @@ const InterviewObserverDialogTranscript = ({ t }: Props) => {
                               ? alpha('#64748b', 0.1)
                               : isCandidate
                                 ? alpha('#22c55e', 0.1)
-                                : alpha('#a855f7', 0.1),
+                                : alpha('#2563eb', 0.1),
                       }}
                     >
                       <Typography

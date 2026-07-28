@@ -118,7 +118,7 @@ const ProfilesPage = () => {
     const [openImportDialog, setOpenImportDialog] = useState(() => Boolean(readPersistedImportJobId()));
     const [currentProfile, setCurrentProfile] = useState<JobSeekerProfile | null>(null);
     const [importForm, setImportForm] = useState({
-        sourceUrl: 'https://ntd.vieclam24h.vn/employer/search/seeker',
+        sourceUrl: 'https://ntd.vieclam24h.vn/tim-kiem-ung-vien-nhanh',
         account: '',
         password: '',
         occupationIds: [] as number[],
@@ -187,13 +187,27 @@ const ProfilesPage = () => {
 
     const occupationOptions: Vieclam24hSourceOccupation[] = useMemo(() => {
         const occupations = catalogQuery.data?.occupations || [];
-        const topIds = new Set(catalogQuery.data?.recommendedOccupationIds || []);
-        return occupations
+        const CORE_KEYWORDS = ['xây dựng', 'thiết kế', 'kiến trúc', 'điện', 'cơ khí'];
+        const filtered = occupations.filter((occupation) => {
+            const nameLower = (occupation.name || '').toLowerCase();
+            return CORE_KEYWORDS.some((kw) => nameLower.includes(kw));
+        });
+
+        if (filtered.length === 0) {
+            return [
+                { id: 31, name: 'Xây dựng', isTop: true, jobFieldIds: [] },
+                { id: 4, name: 'Kiến trúc - Thiết kế nội ngoại thất', isTop: true, jobFieldIds: [] },
+                { id: 41, name: 'Điện - Điện tử - Điện lạnh', isTop: true, jobFieldIds: [] },
+                { id: 47, name: 'Cơ khí - Ô tô - Tự động hóa', isTop: true, jobFieldIds: [] },
+            ];
+        }
+
+        return filtered
             .map((occupation) => ({
                 ...occupation,
-                isTop: occupation.isTop || topIds.has(occupation.id),
+                isTop: true,
             }))
-            .sort((a, b) => Number(b.isTop) - Number(a.isTop) || a.name.localeCompare(b.name, 'vi'));
+            .sort((a, b) => a.name.localeCompare(b.name, 'vi'));
     }, [catalogQuery.data]);
 
     useEffect(() => {
@@ -715,30 +729,27 @@ const ProfilesPage = () => {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={openImportDialog} onClose={handleCloseImportDialog} fullWidth maxWidth="md">
-                <DialogTitle>{t('pages.profiles.import.dialogTitle')}</DialogTitle>
-                <DialogContent sx={{ pt: 1.5, maxHeight: '72vh' }} dividers>
-                    <Stack spacing={2} sx={{ mt: 1 }}>
+            <Dialog open={openImportDialog} onClose={handleCloseImportDialog} fullWidth maxWidth="sm">
+                <DialogTitle sx={{ fontWeight: 800, pb: 1 }}>
+                    {t('pages.profiles.import.dialogTitle', { defaultValue: 'Đồng bộ ứng viên từ Vieclam24h' })}
+                </DialogTitle>
+                <DialogContent sx={{ pt: 1.5, maxHeight: '78vh' }} dividers>
+                    <Stack spacing={2.5} sx={{ mt: 1 }}>
                         <TextField
-                            label={t('pages.profiles.import.sourceUrlLabel')}
-                            value={importForm.sourceUrl}
-                            onChange={(event) => setImportForm((prev) => ({ ...prev, sourceUrl: event.target.value }))}
-                            fullWidth
-                        />
-                        <TextField
-                            label={t('pages.profiles.import.accountLabel')}
+                            label={t('pages.profiles.import.accountLabel', { defaultValue: 'Account' })}
+                            placeholder="Nhập email/tên tài khoản NTD"
                             value={importForm.account}
                             onChange={(event) => setImportForm((prev) => ({ ...prev, account: event.target.value }))}
                             fullWidth
                         />
                         <TextField
-                            label={t('pages.profiles.import.passwordLabel')}
+                            label={t('pages.profiles.import.passwordLabel', { defaultValue: 'Password' })}
                             type="password"
+                            placeholder="Nhập mật khẩu"
                             value={importForm.password}
                             onChange={(event) => setImportForm((prev) => ({ ...prev, password: event.target.value }))}
                             fullWidth
                         />
-                        <Divider sx={{ my: 0.5 }} />
                         <Autocomplete
                             multiple
                             options={occupationOptions}
@@ -766,7 +777,6 @@ const ProfilesPage = () => {
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
                                             #{option.id}
-                                            {option.isTop ? ' · Đề xuất' : ''}
                                         </Typography>
                                     </Box>
                                 </li>
@@ -774,16 +784,8 @@ const ProfilesPage = () => {
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
-                                    label={t('pages.profiles.import.careerLabel', { defaultValue: 'Ngành trọng điểm' })}
-                                    placeholder={t('pages.profiles.import.careerPlaceholder', { defaultValue: 'Chọn ngành cần lấy ứng viên' })}
-                                    helperText={
-                                        catalogQuery.isError
-                                            ? t('pages.profiles.import.catalogError', { defaultValue: 'Không tải được danh sách ngành nghề từ Vieclam24h.' })
-                                            : t('pages.profiles.import.occupationHelper', {
-                                                  defaultValue: 'Chọn một hoặc nhiều ngành nghề nguồn để AI lọc và chuẩn hóa hồ sơ.',
-                                              })
-                                    }
-                                    error={catalogQuery.isError}
+                                    label={t('pages.profiles.import.careerLabel', { defaultValue: 'Target industry' })}
+                                    placeholder={t('pages.profiles.import.careerPlaceholder', { defaultValue: 'Chọn ngành trọng điểm (Xây dựng, Kiến trúc, Điện, Cơ khí)' })}
                                     fullWidth
                                 />
                             )}

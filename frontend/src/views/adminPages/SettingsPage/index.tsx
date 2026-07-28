@@ -1,37 +1,42 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
   Paper,
-  Grid2 as Grid,
-  Switch,
-  FormControlLabel,
   Button,
-  TextField,
-  Divider,
-  Card,
-  CardContent,
   Stack,
   CircularProgress,
-  Alert,
+  Tabs,
+  Tab,
+  Card,
+  CardContent,
+  Grid2 as Grid,
   Chip,
-  MenuItem,
+  Alert,
+  Divider,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import SaveIcon from '@mui/icons-material/Save';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
+
 import { useSystemSettings, SystemSettings } from './hooks/useSystemSettings';
-import fptGpuService, { type FPTGpuControlStatus } from '../../../services/fptGpuService';
-import adminSettingsService, { type SystemHealthPayload } from '../../../services/adminSettingsService';
+import ChatbotSettingsTab from './components/ChatbotSettingsTab';
+import VoiceInterviewTab from './components/VoiceInterviewTab';
+import GeneralSettingsTab from './components/GeneralSettingsTab';
+import ApiIntegrationTab from './components/ApiIntegrationTab';
+import fptGpuService from '../../../services/fptGpuService';
 import toastMessages from '../../../utils/toastMessages';
+import { getApiErrorMessage } from '../../../utils/apiResponse';
 import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 
 const INITIAL_SETTINGS: SystemSettings = {
@@ -41,37 +46,12 @@ const INITIAL_SETTINGS: SystemSettings = {
   ttsSpeed: '0.92',
   interviewQuestionGapSeconds: '2.0',
   interviewMinimumSilenceSeconds: '1.2',
-};
-
-const INTERVIEW_PACING_PRESETS = [
-  {
-    value: 'balanced',
-    speed: '0.92',
-    gap: '2.0',
-    silence: '1.2',
-  },
-  {
-    value: 'natural',
-    speed: '0.86',
-    gap: '2.5',
-    silence: '1.5',
-  },
-  {
-    value: 'snappy',
-    speed: '1.02',
-    gap: '1.4',
-    silence: '0.9',
-  },
-] as const;
-
-const resolveInterviewPacingPreset = (formData: SystemSettings): string => {
-  const speed = String(formData.ttsSpeed || '');
-  const gap = String(formData.interviewQuestionGapSeconds || '');
-  const silence = String(formData.interviewMinimumSilenceSeconds || '');
-  const matched = INTERVIEW_PACING_PRESETS.find(
-    (preset) => preset.speed === speed && preset.gap === gap && preset.silence === silence,
-  );
-  return matched?.value || 'custom';
+  chatbotTitle: 'InfoHR AI',
+  chatbotSubtitle: 'Trợ lý tuyển dụng thông minh',
+  chatbotEmployerGreeting: '',
+  chatbotJobSeekerGreeting: '',
+  chatbotEmployerSuggestions: '',
+  chatbotJobSeekerSuggestions: '',
 };
 
 const serviceLabels: Record<string, string> = {
@@ -98,48 +78,31 @@ const serviceColor = (status?: string): 'success' | 'error' | 'default' => {
   return 'default';
 };
 
-const resolveSettingsNumberLocale = (language?: string | null): string => (
-  String(language || '').toLowerCase().startsWith('vi') ? 'vi-VN' : 'en-US'
-);
-
-const formatVndPerHour = (value?: number, language?: string | null): string => {
-  if (!value) return 'N/A';
-  return `${new Intl.NumberFormat(resolveSettingsNumberLocale(language)).format(value)} VND/h`;
-};
-
-const getApiErrorMessage = (error: unknown, fallback: string): string => {
-  const responseData = (error as { response?: { data?: unknown } })?.response?.data as
-    | {
-        detail?: string;
-        error?: {
-          message?: string;
-          details?: { detail?: string };
-        };
-      }
-    | undefined;
-
-  return (
-    responseData?.error?.details?.detail ||
-    responseData?.error?.message ||
-    responseData?.detail ||
-    (error instanceof Error ? error.message : '') ||
-    fallback
-  );
+const formatVndPerHour = (value?: number, locale: string = 'vi') => {
+  if (value === undefined || value === null) return 'N/A';
+  try {
+    return new Intl.NumberFormat(locale === 'vi' ? 'vi-VN' : 'en-US', {
+      style: 'currency',
+      currency: 'VND',
+      maximumFractionDigits: 0,
+    }).format(value) + '/h';
+  } catch {
+    return `${value} VND/h`;
+  }
 };
 
 const FPTGpuControlCard = () => {
-  const queryClient = useQueryClient();
   const { t, i18n } = useTranslation('admin');
-  const { data, isLoading, isFetching, error } = useQuery<FPTGpuControlStatus>({
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, error, isFetching } = useQuery({
     queryKey: ['fpt-gpu-control'],
     queryFn: fptGpuService.getStatus,
-    refetchInterval: 30000,
+    refetchInterval: 15000,
   });
 
-  type FptGpuAction = 'start' | 'stop' | 'bootstrap' | 'start-bootstrap';
-
   const actionMutation = useMutation({
-    mutationFn: (action: FptGpuAction) => {
+    mutationFn: (action: 'start' | 'stop' | 'bootstrap' | 'start-bootstrap') => {
       if (action === 'start') return fptGpuService.start();
       if (action === 'stop') return fptGpuService.stop();
       if (action === 'bootstrap') return fptGpuService.bootstrap();
@@ -199,26 +162,9 @@ const FPTGpuControlCard = () => {
 
         <Divider sx={{ mb: 3 }} />
 
-        {queryError && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {queryError}
-          </Alert>
-        )}
-        {control?.configured && control?.error && (
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            {control.error}
-          </Alert>
-        )}
-        {!control?.configured && !isLoading && (
-          <Alert severity="info" sx={{ mb: 2 }}>
-            {t('pages.settings.fptGpu.notConfigured')}
-          </Alert>
-        )}
-        {!bootstrapConfigured && !isLoading && (
-          <Alert severity="info" sx={{ mb: 2 }}>
-            {t('pages.settings.fptGpu.bootstrapNotConfigured')}
-          </Alert>
-        )}
+        {queryError && <Alert severity="error" sx={{ mb: 2 }}>{queryError}</Alert>}
+        {control?.configured && control?.error && <Alert severity="warning" sx={{ mb: 2 }}>{control.error}</Alert>}
+        {!control?.configured && !isLoading && <Alert severity="info" sx={{ mb: 2 }}>{t('pages.settings.fptGpu.notConfigured')}</Alert>}
 
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid size={{ xs: 12, md: 4 }}>
@@ -307,302 +253,117 @@ const FPTGpuControlCard = () => {
   );
 };
 
-type SettingsFormProps = {
+interface SettingsFormProps {
   initialSettings: SystemSettings;
   onSave: (data: SystemSettings) => Promise<unknown>;
   isMutating: boolean;
-};
+}
 
-const SettingsForm = ({ initialSettings, onSave, isMutating }: SettingsFormProps) => {
+const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onSave, isMutating }) => {
   const { t } = useTranslation('admin');
   const [formData, setFormData] = useState<SystemSettings>(() => initialSettings);
-  const [healthResult, setHealthResult] = useState<SystemHealthPayload | null>(null);
-
-  const notificationDemoMutation = useMutation({
-    mutationFn: adminSettingsService.sendNotificationDemo,
-    onSuccess: () => toastMessages.success(t('pages.settings.notificationDemo.success')),
-    onError: (error) => toastMessages.error(getApiErrorMessage(error, t('pages.settings.notificationDemo.error'))),
-  });
-
-  const healthMutation = useMutation({
-    mutationFn: adminSettingsService.healthCheck,
-    onSuccess: (result) => {
-      setHealthResult(result);
-      toastMessages.success(`${t('pages.settings.healthCheck.title')}: ${result.status}`);
-    },
-    onError: (error) => toastMessages.error(getApiErrorMessage(error, t('pages.settings.healthCheck.description'))),
-  });
+  const [currentTab, setCurrentTab] = useState<number>(0);
 
   useEffect(() => {
     setFormData(initialSettings);
   }, [initialSettings]);
 
+  const handleFieldChange = (name: keyof SystemSettings, value: unknown) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleToggleChange = (name: keyof SystemSettings) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [name]: event.target.checked }));
-  };
-
-  const handleInputChange = (name: keyof SystemSettings) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [name]: event.target.value }));
-  };
-
-  const handlePresetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const preset = INTERVIEW_PACING_PRESETS.find((item) => item.value === event.target.value);
-    if (!preset) return;
-    setFormData((prev) => ({
-      ...prev,
-      ttsSpeed: preset.speed,
-      interviewQuestionGapSeconds: preset.gap,
-      interviewMinimumSilenceSeconds: preset.silence,
-    }));
   };
 
   const handleSave = async () => {
     try {
       await onSave(formData);
-    } catch (error) {
-      console.error(error);
+    } catch {
+      // Error handled by hook toast
     }
   };
 
   return (
-    <Box>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
-          {t('pages.settings.title')}
-        </Typography>
+    <Box sx={{ pb: 6 }}>
+      {/* Top Header with Title and Global Save Bar */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3,
+          borderRadius: '16px',
+          border: '1px solid',
+          borderColor: 'divider',
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+        }}
+      >
+        <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} gap={2}>
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.02em', mb: 0.5 }}>
+              Cài Đặt Hệ Thống
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Quản lý toàn bộ cấu hình AI Chatbot, phỏng vấn giọng nói, dịch vụ GPU, vận hành và các khóa API.
+            </Typography>
+          </Box>
+
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={isMutating ? <CircularProgress size={18} color="inherit" /> : <SaveIcon />}
+            onClick={handleSave}
+            disabled={isMutating}
+            sx={{
+              py: 1.2,
+              px: 3.5,
+              fontWeight: 700,
+              borderRadius: '12px',
+              boxShadow: '0 8px 20px rgba(15, 23, 42, 0.15)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {isMutating ? t('common.saving') : t('common.saveChanges')}
+          </Button>
+        </Stack>
+
+        {/* Navigation Tabs */}
+        <Box sx={{ mt: 3, borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            value={currentTab}
+            onChange={(_, val) => setCurrentTab(val)}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              '& .MuiTab-root': {
+                fontWeight: 700,
+                fontSize: '0.92rem',
+                py: 1.5,
+                minHeight: 48,
+              },
+            }}
+          >
+            <Tab icon={<SmartToyIcon />} iconPosition="start" label="AI Chatbot (Trợ lý AI)" />
+            <Tab icon={<RecordVoiceOverIcon />} iconPosition="start" label="Phỏng Vấn & Giọng Nói AI" />
+            <Tab icon={<SettingsSuggestIcon />} iconPosition="start" label="Hệ Thống & Thông Báo" />
+            <Tab icon={<VpnKeyIcon />} iconPosition="start" label="API & Tích Hợp" />
+          </Tabs>
+        </Box>
+      </Paper>
+
+      {/* Tab Panels */}
+      <Box sx={{ mt: 2 }}>
+        {currentTab === 0 && <ChatbotSettingsTab formData={formData} onChange={handleFieldChange} />}
+        {currentTab === 1 && (
+          <VoiceInterviewTab
+            formData={formData}
+            onChange={handleFieldChange}
+            FPTGpuControlCardComponent={<FPTGpuControlCard />}
+          />
+        )}
+        {currentTab === 2 && <GeneralSettingsTab formData={formData} onToggleChange={handleToggleChange} />}
+        {currentTab === 3 && <ApiIntegrationTab formData={formData} onChange={handleFieldChange} />}
       </Box>
-
-      <Grid container spacing={3}>
-        <Grid size={{ xs: 12, md: 8 }}>
-          <Stack spacing={3}>
-            <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid', borderColor: 'divider' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
-                  {t('pages.settings.generalTitle')}
-                </Typography>
-                <Divider sx={{ mb: 3 }} />
-
-                <Stack spacing={3}>
-                  <FormControlLabel
-                    control={<Switch checked={!!formData.maintenanceMode} onChange={handleToggleChange('maintenanceMode')} color="error" />}
-                    label={
-                      <Box sx={{ ml: 1 }}>
-                        <Typography variant="subtitle2" fontWeight={700}>
-                          {t('pages.settings.maintenanceMode.label')}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {t('pages.settings.maintenanceMode.desc')}
-                        </Typography>
-                      </Box>
-                    }
-                  />
-
-                  <FormControlLabel
-                    control={<Switch checked={!!formData.autoApproveJobs} onChange={handleToggleChange('autoApproveJobs')} />}
-                    label={
-                      <Box sx={{ ml: 1 }}>
-                        <Typography variant="subtitle2" fontWeight={700}>
-                          {t('pages.settings.autoApproveJobs.label')}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {t('pages.settings.autoApproveJobs.desc')}
-                        </Typography>
-                      </Box>
-                    }
-                  />
-
-                  <FormControlLabel
-                    control={<Switch checked={!!formData.emailNotifications} onChange={handleToggleChange('emailNotifications')} />}
-                    label={
-                      <Box sx={{ ml: 1 }}>
-                        <Typography variant="subtitle2" fontWeight={700}>
-                          {t('pages.settings.emailNotifications.label')}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {t('pages.settings.emailNotifications.desc')}
-                        </Typography>
-                      </Box>
-                    }
-                  />
-                </Stack>
-              </CardContent>
-            </Card>
-
-            <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid', borderColor: 'divider' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
-                  {t('pages.settings.interviewAi.pacingTitle')}
-                </Typography>
-                <Divider sx={{ mb: 3 }} />
-
-                <Stack spacing={2}>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('pages.settings.interviewAi.pacingDescription')}
-                  </Typography>
-                  <TextField
-                    select
-                    label={t('pages.settings.interviewAi.preset.label')}
-                    value={resolveInterviewPacingPreset(formData)}
-                    onChange={handlePresetChange}
-                    size="small"
-                    fullWidth
-                    helperText={t('pages.settings.interviewAi.preset.helper')}
-                  >
-                    <MenuItem value="balanced">
-                      {t('pages.settings.interviewAi.preset.options.balanced')}
-                    </MenuItem>
-                    <MenuItem value="natural">
-                      {t('pages.settings.interviewAi.preset.options.natural')}
-                    </MenuItem>
-                    <MenuItem value="snappy">
-                      {t('pages.settings.interviewAi.preset.options.snappy')}
-                    </MenuItem>
-                    <MenuItem value="custom">
-                      {t('pages.settings.interviewAi.preset.options.custom')}
-                    </MenuItem>
-                  </TextField>
-                  <TextField
-                    label={t('pages.settings.interviewAi.questionGap.label')}
-                    value={formData.interviewQuestionGapSeconds || ''}
-                    onChange={handleInputChange('interviewQuestionGapSeconds')}
-                    type="number"
-                    size="small"
-                    fullWidth
-                    inputProps={{ step: 0.5, min: 0, max: 10 }}
-                    helperText={t('pages.settings.interviewAi.questionGap.helper')}
-                  />
-                  <TextField
-                    label={t('pages.settings.interviewAi.silenceThreshold.label')}
-                    value={formData.interviewMinimumSilenceSeconds || ''}
-                    onChange={handleInputChange('interviewMinimumSilenceSeconds')}
-                    type="number"
-                    size="small"
-                    fullWidth
-                    inputProps={{ step: 0.1, min: 0, max: 10 }}
-                    helperText={t('pages.settings.interviewAi.silenceThreshold.helper')}
-                  />
-                </Stack>
-              </CardContent>
-            </Card>
-
-            <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid', borderColor: 'divider' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
-                  {t('pages.settings.interviewAi.ttsTitle')}
-                </Typography>
-                <Divider sx={{ mb: 3 }} />
-
-                <Stack spacing={2}>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('pages.settings.interviewAi.ttsDescription')}
-                  </Typography>
-                  <TextField
-                    label={t('pages.settings.interviewAi.ttsSpeed.label')}
-                    value={formData.ttsSpeed || ''}
-                    onChange={handleInputChange('ttsSpeed')}
-                    type="number"
-                    size="small"
-                    fullWidth
-                    inputProps={{ step: 0.05, min: 0.5, max: 2 }}
-                    helperText={t('pages.settings.interviewAi.ttsSpeed.helper')}
-                  />
-                </Stack>
-              </CardContent>
-            </Card>
-
-            <FPTGpuControlCard />
-
-            <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid', borderColor: 'divider' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
-                  {t('pages.settings.apiTitle')}
-                </Typography>
-                <Divider sx={{ mb: 3 }} />
-
-                <Stack spacing={3}>
-                  <TextField
-                    label={t('pages.settings.googleApiKey')}
-                    fullWidth
-                    value={formData.googleApiKey || ''}
-                    onChange={handleInputChange('googleApiKey')}
-                    type="password"
-                    size="small"
-                  />
-                  <TextField
-                    label={t('pages.settings.supportEmail')}
-                    fullWidth
-                    value={formData.supportEmail || ''}
-                    onChange={handleInputChange('supportEmail')}
-                    size="small"
-                  />
-                </Stack>
-              </CardContent>
-            </Card>
-          </Stack>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Stack spacing={3} sx={{ position: 'sticky', top: 24 }}>
-            <Paper sx={{ p: 3, borderRadius: '16px', border: '1px solid', borderColor: 'divider' }} elevation={0}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
-                {t('pages.settings.summary')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                {t('pages.settings.summaryText')}
-              </Typography>
-              <Button
-                variant="contained"
-                fullWidth
-                startIcon={isMutating ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-                onClick={handleSave}
-                disabled={isMutating}
-                sx={{ py: 1.5, fontWeight: 700 }}
-              >
-                {isMutating ? t('common.saving') : t('common.saveChanges')}
-              </Button>
-            </Paper>
-
-            <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid', borderColor: 'divider' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Stack spacing={2}>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    startIcon={
-                      notificationDemoMutation.isPending
-                        ? <CircularProgress size={18} />
-                        : <NotificationsActiveIcon />
-                    }
-                    onClick={() => notificationDemoMutation.mutate()}
-                    disabled={notificationDemoMutation.isPending}
-                  >
-                    {notificationDemoMutation.isPending
-                      ? t('pages.settings.notificationDemo.sending')
-                      : t('pages.settings.notificationDemo.send')}
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    startIcon={healthMutation.isPending ? <CircularProgress size={18} /> : <MonitorHeartIcon />}
-                    onClick={() => healthMutation.mutate()}
-                    disabled={healthMutation.isPending}
-                  >
-                    {healthMutation.isPending
-                      ? t('pages.settings.healthCheck.checking')
-                      : t('pages.settings.healthCheck.check')}
-                  </Button>
-                  {healthResult && (
-                    <Alert severity={healthResult.status === 'healthy' ? 'success' : 'warning'} sx={{ mt: 1 }}>
-                      {t('pages.settings.healthCheck.database')}: {healthResult.database || 'N/A'} |{' '}
-                      {t('pages.settings.healthCheck.redis')}: {healthResult.redis || 'N/A'}
-                    </Alert>
-                  )}
-                </Stack>
-              </CardContent>
-            </Card>
-          </Stack>
-        </Grid>
-      </Grid>
     </Box>
   );
 };

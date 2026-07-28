@@ -18,12 +18,15 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import Tooltip from '@mui/material/Tooltip';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
+import { faBolt } from '@fortawesome/free-solid-svg-icons';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CheckIcon from '@mui/icons-material/Check';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
@@ -461,8 +464,8 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
                       height: '100%',
                       minHeight: 165,
                       p: 2.2,
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #e2e8f0',
+                      backgroundColor: job.isUrgent ? '#fff7ed' : '#ffffff',
+                      border: `1px solid ${job.isUrgent ? '#fdba74' : '#e2e8f0'}`,
                       borderRadius: '16px',
                       textDecoration: 'none',
                       color: 'inherit',
@@ -470,8 +473,10 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
                       transition: 'all 0.25s ease',
                       '&:hover': {
                         transform: 'translateY(-3px)',
-                        borderColor: '#cbd5e1',
-                        boxShadow: '0 12px 30px rgba(15, 23, 42, 0.08)',
+                        borderColor: job.isUrgent ? '#ea580c' : '#cbd5e1',
+                        boxShadow: job.isUrgent
+                          ? '0 12px 30px rgba(234, 88, 12, 0.14)'
+                          : '0 12px 30px rgba(15, 23, 42, 0.08)',
                       },
                     }}
                   >
@@ -493,39 +498,83 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
                       >
                         {job.jobName}
                       </Typography>
-                      <IconButton
-                        size="small"
-                        onClick={(e) => toggleFavorite(e, job.id)}
-                        sx={{
-                          p: 0.5,
-                          color: isFav ? '#ef4444' : '#94a3b8',
-                          '&:hover': { backgroundColor: 'transparent', color: '#ef4444' },
-                        }}
-                      >
-                        {isFav ? (
-                          <FavoriteIcon sx={{ fontSize: 20, color: '#ef4444' }} />
-                        ) : (
-                          <FavoriteBorderIcon sx={{ fontSize: 20 }} />
+                      <Stack direction="row" spacing={0.5} alignItems="center">
+                        {job.isUrgent && (
+                          <Tooltip title="Việc làm tuyển gấp" placement="top">
+                            <Box
+                              sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: 24,
+                                height: 24,
+                                borderRadius: '50%',
+                                bgcolor: '#ea580c',
+                                color: '#ffffff',
+                                boxShadow: '0 6px 16px rgba(234, 88, 12, 0.25)',
+                                flexShrink: 0,
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faBolt} style={{ fontSize: 12 }} />
+                            </Box>
+                          </Tooltip>
                         )}
-                      </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => toggleFavorite(e, job.id)}
+                          sx={{
+                            p: 0.5,
+                            color: isFav ? '#ef4444' : '#94a3b8',
+                            '&:hover': { backgroundColor: 'transparent', color: '#ef4444' },
+                          }}
+                        >
+                          {isFav ? (
+                            <FavoriteIcon sx={{ fontSize: 20, color: '#ef4444' }} />
+                          ) : (
+                            <FavoriteBorderIcon sx={{ fontSize: 20 }} />
+                          )}
+                        </IconButton>
+                      </Stack>
                     </Box>
 
                     {/* Middle Row: Company Logo + Company Name / Salary / City */}
                     <Stack direction="row" spacing={1.75} alignItems="center" sx={{ mb: 1.5 }}>
-                      <MuiImageCustom
-                        width={52}
-                        height={52}
-                        src={companyLogo}
-                        fallbackSrc={IMAGES.companyLogoDefault}
-                        sx={{
-                          borderRadius: '10px',
-                          border: '1px solid #f1f5f9',
-                          objectFit: 'contain',
-                          flexShrink: 0,
-                          p: 0.5,
-                          backgroundColor: '#ffffff',
-                        }}
-                      />
+                      <Box sx={{ position: 'relative', flexShrink: 0 }}>
+                        <MuiImageCustom
+                          width={52}
+                          height={52}
+                          src={companyLogo}
+                          fallbackSrc={IMAGES.companyLogoDefault}
+                          sx={{
+                            borderRadius: '10px',
+                            border: `1px solid ${job.isUrgent ? '#fdba74' : '#f1f5f9'}`,
+                            objectFit: 'contain',
+                            flexShrink: 0,
+                            p: 0.5,
+                            backgroundColor: '#ffffff',
+                          }}
+                        />
+                        {job.isUrgent && (
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              top: -7,
+                              left: -7,
+                              width: 20,
+                              height: 20,
+                              borderRadius: '50%',
+                              bgcolor: '#f97316',
+                              color: '#fff',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              boxShadow: '0 6px 14px rgba(249, 115, 22, 0.28)',
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faBolt} style={{ fontSize: 10 }} />
+                          </Box>
+                        )}
+                      </Box>
                       <Stack spacing={0.4} sx={{ minWidth: 0, flex: 1 }}>
                         <Typography
                           variant="body2"

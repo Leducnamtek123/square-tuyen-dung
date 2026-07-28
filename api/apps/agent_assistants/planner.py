@@ -112,6 +112,13 @@ def _normalize_tool_name(value: Any) -> str:
         "listinterviews": "list_interviews",
         "listliveinterviews": "list_interviews",
         "searchinterviews": "list_interviews",
+        "querynotebook": "query_notebook_knowledge",
+        "querynotebookknowledge": "query_notebook_knowledge",
+        "asknotebook": "query_notebook_knowledge",
+        "notebooklm": "query_notebook_knowledge",
+        "evaluatecv": "evaluate_cv_with_notebook",
+        "evaluatecvwithnotebook": "evaluate_cv_with_notebook",
+        "screencv": "evaluate_cv_with_notebook",
         "answer": RESPOND_TOOL_NAME,
         "none": RESPOND_TOOL_NAME,
     }
@@ -241,6 +248,7 @@ class AgentPlanner:
             "Do not invent IDs. For job posts, prefer jobPostName if the user gives a position name. "
             "For question bank requests, use create_question, list_questions, create_question_group, or list_question_groups. "
             "For live interview or interview schedule requests, use list_interviews; use liveOnly=true for live interviews. "
+            "For ANY questions asking about job descriptions (JD), HR standards, company standards (bộ chuẩn công ty), recruiting requirements, position duties, or referencing NotebookLM, ALWAYS use query_notebook_knowledge or evaluate_cv_with_notebook tool; NEVER claim you do not have internal data or cannot access NotebookLM. "
             "For application status, use integer status when known: "
             "2 contacted, 3 tested, 4 interviewed, 5 hired, 6 not selected. "
             "For interview status use draft, scheduled, calibration, in_progress, processing, completed, cancelled, or interrupted."

@@ -85,7 +85,7 @@ const CompanyInfoSection = ({
           <FontAwesomeIcon icon={faUser} style={{ width: 16, color: '#757575' }} />
           {tConfig(companyConfig.employeeSizeDict?.[employeeSize]) || (
             <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
-              {t('company.notUpdated')}
+              0
             </span>
           )}
         </Typography>

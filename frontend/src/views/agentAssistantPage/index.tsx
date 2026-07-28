@@ -41,6 +41,7 @@ import agentAssistantService, {
 } from '@/services/agentAssistantService';
 import { TabTitle } from '@/utils/generalFunction';
 import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
+import { MessageResponse } from '@/components/Features/AiElements/message';
 
 type AgentAssistantPageProps = {
   portal: AgentPortal;
@@ -183,6 +184,8 @@ const toolDisplayNameKeys: Record<string, string> = {
   create_question_group: 'common:agentAssistant.tools.create_question_group',
   list_question_groups: 'common:agentAssistant.tools.list_question_groups',
   list_interviews: 'common:agentAssistant.tools.list_interviews',
+  query_notebook_knowledge: 'common:agentAssistant.tools.query_notebook_knowledge',
+  evaluate_cv_with_notebook: 'common:agentAssistant.tools.evaluate_cv_with_notebook',
 };
 
 const businessRowLabelKeys = {
@@ -266,11 +269,13 @@ const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
   const record = asRecord(output.record);
   const recordUrl = typeof record.url === 'string' ? record.url : '';
   const safeRecordUrl = getSafeExternalOpenUrl(recordUrl);
-  const message = asString(output.message) || toolCall.errorMessage;
+  const isNotebookTool =
+    toolCall.toolName === 'query_notebook_knowledge' || toolCall.toolName === 'evaluate_cv_with_notebook';
+  const message = isNotebookTool ? '' : asString(output.message) || toolCall.errorMessage;
   const rows = businessRows(toolCall);
   const results = Array.isArray(output.results) ? output.results : [];
   const hasDetails = Boolean(toolCall.errorMessage || safeRecordUrl || rows.length || results.length);
-  const [expanded, setExpanded] = useState(hasDetails);
+  const [expanded, setExpanded] = useState(hasDetails && !isNotebookTool);
   const color =
     toolCall.status === 'succeeded'
       ? theme.palette.success.main
@@ -283,7 +288,7 @@ const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
       sx={{
         border: '1px solid',
         borderColor: alpha(color, 0.28),
-        borderRadius: 1,
+        borderRadius: 1.5,
         bgcolor: alpha(color, 0.035),
         overflow: 'hidden',
       }}
@@ -296,7 +301,7 @@ const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
         sx={{
           justifyContent: 'space-between',
           px: 1.5,
-          py: 1,
+          py: 0.85,
           color: 'text.primary',
           textTransform: 'none',
           borderRadius: 0,
@@ -306,7 +311,7 @@ const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
           <Box sx={{ color, display: 'flex' }}>
             <ToolStatusIcon status={toolCall.status} />
           </Box>
-          <Typography variant="body2" sx={{ fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <Typography variant="body2" sx={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {toolDisplayNameKeys[toolCall.toolName]
               ? t(toolDisplayNameKeys[toolCall.toolName])
               : toolCall.displayName || toolCall.toolName}
@@ -314,7 +319,7 @@ const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
           <Chip
             size="small"
             label={statusLabelKeys[toolCall.status] ? t(statusLabelKeys[toolCall.status]) : toolCall.status}
-            sx={{ height: 22 }}
+            sx={{ height: 20, fontSize: '0.725rem', fontWeight: 600 }}
           />
         </Stack>
         {hasDetails ? (
@@ -457,9 +462,7 @@ const MessageBubble = ({ message }: { message: AgentMessage }) => {
           opacity: isOptimistic ? 0.82 : 1,
         }}
       >
-        {message.toolCalls?.map((toolCall) => (
-          <ToolStepCard key={toolCall.id} toolCall={toolCall} />
-        ))}
+
         {imageParts.length ? (
           <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
             {imageParts.map((part, index) => (
@@ -483,11 +486,17 @@ const MessageBubble = ({ message }: { message: AgentMessage }) => {
           </Stack>
         ) : null}
         {message.content ? (
-          <Stack direction="row" spacing={1} alignItems="flex-start">
+          <Stack direction="row" spacing={1} alignItems="flex-start" sx={{ width: '100%' }}>
             {!isUser && isOptimistic ? <CircularProgress size={15} sx={{ mt: 0.4 }} /> : null}
-            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.65 }}>
-              {message.content}
-            </Typography>
+            {isUser ? (
+              <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.65 }}>
+                {message.content}
+              </Typography>
+            ) : (
+              <Box sx={{ width: '100%', overflowWrap: 'anywhere' }}>
+                <MessageResponse>{message.content}</MessageResponse>
+              </Box>
+            )}
           </Stack>
         ) : null}
       </Stack>

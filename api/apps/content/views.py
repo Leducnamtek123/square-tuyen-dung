@@ -639,7 +639,11 @@ class EmployerArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     def _handle_thumbnail(self, request, article):
         from shared.helpers.cloudinary_service import CloudinaryService
         from apps.files.models import File
-        thumb_file = request.FILES.get('thumbnailFile')
+        thumb_file = (
+            request.FILES.get('thumbnailFile') or
+            request.FILES.get('thumbnail') or
+            request.FILES.get('thumbnail_file')
+        )
         if thumb_file:
             upload_result = CloudinaryService.upload_image(thumb_file, 'articles')
             if upload_result:
@@ -648,7 +652,15 @@ class EmployerArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
                 )
                 if file_record:
                     article.thumbnail = file_record
-                    article.save()
+                    article.save(update_fields=['thumbnail'])
+        elif (
+            request.data.get('clearThumbnail') == 'true' or
+            request.data.get('clear_thumbnail') == 'true' or
+            request.data.get('clearThumbnail') is True
+        ):
+            if article.thumbnail:
+                article.thumbnail = None
+                article.save(update_fields=['thumbnail'])
 
 
 class ArticlePublicViewSet(viewsets.ReadOnlyModelViewSet):
@@ -663,8 +675,11 @@ class ArticlePublicViewSet(viewsets.ReadOnlyModelViewSet):
         category = self.request.GET.get('category')
         tag = self.request.GET.get('tag')
         search = self.request.GET.get('search') or self.request.GET.get('kw')
-        if category:
-            qs = qs.filter(category=category)
+        if category and category != 'all':
+            qs = qs.filter(
+                models.Q(category=category) |
+                models.Q(tags__icontains=category)
+            )
         if tag:
             qs = qs.filter(tags__icontains=tag)
         if search:
@@ -752,7 +767,11 @@ class AdminArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     def _handle_thumbnail(self, request, article):
         from shared.helpers.cloudinary_service import CloudinaryService
         from apps.files.models import File
-        thumb_file = request.FILES.get('thumbnailFile')
+        thumb_file = (
+            request.FILES.get('thumbnailFile') or
+            request.FILES.get('thumbnail') or
+            request.FILES.get('thumbnail_file')
+        )
         if thumb_file:
             upload_result = CloudinaryService.upload_image(thumb_file, 'articles')
             if upload_result:
@@ -761,7 +780,15 @@ class AdminArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
                 )
                 if file_record:
                     article.thumbnail = file_record
-                    article.save()
+                    article.save(update_fields=['thumbnail'])
+        elif (
+            request.data.get('clearThumbnail') == 'true' or
+            request.data.get('clear_thumbnail') == 'true' or
+            request.data.get('clearThumbnail') is True
+        ):
+            if article.thumbnail:
+                article.thumbnail = None
+                article.save(update_fields=['thumbnail'])
 
 
 # ===== ContactMessage ViewSets =====

@@ -22,6 +22,8 @@ import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import companyService from '@/services/companyService';
 import commonService from '@/services/commonService';
 import { IMAGES } from '@/configs/constants';
+import { useConfig } from '@/hooks/useConfig';
+import { tConfig } from '@/utils/tConfig';
 import type { Company } from '@/types/models';
 
 const DEFAULT_CATEGORIES = [
@@ -36,6 +38,7 @@ const DEFAULT_CATEGORIES = [
 const TopCompanyCarousel = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { allConfig } = useConfig();
 
   const { data: dynamicCareers = [] } = useQuery({
     queryKey: ['top-careers-carousel'],
@@ -184,13 +187,12 @@ const TopCompanyCarousel = () => {
         </Grid>
       ) : (
         <Grid container spacing={2.5}>
-          {displayList.map((company: Company & { jobPostsCount?: number; employeeSizeRange?: string; employeeSize?: any }) => {
+          {displayList.map((company: Company) => {
             const logo = company.companyImageUrl || company.logoUrl || IMAGES.companyLogoDefault;
-            const openJobs = company.jobPostsCount || Math.floor(Math.random() * 20) + 5;
-            const empSize =
-              typeof company.employeeSize === 'string'
-                ? company.employeeSize
-                : company.employeeSizeRange || 'Trên 300 nhân viên';
+            const openJobs = Number.isFinite(Number(company.jobPostNumber)) ? Number(company.jobPostNumber) : 0;
+            const employeeSizeLabel = company.employeeSize != null
+              ? tConfig(allConfig?.employeeSizeDict?.[String(company.employeeSize)])
+              : '';
 
             return (
               <Grid key={company.id} size={{ xs: 12, sm: 6, md: 4 }}>
@@ -262,7 +264,7 @@ const TopCompanyCarousel = () => {
                     <Stack direction="row" spacing={0.6} alignItems="center">
                       <PeopleOutlineIcon sx={{ fontSize: 15, color: '#d97706' }} />
                       <Typography sx={{ fontSize: '0.775rem', fontWeight: 500, color: '#b45309' }}>
-                        {empSize}
+                        {employeeSizeLabel || '0'}
                       </Typography>
                     </Stack>
                   </Stack>

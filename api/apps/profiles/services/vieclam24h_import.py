@@ -27,11 +27,25 @@ DEFAULT_VIECLAM24H_CAREER_NAMES = [
 ]
 
 _CAREER_KEYWORDS = {
-    "Xây dựng": ["xây dựng", "construction", "civil", "site", "qs", "kết cấu", "giám sát", "project", "safety"],
-    "Thiết kế / Kiến trúc": ["thiết kế", "kiến trúc", "architecture", "interior", "design", "cad", "bim", "decor"],
-    "Điện / Điện tử": ["điện", "electrical", "me", "hvac", "elv", "automation", "electronics", "maintenance"],
-    "Cơ khí": ["cơ khí", "mechanical", "machinery", "manufacturing", "production", "industrial", "welding"],
+    "Xây dựng": [
+        "xây dựng", "construction", "civil", "site", "qs", "kết cấu", "giám sát",
+        "project", "safety", "chỉ huy trưởng", "cht", "pm", "project manager",
+        "qa", "qc", "qa/qc", "bóc tách", "khối lượng", "dự toán", "điều phối",
+        "thu mua", "procurement", "đấu thầu", "tender", "sales admin", "c&c"
+    ],
+    "Thiết kế / Kiến trúc": [
+        "thiết kế", "kiến trúc", "architecture", "interior", "design", "cad", "bim",
+        "decor", "gs id", "giám sát nội thất", "nội thất", "diễn họa", "2d", "3d", "họa viên"
+    ],
+    "Điện / Điện tử": [
+        "điện", "electrical", "me", "mep", "hvac", "elv", "automation", "electronics",
+        "maintenance", "gs mep", "giám sát mep", "cơ điện"
+    ],
+    "Cơ khí": [
+        "cơ khí", "mechanical", "machinery", "manufacturing", "production", "industrial", "welding"
+    ],
 }
+
 
 
 @dataclass
@@ -390,12 +404,14 @@ def import_vieclam24h_candidates(
     target_city: City | None = None,
     target_district: District | None = None,
     created_by: User | None = None,
+    on_progress: Any = None,
 ) -> ImportResult:
     candidates = collect_vieclam24h_candidates(
         source_url,
         username,
         password,
         occupation_ids=list(occupation_ids or []),
+        on_progress=on_progress,
     )
     return persist_vieclam24h_candidates(
         candidates,

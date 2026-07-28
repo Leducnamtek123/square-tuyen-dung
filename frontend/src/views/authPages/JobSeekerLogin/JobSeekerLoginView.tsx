@@ -79,10 +79,7 @@ const JobSeekerLoginView = ({
           boxShadow: { xs: 'none', sm: '0 8px 32px rgba(0, 0, 0, 0.1)' },
         }}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4 }}>
-          <StyledAvatar>
-            <LockOutlinedIcon sx={{ fontSize: 28 }} />
-          </StyledAvatar>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
           <Typography component="h1" variant="h4" align="center" sx={{ fontWeight: 600, color: 'primary.main', mb: 1 }}>
             {title}
           </Typography>

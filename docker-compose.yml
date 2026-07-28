@@ -91,12 +91,13 @@ services:
       - DEBUG=${DEBUG:-False}
       - AUTO_MIGRATE=${AUTO_MIGRATE:-1}
       - AI_TTS_FALLBACK_BASE_URLS=http://vieneu-tts:8298/v1
+      - NOTEBOOKLM_MCP_URL=${NOTEBOOKLM_MCP_URL:-http://host.docker.internal:8085/mcp}
+      - DEFAULT_NOTEBOOKLM_NOTEBOOK_ID=${DEFAULT_NOTEBOOKLM_NOTEBOOK_ID:-0a469926-b901-426d-afe5-843096613137}
       - INTERVIEW_AGENT_SHARED_SECRET=${INTERVIEW_AGENT_SHARED_SECRET:?Set INTERVIEW_AGENT_SHARED_SECRET in .env and share it with livekit-agent}
       - INTERVIEW_AGENT_AUTH_REQUIRED=${INTERVIEW_AGENT_AUTH_REQUIRED:-True}
       - INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS=${INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS:-300}
-    # Needed only when enabling local Docker/host AI fallback.
-    # extra_hosts:
-    #   - "host.docker.internal:host-gateway"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     deploy:
       resources:
         limits:
@@ -139,6 +140,31 @@ services:
     networks:
       - app-net
       - data-net
+
+  # ---------------------------------------------------------------------------
+  # NotebookLM MCP Service
+  # ---------------------------------------------------------------------------
+  notebooklm-mcp:
+    container_name: tuyendung-studio-notebooklm-mcp
+    build:
+      context: ./notebooklm-mcp
+    ports:
+      - "8000:8000"
+    environment:
+      - NOTEBOOKLM_PORT=8000
+      - NOTEBOOKLM_HOST=0.0.0.0
+      - NOTEBOOKLM_TRANSPORT=http
+    volumes:
+      - ${APPDATA}/notebooklm-mcp/Data:/root/.local/share/notebooklm-mcp
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+      - proxy-net
 
   # ---------------------------------------------------------------------------
   # Celery Worker

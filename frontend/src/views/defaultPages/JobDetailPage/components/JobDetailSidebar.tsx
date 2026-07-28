@@ -8,6 +8,8 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import FilterJobPostCard from '../../../components/defaults/FilterJobPostCard';
 import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 import { IMAGES } from '../../../../configs/constants';
+import { useConfig } from '@/hooks/useConfig';
+import { tConfig } from '@/utils/tConfig';
 import type { Company, JobPost } from '@/types/models';
 
 type JobPostDetail = Partial<JobPost> & {
@@ -24,13 +26,16 @@ interface JobDetailSidebarProps {
 
 const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) => {
   const { t } = useTranslation(['public', 'common']);
+  const { allConfig } = useConfig();
 
   const company = jobPostDetail?.companyDict;
   const companyName = company?.companyName || jobPostDetail?.companyName || 'Công ty Tuyển Dụng';
   const companyLogo = company?.logoUrl || company?.companyImageUrl || jobPostDetail?.companyImageUrl || IMAGES.companyLogoDefault;
   const companySlug = company?.slug || jobPostDetail?.companySlug || '';
-  const companyAddress = company?.address || jobPostDetail?.locationName || 'TP.HCM';
-  const companySize = company?.employeeSize ? `${company.employeeSize} nhân viên` : 'Dưới 10 nhân viên';
+  const companyAddress = company?.location?.address || jobPostDetail?.locationName || 'TP.HCM';
+  const companySize = company?.employeeSize != null
+    ? tConfig(allConfig?.employeeSizeDict?.[String(company.employeeSize)])
+    : '';
 
   return (
     <Stack spacing={3}>
@@ -81,7 +86,7 @@ const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) =>
                 <PeopleIcon sx={{ fontSize: 17, color: '#64748b', flexShrink: 0 }} />
                 <Typography variant="body2" sx={{ fontSize: '0.825rem', color: '#475569' }}>
                   <Box component="span" sx={{ fontWeight: 600, color: '#334155' }}>Quy mô: </Box>
-                  {companySize}
+                  {companySize || '0'}
                 </Typography>
               </Stack>
             </Stack>

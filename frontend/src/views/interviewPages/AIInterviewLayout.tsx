@@ -219,7 +219,7 @@ function AIParticipantTile({
         <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
           <div className="flex flex-col gap-0.5">
             <div className="flex items-center gap-1.5">
-              <span className="rounded bg-violet-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-violet-300">
+              <span className="rounded bg-sky-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-sky-300">
                 AI
               </span>
               <span className="text-xs font-semibold text-white">{displayName}</span>
@@ -367,7 +367,7 @@ function TimelineMessage({
             fontWeight: 900,
             letterSpacing: 1.1,
             bgcolor: isAgent
-              ? alpha('#8b5cf6', 0.18)
+              ? alpha('#0ea5e9', 0.18)
               : isLocal
                 ? alpha('#0ea5e9', 0.18)
                 : isEmployer
@@ -376,7 +376,7 @@ function TimelineMessage({
                     ? alpha('#22c55e', 0.12)
                     : alpha('#94a3b8', 0.12),
             color: isAgent
-              ? '#c4b5fd'
+              ? '#7dd3fc'
               : isLocal
                 ? '#7dd3fc'
                 : isEmployer
@@ -386,7 +386,7 @@ function TimelineMessage({
                     : '#cbd5e1',
             border: '1px solid',
             borderColor: isAgent
-              ? alpha('#8b5cf6', 0.28)
+              ? alpha('#0ea5e9', 0.28)
               : isLocal
                 ? alpha('#0ea5e9', 0.24)
                 : isEmployer
@@ -416,14 +416,14 @@ function TimelineMessage({
           borderColor: isTranscript
             ? alpha('#22c55e', 0.16)
             : isAgent
-              ? alpha('#8b5cf6', 0.16)
+              ? alpha('#0ea5e9', 0.16)
               : isLocal
                 ? alpha('#0ea5e9', 0.16)
                 : alpha('#334155', 0.5),
           bgcolor: isTranscript
             ? alpha('#0f172a', 0.82)
             : isAgent
-              ? alpha('#8b5cf6', 0.08)
+              ? alpha('#0ea5e9', 0.08)
               : isLocal
                 ? alpha('#0ea5e9', 0.08)
                 : alpha('#020617', 0.7),

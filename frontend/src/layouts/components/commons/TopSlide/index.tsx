@@ -45,6 +45,7 @@ const HERO_STATS = [
 const RenderItem = ({ item }: { item: Banner }) => {
   const imageUrl = item.imageUrl || IMAGES.coverImageDefault;
   const mobileImageUrl = item.imageMobileUrl || imageUrl;
+  const [isLoaded, setIsLoaded] = React.useState(false);
 
   return (
     <Box
@@ -62,10 +63,14 @@ const RenderItem = ({ item }: { item: Banner }) => {
           component="img"
           src={imageUrl}
           alt={item.description || 'Banner'}
-          loading="lazy"
+          loading="eager"
+          // @ts-ignore fetchPriority property
+          fetchPriority="high"
+          onLoad={() => setIsLoaded(true)}
           onError={(e) => {
             (e.target as HTMLImageElement).src = IMAGES.coverImageDefault;
             (e.target as HTMLImageElement).onerror = null;
+            setIsLoaded(true);
           }}
           sx={{
             width: '100%',
@@ -73,6 +78,8 @@ const RenderItem = ({ item }: { item: Banner }) => {
             objectFit: 'cover',
             objectPosition: 'center center',
             display: 'block',
+            opacity: isLoaded ? 1 : 0,
+            transition: 'opacity 0.3s ease-in-out',
           }}
         />
       </Box>
@@ -94,17 +101,45 @@ const TopSlide = () => {
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
+    let isMounted = true;
     const getBanners = async () => {
       try {
         const resData = await contentService.getBanners({ type: BANNER_TYPES.HOME });
-        setBanners(resData);
+        if (!isMounted) return;
+
+        if (resData && resData.length > 0) {
+          const preloadPromises = resData.slice(0, 2).map((banner) => {
+            return new Promise((resolve) => {
+              const url = banner.imageUrl || IMAGES.coverImageDefault;
+              const img = new Image();
+              img.src = url;
+              img.onload = resolve;
+              img.onerror = resolve;
+            });
+          });
+
+          await Promise.race([
+            Promise.all(preloadPromises),
+            new Promise((r) => setTimeout(r, 600)),
+          ]);
+        }
+
+        if (isMounted) {
+          setBanners(resData);
+        }
       } catch {
         // Error handled silently
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
     getBanners();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (

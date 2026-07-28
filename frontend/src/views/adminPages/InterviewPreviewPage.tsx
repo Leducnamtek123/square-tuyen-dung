@@ -65,7 +65,7 @@ function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
            <AgentAudioVisualizerAura 
              state={speaking ? 'speaking' : 'listening'} 
              size="lg" 
-             color="#8b5cf6" 
+             color="#0284c7" 
            />
         ) : (
           <div className={`flex size-16 items-center justify-center rounded-full border text-2xl
@@ -81,7 +81,7 @@ function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
       {/* Name bar */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
         <div className="flex items-center gap-1.5">
-          {isAI && <span className="rounded bg-violet-500/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-violet-300">AI</span>}
+          {isAI && <span className="rounded bg-sky-500/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-sky-300">AI</span>}
           {isSelf && <span className="rounded bg-cyan-500/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-cyan-300">{t('pages.interviewPreview.connected.you')}</span>}
           <span className="text-xs font-semibold text-white">{name}</span>
           {speaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
@@ -277,7 +277,7 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
               {FAKE_MESSAGES.map((m) => (
                 <div key={`${m.from}-${m.textKey}`} className={`flex gap-2 ${m.from === 'candidate' ? 'flex-row-reverse' : ''}`}>
                   <div className={`flex size-7 flex-shrink-0 items-center justify-center rounded-full text-xs
-                    ${m.from === 'AI' ? 'bg-violet-500/20 text-violet-300' : 'bg-cyan-500/20 text-cyan-300'}`}>
+                    ${m.from === 'AI' ? 'bg-sky-500/20 text-sky-300' : 'bg-cyan-500/20 text-cyan-300'}`}>
                     <FontAwesomeIcon icon={m.from === 'AI' ? faRobot : faUser} />
                   </div>
                   <div className={`max-w-[200px] rounded-xl px-3 py-2 text-xs text-zinc-200

@@ -34,7 +34,7 @@ export const chartColors = {
   amber: '#f59e0b',
   gold: '#fbbf24',
   red: '#ef4444',
-  violet: '#8b5cf6',
+  violet: '#2563eb',
   cyan: '#06b6d4',
   slate: '#475569',
   grid: '#dbeafe',

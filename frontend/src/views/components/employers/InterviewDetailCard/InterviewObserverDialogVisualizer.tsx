@@ -26,7 +26,7 @@ const InterviewObserverDialogVisualizer = () => {
       )}
 
       {videoTracks.length > 0 ? (
-        <Box sx={{ width: screenTracks.length > 0 ? 180 : '100%', height: screenTracks.length > 0 ? 135 : '100%', maxHeight: screenTracks.length > 0 ? 135 : 320, position: screenTracks.length > 0 ? 'absolute' : 'relative', bottom: screenTracks.length > 0 ? 16 : 'auto', right: screenTracks.length > 0 ? 16 : 'auto', zIndex: 2, borderRadius: 2, overflow: 'hidden', border: '2px solid', borderColor: alpha('#a855f7', 0.4), boxShadow: screenTracks.length > 0 ? '0 8px 32px rgba(0,0,0,0.6)' : 'none', bgcolor: '#000' }}>
+        <Box sx={{ width: screenTracks.length > 0 ? 180 : '100%', height: screenTracks.length > 0 ? 135 : '100%', maxHeight: screenTracks.length > 0 ? 135 : 320, position: screenTracks.length > 0 ? 'absolute' : 'relative', bottom: screenTracks.length > 0 ? 16 : 'auto', right: screenTracks.length > 0 ? 16 : 'auto', zIndex: 2, borderRadius: 2, overflow: 'hidden', border: '2px solid', borderColor: alpha('#2563eb', 0.4), boxShadow: screenTracks.length > 0 ? '0 8px 32px rgba(0,0,0,0.6)' : 'none', bgcolor: '#000' }}>
           <VideoTrack trackRef={videoTracks[0]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </Box>
       ) : (

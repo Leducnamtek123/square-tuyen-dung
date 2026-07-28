@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Suspense } from 'react';
-import { Drawer, useTheme, Theme } from "@mui/material";
+import React, { Suspense } from 'react';
+import { Drawer, useTheme } from "@mui/material";
 import DrawerContent from './DrawerContent';
 import type { Theme as StylesTheme } from '@mui/material/styles';
 
@@ -10,6 +9,8 @@ interface SidebarProps {
   drawerWidth: number;
   isAdmin?: boolean;
   liveInterviewCount?: number;
+  isCollapsed?: boolean;
+  toggleCollapse?: () => void;
 }
 
 interface MobileSidebarProps extends SidebarProps {
@@ -18,7 +19,7 @@ interface MobileSidebarProps extends SidebarProps {
   handleDrawerToggle: () => void;
 }
 
-const Sidebar = ({ drawerWidth, isAdmin, liveInterviewCount }: SidebarProps) => {
+const Sidebar = ({ drawerWidth, isAdmin, liveInterviewCount, isCollapsed = false, toggleCollapse }: SidebarProps) => {
   const theme = useTheme();
 
   return (
@@ -27,24 +28,25 @@ const Sidebar = ({ drawerWidth, isAdmin, liveInterviewCount }: SidebarProps) => 
       sx={{
         display: {
           xs: 'none',
-          sm: 'none',
-          md: 'none',
-          lg: 'none',
-          xl: 'block',
+          md: 'block',
         },
+        width: drawerWidth,
+        flexShrink: 0,
         '& .MuiDrawer-paper': {
           boxSizing: 'border-box',
           width: drawerWidth,
-          borderRight: '0px',
-          backgroundColor: theme.palette.background.paper,
-          boxShadow: (theme as Theme).customShadows?.z8,
+          borderRight: '1px solid #f1f5f9',
+          backgroundColor: '#ffffff',
+          boxShadow: '4px 0 20px rgba(15, 23, 42, 0.02)',
           borderRadius: 0,
+          transition: 'width 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+          overflowX: 'hidden',
         },
       }}
       open
     >
       <Suspense fallback={null}>
-        <DrawerContent isAdmin={isAdmin} liveInterviewCount={liveInterviewCount} />
+        <DrawerContent isAdmin={isAdmin} liveInterviewCount={liveInterviewCount} isCollapsed={isCollapsed} toggleCollapse={toggleCollapse} />
       </Suspense>
     </Drawer>
   );
@@ -72,10 +74,7 @@ const MobileSidebar = ({
       sx={{
         display: {
           xs: 'block',
-          sm: 'block',
-          md: 'block',
-          lg: 'block',
-          xl: 'none',
+          md: 'none',
         },
         '& .MuiDrawer-paper': {
           boxSizing: 'border-box',
@@ -88,7 +87,7 @@ const MobileSidebar = ({
       }}
     >
       <Suspense fallback={null}>
-        <DrawerContent isAdmin={isAdmin} liveInterviewCount={liveInterviewCount} />
+        <DrawerContent isAdmin={isAdmin} liveInterviewCount={liveInterviewCount} isCollapsed={false} />
       </Suspense>
     </Drawer>
   );

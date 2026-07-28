@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Pagination, Autoplay } from 'swiper/modules';
@@ -21,7 +21,7 @@ const styles = {
     width: 15,
     height: 15,
     opacity: 0.5,
-    backgroundColor: '#8b6bd4',
+    backgroundColor: '#2563eb',
   },
   '.swiper-pagination-bullet-active': {
     width: 15,

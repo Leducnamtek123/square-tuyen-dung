@@ -152,7 +152,7 @@ const AppliedJobCard = () => {
                         <FontAwesomeIcon
                           icon={faFile}
                           style={{ marginRight: 1 }}
-                          color="#441da0"
+                          color="#2563eb"
                         />{' '}
                         {t("jobSeeker:jobApplication.onlineProfile")}
                       </>

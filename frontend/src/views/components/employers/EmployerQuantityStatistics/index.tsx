@@ -130,7 +130,7 @@ const EmployerQuantityStatistics = () => {
     {
       title: t('statItem.title.totalinterviews'),
       value: data?.totalInterviews,
-      color: '#7c4dff',
+      color: '#2563eb',
       Icon: VideocamOutlinedIcon,
     },
     {

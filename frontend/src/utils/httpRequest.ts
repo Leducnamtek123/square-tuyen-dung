@@ -210,9 +210,20 @@ httpRequest.interceptors.request.use(
       retryConfig.params = cleanParams(retryConfig.params as ParamsRecord);
     }
 
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      if (config.headers) {
+        delete (config.headers as Record<string, unknown>)['Content-Type'];
+        delete (config.headers as Record<string, unknown>)['content-type'];
+        if (typeof (config.headers as any).delete === 'function') {
+          (config.headers as any).delete('Content-Type');
+          (config.headers as any).delete('content-type');
+        }
+      }
+    }
+
     // NOTE: Do NOT auto-convert to snake_case here.
     // The Django backend serializers use camelCase field names with explicit
-    // source= mappings (e.g. companyName â†’ source="company_name").
+    // source= mappings (e.g. companyName → source="company_name").
     // Converting to snake_case breaks the API (400 Bad Request).
 
     const accessToken = tokenService.getAccessTokenFromCookie();

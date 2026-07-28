@@ -168,6 +168,10 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    isAutoSourcingEnabled = serializers.BooleanField(source='is_auto_sourcing_enabled', required=False, default=True)
+    autoSourcingLimit = serializers.IntegerField(source='auto_sourcing_limit', required=False, default=10)
+    autoInterviewEnabled = serializers.BooleanField(source='auto_interview_enabled', required=False, default=True)
+    minScreeningScore = serializers.IntegerField(source='min_screening_score', required=False, default=70)
 
     def get_fields(self):
         fields = super().get_fields()
@@ -314,7 +318,8 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
                   'isSaved', 'isApplied', 'companyDict', 'mobileCompanyDict', 'locationDict', 'views',
 
-                  'isExpired', 'salary', 'city', 'interviewTemplate')
+                  'isExpired', 'salary', 'city', 'interviewTemplate',
+                  'isAutoSourcingEnabled', 'autoSourcingLimit', 'autoInterviewEnabled', 'minScreeningScore')
 
 
     def create(self, validated_data):

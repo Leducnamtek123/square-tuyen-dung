@@ -86,7 +86,7 @@ const ChatPage = () => {
       <Grid
         sx={{ 
           height: '100vh',
-          bgcolor: 'background.paper',
+          bgcolor: '#f8fafc',
         }}
         size={{
           xs: 12,
@@ -98,10 +98,11 @@ const ChatPage = () => {
             <Box 
               sx={{ 
                 borderBottom: 1, 
-                borderColor: 'divider',
+                borderColor: 'rgba(148, 163, 184, 0.28)',
                 p: 2,
-                bgcolor: 'background.paper',
-                boxShadow: (theme: Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.card,
+                bgcolor: 'rgba(255,255,255,0.9)',
+                backdropFilter: 'blur(12px)',
+                boxShadow: '0 8px 24px rgba(15, 23, 42, 0.06)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 2

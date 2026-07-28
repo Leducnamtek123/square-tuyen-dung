@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
 import errorHandling from '../../../../utils/errorHandling';
 import { IMAGES, ROUTES } from '../../../../configs/constants';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 import { removeUserInfo } from '../../../../redux/userSlice';
 import tokenService from '../../../../services/tokenService';
 import AccountSwitchMenu from '../AccountSwitchMenu';
@@ -143,7 +144,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
           >
             <Box
               component="img"
-              src={IMAGES.squareSquareLogo}
+              src={IMAGES.getTextLogo('dark')}
               alt="Logo"
               sx={{ width: 32, height: 32, objectFit: 'contain' }}
             />
@@ -166,7 +167,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
                     href={hasSubItems ? undefined : page.path}
                     className={pathname.startsWith(page.path) ? 'active' : ''}
                     disablePadding
-                    onClick={(e) => handleItemClick(e, page)}
+                    onClick={(e: React.MouseEvent<HTMLElement>) => handleItemClick(e, page)}
                     sx={{ mb: 0.5, mx: 1, width: 'auto', cursor: 'pointer' }}
                   >
                     <ListItemButton

@@ -163,7 +163,7 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
             borderRadius: 2,
             overflow: 'hidden',
             border: '1px solid',
-            borderColor: alpha('#a855f7', 0.35),
+            borderColor: alpha('#2563eb', 0.35),
             boxShadow: screenTracks.length > 0 ? '0 8px 32px rgba(0,0,0,0.45)' : 'none',
             bgcolor: '#000',
           }}

@@ -1039,9 +1039,10 @@ def _recent_chat_text(messages: List[Dict[str, Any]], *, roles: Optional[set[str
 
 
 VIETNAMESE_CHAT_INSTRUCTION = (
-    "Luôn trả lời bằng tiếng Việt có dấu, tự nhiên và dễ đọc. "
+    "Luôn trả lời bằng tiếng Việt có dấu, tự nhiên, lịch sự, chuyên nghiệp và thân thiện với người dùng. "
     "Nếu người dùng viết tiếng Việt không dấu, vẫn trả lời lại bằng tiếng Việt có đầy đủ dấu. "
-    "Không dùng emoji trong câu trả lời."
+    "Trả lời trực tiếp vào nội dung người dùng hỏi, diễn đạt mạch lạc, sắp xếp bố cục bằng Markdown đẹp mắt (sử dụng tiêu đề, danh sách gạch đầu dòng, in đậm các ý chính). "
+    "TUYỆT ĐỐI KHÔNG trích dẫn nguyên văn khối ngữ cảnh/nguồn tài liệu thô (raw context/sources) hay hiển thị các ô/khung thông tin nguồn ở đầu hoặc cuối câu trả lời."
 )
 
 
@@ -1483,3 +1484,46 @@ class ChatAPIView(APIView):
 
 # Keep backward-compat function-based alias (urls.py references ai_views.chat)
 chat = ChatAPIView.as_view()
+
+
+class ChatbotConfigAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        from apps.content.system_settings import load_system_settings
+        settings_data = load_system_settings()
+
+        def parse_suggestions(raw_val, default):
+            if isinstance(raw_val, list):
+                return raw_val
+            if isinstance(raw_val, str):
+                try:
+                    parsed = json.loads(raw_val)
+                    if isinstance(parsed, list):
+                        return parsed
+                except Exception:
+                    return [s.strip() for s in raw_val.split(",") if s.strip()]
+            return default
+
+        employer_suggestions = parse_suggestions(
+            settings_data.get("chatbotEmployerSuggestions"),
+            ["Tìm ứng viên cho vị trí thiết kế", "Soạn tin mời phỏng vấn", "Mức lương thị trường hiện nay"]
+        )
+        job_seeker_suggestions = parse_suggestions(
+            settings_data.get("chatbotJobSeekerSuggestions"),
+            ["Tìm việc làm vị trí Frontend", "Tải mẫu CV tiếng Anh", "Cách trả lời phỏng vấn về mức lương"]
+        )
+
+        data = {
+            "title": settings_data.get("chatbotTitle") or "InfoHR AI",
+            "subtitle": settings_data.get("chatbotSubtitle") or "Trợ lý tuyển dụng thông minh",
+            "employerGreeting": settings_data.get("chatbotEmployerGreeting") or "",
+            "jobSeekerGreeting": settings_data.get("chatbotJobSeekerGreeting") or "",
+            "employerSuggestions": employer_suggestions,
+            "jobSeekerSuggestions": job_seeker_suggestions,
+        }
+        return Response(data_response(errors={}, data=data), status=200)
+
+
+chatbot_config = ChatbotConfigAPIView.as_view()
+

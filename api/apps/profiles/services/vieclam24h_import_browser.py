@@ -990,7 +990,17 @@ def _login_vieclam24h(page, username: str, password: str, search_url: str) -> st
     page.locator('input[name="email"]').fill(username)
     page.locator('input[name="password"]').fill(password)
     page.locator('button[type="submit"]').click()
-    page.wait_for_timeout(2500)
+    page.wait_for_timeout(3000)
+
+    try:
+        body_text = page.locator('body').inner_text()
+        if "không tồn tại" in body_text.lower() or "không chính xác" in body_text.lower() or "đăng nhập thất bại" in body_text.lower():
+            raise ValueError("Tài khoản hoặc mật khẩu Vieclam24h không chính xác. Vui lòng kiểm tra lại thông tin đăng nhập NTD.")
+    except ValueError:
+        raise
+    except Exception:
+        pass
+
     try:
         return _capture_login_token(page, search_url)
     except RuntimeError:
@@ -1223,8 +1233,9 @@ def _collect_candidates_from_search_api(
     occupation_ids: list[int],
     catalog: dict[str, Any],
     *,
-    max_pages: int = 5,
+    max_pages: int = 2,
     per_page: int = 20,
+    on_progress: Any = None,
 ) -> list[dict[str, Any]]:
     candidates: list[dict[str, Any]] = []
     seen: set[str] = set()
@@ -1246,11 +1257,18 @@ def _collect_candidates_from_search_api(
             seen.add(key)
             candidates.append(normalized)
 
+        if callable(on_progress):
+            try:
+                on_progress(15 + int((page_number / max_pages) * 35))
+            except Exception:
+                pass
+
         if len(items) < per_page:
             break
 
     enriched_candidates: list[dict[str, Any]] = []
-    for candidate in candidates:
+    total = len(candidates)
+    for idx, candidate in enumerate(candidates, 1):
         detail_page: dict[str, Any] = {}
         resume_id = candidate.get("resume_id")
         if resume_id is not None:
@@ -1272,16 +1290,23 @@ def _collect_candidates_from_search_api(
                 detail_page = {}
 
         enriched_candidates.append(_enrich_candidate_from_detail(candidate, {}, detail_page))
+        if callable(on_progress) and total > 0:
+            try:
+                on_progress(50 + int((idx / total) * 45))
+            except Exception:
+                pass
 
     return enriched_candidates
+
 
 def collect_vieclam24h_candidates(
     source_url: str,
     username: str,
     password: str,
     occupation_ids: list[int] | None = None,
-    max_pages: int = 5,
+    max_pages: int = 2,
     per_page: int = 20,
+    on_progress: Any = None,
 ) -> list[dict[str, Any]]:
     if not source_url:
         raise ValueError("SOURCE_URL is required.")
@@ -1304,13 +1329,16 @@ def collect_vieclam24h_candidates(
     selected_occupation_ids = _normalize_selected_occupation_ids(occupation_ids, catalog)
 
     candidates: list[dict[str, Any]] = []
-    seen: set[str] = set()
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page(viewport={"width": 1440, "height": 1600})
         try:
+            if callable(on_progress):
+                on_progress(10)
             auth_token = _login_vieclam24h(page, username, password, search_url)
+            if callable(on_progress):
+                on_progress(20)
             candidates = _collect_candidates_from_search_api(
                 page,
                 auth_token,
@@ -1320,6 +1348,7 @@ def collect_vieclam24h_candidates(
                 catalog,
                 max_pages=max_pages,
                 per_page=per_page,
+                on_progress=on_progress,
             )
         finally:
             browser.close()

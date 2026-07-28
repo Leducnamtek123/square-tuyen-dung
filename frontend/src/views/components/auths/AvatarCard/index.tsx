@@ -153,9 +153,9 @@ const AvatarCard = () => {
 
             borderRadius: '50%',
 
-            background: 'linear-gradient(45deg, #441da0, #6b4fd1)',
+            background: 'linear-gradient(45deg, #0f172a, #2563eb)',
 
-            boxShadow: '0 4px 14px 0 rgba(68, 29, 160, 0.15)',
+            boxShadow: '0 4px 14px 0 rgba(15, 23, 42, 0.15)',
 
             '&:hover .avatar-actions': {
 

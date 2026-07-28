@@ -45,10 +45,10 @@ export const ChatWindowMessagePanel = ({
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: 'background.default',
+          bgcolor: '#f8fafc',
           borderLeft: 1,
           borderRight: 1,
-          borderColor: 'divider',
+          borderColor: 'rgba(148, 163, 184, 0.22)',
         }}
       >
         <ChatBubbleOutlineIcon sx={{ fontSize: 64, mb: 2, color: 'text.disabled' }} />
@@ -68,15 +68,16 @@ export const ChatWindowMessagePanel = ({
       sx={{
         flexGrow: 1,
         overflowY: 'auto',
-        p: 2,
+        p: 2.5,
         display: 'flex',
         flexDirection: 'column',
         gap: 1,
+        bgcolor: '#f8fafc',
         '&::-webkit-scrollbar': {
           width: '6px',
         },
         '&::-webkit-scrollbar-thumb': {
-          backgroundColor: 'rgba(0,0,0,0.1)',
+          backgroundColor: 'rgba(100,116,139,0.28)',
           borderRadius: '10px',
         },
       }}
@@ -89,12 +90,12 @@ export const ChatWindowMessagePanel = ({
         <>
           {hasMore && (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
-              <Typography
-                variant="caption"
-                sx={{ cursor: 'pointer', color: 'primary.main' }}
-                onClick={onLoadMore}
-              >
-                {loadPreviousMessagesText}
+            <Typography
+              variant="caption"
+              sx={{ cursor: 'pointer', color: '#2563eb', fontWeight: 700 }}
+              onClick={onLoadMore}
+            >
+              {loadPreviousMessagesText}
               </Typography>
             </Box>
           )}

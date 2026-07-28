@@ -23,11 +23,8 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import SearchIcon from '@mui/icons-material/Search';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import contentService, { type Article, type ArticleCategoryInfo } from '@/services/contentService';
+import contentService, { type ArticleCategoryInfo } from '@/services/contentService';
 import commonService from '@/services/commonService';
 import useSEO from '@/hooks/useSEO';
 import NoDataCard from '@/components/Common/NoDataCard';
@@ -41,10 +38,10 @@ dayjs.locale('vi');
 
 const PAGE_SIZE = 9;
 
-const FALLBACK_POPULAR_KEYWORDS = [
+const FALLBACK_POPULAR_KEYWORDS: string[] = [
   'Đơn xin việc', 'Hồ sơ xin việc', 'BHXH 1 lần', 'Thủ tục nghỉ việc', 'Cách viết CV',
-  'Mẫu CV chuẩn', 'Câu hỏi phỏng vấn', 'Lương Gross sang Net', 'Thuế TNCN', 'Việc làm IT',
-  'Việc làm Marketing', 'Tuyển dụng Bán hàng', 'Kế toán tổng hợp', 'Nhân sự tổng hợp',
+  'Mẫu CV chuẩn', 'Câu hỏi phỏng vấn', 'Lương Gross sang Net', 'Thuế TNCN', 'Việc làm Xây dựng',
+  'Tuyển dụng Bất động sản', 'Kỹ sư Giám sát', 'Kiến trúc sư', 'Thiết kế Nội thất',
   'Cách tính trợ cấp', 'Quy trình thôi việc', 'Môi trường làm việc', 'Văn hóa doanh nghiệp',
   'Bảng lương 2026', 'Kỹ năng phỏng vấn', 'Thủ tục quyết toán thuế', 'Mẫu hợp đồng lao động',
   'Tuyển dụng việc làm', 'Kinh nghiệm tìm việc', 'Cách deal lương', 'Tạo CV miễn phí'
@@ -154,7 +151,20 @@ const NewsContent = () => {
     staleTime: 5 * 60_000,
   });
 
-  // Fetch Articles from API
+  // Fetch Top Featured Articles from API (fixed top 4 published across site)
+  const { data: featuredData } = useQuery({
+    queryKey: ['public-featured-articles'],
+    queryFn: async () => {
+      const response = await contentService.getPublicArticles({
+        page: 1,
+        page_size: 4,
+      });
+      return withArticleImages(response.results || []);
+    },
+    staleTime: 5 * 60_000,
+  });
+
+  // Fetch Articles from API for active category & page
   const { data: articleData, isLoading } = useQuery({
     queryKey: ['public-articles', activeCategorySlug, page],
     queryFn: async () => {
@@ -172,7 +182,7 @@ const NewsContent = () => {
   });
 
   // Fetch Popular Keywords from API
-  const { data: popularKeywordsApi = [] } = useQuery({
+  const { data: popularKeywordsApi = [] } = useQuery<string[]>({
     queryKey: ['popular-keywords'],
     queryFn: async () => {
       const res = await commonService.getPopularKeywords();
@@ -183,13 +193,24 @@ const NewsContent = () => {
 
   const popularKeywords = popularKeywordsApi.length > 0 ? popularKeywordsApi : FALLBACK_POPULAR_KEYWORDS;
 
+  const featuredArticles = featuredData || [];
+  const mainFeaturedArticle = featuredArticles[0] || null;
+  const sideFeaturedArticles = featuredArticles.slice(1, 4);
+
   const articles = articleData?.articles || [];
   const total = articleData?.total || 0;
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const mainFeaturedArticle = articles[0] || null;
-  const sideFeaturedArticles = articles.slice(1, 4);
-  const remainingArticles = articles.slice(4);
+  // Determine articles for "Bài viết mới nhất" grid
+  const displayLatestArticles = React.useMemo(() => {
+    if (activeCategorySlug === 'all') {
+      if (page === 1 && articles.length > 4) {
+        return articles.slice(4);
+      }
+      return articles;
+    }
+    return articles;
+  }, [activeCategorySlug, page, articles]);
 
   const newsListHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language);
   const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
@@ -221,7 +242,7 @@ const NewsContent = () => {
             Bài viết nổi bật
           </Typography>
 
-          {isLoading ? (
+          {isLoading && featuredArticles.length === 0 ? (
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <Skeleton variant="rectangular" height={380} sx={{ borderRadius: 3 }} />
@@ -395,11 +416,11 @@ const NewsContent = () => {
                 </Grid>
               ))}
             </Grid>
-          ) : remainingArticles.length === 0 ? (
+          ) : displayLatestArticles.length === 0 ? (
             <NoDataCard title="Không tìm thấy bài viết" content="Hiện chưa có bài viết thuộc danh mục này." />
           ) : (
             <Grid container spacing={3}>
-              {remainingArticles.map((article) => {
+              {displayLatestArticles.map((article) => {
                 const articleHref = localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.NEWS_DETAIL, article.slug)}`, i18n.language);
                 const publishedAgo = article.publishedAt ? dayjs(article.publishedAt).fromNow() : 'Mới cập nhật';
 
@@ -548,10 +569,9 @@ const NewsContent = () => {
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ gap: 1 }}>
             {popularKeywords.map((item, index) => {
-              const labelText = typeof item === 'string' ? item : item.title || item.kw || '';
-              const itemKey = typeof item === 'string' ? `${item}-${index}` : item.id || index;
-              const kwQuery = typeof item === 'string' ? item : item.kw || item.title || '';
-              const searchHref = `${jobsHref}?kw=${encodeURIComponent(kwQuery)}`;
+              const labelText = item;
+              const itemKey = `${item}-${index}`;
+              const searchHref = `${jobsHref}?kw=${encodeURIComponent(item)}`;
 
               return (
                 <Chip

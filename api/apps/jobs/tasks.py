@@ -1269,3 +1269,10 @@ def analyze_resume_ai(self, activity_id):
                 os.unlink(temp_file)
             except OSError:
                 pass
+
+
+@shared_task
+def run_job_auto_pipeline_task(job_post_id: int):
+    """Celery task to run full auto recruitment pipeline for a job post."""
+    from apps.jobs.auto_pipeline_service import run_full_auto_recruitment_pipeline
+    return run_full_auto_recruitment_pipeline(job_post_id)

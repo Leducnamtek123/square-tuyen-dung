@@ -69,7 +69,7 @@ export const SEGMENT_MAP = {
   'phong-van-truc-tiep': 'interviews',
   'len-lich-phong-van': 'interviews/create',
   'chi-tiet-phong-van': 'interviews',
-  'sua-lich-phong-van': 'interviews/:id/edit',
+  'sua-lich-phong-van': 'interviews',
   'ngan-hang-cau-hoi': 'question-bank',
   'bo-cau-hoi': 'question-groups',
   'xac-thuc-nha-tuyen-dung': 'verification',
