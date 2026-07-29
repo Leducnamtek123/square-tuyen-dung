@@ -6,6 +6,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useTranslation } from "react-i18next";
 import {
   createContext,
+  isValidElement,
   lazy,
   memo,
   Suspense,
@@ -226,15 +227,15 @@ const MessageBranchContent = ({
 
   return (
     <>
-      {childrenArray.map((branch, index) => {
-        const key = (branch as { key?: string | number } | null)?.key ?? index;
+      {childrenArray.map((branch, i) => {
+        const itemKey = (isValidElement(branch) && branch.key != null) ? String(branch.key) : undefined;
         return (
           <div
             className={cn(
               "grid gap-2 overflow-hidden [&>div]:pb-0",
-              index === currentBranch ? "block" : "hidden"
+              i === currentBranch ? "block" : "hidden"
             )}
-            key={key}
+            key={itemKey}
             {...props}>
             {branch}
           </div>

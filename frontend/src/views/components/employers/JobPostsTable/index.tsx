@@ -10,7 +10,7 @@ import DataTable from '../../../../components/Common/DataTable';
 import { JOB_POST_STATUS_BG_COLOR } from '../../../../configs/constants';
 import { useConfig } from '@/hooks/useConfig';
 import type { JobPost } from '../../../../types/models';
-import type { ColumnDef, SortingState, Updater, PaginationState } from '@tanstack/react-table';
+import type { ColumnDef, SortingState, Updater, PaginationState, RowSelectionState, OnChangeFn } from '@tanstack/react-table';
 import pc from '@/utils/muiColors';
 
 interface JobPostsTableProps {
@@ -23,6 +23,10 @@ interface JobPostsTableProps {
   handleUpdate: (slugOrId: string | number) => void;
   sorting: SortingState;
   onSortingChange: (sorting: Updater<SortingState>) => void;
+  enableRowSelection?: boolean;
+  rowSelection?: RowSelectionState;
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
+  variant?: 'card' | 'flat';
 }
 
 const JobPostsTable = ({
@@ -35,6 +39,10 @@ const JobPostsTable = ({
   handleUpdate,
   sorting,
   onSortingChange,
+  enableRowSelection = false,
+  rowSelection,
+  onRowSelectionChange,
+  variant = 'card',
 }: JobPostsTableProps) => {
 
   const { t } = useTranslation('employer');
@@ -198,6 +206,7 @@ const JobPostsTable = ({
 
   return (
     <DataTable
+      variant={variant}
       columns={columns}
       data={rows}
       isLoading={isLoading}
@@ -207,6 +216,9 @@ const JobPostsTable = ({
       enableSorting
       sorting={sorting}
       onSortingChange={onSortingChange}
+      enableRowSelection={enableRowSelection}
+      rowSelection={rowSelection}
+      onRowSelectionChange={onRowSelectionChange}
       emptyMessage={t('jobPost.noData')}
     />
   );

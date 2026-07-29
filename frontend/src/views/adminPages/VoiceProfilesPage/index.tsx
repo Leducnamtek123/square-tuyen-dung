@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import {
   Alert,
   Box,
@@ -162,11 +162,7 @@ const VoiceProfilesPage = () => {
       : undefined
   );
 
-  const getVoiceTypeLabel = (type?: string) => {
-    if (type === 'preset') return t('pages.voiceProfiles.voiceTypes.preset');
-    if (type === 'cloned') return t('pages.voiceProfiles.voiceTypes.cloned');
-    return type || '';
-  };
+
 
   const activeFilterCount = [
     Boolean(searchTerm.trim()),
@@ -196,14 +192,20 @@ const VoiceProfilesPage = () => {
     setPage(0);
   };
 
-  const getStatusLabel = (status?: string) => {
+  const getStatusLabel = useCallback((status?: string) => {
     if (status === 'draft') return t('pages.voiceProfiles.statuses.draft');
     if (status === 'processing') return t('pages.voiceProfiles.statuses.processing');
     if (status === 'ready') return t('pages.voiceProfiles.statuses.ready');
     if (status === 'disabled') return t('pages.voiceProfiles.statuses.disabled');
     if (status === 'failed') return t('pages.voiceProfiles.statuses.failed');
     return status || '';
-  };
+  }, [t]);
+
+  const getVoiceTypeLabel = useCallback((type?: string) => {
+    if (type === 'preset') return t('pages.voiceProfiles.types.preset');
+    if (type === 'cloned') return t('pages.voiceProfiles.types.cloned');
+    return type || '';
+  }, [t]);
 
   const getProfileSampleCount = (profile?: VoiceProfile | null) => profile?.sampleCount ?? profile?.samples?.length ?? 0;
   const getProfileTotalDuration = (profile?: VoiceProfile | null) => Number(profile?.totalDurationSeconds ?? 0);
@@ -359,7 +361,7 @@ const VoiceProfilesPage = () => {
     });
   };
 
-  const openEditDialog = (profile: VoiceProfile) => {
+  const openEditDialog = useCallback((profile: VoiceProfile) => {
     setEditProfile(profile);
     setEditForm({
       name: profile.name || '',
@@ -371,7 +373,7 @@ const VoiceProfilesPage = () => {
       status: profile.status || 'ready',
       sampleCount: getProfileSampleCount(profile),
     });
-  };
+  }, []);
 
   const submitEdit = () => {
     if (!editProfile) return;
@@ -394,7 +396,7 @@ const VoiceProfilesPage = () => {
     });
   };
 
-  const openTestDialog = (profile: VoiceProfile) => {
+  const openTestDialog = useCallback((profile: VoiceProfile) => {
     if (!getProfileReadyFlag(profile)) {
       toastMessages.error(t('pages.voiceProfiles.validation.voiceNotReady'));
       return;
@@ -404,7 +406,7 @@ const VoiceProfilesPage = () => {
     }
     setTestAudioUrl(null);
     setTestProfile(profile);
-  };
+  }, [testAudioUrl, t]);
 
   const closeTestDialog = () => {
     if (testAudioUrl) {

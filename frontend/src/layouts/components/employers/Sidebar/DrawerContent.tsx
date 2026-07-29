@@ -12,7 +12,7 @@ import Link from 'next/link';
 import AdminMenu from './AdminMenu';
 import EmployerMenu from './EmployerMenu';
 
-const shellHeaderHeight = { xs: 56, sm: 64 };
+const shellHeaderHeight = 60;
 
 interface DrawerContentProps {
   isAdmin?: boolean;

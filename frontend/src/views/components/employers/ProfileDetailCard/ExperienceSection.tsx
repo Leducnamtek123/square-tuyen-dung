@@ -52,8 +52,8 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ profileDetail }) 
                 }}
             >
                 <Stack spacing={4}>
-                    {(profileDetail.experiencesDetails || []).map((value, index: number) => (
-                        <Box key={value.id || index}>
+                    {(profileDetail.experiencesDetails || []).map((value, itemIdx: number) => (
+                        <Box key={value.id || value.jobName || `exp-item-${itemIdx}`}>
                             <Grid container spacing={4}>
                                 <Grid size={{ xs: 12, md: 4 }}>
                                     <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', mb: 1.5, lineHeight: 1.3 }}>
@@ -93,7 +93,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ profileDetail }) 
                                     </Typography>
                                 </Grid>
                             </Grid>
-                            {index < (profileDetail.experiencesDetails?.length || 0) - 1 && (
+                            {itemIdx < (profileDetail.experiencesDetails?.length || 0) - 1 && (
                                 <Divider sx={{ mt: 4, borderStyle: 'dashed', borderColor: pc.divider( 0.8) }} />
                             )}
                         </Box>

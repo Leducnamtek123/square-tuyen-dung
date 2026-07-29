@@ -31,43 +31,43 @@ interface MenuItemProps {
 }
 
 const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementType; href?: string; target?: string; rel?: string }>(({ theme }) => ({
-  borderRadius: '10px',
+  borderRadius: '8px',
   margin: '2px 8px',
-  padding: '8px 12px',
-  color: '#475569',
+  padding: '7px 10px',
+  color: '#4B5563',
   textDecoration: 'none',
   position: 'relative',
-  transition: 'all 0.15s ease-in-out',
+  transition: 'all 100ms ease-in-out',
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   '&:hover': {
-    backgroundColor: '#f8fafc',
-    color: '#0f172a',
+    backgroundColor: '#F8FAFC',
+    color: '#111827',
     textDecoration: 'none',
     '& .MuiListItemIcon-root': {
-      color: '#0f172a',
+      color: '#2563EB',
     },
   },
   '&.Mui-selected': {
     backgroundColor: 'rgba(37, 99, 235, 0.08)',
-    color: '#2563eb',
+    color: '#2563EB',
     fontWeight: 600,
     '&::before': {
       content: '""',
       position: 'absolute',
       left: 0,
-      top: '18%',
-      bottom: '18%',
-      width: 4,
+      top: '15%',
+      bottom: '15%',
+      width: 3,
       borderRadius: '0 4px 4px 0',
-      backgroundColor: '#2563eb',
+      backgroundColor: '#2563EB',
     },
     '&:hover': {
       backgroundColor: 'rgba(37, 99, 235, 0.12)',
-      color: '#2563eb',
+      color: '#2563EB',
     },
     '& .MuiListItemIcon-root': {
-      color: '#2563eb',
+      color: '#2563EB',
     },
   },
   '& .MuiTypography-root': {
@@ -75,8 +75,8 @@ const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementT
     fontWeight: 'inherit',
   },
   '& .MuiListItemIcon-root': {
-    color: '#64748b',
-    transition: 'color 0.15s ease-in-out',
+    color: '#6B7280',
+    transition: 'color 100ms ease-in-out',
   },
 }));
 
@@ -242,9 +242,9 @@ const MenuItem = ({ icon: Icon, text, to, external = false, onClick, kind = 'ite
             </Typography>
           </Box>
           <Divider sx={{ my: 0.5 }} />
-          {subItems.map((sub, idx) => (
+          {subItems.map((sub) => (
             <MuiMenuItem
-              key={idx}
+              key={sub.to || sub.text}
               component={sub.external ? 'a' : Link}
               href={sub.to}
               target={sub.external ? '_blank' : undefined}

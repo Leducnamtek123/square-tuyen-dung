@@ -48,3 +48,8 @@ expect_cli_output*.txt
 
 # Local isolated worktrees
 .worktrees/
+
+# Certificates & SSL keys
+*.key
+docker/nginx/certs/
+

@@ -54,7 +54,7 @@ type ThreadGroup = {
 
 type ThreadGroupKey = 'today' | 'yesterday' | 'thisWeek' | 'earlier';
 
-const DEFAULT_AGENT_THREAD_TITLE = 'Agent Assistants';
+const DEFAULT_AGENT_THREAD_TITLE = 'AILA';
 const MAX_IMAGE_ATTACHMENTS = 5;
 const MAX_IMAGE_ATTACHMENT_BYTES = 2 * 1024 * 1024;
 const ALLOWED_IMAGE_MIME_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif']);
@@ -99,6 +99,7 @@ const formatThreadTime = (value?: string | null, locale = 'vi-VN') => {
       month: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
+      timeZone: 'Asia/Ho_Chi_Minh',
     }).format(new Date(value));
   } catch {
     return '';
@@ -379,11 +380,11 @@ const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800 }}>
                 {t('common:agentAssistant.results.title')}
               </Typography>
-              {results.slice(0, 4).map((item, index) => {
+              {results.slice(0, 4).map((item) => {
                 const safeResultUrl = getSafeExternalOpenUrl(resultUrl(item));
                 return (
                   <Box
-                    key={`${resultTitle(item)}-${index}`}
+                    key={resultTitle(item) || resultUrl(item)}
                     component={safeResultUrl ? 'a' : 'div'}
                     {...(safeResultUrl ? { href: safeResultUrl } : {})}
                     sx={{
@@ -405,7 +406,7 @@ const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
                     }}
                   >
                     <Typography variant="body2" sx={{ fontWeight: 750, overflowWrap: 'anywhere' }}>
-                      {resultTitle(item) || t('common:agentAssistant.results.fallback', { index: index + 1 })}
+                      {resultTitle(item) || t('common:agentAssistant.results.fallback')}
                     </Typography>
                     {resultSubtitle(item) ? (
                       <Typography variant="caption" sx={{ color: 'text.secondary', overflowWrap: 'anywhere' }}>
@@ -448,57 +449,81 @@ const MessageBubble = ({ message }: { message: AgentMessage }) => {
   const imageParts = (message.parts || []).filter(isImagePart);
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
-      <Stack
-        spacing={1}
-        sx={{
-          maxWidth: { xs: '94%', md: '74%' },
-          minWidth: isUser ? 0 : { xs: 'min(94%, 320px)', md: 'min(74%, 420px)' },
-          px: isUser ? 1.75 : 0,
-          py: isUser ? 1.1 : 0,
-          borderRadius: 1,
-          bgcolor: isUser ? 'primary.main' : 'transparent',
-          color: isUser ? 'primary.contrastText' : 'text.primary',
-          opacity: isOptimistic ? 0.82 : 1,
-        }}
-      >
+    <Box sx={{ display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start', mb: 0.5 }}>
+      <Stack direction="row" spacing={1.5} alignItems="flex-start" sx={{ maxWidth: { xs: '96%', md: '82%' } }}>
+        {!isUser && (
+          <Box
+            sx={{
+              width: 34,
+              height: 34,
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)',
+              color: '#FFFFFF',
+              display: 'grid',
+              placeItems: 'center',
+              flexShrink: 0,
+              mt: 0.25,
+              boxShadow: '0 2px 6px rgba(37, 99, 235, 0.2)',
+            }}
+          >
+            <SmartToyOutlinedIcon sx={{ fontSize: 19 }} />
+          </Box>
+        )}
 
-        {imageParts.length ? (
-          <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
-            {imageParts.map((part, index) => (
-              <Box
-                key={`${part.name}-${index}`}
-                component="img"
-                src={part.dataUrl}
-                alt={part.name || `attachment-${index + 1}`}
-                sx={{
-                  width: 144,
-                  maxWidth: '100%',
-                  aspectRatio: '4 / 3',
-                  objectFit: 'cover',
-                  borderRadius: 1,
-                  border: '1px solid',
-                  borderColor: isUser ? alpha('#fff', 0.3) : 'divider',
-                  bgcolor: isUser ? alpha('#fff', 0.08) : 'action.hover',
-                }}
-              />
-            ))}
-          </Stack>
-        ) : null}
-        {message.content ? (
-          <Stack direction="row" spacing={1} alignItems="flex-start" sx={{ width: '100%' }}>
-            {!isUser && isOptimistic ? <CircularProgress size={15} sx={{ mt: 0.4 }} /> : null}
-            {isUser ? (
-              <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.65 }}>
-                {message.content}
-              </Typography>
-            ) : (
-              <Box sx={{ width: '100%', overflowWrap: 'anywhere' }}>
-                <MessageResponse>{message.content}</MessageResponse>
-              </Box>
-            )}
-          </Stack>
-        ) : null}
+        <Stack
+          spacing={1}
+          sx={{
+            minWidth: isUser ? 0 : { xs: 'min(94%, 320px)', md: 'min(74%, 420px)' },
+            px: isUser ? 2 : 2.5,
+            py: isUser ? 1.1 : 1.75,
+            borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+            bgcolor: isUser ? '#2563EB' : '#FFFFFF',
+            color: isUser ? '#FFFFFF' : '#111827',
+            border: isUser ? 'none' : '1px solid #E5E7EB',
+            boxShadow: isUser
+              ? '0 2px 8px rgba(37, 99, 235, 0.18)'
+              : '0 1px 4px rgba(0, 0, 0, 0.04)',
+            opacity: isOptimistic ? 0.82 : 1,
+            transition: 'all 100ms ease-in-out',
+          }}
+        >
+          {imageParts.length ? (
+            <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
+              {imageParts.map((part, partIdx) => (
+                <Box
+                  key={part.dataUrl || part.name || `img-part-${partIdx}`}
+                  component="img"
+                  src={part.dataUrl}
+                  alt={part.name || `attachment-${partIdx + 1}`}
+                  sx={{
+                    width: 144,
+                    maxWidth: '100%',
+                    aspectRatio: '4 / 3',
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    border: '1px solid',
+                    borderColor: isUser ? alpha('#fff', 0.3) : '#E5E7EB',
+                    bgcolor: isUser ? alpha('#fff', 0.08) : '#F8FAFC',
+                  }}
+                />
+              ))}
+            </Stack>
+          ) : null}
+          {message.content ? (
+            <Stack direction="row" spacing={1} alignItems="flex-start" sx={{ width: '100%' }}>
+              {!isUser && isOptimistic ? <CircularProgress size={16} sx={{ mt: 0.4, color: '#2563EB' }} /> : null}
+              {isUser ? (
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, fontWeight: 500, fontSize: '0.9375rem', color: '#FFFFFF !important' }}>
+                  {message.content}
+                </Typography>
+              ) : (
+                <Box sx={{ width: '100%', overflowWrap: 'anywhere', fontSize: '0.9375rem', lineHeight: 1.6, color: '#111827' }}>
+                  <MessageResponse>{message.content}</MessageResponse>
+                </Box>
+              )}
+            </Stack>
+          ) : null}
+        </Stack>
       </Stack>
     </Box>
   );
@@ -527,16 +552,17 @@ const ThreadItem = ({
   return (
     <Box
       sx={{
-        borderRadius: 1,
-        bgcolor: selected ? 'background.paper' : 'transparent',
+        borderRadius: '10px',
+        bgcolor: selected ? '#EFF6FF' : 'transparent',
         border: '1px solid',
-        borderColor: selected ? 'divider' : 'transparent',
-        boxShadow: selected ? '0 1px 3px rgba(15, 23, 42, 0.06)' : 'none',
+        borderColor: selected ? '#BFDBFE' : 'transparent',
         display: 'grid',
         gridTemplateColumns: 'minmax(0, 1fr) 32px',
         alignItems: 'center',
+        transition: 'all 100ms ease-in-out',
         '&:hover': {
-          bgcolor: selected ? 'background.paper' : 'action.hover',
+          bgcolor: selected ? '#EFF6FF' : '#F8FAFC',
+          borderColor: selected ? '#93C5FD' : '#E5E7EB',
           '& .agent-thread-delete': { opacity: 1 },
         },
       }}
@@ -548,19 +574,19 @@ const ThreadItem = ({
           justifyContent: 'flex-start',
           textAlign: 'left',
           textTransform: 'none',
-          borderRadius: 1,
+          borderRadius: '10px',
           px: 1.25,
-          py: 1,
-          color: 'text.primary',
+          py: 0.9,
+          color: selected ? '#1D4ED8' : '#111827',
           minWidth: 0,
           '&:hover': { bgcolor: 'transparent' },
         }}
       >
         <Stack spacing={0.25} sx={{ minWidth: 0, width: '100%' }}>
-          <Typography variant="body2" sx={{ fontWeight: 750, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <Typography variant="body2" sx={{ fontWeight: selected ? 650 : 500, fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: selected ? '#1D4ED8 !important' : '#111827' }}>
             {title}
           </Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+          <Typography variant="caption" sx={{ color: selected ? '#2563EB' : '#6B7280', fontSize: '0.75rem' }}>
             {formatThreadTime(thread.lastMessageAt || thread.createAt, locale)}
           </Typography>
         </Stack>
@@ -578,17 +604,17 @@ const ThreadItem = ({
               onDelete();
             }}
             sx={{
-              width: 28,
-              height: 28,
+              width: 26,
+              height: 26,
               mr: 0.5,
-              borderRadius: 1,
-              color: 'text.secondary',
+              borderRadius: '6px',
+              color: '#6B7280',
               opacity: { xs: 1, lg: selected ? 1 : 0 },
-              transition: 'opacity 120ms ease',
-              '&:hover': { color: 'error.main', bgcolor: 'rgba(239, 68, 68, 0.08)' },
+              transition: 'all 100ms ease-in-out',
+              '&:hover': { color: '#EF4444', bgcolor: '#FEE2E2' },
             }}
           >
-            {deleting ? <CircularProgress size={14} /> : <DeleteOutlineRoundedIcon fontSize="small" />}
+            {deleting ? <CircularProgress size={14} color="inherit" /> : <DeleteOutlineRoundedIcon fontSize="small" />}
           </IconButton>
         </span>
       </Tooltip>
@@ -677,41 +703,50 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
 
   useEffect(() => {
     let cancelled = false;
+    setIsLoading(true);
+    setError('');
 
-    const loadInitial = async () => {
-      setIsLoading(true);
-      setError('');
-      try {
-        const threadsResponse = await agentAssistantService.listThreads();
-        if (cancelled) return;
-
-        let nextThreads = threadsResponse.threads || [];
+    agentAssistantService.listThreads()
+      .then((threadsResponse) => {
+        if (cancelled) return null;
+        const nextThreads = threadsResponse.threads || [];
         if (nextThreads.length === 0) {
-          const created = await agentAssistantService.createThread(portal);
-          nextThreads = [created];
+          return agentAssistantService.createThread(portal).then((created) => ({ nextThreads: [created] }));
         }
-        if (cancelled) return;
-
-        setThreads(nextThreads);
-        const firstThread = nextThreads[0];
-        setSelectedThreadId(firstThread?.id ?? null);
-        if (firstThread) {
-          await loadMessages(firstThread.id);
+        return { nextThreads };
+      })
+      .then((data) => {
+        if (!data || cancelled) return null;
+        const { nextThreads } = data;
+        const firstThreadId = nextThreads[0]?.id ?? null;
+        if (firstThreadId) {
+          return agentAssistantService.listMessages(firstThreadId).then((res) => ({
+            nextThreads,
+            firstThreadId,
+            initialMessages: res.messages || [],
+          }));
         }
-      } catch (err) {
+        return { nextThreads, firstThreadId, initialMessages: [] };
+      })
+      .then((data) => {
+        if (!data || cancelled) return;
+        setThreads(data.nextThreads);
+        setSelectedThreadId(data.firstThreadId);
+        setMessages(data.initialMessages);
+      })
+      .catch(() => {
         if (!cancelled) {
           setError(t('common:agentAssistant.loadError'));
         }
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
 
-    void loadInitial();
     return () => {
       cancelled = true;
     };
-  }, [loadMessages, portal, t]);
+  }, [portal, t]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -822,9 +857,9 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
   };
 
   return (
-    <Box sx={{ minHeight: 'calc(100vh - 120px)', minWidth: 0 }}>
+    <Box sx={{ height: 'calc(100vh - 108px)', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
       {error ? (
-        <Alert severity="error" sx={{ mb: 1.5 }}>
+        <Alert severity="error" sx={{ mb: 1.5, borderRadius: '10px' }}>
           {error}
         </Alert>
       ) : null}
@@ -833,49 +868,51 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
         elevation={0}
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', lg: '304px minmax(0, 1fr)' },
+          gridTemplateColumns: { xs: '1fr', lg: '280px minmax(0, 1fr)' },
           gridTemplateRows: { xs: 'minmax(280px, 34dvh) minmax(0, 1fr)', lg: '1fr' },
-          height: { xs: 'calc(100dvh - 126px)', lg: 'calc(100vh - 132px)' },
-          minHeight: { xs: 560, lg: 620 },
-          border: '1px solid',
-          borderColor: 'divider',
-          borderRadius: 1,
+          height: '100%',
+          flexGrow: 1,
+          border: '1px solid #E5E7EB',
+          borderRadius: '12px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
           overflow: 'hidden',
-          bgcolor: 'background.paper',
+          bgcolor: '#FFFFFF',
         }}
       >
+        {/* Left Sidebar */}
         <Box
           sx={{
             display: 'grid',
             gridTemplateRows: 'auto minmax(0, 1fr) auto',
-            borderRight: { xs: 0, lg: '1px solid' },
-            borderBottom: { xs: '1px solid', lg: 0 },
-            borderColor: 'divider',
-            bgcolor: alpha(theme.palette.text.primary, 0.025),
+            borderRight: { xs: 0, lg: '1px solid #E5E7EB' },
+            borderBottom: { xs: '1px solid #E5E7EB', lg: 0 },
+            bgcolor: '#F8FAFC',
             minHeight: 0,
             overflow: 'hidden',
           }}
         >
-          <Stack spacing={1.25} sx={{ p: 1.5, pb: 1 }}>
-            <Stack direction="row" spacing={1.25} alignItems="center">
+          {/* Sidebar Header */}
+          <Stack spacing={1.25} sx={{ p: 2, pb: 1.5, borderBottom: '1px solid #E5E7EB', bgcolor: '#FFFFFF' }}>
+            <Stack direction="row" spacing={1.5} alignItems="center">
               <Box
                 sx={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 1,
+                  width: 34,
+                  height: 34,
+                  borderRadius: '10px',
                   display: 'grid',
                   placeItems: 'center',
-                  color: 'primary.main',
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  color: '#FFFFFF',
+                  background: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)',
+                  boxShadow: '0 2px 6px rgba(37, 99, 235, 0.2)',
                 }}
               >
                 <SmartToyOutlinedIcon fontSize="small" />
               </Box>
               <Box sx={{ minWidth: 0 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 900 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#111827', fontSize: '0.9375rem', lineHeight: 1.2 }}>
                   {t('common:agentAssistant.title')}
                 </Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                <Typography variant="caption" sx={{ color: '#6B7280', fontSize: '0.75rem' }}>
                   {portal === 'admin'
                     ? t('common:agentAssistant.portals.admin')
                     : t('common:agentAssistant.portals.employer')}
@@ -884,28 +921,29 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
             </Stack>
           </Stack>
 
-          <Box sx={{ minHeight: 0, overflowY: 'auto', px: 1.25, pb: 1.25 }}>
+          {/* History List */}
+          <Box sx={{ minHeight: 0, overflowY: 'auto', p: 1.5 }}>
             <Stack
               direction="row"
               spacing={0.75}
               alignItems="center"
-              sx={{ position: 'sticky', top: 0, zIndex: 1, px: 0.25, py: 0.75, bgcolor: 'inherit' }}
+              sx={{ position: 'sticky', top: 0, zIndex: 1, px: 0.5, py: 1, bgcolor: '#F8FAFC' }}
             >
-              <HistoryRoundedIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-              <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 900 }}>
-                {t('common:agentAssistant.recents')}
+              <HistoryRoundedIcon sx={{ fontSize: 16, color: '#6B7280' }} />
+              <Typography variant="overline" sx={{ color: '#6B7280', fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+                LỊCH SỬ TRÒ CHUYỆN
               </Typography>
             </Stack>
 
             {isLoading ? (
               <Stack alignItems="center" sx={{ py: 4 }}>
-                <CircularProgress size={26} />
+                <CircularProgress size={26} sx={{ color: '#2563EB' }} />
               </Stack>
             ) : (
               <Stack spacing={1.5}>
                 {threadGroups.map((group) => (
-                  <Stack key={group.key} spacing={0.75}>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, px: 0.25 }}>
+                  <Stack key={group.key} spacing={0.5}>
+                    <Typography variant="caption" sx={{ color: '#9CA3AF', fontWeight: 700, fontSize: '0.7rem', px: 0.5, textTransform: 'uppercase' }}>
                       {t(threadGroupLabelKeys[group.key])}
                     </Typography>
                     {group.threads.map((thread) => (
@@ -925,38 +963,53 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
             )}
           </Box>
 
-          <Box sx={{ p: 1.25, borderTop: '1px solid', borderColor: 'divider' }}>
+          {/* New Chat Button */}
+          <Box sx={{ p: 1.5, borderTop: '1px solid #E5E7EB', bgcolor: '#FFFFFF' }}>
             <Button
               fullWidth
               startIcon={<AddRoundedIcon />}
               variant="contained"
               onClick={() => void createThread()}
-              sx={{ textTransform: 'none', borderRadius: 1, justifyContent: 'flex-start' }}
+              sx={{
+                textTransform: 'none',
+                borderRadius: '8px',
+                py: 0.9,
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                backgroundColor: '#2563EB',
+                color: '#FFFFFF',
+                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+                '&:hover': {
+                  backgroundColor: '#1D4ED8',
+                },
+              }}
             >
               {t('common:agentAssistant.newChat')}
             </Button>
           </Box>
         </Box>
 
-        <Box sx={{ display: 'grid', gridTemplateRows: 'auto minmax(0, 1fr) auto', minWidth: 0, minHeight: 0 }}>
+        {/* Right Chat Panel */}
+        <Box sx={{ display: 'grid', gridTemplateRows: '56px minmax(0, 1fr) auto', minWidth: 0, minHeight: 0, bgcolor: '#FFFFFF' }}>
+          {/* Header */}
           <Stack
             direction="row"
             spacing={1.5}
             alignItems="center"
             justifyContent="space-between"
-            sx={{ px: 2, py: 1.25, minWidth: 0 }}
+            sx={{ px: 2.5, height: 56, minWidth: 0, borderBottom: '1px solid #E5E7EB' }}
           >
             <Box sx={{ minWidth: 0 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 900, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#111827', fontSize: '0.9375rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {selectedThread?.title && selectedThread.title !== DEFAULT_AGENT_THREAD_TITLE
                   ? selectedThread.title
                   : t('common:agentAssistant.title')}
               </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              <Typography variant="caption" sx={{ color: '#6B7280', fontSize: '0.75rem' }}>
                 {selectedThread ? formatTime(selectedThread.lastMessageAt || selectedThread.createAt, locale) : ''}
               </Typography>
             </Box>
-            <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexShrink: 0 }}>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ flexShrink: 0 }}>
               {selectedThread ? (
                 <Tooltip title={t('common:agentAssistant.deleteHistory')}>
                   <span>
@@ -965,10 +1018,10 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                       size="small"
                       disabled={deletingThreadId === selectedThread.id || isSending}
                       onClick={() => void handleDeleteThread(selectedThread.id)}
-                      sx={{ borderRadius: 1 }}
+                      sx={{ borderRadius: '8px', color: '#6B7280', '&:hover': { color: '#EF4444', bgcolor: '#FEE2E2' } }}
                     >
                       {deletingThreadId === selectedThread.id ? (
-                        <CircularProgress size={16} />
+                        <CircularProgress size={16} color="inherit" />
                       ) : (
                         <DeleteOutlineRoundedIcon fontSize="small" />
                       )}
@@ -976,28 +1029,58 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                   </span>
                 </Tooltip>
               ) : null}
-              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }} />
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800 }}>
-                {t('common:agentAssistant.ready')}
-              </Typography>
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.75,
+                  px: 1.25,
+                  py: 0.35,
+                  borderRadius: '20px',
+                  bgcolor: 'rgba(34, 197, 94, 0.1)',
+                  border: '1px solid rgba(34, 197, 94, 0.2)',
+                }}
+              >
+                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#22C55E' }} />
+                <Typography variant="caption" sx={{ color: '#16A34A', fontWeight: 600, fontSize: '0.75rem' }}>
+                  {t('common:agentAssistant.ready')}
+                </Typography>
+              </Box>
             </Stack>
           </Stack>
-          <Divider />
 
-          <Box sx={{ minHeight: 0, overflowY: 'auto', px: { xs: 1.5, md: 4 }, py: 2.5 }}>
+          {/* Messages Area */}
+          <Box sx={{ minHeight: 0, overflowY: 'auto', px: { xs: 2, md: 3 }, py: 2.5, bgcolor: '#FAFAFA' }}>
             {isLoading ? (
               <Stack alignItems="center" justifyContent="center" sx={{ height: '100%' }}>
-                <CircularProgress />
+                <CircularProgress sx={{ color: '#2563EB' }} />
               </Stack>
             ) : messages.length === 0 ? (
-              <Stack alignItems="center" justifyContent="center" sx={{ height: '100%', color: 'text.secondary' }}>
-                <SmartToyOutlinedIcon sx={{ fontSize: 42, mb: 1 }} />
-                <Typography variant="body2" sx={{ fontWeight: 750 }}>
-                  {t('common:agentAssistant.empty')}
+              <Stack alignItems="center" justifyContent="center" sx={{ height: '100%', py: 4, px: 2, textAlign: 'center' }}>
+                <Box
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)',
+                    color: '#FFFFFF',
+                    display: 'grid',
+                    placeItems: 'center',
+                    mb: 1.5,
+                    boxShadow: '0 2px 8px rgba(37, 99, 235, 0.2)',
+                  }}
+                >
+                  <SmartToyOutlinedIcon sx={{ fontSize: 26 }} />
+                </Box>
+                <Typography variant="h3" sx={{ fontSize: '1.0625rem', fontWeight: 700, color: '#111827', mb: 0.5 }}>
+                  AILA đang sẵn sàng
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#6B7280', maxWidth: 420, fontSize: '0.875rem' }}>
+                  Nhập câu hỏi hoặc nội dung cần hỗ trợ vào ô bên dưới để bắt đầu trò chuyện.
                 </Typography>
               </Stack>
             ) : (
-              <Stack spacing={2.25}>
+              <Stack spacing={2}>
                 {messages.map((message) => (
                   <MessageBubble key={message.id} message={message} />
                 ))}
@@ -1006,22 +1089,22 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
             )}
           </Box>
 
-          <Box sx={{ p: 1.5, borderTop: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+          {/* Bottom Input Area */}
+          <Box sx={{ p: 1.5, borderTop: '1px solid #E5E7EB', bgcolor: '#FFFFFF' }}>
             <Stack spacing={1}>
               {attachments.length ? (
-                <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
+                <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                   {attachments.map((attachment) => (
                     <Box
                       key={attachment.id}
                       sx={{
                         position: 'relative',
-                        width: 74,
+                        width: 64,
                         aspectRatio: '1 / 1',
-                        borderRadius: 1,
+                        borderRadius: '8px',
                         overflow: 'hidden',
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        bgcolor: 'action.hover',
+                        border: '1px solid #E5E7EB',
+                        bgcolor: '#F8FAFC',
                       }}
                     >
                       <Box
@@ -1038,17 +1121,17 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                           onClick={() => handleRemoveAttachment(attachment.id)}
                           sx={{
                             position: 'absolute',
-                            top: 3,
-                            right: 3,
-                            width: 22,
-                            height: 22,
-                            borderRadius: 1,
-                            bgcolor: alpha('#000', 0.62),
-                            color: '#fff',
-                            '&:hover': { bgcolor: alpha('#000', 0.76) },
+                            top: 2,
+                            right: 2,
+                            width: 18,
+                            height: 18,
+                            borderRadius: '4px',
+                            bgcolor: 'rgba(0, 0, 0, 0.65)',
+                            color: '#FFFFFF',
+                            '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.85)' },
                           }}
                         >
-                          <CloseRoundedIcon sx={{ fontSize: 15 }} />
+                          <CloseRoundedIcon sx={{ fontSize: 12 }} />
                         </IconButton>
                       </Tooltip>
                     </Box>
@@ -1071,12 +1154,13 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                       disabled={isSending || Boolean(deletingThreadId)}
                       onClick={() => fileInputRef.current?.click()}
                       sx={{
-                        width: 42,
-                        height: 42,
-                        borderRadius: 1,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        color: 'text.secondary',
+                        width: 40,
+                        height: 40,
+                        borderRadius: '8px',
+                        border: '1px solid #E5E7EB',
+                        color: '#6B7280',
+                        backgroundColor: '#FFFFFF',
+                        '&:hover': { backgroundColor: '#F8FAFC', borderColor: '#D1D5DB' },
                       }}
                     >
                       {attachments.length ? <ImageOutlinedIcon fontSize="small" /> : <AttachFileRoundedIcon fontSize="small" />}
@@ -1100,27 +1184,32 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                   size="small"
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 1,
-                      bgcolor: alpha(theme.palette.text.primary, 0.015),
+                      borderRadius: '8px',
+                      bgcolor: '#FFFFFF',
+                      fontSize: '0.875rem',
+                      '& fieldset': { borderColor: '#E5E7EB' },
+                      '&:hover fieldset': { borderColor: '#D1D5DB' },
+                      '&.Mui-focused fieldset': { borderColor: '#2563EB', borderWidth: '1px' },
                     },
                   }}
                 />
                 <Tooltip title={t('common:agentAssistant.send')}>
                   <span>
                     <IconButton
-                      color="primary"
                       disabled={(!input.trim() && attachments.length === 0) || isSending || Boolean(deletingThreadId)}
                       onClick={() => void handleSend()}
                       sx={{
-                        width: 42,
-                        height: 42,
-                        borderRadius: 1,
-                        bgcolor: 'primary.main',
-                        color: 'primary.contrastText',
-                        '&:hover': { bgcolor: 'primary.dark' },
+                        width: 40,
+                        height: 40,
+                        borderRadius: '8px',
+                        bgcolor: '#2563EB',
+                        color: '#FFFFFF',
+                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+                        '&:hover': { bgcolor: '#1D4ED8' },
                         '&.Mui-disabled': {
-                          bgcolor: 'action.disabledBackground',
-                          color: 'action.disabled',
+                          bgcolor: '#E5E7EB',
+                          color: '#9CA3AF',
+                          boxShadow: 'none',
                         },
                       }}
                     >

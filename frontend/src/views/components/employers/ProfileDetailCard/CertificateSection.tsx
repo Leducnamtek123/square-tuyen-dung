@@ -50,8 +50,8 @@ const CertificateSection: React.FC<CertificateSectionProps> = ({ profileDetail }
                 }}
             >
                 <Stack spacing={4}>
-                    {(profileDetail.certificateDetails || []).map((value, index: number) => (
-                        <Box key={value.id || index}>
+                    {(profileDetail.certificateDetails || []).map((value, itemIdx: number) => (
+                        <Box key={value.id || value.certificateName || `cert-item-${itemIdx}`}>
                             <Stack spacing={2}>
                                 <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', lineHeight: 1.3 }}>
                                     {value?.certificateName}
@@ -70,7 +70,7 @@ const CertificateSection: React.FC<CertificateSectionProps> = ({ profileDetail }
                                     </Stack>
                                 </Stack>
                             </Stack>
-                            {index < (profileDetail.certificateDetails?.length || 0) - 1 && (
+                            {itemIdx < (profileDetail.certificateDetails?.length || 0) - 1 && (
                                 <Divider sx={{ mt: 4, borderStyle: 'dashed', borderColor: pc.divider( 0.8) }} />
                             )}
                         </Box>

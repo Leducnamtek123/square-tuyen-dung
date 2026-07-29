@@ -108,6 +108,8 @@ export default function AdminSectionClient({
   );
 
   useEffect(() => {
+    let isMounted = true;
+
     if (authGate.shouldRedirectToLogin) {
       window.location.replace(loginPath);
       return;
@@ -117,7 +119,7 @@ export default function AdminSectionClient({
       const currentToken = tokenService.getAccessTokenFromCookie();
 
       if (!currentToken) {
-        if (!isAuthPage) {
+        if (!isAuthPage && isMounted) {
           dispatchAuthGate({ type: 'redirectToLogin' });
         }
         return;
@@ -128,10 +130,14 @@ export default function AdminSectionClient({
         try {
           nextUser = await dispatch(getUserInfo()).unwrap();
         } catch {
-          dispatchAuthGate({ type: 'redirectToLogin' });
+          if (isMounted) {
+            dispatchAuthGate({ type: 'redirectToLogin' });
+          }
           return;
         }
       }
+
+      if (!isMounted) return;
 
       if (nextUser?.roleName && nextUser.roleName !== ROLES_NAME.ADMIN) {
         window.location.replace('/');
@@ -144,8 +150,14 @@ export default function AdminSectionClient({
     };
 
     void checkAuth().finally(() => {
-      dispatchAuthGate({ type: 'checked' });
+      if (isMounted) {
+        dispatchAuthGate({ type: 'checked' });
+      }
     });
+
+    return () => {
+      isMounted = false;
+    };
   }, [authGate.shouldRedirectToLogin, adminPrefix, currentUser, dashboardPath, dispatch, isAuthPage, isLoginPage, loginPath]);
 
   if (authGate.isChecking || authGate.shouldRedirectToLogin) {

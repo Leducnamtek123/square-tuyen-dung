@@ -889,77 +889,39 @@ function useReactShaderToyRuntime({
     animFrameIdRef.current = requestAnimationFrame(drawScene);
   };
 
-  const addEventListeners = () => {
-    const options = { passive: true };
-    if (uniformsRef.current.iMouse?.isNeeded && canvasRef.current) {
-      canvasRef.current.addEventListener('mousemove', mouseMove, options);
-      canvasRef.current.addEventListener('mouseout', mouseUp, options);
-      canvasRef.current.addEventListener('mouseup', mouseUp, options);
-      canvasRef.current.addEventListener('mousedown', mouseDown, options);
-      canvasRef.current.addEventListener('touchmove', mouseMove, options);
-      canvasRef.current.addEventListener('touchend', mouseUp, options);
-      canvasRef.current.addEventListener('touchstart', mouseDown, options);
-    }
-    if (uniformsRef.current.iDeviceOrientation?.isNeeded) {
-      window.addEventListener('deviceorientation', onDeviceOrientationChange, options);
-    }
-    if (canvasRef.current) {
-      resizeObserverRef.current = new ResizeObserver(onResize);
-      resizeObserverRef.current.observe(canvasRef.current);
-      window.addEventListener('resize', onResize, options);
-    }
-  };
-
-  const removeEventListeners = () => {
-    const options = { passive: true } as EventListenerOptions;
-    if (uniformsRef.current.iMouse?.isNeeded && canvasRef.current) {
-      canvasRef.current.removeEventListener('mousemove', mouseMove, options);
-      canvasRef.current.removeEventListener('mouseout', mouseUp, options);
-      canvasRef.current.removeEventListener('mouseup', mouseUp, options);
-      canvasRef.current.removeEventListener('mousedown', mouseDown, options);
-      canvasRef.current.removeEventListener('touchmove', mouseMove, options);
-      canvasRef.current.removeEventListener('touchend', mouseUp, options);
-      canvasRef.current.removeEventListener('touchstart', mouseDown, options);
-    }
-    if (uniformsRef.current.iDeviceOrientation?.isNeeded) {
-      window.removeEventListener('deviceorientation', onDeviceOrientationChange, options);
-    }
-    if (resizeObserverRef.current) {
-      resizeObserverRef.current.disconnect();
-      window.removeEventListener('resize', onResize, options);
-    }
-  };
-
   useEffect(() => {
-    propsUniformsRef.current = propUniforms;
-  }, [propUniforms]);
-
-  useEffect(() => {
-    animateWhenNotVisibleRef.current = animateWhenNotVisible;
-    if (animateWhenNotVisible) {
-      isVisibleRef.current = true;
-    }
-  }, [animateWhenNotVisible]);
-
-  // Intersection Observer: pause animation when off-screen when animateWhenNotVisible is false
-  useEffect(() => {
-    if (animateWhenNotVisible || !canvasRef.current) return;
+    const options = { passive: true } as AddEventListenerOptions;
     const canvas = canvasRef.current;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          isVisibleRef.current = entry.isIntersecting;
-          if (entry.isIntersecting) {
-            scheduleDrawScene();
-          }
-        }
-      },
-      { threshold: 0 },
-    );
-    observer.observe(canvas);
-    return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animateWhenNotVisible]);
+    if (!canvas) return;
+
+    const handleMouseMove = (e: Event) => mouseMove(e as MouseEvent | TouchEvent);
+    const handleMouseUp = () => mouseUp();
+    const handleMouseDown = (e: Event) => mouseDown(e as MouseEvent | TouchEvent);
+    const handleDeviceOrientation = (e: Event) => onDeviceOrientationChange(e as DeviceOrientationEvent);
+    const handleResize = () => onResize();
+
+    canvas.addEventListener('mousemove', handleMouseMove, options);
+    canvas.addEventListener('mouseout', handleMouseUp, options);
+    canvas.addEventListener('mouseup', handleMouseUp, options);
+    canvas.addEventListener('mousedown', handleMouseDown, options);
+    canvas.addEventListener('touchmove', handleMouseMove, options);
+    canvas.addEventListener('touchend', handleMouseUp, options);
+    canvas.addEventListener('touchstart', handleMouseDown, options);
+    window.addEventListener('deviceorientation', handleDeviceOrientation, options);
+    window.addEventListener('resize', handleResize, options);
+
+    return () => {
+      canvas.removeEventListener('mousemove', handleMouseMove, options);
+      canvas.removeEventListener('mouseout', handleMouseUp, options);
+      canvas.removeEventListener('mouseup', handleMouseUp, options);
+      canvas.removeEventListener('mousedown', handleMouseDown, options);
+      canvas.removeEventListener('touchmove', handleMouseMove, options);
+      canvas.removeEventListener('touchend', handleMouseUp, options);
+      canvas.removeEventListener('touchstart', handleMouseDown, options);
+      window.removeEventListener('deviceorientation', handleDeviceOrientation, options);
+      window.removeEventListener('resize', handleResize, options);
+    };
+  }, []);
 
   // Main effect for initialization and cleanup
   useEffect(() => {
@@ -981,7 +943,6 @@ function useReactShaderToyRuntime({
         initShaders(preProcessFragment(fs || BASIC_FS), vs || BASIC_VS);
         initBuffers();
         scheduleDrawScene();
-        addEventListeners();
         onResize();
       }
     }
@@ -1002,7 +963,6 @@ function useReactShaderToyRuntime({
         }
         shaderProgramRef.current = null;
       }
-      removeEventListeners();
       cancelAnimationFrame(initFrameIdRef.current ?? 0);
       cancelAnimationFrame(animFrameIdRef.current ?? 0);
       initFrameIdRef.current = undefined;

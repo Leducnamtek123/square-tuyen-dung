@@ -66,10 +66,12 @@ export const useRightSidebarData = <T,>(fetchData: (params: { page: number; page
   const { setSelectedRoomId } = context || {};
 
   React.useEffect(() => {
+    let isMounted = true;
     const loadData = async () => {
       dispatch({ type: 'loading' });
       try {
         const resData = await fetchData({ page, pageSize });
+        if (!isMounted) return;
         const data = normalizeRightSidebarResponse<T>(resData);
         dispatch({
           type: 'loaded',
@@ -77,11 +79,15 @@ export const useRightSidebarData = <T,>(fetchData: (params: { page: number; page
           results: data.results,
         });
       } catch (error) {
-        // Error handled silently
-        dispatch({ type: 'finished' });
+        if (isMounted) {
+          dispatch({ type: 'finished' });
+        }
       }
     };
     loadData();
+    return () => {
+      isMounted = false;
+    };
   }, [page, fetchData, pageSize]);
 
   const handleAddRoom = async (partnerId: string, userData: UserDataPayload) => {

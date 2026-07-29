@@ -781,7 +781,7 @@
   },
   "sidebar": {
     "dashboard": "Dashboard",
-    "agentAssistants": "Agent Assistants",
+    "agentAssistants": "AILA",
     "jobPostList": "Job Post List",
     "candidateManagement": "Candidate Management",
     "appliedApplications": "Applied Applications",
@@ -804,7 +804,7 @@
     "hrmEmployees": "Employee records",
     "hrmRoles": "Roles & permissions",
       "hrmMembers": "Company members",
-      "squareHrmAdmin": "Open InfoHR HRM"
+      "squareHrmAdmin": "Open HRM"
   },
   "interviewHistory": {
     "title": "Video Library",

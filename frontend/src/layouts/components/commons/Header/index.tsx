@@ -33,7 +33,7 @@ import { useQuery } from '@tanstack/react-query';
 import contentService from '../../../../services/contentService';
 
 interface HeaderProps {
-  window?: () => Window;
+  windowProp?: () => Window;
 }
 
 const Header = (_props: HeaderProps) => {

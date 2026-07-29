@@ -19,7 +19,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DownloadIcon from '@mui/icons-material/Download';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-import type { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
+import type { ColumnDef, PaginationState, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
@@ -48,6 +48,10 @@ interface AppliedResumeTableProps {
   onPaginationChange: OnChangeFn<PaginationState>;
   sorting: SortingState;
   onSortingChange: OnChangeFn<SortingState>;
+  enableRowSelection?: boolean;
+  rowSelection?: RowSelectionState;
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
+  variant?: 'card' | 'flat';
 }
 
 const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
@@ -65,7 +69,11 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     pagination,
     onPaginationChange,
     sorting,
-    onSortingChange
+    onSortingChange,
+    enableRowSelection = false,
+    rowSelection,
+    onRowSelectionChange,
+    variant = 'card',
   } = props;
   const { allConfig } = useConfig();
   const [openDrawerId, setOpenDrawerId] = useState<string | number | null>(null);
@@ -365,6 +373,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
         />
       )}
       <DataTable
+        variant={variant}
         columns={columns}
         data={rows}
         isLoading={isLoading}
@@ -374,6 +383,9 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
         enableSorting
         sorting={sorting}
         onSortingChange={onSortingChange}
+        enableRowSelection={enableRowSelection}
+        rowSelection={rowSelection}
+        onRowSelectionChange={onRowSelectionChange}
         emptyMessage={t('appliedResume.table.noCandidates')}
       />
     </>

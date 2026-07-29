@@ -568,9 +568,9 @@ const NewsContent = () => {
             Từ khoá nổi bật
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ gap: 1 }}>
-            {popularKeywords.map((item, index) => {
+            {popularKeywords.map((item) => {
               const labelText = item;
-              const itemKey = `${item}-${index}`;
+              const itemKey = `kw-${item}`;
               const searchHref = `${jobsHref}?kw=${encodeURIComponent(item)}`;
 
               return (

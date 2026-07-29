@@ -245,9 +245,11 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
 
   const prevCityIdRef = React.useRef<number | null>(null);
   React.useEffect(() => {
+    let isMounted = true;
     const loadDistricts = async (cityId: number) => {
       try {
         const resData = await commonService.getDistrictsByCityId(cityId);
+        if (!isMounted) return;
         const nextDistrictOptions = resData.data?.map((d) => ({ id: d.id, name: d.name })) || [];
         if (shouldResetChildLocationValue(prevCityIdRef.current, cityId)) {
           setValue('company.location.district', '');
@@ -255,7 +257,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
         setDistrictOptions(nextDistrictOptions);
         prevCityIdRef.current = cityId;
       } catch (error) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       }
     };
     if (cityId) {
@@ -267,6 +269,9 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
       setDistrictOptions([]);
       prevCityIdRef.current = null;
     }
+    return () => {
+      isMounted = false;
+    };
   }, [cityId, setValue]);
 
   const handleSubmtNextSuccess = (data: EmployerSignUpFormData) => handleNext(data.email);

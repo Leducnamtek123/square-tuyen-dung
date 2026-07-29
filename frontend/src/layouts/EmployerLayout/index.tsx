@@ -12,15 +12,15 @@ import { useLiveInterviewCount } from '@/views/employerPages/InterviewPages/useL
 import ManagementFooter from '../components/commons/ManagementFooter';
 
 interface EmployerLayoutProps {
-  window?: () => Window;
+  windowGetter?: () => unknown;
   children?: React.ReactNode;
 }
 
-const EXPANDED_WIDTH = 250;
-const COLLAPSED_WIDTH = 70;
+const EXPANDED_WIDTH = 224;
+const COLLAPSED_WIDTH = 64;
 
 function EmployerLayout(props: EmployerLayoutProps) {
-  const { window, children } = props;
+  const { windowGetter, children } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState<boolean>(false);
   const liveInterviewCount = useLiveInterviewCount();
@@ -37,12 +37,14 @@ function EmployerLayout(props: EmployerLayoutProps) {
   const toggleCollapse = React.useCallback(() => {
     setIsCollapsed((prev) => {
       const next = !prev;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('square_sidebar_collapsed', String(next));
-      }
       return next;
     });
-  }, []);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('square_sidebar_collapsed', String(!isCollapsed));
+      } catch {}
+    }
+  }, [isCollapsed]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -51,10 +53,10 @@ function EmployerLayout(props: EmployerLayoutProps) {
   const currentDrawerWidth = isCollapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH;
 
   const container =
-    window !== undefined ? () => window().document.body : undefined;
+    windowGetter !== undefined ? () => (windowGetter() as Window).document.body : undefined;
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
       {/* Start: Header */}
       <Header
         drawerWidth={currentDrawerWidth}
@@ -67,7 +69,7 @@ function EmployerLayout(props: EmployerLayoutProps) {
         sx={{
           width: { md: currentDrawerWidth },
           flexShrink: { md: 0 },
-          transition: 'width 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'width 150ms cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         {/* Start: Sidebar */}
@@ -100,20 +102,31 @@ function EmployerLayout(props: EmployerLayoutProps) {
             xs: '100%',
             md: `calc(100% - ${currentDrawerWidth}px)`,
           },
-          transition: 'all 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         <Box
           sx={{
             flexGrow: 1,
-            p: {
-              xs: 1,
-              sm: 3,
-            },
-            mt: 7,
+            mt: '60px',
+            bgcolor: '#F8FAFC',
+            display: 'flex',
+            justifyContent: 'center',
+            width: '100%',
           }}
         >
-          {children}
+          <Box
+            sx={{
+              width: '100%',
+              maxWidth: '1600px',
+              p: {
+                xs: 2, // 16px
+                sm: 3, // 24px (8pt system)
+              },
+            }}
+          >
+            {children}
+          </Box>
         </Box>
         <ManagementFooter />
       </Box>

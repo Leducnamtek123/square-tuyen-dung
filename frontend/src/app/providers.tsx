@@ -32,16 +32,13 @@ function makeQueryClient() {
 }
 
 export function Providers({ children }: { children: any }) {
-  // Use useRef instead of module-level singleton to avoid shared state
-  // between SSR requests in Next.js App Router.
-  const queryClientRef = React.useRef<QueryClient | null>(null);
-  if (!queryClientRef.current) {
-    queryClientRef.current = makeQueryClient();
-  }
+  // Use useState lazy initializer to avoid mutating ref during render
+  // and maintain component instance isolation in Next.js App Router.
+  const [queryClient] = React.useState(() => makeQueryClient());
 
   return (
     <Provider store={store}>
-      <QueryClientProvider client={queryClientRef.current}>
+      <QueryClientProvider client={queryClient}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
           {children}
         </LocalizationProvider>

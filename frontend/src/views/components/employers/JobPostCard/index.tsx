@@ -1,5 +1,6 @@
 'use client';
-import React, { useCallback } from 'react';
+import React, { useMemo, useCallback, useReducer } from 'react';
+import dayjs from '@/configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
 import { Alert, Box, Button, Stack, Typography, Paper, Theme } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
@@ -25,7 +26,9 @@ import { useDataTable } from '../../../../hooks';
 import { useCompanyProfile, useEmployerJobPosts, useJobPostMutations } from '../hooks/useEmployerQueries';
 import type { ApiError } from '../../../../types/api';
 import type { JobPostInput } from '../../../../services/jobService';
+import type { RowSelectionState } from '@tanstack/react-table';
 import FilterBar from '@/components/Common/FilterBar';
+import { ExportModal, type ExportColumn, type ExportScope } from '@/components/Common/ExportModal';
 import { ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 
@@ -102,6 +105,7 @@ const JobPostCard = () => {
   });
 
   const [state, dispatch] = React.useReducer(reducer, initialState);
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
   // Data Fetching & Mutations
   const { data, isLoading } = useEmployerJobPosts({
@@ -151,19 +155,16 @@ const JobPostCard = () => {
   }, []);
 
   const handleShowAdd = useCallback(() => {
-    if (isCreateBlocked) {
-      toastMessages.warn(t('jobPost.verificationRequired.toast'));
-      return;
-    }
+    if (isCreateBlocked) return;
     dispatch({ type: 'openAdd' });
-  }, [isCreateBlocked, t]);
+  }, [isCreateBlocked]);
 
   const handleAddOrUpdate = async (formData: JobPostFormValues) => {
     dispatch({ type: 'setErrors', value: null });
     const editLookup = state.editData?.slug ?? state.editData?.id;
     const payload: JobPostInput = {
       jobName: formData.jobName || '',
-      deadline: formData.deadline ? (typeof formData.deadline === 'string' ? formData.deadline : formData.deadline.toISOString()) : '',
+      deadline: formData.deadline ? (typeof formData.deadline === 'string' ? formData.deadline : (formData.deadline as any).toISOString()) : '',
       quantity: Number(formData.quantity),
       salaryMin: Number(formData.salaryMin),
       salaryMax: Number(formData.salaryMax),
@@ -222,49 +223,103 @@ const JobPostCard = () => {
     );
   }, [deleteJobPost, t]);
 
-    const handleFilter = useCallback((data: { kw: string, isUrgent: number | string, statusId: string | number }) => {
+  const handleFilter = useCallback((data: { kw: string, isUrgent: number | string, statusId: string | number }) => {
     dispatch({
       type: 'setFilter',
       value: {
-      kw: data.kw,
-      isUrgent: data.isUrgent === 1 ? true : data.isUrgent === 2 ? false : '',
-      statusId: data.statusId,
+        kw: data.kw,
+        isUrgent: data.isUrgent === 1 ? true : data.isUrgent === 2 ? false : '',
+        statusId: data.statusId,
       },
     });
     onPaginationChange({ pageIndex: 0, pageSize });
   }, [onPaginationChange, pageSize]);
 
-  const handleExport = async () => {
-    dispatch({ type: 'setProcessing', value: true });
-    try {
-      const params = {
-        page: page + 1,
-        pageSize,
-        ordering,
-        kw: state.filterData.kw,
-        isUrgent: state.filterData.isUrgent === '' ? undefined : state.filterData.isUrgent,
-        status: state.filterData.statusId === '' ? undefined : state.filterData.statusId,
-      };
-      const resData = await jobService.exportEmployerJobPosts(params);
-      xlsxUtils.exportToXLSX(resData, 'JobList');
-    } catch (error) {
-      errorHandling(error);
-    } finally {
-      dispatch({ type: 'setProcessing', value: false });
+  const [exportModalOpen, setExportModalOpen] = React.useState(false);
+
+  const jobPostExportColumns: ExportColumn[] = React.useMemo(() => [
+    {
+      id: 'title',
+      label: t('jobPost.table.title', 'Tiêu đề tin tuyển dụng'),
+      checked: true,
+      getValue: (row) => row['Chức Danh'] || row.jobName || row.title || '---',
+    },
+    {
+      id: 'createdDate',
+      label: t('jobPost.table.createdDate', 'Ngày tạo'),
+      checked: true,
+      getValue: (row) => {
+        const val = row['Ngày Đăng'] || row.createAt || row.createdDate;
+        return val ? dayjs(val).format('DD/MM/YYYY') : '---';
+      },
+    },
+    {
+      id: 'deadline',
+      label: t('jobPost.table.deadline', 'Hạn tuyển'),
+      checked: true,
+      getValue: (row) => {
+        const val = row['Ngày Hết Hạn'] || row.deadline;
+        return val ? dayjs(val).format('DD/MM/YYYY') : '---';
+      },
+    },
+    {
+      id: 'status',
+      label: t('jobPost.table.status', 'Trạng thái'),
+      checked: true,
+      getValue: (row) => row['Trạng thái'] || row.status || '---',
+    },
+    {
+      id: 'applicationsCount',
+      label: t('jobPost.table.applications', 'Số hồ sơ'),
+      checked: true,
+      getValue: (row) => (row['Số Hồ Sơ Ứng Tuyển'] != null ? String(row['Số Hồ Sơ Ứng Tuyển']) : row.appliedNumber != null ? String(row.appliedNumber) : row.applicationsCount != null ? String(row.applicationsCount) : '0'),
+    },
+    {
+      id: 'creator',
+      label: t('jobPost.table.creator', 'Người tạo'),
+      checked: true,
+      getValue: (row) => row['Người tạo'] || row.creator || '---',
+    },
+  ], [t]);
+
+  const handleFetchJobPostsExportData = useCallback(async (scope: ExportScope) => {
+    const params = {
+      page: 1,
+      pageSize: scope === 'all' ? 1000 : pageSize,
+      ordering,
+      kw: scope === 'all' ? undefined : state.filterData.kw,
+      isUrgent: scope === 'all' ? undefined : (state.filterData.isUrgent === '' ? undefined : state.filterData.isUrgent),
+      status: scope === 'all' ? undefined : (state.filterData.statusId === '' ? undefined : state.filterData.statusId),
+    };
+    const resData = await jobService.exportEmployerJobPosts(params);
+    const exportList = (resData || []) as Record<string, any>[];
+    if (scope === 'selected') {
+      const selectedIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
+      if (selectedIds.length === 0) return [];
+      const filtered = exportList.filter((item) => {
+        const itemId = String(item.id ?? item.ID ?? item['Mã Việc Làm'] ?? item.slug ?? '');
+        return selectedIds.includes(itemId);
+      });
+      if (filtered.length > 0) return filtered;
+      const currentList = data?.results || [];
+      return currentList.filter((item: any) => selectedIds.includes(String(item.id ?? item.slug)));
     }
-  };
+    return exportList;
+  }, [pageSize, ordering, state.filterData, rowSelection, data?.results]);
+
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 } }}>
+    <Box sx={{ width: '100%' }}>
       <Paper 
         elevation={0}
         sx={{ 
-          p: { xs: 3, md: 5 }, 
-          borderRadius: 4, 
+          p: { xs: 2.5, md: 3.5 }, 
+          borderRadius: 3, 
           border: '1px solid',
           borderColor: 'divider',
           boxShadow: (theme: Theme) => theme.customShadows?.z1,
-          bgcolor: 'background.paper'
+          bgcolor: 'background.paper',
+          overflow: 'hidden'
         }}
       >
         <Stack 
@@ -272,7 +327,7 @@ const JobPostCard = () => {
           alignItems={{ xs: 'flex-start', sm: 'center' }} 
           justifyContent="space-between" 
           spacing={3} 
-          mb={5}
+          mb={4}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box sx={{ 
@@ -298,9 +353,8 @@ const JobPostCard = () => {
               variant="outlined" 
               color="inherit" 
               startIcon={<FileDownloadOutlinedIcon />} 
-              onClick={handleExport} 
+              onClick={() => setExportModalOpen(true)} 
               sx={{ 
-                 
                 px: 3, 
                 py: 1,
                 fontWeight: 800, 
@@ -317,7 +371,6 @@ const JobPostCard = () => {
               onClick={handleShowAdd} 
               disabled={isCreateBlocked}
               sx={{ 
-                 
                 px: 4, 
                 py: 1.25,
                 boxShadow: (theme: Theme) => theme.customShadows?.primary, 
@@ -344,13 +397,14 @@ const JobPostCard = () => {
           </Alert>
         ) : null}
 
-        <FilterBar title={t('jobPost.filter')} sx={{ mb: 5 }}>
+        <FilterBar variant="flat" title={t('jobPost.filter')} sx={{ mb: 4 }}>
           <Box sx={{ width: '100%', minWidth: 0 }}>
             <JobPostFilterForm handleFilter={handleFilter} />
           </Box>
         </FilterBar>
 
         <JobPostsTable
+          variant="flat"
           rows={data?.results || []}
           isLoading={isLoading}
           rowCount={data?.count || 0}
@@ -360,6 +414,9 @@ const JobPostCard = () => {
           onSortingChange={onSortingChange}
           handleDelete={handleDelete}
           handleUpdate={handleShowUpdate}
+          enableRowSelection
+          rowSelection={rowSelection}
+          onRowSelectionChange={setRowSelection}
         />
 
         <FormPopup
@@ -369,6 +426,19 @@ const JobPostCard = () => {
         >
           <JobPostForm handleAddOrUpdate={handleAddOrUpdate} editData={state.editData} serverErrors={state.serverErrors} />
         </FormPopup>
+
+        <ExportModal
+          open={exportModalOpen}
+          onClose={() => setExportModalOpen(false)}
+          defaultFileName="DanhSachTinTuyenDung"
+          columns={jobPostExportColumns}
+          fetchData={handleFetchJobPostsExportData}
+          totalRecords={{
+            all: data?.count || 0,
+            filtered: data?.count || 0,
+            selected: Object.keys(rowSelection).filter((k) => rowSelection[k]).length,
+          }}
+        />
 
         {(state.isProcessing || isMutating) && <BackdropLoading />}
       </Paper>

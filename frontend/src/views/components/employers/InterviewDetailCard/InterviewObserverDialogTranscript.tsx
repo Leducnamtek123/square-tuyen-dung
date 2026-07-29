@@ -20,7 +20,7 @@ type TranscriptRow = {
 };
 
 const formatTime = (timestamp: number) =>
-  new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  new Date(timestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' });
 
 const mapMessages = (
   items: ReturnType<typeof useInterviewMessages>['messages'],

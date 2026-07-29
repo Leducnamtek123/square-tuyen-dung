@@ -86,21 +86,28 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
   const [advancedSkills, setAdvancedSkills] = React.useState<AdvancedSkill[]>([]);
 
   React.useEffect(() => {
+    let isMounted = true;
     const loadAdvancedSkills = async (slug: string | undefined) => {
       if (!slug) return;
 
       dispatch({ type: 'set_loading', payload: true });
       try {
         const resData = await resumeService.getAdvancedSkills(slug);
+        if (!isMounted) return;
         setAdvancedSkills(resData);
       } catch (error: unknown) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       } finally {
-        dispatch({ type: 'set_loading', payload: false });
+        if (isMounted) {
+          dispatch({ type: 'set_loading', payload: false });
+        }
       }
     };
 
     loadAdvancedSkills(resumeSlug);
+    return () => {
+      isMounted = false;
+    };
   }, [resumeSlug, uiState.refreshToken]);
 
   const handleShowAdd = () => {

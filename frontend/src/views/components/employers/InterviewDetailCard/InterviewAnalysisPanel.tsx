@@ -252,13 +252,13 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                         </Typography>
                                         <Stack spacing={1.5} sx={{ mt: 1.5 }}>
                                             {structuredQuestionPerformance.map((item, idx) => {
-                                                const question = toStringValue(getFirstDefined(item.question, item.question_text, item.text)) || `${t('interviewDetail.label.question')} ${idx + 1}`;
+                                                const question = toStringValue(getFirstDefined(item.question, item.question_text, item.text)) || t('interviewDetail.label.question');
                                                 const feedback = toStringValue(getFirstDefined(item.feedback, item.comment, item.answer)) || t('interviewDetail.messages.noDetails');
                                                 const score = toStringValue(getFirstDefined(item.score, item.points));
 
                                                 return (
                                                     <Box
-                                                        key={`${question}-${feedback}-${score ?? 'na'}`}
+                                                        key={String((item as { id?: unknown })?.id || `${question}-${feedback}`)}
                                                         sx={{
                                                             p: 2,
                                                             borderRadius: 2,

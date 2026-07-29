@@ -157,9 +157,9 @@ export const LiveChatbotPreview: React.FC<LiveChatbotPreviewProps> = ({
 
           {/* Quick Suggestion Chips */}
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, my: 1.5 }}>
-            {currentSuggestions.map((item, idx) => (
+            {currentSuggestions.map((item) => (
               <Chip
-                key={idx}
+                key={item}
                 label={item}
                 sx={{
                   background: '#f8fafc',

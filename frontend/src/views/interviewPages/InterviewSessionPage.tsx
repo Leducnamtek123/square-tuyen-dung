@@ -662,7 +662,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
   const statusText = t(`interviewListCard.statuses.${displayStatusKey}`);
   const statusClass = statusClassMap[displayStatusKey] || 'border-white/15 bg-white/10 text-zinc-200';
   const formattedSchedule = state.session?.scheduledAt
-    ? new Date(state.session.scheduledAt).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US')
+    ? new Date(state.session.scheduledAt).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US', { timeZone: 'Asia/Ho_Chi_Minh' })
     : undefined;
 
   const jobLabel       = state.session?.jobName       || t('common:labels.job');

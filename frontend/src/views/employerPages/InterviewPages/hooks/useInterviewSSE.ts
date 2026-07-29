@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 import tokenService from '../../../../services/tokenService';
@@ -137,18 +137,11 @@ export function useInterviewSSE({
     }
   }, []);
 
-  const connect = useCallback((shouldResetState = false) => {
-    cleanup();
-    if (shouldResetState) {
-      dispatch({ type: 'reset' });
-      reconnectAttempts.current = 0;
-    }
-
+  useEffect(() => {
     if (!sessionId || !enabled) return;
 
     const base = (process.env.NEXT_PUBLIC_API_BASE || '/api').replace(/\/$/, '');
     const token = tokenService.getAccessTokenFromCookie?.() || '';
-    // SSE with auth token as query param (EventSource doesn't support headers)
     const url = buildInterviewSSEUrl({
       apiBase: base,
       sessionId,
@@ -156,63 +149,52 @@ export function useInterviewSSE({
       activeCompanyId,
     });
 
+    dispatch({ type: 'reset' });
+    reconnectAttempts.current = 0;
+
     const es = new EventSource(url);
     eventSourceRef.current = es;
 
-    es.addEventListener('connected', () => {
+    const onConnected = () => {
       dispatch({ type: 'connected' });
       reconnectAttempts.current = 0;
-    });
-
-    es.addEventListener('transcript_added', (e: MessageEvent) => {
+    };
+    const onTranscript = (e: Event) => {
       try {
-        const data: SSETranscriptEvent = JSON.parse(e.data);
+        const data: SSETranscriptEvent = JSON.parse((e as MessageEvent).data);
         dispatch({ type: 'transcriptAdded', transcript: data.transcript });
       } catch {
         // ignore parse errors
       }
-    });
-
-    es.addEventListener('status_changed', (e: MessageEvent) => {
+    };
+    const onStatus = (e: Event) => {
       try {
-        const data: SSEStatusEvent = JSON.parse(e.data);
+        const data: SSEStatusEvent = JSON.parse((e as MessageEvent).data);
         dispatch({ type: 'statusChanged', event: data });
       } catch {
         // ignore
       }
-    });
+    };
 
-    es.addEventListener('heartbeat', () => {
-      // Keep-alive, no action needed
-    });
-
-    es.addEventListener('error', () => {
-      // ignore SSE error events from server
-    });
+    es.addEventListener('connected', onConnected);
+    es.addEventListener('transcript_added', onTranscript);
+    es.addEventListener('status_changed', onStatus);
 
     es.onerror = () => {
       dispatch({ type: 'disconnected' });
       es.close();
       eventSourceRef.current = null;
-
-      // Exponential backoff reconnect (max 30s)
-      const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
-      reconnectAttempts.current += 1;
-
-      if (reconnectAttempts.current <= 10) {
-        reconnectTimeoutRef.current = setTimeout(() => {
-          connect();
-        }, delay);
-      } else {
-        dispatch({ type: 'connectionLost', error: 'SSE connection lost. Please refresh the page.' });
-      }
     };
-  }, [sessionId, enabled, cleanup, activeCompanyId]);
 
-  useEffect(() => {
-    connect(true);
-    return cleanup;
-  }, [connect, cleanup]);
+    return () => {
+      es.removeEventListener('connected', onConnected);
+      es.removeEventListener('transcript_added', onTranscript);
+      es.removeEventListener('status_changed', onStatus);
+      es.close();
+      eventSourceRef.current = null;
+      cleanup();
+    };
+  }, [sessionId, enabled, activeCompanyId, cleanup]);
 
   return {
     liveTranscripts: state.liveTranscripts,

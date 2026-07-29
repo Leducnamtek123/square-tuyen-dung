@@ -58,9 +58,11 @@ export const usePersonalProfileDistrictOptions = (
   const prevCityIdRef = React.useRef<string | number | null>(null);
 
   React.useEffect(() => {
+    let isMounted = true;
     const loadDistricts = async (id: number | string) => {
       try {
         const resData = await commonService.getDistrictsByCityId(id);
+        if (!isMounted) return;
         if (shouldResetChildLocationValue(prevCityIdRef.current, id)) {
           setValue?.('location.district', '');
           setDistrictOptions([]);
@@ -68,7 +70,7 @@ export const usePersonalProfileDistrictOptions = (
         setDistrictOptions(resolvePersonalProfileDistrictOptions(id, resData));
         prevCityIdRef.current = id;
       } catch (error) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       }
     };
 
@@ -81,6 +83,9 @@ export const usePersonalProfileDistrictOptions = (
       setDistrictOptions([]);
       prevCityIdRef.current = null;
     }
+    return () => {
+      isMounted = false;
+    };
   }, [cityId, setValue]);
 
   return districtOptions;

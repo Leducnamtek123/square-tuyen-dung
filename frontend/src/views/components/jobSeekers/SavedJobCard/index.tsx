@@ -35,7 +35,8 @@ const SavedJobCard = () => {
   const [page, setPage] = React.useState(1);
   const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
 
-  const { data, isLoading } = useSavedJobs({ pageSize, page });
+  const queryParams = React.useMemo(() => ({ pageSize, page }), [page]);
+  const { data, isLoading } = useSavedJobs(queryParams);
   const jobPosts = (data?.results || []) as Array<JobPost>;
   const count = data?.count || 0;
 

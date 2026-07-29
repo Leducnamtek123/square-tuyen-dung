@@ -71,21 +71,28 @@ const CVCard = ({ title }: CVCardProps) => {
   const safeCvFileUrl = getSafeResourceUrl(state.cv?.fileUrl);
 
   React.useEffect(() => {
+    let isMounted = true;
     const getResumeDetail = async (slug: string | undefined) => {
       if (!slug) return;
 
       dispatch({ type: 'set-loading', value: true });
       try {
         const resData = (await resumeService.getCv(slug)) as CVData;
+        if (!isMounted) return;
         dispatch({ type: 'set-cv', value: resData });
       } catch (error: unknown) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       } finally {
-        dispatch({ type: 'set-loading', value: false });
+        if (isMounted) {
+          dispatch({ type: 'set-loading', value: false });
+        }
       }
     };
 
     getResumeDetail(resumeSlug);
+    return () => {
+      isMounted = false;
+    };
   }, [resumeSlug, state.refreshToken]);
 
   const handleUpdate = (data: CVFormValues) => {

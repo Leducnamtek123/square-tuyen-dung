@@ -922,19 +922,19 @@
     "recordingWaiting": "The interview has ended, the system is waiting for the recording to sync before displaying here."
   },
   "agentAssistant": {
-    "title": "Agent Assistants",
+    "title": "AILA",
     "recents": "Recents",
     "newChat": "New chat",
     "ready": "Ready",
-    "empty": "Agent is ready",
-    "placeholder": "Message the agent...",
+    "empty": "AILA is ready",
+    "placeholder": "Message AILA...",
     "send": "Send",
     "deleteHistory": "Delete chat history",
     "deleteCurrentHistory": "Delete current chat history",
     "deleteError": "Could not delete this chat history. Please try again.",
-    "loadError": "Could not load Agent Assistants. Please try again.",
-    "sendError": "Agent could not process this request. Please check the content and try again.",
-    "thinking": "Agent is thinking...",
+    "loadError": "Could not load AILA. Please try again.",
+    "sendError": "AILA could not process this request. Please check the content and try again.",
+    "thinking": "AILA is thinking...",
     "attachments": {
       "addImage": "Attach image",
       "remove": "Remove image",
@@ -945,8 +945,8 @@
       "readError": "Could not read this image. Please try another image."
     },
     "portals": {
-      "admin": "InfoHR Admin",
-      "employer": "InfoHR Employer"
+      "admin": "Admin Portal",
+      "employer": "Employer Portal"
     },
     "threadGroups": {
       "today": "Today",

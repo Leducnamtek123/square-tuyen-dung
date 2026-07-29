@@ -48,8 +48,8 @@ const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDeta
                 }}
             >
                 <Stack spacing={4}>
-                    {(profileDetail.skillDetails || []).map((value, index: number) => (
-                        <Box key={value.id || index}>
+                    {(profileDetail.skillDetails || []).map((value, itemIdx: number) => (
+                        <Box key={value.id || value.skillName || `skill-item-${itemIdx}`}>
                             <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', mb: 2 }}>
                                 {value?.skillName}
                             </Typography>
@@ -68,7 +68,7 @@ const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDeta
                                 }} 
                             />
                             
-                            {index < (profileDetail.skillDetails?.length || 0) - 1 && (
+                            {itemIdx < (profileDetail.skillDetails?.length || 0) - 1 && (
                                 <Divider sx={{ mt: 4, borderStyle: 'dashed', borderColor: pc.divider( 0.8) }} />
                             )}
                         </Box>

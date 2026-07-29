@@ -69,11 +69,11 @@ export const InteractiveChipInput: React.FC<InteractiveChipInputProps> = ({
         }}
       >
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: chips.length > 0 ? 2 : 0 }}>
-          {chips.map((chipText, index) => (
+          {chips.map((chipText, chipIdx) => (
             <Chip
-              key={index}
+              key={`chip-item-${chipText}`}
               label={chipText}
-              onDelete={() => handleDeleteChip(index)}
+              onDelete={() => handleDeleteChip(chipIdx)}
               sx={{
                 background: '#fff0f3',
                 color: '#e11d48',

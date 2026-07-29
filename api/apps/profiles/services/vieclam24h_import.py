@@ -20,18 +20,33 @@ from shared.helpers.cloudinary_service import CloudinaryService
 from .vieclam24h_import_browser import collect_vieclam24h_candidates
 
 DEFAULT_VIECLAM24H_CAREER_NAMES = [
+    "Bất động sản",
     "Xây dựng",
+    "Nội thất",
+    "Kiến trúc",
     "Thiết kế / Kiến trúc",
     "Điện / Điện tử",
     "Cơ khí",
 ]
 
 _CAREER_KEYWORDS = {
+    "Bất động sản": [
+        "bất động sản", "bđs", "real estate", "môi giới", "đất đai", "nhà đất", "dự án",
+        "leasing", "property", "cho thuê", "mặt bằng", "chuyên viên bđs", "tư vấn bđs"
+    ],
     "Xây dựng": [
         "xây dựng", "construction", "civil", "site", "qs", "kết cấu", "giám sát",
         "project", "safety", "chỉ huy trưởng", "cht", "pm", "project manager",
         "qa", "qc", "qa/qc", "bóc tách", "khối lượng", "dự toán", "điều phối",
         "thu mua", "procurement", "đấu thầu", "tender", "sales admin", "c&c"
+    ],
+    "Nội thất": [
+        "nội thất", "interior", "decor", "đồ gỗ", "thi công nội thất", "xưởng nội thất",
+        "giám sát nội thất", "trang trí nội thất", "interior design"
+    ],
+    "Kiến trúc": [
+        "kiến trúc", "architecture", "architect", "thiết kế kiến trúc", "họa viên kiến trúc",
+        "diễn họa", "quy hoạch"
     ],
     "Thiết kế / Kiến trúc": [
         "thiết kế", "kiến trúc", "architecture", "interior", "design", "cad", "bim",
@@ -115,7 +130,7 @@ def _match_career(candidate: dict, career_names: Iterable[str]) -> Career | None
         for keyword in _CAREER_KEYWORDS.get(career.name, []):
             if keyword in candidate_text:
                 return career
-    return careers[0]
+    return None
 
 
 def _match_city(candidate: dict) -> City | None:
@@ -521,6 +536,10 @@ def persist_vieclam24h_candidates(
             continue
 
         career = target_career or _match_career(candidate, career_names)
+        if not career:
+            result.skipped_count += 1
+            continue
+
         target_location = _resolve_import_location(target_city, target_district)
         location = target_location or _match_location(candidate)
         city = location.city if location else _match_city(candidate)

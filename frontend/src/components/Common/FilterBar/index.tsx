@@ -31,23 +31,27 @@ const toSxArray = (sx?: SxProps<Theme>): SxArrayItem[] => {
 
 export const filterControlSx = {
   '& .MuiOutlinedInput-root': {
-    minHeight: 42,
+    minHeight: 40,
     borderRadius: '8px',
-    backgroundColor: 'background.paper',
-    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.72)',
-    transition: 'border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease',
+    backgroundColor: '#FFFFFF',
+    transition: 'border-color 100ms ease-in-out, box-shadow 100ms ease-in-out',
     '& fieldset': {
-      borderColor: 'rgba(26, 64, 125, 0.14)',
+      borderColor: '#E5E7EB',
     },
     '&:hover fieldset': {
-      borderColor: 'rgba(26, 64, 125, 0.28)',
+      borderColor: '#D1D5DB',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#2563EB',
+      borderWidth: '1px',
     },
     '&.Mui-focused': {
-      boxShadow: '0 0 0 3px rgba(42, 169, 225, 0.14)',
+      boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.12)',
     },
   },
   '& .MuiInputBase-input': {
-    fontWeight: 600,
+    fontWeight: 500,
+    fontSize: '0.875rem',
   },
 } satisfies SxProps<Theme>;
 
@@ -70,6 +74,7 @@ interface FilterBarProps {
   resetDisabled?: boolean;
   actions?: React.ReactNode;
   children?: React.ReactNode;
+  variant?: 'card' | 'flat';
   sx?: SxProps<Theme>;
   contentSx?: SxProps<Theme>;
   searchSx?: SxProps<Theme>;
@@ -94,6 +99,7 @@ const FilterBar = ({
   resetDisabled = false,
   actions,
   children,
+  variant = 'card',
   sx,
   contentSx,
   searchSx,
@@ -103,18 +109,15 @@ const FilterBar = ({
   const hasActiveFilters = Boolean(activeFilterCount && activeFilterCount > 0);
   const rootSx = React.useMemo(() => ([
     (theme: Theme) => ({
-      mb: 3,
-      p: { xs: 1.5, md: 2 },
-      border: '1px solid',
-      borderColor: alpha(theme.palette.primary.main, 0.14),
-      borderRadius: '8px',
-      background: `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.045)} 0%, ${alpha(
-        theme.palette.background.paper,
-        0.94,
-      )} 100%)`,
+      mb: variant === 'flat' ? 0 : 3,
+      p: variant === 'flat' ? 0 : { xs: 1.5, md: 2 },
+      border: variant === 'flat' ? 'none' : '1px solid #E5E7EB',
+      borderRadius: variant === 'flat' ? 0 : '14px',
+      backgroundColor: variant === 'flat' ? 'transparent' : '#FFFFFF',
+      boxShadow: variant === 'flat' ? 'none' : '0px 1px 3px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px -1px rgba(0, 0, 0, 0.04)',
     }),
     ...toSxArray(sx),
-  ] as SxProps<Theme>), [sx]);
+  ] as SxProps<Theme>), [sx, variant]);
   const searchFieldSx = React.useMemo(() => ([
     {
       width: { xs: '100%', lg: 360 },

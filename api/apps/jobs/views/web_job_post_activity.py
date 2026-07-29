@@ -448,6 +448,7 @@ class EmployerJobPostActivityViewSet(
             queryset,
             many=True,
             fields=[
+                "id",
                 "title",
                 "fullName",
                 "email",

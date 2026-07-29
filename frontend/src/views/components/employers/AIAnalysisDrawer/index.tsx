@@ -244,22 +244,29 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
 
   React.useEffect(() => {
     if (!open || !activityId) return;
+    let isMounted = true;
 
     const fetchDetail = async () => {
       dispatch({ type: 'set-loading', value: true });
       try {
         const res = await jobPostActivityService.getJobPostActivityDetail(activityId);
+        if (!isMounted) return;
         const nextData = res ? toAIAnalysisData(res) : null;
         dispatch({ type: 'set-data', value: nextData });
         syncActivityPatch(toJobPostActivityPatch(nextData));
       } catch {
         // keep current data
       } finally {
-        dispatch({ type: 'set-loading', value: false });
+        if (isMounted) {
+          dispatch({ type: 'set-loading', value: false });
+        }
       }
     };
 
     fetchDetail();
+    return () => {
+      isMounted = false;
+    };
   }, [open, activityId, syncActivityPatch]);
 
   React.useEffect(() => {

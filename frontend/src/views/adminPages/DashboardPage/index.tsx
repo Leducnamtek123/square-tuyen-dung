@@ -68,31 +68,23 @@ const percent = (value: number, total: number) => {
     return Math.round((value / total) * 100);
 };
 
-const DashboardPanel = ({ title, children, accentColor = chartColors.navy, action }: DashboardPanelProps) => (
+const DashboardPanel = ({ title, children, accentColor = '#2563EB', action }: DashboardPanelProps) => (
     <Paper
         elevation={0}
         sx={{
             height: '100%',
             p: { xs: 2, sm: 2.5 },
-            borderRadius: 2,
-            border: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-            boxShadow: '0 14px 34px rgba(15, 57, 127, 0.06)',
+            borderRadius: '14px',
+            border: '1px solid #E5E7EB',
+            bgcolor: '#FFFFFF',
+            boxShadow: '0px 1px 3px 0px rgba(0, 0, 0, 0.04)',
             overflow: 'hidden',
             position: 'relative',
-            '&::before': {
-                content: '""',
-                position: 'absolute',
-                inset: '0 0 auto 0',
-                height: 3,
-                backgroundColor: accentColor,
-            },
         }}
     >
         <Stack spacing={2} sx={{ height: '100%' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 850, letterSpacing: 0, lineHeight: 1.3 }}>
+                <Typography variant="h3" sx={{ fontSize: '1.125rem', fontWeight: 600, color: '#111827' }}>
                     {title}
                 </Typography>
                 {action}

@@ -85,21 +85,28 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
   );
 
   React.useEffect(() => {
+    let isMounted = true;
     const loadExperiencesDetail = async (slug: string | undefined) => {
       if (!slug) return;
 
       dispatch({ type: 'set_loading', payload: true });
       try {
         const resData = await resumeService.getExperiencesDetail(slug);
+        if (!isMounted) return;
         setExperiencesDetail(resData);
       } catch (error: unknown) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       } finally {
-        dispatch({ type: 'set_loading', payload: false });
+        if (isMounted) {
+          dispatch({ type: 'set_loading', payload: false });
+        }
       }
     };
 
     loadExperiencesDetail(resumeSlug);
+    return () => {
+      isMounted = false;
+    };
   }, [resumeSlug, uiState.refreshToken]);
 
   const handleShowUpdate = (id: string | number) => {

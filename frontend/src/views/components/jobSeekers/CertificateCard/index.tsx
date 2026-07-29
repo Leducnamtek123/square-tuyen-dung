@@ -128,6 +128,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
   }, [state.editData]);
 
   React.useEffect(() => {
+    let isMounted = true;
     const loadCertificates = async (slug: string | undefined) => {
       if (!slug) return;
 
@@ -135,15 +136,21 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       try {
         const resData = await resumeService.getCertificates(slug);
+        if (!isMounted) return;
         dispatch({ type: 'set-certificates', value: resData });
       } catch (error: unknown) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       } finally {
-        dispatch({ type: 'set-loading', value: false });
+        if (isMounted) {
+          dispatch({ type: 'set-loading', value: false });
+        }
       }
     };
 
     loadCertificates(resumeSlug);
+    return () => {
+      isMounted = false;
+    };
   }, [resumeSlug, state.isSuccess]);
 
   const handleShowUpdate = (id: string | number) => {

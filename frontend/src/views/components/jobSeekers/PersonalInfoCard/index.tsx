@@ -127,19 +127,26 @@ const PersonalInfoCard = ({ title, sx }: PersonalInfoCardProps) => {
   const [profile, setProfile] = React.useState<EnhancedJobSeekerProfile | null>(null);
 
   React.useEffect(() => {
+    let isMounted = true;
     const getProfile = async () => {
       dispatch({ type: 'set_loading_profile', payload: true });
       try {
         const resData = await jobSeekerProfileService.getProfile();
+        if (!isMounted) return;
         setProfile(resData as EnhancedJobSeekerProfile);
       } catch (error: unknown) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       } finally {
-        dispatch({ type: 'set_loading_profile', payload: false });
+        if (isMounted) {
+          dispatch({ type: 'set_loading_profile', payload: false });
+        }
       }
     };
 
     getProfile();
+    return () => {
+      isMounted = false;
+    };
   }, [uiState.refreshToken]);
 
   const handleUpdateProfile = async (data: PersonalProfileFormValues) => {

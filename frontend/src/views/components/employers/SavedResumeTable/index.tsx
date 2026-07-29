@@ -18,7 +18,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import type { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
+import type { ColumnDef, PaginationState, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
 import { localizeRoutePath } from '../../../../configs/routeLocalization';
@@ -41,6 +41,10 @@ interface SavedResumeTableProps {
   onPaginationChange: OnChangeFn<PaginationState>;
   sorting: SortingState;
   onSortingChange: OnChangeFn<SortingState>;
+  enableRowSelection?: boolean;
+  rowSelection?: RowSelectionState;
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
+  variant?: 'card' | 'flat';
 }
 
 const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
@@ -54,7 +58,11 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
     pagination,
     onPaginationChange,
     sorting,
-    onSortingChange
+    onSortingChange,
+    enableRowSelection = false,
+    rowSelection,
+    onRowSelectionChange,
+    variant = 'card',
   } = props;
   const { allConfig } = useConfig();
 
@@ -227,6 +235,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
 
   return (
     <DataTable
+      variant={variant}
       columns={columns}
       data={rows}
       isLoading={isLoading}
@@ -236,6 +245,9 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
       enableSorting
       sorting={sorting}
       onSortingChange={onSortingChange}
+      enableRowSelection={enableRowSelection}
+      rowSelection={rowSelection}
+      onRowSelectionChange={onRowSelectionChange}
       emptyMessage={t('employer:savedResumeTable.title.youhaventsavedanycandidatesyet')}
     />
   );

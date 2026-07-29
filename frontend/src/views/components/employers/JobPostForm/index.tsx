@@ -102,9 +102,11 @@ const JobPostFormContent = ({
   const prevCityIdRef = useRef<number | string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     const loadDistricts = async (id: number | string) => {
       try {
         const resData = await commonService.getDistrictsByCityId(id);
+        if (!isMounted) return;
         const results = (Array.isArray(resData?.data) ? resData.data : []).map((district) => ({
           id: district.id,
           name: district.name,
@@ -116,7 +118,7 @@ const JobPostFormContent = ({
         dispatch({ type: 'setDistrictOptions', value: results });
         prevCityIdRef.current = id;
       } catch (error) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       }
     };
 
@@ -128,16 +130,22 @@ const JobPostFormContent = ({
       dispatch({ type: 'setDistrictOptions', value: [] });
       prevCityIdRef.current = null;
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [cityId, setValue]);
 
   useEffect(() => {
+    let isMounted = true;
     const loadLocation = async (input: string) => {
       if (!input || input.trim().length < 3) {
-        dispatch({ type: 'setLocationOptions', value: [] });
+        if (isMounted) dispatch({ type: 'setLocationOptions', value: [] });
         return;
       }
       try {
         const resData = await goongService.getPlaces(input);
+        if (!isMounted) return;
         const predictions = Array.isArray(resData?.predictions) ? resData.predictions : [];
         dispatch({
           type: 'setLocationOptions',
@@ -152,6 +160,9 @@ const JobPostFormContent = ({
       }
     };
     void loadLocation(addressDebounce);
+    return () => {
+      isMounted = false;
+    };
   }, [addressDebounce]);
 
   const handleSelectLocation = async (_e: React.SyntheticEvent, value: PlaceOption | null) => {

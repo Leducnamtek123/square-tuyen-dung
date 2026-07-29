@@ -48,8 +48,8 @@ const LanguageSection: React.FC<LanguageSectionProps> = ({ profileDetail }) => {
                 }}
             >
                 <Stack spacing={4}>
-                    {(profileDetail.languageDetails || []).map((value, index: number) => (
-                        <Box key={value.id || index}>
+                    {(profileDetail.languageDetails || []).map((value, itemIdx: number) => (
+                        <Box key={value.id || value.languageName || `lang-item-${itemIdx}`}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                                 <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main' }}>
                                     {value?.languageName}
@@ -85,7 +85,7 @@ const LanguageSection: React.FC<LanguageSectionProps> = ({ profileDetail }) => {
                                 }} 
                             />
                             
-                            {index < (profileDetail.languageDetails?.length || 0) - 1 && (
+                            {itemIdx < (profileDetail.languageDetails?.length || 0) - 1 && (
                                 <Divider sx={{ mt: 4, borderStyle: 'dashed', borderColor: pc.divider( 0.8) }} />
                             )}
                         </Box>

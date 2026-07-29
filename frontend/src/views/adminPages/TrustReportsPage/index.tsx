@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import {
   Box,
   Chip,
@@ -73,10 +73,10 @@ const TrustReportsPage = () => {
   const totalRows = data?.count || 0;
   const emptyValue = t('common.na');
 
-  const getStatusLabel = (status: TrustReport['status']) => {
+  const getStatusLabel = useCallback((status: string) => {
     switch (status) {
-      case 'reviewing':
-        return t('pages.trustReports.status.reviewing');
+      case 'in_review':
+        return t('pages.trustReports.status.in_review');
       case 'resolved':
         return t('pages.trustReports.status.resolved');
       case 'rejected':
@@ -85,7 +85,7 @@ const TrustReportsPage = () => {
       default:
         return t('pages.trustReports.status.open');
     }
-  };
+  }, [t]);
 
   const activeFilterCount = [
     Boolean(searchTerm.trim()),

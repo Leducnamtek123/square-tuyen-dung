@@ -51,8 +51,8 @@ const EducationSection: React.FC<EducationSectionProps> = ({ profileDetail }) =>
                 }}
             >
                 <Stack spacing={4}>
-                    {(profileDetail.educationDetails || []).map((value, index: number) => (
-                        <Box key={value.id || index}>
+                    {(profileDetail.educationDetails || []).map((value, itemIdx: number) => (
+                        <Box key={value.id || value.degreeName || `edu-item-${itemIdx}`}>
                             <Stack spacing={2}>
                                 <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', lineHeight: 1.3 }}>
                                     {value?.degreeName} - {t('profileDetailCard.label.major')}: {value?.major}
@@ -79,7 +79,7 @@ const EducationSection: React.FC<EducationSectionProps> = ({ profileDetail }) =>
                                     </Stack>
                                 </Stack>
                             </Stack>
-                            {index < (profileDetail.educationDetails?.length || 0) - 1 && (
+                            {itemIdx < (profileDetail.educationDetails?.length || 0) - 1 && (
                                 <Divider sx={{ mt: 4, borderStyle: 'dashed', borderColor: pc.divider( 0.8) }} />
                             )}
                         </Box>

@@ -233,6 +233,17 @@ const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderD
     [careersSource, topCareers, customCareers]
   );
 
+  const [headerHeight, setHeaderHeight] = React.useState<number | undefined>(undefined);
+
+  React.useEffect(() => {
+    if (open) {
+      const el = document.getElementById('common-header');
+      if (el) {
+        setHeaderHeight(el.clientHeight);
+      }
+    }
+  }, [open]);
+
   return (
     <Dialog
       hideBackdrop={true}
@@ -242,9 +253,7 @@ const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderD
       slotProps={{
         paper: {
           sx: {
-            top: typeof window === 'undefined'
-              ? undefined
-              : window.document.getElementById('common-header')?.clientHeight,
+            top: headerHeight,
             position: 'absolute',
           },
         }

@@ -92,7 +92,7 @@
   },
   "sidebar": {
     "systemOverview": "Tổng quan",
-    "agentAssistants": "Agent Assistants",
+    "agentAssistants": "AILA",
     "systemAndUsers": "Người dùng & HT",
     "usersAndPermissions": "Phân quyền",
     "systemConfiguration": "Cấu hình hệ thống",
@@ -125,7 +125,7 @@
     "chatWithEmployers": "Kết nối với nhà tuyển dụng",
     "voiceProfiles": "Hồ sơ giọng nói AI",
     "interviewPreview": "Xem trước giao diện phỏng vấn",
-    "squareHrmAdmin": "Mở InfoHR HRM"
+    "squareHrmAdmin": "Mở HRM"
   },
   "aiHealth": {
     "title": "Dịch vụ AI",

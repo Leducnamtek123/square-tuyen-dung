@@ -1,8 +1,8 @@
 import AgentAssistantPage from '@/views/agentAssistantPage';
 
 export const metadata = {
-  title: 'Agent Assistants',
-  description: 'Internal admin agent assistants.',
+  title: 'AILA',
+  description: 'InfoHR AILA AI Assistant.',
 };
 
 export default function Page() {

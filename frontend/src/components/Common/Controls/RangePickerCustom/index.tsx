@@ -1,13 +1,11 @@
 'use client';
 
 import React from 'react';
-
-import { Box, Button, IconButton, Stack } from "@mui/material";
-
+import { Box, Button, Chip, IconButton, Paper, Stack, Tooltip, Typography } from "@mui/material";
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
-
+import EastIcon from '@mui/icons-material/East';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-
 import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +26,6 @@ const RangePickerCustom = ({
   maxRangeMonths = 1,
   resetRangeMonths = maxRangeMonths,
 }: Props) => {
-
   const { t } = useTranslation('common');
 
   const getMaxEndDate = React.useCallback((startValue: Dayjs | null) => {
@@ -56,109 +53,160 @@ const RangePickerCustom = ({
   };
 
   const refreshFilter = () => {
-
     setSelectedDateRange([dayjs().subtract(resetRangeMonths, 'month'), dayjs()]);
-
     setAllowSubmit(!allowSubmit);
-
   };
 
   const startValue = selectedDateRange?.[0] || null;
-
   const endValue = selectedDateRange?.[1] || null;
 
   const maxEndDate = React.useMemo(() => {
-
     if (!startValue) return dayjs();
-
     return getMaxEndDate(startValue);
-
   }, [getMaxEndDate, startValue]);
 
+  const handlePresetSelect = (months: number) => {
+    setSelectedDateRange([dayjs().subtract(months, 'month'), dayjs()]);
+    setAllowSubmit(!allowSubmit);
+  };
+
   return (
+    <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
+      <Paper
+        elevation={0}
+        sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          px: 1.5,
+          py: 0.25,
+          borderRadius: '10px',
+          border: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          transition: 'border-color 150ms ease, box-shadow 150ms ease',
+          '&:hover': {
+            borderColor: 'primary.main',
+          },
+          '&:focus-within': {
+            borderColor: 'primary.main',
+            boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.12)',
+          },
+        }}
+      >
+        <CalendarMonthOutlinedIcon sx={{ fontSize: 18, color: 'primary.main', mr: 1 }} />
+        
+        <DatePicker
+          value={startValue}
+          onChange={(newValue) => handleDateRangeChange(newValue, endValue)}
+          format="DD/MM/YYYY"
+          maxDate={dayjs()}
+          slotProps={{
+            textField: {
+              size: 'small',
+              placeholder: 'Từ ngày',
+              sx: {
+                width: 105,
+                '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                '& .MuiOutlinedInput-root': {
+                  p: 0,
+                  bgcolor: 'transparent',
+                },
+                '& .MuiInputBase-input': {
+                  p: '4px 0',
+                  fontSize: '0.8125rem',
+                  fontWeight: 700,
+                  color: 'text.primary',
+                },
+              },
+            },
+          }}
+        />
 
-    <>
+        <EastIcon sx={{ fontSize: 14, color: 'text.disabled', mx: 0.75 }} />
 
-      <Stack direction="row" spacing={1} alignItems="center">
+        <DatePicker
+          value={endValue}
+          onChange={(newValue) => handleDateRangeChange(startValue, newValue)}
+          format="DD/MM/YYYY"
+          minDate={startValue || undefined}
+          maxDate={maxEndDate}
+          slotProps={{
+            textField: {
+              size: 'small',
+              placeholder: 'Đến ngày',
+              sx: {
+                width: 105,
+                '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                '& .MuiOutlinedInput-root': {
+                  p: 0,
+                  bgcolor: 'transparent',
+                },
+                '& .MuiInputBase-input': {
+                  p: '4px 0',
+                  fontSize: '0.8125rem',
+                  fontWeight: 700,
+                  color: 'text.primary',
+                },
+              },
+            },
+          }}
+        />
+      </Paper>
 
-        <Box width={160}>
-
-          <DatePicker
-
-            value={startValue}
-
-            onChange={(newValue) => {
-
-              handleDateRangeChange(newValue, endValue);
-
-            }}
-
-            format="DD/MM/YYYY"
-
-            maxDate={dayjs()}
-
-            slotProps={{ textField: { size: 'small' } }}
-
-          />
-
-        </Box>
-
-        <Box width={160}>
-
-          <DatePicker
-
-            value={endValue}
-
-            onChange={(newValue) => handleDateRangeChange(startValue, newValue)}
-
-            format="DD/MM/YYYY"
-
-            minDate={startValue || undefined}
-
-            maxDate={maxEndDate}
-
-            slotProps={{ textField: { size: 'small' } }}
-
-          />
-
-        </Box>
-
+      <Stack direction="row" spacing={0.75} alignItems="center">
+        <Chip
+          label="30 ngày"
+          size="small"
+          clickable
+          onClick={() => handlePresetSelect(1)}
+          sx={{ 
+            fontWeight: 700, 
+            fontSize: '0.75rem', 
+            borderRadius: '6px',
+            bgcolor: 'action.hover',
+            '&:hover': { bgcolor: 'primary.extralight', color: 'primary.main' } 
+          }}
+        />
+        <Chip
+          label="90 ngày"
+          size="small"
+          clickable
+          onClick={() => handlePresetSelect(3)}
+          sx={{ 
+            fontWeight: 700, 
+            fontSize: '0.75rem', 
+            borderRadius: '6px',
+            bgcolor: 'action.hover',
+            '&:hover': { bgcolor: 'primary.extralight', color: 'primary.main' }
+          }}
+        />
       </Stack>
 
-      <IconButton aria-label={t('actions.refresh')} size="small" onClick={refreshFilter}>
+      <Tooltip title={t('actions.refresh')} arrow>
+        <IconButton aria-label={t('actions.refresh')} size="small" onClick={refreshFilter}>
+          <RefreshIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
 
-        <RefreshIcon fontSize="small" />
-
-      </IconButton>
-
-      <Box>
-
-        <Button
-
-          size="small"
-
-          variant="contained"
-
-          color="primary"
-
-          style={{ textTransform: 'inherit' }}
-
-          disabled={!selectedDateRange}
-
-          onClick={() => setAllowSubmit(!allowSubmit)}
-
-        >
-
-          {t('actions.apply')}
-
-        </Button>
-
-      </Box>
-
-    </>
-
+      <Button
+        size="small"
+        variant="contained"
+        color="primary"
+        disabled={!selectedDateRange}
+        onClick={() => setAllowSubmit(!allowSubmit)}
+        sx={{
+          textTransform: 'none',
+          fontWeight: 800,
+          borderRadius: '8px',
+          px: 2,
+          py: 0.5,
+          fontSize: '0.8125rem',
+        }}
+      >
+        {t('actions.apply')}
+      </Button>
+    </Stack>
   );
-
 };
 
 export default RangePickerCustom;

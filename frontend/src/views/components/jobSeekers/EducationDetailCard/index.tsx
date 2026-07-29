@@ -110,21 +110,28 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
   const [editData, setEditData] = React.useState<Partial<FormValues> | null>(null);
 
   React.useEffect(() => {
+    let isMounted = true;
     const loadEducationsDetail = async (slug: string | undefined) => {
       if (!slug) return;
 
       dispatch({ type: 'set_loading', payload: true });
       try {
         const resData = await resumeService.getEducationsDetail(slug);
+        if (!isMounted) return;
         setEducationsDetail(resData);
       } catch (error: unknown) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       } finally {
-        dispatch({ type: 'set_loading', payload: false });
+        if (isMounted) {
+          dispatch({ type: 'set_loading', payload: false });
+        }
       }
     };
 
     loadEducationsDetail(resumeSlug);
+    return () => {
+      isMounted = false;
+    };
   }, [resumeSlug, uiState.refreshToken]);
 
   const handleShowUpdate = (id: string | number) => {

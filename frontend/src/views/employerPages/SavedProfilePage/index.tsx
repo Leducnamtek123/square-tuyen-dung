@@ -8,11 +8,7 @@ const SavedProfilePage = () => {
   const { t } = useTranslation('employer');
   TabTitle(t('savedResume.title'));
 
-  return (
-    <Card sx={{ p: 3 }}>
-      <SavedResumeCard title={t('savedResume.title')}/>
-    </Card>
-  );
+  return <SavedResumeCard title={t('savedResume.title')} />;
 };
 
 export default SavedProfilePage;

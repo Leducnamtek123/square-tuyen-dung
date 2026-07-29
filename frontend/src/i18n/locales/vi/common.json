@@ -914,19 +914,19 @@
     "recordingWaiting": "Buổi phỏng vấn đã kết thúc, hệ thống đang chờ video ghi hình đồng bộ về để hiển thị tại đây."
   },
   "agentAssistant": {
-    "title": "Agent Assistants",
+    "title": "AILA",
     "recents": "Gần đây",
     "newChat": "Đoạn chat mới",
     "ready": "Sẵn sàng",
-    "empty": "Agent đang sẵn sàng",
-    "placeholder": "Nhắn cho agent...",
+    "empty": "AILA đang sẵn sàng",
+    "placeholder": "Nhắn cho AILA...",
     "send": "Gửi",
     "deleteHistory": "Xóa lịch sử chat",
     "deleteCurrentHistory": "Xóa lịch sử chat đang mở",
     "deleteError": "Không thể xóa lịch sử chat này. Vui lòng thử lại.",
-    "loadError": "Không thể tải Agent Assistants. Vui lòng thử lại.",
-    "sendError": "Agent chưa chạy được yêu cầu này. Vui lòng kiểm tra nội dung và thử lại.",
-    "thinking": "Agent đang suy nghĩ...",
+    "loadError": "Không thể tải AILA. Vui lòng thử lại.",
+    "sendError": "AILA chưa xử lý được yêu cầu này. Vui lòng kiểm tra nội dung và thử lại.",
+    "thinking": "AILA đang suy nghĩ...",
     "attachments": {
       "addImage": "Đính kèm ảnh",
       "remove": "Xóa ảnh",
@@ -937,8 +937,8 @@
       "readError": "Không thể đọc ảnh này. Vui lòng thử ảnh khác."
     },
     "portals": {
-      "admin": "InfoHR Admin",
-      "employer": "InfoHR Employer"
+      "admin": "Trang quản trị (Admin)",
+      "employer": "Kênh nhà tuyển dụng"
     },
     "threadGroups": {
       "today": "Hôm nay",

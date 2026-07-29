@@ -83,22 +83,29 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
   const [state, uiDispatch] = React.useReducer(reducer, initialState);
 
   React.useEffect(() => {
+    let isMounted = true;
     const getOnlineProfile = async (jobSeekerProfileId: string | number | undefined, params: JobSeekerProfileResumeParams) => {
       if (!jobSeekerProfileId) return;
       uiDispatch({ type: 'set_loading_resumes', payload: true });
       try {
         const resData = (await jobSeekerProfileService.getResumes(jobSeekerProfileId, params)) as PaginatedResponse<Resume>;
+        if (!isMounted) return;
         uiDispatch({ type: 'set_resumes', payload: resData?.results || [] });
       } catch (error: unknown) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       } finally {
-        uiDispatch({ type: 'set_loading_resumes', payload: false });
+        if (isMounted) {
+          uiDispatch({ type: 'set_loading_resumes', payload: false });
+        }
       }
     };
 
     getOnlineProfile(currentUser?.jobSeekerProfile?.id ?? currentUser?.jobSeekerProfileId ?? undefined, {
       resumeType: CV_TYPES.cvUpload,
     });
+    return () => {
+      isMounted = false;
+    };
   }, [currentUser, reloadCounter, state.isSuccess]);
 
   const handleAdd = (data: ProfileUploadFormValues) => {

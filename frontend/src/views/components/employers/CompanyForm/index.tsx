@@ -153,13 +153,15 @@ const CompanyFormContent = ({
   }, [cityId, setValue]);
 
   useEffect(() => {
+    let isMounted = true;
     const loadLocation = async (input: string) => {
       if (!input || input.trim().length < 3) {
-        setLocalLocationOptions([]);
+        if (isMounted) setLocalLocationOptions([]);
         return;
       }
       try {
         const resData = await goongService.getPlaces(input);
+        if (!isMounted) return;
         const predictions = Array.isArray(resData.predictions) ? resData.predictions : [];
         const mappedOptions: PlaceOption[] = predictions.map((prediction: PlacePrediction) => ({
           id: prediction.place_id,
@@ -172,6 +174,9 @@ const CompanyFormContent = ({
       }
     };
     void loadLocation(addressDebounce);
+    return () => {
+      isMounted = false;
+    };
   }, [addressDebounce]);
 
   const handleSelectLocation = async (_e: React.SyntheticEvent, value: string | SelectOption | null) => {

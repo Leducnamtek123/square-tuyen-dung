@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useQuery } from '@tanstack/react-query';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, RowSelectionState } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import DataTable from '@/components/Common/DataTable';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
@@ -25,6 +25,7 @@ import dayjs from '@/configs/dayjs-config';
 import { useDataTable, useDebounce } from '@/hooks';
 import adminManagementService from '@/services/adminManagementService';
 import type { AuditLog } from '@/types/models';
+import { ExportModal, type ExportColumn, type ExportScope } from '@/components/Common/ExportModal';
 
 type AuditLogPageState = {
   searchTerm: string;
@@ -37,10 +38,35 @@ type AuditLogPageState = {
 };
 
 type AuditLogPageAction =
+  | { type: 'set_field'; field: Exclude<keyof AuditLogPageState, 'searchTerm' | 'action'>; value: string }
   | { type: 'set_search_term'; value: string }
   | { type: 'set_action'; value: string }
-  | { type: 'set_field'; field: Exclude<keyof AuditLogPageState, 'searchTerm' | 'action'>; value: string }
   | { type: 'reset' };
+
+const initialState: AuditLogPageState = {
+  searchTerm: '',
+  action: '',
+  actorEmail: '',
+  resourceType: '',
+  resourceId: '',
+  dateFrom: '',
+  dateTo: '',
+};
+
+function reducer(state: AuditLogPageState, action: AuditLogPageAction): AuditLogPageState {
+  switch (action.type) {
+    case 'set_field':
+      return { ...state, [action.field]: action.value };
+    case 'set_search_term':
+      return { ...state, searchTerm: action.value };
+    case 'set_action':
+      return { ...state, action: action.value };
+    case 'reset':
+      return initialState;
+    default:
+      return state;
+  }
+}
 
 const actions = ['create', 'update', 'delete', 'approve', 'reject', 'status_change', 'bulk_status', 'agent_access', 'export'];
 
@@ -53,25 +79,11 @@ const actionColor = (action: string): 'default' | 'primary' | 'success' | 'warni
   return 'default';
 };
 
-const makeExportFilename = () => {
-  const stamp = dayjs().format('YYYYMMDD-HHmmss');
-  return `audit-logs-${stamp}.csv`;
-};
-
-const downloadBlob = (blob: Blob, filename: string) => {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-};
-
 export default function AuditLogsPage() {
   const { t } = useTranslation('admin');
-  const [isExporting, setIsExporting] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const debouncedSearch = useDebounce(state.searchTerm, 500);
+
   const {
     page,
     pageSize: rowsPerPage,
@@ -80,27 +92,13 @@ export default function AuditLogsPage() {
     ordering,
     pagination,
     onPaginationChange,
-  } = useDataTable({ initialPageSize: 10 });
+  } = useDataTable({
+    initialSorting: [{ id: 'createAt', desc: true }],
+    initialPageSize: 10,
+  });
 
-  const [state, dispatch] = useReducer(
-    (current: AuditLogPageState, action: AuditLogPageAction): AuditLogPageState => {
-      switch (action.type) {
-        case 'set_search_term':
-          return { ...current, searchTerm: action.value };
-        case 'set_action':
-          return { ...current, action: action.value };
-        case 'set_field':
-          return { ...current, [action.field]: action.value };
-        case 'reset':
-          return { searchTerm: '', action: '', actorEmail: '', resourceType: '', resourceId: '', dateFrom: '', dateTo: '' };
-        default:
-          return current;
-      }
-    },
-    { searchTerm: '', action: '', actorEmail: '', resourceType: '', resourceId: '', dateFrom: '', dateTo: '' }
-  );
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const debouncedSearch = useDebounce(state.searchTerm, 500);
   const activeFilterCount = [
     state.action,
     state.actorEmail,
@@ -147,21 +145,42 @@ export default function AuditLogsPage() {
     onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
   };
 
-  const handleExport = async () => {
-    if (isExporting) return;
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
-    setIsExporting(true);
-    try {
-      const blob = await adminManagementService.exportAuditLogs({
-        ...queryParams,
-        page: undefined,
-        pageSize: undefined,
-      });
-      downloadBlob(blob, makeExportFilename());
-    } finally {
-      setIsExporting(false);
+  const auditLogExportColumns: ExportColumn[] = useMemo(() => [
+    { id: 'id', label: 'ID', checked: true, getValue: (row) => row.id || row.ID || '---' },
+    {
+      id: 'createAt',
+      label: t('pages.auditLogs.table.time', 'Thời gian'),
+      checked: true,
+      getValue: (row) => (row.createAt ? dayjs(row.createAt).format('DD/MM/YYYY HH:mm:ss') : '---'),
+    },
+    { id: 'action', label: t('pages.auditLogs.table.action', 'Hành động'), checked: true, getValue: (row) => row.action || '---' },
+    { id: 'actorEmail', label: t('pages.auditLogs.table.actor', 'Người thực hiện'), checked: true, getValue: (row) => row.actorEmail || 'system' },
+    { id: 'resourceType', label: t('pages.auditLogs.table.resource', 'Tài nguyên'), checked: true, getValue: (row) => row.resourceType || '---' },
+    { id: 'resourceId', label: 'Resource ID', checked: true, getValue: (row) => row.resourceId || '---' },
+    { id: 'requestMethod', label: 'HTTP Method', checked: true, getValue: (row) => row.requestMethod || '---' },
+    { id: 'requestPath', label: 'Request Path', checked: true, getValue: (row) => row.requestPath || '---' },
+  ], [t]);
+
+  const handleFetchAuditLogExportData = React.useCallback(async (scope: ExportScope) => {
+    const params = scope === 'all' ? {} : queryParams;
+    const res = await adminManagementService.getAuditLogs({
+      ...params,
+      page: 1,
+      pageSize: scope === 'all' ? 1000 : 100,
+    });
+    const exportList = (res.results || []) as Record<string, any>[];
+    if (scope === 'selected') {
+      const selectedIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
+      if (selectedIds.length === 0) return [];
+      const filtered = exportList.filter((item) => selectedIds.includes(String(item.id ?? item.ID ?? '')));
+      if (filtered.length > 0) return filtered;
+      const currentList = data?.results || [];
+      return currentList.filter((item: any) => selectedIds.includes(String(item.id)));
     }
-  };
+    return exportList;
+  }, [queryParams, rowSelection, data?.results]);
 
   const columns = useMemo<ColumnDef<AuditLog>[]>(
     () => [
@@ -232,10 +251,13 @@ export default function AuditLogsPage() {
   );
 
   return (
-    <Box>
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, letterSpacing: '-0.02em', mb: 0.5 }}>
           {t('pages.auditLogs.title')}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {t('pages.auditLogs.subtitle')}
         </Typography>
       </Box>
 
@@ -254,8 +276,8 @@ export default function AuditLogsPage() {
           activeFilterCount={activeFilterCount}
           advancedLabel={t('common.advancedFilters')}
           actions={
-            <Button variant="outlined" startIcon={<DownloadIcon />} onClick={handleExport} disabled={isLoading || isExporting}>
-              {isExporting ? t('pages.auditLogs.exportingCsv') : t('pages.auditLogs.exportCsv')}
+            <Button variant="outlined" startIcon={<DownloadIcon />} onClick={() => setExportModalOpen(true)} disabled={isLoading}>
+              {t('pages.auditLogs.exportCsv')}
             </Button>
           }
           advancedFilters={
@@ -302,22 +324,22 @@ export default function AuditLogsPage() {
             </Stack>
           }
         >
-            <FormControl size="small" sx={{ minWidth: 180 }}>
-              <InputLabel id="audit-action-filter-label">{t('pages.auditLogs.filter.action')}</InputLabel>
-              <Select
-                labelId="audit-action-filter-label"
-                value={state.action}
-                label={t('pages.auditLogs.filter.action')}
-                onChange={(event) => handleActionChange(event.target.value)}
-              >
-                <MenuItem value="">{t('pages.auditLogs.filter.allActions')}</MenuItem>
-                {actions.map((action) => (
-                  <MenuItem key={action} value={action}>
-                    {t(`pages.auditLogs.actions.${action}`, action)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+          <FormControl size="small" sx={{ minWidth: 180 }}>
+            <InputLabel id="audit-action-filter-label">{t('pages.auditLogs.filter.action')}</InputLabel>
+            <Select
+              labelId="audit-action-filter-label"
+              value={state.action}
+              label={t('pages.auditLogs.filter.action')}
+              onChange={(event) => handleActionChange(event.target.value)}
+            >
+              <MenuItem value="">{t('pages.auditLogs.filter.allActions')}</MenuItem>
+              {actions.map((action) => (
+                <MenuItem key={action} value={action}>
+                  {t(`pages.auditLogs.actions.${action}`, action)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </FilterBar>
 
         <DataTable
@@ -330,8 +352,24 @@ export default function AuditLogsPage() {
           enableSorting
           sorting={sorting}
           onSortingChange={onSortingChange}
+          enableRowSelection
+          rowSelection={rowSelection}
+          onRowSelectionChange={setRowSelection}
         />
       </Paper>
+
+      <ExportModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        defaultFileName="AuditLogs"
+        columns={auditLogExportColumns}
+        fetchData={handleFetchAuditLogExportData}
+        totalRecords={{
+          all: data?.count || 0,
+          filtered: data?.count || 0,
+          selected: Object.keys(rowSelection).filter((k) => rowSelection[k]).length,
+        }}
+      />
     </Box>
   );
 }

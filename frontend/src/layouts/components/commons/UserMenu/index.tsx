@@ -61,12 +61,18 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
   const openFeedbackAfterMenuCloseRef = React.useRef(false);
   const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
   const canSubmitFeedback = !!currentUser && currentUser.roleName !== ROLES_NAME.ADMIN;
+  const [hostname, setHostname] = React.useState('');
+
+  React.useEffect(() => {
+    setHostname(window.location.hostname);
+  }, []);
+
   const isAdminPortal =
     isAdminPortalPath(pathname) ||
-    (typeof window !== "undefined" && window.location.hostname === HOST_NAME.ADMIN_PROJECT);
+    hostname === HOST_NAME.ADMIN_PROJECT;
   const isEmployerPortal =
     isEmployerPortalPath(pathname) ||
-    (typeof window !== "undefined" && window.location.hostname.startsWith("employer."));
+    hostname.startsWith("employer.");
   const shouldShowAdminPortalLink =
     currentUser?.roleName === ROLES_NAME.ADMIN && !isAdminPortal;
 
@@ -279,7 +285,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
                 handleLogout,
                 t('nav.logoutTitle'),
                 t('nav.logoutConfirm'),
-                "question"
+                "logout"
               );
             }}
           >

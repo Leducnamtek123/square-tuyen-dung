@@ -287,9 +287,9 @@ const ChatBot = () => {
 
           {state.messages.length === 1 && suggestions.length > 0 && (
             <div className="sq-chatbot__suggestions">
-              {suggestions.map((item, idx) => (
+              {suggestions.map((item) => (
                 <button
-                  key={idx}
+                  key={item}
                   type="button"
                   className="sq-chatbot__suggestion-chip"
                   onClick={() => handleSuggestionClick(item)}

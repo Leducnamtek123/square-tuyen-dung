@@ -52,6 +52,10 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
   onOpenReport,
 }) => {
   const { t, i18n } = useTranslation(["public"]);
+  const [currentUrl, setCurrentUrl] = React.useState('');
+  React.useEffect(() => {
+    setCurrentUrl(window.location.href);
+  }, []);
   const employeeSizeLabel = tConfig(allConfig?.employeeSizeDict?.[String(jobPostDetail?.companyDict?.employeeSize)]);
   const companyDetailHref = jobPostDetail?.companyDict?.slug
     ? localizeRoutePath(
@@ -108,7 +112,7 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
             </p>
           </div>
           <div className="hidden sm:block">
-            <QRCodeBox value={(typeof window !== 'undefined' ? window.location.href : '') || "-"} size={75} />
+            <QRCodeBox value={currentUrl || "-"} size={75} />
           </div>
         </div>
 

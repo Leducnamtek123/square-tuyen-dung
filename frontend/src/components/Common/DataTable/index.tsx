@@ -49,6 +49,7 @@ interface Props<TData> {
   enableRowSelection?: boolean;
   rowSelection?: RowSelectionState;
   onRowSelectionChange?: OnChangeFn<RowSelectionState>;
+  getRowId?: (row: TData, relativeIndex: number) => string;
 
   // Deprecated: use rowCount, pagination, and onPaginationChange instead
   count?: number;
@@ -58,6 +59,7 @@ interface Props<TData> {
   onRowsPerPageChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   emptyMessage?: string;
   paginationMode?: 'visible' | 'hidden';
+  variant?: 'card' | 'flat';
 }
 
 type CellAlign = 'left' | 'center' | 'right' | 'justify' | 'inherit';
@@ -76,6 +78,7 @@ const DataTable = <TData,>({
     enableRowSelection = false,
     rowSelection,
     onRowSelectionChange,
+    getRowId,
     count = 0,
     page = 0,
     rowsPerPage = 10,
@@ -83,6 +86,7 @@ const DataTable = <TData,>({
     onRowsPerPageChange,
     emptyMessage,
     paginationMode = 'visible',
+    variant = 'card',
 }: Props<TData>) => {
     const { t } = useTranslation('admin');
     
@@ -149,6 +153,7 @@ const DataTable = <TData,>({
         enableSorting,
         onSortingChange,
         onRowSelectionChange,
+        getRowId: getRowId || ((row: any, index) => String(row?.id ?? row?.slug ?? index)),
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         manualPagination: true,
@@ -160,7 +165,14 @@ const DataTable = <TData,>({
 
     return (
         <Box sx={{ width: '100%' }}>
-            <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
+            <TableContainer
+                component={variant === 'flat' ? Box : Paper}
+                sx={
+                    variant === 'flat'
+                        ? { borderRadius: 0, boxShadow: 'none', border: 'none' }
+                        : { borderRadius: 2, boxShadow: 'none', border: '1px solid', borderColor: 'divider' }
+                }
+            >
                 <Table sx={{ minWidth: 650 }}>
                     <TableHead sx={{ bgcolor: 'grey.50' }}>
                         {table.getHeaderGroups().map((headerGroup) => (

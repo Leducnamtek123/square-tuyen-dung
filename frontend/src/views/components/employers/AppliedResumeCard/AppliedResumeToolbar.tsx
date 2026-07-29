@@ -223,8 +223,9 @@ const AppliedResumeToolbar: React.FC<Props> = ({
       </Stack>
 
       <FilterBar
+        variant="flat"
         title={t('employer:appliedResume.filters')}
-        sx={{ mb: 5 }}
+        sx={{ mb: 0 }}
         activeFilterCount={numbersFilter + quickFilterCount}
         onReset={onResetFilterData}
         resetDisabled={!numbersFilter && !quickFilterCount}

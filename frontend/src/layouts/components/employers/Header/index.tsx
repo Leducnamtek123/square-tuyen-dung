@@ -20,7 +20,7 @@ interface HeaderProps {
   handleDrawerToggle: () => void;
 }
 
-const shellHeaderHeight = { xs: 56, sm: 64 };
+const shellHeaderHeight = 60;
 
 const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
   const { t, i18n } = useTranslation(['common', 'employer', 'admin']);
@@ -43,15 +43,15 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
         elevation={0}
         onClick={handleOpenUserMenu}
         sx={{
-          p: '3px 12px 3px 3px',
-          borderRadius: '30px',
-          backgroundColor: '#f8fafc',
-          border: '1px solid #e2e8f0',
+          p: '4px 12px 4px 4px',
+          borderRadius: '20px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E5E7EB',
           cursor: 'pointer',
-          transition: 'all 0.2s ease-in-out',
+          transition: 'all 100ms ease-in-out',
           '&:hover': {
-            backgroundColor: '#f1f5f9',
-            borderColor: '#cbd5e1',
+            backgroundColor: '#F8FAFC',
+            borderColor: '#D1D5DB',
           },
         }}
       >
@@ -59,16 +59,16 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
           <Avatar
             alt={currentUser?.fullName}
             src={currentUser?.avatarUrl || undefined}
-            sx={{ width: 32, height: 32, fontSize: '0.875rem' }}
+            sx={{ width: 28, height: 28, fontSize: '0.8125rem', bgcolor: '#2563EB', color: '#FFFFFF' }}
           >
             {currentUser?.fullName?.charAt(0)?.toUpperCase()}
           </Avatar>
           <Typography
             variant="subtitle2"
             sx={{
-              color: '#0f172a',
+              color: '#111827',
               fontWeight: 600,
-              fontSize: '0.85rem',
+              fontSize: '0.875rem',
               display: { xs: 'none', sm: 'block' },
             }}
           >
@@ -91,15 +91,16 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
       sx={{
         width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
         ml: { xs: 0, md: `${drawerWidth}px` },
-        transition: 'all 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
-        minHeight: shellHeaderHeight,
+        transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+        height: shellHeaderHeight,
+        minHeight: `${shellHeaderHeight}px !important`,
         backgroundColor: '#ffffff',
-        color: '#1e293b',
-        borderBottom: '1px solid #f1f5f9',
-        boxShadow: '0 2px 10px rgba(15, 23, 42, 0.03)',
+        color: '#111827',
+        borderBottom: '1px solid #E5E7EB',
+        boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
       }}
     >
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ minHeight: shellHeaderHeight, minWidth: 0 }}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ height: shellHeaderHeight, minWidth: 0, px: 1 }}>
         <Toolbar sx={{ minHeight: shellHeaderHeight, minWidth: 0, flex: '1 1 auto' }}>
           <IconButton
             color="inherit"
@@ -141,7 +142,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
                 if (!href || isLast) {
                   return (
                     <Typography
-                      key={`${breadcrumb.namespace}:${breadcrumb.labelKey}:${index}`}
+                      key={breadcrumb.href || `bc-${breadcrumb.namespace}-${breadcrumb.labelKey}`}
                       variant="body2"
                       sx={{
                         maxWidth: { sm: 180, md: 260, lg: 360 },
@@ -159,7 +160,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
 
                 return (
                   <MuiLink
-                    key={`${breadcrumb.namespace}:${breadcrumb.labelKey}:${index}`}
+                    key={breadcrumb.href || `bclink-${breadcrumb.namespace}-${breadcrumb.labelKey}`}
                     component={NextLink}
                     href={href}
                     underline="hover"

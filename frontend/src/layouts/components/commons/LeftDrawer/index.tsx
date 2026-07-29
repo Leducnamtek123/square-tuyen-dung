@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Box, Button, Drawer, Stack, Divider, List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -38,7 +38,7 @@ interface PageItem {
 }
 
 interface LeftDrawerProps {
-  window?: () => Window;
+  windowProp?: () => Window;
   pages: PageItem[];
   mobileOpen: boolean;
   handleDrawerToggle: () => void;
@@ -48,10 +48,11 @@ interface LeftDrawerProps {
 const DRAWER_WIDTH_SM = 260;
 const DRAWER_WIDTH_XS = '80vw';
 
-const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicActions = true }: LeftDrawerProps) => {
+const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPublicActions = true }: LeftDrawerProps) => {
   const { t } = useTranslation('common');
   const dispatch = useDispatch();
   const { push } = useRouter();
+  const pathname = usePathname() || '';
   const { isAuthenticated } = useAppSelector((state) => state.user);
   const [openSubMenus, setOpenSubMenus] = React.useState<Record<string, boolean>>({});
 
@@ -59,8 +60,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
     setOpenSubMenus((prev) => ({ ...prev, [pageId]: !prev[pageId] }));
   };
 
-  const container = window !== undefined ? () => window().document.body : undefined;
-  const pathname = globalThis?.window?.location?.pathname || '';
+  const container = windowProp !== undefined ? () => windowProp().document.body : undefined;
   const isEmployerPortal = isEmployerPortalPath(pathname);
   const loginRoute = isEmployerPortal ? ROUTES.EMPLOYER_AUTH.LOGIN : ROUTES.AUTH.LOGIN;
   const registerRoute = isEmployerPortal ? ROUTES.EMPLOYER_AUTH.REGISTER : ROUTES.AUTH.REGISTER;
@@ -259,14 +259,13 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
               size="medium"
               sx={{
                 textTransform: 'none',
-                
                 fontWeight: 600,
                 '&:hover': {
                   backgroundColor: 'error.main',
                   color: 'white',
                 },
               }}
-              onClick={() => confirmModal(handleLogout, t('nav.logoutTitle'), t('nav.logoutConfirm'), 'question')}
+              onClick={() => confirmModal(handleLogout, t('nav.logoutTitle'), t('nav.logoutConfirm'), 'logout')}
             >
               {t('nav.logout')}
             </Button>
@@ -279,7 +278,6 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
                 size="medium"
                 sx={{
                   textTransform: 'none',
-                  
                   fontSize: '0.85rem',
                 }}
                 onClick={() => {
@@ -296,7 +294,6 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
                 size="medium"
                 sx={{
                   textTransform: 'none',
-                  
                   fontSize: '0.85rem',
                   fontWeight: 600,
                 }}

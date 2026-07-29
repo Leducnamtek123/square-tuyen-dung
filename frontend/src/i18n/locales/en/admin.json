@@ -92,7 +92,7 @@
   },
   "sidebar": {
     "systemOverview": "System Overview",
-    "agentAssistants": "Agent Assistants",
+    "agentAssistants": "AILA",
     "systemAndUsers": "System & Users",
     "usersAndPermissions": "Users & Permissions",
     "systemConfiguration": "System Configuration",
@@ -125,7 +125,7 @@
       "chatWithEmployers": "Chat with Employers",
       "voiceProfiles": "AI Voice Profiles",
       "interviewPreview": "Interview UI Preview",
-      "squareHrmAdmin": "Open InfoHR HRM"
+      "squareHrmAdmin": "Open HRM"
   },
   "aiHealth": {
     "title": "AI services",

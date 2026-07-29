@@ -1,5 +1,6 @@
 'use client';
 import React, { useMemo, useCallback, useReducer } from 'react';
+import dayjs from '@/configs/dayjs-config';
 import { Box, Paper } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -18,7 +19,8 @@ import { useAppliedResumes, useJobPostOptions, useDeleteJobPostActivity, useUpda
 import { useDataTable } from '../../../../hooks';
 import { useConfig } from '@/hooks/useConfig';
 import type { JobPostActivity } from '@/types/models';
-import type { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
+import type { OnChangeFn, PaginationState, SortingState, RowSelectionState } from '@tanstack/react-table';
+import { ExportModal, type ExportColumn, type ExportScope } from '@/components/Common/ExportModal';
 
 import { AppliedResumeFilterData } from '../AppliedResumeFilterForm';
 import AppliedResumeToolbar from './AppliedResumeToolbar';
@@ -143,6 +145,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   const [state, dispatch] = useReducer(reducer, initialState);
   const [employeeSourceActivity, setEmployeeSourceActivity] = React.useState<JobPostActivity | null>(null);
   const [manualCandidatePopupOpen, setManualCandidatePopupOpen] = React.useState(false);
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
   const {
     page,
@@ -249,11 +252,67 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   }, [queryData?.results]);
 
   const handleAnalysisStateChange = useCallback((id: string | number, nextState: Partial<JobPostActivity>) => {
-    setOptimisticAnalysis((prev) => ({
-      ...prev,
-      [String(id)]: nextState,
-    }));
-  }, []);
+    queryClient.setQueryData(['employerAppliedResumes', queryParams], (oldData: any) => {
+      if (!oldData?.results) return oldData;
+      return {
+        ...oldData,
+        results: oldData.results.map((item: JobPostActivity) => {
+          if (String(item.id) !== String(id)) return item;
+          return { ...item, ...nextState };
+        }),
+      };
+    });
+  }, [queryClient, queryParams]);
+
+  const [exportModalOpen, setExportModalOpen] = React.useState(false);
+
+  const appliedResumeExportColumns: ExportColumn[] = useMemo(() => [
+    {
+      id: 'candidateName',
+      label: t('employer:appliedResume.table.candidateName', 'Họ và tên ứng viên'),
+      checked: true,
+      getValue: (row) => row.fullName || row['Họ và tên'] || row.candidateName || row.name || '---',
+    },
+    {
+      id: 'jobTitle',
+      label: t('employer:appliedResume.table.jobTitle', 'Tin tuyển dụng'),
+      checked: true,
+      getValue: (row) => row.jobName || row['Vị trí ứng tuyển'] || row.jobTitle || '---',
+    },
+    {
+      id: 'appliedDate',
+      label: t('employer:appliedResume.table.appliedDate', 'Ngày nộp'),
+      checked: true,
+      getValue: (row) => {
+        const val = row.createAt || row['Ngày ứng tuyển'] || row.appliedDate;
+        return val ? dayjs(val).format('DD/MM/YYYY') : '---';
+      },
+    },
+    {
+      id: 'status',
+      label: t('employer:appliedResume.table.status', 'Trạng thái'),
+      checked: true,
+      getValue: (row) => row.statusApply || row['Kết quả tuyển dụng'] || row.status || '---',
+    },
+    {
+      id: 'phone',
+      label: t('employer:appliedResume.table.phone', 'Số điện thoại'),
+      checked: true,
+      getValue: (row) => row.phone || row['Số điện thoại'] || '---',
+    },
+    {
+      id: 'email',
+      label: t('employer:appliedResume.table.email', 'Email'),
+      checked: true,
+      getValue: (row) => row.email || row.Email || '---',
+    },
+    {
+      id: 'aiScore',
+      label: t('employer:appliedResume.table.aiScore', 'Điểm AI'),
+      checked: true,
+      getValue: (row) => (row.aiAnalysisScore != null ? String(row.aiAnalysisScore) : row.aiScore != null ? String(row.aiScore) : '---'),
+    },
+  ], [t]);
 
   const handleFilter = useCallback((data: AppliedResumeFilterData) => {
     dispatch({ type: 'close_popup' });
@@ -261,17 +320,19 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     onPaginationChange({ pageIndex: 0, pageSize });
   }, [onPaginationChange, pageSize]);
 
-  const handleExport = async () => {
-    dispatch({ type: 'set_processing', payload: true });
-    try {
-      const resData = await jobPostActivityService.exportAppliedResume(queryParams);
-      xlsxUtils.exportToXLSX(resData, 'AppliedProfilesList');
-    } catch (error) {
-      errorHandling(error);
-    } finally {
-      dispatch({ type: 'set_processing', payload: false });
+  const handleFetchAppliedResumeExportData = useCallback(async (scope: ExportScope) => {
+    const params = scope === 'all' ? {} : queryParams;
+    const resData = await jobPostActivityService.exportAppliedResume(params);
+    const exportList = (resData || []) as Record<string, any>[];
+    if (scope === 'selected') {
+      const selectedIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
+      if (selectedIds.length === 0) return [];
+      const filtered = exportList.filter((item) => selectedIds.includes(String(item.id ?? item.ID ?? item.slug ?? '')));
+      if (filtered.length > 0) return filtered;
+      return resumes.filter((r) => selectedIds.includes(String(r.id)));
     }
-  };
+    return exportList;
+  }, [queryParams, rowSelection, resumes]);
 
   const handleCreateManualCandidate = async (data: ManualCandidateFormValues) => {
     await manualCandidateMutation.mutateAsync(buildManualCandidateFormData(data));
@@ -310,16 +371,17 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   }, [onPaginationChange, pageSize]);
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 } }}>
+    <Box sx={{ width: '100%' }}>
       <Paper 
         elevation={0}
         sx={{ 
-          p: { xs: 3, md: 5 }, 
-          borderRadius: 4, 
+          p: { xs: 2.5, md: 3.5 }, 
+          borderRadius: 3, 
           border: '1px solid',
           borderColor: 'divider',
           boxShadow: (theme) => theme.customShadows?.z1,
-          bgcolor: 'background.paper'
+          bgcolor: 'background.paper',
+          overflow: 'hidden'
         }}
       >
         <AppliedResumeToolbar
@@ -358,11 +420,12 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
           onResetFilterData={handleResetFilterData}
           onOpenFilterPopup={() => dispatch({ type: 'open_popup' })}
           onOpenManualCandidatePopup={() => setManualCandidatePopupOpen(true)}
-          onExport={handleExport}
+          onExport={() => setExportModalOpen(true)}
         />
 
         {state.viewMode === 'table' ? (
             <AppliedResumeTable
+              variant="flat"
               rows={resumes}
               isLoading={isLoading}
               rowCount={count}
@@ -375,6 +438,9 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               onCreateEmployee={setEmployeeSourceActivity}
               onAnalysisStateChange={handleAnalysisStateChange}
               blindMode={state.blindMode}
+              enableRowSelection
+              rowSelection={rowSelection}
+              onRowSelectionChange={setRowSelection as OnChangeFn<RowSelectionState>}
             />
         ) : (
           <AppliedResumeKanban
@@ -407,6 +473,19 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
             requireJobPost
           />
         </FormPopup>
+
+        <ExportModal
+          open={exportModalOpen}
+          onClose={() => setExportModalOpen(false)}
+          defaultFileName="DanhSachHoSoUngTuyen"
+          columns={appliedResumeExportColumns}
+          fetchData={handleFetchAppliedResumeExportData}
+          totalRecords={{
+            all: count || 0,
+            filtered: count || 0,
+            selected: Object.keys(rowSelection).filter((k) => rowSelection[k]).length,
+          }}
+        />
 
         {(state.isProcessing || isDeleting || isUpdatingStatus || manualCandidateMutation.isPending) && <BackdropLoading />}
       </Paper>
