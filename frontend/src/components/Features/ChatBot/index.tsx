@@ -126,7 +126,7 @@ const ChatBot = () => {
     });
   }, []);
 
-  const botTitle = serverConfig?.title || botConfig?.CHAT_TITLE || 'InfoHR AI';
+  const botTitle = serverConfig?.title || botConfig?.CHAT_TITLE || 'AILA AI';
   const botSubtitle = serverConfig?.subtitle || (isEmployer ? 'Trợ lý tuyển dụng thông minh' : 'Trợ lý nghề nghiệp thông minh');
 
   const greeting = useMemo(() => {
@@ -240,7 +240,7 @@ const ChatBot = () => {
         onClick={() => dispatch({ type: 'toggle_open' })}
         aria-label={t('chat:chatbot.launcherAria')}
       >
-        <Image src={isEmployer ? CHATBOT_ICONS.EMPLOYER : CHATBOT_ICONS.JOB_SEEKER} alt="InfoHR AI" width={28} height={28} />
+        <Image src={isEmployer ? CHATBOT_ICONS.EMPLOYER : CHATBOT_ICONS.JOB_SEEKER} alt="AILA AI" width={28} height={28} />
         <span className="sq-chatbot__launcher-ring" />
       </button>
 

@@ -48,14 +48,14 @@ const normalizeSettings = (res: Partial<SystemSettingsPayload> = {}): SystemSett
     ttsSpeed: res.ttsSpeed || '0.92',
     interviewQuestionGapSeconds: res.interviewQuestionGapSeconds || '2.0',
     interviewMinimumSilenceSeconds: res.interviewMinimumSilenceSeconds || '1.2',
-    chatbotTitle: res.chatbotTitle || 'InfoHR AI',
+    chatbotTitle: res.chatbotTitle || 'AILA AI',
     chatbotSubtitle: res.chatbotSubtitle || 'Trợ lý tuyển dụng thông minh',
     chatbotEmployerGreeting:
         res.chatbotEmployerGreeting ||
-        'Chào bạn! Tôi là InfoHR AI, trợ lý tuyển dụng của bạn. Tôi có thể giúp gì cho bạn?\n\n**Bạn có thể hỏi tôi về:**\n- Tìm kiếm ứng viên tiềm năng\n- Soạn tin nhắn mời phỏng vấn\n- Gợi ý mô tả công việc\n- Thống kê thị trường tuyển dụng',
+        'Chào bạn! Tôi là AILA AI, trợ lý tuyển dụng của bạn. Tôi có thể giúp gì cho bạn?\n\n**Bạn có thể hỏi tôi về:**\n- Tìm kiếm ứng viên tiềm năng\n- Soạn tin nhắn mời phỏng vấn\n- Gợi ý mô tả công việc\n- Thống kê thị trường tuyển dụng',
     chatbotJobSeekerGreeting:
         res.chatbotJobSeekerGreeting ||
-        'Chào bạn! Tôi là InfoHR AI, trợ lý tư vấn nghề nghiệp của bạn. Tôi có thể giúp gì cho bạn?\n\n**Bạn có thể hỏi tôi về:**\n- Tìm kiếm việc làm phù hợp\n- Soạn và tối ưu hóa CV\n- Mẹo trả lời phỏng vấn ấn tượng\n- Thông tin mức lương thị trường',
+        'Chào bạn! Tôi là AILA AI, trợ lý tư vấn nghề nghiệp của bạn. Tôi có thể giúp gì cho bạn?\n\n**Bạn có thể hỏi tôi về:**\n- Tìm kiếm việc làm phù hợp\n- Soạn và tối ưu hóa CV\n- Mẹo trả lời phỏng vấn ấn tượng\n- Thông tin mức lương thị trường',
     chatbotEmployerSuggestions: res.chatbotEmployerSuggestions || DEFAULT_EMPLOYER_SUGGESTIONS,
     chatbotJobSeekerSuggestions: res.chatbotJobSeekerSuggestions || DEFAULT_JOBSEEKER_SUGGESTIONS,
 });

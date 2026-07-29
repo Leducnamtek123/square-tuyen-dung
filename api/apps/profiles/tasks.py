@@ -119,6 +119,7 @@ def scheduled_vieclam24h_data_lake_ingestion_task():
         return {"status": "unconfigured"}
 
     source_url = "https://ntd.vieclam24h.vn/tim-kiem-ung-vien-nhanh"
+    hcm_city = City.objects.filter(name__icontains="Hồ Chí Minh").first()
     try:
         candidates = collect_vieclam24h_candidates(
             source_url=source_url,
@@ -131,6 +132,7 @@ def scheduled_vieclam24h_data_lake_ingestion_task():
                 candidates=candidates,
                 source_url=source_url,
                 source_account=username,
+                target_city=hcm_city,
             )
             logger.info(
                 "Scheduled Data Lake Ingestion completed: created=%d, updated=%d, skipped=%d",

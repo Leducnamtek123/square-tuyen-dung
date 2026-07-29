@@ -156,7 +156,7 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     viewEmployerNumber = serializers.SerializerMethodField(
         method_name="get_view_number", read_only=True)
     userDict = auth_serializers.UserSerializer(
-        source='user', fields=["id", "fullName"], read_only=True)
+        source='user', fields=["id", "fullName", "avatarUrl"], read_only=True)
     jobSeekerProfileDict = JobSeekerProfileSerializer(source="job_seeker_profile",
                                                       fields=["id", "old"],
                                                       read_only=True)
@@ -185,6 +185,11 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         request = self.context.get('request', None)
         if request and getattr(request, 'method', None) in ["PUT"]:
             fields['file'].required = False
+        if request:
+            user = getattr(request, 'user', None)
+            if user and (getattr(user, 'role_name', None) == 'EMPLOYER' or getattr(user, 'active_company', None) is not None):
+                for f in ['sourcePlatform', 'sourceUrl', 'sourceAccount', 'sourceRef', 'isImported']:
+                    fields.pop(f, None)
         return fields
 
     def validate_file(self, cv_file):
@@ -974,6 +979,16 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         if cv_file:
             return cv_file.public_id
         return None
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        request = self.context.get('request', None)
+        if request:
+            user = getattr(request, 'user', None)
+            if user and (getattr(user, 'role_name', None) == 'EMPLOYER' or getattr(user, 'active_company', None) is not None):
+                for f in ['sourcePlatform', 'sourceUrl', 'sourceAccount', 'sourceRef', 'isImported']:
+                    fields.pop(f, None)
+        return fields
 
     class Meta:
         model = Resume

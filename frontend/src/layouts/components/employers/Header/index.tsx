@@ -58,9 +58,11 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
         <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
           <Avatar
             alt={currentUser?.fullName}
-            src={currentUser?.avatarUrl ?? undefined}
+            src={currentUser?.avatarUrl || undefined}
             sx={{ width: 32, height: 32, fontSize: '0.875rem' }}
-          />
+          >
+            {currentUser?.fullName?.charAt(0)?.toUpperCase()}
+          </Avatar>
           <Typography
             variant="subtitle2"
             sx={{

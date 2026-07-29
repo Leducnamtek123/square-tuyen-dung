@@ -68,7 +68,7 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
         return {
             "fullName": user.full_name,
             "email": user.email,
-            "avatar": user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else var_sys.AVATAR_DEFAULT["AVATAR"],
+            "avatar": user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else None,
             "phone": profile.phone,
             "gender": profile.gender,
             "birthday": profile.birthday,

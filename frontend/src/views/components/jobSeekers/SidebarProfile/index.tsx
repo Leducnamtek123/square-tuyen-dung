@@ -27,16 +27,32 @@ const SidebarProfile = () => {
             },
           }}
         >
-          <MuiImageCustom
-            src={currentUser?.avatarUrl}
-            width="100%"
-            height="100%"
-            sx={{
-              borderRadius: '50%',
-              objectFit: 'cover',
-              border: '2px solid white',
-            }}
-          />
+          {currentUser?.avatarUrl ? (
+            <MuiImageCustom
+              src={currentUser?.avatarUrl}
+              width="100%"
+              height="100%"
+              sx={{
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '2px solid white',
+              }}
+            />
+          ) : (
+            <Avatar
+              sx={{
+                width: '100%',
+                height: '100%',
+                bgcolor: 'primary.main',
+                color: 'common.white',
+                fontSize: '1.75rem',
+                fontWeight: 700,
+                border: '2px solid white',
+              }}
+            >
+              {currentUser?.fullName?.charAt(0)?.toUpperCase()}
+            </Avatar>
+          )}
         </Box>
         <Box flex={1}>
           <Typography variant="caption">{t('account.welcomeBack')}</Typography>

@@ -1515,7 +1515,7 @@ class ChatbotConfigAPIView(APIView):
         )
 
         data = {
-            "title": settings_data.get("chatbotTitle") or "InfoHR AI",
+            "title": settings_data.get("chatbotTitle") or "AILA AI",
             "subtitle": settings_data.get("chatbotSubtitle") or "Trợ lý tuyển dụng thông minh",
             "employerGreeting": settings_data.get("chatbotEmployerGreeting") or "",
             "jobSeekerGreeting": settings_data.get("chatbotJobSeekerGreeting") or "",

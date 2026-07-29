@@ -678,14 +678,14 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
                 "id": None,
                 "fullName": activity.full_name,
                 "email": activity.email,
-                "avatar": var_sys.AVATAR_DEFAULT["AVATAR"],
+                "avatar": None,
                 "phone": activity.phone,
             }
         return {
             "id": user.id,
             "fullName": user.full_name,
             "email": user.email,
-            "avatar": user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else var_sys.AVATAR_DEFAULT["AVATAR"],
+            "avatar": user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else None,
             "phone": activity.phone,
         }
 
@@ -719,7 +719,7 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
                 "id": instance.user_id,
                 "fullName": f"Candidate #{instance.id}",
                 "email": None,
-                "avatar": var_sys.AVATAR_DEFAULT["AVATAR"],
+                "avatar": None,
                 "phone": None,
             }
         return representation

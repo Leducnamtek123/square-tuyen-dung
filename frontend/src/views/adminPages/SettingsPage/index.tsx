@@ -46,7 +46,7 @@ const INITIAL_SETTINGS: SystemSettings = {
   ttsSpeed: '0.92',
   interviewQuestionGapSeconds: '2.0',
   interviewMinimumSilenceSeconds: '1.2',
-  chatbotTitle: 'InfoHR AI',
+  chatbotTitle: 'AILA AI',
   chatbotSubtitle: 'Trợ lý tuyển dụng thông minh',
   chatbotEmployerGreeting: '',
   chatbotJobSeekerGreeting: '',

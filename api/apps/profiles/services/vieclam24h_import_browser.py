@@ -132,7 +132,16 @@ def get_vieclam24h_catalog(source_url: str | None = None) -> dict[str, Any]:
         ) from exc
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-accelerated-2d-canvas",
+                "--disable-gpu",
+            ],
+        )
         page = browser.new_page(viewport={"width": 1440, "height": 1600})
         try:
             page.goto(f"{origin}{VIECLAM24H_SEARCH_PATH}", wait_until="domcontentloaded", timeout=60000)
@@ -345,6 +354,16 @@ def _normalize_search_item(item: dict[str, Any], catalog: dict[str, Any]) -> dic
         "province_names": province_names,
         "source_ref": str(item.get("id") or item.get("seeker_id") or full_name).strip(),
         "source_url": "",
+        "min_expected_salary": item.get("min_expected_salary"),
+        "max_expected_salary": item.get("max_expected_salary"),
+        "current_salary": item.get("current_salary"),
+        "salary_range": item.get("salary_range"),
+        "experience": item.get("experience"),
+        "position": item.get("position") or item.get("current_position") or item.get("level"),
+        "level": item.get("level"),
+        "gender": seeker_info.get("gender") or item.get("gender"),
+        "birthday": seeker_info.get("birthday") or item.get("birthday") or seeker_info.get("birth_day") or seeker_info.get("year_of_birth"),
+        "marital_status": seeker_info.get("marital_status") or item.get("marital_status"),
         "search_payload": {
             "id": item.get("id"),
             "seeker_id": item.get("seeker_id"),
@@ -734,34 +753,47 @@ def _extract_detail_html_label_value_any(html_source: str, *labels: str) -> str:
 def _try_unlock_contact_information(page) -> bool:
     import re
 
-    selectors = []
-    try:
-        selectors.append(page.get_by_role("button", name=re.compile("Mua thông tin liên hệ", re.IGNORECASE)))
-    except Exception:
-        pass
-    try:
-        selectors.append(page.get_by_text("Mua thông tin liên hệ", exact=False))
-    except Exception:
-        pass
-    try:
-        selectors.append(page.locator("button").filter(has_text="Mua thông tin liên hệ"))
-    except Exception:
-        pass
-    try:
-        selectors.append(page.locator("a").filter(has_text="Mua thông tin liên hệ"))
-    except Exception:
-        pass
+    clicked_initial = False
+    selectors = [
+        lambda: page.get_by_role("button", name=re.compile("Mua thông tin liên hệ", re.IGNORECASE)),
+        lambda: page.get_by_text("Mua thông tin liên hệ", exact=False),
+        lambda: page.locator("button").filter(has_text="Mua thông tin liên hệ"),
+        lambda: page.locator("a").filter(has_text="Mua thông tin liên hệ"),
+    ]
 
-    for locator in selectors:
+    for get_loc in selectors:
         try:
-            if locator.count() <= 0:
-                continue
-            locator.first.click(timeout=5000)
-            page.wait_for_timeout(3000)
-            return True
+            loc = get_loc()
+            if loc.count() > 0:
+                loc.first.click(timeout=5000)
+                page.wait_for_timeout(1500)
+                clicked_initial = True
+                break
         except Exception:
             continue
-    return False
+
+    if not clicked_initial:
+        return False
+
+    confirm_selectors = [
+        lambda: page.get_by_role("button", name=re.compile("^Mua hồ sơ$", re.IGNORECASE)),
+        lambda: page.get_by_text("Mua hồ sơ", exact=True),
+        lambda: page.locator("button").filter(has_text="Mua hồ sơ"),
+        lambda: page.get_by_role("button", name=re.compile("Xác nhận|Đồng ý", re.IGNORECASE)),
+    ]
+
+    for get_conf in confirm_selectors:
+        try:
+            conf_loc = get_conf()
+            if conf_loc.count() > 0:
+                conf_loc.first.click(timeout=5000)
+                page.wait_for_timeout(3000)
+                logger.info("Vieclam24h paid candidate contact unlock confirmed via 'Mua hồ sơ' button.")
+                return True
+        except Exception:
+            continue
+
+    return True
 
 def _collect_detail_page_snapshot(
     page,
@@ -772,8 +804,11 @@ def _collect_detail_page_snapshot(
     auth_token: str | None = None,
 ) -> dict[str, Any]:
     detail_url = f"{_resolve_origin(source_url)}/chi-tiet-nguoi-tim-viec?id={resume_id}"
-    page.goto(detail_url, wait_until="commit", timeout=60000)
-    page.wait_for_timeout(5000)
+    try:
+        page.goto(detail_url, wait_until="domcontentloaded", timeout=15000)
+        page.wait_for_timeout(2000)
+    except Exception as goto_err:
+        logger.warning("Page navigation skipped for detail_url=%s: %s", detail_url, goto_err)
 
     if seeker_id is None:
         raise RuntimeError("Vieclam24h detail page is missing seeker_id; cannot unlock contact information.")
@@ -782,6 +817,9 @@ def _collect_detail_page_snapshot(
     if seeker_id_int is None:
         raise RuntimeError(f"Vieclam24h detail page returned an invalid seeker_id: {seeker_id!r}")
 
+    # Unlock candidate contact via paid points modal
+    _try_unlock_contact_information(page)
+
     _collect_employer_seen_resume(page, auth_token, source_url, resume_id)
     view_token = _collect_check_view_seeker(page, auth_token, source_url, resume_id)
     _collect_resume_hidden(page, auth_token, source_url, resume_id)
@@ -789,6 +827,18 @@ def _collect_detail_page_snapshot(
 
     email = _clean_hidden_contact_value(contact_api.get("email"))
     phone = _clean_hidden_contact_value(contact_api.get("mobile") or contact_api.get("phone"))
+
+    # Fallback to reading DOM text if contact_api email/phone are empty or masked
+    if not email or not phone:
+        try:
+            body_text = page.locator("body").inner_text()
+            lines = [line.strip() for line in body_text.split("\n") if line.strip()]
+            if not email:
+                email = _clean_hidden_contact_value(_extract_detail_label_value(lines, "Email"))
+            if not phone:
+                phone = _clean_hidden_contact_value(_extract_detail_label_value(lines, "Số điện thoại"))
+        except Exception:
+            pass
     birthday_value = contact_api.get("birthday")
     birthday = ""
     if birthday_value not in (None, ""):
@@ -837,6 +887,14 @@ def _enrich_candidate_from_detail(candidate: dict[str, Any], detail_api: dict[st
             enriched["description"] = normalized_detail["description"]
         if normalized_detail.get("skills_summary"):
             enriched["skills_summary"] = normalized_detail["skills_summary"]
+        if detail_api.get("min_expected_salary"):
+            enriched["min_expected_salary"] = detail_api["min_expected_salary"]
+        if detail_api.get("max_expected_salary"):
+            enriched["max_expected_salary"] = detail_api["max_expected_salary"]
+        if detail_api.get("experience"):
+            enriched["experience"] = detail_api["experience"]
+        if detail_api.get("position") or detail_api.get("level"):
+            enriched["position"] = detail_api.get("position") or detail_api.get("level")
         source_payload["detail_api"] = detail_api
         source_payload["detail_api_normalized"] = normalized_detail
 
@@ -853,6 +911,8 @@ def _enrich_candidate_from_detail(candidate: dict[str, Any], detail_api: dict[st
             enriched["birthday"] = detail_page["birthday"]
         if detail_page.get("gender"):
             enriched["gender"] = detail_page["gender"]
+        if detail_page.get("marital_status"):
+            enriched["marital_status"] = detail_page["marital_status"]
         if detail_page.get("address"):
             enriched["address"] = detail_page["address"]
         if detail_page.get("cv_file_url"):
@@ -1101,11 +1161,8 @@ def _normalize_candidate_like(value: Any, fallback_source_url: str, catalog: dic
     skills_summary = _pick_text(source, ["skillsSummary", "skills_summary", "skills", "summary"])
     description = _pick_text(source, ["description", "bio", "summary", "about"])
 
-    if not source_ref:
-        source_ref = email or phone or full_name
-
-    if not email and not phone and not title and not skills_summary and not description:
-        return None
+    seeker_id = _pick_text(source, ["seeker_id", "seekerId", "userId", "user_id", "seeker_user_id"]) or source_ref
+    resume_id = _pick_text(source, ["resume_id", "resumeId", "id", "resume_user_id", "seeker_user_id"]) or source_ref
 
     return {
         "full_name": full_name,
@@ -1115,6 +1172,8 @@ def _normalize_candidate_like(value: Any, fallback_source_url: str, catalog: dic
         "career_name": career_name,
         "city_name": city_name,
         "source_ref": source_ref,
+        "seeker_id": seeker_id,
+        "resume_id": resume_id,
         "source_url": fallback_source_url,
         "source_payload": source,
         "skills_summary": skills_summary,
@@ -1331,7 +1390,16 @@ def collect_vieclam24h_candidates(
     candidates: list[dict[str, Any]] = []
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-accelerated-2d-canvas",
+                "--disable-gpu",
+            ],
+        )
         page = browser.new_page(viewport={"width": 1440, "height": 1600})
         try:
             if callable(on_progress):

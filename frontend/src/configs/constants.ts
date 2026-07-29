@@ -93,11 +93,11 @@ const AUTH_CONFIG = {
   GOONGAPI_KEY: process.env.NEXT_PUBLIC_GOONGAPI_KEY,
   JOB_SEEKER_BOT: {
     AGENT_ID: process.env.NEXT_PUBLIC_JOB_SEEKER_BOT_AGENT_ID || '',
-    CHAT_TITLE: 'InfoHR AI',
+    CHAT_TITLE: 'AILA AI',
   },
   EMPLOYER_BOT: {
     AGENT_ID: process.env.NEXT_PUBLIC_EMPLOYER_BOT_AGENT_ID || '',
-    CHAT_TITLE: 'InfoHR AI',
+    CHAT_TITLE: 'AILA AI',
   },
   BOT_RENDER_MODE: process.env.NEXT_PUBLIC_BOT_RENDER_MODE || 'chat',
 } as const;

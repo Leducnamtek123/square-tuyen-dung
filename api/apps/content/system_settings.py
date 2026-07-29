@@ -9,7 +9,7 @@ from .models import SystemSetting
 
 
 DEFAULT_EMPLOYER_GREETING = (
-    "Chào bạn! Tôi là InfoHR AI, trợ lý tuyển dụng của bạn. Tôi có thể giúp gì cho bạn?\n\n"
+    "Chào bạn! Tôi là AILA AI, trợ lý tuyển dụng của bạn. Tôi có thể giúp gì cho bạn?\n\n"
     "**Bạn có thể hỏi tôi về:**\n"
     "- Tìm kiếm ứng viên tiềm năng\n"
     "- Soạn tin nhắn mời phỏng vấn\n"
@@ -18,7 +18,7 @@ DEFAULT_EMPLOYER_GREETING = (
 )
 
 DEFAULT_JOBSEEKER_GREETING = (
-    "Chào bạn! Tôi là InfoHR AI, trợ lý tư vấn nghề nghiệp của bạn. Tôi có thể giúp gì cho bạn?\n\n"
+    "Chào bạn! Tôi là AILA AI, trợ lý tư vấn nghề nghiệp của bạn. Tôi có thể giúp gì cho bạn?\n\n"
     "**Bạn có thể hỏi tôi về:**\n"
     "- Tìm kiếm việc làm phù hợp\n"
     "- Soạn và tối ưu hóa CV\n"
@@ -47,7 +47,7 @@ SYSTEM_SETTING_DEFAULTS: Dict[str, Any] = {
     "ttsSpeed": "0.92",
     "interviewQuestionGapSeconds": "2.0",
     "interviewMinimumSilenceSeconds": "1.2",
-    "chatbotTitle": "InfoHR AI",
+    "chatbotTitle": "AILA AI",
     "chatbotSubtitle": "Trợ lý tuyển dụng thông minh",
     "chatbotEmployerGreeting": DEFAULT_EMPLOYER_GREETING,
     "chatbotJobSeekerGreeting": DEFAULT_JOBSEEKER_GREETING,

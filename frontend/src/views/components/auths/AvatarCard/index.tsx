@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 
-import { Box, Stack, IconButton, Typography } from "@mui/material";
+import { Box, Stack, IconButton, Typography, Avatar } from "@mui/material";
 
 import { useTranslation } from 'react-i18next';
 
@@ -167,25 +167,32 @@ const AvatarCard = () => {
 
         >
 
-          <MuiImageCustom
-
-            src={currentUser?.avatarUrl}
-
-            width="100%"
-
-            height="100%"
-
-            sx={{
-
-              borderRadius: '50%',
-
-              objectFit: 'cover',
-
-              border: '2px solid white',
-
-            }}
-
-          />
+          {currentUser?.avatarUrl ? (
+            <MuiImageCustom
+              src={currentUser?.avatarUrl}
+              width="100%"
+              height="100%"
+              sx={{
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '2px solid white',
+              }}
+            />
+          ) : (
+            <Avatar
+              sx={{
+                width: '100%',
+                height: '100%',
+                bgcolor: 'primary.main',
+                color: 'common.white',
+                fontSize: '2.5rem',
+                fontWeight: 700,
+                border: '2px solid white',
+              }}
+            >
+              {currentUser?.fullName?.charAt(0)?.toUpperCase()}
+            </Avatar>
+          )}
 
           <Box
 

@@ -246,7 +246,7 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 return avatar.get_full_url()
         except Exception as ex:
             helper.print_log_error("UserSerializer.get_avatar_url", ex)
-        return var_sys.AVATAR_DEFAULT["AVATAR"]
+        return None
 
     def _get_job_seeker_profile_safe(self, user):
         if getattr(user, 'role_name', None) != var_sys.JOB_SEEKER:
@@ -436,7 +436,7 @@ class AvatarSerializer(serializers.ModelSerializer):
                 return avatar.get_full_url()
         except Exception as ex:
             helper.print_log_error("AvatarSerializer.get_avatar_url", ex)
-        return var_sys.AVATAR_DEFAULT["AVATAR"]
+        return None
 
     class Meta:
         model = User

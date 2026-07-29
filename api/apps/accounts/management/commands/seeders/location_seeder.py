@@ -34,6 +34,18 @@ def seed_locations():
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
+        logger.info("Đang dọn dẹp (xóa) toàn bộ danh mục Tỉnh thành, Quận huyện, Phường xã cũ...")
+        from django.db import connection
+        from apps.locations.models import Location
+        Location.objects.all().update(city=None, district=None, ward=None)
+        with connection.cursor() as cursor:
+            cursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+            cursor.execute("TRUNCATE TABLE project_common_ward;")
+            cursor.execute("TRUNCATE TABLE project_common_district;")
+            cursor.execute("TRUNCATE TABLE project_common_city;")
+            cursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+        logger.info("Đã xóa sạch dữ liệu cũ. Bắt đầu nạp dữ liệu mới...")
+
         city_count = 0
         district_count = 0
         ward_count = 0

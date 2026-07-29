@@ -87,7 +87,7 @@ export const ChatbotSettingsTab: React.FC<ChatbotSettingsTabProps> = ({ formData
                     size="small"
                     value={formData.chatbotTitle || ''}
                     onChange={(e) => onChange('chatbotTitle', e.target.value)}
-                    placeholder="InfoHR AI"
+                    placeholder="AILA AI"
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>

@@ -58,13 +58,15 @@ const HeaderAuthArea = ({
         <Stack direction="row" justifyContent="center" alignItems="center">
           <Avatar
             alt="User Avatar"
-            src={currentUserAvatarUrl ?? undefined}
+            src={currentUserAvatarUrl || undefined}
             sx={{
               width: 36,
               height: 36,
               border: '2px solid rgba(148, 163, 184, 0.25)',
             }}
-          />
+          >
+            {currentUserName?.charAt(0)?.toUpperCase()}
+          </Avatar>
           <Typography
             variant="subtitle2"
             sx={{

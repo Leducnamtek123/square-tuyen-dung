@@ -33,7 +33,7 @@ AUTH_PROVIDERS = (('email', 'email'), ('facebook',
                   'facebook'), ('google', 'google'))
 
 AVATAR_DEFAULT = {
-    "AVATAR": asset_url("system", "avt_default.jpg"),
+    "AVATAR": None,
     "COMPANY_LOGO": asset_url("system", "company_logo_default.png"),
     "COMPANY_COVER_IMAGE": asset_url("system", "company_cover_image_default.jpg"),
 }

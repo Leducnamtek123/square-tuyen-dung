@@ -34,38 +34,15 @@ def seed_jobs():
 
     jobs_data = [
         {
-            "career_name": "Kiến trúc",
-            "job_name": "Kiến trúc sư triển khai",
-            "quantity": 2,
-            "position": 4,
-            "experience": 3,
-            "salary_min": 18000000,
-            "salary_max": 32000000,
-            "type_of_workplace": 1,
-            "is_urgent": True,
-            "deadline_days": 18,
-            "job_description": (
-                "Phụ trách triển khai hồ sơ bản vẽ, phối hợp thiết kế và hiện trường cho "
-                "các dự án nhà ở, văn phòng và thương mại của Square."
-            ),
-            "job_requirement": (
-                "Có kinh nghiệm triển khai hồ sơ kỹ thuật, đọc hiểu bản vẽ kiến trúc "
-                "và phối hợp tốt với các bộ môn liên quan."
-            ),
-            "benefits_enjoyed": (
-                "Lương cạnh tranh, tham gia trực tiếp các dự án thực tế và lộ trình "
-                "phát triển rõ ràng."
-            ),
-        },
-        {
             "career_name": "Xây dựng",
-            "job_name": "Kỹ sư giám sát công trình",
+            "job_name": "[TUYỂN GẤP] Kỹ sư Giám sát công trình (GS XD - Site Supervisor)",
             "quantity": 3,
-            "position": 5,
+            "position": 3,
             "experience": 2,
             "salary_min": 16000000,
             "salary_max": 30000000,
             "type_of_workplace": 1,
+            "is_hot": True,
             "is_urgent": True,
             "deadline_days": 14,
             "job_description": (
@@ -81,6 +58,54 @@ def seed_jobs():
             ),
         },
         {
+            "career_name": "Xây dựng",
+            "job_name": "[TUYỂN GẤP] Kỹ sư QA/QC Công trình (Quality Assurance / Quality Control)",
+            "quantity": 3,
+            "position": 4,
+            "experience": 2,
+            "salary_min": 16000000,
+            "salary_max": 24000000,
+            "type_of_workplace": 1,
+            "is_hot": True,
+            "is_urgent": True,
+            "deadline_days": 18,
+            "job_description": (
+                "Kiểm soát chất lượng thi công, vật liệu đầu vào, lập hồ sơ nghiệm thu "
+                "và quy trình QA/QC tại dự án."
+            ),
+            "job_requirement": (
+                "Tốt nghiệp Kỹ sư Xây dựng/Cơ điện, 2-4 năm kinh nghiệm làm QA/QC."
+            ),
+            "benefits_enjoyed": (
+                "Lương 16 - 24 triệu, thưởng theo tiến độ dự án, chế độ bảo hiểm đầy đủ."
+            ),
+        },
+        {
+            "career_name": "Kiến trúc",
+            "job_name": "Kiến trúc sư triển khai",
+            "quantity": 2,
+            "position": 4,
+            "experience": 3,
+            "salary_min": 18000000,
+            "salary_max": 32000000,
+            "type_of_workplace": 1,
+            "is_hot": False,
+            "is_urgent": False,
+            "deadline_days": 25,
+            "job_description": (
+                "Phụ trách triển khai hồ sơ bản vẽ, phối hợp thiết kế và hiện trường cho "
+                "các dự án nhà ở, văn phòng và thương mại của Square."
+            ),
+            "job_requirement": (
+                "Có kinh nghiệm triển khai hồ sơ kỹ thuật, đọc hiểu bản vẽ kiến trúc "
+                "và phối hợp tốt với các bộ môn liên quan."
+            ),
+            "benefits_enjoyed": (
+                "Lương cạnh tranh, tham gia trực tiếp các dự án thực tế và lộ trình "
+                "phát triển rõ ràng."
+            ),
+        },
+        {
             "career_name": "Nội thất",
             "job_name": "Thiết kế nội thất",
             "quantity": 2,
@@ -89,6 +114,7 @@ def seed_jobs():
             "salary_min": 15000000,
             "salary_max": 28000000,
             "type_of_workplace": 2,
+            "is_hot": False,
             "is_urgent": False,
             "deadline_days": 30,
             "job_description": (
@@ -113,6 +139,7 @@ def seed_jobs():
             "salary_min": 20000000,
             "salary_max": 36000000,
             "type_of_workplace": 1,
+            "is_hot": False,
             "is_urgent": False,
             "deadline_days": 45,
             "job_description": (
@@ -127,35 +154,13 @@ def seed_jobs():
                 "Thưởng dự án rõ ràng, làm việc trực tiếp với các đầu việc chiến lược của công ty."
             ),
         },
-        {
-            "career_name": "Kiến trúc",
-            "job_name": "Giám sát hoàn thiện nội thất",
-            "quantity": 2,
-            "position": 5,
-            "experience": 2,
-            "salary_min": 15000000,
-            "salary_max": 26000000,
-            "type_of_workplace": 1,
-            "is_urgent": False,
-            "deadline_days": 35,
-            "job_description": (
-                "Kiểm soát chất lượng hoàn thiện, phối hợp đội thi công và thiết kế để "
-                "bàn giao đúng tiêu chuẩn Square."
-            ),
-            "job_requirement": (
-                "Có kinh nghiệm hiện trường, hiểu vật liệu hoàn thiện và quy trình bàn giao."
-            ),
-            "benefits_enjoyed": (
-                "Được tham gia nhiều dự án cao cấp, thưởng theo chất lượng bàn giao và tiến độ."
-            ),
-        },
     ]
 
     job_count = 0
     for item in jobs_data:
         career = careers.filter(name=item["career_name"]).first()
         if not career:
-            continue
+            career = careers.first()
 
         JobPost.objects.create(
             job_name=item["job_name"],
@@ -176,7 +181,8 @@ def seed_jobs():
             academic_level=2,
             job_type=1,
             status=var_sys.JobPostStatus.APPROVED,
-            is_urgent=item["is_urgent"],
+            is_hot=item.get("is_hot", False),
+            is_urgent=item.get("is_urgent", False),
             contact_person_name=fake.name(),
             contact_person_phone=fake.phone_number(),
             contact_person_email=fake.company_email(),

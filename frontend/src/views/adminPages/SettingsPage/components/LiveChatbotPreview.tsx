@@ -90,7 +90,7 @@ export const LiveChatbotPreview: React.FC<LiveChatbotPreviewProps> = ({
           <Stack direction="row" alignItems="center" spacing={1.5}>
             <Box>
               <Typography variant="subtitle2" sx={{ fontWeight: 700, lineHeight: 1.2, color: '#ffffff' }}>
-                {title || 'InfoHR AI'}
+                {title || 'AILA AI'}
               </Typography>
               <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mt: 0.2 }}>
                 <Box

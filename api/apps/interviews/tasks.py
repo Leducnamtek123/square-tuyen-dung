@@ -195,21 +195,27 @@ def finalize_disconnected_session(session_id):
 
 
 @shared_task
-def send_interview_invitation(session_id):
-    """Send interview invitation email to candidate."""
+def send_interview_invitation(session_id, initial_password=None):
+    """Send interview invitation email to candidate with onboarding credentials."""
     try:
         session = InterviewSession.objects.select_related("candidate", "job_post").get(id=session_id)
         candidate = session.candidate
 
-        web_url = config("WEB_CLIENT_URL", default="http://localhost:3002")
+        web_url = config("WEB_CLIENT_URL", default="https://infohr.vn")
         interview_url = f"{web_url}/phong-van/{session.invite_token}"
-        scheduled_at_display = "ChÃÂ°a cÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t"
+        login_url = f"{web_url}/login"
+        scheduled_at_display = "Ngay khi bạn thuận tiện"
         if session.scheduled_at:
             scheduled_at_display = tz.localtime(session.scheduled_at).strftime("%H:%M - %d/%m/%Y")
 
+        job_title = session.job_post.job_name if session.job_post else "Vị trí tuyển dụng"
+
         context = {
-            "candidate_name": candidate.full_name,
-            "job_title": session.job_post.job_name if session.job_post else "VÃ¡Â»â¹ trÃÂ­ tuyÃ¡Â»Æn dÃ¡Â»Â¥ng",
+            "candidate_name": candidate.full_name or candidate.username or "Ứng viên",
+            "candidate_email": candidate.email,
+            "initial_password": initial_password,
+            "login_url": login_url,
+            "job_title": job_title,
             "interview_url": interview_url,
             "invite_token": session.invite_token,
             "scheduled_at_display": scheduled_at_display,
@@ -219,7 +225,7 @@ def send_interview_invitation(session_id):
         plain_message = strip_tags(html_message)
 
         send_mail(
-            subject=f"[TuyenDungSquare] MÃ¡Â»Âi PhÃ¡Â»Âng vÃ¡ÂºÂ¥n trÃ¡Â»Â±c tuyÃ¡ÂºÂ¿n - {context['job_title']}",
+            subject=f"[InfoHR] Thư mời Phỏng vấn trực tuyến AI - {job_title}",
             message=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[candidate.email],
@@ -246,9 +252,10 @@ def send_evaluation_report(session_id):
         web_url = config("WEB_CLIENT_URL", default="http://localhost:3002")
         report_url = f"{web_url}/employer/interviews/{session.id}"
 
+        candidate_display_name = session.candidate.full_name or session.candidate.username or "Ứng viên"
         context = {
-            "candidate_name": session.candidate.full_name,
-            "job_title": session.job_post.job_name if session.job_post else "VÃ¡Â»â¹ trÃÂ­ tuyÃ¡Â»Æn dÃ¡Â»Â¥ng",
+            "candidate_name": candidate_display_name,
+            "job_title": session.job_post.job_name if session.job_post else "Vị trí tuyển dụng",
             "overall_score": session.ai_overall_score,
             "summary": session.ai_summary,
             "report_url": report_url,
@@ -258,7 +265,7 @@ def send_evaluation_report(session_id):
         plain_message = strip_tags(html_message)
 
         send_mail(
-            subject=f"[TuyenDungSquare] ÃÂÃÂ£ cÃÂ³ kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ PhÃ¡Â»Âng vÃ¡ÂºÂ¥n trÃ¡Â»Â±c tuyÃ¡ÂºÂ¿n - {session.candidate.full_name}",
+            subject=f"[InfoHR] Báo cáo kết quả Phỏng vấn trực tuyến AI - {candidate_display_name}",
             message=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[employer.email],

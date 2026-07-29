@@ -71,6 +71,7 @@ services:
   # ---------------------------------------------------------------------------
   backend:
     container_name: tuyendung-studio-backend
+    shm_size: '2gb'
     build:
       context: ./api
       dockerfile: ${BACKEND_DOCKERFILE:-Dockerfile.prod}

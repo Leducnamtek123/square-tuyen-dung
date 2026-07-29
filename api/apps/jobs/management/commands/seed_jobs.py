@@ -21,9 +21,11 @@ SQUARE_PROJECT_JOBS = [
         "salary_min": 12000000,
         "salary_max": 18000000,
         "position": 5,  # Staff
+        "is_hot": False,
+        "is_urgent": False,
     },
     {
-        "name": "Giám sát Xây dựng (GS XD - Site Supervisor)",
+        "name": "Kỹ sư Giám sát công trình (GS XD - Site Supervisor)",
         "qty": 2,  # Target 1.5 ratio (Tuyển 2 nhận việc -> Giữ 1 sau 6 tháng)
         "career_name": "Xây dựng",
         "city_keyword": "Hà Nội",
@@ -33,6 +35,8 @@ SQUARE_PROJECT_JOBS = [
         "salary_min": 15000000,
         "salary_max": 22000000,
         "position": 3,  # Supervisor
+        "is_hot": True,
+        "is_urgent": True,
     },
     {
         "name": "Giám sát Nội thất (GS ID - Interior Site Supervisor)",
@@ -45,6 +49,8 @@ SQUARE_PROJECT_JOBS = [
         "salary_min": 15000000,
         "salary_max": 25000000,
         "position": 3,  # Supervisor
+        "is_hot": False,
+        "is_urgent": False,
     },
     {
         "name": "Giám sát Cơ điện (GS MEP - MEP Site Supervisor)",
@@ -57,6 +63,8 @@ SQUARE_PROJECT_JOBS = [
         "salary_min": 15000000,
         "salary_max": 22000000,
         "position": 3,  # Supervisor
+        "is_hot": False,
+        "is_urgent": False,
     },
     {
         "name": "Kỹ sư QA/QC Công trình (Quality Assurance / Quality Control)",
@@ -69,6 +77,8 @@ SQUARE_PROJECT_JOBS = [
         "salary_min": 16000000,
         "salary_max": 24000000,
         "position": 4,  # Specialist
+        "is_hot": True,
+        "is_urgent": True,
     },
     {
         "name": "Chỉ huy trưởng Công trình (Site Manager / CHT)",
@@ -81,6 +91,8 @@ SQUARE_PROJECT_JOBS = [
         "salary_min": 25000000,
         "salary_max": 40000000,
         "position": 2,  # Middle Management
+        "is_hot": False,
+        "is_urgent": False,
     },
     {
         "name": "Project Manager (PM - Quản lý Dự án Công trình)",
@@ -93,6 +105,8 @@ SQUARE_PROJECT_JOBS = [
         "salary_min": 35000000,
         "salary_max": 50000000,
         "position": 1,  # Senior Management
+        "is_hot": False,
+        "is_urgent": False,
     },
     {
         "name": "Kỹ sư QS (Quantity Surveyor - Bóc tách khối lượng & Chi phí)",
@@ -105,6 +119,8 @@ SQUARE_PROJECT_JOBS = [
         "salary_min": 15000000,
         "salary_max": 25000000,
         "position": 4,  # Specialist
+        "is_hot": False,
+        "is_urgent": False,
     },
     {
         "name": "Sales Admin (Chuyên viên Hồ sơ Đấu thầu / Tender Admin)",
@@ -117,6 +133,8 @@ SQUARE_PROJECT_JOBS = [
         "salary_min": 10000000,
         "salary_max": 16000000,
         "position": 5,  # Staff
+        "is_hot": False,
+        "is_urgent": False,
     },
     {
         "name": "Diễn họa 2D / Kỹ sư Thiết kế Kỹ thuật (2D Drafter)",
@@ -129,6 +147,8 @@ SQUARE_PROJECT_JOBS = [
         "salary_min": 12000000,
         "salary_max": 18000000,
         "position": 4,  # Specialist
+        "is_hot": False,
+        "is_urgent": False,
     },
     {
         "name": "Admin C&C & Điều phối Dự án (Project Coordinator)",
@@ -141,12 +161,14 @@ SQUARE_PROJECT_JOBS = [
         "salary_min": 10000000,
         "salary_max": 15000000,
         "position": 5,  # Staff
+        "is_hot": False,
+        "is_urgent": False,
     },
 ]
 
 
 class Command(BaseCommand):
-    help = "Clean existing jobs and seed 11 project-focused job posts for Square company"
+    help = "Clean existing jobs and seed 11 project-focused job posts for Square company (HOT for GS and QA/QC only)"
 
     def handle(self, *args, **options):
         company = Company.objects.filter(company_name__icontains="Square").order_by("id").first()
@@ -166,7 +188,7 @@ class Command(BaseCommand):
         deleted_count, _ = JobPost.objects.filter(company=company).delete()
         self.stdout.write(self.style.WARNING(f"Đã xóa {deleted_count} bài đăng cũ của công ty {company.company_name}."))
 
-        self.stdout.write(f"\nBắt đầu khởi tạo {len(SQUARE_PROJECT_JOBS)} bài đăng tuyển dụng mới (Tuyển gấp)...")
+        self.stdout.write(f"\nBắt đầu khởi tạo {len(SQUARE_PROJECT_JOBS)} bài đăng tuyển dụng mới...")
 
         # Cache location objects per city
         city_hanoi = City.objects.filter(name__icontains="Hà Nội").first() or City.objects.filter(id=1).first()
@@ -188,8 +210,12 @@ class Command(BaseCommand):
 
             location = loc_hanoi if item.get("city_keyword") == "Hà Nội" else loc_hcm
 
+            is_hot = item.get("is_hot", False)
+            is_urgent = item.get("is_urgent", False)
+            job_title = f"[TUYỂN GẤP] {item['name']}" if is_urgent else item["name"]
+
             job = JobPost.objects.create(
-                job_name=f"[TUYỂN GẤP] {item['name']}",
+                job_name=job_title,
                 quantity=item["qty"],
                 deadline=deadline,
                 job_description=item["description"],
@@ -202,8 +228,8 @@ class Command(BaseCommand):
                 job_type=1,           # Full-time Permanent
                 salary_min=item["salary_min"],
                 salary_max=item["salary_max"],
-                is_hot=True,
-                is_urgent=True,
+                is_hot=is_hot,
+                is_urgent=is_urgent,
                 status=var_sys.JobPostStatus.APPROVED,
                 contact_person_name="Bộ phận Tuyển dụng Square Group",
                 contact_person_phone="0901234567",
@@ -218,6 +244,7 @@ class Command(BaseCommand):
                 min_screening_score=70,
             )
             created_jobs.append(job)
-            self.stdout.write(self.style.SUCCESS(f"  [{idx}/{len(SQUARE_PROJECT_JOBS)}] 🔥 Created: {job.job_name} (Khu vực: {location.city.name if location and location.city else 'N/A'}, Số lượng: {job.quantity})"))
+            hot_label = "🔥 HOT / Tuyển Gấp" if is_urgent else "📄 Tin Thường"
+            self.stdout.write(self.style.SUCCESS(f"  [{idx}/{len(SQUARE_PROJECT_JOBS)}] {hot_label}: {job.job_name} (Khu vực: {location.city.name if location and location.city else 'N/A'}, Số lượng: {job.quantity})"))
 
-        self.stdout.write(self.style.SUCCESS(f"\nHoàn tất! Đã đăng thành công {len(created_jobs)} bài tuyển dụng Tuyển Gấp mới trên hệ thống Square."))
+        self.stdout.write(self.style.SUCCESS(f"\nHoàn tất! Đã đăng thành công {len(created_jobs)} bài tuyển dụng mới trên hệ thống Square."))
