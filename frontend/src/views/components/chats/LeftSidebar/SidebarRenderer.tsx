@@ -73,7 +73,7 @@ const SidebarRenderer = ({ searchPlaceholderKey, getSubtextName }: SidebarRender
                 hasMore={hasMore}
                 loader={
                   <Stack sx={{ py: 2 }} justifyContent="center">
-                    <CircularProgress color="secondary" sx={{ margin: '0 auto' }} />
+                    <CircularProgress color="primary" sx={{ margin: '0 auto' }} />
                   </Stack>
                 }
               >
@@ -87,7 +87,7 @@ const SidebarRenderer = ({ searchPlaceholderKey, getSubtextName }: SidebarRender
                     sx={{
                       p: 1,
                       borderRadius: 2,
-                      '&:hover': { backgroundColor: '#ede7f6' },
+                      '&:hover': { backgroundColor: '#EFF6FF' },
                     }}
                   >
                     <Box>

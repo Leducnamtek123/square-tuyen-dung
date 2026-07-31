@@ -43,6 +43,8 @@ const supportsAdvancedRegex = (): boolean => {
  * --------------------------------------------------------------------------- */
 const simpleMdToHtml = (md: string): string => {
   let html = md
+    // Images
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="my-2 max-w-full h-auto rounded-lg shadow-sm block" />')
     // Code blocks
     .replace(/```[\w]*\n([\s\S]*?)```/g, "<pre><code>$1</code></pre>")
     // Inline code
@@ -151,12 +153,15 @@ const MessageResponseInner = memo(({
     };
   }, [canRunStreamdown, enableRich, needsCode, needsMath, needsMermaid]);
 
-  const wrapperCn = cn("size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0", className);
+  const wrapperCn = cn(
+    "size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:my-1.5 [&_p]:leading-relaxed [&_h1]:mt-3 [&_h1]:mb-1 [&_h2]:mt-3 [&_h2]:mb-1 [&_h3]:mt-2.5 [&_h3]:mb-1 [&_h4]:mt-2 [&_h4]:mb-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5 [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-2 [&_img]:shadow-sm [&_img]:block",
+    className
+  );
 
   // Not rich mode - plain render
   if (!enableRich) {
     return (
-      <div className={wrapperCn} {...props}>
+      <div className={cn(wrapperCn, "whitespace-pre-wrap")} {...props}>
         {children}
       </div>
     );

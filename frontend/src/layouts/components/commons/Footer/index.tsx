@@ -19,6 +19,7 @@ import { FacebookIcon, WebsiteIcon } from '../../../../components/Common/SocialI
 import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 import { useAppSelector } from '../../../../redux/hooks';
 import { canAccessJobSeekerPortal } from '../../../../utils/accessControl';
+import tokenService from '../../../../services/tokenService';
 
 const subscribeToStaticYear = () => () => {};
 const getCurrentYearSnapshot = () => new Date().getFullYear();
@@ -108,7 +109,15 @@ const Footer = () => {
               ].map((item) => (
                 <Button
                   key={item.label}
-                  onClick={() => push(item.route)}
+                  onClick={() => {
+                    const token = tokenService.getAccessTokenFromCookie();
+                    if (!token || !isAuthenticated) {
+                      const loginPath = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.LOGIN}`, lang);
+                      push(`${loginPath}?redirect=${encodeURIComponent(item.route)}`);
+                    } else {
+                      push(item.route);
+                    }
+                  }}
                   variant="text"
                   sx={navButtonSx}
                 >

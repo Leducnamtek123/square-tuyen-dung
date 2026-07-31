@@ -156,8 +156,91 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
     setPage(1);
   };
 
-  // Compute sub-items list dynamically from real API data with complete fallbacks
+  // Fetch full sample pool for this context (e.g. companyId) to determine available filter chips
+  const baseContextParams = React.useMemo<GetJobPostsParams>(() => {
+    return {
+      ...params,
+      pageSize: 100,
+      page: 1,
+    };
+  }, [params]);
+
+  const { data: contextJobsData } = useQuery({
+    queryKey: ['filter-context-jobs-pool', baseContextParams],
+    queryFn: async () => {
+      const resData = await jobService.getJobPosts(baseContextParams);
+      return resData?.results || [];
+    },
+    staleTime: 5 * 60_000,
+    placeholderData: keepPreviousData,
+  });
+
+  const activeOptions = React.useMemo(() => {
+    if (!contextJobsData || contextJobsData.length === 0) {
+      return null;
+    }
+
+    const citySet = new Set<number | string>();
+    const careerSet = new Set<number | string>();
+    const expSet = new Set<number | string>();
+    const activeSalaryIds = new Set<string>();
+
+    contextJobsData.forEach((job: any) => {
+      // City
+      const cId = job.location?.city?.id ?? job.location?.city ?? job.locationDict?.city ?? job.cityId ?? job.city;
+      if (cId !== undefined && cId !== null && cId !== '') {
+        citySet.add(cId);
+        if (typeof cId === 'number' || !isNaN(Number(cId))) {
+          citySet.add(Number(cId));
+        }
+      }
+
+      // Career
+      const carId = job.career?.id ?? job.career;
+      if (carId !== undefined && carId !== null && carId !== '') {
+        careerSet.add(carId);
+        if (typeof carId === 'number' || !isNaN(Number(carId))) {
+          careerSet.add(Number(carId));
+        }
+      }
+
+      // Experience
+      const expId = job.experience?.id ?? job.experience;
+      if (expId !== undefined && expId !== null && expId !== '') {
+        expSet.add(expId);
+        if (typeof expId === 'number' || !isNaN(Number(expId))) {
+          expSet.add(Number(expId));
+        }
+      }
+
+      // Salary
+      const sMin = job.salaryMin;
+      const sMax = job.salaryMax;
+      SALARY_RANGES.forEach((sr) => {
+        if (sr.id === 'all') return;
+        if (sr.min !== undefined && sr.max !== undefined) {
+          if (sMin && sMax && sMin < sr.max && sMax > sr.min) {
+            activeSalaryIds.add(sr.id);
+          } else if (sMin && !sMax && sMin >= sr.min && sMin <= sr.max) {
+            activeSalaryIds.add(sr.id);
+          } else if (!sMin && sMax && sMax >= sr.min && sMax <= sr.max) {
+            activeSalaryIds.add(sr.id);
+          }
+        } else if (sr.min !== undefined && sr.max === undefined) {
+          if ((sMin && sMin >= sr.min) || (sMax && sMax >= sr.min)) {
+            activeSalaryIds.add(sr.id);
+          }
+        }
+      });
+    });
+
+    return { citySet, careerSet, expSet, activeSalaryIds };
+  }, [contextJobsData]);
+
+  // Compute sub-items list dynamically from real API data filtered by active job context
   const subItems = React.useMemo(() => {
+    let fullList: { id: string | number; label: string }[] = [];
+
     if (currentDimension === 'city') {
       const citiesFromApi =
         allConfig?.cityOptions && allConfig.cityOptions.length > 0
@@ -165,37 +248,71 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
           : allConfig?.cities && allConfig.cities.length > 0
           ? allConfig.cities
           : DEFAULT_VIETNAM_CITIES;
-      return [{ id: 'all', label: 'Tất cả' }, ...citiesFromApi.map((c: any) => ({ id: c.id, label: c.name }))];
-    }
-    if (currentDimension === 'salary') {
-      return SALARY_RANGES;
-    }
-    if (currentDimension === 'experience') {
+      fullList = [{ id: 'all', label: 'Tất cả' }, ...citiesFromApi.map((c: any) => ({ id: c.id, label: c.name }))];
+
+      if (activeOptions?.citySet && activeOptions.citySet.size > 0) {
+        fullList = fullList.filter(
+          (item) => item.id === 'all' || activeOptions.citySet.has(item.id) || activeOptions.citySet.has(Number(item.id))
+        );
+      }
+    } else if (currentDimension === 'salary') {
+      fullList = SALARY_RANGES;
+      if (activeOptions?.activeSalaryIds && activeOptions.activeSalaryIds.size > 0) {
+        fullList = fullList.filter((item) => item.id === 'all' || activeOptions.activeSalaryIds.has(item.id as string));
+      }
+    } else if (currentDimension === 'experience') {
       const expFromApi = allConfig?.experienceOptions || [];
       if (expFromApi.length > 0) {
-        return [{ id: 'all', label: 'Tất cả' }, ...expFromApi.map((e: any) => ({ id: e.id, label: e.name }))];
+        fullList = [{ id: 'all', label: 'Tất cả' }, ...expFromApi.map((e: any) => ({ id: e.id, label: e.name }))];
+      } else {
+        fullList = [
+          { id: 'all', label: 'Tất cả' },
+          { id: '0', label: 'Chưa có kinh nghiệm' },
+          { id: '1', label: 'Dưới 1 năm' },
+          { id: '2', label: '1 - 2 năm' },
+          { id: '3', label: '2 - 3 năm' },
+          { id: '4', label: '3 - 5 năm' },
+          { id: '5', label: 'Trên 5 năm' },
+        ];
       }
-      return [
-        { id: 'all', label: 'Tất cả' },
-        { id: '0', label: 'Chưa có kinh nghiệm' },
-        { id: '1', label: 'Dưới 1 năm' },
-        { id: '2', label: '1 - 2 năm' },
-        { id: '3', label: '2 - 3 năm' },
-        { id: '4', label: '3 - 5 năm' },
-        { id: '5', label: 'Trên 5 năm' },
-      ];
-    }
-    if (currentDimension === 'career') {
+      if (activeOptions?.expSet && activeOptions.expSet.size > 0) {
+        fullList = fullList.filter(
+          (item) =>
+            item.id === 'all' ||
+            activeOptions.expSet.has(item.id) ||
+            activeOptions.expSet.has(Number(item.id)) ||
+            activeOptions.expSet.has(String(item.id))
+        );
+      }
+    } else if (currentDimension === 'career') {
       const careersFromApi =
         allConfig?.careerOptions && allConfig.careerOptions.length > 0
           ? allConfig.careerOptions
           : allConfig?.careers && allConfig.careers.length > 0
           ? allConfig.careers
           : DEFAULT_CAREERS;
-      return [{ id: 'all', label: 'Tất cả' }, ...careersFromApi.map((c: any) => ({ id: c.id, label: c.name }))];
+      fullList = [{ id: 'all', label: 'Tất cả' }, ...careersFromApi.map((c: any) => ({ id: c.id, label: c.name }))];
+
+      if (activeOptions?.careerSet && activeOptions.careerSet.size > 0) {
+        fullList = fullList.filter(
+          (item) => item.id === 'all' || activeOptions.careerSet.has(item.id) || activeOptions.careerSet.has(Number(item.id))
+        );
+      }
+    } else {
+      fullList = [{ id: 'all', label: 'Tất cả' }];
     }
-    return [{ id: 'all', label: 'Tất cả' }];
-  }, [currentDimension, allConfig]);
+
+    return fullList;
+  }, [currentDimension, allConfig, activeOptions]);
+
+  React.useEffect(() => {
+    if (selectedSubItem !== 'all' && subItems.length > 0) {
+      const exists = subItems.some((item) => String(item.id) === String(selectedSubItem));
+      if (!exists) {
+        setSelectedSubItem('all');
+      }
+    }
+  }, [subItems, selectedSubItem]);
 
   const resolvedParams = React.useMemo<GetJobPostsParams>(() => {
     const base = { ...params };

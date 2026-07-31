@@ -135,18 +135,17 @@ export default function EmployerSectionClient({
   );
 
   useEffect(() => {
+    const lang = getPreferredLanguage();
+    const employerPrefix = getPortalPrefix('employer', lang);
+    const loginUrl = `${employerPrefix}/login?redirect=${encodeURIComponent(pathname)}`;
+    const dashboardPath = `${employerPrefix}/bang-dieu-khien`;
+
     if (authGate.shouldRedirectToLogin) {
-      const lang = getPreferredLanguage();
-      const employerPrefix = getPortalPrefix('employer', lang);
-      window.location.replace(`${employerPrefix}/login`);
+      window.location.replace(loginUrl);
       return;
     }
 
     const checkAuth = async () => {
-      const lang = getPreferredLanguage();
-      const employerPrefix = getPortalPrefix('employer', lang);
-      const loginPath = `${employerPrefix}/login`;
-      const dashboardPath = `${employerPrefix}/bang-dieu-khien`;
       const token = tokenService.getAccessTokenFromCookie();
 
       if (isPublicPage) {
@@ -156,7 +155,6 @@ export default function EmployerSectionClient({
             try {
               user = await dispatch(getUserInfo()).unwrap();
             } catch {
-              window.location.replace(loginPath);
               return;
             }
           }
@@ -184,7 +182,7 @@ export default function EmployerSectionClient({
         try {
           user = await dispatch(getUserInfo()).unwrap();
         } catch {
-          window.location.replace(loginPath);
+          window.location.replace(loginUrl);
           return;
         }
       }

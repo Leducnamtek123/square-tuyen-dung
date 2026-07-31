@@ -9,6 +9,7 @@ import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import VideoCameraFrontOutlinedIcon from '@mui/icons-material/VideoCameraFrontOutlined';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import LaunchOutlinedIcon from '@mui/icons-material/LaunchOutlined';
 import { ROUTES, APP_NAME, LINKS } from '@/configs/constants';
 import { getLocalizedRouteVariants, localizeRoutePath } from '@/configs/routeLocalization';
@@ -129,8 +130,37 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand, language, live
       )}
 
       <ListItem disablePadding>
-        <MenuItem icon={LaunchOutlinedIcon} text={t('employer:sidebar.squareHrmAdmin')} to={LINKS.SQUARE_HRM_ADMIN_LINK} external isCollapsed={isCollapsed} />
+        <MenuItem
+          icon={BadgeOutlinedIcon}
+          text={t('employer:sidebar.hrmManagement')}
+          kind="group"
+          isCollapsed={isCollapsed}
+          state={{ expanded: expandedItems.hrm }}
+          onClick={() => handleExpand('hrm')}
+          subItems={[
+            { text: t('employer:sidebar.hrmDashboard'), to: routePath(ROUTES.EMPLOYER.HRM_DASHBOARD), isSelected: isSelected(ROUTES.EMPLOYER.HRM_DASHBOARD) },
+            { text: t('employer:sidebar.hrmEmployeesList'), to: routePath(ROUTES.EMPLOYER.HRM_EMPLOYEES), isSelected: isSelected(ROUTES.EMPLOYER.HRM_EMPLOYEES) },
+            { text: t('employer:sidebar.hrmOnboarding'), to: routePath(ROUTES.EMPLOYER.HRM_ONBOARDING), isSelected: isSelected(ROUTES.EMPLOYER.HRM_ONBOARDING) },
+            { text: t('employer:sidebar.hrmDepartments'), to: routePath(ROUTES.EMPLOYER.HRM_DEPARTMENTS), isSelected: isSelected(ROUTES.EMPLOYER.HRM_DEPARTMENTS) },
+            { text: t('employer:sidebar.hrmContracts'), to: routePath(ROUTES.EMPLOYER.HRM_CONTRACTS), isSelected: isSelected(ROUTES.EMPLOYER.HRM_CONTRACTS) },
+            { text: t('employer:sidebar.hrmLeaves'), to: routePath(ROUTES.EMPLOYER.HRM_LEAVES), isSelected: isSelected(ROUTES.EMPLOYER.HRM_LEAVES) },
+            { text: t('employer:sidebar.hrmOrgChart'), to: routePath(ROUTES.EMPLOYER.HRM_ORG_CHART), isSelected: isSelected(ROUTES.EMPLOYER.HRM_ORG_CHART) },
+          ]}
+        />
       </ListItem>
+      {!isCollapsed && (
+        <Collapse in={expandedItems.hrm} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <MenuItem text={t('employer:sidebar.hrmDashboard')} to={routePath(ROUTES.EMPLOYER.HRM_DASHBOARD)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_DASHBOARD) }} />
+            <MenuItem text={t('employer:sidebar.hrmEmployeesList')} to={routePath(ROUTES.EMPLOYER.HRM_EMPLOYEES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_EMPLOYEES) }} />
+            <MenuItem text={t('employer:sidebar.hrmOnboarding')} to={routePath(ROUTES.EMPLOYER.HRM_ONBOARDING)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_ONBOARDING) }} />
+            <MenuItem text={t('employer:sidebar.hrmDepartments')} to={routePath(ROUTES.EMPLOYER.HRM_DEPARTMENTS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_DEPARTMENTS) }} />
+            <MenuItem text={t('employer:sidebar.hrmContracts')} to={routePath(ROUTES.EMPLOYER.HRM_CONTRACTS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_CONTRACTS) }} />
+            <MenuItem text={t('employer:sidebar.hrmLeaves')} to={routePath(ROUTES.EMPLOYER.HRM_LEAVES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_LEAVES) }} />
+            <MenuItem text={t('employer:sidebar.hrmOrgChart')} to={routePath(ROUTES.EMPLOYER.HRM_ORG_CHART)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_ORG_CHART) }} />
+          </List>
+        </Collapse>
+      )}
     </>
   );
 };

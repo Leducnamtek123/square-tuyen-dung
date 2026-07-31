@@ -1,34 +1,40 @@
 {
-  "tabTitle": "Về chúng tôi - Hệ sinh thái Tuyển dụng {{appName}}",
-  "heading": "Sứ mệnh của chúng tôi",
-  "description": "{{appName}} là nền tảng công nghệ nhân sự hàng đầu, được xây dựng để giải quyết những thách thức lớn nhất trong việc kết nối tài năng và doanh nghiệp. Chúng tôi không chỉ đơn thuần là một trang web kết nối, mà là một hệ sinh thái toàn diện hỗ trợ Phân tích hồ sơ, Đánh giá năng lực và Quản lý phỏng vấn trực tuyến. {{appName}} cam kết mang lại sự minh bạch, bảo mật và hiệu quả vượt trội cho quy trình tuyển dụng hiện đại.",
-  "features": {
-    "careerTitle": "Định hướng Nghề nghiệp Chuẩn xác",
-    "careerDesc": "Cung cấp cái nhìn toàn diện về bản đồ nghề nghiệp, yêu cầu kỹ năng và lộ trình phát triển tại các doanh nghiệp hàng đầu.",
-    "cvTitle": "Xây dựng Hồ sơ Chuyên nghiệp",
-    "cvDesc": "Công cụ tạo CV và Profile trực tuyến giúp ứng viên nổi bật hơn trong mắt nhà tuyển dụng với cấu trúc thông tin khoa học.",
-    "locationTitle": "Kết nối Việc làm Địa phương",
-    "locationDesc": "Số hóa bản đồ việc làm, giúp ứng viên dễ dàng tìm thấy các cơ hội nghề nghiệp ngay tại nơi mình sinh sống.",
-    "notificationTitle": "Hệ thống Cập nhật Tức thì",
-    "notificationDesc": "Thông báo đa kênh giúp cả ứng viên và nhà tuyển dụng không bỏ lỡ bất kỳ phản hồi hay cơ hội phỏng vấn quan trọng nào."
+  "tabTitle": "Về chúng tôi — AILA AI Phỏng vấn & Tuyển dụng Thông minh | InfoHR",
+  "heading": "AILA — AI Phỏng vấn & Tuyển dụng Thông minh",
+  "subtitle": "Giải pháp AI Tuyển dụng Toàn diện thuộc Hệ sinh thái InfoHR: Tìm kiếm & sàng lọc thông minh, phỏng vấn Video & Giọng nói đa ngôn ngữ, đánh giá năng lực & Collaborative Hiring.",
+  "stats": {
+    "stat1Num": "80%",
+    "stat1Text": "Rút ngắn thời gian sơ tuyển & sàng lọc hồ sơ",
+    "stat2Num": "3.5x",
+    "stat2Text": "Tăng tỉ lệ phỏng vấn & tiếp nhận ứng viên thành công",
+    "stat3Num": "95%",
+    "stat3Text": "Độ chính xác thuật toán so khớp kỹ năng AI Match Score",
+    "stat4Num": "24/7",
+    "stat4Text": "Phỏng vấn tự động không khoảng cách thời gian & địa lý"
   },
-  "mobileAppHeading": "Quy trình Tuyển dụng Toàn diện",
-  "cvProfileDetail": {
-    "title": "Số hóa Hồ sơ Ứng tuyển",
-    "desc1": "Tạo Profile trực tuyến chuyên nghiệp, dễ dàng chia sẻ và ứng tuyển chỉ với một click.",
-    "desc2": "Hỗ trợ đính kèm CV tệp cũ và tự động trích xuất các thông tin quan trọng giúp tối ưu hóa kết quả tìm kiếm.",
-    "desc3": "Luôn cập nhật và điều chỉnh linh hoạt để phù hợp với từng định hướng công việc khác nhau của ứng viên."
+  "workflowHeading": "Quy trình Tuyển dụng Đột phá với AILA AI",
+  "workflowLead": "Giải pháp số hóa toàn diện giúp doanh nghiệp tự động hóa từ khâu đăng tin, sàng lọc đến phỏng vấn và tiếp nhận nhân sự.",
+  "steps": {
+    "step1Title": "1. Tìm kiếm & Sàng lọc Thông minh",
+    "step1Desc": "Tự động phân tích hồ sơ CV, chấm điểm độ phù hợp (Match Score) và gợi ý top ứng viên tiềm năng nhất.",
+    "step2Title": "2. Phỏng vấn Video & Voice AI Đa ngôn ngữ",
+    "step2Desc": "AI phỏng vấn trực tiếp bằng giọng nói tự nhiên, phân tích ngữ điệu, biểu cảm và chuyển ngữ real-time.",
+    "step3Title": "3. Đánh giá Năng lực & Skill Gap Analysis",
+    "step3Desc": "Xuất báo cáo chi tiết về điểm mạnh, điểm yếu và khoảng trống kỹ năng so với yêu cầu công việc.",
+    "step4Title": "4. Quyết định Tuyển dụng & Collaborative Hiring",
+    "step4Desc": "Hội đồng tuyển dụng dễ dàng đánh giá chung, trao đổi nhận xét và đồng bộ dữ liệu với hệ thống HRM."
   },
-  "aroundJobDetail": {
-    "title": "Việc làm thông minh theo khu vực",
-    "desc1": "Tìm kiếm công việc trong bán kính mong muốn một cách dễ dàng.",
-    "desc2": "Sử dụng bản đồ trực quan để xác định vị trí doanh nghiệp, giúp bạn chủ động hơn trong việc lựa chọn nơi làm việc.",
-    "desc3": "Tiết kiệm thời gian di chuyển và tìm thấy sự cân bằng hoàn hảo giữa công việc và đời sống cá nhân."
-  },
-  "notificationDetail": {
-    "title": "Quản lý tương tác hiệu quả",
-    "desc1": "Hệ thống thông báo thông minh giúp bạn theo sát trạng thái hồ sơ ứng tuyển.",
-    "desc2": "Nhận lịch hẹn phỏng vấn trực tiếp từ nhà tuyển dụng và phản hồi ngay trên nền tảng.",
-    "desc3": "Đảm bảo sự giao tiếp thông suốt giữa doanh nghiệp và ứng viên trong suốt quá trình tuyển chọn."
-  }
+  "featuresHeading": "Các Tính Năng Đột Phá Thuộc Nền Tảng AILA",
+  "aiVoiceTitle": "Trợ lý Phỏng vấn Giọng nói AI (Voice AI)",
+  "aiVoiceDesc1": "Tự động thực hiện các cuộc phỏng vấn sơ loại bằng giọng nói AI mượt mà, hỗ trợ cả Tiếng Việt và Tiếng Anh.",
+  "aiVoiceDesc2": "Tự động ghi âm, nhận diện giọng nói và chuyển đổi thành văn bản transcript để hội đồng tuyển dụng xem lại bất kỳ lúc nào.",
+  "aiVoiceDesc3": "Giảm thiểu 90% thời gian gọi điện sơ tuyển thủ công của chuyên viên HR.",
+  "aiMatchTitle": "Thuật Toán Match Score & Phân Tích Kỹ Năng",
+  "aiMatchDesc1": "AI tự động đối soát hồ sơ ứng viên với yêu cầu công việc (Job Description) để chấm điểm phần trăm phù hợp.",
+  "aiMatchDesc2": "Phân tích khoảng trống kỹ năng (Skill Gap), đưa ra gợi ý câu hỏi phỏng vấn đào sâu cho từng ứng viên.",
+  "aiMatchDesc3": "Giúp doanh nghiệp ra quyết định tuyển dụng dựa trên dữ liệu khách quan, tránh định kiến cá nhân.",
+  "aiPipelineTitle": "Quản Lý Đường Ống Tuyển Dụng (Candidate CRM)",
+  "aiPipelineDesc1": "Quy trình Kanban trực quan từ Sơ tuyển, Phỏng vấn AI Live đến Ký hợp đồng & Onboarding.",
+  "aiPipelineDesc2": "Tự động gửi thông báo, lịch hẹn phỏng vấn và kết quả đến email/sĐT của ứng viên tức thì.",
+  "aiPipelineDesc3": "Kết nối liền mạch với Hệ sinh thái Quản lý Nhân sự InfoHR HRM."
 }

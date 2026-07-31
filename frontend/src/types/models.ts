@@ -297,6 +297,7 @@ export interface Resume {
   createAt?: string;
   updateAt?: string;
   isSaved?: boolean;
+  matchScore?: number;
   viewEmployerNumber?: number;
   lastViewedDate?: string | null;
   userDict?: UserDict;

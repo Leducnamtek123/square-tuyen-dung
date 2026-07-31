@@ -799,12 +799,15 @@
     "employerVerification": "Xác thực danh tính",
     "account": "Tài khoản",
     "settings": "Cài đặt",
-    "employeeRoles": "Nhân viên & Vai trò",
-    "hrm": "Quản trị nhân sự",
-    "hrmEmployees": "Hồ sơ nhân sự",
-    "hrmRoles": "Vai trò & quyền",
-    "hrmMembers": "Thành viên công ty",
-    "squareHrmAdmin": "Mở HRM"
+    "squareHrmAdmin": "Quản lý Nhân sự (HRM)",
+    "hrmManagement": "Quản lý Nhân sự (HRM)",
+    "hrmDashboard": "Tổng quan HRM",
+    "hrmEmployeesList": "Hồ sơ Nhân viên",
+    "hrmOnboarding": "Tiếp nhận & Onboarding",
+    "hrmDepartments": "Phòng ban & Vị trí",
+    "hrmContracts": "Hợp đồng Lao động",
+    "hrmLeaves": "Quản lý Nghỉ phép",
+    "hrmOrgChart": "Sơ đồ Cây Tổ chức"
   },
   "interviewHistory": {
     "title": "Thư viện Video",

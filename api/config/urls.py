@@ -31,6 +31,7 @@ api_v1_patterns = [
     path("chatbot/", include("apps.chatbot.urls")),
     path("interview/", include("apps.interviews.urls")),
     path("agent-assistants/", include("apps.agent_assistants.urls")),
+    path("native-hrm/", include("apps.hrm.urls")),
     path("hrm/", include("integrations.frappe_hr.urls")),
     path("admin/web/system-settings/", views.SystemSettingsAPIView.as_view()),
     path("ai/tts/", ai_views.tts),

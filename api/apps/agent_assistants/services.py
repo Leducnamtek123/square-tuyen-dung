@@ -708,15 +708,56 @@ def _clean_notebooklm_answer(answer_text: str) -> str:
         answer_text = answer_text.split("\nThoughts\n", 1)[1].strip()
 
     answer_text = re.sub(r"\[\d+\]", "", answer_text)
-    lines = answer_text.split("\n")
-    cleaned_lines = []
-    for line in lines:
-        stripped = line.strip()
-        if re.match(r"^\d+[\.\:\,]?$", stripped) or stripped in (".", ":", ","):
-            continue
-        cleaned_lines.append(line)
-    answer_text = "\n".join(cleaned_lines)
-    answer_text = re.sub(r"\n\s*(\d+\.\s+[^\n]+)", r"\n\n### \1", answer_text)
+
+    # 1. Convert any inline Markdown headings (###, ####) into isolated block headers with double newlines
+    answer_text = re.sub(r"\s*(###+|####+)\s*", r"\n\n\1 ", answer_text)
+
+    # 1. Clean up duplicate inline markers
+    answer_text = re.sub(r"\s*(###+|####+)\s*", r"\n\n\1 ", answer_text)
+    answer_text = re.sub(r"\s*(\*\s*\*\*[^*]+\*\*\:?)\s*", r"\n\n\1\n", answer_text)
+    answer_text = re.sub(r"(?<=[\w\)\:\.\!\?])\s*-\s+", r"\n- ", answer_text)
+
+    # 2. Format Roman Numerals (e.g. "I. Tiêu chuẩn...", "II. 5 nhóm...")
+    answer_text = re.sub(
+        r"(?:^|(?<=[\.\?!;:,\w\)]))\s*([I|V|X]{1,4}\.\s+[^\.\:\n\?]+(?:\([^\)]+\))?)",
+        r"\n\n### \1\n",
+        answer_text,
+    )
+
+    # 3. Format Category Labels
+    answer_text = re.sub(
+        r"(?:^|(?<=[\.\?!;\w\)]))\s*(Học vấn\s*&?\s*Chứng chỉ|Kinh nghiệm\s*làm việc|Yêu cầu\s*Kỹ năng\s*&?\s*Phẩm chất|Kỹ năng cốt lõi|Mục tiêu công việc|Phạm vi quản lý)(?:\:|\b)",
+        r"\n\n* **\1:**\n",
+        answer_text,
+        flags=re.IGNORECASE,
+    )
+
+    # 4. Format Lifecycle Stages
+    answer_text = re.sub(
+        r"(?:^|(?<=[\.\?!;\w\)]))\s*(Khởi tạo \(Initiation\)|Lập kế hoạch \(Planning\)|Triển khai \(Execution\)|Kiểm soát \(Monitoring & Control\)|Kết thúc \(Closing\))",
+        r"\n\n#### \1\n",
+        answer_text,
+    )
+
+    # 5. Break bullet verbs into list items with single newline
+    bullet_verbs = (
+        "Tốt nghiệp", "Sở hữu", "Có tối thiểu", "Khả năng ra", "Có tinh thần", "Có năng lực", "Cam kết hoàn thành",
+        "Tiếp nhận thông tin", "Phân tích chi tiết", "Xác định rõ ràng", "Thiết lập tiến độ", "Lập các kế hoạch",
+        "Điều phối nhịp nhàng", "Trực tiếp quản lý", "Giám sát chặt chẽ", "Đảm bảo kiểm soát", "Tổ chức nghiệm thu", "Hoàn tất đầy đủ", "Quản lý triệt để"
+    )
+    for verb in bullet_verbs:
+        pattern = r"(?<=[\:\.\!\?;\)])\s+(?:\-\s*)?(" + re.escape(verb) + r"\b)"
+        answer_text = re.sub(pattern, r"\n- \1", answer_text)
+
+    # 6. Separate trailing suggestion / emoji footer
+    answer_text = re.sub(
+        r"(?:^|(?<=[\.\?!;\w\)]))\s*(📊|💡|📌|Tôi có thể|Bạn có muốn)",
+        r"\n\n---\n\n\1",
+        answer_text,
+        count=1,
+    )
+
+    # 7. Clean duplicate newlines & whitespace
     answer_text = re.sub(r"\n{3,}", "\n\n", answer_text)
     return _fix_mojibake(answer_text.strip())
 

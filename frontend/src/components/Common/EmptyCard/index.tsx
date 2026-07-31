@@ -13,19 +13,43 @@ const EmptyCard = ({ content, labelButton="Thêm mới", onClick }: EmptyCardPro
   return (
     <Box
       sx={{
-        p: 4,
-        borderRadius: '14px',
-        border: '1px dashed #D1D5DB',
+        p: { xs: 3.5, sm: 4.5 },
+        borderRadius: '16px',
+        border: '1.5px dashed #CBD5E1',
         backgroundColor: '#FFFFFF',
         textAlign: 'center',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 1.5,
+        gap: 2,
+        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+        '&:hover': {
+          borderColor: '#2563EB',
+          backgroundColor: '#F8FAFC',
+          boxShadow: '0 4px 16px -2px rgba(37, 99, 235, 0.08)',
+        },
       }}
     >
-      <Typography variant="body1" sx={{ color: '#4B5563', fontWeight: 500 }}>
+      <Box
+        sx={{
+          width: 44,
+          height: 44,
+          borderRadius: '12px',
+          backgroundColor: '#EFF6FF',
+          color: '#2563EB',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'transform 0.2s ease',
+          '&:hover': {
+            transform: 'scale(1.08)',
+          },
+        }}
+      >
+        <AddIcon sx={{ fontSize: 24 }} />
+      </Box>
+      <Typography variant="body1" sx={{ color: '#475569', fontWeight: 500, fontSize: '0.925rem' }}>
         {content}
       </Typography>
       <Button
@@ -36,12 +60,17 @@ const EmptyCard = ({ content, labelButton="Thêm mới", onClick }: EmptyCardPro
           backgroundColor: '#2563EB',
           color: '#FFFFFF',
           fontWeight: 600,
-          borderRadius: '8px',
-          px: 2.5,
-          py: 0.8,
+          borderRadius: '10px',
+          px: 3,
+          py: 0.9,
           textTransform: 'none',
+          fontSize: '0.875rem',
+          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
+          transition: 'all 0.2s ease',
           '&:hover': {
             backgroundColor: '#1D4ED8',
+            boxShadow: '0 6px 16px rgba(37, 99, 235, 0.3)',
+            transform: 'translateY(-1px)',
           },
         }}
       >

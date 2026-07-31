@@ -120,7 +120,7 @@ const ProfileSearch: React.FC = () => {
 
   return (
     <>
-      <Grid size={12}>
+      <Grid size={12} sx={{ position: { lg: 'sticky' }, top: { lg: '80px' }, zIndex: 10 }}>
         <Paper
           elevation={0}
           sx={{
@@ -184,6 +184,17 @@ const ProfileSearch: React.FC = () => {
             border: '1px solid',
             borderColor: 'divider',
             boxShadow: (theme) => theme.customShadows?.z1,
+            position: { lg: 'sticky' },
+            top: { lg: '160px' },
+            maxHeight: { lg: 'calc(100vh - 180px)' },
+            overflowY: { lg: 'auto' },
+            '&::-webkit-scrollbar': {
+              width: '5px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              bgcolor: '#CBD5E1',
+              borderRadius: '4px',
+            },
           }}
         >
           <Stack spacing={4}>

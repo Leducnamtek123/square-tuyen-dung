@@ -200,6 +200,11 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             return len(resume.resumesaved_set.all())
         return resume.resumesaved_set.count()
 
+    matchScore = serializers.SerializerMethodField(read_only=True)
+
+    def get_matchScore(self, resume):
+        return getattr(resume, "match_score", 0)
+
     def check_saved(self, resume):
         request = self.context.get('request', None)
         if request is None:
@@ -352,7 +357,7 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   "typeOfWorkplaceChooseData", "jobTypeChooseData",
                   "experienceDetails", "educationDetails", "certificateDetails",
                   "languageSkills", "advancedSkills",
-                  "sourcePlatform", "sourceUrl", "sourceAccount", "sourceRef", "isImported")
+                  "sourcePlatform", "sourceUrl", "sourceAccount", "sourceRef", "isImported", "matchScore")
 
     def create(self, validated_data):
         with transaction.atomic():

@@ -50,7 +50,7 @@ const ProfileCardContent: React.FC = () => {
     const totalPages = Math.ceil(count / pageSize);
 
     return (
-        <Grid container spacing={4}>
+        <Grid container spacing={4} alignItems="flex-start">
             <ProfileSearch />
             <Grid size={{ xs: 12, lg: 9 }}>
                 <Stack spacing={5}>
@@ -141,6 +141,7 @@ const ProfileCardContent: React.FC = () => {
                                                 experience={resume.experience ?? 0}
                                                 updateAt={resume.updateAt || ''}
                                                 isSaved={resume.isSaved || false}
+                                                matchScore={resume.matchScore}
                                                 viewEmployerNumber={resume.viewEmployerNumber || 0}
                                                 user={resume.userDict}
                                                 city={resume.city?.id ?? ''}

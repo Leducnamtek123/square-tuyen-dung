@@ -226,6 +226,7 @@ INSTALLED_APPS = [
     'apps.chatbot',
     'apps.interviews',
     'apps.agent_assistants',
+    'apps.hrm',
     'corsheaders',
     'django_celery_results',
     'timezone_field',
@@ -690,6 +691,7 @@ CONN_MAX_AGE = 600  # Keep DB connections alive for 10 minutes
 CONN_HEALTH_CHECKS = True  # Verify connections before reuse (Django 4.1+)
 
 # === NotebookLM MCP Integration ===
-NOTEBOOKLM_MCP_URL = config('NOTEBOOKLM_MCP_URL', default='http://host.docker.internal:8085/mcp')
+NOTEBOOKLM_MCP_URL = config('NOTEBOOKLM_MCP_URL', default='http://host.docker.internal:8000/mcp')
 DEFAULT_NOTEBOOKLM_NOTEBOOK_ID = config('DEFAULT_NOTEBOOKLM_NOTEBOOK_ID', default='0a469926-b901-426d-afe5-843096613137')
+
 

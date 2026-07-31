@@ -125,36 +125,29 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
   };
 
   return (
-    <Paper
-      elevation={0}
-      sx={chartCardSx}
-    >
-      <Stack spacing={3}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+    <Paper elevation={0} sx={chartCardSx}>
+      <Box>
+        {/* Title row */}
+        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1.5}>
           <Typography variant="h4" sx={chartTitleSx}>
             {title}
           </Typography>
-          <MuiTooltip
-            title={t('interviewChart.tooltip')}
-            arrow
-            placement="top"
-          >
-            <InfoIcon sx={{ color: 'text.disabled', cursor: 'pointer', '&:hover': { color: 'primary.main' } }} />
+          <MuiTooltip title={t('interviewChart.tooltip')} arrow placement="top">
+            <InfoIcon sx={{ color: '#98A2B3', cursor: 'pointer', fontSize: 18, '&:hover': { color: '#2563EB' } }} />
           </MuiTooltip>
         </Stack>
 
-        <Divider sx={{ borderStyle: 'dashed' }} />
-
         {/* Summary chips */}
         {data && !isLoading && (
-          <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
+          <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap mb={2}>
             <Chip
               icon={<CheckCircleIcon sx={{ fontSize: 16 }} />}
               label={`${t('interviewChart.passed')}: ${data.passedCount}`}
               size="small"
               sx={{
-                fontWeight: 800,
-                bgcolor: alpha('#00c853', 0.1),
+                fontWeight: 700,
+                fontSize: '12px',
+                bgcolor: alpha('#00c853', 0.08),
                 color: '#00c853',
                 border: '1px solid',
                 borderColor: alpha('#00c853', 0.2),
@@ -165,8 +158,9 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
               label={`${t('interviewChart.failed')}: ${data.failedCount}`}
               size="small"
               sx={{
-                fontWeight: 800,
-                bgcolor: alpha('#ff5630', 0.1),
+                fontWeight: 700,
+                fontSize: '12px',
+                bgcolor: alpha('#ff5630', 0.08),
                 color: '#ff5630',
                 border: '1px solid',
                 borderColor: alpha('#ff5630', 0.2),
@@ -177,9 +171,10 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
               label={`${t('interviewChart.pending')}: ${data.pendingCount}`}
               size="small"
               sx={{
-                fontWeight: 800,
-                bgcolor: alpha('#ffab00', 0.1),
-                color: '#ffab00',
+                fontWeight: 700,
+                fontSize: '12px',
+                bgcolor: alpha('#ffab00', 0.08),
+                color: '#b78103',
                 border: '1px solid',
                 borderColor: alpha('#ffab00', 0.2),
               }}
@@ -189,8 +184,9 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
               label={`${t('interviewChart.avgDuration')}: ${formatDuration(data.avgDurationSeconds)}`}
               size="small"
               sx={{
-                fontWeight: 800,
-                bgcolor: alpha('#2979ff', 0.1),
+                fontWeight: 700,
+                fontSize: '12px',
+                bgcolor: alpha('#2979ff', 0.08),
                 color: '#2979ff',
                 border: '1px solid',
                 borderColor: alpha('#2979ff', 0.2),
@@ -199,29 +195,27 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
           </Stack>
         )}
 
-        <Box>
-          <Stack direction="row" justifyContent="flex-end" spacing={1} mb={3}>
-            <RangePickerCustom
-              allowSubmit={allowSubmit}
-              setAllowSubmit={setAllowSubmit}
-              selectedDateRange={selectedDateRange}
-              setSelectedDateRange={setSelectedDateRange}
-              maxRangeMonths={6}
-              resetRangeMonths={6}
-            />
-          </Stack>
+        {/* Date Filter Row */}
+        <RangePickerCustom
+          allowSubmit={allowSubmit}
+          setAllowSubmit={setAllowSubmit}
+          selectedDateRange={selectedDateRange}
+          setSelectedDateRange={setSelectedDateRange}
+          maxRangeMonths={6}
+          resetRangeMonths={6}
+        />
 
-          <Box sx={chartAreaSx(320)}>
-            {isLoading ? (
-              <ChartLoadingState height="100%" label={t('interviewChart.loading')} />
-            ) : !hasChartData ? (
-              <ChartEmptyState height="100%" label={t('interviewChart.noData')} />
-            ) : (
-              <BarChartClient options={options} data={chartData} height="100%" />
-            )}
-          </Box>
+        {/* Chart Canvas */}
+        <Box sx={chartAreaSx(320)}>
+          {isLoading ? (
+            <ChartLoadingState height="100%" label={t('interviewChart.loading')} />
+          ) : !hasChartData ? (
+            <ChartEmptyState height="100%" label={t('interviewChart.noData')} />
+          ) : (
+            <BarChartClient options={options} data={chartData} height="100%" />
+          )}
         </Box>
-      </Stack>
+      </Box>
     </Paper>
   );
 };

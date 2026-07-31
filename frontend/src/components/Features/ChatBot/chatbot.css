@@ -246,7 +246,8 @@
 
 /* Paragraphs */
 .sq-chatbot__bubble p {
-  margin: 0 0 10px 0;
+  margin: 0 0 5px 0;
+  line-height: 1.45;
 }
 .sq-chatbot__bubble p:last-child {
   margin-bottom: 0;
@@ -258,15 +259,15 @@
 .sq-chatbot__bubble h3,
 .sq-chatbot__bubble h4 {
   font-weight: 700;
-  line-height: 1.35;
-  margin: 14px 0 6px;
+  line-height: 1.3;
+  margin: 8px 0 3px;
   color: #0f172a;
   letter-spacing: -0.01em;
 }
-.sq-chatbot__bubble h1 { font-size: 1.08rem; }
-.sq-chatbot__bubble h2 { font-size: 1.02rem; }
-.sq-chatbot__bubble h3 { font-size: 0.96rem; }
-.sq-chatbot__bubble h4 { font-size: 0.9rem; }
+.sq-chatbot__bubble h1 { font-size: 1.0rem; }
+.sq-chatbot__bubble h2 { font-size: 0.95rem; }
+.sq-chatbot__bubble h3 { font-size: 0.9rem; }
+.sq-chatbot__bubble h4 { font-size: 0.86rem; }
 
 /* Bold & Italic */
 .sq-chatbot__bubble strong,
@@ -281,33 +282,49 @@
 
 /* Unordered list */
 .sq-chatbot__bubble ul {
-  margin: 6px 0 10px 0;
-  padding-left: 1.25rem;
+  margin: 3px 0 5px 0;
+  padding-left: 1.1rem;
   list-style-type: disc;
 }
 .sq-chatbot__bubble ul ul {
   list-style-type: circle;
-  margin: 2px 0;
+  margin: 1px 0;
 }
 
 /* Ordered list */
 .sq-chatbot__bubble ol {
-  margin: 6px 0 10px 0;
-  padding-left: 1.4rem;
+  margin: 3px 0 5px 0;
+  padding-left: 1.2rem;
   list-style-type: decimal;
 }
 .sq-chatbot__bubble ol ol {
   list-style-type: lower-alpha;
-  margin: 2px 0;
+  margin: 1px 0;
 }
 
 /* List items */
 .sq-chatbot__bubble li {
-  margin-bottom: 5px;
-  line-height: 1.6;
+  margin-bottom: 2px;
+  line-height: 1.4;
 }
 .sq-chatbot__bubble li:last-child {
   margin-bottom: 0;
+}
+.sq-chatbot__bubble li p,
+.sq-chatbot__bubble li > p {
+  margin: 0 !important;
+  display: inline;
+  line-height: 1.4;
+}
+
+/* Images */
+.sq-chatbot__bubble img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin: 6px 0;
+  display: block;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
 }
 
 /* Blockquote - Twenty CRM Minimalist Quote */

@@ -177,7 +177,7 @@ const EmployerQuantityStatistics = () => {
       value: data?.totalApply,
       color: '#E53935',
       Icon: GroupsOutlinedIcon,
-      trend: '↑ 18% so với kỳ trước',
+      trend: undefined,
       sparkPath: 'M0 22 Q 25 24, 50 10 T 100 6 T 120 3',
     },
     {
@@ -185,7 +185,7 @@ const EmployerQuantityStatistics = () => {
       value: data?.totalJobPostingPendingApproval,
       color: '#F59E0B',
       Icon: AccessTimeOutlinedIcon,
-      trend: '— 0%',
+      trend: undefined,
       sparkPath: 'M0 16 Q 30 18, 60 14 T 120 16',
     },
     {
@@ -193,7 +193,7 @@ const EmployerQuantityStatistics = () => {
       value: data?.totalJobPostExpired,
       color: '#EF4444',
       Icon: HighlightOffOutlinedIcon,
-      trend: '— 0%',
+      trend: undefined,
       sparkPath: 'M0 20 Q 30 22, 70 12 T 120 18',
     },
     {
@@ -201,7 +201,7 @@ const EmployerQuantityStatistics = () => {
       value: data?.totalJobPost,
       color: '#8B5CF6',
       Icon: DescriptionOutlinedIcon,
-      trend: '↑ 25% so với kỳ trước',
+      trend: undefined,
       sparkPath: 'M0 24 Q 35 22, 65 8 T 120 4',
     },
     {
@@ -209,7 +209,7 @@ const EmployerQuantityStatistics = () => {
       value: data?.totalInterviewsCompleted,
       color: '#10B981',
       Icon: CheckCircleOutlineIcon,
-      trend: '— 0%',
+      trend: undefined,
       sparkPath: 'M0 18 Q 40 16, 80 20 T 120 14',
     },
     {
@@ -218,7 +218,7 @@ const EmployerQuantityStatistics = () => {
       suffix: '%',
       color: '#EAB308',
       Icon: TrendingUpOutlinedIcon,
-      trend: '— 0%',
+      trend: undefined,
       sparkPath: 'M0 20 Q 30 15, 60 22 T 120 18',
     },
     {
@@ -226,7 +226,7 @@ const EmployerQuantityStatistics = () => {
       value: data?.totalInterviews,
       color: '#2563EB',
       Icon: VideocamOutlinedIcon,
-      trend: '↑ 12% so với kỳ trước',
+      trend: undefined,
       sparkPath: 'M0 22 Q 30 12, 70 18 T 120 8',
     },
     {
@@ -235,7 +235,7 @@ const EmployerQuantityStatistics = () => {
       suffix: '/10',
       color: '#06B6D4',
       Icon: SmartToyOutlinedIcon,
-      trend: '↑ 5% so với kỳ trước',
+      trend: undefined,
       sparkPath: 'M0 20 Q 30 24, 70 10 T 120 5',
     },
   ];

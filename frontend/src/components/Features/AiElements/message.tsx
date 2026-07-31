@@ -344,13 +344,13 @@ export const MessageResponse = memo((props: MessageResponseProps) => {
   const {
     className,
     children,
-    enableRich = false,
+    enableRich = true,
     ...rest
   } = props;
 
   if (!enableRich) {
     return (
-      <div className={cn("size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0", className)} {...rest}>
+      <div className={cn("size-full whitespace-pre-wrap [&>*:first-child]:mt-0 [&>*:last-child]:mb-0", className)} {...rest}>
         {children}
       </div>
     );

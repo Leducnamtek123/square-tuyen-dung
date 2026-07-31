@@ -99,6 +99,23 @@ const Header = (_props: HeaderProps) => {
     ];
   }, [dynamicCategories, i18n.language]);
 
+  const aboutChildren = React.useMemo(() => [
+    {
+      id: 'about-1',
+      label: 'Về InfoHR & Hệ sinh thái',
+      description: 'Giới thiệu về nền tảng tuyển dụng & giải pháp quản lý nhân sự InfoHR',
+      path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.ABOUT_US}`, i18n.language),
+      iconName: 'infohr',
+    },
+    {
+      id: 'about-2',
+      label: 'AILA AI — Platform Phỏng vấn',
+      description: 'Truy cập giải pháp phỏng vấn giọng nói & video tự động tại aila.infohr.vn',
+      path: 'https://aila.infohr.vn/',
+      iconName: 'aila',
+    },
+  ], [i18n.language]);
+
   const pages = React.useMemo(() => ({
 
     [HOST_NAME.PROJECT]: [
@@ -110,7 +127,12 @@ const Header = (_props: HeaderProps) => {
         path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language),
         children: infoChildren,
       },
-      { id: '4', label: t('nav.aboutUs'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.ABOUT_US}`, i18n.language) },
+      {
+        id: '4',
+        label: t('nav.aboutUs'),
+        path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.ABOUT_US}`, i18n.language),
+        children: aboutChildren,
+      },
     ],
     [HOST_NAME.EMPLOYER_PROJECT]: [
       { id: '1', label: 'Giới thiệu & Dịch vụ', path: localizeRoutePath(`/${ROUTES.EMPLOYER.INTRODUCE}`, i18n.language) },
@@ -118,7 +140,7 @@ const Header = (_props: HeaderProps) => {
       { id: '3', label: t('nav.pricing', { defaultValue: 'Bảng giá' }), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language) },
       { id: '4', label: t('nav.support', { defaultValue: 'Hỗ trợ' }), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SUPPORT}`, i18n.language) },
     ],
-  }), [t, i18n.language, infoChildren]);
+  }), [t, i18n.language, infoChildren, aboutChildren]);
 
   const theme = useTheme();
 

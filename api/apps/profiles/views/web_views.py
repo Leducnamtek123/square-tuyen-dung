@@ -10,7 +10,7 @@ from shared.configs import variable_response as var_res
 
 from shared.configs.messages import NOTIFICATION_MESSAGES, ERROR_MESSAGES
 
-from django.db.models import Count, Q, Prefetch
+from django.db.models import Count, Q, Prefetch, Case, When, Value, IntegerField
 
 from django.db import transaction
 from django.utils import timezone
@@ -504,9 +504,55 @@ class ResumeViewSet(viewsets.ViewSet,
     def list(self, request, *args, **kwargs):
         user = request.user
         company = user.active_company if getattr(user, 'is_authenticated', False) else None
+
+        active_career_ids = []
+        job_keywords = []
+        if company:
+            from apps.jobs.models import JobPost
+            active_jobs = JobPost.objects.filter(
+                company=company,
+                status=var_sys.JobPostStatus.APPROVED
+            )
+            if not active_jobs.exists():
+                active_jobs = JobPost.objects.filter(
+                    company=company
+                )
+            
+            active_career_ids = list(
+                active_jobs.exclude(career__isnull=True)
+                .values_list('career_id', flat=True)
+                .distinct()
+            )
+            
+            job_names = list(active_jobs.values_list('job_name', flat=True))
+            ignored_words = {"nhân", "viên", "thực", "tập", "công", "ty", "tại", "cho", "vị", "trí", "tuyển", "dụng", "dự", "án"}
+            for jn in job_names:
+                if jn:
+                    for term in jn.replace('/', ' ').replace('-', ' ').replace('(', ' ').replace(')', ' ').split():
+                        clean_term = term.strip()
+                        if len(clean_term) >= 3 and clean_term.lower() not in ignored_words:
+                            if clean_term.lower() not in [k.lower() for k in job_keywords]:
+                                job_keywords.append(clean_term)
+
+        base_qs = self.get_queryset().filter(is_active=True)
+
+        whens = []
+        if active_career_ids:
+            whens.append(When(career_id__in=active_career_ids, then=Value(10)))
+        
+        for kw in job_keywords[:10]:
+            whens.append(When(title__icontains=kw, then=Value(5)))
+
+        if whens:
+            base_qs = base_qs.annotate(
+                match_score=Case(*whens, default=Value(0), output_field=IntegerField())
+            )
+            order_args = ('-match_score', '-id', '-update_at')
+        else:
+            order_args = ('-id', '-update_at', '-create_at')
+
         queryset = self.filter_queryset(
-            self.get_queryset()
-            .filter(is_active=True)
+            base_qs
             .prefetch_related(
                 Prefetch(
                     'resumesaved_set',
@@ -525,29 +571,22 @@ class ResumeViewSet(viewsets.ViewSet,
                     queryset=JobPostActivity.objects.filter(job_post__company=company, is_deleted=False).select_related('job_post').order_by('-create_at') if company else JobPostActivity.objects.none(),
                 ),
             )
-            .order_by('-id', 'update_at', 'create_at')
+            .order_by(*order_args)
         )
 
         page = self.paginate_queryset(queryset)
 
         if page is not None:
-
             serializer = self.get_serializer(page, many=True, fields=[
-
                 'id', 'slug', 'title', 'salaryMin', 'salaryMax',
-
                 'experience', 'viewEmployerNumber', 'updateAt',
-
                 'userDict', 'jobSeekerProfileDict', 'city',
-
-                'isSaved', 'type', 'lastViewedDate'
-
+                'isSaved', 'type', 'lastViewedDate', 'matchScore'
             ])
 
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
-
         return var_res.response_data(data=serializer.data)
 
     @action(methods=["post"], detail=True,

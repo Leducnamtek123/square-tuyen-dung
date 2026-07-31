@@ -9,6 +9,8 @@ import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import { ROUTES, LINKS } from '@/configs/constants';
 import { getLocalizedRouteVariants, localizeRoutePath } from '@/configs/routeLocalization';
 import MenuItem from './MenuItem';
@@ -40,6 +42,9 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
         <MenuItem icon={GridViewIcon} text={t('admin:sidebar.systemOverview')} to={routePath(ROUTES.ADMIN.DASHBOARD)} isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.DASHBOARD) }} />
       </ListItem>
       <ListItem disablePadding>
+        <MenuItem icon={WidgetsOutlinedIcon} text="Thư viện Giao diện" to={routePath(ROUTES.ADMIN.COMPONENTS)} isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.COMPONENTS) }} />
+      </ListItem>
+      <ListItem disablePadding>
         <MenuItem icon={SmartToyOutlinedIcon} text={t('admin:sidebar.agentAssistants')} to={routePath(ROUTES.ADMIN.AGENT_ASSISTANTS)} isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.AGENT_ASSISTANTS) }} />
       </ListItem>
       <ListItem disablePadding>
@@ -54,7 +59,6 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
             { text: t('admin:sidebar.usersAndPermissions'), to: routePath(ROUTES.ADMIN.USERS), isSelected: isSelected(ROUTES.ADMIN.USERS) },
             { text: t('admin:sidebar.systemConfiguration'), to: routePath(ROUTES.ADMIN.SETTINGS), isSelected: isSelected(ROUTES.ADMIN.SETTINGS) },
             { text: t('admin:sidebar.auditLogs'), to: routePath(ROUTES.ADMIN.AUDIT_LOGS), isSelected: isSelected(ROUTES.ADMIN.AUDIT_LOGS) },
-            { text: t('admin:sidebar.squareHrmAdmin'), to: LINKS.SQUARE_HRM_ADMIN_LINK, external: true },
           ]}
         />
       </ListItem>
@@ -64,7 +68,39 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
             <MenuItem text={t('admin:sidebar.usersAndPermissions')} to={routePath(ROUTES.ADMIN.USERS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.USERS) }} />
             <MenuItem text={t('admin:sidebar.systemConfiguration')} to={routePath(ROUTES.ADMIN.SETTINGS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.SETTINGS) }} />
             <MenuItem text={t('admin:sidebar.auditLogs')} to={routePath(ROUTES.ADMIN.AUDIT_LOGS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.AUDIT_LOGS) }} />
-            <MenuItem text={t('admin:sidebar.squareHrmAdmin')} to={LINKS.SQUARE_HRM_ADMIN_LINK} kind="child" external isCollapsed={isCollapsed} />
+          </List>
+        </Collapse>
+      )}
+
+      <ListItem disablePadding>
+        <MenuItem
+          icon={BadgeOutlinedIcon}
+          text={t('employer:sidebar.hrmManagement')}
+          kind="group"
+          isCollapsed={isCollapsed}
+          state={{ expanded: expandedItems.hrm }}
+          onClick={() => handleExpand('hrm')}
+          subItems={[
+            { text: t('employer:sidebar.hrmDashboard'), to: routePath(ROUTES.ADMIN.HRM_DASHBOARD), isSelected: isSelected(ROUTES.ADMIN.HRM_DASHBOARD) },
+            { text: t('employer:sidebar.hrmEmployeesList'), to: routePath(ROUTES.ADMIN.HRM_EMPLOYEES), isSelected: isSelected(ROUTES.ADMIN.HRM_EMPLOYEES) },
+            { text: t('employer:sidebar.hrmOnboarding'), to: routePath(ROUTES.ADMIN.HRM_ONBOARDING), isSelected: isSelected(ROUTES.ADMIN.HRM_ONBOARDING) },
+            { text: t('employer:sidebar.hrmDepartments'), to: routePath(ROUTES.ADMIN.HRM_DEPARTMENTS), isSelected: isSelected(ROUTES.ADMIN.HRM_DEPARTMENTS) },
+            { text: t('employer:sidebar.hrmContracts'), to: routePath(ROUTES.ADMIN.HRM_CONTRACTS), isSelected: isSelected(ROUTES.ADMIN.HRM_CONTRACTS) },
+            { text: t('employer:sidebar.hrmLeaves'), to: routePath(ROUTES.ADMIN.HRM_LEAVES), isSelected: isSelected(ROUTES.ADMIN.HRM_LEAVES) },
+            { text: t('employer:sidebar.hrmOrgChart'), to: routePath(ROUTES.ADMIN.HRM_ORG_CHART), isSelected: isSelected(ROUTES.ADMIN.HRM_ORG_CHART) },
+          ]}
+        />
+      </ListItem>
+      {!isCollapsed && (
+        <Collapse in={expandedItems.hrm} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <MenuItem text={t('employer:sidebar.hrmDashboard')} to={routePath(ROUTES.ADMIN.HRM_DASHBOARD)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_DASHBOARD) }} />
+            <MenuItem text={t('employer:sidebar.hrmEmployeesList')} to={routePath(ROUTES.ADMIN.HRM_EMPLOYEES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_EMPLOYEES) }} />
+            <MenuItem text={t('employer:sidebar.hrmOnboarding')} to={routePath(ROUTES.ADMIN.HRM_ONBOARDING)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_ONBOARDING) }} />
+            <MenuItem text={t('employer:sidebar.hrmDepartments')} to={routePath(ROUTES.ADMIN.HRM_DEPARTMENTS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_DEPARTMENTS) }} />
+            <MenuItem text={t('employer:sidebar.hrmContracts')} to={routePath(ROUTES.ADMIN.HRM_CONTRACTS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_CONTRACTS) }} />
+            <MenuItem text={t('employer:sidebar.hrmLeaves')} to={routePath(ROUTES.ADMIN.HRM_LEAVES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_LEAVES) }} />
+            <MenuItem text={t('employer:sidebar.hrmOrgChart')} to={routePath(ROUTES.ADMIN.HRM_ORG_CHART)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_ORG_CHART) }} />
           </List>
         </Collapse>
       )}

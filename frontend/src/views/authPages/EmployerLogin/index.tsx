@@ -57,6 +57,16 @@ const getCompanyPortalPath = (language: string) => {
   return localizeRoutePath(`/${ROUTES.EMPLOYER.DASHBOARD}`, language);
 };
 
+const getSafeRedirectPath = (fallback: string) => {
+  if (typeof window === 'undefined') return fallback;
+  const params = new URLSearchParams(window.location.search);
+  const redirect = params.get('redirect');
+  if (redirect && redirect.startsWith('/') && !redirect.startsWith('//') && !redirect.includes('\\')) {
+    return redirect;
+  }
+  return fallback;
+};
+
 const getCompanyWorkspace = (user?: User | null) =>
   ((user?.workspaces || []) as Workspace[]).find((workspace) => workspace.type === 'company');
 
@@ -144,7 +154,7 @@ const EmployerLogin = () => {
               if (companyWorkspace) {
                 dispatch(setActiveWorkspace(companyWorkspace));
               }
-              push(getCompanyPortalPath(i18n.language));
+              push(getSafeRedirectPath(getCompanyPortalPath(i18n.language)));
             })
             .catch(() => {
               toastMessages.error(t('messages.loginError'));
@@ -243,7 +253,7 @@ const EmployerLogin = () => {
             if (companyWorkspace) {
               dispatch(setActiveWorkspace(companyWorkspace));
             }
-            push(getCompanyPortalPath(i18n.language));
+            push(getSafeRedirectPath(getCompanyPortalPath(i18n.language)));
           })
           .catch(() => {
             toastMessages.error(t('messages.loginError'));

@@ -53,21 +53,20 @@ export const rgba = (hex: string, opacity: number) => {
 };
 
 export const chartCardSx: SxProps<Theme> = {
-  p: { xs: 2, sm: 3 },
-  borderRadius: 2,
-  boxShadow: (theme) => theme.customShadows?.z1,
-  border: '1px solid',
-  borderColor: 'divider',
+  p: '20px',
+  borderRadius: '14px',
+  border: '1px solid #E7ECF3',
+  boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
   height: '100%',
-  bgcolor: 'background.paper',
+  bgcolor: '#ffffff',
   overflow: 'hidden',
 };
 
 export const chartTitleSx: SxProps<Theme> = {
-  color: 'text.primary',
-  fontSize: { xs: '1rem', sm: '1.125rem' },
-  fontWeight: 800,
-  letterSpacing: 0,
+  color: '#101828',
+  fontSize: '1rem',
+  fontWeight: 700,
+  letterSpacing: '-0.01em',
   lineHeight: 1.35,
 };
 

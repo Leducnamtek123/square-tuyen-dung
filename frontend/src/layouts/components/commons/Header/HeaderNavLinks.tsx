@@ -10,6 +10,8 @@ import GavelOutlinedIcon from '@mui/icons-material/GavelOutlined';
 import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined';
+import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
+import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import { useAppSelector } from "@/redux/hooks";
 import tokenService from "@/services/tokenService";
 import { useTranslation } from "react-i18next";
@@ -40,6 +42,10 @@ type HeaderNavLinksProps = {
 
 const getNavIcon = (iconName?: string) => {
   switch (iconName) {
+    case 'infohr':
+      return <BusinessOutlinedIcon fontSize="small" sx={{ color: '#2563eb' }} />;
+    case 'aila':
+      return <SmartToyOutlinedIcon fontSize="small" sx={{ color: '#fc054b' }} />;
     case 'book':
       return <MenuBookOutlinedIcon fontSize="small" sx={{ color: '#e11d48' }} />;
     case 'gavel':
@@ -216,7 +222,11 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                     onClick={() => {
                       handleCloseDropdown(page.id);
                       onClose();
-                      router.push(child.path);
+                      if (child.path.startsWith('http://') || child.path.startsWith('https://')) {
+                        window.open(child.path, '_blank', 'noopener,noreferrer');
+                      } else {
+                        router.push(child.path);
+                      }
                     }}
                     sx={{
                       py: 1.25,

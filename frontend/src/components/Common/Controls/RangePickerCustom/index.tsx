@@ -1,10 +1,16 @@
 'use client';
 
-import React from 'react';
-import { Box, Button, Chip, IconButton, Paper, Stack, Tooltip, Typography } from "@mui/material";
+import React, { useState } from 'react';
+import {
+  Box,
+  Button,
+  Popover,
+  Stack,
+  Typography,
+} from '@mui/material';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import EastIcon from '@mui/icons-material/East';
+import CheckIcon from '@mui/icons-material/Check';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
@@ -18,192 +24,311 @@ interface Props {
   resetRangeMonths?: number;
 }
 
-const RangePickerCustom = ({
+const RangePickerCustom: React.FC<Props> = ({
   allowSubmit,
   setAllowSubmit,
   selectedDateRange,
   setSelectedDateRange,
-  maxRangeMonths = 1,
+  maxRangeMonths = 6,
   resetRangeMonths = maxRangeMonths,
-}: Props) => {
+}) => {
   const { t } = useTranslation('common');
 
-  const getMaxEndDate = React.useCallback((startValue: Dayjs | null) => {
-    const today = dayjs();
-    if (!startValue) return today;
-
-    const rangeLimit = startValue.add(maxRangeMonths, 'month');
-    return rangeLimit.isAfter(today, 'day') ? today : rangeLimit;
-  }, [maxRangeMonths]);
-
-  const handleDateRangeChange = (startValue: Dayjs | null, endValue: Dayjs | null) => {
-    let nextEndValue = endValue;
-
-    if (startValue && nextEndValue) {
-      const maxEndDate = getMaxEndDate(startValue);
-
-      if (nextEndValue.isAfter(maxEndDate, 'day')) {
-        nextEndValue = maxEndDate;
-      }
-      if (nextEndValue.isBefore(startValue, 'day')) {
-        nextEndValue = startValue;
-      }
-    }
-    setSelectedDateRange([startValue, nextEndValue]);
-  };
-
-  const refreshFilter = () => {
-    setSelectedDateRange([dayjs().subtract(resetRangeMonths, 'month'), dayjs()]);
-    setAllowSubmit(!allowSubmit);
-  };
+  // Popover state
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const startValue = selectedDateRange?.[0] || null;
   const endValue = selectedDateRange?.[1] || null;
 
-  const maxEndDate = React.useMemo(() => {
-    if (!startValue) return dayjs();
-    return getMaxEndDate(startValue);
-  }, [getMaxEndDate, startValue]);
+  // Temp state for popover editing
+  const [tempStart, setTempStart] = useState<Dayjs | null>(startValue);
+  const [tempEnd, setTempEnd] = useState<Dayjs | null>(endValue);
 
-  const handlePresetSelect = (months: number) => {
-    setSelectedDateRange([dayjs().subtract(months, 'month'), dayjs()]);
+  // Sync temp values when selectedDateRange changes or popover opens
+  const handleOpenPopover = (event: React.MouseEvent<HTMLElement>) => {
+    setTempStart(startValue || dayjs().subtract(1, 'month'));
+    setTempEnd(endValue || dayjs());
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClosePopover = () => {
+    setAnchorEl(null);
+  };
+
+  const handleApplyPopover = () => {
+    let nextStart = tempStart;
+    let nextEnd = tempEnd;
+
+    if (nextStart && nextEnd && nextEnd.isBefore(nextStart)) {
+      const swap = nextStart;
+      nextStart = nextEnd;
+      nextEnd = swap;
+    }
+
+    setSelectedDateRange([nextStart, nextEnd]);
+    setAllowSubmit(!allowSubmit);
+    handleClosePopover();
+  };
+
+  const handlePresetSelect = (days: number) => {
+    const end = dayjs();
+    const start = dayjs().subtract(days, 'day');
+    setSelectedDateRange([start, end]);
     setAllowSubmit(!allowSubmit);
   };
 
+  const is30DaysActive = React.useMemo(() => {
+    if (!startValue || !endValue) return false;
+    const diff = Math.abs(endValue.diff(startValue, 'day'));
+    return diff >= 28 && diff <= 32 && endValue.isSame(dayjs(), 'day');
+  }, [startValue, endValue]);
+
+  const is90DaysActive = React.useMemo(() => {
+    if (!startValue || !endValue) return false;
+    const diff = Math.abs(endValue.diff(startValue, 'day'));
+    return diff >= 88 && diff <= 93 && endValue.isSame(dayjs(), 'day');
+  }, [startValue, endValue]);
+
+  const openPopover = Boolean(anchorEl);
+
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
-      <Paper
-        elevation={0}
+    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap sx={{ mb: '20px' }}>
+      {/* ── 1. Single Unified Date Range Trigger Control ──────────────── */}
+      <Box
+        onClick={handleOpenPopover}
         sx={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          px: 1.5,
-          py: 0.25,
+          height: '40px',
+          minWidth: '290px',
+          px: '12px',
           borderRadius: '10px',
           border: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
-          transition: 'border-color 150ms ease, box-shadow 150ms ease',
+          borderColor: openPopover ? '#2563EB' : '#E5EAF2',
+          bgcolor: '#FFFFFF',
+          color: '#344054',
+          fontSize: '13px',
+          fontWeight: 500,
+          display: 'inline-flex',
+          alignItems: 'center',
+          cursor: 'pointer',
+          boxShadow: openPopover ? '0 0 0 3px rgba(37, 99, 235, 0.1)' : 'none',
+          transition: 'all 0.15s ease-in-out',
+          userSelect: 'none',
           '&:hover': {
-            borderColor: 'primary.main',
-          },
-          '&:focus-within': {
-            borderColor: 'primary.main',
-            boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.12)',
+            borderColor: openPopover ? '#2563EB' : '#B8C7E0',
           },
         }}
       >
-        <CalendarMonthOutlinedIcon sx={{ fontSize: 18, color: 'primary.main', mr: 1 }} />
-        
-        <DatePicker
-          value={startValue}
-          onChange={(newValue) => handleDateRangeChange(newValue, endValue)}
-          format="DD/MM/YYYY"
-          maxDate={dayjs()}
-          slotProps={{
-            textField: {
-              size: 'small',
-              placeholder: 'Từ ngày',
-              sx: {
-                width: 105,
-                '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-                '& .MuiOutlinedInput-root': {
-                  p: 0,
-                  bgcolor: 'transparent',
-                },
-                '& .MuiInputBase-input': {
-                  p: '4px 0',
-                  fontSize: '0.8125rem',
-                  fontWeight: 700,
-                  color: 'text.primary',
+        <CalendarMonthOutlinedIcon sx={{ fontSize: 16, color: '#667085', mr: 1, flexShrink: 0 }} />
+
+        <Typography sx={{ fontSize: '13px', fontWeight: 500, color: '#344054', whiteSpace: 'nowrap' }}>
+          {startValue ? startValue.format('DD/MM/YYYY') : '30/06/2025'}
+        </Typography>
+
+        <EastIcon sx={{ fontSize: 14, color: '#667085', mx: 1.5, flexShrink: 0 }} />
+
+        <Typography sx={{ fontSize: '13px', fontWeight: 500, color: '#344054', whiteSpace: 'nowrap' }}>
+          {endValue ? endValue.format('DD/MM/YYYY') : '30/07/2025'}
+        </Typography>
+
+        <CalendarMonthOutlinedIcon sx={{ fontSize: 16, color: '#667085', ml: 'auto', flexShrink: 0 }} />
+      </Box>
+
+      {/* ── 2. Calendar Popover ────────────────────────────────────────── */}
+      <Popover
+        open={openPopover}
+        anchorEl={anchorEl}
+        onClose={handleClosePopover}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        PaperProps={{
+          sx: {
+            borderRadius: '14px',
+            boxShadow: '0 10px 30px rgba(15, 23, 42, 0.12)',
+            border: '1px solid #E5EAF2',
+            p: 2.5,
+            mt: 1,
+            minWidth: 320,
+          },
+        }}
+      >
+        <Typography variant="subtitle2" fontWeight={700} color="#101828" mb={2}>
+          Chọn khoảng thời gian
+        </Typography>
+
+        <Stack direction="row" spacing={1.5} alignItems="center" mb={2.5}>
+          <DatePicker
+            label="Từ ngày"
+            value={tempStart}
+            onChange={(val) => setTempStart(val)}
+            format="DD/MM/YYYY"
+            maxDate={dayjs()}
+            slotProps={{
+              textField: {
+                size: 'small',
+                sx: {
+                  width: 145,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                  },
                 },
               },
-            },
-          }}
-        />
+            }}
+          />
 
-        <EastIcon sx={{ fontSize: 14, color: 'text.disabled', mx: 0.75 }} />
+          <EastIcon sx={{ fontSize: 16, color: '#667085' }} />
 
-        <DatePicker
-          value={endValue}
-          onChange={(newValue) => handleDateRangeChange(startValue, newValue)}
-          format="DD/MM/YYYY"
-          minDate={startValue || undefined}
-          maxDate={maxEndDate}
-          slotProps={{
-            textField: {
-              size: 'small',
-              placeholder: 'Đến ngày',
-              sx: {
-                width: 105,
-                '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-                '& .MuiOutlinedInput-root': {
-                  p: 0,
-                  bgcolor: 'transparent',
-                },
-                '& .MuiInputBase-input': {
-                  p: '4px 0',
-                  fontSize: '0.8125rem',
-                  fontWeight: 700,
-                  color: 'text.primary',
+          <DatePicker
+            label="Đến ngày"
+            value={tempEnd}
+            onChange={(val) => setTempEnd(val)}
+            format="DD/MM/YYYY"
+            minDate={tempStart || undefined}
+            maxDate={dayjs()}
+            slotProps={{
+              textField: {
+                size: 'small',
+                sx: {
+                  width: 145,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                  },
                 },
               },
-            },
-          }}
-        />
-      </Paper>
+            }}
+          />
+        </Stack>
 
-      <Stack direction="row" spacing={0.75} alignItems="center">
-        <Chip
-          label="30 ngày"
-          size="small"
-          clickable
-          onClick={() => handlePresetSelect(1)}
-          sx={{ 
-            fontWeight: 700, 
-            fontSize: '0.75rem', 
-            borderRadius: '6px',
-            bgcolor: 'action.hover',
-            '&:hover': { bgcolor: 'primary.extralight', color: 'primary.main' } 
-          }}
-        />
-        <Chip
-          label="90 ngày"
-          size="small"
-          clickable
-          onClick={() => handlePresetSelect(3)}
-          sx={{ 
-            fontWeight: 700, 
-            fontSize: '0.75rem', 
-            borderRadius: '6px',
-            bgcolor: 'action.hover',
-            '&:hover': { bgcolor: 'primary.extralight', color: 'primary.main' }
-          }}
-        />
-      </Stack>
+        <Stack direction="row" justifyContent="flex-end" spacing={1} pt={1} borderTop="1px solid #F1F5F9">
+          <Button
+            size="small"
+            onClick={handleClosePopover}
+            sx={{
+              height: '36px',
+              px: 2,
+              borderRadius: '8px',
+              color: '#475467',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '13px',
+              '&:hover': { bgcolor: '#F8FAFC' },
+            }}
+          >
+            Hủy
+          </Button>
 
-      <Tooltip title={t('actions.refresh')} arrow>
-        <IconButton aria-label={t('actions.refresh')} size="small" onClick={refreshFilter}>
-          <RefreshIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
+          <Button
+            size="small"
+            variant="contained"
+            onClick={handleApplyPopover}
+            sx={{
+              height: '36px',
+              px: 2.5,
+              borderRadius: '8px',
+              bgcolor: '#2563EB',
+              color: '#FFFFFF',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '13px',
+              boxShadow: 'none',
+              '&:hover': { bgcolor: '#1D4ED8', boxShadow: 'none' },
+            }}
+          >
+            Áp dụng
+          </Button>
+        </Stack>
+      </Popover>
 
+      {/* ── 3. Quick Filter Preset Group (30 ngày & 90 ngày) ──────────── */}
+      <Box
+        onClick={() => handlePresetSelect(30)}
+        sx={{
+          height: '40px',
+          px: '14px',
+          borderRadius: '10px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          fontSize: '13px',
+          fontWeight: is30DaysActive ? 600 : 500,
+          color: is30DaysActive ? '#175CD3' : '#475467',
+          bgcolor: is30DaysActive ? '#EEF4FF' : '#FFFFFF',
+          border: '1px solid',
+          borderColor: is30DaysActive ? '#B2CCFF' : '#E5EAF2',
+          transition: 'all 0.15s ease-in-out',
+          userSelect: 'none',
+          '&:hover': {
+            bgcolor: is30DaysActive ? '#EEF4FF' : '#F8FAFC',
+            borderColor: is30DaysActive ? '#B2CCFF' : '#B8C7E0',
+          },
+        }}
+      >
+        30 ngày
+      </Box>
+
+      <Box
+        onClick={() => handlePresetSelect(90)}
+        sx={{
+          height: '40px',
+          px: '14px',
+          borderRadius: '10px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          fontSize: '13px',
+          fontWeight: is90DaysActive ? 600 : 500,
+          color: is90DaysActive ? '#175CD3' : '#475467',
+          bgcolor: is90DaysActive ? '#EEF4FF' : '#FFFFFF',
+          border: '1px solid',
+          borderColor: is90DaysActive ? '#B2CCFF' : '#E5EAF2',
+          transition: 'all 0.15s ease-in-out',
+          userSelect: 'none',
+          '&:hover': {
+            bgcolor: is90DaysActive ? '#EEF4FF' : '#F8FAFC',
+            borderColor: is90DaysActive ? '#B2CCFF' : '#B8C7E0',
+          },
+        }}
+      >
+        90 ngày
+      </Box>
+
+      {/* ── 4. Apply Button (#0F1B3D) ─────────────────────────────────── */}
       <Button
-        size="small"
+        disableElevation
         variant="contained"
-        color="primary"
         disabled={!selectedDateRange}
         onClick={() => setAllowSubmit(!allowSubmit)}
+        startIcon={<CheckIcon sx={{ fontSize: 16 }} />}
         sx={{
+          height: '40px',
+          px: '18px',
+          borderRadius: '10px',
+          bgcolor: '#0F1B3D',
+          color: '#FFFFFF',
+          fontSize: '13px',
+          fontWeight: 600,
           textTransform: 'none',
-          fontWeight: 800,
-          borderRadius: '8px',
-          px: 2,
-          py: 0.5,
-          fontSize: '0.8125rem',
+          boxShadow: 'none',
+          '&:hover': {
+            bgcolor: '#172554',
+            boxShadow: 'none',
+          },
+          '&.Mui-disabled': {
+            bgcolor: '#94A3B8',
+            color: '#FFFFFF',
+          },
         }}
       >
-        {t('actions.apply')}
+        {t('actions.apply', 'Áp dụng')}
       </Button>
     </Stack>
   );

@@ -111,41 +111,47 @@ const theme = createTheme(baseTheme, {
         {
           props: { variant: 'contained', color: 'primary' },
           style: {
-            backgroundColor: '#0f172a',
+            backgroundColor: '#2563EB',
+            color: '#FFFFFF',
+            boxShadow: '0 4px 14px rgba(37, 99, 235, 0.22)',
             '&:hover': {
-              backgroundColor: '#111827',
+              backgroundColor: '#1D4ED8',
+              boxShadow: '0 6px 20px rgba(37, 99, 235, 0.35)',
             },
           },
         },
         {
           props: { variant: 'contained', color: 'secondary' },
           style: {
-            backgroundColor: '#10b981',
-            boxShadow: '0 8px 18px rgba(16, 185, 129, 0.16)',
+            backgroundColor: '#F1F5F9',
+            color: '#0F172A',
+            boxShadow: 'none',
             '&:hover': {
-              backgroundColor: '#059669',
-              boxShadow: '0 10px 22px rgba(16, 185, 129, 0.2)',
+              backgroundColor: '#E2E8F0',
+              boxShadow: 'none',
             },
           },
         },
         {
-          props: { variant: 'contained', color: 'info' },
+          props: { variant: 'contained', color: 'error' },
           style: {
-            backgroundColor: '#0f172a',
-            boxShadow: '0 8px 18px rgba(15, 23, 42, 0.16)',
+            backgroundColor: '#DC2626',
+            color: '#FFFFFF',
+            boxShadow: '0 4px 12px rgba(220, 38, 38, 0.2)',
             '&:hover': {
-              backgroundColor: '#111827',
-              boxShadow: '0 10px 22px rgba(15, 23, 42, 0.2)',
+              backgroundColor: '#B91C1C',
+              boxShadow: '0 6px 16px rgba(220, 38, 38, 0.3)',
             },
           },
         },
         {
           props: { variant: 'outlined', color: 'primary' },
           style: {
-            borderColor: 'rgba(15, 23, 42, 0.22)',
-            color: '#0f172a',
+            borderColor: '#2563EB',
+            color: '#2563EB',
             '&:hover': {
-              borderColor: 'rgba(15, 23, 42, 0.36)',
+              borderColor: '#1D4ED8',
+              backgroundColor: '#EFF6FF',
             },
           },
         },

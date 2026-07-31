@@ -32,6 +32,8 @@ import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import { useTranslation } from 'react-i18next';
 
+import Image from 'next/image';
+import { CHATBOT_ICONS } from '@/configs/images';
 import agentAssistantService, {
   type AgentMessageAttachment,
   type AgentMessage,
@@ -454,19 +456,21 @@ const MessageBubble = ({ message }: { message: AgentMessage }) => {
         {!isUser && (
           <Box
             sx={{
-              width: 34,
-              height: 34,
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)',
-              color: '#FFFFFF',
-              display: 'grid',
-              placeItems: 'center',
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              bgcolor: '#F8FAFC',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               flexShrink: 0,
               mt: 0.25,
-              boxShadow: '0 2px 6px rgba(37, 99, 235, 0.2)',
+              boxShadow: '0 2px 8px rgba(37, 99, 235, 0.2)',
+              border: '1px solid #DBEAFE',
+              overflow: 'hidden',
             }}
           >
-            <SmartToyOutlinedIcon sx={{ fontSize: 19 }} />
+            <Image src={CHATBOT_ICONS.EMPLOYER} alt="AILA AI" width={32} height={32} style={{ objectFit: 'contain' }} />
           </Box>
         )}
 
@@ -518,7 +522,7 @@ const MessageBubble = ({ message }: { message: AgentMessage }) => {
                 </Typography>
               ) : (
                 <Box sx={{ width: '100%', overflowWrap: 'anywhere', fontSize: '0.9375rem', lineHeight: 1.6, color: '#111827' }}>
-                  <MessageResponse>{message.content}</MessageResponse>
+                  <MessageResponse enableRich>{message.content}</MessageResponse>
                 </Box>
               )}
             </Stack>
@@ -896,17 +900,20 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Box
                 sx={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: '10px',
-                  display: 'grid',
-                  placeItems: 'center',
-                  color: '#FFFFFF',
-                  background: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)',
-                  boxShadow: '0 2px 6px rgba(37, 99, 235, 0.2)',
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  bgcolor: '#F8FAFC',
+                  boxShadow: '0 2px 8px rgba(37, 99, 235, 0.2)',
+                  border: '1px solid #DBEAFE',
+                  overflow: 'hidden',
+                  flexShrink: 0,
                 }}
               >
-                <SmartToyOutlinedIcon fontSize="small" />
+                <Image src={CHATBOT_ICONS.EMPLOYER} alt="AILA AI" width={32} height={32} style={{ objectFit: 'contain' }} />
               </Box>
               <Box sx={{ minWidth: 0 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#111827', fontSize: '0.9375rem', lineHeight: 1.2 }}>

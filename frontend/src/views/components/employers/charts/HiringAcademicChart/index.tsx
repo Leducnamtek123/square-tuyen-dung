@@ -86,43 +86,34 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
   const hasChartData = React.useMemo(() => Boolean(data?.data?.some((value: unknown) => Number(value) > 0)), [data]);
 
   return (
-    <Paper
-      elevation={0}
-      sx={chartCardSx}
-    >
-      <Stack spacing={3}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+    <Paper elevation={0} sx={chartCardSx}>
+      <Box>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1.5}>
           <Typography variant="h4" sx={chartTitleSx}>
             {title}
           </Typography>
           <MuiTooltip title={t('hiringAcademicChart.title')} arrow placement="top">
-            <InfoIcon sx={{ color: 'text.disabled', cursor: 'pointer', '&:hover': { color: 'primary.main' } }} />
+            <InfoIcon sx={{ color: '#98A2B3', cursor: 'pointer', fontSize: 18, '&:hover': { color: '#2563EB' } }} />
           </MuiTooltip>
         </Stack>
 
-        <Divider sx={{ borderStyle: 'dashed' }} />
+        <RangePickerCustom
+          allowSubmit={allowSubmit}
+          setAllowSubmit={setAllowSubmit}
+          selectedDateRange={selectedDateRange}
+          setSelectedDateRange={setSelectedDateRange}
+        />
 
-        <Box>
-          <Stack direction="row" justifyContent="flex-end" spacing={1} mb={3}>
-            <RangePickerCustom
-              allowSubmit={allowSubmit}
-              setAllowSubmit={setAllowSubmit}
-              selectedDateRange={selectedDateRange}
-              setSelectedDateRange={setSelectedDateRange}
-            />
-          </Stack>
-
-          <Box sx={chartAreaSx(320)}>
-            {queryLoading ? (
-              <ChartLoadingState height="100%" label={t('hiringAcademicChart.loading')} />
-            ) : !hasChartData ? (
-              <ChartEmptyState height="100%" label={t('hiringAcademicChart.noData')} />
-            ) : (
-              <PieChartClient data={dataOptions} options={options} height="100%" />
-            )}
-          </Box>
+        <Box sx={chartAreaSx(320)}>
+          {queryLoading ? (
+            <ChartLoadingState height="100%" label={t('hiringAcademicChart.loading')} />
+          ) : !hasChartData ? (
+            <ChartEmptyState height="100%" label={t('hiringAcademicChart.noData')} />
+          ) : (
+            <PieChartClient data={dataOptions} options={options} height="100%" />
+          )}
         </Box>
-      </Stack>
+      </Box>
     </Paper>
   );
 };

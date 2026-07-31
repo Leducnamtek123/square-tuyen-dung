@@ -83,7 +83,7 @@ const renderNode = (node: Node, key: string): React.ReactNode => {
       </figure>;
     case 'p':
       return (
-        <p key={key} className="mb-4 last:mb-0">
+        <p key={key} className="mb-2.5 last:mb-0 [&>p]:mb-0">
           {children}
         </p>
       );
@@ -109,25 +109,29 @@ const renderNode = (node: Node, key: string): React.ReactNode => {
       );
     case 'ul':
       return (
-        <ul key={key} className="mb-4 list-disc pl-5">
+        <ul key={key} className="my-2 list-disc pl-5">
           {children}
         </ul>
       );
     case 'ol':
       return (
-        <ol key={key} className="mb-4 list-decimal pl-5">
+        <ol key={key} className="my-2 list-decimal pl-5">
           {children}
         </ol>
       );
     case 'li':
-      return <li key={key}>{children}</li>;
+      return (
+        <li key={key} className="mb-1 last:mb-0 [&>p]:mb-0 [&>p]:inline">
+          {children}
+        </li>
+      );
     case 'h1':
     case 'h2':
     case 'h3':
     case 'h4':
       return React.createElement(
         element.tagName.toLowerCase(),
-        { key, className: 'mb-3 font-semibold' },
+        { key, className: 'mt-3 mb-1.5 font-semibold text-slate-900' },
         children
       );
     case 'span':

@@ -99,7 +99,7 @@ export default function AdminSectionClient({
   const token = tokenService.getAccessTokenFromCookie();
   const lang = getPreferredLanguage();
   const adminPrefix = getPortalPrefix('admin', lang);
-  const loginPath = `${adminPrefix}/login`;
+  const loginUrl = `${adminPrefix}/login?redirect=${encodeURIComponent(pathname)}`;
   const dashboardPath = `${adminPrefix}/dashboard`;
   const [authGate, dispatchAuthGate] = useReducer(
     authGateReducer,
@@ -111,7 +111,7 @@ export default function AdminSectionClient({
     let isMounted = true;
 
     if (authGate.shouldRedirectToLogin) {
-      window.location.replace(loginPath);
+      window.location.replace(loginUrl);
       return;
     }
 
@@ -158,7 +158,7 @@ export default function AdminSectionClient({
     return () => {
       isMounted = false;
     };
-  }, [authGate.shouldRedirectToLogin, adminPrefix, currentUser, dashboardPath, dispatch, isAuthPage, isLoginPage, loginPath]);
+  }, [authGate.shouldRedirectToLogin, adminPrefix, currentUser, dashboardPath, dispatch, isAuthPage, isLoginPage, loginUrl]);
 
   if (authGate.isChecking || authGate.shouldRedirectToLogin) {
     return <AuthLoadingScreen />;

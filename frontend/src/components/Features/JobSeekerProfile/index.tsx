@@ -43,6 +43,7 @@ interface JobSeekerProfileProps {
   experience: number;
   updateAt: string | Date;
   isSaved?: boolean;
+  matchScore?: number;
   viewEmployerNumber?: number;
   city: number | string;
   user?: UserDict & { avatar?: string };
@@ -63,6 +64,7 @@ const JobSeekerProfile = ({
   experience,
   updateAt,
   isSaved,
+  matchScore,
   viewEmployerNumber,
   city,
   user,
@@ -128,7 +130,7 @@ const JobSeekerProfile = ({
                 />
                 
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Stack direction="row" alignItems="center" spacing={1.5} mb={0.5}>
+                    <Stack direction="row" alignItems="center" spacing={1.5} mb={0.5} flexWrap="wrap">
                         <Typography 
                             variant="h6" 
                             sx={{ 
@@ -144,6 +146,24 @@ const JobSeekerProfile = ({
                             </Box>
                         </Typography>
                         
+                        {matchScore && matchScore > 0 ? (
+                            <Chip
+                                label="🎯 Phù hợp nhu cầu tuyển dụng"
+                                size="small"
+                                sx={{ 
+                                    borderRadius: 1.5, 
+                                    fontWeight: 900, 
+                                    height: 24, 
+                                    fontSize: '0.72rem',
+                                    bgcolor: pc.primary(0.12),
+                                    color: 'primary.main',
+                                    border: '1px solid',
+                                    borderColor: pc.primary(0.25),
+                                    boxShadow: '0 2px 6px rgba(37, 99, 235, 0.12)'
+                                }}
+                            />
+                        ) : null}
+
                         {lastViewedDate && (
                             <Chip
                                 icon={<CheckCircleRoundedIcon sx={{ fontSize: '14px !important' }} />}

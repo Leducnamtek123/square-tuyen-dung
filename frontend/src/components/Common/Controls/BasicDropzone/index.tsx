@@ -40,37 +40,24 @@ const FileDropzone = ({ accept, onDrop, values, multiple = false }: FileDropzone
   return (
 
     <Box
-
       sx={{
-
         borderStyle: 'dashed',
-
         borderWidth: 2,
-
-        borderColor: (theme) => theme.palette.grey[300],
-
-        borderRadius: 3,
-
-        backgroundColor: (theme) => theme.palette.grey[50],
-
-        transition: 'all 0.2s ease-in-out',
-
+        borderColor: '#94A3B8',
+        borderRadius: '16px',
+        backgroundColor: '#F8FAFC',
+        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
         cursor: 'pointer',
-
-        py: 6,
-
+        py: 5,
+        px: 3,
+        textAlign: 'center',
         '&:hover': {
-
-          borderColor: (theme) => theme.palette.primary.main,
-
-          backgroundColor: (theme) => theme.palette.primary.background,
-
+          borderColor: '#2563EB',
+          backgroundColor: '#EFF6FF',
+          boxShadow: '0 4px 16px -2px rgba(37, 99, 235, 0.08)',
         },
-
       }}
-
       {...getRootProps({ className: 'dropzone' })}
-
     >
 
       <input {...(getInputProps() as any)} />
