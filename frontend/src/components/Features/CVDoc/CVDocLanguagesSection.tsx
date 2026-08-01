@@ -11,7 +11,7 @@ type Props = {
 };
 
 const CVDocLanguagesSection = ({ title, items, styles }: Props) => {
-  if (!items || items.length === 0) return null;
+  if (!items || items.length === 0) return <View style={{ height: 0 }} />;
 
   return (
     <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
@@ -19,7 +19,7 @@ const CVDocLanguagesSection = ({ title, items, styles }: Props) => {
       <View style={styles.languageWrapper}>
         {items.map((lang) => (
           <View key={`${lang?.language || 'language'}-${lang?.level || 'level'}`} style={styles.languageItem}>
-            <Text style={styles.languageName}>{i18next.t('common:cvDoc.labels.languagePrefix')}{lang?.language}</Text>
+            <Text style={styles.languageName}>{i18next.t('common:cvDoc.labels.languagePrefix')}{lang?.language || ''}</Text>
             <View style={styles.languageLevel}>
               <LanguageLevelDots level={lang?.level} levelDot={styles.levelDot} levelDotEmpty={styles.levelDotEmpty} />
             </View>

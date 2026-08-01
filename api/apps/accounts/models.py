@@ -104,6 +104,10 @@ class User(AbstractUser, CommonBaseModel):
 
     is_verify_email = models.BooleanField(default=False)
 
+    is_onboarded = models.BooleanField(default=False, db_index=True)
+
+    onboarding_step = models.IntegerField(default=0)
+
     # ForeignKey
 
     role_name = models.CharField(max_length=10, choices=var_sys.ROLE_CHOICES,

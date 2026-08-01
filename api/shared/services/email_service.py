@@ -26,8 +26,8 @@ class EmailService:
         token = email_verification_token.make_token(user=user)
 
         func = f"api/auth/active-email/{encoded_data}/{token}/?redirectLogin={redirect_login}&platform=WEB"
-        protocol = "https" if request.is_secure() else "http"
-        domain = request.META["HTTP_HOST"]
+        protocol = "https" if (request and hasattr(request, "is_secure") and request.is_secure()) else "https"
+        domain = request.META.get("HTTP_HOST", "infohr.vn") if (request and hasattr(request, "META")) else "infohr.vn"
         confirm_email_deeplink = None
 
         if role_name == var_sys.JOB_SEEKER and platform == "APP":

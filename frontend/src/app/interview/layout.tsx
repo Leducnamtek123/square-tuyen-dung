@@ -12,7 +12,7 @@ import './livekit.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Interview Room | InfoHR Tuyá»ƒn Dá»¥ng',
+  title: 'Interview Room | InfoHR Tuyển Dụng',
   description: 'Join your online interview session.',
 };
 

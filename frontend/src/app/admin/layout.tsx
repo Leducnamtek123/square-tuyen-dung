@@ -5,7 +5,7 @@ import AdminSectionClient from './AdminSectionClient';
 export const metadata: Metadata = {
   title: {
     template: '%s | InfoHR Admin',
-    default: 'Quáº£n trá»‹ | InfoHR Admin',
+    default: 'Quản trị | InfoHR Admin',
   },
 };
 

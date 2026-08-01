@@ -1,95 +1,93 @@
-<!DOCTYPE html>
-<html>
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #eee;
-            border-radius: 10px;
-        }
-
-        .header {
-            background-color: #007bff;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            border-radius: 10px 10px 0 0;
-        }
-
-        .content {
-            padding: 20px;
-        }
-
-        .button {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #007bff;
-            color: white !important;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-
-        .footer {
-            font-size: 12px;
-            color: #777;
-            margin-top: 20px;
-            text-align: center;
-        }
-    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thư mời Phỏng vấn AI | InfoHR</title>
 </head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: #0f172a;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; padding: 30px 10px;">
+        <tr>
+            <td align="center">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 580px; background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 24px 32px; border-bottom: 1px solid #f1f5f9; text-align: left;">
+                            <a href="https://infohr.vn" target="_blank" style="text-decoration: none;">
+                                <img src="https://infohr.vn/infohr-icons/logo-brand.png" alt="InfoHR" style="height: 36px; max-height: 36px; border: 0; outline: none; display: block;" />
+                            </a>
+                        </td>
+                    </tr>
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 36px 32px; text-align: center;">
+                            <!-- Icon Badge -->
+                            <table align="center" width="72" height="72" cellpadding="0" cellspacing="0" border="0" style="background-color: #fef2f2; border-radius: 50%; margin: 0 auto 20px auto;">
+                                <tr>
+                                    <td align="center" valign="middle" style="font-size: 32px; line-height: 1;">🤖</td>
+                                </tr>
+                            </table>
 
-<body>
-    <div class="container">
-        <div class="header">
-            <h2>Mời Phỏng vấn trực tuyến</h2>
-        </div>
-        <div class="content">
-            <p>Chào <strong>{{ candidate_name }}</strong>,</p>
-            <p>Bạn đã được mời tham gia buổi Phỏng vấn trực tuyến cho vị trí <strong>{{ job_title }}</strong>.</p>
-            <p>Đây là buổi phỏng vấn tự động với trợ lý ảo AI của InfoHR. Bạn có thể tham gia bất kỳ lúc nào thông qua liên kết dưới đây:</p>
+                            <h1 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">Thư mời phỏng vấn AI</h1>
+                            
+                            <p style="font-size: 15px; line-height: 1.6; color: #475569; margin: 0 0 20px 0;">
+                                Xin chào <strong>{{ candidate_name|default:"Ứng viên" }}</strong>,<br />
+                                Bạn được mời tham gia phỏng vấn AI cho vị trí:
+                            </p>
 
-            <div style="text-align: center; margin: 20px 0;">
-                <a href="{{ interview_url }}" class="button">Tham gia Phỏng vấn ngay</a>
-            </div>
+                            <table align="center" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; margin: 20px 0; padding: 20px;">
+                                <tr>
+                                    <td align="center">
+                                        <div style="font-size: 18px; font-weight: 800; color: #1d4ed8; margin-bottom: 6px;">{{ job_title|default:"Vị trí tuyển dụng" }}</div>
+                                        {% if company_name %}<div style="font-size: 14px; color: #475569;">{{ company_name }}</div>{% endif %}
+                                    </td>
+                                </tr>
+                            </table>
 
-            <div style="background-color: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px 16px; margin-top: 14px;">
-                <p style="margin: 0 0 6px 0; font-weight: bold; color: #111827;">Thời gian phỏng vấn</p>
-                <p style="margin: 0; color: #374151;">{{ scheduled_at_display }} (giờ Việt Nam)</p>
-            </div>
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin: 24px 0; padding: 20px; text-align: left;">
+                                <tr>
+                                    <td style="font-size: 14px; line-height: 1.8; color: #334155;">
+                                        <strong>Thông tin phòng phỏng vấn:</strong><br />
+                                        • Mã truy cập: <strong style="color: #dc2626;">{{ invite_token|default:access_code }}</strong><br />
+                                        • Thời gian: <strong>{{ scheduled_at_display|default:"Ngay khi bạn thuận tiện" }}</strong><br />
+                                        • Hình thức: <strong>Phỏng vấn AI trực tuyến</strong>
+                                    </td>
+                                </tr>
+                            </table>
 
-            {% if candidate_email %}
-            <div style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px 16px; margin-top: 14px;">
-                <p style="margin: 0 0 8px 0; font-weight: bold; color: #0369a1;">Tài khoản truy cập hệ thống InfoHR của bạn:</p>
-                <p style="margin: 0 0 4px 0; color: #0c4a6e;">• <strong>Email đăng nhập:</strong> {{ candidate_email }}</p>
-                {% if initial_password %}
-                <p style="margin: 0 0 4px 0; color: #0c4a6e;">• <strong>Mật khẩu khởi tạo:</strong> <code style="background: #e0f2fe; padding: 2px 6px; border-radius: 4px; font-size: 14px; color: #0369a1;">{{ initial_password }}</code></p>
-                {% endif %}
-                <p style="margin: 6px 0 0 0; font-size: 13px; color: #0284c7;">
-                    Bạn có thể sử dụng thông tin trên để đăng nhập tại <a href="{{ login_url }}" style="color: #0284c7; font-weight: bold;">infohr.vn/login</a> nhằm cập nhật CV, theo dõi trạng thái ứng tuyển và tương tác với hệ thống.
-                </p>
-            </div>
-            {% endif %}
+                            {% if interview_url %}
+                            <table align="center" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 24px auto;">
+                                <tr>
+                                    <td align="center" style="border-radius: 8px; background-color: #dc2626;">
+                                        <a href="{{ interview_url }}" target="_blank" style="font-size: 15px; font-weight: 700; color: #ffffff; text-decoration: none; display: inline-block; padding: 14px 32px; border-radius: 8px;">Truy cập phòng phỏng vấn</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endif %}
 
-            <p style="margin-top: 20px;">Thời gian dự kiến: 15-20 phút.</p>
-            <p>Mã buổi phỏng vấn của bạn: <strong>{{ invite_token }}</strong></p>
-
-            <p>Cảm ơn và chúc bạn có một buổi phỏng vấn ấn tượng!</p>
-        </div>
-        <div class="footer">
-            <p>Đây là email tự động từ hệ thống InfoHR Tuyển Dụng AI.</p>
-        </div>
-    </div>
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 10px; margin-top: 24px; padding: 16px 20px; text-align: left;">
+                                <tr>
+                                    <td style="font-size: 13px; color: #92400e; line-height: 1.6;">
+                                        <strong>Lưu ý trước phỏng vấn:</strong><br />
+                                        • Chuẩn bị thiết bị có Camera và Micro hoạt động tốt<br />
+                                        • Đảm bảo kết nối Internet ổn định<br />
+                                        • Chọn không gian yên tĩnh khi tham gia phỏng vấn
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 20px 32px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; font-size: 13px; color: #64748b; text-align: center;">
+                            <span>© 2026 InfoHR. Bản quyền được bảo hộ.</span>
+                            <span style="margin: 0 8px;">|</span>
+                            <a href="https://infohr.vn" target="_blank" style="color: #64748b; text-decoration: none;">infohr.vn</a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
-
 </html>

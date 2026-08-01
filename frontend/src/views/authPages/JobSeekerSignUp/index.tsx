@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import * as React from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -143,8 +143,12 @@ const JobSeekerSignUp = () => {
       if (isSaveTokenToCookie) {
         dispatch(getUserInfo())
           .unwrap()
-          .then(() => {
-            push('/');
+          .then((user) => {
+            if (user?.isOnboarded === false) {
+              push('/onboarding/candidate');
+            } else {
+              push('/');
+            }
           })
           .catch(() => {
             errorHandling(new Error('Login error'));

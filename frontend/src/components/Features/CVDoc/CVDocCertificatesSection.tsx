@@ -11,7 +11,7 @@ type Props = {
 };
 
 const CVDocCertificatesSection = ({ title, items, styles }: Props) => {
-  if (!items || items.length === 0) return null;
+  if (!items || items.length === 0) return <View style={{ height: 0 }} />;
 
   return (
     <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
@@ -20,8 +20,8 @@ const CVDocCertificatesSection = ({ title, items, styles }: Props) => {
         <View key={`${cert?.name || 'cert'}-${cert?.trainingPlace || 'place'}-${cert?.startDate || 'start'}-${cert?.expirationDate || 'end'}`} style={styles.experienceItem}>
           <View style={styles.experienceHeader}>
             <View>
-              <Text style={styles.experienceTitle}>{cert?.name}</Text>
-              <Text style={styles.experienceCompany}>{cert?.trainingPlace}</Text>
+              <Text style={styles.experienceTitle}>{cert?.name || ''}</Text>
+              <Text style={styles.experienceCompany}>{cert?.trainingPlace || ''}</Text>
             </View>
             <Text style={styles.experienceDate}>
               {formatDate(cert?.startDate)}

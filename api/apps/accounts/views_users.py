@@ -73,6 +73,8 @@ USER_INFO_BASIC_FIELDS = (
     "email",
     "isActive",
     "isVerifyEmail",
+    "isOnboarded",
+    "onboardingStep",
     "avatarUrl",
     "roleName",
     "jobSeekerProfileId",
@@ -207,33 +209,20 @@ def send_verify_email(request):
 @api_view(http_method_names=["GET"])
 @permission_classes([AllowAny])
 def user_active(request, encoded_data, token):
-    if "platform" not in request.GET:
-        return HttpResponseNotFound()
-
-    platform = request.GET.get("platform")
-    if platform not in (var_sys.Platform.WEB, var_sys.Platform.APP):
-        return HttpResponseNotFound()
-
-    redirect_login = ""
-    if platform == var_sys.Platform.WEB:
-        if "redirectLogin" not in request.GET:
-            return HttpResponseNotFound()
-        redirect_login = request.GET.get("redirectLogin")
-        if redirect_login != settings.REDIRECT_LOGIN_CLIENT:
-            return HttpResponseNotFound()
+    platform = request.GET.get("platform", var_sys.Platform.WEB)
+    raw_redirect = request.GET.get("redirectLogin", settings.REDIRECT_LOGIN_CLIENT)
+    redirect_login = raw_redirect.strip("/") if raw_redirect else settings.REDIRECT_LOGIN_CLIENT
 
     user, error_key = EmailVerificationService.verify_user(encoded_data, token)
-
     domain_type = EmailVerificationService.get_domain_type(user)
 
     if error_key:
-        error_msg = ERROR_MESSAGES[error_key]
+        error_msg = ERROR_MESSAGES.get(error_key, "Lỗi xác thực email")
         if platform == var_sys.Platform.WEB:
-            return HttpResponseRedirect(
-                helper.get_full_client_url(
-                    f"{redirect_login}/?errorMessage={error_msg}", domain_type
-                )
+            target_url = helper.get_full_client_url(
+                f"{redirect_login}/?errorMessage={error_msg}", domain_type
             )
+            return HttpResponseRedirect(target_url)
         return response_data(
             status=status.HTTP_400_BAD_REQUEST,
             errors={"errorMessage": [error_msg]},
@@ -241,12 +230,11 @@ def user_active(request, encoded_data, token):
 
     # Success
     if platform == var_sys.Platform.WEB:
-        return HttpResponseRedirect(
-            helper.get_full_client_url(
-                f"{redirect_login}/?successMessage={SUCCESS_MESSAGES['EMAIL_VERIFIED']}",
-                domain_type,
-            )
+        target_url = helper.get_full_client_url(
+            f"{redirect_login}/?successMessage={SUCCESS_MESSAGES['EMAIL_VERIFIED']}",
+            domain_type,
         )
+        return HttpResponseRedirect(target_url)
     return response_data(status=status.HTTP_200_OK)
 
 

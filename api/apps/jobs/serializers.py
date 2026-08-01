@@ -521,7 +521,7 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
                 raise serializers.ValidationError({"job_post": "Tin tuyển dụng đã hết hạn ứng tuyển."})
 
             if not job_post.company.is_verified:
-                raise serializers.ValidationError({"job_post": "CÃ´ng ty cá»§a tin tuyá»ƒn dá»¥ng chÆ°a Ä‘Æ°á»£c xÃ¡c thá»±c."})
+                raise serializers.ValidationError({"job_post": "Công ty của tin tuyển dụng chưa được xác thực."})
 
         return attrs
 

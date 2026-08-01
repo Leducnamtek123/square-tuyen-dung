@@ -105,6 +105,13 @@
       "allCareersList": "Danh sách tất cả nghề nghiệp",
       "topCareers": "Top 10 nghề nghiệp",
       "otherCareers": "Ngành nghề khác"
+    },
+    "workspaceRoles": {
+      "owner": "Chủ sở hữu",
+      "admin": "Quản trị viên",
+      "member": "Thành viên",
+      "recruiter": "Nhà tuyển dụng",
+      "interviewer": "Người phỏng vấn"
     }
   },
   "status": {

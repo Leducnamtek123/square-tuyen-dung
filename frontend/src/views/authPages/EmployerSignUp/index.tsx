@@ -190,8 +190,12 @@ const EmployerSignUp = () => {
       if (isSaveTokenToCookie) {
         dispatch(getUserInfo())
           .unwrap()
-          .then(() => {
-            push('/');
+          .then((user) => {
+            if (user?.isOnboarded === false) {
+              push('/onboarding/employer');
+            } else {
+              push('/employer/dashboard');
+            }
           })
           .catch(() => {
             errorHandling(new Error('Login error'));

@@ -19,6 +19,8 @@ export interface User {
   avatarUrl?: string | null;
   hasCompany?: boolean;
   isVerifyEmail?: boolean;
+  isOnboarded?: boolean;
+  onboardingStep?: number;
   workspaces?: Workspace[];
   canAccessEmployerPortal?: boolean;
   isActive?: boolean;

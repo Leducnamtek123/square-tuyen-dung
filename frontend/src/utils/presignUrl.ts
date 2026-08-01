@@ -36,8 +36,8 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const unwrapResponse = (response: { data?: unknown }): unknown => {
   const payload = response?.data;
-  return isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, 'data')
-    ? payload.data
+  return isRecord(payload) && 'data' in (payload as object)
+    ? (payload as Record<string, unknown>).data
     : payload;
 };
 

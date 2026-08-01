@@ -9,7 +9,7 @@ import CVDocEducationSection from './CVDocEducationSection';
 import CVDocSkillsSection from './CVDocSkillsSection';
 import CVDocLanguagesSection from './CVDocLanguagesSection';
 import CVDocCertificatesSection from './CVDocCertificatesSection';
-import { Document, Font, Page } from './pdf';
+import { Document, Font, Page, View } from './pdf';
 
 Font.register({
   family: 'Roboto',
@@ -43,7 +43,7 @@ type PageBodyProps = {
 };
 
 const PageBody = ({ resume, styles }: PageBodyProps) => (
-  <React.Fragment>
+  <View style={{ flexDirection: 'column' }}>
     <CVDocInfoSection
       resume={resume}
       styles={styles}
@@ -73,7 +73,7 @@ const PageBody = ({ resume, styles }: PageBodyProps) => (
       items={resume?.certificateDetails}
       styles={styles}
     />
-  </React.Fragment>
+  </View>
 );
 
 export default CVDoc;

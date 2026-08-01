@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import * as React from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -72,8 +72,12 @@ const JobSeekerLogin = () => {
   }, [t]);
 
   const navigateHome = async () => {
-    await dispatch(getUserInfo()).unwrap();
-    push('/');
+    const user = await dispatch(getUserInfo()).unwrap();
+    if (user?.isOnboarded === false) {
+      push('/onboarding/candidate');
+    } else {
+      push('/');
+    }
   };
 
   const handleLogin = (data: { email: string; password?: string }) => {

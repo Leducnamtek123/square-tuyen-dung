@@ -115,7 +115,7 @@ const IntroducePage = () => {
             fontSize: '1.1rem',
           }}
         >
-          {t('introduce.heroSubtitle', { appName: APP_NAME, defaultValue: 'Kết nối doanh nghiệp với hàng triệu ứng viên tiềm năng thông qua nền tảng tuyển dụng thông minh.' })}
+          {t('introduce.heroSubtitle', { appName: APP_NAME, defaultValue: 'Kết nối doanh nghiệp với hàng triệu ứng viên tiềm năng thông qua nền tảng tuyển dụng thông minh — hỗ trợ chuyên sâu 4 ngành trọng điểm: Xây dựng, Bất động sản, Kiến trúc / Nội thất và Kỹ thuật.' })}
         </Typography>
       </Box>
 

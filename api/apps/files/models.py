@@ -13,6 +13,7 @@ class File(CommonBaseModel):
     WEB_BANNER_TYPE = "WEB_BANNER"
     MOBILE_BANNER_TYPE = "MOBILE_BANNER"
     SYSTEM_TYPE = "SYSTEM"
+    BUSINESS_LICENSE_TYPE = "BUSINESS_LICENSE"
     OTHER_TYPE = "OTHER"
 
     FILE_TYPES = [
@@ -25,6 +26,7 @@ class File(CommonBaseModel):
         (WEB_BANNER_TYPE, "Web Banner"),
         (MOBILE_BANNER_TYPE, "Mobile Banner"),
         (SYSTEM_TYPE, "System"),
+        (BUSINESS_LICENSE_TYPE, "Business License"),
         (OTHER_TYPE, "Other"),
     ]
 

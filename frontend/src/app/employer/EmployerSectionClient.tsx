@@ -191,6 +191,11 @@ export default function EmployerSectionClient({
         window.location.replace('/');
         return;
       }
+
+      if (user?.isOnboarded === false && !pathname.includes('/onboarding')) {
+        window.location.replace('/onboarding/employer');
+        return;
+      }
     };
 
     void checkAuth().finally(() => dispatchAuthGate({ type: 'checked' }));

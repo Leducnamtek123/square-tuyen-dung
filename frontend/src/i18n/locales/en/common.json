@@ -63,6 +63,13 @@
       "allCareersList": "List of all careers",
       "topCareers": "Top 10 Careers",
       "otherCareers": "Other Careers"
+    },
+    "workspaceRoles": {
+      "owner": "Owner",
+      "admin": "Administrator",
+      "member": "Member",
+      "recruiter": "Recruiter",
+      "interviewer": "Interviewer"
     }
   },
   "footer": {
@@ -891,7 +898,7 @@
     "statusCode": "Status code"
   },
   "language": {
-    "vietnamese": "Tiáº¿ng Viá»‡t",
+    "vietnamese": "Tiếng Việt",
     "english": "English"
   },
   "notification": {

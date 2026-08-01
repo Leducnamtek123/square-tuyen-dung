@@ -72,9 +72,15 @@ export default function AboutUsPage() {
           <Typography variant="h3" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.8rem', md: '2.5rem' }, lineHeight: 1.25 }}>
             Giải Pháp Tuyển Dụng & Quản Trị Nhân Sự Số Hóa
           </Typography>
-          <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 800, fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.7 }}>
-            InfoHR mang đến hệ sinh thái toàn diện kết nối tài năng, quản trị hồ sơ và số hóa quy trình nhân sự doanh nghiệp. Đồng thời tích hợp trực tiếp với nền tảng phỏng vấn AI thông minh <strong>AILA AI</strong>.
+          <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 850, fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.7 }}>
+            InfoHR mang đến hệ sinh thái toàn diện kết nối tài năng, quản trị hồ sơ và số hóa quy trình nhân sự doanh nghiệp — hỗ trợ chuyên sâu <strong>4 ngành nghề trọng điểm</strong> (Xây dựng, Bất động sản, Kiến trúc / Thiết kế nội thất, Kỹ thuật & Cơ điện). Đồng thời tích hợp trực tiếp với nền tảng phỏng vấn AI thông minh <strong>AILA AI</strong>.
           </Typography>
+          <Stack direction="row" spacing={1} flexWrap="wrap" justifyContent="center" gap={1} sx={{ pt: 1 }}>
+            <Chip label="🏗️ Xây dựng" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', fontWeight: 600, border: '1px solid #BFDBFE' }} />
+            <Chip label="🏢 Bất động sản" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', fontWeight: 600, border: '1px solid #BFDBFE' }} />
+            <Chip label="📐 Kiến trúc / Thiết kế nội thất" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', fontWeight: 600, border: '1px solid #BFDBFE' }} />
+            <Chip label="⚡ Kỹ thuật & Cơ điện (MEP)" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', fontWeight: 600, border: '1px solid #BFDBFE' }} />
+          </Stack>
         </Stack>
 
         {/* 2 PHẦN CHÍNH: INFOHR VS AILA AI */}

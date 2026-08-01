@@ -46,3 +46,21 @@ export const openResourceUrlSafely = (
   window.open(safeUrl, target, 'noopener,noreferrer');
   return true;
 };
+
+export const getSafeRedirectPath = (
+  candidatePath: string | null | undefined,
+  fallback = '/'
+): string => {
+  const trimmed = candidatePath?.trim();
+  if (!trimmed) return fallback;
+  if (
+    trimmed.startsWith('/') &&
+    !trimmed.startsWith('//') &&
+    !trimmed.startsWith('/\\') &&
+    !trimmed.includes('\\') &&
+    !trimmed.includes('://')
+  ) {
+    return trimmed;
+  }
+  return fallback;
+};

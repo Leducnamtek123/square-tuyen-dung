@@ -104,12 +104,15 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
         (workspace.type !== "company" ||
           Number(workspace.companyId) === Number(activeWorkspace?.companyId));
 
+      const rawRole = (workspace.roleCode || "member").toLowerCase();
+      const roleLabel = t(`nav.workspaceRoles.${rawRole}`, { defaultValue: workspace.roleCode || "member" });
+
       items.push({
         key,
         isSelected,
         label:
           workspace.type === "company"
-            ? `${workspace.label} (${workspace.roleCode || "member"})`
+            ? `${workspace.label} (${roleLabel})`
             : t("nav.accountManagement"),
         onClick: () => {
           const normalizedWorkspace: Workspace = {

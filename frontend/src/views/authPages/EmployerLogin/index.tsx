@@ -154,7 +154,11 @@ const EmployerLogin = () => {
               if (companyWorkspace) {
                 dispatch(setActiveWorkspace(companyWorkspace));
               }
-              push(getSafeRedirectPath(getCompanyPortalPath(i18n.language)));
+              if (user?.isOnboarded === false) {
+                push('/onboarding/employer');
+              } else {
+                push(getSafeRedirectPath(getCompanyPortalPath(i18n.language)));
+              }
             })
             .catch(() => {
               toastMessages.error(t('messages.loginError'));
@@ -253,7 +257,11 @@ const EmployerLogin = () => {
             if (companyWorkspace) {
               dispatch(setActiveWorkspace(companyWorkspace));
             }
-            push(getSafeRedirectPath(getCompanyPortalPath(i18n.language)));
+            if (user?.isOnboarded === false) {
+              push('/onboarding/employer');
+            } else {
+              push(getSafeRedirectPath(getCompanyPortalPath(i18n.language)));
+            }
           })
           .catch(() => {
             toastMessages.error(t('messages.loginError'));

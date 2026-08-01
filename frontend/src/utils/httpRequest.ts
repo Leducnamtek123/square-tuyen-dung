@@ -100,8 +100,8 @@ const extractApiErrorLogMessage = (data: unknown): string | null => {
 };
 
 const unwrapEnvelopeData = (payload: unknown) =>
-  isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, 'data')
-    ? payload.data
+  isRecord(payload) && 'data' in (payload as object)
+    ? (payload as Record<string, unknown>).data
     : payload;
 
 const unwrapResponse = (response: { data?: unknown }) =>

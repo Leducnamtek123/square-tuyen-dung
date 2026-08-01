@@ -32,6 +32,8 @@ class Command(BaseCommand):
                 role_name=var_sys.EMPLOYER
             )
             emp_user.has_company = True
+            emp_user.is_onboarded = True
+            emp_user.onboarding_step = 4
             emp_user.is_active = True
             emp_user.is_verify_email = True
             emp_user.save()

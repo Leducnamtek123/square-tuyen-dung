@@ -11,7 +11,7 @@ type Props = {
 };
 
 const CVDocEducationSection = ({ title, items, styles }: Props) => {
-  if (!items || items.length === 0) return null;
+  if (!items || items.length === 0) return <View style={{ height: 0 }} />;
 
   return (
     <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
@@ -20,15 +20,15 @@ const CVDocEducationSection = ({ title, items, styles }: Props) => {
         <View key={`${edu?.trainingPlaceName || 'school'}-${edu?.degreeName || 'degree'}-${edu?.startDate || 'start'}-${edu?.completedDate || 'end'}`} style={styles.experienceItem}>
           <View style={styles.experienceHeader}>
             <View>
-              <Text style={styles.experienceTitle}>{edu?.degreeName}</Text>
-              <Text style={styles.experienceCompany}>{edu?.trainingPlaceName}</Text>
-              <Text style={[styles.experienceCompany, { fontSize: 11 }]}>{i18next.t('common:cvDoc.labels.major')} {edu?.major}</Text>
+              <Text style={styles.experienceTitle}>{edu?.degreeName || ''}</Text>
+              <Text style={styles.experienceCompany}>{edu?.trainingPlaceName || ''}</Text>
+              <Text style={[styles.experienceCompany, { fontSize: 11 }]}>{i18next.t('common:cvDoc.labels.major')} {edu?.major || ''}</Text>
             </View>
             <Text style={styles.experienceDate}>
               {formatDate(edu?.startDate)} - {formatDate(edu?.completedDate)}
             </Text>
           </View>
-          {edu?.description && <Text style={styles.experienceDesc}>{edu?.description}</Text>}
+          {edu?.description ? <Text style={styles.experienceDesc}>{edu.description}</Text> : <View style={{ height: 0 }} />}
         </View>
       ))}
     </View>

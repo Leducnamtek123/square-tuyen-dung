@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Stack, Typography } from "@mui/material";
-import { ChromePicker, ColorResult } from 'react-color';
 import defaultTheme from '@/themeConfigs/defaultTheme';
 
 interface Props {
@@ -11,248 +10,131 @@ interface Props {
   onColorSelect: (color: string) => void;
 }
 
-
-
 const DEFAULT_COLORS = [
-
-  defaultTheme.palette.primary.main, // Primary Dark
-
-  '#2196f3', // Blue
-
-  '#4caf50', // Green  
-
-  '#f44336', // Red
-
-  '#ff9800', // Orange
-
+  defaultTheme.palette.primary.main,
+  '#2196f3',
+  '#4caf50',
+  '#f44336',
+  '#ff9800',
+  '#140861',
 ];
 
 const ColorPickerDialog = ({ open, onClose, onColorSelect }: Props) => {
-
   const [selectedColor, setSelectedColor] = React.useState<string>(defaultTheme.palette.primary.main);
-
   const [showCustomPicker, setShowCustomPicker] = React.useState(false);
 
   const handleColorSelect = (color: string) => {
-
-    setSelectedColor(color);
-
+    setSelectedColor(color || defaultTheme.palette.primary.main);
     setShowCustomPicker(false);
-
   };
 
-  const handleCustomColorChange = (color: ColorResult) => {
-
-    setSelectedColor(color.hex);
-
+  const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedColor(e.target.value || defaultTheme.palette.primary.main);
   };
 
   const handleConfirm = () => {
-
-    onColorSelect(selectedColor);
-
+    onColorSelect(selectedColor || defaultTheme.palette.primary.main);
     onClose();
-
   };
 
   return (
-
     <Dialog 
-
       open={open} 
-
       onClose={onClose}
-
       maxWidth="xs"
-
       fullWidth
-
     >
-
       <DialogTitle>
-
         Chọn màu sắc cho CV của bạn
-
       </DialogTitle>
-
       <DialogContent>
-
         <Stack spacing={3}>
-
           <Box>
-
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
-
               Màu sắc gợi ý
-
             </Typography>
-
-            <Stack direction="row" spacing={1} justifyContent="center">
-
+            <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
               {DEFAULT_COLORS.map((color) => (
-
                 <Box
-
                   key={color}
-
                   onClick={() => handleColorSelect(color)}
-
                   sx={{
-
                     width: 40,
-
                     height: 40,
-
                     borderRadius: 1,
-
                     bgcolor: color,
-
                     cursor: 'pointer',
-
                     border: selectedColor === color ? '3px solid' : '1px solid',
-
                     borderColor: selectedColor === color ? 'primary.main' : 'grey.300',
-
-                    '&:hover': {
-
-                      opacity: 0.8,
-
-                    },
-
+                    '&:hover': { opacity: 0.8 },
                   }}
-
                 />
-
               ))}
-
               <Box
-
-                onClick={() => setShowCustomPicker(true)}
-
+                onClick={() => setShowCustomPicker(!showCustomPicker)}
                 sx={{
-
                   width: 40,
-
                   height: 40,
-
                   borderRadius: 1,
-
                   background: 'linear-gradient(45deg, #ff0000, #00ff00, #0000ff)',
-
                   cursor: 'pointer',
-
                   border: showCustomPicker ? '3px solid' : '1px solid',
-
                   borderColor: showCustomPicker ? 'primary.main' : 'grey.300',
-
-                  '&:hover': {
-
-                    opacity: 0.8,
-
-                  },
-
+                  '&:hover': { opacity: 0.8 },
                 }}
-
               />
-
             </Stack>
-
           </Box>
 
           {showCustomPicker && (
-
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-
-              <ChromePicker
-
-                color={selectedColor}
-
+            <Stack direction="row" alignItems="center" justifyContent="center" spacing={2} sx={{ pt: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>Tự chọn màu:</Typography>
+              <input
+                type="color"
+                value={selectedColor || '#2563EB'}
                 onChange={handleCustomColorChange}
-
-                disableAlpha
-
+                style={{
+                  width: 44,
+                  height: 44,
+                  padding: 0,
+                  border: 'none',
+                  borderRadius: 4,
+                  cursor: 'pointer',
+                  backgroundColor: 'transparent',
+                }}
               />
-
-            </Box>
-
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 700, color: 'primary.main' }}>
+                {selectedColor}
+              </Typography>
+            </Stack>
           )}
 
-          <Box sx={{ 
-
-            p: 2, 
-
-            bgcolor: 'grey.100', 
-
-            borderRadius: 1,
-
-            border: '1px solid',
-
-            borderColor: 'grey.300'
-
-          }}>
-
+          <Box sx={{ p: 2, bgcolor: 'grey.100', borderRadius: 1, border: '1px solid', borderColor: 'grey.300' }}>
             <Typography variant="subtitle2" gutterBottom>
-
               Xem trước màu đã chọn
-
             </Typography>
-
-            <Box sx={{
-
-              width: '100%',
-
-              height: 60,
-
-              bgcolor: selectedColor,
-
-              borderRadius: 1,
-
-              boxShadow: 1
-
-            }} />
-
+            <Box sx={{ width: '100%', height: 60, bgcolor: selectedColor || '#2563EB', borderRadius: 1, boxShadow: 1 }} />
           </Box>
-
         </Stack>
-
       </DialogContent>
-
       <DialogActions>
-
         <Button onClick={onClose}>Hủy</Button>
-
         <Button 
-
           variant="contained"
-
           onClick={handleConfirm}
-
           sx={{
-
-            bgcolor: selectedColor,
-
+            bgcolor: selectedColor || '#2563EB',
             '&:hover': {
-
-              bgcolor: selectedColor,
-
+              bgcolor: selectedColor || '#2563EB',
               opacity: 0.9,
-
             },
-
           }}
-
         >
-
           Xác nhận
-
         </Button>
-
       </DialogActions>
-
     </Dialog>
-
   );
-
 };
 
-export default ColorPickerDialog; 
+export default ColorPickerDialog;

@@ -23,4 +23,11 @@ describe('workspace portal route redirects', () => {
     expect(source).not.toContain('${HOST_NAME.PROJECT}${port}${targetPath}');
     expect(source).not.toContain('buildPortalPath("admin", "/dashboard"');
   });
+
+  it('localizes company workspace roleCode using i18n keys', () => {
+    const source = readCommonSource('UserMenu/index.tsx');
+
+    expect(source).toContain('nav.workspaceRoles.');
+    expect(source).not.toContain('${workspace.label} (${workspace.roleCode');
+  });
 });

@@ -230,6 +230,8 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     avatarUrl = serializers.SerializerMethodField(method_name="get_avatar_url", read_only=True)
     isActive = serializers.BooleanField(source='is_active', read_only=True)
     isVerifyEmail = serializers.BooleanField(source='is_verify_email', read_only=True)
+    isOnboarded = serializers.BooleanField(source='is_onboarded', read_only=True)
+    onboardingStep = serializers.IntegerField(source='onboarding_step', read_only=True)
     roleName = serializers.ChoiceField(source="role_name", choices=var_sys.ROLE_CHOICES, required=False)
     jobSeekerProfileId = serializers.SerializerMethodField(method_name="get_job_seeker_profile_id", read_only=True)
     jobSeekerProfile = serializers.SerializerMethodField(method_name="get_job_seeker_profile", read_only=True)
@@ -418,7 +420,7 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "fullName", "email",
-                  "isActive", "isVerifyEmail",
+                  "isActive", "isVerifyEmail", "isOnboarded", "onboardingStep",
                   "avatarUrl", "roleName",
                   "jobSeekerProfileId", "jobSeekerProfile",
                   "companyId", "company",

@@ -4,8 +4,8 @@ import ChatLayout from '@/layouts/ChatLayout';
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | InfoHR Tuyá»ƒn Dá»¥ng',
-    default: 'Tin nháº¯n | InfoHR Tuyá»ƒn Dá»¥ng',
+    template: '%s | InfoHR Tuyển Dụng',
+    default: 'Tin nhắn | InfoHR Tuyển Dụng',
   },
 };
 

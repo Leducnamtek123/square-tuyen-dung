@@ -873,6 +873,8 @@ def upload_file(request):
             folder = settings.CLOUDINARY_DIRECTORY.get("cv", "cv/")
         elif file_type == File.LOGO_TYPE:
             folder = settings.CLOUDINARY_DIRECTORY.get("logo", "logo/")
+        elif file_type == File.BUSINESS_LICENSE_TYPE:
+            folder = settings.CLOUDINARY_DIRECTORY.get("business_license", "business_license/")
             
         upload_result = CloudinaryService.upload_file(file_obj, folder)
         

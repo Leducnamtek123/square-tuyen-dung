@@ -11,8 +11,8 @@ const stripTrailingSlash = (value = '') => value.replace(/\/+$/, '');
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 const unwrapEnvelopeData = (payload: unknown) =>
-  isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, 'data')
-    ? payload.data
+  isRecord(payload) && 'data' in (payload as object)
+    ? (payload as Record<string, unknown>).data
     : payload;
 
 const ensureApiBase = (value: string) => {

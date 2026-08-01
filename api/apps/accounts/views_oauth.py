@@ -1,4 +1,4 @@
-﻿import copy
+import copy
 import json
 import logging
 import re
@@ -142,7 +142,7 @@ class CustomTokenView(TokenView):
                     if not allow_login:
                         return response_data(
                             status=status.HTTP_400_BAD_REQUEST,
-                            errors={"errorMessage": ["TÃ i khoáº£n hoáº·c máº­t kháº©u khÃ´ng chÃ­nh xÃ¡c."]}
+                            errors={"errorMessage": ["Tài khoản hoặc mật khẩu không chính xác."]}
                         )
 
             return response_data(status=stt, data=json.loads(body))

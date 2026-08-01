@@ -4,8 +4,8 @@ import JobSeekerLayout from '@/layouts/JobSeekerLayout';
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | InfoHR Tuyá»ƒn Dá»¥ng',
-    default: 'Trang cÃ¡ nhÃ¢n | InfoHR Tuyá»ƒn Dá»¥ng',
+    template: '%s | InfoHR Tuyển Dụng',
+    default: 'Trang cá nhân | InfoHR Tuyển Dụng',
   },
 };
 

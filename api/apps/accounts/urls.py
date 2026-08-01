@@ -3,13 +3,17 @@ from django.urls import include, path
 
 from rest_framework.routers import DefaultRouter
 
-from . import views
+from . import views, views_onboarding
 
 router = DefaultRouter()
 
 router.register(r'users', views.UserViewSet, basename='user')
 
 urlpatterns = [
+
+    path('onboarding/status/', views_onboarding.GetOnboardingStatusView.as_view()),
+    path('onboarding/candidate/', views_onboarding.CandidateOnboardingView.as_view()),
+    path('onboarding/employer/', views_onboarding.EmployerOnboardingView.as_view()),
 
     path('token/', views.CustomTokenView.as_view()),
 

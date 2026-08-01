@@ -80,6 +80,11 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
         return;
       }
 
+      if (user?.isOnboarded === false && !pathname.includes('/onboarding')) {
+        redirectTo('/onboarding/candidate');
+        return;
+      }
+
       const jobSeekerWorkspace = (user.workspaces || []).find((workspace) => workspace.type === "job_seeker");
       if (jobSeekerWorkspace) {
         dispatch(setActiveWorkspace(jobSeekerWorkspace));

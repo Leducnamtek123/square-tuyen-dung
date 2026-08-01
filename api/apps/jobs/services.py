@@ -226,7 +226,7 @@ class JobActivityService:
 
         if not job_post.company.is_verified:
             logger.warning("Apply failed: job %s company %s is not verified", job_post.id, job_post.company_id)
-            raise CompanyNotVerifiedError("CÃ´ng ty cá»§a tin tuyá»ƒn dá»¥ng chÆ°a Ä‘Æ°á»£c xÃ¡c thá»±c.")
+            raise CompanyNotVerifiedError("Công ty của tin tuyển dụng chưa được xác thực.")
 
         if hasattr(timezone, 'localdate'):
             current_date = timezone.localdate()

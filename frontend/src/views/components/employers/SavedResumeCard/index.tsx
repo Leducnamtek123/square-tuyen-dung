@@ -99,19 +99,19 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
   const savedResumeExportColumns: ExportColumn[] = useMemo(() => [
     {
       id: 'candidateName',
-      label: t('employer:savedResume.table.candidateName', 'Họ và tên'),
+      label: t('employer:savedResume.table.candidateName'),
       checked: true,
       getValue: (row) => row['Họ và tên'] || row.fullName || row.candidateName || '---',
     },
     {
       id: 'jobTitle',
-      label: t('employer:savedResume.table.jobTitle', 'Chức danh'),
+      label: t('employer:savedResume.table.jobTitle'),
       checked: true,
       getValue: (row) => row['Tên hồ sơ'] || row.title || row.jobTitle || '---',
     },
     {
       id: 'savedDate',
-      label: t('employer:savedResume.table.savedDate', 'Ngày lưu'),
+      label: t('employer:savedResume.table.savedDate'),
       checked: true,
       getValue: (row) => {
         const val = row['Ngày lưu'] || row.createAt || row.savedDate;
@@ -120,13 +120,13 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
     },
     {
       id: 'phone',
-      label: t('employer:savedResume.table.phone', 'Số điện thoại'),
+      label: t('employer:savedResume.table.phone'),
       checked: true,
       getValue: (row) => row['Số điện thoại'] || row.phone || '---',
     },
     {
       id: 'email',
-      label: t('employer:savedResume.table.email', 'Email'),
+      label: t('employer:savedResume.table.email'),
       checked: true,
       getValue: (row) => row.Email || row.email || '---',
     },

@@ -141,6 +141,10 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    setUserInfo: (state, action: PayloadAction<User>) => {
+      state.isAuthenticated = true;
+      state.currentUser = action.payload;
+    },
     setActiveWorkspace: (state, action: PayloadAction<AnyWorkspace>) => {
       state.activeWorkspace = normalizeWorkspace(action.payload);
       // Persistence is handled by listenerMiddleware in store.ts
@@ -203,7 +207,7 @@ const userSlice = createSlice({
 });
 
 const { reducer } = userSlice;
-const { setActiveWorkspace } = userSlice.actions;
+const { setActiveWorkspace, setUserInfo } = userSlice.actions;
 
 export default reducer;
 export {
@@ -214,6 +218,7 @@ export {
   updateAvatar,
   deleteAvatar,
   setActiveWorkspace,
+  setUserInfo,
 };
 
 

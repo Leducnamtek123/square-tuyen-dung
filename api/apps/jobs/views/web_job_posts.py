@@ -86,10 +86,10 @@ class PrivateJobPostViewSet(
     @action(methods=["get"], detail=False, url_path="suggested-job-posts", url_name="suggested-job-posts")
     def get_suggested_job_posts(self, request):
         resumes = Resume.objects.filter(user=request.user).values_list("career", "city")
-        careers_id = [x[0] for x in resumes]
-        cities_id = [x[1] for x in resumes]
+        careers_id = [x[0] for x in resumes if x[0] is not None]
+        cities_id = [x[1] for x in resumes if x[1] is not None]
 
-        queryset = (
+        base_qs = (
             JobPost.objects.select_related(
                 'company',
                 'company__logo',
@@ -104,8 +104,23 @@ class PrivateJobPostViewSet(
                 deadline__gte=datetime.datetime.now().date(),
                 company__is_verified=True,
             )
-            .filter(career__in=careers_id, location__city__in=cities_id)
-            .prefetch_related(
+        )
+
+        filter_q = Q()
+        if careers_id:
+            filter_q |= Q(career__in=careers_id)
+        if cities_id:
+            filter_q |= Q(location__city__in=cities_id)
+
+        if filter_q:
+            queryset = base_qs.filter(filter_q)
+            if not queryset.exists():
+                queryset = base_qs
+        else:
+            queryset = base_qs
+
+        queryset = (
+            queryset.prefetch_related(
                 Prefetch(
                     'savedjobpost_set',
                     queryset=SavedJobPost.objects.filter(user=request.user)

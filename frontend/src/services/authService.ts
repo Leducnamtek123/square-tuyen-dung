@@ -1,4 +1,4 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
 import { AUTH_CONFIG } from '../configs/constants';
 import { unwrapDataResponse } from '../utils/apiResponse';
 import { ensurePresignedUrl } from '../utils/presignUrl';
@@ -212,6 +212,39 @@ const authService = {
   updateUserSettings: (data: UserSettingsData): Promise<UserSettingsData> => {
     const url = 'auth/settings/';
     return Promise.resolve(httpRequest.put(url, data)).then(unwrapDataResponse<UserSettingsData>);
+  },
+
+  getOnboardingStatus: (): Promise<{
+    isOnboarded: boolean;
+    onboardingStep: number;
+    roleName: string;
+    hasCompany: boolean;
+    profileCompleteness: number;
+  }> => {
+    const url = 'auth/onboarding/status/';
+    return Promise.resolve(httpRequest.get(url)).then(
+      unwrapDataResponse<{
+        isOnboarded: boolean;
+        onboardingStep: number;
+        roleName: string;
+        hasCompany: boolean;
+        profileCompleteness: number;
+      }>,
+    );
+  },
+
+  candidateOnboarding: (data: Record<string, unknown>): Promise<{ message: string; user: User }> => {
+    const url = 'auth/onboarding/candidate/';
+    return Promise.resolve(httpRequest.post(url, data)).then(
+      unwrapDataResponse<{ message: string; user: User }>,
+    );
+  },
+
+  employerOnboarding: (data: Record<string, unknown>): Promise<{ message: string; company: unknown; user: User }> => {
+    const url = 'auth/onboarding/employer/';
+    return Promise.resolve(httpRequest.post(url, data)).then(
+      unwrapDataResponse<{ message: string; company: unknown; user: User }>,
+    );
   },
 };
 

@@ -28,7 +28,7 @@ from shared.helpers import helper
 
 from django.utils import timezone
 
-from django.db.models import F, Count, Prefetch
+from django.db.models import F, Count, Prefetch, Q
 from django.db import IntegrityError
 
 from django.db.models.functions import ACos, Cos, Radians, Sin
@@ -175,15 +175,11 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.ViewSet,
             url_path="suggested-job-posts", url_name="suggested-job-posts")
 
     def get_suggested_job_posts(self, request):
+        resumes = Resume.objects.filter(user=request.user).values_list("career", "city")
+        careers_id = [x[0] for x in resumes if x[0] is not None]
+        cities_id = [x[1] for x in resumes if x[1] is not None]
 
-        resumes = Resume.objects.filter(user=request.user) \
-            .values_list("career", "city")
-
-        careers_id = [x[0] for x in resumes]
-
-        cities_id = [x[1] for x in resumes]
-
-        queryset = (
+        base_qs = (
             JobPost.objects.select_related(
                 'company', 'company__logo', 'company__cover_image', 'company__user',
                 'location', 'location__city', 'career'
@@ -193,8 +189,23 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.ViewSet,
                 deadline__gte=timezone.localdate(),
                 company__is_verified=True,
             )
-            .filter(career__in=careers_id, location__city__in=cities_id)
-            .prefetch_related(
+        )
+
+        filter_q = Q()
+        if careers_id:
+            filter_q |= Q(career__in=careers_id)
+        if cities_id:
+            filter_q |= Q(location__city__in=cities_id)
+
+        if filter_q:
+            queryset = base_qs.filter(filter_q)
+            if not queryset.exists():
+                queryset = base_qs
+        else:
+            queryset = base_qs
+
+        queryset = (
+            queryset.prefetch_related(
                 Prefetch(
                     'savedjobpost_set',
                     queryset=SavedJobPost.objects.filter(user=request.user) if request.user.is_authenticated else SavedJobPost.objects.none(),

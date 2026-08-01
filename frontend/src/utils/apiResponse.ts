@@ -17,7 +17,7 @@ export const unwrapDataResponse = <T>(raw: unknown, maxDepth = 3): T => {
   let value = raw;
 
   for (let depth = 0; depth < maxDepth; depth += 1) {
-    if (!isObject(value) || !Object.prototype.hasOwnProperty.call(value, 'data')) {
+    if (!isObject(value) || !('data' in (value as object))) {
       break;
     }
 
@@ -35,6 +35,16 @@ export const normalizePaginatedResponse = <T>(raw: unknown): PaginatedResponse<T
 
   if (!isObject(raw)) {
     return { count: 0, results: [] };
+  }
+
+  const unwrapped = unwrapDataResponse<unknown>(raw);
+  if (asItems<T>(unwrapped)) {
+    const items = asItems<T>(unwrapped)!;
+    return { count: items.length, results: items };
+  }
+
+  if (isObject(unwrapped) && (unwrapped.id !== undefined || unwrapped.title !== undefined || unwrapped.slug !== undefined)) {
+    return { count: 1, results: [unwrapped as T] };
   }
 
   const obj = raw as PaginatedLike<T>;

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Card, Stack, Typography } from "@mui/material";
@@ -137,28 +137,26 @@ const DashboardPage = () => {
 
             </Card>
 
-            <Card sx={{ p: { xs: 1, sm: 1, md: 2, lg: 2, xl: 2 } }}>
-
-              <Stack>
-
-                <Box sx={{ mb: 2 }}>
-
-                  <Typography variant="h6">{t('dashboard.suggestedJobs')}</Typography>
-
+            <Card
+              sx={{
+                p: { xs: 2, sm: 3 },
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: (theme) => theme.customShadows?.z1,
+              }}
+            >
+              <Stack spacing={2}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A' }}>
+                    {t('dashboard.suggestedJobs', { defaultValue: 'Việc làm gợi ý phù hợp' })}
+                  </Typography>
                 </Box>
 
                 <Box>
-
-                  {/* Start: SuggestedJobPostCard */}
-
-                  <SuggestedJobPostCard pageSize={10} />
-
-                  {/* End: SuggestedJobPostCard */}
-
+                  <SuggestedJobPostCard pageSize={6} fullWidth={true} />
                 </Box>
-
               </Stack>
-
             </Card>
 
           </Stack>

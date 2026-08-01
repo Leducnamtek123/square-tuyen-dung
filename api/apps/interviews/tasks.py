@@ -295,28 +295,28 @@ def evaluate_interview_session(self, session_id):
 
         history_text = ""
         for transcript in transcripts:
-            role = "NgÃÂ°Ã¡Â»Âi phÃ¡Â»Âng vÃ¡ÂºÂ¥n" if transcript.speaker_role == "ai_agent" else "Ã¡Â»Â¨ng viÃÂªn"
+            role = "Người phỏng vấn" if transcript.speaker_role == "ai_agent" else "Ứng viên"
             history_text += f"{role}: {transcript.content}\n"
 
         prompt = f"""
-BÃ¡ÂºÂ¡n lÃÂ  mÃ¡Â»â¢t chuyÃÂªn gia tuyÃ¡Â»Æn dÃ¡Â»Â¥ng chuyÃÂªn nghiÃ¡Â»â¡p. HÃÂ£y phÃÂ¢n tÃÂ­ch nÃ¡Â»â¢i dung buÃ¡Â»â¢i phÃ¡Â»Âng vÃ¡ÂºÂ¥n sau ÃâÃÂ¢y vÃÂ  ÃâÃÂ°a ra ÃâÃÂ¡nh giÃÂ¡ khÃÂ¡ch quan.
+Bạn là một chuyên gia tuyển dụng chuyên nghiệp. Hãy phân tích nội dung buổi phỏng vấn sau đây và đưa ra đánh giá khách quan.
 
-NÃ¡Â»ËI DUNG BUÃ¡Â»âI PHÃ¡Â»Å½NG VÃ¡ÂºÂ¤N:
+NỘI DUNG BUỔI PHỎNG VẤN:
 {history_text}
 
-HÃÂ£y trÃ¡ÂºÂ£ vÃ¡Â»Â kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ DÃÂ¯Ã¡Â»Å¡I DÃ¡ÂºÂ NG JSON vÃ¡Â»âºi cÃÂ¡c trÃÂ°Ã¡Â»Âng:
-- overall_score: ÃâiÃ¡Â»Æm tÃ¡Â»â¢ng quÃÂ¡t (1-10)
-- technical_score: ÃâiÃ¡Â»Æm kiÃ¡ÂºÂ¿n thÃ¡Â»Â©c chuyÃÂªn mÃÂ´n (1-10)
-- communication_score: ÃâiÃ¡Â»Æm giao tiÃ¡ÂºÂ¿p (1-10)
-- summary: tÃÂ³m tÃ¡ÂºÂ¯t ngÃ¡ÂºÂ¯n gÃ¡Â»Ân (dÃÂ°Ã¡Â»âºi 100 tÃ¡Â»Â«)
-- strengths: danh sÃÂ¡ch 3-5 ÃâiÃ¡Â»Æm mÃ¡ÂºÂ¡nh (list string)
-- weaknesses: danh sÃÂ¡ch 2-3 ÃâiÃ¡Â»Æm cÃ¡ÂºÂ§n cÃ¡ÂºÂ£i thiÃ¡Â»â¡n (list string)
-- detailed_feedback: object gÃ¡Â»âm:
+Hãy trả về kết quả DƯỚI DẠNG JSON với các trường:
+- overall_score: điểm tổng quát (1-10)
+- technical_score: điểm kiến thức chuyên môn (1-10)
+- communication_score: điểm giao tiếp (1-10)
+- summary: tóm tắt ngắn gọn (dưới 100 từ)
+- strengths: danh sách 3-5 điểm mạnh (list string)
+- weaknesses: danh sách 2-3 điểm cần cải thiện (list string)
+- detailed_feedback: object gồm:
   - question_performance: list object {{question: string, feedback: string, score: 1-10}}
   - soft_skills: {{confidence: 1-10, clarity: 1-10, tone: string}}
   - cultural_fit: string
 
-LÃÂ°u ÃÂ½: chÃ¡Â»â° trÃ¡ÂºÂ£ vÃ¡Â»Â 1 JSON object hÃ¡Â»Â£p lÃ¡Â»â¡, khÃÂ´ng thÃÂªm giÃ¡ÂºÂ£i thÃÂ­ch.
+Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
 """
 
         model_alias = config(
