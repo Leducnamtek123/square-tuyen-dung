@@ -1,174 +1,83 @@
 'use client';
 
 import React from 'react';
-import { Box, Card, Stack, Typography } from "@mui/material";
+import { Box, Grid2 as Grid } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { Grid2 as Grid } from "@mui/material";
+import { useQuery } from '@tanstack/react-query';
 import { TabTitle } from '../../../utils/generalFunction';
-import JobSeekerQuantityStatistics from '../../components/jobSeekers/JobSeekerQuantityStatistics';
-import SidebarProfile from '../../components/jobSeekers/SidebarProfile';
-import SidebarViewTotal from '../../components/jobSeekers/SidebarViewTotal';
-import SuggestedJobPostCard from '../../components/defaults/SuggestedJobPostCard';
-import ActivityChart from '../../components/jobSeekers/charts';
-import JobApplicationCard from '../../components/jobSeekers/JobApplicationCard';
+import { APP_NAME } from '../../../configs/constants';
+import { useAppSelector } from '@/redux/hooks';
+import jobPostActivityService from '../../../services/jobPostActivityService';
+import {
+  useSavedJobs,
+  useCompaniesFollowed,
+  useResumeViewed,
+} from '../../components/jobSeekers/hooks/useJobSeekerQueries';
+
+import CandidateTopKpiRow from '../../components/jobSeekers/CandidateDashboardMain/CandidateTopKpiRow';
+import CandidateCvScoreCard from '../../components/jobSeekers/CandidateDashboardMain/CandidateCvScoreCard';
+import CandidateActivityChartCard from '../../components/jobSeekers/CandidateDashboardMain/CandidateActivityChartCard';
+import CandidateRecommendedJobsCard from '../../components/jobSeekers/CandidateDashboardMain/CandidateRecommendedJobsCard';
+import AiRecommendedJobsSection from '../../components/jobSeekers/CandidateDashboardMain/AiRecommendedJobsSection';
 
 const DashboardPage = () => {
-
   const { t } = useTranslation('jobSeeker');
+  TabTitle(t('dashboard.pageTitle', { appName: APP_NAME }));
 
-  TabTitle(t('dashboard.pageTitle'))
+  const { currentUser } = useAppSelector((state) => state.user);
+
+  // 1. Fetch Real Applied Jobs Count
+  const { data: appliedData } = useQuery({
+    queryKey: ['dashboardAppliedJobsCount'],
+    queryFn: async () => {
+      const res = await jobPostActivityService.getJobPostActivity({ pageSize: 1 });
+      return res?.count || 0;
+    },
+    staleTime: 60_000,
+  });
+
+  // 2. Fetch Real Saved Jobs Count
+  const { data: savedData } = useSavedJobs({ pageSize: 1 });
+
+  // 3. Fetch Real Followed Companies Count
+  const { data: followedData } = useCompaniesFollowed({ pageSize: 1 });
+
+  // 4. Fetch Real Employer Resume Viewed Count
+  const { data: viewedData } = useResumeViewed({ pageSize: 1 });
+
+  const stats = React.useMemo(() => {
+    return {
+      appliedCount: appliedData ?? 0,
+      savedCount: savedData?.count ?? 0,
+      viewedCount: viewedData?.count ?? 0,
+      followingCount: followedData?.count ?? 0,
+    };
+  }, [appliedData, savedData?.count, viewedData?.count, followedData?.count]);
 
   return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      {/* Row 1: Top 4 Real API KPI Cards */}
+      <CandidateTopKpiRow user={currentUser} stats={stats} />
 
-    <Box>
-
-      <Grid container spacing={2}>
-
-        <Grid
-
-          size={{
-
-            xs: 12,
-
-            sm: 12,
-
-            md: 5,
-
-            lg: 3,
-
-            xl: 3
-
-          }}>
-
-          <Stack spacing={2}>
-
-            <Card sx={{ p: 2 }}>
-
-              {/* Start: Sidebar profile */}
-
-              <SidebarProfile />
-
-              {/* End: Sidebar profile */}
-
-            </Card>
-
-            <Card sx={{ p: 2 }}>
-
-              {/* Start: Sidebar view total */}
-
-              <SidebarViewTotal />
-
-              {/* End: Sidebar view total */}
-
-            </Card>
-
-            <Card sx={{ p: 2 }}>
-
-              {/* Start: JobApplicationCard */}
-
-              <JobApplicationCard />
-
-              {/* End: JobApplicationCard */}
-
-            </Card>
-
-          </Stack>
-
+      {/* Row 2: CV Score Card & Activity Chart Card */}
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <CandidateCvScoreCard viewedCount={stats.viewedCount} />
         </Grid>
-
-        <Grid
-
-          size={{
-
-            xs: 12,
-
-            sm: 12,
-
-            md: 7,
-
-            lg: 9,
-
-            xl: 9
-
-          }}>
-
-          <Stack spacing={2}>
-
-            <Box>
-
-              {/* Start: JobSeekerQuantityStatistics */}
-
-              <JobSeekerQuantityStatistics />
-
-              {/* End: JobSeekerQuantityStatistics */}
-
-            </Box>
-
-            <Card
-              sx={{
-                p: { xs: 2, sm: 3 },
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                boxShadow: (theme) => theme.customShadows?.z1,
-                overflow: 'hidden',
-              }}
-            >
-
-              <Stack>
-
-                <Box sx={{ mb: 2 }}>
-
-                  <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: 0 }}>{t('dashboard.yourActivity')}</Typography>
-
-                </Box>
-
-                <Box>
-
-                  {/* Start: ActivityChart */}
-
-                  <ActivityChart />
-
-                  {/* End: ActivityChart */}
-
-                </Box>
-
-              </Stack>
-
-            </Card>
-
-            <Card
-              sx={{
-                p: { xs: 2, sm: 3 },
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                boxShadow: (theme) => theme.customShadows?.z1,
-              }}
-            >
-              <Stack spacing={2}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A' }}>
-                    {t('dashboard.suggestedJobs', { defaultValue: 'Việc làm gợi ý phù hợp' })}
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <SuggestedJobPostCard pageSize={6} fullWidth={true} />
-                </Box>
-              </Stack>
-            </Card>
-
-          </Stack>
-
+        <Grid size={{ xs: 12, md: 8 }}>
+          <CandidateActivityChartCard stats={stats} />
         </Grid>
-
       </Grid>
 
+      {/* Row 3: AI Smart Job Recommendations Section */}
+      <AiRecommendedJobsSection />
+
+      {/* Row 4: Recommended Jobs Full Width Section */}
+      <Box>
+        <CandidateRecommendedJobsCard />
+      </Box>
     </Box>
-
   );
-
 };
 
 export default DashboardPage;

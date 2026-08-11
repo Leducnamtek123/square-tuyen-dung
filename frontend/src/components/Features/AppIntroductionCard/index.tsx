@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Box, Button, Card, Stack, Typography } from "@mui/material";
+import { Box, Button, Card, Stack, TextField, Typography } from "@mui/material";
 import { ABOUT_IMAGES, HOST_NAME, ROUTES } from '@/configs/constants';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
@@ -10,6 +10,7 @@ import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import type { Theme as StylesTheme } from '@mui/material/styles';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { openExternalUrlSafely } from '@/utils/safeExternalUrl';
+import toastMessages from '@/utils/toastMessages';
 
 interface AppIntroductionCardProps {
   // Add specific props if needed, otherwise use an empty interface or React.FC
@@ -18,7 +19,14 @@ interface AppIntroductionCardProps {
 const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
   const { t, i18n } = useTranslation('common');
   const { push } = useRouter();
+  const [phoneNumber, setPhoneNumber] = React.useState('');
   const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
+
+  const handleSendSmsLink = () => {
+    if (!phoneNumber.trim()) return;
+    toastMessages.success(t('common:appDownload.smsSuccess', 'Đã gửi liên kết tải ứng dụng qua SMS!'));
+    setPhoneNumber('');
+  };
 
   return (
     <Card sx={{ p: 4, position: 'relative', overflow: 'hidden' }}>
@@ -52,6 +60,24 @@ const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
             sx={{ borderRadius: 2, px: 4 }}
           >
             Dành cho Nhà tuyển dụng
+          </Button>
+        </Stack>
+        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ width: '100%', maxWidth: 480, pt: 1 }}>
+          <TextField
+            size="small"
+            placeholder="Nhập số điện thoại nhận link tải app..."
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            sx={{ flex: 1, bgcolor: '#FFFFFF', borderRadius: 1 }}
+          />
+          <Button
+            variant="contained"
+            color="success"
+            disabled={!phoneNumber.trim()}
+            onClick={handleSendSmsLink}
+            sx={{ borderRadius: 1.5, px: 2.5, whiteSpace: 'nowrap' }}
+          >
+            Gửi link tải app
           </Button>
         </Stack>
         <Box sx={{ width: '100%', pt: 2 }}>

@@ -7,6 +7,8 @@ urlpatterns = [
 
     path('configs/', views.get_all_config),
 
+    path('cities/', views.get_cities),
+
     path('districts/', views.get_districts),
 
     path('wards/', views.get_wards),

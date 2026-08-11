@@ -1,0 +1,297 @@
+File,Line,Type,Snippet
+frontend/src/components/Common/ColorPickerDialog/index.tsx,41,Dialog/Drawer/Modal,<Dialog
+frontend/src/components/Common/ColorPickerDialog/index.tsx,47,Dialog/Drawer/Modal,<DialogTitle>
+frontend/src/components/Common/ColorPickerDialog/index.tsx,50,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/components/Common/ColorPickerDialog/index.tsx,120,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/components/Common/Controls/FormPopup/index.tsx,46,Dialog/Drawer/Modal,<Dialog
+frontend/src/components/Common/Controls/FormPopup/index.tsx,65,Dialog/Drawer/Modal,<DialogTitle
+frontend/src/components/Common/Controls/FormPopup/index.tsx,99,Dialog/Drawer/Modal,<DialogContent sx={{ p: 3 }}>{children}</DialogContent>
+frontend/src/components/Common/Controls/FormPopup/index.tsx,102,Dialog/Drawer/Modal,<DialogActions
+frontend/src/components/Common/ExportModal/ExportModal.tsx,60,Dialog/Drawer/Modal,<Dialog
+frontend/src/components/Common/ExportModal/ExportModal.tsx,94,Dialog/Drawer/Modal,<DialogTitle
+frontend/src/components/Common/ExportModal/ExportModal.tsx,148,Dialog/Drawer/Modal,"<DialogContent sx={{ p: isMobile ? 2 : 3, backgroundColor: '#FFFFFF' }}>"
+frontend/src/components/Common/ExportModal/ExportModal.tsx,215,Dialog/Drawer/Modal,<DialogActions
+frontend/src/components/Common/ImageCropDialog/index.tsx,121,Dialog/Drawer/Modal,"<Dialog open={open} onClose={onCancel} maxWidth=""md"" fullWidth>"
+frontend/src/components/Common/ImageCropDialog/index.tsx,122,Dialog/Drawer/Modal,"<DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>"
+frontend/src/components/Common/ImageCropDialog/index.tsx,135,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/components/Common/ImageCropDialog/index.tsx,177,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup.tsx,68,Dialog/Drawer/Modal,<Dialog
+frontend/src/components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup.tsx,92,Dialog/Drawer/Modal,<DialogTitle
+frontend/src/components/Features/Feedback/index.tsx,189,Dialog/Drawer/Modal,<Dialog
+frontend/src/components/Features/Feedback/index.tsx,204,Dialog/Drawer/Modal,<DialogTitle>
+frontend/src/components/Features/Feedback/index.tsx,240,Dialog/Drawer/Modal,<DialogContent sx={{ pt: 2 }}>
+frontend/src/components/Features/Feedback/index.tsx,392,Dialog/Drawer/Modal,"<DialogActions sx={{ p: 3, pt: 2 }}>"
+frontend/src/layouts/components/MuiShellLayout.tsx,205,Dialog/Drawer/Modal,<Drawer
+frontend/src/layouts/components/MuiShellLayout.tsx,229,Dialog/Drawer/Modal,<Drawer
+frontend/src/layouts/components/commons/LeftDrawer/index.tsx,105,Dialog/Drawer/Modal,<Drawer
+frontend/src/layouts/components/commons/SubHeaderDialog/index.tsx,248,Dialog/Drawer/Modal,<Dialog
+frontend/src/layouts/components/employers/Sidebar/index.tsx,26,Dialog/Drawer/Modal,<Drawer
+frontend/src/layouts/components/employers/Sidebar/index.tsx,49,Dialog/Drawer/Modal,<DrawerContent isAdmin={isAdmin} liveInterviewCount={liveInterviewCount} isCollapsed={isCollapsed} t
+frontend/src/layouts/components/employers/Sidebar/index.tsx,66,Dialog/Drawer/Modal,<Drawer
+frontend/src/layouts/components/employers/Sidebar/index.tsx,90,Dialog/Drawer/Modal,<DrawerContent isAdmin={isAdmin} liveInterviewCount={liveInterviewCount} isCollapsed={false} />
+frontend/src/views/adminPages/BannersPage/BannerDeleteDialog.tsx,14,Dialog/Drawer/Modal,<Dialog open={open} onClose={onClose}>
+frontend/src/views/adminPages/BannersPage/BannerDeleteDialog.tsx,15,Dialog/Drawer/Modal,<DialogTitle>{t('pages.banners.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/BannersPage/BannerDeleteDialog.tsx,16,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/BannersPage/BannerDeleteDialog.tsx,19,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/BannersPage/BannerFormDialog.tsx,188,Dialog/Drawer/Modal,"<Dialog open={open} onClose={onClose} fullWidth maxWidth=""sm"">"
+frontend/src/views/adminPages/BannersPage/BannerFormDialog.tsx,189,Dialog/Drawer/Modal,<DialogTitle>{dialogMode === 'add' ? t('pages.banners.addTitle') : t('pages.banners.editTitle')}</Di
+frontend/src/views/adminPages/BannersPage/BannerFormDialog.tsx,190,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/BannersPage/BannerFormDialog.tsx,280,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,296,Dialog/Drawer/Modal,"<Dialog open={openDialog} onClose={handleClose} fullWidth maxWidth=""xs"">"
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,297,Dialog/Drawer/Modal,<DialogTitle>
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,300,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,347,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,359,Dialog/Drawer/Modal,<Dialog open={openDelete} onClose={handleClose}>
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,360,Dialog/Drawer/Modal,<DialogTitle>{t('pages.bannerTypes.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,361,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,364,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/CareersPage/index.tsx,178,Dialog/Drawer/Modal,"<Dialog open={open} onClose={onClose} fullWidth maxWidth=""sm"">"
+frontend/src/views/adminPages/CareersPage/index.tsx,179,Dialog/Drawer/Modal,<DialogTitle>
+frontend/src/views/adminPages/CareersPage/index.tsx,182,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/CareersPage/index.tsx,269,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/CareersPage/index.tsx,301,Dialog/Drawer/Modal,<Dialog open={open} onClose={onClose}>
+frontend/src/views/adminPages/CareersPage/index.tsx,302,Dialog/Drawer/Modal,<DialogTitle>{t('pages.careers.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/CareersPage/index.tsx,303,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/CareersPage/index.tsx,308,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/ChatPage/index.tsx,242,Dialog/Drawer/Modal,<Dialog open={!!selectedConversation} onClose={() => setSelectedConversation(null)} fullWidth maxWid
+frontend/src/views/adminPages/ChatPage/index.tsx,243,Dialog/Drawer/Modal,<DialogTitle>{t('chat.detail.title')}</DialogTitle>
+frontend/src/views/adminPages/ChatPage/index.tsx,244,Dialog/Drawer/Modal,<DialogContent dividers>
+frontend/src/views/adminPages/ChatPage/index.tsx,306,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/adminPages/CitiesPage/index.tsx,213,Dialog/Drawer/Modal,<Dialog open={state.openDialog} onClose={() => dispatch({ type: 'close-dialogs' })} fullWidth maxWid
+frontend/src/views/adminPages/CitiesPage/index.tsx,214,Dialog/Drawer/Modal,<DialogTitle>{state.dialogMode === 'add' ? t('pages.cities.add') : t('pages.cities.edit')}</DialogTi
+frontend/src/views/adminPages/CitiesPage/index.tsx,215,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/CitiesPage/index.tsx,237,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/CitiesPage/index.tsx,247,Dialog/Drawer/Modal,<Dialog open={state.openDeleteDialog} onClose={() => dispatch({ type: 'close-dialogs' })}>
+frontend/src/views/adminPages/CitiesPage/index.tsx,248,Dialog/Drawer/Modal,<DialogTitle>{t('pages.cities.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/CitiesPage/index.tsx,249,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/CitiesPage/index.tsx,252,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/CompaniesPage/CompanyDeleteDialog.tsx,17,Dialog/Drawer/Modal,<Dialog open={open} onClose={onClose}>
+frontend/src/views/adminPages/CompaniesPage/CompanyDeleteDialog.tsx,18,Dialog/Drawer/Modal,<DialogTitle>{t('pages.companies.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/CompaniesPage/CompanyDeleteDialog.tsx,19,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/CompaniesPage/CompanyDeleteDialog.tsx,29,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/CompaniesPage/CompanyFormDialog.tsx,63,Dialog/Drawer/Modal,"<Dialog open={open} onClose={onClose} fullWidth maxWidth=""md"">"
+frontend/src/views/adminPages/CompaniesPage/CompanyFormDialog.tsx,64,Dialog/Drawer/Modal,<DialogTitle sx={{ fontWeight: 700 }}>
+frontend/src/views/adminPages/CompaniesPage/CompanyFormDialog.tsx,67,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/CompaniesPage/CompanyFormDialog.tsx,238,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 3 }}>"
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,324,Dialog/Drawer/Modal,<Dialog open={openDelete} onClose={() => setOpenDelete(false)}>
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,325,Dialog/Drawer/Modal,<DialogTitle>{t('pages.contactMessages.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,326,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,331,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,339,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,345,Dialog/Drawer/Modal,<DialogTitle>
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,348,Dialog/Drawer/Modal,<DialogContent dividers>
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,392,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/DistrictsPage/index.tsx,306,Dialog/Drawer/Modal,"<Dialog open={state.openDialog} onClose={handleCloseDialog} fullWidth maxWidth=""sm"">"
+frontend/src/views/adminPages/DistrictsPage/index.tsx,307,Dialog/Drawer/Modal,<DialogTitle>{state.dialogMode === 'add' ? t('pages.districts.add') : t('pages.districts.edit')}</Di
+frontend/src/views/adminPages/DistrictsPage/index.tsx,308,Dialog/Drawer/Modal,"<DialogContent sx={{ display: 'grid', gap: 2, pt: 1 }}>"
+frontend/src/views/adminPages/DistrictsPage/index.tsx,338,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/adminPages/DistrictsPage/index.tsx,344,Dialog/Drawer/Modal,<Dialog open={state.openDeleteDialog} onClose={handleCloseDialog}>
+frontend/src/views/adminPages/DistrictsPage/index.tsx,345,Dialog/Drawer/Modal,<DialogTitle>{t('pages.districts.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/DistrictsPage/index.tsx,346,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/DistrictsPage/index.tsx,349,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,492,Dialog/Drawer/Modal,"<Dialog open={openForm} onClose={closeFormDialog} fullWidth maxWidth=""md"">"
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,493,Dialog/Drawer/Modal,<DialogTitle>
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,496,Dialog/Drawer/Modal,<DialogContent dividers>
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,577,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,587,Dialog/Drawer/Modal,<Dialog open={openDelete} onClose={() => setOpenDelete(false)}>
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,588,Dialog/Drawer/Modal,<DialogTitle>{t('pages.feedbacks.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,589,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,594,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,602,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,608,Dialog/Drawer/Modal,<DialogTitle>
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,611,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,629,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/InterviewsPage/index.tsx,224,Dialog/Drawer/Modal,"<Dialog open={!!selectedInterview} onClose={() => setSelectedInterview(null)} fullWidth maxWidth=""sm"
+frontend/src/views/adminPages/InterviewsPage/index.tsx,225,Dialog/Drawer/Modal,<DialogTitle>{t('pages.interviews.detailTitle')}</DialogTitle>
+frontend/src/views/adminPages/InterviewsPage/index.tsx,226,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/InterviewsPage/index.tsx,240,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/adminPages/InterviewsPage/index.tsx,245,Dialog/Drawer/Modal,<Dialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)}>
+frontend/src/views/adminPages/InterviewsPage/index.tsx,246,Dialog/Drawer/Modal,<DialogTitle>{t('pages.interviews.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/InterviewsPage/index.tsx,247,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/InterviewsPage/index.tsx,252,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/adminPages/JobActivityPage/index.tsx,249,Dialog/Drawer/Modal,"<Dialog open={state.openEditDialog} onClose={handleCloseDialogs} fullWidth maxWidth=""xs"">"
+frontend/src/views/adminPages/JobActivityPage/index.tsx,250,Dialog/Drawer/Modal,<DialogTitle>{t('pages.jobActivity.editStatusTitle')}</DialogTitle>
+frontend/src/views/adminPages/JobActivityPage/index.tsx,251,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/JobActivityPage/index.tsx,273,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/JobActivityPage/index.tsx,285,Dialog/Drawer/Modal,<Dialog open={state.openDeleteDialog} onClose={handleCloseDialogs}>
+frontend/src/views/adminPages/JobActivityPage/index.tsx,286,Dialog/Drawer/Modal,<DialogTitle>{t('pages.jobActivity.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/JobActivityPage/index.tsx,287,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/JobActivityPage/index.tsx,292,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/JobNotificationsPage/JobNotificationDeleteDialog.tsx,24,Dialog/Drawer/Modal,<Dialog open={open} onClose={onClose}>
+frontend/src/views/adminPages/JobNotificationsPage/JobNotificationDeleteDialog.tsx,25,Dialog/Drawer/Modal,<DialogTitle>{t('pages.jobNotifications.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/JobNotificationsPage/JobNotificationDeleteDialog.tsx,26,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/JobNotificationsPage/JobNotificationDeleteDialog.tsx,29,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/JobNotificationsPage/JobNotificationFormDialog.tsx,45,Dialog/Drawer/Modal,"<Dialog open={open} onClose={onClose} fullWidth maxWidth=""sm"">"
+frontend/src/views/adminPages/JobNotificationsPage/JobNotificationFormDialog.tsx,46,Dialog/Drawer/Modal,<DialogTitle>
+frontend/src/views/adminPages/JobNotificationsPage/JobNotificationFormDialog.tsx,49,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/JobNotificationsPage/JobNotificationFormDialog.tsx,131,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/JobsPage/index.tsx,253,Dialog/Drawer/Modal,<Dialog open={openDeleteDialog} onClose={handleCloseDialog}>
+frontend/src/views/adminPages/JobsPage/index.tsx,254,Dialog/Drawer/Modal,<DialogTitle>{t('pages.jobs.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/JobsPage/index.tsx,255,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/JobsPage/index.tsx,260,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/ProfileDetailPage/index.tsx,485,Dialog/Drawer/Modal,<Dialog open={openDelete} onClose={() => setOpenDelete(false)}>
+frontend/src/views/adminPages/ProfileDetailPage/index.tsx,486,Dialog/Drawer/Modal,<DialogTitle>{t('pages.profileDetail.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/ProfileDetailPage/index.tsx,487,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/ProfileDetailPage/index.tsx,497,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/ProfilesPage/index.tsx,695,Dialog/Drawer/Modal,<Dialog open={openDeleteDialog} onClose={handleCloseDialog}>
+frontend/src/views/adminPages/ProfilesPage/index.tsx,696,Dialog/Drawer/Modal,<DialogTitle>{t('pages.profiles.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/ProfilesPage/index.tsx,697,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/ProfilesPage/index.tsx,702,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/ProfilesPage/index.tsx,712,Dialog/Drawer/Modal,"<Dialog open={openBulkDeleteDialog} onClose={handleCloseBulkDeleteDialog} maxWidth=""xs"" fullWidth>"
+frontend/src/views/adminPages/ProfilesPage/index.tsx,713,Dialog/Drawer/Modal,"<DialogTitle>{t('pages.profiles.bulkSelect.deleteTitle', { defaultValue: 'Xóa nhiều hồ sơ' })}</Dial"
+frontend/src/views/adminPages/ProfilesPage/index.tsx,714,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/ProfilesPage/index.tsx,722,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/ProfilesPage/index.tsx,732,Dialog/Drawer/Modal,"<Dialog open={openImportDialog} onClose={handleCloseImportDialog} fullWidth maxWidth=""sm"">"
+frontend/src/views/adminPages/ProfilesPage/index.tsx,733,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 800, pb: 1 }}>"
+frontend/src/views/adminPages/ProfilesPage/index.tsx,736,Dialog/Drawer/Modal,"<DialogContent sx={{ pt: 1.5, maxHeight: '78vh' }} dividers>"
+frontend/src/views/adminPages/ProfilesPage/index.tsx,836,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/ResumesPage/index.tsx,170,Dialog/Drawer/Modal,<Dialog open={openDeleteDialog} onClose={handleCloseDialog}>
+frontend/src/views/adminPages/ResumesPage/index.tsx,171,Dialog/Drawer/Modal,<DialogTitle>{t('pages.resumes.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/ResumesPage/index.tsx,172,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/ResumesPage/index.tsx,177,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/UsersPage/index.tsx,161,Dialog/Drawer/Modal,"<Dialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)} maxWidth=""xs"" fullWidth>"
+frontend/src/views/adminPages/UsersPage/index.tsx,162,Dialog/Drawer/Modal,<DialogTitle>{t('pages.users.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/UsersPage/index.tsx,163,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/UsersPage/index.tsx,170,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/UsersPage/components/ScheduleInterviewDialog.tsx,120,Dialog/Drawer/Modal,"<Dialog open={open} onClose={onClose} fullWidth maxWidth=""sm"">"
+frontend/src/views/adminPages/UsersPage/components/ScheduleInterviewDialog.tsx,121,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>"
+frontend/src/views/adminPages/UsersPage/components/ScheduleInterviewDialog.tsx,124,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/UsersPage/components/ScheduleInterviewDialog.tsx,211,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 3 }}>"
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,600,Dialog/Drawer/Modal,"<Dialog open={createOpen} onClose={resetCreateDialog} fullWidth maxWidth=""sm"">"
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,601,Dialog/Drawer/Modal,<DialogTitle>{t('pages.voiceProfiles.dialogs.createTitle')}</DialogTitle>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,602,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,655,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,667,Dialog/Drawer/Modal,"<Dialog open={!!editProfile} onClose={() => setEditProfile(null)} fullWidth maxWidth=""sm"">"
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,668,Dialog/Drawer/Modal,<DialogTitle>{t('pages.voiceProfiles.dialogs.editTitle')}</DialogTitle>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,669,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,739,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,757,Dialog/Drawer/Modal,"<Dialog open={!!deleteProfile} onClose={() => setDeleteProfile(null)} fullWidth maxWidth=""xs"">"
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,758,Dialog/Drawer/Modal,<DialogTitle>{t('pages.voiceProfiles.dialogs.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,759,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,764,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,772,Dialog/Drawer/Modal,"<Dialog open={!!testProfile} onClose={closeTestDialog} fullWidth maxWidth=""sm"">"
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,773,Dialog/Drawer/Modal,<DialogTitle>{t('pages.voiceProfiles.dialogs.testTitle')}</DialogTitle>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,774,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,794,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,802,Dialog/Drawer/Modal,"<Dialog open={!!sampleProfile} onClose={() => setSampleProfile(null)} fullWidth maxWidth=""sm"">"
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,803,Dialog/Drawer/Modal,<DialogTitle>{t('pages.voiceProfiles.dialogs.sampleTitle')}</DialogTitle>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,804,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,814,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,822,Dialog/Drawer/Modal,"<Dialog open={!!grantProfile} onClose={() => setGrantProfile(null)} fullWidth maxWidth=""sm"">"
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,823,Dialog/Drawer/Modal,<DialogTitle>{t('pages.voiceProfiles.dialogs.grantTitle')}</DialogTitle>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,824,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,845,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/adminPages/WardsPage/index.tsx,229,Dialog/Drawer/Modal,"<Dialog open={openDialog} onClose={onClose} fullWidth maxWidth=""xs"">"
+frontend/src/views/adminPages/WardsPage/index.tsx,230,Dialog/Drawer/Modal,<DialogTitle>{dialogMode === 'add' ? t('pages.wards.add') : t('pages.wards.edit')}</DialogTitle>
+frontend/src/views/adminPages/WardsPage/index.tsx,231,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/WardsPage/index.tsx,269,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/adminPages/WardsPage/index.tsx,279,Dialog/Drawer/Modal,<Dialog open={openDeleteDialog} onClose={onClose}>
+frontend/src/views/adminPages/WardsPage/index.tsx,280,Dialog/Drawer/Modal,<DialogTitle>{t('pages.wards.deleteTitle')}</DialogTitle>
+frontend/src/views/adminPages/WardsPage/index.tsx,281,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/adminPages/WardsPage/index.tsx,284,Dialog/Drawer/Modal,"<DialogActions sx={{ px: 3, pb: 2 }}>"
+frontend/src/views/chatPages/ChatPage/index.tsx,52,Dialog/Drawer/Modal,<Drawer
+frontend/src/views/chatPages/ChatPage/index.tsx,165,Dialog/Drawer/Modal,<Drawer
+frontend/src/views/components/employers/AiCandidateRecommendationModal.tsx,148,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/components/employers/AiCandidateRecommendationModal.tsx,162,Dialog/Drawer/Modal,<DialogTitle
+frontend/src/views/components/employers/AiCandidateRecommendationModal.tsx,205,Dialog/Drawer/Modal,<DialogContent sx={{ p: 3 }}>
+frontend/src/views/components/employers/AiCandidateRecommendationModal.tsx,399,Dialog/Drawer/Modal,"<DialogActions sx={{ p: 2.5, backgroundColor: '#ffffff' }}>"
+frontend/src/views/components/employers/EmployeeFromApplicationDialog.tsx,69,Dialog/Drawer/Modal,"<Dialog open={open} onClose={onClose} fullWidth maxWidth=""sm"">"
+frontend/src/views/components/employers/EmployeeFromApplicationDialog.tsx,70,Dialog/Drawer/Modal,<DialogTitle>{t('employer:employees.hrm.convert.title')}</DialogTitle>
+frontend/src/views/components/employers/EmployeeFromApplicationDialog.tsx,71,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/components/employers/EmployeeFromApplicationDialog.tsx,105,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerView.tsx,50,Dialog/Drawer/Modal,<Drawer
+frontend/src/views/components/employers/CompanyImageCard/index.tsx,256,Dialog/Drawer/Modal,"<Dialog open={state.previewVisible} onClose={() => dispatch({ type: 'closePreview' })} maxWidth=""md"""
+frontend/src/views/components/employers/CompanyImageCard/index.tsx,257,Dialog/Drawer/Modal,<DialogTitle sx={{ fontWeight: 700 }}>{t('companyImage.preview')}</DialogTitle>
+frontend/src/views/components/employers/CompanyImageCard/index.tsx,258,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,359,Dialog/Drawer/Modal,"<Dialog open={roleDialogOpen} onClose={() => setRoleDialogOpen(false)} fullWidth maxWidth=""sm"">"
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,360,Dialog/Drawer/Modal,<DialogTitle sx={{ fontWeight: 900 }}>
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,363,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,392,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,400,Dialog/Drawer/Modal,"<Dialog open={memberDialogOpen} onClose={() => setMemberDialogOpen(false)} fullWidth maxWidth=""sm"">"
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,401,Dialog/Drawer/Modal,<DialogTitle sx={{ fontWeight: 900 }}>
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,404,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,425,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/components/employers/InterviewCreateCard/index.tsx,256,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/components/employers/InterviewCreateCard/index.tsx,273,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: '-1px', pt: 3, px: 4 }}>"
+frontend/src/views/components/employers/InterviewCreateCard/index.tsx,276,Dialog/Drawer/Modal,<DialogContent sx={{ px: 4 }}>
+frontend/src/views/components/employers/InterviewCreateCard/index.tsx,293,Dialog/Drawer/Modal,"<DialogActions sx={{ p: 4, gap: 2 }}>"
+frontend/src/views/components/employers/InterviewDetailCard/InterviewObserverDialog.tsx,50,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/components/employers/InterviewDetailCard/InterviewObserverDialog.tsx,64,Dialog/Drawer/Modal,"<DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100vh' }}>"
+frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx,70,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx,81,Dialog/Drawer/Modal,"<DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100vh' }}>"
+frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx,229,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx,240,Dialog/Drawer/Modal,"<DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100vh' }}>"
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,208,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,215,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 900, pt: 3, px: 3, fontSize: '1.5rem' }}>"
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,218,Dialog/Drawer/Modal,"<DialogContent sx={{ px: 3, pb: 0 }}>"
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,236,Dialog/Drawer/Modal,"<DialogActions sx={{ p: 4, pt: 3, gap: 2 }}>"
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,81,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,88,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 900, pt: 3, px: 3, fontSize: '1.5rem' }}>"
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,91,Dialog/Drawer/Modal,"<DialogContent sx={{ px: 3, pb: 0 }}>"
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,163,Dialog/Drawer/Modal,"<DialogActions sx={{ p: 4, pt: 3, gap: 2 }}>"
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,178,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,185,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 900, pt: 3, px: 3 }}>{t('employer:questionGroupsCard.dialog.createNew"
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,186,Dialog/Drawer/Modal,"<DialogContent sx={{ px: 3, pb: 0 }}>"
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,201,Dialog/Drawer/Modal,"<DialogActions sx={{ p: 4, pt: 3, gap: 2 }}>"
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,345,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,352,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 800, color: '#0f172a' }}>Chỉnh sửa tên Hồ sơ ứng tuyển</DialogTitle>"
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,353,Dialog/Drawer/Modal,<DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,368,Dialog/Drawer/Modal,<DialogActions sx={{ p: 2 }}>
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,383,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,390,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 800, color: '#dc2626' }}>Xóa Hồ sơ ứng tuyển</DialogTitle>"
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,391,Dialog/Drawer/Modal,<DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,396,Dialog/Drawer/Modal,<DialogActions sx={{ p: 2 }}>
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateEditProfileModal.tsx,155,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateEditProfileModal.tsx,167,Dialog/Drawer/Modal,"<DialogTitle sx={{ m: 0, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between"
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateEditProfileModal.tsx,182,Dialog/Drawer/Modal,"<DialogContent dividers sx={{ borderColor: '#f1f5f9', py: 3 }}>"
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateEditProfileModal.tsx,379,Dialog/Drawer/Modal,<DialogActions sx={{ p: 2 }}>
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateResumePreviewModal.tsx,55,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateResumePreviewModal.tsx,69,Dialog/Drawer/Modal,<DialogTitle
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateResumePreviewModal.tsx,116,Dialog/Drawer/Modal,"<DialogContent sx={{ p: { xs: 2.5, sm: 4 } }}>"
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateResumePreviewModal.tsx,258,Dialog/Drawer/Modal,"<DialogActions sx={{ p: 2.5, backgroundColor: '#ffffff', borderTop: '1px solid #e2e8f0' }}>"
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateSkillsCard.tsx,123,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateSkillsCard.tsx,130,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 800, color: '#0f172a' }}>Quản lý kỹ năng chuyên môn</DialogTitle>"
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateSkillsCard.tsx,131,Dialog/Drawer/Modal,<DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateSkillsCard.tsx,169,Dialog/Drawer/Modal,<DialogActions sx={{ p: 2 }}>
+frontend/src/views/hrmPages/DepartmentListPage/index.tsx,162,Dialog/Drawer/Modal,"<Dialog open={openDeptModal} onClose={() => setOpenDeptModal(false)} maxWidth=""xs"" fullWidth>"
+frontend/src/views/hrmPages/DepartmentListPage/index.tsx,163,Dialog/Drawer/Modal,<DialogTitle fontWeight={700}>Tạo Phòng ban Mới</DialogTitle>
+frontend/src/views/hrmPages/DepartmentListPage/index.tsx,164,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/hrmPages/DepartmentListPage/index.tsx,188,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/hrmPages/EmployeeListPage/index.tsx,267,Dialog/Drawer/Modal,"<Drawer anchor=""right"" open={Boolean(selectedEmp)} onClose={() => setSelectedEmp(null)}>"
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,703,Dialog/Drawer/Modal,"<Dialog open={openAddEmpModal} onClose={() => setOpenAddEmpModal(false)} maxWidth=""sm"" fullWidth>"
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,704,Dialog/Drawer/Modal,<DialogTitle fontWeight={700}>Thêm Hồ sơ Nhân viên Mới</DialogTitle>
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,705,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,760,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,769,Dialog/Drawer/Modal,"<Dialog open={openAddDeptModal} onClose={() => setOpenAddDeptModal(false)} maxWidth=""xs"" fullWidth>"
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,770,Dialog/Drawer/Modal,<DialogTitle fontWeight={700}>Tạo Phòng ban Mới</DialogTitle>
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,771,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,795,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,804,Dialog/Drawer/Modal,"<Dialog open={openOnboardModal} onClose={() => setOpenOnboardModal(false)} maxWidth=""sm"" fullWidth>"
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,805,Dialog/Drawer/Modal,<DialogTitle fontWeight={700}>Tiếp nhận Ứng viên Trúng tuyển sang HRM</DialogTitle>
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,806,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,868,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/hrmPages/OnboardingPage/index.tsx,262,Dialog/Drawer/Modal,"<Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth=""sm"" fullWidth>"
+frontend/src/views/hrmPages/OnboardingPage/index.tsx,263,Dialog/Drawer/Modal,<DialogTitle fontWeight={700}>Quy trình Tiếp nhận Nhân viên Mới (Employee Onboarding)</DialogTitle>
+frontend/src/views/hrmPages/OnboardingPage/index.tsx,264,Dialog/Drawer/Modal,<DialogContent>
+frontend/src/views/hrmPages/OnboardingPage/index.tsx,352,Dialog/Drawer/Modal,<DialogActions>
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,441,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,448,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 "
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,452,Dialog/Drawer/Modal,<DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,468,Dialog/Drawer/Modal,<DialogActions sx={{ p: 2 }}>
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,483,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,490,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 "
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,494,Dialog/Drawer/Modal,<DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,510,Dialog/Drawer/Modal,<DialogActions sx={{ p: 2 }}>
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,525,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,532,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 "
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,536,Dialog/Drawer/Modal,<DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,611,Dialog/Drawer/Modal,<DialogActions sx={{ p: 2 }}>
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,626,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,633,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 "
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,637,Dialog/Drawer/Modal,<DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,661,Dialog/Drawer/Modal,<DialogActions sx={{ p: 2 }}>
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,676,Dialog/Drawer/Modal,<Dialog
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,683,Dialog/Drawer/Modal,"<DialogTitle sx={{ fontWeight: 800, color: '#ef4444' }}>Đăng xuất tài khoản</DialogTitle>"
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,684,Dialog/Drawer/Modal,<DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,689,Dialog/Drawer/Modal,<DialogActions sx={{ p: 2 }}>
+frontend/src/utils/sweetalert2Modal.ts,6,Dialog/Drawer/Modal,"const ICON_CONFIG: Record<ModalIconType, { bg: string; color: string; svg: string }> = {"

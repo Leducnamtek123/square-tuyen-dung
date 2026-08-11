@@ -58,10 +58,10 @@ export const ExportError: React.FC<ExportErrorProps> = ({
         </Box>
 
         <Typography variant="h6" sx={{ fontWeight: 700, color: '#111827', mb: 0.5, fontSize: '1.25rem' }}>
-          Unable to generate file.
+          Không thể tạo file dữ liệu.
         </Typography>
         <Typography variant="body2" sx={{ color: '#6B7280', mb: 3, fontSize: '0.875rem' }}>
-          {errorMessage || 'Please try again. Đã xảy ra lỗi trong quá trình tạo dữ liệu xuất.'}
+          {errorMessage || 'Đã xảy ra lỗi trong quá trình tạo dữ liệu xuất. Vui lòng thử lại.'}
         </Typography>
 
         <Stack direction="row" spacing={1.5} justifyContent="center">
@@ -83,7 +83,7 @@ export const ExportError: React.FC<ExportErrorProps> = ({
               },
             }}
           >
-            Cancel
+            Đóng
           </Button>
 
           <Button
@@ -102,7 +102,7 @@ export const ExportError: React.FC<ExportErrorProps> = ({
               },
             }}
           >
-            Retry
+            Thử lại
           </Button>
         </Stack>
       </Paper>

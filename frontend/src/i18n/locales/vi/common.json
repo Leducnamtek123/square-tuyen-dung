@@ -1,5 +1,11 @@
 {
   "appName": "Tuyen Dung",
+  "header": {
+    "auth": {
+      "login": "Đăng nhập",
+      "signUp": "Đăng ký"
+    }
+  },
   "city": "Tỉnh/Thành phố",
   "career": "Ngành nghề",
   "experience": "Kinh nghiệm",

@@ -231,7 +231,27 @@ class CompanyViewSet(viewsets.ViewSet,
     lookup_field = "slug"
 
     def get_queryset(self):
+        if getattr(self, 'action', None) == 'claim':
+            return Company.objects.select_related(
+                'user', 'logo', 'cover_image', 'location', 'location__city'
+            ).prefetch_related('company_images', 'company_images__image')
         return self.queryset.filter(is_verified=True)
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_val = self.kwargs.get(lookup_url_kwarg)
+
+        if lookup_val and str(lookup_val).isdigit():
+            obj = queryset.filter(id=int(lookup_val)).first()
+            if obj:
+                self.check_object_permissions(self.request, obj)
+                return obj
+
+        filter_kwargs = {self.lookup_field: lookup_val}
+        obj = generics.get_object_or_404(queryset, **filter_kwargs)
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     def get_permissions(self):
 
@@ -239,7 +259,38 @@ class CompanyViewSet(viewsets.ViewSet,
 
             return [perms_custom.IsJobSeekerUser()]
 
+        elif self.action in ["claim"]:
+
+            return [perms_custom.IsEmployerUser()]
+
         return [perms_sys.AllowAny()]
+
+    @action(detail=True, methods=['post'], permission_classes=[perms_custom.IsEmployerUser])
+    def claim(self, request, slug=None):
+        company = self.get_object()
+        verification, created = CompanyVerification.objects.get_or_create(
+            company=company,
+            defaults={
+                'submitted_by': request.user,
+                'status': CompanyVerification.STATUS_PENDING,
+                'legal_company_name': company.company_name or "",
+                'tax_code': getattr(company, 'tax_code', '') or "",
+            }
+        )
+        if not created and verification.submitted_by != request.user:
+            verification.submitted_by = request.user
+            verification.status = CompanyVerification.STATUS_PENDING
+            verification.save()
+
+        return var_res.response_data(
+            status=status.HTTP_201_CREATED,
+            data={
+                "id": verification.id,
+                "companyId": company.id,
+                "status": verification.status,
+                "message": "Claim request submitted successfully."
+            }
+        )
 
     def list(self, request, *args, **kwargs):
         from shared.helpers.redis_service import RedisService

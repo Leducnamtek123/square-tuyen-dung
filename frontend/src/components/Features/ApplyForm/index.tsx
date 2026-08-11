@@ -4,7 +4,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from 'next/navigation';
 import * as yup from "yup";
-import { Button, Card, CircularProgress, FormControlLabel, Link, Radio, RadioGroup, Stack, Typography } from "@mui/material";
+import { Box, Button, Card, CircularProgress, FormControlLabel, Link, Radio, RadioGroup, Stack, Typography } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faFile, faFilePdf } from "@fortawesome/free-regular-svg-icons";
@@ -94,12 +94,15 @@ const applyFormReducer = (state: ApplyFormState, action: ApplyFormAction): Apply
   }
 };
 
+import CandidateResumePreviewModal from "@/views/components/jobSeekers/CandidateProfile/CandidateResumePreviewModal";
+
 const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) => {
   const { t, i18n } = useTranslation("public");
   const theme = useTheme();
   const { push } = useRouter();
   const { currentUser } = useAppSelector((state) => state.user);
   const [state, dispatch] = React.useReducer(applyFormReducer, initialState);
+  const [previewResume, setPreviewResume] = React.useState<Resume | null>(null);
   const jobSeekerProfileId = (currentUser as { jobSeekerProfileId?: number | string })?.jobSeekerProfileId;
 
   const schema = React.useMemo(() => createApplyFormSchema(t), [t]);
@@ -251,23 +254,28 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                               "& .MuiFormControlLabel-label": { flex: 1 },
                             }}
                           />
-                          <Link
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={getResumePreviewHref(value)}
+                          <Box
+                            onClick={(e: React.MouseEvent) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setPreviewResume(value);
+                            }}
                             sx={{
-                              textDecoration: "none",
-                              color: "primary.main",
-                              "&:hover": { opacity: 0.8 },
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 0.75,
+                              cursor: 'pointer',
+                              color: 'primary.main',
+                              fontWeight: 700,
+                              fontSize: '0.875rem',
+                              '&:hover': { opacity: 0.8, textDecoration: 'underline' },
                             }}
                           >
-                            <Stack direction="row" spacing={0.5} alignItems="center">
-                              <FontAwesomeIcon icon={faEye} />
-                              <Typography sx={{ fontWeight: "bold", cursor: "pointer", whiteSpace: "nowrap" }}>
-                                {t("applyForm.resume.preview")}
-                              </Typography>
-                            </Stack>
-                          </Link>
+                            <FontAwesomeIcon icon={faEye} />
+                            <Typography component="span" sx={{ fontWeight: 700, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                              {t("applyForm.resume.preview")}
+                            </Typography>
+                          </Box>
                         </Stack>
                       </Card>
                     ))}
@@ -314,6 +322,15 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
           </Grid>
         </Grid>
       </form>
+
+      <CandidateResumePreviewModal
+        open={Boolean(previewResume)}
+        onClose={() => setPreviewResume(null)}
+        resume={previewResume as any}
+        candidateName={currentUser?.fullName || undefined}
+        candidateEmail={currentUser?.email || undefined}
+        candidatePhone={(currentUser as any)?.phone || (currentUser as any)?.phoneNumber || undefined}
+      />
     </>
   );
 };

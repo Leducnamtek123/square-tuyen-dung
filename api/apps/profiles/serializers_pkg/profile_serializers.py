@@ -28,13 +28,13 @@ def _choice_values(choices):
 
 
 class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    phone = serializers.CharField(required=True, max_length=15)
-    birthday = serializers.DateField(required=True,
+    phone = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=15)
+    birthday = serializers.DateField(required=False, allow_null=True,
                                      input_formats=[var_sys.DATE_TIME_FORMAT["ISO8601"],
                                                     var_sys.DATE_TIME_FORMAT["Ymd"]])
-    gender = serializers.CharField(required=True, max_length=1)
+    gender = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=1)
     maritalStatus = serializers.CharField(source='marital_status',
-                                          required=True, max_length=1)
+                                          required=False, allow_blank=True, allow_null=True, max_length=1)
     idCardNumber = serializers.CharField(source='id_card_number', required=False,
                                          allow_blank=True, allow_null=True, max_length=30)
     idCardIssueDate = serializers.DateField(source='id_card_issue_date', required=False, allow_null=True,
@@ -54,9 +54,10 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
                                                  allow_blank=True, allow_null=True, max_length=100)
     emergencyContactPhone = serializers.CharField(source='emergency_contact_phone', required=False,
                                                   allow_blank=True, allow_null=True, max_length=20)
-    location = common_serializers.ProfileLocationSerializer()
+    isJobSeeking = serializers.BooleanField(source='is_seeking_job', required=False, default=True)
+    location = common_serializers.ProfileLocationSerializer(required=False, allow_null=True)
 
-    user = auth_serializers.UserSerializer(fields=["fullName", "email", "avatarUrl"])
+    user = auth_serializers.UserSerializer(fields=["fullName", "email", "avatarUrl"], required=False, allow_null=True)
 
     userDict = serializers.SerializerMethodField(method_name="get_user_dict", read_only=True)
 
@@ -122,6 +123,7 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
                   'taxCode', 'socialInsuranceNo',
                   'permanentAddress', 'contactAddress',
                   'emergencyContactName', 'emergencyContactPhone',
+                  'isJobSeeking',
                   'location', 'user', 'userDict', 'old')
 
     def update(self, instance, validated_data):
@@ -138,6 +140,7 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
         instance.contact_address = validated_data.get('contact_address', instance.contact_address)
         instance.emergency_contact_name = validated_data.get('emergency_contact_name', instance.emergency_contact_name)
         instance.emergency_contact_phone = validated_data.get('emergency_contact_phone', instance.emergency_contact_phone)
+        instance.is_seeking_job = validated_data.get('is_seeking_job', instance.is_seeking_job)
         location_obj = instance.location
         user_obj = instance.user
         location_data = validated_data.get("location")

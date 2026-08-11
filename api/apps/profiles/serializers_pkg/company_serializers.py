@@ -478,7 +478,14 @@ class CompanyVerificationSerializer(DynamicFieldsMixin, serializers.ModelSeriali
     companyId = serializers.IntegerField(source="company_id", read_only=True)
     companyDict = CompanySerializer(source="company", read_only=True, fields=["id", "slug", "companyName", "taxCode", "isVerified"])
     companyName = serializers.CharField(source="legal_company_name", required=False, allow_blank=True, max_length=255)
-    taxCode = serializers.CharField(source="tax_code", required=False, allow_blank=True, max_length=30)
+    taxCode = serializers.CharField(source="tax_code", required=False, allow_blank=True, allow_null=True, max_length=30)
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if ret.get("taxCode") is None:
+            ret["taxCode"] = getattr(getattr(instance, "company", None), "tax_code", "") or ""
+        return ret
+
     businessLicense = serializers.CharField(source="business_license", required=False, allow_blank=True, max_length=255)
     representative = serializers.CharField(source="representative_name", required=False, allow_blank=True, max_length=100)
     phone = serializers.CharField(source="contact_phone", required=False, allow_blank=True, max_length=30)

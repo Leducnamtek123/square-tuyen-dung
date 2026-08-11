@@ -152,46 +152,64 @@ export function useInterviewSSE({
     dispatch({ type: 'reset' });
     reconnectAttempts.current = 0;
 
-    const es = new EventSource(url);
-    eventSourceRef.current = es;
+    const MAX_RETRY_ATTEMPTS = 5;
 
-    const onConnected = () => {
-      dispatch({ type: 'connected' });
-      reconnectAttempts.current = 0;
-    };
-    const onTranscript = (e: Event) => {
-      try {
-        const data: SSETranscriptEvent = JSON.parse((e as MessageEvent).data);
-        dispatch({ type: 'transcriptAdded', transcript: data.transcript });
-      } catch {
-        // ignore parse errors
+    const connect = () => {
+      if (reconnectAttempts.current >= MAX_RETRY_ATTEMPTS) {
+        dispatch({ type: 'connectionLost', error: 'Kết nối máy chủ bị ngắt. Đã vượt quá số lần thử lại.' });
+        return;
       }
-    };
-    const onStatus = (e: Event) => {
-      try {
-        const data: SSEStatusEvent = JSON.parse((e as MessageEvent).data);
-        dispatch({ type: 'statusChanged', event: data });
-      } catch {
-        // ignore
-      }
+
+      const es = new EventSource(url);
+      eventSourceRef.current = es;
+
+      const onConnected = () => {
+        dispatch({ type: 'connected' });
+        reconnectAttempts.current = 0;
+      };
+
+      const onTranscript = (e: Event) => {
+        try {
+          const data: SSETranscriptEvent = JSON.parse((e as MessageEvent).data);
+          dispatch({ type: 'transcriptAdded', transcript: data.transcript });
+        } catch {
+          // ignore parse errors
+        }
+      };
+
+      const onStatus = (e: Event) => {
+        try {
+          const data: SSEStatusEvent = JSON.parse((e as MessageEvent).data);
+          dispatch({ type: 'statusChanged', event: data });
+        } catch {
+          // ignore
+        }
+      };
+
+      es.addEventListener('connected', onConnected);
+      es.addEventListener('transcript_added', onTranscript);
+      es.addEventListener('status_changed', onStatus);
+
+      es.onerror = () => {
+        dispatch({ type: 'disconnected' });
+        es.close();
+        eventSourceRef.current = null;
+
+        if (reconnectAttempts.current < MAX_RETRY_ATTEMPTS) {
+          const delay = Math.pow(2, reconnectAttempts.current) * 1000;
+          reconnectAttempts.current += 1;
+          reconnectTimeoutRef.current = setTimeout(() => {
+            connect();
+          }, delay);
+        } else {
+          dispatch({ type: 'connectionLost', error: 'Mất kết nối với máy chủ.' });
+        }
+      };
     };
 
-    es.addEventListener('connected', onConnected);
-    es.addEventListener('transcript_added', onTranscript);
-    es.addEventListener('status_changed', onStatus);
-
-    es.onerror = () => {
-      dispatch({ type: 'disconnected' });
-      es.close();
-      eventSourceRef.current = null;
-    };
+    connect();
 
     return () => {
-      es.removeEventListener('connected', onConnected);
-      es.removeEventListener('transcript_added', onTranscript);
-      es.removeEventListener('status_changed', onStatus);
-      es.close();
-      eventSourceRef.current = null;
       cleanup();
     };
   }, [sessionId, enabled, activeCompanyId, cleanup]);

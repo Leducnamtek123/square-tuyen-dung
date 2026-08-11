@@ -84,7 +84,7 @@ const initialResumeFilter: ResumeFilter = {
   genderId: '',
   maritalStatusId: '',
   page: 1,
-  pageSize: 10,
+  pageSize: 6,
 };
 
 const filterSlice = createSlice({

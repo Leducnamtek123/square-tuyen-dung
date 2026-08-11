@@ -1,5 +1,11 @@
 {
   "appName": "Project",
+  "header": {
+    "auth": {
+      "login": "Login",
+      "signUp": "Sign Up"
+    }
+  },
   "city": "City/Province",
   "career": "Industry",
   "experience": "Experience",

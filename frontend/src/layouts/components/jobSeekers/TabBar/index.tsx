@@ -1,16 +1,17 @@
 'use client';
+
 import * as React from "react";
 import { useRouter, usePathname } from 'next/navigation';
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
-import WorkIcon from "@mui/icons-material/Work";
+import GridViewIcon from "@mui/icons-material/GridView";
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import ApartmentIcon from "@mui/icons-material/Apartment";
-import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
+import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
-import VideoCameraFrontIcon from "@mui/icons-material/VideoCameraFront";
+import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
 import { useTranslation } from 'react-i18next';
 import { ROUTES, APP_NAME } from "../../../../configs/constants";
 import { getLocalizedRouteVariants, localizeRoutePath } from "../../../../configs/routeLocalization";
@@ -21,41 +22,46 @@ const TabBar = () => {
   const { t, i18n } = useTranslation(['jobSeeker', 'common']);
 
   const tabItems = [
-    { id: 1, label: t('jobSeeker:nav.myDashboard', { appName: APP_NAME }), icon: <DashboardIcon />, path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.DASHBOARD}`, i18n.language) },
+    {
+      id: 1,
+      label: `Trang chủ ${APP_NAME}`,
+      icon: <GridViewIcon sx={{ fontSize: 20 }} />,
+      path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.DASHBOARD}`, i18n.language),
+    },
     {
       id: 2,
-      label: t('jobSeeker:nav.profile'),
-      icon: <AssignmentIndIcon />,
+      label: 'Hồ sơ của tôi',
+      icon: <BadgeOutlinedIcon sx={{ fontSize: 20 }} />,
       path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.PROFILE}`, i18n.language),
     },
     {
       id: 3,
-      label: t('jobSeeker:nav.jobs'),
-      icon: <WorkIcon />,
+      label: 'Việc làm',
+      icon: <WorkOutlineIcon sx={{ fontSize: 20 }} />,
       path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.MY_JOB}`, i18n.language),
     },
     {
       id: 4,
-      label: t('jobSeeker:nav.myCompany'),
-      icon: <ApartmentIcon />,
+      label: 'Công ty của tôi',
+      icon: <ApartmentIcon sx={{ fontSize: 20 }} />,
       path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.MY_COMPANY}`, i18n.language),
     },
     {
       id: 5,
-      label: t('jobSeeker:nav.myInterviews'),
-      icon: <VideoCameraFrontIcon />,
+      label: 'Phỏng vấn của tôi',
+      icon: <VideocamOutlinedIcon sx={{ fontSize: 20 }} />,
       path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.MY_INTERVIEWS}`, i18n.language),
     },
     {
       id: 6,
-      label: t('jobSeeker:nav.notifications'),
-      icon: <CircleNotificationsIcon />,
+      label: 'Thông báo',
+      icon: <NotificationsNoneOutlinedIcon sx={{ fontSize: 20 }} />,
       path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NOTIFICATION}`, i18n.language),
     },
     {
       id: 7,
-      label: t('jobSeeker:nav.accountSettings'),
-      icon: <ManageAccountsOutlinedIcon />,
+      label: 'Tài khoản & Thiết lập',
+      icon: <ManageAccountsOutlinedIcon sx={{ fontSize: 20 }} />,
       path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.ACCOUNT}`, i18n.language),
     },
   ];
@@ -80,33 +86,30 @@ const TabBar = () => {
     <Box
       sx={{
         width: "100%",
-        px: 5,
-        pt: 2,
-        backgroundColor: (theme) => theme.palette.grey[50],
+        px: { xs: 2, md: 4 },
+        backgroundColor: "#ffffff",
+        borderBottom: "1px solid #e2e8f0",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
       }}
     >
       <Tabs
         value={value}
         onChange={selectTab}
         variant="scrollable"
-        scrollButtons
+        scrollButtons="auto"
         allowScrollButtonsMobile
         aria-label={t('jobSeeker:nav.tabsAria')}
         sx={{
-          minHeight: '60px',
+          minHeight: '52px',
           '& .MuiTabs-scroller': {
-            height: '100%',
             display: 'flex',
-            alignItems: 'center'
+            alignItems: 'center',
           },
-          '& .MuiTabs-flexContainer': {
-            alignItems: 'center'
+          '& .MuiTabs-indicator': {
+            backgroundColor: '#2563eb',
+            height: 3,
+            borderRadius: '3px 3px 0 0',
           },
-          '& .MuiTabScrollButton-root': {
-            width: 48,
-            height: '100%',
-            alignSelf: 'center'
-          }
         }}
       >
         {tabItems.map((tab) => (
@@ -117,14 +120,25 @@ const TabBar = () => {
             iconPosition="start"
             label={tab.label}
             sx={{
+              minHeight: '52px',
+              px: 2,
               mx: 0.5,
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              textTransform: 'none',
+              color: '#64748b',
               transition: 'all 0.2s ease-in-out',
-              '&:first-of-type': {
-                ml: 0
+              '&.Mui-selected': {
+                color: '#2563eb',
+                fontWeight: 700,
+                '& .MuiSvgIcon-root': {
+                  color: '#2563eb',
+                },
               },
-              '&:last-of-type': {
-                mr: 0
-              }
+              '&:hover': {
+                color: '#2563eb',
+                backgroundColor: '#f8fafc',
+              },
             }}
           />
         ))}

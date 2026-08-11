@@ -36,6 +36,8 @@ export interface JobSeekerProfileUpdatePayload {
   contactAddress?: string;
   emergencyContactName?: string;
   emergencyContactPhone?: string;
+  isJobSeeking?: boolean;
+  isSeekingJob?: boolean;
 }
 
 const formatDateForApi = (value: Date | string | null | undefined): string | null | undefined => {

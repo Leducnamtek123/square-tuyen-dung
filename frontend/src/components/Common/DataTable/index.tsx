@@ -256,6 +256,8 @@ const DataTable = <TData,>({
                     page={finalPageIndex}
                     onPageChange={handlePageChange}
                     onRowsPerPageChange={handleRowsPerPageChange}
+                    backIconButtonProps={{ disabled: isLoading }}
+                    nextIconButtonProps={{ disabled: isLoading }}
                     labelRowsPerPage={t('common.pagination.rowsPerPage')}
                     labelDisplayedRows={({ from, to, count }) => 
                         t('common.pagination.displayedRows', { from, to, count })

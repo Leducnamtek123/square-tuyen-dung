@@ -274,12 +274,23 @@ const JobPostSearch = () => {
             >
               <Button
                 variant="contained"
-                color="primary"
                 startIcon={<SearchIcon />}
                 sx={{
                   whiteSpace: 'nowrap',
                   width: { xs: '100%', sm: 'auto' },
                   justifyContent: 'center',
+                  borderRadius: '10px',
+                  backgroundColor: '#2563eb',
+                  color: '#ffffff',
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  px: 2.5,
+                  py: 1,
+                  boxShadow: 'none',
+                  '&:hover': {
+                    backgroundColor: '#1d4ed8',
+                    boxShadow: 'none',
+                  },
                 }}
                 type="submit"
               >
@@ -287,29 +298,55 @@ const JobPostSearch = () => {
               </Button>
               <Button
                 variant="outlined"
-                color="primary"
                 sx={{
                   whiteSpace: 'nowrap',
                   width: { xs: '100%', sm: 'auto' },
                   justifyContent: 'center',
+                  borderRadius: '10px',
+                  borderColor: '#2563eb',
+                  color: '#2563eb',
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  px: 2,
+                  py: 1,
+                  '&:hover': {
+                    borderColor: '#1d4ed8',
+                    backgroundColor: '#eff6ff',
+                  },
                 }}
-                startIcon={<BookmarkAddIcon />}
+                startIcon={<BookmarkAddIcon sx={{ color: '#2563eb' }} />}
                 onClick={handleOpenSaveAlert}
               >
                 {t('jobSearch.saveSearch')}
               </Button>
               <Button
-                variant="contained"
+                variant="outlined"
                 sx={{
-                  color: 'white',
                   whiteSpace: 'nowrap',
                   width: { xs: '100%', sm: 'auto' },
                   justifyContent: 'center',
+                  borderRadius: '10px',
+                  borderColor: showAdvanceFilter ? '#2563eb' : '#cbd5e1',
+                  backgroundColor: showAdvanceFilter ? '#eff6ff' : '#ffffff',
+                  color: showAdvanceFilter ? '#2563eb' : '#0f172a',
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  px: 2,
+                  py: 1,
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: showAdvanceFilter ? '#1d4ed8' : '#94a3b8',
+                    backgroundColor: showAdvanceFilter ? '#dbeafe' : '#f8fafc',
+                  },
+                  transition: 'all 0.2s ease-in-out',
                 }}
                 startIcon={
-                  showAdvanceFilter ? <FilterAltOffIcon /> : <FilterAltIcon />
+                  showAdvanceFilter ? (
+                    <FilterAltOffIcon sx={{ color: '#2563eb' }} />
+                  ) : (
+                    <FilterAltIcon sx={{ color: '#0f172a' }} />
+                  )
                 }
-                color="secondary"
                 onClick={handleChangeShowFilter}
               >
                 {t('jobSearch.advancedFilter')}

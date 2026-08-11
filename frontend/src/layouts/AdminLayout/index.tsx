@@ -15,7 +15,7 @@ interface AdminLayoutProps {
   children?: React.ReactNode;
 }
 
-const EXPANDED_WIDTH = 224;
+const EXPANDED_WIDTH = 240;
 const COLLAPSED_WIDTH = 64;
 
 const AdminLayout = (props: AdminLayoutProps) => {

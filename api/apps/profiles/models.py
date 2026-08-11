@@ -34,6 +34,7 @@ class JobSeekerProfile(CommonBaseModel):
     contact_address = models.CharField(max_length=255, blank=True, null=True)
     emergency_contact_name = models.CharField(max_length=100, blank=True, null=True)
     emergency_contact_phone = models.CharField(max_length=20, blank=True, null=True)
+    is_seeking_job = models.BooleanField(default=True, db_index=True)
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="job_seeker_profile")
 

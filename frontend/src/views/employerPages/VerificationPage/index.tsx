@@ -199,6 +199,7 @@ const VerificationPage = () => {
       <VerificationLegalProfileForm
         legalProfile={legalProfile}
         onChange={handleLegalProfileChange}
+        onLicenseFileUploaded={(url) => setLegalProfile((prev) => ({ ...prev, businessLicense: url }))}
         onSubmit={handleSaveLegalProfile}
         statusLabel={statusLabel}
         statusColor={statusColor}

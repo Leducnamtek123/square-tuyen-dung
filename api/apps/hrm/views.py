@@ -217,6 +217,35 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             
         return Response(EmployeeSerializer(employee).data, status=status.HTTP_201_CREATED)
 
+    @action(detail=False, methods=['get'], url_path='export-payroll')
+    def export_payroll(self, request):
+        import csv
+        from django.http import HttpResponse
+
+        company = _get_company_for_request(request)
+        employees = Employee.objects.filter(company=company) if company else Employee.objects.none()
+
+        response = HttpResponse(content_type='text/csv; charset=utf-8')
+        response['Content-Disposition'] = 'attachment; filename="hrm_payroll_export.csv"'
+        response.write('\ufeff')
+
+        writer = csv.writer(response)
+        writer.writerow(['Mã nhân viên', 'Họ và tên', 'Email', 'Phòng ban', 'Chức danh', 'Trạng thái', 'Ngày vào làm', 'Lương cơ bản (VND)'])
+
+        for emp in employees:
+            writer.writerow([
+                emp.employee_code,
+                emp.full_name,
+                emp.email,
+                emp.department.name if emp.department else '',
+                emp.designation.name if emp.designation else '',
+                emp.status,
+                emp.join_date,
+                getattr(emp, 'basic_salary', 0) or 0
+            ])
+
+        return response
+
 
 class EmploymentContractViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]

@@ -493,6 +493,27 @@ class ResumeViewSet(viewsets.ViewSet,
 
     lookup_field = "slug"
 
+    def get_object(self):
+        queryset = self.get_queryset()
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_value = self.kwargs.get(lookup_url_kwarg)
+
+        if not lookup_value:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Hồ sơ không tồn tại.")
+
+        if str(lookup_value).isdigit():
+            obj = queryset.filter(Q(id=int(lookup_value)) | Q(slug=str(lookup_value))).first()
+        else:
+            obj = queryset.filter(slug=str(lookup_value)).first()
+
+        if not obj:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Hồ sơ không tồn tại.")
+
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     def get_serializer_class(self):
 
         if self.action in ["retrieve"]:
@@ -534,7 +555,9 @@ class ResumeViewSet(viewsets.ViewSet,
                             if clean_term.lower() not in [k.lower() for k in job_keywords]:
                                 job_keywords.append(clean_term)
 
-        base_qs = self.get_queryset().filter(is_active=True)
+        base_qs = self.get_queryset().filter(is_active=True).filter(
+            Q(job_seeker_profile__isnull=True) | Q(job_seeker_profile__is_seeking_job=True)
+        )
 
         whens = []
         if active_career_ids:
@@ -590,63 +613,59 @@ class ResumeViewSet(viewsets.ViewSet,
         return var_res.response_data(data=serializer.data)
 
     @action(methods=["post"], detail=True,
-
             url_path="resume-saved", url_name="resume-saved")
-
-    def resume_saved(self, request, slug):
-
+    def resume_saved(self, request, slug=None):
         user = request.user
-
-        saved_resumes = ResumeSaved.objects.filter(
-
-            company=user.active_company, resume=self.get_object())
-
-        is_saved = False
-
-        if saved_resumes.exists():
-
-            saved_resume = saved_resumes.first()
-
-            saved_resume.delete()
-
-        else:
-
-            ResumeSaved.objects.create(
-
-                company=request.user.active_company,
-
-                resume=self.get_object()
-
+        company = user.get_active_company() if hasattr(user, 'get_active_company') else getattr(user, 'active_company', None)
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                message="Vui lòng chọn công ty để thực hiện thao tác này."
             )
 
+        resume_obj = self.get_object()
+        saved_resumes = ResumeSaved.objects.filter(
+            company=company, resume=resume_obj)
+
+        is_saved = False
+        if saved_resumes.exists():
+            saved_resume = saved_resumes.first()
+            saved_resume.delete()
+        else:
+            ResumeSaved.objects.create(
+                company=company,
+                resume=resume_obj
+            )
             is_saved = True
 
-        # send notification
+        # send notification safely in background thread to avoid blocking HTTP response
+        import threading
+        def _send_notification_async():
+            try:
+                notification_content = NOTIFICATION_MESSAGES[
+                    'RESUME_SAVED'] if is_saved else NOTIFICATION_MESSAGES['RESUME_UNSAVED']
 
-        company = user.active_company
+                logo_url = var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+                if company and company.logo:
+                    if hasattr(company.logo, 'get_full_url'):
+                        try:
+                            logo_url = company.logo.get_full_url()
+                        except Exception:
+                            pass
 
-        notification_content = NOTIFICATION_MESSAGES[
+                helper.add_employer_saved_resume_notifications(
+                    company.company_name if company else "Công ty",
+                    notification_content,
+                    logo_url,
+                    resume_obj.user_id
+                )
+            except Exception:
+                pass
 
-            'RESUME_SAVED'] if is_saved else NOTIFICATION_MESSAGES['RESUME_UNSAVED']
-
-        helper.add_employer_saved_resume_notifications(
-
-            company.company_name,
-
-            notification_content,
-
-            company.logo.get_full_url(
-
-            ) if company.logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"],
-
-            self.get_object().user_id
-
-        )
+        threading.Thread(target=_send_notification_async, daemon=True).start()
 
         return var_res.response_data(data={
-
             "isSaved": is_saved
-
         })
 
     @action(methods=["post"], detail=True,

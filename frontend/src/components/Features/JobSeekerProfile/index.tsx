@@ -3,6 +3,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { 
+    Button,
     Card, 
     Chip, 
     IconButton, 
@@ -19,8 +20,8 @@ import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import RoomIcon from '@mui/icons-material/Room';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import dayjs from 'dayjs';
@@ -97,227 +98,226 @@ const JobSeekerProfile = ({
             variant="outlined"
             onClick={handleNavigate}
             sx={{
-                p: 3,
-                borderRadius: 4,
+                p: '14px 16px',
+                minHeight: 90,
+                borderRadius: '10px',
                 cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: 'all 0.2s ease-in-out',
                 border: '1px solid',
-                borderColor: 'divider',
-                backgroundColor: 'background.paper',
+                borderColor: '#E2E8F0',
+                backgroundColor: '#FFFFFF',
                 position: 'relative',
                 overflow: 'visible',
                 '&:hover': {
                     borderColor: 'primary.main',
-                    bgcolor: pc.primary( 0.02),
-                    transform: 'translateY(-4px)',
-                    boxShadow: (theme: StylesTheme & { customShadows?: Record<string, string> }) => theme.customShadows?.z12,
-                    '& .profile-actions': { opacity: 1, transform: 'translateX(0)' }
+                    bgcolor: pc.primary(0.015),
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 16px rgba(37, 99, 235, 0.08)',
                 },
             }}
         >
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', md: 'center' }}>
-                <Avatar 
-                    src={user?.avatar || user?.avatarUrl || undefined} 
-                    variant="rounded"
-                    sx={{ 
-                        width: 72, 
-                        height: 72, 
-                        borderRadius: 2.5,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        boxShadow: (theme: StylesTheme & { customShadows?: Record<string, string> }) => theme.customShadows?.z1
-                    }}
-                />
-                
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Stack direction="row" alignItems="center" spacing={1.5} mb={0.5} flexWrap="wrap">
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ xs: 'flex-start', md: 'center' }} justifyContent="space-between">
+                <Stack direction="row" spacing={2} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
+                    <Avatar 
+                        src={user?.avatar || user?.avatarUrl || undefined} 
+                        variant="rounded"
+                        sx={{ 
+                            width: 48, 
+                            height: 48, 
+                            borderRadius: '8px',
+                            border: '1px solid #F1F5F9',
+                            flexShrink: 0,
+                        }}
+                    />
+                    
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+                            <Typography 
+                                variant="subtitle1" 
+                                sx={{ 
+                                    fontWeight: 700, 
+                                    fontSize: '0.95rem',
+                                    color: '#0F172A',
+                                    lineHeight: 1.3,
+                                    transition: 'color 0.2s',
+                                    '&:hover': { color: 'primary.main' }
+                                }}
+                            >
+                                {user?.fullName || title || "Ứng viên"}
+                                {jobSeekerProfile?.old && String(jobSeekerProfile.old) !== '---' && (
+                                    <Box component="span" sx={{ fontWeight: 500, color: '#64748B', ml: 0.75, fontSize: '0.8125rem' }}>
+                                        ({jobSeekerProfile.old} tuổi)
+                                    </Box>
+                                )}
+                            </Typography>
+                            
+                            {matchScore && matchScore > 0 ? (
+                                <Chip
+                                    label="Phù hợp nhu cầu"
+                                    size="small"
+                                    sx={{ 
+                                        borderRadius: '6px', 
+                                        fontWeight: 600, 
+                                        height: 20, 
+                                        fontSize: '0.6875rem',
+                                        bgcolor: '#EFF6FF',
+                                        color: '#2563EB',
+                                        border: '1px solid #DBEAFE',
+                                    }}
+                                />
+                            ) : null}
+
+                            {lastViewedDate && (
+                                <Chip
+                                    icon={<CheckCircleRoundedIcon sx={{ fontSize: '13px !important' }} />}
+                                    label={lastViewedLabel}
+                                    size="small"
+                                    sx={{ 
+                                        borderRadius: '6px', 
+                                        fontWeight: 600, 
+                                        height: 20, 
+                                        fontSize: '0.65rem',
+                                        bgcolor: pc.success(0.08),
+                                        color: 'success.dark',
+                                    }}
+                                />
+                            )}
+                        </Stack>
+
                         <Typography 
-                            variant="h6" 
+                            variant="body2" 
                             sx={{ 
-                                fontWeight: 900, 
-                                color: 'text.primary',
-                                transition: 'color 0.2s',
-                                '&:hover': { color: 'primary.main' }
+                                fontWeight: 600, 
+                                color: 'primary.main', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: 0.75,
+                                fontSize: '0.85rem',
+                                mt: 0.25,
                             }}
                         >
-                            {user?.fullName || t('common:labels.notUpdated')}
-                            <Box component="span" sx={{ fontWeight: 700, color: 'text.secondary', ml: 1, fontSize: '0.9rem', opacity: 0.7 }}>
-                                ({t('employer:profileCard.label.yearsOld', { age: jobSeekerProfile?.old || '---' })})
-                            </Box>
+                            {type === CV_TYPES.cvUpload && (
+                                <PictureAsPdfIcon color="error" fontSize="small" />
+                            )}
+                            {title || "Chưa cập nhật vị trí"}
                         </Typography>
-                        
-                        {matchScore && matchScore > 0 ? (
-                            <Chip
-                                label="🎯 Phù hợp nhu cầu tuyển dụng"
-                                size="small"
-                                sx={{ 
-                                    borderRadius: 1.5, 
-                                    fontWeight: 900, 
-                                    height: 24, 
-                                    fontSize: '0.72rem',
-                                    bgcolor: pc.primary(0.12),
-                                    color: 'primary.main',
-                                    border: '1px solid',
-                                    borderColor: pc.primary(0.25),
-                                    boxShadow: '0 2px 6px rgba(37, 99, 235, 0.12)'
-                                }}
-                            />
-                        ) : null}
 
-                        {lastViewedDate && (
-                            <Chip
-                                icon={<CheckCircleRoundedIcon sx={{ fontSize: '14px !important' }} />}
-                                label={lastViewedLabel}
-                                size="small"
-                                sx={{ 
-                                    borderRadius: 1, 
-                                    fontWeight: 800, 
-                                    height: 22, 
-                                    fontSize: '0.65rem',
-                                    bgcolor: pc.success( 0.08),
-                                    color: 'success.dark',
-                                    border: '1px solid',
-                                    borderColor: pc.success( 0.1)
-                                }}
-                            />
-                        )}
-                    </Stack>
-
-                    <Typography 
-                        variant="subtitle1" 
-                        sx={{ 
-                            fontWeight: 800, 
-                            color: 'primary.main', 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: 1,
-                            mb: 2,
-                            letterSpacing: '-0.2px'
-                        }}
-                    >
-                        {type === CV_TYPES.cvUpload && (
-                            <PictureAsPdfIcon color="error" fontSize="small" />
-                        )}
-                        {title || t('common:labels.notUpdated')}
-                    </Typography>
-
-                    <Stack direction="row" spacing={1.5} flexWrap="wrap" sx={{ gap: 1.5 }}>
-                        <Chip
-                            size="small"
-                            icon={<MonetizationOnIcon sx={{ fontSize: '16px !important', color: 'inherit' }} />}
-                            label={formatLocalizedSalaryRange(salaryMin, salaryMax, i18n.language) || t('common:labels.notUpdated')}
-                            sx={{ 
-                                fontWeight: 800, 
-                                bgcolor: pc.secondary( 0.08), 
-                                color: 'secondary.main', 
-                                border: 'none',
-                                px: 0.5
-                            }}
-                        />
-                        <Chip
-                            size="small"
-                            icon={<WorkOutlineOutlinedIcon sx={{ fontSize: '16px !important', color: 'inherit' }} />}
-                            label={tConfig(String(allConfig?.experienceDict?.[experience] || '')) || t('common:labels.notUpdated')}
-                            sx={{ 
-                                fontWeight: 800, 
-                                bgcolor: pc.primary( 0.08), 
-                                color: 'primary.main', 
-                                border: 'none',
-                                px: 0.5
-                            }}
-                        />
-                        <Chip
-                            size="small"
-                            icon={<RoomIcon sx={{ fontSize: '16px !important', color: 'inherit' }} />}
-                            label={tConfig(String(allConfig?.cityDict?.[city] || '')) || t('common:labels.notUpdated')}
-                            sx={{ 
-                                fontWeight: 800, 
-                                bgcolor: pc.info( 0.08), 
-                                color: 'info.main', 
-                                border: 'none',
-                                px: 0.5
-                            }}
-                        />
-                    </Stack>
-                </Box>
+                        <Stack direction="row" spacing={0.75} flexWrap="wrap" sx={{ gap: 0.75, mt: 0.5 }}>
+                            {Boolean(salaryMin || salaryMax) && (
+                                <Chip
+                                    size="small"
+                                    icon={<MonetizationOnIcon sx={{ fontSize: '14px !important', color: '#64748B' }} />}
+                                    label={formatLocalizedSalaryRange(salaryMin, salaryMax, i18n.language)}
+                                    sx={{ 
+                                        fontWeight: 600, 
+                                        bgcolor: '#F8FAFC', 
+                                        color: '#475569', 
+                                        fontSize: '0.72rem',
+                                        height: 22,
+                                        border: '1px solid #F1F5F9',
+                                    }}
+                                />
+                            )}
+                            {Boolean(experience && allConfig?.experienceDict?.[experience]) && (
+                                <Chip
+                                    size="small"
+                                    icon={<WorkOutlineOutlinedIcon sx={{ fontSize: '14px !important', color: '#64748B' }} />}
+                                    label={tConfig(String(allConfig?.experienceDict?.[experience] || ''))}
+                                    sx={{ 
+                                        fontWeight: 600, 
+                                        bgcolor: '#F8FAFC', 
+                                        color: '#475569', 
+                                        fontSize: '0.72rem',
+                                        height: 22,
+                                        border: '1px solid #F1F5F9',
+                                    }}
+                                />
+                            )}
+                            {Boolean(city && allConfig?.cityDict?.[city]) && (
+                                <Chip
+                                    size="small"
+                                    icon={<RoomIcon sx={{ fontSize: '14px !important', color: '#64748B' }} />}
+                                    label={tConfig(String(allConfig?.cityDict?.[city] || ''))}
+                                    sx={{ 
+                                        fontWeight: 600, 
+                                        bgcolor: '#F8FAFC', 
+                                        color: '#475569', 
+                                        fontSize: '0.72rem',
+                                        height: 22,
+                                        border: '1px solid #F1F5F9',
+                                    }}
+                                />
+                            )}
+                        </Stack>
+                    </Box>
+                </Stack>
 
                 <Stack 
                     alignItems={{ xs: 'flex-start', md: 'flex-end' }} 
-                    spacing={2} 
-                    sx={{ minWidth: { md: 200 } }}
+                    justifyContent="space-between"
+                    spacing={1} 
+                    sx={{ minWidth: { md: 160 }, flexShrink: 0, height: '100%' }}
                 >
+                    <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 500, fontSize: '0.75rem' }}>
+                        {updatedAtLabel}
+                    </Typography>
+
                     <Stack 
                         direction="row" 
-                        spacing={1} 
-                        className="profile-actions"
-                        sx={{ 
-                            opacity: { xs: 1, md: 0.6 }, 
-                            transition: 'all 0.3s',
-                            transform: { xs: 'none', md: 'translateX(10px)' }
-                        }}
+                        spacing={0.75} 
+                        alignItems="center"
                     >
                         <Tooltip title={isSaved ? t('employer:profileCard.actions.unsave') : t('employer:profileCard.actions.save')} arrow>
                             <IconButton
                                 size="small"
-                                onClick={(e) => {
+                                onClick={(e: React.MouseEvent) => {
                                     e.stopPropagation();
                                     handleSave(slug);
                                 }}
                                 sx={{
-                                    color: isSaved ? 'error.main' : 'text.disabled',
-                                    bgcolor: isSaved ? pc.error( 0.08) : pc.actionDisabled( 0.05),
+                                    width: 32,
+                                    height: 32,
+                                    color: isSaved ? 'primary.main' : '#64748B',
+                                    bgcolor: isSaved ? '#EFF6FF' : '#F8FAFC',
+                                    border: '1px solid',
+                                    borderColor: isSaved ? '#BFDBFE' : '#E2E8F0',
                                     '&:hover': { 
-                                        bgcolor: isSaved ? 'error.main' : 'text.primary', 
-                                        color: '#fff',
-                                        boxShadow: (theme: StylesTheme & { customShadows?: Record<string, string> }) => theme.customShadows?.error
+                                        bgcolor: isSaved ? '#DBEAFE' : '#E2E8F0', 
+                                        color: 'primary.main',
                                     }
                                 }}
                             >
-                                {isSaved ? <FavoriteIcon fontSize="small" /> : <FavoriteBorderOutlinedIcon fontSize="small" />}
+                                {isSaved ? <BookmarkIcon sx={{ fontSize: 18 }} /> : <BookmarkBorderIcon sx={{ fontSize: 18 }} />}
                             </IconButton>
                         </Tooltip>
-                        <Tooltip title={t('employer:profileCard.actions.viewProfile')} arrow>
-                            <IconButton 
-                                size="small"
-                                sx={{
-                                    color: 'primary.main',
-                                    bgcolor: pc.primary( 0.08),
-                                    '&:hover': { 
-                                        bgcolor: 'primary.main', 
-                                        color: '#fff',
-                                        boxShadow: (theme: StylesTheme & { customShadows?: Record<string, string> }) => theme.customShadows?.primary
-                                    }
-                                }}
-                            >
-                                <RemoveRedEyeOutlinedIcon fontSize="small" />
-                            </IconButton>
-                        </Tooltip>
-                    </Stack>
-
-                    <Stack spacing={1} alignItems={{ xs: 'flex-start', md: 'flex-end' }}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5, opacity: 0.8 }}>
-                            {updatedAtLabel}
-                        </Typography>
-
-                        <Typography 
-                            variant="caption" 
-                            sx={{ 
-                                color: 'primary.main', 
-                                fontWeight: 900, 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: 0.75, 
-                                bgcolor: pc.primary( 0.05), 
-                                px: 1.5, 
-                                py: 0.5, 
-                                borderRadius: 1.5,
-                                border: '1px solid',
-                                borderColor: pc.primary( 0.1)
+                        
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={(e: React.MouseEvent) => {
+                                e.stopPropagation();
+                                handleNavigate();
+                            }}
+                            sx={{
+                                fontWeight: 700,
+                                fontSize: '0.775rem',
+                                color: 'primary.main',
+                                borderColor: '#BFDBFE',
+                                bgcolor: '#EFF6FF',
+                                textTransform: 'none',
+                                px: 1.5,
+                                py: 0.4,
+                                height: 32,
+                                borderRadius: '6px',
+                                '&:hover': {
+                                    bgcolor: 'primary.main',
+                                    color: '#FFFFFF',
+                                    borderColor: 'primary.main',
+                                }
                             }}
                         >
-                            <RemoveRedEyeOutlinedIcon sx={{ fontSize: 14 }} />
-                            {t('employer:profileCard.label.viewsCount', { count: viewEmployerNumber })}
-                        </Typography>
+                            Xem hồ sơ
+                        </Button>
                     </Stack>
                 </Stack>
             </Stack>

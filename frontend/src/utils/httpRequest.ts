@@ -34,7 +34,7 @@ type StoredWorkspace = {
 };
 
 // Prefix for API endpoints
-const prefix = 'api';
+const prefix = 'api/v1';
 
 // Use relative path to work with nginx proxy, allow override via env if needed
 const baseURL = process.env.NEXT_PUBLIC_API_BASE || `/${prefix}/`;

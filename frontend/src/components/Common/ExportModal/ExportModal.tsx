@@ -237,7 +237,7 @@ export const ExportModal: React.FC<ExportModalProps> = (props) => {
               },
             }}
           >
-            Cancel
+            Hủy
           </Button>
 
           <Button
@@ -258,7 +258,7 @@ export const ExportModal: React.FC<ExportModalProps> = (props) => {
               },
             }}
           >
-            Generate File
+            Xuất file dữ liệu
           </Button>
         </DialogActions>
       )}

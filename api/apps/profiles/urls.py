@@ -75,7 +75,9 @@ urlpatterns = [
 
             'get': 'get_profile_info',
 
-            'put': 'update_profile_info'
+            'put': 'update_profile_info',
+
+            'patch': 'update_profile_info'
 
         })),
 

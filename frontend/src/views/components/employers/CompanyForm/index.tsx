@@ -197,6 +197,14 @@ const CompanyFormContent = ({
 
   const errorText = serverErrors ? Object.values(serverErrors).flat().join(' ') : '';
 
+  const locationValue = useWatch({ control, name: 'location' });
+
+  const handleLocationChange = (val: { address?: string; lat?: number | string | null; lng?: number | string | null }) => {
+    if (val.address) setValue('location.address', val.address, { shouldDirty: true, shouldValidate: true });
+    if (val.lat !== null && val.lat !== undefined) setValue('location.lat', val.lat, { shouldDirty: true });
+    if (val.lng !== null && val.lng !== undefined) setValue('location.lng', val.lng, { shouldDirty: true });
+  };
+
   return (
     <form id="company-form" onSubmit={handleSubmit(handleUpdate)}>
       <Stack spacing={2.5}>
@@ -209,6 +217,8 @@ const CompanyFormContent = ({
             districtOptions={localDistrictOptions}
             locationOptions={localLocationOptions}
             handleSelectLocation={handleSelectLocation}
+            locationValue={locationValue}
+            onLocationChange={handleLocationChange}
           />
         </Box>
       </Stack>

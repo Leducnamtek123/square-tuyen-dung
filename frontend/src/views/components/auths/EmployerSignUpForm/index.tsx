@@ -293,6 +293,13 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
 
   const handleBack = () => setActiveStep((currentStep) => currentStep - 1);
 
+  const companyLocationValue = useWatch({ control, name: 'company.location' });
+  const handleSignUpLocationChange = (val: { address?: string; lat?: number | string | null; lng?: number | string | null }) => {
+    if (val.address) setValue('company.location.address', val.address, { shouldDirty: true, shouldValidate: true });
+    if (val.lat !== null && val.lat !== undefined) setValue('company.location.lat', val.lat?.toString() || '', { shouldDirty: true });
+    if (val.lng !== null && val.lng !== undefined) setValue('company.location.lng', val.lng?.toString() || '', { shouldDirty: true });
+  };
+
   return (
     <Box
       component="form"
@@ -317,6 +324,8 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
             districtOptions={districtOptions}
             locationOptions={locationOptions}
             handleSelectLocation={handleSelectLocation}
+            locationValue={companyLocationValue}
+            onLocationChange={handleSignUpLocationChange}
           />
         </Box>
         <Stack sx={{ mt: 4 }} spacing={2} direction={{ xs: 'column', sm: 'row' }} justifyContent="flex-end">

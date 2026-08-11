@@ -196,6 +196,8 @@ export interface JobPost {
   isExpired?: boolean;
   isVerify?: boolean;
   appliedNumber?: number;
+  aiRecommendedCount?: number;
+  aiRecommendedAvatars?: Array<{ name: string; initial: string; avatarUrl?: string | null }>;
 }
 
 export interface JobPostActivity {
@@ -357,6 +359,8 @@ export interface JobSeekerProfile {
   maritalStatus?: 'S' | 'M' | null;
   location?: Location | null;
   userDict?: UserDict;
+  isJobSeeking?: boolean;
+  isSeekingJob?: boolean;
 }
 
 export interface EducationDetail {

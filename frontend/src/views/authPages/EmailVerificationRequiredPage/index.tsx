@@ -1,23 +1,20 @@
-﻿'use client';
+'use client';
 import * as React from 'react';
-
+import { useRouter } from 'next/navigation';
 import { Box, Button, Card, Container, Typography } from '@mui/material';
-
 import { useTranslation } from 'react-i18next';
 
 import { TabTitle } from '../../../utils/generalFunction';
-
 import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
-
 import authService from '../../../services/authService';
-
 import toastMessages from '../../../utils/toastMessages';
-
 import { useAppSelector } from '../../../hooks/useAppStore';
+import { getSafeRedirectPath } from '../../../utils/safeExternalUrl';
 
 const RESEND_EMAIL_COOLDOWN_MS = 2500;
 
 const EmailVerificationRequiredPage = () => {
+  const router = useRouter();
   const { t } = useTranslation('auth');
 
   TabTitle(t('verification.pageTitle'));
@@ -27,6 +24,54 @@ const EmailVerificationRequiredPage = () => {
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const resendInFlightRef = React.useRef(false);
   const lastResendAttemptAtRef = React.useRef(0);
+  const redirectTriggeredRef = React.useRef(false);
+
+  const checkVerificationStatus = React.useCallback(
+    async (showLoading = false) => {
+      const normalizedEmail = String(email || '').trim();
+      if (!normalizedEmail || redirectTriggeredRef.current) return;
+
+      if (showLoading) setIsFullScreenLoading(true);
+
+      try {
+        const res: any = await authService.sendVerifyEmail(normalizedEmail);
+        const isVerified = res?.data?.emailVerified || res?.emailVerified;
+        if (isVerified && !redirectTriggeredRef.current) {
+          redirectTriggeredRef.current = true;
+          toastMessages.success('Tài khoản của bạn đã được kích hoạt thành công! Vui lòng đăng nhập.');
+          router.push(getSafeRedirectPath('/dang-nhap'));
+        }
+      } catch (error) {
+        // Silent catch for auto-check
+      } finally {
+        if (showLoading) setIsFullScreenLoading(false);
+      }
+    },
+    [email, router]
+  );
+
+  React.useEffect(() => {
+    if (!email) return;
+
+    // Check status on mount
+    checkVerificationStatus(false);
+
+    // Auto-check when switching back to this tab
+    const handleFocus = () => {
+      checkVerificationStatus(false);
+    };
+    window.addEventListener('focus', handleFocus);
+
+    // Periodic auto-check every 4 seconds
+    const intervalId = setInterval(() => {
+      checkVerificationStatus(false);
+    }, 4000);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(intervalId);
+    };
+  }, [email, checkVerificationStatus]);
 
   const handleResendEmail = async () => {
     const normalizedEmail = String(email || '').trim();
@@ -45,7 +90,16 @@ const EmailVerificationRequiredPage = () => {
     setIsFullScreenLoading(true);
 
     try {
-      await authService.sendVerifyEmail(normalizedEmail);
+      const res: any = await authService.sendVerifyEmail(normalizedEmail);
+      const isVerified = res?.data?.emailVerified || res?.emailVerified;
+
+      if (isVerified) {
+        redirectTriggeredRef.current = true;
+        toastMessages.success('Tài khoản của bạn đã được kích hoạt thành công!');
+        router.push(getSafeRedirectPath('/dang-nhap'));
+        return;
+      }
+
       toastMessages.success(t('login.successTitle'));
     } catch (error) {
       toastMessages.error(t('messages.tryAgain'));

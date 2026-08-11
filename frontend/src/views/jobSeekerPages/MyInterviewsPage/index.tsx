@@ -1,126 +1,169 @@
 'use client';
-import React from 'react';
-import { Box, Card, Typography, Button, Avatar, Chip, CircularProgress, useTheme, type Theme } from "@mui/material";
-import { Grid2 as Grid } from "@mui/material";
 
+import React from 'react';
+import Link from 'next/link';
+import {
+  Box,
+  Card,
+  Typography,
+  Button,
+  Avatar,
+  Chip,
+  CircularProgress,
+} from '@mui/material';
+import { Grid2 as Grid } from '@mui/material';
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
+import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
 import { TabTitle } from '../../../utils/generalFunction';
 import { useMyInterviews } from './hooks/useMyInterviews';
 import { transformInterviewSession } from '../../../utils/transformers';
 import type { InterviewSession } from '../../../types/models';
 import { ROUTES } from '../../../configs/constants';
 import { useRouter } from 'next/navigation';
-import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
-import EventAvailableIcon from '@mui/icons-material/EventAvailable';
-import dayjs from '../../../configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
+import { localizeRoutePath } from '../../../configs/routeLocalization';
 
 const MyInterviewsPage = () => {
-    const { t } = useTranslation(['jobSeeker', 'common', 'errors', 'interview']);
-    const theme = useTheme();
-    TabTitle(t('jobSeeker:myInterviewsTitle'));
-    const { push } = useRouter();
-    const { data: interviewsData, isLoading, isError } = useMyInterviews({ pageSize: 50 });
+  const { t, i18n } = useTranslation(['jobSeeker', 'common', 'errors', 'interview']);
+  TabTitle(t('jobSeeker:myInterviewsTitle'));
 
-    const interviews = (interviewsData?.results || []).flatMap((session) => {
-        const interview = transformInterviewSession(session);
-        return interview ? [interview] : [];
-    });
+  const { push } = useRouter();
+  const { data: interviewsData, isLoading, isError } = useMyInterviews({ pageSize: 50 });
 
-    const handleJoin = (inviteToken: string) => {
-        push(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM.replace(':id', inviteToken)}`);
-    };
+  const interviews = (interviewsData?.results || []).flatMap((session) => {
+    const interview = transformInterviewSession(session);
+    return interview ? [interview] : [];
+  });
 
-    const getStatusChip = (status: string) => {
-        let color: "success" | "primary" | "info" | "error" | "warning" | "default" = "default";
-        switch (status) {
-            case 'completed': color = 'success'; break;
-            case 'in_progress': color = 'primary'; break;
-            case 'processing': color = 'warning'; break;
-            case 'scheduled': color = 'info'; break;
-            case 'cancelled': color = 'error'; break;
-        }
-        return <Chip 
-            label={t(`interview:interviewListCard.statuses.${status}`)}
-            color={color} 
-            size="small" 
-        />;
-    };
+  const handleJoin = (inviteToken: string) => {
+    push(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM.replace(':id', inviteToken)}`);
+  };
 
-    return (
-        <Box>
-            <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
-                {t('jobSeeker:myInterviewsTitle')}
+  const jobsPath = localizeRoutePath('/jobs', i18n.language);
+
+  return (
+    <Box>
+      <Card
+        elevation={0}
+        sx={{
+          p: { xs: 3, md: 5 },
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          backgroundColor: '#ffffff',
+          boxShadow: '0 4px 20px -2px rgba(0,0,0,0.03)',
+          minHeight: 480,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+        }}
+      >
+        {isLoading ? (
+          <CircularProgress size={36} />
+        ) : isError ? (
+          <Typography variant="body2" color="error">
+            {t('errors:systemErrorTitle')}
+          </Typography>
+        ) : interviews.length === 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              maxWidth: 420,
+              mx: 'auto',
+            }}
+          >
+            <Box
+              sx={{
+                width: 96,
+                height: 96,
+                borderRadius: '24px',
+                backgroundColor: '#eff6ff',
+                color: '#2563eb',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mb: 2.5,
+              }}
+            >
+              <CalendarMonthOutlinedIcon sx={{ fontSize: 48 }} />
+            </Box>
+
+            <Typography variant="h6" sx={{ fontWeight: 700, color: '#0f172a', mb: 1 }}>
+              Bạn chưa có buổi phỏng vấn nào
             </Typography>
-            <Card sx={{ p: 2, borderRadius: '12px', boxShadow: (theme as Theme & { customShadows?: Record<string, string> }).customShadows?.card }}>
-                {isLoading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                        <CircularProgress />
-                    </Box>
-                ) : isError ? (
-                    <Box sx={{ p: 2, textAlign: 'center', color: 'error.main' }}>
-                        {t('errors:systemErrorTitle')}
-                    </Box>
-                ) : interviews.length === 0 ? (
-                    <Box sx={{ p: 4, textAlign: 'center' }}>
-                        <EventAvailableIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
-                        <Typography variant="h6" color="text.secondary">
-                            {t('jobSeeker:noInterviewsTitle')}
+
+            <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.875rem', mb: 3, lineHeight: 1.5 }}>
+              Các buổi phỏng vấn của bạn sẽ được hiển thị tại đây khi nhà tuyển dụng mời bạn.
+            </Typography>
+
+            <Button
+              component={Link}
+              href={jobsPath}
+              variant="contained"
+              sx={{
+                borderRadius: '10px',
+                backgroundColor: '#2563eb',
+                fontWeight: 700,
+                px: 3.5,
+                py: 1.1,
+                textTransform: 'none',
+                boxShadow: 'none',
+                '&:hover': {
+                  backgroundColor: '#1d4ed8',
+                  boxShadow: 'none',
+                },
+              }}
+            >
+              Tìm việc ngay
+            </Button>
+          </Box>
+        ) : (
+          <Grid container spacing={2} sx={{ width: '100%', textAlign: 'left' }}>
+            {interviews.map((interview: InterviewSession) => (
+              <Grid key={interview.id} size={12}>
+                <Card
+                  variant="outlined"
+                  sx={{
+                    p: 2.5,
+                    borderRadius: '12px',
+                    borderColor: '#e2e8f0',
+                    '&:hover': { borderColor: '#2563eb' },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Avatar sx={{ bgcolor: '#2563eb', width: 48, height: 48 }}>
+                        <VideoCameraFrontIcon />
+                      </Avatar>
+                      <Box>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                          Phỏng vấn: {interview.jobName || 'Chức danh'}
                         </Typography>
+                        <Typography variant="caption" sx={{ color: '#64748b' }}>
+                          {interview.companyName || 'Công ty'}
+                        </Typography>
+                      </Box>
                     </Box>
-                ) : (
-                    <Grid container spacing={2}>
-                        {interviews.map((interview: InterviewSession) => (
-                            <Grid key={interview.id} size={12}>
-                                <Card variant="outlined" sx={{ p: 2, borderRadius: '8px', '&:hover': { borderColor: 'primary.main' } }}>
-                                    <Grid container spacing={2} alignItems="center">
-                                        <Grid>
-                                            <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
-                                                <VideoCameraFrontIcon fontSize="large" />
-                                            </Avatar>
-                                        </Grid>
-                                        <Grid size="grow">
-                                            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                                {interview.roomName || t('jobSeeker:myInterviews.defaultRoomName')}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                                {t('common:labels.time')}: {dayjs(interview.scheduledAt).format('HH:mm - DD/MM/YYYY')}
-                                            </Typography>
-                                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                                {getStatusChip(interview.status)}
-                                                <Chip
-                                                    label={interview.type === 'ai' ? t('jobSeeker:myInterviews.aiInterview') : t('jobSeeker:myInterviews.liveInterview')}
-                                                    size="small"
-                                                    variant="outlined"
-                                                />
-                                                {interview.jobName && (
-                                                    <Typography variant="body2" component="span" sx={{ ml: 1, fontWeight: 'medium' }}>
-                                                        {t('common:labels.job')}: {interview.jobName}
-                                                    </Typography>
-                                                )}
-                                            </Box>
-                                        </Grid>
-                                        <Grid>
-                                            <Button
-                                                variant="contained"
-                                                color="primary"
-                                                disabled={interview.status === 'completed' || interview.status === 'cancelled' || !interview.inviteToken}
-                                                onClick={() => handleJoin(interview.inviteToken!)}
-                                                startIcon={<VideoCameraFrontIcon />}
-                                                sx={{ borderRadius: '8px', textTransform: 'none' }}
-                                            >
-                                                {t('common:actions.joinNow')}
-                                            </Button>
-                                        </Grid>
-                                    </Grid>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
-                )}
-            </Card>
-        </Box>
-    );
+                    <Button
+                      variant="contained"
+                      onClick={() => handleJoin(interview.inviteToken || '')}
+                      sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 700 }}
+                    >
+                      Tham gia
+                    </Button>
+                  </Box>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Card>
+    </Box>
+  );
 };
 
 export default MyInterviewsPage;
-

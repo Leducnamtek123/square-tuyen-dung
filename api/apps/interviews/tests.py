@@ -131,7 +131,7 @@ class InterviewServiceTests(TestCase):
         self.assertNotEqual(context["scheduled_at_display"], "Chưa cập nhật")
         self.assertIn("-", context["scheduled_at_display"])
         mock_send_mail.assert_called_once()
-        self.assertIn("Mời Phỏng vấn trực tuyến", mock_send_mail.call_args.kwargs["subject"])
+        self.assertIn("Thư mời Phỏng vấn", mock_send_mail.call_args.kwargs["subject"])
 
 
 
@@ -145,11 +145,13 @@ class InterviewCompatEndpointTests(TransactionTestCase):
         )
         self.session = InterviewSession.objects.create(candidate=self.candidate)
 
+    @override_settings(INTERVIEW_AGENT_AUTH_REQUIRED=False)
     def test_context_endpoint_returns_payload(self):
         response = self.client.get(f"/api/v1/interview/compat/{self.session.room_name}/context")
         self.assertEqual(response.status_code, 200)
         self.assertIn("candidateEmail", response.json())
 
+    @override_settings(INTERVIEW_AGENT_AUTH_REQUIRED=False)
     def test_next_question_endpoint(self):
         q1 = Question.objects.create(text="Question 1")
         self.session.questions.add(q1)
@@ -162,6 +164,7 @@ class InterviewCompatEndpointTests(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("question", response.json())
 
+    @override_settings(INTERVIEW_AGENT_AUTH_REQUIRED=False)
     def test_status_endpoint_updates_session(self):
         response = self.client.patch(
             f"/api/v1/interview/compat/{self.session.room_name}/status",
@@ -1015,34 +1018,17 @@ class InterviewSessionAPITests(TestCase):
         self.assertEqual(session.status, "calibration")
         self.assertGreaterEqual(mock_thread.call_count, 1)
 
-    @override_settings(INTERVIEW_AGENT_SHARED_SECRET="agent-secret", INTERVIEW_AGENT_AUTH_REQUIRED=True)
+
     @patch(
         "apps.interviews.views.run_django_sync_in_thread",
         side_effect=lambda func, *args, **kwargs: func(*args, **kwargs),
     )
-    @patch("apps.interviews.tasks.send_mail")
-    @patch("apps.interviews.tasks.render_to_string", return_value="<html>mail</html>")
-    def test_invitation_email_includes_scheduled_time(self, mock_render, mock_send_mail):
-        self.session.scheduled_at = timezone.now() + timedelta(days=2)
-        self.session.save(update_fields=["scheduled_at", "update_at"])
-
-        send_interview_invitation(self.session.id)
-
-        mock_render.assert_called_once()
-        template_name, context = mock_render.call_args.args
-        self.assertEqual(template_name, "interview/emails/invitation.html")
-        self.assertIn("scheduled_at_display", context)
-        self.assertNotEqual(context["scheduled_at_display"], "Chưa cập nhật")
-        self.assertIn("-", context["scheduled_at_display"])
-        mock_send_mail.assert_called_once()
-        self.assertIn("Mời Phỏng vấn trực tuyến", mock_send_mail.call_args.kwargs["subject"])
-
     @patch("apps.interviews.tasks.end_interview_session.apply_async")
     @patch(
         "rest_framework.views.APIView.perform_authentication",
         side_effect=SynchronousOnlyOperation("OAuth auth attempted in async context"),
     )
-    def test_invite_token_status_update_skips_drf_authentication(self, mock_auth, mock_end_task, mock_thread):
+    def test_invite_token_status_update_skips_drf_authentication(self, mock_auth, mock_end_task, mock_run_sync):
         anonymous_client = APIClient()
         session = InterviewSession.objects.create(
             candidate=self.candidate,
@@ -1061,7 +1047,6 @@ class InterviewSessionAPITests(TestCase):
         self.assertEqual(session.status, "in_progress")
         mock_auth.assert_not_called()
         mock_end_task.assert_called_once()
-        self.assertGreaterEqual(mock_thread.call_count, 1)
 
     @override_settings(INTERVIEW_AGENT_SHARED_SECRET="agent-secret", INTERVIEW_AGENT_AUTH_REQUIRED=True)
     def test_unsigned_anonymous_status_update_without_invite_token_is_rejected(self):

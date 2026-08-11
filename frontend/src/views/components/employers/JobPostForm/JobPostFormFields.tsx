@@ -19,6 +19,8 @@ import type { JobPostFormValues } from './JobPostSchema';
 import type { SelectOption, SystemConfig } from '@/types/models';
 import pc from '@/utils/muiColors';
 
+import LocationPicker, { LocationValue } from '@/components/Common/LocationPicker';
+
 interface PlaceOption extends SelectOption {
   place_id: string;
 }
@@ -56,9 +58,11 @@ interface JobPostFormFieldsProps {
   allConfig: SystemConfig | null;
   t: TFunction;
   districtOptions: SelectOption[];
-  locationOptions: PlaceOption[];
+  locationOptions?: PlaceOption[];
   interviewTemplateOptions?: SelectOption[];
-  handleSelectLocation: (e: React.SyntheticEvent, value: PlaceOption | null) => void;
+  handleSelectLocation?: (e: React.SyntheticEvent, value: unknown) => void;
+  locationValue?: LocationValue;
+  onLocationChange?: (val: LocationValue) => void;
 }
 
 function JobPostFormFields({
@@ -68,7 +72,9 @@ function JobPostFormFields({
   districtOptions,
   locationOptions,
   interviewTemplateOptions = EMPTY_SELECT_OPTIONS,
-  handleSelectLocation
+  handleSelectLocation,
+  locationValue,
+  onLocationChange,
 }: JobPostFormFieldsProps) {
   const theme = useTheme();
 
@@ -177,7 +183,15 @@ function JobPostFormFields({
         <SingleSelectCustom name="location.district" control={control} options={(districtOptions || []) as SelectOption[]} title={t('jobPostForm.title.district')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectdistrict')} sx={inputSx} />
       </Grid>
       <Grid size={12}>
-        <TextFieldAutoCompleteCustom name="location.address" control={control} options={locationOptions as SelectOption[]} title={t('jobPostForm.title.address')} showRequired={true} placeholder={t('jobPostForm.placeholder.enteraddress')} handleSelect={handleSelectLocation as (e: React.SyntheticEvent, value: unknown) => void} sx={inputSx} />
+        <TextFieldCustom name="location.address" title={t('jobPostForm.title.address')} showRequired={true} placeholder={t('jobPostForm.placeholder.enteraddress')} control={control} sx={inputSx} />
+      </Grid>
+      <Grid size={12}>
+        <LocationPicker
+          value={locationValue}
+          onChange={onLocationChange}
+          label="Định vị địa điểm làm việc trên bản đồ OpenStreetMap"
+          height="350px"
+        />
       </Grid>
       <Grid size={12}>
         <Box sx={{ 

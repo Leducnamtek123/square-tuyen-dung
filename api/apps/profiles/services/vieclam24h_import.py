@@ -133,19 +133,38 @@ def _match_career(candidate: dict, career_names: Iterable[str]) -> Career | None
     return None
 
 
-def _match_city(candidate: dict) -> City | None:
+def _match_city(candidate: dict, target_city: City | None = None) -> City | None:
     city_id = candidate.get("city_id") or candidate.get("province_id")
     if city_id is not None:
         city = City.objects.filter(id=city_id).first()
         if city:
             return city
 
-    city_name = (candidate.get("city_name") or "").strip()
-    if city_name:
-        city = City.objects.filter(name__iexact=city_name).first()
+    raw_city_name = (candidate.get("city_name") or candidate.get("province_name") or "").strip()
+    if raw_city_name:
+        city = City.objects.filter(name__iexact=raw_city_name).first()
         if city:
             return city
-    return City.objects.first()
+
+        lower_name = raw_city_name.lower()
+        if any(hcm in lower_name for hcm in ["hồ chí minh", "hcm", "sài gòn", "saigon"]):
+            city = City.objects.filter(name__icontains="Hồ Chí Minh").first()
+            if city:
+                return city
+
+        if any(hn in lower_name for hn in ["hà nội", "ha noi"]):
+            city = City.objects.filter(name__icontains="Hà Nội").first()
+            if city:
+                return city
+
+        city = City.objects.filter(name__icontains=raw_city_name).first()
+        if city:
+            return city
+
+    if target_city:
+        return target_city
+
+    return City.objects.filter(name__icontains="Hồ Chí Minh").first() or City.objects.first()
 
 
 def _resolve_import_location(target_city: City | None, target_district: District | None) -> Location | None:
@@ -170,10 +189,13 @@ def _resolve_import_location(target_city: City | None, target_district: District
     )
 
 
-def _match_location(candidate: dict) -> Location | None:
-    city = _match_city(candidate)
+def _match_location(candidate: dict, target_city: City | None = None) -> Location | None:
+    city = _match_city(candidate, target_city=target_city)
     if not city:
-        return Location.objects.first()
+        city = target_city or City.objects.filter(name__icontains="Hồ Chí Minh").first() or City.objects.first()
+
+    if not city:
+        return None
 
     location = Location.objects.filter(city=city).first()
     if location:
@@ -531,7 +553,7 @@ def persist_vieclam24h_candidates(
 
         candidate_key = _candidate_key(candidate, source_url)
         email = _candidate_email(candidate)
-        if not email:
+        if not email or email.endswith("@imported.infohr.vn"):
             result.skipped_count += 1
             continue
 
@@ -540,9 +562,8 @@ def persist_vieclam24h_candidates(
             result.skipped_count += 1
             continue
 
-        target_location = _resolve_import_location(target_city, target_district)
-        location = target_location or _match_location(candidate)
-        city = location.city if location else _match_city(candidate)
+        location = _match_location(candidate, target_city=target_city)
+        city = location.city if location else _match_city(candidate, target_city=target_city)
         analysis_score = _score_candidate_for_career(candidate, career) if career else 0
 
         source_payload = dict(candidate.get("source_payload") or candidate)

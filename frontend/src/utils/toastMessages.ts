@@ -1,17 +1,16 @@
-﻿import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 type ToastKind = 'success' | 'error' | 'warn' | 'info';
 
 const showToast = (kind: ToastKind, message: string) => {
-  const toastId = `${kind}:${message}`;
-  if (toast.isActive(toastId)) {
-    return;
-  }
-
+  if (!message) return;
   toast[kind](message, {
-    theme: 'colored',
-    delay: 0,
-    toastId,
+    theme: 'light',
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
   });
 };
 

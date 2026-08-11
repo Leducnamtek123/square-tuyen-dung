@@ -300,8 +300,31 @@ export const useToggleSaveResumeOptimistic = () => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: (slug: string) => resumeService.saveResume(slug),
-    onSuccess: () => {
+    onMutate: async (slug: string) => {
+      await queryClient.cancelQueries({ queryKey: ['employerResumes'] });
+
+      queryClient.setQueriesData({ queryKey: ['employerResumes'] }, (oldData: any) => {
+        if (!oldData || !Array.isArray(oldData.results)) return oldData;
+        return {
+          ...oldData,
+          results: oldData.results.map((resume: Resume) => {
+            if (resume.slug === slug) {
+              return { ...resume, isSaved: !resume.isSaved };
+            }
+            return resume;
+          }),
+        };
+      });
+
+      queryClient.setQueryData(['resumeDetail', slug], (oldDetail: any) => {
+        if (!oldDetail) return oldDetail;
+        return { ...oldDetail, isSaved: !oldDetail.isSaved };
+      });
+    },
+    onSuccess: (resData: any, slug: string) => {
       queryClient.invalidateQueries({ queryKey: ['employerResumes'] });
+      queryClient.invalidateQueries({ queryKey: ['savedResumes'] });
+      queryClient.invalidateQueries({ queryKey: ['resumeDetail', slug] });
     },
   });
 

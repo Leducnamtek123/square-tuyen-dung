@@ -66,7 +66,7 @@ export const ExportProgress: React.FC<ExportProgressProps> = ({
         </Box>
 
         <Typography variant="h6" sx={{ fontWeight: 700, color: '#111827', mb: 0.5, fontSize: '1.125rem' }}>
-          Preparing file...
+          Đang chuẩn bị file...
         </Typography>
 
         <Typography variant="body2" sx={{ color: '#6B7280', mb: 3, fontSize: '0.875rem' }}>
@@ -93,7 +93,7 @@ export const ExportProgress: React.FC<ExportProgressProps> = ({
 
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Typography variant="caption" sx={{ color: '#6B7280', fontWeight: 500, fontSize: '0.8125rem' }}>
-            {stepText || 'Generating Excel...'}
+            {stepText || 'Đang khởi tạo file xuất...'}
           </Typography>
           <Typography variant="caption" sx={{ color: '#2563EB', fontWeight: 700, fontSize: '0.8125rem' }}>
             {progress}%

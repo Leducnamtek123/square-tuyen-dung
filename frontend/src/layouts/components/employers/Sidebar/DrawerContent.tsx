@@ -11,6 +11,7 @@ import { localizeRoutePath } from '@/configs/routeLocalization';
 import Link from 'next/link';
 import AdminMenu from './AdminMenu';
 import EmployerMenu from './EmployerMenu';
+import AiAssistantCard from './AiAssistantCard';
 
 const shellHeaderHeight = 60;
 
@@ -140,7 +141,7 @@ const DrawerContent = ({ isAdmin, liveInterviewCount = 0, isCollapsed = false, t
         )}
       </Toolbar>
 
-      <Box sx={{ px: isCollapsed ? 0.5 : 1, py: 1.5, flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+      <Box sx={{ px: isCollapsed ? 0.5 : 1, py: 1.5, flexGrow: 1, overflowY: 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <List component="nav" disablePadding sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
           {isAdmin ? (
             <AdminMenu t={t} location={location} expandedItems={expandedItems} handleExpand={handleExpand} language={i18n.language} isCollapsed={isCollapsed} />
@@ -148,6 +149,10 @@ const DrawerContent = ({ isAdmin, liveInterviewCount = 0, isCollapsed = false, t
             <EmployerMenu t={t} location={location} expandedItems={expandedItems} handleExpand={handleExpand} language={i18n.language} liveInterviewCount={liveInterviewCount} isCollapsed={isCollapsed} />
           )}
         </List>
+
+        {!isAdmin && (
+          <AiAssistantCard isCollapsed={isCollapsed} language={i18n.language} />
+        )}
       </Box>
     </Box>
   );

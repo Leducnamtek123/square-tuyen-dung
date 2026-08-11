@@ -1,18 +1,21 @@
 'use client';
 
 import React from "react";
-import { Box, CircularProgress, Container } from "@mui/material";
+import { Box, CircularProgress, Container, Grid2 as Grid } from "@mui/material";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import Header from "../components/commons/Header";
-import TabBar from "../components/jobSeekers/TabBar";
 import Footer from "../components/commons/Footer";
+import CandidateSidebar from "@/views/components/jobSeekers/CandidateDashboard/CandidateSidebar";
+import SpaContentTransition from "@/components/Commons/SpaContentTransition";
 import { ROUTES, ROLES_NAME } from "@/configs/constants";
 import { localizeRoutePath } from "@/configs/routeLocalization";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { getUserInfo, setActiveWorkspace } from "@/redux/userSlice";
 import tokenService from "@/services/tokenService";
 import { canAccessJobSeekerPortal } from "@/utils/accessControl";
+
+let hasVerifiedCandidateAuthGlobal = false;
 
 function AuthLoadingScreen() {
   return (
@@ -37,7 +40,10 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
   const dispatch = useAppDispatch();
   const { i18n } = useTranslation("common");
   const { currentUser } = useAppSelector((state) => state.user);
-  const [isAllowed, setIsAllowed] = React.useState(false);
+
+  const [isAllowed, setIsAllowed] = React.useState(() => {
+    return hasVerifiedCandidateAuthGlobal || Boolean(tokenService.getAccessTokenFromCookie() && currentUser);
+  });
 
   React.useEffect(() => {
     let isMounted = true;
@@ -90,6 +96,7 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
         dispatch(setActiveWorkspace(jobSeekerWorkspace));
       }
 
+      hasVerifiedCandidateAuthGlobal = true;
       if (isMounted) {
         setIsAllowed(true);
       }
@@ -100,126 +107,51 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
     return () => {
       isMounted = false;
     };
-  }, [currentUser, dispatch, i18n.language, pathname]);
+  }, [currentUser, dispatch, i18n.language]);
 
   if (!isAllowed) {
     return <AuthLoadingScreen />;
   }
 
   return (
-
-    <Box>
-
+    <Box sx={{ backgroundColor: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Persistent Header */}
       <Header />
 
-      <Box>
-
+      <Box sx={{ flexGrow: 1, py: 3 }}>
         <Container maxWidth="xl">
+          <Grid container spacing={3}>
+            {/* Persistent Fixed Candidate Sidebar Menu */}
+            <Grid size={{ xs: 12, md: 3.5, lg: 2.8 }}>
+              <CandidateSidebar />
+            </Grid>
 
-          <TabBar />
-
+            {/* Dynamic SPA Content Area with Animated Transition & Skeleton Loading */}
+            <Grid size={{ xs: 12, md: 8.5, lg: 9.2 }}>
+              <SpaContentTransition>
+                {children}
+              </SpaContentTransition>
+            </Grid>
+          </Grid>
         </Container>
-
       </Box>
 
-      <Container
-
-        maxWidth="xl"
-
-        sx={{
-
-          my: {
-
-            xs: 1.5,
-
-            sm: 2,
-
-            md: 3,
-
-            lg: 3,
-
-            xl: 3,
-
-          },
-
-          paddingLeft: { xs: 1, sm: 4, md: 6, lg: 8, xl: 8 },
-
-          paddingRight: { xs: 1, sm: 4, md: 6, lg: 8, xl: 8 },
-
-        }}
-
-      >
-
-        {children}
-
-      </Container>
-
+      {/* Persistent Footer */}
       <Box
-
         sx={{
-
-          mt: {
-
-            xs: 0,
-
-            sm: 2,
-
-            md: 6,
-
-            lg: 8,
-
-            xl: 10,
-
-          },
-
-          px: {
-
-            xs: 1,
-
-            sm: 5,
-
-            md: 8,
-
-            lg: 10,
-
-            xl: 14,
-
-          },
-
-          py: {
-
-            xs: 2,
-
-            sm: 2,
-
-            md: 2,
-
-            lg: 5,
-
-            xl: 5,
-
-          },
-
+          mt: 'auto',
+          px: { xs: 2, sm: 5, md: 8, lg: 10 },
+          py: { xs: 3, lg: 5 },
           color: "text.primary",
-
           bgcolor: "background.paper",
-
           borderTop: '1px solid',
-
           borderColor: 'divider',
-
         }}
-
       >
-
         <Footer />
-
       </Box>
-
     </Box>
-
   );
-
 };
 
 export default JobSeekerLayout;

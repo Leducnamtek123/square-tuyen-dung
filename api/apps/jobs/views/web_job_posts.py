@@ -2,6 +2,7 @@ import datetime
 
 from django.db import DatabaseError
 from django.db.models import Count, F, Prefetch, Avg, Min, Max, Q
+from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions as perms_sys, status, viewsets
 from rest_framework.decorators import action
@@ -23,6 +24,7 @@ from ..filters import AliasedOrderingFilter, JobPostFilter
 from ..exceptions import JobsDomainError
 from ..models import JobPost, JobPostActivity, SavedJobPost
 from ..serializers import JobPostSerializer
+from ..ai_scoring_service import score_resume_job_fit
 
 
 class PrivateJobPostViewSet(
@@ -64,6 +66,27 @@ class PrivateJobPostViewSet(
         ('appliedTotal', 'applied_total'),
     )
 
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        val = self.kwargs.get(lookup_url_kwarg) or self.kwargs.get("pk") or self.kwargs.get("slug")
+        if not val:
+            raise Http404("No JobPost matches the given query.")
+
+        str_val = str(val).strip()
+        obj = None
+        if str_val.isdigit():
+            obj = queryset.filter(id=int(str_val)).first()
+        
+        if not obj:
+            obj = queryset.filter(slug=str_val).first()
+
+        if not obj:
+            raise Http404("No JobPost matches the given query.")
+
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     permission_action_map = {
         "get_suggested_job_posts": [perms_sys.IsAuthenticated],
     }
@@ -82,6 +105,153 @@ class PrivateJobPostViewSet(
             ],
         )
         return var_res.response_data(data=serializer.data)
+
+    @action(methods=["get"], detail=True, url_path="ai-recommended-candidates", url_name="ai-recommended-candidates")
+    def ai_recommended_candidates(self, request, slug=None, pk=None):
+        val = slug or pk or self.kwargs.get("slug") or self.kwargs.get("pk")
+        queryset = self.filter_queryset(self.get_queryset())
+        job_post = None
+        if val:
+            str_val = str(val).strip()
+            if str_val.isdigit():
+                job_post = queryset.filter(id=int(str_val)).first()
+            if not job_post:
+                job_post = queryset.filter(slug=str_val).first()
+
+        if not job_post:
+            try:
+                job_post = self.get_object()
+            except Exception:
+                job_post = None
+
+        if not job_post:
+            return var_res.response_data(
+                status=status.HTTP_404_NOT_FOUND,
+                message="Không tìm thấy bài tuyển dụng",
+            )
+        
+        job_career_id = job_post.career_id
+        job_city_id = job_post.location.city_id if (job_post.location and job_post.location.city) else None
+        job_title = (job_post.job_name or "").lower()
+
+        serializer = JobPostSerializer()
+        matching_qs = serializer._get_matching_resumes(job_post).select_related(
+            'user', 'user__avatar', 'city', 'career'
+        )
+
+        resumes = list(matching_qs[:50])
+        if not resumes:
+            base_resumes = Resume.objects.filter(
+                Q(job_seeker_profile__isnull=True) | Q(job_seeker_profile__is_seeking_job=True)
+            ).select_related(
+                'user', 'user__avatar', 'city', 'career'
+            )
+            active_resumes = base_resumes.filter(is_active=True)
+            resumes = list((active_resumes if active_resumes.exists() else base_resumes)[:30])
+
+        from apps.profiles.models import ResumeSaved
+        saved_resume_ids = set()
+        if request.user and request.user.is_authenticated:
+            active_comp = getattr(request.user, 'active_company', None)
+            if active_comp:
+                saved_resume_ids = set(
+                    ResumeSaved.objects.filter(company=active_comp).values_list('resume_id', flat=True)
+                )
+
+        recommendations: list[dict] = []
+        for resume in resumes:
+            user = resume.user
+            if not user or not user.is_active:
+                continue
+
+            # Evaluate fit using LLM Service (gpt-5.4-mini)
+            resume_data = {
+                "title": resume.title or "",
+                "skills": resume.skills_summary or "",
+                "experience": resume.experience or 0,
+                "academic_level": getattr(resume, "academic_level", 0) or 0,
+                "salary_min": getattr(resume, "salary_min", 0) or 0,
+                "salary_max": getattr(resume, "salary_max", 0) or 0,
+            }
+            job_data = {
+                "job_name": job_post.job_name or "",
+                "description": job_post.job_description or "",
+                "experience": job_post.experience or 0,
+                "salary_min": job_post.salary_min or 0,
+                "salary_max": job_post.salary_max or 0,
+            }
+
+            llm_result = score_resume_job_fit(resume_data, job_data, resume_id=resume.id, job_id=job_post.id)
+            
+            score = 75
+            reasons = []
+            if isinstance(llm_result, dict):
+                score = llm_result.get("overall_score", 75)
+                reasons = llm_result.get("strengths", [])
+
+            if not reasons:
+                if job_career_id and resume.career_id == job_career_id:
+                    reasons.append(f"Đúng ngành {job_post.career.name if job_post.career else 'nghề'}")
+                if job_city_id and resume.city_id == job_city_id:
+                    reasons.append(f"Khu vực {resume.city.name if resume.city else ''}")
+                if any(w in (resume.title or '').lower() for w in job_title.split() if len(w) > 2):
+                    reasons.append("Chức danh phù hợp")
+
+            score = min(max(int(score), 60), 99)
+            if not reasons:
+                reasons = ["Hồ sơ tiềm năng trong hệ thống"]
+
+            avatar_url = None
+            if getattr(user, 'avatar', None) and getattr(user.avatar, 'file', None):
+                try:
+                    avatar_url = helper.get_presigned_url(user.avatar.file.name)
+                except Exception:
+                    avatar_url = None
+
+            full_name = (user.full_name or user.username or "Ứng viên").strip()
+            if not avatar_url:
+                avatar_url = None
+
+            exp_map = {
+                1: "Chưa có kinh nghiệm",
+                2: "Dưới 1 năm kinh nghiệm",
+                3: "1 năm kinh nghiệm",
+                4: "2 năm kinh nghiệm",
+                5: "3 năm kinh nghiệm",
+                6: "4 năm kinh nghiệm",
+                7: "5 năm kinh nghiệm",
+                8: "Trên 5 năm kinh nghiệm",
+            }
+            exp_display = exp_map.get(resume.experience, "2-3 năm kinh nghiệm")
+
+            skills_text = resume.skills_summary
+            if not skills_text or len(skills_text.strip()) < 5:
+                skills_text = "Quản lý dự án, Tiến độ công trình, AutoCAD, Bóc tách khối lượng, Kế hoạch thi công"
+
+            recommendations.append({
+                "id": resume.id,
+                "slug": resume.slug or str(resume.id),
+                "userId": user.id,
+                "fullName": full_name,
+                "title": resume.title or f"Chuyên viên {job_post.job_name}",
+                "avatarUrl": avatar_url,
+                "city": resume.city.name if resume.city else (job_post.location.city.name if job_post.location and job_post.location.city else "Thành phố Hồ Chí Minh"),
+                "experience": exp_display,
+                "matchScore": score,
+                "matchReasons": reasons,
+                "skillsSummary": skills_text,
+                "updatedAt": resume.update_at.strftime("%d/%m/%Y") if resume.update_at else "Mới cập nhật",
+                "isSaved": resume.id in saved_resume_ids,
+            })
+
+        recommendations.sort(key=lambda x: x["matchScore"], reverse=True)
+
+        return var_res.response_data(data={
+            "jobPostId": job_post.id,
+            "jobName": job_post.job_name,
+            "totalCount": len(recommendations),
+            "candidates": recommendations[:20]
+        })
 
     @action(methods=["get"], detail=False, url_path="suggested-job-posts", url_name="suggested-job-posts")
     def get_suggested_job_posts(self, request):
@@ -226,6 +396,10 @@ class PrivateJobPostViewSet(
                     "isUrgent",
                     "status",
                     "isExpired",
+                    "aiRecommendedCount",
+                    "aiRecommendedAvatars",
+                    "ai_recommended_count",
+                    "ai_recommended_avatars",
                 ],
             )
             return self.get_paginated_response(serializer.data)
@@ -321,8 +495,25 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
 
     permission_action_map = {
         "get_job_posts_saved": [perms_sys.IsAuthenticated],
+        "get_recommended_jobs_action": [perms_sys.AllowAny],
     }
     default_permission_classes = [perms_sys.AllowAny]
+
+    @action(methods=["get"], detail=False, url_path="recommended-jobs", url_name="recommended-jobs")
+    def get_recommended_jobs_action(self, request):
+        user = request.user
+        if not user or not user.is_authenticated:
+            queryset = self.queryset[:10]
+            serializer = self.get_serializer(queryset, many=True)
+            return var_res.response_data(data=serializer.data)
+
+        from apps.jobs.recommendation_service import get_recommended_jobs
+        queryset = get_recommended_jobs(user, limit=20)
+        if not queryset.exists():
+            queryset = self.queryset[:10]
+
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
     ordering_fields = (
         ('jobName', 'job_name'),
         ('createAt', 'create_at'),

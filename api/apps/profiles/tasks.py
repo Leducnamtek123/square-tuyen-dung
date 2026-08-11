@@ -120,31 +120,70 @@ def scheduled_vieclam24h_data_lake_ingestion_task():
 
     source_url = "https://ntd.vieclam24h.vn/tim-kiem-ung-vien-nhanh"
     hcm_city = City.objects.filter(name__icontains="Hồ Chí Minh").first()
+    active_jobs = JobPost.objects.filter(status=3).select_related("career", "location", "location__city")
+
+    total_created = 0
+    total_updated = 0
+    total_skipped = 0
+
     try:
-        candidates = collect_vieclam24h_candidates(
-            source_url=source_url,
-            username=username,
-            password=password,
-            occupation_ids=[],
-        )
-        if candidates:
-            result = persist_vieclam24h_candidates(
-                candidates=candidates,
+        if active_jobs.exists():
+            for job in active_jobs[:5]:
+                job_city = (job.location.city if job.location and job.location.city else None) or hcm_city
+                keyword = (job.job_name or "").strip()
+                if not keyword:
+                    continue
+
+                candidates = collect_vieclam24h_candidates(
+                    source_url=source_url,
+                    username=username,
+                    password=password,
+                    keyword=keyword,
+                    max_pages=1,
+                    per_page=15,
+                )
+                if candidates:
+                    result = persist_vieclam24h_candidates(
+                        candidates=candidates,
+                        source_url=source_url,
+                        source_account=username,
+                        target_career=job.career,
+                        target_city=job_city,
+                    )
+                    total_created += result.created_count
+                    total_updated += result.updated_count
+                    total_skipped += result.skipped_count
+        else:
+            candidates = collect_vieclam24h_candidates(
                 source_url=source_url,
-                source_account=username,
-                target_city=hcm_city,
+                username=username,
+                password=password,
+                keyword="Xây dựng Nội thất",
+                max_pages=1,
+                per_page=15,
             )
-            logger.info(
-                "Scheduled Data Lake Ingestion completed: created=%d, updated=%d, skipped=%d",
-                result.created_count,
-                result.updated_count,
-                result.skipped_count,
-            )
-            return {
-                "createdCount": result.created_count,
-                "updatedCount": result.updated_count,
-                "skippedCount": result.skipped_count,
-            }
+            if candidates:
+                result = persist_vieclam24h_candidates(
+                    candidates=candidates,
+                    source_url=source_url,
+                    source_account=username,
+                    target_city=hcm_city,
+                )
+                total_created += result.created_count
+                total_updated += result.updated_count
+                total_skipped += result.skipped_count
+
+        logger.info(
+            "Scheduled Data Lake Ingestion completed: created=%d, updated=%d, skipped=%d",
+            total_created,
+            total_updated,
+            total_skipped,
+        )
+        return {
+            "createdCount": total_created,
+            "updatedCount": total_updated,
+            "skippedCount": total_skipped,
+        }
     except Exception as exc:
         logger.exception("Scheduled Vieclam24h Data Lake ingestion failed: %s", exc)
         return {"status": "error", "message": str(exc)}

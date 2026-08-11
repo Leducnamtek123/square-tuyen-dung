@@ -1,0 +1,1097 @@
+File,Line,Snippet,HasHandler
+frontend/src/app/error.tsx,40,<Button,False
+frontend/src/app/error.tsx,43,onClick={reset},True
+frontend/src/app/global-error.tsx,43,"<Button onClick={reset} variant=""contained"" sx={{ px: 4, py: 1.5, borderRadius: 2 }}>",True
+frontend/src/app/not-found.tsx,34,<Button,False
+frontend/src/app/not-found.tsx,37,onClick={() => push('/')},True
+frontend/src/components/Common/ColorPickerDialog/index.tsx,60,onClick={() => handleColorSelect(color)},True
+frontend/src/components/Common/ColorPickerDialog/index.tsx,74,onClick={() => setShowCustomPicker(!showCustomPicker)},True
+frontend/src/components/Common/ColorPickerDialog/index.tsx,121,<Button onClick={onClose}>Hủy</Button>,True
+frontend/src/components/Common/ColorPickerDialog/index.tsx,122,<Button,False
+frontend/src/components/Common/ColorPickerDialog/index.tsx,124,onClick={handleConfirm},True
+frontend/src/components/Common/Controls/BasicDropzone/index.tsx,131,<Button,False
+frontend/src/components/Common/Controls/BasicDropzone/index.tsx,205,<Button,False
+frontend/src/components/Common/Controls/FileUploadCustom/index.tsx,78,onClick={handleInputClick},True
+frontend/src/components/Common/Controls/FileUploadCustom/index.tsx,86,<Button,False
+frontend/src/components/Common/Controls/FileUploadCustom/index.tsx,117,<Button,False
+frontend/src/components/Common/Controls/FileUploadCustom/index.tsx,121,onClick={(e) => {,True
+frontend/src/components/Common/Controls/FormPopup/index.tsx,83,<IconButton,False
+frontend/src/components/Common/Controls/FormPopup/index.tsx,84,onClick={() => setOpenPopup(false)},True
+frontend/src/components/Common/Controls/InputBaseSearchCompanyCustom/index.tsx,121,<IconButton,False
+frontend/src/components/Common/Controls/InputBaseSearchCompanyCustom/index.tsx,125,onClick={() => {,True
+frontend/src/components/Common/Controls/InputBaseSearchCompanyCustom/index.tsx,148,"<Button variant=""contained"" type=""submit"" color=""primary"">",False
+frontend/src/components/Common/Controls/InputBaseSearchHomeCustom/index.tsx,267,<IconButton,False
+frontend/src/components/Common/Controls/InputBaseSearchHomeCustom/index.tsx,269,onClick={() => {,True
+frontend/src/components/Common/Controls/InputBaseSearchHomeCustom/index.tsx,283,<Button,False
+frontend/src/components/Common/Controls/InputBaseSearchHomeCustom/index.tsx,352,onClick={() => handleClickItem(value)},True
+frontend/src/components/Common/Controls/InputBaseSearchHomeCustom/index.tsx,383,onClick={() => handleClickItem(item.kw || item.title)},True
+frontend/src/components/Common/Controls/InputBaseSearchHomeCustom/index.tsx,412,onClick={() => handleClickItem(career.name)},True
+frontend/src/components/Common/Controls/InputBaseSearchHomeCustom/index.tsx,441,onClick={() => handleClickItem(value)},True
+frontend/src/components/Common/Controls/PasswordTextFieldCustom/index.tsx,84,onClick={handleClickShowPassword},True
+frontend/src/components/Common/Controls/RangePickerCustom/index.tsx,98,onClick={handleOpenPopover},True
+frontend/src/components/Common/Controls/RangePickerCustom/index.tsx,210,<Button,False
+frontend/src/components/Common/Controls/RangePickerCustom/index.tsx,212,onClick={handleClosePopover},True
+frontend/src/components/Common/Controls/RangePickerCustom/index.tsx,227,<Button,False
+frontend/src/components/Common/Controls/RangePickerCustom/index.tsx,230,onClick={handleApplyPopover},True
+frontend/src/components/Common/Controls/RangePickerCustom/index.tsx,251,onClick={() => handlePresetSelect(30)},True
+frontend/src/components/Common/Controls/RangePickerCustom/index.tsx,278,onClick={() => handlePresetSelect(90)},True
+frontend/src/components/Common/Controls/RangePickerCustom/index.tsx,305,<Button,False
+frontend/src/components/Common/Controls/RangePickerCustom/index.tsx,309,onClick={() => setAllowSubmit(!allowSubmit)},True
+frontend/src/components/Common/DataTable/index.tsx,197,onClick={header.column.getToggleSortingHandler()},True
+frontend/src/components/Common/DataTableCustom/index.tsx,75,onClick={createSortHandler(headCell.id)},True
+frontend/src/components/Common/DropzoneDialogCustom/index.tsx,25,"<IconButton color=""error"" onClick={() => setOpen(false)}>",True
+frontend/src/components/Common/EmptyCard/index.tsx,55,<Button,False
+frontend/src/components/Common/EmptyCard/index.tsx,58,onClick={onClick},True
+frontend/src/components/Common/ExportModal/ExportError.tsx,68,<Button,False
+frontend/src/components/Common/ExportModal/ExportError.tsx,70,onClick={onClose},True
+frontend/src/components/Common/ExportModal/ExportError.tsx,89,<Button,False
+frontend/src/components/Common/ExportModal/ExportError.tsx,91,onClick={onRetry},True
+frontend/src/components/Common/ExportModal/ExportModal.tsx,132,<IconButton,False
+frontend/src/components/Common/ExportModal/ExportModal.tsx,133,onClick={onClose},True
+frontend/src/components/Common/ExportModal/ExportModal.tsx,224,<Button,False
+frontend/src/components/Common/ExportModal/ExportModal.tsx,226,onClick={onClose},True
+frontend/src/components/Common/ExportModal/ExportModal.tsx,243,<Button,False
+frontend/src/components/Common/ExportModal/ExportModal.tsx,245,onClick={handleStartGenerate},True
+frontend/src/components/Common/ExportModal/ExportOptions.tsx,127,onClick={() => onFormatChange(fmt.id as ExportFormat)},True
+frontend/src/components/Common/ExportModal/ExportOptions.tsx,174,onClick={() => onScopeChange('all')},True
+frontend/src/components/Common/ExportModal/ExportOptions.tsx,204,onClick={() => onScopeChange('filtered')},True
+frontend/src/components/Common/ExportModal/ExportOptions.tsx,234,onClick={() => totalRecords?.selected && totalRecords.selected > 0 && onScopeChange('selected')},True
+frontend/src/components/Common/ExportModal/ExportOptions.tsx,276,<Button,False
+frontend/src/components/Common/ExportModal/ExportOptions.tsx,279,onClick={onSelectAllColumns},True
+frontend/src/components/Common/ExportModal/ExportOptions.tsx,284,<Button,False
+frontend/src/components/Common/ExportModal/ExportOptions.tsx,288,onClick={onClearAllColumns},True
+frontend/src/components/Common/ExportModal/ExportOptions.tsx,313,onClick={() => onToggleColumn(col.id)},True
+frontend/src/components/Common/ExportModal/ExportSuccess.tsx,131,<Button,False
+frontend/src/components/Common/ExportModal/ExportSuccess.tsx,133,onClick={onClose},True
+frontend/src/components/Common/ExportModal/ExportSuccess.tsx,152,<Button,False
+frontend/src/components/Common/ExportModal/ExportSuccess.tsx,154,onClick={onDownload},True
+frontend/src/components/Common/FilterBar/index.tsx,214,"<Button variant=""contained"" startIcon={<SearchIcon />} onClick={onSearchSubmit}>",True
+frontend/src/components/Common/FilterBar/index.tsx,222,<IconButton,False
+frontend/src/components/Common/FilterBar/index.tsx,224,onClick={onReset},True
+frontend/src/components/Common/FilterBar/index.tsx,242,<Button,False
+frontend/src/components/Common/FilterBar/index.tsx,254,onClick={() => setAdvancedOpen((value) => !value)},True
+frontend/src/components/Common/ImageCropDialog/index.tsx,178,"<Button onClick={onCancel} color=""inherit"">",True
+frontend/src/components/Common/ImageCropDialog/index.tsx,181,<Button,False
+frontend/src/components/Common/ImageCropDialog/index.tsx,182,onClick={handleConfirm},True
+frontend/src/components/Common/MaintenanceModeScreen/index.tsx,97,<Button,False
+frontend/src/components/Common/MaintenanceModeScreen/index.tsx,101,onClick={handleReload},True
+frontend/src/components/Common/NoDataCard/index.tsx,103,<Button,False
+frontend/src/components/Common/NoDataCard/index.tsx,105,onClick={onClick},True
+frontend/src/components/Common/Pdf/index.tsx,72,"<IconButton aria-label={t('actions.zoomOut')} color=""warning"" onClick={props.onClick}>",True
+frontend/src/components/Common/Pdf/index.tsx,83,onClick={() => props.onZoom(SpecialZoomLevel.ActualSize)},True
+frontend/src/components/Common/Pdf/index.tsx,92,"<IconButton aria-label={t('actions.zoomIn')} color=""warning"" onClick={props.onClick}>",True
+frontend/src/components/Common/Pdf/index.tsx,102,<Button,False
+frontend/src/components/Common/Pdf/index.tsx,115,onClick={props.onClick},True
+frontend/src/components/Common/ProfileUploadCard/index.tsx,154,onClick={() => handleActive(slug)},True
+frontend/src/components/Common/ProfileUploadCard/index.tsx,183,onClick={() => handleActive(slug)},True
+frontend/src/components/Common/ProfileUploadCard/index.tsx,253,<IconButton,False
+frontend/src/components/Common/ProfileUploadCard/index.tsx,278,onClick={() => {,True
+frontend/src/components/Common/ProfileUploadCard/index.tsx,326,"onClick={safeFileUrl ? () => downloadPdf(safeFileUrl, title) : undefined}",True
+frontend/src/components/Common/ProfileUploadCard/index.tsx,330,<IconButton,False
+frontend/src/components/Common/ProfileUploadCard/index.tsx,352,onClick={() => handleDelete(slug)},True
+frontend/src/components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup.tsx,122,<IconButton,False
+frontend/src/components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup.tsx,123,onClick={() => setOpenPopup(false)},True
+frontend/src/components/ErrorBoundary/index.tsx,95,<Button,False
+frontend/src/components/ErrorBoundary/index.tsx,98,onClick={() => {,True
+frontend/src/components/ErrorBoundary/index.tsx,108,"<Button variant=""outlined"" onClick={this.handleReset}>",True
+frontend/src/components/ErrorBoundary/index.tsx,111,"<Button variant=""contained"" onClick={this.handleReload}>",True
+frontend/src/components/Features/AiElements/conversation.tsx,109,<Button,False
+frontend/src/components/Features/AiElements/conversation.tsx,114,onClick={handleScrollToBottom},True
+frontend/src/components/Features/AiElements/conversation.tsx,170,<Button,False
+frontend/src/components/Features/AiElements/conversation.tsx,175,onClick={handleDownload},True
+frontend/src/components/Features/AiElements/message.tsx,128,<Button,False
+frontend/src/components/Features/AiElements/message.tsx,286,<Button,False
+frontend/src/components/Features/AiElements/message.tsx,289,onClick={goToPrevious},True
+frontend/src/components/Features/AiElements/message.tsx,306,<Button,False
+frontend/src/components/Features/AiElements/message.tsx,309,onClick={goToNext},True
+frontend/src/components/Features/AIToolsCard/index.tsx,178,"<Button variant=""contained"" onClick={handleGenerateTts} disabled={state.ttsLoading}>",True
+frontend/src/components/Features/AIToolsCard/index.tsx,204,"<Button variant=""outlined"" component=""label"">",False
+frontend/src/components/Features/AIToolsCard/index.tsx,222,"<Button variant=""contained"" onClick={handleTranscribe} disabled={state.transcribeLoading}>",True
+frontend/src/components/Features/AppIntroductionCard/index.tsx,38,<Button,False
+frontend/src/components/Features/AppIntroductionCard/index.tsx,42,onClick={() => push(jobsHref)},True
+frontend/src/components/Features/AppIntroductionCard/index.tsx,47,<Button,False
+frontend/src/components/Features/AppIntroductionCard/index.tsx,51,onClick={() => openExternalUrlSafely(`https://${HOST_NAME.EMPLOYER_PROJECT}`)},True
+frontend/src/components/Features/ApplyForm/index.tsx,194,<Button,False
+frontend/src/components/Features/ApplyForm/index.tsx,198,onClick={() => push(profileHref)},True
+frontend/src/components/Features/ApplyForm/index.tsx,258,onClick={(e: React.MouseEvent) => {,True
+frontend/src/components/Features/CareerCarousel/index.tsx,252,onClick={() => handleFilter(value.id)},True
+frontend/src/components/Features/CareerHandbookSection/index.tsx,170,<Button,False
+frontend/src/components/Features/ChatBot/index.tsx,237,<button,False
+frontend/src/components/Features/ChatBot/index.tsx,240,onClick={() => dispatch({ type: 'toggle_open' })},True
+frontend/src/components/Features/ChatBot/index.tsx,259,<button,False
+frontend/src/components/Features/ChatBot/index.tsx,262,onClick={handleReset},True
+frontend/src/components/Features/ChatBot/index.tsx,268,<button,False
+frontend/src/components/Features/ChatBot/index.tsx,271,onClick={() => dispatch({ type: 'close' })},True
+frontend/src/components/Features/ChatBot/index.tsx,291,<button,False
+frontend/src/components/Features/ChatBot/index.tsx,295,onClick={() => handleSuggestionClick(item)},True
+frontend/src/components/Features/ChatBot/index.tsx,324,"<button type=""submit"" disabled={!state.input.trim() || state.isSending} aria-label={t('chat:send')}>",False
+frontend/src/components/Features/ChatBot/index.tsx,333,"<button type=""button"" className=""sq-chatbot__retry-btn"" onClick={handleRetry} disabled={state.isSend",True
+frontend/src/components/Features/ChatCard/index.tsx,66,<IconButton,False
+frontend/src/components/Features/ChatCard/index.tsx,67,onClick={handleRedirect},True
+frontend/src/components/Features/Chats/SidebarHeader/index.tsx,46,onClick={handleRedirect},True
+frontend/src/components/Features/Company/CompanyFollowButton.tsx,54,onClick={handleFollow},True
+frontend/src/components/Features/Feedback/index.tsx,144,<Button,False
+frontend/src/components/Features/Feedback/index.tsx,150,onClick={handleOpen},True
+frontend/src/components/Features/Feedback/index.tsx,155,<Button,False
+frontend/src/components/Features/Feedback/index.tsx,157,onClick={handleOpen},True
+frontend/src/components/Features/Feedback/index.tsx,222,<IconButton,False
+frontend/src/components/Features/Feedback/index.tsx,223,onClick={handleClose},True
+frontend/src/components/Features/Feedback/index.tsx,328,<Button,False
+frontend/src/components/Features/Feedback/index.tsx,332,onClick={() => evidenceInputRef.current?.click()},True
+frontend/src/components/Features/Feedback/index.tsx,372,<IconButton,False
+frontend/src/components/Features/Feedback/index.tsx,376,onClick={handleClearEvidenceImage},True
+frontend/src/components/Features/Feedback/index.tsx,393,<Button,False
+frontend/src/components/Features/Feedback/index.tsx,395,onClick={handleSubmit(handleSendFeedback)},True
+frontend/src/components/Features/JobSeekerProfile/index.tsx,98,onClick={handleNavigate},True
+frontend/src/components/Features/JobSeekerProfile/index.tsx,260,<IconButton,False
+frontend/src/components/Features/JobSeekerProfile/index.tsx,262,onClick={(e) => {,True
+frontend/src/components/Features/JobSeekerProfile/index.tsx,280,<IconButton,False
+frontend/src/components/Features/MainJobRightBanner/index.tsx,79,<Button,False
+frontend/src/components/Features/NotificationCard/index.tsx,70,"<IconButton size=""large"" aria-label={t('notification.openMenu')} color=""inherit"" onClick={openNotifi",True
+frontend/src/components/Features/NotificationCard/index.tsx,149,<Button,False
+frontend/src/components/Features/NotificationCard/index.tsx,152,onClick={() => void handleMakeAllRead()},True
+frontend/src/components/Features/NotificationCard/NotificationCardFooter.tsx,32,<Button,False
+frontend/src/components/Features/NotificationCard/NotificationCardFooter.tsx,35,onClick={onLoadMore},True
+frontend/src/components/Features/NotificationCard/NotificationCardFooter.tsx,55,<Button,False
+frontend/src/components/Features/NotificationCard/NotificationCardFooter.tsx,58,onClick={onViewAll},True
+frontend/src/components/Features/NotificationCard/NotificationCardFooter.tsx,76,<Button,False
+frontend/src/components/Features/NotificationCard/NotificationCardFooter.tsx,80,onClick={onClearAll},True
+frontend/src/components/Features/NotificationCard/NotificationCardItem.tsx,100,onClick={() => onClickItem(value)},True
+frontend/src/components/Features/NotificationCard/NotificationCardItem.tsx,154,onClick={() => onClickItem(value)},True
+frontend/src/components/Features/NotificationCard/NotificationCardItem.tsx,225,<IconButton,False
+frontend/src/components/Features/NotificationCard/NotificationCardItem.tsx,228,onClick={(e) => {,True
+frontend/src/components/Features/TopCompanyCarousel/index.tsx,104,<IconButton,False
+frontend/src/components/Features/TopCompanyCarousel/index.tsx,106,onClick={handleScrollLeft},True
+frontend/src/components/Features/TopCompanyCarousel/index.tsx,138,onClick={() => setSelectedCategory(cat.id)},True
+frontend/src/components/Features/TopCompanyCarousel/index.tsx,163,<IconButton,False
+frontend/src/components/Features/TopCompanyCarousel/index.tsx,165,onClick={handleScrollRight},True
+frontend/src/components/Features/VoiceAssistant/components/app/theme-toggle.tsx,24,"<button type=""button"" onClick={() => setTheme('dark')} className=""cursor-pointer p-1 pl-1.5"">",True
+frontend/src/components/Features/VoiceAssistant/components/app/theme-toggle.tsx,33,<button,False
+frontend/src/components/Features/VoiceAssistant/components/app/theme-toggle.tsx,35,onClick={() => setTheme('light')},True
+frontend/src/components/Features/VoiceAssistant/components/app/theme-toggle.tsx,46,<button,False
+frontend/src/components/Features/VoiceAssistant/components/app/theme-toggle.tsx,48,onClick={() => setTheme('system')},True
+frontend/src/components/Features/VoiceAssistant/components/app/welcome-view.tsx,45,"<Button variant=""primary"" size=""lg"" onClick={onStartCall} className=""mt-6 w-64 font-mono"">",True
+frontend/src/components/Features/VoiceAssistant/components/livekit/alert-toast.tsx,25,"<Alert onClick={() => sonnerToast.dismiss(id)} className=""bg-accent w-full md:w-[364px]"">",True
+frontend/src/components/Features/VoiceAssistant/components/livekit/agent-control-bar/agent-control-bar.tsx,161,<Button,False
+frontend/src/components/Features/VoiceAssistant/components/livekit/agent-control-bar/agent-control-bar.tsx,163,onClick={onDisconnect},True
+frontend/src/components/Features/VoiceAssistant/components/livekit/agent-control-bar/chat-input.tsx,92,<Button,False
+frontend/src/components/ui/button.tsx,42,<button,False
+frontend/src/layouts/components/MuiShellLayout.tsx,129,<IconButton,False
+frontend/src/layouts/components/MuiShellLayout.tsx,137,onClick={handleDrawerToggle},True
+frontend/src/layouts/components/MuiShellLayout.tsx,169,onClick={handleOpenUserMenu},True
+frontend/src/layouts/components/MuiShellNavList.tsx,37,<ListItemButton onClick={() => onToggleGroup(item.id)}>,True
+frontend/src/layouts/components/MuiShellNavList.tsx,54,<ListItemButton onClick={() => onToggleGroup(item.id)}>,True
+frontend/src/layouts/components/commons/AccountSwitchMenu/index.tsx,144,<Button,False
+frontend/src/layouts/components/commons/AccountSwitchMenu/index.tsx,152,onClick={() => handleClickAuth(true)},True
+frontend/src/layouts/components/commons/AccountSwitchMenu/index.tsx,176,<Button,False
+frontend/src/layouts/components/commons/AccountSwitchMenu/index.tsx,196,onClick={() => handleClickAuth(false)},True
+frontend/src/layouts/components/commons/AccountSwitchMenu/index.tsx,212,<Button,False
+frontend/src/layouts/components/commons/AccountSwitchMenu/index.tsx,215,onClick={switchWorkspacePortal},True
+frontend/src/layouts/components/commons/Footer/index.tsx,81,onClick={() => push('/')},True
+frontend/src/layouts/components/commons/Footer/index.tsx,88,<Button,False
+frontend/src/layouts/components/commons/Footer/index.tsx,90,onClick={() => push(item.route)},True
+frontend/src/layouts/components/commons/Footer/index.tsx,110,<Button,False
+frontend/src/layouts/components/commons/Footer/index.tsx,112,onClick={() => {,True
+frontend/src/layouts/components/commons/Footer/index.tsx,136,<Button,False
+frontend/src/layouts/components/commons/Footer/index.tsx,138,onClick={() => push(item.route)},True
+frontend/src/layouts/components/commons/Header/HeaderAuthArea.tsx,92,<IconButton,False
+frontend/src/layouts/components/commons/Header/HeaderAuthArea.tsx,93,onClick={onOpenUserMenu},True
+frontend/src/layouts/components/commons/Header/HeaderAuthArea.tsx,150,<Button,False
+frontend/src/layouts/components/commons/Header/HeaderAuthArea.tsx,153,onClick={onLogin},True
+frontend/src/layouts/components/commons/Header/HeaderAuthArea.tsx,165,<Button,False
+frontend/src/layouts/components/commons/Header/HeaderAuthArea.tsx,168,onClick={onSignUp},True
+frontend/src/layouts/components/commons/Header/HeaderNavLinks.tsx,127,<Button,False
+frontend/src/layouts/components/commons/Header/HeaderNavLinks.tsx,130,onClick={(e) => {,True
+frontend/src/layouts/components/commons/Header/HeaderNavLinks.tsx,192,"onClick={(e) => handleClick(e, page)}",True
+frontend/src/layouts/components/commons/Header/HeaderNavLinks.tsx,222,onClick={() => {,True
+frontend/src/layouts/components/commons/Header/index.tsx,242,<IconButton,False
+frontend/src/layouts/components/commons/Header/index.tsx,246,onClick={handleDrawerToggle},True
+frontend/src/layouts/components/commons/LanguageSwitcher/index.tsx,74,<Button,False
+frontend/src/layouts/components/commons/LanguageSwitcher/index.tsx,79,onClick={openLanguageMenu},True
+frontend/src/layouts/components/commons/LanguageSwitcher/index.tsx,125,onClick={() => changeLanguage(lang.code)},True
+frontend/src/layouts/components/commons/LeftDrawer/index.tsx,142,onClick={handleDrawerToggle},True
+frontend/src/layouts/components/commons/LeftDrawer/index.tsx,170,"onClick={(e: React.MouseEvent<HTMLElement>) => handleItemClick(e, page)}",True
+frontend/src/layouts/components/commons/LeftDrawer/index.tsx,209,onClick={() => handleDrawerToggle()},True
+frontend/src/layouts/components/commons/LeftDrawer/index.tsx,232,<Box onClick={(e) => e.stopPropagation()}>,True
+frontend/src/layouts/components/commons/LeftDrawer/index.tsx,252,onClick={(e) => e.stopPropagation()},True
+frontend/src/layouts/components/commons/LeftDrawer/index.tsx,255,<Button,False
+frontend/src/layouts/components/commons/LeftDrawer/index.tsx,268,"onClick={() => confirmModal(handleLogout, t('nav.logoutTitle'), t('nav.logoutConfirm'), 'logout')}",True
+frontend/src/layouts/components/commons/LeftDrawer/index.tsx,274,<Button,False
+frontend/src/layouts/components/commons/LeftDrawer/index.tsx,283,onClick={() => {,True
+frontend/src/layouts/components/commons/LeftDrawer/index.tsx,290,<Button,False
+frontend/src/layouts/components/commons/LeftDrawer/index.tsx,300,onClick={() => {,True
+frontend/src/layouts/components/commons/SubHeader/index.tsx,103,onClick={() => setOpen(true)},True
+frontend/src/layouts/components/commons/SubHeader/index.tsx,141,onClick={() => handleFilter(item.id)},True
+frontend/src/layouts/components/commons/SubHeader/index.tsx,157,<IconButton,False
+frontend/src/layouts/components/commons/SubHeader/index.tsx,159,onClick={handleScrollNext},True
+frontend/src/layouts/components/commons/SubHeaderDialog/index.tsx,38,<IconButton,False
+frontend/src/layouts/components/commons/SubHeaderDialog/index.tsx,41,onClick={() => setOpen(false)},True
+frontend/src/layouts/components/commons/SubHeaderDialog/index.tsx,81,onClick={() => handleFilter(career.id)},True
+frontend/src/layouts/components/commons/SubHeaderDialog/index.tsx,118,onClick={() => handleFilter(career.id)},True
+frontend/src/layouts/components/commons/SubHeaderDialog/index.tsx,142,<IconButton,False
+frontend/src/layouts/components/commons/SubHeaderDialog/index.tsx,145,onClick={() => setOpen(false)},True
+frontend/src/layouts/components/commons/SubHeaderDialog/index.tsx,173,onClick={() => handleFilter(career.id)},True
+frontend/src/layouts/components/commons/UserMenu/index.tsx,218,<Button,False
+frontend/src/layouts/components/commons/UserMenu/index.tsx,224,onClick={() => {,True
+frontend/src/layouts/components/commons/UserMenu/index.tsx,233,<Button,False
+frontend/src/layouts/components/commons/UserMenu/index.tsx,239,onClick={() => {,True
+frontend/src/layouts/components/commons/UserMenu/index.tsx,256,<Button,False
+frontend/src/layouts/components/commons/UserMenu/index.tsx,262,onClick={handleOpenFeedback},True
+frontend/src/layouts/components/commons/UserMenu/index.tsx,268,<Button,False
+frontend/src/layouts/components/commons/UserMenu/index.tsx,274,onClick={handleOpenBugReport},True
+frontend/src/layouts/components/commons/UserMenu/index.tsx,279,<Button,False
+frontend/src/layouts/components/commons/UserMenu/index.tsx,285,onClick={() => {,True
+frontend/src/layouts/components/commons/WorkspaceSwitchMenu/index.tsx,64,<Button,False
+frontend/src/layouts/components/commons/WorkspaceSwitchMenu/index.tsx,66,onClick={(e) => setAnchorEl(e.currentTarget)},True
+frontend/src/layouts/components/commons/WorkspaceSwitchMenu/index.tsx,95,onClick={() => handleSelectWorkspace(workspace)},True
+frontend/src/layouts/components/employers/Header/index.tsx,44,onClick={handleOpenUserMenu},True
+frontend/src/layouts/components/employers/Header/index.tsx,105,<IconButton,False
+frontend/src/layouts/components/employers/Header/index.tsx,109,onClick={handleDrawerToggle},True
+frontend/src/layouts/components/employers/Sidebar/AdminMenu.tsx,57,onClick={() => handleExpand('system')},True
+frontend/src/layouts/components/employers/Sidebar/AdminMenu.tsx,82,onClick={() => handleExpand('hrm')},True
+frontend/src/layouts/components/employers/Sidebar/AdminMenu.tsx,115,onClick={() => handleExpand('categories')},True
+frontend/src/layouts/components/employers/Sidebar/AdminMenu.tsx,142,onClick={() => handleExpand('content')},True
+frontend/src/layouts/components/employers/Sidebar/AdminMenu.tsx,173,onClick={() => handleExpand('profiles')},True
+frontend/src/layouts/components/employers/Sidebar/AdminMenu.tsx,200,onClick={() => handleExpand('recruitment')},True
+frontend/src/layouts/components/employers/Sidebar/DrawerContent.tsx,122,<IconButton,False
+frontend/src/layouts/components/employers/Sidebar/DrawerContent.tsx,124,onClick={toggleCollapse},True
+frontend/src/layouts/components/employers/Sidebar/EmployerMenu.tsx,56,onClick={() => handleExpand('candidates')},True
+frontend/src/layouts/components/employers/Sidebar/EmployerMenu.tsx,81,onClick={() => handleExpand('interviews')},True
+frontend/src/layouts/components/employers/Sidebar/EmployerMenu.tsx,112,onClick={() => handleExpand('account')},True
+frontend/src/layouts/components/employers/Sidebar/EmployerMenu.tsx,139,onClick={() => handleExpand('hrm')},True
+frontend/src/layouts/components/employers/Sidebar/MenuItem.tsx,119,onClick={handleClick},True
+frontend/src/layouts/components/employers/Sidebar/MenuItem.tsx,252,onClick={handleCloseMenu},True
+frontend/src/layouts/components/jobSeekers/TabBar/index.tsx,117,onClick={() => push(tab.path)},True
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,176,onClick={() => {}},True
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,195,onClick={() => {}},True
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,211,"<EmptyCard content=""Chưa có thông tin kinh nghiệm làm việc"" labelButton=""Thêm kinh nghiệm"" onClick={",True
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,218,"<EmptyCard content=""Chưa cập nhật quá trình học vấn"" labelButton=""Thêm học vấn"" onClick={() => {}} /",True
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,225,"<EmptyCard content=""Chưa bổ sung chứng chỉ chuyên môn"" labelButton=""Thêm chứng chỉ"" onClick={() => {",True
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,306,<Button,False
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,338,<Button,False
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,355,<Button,False
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,380,<Button,False
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,397,<Button,False
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,614,<Button,False
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,617,onClick={() => setIsExportModalOpen(true)},True
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,666,"<IconButton size=""small"" sx={{ color: '#2563EB' }}><EditOutlinedIcon fontSize=""small"" /></IconButton",False
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,667,"<IconButton size=""small"" sx={{ color: '#DC2626' }}><DeleteOutlineIcon fontSize=""small"" /></IconButto",False
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,680,"<IconButton size=""small"" sx={{ color: '#2563EB' }}><EditOutlinedIcon fontSize=""small"" /></IconButton",False
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,681,"<IconButton size=""small"" sx={{ color: '#DC2626' }}><DeleteOutlineIcon fontSize=""small"" /></IconButto",False
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,695,<Button,False
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,697,onClick={() => setErrorPreview('404')},True
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,702,<Button,False
+frontend/src/views/adminPages/ComponentsDesignSystemPage.tsx,705,onClick={() => setErrorPreview('403')},True
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,122,"<Button variant=""contained"" onClick={onNext}",True
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,182,"<Button variant=""outlined"" onClick={onBack}",True
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,186,"<Button variant=""contained"" onClick={onNext}",True
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,255,<button,False
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,258,onClick={() => setChatOpen(false)},True
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,264,<button,False
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,267,onClick={onEnd},True
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,299,"<button type=""button"" aria-label={micOn ? t('pages.interviewPreview.aria.turnMicrophoneOff') : t('pa",True
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,304,"<button type=""button"" aria-label={camOn ? t('pages.interviewPreview.aria.turnCameraOff') : t('pages.",True
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,309,"<button type=""button"" aria-label={t('pages.interviewPreview.aria.shareScreen')} className=""flex size",False
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,312,"<button type=""button"" aria-label={chatOpen ? t('pages.interviewPreview.aria.closeChat') : t('pages.i",True
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,318,"<button type=""button"" onClick={onEnd}",True
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,360,"<button key={s.key} type=""button"" onClick={() => setStep(s.key)}",True
+frontend/src/views/adminPages/InterviewPreviewPage.tsx,387,"<Button variant=""contained"" size=""small"" onClick={() => setStep('connected')}",True
+frontend/src/views/adminPages/ArticlesPage/AdminArticleFormPage.tsx,287,<IconButton onClick={() => push('/admin/articles')} sx={{ bgcolor: 'action.hover' }}>,True
+frontend/src/views/adminPages/ArticlesPage/AdminArticleFormPage.tsx,296,<Button,False
+frontend/src/views/adminPages/ArticlesPage/AdminArticleFormPage.tsx,299,onClick={() => handleSave()},True
+frontend/src/views/adminPages/ArticlesPage/AdminArticleFormPage.tsx,305,<Button,False
+frontend/src/views/adminPages/ArticlesPage/AdminArticleFormPage.tsx,308,onClick={() => handleSave('published')},True
+frontend/src/views/adminPages/ArticlesPage/AdminArticleFormPage.tsx,421,<IconButton,False
+frontend/src/views/adminPages/ArticlesPage/AdminArticleFormPage.tsx,424,onClick={() => dispatch({ type: 'clearThumbnail' })},True
+frontend/src/views/adminPages/ArticlesPage/AdminArticleFormPage.tsx,428,"<Button size=""small"" fullWidth startIcon={<ImageIcon />} onClick={() => fileInputRef.current?.click(",True
+frontend/src/views/adminPages/ArticlesPage/AdminArticleFormPage.tsx,433,<Button,False
+frontend/src/views/adminPages/ArticlesPage/AdminArticleFormPage.tsx,437,onClick={() => fileInputRef.current?.click()},True
+frontend/src/views/adminPages/ArticlesPage/AdminArticleFormPage.tsx,461,"<Button size=""small"" variant=""outlined"" onClick={addTag}>{t('pages.articles.actions.addTag')}</Butto",True
+frontend/src/views/adminPages/ArticlesPage/index.tsx,206,"<IconButton size=""small"" onClick={() => push(`/admin/articles/${row.original.id}`)}>",True
+frontend/src/views/adminPages/ArticlesPage/index.tsx,211,"<IconButton size=""small"" color=""error"" onClick={() => handleDelete(row.original.id, row.original.tit",True
+frontend/src/views/adminPages/ArticlesPage/index.tsx,232,<Button,False
+frontend/src/views/adminPages/ArticlesPage/index.tsx,235,onClick={() => push('/admin/articles/create')},True
+frontend/src/views/adminPages/AuditLogsPage/index.tsx,279,"<Button variant=""outlined"" startIcon={<DownloadIcon />} onClick={() => setExportModalOpen(true)} dis",True
+frontend/src/views/adminPages/BannersPage/BannerDeleteDialog.tsx,20,"<Button onClick={onClose} color=""inherit"">{t('pages.banners.cancel')}</Button>",True
+frontend/src/views/adminPages/BannersPage/BannerDeleteDialog.tsx,21,"<Button onClick={onDelete} color=""error"" variant=""contained"" disabled={isMutating}>",True
+frontend/src/views/adminPages/BannersPage/BannerFormDialog.tsx,249,"<Button variant=""outlined"" startIcon={<UploadFileIcon />} onClick={onPickWebImage}>",True
+frontend/src/views/adminPages/BannersPage/BannerFormDialog.tsx,265,"<Button variant=""outlined"" startIcon={<UploadFileIcon />} onClick={onPickMobileImage}>",True
+frontend/src/views/adminPages/BannersPage/BannerFormDialog.tsx,281,"<Button onClick={onClose} color=""inherit"">{t('pages.banners.cancel')}</Button>",True
+frontend/src/views/adminPages/BannersPage/BannerFormDialog.tsx,282,"<Button onClick={onSave} variant=""contained"" disabled={isMutating || hasValidationErrors}>",True
+frontend/src/views/adminPages/BannersPage/index.tsx,287,"<Button variant=""contained"" startIcon={<AddIcon />} onClick={() => dispatch({ type: 'open-add' })} s",True
+frontend/src/views/adminPages/BannersPage/useBannersPageColumns.tsx,111,"<IconButton size=""small"" color=""primary"" onClick={() => onEdit(info.row.original)}>",True
+frontend/src/views/adminPages/BannersPage/useBannersPageColumns.tsx,114,"<IconButton size=""small"" color=""error"" onClick={() => onDelete(info.row.original)}>",True
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,247,"<IconButton size=""small"" color=""primary"" onClick={() => handleOpenEdit(info.row.original)}>",True
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,252,"<IconButton size=""small"" color=""error"" onClick={() => handleDeleteRequest(info.row.original)}>",True
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,267,"<Button variant=""contained"" startIcon={<AddIcon />} onClick={handleOpenAdd}>",True
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,348,"<Button onClick={handleClose} color=""inherit"">{t('common.cancel')}</Button>",True
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,349,<Button,False
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,350,onClick={handleSave},True
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,365,"<Button onClick={handleClose} color=""inherit"">{t('common.cancel')}</Button>",True
+frontend/src/views/adminPages/BannerTypesPage/index.tsx,366,"<Button onClick={handleDelete} color=""error"" variant=""contained"" disabled={isMutating}>",True
+frontend/src/views/adminPages/CareersPage/index.tsx,231,"<Button variant=""outlined"" startIcon={<ImageIcon />} onClick={() => iconInputRef.current?.click()}>",True
+frontend/src/views/adminPages/CareersPage/index.tsx,235,"<Button color=""inherit"" onClick={onClearIcon}>",True
+frontend/src/views/adminPages/CareersPage/index.tsx,260,"<Button variant=""outlined"" startIcon={<ImageIcon />} onClick={() => iconInputRef.current?.click()}>",True
+frontend/src/views/adminPages/CareersPage/index.tsx,270,"<Button onClick={onClose} color=""inherit"">",True
+frontend/src/views/adminPages/CareersPage/index.tsx,273,<Button,False
+frontend/src/views/adminPages/CareersPage/index.tsx,274,onClick={onSave},True
+frontend/src/views/adminPages/CareersPage/index.tsx,309,"<Button onClick={onClose} color=""inherit"">",True
+frontend/src/views/adminPages/CareersPage/index.tsx,312,<Button,False
+frontend/src/views/adminPages/CareersPage/index.tsx,313,onClick={onDelete},True
+frontend/src/views/adminPages/CareersPage/index.tsx,509,"<IconButton size=""small"" onClick={() => handleOpenEdit(info.row.original)} color=""primary"">",True
+frontend/src/views/adminPages/CareersPage/index.tsx,514,"<IconButton size=""small"" onClick={() => handleOpenDelete(info.row.original)} color=""error"">",True
+frontend/src/views/adminPages/CareersPage/index.tsx,531,"<Button variant=""contained"" startIcon={<AddIcon />} onClick={handleOpenAdd}>",True
+frontend/src/views/adminPages/ChatPage/index.tsx,162,"<IconButton size=""small"" color=""primary"" onClick={() => setSelectedConversation(info.row.original)}>",True
+frontend/src/views/adminPages/ChatPage/index.tsx,307,<Button onClick={() => setSelectedConversation(null)}>{t('common.close')}</Button>,True
+frontend/src/views/adminPages/CitiesPage/index.tsx,160,"<IconButton size=""small"" onClick={() => dispatch({ type: 'open-edit', city: info.row.original })} co",True
+frontend/src/views/adminPages/CitiesPage/index.tsx,165,"<IconButton size=""small"" onClick={() => dispatch({ type: 'open-delete', city: info.row.original })} ",True
+frontend/src/views/adminPages/CitiesPage/index.tsx,184,"<Button variant=""contained"" startIcon={<AddIcon />} onClick={() => dispatch({ type: 'open-add' })}>",True
+frontend/src/views/adminPages/CitiesPage/index.tsx,238,"<Button onClick={() => dispatch({ type: 'close-dialogs' })} color=""inherit"">",True
+frontend/src/views/adminPages/CitiesPage/index.tsx,241,"<Button onClick={handleSave} variant=""contained"" disabled={isMutating || hasValidationErrors}>",True
+frontend/src/views/adminPages/CitiesPage/index.tsx,253,"<Button onClick={() => dispatch({ type: 'close-dialogs' })} color=""inherit"">",True
+frontend/src/views/adminPages/CitiesPage/index.tsx,256,"<Button onClick={handleDelete} color=""error"" variant=""contained"" disabled={isMutating}>",True
+frontend/src/views/adminPages/CompaniesPage/CompanyDeleteDialog.tsx,30,"<Button onClick={onClose} color=""inherit"">{t('pages.companies.cancelBtn')}</Button>",True
+frontend/src/views/adminPages/CompaniesPage/CompanyDeleteDialog.tsx,31,"<Button onClick={onDelete} color=""error"" variant=""contained"" disabled={loading}>",True
+frontend/src/views/adminPages/CompaniesPage/CompanyFormDialog.tsx,239,"<Button onClick={onClose} color=""inherit"">{t('pages.companies.cancelBtn')}</Button>",True
+frontend/src/views/adminPages/CompaniesPage/CompanyFormDialog.tsx,240,"<Button onClick={onSave} variant=""contained"" disabled={isCompanyFormSaveDisabled(formData, isMutatin",True
+frontend/src/views/adminPages/CompaniesPage/index.tsx,257,"<IconButton size=""small"" component=""a"" href={detailHref} target={detailHref ? '_blank' : undefined} ",False
+frontend/src/views/adminPages/CompaniesPage/index.tsx,262,"<IconButton size=""small"" color=""primary"" onClick={() => handleOpenEdit(company)}>",True
+frontend/src/views/adminPages/CompaniesPage/index.tsx,267,"<IconButton size=""small"" color=""error"" onClick={() => handleOpenDelete(company)}>",True
+frontend/src/views/adminPages/CompaniesPage/index.tsx,285,"<Button variant=""contained"" startIcon={<AddIcon />} onClick={handleOpenAdd} sx={{ textTransform: 'no",True
+frontend/src/views/adminPages/CompanyVerificationsPage/index.tsx,176,<Button,False
+frontend/src/views/adminPages/CompanyVerificationsPage/index.tsx,180,"onClick={() => handleUpdate(row, status, note)}",True
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,188,onClick={() => setViewDetail(info.row.original)},True
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,230,<IconButton,False
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,233,onClick={() => handleToggleRead(msg)},True
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,241,<IconButton,False
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,244,onClick={() => { setCurrent(msg); setOpenDelete(true); }},True
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,332,"<Button onClick={() => setOpenDelete(false)} color=""inherit"">{t('pages.contactMessages.cancel')}</Bu",True
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,333,"<Button onClick={handleDelete} color=""error"" variant=""contained"" disabled={isMutating}>",True
+frontend/src/views/adminPages/ContactMessagesPage/index.tsx,393,"<Button onClick={() => setViewDetail(null)} variant=""contained"">",True
+frontend/src/views/adminPages/DistrictsPage/index.tsx,236,"<IconButton size=""small"" onClick={() => handleOpenEdit(info.row.original)} color=""primary"">",True
+frontend/src/views/adminPages/DistrictsPage/index.tsx,241,"<IconButton size=""small"" onClick={() => handleOpenDelete(info.row.original)} color=""error"">",True
+frontend/src/views/adminPages/DistrictsPage/index.tsx,258,"<Button variant=""contained"" startIcon={<AddIcon />} onClick={handleOpenAdd}>",True
+frontend/src/views/adminPages/DistrictsPage/index.tsx,339,<Button onClick={handleCloseDialog}>{t('common.cancel')}</Button>,True
+frontend/src/views/adminPages/DistrictsPage/index.tsx,340,"<Button variant=""contained"" onClick={handleSave} disabled={isMutating || hasValidationErrors}>{t('co",True
+frontend/src/views/adminPages/DistrictsPage/index.tsx,350,<Button onClick={handleCloseDialog}>{t('common.cancel')}</Button>,True
+frontend/src/views/adminPages/DistrictsPage/index.tsx,351,"<Button color=""error"" variant=""contained"" onClick={handleDelete} disabled={isMutating}>{t('common.de",True
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,307,<Button,False
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,311,onClick={() => setEvidencePreview({,True
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,364,<IconButton,False
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,367,onClick={() => openEditDialog(info.row.original)},True
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,373,<IconButton,False
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,376,onClick={() => {,True
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,397,<Button,False
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,400,onClick={openAddDialog},True
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,548,"<Button variant=""outlined"" component=""label"" startIcon={<ImageIcon />}>",False
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,578,"<Button onClick={closeFormDialog} color=""inherit"">",True
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,581,"<Button onClick={handleSave} variant=""contained"" disabled={isMutating}>",True
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,595,"<Button onClick={() => setOpenDelete(false)} color=""inherit"">{t('pages.feedbacks.cancel')}</Button>",True
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,596,"<Button onClick={handleDelete} color=""error"" variant=""contained"" disabled={isMutating}>",True
+frontend/src/views/adminPages/FeedbacksPage/index.tsx,630,"<Button onClick={() => setEvidencePreview(null)} variant=""contained"">",True
+frontend/src/views/adminPages/InterviewsPage/index.tsx,154,"<IconButton size=""small"" color=""info"" onClick={() => setSelectedInterview(interview)}>",True
+frontend/src/views/adminPages/InterviewsPage/index.tsx,161,<IconButton,False
+frontend/src/views/adminPages/InterviewsPage/index.tsx,165,"onClick={() => handleUpdateStatus(interview.id, 'completed')}",True
+frontend/src/views/adminPages/InterviewsPage/index.tsx,171,<IconButton,False
+frontend/src/views/adminPages/InterviewsPage/index.tsx,175,"onClick={() => handleUpdateStatus(interview.id, 'cancelled')}",True
+frontend/src/views/adminPages/InterviewsPage/index.tsx,183,"<IconButton size=""small"" color=""error"" disabled={isMutating} onClick={() => setDeleteTarget(intervie",True
+frontend/src/views/adminPages/InterviewsPage/index.tsx,241,<Button onClick={() => setSelectedInterview(null)}>{t('common.close')}</Button>,True
+frontend/src/views/adminPages/InterviewsPage/index.tsx,253,"<Button onClick={() => setDeleteTarget(null)} color=""inherit"">{t('common.cancel')}</Button>",True
+frontend/src/views/adminPages/InterviewsPage/index.tsx,254,"<Button onClick={handleDelete} color=""error"" variant=""contained"" disabled={isMutating}>",True
+frontend/src/views/adminPages/InterviewsPage/components/InterviewTable.tsx,135,"<IconButton size=""small"" onClick={() => onView(info.row.original)} color=""primary"">",True
+frontend/src/views/adminPages/InterviewsPage/components/InterviewTable.tsx,141,"<IconButton size=""small"" onClick={() => onUpdateStatus(info.row.original.id, 'completed')} color=""su",True
+frontend/src/views/adminPages/InterviewsPage/components/InterviewTable.tsx,148,"<IconButton size=""small"" onClick={() => onUpdateStatus(info.row.original.id, 'cancelled')} color=""wa",True
+frontend/src/views/adminPages/InterviewsPage/components/InterviewTable.tsx,154,"<IconButton size=""small"" onClick={() => onDelete(info.row.original.id)} color=""error"">",True
+frontend/src/views/adminPages/JobActivityPage/index.tsx,204,"<IconButton size=""small"" onClick={() => handleOpenEdit(info.row.original)} color=""primary"">",True
+frontend/src/views/adminPages/JobActivityPage/index.tsx,209,"<IconButton size=""small"" onClick={() => handleOpenDelete(info.row.original)} color=""error"">",True
+frontend/src/views/adminPages/JobActivityPage/index.tsx,274,"<Button onClick={handleCloseDialogs} color=""inherit"">{t('pages.jobActivity.cancelBtn')}</Button>",True
+frontend/src/views/adminPages/JobActivityPage/index.tsx,275,<Button,False
+frontend/src/views/adminPages/JobActivityPage/index.tsx,276,onClick={handleSaveStatus},True
+frontend/src/views/adminPages/JobActivityPage/index.tsx,293,"<Button onClick={handleCloseDialogs} color=""inherit"">{t('pages.jobActivity.cancelBtn')}</Button>",True
+frontend/src/views/adminPages/JobActivityPage/index.tsx,294,<Button,False
+frontend/src/views/adminPages/JobActivityPage/index.tsx,295,onClick={handleDelete},True
+frontend/src/views/adminPages/JobNotificationsPage/index.tsx,212,"<IconButton size=""small"" onClick={() => handleOpenEdit(info.row.original)} color=""primary"">",True
+frontend/src/views/adminPages/JobNotificationsPage/index.tsx,217,"<IconButton size=""small"" onClick={() => handleOpenDelete(info.row.original)} color=""error"">",True
+frontend/src/views/adminPages/JobNotificationsPage/index.tsx,234,"<Button variant=""contained"" startIcon={<AddIcon />} onClick={handleOpenAdd}>",True
+frontend/src/views/adminPages/JobNotificationsPage/JobNotificationDeleteDialog.tsx,30,"<Button onClick={onClose} color=""inherit"">",True
+frontend/src/views/adminPages/JobNotificationsPage/JobNotificationDeleteDialog.tsx,33,"<Button onClick={onDelete} color=""error"" variant=""contained"" disabled={isMutating}>",True
+frontend/src/views/adminPages/JobNotificationsPage/JobNotificationFormDialog.tsx,132,"<Button onClick={onClose} color=""inherit"">",True
+frontend/src/views/adminPages/JobNotificationsPage/JobNotificationFormDialog.tsx,135,"<Button onClick={onSave} variant=""contained"" disabled={isMutating || hasValidationErrors}>",True
+frontend/src/views/adminPages/JobNotificationsPage/components/JobNotificationTable.tsx,85,"<IconButton size=""small"" onClick={() => onEdit?.(info.row.original)} color=""primary"">",True
+frontend/src/views/adminPages/JobNotificationsPage/components/JobNotificationTable.tsx,90,"<IconButton size=""small"" onClick={() => onDelete?.(info.row.original)} color=""error"">",True
+frontend/src/views/adminPages/JobsPage/index.tsx,162,"<IconButton size=""small"" component=""a"" href={detailHref} target={detailHref ? '_blank' : undefined} ",False
+frontend/src/views/adminPages/JobsPage/index.tsx,169,"<IconButton size=""small"" onClick={() => handleApprove(job.id)} color=""success"">",True
+frontend/src/views/adminPages/JobsPage/index.tsx,174,"<IconButton size=""small"" onClick={() => handleReject(job.id)} color=""warning"">",True
+frontend/src/views/adminPages/JobsPage/index.tsx,182,"<IconButton size=""small"" onClick={() => handleReject(job.id)} color=""warning"">",True
+frontend/src/views/adminPages/JobsPage/index.tsx,188,"<IconButton size=""small"" onClick={() => handleOpenDelete(job)} color=""error"">",True
+frontend/src/views/adminPages/JobsPage/index.tsx,261,"<Button onClick={handleCloseDialog} color=""inherit"">{t('pages.jobs.cancel')}</Button>",True
+frontend/src/views/adminPages/JobsPage/index.tsx,262,<Button,False
+frontend/src/views/adminPages/JobsPage/index.tsx,263,onClick={handleDelete},True
+frontend/src/views/adminPages/JobsPage/components/JobTable.tsx,110,"<IconButton size=""small"" onClick={() => onView(info.row.original)} color=""primary"">",True
+frontend/src/views/adminPages/JobsPage/components/JobTable.tsx,115,"<IconButton size=""small"" onClick={() => onEdit(info.row.original)} color=""secondary"">",True
+frontend/src/views/adminPages/JobsPage/components/JobTable.tsx,122,"<IconButton size=""small"" onClick={() => onApprove(info.row.original.id)} color=""success"">",True
+frontend/src/views/adminPages/JobsPage/components/JobTable.tsx,127,"<IconButton size=""small"" onClick={() => onReject(info.row.original.id)} color=""error"">",True
+frontend/src/views/adminPages/JobsPage/components/JobTable.tsx,134,"<IconButton size=""small"" onClick={() => onDelete(info.row.original.id)} color=""error"">",True
+frontend/src/views/adminPages/ProfileDetailPage/index.tsx,251,<IconButton,False
+frontend/src/views/adminPages/ProfileDetailPage/index.tsx,266,<IconButton,False
+frontend/src/views/adminPages/ProfileDetailPage/index.tsx,322,<Button,False
+frontend/src/views/adminPages/ProfileDetailPage/index.tsx,324,"onClick={() => router.push(localizeRoutePath(`/${ROUTES.ADMIN.PROFILES}`, i18n.language))}",True
+frontend/src/views/adminPages/ProfileDetailPage/index.tsx,337,<Button,False
+frontend/src/views/adminPages/ProfileDetailPage/index.tsx,341,onClick={() => setOpenDelete(true)},True
+frontend/src/views/adminPages/ProfileDetailPage/index.tsx,498,"<Button onClick={() => setOpenDelete(false)} color=""inherit"">",True
+frontend/src/views/adminPages/ProfileDetailPage/index.tsx,501,<Button,False
+frontend/src/views/adminPages/ProfileDetailPage/index.tsx,502,onClick={() => deleteMutation.mutate()},True
+frontend/src/views/adminPages/ProfilesPage/index.tsx,311,<IconButton,False
+frontend/src/views/adminPages/ProfilesPage/index.tsx,321,"<IconButton size=""small"" onClick={() => handleOpenDelete(profile)} color=""error"">",True
+frontend/src/views/adminPages/ProfilesPage/index.tsx,425,<Button,False
+frontend/src/views/adminPages/ProfilesPage/index.tsx,428,onClick={() => setOpenImportDialog(true)},True
+frontend/src/views/adminPages/ProfilesPage/index.tsx,510,<Button,False
+frontend/src/views/adminPages/ProfilesPage/index.tsx,514,onClick={handleResetFilters},True
+frontend/src/views/adminPages/ProfilesPage/index.tsx,546,<Button,False
+frontend/src/views/adminPages/ProfilesPage/index.tsx,666,<Button,False
+frontend/src/views/adminPages/ProfilesPage/index.tsx,671,onClick={() => setOpenBulkDeleteDialog(true)},True
+frontend/src/views/adminPages/ProfilesPage/index.tsx,703,"<Button onClick={handleCloseDialog} color=""inherit"">",True
+frontend/src/views/adminPages/ProfilesPage/index.tsx,706,"<Button onClick={handleDelete} color=""error"" variant=""contained"" disabled={isMutating}>",True
+frontend/src/views/adminPages/ProfilesPage/index.tsx,723,"<Button onClick={handleCloseBulkDeleteDialog} color=""inherit"">",True
+frontend/src/views/adminPages/ProfilesPage/index.tsx,726,"<Button onClick={handleBulkDelete} color=""error"" variant=""contained"" disabled={isMutating || !select",True
+frontend/src/views/adminPages/ProfilesPage/index.tsx,837,"<Button onClick={handleCloseImportDialog} color=""inherit"">",True
+frontend/src/views/adminPages/ProfilesPage/index.tsx,840,<Button,False
+frontend/src/views/adminPages/ProfilesPage/index.tsx,841,onClick={handleImport},True
+frontend/src/views/adminPages/ProfilesPage/components/ProfileTable.tsx,100,"<IconButton size=""small"" onClick={() => onView?.(info.row.original)}>",True
+frontend/src/views/adminPages/ProfilesPage/components/ProfileTable.tsx,105,"<IconButton size=""small"" onClick={() => onEdit?.(info.row.original)} color=""primary"">",True
+frontend/src/views/adminPages/ProfilesPage/components/ProfileTable.tsx,110,"<IconButton size=""small"" onClick={() => onDelete?.(info.row.original)} color=""error"">",True
+frontend/src/views/adminPages/ResumesPage/index.tsx,115,"<IconButton size=""small"" component=""a"" href={safeFileUrl} target=""_blank"" rel=""noopener noreferrer"" ",False
+frontend/src/views/adminPages/ResumesPage/index.tsx,120,"<IconButton size=""small"" component=""a"" href={safeFileUrl} download color=""primary"" disabled={!safeFi",False
+frontend/src/views/adminPages/ResumesPage/index.tsx,125,"<IconButton size=""small"" onClick={() => handleOpenDelete(resume)} color=""error"">",True
+frontend/src/views/adminPages/ResumesPage/index.tsx,178,"<Button onClick={handleCloseDialog} color=""inherit"">{t('pages.resumes.cancel')}</Button>",True
+frontend/src/views/adminPages/ResumesPage/index.tsx,179,<Button,False
+frontend/src/views/adminPages/ResumesPage/index.tsx,180,onClick={handleDelete},True
+frontend/src/views/adminPages/ResumesPage/components/ResumeTable.tsx,94,"<IconButton size=""small"" onClick={() => onEdit(info.row.original)}>",True
+frontend/src/views/adminPages/ResumesPage/components/ResumeTable.tsx,99,"<IconButton size=""small"" onClick={() => onDelete(info.row.original)} color=""error"">",True
+frontend/src/views/adminPages/SettingsPage/index.tsx,197,<Button,False
+frontend/src/views/adminPages/SettingsPage/index.tsx,202,onClick={() => actionMutation.mutate('start-bootstrap')},True
+frontend/src/views/adminPages/SettingsPage/index.tsx,206,<Button,False
+frontend/src/views/adminPages/SettingsPage/index.tsx,210,onClick={() => actionMutation.mutate('bootstrap')},True
+frontend/src/views/adminPages/SettingsPage/index.tsx,214,<Button,False
+frontend/src/views/adminPages/SettingsPage/index.tsx,219,onClick={() => actionMutation.mutate('start')},True
+frontend/src/views/adminPages/SettingsPage/index.tsx,223,<Button,False
+frontend/src/views/adminPages/SettingsPage/index.tsx,228,onClick={() => actionMutation.mutate('stop')},True
+frontend/src/views/adminPages/SettingsPage/index.tsx,232,<Button,False
+frontend/src/views/adminPages/SettingsPage/index.tsx,235,onClick={() => queryClient.invalidateQueries({ queryKey: ['fpt-gpu-control'] })},True
+frontend/src/views/adminPages/SettingsPage/index.tsx,240,<Button,False
+frontend/src/views/adminPages/SettingsPage/index.tsx,311,<Button,False
+frontend/src/views/adminPages/SettingsPage/index.tsx,315,onClick={handleSave},True
+frontend/src/views/adminPages/SettingsPage/components/GeneralSettingsTab.tsx,159,<Button,False
+frontend/src/views/adminPages/SettingsPage/components/GeneralSettingsTab.tsx,162,onClick={handleSendNotificationDemo},True
+frontend/src/views/adminPages/SettingsPage/components/GeneralSettingsTab.tsx,169,<Button,False
+frontend/src/views/adminPages/SettingsPage/components/GeneralSettingsTab.tsx,172,onClick={handleHealthCheck},True
+frontend/src/views/adminPages/SettingsPage/components/InteractiveChipInput.tsx,123,<Button,False
+frontend/src/views/adminPages/SettingsPage/components/InteractiveChipInput.tsx,127,onClick={handleAddChip},True
+frontend/src/views/adminPages/UsersPage/index.tsx,131,<Button,False
+frontend/src/views/adminPages/UsersPage/index.tsx,136,onClick={handleBulkDisable},True
+frontend/src/views/adminPages/UsersPage/index.tsx,171,"<Button onClick={() => setDeleteTarget(null)} color=""inherit"">",True
+frontend/src/views/adminPages/UsersPage/index.tsx,174,"<Button onClick={() => void confirmDeleteUser()} color=""error"" variant=""contained"" disabled={isMutat",True
+frontend/src/views/adminPages/UsersPage/components/ScheduleInterviewDialog.tsx,212,"<Button onClick={onClose} color=""inherit"">",True
+frontend/src/views/adminPages/UsersPage/components/ScheduleInterviewDialog.tsx,215,<Button,False
+frontend/src/views/adminPages/UsersPage/components/ScheduleInterviewDialog.tsx,216,onClick={handleSubmit},True
+frontend/src/views/adminPages/UsersPage/components/UserTable.tsx,162,<IconButton,False
+frontend/src/views/adminPages/UsersPage/components/UserTable.tsx,165,onClick={() => onDeleteUser(info.row.original)},True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,502,"<Button size=""small"" variant=""outlined"" startIcon={<EditIcon />} onClick={() => openEditDialog(profi",True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,505,<IconButton,False
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,510,onClick={() => openTestDialog(profile)},True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,515,"<Button size=""small"" variant=""outlined"" startIcon={<UploadFileIcon />} onClick={() => setSampleProfi",True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,519,"<Button size=""small"" variant=""outlined"" startIcon={<BusinessIcon />} onClick={() => setGrantProfile(",True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,522,"<Button size=""small"" color=""error"" variant=""outlined"" startIcon={<DeleteOutlineIcon />} onClick={() ",True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,539,"<Button variant=""contained"" startIcon={<GraphicEqIcon />} onClick={() => setCreateOpen(true)}>",True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,637,"<Button variant=""outlined"" component=""label"" startIcon={<UploadFileIcon />}>",False
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,656,<Button onClick={resetCreateDialog}>{t('pages.voiceProfiles.actions.cancel')}</Button>,True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,657,<Button,False
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,660,onClick={submitCreate},True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,740,<Button onClick={() => setEditProfile(null)}>{t('pages.voiceProfiles.actions.cancel')}</Button>,True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,742,<Button,False
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,746,onClick={submitPrepareProfile},True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,751,"<Button variant=""contained"" disabled={hasEditValidationErrors || updateMutation.isPending} onClick={",True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,765,<Button onClick={() => setDeleteProfile(null)}>{t('pages.voiceProfiles.actions.cancel')}</Button>,True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,766,"<Button color=""error"" variant=""contained"" disabled={deleteMutation.isPending || !deleteProfile} onCl",True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,795,<Button onClick={closeTestDialog}>{t('pages.voiceProfiles.actions.close')}</Button>,True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,796,"<Button variant=""contained"" startIcon={<PlayCircleOutlineIcon />} disabled={testMutation.isPending |",True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,807,"<Button variant=""outlined"" component=""label"" startIcon={<UploadFileIcon />}>",False
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,815,<Button onClick={() => setSampleProfile(null)}>{t('pages.voiceProfiles.actions.cancel')}</Button>,True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,816,"<Button variant=""contained"" disabled={sampleMutation.isPending} onClick={submitSample}>",True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,846,<Button onClick={() => setGrantProfile(null)}>{t('pages.voiceProfiles.actions.cancel')}</Button>,True
+frontend/src/views/adminPages/VoiceProfilesPage/index.tsx,847,"<Button variant=""contained"" disabled={grantMutation.isPending} onClick={submitGrant}>",True
+frontend/src/views/adminPages/WardsPage/index.tsx,270,"<Button onClick={onClose} color=""inherit"">",True
+frontend/src/views/adminPages/WardsPage/index.tsx,273,"<Button onClick={onSave} variant=""contained"" disabled={isMutating || hasValidationErrors}>",True
+frontend/src/views/adminPages/WardsPage/index.tsx,285,"<Button onClick={onClose} color=""inherit"">",True
+frontend/src/views/adminPages/WardsPage/index.tsx,288,"<Button onClick={onDelete} color=""error"" variant=""contained"" disabled={isMutating}>",True
+frontend/src/views/adminPages/WardsPage/index.tsx,441,"<IconButton size=""small"" onClick={() => handleOpenEdit(info.row.original)} color=""primary"">",True
+frontend/src/views/adminPages/WardsPage/index.tsx,446,"<IconButton size=""small"" onClick={() => handleOpenDelete(info.row.original)} color=""error"">",True
+frontend/src/views/adminPages/WardsPage/index.tsx,466,"<Button variant=""contained"" startIcon={<AddIcon />} onClick={handleOpenAdd}>",True
+frontend/src/views/agentAssistantPage/index.tsx,299,<Button,False
+frontend/src/views/agentAssistantPage/index.tsx,301,onClick={() => {,True
+frontend/src/views/agentAssistantPage/index.tsx,430,<Button,False
+frontend/src/views/agentAssistantPage/index.tsx,574,<Button,False
+frontend/src/views/agentAssistantPage/index.tsx,576,onClick={onClick},True
+frontend/src/views/agentAssistantPage/index.tsx,601,<IconButton,False
+frontend/src/views/agentAssistantPage/index.tsx,606,onClick={(event) => {,True
+frontend/src/views/agentAssistantPage/index.tsx,963,onClick={() => void selectThread(thread.id)},True
+frontend/src/views/agentAssistantPage/index.tsx,975,<Button,False
+frontend/src/views/agentAssistantPage/index.tsx,979,onClick={() => void createThread()},True
+frontend/src/views/agentAssistantPage/index.tsx,1023,<IconButton,False
+frontend/src/views/agentAssistantPage/index.tsx,1027,onClick={() => void handleDeleteThread(selectedThread.id)},True
+frontend/src/views/agentAssistantPage/index.tsx,1124,<IconButton,False
+frontend/src/views/agentAssistantPage/index.tsx,1128,onClick={() => handleRemoveAttachment(attachment.id)},True
+frontend/src/views/agentAssistantPage/index.tsx,1160,<IconButton,False
+frontend/src/views/agentAssistantPage/index.tsx,1162,onClick={() => fileInputRef.current?.click()},True
+frontend/src/views/agentAssistantPage/index.tsx,1205,<IconButton,False
+frontend/src/views/agentAssistantPage/index.tsx,1207,onClick={() => void handleSend()},True
+frontend/src/views/authPages/AdminLogin/index.tsx,316,onClick={() => goToSlide(idx)},True
+frontend/src/views/authPages/EmailVerificationRequiredPage/index.tsx,139,<Button,False
+frontend/src/views/authPages/EmailVerificationRequiredPage/index.tsx,141,onClick={handleResendEmail},True
+frontend/src/views/authPages/JobSeekerLogin/JobSeekerLoginView.tsx,118,<Button,False
+frontend/src/views/authPages/JobSeekerLogin/JobSeekerLoginView.tsx,119,onClick={() => onSetLoginMode('email')},True
+frontend/src/views/authPages/JobSeekerLogin/JobSeekerLoginView.tsx,137,<Button,False
+frontend/src/views/authPages/JobSeekerLogin/JobSeekerLoginView.tsx,138,onClick={() => onSetLoginMode('phone')},True
+frontend/src/views/chatPages/ChatPage/index.tsx,115,<IconButton,False
+frontend/src/views/chatPages/ChatPage/index.tsx,116,onClick={() => setOpenLeftDrawer(true)},True
+frontend/src/views/chatPages/ChatPage/index.tsx,126,<IconButton,False
+frontend/src/views/chatPages/ChatPage/index.tsx,127,onClick={() => setOpenRightDrawer(true)},True
+frontend/src/views/components/auths/AccountCard/index.tsx,178,<button,False
+frontend/src/views/components/auths/AccountCard/index.tsx,180,onClick={() => setOpenPopup(true)},True
+frontend/src/views/components/auths/AccountCard/index.tsx,199,<Button,False
+frontend/src/views/components/auths/AvatarCard/index.tsx,233,<IconButton,False
+frontend/src/views/components/auths/AvatarCard/index.tsx,245,onClick={handlePickFile},True
+frontend/src/views/components/auths/AvatarCard/index.tsx,255,<IconButton,False
+frontend/src/views/components/auths/AvatarCard/index.tsx,259,onClick={handleDelete},True
+frontend/src/views/components/auths/EmployerLoginForm/index.tsx,276,onClick={onFacebookLogin},True
+frontend/src/views/components/auths/EmployerLoginForm/index.tsx,306,onClick={() => googleLogin()},True
+frontend/src/views/components/auths/EmployerSignUpForm/index.tsx,324,"<StyledButton variant=""outlined"" onClick={handleBack} startIcon={<NavigateBeforeIcon />}>",True
+frontend/src/views/components/auths/ForgotPasswordForm/index.tsx,76,"<Button fullWidth variant=""contained"" sx={{ mt: 3, mb: 2 }} type=""submit"">",False
+frontend/src/views/components/auths/JobSeekerLoginForm/index.tsx,282,onClick={onFacebookLogin},True
+frontend/src/views/components/auths/JobSeekerLoginForm/index.tsx,312,onClick={() => googleLogin()},True
+frontend/src/views/components/auths/JobSeekerSignUpForm/JobSeekerSignUpSocialButtons.tsx,65,onClick={onGoogleClick},True
+frontend/src/views/components/auths/PhoneOTPLoginForm/index.tsx,334,onClick={handleSendOTP},True
+frontend/src/views/components/auths/PhoneOTPLoginForm/index.tsx,357,onClick={handleVerifyOTP},True
+frontend/src/views/components/auths/PhoneOTPLoginForm/index.tsx,363,<Button,False
+frontend/src/views/components/auths/PhoneOTPLoginForm/index.tsx,366,onClick={() => {,True
+frontend/src/views/components/auths/PhoneOTPLoginForm/index.tsx,381,<Button,False
+frontend/src/views/components/auths/PhoneOTPLoginForm/index.tsx,384,onClick={handleSendOTP},True
+frontend/src/views/components/auths/ResetPasswordForm/index.tsx,108,<Button,False
+frontend/src/views/components/auths/ResetPasswordForm/index.tsx,116,onClick={handleSubmit(handleResetPassword)},True
+frontend/src/views/components/chats/ChatWindow/ChatWindowComposer.tsx,73,<IconButton,False
+frontend/src/views/components/chats/ChatWindow/ChatWindowComposer.tsx,78,onClick={onOpenFilePicker},True
+frontend/src/views/components/chats/ChatWindow/ChatWindowComposer.tsx,86,"<IconButton size=""small"" aria-label={t('composer.chooseEmoji')} sx={{ mr: 1, bgcolor: 'rgba(245, 158",True
+frontend/src/views/components/chats/ChatWindow/ChatWindowComposer.tsx,119,<IconButton,False
+frontend/src/views/components/chats/ChatWindow/ChatWindowMessagePanel.tsx,96,onClick={onLoadMore},True
+frontend/src/views/components/chats/LeftSidebar/SidebarRenderer.tsx,82,onClick={() => handleSelectRoom(value)},True
+frontend/src/views/components/chats/Message/index.tsx,81,onClick={() => openResourceUrlSafely(safeAttachmentUrl)},True
+frontend/src/views/components/chats/Message/index.tsx,86,onClick={() => openResourceUrlSafely(safeAttachmentUrl)},True
+frontend/src/views/components/chats/RightSidebar/RightSidebarRenderer.tsx,164,<Button,False
+frontend/src/views/components/chats/RightSidebar/RightSidebarRenderer.tsx,169,onClick={() => {,True
+frontend/src/views/components/defaults/CategoryCard/index.tsx,116,onClick={() => handleFilter(item.id)},True
+frontend/src/views/components/defaults/CompanySearch/index.tsx,102,<Button,False
+frontend/src/views/components/defaults/CompanySearch/index.tsx,128,<IconButton,False
+frontend/src/views/components/defaults/CompanySearch/index.tsx,130,onClick={handleReset},True
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,404,<Button,False
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,406,onClick={(e) => setAnchorEl(e.currentTarget)},True
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,447,onClick={() => handleDimensionSelect(dim.id)},True
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,472,<IconButton,False
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,474,onClick={handleScrollLeft},True
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,507,onClick={() => handleSubItemSelect(item.id)},True
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,533,<IconButton,False
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,535,onClick={handleScrollRight},True
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,639,<IconButton,False
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,641,"onClick={(e) => toggleFavorite(e, job.id)}",True
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,741,<IconButton,False
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,743,"onClick={() => setPage((p) => Math.max(1, p - 1))}",True
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,760,<IconButton,False
+frontend/src/views/components/defaults/FilterJobPostCard/index.tsx,762,"onClick={() => setPage((p) => Math.min(totalPages, p + 1))}",True
+frontend/src/views/components/defaults/HomeSearch/index.tsx,195,<Button,False
+frontend/src/views/components/defaults/HomeSearch/index.tsx,238,onClick={() => handlePillClick(item)},True
+frontend/src/views/components/defaults/JobByCategory/index.tsx,70,onClick={() => onSelect(item.id)},True
+frontend/src/views/components/defaults/JobPostSearch/index.tsx,275,<Button,False
+frontend/src/views/components/defaults/JobPostSearch/index.tsx,299,<Button,False
+frontend/src/views/components/defaults/JobPostSearch/index.tsx,318,onClick={handleOpenSaveAlert},True
+frontend/src/views/components/defaults/JobPostSearch/index.tsx,322,<Button,False
+frontend/src/views/components/defaults/JobPostSearch/index.tsx,350,onClick={handleChangeShowFilter},True
+frontend/src/views/components/defaults/JobPostSearch/JobPostSearchAdvancedFilters.tsx,191,<IconButton,False
+frontend/src/views/components/defaults/JobPostSearch/JobPostSearchAdvancedFilters.tsx,194,onClick={onReset},True
+frontend/src/views/components/defaults/JobPostSearch/JobPostSearchAdvancedFilters.tsx,203,<IconButton,False
+frontend/src/views/components/defaults/JobPostSearch/JobPostSearchAdvancedFilters.tsx,206,onClick={onToggleAdvancedFilter},True
+frontend/src/views/components/defaults/NotificationCard/index.tsx,120,<Button,False
+frontend/src/views/components/defaults/NotificationCard/index.tsx,129,onClick={() => void handleMakeAllRead()},True
+frontend/src/views/components/defaults/NotificationCard/index.tsx,135,<Button,False
+frontend/src/views/components/defaults/NotificationCard/index.tsx,145,onClick={() => void handleRemoveAll()},True
+frontend/src/views/components/defaults/NotificationCard/index.tsx,187,onClick={() => handleClickItem(value)},True
+frontend/src/views/components/defaults/NotificationCard/index.tsx,231,"<Box sx={{ cursor: ""pointer"", flex: 1, pr: { sm: 4 } }} onClick={() => handleClickItem(value)}>",True
+frontend/src/views/components/defaults/NotificationCard/index.tsx,285,<IconButton,False
+frontend/src/views/components/defaults/NotificationCard/index.tsx,288,onClick={(e) => {,True
+frontend/src/views/components/defaults/NotificationCard/index.tsx,316,"<Button onClick={loadMore} variant=""contained"" disabled={isLoading}>",True
+frontend/src/views/components/employers/AiCandidateRecommendationModal.tsx,199,"<IconButton onClick={onClose} size=""small"" sx={{ color: '#64748b' }}>",True
+frontend/src/views/components/employers/AiCandidateRecommendationModal.tsx,337,<Button,False
+frontend/src/views/components/employers/AiCandidateRecommendationModal.tsx,341,"onClick={() => handleAction('gửi lời mời ứng tuyển', cand.fullName)}",True
+frontend/src/views/components/employers/AiCandidateRecommendationModal.tsx,358,<Button,False
+frontend/src/views/components/employers/AiCandidateRecommendationModal.tsx,371,onClick={() => handleToggleSave(cand)},True
+frontend/src/views/components/employers/AiCandidateRecommendationModal.tsx,400,"<Button onClick={onClose} variant=""outlined"" sx={{ borderRadius: '10px', fontWeight: 700, px: 3, col",True
+frontend/src/views/components/employers/EmployeeFromApplicationDialog.tsx,106,<Button onClick={onClose}>{t('employer:employees.dialog.cancel')}</Button>,True
+frontend/src/views/components/employers/EmployeeFromApplicationDialog.tsx,107,<Button,False
+frontend/src/views/components/employers/EmployeeFromApplicationDialog.tsx,110,"onClick={() => onSubmit(buildEmployeeFromApplicationPayload(activity.id, form))}",True
+frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerHeader.tsx,62,<IconButton,False
+frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerHeader.tsx,63,onClick={onClose},True
+frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerResumeSection.tsx,44,<Button,False
+frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerResumeSection.tsx,125,<Button,False
+frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerStatePanels.tsx,182,<Button,False
+frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerStatePanels.tsx,187,onClick={onAnalyze},True
+frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerStatePanels.tsx,233,<Button,False
+frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerStatePanels.tsx,237,onClick={onAnalyze},True
+frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerStatePanels.tsx,370,<Button,False
+frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerStatePanels.tsx,373,onClick={handleSaveReview},True
+frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerStatePanels.tsx,449,<Button,False
+frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerStatePanels.tsx,454,onClick={onAnalyze},True
+frontend/src/views/components/employers/AppliedResumeCard/AppliedResumeToolbar.tsx,190,<Button,False
+frontend/src/views/components/employers/AppliedResumeCard/AppliedResumeToolbar.tsx,194,onClick={onOpenManualCandidatePopup},True
+frontend/src/views/components/employers/AppliedResumeCard/AppliedResumeToolbar.tsx,206,<Button,False
+frontend/src/views/components/employers/AppliedResumeCard/AppliedResumeToolbar.tsx,210,onClick={onExport},True
+frontend/src/views/components/employers/AppliedResumeCard/AppliedResumeToolbar.tsx,234,<Button,False
+frontend/src/views/components/employers/AppliedResumeCard/AppliedResumeToolbar.tsx,239,onClick={onOpenFilterPopup},True
+frontend/src/views/components/employers/AppliedResumeKanban/index.tsx,457,<IconButton,False
+frontend/src/views/components/employers/AppliedResumeKanban/index.tsx,459,onClick={() => setOpenDrawerId(item.id)},True
+frontend/src/views/components/employers/AppliedResumeKanban/index.tsx,475,<IconButton,False
+frontend/src/views/components/employers/AppliedResumeKanban/index.tsx,478,onClick={() => {,True
+frontend/src/views/components/employers/AppliedResumeKanban/index.tsx,497,<IconButton,False
+frontend/src/views/components/employers/AppliedResumeKanban/index.tsx,500,onClick={() => {,True
+frontend/src/views/components/employers/AppliedResumeKanban/index.tsx,525,<IconButton,False
+frontend/src/views/components/employers/AppliedResumeKanban/index.tsx,527,onClick={() => {,True
+frontend/src/views/components/employers/AppliedResumeKanban/index.tsx,548,<IconButton,False
+frontend/src/views/components/employers/AppliedResumeKanban/index.tsx,550,onClick={() => onCreateEmployee(item)},True
+frontend/src/views/components/employers/AppliedResumeKanban/index.tsx,563,<IconButton,False
+frontend/src/views/components/employers/AppliedResumeKanban/index.tsx,565,onClick={() => handleDelete(item.id)},True
+frontend/src/views/components/employers/AppliedResumeKanban/index.tsx,587,<Button,False
+frontend/src/views/components/employers/AppliedResumeTable/AIAnalysisComponent.tsx,39,onClick={onOpenDrawer},True
+frontend/src/views/components/employers/AppliedResumeTable/AIAnalysisComponent.tsx,66,onClick={onOpenDrawer},True
+frontend/src/views/components/employers/AppliedResumeTable/AIAnalysisComponent.tsx,93,onClick={onOpenDrawer},True
+frontend/src/views/components/employers/AppliedResumeTable/AIAnalysisComponent.tsx,114,<Button,False
+frontend/src/views/components/employers/AppliedResumeTable/AIAnalysisComponent.tsx,118,onClick={onOpenDrawer},True
+frontend/src/views/components/employers/AppliedResumeTable/index.tsx,276,<IconButton,False
+frontend/src/views/components/employers/AppliedResumeTable/index.tsx,280,onClick={() => {,True
+frontend/src/views/components/employers/AppliedResumeTable/index.tsx,308,<IconButton,False
+frontend/src/views/components/employers/AppliedResumeTable/index.tsx,311,onClick={() => {,True
+frontend/src/views/components/employers/AppliedResumeTable/index.tsx,327,<IconButton,False
+frontend/src/views/components/employers/AppliedResumeTable/index.tsx,330,onClick={() => onCreateEmployee(info.row.original)},True
+frontend/src/views/components/employers/AppliedResumeTable/index.tsx,343,<IconButton,False
+frontend/src/views/components/employers/AppliedResumeTable/index.tsx,346,onClick={() => handleDelete(info.row.original.id)},True
+frontend/src/views/components/employers/AppliedResumeTable/SendEmailComponent.tsx,73,<Button,False
+frontend/src/views/components/employers/AppliedResumeTable/SendEmailComponent.tsx,77,"onClick={() => handleOpenSendMail(email, fullName)}",True
+frontend/src/views/components/employers/CompanyCard/index.tsx,247,<Button,False
+frontend/src/views/components/employers/CompanyCard/index.tsx,252,onClick={() => logoInputRef.current?.click()},True
+frontend/src/views/components/employers/CompanyCard/index.tsx,308,<Button,False
+frontend/src/views/components/employers/CompanyCard/index.tsx,313,onClick={() => coverInputRef.current?.click()},True
+frontend/src/views/components/employers/CompanyCard/index.tsx,347,<Button,False
+frontend/src/views/components/employers/CompanyImageCard/index.tsx,207,"<IconButton size=""small"" onClick={() => handlePreview(file)} sx={{ color: 'white', bgcolor: 'rgba(25",True
+frontend/src/views/components/employers/CompanyImageCard/index.tsx,212,"<IconButton size=""small"" onClick={() => handleDelete(file)} sx={{ color: 'error.main', bgcolor: 'rgb",True
+frontend/src/views/components/employers/CompanyImageCard/index.tsx,223,onClick={() => fileInputRef.current?.click()},True
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,257,"<Button variant=""contained"" startIcon={<AddIcon />} onClick={openCreateRole} sx={{ textTransform: 'n",True
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,286,"<IconButton size=""small"" disabled={isSystemRole(role)} onClick={() => openEditRole(role)}><EditIcon ",True
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,291,"<IconButton size=""small"" color=""error"" disabled={isSystemRole(role)} onClick={() => handleDeleteRole",True
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,314,"<Button variant=""contained"" startIcon={<AddIcon />} onClick={openCreateMember} disabled={roles.lengt",True
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,344,"<IconButton size=""small"" onClick={() => openEditMember(member)}><EditIcon fontSize=""small"" /></IconB",True
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,347,"<IconButton size=""small"" color=""error"" onClick={() => handleDeleteMember(member)}>",True
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,393,<Button onClick={() => setRoleDialogOpen(false)}>{t('common:actions.cancel')}</Button>,True
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,394,"<Button variant=""contained"" disabled={!roleForm.code.trim() || !roleForm.name.trim() || isSaving} on",True
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,426,<Button onClick={() => setMemberDialogOpen(false)}>{t('common:actions.cancel')}</Button>,True
+frontend/src/views/components/employers/CompanyTeamCard/index.tsx,427,"<Button variant=""contained"" disabled={!memberForm.userId || !memberForm.roleId || isSaving} onClick=",True
+frontend/src/views/components/employers/InterviewCreateCard/index.tsx,294,<Button,False
+frontend/src/views/components/employers/InterviewCreateCard/index.tsx,295,onClick={() => setIsQuestionDialogOpen(false)},True
+frontend/src/views/components/employers/InterviewCreateCard/index.tsx,301,<Button,False
+frontend/src/views/components/employers/InterviewCreateCard/index.tsx,302,onClick={handleSaveQuestion},True
+frontend/src/views/components/employers/InterviewCreateCard/InterviewCreateCardQuestionSection.tsx,207,<Button,False
+frontend/src/views/components/employers/InterviewCreateCard/InterviewCreateCardQuestionSection.tsx,211,onClick={onOpenAddQuestion},True
+frontend/src/views/components/employers/InterviewCreateCard/InterviewCreateCardQuestionSection.tsx,216,<Button,False
+frontend/src/views/components/employers/InterviewCreateCard/InterviewCreateCardQuestionSection.tsx,222,onClick={onOpenEditQuestion},True
+frontend/src/views/components/employers/InterviewCreateCard/InterviewCreateCardQuestionSection.tsx,233,<Button,False
+frontend/src/views/components/employers/InterviewCreateCard/InterviewCreateCardQuestionSection.tsx,234,onClick={onCancel},True
+frontend/src/views/components/employers/InterviewCreateCard/InterviewCreateCardQuestionSection.tsx,242,<Button,False
+frontend/src/views/components/employers/InterviewDetailCard/index.tsx,185,"<Button variant=""contained"" onClick={onBack} sx={{ fontWeight: 800, px: 3, textTransform: 'none' }}>",True
+frontend/src/views/components/employers/InterviewDetailCard/InterviewAiEvaluationCard.tsx,127,<Button,False
+frontend/src/views/components/employers/InterviewDetailCard/InterviewAiEvaluationCard.tsx,130,onClick={onTriggerAi},True
+frontend/src/views/components/employers/InterviewDetailCard/InterviewAiEvaluationCard.tsx,164,<Button,False
+frontend/src/views/components/employers/InterviewDetailCard/InterviewAiEvaluationCard.tsx,166,onClick={onTriggerAi},True
+frontend/src/views/components/employers/InterviewDetailCard/InterviewDetailHeader.tsx,92,<IconButton,False
+frontend/src/views/components/employers/InterviewDetailCard/InterviewDetailHeader.tsx,93,onClick={onBack},True
+frontend/src/views/components/employers/InterviewDetailCard/InterviewDetailHeader.tsx,110,onClick={onBack},True
+frontend/src/views/components/employers/InterviewDetailCard/InterviewDetailHeader.tsx,227,<Button,False
+frontend/src/views/components/employers/InterviewDetailCard/InterviewDetailHeader.tsx,229,onClick={onForceEndInterview},True
+frontend/src/views/components/employers/InterviewDetailCard/InterviewDetailHeader.tsx,250,<Button,False
+frontend/src/views/components/employers/InterviewDetailCard/InterviewDetailHeader.tsx,252,onClick={onTriggerObserver},True
+frontend/src/views/components/employers/InterviewDetailCard/InterviewDetailHeader.tsx,274,<Button,False
+frontend/src/views/components/employers/InterviewDetailCard/InterviewDetailHeader.tsx,277,onClick={onJoinRoom},True
+frontend/src/views/components/employers/InterviewDetailCard/InterviewHrEvaluationForm.tsx,156,<Button,False
+frontend/src/views/components/employers/InterviewDetailCard/InterviewHrEvaluationForm.tsx,161,onClick={onSubmit},True
+frontend/src/views/components/employers/InterviewDetailCard/InterviewObserverDialogHeader.tsx,90,<Button,False
+frontend/src/views/components/employers/InterviewDetailCard/InterviewObserverDialogHeader.tsx,91,onClick={onClose},True
+frontend/src/views/components/employers/InterviewDetailCard/InterviewRecordingCard.tsx,54,<Button,False
+frontend/src/views/components/employers/InterviewListCard/index.tsx,126,<Button,False
+frontend/src/views/components/employers/InterviewListCard/useInterviewListCardColumns.tsx,167,<IconButton,False
+frontend/src/views/components/employers/InterviewListCard/useInterviewListCardColumns.tsx,184,<IconButton,False
+frontend/src/views/components/employers/InterviewListCard/useInterviewListCardColumns.tsx,202,<IconButton,False
+frontend/src/views/components/employers/InterviewListCard/useInterviewListCardColumns.tsx,203,onClick={() => onCancel(session.roomName)},True
+frontend/src/views/components/employers/InterviewListCard/useInterviewListCardColumns.tsx,218,<IconButton,False
+frontend/src/views/components/employers/InterviewListCard/useInterviewListCardColumns.tsx,219,onClick={() => onDelete(session.id)},True
+frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx,102,<Button,False
+frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx,107,onClick={onLeaveHR},True
+frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx,183,<Button,False
+frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx,188,onClick={onJoinAsHR},True
+frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx,198,"<Button size=""small"" variant=""outlined"" startIcon={<FullscreenIcon />} onClick={onOpenFullscreen} sx",True
+frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx,202,<Button,False
+frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx,207,onClick={() => onForceEnd(session)},True
+frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx,261,<IconButton onClick={onCloseFullscreen} sx={{ color: '#fff' }}>,True
+frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx,312,"<Button variant=""contained"" color=""error"" startIcon={<StopCircleIcon />} onClick={() => onForceEnd(s",True
+frontend/src/views/components/employers/JobPostCard/index.tsx,356,<Button,False
+frontend/src/views/components/employers/JobPostCard/index.tsx,360,onClick={() => setExportModalOpen(true)},True
+frontend/src/views/components/employers/JobPostCard/index.tsx,371,<Button,False
+frontend/src/views/components/employers/JobPostCard/index.tsx,375,onClick={handleShowAdd},True
+frontend/src/views/components/employers/JobPostCard/index.tsx,395,"<Button color=""inherit"" size=""small"" href={verificationHref}>",False
+frontend/src/views/components/employers/JobPostFilterForm/index.tsx,84,<IconButton,False
+frontend/src/views/components/employers/JobPostFilterForm/index.tsx,86,onClick={() => {,True
+frontend/src/views/components/employers/JobPostFilterForm/index.tsx,103,<Button,False
+frontend/src/views/components/employers/JobPostsTable/index.tsx,95,onClick={() => onOpenAiRecommendation?.(job)},True
+frontend/src/views/components/employers/JobPostsTable/index.tsx,122,onClick={() => onOpenAiRecommendation?.(job)},True
+frontend/src/views/components/employers/JobPostsTable/index.tsx,296,<IconButton,False
+frontend/src/views/components/employers/JobPostsTable/index.tsx,298,onClick={() => handleUpdate(info.row.original.slug || info.row.original.id)},True
+frontend/src/views/components/employers/JobPostsTable/index.tsx,309,<IconButton,False
+frontend/src/views/components/employers/JobPostsTable/index.tsx,311,onClick={() => handleDelete(info.row.original.slug || info.row.original.id)},True
+frontend/src/views/components/employers/ProfileDetailCard/index.tsx,556,<Button,False
+frontend/src/views/components/employers/ProfileDetailCard/index.tsx,566,<Button,False
+frontend/src/views/components/employers/ProfileDetailCard/index.tsx,689,<Button,False
+frontend/src/views/components/employers/ProfileDetailCard/index.tsx,705,<Button,False
+frontend/src/views/components/employers/ProfileSearch/index.tsx,155,<Button,False
+frontend/src/views/components/employers/ProfileSearch/index.tsx,217,<Button,False
+frontend/src/views/components/employers/ProfileSearch/index.tsx,221,onClick={handleReset},True
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,148,<IconButton,False
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,150,onClick={() => handleOpen(row.original)},True
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,160,<IconButton,False
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,162,onClick={() => handleDelete(row.original.id)},True
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,187,<Button,False
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,191,onClick={() => handleOpen()},True
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,237,<Button,False
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,238,onClick={handleClose},True
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,244,<Button,False
+frontend/src/views/components/employers/QuestionBankCard/index.tsx,245,onClick={handleSubmit},True
+frontend/src/views/components/employers/QuestionGroupsCard/index.tsx,206,"<IconButton size=""small"" onClick={() => handleOpenEdit(row.original)} color=""primary"">",True
+frontend/src/views/components/employers/QuestionGroupsCard/index.tsx,209,"<IconButton size=""small"" onClick={() => handleDelete(row.original)} color=""error"">",True
+frontend/src/views/components/employers/QuestionGroupsCard/index.tsx,225,"<Button variant=""contained"" color=""primary"" startIcon={<AddIcon />} onClick={handleOpenAdd} sx={{ px",True
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,152,<Button,False
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,155,onClick={onOpenCreateQuestion},True
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,164,"<Button onClick={onCloseDialog} color=""inherit"" sx={{ fontWeight: 700, textTransform: 'none', px: 3 ",True
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,167,<Button,False
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,168,onClick={onSaveGroup},True
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,202,"<Button onClick={onCloseCreateQuestion} color=""inherit"" sx={{ fontWeight: 700, textTransform: 'none'",True
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,205,<Button,False
+frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx,206,onClick={onCreateQuestion},True
+frontend/src/views/components/employers/SavedResumeCard/index.tsx,181,<Button,False
+frontend/src/views/components/employers/SavedResumeCard/index.tsx,185,onClick={() => setExportModalOpen(true)},True
+frontend/src/views/components/employers/SavedResumeFilterForm/index.tsx,95,<IconButton,False
+frontend/src/views/components/employers/SavedResumeFilterForm/index.tsx,97,onClick={onReset},True
+frontend/src/views/components/employers/SavedResumeFilterForm/index.tsx,111,<Button,False
+frontend/src/views/components/employers/SavedResumeTable/index.tsx,189,<IconButton,False
+frontend/src/views/components/employers/SavedResumeTable/index.tsx,193,onClick={() => {,True
+frontend/src/views/components/employers/SavedResumeTable/index.tsx,208,<Button,False
+frontend/src/views/components/employers/SavedResumeTable/index.tsx,221,onClick={() => {,True
+frontend/src/views/components/jobSeekers/AdvancedSkillCard/AdvancedSkillCardTable.tsx,35,<IconButton,False
+frontend/src/views/components/jobSeekers/AdvancedSkillCard/AdvancedSkillCardTable.tsx,45,onClick={() => onEdit(info.row.original.id)},True
+frontend/src/views/components/jobSeekers/AdvancedSkillCard/AdvancedSkillCardTable.tsx,49,<IconButton,False
+frontend/src/views/components/jobSeekers/AdvancedSkillCard/AdvancedSkillCardTable.tsx,59,onClick={() => onDelete(info.row.original.id)},True
+frontend/src/views/components/jobSeekers/AdvancedSkillCard/index.tsx,220,onClick={handleShowAdd},True
+frontend/src/views/components/jobSeekers/AdvancedSkillCard/index.tsx,238,<EmptyCard content={t('jobSeeker:profile.messages.noSkillData')} onClick={handleShowAdd} />,True
+frontend/src/views/components/jobSeekers/AppliedJobCard/index.tsx,113,<Button,False
+frontend/src/views/components/jobSeekers/BoxProfile/CVDocDownloadButton.tsx,84,onClick={handleDownload},True
+frontend/src/views/components/jobSeekers/BoxProfile/index.tsx,174,onClick={() => handleActive(resume.slug)},True
+frontend/src/views/components/jobSeekers/BoxProfile/index.tsx,187,onClick={() => handleActive(resume.slug)},True
+frontend/src/views/components/jobSeekers/BoxProfile/index.tsx,310,<Button,False
+frontend/src/views/components/jobSeekers/BoxProfile/index.tsx,314,onClick={() => {,True
+frontend/src/views/components/jobSeekers/CandidateDashboard/CandidateCVCard.tsx,120,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboard/CandidateCVCard.tsx,122,onClick={handleUploadClick},True
+frontend/src/views/components/jobSeekers/CandidateDashboard/CandidateExperienceCard.tsx,68,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboard/CandidateExperienceCard.tsx,124,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboard/CandidateHeroCard.tsx,86,<IconButton,False
+frontend/src/views/components/jobSeekers/CandidateDashboard/CandidateHeroCard.tsx,241,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboard/CandidateOverviewCard.tsx,132,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboard/CandidateSkillsCard.tsx,57,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboard/CandidateSkillsCard.tsx,104,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/AiRecommendedJobsSection.tsx,99,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/AiRecommendedJobsSection.tsx,232,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,168,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,171,onClick={() => fileInputRef.current?.click()},True
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,191,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,194,onClick={() => fileInputRef.current?.click()},True
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,266,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,269,onClick={() => handleOpenPreview(item)},True
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,286,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,289,onClick={() => handleOpenEdit(item)},True
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,307,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,310,onClick={() => handleOpenDelete(item)},True
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,369,"<Button onClick={() => setEditOpen(false)} sx={{ color: '#64748b', fontWeight: 700, borderRadius: '1",True
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,372,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,374,onClick={handleSaveTitle},True
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,397,"<Button onClick={() => setDeleteOpen(false)} sx={{ color: '#64748b', fontWeight: 700, borderRadius: ",True
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,400,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx,403,onClick={handleConfirmDelete},True
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateCompletenessBannerCard.tsx,152,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateCvScoreCard.tsx,91,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateQuickSupportCard.tsx,35,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateRecommendedJobsCard.tsx,125,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateRecommendedJobsCard.tsx,190,<Button,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateRecommendedJobsCard.tsx,327,<IconButton,False
+frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateRecommendedJobsCard.tsx,329,"onClick={(e) => handleToggleSave(e, job.id, job.jobName, job.slug)}",True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateEditProfileModal.tsx,176,"<IconButton onClick={onClose} size=""small"" sx={{ color: '#64748b' }}>",True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateEditProfileModal.tsx,380,"<Button onClick={onClose} sx={{ color: '#64748b', fontWeight: 700, borderRadius: '10px' }}>",True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateEditProfileModal.tsx,383,<Button,False
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateProfileHeroBanner.tsx,161,<Button,False
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateProfileHeroBanner.tsx,163,onClick={() => coverInputRef.current?.click()},True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateProfileHeroBanner.tsx,223,<IconButton,False
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateProfileHeroBanner.tsx,225,onClick={() => avatarInputRef.current?.click()},True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateProfileHeroBanner.tsx,292,<Button,False
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateProfileHeroBanner.tsx,295,onClick={onEditClick},True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateProfileHeroBanner.tsx,316,<Button,False
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateProfileHeroBanner.tsx,319,onClick={onViewCvClick},True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateProfileHeroBanner.tsx,341,<Button,False
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateProfileHeroBanner.tsx,344,onClick={onDownloadCvClick},True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateResumePreviewModal.tsx,101,<Button,False
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateResumePreviewModal.tsx,104,onClick={() => window.print()},True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateResumePreviewModal.tsx,110,"<IconButton onClick={onClose} size=""small"" sx={{ color: '#64748b', backgroundColor: '#f1f5f9', '&:ho",True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateResumePreviewModal.tsx,259,"<Button onClick={onClose} sx={{ color: '#64748b', fontWeight: 700, borderRadius: '10px' }}>",True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateSkillsCard.tsx,67,"<IconButton size=""small"" onClick={() => setOpenModal(true)} sx={{ color: '#64748b' }}>",True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateSkillsCard.tsx,98,<Button,False
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateSkillsCard.tsx,101,onClick={() => setOpenModal(true)},True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateSkillsCard.tsx,148,<Button,False
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateSkillsCard.tsx,150,onClick={handleAddSkill},True
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateSkillsCard.tsx,170,<Button,False
+frontend/src/views/components/jobSeekers/CandidateProfile/CandidateSkillsCard.tsx,172,onClick={() => setOpenModal(false)},True
+frontend/src/views/components/jobSeekers/CertificateCard/index.tsx,264,onClick={handleShowAdd},True
+frontend/src/views/components/jobSeekers/CertificateCard/index.tsx,282,<EmptyCard content={t('jobSeeker:profile.messages.noCertificateData')} onClick={handleShowAdd} />,True
+frontend/src/views/components/jobSeekers/CertificateCard/index.tsx,332,<IconButton,False
+frontend/src/views/components/jobSeekers/CertificateCard/index.tsx,335,onClick={() => handleShowUpdate(value.id)},True
+frontend/src/views/components/jobSeekers/CertificateCard/index.tsx,343,<IconButton,False
+frontend/src/views/components/jobSeekers/CertificateCard/index.tsx,346,onClick={() => handleDeleteCertificates(value.id)},True
+frontend/src/views/components/jobSeekers/CompanyFollowedCard/index.tsx,59,<Button,False
+frontend/src/views/components/jobSeekers/CompanyFollowedCard/index.tsx,75,<Button,False
+frontend/src/views/components/jobSeekers/CompanyFollowedCard/index.tsx,80,onClick={() => handleFollow(value.company?.slug)},True
+frontend/src/views/components/jobSeekers/CVCard/index.tsx,146,"onClick={() => dispatch({ type: 'open-popup', value: true })}",True
+frontend/src/views/components/jobSeekers/EducationDetailCard/index.tsx,248,onClick={handleShowAdd},True
+frontend/src/views/components/jobSeekers/EducationDetailCard/index.tsx,266,<EmptyCard content={t('profile.messages.noEducationData')} onClick={handleShowAdd} />,True
+frontend/src/views/components/jobSeekers/EducationDetailCard/index.tsx,309,<IconButton,False
+frontend/src/views/components/jobSeekers/EducationDetailCard/index.tsx,319,onClick={() => handleShowUpdate(value.id)},True
+frontend/src/views/components/jobSeekers/EducationDetailCard/index.tsx,324,<IconButton,False
+frontend/src/views/components/jobSeekers/EducationDetailCard/index.tsx,334,onClick={() => handleDeleteEducationDetail(value.id)},True
+frontend/src/views/components/jobSeekers/ExperienceDetailCard/ExperienceDetailTimelineItem.tsx,56,<IconButton,False
+frontend/src/views/components/jobSeekers/ExperienceDetailCard/ExperienceDetailTimelineItem.tsx,66,onClick={() => onEdit(value.id)},True
+frontend/src/views/components/jobSeekers/ExperienceDetailCard/ExperienceDetailTimelineItem.tsx,71,<IconButton,False
+frontend/src/views/components/jobSeekers/ExperienceDetailCard/ExperienceDetailTimelineItem.tsx,81,onClick={() => onDelete(value.id)},True
+frontend/src/views/components/jobSeekers/ExperienceDetailCard/index.tsx,215,onClick={handleShowAdd},True
+frontend/src/views/components/jobSeekers/ExperienceDetailCard/index.tsx,233,<EmptyCard content={t('jobSeeker:profile.messages.noExperienceData')} onClick={handleShowAdd} />,True
+frontend/src/views/components/jobSeekers/GeneralInfoCard/GeneralInfoCardContent.tsx,69,onClick={onEdit},True
+frontend/src/views/components/jobSeekers/JobApplicationCard/index.tsx,50,<IconButton,False
+frontend/src/views/components/jobSeekers/JobApplicationCard/index.tsx,53,onClick={() =>,True
+frontend/src/views/components/jobSeekers/JobPostNotificationCard/index.tsx,131,<Button,False
+frontend/src/views/components/jobSeekers/JobPostNotificationCard/index.tsx,134,onClick={handleShowAdd},True
+frontend/src/views/components/jobSeekers/JobPostNotificationCard/index.tsx,163,"<Button variant=""contained"" color=""primary"" onClick={handleShowAdd}>",True
+frontend/src/views/components/jobSeekers/JobPostNotificationCard/ItemComponent.tsx,174,<IconButton,False
+frontend/src/views/components/jobSeekers/JobPostNotificationCard/ItemComponent.tsx,176,onClick={() => handleShowUpdate(id)},True
+frontend/src/views/components/jobSeekers/JobPostNotificationCard/ItemComponent.tsx,189,<IconButton,False
+frontend/src/views/components/jobSeekers/JobPostNotificationCard/ItemComponent.tsx,191,onClick={() => handleDelete(id)},True
+frontend/src/views/components/jobSeekers/LanguageSkillCard/index.tsx,216,onClick={handleShowAdd},True
+frontend/src/views/components/jobSeekers/LanguageSkillCard/useLanguageSkillCardColumns.tsx,37,<IconButton,False
+frontend/src/views/components/jobSeekers/LanguageSkillCard/useLanguageSkillCardColumns.tsx,47,onClick={() => onEdit(info.row.original.id)},True
+frontend/src/views/components/jobSeekers/LanguageSkillCard/useLanguageSkillCardColumns.tsx,51,<IconButton,False
+frontend/src/views/components/jobSeekers/LanguageSkillCard/useLanguageSkillCardColumns.tsx,61,onClick={() => onDelete(info.row.original.id)},True
+frontend/src/views/components/jobSeekers/PersonalInfoCard/index.tsx,223,onClick={() => dispatch({ type: 'open_popup' })},True
+frontend/src/views/components/jobSeekers/ProfileUpload/ProfileUploadResumeGrid.tsx,61,<Button,False
+frontend/src/views/components/jobSeekers/ProfileUpload/ProfileUploadResumeGrid.tsx,64,onClick={onOpenPopup},True
+frontend/src/views/components/jobSeekers/SavedJobCard/index.tsx,74,<Button,False
+frontend/src/views/components/jobSeekers/SavedJobCard/index.tsx,101,<Button,False
+frontend/src/views/components/jobSeekers/SavedJobCard/index.tsx,107,onClick={() => handleSave(value.slug)},True
+frontend/src/views/components/jobSeekers/SidebarViewTotal/index.tsx,74,<Button,False
+frontend/src/views/components/jobSeekers/SidebarViewTotal/index.tsx,77,onClick={() => push(jobsHref)},True
+frontend/src/views/components/settings/SettingCard/index.tsx,93,<Button,False
+frontend/src/views/defaultPages/AboutUsPage/index.tsx,143,<Button,False
+frontend/src/views/defaultPages/AboutUsPage/index.tsx,218,<Button,False
+frontend/src/views/defaultPages/CompanyDetailPage/CompanyHeader.tsx,140,onClick={handleFollow},True
+frontend/src/views/defaultPages/CompanyDetailPage/CompanyHeader.tsx,154,<Button,False
+frontend/src/views/defaultPages/CompanyDetailPage/CompanyHeader.tsx,158,onClick={() => setOpenSharePopup(true)},True
+frontend/src/views/defaultPages/CompanyDetailPage/CompanyHeader.tsx,164,<Button,False
+frontend/src/views/defaultPages/CompanyDetailPage/CompanyHeader.tsx,168,onClick={() => setOpenReportPopup(true)},True
+frontend/src/views/defaultPages/CompanyDetailPage/CompanySidebar.tsx,67,"<IconButton component=""a"" color=""primary"" aria-label=""facebook"" href={safeFacebookUrl} target=""_blan",False
+frontend/src/views/defaultPages/CompanyDetailPage/CompanySidebar.tsx,72,"<IconButton component=""a"" color=""primary"" aria-label=""youtube"" href={safeYoutubeUrl} target=""_blank""",False
+frontend/src/views/defaultPages/CompanyDetailPage/CompanySidebar.tsx,77,"<IconButton component=""a"" color=""primary"" aria-label=""linkedin"" href={safeLinkedinUrl} target=""_blan",False
+frontend/src/views/defaultPages/HomePage/index.tsx,173,<Button,False
+frontend/src/views/defaultPages/JobDetailPage/index.tsx,281,<Button,False
+frontend/src/views/defaultPages/JobDetailPage/index.tsx,285,onClick={handleMobileApplyClick},True
+frontend/src/views/defaultPages/JobDetailPage/components/JobDetailActions.tsx,57,<Button,False
+frontend/src/views/defaultPages/JobDetailPage/components/JobDetailActions.tsx,62,onClick={handleApplyClick},True
+frontend/src/views/defaultPages/JobDetailPage/components/JobDetailActions.tsx,67,<Button,False
+frontend/src/views/defaultPages/JobDetailPage/components/JobDetailActions.tsx,68,onClick={handleSave},True
+frontend/src/views/defaultPages/JobDetailPage/components/JobDetailActions.tsx,90,<Button,False
+frontend/src/views/defaultPages/JobDetailPage/components/JobDetailActions.tsx,93,onClick={() => setOpenSharePopup(true)},True
+frontend/src/views/defaultPages/JobDetailPage/components/JobDetailActions.tsx,100,<Button,False
+frontend/src/views/defaultPages/JobDetailPage/components/JobDetailActions.tsx,103,onClick={onOpenReport},True
+frontend/src/views/defaultPages/JobDetailPage/components/JobDetailSidebar.tsx,96,<Button,False
+frontend/src/views/defaultPages/NewsPage/ArticleDetailPage.tsx,198,onClick={() => push(newsListHref)},True
+frontend/src/views/defaultPages/NewsPage/ArticleDetailPage.tsx,209,<Button,False
+frontend/src/views/defaultPages/NewsPage/ArticleDetailPage.tsx,441,<Button,False
+frontend/src/views/defaultPages/NewsPage/index.tsx,98,<Button,False
+frontend/src/views/defaultPages/NewsPage/index.tsx,101,onClick={() => onSelectCategory(cat.slug)},True
+frontend/src/views/defaultPages/NewsPage/index.tsx,376,onClick={() => handleSelectCategory('all')},True
+frontend/src/views/defaultPages/NewsPage/index.tsx,394,onClick={() => handleSelectCategory(cat.slug)},True
+frontend/src/views/defaultPages/NewsPage/index.tsx,545,<Button,False
+frontend/src/views/defaultPages/StaticInfoPage/index.tsx,209,"<Button type=""submit"" variant=""contained"" disabled={isSubmitting} sx={{ minWidth: 180 }}>",False
+frontend/src/views/employerPages/BlogPage/EmployerBlogFormPage.tsx,214,<IconButton onClick={() => push('/employer/blog')} sx={{ bgcolor: 'action.hover' }}>,True
+frontend/src/views/employerPages/BlogPage/EmployerBlogFormPage.tsx,226,<Button,False
+frontend/src/views/employerPages/BlogPage/EmployerBlogFormPage.tsx,229,onClick={() => handleSave(false)},True
+frontend/src/views/employerPages/BlogPage/EmployerBlogFormPage.tsx,235,<Button,False
+frontend/src/views/employerPages/BlogPage/EmployerBlogFormPage.tsx,238,onClick={() => handleSave(true)},True
+frontend/src/views/employerPages/BlogPage/EmployerBlogFormPage.tsx,298,"<IconButton size=""small""",False
+frontend/src/views/employerPages/BlogPage/EmployerBlogFormPage.tsx,300,onClick={() => dispatch({ type: 'clearThumbnail' })}>,True
+frontend/src/views/employerPages/BlogPage/EmployerBlogFormPage.tsx,303,"<Button size=""small"" fullWidth startIcon={<ImageIcon />} onClick={() => fileInputRef.current?.click(",True
+frontend/src/views/employerPages/BlogPage/EmployerBlogFormPage.tsx,308,"<Button variant=""outlined"" fullWidth startIcon={<ImageIcon />}",False
+frontend/src/views/employerPages/BlogPage/EmployerBlogFormPage.tsx,309,onClick={() => fileInputRef.current?.click()},True
+frontend/src/views/employerPages/BlogPage/EmployerBlogFormPage.tsx,326,"<Button size=""small"" variant=""outlined"" onClick={addTag}>{t('blog.actions.addTag')}</Button>",True
+frontend/src/views/employerPages/BlogPage/index.tsx,184,"<IconButton size=""small"" onClick={() => push(`/employer/blog/${row.original.id}`)}>",True
+frontend/src/views/employerPages/BlogPage/index.tsx,189,"<IconButton size=""small"" color=""error"" onClick={() => handleDelete(row.original.id, row.original.tit",True
+frontend/src/views/employerPages/BlogPage/index.tsx,210,<Button,False
+frontend/src/views/employerPages/BlogPage/index.tsx,213,onClick={() => push('/employer/blog/create')},True
+frontend/src/views/employerPages/InterviewPages/InterviewHistoryPage.tsx,122,<Button,False
+frontend/src/views/employerPages/InterviewPages/InterviewHistoryPage.tsx,261,<Button,False
+frontend/src/views/employerPages/InterviewPages/InterviewHistoryPage.tsx,286,<IconButton,False
+frontend/src/views/employerPages/InterviewPages/InterviewHistoryPage.tsx,315,<Button,False
+frontend/src/views/employerPages/InterviewPages/InterviewHistoryPage.tsx,317,onClick={fetchSessions},True
+frontend/src/views/employerPages/InterviewPages/InterviewLivePage.tsx,162,<Button,False
+frontend/src/views/employerPages/InterviewPages/InterviewLivePage.tsx,165,onClick={() => dispatch({ type: 'toggle-auto-refresh' })},True
+frontend/src/views/employerPages/InterviewPages/InterviewLivePage.tsx,170,<Button,False
+frontend/src/views/employerPages/InterviewPages/InterviewLivePage.tsx,173,onClick={() => fetchSessions()},True
+frontend/src/views/employerPages/InterviewPages/InterviewLivePage.tsx,188,"<Button color=""inherit"" size=""small"" onClick={() => fetchSessions()}>",True
+frontend/src/views/employerPages/InterviewPages/components/QuestionGroupTable.tsx,67,"<IconButton size=""small"" onClick={() => onEdit(info.row.original)} color=""primary"">",True
+frontend/src/views/employerPages/InterviewPages/components/QuestionGroupTable.tsx,72,"<IconButton size=""small"" onClick={() => onDelete(info.row.original)} color=""error"">",True
+frontend/src/views/employerPages/IntroducePage/index.tsx,200,<Button,False
+frontend/src/views/employerPages/PricingPage/index.tsx,115,<Button,False
+frontend/src/views/employerPages/ProfileDetailPage/index.tsx,21,<Button,False
+frontend/src/views/employerPages/ProfileDetailPage/index.tsx,23,onClick={() => back()},True
+frontend/src/views/employerPages/VerificationPage/components/VerificationIntroCard.tsx,100,"<Button variant=""outlined"" onClick={() => push(companyHref)}>",True
+frontend/src/views/employerPages/VerificationPage/components/VerificationLegalProfileForm.tsx,145,onClick={() => fileInputRef.current?.click()},True
+frontend/src/views/employerPages/VerificationPage/components/VerificationLegalProfileForm.tsx,178,<Button,False
+frontend/src/views/employerPages/VerificationPage/components/VerificationLegalProfileForm.tsx,183,onClick={(e) => e.stopPropagation()},True
+frontend/src/views/employerPages/VerificationPage/components/VerificationLegalProfileForm.tsx,189,<Button,False
+frontend/src/views/employerPages/VerificationPage/components/VerificationLegalProfileForm.tsx,214,<Button,False
+frontend/src/views/errorsPage/ForbiddenPage/index.tsx,76,<Button,False
+frontend/src/views/errorsPage/ForbiddenPage/index.tsx,79,onClick={() => push('/')},True
+frontend/src/views/errorsPage/NotFoundPage/index.tsx,74,<Button,False
+frontend/src/views/errorsPage/NotFoundPage/index.tsx,77,onClick={() => push('/')},True
+frontend/src/views/errorsPage/SystemErrorPage/index.tsx,75,<Button,False
+frontend/src/views/errorsPage/SystemErrorPage/index.tsx,78,onClick={() => window.location.reload()},True
+frontend/src/views/errorsPage/SystemErrorPage/index.tsx,91,<Button,False
+frontend/src/views/errorsPage/SystemErrorPage/index.tsx,94,onClick={() => push('/')},True
+frontend/src/views/hrmPages/DepartmentListPage/index.tsx,90,"<Button variant=""contained"" startIcon={<AddIcon />} onClick={() => setOpenDeptModal(true)}>",True
+frontend/src/views/hrmPages/DepartmentListPage/index.tsx,189,<Button onClick={() => setOpenDeptModal(false)}>Hủy</Button>,True
+frontend/src/views/hrmPages/DepartmentListPage/index.tsx,190,"<Button variant=""contained"" onClick={handleCreateDept}>",True
+frontend/src/views/hrmPages/EmployeeListPage/index.tsx,109,"<Button variant=""outlined"" startIcon={<RefreshIcon />} onClick={fetchData} disabled={loading}>",True
+frontend/src/views/hrmPages/EmployeeListPage/index.tsx,112,"<Button variant=""contained"" color=""primary"" startIcon={<AddIcon />}>",False
+frontend/src/views/hrmPages/EmployeeListPage/index.tsx,196,<TableRow key={emp.id} hover sx={{ cursor: 'pointer' }} onClick={() => setSelectedEmp(emp)}>,True
+frontend/src/views/hrmPages/EmployeeListPage/index.tsx,254,"<Button size=""small"" variant=""outlined"" onClick={(e) => { e.stopPropagation(); setSelectedEmp(emp); ",True
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,264,<Button,False
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,267,onClick={fetchData},True
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,272,<Button,False
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,276,onClick={() => setOpenOnboardModal(true)},True
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,280,<Button,False
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,284,onClick={() => setOpenAddEmpModal(true)},True
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,551,<Button,False
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,554,onClick={() => setOpenAddDeptModal(true)},True
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,642,"<IconButton color=""success"" size=""small"" onClick={() => handleApproveLeave(leave.id)}>",True
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,647,"<IconButton color=""error"" size=""small"" onClick={() => handleRejectLeave(leave.id)}>",True
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,761,<Button onClick={() => setOpenAddEmpModal(false)}>Hủy</Button>,True
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,762,"<Button variant=""contained"" onClick={handleCreateEmployee}>",True
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,796,<Button onClick={() => setOpenAddDeptModal(false)}>Hủy</Button>,True
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,797,"<Button variant=""contained"" onClick={handleCreateDepartment}>",True
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,869,<Button onClick={() => setOpenOnboardModal(false)}>Hủy</Button>,True
+frontend/src/views/hrmPages/HrmDashboardPage/index.tsx,870,"<Button variant=""contained"" color=""secondary"" onClick={handleOnboardCandidate}>",True
+frontend/src/views/hrmPages/LeaveListPage/index.tsx,169,<Button,False
+frontend/src/views/hrmPages/LeaveListPage/index.tsx,174,onClick={() => handleApprove(leave.id)},True
+frontend/src/views/hrmPages/LeaveListPage/index.tsx,178,<Button,False
+frontend/src/views/hrmPages/LeaveListPage/index.tsx,183,onClick={() => handleReject(leave.id)},True
+frontend/src/views/hrmPages/OnboardingPage/index.tsx,128,<Button,False
+frontend/src/views/hrmPages/OnboardingPage/index.tsx,132,onClick={() => setOpenModal(true)},True
+frontend/src/views/hrmPages/OnboardingPage/index.tsx,353,<Button onClick={() => setOpenModal(false)}>Hủy</Button>,True
+frontend/src/views/hrmPages/OnboardingPage/index.tsx,354,"<Button variant=""contained"" color=""secondary"" onClick={handleOnboardSubmit}>",True
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,94,<button,False
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,97,onClick={() => localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)},True
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,103,<button,False
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,106,onClick={() => localParticipant.setCameraEnabled(!isCameraEnabled)},True
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,112,<button,False
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,115,onClick={() => localParticipant.setScreenShareEnabled(!isScreenShareEnabled)},True
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,121,<button,False
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,124,onClick={() => setChatOpen(!chatOpen)},True
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,131,<button,False
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,133,onClick={async () => {,True
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,517,<button,False
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,520,onClick={onCloseChat},True
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,668,<Button,False
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,672,onClick={takeoverActive ? onTakeoverRelease : onTakeoverAcquire},True
+frontend/src/views/interviewPages/AIInterviewLayout.tsx,698,<Button,False
+frontend/src/views/interviewPages/InterviewSessionPage.tsx,211,"<Button variant=""contained"" sx={{ bgcolor: '#0f172a', '&:hover': { bgcolor: '#111827' } }} onClick={",True
+frontend/src/views/interviewPages/InterviewSessionPage.tsx,397,<Button,False
+frontend/src/views/interviewPages/InterviewSessionPage.tsx,399,onClick={actions.onShowPreflight},True
+frontend/src/views/interviewPages/InterviewSessionPage.tsx,417,<Button,False
+frontend/src/views/interviewPages/InterviewSessionPage.tsx,419,onClick={actions.onBack},True
+frontend/src/views/interviewPages/InterviewSessionPage.tsx,426,<Button,False
+frontend/src/views/interviewPages/InterviewSessionPage.tsx,428,onClick={actions.onBackHome},True
+frontend/src/views/interviewPages/PreflightRoom.tsx,273,<Button,False
+frontend/src/views/interviewPages/PreflightRoom.tsx,275,onClick={onCancel},True
+frontend/src/views/interviewPages/PreflightRoom.tsx,288,<Button,False
+frontend/src/views/interviewPages/PreflightRoom.tsx,290,onClick={onJoin},True
+frontend/src/views/jobSeekerPages/VoiceAiInterviewRedirectPage.tsx,56,"<Button variant=""contained"" onClick={() => push(targetUrl)}>",True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,230,onClick={handleOpenEmailDialog},True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,268,onClick={handleOpenPasswordDialog},True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,300,onClick={handleOpenPhoneDialog},True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,394,onClick={() => setLangDialogOpen(true)},True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,421,<Button,False
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,424,onClick={() => setLogoutDialogOpen(true)},True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,469,"<Button onClick={() => setEmailDialogOpen(false)} sx={{ color: '#64748b', fontWeight: 700, borderRad",True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,472,<Button,False
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,474,onClick={handleSaveEmail},True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,511,"<Button onClick={() => setPhoneDialogOpen(false)} sx={{ color: '#64748b', fontWeight: 700, borderRad",True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,514,<Button,False
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,516,onClick={handleSavePhone},True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,552,"<IconButton onClick={() => setShowCurrentPass(!showCurrentPass)} edge=""end"">",True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,576,"<IconButton onClick={() => setShowNewPass(!showNewPass)} edge=""end"">",True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,600,"<IconButton onClick={() => setShowConfirmPass(!showConfirmPass)} edge=""end"">",True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,612,"<Button onClick={() => setPasswordDialogOpen(false)} sx={{ color: '#64748b', fontWeight: 700, border",True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,615,<Button,False
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,617,onClick={handleSavePassword},True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,662,"<Button onClick={() => setLangDialogOpen(false)} sx={{ color: '#64748b', fontWeight: 700, borderRadi",True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,665,<Button,False
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,667,onClick={handleSaveLanguage},True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,690,"<Button onClick={() => setLogoutDialogOpen(false)} sx={{ color: '#64748b', fontWeight: 700, borderRa",True
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,693,<Button,False
+frontend/src/views/jobSeekerPages/AccountPage/index.tsx,696,onClick={handleConfirmLogout},True
+frontend/src/views/jobSeekerPages/AttachedProfilePage/index.tsx,203,onClick={() => handleClickScroll(item.id)},True
+frontend/src/views/jobSeekerPages/CandidateLoginPage/index.tsx,46,<Button,False
+frontend/src/views/jobSeekerPages/CandidateLoginPage/index.tsx,50,onClick={handleJoin},True
+frontend/src/views/jobSeekerPages/MyInterviewsPage/index.tsx,103,<Button,False
+frontend/src/views/jobSeekerPages/MyInterviewsPage/index.tsx,151,<Button,False
+frontend/src/views/jobSeekerPages/MyInterviewsPage/index.tsx,153,onClick={() => handleJoin(interview.inviteToken || '')},True
+frontend/src/views/jobSeekerPages/OnlineProfilePage/index.tsx,226,onClick={() => handleClickScroll(item.id)},True
+frontend/src/views/jobSeekerPages/ProfilePage/index.tsx,331,"<IconButton size=""small"" onClick={() => setEditModalOpen(true)} sx={{ color: '#64748b' }}>",True
+frontend/src/views/jobSeekerPages/ProfilePage/index.tsx,384,"<IconButton size=""small"" onClick={() => setEditModalOpen(true)} sx={{ color: '#64748b' }}>",True
+frontend/src/views/onboardingPages/CandidateOnboardingPage/index.tsx,517,onClick={() => fileInputRef.current?.click()},True
+frontend/src/views/onboardingPages/CandidateOnboardingPage/index.tsx,548,"<Button variant=""outlined"" size=""small"" sx={{ mt: 1 }}>",False
+frontend/src/views/onboardingPages/CandidateOnboardingPage/index.tsx,624,<Button,False
+frontend/src/views/onboardingPages/CandidateOnboardingPage/index.tsx,628,onClick={handleFinishJobs},True
+frontend/src/views/onboardingPages/CandidateOnboardingPage/index.tsx,633,<Button,False
+frontend/src/views/onboardingPages/CandidateOnboardingPage/index.tsx,637,onClick={handleFinishDashboard},True
+frontend/src/views/onboardingPages/CandidateOnboardingPage/index.tsx,649,"<Button disabled={activeStep === 0} onClick={handleBack} variant=""outlined"">",True
+frontend/src/views/onboardingPages/CandidateOnboardingPage/index.tsx,652,"<Button variant=""contained"" onClick={handleNext} size=""large"" disabled={loading || uploadingFile}>",True
+frontend/src/views/onboardingPages/EmployerOnboardingPage/index.tsx,449,onClick={() => gpkdFileInputRef.current?.click()},True
+frontend/src/views/onboardingPages/EmployerOnboardingPage/index.tsx,477,"<Button variant=""text"" color=""inherit"" onClick={handleSkipGpkd}>",True
+frontend/src/views/onboardingPages/EmployerOnboardingPage/index.tsx,497,"<Button variant=""contained"" color=""primary"" size=""large"" onClick={handleCreateJob} startIcon={<AddTa",True
+frontend/src/views/onboardingPages/EmployerOnboardingPage/index.tsx,500,"<Button variant=""outlined"" color=""primary"" size=""large"" onClick={handleGoToDashboard}>",True
+frontend/src/views/onboardingPages/EmployerOnboardingPage/index.tsx,510,"<Button disabled={activeStep === 0} onClick={handleBack} variant=""outlined"" color=""inherit"">",True
+frontend/src/views/onboardingPages/EmployerOnboardingPage/index.tsx,513,"<Button variant=""contained"" color=""primary"" onClick={handleNext} size=""large"">",True
+frontend/src/views/defaultPages/HomePage/__tests__/PublicSearchRoutes.test.ts,19,expect(source).not.toContain('onClick={() => push(`/${ROUTES.JOB_SEEKER.JOBS}`)}');,True

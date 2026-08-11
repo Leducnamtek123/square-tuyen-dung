@@ -1,0 +1,5 @@
+Feature,UIComponent,Handler,Hook,Service,Client,Route,Controller,ServiceLayer,Model,Status
+Job Post Creation,JobPostForm,handleSubmit,useMutation,jobService.createPrivateJobPost,httpRequest.post,/job/web/private-job-posts/,PrivateJobPostViewSet.create,JobPostService.create,JobPost,COMPLETE
+Convert Candidate to Employee,EmployeeFromApplicationDialog,onSubmit,useMutation,hrmService.createEmployee,httpRequest.post,/native-hrm/employees/,EmployeeViewSet.create,HRMService.create,Employee,COMPLETE
+Voice AI SSE Stream,InterviewRoomPage,useEffect,EventSource,interviewService.getStreamUrl,EventSource,/interview/web/sessions/:id/stream/,interview_event_stream,LiveKit / Voice AI,InterviewSession,COMPLETE
+Company Claim,CompanyPage,handleClaim,useMutation,companyService.claimCompany,httpRequest.post,/info/web/companies/:id/claim/,MISSING (404),N/A,N/A,INCOMPLETE

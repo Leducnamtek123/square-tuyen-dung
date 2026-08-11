@@ -1,10 +1,11 @@
 'use client';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Chip, IconButton, Tooltip, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Button, Chip, IconButton, Tooltip, Stack, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import LaunchIcon from '@mui/icons-material/Launch';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import dayjs from 'dayjs';
 import DataTable from '../../../../components/Common/DataTable';
 import { JOB_POST_STATUS_BG_COLOR } from '../../../../configs/constants';
@@ -21,6 +22,7 @@ interface JobPostsTableProps {
   onPaginationChange: (pagination: PaginationState) => void;
   handleDelete: (slugOrId: string | number) => void;
   handleUpdate: (slugOrId: string | number) => void;
+  onOpenAiRecommendation?: (jobPost: JobPost) => void;
   sorting: SortingState;
   onSortingChange: (sorting: Updater<SortingState>) => void;
   enableRowSelection?: boolean;
@@ -37,6 +39,7 @@ const JobPostsTable = ({
   onPaginationChange,
   handleDelete,
   handleUpdate,
+  onOpenAiRecommendation,
   sorting,
   onSortingChange,
   enableRowSelection = false,
@@ -77,6 +80,122 @@ const JobPostsTable = ({
           )}
         </Box>
       ),
+    },
+    {
+      header: 'Gợi ý hồ sơ bởi AI',
+      id: 'aiRecommendation',
+      cell: (info) => {
+        const job = info.row.original;
+        const totalCount = job.aiRecommendedCount ?? (job as any).ai_recommended_count ?? 0;
+        const rawAvatars = (job.aiRecommendedAvatars || (job as any).ai_recommended_avatars || []) as Array<{ name?: string; initial?: string; avatarUrl?: string | null }>;
+
+        if (totalCount === 0) {
+          return (
+            <Typography
+              onClick={() => onOpenAiRecommendation?.(job)}
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                cursor: 'pointer',
+                fontStyle: 'italic',
+                display: 'block',
+                textAlign: 'center',
+                '&:hover': { color: 'primary.main' }
+              }}
+            >
+              --
+            </Typography>
+          );
+        }
+
+        const avatars = rawAvatars.length > 0 ? rawAvatars : [
+          { name: 'Ứng viên 1', initial: 'A', avatarUrl: 'https://ui-avatars.com/api/?name=AI+Candidate+1&background=0D8ABC&color=fff&bold=true&rounded=true' },
+          { name: 'Ứng viên 2', initial: 'B', avatarUrl: 'https://ui-avatars.com/api/?name=AI+Candidate+2&background=059669&color=fff&bold=true&rounded=true' },
+          { name: 'Ứng viên 3', initial: 'C', avatarUrl: 'https://ui-avatars.com/api/?name=AI+Candidate+3&background=d97706&color=fff&bold=true&rounded=true' },
+        ];
+
+        const remainingCount = Math.max(0, totalCount - avatars.length);
+
+        return (
+          <Tooltip title={`Xem ${totalCount} hồ sơ được AI phân tích & đề xuất cho vị trí này`} arrow>
+            <Box
+              onClick={() => onOpenAiRecommendation?.(job)}
+              sx={{
+                display: 'inline-flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                cursor: 'pointer',
+                py: 0.5,
+                transition: 'all 0.2s',
+                '&:hover .view-list-link': {
+                  textDecoration: 'underline',
+                  color: '#1d4ed8',
+                },
+                '&:hover .avatar-stack': {
+                  transform: 'scale(1.04)',
+                },
+              }}
+            >
+              <Stack
+                className="avatar-stack"
+                direction="row"
+                alignItems="center"
+                spacing={-0.85}
+                sx={{ mb: 0.5, transition: 'transform 0.2s' }}
+              >
+                {avatars.slice(0, 3).map((item, idx) => (
+                  <Avatar
+                    key={idx}
+                    src={item.avatarUrl || undefined}
+                    alt={item.name}
+                    sx={{
+                      width: 26,
+                      height: 26,
+                      fontSize: '0.7rem',
+                      fontWeight: 700,
+                      border: '2px solid #ffffff',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+                    }}
+                  >
+                    {item.initial || 'U'}
+                  </Avatar>
+                ))}
+
+                {remainingCount > 0 && (
+                  <Avatar
+                    sx={{
+                      width: 26,
+                      height: 26,
+                      fontSize: '0.65rem',
+                      fontWeight: 800,
+                      color: '#ffffff',
+                      bgcolor: '#64748b',
+                      border: '2px solid #ffffff',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+                    }}
+                  >
+                    +{remainingCount}
+                  </Avatar>
+                )}
+              </Stack>
+
+              <Typography
+                className="view-list-link"
+                variant="caption"
+                sx={{
+                  fontSize: '0.725rem',
+                  color: '#2563eb',
+                  fontWeight: 600,
+                  lineHeight: 1.2,
+                  cursor: 'pointer',
+                }}
+              >
+                Xem danh sách
+              </Typography>
+            </Box>
+          </Tooltip>
+        );
+      },
     },
     {
       header: t('jobPost.table.postDate'),

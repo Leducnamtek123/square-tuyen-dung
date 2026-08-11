@@ -13,13 +13,17 @@ import type { SystemConfig, SelectOption } from "../../../../types/models";
 import type { CompanyFormValues } from './types';
 import pc from '@/utils/muiColors';
 
+import LocationPicker, { LocationValue } from '@/components/Common/LocationPicker';
+
 interface CompanyFormFieldsProps {
   control: Control<CompanyFormValues>;
   t: TFunction<"employer", undefined>;
   allConfig: SystemConfig | null;
   districtOptions: SelectOption[];
-  locationOptions: SelectOption[];
-  handleSelectLocation: (e: React.SyntheticEvent, value: string | SelectOption | null) => void;
+  locationOptions?: SelectOption[];
+  handleSelectLocation?: (e: React.SyntheticEvent, value: string | SelectOption | null) => void;
+  locationValue?: LocationValue;
+  onLocationChange?: (val: LocationValue) => void;
 }
 
 const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({
@@ -29,6 +33,8 @@ const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({
   districtOptions,
   locationOptions,
   handleSelectLocation,
+  locationValue,
+  onLocationChange,
 }) => {
   const inputSx = {
     '& .MuiOutlinedInput-root': {
@@ -109,13 +115,15 @@ const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({
         <SingleSelectCustom options={districtOptions} name="location.district" control={control} title={t('companyForm.title.district')} showRequired={true} placeholder={t('companyForm.placeholder.selectdistrict')} sx={inputSx} />
       </Grid>
       <Grid size={12}>
-        <TextFieldAutoCompleteCustom name="location.address" title={t('companyForm.title.address')} showRequired={true} placeholder={t('companyForm.placeholder.enteraddress')} control={control} options={locationOptions} handleSelect={handleSelectLocation} sx={inputSx} />
+        <TextFieldCustom name="location.address" title={t('companyForm.title.address')} showRequired={true} placeholder={t('companyForm.placeholder.enteraddress')} control={control} sx={inputSx} />
       </Grid>
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextFieldCustom name="location.lat" title={t('companyForm.title.latitude')} placeholder={t('companyForm.placeholder.enterlatitudecoordinateonthemap')} helperText={t('companyForm.helperText.automaticallyfilledifyouchooseasuggestedaddress')} control={control} sx={inputSx} />
-      </Grid>
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextFieldCustom name="location.lng" title={t('companyForm.title.longitude')} placeholder={t('companyForm.placeholder.enterlongitudecoordinateonthemap')} helperText={t('companyForm.helperText.automaticallyfilledifyouchooseasuggestedaddress')} control={control} sx={inputSx} />
+      <Grid size={12}>
+        <LocationPicker
+          value={locationValue}
+          onChange={onLocationChange}
+          label="Bản đồ vị trí trụ sở công ty (OpenStreetMap)"
+          height="350px"
+        />
       </Grid>
       <Grid size={12}>
         <Paper elevation={0} sx={{ p: { xs: 2, md: 2.5 }, borderRadius: 2.5, border: '1px solid', borderColor: pc.divider(0.95), bgcolor: 'background.paper' }}>

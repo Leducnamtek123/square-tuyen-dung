@@ -156,7 +156,7 @@ export default function CandidateOnboardingPage() {
     setUploadingFile(true);
     setErrorMsg('');
     try {
-      const res = await commonService.uploadFile(file, 'RESUME');
+      const res = await commonService.uploadFile(file, 'CV');
       setFormData((prev) => ({
         ...prev,
         fileId: res.id,
@@ -243,6 +243,9 @@ export default function CandidateOnboardingPage() {
 
         if (res.user) {
           dispatch(setUserInfo(res.user));
+        }
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('sq_onboarding_done', 'true');
         }
         setActiveStep(3); // Step 4: Success
       } catch (err: unknown) {

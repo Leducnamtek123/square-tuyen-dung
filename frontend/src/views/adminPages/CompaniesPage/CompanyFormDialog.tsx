@@ -18,6 +18,7 @@ import {
   getCompanyFormValidationErrors,
   type CompanyFormValidationErrors,
 } from './companyFormValidation';
+import LocationPicker from '@/components/Common/LocationPicker';
 
 type Props = {
   open: boolean;
@@ -224,11 +225,21 @@ const CompanyFormDialog = ({
               required
             />
           </Grid>
-          <Grid size={6}>
-            <TextField label={t('pages.companies.form.latitude')} fullWidth type="number" name="location.lat" value={formData.location.lat ?? ''} onChange={(e) => onLocationChange('lat', e.target.value)} />
-          </Grid>
-          <Grid size={6}>
-            <TextField label={t('pages.companies.form.longitude')} fullWidth type="number" name="location.lng" value={formData.location.lng ?? ''} onChange={(e) => onLocationChange('lng', e.target.value)} />
+          <Grid size={12}>
+            <LocationPicker
+              value={{
+                address: formData.location.address,
+                lat: formData.location.lat,
+                lng: formData.location.lng,
+              }}
+              onChange={(val) => {
+                if (val.address) onLocationChange('address', val.address);
+                if (val.lat !== null && val.lat !== undefined) onLocationChange('lat', String(val.lat));
+                if (val.lng !== null && val.lng !== undefined) onLocationChange('lng', String(val.lng));
+              }}
+              label="Bản đồ định vị trụ sở (OpenStreetMap)"
+              height="300px"
+            />
           </Grid>
           <Grid size={12}>
             <TextField label={t('pages.companies.descriptionLabel')} fullWidth multiline rows={4} name="description" value={formData.description || ''} onChange={(e) => onFieldChange('description', e.target.value)} />

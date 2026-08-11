@@ -221,123 +221,122 @@ const ArticleDetailPage = () => {
         {t('news.article.backToList', { ns: 'public' })}
       </Button>
 
-      {/* ── Unified Glassmorphic Hero Banner ────────────────────────────── */}
+      {/* ── Top Featured Image (Unobscured & Standalone) ────────────────── */}
       <Box
         sx={{
-          position: 'relative',
+          width: '100%',
+          maxHeight: { xs: 320, sm: 440, md: 520 },
+          borderRadius: '20px',
           overflow: 'hidden',
-          borderRadius: { xs: 3, md: 4 },
-          minHeight: { xs: 420, md: 500 },
-          mb: 4,
-          display: 'flex',
-          alignItems: 'flex-end',
-          boxShadow: '0 20px 48px rgba(15, 23, 42, 0.12)',
+          mb: 3,
+          boxShadow: '0 12px 32px -4px rgba(15, 23, 42, 0.08)',
           border: '1px solid #e2e8f0',
-          backgroundColor: '#0f172a',
+          backgroundColor: '#f8fafc',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        {/* Full-bleed crisp featured image in background */}
         <Box
           component="img"
           src={articleImage}
           alt={article.title}
           sx={{
-            position: 'absolute',
-            inset: 0,
             width: '100%',
-            height: '100%',
+            height: 'auto',
+            maxHeight: { xs: 320, sm: 440, md: 520 },
             objectFit: 'cover',
-            objectPosition: 'center',
             display: 'block',
           }}
         />
-
-        {/* Soft, smooth gradient transition at bottom to guarantee 100% text legibility */}
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(180deg, rgba(15, 23, 42, 0) 20%, rgba(15, 23, 42, 0.5) 60%, rgba(15, 23, 42, 0.85) 100%)',
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* Frosted Glass Content Panel anchored at bottom */}
-        <Box
-          sx={{
-            position: 'relative',
-            zIndex: 2,
-            width: '100%',
-            p: { xs: 3, md: 4.5 },
-            background: 'rgba(15, 23, 42, 0.55)',
-            backdropFilter: 'blur(14px) saturate(160%)',
-            WebkitBackdropFilter: 'blur(14px) saturate(160%)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.15)',
-          }}
-        >
-          <Stack spacing={2} sx={{ maxWidth: 960 }}>
-            <Chip
-              label={categoryLabel}
-              icon={article.category === 'news' ? <NewspaperIcon fontSize="small" /> : <TagIcon fontSize="small" />}
-              sx={{
-                alignSelf: 'flex-start',
-                borderRadius: 2,
-                bgcolor: '#2563eb',
-                color: '#ffffff',
-                fontWeight: 800,
-                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.35)',
-                px: 0.5,
-                '& .MuiChip-icon': { color: '#ffffff' },
-              }}
-            />
-
-            <Typography
-              variant="h1"
-              sx={{
-                fontWeight: 900,
-                fontSize: { xs: 24, sm: 32, md: 40 },
-                lineHeight: 1.25,
-                letterSpacing: '-0.015em',
-                color: '#ffffff !important',
-                textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
-                textWrap: 'balance',
-              }}
-            >
-              {article.title}
-            </Typography>
-
-            <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" sx={{ color: 'rgba(255, 255, 255, 0.92)', pt: 0.5 }}>
-              {publishedDate && (
-                <Stack direction="row" spacing={0.75} alignItems="center">
-                  <AccessTimeIcon sx={{ fontSize: 18, color: '#93c5fd' }} />
-                  <Typography variant="body2" fontWeight={700} color="#ffffff">{publishedDate}</Typography>
-                </Stack>
-              )}
-              <Stack direction="row" spacing={0.75} alignItems="center">
-                <VisibilityIcon sx={{ fontSize: 18, color: '#93c5fd' }} />
-                <Typography variant="body2" fontWeight={700} color="#ffffff">{t('news.views', { count: article.viewCount || 0, ns: 'public' })}</Typography>
-              </Stack>
-              {article.authorName && (
-                <Stack direction="row" spacing={0.75} alignItems="center">
-                  <PersonIcon sx={{ fontSize: 18, color: '#93c5fd' }} />
-                  <Typography variant="body2" fontWeight={700} color="#ffffff">{article.authorName}</Typography>
-                </Stack>
-              )}
-            </Stack>
-          </Stack>
-        </Box>
       </Box>
 
+      {/* ── Standalone Article Title & Metadata Section (Below Image) ──── */}
+      <Card
+        elevation={0}
+        sx={{
+          p: { xs: 3, md: 4 },
+          borderRadius: '20px',
+          border: '1px solid #e2e8f0',
+          backgroundColor: '#ffffff',
+          boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.04)',
+          mb: 4,
+        }}
+      >
+        <Stack spacing={2.5}>
+          <Chip
+            label={categoryLabel}
+            icon={article.category === 'news' ? <NewspaperIcon fontSize="small" /> : <TagIcon fontSize="small" />}
+            sx={{
+              alignSelf: 'flex-start',
+              borderRadius: '8px',
+              bgcolor: '#2563eb',
+              color: '#ffffff',
+              fontWeight: 700,
+              px: 0.5,
+              '& .MuiChip-icon': { color: '#ffffff' },
+            }}
+          />
+
+          <Typography
+            variant="h1"
+            sx={{
+              fontWeight: 800,
+              fontSize: { xs: '1.5rem', sm: '2rem', md: '2.375rem' },
+              lineHeight: 1.3,
+              color: '#0f172a',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {article.title}
+          </Typography>
+
+          <Stack
+            direction="row"
+            spacing={3}
+            alignItems="center"
+            flexWrap="wrap"
+            sx={{ color: '#64748b', pt: 0.5 }}
+          >
+            {publishedDate && (
+              <Stack direction="row" spacing={0.75} alignItems="center">
+                <AccessTimeIcon sx={{ fontSize: 18, color: '#2563eb' }} />
+                <Typography variant="body2" fontWeight={600} color="#334155">
+                  {publishedDate}
+                </Typography>
+              </Stack>
+            )}
+
+            <Stack direction="row" spacing={0.75} alignItems="center">
+              <VisibilityIcon sx={{ fontSize: 18, color: '#2563eb' }} />
+              <Typography variant="body2" fontWeight={600} color="#334155">
+                {t('news.views', { count: article.viewCount || 0, ns: 'public' })}
+              </Typography>
+            </Stack>
+
+            {article.authorName && (
+              <Stack direction="row" spacing={0.75} alignItems="center">
+                <PersonIcon sx={{ fontSize: 18, color: '#2563eb' }} />
+                <Typography variant="body2" fontWeight={600} color="#334155">
+                  {article.authorName}
+                </Typography>
+              </Stack>
+            )}
+          </Stack>
+        </Stack>
+      </Card>
+
+      {/* ── Main Article Content Grid ──────────────────────────────────── */}
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, lg: 8 }}>
           <Card
             elevation={0}
             sx={{
               overflow: 'hidden',
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: alpha('#17488a', 0.12),
-              boxShadow: '0 18px 44px rgba(15, 57, 127, 0.08)',
+              borderRadius: '20px',
+              border: '1px solid #e2e8f0',
+              backgroundColor: '#ffffff',
+              boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.04)',
             }}
           >
             <CardContent sx={{ p: { xs: 3, md: 4 } }}>
@@ -379,10 +378,10 @@ const ArticleDetailPage = () => {
             <Card
               elevation={0}
               sx={{
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: alpha('#17488a', 0.14),
-                boxShadow: '0 18px 44px rgba(15, 57, 127, 0.08)',
+                borderRadius: '20px',
+                border: '1px solid #e2e8f0',
+                backgroundColor: '#ffffff',
+                boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.04)',
               }}
             >
               <CardContent sx={{ p: 2.5 }}>
@@ -420,7 +419,7 @@ const ArticleDetailPage = () => {
             <Card
               elevation={0}
               sx={{
-                borderRadius: 2,
+                borderRadius: '20px',
                 overflow: 'hidden',
                 border: '1px solid',
                 borderColor: alpha('#f97316', 0.24),

@@ -136,6 +136,12 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
   const { allConfig } = useConfig();
   const { push } = useRouter();
 
+  const [localRows, setLocalRows] = useState<JobPostActivity[]>(rows);
+
+  React.useEffect(() => {
+    setLocalRows(rows);
+  }, [rows]);
+
   const [openDrawerId, setOpenDrawerId] = useState<string | number | null>(null);
 
   const statuses = useMemo(() => {
@@ -151,7 +157,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
       }
     });
 
-    rows.forEach((row) => {
+    (localRows || []).forEach((row) => {
       const statusKey = String(row.status || statuses[0]?.id || '1');
       if (!board[statusKey]) {
         board[statusKey] = [];
@@ -159,7 +165,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
       board[statusKey].push(row);
     });
     return board;
-  }, [rows, statuses]);
+  }, [localRows, statuses]);
 
   const handleDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result;
@@ -186,7 +192,26 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
       return;
     }
 
-    handleChangeApplicationStatus(candidateId, newStatusId, () => {});
+    // Optimistic local state update
+    const previousRows = [...localRows];
+    setLocalRows((prev) =>
+      prev.map((item) =>
+        String(item.id) === String(candidateId)
+          ? { ...item, status: Number(newStatusId) }
+          : item
+      )
+    );
+
+    handleChangeApplicationStatus(candidateId, newStatusId, (success: boolean) => {
+      if (!success) {
+        // Rollback to original state on failure
+        setLocalRows(previousRows);
+        errorModal(
+          t('appliedResume.status.errorTitle', 'Cập nhật thất bại'),
+          t('appliedResume.status.rollbackMsg', 'Không thể cập nhật trạng thái ứng viên. Đã khôi phục vị trí ban đầu.')
+        );
+      }
+    });
   };
 
   const selectedActivityInfo = useMemo(() => {

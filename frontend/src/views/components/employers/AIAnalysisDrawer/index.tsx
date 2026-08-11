@@ -9,6 +9,9 @@ import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
 import type { JobPostActivity } from '@/types/models';
 import type { PaginatedResponse } from '@/types/api';
+import { ROUTES } from '@/configs/routeConfig';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import { formatRoute } from '@/utils/funcUtils';
 import AIAnalysisDrawerView from './AIAnalysisDrawerView';
 
 export type AIAnalysisData = {
@@ -93,15 +96,15 @@ const toStringOrStringArray = (value: unknown): string | string[] | undefined =>
   return undefined;
 };
 
-const toAIAnalysisData = (activity: JobPostActivity): AIAnalysisData => {
+const toAIAnalysisData = (activity: JobPostActivity, language = 'vi'): AIAnalysisData => {
   const raw = activity as ActivityRawFields;
   const jobPostDict = raw.jobPostDict || {};
   const aiAnalysisScoreRaw = raw.aiAnalysisScore;
   const resumeSlug = activity.resume?.slug || activity.resumeSlug;
   const resumeType = activity.type || activity.resume?.type;
-  // Build online profile URL from slug
+  // Build online profile URL from slug using localized route
   const onlineProfileUrl = resumeSlug
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/ho-so-truc-tuyen/${resumeSlug}`
+    ? localizeRoutePath(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, resumeSlug)}`, language)
     : undefined;
 
   return {
@@ -209,7 +212,7 @@ function reducer(state: AIAnalysisDrawerState, action: AIAnalysisDrawerAction): 
 }
 
 const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisStateChange }: AIAnalysisDrawerProps) => {
-  const { t } = useTranslation('employer');
+  const { t, i18n } = useTranslation('employer');
   const queryClient = useQueryClient();
   const [state, dispatch] = React.useReducer(reducer, {
     ...initialState,
@@ -251,7 +254,7 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
       try {
         const res = await jobPostActivityService.getJobPostActivityDetail(activityId);
         if (!isMounted) return;
-        const nextData = res ? toAIAnalysisData(res) : null;
+        const nextData = res ? toAIAnalysisData(res, i18n.language) : null;
         dispatch({ type: 'set-data', value: nextData });
         syncActivityPatch(toJobPostActivityPatch(nextData));
       } catch {

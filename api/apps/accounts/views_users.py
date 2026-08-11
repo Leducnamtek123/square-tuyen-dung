@@ -198,8 +198,11 @@ def send_verify_email(request):
             errors={"errorMessage": [ERROR_MESSAGES["EMAIL_NOT_REGISTERED"]]},
         )
 
-    if user.is_verify_email:
-        return response_data(status=status.HTTP_200_OK, data={"emailVerified": True})
+    if user.is_verify_email or user.is_active:
+        return response_data(
+            status=status.HTTP_200_OK,
+            data={"emailVerified": True, "message": SUCCESS_MESSAGES["EMAIL_VERIFIED"]},
+        )
 
     helper.send_email_verify_email(request, user, platform=platform)
 

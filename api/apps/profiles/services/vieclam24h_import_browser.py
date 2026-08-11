@@ -68,13 +68,26 @@ def _default_search_params(page: int = 1, per_page: int = 20) -> dict[str, str]:
     return params
 
 
-def _build_search_url(origin: str, page: int = 1, per_page: int = 20, occupation_ids: list[int] | None = None) -> str:
+def _build_search_url(
+    origin: str,
+    page: int = 1,
+    per_page: int = 20,
+    occupation_ids: list[int] | None = None,
+    province_ids: list[int] | None = None,
+    keyword: str | None = None,
+) -> str:
     from urllib.parse import urlencode
 
     params = _default_search_params(page=page, per_page=per_page)
+    if keyword and keyword.strip():
+        params["keyword"] = keyword.strip()
+        params["q"] = keyword.strip()
+
     query_parts = list(params.items())
     for occupation_id in occupation_ids or []:
         query_parts.append(("occupation_ids[]", str(occupation_id)))
+    for province_id in province_ids or []:
+        query_parts.append(("province_ids[]", str(province_id)))
     return f"{_search_api_url(origin)}?{urlencode(query_parts, doseq=True)}"
 
 
@@ -528,8 +541,24 @@ def _evaluate_json(
     return parsed
 
 
-def _collect_search_items(page, auth_token: str | None, origin: str, occupation_ids: list[int], page_number: int, per_page: int) -> list[dict[str, Any]]:
-    url = _build_search_url(origin, page=page_number, per_page=per_page, occupation_ids=occupation_ids)
+def _collect_search_items(
+    page,
+    auth_token: str | None,
+    origin: str,
+    occupation_ids: list[int],
+    page_number: int,
+    per_page: int,
+    province_ids: list[int] | None = None,
+    keyword: str | None = None,
+) -> list[dict[str, Any]]:
+    url = _build_search_url(
+        origin,
+        page=page_number,
+        per_page=per_page,
+        occupation_ids=occupation_ids,
+        province_ids=province_ids,
+        keyword=keyword,
+    )
     payload = _evaluate_json(page, url, auth_token, origin)
     if payload.get("code") != 200:
         message = payload.get("msg") or "Vieclam24h search failed."
@@ -1294,13 +1323,24 @@ def _collect_candidates_from_search_api(
     *,
     max_pages: int = 2,
     per_page: int = 20,
+    province_ids: list[int] | None = None,
+    keyword: str | None = None,
     on_progress: Any = None,
 ) -> list[dict[str, Any]]:
     candidates: list[dict[str, Any]] = []
     seen: set[str] = set()
 
     for page_number in range(1, max_pages + 1):
-        items = _collect_search_items(page, auth_token, origin, occupation_ids, page_number, per_page)
+        items = _collect_search_items(
+            page,
+            auth_token,
+            origin,
+            occupation_ids,
+            page_number,
+            per_page,
+            province_ids=province_ids,
+            keyword=keyword,
+        )
         if not items:
             break
 
@@ -1363,6 +1403,8 @@ def collect_vieclam24h_candidates(
     username: str,
     password: str,
     occupation_ids: list[int] | None = None,
+    province_ids: list[int] | None = None,
+    keyword: str | None = None,
     max_pages: int = 2,
     per_page: int = 20,
     on_progress: Any = None,
@@ -1416,6 +1458,8 @@ def collect_vieclam24h_candidates(
                 catalog,
                 max_pages=max_pages,
                 per_page=per_page,
+                province_ids=province_ids,
+                keyword=keyword,
                 on_progress=on_progress,
             )
         finally:

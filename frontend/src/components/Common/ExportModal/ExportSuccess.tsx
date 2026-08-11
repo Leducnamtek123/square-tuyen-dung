@@ -77,10 +77,10 @@ export const ExportSuccess: React.FC<ExportSuccessProps> = ({
         </Box>
 
         <Typography variant="h6" sx={{ fontWeight: 700, color: '#111827', mb: 0.5, fontSize: '1.25rem' }}>
-          Export completed successfully.
+          Xuất dữ liệu thành công!
         </Typography>
         <Typography variant="body2" sx={{ color: '#6B7280', mb: 3, fontSize: '0.875rem' }}>
-          Tệp dữ liệu đã sẵn sàng. Vui lòng bấm nút <strong>Download</strong> để tải về thiết bị.
+          Tệp dữ liệu đã sẵn sàng. Vui lòng bấm nút <strong>Tải xuống</strong> để tải về thiết bị.
         </Typography>
 
         {/* File summary card */}
@@ -122,7 +122,7 @@ export const ExportSuccess: React.FC<ExportSuccessProps> = ({
                 Tổng số bản ghi: <strong>{recordCount}</strong> dòng
               </Typography>
             </Box>
-            <Chip label="Ready" size="small" color="success" sx={{ height: 22, fontSize: '0.7rem', fontWeight: 600 }} />
+            <Chip label="Sẵn sàng" size="small" color="success" sx={{ height: 22, fontSize: '0.7rem', fontWeight: 600 }} />
           </Stack>
         </Paper>
 
@@ -146,7 +146,7 @@ export const ExportSuccess: React.FC<ExportSuccessProps> = ({
               },
             }}
           >
-            Close
+            Đóng
           </Button>
 
           <Button
@@ -166,7 +166,7 @@ export const ExportSuccess: React.FC<ExportSuccessProps> = ({
               },
             }}
           >
-            Download
+            Tải xuống
           </Button>
         </Stack>
       </Paper>

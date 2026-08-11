@@ -53,14 +53,14 @@ export const ExportPreview: React.FC<ExportPreviewProps> = ({
         </Stack>
         <Stack direction="row" spacing={1} alignItems="center">
           <Chip
-            label="Showing first 10 rows"
+            label="Hiển thị 10 dòng đầu"
             size="small"
             variant="outlined"
             sx={{ height: 22, fontSize: '0.725rem', borderColor: '#CBD5E1', color: '#475569', fontWeight: 500 }}
           />
           {totalRecords !== undefined && (
             <Chip
-              label={`Total: ${totalRecords} records`}
+              label={`Tổng số: ${totalRecords} bản ghi`}
               size="small"
               sx={{ height: 22, fontSize: '0.725rem', backgroundColor: '#E0E7FF', color: '#3730A3', fontWeight: 600 }}
             />

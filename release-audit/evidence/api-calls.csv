@@ -1,0 +1,606 @@
+File,Line,Call
+frontend/src/services/adminInterviewService.ts,12,"const data = await httpRequest.get('interview/admin/sessions/', { params: cleanParams(params) });"
+frontend/src/services/adminInterviewService.ts,16,return (httpRequest.get(`interview/admin/sessions/${id}/`) as Promise<unknown>)
+frontend/src/services/adminInterviewService.ts,20,"return (httpRequest.patch(`interview/admin/sessions/${id}/`, { status }) as Promise<unknown>)"
+frontend/src/services/adminInterviewService.ts,24,return httpRequest.delete(`interview/admin/sessions/${id}/`);
+frontend/src/services/adminJobService.ts,12,"const data = await httpRequest.get('job/web/admin-job-posts/', { params: cleanParams(params) });"
+frontend/src/services/adminJobService.ts,16,"return (httpRequest.patch(`job/web/admin-job-posts/${id}/`, data) as Promise<unknown>)"
+frontend/src/services/adminJobService.ts,20,return (httpRequest.patch(`job/web/admin-job-posts/${id}/approve/`) as Promise<unknown>)
+frontend/src/services/adminJobService.ts,24,return (httpRequest.patch(`job/web/admin-job-posts/${id}/reject/`) as Promise<unknown>)
+frontend/src/services/adminJobService.ts,28,return httpRequest.delete(`job/web/admin-job-posts/${id}/`);
+frontend/src/services/adminManagementService.ts,226,"return withPaginatedPresign<Career>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,232,"httpRequest.post<Career>(url, data, adminManagementService.buildMultipartConfig(data))"
+frontend/src/services/adminManagementService.ts,239,"httpRequest.patch<Career>(url, data, adminManagementService.buildMultipartConfig(data))"
+frontend/src/services/adminManagementService.ts,245,return httpRequest.delete(url);
+frontend/src/services/adminManagementService.ts,250,"return withPaginatedPresign<City>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,255,"return withPresign(httpRequest.post<City>(url, data));"
+frontend/src/services/adminManagementService.ts,260,"return withPresign(httpRequest.patch<City>(url, data));"
+frontend/src/services/adminManagementService.ts,265,return httpRequest.delete(url);
+frontend/src/services/adminManagementService.ts,270,"return withPaginatedPresign<District>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,275,"return withPresign(httpRequest.post<District>(url, data));"
+frontend/src/services/adminManagementService.ts,280,"return withPresign(httpRequest.patch<District>(url, data));"
+frontend/src/services/adminManagementService.ts,285,return httpRequest.delete(url);
+frontend/src/services/adminManagementService.ts,290,"return normalizePaginated<Ward>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,295,"return unwrapEntity<Ward>(httpRequest.post(url, data));"
+frontend/src/services/adminManagementService.ts,300,"return unwrapEntity<Ward>(httpRequest.patch(url, data));"
+frontend/src/services/adminManagementService.ts,305,return httpRequest.delete(url);
+frontend/src/services/adminManagementService.ts,310,"return withPaginatedPresign<Company>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,315,return withPresign(httpRequest.get<Company>(url));
+frontend/src/services/adminManagementService.ts,320,"return withPresign(httpRequest.post<Company>(url, data, adminManagementService.buildMultipartConfig(data)));"
+frontend/src/services/adminManagementService.ts,325,"return withPresign(httpRequest.patch<Company>(url, data, adminManagementService.buildMultipartConfig(data)));"
+frontend/src/services/adminManagementService.ts,330,return httpRequest.delete(url);
+frontend/src/services/adminManagementService.ts,335,"return normalizePaginated<CompanyVerification>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,340,"return unwrapEntity<CompanyVerification>(httpRequest.patch(url, data));"
+frontend/src/services/adminManagementService.ts,345,"return normalizePaginated<TrustReport>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,350,"return normalizePaginated<AuditLog>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,355,"return httpRequest.get<Blob>(url, {"
+frontend/src/services/adminManagementService.ts,363,"return unwrapEntity<TrustReport>(httpRequest.patch(url, data));"
+frontend/src/services/adminManagementService.ts,368,"return withPaginatedPresign<Banner>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,373,"return withPresign(httpRequest.post<Banner>(url, data, adminManagementService.buildMultipartConfig(data)));"
+frontend/src/services/adminManagementService.ts,378,"return withPresign(httpRequest.patch<Banner>(url, data, adminManagementService.buildMultipartConfig(data)));"
+frontend/src/services/adminManagementService.ts,383,return httpRequest.delete(url);
+frontend/src/services/adminManagementService.ts,388,"return withPaginatedPresign<BannerType>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,393,"return withPresign(httpRequest.post<BannerType>(url, data));"
+frontend/src/services/adminManagementService.ts,398,"return withPresign(httpRequest.patch<BannerType>(url, data));"
+frontend/src/services/adminManagementService.ts,403,return httpRequest.delete(url);
+frontend/src/services/adminManagementService.ts,408,"return withPaginatedPresign<Feedback>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,413,"return withPresign(httpRequest.post<Feedback>(url, data, adminManagementService.buildMultipartConfig(data)));"
+frontend/src/services/adminManagementService.ts,418,"return withPresign(httpRequest.patch<Feedback>(url, data, adminManagementService.buildMultipartConfig(data)));"
+frontend/src/services/adminManagementService.ts,423,return httpRequest.delete(url);
+frontend/src/services/adminManagementService.ts,430,"return withPaginatedPresign<JobSeekerProfile>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,435,return withPresign(httpRequest.get<JobSeekerProfile>(url));
+frontend/src/services/adminManagementService.ts,440,"return withPresign(httpRequest.post<JobSeekerProfile>(url, data));"
+frontend/src/services/adminManagementService.ts,445,"return withPresign(httpRequest.patch<JobSeekerProfile>(url, data));"
+frontend/src/services/adminManagementService.ts,450,return httpRequest.delete(url);
+frontend/src/services/adminManagementService.ts,455,"return unwrapEntity<{ deleted: number }>(httpRequest.post(url, { ids }));"
+frontend/src/services/adminManagementService.ts,460,"return withPaginatedPresign<Resume>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,465,"return unwrapEntity<Vieclam24hCatalogResponse>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,470,return withPresign(httpRequest.get<Resume>(url));
+frontend/src/services/adminManagementService.ts,475,"return withPresign(httpRequest.post<Resume>(url, data));"
+frontend/src/services/adminManagementService.ts,480,"return withPresign(httpRequest.patch<Resume>(url, data));"
+frontend/src/services/adminManagementService.ts,485,return httpRequest.delete(url);
+frontend/src/services/adminManagementService.ts,491,"httpRequest.post(url, data, { timeout: 180000 })"
+frontend/src/services/adminManagementService.ts,497,return unwrapEntity<Vieclam24hImportJob>(httpRequest.get(url));
+frontend/src/services/adminManagementService.ts,504,"return normalizePaginated<JobPostActivity>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,509,"return unwrapEntity<JobPostActivity>(httpRequest.post(url, data));"
+frontend/src/services/adminManagementService.ts,514,"return unwrapEntity<JobPostActivity>(httpRequest.patch(url, data));"
+frontend/src/services/adminManagementService.ts,519,return httpRequest.delete(url);
+frontend/src/services/adminManagementService.ts,524,"return normalizePaginated<JobPostNotification>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,529,"return unwrapEntity<JobPostNotification>(httpRequest.post(url, data));"
+frontend/src/services/adminManagementService.ts,534,"return unwrapEntity<JobPostNotification>(httpRequest.patch(url, data));"
+frontend/src/services/adminManagementService.ts,539,return httpRequest.delete(url);
+frontend/src/services/adminManagementService.ts,544,"return normalizePaginated<QuestionGroup>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,549,"return unwrapEntity<QuestionGroup>(httpRequest.post(url, data));"
+frontend/src/services/adminManagementService.ts,554,"return unwrapEntity<QuestionGroup>(httpRequest.patch(url, data));"
+frontend/src/services/adminManagementService.ts,559,return httpRequest.delete(url);
+frontend/src/services/adminManagementService.ts,565,"return normalizePaginated<Question>(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/adminManagementService.ts,570,"return unwrapEntity<Question>(httpRequest.post(url, data));"
+frontend/src/services/adminManagementService.ts,575,"return unwrapEntity<Question>(httpRequest.patch(url, data));"
+frontend/src/services/adminManagementService.ts,580,return httpRequest.delete(url);
+frontend/src/services/adminService.ts,30,"return withPresign(httpRequest.get(url, { params: cleanParams(params) }))"
+frontend/src/services/adminService.ts,37,return withPresign(httpRequest.get<AdminGeneralStats>(url));
+frontend/src/services/adminSettingsService.ts,67,return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<SystemSettingsPayload>);
+frontend/src/services/adminSettingsService.ts,71,"return (httpRequest.put(url, data) as Promise<unknown>).then(unwrapDataResponse<SystemSettingsPayload>);"
+frontend/src/services/adminSettingsService.ts,75,"return (httpRequest.post(url, {"
+frontend/src/services/adminSettingsService.ts,84,return (httpRequest.get(url) as Promise<unknown>).then(normalizeHealthResponse);
+frontend/src/services/advancedSkillService.ts,20,"return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<AdvancedSkill>);"
+frontend/src/services/advancedSkillService.ts,25,return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<AdvancedSkill>);
+frontend/src/services/advancedSkillService.ts,30,"return (httpRequest.put(url, data) as Promise<unknown>).then(unwrapDataResponse<AdvancedSkill>);"
+frontend/src/services/advancedSkillService.ts,35,return httpRequest.delete(url);
+frontend/src/services/agentAssistantService.ts,105,"return (httpRequest.get(""agent-assistants/tools/"") as Promise<unknown>).then((data) =>"
+frontend/src/services/agentAssistantService.ts,111,"return (httpRequest.get(""agent-assistants/threads/"") as Promise<unknown>).then((data) =>"
+frontend/src/services/agentAssistantService.ts,117,"return (httpRequest.post(""agent-assistants/threads/"", { portal }) as Promise<unknown>).then((data) =>"
+frontend/src/services/agentAssistantService.ts,123,return (httpRequest.get(`agent-assistants/threads/${threadId}/messages/`) as Promise<unknown>).then((data) =>
+frontend/src/services/agentAssistantService.ts,134,return (httpRequest.post(
+frontend/src/services/agentAssistantService.ts,144,return httpRequest.delete(`agent-assistants/threads/${threadId}/`);
+frontend/src/services/aiService.ts,47,"const response = await httpRequest.post<ArrayBuffer>(url, payload, {"
+frontend/src/services/aiService.ts,58,"return httpRequest.get<ArrayBuffer>(url, { responseType: 'arraybuffer' });"
+frontend/src/services/aiService.ts,67,"const response = await httpRequest.post<unknown>(url, formData, {"
+frontend/src/services/aiService.ts,76,const response = await httpRequest.get<unknown>(`interview/web/screening-results/${id}/`);
+frontend/src/services/aiService.ts,81,const response = await httpRequest.get<unknown>('ai/health/');
+frontend/src/services/authService.ts,59,"return Promise.resolve(httpRequest.post(url, data)).then(unwrapDataResponse<TokenResponse>);"
+frontend/src/services/authService.ts,82,"return Promise.resolve(httpRequest.post(url, data)).then(unwrapDataResponse<TokenResponse>);"
+frontend/src/services/authService.ts,93,"return Promise.resolve(httpRequest.post(url, data)).then(unwrapDataResponse<TokenResponse>);"
+frontend/src/services/authService.ts,103,"return Promise.resolve(httpRequest.post(url, data)).then(normalizeActionResponse);"
+frontend/src/services/authService.ts,108,"return Promise.resolve(httpRequest.post(url, { email, roleName })).then("
+frontend/src/services/authService.ts,115,"return Promise.resolve(httpRequest.post(url, { email })).then("
+frontend/src/services/authService.ts,122,"return Promise.resolve(httpRequest.post(url, data)).then(normalizeActionResponse);"
+frontend/src/services/authService.ts,127,"return Promise.resolve(httpRequest.post(url, data)).then(normalizeActionResponse);"
+frontend/src/services/authService.ts,132,"return Promise.resolve(httpRequest.post(url, { email, platform })).then(normalizeActionResponse);"
+frontend/src/services/authService.ts,142,const data = unwrapDataResponse<UserResponse>(await httpRequest.get(url));
+frontend/src/services/authService.ts,158,return unwrapDataResponse<UserResponse>(await httpRequest.get(url));
+frontend/src/services/authService.ts,163,"const resData = unwrapDataResponse<UserResponse>(await httpRequest.patch(url, data));"
+frontend/src/services/authService.ts,172,"const resData = unwrapDataResponse<UserResponse>(await httpRequest.put(url, data, {"
+frontend/src/services/authService.ts,185,const resData = unwrapDataResponse<UserResponse>(await httpRequest.delete(url));
+frontend/src/services/authService.ts,194,"return Promise.resolve(httpRequest.put(url, data)).then(normalizeActionResponse);"
+frontend/src/services/authService.ts,199,"return Promise.resolve(httpRequest.post(url, { ...data, platform: data.platform || 'WEB' })).then(normalizeActionRespons"
+frontend/src/services/authService.ts,204,"return Promise.resolve(httpRequest.post(url, data)).then(normalizeActionResponse);"
+frontend/src/services/authService.ts,209,return Promise.resolve(httpRequest.get(url)).then(unwrapDataResponse<UserSettingsData>);
+frontend/src/services/authService.ts,214,"return Promise.resolve(httpRequest.put(url, data)).then(unwrapDataResponse<UserSettingsData>);"
+frontend/src/services/authService.ts,225,return Promise.resolve(httpRequest.get(url)).then(
+frontend/src/services/authService.ts,238,"return Promise.resolve(httpRequest.post(url, data)).then("
+frontend/src/services/authService.ts,245,"return Promise.resolve(httpRequest.post(url, data)).then("
+frontend/src/services/certificateService.ts,22,"return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<Certificate>);"
+frontend/src/services/certificateService.ts,27,return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<Certificate>);
+frontend/src/services/certificateService.ts,32,"return (httpRequest.put(url, data) as Promise<unknown>).then(unwrapDataResponse<Certificate>);"
+frontend/src/services/certificateService.ts,37,return httpRequest.delete(url);
+frontend/src/services/chatbotService.ts,35,"const response = await httpRequest.post('ai/chat/', payload, { timeout: 120000 });"
+frontend/src/services/chatbotService.ts,39,const response = await httpRequest.get('ai/chatbot/config/');
+frontend/src/services/commonService.ts,40,const data = (await httpRequest.get(url)) as SystemConfig;
+frontend/src/services/commonService.ts,57,const data = await httpRequest.get(url);
+frontend/src/services/commonService.ts,74,const data = await httpRequest.get(url);
+frontend/src/services/commonService.ts,80,const data = (await httpRequest.get(url)) as unknown;
+frontend/src/services/commonService.ts,87,const data = await httpRequest.get(url);
+frontend/src/services/commonService.ts,97,"const res = await httpRequest.get(url, {"
+frontend/src/services/commonService.ts,106,"const res = await httpRequest.get(url, {"
+frontend/src/services/commonService.ts,118,"return httpRequest.get(url, {"
+frontend/src/services/commonService.ts,158,return httpRequest.get(url) as Promise<{ status: string }>;
+frontend/src/services/commonService.ts,173,"return (httpRequest.post(url, formData, {"
+frontend/src/services/companyFollowed.ts,16,"return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>).then((data) =>"
+frontend/src/services/companyImageService.ts,13,const data = await httpRequest.get<PaginatedResponse<CompanyImage>>(url);
+frontend/src/services/companyImageService.ts,19,"const resData = await httpRequest.post<CompanyImage[]>(url, data, {"
+frontend/src/services/companyImageService.ts,29,return httpRequest.delete(url);
+frontend/src/services/companyService.ts,44,const data = await httpRequest.get<Company>(url);
+frontend/src/services/companyService.ts,50,"const resData = await httpRequest.put<Company>(url, data);"
+frontend/src/services/companyService.ts,56,"const resData = await httpRequest.put<Company>(url, data, {"
+frontend/src/services/companyService.ts,66,"const resData = await httpRequest.put<Company>(url, data, {"
+frontend/src/services/companyService.ts,78,"const data = await httpRequest.get<PaginatedResponse<Company>>(url, {"
+frontend/src/services/companyService.ts,86,const data = await httpRequest.get<Company>(url);
+frontend/src/services/companyService.ts,92,const data = await httpRequest.get<JobPost | null>(url);
+frontend/src/services/companyService.ts,98,return (httpRequest.post(url) as Promise<unknown>).then(unwrapDataResponse<{ isFollowed: boolean }>);
+frontend/src/services/companyService.ts,103,const data = await httpRequest.get<unknown>(url);
+frontend/src/services/companyTeamService.ts,59,"return (httpRequest.post('info/web/company-roles/', data) as Promise<unknown>)"
+frontend/src/services/companyTeamService.ts,63,"return (httpRequest.patch(`info/web/company-roles/${id}/`, data) as Promise<unknown>)"
+frontend/src/services/companyTeamService.ts,67,return httpRequest.delete<void>(`info/web/company-roles/${id}/`);
+frontend/src/services/companyTeamService.ts,75,"return (httpRequest.post('info/web/company-members/', normalizeMemberPayload(data)) as Promise<unknown>)"
+frontend/src/services/companyTeamService.ts,79,"return (httpRequest.patch(`info/web/company-members/${id}/`, normalizeMemberPayload(data)) as Promise<unknown>)"
+frontend/src/services/companyTeamService.ts,83,return httpRequest.delete<void>(`info/web/company-members/${id}/`);
+frontend/src/services/companyTeamService.ts,86,return (httpRequest.get('info/web/company-members/me/') as Promise<unknown>)
+frontend/src/services/companyVerificationService.ts,24,return (httpRequest.get('info/web/company-verification/') as Promise<unknown>)
+frontend/src/services/companyVerificationService.ts,28,"return (httpRequest.put('info/web/company-verification/', data) as Promise<unknown>)"
+frontend/src/services/contactMessageService.ts,20,"const res = await httpRequest.post(url, data);"
+frontend/src/services/contactMessageService.ts,27,"const res = await httpRequest.get(url, { params: cleanParams(params) });"
+frontend/src/services/contactMessageService.ts,34,"const res = await httpRequest.patch(url, { is_read: true });"
+frontend/src/services/contactMessageService.ts,41,await httpRequest.delete(url);
+frontend/src/services/contentService.ts,143,const response = await httpRequest.get(url);
+frontend/src/services/contentService.ts,155,"return (httpRequest.post(url, formData, {"
+frontend/src/services/contentService.ts,162,"return (httpRequest.post(url, data) as Promise<unknown>).then((response) =>"
+frontend/src/services/contentService.ts,169,"const response = await withPresign(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/contentService.ts,175,return (httpRequest.post(url) as Promise<unknown>).then((response) =>
+frontend/src/services/contentService.ts,184,const response = await httpRequest.get(url);
+frontend/src/services/contentService.ts,192,const response = await httpRequest.get(url);
+frontend/src/services/contentService.ts,197,"return (httpRequest.post('content/web/admin/article-categories/', data) as Promise<unknown>)"
+frontend/src/services/contentService.ts,202,"return (httpRequest.patch(`content/web/admin/article-categories/${id}/`, data) as Promise<unknown>)"
+frontend/src/services/contentService.ts,207,return httpRequest.delete(`content/web/admin/article-categories/${id}/`) as Promise<void>;
+frontend/src/services/contentService.ts,213,"const response = await httpRequest.get('content/web/articles/', {"
+frontend/src/services/contentService.ts,220,const response = await httpRequest.get(`content/web/articles/${slug}/`);
+frontend/src/services/contentService.ts,227,"const response = await httpRequest.get('content/web/admin/articles/', {"
+frontend/src/services/contentService.ts,234,const response = await httpRequest.get(`content/web/admin/articles/${id}/`);
+frontend/src/services/contentService.ts,244,"return (httpRequest.post('content/web/admin/articles/', form, {"
+frontend/src/services/contentService.ts,256,"return (httpRequest.patch(`content/web/admin/articles/${id}/`, form, {"
+frontend/src/services/contentService.ts,263,return httpRequest.delete(`content/web/admin/articles/${id}/`) as Promise<void>;
+frontend/src/services/contentService.ts,269,"const response = await httpRequest.get('content/web/employer/articles/', {"
+frontend/src/services/contentService.ts,276,const response = await httpRequest.get(`content/web/employer/articles/${id}/`);
+frontend/src/services/contentService.ts,286,"return (httpRequest.post('content/web/employer/articles/', form, {"
+frontend/src/services/contentService.ts,298,"return (httpRequest.patch(`content/web/employer/articles/${id}/`, form, {"
+frontend/src/services/contentService.ts,305,return httpRequest.delete(`content/web/employer/articles/${id}/`) as Promise<void>;
+frontend/src/services/educationDetailService.ts,22,"return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<EducationDetail>);"
+frontend/src/services/educationDetailService.ts,27,return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<EducationDetail>);
+frontend/src/services/educationDetailService.ts,32,"return (httpRequest.put(url, data) as Promise<unknown>).then(unwrapDataResponse<EducationDetail>);"
+frontend/src/services/educationDetailService.ts,37,return httpRequest.delete(url);
+frontend/src/services/experienceDetailService.ts,22,"return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<ExperienceDetail>);"
+frontend/src/services/experienceDetailService.ts,27,return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<ExperienceDetail>);
+frontend/src/services/experienceDetailService.ts,32,"return (httpRequest.put(url, data) as Promise<unknown>).then(unwrapDataResponse<ExperienceDetail>);"
+frontend/src/services/experienceDetailService.ts,37,return httpRequest.delete(url);
+frontend/src/services/fptGpuService.ts,48,return httpRequest.get<FPTGpuControlStatus>('ai/gpu-control/');
+frontend/src/services/fptGpuService.ts,52,return httpRequest.post<FPTGpuActionResponse>('ai/gpu-control/start/');
+frontend/src/services/fptGpuService.ts,56,return httpRequest.post<FPTGpuActionResponse>('ai/gpu-control/stop/');
+frontend/src/services/fptGpuService.ts,60,return httpRequest.post<FPTGpuActionResponse>('ai/gpu-control/bootstrap/');
+frontend/src/services/fptGpuService.ts,64,return httpRequest.post<FPTGpuActionResponse>('ai/gpu-control/start-bootstrap/');
+frontend/src/services/goongService.ts,38,return axios.get(url).then((response) => response.data);
+frontend/src/services/goongService.ts,49,return axios.get(url).then((response) => response.data);
+frontend/src/services/hrmService.ts,159,"return (httpRequest.post('hrm/web/employees/from-application/', data) as Promise<unknown>).then("
+frontend/src/services/hrmService.ts,165,"return (httpRequest.post('hrm/web/employees/provision-current-user/', {}) as Promise<unknown>).then("
+frontend/src/services/hrmService.ts,171,return (httpRequest.get('hrm/web/integration-status/') as Promise<unknown>).then(
+frontend/src/services/hrmService.ts,178,return (httpRequest.get('native-hrm/dashboard/stats/') as Promise<unknown>).then(
+frontend/src/services/hrmService.ts,184,"return (httpRequest.get('native-hrm/employees/', { params }) as Promise<unknown>).then((res: any) => {"
+frontend/src/services/hrmService.ts,191,return (httpRequest.get(`native-hrm/employees/${id}/`) as Promise<unknown>).then(
+frontend/src/services/hrmService.ts,197,"return (httpRequest.post('native-hrm/employees/', data) as Promise<unknown>).then("
+frontend/src/services/hrmService.ts,203,"return (httpRequest.patch(`native-hrm/employees/${id}/`, data) as Promise<unknown>).then("
+frontend/src/services/hrmService.ts,209,"return (httpRequest.post('native-hrm/employees/onboard-from-candidate/', payload) as Promise<unknown>).then("
+frontend/src/services/hrmService.ts,215,return (httpRequest.get('native-hrm/departments/') as Promise<unknown>).then((res: any) => {
+frontend/src/services/hrmService.ts,222,"return (httpRequest.post('native-hrm/departments/', data) as Promise<unknown>).then("
+frontend/src/services/hrmService.ts,228,return (httpRequest.get('native-hrm/departments/org-chart/') as Promise<unknown>).then(
+frontend/src/services/hrmService.ts,234,return (httpRequest.get('native-hrm/designations/') as Promise<unknown>).then((res: any) => {
+frontend/src/services/hrmService.ts,241,return (httpRequest.get('native-hrm/leave-requests/') as Promise<unknown>).then((res: any) => {
+frontend/src/services/hrmService.ts,248,"return (httpRequest.patch(`native-hrm/leave-requests/${id}/approve/`, {}) as Promise<unknown>).then("
+frontend/src/services/hrmService.ts,254,"return (httpRequest.patch(`native-hrm/leave-requests/${id}/reject/`, { rejection_reason }) as Promise<unknown>).then("
+frontend/src/services/hrmService.ts,260,return (httpRequest.get('native-hrm/contracts/') as Promise<unknown>).then((res: any) => {
+frontend/src/services/interviewService.ts,131,"return (httpRequest.post(url, data) as Promise<unknown>)"
+frontend/src/services/interviewService.ts,145,return httpRequest.delete(url) as Promise<void>;
+frontend/src/services/interviewService.ts,168,return (httpRequest.get(url) as Promise<unknown>)
+frontend/src/services/interviewService.ts,174,return Promise.resolve(httpRequest.post(url)).then(normalizeTriggerAiEvaluationResponse);
+frontend/src/services/interviewService.ts,179,"return (httpRequest.post(url, data) as Promise<unknown>)"
+frontend/src/services/interviewService.ts,192,return (httpRequest.post(url) as Promise<unknown>)
+frontend/src/services/interviewService.ts,198,return (httpRequest.post(url) as Promise<unknown>)
+frontend/src/services/interviewService.ts,204,return (httpRequest.get(url) as Promise<unknown>)
+frontend/src/services/jobPostActivityService.ts,75,"return (httpRequest.post(url, {"
+frontend/src/services/jobPostActivityService.ts,104,"return (httpRequest.post(url, data) as Promise<unknown>).then((response) =>"
+frontend/src/services/jobPostActivityService.ts,111,"return withPresign(httpRequest.get(url, { params: cleanParams(params) }))"
+frontend/src/services/jobPostActivityService.ts,117,"return withPresign(httpRequest.get(url, { params: cleanParams(params) }))"
+frontend/src/services/jobPostActivityService.ts,123,"return (withPresign(httpRequest.get(url, { params: cleanParams(params) })) as Promise<unknown>)"
+frontend/src/services/jobPostActivityService.ts,129,"return (httpRequest.put(url, data) as Promise<unknown>)"
+frontend/src/services/jobPostActivityService.ts,135,"return (httpRequest.post(url, data, {"
+frontend/src/services/jobPostActivityService.ts,142,return httpRequest.delete(url);
+frontend/src/services/jobPostActivityService.ts,147,return (withPresign(httpRequest.get(url)) as Promise<unknown>)
+frontend/src/services/jobPostActivityService.ts,153,"return (httpRequest.post(url, payload || {}) as Promise<unknown>).then((response) =>"
+frontend/src/services/jobPostActivityService.ts,160,"return (httpRequest.post(url, payload) as Promise<unknown>)"
+frontend/src/services/jobPostNotificationService.ts,43,"return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<JobPostNotification>);"
+frontend/src/services/jobPostNotificationService.ts,48,"return (httpRequest.get(url, {"
+frontend/src/services/jobPostNotificationService.ts,55,"return (httpRequest.put(url, data) as Promise<unknown>).then(unwrapDataResponse<JobPostNotification>);"
+frontend/src/services/jobPostNotificationService.ts,60,return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<JobPostNotification>);
+frontend/src/services/jobPostNotificationService.ts,65,return httpRequest.delete(url) as Promise<void>;
+frontend/src/services/jobPostNotificationService.ts,70,"return (httpRequest.patch(url, {}) as Promise<unknown>).then(unwrapDataResponse<JobPostNotificationStatusResponse>);"
+frontend/src/services/jobSeekerProfileService.ts,72,const data = await httpRequest.get<JobSeekerProfile>(url);
+frontend/src/services/jobSeekerProfileService.ts,78,"const resData = await httpRequest.put<JobSeekerProfile>(url, normalizeProfilePayload(data));"
+frontend/src/services/jobSeekerProfileService.ts,90,"const raw = await httpRequest.get<unknown>(url, { params: cleanParams(params) });"
+frontend/src/services/jobService.ts,115,"return (httpRequest.get(url, { params: { q: kw } }) as Promise<unknown>).then(normalizeJobTitleSuggestions);"
+frontend/src/services/jobService.ts,120,"return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>).then((data) =>"
+frontend/src/services/jobService.ts,127,"return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>)"
+frontend/src/services/jobService.ts,133,return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<JobPost>);
+frontend/src/services/jobService.ts,138,"return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<JobPost>);"
+frontend/src/services/jobService.ts,143,"return (httpRequest.put(url, data) as Promise<unknown>).then(unwrapDataResponse<JobPost>);"
+frontend/src/services/jobService.ts,148,return httpRequest.delete(url) as Promise<void>;
+frontend/src/services/jobService.ts,153,return httpRequest.get(url) as Promise<JobPostOptionResponse>;
+frontend/src/services/jobService.ts,158,"return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>).then((data) =>"
+frontend/src/services/jobService.ts,165,return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<JobPost>);
+frontend/src/services/jobService.ts,170,"return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>).then((data) =>"
+frontend/src/services/jobService.ts,177,"return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>).then((data) =>"
+frontend/src/services/jobService.ts,184,return (httpRequest.post(url) as Promise<unknown>).then(unwrapDataResponse<{ isSaved: boolean }>);
+frontend/src/services/jobService.ts,189,return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<JobSalaryInsightResponse>);
+frontend/src/services/languageSkillService.ts,21,"return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<LanguageSkill>);"
+frontend/src/services/languageSkillService.ts,26,return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<LanguageSkill>);
+frontend/src/services/languageSkillService.ts,31,"return (httpRequest.put(url, data) as Promise<unknown>).then(unwrapDataResponse<LanguageSkill>);"
+frontend/src/services/languageSkillService.ts,36,return httpRequest.delete(url);
+frontend/src/services/mediaService.ts,6,"return httpRequest.get(endpoint, { params: { url } });"
+frontend/src/services/questionGroupService.ts,30,return (httpRequest.get(`interview/web/question-groups/${id}/`) as Promise<unknown>)
+frontend/src/services/questionGroupService.ts,34,"return (httpRequest.post('interview/web/question-groups/', data) as Promise<unknown>)"
+frontend/src/services/questionGroupService.ts,38,"return (httpRequest.patch(`interview/web/question-groups/${id}/`, data) as Promise<unknown>)"
+frontend/src/services/questionService.ts,38,return (httpRequest.get(`interview/web/questions/${id}/`) as Promise<unknown>)
+frontend/src/services/questionService.ts,43,"return (httpRequest.post('interview/web/questions/', data) as Promise<unknown>)"
+frontend/src/services/questionService.ts,49,"return (httpRequest.patch(`interview/web/questions/${id}/`, data) as Promise<unknown>)"
+frontend/src/services/questionService.ts,54,return httpRequest.delete(`interview/web/questions/${id}/`);
+frontend/src/services/resumeSavedService.ts,27,"return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>)"
+frontend/src/services/resumeService.ts,92,"return (httpRequest.post(url, data) as Promise<unknown>).then((response) =>"
+frontend/src/services/resumeService.ts,99,"const data = (await httpRequest.get(url, { params })) as unknown;"
+frontend/src/services/resumeService.ts,105,const data = (await httpRequest.get(url)) as unknown;
+frontend/src/services/resumeService.ts,111,return (httpRequest.post(url) as Promise<unknown>).then(unwrapDataResponse<{ isSaved: boolean }>);
+frontend/src/services/resumeService.ts,116,return (httpRequest.post(url) as Promise<unknown>).then((response) =>
+frontend/src/services/resumeService.ts,123,const data = (await httpRequest.get(url)) as unknown;
+frontend/src/services/resumeService.ts,129,const data = (await httpRequest.get(url)) as unknown;
+frontend/src/services/resumeService.ts,135,"const resData = (await httpRequest.put(url, formData, {"
+frontend/src/services/resumeService.ts,143,"const resData = (await httpRequest.post(url, data, {"
+frontend/src/services/resumeService.ts,151,"const resData = (await httpRequest.put(url, data)) as unknown;"
+frontend/src/services/resumeService.ts,157,return httpRequest.delete(url) as Promise<void>;
+frontend/src/services/resumeService.ts,162,return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<ResumeActiveStatusResponse>);
+frontend/src/services/resumeService.ts,167,return (httpRequest.get(url) as Promise<unknown>).then(normalizeListResponse<ExperienceDetail>);
+frontend/src/services/resumeService.ts,172,return (httpRequest.get(url) as Promise<unknown>).then(normalizeListResponse<EducationDetail>);
+frontend/src/services/resumeService.ts,177,return (httpRequest.get(url) as Promise<unknown>).then(normalizeListResponse<Certificate>);
+frontend/src/services/resumeService.ts,182,return (httpRequest.get(url) as Promise<unknown>).then(normalizeListResponse<LanguageSkill>);
+frontend/src/services/resumeService.ts,187,return (httpRequest.get(url) as Promise<unknown>).then(normalizeListResponse<AdvancedSkill>);
+frontend/src/services/resumeViewedService.ts,20,"return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>).then((data) =>"
+frontend/src/services/statisticService.ts,150,"return (httpRequest.get(url, { params: { type: 'general' } }) as Promise<unknown>)"
+frontend/src/services/statisticService.ts,156,"return (httpRequest.post(url, cleanParams(data), { params: { type: 'recruitment-by-rank' } }) as Promise<unknown>)"
+frontend/src/services/statisticService.ts,162,"return (httpRequest.post(url, cleanParams(data), { params: { type: 'application' } }) as Promise<unknown>)"
+frontend/src/services/statisticService.ts,168,"return (httpRequest.post(url, cleanParams(data), { params: { type: 'candidate' } }) as Promise<unknown>)"
+frontend/src/services/statisticService.ts,174,"return (httpRequest.post(url, cleanParams(data), { params: { type: 'recruitment' } }) as Promise<unknown>)"
+frontend/src/services/statisticService.ts,180,"return (httpRequest.post(url, cleanParams(data), { params: { type: 'interview' } }) as Promise<unknown>)"
+frontend/src/services/statisticService.ts,186,"return (httpRequest.get(url, { params: { type: 'general' } }) as Promise<unknown>)"
+frontend/src/services/statisticService.ts,192,"return (httpRequest.get(url, { params: { type: 'total-view' } }) as Promise<unknown>)"
+frontend/src/services/statisticService.ts,198,"return (httpRequest.get(url, { params: { type: 'activity' } }) as Promise<unknown>)"
+frontend/src/services/statisticService.ts,204,"return (httpRequest.get(url, { params: { type: 'general' } }) as Promise<unknown>)"
+frontend/src/services/trustReportService.ts,28,"return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<TrustReport>);"
+frontend/src/services/userService.ts,20,"const data = await withPresign(httpRequest.get(url, { params: cleanParams(params) }));"
+frontend/src/services/userService.ts,25,"return withPresign(httpRequest.patch(url, data) as Promise<UserModel>);"
+frontend/src/services/userService.ts,29,return (httpRequest.post(url) as Promise<unknown>).then(unwrapDataResponse<UserStatusResponse>);
+frontend/src/services/userService.ts,33,"return (httpRequest.post(url, { ids, isActive }) as Promise<unknown>).then("
+frontend/src/services/userService.ts,39,return httpRequest.delete(url);
+frontend/src/services/voiceProfileService.ts,33,"return (httpRequest.get('interview/web/voice-profiles/', {"
+frontend/src/services/voiceProfileService.ts,39,"return (httpRequest.post('interview/web/voice-profiles/', data) as Promise<unknown>)"
+frontend/src/services/voiceProfileService.ts,44,"return (httpRequest.patch(`interview/web/voice-profiles/${id}/`, data) as Promise<unknown>)"
+frontend/src/services/voiceProfileService.ts,49,return httpRequest.delete(`interview/web/voice-profiles/${id}/`);
+frontend/src/services/voiceProfileService.ts,53,"return (httpRequest.post(`interview/web/voice-profiles/${id}/samples/`, data, multipartConfig) as Promise<unknown>)"
+frontend/src/services/voiceProfileService.ts,58,"return (httpRequest.post(`interview/web/voice-profiles/${id}/prepare/`, {}) as Promise<unknown>)"
+frontend/src/services/voiceProfileService.ts,63,"return (httpRequest.post(`interview/web/voice-profiles/${id}/grants/`, data) as Promise<unknown>)"
+frontend/src/services/voiceProfileService.ts,68,return httpRequest.delete(`interview/admin/voice-profile-grants/${id}/`);
+frontend/src/services/__tests__/adminJobService.test.ts,16,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ results: [] });
+frontend/src/services/__tests__/adminJobService.test.ts,18,"expect(httpRequest.get).toHaveBeenCalledWith('job/web/admin-job-posts/', { params: { page: 2 } });"
+frontend/src/services/__tests__/adminJobService.test.ts,22,"(httpRequest.patch as jest.Mock).mockResolvedValueOnce({ id: '1', title: 'New' });"
+frontend/src/services/__tests__/adminJobService.test.ts,24,"expect(httpRequest.patch).toHaveBeenCalledWith('job/web/admin-job-posts/1/', { title: 'New' });"
+frontend/src/services/__tests__/adminJobService.test.ts,28,"(httpRequest.patch as jest.Mock).mockResolvedValueOnce({ id: '1', status: 'approved' });"
+frontend/src/services/__tests__/adminJobService.test.ts,30,expect(httpRequest.patch).toHaveBeenCalledWith('job/web/admin-job-posts/1/approve/');
+frontend/src/services/__tests__/adminJobService.test.ts,34,"(httpRequest.patch as jest.Mock).mockResolvedValueOnce({ id: '1', status: 'rejected' });"
+frontend/src/services/__tests__/adminJobService.test.ts,36,expect(httpRequest.patch).toHaveBeenCalledWith('job/web/admin-job-posts/1/reject/');
+frontend/src/services/__tests__/adminJobService.test.ts,44,(httpRequest.patch as jest.Mock)
+frontend/src/services/__tests__/adminJobService.test.ts,55,(httpRequest.delete as jest.Mock).mockResolvedValueOnce({});
+frontend/src/services/__tests__/adminJobService.test.ts,57,expect(httpRequest.delete).toHaveBeenCalledWith('job/web/admin-job-posts/1/');
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,26,(httpRequest.get as jest.Mock).mockResolvedValueOnce([job]);
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,30,"expect(httpRequest.get).toHaveBeenCalledWith('job/web/admin-job-posts/', { params: { page: 1 } });"
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,36,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,42,"expect(httpRequest.get).toHaveBeenCalledWith('interview/admin/sessions/', { params: { page: 2 } });"
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,48,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,54,expect(httpRequest.get).toHaveBeenCalledWith('interview/admin/sessions/6/');
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,60,(httpRequest.patch as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,66,"expect(httpRequest.patch).toHaveBeenCalledWith('interview/admin/sessions/7/', { status: 'cancelled' });"
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,72,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,78,"expect(httpRequest.get).toHaveBeenCalledWith('auth/users/', { params: { page: 3 } });"
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,84,(httpRequest.patch as jest.Mock).mockResolvedValueOnce({ data: { data: user } });
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,87,"expect(httpRequest.patch).toHaveBeenCalledWith('auth/users/9/', { roleName: 'ADMIN' });"
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,101,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,108,"expect(httpRequest.post).toHaveBeenNthCalledWith(1, 'auth/users/9/toggle-active/');"
+frontend/src/services/__tests__/adminListServicesResponse.test.ts,109,"expect(httpRequest.post).toHaveBeenNthCalledWith(2, 'auth/users/bulk-status/', {"
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,24,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,30,"expect(httpRequest.get).toHaveBeenCalledWith('common/admin/careers/', { params: { page: 1 } });"
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,36,(httpRequest.get as jest.Mock).mockResolvedValueOnce([activity]);
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,40,"expect(httpRequest.get).toHaveBeenCalledWith('job/web/admin/job-posts-activity/', { params: { page: 1 } });"
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,46,"(httpRequest.get as jest.Mock).mockResolvedValueOnce({ count: 1, results: [resume] });"
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,50,"expect(httpRequest.get).toHaveBeenCalledWith('info/web/admin/resumes/', {"
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,61,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: company } });
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,62,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: createdCompany } });
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,63,(httpRequest.patch as jest.Mock).mockResolvedValueOnce({ data: { data: updatedCompany } });
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,69,expect(httpRequest.get).toHaveBeenCalledWith('info/web/admin/companies/42/');
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,70,"expect(httpRequest.post).toHaveBeenCalledWith('info/web/admin/companies/', { companyName: 'Square New' }, undefined);"
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,71,"expect(httpRequest.patch).toHaveBeenCalledWith('info/web/admin/companies/42/', { companyName: 'Square Updated' }, undefi"
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,78,(httpRequest.patch as jest.Mock)
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,85,expect(httpRequest.patch).toHaveBeenNthCalledWith(
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,90,expect(httpRequest.patch).toHaveBeenNthCalledWith(
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,104,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,109,(httpRequest.patch as jest.Mock)
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,120,"(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: { createdCount: 1, updatedCount: 0, skippedCount: "
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,129,expect(httpRequest.post).toHaveBeenCalledWith(
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,142,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: { deleted: 3 } } });
+frontend/src/services/__tests__/adminManagementServiceResponse.test.ts,146,expect(httpRequest.post).toHaveBeenCalledWith(
+frontend/src/services/__tests__/adminService.test.ts,20,(httpRequest.get as jest.Mock).mockResolvedValueOnce(mockData);
+frontend/src/services/__tests__/adminService.test.ts,23,"expect(httpRequest.get).toHaveBeenCalledWith('auth/users/', { params: { page: 1 } });"
+frontend/src/services/__tests__/adminService.test.ts,31,(httpRequest.get as jest.Mock).mockResolvedValueOnce(mockData);
+frontend/src/services/__tests__/adminService.test.ts,35,"expect(httpRequest.get).toHaveBeenCalledWith('auth/users/', { params: { page: 2 } });"
+frontend/src/services/__tests__/adminService.test.ts,42,(httpRequest.get as jest.Mock).mockResolvedValueOnce(mockData);
+frontend/src/services/__tests__/adminService.test.ts,45,expect(httpRequest.get).toHaveBeenCalledWith('interview/web/statistics/admin-general-statistics/');
+frontend/src/services/__tests__/adminService.test.ts,53,(httpRequest.get as jest.Mock).mockResolvedValueOnce(mockData);
+frontend/src/services/__tests__/adminService.test.ts,56,expect(httpRequest.get).toHaveBeenCalledWith('interview/web/statistics/admin-general-statistics/');
+frontend/src/services/__tests__/adminSettingsService.test.ts,16,(httpRequest.post as jest.Mock).mockResolvedValueOnce(null);
+frontend/src/services/__tests__/adminSettingsService.test.ts,19,"expect(httpRequest.post).toHaveBeenCalledWith('content/send-noti-demo/', {"
+frontend/src/services/__tests__/adminSettingsService.test.ts,28,(httpRequest.post as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/adminSettingsService.test.ts,39,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/adminSettingsService.test.ts,52,expect(httpRequest.get).toHaveBeenCalledWith('common/health/');
+frontend/src/services/__tests__/adminSettingsService.test.ts,68,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: settings } });
+frontend/src/services/__tests__/adminSettingsService.test.ts,69,(httpRequest.put as jest.Mock).mockResolvedValueOnce({ data: { data: updatedSettings } });
+frontend/src/services/__tests__/adminSettingsService.test.ts,74,expect(httpRequest.get).toHaveBeenCalledWith('admin/web/system-settings/');
+frontend/src/services/__tests__/adminSettingsService.test.ts,75,"expect(httpRequest.put).toHaveBeenCalledWith('admin/web/system-settings/', { autoApproveJobs: true });"
+frontend/src/services/__tests__/agentAssistantService.test.ts,16,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ thread: { id: 12 } });
+frontend/src/services/__tests__/agentAssistantService.test.ts,29,expect(httpRequest.post).toHaveBeenCalledWith(
+frontend/src/services/__tests__/agentAssistantService.test.ts,43,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/agentAssistantService.test.ts,55,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: thread });
+frontend/src/services/__tests__/agentAssistantService.test.ts,67,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: payload });
+frontend/src/services/__tests__/aiService.test.ts,27,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/aiService.test.ts,42,(httpRequest.post as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/aiService.test.ts,49,"expect(httpRequest.post).toHaveBeenCalledWith('ai/transcribe/', expect.any(FormData), {"
+frontend/src/services/__tests__/authService.test.ts,23,"it('calls httpRequest.post with correct params', async () => {"
+frontend/src/services/__tests__/authService.test.ts,24,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ access_token: 'aaa' });
+frontend/src/services/__tests__/authService.test.ts,26,"expect(httpRequest.post).toHaveBeenCalledWith('auth/token/', expect.any(Object));"
+frontend/src/services/__tests__/authService.test.ts,27,expect((httpRequest.post as jest.Mock).mock.calls[0][1]).not.toHaveProperty('client_secret');
+frontend/src/services/__tests__/authService.test.ts,33,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/authService.test.ts,46,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/authService.test.ts,52,expect(httpRequest.get).toHaveBeenCalledWith('auth/user-info-basic/');
+frontend/src/services/__tests__/authService.test.ts,58,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/authService.test.ts,70,(httpRequest.patch as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/authService.test.ts,75,"expect(httpRequest.patch).toHaveBeenCalledWith('auth/update-user/', { fullName: 'New Name' });"
+frontend/src/services/__tests__/authService.test.ts,82,(httpRequest.put as jest.Mock).mockResolvedValueOnce({ avatarUrl: 'new.jpg' });
+frontend/src/services/__tests__/authService.test.ts,85,"expect(httpRequest.put).toHaveBeenCalledWith('auth/avatar/', fd, expect.any(Object));"
+frontend/src/services/__tests__/authService.test.ts,90,(httpRequest.delete as jest.Mock).mockResolvedValueOnce({ avatarUrl: null });
+frontend/src/services/__tests__/authService.test.ts,92,expect(httpRequest.delete).toHaveBeenCalledWith('auth/avatar/');
+frontend/src/services/__tests__/authService.test.ts,100,"expect(httpRequest.post).toHaveBeenCalledWith('auth/check-creds/', { email: 'a@b.com', roleName: 'JOB_SEEKER' });"
+frontend/src/services/__tests__/authService.test.ts,105,expect(httpRequest.get).toHaveBeenCalledWith('auth/user-workspaces/');
+frontend/src/services/__tests__/authService.test.ts,111,"expect(httpRequest.post).toHaveBeenCalledWith('auth/email-exists/', { email: 'a@b.com' });"
+frontend/src/services/__tests__/authService.test.ts,125,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/authService.test.ts,128,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/authService.test.ts,132,(httpRequest.patch as jest.Mock).mockResolvedValueOnce({ data: { data: updatedUser } });
+frontend/src/services/__tests__/authService.test.ts,133,(httpRequest.put as jest.Mock)
+frontend/src/services/__tests__/authService.test.ts,136,(httpRequest.delete as jest.Mock).mockResolvedValueOnce({ data: { data: deletedAvatar } });
+frontend/src/services/__tests__/authService.test.ts,156,"expect(httpRequest.post).toHaveBeenCalledWith('auth/forgot-password/', { email: 'a@b.com', platform: 'WEB' });"
+frontend/src/services/__tests__/authService.test.ts,160,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/authService.test.ts,163,(httpRequest.put as jest.Mock).mockResolvedValueOnce({ data: null });
+frontend/src/services/__tests__/authService.test.ts,171,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ emailVerified: false });
+frontend/src/services/__tests__/authService.test.ts,180,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/authService.test.ts,189,(httpRequest.post as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/authService.test.ts,203,expect(httpRequest.get).toHaveBeenCalledWith('auth/settings/');
+frontend/src/services/__tests__/authService.test.ts,208,"expect(httpRequest.post).toHaveBeenCalledWith('auth/convert-token/', {"
+frontend/src/services/__tests__/authService.test.ts,220,"expect(httpRequest.post).toHaveBeenCalledWith('auth/firebase-login/', expect.any(Object));"
+frontend/src/services/__tests__/authService.test.ts,221,expect((httpRequest.post as jest.Mock).mock.calls[0][1]).not.toHaveProperty('client_secret');
+frontend/src/services/__tests__/authService.test.ts,226,"expect(httpRequest.post).toHaveBeenCalledWith('auth/revoke-token/', expect.any(Object));"
+frontend/src/services/__tests__/authService.test.ts,227,expect((httpRequest.post as jest.Mock).mock.calls[0][1]).not.toHaveProperty('client_secret');
+frontend/src/services/__tests__/authService.test.ts,232,"expect(httpRequest.post).toHaveBeenCalledWith('auth/job-seeker/register/', { email: 'a@b.com' });"
+frontend/src/services/__tests__/authService.test.ts,237,"expect(httpRequest.post).toHaveBeenCalledWith('auth/employer/register/', { email: 'a@b.com' });"
+frontend/src/services/__tests__/authService.test.ts,242,"expect(httpRequest.put).toHaveBeenCalledWith('auth/change-password/', { new_password: 'pass' });"
+frontend/src/services/__tests__/authService.test.ts,247,"expect(httpRequest.post).toHaveBeenCalledWith('auth/reset-password/', { email: 'a@b.com' });"
+frontend/src/services/__tests__/authService.test.ts,252,"expect(httpRequest.put).toHaveBeenCalledWith('auth/settings/', { language: 'vi' });"
+frontend/src/services/__tests__/authService.test.ts,257,"expect(httpRequest.post).toHaveBeenCalledWith('auth/send-verify-email/', { email: 'a@b.com', platform: 'WEB' });"
+frontend/src/services/__tests__/chatbotService.test.ts,20,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: response } });
+frontend/src/services/__tests__/chatbotService.test.ts,23,expect(httpRequest.post).toHaveBeenCalledWith(
+frontend/src/services/__tests__/chatbotService.test.ts,37,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: config } });
+frontend/src/services/__tests__/chatbotService.test.ts,40,expect(httpRequest.get).toHaveBeenCalledWith('ai/chatbot/config/');
+frontend/src/services/__tests__/commonService.test.ts,22,(httpRequest.get as jest.Mock).mockResolvedValueOnce(districts);
+frontend/src/services/__tests__/commonService.test.ts,26,expect(httpRequest.get).toHaveBeenCalledWith('common/districts/?cityId=79');
+frontend/src/services/__tests__/commonService.test.ts,32,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: districts });
+frontend/src/services/__tests__/commonService.test.ts,36,expect(httpRequest.get).toHaveBeenCalledWith('common/districts/?cityId=79');
+frontend/src/services/__tests__/commonService.test.ts,43,expect(httpRequest.get).not.toHaveBeenCalled();
+frontend/src/services/__tests__/commonService.test.ts,49,(httpRequest.get as jest.Mock).mockResolvedValueOnce(wards);
+frontend/src/services/__tests__/commonService.test.ts,53,expect(httpRequest.get).toHaveBeenCalledWith('common/wards/?districtId=1');
+frontend/src/services/__tests__/commonService.test.ts,60,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/commonService.test.ts,70,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/commonService.test.ts,83,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: config } });
+frontend/src/services/__tests__/commonService.test.ts,86,expect(httpRequest.get).toHaveBeenCalledWith('common/configs/');
+frontend/src/services/__tests__/commonService.test.ts,97,(httpRequest.post as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/commonService.test.ts,102,expect(httpRequest.post).toHaveBeenCalledWith(
+frontend/src/services/__tests__/contentService.test.ts,19,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/contentService.test.ts,25,expect(httpRequest.get).toHaveBeenCalledWith('content/web/feedbacks/');
+frontend/src/services/__tests__/contentService.test.ts,33,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/contentService.test.ts,56,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/contentService.test.ts,67,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/contentService.test.ts,76,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/contentService.test.ts,97,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/contentService.test.ts,101,(httpRequest.patch as jest.Mock)
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,34,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,40,"expect(httpRequest.get).toHaveBeenCalledWith('job/web/employer-job-posts-activity/', { params: { page: 1 } });"
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,46,(httpRequest.get as jest.Mock).mockResolvedValueOnce([savedResume]);
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,50,"expect(httpRequest.get).toHaveBeenCalledWith('info/web/resumes-saved/', { params: { page: 2 } });"
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,62,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: exportRows } });
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,65,"expect(httpRequest.get).toHaveBeenCalledWith('info/web/resumes-saved/export/', {"
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,73,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,80,"expect(httpRequest.get).toHaveBeenNthCalledWith(1, 'info/web/company-roles/', { params: { page: 1 } });"
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,81,"expect(httpRequest.get).toHaveBeenNthCalledWith(2, 'info/web/company-members/', { params: { page: 1 } });"
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,91,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: company } });
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,92,(httpRequest.put as jest.Mock)
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,106,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: verification } });
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,107,(httpRequest.put as jest.Mock).mockResolvedValueOnce({ data: { data: updatedVerification } });
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,119,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,122,(httpRequest.patch as jest.Mock)
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,125,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: myMembership } });
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,144,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,151,"expect(httpRequest.get).toHaveBeenNthCalledWith(1, 'interview/web/sessions/', { params: { page: 1 } });"
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,152,"expect(httpRequest.get).toHaveBeenNthCalledWith(2, 'interview/web/evaluations/', { params: { interview: 15 } });"
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,160,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,167,"expect(httpRequest.get).toHaveBeenNthCalledWith(1, 'interview/web/questions/', { params: { page: 1 } });"
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,168,"expect(httpRequest.get).toHaveBeenNthCalledWith(2, 'interview/web/question-groups/', { params: { page: 1 } });"
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,178,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: question } });
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,179,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: createdQuestion } });
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,180,(httpRequest.patch as jest.Mock).mockResolvedValueOnce({ data: { data: updatedQuestion } });
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,186,expect(httpRequest.get).toHaveBeenCalledWith('interview/web/questions/33/');
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,187,"expect(httpRequest.post).toHaveBeenCalledWith('interview/web/questions/', { text: 'Tell me about Next.js' });"
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,188,"expect(httpRequest.patch).toHaveBeenCalledWith('interview/web/questions/33/', { text: 'Tell me about React hooks' });"
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,196,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: group } });
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,197,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: createdGroup } });
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,198,(httpRequest.patch as jest.Mock).mockResolvedValueOnce({ data: { data: updatedGroup } });
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,204,expect(httpRequest.get).toHaveBeenCalledWith('interview/web/question-groups/35/');
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,205,"expect(httpRequest.post).toHaveBeenCalledWith('interview/web/question-groups/', { name: 'Backend set' });"
+frontend/src/services/__tests__/employerListServicesResponse.test.ts,206,"expect(httpRequest.patch).toHaveBeenCalledWith('interview/web/question-groups/35/', { name: 'Frontend advanced set' });"
+frontend/src/services/__tests__/hrmService.test.ts,15,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ hrmEmployeeId: 'HR-EMP-0001' });
+frontend/src/services/__tests__/hrmService.test.ts,22,"expect(httpRequest.post).toHaveBeenCalledWith('hrm/web/employees/from-application/', {"
+frontend/src/services/__tests__/hrmService.test.ts,31,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ userId: 'hr@example.com' });
+frontend/src/services/__tests__/hrmService.test.ts,33,"expect(httpRequest.post).toHaveBeenCalledWith('hrm/web/employees/provision-current-user/', {});"
+frontend/src/services/__tests__/hrmService.test.ts,37,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ enabled: true });
+frontend/src/services/__tests__/hrmService.test.ts,39,expect(httpRequest.get).toHaveBeenCalledWith('hrm/web/integration-status/');
+frontend/src/services/__tests__/hrmService.test.ts,57,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/hrmService.test.ts,60,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: integrationStatus } });
+frontend/src/services/__tests__/interviewService.test.ts,33,(httpRequest.post as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/interviewService.test.ts,39,expect(httpRequest.post).toHaveBeenCalledWith('interview/web/sessions/7/evaluate-ai/');
+frontend/src/services/__tests__/interviewService.test.ts,60,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/interviewService.test.ts,71,(httpRequest.patch as jest.Mock)
+frontend/src/services/__tests__/interviewService.test.ts,82,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/interviewService.test.ts,115,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/interviewService.test.ts,118,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/jobPostActivityService.test.ts,23,(httpRequest.post as jest.Mock).mockResolvedValueOnce(null);
+frontend/src/services/__tests__/jobPostActivityService.test.ts,31,(httpRequest.post as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/jobPostActivityService.test.ts,40,"expect(httpRequest.post).toHaveBeenCalledWith('job/web/employer-job-posts-activity/12/analyze-resume/', {});"
+frontend/src/services/__tests__/jobPostActivityService.test.ts,44,(httpRequest.post as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/jobPostActivityService.test.ts,65,(httpRequest.post as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/jobPostActivityService.test.ts,91,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/jobPostActivityService.test.ts,101,(httpRequest.put as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/jobPostActivityService.test.ts,104,(httpRequest.post as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/jobPostActivityService.test.ts,120,(httpRequest.post as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/jobPostActivityService.test.ts,125,expect(httpRequest.post).toHaveBeenCalledWith(
+frontend/src/services/__tests__/jobPostActivityService.test.ts,140,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: exportRows } });
+frontend/src/services/__tests__/jobPostActivityService.test.ts,143,"expect(httpRequest.get).toHaveBeenCalledWith('job/web/employer-job-posts-activity/export/', {"
+frontend/src/services/__tests__/jobSeekerProfileService.test.ts,17,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: profile } });
+frontend/src/services/__tests__/jobSeekerProfileService.test.ts,18,(httpRequest.put as jest.Mock).mockResolvedValueOnce({ data: { data: updatedProfile } });
+frontend/src/services/__tests__/jobSeekerProfileService.test.ts,24,expect(httpRequest.get).toHaveBeenCalledWith('info/profile/');
+frontend/src/services/__tests__/jobSeekerProfileService.test.ts,25,"expect(httpRequest.put).toHaveBeenCalledWith('info/profile/', { user: { fullName: 'Candidate Updated' } });"
+frontend/src/services/__tests__/jobSeekerProfileService.test.ts,30,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/jobSeekerProfileService.test.ts,37,expect(httpRequest.get).toHaveBeenCalledWith(
+frontend/src/services/__tests__/jobSeekerProfileService.test.ts,46,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,37,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,57,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: exportRows } });
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,60,"expect(httpRequest.get).toHaveBeenCalledWith('job/web/private-job-posts/export/', {"
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,66,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,79,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,89,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: uploadedImages } });
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,92,expect(httpRequest.post).toHaveBeenCalledWith(
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,103,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,116,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,134,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: createdJob } });
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,135,(httpRequest.put as jest.Mock).mockResolvedValueOnce({ data: { data: updatedJob } });
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,149,"expect(httpRequest.post).toHaveBeenCalledWith('job/web/private-job-posts/', payload);"
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,150,"expect(httpRequest.put).toHaveBeenCalledWith('job/web/private-job-posts/17/', { jobName: 'Senior Frontend Developer' });"
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,154,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,161,"expect(httpRequest.post).toHaveBeenNthCalledWith(1, 'job/web/job-posts/frontend-developer/save/');"
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,162,"expect(httpRequest.post).toHaveBeenNthCalledWith(2, 'info/web/companies/square-group/followed/');"
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,170,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,196,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: createdNotification } });
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,197,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: detailNotification } });
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,198,(httpRequest.put as jest.Mock).mockResolvedValueOnce({ data: { data: updatedNotification } });
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,199,(httpRequest.patch as jest.Mock).mockResolvedValueOnce({ data: { data: { isActive: false } } });
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,216,"expect(httpRequest.post).toHaveBeenCalledWith('job/web/job-post-notifications/', payload);"
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,217,expect(httpRequest.get).toHaveBeenCalledWith('job/web/job-post-notifications/18/');
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,218,"expect(httpRequest.put).toHaveBeenCalledWith('job/web/job-post-notifications/18/', { jobName: 'Senior frontend alert' })"
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,219,"expect(httpRequest.patch).toHaveBeenCalledWith('job/web/job-post-notifications/18/', {});"
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,224,(httpRequest.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,240,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,245,(httpRequest.patch as jest.Mock).mockResolvedValueOnce({ data: { data: updatedProfile } });
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,253,"expect(httpRequest.post).toHaveBeenNthCalledWith(1, 'interview/web/voice-profiles/', { name: 'Recruiter voice' });"
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,254,"expect(httpRequest.patch).toHaveBeenCalledWith('interview/web/voice-profiles/20/', { status: 'disabled' });"
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,255,"expect(httpRequest.post).toHaveBeenNthCalledWith(2, 'interview/web/voice-profiles/20/samples/', sampleData, { headers: {"
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,256,"expect(httpRequest.post).toHaveBeenNthCalledWith(3, 'interview/web/voice-profiles/20/prepare/', {});"
+frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts,257,"expect(httpRequest.post).toHaveBeenNthCalledWith(4, 'interview/web/voice-profiles/20/grants/', { company: 5, isActive: t"
+frontend/src/services/__tests__/resumeDetailServices.test.ts,27,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/resumeDetailServices.test.ts,33,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/resumeDetailServices.test.ts,39,(httpRequest.put as jest.Mock)
+frontend/src/services/__tests__/resumeService.test.ts,31,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/resumeService.test.ts,46,(httpRequest.post as jest.Mock)
+frontend/src/services/__tests__/resumeService.test.ts,55,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: { isSaved: true } } });
+frontend/src/services/__tests__/resumeService.test.ts,56,(httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: { isActive: false } } });
+frontend/src/services/__tests__/resumeService.test.ts,61,expect(httpRequest.post).toHaveBeenCalledWith('info/web/resumes/cv-a/resume-saved/');
+frontend/src/services/__tests__/resumeService.test.ts,62,expect(httpRequest.get).toHaveBeenCalledWith('info/web/private-resumes/cv-a/resume-active/');
+frontend/src/services/__tests__/resumeService.test.ts,72,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/resumeService.test.ts,76,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: created } });
+frontend/src/services/__tests__/resumeService.test.ts,77,(httpRequest.put as jest.Mock).mockResolvedValueOnce({ data: { data: updated } });
+frontend/src/services/__tests__/resumeService.test.ts,87,(httpRequest.put as jest.Mock).mockResolvedValueOnce({ data: null });
+frontend/src/services/__tests__/resumeService.test.ts,90,"expect(httpRequest.put).toHaveBeenCalledWith('info/web/private-resumes/cv-a/cv/', expect.any(FormData), {"
+frontend/src/services/__tests__/statisticService.test.ts,20,(httpRequest.get as jest.Mock)
+frontend/src/services/__tests__/statisticService.test.ts,24,(httpRequest.post as jest.Mock).mockResolvedValueOnce({
+frontend/src/services/__tests__/trustReportService.test.ts,22,(httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: { data: report } });
+frontend/src/services/__tests__/trustReportService.test.ts,32,"expect(httpRequest.post).toHaveBeenCalledWith('info/web/trust-reports/', {"
+frontend/src/utils/apiClient.ts,19,"httpRequest.get(url, config) as Promise<T>,"
+frontend/src/utils/apiClient.ts,22,"httpRequest.post(url, data, config) as Promise<T>,"
+frontend/src/utils/apiClient.ts,25,"httpRequest.put(url, data, config) as Promise<T>,"
+frontend/src/utils/apiClient.ts,28,"httpRequest.patch(url, data, config) as Promise<T>,"
+frontend/src/utils/apiClient.ts,31,"httpRequest.delete(url, config) as Promise<T>,"
+frontend/src/utils/httpRequest.ts,43,const httpRequest = axios.create({
+frontend/src/utils/httpRequest.ts,61,export const refreshClient = axios.create({
+frontend/src/utils/httpRequest.ts,206,httpRequest.interceptors.request.use(
+frontend/src/utils/httpRequest.ts,242,httpRequest.interceptors.response.use(
+frontend/src/utils/presignUrl.ts,47,"const response = await axios.get(`${getBaseUrl()}common/presign/`, {"
+frontend/src/utils/__tests__/httpRequest.test.ts,61,const response = await httpRequest.get('/some-protected-endpoint');
+frontend/src/utils/__tests__/httpRequest.test.ts,77,const response = await httpRequest.get('/company-scoped-endpoint');
+frontend/src/utils/__tests__/httpRequest.test.ts,90,const response = await httpRequest.get('job/web/job-posts/senior-react-dev/');
+frontend/src/utils/__tests__/httpRequest.test.ts,102,"const response = await httpRequest.post('auth/token/', {});"
+frontend/src/utils/__tests__/httpRequest.test.ts,112,"await httpRequest.get('/params-test', {"
+frontend/src/utils/__tests__/httpRequest.test.ts,123,"await httpRequest.get('/params-test-keep', {"
+frontend/src/utils/__tests__/httpRequest.test.ts,137,const response = await httpRequest.get('/snake-endpoint');
+frontend/src/utils/__tests__/httpRequest.test.ts,148,const response = await httpRequest.get('/empty-success-endpoint');
+frontend/src/utils/__tests__/httpRequest.test.ts,158,const response = await httpRequest.get('/500-endpoint');
+frontend/src/utils/__tests__/httpRequest.test.ts,170,await expect(httpRequest.get('/maintenance-endpoint')).rejects.toThrow();
+frontend/src/utils/__tests__/httpRequest.test.ts,176,await expect(httpRequest.get('/400-endpoint')).rejects.toThrow();
+frontend/src/utils/__tests__/httpRequest.test.ts,181,await expect(httpRequest.post('auth/token/')).rejects.toThrow();
+frontend/src/utils/__tests__/httpRequest.test.ts,197,const response = await httpRequest.get('job/web/job-posts/senior-react-dev/');
+frontend/src/utils/__tests__/httpRequest.test.ts,206,await expect(httpRequest.get('/protected-endpoint')).rejects.toThrow();
+frontend/src/utils/__tests__/httpRequest.test.ts,229,const response = await httpRequest.get('/protected-refresh');
+frontend/src/utils/__tests__/httpRequest.test.ts,245,await expect(httpRequest.get('/fail-refresh')).rejects.toThrow();
+frontend/src/utils/__tests__/httpRequest.test.ts,265,const response = await httpRequest.get('/protected-refresh-legacy');
+frontend/src/utils/__tests__/presignUrl.test.ts,33,(axios.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/utils/__tests__/presignUrl.test.ts,41,"expect(axios.get).toHaveBeenCalledWith('/api/common/presign/', expect.objectContaining({"
+frontend/src/utils/__tests__/presignUrl.test.ts,49,(axios.get as jest.Mock).mockResolvedValueOnce({
+frontend/src/utils/__tests__/presignUrl.test.ts,56,"expect(axios.get).toHaveBeenCalledWith('/api/common/presign/', expect.objectContaining({"
+frontend/src/utils/__tests__/presignUrl.test.ts,63,(axios.get as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+frontend/src/utils/__tests__/presignUrl.test.ts,81,(axios.get as jest.Mock).mockResolvedValue({
+frontend/src/utils/__tests__/presignUrl.test.ts,94,(axios.get as jest.Mock).mockResolvedValue({
+frontend/src/utils/__tests__/presignUrl.test.ts,113,(axios.get as jest.Mock).mockResolvedValue({

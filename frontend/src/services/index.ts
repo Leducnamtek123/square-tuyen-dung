@@ -54,5 +54,6 @@ export { default as mediaService } from './mediaService';
 // --- External Integrations ---
 export * as firebaseService from './firebaseService';
 export { default as goongService } from './goongService';
+export { default as nominatimService } from './nominatimService';
 export { default as chatbotService } from './chatbotService';
 export { default as aiService } from './aiService';

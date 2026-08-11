@@ -243,6 +243,39 @@ services:
       - data-net
 
   # ---------------------------------------------------------------------------
+  # Database Automated Daily Backup Service (mysqldump + compression + retention)
+  # ---------------------------------------------------------------------------
+  db-backup:
+    container_name: tuyendung-studio-db-backup
+    image: public.ecr.aws/docker/library/mysql:8.0
+    restart: always
+    entrypoint: >
+      /bin/sh -c "
+      echo '🚀 [DB Backup Service] Initializing Automated Database Daily Backup...';
+      while true; do
+        DATE=$$(date +%Y-%m-%d_%H%M%S);
+        FILE=/backups/db_backup_square_$${DATE}.sql.gz;
+        echo \"[$$DATE] 🔄 Executing zero-downtime mysqldump...\";
+        mysqldump -h db -u root -p$${MYSQL_ROOT_PASSWORD} --single-transaction --quick --routines --triggers $${MYSQL_DATABASE} | gzip > $$FILE;
+        SIZE=$$(du -sh $$FILE 2>/dev/null | cut -f1);
+        echo \"[$$DATE] ✅ Daily backup created successfully: $$FILE ($$SIZE)\";
+        find /backups -name 'db_backup_*.sql.gz' -mtime +30 -delete 2>/dev/null;
+        echo \"[$$DATE] 💤 Next automated backup scheduled in 24 hours.\";
+        sleep 86400;
+      done
+      "
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      MYSQL_DATABASE: ${DB_NAME:-square_db}
+    volumes:
+      - ./backups:/backups
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - data-net
+
+  # ---------------------------------------------------------------------------
   # Redis
   # ---------------------------------------------------------------------------
   redis:

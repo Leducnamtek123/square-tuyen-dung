@@ -10,24 +10,28 @@ const ProfilePage = () => {
   TabTitle(t('sidebar.findCandidates'));
 
   return (
-    <Card sx={{ p: 3, pt: 4 }}>
-      <Typography
-        variant="h5"
-        sx={{
-          fontWeight: 600,
-          background: (theme: Theme) => theme.palette.primary.main,
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          fontSize: { xs: "1.25rem", sm: "1.5rem" },
-        }}
-      >
-        {t('sidebar.findCandidates')}
-      </Typography>
-      <Divider sx={{ mt: 2, mb: 3 }} />
-      <Box>
-        <ProfileCard />
+    <Box sx={{ width: '100%', minWidth: 0, p: 0 }}>
+      <Box sx={{ mb: 2.5 }}>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 800,
+            color: '#0F172A',
+            fontSize: { xs: "1.25rem", md: "1.5rem" },
+            letterSpacing: '-0.02em',
+          }}
+        >
+          {t('sidebar.findCandidates')}
+        </Typography>
+        <Typography
+          variant="body2"
+          sx={{ color: '#64748B', mt: 0.5, fontSize: '0.85rem' }}
+        >
+          Tìm và lọc ứng viên phù hợp với vị trí tuyển dụng của bạn
+        </Typography>
       </Box>
-    </Card>
+      <ProfileCard />
+    </Box>
   );
 };
 

@@ -160,17 +160,17 @@ const commonService = {
 
   uploadFile: async (
     file: File,
-    fileType: string = 'OTHER',
+    fileType: string = 'CV',
     options: { onUploadProgress?: (progress: number) => void } = {},
   ): Promise<{ id: number; url: string; name: string }> => {
     const url = 'common/upload-file/';
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('file_type', fileType);
+    // Normalize 'RESUME' or empty type to backend-valid choice 'CV'
+    const normalizedFileType = (!fileType || fileType === 'RESUME') ? 'CV' : fileType;
+    formData.append('file_type', normalizedFileType);
+
     return (httpRequest.post(url, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
       onUploadProgress: (event) => {
         if (!options.onUploadProgress) return;
         if (!event.total) {

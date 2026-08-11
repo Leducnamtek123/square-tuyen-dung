@@ -25,12 +25,6 @@ employer_router.register(r'articles', views.EmployerArticleViewSet, basename='em
 
 urlpatterns = [
 
-    path('', include([
-
-        path('send-noti-demo/', views.send_notification_demo),
-
-    ])),
-
     path('app/', include([
 
         path('', include(app_router.urls)),

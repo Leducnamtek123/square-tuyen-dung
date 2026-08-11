@@ -24,7 +24,7 @@ from shared.configs import variable_system as var_sys
 
 
 def test_http_probe_url_converts_websocket_schemes():
-assert _http_probe_url("wss://infohr.vn/livekit") == "https://infohr.vn/livekit"
+    assert _http_probe_url("wss://infohr.vn/livekit") == "https://infohr.vn/livekit"
     assert _http_probe_url("ws://livekit:7880") == "http://livekit:7880"
 
 
@@ -33,11 +33,11 @@ def test_probe_http_service_uses_http_url_for_wss(monkeypatch):
     mock_get = Mock(return_value=fake_response)
     monkeypatch.setattr("integrations.ai.views.requests.get", mock_get)
 
-result = _probe_http_service("livekit", "wss://infohr.vn/livekit", path="/")
+    result = _probe_http_service("livekit", "wss://infohr.vn/livekit", path="/")
 
     assert result["status"] == "online"
     mock_get.assert_called_once()
-assert mock_get.call_args.args[0] == "https://infohr.vn/livekit/"
+    assert mock_get.call_args.args[0] == "https://infohr.vn/livekit/"
 
 def test_tts_proxy_buffers_audio_before_returning_response(monkeypatch, settings):
     settings.AI_TTS_BASE_URL = "http://primary.test/v1"

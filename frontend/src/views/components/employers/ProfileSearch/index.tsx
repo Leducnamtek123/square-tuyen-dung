@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -7,14 +9,16 @@ import {
   Button,
   Stack,
   Typography,
-  Grid2 as Grid,
   Box,
   Paper,
   Divider,
   Tooltip,
+  Drawer,
+  IconButton,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import CloseIcon from '@mui/icons-material/Close';
 import BriefcaseIcon from '@mui/icons-material/WorkHistory';
 import MagicIcon from '@mui/icons-material/AutoAwesome';
 import GroupIcon from '@mui/icons-material/Groups';
@@ -30,10 +34,9 @@ import { resetSearchResume, searchResume } from '../../../../redux/filterSlice';
 import type { ResumeFilter } from '../../../../redux/filterSlice';
 import { useConfig } from '@/hooks/useConfig';
 import pc from '@/utils/muiColors';
-import { filterControlSx } from '@/components/Common/FilterBar';
 import type { SxProps, Theme } from '@mui/material/styles';
 
-interface ProfileSearchValues {
+export interface ProfileSearchValues {
   kw: string;
   cityId: string | number;
   careerId: string | number;
@@ -55,12 +58,21 @@ interface FilterGroupProps {
   control: ReturnType<typeof useForm<ProfileSearchValues>>['control'];
 }
 
-const compactFilterControlSx = {
-  ...(filterControlSx as Record<string, unknown>),
+const searchControlSx = {
   '& .MuiOutlinedInput-root': {
-    ...((filterControlSx as Record<string, Record<string, unknown>>)['& .MuiOutlinedInput-root'] || {}),
-    height: 48,
-    fontWeight: 700,
+    height: 42,
+    fontSize: '0.875rem',
+    borderRadius: '8px',
+    backgroundColor: '#FFFFFF',
+  },
+} as SxProps<Theme>;
+
+const sidebarFilterControlSx = {
+  '& .MuiOutlinedInput-root': {
+    height: 38,
+    fontSize: '0.8125rem',
+    borderRadius: '6px',
+    backgroundColor: '#F8FAFC',
   },
 } as SxProps<Theme>;
 
@@ -72,240 +84,373 @@ const FilterGroup = ({
   placeholder,
   control,
 }: FilterGroupProps) => (
-  <Stack spacing={1.5}>
+  <Stack spacing={0.75}>
     <Typography
       variant="caption"
       sx={{
         display: 'flex',
         alignItems: 'center',
-        color: 'text.secondary',
-        fontWeight: 900,
+        color: '#64748B',
+        fontWeight: 700,
         textTransform: 'uppercase',
-        letterSpacing: 1.5,
-        fontSize: '0.7rem',
+        letterSpacing: '0.4px',
+        fontSize: '0.72rem',
       }}
     >
-      <Icon sx={{ mr: 1, color: 'primary.main', fontSize: 18 }} />
+      <Icon sx={{ mr: 0.75, color: 'primary.main', fontSize: 15 }} />
       {label}
     </Typography>
     <SingleSelectCustom
       name={name}
       control={control}
-    options={options}
-    placeholder={placeholder}
-    sx={filterControlSx}
-  />
-</Stack>
+      options={options}
+      placeholder={placeholder}
+      sx={sidebarFilterControlSx}
+    />
+  </Stack>
 );
 
-const ProfileSearch: React.FC = () => {
+export const useProfileSearch = () => {
   const { t } = useTranslation(['employer', 'common']);
   const dispatch = useDispatch();
   const { allConfig } = useConfig();
   const { resumeFilter } = useAppSelector((state) => state.filter);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const { control, reset, handleSubmit } = useForm<ProfileSearchValues>();
+  const { control, reset, handleSubmit, getValues } = useForm<ProfileSearchValues>();
 
   useEffect(() => {
     reset(resumeFilter as ProfileSearchValues);
   }, [resumeFilter, reset]);
 
   const handleFilter = (data: ProfileSearchValues) => {
-    dispatch(searchResume({ ...data, page: 1, pageSize: 10 } as ResumeFilter));
+    dispatch(searchResume({ ...data, page: 1, pageSize: 6 } as ResumeFilter));
   };
 
   const handleReset = () => {
     dispatch(resetSearchResume());
   };
 
+  const activeFilterCount = Object.keys(resumeFilter).filter((key) => {
+    const ignoredKeys = ['page', 'pageSize', 'kw', 'cityId'];
+    if (ignoredKeys.includes(key)) return false;
+    const val = (resumeFilter as any)[key];
+    return val !== undefined && val !== '' && val !== null;
+  }).length;
+
+  return {
+    control,
+    handleSubmit,
+    handleFilter,
+    handleReset,
+    allConfig,
+    t,
+    drawerOpen,
+    setDrawerOpen,
+    activeFilterCount,
+    getValues,
+  };
+};
+
+export const ProfileSearchBar: React.FC<{
+  control: ReturnType<typeof useForm<ProfileSearchValues>>['control'];
+  handleSubmit: ReturnType<typeof useForm<ProfileSearchValues>>['handleSubmit'];
+  handleFilter: (data: ProfileSearchValues) => void;
+  allConfig: ReturnType<typeof useConfig>['allConfig'];
+  t: (key: string) => string;
+  onOpenFilterDrawer: () => void;
+  activeFilterCount: number;
+}> = ({ control, handleSubmit, handleFilter, allConfig, t, onOpenFilterDrawer, activeFilterCount }) => (
+  <Paper
+    elevation={0}
+    sx={{
+      p: 1.25,
+      borderRadius: '10px',
+      bgcolor: '#FFFFFF',
+      border: '1px solid #E2E8F0',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+      width: '100%',
+    }}
+  >
+    <Stack
+      direction={{ xs: 'column', sm: 'row' }}
+      spacing={1.5}
+      component="form"
+      onSubmit={handleSubmit(handleFilter)}
+      alignItems="center"
+      sx={{ width: '100%' }}
+    >
+      {/* Keyword Input */}
+      <Box sx={{ flex: 1, minWidth: 0, width: '100%' }}>
+        <TextFieldCustom
+          name="kw"
+          placeholder={t('employer:profileSearch.placeholder.enterkeywords')}
+          control={control}
+          icon={<SearchIcon sx={{ color: 'primary.main', fontSize: 20 }} />}
+          sx={searchControlSx}
+        />
+      </Box>
+
+      {/* City Select */}
+      <Box sx={{ width: { xs: '100%', sm: 220 }, flexShrink: 0 }}>
+        <SingleSelectCustom
+          name="cityId"
+          control={control}
+          options={allConfig?.cityOptions || []}
+          placeholder={t('employer:profileSearch.placeholder.selectcityprovince')}
+          sx={searchControlSx}
+        />
+      </Box>
+
+      {/* Filter Button next to City Select */}
+      <Box sx={{ width: { xs: '100%', sm: 'auto' }, flexShrink: 0 }}>
+        <Button
+          variant={activeFilterCount > 0 ? 'contained' : 'outlined'}
+          color={activeFilterCount > 0 ? 'primary' : 'inherit'}
+          startIcon={<FilterAltIcon sx={{ fontSize: 18 }} />}
+          onClick={onOpenFilterDrawer}
+          sx={{
+            height: 42,
+            borderRadius: '8px',
+            fontWeight: 700,
+            fontSize: '0.875rem',
+            textTransform: 'none',
+            px: 2,
+            borderColor: activeFilterCount > 0 ? 'primary.main' : '#CBD5E1',
+            bgcolor: activeFilterCount > 0 ? undefined : '#F8FAFC',
+            color: activeFilterCount > 0 ? '#FFFFFF' : '#334155',
+            '&:hover': {
+              bgcolor: activeFilterCount > 0 ? undefined : '#F1F5F9',
+              borderColor: activeFilterCount > 0 ? undefined : '#94A3B8',
+            },
+          }}
+        >
+          Bộ lọc {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}
+        </Button>
+      </Box>
+
+      {/* Search Button */}
+      <Box sx={{ width: { xs: '100%', sm: 140 }, flexShrink: 0 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<SearchIcon />}
+          type="submit"
+          fullWidth
+          sx={{
+            height: 42,
+            borderRadius: '8px',
+            fontWeight: 700,
+            fontSize: '0.875rem',
+            textTransform: 'none',
+            boxShadow: 'none',
+            '&:hover': {
+              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
+            },
+          }}
+        >
+          {t('employer:profileSearch.label.search')}
+        </Button>
+      </Box>
+    </Stack>
+  </Paper>
+);
+
+export const ProfileFilterDrawer: React.FC<{
+  open: boolean;
+  onClose: () => void;
+  control: ReturnType<typeof useForm<ProfileSearchValues>>['control'];
+  handleReset: () => void;
+  handleSubmit: ReturnType<typeof useForm<ProfileSearchValues>>['handleSubmit'];
+  handleFilter: (data: ProfileSearchValues) => void;
+  allConfig: ReturnType<typeof useConfig>['allConfig'];
+  t: (key: string) => string;
+}> = ({ open, onClose, control, handleReset, handleSubmit, handleFilter, allConfig, t }) => (
+  <Drawer
+    anchor="right"
+    open={open}
+    onClose={onClose}
+    PaperProps={{
+      sx: {
+        width: { xs: '100%', sm: 380 },
+        maxWidth: '100vw',
+        p: 0,
+        bgcolor: '#FFFFFF',
+      },
+    }}
+  >
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* Drawer Header */}
+      <Box
+        sx={{
+          p: 2.5,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderBottom: '1px solid #E2E8F0',
+        }}
+      >
+        <Stack direction="row" spacing={1.25} alignItems="center">
+          <FilterAltIcon sx={{ fontSize: 20, color: 'primary.main' }} />
+          <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1rem', color: '#0F172A' }}>
+            {t('employer:profileSearch.title.advancedFilters').toUpperCase()}
+          </Typography>
+        </Stack>
+
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Tooltip title={t('employer:profileSearch.label.clearFilters')} arrow>
+            <Button
+              variant="text"
+              color="error"
+              size="small"
+              onClick={handleReset}
+              sx={{
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                textTransform: 'none',
+                minWidth: 'auto',
+                px: 1,
+              }}
+            >
+              Xóa bộ lọc
+            </Button>
+          </Tooltip>
+          <IconButton size="small" onClick={onClose} sx={{ color: '#64748B' }}>
+            <CloseIcon sx={{ fontSize: 20 }} />
+          </IconButton>
+        </Stack>
+      </Box>
+
+      {/* Drawer Body - Filter List */}
+      <Box sx={{ flex: 1, overflowY: 'auto', p: 2.5 }}>
+        <Stack spacing={2}>
+          <FilterGroup
+            label={t('employer:profileSearch.label.careers')}
+            icon={BriefcaseIcon}
+            name="careerId"
+            options={allConfig?.careerOptions || []}
+            placeholder={t('employer:profileSearch.placeholder.allcareers')}
+            control={control}
+          />
+          <FilterGroup
+            label={t('employer:profileSearch.label.experience')}
+            icon={MagicIcon}
+            name="experienceId"
+            options={allConfig?.experienceOptions || []}
+            placeholder={t('employer:profileSearch.placeholder.allexperience')}
+            control={control}
+          />
+          <FilterGroup
+            label={t('employer:profileSearch.label.position')}
+            icon={GroupIcon}
+            name="positionId"
+            options={allConfig?.positionOptions || []}
+            placeholder={t('employer:profileSearch.placeholder.allpositions')}
+            control={control}
+          />
+          <FilterGroup
+            label={t('employer:profileSearch.label.academicLevel')}
+            icon={SchoolIcon}
+            name="academicLevelId"
+            options={allConfig?.academicLevelOptions || []}
+            placeholder={t('employer:profileSearch.placeholder.allacademiclevels')}
+            control={control}
+          />
+          <FilterGroup
+            label={t('employer:profileSearch.label.workplace')}
+            icon={BuildingIcon}
+            name="typeOfWorkplaceId"
+            options={allConfig?.typeOfWorkplaceOptions || []}
+            placeholder={t('employer:profileSearch.placeholder.allworkplaces')}
+            control={control}
+          />
+          <FilterGroup
+            label={t('employer:profileSearch.label.employmentType')}
+            icon={WorkerIcon}
+            name="jobTypeId"
+            options={allConfig?.jobTypeOptions || []}
+            placeholder={t('employer:profileSearch.placeholder.allemploymenttypes')}
+            control={control}
+          />
+          <FilterGroup
+            label={t('employer:profileSearch.label.gender')}
+            icon={GenderIcon}
+            name="genderId"
+            options={allConfig?.genderOptions || []}
+            placeholder={t('employer:profileSearch.placeholder.allgenders')}
+            control={control}
+          />
+          <FilterGroup
+            label={t('employer:profileSearch.label.maritalStatus')}
+            icon={FamilyIcon}
+            name="maritalStatusId"
+            options={allConfig?.maritalStatusOptions || []}
+            placeholder={t('employer:profileSearch.placeholder.allmaritalstatuses')}
+            control={control}
+          />
+        </Stack>
+      </Box>
+
+      {/* Drawer Footer - Apply Button */}
+      <Box sx={{ p: 2, borderTop: '1px solid #E2E8F0', bgcolor: '#F8FAFC' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          onClick={handleSubmit((data) => {
+            handleFilter(data);
+            onClose();
+          })}
+          sx={{
+            height: 44,
+            borderRadius: '8px',
+            fontWeight: 700,
+            fontSize: '0.9rem',
+            textTransform: 'none',
+          }}
+        >
+          Áp dụng bộ lọc
+        </Button>
+      </Box>
+    </Box>
+  </Drawer>
+);
+
+const ProfileSearch: React.FC = () => {
+  const {
+    control,
+    handleSubmit,
+    handleFilter,
+    handleReset,
+    allConfig,
+    t,
+    drawerOpen,
+    setDrawerOpen,
+    activeFilterCount,
+  } = useProfileSearch();
+
   return (
-    <>
-      <Grid size={12} sx={{ position: { lg: 'sticky' }, top: { lg: '80px' }, zIndex: 10 }}>
-        <Paper
-          elevation={0}
-          sx={{
-            p: 1.5,
-            borderRadius: '8px',
-            bgcolor: 'background.paper',
-            border: '1px solid',
-            borderColor: 'divider',
-            boxShadow: (theme) => theme.customShadows?.z1,
-          }}
-        >
-          <Grid container spacing={2} component="form" onSubmit={handleSubmit(handleFilter)} alignItems="center">
-            <Grid size={{ xs: 12, md: 6, lg: 6.5 }}>
-              <TextFieldCustom
-                name="kw"
-                placeholder={t('employer:profileSearch.placeholder.enterkeywords')}
-                control={control}
-                icon={<SearchIcon sx={{ color: 'primary.main' }} />}
-                sx={compactFilterControlSx}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 3, lg: 3 }}>
-              <SingleSelectCustom
-                name="cityId"
-                control={control}
-                options={allConfig?.cityOptions || []}
-                placeholder={t('employer:profileSearch.placeholder.selectcityprovince')}
-                sx={compactFilterControlSx}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 3, lg: 2.5 }}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<SearchIcon />}
-                type="submit"
-                fullWidth
-                sx={{
-                  height: 48,
-                  
-                  boxShadow: (theme) => theme.customShadows?.primary,
-                  fontWeight: 900,
-                  fontSize: '1rem',
-                  textTransform: 'none',
-                  letterSpacing: '0.5px',
-                }}
-              >
-                {t('employer:profileSearch.label.search')}
-              </Button>
-            </Grid>
-          </Grid>
-        </Paper>
-      </Grid>
-
-      <Grid size={{ xs: 12, lg: 3 }}>
-        <Paper
-          sx={{
-            p: 2.5,
-            bgcolor: 'background.paper',
-            borderRadius: '8px',
-            border: '1px solid',
-            borderColor: 'divider',
-            boxShadow: (theme) => theme.customShadows?.z1,
-            position: { lg: 'sticky' },
-            top: { lg: '160px' },
-            maxHeight: { lg: 'calc(100vh - 180px)' },
-            overflowY: { lg: 'auto' },
-            '&::-webkit-scrollbar': {
-              width: '5px',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              bgcolor: '#CBD5E1',
-              borderRadius: '4px',
-            },
-          }}
-        >
-          <Stack spacing={4}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Stack direction="row" spacing={1.5} alignItems="center">
-                <Box sx={{ 
-                  p: 0.75, 
-                  borderRadius: 1.5, 
-                  bgcolor: 'primary.extralight', 
-                  color: 'primary.main',
-                  display: 'flex'
-                }}>
-                  <FilterAltIcon sx={{ fontSize: 20 }} />
-                </Box>
-                <Typography variant="subtitle1" sx={{ color: 'text.primary', fontWeight: 900, letterSpacing: '0.5px' }}>
-                  {t('employer:profileSearch.title.advancedFilters').toUpperCase()}
-                </Typography>
-              </Stack>
-              <Tooltip title={t('employer:profileSearch.label.clearFilters')} arrow>
-                <Button
-                  variant="text"
-                  color="error"
-                  size="small"
-                  onClick={handleReset}
-                  sx={{
-                    minWidth: 44,
-                    height: 44,
-                    
-                    p: 0,
-                    bgcolor: pc.error( 0.08),
-                    color: 'error.main',
-                    '&:hover': { bgcolor: 'error.main', color: '#fff' },
-                  }}
-                >
-                  <RefreshIcon sx={{ fontSize: 22 }} />
-                </Button>
-              </Tooltip>
-            </Stack>
-
-            <Divider sx={{ borderStyle: 'dashed', opacity: 0.6 }} />
-
-            <Stack spacing={3.5}>
-              <FilterGroup
-                label={t('employer:profileSearch.label.careers')}
-                icon={BriefcaseIcon}
-                name="careerId"
-                options={allConfig?.careerOptions || []}
-                placeholder={t('employer:profileSearch.placeholder.allcareers')}
-                control={control}
-              />
-              <FilterGroup
-                label={t('employer:profileSearch.label.experience')}
-                icon={MagicIcon}
-                name="experienceId"
-                options={allConfig?.experienceOptions || []}
-                placeholder={t('employer:profileSearch.placeholder.allexperience')}
-                control={control}
-              />
-              <FilterGroup
-                label={t('employer:profileSearch.label.position')}
-                icon={GroupIcon}
-                name="positionId"
-                options={allConfig?.positionOptions || []}
-                placeholder={t('employer:profileSearch.placeholder.allpositions')}
-                control={control}
-              />
-              <FilterGroup
-                label={t('employer:profileSearch.label.academicLevel')}
-                icon={SchoolIcon}
-                name="academicLevelId"
-                options={allConfig?.academicLevelOptions || []}
-                placeholder={t('employer:profileSearch.placeholder.allacademiclevels')}
-                control={control}
-              />
-              <FilterGroup
-                label={t('employer:profileSearch.label.workplace')}
-                icon={BuildingIcon}
-                name="typeOfWorkplaceId"
-                options={allConfig?.typeOfWorkplaceOptions || []}
-                placeholder={t('employer:profileSearch.placeholder.allworkplaces')}
-                control={control}
-              />
-              <FilterGroup
-                label={t('employer:profileSearch.label.employmentType')}
-                icon={WorkerIcon}
-                name="jobTypeId"
-                options={allConfig?.jobTypeOptions || []}
-                placeholder={t('employer:profileSearch.placeholder.allemploymenttypes')}
-                control={control}
-              />
-              <FilterGroup
-                label={t('employer:profileSearch.label.gender')}
-                icon={GenderIcon}
-                name="genderId"
-                options={allConfig?.genderOptions || []}
-                placeholder={t('employer:profileSearch.placeholder.allgenders')}
-                control={control}
-              />
-              <FilterGroup
-                label={t('employer:profileSearch.label.maritalStatus')}
-                icon={FamilyIcon}
-                name="maritalStatusId"
-                options={allConfig?.maritalStatusOptions || []}
-                placeholder={t('employer:profileSearch.placeholder.allmaritalstatuses')}
-                control={control}
-              />
-            </Stack>
-          </Stack>
-        </Paper>
-      </Grid>
-    </>
+    <Stack spacing={2} sx={{ width: '100%' }}>
+      <ProfileSearchBar
+        control={control}
+        handleSubmit={handleSubmit}
+        handleFilter={handleFilter}
+        allConfig={allConfig}
+        t={t}
+        onOpenFilterDrawer={() => setDrawerOpen(true)}
+        activeFilterCount={activeFilterCount}
+      />
+      <ProfileFilterDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        control={control}
+        handleReset={handleReset}
+        handleSubmit={handleSubmit}
+        handleFilter={handleFilter}
+        allConfig={allConfig}
+        t={t}
+      />
+    </Stack>
   );
 };
 

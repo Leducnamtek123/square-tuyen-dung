@@ -115,7 +115,14 @@
     },
     "confirmUnsaveTitle": "Bỏ lưu hồ sơ",
     "confirmUnsaveMessage": "Bạn có chắc muốn bỏ lưu hồ sơ này?",
-    "manageSubtitle": "Quản lý hồ sơ đã lưu"
+    "manageSubtitle": "Quản lý hồ sơ đã lưu",
+    "table": {
+      "candidateName": "Họ và tên",
+      "jobTitle": "Tên vị trí / Chức danh",
+      "savedDate": "Ngày lưu",
+      "phone": "Số điện thoại",
+      "email": "Email"
+    }
   },
   "savedResumeTable": {
     "title": {

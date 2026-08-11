@@ -279,7 +279,7 @@ export const ExportOptions: React.FC<ExportOptionsProps> = ({
               onClick={onSelectAllColumns}
               sx={{ fontSize: '0.75rem', py: 0.25, px: 1, textTransform: 'none', borderRadius: '6px' }}
             >
-              Select All
+              Chọn tất cả
             </Button>
             <Button
               size="small"
@@ -288,7 +288,7 @@ export const ExportOptions: React.FC<ExportOptionsProps> = ({
               onClick={onClearAllColumns}
               sx={{ fontSize: '0.75rem', py: 0.25, px: 1, textTransform: 'none', borderRadius: '6px', color: 'text.secondary' }}
             >
-              Clear All
+              Bỏ chọn tất cả
             </Button>
           </Stack>
         </Stack>

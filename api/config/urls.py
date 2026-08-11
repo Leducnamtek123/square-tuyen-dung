@@ -59,7 +59,6 @@ urlpatterns = [
     path("o/", include("oauth2_provider.urls", namespace="oauth2_provider")),
     path("auth/", include("drf_social_oauth2.urls", namespace="drf")),
     path("api/v1/", include((api_v1_patterns, "api-v1"))),
-    # Backward compatibility during migration. Remove after clients move to /api/v1/.
     path("api/", include((api_v1_patterns, "api-legacy"))),
     path("", custom_admin_site.urls),
 ]

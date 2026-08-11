@@ -87,9 +87,13 @@ function reducer(state: JobPostCardState, action: JobPostCardAction): JobPostCar
   }
 }
 
+import AiCandidateRecommendationModal from '../AiCandidateRecommendationModal';
+
 const JobPostCard = () => {
   const { t, i18n } = useTranslation('employer');
   const verificationHref = localizeRoutePath(`/${ROUTES.EMPLOYER.VERIFICATION}`, i18n.language);
+  const [aiModalOpen, setAiModalOpen] = React.useState(false);
+  const [selectedAiJob, setSelectedAiJob] = React.useState<any>(null);
 
   const {
     page,
@@ -414,9 +418,19 @@ const JobPostCard = () => {
           onSortingChange={onSortingChange}
           handleDelete={handleDelete}
           handleUpdate={handleShowUpdate}
+          onOpenAiRecommendation={(job) => {
+            setSelectedAiJob(job);
+            setAiModalOpen(true);
+          }}
           enableRowSelection
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
+        />
+
+        <AiCandidateRecommendationModal
+          open={aiModalOpen}
+          onClose={() => setAiModalOpen(false)}
+          jobPost={selectedAiJob}
         />
 
         <FormPopup

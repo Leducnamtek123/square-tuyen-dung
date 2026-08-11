@@ -409,6 +409,20 @@ def get_all_config(request):
 @api_view(http_method_names=["GET"])
 @authentication_classes([])
 @permission_classes([AllowAny])
+def get_cities(request):
+    try:
+        def _build_cities():
+            cities = list(City.objects.all().values_list("id", "name"))
+            return utils.convert_tuple_or_list_to_options(cities)[0]
+        city_options = _run_blocking(_build_cities)
+    except Exception as ex:
+        helper.print_log_error("get_cities", ex)
+        return var_res.response_data(data=[])
+    return var_res.response_data(data=city_options)
+
+@api_view(http_method_names=["GET"])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def get_districts(request):
 
     params = request.query_params

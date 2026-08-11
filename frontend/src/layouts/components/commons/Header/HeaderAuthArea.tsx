@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from "react";
-import { Avatar, Box, Button, Card, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Button, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import VerifiedIcon from "@mui/icons-material/Verified";
 import { useTranslation } from "react-i18next";
 import UserMenu from "../UserMenu";
 
@@ -9,6 +10,7 @@ type HeaderAuthAreaProps = {
   isAuthenticated: boolean;
   currentUserName?: string;
   currentUserAvatarUrl?: string | null;
+  isVerified?: boolean;
   anchorElUser: HTMLElement | null;
   onOpenUserMenu: (event: React.MouseEvent<HTMLElement>) => void;
   onCloseUserMenu: () => void;
@@ -20,6 +22,7 @@ const HeaderAuthArea = ({
   isAuthenticated,
   currentUserName,
   currentUserAvatarUrl,
+  isVerified = true,
   anchorElUser,
   onOpenUserMenu,
   onCloseUserMenu,
@@ -27,62 +30,113 @@ const HeaderAuthArea = ({
   onSignUp,
 }: HeaderAuthAreaProps) => {
   const { t } = useTranslation('common');
+
+  // Sync avatar URL with LocalStorage cache so avatar updates instantly on page
+  const [avatarUrl, setAvatarUrl] = React.useState<string | undefined>(undefined);
+
+  React.useEffect(() => {
+    const syncAvatar = () => {
+      if (typeof window !== 'undefined') {
+        const cached = localStorage.getItem('sq_user_avatar');
+        if (cached) {
+          setAvatarUrl(cached);
+          return;
+        }
+      }
+      setAvatarUrl(currentUserAvatarUrl || undefined);
+    };
+
+    syncAvatar();
+
+    // Listen for custom storage events when avatar is uploaded
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', syncAvatar);
+      return () => window.removeEventListener('storage', syncAvatar);
+    }
+  }, [currentUserAvatarUrl]);
+
   return isAuthenticated ? (
     <Box sx={{ flexGrow: 0, ml: 1 }}>
-      <Card
-        variant="outlined"
-        onClick={onOpenUserMenu}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onOpenUserMenu(e as unknown as React.MouseEvent<HTMLElement>);
-          }
+      <Tooltip
+        arrow
+        placement="bottom-end"
+        title={
+          <Box sx={{ p: 0.5, minWidth: 140 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.875rem' }}>
+              {currentUserName || 'Ứng viên'}
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
+              <VerifiedIcon sx={{ fontSize: 13, color: isVerified ? '#4ade80' : '#94a3b8' }} />
+              <Typography variant="caption" sx={{ color: isVerified ? '#4ade80' : '#cbd5e1', fontWeight: 700, fontSize: '0.725rem' }}>
+                {isVerified ? 'Tài khoản đã xác thực' : 'Tài khoản chưa xác thực'}
+              </Typography>
+            </Box>
+          </Box>
+        }
+        slotProps={{
+          popper: {
+            sx: {
+              '& .MuiTooltip-tooltip': {
+                backgroundColor: '#0f172a',
+                borderRadius: '12px',
+                p: 1.25,
+                boxShadow: '0 10px 25px -5px rgba(0,0,0,0.25)',
+              },
+              '& .MuiTooltip-arrow': {
+                color: '#0f172a',
+              },
+            },
+          },
         }}
+      >
+        <IconButton
+          onClick={onOpenUserMenu}
           sx={{
-            p: 0.5,
-            borderRadius: 999,
+            p: 0.4,
+            border: '2px solid rgba(226, 232, 240, 0.95)',
+            borderRadius: '50%',
             backgroundColor: '#ffffff',
-            borderColor: 'rgba(226, 232, 240, 0.95)',
-            cursor: "pointer",
-            transition: "all 0.3s ease",
-            backdropFilter: "blur(8px)",
-            "&:hover": {
-              backgroundColor: '#ffffff',
-              borderColor: 'rgba(15, 23, 42, 0.16)',
-              transform: "translateY(-1px)",
+            transition: 'all 0.2s ease-in-out',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            '&:hover': {
+              borderColor: '#2563eb',
+              transform: 'scale(1.05)',
+              boxShadow: '0 4px 14px rgba(37,99,235,0.18)',
             },
           }}
         >
-        <Stack direction="row" justifyContent="center" alignItems="center">
-          <Avatar
-            alt="User Avatar"
-            src={currentUserAvatarUrl || undefined}
-            sx={{
-              width: 36,
-              height: 36,
-              border: '2px solid rgba(148, 163, 184, 0.25)',
-            }}
-          >
-            {currentUserName?.charAt(0)?.toUpperCase()}
-          </Avatar>
-          <Typography
-            variant="subtitle2"
-            sx={{
-              px: 1,
-              color: '#0f172a',
-              fontWeight: 600,
-              display: {
-                xs: "none",
-                sm: "block",
-              },
-            }}
-          >
-            {currentUserName}
-          </Typography>
-        </Stack>
-      </Card>
+          <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+            <Avatar
+              alt={currentUserName || 'User Avatar'}
+              src={avatarUrl || currentUserAvatarUrl || undefined}
+              sx={{
+                width: 38,
+                height: 38,
+                bgcolor: '#2563eb',
+                fontWeight: 800,
+                fontSize: '1rem',
+              }}
+            >
+              {currentUserName?.charAt(0)?.toUpperCase()}
+            </Avatar>
+
+            {/* Small Verified Badge Icon (Green if verified, Gray if unverified) */}
+            <VerifiedIcon
+              sx={{
+                position: 'absolute',
+                bottom: -2,
+                right: -2,
+                fontSize: 15,
+                color: isVerified ? '#16a34a' : '#94a3b8',
+                backgroundColor: '#ffffff',
+                borderRadius: '50%',
+                p: '1px',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+              }}
+            />
+          </Box>
+        </IconButton>
+      </Tooltip>
 
       <UserMenu
         anchorElUser={anchorElUser}
@@ -96,48 +150,32 @@ const HeaderAuthArea = ({
         <Button
           variant="outlined"
           size="small"
+          onClick={onLogin}
           sx={{
             color: '#0f172a',
-            backgroundColor: '#ffffff',
-            border: '1px solid rgba(15, 23, 42, 0.16)',
-            px: { xs: 1.5, sm: 2.5 },
-            py: 0.75,
-            fontSize: { xs: "0.75rem", sm: "0.85rem" },
-            boxShadow: '0 8px 18px rgba(15, 23, 42, 0.06)',
-            transition: "all 0.2s ease",
-            "&:hover": {
-              backgroundColor: 'rgba(15, 23, 42, 0.04)',
-              borderColor: 'rgba(15, 23, 42, 0.24)',
-              boxShadow: '0 10px 22px rgba(15, 23, 42, 0.08)',
-              transform: "translateY(-1px)",
-            },
+            borderColor: '#cbd5e1',
+            borderRadius: '10px',
+            textTransform: 'none',
+            fontWeight: 600,
+            fontSize: '0.85rem',
           }}
-          onClick={onLogin}
         >
-          {t('nav.login')}
+          {t('header.auth.login', { defaultValue: 'Đăng nhập' })}
         </Button>
-
         <Button
           variant="contained"
           size="small"
-          sx={{
-            color: '#ffffff',
-            backgroundColor: '#e11d48',
-            px: { xs: 1.5, sm: 2.5 },
-            py: 0.75,
-            fontSize: { xs: "0.72rem", sm: "0.85rem" },
-            fontWeight: 700,
-            boxShadow: '0 8px 20px rgba(225, 29, 72, 0.28)',
-            transition: "all 0.3s ease",
-            "&:hover": {
-              backgroundColor: '#be123c',
-              transform: "translateY(-1px)",
-              boxShadow: '0 10px 24px rgba(225, 29, 72, 0.38)',
-            },
-          }}
           onClick={onSignUp}
+          sx={{
+            backgroundColor: '#2563eb',
+            color: '#ffffff',
+            borderRadius: '10px',
+            textTransform: 'none',
+            fontWeight: 600,
+            fontSize: '0.85rem',
+          }}
         >
-          {t('nav.register')}
+          {t('header.auth.signUp', { defaultValue: 'Đăng ký' })}
         </Button>
       </Stack>
     </Box>

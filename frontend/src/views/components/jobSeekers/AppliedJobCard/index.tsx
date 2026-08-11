@@ -137,21 +137,41 @@ const AppliedJobCard = () => {
                 salaryMin={value?.jobPostDict.salaryMin}
                 salaryMax={value?.jobPostDict.salaryMax}
               >
-                <Stack spacing={1}>
+                <Stack spacing={1} alignItems={{ xs: 'flex-start', sm: 'flex-end' }}>
                   <Chip
                     label={t("jobSeeker:jobManagement.appliedOn", {
                       date: dayjs(value?.createAt).format("DD/MM/YYYY"),
                     })}
                     size="small"
                     color="success"
-                    icon={<DoneIcon />}
+                    icon={<DoneIcon sx={{ fontSize: 16 }} />}
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: '0.75rem',
+                      borderRadius: '8px',
+                      height: 26,
+                      px: 0.5,
+                      whiteSpace: 'nowrap',
+                      boxShadow: '0 2px 6px rgba(22,163,74,0.15)',
+                    }}
                   />
-                  <Typography variant="subtitle2" color="GrayText">
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      color: '#64748b',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
                     {value?.resumeDict?.type === CV_TYPES.cvWebsite ? (
                       <>
                         <FontAwesomeIcon
                           icon={faFile}
-                          style={{ marginRight: 1 }}
+                          style={{ marginRight: 2 }}
                           color="#2563eb"
                         />{' '}
                         {t("jobSeeker:jobApplication.onlineProfile")}
@@ -160,13 +180,20 @@ const AppliedJobCard = () => {
                       <>
                         <FontAwesomeIcon
                           icon={faFilePdf}
-                          style={{ marginRight: 1 }}
-                          color="red"
+                          style={{ marginRight: 2 }}
+                          color="#dc2626"
                         />{' '}
                         {t("jobSeeker:jobApplication.attachedResume")}
                       </>
                     ) : (
-                      ''
+                      <>
+                        <FontAwesomeIcon
+                          icon={faFile}
+                          style={{ marginRight: 2 }}
+                          color="#2563eb"
+                        />{' '}
+                        Hồ sơ trực tuyến
+                      </>
                     )}
                   </Typography>
                 </Stack>

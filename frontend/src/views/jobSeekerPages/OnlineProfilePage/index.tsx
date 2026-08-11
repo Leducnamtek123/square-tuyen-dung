@@ -18,10 +18,14 @@ import EducationDetailCard from '../../components/jobSeekers/EducationDetailCard
 import CertificateCard from '../../components/jobSeekers/CertificateCard';
 import LanguageSkillCard from '../../components/jobSeekers/LanguageSkillCard';
 import AdvancedSkillCard from '../../components/jobSeekers/AdvancedSkillCard';
+import usePreventUnsavedChanges from '../../../hooks/usePreventUnsavedChanges';
 
 const OnlineProfilePage = () => {
     const { t } = useTranslation('jobSeeker');
-    TabTitle(t("onlineProfile.pageTitle"))
+    TabTitle(t("onlineProfile.pageTitle"));
+
+    const [isDirty, setIsDirty] = React.useState(false);
+    usePreventUnsavedChanges(isDirty);
 
     const refs = React.useRef<(HTMLElement | null)[]>([]);
 

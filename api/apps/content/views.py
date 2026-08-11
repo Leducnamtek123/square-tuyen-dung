@@ -264,41 +264,6 @@ def get_mobile_banner(request):
         return var_res.response_data(data=[])
 
 
-@api_view(http_method_names=['post'])
-@permission_classes([perms_sys.IsAdminUser])
-def send_notification_demo(request):
-    data = request.data
-
-    title = data.get("title", "TEST")
-
-    content = data.get('content', "TEST CONTENT")
-
-    user_list = data.get('userList', [])
-
-    notification_type = data.get("type", "SYSTEM")
-
-    body_content = data.get('bodyContent', {})
-
-    image_link = data.get("imageLink", None)
-
-    queue_notification.add_notification_to_user.delay(
-
-        title=title,
-
-        content=content,
-
-        type_name=notification_type,
-
-        image=image_link,
-
-        content_of_type=body_content,
-
-        user_id_list=user_list
-
-    )
-
-    return var_res.response_data()
-
 
 # ===== Admin ViewSets =====
 

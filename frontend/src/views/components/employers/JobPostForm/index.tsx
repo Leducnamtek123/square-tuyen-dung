@@ -15,6 +15,7 @@ import type { SelectOption } from '@/types/models';
 import { createEditorStateFromHTMLString } from '@/utils/editorUtils';
 import { shouldResetChildLocationValue } from '@/utils/locationForm';
 import { Alert, Stack } from '@mui/material';
+import usePreventUnsavedChanges from '@/hooks/usePreventUnsavedChanges';
 
 interface JobPostFormProps {
   handleAddOrUpdate: (data: JobPostFormValues) => void;
@@ -91,10 +92,12 @@ const JobPostFormContent = ({
   const schema = useMemo(() => getJobPostSchema(t), [t]);
   const initialValues = React.useMemo(() => buildInitialValues(editData), [editData]);
 
-  const { handleSubmit, control, setValue } = useForm<JobPostFormValues>({
+  const { handleSubmit, control, setValue, formState: { isDirty } } = useForm<JobPostFormValues>({
     resolver: typedYupResolver(schema),
     defaultValues: initialValues,
   });
+
+  usePreventUnsavedChanges(isDirty);
 
   const cityId = useWatch({ control, name: 'location.city' });
   const address = useWatch({ control, name: 'location.address' });
@@ -180,6 +183,14 @@ const JobPostFormContent = ({
     }
   };
 
+  const locationValue = useWatch({ control, name: 'location' });
+
+  const handleLocationChange = (val: { address?: string; lat?: number | string | null; lng?: number | string | null }) => {
+    if (val.address) setValue('location.address', val.address, { shouldDirty: true, shouldValidate: true });
+    if (val.lat !== null && val.lat !== undefined) setValue('location.lat', val.lat, { shouldDirty: true });
+    if (val.lng !== null && val.lng !== undefined) setValue('location.lng', val.lng, { shouldDirty: true });
+  };
+
   const errorText = serverErrors ? Object.values(serverErrors).flat().join(' ') : '';
 
   return (
@@ -193,7 +204,8 @@ const JobPostFormContent = ({
           districtOptions={state.districtOptions}
           locationOptions={state.locationOptions}
           interviewTemplateOptions={questionGroupOptions}
-          handleSelectLocation={handleSelectLocation}
+          locationValue={locationValue}
+          onLocationChange={handleLocationChange}
         />
       </Stack>
     </form>

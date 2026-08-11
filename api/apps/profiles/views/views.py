@@ -57,7 +57,7 @@ class ProfileView(viewsets.ViewSet):
                 errors={"errorMessage": ["User does not have a job seeker profile."]},
             )
 
-        serializer = JobSeekerProfileSerializer(job_seeker_profile, data=data)
+        serializer = JobSeekerProfileSerializer(job_seeker_profile, data=data, partial=True)
         if not serializer.is_valid():
             return var_res.response_data(
                 status=status.HTTP_400_BAD_REQUEST,

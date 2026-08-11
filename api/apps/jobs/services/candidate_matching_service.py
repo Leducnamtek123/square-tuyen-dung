@@ -28,7 +28,9 @@ def match_and_source_candidates_for_job(job_post: JobPost, target_limit: int | N
     activities: List[JobPostActivity] = list(existing_activities)
 
     # 1. Query existing Data Lake (Resume DB)
-    data_lake_resumes = Resume.objects.filter(is_active=True).exclude(user_id__in=existing_user_ids)
+    data_lake_resumes = Resume.objects.filter(is_active=True).filter(
+        Q(job_seeker_profile__isnull=True) | Q(job_seeker_profile__is_seeking_job=True)
+    ).exclude(user_id__in=existing_user_ids)
     if job_post.career_id:
         data_lake_resumes = data_lake_resumes.filter(career_id=job_post.career_id)
     if job_post.location and job_post.location.city_id:

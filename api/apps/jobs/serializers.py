@@ -25,6 +25,7 @@ from .models import (
 )
 
 from apps.locations.models import Location
+from apps.profiles.models import Resume
 
 from common import serializers as common_serializers
 
@@ -161,6 +162,11 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     isExpired = serializers.SerializerMethodField(method_name='check_is_expired', read_only=True)
 
+    aiRecommendedCount = serializers.SerializerMethodField(method_name="get_ai_recommended_count", read_only=True)
+    ai_recommended_count = serializers.SerializerMethodField(method_name="get_ai_recommended_count", read_only=True)
+    aiRecommendedAvatars = serializers.SerializerMethodField(method_name="get_ai_recommended_avatars", read_only=True)
+    ai_recommended_avatars = serializers.SerializerMethodField(method_name="get_ai_recommended_avatars", read_only=True)
+
     from apps.interviews.models import QuestionGroup
     interviewTemplate = serializers.PrimaryKeyRelatedField(
         source='interview_template',
@@ -253,14 +259,59 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return False
 
     def check_is_expired(self, job_post):
-
         deadline = job_post.deadline
-
         if deadline < timezone.localdate():
-
             return True
-
         return False
+
+    def _get_matching_resumes(self, job_post):
+        qs = Resume.objects.filter(
+            Q(job_seeker_profile__isnull=True) | Q(job_seeker_profile__is_seeking_job=True)
+        ).select_related('user', 'user__avatar')
+        active_qs = qs.filter(is_active=True)
+        if active_qs.exists():
+            qs = active_qs
+        if job_post.career_id:
+            matching = qs.filter(career_id=job_post.career_id)
+            if matching.exists():
+                return matching
+        if job_post.job_name:
+            words = [w.strip() for w in job_post.job_name.split() if len(w.strip()) > 2]
+            if words:
+                query = Q()
+                for w in words:
+                    query |= Q(title__icontains=w) | Q(skills_summary__icontains=w)
+                matching = qs.filter(query)
+                if matching.exists():
+                    return matching
+        return qs
+
+    def get_ai_recommended_count(self, job_post):
+        return self._get_matching_resumes(job_post).count()
+
+    def get_ai_recommended_avatars(self, job_post):
+        resumes = list(self._get_matching_resumes(job_post)[:3])
+        result = []
+        for r in resumes:
+            u = getattr(r, 'user', None)
+            name = (getattr(u, 'full_name', '') or getattr(u, 'username', '') or getattr(r, 'title', '') or "Ứng viên").strip()
+            initial = name[0].upper() if name else "U"
+            avatar_url = None
+            if u and getattr(u, 'avatar', None) and getattr(u.avatar, 'file', None):
+                try:
+                    avatar_url = helper.get_presigned_url(u.avatar.file.name)
+                except Exception:
+                    avatar_url = None
+            if not avatar_url:
+                avatar_url = None
+
+            result.append({
+                "name": name,
+                "initial": initial,
+                "avatarUrl": avatar_url
+            })
+
+        return result
 
 
 
@@ -319,7 +370,8 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   'isSaved', 'isApplied', 'companyDict', 'mobileCompanyDict', 'locationDict', 'views',
 
                   'isExpired', 'salary', 'city', 'interviewTemplate',
-                  'isAutoSourcingEnabled', 'autoSourcingLimit', 'autoInterviewEnabled', 'minScreeningScore')
+                  'isAutoSourcingEnabled', 'autoSourcingLimit', 'autoInterviewEnabled', 'minScreeningScore',
+                  'aiRecommendedCount', 'aiRecommendedAvatars', 'ai_recommended_count', 'ai_recommended_avatars')
 
 
     def create(self, validated_data):

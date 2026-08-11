@@ -262,6 +262,13 @@ const hrmService = {
       return Array.isArray(unwrapped) ? unwrapped : unwrapped?.results || [];
     });
   },
+
+  exportPayrollCsv: async (): Promise<Blob> => {
+    const response = await httpRequest.get('native-hrm/employees/export-payroll/', {
+      responseType: 'blob',
+    });
+    return response as unknown as Blob;
+  },
 };
 
 export default hrmService;

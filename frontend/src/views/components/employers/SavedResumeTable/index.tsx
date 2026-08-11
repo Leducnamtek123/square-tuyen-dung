@@ -14,7 +14,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
@@ -217,7 +217,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
                       boxShadow: (theme) => theme.customShadows?.z1,
                       '&:hover': { bgcolor: 'error.dark' }
                   }}
-                  startIcon={<FavoriteIcon fontSize="small" />}
+                  startIcon={<BookmarkIcon fontSize="small" />}
                   onClick={() => {
                     if (!actionState.canUnsave) return;
                     handleUnsave(actionState.slug);

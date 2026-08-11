@@ -1,0 +1,22 @@
+{
+  "frontend": {
+    "files": 1069,
+    "pages": 124,
+    "components": 462,
+    "buttons": 1096,
+    "forms": 121,
+    "dialogs": 296,
+    "tables": 38,
+    "services": 43,
+    "api_calls": 605
+  },
+  "backend": {
+    "python_files": 326,
+    "viewsets": 77,
+    "apiviews": 19,
+    "controllers": 96,
+    "routes": 188,
+    "serializers": 64,
+    "models": 48
+  }
+}

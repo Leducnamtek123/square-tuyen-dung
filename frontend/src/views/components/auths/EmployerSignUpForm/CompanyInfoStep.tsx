@@ -11,14 +11,18 @@ import type { TFunction } from 'i18next';
 import type { EmployerSignUpFormData } from './types';
 import type { SelectOption } from '@/types/models';
 
+import LocationPicker, { LocationValue } from '@/components/Common/LocationPicker';
+
 interface CompanyInfoStepProps {
   control: Control<EmployerSignUpFormData>;
   t: TFunction<string | string[], undefined>;
   show: boolean;
   allConfig: { employeeSizeOptions?: SelectOption[]; cityOptions?: SelectOption[] } | null;
   districtOptions: SelectOption[];
-  locationOptions: SelectOption[];
-  handleSelectLocation: (e: React.SyntheticEvent, value: string | SelectOption | null) => void;
+  locationOptions?: SelectOption[];
+  handleSelectLocation?: (e: React.SyntheticEvent, value: string | SelectOption | null) => void;
+  locationValue?: LocationValue;
+  onLocationChange?: (val: LocationValue) => void;
 }
 
 const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
@@ -28,7 +32,9 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
   allConfig,
   districtOptions,
   locationOptions,
-  handleSelectLocation
+  handleSelectLocation,
+  locationValue,
+  onLocationChange,
 }) => {
   return (
     <Box sx={{ mb: 2, display: show ? 'block' : 'none' }}>
@@ -184,14 +190,12 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <TextFieldAutoCompleteCustom
+          <TextFieldCustom
             name="company.location.address"
             title={t('form.address')}
             showRequired={true}
             placeholder={t('form.addressPlaceholder')}
             control={control}
-            options={locationOptions}
-            handleSelect={handleSelectLocation}
             helperText={t('form.addressHelper')}
             sx={{
               '& .MuiOutlinedInput-root': {
@@ -199,6 +203,14 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
               }
             }}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+          <LocationPicker
+            value={locationValue}
+            onChange={onLocationChange}
+            label="Bản đồ vị trí công ty (OpenStreetMap)"
+            height="340px"
           />
         </Grid>
       </Grid>

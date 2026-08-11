@@ -138,7 +138,21 @@ def _request_has_verified_agent_auth(request, auth_error) -> bool:
 
 
 def _request_has_invite_token(request) -> bool:
-    return bool(request.data.get("invite_token") or request.data.get("inviteToken"))
+    try:
+        body_bytes = getattr(request, 'body', b'')
+        if body_bytes:
+            import json
+            parsed = json.loads(body_bytes.decode('utf-8'))
+            if isinstance(parsed, dict):
+                token = parsed.get("invite_token") or parsed.get("inviteToken")
+                if token:
+                    return True
+    except Exception:
+        pass
+    try:
+        return bool(request.data.get("invite_token") or request.data.get("inviteToken"))
+    except Exception:
+        return False
 
 
 def _user_can_update_status(user, session: InterviewSession, request=None) -> bool:
@@ -584,6 +598,12 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         base_qs = InterviewSession.objects.select_related(
             'candidate', 'job_post', 'job_post__company', 'created_by', 'voice_profile', 'question_group'
         ).prefetch_related('questions', 'transcripts', 'evaluations')
+
+        if self.action in [
+            'retrieve_by_invite_token', 'livekit_token_by_invite_token',
+            'context', 'update_status', 'append_transcription',
+        ]:
+            return base_qs
 
         if user.is_anonymous:
             return base_qs.none()

@@ -71,6 +71,26 @@ emp_user.is_active = True
 emp_user.is_verify_email = True
 emp_user.save()
 
+company_description = """<p><strong>1. Sứ mệnh và Triết lý Thiết kế</strong></p>
+<p>Square hoạt động với sứ mệnh kiến tạo các không gian nội thất sống và làm việc chất lượng để mang lại hạnh phúc và thịnh vượng cho khách hàng. Đội ngũ thiết kế và kiến trúc sư của công ty làm việc theo triết lý <em>"Chúng tôi hiểu và chúng tôi làm"</em>, đảm bảo mỗi công trình đều mang đậm dấu ấn cá nhân, văn hóa của khách hàng mà vẫn tối ưu hóa được công năng sử dụng.</p>
+
+<p><strong>2. Tiêu chuẩn Chất lượng Quốc tế</strong></p>
+<p>Công ty áp dụng hệ thống quản lý chất lượng theo tiêu chuẩn ISO 9001:2008, đã được tổ chức TÜV SÜD Group (Đức) chứng nhận. Việc này đảm bảo mọi quy trình từ tư vấn, thiết kế đến thi công nội thất đều tuân thủ các quy chuẩn nghiêm ngặt.</p>
+
+<p><strong>3. Các Cam kết Cốt lõi của Square</strong></p>
+<p>Square đưa ra 6 cam kết chính nhằm bảo vệ quyền lợi khách hàng:</p>
+<ul>
+  <li><strong>Chất lượng chuẩn ISO:</strong> Tuân thủ chặt chẽ các quy chuẩn quốc tế.</li>
+  <li><strong>Không phát sinh chi phí:</strong> Cam kết gói chi phí hợp lý nhất theo ngân sách và không thu thêm bất kỳ khoản phí nào sau khi ký hợp đồng (theo quy định hợp đồng Lumpsum).</li>
+  <li><strong>Rút ngắn thời gian:</strong> Quy trình vận hành khép kín giúp tiết kiệm 30% thời gian so với quy trình thông thường.</li>
+  <li><strong>Bảo hành nhanh:</strong> Hỗ trợ xử lý các vấn đề sau bàn giao trong vòng 24 giờ.</li>
+  <li><strong>Bảo mật tuyệt đối:</strong> Thông tin giao dịch của khách hàng được bảo mật theo quy định pháp luật.</li>
+  <li><strong>Báo cáo bằng hình ảnh:</strong> Khách hàng có thể theo dõi tiến độ và chất lượng công trình từ xa qua hình ảnh được cập nhật liên tục.</li>
+</ul>
+
+<p><strong>4. Văn hóa & 21 Giá trị cốt lõi</strong></p>
+<p>Square xây dựng môi trường làm việc sáng tạo, chuyên nghiệp, nơi các thành viên cùng chia sẻ 21 giá trị văn hóa doanh nghiệp, tôn trọng sự khác biệt và không ngừng học hỏi phát triển bản thân.</p>"""
+
 company, _ = Company.objects.update_or_create(
     user=emp_user,
     defaults={
@@ -78,9 +98,15 @@ company, _ = Company.objects.update_or_create(
         "company_email": employer_email,
         "company_phone": "0901234567",
         "tax_code": "0312345678",
+        "website_url": "https://www.square.vn",
+        "facebook_url": "https://www.facebook.com/square.vn",
+        "youtube_url": "https://www.youtube.com/user/Squareinteriordeco",
+        "since": datetime.date(2009, 1, 1),
         "employee_size": 100,
+        "is_verified": True,
         "location": loc,
         "field_operation": "Bất động sản, Xây dựng, Nội thất, Kiến trúc",
+        "description": company_description,
     },
 )
 
@@ -194,12 +220,14 @@ interview, _ = InterviewSession.objects.get_or_create(
 interview.questions.add(q1, q2)
 
 print("Creating OAuth2 Application...")
-Application.objects.create(
-    user=admin_user,
-    client_type=Application.CLIENT_CONFIDENTIAL,
-    authorization_grant_type=Application.GRANT_PASSWORD,
-    name='project_web_app',
+Application.objects.get_or_create(
     client_id=required_env('CLIENT_ID'),
-    client_secret=required_env('CLIENT_SECRET')
+    defaults={
+        "user": admin_user,
+        "client_type": Application.CLIENT_CONFIDENTIAL,
+        "authorization_grant_type": Application.GRANT_PASSWORD,
+        "name": 'project_web_app',
+        "client_secret": required_env('CLIENT_SECRET')
+    }
 )
 print("Done. Square-only seed complete.")
