@@ -82,6 +82,7 @@ const nextConfig = {
       { source: '/cong-ty', destination: '/companies' },
       { source: '/cong-ty/:slug', destination: '/companies/:slug' },
       { source: '/ve-chung-toi', destination: '/about-us' },
+      { source: '/gioi-thieu', destination: '/about-us' },
       { source: '/viec-lam-theo-nganh-nghe', destination: '/jobs-by-career' },
       { source: '/viec-lam-theo-tinh-thanh', destination: '/jobs-by-city' },
       { source: '/viec-lam-theo-hinh-thuc-lam-viec', destination: '/jobs-by-type' },

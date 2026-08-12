@@ -11,8 +11,8 @@ interface SEOProps {
   noIndex?: boolean;
 }
 
-const SITE_NAME = 'InfoHR Tuyển Dụng';
-const DEFAULT_IMAGE = 'https://sqstudio.vn/infohr-icons/icon.svg';
+const SITE_NAME = 'InfoHR';
+const DEFAULT_IMAGE = 'https://infohr.vn/android-chrome-512x512.png';
 const DEFAULT_DESCRIPTION =
   'InfoHR - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín.';
 

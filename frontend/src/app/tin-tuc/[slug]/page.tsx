@@ -11,9 +11,9 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  console.log('[generateMetadata blog/[slug]] fetching slug:', slug);
+  console.log('[generateMetadata tin-tuc/[slug]] fetching slug:', slug);
   const article = await serverFetch<Article>(`content/web/articles/${slug}/`);
-  console.log('[generateMetadata blog/[slug]] fetched article:', article ? article.title : 'NULL');
+  console.log('[generateMetadata tin-tuc/[slug]] fetched article:', article ? article.title : 'NULL');
 
   if (!article) {
     return buildPageMetadata('news');

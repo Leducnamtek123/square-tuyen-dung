@@ -121,3 +121,49 @@ export async function buildPageMetadata(key: string, extra?: Partial<Metadata>):
     ...extra,
   };
 }
+
+export interface SeoMetadataOptions {
+  title: string;
+  description: string;
+  path: string;
+  image?: string;
+  type?: 'website' | 'article';
+}
+
+/**
+ * Build complete SEO Metadata (title, description, canonical URL, and OpenGraph object)
+ */
+export function buildSeoMetadata({
+  title,
+  description,
+  path,
+  image = 'https://infohr.vn/android-chrome-512x512.png',
+  type = 'website',
+}: SeoMetadataOptions): Metadata {
+  const cleanPath = path === '/' ? '' : (path.startsWith('/') ? path : `/${path}`);
+  const canonicalUrl = `https://infohr.vn${cleanPath}`;
+  const fullImageUrl = image.startsWith('http') ? image : `https://infohr.vn${image.startsWith('/') ? '' : '/'}${image}`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: 'InfoHR',
+      locale: 'vi_VN',
+      type,
+      images: [
+        {
+          url: fullImageUrl,
+          alt: title,
+        },
+      ],
+    },
+  };
+}
+

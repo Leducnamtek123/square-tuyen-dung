@@ -15,22 +15,31 @@ const beVietnamPro = Be_Vietnam_Pro({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://infohr.vn'),
   title: {
-    template: '%s | InfoHR Tuyển Dụng',
-    default: 'InfoHR | Tìm việc nhanh, tuyển dụng hiệu quả',
+    template: '%s | InfoHR',
+    default: 'InfoHR - Tìm việc nhanh, tuyển dụng hiệu quả',
   },
   description:
     'InfoHR - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín. Ứng tuyển nhanh chóng, hiệu quả',
   keywords:
     'tìm việc, tuyển dụng, việc làm, ứng tuyển, nhà tuyển dụng, CV, hồ sơ xin việc, InfoHR, tuyển dụng Việt Nam',
   openGraph: {
-    title: 'InfoHR | Tìm việc nhanh, tuyển dụng hiệu quả',
+    title: 'InfoHR - Tìm việc nhanh, tuyển dụng hiệu quả',
     description:
-      'InfoHR - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín.',
-    url: 'https://sqstudio.vn/',
-    siteName: 'InfoHR Tuyển Dụng',
+      'InfoHR - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín. Ứng tuyển nhanh chóng, hiệu quả',
+    url: 'https://infohr.vn',
+    siteName: 'InfoHR',
     locale: 'vi_VN',
     type: 'website',
+    images: [
+      {
+        url: 'https://infohr.vn/android-chrome-512x512.png',
+        width: 512,
+        height: 512,
+        alt: 'InfoHR',
+      },
+    ],
   },
   icons: {
     icon: [

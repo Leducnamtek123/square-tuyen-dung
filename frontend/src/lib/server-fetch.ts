@@ -27,9 +27,12 @@ const dockerHostApiProxyOrigin = `http://host.docker.internal:${process.env.NGIN
 
 const resolveBackendBaseUrl = () => {
   const backendUrl = process.env.BACKEND_API_URL || '';
-
-  if (backendUrl && !isDockerBackendHost(backendUrl)) {
+  if (backendUrl) {
     return ensureApiBase(backendUrl);
+  }
+
+  if (isDockerRuntime) {
+    return ensureApiBase('http://backend:8000/api');
   }
 
   const apiProxyOrigin = process.env.API_PROXY_ORIGIN || '';
@@ -42,15 +45,7 @@ const resolveBackendBaseUrl = () => {
     return ensureApiBase(publicApiBase);
   }
 
-  if (isDockerRuntime) {
-    return ensureApiBase(dockerHostApiProxyOrigin);
-  }
-
-  if (!isDockerRuntime) {
-    return ensureApiBase(`http://localhost:${process.env.NGINX_PORT || '8080'}`);
-  }
-
-  return 'http://backend:8000/api';
+  return ensureApiBase(`http://localhost:${process.env.NGINX_PORT || '8080'}`);
 };
 
 const baseUrl = `${resolveBackendBaseUrl()}/`;

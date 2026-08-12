@@ -1,23 +1,21 @@
 import type { Metadata } from 'next';
 import { buildSeoMetadata } from '@/utils/serverI18n';
 import DefaultLayout from '@/layouts/DefaultLayout';
-import StaticInfoPage from '@/views/defaultPages/StaticInfoPage';
+import NewsPage from '@/views/defaultPages/NewsPage';
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildSeoMetadata({
-    title: 'Liên hệ',
+    title: 'Tin tức & Blog tuyển dụng',
     description:
-      'Liên hệ với InfoHR để được hỗ trợ giải đáp thắc mắc, đóng góp ý kiến hoặc tư vấn dịch vụ tuyển dụng và tìm việc làm.',
-    path: '/lien-he',
+      'Cập nhật tin tức mới nhất về thị trường lao động, kinh nghiệm phỏng vấn, tư vấn phát triển sự nghiệp và bí quyết tuyển dụng hiệu quả từ InfoHR.',
+    path: '/tin-tuc',
   });
 }
 
 export default function Page() {
   return (
     <DefaultLayout>
-      <StaticInfoPage pageKey="contact" />
+      <NewsPage />
     </DefaultLayout>
   );
 }
-
-
