@@ -19,7 +19,12 @@
   "lastModified": "Last modified",
   "all": "All",
   "select": "Select",
-  "search": "Search",
+  "search": {
+    "button": "Search",
+    "suggestions": "Search suggestions",
+    "recent": "Recent searches",
+    "noResults": "No results found"
+  },
   "reset": "Reset",
   "loading": "Loading...",
   "noData": "No data",
@@ -95,7 +100,8 @@
     "employerDashboard": "Employer Dashboard",
     "connectWith": "Connect with {{appName}}",
     "rightsReserved": "Â© {{year}} {{appName}}. All Rights Reserved.",
-    "forJobSeekers": "For Job Seekers"
+    "forJobSeekers": "For Job Seekers",
+    "support": "Help & Support"
   },
   "next": "Next",
   "actionsLabel": "Actions",
@@ -346,7 +352,8 @@
     "loadingPdf": "Loading PDF...",
     "saveSuccess": "Saved successfully.",
     "loadFailed": "Unable to load data. Please try again.",
-    "actionFailed": "Unable to perform this action right now. Please try again."
+    "actionFailed": "Unable to perform this action right now. Please try again.",
+    "copied": "Copied to clipboard!"
   },
   "breadcrumbs": {
     "label": "Breadcrumb",
@@ -544,8 +551,13 @@
     "title": "Online Interview Details"
   },
   "jobPost": {
-    "manageSubtitle": "Manage post details",
-    "remaining": "Remaining"
+    "urgentHiring": "Urgent Hiring",
+    "jobsCount": "{{count}} jobs",
+    "table": {
+      "title": "Job Post Title",
+      "createdDate": "Created Date",
+      "creator": "Creator"
+    }
   },
   "jobPostForm": {
     "section": {
@@ -878,12 +890,6 @@
     "pdfOnly": "Only PDF files accepted",
     "delete": "Delete"
   },
-  "search": {
-    "button": "Search",
-    "suggestions": "Search suggestions",
-    "recent": "Recent searches",
-    "noResults": "No results found"
-  },
   "notFound": {
     "title": "Page not found",
     "message": "The URL may have changed or the page has been deleted. Please check the URL or return to home.",
@@ -916,10 +922,6 @@
     "read": "Read",
     "unreadCount": "{{count}} unread",
     "viewAll": "View all"
-  },
-  "jobPost": {
-    "urgentHiring": "Urgent Hiring",
-    "jobsCount": "{{count}} jobs"
   },
   "profileUpload": {
     "allowSearch": "Allow search",
@@ -1013,7 +1015,27 @@
   "sidebarHeader": {
     "backToHome": "Back to Home",
     "backToAdmin": "Back to Admin"
-  }
+  },
+  "forbiddenCode": "403",
+  "forbiddenTitle": "Access Forbidden",
+  "forbiddenBody": "You do not have permission to access this page or resource.",
+  "backHome": "Back to Home",
+  "notFoundCode": "404",
+  "notFoundTitle": "Page Not Found",
+  "notFoundBody": "The page you are looking for does not exist or has been moved.",
+  "systemErrorCode": "500",
+  "systemErrorTitle": "System Error",
+  "systemErrorBody": "An internal server error occurred. We are working on resolving it.",
+  "tryAgain": "Try Again",
+  "appDownload": {
+    "smsSuccess": "App download link sent via SMS successfully!"
+  },
+  "connectingTitle": "Connecting voice assistant...",
+  "connectingDescription": "Please stay connected and prepare your microphone.",
+  "startAudio": "Start Audio",
+  "preconnectMessage": "Establishing secure voice channel...",
+  "startCall": "Start Call",
+  "welcomeMessage": "Hello! I am InfoHR AI Virtual Assistant. How can I help you today?",
+  "setupHelpPrefix": "Need technical help? ",
+  "setupHelpLink": "View setup guide"
 }
-
-

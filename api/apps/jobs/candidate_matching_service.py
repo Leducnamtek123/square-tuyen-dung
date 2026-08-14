@@ -70,11 +70,12 @@ def match_and_source_candidates_for_job(job_post: JobPost, target_limit: int | N
             try:
                 logger.info("Auto-sourcing %d candidates from Vieclam24h for JobPost %s (%s)", needed, job_post.id, job_post.job_name)
                 source_url = "https://ntd.vieclam24h.vn/tim-kiem-ung-vien-nhanh"
+                keyword = (job_post.job_name or "").strip()
                 cands = collect_vieclam24h_candidates(
                     source_url=source_url,
                     username=username,
                     password=password,
-                    occupation_ids=[],
+                    keyword=keyword,
                 )
                 if cands:
                     target_city = job_post.location.city if job_post.location else None

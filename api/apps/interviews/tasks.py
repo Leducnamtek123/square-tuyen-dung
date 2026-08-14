@@ -211,13 +211,14 @@ def send_interview_invitation(session_id, initial_password=None):
         job_title = session.job_post.job_name if session.job_post else "Vị trí tuyển dụng"
 
         context = {
-            "candidate_name": candidate.full_name or candidate.username or "Ứng viên",
+            "candidate_name": candidate.full_name or "Ứng viên",
             "candidate_email": candidate.email,
             "initial_password": initial_password,
             "login_url": login_url,
             "job_title": job_title,
             "interview_url": interview_url,
             "invite_token": session.invite_token,
+            "access_code": session.invite_token,
             "scheduled_at_display": scheduled_at_display,
         }
 

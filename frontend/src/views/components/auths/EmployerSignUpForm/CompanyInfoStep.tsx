@@ -6,7 +6,7 @@ import SingleSelectCustom from '../../../../components/Common/Controls/SingleSel
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
 import TextFieldAutoCompleteCustom from '../../../../components/Common/Controls/TextFieldAutoCompleteCustom';
 import { DATE_OPTIONS } from '../../../../configs/constants';
-import type { Control } from 'react-hook-form';
+import { useWatch, type Control } from 'react-hook-form';
 import type { TFunction } from 'i18next';
 import type { EmployerSignUpFormData } from './types';
 import type { SelectOption } from '@/types/models';
@@ -36,6 +36,8 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
   locationValue,
   onLocationChange,
 }) => {
+  const cityId = useWatch({ control, name: 'company.location.city' });
+
   return (
     <Box sx={{ mb: 2, display: show ? 'block' : 'none' }}>
       <Grid container spacing={2.5}>
@@ -178,6 +180,8 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             options={districtOptions}
             name="company.location.district"
             control={control}
+            disabled={!cityId}
+            disabledPlaceholder={t('form.selectCityFirst', { defaultValue: 'Vui lòng chọn Tỉnh / Thành phố trước' })}
             title={t('form.district')}
             placeholder={t('form.districtPlaceholder')}
             showRequired={true}
@@ -205,14 +209,16 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             }}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <LocationPicker
-            value={locationValue}
-            onChange={onLocationChange}
-            label="Bản đồ vị trí công ty (OpenStreetMap)"
-            height="340px"
-          />
-        </Grid>
+        {show && (
+          <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+            <LocationPicker
+              value={locationValue}
+              onChange={onLocationChange}
+              label="Bản đồ vị trí công ty (OpenStreetMap)"
+              height="340px"
+            />
+          </Grid>
+        )}
       </Grid>
     </Box>
   );

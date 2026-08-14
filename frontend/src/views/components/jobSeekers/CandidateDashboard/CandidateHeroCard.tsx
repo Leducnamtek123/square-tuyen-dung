@@ -23,6 +23,7 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import type { User } from '@/types/models';
 import type { ExtendedResume } from '@/components/Features/CVDoc';
+import dayjs from 'dayjs';
 
 interface CandidateHeroCardProps {
   user: User | null;
@@ -33,16 +34,19 @@ interface CandidateHeroCardProps {
 const CandidateHeroCard = ({
   user,
   resume,
-  completenessPercent = 72,
+  completenessPercent = 0,
 }: CandidateHeroCardProps) => {
-  const displayName = user?.fullName || resume?.title || 'Nam';
-  const displayTitle = resume?.title || 'Kỹ sư phần mềm';
-  const displayEmail = user?.email || 'nam@gmail.com';
-  const displayPhone = (user as { phone?: string })?.phone || '0901 234 567';
-  const displayLocation = 'Hà Nội, Việt Nam';
-  const displayDob = '01/01/1995';
-  const displayGender = 'Nam';
-  const displayUpdated = '20/05/2024';
+  const displayName = user?.fullName || 'Ứng viên';
+  const displayTitle = resume?.title || 'Chưa cập nhật chức danh';
+  const displayEmail = user?.email || 'Chưa cập nhật';
+  const displayPhone = (user as { phone?: string })?.phone || (user as { phoneNumber?: string })?.phoneNumber || (resume as any)?.jobSeekerProfile?.phone || 'Chưa cập nhật';
+  const displayLocation = (typeof (resume as any)?.city === 'object' ? (resume as any)?.city?.name : (resume as any)?.city) || 'Chưa cập nhật';
+  const rawDob = (user as any)?.jobSeekerProfile?.birthday;
+  const displayDob = rawDob && dayjs(rawDob).isValid() ? dayjs(rawDob).format('DD/MM/YYYY') : 'Chưa cập nhật';
+  const rawGender = (user as any)?.jobSeekerProfile?.gender;
+  const displayGender = rawGender === 'M' ? 'Nam' : rawGender === 'F' ? 'Nữ' : rawGender ? 'Khác' : 'Chưa cập nhật';
+  const rawUpdated = resume?.updateAt || (resume as any)?.createdAt;
+  const displayUpdated = rawUpdated && dayjs(rawUpdated).isValid() ? dayjs(rawUpdated).format('DD/MM/YYYY') : 'Chưa cập nhật';
 
   return (
     <Card

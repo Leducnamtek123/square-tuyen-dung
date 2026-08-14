@@ -14,6 +14,7 @@ import {
   Box,
   Autocomplete,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import CloseIcon from '@mui/icons-material/Close';
 import commonService from '@/services/commonService';
 import type { SelectOption, SystemConfig } from '@/types/models';
@@ -42,11 +43,14 @@ interface CandidateEditProfileModalProps {
   onSave: (data: ProfileFormData) => void;
 }
 
-const normalizeOptionLabel = (opt: SelectOption | string | null | undefined): string => {
+const normalizeOptionLabel = (opt: SelectOption | string | null | undefined, t?: (k: string, opt?: { defaultValue?: string }) => string): string => {
   if (!opt) return '';
-  if (typeof opt === 'string') return opt;
+  if (typeof opt === 'string') {
+    return t ? t(`choices.${opt}`, { defaultValue: opt }) : opt;
+  }
   const o = opt as unknown as { name?: string; label?: string; title?: string; id?: string | number };
-  return o.name || o.label || o.title || String(o.id || '');
+  const raw = o.name || o.label || o.title || String(o.id || '');
+  return t ? t(`choices.${raw}`, { defaultValue: raw }) : raw;
 };
 
 const CandidateEditProfileModal: React.FC<CandidateEditProfileModalProps> = ({
@@ -55,9 +59,15 @@ const CandidateEditProfileModal: React.FC<CandidateEditProfileModalProps> = ({
   initialData,
   onSave,
 }) => {
+  const { t } = useTranslation(['common', 'jobSeeker']);
   const [formData, setFormData] = React.useState<ProfileFormData>(initialData);
+
+  const getLabel = React.useCallback((opt: SelectOption | string | null | undefined): string => {
+    return normalizeOptionLabel(opt, t);
+  }, [t]);
   const [config, setConfig] = React.useState<SystemConfig | null>(null);
   const [districtOptions, setDistrictOptions] = React.useState<SelectOption[]>([]);
+  const [isDistrictLoading, setIsDistrictLoading] = React.useState(false);
 
   // Synchronize initial form data
   React.useEffect(() => {
@@ -114,6 +124,7 @@ const CandidateEditProfileModal: React.FC<CandidateEditProfileModalProps> = ({
   React.useEffect(() => {
     if (!open || !formData.city) {
       setDistrictOptions([]);
+      setIsDistrictLoading(false);
       return;
     }
 
@@ -125,13 +136,15 @@ const CandidateEditProfileModal: React.FC<CandidateEditProfileModalProps> = ({
 
     const cityId = matchedCity ? matchedCity.id : formData.city;
     if (cityId) {
+      setIsDistrictLoading(true);
       commonService
         .getDistrictsByCityId(cityId)
         .then((res) => {
           const results = Array.isArray(res) ? res : res.data || [];
           setDistrictOptions(results);
         })
-        .catch(() => setDistrictOptions([]));
+        .catch(() => setDistrictOptions([]))
+        .finally(() => setIsDistrictLoading(false));
     }
   }, [formData.city, cityOptions, open]);
 
@@ -261,9 +274,9 @@ const CandidateEditProfileModal: React.FC<CandidateEditProfileModalProps> = ({
               <Autocomplete
                 size="small"
                 options={genderOptions}
-                getOptionLabel={(opt) => normalizeOptionLabel(opt)}
-                value={genderOptions.find((g) => g.id === formData.gender || normalizeOptionLabel(g) === formData.gender) || null}
-                onChange={(_, newValue) => handleChange('gender', newValue ? normalizeOptionLabel(newValue) : '')}
+                getOptionLabel={(opt) => getLabel(opt)}
+                value={genderOptions.find((g) => getLabel(g).toLowerCase() === formData.gender.toLowerCase() || String(g.name || '').toLowerCase() === formData.gender.toLowerCase() || String(g.id).toLowerCase() === formData.gender.toLowerCase()) || (formData.gender ? { id: formData.gender, name: formData.gender } : null)}
+                onChange={(_, newValue) => handleChange('gender', newValue ? getLabel(newValue) : '')}
                 renderInput={(params) => <TextField {...params} placeholder="Chọn Giới tính" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />}
               />
             </Grid>
@@ -276,25 +289,48 @@ const CandidateEditProfileModal: React.FC<CandidateEditProfileModalProps> = ({
               <Autocomplete
                 size="small"
                 options={cityOptions}
-                getOptionLabel={(opt) => normalizeOptionLabel(opt)}
-                value={cityOptions.find((c) => normalizeOptionLabel(c).toLowerCase() === formData.city.toLowerCase() || String(c.id) === String(formData.city)) || (formData.city ? { id: formData.city, name: formData.city } : null)}
-                onChange={(_, newValue) => handleChange('city', newValue ? normalizeOptionLabel(newValue) : '')}
+                getOptionLabel={(opt) => getLabel(opt)}
+                value={cityOptions.find((c) => getLabel(c).toLowerCase() === formData.city.toLowerCase() || String(c.id) === String(formData.city)) || (formData.city ? { id: formData.city, name: formData.city } : null)}
+                onChange={(_, newValue) => handleChange('city', newValue ? getLabel(newValue) : '')}
                 renderInput={(params) => <TextField {...params} placeholder="Chọn Tỉnh / Thành phố" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />}
               />
             </Grid>
 
             {/* Location: Quận / Huyện */}
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Typography variant="caption" sx={{ color: '#0f172a', fontWeight: 700, mb: 0.5, display: 'block' }}>
+              <Typography variant="caption" sx={{ color: !formData.city ? '#94a3b8' : '#0f172a', fontWeight: 700, mb: 0.5, display: 'block' }}>
                 Quận / Huyện
               </Typography>
               <Autocomplete
                 size="small"
+                disabled={!formData.city || isDistrictLoading}
+                loading={isDistrictLoading}
+                loadingText="Đang tải danh sách Quận / Huyện..."
+                noOptionsText={!formData.city ? 'Vui lòng chọn Tỉnh / Thành phố trước' : 'Không tìm thấy quận/huyện'}
                 options={districtOptions}
-                getOptionLabel={(opt) => normalizeOptionLabel(opt)}
-                value={districtOptions.find((d) => normalizeOptionLabel(d).toLowerCase() === formData.district.toLowerCase() || String(d.id) === String(formData.district)) || (formData.district ? { id: formData.district, name: formData.district } : null)}
-                onChange={(_, newValue) => handleChange('district', newValue ? normalizeOptionLabel(newValue) : '')}
-                renderInput={(params) => <TextField {...params} placeholder="Chọn Quận / Huyện" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />}
+                getOptionLabel={(opt) => getLabel(opt)}
+                value={districtOptions.find((d) => getLabel(d).toLowerCase() === formData.district.toLowerCase() || String(d.id) === String(formData.district)) || (formData.district ? { id: formData.district, name: formData.district } : null)}
+                onChange={(_, newValue) => handleChange('district', newValue ? getLabel(newValue) : '')}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={
+                      !formData.city
+                        ? 'Vui lòng chọn Tỉnh / Thành phố trước'
+                        : isDistrictLoading
+                          ? 'Đang tải Quận / Huyện...'
+                          : 'Chọn Quận / Huyện'
+                    }
+                    helperText={!formData.city ? 'Chọn Tỉnh / Thành phố để mở danh sách Quận / Huyện' : ''}
+                    FormHelperTextProps={{ sx: { mx: 0.5, mt: 0.5, color: '#64748b', fontSize: '0.75rem' } }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '12px',
+                        backgroundColor: !formData.city ? '#f8fafc' : '#ffffff',
+                      },
+                    }}
+                  />
+                )}
               />
             </Grid>
 
@@ -306,9 +342,9 @@ const CandidateEditProfileModal: React.FC<CandidateEditProfileModalProps> = ({
               <Autocomplete
                 size="small"
                 options={educationOptions}
-                getOptionLabel={(opt) => normalizeOptionLabel(opt)}
-                value={educationOptions.find((e) => normalizeOptionLabel(e).toLowerCase() === formData.education.toLowerCase()) || (formData.education ? { id: formData.education, name: formData.education } : null)}
-                onChange={(_, newValue) => handleChange('education', newValue ? normalizeOptionLabel(newValue) : '')}
+                getOptionLabel={(opt) => getLabel(opt)}
+                value={educationOptions.find((e) => getLabel(e).toLowerCase() === formData.education.toLowerCase() || String(e.name || '').toLowerCase() === formData.education.toLowerCase() || String(e.id).toLowerCase() === formData.education.toLowerCase()) || (formData.education ? { id: formData.education, name: getLabel(formData.education) } : null)}
+                onChange={(_, newValue) => handleChange('education', newValue ? getLabel(newValue) : '')}
                 renderInput={(params) => <TextField {...params} placeholder="Chọn Trình độ học vấn" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />}
               />
             </Grid>
@@ -321,9 +357,9 @@ const CandidateEditProfileModal: React.FC<CandidateEditProfileModalProps> = ({
               <Autocomplete
                 size="small"
                 options={experienceOptions}
-                getOptionLabel={(opt) => normalizeOptionLabel(opt)}
-                value={experienceOptions.find((exp) => normalizeOptionLabel(exp).toLowerCase() === formData.experience.toLowerCase()) || (formData.experience ? { id: formData.experience, name: formData.experience } : null)}
-                onChange={(_, newValue) => handleChange('experience', newValue ? normalizeOptionLabel(newValue) : '')}
+                getOptionLabel={(opt) => getLabel(opt)}
+                value={experienceOptions.find((exp) => getLabel(exp).toLowerCase() === formData.experience.toLowerCase() || String(exp.name || '').toLowerCase() === formData.experience.toLowerCase() || String(exp.id).toLowerCase() === formData.experience.toLowerCase()) || (formData.experience ? { id: formData.experience, name: getLabel(formData.experience) } : null)}
+                onChange={(_, newValue) => handleChange('experience', newValue ? getLabel(newValue) : '')}
                 renderInput={(params) => <TextField {...params} placeholder="Chọn Kinh nghiệm làm việc" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />}
               />
             </Grid>
@@ -336,9 +372,9 @@ const CandidateEditProfileModal: React.FC<CandidateEditProfileModalProps> = ({
               <Autocomplete
                 size="small"
                 options={careerOptions}
-                getOptionLabel={(opt) => normalizeOptionLabel(opt)}
-                value={careerOptions.find((cr) => normalizeOptionLabel(cr).toLowerCase() === formData.career.toLowerCase() || String(cr.id) === String(formData.career)) || (formData.career ? { id: formData.career, name: formData.career } : null)}
-                onChange={(_, newValue) => handleChange('career', newValue ? normalizeOptionLabel(newValue) : '')}
+                getOptionLabel={(opt) => getLabel(opt)}
+                value={careerOptions.find((cr) => getLabel(cr).toLowerCase() === formData.career.toLowerCase() || String(cr.name || '').toLowerCase() === formData.career.toLowerCase() || String(cr.id) === String(formData.career)) || (formData.career ? { id: formData.career, name: getLabel(formData.career) } : null)}
+                onChange={(_, newValue) => handleChange('career', newValue ? getLabel(newValue) : '')}
                 renderInput={(params) => <TextField {...params} placeholder="Chọn Ngành nghề chính" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />}
               />
             </Grid>
@@ -351,9 +387,9 @@ const CandidateEditProfileModal: React.FC<CandidateEditProfileModalProps> = ({
               <Autocomplete
                 size="small"
                 options={maritalStatusOptions}
-                getOptionLabel={(opt) => normalizeOptionLabel(opt)}
-                value={maritalStatusOptions.find((m) => normalizeOptionLabel(m).toLowerCase() === formData.maritalStatus.toLowerCase()) || (formData.maritalStatus ? { id: formData.maritalStatus, name: formData.maritalStatus } : null)}
-                onChange={(_, newValue) => handleChange('maritalStatus', newValue ? normalizeOptionLabel(newValue) : '')}
+                getOptionLabel={(opt) => getLabel(opt)}
+                value={maritalStatusOptions.find((m) => getLabel(m).toLowerCase() === formData.maritalStatus.toLowerCase() || String(m.name || '').toLowerCase() === formData.maritalStatus.toLowerCase() || String(m.id).toLowerCase() === formData.maritalStatus.toLowerCase()) || (formData.maritalStatus ? { id: formData.maritalStatus, name: getLabel(formData.maritalStatus) } : null)}
+                onChange={(_, newValue) => handleChange('maritalStatus', newValue ? getLabel(newValue) : '')}
                 renderInput={(params) => <TextField {...params} placeholder="Chọn Tình trạng hôn nhân" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />}
               />
             </Grid>

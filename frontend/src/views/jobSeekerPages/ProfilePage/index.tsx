@@ -26,67 +26,47 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { getUserInfo, setUserInfo } from '@/redux/userSlice';
 import authService from '@/services/authService';
 import jobSeekerProfileService from '@/services/jobSeekerProfileService';
+import resumeService from '@/services/resumeService';
 import toastMessages from '@/utils/toastMessages';
 import CandidateAppliedResumeCard from '../../components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard';
 import CandidateProfileHeroBanner from '../../components/jobSeekers/CandidateProfile/CandidateProfileHeroBanner';
 import CandidateEditProfileModal, { ProfileFormData } from '../../components/jobSeekers/CandidateProfile/CandidateEditProfileModal';
 import CandidateSkillsCard from '../../components/jobSeekers/CandidateProfile/CandidateSkillsCard';
 import { useResumes } from '../../components/jobSeekers/hooks/useJobSeekerQueries';
-import { CV_TYPES } from '../../../configs/constants';
+import { CV_TYPES, ROUTES } from '../../../configs/constants';
+import { localizeRoutePath } from '../../../configs/routeLocalization';
 import type { ExtendedResume } from '@/components/Features/CVDoc';
 import type { User } from '@/types/models';
 
 const formatDate = (dateStr?: string | null) => {
-  if (!dateStr) return '01/01/1995';
+  if (!dateStr) return 'Chưa cập nhật';
   const d = dayjs(dateStr);
-  return d.isValid() ? d.format('DD/MM/YYYY') : '01/01/1995';
+  return d.isValid() ? d.format('DD/MM/YYYY') : 'Chưa cập nhật';
 };
 
-// Safe LocalStorage helper preventing QuotaExceededError crash
-const safeSaveStorage = (key: string, value: string) => {
-  try {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(key, value);
-    }
-  } catch (err) {
-    console.warn(`LocalStorage quota limit reached for ${key}, skipping persistent cache:`, err);
-  }
-};
 
-// Compress high-res uploaded images to compact JPEG base64 (max 600px width)
-const compressImage = (file: File, maxWidth = 600, quality = 0.75): Promise<string> => {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        } else {
-          resolve((e.target?.result as string) || '');
-        }
-      };
-      img.onerror = () => resolve('');
-      img.src = (e.target?.result as string) || '';
-    };
-    reader.readAsDataURL(file);
-  });
+const INITIAL_PROFILE_DATA: ProfileFormData = {
+  fullName: '',
+  title: '',
+  email: '',
+  phoneNumber: '',
+  dob: '',
+  gender: '',
+  city: '',
+  district: '',
+  address: '',
+  education: '',
+  experience: '',
+  career: '',
+  maritalStatus: '',
+  bio: '',
 };
 
 const ProfilePage = () => {
-  const { t } = useTranslation(['jobSeeker', 'common']);
+  const { t, i18n } = useTranslation(['jobSeeker', 'common']);
   TabTitle(t('jobSeeker:profile.title'));
+
+  const myCompanyHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.MY_COMPANY}`, i18n.language);
 
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.user);
@@ -102,81 +82,92 @@ const ProfilePage = () => {
     return resumes && resumes.length > 0 ? (resumes[0] as unknown as ExtendedResume) : null;
   }, [resumes]);
 
-  // Persistent Avatar & Cover URL from localStorage
-  const [avatarUrl, setAvatarUrl] = React.useState<string | undefined>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('sq_user_avatar') || currentUser?.avatarUrl || undefined;
-    }
-    return currentUser?.avatarUrl || undefined;
-  });
+  // Direct Avatar & Cover URL from Redux / Backend User
+  const [avatarUrl, setAvatarUrl] = React.useState<string | undefined>(currentUser?.avatarUrl || undefined);
+  const [coverUrl, setCoverUrl] = React.useState<string | undefined>(undefined);
 
-  const [coverUrl, setCoverUrl] = React.useState<string | undefined>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('sq_user_cover') || undefined;
-    }
-    return undefined;
-  });
-
-  // Profile Form State
-  const [profileData, setProfileData] = React.useState<ProfileFormData>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('sq_user_profile_data');
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {
-          // ignore
-        }
-      }
-    }
-    return {
-      fullName: currentUser?.fullName || 'Lê Đức Nam',
-      title: 'Chuyên viên phần mềm / Kỹ sư',
-      email: currentUser?.email || 'leducnamtek123@gmail.com',
-      phoneNumber: (currentUser as unknown as { phoneNumber?: string })?.phoneNumber || '0901 234 567',
-      dob: '1995-01-01',
-      gender: 'male',
-      city: 'Hồ Chí Minh',
-      district: 'Quận 1',
-      address: 'Hồ Chí Minh',
-      education: 'Đại học',
-      experience: '2 năm',
-      career: 'Công nghệ thông tin',
-      maritalStatus: 'Độc thân',
-      bio: 'Chuyên viên phần mềm với hơn 2 năm kinh nghiệm phát triển hệ thống và quản lý sản phẩm. Thành thạo công nghệ hiện đại, bóc tách giải pháp và tối ưu quy trình.',
-    };
-  });
+  // Profile Form State - Clean initial state from real user data
+  const [profileData, setProfileData] = React.useState<ProfileFormData>(() => ({
+    ...INITIAL_PROFILE_DATA,
+    fullName: currentUser?.fullName || '',
+    email: currentUser?.email || '',
+    phoneNumber: (currentUser as unknown as { phoneNumber?: string })?.phoneNumber || '',
+  }));
 
   const [editModalOpen, setEditModalOpen] = React.useState(false);
   const [isJobSeeking, setIsJobSeeking] = React.useState<boolean>(true);
   const [isSubmittingStatus, setIsSubmittingStatus] = React.useState<boolean>(false);
 
-  // Synchronize currentUser from Redux and fetch profile status
+  // Clear stale mock localStorage data
   React.useEffect(() => {
-    if (currentUser?.fullName) {
-      setProfileData((prev) => ({
-        ...prev,
-        fullName: currentUser.fullName || prev.fullName,
-        email: currentUser.email || prev.email,
-      }));
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('sq_user_profile_data');
     }
-    if (currentUser?.avatarUrl && typeof window !== 'undefined' && !localStorage.getItem('sq_user_avatar')) {
-      setAvatarUrl(currentUser.avatarUrl);
-    }
+  }, []);
+
+  // Synchronize profile data from Backend API
+  React.useEffect(() => {
     const fetchProfileStatus = async () => {
       try {
         const p = await jobSeekerProfileService.getProfile();
         if (p) {
           setIsJobSeeking(p.isJobSeeking ?? p.isSeekingJob ?? true);
+          setProfileData((prev) => {
+            const loc = p.location as any;
+            const cityName = loc?.city?.name || (typeof loc?.city === 'string' ? loc.city : '') || '';
+            const districtName = loc?.district?.name || (typeof loc?.district === 'string' ? loc.district : '') || '';
+            const genderVal = p.gender === 'M' ? 'Nam' : p.gender === 'F' ? 'Nữ' : p.gender === 'O' ? 'Khác' : '';
+            const maritalVal = p.maritalStatus === 'M' ? 'Đã kết hôn' : p.maritalStatus === 'S' ? 'Độc thân' : '';
+            return {
+              ...prev,
+              fullName: currentUser?.fullName || (p as any).user?.fullName || prev.fullName,
+              email: currentUser?.email || (p as any).user?.email || prev.email,
+              phoneNumber: p.phone || (currentUser as any)?.phoneNumber || prev.phoneNumber,
+              dob: p.birthday ? String(p.birthday).slice(0, 10) : prev.dob,
+              gender: genderVal || prev.gender,
+              maritalStatus: maritalVal || prev.maritalStatus,
+              city: cityName || prev.city,
+              district: districtName || prev.district,
+              address: loc?.address || prev.address,
+            };
+          });
         }
       } catch (err) {
         console.warn('Could not fetch candidate profile status from backend:', err);
       }
     };
+
     if (currentUser) {
       void fetchProfileStatus();
     }
   }, [currentUser]);
+
+  // Synchronize resume title, career, experience, education, bio from primary active resume
+  React.useEffect(() => {
+    if (resume) {
+      setProfileData((prev) => ({
+        ...prev,
+        title: resume.title || prev.title,
+        career: (resume as any).career?.name || (typeof (resume as any).career === 'string' ? (resume as any).career : '') || prev.career,
+        city: (resume as any).city?.name || (typeof (resume as any).city === 'string' ? (resume as any).city : '') || prev.city,
+        experience: typeof (resume as any).experience === 'object' ? (resume as any).experience?.name : (resume as any).experience ? `${(resume as any).experience} năm` : prev.experience,
+        education: typeof (resume as any).academicLevel === 'object' ? (resume as any).academicLevel?.name : (resume as any).academicLevel ? String((resume as any).academicLevel) : prev.education,
+        bio: (resume as any).description || prev.bio,
+      }));
+    }
+  }, [resume]);
+
+  // Skills from primary resume
+  const skillsList = React.useMemo(() => {
+    if (!resume) return [];
+    if (Array.isArray((resume as any).advancedSkills) && (resume as any).advancedSkills.length > 0) {
+      return (resume as any).advancedSkills.map((s: any) => s.name || String(s));
+    }
+    if ((resume as any).skillsSummary) {
+      return String((resume as any).skillsSummary).split(',').map((s) => s.trim()).filter(Boolean);
+    }
+    return [];
+  }, [resume]);
 
   const handleSeekingStatusChange = async (newStatus: boolean) => {
     setIsSubmittingStatus(true);
@@ -191,7 +182,6 @@ const ProfilePage = () => {
     } catch (err) {
       console.error('Failed to update job seeking status:', err);
       toastMessages.error('Không thể cập nhật trạng thái nhận việc làm. Vui lòng thử lại!');
-      throw err;
     } finally {
       setIsSubmittingStatus(false);
     }
@@ -199,109 +189,135 @@ const ProfilePage = () => {
 
   // Handle Avatar Upload API
   const handleAvatarChange = async (file: File, localUrl: string) => {
-    // 1. Instant System Toast Notification
-    toastMessages.success('Cập nhật ảnh đại diện thành công!');
-
-    // 2. Instant local blob preview
     setAvatarUrl(localUrl);
-    if (currentUser) {
-      dispatch(setUserInfo({ ...currentUser, avatarUrl: localUrl }));
-    }
 
-    // 3. Compress image and safely persist in localStorage
-    const compressedBase64 = await compressImage(file, 400, 0.8);
-    if (compressedBase64) {
-      setAvatarUrl(compressedBase64);
-      safeSaveStorage('sq_user_avatar', compressedBase64);
-      if (currentUser) {
-        dispatch(setUserInfo({ ...currentUser, avatarUrl: compressedBase64 }));
-      }
-    }
-
-    // 4. Send upload request to Backend API (Field 'file')
     try {
       const formData = new FormData();
       formData.append('file', file);
       const res = await authService.updateAvatar(formData);
       if (res?.avatarUrl) {
         setAvatarUrl(res.avatarUrl);
-        safeSaveStorage('sq_user_avatar', res.avatarUrl);
+        if (currentUser) {
+          dispatch(setUserInfo({ ...currentUser, avatarUrl: res.avatarUrl }));
+        }
       }
       void dispatch(getUserInfo());
+      toastMessages.success('Cập nhật ảnh đại diện thành công!');
     } catch (err) {
-      console.warn('Backend Cloudinary upload notice, updated in local session:', err);
+      console.error('Failed to upload avatar to server:', err);
+      toastMessages.error('Không thể tải ảnh đại diện lên máy chủ. Vui lòng thử lại!');
     }
   };
 
   // Handle Cover Upload API
   const handleCoverChange = async (file: File, localUrl: string) => {
-    // 1. Instant System Toast Notification
-    toastMessages.success('Cập nhật ảnh bìa thành công!');
-
-    // 2. Instant local blob preview
     setCoverUrl(localUrl);
 
-    // 3. Compress cover image to max 800px width to fit within browser storage
-    const compressedBase64 = await compressImage(file, 800, 0.7);
-    if (compressedBase64) {
-      setCoverUrl(compressedBase64);
-      safeSaveStorage('sq_user_cover', compressedBase64);
-    }
-
-    // 4. Send update request to Backend API
     try {
       await authService.updateUser(({ coverUrl: localUrl } as unknown) as Partial<User>);
       void dispatch(getUserInfo());
+      toastMessages.success('Cập nhật ảnh bìa thành công!');
     } catch (err) {
-      console.warn('Backend cover update notice, updated in local session:', err);
+      console.error('Failed to upload cover to server:', err);
+      toastMessages.error('Không thể cập nhật ảnh bìa lên máy chủ. Vui lòng thử lại!');
     }
   };
 
   // Handle Profile Save API
   const handleSaveProfile = async (updated: ProfileFormData) => {
-    toastMessages.success('Cập nhật thông tin cá nhân thành công!');
-    setProfileData(updated);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('sq_user_profile_data', JSON.stringify(updated));
-      if (updated.phoneNumber) {
-        localStorage.setItem('sq_user_phone', updated.phoneNumber);
-      }
-    }
     try {
-      await authService.updateUser({ fullName: updated.fullName, email: updated.email });
-      void dispatch(getUserInfo());
-    } catch (err) {
-      console.warn('Backend update user notice, updated in session:', err);
-      if (currentUser) {
-        dispatch(setUserInfo({ ...currentUser, fullName: updated.fullName, email: updated.email }));
+      setProfileData(updated);
+
+      const genderPayload =
+        updated.gender === 'male' || updated.gender === 'Nam' || updated.gender === 'M'
+          ? 'M'
+          : updated.gender === 'female' || updated.gender === 'Nữ' || updated.gender === 'F'
+            ? 'F'
+            : updated.gender === 'other' || updated.gender === 'Khác' || updated.gender === 'O'
+              ? 'O'
+              : undefined;
+
+      const maritalPayload =
+        updated.maritalStatus === 'Đã kết hôn' || updated.maritalStatus === 'M' || updated.maritalStatus === 'married'
+          ? 'M'
+          : updated.maritalStatus === 'Độc thân' || updated.maritalStatus === 'S' || updated.maritalStatus === 'single'
+            ? 'S'
+            : undefined;
+
+      await jobSeekerProfileService.updateProfile({
+        phone: updated.phoneNumber ? updated.phoneNumber.trim() : undefined,
+        birthday: updated.dob || undefined,
+        gender: genderPayload,
+        maritalStatus: maritalPayload,
+        user: updated.fullName ? { fullName: updated.fullName.trim() } : undefined,
+      });
+
+      if (updated.fullName) {
+        try {
+          await authService.updateUser({ fullName: updated.fullName.trim() });
+        } catch (authErr) {
+          console.warn('Could not update user account name:', authErr);
+        }
       }
+
+      if (resume?.slug) {
+        try {
+          await resumeService.updateResume(resume.slug, {
+            title: updated.title || undefined,
+            description: updated.bio || undefined,
+          });
+        } catch (resErr) {
+          console.warn('Could not update primary resume fields:', resErr);
+        }
+      }
+
+      void dispatch(getUserInfo());
+      toastMessages.success('Cập nhật thông tin cá nhân thành công!');
+    } catch (err) {
+      console.error('Failed to update candidate profile:', err);
+      toastMessages.error('Không thể cập nhật thông tin cá nhân. Vui lòng thử lại!');
     }
   };
 
   const personalInfoGrid = [
-    { label: 'Email', value: profileData.email, icon: <EmailOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Số điện thoại', value: profileData.phoneNumber, icon: <PhoneIphoneOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Tỉnh / Thành phố', value: profileData.city, icon: <LocationOnOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Quận / Huyện', value: profileData.district, icon: <LocationOnOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Trình độ học vấn', value: profileData.education, icon: <SchoolOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Kinh nghiệm', value: profileData.experience, icon: <WorkOutlineOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Ngành nghề', value: profileData.career, icon: <CategoryOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Tình trạng hôn nhân', value: profileData.maritalStatus, icon: <FavoriteBorderOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
+    { label: 'Email', value: profileData.email || 'Chưa cập nhật', icon: <EmailOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
+    { label: 'Số điện thoại', value: profileData.phoneNumber || 'Chưa cập nhật', icon: <PhoneIphoneOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
+    { label: 'Tỉnh / Thành phố', value: profileData.city || 'Chưa cập nhật', icon: <LocationOnOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
+    { label: 'Quận / Huyện', value: profileData.district || 'Chưa cập nhật', icon: <LocationOnOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
+    { label: 'Trình độ học vấn', value: profileData.education ? t(`common:choices.${profileData.education}`, { defaultValue: profileData.education }) : 'Chưa cập nhật', icon: <SchoolOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
+    { label: 'Kinh nghiệm', value: profileData.experience ? t(`common:choices.${profileData.experience}`, { defaultValue: profileData.experience }) : 'Chưa cập nhật', icon: <WorkOutlineOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
+    { label: 'Ngành nghề', value: profileData.career ? t(`common:choices.${profileData.career}`, { defaultValue: profileData.career }) : 'Chưa cập nhật', icon: <CategoryOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
+    { label: 'Tình trạng hôn nhân', value: profileData.maritalStatus ? t(`common:choices.${profileData.maritalStatus}`, { defaultValue: profileData.maritalStatus }) : 'Chưa cập nhật', icon: <FavoriteBorderOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
     { label: 'Ngày sinh', value: formatDate(profileData.dob), icon: <CakeOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Giới tính', value: profileData.gender === 'male' ? 'Nam' : profileData.gender === 'female' ? 'Nữ' : 'Khác', icon: <PersonOutlineOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
+    {
+      label: 'Giới tính',
+      value:
+        profileData.gender === 'male' || profileData.gender === 'Nam' || profileData.gender === 'M'
+          ? 'Nam'
+          : profileData.gender === 'female' || profileData.gender === 'Nữ' || profileData.gender === 'F'
+            ? 'Nữ'
+            : profileData.gender === 'other' || profileData.gender === 'Khác' || profileData.gender === 'O'
+              ? 'Khác'
+              : profileData.gender
+                ? profileData.gender
+                : 'Chưa cập nhật',
+      icon: <PersonOutlineOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} />,
+    },
   ];
 
   return (
     <Box>
       {/* 1. Hero Profile Banner */}
       <CandidateProfileHeroBanner
-        fullName={profileData.fullName}
+        fullName={profileData.fullName || currentUser?.fullName || 'Ứng viên'}
         title={profileData.title}
         avatarUrl={avatarUrl || currentUser?.avatarUrl || undefined}
         coverUrl={coverUrl}
+        experience={profileData.experience ? t(`common:choices.${profileData.experience}`, { defaultValue: profileData.experience }) : undefined}
+        updatedAt={(resume as any)?.updateAt || (resume as any)?.createdAt || undefined}
         isJobSeeking={isJobSeeking}
         isSubmittingStatus={isSubmittingStatus}
-        location={`${profileData.city || 'Hà Nội'}${profileData.district ? `, ${profileData.district}` : ''}`}
+        location={profileData.city ? `${profileData.city}${profileData.district ? `, ${profileData.district}` : ''}` : ''}
         onEditClick={() => setEditModalOpen(true)}
         onAvatarChange={handleAvatarChange}
         onCoverChange={handleCoverChange}
@@ -356,7 +372,7 @@ const ProfilePage = () => {
                         <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>
                           {item.label}
                         </Typography>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.875rem' }} noWrap>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: item.value && item.value !== 'Chưa cập nhật' ? '#0f172a' : '#94a3b8', fontSize: '0.875rem' }} noWrap>
                           {item.value || 'Chưa cập nhật'}
                         </Typography>
                       </Box>
@@ -398,7 +414,7 @@ const ProfilePage = () => {
             </Card>
 
             {/* Card C: Technical Skills */}
-            <CandidateSkillsCard />
+            <CandidateSkillsCard initialSkills={skillsList} />
           </Stack>
         </Grid>
 

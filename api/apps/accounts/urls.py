@@ -12,7 +12,9 @@ router.register(r'users', views.UserViewSet, basename='user')
 urlpatterns = [
 
     path('onboarding/status/', views_onboarding.GetOnboardingStatusView.as_view()),
+    path('onboarding/candidate/step/', views_onboarding.CandidateStepSaveView.as_view()),
     path('onboarding/candidate/', views_onboarding.CandidateOnboardingView.as_view()),
+    path('onboarding/employer/step/', views_onboarding.EmployerStepSaveView.as_view()),
     path('onboarding/employer/', views_onboarding.EmployerOnboardingView.as_view()),
 
     path('token/', views.CustomTokenView.as_view()),

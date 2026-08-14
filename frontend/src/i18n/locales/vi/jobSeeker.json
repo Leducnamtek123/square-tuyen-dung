@@ -484,5 +484,104 @@
   "form": {
     "phoneNumber": "Số điện thoại",
     "otpCode": "Mã OTP"
+  },
+  "onboarding": {
+    "pageTitle": "Thiết lập Hồ sơ Ứng viên | InfoHR",
+    "steps": {
+      "careerGoals": "Mục tiêu & Nguyện vọng",
+      "skillsExperience": "Kỹ năng & Kinh nghiệm",
+      "resumeUpload": "Tải CV / Hồ sơ",
+      "complete": "Hoàn tất"
+    },
+    "stepCounter": "Bước {{current}} / {{total}}",
+    "step1": {
+      "title": "Mục tiêu & Nguyện vọng nghề nghiệp",
+      "subtitle": "Chỉ mất 1 phút để thiết lập mục tiêu tìm việc và nhận các cơ hội việc làm phù hợp nhất",
+      "desiredJobTitle": "Bạn đang tìm công việc gì?",
+      "desiredJobTitlePlaceholder": "VD: Chuyên viên Marketing, Kỹ sư phần mềm, Quản trị nhân sự...",
+      "desiredJobTitleHelper": "Nhập tên vị trí chức danh bạn mong muốn ứng tuyển",
+      "career": "Ngành nghề chính",
+      "careerPlaceholder": "Chọn ngành nghề chuyên môn...",
+      "careerHelper": "Lĩnh vực ngành nghề phù hợp chuyên môn của bạn",
+      "city": "Bạn muốn làm việc ở đâu?",
+      "cityPlaceholder": "Chọn Tỉnh / Thành phố...",
+      "cityHelper": "Địa điểm bạn ưu tiên làm việc",
+      "workplaceType": "Hình thức làm việc ưu tiên",
+      "workplaceOnsite": "Tại văn phòng (Onsite)",
+      "workplaceHybrid": "Linh hoạt (Hybrid)",
+      "workplaceRemote": "Từ xa (Remote)"
+    },
+    "step2": {
+      "title": "Kỹ năng & Kinh nghiệm làm việc",
+      "subtitle": "Kỹ năng và mức lương mong muốn giúp hệ thống đề xuất việc làm chuẩn xác nhất",
+      "skillsLabel": "Kỹ năng thế mạnh của bạn",
+      "skillsPlaceholder": "Nhập kỹ năng rồi nhấn Enter (VD: Quản lý dự án, AutoCAD, Giám sát thi công...)",
+      "skillsAddMorePlaceholder": "Nhập thêm kỹ năng rồi nhấn Enter...",
+      "skillsHelper": "Nhập các kỹ năng chuyên môn của bạn (nhấn Enter hoặc dấu phẩy để thêm)",
+      "experienceLabel": "Số năm kinh nghiệm làm việc",
+      "salaryLabel": "Mức lương mong muốn (VNĐ / tháng)",
+      "salaryRange": "Khoảng lương nhanh",
+      "salaryBelow10": "Dưới 10 triệu",
+      "salary10To15": "10 - 15 triệu",
+      "salary15To25": "15 - 25 triệu",
+      "salaryAbove25": "Trên 25 triệu",
+      "salaryNegotiable": "Thỏa thuận",
+      "salaryCustom": "Nhập mức lương cụ thể",
+      "salaryMin": "Lương tối thiểu",
+      "salaryMax": "Lương tối đa",
+      "salaryMinPlaceholder": "VD: 10,000,000",
+      "salaryMaxPlaceholder": "VD: 20,000,000",
+      "academicLevelLabel": "Trình độ học vấn cao nhất"
+    },
+    "step3": {
+      "title": "Tải CV hoặc Tạo hồ sơ nhanh",
+      "subtitle": "CV giúp nhà tuyển dụng đánh giá năng lực của bạn nhanh chóng",
+      "dropzoneTitle": "Kéo thả file CV của bạn vào đây hoặc bấm để chọn",
+      "dropzoneSubtitle": "Hỗ trợ định dạng PDF, DOC, DOCX (Dung lượng tối đa 10MB)",
+      "selectFile": "Chọn tệp từ máy tính",
+      "uploadedCv": "CV đã đính kèm",
+      "replaceCv": "Thay đổi file",
+      "removeCv": "Xóa CV",
+      "uploading": "Đang tải file lên...",
+      "optionalNotice": "* Bạn có thể bấm 'Hoàn tất hồ sơ cơ bản' để tiếp tục và bổ sung CV sau."
+    },
+    "step4": {
+      "title": "Hồ sơ của bạn đã sẵn sàng!",
+      "subtitle": "Hệ thống đã phân tích mục tiêu và tìm thấy các cơ hội việc làm phù hợp nhất cho bạn.",
+      "completenessScore": "Mức độ hoàn thiện hồ sơ",
+      "summaryTitle": "Tóm tắt mục tiêu công việc đã lưu",
+      "position": "Vị trí",
+      "career": "Ngành nghề",
+      "location": "Địa điểm",
+      "salary": "Mức lương",
+      "skills": "Kỹ năng chính",
+      "cvStatus": "Trạng thái CV",
+      "cvAttached": "Đã đính kèm",
+      "cvNotAttached": "Chưa đính kèm",
+      "recommendedJobsTitle": "Việc làm phù hợp đề xuất cho bạn",
+      "viewJob": "Xem chi tiết",
+      "exploreJobs": "Khám phá Việc làm Phù hợp ngay",
+      "viewDashboard": "Xem Trang cá nhân của tôi"
+    },
+    "actions": {
+      "back": "Quay lại",
+      "next": "Tiếp theo",
+      "complete": "Hoàn tất hồ sơ cơ bản",
+      "saving": "Đang lưu...",
+      "submitting": "Đang hoàn tất...",
+      "skip": "Bỏ qua bước này"
+    },
+    "validation": {
+      "desiredJobTitleRequired": "Vui lòng nhập vị trí công việc mong muốn.",
+      "careerRequired": "Vui lòng chọn ngành nghề chính.",
+      "cityRequired": "Vui lòng chọn địa điểm làm việc mong muốn.",
+      "skillsMin": "Vui lòng chọn hoặc nhập ít nhất 1 kỹ năng.",
+      "salaryRangeInvalid": "Lương tối thiểu không được lớn hơn lương tối đa.",
+      "fileSizeExceeded": "Dung lượng file CV không được vượt quá 10MB.",
+      "fileFormatInvalid": "Chỉ chấp nhận file định dạng PDF, DOC, DOCX.",
+      "saveFailed": "Không thể lưu thông tin. Vui lòng thử lại.",
+      "uploadFailed": "Tải file CV thất bại. Vui lòng thử lại."
+    }
   }
 }
+

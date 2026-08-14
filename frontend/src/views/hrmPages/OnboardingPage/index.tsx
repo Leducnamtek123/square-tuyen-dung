@@ -36,9 +36,10 @@ import hrmService, { NativeEmployee, NativeDepartment, NativeDesignation } from 
 import { TabTitle } from '@/utils/generalFunction';
 
 export default function OnboardingPage() {
-  TabTitle('Tiếp nhận & Onboarding Nhân viên | Frappe Logic');
+  TabTitle('Tiếp nhận & Onboarding Nhân viên | InfoHR');
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [employees, setEmployees] = useState<NativeEmployee[]>([]);
   const [departments, setDepartments] = useState<NativeDepartment[]>([]);
   const [designations, setDesignations] = useState<NativeDesignation[]>([]);
@@ -60,17 +61,19 @@ export default function OnboardingPage() {
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null);
     try {
       const [empData, deptData, desigData] = await Promise.all([
-        hrmService.getEmployees().catch(() => []),
-        hrmService.getDepartments().catch(() => []),
-        hrmService.getDesignations().catch(() => []),
+        hrmService.getEmployees(),
+        hrmService.getDepartments(),
+        hrmService.getDesignations(),
       ]);
       setEmployees(empData.filter((e) => e.status === 'PROBATION' || e.status === 'ACTIVE'));
       setDepartments(deptData);
       setDesignations(desigData);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching onboarding data:', err);
+      setError(err?.response?.data?.message || err?.message || 'Không thể tải dữ liệu tiếp nhận nhân viên.');
     } finally {
       setLoading(false);
     }
@@ -118,10 +121,10 @@ export default function OnboardingPage() {
       >
         <Box>
           <Typography variant="h4" fontWeight={700} color="primary" display="flex" alignItems="center" gap={1.5}>
-            <RocketLaunchIcon fontSize="large" color="primary" /> Cầu nối Tiếp nhận Nhân viên (Recruitment-to-Employee Onboarding)
+            <RocketLaunchIcon fontSize="large" color="primary" /> Tiếp nhận Nhân viên Mới (Employee Onboarding)
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Chuyển đổi Ứng viên trúng tuyển (Hired Candidate) &rarr; Thư mời nhận việc &rarr; Hồ sơ Nhân viên chính thức chuẩn Frappe HRMS
+            Chuyển đổi Ứng viên trúng tuyển (Hired Candidate) &rarr; Thiết lập hợp đồng &rarr; Hồ sơ Nhân sự Native HRM
           </Typography>
         </Box>
 
@@ -135,6 +138,12 @@ export default function OnboardingPage() {
           Tiếp nhận Nhân viên Mới
         </Button>
       </Box>
+
+      {error && (
+        <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
 
       {successMsg && (
         <Alert severity="success" onClose={() => setSuccessMsg(null)} sx={{ mb: 3 }}>

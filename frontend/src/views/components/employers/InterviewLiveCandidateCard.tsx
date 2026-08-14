@@ -45,7 +45,7 @@ const initialState: InterviewLiveCandidateCardState = {
   hrPresenceLoading: false,
 };
 
-const resolveLiveKitServerUrl = (details: { serverUrl?: string; server_url?: string; url?: string }) => {
+const resolveLiveKitServerUrl = (details: { serverUrl?: string }) => {
   const localUrl = getSafeLiveKitUrl();
 
   if (
@@ -56,7 +56,7 @@ const resolveLiveKitServerUrl = (details: { serverUrl?: string; server_url?: str
     return localUrl;
   }
 
-  return details.serverUrl || details.server_url || details.url || localUrl;
+  return details.serverUrl || localUrl;
 };
 
 const reducer = (

@@ -1,20 +1,19 @@
 import type { RoleName } from './auth';
 
-/* Job Post Status */
-type JobPostStatus = 'draft' | 'active' | 'expired';
-
-/** Maps legacy numeric status to semantic status */
-const JOB_POST_STATUS_MAP: Record<number, JobPostStatus> = {
-  1: 'draft',
-  2: 'active',
-  3: 'expired',
-} as const;
+/* Job Post Status: Canonical source is backend var_sys.JobPostStatus */
+export enum JobPostStatus {
+  PENDING = 1,
+  REJECTED = 2,
+  APPROVED = 3,
+}
 
 
 export interface User {
   id: number;
   email: string;
   fullName?: string;
+  phone?: string;
+  phoneNumber?: string;
   roleName?: RoleName;
   avatarUrl?: string | null;
   hasCompany?: boolean;
@@ -267,9 +266,9 @@ export interface ResumeDetailResponse extends Resume {
   jobSeekerProfile?: JobSeekerProfile;
   experiencesDetails?: ExperienceDetail[];
   educationDetails?: EducationDetail[];
-  certificateDetails?: Certificate[];
-  languageDetails?: LanguageSkill[];
-  skillDetails?: AdvancedSkill[];
+  certificates?: Certificate[];
+  languageSkills?: LanguageSkill[];
+  advancedSkills?: AdvancedSkill[];
   user?: User;
 }
 
@@ -311,6 +310,7 @@ export interface Resume {
     id?: number | string;
     fullName?: string;
     email?: string;
+    phone?: string;
   };
   // Search-related fields
   searchScore?: number;
@@ -357,6 +357,8 @@ export interface JobSeekerProfile {
   birthday?: string | null;
   gender?: 'M' | 'F' | 'O' | null;
   maritalStatus?: 'S' | 'M' | null;
+  contactAddress?: string | null;
+  permanentAddress?: string | null;
   location?: Location | null;
   userDict?: UserDict;
   isJobSeeking?: boolean;

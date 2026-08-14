@@ -13,6 +13,7 @@ import {
   Box,
 } from '@mui/material';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
+import { useTranslation } from 'react-i18next';
 import FPTGpuControlCard from '../index'; // Will pass or import properly
 import type { SystemSettings } from '../hooks/useSystemSettings';
 
@@ -25,28 +26,28 @@ interface VoiceInterviewTabProps {
 const INTERVIEW_PACING_PRESETS = [
   {
     value: 'balanced',
-    label: 'Cân bằng (Mặc định - Khuyên dùng)',
+    labelKey: 'pages.settings.interviewAi.preset.options.balanced',
     speed: '0.92',
     gap: '2.0',
     silence: '1.2',
   },
   {
     value: 'natural',
-    label: 'Tự nhiên, chậm rãi',
+    labelKey: 'pages.settings.interviewAi.preset.options.natural',
     speed: '0.86',
     gap: '2.5',
     silence: '1.5',
   },
   {
     value: 'snappy',
-    label: 'Nhanh nhạy, phản hồi gấp',
+    labelKey: 'pages.settings.interviewAi.preset.options.snappy',
     speed: '1.02',
     gap: '1.4',
     silence: '0.9',
   },
   {
     value: 'custom',
-    label: 'Tùy chỉnh thủ công',
+    labelKey: 'pages.settings.interviewAi.preset.options.custom',
     speed: '',
     gap: '',
     silence: '',
@@ -68,6 +69,7 @@ export const VoiceInterviewTab: React.FC<VoiceInterviewTabProps> = ({
   onChange,
   FPTGpuControlCardComponent,
 }) => {
+  const { t } = useTranslation('admin');
   const currentPreset = resolveInterviewPacingPreset(formData);
 
   const handlePresetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,11 +87,11 @@ export const VoiceInterviewTab: React.FC<VoiceInterviewTabProps> = ({
           <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
             <RecordVoiceOverIcon color="primary" sx={{ fontSize: 28 }} />
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Cấu Hình Nhịp Độ Phỏng Vấn AI (Voice AI Pacing)
+              {t('pages.settings.interviewAi.pacingTitle')}
             </Typography>
           </Stack>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Tùy chỉnh tốc độ đọc câu hỏi phỏng vấn (TTS) và khoảng nghỉ nhận diện câu trả lời của ứng viên.
+            {t('pages.settings.interviewAi.pacingDescription')}
           </Typography>
 
           <Divider sx={{ mb: 3 }} />
@@ -97,55 +99,64 @@ export const VoiceInterviewTab: React.FC<VoiceInterviewTabProps> = ({
           <Stack spacing={3}>
             <TextField
               select
-              label="Preset nhịp độ phỏng vấn"
+              label={t('pages.settings.interviewAi.preset.label')}
               fullWidth
               size="small"
               value={currentPreset}
               onChange={handlePresetChange}
-              helperText="Chọn nhanh bộ tham số tối ưu hóa trải nghiệm phỏng vấn giọng nói."
+              helperText={t('pages.settings.interviewAi.preset.helper')}
             >
               {INTERVIEW_PACING_PRESETS.map((preset) => (
                 <MenuItem key={preset.value} value={preset.value}>
-                  {preset.label}
+                  {t(preset.labelKey)}
                 </MenuItem>
               ))}
             </TextField>
 
+            <Box sx={{ mt: 1 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
+                {t('pages.settings.interviewAi.ttsTitle')}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
+                {t('pages.settings.interviewAi.ttsDescription')}
+              </Typography>
+            </Box>
+
             <Grid container spacing={2}>
               <Grid size={{ xs: 12, md: 4 }}>
                 <TextField
-                  label="Tốc độ đọc câu hỏi (TTS Speed)"
+                  label={t('pages.settings.interviewAi.ttsSpeed.label')}
                   value={formData.ttsSpeed || ''}
                   onChange={(e) => onChange('ttsSpeed', e.target.value)}
                   type="number"
                   size="small"
                   fullWidth
                   inputProps={{ step: 0.05, min: 0.5, max: 2 }}
-                  helperText="Tốc độ chuẩn: 0.92 (Từ 0.5 đến 2.0)"
+                  helperText={t('pages.settings.interviewAi.ttsSpeed.helper')}
                 />
               </Grid>
               <Grid size={{ xs: 12, md: 4 }}>
                 <TextField
-                  label="Khoảng nghỉ chuyển câu (Gap Seconds)"
+                  label={t('pages.settings.interviewAi.questionGap.label')}
                   value={formData.interviewQuestionGapSeconds || ''}
                   onChange={(e) => onChange('interviewQuestionGapSeconds', e.target.value)}
                   type="number"
                   size="small"
                   fullWidth
                   inputProps={{ step: 0.1, min: 0, max: 10 }}
-                  helperText="Thời gian chờ giữa 2 câu hỏi (giây)"
+                  helperText={t('pages.settings.interviewAi.questionGap.helper')}
                 />
               </Grid>
               <Grid size={{ xs: 12, md: 4 }}>
                 <TextField
-                  label="Thời gian im lặng tối thiểu (Minimum Silence)"
+                  label={t('pages.settings.interviewAi.silenceThreshold.label')}
                   value={formData.interviewMinimumSilenceSeconds || ''}
                   onChange={(e) => onChange('interviewMinimumSilenceSeconds', e.target.value)}
                   type="number"
                   size="small"
                   fullWidth
                   inputProps={{ step: 0.1, min: 0, max: 10 }}
-                  helperText="Xác nhận ứng viên đã trả lời xong (giây)"
+                  helperText={t('pages.settings.interviewAi.silenceThreshold.helper')}
                 />
               </Grid>
             </Grid>

@@ -1,7 +1,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-const source = readFileSync(join(__dirname, '../index.tsx'), 'utf8');
+const indexSource = readFileSync(join(__dirname, '../index.tsx'), 'utf8');
+const voiceTabSource = readFileSync(join(__dirname, '../components/VoiceInterviewTab.tsx'), 'utf8');
+const source = indexSource + '\n' + voiceTabSource;
 
 const fptGpuKeys = [
   'pages.settings.fptGpu.title',

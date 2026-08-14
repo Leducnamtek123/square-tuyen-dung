@@ -50,42 +50,42 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('common:labels.email')} 
-                        value={profileDetail?.user?.email} 
+                        value={profileDetail?.user?.email || (profileDetail as any)?.userDict?.email} 
                         icon={<EmailIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.phone')} 
-                        value={profileDetail?.jobSeekerProfile?.phone as string} 
+                        value={(profileDetail?.jobSeekerProfile?.phone || (profileDetail as any)?.jobSeekerProfileDict?.phone) as string} 
                         icon={<PhoneIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.gender')} 
-                        value={tConfig(allConfig?.genderDict?.[profileDetail?.jobSeekerProfile?.gender as string | number])} 
+                        value={tConfig(allConfig?.genderDict?.[(profileDetail?.jobSeekerProfile?.gender || (profileDetail as any)?.gender) as string | number])} 
                         icon={<GenderIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.dob')} 
-                        value={profileDetail?.jobSeekerProfile?.birthday ? <TimeAgo date={profileDetail.jobSeekerProfile.birthday} type="format" /> : ''} 
+                        value={(profileDetail?.jobSeekerProfile?.birthday || (profileDetail as any)?.birthday) ? <TimeAgo date={(profileDetail?.jobSeekerProfile?.birthday || (profileDetail as any)?.birthday)} type="format" /> : ''} 
                         icon={<CakeIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.maritalStatus')} 
-                        value={tConfig(allConfig?.maritalStatusDict?.[profileDetail?.jobSeekerProfile?.maritalStatus as string | number])} 
+                        value={tConfig(allConfig?.maritalStatusDict?.[(profileDetail?.jobSeekerProfile?.maritalStatus || (profileDetail as any)?.maritalStatus) as string | number])} 
                         icon={<FamilyIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.cityProvince')} 
-                        value={tConfig(allConfig?.cityDict?.[String(profileDetail?.jobSeekerProfile?.location?.city)])} 
+                        value={tConfig(allConfig?.cityDict?.[String(profileDetail?.jobSeekerProfile?.location?.city || profileDetail?.city || '')])} 
                         icon={<LocationIcon />}
                     />
                 </Grid>
@@ -99,7 +99,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.address')} 
-                        value={profileDetail?.jobSeekerProfile?.location?.address} 
+                        value={profileDetail?.jobSeekerProfile?.contactAddress || profileDetail?.jobSeekerProfile?.location?.address || (profileDetail as any)?.contactAddress || (profileDetail as any)?.address} 
                         icon={<HomeIcon />}
                     />
                 </Grid>

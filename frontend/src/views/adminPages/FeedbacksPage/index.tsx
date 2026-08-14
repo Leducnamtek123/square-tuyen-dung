@@ -141,7 +141,7 @@ const FeedbacksPage = () => {
     setFormState({
       content: feedback.content || '',
       rating: String(feedback.rating || 5),
-      isActive: !!(feedback.isActive ?? feedback.is_active),
+      isActive: Boolean(feedback.isActive),
       userId: String(feedback.userId ?? feedback.userDict?.id ?? ''),
       evidenceImageFile: null,
       evidenceImageUrl: feedback.evidenceImageUrl || '',
@@ -169,7 +169,7 @@ const FeedbacksPage = () => {
       await updateFeedback({
         id: fb.id,
         data: {
-          isActive: !Boolean(fb.isActive ?? fb.is_active),
+          isActive: !Boolean(fb.isActive),
         },
       });
     } catch (e) {
@@ -327,7 +327,7 @@ const FeedbacksPage = () => {
     },
     {
       id: 'is_active',
-      accessorFn: (row) => row.isActive ?? row.is_active,
+      accessorFn: (row) => row.isActive,
       header: t('pages.feedbacks.table.status') as string,
       cell: (info) => (
         <Stack direction="row" spacing={0.5} alignItems="center">
@@ -349,7 +349,7 @@ const FeedbacksPage = () => {
     },
     {
       id: 'create_at',
-      accessorFn: (row) => row.createAt || row.create_at,
+      accessorFn: (row) => row.createAt,
       header: t('pages.feedbacks.table.createdAt') as string,
       enableSorting: true,
       cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—',

@@ -171,6 +171,7 @@ const commonService = {
     formData.append('file_type', normalizedFileType);
 
     return (httpRequest.post(url, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
       onUploadProgress: (event) => {
         if (!options.onUploadProgress) return;
         if (!event.total) {

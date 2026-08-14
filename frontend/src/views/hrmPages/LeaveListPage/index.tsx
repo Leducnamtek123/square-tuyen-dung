@@ -29,16 +29,19 @@ export default function LeaveListPage() {
   TabTitle('Quản lý Nghỉ phép | Native HRM');
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [leaveRequests, setLeaveRequests] = useState<NativeLeaveRequest[]>([]);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const data = await hrmService.getLeaveRequests().catch(() => []);
+      const data = await hrmService.getLeaveRequests();
       setLeaveRequests(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching leave requests:', err);
+      setError(err?.response?.data?.message || err?.message || 'Không thể tải danh sách nghỉ phép.');
     } finally {
       setLoading(false);
     }
@@ -90,6 +93,12 @@ export default function LeaveListPage() {
           </Typography>
         </Box>
       </Box>
+
+      {error && (
+        <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
 
       {successMsg && (
         <Alert severity="success" onClose={() => setSuccessMsg(null)} sx={{ mb: 3 }}>

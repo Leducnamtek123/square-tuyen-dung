@@ -46,7 +46,7 @@ const formatDate = (dateStr?: string | null) => {
 };
 
 const getLocationName = (loc: unknown): string => {
-  if (!loc) return 'Thành phố Hồ Chí Minh';
+  if (!loc) return 'Toàn quốc';
   if (typeof loc === 'string') return loc;
   if (typeof loc === 'object' && loc !== null) {
     const l = loc as Record<string, unknown>;
@@ -57,7 +57,7 @@ const getLocationName = (loc: unknown): string => {
     }
     if (typeof l.city === 'string') return l.city;
   }
-  return 'Thành phố Hồ Chí Minh';
+  return 'Toàn quốc';
 };
 
 const CandidateRecommendedJobsCard = () => {
@@ -203,7 +203,7 @@ const CandidateRecommendedJobsCard = () => {
           {jobs.map((job) => {
             const jobDetailPath = localizeRoutePath(`/jobs/${job.slug}`, i18n.language);
             const isSaved = !!savedJobs[job.id];
-            const companyName = job.companyDict?.companyName || job.company?.companyName || 'Square Tuyen Dung';
+            const companyName = job.companyDict?.companyName || job.company?.companyName || '';
             const companyLogo = job.companyDict?.logoUrl || job.company?.logoUrl;
             const salaryText = formatSalary(job.salaryMin, job.salaryMax);
             const locationText = getLocationName(job.location);

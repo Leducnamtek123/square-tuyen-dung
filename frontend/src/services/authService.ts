@@ -214,29 +214,31 @@ const authService = {
     return Promise.resolve(httpRequest.put(url, data)).then(unwrapDataResponse<UserSettingsData>);
   },
 
-  getOnboardingStatus: (): Promise<{
-    isOnboarded: boolean;
-    onboardingStep: number;
-    roleName: string;
-    hasCompany: boolean;
-    profileCompleteness: number;
-  }> => {
+  getOnboardingStatus: (): Promise<import('../types/auth').OnboardingStatusResponse> => {
     const url = 'auth/onboarding/status/';
     return Promise.resolve(httpRequest.get(url)).then(
-      unwrapDataResponse<{
-        isOnboarded: boolean;
-        onboardingStep: number;
-        roleName: string;
-        hasCompany: boolean;
-        profileCompleteness: number;
-      }>,
+      unwrapDataResponse<import('../types/auth').OnboardingStatusResponse>,
     );
   },
 
-  candidateOnboarding: (data: Record<string, unknown>): Promise<{ message: string; user: User }> => {
+  saveCandidateOnboardingStep: (data: Record<string, unknown>): Promise<{ message: string; onboardingStep: number }> => {
+    const url = 'auth/onboarding/candidate/step/';
+    return Promise.resolve(httpRequest.patch(url, data)).then(
+      unwrapDataResponse<{ message: string; onboardingStep: number }>,
+    );
+  },
+
+  candidateOnboarding: (data: Record<string, unknown>): Promise<{ message: string; user: User; recommendedJobs?: import('../types/auth').RecommendedJobPreview[] }> => {
     const url = 'auth/onboarding/candidate/';
     return Promise.resolve(httpRequest.post(url, data)).then(
-      unwrapDataResponse<{ message: string; user: User }>,
+      unwrapDataResponse<{ message: string; user: User; recommendedJobs?: import('../types/auth').RecommendedJobPreview[] }>,
+    );
+  },
+
+  saveEmployerOnboardingStep: (data: Record<string, unknown>): Promise<{ message: string; onboardingStep: number }> => {
+    const url = 'auth/onboarding/employer/step/';
+    return Promise.resolve(httpRequest.patch(url, data)).then(
+      unwrapDataResponse<{ message: string; onboardingStep: number }>,
     );
   },
 

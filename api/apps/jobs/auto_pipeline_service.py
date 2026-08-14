@@ -53,10 +53,7 @@ def run_full_auto_recruitment_pipeline(job_post_id: int) -> dict[str, int]:
                             activity.save(update_fields=["ai_analysis_score", "ai_analysis_summary", "update_at"])
                     except Exception as score_exc:
                         logger.warning("Failed AI scoring for JobPostActivity %s: %s", activity.id, score_exc)
-                        # Fallback default score if resume exists
-                        score = 75
-                        activity.ai_analysis_score = score
-                        activity.save(update_fields=["ai_analysis_score", "update_at"])
+                        score = None
 
             screened_count += 1
 

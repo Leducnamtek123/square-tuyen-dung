@@ -13,7 +13,7 @@ interface AdvancedSkillSectionProps {
 const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDetail }) => {
     const { t } = useTranslation(['employer', 'common']);
 
-    if (!(profileDetail?.skillDetails && profileDetail.skillDetails.length > 0)) return null;
+    if (!(profileDetail?.advancedSkills && profileDetail.advancedSkills.length > 0)) return null;
 
     return (
         <Box>
@@ -48,15 +48,15 @@ const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDeta
                 }}
             >
                 <Stack spacing={4}>
-                    {(profileDetail.skillDetails || []).map((value, itemIdx: number) => (
-                        <Box key={value.id || value.skillName || `skill-item-${itemIdx}`}>
+                    {(profileDetail.advancedSkills || []).map((value, itemIdx: number) => (
+                        <Box key={value.id || value.name || value.skillName || `skill-item-${itemIdx}`}>
                             <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', mb: 2 }}>
-                                {value?.skillName}
+                                {value?.name || value?.skillName}
                             </Typography>
                             
                             <LinearProgress 
                                 variant="determinate" 
-                                value={Number(value?.point || 0)} 
+                                value={Number(value?.point || (typeof value?.level === 'number' ? value.level * 20 : 100))} 
                                 sx={{ 
                                     height: 8, 
                                     borderRadius: 4,
@@ -68,7 +68,7 @@ const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDeta
                                 }} 
                             />
                             
-                            {itemIdx < (profileDetail.skillDetails?.length || 0) - 1 && (
+                            {itemIdx < (profileDetail.advancedSkills?.length || 0) - 1 && (
                                 <Divider sx={{ mt: 4, borderStyle: 'dashed', borderColor: pc.divider( 0.8) }} />
                             )}
                         </Box>

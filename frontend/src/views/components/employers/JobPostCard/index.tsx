@@ -2,7 +2,7 @@
 import React, { useMemo, useCallback, useReducer } from 'react';
 import dayjs from '@/configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
-import { Alert, Box, Button, Stack, Typography, Paper, Theme } from "@mui/material";
+import { Alert, Box, Button, Stack, Typography, Paper, type Theme } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
@@ -14,27 +14,30 @@ import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import xlsxUtils from '../../../../utils/xlsxUtils';
-import type { AxiosError } from 'axios';
 import FormPopup from '../../../../components/Common/Controls/FormPopup';
-import JobPostFilterForm from '../JobPostFilterForm';
 import JobPostForm from '../JobPostForm';
 import type { JobPostFormValues } from '../JobPostForm/JobPostSchema';
 import jobService from '../../../../services/jobService';
 import JobPostsTable from '../JobPostsTable';
 import { useDataTable } from '../../../../hooks';
 import { useCompanyProfile, useEmployerJobPosts, useJobPostMutations } from '../hooks/useEmployerQueries';
-import type { ApiError } from '../../../../types/api';
 import type { JobPostInput } from '../../../../services/jobService';
 import type { RowSelectionState } from '@tanstack/react-table';
-import FilterBar from '@/components/Common/FilterBar';
+import { useConfig } from '@/hooks/useConfig';
+import { useForm } from 'react-hook-form';
+import {
+  GlobalFilterBar,
+  ActiveFilterChips,
+  GlobalFilterDrawer,
+  jobPostFilterConfig,
+  useGlobalFilter,
+} from '@/components/Common/Filters';
 import { ExportModal, type ExportColumn, type ExportScope } from '@/components/Common/ExportModal';
 import { ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
+import AiCandidateRecommendationModal from '../AiCandidateRecommendationModal';
 
 type JobPostEditData = Partial<JobPostFormValues> & { id?: string | number; slug?: string };
-
-type FilterState = { kw: string; isUrgent: boolean | ''; statusId: string | number };
 
 const getSelectId = (
   value: number | string | { id?: number | string | null } | null | undefined,
@@ -45,7 +48,6 @@ const toNullableNumber = (value: number | string | null | undefined) => (
 );
 
 type JobPostCardState = {
-  filterData: FilterState;
   openPopup: boolean;
   editData: JobPostEditData | null;
   serverErrors: Record<string, string[]> | null;
@@ -53,7 +55,6 @@ type JobPostCardState = {
 };
 
 type JobPostCardAction =
-  | { type: 'setFilter'; value: FilterState }
   | { type: 'openAdd' }
   | { type: 'openEdit'; value: JobPostEditData }
   | { type: 'closePopup' }
@@ -61,7 +62,6 @@ type JobPostCardAction =
   | { type: 'setProcessing'; value: boolean };
 
 const initialState: JobPostCardState = {
-  filterData: { kw: '', isUrgent: '', statusId: '' },
   openPopup: false,
   editData: null,
   serverErrors: null,
@@ -70,8 +70,6 @@ const initialState: JobPostCardState = {
 
 function reducer(state: JobPostCardState, action: JobPostCardAction): JobPostCardState {
   switch (action.type) {
-    case 'setFilter':
-      return { ...state, filterData: action.value };
     case 'openAdd':
       return { ...state, openPopup: true, editData: null, serverErrors: null };
     case 'openEdit':
@@ -87,10 +85,9 @@ function reducer(state: JobPostCardState, action: JobPostCardAction): JobPostCar
   }
 }
 
-import AiCandidateRecommendationModal from '../AiCandidateRecommendationModal';
-
 const JobPostCard = () => {
   const { t, i18n } = useTranslation('employer');
+  const { allConfig } = useConfig();
   const verificationHref = localizeRoutePath(`/${ROUTES.EMPLOYER.VERIFICATION}`, i18n.language);
   const [aiModalOpen, setAiModalOpen] = React.useState(false);
   const [selectedAiJob, setSelectedAiJob] = React.useState<any>(null);
@@ -111,14 +108,41 @@ const JobPostCard = () => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
+  const filter = useGlobalFilter({
+    config: jobPostFilterConfig,
+    allConfig,
+    onApply: () => {
+      onPaginationChange({ pageIndex: 0, pageSize });
+    },
+    onReset: () => {
+      onPaginationChange({ pageIndex: 0, pageSize });
+    },
+  });
+
+  const { control, handleSubmit, reset } = useForm<any>({
+    defaultValues: filter.appliedValues,
+  });
+
+  // Sync react-hook-form when filter values change externally (e.g. URL param or chip removal)
+  React.useEffect(() => {
+    reset(filter.appliedValues);
+  }, [filter.appliedValues, reset]);
+
+  const activeUrgentVal = useMemo(() => {
+    const raw = filter.appliedValues.isUrgent;
+    if (raw === 'true' || raw === true || raw === 1 || raw === '1') return true;
+    if (raw === 'false' || raw === false || raw === 2 || raw === '2') return false;
+    return undefined;
+  }, [filter.appliedValues.isUrgent]);
+
   // Data Fetching & Mutations
   const { data, isLoading } = useEmployerJobPosts({
     page: page + 1,
     pageSize,
     ordering,
-    kw: state.filterData.kw,
-    isUrgent: state.filterData.isUrgent === '' ? undefined : state.filterData.isUrgent,
-    status: state.filterData.statusId === '' ? undefined : state.filterData.statusId,
+    kw: filter.appliedValues.kw || undefined,
+    isUrgent: activeUrgentVal,
+    status: filter.appliedValues.statusId === '' ? undefined : filter.appliedValues.statusId,
   });
 
   const { addJobPost, updateJobPost, deleteJobPost, isMutating } = useJobPostMutations();
@@ -227,30 +251,18 @@ const JobPostCard = () => {
     );
   }, [deleteJobPost, t]);
 
-  const handleFilter = useCallback((data: { kw: string, isUrgent: number | string, statusId: string | number }) => {
-    dispatch({
-      type: 'setFilter',
-      value: {
-        kw: data.kw,
-        isUrgent: data.isUrgent === 1 ? true : data.isUrgent === 2 ? false : '',
-        statusId: data.statusId,
-      },
-    });
-    onPaginationChange({ pageIndex: 0, pageSize });
-  }, [onPaginationChange, pageSize]);
-
   const [exportModalOpen, setExportModalOpen] = React.useState(false);
 
   const jobPostExportColumns: ExportColumn[] = React.useMemo(() => [
     {
       id: 'title',
-      label: t('jobPost.table.title', 'Tiêu đề tin tuyển dụng'),
+      label: t('jobPost.table.title'),
       checked: true,
       getValue: (row) => row['Chức Danh'] || row.jobName || row.title || '---',
     },
     {
       id: 'createdDate',
-      label: t('jobPost.table.createdDate', 'Ngày tạo'),
+      label: t('jobPost.table.createdDate'),
       checked: true,
       getValue: (row) => {
         const val = row['Ngày Đăng'] || row.createAt || row.createdDate;
@@ -259,7 +271,7 @@ const JobPostCard = () => {
     },
     {
       id: 'deadline',
-      label: t('jobPost.table.deadline', 'Hạn tuyển'),
+      label: t('jobPost.table.deadline'),
       checked: true,
       getValue: (row) => {
         const val = row['Ngày Hết Hạn'] || row.deadline;
@@ -268,19 +280,19 @@ const JobPostCard = () => {
     },
     {
       id: 'status',
-      label: t('jobPost.table.status', 'Trạng thái'),
+      label: t('jobPost.table.status'),
       checked: true,
       getValue: (row) => row['Trạng thái'] || row.status || '---',
     },
     {
       id: 'applicationsCount',
-      label: t('jobPost.table.applications', 'Số hồ sơ'),
+      label: t('jobPost.table.applications'),
       checked: true,
       getValue: (row) => (row['Số Hồ Sơ Ứng Tuyển'] != null ? String(row['Số Hồ Sơ Ứng Tuyển']) : row.appliedNumber != null ? String(row.appliedNumber) : row.applicationsCount != null ? String(row.applicationsCount) : '0'),
     },
     {
       id: 'creator',
-      label: t('jobPost.table.creator', 'Người tạo'),
+      label: t('jobPost.table.creator'),
       checked: true,
       getValue: (row) => row['Người tạo'] || row.creator || '---',
     },
@@ -291,9 +303,9 @@ const JobPostCard = () => {
       page: 1,
       pageSize: scope === 'all' ? 1000 : pageSize,
       ordering,
-      kw: scope === 'all' ? undefined : state.filterData.kw,
-      isUrgent: scope === 'all' ? undefined : (state.filterData.isUrgent === '' ? undefined : state.filterData.isUrgent),
-      status: scope === 'all' ? undefined : (state.filterData.statusId === '' ? undefined : state.filterData.statusId),
+      kw: scope === 'all' ? undefined : (filter.appliedValues.kw || undefined),
+      isUrgent: scope === 'all' ? undefined : activeUrgentVal,
+      status: scope === 'all' ? undefined : (filter.appliedValues.statusId === '' ? undefined : filter.appliedValues.statusId),
     };
     const resData = await jobService.exportEmployerJobPosts(params);
     const exportList = (resData || []) as Record<string, any>[];
@@ -309,8 +321,7 @@ const JobPostCard = () => {
       return currentList.filter((item: any) => selectedIds.includes(String(item.id ?? item.slug)));
     }
     return exportList;
-  }, [pageSize, ordering, state.filterData, rowSelection, data?.results]);
-
+  }, [pageSize, ordering, filter.appliedValues, activeUrgentVal, rowSelection, data?.results]);
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -331,7 +342,7 @@ const JobPostCard = () => {
           alignItems={{ xs: 'flex-start', sm: 'center' }} 
           justifyContent="space-between" 
           spacing={3} 
-          mb={4}
+          mb={3}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box sx={{ 
@@ -344,15 +355,15 @@ const JobPostCard = () => {
               <WorkOutlineIcon sx={{ fontSize: 28 }} />
             </Box>
             <Box>
-            <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px', mb: 0.5 }}>
-              {t('jobPost.title')}
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-              {t('jobPost.manageSubtitle')}
-            </Typography>
+              <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px', mb: 0.5 }}>
+                {t('jobPost.title')}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                {t('jobPost.manageSubtitle')}
+              </Typography>
+            </Box>
           </Box>
-          </Box>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} width={{ xs: '100%', sm: 'auto' }}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems="center" width={{ xs: '100%', sm: 'auto' }}>
             <Button 
               variant="outlined" 
               color="inherit" 
@@ -360,7 +371,7 @@ const JobPostCard = () => {
               onClick={() => setExportModalOpen(true)} 
               sx={{ 
                 px: 3, 
-                py: 1,
+                py: 1, 
                 fontWeight: 800, 
                 textTransform: 'none',
                 borderStyle: 'dashed'
@@ -376,7 +387,7 @@ const JobPostCard = () => {
               disabled={isCreateBlocked}
               sx={{ 
                 px: 4, 
-                py: 1.25,
+                py: 1.25, 
                 boxShadow: (theme: Theme) => theme.customShadows?.primary, 
                 fontWeight: 900,
                 textTransform: 'none'
@@ -385,6 +396,35 @@ const JobPostCard = () => {
               {t('jobPost.createNew')}
             </Button>
           </Stack>
+        </Stack>
+
+        {/* Unified Global Filter Bar */}
+        <Stack spacing={1.5} sx={{ mb: 3 }}>
+          <GlobalFilterBar
+            control={control}
+            handleSubmit={handleSubmit}
+            handleSearchSubmit={(data) => {
+              filter.handleApply(data);
+            }}
+            primaryFieldName="statusId"
+            primaryFieldOptions={allConfig?.jobPostStatusOptions || []}
+            primaryFieldPlaceholder={t('jobPost.filters.statusPlaceholder')}
+            searchPlaceholder={t('jobPost.filters.keywordsPlaceholder')}
+            onOpenFilterDrawer={() => filter.setDrawerOpen(true)}
+            activeFilterCount={filter.activeFilterCount}
+          />
+
+          <ActiveFilterChips
+            tags={filter.activeTags}
+            onRemoveTag={(key) => {
+              reset({ ...filter.appliedValues, [key]: '' });
+              filter.handleRemoveTag(key);
+            }}
+            onClearAll={() => {
+              reset(jobPostFilterConfig.defaultValues);
+              filter.handleReset();
+            }}
+          />
         </Stack>
 
         {isCreateBlocked ? (
@@ -401,11 +441,23 @@ const JobPostCard = () => {
           </Alert>
         ) : null}
 
-        <FilterBar variant="flat" title={t('jobPost.filter')} sx={{ mb: 4 }}>
-          <Box sx={{ width: '100%', minWidth: 0 }}>
-            <JobPostFilterForm handleFilter={handleFilter} />
-          </Box>
-        </FilterBar>
+        {/* Global Filter Drawer */}
+        <GlobalFilterDrawer
+          open={filter.drawerOpen}
+          onClose={() => filter.setDrawerOpen(false)}
+          config={jobPostFilterConfig}
+          control={control}
+          allConfig={allConfig}
+          handleReset={() => {
+            reset(jobPostFilterConfig.defaultValues);
+            filter.handleReset();
+            filter.setDrawerOpen(false);
+          }}
+          handleSubmit={handleSubmit}
+          handleApply={(data) => {
+            filter.handleApply(data);
+          }}
+        />
 
         <JobPostsTable
           variant="flat"

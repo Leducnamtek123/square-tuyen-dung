@@ -433,9 +433,12 @@ def _acquire_analysis_slot(activity_id: int, max_slots: int, ttl_seconds: int) -
     if max_slots <= 0:
         return None
 
+    str_act_id = str(activity_id)
     for idx in range(max_slots):
         slot_key = f"ai:resume-analysis:slot:{idx}"
-        if cache.add(slot_key, str(activity_id), timeout=ttl_seconds):
+        existing = cache.get(slot_key)
+        if existing is None or str(existing) == str_act_id:
+            cache.set(slot_key, str_act_id, timeout=ttl_seconds)
             return slot_key
 
     return None
@@ -876,9 +879,9 @@ def analyze_resume_ai(self, activity_id):
     slot_key = None
 
     try:
-        max_slots = config("AI_RESUME_ANALYSIS_MAX_CONCURRENCY", default=2, cast=int)
-        slot_wait_seconds = config("AI_RESUME_ANALYSIS_SLOT_WAIT_SECONDS", default=20, cast=int)
-        slot_ttl_seconds = config("AI_RESUME_ANALYSIS_SLOT_TTL_SECONDS", default=1800, cast=int)
+        max_slots = config("AI_RESUME_ANALYSIS_MAX_CONCURRENCY", default=4, cast=int)
+        slot_wait_seconds = config("AI_RESUME_ANALYSIS_SLOT_WAIT_SECONDS", default=5, cast=int)
+        slot_ttl_seconds = config("AI_RESUME_ANALYSIS_SLOT_TTL_SECONDS", default=120, cast=int)
 
         slot_key = _acquire_analysis_slot(
             activity_id=activity_id,

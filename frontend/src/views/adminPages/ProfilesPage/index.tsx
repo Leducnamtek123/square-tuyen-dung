@@ -736,6 +736,13 @@ const ProfilesPage = () => {
                 <DialogContent sx={{ pt: 1.5, maxHeight: '78vh' }} dividers>
                     <Stack spacing={2.5} sx={{ mt: 1 }}>
                         <TextField
+                            label={t('pages.profiles.import.sourceUrlLabel', { defaultValue: 'Source URL' })}
+                            placeholder="Nhập URL nguồn tìm kiếm"
+                            value={importForm.sourceUrl}
+                            onChange={(event) => setImportForm((prev) => ({ ...prev, sourceUrl: event.target.value }))}
+                            fullWidth
+                        />
+                        <TextField
                             label={t('pages.profiles.import.accountLabel', { defaultValue: 'Account' })}
                             placeholder="Nhập email/tên tài khoản NTD"
                             value={importForm.account}
@@ -755,6 +762,11 @@ const ProfilesPage = () => {
                             options={occupationOptions}
                             loading={catalogQuery.isLoading}
                             disableCloseOnSelect
+                            noOptionsText={t('common.noOptions')}
+                            loadingText={t('common.loading')}
+                            openText={t('common.autocomplete.open')}
+                            closeText={t('common.autocomplete.close')}
+                            clearText={t('common.autocomplete.clear')}
                             value={occupationOptions.filter((option) => importForm.occupationIds.includes(option.id))}
                             onChange={(_, value) =>
                                 setImportForm((prev) => ({

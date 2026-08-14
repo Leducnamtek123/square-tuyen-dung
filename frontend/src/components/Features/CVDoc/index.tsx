@@ -70,7 +70,7 @@ const PageBody = ({ resume, styles }: PageBodyProps) => (
     />
     <CVDocCertificatesSection
       title={i18next.t('common:cvDoc.sections.certificates')}
-      items={resume?.certificateDetails}
+      items={resume?.certificates}
       styles={styles}
     />
   </View>

@@ -1,5 +1,5 @@
 import httpRequest from '../utils/httpRequest';
-import { unwrapDataResponse } from '../utils/apiResponse';
+import { unwrapDataResponse, normalizePaginatedResponse } from '../utils/apiResponse';
 
 export type EmployeeFromApplicationPayload = {
   applicationId: number;
@@ -141,16 +141,20 @@ export type HrmDashboardStats = {
 export type OnboardCandidatePayload = {
   job_application_id?: number;
   candidate_profile_id?: number;
-  first_name: string;
-  last_name: string;
-  email: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
   phone?: string;
   department_id?: number;
   designation_id?: number;
-  join_date: string;
+  reports_to_id?: number;
+  join_date?: string;
   probation_end_date?: string;
   base_salary?: number;
+  allowance?: number;
   employment_type?: string;
+  status?: string;
+  notes?: string;
 };
 
 const hrmService = {
@@ -175,91 +179,68 @@ const hrmService = {
 
   // Native HRM API Endpoints
   getDashboardStats: (): Promise<HrmDashboardStats> => {
-    return (httpRequest.get('native-hrm/dashboard/stats/') as Promise<unknown>).then(
-      unwrapDataResponse<HrmDashboardStats>,
-    );
+    return httpRequest.get('native-hrm/dashboard/stats/').then((res) => unwrapDataResponse<HrmDashboardStats>(res));
   },
 
   getEmployees: (params?: { department?: number; status?: string; search?: string }): Promise<NativeEmployee[]> => {
-    return (httpRequest.get('native-hrm/employees/', { params }) as Promise<unknown>).then((res: any) => {
-      const unwrapped = unwrapDataResponse<any>(res);
-      return Array.isArray(unwrapped) ? unwrapped : unwrapped?.results || [];
+    return httpRequest.get('native-hrm/employees/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeEmployee>(res).results;
     });
   },
 
   getEmployeeDetail: (id: number): Promise<NativeEmployee> => {
-    return (httpRequest.get(`native-hrm/employees/${id}/`) as Promise<unknown>).then(
-      unwrapDataResponse<NativeEmployee>,
-    );
+    return httpRequest.get(`native-hrm/employees/${id}/`).then((res) => unwrapDataResponse<NativeEmployee>(res));
   },
 
   createEmployee: (data: Partial<NativeEmployee>): Promise<NativeEmployee> => {
-    return (httpRequest.post('native-hrm/employees/', data) as Promise<unknown>).then(
-      unwrapDataResponse<NativeEmployee>,
-    );
+    return httpRequest.post('native-hrm/employees/', data).then((res) => unwrapDataResponse<NativeEmployee>(res));
   },
 
   updateEmployee: (id: number, data: Partial<NativeEmployee>): Promise<NativeEmployee> => {
-    return (httpRequest.patch(`native-hrm/employees/${id}/`, data) as Promise<unknown>).then(
-      unwrapDataResponse<NativeEmployee>,
-    );
+    return httpRequest.patch(`native-hrm/employees/${id}/`, data).then((res) => unwrapDataResponse<NativeEmployee>(res));
   },
 
   onboardCandidate: (payload: OnboardCandidatePayload): Promise<NativeEmployee> => {
-    return (httpRequest.post('native-hrm/employees/onboard-from-candidate/', payload) as Promise<unknown>).then(
-      unwrapDataResponse<NativeEmployee>,
-    );
+    return httpRequest.post('native-hrm/employees/onboard-from-candidate/', payload).then((res) => unwrapDataResponse<NativeEmployee>(res));
   },
 
   getDepartments: (): Promise<NativeDepartment[]> => {
-    return (httpRequest.get('native-hrm/departments/') as Promise<unknown>).then((res: any) => {
-      const unwrapped = unwrapDataResponse<any>(res);
-      return Array.isArray(unwrapped) ? unwrapped : unwrapped?.results || [];
+    return httpRequest.get('native-hrm/departments/').then((res) => {
+      return normalizePaginatedResponse<NativeDepartment>(res).results;
     });
   },
 
   createDepartment: (data: { name: string; code?: string; parent?: number; description?: string }): Promise<NativeDepartment> => {
-    return (httpRequest.post('native-hrm/departments/', data) as Promise<unknown>).then(
-      unwrapDataResponse<NativeDepartment>,
-    );
+    return httpRequest.post('native-hrm/departments/', data).then((res) => unwrapDataResponse<NativeDepartment>(res));
   },
 
   getOrgChart: (): Promise<NativeOrgTreeNode[]> => {
-    return (httpRequest.get('native-hrm/departments/org-chart/') as Promise<unknown>).then(
-      unwrapDataResponse<NativeOrgTreeNode[]>,
-    );
+    return httpRequest.get('native-hrm/departments/org-chart/').then((res) => unwrapDataResponse<NativeOrgTreeNode[]>(res));
   },
 
   getDesignations: (): Promise<NativeDesignation[]> => {
-    return (httpRequest.get('native-hrm/designations/') as Promise<unknown>).then((res: any) => {
-      const unwrapped = unwrapDataResponse<any>(res);
-      return Array.isArray(unwrapped) ? unwrapped : unwrapped?.results || [];
+    return httpRequest.get('native-hrm/designations/').then((res) => {
+      return normalizePaginatedResponse<NativeDesignation>(res).results;
     });
   },
 
   getLeaveRequests: (): Promise<NativeLeaveRequest[]> => {
-    return (httpRequest.get('native-hrm/leave-requests/') as Promise<unknown>).then((res: any) => {
-      const unwrapped = unwrapDataResponse<any>(res);
-      return Array.isArray(unwrapped) ? unwrapped : unwrapped?.results || [];
+    return httpRequest.get('native-hrm/leave-requests/').then((res) => {
+      return normalizePaginatedResponse<NativeLeaveRequest>(res).results;
     });
   },
 
   approveLeaveRequest: (id: number): Promise<NativeLeaveRequest> => {
-    return (httpRequest.patch(`native-hrm/leave-requests/${id}/approve/`, {}) as Promise<unknown>).then(
-      unwrapDataResponse<NativeLeaveRequest>,
-    );
+    return httpRequest.patch(`native-hrm/leave-requests/${id}/approve/`, {}).then((res) => unwrapDataResponse<NativeLeaveRequest>(res));
   },
 
   rejectLeaveRequest: (id: number, rejection_reason?: string): Promise<NativeLeaveRequest> => {
-    return (httpRequest.patch(`native-hrm/leave-requests/${id}/reject/`, { rejection_reason }) as Promise<unknown>).then(
-      unwrapDataResponse<NativeLeaveRequest>,
-    );
+    return httpRequest.patch(`native-hrm/leave-requests/${id}/reject/`, { rejection_reason }).then((res) => unwrapDataResponse<NativeLeaveRequest>(res));
   },
 
   getContracts: (): Promise<NativeContract[]> => {
-    return (httpRequest.get('native-hrm/contracts/') as Promise<unknown>).then((res: any) => {
-      const unwrapped = unwrapDataResponse<any>(res);
-      return Array.isArray(unwrapped) ? unwrapped : unwrapped?.results || [];
+    return httpRequest.get('native-hrm/contracts/').then((res) => {
+      return normalizePaginatedResponse<NativeContract>(res).results;
     });
   },
 

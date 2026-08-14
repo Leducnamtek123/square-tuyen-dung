@@ -65,6 +65,7 @@ interface AppliedResumeKanbanProps {
   handleDelete: (id: string | number) => void;
   onCreateEmployee?: (activity: JobPostActivity) => void;
   onAnalysisStateChange?: (id: string | number, nextState: Partial<JobPostActivity>) => void;
+  onAddCandidate?: () => void;
   blindMode?: boolean;
 }
 
@@ -130,6 +131,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
   handleDelete,
   onCreateEmployee,
   onAnalysisStateChange,
+  onAddCandidate,
   blindMode = false,
 }) => {
   const { t, i18n } = useTranslation(['employer', 'common']);
@@ -612,6 +614,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
                       <Button
                         variant="outlined"
                         startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+                        onClick={() => onAddCandidate?.()}
                         sx={{
                           width: '100%',
                           height: '38px',
@@ -631,7 +634,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
                           },
                         }}
                       >
-                        {columnCount > 0 ? '+ Xem thêm' : '+ Thêm ứng viên'}
+                        {columnCount > 0 ? t('common:viewMore', 'Xem thêm') : t('employer:manualCandidate.actions.add', 'Thêm ứng viên')}
                       </Button>
                     </Box>
                   )}

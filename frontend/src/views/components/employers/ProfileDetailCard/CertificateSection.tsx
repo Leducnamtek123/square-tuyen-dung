@@ -15,7 +15,7 @@ interface CertificateSectionProps {
 const CertificateSection: React.FC<CertificateSectionProps> = ({ profileDetail }) => {
     const { t } = useTranslation(['employer', 'common']);
 
-    if (!(profileDetail?.certificateDetails && profileDetail.certificateDetails.length > 0)) return null;
+    if (!(profileDetail?.certificates && profileDetail.certificates.length > 0)) return null;
 
     return (
         <Box>
@@ -50,16 +50,16 @@ const CertificateSection: React.FC<CertificateSectionProps> = ({ profileDetail }
                 }}
             >
                 <Stack spacing={4}>
-                    {(profileDetail.certificateDetails || []).map((value, itemIdx: number) => (
-                        <Box key={value.id || value.certificateName || `cert-item-${itemIdx}`}>
+                    {(profileDetail.certificates || []).map((value, itemIdx: number) => (
+                        <Box key={value.id || value.name || value.certificateName || `cert-item-${itemIdx}`}>
                             <Stack spacing={2}>
                                 <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', lineHeight: 1.3 }}>
-                                    {value?.certificateName}
+                                    {value?.name || value?.certificateName}
                                 </Typography>
                                 
                                 <Stack spacing={1.5}>
                                     <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                                        {value?.trainingPlaceName}
+                                        {value?.trainingPlace || value?.trainingPlaceName}
                                     </Typography>
                                     
                                     <Stack direction="row" alignItems="center" spacing={1.5}>
@@ -70,7 +70,7 @@ const CertificateSection: React.FC<CertificateSectionProps> = ({ profileDetail }
                                     </Stack>
                                 </Stack>
                             </Stack>
-                            {itemIdx < (profileDetail.certificateDetails?.length || 0) - 1 && (
+                            {itemIdx < (profileDetail.certificates?.length || 0) - 1 && (
                                 <Divider sx={{ mt: 4, borderStyle: 'dashed', borderColor: pc.divider( 0.8) }} />
                             )}
                         </Box>

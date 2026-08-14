@@ -38,6 +38,37 @@ dayjs.locale('vi');
 
 const PAGE_SIZE = 9;
 
+const FIXED_NEWS_KEYS = [
+  'news.category.all',
+  'news.category.news',
+  'news.category.blog',
+  'news.categoryFallback',
+  'news.topic.all',
+  'news.topic.recruitment',
+  'news.topic.realEstate',
+  'news.topic.construction',
+  'news.topic.interior',
+  'news.topic.architecture',
+  'news.topic.portfolio',
+  'news.topic.skills',
+  'news.views',
+  'news.heroEyebrow',
+  'news.heroTitle',
+  'news.heroSubtitle',
+  'news.viewAllArticles',
+  'news.exploreJobs',
+  'news.searchPlaceholder',
+  'news.searchButton',
+  'news.emptyTitle',
+  'news.emptyContent',
+  'news.quickReadTitle',
+  'news.quickReadDescription',
+  'news.currentFilter',
+  'news.audienceTitle',
+  'news.audienceDescription',
+  'news.newJobsCta',
+] as const;
+
 const FALLBACK_POPULAR_KEYWORDS: string[] = [
   'Đơn xin việc', 'Hồ sơ xin việc', 'BHXH 1 lần', 'Thủ tục nghỉ việc', 'Cách viết CV',
   'Mẫu CV chuẩn', 'Câu hỏi phỏng vấn', 'Lương Gross sang Net', 'Thuế TNCN', 'Việc làm Xây dựng',
@@ -417,12 +448,13 @@ const NewsContent = () => {
               ))}
             </Grid>
           ) : displayLatestArticles.length === 0 ? (
-            <NoDataCard title="Không tìm thấy bài viết" content="Hiện chưa có bài viết thuộc danh mục này." />
+            <NoDataCard title={t('news.emptyTitle')} content={t('news.emptyContent')} />
           ) : (
             <Grid container spacing={3}>
               {displayLatestArticles.map((article) => {
                 const articleHref = localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.NEWS_DETAIL, article.slug)}`, i18n.language);
-                const publishedAgo = article.publishedAt ? dayjs(article.publishedAt).fromNow() : 'Mới cập nhật';
+                const articleTimestamp = article.publishedAt || article.createAt || article.updateAt;
+                const publishedAgo = articleTimestamp ? dayjs(articleTimestamp).fromNow() : 'Mới cập nhật';
 
                 return (
                   <Grid key={article.id} size={{ xs: 12, sm: 6, md: 4 }}>

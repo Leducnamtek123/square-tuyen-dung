@@ -454,7 +454,7 @@ def _coerce_limit(value: Any, default: int = 5) -> int:
 
 def _resolve_application_status(value: Any, fallback_text: str = "") -> int | None:
     direct = _coerce_int(value)
-    if direct:
+    if direct is not None and direct in var_sys.ApplicationStatus.values:
         return direct
 
     normalized = _normalize_text(str(value or ""))
@@ -468,12 +468,15 @@ def _resolve_application_status(value: Any, fallback_text: str = "") -> int | No
     for aliases, status in status_aliases:
         if any(_normalize_text(alias) in normalized for alias in aliases):
             return int(status)
-    return _extract_application_status(fallback_text)
+    fallback_val = _extract_application_status(fallback_text)
+    if fallback_val is not None and fallback_val in var_sys.ApplicationStatus.values:
+        return fallback_val
+    return None
 
 
 def _resolve_job_post_status(value: Any, fallback_text: str = "") -> int | None:
     direct = _coerce_int(value)
-    if direct:
+    if direct is not None and direct in var_sys.JobPostStatus.values:
         return direct
 
     normalized = _normalize_text(f"{value or ''} {fallback_text or ''}")

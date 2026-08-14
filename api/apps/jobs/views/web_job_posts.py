@@ -108,26 +108,12 @@ class PrivateJobPostViewSet(
 
     @action(methods=["get"], detail=True, url_path="ai-recommended-candidates", url_name="ai-recommended-candidates")
     def ai_recommended_candidates(self, request, slug=None, pk=None):
-        val = slug or pk or self.kwargs.get("slug") or self.kwargs.get("pk")
-        queryset = self.filter_queryset(self.get_queryset())
-        job_post = None
-        if val:
-            str_val = str(val).strip()
-            if str_val.isdigit():
-                job_post = queryset.filter(id=int(str_val)).first()
-            if not job_post:
-                job_post = queryset.filter(slug=str_val).first()
-
-        if not job_post:
-            try:
-                job_post = self.get_object()
-            except Exception:
-                job_post = None
-
-        if not job_post:
+        try:
+            job_post = self.get_object()
+        except Exception:
             return var_res.response_data(
                 status=status.HTTP_404_NOT_FOUND,
-                message="Không tìm thấy bài tuyển dụng",
+                errors={"errorMessage": ["Không tìm thấy bài tuyển dụng."]},
             )
         
         job_career_id = job_post.career_id
@@ -135,19 +121,11 @@ class PrivateJobPostViewSet(
         job_title = (job_post.job_name or "").lower()
 
         serializer = JobPostSerializer()
-        matching_qs = serializer._get_matching_resumes(job_post).select_related(
+        matching_qs = serializer._get_matching_resumes(job_post).filter(is_active=True).select_related(
             'user', 'user__avatar', 'city', 'career'
         )
 
         resumes = list(matching_qs[:50])
-        if not resumes:
-            base_resumes = Resume.objects.filter(
-                Q(job_seeker_profile__isnull=True) | Q(job_seeker_profile__is_seeking_job=True)
-            ).select_related(
-                'user', 'user__avatar', 'city', 'career'
-            )
-            active_resumes = base_resumes.filter(is_active=True)
-            resumes = list((active_resumes if active_resumes.exists() else base_resumes)[:30])
 
         from apps.profiles.models import ResumeSaved
         saved_resume_ids = set()
@@ -164,7 +142,7 @@ class PrivateJobPostViewSet(
             if not user or not user.is_active:
                 continue
 
-            # Evaluate fit using LLM Service (gpt-5.4-mini)
+            # Evaluate fit using LLM Service
             resume_data = {
                 "title": resume.title or "",
                 "skills": resume.skills_summary or "",
@@ -183,23 +161,24 @@ class PrivateJobPostViewSet(
 
             llm_result = score_resume_job_fit(resume_data, job_data, resume_id=resume.id, job_id=job_post.id)
             
-            score = 75
+            score = None
             reasons = []
             if isinstance(llm_result, dict):
-                score = llm_result.get("overall_score", 75)
-                reasons = llm_result.get("strengths", [])
+                score_val = llm_result.get("overall_score")
+                if score_val is not None:
+                    try:
+                        score = int(score_val)
+                    except (ValueError, TypeError):
+                        score = None
+                reasons = [r for r in llm_result.get("strengths", []) if isinstance(r, str) and r.strip()]
 
             if not reasons:
                 if job_career_id and resume.career_id == job_career_id:
                     reasons.append(f"Đúng ngành {job_post.career.name if job_post.career else 'nghề'}")
                 if job_city_id and resume.city_id == job_city_id:
                     reasons.append(f"Khu vực {resume.city.name if resume.city else ''}")
-                if any(w in (resume.title or '').lower() for w in job_title.split() if len(w) > 2):
+                if job_title and any(w in (resume.title or '').lower() for w in job_title.split() if len(w) > 2):
                     reasons.append("Chức danh phù hợp")
-
-            score = min(max(int(score), 60), 99)
-            if not reasons:
-                reasons = ["Hồ sơ tiềm năng trong hệ thống"]
 
             avatar_url = None
             if getattr(user, 'avatar', None) and getattr(user.avatar, 'file', None):
@@ -208,9 +187,7 @@ class PrivateJobPostViewSet(
                 except Exception:
                     avatar_url = None
 
-            full_name = (user.full_name or user.username or "Ứng viên").strip()
-            if not avatar_url:
-                avatar_url = None
+            full_name = (user.full_name or user.username or "").strip()
 
             exp_map = {
                 1: "Chưa có kinh nghiệm",
@@ -222,29 +199,25 @@ class PrivateJobPostViewSet(
                 7: "5 năm kinh nghiệm",
                 8: "Trên 5 năm kinh nghiệm",
             }
-            exp_display = exp_map.get(resume.experience, "2-3 năm kinh nghiệm")
-
-            skills_text = resume.skills_summary
-            if not skills_text or len(skills_text.strip()) < 5:
-                skills_text = "Quản lý dự án, Tiến độ công trình, AutoCAD, Bóc tách khối lượng, Kế hoạch thi công"
+            exp_display = exp_map.get(resume.experience) if resume.experience else None
 
             recommendations.append({
                 "id": resume.id,
                 "slug": resume.slug or str(resume.id),
                 "userId": user.id,
                 "fullName": full_name,
-                "title": resume.title or f"Chuyên viên {job_post.job_name}",
+                "title": resume.title or None,
                 "avatarUrl": avatar_url,
-                "city": resume.city.name if resume.city else (job_post.location.city.name if job_post.location and job_post.location.city else "Thành phố Hồ Chí Minh"),
+                "city": resume.city.name if resume.city else None,
                 "experience": exp_display,
                 "matchScore": score,
                 "matchReasons": reasons,
-                "skillsSummary": skills_text,
-                "updatedAt": resume.update_at.strftime("%d/%m/%Y") if resume.update_at else "Mới cập nhật",
+                "skillsSummary": resume.skills_summary or None,
+                "updatedAt": resume.update_at.strftime("%d/%m/%Y") if resume.update_at else None,
                 "isSaved": resume.id in saved_resume_ids,
             })
 
-        recommendations.sort(key=lambda x: x["matchScore"], reverse=True)
+        recommendations.sort(key=lambda x: (x["matchScore"] is not None, x["matchScore"] or 0), reverse=True)
 
         return var_res.response_data(data={
             "jobPostId": job_post.id,

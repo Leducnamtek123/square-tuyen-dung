@@ -568,7 +568,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
         window.location.hostname === 'localhost' ||
         window.location.hostname === '127.0.0.1';
       let urlToUse = getSafeLiveKitUrl(isLocalOrigin);
-      const returnedUrl = tokenData.serverUrl || tokenData.server_url || tokenData.url;
+      const returnedUrl = tokenData.serverUrl;
       if (!isLocalOrigin && returnedUrl) {
         const isInternal =
           returnedUrl.includes('localhost') ||

@@ -13,7 +13,7 @@ interface LanguageSectionProps {
 const LanguageSection: React.FC<LanguageSectionProps> = ({ profileDetail }) => {
     const { t } = useTranslation(['employer', 'common']);
 
-    if (!(profileDetail?.languageDetails && profileDetail.languageDetails.length > 0)) return null;
+    if (!(profileDetail?.languageSkills && profileDetail.languageSkills.length > 0)) return null;
 
     return (
         <Box>
@@ -48,11 +48,11 @@ const LanguageSection: React.FC<LanguageSectionProps> = ({ profileDetail }) => {
                 }}
             >
                 <Stack spacing={4}>
-                    {(profileDetail.languageDetails || []).map((value, itemIdx: number) => (
+                    {(profileDetail.languageSkills || []).map((value, itemIdx: number) => (
                         <Box key={value.id || value.languageName || `lang-item-${itemIdx}`}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                                 <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main' }}>
-                                    {value?.languageName}
+                                    {value?.languageName || String(value?.language || '')}
                                 </Typography>
                                 <Typography 
                                     variant="caption" 
@@ -67,13 +67,13 @@ const LanguageSection: React.FC<LanguageSectionProps> = ({ profileDetail }) => {
                                         letterSpacing: '0.5px'
                                     }}
                                 >
-                                    {value?.levelName}
+                                    {value?.levelName || String(value?.level || '')}
                                 </Typography>
                             </Stack>
                             
                             <LinearProgress 
                                 variant="determinate" 
-                                value={Number(value?.point || 0)} 
+                                value={Number(value?.point || (typeof value?.level === 'number' ? value.level * 20 : 100))} 
                                 sx={{ 
                                     height: 8, 
                                     borderRadius: 4,
@@ -85,7 +85,7 @@ const LanguageSection: React.FC<LanguageSectionProps> = ({ profileDetail }) => {
                                 }} 
                             />
                             
-                            {itemIdx < (profileDetail.languageDetails?.length || 0) - 1 && (
+                            {itemIdx < (profileDetail.languageSkills?.length || 0) - 1 && (
                                 <Divider sx={{ mt: 4, borderStyle: 'dashed', borderColor: pc.divider( 0.8) }} />
                             )}
                         </Box>

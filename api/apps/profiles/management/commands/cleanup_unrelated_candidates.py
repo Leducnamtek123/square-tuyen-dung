@@ -68,22 +68,25 @@ class Command(BaseCommand):
         deleted_resumes_count, _ = resumes_to_delete.delete()
 
         # Clean orphaned profiles
-        orphan_profiles = JobSeekerProfile.objects.filter(
+        orphan_profiles_qs = JobSeekerProfile.objects.filter(
             Q(id__in=profile_ids) | Q(resumes__isnull=True)
-        ).filter(resumes__isnull=True).distinct()
+        ).filter(resumes__isnull=True)
 
-        orphan_profile_ids = list(orphan_profiles.values_list("user_id", flat=True))
-        deleted_profiles_count, _ = orphan_profiles.delete()
+        orphan_profile_ids = list(orphan_profiles_qs.values_list("user_id", flat=True).distinct())
+        orphan_profile_pks = list(orphan_profiles_qs.values_list("id", flat=True).distinct())
+        deleted_profiles_count, _ = JobSeekerProfile.objects.filter(id__in=orphan_profile_pks).delete()
 
         # Clean orphaned candidate users
-        orphan_users = User.objects.filter(
-            id__in=user_ids + orphan_profile_ids,
-            role_name=var_sys.JOB_SEEKER,
-            resumes__isnull=True,
-            job_seeker_profile__isnull=True,
-        ).exclude(is_superuser=True, is_staff=True).distinct()
+        orphan_user_ids = list(
+            User.objects.filter(
+                id__in=user_ids + orphan_profile_ids,
+                role_name=var_sys.JOB_SEEKER,
+                resumes__isnull=True,
+                job_seeker_profile__isnull=True,
+            ).exclude(is_superuser=True, is_staff=True).values_list("id", flat=True).distinct()
+        )
 
-        deleted_users_count, _ = orphan_users.delete()
+        deleted_users_count, _ = User.objects.filter(id__in=orphan_user_ids).delete()
 
         remaining_resumes = Resume.objects.count()
 

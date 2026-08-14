@@ -21,7 +21,7 @@ export const unwrapDataResponse = <T>(raw: unknown, maxDepth = 3): T => {
       break;
     }
 
-    value = value.data;
+    value = (value as Record<string, unknown>).data;
   }
 
   return value as T;
@@ -43,32 +43,18 @@ export const normalizePaginatedResponse = <T>(raw: unknown): PaginatedResponse<T
     return { count: items.length, results: items };
   }
 
-  if (isObject(unwrapped) && (unwrapped.id !== undefined || unwrapped.title !== undefined || unwrapped.slug !== undefined)) {
-    return { count: 1, results: [unwrapped as T] };
+  if (isObject(unwrapped)) {
+    const results =
+      asItems<T>(unwrapped.results) ||
+      asItems<T>(unwrapped.data) ||
+      [];
+    const count =
+      asCount(unwrapped.count) ??
+      results.length;
+    return { count, results };
   }
 
-  const obj = raw as PaginatedLike<T>;
-  const nested = isObject(obj.data) ? obj.data : null;
-  const nestedItems = nested ? asItems<T>((nested as { data?: unknown }).data) : null;
-  const nestedData = nested && isObject((nested as { data?: unknown }).data)
-    ? (nested as { data?: unknown }).data
-    : null;
-
-  const results =
-    asItems<T>(obj.results) ||
-    asItems<T>(obj.data) ||
-    (nested ? asItems<T>((nested as Partial<PaginatedResponse<T>>).results) : null) ||
-    nestedItems ||
-    (nestedData ? asItems<T>((nestedData as Partial<PaginatedResponse<T>>).results) : null) ||
-    [];
-
-  const count =
-    asCount(obj.count) ??
-    (nested ? asCount((nested as Partial<PaginatedResponse<T>>).count) : null) ??
-    (nestedData ? asCount((nestedData as Partial<PaginatedResponse<T>>).count) : null) ??
-    results.length;
-
-  return { count, results };
+  return { count: 0, results: [] };
 };
 
 export const getApiErrorMessage = (error: unknown, fallbackMessage: string): string => {

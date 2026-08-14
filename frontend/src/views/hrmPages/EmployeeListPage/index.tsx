@@ -49,18 +49,21 @@ export default function EmployeeListPage() {
 
   // Selected Employee Detail Drawer
   const [selectedEmp, setSelectedEmp] = useState<NativeEmployee | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null);
     try {
       const [empData, deptData] = await Promise.all([
-        hrmService.getEmployees().catch(() => []),
-        hrmService.getDepartments().catch(() => []),
+        hrmService.getEmployees(),
+        hrmService.getDepartments(),
       ]);
       setEmployees(empData);
       setDepartments(deptData);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching employee list:', err);
+      setError(err?.response?.data?.message || err?.message || 'Không thể tải danh sách nhân viên.');
     } finally {
       setLoading(false);
     }
@@ -114,6 +117,12 @@ export default function EmployeeListPage() {
           </Button>
         </Stack>
       </Box>
+
+      {error && (
+        <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
 
       {/* Filter Bar */}
       <Card sx={{ p: 2.5, mb: 3, borderRadius: 3, boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>

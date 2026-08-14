@@ -80,6 +80,7 @@ export const createCompanyFormSchema = (t: CompanyFormT) =>
     since: yup
       .date()
       .nullable()
+      .transform((value, originalValue) => (originalValue === '' || originalValue === null || originalValue === undefined ? null : value))
       .max(DATE_OPTIONS.today(), t('companyForm.validation.foundedDateInFuture')),
     companyEmail: yup.string().required(t('companyForm.validation.companyEmailRequired')).email(t('companyForm.validation.companyEmailInvalid')).max(100, t('companyForm.validation.companyEmailMax')),
     companyPhone: yup.string().required(t('companyForm.validation.companyPhoneRequired')).matches(REGEX_VALIDATE.phoneRegExp, t('companyForm.validation.companyPhoneInvalid')).max(15, t('companyForm.validation.companyPhoneMax')),

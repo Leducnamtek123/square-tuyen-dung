@@ -13,22 +13,17 @@ import {
   IconButton,
   Chip,
   Avatar,
-  Divider,
   Stack,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
-import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
-import TranslateIcon from '@mui/icons-material/Translate';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
-import PhoneIphoneOutlinedIcon from '@mui/icons-material/PhoneIphoneOutlined';
-import type { ExtendedResume } from '@/components/Features/CVDoc';
+import dayjs from 'dayjs';
+import type { ExtendedResume, CVDocExperience, CVDocEducation, CVDocAdvancedSkill, CVDocCertificate } from '@/components/Features/CVDoc';
 
 interface CandidateResumePreviewModalProps {
   open: boolean;
@@ -44,12 +39,57 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
   open,
   onClose,
   resume,
-  candidateName = 'Đức Nam Lê',
-  candidateEmail = 'leducnamtek123@gmail.com',
-  candidatePhone = '0901 234 567',
+  candidateName = '',
+  candidateEmail = '',
+  candidatePhone = '',
   avatarUrl,
 }) => {
-  const resumeTitle = resume?.title || 'Kế toán / Kỹ sư Cơ điện MEP';
+  const displayName = candidateName || resume?.user?.fullName || 'Ứng viên';
+  const displayEmail = candidateEmail || resume?.user?.email || '';
+  const displayPhone = candidatePhone || (resume as any)?.jobSeekerProfile?.phone || '';
+  const resumeTitle = resume?.title || 'Hồ sơ ứng viên';
+  const updatedAt = resume?.updateAt || (resume as any)?.createdAt;
+
+  const cityName =
+    typeof resume?.city === 'object' && resume.city?.name
+      ? resume.city.name
+      : typeof (resume as any)?.city === 'string'
+      ? (resume as any).city
+      : '';
+
+  const positionName =
+    resume?.positionChooseData?.name ||
+    (typeof (resume as any)?.position === 'object' ? (resume as any)?.position?.name : (resume as any)?.position) ||
+    '';
+
+  const experienceLabel =
+    resume?.experienceChooseData?.name ||
+    (typeof (resume as any)?.experience === 'object' ? (resume as any)?.experience?.name : (resume as any)?.experience ? `${(resume as any).experience} năm` : '');
+
+  const educationLabel =
+    resume?.academicLevelChooseData?.name ||
+    (typeof (resume as any)?.academicLevel === 'object' ? (resume as any)?.academicLevel?.name : (resume as any)?.academicLevel ? String((resume as any).academicLevel) : '');
+
+  const objectiveText = resume?.description || (resume as any)?.careerObjective || '';
+
+  const formatSalary = () => {
+    if (resume?.salaryMin && resume?.salaryMax) {
+      return `${(resume.salaryMin / 1000000).toLocaleString('vi-VN')} - ${(resume.salaryMax / 1000000).toLocaleString('vi-VN')} triệu VNĐ`;
+    }
+    if (resume?.salaryMin) {
+      return `Từ ${(resume.salaryMin / 1000000).toLocaleString('vi-VN')} triệu VNĐ`;
+    }
+    if (typeof (resume as any)?.salary === 'string') {
+      return (resume as any).salary;
+    }
+    return '';
+  };
+  const salaryText = formatSalary();
+
+  const experiences: CVDocExperience[] = resume?.experienceDetails || [];
+  const educations: CVDocEducation[] = resume?.educationDetails || [];
+  const advancedSkills: CVDocAdvancedSkill[] = resume?.advancedSkills || [];
+  const certificates: CVDocCertificate[] = resume?.certificates || [];
 
   return (
     <Dialog
@@ -82,7 +122,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
             src={avatarUrl || undefined}
             sx={{ width: 48, height: 48, bgcolor: '#2563eb', fontWeight: 700, fontSize: '1.25rem' }}
           >
-            {candidateName.charAt(0)}
+            {displayName.trim().charAt(0).toUpperCase()}
           </Avatar>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -92,7 +132,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
               <Chip label="Sẵn sàng ứng tuyển" size="small" sx={{ backgroundColor: '#dcfce7', color: '#15803d', fontWeight: 700, fontSize: '0.675rem' }} />
             </Box>
             <Typography variant="caption" sx={{ color: '#64748b' }}>
-              Ứng viên: {candidateName} • Cập nhật lần cuối: 01/08/2026
+              Ứng viên: {displayName} • Cập nhật lần cuối: {updatedAt && dayjs(updatedAt).isValid() ? dayjs(updatedAt).format('DD/MM/YYYY') : 'Chưa cập nhật'}
             </Typography>
           </Box>
         </Box>
@@ -127,32 +167,32 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
             <Grid container spacing={2.5}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Họ và tên</Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>{candidateName}</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: displayName ? '#0f172a' : '#94a3b8' }}>
+                  {displayName || 'Chưa cập nhật'}
+                </Typography>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Tỉnh / Thành phố</Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>Thành phố Hà Nội</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: cityName ? '#0f172a' : '#94a3b8' }}>
+                  {cityName || 'Chưa cập nhật'}
+                </Typography>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Số điện thoại</Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>{candidatePhone}</Typography>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Quận / Huyện</Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>Quận Cầu Giấy</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: displayPhone ? '#0f172a' : '#94a3b8' }}>
+                  {displayPhone || 'Chưa cập nhật'}
+                </Typography>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Email liên hệ</Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>{candidateEmail}</Typography>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Tình trạng hôn nhân</Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>Độc thân</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: displayEmail ? '#0f172a' : '#94a3b8' }}>
+                  {displayEmail || 'Chưa cập nhật'}
+                </Typography>
               </Grid>
             </Grid>
           </Box>
 
-          {/* Section 2: Thông tin chung */}
+          {/* Section 2: Thông tin chung & Mục tiêu nghề nghiệp */}
           <Box sx={{ p: 3, borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, pb: 1, borderBottom: '2px solid #2563eb' }}>
               <WorkOutlineIcon sx={{ color: '#2563eb' }} />
@@ -162,28 +202,38 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
             </Box>
 
             <Grid container spacing={2.5}>
-              <Grid size={12}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Mục tiêu nghề nghiệp</Typography>
-                <Typography variant="body2" sx={{ color: '#334155', mt: 0.5, lineHeight: 1.6 }}>
-                  Mong muốn cống hiến năng lực chuyên môn trong lĩnh vực Kỹ thuật / Kế toán, áp dụng kiến thức thực tế để tối ưu hóa quy trình, mang lại giá trị bền vững cho doanh nghiệp và thăng tiến lên vị trí Quản lý.
-                </Typography>
-              </Grid>
+              {objectiveText && (
+                <Grid size={12}>
+                  <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Mục tiêu nghề nghiệp</Typography>
+                  <Typography variant="body2" sx={{ color: '#334155', mt: 0.5, lineHeight: 1.6 }}>
+                    {objectiveText}
+                  </Typography>
+                </Grid>
+              )}
 
               <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Vị trí mong muốn</Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#2563eb' }}>{resumeTitle}</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: positionName || resumeTitle ? '#2563eb' : '#94a3b8' }}>
+                  {positionName || resumeTitle || 'Chưa cập nhật'}
+                </Typography>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Địa điểm làm việc mong muốn</Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>Thành phố Hà Nội / TP. Hồ Chí Minh</Typography>
+                <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Kinh nghiệm làm việc</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: experienceLabel ? '#0f172a' : '#94a3b8' }}>
+                  {experienceLabel || 'Chưa cập nhật'}
+                </Typography>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Cấp bậc mong muốn</Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>Chuyên viên / Giám sát</Typography>
+                <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Trình độ học vấn</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: educationLabel ? '#0f172a' : '#94a3b8' }}>
+                  {educationLabel || 'Chưa cập nhật'}
+                </Typography>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>Mức lương mong muốn</Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#16a34a' }}>15.000.000 - 25.000.000 VNĐ</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: salaryText ? '#16a34a' : '#94a3b8' }}>
+                  {salaryText || 'Thỏa thuận'}
+                </Typography>
               </Grid>
             </Grid>
           </Box>
@@ -197,21 +247,31 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
               </Typography>
             </Box>
 
-            <Stack spacing={2}>
-              <Box sx={{ pl: 2, borderLeft: '3px solid #2563eb' }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
-                  Giám sát Cơ điện MEP — Công ty Cổ phần Xây dựng Square
-                </Typography>
-                <Typography variant="caption" sx={{ color: '#2563eb', fontWeight: 700, display: 'block', my: 0.25 }}>
-                  01/2024 — Hiện tại (1 năm 7 tháng)
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.85rem', lineHeight: 1.6 }}>
-                  • Trực tiếp giám sát thi công hệ thống Điện, Nước, HVAC tại các dự án tòa nhà văn phòng và khu căn hộ cao cấp.<br />
-                  • Khảo sát mặt bằng, kiểm tra chất lượng vật tư đầu vào và nghiệm thu công trình theo đúng thiết kế bản vẽ.<br />
-                  • Phối hợp chặt chẽ với Chủ đầu tư và các Nhà thầu phụ đảm bảo tiến độ và an toàn lao động.
-                </Typography>
-              </Box>
-            </Stack>
+            {experiences.length > 0 ? (
+              <Stack spacing={2}>
+                {experiences.map((exp, idx) => (
+                  <Box key={idx} sx={{ pl: 2, borderLeft: '3px solid #2563eb' }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
+                      {exp.jobName} {exp.companyName ? `— ${exp.companyName}` : ''}
+                    </Typography>
+                    {(exp.startDate || exp.endDate) && (
+                      <Typography variant="caption" sx={{ color: '#2563eb', fontWeight: 700, display: 'block', my: 0.25 }}>
+                        {exp.startDate || '—'} — {exp.endDate || 'Hiện tại'}
+                      </Typography>
+                    )}
+                    {exp.description && (
+                      <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.85rem', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
+                        {exp.description}
+                      </Typography>
+                    )}
+                  </Box>
+                ))}
+              </Stack>
+            ) : (
+              <Typography variant="body2" sx={{ color: '#94a3b8', fontStyle: 'italic' }}>
+                Chưa có thông tin kinh nghiệm làm việc
+              </Typography>
+            )}
           </Box>
 
           {/* Section 4: Học vấn & Kỹ năng */}
@@ -224,15 +284,31 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
                     Trình độ học vấn
                   </Typography>
                 </Box>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
-                  Cử nhân Kỹ thuật / Kinh tế
-                </Typography>
-                <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mb: 0.5 }}>
-                  Trường Đại học Bách Khoa / Đại học Quốc Gia (2019 - 2023)
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.825rem' }}>
-                  Tốt nghiệp loại Giỏi. Điểm trung bình GPA: 3.4/4.0.
-                </Typography>
+                {educations.length > 0 ? (
+                  <Stack spacing={1.5}>
+                    {educations.map((edu, idx) => (
+                      <Box key={idx}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
+                          {edu.degreeName || edu.major || 'Học vấn'}
+                        </Typography>
+                        {edu.trainingPlaceName && (
+                          <Typography variant="caption" sx={{ color: '#64748b', display: 'block' }}>
+                            {edu.trainingPlaceName} {(edu.startDate || edu.completedDate) ? `(${edu.startDate || ''} - ${edu.completedDate || ''})` : ''}
+                          </Typography>
+                        )}
+                        {edu.description && (
+                          <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.825rem', mt: 0.5 }}>
+                            {edu.description}
+                          </Typography>
+                        )}
+                      </Box>
+                    ))}
+                  </Stack>
+                ) : (
+                  <Typography variant="body2" sx={{ color: '#94a3b8', fontStyle: 'italic' }}>
+                    {educationLabel || 'Chưa cập nhật thông tin học vấn'}
+                  </Typography>
+                )}
               </Box>
             </Grid>
 
@@ -244,11 +320,33 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
                     Kỹ năng & Chứng chỉ
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {['AutoCAD', 'Revit MEP', 'Bóc tách khối lượng', 'MS Project', 'Tiếng Anh Giao tiếp B2'].map((skill) => (
-                    <Chip key={skill} label={skill} size="small" sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 700 }} />
-                  ))}
-                </Box>
+                {advancedSkills.length > 0 || certificates.length > 0 ? (
+                  <Stack spacing={2}>
+                    {advancedSkills.length > 0 && (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                        {advancedSkills.map((skill, idx) => (
+                          <Chip key={idx} label={skill.name} size="small" sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 700 }} />
+                        ))}
+                      </Box>
+                    )}
+                    {certificates.length > 0 && (
+                      <Stack spacing={1}>
+                        {certificates.map((cert, idx) => (
+                          <Box key={idx} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <CardMembershipIcon sx={{ fontSize: 16, color: '#16a34a' }} />
+                            <Typography variant="body2" sx={{ fontWeight: 600, color: '#0f172a' }}>
+                              {cert.name} {cert.trainingPlace ? `(${cert.trainingPlace})` : ''}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Stack>
+                    )}
+                  </Stack>
+                ) : (
+                  <Typography variant="body2" sx={{ color: '#94a3b8', fontStyle: 'italic' }}>
+                    Chưa cập nhật kỹ năng & chứng chỉ
+                  </Typography>
+                )}
               </Box>
             </Grid>
           </Grid>

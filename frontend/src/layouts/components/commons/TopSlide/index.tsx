@@ -4,43 +4,18 @@ import React from 'react';
 import { Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import {
-  Avatar,
   Box,
-  Card,
-  CardContent,
-  Grid2 as Grid,
   Skeleton,
   Stack,
   Typography,
 } from '@mui/material';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import ApartmentIcon from '@mui/icons-material/Apartment';
-import SearchIcon from '@mui/icons-material/Search';
-import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import HomeSearch from '../../../../views/components/defaults/HomeSearch';
 import contentService from '../../../../services/contentService';
 import { BANNER_TYPES, IMAGES } from '../../../../configs/constants';
 import type { Banner } from '../../../../types/models';
 
+const HERO_CONTAINER_MAX_WIDTH = 1280;
 const HERO_HEADER_OFFSET = { xs: '56px', sm: '64px' };
-
-const HERO_STATS = [
-  {
-    title: 'Hàng nghìn vị trí',
-    description: 'Tập trung việc làm theo nghề, khu vực và mức lương.',
-    icon: SearchIcon,
-  },
-  {
-    title: 'Nhà tuyển dụng rõ ràng',
-    description: 'Thông tin công ty và tin đăng được trình bày gọn gàng.',
-    icon: ApartmentIcon,
-  },
-  {
-    title: 'Cập nhật nhanh',
-    description: 'Gợi ý mới được tải mượt, phù hợp cho trải nghiệm lướt nhanh.',
-    icon: AccessTimeIcon,
-  },
-];
 
 const RenderItem = ({ item }: { item: Banner }) => {
   const imageUrl = item.imageUrl || IMAGES.coverImageDefault;
@@ -88,7 +63,7 @@ const RenderItem = ({ item }: { item: Banner }) => {
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(90deg, rgba(15, 23, 42, 0.90) 0%, rgba(15, 23, 42, 0.62) 48%, rgba(15, 23, 42, 0.12) 100%)',
+            'linear-gradient(90deg, rgba(4, 48, 104, 0.95) 0%, rgba(15, 23, 42, 0.62) 48%, rgba(15, 23, 42, 0.12) 100%)',
           pointerEvents: 'none',
         }}
       />
@@ -145,9 +120,14 @@ const TopSlide = () => {
   return (
     <Box
       sx={{
-        width: '100%',
-        mt: 3,
-        borderRadius: { xs: '16px', md: '24px' },
+        width: '100vw',
+        mx: 'calc(50% - 50vw)',
+        minHeight: { xs: 560, md: 650 },
+        height: {
+          xs: `calc(100svh - ${HERO_HEADER_OFFSET.xs})`,
+          sm: `calc(100svh - ${HERO_HEADER_OFFSET.sm})`,
+        },
+        position: 'relative',
         overflow: 'hidden',
         boxShadow: '0 16px 36px rgba(15, 23, 42, 0.10)',
         bgcolor: '#0f172a',
@@ -156,7 +136,8 @@ const TopSlide = () => {
     >
       <Box
         sx={{
-          minHeight: { xs: 420, md: 460 },
+          width: '100%',
+          height: '100%',
           position: 'relative',
           overflow: 'hidden',
           bgcolor: '#0f172a',
@@ -207,7 +188,7 @@ const TopSlide = () => {
           <Box
             sx={{
               width: '100%',
-              maxWidth: 1040,
+              maxWidth: HERO_CONTAINER_MAX_WIDTH,
               px: { xs: 3, sm: 4, md: 8, lg: 10 },
               pointerEvents: 'auto',
             }}

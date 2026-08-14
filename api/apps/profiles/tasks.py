@@ -118,6 +118,8 @@ def scheduled_vieclam24h_data_lake_ingestion_task():
         logger.info("Vieclam24h shared credentials not configured.")
         return {"status": "unconfigured"}
 
+    from apps.jobs.models import JobPost
+
     source_url = "https://ntd.vieclam24h.vn/tim-kiem-ung-vien-nhanh"
     hcm_city = City.objects.filter(name__icontains="Hồ Chí Minh").first()
     active_jobs = JobPost.objects.filter(status=3).select_related("career", "location", "location__city")

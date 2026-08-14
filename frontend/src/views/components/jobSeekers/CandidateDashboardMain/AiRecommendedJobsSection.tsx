@@ -124,7 +124,7 @@ const AiRecommendedJobsSection = () => {
           {jobs.map((job, idx) => {
             const score = 98 - idx * 3;
             const item = job as any;
-            const companyName = item.company?.companyName || item.companyDict?.companyName || 'Công ty hàng đầu';
+            const companyName = item.company?.companyName || item.companyDict?.companyName || '';
             const logoUrl = item.company?.logoUrl || item.companyDict?.logoUrl || undefined;
             const cityName = item.location?.city?.name || 'Toàn quốc';
             const sMin = item.salaryMin || item.salary_min;

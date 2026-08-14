@@ -484,19 +484,20 @@ class JobActivityService:
         try:
             if isinstance(criteria, list):
                 activity.ai_analysis_criteria = criteria
-            analyze_resume_ai.delay(activity.id)
             activity.ai_analysis_status = 'processing'
             activity.ai_analysis_progress = 5
-            update_fields = ['ai_analysis_status', 'ai_analysis_progress', 'update_at']
+            activity.ai_analysis_summary = ""
+            update_fields = ['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at']
             if isinstance(criteria, list):
                 update_fields.append('ai_analysis_criteria')
             activity.save(update_fields=update_fields)
+
+            analyze_resume_ai.delay(activity.id)
         except Exception:
             activity.ai_analysis_status = 'failed'
             activity.ai_analysis_progress = 0
-            activity.ai_analysis_summary = "Không thể gửi tác vụ phân tích AI vào hàng đợi."
+            activity.ai_analysis_summary = "Không thể khởi tạo tác vụ phân tích AI. Vui lòng thử lại."
             activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
-            raise
 
     @staticmethod
     def get_employer_job_stats(company: Any) -> Dict[str, int]:

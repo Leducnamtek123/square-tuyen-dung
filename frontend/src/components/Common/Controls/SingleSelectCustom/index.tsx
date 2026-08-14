@@ -21,6 +21,10 @@ interface Props<T extends FieldValues = FieldValues> {
   title?: string | null;
   showRequired?: boolean;
   placeholder?: string;
+  disabledPlaceholder?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  noOptionsText?: string;
   sx?: SxProps<Theme>;
 }
 
@@ -31,76 +35,72 @@ const SingleSelectCustom = <T extends FieldValues = FieldValues>({
   title = null,
   showRequired = false,
   placeholder = '',
+  disabledPlaceholder,
+  disabled = false,
+  loading = false,
+  noOptionsText,
   sx = EMPTY_SX,
 }: Props<T>) => {
   const { t } = useTranslation('common');
+  const activePlaceholder = disabled && disabledPlaceholder ? disabledPlaceholder : placeholder;
 
   return (
     <div>
       {title && (
-
-        <Typography variant="subtitle2" gutterBottom>
-
+        <Typography variant="subtitle2" gutterBottom sx={{ color: disabled ? 'text.disabled' : 'inherit' }}>
           {title} {showRequired && <span style={{ color: 'red' }}>*</span>}
-
         </Typography>
-
       )}
 
       <ControllerAny
         name={name as Path<T>}
         control={control}
-
         render={({ field, fieldState }: any) => (
-
           <>
-
             <Autocomplete
-              sx={sx}
+              sx={{
+                ...sx,
+                ...(disabled && {
+                  opacity: 0.75,
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#f8fafc',
+                  },
+                }),
+              }}
               fullWidth
-
+              disabled={disabled}
+              loading={loading}
               id={field.name}
-
               clearOnBlur
-
               options={options}
-
-              noOptionsText={t('noOptions')}
+              noOptionsText={noOptionsText || t('noOptions')}
               loadingText={t('loading')}
               openText={t('autocomplete.open')}
               closeText={t('autocomplete.close')}
               clearText={t('autocomplete.clear')}
-
               autoHighlight={false}
-
               getOptionLabel={(option) => typeof option.name === 'string' ? t(`choices.${option.name}`, option.name) : option.name}
-
               value={options.find((o) => o.id == field.value) || null}
-
               onChange={(e, value) => field.onChange(value?.id ?? null)}
-
               renderInput={(params) => (
-
-                <TextField  error={fieldState.invalid} {...params} size="small" placeholder={placeholder} />
-
+                <TextField
+                  error={fieldState.invalid}
+                  {...params}
+                  size="small"
+                  placeholder={activePlaceholder}
+                  disabled={disabled}
+                />
               )}
-
             />
 
             {fieldState.invalid && (
               <ValidationError message={fieldState.error?.message} />
             )}
-
           </>
-
         )}
-
       />
-
     </div>
-
   );
-
 };
 
 export default SingleSelectCustom;

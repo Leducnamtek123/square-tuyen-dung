@@ -38,7 +38,7 @@ from ..serializers import (
 )
 
 logger = logging.getLogger(__name__)
-AI_PROCESSING_TIMEOUT_MINUTES = 20
+AI_PROCESSING_TIMEOUT_MINUTES = 2
 
 
 def _is_truthy(value) -> bool:
@@ -231,6 +231,13 @@ class EmployerJobPostActivityViewSet(
         instance = self.get_object()
         if instance.job_post.company != request.user.active_company:
             return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        stale_before = timezone.now() - timedelta(minutes=AI_PROCESSING_TIMEOUT_MINUTES)
+        if instance.ai_analysis_status == 'processing' and instance.update_at and instance.update_at < stale_before:
+            instance.ai_analysis_status = 'failed'
+            instance.ai_analysis_progress = 0
+            instance.ai_analysis_summary = "Phân tích AI quá thời gian xử lý. Vui lòng thử lại."
+            instance.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
         fields = [
             "id",
             "fullName",

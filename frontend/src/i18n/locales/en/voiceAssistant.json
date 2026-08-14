@@ -1,10 +1,10 @@
 {
-  "connectingTitle": "Connecting voice AI",
-  "connectingDescription": "Joining the interview room, syncing mic, chat, and visualizer with the Agent Session View.",
+  "connectingTitle": "Connecting voice assistant...",
+  "connectingDescription": "Please stay connected and prepare your microphone.",
   "startAudio": "Start Audio",
-  "welcomeMessage": "Chat live with your voice AI agent",
-  "startCall": "Start call",
-  "setupHelpPrefix": "Need help getting set up? Check out the",
-  "setupHelpLink": "Voice AI quickstart",
-  "preconnectMessage": "Agent is listening, ask it a question"
+  "welcomeMessage": "Hello! I am InfoHR AI Virtual Assistant. How can I help you today?",
+  "startCall": "Start Call",
+  "setupHelpPrefix": "Need technical help? ",
+  "setupHelpLink": "View setup guide",
+  "preconnectMessage": "Establishing secure voice channel..."
 }

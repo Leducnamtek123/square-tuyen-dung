@@ -1,10 +1,10 @@
 {
-  "connectingTitle": "Đang kết nối voice AI",
-  "connectingDescription": "Đang vào phòng phỏng vấn, đồng bộ mic, chat và visualizer theo kiểu Agent Session View.",
+  "connectingTitle": "Đang kết nối trợ lý giọng nói...",
+  "connectingDescription": "Vui lòng giữ kết nối và chuẩn bị micro của bạn.",
   "startAudio": "Bật âm thanh",
-  "welcomeMessage": "Trò chuyện trực tiếp với trợ lý voice AI của bạn",
+  "welcomeMessage": "Xin chào! Tôi là Trợ lý Ảo AI của InfoHR. Tôi có thể giúp gì cho bạn hôm nay?",
   "startCall": "Bắt đầu cuộc gọi",
-  "setupHelpPrefix": "Cần trợ giúp để thiết lập? Xem",
-  "setupHelpLink": "hướng dẫn Voice AI quickstart",
-  "preconnectMessage": "Agent đang lắng nghe, hãy đặt câu hỏi"
+  "setupHelpPrefix": "Cần hỗ trợ kỹ thuật? ",
+  "setupHelpLink": "Xem hướng dẫn cài đặt",
+  "preconnectMessage": "Đang thiết lập kênh thoại an toàn..."
 }

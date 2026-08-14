@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
@@ -71,7 +71,6 @@ export const useProfiles = (params?: AdminListParams): UseProfilesResult => {
             toastMessages.success(
                 i18next.t('admin:pages.profiles.toast.bulkDeleteSuccess', {
                     count: result.deleted,
-                    defaultValue: `Đã xóa ${result.deleted} hồ sơ.`,
                 })
             );
             queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
@@ -86,15 +85,11 @@ export const useProfiles = (params?: AdminListParams): UseProfilesResult => {
         mutationFn: (data) => adminManagementService.importVieclam24hCandidates(data),
         onSuccess: () => {
             toastMessages.success(
-                i18next.t('admin:pages.profiles.toast.importQueued', {
-                    defaultValue: 'Đã tạo tác vụ lấy ứng viên. Hệ thống đang xử lý nền.',
-                })
+                i18next.t('admin:pages.profiles.toast.importQueued')
             );
         },
         onError: (err: Error | unknown) => {
-            toastMessages.error(i18next.t('admin:pages.profiles.toast.importError', {
-                defaultValue: 'Không thể lấy ứng viên từ Vieclam24h.',
-            }));
+            toastMessages.error(i18next.t('admin:pages.profiles.toast.importError'));
             console.error(err);
         },
     });

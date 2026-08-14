@@ -938,7 +938,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
             >
               <HistoryRoundedIcon sx={{ fontSize: 16, color: '#6B7280' }} />
               <Typography variant="overline" sx={{ color: '#6B7280', fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.05em' }}>
-                LỊCH SỬ TRÒ CHUYỆN
+                {t('common:agentAssistant.recents')}
               </Typography>
             </Stack>
 
@@ -1080,10 +1080,10 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                   <SmartToyOutlinedIcon sx={{ fontSize: 26 }} />
                 </Box>
                 <Typography variant="h3" sx={{ fontSize: '1.0625rem', fontWeight: 700, color: '#111827', mb: 0.5 }}>
-                  AILA đang sẵn sàng
+                  {t('common:agentAssistant.ready')}
                 </Typography>
                 <Typography variant="body2" sx={{ color: '#6B7280', maxWidth: 420, fontSize: '0.875rem' }}>
-                  Nhập câu hỏi hoặc nội dung cần hỗ trợ vào ô bên dưới để bắt đầu trò chuyện.
+                  {t('common:agentAssistant.empty')}
                 </Typography>
               </Stack>
             ) : (

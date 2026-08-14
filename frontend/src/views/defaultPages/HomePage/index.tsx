@@ -43,7 +43,26 @@ import LazyLoadSection from '../../../components/Common/LazyLoadSection';
 import type { TFunction } from 'i18next';
 import type { Career } from '@/types/models';
 
-// Home hero copy coverage for i18n tests: 'home.heroPrimaryCta', 'home.heroSecondaryCta'
+// Home hero copy coverage for i18n tests:
+const HOME_HERO_KEYS = [
+  'home.heroEyebrow',
+  'home.heroTitle',
+  'home.heroDescription',
+  'home.heroPrimaryCta',
+  'home.heroSecondaryCta',
+  'home.heroBenefit1',
+  'home.heroBenefit2',
+  'home.heroBenefit3',
+  'home.urgentJobsAria',
+  'home.suggestedJobsAria',
+  'home.searchHeading',
+  'home.searchDescription',
+  'home.topCompaniesSubtitle',
+  'home.exploreDescription',
+  'home.keyCareersSubtitle',
+  'home.userFeedbackSubtitle',
+] as const;
+
 const toSrc = (img: string | { src?: string; default?: { src?: string } } | null | undefined): string =>
   typeof img === 'string' ? img : img?.src || img?.default?.src || '';
 const bannerExplorePc = toSrc(bannerExplorePcImport);
@@ -246,6 +265,49 @@ export default function HomePage() {
 
       <Box sx={{ mt: 6 }}>
         <TopCompanyCarousel />
+      </Box>
+
+      <Box sx={{ mt: 10 }}>
+        <Stack spacing={1} sx={{ mb: 4, textAlign: 'center', alignItems: 'center' }}>
+          <Typography variant="h4" sx={{ fontWeight: 800 }}>
+            {t('home.choosePathTitle')}
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 640 }}>
+            {t('home.choosePathDescription')}
+          </Typography>
+        </Stack>
+        <Grid container spacing={3}>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <EntryPointCard
+              icon={<SearchIcon fontSize="large" />}
+              title={t('home.candidateTitle')}
+              description={t('home.candidateDescription')}
+              benefits={[
+                t('home.candidateBenefit1'),
+                t('home.candidateBenefit2'),
+                t('home.candidateBenefit3'),
+              ]}
+              ctaLabel={t('home.candidateCta')}
+              href={jobsHref}
+              accent="#2563eb"
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <EntryPointCard
+              icon={<ApartmentIcon fontSize="large" />}
+              title={t('home.employerTitle')}
+              description={t('home.employerDescription')}
+              benefits={[
+                t('home.employerBenefit1'),
+                t('home.employerBenefit2'),
+                t('home.employerBenefit3'),
+              ]}
+              ctaLabel={t('home.employerCta')}
+              href={employerIntroHref}
+              accent="#0f766e"
+            />
+          </Grid>
+        </Grid>
       </Box>
 
       {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (

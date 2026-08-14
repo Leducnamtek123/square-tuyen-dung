@@ -398,13 +398,40 @@ class RegistrationService:
     @staticmethod
     def register_job_seeker(validated_data: dict) -> User:
         """
-        Creates a Job Seeker user along with their Profile and default Resume.
+        Creates a Job Seeker user along with their Profile and default Resume,
+        or claims an existing imported profile if the user has no usable password set yet.
         """
         try:
             with transaction.atomic():
-                # Extract data
+                email = validated_data.get("email", "").strip().lower()
+                full_name = validated_data.get("full_name") or validated_data.get("fullName") or ""
+                password = validated_data.get("password")
+
                 validated_data.pop("confirmPassword", None)
                 validated_data.pop("platform", None)
+
+                existing_user = User.objects.filter(email__iexact=email).first()
+
+                if existing_user and not existing_user.has_usable_password():
+                    existing_user.set_password(password)
+                    if full_name:
+                        existing_user.full_name = full_name
+                    existing_user.is_active = False
+                    existing_user.save()
+
+                    job_seeker_profile = JobSeekerProfile.objects.filter(user=existing_user).first()
+                    if not job_seeker_profile:
+                        job_seeker_profile = JobSeekerProfile.objects.create(user=existing_user)
+
+                    resume = Resume.objects.filter(user=existing_user).first()
+                    if not resume:
+                        Resume.objects.create(
+                            job_seeker_profile=job_seeker_profile,
+                            user=existing_user,
+                            type=var_sys.CV_WEBSITE
+                        )
+
+                    return existing_user
 
                 # 1. Create User
                 user = User.objects.create_user_with_role_name(

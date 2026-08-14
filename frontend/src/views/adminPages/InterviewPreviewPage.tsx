@@ -19,7 +19,7 @@ import { localizeRoutePath } from '@/configs/routeLocalization';
 // ─── Fake data ────────────────────────────────────────────────────────────────
 const FAKE_SESSION = {
   jobName: 'Frontend Engineer – React/Next.js',
-  candidateName: 'Lê Đức Nam',
+  candidateName: 'Ứng viên mẫu (Demo)',
   roomCode: 'SQ-2026-C219012',
   scheduledAt: '2026-04-25T14:00:00',
   status: 'in_progress',

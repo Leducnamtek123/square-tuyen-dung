@@ -24,6 +24,10 @@ const pageExists = (route: string): boolean => {
     resolve(appDir, pagePath, 'page.ts'),
     resolve(appDir, pagePath, 'page.jsx'),
     resolve(appDir, pagePath, 'page.js'),
+    resolve(appDir, '(candidate)', pagePath, 'page.tsx'),
+    resolve(appDir, '(candidate)', pagePath, 'page.ts'),
+    resolve(appDir, 'employer', pagePath, 'page.tsx'),
+    resolve(appDir, 'admin', pagePath, 'page.tsx'),
   ];
   return candidates.some(existsSync);
 };

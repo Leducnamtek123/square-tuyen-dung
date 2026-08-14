@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import dynamic from 'next/dynamic';
 import { Box, Typography, Skeleton } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -42,8 +43,51 @@ const LocationPickerContent = dynamic(() => import('./LocationPickerContent'), {
   ),
 });
 
+class LocationPickerErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.warn('LocationPicker error caught by boundary:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <Box
+          sx={{
+            p: 2,
+            borderRadius: 2,
+            bgcolor: 'action.hover',
+            border: '1px dashed',
+            borderColor: 'divider',
+          }}
+        >
+          <Typography variant="caption" color="text.secondary">
+            Bản đồ định vị tạm thời không khả dụng. Bạn vẫn có thể nhập địa chỉ công ty thủ công ở trên.
+          </Typography>
+        </Box>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function LocationPicker(props: LocationPickerProps) {
-  return <LocationPickerContent {...props} />;
+  return (
+    <LocationPickerErrorBoundary>
+      <LocationPickerContent {...props} />
+    </LocationPickerErrorBoundary>
+  );
 }
 
 export type { LocationValue, LocationPickerProps } from './LocationPickerContent';

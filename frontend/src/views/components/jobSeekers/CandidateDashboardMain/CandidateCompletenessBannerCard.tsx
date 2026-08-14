@@ -45,21 +45,18 @@ const CandidateCompletenessBannerCard = ({
       return onboardingStatus.profileCompleteness;
     }
 
-    // Client-side fallback computation while API resolves
+    // Client-side computation from real user attributes while API resolves
     let score = 0;
     if (currentUser?.fullName) score += 20;
     if (currentUser?.email) score += 20;
-    const phone = (currentUser as unknown as { phoneNumber?: string })?.phoneNumber;
-    const cachedPhone = typeof window !== 'undefined' ? localStorage.getItem('sq_user_phone') : null;
-    if (phone || cachedPhone) score += 20;
-    const cachedAvatar = typeof window !== 'undefined' ? localStorage.getItem('sq_user_avatar') : null;
-    if (currentUser?.avatarUrl || cachedAvatar) score += 20;
-    const onboardingDone = typeof window !== 'undefined' ? localStorage.getItem('sq_onboarding_done') : null;
-    const isVerified = (currentUser as unknown as { isVerified?: boolean })?.isVerified;
-    if (onboardingDone || isVerified) score += 20;
+    const phone = (currentUser as unknown as { phone?: string })?.phone || (currentUser as unknown as { phoneNumber?: string })?.phoneNumber;
+    if (phone) score += 20;
+    if (currentUser?.avatarUrl) score += 20;
+    const isVerified = (currentUser as unknown as { isVerified?: boolean })?.isVerified || onboardingStatus?.isOnboarded;
+    if (isVerified) score += 20;
 
     return Math.min(score, 100);
-  }, [currentUser, onboardingStatus?.profileCompleteness, overridePercent]);
+  }, [currentUser, onboardingStatus?.profileCompleteness, onboardingStatus?.isOnboarded, overridePercent]);
 
   const profilePath = localizeRoutePath('/profile', i18n.language);
 

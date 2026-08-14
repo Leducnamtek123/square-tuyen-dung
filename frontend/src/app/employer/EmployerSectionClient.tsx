@@ -88,6 +88,8 @@ const DEFAULT_LAYOUT_PATHS = [
   '/nha-tuyen-dung/cau-hoi-thuong-gap',
   '/employer/terms-of-service',
   '/nha-tuyen-dung/dieu-khoan-dich-vu',
+  '/employer/privacy-policy',
+  '/nha-tuyen-dung/chinh-sach-bao-mat',
   // /employer/candidates & /employer/blog are protected routes requiring employer login.
 ];
 

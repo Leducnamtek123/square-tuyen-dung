@@ -6,7 +6,7 @@ import DatePickerCustom from '../../../../components/Common/Controls/DatePickerC
 import TextFieldAutoCompleteCustom from '../../../../components/Common/Controls/TextFieldAutoCompleteCustom';
 import RichTextEditorCustom from '../../../../components/Common/Controls/RichTextEditorCustom';
 import { DATE_OPTIONS } from '../../../../configs/constants';
-import type { Control } from "react-hook-form";
+import { useWatch, type Control } from "react-hook-form";
 import type { TFunction } from "i18next";
 import type { SystemConfig, SelectOption } from "../../../../types/models";
 
@@ -36,6 +36,7 @@ const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({
   locationValue,
   onLocationChange,
 }) => {
+  const cityId = useWatch({ control, name: 'location.city' });
   const inputSx = {
     '& .MuiOutlinedInput-root': {
       minHeight: 42,
@@ -112,7 +113,17 @@ const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({
         <SingleSelectCustom name="location.city" control={control} options={allConfig?.cityOptions || []} title={t('companyForm.title.cityprovince')} showRequired={true} placeholder={t('companyForm.placeholder.selectcityprovince')} sx={inputSx} />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
-        <SingleSelectCustom options={districtOptions} name="location.district" control={control} title={t('companyForm.title.district')} showRequired={true} placeholder={t('companyForm.placeholder.selectdistrict')} sx={inputSx} />
+        <SingleSelectCustom
+          options={districtOptions}
+          name="location.district"
+          control={control}
+          disabled={!cityId}
+          disabledPlaceholder={t('companyForm.placeholder.selectCityFirst')}
+          title={t('companyForm.title.district')}
+          showRequired={true}
+          placeholder={t('companyForm.placeholder.selectdistrict')}
+          sx={inputSx}
+        />
       </Grid>
       <Grid size={12}>
         <TextFieldCustom name="location.address" title={t('companyForm.title.address')} showRequired={true} placeholder={t('companyForm.placeholder.enteraddress')} control={control} sx={inputSx} />

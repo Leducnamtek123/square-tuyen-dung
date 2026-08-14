@@ -10,6 +10,7 @@ import {
   Avatar,
   Chip,
   CircularProgress,
+  Stack,
 } from '@mui/material';
 import { Grid2 as Grid } from '@mui/material';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
@@ -24,7 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { localizeRoutePath } from '../../../configs/routeLocalization';
 
 const MyInterviewsPage = () => {
-  const { t, i18n } = useTranslation(['jobSeeker', 'common', 'errors', 'interview']);
+  const { t, i18n } = useTranslation(['jobSeeker', 'common', 'errors', 'interview', 'employer']);
   TabTitle(t('jobSeeker:myInterviewsTitle'));
 
   const { push } = useRouter();
@@ -140,9 +141,17 @@ const MyInterviewsPage = () => {
                         <VideoCameraFrontIcon />
                       </Avatar>
                       <Box>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
-                          Phỏng vấn: {interview.jobName || 'Chức danh'}
-                        </Typography>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                            {interview.jobName || 'Chức danh'}
+                          </Typography>
+                          {interview.status && (
+                            <Chip
+                              size="small"
+                              label={t(`employer:interviewListCard.statuses.${interview.status}`)}
+                            />
+                          )}
+                        </Stack>
                         <Typography variant="caption" sx={{ color: '#64748b' }}>
                           {interview.companyName || 'Công ty'}
                         </Typography>

@@ -302,6 +302,10 @@ export const useToggleSaveResumeOptimistic = () => {
     mutationFn: (slug: string) => resumeService.saveResume(slug),
     onMutate: async (slug: string) => {
       await queryClient.cancelQueries({ queryKey: ['employerResumes'] });
+      await queryClient.cancelQueries({ queryKey: ['resumeDetail', slug] });
+
+      const previousResumes = queryClient.getQueriesData({ queryKey: ['employerResumes'] });
+      const previousDetail = queryClient.getQueryData(['resumeDetail', slug]);
 
       queryClient.setQueriesData({ queryKey: ['employerResumes'] }, (oldData: any) => {
         if (!oldData || !Array.isArray(oldData.results)) return oldData;
@@ -320,11 +324,25 @@ export const useToggleSaveResumeOptimistic = () => {
         if (!oldDetail) return oldDetail;
         return { ...oldDetail, isSaved: !oldDetail.isSaved };
       });
+
+      return { previousResumes, previousDetail, slug };
     },
-    onSuccess: (resData: any, slug: string) => {
+    onError: (_err, slug, context) => {
+      if (context?.previousResumes) {
+        context.previousResumes.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+      if (context?.previousDetail !== undefined) {
+        queryClient.setQueryData(['resumeDetail', slug], context.previousDetail);
+      }
+    },
+    onSettled: (_resData, _err, slug) => {
       queryClient.invalidateQueries({ queryKey: ['employerResumes'] });
       queryClient.invalidateQueries({ queryKey: ['savedResumes'] });
-      queryClient.invalidateQueries({ queryKey: ['resumeDetail', slug] });
+      if (slug) {
+        queryClient.invalidateQueries({ queryKey: ['resumeDetail', slug] });
+      }
     },
   });
 

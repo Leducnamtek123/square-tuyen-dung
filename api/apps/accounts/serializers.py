@@ -94,17 +94,17 @@ class JobSeekerRegisterSerializer(PasswordConfirmMixin, serializers.Serializer):
     email = serializers.EmailField(
         required=True,
         max_length=100,
-        validators=[
-            UniqueValidator(
-                queryset=User.objects.all(),
-                lookup='iexact',
-                message=ERROR_MESSAGES['EMAIL_EXISTS'],
-            )
-        ],
     )
     password = serializers.CharField(required=True, max_length=128)
     confirmPassword = serializers.CharField(required=True, max_length=128)
     platform = serializers.CharField(required=True, max_length=3)
+
+    def validate_email(self, value):
+        email_clean = value.strip().lower()
+        existing_user = User.objects.filter(email__iexact=email_clean).first()
+        if existing_user and existing_user.has_usable_password():
+            raise serializers.ValidationError(ERROR_MESSAGES['EMAIL_EXISTS'])
+        return email_clean
 
     def validate_password(self, value):
         return validate_auth_password(value)
@@ -317,7 +317,8 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 status=CompanyMember.STATUS_ACTIVE,
                 is_active=True,
             ).exists()
-        except Exception:
+        except Exception as ex:
+            helper.print_log_error("UserSerializer.get_can_access_employer_portal", ex)
             return False
 
     def get_employer_role_code(self, user):
@@ -332,7 +333,8 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                     is_active=True,
                 ).first()
             return membership.role.code if membership and membership.role else None
-        except Exception:
+        except Exception as ex:
+            helper.print_log_error("UserSerializer.get_employer_role_code", ex)
             return None
 
     def get_workspaces(self, user):
@@ -345,8 +347,8 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         try:
             # We use JobSeekerProfile already imported from apps.profiles.models
             has_job_seeker_profile = JobSeekerProfile.objects.filter(user=user).exists()
-        except Exception:
-            pass
+        except Exception as ex:
+            helper.print_log_error("UserSerializer.get_workspaces.has_job_seeker_profile", ex)
 
         if (role_name == var_sys.JOB_SEEKER or has_job_seeker_profile) and role_name != var_sys.ADMIN:
             workspaces.append({
@@ -370,8 +372,8 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                     "roleCode": "owner",
                     "isDefault": getattr(user, "role_name", None) == var_sys.EMPLOYER,
                 })
-        except Exception:
-            pass
+        except Exception as ex:
+            helper.print_log_error("UserSerializer.get_workspaces.owned_company", ex)
 
         try:
             memberships = getattr(user, "_active_memberships", None)
@@ -396,8 +398,8 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                     "roleCode": membership.role.code if membership.role else None,
                     "isDefault": False,
                 })
-        except Exception:
-            pass
+        except Exception as ex:
+            helper.print_log_error("UserSerializer.get_workspaces.memberships", ex)
 
         return workspaces
 

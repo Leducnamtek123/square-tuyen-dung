@@ -15,6 +15,7 @@ import {
   TableRow,
   Paper,
   CircularProgress,
+  Alert,
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -27,15 +28,18 @@ export default function ContractListPage() {
   TabTitle('Hợp đồng Lao động & Mức lương | Native HRM');
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [contracts, setContracts] = useState<NativeContract[]>([]);
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const data = await hrmService.getContracts().catch(() => []);
+      const data = await hrmService.getContracts();
       setContracts(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching contracts:', err);
+      setError(err?.response?.data?.message || err?.message || 'Không thể tải danh sách hợp đồng.');
     } finally {
       setLoading(false);
     }
@@ -67,6 +71,12 @@ export default function ContractListPage() {
           </Typography>
         </Box>
       </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
 
       {/* Contract Table */}
       {loading ? (

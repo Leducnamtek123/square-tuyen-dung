@@ -89,337 +89,180 @@ const AppliedResumeToolbar: React.FC<Props> = ({
     (aiAnalysisStatusSelect ? 1 : 0) +
     (aiScoreMin ? 1 : 0) +
     (blindMode ? 1 : 0);
+  const totalFilterCount = numbersFilter + quickFilterCount;
 
   return (
-    <>
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
-        justifyContent="space-between"
-        spacing={3}
-        mb={5}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Box sx={{ 
-            p: 1, 
-            borderRadius: 2, 
-            bgcolor: 'primary.extralight', 
-            color: 'primary.main',
-            display: 'flex'
-          }}>
-            <AssignmentTurnedInIcon sx={{ fontSize: 28 }} />
-          </Box>
-          <Box>
-            <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px', mb: 0.5 }}>
-              {title}
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-              {t('employer:appliedResume.manageSubtitle')}
-            </Typography>
-          </Box>
+    <Stack
+      direction={{ xs: 'column', sm: 'row' }}
+      alignItems={{ xs: 'flex-start', sm: 'center' }}
+      justifyContent="space-between"
+      spacing={3}
+      mb={4}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ 
+          p: 1, 
+          borderRadius: 2, 
+          bgcolor: 'primary.extralight', 
+          color: 'primary.main',
+          display: 'flex'
+        }}>
+          <AssignmentTurnedInIcon sx={{ fontSize: 28 }} />
         </Box>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-          <ToggleButtonGroup
-            value={viewMode}
-            exclusive
-            onChange={(_, newValue) => {
-              if (newValue) onViewModeChange(newValue);
-            }}
-            size="small"
-            sx={{
-              p: 0.5,
-              bgcolor: alpha(theme.palette.primary.main, 0.08),
-              borderRadius: 2,
-              '& .MuiToggleButtonGroup-grouped': {
-                border: 0,
-                borderRadius: 1.5,
-                '&.Mui-disabled': {
-                  border: 0,
-                },
-                '&:not(:first-of-type)': {
-                  borderRadius: 1.5,
-                },
-                '&:first-of-type': {
-                  borderRadius: 1.5,
-                },
-              },
-            }}
-          >
-            <ToggleButton 
-              value="table" 
-              sx={{ 
-                fontWeight: 800, 
-                px: 3, 
-                py: 1,
-                textTransform: 'none',
-                color: 'primary.main',
-                '&.Mui-selected, &.Mui-selected:hover': {
-                  bgcolor: 'primary.main',
-                  color: 'primary.contrastText',
-                  boxShadow: theme.customShadows?.z1,
-                },
-                '&:hover': {
-                  bgcolor: alpha(theme.palette.primary.main, 0.12),
-                }
-              }}
-            >
-              <ViewListIcon sx={{ mr: 1, fontSize: 20 }} /> {t('employer:appliedResume.tableView')}
-            </ToggleButton>
-            <ToggleButton 
-              value="board" 
-              sx={{ 
-                fontWeight: 800, 
-                px: 3, 
-                py: 1,
-                textTransform: 'none',
-                color: 'primary.main',
-                '&.Mui-selected, &.Mui-selected:hover': {
-                  bgcolor: 'primary.main',
-                  color: 'primary.contrastText',
-                  boxShadow: theme.customShadows?.z1,
-                },
-                '&:hover': {
-                  bgcolor: alpha(theme.palette.primary.main, 0.12),
-                }
-              }}
-            >
-              <ViewKanbanIcon sx={{ mr: 1, fontSize: 20 }} /> {t('employer:appliedResume.boardView')}
-            </ToggleButton>
-          </ToggleButtonGroup>
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px', mb: 0.5 }}>
+            {title}
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+            {t('employer:appliedResume.manageSubtitle')}
+          </Typography>
+        </Box>
+      </Box>
 
-          <Button
-            variant="contained"
-            color="secondary"
-            startIcon={<PersonAddIcon />}
-            onClick={onOpenManualCandidatePopup}
-            sx={{
-              px: 3,
-              py: 1.25,
-              fontWeight: 900,
-              textTransform: 'none',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {t('employer:manualCandidate.actions.add')}
-          </Button>
-
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<FileDownloadOutlinedIcon />}
-            onClick={onExport}
-            sx={{
-              
-              px: 4,
-              py: 1.25,
-              boxShadow: theme.customShadows?.primary,
-              fontWeight: 900,
-              textTransform: 'none',
-            }}
-          >
-            {t('employer:appliedResume.downloadList')}
-          </Button>
-        </Stack>
-      </Stack>
-
-      <FilterBar
-        variant="flat"
-        title={t('employer:appliedResume.filters')}
-        sx={{ mb: 0 }}
-        activeFilterCount={numbersFilter + quickFilterCount}
-        onReset={onResetFilterData}
-        resetDisabled={!numbersFilter && !quickFilterCount}
-        resetLabel={t('common:reset')}
-        actions={(
-          <Button
-            variant="outlined"
-            color="inherit"
-            startIcon={<FilterListIcon />}
-            endIcon={<ExpandMoreIcon />}
-            onClick={onOpenFilterPopup}
-            sx={{
-              
-              px: 2,
-              fontWeight: 800,
-              textTransform: 'none',
-              bgcolor: 'background.paper',
-              borderStyle: 'dashed',
-              whiteSpace: 'nowrap',
-              '&:hover': { bgcolor: 'primary.extralight', borderColor: 'primary.main', borderStyle: 'solid' },
-            }}
-          >
-            {t('employer:appliedResume.advancedFilter')}
-            {numbersFilter > 0 && (
-              <Box
-                component="span"
-                sx={{
-                  ml: 1,
-                  px: 1,
-                  py: 0.25,
-                  borderRadius: '8px',
-                  bgcolor: 'primary.main',
-                  color: 'white',
-                  fontSize: '0.75rem',
-                  fontWeight: 900,
-                }}
-              >
-                {numbersFilter}
-              </Box>
-            )}
-          </Button>
-        )}
-      >
-        <Grid container spacing={1.5} alignItems="center" sx={{ width: '100%' }}>
-          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-            <Autocomplete
-              getOptionLabel={(option) => option.jobName}
-              value={jobPostOptions.find((o) => String(o.id) === jobPostIdSelect) || null}
-              onChange={(e, value) => onJobPostSelect(value?.id ? String(value.id) : '')}
-              disablePortal
-              size="small"
-              options={jobPostOptions}
-              noOptionsText={t('common:noOptions')}
-              loadingText={t('common:loading')}
-              openText={t('common:autocomplete.open')}
-              closeText={t('common:autocomplete.close')}
-              clearText={t('common:autocomplete.clear')}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder={t('employer:appliedResume.allJobPosts')}
-                  slotProps={{
-                    input: {
-                      ...params.InputProps,
-                      startAdornment: (
-                        <>
-                          <WorkOutlineIcon sx={{ color: 'text.disabled', mr: 1, fontSize: 20 }} />
-                          {params.InputProps.startAdornment}
-                        </>
-                      ),
-                    },
-                  }}
-                  sx={filterControlSx}
-                />
-              )}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-            <Autocomplete
-              getOptionLabel={(option) => tConfig(option.name as string)}
-              value={allConfig?.applicationStatusOptions?.find((o) => String(o.id) === applicationStatusSelect) || null}
-              onChange={(e, value) => onApplicationStatusSelect(value?.id ? String(value.id) : '')}
-              disablePortal
-              size="small"
-              options={allConfig?.applicationStatusOptions || []}
-              noOptionsText={t('common:noOptions')}
-              loadingText={t('common:loading')}
-              openText={t('common:autocomplete.open')}
-              closeText={t('common:autocomplete.close')}
-              clearText={t('common:autocomplete.clear')}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder={t('employer:appliedResume.allStatuses')}
-                  slotProps={{
-                    input: {
-                      ...params.InputProps,
-                      startAdornment: (
-                        <>
-                          <AssignmentTurnedInIcon sx={{ color: 'text.disabled', mr: 1, fontSize: 20 }} />
-                          {params.InputProps.startAdornment}
-                        </>
-                      ),
-                    },
-                  }}
-                  sx={filterControlSx}
-                />
-              )}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
-            <Autocomplete
-              getOptionLabel={(option) => option.name}
-              value={aiAnalysisStatusOptions.find((o) => String(o.id) === aiAnalysisStatusSelect) || null}
-              onChange={(e, value) => onAiAnalysisStatusSelect(value?.id ? String(value.id) : '')}
-              disablePortal
-              size="small"
-              options={aiAnalysisStatusOptions}
-              noOptionsText={t('common:noOptions')}
-              loadingText={t('common:loading')}
-              openText={t('common:autocomplete.open')}
-              closeText={t('common:autocomplete.close')}
-              clearText={t('common:autocomplete.clear')}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder={t('employer:appliedResume.ai.allStatuses')}
-                  slotProps={{
-                    input: {
-                      ...params.InputProps,
-                      startAdornment: (
-                        <>
-                          <AutoAwesomeIcon sx={{ color: 'text.disabled', mr: 1, fontSize: 20 }} />
-                          {params.InputProps.startAdornment}
-                        </>
-                      ),
-                    },
-                  }}
-                  sx={filterControlSx}
-                />
-              )}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
-            <TextField
-              value={aiScoreMin}
-              onChange={(event) => onAiScoreMinChange(event.target.value)}
-              type="number"
-              size="small"
-              placeholder={t('employer:appliedResume.ai.scoreMin')}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SpeedIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
-                    </InputAdornment>
-                  ),
-                },
-                htmlInput: { min: 0, max: 100 },
-              }}
-              sx={filterControlSx}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
-            <ToggleButton
-              value="blind"
-              selected={blindMode}
-              onChange={() => onBlindModeChange(!blindMode)}
-              fullWidth
-              size="small"
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems="center" flexWrap="wrap">
+        <Button
+          variant={totalFilterCount > 0 ? 'contained' : 'outlined'}
+          color="primary"
+          startIcon={<FilterListIcon />}
+          endIcon={<ExpandMoreIcon />}
+          onClick={onOpenFilterPopup}
+          sx={{
+            px: 2.5,
+            py: 1,
+            fontWeight: 900,
+            textTransform: 'none',
+            borderRadius: 2,
+            whiteSpace: 'nowrap',
+            boxShadow: totalFilterCount > 0 ? theme.customShadows?.primary : 'none',
+            bgcolor: totalFilterCount > 0 ? 'primary.main' : 'background.paper',
+            borderColor: totalFilterCount > 0 ? 'primary.main' : 'divider',
+            '&:hover': {
+              bgcolor: totalFilterCount > 0 ? 'primary.dark' : alpha(theme.palette.primary.main, 0.08),
+            },
+          }}
+        >
+          {t('employer:appliedResume.filters')}
+          {totalFilterCount > 0 && (
+            <Box
+              component="span"
               sx={{
-                height: 40,
-                justifyContent: 'flex-start',
-                gap: 1,
-                px: 1.5,
-                borderRadius: 1.5,
-                borderColor: 'divider',
-                color: blindMode ? 'primary.contrastText' : 'text.secondary',
-                bgcolor: blindMode ? 'primary.main' : 'background.paper',
-                fontWeight: 800,
-                textTransform: 'none',
-                '&.Mui-selected, &.Mui-selected:hover': {
-                  bgcolor: 'primary.main',
-                  color: 'primary.contrastText',
-                },
+                ml: 1,
+                px: 1,
+                py: 0.2,
+                borderRadius: '12px',
+                bgcolor: 'common.white',
+                color: 'primary.main',
+                fontSize: '0.75rem',
+                fontWeight: 900,
               }}
             >
-              <VisibilityOffIcon sx={{ fontSize: 20 }} />
-              {t('employer:appliedResume.ai.blindMode')}
-            </ToggleButton>
-          </Grid>
-        </Grid>
-      </FilterBar>
-    </>
+              {totalFilterCount}
+            </Box>
+          )}
+        </Button>
+
+        <ToggleButtonGroup
+          value={viewMode}
+          exclusive
+          onChange={(_, newValue) => {
+            if (newValue) onViewModeChange(newValue);
+          }}
+          size="small"
+          sx={{
+            p: 0.5,
+            bgcolor: alpha(theme.palette.primary.main, 0.08),
+            borderRadius: 2,
+            '& .MuiToggleButtonGroup-grouped': {
+              border: 0,
+              borderRadius: 1.5,
+              '&.Mui-disabled': {
+                border: 0,
+              },
+              '&:not(:first-of-type)': {
+                borderRadius: 1.5,
+              },
+              '&:first-of-type': {
+                borderRadius: 1.5,
+              },
+            },
+          }}
+        >
+          <ToggleButton 
+            value="table" 
+            sx={{ 
+              fontWeight: 800, 
+              px: 2.5, 
+              py: 0.8,
+              textTransform: 'none',
+              color: 'primary.main',
+              '&.Mui-selected, &.Mui-selected:hover': {
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
+                boxShadow: theme.customShadows?.z1,
+              },
+              '&:hover': {
+                bgcolor: alpha(theme.palette.primary.main, 0.12),
+              }
+            }}
+          >
+            <ViewListIcon sx={{ mr: 1, fontSize: 20 }} /> {t('employer:appliedResume.tableView')}
+          </ToggleButton>
+          <ToggleButton 
+            value="board" 
+            sx={{ 
+              fontWeight: 800, 
+              px: 2.5, 
+              py: 0.8,
+              textTransform: 'none',
+              color: 'primary.main',
+              '&.Mui-selected, &.Mui-selected:hover': {
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
+                boxShadow: theme.customShadows?.z1,
+              },
+              '&:hover': {
+                bgcolor: alpha(theme.palette.primary.main, 0.12),
+              }
+            }}
+          >
+            <ViewKanbanIcon sx={{ mr: 1, fontSize: 20 }} /> {t('employer:appliedResume.boardView')}
+          </ToggleButton>
+        </ToggleButtonGroup>
+
+        <Button
+          variant="contained"
+          color="secondary"
+          startIcon={<PersonAddIcon />}
+          onClick={onOpenManualCandidatePopup}
+          sx={{
+            px: 2.5,
+            py: 1,
+            fontWeight: 900,
+            textTransform: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {t('employer:manualCandidate.actions.add')}
+        </Button>
+
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<FileDownloadOutlinedIcon />}
+          onClick={onExport}
+          sx={{
+            px: 3,
+            py: 1,
+            boxShadow: theme.customShadows?.primary,
+            fontWeight: 900,
+            textTransform: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {t('employer:appliedResume.downloadList')}
+        </Button>
+      </Stack>
+    </Stack>
   );
 };
 

@@ -108,63 +108,35 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                   {String(info.getValue() ?? '')}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {isManualCandidate ? (
+                  {isManualCandidate && (
                     <Chip
                       size="small"
                       label={t('manualCandidate.badge')}
                       sx={{ height: 22, fontSize: '0.68rem', fontWeight: 900 }}
                     />
-                  ) : resumeType === CV_TYPES.cvWebsite ? (
-                    /* Online CV – informational only */
-                    <Tooltip title={t('appliedResume.table.onlineResume')} arrow>
-                      <Box sx={{ 
-                        display: 'flex', 
-                        p: 0.5, 
-                        borderRadius: 1, 
-                        bgcolor: pc.primary( 0.08), 
-                        color: 'primary.main' 
-                      }}>
-                        <DescriptionIcon sx={{ fontSize: 14 }} />
-                      </Box>
-                    </Tooltip>
-                  ) : (
-                    /* Attached CV – click or hover to download */
-                    <Tooltip
-                      title={
-                        safeCvFileUrl ? (
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <span>{t('appliedResume.table.attachedResume')}</span>
-                            <DownloadIcon sx={{ fontSize: 13 }} />
-                          </Box>
-                        ) : t('appliedResume.table.attachedResume')
-                      }
-                      arrow
-                    >
-                      <Box
-                        sx={{ 
-                          display: 'flex', 
-                          p: 0.5, 
-                          borderRadius: 1, 
-                          bgcolor: pc.error( 0.08), 
-                          color: 'error.main',
-                          cursor: safeCvFileUrl ? 'pointer' : 'default',
-                          textDecoration: 'none',
-                          '&:hover': safeCvFileUrl ? { bgcolor: pc.error( 0.16) } : {},
-                          transition: 'background-color 0.15s',
+                  )}
+                  {safeCvFileUrl && (
+                    <Tooltip title={t('appliedResume.table.clickToDownload')} arrow>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(safeCvFileUrl, '_blank', 'noopener,noreferrer');
                         }}
-                        {...(safeCvFileUrl ? {
-                          component: 'a' as const,
-                          href: safeCvFileUrl,
-                          download: true,
-                          onClick: (e: React.MouseEvent) => e.stopPropagation(),
-                        } : {})}
+                        sx={{
+                          p: 0.5,
+                          borderRadius: 1,
+                          bgcolor: pc.error(0.08),
+                          color: 'error.main',
+                          '&:hover': { bgcolor: pc.error(0.16) },
+                        }}
                       >
-                        <PictureAsPdfIcon sx={{ fontSize: 14 }} />
-                      </Box>
+                        <PictureAsPdfIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
                     </Tooltip>
                   )}
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.2px' }}>
-                    {resumeTitle || t('appliedResume.table.notUpdated')}
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                    {resumeTitle || '---'}
                   </Typography>
                 </Box>
               </>
@@ -175,68 +147,33 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     },
     {
       accessorKey: 'jobName',
+      id: 'jobName',
       header: t('appliedResume.table.appliedPosition'),
-      enableSorting: true,
-      cell: (info) => (
-        <Typography variant="body2" noWrap sx={{ fontWeight: 800, color: 'primary.main', maxWidth: 200 }}>
-            {info.row.original.jobName ? String(info.row.original.jobName) : '---'}
-        </Typography>
-      ),
+      cell: (info) => {
+        const row = info.row.original as any;
+        const rawTitle =
+          (info.getValue() as string) ||
+          row.jobName ||
+          row.jobPost?.jobName ||
+          row.job_post?.job_name ||
+          row.jobPostDict?.jobName ||
+          '';
+        const cleanTitle = rawTitle.replace(/^\[?TUYỂN GẤP\]?\|?\s*/i, '').trim();
+        return (
+          <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main' }}>
+            {cleanTitle ? `[TUYỂN GẤP] ${cleanTitle}` : '---'}
+          </Typography>
+        );
+      },
     },
     {
       accessorKey: 'createAt',
       header: t('appliedResume.table.appliedDate'),
-      enableSorting: true,
       cell: (info) => (
         <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
             {info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '---'}
         </Typography>
       ),
-    },
-    {
-      id: 'type',
-      header: t('appliedResume.table.profileType'),
-      cell: (info) => {
-        const resumeType = info.row.original.type || info.row.original.resume?.type;
-        const isManualCandidate = Boolean(info.row.original.isManualCandidate);
-        const isOnline = resumeType === CV_TYPES.cvWebsite;
-        const cvFileUrl = info.row.original.resumeFileUrl || info.row.original.resume?.fileUrl || '';
-        const safeCvFileUrl = getSafeResourceUrl(cvFileUrl);
-        return (
-          <Tooltip
-            title={!isOnline && safeCvFileUrl ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <span>{t('appliedResume.table.clickToDownload')}</span>
-                <DownloadIcon sx={{ fontSize: 13 }} />
-              </Box>
-            ) : ''}
-            arrow
-            disableHoverListener={isOnline || !safeCvFileUrl}
-          >
-            <Chip 
-                label={isManualCandidate ? t('manualCandidate.badge') : isOnline ? t('appliedResume.table.onlineResume') : t('appliedResume.table.attachedResume')}
-                size="small" 
-                sx={{ 
-                  fontWeight: 900, 
-                  fontSize: '0.7rem',
-                  borderRadius: 1.5,
-                  bgcolor: isManualCandidate ? pc.secondary(0.08) : isOnline ? pc.primary( 0.08) : pc.error( 0.08),
-                  color: isManualCandidate ? 'secondary.main' : isOnline ? 'primary.main' : 'error.main',
-                  border: '1px solid',
-                  borderColor: isManualCandidate ? pc.secondary(0.1) : isOnline ? pc.primary( 0.1) : pc.error( 0.1),
-                  '& .MuiChip-label': { px: 1.5 },
-                  cursor: !isOnline && safeCvFileUrl ? 'pointer' : 'default',
-                }}
-                {...(!isOnline && safeCvFileUrl ? {
-                  component: 'a' as const,
-                  href: safeCvFileUrl,
-                  download: true,
-                  onClick: (e: React.MouseEvent) => e.stopPropagation(),
-                } : {})}
-            />
-          </Tooltip>
-        );
-      },
     },
     {
       accessorKey: 'aiAnalysisScore',

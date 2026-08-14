@@ -51,7 +51,7 @@ export type ExtendedResume = Resume & {
   educationDetails?: CVDocEducation[];
   advancedSkills?: CVDocAdvancedSkill[];
   languageSkills?: CVDocLanguageSkill[];
-  certificateDetails?: CVDocCertificate[];
+  certificates?: CVDocCertificate[];
 };
 
 export interface CVDocProps {

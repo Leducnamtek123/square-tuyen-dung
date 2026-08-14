@@ -4,7 +4,7 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
 import { DATE_OPTIONS } from '../../../../configs/constants';
-import type { Control } from 'react-hook-form';
+import { useWatch, type Control } from 'react-hook-form';
 import type { SelectOption, SystemConfig } from '@/types/models';
 import type { PersonalProfileFormValues } from './types';
 
@@ -16,6 +16,8 @@ type Props = {
 };
 
 const PersonalProfileFormFields = ({ control, allConfig, districtOptions, t }: Props) => {
+  const cityVal = useWatch({ control, name: 'location.city' });
+
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
@@ -37,7 +39,16 @@ const PersonalProfileFormFields = ({ control, allConfig, districtOptions, t }: P
         <SingleSelectCustom name="location.city" control={control} options={allConfig?.cityOptions || []} title={t('jobSeeker:profile.fields.city')} showRequired placeholder={t('jobSeeker:profile.placeholders.selectCity')} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <SingleSelectCustom name="location.district" control={control} options={districtOptions || []} title={t('jobSeeker:profile.fields.district')} showRequired placeholder={t('jobSeeker:profile.placeholders.selectDistrict')} />
+        <SingleSelectCustom
+          name="location.district"
+          control={control}
+          disabled={!cityVal}
+          disabledPlaceholder={t('jobSeeker:profile.placeholders.selectCityFirst', { defaultValue: 'Vui lòng chọn Tỉnh / Thành phố trước' })}
+          options={districtOptions || []}
+          title={t('jobSeeker:profile.fields.district')}
+          showRequired
+          placeholder={t('jobSeeker:profile.placeholders.selectDistrict')}
+        />
       </Grid>
       <Grid size={12}>
         <TextFieldCustom name="location.address" title={t('jobSeeker:profile.fields.address')} showRequired placeholder={t('jobSeeker:profile.placeholders.address')} control={control} />

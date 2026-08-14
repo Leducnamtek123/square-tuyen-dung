@@ -2,7 +2,10 @@
   "appliedResume": {
     "title": "Quản lý hồ sơ ứng tuyển",
     "downloadList": "Tải danh sách",
-    "filters": "Bộ lọc:",
+    "filters": {
+      "selectJobPost": "Chọn tin tuyển dụng",
+      "searchPlaceholder": "Tìm kiếm theo tên ứng viên, email, số điện thoại..."
+    },
     "allJobPosts": "Tất cả tin tuyển dụng",
     "allStatuses": "Tất cả trạng thái tuyển dụng",
     "advancedFilter": "Bộ lọc nâng cao",
@@ -10,8 +13,8 @@
     "boardView": "Thẻ",
     "table": {
       "noCandidates": "Chưa có ứng viên nào ứng tuyển",
-      "onlineResume": "Hồ sơ Trực tuyến",
-      "attachedResume": "Hồ sơ Đính kèm",
+      "onlineResume": "Hồ sơ ứng viên",
+      "attachedResume": "Hồ sơ ứng viên",
       "notUpdated": "Chưa cập nhật",
       "profileName": "Tên ứng viên",
       "appliedPosition": "Vị trí ứng tuyển",
@@ -25,7 +28,12 @@
         "delete": "Xóa hồ sơ",
         "scheduleInterview": "Lên lịch phỏng vấn"
       },
-      "clickToDownload": "Nhấp để tải xuống"
+      "clickToDownload": "Nhấp để tải xuống",
+      "candidateName": "Họ và tên Ứng viên",
+      "jobTitle": "Vị trí ứng tuyển",
+      "phone": "Số điện thoại",
+      "email": "Email",
+      "aiScore": "Điểm đánh giá AI"
     },
     "ai": {
       "analysisStarted": "Đã bắt đầu phân tích AI. Vui lòng đợi trong giây lát.",
@@ -59,9 +67,9 @@
       "allSkillsTitle": "Tất cả kỹ năng",
       "noData": "Không có dữ liệu",
       "resumeTitle": "Hồ sơ ứng viên",
-      "onlineResumeLabel": "Hồ sơ trực tuyến",
-      "onlineResumeHint": "AI sẽ phân tích hồ sơ trực tuyến của ứng viên.",
-      "viewOnlineProfile": "Xem hồ sơ trực tuyến",
+      "onlineResumeLabel": "Thông tin hồ sơ ứng viên",
+      "onlineResumeHint": "AI sẽ phân tích chi tiết thông tin hồ sơ của ứng viên.",
+      "viewOnlineProfile": "Xem chi tiết hồ sơ",
       "viewAnalysis": "Xem phân tích AI",
       "failed": "Phân tích AI thất bại",
       "allStatuses": "Trạng thái AI",
@@ -97,14 +105,16 @@
       "updateConfirm": "Hồ sơ sẽ được cập nhật sang trạng thái <strong style=\"color:red;\">\"{{statusName}}\"</strong>. Bạn có chắc chắn không?",
       "errorTitle": "Đã xảy ra lỗi",
       "errorMsg": "Bạn không được phép thay đổi trạng thái ứng tuyển từ <strong style=\"color:red;\">\"{{fromStatus}}\"</strong> sang <strong style=\"color:red;\">\"{{toStatus}}\"</strong>",
-      "updateSuccess": "Cập nhật thành công."
+      "updateSuccess": "Cập nhật thành công.",
+      "rollbackMsg": "Không thể cập nhật trạng thái hồ sơ. Đã khôi phục trạng thái ban đầu."
     },
     "delete": {
       "title": "Xóa hồ sơ ứng tuyển",
       "confirm": "Hồ sơ ứng tuyển này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn không?",
       "success": "Xóa hồ sơ ứng tuyển thành công."
     },
-    "manageSubtitle": "Quản lý hồ sơ ứng tuyển"
+    "manageSubtitle": "Quản lý hồ sơ ứng tuyển",
+    "subtitle": "Theo dõi, đánh giá và quản lý toàn bộ hồ sơ ứng viên ứng tuyển vào các vị trí của doanh nghiệp."
   },
   "savedResume": {
     "title": "Quản lý hồ sơ đã lưu",
@@ -122,6 +132,14 @@
       "savedDate": "Ngày lưu",
       "phone": "Số điện thoại",
       "email": "Email"
+    },
+    "subtitle": "Quản lý và theo dõi các hồ sơ ứng viên bạn đã lưu lại để tiện liên hệ hoặc tuyển dụng sau này.",
+    "columns": {
+      "candidateName": "Họ và tên",
+      "jobTitle": "Vị trí / Chức danh",
+      "experience": "Kinh nghiệm",
+      "city": "Tỉnh / Thành phố",
+      "savedAt": "Ngày lưu"
     }
   },
   "savedResumeTable": {
@@ -392,6 +410,7 @@
       "entercompanyemail": "Nhập email công ty",
       "entercompanyphonenumber": "Nhập số điện thoại công ty",
       "selectcityprovince": "Chọn Tỉnh/Thành phố",
+      "selectCityFirst": "Vui lòng chọn Tỉnh / Thành phố trước",
       "selectdistrict": "Chọn Quận/Huyện",
       "enteraddress": "Nhập địa chỉ",
       "enterlatitudecoordinateonthemap": "Nhập vĩ độ trên bản đồ",
@@ -635,6 +654,7 @@
       "selectacademiclevel": "Chọn trình độ HV",
       "selectinterviewtemplate": "Chọn mẫu phỏng vấn cho đánh giá sơ bộ tự động...",
       "selectcityprovince": "Chọn Tỉnh/Thành phố",
+      "selectCityFirst": "Vui lòng chọn Tỉnh / Thành phố trước",
       "selectdistrict": "Chọn Quận/Huyện",
       "enteraddress": "Nhập địa chỉ",
       "enterlatitudecoordinateofthecompanyonthemap": "Nhập vĩ độ trên bản đồ",
@@ -974,8 +994,8 @@
     "label": {
       "lastUpdated": "Cập nhật:",
       "lastViewed": "Xem lần cuối:",
-      "onlineCv": "CV trực tuyến",
-      "attachedCv": "CV đính kèm",
+      "onlineCv": "Hồ sơ ứng viên",
+      "attachedCv": "Hồ sơ ứng viên",
       "active": "Đang hoạt động",
       "inactive": "Không hoạt động",
       "printProfile": "In hồ sơ",
@@ -1655,5 +1675,109 @@
   "questionBank": {
     "deleteTitle": "Xóa câu hỏi",
     "hint": "Nhập nội dung câu hỏi rõ ràng và ngắn gọn."
+  },
+  "employerOnboarding": {
+    "pageTitle": "Thiết lập Tài khoản Doanh nghiệp | InfoHR",
+    "steps": {
+      "companyProfile": "Thương hiệu Doanh nghiệp",
+      "recruiterProfile": "Đại diện Tuyển dụng",
+      "verification": "Xác thực GPKD",
+      "complete": "Hoàn tất"
+    },
+    "stepCounter": "Bước {{current}} / {{total}}",
+    "invitation": {
+      "title": "Bạn đã được mời tham gia doanh nghiệp",
+      "subtitle": "Tài khoản của bạn đã được mời làm việc tại doanh nghiệp với vai trò được cấp sẵn.",
+      "company": "Doanh nghiệp",
+      "role": "Vai trò",
+      "acceptAndContinue": "Chấp nhận & Tiếp tục"
+    },
+    "step1": {
+      "title": "Thông tin Thương hiệu Doanh nghiệp",
+      "subtitle": "Hoàn tất thông tin doanh nghiệp để xây dựng thương hiệu uy tín và thu hút ứng viên tài năng",
+      "logoLabel": "Logo Doanh nghiệp",
+      "logoUpload": "Tải Logo",
+      "logoChange": "Đổi Logo",
+      "logoHint": "Định dạng PNG, JPG (tối đa 5MB). Khuyên dùng tỉ lệ 1:1.",
+      "companyName": "Tên doanh nghiệp / Công ty đầy đủ",
+      "companyNamePlaceholder": "VD: Công ty Cổ phần Công nghệ Square...",
+      "companyNameHelper": "Nhập chính xác tên doanh nghiệp theo Giấy phép ĐKKD",
+      "taxCode": "Mã số thuế (MST)",
+      "taxCodePlaceholder": "VD: 0101234567",
+      "taxCodeHelper": "Mã số thuế doanh nghiệp (tuỳ chọn khi khởi tạo)",
+      "employeeSize": "Quy mô nhân sự",
+      "fieldOperation": "Lĩnh vực hoạt động chính",
+      "fieldOperationPlaceholder": "VD: Công nghệ thông tin, Xây dựng, Bán lẻ...",
+      "locationSection": "Địa chỉ trụ sở / Chi nhánh tuyển dụng",
+      "city": "Tỉnh / Thành phố",
+      "cityPlaceholder": "Chọn Tỉnh / Thành phố...",
+      "district": "Quận / Huyện",
+      "districtPlaceholder": "Chọn Quận / Huyện...",
+      "address": "Địa chỉ chi tiết",
+      "addressPlaceholder": "Số nhà, tên đường, tòa nhà...",
+      "website": "Website công ty",
+      "websitePlaceholder": "https://company.vn"
+    },
+    "step2": {
+      "title": "Thông tin Đại diện Tuyển dụng",
+      "subtitle": "Thông tin người phụ trách giúp ứng viên và hệ thống liên hệ trao đổi công việc dễ dàng",
+      "recruiterName": "Họ và tên người phụ trách",
+      "recruiterNamePlaceholder": "VD: Nguyễn Văn A",
+      "recruiterTitle": "Chức danh / Vị trí công tác",
+      "recruiterTitlePlaceholder": "VD: Trưởng phòng Tuyển dụng, HR Manager...",
+      "recruiterPhone": "Số điện thoại liên hệ / Zalo",
+      "recruiterPhonePlaceholder": "VD: 0912345678",
+      "recruiterEmail": "Email nhận thông báo ứng tuyển",
+      "recruiterEmailPlaceholder": "recruitment@company.vn",
+      "hiringNeeds": "Nhu cầu tuyển dụng trọng tâm",
+      "hiringNeedsPlaceholder": "Nhập vị trí/ngành cần tuyển (VD: Frontend, Kế toán, Sales...)",
+      "hiringNeedsHelper": "Nhập và nhấn Enter để thêm các vị trí ưu tiên tuyển dụng",
+      "description": "Giới thiệu ngắn về môi trường làm việc & văn hóa",
+      "descriptionPlaceholder": "Mô tả điểm nổi bật về phúc lợi, môi trường làm việc, văn hóa doanh nghiệp..."
+    },
+    "step3": {
+      "title": "Xác thực Doanh nghiệp (GPKD)",
+      "subtitle": "Doanh nghiệp có tích xanh xác thực sẽ nhận được độ tin cậy cao và thu hút ứng viên gấp 3 lần",
+      "benefitsTitle": "Lợi ích khi xác thực Giấy phép ĐKKD ngay:",
+      "benefit1": "Huy hiệu Tích xanh Doanh nghiệp uy tín",
+      "benefit2": "Ưu tiên hiển thị tin tuyển dụng ở vị trí nổi bật",
+      "benefit3": "Tăng x3 tỷ lệ ứng tuyển của các ứng viên chất lượng cao",
+      "dropzoneTitle": "Kéo thả file GPKD (Ảnh hoặc PDF) vào đây hoặc bấm để chọn",
+      "dropzoneSubtitle": "Định dạng hỗ trợ: JPG, PNG, PDF (Dung lượng tối đa 10MB)",
+      "uploadedFile": "Giấy phép kinh doanh đã tải lên",
+      "replaceFile": "Thay đổi file",
+      "removeFile": "Xóa file",
+      "skipNotice": "Bạn có thể bỏ qua bước này và cập nhật GPKD bất kỳ lúc nào trong phần Cài đặt công ty."
+    },
+    "step4": {
+      "title": "Chào mừng bạn gia nhập InfoHR!",
+      "subtitle": "Hồ sơ doanh nghiệp đã được thiết lập thành công. Bạn có thể bắt đầu đăng tin và tuyển dụng nhân tài ngay bây giờ.",
+      "freeBanner": "Hệ thống hỗ trợ Nhà tuyển dụng đăng tin và quản lý ứng viên hoàn toàn <b>miễn phí không giới hạn</b>.",
+      "summaryTitle": "Thông tin doanh nghiệp đã tạo",
+      "companyName": "Công ty",
+      "recruiter": "Đại diện",
+      "location": "Địa chỉ",
+      "verificationStatus": "Trạng thái xác thực",
+      "verifiedPending": "Đang chờ duyệt GPKD",
+      "notSubmitted": "Chưa nộp GPKD",
+      "postJob": "Đăng tin Tuyển dụng ngay",
+      "dashboard": "Vào Bảng điều khiển Quản trị"
+    },
+    "actions": {
+      "back": "Quay lại",
+      "next": "Tiếp theo",
+      "complete": "Hoàn thành thiết lập",
+      "skipVerification": "Bỏ qua & Xác thực sau",
+      "saving": "Đang lưu...",
+      "submitting": "Đang hoàn tất..."
+    },
+    "validation": {
+      "companyNameRequired": "Vui lòng nhập tên công ty / doanh nghiệp.",
+      "recruiterNameRequired": "Vui lòng nhập họ tên người phụ trách tuyển dụng.",
+      "recruiterPhoneRequired": "Vui lòng nhập số điện thoại liên hệ.",
+      "cityRequired": "Vui lòng chọn Tỉnh / Thành phố trụ sở.",
+      "saveFailed": "Không thể lưu thông tin doanh nghiệp. Vui lòng thử lại.",
+      "uploadFailed": "Tải file lên thất bại. Vui lòng thử lại."
+    }
   }
 }

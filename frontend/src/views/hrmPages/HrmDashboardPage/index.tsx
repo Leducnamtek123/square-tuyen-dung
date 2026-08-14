@@ -118,16 +118,18 @@ export default function HrmDashboardPage() {
   });
 
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
+    setErrorMessage(null);
     try {
       const [statsData, empData, deptData, leaveData, orgData] = await Promise.all([
-        hrmService.getDashboardStats().catch(() => null),
-        hrmService.getEmployees().catch(() => []),
-        hrmService.getDepartments().catch(() => []),
-        hrmService.getLeaveRequests().catch(() => []),
-        hrmService.getOrgChart().catch(() => []),
+        hrmService.getDashboardStats(),
+        hrmService.getEmployees(),
+        hrmService.getDepartments(),
+        hrmService.getLeaveRequests(),
+        hrmService.getOrgChart(),
       ]);
 
       if (statsData) setStats(statsData);
@@ -135,8 +137,9 @@ export default function HrmDashboardPage() {
       setDepartments(deptData);
       setLeaveRequests(leaveData);
       setOrgChart(orgData);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching HRM data:', err);
+      setErrorMessage(err?.response?.data?.message || err?.message || 'Không thể tải dữ liệu HRM.');
     } finally {
       setLoading(false);
     }
@@ -287,6 +290,12 @@ export default function HrmDashboardPage() {
           </Button>
         </Stack>
       </Box>
+
+      {errorMessage && (
+        <Alert severity="error" onClose={() => setErrorMessage(null)} sx={{ mb: 3 }}>
+          {errorMessage}
+        </Alert>
+      )}
 
       {actionSuccess && (
         <Alert severity="success" onClose={() => setActionSuccess(null)} sx={{ mb: 3 }}>

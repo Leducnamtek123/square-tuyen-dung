@@ -184,9 +184,9 @@ def score_job_application(activity):
         "salary_max": getattr(job, "salary_max", 0),
     }
     res = score_resume_job_fit(resume_data, job_data, resume_id=resume.id if resume else None, job_id=job.id if job else None)
-    if isinstance(res, dict):
+    if isinstance(res, dict) and res.get("overall_score") is not None:
         return {
-            "score": res.get("overall_score", 70),
+            "score": res.get("overall_score"),
             "summary": res.get("recommendation", ""),
         }
-    return {"score": 70, "summary": ""}
+    return {"score": None, "summary": ""}

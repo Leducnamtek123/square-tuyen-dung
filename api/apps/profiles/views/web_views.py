@@ -620,7 +620,7 @@ class ResumeViewSet(viewsets.ViewSet,
         if not company:
             return var_res.response_data(
                 status=status.HTTP_400_BAD_REQUEST,
-                message="Vui lòng chọn công ty để thực hiện thao tác này."
+                errors={"errorMessage": ["Vui lòng chọn công ty để thực hiện thao tác này."]}
             )
 
         resume_obj = self.get_object()

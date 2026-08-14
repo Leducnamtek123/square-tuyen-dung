@@ -107,7 +107,7 @@ const getLocalLiveKitUrl = () => {
   }
 };
 
-const resolveLiveKitServerUrl = (details: { serverUrl?: string; server_url?: string; url?: string }) => {
+const resolveLiveKitServerUrl = (details: { serverUrl?: string }) => {
   const localUrl = getLocalLiveKitUrl();
 
   if (
@@ -118,7 +118,7 @@ const resolveLiveKitServerUrl = (details: { serverUrl?: string; server_url?: str
     return localUrl;
   }
 
-  return details.serverUrl || details.server_url || details.url || localUrl;
+  return details.serverUrl || localUrl;
 };
 
 const reducer = (state: State, action: Action): State => {

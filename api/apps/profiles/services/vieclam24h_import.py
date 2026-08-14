@@ -134,6 +134,8 @@ def _match_career(candidate: dict, career_names: Iterable[str]) -> Career | None
 
 
 def _match_city(candidate: dict, target_city: City | None = None) -> City | None:
+    if target_city:
+        return target_city
     city_id = candidate.get("city_id") or candidate.get("province_id")
     if city_id is not None:
         city = City.objects.filter(id=city_id).first()
@@ -189,7 +191,11 @@ def _resolve_import_location(target_city: City | None, target_district: District
     )
 
 
-def _match_location(candidate: dict, target_city: City | None = None) -> Location | None:
+def _match_location(candidate: dict, target_city: City | None = None, target_district: District | None = None) -> Location | None:
+    if target_city or target_district:
+        loc = _resolve_import_location(target_city, target_district)
+        if loc:
+            return loc
     city = _match_city(candidate, target_city=target_city)
     if not city:
         city = target_city or City.objects.filter(name__icontains="Hồ Chí Minh").first() or City.objects.first()
@@ -197,13 +203,23 @@ def _match_location(candidate: dict, target_city: City | None = None) -> Locatio
     if not city:
         return None
 
-    location = Location.objects.filter(city=city).first()
+    raw_address = (
+        _get_candidate_prop(candidate, "address")
+        or _get_candidate_prop(candidate, "contact_address")
+        or candidate.get("district_name")
+        or candidate.get("city_name")
+        or (target_district.name if target_district else None)
+        or city.name
+    ).strip()
+
+    location = Location.objects.filter(city=city, address=raw_address).first()
     if location:
         return location
 
     return Location.objects.create(
         city=city,
-        address=(candidate.get("city_name") or city.name).strip(),
+        district=target_district,
+        address=raw_address,
     )
 
 
@@ -248,6 +264,28 @@ def _sync_remote_file(file_record: File | None, remote_url: str, folder_key: str
 
     folder = settings.CLOUDINARY_DIRECTORY.get(folder_key, folder_key)
     upload_result = CloudinaryService.upload_file(remote_url, folder)
+    if not upload_result:
+        try:
+            import os
+            import tempfile
+            import requests
+            resp = requests.get(
+                remote_url,
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+                timeout=15,
+            )
+            if resp.status_code == 200 and len(resp.content) > 100:
+                with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+                    tmp.write(resp.content)
+                    tmp_path = tmp.name
+                upload_result = CloudinaryService.upload_file(tmp_path, folder)
+                try:
+                    os.unlink(tmp_path)
+                except OSError:
+                    pass
+        except Exception as err:
+            logger.warning("Fallback requests download for remote_url failed: %s", err)
+
     if not upload_result:
         return file_record
     return File.update_or_create_file_with_cloudinary(file_record, upload_result, file_type)
@@ -316,13 +354,30 @@ def _parse_birthday(value: object) -> date | None:
     val_str = str(value).strip()
     if not val_str:
         return None
-    if len(val_str) == 4 and val_str.isdigit():
+
+    match_iso = re.search(r"(\d{4})[-/](\d{1,2})[-/](\d{1,2})", val_str)
+    if match_iso:
+        y, m, d = map(int, match_iso.groups())
         try:
-            year = int(val_str)
-            if 1950 <= year <= 2025:
-                return date(year, 1, 1)
+            return date(y, m, d)
         except ValueError:
             pass
+
+    match_dmy = re.search(r"(\d{1,2})[-/](\d{1,2})[-/](\d{4})", val_str)
+    if match_dmy:
+        d, m, y = map(int, match_dmy.groups())
+        try:
+            return date(y, m, d)
+        except ValueError:
+            pass
+
+    match_year = re.search(r"\b(19[5-9]\d|20[0-2]\d)\b", val_str)
+    if match_year:
+        try:
+            return date(int(match_year.group(1)), 1, 1)
+        except ValueError:
+            pass
+
     if val_str.isdigit() and len(val_str) > 4:
         try:
             ts = int(val_str)
@@ -330,17 +385,7 @@ def _parse_birthday(value: object) -> date | None:
                 return date.fromtimestamp(ts)
         except (ValueError, OSError, OverflowError):
             pass
-    try:
-        return date.fromisoformat(val_str)
-    except ValueError:
-        pass
-    match = re.match(r"^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$", val_str)
-    if match:
-        day, month, year = map(int, match.groups())
-        try:
-            return date(year, month, day)
-        except ValueError:
-            pass
+
     return None
 
 
@@ -416,17 +461,112 @@ def _map_position(value: object) -> int | None:
         return 3
     if "chuyên gia" in val_str or "specialist" in val_str or "senior" in val_str:
         return 4
-    if "nhân viên" in val_str or "staff" in val_str or "officer" in val_str or "kỹ sư" in val_str:
+    if "nhân viên" in val_str or "staff" in val_str or "officer" in val_str or "kỹ sư" in val_str or "engineer" in val_str:
         return 5
     if "cộng tác viên" in val_str or "collaborator" in val_str or "thực tập" in val_str or "intern" in val_str:
         return 6
     return 5
 
 
+def _map_academic_level(value: object) -> int | None:
+    if value is None:
+        return None
+    if isinstance(value, int) and 1 <= value <= 6:
+        return value
+    val_str = str(value).strip().lower()
+    if not val_str:
+        return None
+    if val_str.isdigit():
+        num = int(val_str)
+        if 1 <= num <= 6:
+            return num
+    if "thạc sĩ" in val_str or "tiến sĩ" in val_str or "postgraduate" in val_str or "master" in val_str or "phd" in val_str:
+        return 1
+    if "đại học" in val_str or "university" in val_str or "cử nhân" in val_str or "kỹ sư" in val_str:
+        return 2
+    if "cao đẳng" in val_str or "college" in val_str:
+        return 3
+    if "trung cấp" in val_str or "học nghề" in val_str or "vocational" in val_str or "intermediate" in val_str:
+        return 4
+    if "trung học" in val_str or "phổ thông" in val_str or "high school" in val_str:
+        return 5
+    if "chứng chỉ" in val_str or "certificate" in val_str:
+        return 6
+    return None
+
+
+def _map_job_type(value: object) -> int | None:
+    if value is None:
+        return None
+    if isinstance(value, int) and 1 <= value <= 7:
+        return value
+    val_str = str(value).strip().lower()
+    if not val_str:
+        return None
+    if "toàn thời gian" in val_str or "chính thức" in val_str or "full-time" in val_str or "fulltime" in val_str:
+        return 1
+    if "bán thời gian" in val_str or "part-time" in val_str or "parttime" in val_str:
+        return 3
+    if "thực tập" in val_str or "intern" in val_str:
+        return 6
+    return 1
+
+
+def _map_type_of_workplace(value: object) -> int | None:
+    if value is None:
+        return None
+    if isinstance(value, int) and 1 <= value <= 3:
+        return value
+    val_str = str(value).strip().lower()
+    if not val_str:
+        return None
+    if "hybrid" in val_str or "linh hoạt" in val_str:
+        return 2
+    if "remote" in val_str or "từ xa" in val_str or "home" in val_str:
+        return 3
+    return 1
+
+
+def _get_candidate_prop(candidate: dict, key: str, default: Any = None) -> Any:
+    val = candidate.get(key)
+    if val is not None and val != "":
+        return val
+
+    source_payload = candidate.get("source_payload") or {}
+    if not isinstance(source_payload, dict):
+        source_payload = {}
+
+    search = source_payload.get("search") or {}
+    if isinstance(search, dict):
+        if search.get(key) is not None and search.get(key) != "":
+            return search.get(key)
+        seeker_info = search.get("seeker_info") or {}
+        if isinstance(seeker_info, dict) and seeker_info.get(key) is not None and seeker_info.get(key) != "":
+            return seeker_info.get(key)
+
+    detail_page = source_payload.get("detail_page") or {}
+    if isinstance(detail_page, dict) and detail_page.get(key) is not None and detail_page.get(key) != "":
+        return detail_page.get(key)
+
+    detail_api = source_payload.get("detail_api") or {}
+    if isinstance(detail_api, dict) and detail_api.get(key) is not None and detail_api.get(key) != "":
+        return detail_api.get(key)
+
+    search_payload = candidate.get("search_payload") or {}
+    if isinstance(search_payload, dict):
+        if search_payload.get(key) is not None and search_payload.get(key) != "":
+            return search_payload.get(key)
+        seeker_info = search_payload.get("seeker_info") or {}
+        if isinstance(seeker_info, dict) and seeker_info.get(key) is not None and seeker_info.get(key) != "":
+            return seeker_info.get(key)
+
+    return default
+
+
 def _map_salary(candidate: dict) -> tuple[int, int, int | None]:
-    min_sal = candidate.get("min_expected_salary") or candidate.get("salary_min")
-    max_sal = candidate.get("max_expected_salary") or candidate.get("salary_max")
-    curr_sal = candidate.get("current_salary")
+    min_sal = _get_candidate_prop(candidate, "min_expected_salary") or _get_candidate_prop(candidate, "salary_min")
+    max_sal = _get_candidate_prop(candidate, "max_expected_salary") or _get_candidate_prop(candidate, "salary_max")
+    curr_sal = _get_candidate_prop(candidate, "current_salary")
 
     def _to_int(val):
         if val is None:
@@ -444,7 +584,7 @@ def _map_salary(candidate: dict) -> tuple[int, int, int | None]:
     salary_curr = _to_int(curr_sal)
 
     if salary_min == 0 and salary_max == 0:
-        salary_range = str(candidate.get("salary_range") or "").lower()
+        salary_range = str(_get_candidate_prop(candidate, "salary_range") or "").lower()
         if salary_range:
             nums = re.findall(r"\d+(?:[\.,]\d+)?", salary_range)
             if len(nums) >= 2:
@@ -557,12 +697,17 @@ def persist_vieclam24h_candidates(
             result.skipped_count += 1
             continue
 
-        career = target_career or _match_career(candidate, career_names)
+        matched_career = _match_career(candidate, career_names)
+        career = matched_career
+        if not career and target_career:
+            if _score_candidate_for_career(candidate, target_career) > 0 or _match_career(candidate, [target_career.name]):
+                career = target_career
+
         if not career:
             result.skipped_count += 1
             continue
 
-        location = _match_location(candidate, target_city=target_city)
+        location = _match_location(candidate, target_city=target_city, target_district=target_district)
         city = location.city if location else _match_city(candidate, target_city=target_city)
         analysis_score = _score_candidate_for_career(candidate, career) if career else 0
 
@@ -579,13 +724,11 @@ def persist_vieclam24h_candidates(
             "targetDistrictName": target_district.name if target_district else None,
         }
         remote_cv_url = _resolve_remote_url(
-            candidate.get("cv_file_url")
-            or (candidate.get("source_payload") or {}).get("detail_page", {}).get("cv_file_url"),
+            _get_candidate_prop(candidate, "cv_file_url"),
             source_url,
         )
         remote_avatar_url = _resolve_remote_url(
-            candidate.get("avatar_url")
-            or (candidate.get("source_payload") or {}).get("detail_page", {}).get("avatar_url"),
+            _get_candidate_prop(candidate, "avatar_url"),
             source_url,
         )
         if remote_cv_url:
@@ -623,7 +766,7 @@ def persist_vieclam24h_candidates(
                 user_update_fields.append("update_at")
                 user.save(update_fields=user_update_fields)
 
-            phone_val = (candidate.get("phone") or "").strip() or None
+            phone_val = (_get_candidate_prop(candidate, "phone") or "").strip() or None
             if phone_val and job_seeker_profile.phone != phone_val:
                 job_seeker_profile.phone = phone_val
                 job_seeker_profile.save(update_fields=["phone", "update_at"])
@@ -644,12 +787,22 @@ def persist_vieclam24h_candidates(
                     update_fields.append("update_at")
                     user.save(update_fields=update_fields)
 
+            raw_contact_address = (
+                _get_candidate_prop(candidate, "address")
+                or _get_candidate_prop(candidate, "contact_address")
+                or candidate.get("district_name")
+                or candidate.get("city_name")
+            )
+            if raw_contact_address:
+                raw_contact_address = str(raw_contact_address).strip()
+
             profile_defaults = {
-                "phone": (candidate.get("phone") or "").strip() or None,
+                "phone": (_get_candidate_prop(candidate, "phone") or "").strip() or None,
                 "location": location,
-                "birthday": _parse_birthday(candidate.get("birthday")),
-                "gender": _map_gender(candidate.get("gender")),
-                "marital_status": _map_marital_status(candidate.get("marital_status")),
+                "contact_address": raw_contact_address or None,
+                "birthday": _parse_birthday(_get_candidate_prop(candidate, "birthday")),
+                "gender": _map_gender(_get_candidate_prop(candidate, "gender")),
+                "marital_status": _map_marital_status(_get_candidate_prop(candidate, "marital_status")),
             }
             job_seeker_profile, created_profile = JobSeekerProfile.objects.get_or_create(
                 user=user,
@@ -666,21 +819,24 @@ def persist_vieclam24h_candidates(
                     job_seeker_profile.save(update_fields=profile_update_fields)
 
         sal_min, sal_max, exp_sal = _map_salary(candidate)
-        exp_mapped = _map_experience(candidate.get("experience"))
-        pos_mapped = _map_position(candidate.get("position") or candidate.get("level"))
+        exp_mapped = _map_experience(_get_candidate_prop(candidate, "experience"))
+        pos_mapped = _map_position(_get_candidate_prop(candidate, "position") or _get_candidate_prop(candidate, "current_position") or _get_candidate_prop(candidate, "level"))
+        acad_mapped = _map_academic_level(_get_candidate_prop(candidate, "academic_level") or _get_candidate_prop(candidate, "education") or _get_candidate_prop(candidate, "education_level"))
+        workplace_mapped = _map_type_of_workplace(_get_candidate_prop(candidate, "type_of_workplace") or _get_candidate_prop(candidate, "workplace_type") or _get_candidate_prop(candidate, "working_method"))
+        job_type_mapped = _map_job_type(_get_candidate_prop(candidate, "job_type") or _get_candidate_prop(candidate, "work_type") or _get_candidate_prop(candidate, "work_time"))
 
         resume_defaults = {
-            "title": (candidate.get("title") or full_name).strip() or full_name,
-            "description": (candidate.get("description") or "").strip() or None,
-            "skills_summary": (candidate.get("skills_summary") or "").strip() or None,
+            "title": (_get_candidate_prop(candidate, "title") or candidate.get("title") or full_name).strip() or full_name,
+            "description": (_get_candidate_prop(candidate, "description") or "").strip() or None,
+            "skills_summary": (_get_candidate_prop(candidate, "skills_summary") or "").strip() or None,
             "salary_min": sal_min,
             "salary_max": sal_max,
             "expected_salary": exp_sal,
             "position": pos_mapped,
             "experience": exp_mapped,
-            "academic_level": None,
-            "type_of_workplace": None,
-            "job_type": None,
+            "academic_level": acad_mapped,
+            "type_of_workplace": workplace_mapped,
+            "job_type": job_type_mapped,
             "city": city,
             "career": career,
             "job_seeker_profile": job_seeker_profile,

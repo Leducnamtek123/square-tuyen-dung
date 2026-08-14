@@ -20,17 +20,11 @@ interface CandidateSkillsCardProps {
 
 const CandidateSkillsCard = ({ resume }: CandidateSkillsCardProps) => {
   const skills = resume?.advancedSkills && resume.advancedSkills.length > 0
-    ? resume.advancedSkills.map(s => ({
-        name: s.name,
+    ? resume.advancedSkills.map((s) => ({
+        name: s.name || '',
         percent: (s.level ?? 4) * 20,
-      }))
-    : [
-        { name: 'JavaScript', percent: 90 },
-        { name: 'ReactJS', percent: 85 },
-        { name: 'NodeJS', percent: 80 },
-        { name: 'HTML/CSS', percent: 90 },
-        { name: 'SQL', percent: 75 },
-      ];
+      })).filter((s) => Boolean(s.name))
+    : [];
 
   return (
     <Card
@@ -72,32 +66,38 @@ const CandidateSkillsCard = ({ resume }: CandidateSkillsCardProps) => {
       </Box>
 
       <Stack spacing={2} sx={{ flexGrow: 1 }}>
-        {skills.map((skill) => (
-          <Box key={skill.name}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.75 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#0f172a', fontSize: '0.875rem' }}>
-                {skill.name}
-              </Typography>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#475569', fontSize: '0.875rem' }}>
-                {skill.percent}%
-              </Typography>
-            </Box>
+        {skills.length > 0 ? (
+          skills.map((skill) => (
+            <Box key={skill.name}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.75 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#0f172a', fontSize: '0.875rem' }}>
+                  {skill.name}
+                </Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#475569', fontSize: '0.875rem' }}>
+                  {skill.percent}%
+                </Typography>
+              </Box>
 
-            <LinearProgress
-              variant="determinate"
-              value={skill.percent}
-              sx={{
-                height: 8,
-                borderRadius: 4,
-                backgroundColor: '#f1f5f9',
-                '& .MuiLinearProgress-bar': {
+              <LinearProgress
+                variant="determinate"
+                value={skill.percent}
+                sx={{
+                  height: 8,
                   borderRadius: 4,
-                  backgroundColor: '#2563eb',
-                },
-              }}
-            />
-          </Box>
-        ))}
+                  backgroundColor: '#f1f5f9',
+                  '& .MuiLinearProgress-bar': {
+                    borderRadius: 4,
+                    backgroundColor: '#2563eb',
+                  },
+                }}
+              />
+            </Box>
+          ))
+        ) : (
+          <Typography variant="body2" sx={{ color: '#94a3b8', fontStyle: 'italic', py: 2, textAlign: 'center' }}>
+            Chưa có thông tin kỹ năng nổi bật
+          </Typography>
+        )}
       </Stack>
 
       <Box sx={{ textAlign: 'center', mt: 2, pt: 1.5, borderTop: '1px solid #f8fafc' }}>

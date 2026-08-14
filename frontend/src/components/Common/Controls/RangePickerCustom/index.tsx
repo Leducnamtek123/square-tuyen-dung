@@ -328,7 +328,7 @@ const RangePickerCustom: React.FC<Props> = ({
           },
         }}
       >
-        {t('actions.apply', 'Áp dụng')}
+        {t('actions.apply')}
       </Button>
     </Stack>
   );

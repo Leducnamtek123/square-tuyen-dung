@@ -27,6 +27,7 @@ export default function DepartmentListPage() {
   TabTitle('Phòng ban & Chức danh | Native HRM');
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [departments, setDepartments] = useState<NativeDepartment[]>([]);
   const [designations, setDesignations] = useState<NativeDesignation[]>([]);
   
@@ -36,15 +37,17 @@ export default function DepartmentListPage() {
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null);
     try {
       const [deptData, desigData] = await Promise.all([
-        hrmService.getDepartments().catch(() => []),
-        hrmService.getDesignations().catch(() => []),
+        hrmService.getDepartments(),
+        hrmService.getDesignations(),
       ]);
       setDepartments(deptData);
       setDesignations(desigData);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching department data:', err);
+      setError(err?.response?.data?.message || err?.message || 'Không thể tải danh sách phòng ban.');
     } finally {
       setLoading(false);
     }
@@ -91,6 +94,12 @@ export default function DepartmentListPage() {
           Tạo Phòng ban Mới
         </Button>
       </Box>
+
+      {error && (
+        <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
 
       {successMsg && (
         <Alert severity="success" onClose={() => setSuccessMsg(null)} sx={{ mb: 3 }}>

@@ -201,7 +201,7 @@ const ProfileDetailPage = () => {
               {info.getValue() as string || '—'}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {isOnline ? t('pages.profileDetail.table.online') : t('pages.profileDetail.table.attached')}
+              {t('pages.profileDetail.table.online')}
             </Typography>
           </Box>
         );
@@ -211,13 +211,12 @@ const ProfileDetailPage = () => {
       accessorKey: 'type',
       header: t('pages.profileDetail.table.resumeType') as string,
       cell: (info) => {
-        const isOnline = info.getValue() === CV_TYPES.cvWebsite;
         return (
           <Chip
             size="small"
-            label={isOnline ? t('pages.profileDetail.table.online') : t('pages.profileDetail.table.attached')}
-            color={isOnline ? 'primary' : 'default'}
-            variant={isOnline ? 'filled' : 'outlined'}
+            label={t('pages.profileDetail.table.online')}
+            color="primary"
+            variant="filled"
           />
         );
       },
@@ -426,7 +425,7 @@ const ProfileDetailPage = () => {
                 <InfoRow
                   icon={<BadgeIcon fontSize="small" />}
                   label={t('pages.profileDetail.table.resumeType')}
-                  value={valueOrDash(primaryResume?.type === CV_TYPES.cvWebsite ? t('pages.profileDetail.table.online') : primaryResume ? t('pages.profileDetail.table.attached') : '')}
+                  value={valueOrDash(primaryResume ? t('pages.profileDetail.table.online') : '')}
                 />
                 <InfoRow
                   icon={<BadgeIcon fontSize="small" />}

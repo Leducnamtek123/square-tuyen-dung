@@ -150,15 +150,15 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         method_name="get_cv_file_url", read_only=True)
     file = serializers.FileField(required=True, write_only=True)
     user = auth_serializers.UserSerializer(
-        fields=["id", "fullName", "avatarUrl"], read_only=True)
+        fields=["id", "fullName", "email", "avatarUrl"], read_only=True)
     isSaved = serializers.SerializerMethodField(
         method_name='check_saved', read_only=True)
     viewEmployerNumber = serializers.SerializerMethodField(
         method_name="get_view_number", read_only=True)
     userDict = auth_serializers.UserSerializer(
-        source='user', fields=["id", "fullName", "avatarUrl"], read_only=True)
+        source='user', fields=["id", "fullName", "email", "avatarUrl"], read_only=True)
     jobSeekerProfileDict = JobSeekerProfileSerializer(source="job_seeker_profile",
-                                                      fields=["id", "old"],
+                                                      fields=["id", "phone", "old", "contactAddress", "birthday", "gender", "maritalStatus", "location"],
                                                       read_only=True)
     lastViewedDate = serializers.SerializerMethodField(
         method_name='get_last_viewed_date', read_only=True)
@@ -977,6 +977,8 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         cv_file = resume.file
         if cv_file:
             return cv_file.get_full_url()
+        if resume.source_payload and isinstance(resume.source_payload, dict):
+            return resume.source_payload.get("cvFileUrl") or (resume.source_payload.get("detail_page") or {}).get("cv_file_url")
         return None
 
     def get_cv_file_public_id(self, resume):

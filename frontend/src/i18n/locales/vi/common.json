@@ -175,7 +175,8 @@
     "candidateDashboard": "Bảng điều khiển ứng viên",
     "employerDashboard": "Bảng điều khiển nhà tuyển dụng",
     "connectWith": "Kết nối với {{appName}}",
-    "rightsReserved": "© {{year}} {{appName}}. Bản quyền được bảo lưu."
+    "rightsReserved": "© {{year}} {{appName}}. Bản quyền được bảo lưu.",
+    "support": "Trợ giúp"
   },
   "quickSearch": "Tìm kiếm nhanh",
   "notUpdated": "Chưa cập nhật",
@@ -403,8 +404,8 @@
     },
     "table": {
       "profileName": "Tên ứng viên",
-      "onlineResume": "Hồ sơ Trực tuyến",
-      "attachedResume": "Hồ sơ Đính kèm",
+      "onlineResume": "Hồ sơ ứng viên",
+      "attachedResume": "Hồ sơ ứng viên",
       "notUpdated": "Chưa cập nhật",
       "appliedPosition": "Vị trí ứng tuyển",
       "appliedDate": "Ngày ứng tuyển",
@@ -520,7 +521,12 @@
   },
   "jobPost": {
     "urgentHiring": "Tuyển gấp",
-    "jobsCount": "{{count}} việc làm"
+    "jobsCount": "{{count}} việc làm",
+    "table": {
+      "title": "Tiêu đề tin tuyển dụng",
+      "createdDate": "Ngày đăng",
+      "creator": "Người tạo"
+    }
   },
   "jobPostForm": {
     "section": {
@@ -680,7 +686,8 @@
     "loadingPdf": "Đang tải PDF...",
     "saveSuccess": "Đã lưu thành công.",
     "loadFailed": "Không thể tải dữ liệu. Vui lòng thử lại.",
-    "actionFailed": "Không thể thao tác lúc này. Vui lòng thử lại."
+    "actionFailed": "Không thể thao tác lúc này. Vui lòng thử lại.",
+    "copied": "Đã sao chép vào bộ nhớ tạm!"
   },
   "breadcrumbs": {
     "label": "Điều hướng breadcrumb",
@@ -1008,5 +1015,27 @@
   },
   "next": "Tiếp",
   "id": "ID",
-  "na": "N/A"
+  "na": "N/A",
+  "forbiddenCode": "403",
+  "forbiddenTitle": "Truy cập bị từ chối",
+  "forbiddenBody": "Bạn không có quyền truy cập vào trang hoặc tài nguyên này.",
+  "backHome": "Quay về Trang chủ",
+  "notFoundCode": "404",
+  "notFoundTitle": "Không tìm thấy trang",
+  "notFoundBody": "Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.",
+  "systemErrorCode": "500",
+  "systemErrorTitle": "Lỗi hệ thống",
+  "systemErrorBody": "Đã có lỗi xảy ra phía máy chủ. Chúng tôi đang xử lý sự cố.",
+  "tryAgain": "Thử lại",
+  "appDownload": {
+    "smsSuccess": "Đã gửi liên kết tải ứng dụng qua tin nhắn SMS thành công!"
+  },
+  "connectingTitle": "Đang kết nối trợ lý giọng nói...",
+  "connectingDescription": "Vui lòng giữ kết nối và chuẩn bị micro của bạn.",
+  "startAudio": "Bật âm thanh",
+  "preconnectMessage": "Đang thiết lập kênh thoại an toàn...",
+  "startCall": "Bắt đầu cuộc gọi",
+  "welcomeMessage": "Xin chào! Tôi là Trợ lý Ảo AI của InfoHR. Tôi có thể giúp gì cho bạn hôm nay?",
+  "setupHelpPrefix": "Cần hỗ trợ kỹ thuật? ",
+  "setupHelpLink": "Xem hướng dẫn cài đặt"
 }

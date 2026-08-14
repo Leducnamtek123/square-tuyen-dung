@@ -24,9 +24,15 @@ interface CandidateSkillsCardProps {
 }
 
 const CandidateSkillsCard: React.FC<CandidateSkillsCardProps> = ({
-  initialSkills = ['AutoCAD', 'Revit MEP', 'Bóc tách khối lượng', 'Giám sát thi công', 'MS Project', 'Tiến độ công trình'],
+  initialSkills = [],
 }) => {
-  const [skills, setSkills] = React.useState<string[]>(initialSkills);
+  const [skills, setSkills] = React.useState<string[]>(initialSkills || []);
+
+  React.useEffect(() => {
+    if (initialSkills && initialSkills.length > 0) {
+      setSkills(initialSkills);
+    }
+  }, [initialSkills]);
   const [openModal, setOpenModal] = React.useState(false);
   const [newSkillInput, setNewSkillInput] = React.useState('');
 

@@ -43,6 +43,8 @@ import { useEmployerResumes, useToggleSaveResumeOptimistic, useResumeDetail } fr
 import type { Resume } from '@/types/models';
 import pc from '@/utils/muiColors';
 import { formatLocalizedSalaryRange } from '@/utils/customData';
+import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
+
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { formatRoute } from '@/utils/funcUtils';
 import { CV_TYPES, ROUTES } from '@/configs/constants';
@@ -280,7 +282,10 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
     );
   }
 
-  const user = (resume as any).userDict || (resume as any).user;
+  const user = (resume as any).user || (resume as any).userDict;
+  const profileObj = (resume as any).jobSeekerProfile || (resume as any).jobSeekerProfileDict;
+  const phone = (resume as any).jobSeekerProfile?.phone || (resume as any).jobSeekerProfileDict?.phone || profileObj?.phone || user?.phone || (resume as any).phone || (resume as any).contactPhone;
+  const email = (resume as any).user?.email || (resume as any).userDict?.email || user?.email || profileObj?.email || (resume as any).email || (resume as any).contactEmail;
   const fullName = user?.fullName || resume.title || 'Ứng viên';
   const age = (resume as any).jobSeekerProfileDict?.old;
   const profileDetailHref = localizeRoutePath(
@@ -292,20 +297,29 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
     window.open(profileDetailHref, '_blank');
   };
 
-  const experienceLabel = resume.experience && allConfig?.experienceDict?.[resume.experience]
-    ? tConfig(String(allConfig.experienceDict[resume.experience]))
+  const expId = typeof resume.experience === 'number' ? resume.experience : (typeof resume.experience === 'object' ? (resume.experience as any)?.id : undefined);
+  const experienceLabel = expId && allConfig?.experienceDict?.[expId]
+    ? tConfig(String(allConfig.experienceDict[expId]))
     : 'Chưa cập nhật';
-  const cityLabel = resume.city?.id && allConfig?.cityDict?.[resume.city.id]
-    ? tConfig(String(allConfig.cityDict[resume.city.id]))
+
+  const cityId = typeof resume.city === 'number' ? resume.city : (typeof resume.city === 'object' ? (resume.city as any)?.id : profileObj?.location?.city);
+  const cityLabel = cityId && allConfig?.cityDict?.[cityId]
+    ? tConfig(String(allConfig.cityDict[cityId]))
+    : (profileObj?.contactAddress || profileObj?.location?.address || 'Chưa cập nhật');
+
+  const careerId = typeof resume.career === 'number' ? resume.career : (typeof resume.career === 'object' ? (resume.career as any)?.id : undefined);
+  const careerLabel = careerId && allConfig?.careerDict?.[careerId]
+    ? tConfig(String(allConfig.careerDict[careerId]))
     : 'Chưa cập nhật';
-  const careerLabel = resume.career?.id && allConfig?.careerDict?.[resume.career.id]
-    ? tConfig(String(allConfig.careerDict[resume.career.id]))
-    : 'Chưa cập nhật';
-  const academicLabel = resume.academicLevel && allConfig?.academicLevelDict?.[resume.academicLevel]
-    ? tConfig(String(allConfig.academicLevelDict[resume.academicLevel]))
+
+  const academicId = typeof resume.academicLevel === 'number' ? resume.academicLevel : (typeof resume.academicLevel === 'object' ? (resume.academicLevel as any)?.id : undefined);
+  const academicLabel = academicId && allConfig?.academicLevelDict?.[academicId]
+    ? tConfig(String(allConfig.academicLevelDict[academicId]))
     : 'Đại học';
-  const positionLabel = resume.position && allConfig?.positionDict?.[resume.position]
-    ? tConfig(String(allConfig.positionDict[resume.position]))
+
+  const positionId = typeof resume.position === 'number' ? resume.position : (typeof resume.position === 'object' ? (resume.position as any)?.id : undefined);
+  const positionLabel = positionId && allConfig?.positionDict?.[positionId]
+    ? tConfig(String(allConfig.positionDict[positionId]))
     : 'Nhân viên';
 
   return (
@@ -432,9 +446,15 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
                 <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.8rem' }}>
                   Số điện thoại:
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#2563EB', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <LockIcon sx={{ fontSize: 13 }} /> Thông tin ẩn
-                </Typography>
+                {phone ? (
+                  <Typography variant="caption" sx={{ color: '#0F172A', fontWeight: 600, fontSize: '0.8rem' }}>
+                    {phone}
+                  </Typography>
+                ) : (
+                  <Typography variant="caption" sx={{ color: '#2563EB', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <LockIcon sx={{ fontSize: 13 }} /> Thông tin ẩn
+                  </Typography>
+                )}
               </Stack>
             </Grid>
 
@@ -444,9 +464,15 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
                 <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.8rem' }}>
                   Email:
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#2563EB', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <LockIcon sx={{ fontSize: 13 }} /> Thông tin ẩn
-                </Typography>
+                {email ? (
+                  <Typography variant="caption" sx={{ color: '#0F172A', fontWeight: 600, fontSize: '0.8rem' }}>
+                    {email}
+                  </Typography>
+                ) : (
+                  <Typography variant="caption" sx={{ color: '#2563EB', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <LockIcon sx={{ fontSize: 13 }} /> Thông tin ẩn
+                  </Typography>
+                )}
               </Stack>
             </Grid>
 
@@ -574,12 +600,13 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
                 size="small"
                 variant="outlined"
                 component="a"
-                href={resume.fileUrl}
+                href={getSafeExternalOpenUrl(resume.fileUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
                 startIcon={<OpenInNewIcon sx={{ fontSize: 14 }} />}
                 sx={{ fontSize: '0.75rem', textTransform: 'none', fontWeight: 600 }}
               >
+
                 Mở trong tab mới
               </Button>
             </Stack>

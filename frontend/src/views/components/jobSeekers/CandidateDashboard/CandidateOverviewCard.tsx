@@ -23,40 +23,76 @@ interface CandidateOverviewCardProps {
 }
 
 const CandidateOverviewCard = ({ resume }: CandidateOverviewCardProps) => {
+  const experienceVal =
+    resume?.experienceChooseData?.name ||
+    (typeof (resume as any)?.experience === 'object' ? (resume as any)?.experience?.name : (resume as any)?.experience ? `${(resume as any).experience} năm` : 'Chưa cập nhật');
+
+  const positionVal =
+    resume?.positionChooseData?.name ||
+    (typeof (resume as any)?.position === 'object' ? (resume as any)?.position?.name : (resume as any)?.position) ||
+    'Chưa cập nhật';
+
+  const formatSalary = () => {
+    if (resume?.salaryMin && resume?.salaryMax) {
+      return `${(resume.salaryMin / 1000000).toLocaleString('vi-VN')} - ${(resume.salaryMax / 1000000).toLocaleString('vi-VN')} triệu`;
+    }
+    if (resume?.salaryMin) {
+      return `Từ ${(resume.salaryMin / 1000000).toLocaleString('vi-VN')} triệu`;
+    }
+    if (typeof (resume as any)?.salary === 'string') {
+      return (resume as any).salary;
+    }
+    return 'Thỏa thuận';
+  };
+
+  const educationVal =
+    resume?.academicLevelChooseData?.name ||
+    (typeof (resume as any)?.academicLevel === 'object' ? (resume as any)?.academicLevel?.name : (resume as any)?.academicLevel ? String((resume as any).academicLevel) : 'Chưa cập nhật');
+
+  const careerVal =
+    (resume as any)?.careerChooseData?.name ||
+    (typeof (resume as any)?.career === 'object' ? (resume as any)?.career?.name : (resume as any)?.career) ||
+    'Chưa cập nhật';
+
+  const jobTypeVal =
+    resume?.jobTypeChooseData?.name ||
+    (typeof (resume as any)?.jobType === 'object' ? (resume as any)?.jobType?.name : (resume as any)?.jobType) ||
+    'Chưa cập nhật';
+
   const overviewItems = [
     {
       label: 'Kinh nghiệm',
-      value: '2 năm',
+      value: experienceVal,
       icon: <WorkHistoryOutlinedIcon sx={{ color: '#2563eb' }} />,
       bgColor: '#eff6ff',
     },
     {
       label: 'Cấp bậc mong muốn',
-      value: 'Nhân viên',
+      value: positionVal,
       icon: <LockOutlinedIcon sx={{ color: '#16a34a' }} />,
       bgColor: '#f0fdf4',
     },
     {
       label: 'Mức lương mong muốn',
-      value: '15 - 20 triệu',
+      value: formatSalary(),
       icon: <MonetizationOnOutlinedIcon sx={{ color: '#ea580c' }} />,
       bgColor: '#fff7ed',
     },
     {
       label: 'Học vấn',
-      value: 'Đại học',
+      value: educationVal,
       icon: <SchoolOutlinedIcon sx={{ color: '#9333ea' }} />,
       bgColor: '#faf5ff',
     },
     {
       label: 'Ngành nghề',
-      value: 'Công nghệ thông tin',
+      value: careerVal,
       icon: <CodeOutlinedIcon sx={{ color: '#0d9488' }} />,
       bgColor: '#f0fdfa',
     },
     {
       label: 'Hình thức làm việc',
-      value: 'Toàn thời gian',
+      value: jobTypeVal,
       icon: <AccessTimeOutlinedIcon sx={{ color: '#0284c7' }} />,
       bgColor: '#f0f9ff',
     },

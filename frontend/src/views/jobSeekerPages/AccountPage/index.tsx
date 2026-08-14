@@ -32,8 +32,10 @@ import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
 import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
-import { removeUserInfo } from '@/redux/userSlice';
+import { removeUserInfo, getUserInfo } from '@/redux/userSlice';
 import tokenService from '@/services/tokenService';
+import authService from '@/services/authService';
+import jobSeekerProfileService from '@/services/jobSeekerProfileService';
 import toastMessages from '@/utils/toastMessages';
 
 const AccountPage = () => {
@@ -43,23 +45,15 @@ const AccountPage = () => {
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.user);
 
-  // Dynamic user security info states
-  const [email, setEmail] = React.useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('sq_user_email') || currentUser?.email || 'leducnamtek123@gmail.com';
-    }
-    return currentUser?.email || 'leducnamtek123@gmail.com';
-  });
+  // Dynamic user security info states from real currentUser data
+  const [email, setEmail] = React.useState<string>(currentUser?.email || '');
 
   const [phone, setPhone] = React.useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      return (
-        localStorage.getItem('sq_user_phone') ||
-        (currentUser as unknown as { phoneNumber?: string })?.phoneNumber ||
-        '0901 234 567'
-      );
-    }
-    return (currentUser as unknown as { phoneNumber?: string })?.phoneNumber || '0901 234 567';
+    return (
+      (currentUser as unknown as { phone?: string })?.phone ||
+      (currentUser as unknown as { phoneNumber?: string })?.phoneNumber ||
+      ''
+    );
   });
 
   // Notification preferences states (persisted in localStorage)
@@ -139,15 +133,21 @@ const AccountPage = () => {
     setEmailDialogOpen(true);
   };
 
-  const handleSaveEmail = () => {
+  const handleSaveEmail = async () => {
     if (!newEmailInput.trim() || !newEmailInput.includes('@')) {
       toastMessages.error('Vui lòng nhập địa chỉ email hợp lệ!');
       return;
     }
-    setEmail(newEmailInput.trim());
-    if (typeof window !== 'undefined') localStorage.setItem('sq_user_email', newEmailInput.trim());
-    setEmailDialogOpen(false);
-    toastMessages.success('Cập nhật địa chỉ email thành công!');
+    try {
+      await authService.updateUser({ email: newEmailInput.trim() });
+      setEmail(newEmailInput.trim());
+      void dispatch(getUserInfo());
+      setEmailDialogOpen(false);
+      toastMessages.success('Cập nhật địa chỉ email thành công!');
+    } catch (err) {
+      console.error('Failed to update email:', err);
+      toastMessages.error('Không thể cập nhật email. Vui lòng thử lại!');
+    }
   };
 
   const handleOpenPhoneDialog = () => {
@@ -155,15 +155,21 @@ const AccountPage = () => {
     setPhoneDialogOpen(true);
   };
 
-  const handleSavePhone = () => {
+  const handleSavePhone = async () => {
     if (!newPhoneInput.trim() || newPhoneInput.trim().length < 8) {
       toastMessages.error('Vui lòng nhập số điện thoại hợp lệ!');
       return;
     }
-    setPhone(newPhoneInput.trim());
-    if (typeof window !== 'undefined') localStorage.setItem('sq_user_phone', newPhoneInput.trim());
-    setPhoneDialogOpen(false);
-    toastMessages.success('Cập nhật số điện thoại thành công!');
+    try {
+      await jobSeekerProfileService.updateProfile({ phone: newPhoneInput.trim() });
+      setPhone(newPhoneInput.trim());
+      void dispatch(getUserInfo());
+      setPhoneDialogOpen(false);
+      toastMessages.success('Cập nhật số điện thoại thành công!');
+    } catch (err) {
+      console.error('Failed to update phone number:', err);
+      toastMessages.error('Không thể cập nhật số điện thoại. Vui lòng thử lại!');
+    }
   };
 
   const handleOpenPasswordDialog = () => {
@@ -173,7 +179,7 @@ const AccountPage = () => {
     setPasswordDialogOpen(true);
   };
 
-  const handleSavePassword = () => {
+  const handleSavePassword = async () => {
     if (!currentPassword) {
       toastMessages.error('Vui lòng nhập mật khẩu hiện tại!');
       return;
@@ -186,8 +192,14 @@ const AccountPage = () => {
       toastMessages.error('Xác nhận mật khẩu mới không khớp!');
       return;
     }
-    setPasswordDialogOpen(false);
-    toastMessages.success('Đổi mật khẩu tài khoản thành công!');
+    try {
+      await authService.changePassword({ oldPassword: currentPassword, newPassword: newPassword, confirmPassword });
+      setPasswordDialogOpen(false);
+      toastMessages.success('Đổi mật khẩu tài khoản thành công!');
+    } catch (err) {
+      console.error('Failed to change password:', err);
+      toastMessages.error('Không thể đổi mật khẩu. Vui lòng kiểm tra lại mật khẩu hiện tại!');
+    }
   };
 
   const handleSaveLanguage = () => {
@@ -245,20 +257,22 @@ const AccountPage = () => {
               <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#64748b', minWidth: 110 }}>
                 Email
               </Typography>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>
-                {email}
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: email ? '#0f172a' : '#94a3b8' }}>
+                {email || 'Chưa cập nhật'}
               </Typography>
-              <Chip
-                size="small"
-                label="Đã xác thực"
-                sx={{
-                  backgroundColor: '#dcfce7',
-                  color: '#15803d',
-                  fontSize: '0.7rem',
-                  fontWeight: 700,
-                  height: 20,
-                }}
-              />
+              {email && (
+                <Chip
+                  size="small"
+                  label="Đã xác thực"
+                  sx={{
+                    backgroundColor: '#dcfce7',
+                    color: '#15803d',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    height: 20,
+                  }}
+                />
+              )}
             </Box>
             <ArrowForwardIosIcon sx={{ fontSize: 14, color: '#94a3b8' }} />
           </Box>
@@ -314,20 +328,22 @@ const AccountPage = () => {
               <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#64748b', minWidth: 110 }}>
                 Số điện thoại
               </Typography>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>
-                {phone}
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: phone ? '#0f172a' : '#94a3b8' }}>
+                {phone || 'Chưa cập nhật'}
               </Typography>
-              <Chip
-                size="small"
-                label="Đã xác thực"
-                sx={{
-                  backgroundColor: '#dcfce7',
-                  color: '#15803d',
-                  fontSize: '0.7rem',
-                  fontWeight: 700,
-                  height: 20,
-                }}
-              />
+              {phone && (
+                <Chip
+                  size="small"
+                  label="Đã xác thực"
+                  sx={{
+                    backgroundColor: '#dcfce7',
+                    color: '#15803d',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    height: 20,
+                  }}
+                />
+              )}
             </Box>
             <ArrowForwardIosIcon sx={{ fontSize: 14, color: '#94a3b8' }} />
           </Box>

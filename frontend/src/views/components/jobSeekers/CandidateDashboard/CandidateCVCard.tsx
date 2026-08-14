@@ -22,7 +22,10 @@ const CandidateCVCard = ({ resume, user }: CandidateCVCardProps) => {
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [selectedFileName, setSelectedFileName] = React.useState<string | null>(null);
 
-  const defaultFileName = `CV_${user?.fullName || 'Nam'}_2024.pdf`;
+  const defaultFileName =
+    (resume as any)?.file?.name ||
+    ((resume as any)?.fileUrl ? (resume as any).fileUrl.split('/').pop() : '') ||
+    (user?.fullName ? `CV_${user.fullName.trim().replace(/\s+/g, '_')}.pdf` : 'CV_UngVien.pdf');
   const displayFileName = selectedFileName || defaultFileName;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

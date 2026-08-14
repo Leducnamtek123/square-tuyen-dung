@@ -22,6 +22,7 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import AddIcon from '@mui/icons-material/Add';
 import toastMessages from '@/utils/toastMessages';
+import dayjs from 'dayjs';
 import CandidateResumePreviewModal from '../CandidateProfile/CandidateResumePreviewModal';
 import type { ExtendedResume } from '@/components/Features/CVDoc';
 
@@ -45,28 +46,38 @@ interface CandidateAppliedResumeCardProps {
 const CandidateAppliedResumeCard = ({
   resume,
   resumesList,
-  candidateName = 'Đức Nam Lê',
-  candidateEmail = 'leducnamtek123@gmail.com',
-  candidatePhone = '0901 234 567',
+  candidateName = '',
+  candidateEmail = '',
+  candidatePhone = '',
   avatarUrl,
-}: CandidateAppliedResumeCardProps) => {
-  // Support Multiple Resumes List
-  const [items, setItems] = React.useState<ResumeItemData[]>([
-    {
-      id: 1,
-      title: resume?.title || 'Kế toán / Kỹ sư Xây dựng MEP',
-      updatedDate: '01/08/2026',
-      fileName: 'CV_DucNamLe_2026.pdf',
-      isSearchable: true,
-    },
-    {
-      id: 2,
-      title: 'Giám sát Công trình Interior Supervisor',
-      updatedDate: '26/07/2026',
-      fileName: 'CV_GiamSatNoiThat.pdf',
-      isSearchable: true,
-    },
-  ]);
+}: CandidateAppliedResumeCardProps) => {  // Support Multiple Resumes List
+  const [items, setItems] = React.useState<ResumeItemData[]>([]);
+
+  React.useEffect(() => {
+    if (resumesList && resumesList.length > 0) {
+      setItems(
+        resumesList.map((r: any) => ({
+          id: r.id,
+          title: r.title || 'Hồ sơ ứng tuyển',
+          updatedDate: r.updateAt || r.createAt ? (dayjs as any)(r.updateAt || r.createAt).format('DD/MM/YYYY') : '---',
+          fileName: r.file?.name || (r.fileUrl ? r.fileUrl.split('/').pop() : '') || (r.type === 'WEBSITE' ? 'Hồ sơ trực tuyến' : 'CV Đính kèm'),
+          isSearchable: Boolean(r.isSearchable ?? r.isActive ?? true),
+        }))
+      );
+    } else if (resume) {
+      setItems([
+        {
+          id: (resume as any).id || 1,
+          title: resume.title || 'Hồ sơ ứng tuyển',
+          updatedDate: (resume as any).updateAt ? (dayjs as any)((resume as any).updateAt).format('DD/MM/YYYY') : '---',
+          fileName: (resume as any).file?.name || ((resume as any).fileUrl ? (resume as any).fileUrl.split('/').pop() : '') || 'Hồ sơ trực tuyến',
+          isSearchable: true,
+        },
+      ]);
+    } else {
+      setItems([]);
+    }
+  }, [resumesList, resume]);
 
   // Preview Modal State
   const [previewOpen, setPreviewOpen] = React.useState(false);

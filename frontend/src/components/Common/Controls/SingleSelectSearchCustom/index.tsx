@@ -22,6 +22,9 @@ interface Props<T extends FieldValues = FieldValues> {
   name: string;
   control: Control<T>;
   placeholder?: string;
+  disabledPlaceholder?: string;
+  disabled?: boolean;
+  loading?: boolean;
   options?: SelectOption[];
   noOptionsText?: string;
   variant?: 'default' | 'hero';
@@ -30,6 +33,9 @@ interface Props<T extends FieldValues = FieldValues> {
 
 const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
   placeholder = '',
+  disabledPlaceholder,
+  disabled = false,
+  loading = false,
   name,
   control,
   options = EMPTY_OPTIONS,
@@ -41,21 +47,17 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
   const theme = useTheme();
   const { t } = useTranslation('common');
   const isHero = variant === 'hero';
+  const activePlaceholder = disabled && disabledPlaceholder ? disabledPlaceholder : placeholder;
 
   return (
-
     <ControllerAny
-
       name={name as Path<T>}
-
       control={control}
-
       render={({ field }: any) => (
-
         <Autocomplete
-
           fullWidth
-
+          disabled={disabled}
+          loading={loading}
           id={field.name}
 
           options={options}
@@ -126,7 +128,8 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
 
               size="small"
 
-              placeholder={placeholder}
+              placeholder={activePlaceholder}
+              disabled={disabled}
               slotProps={{
                 input: {
                   ...params.InputProps,

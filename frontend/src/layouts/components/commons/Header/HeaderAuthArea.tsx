@@ -31,29 +31,7 @@ const HeaderAuthArea = ({
 }: HeaderAuthAreaProps) => {
   const { t } = useTranslation('common');
 
-  // Sync avatar URL with LocalStorage cache so avatar updates instantly on page
-  const [avatarUrl, setAvatarUrl] = React.useState<string | undefined>(undefined);
-
-  React.useEffect(() => {
-    const syncAvatar = () => {
-      if (typeof window !== 'undefined') {
-        const cached = localStorage.getItem('sq_user_avatar');
-        if (cached) {
-          setAvatarUrl(cached);
-          return;
-        }
-      }
-      setAvatarUrl(currentUserAvatarUrl || undefined);
-    };
-
-    syncAvatar();
-
-    // Listen for custom storage events when avatar is uploaded
-    if (typeof window !== 'undefined') {
-      window.addEventListener('storage', syncAvatar);
-      return () => window.removeEventListener('storage', syncAvatar);
-    }
-  }, [currentUserAvatarUrl]);
+  const avatarUrl = currentUserAvatarUrl || undefined;
 
   return isAuthenticated ? (
     <Box sx={{ flexGrow: 0, ml: 1 }}>

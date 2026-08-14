@@ -2,7 +2,10 @@
   "appliedResume": {
     "title": "Applied Resume Management",
     "downloadList": "Download List",
-    "filters": "Filters:",
+    "filters": {
+      "selectJobPost": "Select job post",
+      "searchPlaceholder": "Search by candidate name, email, phone..."
+    },
     "allJobPosts": "All job posts",
     "allStatuses": "All recruitment statuses",
     "advancedFilter": "Advanced Filter",
@@ -25,7 +28,12 @@
         "delete": "Delete profile",
         "scheduleInterview": "Schedule interview"
       },
-      "clickToDownload": "Click to download"
+      "clickToDownload": "Click to download",
+      "candidateName": "Candidate Name",
+      "jobTitle": "Applied Position",
+      "phone": "Phone Number",
+      "email": "Email",
+      "aiScore": "AI Score"
     },
     "ai": {
       "analysisStarted": "AI analysis started. Please wait a few seconds.",
@@ -97,14 +105,16 @@
       "updateConfirm": "The profile will be updated to status <strong style=\"color:red;\">\"{{statusName}}\"</strong>. Are you sure?",
       "errorTitle": "Error occurred",
       "errorMsg": "You are not allowed to change the application status from <strong style=\"color:red;\">\"{{fromStatus}}\"</strong> to <strong style=\"color:red;\">\"{{toStatus}}\"</strong>",
-      "updateSuccess": "Update successful."
+      "updateSuccess": "Update successful.",
+      "rollbackMsg": "Could not update status. Reverted to previous state."
     },
     "delete": {
       "title": "Delete Applied Profile",
       "confirm": "This applied profile will be permanently deleted and cannot be recovered. Are you sure?",
       "success": "Candidate application deleted successfully."
     },
-    "manageSubtitle": "Manage applied resumes"
+    "manageSubtitle": "Manage applied resumes",
+    "subtitle": "Track, evaluate, and manage all candidate applications submitted for your company positions."
   },
   "savedResume": {
     "title": "Saved Resume Management",
@@ -122,6 +132,14 @@
       "savedDate": "Saved Date",
       "phone": "Phone Number",
       "email": "Email"
+    },
+    "subtitle": "Manage and track candidate profiles you have saved for future contact or hiring.",
+    "columns": {
+      "candidateName": "Candidate Name",
+      "jobTitle": "Job Title",
+      "experience": "Experience",
+      "city": "City / Province",
+      "savedAt": "Saved Date"
     }
   },
   "savedResumeTable": {
@@ -392,6 +410,7 @@
       "entercompanyemail": "Enter company email",
       "entercompanyphonenumber": "Enter company phone number",
       "selectcityprovince": "Select city/province",
+      "selectCityFirst": "Please select City / Province first",
       "selectdistrict": "Select district",
       "enteraddress": "Enter address",
       "enterlatitudecoordinateonthemap": "Enter latitude coordinate on the map.",
@@ -632,6 +651,7 @@
       "selectacademiclevel": "Select academic level",
       "selectinterviewtemplate": "Select an interview template for automated preliminary assessment...",
       "selectcityprovince": "Select city/province",
+      "selectCityFirst": "Please select City / Province first",
       "selectdistrict": "Select district",
       "enteraddress": "Enter address",
       "enterlatitudecoordinateofthecompanyonthemap": "Enter latitude coordinate of the company on the map.",
@@ -810,8 +830,8 @@
     "hrm": "HRM",
     "hrmEmployees": "Employee records",
     "hrmRoles": "Roles & permissions",
-      "hrmMembers": "Company members",
-      "squareHrmAdmin": "Open HRM"
+    "hrmMembers": "Company members",
+    "squareHrmAdmin": "Open HRM"
   },
   "interviewHistory": {
     "title": "Video Library",
@@ -1652,6 +1672,109 @@
   "questionBank": {
     "deleteTitle": "Delete question",
     "hint": "Keep the question clear and concise."
+  },
+  "employerOnboarding": {
+    "pageTitle": "Employer Account Setup | InfoHR",
+    "steps": {
+      "companyProfile": "Company Profile",
+      "recruiterProfile": "Recruiter Profile",
+      "verification": "Business Verification",
+      "complete": "Complete"
+    },
+    "stepCounter": "Step {{current}} of {{total}}",
+    "invitation": {
+      "title": "You have been invited to join a company",
+      "subtitle": "Your account has been invited to join this company with an assigned role.",
+      "company": "Company",
+      "role": "Role",
+      "acceptAndContinue": "Accept & Continue"
+    },
+    "step1": {
+      "title": "Company Brand Profile",
+      "subtitle": "Complete your company details to build employer branding and attract top talent",
+      "logoLabel": "Company Logo",
+      "logoUpload": "Upload Logo",
+      "logoChange": "Change Logo",
+      "logoHint": "PNG, JPG format (Max 5MB). Recommended 1:1 aspect ratio.",
+      "companyName": "Full Company / Organization Name",
+      "companyNamePlaceholder": "e.g. Square Technology Corporation...",
+      "companyNameHelper": "Enter company name as registered on business license",
+      "taxCode": "Tax Identification Number (TIN)",
+      "taxCodePlaceholder": "e.g. 0101234567",
+      "taxCodeHelper": "Business tax code (optional during initial setup)",
+      "employeeSize": "Employee Size",
+      "fieldOperation": "Primary Industry / Sector",
+      "fieldOperationPlaceholder": "e.g. Information Technology, Construction, Retail...",
+      "locationSection": "Headquarters / Hiring Office Location",
+      "city": "City / Province",
+      "cityPlaceholder": "Select City / Province...",
+      "district": "District",
+      "districtPlaceholder": "Select District...",
+      "address": "Detailed Address",
+      "addressPlaceholder": "Building, street name, number...",
+      "website": "Company Website",
+      "websitePlaceholder": "https://company.com"
+    },
+    "step2": {
+      "title": "Recruiter Representative Information",
+      "subtitle": "Representative info helps candidates and our platform reach out easily for hiring matters",
+      "recruiterName": "Representative Full Name",
+      "recruiterNamePlaceholder": "e.g. John Doe",
+      "recruiterTitle": "Job Title / Role",
+      "recruiterTitlePlaceholder": "e.g. Talent Acquisition Lead, HR Manager...",
+      "recruiterPhone": "Phone Number / WhatsApp",
+      "recruiterPhonePlaceholder": "e.g. 0912345678",
+      "recruiterEmail": "Notification Email for Applications",
+      "recruiterEmailPlaceholder": "recruitment@company.com",
+      "hiringNeeds": "Key Hiring Focus",
+      "hiringNeedsPlaceholder": "Type role or skill needed (e.g. Frontend, Accounting, Sales...)",
+      "hiringNeedsHelper": "Type and press Enter to add primary hiring priorities",
+      "description": "About Workplace Environment & Culture",
+      "descriptionPlaceholder": "Describe work culture, employee benefits, perks..."
+    },
+    "step3": {
+      "title": "Business License Verification",
+      "subtitle": "Verified businesses earn trust badges and attract 3x more qualified candidates",
+      "benefitsTitle": "Benefits of verifying your business license now:",
+      "benefit1": "Verified Employer blue checkmark badge",
+      "benefit2": "Priority search ranking for all your job postings",
+      "benefit3": "3x higher application rate from high-quality candidates",
+      "dropzoneTitle": "Drag and drop business license file (Image or PDF) here",
+      "dropzoneSubtitle": "Supported formats: JPG, PNG, PDF (Max 10MB)",
+      "uploadedFile": "Uploaded business license",
+      "replaceFile": "Change file",
+      "removeFile": "Remove file",
+      "skipNotice": "You can skip this step and upload your license anytime in Company Settings."
+    },
+    "step4": {
+      "title": "Welcome to InfoHR!",
+      "subtitle": "Your company profile is now ready. You can start posting jobs and hiring talent immediately.",
+      "freeBanner": "Our platform supports unlimited job postings and candidate management for employers.",
+      "summaryTitle": "Created Company Profile",
+      "companyName": "Company",
+      "recruiter": "Representative",
+      "location": "Location",
+      "verificationStatus": "Verification Status",
+      "verifiedPending": "Pending GPKD review",
+      "notSubmitted": "Not submitted",
+      "postJob": "Post a Job Now",
+      "dashboard": "Go to Employer Dashboard"
+    },
+    "actions": {
+      "back": "Back",
+      "next": "Continue",
+      "complete": "Complete Setup",
+      "skipVerification": "Skip & Verify Later",
+      "saving": "Saving...",
+      "submitting": "Finalizing..."
+    },
+    "validation": {
+      "companyNameRequired": "Please enter your company / business name.",
+      "recruiterNameRequired": "Please enter representative's full name.",
+      "recruiterPhoneRequired": "Please enter contact phone number.",
+      "cityRequired": "Please select headquarters city / province.",
+      "saveFailed": "Failed to save company information. Please try again.",
+      "uploadFailed": "Failed to upload file. Please try again."
+    }
   }
 }
-

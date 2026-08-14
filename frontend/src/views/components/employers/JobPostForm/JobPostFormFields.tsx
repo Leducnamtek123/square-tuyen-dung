@@ -8,7 +8,7 @@ import CheckboxCustom from '../../../../components/Common/Controls/CheckboxCusto
 import RichTextEditorCustom from '../../../../components/Common/Controls/RichTextEditorCustom';
 import TextFieldAutoCompleteCustom from '../../../../components/Common/Controls/TextFieldAutoCompleteCustom';
 import { DATE_OPTIONS } from '../../../../configs/constants';
-import type { Control } from 'react-hook-form';
+import { useWatch, type Control } from 'react-hook-form';
 import { TFunction } from 'i18next';
 import type { Theme } from '@mui/material/styles';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -29,22 +29,13 @@ const EMPTY_SELECT_OPTIONS: SelectOption[] = [];
 
 type SectionHeaderProps = {
   theme: Theme;
-  icon: React.ReactElement;
+  icon: React.ReactNode;
   title: string;
 };
 
 const SectionHeader = ({ theme, icon, title }: SectionHeaderProps) => (
-  <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3, mt: 1 }}>
-    <Box
-      sx={{
-        p: 0.75,
-        borderRadius: 1.25,
-        bgcolor: 'primary.extralight',
-        color: 'primary.main',
-        display: 'flex',
-        boxShadow: pc.primary( 0.1),
-      }}
-    >
+  <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
+    <Box sx={{ color: theme.palette.primary.main, display: 'flex' }}>
       {icon}
     </Box>
     <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '0.5px' }}>
@@ -77,6 +68,7 @@ function JobPostFormFields({
   onLocationChange,
 }: JobPostFormFieldsProps) {
   const theme = useTheme();
+  const cityId = useWatch({ control, name: 'location.city' });
 
   const inputSx = {
     '& .MuiOutlinedInput-root': {
@@ -180,7 +172,17 @@ function JobPostFormFields({
         <SingleSelectCustom name="location.city" control={control} options={(allConfig?.cityOptions || []) as SelectOption[]} title={t('jobPostForm.title.cityprovince')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectcityprovince')} sx={inputSx} />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
-        <SingleSelectCustom name="location.district" control={control} options={(districtOptions || []) as SelectOption[]} title={t('jobPostForm.title.district')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectdistrict')} sx={inputSx} />
+        <SingleSelectCustom
+          name="location.district"
+          control={control}
+          disabled={!cityId}
+          disabledPlaceholder={t('jobPostForm.placeholder.selectCityFirst')}
+          options={(districtOptions || []) as SelectOption[]}
+          title={t('jobPostForm.title.district')}
+          showRequired={true}
+          placeholder={t('jobPostForm.placeholder.selectdistrict')}
+          sx={inputSx}
+        />
       </Grid>
       <Grid size={12}>
         <TextFieldCustom name="location.address" title={t('jobPostForm.title.address')} showRequired={true} placeholder={t('jobPostForm.placeholder.enteraddress')} control={control} sx={inputSx} />

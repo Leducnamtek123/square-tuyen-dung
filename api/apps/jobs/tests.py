@@ -1789,3 +1789,91 @@ class TestAIScoringFallback:
         assert 'Backend Dev' in prompt
         assert 'Senior Dev' in prompt
         assert 'Python, Django' in prompt
+
+
+@pytest.mark.django_db
+class TestAiRecommendedCandidatesAPI:
+    def test_ai_recommended_candidates_not_found_returns_404_dict(self, employer_user, company):
+        client = APIClient()
+        client.force_authenticate(user=employer_user)
+
+        response = client.get("/api/v1/job/web/private-job-posts/non-existent-slug-9999/ai-recommended-candidates/")
+        assert response.status_code == 404
+        errors = response.data.get("errors") or response.data.get("error", {}).get("details", {})
+        assert "errorMessage" in errors
+
+    def test_ai_recommended_candidates_only_recommends_active_without_fake_data(
+        self,
+        employer_user,
+        job_post,
+        resume,
+        city,
+        career,
+    ):
+        from apps.profiles.models import JobSeekerProfile, Resume
+
+        # Create an inactive resume that matches
+        inactive_user = employer_user.__class__.objects.create_user_with_role_name(
+            email="inactive-candidate@test.com",
+            full_name="Inactive Candidate",
+            role_name=var_sys.JOB_SEEKER,
+            password="testpass123",
+            is_active=True,
+            is_verify_email=True,
+        )
+        inactive_profile = JobSeekerProfile.objects.create(
+            user=inactive_user,
+            phone="0911223344",
+        )
+        Resume.objects.create(
+            title="Inactive Senior Dev",
+            description="Inactive resume",
+            experience=3,
+            is_active=False,
+            user=inactive_user,
+            job_seeker_profile=inactive_profile,
+            career=career,
+            city=city,
+        )
+
+        client = APIClient()
+        client.force_authenticate(user=employer_user)
+
+        response = client.get(f"/api/v1/job/web/private-job-posts/{job_post.slug}/ai-recommended-candidates/")
+        assert response.status_code == 200
+        candidates = response.data["data"]["candidates"]
+
+        # Ensure active resume is included, inactive is NOT included
+        active_ids = [c["id"] for c in candidates]
+        assert resume.id in active_ids
+        assert not any(c["title"] == "Inactive Senior Dev" for c in candidates)
+
+        # Check candidate fields are authentic (not fabricated mock strings)
+        for cand in candidates:
+            if cand["id"] == resume.id:
+                assert cand["title"] == resume.title
+                assert cand["skillsSummary"] == resume.skills_summary
+                if resume.city:
+                    assert cand["city"] == resume.city.name
+
+
+@pytest.mark.django_db
+class TestScoreJobApplication:
+    def test_score_job_application_returns_none_score_on_failure(self, job_post, job_seeker_user, resume):
+        from apps.jobs.models import JobPostActivity
+        from apps.jobs.ai_scoring_service import score_job_application
+        from unittest.mock import patch
+
+        activity = JobPostActivity.objects.create(
+            job_post=job_post,
+            user=job_seeker_user,
+            resume=resume,
+            full_name='Test',
+            email='test@test.com',
+            phone='0901234567',
+        )
+
+        with patch("apps.jobs.ai_scoring_service.score_resume_job_fit", return_value=None):
+            result = score_job_application(activity)
+            assert result["score"] is None
+            assert result["summary"] == ""

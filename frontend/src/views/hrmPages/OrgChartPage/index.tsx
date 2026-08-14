@@ -9,6 +9,8 @@ import {
   Chip,
   Avatar,
   Paper,
+  Alert,
+  Button,
 } from '@mui/material';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 
@@ -19,15 +21,18 @@ export default function OrgChartPage() {
   TabTitle('Sơ đồ Cây Tổ chức | Native HRM');
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [orgTree, setOrgTree] = useState<NativeOrgTreeNode[]>([]);
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const data = await hrmService.getOrgChart().catch(() => []);
+      const data = await hrmService.getOrgChart();
       setOrgTree(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching org chart:', err);
+      setError(err?.response?.data?.message || err?.message || 'Không thể tải sơ đồ tổ chức. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -98,11 +103,25 @@ export default function OrgChartPage() {
         </Box>
       </Box>
 
+      {error && (
+        <Alert
+          severity="error"
+          sx={{ mb: 3 }}
+          action={
+            <Button color="inherit" size="small" onClick={fetchData}>
+              Thử lại
+            </Button>
+          }
+        >
+          {error}
+        </Alert>
+      )}
+
       {loading ? (
         <Box display="flex" justifyContent="center" py={6}>
           <CircularProgress />
         </Box>
-      ) : (
+      ) : error ? null : (
         <Card sx={{ p: 3, borderRadius: 3, boxShadow: '0 4px 16px rgba(0,0,0,0.05)' }}>
           {orgTree.length === 0 ? (
             <Typography color="text.secondary" align="center" py={4}>

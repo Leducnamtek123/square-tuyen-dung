@@ -21,12 +21,15 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import dayjs from 'dayjs';
 
 interface CandidateProfileHeroBannerProps {
   fullName: string;
   title?: string;
   avatarUrl?: string;
   coverUrl?: string;
+  experience?: string;
+  updatedAt?: string;
   isJobSeeking?: boolean;
   isSubmittingStatus?: boolean;
   location?: string;
@@ -40,12 +43,14 @@ interface CandidateProfileHeroBannerProps {
 
 const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
   fullName,
-  title = 'Kỹ sư Cơ điện (MEP Site Supervisor)',
+  title = '',
   avatarUrl,
   coverUrl,
+  experience,
+  updatedAt,
   isJobSeeking = true,
   isSubmittingStatus = false,
-  location = 'Thành phố Hồ Chí Minh',
+  location = '',
   onEditClick,
   onAvatarChange,
   onCoverChange,
@@ -64,6 +69,14 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
     setSeekingStatus(isJobSeeking);
   }, [isJobSeeking]);
 
+  React.useEffect(() => {
+    setCurrentAvatar(avatarUrl);
+  }, [avatarUrl]);
+
+  React.useEffect(() => {
+    setCurrentCover(coverUrl);
+  }, [coverUrl]);
+
   const handleToggleSeeking = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newStatus = e.target.checked;
     setSeekingStatus(newStatus);
@@ -75,28 +88,6 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
       }
     }
   };
-
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const cached = localStorage.getItem('sq_user_avatar');
-      if (cached) {
-        setCurrentAvatar(cached);
-        return;
-      }
-    }
-    setCurrentAvatar(avatarUrl);
-  }, [avatarUrl]);
-
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const cached = localStorage.getItem('sq_user_cover');
-      if (cached) {
-        setCurrentCover(cached);
-        return;
-      }
-    }
-    setCurrentCover(coverUrl);
-  }, [coverUrl]);
 
   const handleAvatarFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -217,7 +208,7 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
                   boxShadow: '0 8px 24px -4px rgba(0,0,0,0.15)',
                 }}
               >
-                {fullName ? fullName.charAt(0).toUpperCase() : 'N'}
+                {fullName ? fullName.trim().charAt(0).toUpperCase() : ''}
               </Avatar>
               <Tooltip title="Bấm để chọn và cập nhật ảnh đại diện mới">
                 <IconButton
@@ -251,7 +242,7 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
                     lineHeight: 1.2,
                   }}
                 >
-                  {fullName}
+                  {fullName || 'Ứng viên'}
                 </Typography>
                 <Chip
                   size="small"
@@ -266,23 +257,25 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
                 />
               </Box>
 
-              <Typography variant="subtitle2" sx={{ color: '#334155', fontWeight: 700, fontSize: '0.925rem', mt: 0.5 }}>
-                {title}
+              <Typography variant="subtitle2" sx={{ color: title ? '#334155' : '#94a3b8', fontWeight: title ? 700 : 500, fontSize: '0.925rem', mt: 0.5 }}>
+                {title || 'Chưa cập nhật chức danh'}
               </Typography>
 
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.75, mt: 0.75, flexWrap: 'wrap' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <LocationOnOutlinedIcon sx={{ fontSize: 16, color: '#2563eb' }} />
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.8rem' }}>
-                    {location}
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: location ? '#475569' : '#94a3b8', fontSize: '0.8rem' }}>
+                    {location || 'Chưa cập nhật địa điểm'}
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <WorkOutlineIcon sx={{ fontSize: 16, color: '#2563eb' }} />
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.8rem' }}>
-                    2+ năm kinh nghiệm
-                  </Typography>
-                </Box>
+                {experience && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <WorkOutlineIcon sx={{ fontSize: 16, color: '#2563eb' }} />
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.8rem' }}>
+                      {experience}
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             </Box>
           </Box>
@@ -408,7 +401,7 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
           </Box>
 
           <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem' }}>
-            Hồ sơ cập nhật lần cuối: <strong>01/08/2026</strong>
+            Hồ sơ cập nhật lần cuối: <strong>{updatedAt && dayjs(updatedAt).isValid() ? dayjs(updatedAt).format('DD/MM/YYYY') : 'Chưa cập nhật'}</strong>
           </Typography>
         </Box>
       </Box>

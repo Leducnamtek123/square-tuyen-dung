@@ -18,6 +18,8 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import type { ChipProps } from '@mui/material';
 import commonService from '@/services/commonService';
 import toastMessages from '@/utils/toastMessages';
+import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
+
 
 export interface VerificationLegalProfile {
   companyName: string;
@@ -178,14 +180,18 @@ const VerificationLegalProfileForm = ({
                       <Button
                         size="small"
                         variant="outlined"
-                        href={uploadedFileUrl}
+                        component="a"
+                        href={getSafeExternalOpenUrl(uploadedFileUrl)}
                         target="_blank"
+                        rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
                         sx={{ borderRadius: '10px', textTransform: 'none', fontWeight: 700 }}
                       >
                         Xem tài liệu
                       </Button>
                     )}
+
+
                     <Button
                       size="small"
                       variant="contained"

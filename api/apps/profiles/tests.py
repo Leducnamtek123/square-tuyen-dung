@@ -1924,3 +1924,33 @@ def test_admin_resume_list_filters_by_job_seeker_profile_id(admin_user, job_seek
     results = payload.get("data", payload).get("results", payload.get("results", []))
     assert [item["id"] for item in results] == [resume.id]
     assert other_resume.id not in [item["id"] for item in results]
+
+
+@pytest.mark.django_db
+class TestResumeSavedAPI:
+    def test_resume_saved_missing_company_returns_400_without_crash(self, admin_user, resume):
+        client = APIClient()
+        client.force_authenticate(user=admin_user)
+
+        response = client.post(f"/api/v1/info/web/resumes/{resume.slug}/resume-saved/")
+        assert response.status_code == 400
+        errors = response.data.get("errors") or response.data.get("error", {}).get("details", {})
+        assert "errorMessage" in errors
+
+    def test_resume_saved_toggles_save_state(self, employer_user, company, resume):
+        client = APIClient()
+        client.force_authenticate(user=employer_user)
+
+        # Save
+        response1 = client.post(f"/api/v1/info/web/resumes/{resume.slug}/resume-saved/")
+        assert response1.status_code == 200
+        assert response1.data["data"]["isSaved"] is True
+        from apps.profiles.models import ResumeSaved
+        assert ResumeSaved.objects.filter(company=company, resume=resume).exists()
+
+        # Unsave
+        response2 = client.post(f"/api/v1/info/web/resumes/{resume.slug}/resume-saved/")
+        assert response2.status_code == 200
+        assert response2.data["data"]["isSaved"] is False
+        assert not ResumeSaved.objects.filter(company=company, resume=resume).exists()
+

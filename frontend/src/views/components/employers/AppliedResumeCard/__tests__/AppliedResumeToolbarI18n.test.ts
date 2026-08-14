@@ -11,9 +11,10 @@ describe('AppliedResumeToolbar i18n', () => {
       'employer:appliedResume.ai.status.processing',
       'employer:appliedResume.ai.status.completed',
       'employer:appliedResume.ai.status.failed',
-      'employer:appliedResume.ai.allStatuses',
-      'employer:appliedResume.ai.scoreMin',
-      'employer:appliedResume.ai.blindMode',
+      'employer:appliedResume.manageSubtitle',
+      'employer:appliedResume.tableView',
+      'employer:appliedResume.boardView',
+      'employer:manualCandidate.actions.add',
     ];
 
     for (const key of toolbarKeys) {

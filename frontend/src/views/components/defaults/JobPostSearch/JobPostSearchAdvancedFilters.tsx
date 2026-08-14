@@ -108,6 +108,8 @@ const JobPostSearchAdvancedFilters = ({
           <SingleSelectSearchCustom
             name="districtId"
             placeholder={t('jobSearch.allDistricts')}
+            disabled={!cityId}
+            disabledPlaceholder={t('jobSearch.selectCityFirst')}
             control={control}
             options={districtOptions}
             noOptionsText={!cityId ? t('jobSearch.selectCityFirst') : undefined}
@@ -125,6 +127,8 @@ const JobPostSearchAdvancedFilters = ({
           <SingleSelectSearchCustom
             name="wardId"
             placeholder={t('jobSearch.allWards')}
+            disabled={!districtId}
+            disabledPlaceholder={t('jobSearch.selectDistrictFirst')}
             control={control}
             options={wardOptions}
             noOptionsText={!districtId ? t('jobSearch.selectDistrictFirst') : undefined}

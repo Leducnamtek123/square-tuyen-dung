@@ -106,9 +106,9 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
             errors["birthday"] = ["Birthday must be before today."]
         if "id_card_issue_date" in attrs and id_card_issue_date and id_card_issue_date > today:
             errors["idCardIssueDate"] = ["ID card issue date cannot be in the future."]
-        if "gender" in attrs and gender not in _choice_values(var_sys.GENDER_CHOICES):
+        if "gender" in attrs and gender and gender not in _choice_values(var_sys.GENDER_CHOICES):
             errors["gender"] = ["Invalid choice."]
-        if "marital_status" in attrs and marital_status not in _choice_values(var_sys.MARITAL_STATUS_CHOICES):
+        if "marital_status" in attrs and marital_status and marital_status not in _choice_values(var_sys.MARITAL_STATUS_CHOICES):
             errors["maritalStatus"] = ["Invalid choice."]
 
         if errors:

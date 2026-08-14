@@ -122,10 +122,10 @@
     "feedbacksManagement": "User Reviews",
     "contactMessages": "Bug Reports & Contact Messages",
     "articlesManagement": "News & Blog",
-      "chatWithEmployers": "Chat with Employers",
-      "voiceProfiles": "AI Voice Profiles",
-      "interviewPreview": "Interview UI Preview",
-      "squareHrmAdmin": "Open HRM"
+    "chatWithEmployers": "Chat with Employers",
+    "voiceProfiles": "AI Voice Profiles",
+    "interviewPreview": "Interview UI Preview",
+    "squareHrmAdmin": "Open HRM"
   },
   "aiHealth": {
     "title": "AI services",
@@ -590,12 +590,15 @@
         "deleteSuccess": "Profile deleted",
         "deleteError": "Could not delete profile",
         "importSuccess": "Imported {{created}} new candidates, updated {{updated}} profiles, skipped {{skipped}}.",
-        "importError": "Could not import candidates from Vieclam24h."
+        "importError": "Could not initiate resume import.",
+        "bulkDeleteSuccess": "Profiles deleted successfully.",
+        "importQueued": "Resume import job queued."
       },
       "addCandidate": "Add Candidate",
       "searchPlaceholder": "Search candidates...",
       "filter": {
-        "title": "Candidate pool filters"
+        "title": "Candidate pool filters",
+        "helper": "Filter candidate profiles"
       },
       "addTitle": "Add New Candidate Profile",
       "editTitle": "Edit Candidate Profile",
@@ -624,16 +627,22 @@
       "deleteBtn": "Confirm Delete",
       "deletingBtn": "Deleting...",
       "import": {
-        "openButton": "Import candidates",
-        "dialogTitle": "Import candidates from Vieclam24h",
+        "openButton": "Import Resumes",
+        "dialogTitle": "Import Candidate Profiles",
         "sourceUrlLabel": "Recruitment link",
-        "accountLabel": "Account",
+        "accountLabel": "Source Account",
         "passwordLabel": "Password",
-        "careerLabel": "Target industry",
-        "careerPlaceholder": "Select the industry to import",
+        "careerLabel": "Default Career",
+        "careerPlaceholder": "Select career...",
         "cancel": "Cancel",
-        "confirm": "Import candidates",
-        "importing": "Importing..."
+        "confirm": "Start Import",
+        "importing": "Importing...",
+        "completedTitle": "Import Completed",
+        "failedTitle": "Import Failed",
+        "processingTitle": "Import in Progress",
+        "completedMessage": "Resumes imported successfully.",
+        "failedMessage": "An error occurred during resume import.",
+        "processingMessage": "System is processing resumes in background..."
       },
       "table": {
         "avatar": "Avatar",
@@ -657,57 +666,63 @@
       "breadcrumbResources": "Resources",
       "breadcrumbProfiles": "Profiles",
       "deleteConfirm": "This will be permanently deleted, continue?",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "bulkSelect": {
+        "selectedCount": "{{count}} profiles selected",
+        "deleteBtn": "Delete Selected",
+        "deleteTitle": "Confirm Bulk Deletion",
+        "deleteConfirm": "Are you sure you want to delete selected profiles? This action cannot be undone."
+      }
     },
     "profileDetail": {
-      "title": "Candidate Profile Detail",
-      "subtitle": "Review profile data, contact details, and related CVs.",
-      "back": "Back to list",
-      "deleteTitle": "Confirm profile deletion",
+      "title": "Candidate Profile Details",
+      "subtitle": "View detailed candidate information, history, and attached resumes.",
+      "back": "Back",
+      "deleteTitle": "Confirm Profile Deletion",
       "deleteConfirm": "Are you sure you want to delete the profile of <strong>{{name}}</strong>? This action cannot be undone.",
-      "deleteBtn": "Delete profile",
+      "deleteBtn": "Delete Profile",
       "deletingBtn": "Deleting...",
       "sections": {
-        "summary": "Overview",
-        "contact": "Contact information",
-        "details": "Profile details",
-        "resumes": "Related CVs"
+        "summary": "Summary",
+        "contact": "Contact Information",
+        "details": "Personal Details",
+        "resumes": "Resumes / CVs"
       },
       "labels": {
-        "fullName": "Full name",
+        "fullName": "Full Name",
         "email": "Email",
         "phone": "Phone",
-        "birthday": "Date of birth",
+        "birthday": "Date of Birth",
         "gender": "Gender",
-        "maritalStatus": "Marital status",
-        "location": "City/Province",
+        "maritalStatus": "Marital Status",
+        "location": "City / Province",
         "district": "District",
         "address": "Address",
         "profileId": "Profile ID",
-        "source": "Data source",
-        "createdAt": "Created at",
-        "updatedAt": "Last updated",
-        "noData": "No data",
+        "source": "Profile Source",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At",
+        "noData": "No data available",
         "active": "Active",
         "inactive": "Inactive"
       },
       "table": {
-        "title": "CV Title",
-        "resumeType": "CV type",
-        "createdAt": "Created at",
-        "updatedAt": "Updated at",
+        "title": "Resume / CV Title",
+        "resumeType": "Resume Type",
+        "createdAt": "Created Date",
+        "updatedAt": "Updated Date",
         "actions": "Actions",
         "view": "View",
         "download": "Download",
-        "openOnline": "Open online profile",
+        "openOnline": "Open Online",
         "noData": "No related CVs",
-        "attached": "Attached CV",
-        "online": "Online profile"
+        "attached": "Attached",
+        "online": "Online Resume"
       },
       "messages": {
         "loading": "Loading profile...",
         "notFound": "Candidate profile not found.",
-        "noResumes": "This profile has no CVs yet."
+        "noResumes": "No resumes uploaded yet."
       }
     },
     "questionGroups": {
@@ -833,7 +848,6 @@
         "blockAccount": "Block account",
         "unblockAccount": "Unblock account",
         "delete": "Delete",
-        "delete": "Delete",
         "noUsers": "No users found"
       },
       "filter": {
@@ -876,8 +890,8 @@
         "role": "Role",
         "allRoles": "All"
       },
-      "deleteTitle": "Confirm Delete User",
-      "deleteConfirm": "Are you sure you want to delete user <strong>{{name}}</strong>? This action cannot be undone.",
+      "deleteTitle": "Delete User",
+      "deleteConfirm": "Are you sure you want to delete this user from system?",
       "deleteBtn": "Delete",
       "cancel": "Cancel",
       "title": "User Management",
@@ -946,7 +960,8 @@
         "open": "Open",
         "reviewing": "Reviewing",
         "resolved": "Resolved",
-        "rejected": "Rejected"
+        "rejected": "Rejected",
+        "in_review": "In Review"
       },
       "toast": {
         "updateSuccess": "Report status updated.",
@@ -987,7 +1002,8 @@
         "actor": "Actor",
         "resource": "Resource",
         "request": "Request"
-      }
+      },
+      "subtitle": "Track and record all system activity logs."
     },
     "questions": {
       "title": "Interview Question Bank",
@@ -1205,34 +1221,34 @@
         "description": "Send system notifications via email to administrators",
         "desc": "Send system notifications via email to administrators"
       },
-    "interviewAi": {
-      "pacingTitle": "Interview AI Pacing",
-      "pacingDescription": "Tune how quickly the interviewer speaks and how long it waits before asking the next question.",
-      "preset": {
-        "label": "Pacing preset",
-        "helper": "Choose a preset to fill all timing values, or switch to Custom and adjust manually.",
-        "options": {
-          "balanced": "Balanced",
-          "natural": "Natural",
-          "snappy": "Snappy",
-          "custom": "Custom"
+      "interviewAi": {
+        "pacingTitle": "Interview AI Pacing",
+        "pacingDescription": "Tune how quickly the interviewer speaks and how long it waits before asking the next question.",
+        "preset": {
+          "label": "Pacing preset",
+          "helper": "Choose a preset to fill all timing values, or switch to Custom and adjust manually.",
+          "options": {
+            "balanced": "Balanced",
+            "natural": "Natural",
+            "snappy": "Snappy",
+            "custom": "Custom"
+          }
+        },
+        "questionGap": {
+          "label": "Gap before next question (seconds)",
+          "helper": "Increase this if the AI interrupts candidates too quickly."
+        },
+        "silenceThreshold": {
+          "label": "Minimum silence threshold (seconds)",
+          "helper": "Keep this above zero if you want the AI to feel less eager to jump in."
+        },
+        "ttsTitle": "TTS Speed",
+        "ttsDescription": "Control how fast the AI voice speaks during the interview.",
+        "ttsSpeed": {
+          "label": "Voice speed",
+          "helper": "1.0 is normal. Lower values sound calmer; higher values sound faster."
         }
       },
-      "questionGap": {
-        "label": "Gap before next question (seconds)",
-        "helper": "Increase this if the AI interrupts candidates too quickly."
-      },
-      "silenceThreshold": {
-        "label": "Minimum silence threshold (seconds)",
-        "helper": "Keep this above zero if you want the AI to feel less eager to jump in."
-      },
-      "ttsTitle": "TTS Speed",
-      "ttsDescription": "Control how fast the AI voice speaks during the interview.",
-      "ttsSpeed": {
-        "label": "Voice speed",
-        "helper": "1.0 is normal. Lower values sound calmer; higher values sound faster."
-      }
-    },
       "apiTitle": "API & External Services",
       "googleApiKey": "Google API Key",
       "supportEmail": "Support Email",
@@ -1254,6 +1270,34 @@
         "checking": "Checking...",
         "database": "Database",
         "redis": "Redis"
+      },
+      "interviewAi": {
+        "pacingTitle": "Voice AI Interview Pacing Configuration",
+        "pacingDescription": "Customize interview question reading speed (TTS) and candidate response silence recognition gaps.",
+        "preset": {
+          "label": "Interview Pacing Preset",
+          "helper": "Quickly select optimized parameters for voice interview experience.",
+          "options": {
+            "balanced": "Balanced (Default - Recommended)",
+            "natural": "Natural & Deliberate",
+            "snappy": "Snappy & Fast Response",
+            "custom": "Manual Customization"
+          }
+        },
+        "questionGap": {
+          "label": "Question Transition Gap (Seconds)",
+          "helper": "Wait time between questions (seconds)"
+        },
+        "silenceThreshold": {
+          "label": "Silence Recognition Threshold (Seconds)",
+          "helper": "Silence duration before AI recognizes candidate finished speaking"
+        },
+        "ttsTitle": "AI Voice Reading Speed (TTS)",
+        "ttsDescription": "Adjust playback speed for the virtual interview assistant.",
+        "ttsSpeed": {
+          "label": "Question Reading Speed (TTS Speed)",
+          "helper": "Standard speed: 0.92 (From 0.5 to 2.0)"
+        }
       },
       "fptGpu": {
         "title": "FPT GPU Container",
@@ -1633,6 +1677,10 @@
         "prepareError": "Could not prepare voice profile.",
         "grantSuccess": "Voice access granted.",
         "grantError": "Could not grant voice access."
+      },
+      "types": {
+        "preset": "System Preset Voice",
+        "cloned": "AI Cloned Voice"
       }
     },
     "bannerTypes": {
@@ -1802,7 +1850,8 @@
         "markAsReadError": "Could not mark as read",
         "deleteSuccess": "Message deleted",
         "deleteError": "Could not delete message"
-      }
+      },
+      "deleteTooltip": "Delete contact message"
     }
   },
   "common": {
@@ -1893,4 +1942,3 @@
     }
   }
 }
-

@@ -23,6 +23,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import SearchIcon from '@mui/icons-material/Search';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useTranslation } from 'react-i18next';
 
 import nominatimService, { NominatimPlace } from '@/services/nominatimService';
 import useDebounce from '@/hooks/useDebounce';
@@ -79,12 +80,57 @@ export interface LocationPickerProps {
 // Default center: Ha Noi, Vietnam [21.0285, 105.8542] or Ho Chi Minh City [10.8231, 106.6297]
 const DEFAULT_CENTER: [number, number] = [10.7769, 106.7009];
 
+const isValidLatLng = (lat: unknown, lng: unknown): boolean => {
+  const nLat = Number(lat);
+  const nLng = Number(lng);
+  return (
+    typeof lat !== 'undefined' &&
+    typeof lng !== 'undefined' &&
+    lat !== null &&
+    lng !== null &&
+    !isNaN(nLat) &&
+    !isNaN(nLng) &&
+    isFinite(nLat) &&
+    isFinite(nLng) &&
+    nLat >= -90 &&
+    nLat <= 90 &&
+    nLng >= -180 &&
+    nLng <= 180
+  );
+};
+
+function MapAutoResize() {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        map.invalidateSize();
+      } catch (err) {
+        console.warn('Map invalidateSize error:', err);
+      }
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
+
 // Component to dynamically adjust map center when coordinates change
 function MapRecenter({ center }: { center: [number, number] }) {
   const map = useMap();
   useEffect(() => {
-    if (center && center[0] && center[1]) {
-      map.flyTo(center, Math.max(map.getZoom(), 15), { animate: true, duration: 1 });
+    if (
+      Array.isArray(center) &&
+      center.length === 2 &&
+      isValidLatLng(center[0], center[1])
+    ) {
+      try {
+        const size = map.getSize();
+        if (size && size.x > 0 && size.y > 0) {
+          map.flyTo(center, Math.max(map.getZoom() || 15, 15), { animate: true, duration: 1 });
+        }
+      } catch (err) {
+        console.warn('MapRecenter flyTo error:', err);
+      }
     }
   }, [center, map]);
   return null;
@@ -107,9 +153,11 @@ function InteractiveMapEvents({
   useMapEvents({
     click(e) {
       if (disabled) return;
-      const newPos: [number, number] = [e.latlng.lat, e.latlng.lng];
-      setPosition(newPos);
-      onPositionChange(e.latlng.lat, e.latlng.lng);
+      if (e?.latlng && isValidLatLng(e.latlng.lat, e.latlng.lng)) {
+        const newPos: [number, number] = [e.latlng.lat, e.latlng.lng];
+        setPosition(newPos);
+        onPositionChange(e.latlng.lat, e.latlng.lng);
+      }
     },
   });
 
@@ -119,20 +167,26 @@ function InteractiveMapEvents({
         const marker = markerRef.current;
         if (marker != null) {
           const latLng = marker.getLatLng();
-          const newPos: [number, number] = [latLng.lat, latLng.lng];
-          setPosition(newPos);
-          onPositionChange(latLng.lat, latLng.lng);
+          if (latLng && isValidLatLng(latLng.lat, latLng.lng)) {
+            const newPos: [number, number] = [latLng.lat, latLng.lng];
+            setPosition(newPos);
+            onPositionChange(latLng.lat, latLng.lng);
+          }
         }
       },
     }),
     [onPositionChange, setPosition]
   );
 
+  const safePosition: [number, number] = isValidLatLng(position?.[0], position?.[1])
+    ? position
+    : DEFAULT_CENTER;
+
   return (
     <Marker
       draggable={!disabled}
       eventHandlers={eventHandlers}
-      position={position}
+      position={safePosition}
       ref={markerRef}
       icon={defaultMarkerIcon}
     >
@@ -156,15 +210,16 @@ export default function LocationPickerContent({
   showGps = true,
   defaultCenter = DEFAULT_CENTER,
 }: LocationPickerProps) {
+  const { t } = useTranslation('common');
   // Parsed initial coordinates
-  const initialLat = value?.lat !== undefined && value?.lat !== null && value?.lat !== '' ? Number(value.lat) : null;
-  const initialLng = value?.lng !== undefined && value?.lng !== null && value?.lng !== '' ? Number(value.lng) : null;
+  const initialLat = isValidLatLng(value?.lat, value?.lng) ? Number(value?.lat) : null;
+  const initialLng = isValidLatLng(value?.lat, value?.lng) ? Number(value?.lng) : null;
 
   const [position, setPosition] = useState<[number, number]>(() => {
-    if (initialLat && initialLng && !isNaN(initialLat) && !isNaN(initialLng)) {
+    if (initialLat !== null && initialLng !== null && isValidLatLng(initialLat, initialLng)) {
       return [initialLat, initialLng];
     }
-    return defaultCenter;
+    return isValidLatLng(defaultCenter?.[0], defaultCenter?.[1]) ? defaultCenter : DEFAULT_CENTER;
   });
 
   const [address, setAddress] = useState<string>(value?.address || '');
@@ -182,17 +237,10 @@ export default function LocationPickerContent({
     if (value?.address !== undefined && value.address !== address) {
       setAddress(value.address);
     }
-    if (
-      value?.lat !== undefined &&
-      value?.lng !== undefined &&
-      value.lat !== null &&
-      value.lng !== null &&
-      value.lat !== '' &&
-      value.lng !== ''
-    ) {
-      const numLat = Number(value.lat);
-      const numLng = Number(value.lng);
-      if (!isNaN(numLat) && !isNaN(numLng) && (numLat !== position[0] || numLng !== position[1])) {
+    if (isValidLatLng(value?.lat, value?.lng)) {
+      const numLat = Number(value!.lat);
+      const numLng = Number(value!.lng);
+      if (numLat !== position[0] || numLng !== position[1]) {
         setPosition([numLat, numLng]);
       }
     }
@@ -287,7 +335,7 @@ export default function LocationPickerContent({
 
   // GPS Device Geolocation
   const handleGetCurrentLocation = () => {
-    if (!navigator.geolocation) {
+    if (typeof window === 'undefined' || !navigator.geolocation) {
       setGpsError('Trình duyệt của bạn không hỗ trợ định vị GPS.');
       return;
     }
@@ -305,7 +353,18 @@ export default function LocationPickerContent({
       (err) => {
         setIsGpsLoading(false);
         console.warn('Geolocation error:', err);
-        setGpsError('Không thể lấy vị trí thiết bị. Vui lòng cho phép quyền truy cập vị trí trên trình duyệt.');
+        if (err.code === 1) {
+          // PERMISSION_DENIED
+          setGpsError('Quyền truy cập vị trí đã bị từ chối hoặc bị chặn bởi trình duyệt. Vui lòng cho phép quyền vị trí trong cài đặt trình duyệt để sử dụng tính năng này.');
+        } else if (err.code === 2) {
+          // POSITION_UNAVAILABLE
+          setGpsError('Không thể xác định vị trí hiện tại của thiết bị. Vui lòng kiểm tra lại kết nối GPS hoặc thử lại sau.');
+        } else if (err.code === 3) {
+          // TIMEOUT
+          setGpsError('Yêu cầu định vị đã hết thời gian chờ (timeout). Vui lòng thử lại.');
+        } else {
+          setGpsError('Không thể lấy vị trí thiết bị. Vui lòng cho phép quyền truy cập vị trí trên trình duyệt.');
+        }
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
@@ -331,6 +390,11 @@ export default function LocationPickerContent({
               filterOptions={(x) => x}
               loading={isSearching}
               disabled={disabled}
+              noOptionsText={t('common:noOptions')}
+              loadingText={t('common:loading')}
+              openText={t('common:autocomplete.open')}
+              closeText={t('common:autocomplete.close')}
+              clearText={t('common:autocomplete.clear')}
               onInputChange={(_e, newInputValue) => setSearchQuery(newInputValue)}
               onChange={(_e, selectedOption) => {
                 if (selectedOption && typeof selectedOption === 'object') {
@@ -433,6 +497,7 @@ export default function LocationPickerContent({
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          <MapAutoResize />
           <MapRecenter center={position} />
           <InteractiveMapEvents
             disabled={disabled}

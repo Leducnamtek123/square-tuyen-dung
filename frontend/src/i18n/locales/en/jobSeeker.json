@@ -484,5 +484,104 @@
   "form": {
     "phoneNumber": "Phone number",
     "otpCode": "OTP code"
+  },
+  "onboarding": {
+    "pageTitle": "Candidate Profile Setup | InfoHR",
+    "steps": {
+      "careerGoals": "Career Goals",
+      "skillsExperience": "Skills & Experience",
+      "resumeUpload": "Upload CV / Resume",
+      "complete": "Complete"
+    },
+    "stepCounter": "Step {{current}} of {{total}}",
+    "step1": {
+      "title": "Career Goals & Preferences",
+      "subtitle": "Takes just 1 minute to set your goals and discover the best matching jobs",
+      "desiredJobTitle": "What job title are you looking for?",
+      "desiredJobTitlePlaceholder": "e.g. Marketing Specialist, Software Engineer, HR Manager...",
+      "desiredJobTitleHelper": "Enter the job title you wish to apply for",
+      "career": "Primary Industry",
+      "careerPlaceholder": "Select industry...",
+      "careerHelper": "Your primary professional field",
+      "city": "Where do you want to work?",
+      "cityPlaceholder": "Select City / Province...",
+      "cityHelper": "Your preferred working location",
+      "workplaceType": "Preferred Workplace Type",
+      "workplaceOnsite": "Office-based (Onsite)",
+      "workplaceHybrid": "Hybrid",
+      "workplaceRemote": "Remote"
+    },
+    "step2": {
+      "title": "Skills & Work Experience",
+      "subtitle": "Your skills and salary expectations help our AI find the most relevant opportunities",
+      "skillsLabel": "Core Skills & Strengths",
+      "skillsPlaceholder": "Type skill and press Enter (e.g. Project Management, AutoCAD, Site Supervision...)",
+      "skillsAddMorePlaceholder": "Type more skills and press Enter...",
+      "skillsHelper": "Type your professional skills (press Enter or comma to add)",
+      "experienceLabel": "Years of experience",
+      "salaryLabel": "Expected Salary (VND / month)",
+      "salaryRange": "Quick ranges",
+      "salaryBelow10": "Under 10M",
+      "salary10To15": "10 - 15M",
+      "salary15To25": "15 - 25M",
+      "salaryAbove25": "Over 25M",
+      "salaryNegotiable": "Negotiable",
+      "salaryCustom": "Enter specific salary range",
+      "salaryMin": "Minimum salary",
+      "salaryMax": "Maximum salary",
+      "salaryMinPlaceholder": "e.g. 10,000,000",
+      "salaryMaxPlaceholder": "e.g. 20,000,000",
+      "academicLevelLabel": "Highest Education Level"
+    },
+    "step3": {
+      "title": "Upload CV or Quick Setup",
+      "subtitle": "A CV helps recruiters quickly evaluate your profile and qualifications",
+      "dropzoneTitle": "Drag and drop your CV file here or click to browse",
+      "dropzoneSubtitle": "Supports PDF, DOC, DOCX (Max 10MB)",
+      "selectFile": "Choose file from computer",
+      "uploadedCv": "Attached CV",
+      "replaceCv": "Change file",
+      "removeCv": "Remove CV",
+      "uploading": "Uploading file...",
+      "optionalNotice": "* You can click 'Complete basic profile' to continue and upload your CV later."
+    },
+    "step4": {
+      "title": "Your Profile is Ready!",
+      "subtitle": "The system has analyzed your preferences and found the best matching jobs for you.",
+      "completenessScore": "Profile Completeness",
+      "summaryTitle": "Saved Career Preferences",
+      "position": "Position",
+      "career": "Industry",
+      "location": "Location",
+      "salary": "Salary",
+      "skills": "Key Skills",
+      "cvStatus": "CV Status",
+      "cvAttached": "Attached",
+      "cvNotAttached": "Not attached",
+      "recommendedJobsTitle": "Recommended Jobs for You",
+      "viewJob": "View Details",
+      "exploreJobs": "Explore Matching Jobs Now",
+      "viewDashboard": "View My Profile"
+    },
+    "actions": {
+      "back": "Back",
+      "next": "Continue",
+      "complete": "Complete basic profile",
+      "saving": "Saving...",
+      "submitting": "Finalizing...",
+      "skip": "Skip this step"
+    },
+    "validation": {
+      "desiredJobTitleRequired": "Please enter your desired job title.",
+      "careerRequired": "Please select a primary industry.",
+      "cityRequired": "Please select a preferred working location.",
+      "skillsMin": "Please enter or select at least 1 skill.",
+      "salaryRangeInvalid": "Minimum salary cannot exceed maximum salary.",
+      "fileSizeExceeded": "CV file size cannot exceed 10MB.",
+      "fileFormatInvalid": "Only PDF, DOC, and DOCX files are allowed.",
+      "saveFailed": "Failed to save information. Please try again.",
+      "uploadFailed": "Failed to upload CV file. Please try again."
+    }
   }
 }
+

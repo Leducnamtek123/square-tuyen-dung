@@ -59,8 +59,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = [
-            'id', 'company', 'user', 'candidate_profile', 'employee_code',
-            'first_name', 'last_name', 'full_name', 'email', 'phone', 'avatar',
+            'id', 'company', 'user', 'candidate_profile', 'onboarded_from_activity',
+            'employee_code', 'first_name', 'last_name', 'full_name', 'email', 'phone', 'avatar',
             'gender', 'date_of_birth', 'address', 'department', 'department_name',
             'designation', 'designation_title', 'reports_to', 'reports_to_name',
             'status', 'employment_type', 'join_date', 'probation_end_date',
@@ -108,13 +108,17 @@ class AttendanceRecordSerializer(serializers.ModelSerializer):
 class OnboardCandidateSerializer(serializers.Serializer):
     job_application_id = serializers.IntegerField(required=False, allow_null=True)
     candidate_profile_id = serializers.IntegerField(required=False, allow_null=True)
-    first_name = serializers.CharField(max_length=150)
-    last_name = serializers.CharField(max_length=150)
-    email = serializers.EmailField()
-    phone = serializers.CharField(max_length=30, required=False, allow_blank=True)
+    first_name = serializers.CharField(max_length=150, required=False, allow_blank=True, default='')
+    last_name = serializers.CharField(max_length=150, required=False, allow_blank=True, default='')
+    email = serializers.EmailField(required=False, allow_blank=True, default='')
+    phone = serializers.CharField(max_length=30, required=False, allow_blank=True, default='')
     department_id = serializers.IntegerField(required=False, allow_null=True)
     designation_id = serializers.IntegerField(required=False, allow_null=True)
-    join_date = serializers.DateField()
+    reports_to_id = serializers.IntegerField(required=False, allow_null=True)
+    join_date = serializers.DateField(required=False, allow_null=True)
     probation_end_date = serializers.DateField(required=False, allow_null=True)
-    base_salary = serializers.DecimalField(max_digits=15, decimal_places=2, default=0)
-    employment_type = serializers.CharField(default='FULL_TIME')
+    base_salary = serializers.DecimalField(max_digits=15, decimal_places=2, required=False, default=0)
+    allowance = serializers.DecimalField(max_digits=15, decimal_places=2, required=False, default=0)
+    employment_type = serializers.CharField(required=False, default='FULL_TIME')
+    status = serializers.CharField(required=False, default='PROBATION')
+    notes = serializers.CharField(required=False, allow_blank=True, default='')

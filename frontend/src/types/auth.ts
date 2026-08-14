@@ -67,4 +67,73 @@ export type UserSettingsData = {
   smsNotificationActive?: boolean;
 };
 
+export interface CandidateDraft {
+  desiredJobTitle?: string;
+  careerId?: number | string;
+  cityId?: number | string;
+  typeOfWorkplace?: number;
+  salaryMin?: number;
+  salaryMax?: number;
+  expectedSalary?: number;
+  isSalaryNegotiable?: boolean;
+  experience?: number;
+  academicLevel?: number;
+  skills?: string[];
+  skillsSummary?: string;
+  fileId?: number | null;
+  fileName?: string;
+  fileUrl?: string;
+}
+
+export interface EmployerDraft {
+  companyName?: string;
+  logoId?: number | null;
+  logoUrl?: string;
+  taxCode?: string;
+  employeeSize?: number;
+  fieldOperation?: string;
+  cityId?: number | string;
+  districtId?: number | string;
+  address?: string;
+  websiteUrl?: string;
+  description?: string;
+  companyEmail?: string;
+  companyPhone?: string;
+  recruiterName?: string;
+  recruiterTitle?: string;
+  recruiterPhone?: string;
+  recruiterEmail?: string;
+  hiringNeeds?: string[];
+  gpkdFileId?: number | null;
+  gpkdFileName?: string;
+  gpkdFileUrl?: string;
+}
+
+export interface RecommendedJobPreview {
+  id: number;
+  jobName: string;
+  companyName: string;
+  companyLogo?: string;
+  cityName?: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  slug?: string;
+}
+
+export interface OnboardingStatusResponse {
+  isOnboarded: boolean;
+  onboardingStep: number;
+  roleName: string;
+  hasCompany: boolean;
+  profileCompleteness: number;
+  candidateDraft?: CandidateDraft | null;
+  employerDraft?: EmployerDraft | null;
+  hasExistingMembership?: boolean;
+  existingCompany?: {
+    companyId: number;
+    companyName: string;
+    roleName: string;
+  } | null;
+}
+
 

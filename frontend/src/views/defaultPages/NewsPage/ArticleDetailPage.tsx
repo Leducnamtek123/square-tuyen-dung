@@ -51,6 +51,18 @@ const formatDate = (value?: string | null) => {
 const buildAbsoluteUrl = (path: string) =>
   `${typeof window !== 'undefined' ? window.location.origin : ''}${path}`;
 
+const FIXED_ARTICLE_KEYS = [
+  'news.article.notFoundTitle',
+  'news.article.notFoundContent',
+  'news.article.backToNews',
+  'news.article.backToList',
+  'news.article.emptyContent',
+  'news.article.infoTitle',
+  'news.article.moreTitle',
+  'news.article.moreDescription',
+  'news.article.newsHomeCta',
+] as const;
+
 const ArticleDetailSkeleton = () => (
   <Stack spacing={3}>
     <Skeleton variant="rectangular" height={360} sx={{ borderRadius: 3 }} />

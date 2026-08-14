@@ -59,6 +59,7 @@ class Employee(CommonBaseModel):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="employees")
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="employee_profile")
     candidate_profile = models.ForeignKey(JobSeekerProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name="employees")
+    onboarded_from_activity = models.ForeignKey('job.JobPostActivity', on_delete=models.SET_NULL, null=True, blank=True, related_name="converted_employees")
     
     employee_code = models.CharField(max_length=50, db_index=True)
     first_name = models.CharField(max_length=150)
