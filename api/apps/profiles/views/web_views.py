@@ -10,7 +10,7 @@ from shared.configs import variable_response as var_res
 
 from shared.configs.messages import NOTIFICATION_MESSAGES, ERROR_MESSAGES
 
-from django.db.models import Count, Q, Prefetch, Case, When, Value, IntegerField
+from django.db.models import Count, Q, Prefetch, Case, When, Value, IntegerField, F, ExpressionWrapper
 
 from django.db import transaction
 from django.utils import timezone
@@ -527,25 +527,51 @@ class ResumeViewSet(viewsets.ViewSet,
         company = user.active_company if getattr(user, 'is_authenticated', False) else None
 
         active_career_ids = []
+        active_city_ids = []
+        active_exp_ids = []
         job_keywords = []
+        target_job = None
+
         if company:
             from apps.jobs.models import JobPost
-            active_jobs = JobPost.objects.filter(
-                company=company,
-                status=var_sys.JobPostStatus.APPROVED
-            )
-            if not active_jobs.exists():
+            job_post_id = request.query_params.get('jobPostId') or request.query_params.get('job_post_id')
+            if job_post_id and str(job_post_id).isdigit():
+                target_job = JobPost.objects.filter(company=company, id=int(job_post_id)).first()
+
+            if target_job:
+                if target_job.career_id:
+                    active_career_ids = [target_job.career_id]
+                if target_job.location and target_job.location.city_id:
+                    active_city_ids = [target_job.location.city_id]
+                if target_job.experience:
+                    active_exp_ids = [target_job.experience]
+                
+                job_names = [target_job.job_name]
+            else:
                 active_jobs = JobPost.objects.filter(
-                    company=company
+                    company=company,
+                    status=var_sys.JobPostStatus.APPROVED
                 )
-            
-            active_career_ids = list(
-                active_jobs.exclude(career__isnull=True)
-                .values_list('career_id', flat=True)
-                .distinct()
-            )
-            
-            job_names = list(active_jobs.values_list('job_name', flat=True))
+                if not active_jobs.exists():
+                    active_jobs = JobPost.objects.filter(company=company)
+                
+                active_career_ids = list(
+                    active_jobs.exclude(career__isnull=True)
+                    .values_list('career_id', flat=True)
+                    .distinct()
+                )
+                active_city_ids = list(
+                    active_jobs.exclude(location__city__isnull=True)
+                    .values_list('location__city_id', flat=True)
+                    .distinct()
+                )
+                active_exp_ids = list(
+                    active_jobs.exclude(experience__isnull=True)
+                    .values_list('experience', flat=True)
+                    .distinct()
+                )
+                job_names = list(active_jobs.values_list('job_name', flat=True))
+
             ignored_words = {"nhân", "viên", "thực", "tập", "công", "ty", "tại", "cho", "vị", "trí", "tuyển", "dụng", "dự", "án"}
             for jn in job_names:
                 if jn:
@@ -559,20 +585,38 @@ class ResumeViewSet(viewsets.ViewSet,
             Q(job_seeker_profile__isnull=True) | Q(job_seeker_profile__is_seeking_job=True)
         )
 
-        whens = []
-        if active_career_ids:
-            whens.append(When(career_id__in=active_career_ids, then=Value(10)))
-        
-        for kw in job_keywords[:10]:
-            whens.append(When(title__icontains=kw, then=Value(5)))
+        career_whens = [When(career_id__in=active_career_ids, then=Value(35))] if active_career_ids else []
+        city_whens = [When(city_id__in=active_city_ids, then=Value(20))] if active_city_ids else []
+        exp_whens = [When(experience__in=active_exp_ids, then=Value(20))] if active_exp_ids else []
+        kw_whens = [When(title__icontains=kw, then=Value(15)) for kw in job_keywords[:10]]
 
-        if whens:
+        if career_whens or city_whens or exp_whens or kw_whens:
             base_qs = base_qs.annotate(
-                match_score=Case(*whens, default=Value(0), output_field=IntegerField())
+                score_career=Case(*career_whens, default=Value(0), output_field=IntegerField()),
+                score_city=Case(*city_whens, default=Value(0), output_field=IntegerField()),
+                score_exp=Case(*exp_whens, default=Value(0), output_field=IntegerField()),
+                score_kw=Case(*kw_whens, default=Value(0), output_field=IntegerField()),
+            ).annotate(
+                match_score=ExpressionWrapper(
+                    F('score_career') + F('score_city') + F('score_exp') + F('score_kw'),
+                    output_field=IntegerField()
+                )
             )
-            order_args = ('-match_score', '-id', '-update_at')
         else:
-            order_args = ('-id', '-update_at', '-create_at')
+            base_qs = base_qs.annotate(
+                match_score=Value(0, output_field=IntegerField())
+            )
+
+        ai_suggested = request.query_params.get('aiSuggested', '').lower() in ['true', '1']
+        if ai_suggested and (career_whens or city_whens or exp_whens or kw_whens):
+            base_qs = base_qs.filter(match_score__gte=20)
+
+        sort_param = request.query_params.get('sort', '').lower()
+        ordering_param = request.query_params.get('ordering', '')
+        if sort_param == 'newest' or ordering_param in ['-update_at', '-updateAt']:
+            order_args = ('-update_at', '-create_at', '-id')
+        else:
+            order_args = ('-match_score', '-update_at', '-id')
 
         queryset = self.filter_queryset(
             base_qs

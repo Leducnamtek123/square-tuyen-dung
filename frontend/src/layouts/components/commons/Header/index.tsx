@@ -109,7 +109,7 @@ const Header = (_props: HeaderProps) => {
     },
     {
       id: 'about-2',
-      label: 'AILA AI — Platform Phỏng vấn',
+      label: 'AILA AI - Platform Phỏng vấn',
       description: 'Truy cập giải pháp phỏng vấn giọng nói & video tự động tại aila.infohr.vn',
       path: 'https://aila.infohr.vn/',
       iconName: 'aila',
@@ -325,7 +325,7 @@ const Header = (_props: HeaderProps) => {
                 </React.Suspense>
               )}
 
-              {/* Auth buttons — hide on xs when not authenticated (available in drawer) */}
+              {/* Auth buttons - hide on xs when not authenticated (available in drawer) */}
               {!isAdminPortal && (
                 <Box sx={{ display: isAuthenticated ? 'flex' : { xs: 'none', sm: 'flex' } }}>
                   <HeaderAuthArea

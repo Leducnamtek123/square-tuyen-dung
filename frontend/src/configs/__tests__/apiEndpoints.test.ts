@@ -45,7 +45,7 @@ describe('apiEndpoints', () => {
       expect(isPublicEndpoint(url)).toBe(true);
     });
 
-    // Admin endpoints — MUST be private even under public prefixes
+    // Admin endpoints - MUST be private even under public prefixes
     it.each([
       'common/admin/careers/',
       'common/admin/careers/?page=1&pageSize=10',

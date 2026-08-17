@@ -196,7 +196,7 @@ export default function ClientAppRoot({ children }: { children: any }) {
     <ErrorBoundary>
       <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
           {children}
-          <ToastContainerAny autoClose={2500} transition={Bounce} position="top-right" theme="light" />
+          <ToastContainerAny autoClose={2500} transition={Bounce} position="top-right" theme="light" style={{ top: '72px' }} />
           {canShowChatBot && <ChatBot />}
       </GoogleOAuthProvider>
       <ScrollToTop />

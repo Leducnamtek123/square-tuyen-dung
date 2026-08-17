@@ -29,6 +29,8 @@ interface JobPostsTableProps {
   rowSelection?: RowSelectionState;
   onRowSelectionChange?: OnChangeFn<RowSelectionState>;
   variant?: 'card' | 'flat';
+  stickyHeader?: boolean;
+  maxHeight?: number | string;
 }
 
 const JobPostsTable = ({
@@ -46,6 +48,8 @@ const JobPostsTable = ({
   rowSelection,
   onRowSelectionChange,
   variant = 'card',
+  stickyHeader = true,
+  maxHeight,
 }: JobPostsTableProps) => {
 
   const { t } = useTranslation('employer');
@@ -339,6 +343,8 @@ const JobPostsTable = ({
       rowSelection={rowSelection}
       onRowSelectionChange={onRowSelectionChange}
       emptyMessage={t('jobPost.noData')}
+      stickyHeader={stickyHeader}
+      maxHeight={maxHeight}
     />
   );
 };

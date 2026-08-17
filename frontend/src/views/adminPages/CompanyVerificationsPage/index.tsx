@@ -155,9 +155,15 @@ const CompanyVerificationsPage = () => {
                         fullWidth
                       />
                     </TableCell>
-                    <TableCell sx={{ minWidth: 280 }}>
-                      <Stack direction={{ xs: 'column', lg: 'row' }} spacing={1} alignItems={{ xs: 'stretch', lg: 'center' }}>
-                        <Chip size="small" label={getStatusLabel(status)} color={statusColor(status)} variant="outlined" />
+                    <TableCell sx={{ minWidth: 300 }}>
+                      <Stack direction={{ xs: 'column', xl: 'row' }} spacing={1.25} alignItems={{ xs: 'stretch', xl: 'center' }}>
+                        <Chip
+                          size="small"
+                          label={getStatusLabel(status)}
+                          color={statusColor(status)}
+                          variant="outlined"
+                          sx={{ fontWeight: 700, borderRadius: '6px' }}
+                        />
                         <FormControl size="small" sx={{ minWidth: 130 }}>
                           <InputLabel>{t('pages.companyVerifications.table.status')}</InputLabel>
                           <Select
@@ -165,9 +171,10 @@ const CompanyVerificationsPage = () => {
                             value={status}
                             disabled={updateMutation.isPending || !row.id}
                             onChange={(event) => setStatuses((prev) => ({ ...prev, [rowId]: event.target.value as VerificationStatus }))}
+                            sx={{ borderRadius: '8px', fontSize: '0.85rem' }}
                           >
                             {STATUS_OPTIONS.map((item) => (
-                              <MenuItem key={item} value={item}>
+                              <MenuItem key={item} value={item} sx={{ fontSize: '0.85rem' }}>
                                 {getStatusLabel(item)}
                               </MenuItem>
                             ))}
@@ -178,6 +185,19 @@ const CompanyVerificationsPage = () => {
                           variant="contained"
                           disabled={updateMutation.isPending || !row.id}
                           onClick={() => handleUpdate(row, status, note)}
+                          sx={{
+                            minHeight: 38,
+                            px: 2,
+                            borderRadius: '8px',
+                            fontWeight: 700,
+                            fontSize: '0.8125rem',
+                            textTransform: 'none',
+                            whiteSpace: 'nowrap',
+                            boxShadow: 'none',
+                            '&:hover': {
+                              boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)',
+                            },
+                          }}
                         >
                           {t('pages.companyVerifications.actions.update')}
                         </Button>

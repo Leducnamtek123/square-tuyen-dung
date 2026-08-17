@@ -125,7 +125,7 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
             overflow: 'hidden',
             border: '1px solid',
             borderColor: alpha('#22c55e', 0.25),
-            bgcolor: '#000',
+            bgcolor: '#020617',
           }}
         >
           <VideoTrack
@@ -164,8 +164,8 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
             overflow: 'hidden',
             border: '1px solid',
             borderColor: alpha('#2563eb', 0.35),
-            boxShadow: screenTracks.length > 0 ? '0 8px 32px rgba(0,0,0,0.45)' : 'none',
-            bgcolor: '#000',
+            boxShadow: screenTracks.length > 0 ? '0 8px 32px rgba(2,6,23,0.45)' : 'none',
+            bgcolor: '#020617',
           }}
         >
           <VideoTrack

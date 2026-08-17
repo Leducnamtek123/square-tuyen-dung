@@ -1,5 +1,5 @@
 /**
- * Frontend E2E Tests — Interview Service Payload Validation
+ * Frontend E2E Tests - Interview Service Payload Validation
  * 
  * Ensures all API payloads use snake_case keys matching Django serializers.
  * This catches the camelCase vs snake_case mismatch bugs.
@@ -163,7 +163,7 @@ describe('ScheduleSessionInput type validation', () => {
       expect(validTypes).toContain(input.type);
     }
 
-    // 'live' is NOT a valid type — this was a previous bug
+    // 'live' is NOT a valid type - this was a previous bug
     // TypeScript would catch this at compile time now
     expect(validTypes).not.toContain('live');
   });

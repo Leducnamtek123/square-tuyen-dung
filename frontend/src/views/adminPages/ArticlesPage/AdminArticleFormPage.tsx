@@ -435,7 +435,20 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
                 fullWidth
                 startIcon={<ImageIcon />}
                 onClick={() => fileInputRef.current?.click()}
-                sx={{ height: 100, borderStyle: 'dashed' }}
+                sx={{
+                  height: 100,
+                  border: '1.5px solid #E2E8F0',
+                  bgcolor: '#F8FAFC',
+                  borderRadius: '14px',
+                  color: '#475569',
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  '&:hover': {
+                    borderColor: '#2563EB',
+                    bgcolor: '#EFF6FF',
+                    color: '#2563EB',
+                  },
+                }}
               >
                 {t('pages.articles.actions.chooseImage')}
               </Button>

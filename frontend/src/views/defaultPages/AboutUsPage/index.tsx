@@ -21,11 +21,15 @@ import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import ArchitectureIcon from '@mui/icons-material/Architecture';
+import EngineeringIcon from '@mui/icons-material/Engineering';
+import BoltIcon from '@mui/icons-material/Bolt';
 import { TabTitle } from '../../../utils/generalFunction';
 import { APP_NAME } from '../../../configs/constants';
 
 export default function AboutUsPage() {
-  TabTitle(`Về chúng tôi — Hệ sinh thái Tuyển dụng & Nhân sự ${APP_NAME}`);
+  TabTitle(`Về chúng tôi - Hệ sinh thái Tuyển dụng & Nhân sự ${APP_NAME}`);
 
   const infohrFeatures = [
     {
@@ -73,13 +77,13 @@ export default function AboutUsPage() {
             Giải Pháp Tuyển Dụng & Quản Trị Nhân Sự Số Hóa
           </Typography>
           <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 850, fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.7 }}>
-            InfoHR mang đến hệ sinh thái toàn diện kết nối tài năng, quản trị hồ sơ và số hóa quy trình nhân sự doanh nghiệp — hỗ trợ chuyên sâu <strong>4 ngành nghề trọng điểm</strong> (Xây dựng, Bất động sản, Kiến trúc / Thiết kế nội thất, Kỹ thuật & Cơ điện). Đồng thời tích hợp trực tiếp với nền tảng phỏng vấn AI thông minh <strong>AILA AI</strong>.
+            InfoHR mang đến hệ sinh thái toàn diện kết nối tài năng, quản trị hồ sơ và số hóa quy trình nhân sự doanh nghiệp - hỗ trợ chuyên sâu <strong>4 ngành nghề trọng điểm</strong> (Xây dựng, Bất động sản, Kiến trúc / Thiết kế nội thất, Kỹ thuật & Cơ điện). Đồng thời tích hợp trực tiếp với nền tảng phỏng vấn AI thông minh <strong>AILA AI</strong>.
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap" justifyContent="center" gap={1} sx={{ pt: 1 }}>
-            <Chip label="🏗️ Xây dựng" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', fontWeight: 600, border: '1px solid #BFDBFE' }} />
-            <Chip label="🏢 Bất động sản" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', fontWeight: 600, border: '1px solid #BFDBFE' }} />
-            <Chip label="📐 Kiến trúc / Thiết kế nội thất" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', fontWeight: 600, border: '1px solid #BFDBFE' }} />
-            <Chip label="⚡ Kỹ thuật & Cơ điện (MEP)" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', fontWeight: 600, border: '1px solid #BFDBFE' }} />
+            <Chip icon={<EngineeringIcon fontSize="small" sx={{ color: '#2563EB !important' }} />} label="Xây dựng" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', fontWeight: 600, border: '1px solid #BFDBFE' }} />
+            <Chip icon={<ApartmentIcon fontSize="small" sx={{ color: '#2563EB !important' }} />} label="Bất động sản" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', fontWeight: 600, border: '1px solid #BFDBFE' }} />
+            <Chip icon={<ArchitectureIcon fontSize="small" sx={{ color: '#2563EB !important' }} />} label="Kiến trúc / Thiết kế nội thất" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', fontWeight: 600, border: '1px solid #BFDBFE' }} />
+            <Chip icon={<BoltIcon fontSize="small" sx={{ color: '#2563EB !important' }} />} label="Kỹ thuật & Cơ điện (MEP)" sx={{ bgcolor: '#EFF6FF', color: '#1D4ED8', fontWeight: 600, border: '1px solid #BFDBFE' }} />
           </Stack>
         </Stack>
 
@@ -182,7 +186,7 @@ export default function AboutUsPage() {
                   </Avatar>
                   <Box>
                     <Typography variant="h5" sx={{ fontWeight: 800, color: '#0F172A' }}>
-                      2. AILA AI — Phỏng Vấn Thông Minh
+                      2. AILA AI - Phỏng Vấn Thông Minh
                     </Typography>
                     <Typography variant="caption" sx={{ color: '#FC054B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       Nền Tảng AI Phỏng Vấn Toàn Diện (aila.infohr.vn)

@@ -77,7 +77,7 @@ interface UrlLocation {
 /**
  * Simplified presignInObject: single-walk approach.
  *
- * 1. Deep clone the object first (safe — no cache mutation)
+ * 1. Deep clone the object first (safe - no cache mutation)
  * 2. Walk the clone once, collecting + replacing in-place
  *
  * This eliminates the fragile double-walk where clone tree order
@@ -97,7 +97,7 @@ export const presignInObject = async <T>(
     clone = (Array.isArray(value) ? [...value] : { ...value }) as T;
   }
 
-  // Phase 2: Single walk — collect all MinIO URL locations
+  // Phase 2: Single walk - collect all MinIO URL locations
   const locations: UrlLocation[] = [];
   const visited = new WeakSet();
 
@@ -135,7 +135,7 @@ export const presignInObject = async <T>(
     ),
   );
 
-  // Phase 4: Apply presigned URLs directly on the clone (safe — it's our copy)
+  // Phase 4: Apply presigned URLs directly on the clone (safe - it's our copy)
   for (const { path, presigned } of presignedResults) {
     if (typeof presigned !== 'string') continue;
 

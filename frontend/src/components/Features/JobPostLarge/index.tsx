@@ -48,16 +48,16 @@ const JobPostLarge = ({
       sx={{
         display: 'block',
         width: '100%',
-        boxShadow: 0,
+        boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)',
         cursor: 'pointer',
         color: 'inherit',
         textDecoration: 'none',
-        px: 2,
-        pt: 2,
-        pb: 1,
-        transition: 'all 0.3s ease',
-        borderRadius: 2.5,
-        border: `1px solid ${theme.palette.divider}`,
+        px: { xs: 2, sm: 2.75 },
+        pt: { xs: 2, sm: 2.5 },
+        pb: 1.5,
+        transition: 'transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease',
+        borderRadius: '20px',
+        border: '1px solid rgba(226, 232, 240, 0.85)',
         position: 'relative',
         overflow: 'hidden',
         backgroundColor:
@@ -72,19 +72,22 @@ const JobPostLarge = ({
             right: 0,
             width: '100%',
             height: '4px',
-            background: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.light})`,
+            background: `linear-gradient(90deg, #f97316, #fb923c)`,
           },
         }),
         '&:hover': {
           transform: 'translateY(-3px)',
-          boxShadow: theme.customShadows.large,
-          borderColor: isUrgent ? theme.palette.secondary.main : theme.palette.primary.main,
+          boxShadow: '0 25px 45px -10px rgba(15, 57, 127, 0.12)',
+          borderColor: isUrgent ? '#f97316' : '#2563eb',
           backgroundColor:
             theme.palette.mode === 'light'
               ? isUrgent
-                ? theme.palette.secondary.backgroundHover
-                : pc.primary( 0.02)
+                ? '#fffaf5'
+                : '#fbfcfe'
               : theme.palette.grey[800],
+        },
+        '&:active': {
+          transform: 'scale(0.99)',
         },
       }}
       aria-label={jobName || t('common:viewDetails')}

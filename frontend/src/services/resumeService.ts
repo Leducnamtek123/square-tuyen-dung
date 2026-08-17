@@ -26,6 +26,9 @@ export interface GetResumesParams {
   jobTypeId?: string | number;
   genderId?: string | number;
   maritalStatusId?: string | number;
+  jobPostId?: string | number;
+  aiSuggested?: boolean | string;
+  sort?: string;
   page?: number;
   pageSize?: number;
   ordering?: string;

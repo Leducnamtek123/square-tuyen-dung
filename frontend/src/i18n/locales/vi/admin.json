@@ -663,7 +663,8 @@
         "processingTitle": "Đang xử lý nhập hồ sơ",
         "completedMessage": "Đã nhập thành công các hồ sơ CV.",
         "failedMessage": "Có lỗi xảy ra trong quá trình nhập hồ sơ.",
-        "processingMessage": "Hệ thống đang tiến hành xử lý hồ sơ nền..."
+        "processingMessage": "Hệ thống đang tiến hành xử lý hồ sơ nền...",
+        "sourceUrlLabel": "[VI] sourceUrlLabel"
       },
       "bulkSelect": {
         "selectedCount": "Đã chọn {{count}} hồ sơ",
@@ -1169,56 +1170,6 @@
         "desc": "Gửi thông báo hệ thống qua email cho quản trị viên"
       },
       "interviewAi": {
-        "pacingTitle": "Nhịp phỏng vấn AI",
-        "pacingDescription": "Tinh chỉnh tốc độ nói của AI và thời gian chờ trước khi hỏi câu tiếp theo.",
-        "preset": {
-          "label": "Mẫu nhịp",
-          "helper": "Chọn một mẫu để điền sẵn các giá trị timing, hoặc chọn Tùy chỉnh để sửa tay.",
-          "options": {
-            "balanced": "Cân bằng",
-            "natural": "Tự nhiên",
-            "snappy": "Nhanh",
-            "custom": "Tùy chỉnh"
-          }
-        },
-        "questionGap": {
-          "label": "Khoảng chờ trước câu tiếp theo (giây)",
-          "helper": "Tăng giá trị này nếu AI hỏi quá nhanh khi ứng viên còn đang suy nghĩ."
-        },
-        "silenceThreshold": {
-          "label": "Ngưỡng im lặng tối thiểu (giây)",
-          "helper": "Giữ giá trị này lớn hơn 0 nếu muốn AI bớt chen vào quá sớm."
-        },
-        "ttsTitle": "Tốc độ TTS",
-        "ttsDescription": "Điều chỉnh tốc độ giọng AI khi phỏng vấn.",
-        "ttsSpeed": {
-          "label": "Tốc độ giọng",
-          "helper": "1.0 là bình thường. Giá trị thấp hơn sẽ chậm và dịu hơn, cao hơn sẽ nhanh hơn."
-        }
-      },
-      "apiTitle": "API & Dịch vụ bên ngoài",
-      "googleApiKey": "Google API Key",
-      "supportEmail": "Email hỗ trợ",
-      "summary": "Tóm tắt cấu hình",
-      "summaryText": "Vui lòng kiểm tra kỹ các thông tin cấu hình trước khi lưu. Các thay đổi có thể ảnh hưởng đến toàn bộ hệ thống ngay lập tức.",
-      "saveBtn": "Lưu thay đổi",
-      "notificationDemo": {
-        "title": "Demo thông báo",
-        "description": "Gửi một thông báo demo để kiểm tra cấu hình.",
-        "send": "Gửi thông báo demo",
-        "sending": "Đang gửi...",
-        "success": "Đã gửi thông báo demo.",
-        "error": "Gửi thông báo demo thất bại."
-      },
-      "healthCheck": {
-        "title": "Tình trạng hệ thống",
-        "description": "Kiểm tra kết nối cơ sở dữ liệu và bộ nhớ đệm.",
-        "check": "Kiểm tra",
-        "checking": "Đang kiểm tra...",
-        "database": "Cơ sở dữ liệu",
-        "redis": "Redis"
-      },
-      "interviewAi": {
         "pacingTitle": "Cấu Hình Nhịp Độ Phỏng Vấn AI (Voice AI Pacing)",
         "pacingDescription": "Tùy chỉnh tốc độ đọc câu hỏi phỏng vấn (TTS) và khoảng nghỉ nhận diện câu trả lời của ứng viên.",
         "preset": {
@@ -1245,6 +1196,28 @@
           "label": "Tốc độ đọc câu hỏi (TTS Speed)",
           "helper": "Tốc độ chuẩn: 0.92 (Từ 0.5 đến 2.0)"
         }
+      },
+      "apiTitle": "API & Dịch vụ bên ngoài",
+      "googleApiKey": "Google API Key",
+      "supportEmail": "Email hỗ trợ",
+      "summary": "Tóm tắt cấu hình",
+      "summaryText": "Vui lòng kiểm tra kỹ các thông tin cấu hình trước khi lưu. Các thay đổi có thể ảnh hưởng đến toàn bộ hệ thống ngay lập tức.",
+      "saveBtn": "Lưu thay đổi",
+      "notificationDemo": {
+        "title": "Demo thông báo",
+        "description": "Gửi một thông báo demo để kiểm tra cấu hình.",
+        "send": "Gửi thông báo demo",
+        "sending": "Đang gửi...",
+        "success": "Đã gửi thông báo demo.",
+        "error": "Gửi thông báo demo thất bại."
+      },
+      "healthCheck": {
+        "title": "Tình trạng hệ thống",
+        "description": "Kiểm tra kết nối cơ sở dữ liệu và bộ nhớ đệm.",
+        "check": "Kiểm tra",
+        "checking": "Đang kiểm tra...",
+        "database": "Cơ sở dữ liệu",
+        "redis": "Redis"
       },
       "fptGpu": {
         "title": "Container FPT GPU",
@@ -1897,6 +1870,12 @@
     "pagination": {
       "rowsPerPage": "Số dòng mỗi trang",
       "displayedRows": "{{from}}-{{to}} trên {{count}}"
+    },
+    "noOptions": "[VI] noOptions",
+    "autocomplete": {
+      "open": "[VI] open",
+      "close": "[VI] close",
+      "clear": "[VI] clear"
     }
   },
   "chat": {

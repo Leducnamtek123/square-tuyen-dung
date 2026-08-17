@@ -289,15 +289,6 @@ class JobActivityService:
                 activity.ai_analysis_progress = 0
                 activity.ai_analysis_summary = "Không thể khởi tạo tác vụ phân tích AI. Vui lòng thử lại."
                 activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
-        
-        # Auto-schedule AI Screening if Job Post has Interview Template
-        if job_post.interview_template_id:
-            try:
-                from apps.interviews.tasks import auto_schedule_screening_interview
-                auto_schedule_screening_interview.delay(activity.id)
-            except Exception as ex:
-                helper.print_log_error("auto schedule screening", ex)
-
         company = job_post.company
         domain = settings.DOMAIN_CLIENT["job_seeker"]
 

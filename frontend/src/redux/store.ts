@@ -11,7 +11,7 @@ import {
 } from '@/utils/storageKeys';
 
 // ---------------------------------------------------------------------------
-// Persistence middleware — keeps side effects OUT of reducers
+// Persistence middleware - keeps side effects OUT of reducers
 // ---------------------------------------------------------------------------
 
 const persistenceMiddleware = createListenerMiddleware();

@@ -1,5 +1,5 @@
 /**
- * Frontend E2E Tests — Route Localization
+ * Frontend E2E Tests - Route Localization
  * Tests that route segments are correctly translated between EN ↔ VI.
  */
 
@@ -140,7 +140,7 @@ describe('ROUTES constants have valid paths', () => {
   });
 
   it('TYPE_CHOICES in model only accepts technical/behavioral/mixed', () => {
-    // This is a documentation test — the frontend must send one of these
+    // This is a documentation test - the frontend must send one of these
     const VALID_TYPES = ['technical', 'behavioral', 'mixed'];
     // The value 'live' that was previously hardcoded is NOT valid
     expect(VALID_TYPES).not.toContain('live');

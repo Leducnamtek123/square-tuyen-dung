@@ -86,7 +86,7 @@ const ResumesPage = () => {
                         {info.getValue() as string}
                     </Typography>
                     <Typography variant="caption" color="textSecondary">
-                        {info.row.original.userDict?.fullName || '—'}
+                        {info.row.original.userDict?.fullName || '-'}
                     </Typography>
                 </Box>
             ),
@@ -99,7 +99,7 @@ const ResumesPage = () => {
         {
             accessorKey: 'createAt',
             header: t('pages.resumes.table.createdAt') as string,
-            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—',
+            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '-',
         },
         {
             id: 'actions',

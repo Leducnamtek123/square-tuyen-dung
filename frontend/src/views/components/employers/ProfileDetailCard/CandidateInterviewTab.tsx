@@ -69,7 +69,7 @@ export const CandidateInterviewTab: React.FC<CandidateInterviewTabProps> = ({ pr
             px: 2,
             borderRadius: '12px',
             bgcolor: '#F8FAFC',
-            border: '1px dashed #CBD5E1',
+            border: '1px solid #E2E8F0',
             textAlign: 'center',
           }}
         >

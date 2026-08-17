@@ -1240,6 +1240,28 @@ def analyze_resume_ai(self, activity_id):
 
         logger.info("AI Analysis completed for Activity %s. Score: %s", activity_id, activity.ai_analysis_score)
 
+        # Gatekeeper: Trigger automated AI interview only if candidate score meets or exceeds min_screening_score
+        try:
+            job_post = activity.job_post
+            if job_post and job_post.interview_template_id:
+                auto_interview = getattr(job_post, "auto_interview_enabled", True)
+                min_score = getattr(job_post, "min_screening_score", 70) or 70
+                score = activity.ai_analysis_score or 0
+                if auto_interview and score >= min_score:
+                    from apps.interviews.tasks import auto_schedule_screening_interview
+                    auto_schedule_screening_interview.delay(activity.id)
+                    logger.info(
+                        "Activity %s qualified for auto-interview (score %s >= %s). Queued screening interview invitation.",
+                        activity_id, score, min_score
+                    )
+                else:
+                    logger.info(
+                        "Activity %s did not qualify for auto-interview (score %s < %s or auto_interview_enabled is False).",
+                        activity_id, score, min_score
+                    )
+        except Exception as gate_exc:
+            logger.error("Error evaluating screening interview gatekeeper for activity %s: %s", activity_id, gate_exc)
+
     except (httpx.TimeoutException, httpx.ConnectError) as exc:
         max_r = 3  # matches retry_kwargs['max_retries']
         if (self.request.retries or 0) >= max_r:

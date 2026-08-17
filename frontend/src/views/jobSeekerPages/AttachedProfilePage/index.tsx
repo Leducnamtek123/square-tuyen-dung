@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from "react";
 import { Box, Card, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
@@ -17,6 +17,7 @@ const AttachedProfilePage = () => {
     TabTitle(t("attachedProfile.pageTitle"));
 
     const refs = React.useRef<(HTMLElement | null)[]>([]);
+    const [activeSection, setActiveSection] = React.useState<number>(0);
 
     const items = [
         { id: 0, value: t('attachedProfile.sections.personal'), icon: <PersonPinOutlinedIcon /> },
@@ -24,244 +25,185 @@ const AttachedProfilePage = () => {
         { id: 2, value: t('attachedProfile.sections.cv'), icon: <UploadFileOutlinedIcon /> },
     ];
 
+    React.useEffect(() => {
+        const observerOptions = {
+            root: null,
+            rootMargin: '-15% 0px -60% 0px',
+            threshold: 0,
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    const idx = refs.current.findIndex((el) => el === entry.target);
+                    if (idx !== -1) {
+                        setActiveSection(idx);
+                    }
+                }
+            });
+        }, observerOptions);
+
+        refs.current.forEach((ref) => {
+            if (ref) observer.observe(ref);
+        });
+
+        return () => {
+            observer.disconnect();
+        };
+    }, []);
+
     const handleClickScroll = (index: number) => {
+        setActiveSection(index);
         refs.current[index]?.scrollIntoView({ behavior: "smooth", block: "center" });
     };
 
     return (
-
         <Box sx={{ py: 2, px: { xs: 2, sm: 3 } }}>
-
             <Grid container spacing={3}>
-
                 <Grid
-
                     size={{
-
                         xs: 12,
-
                         sm: 12,
-
                         md: 7,
-
                         lg: 9,
-
                         xl: 9
-
                     }}>
-
                     <Stack spacing={3}>
+                        <Card
+                            ref={(el) => { refs.current[0] = el; }}
+                            sx={{
+                                '&:hover': {
+                                    boxShadow: (theme) => theme.customShadows.card,
+                                    borderColor: 'primary.main',
+                                    transition: 'all 0.3s ease'
+                                }
+                            }}
+                        >
+                            {/* Start: Personal info */}
+                            <PersonalInfoCard title={t('attachedProfile.sections.personal')} />
+                            {/* End: Personal info  */}
+                        </Card>
 
                         <Card
-
-                            ref={(el) => { refs.current[0] = el; }}
-
+                            ref={(el) => { refs.current[1] = el; }}
                             sx={{
-
                                 '&:hover': {
-
                                     boxShadow: (theme) => theme.customShadows.card,
-
                                     borderColor: 'primary.main',
-
                                     transition: 'all 0.3s ease'
-
                                 }
-
                             }}
-
                         >
-
-                            {/* Start: Personal info */}
-
-                            <PersonalInfoCard title={t('attachedProfile.sections.personal')} />
-
-                            {/* End: Personal info  */}
-
-                        </Card>
-
-                        <Card ref={(el) => { refs.current[1] = el; }}>
-
                             {/* Start: General info */}
-
                             <GeneralInfoCard title={t('attachedProfile.sections.general')} />
-
                             {/* End: General info */}
-
                         </Card>
 
-                        <Card ref={(el) => { refs.current[2] = el; }}>
-
+                        <Card
+                            ref={(el) => { refs.current[2] = el; }}
+                            sx={{
+                                '&:hover': {
+                                    boxShadow: (theme) => theme.customShadows.card,
+                                    borderColor: 'primary.main',
+                                    transition: 'all 0.3s ease'
+                                }
+                            }}
+                        >
                             {/* Start: Cv card */}
-
                             <CVCard title={t('attachedProfile.sections.cv')} />
-
                             {/* End: Cv card */}
-
                         </Card>
-
                     </Stack>
-
                 </Grid>
 
                 <Grid
-
                     sx={{
-
                         display: {
-
                             xs: 'none',
-
                             sm: 'none',
-
                             md: 'block'
-
                         }
-
                     }}
-
                     size={{
-
                         xs: 12,
-
                         sm: 12,
-
                         md: 5,
-
                         lg: 3,
-
                         xl: 3
-
                     }}>
-
                     <Stack
-
                         spacing={2}
-
                         sx={{
-
                             position: 'sticky',
-
                             top: 80,
-
                         }}
-
                     >
-
                         <Card
-
                             sx={{
-
                                 p: 3,
-
                                 background: (theme) => theme.palette.primary.main,
-
                                 color: 'white',
-
                                 border: 'none'
-
                             }}
-
                         >
-
                             <Stack spacing={2}>
-
                                 <Typography
-
                                     variant="h6"
-
                                     sx={{
-
                                         fontWeight: 600,
-
                                         color: 'inherit'
-
                                     }}
-
                                 >
-
                                     {t('attachedProfile.sidebar.title')}
-
                                 </Typography>
 
                                 <List sx={{ width: '100%' }}>
-
                                     {items.map((item) => (
-
                                         <ListItem
-
                                             key={item.id}
-
                                             disablePadding
-
                                             sx={{ mb: 1 }}
-
                                         >
-
                                             <ListItemButton
-
                                                 onClick={() => handleClickScroll(item.id)}
-
+                                                selected={activeSection === item.id}
                                                 sx={{
-
                                                     borderRadius: 2,
-
+                                                    bgcolor: activeSection === item.id ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
                                                     '&:hover': {
-
-                                                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-
-                                                    }
-
+                                                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                                                    },
+                                                    '&.Mui-selected': {
+                                                        backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                                                        '&:hover': {
+                                                            backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                                                        },
+                                                    },
                                                 }}
-
                                             >
-
                                                 <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
-
                                                     {item.icon}
-
                                                 </ListItemIcon>
-
                                                 <ListItemText
-
                                                     primary={item.value}
-
                                                     slotProps={{
-
                                                         primary: {
-
                                                             fontSize: '0.9rem',
-
-                                                            fontWeight: 500
-
+                                                            fontWeight: activeSection === item.id ? 700 : 500
                                                         }
-
                                                     }}
-
                                                 />
-
                                             </ListItemButton>
-
                                         </ListItem>
-
                                     ))}
-
                                 </List>
-
                             </Stack>
-
                         </Card>
-
                     </Stack>
-
                 </Grid>
-
             </Grid>
-
         </Box>
-
     );
-
 };
 
 export default AttachedProfilePage;

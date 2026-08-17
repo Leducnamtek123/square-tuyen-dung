@@ -11,24 +11,26 @@ const ProfilePage = () => {
 
   return (
     <Box sx={{ width: '100%', minWidth: 0, p: 0 }}>
-      <Box sx={{ mb: 2.5 }}>
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 800,
-            color: '#0F172A',
-            fontSize: { xs: "1.25rem", md: "1.5rem" },
-            letterSpacing: '-0.02em',
-          }}
-        >
-          {t('sidebar.findCandidates')}
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{ color: '#64748B', mt: 0.5, fontSize: '0.85rem' }}
-        >
-          Tìm và lọc ứng viên phù hợp với vị trí tuyển dụng của bạn
-        </Typography>
+      <Box sx={{ mb: 2.5, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, sm: { alignItems: 'center' }, justifyContent: 'space-between', gap: 1 }}>
+        <Box>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 800,
+              color: '#0F172A',
+              fontSize: { xs: "1.35rem", md: "1.65rem" },
+              letterSpacing: '-0.025em',
+            }}
+          >
+            {t('sidebar.findCandidates')}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ color: '#64748B', mt: 0.5, fontSize: '0.875rem', fontWeight: 500 }}
+          >
+            Tìm kiếm, đánh giá và khớp nối ứng viên tiềm năng phù hợp với tiêu chí tuyển dụng
+          </Typography>
+        </Box>
       </Box>
       <ProfileCard />
     </Box>

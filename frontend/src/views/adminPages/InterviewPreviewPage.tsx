@@ -338,7 +338,7 @@ export default function InterviewPreviewPage() {
   }[step];
 
   return (
-    <div className="min-h-screen bg-[#020617] p-4 md:p-6 text-white">
+    <div className="min-h-[100dvh] bg-[#020617] p-4 md:p-6 text-white">
       {/* Admin top bar */}
       <div className="mb-4 flex items-center justify-between rounded-2xl border border-white/8 bg-zinc-900/50 px-4 py-3 backdrop-blur-xl">
         <div>

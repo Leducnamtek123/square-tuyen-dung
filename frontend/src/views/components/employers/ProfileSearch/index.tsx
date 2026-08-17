@@ -80,6 +80,9 @@ export const ProfileSearchBar: React.FC<any> = (props) => (
     control={props.control}
     handleSubmit={props.handleSubmit}
     handleSearchSubmit={(data) => props.handleFilter?.(data)}
+    primaryFieldName={props.primaryFieldName || 'jobPostId'}
+    primaryFieldOptions={props.primaryFieldOptions || []}
+    primaryFieldPlaceholder={props.primaryFieldPlaceholder || (props.t ? props.t('employer:profileCard.aiMatch.jobPostSelector') : 'Khớp theo tin tuyển dụng...')}
     cityOptions={props.allConfig?.cityOptions || []}
     searchPlaceholder={props.t ? props.t('employer:profileSearch.placeholder.enterkeywords') : 'Nhập từ khóa...'}
     cityPlaceholder={props.t ? props.t('employer:profileSearch.placeholder.selectcityprovince') : 'Chọn tỉnh thành'}

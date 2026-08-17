@@ -244,9 +244,10 @@ const CareerFormDialog = ({
             <Paper
               variant="outlined"
               sx={{
-                p: 2,
-                borderStyle: 'dashed',
-                borderRadius: 2,
+                p: 2.5,
+                border: '1px solid #E2E8F0',
+                bgcolor: '#F8FAFC',
+                borderRadius: 3,
                 textAlign: 'center',
               }}
             >

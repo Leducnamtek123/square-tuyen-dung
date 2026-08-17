@@ -463,7 +463,7 @@ const VoiceProfilesPage = () => {
           <Box>
             <Typography fontWeight={700}>{profile.name}</Typography>
             <Typography variant="caption" color="text.secondary">
-              {profile.description || profile.presetVoiceId || profile.preset_voice_id || '—'}
+              {profile.description || profile.presetVoiceId || profile.preset_voice_id || '-'}
             </Typography>
           </Box>
         );

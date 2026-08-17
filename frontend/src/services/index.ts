@@ -1,5 +1,5 @@
 // =============================================================================
-// Services Index — Domain-based re-exports
+// Services Index - Domain-based re-exports
 // =============================================================================
 // This file re-exports all services so existing imports still work.
 // New code should import from domain subfolders:

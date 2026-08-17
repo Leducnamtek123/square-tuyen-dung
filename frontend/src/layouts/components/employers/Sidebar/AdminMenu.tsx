@@ -220,9 +220,9 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
             <MenuItem text={t('admin:sidebar.trustReports')} to={routePath(ROUTES.ADMIN.TRUST_REPORTS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.TRUST_REPORTS) }} />
             <MenuItem text={t('admin:sidebar.activityLogs')} to={routePath(ROUTES.ADMIN.JOB_ACTIVITY)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.JOB_ACTIVITY) }} />
             <MenuItem text={t('admin:sidebar.interviewSchedule')} to={routePath(ROUTES.ADMIN.INTERVIEWS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.INTERVIEWS) }} />
-            <MenuItem icon={RecordVoiceOverOutlinedIcon} text={t('admin:sidebar.voiceProfiles')} to={routePath(ROUTES.ADMIN.VOICE_PROFILES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.VOICE_PROFILES) }} />
+            <MenuItem text={t('admin:sidebar.voiceProfiles')} to={routePath(ROUTES.ADMIN.VOICE_PROFILES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.VOICE_PROFILES) }} />
             <MenuItem text={t('admin:sidebar.jobNotifications')} to={routePath(ROUTES.ADMIN.JOB_NOTIFICATIONS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.JOB_NOTIFICATIONS) }} />
-            <MenuItem icon={VideoLibraryIcon} text={t('admin:sidebar.interviewPreview')} to={routePath(ROUTES.ADMIN.INTERVIEW_PREVIEW)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.INTERVIEW_PREVIEW) }} />
+            <MenuItem text={t('admin:sidebar.interviewPreview')} to={routePath(ROUTES.ADMIN.INTERVIEW_PREVIEW)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.INTERVIEW_PREVIEW) }} />
           </List>
         </Collapse>
       )}

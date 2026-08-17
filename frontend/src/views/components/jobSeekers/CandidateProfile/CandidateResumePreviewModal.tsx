@@ -252,11 +252,11 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
                 {experiences.map((exp, idx) => (
                   <Box key={idx} sx={{ pl: 2, borderLeft: '3px solid #2563eb' }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
-                      {exp.jobName} {exp.companyName ? `— ${exp.companyName}` : ''}
+                      {exp.jobName} {exp.companyName ? `- ${exp.companyName}` : ''}
                     </Typography>
                     {(exp.startDate || exp.endDate) && (
                       <Typography variant="caption" sx={{ color: '#2563eb', fontWeight: 700, display: 'block', my: 0.25 }}>
-                        {exp.startDate || '—'} — {exp.endDate || 'Hiện tại'}
+                        {exp.startDate || '-'} - {exp.endDate || 'Hiện tại'}
                       </Typography>
                     )}
                     {exp.description && (

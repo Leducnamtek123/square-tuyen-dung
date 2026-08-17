@@ -192,7 +192,7 @@ const JobActivityPage = () => {
             accessorKey: 'createAt',
             header: t('pages.jobActivity.table.updatedAt') as string,
             enableSorting: true,
-            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '—',
+            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '-',
         },
         {
             id: 'actions',

@@ -112,14 +112,14 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
         direction={{ xs: 'column', sm: 'row' }}
         alignItems={{ xs: 'flex-start', sm: 'center' }}
         justifyContent="space-between"
-        spacing={3}
-        mb={6}
+        spacing={2.5}
+        mb={3}
       >
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px' }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '-0.02em' }}>
             {displayTitle}
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, mt: 0.5, opacity: 0.8 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500, mt: 0.5 }}>
             {t('interview:interviewListCard.description', { count })}
           </Typography>
         </Box>
@@ -130,13 +130,12 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
           component={Link}
           href={createHref}
           sx={{
-            
-            px: 4,
-            py: 1.5,
+            px: 3.5,
+            py: 1.25,
             boxShadow: (theme) => theme.customShadows?.primary,
-            fontWeight: 900,
+            fontWeight: 800,
             textTransform: 'none',
-            fontSize: '0.95rem',
+            fontSize: '0.9rem',
           }}
         >
           {t('interview:interviewListCard.scheduleInterview')}
@@ -154,6 +153,8 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
         sorting={sorting}
         onSortingChange={onSortingChange as OnChangeFn<SortingState>}
         emptyMessage={t('interview:interviewListCard.noInterviews')}
+        stickyHeader
+        maxHeight="calc(100vh - 280px)"
       />
 
       {isMutating && <BackdropLoading />}

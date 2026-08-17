@@ -307,7 +307,7 @@ const JobDetailPage = () => {
           facebook: {
             url: (typeof window !== 'undefined' ? window.location.href : ''),
             quote: state.jobPostDetail?.jobName,
-            hashtag: "#Project",
+            hashtag: "#InfoHR",
           },
           facebookMessenger: {
             url: (typeof window !== 'undefined' ? window.location.href : ''),
@@ -316,12 +316,12 @@ const JobDetailPage = () => {
             url: (typeof window !== 'undefined' ? window.location.href : ''),
             title: state.jobPostDetail?.jobName,
             summary: state.jobPostDetail?.jobDescription,
-            source: "Project",
+            source: "InfoHR",
           },
           twitter: {
             url: (typeof window !== 'undefined' ? window.location.href : ''),
             title: state.jobPostDetail?.jobName,
-            hashtags: ["Project", "tuyendung"],
+            hashtags: ["InfoHR", "tuyendung"],
           },
           email: {
             url: (typeof window !== 'undefined' ? window.location.href : ''),

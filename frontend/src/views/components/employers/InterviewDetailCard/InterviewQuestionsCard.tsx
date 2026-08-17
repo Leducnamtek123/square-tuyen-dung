@@ -82,7 +82,7 @@ const InterviewQuestionsCard: React.FC<InterviewQuestionsCardProps> = ({ session
             </Box>
           ))
         ) : (
-          <Box sx={{ textAlign: 'center', py: 5, ...interviewDetailPanelSx, borderStyle: 'dashed', bgcolor: pc.actionDisabled(0.025) }}>
+          <Box sx={{ textAlign: 'center', py: 5, ...interviewDetailPanelSx, borderStyle: 'solid', borderWidth: 1, borderColor: '#E2E8F0', bgcolor: pc.actionDisabled(0.025) }}>
             <HelpOutlineIcon sx={{ fontSize: 38, color: 'text.disabled', mb: 1.5, opacity: 0.35 }} />
             <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 750 }}>
               {t('interviewDetail.messages.noQuestions')}

@@ -77,22 +77,25 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
             href={localizeRoutePath(kpi.path, i18n.language)}
             elevation={0}
             sx={{
-              p: 2.25,
-              borderRadius: '16px',
-              border: '1px solid #e2e8f0',
+              p: 2.5,
+              borderRadius: '20px',
+              border: '1px solid rgba(226, 232, 240, 0.85)',
               backgroundColor: '#ffffff',
-              boxShadow: '0 4px 20px -2px rgba(0,0,0,0.03)',
+              boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               textDecoration: 'none',
               color: 'inherit',
-              transition: 'all 0.2s ease-in-out',
+              transition: 'transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease, border-color 180ms ease',
               height: '100%',
               '&:hover': {
                 borderColor: '#2563eb',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 8px 24px -4px rgba(37,99,235,0.12)',
+                transform: 'translateY(-3px)',
+                boxShadow: '0 20px 35px -5px rgba(37, 99, 235, 0.12)',
+              },
+              '&:active': {
+                transform: 'scale(0.99)',
               },
             }}
           >
@@ -100,9 +103,9 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.5 }}>
                 <Box
                   sx={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: '10px',
+                    width: 38,
+                    height: 38,
+                    borderRadius: '12px',
                     backgroundColor: kpi.bgColor,
                     display: 'flex',
                     alignItems: 'center',
@@ -116,7 +119,7 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
                   sx={{
                     fontWeight: 700,
                     color: '#475569',
-                    fontSize: '0.8rem',
+                    fontSize: '0.825rem',
                     lineHeight: 1.3,
                   }}
                 >
@@ -142,7 +145,9 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
               sx={{
                 fontWeight: 800,
                 color: '#0f172a',
-                fontSize: '1.5rem',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '1.625rem',
+                letterSpacing: '-0.02em',
                 ml: 1,
               }}
             >

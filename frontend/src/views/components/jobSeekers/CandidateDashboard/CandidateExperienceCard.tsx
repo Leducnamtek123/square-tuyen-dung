@@ -81,7 +81,7 @@ const CandidateExperienceCard = ({ resume }: CandidateExperienceCardProps) => {
 
               {(exp.startDate || exp.endDate) && (
                 <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.8rem', display: 'block', mb: 1 }}>
-                  {exp.startDate || '—'} - {exp.endDate || 'Hiện tại'}
+                  {exp.startDate || '-'} - {exp.endDate || 'Hiện tại'}
                 </Typography>
               )}
 

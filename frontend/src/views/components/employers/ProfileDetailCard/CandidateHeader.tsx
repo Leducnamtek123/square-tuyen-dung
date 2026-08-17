@@ -84,7 +84,7 @@ export const CandidateHeader: React.FC<CandidateHeaderProps> = ({
     }
   };
 
-  const code = candidateCode || (profileDetail.id ? `UV${String(profileDetail.id).padStart(8, '0')}` : '—');
+  const code = candidateCode || (profileDetail.id ? `UV${String(profileDetail.id).padStart(8, '0')}` : '-');
 
   return (
     <Paper

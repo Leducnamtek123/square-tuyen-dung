@@ -382,7 +382,13 @@
     "resendIn": "Resend code in...",
     "title": "Title",
     "body": "Body",
-    "label": "Label"
+    "label": "Label",
+    "welcomeBack": "Welcome Back",
+    "errorTitle": "Error Title",
+    "successTitle": "Success Title",
+    "forgotPassword": "Forgot Password",
+    "noAccount": "No Account",
+    "signUp": "Sign Up"
   },
   "form": {
     "phoneNumber": "Your phone number",
@@ -416,7 +422,8 @@
     "districtPlaceholder": "District Placeholder",
     "address": "Address",
     "addressPlaceholder": "Address Placeholder",
-    "addressHelper": "Address Helper"
+    "addressHelper": "Address Helper",
+    "selectCityFirst": "Select City First"
   },
   "loadPreviousMessages": "Load previous messages",
   "typeAMessage": "Type a message...",
@@ -427,11 +434,36 @@
   "appliedResume": {
     "ai": {
       "viewAnalysis": "View AI Analysis",
-      "failed": "AI analysis failed"
+      "failed": "Analysis failed",
+      "resumeTitle": "Resume Title",
+      "onlineResumeLabel": "Online Resume Label",
+      "onlineResumeHint": "Online Resume Hint",
+      "viewOnlineProfile": "View Online Profile",
+      "scanStatusScanning": "Scan Status Scanning",
+      "scanStatusIdle": "Scan Status Idle",
+      "openCV": "Open C V",
+      "scanning": "Scanning",
+      "scanProgress": "Scan Progress",
+      "failedTitle": "Failed Title",
+      "retry": "Retry",
+      "idleTitle": "Idle Title",
+      "idleHint": "Idle Hint",
+      "startScan": "Start Scan",
+      "completeTitle": "Complete Title",
+      "overviewTitle": "Overview Title",
+      "noEvaluation": "No Evaluation",
+      "prosTitle": "Pros Title",
+      "consTitle": "Cons Title",
+      "matchingSkillsTitle": "Matching Skills Title",
+      "missingSkillsTitle": "Missing Skills Title",
+      "allSkillsTitle": "All Skills Title",
+      "reanalyze": "Reanalyze",
+      "drawerTitle": "Drawer Title",
+      "loading": "Loading"
     },
     "email": {
       "resendTooltip": "Resend email",
-      "sendTooltip": "Send email"
+      "sendTooltip": "Send feedback"
     },
     "table": {
       "profileName": "Profile Name",
@@ -446,9 +478,16 @@
       "actions": "Actions",
       "tooltips": {
         "view": "View profile",
-        "delete": "Delete profile"
+        "delete": "Delete profile",
+        "scheduleInterview": "Schedule Interview"
       },
-      "noCandidates": "No candidates have applied yet"
+      "noCandidates": "No candidates have applied yet",
+      "clickToDownload": "Click To Download"
+    },
+    "status": {
+      "errorTitle": "Error Title",
+      "errorMsg": "Error Msg",
+      "rollbackMsg": "Rollback Msg"
     }
   },
   "companyProfile": {
@@ -494,7 +533,8 @@
       "selectdistrict": "Select district",
       "enteraddress": "Enter address",
       "enterlatitudecoordinateonthemap": "Enter latitude coordinate on the map.",
-      "enterlongitudecoordinateonthemap": "Enter longitude coordinate on the map."
+      "enterlongitudecoordinateonthemap": "Enter longitude coordinate on the map.",
+      "selectCityFirst": "Select City First"
     },
     "helperText": {
       "automaticallyfilledifyouchooseasuggestedaddress": "Automatically filled if you choose a suggested address."
@@ -526,11 +566,12 @@
       "comments": "Detailed Comments",
       "proposedSalary": "Proposed Salary (VND)",
       "submitEvaluation": "Submit Final Evaluation",
-      "openRecording": "Open recording"
+      "openRecording": "Open recording",
+      "commentsPlaceholder": "Comments Placeholder"
     },
     "subtitle": {
-      "analysis": "AI Analysis",
-      "questions": "Question List",
+      "analysis": "Analysis Results",
+      "questions": "Suggested Questions",
       "transcript": "Conversation Transcript",
       "aiEvaluation": "AI Evaluation Result",
       "info": "Interview Information",
@@ -546,7 +587,15 @@
       "candidate": "CANDIDATE",
       "position": "POSITION",
       "type": "INTERVIEW TYPE",
-      "schedule": "SCHEDULE"
+      "schedule": "SCHEDULE",
+      "aiOverallQuality": "Ai Overall Quality",
+      "softSkills": "Soft Skills",
+      "confidence": "Confidence",
+      "clarity": "Clarity",
+      "tone": "Tone",
+      "culturalFit": "Cultural Fit",
+      "questionPerformance": "Question Performance",
+      "question": "Question"
     },
     "title": "Online Interview Details"
   },
@@ -557,7 +606,10 @@
       "title": "Job Post Title",
       "createdDate": "Created Date",
       "creator": "Creator"
-    }
+    },
+    "timeLeft": "Time Left",
+    "manageSubtitle": "Manage post details",
+    "remaining": "Remaining"
   },
   "jobPostForm": {
     "section": {
@@ -587,7 +639,8 @@
       "address": "Address",
       "contactpersonname": "Contact Person Name",
       "contactpersonphone": "Contact Person Phone",
-      "contactpersonemail": "Contact Person Email"
+      "contactpersonemail": "Contact Person Email",
+      "interviewtemplate": "Interviewtemplate"
     },
     "placeholder": {
       "enterjobtitle": "Enter job title",
@@ -606,7 +659,9 @@
       "enteraddress": "Enter address",
       "entercontactpersonname": "Enter contact person name",
       "entercontactpersonphone": "Enter contact person phone",
-      "entercontactpersonemail": "Enter contact person email"
+      "entercontactpersonemail": "Enter contact person email",
+      "selectinterviewtemplate": "Selectinterviewtemplate",
+      "selectCityFirst": "Select City First"
     },
     "label": {
       "isUrgent": "Urgent Hiring"
@@ -651,7 +706,10 @@
       "contactpersonphoneexceededallowedlength": "Contact person phone exceeded allowed length.",
       "contactpersonemailisrequired": "Contact person email is required.",
       "invalidemail": "Invalid email.",
-      "contactpersonemailexceededallowedlength": "Contact person email exceeded allowed length."
+      "contactpersonemailexceededallowedlength": "Contact person email exceeded allowed length.",
+      "interviewtemplateinvalid": "Interviewtemplateinvalid",
+      "choiceInvalid": "Choice Invalid",
+      "salaryTooLarge": "Salary Too Large"
     }
   },
   "minimum-wage-comparison": "Minimum wage",
@@ -686,7 +744,10 @@
       "workExperience": "Work Experience",
       "generalInfo": "General Information",
       "languages": "Languages",
-      "personalInfo": "Personal Information"
+      "personalInfo": "Personal Information",
+      "profileNotFound": "Profile Not Found",
+      "privateProfile": "Private Profile",
+      "profileDetail": "Profile Detail"
     },
     "messages": {
       "noAttachedFile": "No attached file"
@@ -718,7 +779,8 @@
     "missingInvite": "Missing invitation",
     "missingSessionId": "Missing session ID",
     "invalidSession": "Invalid session",
-    "tokenMissing": "Authentication token missing"
+    "tokenMissing": "Authentication token missing",
+    "mic_denied": "Mic_denied"
   },
   "pages": {
     "interviews": {
@@ -734,6 +796,90 @@
         "actionFailed": "Action Failed",
         "roleUpdated": "Role Updated",
         "roleUpdateFailed": "Role Update Failed"
+      },
+      "scheduleInterviewDialog": {
+        "success": "Success",
+        "error": "Error",
+        "questionFallback": "Question Fallback",
+        "title": "Title",
+        "timeLabel": "Time Label",
+        "questionsLabel": "Questions Label",
+        "questionsPlaceholder": "Questions Placeholder",
+        "notesLabel": "Notes Label",
+        "notesPlaceholder": "Notes Placeholder",
+        "cancelBtn": "Cancel Btn",
+        "schedulingBtn": "Scheduling Btn",
+        "submitBtn": "Submit Btn"
+      }
+    },
+    "banners": {
+      "deleteTitle": "Delete Title",
+      "deleteConfirm": "Delete Confirm",
+      "cancel": "Cancel",
+      "deleting": "Deleting",
+      "delete": "Delete",
+      "addTitle": "Add Title",
+      "editTitle": "Edit Title",
+      "form": {
+        "description": "Description",
+        "buttonText": "Button Text",
+        "buttonLink": "Button Link",
+        "platform": "Platform",
+        "bannerType": "Banner Type",
+        "descLocation": "Desc Location",
+        "showButton": "Show Button",
+        "activeLabel": "Active Label",
+        "webImageLabel": "Web Image Label",
+        "chooseWeb": "Choose Web",
+        "mobileImageLabel": "Mobile Image Label",
+        "chooseMobile": "Choose Mobile"
+      },
+      "noWebImage": "No Web Image",
+      "errorLoadingImage": "Error Loading Image",
+      "noMobileImage": "No Mobile Image",
+      "saving": "Saving",
+      "save": "Save"
+    },
+    "companies": {
+      "deleteTitle": "Delete Title",
+      "cancelBtn": "Cancel Btn",
+      "deletingBtn": "Deleting Btn",
+      "deleteBtn": "Delete Btn",
+      "addConfirmTitle": "Add Confirm Title",
+      "editConfirmTitle": "Edit Confirm Title",
+      "companyNameLabel": "Company Name Label",
+      "taxCodeLabel": "Tax Code Label",
+      "employeeSizeLabel": "Employee Size Label",
+      "companyEmailLabel": "Company Email Label",
+      "companyPhoneLabel": "Company Phone Label",
+      "fieldOperationLabel": "Field Operation Label",
+      "websiteLabel": "Website Label",
+      "form": {
+        "since": "Since",
+        "cityId": "City Id",
+        "districtId": "District Id",
+        "wardId": "Ward Id",
+        "address": "Address"
+      },
+      "descriptionLabel": "Description Label",
+      "savingBtn": "Saving Btn",
+      "saveBtn": "Save Btn"
+    },
+    "jobNotifications": {
+      "deleteTitle": "Delete Title",
+      "deleteConfirm": "Delete Confirm",
+      "cancel": "Cancel",
+      "addNotification": "Add Notification",
+      "editNotification": "Edit Notification",
+      "form": {
+        "title": "Title",
+        "salary": "Salary",
+        "frequency": "Frequency",
+        "position": "Position",
+        "experience": "Experience",
+        "careerId": "Career Id",
+        "cityId": "City Id",
+        "isActive": "Is Active"
       }
     }
   },
@@ -765,7 +911,14 @@
     "allWorkplaces": "All Workplaces",
     "allGenders": "All Genders",
     "tabTitle": "Tab Title",
-    "recommendedJobs": "Recommended Jobs"
+    "recommendedJobs": "Recommended Jobs",
+    "savedAlert": {
+      "defaultName": "Default Name",
+      "success": "Success"
+    },
+    "saveSearch": "Save Search",
+    "resetFiltersAria": "Reset Filters Aria",
+    "closeAdvancedFiltersAria": "Close Advanced Filters Aria"
   },
   "profile": {
     "messages": {
@@ -796,7 +949,10 @@
     "followAt": "Follow At",
     "generalInfo": "General Info",
     "map": "Map",
-    "images": "Images"
+    "images": "Images",
+    "verified": "Verified",
+    "report": "Report",
+    "verifiedDescription": "Verified Description"
   },
   "jobDetail": {
     "actions": {
@@ -804,7 +960,8 @@
       "apply": "Apply",
       "saved": "Saved",
       "save": "Save",
-      "share": "Share"
+      "share": "Share",
+      "report": "Report"
     },
     "contactInfo": "Contact Info",
     "contactPerson": "Contact Person",
@@ -850,7 +1007,15 @@
     }
   },
   "controls": {
-    "end": "End"
+    "end": "End",
+    "muteMicrophone": "Mute Microphone",
+    "unmuteMicrophone": "Unmute Microphone",
+    "turnCameraOff": "Turn Camera Off",
+    "turnCameraOn": "Turn Camera On",
+    "stopScreenShare": "Stop Screen Share",
+    "startScreenShare": "Start Screen Share",
+    "ending": "Ending",
+    "enableAudio": "Enable Audio"
   },
   "sessionNotJoinable": "Session Not Joinable",
   "readyBody": "Ready Body",
@@ -882,7 +1047,8 @@
     }
   },
   "auto": {
-    "index_wwwInfoHRvn_9a21": "www.InfoHR.vn"
+    "index_wwwInfoHRvn_9a21": "www.InfoHR.vn",
+    "index_wwwsquarevn_9a21": "Index_wwwsquarevn_9a21"
   },
   "fileUpload": {
     "dragDropOrSelect": "Drag and drop file here or",
@@ -1037,5 +1203,220 @@
   "startCall": "Start Call",
   "welcomeMessage": "Hello! I am InfoHR AI Virtual Assistant. How can I help you today?",
   "setupHelpPrefix": "Need technical help? ",
-  "setupHelpLink": "View setup guide"
+  "setupHelpLink": "View setup guide",
+  "applyForm": {
+    "validation": {
+      "phoneMax": "Phone Max"
+    }
+  },
+  "EmptyCard": " Empty Card",
+  "profileDetail": {
+    "": ""
+  },
+  "signup": {
+    "heading": "Heading",
+    "jobSeekerSubtitle": "Job Seeker Subtitle",
+    "haveAccount": "Have Account",
+    "signIn": "Sign In"
+  },
+  "companySearch": {
+    "resetFiltersAria": "Reset Filters Aria"
+  },
+  "manualCandidate": {
+    "badge": "Badge",
+    "form": {
+      "jobPost": "Job Post",
+      "selectJobPost": "Select Job Post",
+      "cvFile": "Cv File",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Full Name Placeholder",
+      "title": "Title",
+      "titlePlaceholder": "Title Placeholder",
+      "email": "Email",
+      "emailPlaceholder": "Email Placeholder",
+      "phone": "Phone",
+      "phonePlaceholder": "Phone Placeholder",
+      "career": "Career",
+      "selectCareer": "Select Career",
+      "city": "City",
+      "selectCity": "Select City",
+      "experience": "Experience",
+      "selectExperience": "Select Experience",
+      "position": "Position",
+      "selectPosition": "Select Position",
+      "academicLevel": "Academic Level",
+      "selectAcademicLevel": "Select Academic Level",
+      "typeOfWorkplace": "Type Of Workplace",
+      "selectTypeOfWorkplace": "Select Type Of Workplace",
+      "jobType": "Job Type",
+      "selectJobType": "Select Job Type",
+      "salaryMin": "Salary Min",
+      "salaryMinPlaceholder": "Salary Min Placeholder",
+      "salaryMax": "Salary Max",
+      "salaryMaxPlaceholder": "Salary Max Placeholder",
+      "expectedSalary": "Expected Salary",
+      "expectedSalaryPlaceholder": "Expected Salary Placeholder",
+      "description": "Description",
+      "descriptionPlaceholder": "Description Placeholder",
+      "skillsSummary": "Skills Summary",
+      "skillsSummaryPlaceholder": "Skills Summary Placeholder",
+      "note": "Note",
+      "notePlaceholder": "Note Placeholder"
+    }
+  },
+  "employees": {
+    "hrm": {
+      "convert": {
+        "openEmployee": "Open Employee",
+        "action": "Action"
+      }
+    }
+  },
+  "viewMore": "View More",
+  "liveRoom": {
+    "participants": {
+      "employer": "Employer",
+      "observer": "Observer",
+      "candidate": "Candidate",
+      "guest": "Guest",
+      "you": "You",
+      "aiInterviewer": "Ai Interviewer"
+    },
+    "chat": {
+      "close": "Close",
+      "open": "Open",
+      "aiControlPlaceholder": "Ai Control Placeholder",
+      "placeholder": "Placeholder",
+      "aiControlSend": "Ai Control Send",
+      "send": "Send",
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "messagesCount": "Messages Count",
+      "noMessages": "No Messages",
+      "noMessagesDesc": "No Messages Desc",
+      "chatMode": "Chat Mode",
+      "aiControlMode": "Ai Control Mode",
+      "takeoverMode": "Takeover Mode",
+      "takeoverActive": "Takeover Active",
+      "takeoverInactive": "Takeover Inactive",
+      "takeoverTitle": "Takeover Title",
+      "takeoverHint": "Takeover Hint",
+      "takeoverSending": "Takeover Sending",
+      "takeoverRelease": "Takeover Release",
+      "takeoverAcquire": "Takeover Acquire"
+    },
+    "chips": {
+      "you": "You",
+      "ai": "Ai",
+      "employer": "Employer",
+      "live": "Live"
+    },
+    "observingBar": {
+      "hrObserving": "Hr Observing",
+      "hrWaiting": "Hr Waiting",
+      "employerObserving": "Employer Observing",
+      "live": "Live",
+      "waiting": "Waiting"
+    }
+  },
+  "profileCard": {
+    "messages": {
+      "saveSuccess": "Save Success",
+      "unsaveSuccess": "Unsave Success"
+    },
+    "title": {
+      "noresultsfound": "Noresultsfound"
+    }
+  },
+  "seo": {
+    "jobDetail": {
+      "titlePrefix": "Title Prefix",
+      "at": "At",
+      "reputableCompany": "Reputable Company",
+      "keywordsSuffix": "Keywords Suffix",
+      "breadcrumb": {
+        "home": "Home",
+        "jobs": "Jobs"
+      }
+    },
+    "jobList": {
+      "description": "Description",
+      "keywords": "Keywords"
+    },
+    "articleDetail": {
+      "description": "Description",
+      "breadcrumb": {
+        "home": "Home"
+      }
+    },
+    "newsList": {
+      "title": "Title",
+      "description": "Description"
+    }
+  },
+  "news": {
+    "category": {
+      "news": "News",
+      "blog": "Blog"
+    },
+    "article": {
+      "notFoundTitle": "Not Found Title",
+      "notFoundContent": "Not Found Content",
+      "backToNews": "Back To News",
+      "backToList": "Back To List",
+      "emptyContent": "Empty Content",
+      "infoTitle": "Info Title",
+      "moreTitle": "More Title",
+      "moreDescription": "More Description",
+      "newsHomeCta": "News Home Cta"
+    },
+    "views": "Views",
+    "emptyTitle": "Empty Title",
+    "emptyContent": "Empty Content"
+  },
+  "interviewLive": {
+    "table": {
+      "candidate": "Candidate",
+      "position": "Position",
+      "time": "Time"
+    },
+    "title": "Title",
+    "subtitle": "Subtitle",
+    "autoRefresh": {
+      "on": "On",
+      "off": "Off"
+    },
+    "updating": "Updating",
+    "activeNow": "Active Now",
+    "noData": {
+      "title": "Title",
+      "subtitle": "Subtitle"
+    }
+  },
+  "processingTitle": "Processing Title",
+  "processingBody": "Processing Body",
+  "preflight": {
+    "title": "Title",
+    "subtitle": "Subtitle",
+    "mic_ready": "Mic_ready",
+    "join": "Join"
+  },
+  "account": {
+    "pageTitle": "Page Title"
+  },
+  "onboarding": {
+    "validation": {
+      "desiredJobTitleRequired": "Desired Job Title Required",
+      "careerRequired": "Career Required",
+      "cityRequired": "City Required",
+      "skillsMin": "Skills Min",
+      "salaryRangeInvalid": "Salary Range Invalid"
+    }
+  },
+  "employerOnboarding": {
+    "validation": {
+      "companyNameRequired": "Company Name Required",
+      "recruiterNameRequired": "Recruiter Name Required"
+    }
+  }
 }

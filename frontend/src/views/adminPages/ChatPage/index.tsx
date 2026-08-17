@@ -121,7 +121,7 @@ const AdminChatPage = () => {
       accessorKey: 'lastMessage',
       cell: (info) => {
         const msg = info.getValue() as string | { content: string };
-        const content = typeof msg === 'string' ? msg : msg?.content || '—';
+        const content = typeof msg === 'string' ? msg : msg?.content || '-';
         return (
           <Typography
             variant="body2"
@@ -150,7 +150,7 @@ const AdminChatPage = () => {
       cell: (info) => (
         info.getValue() 
           ? dayjs(info.getValue() as string).format('DD/MM/YYYY') 
-          : '—'
+          : '-'
       ),
     },
     {
@@ -208,7 +208,7 @@ const AdminChatPage = () => {
             </Box>
             <Box>
               <Typography variant="h5" fontWeight={700} color={s.color}>
-                {isLoading ? '—' : s.value}
+                {isLoading ? '-' : s.value}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {s.label}
@@ -288,7 +288,7 @@ const AdminChatPage = () => {
                           {message.createAt ? ` · ${dayjs(message.createAt).format('DD/MM/YYYY HH:mm')}` : ''}
                         </Typography>
                         <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: 'pre-wrap' }}>
-                          {message.text || message.fileName || '—'}
+                          {message.text || message.fileName || '-'}
                         </Typography>
                         {safeAttachmentUrl && (
                           <Link href={safeAttachmentUrl} target="_blank" rel="noopener noreferrer" color="inherit" underline="always">

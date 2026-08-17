@@ -1,9 +1,9 @@
 export { default as DashboardPage } from './DashboardPage';
-// QuestionsPage removed — managed by employers, not admin
+// QuestionsPage removed - managed by employers, not admin
 export { default as UsersPage } from './UsersPage';
 export { default as JobsPage } from './JobsPage';
 export { default as InterviewsPage } from './InterviewsPage';
-// InterviewLivePage removed — managed by employers, not admin
+// InterviewLivePage removed - managed by employers, not admin
 export { default as SettingsPage } from './SettingsPage';
 export { default as VoiceProfilesPage } from './VoiceProfilesPage';
 export { default as CareersPage } from './CareersPage';
@@ -17,7 +17,7 @@ export { default as JobActivityPage } from './JobActivityPage';
 export { default as JobNotificationsPage } from './JobNotificationsPage';
 export { default as DistrictsPage } from './DistrictsPage';
 export { default as WardsPage } from './WardsPage';
-// QuestionGroupsPage removed — managed by employers, not admin
+// QuestionGroupsPage removed - managed by employers, not admin
 export { default as BannersPage } from './BannersPage';
 export { default as BannerTypesPage } from './BannerTypesPage';
 export { default as FeedbacksPage } from './FeedbacksPage';

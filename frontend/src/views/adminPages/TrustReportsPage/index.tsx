@@ -255,6 +255,8 @@ const TrustReportsPage = () => {
           sorting={sorting}
           onSortingChange={onSortingChange}
           emptyMessage={t('pages.trustReports.empty')}
+          stickyHeader
+          maxHeight="calc(100vh - 280px)"
         />
       </Paper>
     </Box>

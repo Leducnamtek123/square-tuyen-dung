@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────
-   LiveKit Components Styles — scoped to /interview/* pages only.
+   LiveKit Components Styles - scoped to /interview/* pages only.
    Using a local vendor copy of @livekit/components-styles to bypass
    Turbopack's "style" condition resolution issue with the package.
    ───────────────────────────────────────────────────────────────── */

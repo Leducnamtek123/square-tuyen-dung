@@ -52,6 +52,8 @@ interface AppliedResumeTableProps {
   rowSelection?: RowSelectionState;
   onRowSelectionChange?: OnChangeFn<RowSelectionState>;
   variant?: 'card' | 'flat';
+  stickyHeader?: boolean;
+  maxHeight?: number | string;
 }
 
 const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
@@ -74,6 +76,8 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     rowSelection,
     onRowSelectionChange,
     variant = 'card',
+    stickyHeader = true,
+    maxHeight,
   } = props;
   const { allConfig } = useConfig();
   const [openDrawerId, setOpenDrawerId] = useState<string | number | null>(null);
@@ -324,6 +328,8 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
         rowSelection={rowSelection}
         onRowSelectionChange={onRowSelectionChange}
         emptyMessage={t('appliedResume.table.noCandidates')}
+        stickyHeader={stickyHeader}
+        maxHeight={maxHeight}
       />
     </>
   );

@@ -49,7 +49,7 @@ export const JobPostLargeInfoChips = ({
         icon={faCircleDollarToSlot}
         style={{ fontSize: '16px', color: theme.palette.primary.main }}
       />
-      <Typography sx={labelSx(theme, 'primary')}>
+      <Typography sx={{ ...labelSx(theme, 'primary'), fontFamily: 'var(--font-mono)', letterSpacing: '-0.01em' }}>
         {formatLocalizedSalaryRange(salaryMin, salaryMax, salaryLanguage)}
       </Typography>
     </Box>

@@ -107,16 +107,19 @@ const CandidateSkillsCard: React.FC<CandidateSkillsCardProps> = ({
             onClick={() => setOpenModal(true)}
             sx={{
               borderRadius: '10px',
-              border: '1px dashed #cbd5e1',
-              color: '#2563eb',
+              border: '1px solid #BFDBFE',
+              backgroundColor: '#EFF6FF',
+              color: '#1D4ED8',
               fontWeight: 700,
               fontSize: '0.775rem',
               textTransform: 'none',
               px: 1.5,
               py: 0.5,
+              transition: 'all 0.2s ease',
               '&:hover': {
-                borderColor: '#2563eb',
-                backgroundColor: '#eff6ff',
+                borderColor: '#93C5FD',
+                backgroundColor: '#DBEAFE',
+                transform: 'translateY(-1px)',
               },
             }}
           >

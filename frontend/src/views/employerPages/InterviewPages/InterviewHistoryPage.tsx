@@ -363,9 +363,9 @@ const InterviewHistoryPage = () => {
             py: 10,
             textAlign: 'center',
             borderRadius: 4,
-            border: '1px dashed',
-            borderColor: 'divider',
-            bgcolor: 'transparent',
+            border: '1px solid #E2E8F0',
+            bgcolor: '#FFFFFF',
+            boxShadow: '0 4px 20px rgba(15, 23, 42, 0.04)',
           }}
         >
           <VideoLibraryIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2, opacity: 0.2 }} />

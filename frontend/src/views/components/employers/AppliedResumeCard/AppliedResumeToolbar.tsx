@@ -141,7 +141,7 @@ const AppliedResumeToolbar: React.FC<Props> = ({
             },
           }}
         >
-          {t('employer:appliedResume.filters')}
+          {t('employer:appliedResume.advancedFilter')}
           {totalFilterCount > 0 && (
             <Box
               component="span"

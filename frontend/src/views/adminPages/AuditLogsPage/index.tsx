@@ -355,6 +355,8 @@ export default function AuditLogsPage() {
           enableRowSelection
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
+          stickyHeader
+          maxHeight="calc(100vh - 280px)"
         />
       </Paper>
 

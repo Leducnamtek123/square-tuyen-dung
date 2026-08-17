@@ -277,7 +277,10 @@
       "applications": "Applications",
       "views": "Views",
       "status": "Status",
-      "actions": "Actions"
+      "actions": "Actions",
+      "title": "Title",
+      "createdDate": "Created Date",
+      "creator": "Creator"
     },
     "urgent": "Urgent",
     "noData": "You have no job posts yet",
@@ -684,6 +687,33 @@
       "updatedAt": "Updated: {{date}}",
       "viewsCount": "{{count}} views"
     },
+    "tabs": {
+      "findNewCandidates": "Find Candidates",
+      "aiSuggestedCandidates": "AI-Suggested Candidates",
+      "aiBeta": "AI Match"
+    },
+    "sort": {
+      "label": "Sort by:",
+      "mostSuitable": "Most suitable",
+      "newest": "Newest"
+    },
+    "aiMatch": {
+      "score": "AI Match: {{score}}%",
+      "badge": "{{score}}% Match",
+      "badgeText": "Match",
+      "highMatch": "Highly suitable",
+      "mediumMatch": "Suitable",
+      "jobPostSelector": "Match by job post...",
+      "allJobPosts": "All active job vacancies",
+      "insightsTitle": "AI Candidate Match Insights",
+      "insightsSubtitle": "Automated evaluation based on job post requirements and candidate profile",
+      "criteriaCareer": "Career & Position",
+      "criteriaLocation": "Location",
+      "criteriaExperience": "Experience",
+      "criteriaSalary": "Salary Expectations",
+      "matchingHighlights": "Matching Strengths",
+      "noAnalysisYet": "Candidate profile is being analyzed by AI."
+    },
     "messages": {
       "saveSuccess": "Saved successfully.",
       "unsaveSuccess": "Unsaved successfully."
@@ -808,7 +838,7 @@
   },
   "sidebar": {
     "dashboard": "Dashboard",
-    "agentAssistants": "AILA",
+    "agentAssistants": "AI Assistant (AILA)",
     "jobPostList": "Job Post List",
     "candidateManagement": "Candidate Management",
     "appliedApplications": "Applied Applications",
@@ -831,7 +861,15 @@
     "hrmEmployees": "Employee records",
     "hrmRoles": "Roles & permissions",
     "hrmMembers": "Company members",
-    "squareHrmAdmin": "Open HRM"
+    "squareHrmAdmin": "HRM Management",
+    "hrmManagement": "HRM Management",
+    "hrmDashboard": "Hrm Dashboard",
+    "hrmEmployeesList": "Hrm Employees List",
+    "hrmOnboarding": "Hrm Onboarding",
+    "hrmDepartments": "Hrm Departments",
+    "hrmContracts": "Hrm Contracts",
+    "hrmLeaves": "Hrm Leaves",
+    "hrmOrgChart": "Hrm Org Chart"
   },
   "interviewHistory": {
     "title": "Video Library",
@@ -1713,7 +1751,9 @@
       "address": "Detailed Address",
       "addressPlaceholder": "Building, street name, number...",
       "website": "Company Website",
-      "websitePlaceholder": "https://company.com"
+      "websitePlaceholder": "https://company.com",
+      "selectCityFirst": "Select City First",
+      "cityFirstHelper": "City First Helper"
     },
     "step2": {
       "title": "Recruiter Representative Information",

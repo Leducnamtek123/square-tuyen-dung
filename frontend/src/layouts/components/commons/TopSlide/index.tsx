@@ -120,18 +120,18 @@ const TopSlide = () => {
   return (
     <Box
       sx={{
-        width: '100vw',
-        mx: 'calc(50% - 50vw)',
-        minHeight: { xs: 560, md: 650 },
+        width: '100%',
+        minHeight: { xs: 520, md: 620 },
         height: {
           xs: `calc(100svh - ${HERO_HEADER_OFFSET.xs})`,
           sm: `calc(100svh - ${HERO_HEADER_OFFSET.sm})`,
         },
+        maxHeight: { md: 720 },
         position: 'relative',
         overflow: 'hidden',
         boxShadow: '0 16px 36px rgba(15, 23, 42, 0.10)',
         bgcolor: '#0f172a',
-        fontFamily: "'Plus Jakarta Sans', var(--font-be-vietnam-pro), sans-serif",
+        fontFamily: "var(--font-inter), 'Inter', sans-serif",
       }}
     >
       <Box
@@ -193,36 +193,65 @@ const TopSlide = () => {
               pointerEvents: 'auto',
             }}
           >
-            <Stack spacing={2}>
+            <Stack spacing={2.5}>
               <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-                <Typography
-                  variant="h4"
+                <Box
                   sx={{
-                    fontWeight: 900,
-                    fontSize: { xs: '1.4rem', sm: '1.85rem', md: '2.25rem' },
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    px: 1.75,
+                    py: 0.5,
+                    mb: 1.5,
+                    borderRadius: '9999px',
+                    bgcolor: 'rgba(255, 255, 255, 0.12)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    backdropFilter: 'blur(12px)',
+                    color: '#e0f2fe',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  <Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#38bdf8', boxShadow: '0 0 8px #38bdf8' }} />
+                  Nền tảng Tuyển dụng &amp; Phỏng vấn AI chuẩn xác
+                </Box>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 800,
+                    fontSize: { xs: '1.65rem', sm: '2.15rem', md: '2.65rem' },
                     color: '#ffffff',
-                    lineHeight: 1.25,
-                    textShadow: '0 2px 10px rgba(0, 0, 0, 0.45)',
-                    letterSpacing: '-0.02em',
+                    lineHeight: 1.2,
+                    textShadow: '0 2px 12px rgba(0, 0, 0, 0.5)',
+                    letterSpacing: '-0.025em',
                   }}
                 >
                   Chắp cánh sự nghiệp của bạn cùng{' '}
-                  <Box component="span" sx={{ color: '#f43f5e' }}>
-                    InfoHR!
+                  <Box
+                    component="span"
+                    sx={{
+                      background: 'linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #818cf8 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      fontWeight: 900,
+                    }}
+                  >
+                    InfoHR
                   </Box>
                 </Typography>
                 <Typography
                   variant="subtitle1"
                   sx={{
-                    fontWeight: 700,
-                    fontSize: { xs: '0.95rem', sm: '1.15rem' },
-                    color: '#f8fafc',
-                    opacity: 0.95,
-                    mt: 0.5,
+                    fontWeight: 500,
+                    fontSize: { xs: '0.92rem', sm: '1.08rem' },
+                    color: 'rgba(241, 245, 249, 0.92)',
+                    mt: 1,
+                    maxWidth: 620,
                     textShadow: '0 1px 6px rgba(0, 0, 0, 0.4)',
                   }}
                 >
-                  Kết nối ứng viên & nhà tuyển dụng nhanh nhất.
+                  Kết nối ứng viên tài năng &amp; nhà tuyển dụng hàng đầu qua hệ thống AI Matching thế hệ mới.
                 </Typography>
               </Box>
               <HomeSearch variant="hero" />

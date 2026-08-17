@@ -182,11 +182,13 @@ const CandidateAppliedResumeCard = ({
           onClick={() => fileInputRef.current?.click()}
           sx={{
             borderRadius: '10px',
-            color: '#2563eb',
+            border: '1px solid #BFDBFE',
+            backgroundColor: '#EFF6FF',
+            color: '#1D4ED8',
             fontWeight: 700,
             fontSize: '0.775rem',
             textTransform: 'none',
-            '&:hover': { backgroundColor: '#eff6ff' },
+            '&:hover': { backgroundColor: '#DBEAFE', borderColor: '#93C5FD' },
           }}
         >
           Tải CV mới
@@ -195,7 +197,7 @@ const CandidateAppliedResumeCard = ({
 
       {/* List of Multiple Resumes */}
       {items.length === 0 ? (
-        <Box sx={{ p: 4, textAlign: 'center', backgroundColor: '#f8fafc', borderRadius: '14px', border: '1px dashed #cbd5e1' }}>
+        <Box sx={{ p: 4, textAlign: 'center', backgroundColor: '#f8fafc', borderRadius: '14px', border: '1px solid #E2E8F0' }}>
           <Typography variant="body2" sx={{ color: '#64748b', mb: 1.5, fontWeight: 500 }}>
             Bạn chưa có hồ sơ ứng tuyển nào. Hãy tải CV mới từ máy tính để ứng tuyển công việc.
           </Typography>

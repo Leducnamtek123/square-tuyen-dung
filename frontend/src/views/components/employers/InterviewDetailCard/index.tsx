@@ -175,7 +175,7 @@ const InterviewDetailNotFound = ({
   actionLabel: string;
   onBack: () => void;
 }) => (
-  <Paper elevation={0} sx={{ textAlign: 'center', py: 10, px: 3, borderRadius: 2, bgcolor: 'background.paper', border: '1px dashed', borderColor: 'divider' }}>
+  <Paper elevation={0} sx={{ textAlign: 'center', py: 10, px: 3, borderRadius: 3, bgcolor: '#FFFFFF', border: '1px solid #E2E8F0', boxShadow: '0 4px 20px rgba(15, 23, 42, 0.04)' }}>
     <Typography color="text.primary" variant="h5" sx={{ fontWeight: 800, mb: 1, letterSpacing: 0 }}>
       {title}
     </Typography>

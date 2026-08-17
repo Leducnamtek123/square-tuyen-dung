@@ -277,7 +277,7 @@ const FeedbacksPage = () => {
               {user?.fullName?.charAt(0)?.toUpperCase() || '?'}
             </Avatar>
             <Box>
-              <Typography variant="body2" fontWeight={600}>{user?.fullName || '—'}</Typography>
+              <Typography variant="body2" fontWeight={600}>{user?.fullName || '-'}</Typography>
               <Typography variant="caption" color="text.secondary">{user?.email || ''}</Typography>
             </Box>
           </Box>
@@ -300,7 +300,7 @@ const FeedbacksPage = () => {
         const feedback = info.row.original;
         const evidenceImageUrl = feedback.evidenceImageUrl;
         if (!evidenceImageUrl) {
-          return <Typography variant="body2" color="text.secondary">—</Typography>;
+          return <Typography variant="body2" color="text.secondary">-</Typography>;
         }
 
         return (
@@ -352,7 +352,7 @@ const FeedbacksPage = () => {
       accessorFn: (row) => row.createAt,
       header: t('pages.feedbacks.table.createdAt') as string,
       enableSorting: true,
-      cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—',
+      cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '-',
     },
     {
       id: 'actions',

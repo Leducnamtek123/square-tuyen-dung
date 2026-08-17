@@ -83,7 +83,7 @@ const UserTable = ({
                             {user.fullName?.charAt(0)}
                         </Avatar>
                         <Box>
-                             <Typography variant="body2" sx={{ fontWeight: 600 }}>{user.fullName || '—'}</Typography>
+                             <Typography variant="body2" sx={{ fontWeight: 600 }}>{user.fullName || '-'}</Typography>
                              <Typography variant="caption" color="text.secondary">{user.email}</Typography>
                         </Box>
                     </Box>

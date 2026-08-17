@@ -60,19 +60,17 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
       <Stack spacing={2} direction="column">
         <Box
           sx={{
-            border: '2px dashed',
-            borderColor: 'rgba(42, 169, 225, 0.34)',
+            border: '1.5px solid #CBD5E1',
             borderRadius: 4,
             p: 3,
             textAlign: 'center',
-            bgcolor: 'background.paper',
+            bgcolor: '#F8FAFC',
             cursor: 'pointer',
             transition: 'all 0.2s ease-in-out',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.86)',
             '&:hover': {
-              borderColor: 'primary.main',
-              bgcolor: 'rgba(42, 169, 225, 0.04)',
-              boxShadow: '0 10px 24px rgba(26, 64, 125, 0.08)',
+              borderColor: '#2563EB',
+              bgcolor: '#EFF6FF',
+              boxShadow: '0 8px 24px rgba(37, 99, 235, 0.08)',
             }
           }}
           onClick={handleInputClick}

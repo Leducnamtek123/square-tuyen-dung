@@ -133,9 +133,9 @@ const VerificationLegalProfileForm = ({
             <Box
               sx={{
                 p: 3,
-                border: '2px dashed #cbd5e1',
+                border: '1.5px solid #CBD5E1',
                 borderRadius: '16px',
-                backgroundColor: '#f8fafc',
+                backgroundColor: '#F8FAFC',
                 textAlign: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.2s',

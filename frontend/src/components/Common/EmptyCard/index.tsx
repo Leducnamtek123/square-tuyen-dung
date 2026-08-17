@@ -15,8 +15,8 @@ const EmptyCard = ({ content, labelButton="Thêm mới", onClick }: EmptyCardPro
       sx={{
         p: { xs: 3.5, sm: 4.5 },
         borderRadius: '16px',
-        border: '1.5px dashed #CBD5E1',
-        backgroundColor: '#FFFFFF',
+        border: '1px solid #E2E8F0',
+        backgroundColor: '#F8FAFC',
         textAlign: 'center',
         display: 'flex',
         flexDirection: 'column',
@@ -25,9 +25,9 @@ const EmptyCard = ({ content, labelButton="Thêm mới", onClick }: EmptyCardPro
         gap: 2,
         transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
         '&:hover': {
-          borderColor: '#2563EB',
-          backgroundColor: '#F8FAFC',
-          boxShadow: '0 4px 16px -2px rgba(37, 99, 235, 0.08)',
+          borderColor: '#CBD5E1',
+          backgroundColor: '#FFFFFF',
+          boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.05)',
         },
       }}
     >

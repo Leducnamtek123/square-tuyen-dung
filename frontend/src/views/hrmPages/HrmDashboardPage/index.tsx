@@ -41,6 +41,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -683,8 +684,9 @@ export default function HrmDashboardPage() {
             <Box sx={{ pl: 2 }}>
               {orgChart.map((node) => (
                 <Box key={node.id} sx={{ mb: 2, p: 2, borderLeft: '3px solid #1976d2', bgcolor: '#f8fafc', borderRadius: 2 }}>
-                  <Typography variant="subtitle1" fontWeight={700} color="primary">
-                    🏢 {node.name} {node.code && `(${node.code})`}
+                  <Typography variant="subtitle1" fontWeight={700} color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                    <BusinessIcon fontSize="small" />
+                    {node.name} {node.code && `(${node.code})`}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     Trưởng phòng: {node.manager_name || 'Chưa gán'} | Quy mô: {node.employee_count} nhân viên
@@ -694,8 +696,9 @@ export default function HrmDashboardPage() {
                     <Box sx={{ pl: 3, mt: 1.5 }}>
                       {node.children.map((child) => (
                         <Box key={child.id} sx={{ mb: 1, p: 1.5, borderLeft: '2px solid #9c27b0', bgcolor: '#fff', borderRadius: 1 }}>
-                          <Typography variant="body2" fontWeight={600}>
-                            📂 {child.name} {child.code && `(${child.code})`}
+                          <Typography variant="body2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                            <FolderOutlinedIcon fontSize="small" color="secondary" />
+                            {child.name} {child.code && `(${child.code})`}
                           </Typography>
                         </Box>
                       ))}

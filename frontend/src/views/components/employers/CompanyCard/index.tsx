@@ -202,10 +202,10 @@ const CompanyCard = () => {
             <Typography
               variant="subtitle2"
               sx={{
-                color: 'primary.main',
-                fontSize: '0.75rem',
-                fontWeight: 900,
-                letterSpacing: 0,
+                color: '#475569',
+                fontSize: '0.8125rem',
+                fontWeight: 700,
+                letterSpacing: '0.02em',
                 textTransform: 'uppercase',
               }}
             >
@@ -253,10 +253,9 @@ const CompanyCard = () => {
                 sx={{
                   minHeight: 34,
                   width: '100%',
-                  
                   boxShadow: 'none',
                   color: 'white',
-                  fontWeight: 800,
+                  fontWeight: 700,
                   textTransform: 'none',
                 }}
               >
@@ -269,10 +268,10 @@ const CompanyCard = () => {
             <Typography
               variant="subtitle2"
               sx={{
-                color: 'primary.main',
-                fontSize: '0.75rem',
-                fontWeight: 900,
-                letterSpacing: 0,
+                color: '#475569',
+                fontSize: '0.8125rem',
+                fontWeight: 700,
+                letterSpacing: '0.02em',
                 textTransform: 'uppercase',
               }}
             >
@@ -302,12 +301,11 @@ const CompanyCard = () => {
                   position: 'absolute',
                   inset: 'auto 0 0',
                   height: 72,
-                  background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.46) 100%)',
+                  background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 100%)',
                 }}
               />
               <Button
                 variant="contained"
-                color="secondary"
                 size="small"
                 startIcon={<CameraAltOutlinedIcon />}
                 onClick={() => coverInputRef.current?.click()}
@@ -316,11 +314,17 @@ const CompanyCard = () => {
                   left: 14,
                   bottom: 14,
                   minHeight: 34,
-                  
-                  boxShadow: 'none',
-                  color: 'white',
-                  fontWeight: 800,
+                  bgcolor: 'rgba(15, 23, 42, 0.75)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                  color: '#FFFFFF',
+                  fontWeight: 700,
                   textTransform: 'none',
+                  '&:hover': {
+                    bgcolor: 'rgba(15, 23, 42, 0.9)',
+                    transform: 'translateY(-1px)',
+                  },
                 }}
               >
                 {t('companyProfile.labels.changeCover')}
@@ -329,7 +333,7 @@ const CompanyCard = () => {
           </Stack>
         </Box>
 
-        <Divider sx={{ borderStyle: 'dashed' }} />
+        <Divider sx={{ borderColor: '#E2E8F0', my: 1 }} />
 
         <Box>
           <CompanyForm

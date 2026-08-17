@@ -82,14 +82,14 @@ const ImagePreview = ({
           width,
           height: 80,
           borderRadius: 1,
-          border: '1px dashed',
-          borderColor: 'divider',
+          border: '1px solid',
+          borderColor: '#E2E8F0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: 'text.secondary',
           fontSize: 13,
-          bgcolor: 'action.hover',
+          bgcolor: '#F8FAFC',
         }}
       >
         {emptyText}
@@ -125,12 +125,13 @@ const ImagePreview = ({
           width,
           height: 80,
           borderRadius: 1,
-          border: '1px dashed',
-          borderColor: 'divider',
+          border: '1px solid',
+          borderColor: '#E2E8F0',
           alignItems: 'center',
           justifyContent: 'center',
           color: 'text.secondary',
           fontSize: 13,
+          bgcolor: '#F8FAFC',
         }}
       >
         {errorText}

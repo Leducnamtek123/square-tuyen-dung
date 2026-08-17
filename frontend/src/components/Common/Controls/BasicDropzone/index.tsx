@@ -41,9 +41,9 @@ const FileDropzone = ({ accept, onDrop, values, multiple = false }: FileDropzone
 
     <Box
       sx={{
-        borderStyle: 'dashed',
-        borderWidth: 2,
-        borderColor: '#94A3B8',
+        borderStyle: 'solid',
+        borderWidth: 1.5,
+        borderColor: '#CBD5E1',
         borderRadius: '16px',
         backgroundColor: '#F8FAFC',
         transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',

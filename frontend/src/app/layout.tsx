@@ -1,17 +1,21 @@
 import type { Metadata, Viewport } from 'next';
-import { Be_Vietnam_Pro } from 'next/font/google';
+import { Geist, Geist_Mono } from 'next/font/google';
 import ThemeRegistry from '../components/ThemeRegistry/ThemeRegistry';
 import { Providers } from './providers';
 import ClientAppRoot from './ClientAppRoot';
 import './globals.css';
 import './app-overrides.css';
 
-const beVietnamPro = Be_Vietnam_Pro({
-  subsets: ['latin', 'vietnamese'],
-  weight: ['300', '400', '500', '600', '700', '800'],
-  style: ['normal', 'italic'],
+const geistSans = Geist({
+  subsets: ['latin'],
   display: 'swap',
-  variable: '--font-be-vietnam-pro',
+  variable: '--font-sans',
+});
+
+const geistMono = Geist_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-mono',
 });
 
 export const metadata: Metadata = {
@@ -66,7 +70,7 @@ export default function RootLayout({
   children: any;
 }) {
   return (
-    <html lang="vi" className={`${beVietnamPro.variable}`} suppressHydrationWarning>
+    <html lang="vi" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -74,7 +78,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
       </head>
-      <body style={{ fontFamily: 'var(--font-be-vietnam-pro), sans-serif' }} suppressHydrationWarning>
+      <body style={{ fontFamily: 'var(--font-sans), var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }} suppressHydrationWarning>
         <div className="bg-atmosphere" />
         <ThemeRegistry>
           <Providers>

@@ -161,7 +161,7 @@ export default function StepResumeUpload({
             textAlign: 'center',
             cursor: isUploading ? 'default' : 'pointer',
             borderRadius: 4,
-            border: '2px dashed',
+            border: '1.5px solid',
             borderColor: isDragOver ? '#2563EB' : '#CBD5E1',
             backgroundColor: isDragOver ? 'rgba(37, 99, 235, 0.04)' : '#F8FAFC',
             transition: 'all 0.2s ease',

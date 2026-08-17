@@ -277,7 +277,10 @@
       "applications": "Lượt ứng tuyển",
       "views": "Lượt xem",
       "status": "Trạng thái",
-      "actions": "Thao tác"
+      "actions": "Thao tác",
+      "title": "[VI] title",
+      "createdDate": "[VI] createdDate",
+      "creator": "[VI] creator"
     },
     "urgent": "Gấp",
     "noData": "Bạn chưa có tin tuyển dụng nào",
@@ -684,6 +687,33 @@
       "updatedAt": "Cập nhật: {{date}}",
       "viewsCount": "{{count}} lượt xem"
     },
+    "tabs": {
+      "findNewCandidates": "Tìm kiếm ứng viên",
+      "aiSuggestedCandidates": "Ứng viên AI gợi ý",
+      "aiBeta": "AI Match"
+    },
+    "sort": {
+      "label": "Sắp xếp theo:",
+      "mostSuitable": "Phù hợp nhất",
+      "newest": "Mới nhất"
+    },
+    "aiMatch": {
+      "score": "Độ phù hợp AI: {{score}}%",
+      "badge": "{{score}}% Phù hợp",
+      "badgeText": "Phù hợp",
+      "highMatch": "Rất phù hợp",
+      "mediumMatch": "Phù hợp",
+      "jobPostSelector": "Khớp theo tin tuyển dụng...",
+      "allJobPosts": "Tất cả tin tuyển dụng đang mở",
+      "insightsTitle": "Đánh giá mức độ phù hợp bởi AI",
+      "insightsSubtitle": "Phân tích tự động dựa trên JD tin tuyển dụng và hồ sơ ứng viên",
+      "criteriaCareer": "Ngành nghề & Vị trí",
+      "criteriaLocation": "Địa điểm làm việc",
+      "criteriaExperience": "Kinh nghiệm thực chiến",
+      "criteriaSalary": "Mức lương kỳ vọng",
+      "matchingHighlights": "Điểm mạnh phù hợp",
+      "noAnalysisYet": "Hồ sơ ứng viên đang được AI phân tích chi tiết."
+    },
     "messages": {
       "saveSuccess": "Lưu hồ sơ thành công.",
       "unsaveSuccess": "Bỏ lưu hồ sơ thành công."
@@ -808,7 +838,7 @@
   },
   "sidebar": {
     "dashboard": "Bảng điều khiển",
-    "agentAssistants": "AILA",
+    "agentAssistants": "Trợ lý AI (AILA)",
     "jobPostList": "Danh sách tin TD",
     "candidateManagement": "Quản lý ứng viên",
     "appliedApplications": "Hồ sơ ứng tuyển",
@@ -826,8 +856,8 @@
     "employerVerification": "Xác thực danh tính",
     "account": "Tài khoản",
     "settings": "Cài đặt",
-    "squareHrmAdmin": "Quản lý Nhân sự (HRM)",
-    "hrmManagement": "Quản lý Nhân sự (HRM)",
+    "squareHrmAdmin": "Quản lý Nhân sự",
+    "hrmManagement": "Quản lý Nhân sự",
     "hrmDashboard": "Tổng quan HRM",
     "hrmEmployeesList": "Hồ sơ Nhân viên",
     "hrmOnboarding": "Tiếp nhận & Onboarding",
@@ -923,7 +953,7 @@
       "noConnectionDetails": "Chưa có connection details để mở fullscreen.",
       "joinPresence": "Tham gia hiện diện",
       "joinPresenceLoading": "Đang kết nối...",
-      "joinPresenceTooltip": "Vào phòng với tư cách Nhà tuyển dụng — ứng viên sẽ thấy bạn",
+      "joinPresenceTooltip": "Vào phòng với tư cách Nhà tuyển dụng - ứng viên sẽ thấy bạn",
       "presenceTitle": "Tham gia hiện diện",
       "presenceSubtitle": "Bạn đang tham gia với tư cách Nhà tuyển dụng. Ứng viên có thể thấy sự hiện diện của bạn.",
       "presenceExit": "Rời phòng"
@@ -1716,7 +1746,9 @@
       "address": "Địa chỉ chi tiết",
       "addressPlaceholder": "Số nhà, tên đường, tòa nhà...",
       "website": "Website công ty",
-      "websitePlaceholder": "https://company.vn"
+      "websitePlaceholder": "https://company.vn",
+      "selectCityFirst": "[VI] selectCityFirst",
+      "cityFirstHelper": "[VI] cityFirstHelper"
     },
     "step2": {
       "title": "Thông tin Đại diện Tuyển dụng",

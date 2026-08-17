@@ -906,11 +906,15 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     lastViewedDate = serializers.SerializerMethodField(method_name='get_last_viewed_date', read_only=True)
     isSentEmail = serializers.SerializerMethodField(method_name='check_sent_email', read_only=True)
     aiAnalysis = serializers.SerializerMethodField(method_name='get_ai_analysis', read_only=True)
+    matchScore = serializers.SerializerMethodField(method_name='get_match_score', read_only=True)
     sourcePlatform = serializers.CharField(source="source_platform", read_only=True, allow_null=True, required=False)
     sourceUrl = serializers.CharField(source="source_url", read_only=True, allow_null=True, required=False)
     sourceAccount = serializers.CharField(source="source_account", read_only=True, allow_null=True, required=False)
     sourceRef = serializers.CharField(source="source_ref", read_only=True, allow_null=True, required=False)
     isImported = serializers.BooleanField(source="is_imported", read_only=True, required=False)
+
+    def get_match_score(self, resume):
+        return getattr(resume, "match_score", 0)
 
     def check_saved(self, resume):
         request = self.context.get('request', None)
@@ -1004,9 +1008,9 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   "position", "experience", "academicLevel",
                   "typeOfWorkplace", "jobType", "isActive",
                   "city", "career", "updateAt", "fileUrl",
-                  "filePublicId", "city", 'isSaved', "type",
+                  "filePublicId", 'isSaved', "type",
                   "user", "jobSeekerProfile",
                   "experiencesDetails", "educationDetails",
                   "certificates", "languageSkills", "advancedSkills",
-                  "lastViewedDate", "isSentEmail", "aiAnalysis",
+                  "lastViewedDate", "isSentEmail", "aiAnalysis", "matchScore",
                   "sourcePlatform", "sourceUrl", "sourceAccount", "sourceRef", "isImported")

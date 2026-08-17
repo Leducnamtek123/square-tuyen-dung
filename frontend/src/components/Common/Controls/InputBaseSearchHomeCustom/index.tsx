@@ -80,6 +80,52 @@ import commonService from '@/services/commonService';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
+const DEFAULT_HERO_PLACEHOLDERS = [
+  'Tìm kiếm: Kỹ sư phần mềm, React, Java...',
+  'Tìm kiếm: Trưởng phòng nhân sự, HR Manager...',
+  'Tìm kiếm: UI/UX Designer, Figma, Design System...',
+  'Tìm kiếm: Kế toán tổng hợp, Financial Analyst...',
+  'Tìm kiếm: Giám đốc kinh doanh, Sales B2B...',
+];
+
+function useHeroTypewriter(phrases: string[], enabled: boolean) {
+  const [currentText, setCurrentText] = React.useState(phrases[0] || '');
+  const [phraseIndex, setPhraseIndex] = React.useState(0);
+  const [charIndex, setCharIndex] = React.useState(0);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!enabled || phrases.length === 0) return;
+
+    const currentPhrase = phrases[phraseIndex % phrases.length];
+    const typingSpeed = isDeleting ? 30 : 65;
+
+    const timer = setTimeout(() => {
+      if (!isDeleting) {
+        if (charIndex < currentPhrase.length) {
+          setCurrentText(currentPhrase.substring(0, charIndex + 1));
+          setCharIndex((prev) => prev + 1);
+        } else {
+          // Pause at full text
+          setTimeout(() => setIsDeleting(true), 2000);
+        }
+      } else {
+        if (charIndex > 0) {
+          setCurrentText(currentPhrase.substring(0, charIndex - 1));
+          setCharIndex((prev) => prev - 1);
+        } else {
+          setIsDeleting(false);
+          setPhraseIndex((prev) => (prev + 1) % phrases.length);
+        }
+      }
+    }, typingSpeed);
+
+    return () => clearTimeout(timer);
+  }, [charIndex, isDeleting, phraseIndex, phrases, enabled]);
+
+  return enabled ? currentText : '';
+}
+
 const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
@@ -90,6 +136,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
 }: Props<T>) => {
   const theme = useTheme();
   const isHero = variant === 'hero';
+  const animatedHeroPlaceholder = useHeroTypewriter(DEFAULT_HERO_PLACEHOLDERS, isHero);
   const { t, i18n } = useTranslation('common');
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const inputSearchRef = React.useRef<HTMLDivElement | null>(null);
@@ -245,7 +292,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                     },
                   },
                 }}
-                placeholder={placeholder}
+                placeholder={isHero && animatedHeroPlaceholder ? animatedHeroPlaceholder : placeholder}
                 slotProps={{ input: { 'aria-label': 'search' } }}
                 value={field.value ?? ''}
                 onFocus={() => dispatchSearch({ type: 'show_result', value: true })}

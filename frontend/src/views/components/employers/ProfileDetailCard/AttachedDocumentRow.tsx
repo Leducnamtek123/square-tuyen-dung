@@ -209,7 +209,7 @@ export const AttachedDocumentRow: React.FC<AttachedDocumentRowProps> = ({
             sx={{
               p: 3,
               borderRadius: '12px',
-              border: '1px dashed #CBD5E1',
+              border: '1px solid #E2E8F0',
               bgcolor: '#F8FAFC',
               textAlign: 'center',
             }}

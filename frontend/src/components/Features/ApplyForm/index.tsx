@@ -178,11 +178,11 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                 <Card
                   variant="outlined"
                   sx={{
-                    p: 2,
+                    p: 2.5,
                     textAlign: "center",
-                    borderStyle: "dashed",
-                    borderColor: "error.main",
-                    bgcolor: pc.error( 0.02),
+                    border: "1px solid #FECACA",
+                    bgcolor: "#FEF2F2",
+                    borderRadius: 3,
                   }}
                 >
                   <Typography variant="body1" color="error" sx={{ fontWeight: 600, mb: 1 }}>

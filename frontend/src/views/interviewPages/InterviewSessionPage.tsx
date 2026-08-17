@@ -186,7 +186,7 @@ function InterviewSessionBridge({
 
 function InterviewSessionLoading({ label }: { label: string }) {
   return (
-    <main className="grid min-h-screen place-items-center bg-[#020617] text-zinc-100">
+    <main className="grid min-h-[100dvh] place-items-center bg-[#020617] text-zinc-100">
       <div className="flex flex-col items-center gap-3 text-center">
         <CircularProgress size={36} sx={{ color: '#38bdf8' }} />
         <p className="text-sm text-zinc-400">{label}</p>
@@ -205,7 +205,7 @@ function InterviewSessionError({
   onBackHome: () => void;
 }) {
   return (
-    <main className="grid min-h-screen place-items-center bg-[#020617] px-6">
+    <main className="grid min-h-[100dvh] place-items-center bg-[#020617] px-6">
       <section className="w-full max-w-lg rounded-2xl border border-rose-400/30 bg-rose-500/10 p-8 text-center text-rose-100">
         <p className="mb-6 text-lg font-medium">{message}</p>
       <Button variant="contained" sx={{ bgcolor: '#0f172a', '&:hover': { bgcolor: '#111827' } }} onClick={onBackHome}>
@@ -242,7 +242,7 @@ function ActiveInterviewRoom({
   onEndSession: () => Promise<void>;
 }) {
   return (
-    <main className="flex min-h-screen flex-col bg-[#020617] text-zinc-100">
+    <main className="flex min-h-[100dvh] flex-col bg-[#020617] text-zinc-100">
       <header className="relative z-10 flex items-center justify-between border-b border-white/5 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl md:px-6">
         <div>
           <h1 className="text-sm font-semibold text-white md:text-base">{sessionTitle}</h1>
@@ -328,7 +328,7 @@ function InterviewWaitingRoom({
   actions: WaitingRoomActions;
 }) {
   return (
-    <main className="dark min-h-screen bg-[#020617] px-4 py-4 text-zinc-100 md:px-8 md:py-6">
+    <main className="dark min-h-[100dvh] bg-[#020617] px-4 py-4 text-zinc-100 md:px-8 md:py-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
         {viewState.isInterrupted && (
           <Alert severity="warning" sx={{ borderRadius: 3, bgcolor: 'rgba(245, 158, 11, 0.08)', color: '#fbbf24' }}>

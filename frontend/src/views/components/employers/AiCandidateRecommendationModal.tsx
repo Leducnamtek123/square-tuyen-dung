@@ -348,8 +348,8 @@ const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationModalPro
                       {/* Candidate Skills Summary */}
                       {cand.skillsSummary && (
                         <Box sx={{ mt: 1, p: 1.25, backgroundColor: '#f8fafc', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
-                          <Typography variant="caption" sx={{ color: '#475569', fontWeight: 700, display: 'block', mb: 0.5 }}>
-                            💡 Kỹ năng chuyên môn cốt lõi:
+                          <Typography variant="caption" sx={{ color: '#475569', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+                            <AutoAwesomeIcon sx={{ fontSize: 13, color: '#2563EB' }} /> Kỹ năng chuyên môn cốt lõi:
                           </Typography>
                           <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
                             {cand.skillsSummary.split(',').map((skill, sIdx) => (

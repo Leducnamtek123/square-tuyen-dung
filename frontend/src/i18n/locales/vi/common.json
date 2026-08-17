@@ -345,7 +345,13 @@
     "resendIn": "Gửi lại mã sau...",
     "title": "Tiêu đề",
     "body": "Nội dung",
-    "label": "Nhãn"
+    "label": "Nhãn",
+    "welcomeBack": "[VI] welcomeBack",
+    "errorTitle": "[VI] errorTitle",
+    "successTitle": "[VI] successTitle",
+    "forgotPassword": "[VI] forgotPassword",
+    "noAccount": "[VI] noAccount",
+    "signUp": "[VI] signUp"
   },
   "validation": {
     "invalidDate": "Ngày không hợp lệ",
@@ -385,7 +391,8 @@
     "districtPlaceholder": "Chọn quận/huyện",
     "address": "Địa chỉ",
     "addressPlaceholder": "Nhập địa chỉ",
-    "addressHelper": "Tự động điền nếu chọn địa chỉ gợi ý"
+    "addressHelper": "Tự động điền nếu chọn địa chỉ gợi ý",
+    "selectCityFirst": "[VI] selectCityFirst"
   },
   "loadPreviousMessages": "Tải tin nhắn cũ hơn",
   "typeAMessage": "Gõ tin nhắn...",
@@ -396,7 +403,32 @@
   "appliedResume": {
     "ai": {
       "viewAnalysis": "Xem phân tích AI",
-      "failed": "Phân tích thất bại"
+      "failed": "Phân tích thất bại",
+      "resumeTitle": "[VI] resumeTitle",
+      "onlineResumeLabel": "[VI] onlineResumeLabel",
+      "onlineResumeHint": "[VI] onlineResumeHint",
+      "viewOnlineProfile": "[VI] viewOnlineProfile",
+      "scanStatusScanning": "[VI] scanStatusScanning",
+      "scanStatusIdle": "[VI] scanStatusIdle",
+      "openCV": "[VI] openCV",
+      "scanning": "[VI] scanning",
+      "scanProgress": "[VI] scanProgress",
+      "failedTitle": "[VI] failedTitle",
+      "retry": "[VI] retry",
+      "idleTitle": "[VI] idleTitle",
+      "idleHint": "[VI] idleHint",
+      "startScan": "[VI] startScan",
+      "completeTitle": "[VI] completeTitle",
+      "overviewTitle": "[VI] overviewTitle",
+      "noEvaluation": "[VI] noEvaluation",
+      "prosTitle": "[VI] prosTitle",
+      "consTitle": "[VI] consTitle",
+      "matchingSkillsTitle": "[VI] matchingSkillsTitle",
+      "missingSkillsTitle": "[VI] missingSkillsTitle",
+      "allSkillsTitle": "[VI] allSkillsTitle",
+      "reanalyze": "[VI] reanalyze",
+      "drawerTitle": "[VI] drawerTitle",
+      "loading": "[VI] loading"
     },
     "email": {
       "resendTooltip": "Gửi lại mail",
@@ -415,9 +447,16 @@
       "actions": "Thao tác",
       "tooltips": {
         "view": "Xem hồ sơ",
-        "delete": "Xóa hồ sơ"
+        "delete": "Xóa hồ sơ",
+        "scheduleInterview": "[VI] scheduleInterview"
       },
-      "noCandidates": "Chưa có ứng viên nào ứng tuyển"
+      "noCandidates": "Chưa có ứng viên nào ứng tuyển",
+      "clickToDownload": "[VI] clickToDownload"
+    },
+    "status": {
+      "errorTitle": "[VI] errorTitle",
+      "errorMsg": "[VI] errorMsg",
+      "rollbackMsg": "[VI] rollbackMsg"
     }
   },
   "companyProfile": {
@@ -463,7 +502,8 @@
       "selectdistrict": "Chọn Quận/Huyện",
       "enteraddress": "Nhập địa chỉ",
       "enterlatitudecoordinateonthemap": "Nhập vĩ độ trên bản đồ",
-      "enterlongitudecoordinateonthemap": "Nhập kinh độ trên bản đồ"
+      "enterlongitudecoordinateonthemap": "Nhập kinh độ trên bản đồ",
+      "selectCityFirst": "[VI] selectCityFirst"
     },
     "helperText": {
       "automaticallyfilledifyouchooseasuggestedaddress": "Tự động điền nếu bạn chọn một địa chỉ gợi ý"
@@ -495,7 +535,8 @@
       "comments": "Nhận xét chi tiết",
       "proposedSalary": "Lương đề xuất (VNĐ)",
       "submitEvaluation": "Gửi đánh giá cuối cùng",
-      "openRecording": "Mở ghi hình"
+      "openRecording": "Mở ghi hình",
+      "commentsPlaceholder": "[VI] commentsPlaceholder"
     },
     "subtitle": {
       "analysis": "Kết quả Phân Tích",
@@ -515,7 +556,15 @@
       "candidate": "ỨNG VIÊN",
       "position": "VỊ TRÍ",
       "type": "LOẠI PHỎNG VẤN",
-      "schedule": "LỊCH TRÌNH"
+      "schedule": "LỊCH TRÌNH",
+      "aiOverallQuality": "[VI] aiOverallQuality",
+      "softSkills": "[VI] softSkills",
+      "confidence": "[VI] confidence",
+      "clarity": "[VI] clarity",
+      "tone": "[VI] tone",
+      "culturalFit": "[VI] culturalFit",
+      "questionPerformance": "[VI] questionPerformance",
+      "question": "[VI] question"
     },
     "title": "Chi tiết Phỏng vấn Online"
   },
@@ -526,7 +575,8 @@
       "title": "Tiêu đề tin tuyển dụng",
       "createdDate": "Ngày đăng",
       "creator": "Người tạo"
-    }
+    },
+    "timeLeft": "[VI] timeLeft"
   },
   "jobPostForm": {
     "section": {
@@ -556,7 +606,8 @@
       "address": "Địa chỉ",
       "contactpersonname": "Tên người liên hệ",
       "contactpersonphone": "SĐT liên hệ",
-      "contactpersonemail": "Email liên hệ"
+      "contactpersonemail": "Email liên hệ",
+      "interviewtemplate": "[VI] interviewtemplate"
     },
     "placeholder": {
       "enterjobtitle": "Nhập tiêu đề C.V",
@@ -575,7 +626,9 @@
       "enteraddress": "Nhập địa chỉ",
       "entercontactpersonname": "Nhập người liên hệ",
       "entercontactpersonphone": "Nhập SĐT liên hệ",
-      "entercontactpersonemail": "Nhập email liên hệ"
+      "entercontactpersonemail": "Nhập email liên hệ",
+      "selectinterviewtemplate": "[VI] selectinterviewtemplate",
+      "selectCityFirst": "[VI] selectCityFirst"
     },
     "label": {
       "isUrgent": "Tuyển gấp"
@@ -620,7 +673,10 @@
       "contactpersonphoneexceededallowedlength": "SĐT quá dài",
       "contactpersonemailisrequired": "Yêu cầu email",
       "invalidemail": "Email không hợp lệ",
-      "contactpersonemailexceededallowedlength": "Email quá dài"
+      "contactpersonemailexceededallowedlength": "Email quá dài",
+      "interviewtemplateinvalid": "[VI] interviewtemplateinvalid",
+      "choiceInvalid": "[VI] choiceInvalid",
+      "salaryTooLarge": "[VI] salaryTooLarge"
     }
   },
   "minimum-wage-comparison": "Lương tối thiểu",
@@ -655,7 +711,10 @@
       "workExperience": "Kinh nghiệm làm việc",
       "generalInfo": "Thông tin chung",
       "languages": "Ngôn ngữ",
-      "personalInfo": "Thông tin cá nhân"
+      "personalInfo": "Thông tin cá nhân",
+      "profileNotFound": "[VI] profileNotFound",
+      "privateProfile": "[VI] privateProfile",
+      "profileDetail": "[VI] profileDetail"
     },
     "messages": {
       "noAttachedFile": "Không có tệp đính kèm."
@@ -715,7 +774,8 @@
     "missingInvite": "Thiếu lời mời",
     "missingSessionId": "Thiếu ID phiên",
     "invalidSession": "Phiên không hợp lệ",
-    "tokenMissing": "Thiếu token xác thực"
+    "tokenMissing": "Thiếu token xác thực",
+    "mic_denied": "[VI] mic_denied"
   },
   "pages": {
     "interviews": {
@@ -731,6 +791,90 @@
         "actionFailed": "Thao tác thất bại",
         "roleUpdated": "Đã cập nhật vai trò",
         "roleUpdateFailed": "Cập nhật vai trò thất bại"
+      },
+      "scheduleInterviewDialog": {
+        "success": "[VI] success",
+        "error": "[VI] error",
+        "questionFallback": "[VI] questionFallback",
+        "title": "[VI] title",
+        "timeLabel": "[VI] timeLabel",
+        "questionsLabel": "[VI] questionsLabel",
+        "questionsPlaceholder": "[VI] questionsPlaceholder",
+        "notesLabel": "[VI] notesLabel",
+        "notesPlaceholder": "[VI] notesPlaceholder",
+        "cancelBtn": "[VI] cancelBtn",
+        "schedulingBtn": "[VI] schedulingBtn",
+        "submitBtn": "[VI] submitBtn"
+      }
+    },
+    "banners": {
+      "deleteTitle": "[VI] deleteTitle",
+      "deleteConfirm": "[VI] deleteConfirm",
+      "cancel": "[VI] cancel",
+      "deleting": "[VI] deleting",
+      "delete": "[VI] delete",
+      "addTitle": "[VI] addTitle",
+      "editTitle": "[VI] editTitle",
+      "form": {
+        "description": "[VI] description",
+        "buttonText": "[VI] buttonText",
+        "buttonLink": "[VI] buttonLink",
+        "platform": "[VI] platform",
+        "bannerType": "[VI] bannerType",
+        "descLocation": "[VI] descLocation",
+        "showButton": "[VI] showButton",
+        "activeLabel": "[VI] activeLabel",
+        "webImageLabel": "[VI] webImageLabel",
+        "chooseWeb": "[VI] chooseWeb",
+        "mobileImageLabel": "[VI] mobileImageLabel",
+        "chooseMobile": "[VI] chooseMobile"
+      },
+      "noWebImage": "[VI] noWebImage",
+      "errorLoadingImage": "[VI] errorLoadingImage",
+      "noMobileImage": "[VI] noMobileImage",
+      "saving": "[VI] saving",
+      "save": "[VI] save"
+    },
+    "companies": {
+      "deleteTitle": "[VI] deleteTitle",
+      "cancelBtn": "[VI] cancelBtn",
+      "deletingBtn": "[VI] deletingBtn",
+      "deleteBtn": "[VI] deleteBtn",
+      "addConfirmTitle": "[VI] addConfirmTitle",
+      "editConfirmTitle": "[VI] editConfirmTitle",
+      "companyNameLabel": "[VI] companyNameLabel",
+      "taxCodeLabel": "[VI] taxCodeLabel",
+      "employeeSizeLabel": "[VI] employeeSizeLabel",
+      "companyEmailLabel": "[VI] companyEmailLabel",
+      "companyPhoneLabel": "[VI] companyPhoneLabel",
+      "fieldOperationLabel": "[VI] fieldOperationLabel",
+      "websiteLabel": "[VI] websiteLabel",
+      "form": {
+        "since": "[VI] since",
+        "cityId": "[VI] cityId",
+        "districtId": "[VI] districtId",
+        "wardId": "[VI] wardId",
+        "address": "[VI] address"
+      },
+      "descriptionLabel": "[VI] descriptionLabel",
+      "savingBtn": "[VI] savingBtn",
+      "saveBtn": "[VI] saveBtn"
+    },
+    "jobNotifications": {
+      "deleteTitle": "[VI] deleteTitle",
+      "deleteConfirm": "[VI] deleteConfirm",
+      "cancel": "[VI] cancel",
+      "addNotification": "[VI] addNotification",
+      "editNotification": "[VI] editNotification",
+      "form": {
+        "title": "[VI] title",
+        "salary": "[VI] salary",
+        "frequency": "[VI] frequency",
+        "position": "[VI] position",
+        "experience": "[VI] experience",
+        "careerId": "[VI] careerId",
+        "cityId": "[VI] cityId",
+        "isActive": "[VI] isActive"
       }
     }
   },
@@ -762,7 +906,14 @@
     "allWorkplaces": "Tất cả nơi làm việc",
     "allGenders": "Tất cả giới tính",
     "tabTitle": "Tìm việc làm",
-    "recommendedJobs": "Việc làm đề xuất"
+    "recommendedJobs": "Việc làm đề xuất",
+    "savedAlert": {
+      "defaultName": "[VI] defaultName",
+      "success": "[VI] success"
+    },
+    "saveSearch": "[VI] saveSearch",
+    "resetFiltersAria": "[VI] resetFiltersAria",
+    "closeAdvancedFiltersAria": "[VI] closeAdvancedFiltersAria"
   },
   "profile": {
     "messages": {
@@ -793,7 +944,10 @@
     "followAt": "Theo dõi tại",
     "generalInfo": "Thông tin chung",
     "map": "Bản đồ",
-    "images": "Hình ảnh"
+    "images": "Hình ảnh",
+    "verified": "[VI] verified",
+    "report": "[VI] report",
+    "verifiedDescription": "[VI] verifiedDescription"
   },
   "jobDetail": {
     "actions": {
@@ -801,7 +955,8 @@
       "apply": "Ứng tuyển ngay",
       "saved": "Đã lưu",
       "save": "Lưu tin",
-      "share": "Chia sẻ"
+      "share": "Chia sẻ",
+      "report": "[VI] report"
     },
     "contactInfo": "Thông tin liên hệ",
     "contactPerson": "Người liên hệ",
@@ -847,7 +1002,15 @@
     }
   },
   "controls": {
-    "end": "Kết thúc"
+    "end": "Kết thúc",
+    "muteMicrophone": "[VI] muteMicrophone",
+    "unmuteMicrophone": "[VI] unmuteMicrophone",
+    "turnCameraOff": "[VI] turnCameraOff",
+    "turnCameraOn": "[VI] turnCameraOn",
+    "stopScreenShare": "[VI] stopScreenShare",
+    "startScreenShare": "[VI] startScreenShare",
+    "ending": "[VI] ending",
+    "enableAudio": "[VI] enableAudio"
   },
   "sessionNotJoinable": "Phiên phỏng vấn không thể tham gia",
   "readyBody": "Nhấn bên dưới để tham gia vào buổi phỏng vấn của bạn.",
@@ -1037,5 +1200,220 @@
   "startCall": "Bắt đầu cuộc gọi",
   "welcomeMessage": "Xin chào! Tôi là Trợ lý Ảo AI của InfoHR. Tôi có thể giúp gì cho bạn hôm nay?",
   "setupHelpPrefix": "Cần hỗ trợ kỹ thuật? ",
-  "setupHelpLink": "Xem hướng dẫn cài đặt"
+  "setupHelpLink": "Xem hướng dẫn cài đặt",
+  "applyForm": {
+    "validation": {
+      "phoneMax": "[VI] phoneMax"
+    }
+  },
+  "EmptyCard": "[VI] EmptyCard",
+  "profileDetail": {
+    "": "[VI] "
+  },
+  "signup": {
+    "heading": "[VI] heading",
+    "jobSeekerSubtitle": "[VI] jobSeekerSubtitle",
+    "haveAccount": "[VI] haveAccount",
+    "signIn": "[VI] signIn"
+  },
+  "companySearch": {
+    "resetFiltersAria": "[VI] resetFiltersAria"
+  },
+  "manualCandidate": {
+    "badge": "[VI] badge",
+    "form": {
+      "jobPost": "[VI] jobPost",
+      "selectJobPost": "[VI] selectJobPost",
+      "cvFile": "[VI] cvFile",
+      "fullName": "[VI] fullName",
+      "fullNamePlaceholder": "[VI] fullNamePlaceholder",
+      "title": "[VI] title",
+      "titlePlaceholder": "[VI] titlePlaceholder",
+      "email": "[VI] email",
+      "emailPlaceholder": "[VI] emailPlaceholder",
+      "phone": "[VI] phone",
+      "phonePlaceholder": "[VI] phonePlaceholder",
+      "career": "[VI] career",
+      "selectCareer": "[VI] selectCareer",
+      "city": "[VI] city",
+      "selectCity": "[VI] selectCity",
+      "experience": "[VI] experience",
+      "selectExperience": "[VI] selectExperience",
+      "position": "[VI] position",
+      "selectPosition": "[VI] selectPosition",
+      "academicLevel": "[VI] academicLevel",
+      "selectAcademicLevel": "[VI] selectAcademicLevel",
+      "typeOfWorkplace": "[VI] typeOfWorkplace",
+      "selectTypeOfWorkplace": "[VI] selectTypeOfWorkplace",
+      "jobType": "[VI] jobType",
+      "selectJobType": "[VI] selectJobType",
+      "salaryMin": "[VI] salaryMin",
+      "salaryMinPlaceholder": "[VI] salaryMinPlaceholder",
+      "salaryMax": "[VI] salaryMax",
+      "salaryMaxPlaceholder": "[VI] salaryMaxPlaceholder",
+      "expectedSalary": "[VI] expectedSalary",
+      "expectedSalaryPlaceholder": "[VI] expectedSalaryPlaceholder",
+      "description": "[VI] description",
+      "descriptionPlaceholder": "[VI] descriptionPlaceholder",
+      "skillsSummary": "[VI] skillsSummary",
+      "skillsSummaryPlaceholder": "[VI] skillsSummaryPlaceholder",
+      "note": "[VI] note",
+      "notePlaceholder": "[VI] notePlaceholder"
+    }
+  },
+  "employees": {
+    "hrm": {
+      "convert": {
+        "openEmployee": "[VI] openEmployee",
+        "action": "[VI] action"
+      }
+    }
+  },
+  "viewMore": "[VI] viewMore",
+  "liveRoom": {
+    "participants": {
+      "employer": "[VI] employer",
+      "observer": "[VI] observer",
+      "candidate": "[VI] candidate",
+      "guest": "[VI] guest",
+      "you": "[VI] you",
+      "aiInterviewer": "[VI] aiInterviewer"
+    },
+    "chat": {
+      "close": "[VI] close",
+      "open": "[VI] open",
+      "aiControlPlaceholder": "[VI] aiControlPlaceholder",
+      "placeholder": "[VI] placeholder",
+      "aiControlSend": "[VI] aiControlSend",
+      "send": "[VI] send",
+      "title": "[VI] title",
+      "subtitle": "[VI] subtitle",
+      "messagesCount": "[VI] messagesCount",
+      "noMessages": "[VI] noMessages",
+      "noMessagesDesc": "[VI] noMessagesDesc",
+      "chatMode": "[VI] chatMode",
+      "aiControlMode": "[VI] aiControlMode",
+      "takeoverMode": "[VI] takeoverMode",
+      "takeoverActive": "[VI] takeoverActive",
+      "takeoverInactive": "[VI] takeoverInactive",
+      "takeoverTitle": "[VI] takeoverTitle",
+      "takeoverHint": "[VI] takeoverHint",
+      "takeoverSending": "[VI] takeoverSending",
+      "takeoverRelease": "[VI] takeoverRelease",
+      "takeoverAcquire": "[VI] takeoverAcquire"
+    },
+    "chips": {
+      "you": "[VI] you",
+      "ai": "[VI] ai",
+      "employer": "[VI] employer",
+      "live": "[VI] live"
+    },
+    "observingBar": {
+      "hrObserving": "[VI] hrObserving",
+      "hrWaiting": "[VI] hrWaiting",
+      "employerObserving": "[VI] employerObserving",
+      "live": "[VI] live",
+      "waiting": "[VI] waiting"
+    }
+  },
+  "profileCard": {
+    "messages": {
+      "saveSuccess": "[VI] saveSuccess",
+      "unsaveSuccess": "[VI] unsaveSuccess"
+    },
+    "title": {
+      "noresultsfound": "[VI] noresultsfound"
+    }
+  },
+  "seo": {
+    "jobDetail": {
+      "titlePrefix": "[VI] titlePrefix",
+      "at": "[VI] at",
+      "reputableCompany": "[VI] reputableCompany",
+      "keywordsSuffix": "[VI] keywordsSuffix",
+      "breadcrumb": {
+        "home": "[VI] home",
+        "jobs": "[VI] jobs"
+      }
+    },
+    "jobList": {
+      "description": "[VI] description",
+      "keywords": "[VI] keywords"
+    },
+    "articleDetail": {
+      "description": "[VI] description",
+      "breadcrumb": {
+        "home": "[VI] home"
+      }
+    },
+    "newsList": {
+      "title": "[VI] title",
+      "description": "[VI] description"
+    }
+  },
+  "news": {
+    "category": {
+      "news": "[VI] news",
+      "blog": "[VI] blog"
+    },
+    "article": {
+      "notFoundTitle": "[VI] notFoundTitle",
+      "notFoundContent": "[VI] notFoundContent",
+      "backToNews": "[VI] backToNews",
+      "backToList": "[VI] backToList",
+      "emptyContent": "[VI] emptyContent",
+      "infoTitle": "[VI] infoTitle",
+      "moreTitle": "[VI] moreTitle",
+      "moreDescription": "[VI] moreDescription",
+      "newsHomeCta": "[VI] newsHomeCta"
+    },
+    "views": "[VI] views",
+    "emptyTitle": "[VI] emptyTitle",
+    "emptyContent": "[VI] emptyContent"
+  },
+  "interviewLive": {
+    "table": {
+      "candidate": "[VI] candidate",
+      "position": "[VI] position",
+      "time": "[VI] time"
+    },
+    "title": "[VI] title",
+    "subtitle": "[VI] subtitle",
+    "autoRefresh": {
+      "on": "[VI] on",
+      "off": "[VI] off"
+    },
+    "updating": "[VI] updating",
+    "activeNow": "[VI] activeNow",
+    "noData": {
+      "title": "[VI] title",
+      "subtitle": "[VI] subtitle"
+    }
+  },
+  "processingTitle": "[VI] processingTitle",
+  "processingBody": "[VI] processingBody",
+  "preflight": {
+    "title": "[VI] title",
+    "subtitle": "[VI] subtitle",
+    "mic_ready": "[VI] mic_ready",
+    "join": "[VI] join"
+  },
+  "account": {
+    "pageTitle": "[VI] pageTitle"
+  },
+  "onboarding": {
+    "validation": {
+      "desiredJobTitleRequired": "[VI] desiredJobTitleRequired",
+      "careerRequired": "[VI] careerRequired",
+      "cityRequired": "[VI] cityRequired",
+      "skillsMin": "[VI] skillsMin",
+      "salaryRangeInvalid": "[VI] salaryRangeInvalid"
+    }
+  },
+  "employerOnboarding": {
+    "validation": {
+      "companyNameRequired": "[VI] companyNameRequired",
+      "recruiterNameRequired": "[VI] recruiterNameRequired"
+    }
+  }
 }

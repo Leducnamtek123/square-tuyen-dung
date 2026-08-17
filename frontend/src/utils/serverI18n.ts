@@ -56,6 +56,7 @@ const PAGE_TITLES: Record<string, Record<SupportedLocale, string>> = {
   'admin.jobs':               { vi: 'Tin tuyển dụng', en: 'Job Posts' },
   'admin.companies':          { vi: 'Công ty', en: 'Companies' },
   'admin.profiles':           { vi: 'Hồ sơ', en: 'Profiles' },
+  'admin.profileDetail':      { vi: 'Chi tiết hồ sơ', en: 'Profile Detail' },
   'admin.resumes':            { vi: 'CV đính kèm', en: 'Resumes' },
   'admin.careers':            { vi: 'Ngành nghề', en: 'Careers' },
   'admin.cities':             { vi: 'Tỉnh / Thành phố', en: 'Cities' },

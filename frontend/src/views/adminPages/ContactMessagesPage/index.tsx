@@ -133,7 +133,7 @@ const ContactMessagesPage = () => {
     {
       accessorKey: 'subject',
       header: t('pages.contactMessages.table.subject') as string,
-      cell: (info) => info.getValue() || '—',
+      cell: (info) => info.getValue() || '-',
     },
     {
       accessorKey: 'name',
@@ -157,14 +157,14 @@ const ContactMessagesPage = () => {
     {
       accessorKey: 'phone',
       header: t('pages.contactMessages.table.phone') as string,
-      cell: (info) => info.getValue() || '—',
+      cell: (info) => info.getValue() || '-',
     },
     {
       accessorKey: 'pageUrl',
       header: t('pages.contactMessages.table.pageUrl') as string,
       cell: (info) => {
         const url = info.getValue() as string | undefined;
-        if (!url) return '—';
+        if (!url) return '-';
         return (
           <Typography variant="body2" sx={{ maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {url}
@@ -214,7 +214,7 @@ const ContactMessagesPage = () => {
       accessorFn: (row) => row.createAt || row.create_at,
       header: t('pages.contactMessages.table.createdAt') as string,
       enableSorting: true,
-      cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '—',
+      cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '-',
     },
     {
       id: 'actions',
@@ -354,7 +354,7 @@ const ContactMessagesPage = () => {
               </Box>
               <Box>
                 <Typography variant="caption" color="text.secondary">{t('pages.contactMessages.table.subject')}</Typography>
-                <Typography variant="body1">{viewDetail.subject || '—'}</Typography>
+                <Typography variant="body1">{viewDetail.subject || '-'}</Typography>
               </Box>
               <Box>
                 <Typography variant="caption" color="text.secondary">{t('pages.contactMessages.table.name')}</Typography>
@@ -373,7 +373,7 @@ const ContactMessagesPage = () => {
               <Box>
                 <Typography variant="caption" color="text.secondary">{t('pages.contactMessages.table.pageUrl')}</Typography>
                 <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-                  {viewDetail.pageUrl || '—'}
+                  {viewDetail.pageUrl || '-'}
                 </Typography>
               </Box>
               <Box>

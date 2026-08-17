@@ -274,10 +274,10 @@ const ProfilesPage = () => {
                         </Avatar>
                         <Box>
                             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {user?.fullName || '—'}
+                                {user?.fullName || '-'}
                             </Typography>
                             <Typography variant="caption" color="textSecondary">
-                                {user?.email || '—'}
+                                {user?.email || '-'}
                             </Typography>
                         </Box>
                     </Box>
@@ -287,17 +287,17 @@ const ProfilesPage = () => {
         {
             accessorKey: 'phone',
             header: t('pages.profiles.table.phone') as string,
-            cell: (info) => (info.getValue() as string) || '—',
+            cell: (info) => (info.getValue() as string) || '-',
         },
         {
             accessorKey: 'currentJobTitle',
             header: t('pages.profiles.table.title') as string,
-            cell: (info) => (info.getValue() as string) || '—',
+            cell: (info) => (info.getValue() as string) || '-',
         },
         {
             accessorKey: 'createAt',
             header: t('pages.profiles.table.createdAt') as string,
-            cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—'),
+            cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '-'),
         },
         {
             id: 'actions',

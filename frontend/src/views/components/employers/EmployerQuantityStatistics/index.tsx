@@ -62,29 +62,32 @@ const Sparkline = ({ color, path = "M0 18 Q 30 5, 60 15 T 120 8" }: { color: str
 
 const StatItem = ({ title, value, suffix, color, Icon, loading, trend, sparkPath }: StatItemProps) => {
   const isPositive = trend?.includes('↑');
-  const isNeutral = trend?.includes('—');
+  const isNeutral = trend?.includes('-') || trend?.includes('-');
 
   return (
     <Paper
       elevation={0}
       sx={{
         p: 3,
-        borderRadius: '20px',
-        border: '1px solid #EEF2F7',
+        borderRadius: '24px',
+        border: '1px solid rgba(226, 232, 240, 0.8)',
         bgcolor: '#ffffff',
-        boxShadow: '0 2px 8px -2px rgba(15, 23, 42, 0.04), 0 1px 3px 0 rgba(15, 23, 42, 0.02)',
+        boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.04), 0 1px 3px 0 rgba(15, 23, 42, 0.02)',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: 'transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease, border-color 180ms ease',
         position: 'relative',
         overflow: 'hidden',
         '&:hover': {
           transform: 'translateY(-4px)',
-          boxShadow: '0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.03)',
-          borderColor: alpha(color, 0.35),
-        }
+          boxShadow: '0 25px 45px -10px rgba(15, 57, 127, 0.12)',
+          borderColor: alpha(color, 0.45),
+        },
+        '&:active': {
+          transform: 'scale(0.99)',
+        },
       }}
     >
       <Stack spacing={2}>
@@ -96,7 +99,7 @@ const StatItem = ({ title, value, suffix, color, Icon, loading, trend, sparkPath
               justifyContent: 'center',
               width: 44,
               height: 44,
-              borderRadius: '50%',
+              borderRadius: '14px',
               bgcolor: alpha(color, 0.12),
               color: color,
               flexShrink: 0,
@@ -123,15 +126,16 @@ const StatItem = ({ title, value, suffix, color, Icon, loading, trend, sparkPath
             <Typography
               sx={{
                 color: '#0F172A',
+                fontFamily: 'var(--font-mono)',
                 fontSize: '2.125rem',
                 fontWeight: 800,
                 lineHeight: 1.1,
-                letterSpacing: '-0.02em',
+                letterSpacing: '-0.03em',
               }}
             >
               {typeof value === 'number' ? value.toLocaleString() : value ?? 0}
               {suffix && (
-                <Typography component="span" sx={{ fontSize: '1.125rem', fontWeight: 700, color: '#64748B', ml: 0.5 }}>
+                <Typography component="span" sx={{ fontSize: '1.125rem', fontWeight: 700, color: '#64748B', ml: 0.5, fontFamily: 'var(--font-sans)' }}>
                   {suffix}
                 </Typography>
               )}

@@ -26,22 +26,27 @@ const CandidateCvScoreCard: React.FC<CandidateCvScoreCardProps> = ({ viewedCount
     <Card
       elevation={0}
       sx={{
-        p: 2.5,
-        borderRadius: '16px',
-        border: '1px solid #e2e8f0',
+        p: 3,
+        borderRadius: '24px',
+        border: '1px solid rgba(226, 232, 240, 0.85)',
         backgroundColor: '#ffffff',
-        boxShadow: '0 4px 20px -2px rgba(0,0,0,0.03)',
+        boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        transition: 'transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease',
+        '&:hover': {
+          transform: 'translateY(-3px)',
+          boxShadow: '0 25px 45px -10px rgba(15, 57, 127, 0.10)',
+        },
       }}
     >
-      <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a', mb: 0.5 }}>
-        CV của bạn đã đủ tốt chưa?
+      <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', mb: 0.5, fontSize: '1.05rem' }}>
+        Sức khỏe hồ sơ & Lượt xem
       </Typography>
 
       <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.8rem', display: 'block', mb: 2 }}>
-        Có bao nhiêu nhà tuyển dụng quan tâm hồ sơ của bạn?
+        Đo lường mức độ quan tâm của nhà tuyển dụng tới CV
       </Typography>
 
       {/* Circle Score Donut */}
@@ -50,19 +55,20 @@ const CandidateCvScoreCard: React.FC<CandidateCvScoreCardProps> = ({ viewedCount
           <CircularProgress
             variant="determinate"
             value={100}
-            size={90}
-            thickness={5}
-            sx={{ color: '#e2e8f0' }}
+            size={96}
+            thickness={4.5}
+            sx={{ color: '#f1f5f9' }}
           />
           <CircularProgress
             variant="determinate"
             value={progressValue}
-            size={90}
-            thickness={5}
+            size={96}
+            thickness={4.5}
             sx={{
               color: '#2563eb',
               position: 'absolute',
               left: 0,
+              strokeLinecap: 'round',
             }}
           />
           <Box
@@ -77,7 +83,7 @@ const CandidateCvScoreCard: React.FC<CandidateCvScoreCardProps> = ({ viewedCount
               justifyContent: 'center',
             }}
           >
-            <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a' }}>
+            <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', fontFamily: 'var(--font-mono)', letterSpacing: '-0.03em' }}>
               {viewedCount}
             </Typography>
           </Box>
@@ -85,7 +91,7 @@ const CandidateCvScoreCard: React.FC<CandidateCvScoreCardProps> = ({ viewedCount
       </Box>
 
       <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.825rem', textAlign: 'center', mb: 2.5, lineHeight: 1.5 }}>
-        Mỗi lượt xem CV từ nhà tuyển dụng đều là một cơ hội để bạn tiến gần hơn tới công việc phù hợp.
+        Mỗi lượt xem CV từ nhà tuyển dụng đều là cơ hội tốt để bạn kết nối và phỏng vấn trực tiếp.
       </Typography>
 
       <Button
@@ -95,20 +101,23 @@ const CandidateCvScoreCard: React.FC<CandidateCvScoreCardProps> = ({ viewedCount
         endIcon={<ArrowForwardIcon />}
         fullWidth
         sx={{
-          borderRadius: '10px',
+          mt: 'auto',
+          borderRadius: '12px',
           backgroundColor: '#2563eb',
           fontWeight: 700,
           py: 1.2,
-          textTransform: 'none',
-          boxShadow: 'none',
-          mt: 'auto',
+          boxShadow: '0 4px 14px rgba(37, 99, 235, 0.25)',
+          transition: 'transform 120ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 120ms ease',
           '&:hover': {
             backgroundColor: '#1d4ed8',
-            boxShadow: '0 4px 12px rgba(37,99,235,0.25)',
+            boxShadow: '0 8px 20px rgba(37, 99, 235, 0.35)',
+          },
+          '&:active': {
+            transform: 'scale(0.98)',
           },
         }}
       >
-        Khám phá ngay
+        Tối ưu hồ sơ ngay
       </Button>
     </Card>
   );

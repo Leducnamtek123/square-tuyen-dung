@@ -196,7 +196,7 @@ const buildSchema = (data: StructuredDataSchema): JsonLdObject => {
 const SCRIPT_ID_PREFIX = 'ld-json-';
 
 /**
- * useStructuredData — Injects JSON-LD structured data (schema.org).
+ * useStructuredData - Injects JSON-LD structured data (schema.org).
  * Supports JobPosting, Organization, WebSite, BreadcrumbList schemas.
  */
 const useStructuredData = (schemas: StructuredDataSchema | StructuredDataSchema[]) => {

@@ -68,7 +68,7 @@ const getInitials = (name?: string | null): string => {
 };
 
 const valueOrDash = (value?: React.ReactNode): React.ReactNode => {
-  if (value === undefined || value === null || value === '') return '—';
+  if (value === undefined || value === null || value === '') return '-';
   return value;
 };
 
@@ -198,7 +198,7 @@ const ProfileDetailPage = () => {
         return (
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 900 }}>
-              {info.getValue() as string || '—'}
+              {info.getValue() as string || '-'}
             </Typography>
             <Typography variant="caption" color="text.secondary">
               {t('pages.profileDetail.table.online')}
@@ -224,12 +224,12 @@ const ProfileDetailPage = () => {
     {
       accessorKey: 'createAt',
       header: t('pages.profileDetail.table.createdAt') as string,
-      cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—'),
+      cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '-'),
     },
     {
       accessorKey: 'updateAt',
       header: t('pages.profileDetail.table.updatedAt') as string,
-      cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—'),
+      cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '-'),
     },
     {
       id: 'actions',

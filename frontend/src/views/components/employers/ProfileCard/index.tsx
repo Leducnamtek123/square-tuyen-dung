@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -18,8 +19,11 @@ import {
   Divider,
   Grid,
   Skeleton,
-  useTheme,
-  alpha,
+  Tabs,
+  Tab,
+  Select,
+  MenuItem,
+  FormControl,
 } from '@mui/material';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
@@ -28,18 +32,22 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import SchoolIcon from '@mui/icons-material/School';
-import WorkIcon from '@mui/icons-material/Work';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import LockIcon from '@mui/icons-material/Lock';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
-import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import dayjs from 'dayjs';
 
 import toastMessages from '../../../../utils/toastMessages';
 import { ProfileSearchBar, ProfileFilterDrawer, useProfileSearch } from '../ProfileSearch';
-import { useEmployerResumes, useToggleSaveResumeOptimistic, useResumeDetail } from '../hooks/useEmployerQueries';
+import {
+  useEmployerResumes,
+  useToggleSaveResumeOptimistic,
+  useResumeDetail,
+  useJobPostOptions,
+} from '../hooks/useEmployerQueries';
+import { searchResume } from '../../../../redux/filterSlice';
+import type { ResumeFilter } from '../../../../redux/filterSlice';
 import type { Resume } from '@/types/models';
 import pc from '@/utils/muiColors';
 import { formatLocalizedSalaryRange } from '@/utils/customData';
@@ -65,7 +73,7 @@ const MasterCandidateItem: React.FC<MasterItemProps> = ({
   onSelect,
   onSave,
 }) => {
-  const { t, i18n } = useTranslation(['employer', 'common']);
+  const { t } = useTranslation(['employer', 'common']);
   const { allConfig } = useConfig();
 
   const user = resume.userDict || resume.user;
@@ -78,9 +86,25 @@ const MasterCandidateItem: React.FC<MasterItemProps> = ({
     ? tConfig(String(allConfig.cityDict[resume.city.id]))
     : null;
 
-  const updatedAtLabel = resume.updateAt
-    ? dayjs(resume.updateAt).format('DD/MM/YYYY')
-    : '';
+  const matchScore = typeof resume.matchScore === 'number' ? resume.matchScore : 0;
+
+  const updatedAtLabel = useMemo(() => {
+    if (!resume.updateAt) return '';
+    const now = dayjs();
+    const updated = dayjs(resume.updateAt);
+    const diffHours = now.diff(updated, 'hour');
+    if (diffHours < 1) {
+      const diffMins = Math.max(1, now.diff(updated, 'minute'));
+      return `${diffMins} phút trước`;
+    }
+    if (diffHours < 24) {
+      return `${diffHours} giờ trước`;
+    }
+    if (diffHours < 48) {
+      return 'Hôm qua';
+    }
+    return updated.format('DD/MM/YYYY');
+  }, [resume.updateAt]);
 
   return (
     <Paper
@@ -109,8 +133,8 @@ const MasterCandidateItem: React.FC<MasterItemProps> = ({
           src={(user as any)?.avatar || (user as any)?.avatarUrl || undefined}
           variant="rounded"
           sx={{
-            width: 44,
-            height: 44,
+            width: 46,
+            height: 46,
             borderRadius: '10px',
             border: '1px solid #E2E8F0',
             flexShrink: 0,
@@ -157,13 +181,13 @@ const MasterCandidateItem: React.FC<MasterItemProps> = ({
             </Tooltip>
           </Stack>
 
-          {/* Active status / match chip */}
-          <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mt: 0.25, mb: 0.5 }}>
+          {/* Active status & AI Match Score Chip */}
+          <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" sx={{ mt: 0.4, mb: 0.5 }}>
             <Chip
               label="Đang tìm việc"
               size="small"
               sx={{
-                height: 18,
+                height: 19,
                 fontSize: '0.65rem',
                 fontWeight: 600,
                 bgcolor: '#FEF3C7',
@@ -171,20 +195,30 @@ const MasterCandidateItem: React.FC<MasterItemProps> = ({
                 borderRadius: '4px',
               }}
             />
-            {resume.matchScore && resume.matchScore > 0 ? (
+            {matchScore > 0 && (
               <Chip
-                label="Phù hợp"
+                icon={
+                  <AutoAwesomeIcon
+                    sx={{
+                      fontSize: '12px !important',
+                      color: matchScore >= 70 ? '#059669 !important' : '#2563EB !important',
+                    }}
+                  />
+                }
+                label={`${matchScore}% ${t('employer:profileCard.aiMatch.badgeText', 'Phù hợp')}`}
                 size="small"
                 sx={{
-                  height: 18,
-                  fontSize: '0.65rem',
-                  fontWeight: 600,
-                  bgcolor: '#EFF6FF',
-                  color: '#2563EB',
-                  borderRadius: '4px',
+                  height: 20,
+                  fontSize: '0.6875rem',
+                  fontWeight: 700,
+                  bgcolor: matchScore >= 70 ? '#ECFDF5' : '#EFF6FF',
+                  color: matchScore >= 70 ? '#059669' : '#2563EB',
+                  border: `1px solid ${matchScore >= 70 ? '#A7F3D0' : '#BFDBFE'}`,
+                  borderRadius: '6px',
+                  pl: 0.25,
                 }}
               />
-            ) : null}
+            )}
           </Stack>
 
           {/* Job Title */}
@@ -248,10 +282,9 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
   onSave,
 }) => {
   const { t, i18n } = useTranslation(['employer', 'common']);
-  const { push } = useRouter();
   const { allConfig } = useConfig();
 
-  const { data: fetchedDetail, isLoading } = useResumeDetail(resumeSlug);
+  const { data: fetchedDetail } = useResumeDetail(resumeSlug);
   const resume = fetchedDetail || initialResume;
 
   if (!resumeSlug || !resume) {
@@ -322,6 +355,9 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
     ? tConfig(String(allConfig.positionDict[positionId]))
     : 'Nhân viên';
 
+  const matchScore = typeof resume.matchScore === 'number' ? resume.matchScore : 0;
+  const aiAnalysis = (resume as any).aiAnalysis;
+
   return (
     <Paper
       elevation={0}
@@ -376,7 +412,6 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
 
         {/* Action Buttons */}
         <Stack direction="row" spacing={1} alignItems="center">
-          {/* Synchronized Save Bookmark Button */}
           <Button
             variant={resume.isSaved ? 'contained' : 'outlined'}
             color={resume.isSaved ? 'primary' : 'inherit'}
@@ -400,7 +435,6 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
             {resume.isSaved ? 'Đã lưu' : 'Lưu hồ sơ'}
           </Button>
 
-          {/* View Full Profile Button */}
           <Button
             variant="contained"
             color="primary"
@@ -426,6 +460,166 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
 
       {/* 2. Main Profile Overview Body */}
       <Box sx={{ p: 3 }}>
+        {/* AI Match Insights Card */}
+        {matchScore > 0 && (
+          <Box
+            sx={{
+              mb: 3,
+              p: 2.5,
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #F0FDF4 0%, #EFF6FF 100%)',
+              border: '1px solid #BFDBFE',
+              boxShadow: '0 2px 8px rgba(37, 99, 235, 0.06)',
+            }}
+          >
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <AutoAwesomeIcon sx={{ color: '#2563EB', fontSize: 22 }} />
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#1E3A8A', fontSize: '0.95rem' }}>
+                  {t('employer:profileCard.aiMatch.insightsTitle', 'Đánh giá mức độ phù hợp bởi AI')}
+                </Typography>
+              </Stack>
+              <Chip
+                label={`${matchScore}% ${t('employer:profileCard.aiMatch.badgeText', 'Phù hợp')}`}
+                sx={{
+                  fontWeight: 800,
+                  fontSize: '0.8rem',
+                  bgcolor: matchScore >= 70 ? '#059669' : '#2563EB',
+                  color: '#FFFFFF',
+                  px: 0.5,
+                  borderRadius: '6px',
+                }}
+              />
+            </Stack>
+
+            <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.8rem', mb: 2 }}>
+              {t(
+                'employer:profileCard.aiMatch.insightsSubtitle',
+                'Phân tích tự động dựa trên JD tin tuyển dụng và hồ sơ ứng viên'
+              )}
+            </Typography>
+
+            {/* Criteria Match Grid */}
+            <Grid container spacing={1.5}>
+              <Grid item xs={6} sm={3}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 1.25,
+                    bgcolor: '#FFFFFF',
+                    borderRadius: '8px',
+                    border: '1px solid #E2E8F0',
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ color: '#64748B', fontWeight: 600, display: 'block', fontSize: '0.72rem' }}
+                  >
+                    {t('employer:profileCard.aiMatch.criteriaCareer', 'Ngành nghề')}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.8rem', mt: 0.25 }}
+                    noWrap
+                  >
+                    {careerLabel}
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 1.25,
+                    bgcolor: '#FFFFFF',
+                    borderRadius: '8px',
+                    border: '1px solid #E2E8F0',
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ color: '#64748B', fontWeight: 600, display: 'block', fontSize: '0.72rem' }}
+                  >
+                    {t('employer:profileCard.aiMatch.criteriaLocation', 'Địa điểm')}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.8rem', mt: 0.25 }}
+                    noWrap
+                  >
+                    {cityLabel}
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 1.25,
+                    bgcolor: '#FFFFFF',
+                    borderRadius: '8px',
+                    border: '1px solid #E2E8F0',
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ color: '#64748B', fontWeight: 600, display: 'block', fontSize: '0.72rem' }}
+                  >
+                    {t('employer:profileCard.aiMatch.criteriaExperience', 'Kinh nghiệm')}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.8rem', mt: 0.25 }}
+                    noWrap
+                  >
+                    {experienceLabel}
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 1.25,
+                    bgcolor: '#FFFFFF',
+                    borderRadius: '8px',
+                    border: '1px solid #E2E8F0',
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ color: '#64748B', fontWeight: 600, display: 'block', fontSize: '0.72rem' }}
+                  >
+                    {t('employer:profileCard.aiMatch.criteriaSalary', 'Mức lương')}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: '#2563EB', fontSize: '0.8rem', mt: 0.25 }}
+                    noWrap
+                  >
+                    {formatLocalizedSalaryRange(resume.salaryMin, resume.salaryMax, i18n.language)}
+                  </Typography>
+                </Paper>
+              </Grid>
+            </Grid>
+
+            {aiAnalysis?.summary && (
+              <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px dashed #BFDBFE' }}>
+                <Typography variant="caption" sx={{ fontWeight: 700, color: '#1E3A8A', display: 'block', mb: 0.5 }}>
+                  Tóm tắt phân tích AI:
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#334155', fontSize: '0.8rem', lineHeight: 1.5 }}>
+                  {aiAnalysis.summary}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        )}
+
         {/* Contact Info Header */}
         <Stack direction="row" spacing={2.5} alignItems="center" sx={{ mb: 3 }}>
           <Avatar
@@ -451,9 +645,12 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
                     {phone}
                   </Typography>
                 ) : (
-                  <Typography variant="caption" sx={{ color: '#2563EB', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <LockIcon sx={{ fontSize: 13 }} /> Thông tin ẩn
-                  </Typography>
+                  <Stack direction="row" spacing={0.5} alignItems="center">
+                    <LockIcon sx={{ fontSize: 13, color: '#2563EB' }} />
+                    <Typography variant="caption" sx={{ color: '#2563EB', fontWeight: 600, fontSize: '0.8rem' }}>
+                      Thông tin ẩn
+                    </Typography>
+                  </Stack>
                 )}
               </Stack>
             </Grid>
@@ -464,19 +661,13 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
                 <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.8rem' }}>
                   Email:
                 </Typography>
-                {email ? (
-                  <Typography variant="caption" sx={{ color: '#0F172A', fontWeight: 600, fontSize: '0.8rem' }}>
-                    {email}
-                  </Typography>
-                ) : (
-                  <Typography variant="caption" sx={{ color: '#2563EB', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <LockIcon sx={{ fontSize: 13 }} /> Thông tin ẩn
-                  </Typography>
-                )}
+                <Typography variant="caption" sx={{ color: '#0F172A', fontWeight: 600, fontSize: '0.8rem' }}>
+                  {email || 'Chưa cập nhật'}
+                </Typography>
               </Stack>
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <LocationOnIcon sx={{ fontSize: 16, color: '#64748B' }} />
                 <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.8rem' }}>
@@ -490,12 +681,15 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
           </Grid>
         </Stack>
 
-        <Divider sx={{ mb: 3, borderStyle: 'dashed' }} />
+        <Divider sx={{ mb: 3, borderColor: '#F1F5F9' }} />
 
-        {/* Overview Parameters Grid */}
+        {/* 3. Detailed Information Grid */}
         <Grid container spacing={2.5} sx={{ mb: 3 }}>
           <Grid item xs={6} sm={3}>
-            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.75rem', display: 'block', mb: 0.25 }}>
+            <Typography
+              variant="caption"
+              sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.75rem', display: 'block', mb: 0.25 }}
+            >
               Trình độ học vấn
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.875rem' }}>
@@ -504,7 +698,10 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
           </Grid>
 
           <Grid item xs={6} sm={3}>
-            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.75rem', display: 'block', mb: 0.25 }}>
+            <Typography
+              variant="caption"
+              sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.75rem', display: 'block', mb: 0.25 }}
+            >
               Kinh nghiệm làm việc
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.875rem' }}>
@@ -513,7 +710,10 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
           </Grid>
 
           <Grid item xs={6} sm={3}>
-            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.75rem', display: 'block', mb: 0.25 }}>
+            <Typography
+              variant="caption"
+              sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.75rem', display: 'block', mb: 0.25 }}
+            >
               Cấp bậc hiện tại
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.875rem' }}>
@@ -522,7 +722,10 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
           </Grid>
 
           <Grid item xs={6} sm={3}>
-            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.75rem', display: 'block', mb: 0.25 }}>
+            <Typography
+              variant="caption"
+              sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.75rem', display: 'block', mb: 0.25 }}
+            >
               Mức lương mong muốn
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 700, color: '#2563EB', fontSize: '0.875rem' }}>
@@ -531,7 +734,10 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
           </Grid>
 
           <Grid item xs={6} sm={6}>
-            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.75rem', display: 'block', mb: 0.25 }}>
+            <Typography
+              variant="caption"
+              sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.75rem', display: 'block', mb: 0.25 }}
+            >
               Ngành nghề ứng tuyển
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.875rem' }}>
@@ -540,7 +746,10 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
           </Grid>
 
           <Grid item xs={6} sm={6}>
-            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.75rem', display: 'block', mb: 0.25 }}>
+            <Typography
+              variant="caption"
+              sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.75rem', display: 'block', mb: 0.25 }}
+            >
               Địa điểm mong muốn
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.875rem' }}>
@@ -552,7 +761,10 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
         {/* Skills Summary Chips */}
         {resume.skillsSummary ? (
           <Box sx={{ mb: 3, p: 2, bgcolor: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#334155', mb: 1, fontSize: '0.8125rem' }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 700, color: '#334155', mb: 1, fontSize: '0.8125rem' }}
+            >
               Kỹ năng chuyên môn & Kỹ năng mềm
             </Typography>
             <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap sx={{ gap: 0.75 }}>
@@ -577,10 +789,16 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
         {/* Description / Summary */}
         {resume.description && (
           <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', mb: 0.75, fontSize: '0.85rem' }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 700, color: '#0F172A', mb: 0.75, fontSize: '0.85rem' }}
+            >
               Mục tiêu nghề nghiệp & Giới thiệu bản thân
             </Typography>
-            <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.85rem', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+            <Typography
+              variant="body2"
+              sx={{ color: '#475569', fontSize: '0.85rem', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}
+            >
               {resume.description}
             </Typography>
           </Box>
@@ -592,7 +810,10 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <PictureAsPdfIcon sx={{ color: '#EF4444', fontSize: 20 }} />
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.875rem' }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.875rem' }}
+                >
                   File Hồ sơ đính kèm (CV PDF)
                 </Typography>
               </Stack>
@@ -606,7 +827,6 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
                 startIcon={<OpenInNewIcon sx={{ fontSize: 14 }} />}
                 sx={{ fontSize: '0.75rem', textTransform: 'none', fontWeight: 600 }}
               >
-
                 Mở trong tab mới
               </Button>
             </Stack>
@@ -638,7 +858,8 @@ const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
 
 /* ─── Main ProfileCard Master-Detail Container ────────────────────────────── */
 const ProfileCardContent: React.FC = () => {
-  const { t } = useTranslation('employer');
+  const { t, i18n } = useTranslation(['employer', 'common']);
+  const dispatch = useDispatch();
   const {
     control,
     handleSubmit,
@@ -650,14 +871,38 @@ const ProfileCardContent: React.FC = () => {
     activeFilterCount,
   } = useProfileSearch();
 
+  const { data: rawJobPosts = [] } = useJobPostOptions();
+  const formattedJobPostOptions = useMemo(
+    () => [
+      { id: '', name: t('employer:profileCard.aiMatch.allJobPosts', 'Tất cả tin tuyển dụng đang mở') },
+      ...rawJobPosts.map((jp) => ({ id: String(jp.id), name: jp.jobName })),
+    ],
+    [rawJobPosts, t]
+  );
+
   const { resumeFilter } = useAppSelector((state) => state.filter);
   const { pageSize } = resumeFilter;
   const [page, setPage] = useState(1);
 
-  const queryParams = useMemo(() => ({
-    ...resumeFilter,
-    page,
-  }), [resumeFilter, page]);
+  // Active Tab: 'all' (Find candidates) vs 'ai' (AI-suggested candidates)
+  const [activeTab, setActiveTab] = useState<'all' | 'ai'>(
+    resumeFilter.aiSuggested ? 'ai' : 'all'
+  );
+
+  // Sort: 'suitable' (Most suitable) vs 'newest' (Newest)
+  const [sortOption, setSortOption] = useState<string>(
+    resumeFilter.sort || 'suitable'
+  );
+
+  const queryParams = useMemo(
+    () => ({
+      ...resumeFilter,
+      sort: sortOption,
+      aiSuggested: activeTab === 'ai' ? true : undefined,
+      page,
+    }),
+    [resumeFilter, sortOption, activeTab, page]
+  );
 
   const { data: queryData, isLoading } = useEmployerResumes(queryParams);
   const resumes: Resume[] = queryData?.results || [];
@@ -675,13 +920,11 @@ const ProfileCardContent: React.FC = () => {
 
   const { mutate: toggleSave } = useToggleSaveResumeOptimistic();
 
-  const handleChangePage = (_: React.ChangeEvent<unknown>, newPage: number) => {
-    setPage(newPage);
-    setSelectedSlug('');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  const currentSelectedIndex = useMemo(() => {
+    return resumes.findIndex((r) => r.slug === (selectedSlug || resumes[0]?.slug));
+  }, [resumes, selectedSlug]);
 
-  const handleSave = (slug: string) => {
+  const handleSave = React.useCallback((slug: string) => {
     toggleSave(slug, {
       onSuccess: (resData: any) => {
         const isSaved = resData?.isSaved;
@@ -689,10 +932,95 @@ const ProfileCardContent: React.FC = () => {
           isSaved ? t('profileCard.messages.saveSuccess') : t('profileCard.messages.unsaveSuccess')
         );
       },
-      onError: (err: any) => {
+      onError: () => {
         toastMessages.error('Đã xảy ra lỗi khi lưu hồ sơ. Vui lòng thử lại.');
       },
     });
+  }, [toggleSave, t]);
+
+  // Keyboard navigation for Master Candidate List (↑/↓ to navigate, S to save, Enter to open full profile)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      if (
+        activeEl &&
+        (activeEl.tagName === 'INPUT' ||
+          activeEl.tagName === 'TEXTAREA' ||
+          activeEl.tagName === 'SELECT' ||
+          (activeEl as HTMLElement).isContentEditable)
+      ) {
+        return;
+      }
+
+      if (!resumes || resumes.length === 0) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextIndex = currentSelectedIndex < resumes.length - 1 ? currentSelectedIndex + 1 : 0;
+        if (resumes[nextIndex]) {
+          setSelectedSlug(resumes[nextIndex].slug);
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prevIndex = currentSelectedIndex > 0 ? currentSelectedIndex - 1 : resumes.length - 1;
+        if (resumes[prevIndex]) {
+          setSelectedSlug(resumes[prevIndex].slug);
+        }
+      } else if (e.key === 's' || e.key === 'S') {
+        const activeResume = resumes[currentSelectedIndex >= 0 ? currentSelectedIndex : 0];
+        if (activeResume) {
+          e.preventDefault();
+          handleSave(activeResume.slug);
+        }
+      } else if (e.key === 'Enter') {
+        const activeResume = resumes[currentSelectedIndex >= 0 ? currentSelectedIndex : 0];
+        if (activeResume) {
+          e.preventDefault();
+          const targetUrl = localizeRoutePath(
+            `/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, activeResume.slug)}`,
+            i18n.language
+          );
+          window.open(targetUrl, '_blank');
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [resumes, currentSelectedIndex, handleSave, i18n.language]);
+
+  const handleChangePage = (_: React.ChangeEvent<unknown>, newPage: number) => {
+    setPage(newPage);
+    setSelectedSlug('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleTabChange = (_: React.SyntheticEvent, newTab: 'all' | 'ai') => {
+    setActiveTab(newTab);
+    setPage(1);
+    setSelectedSlug('');
+    dispatch(
+      searchResume({
+        ...resumeFilter,
+        aiSuggested: newTab === 'ai' ? true : undefined,
+        sort: newTab === 'ai' ? 'suitable' : sortOption,
+        page: 1,
+      } as ResumeFilter)
+    );
+  };
+
+  const handleSortChange = (newSort: string) => {
+    setSortOption(newSort);
+    setPage(1);
+    dispatch(
+      searchResume({
+        ...resumeFilter,
+        sort: newSort,
+        page: 1,
+      } as ResumeFilter)
+    );
   };
 
   const totalPages = Math.ceil(count / pageSize);
@@ -700,18 +1028,195 @@ const ProfileCardContent: React.FC = () => {
 
   return (
     <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {/* 1. Top Search Bar with Filter Button */}
+      {/* 1. High-End Segmented AI Match & Search Mode Switcher */}
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: '16px',
+          border: '1px solid #E2E8F0',
+          bgcolor: '#FFFFFF',
+          p: 1.5,
+          boxShadow: '0 2px 12px rgba(15, 23, 42, 0.04)',
+        }}
+      >
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          alignItems={{ xs: 'stretch', sm: 'center' }}
+          justifyContent="space-between"
+          spacing={1.5}
+        >
+          {/* Segmented Mode Switcher */}
+          <Box
+            sx={{
+              display: 'inline-flex',
+              p: '4px',
+              borderRadius: '12px',
+              bgcolor: '#F1F5F9',
+              border: '1px solid #E2E8F0',
+              gap: '4px',
+            }}
+          >
+            {/* Standard Search Button */}
+            <Button
+              onClick={(e) => handleTabChange(e, 'all')}
+              disableRipple
+              startIcon={
+                <PersonSearchIcon
+                  sx={{
+                    fontSize: '18px !important',
+                    color: activeTab === 'all' ? 'primary.main' : '#64748B',
+                    transition: 'color 0.2s',
+                  }}
+                />
+              }
+              sx={{
+                px: 2.25,
+                py: 1,
+                borderRadius: '9px',
+                textTransform: 'none',
+                fontWeight: activeTab === 'all' ? 800 : 600,
+                fontSize: '0.875rem',
+                color: activeTab === 'all' ? '#0F172A' : '#64748B',
+                bgcolor: activeTab === 'all' ? '#FFFFFF' : 'transparent',
+                boxShadow: activeTab === 'all' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none',
+                border: activeTab === 'all' ? '1px solid #E2E8F0' : '1px solid transparent',
+                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                '&:hover': {
+                  bgcolor: activeTab === 'all' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.6)',
+                  color: '#0F172A',
+                },
+              }}
+            >
+              {t('employer:profileCard.tabs.findNewCandidates', 'Tìm kiếm ứng viên')}
+            </Button>
+
+            {/* AI Match Button */}
+            <Button
+              onClick={(e) => handleTabChange(e, 'ai')}
+              disableRipple
+              startIcon={
+                <AutoAwesomeIcon
+                  sx={{
+                    fontSize: '18px !important',
+                    color: activeTab === 'ai' ? '#2563EB' : '#6366F1',
+                    filter: activeTab === 'ai' ? 'drop-shadow(0 0 6px rgba(37,99,235,0.4))' : 'none',
+                    transition: 'all 0.2s',
+                  }}
+                />
+              }
+              sx={{
+                px: 2.25,
+                py: 1,
+                borderRadius: '9px',
+                textTransform: 'none',
+                fontWeight: activeTab === 'ai' ? 800 : 600,
+                fontSize: '0.875rem',
+                color: activeTab === 'ai' ? '#1E3A8A' : '#475569',
+                bgcolor: activeTab === 'ai' ? '#FFFFFF' : 'transparent',
+                boxShadow: activeTab === 'ai' ? '0 2px 10px rgba(37, 99, 235, 0.12)' : 'none',
+                border: activeTab === 'ai' ? '1px solid #BFDBFE' : '1px solid transparent',
+                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                '&:hover': {
+                  bgcolor: activeTab === 'ai' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.6)',
+                  color: '#1E3A8A',
+                },
+              }}
+            >
+              <Stack direction="row" spacing={1} alignItems="center">
+                <span>{t('employer:profileCard.tabs.aiSuggestedCandidates', 'Ứng viên AI gợi ý')}</span>
+                <Chip
+                  label="AI MATCH PRO"
+                  size="small"
+                  sx={{
+                    height: 20,
+                    fontSize: '0.625rem',
+                    fontWeight: 800,
+                    letterSpacing: '0.04em',
+                    background: activeTab === 'ai'
+                      ? 'linear-gradient(135deg, #2563EB 0%, #7C3AED 100%)'
+                      : '#E0E7FF',
+                    color: activeTab === 'ai' ? '#FFFFFF' : '#4338CA',
+                    border: 'none',
+                    boxShadow: activeTab === 'ai' ? '0 2px 6px rgba(37,99,235,0.25)' : 'none',
+                  }}
+                />
+              </Stack>
+            </Button>
+          </Box>
+
+          {/* Quick Pool Status Indicator */}
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ px: 1 }}>
+            <Box
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                bgcolor: '#10B981',
+                boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.2)',
+              }}
+            />
+            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.78rem' }}>
+              Kho dữ liệu:{' '}
+              <Box component="span" sx={{ color: '#0F172A', fontWeight: 700 }}>
+                {count > 0 ? `${count} hồ sơ sẵn sàng` : 'Hồ sơ đã kiểm duyệt'}
+              </Box>
+            </Typography>
+          </Stack>
+        </Stack>
+
+        {/* Dynamic Contextual AI Insight Bar when in AI Mode */}
+        {activeTab === 'ai' && (
+          <Box
+            sx={{
+              mt: 1.5,
+              p: 1.5,
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, rgba(239, 246, 255, 0.8) 0%, rgba(245, 243, 255, 0.7) 100%)',
+              border: '1px solid #BFDBFE',
+              display: 'flex',
+              alignItems: { xs: 'flex-start', sm: 'center' },
+              justifyContent: 'space-between',
+              flexDirection: { xs: 'column', sm: 'row' },
+              gap: 1,
+            }}
+          >
+            <Stack direction="row" spacing={1.25} alignItems="center">
+              <AutoAwesomeIcon sx={{ color: '#2563EB', fontSize: 18 }} />
+              <Typography variant="body2" sx={{ color: '#1E3A8A', fontWeight: 600, fontSize: '0.8125rem' }}>
+                Thuật toán AI tự động chấm điểm tương đồng dựa trên JD vị trí tuyển dụng (Ngành nghề, Tỉnh thành, Kinh nghiệm & Kỹ năng).
+              </Typography>
+            </Stack>
+            <Chip
+              label="Bộ lọc tối ưu AI"
+              size="small"
+              sx={{
+                height: 20,
+                fontSize: '0.6875rem',
+                fontWeight: 700,
+                bgcolor: '#DBEAFE',
+                color: '#1D4ED8',
+                border: '1px solid #93C5FD',
+              }}
+            />
+          </Box>
+        )}
+      </Paper>
+
+      {/* 2. Top Search Bar with Job Post Selector & Filter Button */}
       <ProfileSearchBar
         control={control}
         handleSubmit={handleSubmit}
         handleFilter={handleFilter}
         allConfig={allConfig}
+        primaryFieldName="jobPostId"
+        primaryFieldOptions={formattedJobPostOptions}
+        primaryFieldPlaceholder={t('employer:profileCard.aiMatch.jobPostSelector', 'Khớp theo tin tuyển dụng...')}
         t={t}
         onOpenFilterDrawer={() => setDrawerOpen(true)}
         activeFilterCount={activeFilterCount}
       />
 
-      {/* 2. Slide-in Right Filter Drawer Modal */}
+      {/* 3. Slide-in Right Filter Drawer Modal */}
       <ProfileFilterDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -723,7 +1228,7 @@ const ProfileCardContent: React.FC = () => {
         t={t}
       />
 
-      {/* 3. Vieclam24h Master-Detail 2-Column Split View */}
+      {/* 4. Vieclam24h Master-Detail 2-Column Split View */}
       <Box sx={{ width: '100%', minWidth: 0 }}>
         {isLoading ? (
           <Grid container spacing={2}>
@@ -744,17 +1249,21 @@ const ProfileCardContent: React.FC = () => {
             sx={{
               textAlign: 'center',
               py: 10,
-              borderRadius: '10px',
-              bgcolor: pc.actionDisabled(0.04),
-              border: '2px dashed',
-              borderColor: pc.divider(0.6),
+              borderRadius: '16px',
+              bgcolor: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              boxShadow: '0 4px 20px rgba(15, 23, 42, 0.04)',
             }}
           >
             <SearchOffIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2, opacity: 0.3 }} />
             <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.secondary' }}>
               {t('profileCard.title.noresultsfound')}
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontWeight: 500, maxWidth: 360, mx: 'auto', opacity: 0.7 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mt: 1, fontWeight: 500, maxWidth: 360, mx: 'auto', opacity: 0.7 }}
+            >
               Thử thay đổi từ khóa hoặc điều chỉnh bộ lọc để phát hiện thêm các ứng viên tài năng.
             </Typography>
           </Paper>
@@ -763,13 +1272,65 @@ const ProfileCardContent: React.FC = () => {
             {/* LEFT COLUMN: Master Candidate List (~360px - 400px) */}
             <Grid item xs={12} lg={4.5} xl={4}>
               <Stack spacing={1.5}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 0.5 }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A', fontSize: '1rem' }}>
-                    Kết quả: {' '}
-                    <Box component="span" sx={{ color: 'primary.main', fontWeight: 900 }}>
-                      {count} ứng viên
-                    </Box>
-                  </Typography>
+                {/* Result count & Sort dropdown bar */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    pb: 0.5,
+                    px: 0.5,
+                  }}
+                >
+                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.95rem' }}>
+                      Kết quả:{' '}
+                      <Box component="span" sx={{ color: 'primary.main', fontWeight: 900 }}>
+                        {count} ứng viên
+                      </Box>
+                    </Typography>
+                    <Tooltip title="Dùng phím mũi tên ↑/↓ để chuyển ứng viên, phím S để lưu/bỏ lưu, Enter để xem chi tiết" arrow>
+                      <Chip
+                        label="↑/↓ duyệt nhanh"
+                        size="small"
+                        sx={{
+                          height: 20,
+                          fontSize: '0.675rem',
+                          fontWeight: 700,
+                          bgcolor: '#F1F5F9',
+                          color: '#475569',
+                          border: '1px solid #E2E8F0',
+                          cursor: 'help',
+                          display: { xs: 'none', sm: 'inline-flex' },
+                        }}
+                      />
+                    </Tooltip>
+                  </Stack>
+
+                  {/* Sort Selection */}
+                  <FormControl size="small" variant="standard" sx={{ minWidth: 140 }}>
+                    <Select
+                      value={sortOption}
+                      onChange={(e) => handleSortChange(e.target.value)}
+                      disableUnderline
+                      sx={{
+                        fontSize: '0.8125rem',
+                        fontWeight: 700,
+                        color: 'primary.main',
+                        '& .MuiSelect-select': {
+                          py: 0.5,
+                          pr: '24px !important',
+                        },
+                      }}
+                    >
+                      <MenuItem value="suitable" sx={{ fontSize: '0.8125rem', fontWeight: 600 }}>
+                        {t('employer:profileCard.sort.mostSuitable', 'Phù hợp nhất')}
+                      </MenuItem>
+                      <MenuItem value="newest" sx={{ fontSize: '0.8125rem', fontWeight: 600 }}>
+                        {t('employer:profileCard.sort.newest', 'Mới nhất')}
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
                 </Box>
 
                 {/* Candidate List */}

@@ -111,7 +111,7 @@ const defaultTheme = {
   palette: colors,
   customShadows,
   typography: {
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontFamily: "var(--font-sans), var(--font-geist-sans), var(--font-inter), 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     h1: { fontSize: '32px', fontWeight: 700, lineHeight: 1.25, letterSpacing: '-0.02em', color: '#111827' }, // Page title
     h2: { fontSize: '22px', fontWeight: 700, lineHeight: 1.3, letterSpacing: '-0.015em', color: '#111827' }, // Section title
     h3: { fontSize: '18px', fontWeight: 600, lineHeight: 1.35, letterSpacing: '-0.01em', color: '#111827' }, // Card title

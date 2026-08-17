@@ -23,6 +23,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import SearchIcon from '@mui/icons-material/Search';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useTranslation } from 'react-i18next';
 
 import nominatimService, { NominatimPlace } from '@/services/nominatimService';
@@ -538,10 +539,11 @@ export default function LocationPickerContent({
           <Box
             sx={{
               position: 'absolute',
-              bottom: 12,
-              left: 12,
+              bottom: 8,
+              left: '50%',
+              transform: 'translateX(-50%)',
               zIndex: 1000,
-              bgcolor: 'rgba(30, 41, 59, 0.85)',
+              bgcolor: 'rgba(15, 23, 42, 0.82)',
               color: '#ffffff',
               px: 1.5,
               py: 0.5,
@@ -549,9 +551,13 @@ export default function LocationPickerContent({
               fontSize: '0.75rem',
               backdropFilter: 'blur(4px)',
               pointerEvents: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.75,
             }}
           >
-            💡 Nhấp vào bản đồ hoặc kéo ghim để cập nhật vị trí
+            <InfoOutlinedIcon sx={{ fontSize: 14, color: '#60A5FA' }} />
+            Nhấp vào bản đồ hoặc kéo ghim để cập nhật vị trí
           </Box>
         )}
       </Paper>

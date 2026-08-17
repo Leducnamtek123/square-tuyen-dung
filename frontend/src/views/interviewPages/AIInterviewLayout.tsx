@@ -23,6 +23,7 @@ import {
   faMicrophoneSlash,
   faPhoneSlash,
   faSpinner,
+  faUser,
   faXmark,
   faVideo,
   faVideoSlash,
@@ -90,65 +91,67 @@ function CustomControlBar({
   const [ending, setEnding] = useState(false);
 
   return (
-    <div className="flex items-center justify-center gap-3 border-t border-white/8 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl">
-      <button
-        type="button"
-        aria-label={isMicrophoneEnabled ? t('controls.muteMicrophone') : t('controls.unmuteMicrophone')}
-        onClick={() => localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)}
-        className={`flex size-11 items-center justify-center rounded-full border transition-all
-          ${isMicrophoneEnabled ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}
-      >
-        <FontAwesomeIcon icon={isMicrophoneEnabled ? faMicrophone : faMicrophoneSlash} />
-      </button>
-      <button
-        type="button"
-        aria-label={isCameraEnabled ? t('controls.turnCameraOff') : t('controls.turnCameraOn')}
-        onClick={() => localParticipant.setCameraEnabled(!isCameraEnabled)}
-        className={`flex size-11 items-center justify-center rounded-full border transition-all
-          ${isCameraEnabled ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}
-      >
-        <FontAwesomeIcon icon={isCameraEnabled ? faVideo : faVideoSlash} />
-      </button>
-      <button
-        type="button"
-        aria-label={isScreenShareEnabled ? t('controls.stopScreenShare') : t('controls.startScreenShare')}
-        onClick={() => localParticipant.setScreenShareEnabled(!isScreenShareEnabled)}
-        className={`flex size-11 items-center justify-center rounded-full border transition-all
-          ${isScreenShareEnabled ? 'border-cyan-400/40 bg-cyan-500/20 text-cyan-300' : 'border-white/15 bg-white/8 text-white hover:bg-white/15'}`}
-      >
-        <FontAwesomeIcon icon={faDesktop} />
-      </button>
-      <button
-        type="button"
-        aria-label={chatOpen ? t('liveRoom.chat.close') : t('liveRoom.chat.open')}
-        onClick={() => setChatOpen(!chatOpen)}
-        className={`flex size-11 items-center justify-center rounded-full border transition-all
-          ${chatOpen ? 'border-cyan-400/40 bg-cyan-500/20 text-cyan-300' : 'border-white/15 bg-white/8 text-white hover:bg-white/15'}`}
-      >
-        <FontAwesomeIcon icon={faComment} />
-      </button>
-      <div className="mx-2 h-6 w-px bg-white/10" />
-      <button
-        type="button"
-        onClick={async () => {
-          if (ending) return;
-          setEnding(true);
-          try {
-            await onEndSession?.();
-          } catch {
-            // keep disconnect flow resilient
-          } finally {
-            setEnding(false);
-          }
-        }}
-        disabled={ending}
-        className={`flex h-11 items-center gap-2 rounded-full border border-rose-400/40 bg-rose-500/20 px-5 text-sm font-bold text-rose-300 transition-all ${
-          ending ? 'cursor-wait opacity-70' : 'hover:bg-rose-500/30'
-        }`}
-      >
-        <FontAwesomeIcon icon={ending ? faSpinner : faPhoneSlash} className={ending ? 'animate-spin' : undefined} />
-        {ending ? t('controls.ending') : t('controls.end')}
-      </button>
+    <div className="flex items-center justify-center px-4 py-4">
+      <div className="flex items-center justify-center gap-3 rounded-full border border-white/15 bg-slate-950/80 px-4 py-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-2xl ring-1 ring-white/10">
+        <button
+          type="button"
+          aria-label={isMicrophoneEnabled ? t('controls.muteMicrophone') : t('controls.unmuteMicrophone')}
+          onClick={() => localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)}
+          className={`flex size-11 items-center justify-center rounded-full border transition-all duration-150 active:scale-95
+            ${isMicrophoneEnabled ? 'border-white/15 bg-white/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.08)] hover:bg-white/20' : 'border-rose-400/50 bg-rose-500/25 text-rose-200 shadow-[0_0_15px_rgba(244,63,94,0.2)]'}`}
+        >
+          <FontAwesomeIcon icon={isMicrophoneEnabled ? faMicrophone : faMicrophoneSlash} />
+        </button>
+        <button
+          type="button"
+          aria-label={isCameraEnabled ? t('controls.turnCameraOff') : t('controls.turnCameraOn')}
+          onClick={() => localParticipant.setCameraEnabled(!isCameraEnabled)}
+          className={`flex size-11 items-center justify-center rounded-full border transition-all duration-150 active:scale-95
+            ${isCameraEnabled ? 'border-white/15 bg-white/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.08)] hover:bg-white/20' : 'border-rose-400/50 bg-rose-500/25 text-rose-200 shadow-[0_0_15px_rgba(244,63,94,0.2)]'}`}
+        >
+          <FontAwesomeIcon icon={isCameraEnabled ? faVideo : faVideoSlash} />
+        </button>
+        <button
+          type="button"
+          aria-label={isScreenShareEnabled ? t('controls.stopScreenShare') : t('controls.startScreenShare')}
+          onClick={() => localParticipant.setScreenShareEnabled(!isScreenShareEnabled)}
+          className={`flex size-11 items-center justify-center rounded-full border transition-all duration-150 active:scale-95
+            ${isScreenShareEnabled ? 'border-cyan-400/50 bg-cyan-500/25 text-cyan-200 shadow-[0_0_15px_rgba(6,182,212,0.2)]' : 'border-white/15 bg-white/10 text-white hover:bg-white/20'}`}
+        >
+          <FontAwesomeIcon icon={faDesktop} />
+        </button>
+        <button
+          type="button"
+          aria-label={chatOpen ? t('liveRoom.chat.close') : t('liveRoom.chat.open')}
+          onClick={() => setChatOpen(!chatOpen)}
+          className={`flex size-11 items-center justify-center rounded-full border transition-all duration-150 active:scale-95
+            ${chatOpen ? 'border-cyan-400/50 bg-cyan-500/25 text-cyan-200 shadow-[0_0_15px_rgba(6,182,212,0.2)]' : 'border-white/15 bg-white/10 text-white hover:bg-white/20'}`}
+        >
+          <FontAwesomeIcon icon={faComment} />
+        </button>
+        <div className="mx-1.5 h-6 w-px bg-white/15" />
+        <button
+          type="button"
+          onClick={async () => {
+            if (ending) return;
+            setEnding(true);
+            try {
+              await onEndSession?.();
+            } catch {
+              // keep disconnect flow resilient
+            } finally {
+              setEnding(false);
+            }
+          }}
+          disabled={ending}
+          className={`flex h-11 items-center gap-2 rounded-full border border-rose-400/50 bg-rose-500/25 px-5 text-sm font-bold text-rose-200 shadow-[0_0_20px_rgba(244,63,94,0.25)] transition-all duration-150 active:scale-95 ${
+            ending ? 'cursor-wait opacity-70' : 'hover:bg-rose-500/35'
+          }`}
+        >
+          <FontAwesomeIcon icon={ending ? faSpinner : faPhoneSlash} className={ending ? 'animate-spin' : undefined} />
+          {ending ? t('controls.ending') : t('controls.end')}
+        </button>
+      </div>
     </div>
   );
 }
@@ -243,7 +246,7 @@ function AIParticipantTile({
         <div className={`absolute inset-0 ${isSelf ? 'bg-gradient-to-br from-zinc-800 to-zinc-900' : 'bg-gradient-to-br from-cyan-950 to-zinc-900'} z-0`} />
         <div className="relative z-10 flex h-full w-full items-center justify-center">
           <div className="flex size-28 items-center justify-center rounded-full border border-white/10 bg-white/10 text-5xl text-white/45 shadow-2xl shadow-black/30">
-            {isAgent ? 'AI' : '👤'}
+            {isAgent ? 'AI' : <FontAwesomeIcon icon={faUser} className="text-3xl" />}
           </div>
         </div>
         <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">

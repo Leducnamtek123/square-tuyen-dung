@@ -1,5 +1,5 @@
 /**
- * Image assets — extracted from constants.ts to avoid polluting every import
+ * Image assets - extracted from constants.ts to avoid polluting every import
  * with 50+ static asset dependencies.
  *
  * Import only what you need:

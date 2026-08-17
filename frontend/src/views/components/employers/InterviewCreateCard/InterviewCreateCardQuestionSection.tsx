@@ -209,7 +209,18 @@ const InterviewCreateCardQuestionSection = ({
             size="medium"
             startIcon={<AddCircleOutlineIcon />}
             onClick={onOpenAddQuestion}
-            sx={{ textTransform: 'none', fontWeight: 900, borderStyle: 'dashed', px: 3 }}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 800,
+              border: '1px solid #2563EB',
+              bgcolor: '#EFF6FF',
+              color: '#2563EB',
+              px: 3,
+              '&:hover': {
+                bgcolor: '#DBEAFE',
+                borderColor: '#1D4ED8',
+              },
+            }}
           >
             {t('interview:employer.questions.add')}
           </Button>
@@ -220,7 +231,18 @@ const InterviewCreateCardQuestionSection = ({
             startIcon={<EditIcon />}
             disabled={selectedQuestionsCount !== 1}
             onClick={onOpenEditQuestion}
-            sx={{ textTransform: 'none', fontWeight: 900, borderStyle: 'dashed', px: 3 }}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 800,
+              border: '1px solid #E2E8F0',
+              bgcolor: '#FFFFFF',
+              color: '#334155',
+              px: 3,
+              '&:hover': {
+                bgcolor: '#F8FAFC',
+                borderColor: '#CBD5E1',
+              },
+            }}
           >
             {t('interview:employer.questions.edit')}
           </Button>
@@ -228,7 +250,7 @@ const InterviewCreateCardQuestionSection = ({
       </Grid>
 
       <Grid size={12}>
-        <Divider sx={{ mt: 4, mb: 2, borderStyle: 'dashed' }} />
+        <Divider sx={{ mt: 4, mb: 2, borderColor: '#E2E8F0' }} />
         <Stack direction="row" spacing={2} justifyContent="flex-end">
           <Button
             onClick={onCancel}

@@ -164,7 +164,7 @@ const EmployerBlogListPage = () => {
       header: t('blog.table.publishedAt'),
       cell: ({ row }: { row: { original: Article } }) => (
         <Typography variant="body2">
-          {row.original.publishedAt ? dayjs(row.original.publishedAt).format('DD/MM/YYYY') : '—'}
+          {row.original.publishedAt ? dayjs(row.original.publishedAt).format('DD/MM/YYYY') : '-'}
         </Typography>
       ),
     },

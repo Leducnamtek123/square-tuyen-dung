@@ -1222,56 +1222,6 @@
         "desc": "Send system notifications via email to administrators"
       },
       "interviewAi": {
-        "pacingTitle": "Interview AI Pacing",
-        "pacingDescription": "Tune how quickly the interviewer speaks and how long it waits before asking the next question.",
-        "preset": {
-          "label": "Pacing preset",
-          "helper": "Choose a preset to fill all timing values, or switch to Custom and adjust manually.",
-          "options": {
-            "balanced": "Balanced",
-            "natural": "Natural",
-            "snappy": "Snappy",
-            "custom": "Custom"
-          }
-        },
-        "questionGap": {
-          "label": "Gap before next question (seconds)",
-          "helper": "Increase this if the AI interrupts candidates too quickly."
-        },
-        "silenceThreshold": {
-          "label": "Minimum silence threshold (seconds)",
-          "helper": "Keep this above zero if you want the AI to feel less eager to jump in."
-        },
-        "ttsTitle": "TTS Speed",
-        "ttsDescription": "Control how fast the AI voice speaks during the interview.",
-        "ttsSpeed": {
-          "label": "Voice speed",
-          "helper": "1.0 is normal. Lower values sound calmer; higher values sound faster."
-        }
-      },
-      "apiTitle": "API & External Services",
-      "googleApiKey": "Google API Key",
-      "supportEmail": "Support Email",
-      "summary": "Configuration Summary",
-      "summaryText": "Please review all configuration settings carefully before saving. Changes may affect the entire system immediately.",
-      "saveBtn": "Save Changes",
-      "notificationDemo": {
-        "title": "Notification Demo",
-        "description": "Send a demo notification to verify delivery settings.",
-        "send": "Send demo notification",
-        "sending": "Sending...",
-        "success": "Demo notification sent.",
-        "error": "Failed to send demo notification."
-      },
-      "healthCheck": {
-        "title": "System Health",
-        "description": "Check database and cache connectivity.",
-        "check": "Check health",
-        "checking": "Checking...",
-        "database": "Database",
-        "redis": "Redis"
-      },
-      "interviewAi": {
         "pacingTitle": "Voice AI Interview Pacing Configuration",
         "pacingDescription": "Customize interview question reading speed (TTS) and candidate response silence recognition gaps.",
         "preset": {
@@ -1298,6 +1248,28 @@
           "label": "Question Reading Speed (TTS Speed)",
           "helper": "Standard speed: 0.92 (From 0.5 to 2.0)"
         }
+      },
+      "apiTitle": "API & External Services",
+      "googleApiKey": "Google API Key",
+      "supportEmail": "Support Email",
+      "summary": "Configuration Summary",
+      "summaryText": "Please review all configuration settings carefully before saving. Changes may affect the entire system immediately.",
+      "saveBtn": "Save Changes",
+      "notificationDemo": {
+        "title": "Notification Demo",
+        "description": "Send a demo notification to verify delivery settings.",
+        "send": "Send demo notification",
+        "sending": "Sending...",
+        "success": "Demo notification sent.",
+        "error": "Failed to send demo notification."
+      },
+      "healthCheck": {
+        "title": "System Health",
+        "description": "Check database and cache connectivity.",
+        "check": "Check health",
+        "checking": "Checking...",
+        "database": "Database",
+        "redis": "Redis"
       },
       "fptGpu": {
         "title": "FPT GPU Container",
@@ -1902,6 +1874,12 @@
     "pagination": {
       "rowsPerPage": "Rows per page",
       "displayedRows": "{{from}}-{{to}} of {{count}}"
+    },
+    "noOptions": "No Options",
+    "autocomplete": {
+      "open": "Open",
+      "close": "Close",
+      "clear": "Clear"
     }
   },
   "chat": {

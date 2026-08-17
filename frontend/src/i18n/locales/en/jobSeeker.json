@@ -125,7 +125,8 @@
       "major": "Enter major",
       "trainingPlace": "Enter training institution",
       "gradeOrRank": "Enter grade or rank",
-      "certificateName": "Enter certificate name"
+      "certificateName": "Enter certificate name",
+      "selectCityFirst": "Select City First"
     },
     "validation": {
       "fullNameRequired": "Full name is required.",
@@ -584,4 +585,3 @@
     }
   }
 }
-

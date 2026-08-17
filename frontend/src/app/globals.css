@@ -1,8 +1,5 @@
-/* Google Font Inter for Premium Enterprise SaaS UI */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-/* TailwindCSS v4 — selective import to avoid Preflight conflicting with MUI */
-/* DO NOT use @import "tailwindcss" — its CSS reset breaks MUI components */
+/* TailwindCSS v4 - selective import to avoid Preflight conflicting with MUI */
+/* DO NOT use @import "tailwindcss" - its CSS reset breaks MUI components */
 @import "tailwindcss/theme" layer(theme);
 @import "tailwindcss/utilities" layer(utilities);
 @import "tw-animate-css";
@@ -10,7 +7,9 @@
 
 /* Premium SaaS Global Styles */
 :root {
-  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-inter: var(--font-sans);
   --color-primary: #2563EB;
   --color-primary-hover: #1D4ED8;
   --color-bg: #F8FAFC;
@@ -23,7 +22,7 @@
 }
 
 body, html {
-  font-family: var(--font-inter) !important;
+  font-family: var(--font-sans) !important;
   background-color: var(--color-bg) !important;
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
@@ -31,32 +30,36 @@ body, html {
 
 /* Micro-animations and transitions according to specifications */
 .saas-card {
-  border-radius: 14px !important;
+  border-radius: 16px !important;
   background-color: #FFFFFF !important;
   border: 1px solid #E5E7EB !important;
   box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px -1px rgba(0, 0, 0, 0.04) !important;
-  transition: box-shadow 100ms ease-in-out, border-color 100ms ease-in-out, transform 100ms ease-in-out !important;
+  transition: box-shadow 150ms ease-in-out, border-color 150ms ease-in-out, transform 150ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .saas-card:hover {
-  box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0px 6px 16px 0px rgba(15, 23, 42, 0.08) !important;
   border-color: #D1D5DB !important;
+}
+
+.saas-card:active {
+  transform: scale(0.99) !important;
 }
 
 .saas-btn-primary {
   background-color: #2563EB !important;
   color: #FFFFFF !important;
   font-weight: 600 !important;
-  border-radius: 8px !important;
+  border-radius: 10px !important;
   box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05) !important;
-  transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out, transform 100ms ease-in-out !important;
+  transition: background-color 120ms ease-in-out, box-shadow 120ms ease-in-out, transform 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 .saas-btn-primary:hover {
   background-color: #1D4ED8 !important;
-  box-shadow: 0px 2px 4px rgba(37, 99, 235, 0.25) !important;
+  box-shadow: 0px 2px 6px rgba(37, 99, 235, 0.28) !important;
 }
 .saas-btn-primary:active {
-  transform: scale(0.98);
+  transform: scale(0.98) !important;
 }
 
 .saas-btn-secondary {
@@ -64,12 +67,15 @@ body, html {
   color: #374151 !important;
   border: 1px solid #E5E7EB !important;
   font-weight: 600 !important;
-  border-radius: 8px !important;
-  transition: background-color 100ms ease-in-out, border-color 100ms ease-in-out !important;
+  border-radius: 10px !important;
+  transition: background-color 120ms ease-in-out, border-color 120ms ease-in-out, transform 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 .saas-btn-secondary:hover {
   background-color: #F9FAFB !important;
   border-color: #D1D5DB !important;
+}
+.saas-btn-secondary:active {
+  transform: scale(0.98) !important;
 }
 
 .saas-btn-danger {
@@ -77,11 +83,14 @@ body, html {
   color: #EF4444 !important;
   border: 1px solid #FCA5A5 !important;
   font-weight: 600 !important;
-  border-radius: 8px !important;
-  transition: background-color 100ms ease-in-out !important;
+  border-radius: 10px !important;
+  transition: background-color 120ms ease-in-out, transform 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 .saas-btn-danger:hover {
   background-color: #FEE2E2 !important;
+}
+.saas-btn-danger:active {
+  transform: scale(0.98) !important;
 }
 
 /* Swiper carousel CSS */
@@ -170,7 +179,7 @@ html {
 body {
   margin: 0;
   overflow-x: hidden;
-  font-family: var(--font-be-vietnam-pro), 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+  font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -182,7 +191,7 @@ code {
 }
 
 :root {
-  /* Base — InfoHR Brand Colors (white-first UI with pink accents) */
+  /* Base - InfoHR Brand Colors (white-first UI with pink accents) */
   --background: #ffffff;
   --foreground: #0f172a;
   --card: #ffffff;
@@ -219,7 +228,7 @@ code {
 }
 
 .dark {
-  /* Dark mode — InfoHR brand on dark bg */
+  /* Dark mode - InfoHR brand on dark bg */
   --background: #180812;              /* deep plum */
   --foreground: #ffeaf1;
   --card: #250d1c;
@@ -315,7 +324,7 @@ h1, h2, h3, h4, h5, .display-text {
   letter-spacing: -0.01em;
 }
 
-/* Optimized Background Atmosphere — using fewer gradients for better perf */
+/* Optimized Background Atmosphere - using fewer gradients for better perf */
 .bg-atmosphere {
   position: fixed;
   inset: 0;
@@ -333,7 +342,7 @@ h1, h2, h3, h4, h5, .display-text {
     radial-gradient(at 100% 100%, rgba(42, 169, 225, 0.08) 0px, transparent 50%);
 }
 
-/* Rich text editor images — override inline width/height set by the editor insert dialog */
+/* Rich text editor images - override inline width/height set by the editor insert dialog */
 .rdw-editor-main img,
 .rdw-editor-main .public-DraftStyleDefault-block img,
 .rdw-editor-main .public-DraftEditor-content img {
@@ -345,7 +354,7 @@ h1, h2, h3, h4, h5, .display-text {
   border-radius: 6px;
 }
 
-/* Figure wrapper also gets inline width — must override */
+/* Figure wrapper also gets inline width - must override */
 .rdw-editor-main figure,
 .rdw-editor-main .rdw-image-alignment {
   display: block !important;
@@ -371,7 +380,7 @@ h1, h2, h3, h4, h5, .display-text {
   display: none;
 }
 
-/* Refined Glassmorphism Cards — optimized blur intensity */
+/* Refined Glassmorphism Cards - optimized blur intensity */
 .glass-panel {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(8px);

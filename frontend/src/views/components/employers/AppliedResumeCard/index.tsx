@@ -489,7 +489,13 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
                 py: 1,
                 fontWeight: 800,
                 textTransform: 'none',
-                borderStyle: 'dashed',
+                border: '1px solid #E2E8F0',
+                bgcolor: '#FFFFFF',
+                color: '#334155',
+                '&:hover': {
+                  bgcolor: '#F8FAFC',
+                  borderColor: '#CBD5E1',
+                },
               }}
             >
               {t('employer:appliedResume.downloadList', 'Tải danh sách')}

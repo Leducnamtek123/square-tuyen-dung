@@ -84,31 +84,33 @@ const CareerJobSection = ({
   const Icon = career.appIconName ? CAREER_ICON_MAP[career.appIconName.toLowerCase()] : undefined;
 
   return (
-    <Card variant="outlined" sx={{ boxShadow: 0 }}>
-      <CardHeader
-        avatar={
-          <Avatar sx={{ bgcolor: 'rgba(15, 23, 42, 0.06)', color: '#0f172a' }} aria-label={career.name}>
-            {Icon ? <Icon color="inherit" /> : career.name.slice(0, 1)}
-          </Avatar>
-        }
-        title={
-          <Typography variant="h5" sx={{ color: 'text.primary' }}>
-            {t('home.jobsIn', { careerName: career.name })}
-          </Typography>
-        }
-        sx={{
-          backgroundColor: 'rgba(15, 23, 42, 0.04)',
-          borderBottom: '1px solid',
-          borderColor: 'rgba(15, 23, 42, 0.10)',
-          p: { xs: 0.75, sm: 1, md: 1.5, lg: 1.5, xl: 1.5 },
-        }}
-      />
-      <CardContent>
-        <Box sx={{ p: { xs: 0, sm: 0, md: 0, lg: 2, xl: 2 } }}>
-          <FilterJobPostCard params={{ careerId: career.id }} />
-        </Box>
-      </CardContent>
-    </Card>
+    <Box sx={{ mb: 6 }}>
+      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
+        <Avatar
+          sx={{
+            bgcolor: 'rgba(37, 99, 235, 0.08)',
+            color: '#2563eb',
+            width: 42,
+            height: 42,
+            borderRadius: 2,
+          }}
+          aria-label={career.name}
+        >
+          {Icon ? <Icon color="inherit" fontSize="small" /> : career.name.slice(0, 1)}
+        </Avatar>
+        <Typography
+          variant="h5"
+          sx={{
+            color: 'text.primary',
+            fontWeight: 800,
+            fontSize: { xs: '1.2rem', md: '1.35rem' },
+          }}
+        >
+          {t('home.jobsIn', { careerName: career.name })}
+        </Typography>
+      </Stack>
+      <FilterJobPostCard params={{ careerId: career.id }} />
+    </Box>
   );
 };
 
@@ -120,6 +122,7 @@ const EntryPointCard = ({
   ctaLabel,
   href,
   accent,
+  statusBadge,
 }: {
   icon: React.ReactNode;
   title: string;
@@ -128,46 +131,86 @@ const EntryPointCard = ({
   ctaLabel: string;
   href: string;
   accent: string;
+  statusBadge?: { text: string; color?: string };
 }) => {
   return (
     <Card
       sx={{
         height: '100%',
-        borderRadius: 4,
-        boxShadow: 0,
+        borderRadius: '24px',
+        boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03)',
         border: '1px solid',
-        borderColor: 'divider',
+        borderColor: 'rgba(226, 232, 240, 0.8)',
+        bgcolor: '#ffffff',
         overflow: 'hidden',
-        transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+        position: 'relative',
+        transition:
+          'transform 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms ease, border-color 200ms ease',
         '&:hover': {
           transform: 'translateY(-4px)',
-          boxShadow: '0 18px 40px rgba(15, 57, 127, 0.12)',
+          boxShadow: '0 25px 50px -12px rgba(15, 57, 127, 0.12)',
           borderColor: accent,
+        },
+        '&:active': {
+          transform: 'scale(0.99)',
         },
       }}
     >
-      <CardContent sx={{ p: { xs: 2.5, sm: 3, md: 3.5 } }}>
-        <Stack spacing={2.5}>
-          <Stack direction="row" spacing={1.5} alignItems="center">
+      <CardContent sx={{ p: { xs: 3, sm: 3.5, md: 4 } }}>
+        <Stack spacing={3}>
+          {statusBadge && (
             <Box
               sx={{
-                width: 52,
-                height: 52,
-                borderRadius: 2,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 1,
+                width: 'fit-content',
+                px: 1.5,
+                py: 0.5,
+                borderRadius: '9999px',
+                bgcolor: `${accent}0c`,
+                border: `1px solid ${accent}22`,
+                color: accent,
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                letterSpacing: '0.01em',
+              }}
+            >
+              <Box
+                component="span"
+                sx={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  bgcolor: accent,
+                  boxShadow: `0 0 6px ${accent}`,
+                }}
+              />
+              {statusBadge.text}
+            </Box>
+          )}
+
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Box
+              sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '16px',
                 display: 'grid',
                 placeItems: 'center',
-                bgcolor: `${accent}14`,
+                bgcolor: `${accent}12`,
                 color: accent,
                 flexShrink: 0,
+                border: `1px solid ${accent}24`,
               }}
             >
               {icon}
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.25, fontSize: { xs: '1.1rem', md: '1.25rem' } }}>
                 {title}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.45 }}>
                 {description}
               </Typography>
             </Box>
@@ -181,9 +224,13 @@ const EntryPointCard = ({
                 size="small"
                 variant="outlined"
                 sx={{
-                  borderColor: `${accent}33`,
-                  bgcolor: `${accent}08`,
+                  borderColor: 'rgba(226, 232, 240, 0.9)',
+                  bgcolor: '#f8fafc',
+                  color: '#334155',
                   fontWeight: 600,
+                  fontSize: '0.8rem',
+                  borderRadius: '8px',
+                  py: 0.5,
                 }}
               />
             ))}
@@ -199,11 +246,21 @@ const EntryPointCard = ({
               width: { xs: '100%', sm: 'fit-content' },
               justifyContent: 'center',
               bgcolor: accent,
-              boxShadow: `0 8px 18px ${accent}2E`,
+              color: '#ffffff',
+              fontWeight: 700,
+              borderRadius: '12px',
+              px: 3,
+              py: 1.2,
+              boxShadow: `0 4px 14px ${accent}33`,
+              transition:
+                'transform 120ms cubic-bezier(0.16, 1, 0.3, 1), background-color 120ms ease, box-shadow 120ms ease',
               '&:hover': {
                 bgcolor: accent,
                 filter: 'brightness(0.92)',
-                boxShadow: `0 10px 22px ${accent}38`,
+                boxShadow: `0 8px 20px ${accent}44`,
+              },
+              '&:active': {
+                transform: 'scale(0.98)',
               },
             }}
           >
@@ -276,7 +333,7 @@ export default function HomePage() {
             {t('home.choosePathDescription')}
           </Typography>
         </Stack>
-        <Grid container spacing={3}>
+        <Grid container spacing={3.5}>
           <Grid size={{ xs: 12, md: 6 }}>
             <EntryPointCard
               icon={<SearchIcon fontSize="large" />}
@@ -290,6 +347,7 @@ export default function HomePage() {
               ctaLabel={t('home.candidateCta')}
               href={jobsHref}
               accent="#2563eb"
+              statusBadge={{ text: '🔥 +450 việc làm mới cập nhật hôm nay' }}
             />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>
@@ -305,6 +363,7 @@ export default function HomePage() {
               ctaLabel={t('home.employerCta')}
               href={employerIntroHref}
               accent="#0f766e"
+              statusBadge={{ text: '⚡ AI Matching 98.4% chuẩn xác' }}
             />
           </Grid>
         </Grid>
@@ -312,33 +371,33 @@ export default function HomePage() {
 
       {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
         <Box sx={{ mt: 10 }}>
-          <Card variant="outlined">
-            <CardHeader
-              avatar={
-                <Avatar sx={{ bgcolor: 'rgba(15, 23, 42, 0.06)', color: '#0f172a' }} aria-label={t('home.suggestedJobsAria')}>
-                  <TipsAndUpdatesIcon color="inherit" />
-                </Avatar>
-              }
-              title={
-                <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 800 }}>
-                  {t('home.suggestedJobs')}
-                </Typography>
-              }
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
+            <Avatar
               sx={{
-                backgroundColor: 'rgba(15, 23, 42, 0.04)',
-                borderBottom: '1px solid',
-                borderColor: 'rgba(15, 23, 42, 0.10)',
-                p: { xs: 0.75, sm: 1, md: 1.5, lg: 1.5, xl: 1.5 },
+                bgcolor: 'rgba(37, 99, 235, 0.08)',
+                color: '#2563eb',
+                width: 42,
+                height: 42,
+                borderRadius: 2,
               }}
-            />
-            <CardContent sx={{ backgroundColor: 'rgba(248, 250, 252, 0.82)' }}>
-              <Box sx={{ p: { xs: 0, sm: 0, md: 0, lg: 2, xl: 2 } }}>
-                <LazyLoadSection minHeight="400px">
-                  <SuggestedJobPostCard />
-                </LazyLoadSection>
-              </Box>
-            </CardContent>
-          </Card>
+              aria-label={t('home.suggestedJobsAria')}
+            >
+              <TipsAndUpdatesIcon color="inherit" fontSize="small" />
+            </Avatar>
+            <Typography
+              variant="h5"
+              sx={{
+                color: 'text.primary',
+                fontWeight: 800,
+                fontSize: { xs: '1.2rem', md: '1.35rem' },
+              }}
+            >
+              {t('home.suggestedJobs')}
+            </Typography>
+          </Stack>
+          <LazyLoadSection minHeight="400px">
+            <SuggestedJobPostCard />
+          </LazyLoadSection>
         </Box>
       )}
 

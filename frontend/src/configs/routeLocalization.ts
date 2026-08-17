@@ -1,5 +1,5 @@
 /**
- * Route Localization — Powered by routeConfig.ts (single source of truth)
+ * Route Localization - Powered by routeConfig.ts (single source of truth)
  *
  * Provides helpers to translate route paths between Vietnamese and English.
  */

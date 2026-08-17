@@ -92,13 +92,17 @@ const theme = createTheme(baseTheme, {
         },
         outlined: {
           borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: 'rgba(226, 232, 240, 0.95)',
           backgroundColor: 'rgba(255, 255, 255, 0.94)',
-          boxShadow: '0 1px 0 rgba(255,255,255,0.8)',
+          boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
           '&:hover': {
             transform: 'translateY(-1px)',
             borderWidth: 1,
-            backgroundColor: 'rgba(15, 23, 42, 0.04)',
-            boxShadow: '0 8px 18px rgba(15, 23, 42, 0.06)',
+            borderStyle: 'solid',
+            backgroundColor: '#F8FAFC',
+            borderColor: '#CBD5E1',
+            boxShadow: '0 4px 12px rgba(15, 23, 42, 0.06)',
           },
         },
         text: {

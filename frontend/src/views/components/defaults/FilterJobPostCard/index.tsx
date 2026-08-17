@@ -561,7 +561,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
       ) : (
         <>
           <Grid container spacing={2.5}>
-            {jobPosts.map((job: ModelsJobPost & { companyDict?: { companyImageUrl?: string | null; companyName?: string | null }; locationDict?: { city?: number | string } }) => {
+            {jobPosts.map((job: ModelsJobPost & { companyDict?: { companyImageUrl?: string | null; companyName?: string | null }; locationDict?: { city?: number | string } }, idx: number) => {
               const isFav = Boolean(favorites[job.id]);
               const companyNameStr = job.companyDict?.companyName || job.company?.companyName || 'Công ty Tuyển Dụng';
               const companyLogo = job.companyDict?.companyImageUrl || job.company?.logoUrl || IMAGES.companyLogoDefault;
@@ -580,20 +580,28 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
                       justify: 'space-between',
                       height: '100%',
                       minHeight: 165,
-                      p: 2.2,
-                      backgroundColor: job.isUrgent ? '#fff7ed' : '#ffffff',
-                      border: `1px solid ${job.isUrgent ? '#fdba74' : '#e2e8f0'}`,
-                      borderRadius: '16px',
+                      p: 2.5,
+                      backgroundColor: job.isUrgent ? '#fffaf5' : '#ffffff',
+                      border: `1px solid ${job.isUrgent ? 'rgba(251, 146, 60, 0.45)' : 'rgba(226, 232, 240, 0.8)'}`,
+                      borderRadius: '20px',
                       textDecoration: 'none',
                       color: 'inherit',
                       position: 'relative',
-                      transition: 'all 0.25s ease',
+                      boxShadow: job.isUrgent
+                        ? '0 10px 25px -5px rgba(249, 115, 22, 0.08), 0 1px 3px rgba(0,0,0,0.02)'
+                        : '0 20px 40px -15px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(0,0,0,0.02)',
+                      transition: 'transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease, border-color 180ms ease',
+                      animation: 'fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards',
+                      animationDelay: `${(idx % 12) * 40}ms`,
                       '&:hover': {
-                        transform: 'translateY(-3px)',
-                        borderColor: job.isUrgent ? '#ea580c' : '#cbd5e1',
+                        transform: 'translateY(-4px)',
+                        borderColor: job.isUrgent ? '#ea580c' : '#2563eb',
                         boxShadow: job.isUrgent
-                          ? '0 12px 30px rgba(234, 88, 12, 0.14)'
-                          : '0 12px 30px rgba(15, 23, 42, 0.08)',
+                          ? '0 20px 35px -5px rgba(234, 88, 12, 0.16)'
+                          : '0 25px 45px -10px rgba(15, 57, 127, 0.12)',
+                      },
+                      '&:active': {
+                        transform: 'scale(0.99)',
                       },
                     }}
                   >
@@ -702,7 +710,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
                         </Typography>
                         <Stack direction="row" spacing={0.5} alignItems="center">
                           <AttachMoneyIcon sx={{ fontSize: 16, color: '#2563eb' }} />
-                          <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: '#2563eb' }}>
+                          <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: '#2563eb', fontFamily: 'var(--font-mono)', letterSpacing: '-0.01em' }}>
                             {salaryDisplay}
                           </Typography>
                         </Stack>

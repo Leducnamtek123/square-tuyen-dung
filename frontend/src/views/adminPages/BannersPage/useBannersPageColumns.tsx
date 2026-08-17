@@ -40,7 +40,7 @@ export const useBannersPageColumns = ({ typeOptions, onEdit, onDelete }: UseBann
               sx={{ width: 120, height: 60, objectFit: 'cover', borderRadius: 1 }}
             />
           ) : (
-            '—'
+            '-'
           ),
       },
       {
@@ -58,7 +58,7 @@ export const useBannersPageColumns = ({ typeOptions, onEdit, onDelete }: UseBann
               sx={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 1 }}
             />
           ) : (
-            '—'
+            '-'
           ),
       },
       {
@@ -67,7 +67,7 @@ export const useBannersPageColumns = ({ typeOptions, onEdit, onDelete }: UseBann
         enableSorting: true,
         cell: (info) => (
           <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {(info.getValue() as string) || '—'}
+            {(info.getValue() as string) || '-'}
           </Typography>
         ),
       },

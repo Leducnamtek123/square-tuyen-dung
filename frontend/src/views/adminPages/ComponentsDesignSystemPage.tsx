@@ -81,7 +81,7 @@ export default function ComponentsDesignSystemPage() {
   ];
 
   return (
-    <Box sx={{ pb: 8, pt: 3, px: { xs: 2, md: 4 }, minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
+    <Box sx={{ pb: 8, pt: 3, px: { xs: 2, md: 4 }, minHeight: '100dvh', backgroundColor: '#F8FAFC' }}>
       <Container maxWidth="xl">
         {/* Header Hero Banner */}
         <Paper
@@ -101,7 +101,7 @@ export default function ComponentsDesignSystemPage() {
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Chip
                 icon={<WidgetsOutlinedIcon sx={{ color: '#60A5FA !important', fontSize: 18 }} />}
-                label="InfoHR Design System 2026 — Comprehensive Gallery"
+                label="InfoHR Design System 2026 - Comprehensive Gallery"
                 sx={{
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   color: '#93C5FD',
@@ -148,7 +148,7 @@ export default function ComponentsDesignSystemPage() {
             }}
           >
             <Tab label="1. Thẻ State Data Rỗng (NoDataCard Variants)" />
-            <Tab label="2. Thẻ Nét Đứt & Action (EmptyCard)" />
+            <Tab label="2. Thẻ Trạng Thái Rỗng & Action Callout (EmptyCard)" />
             <Tab label="3. Thẻ Việc Làm, Ứng Viên & Công Ty (Feature Cards)" />
             <Tab label="4. Bộ Nút Bấm Chuẩn (Button System)" />
             <Tab label="5. Thẻ Thống Kê KPI & Kanban Pipeline" />
@@ -158,35 +158,23 @@ export default function ComponentsDesignSystemPage() {
           </Tabs>
         </Box>
 
-        {/* TAB 1: NO DATA CARD VARIANTS */}
+        {/* TAB 1: NO DATA CARDS */}
         {activeTab === 0 && (
           <Stack spacing={4}>
-            <Card sx={{ p: 4, borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: 'none' }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: '#0F172A', mb: 1 }}>
-                Mẫu Nổi Bật: Không tìm thấy việc làm phù hợp với tiêu chí của bạn
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#64748B', mb: 3 }}>
-                Được sử dụng tại trang Tìm kiếm việc làm khi người dùng lọc không có kết quả phù hợp (`svgKey="ImageSvg3"`).
-              </Typography>
-              <NoDataCard
-                title="Không tìm thấy việc làm phù hợp với tiêu chí của bạn"
-                content="Hãy thử điều chỉnh lại bộ lọc địa điểm, ngành nghề hoặc xóa từ khóa tìm kiếm để khám phá thêm nhiều cơ hội công việc khác."
-                buttonText="Xóa bộ lọc & Thử lại"
-                svgKey="ImageSvg3"
-                onClick={() => {}}
-              />
-            </Card>
-
-            <Typography variant="h6" sx={{ fontWeight: 700, color: '#0F172A', mt: 2 }}>
-              Tất cả 7 Mẫu Minh Họa SVG Trạng Thái Rỗng (Empty State Variants)
+            <Typography variant="h6" sx={{ fontWeight: 700, color: '#0F172A' }}>
+              Trường Hợp Dữ Liệu Trống (Empty State Cards)
             </Typography>
             <Grid container spacing={3}>
-              {svgVariants.map((item) => (
-                <Grid size={{ xs: 12, md: 6 }} key={item.key}>
-                  <Card sx={{ p: 2, borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: 'none', height: '100%' }}>
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: '#2563EB', display: 'block', mb: 1 }}>
-                      {item.key} — {item.desc}
-                    </Typography>
+              {[
+                { title: 'Chưa có thông tin việc làm', key: 'job' },
+                { title: 'Chưa có hồ sơ ứng tuyển', key: 'resume' },
+                { title: 'Chưa có công ty theo dõi', key: 'company' },
+                { title: 'Chưa có kết quả phân tích AI', key: 'ai' },
+                { title: 'Chưa có bài viết tin tức', key: 'article' },
+                { title: 'Chưa có thông báo mới', key: 'notification' },
+              ].map((item) => (
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.key}>
+                  <Card sx={{ p: 1, borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: 'none' }}>
                     <NoDataCard
                       title={item.title}
                       content="Dữ liệu hiển thị trực quan theo tiêu chuẩn thiết kế SaaS 2026."
@@ -201,7 +189,7 @@ export default function ComponentsDesignSystemPage() {
           </Stack>
         )}
 
-        {/* TAB 2: EMPTY CARD (DASHED) */}
+        {/* TAB 2: EMPTY CARD (SOLID CALLOUT) */}
         {activeTab === 1 && (
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
@@ -278,7 +266,7 @@ export default function ComponentsDesignSystemPage() {
                         </Typography>
                         <Chip
                           icon={<CheckCircleOutlinedIcon sx={{ color: '#059669 !important', fontSize: 16 }} />}
-                          label="🎯 Phù hợp nhu cầu tuyển dụng"
+                          label="Phù hợp nhu cầu tuyển dụng"
                           sx={{
                             backgroundColor: '#ECFDF5',
                             color: '#047857',
@@ -326,22 +314,22 @@ export default function ComponentsDesignSystemPage() {
         {/* TAB 4: BUTTON SYSTEM */}
         {activeTab === 3 && (
           <Stack spacing={4}>
-            {/* Primary & Action Buttons */}
+            {/* Primary & Add Action Buttons */}
             <Card sx={{ p: 4, borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: 'none' }}>
               <Typography variant="h6" sx={{ fontWeight: 700, color: '#0F172A', mb: 1 }}>
-                Nút Thêm mới (Add Buttons)
+                1. Nút Thêm Mới & Tạo Dữ Liệu (Add & Create Buttons)
               </Typography>
               <Typography variant="body2" sx={{ color: '#64748B', mb: 3 }}>
-                Sử dụng cho hành động tạo mới dữ liệu, đăng tin, thêm học vấn/kinh nghiệm.
+                Sử dụng cho hành động tạo mới dữ liệu, đăng tin, thêm học vấn/kinh nghiệm với màu primary solid cao cấp.
               </Typography>
-              <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+              <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap alignItems="center">
                 <Button
                   variant="contained"
                   startIcon={<AddIcon />}
                   sx={{
                     backgroundColor: '#2563EB',
                     color: '#FFFFFF',
-                    fontWeight: 600,
+                    fontWeight: 700,
                     borderRadius: '10px',
                     px: 3,
                     py: 1,
@@ -350,7 +338,7 @@ export default function ComponentsDesignSystemPage() {
                     '&:hover': { backgroundColor: '#1D4ED8', transform: 'translateY(-1px)' },
                   }}
                 >
-                  Thêm tin tuyển dụng
+                  Tạo tin tuyển dụng
                 </Button>
                 <Button
                   variant="contained"
@@ -359,7 +347,7 @@ export default function ComponentsDesignSystemPage() {
                   sx={{
                     backgroundColor: '#2563EB',
                     color: '#FFFFFF',
-                    fontWeight: 600,
+                    fontWeight: 700,
                     borderRadius: '8px',
                     px: 2,
                     py: 0.7,
@@ -368,13 +356,168 @@ export default function ComponentsDesignSystemPage() {
                 >
                   Thêm ứng viên
                 </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<AddIcon />}
+                  size="small"
+                  sx={{
+                    borderRadius: '10px',
+                    border: '1px solid #BFDBFE',
+                    backgroundColor: '#EFF6FF',
+                    color: '#1D4ED8',
+                    fontWeight: 700,
+                    fontSize: '0.8125rem',
+                    textTransform: 'none',
+                    px: 2,
+                    py: 0.6,
+                    '&:hover': { backgroundColor: '#DBEAFE', borderColor: '#93C5FD' },
+                  }}
+                >
+                  Thêm kỹ năng (Inline Chip Button)
+                </Button>
+              </Stack>
+            </Card>
+
+            {/* Import & Export Solid Action Buttons */}
+            <Card sx={{ p: 4, borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: 'none' }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: '#0F172A', mb: 1 }}>
+                2. Nút Xuất & Nhập Dữ Liệu (Export & Import Buttons)
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#64748B', mb: 3 }}>
+                Tuyệt đối không dùng viền nét đứt (dashed). Sử dụng viền solid sắc nét `1px solid #E2E8F0` hoặc soft tone background.
+              </Typography>
+              <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap alignItems="center">
+                <Button
+                  variant="outlined"
+                  startIcon={<FileDownloadOutlinedIcon />}
+                  sx={{
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                    backgroundColor: '#FFFFFF',
+                    color: '#334155',
+                    fontWeight: 700,
+                    px: 2.5,
+                    py: 0.9,
+                    textTransform: 'none',
+                    boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
+                    '&:hover': {
+                      backgroundColor: '#F8FAFC',
+                      borderColor: '#CBD5E1',
+                      transform: 'translateY(-1px)',
+                    },
+                  }}
+                >
+                  Xuất danh sách (Excel / CSV)
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<CloudUploadOutlinedIcon />}
+                  sx={{
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                    backgroundColor: '#FFFFFF',
+                    color: '#334155',
+                    fontWeight: 700,
+                    px: 2.5,
+                    py: 0.9,
+                    textTransform: 'none',
+                    boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
+                    '&:hover': {
+                      backgroundColor: '#F8FAFC',
+                      borderColor: '#CBD5E1',
+                      transform: 'translateY(-1px)',
+                    },
+                  }}
+                >
+                  Nhập danh sách từ tệp
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<FileDownloadOutlinedIcon />}
+                  sx={{
+                    backgroundColor: '#0F172A',
+                    color: '#FFFFFF',
+                    fontWeight: 700,
+                    borderRadius: '10px',
+                    px: 2.5,
+                    py: 0.9,
+                    textTransform: 'none',
+                    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.15)',
+                    '&:hover': { backgroundColor: '#1E293B' },
+                  }}
+                >
+                  Tải báo cáo PDF
+                </Button>
+              </Stack>
+            </Card>
+
+            {/* Secondary & Utility Buttons */}
+            <Card sx={{ p: 4, borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: 'none' }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: '#0F172A', mb: 1 }}>
+                3. Nút Điều Khiển Phụ & Bộ Lọc (Secondary & Filter Buttons)
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#64748B', mb: 3 }}>
+                Dành cho chức năng chỉnh sửa, bộ lọc, xem trước và thao tác phụ.
+              </Typography>
+              <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap alignItems="center">
+                <Button
+                  variant="outlined"
+                  startIcon={<EditOutlinedIcon />}
+                  sx={{
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                    backgroundColor: '#FFFFFF',
+                    color: '#334155',
+                    fontWeight: 700,
+                    px: 2.5,
+                    py: 0.9,
+                    textTransform: 'none',
+                    '&:hover': { backgroundColor: '#F8FAFC', borderColor: '#CBD5E1' },
+                  }}
+                >
+                  Chỉnh sửa thông tin
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<FilterListOutlinedIcon />}
+                  sx={{
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                    backgroundColor: '#FFFFFF',
+                    color: '#334155',
+                    fontWeight: 700,
+                    px: 2.5,
+                    py: 0.9,
+                    textTransform: 'none',
+                    '&:hover': { backgroundColor: '#F8FAFC', borderColor: '#CBD5E1' },
+                  }}
+                >
+                  Bộ lọc nâng cao
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<VisibilityOutlinedIcon />}
+                  sx={{
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                    backgroundColor: '#FFFFFF',
+                    color: '#334155',
+                    fontWeight: 700,
+                    px: 2.5,
+                    py: 0.9,
+                    textTransform: 'none',
+                    '&:hover': { backgroundColor: '#F8FAFC', borderColor: '#CBD5E1' },
+                  }}
+                >
+                  Xem trước hồ sơ
+                </Button>
               </Stack>
             </Card>
 
             {/* Delete & Danger Buttons */}
             <Card sx={{ p: 4, borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: 'none' }}>
               <Typography variant="h6" sx={{ fontWeight: 700, color: '#DC2626', mb: 1 }}>
-                Nút Xóa & Cảnh Báo (Delete & Danger Buttons)
+                4. Nút Xóa & Cảnh Báo (Delete & Danger Buttons)
               </Typography>
               <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap alignItems="center">
                 <Button
@@ -633,6 +776,55 @@ export default function ComponentsDesignSystemPage() {
                 fetchData={async () => dummyExportData}
               />
             </Card>
+
+            {/* Liquid Glass Floating Dock Preview */}
+            <Card sx={{ p: 4, borderRadius: '24px', border: '1px solid #E2E8F0', boxShadow: 'none', bgcolor: '#020617', color: '#FFF' }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, color: '#F8FAFC', mb: 1 }}>
+                Liquid Glass Floating Dock (`AI Interview Studio Controls`)
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#94A3B8', mb: 3 }}>
+                Thanh điều khiển cuộc gọi phỏng vấn AI với hiệu ứng Liquid Glass mờ, ring viền sáng 1px và phản hồi xúc giác.
+              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                <Box
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                    borderRadius: '9999px',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    bgcolor: 'rgba(15, 23, 42, 0.8)',
+                    px: 3,
+                    py: 1.2,
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
+                    backdropFilter: 'blur(16px)',
+                  }}
+                >
+                  <Box sx={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.15)', bgcolor: 'rgba(255,255,255,0.1)', display: 'grid', placeItems: 'center' }}>
+                    <SmartToyOutlinedIcon sx={{ fontSize: 20, color: '#60A5FA' }} />
+                  </Box>
+                  <Box sx={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.15)', bgcolor: 'rgba(255,255,255,0.1)', display: 'grid', placeItems: 'center' }}>
+                    <VisibilityOutlinedIcon sx={{ fontSize: 20, color: '#FFF' }} />
+                  </Box>
+                  <Box sx={{ width: 1, height: 24, bgcolor: 'rgba(255,255,255,0.15)' }} />
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{
+                      borderRadius: '9999px',
+                      bgcolor: 'rgba(239, 68, 68, 0.25)',
+                      border: '1px solid rgba(248, 113, 113, 0.5)',
+                      color: '#FECDD3',
+                      fontWeight: 700,
+                      px: 2.5,
+                      textTransform: 'none',
+                    }}
+                  >
+                    Kết thúc phỏng vấn
+                  </Button>
+                </Box>
+              </Box>
+            </Card>
           </Stack>
         )}
 
@@ -709,7 +901,7 @@ export default function ComponentsDesignSystemPage() {
               </Button>
             </Stack>
             <Divider sx={{ mb: 3 }} />
-            <Box sx={{ border: '1px dashed #CBD5E1', borderRadius: '16px', py: 4 }}>
+            <Box sx={{ border: '1px solid #E2E8F0', bgcolor: '#F8FAFC', borderRadius: '16px', py: 4 }}>
               {errorPreview === '404' ? <NotFoundPage /> : <ForbiddenPage />}
             </Box>
           </Card>

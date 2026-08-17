@@ -128,7 +128,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                     <ListItemText primary={item} slotProps={{ primary: { variant: 'body2', lineHeight: 1.6, fontWeight: 650, color: 'success.dark' } }} />
                                 </ListItem>
                             )) : (
-                                <Box sx={{ py: 4, textAlign: 'center', bgcolor: pc.actionDisabled( 0.03), borderRadius: 2, border: '1px dashed', borderColor: 'divider' }}>
+                                <Box sx={{ py: 4, textAlign: 'center', bgcolor: pc.actionDisabled( 0.03), borderRadius: 2, border: '1px solid', borderColor: '#E2E8F0' }}>
                                     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 750, letterSpacing: 0 }}>{t('interviewDetail.messages.noData')}</Typography>
                                 </Box>
                             )}
@@ -163,7 +163,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                     <ListItemText primary={item} slotProps={{ primary: { variant: 'body2', lineHeight: 1.6, fontWeight: 650, color: 'error.dark' } }} />
                                 </ListItem>
                             )) : (
-                                <Box sx={{ py: 4, textAlign: 'center', bgcolor: pc.actionDisabled( 0.03), borderRadius: 2, border: '1px dashed', borderColor: 'divider' }}>
+                                <Box sx={{ py: 4, textAlign: 'center', bgcolor: pc.actionDisabled( 0.03), borderRadius: 2, border: '1px solid', borderColor: '#E2E8F0' }}>
                                     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 750, letterSpacing: 0 }}>{t('interviewDetail.messages.noData')}</Typography>
                                 </Box>
                             )}

@@ -125,7 +125,8 @@
       "gradeOrRank": "Nhập xếp loại/điểm số",
       "selectLanguage": "Chọn ngoại ngữ",
       "skillName": "Nhập tên kỹ năng",
-      "certificateName": "Nhập tên chứng chỉ"
+      "certificateName": "Nhập tên chứng chỉ",
+      "selectCityFirst": "[VI] selectCityFirst"
     },
     "validation": {
       "fullNameRequired": "Vui lòng nhập họ và tên.",
@@ -584,4 +585,3 @@
     }
   }
 }
-

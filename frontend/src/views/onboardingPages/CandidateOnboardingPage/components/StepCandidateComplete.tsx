@@ -155,7 +155,7 @@ export default function StepCandidateComplete({
                   {t('onboarding.step4.position', 'Vị trí')}
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
-                  {formData.desiredJobTitle || '—'}
+                  {formData.desiredJobTitle || '-'}
                 </Typography>
               </Box>
             </Stack>
@@ -169,7 +169,7 @@ export default function StepCandidateComplete({
                   {t('onboarding.step4.career', 'Ngành nghề')}
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
-                  {careerName || '—'}
+                  {careerName || '-'}
                 </Typography>
               </Box>
             </Stack>
@@ -183,7 +183,7 @@ export default function StepCandidateComplete({
                   {t('onboarding.step4.location', 'Địa điểm')}
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
-                  {cityName || '—'}
+                  {cityName || '-'}
                 </Typography>
               </Box>
             </Stack>

@@ -1,5 +1,5 @@
 /**
- * Frontend E2E Tests — Rewrite Completeness Guard
+ * Frontend E2E Tests - Rewrite Completeness Guard
  * 
  * This is THE MOST CRITICAL test file. It automatically verifies that
  * every localized route has a matching rewrite rule in next.config.mjs.
@@ -74,7 +74,7 @@ const doesPageExist = (destination: string): boolean => {
   return possiblePaths.some((p: string) => existsSync(p));
 };
 
-describe('Rewrite Completeness — Prevents 404 in Production', () => {
+describe('Rewrite Completeness - Prevents 404 in Production', () => {
   const rewrites = getRewriteRules();
 
   it('has parsed rewrite rules from next.config.mjs', () => {
@@ -135,7 +135,7 @@ describe('Rewrite Completeness — Prevents 404 in Production', () => {
         
         // If localized path equals English path, Next.js serves it directly
         if (viPath === `/${route}`) {
-          // No rewrite needed — page exists at the English path
+          // No rewrite needed - page exists at the English path
           return;
         }
         
@@ -158,7 +158,7 @@ describe('Rewrite Completeness — Prevents 404 in Production', () => {
       it(`${dest} has a page file in app/`, () => {
         const exists = doesPageExist(dest);
         if (!exists) {
-          console.warn(`⚠️  No page found for ${dest} — may use catch-all or layout`);
+          console.warn(`⚠️  No page found for ${dest} - may use catch-all or layout`);
         }
         // This is advisory, not a hard fail (catch-all routes are valid)
         expect(true).toBe(true);

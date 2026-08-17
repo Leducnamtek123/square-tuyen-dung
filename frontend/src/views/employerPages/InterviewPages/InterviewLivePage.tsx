@@ -18,8 +18,6 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import interviewService from '../../../services/interviewService';
 import { type InterviewSession } from '../../../types/models';
 import InterviewLiveCandidateCard from '../../../views/components/employers/InterviewLiveCandidateCard';
-import AIServiceHealthBanner from '../../../components/Features/AIServiceHealthBanner';
-import pc from '@/utils/muiColors';
 import { getLiveInterviewSessions } from './liveInterviewSessions';
 
 type InterviewLivePageState = {
@@ -179,8 +177,6 @@ const InterviewLivePage = () => {
         </Stack>
       </Stack>
 
-      <AIServiceHealthBanner />
-
       {state.error && (
         <Alert
           severity="error"
@@ -202,8 +198,29 @@ const InterviewLivePage = () => {
       )}
 
       <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
-        <FiberManualRecordIcon sx={{ fontSize: 12, color: theme.palette.primary.main, animation: 'liveDot 2s infinite', '@keyframes liveDot': { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.35 } } }} />
-        <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary' }}>
+        <Box
+          sx={{
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            bgcolor: '#EF4444',
+            boxShadow: '0 0 10px rgba(239, 68, 68, 0.8)',
+            position: 'relative',
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              inset: -4,
+              borderRadius: '50%',
+              border: '2px solid rgba(239, 68, 68, 0.5)',
+              animation: 'livePing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite',
+            },
+            '@keyframes livePing': {
+              '0%': { transform: 'scale(0.8)', opacity: 1 },
+              '100%': { transform: 'scale(2.2)', opacity: 0 },
+            },
+          }}
+        />
+        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
           {t('interviewLive.activeNow')}
         </Typography>
       </Stack>
@@ -214,9 +231,9 @@ const InterviewLivePage = () => {
           sx={{
             p: 4,
             borderRadius: 4,
-            border: '1px dashed',
-            borderColor: 'divider',
-            bgcolor: pc.bgPaper( 0.8),
+            border: '1px solid #E2E8F0',
+            bgcolor: '#FFFFFF',
+            boxShadow: '0 4px 20px rgba(15, 23, 42, 0.04)',
             textAlign: 'center',
           }}
         >

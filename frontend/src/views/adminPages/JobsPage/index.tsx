@@ -132,7 +132,7 @@ const JobsPage = () => {
                         {info.getValue() as string}
                     </Typography>
                     <Typography variant="caption" color="textSecondary">
-                        {info.row.original.companyDict?.companyName || info.row.original.company?.companyName || '—'}
+                        {info.row.original.companyDict?.companyName || info.row.original.company?.companyName || '-'}
                     </Typography>
                 </Box>
             ),
@@ -145,7 +145,7 @@ const JobsPage = () => {
         {
             accessorKey: 'createAt',
             header: t('pages.jobs.table.createdAt') as string,
-            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—',
+            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '-',
         },
         {
             id: 'actions',

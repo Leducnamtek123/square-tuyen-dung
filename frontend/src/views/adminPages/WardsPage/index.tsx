@@ -424,12 +424,12 @@ const WardsPage = () => {
       {
         accessorKey: 'districtDict.name',
         header: t('pages.wards.table.district') as string,
-        cell: (info) => (info.getValue() as string) || '—',
+        cell: (info) => (info.getValue() as string) || '-',
       },
       {
         accessorKey: 'districtDict.cityDict.name',
         header: t('pages.wards.table.city') as string,
-        cell: (info) => (info.getValue() as string) || '—',
+        cell: (info) => (info.getValue() as string) || '-',
       },
       {
         id: 'actions',

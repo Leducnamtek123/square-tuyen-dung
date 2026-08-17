@@ -181,14 +181,14 @@ const AdminArticlesPage = () => {
     {
       accessorKey: 'authorName',
       header: t('pages.articles.table.author'),
-      cell: ({ row }) => <Typography variant="body2">{row.original.authorName || '—'}</Typography>,
+      cell: ({ row }) => <Typography variant="body2">{row.original.authorName || '-'}</Typography>,
     },
     {
       accessorKey: 'publishedAt',
       header: t('pages.articles.table.publishedAt'),
       cell: ({ row }) => (
         <Typography variant="body2">
-          {row.original.publishedAt ? dayjs(row.original.publishedAt).format('DD/MM/YYYY HH:mm') : '—'}
+          {row.original.publishedAt ? dayjs(row.original.publishedAt).format('DD/MM/YYYY HH:mm') : '-'}
         </Typography>
       ),
     },

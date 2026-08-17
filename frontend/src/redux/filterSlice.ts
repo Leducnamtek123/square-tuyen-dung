@@ -33,6 +33,9 @@ export interface ResumeFilter {
   jobTypeId: string;
   genderId: string;
   maritalStatusId: string;
+  jobPostId?: string;
+  sort?: string;
+  aiSuggested?: boolean;
   page: number;
   pageSize: number;
 }

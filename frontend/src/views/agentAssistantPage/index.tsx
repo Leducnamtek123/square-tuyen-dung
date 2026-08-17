@@ -1097,8 +1097,8 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
           </Box>
 
           {/* Bottom Input Area */}
-          <Box sx={{ p: 1.5, borderTop: '1px solid #E5E7EB', bgcolor: '#FFFFFF' }}>
-            <Stack spacing={1}>
+          <Box sx={{ p: 2, borderTop: '1px solid rgba(226, 232, 240, 0.85)', bgcolor: '#FFFFFF' }}>
+            <Stack spacing={1.5}>
               {attachments.length ? (
                 <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                   {attachments.map((attachment) => (
@@ -1108,7 +1108,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                         position: 'relative',
                         width: 64,
                         aspectRatio: '1 / 1',
-                        borderRadius: '8px',
+                        borderRadius: '10px',
                         overflow: 'hidden',
                         border: '1px solid #E5E7EB',
                         bgcolor: '#F8FAFC',
@@ -1146,7 +1146,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                 </Stack>
               ) : null}
 
-              <Stack direction="row" spacing={1} alignItems="flex-end">
+              <Stack direction="row" spacing={1.25} alignItems="flex-end">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -1161,13 +1161,14 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                       disabled={isSending || Boolean(deletingThreadId)}
                       onClick={() => fileInputRef.current?.click()}
                       sx={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: '8px',
-                        border: '1px solid #E5E7EB',
-                        color: '#6B7280',
-                        backgroundColor: '#FFFFFF',
-                        '&:hover': { backgroundColor: '#F8FAFC', borderColor: '#D1D5DB' },
+                        width: 42,
+                        height: 42,
+                        borderRadius: '12px',
+                        border: '1px solid rgba(226, 232, 240, 0.9)',
+                        color: '#64748B',
+                        backgroundColor: '#F8FAFC',
+                        transition: 'all 150ms ease',
+                        '&:hover': { backgroundColor: '#F1F5F9', borderColor: '#CBD5E1' },
                       }}
                     >
                       {attachments.length ? <ImageOutlinedIcon fontSize="small" /> : <AttachFileRoundedIcon fontSize="small" />}
@@ -1191,12 +1192,15 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                   size="small"
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: '8px',
-                      bgcolor: '#FFFFFF',
+                      borderRadius: '14px',
+                      bgcolor: '#F8FAFC',
                       fontSize: '0.875rem',
-                      '& fieldset': { borderColor: '#E5E7EB' },
-                      '&:hover fieldset': { borderColor: '#D1D5DB' },
-                      '&.Mui-focused fieldset': { borderColor: '#2563EB', borderWidth: '1px' },
+                      transition: 'border-color 150ms ease, background-color 150ms ease',
+                      '& fieldset': { borderColor: 'rgba(226, 232, 240, 0.9)' },
+                      '&:hover': { bgcolor: '#FFFFFF' },
+                      '&:hover fieldset': { borderColor: '#CBD5E1' },
+                      '&.Mui-focused': { bgcolor: '#FFFFFF' },
+                      '&.Mui-focused fieldset': { borderColor: '#2563EB', borderWidth: '1.5px' },
                     },
                   }}
                 />
@@ -1206,16 +1210,18 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                       disabled={(!input.trim() && attachments.length === 0) || isSending || Boolean(deletingThreadId)}
                       onClick={() => void handleSend()}
                       sx={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: '8px',
+                        width: 42,
+                        height: 42,
+                        borderRadius: '12px',
                         bgcolor: '#2563EB',
                         color: '#FFFFFF',
-                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-                        '&:hover': { bgcolor: '#1D4ED8' },
+                        boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+                        transition: 'transform 120ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 120ms ease, background-color 120ms ease',
+                        '&:hover': { bgcolor: '#1D4ED8', boxShadow: '0 6px 18px rgba(37, 99, 235, 0.35)' },
+                        '&:active': { transform: 'scale(0.96)' },
                         '&.Mui-disabled': {
-                          bgcolor: '#E5E7EB',
-                          color: '#9CA3AF',
+                          bgcolor: '#E2E8F0',
+                          color: '#94A3B8',
                           boxShadow: 'none',
                         },
                       }}

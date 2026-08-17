@@ -69,9 +69,9 @@ const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({
       sx={{
         '& > .MuiGrid2-root > div > .MuiTypography-root': {
           mb: 0.75,
-          color: 'primary.main',
+          color: '#1E293B',
           fontSize: '0.8125rem',
-          fontWeight: 800,
+          fontWeight: 700,
           lineHeight: 1.35,
         },
       }}

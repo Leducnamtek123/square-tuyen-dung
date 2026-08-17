@@ -371,6 +371,20 @@ class EmployerJobPostActivityViewSet(
             email=candidate_profile.email,
             phone=candidate_profile.phone,
         )
+
+        from django.conf import settings
+        from shared.helpers import helper
+
+        if getattr(settings, 'AI_RESUME_AUTO_ANALYZE', True):
+            try:
+                from apps.jobs.tasks import analyze_resume_ai
+                analyze_resume_ai.delay(job_post_activity.id)
+                job_post_activity.ai_analysis_status = 'processing'
+                job_post_activity.ai_analysis_progress = 5
+                job_post_activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'update_at'])
+            except Exception as ex:
+                helper.print_log_error("auto analyze resume manual candidate", ex)
+
         response_serializer = self.get_serializer(
             job_post_activity,
             fields=[

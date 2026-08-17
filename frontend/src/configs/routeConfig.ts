@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * routeConfig.ts — Single source of truth for ALL application routes
+ * routeConfig.ts - Single source of truth for ALL application routes
  * ============================================================================
  *
  * Every route path (EN ↔ VI), portal prefix, and Next.js rewrite rule is
@@ -15,7 +15,7 @@
  */
 
 // ---------------------------------------------------------------------------
-// 1. Segment Map — Maps every Vietnamese slug ↔ English slug
+// 1. Segment Map - Maps every Vietnamese slug ↔ English slug
 // ---------------------------------------------------------------------------
 
 export const SEGMENT_MAP = {
@@ -26,7 +26,7 @@ export const SEGMENT_MAP = {
   'cap-nhat-mat-khau': 'reset-password',
   'xac-nhan-email': 'email-verification-required',
 
-  // Job Seeker — Public
+  // Job Seeker - Public
   'viec-lam': 'jobs',
   'cong-ty': 'companies',
   've-chung-toi': 'about-us',
@@ -34,7 +34,7 @@ export const SEGMENT_MAP = {
   'viec-lam-theo-tinh-thanh': 'jobs-by-city',
   'viec-lam-theo-hinh-thuc-lam-viec': 'jobs-by-type',
 
-  // Job Seeker — Private
+  // Job Seeker - Private
   'bang-dieu-khien': 'dashboard',
   'ho-so': 'profile',
   'ho-so-tung-buoc': 'online-profile',
@@ -130,7 +130,7 @@ for (const [vi, en] of Object.entries(SEGMENT_MAP)) {
 }
 
 // ---------------------------------------------------------------------------
-// 2. ROUTES constant — Structured route paths (English-only, canonical)
+// 2. ROUTES constant - Structured route paths (English-only, canonical)
 // ---------------------------------------------------------------------------
 
 export const ROUTES = {
@@ -282,7 +282,7 @@ export const ROUTES = {
 } as const;
 
 // ---------------------------------------------------------------------------
-// 3. Rewrite rules — Generated from SEGMENT_MAP for next.config.mjs
+// 3. Rewrite rules - Generated from SEGMENT_MAP for next.config.mjs
 // ---------------------------------------------------------------------------
 
 type RewriteRule = { source: string; destination: string };

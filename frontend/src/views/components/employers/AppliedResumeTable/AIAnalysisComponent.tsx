@@ -118,18 +118,19 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
       onClick={onOpenDrawer}
       sx={{ 
         textTransform: 'none', 
-         
         fontSize: '0.75rem', 
         py: 0.5,
         px: 1.5,
-        fontWeight: 900,
-        color: 'primary.main',
-        borderColor: pc.primary( 0.3),
-        borderStyle: 'dashed',
+        fontWeight: 800,
+        color: '#2563EB',
+        border: '1px solid #BFDBFE',
+        bgcolor: '#EFF6FF',
+        borderRadius: '8px',
+        transition: 'all 0.2s ease',
         '&:hover': {
-            bgcolor: pc.primary( 0.06),
-            borderColor: 'primary.main',
-            borderStyle: 'solid'
+          bgcolor: '#DBEAFE',
+          borderColor: '#1D4ED8',
+          color: '#1D4ED8',
         }
       }}
     >

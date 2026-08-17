@@ -217,23 +217,26 @@ const CompanyImageCard = () => {
             </Box>
           ))
         )}
-
         {fileList.length < 15 && !isLoading && (
           <Box
             onClick={() => fileInputRef.current?.click()}
             sx={{
               cursor: 'pointer',
               borderRadius: 3,
-              border: (theme) => `2px dashed ${theme.palette.divider}`,
-              bgcolor: 'grey.50',
+              border: '1.5px solid #E2E8F0',
+              bgcolor: '#F8FAFC',
               aspectRatio: '1/1',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               gap: 1,
-              transition: 'all 0.2s',
-              '&:hover': { borderColor: 'primary.main', bgcolor: 'primary.extralight' },
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                borderColor: '#2563EB',
+                bgcolor: '#EFF6FF',
+                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.08)',
+              },
             }}
           >
             <CameraAltOutlinedIcon sx={{ fontSize: 32, color: 'primary.main' }} />
