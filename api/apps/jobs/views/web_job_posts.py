@@ -95,7 +95,14 @@ class PrivateJobPostViewSet(
     @action(methods=["get"], detail=False, url_path="job-posts-options", url_name="job-posts-options")
     def get_job_post_options(self, request):
         user = request.user
-        queryset = self.queryset.filter(company=user.active_company).only("id", "job_name", "slug")
+        from apps.accounts.active_company import apply_active_company_from_request
+        from apps.profiles.models import Company
+        company = apply_active_company_from_request(request)
+        if not company:
+            company = getattr(user, 'company', None) or Company.objects.filter(user=user).first()
+        if not company:
+            return var_res.response_data(data=[])
+        queryset = JobPost.objects.filter(company=company).order_by("-id")
         serializer = JobPostSerializer(
             queryset,
             many=True,
@@ -120,10 +127,12 @@ class PrivateJobPostViewSet(
         job_city_id = job_post.location.city_id if (job_post.location and job_post.location.city) else None
         job_title = (job_post.job_name or "").lower()
 
-        serializer = JobPostSerializer()
-        matching_qs = serializer._get_matching_resumes(job_post).filter(is_active=True).select_related(
-            'user', 'user__avatar', 'city', 'career'
-        )
+        matching_qs = Resume.objects.filter(is_active=True)
+        if job_career_id:
+            matching_qs = matching_qs.filter(career_id=job_career_id)
+        if job_city_id:
+            matching_qs = matching_qs.filter(city_id=job_city_id)
+        matching_qs = matching_qs.select_related('user', 'user__avatar', 'city', 'career')
 
         resumes = list(matching_qs[:50])
 
