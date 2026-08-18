@@ -317,12 +317,12 @@ export default function DepartmentListPage() {
                             }}
                           />
                           <Tooltip title="Chỉnh sửa">
-                            <IconButton size="small" onClick={() => handleOpenEditDept(dept)} sx={{ color: '#64748b', '&:hover': { color: '#2563eb' } }}>
+                            <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenEditDept(dept)} sx={{ color: '#64748b', '&:hover': { color: '#2563eb' } }}>
                               <EditOutlinedIcon sx={{ fontSize: 16 }} />
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Xóa phòng ban">
-                            <IconButton size="small" onClick={() => setDeletingDeptId(dept.id)} sx={{ color: '#64748b', '&:hover': { color: '#dc2626' } }}>
+                            <IconButton aria-label="Thao tác" size="small" onClick={() => setDeletingDeptId(dept.id)} sx={{ color: '#64748b', '&:hover': { color: '#dc2626' } }}>
                               <DeleteOutlineOutlinedIcon sx={{ fontSize: 16 }} />
                             </IconButton>
                           </Tooltip>
@@ -413,12 +413,12 @@ export default function DepartmentListPage() {
                         <TableCell align="right">
                           <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                             <Tooltip title="Chỉnh sửa">
-                              <IconButton size="small" onClick={() => handleOpenEditDesig(desig)} sx={{ color: '#64748b', '&:hover': { color: '#2563eb' } }}>
+                              <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenEditDesig(desig)} sx={{ color: '#64748b', '&:hover': { color: '#2563eb' } }}>
                                 <EditOutlinedIcon sx={{ fontSize: 16 }} />
                               </IconButton>
                             </Tooltip>
                             <Tooltip title="Xóa chức danh">
-                              <IconButton size="small" onClick={() => setDeletingDesigId(desig.id)} sx={{ color: '#64748b', '&:hover': { color: '#dc2626' } }}>
+                              <IconButton aria-label="Thao tác" size="small" onClick={() => setDeletingDesigId(desig.id)} sx={{ color: '#64748b', '&:hover': { color: '#dc2626' } }}>
                                 <DeleteOutlineOutlinedIcon sx={{ fontSize: 16 }} />
                               </IconButton>
                             </Tooltip>

@@ -267,7 +267,7 @@ export const AttachedDocumentRow: React.FC<AttachedDocumentRowProps> = ({
               >
                 Mở tab mới
               </Button>
-              <IconButton size="small" onClick={() => setPreviewOpen(false)}>
+              <IconButton aria-label="Thao tác" size="small" onClick={() => setPreviewOpen(false)}>
                 <CloseIcon />
               </IconButton>
             </Stack>

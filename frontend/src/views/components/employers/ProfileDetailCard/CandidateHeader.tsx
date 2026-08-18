@@ -374,7 +374,7 @@ export const CandidateHeader: React.FC<CandidateHeaderProps> = ({
             </Button>
 
             {/* More Options Dropdown */}
-            <IconButton
+            <IconButton aria-label="Thao tác"
               size="small"
               onClick={(e) => setAnchorEl(e.currentTarget)}
               sx={{

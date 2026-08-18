@@ -34,7 +34,7 @@ export const useLanguageSkillCardColumns = ({ languageDict, onEdit, onDelete }: 
         meta: { align: 'right' },
         cell: (info) => (
           <Stack direction="row" spacing={1} justifyContent="flex-end">
-            <IconButton
+            <IconButton aria-label="Quay lại"
               size="small"
               sx={{
                 color: 'secondary.main',
@@ -48,7 +48,7 @@ export const useLanguageSkillCardColumns = ({ languageDict, onEdit, onDelete }: 
             >
               <ModeEditOutlineOutlinedIcon fontSize="small" />
             </IconButton>
-            <IconButton
+            <IconButton aria-label="Quay lại"
               size="small"
               sx={{
                 color: 'error.main',

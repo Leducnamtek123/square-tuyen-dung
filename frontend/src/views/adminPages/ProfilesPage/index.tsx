@@ -308,7 +308,7 @@ const ProfilesPage = () => {
                 return (
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                         <Tooltip title={t('pages.profiles.table.view')}>
-                            <IconButton
+                            <IconButton aria-label="Xem chi tiết"
                                 size="small"
                                 component={Link}
                                 href={formatRoute(ROUTES.ADMIN.PROFILE_DETAIL, String(profile.id), ':id')}
@@ -318,7 +318,7 @@ const ProfilesPage = () => {
                             </IconButton>
                         </Tooltip>
                         <Tooltip title={t('pages.profiles.table.delete')}>
-                            <IconButton size="small" onClick={() => handleOpenDelete(profile)} color="error">
+                            <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenDelete(profile)} color="error">
                                 <DeleteIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>

@@ -22,7 +22,7 @@ const DropzoneDialogCustom = (props: Props) => {
 
         <Typography variant="h5">{title}</Typography>
 
-        <IconButton color="error" onClick={() => setOpen(false)}>
+        <IconButton aria-label="Thao tác" color="error" onClick={() => setOpen(false)}>
 
           <CloseIcon />
 

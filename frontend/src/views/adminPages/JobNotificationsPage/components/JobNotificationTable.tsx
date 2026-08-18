@@ -82,12 +82,12 @@ const JobNotificationTable = ({
             cell: (info) => (
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
                     <Tooltip title={t('pages.jobNotifications.table.edit')}>
-                        <IconButton size="small" onClick={() => onEdit?.(info.row.original)} color="primary">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onEdit?.(info.row.original)} color="primary">
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={t('pages.jobNotifications.table.delete')}>
-                        <IconButton size="small" onClick={() => onDelete?.(info.row.original)} color="error">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onDelete?.(info.row.original)} color="error">
                             <DeleteIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>

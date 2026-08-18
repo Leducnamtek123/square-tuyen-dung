@@ -254,17 +254,17 @@ const CompaniesPage = () => {
         return (
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
             <Tooltip title={t('pages.companies.table.viewDetails')}>
-              <IconButton size="small" component="a" href={detailHref} target={detailHref ? '_blank' : undefined} rel={detailHref ? 'noopener noreferrer' : undefined} disabled={!detailHref}>
+              <IconButton aria-label="Xem chi tiết" size="small" component="a" href={detailHref} target={detailHref ? '_blank' : undefined} rel={detailHref ? 'noopener noreferrer' : undefined} disabled={!detailHref}>
                 <VisibilityIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title={t('pages.companies.table.edit')}>
-              <IconButton size="small" color="primary" onClick={() => handleOpenEdit(company)}>
+              <IconButton aria-label="Thao tác" size="small" color="primary" onClick={() => handleOpenEdit(company)}>
                 <EditIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title={t('pages.companies.table.delete')}>
-              <IconButton size="small" color="error" onClick={() => handleOpenDelete(company)}>
+              <IconButton aria-label="Thao tác" size="small" color="error" onClick={() => handleOpenDelete(company)}>
                 <DeleteIcon fontSize="small" />
               </IconButton>
             </Tooltip>

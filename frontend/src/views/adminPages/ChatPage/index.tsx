@@ -159,7 +159,7 @@ const AdminChatPage = () => {
       meta: { align: 'right' },
       cell: (info) => (
         <Tooltip title={t('chat.tooltip.viewDetail')}>
-          <IconButton size="small" color="primary" onClick={() => setSelectedConversation(info.row.original)}>
+          <IconButton aria-label="Thao tác" size="small" color="primary" onClick={() => setSelectedConversation(info.row.original)}>
             <VisibilityIcon fontSize="small" />
           </IconButton>
         </Tooltip>

@@ -161,7 +161,7 @@ export const CandidateSidebar: React.FC<CandidateSidebarProps> = ({ profileDetai
             </Box>
             {email && (
               <Tooltip title="Sao chép email">
-                <IconButton size="small" onClick={() => handleCopy(email, 'email')} sx={{ color: '#94A3B8' }}>
+                <IconButton aria-label="Thao tác" size="small" onClick={() => handleCopy(email, 'email')} sx={{ color: '#94A3B8' }}>
                   <ContentCopyIcon sx={{ fontSize: 14 }} />
                 </IconButton>
               </Tooltip>
@@ -203,7 +203,7 @@ export const CandidateSidebar: React.FC<CandidateSidebarProps> = ({ profileDetai
             </Box>
             {phone && (
               <Tooltip title="Sao chép số điện thoại">
-                <IconButton size="small" onClick={() => handleCopy(phone, 'số điện thoại')} sx={{ color: '#94A3B8' }}>
+                <IconButton aria-label="Thao tác" size="small" onClick={() => handleCopy(phone, 'số điện thoại')} sx={{ color: '#94A3B8' }}>
                   <ContentCopyIcon sx={{ fontSize: 14 }} />
                 </IconButton>
               </Tooltip>

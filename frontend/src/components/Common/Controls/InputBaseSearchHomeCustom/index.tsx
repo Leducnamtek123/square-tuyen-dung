@@ -311,7 +311,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                       visibility: field.value !== '' && field.value !== null ? 'visible' : 'hidden',
                     }}
                   >
-                    <IconButton
+                    <IconButton aria-label="Thao tác"
                       size="small"
                       onClick={() => {
                         field.onChange('');

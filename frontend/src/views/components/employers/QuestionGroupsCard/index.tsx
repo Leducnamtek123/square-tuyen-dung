@@ -203,10 +203,10 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
       id: 'actions',
       cell: ({ row }) => (
         <Stack direction="row" spacing={1} justifyContent="flex-end">
-          <IconButton size="small" onClick={() => handleOpenEdit(row.original)} color="primary">
+          <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenEdit(row.original)} color="primary">
             <EditIcon fontSize="small" />
           </IconButton>
-          <IconButton size="small" onClick={() => handleDelete(row.original)} color="error">
+          <IconButton aria-label="Thao tác" size="small" onClick={() => handleDelete(row.original)} color="error">
             <DeleteIcon fontSize="small" />
           </IconButton>
         </Stack>

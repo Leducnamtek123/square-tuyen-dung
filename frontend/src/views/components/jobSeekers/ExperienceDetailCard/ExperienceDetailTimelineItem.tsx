@@ -53,7 +53,7 @@ const ExperienceDetailTimelineItem = ({ value, onEdit, onDelete, t }: Props) => 
         </Typography>
 
         <Stack direction="row" spacing={1}>
-          <IconButton
+          <IconButton aria-label="Quay lại"
             size="small"
             sx={{
               color: 'secondary.main',
@@ -68,7 +68,7 @@ const ExperienceDetailTimelineItem = ({ value, onEdit, onDelete, t }: Props) => 
             <ModeEditOutlineOutlinedIcon fontSize="small" />
           </IconButton>
 
-          <IconButton
+          <IconButton aria-label="Quay lại"
             size="small"
             sx={{
               color: 'error.main',

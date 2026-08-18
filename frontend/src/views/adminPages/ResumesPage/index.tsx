@@ -112,17 +112,17 @@ const ResumesPage = () => {
                 return (
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                         <Tooltip title={t('pages.resumes.table.view')}>
-                             <IconButton size="small" component="a" href={safeFileUrl} target="_blank" rel="noopener noreferrer" color="info" disabled={!safeFileUrl}>
+                             <IconButton aria-label="Thao tác" size="small" component="a" href={safeFileUrl} target="_blank" rel="noopener noreferrer" color="info" disabled={!safeFileUrl}>
                                 <VisibilityIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title={t('pages.resumes.table.download')}>
-                             <IconButton size="small" component="a" href={safeFileUrl} download color="primary" disabled={!safeFileUrl}>
+                             <IconButton aria-label="Tải xuống" size="small" component="a" href={safeFileUrl} download color="primary" disabled={!safeFileUrl}>
                                 <DownloadIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title={t('pages.resumes.table.delete')}>
-                            <IconButton size="small" onClick={() => handleOpenDelete(resume)} color="error">
+                            <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenDelete(resume)} color="error">
                                 <DeleteIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>

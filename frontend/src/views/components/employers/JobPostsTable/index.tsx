@@ -297,7 +297,7 @@ const JobPostsTable = ({
       cell: (info) => (
         <Stack direction="row" spacing={1} justifyContent="flex-end">
           <Tooltip title={t('jobPost.tooltips.update')} arrow>
-            <IconButton
+            <IconButton aria-label="Thao tác"
               size="small"
               onClick={() => handleUpdate(info.row.original.slug || info.row.original.id)}
               sx={{ 
@@ -310,7 +310,7 @@ const JobPostsTable = ({
             </IconButton>
           </Tooltip>
           <Tooltip title={t('jobPost.tooltips.delete')} arrow>
-            <IconButton
+            <IconButton aria-label="Thao tác"
               size="small"
               onClick={() => handleDelete(info.row.original.slug || info.row.original.id)}
               sx={{ 

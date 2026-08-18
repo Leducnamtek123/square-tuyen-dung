@@ -201,12 +201,12 @@ const JobActivityPage = () => {
             cell: (info) => (
                 <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                     <Tooltip title={t('pages.jobActivity.table.updateStatus')}>
-                        <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={t('pages.jobActivity.table.delete')}>
-                        <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
                             <DeleteIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>

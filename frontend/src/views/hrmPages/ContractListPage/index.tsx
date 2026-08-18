@@ -350,12 +350,12 @@ export default function ContractListPage() {
                       <TableCell align="right">
                         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                           <Tooltip title="Chỉnh sửa hợp đồng">
-                            <IconButton size="small" onClick={() => handleOpenEdit(c)} sx={{ color: '#64748b', '&:hover': { color: '#2563eb' } }}>
+                            <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenEdit(c)} sx={{ color: '#64748b', '&:hover': { color: '#2563eb' } }}>
                               <EditOutlinedIcon sx={{ fontSize: 17 }} />
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Xóa hợp đồng">
-                            <IconButton size="small" onClick={() => setDeletingContractId(c.id)} sx={{ color: '#64748b', '&:hover': { color: '#dc2626' } }}>
+                            <IconButton aria-label="Thao tác" size="small" onClick={() => setDeletingContractId(c.id)} sx={{ color: '#64748b', '&:hover': { color: '#dc2626' } }}>
                               <DeleteOutlineOutlinedIcon sx={{ fontSize: 17 }} />
                             </IconButton>
                           </Tooltip>

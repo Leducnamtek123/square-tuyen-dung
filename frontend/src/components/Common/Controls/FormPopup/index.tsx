@@ -80,7 +80,7 @@ const Popup = ({
               {title}
             </Typography>
 
-            <IconButton
+            <IconButton aria-label="Thao tác"
               onClick={() => setOpenPopup(false)}
               sx={{
                 color: theme.palette.grey[500],

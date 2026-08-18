@@ -227,7 +227,7 @@ const ContactMessagesPage = () => {
           <Stack direction="row" spacing={0.5} justifyContent="flex-end">
             {!isRead && (
               <Tooltip title={t('pages.contactMessages.markAsRead')}>
-                <IconButton
+                <IconButton aria-label="Thao tác"
                   size="small"
                   color="primary"
                   onClick={() => handleToggleRead(msg)}
@@ -238,7 +238,7 @@ const ContactMessagesPage = () => {
               </Tooltip>
             )}
             <Tooltip title={t('pages.contactMessages.deleteTooltip')}>
-              <IconButton
+              <IconButton aria-label="Thao tác"
                 size="small"
                 color="error"
                 onClick={() => { setCurrent(msg); setOpenDelete(true); }}

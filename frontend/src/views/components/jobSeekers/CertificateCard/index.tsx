@@ -329,7 +329,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
                           </Typography>
 
                           <Stack direction="row" spacing={1}>
-                            <IconButton
+                            <IconButton aria-label="Thao tác"
                               color="primary"
                               size="small"
                               onClick={() => handleShowUpdate(value.id)}
@@ -340,7 +340,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
                             >
                               <ModeEditOutlineOutlinedIcon fontSize="small" />
                             </IconButton>
-                            <IconButton
+                            <IconButton aria-label="Thao tác"
                               color="error"
                               size="small"
                               onClick={() => handleDeleteCertificates(value.id)}

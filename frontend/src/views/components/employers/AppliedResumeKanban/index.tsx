@@ -481,7 +481,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
                                         sx={{ borderTop: '1px solid #F1F5F9' }}
                                       >
                                         <Tooltip title={t('appliedResume.table.aiAnalysis')} arrow>
-                                          <IconButton
+                                          <IconButton aria-label="Thao tác"
                                             size="small"
                                             onClick={() => setOpenDrawerId(item.id)}
                                             sx={{
@@ -499,7 +499,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
                                         <Stack direction="row" spacing={0.5} alignItems="center">
                                           <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
                                             <span>
-                                              <IconButton
+                                              <IconButton aria-label="Xem chi tiết"
                                                 size="small"
                                                 disabled={blindMode || !detailSlug}
                                                 onClick={() => {
@@ -521,7 +521,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
                                             arrow
                                           >
                                             <span>
-                                              <IconButton
+                                              <IconButton aria-label="Xem chi tiết"
                                                 size="small"
                                                 disabled={!canScheduleInterview}
                                                 onClick={() => {
@@ -549,7 +549,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
 
                                           {!blindMode && item.hrmEmployeeId ? (
                                             <Tooltip title={t('employees.hrm.convert.openEmployee')} arrow>
-                                              <IconButton
+                                              <IconButton aria-label="Thao tác"
                                                 size="small"
                                                 onClick={() => {
                                                   if (item.hrmEmployeeUrl) {
@@ -572,7 +572,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
                                                 title={t('employees.hrm.convert.action')}
                                                 arrow
                                               >
-                                                <IconButton
+                                                <IconButton aria-label="Thao tác"
                                                   size="small"
                                                   onClick={() => onCreateEmployee(item)}
                                                   sx={{
@@ -587,7 +587,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
                                           )}
 
                                           <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>
-                                            <IconButton
+                                            <IconButton aria-label="Thao tác"
                                               size="small"
                                               onClick={() => handleDelete(item.id)}
                                               sx={{

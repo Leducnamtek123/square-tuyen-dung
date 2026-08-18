@@ -855,8 +855,8 @@ export default function ComponentsDesignSystemPage() {
                     </TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
-                        <IconButton size="small" sx={{ color: '#2563EB' }}><EditOutlinedIcon fontSize="small" /></IconButton>
-                        <IconButton size="small" sx={{ color: '#DC2626' }}><DeleteOutlineIcon fontSize="small" /></IconButton>
+                        <IconButton aria-label="Thao tác" size="small" sx={{ color: '#2563EB' }}><EditOutlinedIcon fontSize="small" /></IconButton>
+                        <IconButton aria-label="Thao tác" size="small" sx={{ color: '#DC2626' }}><DeleteOutlineIcon fontSize="small" /></IconButton>
                       </Stack>
                     </TableCell>
                   </TableRow>
@@ -869,8 +869,8 @@ export default function ComponentsDesignSystemPage() {
                     </TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
-                        <IconButton size="small" sx={{ color: '#2563EB' }}><EditOutlinedIcon fontSize="small" /></IconButton>
-                        <IconButton size="small" sx={{ color: '#DC2626' }}><DeleteOutlineIcon fontSize="small" /></IconButton>
+                        <IconButton aria-label="Thao tác" size="small" sx={{ color: '#2563EB' }}><EditOutlinedIcon fontSize="small" /></IconButton>
+                        <IconButton aria-label="Thao tác" size="small" sx={{ color: '#DC2626' }}><DeleteOutlineIcon fontSize="small" /></IconButton>
                       </Stack>
                     </TableCell>
                   </TableRow>

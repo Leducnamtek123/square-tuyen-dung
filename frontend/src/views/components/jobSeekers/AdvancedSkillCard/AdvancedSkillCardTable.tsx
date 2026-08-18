@@ -32,7 +32,7 @@ const AdvancedSkillCardTable = ({ data, onEdit, onDelete, t }: Props) => (
         meta: { align: 'right' },
         cell: (info: { row: { original: AdvancedSkill } }) => (
           <Stack direction="row" spacing={1} justifyContent="flex-end">
-            <IconButton
+            <IconButton aria-label="Quay lại"
               size="small"
               sx={{
                 color: 'secondary.main',
@@ -46,7 +46,7 @@ const AdvancedSkillCardTable = ({ data, onEdit, onDelete, t }: Props) => (
             >
               <ModeEditOutlineOutlinedIcon fontSize="small" />
             </IconButton>
-            <IconButton
+            <IconButton aria-label="Quay lại"
               size="small"
               sx={{
                 color: 'error.main',

@@ -240,7 +240,7 @@ const CompanyImageCard = () => {
                 }}
               >
                 <Tooltip title={t('common:actions.preview')}>
-                  <IconButton
+                  <IconButton aria-label="Thao tác"
                     size="small"
                     onClick={() => handlePreview(file)}
                     sx={{
@@ -254,7 +254,7 @@ const CompanyImageCard = () => {
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t('common:actions.delete')}>
-                  <IconButton
+                  <IconButton aria-label="Thao tác"
                     size="small"
                     onClick={() => handleDelete(file)}
                     sx={{
@@ -355,7 +355,7 @@ const CompanyImageCard = () => {
           }}
         >
           {t('companyImage.preview')}
-          <IconButton size="small" onClick={() => dispatch({ type: 'closePreview' })} sx={{ color: '#64748b' }}>
+          <IconButton aria-label="Thao tác" size="small" onClick={() => dispatch({ type: 'closePreview' })} sx={{ color: '#64748b' }}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>

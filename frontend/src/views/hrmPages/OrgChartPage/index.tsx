@@ -98,7 +98,7 @@ export default function OrgChartPage() {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               {hasChildren ? (
-                <IconButton
+                <IconButton aria-label="Thao tác"
                   size="small"
                   onClick={() => toggleNode(node.id)}
                   sx={{

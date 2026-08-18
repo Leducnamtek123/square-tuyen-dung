@@ -186,7 +186,7 @@ const CandidateEditProfileModal: React.FC<CandidateEditProfileModalProps> = ({
             Cập nhật thông tin chi tiết để tăng độ tin cậy với nhà tuyển dụng
           </Typography>
         </Box>
-        <IconButton onClick={onClose} size="small" sx={{ color: '#64748b' }}>
+        <IconButton aria-label="Đóng" onClick={onClose} size="small" sx={{ color: '#64748b' }}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>

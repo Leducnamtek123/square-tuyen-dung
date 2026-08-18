@@ -186,7 +186,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
           <Stack direction="row" spacing={1} justifyContent="flex-end">
             <Tooltip title={t('employer:savedResumeTable.title.viewprofile')} arrow>
               <span>
-                <IconButton
+                <IconButton aria-label="Xem chi tiết"
                   size="small"
                   color="primary"
                   disabled={!actionState.canView}

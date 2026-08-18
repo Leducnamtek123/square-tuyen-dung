@@ -283,7 +283,7 @@ const InterviewHistoryPage = () => {
 
           return (
             <Tooltip title={t('common:actions.details')}>
-              <IconButton
+              <IconButton aria-label="Xem chi tiết"
                 component={Link}
                 href={detailHref}
                 color="primary"

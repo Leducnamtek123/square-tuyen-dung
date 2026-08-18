@@ -591,7 +591,8 @@
         "deleteError": "Không thể xóa hồ sơ",
         "bulkDeleteSuccess": "Đã xóa các hồ sơ thành công.",
         "importQueued": "Đã thêm tiến trình nhập hồ sơ vào hàng đợi.",
-        "importError": "Không thể khởi tạo tiến trình nhập hồ sơ."
+        "importError": "Không thể khởi tạo tiến trình nhập hồ sơ.",
+        "importSuccess": "Imported {{created}} new candidates, updated {{updated}} profiles, skipped {{skipped}}."
       },
       "addCandidate": "Thêm ứng viên",
       "searchPlaceholder": "Tìm kiếm ứng viên...",
@@ -1813,13 +1814,16 @@
         "actions": "Hành động",
         "openOnline": "Mở xem trực tuyến",
         "view": "Xem",
-        "download": "Tải xuống"
+        "download": "Tải xuống",
+        "noData": "No related CVs"
       },
       "messages": {
         "noResumes": "Ứng viên chưa tải lên CV nào.",
-        "notFound": "Không tìm thấy thông tin hồ sơ ứng viên."
+        "notFound": "Không tìm thấy thông tin hồ sơ ứng viên.",
+        "loading": "Loading profile..."
       },
-      "back": "Quay lại"
+      "back": "Quay lại",
+      "deleteConfirm": "Are you sure you want to delete the profile of <strong>{{name}}</strong>? This action cannot be undone."
     }
   },
   "common": {

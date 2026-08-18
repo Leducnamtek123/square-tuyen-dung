@@ -119,7 +119,7 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
             {t('shareVia')}
           </Typography>
 
-          <IconButton
+          <IconButton aria-label="Thao tác"
             onClick={() => setOpenPopup(false)}
             size="small"
             sx={{

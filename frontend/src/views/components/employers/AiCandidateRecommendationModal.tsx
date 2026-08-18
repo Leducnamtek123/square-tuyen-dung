@@ -238,7 +238,7 @@ const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationModalPro
             </Typography>
           </Box>
         </Box>
-        <IconButton onClick={onClose} size="small" sx={{ color: '#64748b' }}>
+        <IconButton aria-label="Đóng" onClick={onClose} size="small" sx={{ color: '#64748b' }}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>

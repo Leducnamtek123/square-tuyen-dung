@@ -247,7 +247,7 @@ const ProfileDetailPage = () => {
           <Stack direction="row" spacing={0.5} justifyContent="flex-end">
             <Tooltip title={isOnline ? t('pages.profileDetail.table.openOnline') : t('pages.profileDetail.table.view')}>
               <span>
-                <IconButton
+                <IconButton aria-label="Thao tác"
                   size="small"
                   component="a"
                   href={isOnline ? onlineHref : safeFileUrl || undefined}
@@ -262,7 +262,7 @@ const ProfileDetailPage = () => {
             </Tooltip>
             <Tooltip title={t('pages.profileDetail.table.download')}>
               <span>
-                <IconButton
+                <IconButton aria-label="Tải xuống"
                   size="small"
                   component="a"
                   href={safeFileUrl || undefined}

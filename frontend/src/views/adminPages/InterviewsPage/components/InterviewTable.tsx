@@ -132,26 +132,26 @@ const InterviewTable = ({
             cell: (info) => (
                 <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                     <Tooltip title={t('interviewAdminPage.viewDetails', { ns: 'interview' })}>
-                        <IconButton size="small" onClick={() => onView(info.row.original)} color="primary">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onView(info.row.original)} color="primary">
                             <VisibilityOutlinedIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     {String(info.row.original.status).toLowerCase() !== 'completed' && (
                         <Tooltip title={t('interviewAdminPage.markCompleted', { ns: 'interview' })}>
-                            <IconButton size="small" onClick={() => onUpdateStatus(info.row.original.id, 'completed')} color="success">
+                            <IconButton aria-label="Thao tác" size="small" onClick={() => onUpdateStatus(info.row.original.id, 'completed')} color="success">
                                 <CheckCircleOutlineIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
                     )}
                     {String(info.row.original.status).toLowerCase() !== 'cancelled' && (
                         <Tooltip title={t('interviewAdminPage.cancelInterview', { ns: 'interview' })}>
-                            <IconButton size="small" onClick={() => onUpdateStatus(info.row.original.id, 'cancelled')} color="warning">
+                            <IconButton aria-label="Thao tác" size="small" onClick={() => onUpdateStatus(info.row.original.id, 'cancelled')} color="warning">
                                 <CancelOutlinedIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
                     )}
                     <Tooltip title={t('interviewAdminPage.delete', { ns: 'interview' })}>
-                        <IconButton size="small" onClick={() => onDelete(info.row.original.id)} color="error">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onDelete(info.row.original.id)} color="error">
                             <DeleteOutlineIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>

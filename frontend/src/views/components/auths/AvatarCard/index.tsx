@@ -180,7 +180,7 @@ const AvatarCard = () => {
           </Button>
 
           {currentUser?.avatarUrl && (
-            <IconButton
+            <IconButton aria-label="Thao tác"
               size="small"
               onClick={(e) => {
                 e.stopPropagation();

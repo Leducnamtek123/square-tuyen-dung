@@ -36,5 +36,35 @@
   "aiPipelineTitle": "Quản Lý Đường Ống Tuyển Dụng (Candidate CRM)",
   "aiPipelineDesc1": "Quy trình Kanban trực quan từ Sơ tuyển, Phỏng vấn AI Live đến Ký hợp đồng & Onboarding.",
   "aiPipelineDesc2": "Tự động gửi thông báo, lịch hẹn phỏng vấn và kết quả đến email/sĐT của ứng viên tức thì.",
-  "aiPipelineDesc3": "Kết nối liền mạch với Hệ sinh thái Quản lý Nhân sự InfoHR HRM."
+  "aiPipelineDesc3": "Kết nối liền mạch với Hệ sinh thái Quản lý Nhân sự InfoHR HRM.",
+  "description": "{{appName}} is a leading HR technology platform built to solve the biggest challenges in connecting talent and businesses. We are not just a connection website, but a comprehensive ecosystem supporting Profile Analysis, Competency Assessment, and Online Interview Management. {{appName}} is committed to bringing transparency, security, and superior efficiency to the modern recruitment process.",
+  "features": {
+    "careerTitle": "Accurate Career Orientation",
+    "careerDesc": "Provide a comprehensive view of career maps, skill requirements, and development paths at leading enterprises.",
+    "cvTitle": "Professional Profile Building",
+    "cvDesc": "Online CV and Profile creation tools help candidates stand out to employers with scientific information structures.",
+    "locationTitle": "Local Job Connection",
+    "locationDesc": "Digitized job maps make it easy for candidates to find career opportunities right where they live.",
+    "notificationTitle": "Instant Update System",
+    "notificationDesc": "Multi-channel notifications help both candidates and employers not miss any important feedback or interview opportunities."
+  },
+  "mobileAppHeading": "Comprehensive Recruitment Process",
+  "cvProfileDetail": {
+    "title": "Digitize Application Profiles",
+    "desc1": "Create a professional online Profile, easily share and apply with just one click.",
+    "desc2": "Support attaching old file CVs and automatically extract important information to optimize search results.",
+    "desc3": "Always updated and flexibly adjusted to suit each different career direction of candidates."
+  },
+  "aroundJobDetail": {
+    "title": "Smart Regional Jobs",
+    "desc1": "Easily search for jobs within your desired radius.",
+    "desc2": "Use visual maps to identify business locations, helping you be more proactive in choosing where to work.",
+    "desc3": "Save travel time and find the perfect balance between work and personal life."
+  },
+  "notificationDetail": {
+    "title": "Effective Interaction Management",
+    "desc1": "Smart notification system helps you closely follow the status of your application profile.",
+    "desc2": "Receive interview appointments directly from employers and respond right on the platform.",
+    "desc3": "Ensure seamless communication between businesses and candidates throughout the selection process."
+  }
 }

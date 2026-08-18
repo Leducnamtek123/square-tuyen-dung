@@ -469,7 +469,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
           </Menu>
 
           {/* Scroll Left Button */}
-          <IconButton
+          <IconButton aria-label="Quay lại"
             size="small"
             onClick={handleScrollLeft}
             sx={{
@@ -530,7 +530,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
           </Box>
 
           {/* Scroll Right Button */}
-          <IconButton
+          <IconButton aria-label="Quay lại"
             size="small"
             onClick={handleScrollRight}
             sx={{
@@ -644,7 +644,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
                             </Box>
                           </Tooltip>
                         )}
-                        <IconButton
+                        <IconButton aria-label="Thao tác"
                           size="small"
                           onClick={(e) => toggleFavorite(e, job.id)}
                           sx={{
@@ -746,7 +746,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
 
           {/* ── Bottom Circular Pagination ──────────────────────────────────── */}
           <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ mt: 4 }}>
-            <IconButton
+            <IconButton aria-label="Thao tác"
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               sx={{
@@ -765,7 +765,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
               {page} / {totalPages}
             </Typography>
 
-            <IconButton
+            <IconButton aria-label="Thao tác"
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               sx={{

@@ -89,7 +89,7 @@ const InterviewDetailHeader = ({
   return (
     <Box sx={{ mb: 3, pb: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-        <IconButton
+        <IconButton aria-label="Quay lại"
           onClick={onBack}
           size="small"
           sx={{

@@ -268,7 +268,7 @@ const JobSeekerProfile = ({
                         alignItems="center"
                     >
                         <Tooltip title={isSaved ? t('employer:profileCard.actions.unsave') : t('employer:profileCard.actions.save')} arrow>
-                            <IconButton
+                            <IconButton aria-label="Thao tác"
                                 size="small"
                                 onClick={(e: React.MouseEvent) => {
                                     e.stopPropagation();

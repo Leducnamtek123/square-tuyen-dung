@@ -120,7 +120,7 @@ const DrawerContent = ({ isAdmin, liveInterviewCount = 0, isCollapsed = false, t
 
         {toggleCollapse && (
           <Tooltip title={isCollapsed ? "Mở rộng menu" : "Thu gọn menu"} placement="right" arrow>
-            <IconButton
+            <IconButton aria-label="Thao tác"
               size="small"
               onClick={toggleCollapse}
               sx={{

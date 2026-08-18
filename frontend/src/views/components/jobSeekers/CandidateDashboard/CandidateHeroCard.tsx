@@ -87,7 +87,7 @@ const CandidateHeroCard = ({
             >
               {displayName.charAt(0).toUpperCase()}
             </Avatar>
-            <IconButton
+            <IconButton aria-label="Quay lại"
               size="small"
               sx={{
                 position: 'absolute',

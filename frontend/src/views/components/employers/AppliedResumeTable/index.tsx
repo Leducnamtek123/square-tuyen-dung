@@ -121,7 +121,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                   )}
                   {safeCvFileUrl && (
                     <Tooltip title={t('appliedResume.table.clickToDownload')} arrow>
-                      <IconButton
+                      <IconButton aria-label="Thao tác"
                         size="small"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -214,7 +214,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             return (
           <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
             <span>
-              <IconButton
+              <IconButton aria-label="Xem chi tiết"
                 color="primary"
                 size="small"
                 disabled={blindMode || !detailSlug}
@@ -246,7 +246,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
 
           {!blindMode && info.row.original.hrmEmployeeId ? (
             <Tooltip title={t('employees.hrm.convert.openEmployee')} arrow>
-              <IconButton
+              <IconButton aria-label="Thao tác"
                 size="small"
                 color="primary"
                 onClick={() => {
@@ -265,7 +265,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             </Tooltip>
           ) : (!blindMode && [4, 5].includes(Number(info.row.original.status)) && onCreateEmployee && (
             <Tooltip title={t('employees.hrm.convert.action')} arrow>
-              <IconButton
+              <IconButton aria-label="Thao tác"
                 size="small"
                 color="success"
                 onClick={() => onCreateEmployee(info.row.original)}
@@ -281,7 +281,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
           ))}
 
           <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>
-            <IconButton
+            <IconButton aria-label="Thao tác"
               size="small"
               color="error"
               onClick={() => handleDelete(info.row.original.id)}

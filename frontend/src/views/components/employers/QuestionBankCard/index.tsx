@@ -145,7 +145,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
                     <Tooltip title={t('common:actions.edit')} arrow>
                         <span>
-                            <IconButton
+                            <IconButton aria-label="Thao tác"
                                 size="small"
                                 onClick={() => handleOpen(row.original)}
                                 color="primary"
@@ -157,7 +157,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                     </Tooltip>
                     <Tooltip title={t('common:actions.delete')} arrow>
                         <span>
-                            <IconButton
+                            <IconButton aria-label="Thao tác"
                                 size="small"
                                 onClick={() => handleDelete(row.original.id)}
                                 color="error"

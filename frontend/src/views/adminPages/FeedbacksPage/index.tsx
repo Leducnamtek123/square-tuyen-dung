@@ -361,7 +361,7 @@ const FeedbacksPage = () => {
       cell: (info) => (
         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
           <Tooltip title={t('pages.feedbacks.table.editTooltip')}>
-            <IconButton
+            <IconButton aria-label="Thao tác"
               size="small"
               color="primary"
               onClick={() => openEditDialog(info.row.original)}
@@ -370,7 +370,7 @@ const FeedbacksPage = () => {
             </IconButton>
           </Tooltip>
           <Tooltip title={t('pages.feedbacks.table.deleteTooltip')}>
-            <IconButton
+            <IconButton aria-label="Thao tác"
               size="small"
               color="error"
               onClick={() => {

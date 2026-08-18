@@ -1,0 +1,514 @@
+[
+  {
+    "route": "/account",
+    "filePath": "src\\app\\(candidate)\\account\\page.tsx"
+  },
+  {
+    "route": "/dashboard",
+    "filePath": "src\\app\\(candidate)\\dashboard\\page.tsx"
+  },
+  {
+    "route": "/my-interviews",
+    "filePath": "src\\app\\(candidate)\\my-interviews\\page.tsx"
+  },
+  {
+    "route": "/my-jobs",
+    "filePath": "src\\app\\(candidate)\\my-jobs\\page.tsx"
+  },
+  {
+    "route": "/profile",
+    "filePath": "src\\app\\(candidate)\\profile\\page.tsx"
+  },
+  {
+    "route": "/about-us",
+    "filePath": "src\\app\\about-us\\page.tsx"
+  },
+  {
+    "route": "/admin/agent-assistants",
+    "filePath": "src\\app\\admin\\agent-assistants\\page.tsx"
+  },
+  {
+    "route": "/admin/articles/create",
+    "filePath": "src\\app\\admin\\articles\\create\\page.tsx"
+  },
+  {
+    "route": "/admin/articles",
+    "filePath": "src\\app\\admin\\articles\\page.tsx"
+  },
+  {
+    "route": "/admin/articles/[id]",
+    "filePath": "src\\app\\admin\\articles\\[id]\\page.tsx"
+  },
+  {
+    "route": "/admin/audit-logs",
+    "filePath": "src\\app\\admin\\audit-logs\\page.tsx"
+  },
+  {
+    "route": "/admin/banner-types",
+    "filePath": "src\\app\\admin\\banner-types\\page.tsx"
+  },
+  {
+    "route": "/admin/banners",
+    "filePath": "src\\app\\admin\\banners\\page.tsx"
+  },
+  {
+    "route": "/admin/careers",
+    "filePath": "src\\app\\admin\\careers\\page.tsx"
+  },
+  {
+    "route": "/admin/chat",
+    "filePath": "src\\app\\admin\\chat\\page.tsx"
+  },
+  {
+    "route": "/admin/cities",
+    "filePath": "src\\app\\admin\\cities\\page.tsx"
+  },
+  {
+    "route": "/admin/companies",
+    "filePath": "src\\app\\admin\\companies\\page.tsx"
+  },
+  {
+    "route": "/admin/company-verifications",
+    "filePath": "src\\app\\admin\\company-verifications\\page.tsx"
+  },
+  {
+    "route": "/admin/components",
+    "filePath": "src\\app\\admin\\components\\page.tsx"
+  },
+  {
+    "route": "/admin/contact-messages",
+    "filePath": "src\\app\\admin\\contact-messages\\page.tsx"
+  },
+  {
+    "route": "/admin/dashboard",
+    "filePath": "src\\app\\admin\\dashboard\\page.tsx"
+  },
+  {
+    "route": "/admin/districts",
+    "filePath": "src\\app\\admin\\districts\\page.tsx"
+  },
+  {
+    "route": "/admin/feedbacks",
+    "filePath": "src\\app\\admin\\feedbacks\\page.tsx"
+  },
+  {
+    "route": "/admin/forgot-password",
+    "filePath": "src\\app\\admin\\forgot-password\\page.tsx"
+  },
+  {
+    "route": "/admin/hrm/contracts",
+    "filePath": "src\\app\\admin\\hrm\\contracts\\page.tsx"
+  },
+  {
+    "route": "/admin/hrm/dashboard",
+    "filePath": "src\\app\\admin\\hrm\\dashboard\\page.tsx"
+  },
+  {
+    "route": "/admin/hrm/departments",
+    "filePath": "src\\app\\admin\\hrm\\departments\\page.tsx"
+  },
+  {
+    "route": "/admin/hrm/employees",
+    "filePath": "src\\app\\admin\\hrm\\employees\\page.tsx"
+  },
+  {
+    "route": "/admin/hrm/leaves",
+    "filePath": "src\\app\\admin\\hrm\\leaves\\page.tsx"
+  },
+  {
+    "route": "/admin/hrm/onboarding",
+    "filePath": "src\\app\\admin\\hrm\\onboarding\\page.tsx"
+  },
+  {
+    "route": "/admin/hrm/org-chart",
+    "filePath": "src\\app\\admin\\hrm\\org-chart\\page.tsx"
+  },
+  {
+    "route": "/admin/hrm",
+    "filePath": "src\\app\\admin\\hrm\\page.tsx"
+  },
+  {
+    "route": "/admin/interview-preview",
+    "filePath": "src\\app\\admin\\interview-preview\\page.tsx"
+  },
+  {
+    "route": "/admin/interviews",
+    "filePath": "src\\app\\admin\\interviews\\page.tsx"
+  },
+  {
+    "route": "/admin/job-activity",
+    "filePath": "src\\app\\admin\\job-activity\\page.tsx"
+  },
+  {
+    "route": "/admin/job-notifications",
+    "filePath": "src\\app\\admin\\job-notifications\\page.tsx"
+  },
+  {
+    "route": "/admin/jobs",
+    "filePath": "src\\app\\admin\\jobs\\page.tsx"
+  },
+  {
+    "route": "/admin/login",
+    "filePath": "src\\app\\admin\\login\\page.tsx"
+  },
+  {
+    "route": "/admin",
+    "filePath": "src\\app\\admin\\page.tsx"
+  },
+  {
+    "route": "/admin/profiles",
+    "filePath": "src\\app\\admin\\profiles\\page.tsx"
+  },
+  {
+    "route": "/admin/profiles/[id]",
+    "filePath": "src\\app\\admin\\profiles\\[id]\\page.tsx"
+  },
+  {
+    "route": "/admin/question-groups",
+    "filePath": "src\\app\\admin\\question-groups\\page.tsx"
+  },
+  {
+    "route": "/admin/questions",
+    "filePath": "src\\app\\admin\\questions\\page.tsx"
+  },
+  {
+    "route": "/admin/reset-password/[token]",
+    "filePath": "src\\app\\admin\\reset-password\\[token]\\page.tsx"
+  },
+  {
+    "route": "/admin/resumes",
+    "filePath": "src\\app\\admin\\resumes\\page.tsx"
+  },
+  {
+    "route": "/admin/settings",
+    "filePath": "src\\app\\admin\\settings\\page.tsx"
+  },
+  {
+    "route": "/admin/trust-reports",
+    "filePath": "src\\app\\admin\\trust-reports\\page.tsx"
+  },
+  {
+    "route": "/admin/users",
+    "filePath": "src\\app\\admin\\users\\page.tsx"
+  },
+  {
+    "route": "/admin/voice-profiles",
+    "filePath": "src\\app\\admin\\voice-profiles\\page.tsx"
+  },
+  {
+    "route": "/admin/wards",
+    "filePath": "src\\app\\admin\\wards\\page.tsx"
+  },
+  {
+    "route": "/attached-profile/[slug]",
+    "filePath": "src\\app\\attached-profile\\[slug]\\page.tsx"
+  },
+  {
+    "route": "/blog",
+    "filePath": "src\\app\\blog\\page.tsx"
+  },
+  {
+    "route": "/blog/[slug]",
+    "filePath": "src\\app\\blog\\[slug]\\page.tsx"
+  },
+  {
+    "route": "/chat",
+    "filePath": "src\\app\\chat\\page.tsx"
+  },
+  {
+    "route": "/companies",
+    "filePath": "src\\app\\companies\\page.tsx"
+  },
+  {
+    "route": "/companies/[slug]",
+    "filePath": "src\\app\\companies\\[slug]\\page.tsx"
+  },
+  {
+    "route": "/contact",
+    "filePath": "src\\app\\contact\\page.tsx"
+  },
+  {
+    "route": "/email-verification-required",
+    "filePath": "src\\app\\email-verification-required\\page.tsx"
+  },
+  {
+    "route": "/employer/account",
+    "filePath": "src\\app\\employer\\account\\page.tsx"
+  },
+  {
+    "route": "/employer/agent-assistants",
+    "filePath": "src\\app\\employer\\agent-assistants\\page.tsx"
+  },
+  {
+    "route": "/employer/applied-profiles",
+    "filePath": "src\\app\\employer\\applied-profiles\\page.tsx"
+  },
+  {
+    "route": "/employer/blog/create",
+    "filePath": "src\\app\\employer\\blog\\create\\page.tsx"
+  },
+  {
+    "route": "/employer/blog",
+    "filePath": "src\\app\\employer\\blog\\page.tsx"
+  },
+  {
+    "route": "/employer/blog/[id]",
+    "filePath": "src\\app\\employer\\blog\\[id]\\page.tsx"
+  },
+  {
+    "route": "/employer/candidates",
+    "filePath": "src\\app\\employer\\candidates\\page.tsx"
+  },
+  {
+    "route": "/employer/candidates/[slug]",
+    "filePath": "src\\app\\employer\\candidates\\[slug]\\page.tsx"
+  },
+  {
+    "route": "/employer/chat",
+    "filePath": "src\\app\\employer\\chat\\page.tsx"
+  },
+  {
+    "route": "/employer/company",
+    "filePath": "src\\app\\employer\\company\\page.tsx"
+  },
+  {
+    "route": "/employer/contact",
+    "filePath": "src\\app\\employer\\contact\\page.tsx"
+  },
+  {
+    "route": "/employer/dashboard",
+    "filePath": "src\\app\\employer\\dashboard\\page.tsx"
+  },
+  {
+    "route": "/employer/faq",
+    "filePath": "src\\app\\employer\\faq\\page.tsx"
+  },
+  {
+    "route": "/employer/forgot-password",
+    "filePath": "src\\app\\employer\\forgot-password\\page.tsx"
+  },
+  {
+    "route": "/employer/hrm/contracts",
+    "filePath": "src\\app\\employer\\hrm\\contracts\\page.tsx"
+  },
+  {
+    "route": "/employer/hrm/dashboard",
+    "filePath": "src\\app\\employer\\hrm\\dashboard\\page.tsx"
+  },
+  {
+    "route": "/employer/hrm/departments",
+    "filePath": "src\\app\\employer\\hrm\\departments\\page.tsx"
+  },
+  {
+    "route": "/employer/hrm/employees",
+    "filePath": "src\\app\\employer\\hrm\\employees\\page.tsx"
+  },
+  {
+    "route": "/employer/hrm/leaves",
+    "filePath": "src\\app\\employer\\hrm\\leaves\\page.tsx"
+  },
+  {
+    "route": "/employer/hrm/onboarding",
+    "filePath": "src\\app\\employer\\hrm\\onboarding\\page.tsx"
+  },
+  {
+    "route": "/employer/hrm/org-chart",
+    "filePath": "src\\app\\employer\\hrm\\org-chart\\page.tsx"
+  },
+  {
+    "route": "/employer/hrm",
+    "filePath": "src\\app\\employer\\hrm\\page.tsx"
+  },
+  {
+    "route": "/employer/interviews/create",
+    "filePath": "src\\app\\employer\\interviews\\create\\page.tsx"
+  },
+  {
+    "route": "/employer/interviews/history",
+    "filePath": "src\\app\\employer\\interviews\\history\\page.tsx"
+  },
+  {
+    "route": "/employer/interviews/live",
+    "filePath": "src\\app\\employer\\interviews\\live\\page.tsx"
+  },
+  {
+    "route": "/employer/interviews",
+    "filePath": "src\\app\\employer\\interviews\\page.tsx"
+  },
+  {
+    "route": "/employer/interviews/session/[id]",
+    "filePath": "src\\app\\employer\\interviews\\session\\[id]\\page.tsx"
+  },
+  {
+    "route": "/employer/interviews/[id]/edit",
+    "filePath": "src\\app\\employer\\interviews\\[id]\\edit\\page.tsx"
+  },
+  {
+    "route": "/employer/interviews/[id]",
+    "filePath": "src\\app\\employer\\interviews\\[id]\\page.tsx"
+  },
+  {
+    "route": "/employer/introduce",
+    "filePath": "src\\app\\employer\\introduce\\page.tsx"
+  },
+  {
+    "route": "/employer/job-posts",
+    "filePath": "src\\app\\employer\\job-posts\\page.tsx"
+  },
+  {
+    "route": "/employer/login",
+    "filePath": "src\\app\\employer\\login\\page.tsx"
+  },
+  {
+    "route": "/employer/notifications",
+    "filePath": "src\\app\\employer\\notifications\\page.tsx"
+  },
+  {
+    "route": "/employer",
+    "filePath": "src\\app\\employer\\page.tsx"
+  },
+  {
+    "route": "/employer/pricing",
+    "filePath": "src\\app\\employer\\pricing\\page.tsx"
+  },
+  {
+    "route": "/employer/privacy-policy",
+    "filePath": "src\\app\\employer\\privacy-policy\\page.tsx"
+  },
+  {
+    "route": "/employer/question-bank",
+    "filePath": "src\\app\\employer\\question-bank\\page.tsx"
+  },
+  {
+    "route": "/employer/question-groups",
+    "filePath": "src\\app\\employer\\question-groups\\page.tsx"
+  },
+  {
+    "route": "/employer/register",
+    "filePath": "src\\app\\employer\\register\\page.tsx"
+  },
+  {
+    "route": "/employer/reset-password/[token]",
+    "filePath": "src\\app\\employer\\reset-password\\[token]\\page.tsx"
+  },
+  {
+    "route": "/employer/saved-profiles",
+    "filePath": "src\\app\\employer\\saved-profiles\\page.tsx"
+  },
+  {
+    "route": "/employer/service",
+    "filePath": "src\\app\\employer\\service\\page.tsx"
+  },
+  {
+    "route": "/employer/settings",
+    "filePath": "src\\app\\employer\\settings\\page.tsx"
+  },
+  {
+    "route": "/employer/support",
+    "filePath": "src\\app\\employer\\support\\page.tsx"
+  },
+  {
+    "route": "/employer/terms-of-service",
+    "filePath": "src\\app\\employer\\terms-of-service\\page.tsx"
+  },
+  {
+    "route": "/employer/verification",
+    "filePath": "src\\app\\employer\\verification\\page.tsx"
+  },
+  {
+    "route": "/faq",
+    "filePath": "src\\app\\faq\\page.tsx"
+  },
+  {
+    "route": "/forbidden",
+    "filePath": "src\\app\\forbidden\\page.tsx"
+  },
+  {
+    "route": "/forgot-password",
+    "filePath": "src\\app\\forgot-password\\page.tsx"
+  },
+  {
+    "route": "/gioi-thieu",
+    "filePath": "src\\app\\gioi-thieu\\page.tsx"
+  },
+  {
+    "route": "/interview/login",
+    "filePath": "src\\app\\interview\\login\\page.tsx"
+  },
+  {
+    "route": "/interview/[id]",
+    "filePath": "src\\app\\interview\\[id]\\page.tsx"
+  },
+  {
+    "route": "/jobs",
+    "filePath": "src\\app\\jobs\\page.tsx"
+  },
+  {
+    "route": "/jobs/[slug]",
+    "filePath": "src\\app\\jobs\\[slug]\\page.tsx"
+  },
+  {
+    "route": "/jobs-by-career",
+    "filePath": "src\\app\\jobs-by-career\\page.tsx"
+  },
+  {
+    "route": "/jobs-by-city",
+    "filePath": "src\\app\\jobs-by-city\\page.tsx"
+  },
+  {
+    "route": "/jobs-by-type",
+    "filePath": "src\\app\\jobs-by-type\\page.tsx"
+  },
+  {
+    "route": "/lien-he",
+    "filePath": "src\\app\\lien-he\\page.tsx"
+  },
+  {
+    "route": "/login",
+    "filePath": "src\\app\\login\\page.tsx"
+  },
+  {
+    "route": "/my-company",
+    "filePath": "src\\app\\my-company\\page.tsx"
+  },
+  {
+    "route": "/onboarding/candidate",
+    "filePath": "src\\app\\onboarding\\candidate\\page.tsx"
+  },
+  {
+    "route": "/onboarding/employer",
+    "filePath": "src\\app\\onboarding\\employer\\page.tsx"
+  },
+  {
+    "route": "/online-profile/[slug]",
+    "filePath": "src\\app\\online-profile\\[slug]\\page.tsx"
+  },
+  {
+    "route": "/",
+    "filePath": "src\\app\\page.tsx"
+  },
+  {
+    "route": "/privacy-policy",
+    "filePath": "src\\app\\privacy-policy\\page.tsx"
+  },
+  {
+    "route": "/register",
+    "filePath": "src\\app\\register\\page.tsx"
+  },
+  {
+    "route": "/reset-password/[token]",
+    "filePath": "src\\app\\reset-password\\[token]\\page.tsx"
+  },
+  {
+    "route": "/terms-of-service",
+    "filePath": "src\\app\\terms-of-service\\page.tsx"
+  },
+  {
+    "route": "/tin-tuc",
+    "filePath": "src\\app\\tin-tuc\\page.tsx"
+  },
+  {
+    "route": "/tin-tuc/[slug]",
+    "filePath": "src\\app\\tin-tuc\\[slug]\\page.tsx"
+  }
+]

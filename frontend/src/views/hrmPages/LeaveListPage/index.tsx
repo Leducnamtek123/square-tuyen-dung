@@ -388,7 +388,7 @@ export default function LeaveListPage() {
                             </>
                           )}
                           <Tooltip title="Hủy / Xóa đơn nghỉ phép">
-                            <IconButton
+                            <IconButton aria-label="Thao tác"
                               size="small"
                               onClick={() => setDeletingLeaveId(l.id)}
                               sx={{ color: '#64748b', '&:hover': { color: '#dc2626' } }}

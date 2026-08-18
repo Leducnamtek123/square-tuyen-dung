@@ -576,7 +576,9 @@
       "createdDate": "Ngày đăng",
       "creator": "Người tạo"
     },
-    "timeLeft": "[VI] timeLeft"
+    "timeLeft": "[VI] timeLeft",
+    "manageSubtitle": "Manage post details",
+    "remaining": "Remaining"
   },
   "jobPostForm": {
     "section": {
@@ -1042,7 +1044,8 @@
     }
   },
   "auto": {
-    "index_wwwsquarevn_9a21": "www.square.vn"
+    "index_wwwsquarevn_9a21": "www.square.vn",
+    "index_wwwInfoHRvn_9a21": "www.InfoHR.vn"
   },
   "fileUpload": {
     "dragDropOrSelect": "Kéo thả file vào đây hoặc",

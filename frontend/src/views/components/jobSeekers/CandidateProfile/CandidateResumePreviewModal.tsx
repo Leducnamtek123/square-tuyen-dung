@@ -147,7 +147,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
           >
             In CV
           </Button>
-          <IconButton onClick={onClose} size="small" sx={{ color: '#64748b', backgroundColor: '#f1f5f9', '&:hover': { backgroundColor: '#e2e8f0' } }}>
+          <IconButton aria-label="Đóng" onClick={onClose} size="small" sx={{ color: '#64748b', backgroundColor: '#f1f5f9', '&:hover': { backgroundColor: '#e2e8f0' } }}>
             <CloseIcon />
           </IconButton>
         </Stack>

@@ -70,7 +70,7 @@ const CandidateSkillsCard: React.FC<CandidateSkillsCardProps> = ({
             sx={{ backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 700, fontSize: '0.725rem', height: 22 }}
           />
         </Box>
-        <IconButton size="small" onClick={() => setOpenModal(true)} sx={{ color: '#64748b' }}>
+        <IconButton aria-label="Thao tác" size="small" onClick={() => setOpenModal(true)} sx={{ color: '#64748b' }}>
           <EditOutlinedIcon sx={{ fontSize: 18 }} />
         </IconButton>
       </Box>

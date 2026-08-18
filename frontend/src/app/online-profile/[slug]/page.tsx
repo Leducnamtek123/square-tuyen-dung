@@ -1,4 +1,4 @@
-import DefaultLayout from '@/layouts/DefaultLayout';
+import JobSeekerLayout from '@/layouts/JobSeekerLayout';
 import OnlineProfilePage from '@/views/jobSeekerPages/OnlineProfilePage';
 
 export const metadata = {
@@ -8,8 +8,8 @@ export const metadata = {
 
 export default function Page() {
   return (
-    <DefaultLayout>
+    <JobSeekerLayout>
       <OnlineProfilePage />
-    </DefaultLayout>
+    </JobSeekerLayout>
   );
 }

@@ -112,7 +112,7 @@ const ChatPage = () => {
               {(isMobile || isMedium) && (
                 <Stack direction="row" spacing={1}>
                   {isMobile && (
-                    <IconButton 
+                    <IconButton aria-label="Thao tác" 
                       onClick={() => setOpenLeftDrawer(true)}
                       sx={{ 
                         bgcolor: 'primary.background',
@@ -123,7 +123,7 @@ const ChatPage = () => {
                     </IconButton>
                   )}
                   {(isMobile || isMedium) && (
-                    <IconButton 
+                    <IconButton aria-label="Thao tác" 
                       onClick={() => setOpenRightDrawer(true)}
                       sx={{ 
                         bgcolor: 'primary.background',

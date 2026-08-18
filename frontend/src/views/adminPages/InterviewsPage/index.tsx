@@ -152,14 +152,14 @@ const InterviewsPage = () => {
         return (
           <Stack direction="row" spacing={0.5} justifyContent="flex-end">
             <Tooltip title={t('pages.interviews.table.view')}>
-              <IconButton size="small" color="info" onClick={() => setSelectedInterview(interview)}>
+              <IconButton aria-label="Thao tác" size="small" color="info" onClick={() => setSelectedInterview(interview)}>
                 <VisibilityIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             {status !== 'completed' && status !== 'cancelled' && (
               <>
                 <Tooltip title={t('pages.interviews.table.markCompleted')}>
-                  <IconButton
+                  <IconButton aria-label="Thao tác"
                     size="small"
                     color="success"
                     disabled={isMutating}
@@ -169,7 +169,7 @@ const InterviewsPage = () => {
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t('pages.interviews.table.cancel')}>
-                  <IconButton
+                  <IconButton aria-label="Thao tác"
                     size="small"
                     color="warning"
                     disabled={isMutating}
@@ -181,7 +181,7 @@ const InterviewsPage = () => {
               </>
             )}
             <Tooltip title={t('pages.interviews.table.delete')}>
-              <IconButton size="small" color="error" disabled={isMutating} onClick={() => setDeleteTarget(interview)}>
+              <IconButton aria-label="Thao tác" size="small" color="error" disabled={isMutating} onClick={() => setDeleteTarget(interview)}>
                 <DeleteIcon fontSize="small" />
               </IconButton>
             </Tooltip>

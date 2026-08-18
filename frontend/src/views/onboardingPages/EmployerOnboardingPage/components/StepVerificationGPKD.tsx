@@ -326,7 +326,7 @@ export default function StepVerificationGPKD({
                 {t('employerOnboarding.step3.replaceFile', 'Thay file')}
               </Button>
               <Tooltip title={t('employerOnboarding.step3.removeFile', 'Xóa file')}>
-                <IconButton onClick={handleRemoveFile} size="small" sx={{ color: '#EF4444' }}>
+                <IconButton aria-label="Xóa" onClick={handleRemoveFile} size="small" sx={{ color: '#EF4444' }}>
                   <DeleteOutlineIcon fontSize="small" />
                 </IconButton>
               </Tooltip>

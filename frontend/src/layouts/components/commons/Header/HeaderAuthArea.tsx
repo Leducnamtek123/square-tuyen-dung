@@ -67,7 +67,7 @@ const HeaderAuthArea = ({
           },
         }}
       >
-        <IconButton
+        <IconButton aria-label="Quay lại"
           onClick={onOpenUserMenu}
           sx={{
             p: 0.4,

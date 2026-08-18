@@ -290,7 +290,7 @@ export default function StepResumeUpload({
                 {t('onboarding.step3.replaceCv', 'Thay file')}
               </Button>
               <Tooltip title={t('onboarding.step3.removeCv', 'Xóa CV')}>
-                <IconButton onClick={handleRemoveFile} size="small" sx={{ color: '#EF4444' }}>
+                <IconButton aria-label="Xóa" onClick={handleRemoveFile} size="small" sx={{ color: '#EF4444' }}>
                   <DeleteOutlineIcon fontSize="small" />
                 </IconButton>
               </Tooltip>

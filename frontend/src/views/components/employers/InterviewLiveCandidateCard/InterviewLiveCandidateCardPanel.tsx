@@ -258,7 +258,7 @@ const InterviewLiveCandidateCardPanel = ({
                 {session.jobName || 'N/A'} · {statusLabel}
               </Typography>
             </Box>
-            <IconButton onClick={onCloseFullscreen} sx={{ color: '#fff' }}>
+            <IconButton aria-label="Đóng" onClick={onCloseFullscreen} sx={{ color: '#fff' }}>
               <CloseIcon />
             </IconButton>
           </Box>

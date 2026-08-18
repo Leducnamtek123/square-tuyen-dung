@@ -118,7 +118,7 @@ const InputBaseSearchCompanyCustom = <T extends FieldValues = FieldValues>({
 
                 >
 
-                  <IconButton
+                  <IconButton aria-label="Thao tác"
 
                     size="small"
 

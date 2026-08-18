@@ -87,7 +87,7 @@ export const GlobalFilterDrawer: React.FC<GlobalFilterDrawerProps> = ({
                 Xóa bộ lọc
               </Button>
             </Tooltip>
-            <IconButton size="small" onClick={onClose} sx={{ color: '#64748B' }}>
+            <IconButton aria-label="Đóng" size="small" onClick={onClose} sx={{ color: '#64748B' }}>
               <CloseIcon sx={{ fontSize: 20 }} />
             </IconButton>
           </Stack>

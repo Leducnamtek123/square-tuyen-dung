@@ -324,7 +324,7 @@ const CandidateRecommendedJobsCard = () => {
                   </Box>
 
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2, pt: 1, borderTop: '1px solid #f8fafc' }}>
-                    <IconButton
+                    <IconButton aria-label="Thao tác"
                       size="small"
                       onClick={(e) => handleToggleSave(e, job.id, job.jobName, job.slug)}
                       sx={{ color: isSaved ? '#2563eb' : '#94a3b8', p: 0.5, '&:hover': { color: '#2563eb' } }}

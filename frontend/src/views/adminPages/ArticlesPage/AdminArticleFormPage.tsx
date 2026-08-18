@@ -284,7 +284,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
     <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
       {/* Header */}
       <Stack direction="row" alignItems="center" spacing={2} mb={4}>
-        <IconButton onClick={() => push('/admin/articles')} sx={{ bgcolor: 'action.hover' }}>
+        <IconButton aria-label="Thao tác" onClick={() => push('/admin/articles')} sx={{ bgcolor: 'action.hover' }}>
           <ArrowBackIcon />
         </IconButton>
         <Box flex={1}>
@@ -418,7 +418,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
                   alt={t('pages.articles.form.thumbnailAlt')}
                   sx={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 1.5 }}
                 />
-                <IconButton
+                <IconButton aria-label="Thao tác"
                   size="small"
                   sx={{ position: 'absolute', top: 4, right: 4, bgcolor: 'rgba(0,0,0,0.5)', color: 'white' }}
                   onClick={() => dispatch({ type: 'clearThumbnail' })}

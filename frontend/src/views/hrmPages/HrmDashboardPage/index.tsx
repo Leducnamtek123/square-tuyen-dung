@@ -535,14 +535,14 @@ export default function HrmDashboardPage() {
                           </TableCell>
                           <TableCell align="right">
                             <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                              <IconButton
+                              <IconButton aria-label="Thao tác"
                                 size="small"
                                 onClick={() => approveLeave.mutate(leave.id)}
                                 sx={{ color: '#16a34a', bgcolor: '#f0fdf4', '&:hover': { bgcolor: '#dcfce7' } }}
                               >
                                 <CheckIcon sx={{ fontSize: 16 }} />
                               </IconButton>
-                              <IconButton
+                              <IconButton aria-label="Thao tác"
                                 size="small"
                                 onClick={() => rejectLeave.mutate({ id: leave.id })}
                                 sx={{ color: '#dc2626', bgcolor: '#fef2f2', '&:hover': { bgcolor: '#fee2e2' } }}

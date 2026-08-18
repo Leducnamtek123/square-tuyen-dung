@@ -164,7 +164,7 @@ const CompanyTeamCard = () => {
       return companyTeamService.createRole(payload);
     },
     onSuccess: () => {
-      toastMessages.success(t('employer:company.team.saveSuccess'));
+      toastMessages.success(t('common:messages.saveSuccess'));
       setRoleDialogOpen(false);
       setRoleForm(emptyRoleForm);
       invalidateTeam();
@@ -187,7 +187,7 @@ const CompanyTeamCard = () => {
       return companyTeamService.createMember(payload);
     },
     onSuccess: () => {
-      toastMessages.success(t('employer:company.team.saveSuccess'));
+      toastMessages.success(t('common:messages.saveSuccess'));
       setMemberDialogOpen(false);
       setMemberForm(emptyMemberForm);
       invalidateTeam();
@@ -254,18 +254,17 @@ const CompanyTeamCard = () => {
   const handleDeleteRole = (role: CompanyRole) => {
     confirmModal(
       () => deleteRoleMutation.mutate(role.id),
-      t('employer:company.team.deleteConfirmTitle'),
-      t('employer:company.team.deleteRoleConfirmMessage', { name: role.name }),
+      t('employer:company.team.deleteRoleTitle'),
+      t('employer:company.team.deleteRoleConfirm'),
       'warning',
     );
   };
 
   const handleDeleteMember = (member: CompanyMember) => {
-    const label = member.userDict?.fullName || member.userDict?.email || `#${member.userId}`;
     confirmModal(
       () => deleteMemberMutation.mutate(member.id),
-      t('employer:company.team.deleteConfirmTitle'),
-      t('employer:company.team.deleteMemberConfirmMessage', { name: label }),
+      t('employer:company.team.deleteMemberTitle'),
+      t('employer:company.team.deleteMemberConfirm'),
       'warning',
     );
   };
@@ -420,14 +419,14 @@ const CompanyTeamCard = () => {
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                       <Tooltip title={isSystemRole(role) ? t('employer:company.team.systemRoleLocked') : t('common:actions.edit')}>
                         <span>
-                          <IconButton size="small" disabled={isSystemRole(role)} onClick={() => openEditRole(role)} sx={{ color: '#64748b' }}>
+                          <IconButton aria-label="Thao tác" size="small" disabled={isSystemRole(role)} onClick={() => openEditRole(role)} sx={{ color: '#64748b' }}>
                             <EditOutlinedIcon fontSize="small" />
                           </IconButton>
                         </span>
                       </Tooltip>
                       <Tooltip title={isSystemRole(role) ? t('employer:company.team.systemRoleLocked') : t('common:actions.delete')}>
                         <span>
-                          <IconButton size="small" color="error" disabled={isSystemRole(role)} onClick={() => handleDeleteRole(role)}>
+                          <IconButton aria-label="Thao tác" size="small" color="error" disabled={isSystemRole(role)} onClick={() => handleDeleteRole(role)}>
                             <DeleteOutlineOutlinedIcon fontSize="small" />
                           </IconButton>
                         </span>
@@ -525,12 +524,12 @@ const CompanyTeamCard = () => {
                   <TableCell align="right">
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                       <Tooltip title={t('common:actions.edit')}>
-                        <IconButton size="small" onClick={() => openEditMember(member)} sx={{ color: '#64748b' }}>
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => openEditMember(member)} sx={{ color: '#64748b' }}>
                           <EditOutlinedIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title={t('common:actions.delete')}>
-                        <IconButton size="small" color="error" onClick={() => handleDeleteMember(member)}>
+                        <IconButton aria-label="Thao tác" size="small" color="error" onClick={() => handleDeleteMember(member)}>
                           <DeleteOutlineOutlinedIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>

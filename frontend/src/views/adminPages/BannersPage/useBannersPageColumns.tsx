@@ -108,10 +108,10 @@ export const useBannersPageColumns = ({ typeOptions, onEdit, onDelete }: UseBann
         meta: { align: 'right' },
         cell: (info) => (
           <Stack direction="row" spacing={1} justifyContent="flex-end">
-            <IconButton size="small" color="primary" onClick={() => onEdit(info.row.original)}>
+            <IconButton aria-label="Thao tác" size="small" color="primary" onClick={() => onEdit(info.row.original)}>
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton size="small" color="error" onClick={() => onDelete(info.row.original)}>
+            <IconButton aria-label="Thao tác" size="small" color="error" onClick={() => onDelete(info.row.original)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Stack>

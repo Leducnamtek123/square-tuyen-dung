@@ -344,7 +344,7 @@ const ProfilePage = () => {
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
                   Thông tin cá nhân & Liên hệ
                 </Typography>
-                <IconButton size="small" onClick={() => setEditModalOpen(true)} sx={{ color: '#64748b' }}>
+                <IconButton aria-label="Thao tác" size="small" onClick={() => setEditModalOpen(true)} sx={{ color: '#64748b' }}>
                   <EditOutlinedIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Box>
@@ -397,7 +397,7 @@ const ProfilePage = () => {
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
                   Giới thiệu bản thân
                 </Typography>
-                <IconButton size="small" onClick={() => setEditModalOpen(true)} sx={{ color: '#64748b' }}>
+                <IconButton aria-label="Thao tác" size="small" onClick={() => setEditModalOpen(true)} sx={{ color: '#64748b' }}>
                   <EditOutlinedIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Box>

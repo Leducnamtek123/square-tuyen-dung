@@ -157,12 +157,12 @@ const CitiesPage = () => {
         cell: (info) => (
           <Stack direction="row" spacing={0.5} justifyContent="flex-end">
             <Tooltip title={t('pages.cities.table.edit')}>
-              <IconButton size="small" onClick={() => dispatch({ type: 'open-edit', city: info.row.original })} color="primary">
+              <IconButton aria-label="Thao tác" size="small" onClick={() => dispatch({ type: 'open-edit', city: info.row.original })} color="primary">
                 <EditIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title={t('pages.cities.table.delete')}>
-              <IconButton size="small" onClick={() => dispatch({ type: 'open-delete', city: info.row.original })} color="error">
+              <IconButton aria-label="Thao tác" size="small" onClick={() => dispatch({ type: 'open-delete', city: info.row.original })} color="error">
                 <DeleteIcon fontSize="small" />
               </IconButton>
             </Tooltip>

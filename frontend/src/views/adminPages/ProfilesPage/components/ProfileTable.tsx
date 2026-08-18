@@ -97,17 +97,17 @@ const ProfileTable = ({
             cell: (info) => (
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
                     <Tooltip title={t('pages.profiles.table.viewDetails')}>
-                        <IconButton size="small" onClick={() => onView?.(info.row.original)}>
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onView?.(info.row.original)}>
                             <VisibilityIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={t('pages.profiles.table.edit')}>
-                        <IconButton size="small" onClick={() => onEdit?.(info.row.original)} color="primary">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onEdit?.(info.row.original)} color="primary">
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={t('pages.profiles.table.delete')}>
-                        <IconButton size="small" onClick={() => onDelete?.(info.row.original)} color="error">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onDelete?.(info.row.original)} color="error">
                             <DeleteIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>

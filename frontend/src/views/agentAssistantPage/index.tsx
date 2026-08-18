@@ -1157,7 +1157,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                 />
                 <Tooltip title={t('common:agentAssistant.attachments.addImage')}>
                   <span>
-                    <IconButton
+                    <IconButton aria-label="Thao tác"
                       disabled={isSending || Boolean(deletingThreadId)}
                       onClick={() => fileInputRef.current?.click()}
                       sx={{
@@ -1206,7 +1206,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                 />
                 <Tooltip title={t('common:agentAssistant.send')}>
                   <span>
-                    <IconButton
+                    <IconButton aria-label="Thao tác"
                       disabled={(!input.trim() && attachments.length === 0) || isSending || Boolean(deletingThreadId)}
                       onClick={() => void handleSend()}
                       sx={{

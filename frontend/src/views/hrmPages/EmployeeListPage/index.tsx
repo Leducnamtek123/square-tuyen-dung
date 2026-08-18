@@ -461,7 +461,7 @@ export default function EmployeeListPage() {
                       <TableCell align="right">
                         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                           <Tooltip title="Xem chi tiết hồ sơ">
-                            <IconButton
+                            <IconButton aria-label="Thao tác"
                               size="small"
                               onClick={() => setSelectedEmp(emp)}
                               sx={{ color: '#64748b', '&:hover': { color: '#2563eb' } }}
@@ -470,7 +470,7 @@ export default function EmployeeListPage() {
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Chỉnh sửa hồ sơ">
-                            <IconButton
+                            <IconButton aria-label="Thao tác"
                               size="small"
                               onClick={() => handleOpenEdit(emp)}
                               sx={{ color: '#64748b', '&:hover': { color: '#7c3aed' } }}
@@ -479,7 +479,7 @@ export default function EmployeeListPage() {
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Xóa nhân sự">
-                            <IconButton
+                            <IconButton aria-label="Thao tác"
                               size="small"
                               onClick={() => setDeletingEmpId(emp.id)}
                               sx={{ color: '#64748b', '&:hover': { color: '#dc2626' } }}
@@ -511,7 +511,7 @@ export default function EmployeeListPage() {
               <Typography variant="h6" sx={{ fontWeight: 900, color: '#0f172a' }}>
                 Hồ sơ Nhân viên
               </Typography>
-              <IconButton size="small" onClick={() => setSelectedEmp(null)} sx={{ color: '#64748b' }}>
+              <IconButton aria-label="Thao tác" size="small" onClick={() => setSelectedEmp(null)} sx={{ color: '#64748b' }}>
                 <CloseIcon />
               </IconButton>
             </Box>

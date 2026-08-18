@@ -203,12 +203,12 @@ const AdminArticlesPage = () => {
       cell: ({ row }) => (
         <Stack direction="row" spacing={0.5}>
           <Tooltip title={t('pages.articles.actions.edit')}>
-            <IconButton size="small" onClick={() => push(`/admin/articles/${row.original.id}`)}>
+            <IconButton aria-label="Thao tác" size="small" onClick={() => push(`/admin/articles/${row.original.id}`)}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title={t('pages.articles.actions.delete')}>
-            <IconButton size="small" color="error" onClick={() => handleDelete(row.original.id, row.original.title)}>
+            <IconButton aria-label="Thao tác" size="small" color="error" onClick={() => handleDelete(row.original.id, row.original.title)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>

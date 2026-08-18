@@ -1,0 +1,394 @@
+{
+  "total": 33,
+  "giantFiles": [
+    {
+      "file": "src/views/components/employers/ProfileCard/index.tsx",
+      "lines": 1399,
+      "sizeBytes": 52662,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Redux State Management",
+        "Modal / Dialog Controls",
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/agentAssistantPage/index.tsx",
+      "lines": 1241,
+      "sizeBytes": 49228,
+      "responsibilities": [
+        "Local State Management"
+      ],
+      "srpViolation": false,
+      "recommendedArchitecture": "Extract reusable helper functions & sub-views"
+    },
+    {
+      "file": "src/components/agents-ui/react-shader-toy.tsx",
+      "lines": 1014,
+      "sizeBytes": 36823,
+      "responsibilities": [
+        "WebGL / Canvas Graphics",
+        "Audio / Video Streaming"
+      ],
+      "srpViolation": false,
+      "recommendedArchitecture": "Extract reusable helper functions & sub-views"
+    },
+    {
+      "file": "src/views/interviewPages/AIInterviewLayout.tsx",
+      "lines": 988,
+      "sizeBytes": 41854,
+      "responsibilities": [
+        "Local State Management",
+        "Heavy Side Effects (7 useEffects)",
+        "WebGL / Canvas Graphics",
+        "Audio / Video Streaming"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/adminPages/ComponentsDesignSystemPage.tsx",
+      "lines": 913,
+      "sizeBytes": 45030,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Modal / Dialog Controls",
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/adminPages/ProfilesPage/index.tsx",
+      "lines": 877,
+      "sizeBytes": 42068,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Modal / Dialog Controls",
+        "Heavy Side Effects (5 useEffects)",
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/adminPages/VoiceProfilesPage/index.tsx",
+      "lines": 857,
+      "sizeBytes": 38400,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Modal / Dialog Controls",
+        "Audio / Video Streaming"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/hrmPages/EmployeeListPage/index.tsx",
+      "lines": 837,
+      "sizeBytes": 35214,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Modal / Dialog Controls"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/types/models.ts",
+      "lines": 796,
+      "sizeBytes": 20210,
+      "responsibilities": [
+        "Audio / Video Streaming"
+      ],
+      "srpViolation": false,
+      "recommendedArchitecture": "Extract reusable helper functions & sub-views"
+    },
+    {
+      "file": "src/views/components/defaults/FilterJobPostCard/index.tsx",
+      "lines": 794,
+      "sizeBytes": 32394,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/interviewPages/InterviewSessionPage.tsx",
+      "lines": 738,
+      "sizeBytes": 32525,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Audio / Video Streaming"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/jobSeekerPages/AccountPage/index.tsx",
+      "lines": 724,
+      "sizeBytes": 27456,
+      "responsibilities": [
+        "Local State Management",
+        "Redux State Management",
+        "Modal / Dialog Controls",
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/hrmPages/HrmDashboardPage/index.tsx",
+      "lines": 723,
+      "sizeBytes": 28015,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Modal / Dialog Controls",
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/components/employers/CompanyTeamCard/index.tsx",
+      "lines": 690,
+      "sizeBytes": 26403,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Modal / Dialog Controls",
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/components/employers/AppliedResumeCard/index.tsx",
+      "lines": 659,
+      "sizeBytes": 23687,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Modal / Dialog Controls",
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/components/employers/AppliedResumeKanban/index.tsx",
+      "lines": 652,
+      "sizeBytes": 30400,
+      "responsibilities": [
+        "Local State Management",
+        "Modal / Dialog Controls"
+      ],
+      "srpViolation": false,
+      "recommendedArchitecture": "Extract reusable helper functions & sub-views"
+    },
+    {
+      "file": "src/views/defaultPages/NewsPage/index.tsx",
+      "lines": 647,
+      "sizeBytes": 25673,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management"
+      ],
+      "srpViolation": false,
+      "recommendedArchitecture": "Extract reusable helper functions & sub-views"
+    },
+    {
+      "file": "src/views/hrmPages/DepartmentListPage/index.tsx",
+      "lines": 646,
+      "sizeBytes": 26229,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Modal / Dialog Controls",
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/adminPages/FeedbacksPage/index.tsx",
+      "lines": 640,
+      "sizeBytes": 22411,
+      "responsibilities": [
+        "Local State Management",
+        "Modal / Dialog Controls",
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/mocks/mockData.ts",
+      "lines": 637,
+      "sizeBytes": 21423,
+      "responsibilities": [
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": false,
+      "recommendedArchitecture": "Extract reusable helper functions & sub-views"
+    },
+    {
+      "file": "src/components/Common/LocationPicker/LocationPickerContent.tsx",
+      "lines": 609,
+      "sizeBytes": 19799,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Heavy Side Effects (5 useEffects)"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/components/employers/hooks/useEmployerQueries.ts",
+      "lines": 600,
+      "sizeBytes": 23709,
+      "responsibilities": [
+        "Direct API Integration",
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": false,
+      "recommendedArchitecture": "Extract reusable helper functions & sub-views"
+    },
+    {
+      "file": "src/views/adminPages/DashboardPage/index.tsx",
+      "lines": 599,
+      "sizeBytes": 29523,
+      "responsibilities": [],
+      "srpViolation": false,
+      "recommendedArchitecture": "Extract reusable helper functions & sub-views"
+    },
+    {
+      "file": "src/views/adminPages/CareersPage/index.tsx",
+      "lines": 594,
+      "sizeBytes": 17797,
+      "responsibilities": [
+        "Local State Management",
+        "Modal / Dialog Controls"
+      ],
+      "srpViolation": false,
+      "recommendedArchitecture": "Extract reusable helper functions & sub-views"
+    },
+    {
+      "file": "src/views/hrmPages/LeaveListPage/index.tsx",
+      "lines": 568,
+      "sizeBytes": 23044,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Modal / Dialog Controls",
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/hrmPages/ContractListPage/index.tsx",
+      "lines": 545,
+      "sizeBytes": 22689,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Modal / Dialog Controls"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/services/adminManagementService.ts",
+      "lines": 530,
+      "sizeBytes": 18954,
+      "responsibilities": [
+        "Direct API Integration"
+      ],
+      "srpViolation": false,
+      "recommendedArchitecture": "Extract reusable helper functions & sub-views"
+    },
+    {
+      "file": "src/views/adminPages/WardsPage/index.tsx",
+      "lines": 528,
+      "sizeBytes": 16829,
+      "responsibilities": [
+        "Local State Management",
+        "Modal / Dialog Controls"
+      ],
+      "srpViolation": false,
+      "recommendedArchitecture": "Extract reusable helper functions & sub-views"
+    },
+    {
+      "file": "src/views/components/employers/JobPostCard/index.tsx",
+      "lines": 522,
+      "sizeBytes": 19290,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Modal / Dialog Controls",
+        "WebGL / Canvas Graphics"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/adminPages/ProfileDetailPage/index.tsx",
+      "lines": 515,
+      "sizeBytes": 20400,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Modal / Dialog Controls"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    },
+    {
+      "file": "src/views/components/employers/ProfileDetailCard/CandidateSidebar.tsx",
+      "lines": 511,
+      "sizeBytes": 17000,
+      "responsibilities": [
+        "Local State Management"
+      ],
+      "srpViolation": false,
+      "recommendedArchitecture": "Extract reusable helper functions & sub-views"
+    },
+    {
+      "file": "src/components/Common/Controls/InputBaseSearchHomeCustom/index.tsx",
+      "lines": 510,
+      "sizeBytes": 20092,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management"
+      ],
+      "srpViolation": false,
+      "recommendedArchitecture": "Extract reusable helper functions & sub-views"
+    },
+    {
+      "file": "src/views/hrmPages/OnboardingPage/index.tsx",
+      "lines": 509,
+      "sizeBytes": 20347,
+      "responsibilities": [
+        "Direct API Integration",
+        "Local State Management",
+        "Modal / Dialog Controls"
+      ],
+      "srpViolation": true,
+      "recommendedArchitecture": "Split into Custom State Hook + Container Component + Sub-component Presenters"
+    }
+  ]
+}

@@ -306,7 +306,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
                           </Typography>
 
                           <Stack direction="row" spacing={1}>
-                            <IconButton
+                            <IconButton aria-label="Quay lại"
                               size="small"
                               sx={{
                                 color: 'secondary.main',
@@ -321,7 +321,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
                               <ModeEditOutlineOutlinedIcon fontSize="small" />
                             </IconButton>
 
-                            <IconButton
+                            <IconButton aria-label="Quay lại"
                               size="small"
                               sx={{
                                 color: 'error.main',

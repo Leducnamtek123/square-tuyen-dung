@@ -164,7 +164,7 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
           return (
             <Stack direction="row" spacing={1} justifyContent="flex-end">
               <Tooltip title={t('common:view')} arrow>
-                <IconButton
+                <IconButton aria-label="Xem chi tiết"
                   component={Link}
                   href={detailHref}
                   color="primary"
@@ -181,7 +181,7 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
 
               {canEdit && (
                 <Tooltip title={t('interview:interviewListCard.editInterview')} arrow>
-                  <IconButton
+                  <IconButton aria-label="Chỉnh sửa"
                     component={Link}
                     href={editHref}
                     color="info"
@@ -199,7 +199,7 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
 
               {canCancel && (
                 <Tooltip title={t('interview:interviewListCard.cancelInterview')} arrow>
-                  <IconButton
+                  <IconButton aria-label="Thao tác"
                     onClick={() => onCancel(session.roomName)}
                     color="warning"
                     size="small"
@@ -215,7 +215,7 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
               )}
 
               <Tooltip title={t('interview:interviewListCard.deleteInterview')} arrow>
-                <IconButton
+                <IconButton aria-label="Thao tác"
                   onClick={() => onDelete(session.id)}
                   color="error"
                   size="small"

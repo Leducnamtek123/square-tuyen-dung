@@ -159,19 +159,19 @@ const JobsPage = () => {
                 return (
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                         <Tooltip title={t('pages.jobs.table.view')}>
-                             <IconButton size="small" component="a" href={detailHref} target={detailHref ? '_blank' : undefined} rel={detailHref ? 'noopener noreferrer' : undefined} color="info" disabled={!detailHref}>
+                             <IconButton aria-label="Xem chi tiết" size="small" component="a" href={detailHref} target={detailHref ? '_blank' : undefined} rel={detailHref ? 'noopener noreferrer' : undefined} color="info" disabled={!detailHref}>
                                 <VisibilityIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
                         {Number(job.status) === 1 && (
                             <>
                                 <Tooltip title={t('pages.jobs.table.approveAction')}>
-                                    <IconButton size="small" onClick={() => handleApprove(job.id)} color="success">
+                                    <IconButton aria-label="Thao tác" size="small" onClick={() => handleApprove(job.id)} color="success">
                                         <CheckCircleIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
                                 <Tooltip title={t('pages.jobs.table.rejectAction')}>
-                                    <IconButton size="small" onClick={() => handleReject(job.id)} color="warning">
+                                    <IconButton aria-label="Thao tác" size="small" onClick={() => handleReject(job.id)} color="warning">
                                         <CancelIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
@@ -179,13 +179,13 @@ const JobsPage = () => {
                         )}
                         {Number(job.status) === 3 && (
                             <Tooltip title={t('pages.jobs.table.rejectAction')}>
-                                <IconButton size="small" onClick={() => handleReject(job.id)} color="warning">
+                                <IconButton aria-label="Thao tác" size="small" onClick={() => handleReject(job.id)} color="warning">
                                     <CancelIcon fontSize="small" />
                                 </IconButton>
                             </Tooltip>
                         )}
                         <Tooltip title={t('pages.jobs.table.delete')}>
-                            <IconButton size="small" onClick={() => handleOpenDelete(job)} color="error">
+                            <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenDelete(job)} color="error">
                                 <DeleteIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>

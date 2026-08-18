@@ -244,12 +244,12 @@ const BannerTypesPage = () => {
       cell: (info) => (
         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
           <Tooltip title={t('common.edit')}>
-            <IconButton size="small" color="primary" onClick={() => handleOpenEdit(info.row.original)}>
+            <IconButton aria-label="Thao tác" size="small" color="primary" onClick={() => handleOpenEdit(info.row.original)}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title={t('common.delete')}>
-            <IconButton size="small" color="error" onClick={() => handleDeleteRequest(info.row.original)}>
+            <IconButton aria-label="Thao tác" size="small" color="error" onClick={() => handleDeleteRequest(info.row.original)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>

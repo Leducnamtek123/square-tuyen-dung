@@ -864,7 +864,12 @@
     "hrmDepartments": "Phòng ban & Vị trí",
     "hrmContracts": "Hợp đồng Lao động",
     "hrmLeaves": "Quản lý Nghỉ phép",
-    "hrmOrgChart": "Sơ đồ Cây Tổ chức"
+    "hrmOrgChart": "Sơ đồ Cây Tổ chức",
+    "employeeRoles": "Employees & Roles",
+    "hrm": "HRM",
+    "hrmEmployees": "Employee records",
+    "hrmRoles": "Roles & permissions",
+    "hrmMembers": "Company members"
   },
   "interviewHistory": {
     "title": "Thư viện Video",

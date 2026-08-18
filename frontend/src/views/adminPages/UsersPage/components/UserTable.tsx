@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useCallback, useMemo } from 'react';
 import { Chip, Tooltip, Switch, Typography, Stack, Select, MenuItem, SelectChangeEvent, Avatar, Box, IconButton } from "@mui/material";

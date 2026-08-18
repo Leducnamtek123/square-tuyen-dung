@@ -59,7 +59,7 @@ const AIAnalysisDrawerHeader = ({ title, subtitle, onClose }: Props) => {
           )}
         </Box>
       </Stack>
-      <IconButton
+      <IconButton aria-label="Đóng"
         onClick={onClose}
         size="small"
         sx={{

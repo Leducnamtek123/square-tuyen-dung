@@ -211,7 +211,7 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
                 {fullName ? fullName.trim().charAt(0).toUpperCase() : ''}
               </Avatar>
               <Tooltip title="Bấm để chọn và cập nhật ảnh đại diện mới">
-                <IconButton
+                <IconButton aria-label="Thao tác"
                   size="small"
                   onClick={() => avatarInputRef.current?.click()}
                   sx={{

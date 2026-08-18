@@ -101,7 +101,7 @@ const TopCompanyCarousel = () => {
 
       {/* ── Industry Category Pills Bar ─────────────────────────────── */}
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3, width: '100%', overflow: 'hidden' }}>
-        <IconButton
+        <IconButton aria-label="Quay lại"
           size="small"
           onClick={handleScrollLeft}
           sx={{
@@ -160,7 +160,7 @@ const TopCompanyCarousel = () => {
           })}
         </Box>
 
-        <IconButton
+        <IconButton aria-label="Quay lại"
           size="small"
           onClick={handleScrollRight}
           sx={{
