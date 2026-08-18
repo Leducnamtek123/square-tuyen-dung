@@ -10,7 +10,6 @@ image_setting:
   image_password: "<registry-token>"
 
 access_container:
-  tcp_ports: []
   http_ports:
     - 8298
 
@@ -22,41 +21,32 @@ advanced_settings:
     - key: PORT
       value: "8298"
     - key: TTS_DEVICE
-      value: cuda
+      value: "cuda"
     - key: TTS_CODEC_DEVICE
-      value: cuda
+      value: "cuda"
     - key: TTS_MODE
-      value: fast
+      value: "fast"
     - key: TTS_BACKBONE_REPO
-      value: pnnbao-ump/VieNeu-TTS
-    - key: TTS_GGUF_FILENAME
-      value: ""
+      value: "pnnbao-ump/VieNeu-TTS"
     - key: TTS_EMOTION
-      value: natural
+      value: "natural"
     - key: TTS_GPU_MEM_FRACTION
       value: "0.30"
     - key: TTS_INFER_TEMPERATURE
-      value: ""
+      value: "1.0"
     - key: TTS_INFER_TOP_K
-      value: ""
+      value: "50"
     - key: TTS_MAX_CHARS
-      value: ""
+      value: "256"
     - key: TTS_DEFAULT_SPEED
-      value: ""
-    - key: TTS_NORMALIZE_AUDIO
-      value: ""
+      value: "1.0"
     - key: TTS_PEAK_LIMIT
       value: "0.98"
-    - key: TTS_PEAK_NORMALIZE_TARGET
-      value: ""
     - key: VOICE_PROFILE_BACKEND_API_URL
       value: "https://<your-backend-domain>/api"
     - key: INTERVIEW_AGENT_SHARED_SECRET
       value: "<shared-secret>"
     - key: TTS_VOICE_PROFILE_CACHE_DIR
-      value: /tmp/vieneu_voice_profiles
+      value: "/tmp/vieneu_voice_profiles"
     - key: HF_HOME
-      value: /root/.cache/huggingface
-  startup_commands:
-    cmd:
-    args:
+      value: "/root/.cache/huggingface"

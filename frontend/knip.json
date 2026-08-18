@@ -24,14 +24,11 @@
     "playwright.config.ts",
     "src/test/setup.ts",
     "*.cjs",
-    "*.mjs",
-    "tools/**/*.{cjs,mjs,ts}",
-    "tools-*.mjs"
+    "*.mjs"
   ],
   "project": [
     "src/**/*.{ts,tsx}",
-    "*.{ts,tsx,cjs,mjs}",
-    "tools/**/*.{ts,tsx,cjs,mjs}"
+    "*.{ts,tsx,cjs,mjs}"
   ],
   "ignore": [
     "coverage/**",

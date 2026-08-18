@@ -154,10 +154,10 @@ export default function CompanyVerificationsPage() {
         id: 'documents',
         header: 'Tài liệu xác thực (KYC)',
         cell: (row) => {
-          if (!row.businessLicense) {
+          const safeDocUrl = getSafeExternalOpenUrl(row.businessLicense);
+          if (!safeDocUrl) {
             return <Typography variant="caption" sx={{ color: '#94A3B8' }}>Chưa đính kèm</Typography>;
           }
-          const safeDocUrl = getSafeExternalOpenUrl(row.businessLicense);
           return (
             <Button
               size="small"
@@ -368,48 +368,54 @@ export default function CompanyVerificationsPage() {
               <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', mb: 0.5 }}>
                 Giấy phép kinh doanh đính kèm
               </Typography>
-              {inspectingVerification.businessLicense ? (
-                <Paper
-                  variant="outlined"
-                  sx={{
-                    p: 2,
-                    borderRadius: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    bgcolor: '#FFFFFF',
-                  }}
-                >
-                  <Stack direction="row" spacing={1.5} alignItems="center">
-                    <FileOpenOutlinedIcon sx={{ color: '#2563EB', fontSize: 28 }} />
-                    <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#1E293B' }}>
-                        Giay_phep_kinh_doanh.pdf
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: '#64748B' }}>
-                        Tài liệu tải lên bởi doanh nghiệp
+              {(() => {
+                const safeLicenseUrl = getSafeExternalOpenUrl(inspectingVerification.businessLicense);
+                if (!safeLicenseUrl) {
+                  return (
+                    <Box sx={{ p: 2, bgcolor: '#F8FAFC', borderRadius: 2, textAlign: 'center' }}>
+                      <Typography variant="body2" sx={{ color: '#94A3B8' }}>
+                        Doanh nghiệp chưa tải lên bản sao giấy phép
                       </Typography>
                     </Box>
-                  </Stack>
-                  <Button
-                    size="small"
-                    variant="contained"
-                    href={getSafeExternalOpenUrl(inspectingVerification.businessLicense)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    endIcon={<LaunchIcon sx={{ fontSize: 14 }} />}
-                    sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}
+                  );
+                }
+                return (
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      bgcolor: '#FFFFFF',
+                    }}
                   >
-                    Mở tài liệu
-                  </Button>
-                </Paper>
-              ) : (
-                <Box sx={{ p: 2, bgcolor: '#F8FAFC', borderRadius: 2, textAlign: 'center' }}>
-                  <Typography variant="body2" sx={{ color: '#94A3B8' }}>
-                    Doanh nghiệp chưa tải lên bản sao giấy phép
-                  </Typography>
-                </Box>
-              )}
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                      <FileOpenOutlinedIcon sx={{ color: '#2563EB', fontSize: 28 }} />
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: '#1E293B' }}>
+                          Giay_phep_kinh_doanh.pdf
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#64748B' }}>
+                          Tài liệu tải lên bởi doanh nghiệp
+                        </Typography>
+                      </Box>
+                    </Stack>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      href={safeLicenseUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      endIcon={<LaunchIcon sx={{ fontSize: 14 }} />}
+                      sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}
+                    >
+                      Mở tài liệu
+                    </Button>
+                  </Paper>
+                );
+              })()}
             </Box>
 
             {inspectingVerification.adminNote && (

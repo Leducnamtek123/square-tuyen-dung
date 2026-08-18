@@ -1176,7 +1176,8 @@
       "fallback": "Result {{index}}",
       "more": "And {{count}} more results.",
       "openRecord": "Open record"
-    }
+    },
+    "openLink": "Open link"
   },
   "sidebarHeader": {
     "backToHome": "Back to Home",

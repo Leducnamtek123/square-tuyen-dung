@@ -440,7 +440,7 @@ export default function JobsPage() {
                       <Button
                         size="small"
                         variant="outlined"
-                        href={localizeRoutePath(formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, { slug: inspectingJob.slug }), i18n.language)}
+                        href={localizeRoutePath(formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, inspectingJob.slug), i18n.language)}
                         target="_blank"
                         rel="noopener noreferrer"
                         startIcon={<LaunchIcon sx={{ fontSize: 14 }} />}

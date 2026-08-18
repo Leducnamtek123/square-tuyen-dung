@@ -1173,7 +1173,8 @@
       "fallback": "Kết quả {{index}}",
       "more": "Và {{count}} kết quả khác.",
       "openRecord": "Mở bản ghi"
-    }
+    },
+    "openLink": "Mở liên kết"
   },
   "sidebarHeader": {
     "backToHome": "Về trang chủ",
