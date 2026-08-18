@@ -204,6 +204,9 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     def get_job_post_number(self, company):
         if hasattr(company, "active_job_post_count"):
             return company.active_job_post_count
+        if hasattr(company, "_prefetched_objects_cache") and "job_posts" in company._prefetched_objects_cache:
+            now = datetime.datetime.now().date()
+            return len([jp for jp in company.job_posts.all() if getattr(jp, 'deadline', None) and jp.deadline >= now and getattr(jp, 'status', None) == var_sys.JobPostStatus.APPROVED])
         now = datetime.datetime.now().date()
         return company.job_posts.filter(deadline__gte=now, status=var_sys.JobPostStatus.APPROVED).count()
 

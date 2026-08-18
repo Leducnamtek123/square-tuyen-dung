@@ -95,7 +95,7 @@ class PrivateJobPostViewSet(
     @action(methods=["get"], detail=False, url_path="job-posts-options", url_name="job-posts-options")
     def get_job_post_options(self, request):
         user = request.user
-        queryset = self.queryset.filter(company=user.active_company)
+        queryset = self.queryset.filter(company=user.active_company).only("id", "job_name", "slug")
         serializer = JobPostSerializer(
             queryset,
             many=True,
@@ -882,3 +882,29 @@ class AdminJobPostViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         job_post.save()
         record_audit_log(request=request, action="reject", instance=job_post)
         return var_res.response_data(data=JobPostSerializer(job_post).data)
+
+    @action(detail=False, methods=['post'], url_path='bulk-approve')
+    def bulk_approve(self, request):
+        ids = request.data.get("ids", [])
+        if not ids or not isinstance(ids, list):
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"ids": ["Danh sách ID là bắt buộc."]},
+            )
+        valid_jobs = JobPost.objects.filter(id__in=ids, company__is_verified=True)
+        updated_count = valid_jobs.update(status=var_sys.JobPostStatus.APPROVED)
+        return var_res.response_data(data={"updatedCount": updated_count})
+
+    @action(detail=False, methods=['post'], url_path='bulk-reject')
+    def bulk_reject(self, request):
+        ids = request.data.get("ids", [])
+        reason = request.data.get("reason", "")
+        if not ids or not isinstance(ids, list):
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"ids": ["Danh sách ID là bắt buộc."]},
+            )
+        updated_count = JobPost.objects.filter(id__in=ids).update(
+            status=var_sys.JobPostStatus.REJECTED
+        )
+        return var_res.response_data(data={"updatedCount": updated_count, "reason": reason})

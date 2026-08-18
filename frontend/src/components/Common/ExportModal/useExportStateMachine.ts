@@ -143,7 +143,7 @@ export function useExportStateMachine(props: ExportModalProps) {
       const exportedData = transformDataForExport(fullData, activeColumns);
       await updateProgressStep(75, `Generating ${format.toUpperCase()} structure...`);
 
-      const blob = xlsxUtils.generateBlob(exportedData, format);
+      const blob = await xlsxUtils.generateBlob(exportedData, format);
       const ext = format === 'csv' ? '.csv' : '.xlsx';
       const cleanName = fileName.trim().endsWith(ext) ? fileName.trim() : `${fileName.trim()}${ext}`;
 

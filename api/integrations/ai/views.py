@@ -96,7 +96,7 @@ def _tts_help_response() -> JsonResponse:
                 },
             },
         },
-        status=200,
+        status=405,
     )
 
 def _tts_sample_response_from_file(file_record) -> HttpResponse | None:
@@ -227,7 +227,7 @@ def _tts_response_from_body(body: Dict[str, Any]):
     for index, base_url in enumerate(get_service_base_urls("tts")):
         url = f"{base_url}/audio/speech"
         try:
-            upstream = requests.post(url, json=payload, stream=False, timeout=(10, 300))
+            upstream = requests.post(url, json=payload, stream=False, timeout=(5, 30))
         except requests.RequestException as e:
             last_error = {"source": "primary" if index == 0 else f"fallback-{index}", "detail": str(e)}
             logger.warning("TTS candidate %s unavailable: %s", base_url, e)
@@ -315,7 +315,7 @@ def _transcribe_fn(request: HttpRequest):
     for index, base_url in enumerate(get_service_base_urls("stt")):
         url = f"{base_url}/audio/transcriptions"
         try:
-            upstream = requests.post(url, data=data, files=files, timeout=(10, 300))
+            upstream = requests.post(url, data=data, files=files, timeout=(5, 30))
         except requests.RequestException as e:
             last_error = {"source": "primary" if index == 0 else f"fallback-{index}", "detail": str(e)}
             logger.warning("STT candidate %s unavailable: %s", base_url, e)

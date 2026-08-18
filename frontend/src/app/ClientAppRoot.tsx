@@ -8,7 +8,6 @@ import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { getUserInfo, removeUserInfo } from "../redux/userSlice";
 import { useConfig } from "@/hooks/useConfig";
 import { toast, ToastContainer, Bounce } from "react-toastify";
-const ToastContainerAny = ToastContainer as unknown as React.ComponentType<any>;
 import "react-toastify/dist/ReactToastify.css";
 import ChatBot from "../components/Features/ChatBot";
 import ScrollToTop from "../components/Common/ScrollToTop";
@@ -27,7 +26,7 @@ import {
   type MaintenanceModeDetail,
 } from "../utils/maintenanceMode";
 
-export default function ClientAppRoot({ children }: { children: any }) {
+export default function ClientAppRoot({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation('common');
   const hasMounted = React.useSyncExternalStore(
     () => () => {},
@@ -196,7 +195,7 @@ export default function ClientAppRoot({ children }: { children: any }) {
     <ErrorBoundary>
       <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
           {children}
-          <ToastContainerAny autoClose={2500} transition={Bounce} position="top-right" theme="light" style={{ top: '72px' }} />
+          <ToastContainer autoClose={2500} transition={Bounce} position="top-right" theme="light" style={{ top: '72px' }} />
           {canShowChatBot && <ChatBot />}
       </GoogleOAuthProvider>
       <ScrollToTop />

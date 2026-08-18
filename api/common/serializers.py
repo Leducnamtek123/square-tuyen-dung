@@ -72,6 +72,10 @@ class CareerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             return None
 
     def get_job_post_total(self, career):
+        if hasattr(career, 'job_post_count'):
+            return career.job_post_count
+        if hasattr(career, '_prefetched_objects_cache') and 'job_posts' in career._prefetched_objects_cache:
+            return len(career.job_posts.all())
         try:
             return career.job_posts.count()
         except Exception:

@@ -22,6 +22,7 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 
 interface CandidateProfileHeroBannerProps {
   fullName: string;
@@ -58,6 +59,7 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
   onDownloadCvClick,
   onSeekingStatusChange,
 }) => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
   const [seekingStatus, setSeekingStatus] = React.useState(isJobSeeking);
   const [currentAvatar, setCurrentAvatar] = React.useState(avatarUrl);
   const [currentCover, setCurrentCover] = React.useState(coverUrl);
@@ -148,7 +150,7 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
           p: 2,
         }}
       >
-        <Tooltip title="Bấm để chọn và tải ảnh bìa mới từ máy tính">
+        <Tooltip title={t('jobSeeker:candidateProfile.hero.changeCoverTooltip', { defaultValue: 'Bấm để chọn và tải ảnh bìa mới từ máy tính' })}>
           <Button
             size="small"
             onClick={() => coverInputRef.current?.click()}
@@ -168,7 +170,7 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
               },
             }}
           >
-            Đổi ảnh bìa
+            {t('jobSeeker:candidateProfile.hero.changeCover', { defaultValue: 'Đổi ảnh bìa' })}
           </Button>
         </Tooltip>
       </Box>
@@ -210,7 +212,7 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
               >
                 {fullName ? fullName.trim().charAt(0).toUpperCase() : ''}
               </Avatar>
-              <Tooltip title="Bấm để chọn và cập nhật ảnh đại diện mới">
+              <Tooltip title={t('jobSeeker:candidateProfile.hero.changeAvatarTooltip', { defaultValue: 'Bấm để chọn và cập nhật ảnh đại diện mới' })}>
                 <IconButton aria-label="Thao tác"
                   size="small"
                   onClick={() => avatarInputRef.current?.click()}
@@ -242,11 +244,11 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
                     lineHeight: 1.2,
                   }}
                 >
-                  {fullName || 'Ứng viên'}
+                  {fullName || t('jobSeeker:candidateProfile.hero.candidateFallback', { defaultValue: 'Ứng viên' })}
                 </Typography>
                 <Chip
                   size="small"
-                  label="Đã xác thực"
+                  label={t('jobSeeker:candidateProfile.hero.verified', { defaultValue: 'Đã xác thực' })}
                   sx={{
                     backgroundColor: '#dcfce7',
                     color: '#15803d',
@@ -258,14 +260,14 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
               </Box>
 
               <Typography variant="subtitle2" sx={{ color: title ? '#334155' : '#94a3b8', fontWeight: title ? 700 : 500, fontSize: '0.925rem', mt: 0.5 }}>
-                {title || 'Chưa cập nhật chức danh'}
+                {title || t('jobSeeker:candidateProfile.hero.noTitle', { defaultValue: 'Chưa cập nhật chức danh' })}
               </Typography>
 
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.75, mt: 0.75, flexWrap: 'wrap' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <LocationOnOutlinedIcon sx={{ fontSize: 16, color: '#2563eb' }} />
                   <Typography variant="caption" sx={{ fontWeight: 600, color: location ? '#475569' : '#94a3b8', fontSize: '0.8rem' }}>
-                    {location || 'Chưa cập nhật địa điểm'}
+                    {location || t('jobSeeker:candidateProfile.hero.noLocation', { defaultValue: 'Chưa cập nhật địa điểm' })}
                   </Typography>
                 </Box>
                 {experience && (
@@ -302,7 +304,7 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
                 },
               }}
             >
-              Chỉnh sửa
+              {t('jobSeeker:candidateProfile.hero.edit', { defaultValue: 'Chỉnh sửa' })}
             </Button>
 
             {onViewCvClick && (
@@ -326,7 +328,7 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
                   },
                 }}
               >
-                Xem CV
+                {t('jobSeeker:candidateProfile.hero.viewCv', { defaultValue: 'Xem CV' })}
               </Button>
             )}
 
@@ -350,7 +352,7 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
                   },
                 }}
               >
-                Tải CV PDF
+                {t('jobSeeker:candidateProfile.hero.downloadCv', { defaultValue: 'Tải CV PDF' })}
               </Button>
             )}
           </Stack>
@@ -382,14 +384,14 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
               }
               label={
                 <Typography variant="body2" sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.85rem' }}>
-                  Bật trạng thái nhận cơ hội việc làm
+                  {t('jobSeeker:candidateProfile.hero.seekingSwitchLabel', { defaultValue: 'Bật trạng thái nhận cơ hội việc làm' })}
                 </Typography>
               }
               sx={{ mr: 0 }}
             />
             <Chip
               size="small"
-              label={seekingStatus ? 'Đang mở cửa nhận việc' : 'Đang tạm dừng nhận việc'}
+              label={seekingStatus ? t('jobSeeker:candidateProfile.hero.seekingActive', { defaultValue: 'Đang mở cửa nhận việc' }) : t('jobSeeker:candidateProfile.hero.seekingInactive', { defaultValue: 'Đang tạm dừng nhận việc' })}
               sx={{
                 backgroundColor: seekingStatus ? '#dcfce7' : '#f1f5f9',
                 color: seekingStatus ? '#15803d' : '#64748b',
@@ -401,7 +403,10 @@ const CandidateProfileHeroBanner: React.FC<CandidateProfileHeroBannerProps> = ({
           </Box>
 
           <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem' }}>
-            Hồ sơ cập nhật lần cuối: <strong>{updatedAt && dayjs(updatedAt).isValid() ? dayjs(updatedAt).format('DD/MM/YYYY') : 'Chưa cập nhật'}</strong>
+            {t('jobSeeker:candidateProfile.hero.lastUpdated', {
+              date: updatedAt && dayjs(updatedAt).isValid() ? dayjs(updatedAt).format('DD/MM/YYYY') : t('jobSeeker:account.notUpdated', { defaultValue: 'Chưa cập nhật' }),
+              defaultValue: `Hồ sơ cập nhật lần cuối: ${updatedAt && dayjs(updatedAt).isValid() ? dayjs(updatedAt).format('DD/MM/YYYY') : 'Chưa cập nhật'}`
+            })}
           </Typography>
         </Box>
       </Box>

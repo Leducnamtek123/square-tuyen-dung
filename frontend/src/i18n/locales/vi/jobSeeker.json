@@ -263,7 +263,45 @@
     "settings": "Cài đặt",
     "title": "Thiết lập tài khoản",
     "changePassword": "Đổi mật khẩu",
-    "deactivate": "Vô hiệu hóa tài khoản"
+    "deactivate": "Vô hiệu hóa tài khoản",
+    "security": "Bảo mật tài khoản",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "password": "Mật khẩu",
+    "notifications": "Thông báo",
+    "emailNotify": "Nhận thông báo qua email",
+    "smsNotify": "Nhận thông báo qua SMS",
+    "jobAlertNotify": "Thông báo việc làm phù hợp",
+    "other": "Khác",
+    "language": "Ngôn ngữ",
+    "logout": "Đăng xuất khỏi tài khoản",
+    "updateEmailTitle": "Cập nhật Email tài khoản",
+    "newEmail": "Địa chỉ Email mới",
+    "updatePhoneTitle": "Cập nhật Số điện thoại",
+    "newPhone": "Số điện thoại mới",
+    "changePasswordTitle": "Đổi mật khẩu tài khoản",
+    "currentPassword": "Mật khẩu hiện tại",
+    "newPassword": "Mật khẩu mới",
+    "confirmNewPassword": "Xác nhận mật khẩu mới",
+    "selectLanguageTitle": "Chọn Ngôn ngữ giao diện",
+    "logoutTitle": "Đăng xuất tài khoản",
+    "logoutConfirm": "Bạn có chắc chắn muốn đăng xuất khỏi tài khoản InfoHR không?",
+    "logoutBtn": "Đăng xuất",
+    "verified": "Đã xác thực",
+    "notUpdated": "Chưa cập nhật",
+    "vietnameseLang": "Tiếng Việt (Việt Nam)",
+    "englishLang": "English (United States)",
+    "saveChanges": "Lưu thay đổi",
+    "applyLang": "Áp dụng",
+    "cancel": "Hủy",
+    "passwordMinLength": "Mật khẩu mới phải chứa ít nhất 6 ký tự!",
+    "passwordMismatch": "Xác nhận mật khẩu mới không khớp!",
+    "emailInvalid": "Vui lòng nhập địa chỉ email hợp lệ!",
+    "phoneInvalid": "Vui lòng nhập số điện thoại hợp lệ!",
+    "updateEmailSuccess": "Cập nhật địa chỉ email thành công!",
+    "updatePhoneSuccess": "Cập nhật số điện thoại thành công!",
+    "changePasswordSuccess": "Đổi mật khẩu tài khoản thành công!",
+    "logoutSuccess": "Đã đăng xuất tài khoản thành công."
   },
   "settings": {
     "toast": {
@@ -336,7 +374,13 @@
   "myInterviews": {
     "defaultRoomName": "Phòng phỏng vấn",
     "aiInterview": "Phỏng vấn AI",
-    "liveInterview": "Phỏng vấn Trực tiếp"
+    "liveInterview": "Phỏng vấn Trực tiếp",
+    "emptyTitle": "Bạn chưa có buổi phỏng vấn nào",
+    "emptySubtitle": "Các buổi phỏng vấn của bạn sẽ được hiển thị tại đây khi nhà tuyển dụng mời bạn.",
+    "findJobs": "Tìm việc ngay",
+    "jobNameFallback": "Chức danh",
+    "companyNameFallback": "Công ty",
+    "join": "Tham gia"
   },
   "jobApplication": {
     "title": "Hồ sơ ứng tuyển",
@@ -582,6 +626,71 @@
       "fileFormatInvalid": "Chỉ chấp nhận file định dạng PDF, DOC, DOCX.",
       "saveFailed": "Không thể lưu thông tin. Vui lòng thử lại.",
       "uploadFailed": "Tải file CV thất bại. Vui lòng thử lại."
+    }
+  },
+  "candidateDashboard": {
+    "kpi": {
+      "appliedTitle": "Việc làm đã ứng tuyển",
+      "appliedSubtext": "Hồ sơ đang chờ phản hồi",
+      "savedTitle": "Việc làm đã lưu",
+      "savedSubtext": "Công việc yêu thích của bạn",
+      "viewedTitle": "Nhà tuyển dụng đã xem",
+      "viewedSubtext": "Trong 30 ngày gần đây",
+      "followingTitle": "Công ty đang theo dõi",
+      "followingSubtext": "Quan tâm đến bạn"
+    },
+    "cvHealth": {
+      "title": "Sức khỏe hồ sơ & Lượt xem",
+      "subtitle": "Đo lường mức độ quan tâm của nhà tuyển dụng tới CV",
+      "description": "Mỗi lượt xem CV từ nhà tuyển dụng đều là cơ hội tốt để bạn kết nối và phỏng vấn trực tiếp.",
+      "optimizeButton": "Tối ưu hồ sơ ngay"
+    },
+    "activity": {
+      "title": "Hoạt động của bạn",
+      "timeframes": {
+        "7_days": "7 ngày qua",
+        "30_days": "30 ngày qua",
+        "90_days": "90 ngày qua"
+      },
+      "emptyTitle": "Chưa có dữ liệu thống kê",
+      "emptySubtitle": "Khi bạn hoạt động, dữ liệu sẽ được hiển thị tại đây.",
+      "applied": "Hồ sơ đã ứng tuyển",
+      "saved": "Việc làm đã lưu",
+      "viewed": "Nhà tuyển dụng đã xem CV",
+      "following": "Công ty đang theo dõi"
+    },
+    "aiRecommended": {
+      "title": "Việc làm gợi ý bởi AI",
+      "subtitle": "AI phân tích hồ sơ & nguyện vọng để đề xuất các cơ hội phù hợp nhất với bạn",
+      "viewAll": "Xem tất cả"
+    }
+  },
+  "candidateProfile": {
+    "hero": {
+      "changeCover": "Đổi ảnh bìa",
+      "changeCoverTooltip": "Bấm để chọn và tải ảnh bìa mới từ máy tính",
+      "changeAvatarTooltip": "Bấm để chọn và cập nhật ảnh đại diện mới",
+      "candidateFallback": "Ứng viên",
+      "verified": "Đã xác thực",
+      "noTitle": "Chưa cập nhật chức danh",
+      "noLocation": "Chưa cập nhật địa điểm",
+      "edit": "Chỉnh sửa",
+      "viewCv": "Xem CV",
+      "downloadCv": "Tải CV PDF",
+      "seekingSwitchLabel": "Bật trạng thái nhận cơ hội việc làm",
+      "seekingActive": "Đang mở cửa nhận việc",
+      "seekingInactive": "Đang tạm dừng nhận việc",
+      "lastUpdated": "Hồ sơ cập nhật lần cuối: {{date}}"
+    },
+    "skills": {
+      "title": "Kỹ năng chuyên môn",
+      "skillsCount": "{{count}} kỹ năng",
+      "empty": "Chưa thêm kỹ năng chuyên môn nào.",
+      "addSkill": "Thêm kỹ năng",
+      "manageModalTitle": "Quản lý kỹ năng chuyên môn",
+      "skillInputPlaceholder": "Nhập tên kỹ năng...",
+      "add": "Thêm",
+      "done": "Hoàn tất"
     }
   }
 }

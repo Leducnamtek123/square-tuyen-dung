@@ -25,7 +25,7 @@ import { unwrapDataResponse } from '@/utils/apiResponse';
 import type { JobPost } from '@/types/models';
 
 const AiRecommendedJobsSection = () => {
-  const { i18n } = useTranslation('common');
+  const { t, i18n } = useTranslation(['jobSeeker', 'common']);
   const [loading, setLoading] = React.useState(true);
   const [jobs, setJobs] = React.useState<JobPost[]>([]);
 
@@ -87,11 +87,11 @@ const AiRecommendedJobsSection = () => {
           <Box>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a' }}>
-                Việc làm gợi ý bởi AI
+                {t('jobSeeker:candidateDashboard.aiRecommended.title', { defaultValue: 'Việc làm gợi ý bởi AI' })}
               </Typography>
             </Stack>
             <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 500 }}>
-              AI phân tích hồ sơ & nguyện vọng để đề xuất các cơ hội phù hợp nhất với bạn
+              {t('jobSeeker:candidateDashboard.aiRecommended.subtitle', { defaultValue: 'AI phân tích hồ sơ & nguyện vọng để đề xuất các cơ hội phù hợp nhất với bạn' })}
             </Typography>
           </Box>
         </Box>
@@ -107,7 +107,7 @@ const AiRecommendedJobsSection = () => {
             '&:hover': { backgroundColor: '#eff6ff' },
           }}
         >
-          Xem tất cả
+          {t('jobSeeker:candidateDashboard.aiRecommended.viewAll', { defaultValue: 'Xem tất cả' })}
         </Button>
       </Stack>
 

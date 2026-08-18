@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
-import { utils, writeFileXLSX, write } from 'xlsx';
 import type { ExportTableRow } from '../types/api';
 
 const xlsxUtils = {
-  exportToXLSX: (data: ExportTableRow[], fileName = 'data'): void => {
+  exportToXLSX: async (data: ExportTableRow[], fileName = 'data'): Promise<void> => {
+    const { utils, writeFileXLSX } = await import('xlsx');
     const ws = utils.json_to_sheet(data);
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, 'Data');
@@ -13,7 +13,8 @@ const xlsxUtils = {
   /**
    * Generates a Blob for either XLSX or CSV file format without triggering direct download.
    */
-  generateBlob: (data: Record<string, any>[], format: 'xlsx' | 'csv' = 'xlsx'): Blob => {
+  generateBlob: async (data: Record<string, any>[], format: 'xlsx' | 'csv' = 'xlsx'): Promise<Blob> => {
+    const { utils, write } = await import('xlsx');
     const ws = utils.json_to_sheet(data);
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, 'ExportData');

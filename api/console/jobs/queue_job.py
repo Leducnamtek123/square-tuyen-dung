@@ -24,8 +24,7 @@ def send_email_job_post_callback(results):
 def send_email_job_post_for_job_seeker_task(frequency, max_size=100):
 
     users = User.objects.filter(is_active=True, is_verify_email=True,
-
-                                role_name=var_sys.JOB_SEEKER, email='khuy220@gmail.com')
+                                role_name=var_sys.JOB_SEEKER)
 
     total_user = users.count()
 

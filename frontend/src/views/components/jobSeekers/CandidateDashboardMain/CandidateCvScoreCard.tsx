@@ -18,7 +18,7 @@ interface CandidateCvScoreCardProps {
 }
 
 const CandidateCvScoreCard: React.FC<CandidateCvScoreCardProps> = ({ viewedCount = 0 }) => {
-  const { i18n } = useTranslation('common');
+  const { t, i18n } = useTranslation(['jobSeeker', 'common']);
   const profilePath = localizeRoutePath('/profile', i18n.language);
   const progressValue = viewedCount > 0 ? Math.min(viewedCount * 20, 100) : 0;
 
@@ -42,11 +42,11 @@ const CandidateCvScoreCard: React.FC<CandidateCvScoreCardProps> = ({ viewedCount
       }}
     >
       <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', mb: 0.5, fontSize: '1.05rem' }}>
-        Sức khỏe hồ sơ & Lượt xem
+        {t('jobSeeker:candidateDashboard.cvHealth.title', { defaultValue: 'Sức khỏe hồ sơ & Lượt xem' })}
       </Typography>
 
       <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.8rem', display: 'block', mb: 2 }}>
-        Đo lường mức độ quan tâm của nhà tuyển dụng tới CV
+        {t('jobSeeker:candidateDashboard.cvHealth.subtitle', { defaultValue: 'Đo lường mức độ quan tâm của nhà tuyển dụng tới CV' })}
       </Typography>
 
       {/* Circle Score Donut */}
@@ -91,7 +91,7 @@ const CandidateCvScoreCard: React.FC<CandidateCvScoreCardProps> = ({ viewedCount
       </Box>
 
       <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.825rem', textAlign: 'center', mb: 2.5, lineHeight: 1.5 }}>
-        Mỗi lượt xem CV từ nhà tuyển dụng đều là cơ hội tốt để bạn kết nối và phỏng vấn trực tiếp.
+        {t('jobSeeker:candidateDashboard.cvHealth.description', { defaultValue: 'Mỗi lượt xem CV từ nhà tuyển dụng đều là cơ hội tốt để bạn kết nối và phỏng vấn trực tiếp.' })}
       </Typography>
 
       <Button
@@ -117,7 +117,7 @@ const CandidateCvScoreCard: React.FC<CandidateCvScoreCardProps> = ({ viewedCount
           },
         }}
       >
-        Tối ưu hồ sơ ngay
+        {t('jobSeeker:candidateDashboard.cvHealth.optimizeButton', { defaultValue: 'Tối ưu hồ sơ ngay' })}
       </Button>
     </Card>
   );

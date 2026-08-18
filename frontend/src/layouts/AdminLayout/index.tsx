@@ -1,14 +1,13 @@
 'use client';
 
 import * as React from 'react';
-
 import PropTypes from 'prop-types';
-
 import { Box } from "@mui/material";
 
 import Header from '../components/employers/Header';
 import Sidebar from '../components/employers/Sidebar';
 import ManagementFooter from '../components/commons/ManagementFooter';
+import AdminCommandPalette from '@/components/Common/AdminCommandPalette';
 
 interface AdminLayoutProps {
   windowGetter?: () => unknown;
@@ -22,6 +21,7 @@ const AdminLayout = (props: AdminLayoutProps) => {
   const { windowGetter, children } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState<boolean>(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -30,6 +30,18 @@ const AdminLayout = (props: AdminLayoutProps) => {
         setIsCollapsed(true);
       }
     }
+  }, []);
+
+  // Global Ctrl+K / Cmd+K shortcut
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setCommandPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const toggleCollapse = React.useCallback(() => {
@@ -126,22 +138,18 @@ const AdminLayout = (props: AdminLayoutProps) => {
         </Box>
         <ManagementFooter />
       </Box>
+
+      {/* Global Admin Command Palette (Ctrl+K) */}
+      <AdminCommandPalette
+        open={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+      />
     </Box>
   );
 };
 
 AdminLayout.propTypes = {
-
-  /**
-
-   * Injected by the documentation to work in an iframe.
-
-   * You won't need it on your project.
-
-   */
-
   window: PropTypes.func,
-
 };
 
 export default AdminLayout;

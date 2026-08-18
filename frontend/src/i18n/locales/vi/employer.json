@@ -1130,7 +1130,8 @@
       "statusDisabled": "Đã khóa",
       "statusInvited": "Đã mời",
       "systemRoleLocked": "Vai trò hệ thống đã được khóa",
-      "userId": "ID người dùng"
+      "userId": "ID người dùng",
+      "deleteSuccess": "Xóa thành viên thành công."
     },
     "title": "Thông tin công ty",
     "following": "Đang theo dõi",

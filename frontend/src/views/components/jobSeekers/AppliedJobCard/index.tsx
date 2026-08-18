@@ -192,7 +192,7 @@ const AppliedJobCard = () => {
                           style={{ marginRight: 2 }}
                           color="#2563eb"
                         />{' '}
-                        Hồ sơ trực tuyến
+                        {t("jobSeeker:jobApplication.onlineProfile", { defaultValue: 'Hồ sơ trực tuyến' })}
                       </>
                     )}
                   </Typography>

@@ -1,7 +1,12 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-const source = readFileSync(join(__dirname, '../index.tsx'), 'utf8');
+const source = [
+  readFileSync(join(__dirname, '../index.tsx'), 'utf8'),
+  readFileSync(join(__dirname, '../components/ThreadSidebar.tsx'), 'utf8'),
+  readFileSync(join(__dirname, '../components/ToolStepCard.tsx'), 'utf8'),
+  readFileSync(join(__dirname, '../components/MessageItem.tsx'), 'utf8'),
+].join('\n');
 
 const fixedKeys = [
   'agentAssistant.title',

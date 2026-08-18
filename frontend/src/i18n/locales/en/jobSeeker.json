@@ -297,7 +297,45 @@
     "settings": "Settings",
     "title": "Account Settings",
     "changePassword": "Change Password",
-    "deactivate": "Deactivate Account"
+    "deactivate": "Deactivate Account",
+    "security": "Account Security",
+    "email": "Email",
+    "phone": "Phone Number",
+    "password": "Password",
+    "notifications": "Notifications",
+    "emailNotify": "Receive notifications via email",
+    "smsNotify": "Receive notifications via SMS",
+    "jobAlertNotify": "Job alert notifications",
+    "other": "Other",
+    "language": "Language",
+    "logout": "Log out of account",
+    "updateEmailTitle": "Update Account Email",
+    "newEmail": "New Email Address",
+    "updatePhoneTitle": "Update Phone Number",
+    "newPhone": "New Phone Number",
+    "changePasswordTitle": "Change Account Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "selectLanguageTitle": "Select Interface Language",
+    "logoutTitle": "Log Out Account",
+    "logoutConfirm": "Are you sure you want to log out of your InfoHR account?",
+    "logoutBtn": "Log Out",
+    "verified": "Verified",
+    "notUpdated": "Not updated",
+    "vietnameseLang": "Tiếng Việt (Việt Nam)",
+    "englishLang": "English (United States)",
+    "saveChanges": "Save changes",
+    "applyLang": "Apply",
+    "cancel": "Cancel",
+    "passwordMinLength": "New password must be at least 6 characters long!",
+    "passwordMismatch": "New password confirmation does not match!",
+    "emailInvalid": "Please enter a valid email address!",
+    "phoneInvalid": "Please enter a valid phone number!",
+    "updateEmailSuccess": "Account email updated successfully!",
+    "updatePhoneSuccess": "Phone number updated successfully!",
+    "changePasswordSuccess": "Account password changed successfully!",
+    "logoutSuccess": "Logged out successfully."
   },
   "settings": {
     "toast": {
@@ -370,7 +408,13 @@
   "myInterviews": {
     "defaultRoomName": "Interview room",
     "aiInterview": "AI Interview",
-    "liveInterview": "Live Interview"
+    "liveInterview": "Live Interview",
+    "emptyTitle": "You have no interviews scheduled",
+    "emptySubtitle": "Your interviews will appear here once an employer invites you.",
+    "findJobs": "Find jobs now",
+    "jobNameFallback": "Job title",
+    "companyNameFallback": "Company",
+    "join": "Join"
   },
   "jobApplication": {
     "title": "Application Resumes",
@@ -582,6 +626,71 @@
       "fileFormatInvalid": "Only PDF, DOC, and DOCX files are allowed.",
       "saveFailed": "Failed to save information. Please try again.",
       "uploadFailed": "Failed to upload CV file. Please try again."
+    }
+  },
+  "candidateDashboard": {
+    "kpi": {
+      "appliedTitle": "Applied Jobs",
+      "appliedSubtext": "Applications awaiting response",
+      "savedTitle": "Saved Jobs",
+      "savedSubtext": "Your bookmarked jobs",
+      "viewedTitle": "Employer CV Views",
+      "viewedSubtext": "In the last 30 days",
+      "followingTitle": "Followed Companies",
+      "followingSubtext": "Interested in you"
+    },
+    "cvHealth": {
+      "title": "Profile Health & Views",
+      "subtitle": "Measure employer interest in your CV",
+      "description": "Every profile view from employers is a great opportunity to connect and interview directly.",
+      "optimizeButton": "Optimize Profile Now"
+    },
+    "activity": {
+      "title": "Your Activity",
+      "timeframes": {
+        "7_days": "Last 7 days",
+        "30_days": "Last 30 days",
+        "90_days": "Last 90 days"
+      },
+      "emptyTitle": "No statistics yet",
+      "emptySubtitle": "Activity data will appear here once you interact.",
+      "applied": "Applied Resumes",
+      "saved": "Saved Jobs",
+      "viewed": "Employer CV Views",
+      "following": "Followed Companies"
+    },
+    "aiRecommended": {
+      "title": "AI Recommended Jobs",
+      "subtitle": "AI analyzes your profile and aspirations to suggest the best matching opportunities",
+      "viewAll": "View all"
+    }
+  },
+  "candidateProfile": {
+    "hero": {
+      "changeCover": "Change Cover",
+      "changeCoverTooltip": "Click to select and upload a new cover image",
+      "changeAvatarTooltip": "Click to update your avatar",
+      "candidateFallback": "Candidate",
+      "verified": "Verified",
+      "noTitle": "Title not updated",
+      "noLocation": "Location not updated",
+      "edit": "Edit",
+      "viewCv": "View CV",
+      "downloadCv": "Download CV PDF",
+      "seekingSwitchLabel": "Turn on open to job opportunities status",
+      "seekingActive": "Open to opportunities",
+      "seekingInactive": "Currently not looking",
+      "lastUpdated": "Profile last updated: {{date}}"
+    },
+    "skills": {
+      "title": "Professional Skills",
+      "skillsCount": "{{count}} skills",
+      "empty": "No professional skills added yet.",
+      "addSkill": "Add skill",
+      "manageModalTitle": "Manage Professional Skills",
+      "skillInputPlaceholder": "Enter skill name...",
+      "add": "Add",
+      "done": "Done"
     }
   }
 }

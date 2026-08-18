@@ -19,6 +19,8 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
+import { useTranslation } from 'react-i18next';
+
 interface CandidateSkillsCardProps {
   initialSkills?: string[];
 }
@@ -26,6 +28,7 @@ interface CandidateSkillsCardProps {
 const CandidateSkillsCard: React.FC<CandidateSkillsCardProps> = ({
   initialSkills = [],
 }) => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
   const [skills, setSkills] = React.useState<string[]>(initialSkills || []);
 
   React.useEffect(() => {
@@ -62,10 +65,10 @@ const CandidateSkillsCard: React.FC<CandidateSkillsCardProps> = ({
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
-            Kỹ năng chuyên môn
+            {t('jobSeeker:candidateProfile.skills.title', { defaultValue: 'Kỹ năng chuyên môn' })}
           </Typography>
           <Chip
-            label={`${skills.length} kỹ năng`}
+            label={t('jobSeeker:candidateProfile.skills.skillsCount', { count: skills.length, defaultValue: `${skills.length} kỹ năng` })}
             size="small"
             sx={{ backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 700, fontSize: '0.725rem', height: 22 }}
           />
@@ -77,7 +80,7 @@ const CandidateSkillsCard: React.FC<CandidateSkillsCardProps> = ({
 
       {skills.length === 0 ? (
         <Typography variant="body2" sx={{ color: '#94a3b8', fontStyle: 'italic', fontSize: '0.875rem' }}>
-          Chưa thêm kỹ năng chuyên môn nào.
+          {t('jobSeeker:candidateProfile.skills.empty', { defaultValue: 'Chưa thêm kỹ năng chuyên môn nào.' })}
         </Typography>
       ) : (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -123,7 +126,7 @@ const CandidateSkillsCard: React.FC<CandidateSkillsCardProps> = ({
               },
             }}
           >
-            Thêm kỹ năng
+            {t('jobSeeker:candidateProfile.skills.addSkill', { defaultValue: 'Thêm kỹ năng' })}
           </Button>
         </Box>
       )}
@@ -136,14 +139,16 @@ const CandidateSkillsCard: React.FC<CandidateSkillsCardProps> = ({
         fullWidth
         PaperProps={{ sx: { borderRadius: '20px', p: 1 } }}
       >
-        <DialogTitle sx={{ fontWeight: 800, color: '#0f172a' }}>Quản lý kỹ năng chuyên môn</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 800, color: '#0f172a' }}>
+          {t('jobSeeker:candidateProfile.skills.manageModalTitle', { defaultValue: 'Quản lý kỹ năng chuyên môn' })}
+        </DialogTitle>
         <DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
           <Stack spacing={2} sx={{ pt: 1 }}>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <TextField
                 fullWidth
                 size="small"
-                placeholder="Nhập tên kỹ năng..."
+                placeholder={t('jobSeeker:candidateProfile.skills.skillInputPlaceholder', { defaultValue: 'Nhập tên kỹ năng...' })}
                 value={newSkillInput}
                 onChange={(e) => setNewSkillInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -159,7 +164,7 @@ const CandidateSkillsCard: React.FC<CandidateSkillsCardProps> = ({
                 onClick={handleAddSkill}
                 sx={{ borderRadius: '10px', backgroundColor: '#2563eb', fontWeight: 700, px: 2 }}
               >
-                Thêm
+                {t('jobSeeker:candidateProfile.skills.add', { defaultValue: 'Thêm' })}
               </Button>
             </Box>
 
@@ -181,7 +186,7 @@ const CandidateSkillsCard: React.FC<CandidateSkillsCardProps> = ({
             onClick={() => setOpenModal(false)}
             sx={{ borderRadius: '10px', backgroundColor: '#2563eb', fontWeight: 700, width: '100%' }}
           >
-            Hoàn tất
+            {t('jobSeeker:candidateProfile.skills.done', { defaultValue: 'Hoàn tất' })}
           </Button>
         </DialogActions>
       </Dialog>

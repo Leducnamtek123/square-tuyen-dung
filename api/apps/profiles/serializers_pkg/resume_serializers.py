@@ -196,6 +196,8 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return validate_pdf_cv_file(cv_file)
 
     def get_view_number(self, resume):
+        if hasattr(resume, "view_count"):
+            return resume.view_count
         if hasattr(resume, "_prefetched_objects_cache") and "resumesaved_set" in resume._prefetched_objects_cache:
             return len(resume.resumesaved_set.all())
         return resume.resumesaved_set.count()
@@ -206,6 +208,8 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return getattr(resume, "match_score", 0)
 
     def check_saved(self, resume):
+        if hasattr(resume, "is_saved"):
+            return resume.is_saved
         request = self.context.get('request', None)
         if request is None:
             return None
@@ -217,6 +221,8 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return None
 
     def get_last_viewed_date(self, resume):
+        if hasattr(resume, "last_viewed_at"):
+            return resume.last_viewed_at
         request = self.context.get('request', None)
         if request is None:
             return None

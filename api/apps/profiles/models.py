@@ -76,7 +76,7 @@ class Resume(CommonBaseModel):
 
     is_active = models.BooleanField(default=False, db_index=True)
 
-    type = models.CharField(max_length=10, default=var_sys.CV_UPLOAD)
+    type = models.CharField(max_length=10, default=var_sys.CV_UPLOAD, db_index=True)
 
     source_platform = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     source_url = models.URLField(blank=True, null=True)
@@ -105,6 +105,7 @@ class Resume(CommonBaseModel):
         indexes = [
             models.Index(fields=['is_active', '-update_at'], name='idx_resume_active_updated'),
             models.Index(fields=['user', 'is_active'], name='idx_resume_user_active'),
+            models.Index(fields=['is_active', 'type'], name='idx_resume_active_type'),
         ]
 
     def __str__(self):

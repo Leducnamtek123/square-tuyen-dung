@@ -1130,7 +1130,8 @@
       "statusDisabled": "Disabled",
       "statusInvited": "Invited",
       "systemRoleLocked": "System role is locked",
-      "userId": "User ID"
+      "userId": "User ID",
+      "deleteSuccess": "Member removed successfully."
     },
     "title": "Company Information",
     "following": "Following",

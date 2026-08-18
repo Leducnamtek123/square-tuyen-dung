@@ -31,7 +31,7 @@ function makeQueryClient() {
   });
 }
 
-export function Providers({ children }: { children: any }) {
+export function Providers({ children }: { children: React.ReactNode }) {
   // Use useState lazy initializer to avoid mutating ref during render
   // and maintain component instance isolation in Next.js App Router.
   const [queryClient] = React.useState(() => makeQueryClient());

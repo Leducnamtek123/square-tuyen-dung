@@ -46,11 +46,16 @@ const useFireStoreGetChatRoom = (
     condition && (condition.compareValue === undefined || condition.compareValue === null)
   );
 
+  const conditionField = condition?.fieldName;
+  const conditionOperator = condition?.operator;
+  const conditionValue = condition?.compareValue;
+
   React.useEffect(() => {
     if (hasInvalidCondition) {
       return;
     }
 
+    let isMounted = true;
     const collectionRef = collection(db, 'chatRooms');
 
     const baseConstraints: QueryConstraint[] = [orderBy('createdAt', sort)];
@@ -60,10 +65,10 @@ const useFireStoreGetChatRoom = (
 
     let q = query(collectionRef, ...baseConstraints);
 
-    if (condition) {
+    if (conditionField && conditionOperator && conditionValue !== undefined && conditionValue !== null) {
       q = query(
         collectionRef,
-        where(condition.fieldName, condition.operator, condition.compareValue),
+        where(conditionField, conditionOperator, conditionValue),
         ...baseConstraints
       );
     }
@@ -113,6 +118,8 @@ const useFireStoreGetChatRoom = (
         );
       }
 
+      if (!isMounted) return;
+
       // Merge rooms with user data
       const chatRoomsData: ChatRoomWithUser[] = roomsData.map((room) => ({
         ...room.data,
@@ -123,8 +130,11 @@ const useFireStoreGetChatRoom = (
       setDocs(chatRoomsData);
     });
 
-    return unsubscribe;
-  }, [condition, hasInvalidCondition, sort, limitNum, userId]);
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, [conditionField, conditionOperator, conditionValue, hasInvalidCondition, sort, limitNum, userId]);
 
   return hasInvalidCondition ? [] : docs;
 };

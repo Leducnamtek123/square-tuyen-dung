@@ -75,7 +75,7 @@ def test_tts_proxy_buffers_audio_before_returning_response(monkeypatch, settings
         {
             "url": "http://primary.test/v1/audio/speech",
             "stream": False,
-            "timeout": (10, 300),
+            "timeout": (5, 30),
         }
     ]
 
@@ -112,7 +112,7 @@ def test_tts_get_returns_helpful_message(client):
     response = client.get("/api/ai/tts/")
     payload = response.json()
 
-    assert response.status_code == 200
+    assert response.status_code == 405
     assert payload["error"]["code"] == "METHOD_NOT_ALLOWED"
     assert "Use POST /api/ai/tts/" in payload["error"]["message"]
 

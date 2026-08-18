@@ -19,15 +19,11 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import {
-  BriefcaseBusiness,
-  Building2,
-  Calendar,
-  DollarSign,
-  Mail,
-  Phone,
-  UserCheck,
-} from 'lucide-react';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
+import BusinessIcon from '@mui/icons-material/Business';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import type { TFunction } from 'i18next';
 import type { JobPostActivity } from '@/types/models';
 import hrmService, {
@@ -150,7 +146,7 @@ const EmployeeFromApplicationDialog = ({
               alignItems: 'center',
             }}
           >
-            <UserCheck size={22} />
+            <PersonAddAlt1Icon sx={{ fontSize: 22 }} />
           </Box>
           <Box>
             <Typography variant="h6" fontWeight={700}>
@@ -195,7 +191,7 @@ const EmployeeFromApplicationDialog = ({
                     {candidateName}
                   </Typography>
                   <Stack direction="row" spacing={1} alignItems="center" sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
-                    <BriefcaseBusiness size={14} />
+                    <WorkOutlineIcon sx={{ fontSize: 14 }} />
                     <span>{appliedPosition}</span>
                   </Stack>
                 </Box>
@@ -205,11 +201,11 @@ const EmployeeFromApplicationDialog = ({
             <Grid item xs={12} sm={6}>
               <Stack spacing={0.75}>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
-                  <Mail size={14} />
+                  <EmailOutlinedIcon sx={{ fontSize: 14 }} />
                   <span>{candidateEmail || 'Chưa cập nhật email'}</span>
                 </Stack>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
-                  <Phone size={14} />
+                  <PhoneOutlinedIcon sx={{ fontSize: 14 }} />
                   <span>{candidatePhone || 'Chưa cập nhật SĐT'}</span>
                 </Stack>
               </Stack>
@@ -220,7 +216,7 @@ const EmployeeFromApplicationDialog = ({
         {/* Employment Configuration Form */}
         <Box component="form" id="onboard-candidate-form" onSubmit={handleSubmit}>
           <Typography variant="subtitle2" color="primary.main" sx={{ mb: 2, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Building2 size={16} /> Thiết lập Vị trí & Hợp đồng Nhận việc
+            <BusinessIcon sx={{ fontSize: 16 }} /> Thiết lập Vị trí & Hợp đồng Nhận việc
           </Typography>
 
           {loadingMetadata ? (
@@ -378,7 +374,7 @@ const EmployeeFromApplicationDialog = ({
           form="onboard-candidate-form"
           variant="contained"
           disabled={loading || loadingMetadata}
-          startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <UserCheck size={18} />}
+          startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <PersonAddAlt1Icon sx={{ fontSize: 18 }} />}
           sx={{ px: 3, fontWeight: 700 }}
         >
           {loading ? 'Đang tiếp nhận...' : 'Chuyển sang tiếp nhận'}

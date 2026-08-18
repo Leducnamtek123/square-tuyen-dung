@@ -264,34 +264,34 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             return True
         return False
 
-    def _get_matching_resumes(self, job_post):
+    def _get_matching_resumes_info(self, job_post):
+        if hasattr(job_post, '_cached_matching_info'):
+            return job_post._cached_matching_info
+
+        # Single optimized queryset without multiple sequential .exists() checks
         qs = Resume.objects.filter(
-            Q(job_seeker_profile__isnull=True) | Q(job_seeker_profile__is_seeking_job=True)
+            Q(job_seeker_profile__isnull=True) | Q(job_seeker_profile__is_seeking_job=True),
+            is_active=True
         ).select_related('user', 'user__avatar')
-        active_qs = qs.filter(is_active=True)
-        if active_qs.exists():
-            qs = active_qs
+
         if job_post.career_id:
             matching = qs.filter(career_id=job_post.career_id)
-            if matching.exists():
-                return matching
-        if job_post.job_name:
+        elif job_post.job_name:
             words = [w.strip() for w in job_post.job_name.split() if len(w.strip()) > 2]
             if words:
                 query = Q()
                 for w in words:
                     query |= Q(title__icontains=w) | Q(skills_summary__icontains=w)
                 matching = qs.filter(query)
-                if matching.exists():
-                    return matching
-        return qs
+            else:
+                matching = qs
+        else:
+            matching = qs
 
-    def get_ai_recommended_count(self, job_post):
-        return self._get_matching_resumes(job_post).count()
+        resumes = list(matching[:3])
+        count = len(resumes) if len(resumes) < 3 else matching.count()
 
-    def get_ai_recommended_avatars(self, job_post):
-        resumes = list(self._get_matching_resumes(job_post)[:3])
-        result = []
+        avatars = []
         for r in resumes:
             u = getattr(r, 'user', None)
             name = (getattr(u, 'full_name', '') or getattr(u, 'username', '') or getattr(r, 'title', '') or "Ứng viên").strip()
@@ -302,16 +302,24 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                     avatar_url = helper.get_presigned_url(u.avatar.file.name)
                 except Exception:
                     avatar_url = None
-            if not avatar_url:
-                avatar_url = None
 
-            result.append({
+            avatars.append({
                 "name": name,
                 "initial": initial,
                 "avatarUrl": avatar_url
             })
 
-        return result
+        info = (count, avatars)
+        job_post._cached_matching_info = info
+        return info
+
+    def get_ai_recommended_count(self, job_post):
+        count, _ = self._get_matching_resumes_info(job_post)
+        return count
+
+    def get_ai_recommended_avatars(self, job_post):
+        _, avatars = self._get_matching_resumes_info(job_post)
+        return avatars
 
 
 

@@ -73,15 +73,15 @@ export const validateVerificationLegalProfile = (
     }
   });
 
-  if (legalProfile.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(legalProfile.email.trim())) {
+  if (legalProfile.email?.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(legalProfile.email.trim())) {
     errors.email = t('verification.validation.email');
   }
 
-  if (legalProfile.phone.trim() && !REGEX_VALIDATE.phoneRegExp.test(legalProfile.phone.trim())) {
+  if (legalProfile.phone?.trim() && !REGEX_VALIDATE.phoneRegExp.test(legalProfile.phone.trim())) {
     errors.phone = t('verification.validation.phone');
   }
 
-  if (legalProfile.website.trim() && !REGEX_VALIDATE.urlRegExp.test(legalProfile.website.trim())) {
+  if (legalProfile.website?.trim() && !REGEX_VALIDATE.urlRegExp.test(legalProfile.website.trim())) {
     errors.website = t('verification.validation.website');
   }
 

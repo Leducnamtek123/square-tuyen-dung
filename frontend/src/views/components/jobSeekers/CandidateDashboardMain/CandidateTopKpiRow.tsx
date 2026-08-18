@@ -27,7 +27,7 @@ interface CandidateTopKpiRowProps {
 }
 
 const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
-  const { i18n } = useTranslation('common');
+  const { t, i18n } = useTranslation(['jobSeeker', 'common']);
   const appliedCount = stats?.appliedCount ?? 0;
   const savedCount = stats?.savedCount ?? 0;
   const viewedCount = stats?.viewedCount ?? 0;
@@ -35,33 +35,33 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
 
   const kpis = [
     {
-      title: 'Việc làm đã ứng tuyển',
+      title: t('jobSeeker:candidateDashboard.kpi.appliedTitle', { defaultValue: 'Việc làm đã ứng tuyển' }),
       value: appliedCount,
-      subtext: 'Hồ sơ đang chờ phản hồi',
+      subtext: t('jobSeeker:candidateDashboard.kpi.appliedSubtext', { defaultValue: 'Hồ sơ đang chờ phản hồi' }),
       icon: <WorkOutlineIcon sx={{ color: '#16a34a' }} />,
       bgColor: '#f0fdf4',
       path: '/my-jobs?tab=2',
     },
     {
-      title: 'Việc làm đã lưu',
+      title: t('jobSeeker:candidateDashboard.kpi.savedTitle', { defaultValue: 'Việc làm đã lưu' }),
       value: savedCount,
-      subtext: 'Công việc yêu thích của bạn',
+      subtext: t('jobSeeker:candidateDashboard.kpi.savedSubtext', { defaultValue: 'Công việc yêu thích của bạn' }),
       icon: <BookmarkBorderIcon sx={{ color: '#2563eb' }} />,
       bgColor: '#eff6ff',
       path: '/my-jobs?tab=1',
     },
     {
-      title: 'Nhà tuyển dụng đã xem',
+      title: t('jobSeeker:candidateDashboard.kpi.viewedTitle', { defaultValue: 'Nhà tuyển dụng đã xem' }),
       value: viewedCount,
-      subtext: 'Trong 30 ngày gần đây',
+      subtext: t('jobSeeker:candidateDashboard.kpi.viewedSubtext', { defaultValue: 'Trong 30 ngày gần đây' }),
       icon: <RemoveRedEyeOutlinedIcon sx={{ color: '#4f46e5' }} />,
       bgColor: '#eef2ff',
-      path: '/my-jobs?tab=1',
+      path: '/my-company',
     },
     {
-      title: 'Công ty đang theo dõi',
+      title: t('jobSeeker:candidateDashboard.kpi.followingTitle', { defaultValue: 'Công ty đang theo dõi' }),
       value: followingCount,
-      subtext: 'Quan tâm đến bạn',
+      subtext: t('jobSeeker:candidateDashboard.kpi.followingSubtext', { defaultValue: 'Quan tâm đến bạn' }),
       icon: <FavoriteBorderIcon sx={{ color: '#ea580c' }} />,
       bgColor: '#fff7ed',
       path: '/companies',

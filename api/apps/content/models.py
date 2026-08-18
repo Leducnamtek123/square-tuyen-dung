@@ -54,7 +54,7 @@ class Feedback(ProjectBaseModel):
 
     rating = models.SmallIntegerField(default=5)
 
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False, db_index=True)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="feedbacks", null=True, blank=True)
 
@@ -95,7 +95,7 @@ class Banner(ProjectBaseModel):
 
     type = models.IntegerField(default=var_sys.BannerType.HOME, db_index=True)
 
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False, db_index=True)
 
     image = models.OneToOneField(File, on_delete=models.SET_NULL, null=True, related_name="banner_image")
 

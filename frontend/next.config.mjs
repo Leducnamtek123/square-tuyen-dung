@@ -47,6 +47,9 @@ const nextConfig = {
     'sweetalert2',
     'react-easy-crop',
   ],
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+  },
   experimental: {
     optimizePackageImports: [
       '@mui/material',
@@ -54,7 +57,7 @@ const nextConfig = {
       '@mui/lab',
       '@mui/x-date-pickers',
       '@phosphor-icons/react',
-      'lucide-react',
+      'dayjs',
       '@fortawesome/react-fontawesome',
     ],
   },
@@ -230,6 +233,7 @@ const nextConfig = {
     ];
   },
   images: {
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       { protocol: 'https', hostname: 's3.infohr.vn' },
       { protocol: 'http', hostname: 'minio' },

@@ -12,6 +12,8 @@ import {
 } from '@mui/material';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 
+import { useTranslation } from 'react-i18next';
+
 interface CandidateActivityChartCardProps {
   stats?: {
     appliedCount?: number;
@@ -22,6 +24,7 @@ interface CandidateActivityChartCardProps {
 }
 
 const CandidateActivityChartCard: React.FC<CandidateActivityChartCardProps> = ({ stats }) => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
   const [timeframe, setTimeframe] = React.useState('7_days');
 
   const appliedCount = stats?.appliedCount ?? 0;
@@ -47,7 +50,7 @@ const CandidateActivityChartCard: React.FC<CandidateActivityChartCardProps> = ({
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
         <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
-          Hoạt động của bạn
+          {t('jobSeeker:candidateDashboard.activity.title', { defaultValue: 'Hoạt động của bạn' })}
         </Typography>
 
         <Select
@@ -64,9 +67,9 @@ const CandidateActivityChartCard: React.FC<CandidateActivityChartCardProps> = ({
             },
           }}
         >
-          <MenuItem value="7_days">7 ngày qua</MenuItem>
-          <MenuItem value="30_days">30 ngày qua</MenuItem>
-          <MenuItem value="90_days">90 ngày qua</MenuItem>
+          <MenuItem value="7_days">{t('jobSeeker:candidateDashboard.activity.timeframes.7_days', { defaultValue: '7 ngày qua' })}</MenuItem>
+          <MenuItem value="30_days">{t('jobSeeker:candidateDashboard.activity.timeframes.30_days', { defaultValue: '30 ngày qua' })}</MenuItem>
+          <MenuItem value="90_days">{t('jobSeeker:candidateDashboard.activity.timeframes.90_days', { defaultValue: '90 ngày qua' })}</MenuItem>
         </Select>
       </Box>
 
@@ -100,11 +103,11 @@ const CandidateActivityChartCard: React.FC<CandidateActivityChartCardProps> = ({
           </Box>
 
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a', mb: 0.5 }}>
-            Chưa có dữ liệu thống kê
+            {t('jobSeeker:candidateDashboard.activity.emptyTitle', { defaultValue: 'Chưa có dữ liệu thống kê' })}
           </Typography>
 
           <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.8rem' }}>
-            Khi bạn hoạt động, dữ liệu sẽ được hiển thị tại đây.
+            {t('jobSeeker:candidateDashboard.activity.emptySubtitle', { defaultValue: 'Khi bạn hoạt động, dữ liệu sẽ được hiển thị tại đây.' })}
           </Typography>
         </Box>
       ) : (
@@ -114,7 +117,7 @@ const CandidateActivityChartCard: React.FC<CandidateActivityChartCardProps> = ({
             <Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                 <Typography variant="caption" sx={{ fontWeight: 700, color: '#475569' }}>
-                  Hồ sơ đã ứng tuyển
+                  {t('jobSeeker:candidateDashboard.activity.applied', { defaultValue: 'Hồ sơ đã ứng tuyển' })}
                 </Typography>
                 <Typography variant="caption" sx={{ fontWeight: 800, color: '#16a34a' }}>
                   {appliedCount}
@@ -130,7 +133,7 @@ const CandidateActivityChartCard: React.FC<CandidateActivityChartCardProps> = ({
             <Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                 <Typography variant="caption" sx={{ fontWeight: 700, color: '#475569' }}>
-                  Việc làm đã lưu
+                  {t('jobSeeker:candidateDashboard.activity.saved', { defaultValue: 'Việc làm đã lưu' })}
                 </Typography>
                 <Typography variant="caption" sx={{ fontWeight: 800, color: '#2563eb' }}>
                   {savedCount}
@@ -146,7 +149,7 @@ const CandidateActivityChartCard: React.FC<CandidateActivityChartCardProps> = ({
             <Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                 <Typography variant="caption" sx={{ fontWeight: 700, color: '#475569' }}>
-                  Nhà tuyển dụng đã xem CV
+                  {t('jobSeeker:candidateDashboard.activity.viewed', { defaultValue: 'Nhà tuyển dụng đã xem CV' })}
                 </Typography>
                 <Typography variant="caption" sx={{ fontWeight: 800, color: '#4f46e5' }}>
                   {viewedCount}
@@ -162,7 +165,7 @@ const CandidateActivityChartCard: React.FC<CandidateActivityChartCardProps> = ({
             <Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                 <Typography variant="caption" sx={{ fontWeight: 700, color: '#475569' }}>
-                  Công ty đang theo dõi
+                  {t('jobSeeker:candidateDashboard.activity.following', { defaultValue: 'Công ty đang theo dõi' })}
                 </Typography>
                 <Typography variant="caption" sx={{ fontWeight: 800, color: '#ea580c' }}>
                   {followingCount}

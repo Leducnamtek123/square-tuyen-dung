@@ -321,6 +321,7 @@ else:
             "PASSWORD": config("DB_PASSWORD", default=""),
             "HOST": config("DB_HOST", default=""),
             "PORT": config("DB_PORT", default=""),
+            "CONN_MAX_AGE": config("DB_CONN_MAX_AGE", default=60, cast=int),
             "OPTIONS": {
                 "charset": "utf8mb4",
                 "init_command": "SET sql_mode='STRICT_TRANS_TABLES', NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'",
