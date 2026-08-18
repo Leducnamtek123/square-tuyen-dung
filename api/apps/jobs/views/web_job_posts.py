@@ -457,7 +457,7 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
         status=var_sys.JobPostStatus.APPROVED,
         deadline__gte=datetime.datetime.now().date(),
         company__is_verified=True,
-    ).order_by("-create_at", "-update_at", "-id")
+    ).order_by("-is_urgent", "-is_hot", "-create_at", "-update_at", "-id")
     serializer_class = JobPostSerializer
     renderer_classes = [renderers.MyJSONRenderer]
     pagination_class = paginations.CustomPagination

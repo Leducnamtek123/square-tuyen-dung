@@ -244,7 +244,7 @@ const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationModalPro
       </DialogTitle>
 
       {/* Content */}
-      <DialogContent sx={{ p: 3 }}>
+      <DialogContent sx={{ p: 3, pt: '24px !important' }}>
         {loading ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 6, gap: 2 }}>
             <CircularProgress size={36} sx={{ color: '#2563eb' }} />

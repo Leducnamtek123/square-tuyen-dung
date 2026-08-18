@@ -95,7 +95,7 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.ViewSet,
     queryset = JobPost.objects.select_related(
         'company', 'company__logo', 'company__cover_image', 'company__user',
         'location', 'location__city', 'career'
-    ).all().order_by("-create_at", "-update_at", "-id")
+    ).all().order_by("-is_urgent", "-is_hot", "-create_at", "-update_at", "-id")
 
     serializer_class = JobPostSerializer
 

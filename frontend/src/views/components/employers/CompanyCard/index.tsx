@@ -245,18 +245,26 @@ const CompanyCard = () => {
                 />
               </Box>
               <Button
-                variant="contained"
-                color="secondary"
+                variant="outlined"
                 size="small"
-                startIcon={<CameraAltOutlinedIcon />}
+                startIcon={<CameraAltOutlinedIcon sx={{ fontSize: 16 }} />}
                 onClick={() => logoInputRef.current?.click()}
                 sx={{
                   minHeight: 34,
                   width: '100%',
-                  boxShadow: 'none',
-                  color: 'white',
+                  borderColor: '#cbd5e1',
+                  color: '#0f172a',
+                  bgcolor: '#ffffff',
                   fontWeight: 700,
                   textTransform: 'none',
+                  fontSize: '0.8125rem',
+                  borderRadius: 2,
+                  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                  '&:hover': {
+                    borderColor: '#94a3b8',
+                    bgcolor: '#f8fafc',
+                    color: '#0f172a',
+                  },
                 }}
               >
                 {t('companyProfile.labels.changeLogo')}
@@ -301,28 +309,31 @@ const CompanyCard = () => {
                   position: 'absolute',
                   inset: 'auto 0 0',
                   height: 72,
-                  background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 100%)',
+                  background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%)',
                 }}
               />
               <Button
                 variant="contained"
                 size="small"
-                startIcon={<CameraAltOutlinedIcon />}
+                startIcon={<CameraAltOutlinedIcon sx={{ fontSize: 16 }} />}
                 onClick={() => coverInputRef.current?.click()}
                 sx={{
                   position: 'absolute',
                   left: 14,
                   bottom: 14,
                   minHeight: 34,
-                  bgcolor: 'rgba(15, 23, 42, 0.75)',
-                  backdropFilter: 'blur(8px)',
-                  border: '1px solid rgba(255, 255, 255, 0.25)',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                  bgcolor: 'rgba(15, 23, 42, 0.8)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
                   color: '#FFFFFF',
                   fontWeight: 700,
+                  fontSize: '0.8125rem',
+                  borderRadius: 2,
                   textTransform: 'none',
                   '&:hover': {
-                    bgcolor: 'rgba(15, 23, 42, 0.9)',
+                    bgcolor: 'rgba(15, 23, 42, 0.95)',
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
                     transform: 'translateY(-1px)',
                   },
                 }}

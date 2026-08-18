@@ -1,43 +1,28 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-
-import { Box, Stack, IconButton, Typography, Avatar } from "@mui/material";
-
+import { Box, Stack, IconButton, Typography, Avatar, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-
-import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
-
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-
+import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
-
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-
 import toastMessages from '../../../../utils/toastMessages';
-
 import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
-
 import { deleteAvatar, updateAvatar } from '../../../../redux/userSlice';
 import { compressImageFile } from '../../../../utils/imageCompression';
 import ImageCropDialog from '../../../../components/Common/ImageCropDialog';
 
 const AvatarCard = () => {
-
   const { t } = useTranslation('auth');
-
   const dispatch = useAppDispatch();
-
   const { currentUser } = useAppSelector((state) => state.user);
-
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-
   const [cropOpen, setCropOpen] = React.useState(false);
   const [cropImageSrc, setCropImageSrc] = React.useState('');
   const [cropFileName, setCropFileName] = React.useState('');
 
-  const handleCropConfirm = async (croppedFile: File, previewUrl: string) => {
+  const handleCropConfirm = async (croppedFile: File) => {
     setCropOpen(false);
     const compressed = await compressImageFile(croppedFile);
     await handleUpload(compressed);
@@ -50,77 +35,45 @@ const AvatarCard = () => {
   };
 
   const handleUpload = async (file: File) => {
-
     const formData = new FormData();
-
     formData.append('file', file);
-
     setIsFullScreenLoading(true);
 
     dispatch(updateAvatar(formData))
-
       .unwrap()
-
       .then(() => {
-
         toastMessages.success(t('account.avatarUpdateSuccess'));
-
       })
-
       .catch(() => {
-
         toastMessages.error(t('messages.tryAgain'));
-
       })
-
       .finally(() => setIsFullScreenLoading(false));
-
   };
 
   const handleDelete = () => {
-
     const del = async () => {
-
       setIsFullScreenLoading(true);
-
       dispatch(deleteAvatar())
-
         .unwrap()
-
         .then(() => {
-
           toastMessages.success(t('account.avatarDeleteSuccess'));
-
         })
-
         .catch(() => {
-
           toastMessages.error(t('messages.genericError'));
-
         })
-
         .finally(() => setIsFullScreenLoading(false));
-
     };
 
     confirmModal(
-
       () => del(),
-
       t('account.avatar'),
-
       t('account.avatarDeleteConfirm'),
-
       'warning'
-
     );
-
   };
 
   const handlePickFile = () => {
-
     fileInputRef.current?.click();
-
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,39 +87,30 @@ const AvatarCard = () => {
   };
 
   return (
-
     <>
-
-      <Stack alignItems="center">
-
+      <Stack alignItems="center" spacing={2}>
         <Box
-
           sx={{
-
             position: 'relative',
-
             width: 120,
-
             height: 120,
-
-            padding: '4px',
-
             borderRadius: '50%',
-
-            background: 'linear-gradient(45deg, #0f172a, #2563eb)',
-
-            boxShadow: '0 4px 14px 0 rgba(15, 23, 42, 0.15)',
-
-            '&:hover .avatar-actions': {
-
-              opacity: 1,
-
+            p: '3px',
+            bgcolor: '#ffffff',
+            border: '2px solid #e2e8f0',
+            boxShadow: '0 8px 24px -4px rgba(15, 23, 42, 0.12)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              borderColor: '#2563eb',
+              transform: 'scale(1.02)',
+              '& .avatar-overlay': {
+                opacity: 1,
+              },
             },
-
           }}
-
+          onClick={handlePickFile}
         >
-
           {currentUser?.avatarUrl ? (
             <MuiImageCustom
               src={currentUser?.avatarUrl}
@@ -175,7 +119,6 @@ const AvatarCard = () => {
               sx={{
                 borderRadius: '50%',
                 objectFit: 'cover',
-                border: '2px solid white',
               }}
             />
           ) : (
@@ -183,109 +126,80 @@ const AvatarCard = () => {
               sx={{
                 width: '100%',
                 height: '100%',
-                bgcolor: 'primary.main',
-                color: 'common.white',
+                bgcolor: '#eff6ff',
+                color: '#2563eb',
                 fontSize: '2.5rem',
-                fontWeight: 700,
-                border: '2px solid white',
+                fontWeight: 800,
               }}
             >
-              {currentUser?.fullName?.charAt(0)?.toUpperCase()}
+              {currentUser?.fullName?.charAt(0)?.toUpperCase() || 'U'}
             </Avatar>
           )}
 
           <Box
-
-            className="avatar-actions"
-
+            className="avatar-overlay"
             sx={{
-
               position: 'absolute',
-
-              top: 0,
-
-              left: 0,
-
-              right: 0,
-
-              bottom: 0,
-
+              inset: 0,
               borderRadius: '50%',
-
-              backgroundColor: 'rgba(0, 0, 0, 0.3)',
-
+              bgcolor: 'rgba(15, 23, 42, 0.55)',
+              backdropFilter: 'blur(2px)',
               display: 'flex',
-
-              justifyContent: 'center',
-
               alignItems: 'center',
-
+              justifyContent: 'center',
               opacity: 0,
-
               transition: 'opacity 0.2s ease',
-
+              color: '#ffffff',
             }}
-
           >
-
-            <Stack direction="row" spacing={1}>
-
-              <IconButton
-
-                size="small"
-
-                sx={{
-
-                  bgcolor: 'white',
-
-                  '&:hover': { bgcolor: 'white', opacity: 0.9 },
-
-                }}
-
-                onClick={handlePickFile}
-
-              >
-
-                <ModeEditOutlineOutlinedIcon sx={{ fontSize: 18, color: '#fca34d' }} />
-
-              </IconButton>
-
-              {currentUser?.avatarUrl && (
-
-                <IconButton
-
-                  size="small"
-
-                  onClick={handleDelete}
-
-                  sx={{
-
-                    bgcolor: 'white',
-
-                    '&:hover': { bgcolor: 'white', opacity: 0.9 },
-
-                  }}
-
-                >
-
-                  <HighlightOffIcon sx={{ fontSize: 18, color: '#d32f2f' }} />
-
-                </IconButton>
-
-              )}
-
-            </Stack>
-
+            <CameraAltOutlinedIcon sx={{ fontSize: 28 }} />
           </Box>
-
         </Box>
 
-        <Typography variant="subtitle2" gutterBottom sx={{ mt: 1 }}>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<CameraAltOutlinedIcon sx={{ fontSize: 16 }} />}
+            onClick={handlePickFile}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 700,
+              fontSize: '0.8125rem',
+              borderColor: '#cbd5e1',
+              color: '#0f172a',
+              bgcolor: '#ffffff',
+              '&:hover': {
+                borderColor: '#94a3b8',
+                bgcolor: '#f8fafc',
+              },
+            }}
+          >
+            Đổi ảnh
+          </Button>
 
-          {t('account.avatar')}
-
-        </Typography>
-
+          {currentUser?.avatarUrl && (
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete();
+              }}
+              sx={{
+                borderRadius: 2,
+                border: '1px solid #fee2e2',
+                bgcolor: '#fef2f2',
+                color: '#dc2626',
+                '&:hover': {
+                  bgcolor: '#fee2e2',
+                },
+              }}
+            >
+              <DeleteOutlineOutlinedIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          )}
+        </Stack>
       </Stack>
 
       <input
@@ -310,7 +224,6 @@ const AvatarCard = () => {
       />
     </>
   );
-
 };
 
 export default React.memo(AvatarCard);

@@ -1,25 +1,16 @@
-
 from django.core.exceptions import ValidationError
-
 from requests.compat import basestring
-
 from shared.configs import variable_system as var_sys
-
 from shared.helpers import utils
-
 from django.db.models import Q
-
 import django_filters
-
 from rest_framework.filters import OrderingFilter
 
 from .models import (
-
     JobPost,
-
     JobPostActivity
-
 )
+
 
 class JobPostFilter(django_filters.FilterSet):
 
@@ -49,9 +40,7 @@ class JobPostFilter(django_filters.FilterSet):
     experienceId = django_filters.ChoiceFilter(choices=var_sys.EXPERIENCE_CHOICES, field_name='experience')
     experienceIds = ChoiceInFilter(choices=var_sys.EXPERIENCE_CHOICES, field_name='experience', lookup_expr='in')
 
-    typeOfWorkplaceId = django_filters.ChoiceFilter(choices=var_sys.TYPE_OF_WORKPLACE_CHOICES,
-
-                                                    field_name='type_of_workplace')
+    typeOfWorkplaceId = django_filters.ChoiceFilter(choices=var_sys.TYPE_OF_WORKPLACE_CHOICES, field_name='type_of_workplace')
     typeOfWorkplaceIds = ChoiceInFilter(
         choices=var_sys.TYPE_OF_WORKPLACE_CHOICES,
         field_name='type_of_workplace',
@@ -64,8 +53,6 @@ class JobPostFilter(django_filters.FilterSet):
     genderId = django_filters.ChoiceFilter(choices=var_sys.GENDER_CHOICES, field_name='gender_required')
     genderIds = ChoiceInFilter(choices=var_sys.GENDER_CHOICES, field_name='gender_required', lookup_expr='in')
 
-    # Salary filters accept the selected band from the UI and return jobs whose
-    # stored salary range overlaps that band.
     salaryMin = django_filters.NumberFilter(field_name='salary_max', lookup_expr='gte')
     salaryMax = django_filters.NumberFilter(field_name='salary_min', lookup_expr='lte')
 
@@ -79,17 +66,15 @@ class JobPostFilter(django_filters.FilterSet):
     companyId = django_filters.NumberFilter(field_name="company")
 
     class Meta:
-
         model = JobPost
-
-        fields = ['kw', 'careerId', 'cityId', 'districtId', 'wardId', 'positionId',
-
-                  'experienceId', 'typeOfWorkplaceId', 'jobTypeId',
-
-                  'genderId', 'salaryMin', 'salaryMax', 'isUrgent', 'statusId', 'excludeSlug', 'companyId',
-                  'careerIds', 'cityIds', 'districtIds', 'wardIds', 'positionIds',
-                  'experienceIds', 'typeOfWorkplaceIds', 'jobTypeIds', 'genderIds',
-                  'statusIds']
+        fields = [
+            'kw', 'careerId', 'cityId', 'districtId', 'wardId', 'positionId',
+            'experienceId', 'typeOfWorkplaceId', 'jobTypeId',
+            'genderId', 'salaryMin', 'salaryMax', 'isUrgent', 'statusId', 'excludeSlug', 'companyId',
+            'careerIds', 'cityIds', 'districtIds', 'wardIds', 'positionIds',
+            'experienceIds', 'typeOfWorkplaceIds', 'jobTypeIds', 'genderIds',
+            'statusIds'
+        ]
 
     def job_name_or_career_name(self, queryset, name, value):
         if value is None or (isinstance(value, str) and not value.strip()):
@@ -108,106 +93,75 @@ class JobPostFilter(django_filters.FilterSet):
             if ids:
                 from django.db.models import Case, When
                 preserved = Case(*[When(id=pk, then=pos) for pos, pk in enumerate(ids)])
-                return queryset.filter(id__in=ids).order_by(preserved)
+                return queryset.filter(id__in=ids).order_by("-is_urgent", "-is_hot", preserved)
             
             return queryset.none()
         except Exception:
             # Fallback to DB search
-            return queryset.filter(Q(job_name__icontains=value) | Q(career__name__icontains=value))
+            return queryset.filter(Q(job_name__icontains=value) | Q(career__name__icontains=value)).order_by("-is_urgent", "-is_hot", "-create_at", "-id")
 
     def exclude_slug(self, queryset, name, value):
-
         return queryset.exclude(slug=value)
 
+
 class AliasedOrderingFilter(OrderingFilter):
-
     """ this allows us to "alias" fields on our model to ensure consistency at the API level
-
         We do so by allowing the ordering_fields attribute to accept a list of tuples.
-
         You can mix and match, i.e.:
-
         ordering_fields = (('alias1', 'field1'), 'field2', ('alias2', 'field2')) """
 
     def remove_invalid_fields(self, queryset, fields, view, request):
-
         valid_fields = getattr(view, 'ordering_fields', self.ordering_fields)
-
         if valid_fields is None or valid_fields == '__all__':
-
             return super(AliasedOrderingFilter, self).remove_invalid_fields(queryset, fields, view)
 
         aliased_fields = {}
-
         for field in valid_fields:
-
             if isinstance(field, basestring):
-
                 aliased_fields[field] = field
-
             else:
-
                 aliased_fields[field[0]] = field[1]
 
         ordering = []
-
         for raw_field in fields:
-
             invert = raw_field[0] == '-'
-
             field = raw_field.lstrip('-')
-
             if field in aliased_fields:
-
                 if invert:
-
                     ordering.append('-{}'.format(aliased_fields[field]))
-
                 else:
-
                     ordering.append(aliased_fields[field])
 
         return ordering
 
+    def filter_queryset(self, request, queryset, view):
+        ordering = self.get_ordering(request, queryset, view)
+
+        # For JobPost models, always prioritize urgent and hot jobs at the top
+        if hasattr(queryset.model, 'is_urgent') and hasattr(queryset.model, 'is_hot'):
+            priority = ['-is_urgent', '-is_hot']
+            if ordering:
+                cleaned_ordering = [f for f in ordering if f not in ('-is_urgent', '-is_hot', 'is_urgent', 'is_hot')]
+                return queryset.order_by(*(priority + list(cleaned_ordering)))
+            return queryset.order_by(*(priority + ['-create_at', '-update_at', '-id']))
+
+        if ordering:
+            return queryset.order_by(*ordering)
+        return queryset
+
+
 class EmployerJobPostActivityFilter(django_filters.FilterSet):
-
     cityId = django_filters.NumberFilter(method='filter_resume_or_manual_city')
-
     careerId = django_filters.NumberFilter(method='filter_resume_or_manual_career')
-
-    experienceId = django_filters.ChoiceFilter(choices=var_sys.EXPERIENCE_CHOICES,
-
-                                               method='filter_resume_or_manual_experience')
-
-    positionId = django_filters.ChoiceFilter(choices=var_sys.POSITION_CHOICES,
-
-                                             method='filter_resume_or_manual_position')
-
-    academicLevelId = django_filters.ChoiceFilter(choices=var_sys.ACADEMIC_LEVEL,
-
-                                                  method='filter_resume_or_manual_academic_level')
-
-    typeOfWorkplaceId = django_filters.ChoiceFilter(choices=var_sys.TYPE_OF_WORKPLACE_CHOICES,
-
-                                                    method='filter_resume_or_manual_type_of_workplace')
-
-    jobTypeId = django_filters.ChoiceFilter(choices=var_sys.JOB_TYPE_CHOICES,
-
-                                            method='filter_resume_or_manual_job_type')
-
-    genderId = django_filters.ChoiceFilter(choices=var_sys.GENDER_CHOICES,
-
-                                           field_name='resume__job_seeker_profile__gender')
-
-    maritalStatusId = django_filters.ChoiceFilter(choices=var_sys.MARITAL_STATUS_CHOICES,
-
-                                                  field_name="resume__job_seeker_profile__marital_status")
-
+    experienceId = django_filters.ChoiceFilter(choices=var_sys.EXPERIENCE_CHOICES, method='filter_resume_or_manual_experience')
+    positionId = django_filters.ChoiceFilter(choices=var_sys.POSITION_CHOICES, method='filter_resume_or_manual_position')
+    academicLevelId = django_filters.ChoiceFilter(choices=var_sys.ACADEMIC_LEVEL, method='filter_resume_or_manual_academic_level')
+    typeOfWorkplaceId = django_filters.ChoiceFilter(choices=var_sys.TYPE_OF_WORKPLACE_CHOICES, method='filter_resume_or_manual_type_of_workplace')
+    jobTypeId = django_filters.ChoiceFilter(choices=var_sys.JOB_TYPE_CHOICES, method='filter_resume_or_manual_job_type')
+    genderId = django_filters.ChoiceFilter(choices=var_sys.GENDER_CHOICES, field_name='resume__job_seeker_profile__gender')
+    maritalStatusId = django_filters.ChoiceFilter(choices=var_sys.MARITAL_STATUS_CHOICES, field_name="resume__job_seeker_profile__marital_status")
     jobPostId = django_filters.NumberFilter(field_name='job_post')
-
-    status = django_filters.ChoiceFilter(choices=var_sys.APPLICATION_STATUS,
-
-                                         field_name='status')
+    status = django_filters.ChoiceFilter(choices=var_sys.APPLICATION_STATUS, field_name='status')
 
     aiAnalysisStatus = django_filters.ChoiceFilter(
         choices=(
@@ -218,7 +172,6 @@ class EmployerJobPostActivityFilter(django_filters.FilterSet):
         ),
         field_name='ai_analysis_status',
     )
-
     aiReviewStatus = django_filters.ChoiceFilter(
         choices=(
             ('ai_only', 'AI only'),
@@ -227,7 +180,6 @@ class EmployerJobPostActivityFilter(django_filters.FilterSet):
         ),
         field_name='ai_analysis_review_status',
     )
-
     aiScoreMin = django_filters.NumberFilter(field_name='ai_analysis_score', lookup_expr='gte')
     aiScoreMax = django_filters.NumberFilter(field_name='ai_analysis_score', lookup_expr='lte')
     hasAiAnalysis = django_filters.BooleanFilter(method='filter_has_ai_analysis')
@@ -262,20 +214,12 @@ class EmployerJobPostActivityFilter(django_filters.FilterSet):
         return queryset.exclude(ai_analysis_status='completed', ai_analysis_score__isnull=False)
 
     class Meta:
-
         model = JobPostActivity
-
         fields = [
-
             'cityId', 'careerId',
-
             'experienceId', 'positionId',
-
             'academicLevelId', 'typeOfWorkplaceId',
-
             'jobTypeId', 'genderId', 'maritalStatusId',
-
             'jobPostId', 'status', 'aiAnalysisStatus', 'aiReviewStatus',
             'aiScoreMin', 'aiScoreMax', 'hasAiAnalysis'
-
         ]
