@@ -107,18 +107,49 @@ class AttendanceRecordSerializer(serializers.ModelSerializer):
 
 class OnboardCandidateSerializer(serializers.Serializer):
     job_application_id = serializers.IntegerField(required=False, allow_null=True)
+    application_id = serializers.IntegerField(required=False, allow_null=True, write_only=True)
+    applicationId = serializers.IntegerField(required=False, allow_null=True, write_only=True)
     candidate_profile_id = serializers.IntegerField(required=False, allow_null=True)
+    candidateProfileId = serializers.IntegerField(required=False, allow_null=True, write_only=True)
     first_name = serializers.CharField(max_length=150, required=False, allow_blank=True, default='')
     last_name = serializers.CharField(max_length=150, required=False, allow_blank=True, default='')
     email = serializers.EmailField(required=False, allow_blank=True, default='')
     phone = serializers.CharField(max_length=30, required=False, allow_blank=True, default='')
     department_id = serializers.IntegerField(required=False, allow_null=True)
+    departmentId = serializers.IntegerField(required=False, allow_null=True, write_only=True)
     designation_id = serializers.IntegerField(required=False, allow_null=True)
+    designationId = serializers.IntegerField(required=False, allow_null=True, write_only=True)
     reports_to_id = serializers.IntegerField(required=False, allow_null=True)
+    reportsToId = serializers.IntegerField(required=False, allow_null=True, write_only=True)
     join_date = serializers.DateField(required=False, allow_null=True)
+    joinDate = serializers.DateField(required=False, allow_null=True, write_only=True)
     probation_end_date = serializers.DateField(required=False, allow_null=True)
+    probationEndDate = serializers.DateField(required=False, allow_null=True, write_only=True)
     base_salary = serializers.DecimalField(max_digits=15, decimal_places=2, required=False, default=0)
+    baseSalary = serializers.DecimalField(max_digits=15, decimal_places=2, required=False, default=0, write_only=True)
     allowance = serializers.DecimalField(max_digits=15, decimal_places=2, required=False, default=0)
     employment_type = serializers.CharField(required=False, default='FULL_TIME')
+    employmentType = serializers.CharField(required=False, write_only=True)
     status = serializers.CharField(required=False, default='PROBATION')
     notes = serializers.CharField(required=False, allow_blank=True, default='')
+
+    def validate(self, attrs):
+        if not attrs.get('job_application_id'):
+            attrs['job_application_id'] = attrs.get('application_id') or attrs.get('applicationId')
+        if not attrs.get('candidate_profile_id'):
+            attrs['candidate_profile_id'] = attrs.get('candidateProfileId')
+        if not attrs.get('department_id'):
+            attrs['department_id'] = attrs.get('departmentId')
+        if not attrs.get('designation_id'):
+            attrs['designation_id'] = attrs.get('designationId')
+        if not attrs.get('reports_to_id'):
+            attrs['reports_to_id'] = attrs.get('reportsToId')
+        if not attrs.get('join_date'):
+            attrs['join_date'] = attrs.get('joinDate')
+        if not attrs.get('probation_end_date'):
+            attrs['probation_end_date'] = attrs.get('probationEndDate')
+        if not attrs.get('base_salary') and attrs.get('baseSalary'):
+            attrs['base_salary'] = attrs.get('baseSalary')
+        if not attrs.get('employment_type') and attrs.get('employmentType'):
+            attrs['employment_type'] = attrs.get('employmentType')
+        return attrs

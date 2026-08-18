@@ -104,6 +104,8 @@
     "start": "next start",
     "lint": "eslint src --ext .ts,.tsx",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "jest",
+    "test:contracts": "node scripts/verify-contracts.mjs",
     "i18n:audit": "node audit_i18n.cjs",
     "doctor": "npx react-doctor@latest"
   },

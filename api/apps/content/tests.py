@@ -642,3 +642,34 @@ class TestEmployerArticleAPI:
         assert response.status_code == 200
         payload = _article_payload(response)
         assert [item["id"] for item in payload["results"]] == [matching.id]
+
+
+@pytest.mark.django_db
+class TestArticleCategoriesAndDemoNotification:
+    def test_get_article_categories_public_returns_choices_list(self):
+        client = APIClient()
+        response = client.get("/api/v1/content/web/article-categories/")
+        assert response.status_code == 200
+        data = _article_payload(response)
+        assert isinstance(data, list)
+        assert len(data) == len(Article.CATEGORY_CHOICES)
+        slugs = [item["slug"] for item in data]
+        assert "cam-nang" in slugs
+        assert "thue-tncn" in slugs
+
+    def test_send_notification_demo_requires_admin(self, job_seeker_user, admin_user):
+        unauth_client = APIClient()
+        res_unauth = unauth_client.post("/api/v1/content/send-noti-demo/", {"title": "Test"})
+        assert res_unauth.status_code in (401, 403)
+
+        js_client = APIClient()
+        js_client.force_authenticate(user=job_seeker_user)
+        res_forbidden = js_client.post("/api/v1/content/send-noti-demo/", {"title": "Test"})
+        assert res_forbidden.status_code == 403
+
+        admin_client = APIClient()
+        admin_client.force_authenticate(user=admin_user)
+        res_ok = admin_client.post("/api/v1/content/send-noti-demo/", {"title": "Test Demo", "content": "Sample content"})
+        assert res_ok.status_code == 200
+        assert _article_payload(res_ok).get("success") is True
+

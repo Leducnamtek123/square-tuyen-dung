@@ -462,3 +462,16 @@ def test_sync_oauth_client_supports_public_web_client_without_secret(monkeypatch
     assert app.authorization_grant_type == Application.GRANT_PASSWORD
     assert app.hash_client_secret is False
     assert app.client_secret == ""
+
+
+@pytest.mark.django_db
+def test_get_popular_keywords_returns_success_list():
+    client = APIClient()
+    response = client.get("/api/v1/common/popular-keywords/")
+    assert response.status_code == 200
+    payload = response.json()
+    data = payload.get("data", payload)
+    assert isinstance(data, list)
+    assert len(data) >= 3
+    assert any("title" in item for item in data)
+

@@ -822,3 +822,62 @@ class AdminContactMessageViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return var_res.response_data(data=serializer.data)
+
+
+@api_view(["GET"])
+@permission_classes([perms_sys.AllowAny])
+def get_article_categories(request):
+    """
+    Returns list of article categories derived from Article.CATEGORY_CHOICES.
+    """
+    categories = []
+    for idx, (code, label) in enumerate(Article.CATEGORY_CHOICES, start=1):
+        categories.append({
+            "id": idx,
+            "name": label,
+            "slug": code,
+            "description": f"Chuyên mục {label}",
+            "iconName": "book" if code == Article.CATEGORY_CAM_NANG else "newspaper",
+            "sortOrder": idx,
+            "isActive": True,
+        })
+    return var_res.response_data(data=categories)
+
+
+@api_view(["POST"])
+@permission_classes([perms_sys.IsAdminUser])
+def send_notification_demo(request):
+    """
+    Admin demo notification dispatch.
+    """
+    title = request.data.get("title", "Thông báo thử nghiệm")
+    content = request.data.get("content", "Đây là thông báo kiểm tra hệ thống.")
+    notification_type = request.data.get("type", "SYSTEM")
+    user_list = request.data.get("userList", [])
+
+    if user_list:
+        for uid in user_list:
+            try:
+                queue_notification.delay(
+                    type=notification_type,
+                    title=title,
+                    content=content,
+                    user_id=int(uid),
+                )
+            except Exception:
+                pass
+    else:
+        try:
+            queue_notification.delay(
+                type=notification_type,
+                title=title,
+                content=content,
+                user_id=request.user.id,
+            )
+        except Exception:
+            pass
+
+    return var_res.response_data(
+        data={"success": True, "message": "Demo notification triggered successfully."},
+        status=status.HTTP_200_OK,
+    )

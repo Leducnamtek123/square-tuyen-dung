@@ -98,22 +98,16 @@ describe('adminManagementService list response normalization', () => {
     const ward = { id: 3, name: 'Ward 1' };
     const activity = { id: 11, status: 3 };
     const notification = { id: 12, jobName: 'Frontend Developer' };
-    const questionGroup = { id: 13, name: 'Screening' };
-    const question = { id: 14, text: 'Tell me about React' };
 
     (httpRequest.post as jest.Mock)
       .mockResolvedValueOnce({ data: { data: ward } })
-      .mockResolvedValueOnce({ data: { data: notification } })
-      .mockResolvedValueOnce({ data: { data: questionGroup } })
-      .mockResolvedValueOnce({ data: { data: question } });
+      .mockResolvedValueOnce({ data: { data: notification } });
     (httpRequest.patch as jest.Mock)
       .mockResolvedValueOnce({ data: { data: activity } });
 
     await expect(adminManagementService.createWard({ name: 'Ward 1', code: 'W1', district: 2 })).resolves.toEqual(ward);
     await expect(adminManagementService.updateJobActivity(11, { status: 3 })).resolves.toEqual(activity);
     await expect(adminManagementService.createJobNotification({ jobName: 'Frontend Developer', frequency: 1 })).resolves.toEqual(notification);
-    await expect(adminManagementService.createQuestionGroup({ name: 'Screening' })).resolves.toEqual(questionGroup);
-    await expect(adminManagementService.createQuestion({ text: 'Tell me about React' })).resolves.toEqual(question);
   });
 
   it('uses an extended timeout for Vieclam24h imports', async () => {

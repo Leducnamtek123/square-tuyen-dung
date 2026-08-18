@@ -170,13 +170,6 @@ const contentService = {
     return toListData<Banner>(response);
   },
 
-  sendNotificationDemo: (): Promise<{ success?: boolean; message?: string }> => {
-    const url = 'content/send-noti-demo/';
-    return (httpRequest.post(url) as Promise<unknown>).then((response) =>
-      normalizeActionResponse(response, { success: true })
-    );
-  },
-
   // ─── Public Article Category API ─────────────────────────────────────────
 
   getPublicArticleCategories: async (): Promise<ArticleCategoryInfo[]> => {
@@ -191,20 +184,6 @@ const contentService = {
     const url = 'content/web/admin/article-categories/';
     const response = await httpRequest.get(url);
     return toListData<ArticleCategoryInfo>(response);
-  },
-
-  adminCreateArticleCategory: (data: ArticleCategoryPayload): Promise<ArticleCategoryInfo> => {
-    return (httpRequest.post('content/web/admin/article-categories/', data) as Promise<unknown>)
-      .then(unwrapDetailResponse<ArticleCategoryInfo>);
-  },
-
-  adminUpdateArticleCategory: (id: number, data: Partial<ArticleCategoryPayload>): Promise<ArticleCategoryInfo> => {
-    return (httpRequest.patch(`content/web/admin/article-categories/${id}/`, data) as Promise<unknown>)
-      .then(unwrapDetailResponse<ArticleCategoryInfo>);
-  },
-
-  adminDeleteArticleCategory: (id: number): Promise<void> => {
-    return httpRequest.delete(`content/web/admin/article-categories/${id}/`) as Promise<void>;
   },
 
   // ─── Public Article API ──────────────────────────────────────────────────

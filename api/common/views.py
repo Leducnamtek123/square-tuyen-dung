@@ -908,3 +908,46 @@ def upload_file(request):
         return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR, errors={"errorMessage": ["Upload failed."]})
     
     return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors=serializer.errors)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_popular_keywords(request):
+    """
+    Returns popular keywords for search bar and discovery pages.
+    """
+    keywords = [
+        {"id": 1, "title": "Việc làm Hà Nội", "cityId": 2},
+        {"id": 2, "title": "Việc làm TP.HCM", "cityId": 1},
+        {"id": 3, "title": "Việc làm Đà Nẵng", "cityId": 3},
+        {"id": 4, "title": "Việc làm IT - Software", "kw": "Software", "careerId": 1},
+        {"id": 5, "title": "Việc làm Marketing", "kw": "Marketing"},
+        {"id": 6, "title": "Việc làm Kế toán", "kw": "Kế toán"},
+    ]
+
+    try:
+        top_careers = list(
+            Career.objects.annotate(
+                job_count=Count('job_posts', filter=Q(job_posts__status=var_sys.JobPostStatus.APPROVED))
+            ).order_by('-job_count')[:4]
+        )
+
+        if top_careers:
+            keywords = [
+                {"id": 1, "title": "Việc làm Hà Nội", "cityId": 2},
+                {"id": 2, "title": "Việc làm TP.HCM", "cityId": 1},
+                {"id": 3, "title": "Việc làm Đà Nẵng", "cityId": 3},
+            ]
+            idx = 4
+            for career in top_careers:
+                keywords.append({
+                    "id": idx,
+                    "title": f"Việc làm {career.name}",
+                    "kw": career.name,
+                    "careerId": career.id,
+                })
+                idx += 1
+    except Exception:
+        pass
+
+    return var_res.response_data(data=keywords)

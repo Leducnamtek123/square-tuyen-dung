@@ -140,19 +140,30 @@ export type HrmDashboardStats = {
 
 export type OnboardCandidatePayload = {
   job_application_id?: number;
+  applicationId?: number;
   candidate_profile_id?: number;
+  candidateProfileId?: number;
   first_name?: string;
+  firstName?: string;
   last_name?: string;
+  lastName?: string;
   email?: string;
   phone?: string;
   department_id?: number;
+  departmentId?: number;
   designation_id?: number;
+  designationId?: number;
   reports_to_id?: number;
+  reportsToId?: number;
   join_date?: string;
+  joinDate?: string;
   probation_end_date?: string;
+  probationEndDate?: string;
   base_salary?: number;
+  baseSalary?: number;
   allowance?: number;
   employment_type?: string;
+  employmentType?: string;
   status?: string;
   notes?: string;
 };
@@ -201,7 +212,21 @@ const hrmService = {
   },
 
   onboardCandidate: (payload: OnboardCandidatePayload): Promise<NativeEmployee> => {
-    return httpRequest.post('native-hrm/employees/onboard-from-candidate/', payload).then((res) => unwrapDataResponse<NativeEmployee>(res));
+    const normalizedPayload = {
+      ...payload,
+      job_application_id: payload.job_application_id ?? payload.applicationId,
+      candidate_profile_id: payload.candidate_profile_id ?? payload.candidateProfileId,
+      department_id: payload.department_id ?? payload.departmentId,
+      designation_id: payload.designation_id ?? payload.designationId,
+      reports_to_id: payload.reports_to_id ?? payload.reportsToId,
+      join_date: payload.join_date ?? payload.joinDate,
+      probation_end_date: payload.probation_end_date ?? payload.probationEndDate,
+      base_salary: payload.base_salary ?? payload.baseSalary,
+      employment_type: payload.employment_type ?? payload.employmentType,
+    };
+    return httpRequest
+      .post('native-hrm/employees/onboard-from-candidate/', normalizedPayload)
+      .then((res) => unwrapDataResponse<NativeEmployee>(res));
   },
 
   getDepartments: (): Promise<NativeDepartment[]> => {

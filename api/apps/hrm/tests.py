@@ -215,6 +215,33 @@ class HrmAppTestCase(TestCase):
         self.application_a.refresh_from_db()
         self.assertEqual(self.application_a.status, var_sys.ApplicationStatus.HIRED)
 
+    def test_candidate_conversion_with_camel_case_application_id(self):
+        """Conversion with frontend camelCase applicationId and related fields."""
+        dept = Department.objects.create(name="Product Engineering", company=self.company_a)
+        desig = Designation.objects.create(title="Senior Frontend Engineer", company=self.company_a)
+
+        payload = {
+            'applicationId': self.application_a.id,
+            'departmentId': dept.id,
+            'designationId': desig.id,
+            'joinDate': '2026-09-01',
+            'probationEndDate': '2026-11-01',
+            'baseSalary': 35000000,
+            'allowance': 5000000,
+            'employmentType': 'FULL_TIME',
+        }
+
+        response = self.client_a.post(
+            '/api/v1/native-hrm/employees/onboard-from-candidate/',
+            payload,
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        emp = Employee.objects.get(email=self.candidate_user.email, company=self.company_a)
+        self.assertEqual(emp.onboarded_from_activity, self.application_a)
+        self.assertEqual(emp.department, dept)
+        self.assertEqual(emp.designation, desig)
+
     def test_candidate_conversion_idempotency(self):
         """Calling conversion twice must return existing employee without duplicating."""
         payload = {

@@ -103,7 +103,9 @@ export function getStyles(appConfig: AppConfig) {
  */
 export function getSandboxTokenSource(appConfig: AppConfig) {
   return TokenSource.custom(async () => {
-    const url = new URL(process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT!, window.location.origin);
+    const endpoint = process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT || '/api/v1/interview/web/sessions/sandbox-token/';
+    const baseOrigin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+    const url = new URL(endpoint, baseOrigin);
     const sandboxId = appConfig.sandboxId ?? '';
     const roomConfig = appConfig.agentName
       ? {
@@ -122,6 +124,9 @@ export function getSandboxTokenSource(appConfig: AppConfig) {
           room_config: roomConfig,
         }),
       });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch connection details: HTTP ${res.status}`);
+      }
       return await res.json();
     } catch (error) {
       console.error('Error fetching connection details:', error);

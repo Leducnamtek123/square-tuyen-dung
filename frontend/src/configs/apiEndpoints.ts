@@ -20,7 +20,10 @@ const PUBLIC_EXACT_URLS: ReadonlySet<string> = new Set([
   'common/configs/',
   'common/top-careers/',
   'common/all-careers/',
+  'common/popular-keywords/',
   'common/health/',
+  'content/web/article-categories/',
+  'job/web/search/job-suggest-title/',
 ]);
 
 /**

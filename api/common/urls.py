@@ -17,6 +17,8 @@ urlpatterns = [
 
     path('all-careers/', views.get_all_careers),
 
+    path('popular-keywords/', views.get_popular_keywords),
+
     path('presign/', views.presign_url),
 
     path('upload-file/', views.upload_file),

@@ -25,6 +25,8 @@ employer_router.register(r'articles', views.EmployerArticleViewSet, basename='em
 
 urlpatterns = [
 
+    path('send-noti-demo/', views.send_notification_demo),
+
     path('app/', include([
 
         path('', include(app_router.urls)),
@@ -39,13 +41,16 @@ urlpatterns = [
 
         path("sms-download-app/", views.send_sms_download_app),
 
-        path('banner/', views.get_web_banner)
+        path('banner/', views.get_web_banner),
+
+        path('article-categories/', views.get_article_categories),
 
     ])),
 
     path('web/admin/', include([
         path('', include(admin_router.urls)),
         path('system-settings/', views.system_settings_view),
+        path('article-categories/', views.get_article_categories),
     ])),
 
     path('web/employer/', include([

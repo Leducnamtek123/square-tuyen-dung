@@ -113,43 +113,12 @@ const commonService = {
     const url = 'common/all-careers/';
     const pageSize = Number(params.pageSize || 1000);
     const kw = params.kw;
-    const startPage = Number(params.page || 1);
-    const fetchPage = async (page: number): Promise<unknown> => {
-      return httpRequest.get(url, {
-        params: { page, pageSize, kw },
-      });
-    };
+    const page = Number(params.page || 1);
 
-    const fetchUntilShortPage = async (page: number, collected: Career[]): Promise<Career[]> => {
-      const res = await fetchPage(page);
-      const pageResults = extractResults<Career>(res);
-      const nextResults = collected.concat(pageResults);
-
-      if (!pageResults.length || pageResults.length < pageSize) {
-        return nextResults;
-      }
-      return fetchUntilShortPage(page + 1, nextResults);
-    };
-
-    const firstPage = await fetchPage(startPage);
-    const firstPageResults = extractResults<Career>(firstPage);
-    const total = extractExplicitCount(firstPage);
-
-    let results: Career[];
-    if (total) {
-      const totalPages = Math.ceil(total / pageSize);
-      const remainingPages = Array.from(
-        { length: Math.max(0, totalPages - startPage) },
-        (_, index) => startPage + index + 1
-      );
-      const remainingResults = await Promise.all(remainingPages.map(fetchPage));
-      results = firstPageResults.concat(remainingResults.flatMap((res) => extractResults<Career>(res)));
-    } else {
-      results = firstPageResults.length < pageSize
-        ? firstPageResults
-        : await fetchUntilShortPage(startPage + 1, firstPageResults);
-    }
-
+    const res = await httpRequest.get(url, {
+      params: { page, pageSize, kw },
+    });
+    const results = extractResults<Career>(res);
     return (await presignInObject(results)) as Career[];
   },
 
