@@ -239,6 +239,14 @@ const hrmService = {
     return httpRequest.post('native-hrm/departments/', data).then((res) => unwrapDataResponse<NativeDepartment>(res));
   },
 
+  updateDepartment: (id: number, data: Partial<NativeDepartment>): Promise<NativeDepartment> => {
+    return httpRequest.patch(`native-hrm/departments/${id}/`, data).then((res) => unwrapDataResponse<NativeDepartment>(res));
+  },
+
+  deleteDepartment: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/departments/${id}/`).then(() => undefined);
+  },
+
   getOrgChart: (): Promise<NativeOrgTreeNode[]> => {
     return httpRequest.get('native-hrm/departments/org-chart/').then((res) => unwrapDataResponse<NativeOrgTreeNode[]>(res));
   },
@@ -249,10 +257,34 @@ const hrmService = {
     });
   },
 
+  createDesignation: (data: { title: string; code?: string; description?: string }): Promise<NativeDesignation> => {
+    return httpRequest.post('native-hrm/designations/', data).then((res) => unwrapDataResponse<NativeDesignation>(res));
+  },
+
+  updateDesignation: (id: number, data: Partial<NativeDesignation>): Promise<NativeDesignation> => {
+    return httpRequest.patch(`native-hrm/designations/${id}/`, data).then((res) => unwrapDataResponse<NativeDesignation>(res));
+  },
+
+  deleteDesignation: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/designations/${id}/`).then(() => undefined);
+  },
+
+  deleteEmployee: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/employees/${id}/`).then(() => undefined);
+  },
+
   getLeaveRequests: (): Promise<NativeLeaveRequest[]> => {
     return httpRequest.get('native-hrm/leave-requests/').then((res) => {
       return normalizePaginatedResponse<NativeLeaveRequest>(res).results;
     });
+  },
+
+  createLeaveRequest: (data: Partial<NativeLeaveRequest>): Promise<NativeLeaveRequest> => {
+    return httpRequest.post('native-hrm/leave-requests/', data).then((res) => unwrapDataResponse<NativeLeaveRequest>(res));
+  },
+
+  deleteLeaveRequest: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/leave-requests/${id}/`).then(() => undefined);
   },
 
   approveLeaveRequest: (id: number): Promise<NativeLeaveRequest> => {
@@ -267,6 +299,18 @@ const hrmService = {
     return httpRequest.get('native-hrm/contracts/').then((res) => {
       return normalizePaginatedResponse<NativeContract>(res).results;
     });
+  },
+
+  createContract: (data: Partial<NativeContract>): Promise<NativeContract> => {
+    return httpRequest.post('native-hrm/contracts/', data).then((res) => unwrapDataResponse<NativeContract>(res));
+  },
+
+  updateContract: (id: number, data: Partial<NativeContract>): Promise<NativeContract> => {
+    return httpRequest.patch(`native-hrm/contracts/${id}/`, data).then((res) => unwrapDataResponse<NativeContract>(res));
+  },
+
+  deleteContract: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/contracts/${id}/`).then(() => undefined);
   },
 
   exportPayrollCsv: async (): Promise<Blob> => {

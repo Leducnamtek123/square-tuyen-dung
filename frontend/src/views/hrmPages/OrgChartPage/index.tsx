@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -11,127 +11,311 @@ import {
   Paper,
   Alert,
   Button,
+  Stack,
+  IconButton,
+  Collapse,
+  Tooltip,
 } from '@mui/material';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import BusinessIcon from '@mui/icons-material/Business';
+import AddIcon from '@mui/icons-material/Add';
+import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
+import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
+import Link from 'next/link';
 
-import hrmService, { NativeOrgTreeNode } from '@/services/hrmService';
+import { useHrmOrgChart } from '../hooks/useHrmQueries';
+import { NativeOrgTreeNode } from '@/services/hrmService';
 import { TabTitle } from '@/utils/generalFunction';
 
 export default function OrgChartPage() {
-  TabTitle('Sơ đồ Cây Tổ chức | Native HRM');
+  TabTitle('Sơ đồ Cây Tổ chức | InfoHR HRM');
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [orgTree, setOrgTree] = useState<NativeOrgTreeNode[]>([]);
+  const { data: orgTree = [], isLoading: loading, error, refetch } = useHrmOrgChart();
+  const [collapsedNodes, setCollapsedNodes] = useState<Record<number, boolean>>({});
 
-  const fetchData = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await hrmService.getOrgChart();
-      setOrgTree(data);
-    } catch (err: any) {
-      console.error('Error fetching org chart:', err);
-      setError(err?.response?.data?.message || err?.message || 'Không thể tải sơ đồ tổ chức. Vui lòng thử lại.');
-    } finally {
-      setLoading(false);
-    }
+  const toggleNode = (id: number) => {
+    setCollapsedNodes((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const isExpanded = (id: number) => {
+    return !collapsedNodes[id]; // Default expanded
+  };
 
-  const renderTreeNode = (node: NativeOrgTreeNode, level: number = 0) => (
-    <Box key={node.id} sx={{ ml: level * 3, mt: 1.5, position: 'relative' }}>
-      <Paper
-        elevation={1}
-        sx={{
-          p: 2,
-          borderRadius: 3,
-          borderLeft: '4px solid #1976d2',
-          bgcolor: level === 0 ? '#f0f7ff' : '#ffffff',
-          maxWidth: 600,
-        }}
-      >
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box display="flex" alignItems="center" gap={1.5}>
-            <Avatar sx={{ bgcolor: 'primary.main', width: 32, height: 32 }}>
-              <AccountTreeOutlinedIcon fontSize="small" />
-            </Avatar>
-            <Box>
-              <Typography fontWeight={700} color="primary.dark">
-                {node.name}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Trưởng phòng: {node.manager_name || 'Chưa gán'}
-              </Typography>
-            </Box>
+  const handleExpandAll = () => {
+    setCollapsedNodes({});
+  };
+
+  const handleCollapseAll = () => {
+    const allIds: Record<number, boolean> = {};
+    const collectIds = (nodes: NativeOrgTreeNode[]) => {
+      nodes.forEach((n) => {
+        if (n && n.id) {
+          allIds[n.id] = true;
+          if (n.children && Array.isArray(n.children)) {
+            collectIds(n.children);
+          }
+        }
+      });
+    };
+    if (Array.isArray(orgTree)) {
+      collectIds(orgTree);
+    }
+    setCollapsedNodes(allIds);
+  };
+
+  const renderTreeNode = (node: NativeOrgTreeNode, level: number = 0) => {
+    if (!node) return null;
+    const hasChildren = Array.isArray(node.children) && node.children.length > 0;
+    const expanded = isExpanded(node.id);
+    const nodeName = node.name || `Phòng ban #${node.id}`;
+    const initialChar = nodeName.trim().charAt(0)?.toUpperCase() || 'D';
+
+    return (
+      <Box key={node.id} sx={{ ml: level === 0 ? 0 : { xs: 2, sm: 4 }, mt: 2, position: 'relative' }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2.25,
+            borderRadius: 3,
+            border: '1px solid',
+            borderColor: level === 0 ? '#93c5fd' : '#e2e8f0',
+            bgcolor: level === 0 ? '#f8fafc' : '#ffffff',
+            maxWidth: 680,
+            boxShadow: '0 2px 8px 0 rgba(0, 0, 0, 0.03)',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              borderColor: '#2563eb',
+              boxShadow: '0 6px 20px -4px rgba(37, 99, 235, 0.1)',
+            },
+          }}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              {hasChildren ? (
+                <IconButton
+                  size="small"
+                  onClick={() => toggleNode(node.id)}
+                  sx={{
+                    width: 28,
+                    height: 28,
+                    bgcolor: '#eff6ff',
+                    color: '#2563eb',
+                    '&:hover': { bgcolor: '#dbeafe' },
+                  }}
+                >
+                  {expanded ? <ExpandMoreIcon sx={{ fontSize: 18 }} /> : <ChevronRightIcon sx={{ fontSize: 18 }} />}
+                </IconButton>
+              ) : (
+                <Box sx={{ width: 28, display: 'flex', justifyContent: 'center' }}>
+                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#cbd5e1' }} />
+                </Box>
+              )}
+
+              <Avatar
+                sx={{
+                  bgcolor: level === 0 ? '#2563eb' : '#eff6ff',
+                  color: level === 0 ? '#ffffff' : '#2563eb',
+                  width: 38,
+                  height: 38,
+                  fontWeight: 800,
+                }}
+              >
+                {initialChar}
+              </Avatar>
+
+              <Box>
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.9375rem' }}>
+                  {nodeName}
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 500 }}>
+                  Trưởng phòng: <strong style={{ color: '#1e293b' }}>{node.manager_name || 'Chưa gán'}</strong>
+                </Typography>
+              </Box>
+            </Stack>
+
+            <Chip
+              label={`${node.employee_count ?? 0} Nhân sự`}
+              size="small"
+              sx={{
+                fontWeight: 800,
+                fontSize: '0.75rem',
+                bgcolor: level === 0 ? '#dbeafe' : '#f1f5f9',
+                color: level === 0 ? '#1d4ed8' : '#334155',
+                borderRadius: 1.5,
+              }}
+            />
           </Box>
-          <Chip label={`${node.employee_count} Nhân sự`} size="small" color="info" />
-        </Box>
-      </Paper>
+        </Paper>
 
-      {node.children && node.children.length > 0 && (
-        <Box sx={{ pl: 2, borderLeft: '2px dashed #bbb', ml: 2, mt: 1 }}>
-          {node.children.map((child) => renderTreeNode(child, level + 1))}
-        </Box>
-      )}
-    </Box>
-  );
+        {hasChildren && (
+          <Collapse in={expanded}>
+            <Box
+              sx={{
+                pl: { xs: 1.5, sm: 2.5 },
+                ml: { xs: 1.5, sm: 2.5 },
+                borderLeft: '2px dashed #cbd5e1',
+                mt: 1,
+              }}
+            >
+              {node.children.map((child) => renderTreeNode(child, level + 1))}
+            </Box>
+          </Collapse>
+        )}
+      </Box>
+    );
+  };
 
   return (
-    <Box sx={{ p: 3, maxWidth: 1400, margin: '0 auto' }}>
-      {/* Page Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-          pb: 2,
-          borderBottom: '1px solid #e0e0e0',
-        }}
-      >
-        <Box>
-          <Typography variant="h4" fontWeight={700} color="primary" display="flex" alignItems="center" gap={1.5}>
-            <AccountTreeOutlinedIcon fontSize="large" color="primary" /> Sơ đồ Cây Tổ chức Doanh nghiệp (Org Chart Tree)
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Trực quan hóa cấu trúc Phân cấp Quản lý phòng ban & Nhân sự cấp dưới chuẩn Frappe HRMS
-          </Typography>
-        </Box>
-      </Box>
+    <Box sx={{ width: '100%', maxWidth: 1400, mx: 'auto', p: { xs: 2, sm: 3 } }}>
+      <Stack spacing={3.5}>
+        {/* Header */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Box
+              sx={{
+                width: 44,
+                height: 44,
+                borderRadius: '12px',
+                bgcolor: '#fffbeb',
+                color: '#d97706',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <AccountTreeOutlinedIcon sx={{ fontSize: 24 }} />
+            </Box>
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 900, color: '#0f172a', fontSize: { xs: '1.25rem', md: '1.5rem' }, letterSpacing: '-0.02em' }}>
+                Sơ đồ Cây Tổ chức Doanh nghiệp
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 500, fontSize: '0.875rem' }}>
+                Trực quan hóa cấu trúc phân cấp phòng ban, trưởng phòng phụ trách và định biên nhân sự
+              </Typography>
+            </Box>
+          </Stack>
 
-      {error && (
-        <Alert
-          severity="error"
-          sx={{ mb: 3 }}
-          action={
-            <Button color="inherit" size="small" onClick={fetchData}>
-              Thử lại
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Tooltip title="Mở rộng tất cả các nhánh">
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<UnfoldMoreIcon sx={{ fontSize: 16 }} />}
+                onClick={handleExpandAll}
+                sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700, fontSize: '0.8125rem' }}
+              >
+                Mở rộng tất cả
+              </Button>
+            </Tooltip>
+            <Tooltip title="Thu gọn tất cả các nhánh">
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<UnfoldLessIcon sx={{ fontSize: 16 }} />}
+                onClick={handleCollapseAll}
+                sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700, fontSize: '0.8125rem' }}
+              >
+                Thu gọn
+              </Button>
+            </Tooltip>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
+              onClick={() => refetch()}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 700,
+                color: '#0f172a',
+                borderColor: '#cbd5e1',
+                bgcolor: '#ffffff',
+                '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' },
+              }}
+            >
+              Làm mới
             </Button>
-          }
-        >
-          {error}
-        </Alert>
-      )}
-
-      {loading ? (
-        <Box display="flex" justifyContent="center" py={6}>
-          <CircularProgress />
+          </Stack>
         </Box>
-      ) : error ? null : (
-        <Card sx={{ p: 3, borderRadius: 3, boxShadow: '0 4px 16px rgba(0,0,0,0.05)' }}>
-          {orgTree.length === 0 ? (
-            <Typography color="text.secondary" align="center" py={4}>
-              Chưa có dữ liệu cây tổ chức phòng ban.
+
+        {/* Tree Render Container */}
+        {loading ? (
+          <Paper elevation={0} sx={{ p: 6, borderRadius: 3, border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+            <CircularProgress size={32} />
+            <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 600 }}>
+              Đang tải sơ đồ cơ cấu tổ chức...
             </Typography>
-          ) : (
-            orgTree.map((rootNode) => renderTreeNode(rootNode, 0))
-          )}
-        </Card>
-      )}
+          </Paper>
+        ) : error ? (
+          <Alert severity="error" sx={{ borderRadius: 3 }}>
+            Không thể tải sơ đồ tổ chức. Vui lòng kiểm tra lại kết nối hoặc phân quyền.
+          </Alert>
+        ) : !Array.isArray(orgTree) || orgTree.length === 0 ? (
+          <Paper elevation={0} sx={{ p: 6, textAlign: 'center', borderRadius: 3, border: '1px solid #e2e8f0', bgcolor: '#ffffff' }}>
+            <Box
+              sx={{
+                width: 64,
+                height: 64,
+                borderRadius: '16px',
+                bgcolor: '#f1f5f9',
+                color: '#64748b',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 2,
+              }}
+            >
+              <BusinessIcon sx={{ fontSize: 32 }} />
+            </Box>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', mb: 1 }}>
+              Chưa có dữ liệu Sơ đồ Tổ chức
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#64748b', maxWidth: 460, mx: 'auto', mb: 3 }}>
+              Doanh nghiệp của bạn chưa tạo phòng ban nào hoặc chưa phân cấp cơ cấu tổ chức.
+            </Typography>
+            <Link href="/employer/hrm/departments" style={{ textDecoration: 'none' }}>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                sx={{
+                  borderRadius: 2.5,
+                  textTransform: 'none',
+                  fontWeight: 800,
+                  bgcolor: '#7c3aed',
+                  boxShadow: '0 4px 12px 0 rgba(124, 58, 237, 0.2)',
+                  '&:hover': { bgcolor: '#6d28d9' },
+                }}
+              >
+                Đến trang Phòng ban & Thiết lập
+              </Button>
+            </Link>
+          </Paper>
+        ) : (
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2.5, sm: 4 },
+              borderRadius: 3,
+              border: '1px solid #e2e8f0',
+              bgcolor: '#ffffff',
+            }}
+          >
+            <Box sx={{ pb: 1, mb: 2, borderBottom: '1px solid #f1f5f9' }}>
+              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Cấu trúc phân cấp bộ máy công ty
+              </Typography>
+            </Box>
+            {orgTree.map((rootNode) => renderTreeNode(rootNode, 0))}
+          </Paper>
+        )}
+      </Stack>
     </Box>
   );
 }

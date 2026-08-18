@@ -79,21 +79,53 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         if not company:
             return Response([])
 
-        departments = Department.objects.filter(company=company, parent__isnull=True)
+        all_depts = list(Department.objects.filter(company=company).select_related('manager', 'parent'))
+        if not all_depts:
+            return Response([])
+
+        dept_ids = {d.id for d in all_depts}
+        root_depts = [d for d in all_depts if not d.parent_id or d.parent_id not in dept_ids]
+        if not root_depts:
+            root_depts = all_depts
+
+        emp_counts = dict(
+            Employee.objects.filter(company=company, status__in=['PROBATION', 'ACTIVE'])
+            .values('department_id')
+            .annotate(cnt=Count('id'))
+            .values_list('department_id', 'cnt')
+        )
+
+        children_map = {}
+        for d in all_depts:
+            if d.parent_id and d.parent_id in dept_ids and d.parent_id != d.id:
+                children_map.setdefault(d.parent_id, []).append(d)
+
+        visited = set()
 
         def build_tree(dept):
-            children = Department.objects.filter(parent=dept)
-            employees = Employee.objects.filter(department=dept, status__in=['PROBATION', 'ACTIVE'])
+            if dept.id in visited:
+                return None
+            visited.add(dept.id)
+            children = children_map.get(dept.id, [])
+            child_nodes = []
+            for child in children:
+                node = build_tree(child)
+                if node:
+                    child_nodes.append(node)
             return {
                 'id': dept.id,
-                'name': dept.name,
-                'code': dept.code,
+                'name': dept.name or f'Phòng ban #{dept.id}',
+                'code': dept.code or '',
                 'manager_name': dept.manager.full_name if dept.manager else None,
-                'employee_count': employees.count(),
-                'children': [build_tree(child) for child in children],
+                'employee_count': emp_counts.get(dept.id, 0),
+                'children': child_nodes,
             }
 
-        tree = [build_tree(dept) for dept in departments]
+        tree = []
+        for dept in root_depts:
+            node = build_tree(dept)
+            if node:
+                tree.append(node)
         return Response(tree)
 
 
@@ -229,6 +261,15 @@ class EmploymentContractViewSet(viewsets.ModelViewSet):
             return EmploymentContract.objects.none()
         return EmploymentContract.objects.filter(employee__company=company).select_related('employee')
 
+    def perform_create(self, serializer):
+        company = _get_company_for_request(self.request)
+        if not company:
+            raise PermissionDenied("Bạn không có quyền quản lý hợp đồng cho công ty này.")
+        employee = serializer.validated_data.get('employee')
+        if employee and employee.company != company:
+            raise PermissionDenied("Nhân viên này không thuộc công ty của bạn.")
+        serializer.save()
+
 
 class LeaveTypeViewSet(viewsets.ModelViewSet):
     permission_classes = [perms_custom.CanManageEmployees]
@@ -256,6 +297,15 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
         if not company:
             return LeaveRequest.objects.none()
         return LeaveRequest.objects.filter(employee__company=company).select_related('employee', 'leave_type', 'approved_by')
+
+    def perform_create(self, serializer):
+        company = _get_company_for_request(self.request)
+        if not company:
+            raise PermissionDenied("Bạn không có quyền gửi đơn nghỉ phép cho công ty này.")
+        employee = serializer.validated_data.get('employee')
+        if employee and employee.company != company:
+            raise PermissionDenied("Nhân viên này không thuộc công ty của bạn.")
+        serializer.save()
 
     @action(detail=True, methods=['patch'], url_path='approve')
     def approve(self, request, pk=None):
