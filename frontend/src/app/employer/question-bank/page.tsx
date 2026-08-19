@@ -1,9 +1,10 @@
-﻿import QuestionBankPage from '@/views/employerPages/InterviewPages/QuestionBankPage';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
+import QuestionBankPage from '@/views/employerPages/InterviewPages/QuestionBankPage';
 
-export const metadata = {
-  title: 'Ngân hàng câu hỏi',
-  description: 'Browse Employer Question Bank.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.question-bank');
+}
 
 export default function Page() {
   return <QuestionBankPage />;

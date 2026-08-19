@@ -146,7 +146,7 @@ const DataTableCustom = ({
         overflow: 'hidden',
       }}
     >
-      <TableContainer sx={{ maxHeight: 'calc(100vh - 240px)', minHeight: 300 }}>
+      <TableContainer sx={{ maxHeight: 'calc(100dvh - 240px)', minHeight: 300, WebkitOverflowScrolling: 'touch' }}>
         <Table
           sx={{
             minWidth: 750,

@@ -9,6 +9,7 @@ import {
   Paper,
   Stack,
   Typography,
+  alpha,
   useTheme,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -139,38 +140,132 @@ const InterviewLivePage = () => {
   }, [fetchSessions, t]);
 
   return (
-    <Box sx={{ px: { xs: 1, sm: 2 }, py: { xs: 2, sm: 2 }, backgroundColor: 'background.paper', borderRadius: 2 }}>
+    <Box sx={{ px: { xs: 1.5, sm: 3 }, py: { xs: 2.5, sm: 3 }, maxWidth: 1600, mx: 'auto' }}>
+      {/* Top Header & Controls */}
       <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
+        direction={{ xs: 'column', md: 'row' }}
+        alignItems={{ xs: 'flex-start', md: 'center' }}
         justifyContent="space-between"
-        spacing={{ xs: 2, sm: 0 }}
-        mb={3}
+        spacing={2}
+        sx={{
+          mb: 3.5,
+          p: { xs: 2, sm: 2.5 },
+          borderRadius: 4,
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.04)',
+        }}
       >
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-            {t('interviewLive.title')}
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            {t('interviewLive.subtitle')}
-          </Typography>
+          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 0.5 }}>
+            <Box
+              sx={{
+                width: 38,
+                height: 38,
+                borderRadius: '12px',
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                color: 'primary.main',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <FiberManualRecordIcon
+                sx={{
+                  fontSize: 14,
+                  color: activeSessions.length > 0 ? '#EF4444' : '#94A3B8',
+                  animation: activeSessions.length > 0 ? 'liveDotPing 1.8s infinite' : 'none',
+                  '@keyframes liveDotPing': {
+                    '0%, 100%': { transform: 'scale(1)', opacity: 1 },
+                    '50%': { transform: 'scale(1.4)', opacity: 0.5 },
+                  },
+                }}
+              />
+            </Box>
+            <Box>
+              <Stack direction="row" alignItems="center" spacing={1.5}>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: 800,
+                    letterSpacing: '-0.02em',
+                    color: 'text.primary',
+                    fontSize: { xs: '1.25rem', sm: '1.45rem' },
+                  }}
+                >
+                  {t('interviewLive.title')}
+                </Typography>
+                <Box
+                  sx={{
+                    px: 1.5,
+                    py: 0.3,
+                    borderRadius: '20px',
+                    bgcolor: activeSessions.length > 0 ? alpha('#EF4444', 0.1) : alpha(theme.palette.text.secondary, 0.08),
+                    border: '1px solid',
+                    borderColor: activeSessions.length > 0 ? alpha('#EF4444', 0.25) : 'divider',
+                    color: activeSessions.length > 0 ? '#EF4444' : 'text.secondary',
+                    fontSize: '0.75rem',
+                    fontWeight: 800,
+                  }}
+                >
+                  {activeSessions.length} {t('interviewLive.activeNow').toLowerCase()}
+                </Box>
+              </Stack>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25, fontWeight: 500 }}>
+                {t('interviewLive.subtitle')}
+              </Typography>
+            </Box>
+          </Stack>
         </Box>
 
         <Stack direction="row" spacing={1.5} alignItems="center">
           <Button
-            variant="outlined"
+            variant={state.autoRefresh ? 'contained' : 'outlined'}
             color={state.autoRefresh ? 'primary' : 'inherit'}
             onClick={() => dispatch({ type: 'toggle-auto-refresh' })}
-            sx={{ px: 2, textTransform: 'none' }}
+            sx={{
+              px: 2.25,
+              py: 0.85,
+              borderRadius: '12px',
+              textTransform: 'none',
+              fontWeight: 700,
+              fontSize: '0.8125rem',
+              boxShadow: 'none',
+              '&:hover': { boxShadow: 'none' },
+            }}
           >
             {state.autoRefresh ? t('interviewLive.autoRefresh.on') : t('interviewLive.autoRefresh.off')}
           </Button>
           <Button
             variant="outlined"
-            color="primary"
             onClick={() => fetchSessions()}
-            startIcon={<RefreshIcon />}
-            sx={{ px: 2, textTransform: 'none' }}
+            disabled={state.refreshing}
+            startIcon={
+              <RefreshIcon
+                sx={{
+                  animation: state.refreshing ? 'spin 1s linear infinite' : 'none',
+                  '@keyframes spin': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(360deg)' },
+                  },
+                }}
+              />
+            }
+            sx={{
+              px: 2.25,
+              py: 0.85,
+              borderRadius: '12px',
+              borderColor: 'divider',
+              color: 'text.primary',
+              textTransform: 'none',
+              fontWeight: 700,
+              fontSize: '0.8125rem',
+              '&:hover': {
+                borderColor: 'primary.main',
+                bgcolor: alpha(theme.palette.primary.main, 0.04),
+              },
+            }}
           >
             {state.refreshing ? t('interviewLive.updating') : t('common:actions.refresh')}
           </Button>
@@ -185,67 +280,85 @@ const InterviewLivePage = () => {
               {t('common:actions.retry')}
             </Button>
           }
-          sx={{ mb: 2 }}
+          sx={{ mb: 3, borderRadius: 3 }}
         >
           {state.error}
         </Alert>
       )}
 
       {state.loading && (
-        <Box sx={{ width: '100%', mb: 2 }}>
-          <LinearProgress color="primary" sx={{ height: 4, borderRadius: 3 }} />
+        <Box sx={{ width: '100%', mb: 3 }}>
+          <LinearProgress
+            color="primary"
+            sx={{
+              height: 4,
+              borderRadius: 3,
+              bgcolor: alpha(theme.palette.primary.main, 0.1),
+            }}
+          />
         </Box>
       )}
 
-      <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
-        <Box
-          sx={{
-            width: 10,
-            height: 10,
-            borderRadius: '50%',
-            bgcolor: '#EF4444',
-            boxShadow: '0 0 10px rgba(239, 68, 68, 0.8)',
-            position: 'relative',
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              inset: -4,
-              borderRadius: '50%',
-              border: '2px solid rgba(239, 68, 68, 0.5)',
-              animation: 'livePing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite',
-            },
-            '@keyframes livePing': {
-              '0%': { transform: 'scale(0.8)', opacity: 1 },
-              '100%': { transform: 'scale(2.2)', opacity: 0 },
-            },
-          }}
-        />
-        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A', letterSpacing: '-0.01em' }}>
-          {t('interviewLive.activeNow')}
-        </Typography>
-      </Stack>
-
+      {/* Main Content Area */}
       {activeSessions.length === 0 && !state.loading ? (
         <Paper
           elevation={0}
           sx={{
-            p: 4,
+            py: 8,
+            px: 3,
             borderRadius: 4,
-            border: '1px solid #E2E8F0',
-            bgcolor: '#FFFFFF',
-            boxShadow: '0 4px 20px rgba(15, 23, 42, 0.04)',
+            border: '1px dashed',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
             textAlign: 'center',
+            maxWidth: 640,
+            mx: 'auto',
+            my: 4,
           }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>
+          <Box
+            sx={{
+              width: 72,
+              height: 72,
+              borderRadius: '20px',
+              bgcolor: alpha(theme.palette.primary.main, 0.08),
+              color: 'primary.main',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mx: 'auto',
+              mb: 2.5,
+            }}
+          >
+            <FiberManualRecordIcon sx={{ fontSize: 28, color: 'text.disabled' }} />
+          </Box>
+          <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', mb: 1, letterSpacing: '-0.01em' }}>
             {t('interviewLive.noData.title')}
           </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 440, mx: 'auto', lineHeight: 1.6 }}>
             {t('interviewLive.noData.subtitle')}
           </Typography>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => fetchSessions()}
+            startIcon={<RefreshIcon />}
+            sx={{ mt: 3, borderRadius: '10px', textTransform: 'none', fontWeight: 700 }}
+          >
+            {t('common:actions.refresh')}
+          </Button>
         </Paper>
       ) : (
-        <Stack spacing={2}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              xl: activeSessions.length > 1 ? 'repeat(2, 1fr)' : '1fr',
+            },
+            gap: 3,
+          }}
+        >
           {activeSessions.map((session) => (
             <InterviewLiveCandidateCard
               key={session.id}
@@ -254,7 +367,7 @@ const InterviewLivePage = () => {
               isForceEnding={state.actionLoadingId === session.id}
             />
           ))}
-        </Stack>
+        </Box>
       )}
     </Box>
   );

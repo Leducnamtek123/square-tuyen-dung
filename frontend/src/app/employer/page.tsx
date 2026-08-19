@@ -1,9 +1,10 @@
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import { redirect } from 'next/navigation';
 
-export const metadata = {
-  title: 'Employer',
-  description: 'Browse Employer.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.introduce');
+}
 
 export default function EmployerRootPage() {
   redirect('/employer/introduce');

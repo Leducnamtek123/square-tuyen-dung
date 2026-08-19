@@ -144,7 +144,7 @@ export const ProfileSearch: React.FC = () => {
     <Stack spacing={1.5} sx={{ width: '100%' }}>
       {/* Primary Filter Search Bar */}
       <GlobalFilterBar
-        control={control}
+        control={control as any}
         handleSubmit={handleSubmit}
         handleSearchSubmit={(data) => handleApply(data)}
         cityOptions={allConfig?.cityOptions || []}
@@ -166,7 +166,7 @@ export const ProfileSearch: React.FC = () => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         config={candidateFilterConfig}
-        control={control}
+        control={control as any}
         allConfig={allConfig}
         handleReset={handleReset}
         handleSubmit={handleSubmit}

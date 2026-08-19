@@ -565,7 +565,7 @@ const AccountPage = () => {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton aria-label="Thao tác" onClick={() => setShowCurrentPass(!showCurrentPass)} edge="end">
+                      <IconButton aria-label={showCurrentPass ? "Ẩn mật khẩu" : "Hiện mật khẩu"} onClick={() => setShowCurrentPass(!showCurrentPass)} edge="end">
                         {showCurrentPass ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
                       </IconButton>
                     </InputAdornment>
@@ -589,7 +589,7 @@ const AccountPage = () => {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton aria-label="Thao tác" onClick={() => setShowNewPass(!showNewPass)} edge="end">
+                      <IconButton aria-label={showNewPass ? "Ẩn mật khẩu mới" : "Hiện mật khẩu mới"} onClick={() => setShowNewPass(!showNewPass)} edge="end">
                         {showNewPass ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
                       </IconButton>
                     </InputAdornment>
@@ -613,7 +613,7 @@ const AccountPage = () => {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton aria-label="Thao tác" onClick={() => setShowConfirmPass(!showConfirmPass)} edge="end">
+                      <IconButton aria-label={showConfirmPass ? "Ẩn xác nhận mật khẩu" : "Hiện xác nhận mật khẩu"} onClick={() => setShowConfirmPass(!showConfirmPass)} edge="end">
                         {showConfirmPass ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
                       </IconButton>
                     </InputAdornment>

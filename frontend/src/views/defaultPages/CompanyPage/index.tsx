@@ -64,17 +64,16 @@ const CompanyPage = () => {
               gap: 1.5,
             }}
           >
-            <span>Khám Phá</span>
             <Box
               component="span"
               sx={{
-                color: '#2563eb',
+                color: '#0f172a',
                 position: 'relative',
                 display: 'inline-flex',
                 alignItems: 'center',
               }}
             >
-              Văn Hóa Công ty
+              {t('companySearch.exploreHeading')}
               <AutoAwesomeIcon
                 sx={{
                   color: '#3b82f6',

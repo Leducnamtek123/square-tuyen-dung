@@ -69,15 +69,15 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
   ];
 
   return (
-    <Grid container spacing={2} sx={{ width: '100%' }}>
+    <Grid container spacing={{ xs: 1.5, sm: 2 }} sx={{ width: '100%' }}>
       {kpis.map((kpi) => (
-        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={kpi.title}>
+        <Grid size={{ xs: 6, sm: 6, md: 3 }} key={kpi.title}>
           <Card
             component={Link}
             href={localizeRoutePath(kpi.path, i18n.language)}
             elevation={0}
             sx={{
-              p: 2.5,
+              p: { xs: 1.75, sm: 2.5 },
               borderRadius: '20px',
               border: '1px solid rgba(226, 232, 240, 0.85)',
               backgroundColor: '#ffffff',

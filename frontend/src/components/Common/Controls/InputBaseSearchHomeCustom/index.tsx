@@ -284,7 +284,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                   '& .MuiInputBase-input': {
                     fontWeight: 600,
                     color: 'text.primary',
-                    fontSize: isHero ? 14 : undefined,
+                    fontSize: isHero ? { xs: 16, sm: 14 } : { xs: 16, sm: 14 },
                     py: isHero ? 1.4 : undefined,
                     '&::placeholder': {
                       color: isHero ? 'rgba(15, 23, 42, 0.55)' : 'text.secondary',
@@ -355,7 +355,11 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
           open={state.showResult}
           anchorEl={inputSearchRef.current}
           placement="bottom-start"
-          style={{ zIndex: 20, width: inputSearchRef.current?.offsetWidth || 360 }}
+          style={{
+            zIndex: 20,
+            width: inputSearchRef.current?.offsetWidth || 360,
+            maxWidth: 'calc(100vw - 32px)',
+          }}
         >
           <Box
             sx={{
@@ -367,6 +371,8 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
               borderRadius: 3,
               maxHeight: '60vh',
               overflowY: 'auto',
+              boxSizing: 'border-box',
+              maxWidth: '100%',
             }}
           >
             <Stack spacing={2}>

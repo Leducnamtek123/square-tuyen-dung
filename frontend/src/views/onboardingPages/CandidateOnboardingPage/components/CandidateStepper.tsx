@@ -84,18 +84,18 @@ export default function CandidateStepper({ activeStep, steps }: CandidateStepper
               key={stepLabel}
               alignItems="center"
               spacing={1}
-              sx={{ zIndex: 1, minWidth: 80, cursor: 'default' }}
+              sx={{ zIndex: 1, minWidth: { xs: 48, sm: 80 }, cursor: 'default' }}
             >
               <Box
                 sx={{
-                  width: 36,
-                  height: 36,
+                  width: { xs: 32, sm: 36 },
+                  height: { xs: 32, sm: 36 },
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontWeight: 700,
-                  fontSize: '0.875rem',
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                   backgroundColor: isCompleted ? '#10B981' : isActive ? '#2563EB' : '#FFFFFF',
                   color: isCompleted || isActive ? '#FFFFFF' : '#64748B',
@@ -111,7 +111,7 @@ export default function CandidateStepper({ activeStep, steps }: CandidateStepper
                     : 'none',
                 }}
               >
-                {isCompleted ? <CheckIcon sx={{ fontSize: 20 }} /> : index + 1}
+                {isCompleted ? <CheckIcon sx={{ fontSize: { xs: 16, sm: 20 } }} /> : index + 1}
               </Box>
 
               <Typography
@@ -120,9 +120,10 @@ export default function CandidateStepper({ activeStep, steps }: CandidateStepper
                   fontWeight: isActive ? 700 : 500,
                   color: isActive ? '#0F172A' : isCompleted ? '#10B981' : '#64748B',
                   textAlign: 'center',
-                  maxWidth: 120,
+                  maxWidth: { xs: 68, sm: 120 },
                   lineHeight: 1.2,
-                  fontSize: '0.8125rem',
+                  fontSize: { xs: '0.72rem', sm: '0.8125rem' },
+                  display: { xs: isActive ? 'block' : 'none', sm: 'block' },
                 }}
               >
                 {stepLabel}

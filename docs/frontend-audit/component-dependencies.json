@@ -1,0 +1,124 @@
+{
+  "sharedComponents": {
+    "CandidateSidebar": {
+      "path": "src/views/components/jobSeekers/CandidateDashboard/CandidateSidebar.tsx",
+      "consumers": [
+        "/(candidate)/dashboard",
+        "/(candidate)/profile",
+        "/(candidate)/account",
+        "/(candidate)/my-jobs",
+        "/(candidate)/my-interviews",
+        "/online-profile/[slug]",
+        "/my-company",
+        "/notifications"
+      ],
+      "risk": "HIGH",
+      "audited": true,
+      "breakpointDivergenceObserved": true
+    },
+    "CategoryCard": {
+      "path": "src/views/components/defaults/CategoryCard/index.tsx",
+      "consumers": [
+        "/jobs-by-career",
+        "/jobs-by-city",
+        "/jobs-by-type"
+      ],
+      "risk": "MEDIUM",
+      "audited": true,
+      "breakpointDivergenceObserved": false
+    },
+    "JobPostSearch": {
+      "path": "src/views/components/defaults/JobPostSearch/index.tsx",
+      "consumers": [
+        "/",
+        "/jobs"
+      ],
+      "risk": "HIGH",
+      "audited": true,
+      "breakpointDivergenceObserved": true
+    },
+    "SuggestedJobPostCard": {
+      "path": "src/views/components/defaults/SuggestedJobPostCard/index.tsx",
+      "consumers": [
+        "/jobs",
+        "/(candidate)/my-jobs",
+        "/my-company"
+      ],
+      "risk": "MEDIUM",
+      "audited": true,
+      "breakpointDivergenceObserved": false
+    },
+    "StaticInfoPage": {
+      "path": "src/views/defaultPages/StaticInfoPage/index.tsx",
+      "consumers": [
+        "/contact",
+        "/lien-he",
+        "/faq",
+        "/privacy-policy",
+        "/terms-of-service"
+      ],
+      "risk": "LOW",
+      "audited": true,
+      "breakpointDivergenceObserved": false
+    },
+    "NewsPage": {
+      "path": "src/views/defaultPages/NewsPage/index.tsx",
+      "consumers": [
+        "/blog",
+        "/tin-tuc"
+      ],
+      "risk": "LOW",
+      "audited": true,
+      "breakpointDivergenceObserved": false
+    },
+    "NotificationCard": {
+      "path": "src/views/components/defaults/NotificationCard/index.tsx",
+      "consumers": [
+        "/notifications",
+        "/employer/notifications",
+        "/(candidate)/dashboard"
+      ],
+      "risk": "MEDIUM",
+      "audited": true,
+      "breakpointDivergenceObserved": false
+    },
+    "OnboardingShell": {
+      "path": "src/views/onboardingPages/components/OnboardingShell.tsx",
+      "consumers": [
+        "/onboarding/candidate",
+        "/onboarding/employer"
+      ],
+      "risk": "MEDIUM",
+      "audited": true,
+      "breakpointDivergenceObserved": false
+    },
+    "ForgotPasswordForm": {
+      "path": "src/views/components/auths/ForgotPasswordForm/index.tsx",
+      "consumers": [
+        "/forgot-password",
+        "/employer/forgot-password"
+      ],
+      "risk": "MEDIUM",
+      "audited": true,
+      "breakpointDivergenceObserved": false
+    },
+    "EmployerLoginForm": {
+      "path": "src/views/components/auths/EmployerLoginForm/index.tsx",
+      "consumers": [
+        "/employer/login"
+      ],
+      "risk": "LOW",
+      "audited": true,
+      "breakpointDivergenceObserved": false
+    },
+    "EmployerSignUpForm": {
+      "path": "src/views/components/auths/EmployerSignUpForm/index.tsx",
+      "consumers": [
+        "/employer/register"
+      ],
+      "risk": "HIGH",
+      "audited": true,
+      "breakpointDivergenceObserved": true
+    }
+  }
+}

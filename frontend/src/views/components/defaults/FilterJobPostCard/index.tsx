@@ -746,7 +746,8 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
 
           {/* ── Bottom Circular Pagination ──────────────────────────────────── */}
           <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ mt: 4 }}>
-            <IconButton aria-label="Thao tác"
+            <IconButton
+              aria-label="Trang trước"
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               sx={{
@@ -765,7 +766,8 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
               {page} / {totalPages}
             </Typography>
 
-            <IconButton aria-label="Thao tác"
+            <IconButton
+              aria-label="Trang sau"
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               sx={{

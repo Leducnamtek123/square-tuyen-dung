@@ -363,13 +363,14 @@ const JobPostCard = () => {
               </Typography>
             </Box>
           </Box>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems="center" width={{ xs: '100%', sm: 'auto' }}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems="center" sx={{ width: { xs: '100%', sm: 'auto' } }}>
             <Button 
               variant="outlined" 
               color="inherit" 
               startIcon={<FileDownloadOutlinedIcon />} 
               onClick={() => setExportModalOpen(true)} 
               sx={{ 
+                width: { xs: '100%', sm: 'auto' },
                 px: 3, 
                 py: 1, 
                 fontWeight: 800, 
@@ -392,6 +393,7 @@ const JobPostCard = () => {
               onClick={handleShowAdd} 
               disabled={isCreateBlocked}
               sx={{ 
+                width: { xs: '100%', sm: 'auto' },
                 px: 4, 
                 py: 1.25, 
                 boxShadow: (theme: Theme) => theme.customShadows?.primary, 

@@ -25,6 +25,13 @@ export type ThreadGroup = {
   threads: AgentThread[];
 };
 
+export const threadGroupFriendlyLabels: Record<ThreadGroupKey, string> = {
+  today: 'Hôm nay',
+  yesterday: 'Hôm qua',
+  thisWeek: 'Tuần này',
+  earlier: 'Trước đó',
+};
+
 export const threadGroupLabelKeys: Record<ThreadGroupKey, string> = {
   today: 'common:agentAssistant.threadGroups.today',
   yesterday: 'common:agentAssistant.threadGroups.yesterday',
@@ -64,15 +71,15 @@ const ThreadItem = ({
   onDelete,
 }: ThreadItemProps) => {
   const { t } = useTranslation('common');
-  const displayTitle = thread.title || t('common:agentAssistant.attachments.threadTitle');
+  const displayTitle = thread.title || 'Đoạn chat mới';
 
   return (
     <Box
       sx={{
-        borderRadius: '8px',
+        borderRadius: '10px',
         bgcolor: selected ? '#EFF6FF' : 'transparent',
         border: '1px solid',
-        borderColor: selected ? '#BFDBFE' : 'transparent',
+        borderColor: selected ? '#BAE6FD' : 'transparent',
         transition: 'all 0.15s ease',
         '&:hover': {
           bgcolor: selected ? '#EFF6FF' : '#F1F5F9',
@@ -87,11 +94,11 @@ const ThreadItem = ({
           sx={{
             justifyContent: 'flex-start',
             textAlign: 'left',
-            py: 0.85,
-            px: 1.25,
+            py: 1,
+            px: 1.5,
             minWidth: 0,
             textTransform: 'none',
-            borderRadius: '8px',
+            borderRadius: '10px',
           }}
         >
           <Box sx={{ minWidth: 0, width: '100%' }}>
@@ -99,7 +106,7 @@ const ThreadItem = ({
               variant="body2"
               sx={{
                 fontWeight: selected ? 700 : 500,
-                color: selected ? '#1D4ED8' : '#1F2937',
+                color: selected ? '#0284C7' : '#1E293B',
                 fontSize: '0.8125rem',
                 lineHeight: 1.35,
                 overflow: 'hidden',
@@ -112,7 +119,7 @@ const ThreadItem = ({
             <Typography
               variant="caption"
               sx={{
-                color: selected ? '#3B82F6' : '#9CA3AF',
+                color: selected ? '#0284C7' : '#94A3B8',
                 fontSize: '0.7rem',
                 display: 'block',
                 mt: 0.25,
@@ -122,11 +129,11 @@ const ThreadItem = ({
             </Typography>
           </Box>
         </Button>
-        <Tooltip title={t('common:agentAssistant.deleteHistory')}>
+        <Tooltip title={t('common:agentAssistant.deleteHistory') || 'Xóa lịch sử'}>
           <span>
             <IconButton
               className="delete-btn"
-              aria-label={t('common:agentAssistant.deleteHistory')}
+              aria-label="Xóa đoạn chat"
               size="small"
               disabled={deleting}
               onClick={(e) => {
@@ -136,7 +143,7 @@ const ThreadItem = ({
               sx={{
                 opacity: selected ? 1 : 0,
                 transition: 'opacity 0.15s ease',
-                color: '#9CA3AF',
+                color: '#94A3B8',
                 p: 0.5,
                 borderRadius: '6px',
                 '&:hover': { color: '#EF4444', bgcolor: '#FEE2E2' },
@@ -180,12 +187,23 @@ export const ThreadSidebar = ({
 }: ThreadSidebarProps) => {
   const { t } = useTranslation('common');
 
+  const getGroupTitle = (key: ThreadGroupKey) => {
+    const i18nKey = threadGroupLabelKeys[key];
+    if (i18nKey) {
+      const translated = t(i18nKey);
+      if (translated && !translated.startsWith('agentAssistant.threadGroups.')) {
+        return translated;
+      }
+    }
+    return threadGroupFriendlyLabels[key] || key;
+  };
+
   return (
     <Box
       sx={{
         display: 'grid',
-        gridTemplateRows: '56px minmax(0, 1fr) auto',
-        borderRight: '1px solid #E5E7EB',
+        gridTemplateRows: '60px minmax(0, 1fr) auto',
+        borderRight: '1px solid #E2E8F0',
         minHeight: 0,
         bgcolor: '#F8FAFC',
       }}
@@ -196,9 +214,9 @@ export const ThreadSidebar = ({
         spacing={1.5}
         alignItems="center"
         justifyContent="space-between"
-        sx={{ px: 2, height: 56, borderBottom: '1px solid #E5E7EB' }}
+        sx={{ px: 2, height: 60, borderBottom: '1px solid #E2E8F0', bgcolor: '#FFFFFF' }}
       >
-        <Stack direction="row" spacing={1.5} alignItems="center">
+        <Stack direction="row" spacing={1.25} alignItems="center">
           <Box
             sx={{
               width: 36,
@@ -207,9 +225,9 @@ export const ThreadSidebar = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              bgcolor: '#F8FAFC',
-              boxShadow: '0 2px 8px rgba(37, 99, 235, 0.2)',
-              border: '1px solid #DBEAFE',
+              bgcolor: '#F0F9FF',
+              boxShadow: '0 2px 6px rgba(14, 165, 233, 0.15)',
+              border: '1px solid #BAE6FD',
               overflow: 'hidden',
               flexShrink: 0,
             }}
@@ -217,22 +235,20 @@ export const ThreadSidebar = ({
             <Image
               src={CHATBOT_ICONS.EMPLOYER}
               alt="AILA AI"
-              width={32}
-              height={32}
+              width={28}
+              height={28}
               style={{ objectFit: 'contain' }}
             />
           </Box>
           <Box sx={{ minWidth: 0 }}>
             <Typography
               variant="subtitle1"
-              sx={{ fontWeight: 700, color: '#111827', fontSize: '0.9375rem', lineHeight: 1.2 }}
+              sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.9375rem', lineHeight: 1.2 }}
             >
-              {t('common:agentAssistant.title')}
+              AILA AI
             </Typography>
-            <Typography variant="caption" sx={{ color: '#6B7280', fontSize: '0.75rem' }}>
-              {portal === 'admin'
-                ? t('common:agentAssistant.portals.admin')
-                : t('common:agentAssistant.portals.employer')}
+            <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.75rem' }}>
+              {portal === 'admin' ? 'Kênh Quản trị viên' : 'Kênh Nhà tuyển dụng'}
             </Typography>
           </Box>
         </Stack>
@@ -246,18 +262,18 @@ export const ThreadSidebar = ({
           alignItems="center"
           sx={{ position: 'sticky', top: 0, zIndex: 1, px: 0.5, py: 1, bgcolor: '#F8FAFC' }}
         >
-          <HistoryRoundedIcon sx={{ fontSize: 16, color: '#6B7280' }} />
+          <HistoryRoundedIcon sx={{ fontSize: 16, color: '#64748B' }} />
           <Typography
             variant="overline"
-            sx={{ color: '#6B7280', fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.05em' }}
+            sx={{ color: '#64748B', fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.05em' }}
           >
-            {t('common:agentAssistant.recents')}
+            GẦN ĐÂY
           </Typography>
         </Stack>
 
         {isLoading ? (
           <Stack alignItems="center" sx={{ py: 4 }}>
-            <CircularProgress size={26} sx={{ color: '#2563EB' }} />
+            <CircularProgress size={24} sx={{ color: '#0284C7' }} />
           </Stack>
         ) : (
           <Stack spacing={1.5}>
@@ -266,14 +282,14 @@ export const ThreadSidebar = ({
                 <Typography
                   variant="caption"
                   sx={{
-                    color: '#9CA3AF',
+                    color: '#94A3B8',
                     fontWeight: 700,
                     fontSize: '0.7rem',
                     px: 0.5,
                     textTransform: 'uppercase',
                   }}
                 >
-                  {t(threadGroupLabelKeys[group.key])}
+                  {getGroupTitle(group.key)}
                 </Typography>
                 {group.threads.map((thread) => (
                   <ThreadItem
@@ -293,7 +309,7 @@ export const ThreadSidebar = ({
       </Box>
 
       {/* New Chat Button */}
-      <Box sx={{ p: 1.5, borderTop: '1px solid #E5E7EB', bgcolor: '#FFFFFF' }}>
+      <Box sx={{ p: 1.5, borderTop: '1px solid #E2E8F0', bgcolor: '#FFFFFF' }}>
         <Button
           fullWidth
           startIcon={<AddRoundedIcon />}
@@ -301,19 +317,19 @@ export const ThreadSidebar = ({
           onClick={onCreateThread}
           sx={{
             textTransform: 'none',
-            borderRadius: '8px',
-            py: 0.9,
-            fontWeight: 600,
+            borderRadius: '10px',
+            py: 1,
+            fontWeight: 700,
             fontSize: '0.875rem',
-            backgroundColor: '#2563EB',
+            backgroundColor: '#0284C7',
             color: '#FFFFFF',
-            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+            boxShadow: '0 2px 8px rgba(2, 132, 199, 0.25)',
             '&:hover': {
-              backgroundColor: '#1D4ED8',
+              backgroundColor: '#0369A1',
             },
           }}
         >
-          {t('common:agentAssistant.newChat')}
+          Đoạn chat mới
         </Button>
       </Box>
     </Box>

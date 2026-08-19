@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   Dialog,
   DialogContent,
   IconButton,
@@ -19,6 +20,8 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
+import GraphicEqIcon from '@mui/icons-material/GraphicEq';
+import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import { LiveKitRoom, RoomAudioRenderer } from '@livekit/components-react';
 import { useTranslation } from 'react-i18next';
 import { type InterviewSession } from '../../../../types/models';
@@ -105,7 +108,7 @@ const InterviewLiveCandidateCardPanel = ({
               size="small"
               startIcon={<CloseIcon />}
               onClick={onLeaveHR}
-              sx={{ textTransform: 'none', fontWeight: 800, color: '#f87171', borderColor: 'rgba(248,113,113,0.4)' }}
+              sx={{ textTransform: 'none', fontWeight: 800, color: '#f87171', borderColor: 'rgba(248,113,113,0.4)', borderRadius: '10px' }}
             >
               {t('employer:interviewLive.candidateCard.presenceExit')}
             </Button>
@@ -132,100 +135,221 @@ const InterviewLiveCandidateCardPanel = ({
 
   return (
     <>
-      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1.5 }}>
-        {session.roomName || t('interview:interviewDetail.label.roomCode')}
-      </Typography>
-
       <Box
         sx={{
-          borderRadius: 3,
+          borderRadius: 3.5,
           overflow: 'hidden',
           border: '1px solid',
-          borderColor: pc.divider( 0.9),
-          bgcolor: alpha('#020617', 0.98),
+          borderColor: alpha('#38BDF8', 0.15),
+          bgcolor: '#0B1120',
+          backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(14,165,233,0.12) 0%, rgba(2,6,23,0.95) 75%)',
           minHeight: 280,
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        {loadingToken ? (
-          <Box sx={{ minHeight: 280, display: 'grid', placeItems: 'center' }}>
-            <Stack spacing={1.5} alignItems="center">
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
-                {t('employer:interviewLive.candidateCard.connecting')}
-              </Typography>
-            </Stack>
-          </Box>
-        ) : tokenError ? (
-          <Box sx={{ minHeight: 280, p: 2 }}>
-            <Alert severity="warning">{tokenError}</Alert>
-          </Box>
-        ) : connectionDetails ? (
-          <LiveKitRoom token={connectionDetails.token} serverUrl={connectionDetails.serverUrl} connect={isLive} audio={false} video={false}>
-            <Box sx={{ p: 2 }}>
-              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
-                <Chip
-                  icon={<FiberManualRecordIcon sx={{ fontSize: '10px !important', color: '#22c55e !important' }} />}
-                  label={t('employer:interviewLive.candidateCard.live')}
-                  size="small"
+        {/* Top Floating Mini-Action Bar */}
+        <Box
+          sx={{
+            p: 1.75,
+            borderBottom: '1px solid',
+            borderColor: 'rgba(255, 255, 255, 0.06)',
+            bgcolor: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(12px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 1,
+            flexWrap: 'wrap',
+          }}
+        >
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Chip
+              icon={
+                <FiberManualRecordIcon
                   sx={{
-                    fontWeight: 900,
-                    fontSize: '0.65rem',
-                    letterSpacing: 1.5,
-                    height: 24,
-                    bgcolor: alpha('#22c55e', 0.08),
-                    color: '#22c55e',
-                    border: '1px solid',
-                    borderColor: alpha('#22c55e', 0.16),
+                    fontSize: '9px !important',
+                    color: isLive ? '#22c55e !important' : '#94a3b8 !important',
+                    animation: isLive ? 'radarPulse 1.5s infinite' : 'none',
+                    '@keyframes radarPulse': {
+                      '0%': { transform: 'scale(1)', opacity: 1 },
+                      '50%': { transform: 'scale(1.35)', opacity: 0.5 },
+                      '100%': { transform: 'scale(1)', opacity: 1 },
+                    },
                   }}
                 />
-                <Stack direction="row" spacing={1}>
-                  <Tooltip title={t('employer:interviewLive.candidateCard.joinPresenceTooltip')} arrow>
-                    <span>
-                      <Button
-                        size="small"
-                        variant="contained"
-                        color="warning"
-                        startIcon={<MeetingRoomIcon />}
-                        onClick={onJoinAsHR}
-                        disabled={hrPresenceLoading || !isLive}
-                        sx={{ fontWeight: 800, textTransform: 'none', bgcolor: '#f59e0b', '&:hover': { bgcolor: '#d97706' } }}
-                      >
-                        {hrPresenceLoading
-                          ? t('employer:interviewLive.candidateCard.joinPresenceLoading')
-                          : t('employer:interviewLive.candidateCard.joinPresence')}
-                      </Button>
-                    </span>
-                  </Tooltip>
-                  <Button size="small" variant="outlined" startIcon={<FullscreenIcon />} onClick={onOpenFullscreen} sx={{ fontWeight: 800, textTransform: 'none' }}>
-                    {t('employer:interviewLive.candidateCard.maximize')}
-                  </Button>
-                  {normalizedStatus === 'in_progress' && (
-                    <Button
-                      size="small"
-                      variant="text"
-                      color="error"
-                      startIcon={<StopCircleIcon />}
-                      onClick={() => onForceEnd(session)}
-                      disabled={isForceEnding}
-                      sx={{ fontWeight: 800, textTransform: 'none' }}
-                    >
-                      {t('employer:interviewLive.candidateCard.end')}
-                    </Button>
-                  )}
-                </Stack>
-              </Stack>
+              }
+              label={isLive ? t('employer:interviewLive.candidateCard.live') : statusLabel || 'Chờ bắt đầu'}
+              size="small"
+              sx={{
+                fontWeight: 800,
+                fontSize: '0.6875rem',
+                letterSpacing: '0.04em',
+                height: 26,
+                borderRadius: '8px',
+                bgcolor: isLive ? alpha('#22c55e', 0.12) : 'rgba(255,255,255,0.06)',
+                color: isLive ? '#4ade80' : 'rgba(255,255,255,0.75)',
+                border: '1px solid',
+                borderColor: isLive ? alpha('#22c55e', 0.3) : 'rgba(255,255,255,0.1)',
+              }}
+            />
+          </Stack>
 
-              <LiveObserverVisualizer compact />
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Tooltip title={t('employer:interviewLive.candidateCard.joinPresenceTooltip')} arrow>
+              <span>
+                <Button
+                  size="small"
+                  variant="contained"
+                  startIcon={<MeetingRoomIcon sx={{ fontSize: 16 }} />}
+                  onClick={onJoinAsHR}
+                  disabled={hrPresenceLoading || !isLive}
+                  sx={{
+                    fontWeight: 750,
+                    fontSize: '0.75rem',
+                    textTransform: 'none',
+                    borderRadius: '10px',
+                    bgcolor: '#0284c7',
+                    color: '#ffffff',
+                    px: 1.75,
+                    py: 0.6,
+                    boxShadow: 'none',
+                    '&:hover': { bgcolor: '#0369a1', boxShadow: 'none' },
+                  }}
+                >
+                  {hrPresenceLoading
+                    ? t('employer:interviewLive.candidateCard.joinPresenceLoading')
+                    : t('employer:interviewLive.candidateCard.joinPresence')}
+                </Button>
+              </span>
+            </Tooltip>
+
+            {connectionDetails && (
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<FullscreenIcon sx={{ fontSize: 16 }} />}
+                onClick={onOpenFullscreen}
+                sx={{
+                  fontWeight: 750,
+                  fontSize: '0.75rem',
+                  textTransform: 'none',
+                  borderRadius: '10px',
+                  color: 'rgba(255,255,255,0.85)',
+                  borderColor: 'rgba(255,255,255,0.18)',
+                  px: 1.5,
+                  py: 0.6,
+                  '&:hover': {
+                    borderColor: 'rgba(255,255,255,0.4)',
+                    bgcolor: 'rgba(255,255,255,0.06)',
+                  },
+                }}
+              >
+                {t('employer:interviewLive.candidateCard.maximize')}
+              </Button>
+            )}
+
+            {normalizedStatus === 'in_progress' && (
+              <Button
+                size="small"
+                variant="text"
+                color="error"
+                startIcon={<StopCircleIcon sx={{ fontSize: 16 }} />}
+                onClick={() => onForceEnd(session)}
+                disabled={isForceEnding}
+                sx={{
+                  fontWeight: 750,
+                  fontSize: '0.75rem',
+                  textTransform: 'none',
+                  borderRadius: '10px',
+                  color: '#f87171',
+                  px: 1.5,
+                  '&:hover': { bgcolor: alpha('#ef4444', 0.1) },
+                }}
+              >
+                {t('employer:interviewLive.candidateCard.end')}
+              </Button>
+            )}
+          </Stack>
+        </Box>
+
+        {/* Video Canvas / Live Content / Smart Standby */}
+        <Box sx={{ flex: 1, p: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          {loadingToken ? (
+            <Box sx={{ minHeight: 220, display: 'grid', placeItems: 'center' }}>
+              <Stack spacing={2} alignItems="center">
+                <CircularProgress size={32} thickness={4} sx={{ color: '#38bdf8' }} />
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.65)', fontWeight: 600 }}>
+                  {t('employer:interviewLive.candidateCard.connecting')}
+                </Typography>
+              </Stack>
             </Box>
-          </LiveKitRoom>
-        ) : (
-          <Box sx={{ minHeight: 280, display: 'grid', placeItems: 'center', p: 2 }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              {t('employer:interviewLive.candidateCard.notReady')}
-            </Typography>
-          </Box>
-        )}
+          ) : tokenError ? (
+            <Box sx={{ p: 2 }}>
+              <Alert severity="warning" sx={{ borderRadius: 2.5 }}>{tokenError}</Alert>
+            </Box>
+          ) : connectionDetails ? (
+            <LiveKitRoom token={connectionDetails.token} serverUrl={connectionDetails.serverUrl} connect={isLive} audio={false} video={false}>
+              <LiveObserverVisualizer compact />
+            </LiveKitRoom>
+          ) : (
+            /* Smart Standby State */
+            <Box
+              sx={{
+                minHeight: 220,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+                p: 3,
+                position: 'relative',
+              }}
+            >
+              {/* Animated Radar Pulse Core */}
+              <Box
+                sx={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  bgcolor: alpha('#38BDF8', 0.1),
+                  border: '1px solid',
+                  borderColor: alpha('#38BDF8', 0.3),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mb: 2,
+                  position: 'relative',
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    inset: -8,
+                    borderRadius: '50%',
+                    border: '1px solid rgba(56, 189, 248, 0.25)',
+                    animation: 'radarRing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite',
+                  },
+                  '@keyframes radarRing': {
+                    '0%': { transform: 'scale(0.8)', opacity: 1 },
+                    '100%': { transform: 'scale(1.8)', opacity: 0 },
+                  },
+                }}
+              >
+                <VideocamOutlinedIcon sx={{ fontSize: 28, color: '#38BDF8' }} />
+              </Box>
+
+              <Typography variant="subtitle2" sx={{ color: '#FFFFFF', fontWeight: 800, letterSpacing: '-0.01em', mb: 0.5 }}>
+                Đang chờ tín hiệu phòng phỏng vấn
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)', maxWidth: 360, lineHeight: 1.6, display: 'block' }}>
+                Hệ thống sẽ tự động bắt sóng và truyền hình ảnh/âm thanh khi ứng viên tham gia vào phòng phỏng vấn.
+              </Typography>
+            </Box>
+          )}
+        </Box>
       </Box>
 
+      {/* Fullscreen Observer Dialog */}
       <Dialog
         open={fullscreenOpen}
         onClose={onCloseFullscreen}
@@ -271,11 +395,11 @@ const InterviewLiveCandidateCardPanel = ({
                     <LiveObserverVisualizer compact={false} />
                   </Paper>
 
-                  <Paper elevation={0} sx={{ p: 2, borderRadius: 4, border: '1px solid rgba(255,255,255,0.08)', bgcolor: 'rgba(15,23,42,0.9)', overflow: 'auto' }}>
-                    <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 900, mb: 1 }}>
+                  <Paper elevation={0} sx={{ p: 2.5, borderRadius: 4, border: '1px solid rgba(255,255,255,0.08)', bgcolor: 'rgba(15,23,42,0.9)', overflow: 'auto' }}>
+                    <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 900, mb: 2 }}>
                       {t('employer:interviewLive.candidateCard.liveSession')}
                     </Typography>
-                    <Stack spacing={1.5}>
+                    <Stack spacing={2}>
                       <Box>
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)', display: 'block' }}>
                           {t('employer:interviewLive.candidateCard.candidate')}
@@ -296,7 +420,7 @@ const InterviewLiveCandidateCardPanel = ({
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)', display: 'block' }}>
                           {t('employer:interviewLive.candidateCard.room')}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#fff', fontWeight: 700 }}>
+                        <Typography variant="body2" sx={{ color: '#fff', fontWeight: 700, fontFamily: 'monospace' }}>
                           {session.roomName || 'N/A'}
                         </Typography>
                       </Box>
@@ -309,7 +433,14 @@ const InterviewLiveCandidateCardPanel = ({
                         </Typography>
                       </Box>
                       {normalizedStatus === 'in_progress' && (
-                        <Button variant="contained" color="error" startIcon={<StopCircleIcon />} onClick={() => onForceEnd(session)} disabled={isForceEnding} sx={{ textTransform: 'none', fontWeight: 800 }}>
+                        <Button
+                          variant="contained"
+                          color="error"
+                          startIcon={<StopCircleIcon />}
+                          onClick={() => onForceEnd(session)}
+                          disabled={isForceEnding}
+                          sx={{ textTransform: 'none', fontWeight: 800, borderRadius: '10px' }}
+                        >
                           {t('employer:interviewLive.candidateCard.endSession')}
                         </Button>
                       )}
@@ -318,7 +449,7 @@ const InterviewLiveCandidateCardPanel = ({
                 </Box>
               </LiveKitRoom>
             ) : (
-              <Alert severity="warning">{t('employer:interviewLive.candidateCard.noConnectionDetails')}</Alert>
+              <Alert severity="warning" sx={{ borderRadius: 2 }}>{t('employer:interviewLive.candidateCard.noConnectionDetails')}</Alert>
             )}
           </Box>
         </DialogContent>

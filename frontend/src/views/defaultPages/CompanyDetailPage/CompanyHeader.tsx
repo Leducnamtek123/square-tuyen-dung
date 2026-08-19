@@ -131,10 +131,15 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
               </Typography>
             </Stack>
           </Box>
-          <Box sx={{ pt: 1 }}>
+          <Box sx={{ pt: 1, display: { xs: 'none', md: 'block' } }}>
             <QRCodeBox value={(typeof window !== 'undefined' ? window.location.href : '') || "-"} size={80} label={t("companyDetail.shareWithQr")} />
           </Box>
-          <Stack spacing={1.5} justifyContent="center">
+          <Stack
+            direction={{ xs: "row", sm: "row", md: "column" }}
+            spacing={1.5}
+            justifyContent="center"
+            sx={{ width: { xs: '100%', md: 'auto' }, flexWrap: 'wrap' }}
+          >
             {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
               <LoadingButton
                 onClick={handleFollow}
@@ -143,7 +148,12 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
                 loadingPosition="start"
                 variant={companyDetail.isFollowed ? "contained" : "outlined"}
                 color="primary"
-                sx={{ minWidth: 160, borderRadius: 2, boxShadow: "none" }}
+                sx={{
+                  flex: { xs: '1 1 auto', md: 'none' },
+                  minWidth: { xs: 120, sm: 140, md: 160 },
+                  borderRadius: 2,
+                  boxShadow: "none"
+                }}
               >
                 <span>
                   {companyDetail.isFollowed ? t("companyDetail.followed") : t("companyDetail.follow")}{" "}
@@ -156,7 +166,12 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
               color="secondary"
               startIcon={<ShareIcon />}
               onClick={() => setOpenSharePopup(true)}
-              sx={{ minWidth: 160, borderRadius: 2, boxShadow: "none" }}
+              sx={{
+                flex: { xs: '1 1 auto', md: 'none' },
+                minWidth: { xs: 120, sm: 140, md: 160 },
+                borderRadius: 2,
+                boxShadow: "none"
+              }}
             >
               {t("companyDetail.share")}
             </Button>
@@ -166,7 +181,12 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
                 color="warning"
                 startIcon={<FlagIcon />}
                 onClick={() => setOpenReportPopup(true)}
-                sx={{ minWidth: 160, borderRadius: 2, boxShadow: "none" }}
+                sx={{
+                  flex: { xs: '1 1 auto', md: 'none' },
+                  minWidth: { xs: 120, sm: 140, md: 160 },
+                  borderRadius: 2,
+                  boxShadow: "none"
+                }}
               >
                 {t("companyDetail.report")}
               </Button>

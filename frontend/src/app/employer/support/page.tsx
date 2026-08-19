@@ -1,9 +1,10 @@
-﻿import SupportPage from '@/views/employerPages/SupportPage';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
+import SupportPage from '@/views/employerPages/SupportPage';
 
-export const metadata = {
-  title: 'Hỗ trợ',
-  description: 'Browse Employer Support.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.support');
+}
 
 export default function Page() {
   return <SupportPage />;

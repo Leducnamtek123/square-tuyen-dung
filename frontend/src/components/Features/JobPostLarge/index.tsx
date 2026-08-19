@@ -93,18 +93,27 @@ const JobPostLarge = ({
       aria-label={jobName || t('common:viewDetails')}
     >
       <Stack spacing={1.5}>
-        <Stack direction="row" spacing={2} alignItems="flex-start">
-          <Box sx={{ position: 'relative' }}>
+        <Stack direction="row" spacing={{ xs: 1.5, sm: 2 }} alignItems="flex-start">
+          <Box
+            sx={{
+              position: 'relative',
+              width: { xs: 64, sm: 84, md: 100 },
+              height: { xs: 64, sm: 84, md: 100 },
+              flexShrink: 0,
+            }}
+          >
             <MuiImageCustom
-              width={100}
-              height={100}
+              width="100%"
+              height="100%"
               src={companyImageUrl || IMAGES.companyLogoDefault}
               fallbackSrc={IMAGES.companyLogoDefault}
               sx={{
+                width: '100%',
+                height: '100%',
                 border: 1,
                 borderRadius: 2.5,
                 borderColor: theme.palette.grey[200],
-                p: 1,
+                p: { xs: 0.5, sm: 1 },
                 backgroundColor: theme.palette.common.white,
                 transition: 'all 0.2s ease',
                 '&:hover': {
@@ -116,16 +125,17 @@ const JobPostLarge = ({
             {isUrgent && <UrgentBadge theme={theme} />}
           </Box>
 
-          <Stack flex={1} spacing={0.75}>
-            <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-              <Box flex={1}>
+          <Stack flex={1} sx={{ minWidth: 0 }} spacing={0.75}>
+            <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1}>
+              <Box flex={1} sx={{ minWidth: 0 }}>
                 <Typography
                   sx={{
-                    fontSize: 18,
+                    fontSize: { xs: 15, sm: 16, md: 18 },
                     fontWeight: 700,
                     color: theme.palette.grey[900],
                     lineHeight: 1.3,
                     mb: 0.5,
+                    overflowWrap: 'break-word',
                   }}
                 >
                   {jobName}
@@ -134,8 +144,9 @@ const JobPostLarge = ({
                   variant="h6"
                   sx={{
                     color: theme.palette.primary.main,
-                    fontSize: 14,
+                    fontSize: { xs: 13, sm: 14 },
                     fontWeight: 600,
+                    overflowWrap: 'break-word',
                   }}
                 >
                   {companyName}

@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Box, Stack, Typography, Drawer, IconButton, useTheme, useMediaQuery, Theme } from "@mui/material";
@@ -46,7 +46,7 @@ const ChatPage = () => {
   const isJobSeeker = currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
 
   return (
-    <Grid container sx={{ height: '100vh', bgcolor: 'background.default' }}>
+    <Grid container sx={{ height: '100dvh', minHeight: '100dvh', bgcolor: 'background.default' }}>
       {/* Left Sidebar */}
       {isMobile ? (
         <Drawer
@@ -68,7 +68,7 @@ const ChatPage = () => {
       ) : (
         <Grid
           sx={{
-            height: '100vh',
+            height: '100dvh',
             borderRight: 1,
             borderColor: 'divider',
             display: { xs: 'none', sm: 'block' }
@@ -85,7 +85,7 @@ const ChatPage = () => {
       {/* Main Chat Window */}
       <Grid
         sx={{ 
-          height: '100vh',
+          height: '100dvh',
           bgcolor: '#f8fafc',
         }}
         size={{
@@ -181,7 +181,7 @@ const ChatPage = () => {
       ) : (
         <Grid
           sx={{
-            height: '100vh',
+            height: '100dvh',
             borderLeft: 1,
             borderColor: 'divider',
             display: { xs: 'none', md: 'block' },

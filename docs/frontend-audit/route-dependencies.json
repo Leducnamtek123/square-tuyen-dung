@@ -1,0 +1,4533 @@
+[
+  {
+    "route": "/",
+    "source": "src/app/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 12,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    }
+  },
+  {
+    "route": "/(candidate)/account",
+    "source": "src/app/(candidate)/account/page.tsx",
+    "layout": "src/app/(candidate)/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/(candidate)/dashboard",
+    "source": "src/app/(candidate)/dashboard/page.tsx",
+    "layout": "src/app/(candidate)/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/(candidate)/my-interviews",
+    "source": "src/app/(candidate)/my-interviews/page.tsx",
+    "layout": "src/app/(candidate)/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 9,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/(candidate)/my-jobs",
+    "source": "src/app/(candidate)/my-jobs/page.tsx",
+    "layout": "src/app/(candidate)/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/(candidate)/profile",
+    "source": "src/app/(candidate)/profile/page.tsx",
+    "layout": "src/app/(candidate)/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/about-us",
+    "source": "src/app/about-us/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 12,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    }
+  },
+  {
+    "route": "/admin",
+    "source": "src/app/admin/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 8,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [
+      "tokenService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/agent-assistants",
+    "source": "src/app/admin/agent-assistants/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/articles",
+    "source": "src/app/admin/articles/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/articles/[id]",
+    "source": "src/app/admin/articles/[id]/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 5,
+    "sharedComponents": [
+      "src/components/Common/Controls/SimpleRichEditor/index.tsx",
+      "src/components/Common/Controls/ValidationError/index.tsx",
+      "src/components/Features/AiElements/message.tsx",
+      "src/components/Features/CVDoc/utils.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "admin"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/articles/create",
+    "source": "src/app/admin/articles/create/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 4,
+    "sharedComponents": [
+      "src/components/Common/Controls/SimpleRichEditor/index.tsx",
+      "src/components/Common/Controls/ValidationError/index.tsx",
+      "src/components/Features/AiElements/message.tsx",
+      "src/components/Features/CVDoc/utils.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "admin"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/audit-logs",
+    "source": "src/app/admin/audit-logs/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/banner-types",
+    "source": "src/app/admin/banner-types/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 26,
+    "sharedComponents": [
+      "src/components/Common/AdminDataGrid/index.tsx",
+      "src/components/Common/Controls/ValidationError/index.tsx",
+      "src/components/Common/ExportModal/ExportModal.tsx",
+      "src/components/Common/ExportModal/ExportOptions.tsx",
+      "src/components/Common/ExportModal/ExportSuccess.tsx",
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/JobPost/index.tsx",
+      "src/components/Features/JobPostLarge/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx"
+    ],
+    "services": [
+      "adminManagementService"
+    ],
+    "hooks": [
+      "useCompanies"
+    ],
+    "hasForm": false,
+    "hasTable": true,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/banners",
+    "source": "src/app/admin/banners/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/careers",
+    "source": "src/app/admin/careers/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/chat",
+    "source": "src/app/admin/chat/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 9,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/cities",
+    "source": "src/app/admin/cities/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/companies",
+    "source": "src/app/admin/companies/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/company-verifications",
+    "source": "src/app/admin/company-verifications/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 3,
+    "sharedComponents": [
+      "src/components/Features/Company/index.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/components",
+    "source": "src/app/admin/components/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 4,
+    "sharedComponents": [
+      "src/components/Common/EmptyCard/index.tsx",
+      "src/components/Common/ExportModal/ExportModal.tsx",
+      "src/components/Common/NoDataCard/index.tsx",
+      "src/components/Common/NumberCard/index.tsx",
+      "src/components/Features/AiElements/message.tsx",
+      "src/components/Features/ChatBot/index.tsx",
+      "src/components/Features/JobPost/index.tsx",
+      "src/components/Features/JobPostLarge/index.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/button.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ui/button.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": true,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/contact-messages",
+    "source": "src/app/admin/contact-messages/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/dashboard",
+    "source": "src/app/admin/dashboard/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/districts",
+    "source": "src/app/admin/districts/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/feedbacks",
+    "source": "src/app/admin/feedbacks/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/forgot-password",
+    "source": "src/app/admin/forgot-password/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 10,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/hrm",
+    "source": "src/app/admin/hrm/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/hrm/contracts",
+    "source": "src/app/admin/hrm/contracts/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/hrm/dashboard",
+    "source": "src/app/admin/hrm/dashboard/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/hrm/departments",
+    "source": "src/app/admin/hrm/departments/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/hrm/employees",
+    "source": "src/app/admin/hrm/employees/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/hrm/leaves",
+    "source": "src/app/admin/hrm/leaves/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/hrm/onboarding",
+    "source": "src/app/admin/hrm/onboarding/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/hrm/org-chart",
+    "source": "src/app/admin/hrm/org-chart/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/interview-preview",
+    "source": "src/app/admin/interview-preview/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 6,
+    "sharedComponents": [
+      "src/components/agents-ui/agent-audio-visualizer-aura.tsx",
+      "src/components/Features/AiElements/message.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/agent-audio-visualizer-aura.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/button.tsx",
+      "src/components/ui/button.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "admin"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/interviews",
+    "source": "src/app/admin/interviews/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 9,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/job-activity",
+    "source": "src/app/admin/job-activity/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/job-notifications",
+    "source": "src/app/admin/job-notifications/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/jobs",
+    "source": "src/app/admin/jobs/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/login",
+    "source": "src/app/admin/login/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 10,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/profiles",
+    "source": "src/app/admin/profiles/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/profiles/[id]",
+    "source": "src/app/admin/profiles/[id]/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/question-groups",
+    "source": "src/app/admin/question-groups/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 4,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "employer"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/questions",
+    "source": "src/app/admin/questions/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 4,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "employer"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/reset-password/[token]",
+    "source": "src/app/admin/reset-password/[token]/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 4,
+    "sharedComponents": [
+      "src/components/Features/Company/index.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/resumes",
+    "source": "src/app/admin/resumes/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/settings",
+    "source": "src/app/admin/settings/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/trust-reports",
+    "source": "src/app/admin/trust-reports/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/users",
+    "source": "src/app/admin/users/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/voice-profiles",
+    "source": "src/app/admin/voice-profiles/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 5,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/admin/wards",
+    "source": "src/app/admin/wards/page.tsx",
+    "layout": "src/app/admin/layout.tsx",
+    "category": "admin",
+    "authRequired": true,
+    "role": "ADMIN",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/attached-profile/[slug]",
+    "source": "src/app/attached-profile/[slug]/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/blog",
+    "source": "src/app/blog/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 12,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/blog/[slug]",
+    "source": "src/app/blog/[slug]/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 19,
+    "sharedComponents": [
+      "src/components/Common/HtmlContent/index.tsx",
+      "src/components/Common/NoDataCard/index.tsx",
+      "src/components/Features/AiElements/message.tsx",
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CompanyAction/Loading.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/button.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx",
+      "src/components/ui/button.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [
+      "useSEO",
+      "useStructuredData"
+    ],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/chat",
+    "source": "src/app/chat/page.tsx",
+    "layout": "src/app/chat/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    }
+  },
+  {
+    "route": "/companies",
+    "source": "src/app/companies/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 12,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    }
+  },
+  {
+    "route": "/companies/[slug]",
+    "source": "src/app/companies/[slug]/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 27,
+    "sharedComponents": [
+      "src/components/Common/AdminDataGrid/index.tsx",
+      "src/components/Common/Controls/ValidationError/index.tsx",
+      "src/components/Common/ExportModal/ExportModal.tsx",
+      "src/components/Common/ExportModal/ExportOptions.tsx",
+      "src/components/Common/ExportModal/ExportSuccess.tsx",
+      "src/components/Features/AiElements/message.tsx",
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx",
+      "src/components/Features/JobPostLarge/index.tsx",
+      "src/components/Features/JobSeekerProfile/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/button.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ui/button.tsx"
+    ],
+    "services": [
+      "adminManagementService"
+    ],
+    "hooks": [
+      "useCompanies"
+    ],
+    "hasForm": false,
+    "hasTable": true,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    }
+  },
+  {
+    "route": "/contact",
+    "source": "src/app/contact/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 139,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/email-verification-required",
+    "source": "src/app/email-verification-required/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 11,
+    "sharedComponents": [
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/employer",
+    "source": "src/app/employer/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/account",
+    "source": "src/app/employer/account/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/agent-assistants",
+    "source": "src/app/employer/agent-assistants/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/applied-profiles",
+    "source": "src/app/employer/applied-profiles/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/blog",
+    "source": "src/app/employer/blog/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/blog/[id]",
+    "source": "src/app/employer/blog/[id]/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 5,
+    "sharedComponents": [
+      "src/components/Common/Controls/SimpleRichEditor/index.tsx",
+      "src/components/Features/AiElements/message.tsx",
+      "src/components/Features/CVDoc/utils.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "employer"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/blog/create",
+    "source": "src/app/employer/blog/create/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 4,
+    "sharedComponents": [
+      "src/components/Common/Controls/SimpleRichEditor/index.tsx",
+      "src/components/Features/AiElements/message.tsx",
+      "src/components/Features/CVDoc/utils.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "employer"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/candidates",
+    "source": "src/app/employer/candidates/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/candidates/[slug]",
+    "source": "src/app/employer/candidates/[slug]/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/chat",
+    "source": "src/app/employer/chat/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/company",
+    "source": "src/app/employer/company/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 3,
+    "sharedComponents": [
+      "src/components/Features/Company/index.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/contact",
+    "source": "src/app/employer/contact/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 128,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/dashboard",
+    "source": "src/app/employer/dashboard/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/faq",
+    "source": "src/app/employer/faq/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 128,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/forgot-password",
+    "source": "src/app/employer/forgot-password/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 4,
+    "sharedComponents": [
+      "src/components/Features/Company/index.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/hrm",
+    "source": "src/app/employer/hrm/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/hrm/contracts",
+    "source": "src/app/employer/hrm/contracts/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/hrm/dashboard",
+    "source": "src/app/employer/hrm/dashboard/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/hrm/departments",
+    "source": "src/app/employer/hrm/departments/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/hrm/employees",
+    "source": "src/app/employer/hrm/employees/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/hrm/leaves",
+    "source": "src/app/employer/hrm/leaves/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/hrm/onboarding",
+    "source": "src/app/employer/hrm/onboarding/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/hrm/org-chart",
+    "source": "src/app/employer/hrm/org-chart/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/interviews",
+    "source": "src/app/employer/interviews/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 4,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/interviews/[id]",
+    "source": "src/app/employer/interviews/[id]/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 4,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/interviews/[id]/edit",
+    "source": "src/app/employer/interviews/[id]/edit/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 4,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "employer"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/interviews/create",
+    "source": "src/app/employer/interviews/create/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 4,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "employer"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/interviews/history",
+    "source": "src/app/employer/interviews/history/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 4,
+    "sharedComponents": [
+      "src/components/Common/DataTable/index.tsx",
+      "src/components/Common/FilterBar/index.tsx",
+      "src/components/Common/Loading/BackdropLoading/index.tsx",
+      "src/components/Features/CompanyAction/Loading.tsx",
+      "src/components/Features/CVDoc/utils.tsx"
+    ],
+    "services": [
+      "interviewService"
+    ],
+    "hooks": [
+      "useDebounce"
+    ],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/interviews/live",
+    "source": "src/app/employer/interviews/live/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 4,
+    "sharedComponents": [
+      "src/components/Features/AiElements/message.tsx",
+      "src/components/Features/CompanyAction/Loading.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/toggle.tsx"
+    ],
+    "services": [
+      "interviewService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/interviews/session/[id]",
+    "source": "src/app/employer/interviews/session/[id]/page.tsx",
+    "layout": "src/app/employer/interviews/session/[id]/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 5,
+    "sharedComponents": [
+      "src/components/Common/Map/index.tsx",
+      "src/components/Features/AiElements/message.tsx",
+      "src/components/Features/CompanyAction/Loading.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [
+      "interviewService",
+      "tokenService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/introduce",
+    "source": "src/app/employer/introduce/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/job-posts",
+    "source": "src/app/employer/job-posts/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 3,
+    "sharedComponents": [
+      "src/components/Features/JobPost/index.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/login",
+    "source": "src/app/employer/login/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 4,
+    "sharedComponents": [
+      "src/components/Features/Company/index.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/notifications",
+    "source": "src/app/employer/notifications/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/pricing",
+    "source": "src/app/employer/pricing/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/privacy-policy",
+    "source": "src/app/employer/privacy-policy/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 130,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/question-bank",
+    "source": "src/app/employer/question-bank/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 4,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "employer"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/question-groups",
+    "source": "src/app/employer/question-groups/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 4,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "employer"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/register",
+    "source": "src/app/employer/register/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 4,
+    "sharedComponents": [
+      "src/components/Features/Company/index.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/reset-password/[token]",
+    "source": "src/app/employer/reset-password/[token]/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 4,
+    "sharedComponents": [
+      "src/components/Features/Company/index.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/saved-profiles",
+    "source": "src/app/employer/saved-profiles/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 131,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/service",
+    "source": "src/app/employer/service/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/settings",
+    "source": "src/app/employer/settings/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 7,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/support",
+    "source": "src/app/employer/support/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/terms-of-service",
+    "source": "src/app/employer/terms-of-service/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 130,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/employer/verification",
+    "source": "src/app/employer/verification/page.tsx",
+    "layout": "src/app/employer/layout.tsx",
+    "category": "employer",
+    "authRequired": true,
+    "role": "EMPLOYER",
+    "componentsCount": 3,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/faq",
+    "source": "src/app/faq/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 135,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/forbidden",
+    "source": "src/app/forbidden/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 4,
+    "sharedComponents": [
+      "src/components/Features/AiElements/message.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/forgot-password",
+    "source": "src/app/forgot-password/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 11,
+    "sharedComponents": [
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/gioi-thieu",
+    "source": "src/app/gioi-thieu/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 12,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/interview/[id]",
+    "source": "src/app/interview/[id]/page.tsx",
+    "layout": "src/app/interview/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 133,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/interview/login",
+    "source": "src/app/interview/login/page.tsx",
+    "layout": "src/app/interview/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 10,
+    "sharedComponents": [
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/jobs",
+    "source": "src/app/jobs/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 12,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-006": "not_applicable"
+    }
+  },
+  {
+    "route": "/jobs-by-career",
+    "source": "src/app/jobs-by-career/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 8,
+    "sharedComponents": [
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-006": "not_applicable"
+    }
+  },
+  {
+    "route": "/jobs-by-city",
+    "source": "src/app/jobs-by-city/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 8,
+    "sharedComponents": [
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-006": "not_applicable"
+    }
+  },
+  {
+    "route": "/jobs-by-type",
+    "source": "src/app/jobs-by-type/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 8,
+    "sharedComponents": [
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-006": "not_applicable"
+    }
+  },
+  {
+    "route": "/jobs/[slug]",
+    "source": "src/app/jobs/[slug]/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 27,
+    "sharedComponents": [
+      "src/components/Common/AdminDataGrid/index.tsx",
+      "src/components/Common/Controls/ValidationError/index.tsx",
+      "src/components/Common/ExportModal/ExportModal.tsx",
+      "src/components/Common/ExportModal/ExportOptions.tsx",
+      "src/components/Common/ExportModal/ExportSuccess.tsx",
+      "src/components/Features/AiElements/message.tsx",
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx",
+      "src/components/Features/JobPostLarge/index.tsx",
+      "src/components/Features/JobSeekerProfile/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/button.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ui/button.tsx"
+    ],
+    "services": [
+      "adminManagementService"
+    ],
+    "hooks": [
+      "useCompanies"
+    ],
+    "hasForm": false,
+    "hasTable": true,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-006": "not_applicable"
+    }
+  },
+  {
+    "route": "/lien-he",
+    "source": "src/app/lien-he/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 139,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/login",
+    "source": "src/app/login/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 11,
+    "sharedComponents": [
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/my-company",
+    "source": "src/app/my-company/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 10,
+    "sharedComponents": [
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/onboarding/candidate",
+    "source": "src/app/onboarding/candidate/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "onboarding",
+    "authRequired": true,
+    "role": "USER",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/onboarding/employer",
+    "source": "src/app/onboarding/employer/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "onboarding",
+    "authRequired": true,
+    "role": "USER",
+    "componentsCount": 1,
+    "sharedComponents": [],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  },
+  {
+    "route": "/online-profile/[slug]",
+    "source": "src/app/online-profile/[slug]/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 10,
+    "sharedComponents": [
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/privacy-policy",
+    "source": "src/app/privacy-policy/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 135,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/register",
+    "source": "src/app/register/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 11,
+    "sharedComponents": [
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/reset-password/[token]",
+    "source": "src/app/reset-password/[token]/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 11,
+    "sharedComponents": [
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/terms-of-service",
+    "source": "src/app/terms-of-service/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 135,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/tin-tuc",
+    "source": "src/app/tin-tuc/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 12,
+    "sharedComponents": [
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx"
+    ],
+    "services": [],
+    "hooks": [],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "passed",
+      "runtime": "passed",
+      "responsive": "passed",
+      "ux": "passed",
+      "a11y": "passed",
+      "performance": "passed",
+      "api": "passed",
+      "i18n": "passed",
+      "verified": true
+    },
+    "systemicDependencies": {
+      "FE-SYS-001": "open",
+      "FE-SYS-003": "open",
+      "FE-SYS-005": "open"
+    }
+  },
+  {
+    "route": "/tin-tuc/[slug]",
+    "source": "src/app/tin-tuc/[slug]/page.tsx",
+    "layout": "src/app/layout.tsx",
+    "category": "public",
+    "authRequired": false,
+    "role": "guest",
+    "componentsCount": 19,
+    "sharedComponents": [
+      "src/components/Common/HtmlContent/index.tsx",
+      "src/components/Common/NoDataCard/index.tsx",
+      "src/components/Features/AiElements/message.tsx",
+      "src/components/Features/Companies/index.tsx",
+      "src/components/Features/Company/index.tsx",
+      "src/components/Features/CompanyAction/Loading.tsx",
+      "src/components/Features/CVDoc/utils.tsx",
+      "src/components/Features/Feedback/index.tsx",
+      "src/components/Features/JobPost/index.tsx",
+      "src/components/Features/VoiceAssistant/components/app/app.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/button.tsx",
+      "src/components/Features/VoiceAssistant/components/livekit/select.tsx",
+      "src/components/ThemeRegistry/ThemeRegistry.tsx",
+      "src/components/ui/button.tsx"
+    ],
+    "services": [
+      "contentService"
+    ],
+    "hooks": [
+      "useSEO",
+      "useStructuredData"
+    ],
+    "hasForm": false,
+    "hasTable": false,
+    "hasDialog": false,
+    "hasDrawer": false,
+    "i18nNamespaces": [
+      "common"
+    ],
+    "auditState": {
+      "static": "pending",
+      "runtime": "pending",
+      "responsive": "pending",
+      "ux": "pending",
+      "a11y": "pending",
+      "performance": "pending",
+      "api": "pending",
+      "i18n": "pending",
+      "verified": false
+    }
+  }
+]

@@ -116,7 +116,7 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
   return (
 
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box sx={{ display: 'flex', minHeight: '100dvh', bgcolor: 'background.default' }}>
 
       <CssBaseline />
 
@@ -254,7 +254,7 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
-          minHeight: '100vh',
+          minHeight: '100dvh',
           p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
         }}

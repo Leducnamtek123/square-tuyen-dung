@@ -114,7 +114,7 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
   }
 
   return (
-    <Box sx={{ backgroundColor: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ backgroundColor: '#f8fafc', minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
       {/* Persistent Header */}
       <Header />
 

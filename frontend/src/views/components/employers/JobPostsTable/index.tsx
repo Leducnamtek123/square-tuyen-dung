@@ -112,12 +112,7 @@ const JobPostsTable = ({
           );
         }
 
-        const avatars = rawAvatars.length > 0 ? rawAvatars : [
-          { name: 'Ứng viên 1', initial: 'A', avatarUrl: 'https://ui-avatars.com/api/?name=AI+Candidate+1&background=0D8ABC&color=fff&bold=true&rounded=true' },
-          { name: 'Ứng viên 2', initial: 'B', avatarUrl: 'https://ui-avatars.com/api/?name=AI+Candidate+2&background=059669&color=fff&bold=true&rounded=true' },
-          { name: 'Ứng viên 3', initial: 'C', avatarUrl: 'https://ui-avatars.com/api/?name=AI+Candidate+3&background=d97706&color=fff&bold=true&rounded=true' },
-        ];
-
+        const avatars = rawAvatars;
         const remainingCount = Math.max(0, totalCount - avatars.length);
 
         return (
@@ -140,48 +135,67 @@ const JobPostsTable = ({
                 },
               }}
             >
-              <Stack
-                className="avatar-stack"
-                direction="row"
-                alignItems="center"
-                spacing={-0.85}
-                sx={{ mb: 0.5, transition: 'transform 0.2s' }}
-              >
-                {avatars.slice(0, 3).map((item, idx) => (
-                  <Avatar
-                    key={idx}
-                    src={item.avatarUrl || undefined}
-                    alt={item.name}
-                    sx={{
-                      width: 26,
-                      height: 26,
-                      fontSize: '0.7rem',
-                      fontWeight: 700,
-                      border: '2px solid #ffffff',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-                    }}
-                  >
-                    {item.initial || 'U'}
-                  </Avatar>
-                ))}
+              {avatars.length > 0 ? (
+                <Stack
+                  className="avatar-stack"
+                  direction="row"
+                  alignItems="center"
+                  spacing={-0.85}
+                  sx={{ mb: 0.5, transition: 'transform 0.2s' }}
+                >
+                  {avatars.slice(0, 3).map((item, idx) => (
+                    <Avatar
+                      key={idx}
+                      src={item.avatarUrl || undefined}
+                      alt={item.name}
+                      sx={{
+                        width: 26,
+                        height: 26,
+                        fontSize: '0.7rem',
+                        fontWeight: 700,
+                        border: '2px solid #ffffff',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+                      }}
+                    >
+                      {item.initial || 'U'}
+                    </Avatar>
+                  ))}
 
-                {remainingCount > 0 && (
-                  <Avatar
-                    sx={{
-                      width: 26,
-                      height: 26,
-                      fontSize: '0.65rem',
-                      fontWeight: 800,
-                      color: '#ffffff',
-                      bgcolor: '#64748b',
-                      border: '2px solid #ffffff',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-                    }}
-                  >
-                    +{remainingCount}
-                  </Avatar>
-                )}
-              </Stack>
+                  {remainingCount > 0 && (
+                    <Avatar
+                      sx={{
+                        width: 26,
+                        height: 26,
+                        fontSize: '0.65rem',
+                        fontWeight: 800,
+                        color: '#ffffff',
+                        bgcolor: '#64748b',
+                        border: '2px solid #ffffff',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+                      }}
+                    >
+                      +{remainingCount}
+                    </Avatar>
+                  )}
+                </Stack>
+              ) : (
+                <Chip
+                  icon={<AutoAwesomeIcon sx={{ fontSize: '14px !important', color: '#2563EB' }} />}
+                  label={`${totalCount} gợi ý`}
+                  size="small"
+                  sx={{
+                    mb: 0.5,
+                    height: 24,
+                    fontSize: '0.725rem',
+                    fontWeight: 800,
+                    bgcolor: pc.primary(0.08),
+                    color: 'primary.main',
+                    border: '1px solid',
+                    borderColor: pc.primary(0.2),
+                    cursor: 'pointer',
+                  }}
+                />
+              )}
 
               <Typography
                 className="view-list-link"

@@ -1,0 +1,145 @@
+{
+  "routes": [
+    {
+      "route": "/(candidate)/dashboard",
+      "operations": [
+        {
+          "name": "Get Applied Jobs Count",
+          "component": "DashboardPage",
+          "hook": "useQuery(['dashboardAppliedJobsCount'])",
+          "service": "jobPostActivityService.getJobPostActivity",
+          "endpoint": "/api/v1/job-post-activities/",
+          "method": "GET",
+          "cache": "staleTime: 60s"
+        },
+        {
+          "name": "Get Saved Jobs Count",
+          "component": "DashboardPage",
+          "hook": "useSavedJobs",
+          "service": "jobPostActivityService.getSavedJobs",
+          "endpoint": "/api/v1/job-post-saved/",
+          "method": "GET",
+          "cache": "React Query cache"
+        },
+        {
+          "name": "Get Followed Companies Count",
+          "component": "DashboardPage",
+          "hook": "useCompaniesFollowed",
+          "service": "companyService.getCompaniesFollowed",
+          "endpoint": "/api/v1/companies/followed/",
+          "method": "GET",
+          "cache": "React Query cache"
+        },
+        {
+          "name": "Get Resume Views Count",
+          "component": "DashboardPage",
+          "hook": "useResumeViewed",
+          "service": "resumeService.getResumeViewed",
+          "endpoint": "/api/v1/resumes/viewed/",
+          "method": "GET",
+          "cache": "React Query cache"
+        }
+      ]
+    },
+    {
+      "route": "/(candidate)/profile",
+      "operations": [
+        {
+          "name": "Get Candidate Profile",
+          "component": "ProfilePage",
+          "service": "jobSeekerProfileService.getProfile",
+          "endpoint": "/api/v1/job-seekers/profile/",
+          "method": "GET"
+        },
+        {
+          "name": "Update Candidate Profile",
+          "component": "CandidateEditProfileModal",
+          "service": "jobSeekerProfileService.updateProfile",
+          "endpoint": "/api/v1/job-seekers/profile/",
+          "method": "PATCH"
+        },
+        {
+          "name": "Upload Avatar",
+          "component": "CandidateProfileHeroBanner",
+          "service": "authService.updateAvatar",
+          "endpoint": "/api/v1/auth/avatar/",
+          "method": "POST"
+        },
+        {
+          "name": "Get Resumes",
+          "component": "ProfilePage",
+          "hook": "useResumes",
+          "service": "resumeService.getResumes",
+          "endpoint": "/api/v1/resumes/",
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "route": "/(candidate)/account",
+      "operations": [
+        {
+          "name": "Update User Account",
+          "component": "AccountPage",
+          "service": "authService.updateUser",
+          "endpoint": "/api/v1/auth/user/",
+          "method": "PATCH"
+        },
+        {
+          "name": "Change Password",
+          "component": "AccountPage",
+          "service": "authService.changePassword",
+          "endpoint": "/api/v1/auth/change-password/",
+          "method": "POST"
+        },
+        {
+          "name": "Update Phone",
+          "component": "AccountPage",
+          "service": "jobSeekerProfileService.updateProfile",
+          "endpoint": "/api/v1/job-seekers/profile/",
+          "method": "PATCH"
+        }
+      ]
+    },
+    {
+      "route": "/(candidate)/my-jobs",
+      "operations": [
+        {
+          "name": "Get Saved Jobs List",
+          "component": "SavedJobCard",
+          "service": "jobPostActivityService.getSavedJobs",
+          "endpoint": "/api/v1/job-post-saved/",
+          "method": "GET"
+        },
+        {
+          "name": "Get Applied Jobs List",
+          "component": "AppliedJobCard",
+          "service": "jobPostActivityService.getJobPostActivity",
+          "endpoint": "/api/v1/job-post-activities/",
+          "method": "GET"
+        },
+        {
+          "name": "Get Job Notifications",
+          "component": "JobPostNotificationCard",
+          "service": "jobPostNotificationService.getJobPostNotifications",
+          "endpoint": "/api/v1/job-post-notifications/",
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "route": "/(candidate)/my-interviews",
+      "operations": [
+        {
+          "name": "Get My Interviews",
+          "component": "MyInterviewsPage",
+          "hook": "useMyInterviews",
+          "service": "interviewService.getMyInterviews",
+          "endpoint": "/api/v1/interviews/my-interviews/",
+          "method": "GET",
+          "transform": "transformInterviewSession"
+        }
+      ]
+    }
+  ]
+}

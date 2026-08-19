@@ -1,9 +1,10 @@
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import StaticInfoPage from '@/views/defaultPages/StaticInfoPage';
 
-export const metadata = {
-  title: 'Employer FAQ',
-  description: 'Employer frequently asked questions.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.faq');
+}
 
 export default function Page() {
   return <StaticInfoPage pageKey="faq" />;

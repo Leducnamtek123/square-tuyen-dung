@@ -1,9 +1,10 @@
-﻿import JobPostPage from '@/views/employerPages/JobPostPage';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
+import JobPostPage from '@/views/employerPages/JobPostPage';
 
-export const metadata = {
-  title: 'Quản lý tin tuyển dụng',
-  description: 'Browse Employer Job Posts.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.job-posts');
+}
 
 export default function Page() {
   return <JobPostPage />;

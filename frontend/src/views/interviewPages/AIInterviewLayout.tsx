@@ -91,14 +91,14 @@ function CustomControlBar({
   const [ending, setEnding] = useState(false);
 
   return (
-    <div className="flex items-center justify-center px-4 py-4">
-      <div className="flex items-center justify-center gap-3 rounded-full border border-white/15 bg-slate-950/80 px-4 py-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-2xl ring-1 ring-white/10">
+    <div className="flex items-center justify-center px-4 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="flex items-center justify-center gap-3 rounded-full border border-slate-200/90 bg-white/95 px-4 py-2.5 shadow-[0_15px_35px_-5px_rgba(15,23,42,0.1)] backdrop-blur-2xl ring-1 ring-slate-900/5">
         <button
           type="button"
           aria-label={isMicrophoneEnabled ? t('controls.muteMicrophone') : t('controls.unmuteMicrophone')}
           onClick={() => localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)}
           className={`flex size-11 items-center justify-center rounded-full border transition-all duration-150 active:scale-95
-            ${isMicrophoneEnabled ? 'border-white/15 bg-white/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.08)] hover:bg-white/20' : 'border-rose-400/50 bg-rose-500/25 text-rose-200 shadow-[0_0_15px_rgba(244,63,94,0.2)]'}`}
+            ${isMicrophoneEnabled ? 'border-slate-200 bg-slate-100/90 text-slate-700 hover:bg-slate-200 shadow-sm' : 'border-rose-200 bg-rose-50 text-rose-600 shadow-[0_0_15px_rgba(244,63,94,0.15)]'}`}
         >
           <FontAwesomeIcon icon={isMicrophoneEnabled ? faMicrophone : faMicrophoneSlash} />
         </button>
@@ -107,7 +107,7 @@ function CustomControlBar({
           aria-label={isCameraEnabled ? t('controls.turnCameraOff') : t('controls.turnCameraOn')}
           onClick={() => localParticipant.setCameraEnabled(!isCameraEnabled)}
           className={`flex size-11 items-center justify-center rounded-full border transition-all duration-150 active:scale-95
-            ${isCameraEnabled ? 'border-white/15 bg-white/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.08)] hover:bg-white/20' : 'border-rose-400/50 bg-rose-500/25 text-rose-200 shadow-[0_0_15px_rgba(244,63,94,0.2)]'}`}
+            ${isCameraEnabled ? 'border-slate-200 bg-slate-100/90 text-slate-700 hover:bg-slate-200 shadow-sm' : 'border-rose-200 bg-rose-50 text-rose-600 shadow-[0_0_15px_rgba(244,63,94,0.15)]'}`}
         >
           <FontAwesomeIcon icon={isCameraEnabled ? faVideo : faVideoSlash} />
         </button>
@@ -116,7 +116,7 @@ function CustomControlBar({
           aria-label={isScreenShareEnabled ? t('controls.stopScreenShare') : t('controls.startScreenShare')}
           onClick={() => localParticipant.setScreenShareEnabled(!isScreenShareEnabled)}
           className={`flex size-11 items-center justify-center rounded-full border transition-all duration-150 active:scale-95
-            ${isScreenShareEnabled ? 'border-cyan-400/50 bg-cyan-500/25 text-cyan-200 shadow-[0_0_15px_rgba(6,182,212,0.2)]' : 'border-white/15 bg-white/10 text-white hover:bg-white/20'}`}
+            ${isScreenShareEnabled ? 'border-sky-300 bg-sky-50 text-sky-700 shadow-[0_0_15px_rgba(14,165,233,0.2)]' : 'border-slate-200 bg-slate-100/90 text-slate-700 hover:bg-slate-200'}`}
         >
           <FontAwesomeIcon icon={faDesktop} />
         </button>
@@ -125,11 +125,11 @@ function CustomControlBar({
           aria-label={chatOpen ? t('liveRoom.chat.close') : t('liveRoom.chat.open')}
           onClick={() => setChatOpen(!chatOpen)}
           className={`flex size-11 items-center justify-center rounded-full border transition-all duration-150 active:scale-95
-            ${chatOpen ? 'border-cyan-400/50 bg-cyan-500/25 text-cyan-200 shadow-[0_0_15px_rgba(6,182,212,0.2)]' : 'border-white/15 bg-white/10 text-white hover:bg-white/20'}`}
+            ${chatOpen ? 'border-sky-300 bg-sky-50 text-sky-700 shadow-[0_0_15px_rgba(14,165,233,0.2)]' : 'border-slate-200 bg-slate-100/90 text-slate-700 hover:bg-slate-200'}`}
         >
           <FontAwesomeIcon icon={faComment} />
         </button>
-        <div className="mx-1.5 h-6 w-px bg-white/15" />
+        <div className="mx-1.5 h-6 w-px bg-slate-200" />
         <button
           type="button"
           onClick={async () => {
@@ -144,8 +144,8 @@ function CustomControlBar({
             }
           }}
           disabled={ending}
-          className={`flex h-11 items-center gap-2 rounded-full border border-rose-400/50 bg-rose-500/25 px-5 text-sm font-bold text-rose-200 shadow-[0_0_20px_rgba(244,63,94,0.25)] transition-all duration-150 active:scale-95 ${
-            ending ? 'cursor-wait opacity-70' : 'hover:bg-rose-500/35'
+          className={`flex h-11 items-center gap-2 rounded-full border border-rose-200 bg-rose-500 hover:bg-rose-600 px-5 text-sm font-bold text-white shadow-[0_4px_15px_rgba(244,63,94,0.3)] transition-all duration-150 active:scale-95 ${
+            ending ? 'cursor-wait opacity-70' : ''
           }`}
         >
           <FontAwesomeIcon icon={ending ? faSpinner : faPhoneSlash} className={ending ? 'animate-spin' : undefined} />
@@ -206,29 +206,29 @@ function AIParticipantTile({
   if (isAgent || shouldRenderSyntheticAgent) {
     return (
       <div
-        className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-white/8 bg-[#0f172a] shadow-[0_0_0_2px_rgba(14,165,233,0)] transition-all data-[speaking=true]:border-cyan-400/60 data-[speaking=true]:shadow-[0_0_0_2px_rgba(14,165,233,0.3)]"
+        className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition-all data-[speaking=true]:border-sky-400 data-[speaking=true]:shadow-[0_0_0_2px_rgba(14,165,233,0.25)]"
         data-speaking={isSpeaking}
       >
-        <div className="absolute inset-0 bg-zinc-950" />
+        <div className="absolute inset-0 bg-gradient-to-b from-sky-50/50 via-white to-slate-50" />
         <div className="relative z-10 flex h-full w-full items-center justify-center">
           <AgentAudioVisualizerAura
             audioTrack={audioTrack ?? trackRef}
             state={visualizerState}
             size="lg"
-            color="#1FD5F9"
-            className="size-[224px]"
+            color="#0ea5e9"
+            className="size-[140px] sm:size-[180px] md:size-[224px]"
           />
         </div>
-        <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
+        <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-slate-900/60 to-transparent px-3 py-2.5">
           <div className="flex flex-col gap-0.5">
             <div className="flex items-center gap-1.5">
-              <span className="rounded bg-sky-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-sky-300">
+              <span className="rounded bg-sky-500 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white shadow-sm">
                 AI
               </span>
               <span className="text-xs font-semibold text-white">{displayName}</span>
-              {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
+              {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-sky-300" />}
             </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-zinc-300/90">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-200">
               {t(visualizerState === 'speaking' ? 'aiSpeaking' : visualizerState === 'listening' ? 'aiListening' : 'agentView.ready')}
             </span>
           </div>
@@ -237,32 +237,34 @@ function AIParticipantTile({
     );
   }
 
-  if (!trackRef?.publication) {
+  const isMuted = !trackRef?.publication || trackRef.publication.isMuted || !trackRef.publication.track;
+
+  if (isMuted) {
     return (
       <div
-        className={`relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border bg-[#0f172a] transition-all ${isSpeaking ? 'border-cyan-400/60 shadow-[0_0_0_2px_rgba(14,165,233,0.3)]' : 'border-white/8'}`}
+        className={`relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition-all ${isSpeaking ? 'border-sky-400 shadow-[0_0_0_2px_rgba(14,165,233,0.25)]' : ''}`}
         data-speaking={isSpeaking}
       >
-        <div className={`absolute inset-0 ${isSelf ? 'bg-gradient-to-br from-zinc-800 to-zinc-900' : 'bg-gradient-to-br from-cyan-950 to-zinc-900'} z-0`} />
+        <div className={`absolute inset-0 ${isSelf ? 'bg-gradient-to-br from-slate-100 via-slate-50 to-sky-50/40' : 'bg-gradient-to-br from-sky-50/60 via-slate-50 to-slate-100'} z-0`} />
         <div className="relative z-10 flex h-full w-full items-center justify-center">
-          <div className="flex size-28 items-center justify-center rounded-full border border-white/10 bg-white/10 text-5xl text-white/45 shadow-2xl shadow-black/30">
-            {isAgent ? 'AI' : <FontAwesomeIcon icon={faUser} className="text-3xl" />}
+          <div className="flex size-24 items-center justify-center rounded-full border border-slate-200 bg-white text-4xl text-slate-400 shadow-md">
+            {isAgent ? 'AI' : <FontAwesomeIcon icon={faUser} className="text-2xl text-slate-400" />}
           </div>
         </div>
-        <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-slate-900/60 to-transparent px-3 py-2.5">
           <div className="flex items-center gap-1.5">
             {isSelf && (
-              <span className="rounded bg-cyan-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-cyan-300">
+              <span className="rounded bg-sky-500 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white shadow-sm">
                 {t('liveRoom.chips.you')}
               </span>
             )}
             {variant === 'candidate' && !isSelf && !isEmployer && (
-              <span className="rounded bg-zinc-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-zinc-200">
+              <span className="rounded bg-slate-700 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white">
                 {candidateLabel}
               </span>
             )}
             <span className="text-xs font-semibold text-white">{displayName}</span>
-            {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
+            {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-sky-300" />}
           </div>
         </div>
       </div>
@@ -271,27 +273,26 @@ function AIParticipantTile({
 
   return (
     <div
-      className={`relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border bg-[#0f172a] transition-all ${isSpeaking ? 'border-cyan-400/60 shadow-[0_0_0_2px_rgba(14,165,233,0.3)]' : 'border-white/8'}`}
+      className={`relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-slate-200/90 bg-slate-950 shadow-sm transition-all ${isSpeaking ? 'border-sky-400 shadow-[0_0_0_2px_rgba(14,165,233,0.25)]' : ''}`}
       data-speaking={isSpeaking}
     >
-      <div className={`absolute inset-0 ${isSelf ? 'bg-gradient-to-br from-zinc-800 to-zinc-900' : 'bg-gradient-to-br from-cyan-950 to-zinc-900'} z-0`} />
       <div className="relative z-10 h-full w-full overflow-hidden rounded-2xl">
         <VideoTrack trackRef={trackRef as any} className={`h-full w-full object-cover ${isSelf ? 'scale-x-[-1]' : ''}`} />
       </div>
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-slate-900/60 to-transparent px-3 py-2.5">
         <div className="flex items-center gap-1.5">
           {isSelf && (
-            <span className="rounded bg-cyan-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-cyan-300">
+            <span className="rounded bg-sky-500 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white shadow-sm">
               {t('liveRoom.chips.you')}
             </span>
           )}
           {variant === 'candidate' && !isSelf && !isEmployer && (
-            <span className="rounded bg-zinc-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-zinc-200">
+            <span className="rounded bg-slate-700 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white">
               {candidateLabel}
             </span>
           )}
           <span className="text-xs font-semibold text-white">{displayName}</span>
-          {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
+          {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-sky-300" />}
         </div>
       </div>
     </div>
@@ -418,28 +419,28 @@ function TimelineMessage({
           borderRadius: 3,
           border: '1px solid',
           borderColor: isTranscript
-            ? alpha('#22c55e', 0.16)
+            ? '#bbf7d0'
             : isAgent
-              ? alpha('#0ea5e9', 0.16)
+              ? '#bae6fd'
               : isLocal
-                ? alpha('#0ea5e9', 0.16)
-                : alpha('#334155', 0.5),
+                ? '#bae6fd'
+                : '#e2e8f0',
           bgcolor: isTranscript
-            ? alpha('#0f172a', 0.82)
+            ? '#f0fdf4'
             : isAgent
-              ? alpha('#0ea5e9', 0.08)
+              ? '#f0f9ff'
               : isLocal
-                ? alpha('#0ea5e9', 0.08)
-                : alpha('#020617', 0.7),
-          color: '#fff',
-          boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
+                ? '#f0f9ff'
+                : '#ffffff',
+          color: '#0f172a',
+          boxShadow: '0 2px 8px rgba(15,23,42,0.04)',
           lineHeight: 1.8,
           fontWeight: 600,
           whiteSpace: 'pre-wrap',
           wordBreak: 'break-word',
         }}
       >
-        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.92)', fontWeight: 600, whiteSpace: 'pre-wrap' }}>
+        <Typography variant="body2" sx={{ color: '#0f172a', fontWeight: 600, whiteSpace: 'pre-wrap' }}>
           {sanitizeInterviewText(entry.message)}
         </Typography>
       </Paper>
@@ -503,25 +504,25 @@ function ChatPanel({
 
   return (
     <div
-      className={`absolute z-30 flex w-full flex-col overflow-hidden border-white/8 bg-[#0b1120] shadow-[-10px_0_30px_rgba(0,0,0,0.5)] sm:left-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-[352px] md:w-[380px] ${
+      className={`absolute z-30 flex w-full flex-col overflow-hidden border-slate-200/90 bg-white shadow-[-10px_0_30px_rgba(15,23,42,0.06)] sm:left-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-[352px] md:w-[380px] ${
         isCompactChatView
-          ? 'inset-x-0 bottom-0 h-[58dvh] rounded-t-[32px] border-t border-l-0 shadow-[0_-18px_48px_rgba(0,0,0,0.6)]'
+          ? 'inset-x-0 bottom-0 h-[58dvh] rounded-t-[32px] border-t border-l-0 shadow-[0_-18px_48px_rgba(15,23,42,0.12)]'
           : 'inset-0 h-full border-l'
       }`}
     >
-      {isCompactChatView && <div className="flex justify-center border-b border-white/8 px-4 pt-3"><div className="h-1.5 w-14 rounded-full bg-white/15" /></div>}
-      <div className="shrink-0 border-b border-white/8 bg-[#0b1120]/96 px-4 py-3 backdrop-blur-xl">
+      {isCompactChatView && <div className="flex justify-center border-b border-slate-200 px-4 pt-3"><div className="h-1.5 w-14 rounded-full bg-slate-200" /></div>}
+      <div className="shrink-0 border-b border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur-xl">
         <div className="flex items-start justify-between gap-3">
           <div className={isCompactChatView ? 'min-w-0 max-w-[168px]' : 'min-w-0'}>
-            <p className={`text-sm font-bold text-white ${isCompactChatView ? 'truncate' : ''}`}>{t('liveRoom.chat.title')}</p>
-            <p className={`mt-0.5 text-xs text-zinc-500 ${isCompactChatView ? 'hidden' : ''}`}>{t('liveRoom.chat.subtitle')}</p>
+            <p className={`text-sm font-bold text-slate-900 ${isCompactChatView ? 'truncate' : ''}`}>{t('liveRoom.chat.title')}</p>
+            <p className={`mt-0.5 text-xs text-slate-500 ${isCompactChatView ? 'hidden' : ''}`}>{t('liveRoom.chat.subtitle')}</p>
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:hidden">
             <button
               type="button"
               aria-label={t('liveRoom.chat.close')}
               onClick={onCloseChat}
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 text-xs font-bold text-white transition-colors hover:bg-white/10"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-slate-200 bg-slate-100 px-3 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-200"
             >
               <FontAwesomeIcon icon={faXmark} className="text-[11px]" />
               <span>{t('liveRoom.chat.close')}</span>
@@ -536,18 +537,18 @@ function ChatPanel({
                 label={t('liveRoom.chat.messagesCount', { count: messages.length })}
                 size="small"
                 sx={{
-                  fontWeight: 900,
-                  bgcolor: alpha('#0ea5e9', 0.16),
-                  color: '#7dd3fc',
+                  fontWeight: 800,
+                  bgcolor: '#e0f2fe',
+                  color: '#0284c7',
                   border: '1px solid',
-                  borderColor: alpha('#0ea5e9', 0.28),
+                  borderColor: '#bae6fd',
                 }}
               />
             </Stack>
           )}
         </div>
       </div>
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className="min-h-0 flex-1 overflow-hidden bg-slate-50/50">
         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <Box
             ref={scrollRef}
@@ -557,7 +558,7 @@ function ChatPanel({
               overflowY: 'auto',
               p: 2,
               '&::-webkit-scrollbar': { width: 6 },
-              '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.12)', borderRadius: 3 },
+              '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0,0,0,0.12)', borderRadius: 3 },
             }}
           >
             {messages.length > 0 ? (
@@ -569,10 +570,10 @@ function ChatPanel({
             ) : (
               <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', textAlign: 'center', px: 2 }}>
                 <Stack spacing={1}>
-                  <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 900 }}>
+                  <Typography variant="subtitle2" sx={{ color: '#0f172a', fontWeight: 800 }}>
                     {t('liveRoom.chat.noMessages')}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  <Typography variant="caption" sx={{ color: '#64748b' }}>
                     {t('liveRoom.chat.noMessagesDesc')}
                   </Typography>
                 </Stack>
@@ -589,8 +590,8 @@ function ChatPanel({
             }}
             sx={{
               p: 1.5,
-              borderTop: '1px solid rgba(255,255,255,0.06)',
-              bgcolor: 'rgba(2, 6, 23, 0.9)',
+              borderTop: '1px solid #e2e8f0',
+              bgcolor: '#ffffff',
               backdropFilter: 'blur(12px)',
             }}
           >

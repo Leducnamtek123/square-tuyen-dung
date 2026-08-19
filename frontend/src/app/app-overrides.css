@@ -124,6 +124,13 @@
   margin-top: 8px !important;
 }
 
+@media (max-width: 380px) {
+  .saas-swal-actions {
+    flex-direction: column-reverse !important;
+    gap: 8px !important;
+  }
+}
+
 /* Cancel Button: [ Hủy ] */
 .saas-swal-cancel-btn {
   flex: 1 !important;

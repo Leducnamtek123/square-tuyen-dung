@@ -68,8 +68,8 @@ const StatItem = ({ title, value, suffix, color, Icon, loading, trend, sparkPath
     <Paper
       elevation={0}
       sx={{
-        p: 3,
-        borderRadius: '24px',
+        p: { xs: 2, sm: 3 },
+        borderRadius: { xs: '18px', sm: '24px' },
         border: '1px solid rgba(226, 232, 240, 0.8)',
         bgcolor: '#ffffff',
         boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.04), 0 1px 3px 0 rgba(15, 23, 42, 0.02)',
@@ -90,28 +90,28 @@ const StatItem = ({ title, value, suffix, color, Icon, loading, trend, sparkPath
         },
       }}
     >
-      <Stack spacing={2}>
-        <Stack direction="row" spacing={1.5} alignItems="center">
+      <Stack spacing={{ xs: 1.5, sm: 2 }}>
+        <Stack direction="row" spacing={1.25} alignItems="center">
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 44,
-              height: 44,
-              borderRadius: '14px',
+              width: { xs: 36, sm: 44 },
+              height: { xs: 36, sm: 44 },
+              borderRadius: { xs: '10px', sm: '14px' },
               bgcolor: alpha(color, 0.12),
               color: color,
               flexShrink: 0,
             }}
           >
-            <Icon sx={{ fontSize: 24 }} />
+            <Icon sx={{ fontSize: { xs: 20, sm: 24 } }} />
           </Box>
           <Typography
             sx={{
               fontWeight: 600,
               color: '#64748B',
-              fontSize: '0.875rem',
+              fontSize: { xs: '0.78rem', sm: '0.875rem' },
               lineHeight: 1.3,
             }}
           >
@@ -245,9 +245,9 @@ const EmployerQuantityStatistics = () => {
   ];
 
   return (
-    <Grid container spacing={3}>
+    <Grid container spacing={{ xs: 1.5, sm: 2.5, md: 3 }}>
       {statItems.map((item) => (
-        <Grid key={item.title} size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
+        <Grid key={item.title} size={{ xs: 6, sm: 6, md: 6, lg: 3 }}>
           <StatItem
             title={item.title}
             value={item.value}

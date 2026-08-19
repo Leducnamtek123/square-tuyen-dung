@@ -1419,5 +1419,30 @@
       "companyNameRequired": "Company Name Required",
       "recruiterNameRequired": "Recruiter Name Required"
     }
+  },
+  "agentAssistant": {
+    "initError": "Failed to initialize AI Assistant. Please try again.",
+    "createThreadError": "Failed to create a new chat session.",
+    "deleteThreadError": "Failed to delete chat session.",
+    "deleteError": "Failed to delete chat session.",
+    "deleteHistory": "Delete history",
+    "loadMessagesError": "Failed to load message history.",
+    "loadError": "Failed to load messages.",
+    "sendError": "Failed to send message.",
+    "attachments": {
+      "invalidType": "Unsupported file format. Please upload a valid image.",
+      "unsupported": "Unsupported file format.",
+      "fileTooLarge": "Image file size exceeds the 5MB limit.",
+      "tooLarge": "File size exceeds the allowed limit.",
+      "maxCountExceeded": "Maximum number of image attachments reached.",
+      "limit": "Maximum attachment limit reached.",
+      "readFailed": "Failed to read image file.",
+      "readError": "Failed to read attachment file."
+    }
+  },
+  "status": {
+    "loading": "Loading...",
+    "searchable": "Searchable",
+    "notSearchable": "Not Searchable"
   }
 }

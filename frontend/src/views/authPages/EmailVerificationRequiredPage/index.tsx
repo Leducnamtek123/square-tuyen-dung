@@ -38,7 +38,7 @@ const EmailVerificationRequiredPage = () => {
         const isVerified = res?.data?.emailVerified || res?.emailVerified;
         if (isVerified && !redirectTriggeredRef.current) {
           redirectTriggeredRef.current = true;
-          toastMessages.success('Tài khoản của bạn đã được kích hoạt thành công! Vui lòng đăng nhập.');
+          toastMessages.success(t('verification.activatedSuccess'));
           router.push(getSafeRedirectPath('/dang-nhap'));
         }
       } catch (error) {
@@ -47,7 +47,7 @@ const EmailVerificationRequiredPage = () => {
         if (showLoading) setIsFullScreenLoading(false);
       }
     },
-    [email, router]
+    [email, router, t]
   );
 
   React.useEffect(() => {
@@ -95,7 +95,7 @@ const EmailVerificationRequiredPage = () => {
 
       if (isVerified) {
         redirectTriggeredRef.current = true;
-        toastMessages.success('Tài khoản của bạn đã được kích hoạt thành công!');
+        toastMessages.success(t('verification.activatedSuccess'));
         router.push(getSafeRedirectPath('/dang-nhap'));
         return;
       }

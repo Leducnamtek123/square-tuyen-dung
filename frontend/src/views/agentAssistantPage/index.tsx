@@ -118,6 +118,8 @@ const createOptimisticMessage = (
 
 export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) {
   const { t, i18n } = useTranslation('common');
+  const locale = i18n.language === 'en' ? 'en-US' : 'vi-VN';
+
   const [threads, setThreads] = useState<AgentThread[]>([]);
   const [selectedThreadId, setSelectedThreadId] = useState<number | null>(null);
   const [messages, setMessages] = useState<AgentMessage[]>([]);
@@ -125,167 +127,154 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
   const [attachments, setAttachments] = useState<PendingAgentAttachment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [deletingThreadId, setDeletingThreadId] = useState<number | null>(null);
-  const [error, setError] = useState('');
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-  const locale = i18n.language === 'en' ? 'en-US' : 'vi-VN';
 
-  TabTitle(t('common:agentAssistant.title'));
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  TabTitle('AILA AI - InfoHR');
 
   const selectedThread = useMemo(
-    () => threads.find((thread) => thread.id === selectedThreadId) ?? null,
+    () => threads.find((thread) => thread.id === selectedThreadId) || null,
     [selectedThreadId, threads],
   );
+
   const threadGroups = useMemo(() => groupThreads(threads), [threads]);
 
-  const loadMessages = useCallback(async (threadId: number) => {
-    const response = await agentAssistantService.listMessages(threadId);
-    setMessages(response.messages || []);
-  }, []);
+  const loadMessages = useCallback(
+    async (threadId: number) => {
+      try {
+        const res = await agentAssistantService.listMessages(threadId);
+        setMessages(res.messages || []);
+      } catch {
+        setError(t('common:agentAssistant.loadMessagesError'));
+      }
+    },
+    [t],
+  );
 
   const selectThread = useCallback(
-    async (threadId: number) => {
-      if (threadId === selectedThreadId) return;
+    (threadId: number) => {
       setSelectedThreadId(threadId);
-      setError('');
-      await loadMessages(threadId);
+      setError(null);
+      void loadMessages(threadId);
     },
-    [loadMessages, selectedThreadId],
+    [loadMessages],
   );
 
   const createThread = useCallback(async () => {
-    const created = await agentAssistantService.createThread(portal);
-    setThreads((current) => [created, ...current]);
-    setSelectedThreadId(created.id);
-    setMessages([]);
-    return created;
-  }, [portal]);
-
-  const handleDeleteThread = useCallback(
-    async (threadId: number) => {
-      if (deletingThreadId || isSending) return;
-
-      setDeletingThreadId(threadId);
-      setError('');
-      try {
-        await agentAssistantService.deleteThread(threadId);
-        const remainingThreads = threads.filter((thread) => thread.id !== threadId);
-        setThreads(remainingThreads);
-
-        if (selectedThreadId === threadId) {
-          const nextThread = remainingThreads[0];
-          if (nextThread) {
-            setSelectedThreadId(nextThread.id);
-            await loadMessages(nextThread.id);
-          } else {
-            const created = await agentAssistantService.createThread(portal);
-            setThreads([created]);
-            setSelectedThreadId(created.id);
-            setMessages([]);
-          }
-        }
-      } catch {
-        setError(t('common:agentAssistant.deleteError'));
-      } finally {
-        setDeletingThreadId(null);
-      }
-    },
-    [deletingThreadId, isSending, loadMessages, portal, selectedThreadId, t, threads],
-  );
-
-  useEffect(() => {
-    let cancelled = false;
-    setIsLoading(true);
-    setError('');
-
-    agentAssistantService.listThreads()
-      .then((threadsResponse) => {
-        if (cancelled) return null;
-        const nextThreads = threadsResponse.threads || [];
-        if (nextThreads.length === 0) {
-          return agentAssistantService.createThread(portal).then((created) => ({ nextThreads: [created] }));
-        }
-        return { nextThreads };
-      })
-      .then((data) => {
-        if (!data || cancelled) return null;
-        const { nextThreads } = data;
-        const firstThreadId = nextThreads[0]?.id ?? null;
-        if (firstThreadId) {
-          return agentAssistantService.listMessages(firstThreadId).then((res) => ({
-            nextThreads,
-            firstThreadId,
-            initialMessages: res.messages || [],
-          }));
-        }
-        return { nextThreads, firstThreadId, initialMessages: [] };
-      })
-      .then((data) => {
-        if (!data || cancelled) return;
-        setThreads(data.nextThreads);
-        setSelectedThreadId(data.firstThreadId);
-        setMessages(data.initialMessages);
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setError(t('common:agentAssistant.loadError'));
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
+    try {
+      setIsLoading(true);
+      const newThread = await agentAssistantService.createThread(portal);
+      setThreads((current) => [newThread, ...current]);
+      setSelectedThreadId(newThread.id);
+      setMessages([]);
+      setError(null);
+    } catch {
+      setError(t('common:agentAssistant.createThreadError'));
+    } finally {
+      setIsLoading(false);
+    }
   }, [portal, t]);
 
+  const initialize = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const threadListRes = await agentAssistantService.listThreads();
+      const threadList = threadListRes.threads || [];
+      setThreads(threadList);
+
+      if (threadList.length > 0) {
+        setSelectedThreadId(threadList[0].id);
+        await loadMessages(threadList[0].id);
+      } else {
+        await createThread();
+      }
+    } catch {
+      setError(t('common:agentAssistant.initError'));
+    } finally {
+      setIsLoading(false);
+    }
+  }, [createThread, loadMessages, t]);
+
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    void initialize();
+  }, [initialize]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
 
-  const handleSelectAttachments = async (files: FileList | null) => {
-    if (!files?.length) return;
+  const handleDeleteThread = async (threadId: number) => {
+    try {
+      setDeletingThreadId(threadId);
+      await agentAssistantService.deleteThread(threadId);
 
-    const selectedFiles = Array.from(files);
-    const remainingSlots = MAX_IMAGE_ATTACHMENTS - attachments.length;
-    if (remainingSlots <= 0 || selectedFiles.length > remainingSlots) {
-      setError(t('common:agentAssistant.attachments.limit', { count: MAX_IMAGE_ATTACHMENTS }));
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      const nextThreads = threads.filter((item) => item.id !== threadId);
+      setThreads(nextThreads);
+
+      if (selectedThreadId === threadId) {
+        if (nextThreads.length > 0) {
+          selectThread(nextThreads[0].id);
+        } else {
+          await createThread();
+        }
+      }
+    } catch {
+      setError(t('common:agentAssistant.deleteThreadError'));
+    } finally {
+      setDeletingThreadId(null);
+    }
+  };
+
+  const handleSelectAttachments = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const availableSlots = MAX_IMAGE_ATTACHMENTS - attachments.length;
+    if (availableSlots <= 0) {
+      setError(t('common:agentAssistant.attachments.maxCountExceeded', { count: MAX_IMAGE_ATTACHMENTS }));
       return;
     }
 
+    const selectedFiles = Array.from(files).slice(0, availableSlots);
     const nextAttachments: PendingAgentAttachment[] = [];
-    try {
-      for (const file of selectedFiles) {
-        if (!ALLOWED_IMAGE_MIME_TYPES.has(file.type)) {
-          setError(t('common:agentAssistant.attachments.unsupported'));
-          continue;
-        }
-        if (file.size > MAX_IMAGE_ATTACHMENT_BYTES) {
-          setError(t('common:agentAssistant.attachments.tooLarge'));
-          continue;
-        }
 
-        nextAttachments.push({
-          id: `${file.name}-${file.lastModified}-${crypto.randomUUID()}`,
-          type: 'image',
-          name: file.name,
-          mimeType: file.type,
-          size: file.size,
-          dataUrl: await readFileAsDataUrl(file),
-        });
+    for (const file of selectedFiles) {
+      if (!ALLOWED_IMAGE_MIME_TYPES.has(file.type)) {
+        setError(t('common:agentAssistant.attachments.invalidType'));
+        continue;
       }
-    } catch {
-      setError(t('common:agentAssistant.attachments.readError'));
-    } finally {
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (file.size > MAX_IMAGE_ATTACHMENT_BYTES) {
+        setError(t('common:agentAssistant.attachments.fileTooLarge'));
+        continue;
+      }
+
+      try {
+        const dataUrl = await readFileAsDataUrl(file);
+        nextAttachments.push({
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          type: 'image',
+          mimeType: file.type,
+          dataUrl,
+          name: file.name,
+          size: file.size,
+        });
+      } catch {
+        setError(t('common:agentAssistant.attachments.readFailed'));
+      }
     }
 
     if (nextAttachments.length) {
-      setError('');
       setAttachments((current) => [...current, ...nextAttachments]);
+      setError(null);
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -295,48 +284,46 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
 
   const handleSend = async () => {
     const content = input.trim();
-    const attachmentSnapshot = attachments;
-    const attachmentPayload = attachmentSnapshot.map(({ id, ...attachment }) => attachment);
-    if ((!content && attachmentPayload.length === 0) || isSending) return;
-
-    setIsSending(true);
-    setError('');
-    setInput('');
-    setAttachments([]);
+    if ((!content && attachments.length === 0) || !selectedThreadId || isSending) return;
 
     let optimisticUser: AgentMessage | null = null;
     let optimisticAssistant: AgentMessage | null = null;
+    const attachmentSnapshot = [...attachments];
+    const cleanAttachments: AgentMessageAttachment[] = attachments.map((item) => ({
+      type: 'image',
+      mimeType: item.mimeType,
+      dataUrl: item.dataUrl,
+      name: item.name,
+      size: item.size,
+    }));
 
     try {
-      const thread = selectedThread ?? (await createThread());
-      optimisticUser = createOptimisticMessage('user', content, 1, attachmentPayload);
-      optimisticAssistant = createOptimisticMessage('assistant', t('common:agentAssistant.thinking'), 2);
+      setIsSending(true);
+      setError(null);
 
-      setMessages((current) => [...current, optimisticUser as AgentMessage, optimisticAssistant as AgentMessage]);
-      setThreads((current) => {
-        const optimisticThread = {
-          ...thread,
-          title: thread.title === DEFAULT_AGENT_THREAD_TITLE
-            ? (content || t('common:agentAssistant.attachments.threadTitle')).slice(0, 90)
-            : thread.title,
-          lastMessageAt: new Date().toISOString(),
-        };
-        const withoutUpdated = current.filter((item) => item.id !== thread.id);
-        return [optimisticThread, ...withoutUpdated];
-      });
-      setSelectedThreadId(thread.id);
+      optimisticUser = createOptimisticMessage('user', content, 0, cleanAttachments);
+      optimisticAssistant = createOptimisticMessage('assistant', '', 1);
 
-      const response = await agentAssistantService.sendMessage(thread.id, content, attachmentPayload);
-      setMessages((current) => [
-        ...current.filter((message) => message.id !== optimisticUser?.id && message.id !== optimisticAssistant?.id),
-        response.userMessage,
-        response.assistantMessage,
-      ]);
-      setThreads((current) => {
-        const withoutUpdated = current.filter((item) => item.id !== response.thread.id);
-        return [response.thread, ...withoutUpdated];
-      });
-      setSelectedThreadId(response.thread.id);
+      setMessages((current) => [...current, optimisticUser!, optimisticAssistant!]);
+      setInput('');
+      setAttachments([]);
+
+      const response = await agentAssistantService.sendMessage(
+        selectedThreadId,
+        content,
+        cleanAttachments,
+      );
+
+      setMessages((current) =>
+        current.map((message) => {
+          if (message.id === optimisticUser?.id) return response.userMessage;
+          if (message.id === optimisticAssistant?.id) return response.assistantMessage;
+          return message;
+        }),
+      );
+
+      const threadListRes = await agentAssistantService.listThreads();
+      setThreads(threadListRes.threads || []);
     } catch {
       setError(t('common:agentAssistant.sendError'));
       setMessages((current) =>
@@ -353,11 +340,16 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
     <Box
       sx={{
         width: '100%',
-        height: '100%',
+        height: { xs: 'calc(100dvh - 120px)', sm: 'calc(100dvh - 130px)', md: 'calc(100dvh - 140px)' },
+        maxHeight: '920px',
+        minHeight: { xs: '540px', md: '640px' },
         display: 'grid',
         gridTemplateColumns: { xs: '1fr', md: '280px minmax(0, 1fr)' },
         overflow: 'hidden',
         bgcolor: '#FFFFFF',
+        borderRadius: { xs: 2, md: 3 },
+        border: '1px solid #E2E8F0',
+        boxShadow: '0 4px 20px -4px rgba(15, 23, 42, 0.06)',
       }}
     >
       {/* Left Sidebar */}
@@ -377,7 +369,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
       <Box
         sx={{
           display: 'grid',
-          gridTemplateRows: '56px minmax(0, 1fr) auto',
+          gridTemplateRows: '60px minmax(0, 1fr) auto',
           minWidth: 0,
           minHeight: 0,
           bgcolor: '#FFFFFF',
@@ -389,14 +381,14 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
           spacing={1.5}
           alignItems="center"
           justifyContent="space-between"
-          sx={{ px: 2.5, height: 56, minWidth: 0, borderBottom: '1px solid #E5E7EB' }}
+          sx={{ px: 2.5, height: 60, minWidth: 0, borderBottom: '1px solid #E2E8F0', bgcolor: '#FFFFFF' }}
         >
           <Box sx={{ minWidth: 0 }}>
             <Typography
               variant="subtitle1"
               sx={{
                 fontWeight: 700,
-                color: '#111827',
+                color: '#0F172A',
                 fontSize: '0.9375rem',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -405,24 +397,24 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
             >
               {selectedThread?.title && selectedThread.title !== DEFAULT_AGENT_THREAD_TITLE
                 ? selectedThread.title
-                : t('common:agentAssistant.title')}
+                : 'AILA - Trợ lý AI Tuyển dụng'}
             </Typography>
-            <Typography variant="caption" sx={{ color: '#6B7280', fontSize: '0.75rem' }}>
+            <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.75rem' }}>
               {selectedThread ? formatTime(selectedThread.lastMessageAt || selectedThread.createAt, locale) : ''}
             </Typography>
           </Box>
           <Stack direction="row" spacing={1} alignItems="center" sx={{ flexShrink: 0 }}>
             {selectedThread ? (
-              <Tooltip title={t('common:agentAssistant.deleteHistory')}>
+              <Tooltip title={t('common:agentAssistant.deleteHistory') || 'Xóa đoạn chat'}>
                 <span>
                   <IconButton
-                    aria-label={t('common:agentAssistant.deleteCurrentHistory')}
+                    aria-label="Xóa đoạn chat hiện tại"
                     size="small"
                     disabled={deletingThreadId === selectedThread.id || isSending}
                     onClick={() => void handleDeleteThread(selectedThread.id)}
                     sx={{
                       borderRadius: '8px',
-                      color: '#6B7280',
+                      color: '#64748B',
                       '&:hover': { color: '#EF4444', bgcolor: '#FEE2E2' },
                     }}
                   >
@@ -448,7 +440,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
               }}
             >
               <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#22C55E' }} />
-              <Typography variant="caption" sx={{ fontWeight: 600, color: '#15803D', fontSize: '0.75rem' }}>
+              <Typography variant="caption" sx={{ fontWeight: 700, color: '#15803D', fontSize: '0.75rem' }}>
                 Online
               </Typography>
             </Box>
@@ -456,37 +448,37 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
         </Stack>
 
         {/* Message Stream */}
-        <Box sx={{ minHeight: 0, overflowY: 'auto', px: { xs: 2, md: 3 }, py: 2.5, bgcolor: '#FAFAFA' }}>
+        <Box sx={{ minHeight: 0, overflowY: 'auto', px: { xs: 2, md: 3.5 }, py: 3, bgcolor: '#F8FAFC' }}>
           {isLoading ? (
             <Stack alignItems="center" justifyContent="center" sx={{ height: '100%' }}>
-              <CircularProgress sx={{ color: '#2563EB' }} />
+              <CircularProgress sx={{ color: '#0284C7' }} />
             </Stack>
           ) : messages.length === 0 ? (
-            <Stack alignItems="center" justifyContent="center" sx={{ height: '100%', py: 4, px: 2, textAlign: 'center' }}>
+            <Stack alignItems="center" justifyContent="center" sx={{ height: '100%', py: 6, px: 2, textAlign: 'center' }}>
               <Box
                 sx={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)',
+                  width: 52,
+                  height: 52,
+                  borderRadius: '16px',
+                  background: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
                   color: '#FFFFFF',
                   display: 'grid',
                   placeItems: 'center',
-                  mb: 1.5,
-                  boxShadow: '0 2px 8px rgba(37, 99, 235, 0.2)',
+                  mb: 2,
+                  boxShadow: '0 4px 14px rgba(2, 132, 199, 0.25)',
                 }}
               >
-                <SmartToyOutlinedIcon sx={{ fontSize: 26 }} />
+                <SmartToyOutlinedIcon sx={{ fontSize: 28 }} />
               </Box>
-              <Typography variant="h3" sx={{ fontSize: '1.0625rem', fontWeight: 700, color: '#111827', mb: 0.5 }}>
-                {t('common:agentAssistant.ready')}
+              <Typography variant="h3" sx={{ fontSize: '1.125rem', fontWeight: 700, color: '#0F172A', mb: 0.75 }}>
+                AILA đã sẵn sàng hỗ trợ bạn
               </Typography>
-              <Typography variant="body2" sx={{ color: '#6B7280', maxWidth: 420, fontSize: '0.875rem' }}>
-                {t('common:agentAssistant.empty')}
+              <Typography variant="body2" sx={{ color: '#64748B', maxWidth: 460, fontSize: '0.875rem', lineHeight: 1.6 }}>
+                Đặt câu hỏi về tiêu chuẩn tuyển dụng, tìm kiếm ứng viên tiềm năng, tạo câu hỏi phỏng vấn hoặc đánh giá hồ sơ CV.
               </Typography>
             </Stack>
           ) : (
-            <Stack spacing={2}>
+            <Stack spacing={2.5}>
               {messages.map((message) => (
                 <MessageItem key={message.id} message={message} />
               ))}
@@ -496,8 +488,8 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
         </Box>
 
         {/* Bottom Input Area */}
-        <Box sx={{ p: 2, borderTop: '1px solid rgba(226, 232, 240, 0.85)', bgcolor: '#FFFFFF' }}>
-          <Stack spacing={1.5}>
+        <Box sx={{ p: 2, borderTop: '1px solid #E2E8F0', bgcolor: '#FFFFFF' }}>
+          <Stack spacing={1.25}>
             {attachments.length ? (
               <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                 {attachments.map((attachment) => (
@@ -509,7 +501,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                       aspectRatio: '1 / 1',
                       borderRadius: '10px',
                       overflow: 'hidden',
-                      border: '1px solid #E5E7EB',
+                      border: '1px solid #E2E8F0',
                       bgcolor: '#F8FAFC',
                     }}
                   >
@@ -519,10 +511,10 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                       alt={attachment.name}
                       sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                     />
-                    <Tooltip title={t('common:agentAssistant.attachments.remove')}>
+                    <Tooltip title="Gỡ ảnh">
                       <IconButton
                         size="small"
-                        aria-label={t('common:agentAssistant.attachments.remove')}
+                        aria-label="Gỡ ảnh"
                         disabled={isSending}
                         onClick={() => handleRemoveAttachment(attachment.id)}
                         sx={{
@@ -554,17 +546,17 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                 hidden
                 onChange={(event) => void handleSelectAttachments(event.target.files)}
               />
-              <Tooltip title={t('common:agentAssistant.attachments.addImage')}>
+              <Tooltip title="Đính kèm ảnh">
                 <span>
                   <IconButton
-                    aria-label="Thao tác"
+                    aria-label="Đính kèm tệp"
                     disabled={isSending || Boolean(deletingThreadId)}
                     onClick={() => fileInputRef.current?.click()}
                     sx={{
                       width: 42,
                       height: 42,
                       borderRadius: '12px',
-                      border: '1px solid rgba(226, 232, 240, 0.9)',
+                      border: '1px solid #E2E8F0',
                       color: '#64748B',
                       backgroundColor: '#F8FAFC',
                       transition: 'all 150ms ease',
@@ -581,7 +573,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                 maxRows={6}
                 value={input}
                 disabled={isSending || Boolean(deletingThreadId)}
-                placeholder={t('common:agentAssistant.placeholder')}
+                placeholder="Nhắn cho AILA..."
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
@@ -596,11 +588,11 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                     fontSize: '0.9375rem',
                     '& fieldset': { borderColor: '#E2E8F0' },
                     '&:hover fieldset': { borderColor: '#CBD5E1' },
-                    '&.Mui-focused fieldset': { borderColor: '#2563EB', borderWidth: '1.5px' },
+                    '&.Mui-focused fieldset': { borderColor: '#0284C7', borderWidth: '1.5px' },
                   },
                 }}
               />
-              <Tooltip title={t('common:agentAssistant.send')}>
+              <Tooltip title="Gửi tin nhắn">
                 <span>
                   <IconButton
                     color="primary"
@@ -610,10 +602,11 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                       width: 42,
                       height: 42,
                       borderRadius: '12px',
-                      bgcolor: '#2563EB',
+                      bgcolor: '#0284C7',
                       color: '#FFFFFF',
-                      '&:hover': { bgcolor: '#1D4ED8' },
-                      '&.Mui-disabled': { bgcolor: '#F1F5F9', color: '#94A3B8' },
+                      boxShadow: '0 2px 8px rgba(2, 132, 199, 0.25)',
+                      '&:hover': { bgcolor: '#0369A1' },
+                      '&.Mui-disabled': { bgcolor: '#F1F5F9', color: '#94A3B8', boxShadow: 'none' },
                     }}
                   >
                     {isSending ? <CircularProgress size={18} color="inherit" /> : <SendRoundedIcon fontSize="small" />}
@@ -623,7 +616,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
             </Stack>
 
             {error ? (
-              <Alert severity="error" sx={{ mt: 1, py: 0.5, borderRadius: '8px' }}>
+              <Alert severity="error" sx={{ mt: 1, py: 0.5, borderRadius: '8px', fontSize: '0.8125rem' }}>
                 {error}
               </Alert>
             ) : null}

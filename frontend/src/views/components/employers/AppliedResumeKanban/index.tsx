@@ -13,6 +13,10 @@ import {
   Tooltip,
   LinearProgress,
   Button,
+  Tab,
+  Tabs,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
@@ -145,10 +149,27 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
   }, [rows]);
 
   const [openDrawerId, setOpenDrawerId] = useState<string | number | null>(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [mobileSelectedStatus, setMobileSelectedStatus] = useState<string>('');
 
   const statuses = useMemo(() => {
     return allConfig?.applicationStatusOptions || [];
   }, [allConfig]);
+
+  React.useEffect(() => {
+    if (statuses.length > 0 && !mobileSelectedStatus) {
+      setMobileSelectedStatus(String(statuses[0].id));
+    }
+  }, [statuses, mobileSelectedStatus]);
+
+  const displayedStatuses = useMemo(() => {
+    if (isMobile && mobileSelectedStatus) {
+      const match = statuses.find((s) => String(s.id) === mobileSelectedStatus);
+      return match ? [match] : statuses.slice(0, 1);
+    }
+    return statuses;
+  }, [isMobile, mobileSelectedStatus, statuses]);
 
   // Group rows by status ID
   const columns = useMemo(() => {
@@ -250,14 +271,51 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
         />
       )}
 
-      <Box sx={{ width: '100%', overflowX: 'auto', pb: 2, minHeight: '600px' }}>
+      {/* Mobile Status Tabs Switcher */}
+      <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 2 }}>
+        <Tabs
+          value={mobileSelectedStatus || (statuses[0]?.id ? String(statuses[0].id) : false)}
+          onChange={(_, val) => setMobileSelectedStatus(String(val))}
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{
+            minHeight: 44,
+            '& .MuiTab-root': {
+              minHeight: 44,
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              textTransform: 'none',
+              borderRadius: '12px',
+              mr: 1,
+              px: 1.5,
+              py: 0.5,
+            },
+          }}
+        >
+          {statuses.map((status) => {
+            const count = columns[String(status.id)]?.length || 0;
+            return (
+              <Tab
+                key={String(status.id)}
+                value={String(status.id)}
+                label={`${tConfig(status.name as string)} (${count})`}
+              />
+            );
+          })}
+        </Tabs>
+      </Box>
+
+      <Box sx={{ width: '100%', overflowX: isMobile ? 'visible' : 'auto', pb: 2, minHeight: '500px' }}>
         <DragDropContext onDragEnd={handleDragEnd}>
           <Stack
             direction="row"
             spacing={2.5}
-            sx={{ minWidth: statuses.length * 320 + 'px', alignItems: 'flex-start' }}
+            sx={{
+              minWidth: { xs: '100%', md: statuses.length * 320 + 'px' },
+              alignItems: 'flex-start',
+            }}
           >
-            {statuses.map((status) => {
+            {displayedStatuses.map((status) => {
               const safeStatusId = String(status.id);
               const columnCount = columns[safeStatusId]?.length || 0;
               const statusStyle = getStatusStyle(safeStatusId);
@@ -269,7 +327,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                       sx={{
-                        width: 320,
+                        width: { xs: '100%', md: 320 },
                         bgcolor: snapshot.isDraggingOver ? '#F1F5F9' : '#F8FAFC',
                         borderRadius: '16px',
                         p: 2,
@@ -370,6 +428,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
                                     ref={providedDraggable.innerRef}
                                     {...providedDraggable.draggableProps}
                                     {...providedDraggable.dragHandleProps}
+                                    style={providedDraggable.draggableProps.style as React.CSSProperties}
                                     elevation={0}
                                     sx={{
                                       p: '16px',

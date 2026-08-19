@@ -1,9 +1,10 @@
-﻿import QuestionGroupsPage from '@/views/employerPages/InterviewPages/QuestionGroupsPage';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
+import QuestionGroupsPage from '@/views/employerPages/InterviewPages/QuestionGroupsPage';
 
-export const metadata = {
-  title: 'Nhóm câu hỏi',
-  description: 'Browse Employer Question Groups.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.question-groups');
+}
 
 export default function Page() {
   return <QuestionGroupsPage />;

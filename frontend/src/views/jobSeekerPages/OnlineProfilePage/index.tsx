@@ -74,6 +74,49 @@ const OnlineProfilePage = () => {
 
     return (
         <Box sx={{ py: 2, px: { xs: 2, sm: 3 } }}>
+            {/* Mobile Section Quick Jump Bar */}
+            <Box
+                sx={{
+                    display: { xs: 'flex', md: 'none' },
+                    overflowX: 'auto',
+                    gap: 1,
+                    pb: 1.5,
+                    mb: 1.5,
+                    WebkitOverflowScrolling: 'touch',
+                    '&::-webkit-scrollbar': { display: 'none' },
+                    msOverflowStyle: 'none',
+                    scrollbarWidth: 'none',
+                }}
+            >
+                {items.map((item) => {
+                    const isActive = activeSection === item.id;
+                    return (
+                        <Box
+                            key={item.id}
+                            onClick={() => handleClickScroll(item.id)}
+                            sx={{
+                                px: 2,
+                                py: 0.75,
+                                borderRadius: '20px',
+                                fontSize: '0.8rem',
+                                fontWeight: isActive ? 700 : 500,
+                                color: isActive ? '#ffffff' : 'text.primary',
+                                backgroundColor: isActive ? 'primary.main' : 'background.paper',
+                                border: '1px solid',
+                                borderColor: isActive ? 'primary.main' : 'divider',
+                                whiteSpace: 'nowrap',
+                                cursor: 'pointer',
+                                flexShrink: 0,
+                                transition: 'all 0.2s ease',
+                                boxShadow: isActive ? '0 4px 12px rgba(37, 99, 235, 0.2)' : 'none',
+                            }}
+                        >
+                            {item.value}
+                        </Box>
+                    );
+                })}
+            </Box>
+
             <Grid container spacing={3}>
                 <Grid
                     size={{

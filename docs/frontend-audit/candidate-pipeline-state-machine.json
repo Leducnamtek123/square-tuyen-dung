@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "CandidateApplicationPipelineStateMachine",
+  "version": "1.0.0",
+  "initialState": 1,
+  "states": {
+    "1": {
+      "key": "PENDING_CONFIRMATION",
+      "label": "Chờ xác nhận",
+      "allowedNextStates": [2, 6],
+      "actions": ["contact_candidate", "reject_candidate"]
+    },
+    "2": {
+      "key": "CONTACTED",
+      "label": "Đã liên hệ",
+      "allowedNextStates": [3, 6],
+      "actions": ["send_test", "reject_candidate"]
+    },
+    "3": {
+      "key": "TESTED",
+      "label": "Đã làm bài test",
+      "allowedNextStates": [4, 6],
+      "actions": ["schedule_interview", "reject_candidate"]
+    },
+    "4": {
+      "key": "INTERVIEWED",
+      "label": "Đã phỏng vấn",
+      "allowedNextStates": [5, 6],
+      "actions": ["hire_candidate", "onboard_hrm", "reject_candidate"]
+    },
+    "5": {
+      "key": "HIRED",
+      "label": "Đã tuyển dụng",
+      "allowedNextStates": [],
+      "terminal": true,
+      "actions": ["onboard_hrm"]
+    },
+    "6": {
+      "key": "NOT_SELECTED",
+      "label": "Không phù hợp",
+      "allowedNextStates": [],
+      "terminal": true,
+      "actions": []
+    }
+  }
+}

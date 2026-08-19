@@ -1,9 +1,10 @@
-﻿import ServicePage from '@/views/employerPages/ServicePage';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
+import ServicePage from '@/views/employerPages/ServicePage';
 
-export const metadata = {
-  title: 'Dịch vụ tuyển dụng',
-  description: 'Browse Employer Service.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.service');
+}
 
 export default function Page() {
   return <ServicePage />;

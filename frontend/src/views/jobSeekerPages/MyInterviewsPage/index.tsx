@@ -94,11 +94,11 @@ const MyInterviewsPage = () => {
             </Box>
 
             <Typography variant="h6" sx={{ fontWeight: 700, color: '#0f172a', mb: 1 }}>
-              Bạn chưa có buổi phỏng vấn nào
+              {t('jobSeeker:myInterviews.emptyTitle')}
             </Typography>
 
             <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.875rem', mb: 3, lineHeight: 1.5 }}>
-              Các buổi phỏng vấn của bạn sẽ được hiển thị tại đây khi nhà tuyển dụng mời bạn.
+              {t('jobSeeker:myInterviews.emptySubtitle')}
             </Typography>
 
             <Button
@@ -119,7 +119,7 @@ const MyInterviewsPage = () => {
                 },
               }}
             >
-              Tìm việc ngay
+              {t('jobSeeker:myInterviews.findJobs')}
             </Button>
           </Box>
         ) : (
@@ -143,7 +143,7 @@ const MyInterviewsPage = () => {
                       <Box>
                         <Stack direction="row" spacing={1} alignItems="center">
                           <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
-                            {interview.jobName || 'Chức danh'}
+                            {interview.jobName || t('jobSeeker:myInterviews.jobNameFallback')}
                           </Typography>
                           {interview.status && (
                             <Chip
@@ -153,7 +153,7 @@ const MyInterviewsPage = () => {
                           )}
                         </Stack>
                         <Typography variant="caption" sx={{ color: '#64748b' }}>
-                          {interview.companyName || 'Công ty'}
+                          {interview.companyName || t('jobSeeker:myInterviews.companyNameFallback')}
                         </Typography>
                       </Box>
                     </Box>
@@ -162,7 +162,7 @@ const MyInterviewsPage = () => {
                       onClick={() => handleJoin(interview.inviteToken || '')}
                       sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 700 }}
                     >
-                      Tham gia
+                      {t('jobSeeker:myInterviews.join')}
                     </Button>
                   </Box>
                 </Card>

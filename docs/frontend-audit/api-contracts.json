@@ -1,0 +1,431 @@
+{
+  "contracts": [
+    {
+      "service": "authService.checkCreds",
+      "endpoint": "/api/v1/auth/creds-check/",
+      "method": "POST",
+      "requestDto": {
+        "email": "string",
+        "role": "string"
+      },
+      "responseDto": {
+        "exists": "boolean",
+        "emailVerified": "boolean",
+        "email": "string"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "authService.getToken",
+      "endpoint": "/api/v1/auth/token/",
+      "method": "POST",
+      "requestDto": {
+        "username": "string",
+        "password": "string",
+        "role": "string"
+      },
+      "responseDto": {
+        "accessToken": "string",
+        "refreshToken": "string",
+        "backend": "string"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "jobPostActivityService.getJobPostActivity",
+      "endpoint": "/api/v1/job-post-activities/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "JobPostActivity[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "jobPostActivityService.getSavedJobs",
+      "endpoint": "/api/v1/job-post-saved/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "JobPostSaved[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "jobSeekerProfileService.getProfile",
+      "endpoint": "/api/v1/job-seekers/profile/",
+      "method": "GET",
+      "responseDto": "JobSeekerProfile",
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "interviewService.getMyInterviews",
+      "endpoint": "/api/v1/interviews/my-interviews/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "RawInterviewSession[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "contentService.getPublicArticles",
+      "endpoint": "/api/v1/articles/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "Article[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "contactMessageService.create",
+      "endpoint": "/api/v1/contact-messages/",
+      "method": "POST",
+      "requestDto": "ContactMessagePayload",
+      "responseDto": {
+        "id": "number",
+        "status": "string"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "authService.employerRegister",
+      "endpoint": "/api/v1/auth/employer/register/",
+      "method": "POST",
+      "requestDto": "EmployerRegisterData",
+      "responseDto": {
+        "message": "string"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "authService.getOnboardingStatus",
+      "endpoint": "/api/v1/auth/onboarding/status/",
+      "method": "GET",
+      "responseDto": {
+        "isOnboarded": "boolean",
+        "onboardingStep": "number",
+        "roleName": "string",
+        "hasCompany": "boolean",
+        "profileCompleteness": "number",
+        "candidateDraft": "object | null",
+        "employerDraft": "object | null",
+        "hasExistingMembership": "boolean",
+        "existingCompany": "object | null"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "authService.saveCandidateOnboardingStep",
+      "endpoint": "/api/v1/auth/onboarding/candidate/step/",
+      "method": "PATCH",
+      "requestDto": "CandidateOnboardingStepPayload",
+      "responseDto": {
+        "message": "string",
+        "onboardingStep": "number"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "authService.candidateOnboarding",
+      "endpoint": "/api/v1/auth/onboarding/candidate/",
+      "method": "POST",
+      "requestDto": "CandidateOnboardingFullPayload",
+      "responseDto": {
+        "message": "string",
+        "user": "User",
+        "recommendedJobs": "RecommendedJobPreview[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "authService.saveEmployerOnboardingStep",
+      "endpoint": "/api/v1/auth/onboarding/employer/step/",
+      "method": "PATCH",
+      "requestDto": "EmployerOnboardingStepPayload",
+      "responseDto": {
+        "message": "string",
+        "onboardingStep": "number"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "authService.employerOnboarding",
+      "endpoint": "/api/v1/auth/onboarding/employer/",
+      "method": "POST",
+      "requestDto": "EmployerOnboardingFullPayload",
+      "responseDto": {
+        "message": "string",
+        "company": "object",
+        "user": "User"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "authService.forgotPassword",
+      "endpoint": "/api/v1/auth/forgot-password/",
+      "method": "POST",
+      "requestDto": {
+        "email": "string",
+        "platform": "string"
+      },
+      "responseDto": "void",
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "statisticService.employerGeneralStatistics",
+      "endpoint": "/api/v1/jobs/employer-statistics/?type=general",
+      "method": "GET",
+      "responseDto": {
+        "totalJobPost": "number",
+        "totalJobPostingPendingApproval": "number",
+        "totalJobPostExpired": "number",
+        "totalApply": "number",
+        "totalFollowers": "number",
+        "totalSavedProfiles": "number",
+        "totalInterviews": "number",
+        "totalInterviewsCompleted": "number",
+        "totalInterviewsInProgress": "number",
+        "avgAiOverallScore": "number",
+        "avgAiTechnicalScore": "number",
+        "avgAiCommunicationScore": "number",
+        "conversionRate": "number"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "jobService.getEmployerJobPost",
+      "endpoint": "/api/v1/jobs/private/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "JobPost[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "jobService.addJobPost",
+      "endpoint": "/api/v1/jobs/private/",
+      "method": "POST",
+      "requestDto": "JobPostInput",
+      "responseDto": "JobPost",
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "resumeService.getResumes",
+      "endpoint": "/api/v1/resumes/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "Resume[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "resumeService.getResumeDetail",
+      "endpoint": "/api/v1/resumes/{slug}/",
+      "method": "GET",
+      "responseDto": "ResumeDetailResponse",
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "jobPostActivityService.getAppliedResume",
+      "endpoint": "/api/v1/jobs/employer-job-posts-activity/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "JobPostActivity[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "jobPostActivityService.changeApplicationStatus",
+      "endpoint": "/api/v1/jobs/employer-job-posts-activity/{id}/application-status/",
+      "method": "PUT",
+      "requestDto": {
+        "status": "number"
+      },
+      "responseDto": {
+        "id": "number",
+        "status": "number",
+        "statusName": "string"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "interviewService.getInterviewSessions",
+      "endpoint": "/api/v1/interviews/web/sessions/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "InterviewSession[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "interviewService.getInterviewSessionDetail",
+      "endpoint": "/api/v1/interviews/web/sessions/{id}/",
+      "method": "GET",
+      "responseDto": "InterviewSessionDetail",
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "resumeSavedService.getSavedResumes",
+      "endpoint": "/api/v1/resumes-saved/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "ResumeSaved[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "interviewQuestionService.getQuestions",
+      "endpoint": "/api/v1/interviews/web/questions/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "Question[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "interviewQuestionService.getQuestionGroups",
+      "endpoint": "/api/v1/interviews/web/question-groups/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "QuestionGroup[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "interviewService.createInterviewSession",
+      "endpoint": "/api/v1/interviews/web/sessions/",
+      "method": "POST",
+      "requestDto": "InterviewSessionCreatePayload",
+      "responseDto": "InterviewSession",
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "interviewService.updateInterviewSession",
+      "endpoint": "/api/v1/interviews/web/sessions/{id}/",
+      "method": "PUT",
+      "requestDto": "InterviewSessionCreatePayload",
+      "responseDto": "InterviewSession",
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "interviewService.getLiveKitParticipantToken",
+      "endpoint": "/api/v1/interviews/web/sessions/{id}/token/",
+      "method": "POST",
+      "responseDto": {
+        "token": "string",
+        "wsUrl": "string"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "interviewService.getLiveKitObserverToken",
+      "endpoint": "/api/v1/interviews/web/sessions/{id}/observer-token/",
+      "method": "POST",
+      "responseDto": {
+        "token": "string",
+        "wsUrl": "string"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "companyService.getCompanyInfo",
+      "endpoint": "/api/v1/companies/private/info/",
+      "method": "GET",
+      "responseDto": "Company",
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "companyService.updateCompanyInfo",
+      "endpoint": "/api/v1/companies/private/{slug}/",
+      "method": "PUT",
+      "requestDto": "CompanyUpdatePayload",
+      "responseDto": "Company",
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "companyVerificationService.getVerification",
+      "endpoint": "/api/v1/companies/verification/",
+      "method": "GET",
+      "responseDto": "CompanyVerificationPayload",
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "companyVerificationService.submitVerification",
+      "endpoint": "/api/v1/companies/verification/",
+      "method": "POST",
+      "requestDto": "CompanyVerificationPayload",
+      "responseDto": "CompanyVerificationPayload",
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "hrmService.getEmployees",
+      "endpoint": "/api/v1/hrm/employees/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "HrmEmployee[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "hrmService.getDepartments",
+      "endpoint": "/api/v1/hrm/departments/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "Department[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "hrmService.getLeaveRequests",
+      "endpoint": "/api/v1/hrm/leave-requests/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "LeaveRequest[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "hrmService.getContracts",
+      "endpoint": "/api/v1/hrm/contracts/",
+      "method": "GET",
+      "responseDto": {
+        "count": "number",
+        "results": "EmploymentContract[]"
+      },
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "hrmService.getDashboardStats",
+      "endpoint": "/api/v1/hrm/dashboard/stats/",
+      "method": "GET",
+      "responseDto": "HrmDashboardStats",
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "hrmService.getOrgChart",
+      "endpoint": "/api/v1/hrm/departments/org-chart/",
+      "method": "GET",
+      "responseDto": "OrgChartNode[]",
+      "status": "VERIFIED_MATCH"
+    },
+    {
+      "service": "contentService.getCompanyArticles",
+      "endpoint": "/api/v1/content/articles/",
+      "method": "GET",
+      "responseDto": "PaginatedArticles",
+      "status": "VERIFIED_MATCH"
+    }
+  ]
+}

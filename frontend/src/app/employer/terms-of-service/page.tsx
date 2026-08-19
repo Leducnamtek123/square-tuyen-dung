@@ -1,9 +1,10 @@
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import StaticInfoPage from '@/views/defaultPages/StaticInfoPage';
 
-export const metadata = {
-  title: 'Employer Terms of Service',
-  description: 'InfoHR employer terms of service.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.terms-of-service');
+}
 
 export default function Page() {
   return <StaticInfoPage pageKey="terms" />;

@@ -1,9 +1,10 @@
-﻿import ProfileDetailPage from '@/views/employerPages/ProfileDetailPage';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
+import ProfileDetailPage from '@/views/employerPages/ProfileDetailPage';
 
-export const metadata = {
-  title: 'Chi tiết ứng viên',
-  description: 'Browse Employer Candidates.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.candidate-detail');
+}
 
 export default function Page() {
   return <ProfileDetailPage />;

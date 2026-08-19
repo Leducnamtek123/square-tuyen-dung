@@ -69,12 +69,12 @@ const getErrorDetail = (err: unknown): string | null => {
 };
 
 const statusClassMap: Record<string, string> = {
-  scheduled:   'border-sky-400/30 bg-sky-500/15 text-sky-200',
-  in_progress: 'border-amber-400/30 bg-amber-500/15 text-amber-200',
-  processing:  'border-amber-400/30 bg-amber-500/15 text-amber-200',
-  completed:   'border-emerald-400/30 bg-emerald-500/15 text-emerald-200',
-  cancelled:   'border-rose-400/30 bg-rose-500/15 text-rose-200',
-  interrupted: 'border-amber-400/30 bg-amber-500/15 text-amber-200',
+  scheduled:   'border-sky-200 bg-sky-50 text-sky-700',
+  in_progress: 'border-amber-200 bg-amber-50 text-amber-700',
+  processing:  'border-amber-200 bg-amber-50 text-amber-700',
+  completed:   'border-emerald-200 bg-emerald-50 text-emerald-700',
+  cancelled:   'border-rose-200 bg-rose-50 text-rose-700',
+  interrupted: 'border-amber-200 bg-amber-50 text-amber-700',
 };
 
 const JOINABLE_STATUSES = ['scheduled', 'calibration', 'in_progress', 'interrupted'];
@@ -186,10 +186,10 @@ function InterviewSessionBridge({
 
 function InterviewSessionLoading({ label }: { label: string }) {
   return (
-    <main className="grid min-h-[100dvh] place-items-center bg-[#020617] text-zinc-100">
+    <main className="grid min-h-[100dvh] place-items-center bg-[#f8fafc] text-slate-800">
       <div className="flex flex-col items-center gap-3 text-center">
-        <CircularProgress size={36} sx={{ color: '#38bdf8' }} />
-        <p className="text-sm text-zinc-400">{label}</p>
+        <CircularProgress size={36} sx={{ color: '#0284c7' }} />
+        <p className="text-sm font-medium text-slate-500">{label}</p>
       </div>
     </main>
   );
@@ -205,10 +205,10 @@ function InterviewSessionError({
   onBackHome: () => void;
 }) {
   return (
-    <main className="grid min-h-[100dvh] place-items-center bg-[#020617] px-6">
-      <section className="w-full max-w-lg rounded-2xl border border-rose-400/30 bg-rose-500/10 p-8 text-center text-rose-100">
+    <main className="grid min-h-[100dvh] place-items-center bg-[#f8fafc] px-6">
+      <section className="w-full max-w-lg rounded-2xl border border-rose-200 bg-rose-50/80 p-8 text-center text-rose-900 shadow-sm">
         <p className="mb-6 text-lg font-medium">{message}</p>
-      <Button variant="contained" sx={{ bgcolor: '#0f172a', '&:hover': { bgcolor: '#111827' } }} onClick={onBackHome}>
+        <Button variant="contained" sx={{ bgcolor: '#0284c7', color: '#fff', '&:hover': { bgcolor: '#0369a1' } }} onClick={onBackHome}>
           {actionLabel}
         </Button>
       </section>
@@ -242,20 +242,31 @@ function ActiveInterviewRoom({
   onEndSession: () => Promise<void>;
 }) {
   return (
-    <main className="flex min-h-[100dvh] flex-col bg-[#020617] text-zinc-100">
-      <header className="relative z-10 flex items-center justify-between border-b border-white/5 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl md:px-6">
-        <div>
-          <h1 className="text-sm font-semibold text-white md:text-base">{sessionTitle}</h1>
-          <p className="mt-0.5 text-xs text-zinc-400">{jobLabel} | {candidateLabel}</p>
+    <main className="flex min-h-[100dvh] flex-col bg-[#f1f5f9] text-slate-900">
+      <header className="relative z-10 flex items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur-xl md:px-6 shadow-sm">
+        <div className="flex items-center gap-3">
+          <Image
+            src={IMAGES.getTextLogo('dark')}
+            alt="InfoHR"
+            width={90}
+            height={28}
+            style={{ height: 24, width: 'auto', objectFit: 'contain' }}
+            priority
+          />
+          <div className="h-4 w-px bg-slate-200" />
+          <div>
+            <h1 className="text-sm font-bold text-slate-900 md:text-base">{sessionTitle}</h1>
+            <p className="mt-0.5 text-xs font-medium text-slate-500">{jobLabel} • {candidateLabel}</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className={cn('inline-flex items-center rounded-md border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest', statusClass)}>
+          <span className={cn('inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider', statusClass)}>
             {statusText}
           </span>
         </div>
       </header>
 
-      <div className="flex-1" style={{ height: 'calc(100vh - 57px)' }}>
+      <div className="flex-1" style={{ height: 'calc(100dvh - 57px)', minHeight: 'calc(100dvh - 57px)' }}>
         <LiveKitRoom
           token={connectionDetails.token}
           serverUrl={connectionDetails.serverUrl}
@@ -273,7 +284,7 @@ function ActiveInterviewRoom({
       </div>
 
       {formattedSchedule && (
-        <p className="px-4 py-2 text-xs text-zinc-500">
+        <p className="border-t border-slate-200 bg-white px-4 py-2 text-center text-xs text-slate-500">
           {timeLabel} &bull; {formattedSchedule}
         </p>
       )}
@@ -328,121 +339,150 @@ function InterviewWaitingRoom({
   actions: WaitingRoomActions;
 }) {
   return (
-    <main className="dark min-h-[100dvh] bg-[#020617] px-4 py-4 text-zinc-100 md:px-8 md:py-6">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
-        {viewState.isInterrupted && (
-          <Alert severity="warning" sx={{ borderRadius: 3, bgcolor: 'rgba(245, 158, 11, 0.08)', color: '#fbbf24' }}>
-            {labels.interruptedResumeHint}
-          </Alert>
-        )}
-
-        <header className="relative overflow-hidden rounded-3xl border border-white/5 bg-zinc-900/40 p-4 shadow-2xl shadow-black/50 backdrop-blur-2xl md:p-5">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.1),transparent_60%)]" />
-          <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-xl font-semibold tracking-tight text-white md:text-2xl">{labels.sessionTitle}</h1>
-              <p className="mt-1 text-sm font-medium text-zinc-400">{labels.jobLabel} | {labels.candidateLabel}</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className={cn('inline-flex items-center rounded-lg border px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.15em] shadow-sm', statusClass)}>
-                {labels.statusText}
-              </span>
-            </div>
+    <main className="flex min-h-[100dvh] flex-col bg-[#f8fafc] text-slate-800">
+      {/* Top Header Bar */}
+      <header className="relative z-20 flex items-center justify-between border-b border-slate-200/80 bg-white/85 px-4 py-3.5 backdrop-blur-xl md:px-8 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Image
+              src={IMAGES.getTextLogo('dark')}
+              alt="InfoHR"
+              width={100}
+              height={32}
+              style={{ height: 26, width: 'auto', objectFit: 'contain' }}
+              priority
+            />
           </div>
-        </header>
+          <div className="hidden h-5 w-px bg-slate-200 sm:block" />
+          <div>
+            <h1 className="text-sm font-bold tracking-tight text-slate-900 md:text-base">{labels.sessionTitle}</h1>
+            <p className="text-xs font-medium text-slate-500">{labels.jobLabel} • {labels.candidateLabel}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className={cn('inline-flex items-center rounded-full border px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm', statusClass)}>
+            {labels.statusText}
+          </span>
+        </div>
+      </header>
 
-        <section className="relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white/10 bg-[#020617] shadow-[0_0_100px_rgba(0,0,0,0.5)]">
+      {/* Main Content Area */}
+      <div className="relative flex flex-1 items-center justify-center p-4 sm:p-6 md:p-10">
+        {/* Ambient background glows */}
+        <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-[350px] w-[600px] rounded-full bg-sky-500/8 blur-[120px]" />
+        <div className="pointer-events-none absolute bottom-0 right-1/4 h-[250px] w-[400px] rounded-full bg-cyan-500/6 blur-[100px]" />
+
+        <div className="relative z-10 w-full max-w-xl">
+          {viewState.isInterrupted && (
+            <Alert severity="warning" sx={{ mb: 3, borderRadius: '14px', bgcolor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a' }}>
+              {labels.interruptedResumeHint}
+            </Alert>
+          )}
+
           {viewState.showPreflight ? (
-            <div className="relative flex h-full min-h-[520px] items-center justify-center px-6 py-10">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.15),transparent_52%)]" />
-              <PreflightRoom
-                onJoin={actions.onJoin}
-                onCancel={actions.onCancelPreflight}
-                starting={viewState.starting}
-              />
-            </div>
+            <PreflightRoom
+              onJoin={actions.onJoin}
+              onCancel={actions.onCancelPreflight}
+              starting={viewState.starting}
+            />
           ) : (
-            <div className="relative flex h-full min-h-[520px] items-center justify-center px-6 py-10">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.22),transparent_52%)]" />
-              <div className="relative flex w-full max-w-2xl flex-col items-center gap-10 text-center">
-                <div className="relative group">
-                  <div className="absolute inset-0 rounded-full bg-cyan-500/10 blur-[80px] transition-all duration-1000 group-hover:bg-cyan-500/20" />
-                  <div className="relative z-10 flex h-[96px] w-[240px] max-w-[70vw] items-center justify-center opacity-90 transition-all duration-1000 group-hover:opacity-100 md:h-[120px] md:w-[320px]">
-                    <Image
-                      src={IMAGES.getTextLogo('light')}
-                      alt="InfoHR"
-                      width={320}
-                      height={107}
-                      style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
-                      priority
-                    />
-                  </div>
-                </div>
+            <div className="relative flex flex-col items-center gap-6 rounded-3xl border border-slate-200/90 bg-white/95 p-8 text-center shadow-[0_25px_50px_-12px_rgba(15,23,42,0.06),0_1px_0_rgba(255,255,255,1)_inset] backdrop-blur-2xl md:p-10">
+              <div className="relative flex h-[80px] w-[200px] items-center justify-center">
+                <Image
+                  src={IMAGES.getTextLogo('dark')}
+                  alt="InfoHR"
+                  width={240}
+                  height={80}
+                  style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
+                  priority
+                />
+              </div>
 
-                <div className="space-y-4">
-                  <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
-                    {viewState.isJoinable ? labels.readyTitle : labels.unavailableTitle}
-                  </h2>
-                  {error && (
-                    <p className="text-sm font-bold uppercase tracking-widest text-rose-400">{error}</p>
-                  )}
-                  <p className="mx-auto max-w-md text-sm leading-relaxed text-zinc-400">
-                    {viewState.isJoinable ? labels.readyBody : labels.unavailableBody}
-                  </p>
-                </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">
+                  {viewState.isJoinable ? labels.readyTitle : labels.unavailableTitle}
+                </h2>
+                {error && (
+                  <p className="text-xs font-bold uppercase tracking-widest text-rose-600">{error}</p>
+                )}
+                <p className="mx-auto max-w-sm text-sm leading-relaxed text-slate-600">
+                  {viewState.isJoinable ? labels.readyBody : labels.unavailableBody}
+                </p>
+              </div>
 
-                <div className="flex flex-col items-center gap-3">
-                  {viewState.isJoinable ? (
-                    <>
-                      <Button
-                        variant="contained"
-                        onClick={actions.onShowPreflight}
-                        disabled={viewState.starting}
-                        sx={{
-                          height: 56,
-                          borderRadius: '1rem',
-                          background: '#0ea5e9',
-                          px: 6,
-                          fontSize: '0.8rem',
-                          fontWeight: 900,
-                          letterSpacing: '0.2em',
-                          textTransform: 'uppercase',
-                          boxShadow: '0 0 30px rgba(14,165,233,0.3)',
-                          '&:hover': { background: '#38bdf8' },
-                          '&:disabled': { opacity: 0.5 },
-                        }}
-                      >
-                        {viewState.starting ? <CircularProgress size={22} color="inherit" /> : labels.startInterview}
-                      </Button>
-                      <Button
-                        variant="text"
-                        onClick={actions.onBack}
-                        sx={{ fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', '&:hover': { color: 'white' } }}
-                      >
-                        {labels.back}
-                      </Button>
-                    </>
-                  ) : (
+              <div className="flex w-full flex-col items-center gap-3 pt-2">
+                {viewState.isJoinable ? (
+                  <>
                     <Button
                       variant="contained"
-                      onClick={actions.onBackHome}
-                      sx={{ height: 48, borderRadius: '1rem', background: '#1e293b', px: 5, fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', '&:hover': { background: '#334155' } }}
+                      onClick={actions.onShowPreflight}
+                      disabled={viewState.starting}
+                      sx={{
+                        width: '100%',
+                        maxWidth: '280px',
+                        py: 1.5,
+                        borderRadius: '12px',
+                        background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                        color: '#ffffff',
+                        fontSize: '0.875rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.02em',
+                        textTransform: 'none',
+                        boxShadow: '0 4px 18px rgba(14, 165, 233, 0.35)',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, #38bdf8, #0ea5e9)',
+                          boxShadow: '0 6px 22px rgba(14, 165, 233, 0.5)',
+                        },
+                        '&:active': { transform: 'scale(0.98)' },
+                      }}
                     >
-                      {labels.backHome}
+                      {viewState.starting ? <CircularProgress size={20} color="inherit" /> : labels.startInterview}
                     </Button>
-                  )}
-                </div>
+                    <Button
+                      variant="text"
+                      onClick={actions.onBack}
+                      sx={{
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        color: '#64748b',
+                        textTransform: 'none',
+                        '&:hover': { color: '#0f172a' },
+                      }}
+                    >
+                      {labels.back}
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    variant="contained"
+                    onClick={actions.onBackHome}
+                    sx={{
+                      py: 1.5,
+                      px: 4,
+                      borderRadius: '12px',
+                      background: '#0284c7',
+                      color: '#ffffff',
+                      fontSize: '0.85rem',
+                      fontWeight: 700,
+                      textTransform: 'none',
+                      '&:hover': { background: '#0369a1' },
+                    }}
+                  >
+                    {labels.backHome}
+                  </Button>
+                )}
               </div>
             </div>
           )}
-        </section>
-
-        {formattedSchedule && (
-          <p className="text-xs text-zinc-500">
-            {labels.time} &bull; {formattedSchedule}
-          </p>
-        )}
+        </div>
       </div>
+
+      {formattedSchedule && (
+        <footer className="border-t border-slate-200/80 bg-white/60 py-2.5 text-center text-xs text-slate-500">
+          {labels.time} • {formattedSchedule}
+        </footer>
+      )}
     </main>
   );
 }

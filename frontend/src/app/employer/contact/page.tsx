@@ -1,9 +1,10 @@
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import StaticInfoPage from '@/views/defaultPages/StaticInfoPage';
 
-export const metadata = {
-  title: 'Báo lỗi & liên hệ nhà tuyển dụng',
-  description: 'Gửi báo lỗi, góp ý hoặc liên hệ hỗ trợ cho khu vực nhà tuyển dụng.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.contact');
+}
 
 export default function Page() {
   return <StaticInfoPage pageKey="contact" />;

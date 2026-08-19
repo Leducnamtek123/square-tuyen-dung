@@ -1,14 +1,15 @@
-'use client';
-
-import React, { useEffect, useReducer } from 'react';
-import { Avatar, Box, Paper, Stack, Typography, alpha, useTheme } from '@mui/material';
+import React, { useEffect, useReducer, useState } from 'react';
+import { Avatar, Box, Chip, IconButton, Paper, Stack, Tooltip, Typography, alpha, useTheme } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import WorkIcon from '@mui/icons-material/Work';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CheckIcon from '@mui/icons-material/Check';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { useTranslation } from 'react-i18next';
 
 import interviewService from '../../../services/interviewService';
 import { type InterviewSession } from '../../../types/models';
-import { ACTIVE_STATUSES, getSafeLiveKitUrl, normalizeStatus } from './InterviewLiveCandidateCard/InterviewLiveCandidateCardPresence';
+import { ACTIVE_STATUSES, ElapsedTimer, getSafeLiveKitUrl, normalizeStatus } from './InterviewLiveCandidateCard/InterviewLiveCandidateCardPresence';
 import InterviewLiveCandidateCardPanel from './InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel';
 import pc from '@/utils/muiColors';
 
@@ -99,10 +100,18 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
   const theme = useTheme();
   const { t } = useTranslation(['employer', 'interview', 'common']);
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [copied, setCopied] = useState(false);
 
   const normalizedStatus = normalizeStatus(session.status);
   const isLive = ACTIVE_STATUSES.has(normalizedStatus);
   const shouldLoadObserverToken = normalizedStatus === 'calibration' || normalizedStatus === 'in_progress';
+
+  const handleCopyRoom = () => {
+    if (!session.roomName) return;
+    navigator.clipboard?.writeText(session.roomName);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     let alive = true;
@@ -164,21 +173,22 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
     <Paper
       elevation={0}
       sx={{
-        p: 2.5,
-        borderRadius: 5,
+        p: { xs: 2, sm: 2.75 },
+        borderRadius: 4,
         border: '1px solid',
-        borderColor: pc.primary(0.12),
-        bgcolor: pc.bgPaper(0.92),
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
         overflow: 'hidden',
         position: 'relative',
         transition: 'all 0.25s ease',
-        boxShadow: '0 24px 60px rgba(15, 23, 42, 0.10)',
+        boxShadow: '0 8px 30px -4px rgba(15, 23, 42, 0.06)',
         '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: `0 22px 50px ${pc.primary(0.08)}`,
+          borderColor: alpha(theme.palette.primary.main, 0.35),
+          boxShadow: '0 16px 40px -6px rgba(15, 23, 42, 0.1)',
         },
       }}
     >
+      {/* Top Accent Stripe */}
       <Box
         sx={{
           position: 'absolute',
@@ -187,28 +197,90 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
           right: 0,
           height: 3,
           background: isLive
-            ? `linear-gradient(90deg, ${pc.primary( 0.2)}, ${theme.palette.primary.main}, ${pc.primary( 0.2)})`
-            : `linear-gradient(90deg, ${pc.success( 0.15)}, ${theme.palette.success.main}, ${pc.success( 0.15)})`,
+            ? `linear-gradient(90deg, #38BDF8, ${theme.palette.primary.main}, #818CF8)`
+            : `linear-gradient(90deg, #22C55E, ${theme.palette.success.main}, #4ADE80)`,
         }}
       />
 
-      <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={2} sx={{ mb: 1.75 }}>
-        <Box>
-          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
-            <Avatar sx={{ width: 30, height: 30, bgcolor: pc.primary(0.1), color: 'primary.main' }}>
-              <PersonIcon sx={{ fontSize: 18 }} />
-            </Avatar>
-            <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary' }}>
-              {session.candidateName || t('employer:interviewLive.candidateCard.unknownCandidate')}
-            </Typography>
-          </Stack>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <WorkIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
-            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-              {session.jobName || 'N/A'}
-            </Typography>
-          </Stack>
-        </Box>
+      {/* Candidate Profile Bar */}
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        alignItems={{ xs: 'flex-start', sm: 'center' }}
+        justifyContent="space-between"
+        spacing={2}
+        sx={{ mb: 2 }}
+      >
+        <Stack direction="row" alignItems="center" spacing={1.75}>
+          <Avatar
+            sx={{
+              width: 44,
+              height: 44,
+              bgcolor: alpha(theme.palette.primary.main, 0.1),
+              color: 'primary.main',
+              fontWeight: 800,
+              fontSize: '1.05rem',
+              border: '1px solid',
+              borderColor: alpha(theme.palette.primary.main, 0.2),
+            }}
+          >
+            {session.candidateName ? session.candidateName.charAt(0).toUpperCase() : <PersonIcon />}
+          </Avatar>
+          <Box>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1.05rem', letterSpacing: '-0.01em' }}>
+                {session.candidateName || t('employer:interviewLive.candidateCard.unknownCandidate')}
+              </Typography>
+            </Stack>
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.25 }}>
+              <WorkIcon sx={{ fontSize: 13, color: 'text.secondary' }} />
+              <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.8125rem' }}>
+                {session.jobName || 'Chuyên viên'}
+              </Typography>
+            </Stack>
+          </Box>
+        </Stack>
+
+        {/* Telemetry Chips & Room Code */}
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ flexWrap: 'wrap' }}>
+          {session.startTime && (
+            <Box
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.75,
+                px: 1.25,
+                py: 0.4,
+                borderRadius: '10px',
+                bgcolor: alpha(theme.palette.primary.main, 0.06),
+                border: '1px solid',
+                borderColor: alpha(theme.palette.primary.main, 0.15),
+              }}
+            >
+              <AccessTimeIcon sx={{ fontSize: 13, color: 'primary.main' }} />
+              <ElapsedTimer startTime={session.startTime} />
+            </Box>
+          )}
+
+          {session.roomName && (
+            <Tooltip title={copied ? 'Đã sao chép!' : 'Sao chép mã phòng'} arrow>
+              <Chip
+                icon={copied ? <CheckIcon sx={{ fontSize: '13px !important', color: '#16a34a !important' }} /> : <ContentCopyIcon sx={{ fontSize: '12px !important' }} />}
+                label={session.roomName}
+                size="small"
+                onClick={handleCopyRoom}
+                sx={{
+                  fontFamily: 'monospace',
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  borderRadius: '10px',
+                  bgcolor: 'action.hover',
+                  cursor: 'pointer',
+                  '&:hover': { bgcolor: 'action.selected' },
+                }}
+              />
+            </Tooltip>
+          )}
+        </Stack>
       </Stack>
 
       <InterviewLiveCandidateCardPanel

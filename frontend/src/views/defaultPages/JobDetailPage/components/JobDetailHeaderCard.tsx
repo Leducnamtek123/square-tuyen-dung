@@ -123,8 +123,8 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
             {jobPostDetail?.jobName}
           </h2>
 
-          <div className="mt-4 flex flex-wrap gap-8 text-sm text-muted-foreground">
-            <div className="flex items-center gap-3">
+          <div className="mt-4 flex flex-wrap gap-3 sm:gap-6 md:gap-8 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 sm:gap-3">
               <FontAwesomeIcon icon={faCalendarDay} className="text-primary" />
               <span>
                 {t("jobDetail.deadline")}: {dayjs(jobPostDetail?.deadline).format("DD/MM/YYYY")}

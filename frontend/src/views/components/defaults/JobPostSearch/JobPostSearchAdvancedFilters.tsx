@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, IconButton, Stack, Typography } from '@mui/material';
+import { Button, Card, IconButton, Stack, Typography } from '@mui/material';
+
 import { Grid2 as Grid } from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -218,6 +219,52 @@ const JobPostSearchAdvancedFilters = ({
           </Stack>
         </Grid>
       </Grid>
+
+      {/* Mobile Action Controls */}
+      <Stack
+        direction="row"
+        spacing={1.5}
+        sx={{
+          display: { xs: 'flex', lg: 'none' },
+          mt: 2,
+          pt: 1.5,
+          borderTop: '1px solid #f1f5f9',
+        }}
+      >
+        <Button
+          fullWidth
+          variant="outlined"
+          color="inherit"
+          onClick={onReset}
+          startIcon={<DeleteForeverIcon />}
+          sx={{
+            borderRadius: 2.5,
+            py: 1,
+            fontWeight: 700,
+            textTransform: 'none',
+            fontSize: '0.875rem',
+            borderColor: '#e2e8f0',
+          }}
+        >
+          {t('jobSearch.resetFiltersAria')}
+        </Button>
+        <Button
+          fullWidth
+          variant="contained"
+          color="primary"
+          onClick={onToggleAdvancedFilter}
+          sx={{
+            borderRadius: 2.5,
+            py: 1,
+            fontWeight: 700,
+            textTransform: 'none',
+            fontSize: '0.875rem',
+            boxShadow: '0 4px 14px rgba(37, 99, 235, 0.25)',
+          }}
+        >
+          {t('common:actions.apply')}
+        </Button>
+      </Stack>
     </Card>
   );
 };

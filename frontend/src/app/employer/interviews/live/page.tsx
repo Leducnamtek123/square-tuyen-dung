@@ -1,9 +1,10 @@
-﻿import InterviewLivePage from '@/views/employerPages/InterviewPages/InterviewLivePage';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
+import InterviewLivePage from '@/views/employerPages/InterviewPages/InterviewLivePage';
 
-export const metadata = {
-  title: 'Phỏng vấn trực tiếp',
-  description: 'Browse Employer Interviews Live.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.interviews-live');
+}
 
 export default function Page() {
   return <InterviewLivePage />;

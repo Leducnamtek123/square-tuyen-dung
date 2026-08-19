@@ -21,6 +21,25 @@ import { useTranslation } from 'react-i18next';
 import { type AgentToolCall } from '@/services/agentAssistantService';
 import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 
+export const toolFriendlyNames: Record<string, string> = {
+  query_notebook_knowledge: 'Truy vấn tài liệu & tiêu chuẩn doanh nghiệp',
+  evaluate_cv_with_notebook: 'Đánh giá hồ sơ ứng viên theo tiêu chuẩn',
+  create_manual_candidate: 'Tạo hồ sơ ứng viên mới',
+  search_candidates: 'Tìm kiếm ứng viên tiềm năng',
+  update_application_status: 'Cập nhật trạng thái ứng tuyển',
+  list_job_posts: 'Tra cứu tin tuyển dụng',
+  list_applications: 'Tra cứu hồ sơ ứng tuyển',
+  list_companies: 'Danh sách doanh nghiệp',
+  review_job_post: 'Đánh giá tin tuyển dụng',
+  create_interview_for_candidate: 'Lên lịch phỏng vấn AI cho ứng viên',
+  create_interview_for_application: 'Lên lịch phỏng vấn hồ sơ',
+  generate_interview_questions: 'Tạo bộ câu hỏi phỏng vấn thông minh',
+  create_interview_question_group: 'Tạo nhóm câu hỏi phỏng vấn',
+  search_candidate_profiles: 'Tra cứu hồ sơ ứng viên',
+  search_job_post_applications: 'Tìm hồ sơ ứng tuyển theo tin',
+  search_job_posts: 'Tìm kiếm tin tuyển dụng',
+};
+
 export const toolDisplayNameKeys: Record<string, string> = {
   create_manual_candidate: 'common:agentAssistant.tools.create_manual_candidate',
   search_candidates: 'common:agentAssistant.tools.search_candidates',
@@ -38,6 +57,13 @@ export const toolDisplayNameKeys: Record<string, string> = {
   search_job_posts: 'common:agentAssistant.tools.searchJobPosts',
   query_notebook_knowledge: 'common:agentAssistant.tools.queryNotebookKnowledge',
   evaluate_cv_with_notebook: 'common:agentAssistant.tools.evaluateCvWithNotebook',
+};
+
+const statusFriendlyLabels: Record<string, string> = {
+  pending: 'Chờ xử lý',
+  running: 'Đang xử lý...',
+  succeeded: 'Hoàn tất',
+  failed: 'Không thành công',
 };
 
 const statusLabelKeys: Record<string, string> = {
@@ -60,6 +86,21 @@ const businessRowLabelKeys: Record<string, string> = {
   interviewId: 'common:agentAssistant.rows.interviewId',
   applicationId: 'common:agentAssistant.rows.applicationId',
   jobPostId: 'common:agentAssistant.rows.jobPostId',
+};
+
+const businessRowFriendlyLabels: Record<string, string> = {
+  candidate: 'Ứng viên',
+  email: 'Email',
+  phone: 'Số điện thoại',
+  jobPost: 'Tin tuyển dụng',
+  company: 'Công ty',
+  status: 'Trạng thái',
+  question: 'Câu hỏi',
+  questionGroup: 'Bộ câu hỏi',
+  questionsCount: 'Số lượng câu hỏi',
+  interviewId: 'Mã phỏng vấn',
+  applicationId: 'Mã ứng tuyển',
+  jobPostId: 'Mã tin tuyển dụng',
 };
 
 const asRecord = (value: unknown): Record<string, unknown> =>
@@ -98,27 +139,27 @@ const businessRows = (toolCall: AgentToolCall) => {
   const output = asRecord(toolCall.output);
   const record = asRecord(output.record);
   return [
-    [businessRowLabelKeys.candidate, firstString(record.candidateName, record.fullName, record.name)],
-    [businessRowLabelKeys.email, record.email],
-    [businessRowLabelKeys.phone, record.phone],
-    [businessRowLabelKeys.jobPost, record.jobPostName],
-    [businessRowLabelKeys.company, record.companyName],
-    [businessRowLabelKeys.status, record.statusLabel],
-    [businessRowLabelKeys.question, firstString(record.questionText, record.text)],
-    [businessRowLabelKeys.questionGroup, record.name],
-    [businessRowLabelKeys.questionsCount, record.questionsCount],
-    [businessRowLabelKeys.interviewId, record.interviewId],
-    [businessRowLabelKeys.applicationId, record.applicationId],
-    [businessRowLabelKeys.jobPostId, record.jobPostId],
+    ['candidate', firstString(record.candidateName, record.fullName, record.name)],
+    ['email', record.email],
+    ['phone', record.phone],
+    ['jobPost', record.jobPostName],
+    ['company', record.companyName],
+    ['status', record.statusLabel],
+    ['question', firstString(record.questionText, record.text)],
+    ['questionGroup', record.name],
+    ['questionsCount', record.questionsCount],
+    ['interviewId', record.interviewId],
+    ['applicationId', record.applicationId],
+    ['jobPostId', record.jobPostId],
   ]
-    .map(([labelKey, value]) => ({ labelKey: String(labelKey), value: value == null ? '' : String(value) }))
+    .map(([key, value]) => ({ key: String(key), value: value == null ? '' : String(value) }))
     .filter((row) => row.value.trim());
 };
 
 const ToolStatusIcon = ({ status }: { status: AgentToolCall['status'] }) => {
-  if (status === 'succeeded') return <CheckCircleOutlineIcon fontSize="small" />;
-  if (status === 'failed') return <ErrorOutlineIcon fontSize="small" />;
-  return <PlayCircleOutlineIcon fontSize="small" />;
+  if (status === 'succeeded') return <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />;
+  if (status === 'failed') return <ErrorOutlineIcon sx={{ fontSize: 16 }} />;
+  return <PlayCircleOutlineIcon sx={{ fontSize: 16 }} />;
 };
 
 export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
@@ -134,22 +175,47 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
   const rows = businessRows(toolCall);
   const results = Array.isArray(output.results) ? output.results : [];
   const hasDetails = Boolean(toolCall.errorMessage || safeRecordUrl || rows.length || results.length);
-  const [expanded, setExpanded] = useState(hasDetails && !isNotebookTool);
-  const color =
-    toolCall.status === 'succeeded'
-      ? theme.palette.success.main
-      : toolCall.status === 'failed'
-        ? theme.palette.error.main
-        : theme.palette.info.main;
+  const [expanded, setExpanded] = useState(false);
+
+  const isSuccess = toolCall.status === 'succeeded';
+  const isFailed = toolCall.status === 'failed';
+
+  const borderColor = isSuccess ? '#bbf7d0' : isFailed ? '#fecdd3' : '#bae6fd';
+  const bgColor = isSuccess ? '#f0fdf4' : isFailed ? '#fff1f2' : '#f0f9ff';
+  const textColor = isSuccess ? '#15803d' : isFailed ? '#b91c1c' : '#0369a1';
+  const chipBg = isSuccess ? '#dcfce7' : isFailed ? '#fee2e2' : '#e0f2fe';
+
+  const getToolTitle = () => {
+    const key = toolDisplayNameKeys[toolCall.toolName];
+    if (key) {
+      const translated = t(key);
+      if (translated && !translated.startsWith('agentAssistant.tools.')) {
+        return translated;
+      }
+    }
+    return toolFriendlyNames[toolCall.toolName] || toolCall.displayName || toolCall.toolName;
+  };
+
+  const getStatusText = () => {
+    const key = statusLabelKeys[toolCall.status];
+    if (key) {
+      const translated = t(key);
+      if (translated && !translated.startsWith('agentAssistant.status.')) {
+        return translated;
+      }
+    }
+    return statusFriendlyLabels[toolCall.status] || toolCall.status;
+  };
 
   return (
     <Box
       sx={{
         border: '1px solid',
-        borderColor: alpha(color, 0.28),
-        borderRadius: 1.5,
-        bgcolor: alpha(color, 0.035),
+        borderColor,
+        borderRadius: 2,
+        bgcolor: bgColor,
         overflow: 'hidden',
+        transition: 'all 0.15s ease',
       }}
     >
       <Button
@@ -160,38 +226,43 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
         sx={{
           justifyContent: 'space-between',
           px: 1.5,
-          py: 0.85,
+          py: 0.75,
           color: 'text.primary',
           textTransform: 'none',
           borderRadius: 0,
         }}
       >
         <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
-          <Box sx={{ color, display: 'flex' }}>
+          <Box sx={{ color: textColor, display: 'flex', alignItems: 'center' }}>
             <ToolStatusIcon status={toolCall.status} />
           </Box>
-          <Typography variant="body2" sx={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {toolDisplayNameKeys[toolCall.toolName]
-              ? t(toolDisplayNameKeys[toolCall.toolName])
-              : toolCall.displayName || toolCall.toolName}
+          <Typography variant="body2" sx={{ fontWeight: 600, color: textColor, fontSize: '0.8125rem', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {getToolTitle()}
           </Typography>
           <Chip
             size="small"
-            label={statusLabelKeys[toolCall.status] ? t(statusLabelKeys[toolCall.status]) : toolCall.status}
-            sx={{ height: 20, fontSize: '0.725rem', fontWeight: 600 }}
+            label={getStatusText()}
+            sx={{
+              height: 20,
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              bgcolor: chipBg,
+              color: textColor,
+              border: 'none',
+            }}
           />
         </Stack>
         {hasDetails ? (
           expanded ? (
-            <KeyboardArrowUpRoundedIcon fontSize="small" />
+            <KeyboardArrowUpRoundedIcon sx={{ fontSize: 18, color: textColor }} />
           ) : (
-            <KeyboardArrowDownRoundedIcon fontSize="small" />
+            <KeyboardArrowDownRoundedIcon sx={{ fontSize: 18, color: textColor }} />
           )
         ) : null}
       </Button>
 
       {message ? (
-        <Typography variant="body2" sx={{ px: 1.5, pb: expanded && hasDetails ? 1 : 1.5, color: 'text.secondary' }}>
+        <Typography variant="body2" sx={{ px: 1.5, pb: expanded && hasDetails ? 1 : 1.25, color: 'text.secondary', fontSize: '0.8125rem' }}>
           {message}
         </Typography>
       ) : null}
@@ -199,25 +270,25 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
       {expanded && hasDetails ? (
         <Stack spacing={1.25} sx={{ p: 1.5, pt: 0 }}>
           {toolCall.errorMessage ? (
-            <Alert severity="error" sx={{ py: 0.5 }}>
+            <Alert severity="error" sx={{ py: 0.5, fontSize: '0.8125rem' }}>
               {toolCall.errorMessage}
             </Alert>
           ) : null}
 
           {rows.length ? (
-            <Paper variant="outlined" sx={{ p: 1, borderRadius: 1.25, bgcolor: 'background.paper' }}>
+            <Paper variant="outlined" sx={{ p: 1.25, borderRadius: 1.5, bgcolor: '#ffffff', borderColor: '#E2E8F0' }}>
               <Stack spacing={0.65}>
                 {rows.map((row) => (
                   <Stack
-                    key={`${row.labelKey}-${row.value}`}
+                    key={`${row.key}-${row.value}`}
                     direction="row"
                     justifyContent="space-between"
                     spacing={1}
                   >
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      {t(row.labelKey)}:
+                      {businessRowFriendlyLabels[row.key] || row.key}:
                     </Typography>
-                    <Typography variant="caption" sx={{ fontWeight: 700, textAlign: 'right' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, textAlign: 'right', color: '#0F172A' }}>
                       {row.value}
                     </Typography>
                   </Stack>
@@ -229,10 +300,10 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
           {results.length ? (
             <Stack spacing={0.75}>
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
-                {t('common:agentAssistant.results.title')} ({results.length})
+                Kết quả tìm thấy ({results.length})
               </Typography>
               {results.slice(0, 4).map((item, index) => {
-                const title = resultTitle(item) || t('common:agentAssistant.results.fallback');
+                const title = resultTitle(item) || 'Kết quả';
                 const subtitle = resultSubtitle(item);
                 const itemUrl = resultUrl(item);
                 const safeUrl = getSafeExternalOpenUrl(itemUrl);
@@ -241,11 +312,11 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
                   <Paper
                     key={`${title}-${index}`}
                     variant="outlined"
-                    sx={{ p: 1, borderRadius: 1.25, bgcolor: 'background.paper' }}
+                    sx={{ p: 1, borderRadius: 1.25, bgcolor: '#ffffff', borderColor: '#E2E8F0' }}
                   >
                     <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
                       <Box sx={{ minWidth: 0 }}>
-                        <Typography variant="caption" sx={{ fontWeight: 700, display: 'block' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700, display: 'block', color: '#0F172A' }}>
                           {title}
                         </Typography>
                         {subtitle ? (
@@ -264,7 +335,7 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
                           endIcon={<OpenInNewIcon fontSize="inherit" />}
                           sx={{ fontSize: '0.725rem', py: 0.25, px: 0.75, minWidth: 0 }}
                         >
-                          {t('common:agentAssistant.openLink')}
+                          Xem chi tiết
                         </Button>
                       ) : null}
                     </Stack>
@@ -273,7 +344,7 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
               })}
               {results.length > 4 ? (
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {t('common:agentAssistant.results.more', { count: results.length - 4 })}
+                  + Thêm {results.length - 4} kết quả khác
                 </Typography>
               ) : null}
             </Stack>
@@ -288,9 +359,9 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 endIcon={<OpenInNewIcon fontSize="inherit" />}
-                sx={{ fontSize: '0.75rem' }}
+                sx={{ fontSize: '0.75rem', borderRadius: 1.5 }}
               >
-                {t('common:agentAssistant.results.openRecord')}
+                Mở liên kết chi tiết
               </Button>
             </Box>
           ) : null}

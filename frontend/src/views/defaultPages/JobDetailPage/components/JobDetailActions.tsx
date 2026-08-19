@@ -51,13 +51,13 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-4">
+    <div className="flex flex-wrap items-center gap-2.5 sm:gap-4">
       {canApply && (
         <>
           <Button
             variant="default"
             size="lg"
-            className="bg-primary font-semibold text-white"
+            className="w-full sm:w-auto bg-primary font-semibold text-white"
             disabled={isApplied}
             onClick={handleApplyClick}
           >
@@ -69,11 +69,11 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
               variant={isSaved ? "default" : "outline"}
               size="lg"
               disabled={isLoadingSave}
-              className={
+              className={`w-full sm:w-auto ${
                 isSaved
                   ? "bg-secondary text-white"
                   : "border-primary/25 text-primary hover:bg-primary/5"
-              }
+              }`}
             >
               {isLoadingSave ? (
                 <span className="mr-2 inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -91,7 +91,7 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
         variant="outline"
         size="lg"
         onClick={() => setOpenSharePopup(true)}
-        className="border-primary/25 text-primary hover:bg-primary/5"
+        className="w-full sm:w-auto border-primary/25 text-primary hover:bg-primary/5"
       >
         <ShareIcon fontSize="small" className="mr-2" />
         {t("jobDetail.actions.share")}
@@ -101,7 +101,7 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
           variant="outline"
           size="lg"
           onClick={onOpenReport}
-          className="border-amber-300 text-amber-700 hover:bg-amber-50"
+          className="w-full sm:w-auto border-amber-300 text-amber-700 hover:bg-amber-50"
         >
           <FlagIcon fontSize="small" className="mr-2" />
           {t("jobDetail.actions.report")}

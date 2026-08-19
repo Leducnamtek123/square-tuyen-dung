@@ -1,9 +1,7 @@
-﻿import EmployerSignUp from '@/views/authPages/EmployerSignUp';
+import EmployerSignUp from '@/views/authPages/EmployerSignUp';
+import { buildPageMetadata } from '@/utils/serverI18n';
 
-export const metadata = {
-  title: 'Đăng ký nhà tuyển dụng',
-  description: 'Browse Employer Register.',
-};
+export const generateMetadata = () => buildPageMetadata('employer.register');
 
 export default function Page() {
   return <EmployerSignUp />;

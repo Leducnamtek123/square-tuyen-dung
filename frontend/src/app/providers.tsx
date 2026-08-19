@@ -8,6 +8,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import store from '../redux/store';
 import '../configs/dayjs-config';
 import '../i18n';
+import { useTranslation } from 'react-i18next';
 import errorHandling from '@/utils/errorHandling';
 import { isMaintenanceModeError } from '@/utils/maintenanceMode';
 
@@ -35,11 +36,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   // Use useState lazy initializer to avoid mutating ref during render
   // and maintain component instance isolation in Next.js App Router.
   const [queryClient] = React.useState(() => makeQueryClient());
+  const { i18n } = useTranslation();
+  const activeLocale = i18n.language?.startsWith('en') ? 'en' : 'vi';
 
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={activeLocale}>
           {children}
         </LocalizationProvider>
       </QueryClientProvider>

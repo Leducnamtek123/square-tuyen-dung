@@ -35,54 +35,63 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   const toolCalls = message.toolCalls || [];
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start', mb: 0.5 }}>
-      <Stack direction="row" spacing={1.5} alignItems="flex-start" sx={{ maxWidth: { xs: '96%', md: '82%' } }}>
+    <Box sx={{ display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start', mb: 1.5, width: '100%' }}>
+      <Stack
+        direction="row"
+        spacing={1.5}
+        alignItems="flex-start"
+        sx={{
+          maxWidth: { xs: '96%', sm: '88%', md: '82%' },
+          width: isUser ? 'auto' : '100%',
+        }}
+      >
         {!isUser && (
           <Box
             sx={{
               width: 36,
               height: 36,
               borderRadius: '50%',
-              bgcolor: '#F8FAFC',
+              bgcolor: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
-              mt: 0.25,
-              boxShadow: '0 2px 8px rgba(37, 99, 235, 0.2)',
-              border: '1px solid #DBEAFE',
+              mt: 0.5,
+              boxShadow: '0 2px 8px rgba(15, 23, 42, 0.08)',
+              border: '1px solid #E2E8F0',
               overflow: 'hidden',
             }}
           >
             <Image
               src={CHATBOT_ICONS.EMPLOYER}
               alt="AILA AI"
-              width={32}
-              height={32}
+              width={28}
+              height={28}
               style={{ objectFit: 'contain' }}
             />
           </Box>
         )}
 
         <Stack
-          spacing={1}
+          spacing={1.25}
           sx={{
-            minWidth: isUser ? 0 : { xs: 'min(94%, 320px)', md: 'min(74%, 420px)' },
-            px: isUser ? 2 : 2.5,
-            py: isUser ? 1.1 : 1.75,
-            borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-            bgcolor: isUser ? '#2563EB' : '#FFFFFF',
-            color: isUser ? '#FFFFFF' : '#111827',
-            border: isUser ? 'none' : '1px solid #E5E7EB',
+            flex: isUser ? 'initial' : 1,
+            minWidth: 0,
+            px: isUser ? 2.25 : 2.5,
+            py: isUser ? 1.25 : 2,
+            borderRadius: isUser ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+            bgcolor: isUser ? '#0284c7' : '#FFFFFF',
+            color: isUser ? '#FFFFFF' : '#0F172A',
+            border: isUser ? 'none' : '1px solid #E2E8F0',
             boxShadow: isUser
-              ? '0 2px 8px rgba(37, 99, 235, 0.18)'
-              : '0 1px 4px rgba(0, 0, 0, 0.04)',
+              ? '0 2px 10px rgba(2, 132, 199, 0.25)'
+              : '0 2px 12px rgba(15, 23, 42, 0.04)',
             opacity: isOptimistic ? 0.82 : 1,
-            transition: 'all 100ms ease-in-out',
+            transition: 'all 120ms ease-in-out',
           }}
         >
           {toolCalls.length ? (
-            <Stack spacing={1} sx={{ mb: 1 }}>
+            <Stack spacing={1} sx={{ mb: 0.5 }}>
               {toolCalls.map((tc) => (
                 <ToolStepCard key={tc.id || tc.toolName} toolCall={tc} />
               ))}
@@ -115,7 +124,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
           {message.content ? (
             <Stack direction="row" spacing={1} alignItems="flex-start" sx={{ width: '100%' }}>
               {!isUser && isOptimistic ? (
-                <CircularProgress size={16} sx={{ mt: 0.4, color: '#2563EB' }} />
+                <CircularProgress size={16} sx={{ mt: 0.4, color: '#0284c7' }} />
               ) : null}
               {isUser ? (
                 <Typography
@@ -136,8 +145,22 @@ export const MessageItem = ({ message }: MessageItemProps) => {
                     width: '100%',
                     overflowWrap: 'anywhere',
                     fontSize: '0.9375rem',
-                    lineHeight: 1.6,
-                    color: '#111827',
+                    lineHeight: 1.7,
+                    color: '#0F172A',
+                    '& ul, & ol': {
+                      pl: 2.5,
+                      my: 1,
+                    },
+                    '& li': {
+                      my: 0.5,
+                    },
+                    '& p': {
+                      my: 0.75,
+                    },
+                    '& strong': {
+                      color: '#0F172A',
+                      fontWeight: 700,
+                    },
                   }}
                 >
                   <MessageResponse enableRich>{message.content}</MessageResponse>

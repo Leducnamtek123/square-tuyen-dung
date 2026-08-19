@@ -1,9 +1,7 @@
 import CandidateOnboardingPage from '@/views/onboardingPages/CandidateOnboardingPage';
+import { buildPageMetadata } from '@/utils/serverI18n';
 
-export const metadata = {
-  title: 'Onboarding Ứng viên | InfoHR',
-  description: 'Thiết lập mục tiêu và thông tin nghề nghiệp ban đầu cho Ứng viên.',
-};
+export const generateMetadata = () => buildPageMetadata('onboarding.candidate');
 
 export default function Page() {
   return <CandidateOnboardingPage />;

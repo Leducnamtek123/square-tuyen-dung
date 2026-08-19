@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "EmployerJobStateMachine",
+  "version": "1.0.0",
+  "initialState": "PENDING",
+  "states": {
+    "PENDING": {
+      "label": "Chờ duyệt",
+      "description": "Bài đăng mới hoặc bài đăng đã chỉnh sửa nội dung cốt lõi đang chờ ban quản trị phê duyệt.",
+      "transitions": ["APPROVED", "REJECTED", "DELETED"]
+    },
+    "APPROVED": {
+      "label": "Đang hoạt động",
+      "description": "Bài đăng được phê duyệt công khai và hiển thị trên cổng ứng viên.",
+      "transitions": ["EXPIRED", "PAUSED", "CLOSED", "PENDING", "DELETED"]
+    },
+    "PAUSED": {
+      "label": "Tạm dừng",
+      "description": "Nhà tuyển dụng tạm thời ẩn bài đăng khỏi tìm kiếm công khai.",
+      "transitions": ["APPROVED", "CLOSED", "DELETED"]
+    },
+    "EXPIRED": {
+      "label": "Hết hạn",
+      "description": "Hạn nộp hồ sơ (deadline) nhỏ hơn ngày hiện tại.",
+      "transitions": ["APPROVED", "CLOSED", "DELETED"]
+    },
+    "REJECTED": {
+      "label": "Bị từ chối",
+      "description": "Bài đăng vi phạm chính sách hoặc không đạt tiêu chuẩn kiểm duyệt.",
+      "transitions": ["PENDING", "DELETED"]
+    },
+    "CLOSED": {
+      "label": "Đã đóng",
+      "description": "Nhà tuyển dụng đã hoàn tất tuyển dụng và đóng tin.",
+      "transitions": ["APPROVED", "DELETED"]
+    },
+    "DELETED": {
+      "label": "Đã xóa",
+      "description": "Bài đăng bị xóa mềm khỏi danh sách quản lý.",
+      "transitions": []
+    }
+  }
+}
