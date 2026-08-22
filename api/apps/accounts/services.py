@@ -259,7 +259,9 @@ class AvatarService:
             user.save()
 
             if not user.has_company:
-                queue_auth.update_avatar.delay(user.id, user.avatar.get_full_url())
+                user_id = user.id
+                avatar_url = user.avatar.get_full_url()
+                transaction.on_commit(lambda: queue_auth.update_avatar.delay(user_id, avatar_url))
 
         return user.avatar.get_full_url()
 
@@ -282,7 +284,9 @@ class AvatarService:
             user.save()
 
             if not user.has_company:
-                queue_auth.update_avatar.delay(user.id, var_sys.AVATAR_DEFAULT["AVATAR"])
+                user_id = user.id
+                default_avatar = var_sys.AVATAR_DEFAULT["AVATAR"]
+                transaction.on_commit(lambda: queue_auth.update_avatar.delay(user_id, default_avatar))
 
         return var_sys.AVATAR_DEFAULT["AVATAR"]
 

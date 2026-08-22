@@ -228,10 +228,15 @@ class CustomConvertTokenView(ConvertTokenView):
                 "grant_type": "authorization_code",
             }
 
-            response = requests.post(
-                settings.SOCIAL_AUTH_GOOGLE_OAUTH2_TOKEN_URL,
-                data=data,
-            )
+            try:
+                response = requests.post(
+                    settings.SOCIAL_AUTH_GOOGLE_OAUTH2_TOKEN_URL,
+                    data=data,
+                    timeout=10,
+                )
+            except requests.RequestException as req_err:
+                logger.error("Google OAuth token request failed: %s", req_err)
+                raise BadRequest("Không thể kết nối đến máy chủ xác thực Google. Vui lòng thử lại sau.")
 
             # Check response status
             if response.status_code != 200:
@@ -357,13 +362,16 @@ class CustomConvertTokenView(ConvertTokenView):
 
 class CustomRevokeTokenView(RevokeTokenView):
     def facebook_revoke_token(self, access_token):
-        response = requests.delete(
-            url=settings.SOCIAL_AUTH_FACEBOOK_OAUTH2_REVOKE_TOKEN_URL,
-            headers={"Authorization": "Bearer {}".format(access_token)},
-        )
-
-        if response.status_code == status.HTTP_200_OK:
-            logger.info("Revoke facebook token success.")
+        try:
+            response = requests.delete(
+                url=settings.SOCIAL_AUTH_FACEBOOK_OAUTH2_REVOKE_TOKEN_URL,
+                headers={"Authorization": "Bearer {}".format(access_token)},
+                timeout=10,
+            )
+            if response.status_code == status.HTTP_200_OK:
+                logger.info("Revoke facebook token success.")
+        except requests.RequestException as req_err:
+            logger.warning("Revoke facebook token failed: %s", req_err)
 
     def google_revoke_token(self, access_token):
         pass

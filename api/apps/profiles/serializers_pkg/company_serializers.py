@@ -333,7 +333,9 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 instance.save()
 
                 # update in firebase
-                queue_auth.update_info.delay(instance.user_id, instance.company_name)
+                user_id = instance.user_id
+                company_name = instance.company_name
+                transaction.on_commit(lambda: queue_auth.update_info.delay(user_id, company_name))
 
                 return instance
 
@@ -722,8 +724,9 @@ class LogoCompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                     File.LOGO_TYPE
                 )
                 company.save()
-
-                queue_auth.update_avatar.delay(company.user_id, company.logo.get_full_url())
+                user_id = company.user_id
+                logo_url = company.logo.get_full_url()
+                transaction.on_commit(lambda: queue_auth.update_avatar.delay(user_id, logo_url))
 
             return company
         except Exception as e:

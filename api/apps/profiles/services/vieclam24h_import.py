@@ -686,191 +686,195 @@ def persist_vieclam24h_candidates(
     result = ImportResult()
 
     for candidate in candidates:
-        full_name = (candidate.get("full_name") or "").strip()
-        if not full_name:
-            result.skipped_count += 1
-            continue
+        try:
+            full_name = (candidate.get("full_name") or "").strip()
+            if not full_name:
+                result.skipped_count += 1
+                continue
 
-        candidate_key = _candidate_key(candidate, source_url)
-        email = _candidate_email(candidate)
-        if not email or email.endswith("@imported.infohr.vn"):
-            result.skipped_count += 1
-            continue
+            candidate_key = _candidate_key(candidate, source_url)
+            email = _candidate_email(candidate)
+            if not email or email.endswith("@imported.infohr.vn"):
+                result.skipped_count += 1
+                continue
 
-        matched_career = _match_career(candidate, career_names)
-        career = matched_career
-        if not career and target_career:
-            if _score_candidate_for_career(candidate, target_career) > 0 or _match_career(candidate, [target_career.name]):
-                career = target_career
+            matched_career = _match_career(candidate, career_names)
+            career = matched_career
+            if not career and target_career:
+                if _score_candidate_for_career(candidate, target_career) > 0 or _match_career(candidate, [target_career.name]):
+                    career = target_career
 
-        if not career:
-            result.skipped_count += 1
-            continue
+            if not career:
+                result.skipped_count += 1
+                continue
 
-        location = _match_location(candidate, target_city=target_city, target_district=target_district)
-        city = location.city if location else _match_city(candidate, target_city=target_city)
-        analysis_score = _score_candidate_for_career(candidate, career) if career else 0
+            location = _match_location(candidate, target_city=target_city, target_district=target_district)
+            city = location.city if location else _match_city(candidate, target_city=target_city)
+            analysis_score = _score_candidate_for_career(candidate, career) if career else 0
 
-        source_payload = dict(candidate.get("source_payload") or candidate)
-        source_payload["analysis"] = {
-            "targetCareerId": target_career.id if target_career else None,
-            "targetCareerName": target_career.name if target_career else None,
-            "score": analysis_score,
-            "selectedOccupationIds": candidate.get("source_occupation_ids") or [],
-            "selectedOccupationNames": candidate.get("source_occupation_names") or [],
-            "targetCityId": target_city.id if target_city else None,
-            "targetCityName": target_city.name if target_city else None,
-            "targetDistrictId": target_district.id if target_district else None,
-            "targetDistrictName": target_district.name if target_district else None,
-        }
-        remote_cv_url = _resolve_remote_url(
-            _get_candidate_prop(candidate, "cv_file_url"),
-            source_url,
-        )
-        remote_avatar_url = _resolve_remote_url(
-            _get_candidate_prop(candidate, "avatar_url"),
-            source_url,
-        )
-        if remote_cv_url:
-            source_payload["cvFileUrl"] = remote_cv_url
-        if remote_avatar_url:
-            source_payload["avatarUrl"] = remote_avatar_url
-
-        source_ref = candidate.get("source_ref") or candidate_key
-        existing_resume = Resume.objects.filter(source_platform="vieclam24h", source_ref=source_ref).first()
-
-        user_defaults = {
-            "full_name": full_name,
-            "role_name": var_sys.JOB_SEEKER,
-            "is_active": True,
-            "is_verify_email": False,
-        }
-
-        if existing_resume:
-            user = existing_resume.user
-            job_seeker_profile = existing_resume.job_seeker_profile or JobSeekerProfile.objects.filter(user=user).first()
-            if not job_seeker_profile:
-                job_seeker_profile = JobSeekerProfile.objects.create(user=user, location=location)
-
-            user_update_fields = []
-            if full_name and user.full_name != full_name:
-                user.full_name = full_name
-                user_update_fields.append("full_name")
-
-            # Update email if current email is synthetic or if a real unlocked email is provided
-            if email and email != user.email:
-                if "@imported.infohr.vn" in user.email or "@" in email and not email.endswith("@imported.infohr.vn"):
-                    user.email = email
-                    user_update_fields.append("email")
-            if user_update_fields:
-                user_update_fields.append("update_at")
-                user.save(update_fields=user_update_fields)
-
-            phone_val = (_get_candidate_prop(candidate, "phone") or "").strip() or None
-            if phone_val and job_seeker_profile.phone != phone_val:
-                job_seeker_profile.phone = phone_val
-                job_seeker_profile.save(update_fields=["phone", "update_at"])
-
-            if location and job_seeker_profile.location != location:
-                job_seeker_profile.location = location
-                job_seeker_profile.save(update_fields=["location", "update_at"])
-
-        else:
-            user, created_user = User.objects.get_or_create(email=email, defaults=user_defaults)
-            if not created_user:
-                update_fields = []
-                for field, value in user_defaults.items():
-                    if getattr(user, field) != value:
-                        setattr(user, field, value)
-                        update_fields.append(field)
-                if update_fields:
-                    update_fields.append("update_at")
-                    user.save(update_fields=update_fields)
-
-            raw_contact_address = (
-                _get_candidate_prop(candidate, "address")
-                or _get_candidate_prop(candidate, "contact_address")
-                or candidate.get("district_name")
-                or candidate.get("city_name")
-            )
-            if raw_contact_address:
-                raw_contact_address = str(raw_contact_address).strip()
-
-            profile_defaults = {
-                "phone": (_get_candidate_prop(candidate, "phone") or "").strip() or None,
-                "location": location,
-                "contact_address": raw_contact_address or None,
-                "birthday": _parse_birthday(_get_candidate_prop(candidate, "birthday")),
-                "gender": _map_gender(_get_candidate_prop(candidate, "gender")),
-                "marital_status": _map_marital_status(_get_candidate_prop(candidate, "marital_status")),
+            source_payload = dict(candidate.get("source_payload") or candidate)
+            source_payload["analysis"] = {
+                "targetCareerId": target_career.id if target_career else None,
+                "targetCareerName": target_career.name if target_career else None,
+                "score": analysis_score,
+                "selectedOccupationIds": candidate.get("source_occupation_ids") or [],
+                "selectedOccupationNames": candidate.get("source_occupation_names") or [],
+                "targetCityId": target_city.id if target_city else None,
+                "targetCityName": target_city.name if target_city else None,
+                "targetDistrictId": target_district.id if target_district else None,
+                "targetDistrictName": target_district.name if target_district else None,
             }
-            job_seeker_profile, created_profile = JobSeekerProfile.objects.get_or_create(
-                user=user,
-                defaults=profile_defaults,
+            remote_cv_url = _resolve_remote_url(
+                _get_candidate_prop(candidate, "cv_file_url"),
+                source_url,
             )
-            if not created_profile:
-                profile_update_fields = []
-                for field, value in profile_defaults.items():
-                    if value is not None and getattr(job_seeker_profile, field) != value:
-                        setattr(job_seeker_profile, field, value)
-                        profile_update_fields.append(field)
-                if profile_update_fields:
-                    profile_update_fields.append("update_at")
-                    job_seeker_profile.save(update_fields=profile_update_fields)
+            remote_avatar_url = _resolve_remote_url(
+                _get_candidate_prop(candidate, "avatar_url"),
+                source_url,
+            )
+            if remote_cv_url:
+                source_payload["cvFileUrl"] = remote_cv_url
+            if remote_avatar_url:
+                source_payload["avatarUrl"] = remote_avatar_url
 
-        sal_min, sal_max, exp_sal = _map_salary(candidate)
-        exp_mapped = _map_experience(_get_candidate_prop(candidate, "experience"))
-        pos_mapped = _map_position(_get_candidate_prop(candidate, "position") or _get_candidate_prop(candidate, "current_position") or _get_candidate_prop(candidate, "level"))
-        acad_mapped = _map_academic_level(_get_candidate_prop(candidate, "academic_level") or _get_candidate_prop(candidate, "education") or _get_candidate_prop(candidate, "education_level"))
-        workplace_mapped = _map_type_of_workplace(_get_candidate_prop(candidate, "type_of_workplace") or _get_candidate_prop(candidate, "workplace_type") or _get_candidate_prop(candidate, "working_method"))
-        job_type_mapped = _map_job_type(_get_candidate_prop(candidate, "job_type") or _get_candidate_prop(candidate, "work_type") or _get_candidate_prop(candidate, "work_time"))
+            source_ref = candidate.get("source_ref") or candidate_key
+            existing_resume = Resume.objects.filter(source_platform="vieclam24h", source_ref=source_ref).first()
 
-        resume_defaults = {
-            "title": (_get_candidate_prop(candidate, "title") or candidate.get("title") or full_name).strip() or full_name,
-            "description": (_get_candidate_prop(candidate, "description") or "").strip() or None,
-            "skills_summary": (_get_candidate_prop(candidate, "skills_summary") or "").strip() or None,
-            "salary_min": sal_min,
-            "salary_max": sal_max,
-            "expected_salary": exp_sal,
-            "position": pos_mapped,
-            "experience": exp_mapped,
-            "academic_level": acad_mapped,
-            "type_of_workplace": workplace_mapped,
-            "job_type": job_type_mapped,
-            "city": city,
-            "career": career,
-            "job_seeker_profile": job_seeker_profile,
-            "user": user,
-            "type": var_sys.CV_WEBSITE,
-            "is_active": True,
-            "source_platform": "vieclam24h",
-            "source_url": source_url,
-            "source_account": source_account,
-            "source_ref": source_ref,
-            "source_payload": source_payload,
-            "is_imported": True,
-        }
+            user_defaults = {
+                "full_name": full_name,
+                "role_name": var_sys.JOB_SEEKER,
+                "is_active": True,
+                "is_verify_email": False,
+            }
 
-        resume, created_resume = Resume.objects.update_or_create(
-            source_platform="vieclam24h",
-            source_ref=resume_defaults["source_ref"],
-            defaults=resume_defaults,
-        )
+            if existing_resume:
+                user = existing_resume.user
+                job_seeker_profile = existing_resume.job_seeker_profile or JobSeekerProfile.objects.filter(user=user).first()
+                if not job_seeker_profile:
+                    job_seeker_profile = JobSeekerProfile.objects.create(user=user, location=location)
 
-        _parse_cv_text_fallback(candidate, resume, job_seeker_profile)
+                user_update_fields = []
+                if full_name and user.full_name != full_name:
+                    user.full_name = full_name
+                    user_update_fields.append("full_name")
 
-        if remote_cv_url:
-            resume.file = _sync_remote_file(resume.file, remote_cv_url, "cv", File.CV_TYPE)
-            if resume.file:
-                resume.save(update_fields=["file", "update_at"])
+                # Update email if current email is synthetic or if a real unlocked email is provided
+                if email and email != user.email:
+                    if "@imported.infohr.vn" in user.email or ("@" in email and not email.endswith("@imported.infohr.vn")):
+                        user.email = email
+                        user_update_fields.append("email")
+                if user_update_fields:
+                    user_update_fields.append("update_at")
+                    user.save(update_fields=user_update_fields)
 
-        if remote_avatar_url:
-            _sync_remote_avatar(user, remote_avatar_url)
+                phone_val = (_get_candidate_prop(candidate, "phone") or "").strip() or None
+                if phone_val and job_seeker_profile.phone != phone_val:
+                    job_seeker_profile.phone = phone_val
+                    job_seeker_profile.save(update_fields=["phone", "update_at"])
 
-        if created_resume:
-            result.created_count += 1
-        else:
-            result.updated_count += 1
+                if location and job_seeker_profile.location != location:
+                    job_seeker_profile.location = location
+                    job_seeker_profile.save(update_fields=["location", "update_at"])
+
+            else:
+                user, created_user = User.objects.get_or_create(email=email, defaults=user_defaults)
+                if not created_user:
+                    update_fields = []
+                    for field, value in user_defaults.items():
+                        if getattr(user, field) != value:
+                            setattr(user, field, value)
+                            update_fields.append(field)
+                    if update_fields:
+                        update_fields.append("update_at")
+                        user.save(update_fields=update_fields)
+
+                raw_contact_address = (
+                    _get_candidate_prop(candidate, "address")
+                    or _get_candidate_prop(candidate, "contact_address")
+                    or candidate.get("district_name")
+                    or candidate.get("city_name")
+                )
+                if raw_contact_address:
+                    raw_contact_address = str(raw_contact_address).strip()
+
+                profile_defaults = {
+                    "phone": (_get_candidate_prop(candidate, "phone") or "").strip() or None,
+                    "location": location,
+                    "contact_address": raw_contact_address or None,
+                    "birthday": _parse_birthday(_get_candidate_prop(candidate, "birthday")),
+                    "gender": _map_gender(_get_candidate_prop(candidate, "gender")),
+                    "marital_status": _map_marital_status(_get_candidate_prop(candidate, "marital_status")),
+                }
+                job_seeker_profile, created_profile = JobSeekerProfile.objects.get_or_create(
+                    user=user,
+                    defaults=profile_defaults,
+                )
+                if not created_profile:
+                    profile_update_fields = []
+                    for field, value in profile_defaults.items():
+                        if value is not None and getattr(job_seeker_profile, field) != value:
+                            setattr(job_seeker_profile, field, value)
+                            profile_update_fields.append(field)
+                    if profile_update_fields:
+                        profile_update_fields.append("update_at")
+                        job_seeker_profile.save(update_fields=profile_update_fields)
+
+            sal_min, sal_max, exp_sal = _map_salary(candidate)
+            exp_mapped = _map_experience(_get_candidate_prop(candidate, "experience"))
+            pos_mapped = _map_position(_get_candidate_prop(candidate, "position") or _get_candidate_prop(candidate, "current_position") or _get_candidate_prop(candidate, "level"))
+            acad_mapped = _map_academic_level(_get_candidate_prop(candidate, "academic_level") or _get_candidate_prop(candidate, "education") or _get_candidate_prop(candidate, "education_level"))
+            workplace_mapped = _map_type_of_workplace(_get_candidate_prop(candidate, "type_of_workplace") or _get_candidate_prop(candidate, "workplace_type") or _get_candidate_prop(candidate, "working_method"))
+            job_type_mapped = _map_job_type(_get_candidate_prop(candidate, "job_type") or _get_candidate_prop(candidate, "work_type") or _get_candidate_prop(candidate, "work_time"))
+
+            resume_defaults = {
+                "title": (_get_candidate_prop(candidate, "title") or candidate.get("title") or full_name).strip() or full_name,
+                "description": (_get_candidate_prop(candidate, "description") or "").strip() or None,
+                "skills_summary": (_get_candidate_prop(candidate, "skills_summary") or "").strip() or None,
+                "salary_min": sal_min,
+                "salary_max": sal_max,
+                "expected_salary": exp_sal,
+                "position": pos_mapped,
+                "experience": exp_mapped,
+                "academic_level": acad_mapped,
+                "type_of_workplace": workplace_mapped,
+                "job_type": job_type_mapped,
+                "city": city,
+                "career": career,
+                "job_seeker_profile": job_seeker_profile,
+                "user": user,
+                "type": var_sys.CV_WEBSITE,
+                "is_active": True,
+                "source_platform": "vieclam24h",
+                "source_url": source_url,
+                "source_account": source_account,
+                "source_ref": source_ref,
+                "source_payload": source_payload,
+                "is_imported": True,
+            }
+
+            resume, created_resume = Resume.objects.update_or_create(
+                source_platform="vieclam24h",
+                source_ref=resume_defaults["source_ref"],
+                defaults=resume_defaults,
+            )
+
+            _parse_cv_text_fallback(candidate, resume, job_seeker_profile)
+
+            if remote_cv_url:
+                resume.file = _sync_remote_file(resume.file, remote_cv_url, "cv", File.CV_TYPE)
+                if resume.file:
+                    resume.save(update_fields=["file", "update_at"])
+
+            if remote_avatar_url:
+                _sync_remote_avatar(user, remote_avatar_url)
+
+            if created_resume:
+                result.created_count += 1
+            else:
+                result.updated_count += 1
+
+        except Exception as candidate_err:
+            result.skipped_count += 1
 
     return result
 

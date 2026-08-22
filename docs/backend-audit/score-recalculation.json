@@ -1,0 +1,79 @@
+{
+  "auditPhase": "Phase 2 — Adversarial & Evidence Verification",
+  "previousScore": 90.8,
+  "recalculatedScore": 84.8,
+  "delta": -6.0,
+  "classification": "🟡 PRODUCTION READY WITH KNOWN DEBT",
+  "scoreBreakdown": [
+    {
+      "category": "Architecture",
+      "oldScore": 8.5,
+      "verifiedScore": 7.5,
+      "delta": -1.0,
+      "reason": "God services identified: `apps/agent_assistants/services.py` (2,464 LOC, 30+ tools) and `integrations/ai/views.py` (1,530 LOC mixing infra SSH with AI proxies)."
+    },
+    {
+      "category": "Transactions & Concurrency",
+      "oldScore": 9.3,
+      "verifiedScore": 8.2,
+      "delta": -1.1,
+      "reason": "Celery `.delay()` calls dispatched directly inside `transaction.atomic()` without `transaction.on_commit()` (race condition on uncommitted DB rows)."
+    },
+    {
+      "category": "Performance",
+      "oldScore": 8.8,
+      "verifiedScore": 8.0,
+      "delta": -0.8,
+      "reason": "Synchronous `requests` HTTP calls executed in WSGI request threads during OAuth and external resume downloads; sequential DB saves in data ingestion."
+    },
+    {
+      "category": "Security",
+      "oldScore": 9.2,
+      "verifiedScore": 8.8,
+      "delta": -0.4,
+      "reason": "FPT GPU SSH bootstrap logic embedded in application view layer rather than isolated management service."
+    },
+    {
+      "category": "Testing",
+      "oldScore": 9.0,
+      "verifiedScore": 8.5,
+      "delta": -0.5,
+      "reason": "Heavy reliance on mocks for LiveKit WebRTC and AI LLM streaming; end-to-end integration test coverage for voice interruption is limited."
+    },
+    {
+      "category": "Scalability",
+      "oldScore": 9.0,
+      "verifiedScore": 8.5,
+      "delta": -0.5,
+      "reason": "Synchronous external network I/O in web worker threads can exhaust Gunicorn worker pools under high concurrency."
+    },
+    {
+      "category": "Production Readiness",
+      "oldScore": 9.2,
+      "verifiedScore": 8.5,
+      "delta": -0.7,
+      "reason": "Core features are operational, but critical concurrency and architectural decoupling items should be addressed for scale."
+    },
+    {
+      "category": "Data Isolation",
+      "oldScore": 9.6,
+      "verifiedScore": 9.2,
+      "delta": -0.4,
+      "reason": "Strong tenant isolation in place via `_get_company_for_request`, but static querysets in a few secondary views rely strictly on DRF permission checks."
+    },
+    {
+      "category": "Authorization",
+      "oldScore": 9.4,
+      "verifiedScore": 9.2,
+      "delta": -0.2,
+      "reason": "Granular RBAC verified, but object-level checks require continuous integration assertions across all 107 viewsets."
+    },
+    {
+      "category": "API Contract",
+      "oldScore": 9.5,
+      "verifiedScore": 9.2,
+      "delta": -0.3,
+      "reason": "Near 100% parity, but dual camelCase/snake_case parameter handling exists in legacy filter query parameters."
+    }
+  ]
+}

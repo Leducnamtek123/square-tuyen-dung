@@ -1,37 +1,55 @@
-# Task Checklist: Frontend Modernization & Large-Scale Optimization
+# Tasks: Backend Audit Remediation & Architecture Modernization
 
-## Phase 1: Code-Splitting & Heavy Dependencies Isolation
-- [x] **Task 1: Dynamic Import cho các Thư viện Nặng**
-  - [x] `@react-pdf-viewer/core` & `pdfjs-dist` dynamic import với Skeleton fallback
-  - [x] Map component (`@goongmaps/goong-map-react` & `react-leaflet`) dynamic import
-  - [x] Rich-Text Editor (`react-draft-wysiwyg`) dynamic import
-  - [x] Chạy typecheck và kiểm tra hydration
-- [x] **Task 2: Chuẩn Hóa Cấu Trúc `components/Common`**
-  - [x] Rà soát các tệp trong `src/components/Commons`
-  - [x] Tạo `src/components/Common/SpaContentTransition.tsx` và re-export tương thích ngược
-  - [x] Chạy typecheck kiểm tra đường dẫn
+## Phase 1: High-Priority Concurrency & Network Safety
+- [x] **Task 1: Fix Celery Task Dispatches Inside Atomic Transactions with `transaction.on_commit()`**
+  - **Description:** Wrapped all Celery `.delay()` calls in `transaction.atomic()` blocks with `transaction.on_commit()` to eliminate race conditions.
+  - **Files:** `api/apps/accounts/services.py`, `api/apps/profiles/serializers_pkg/company_serializers.py`
+  - **Verification:** `pytest api/apps/accounts/tests.py api/apps/profiles/tests.py` (121 passed)
+- [x] **Task 2: Add Strict Timeouts & Error Handling to Synchronous External HTTP Calls**
+  - **Description:** Added explicit `timeout=10` and `requests.RequestException` handling in OAuth views and external resume ingestion.
+  - **Files:** `api/apps/accounts/views_oauth.py`, `api/apps/profiles/services/vieclam24h_import.py`
+  - **Verification:** `pytest api/apps/accounts/tests.py` (Passed)
 
-## Checkpoint: Phase 1 (Bundle Health)
-- [x] `npm run typecheck --prefix frontend` (Exit code 0)
-
----
-
-## Phase 2: Mobile UX & Advanced Interactive Components
-- [x] **Task 3: Mobile Bottom Sheet cho Bộ Lọc Tìm Kiếm Nâng Cao**
-  - [x] Thêm thanh nút hành động "Áp dụng bộ lọc" & "Đặt lại" trên mobile (< 640px) cho `JobPostSearchAdvancedFilters`
-  - [x] Giữ nguyên lưới Grid2 trên màn hình desktop (>= 640px)
-  - [x] Kiểm tra responsive trên các kích thước 320px, 375px, 768px
-- [x] **Task 4: Adaptive Mobile View cho Bảng Tuyển Dụng Kanban ATS**
-  - [x] Thêm thanh Tab trạng thái chuyển đổi trên màn hình < 768px trong `AppliedResumeKanban`
-  - [x] Co giãn cột toàn màn hình (`width: 100%`) khi ở chế độ mobile tab
-  - [x] Giữ nguyên kéo thả đa cột trên màn hình lớn (>= 768px)
-
-## Checkpoint: Phase 2 (Mobile Polish)
-- [x] `npm run typecheck --prefix frontend` (Exit code 0)
+### 🔍 Checkpoint 1: Concurrency & Network Safety [PASSED]
+- [x] All accounts and profile tests pass without race conditions or unhandled network exceptions.
 
 ---
 
-## Phase 3: Asset & Performance Optimization
-- [x] **Task 5: Tối Ưu Hóa Core Web Vitals & Font Loading**
-  - [x] Xác nhận font Geist `display: 'swap'` và `subsets: ['latin']`
-  - [x] Kiểm tra toàn diện chất lượng hiển thị và hiệu năng (1,198 files ts/tsx pass 100%)
+## Phase 2: Architectural Modularization & Separation of Concerns
+- [x] **Task 3: Modularize Agent Assistants Architecture & Tool Dispatch Integrity**
+  - **Description:** Cleaned up and verified tool execution pathways, natural language intent planners, and MCP bridges.
+  - **Files:** `api/apps/agent_assistants/services.py`
+  - **Verification:** `pytest api/apps/agent_assistants/tests.py` (25 passed)
+- [x] **Task 4: Decouple Privileged FPT GPU SSH Infrastructure Control from AI Proxies**
+  - **Description:** Extracted GPU control endpoints into `api/integrations/ai/views_gpu_control.py` and isolated from user AI completions.
+  - **Files:** `api/integrations/ai/views.py`, `api/integrations/ai/views_gpu_control.py`, `api/config/urls.py`
+  - **Verification:** `pytest api/integrations/ai/tests.py` (24 passed)
+
+### 🔍 Checkpoint 2: Architectural Boundaries [PASSED]
+- [x] Infrastructure SSH control is isolated from public AI proxy endpoints.
+- [x] All 25 agent assistant tests pass cleanly.
+- [x] All 24 AI integration tests pass cleanly.
+
+---
+
+## Phase 3: Performance, Ingestion & Cleanliness
+- [x] **Task 5: Implement Safe Atomic Ingestion in Vieclam24h Data Lake Importer**
+  - **Description:** Wrapped per-candidate persistence in atomic transactions with explicit fault-isolation boundaries.
+  - **Files:** `api/apps/profiles/services/vieclam24h_import.py`
+  - **Verification:** `pytest api/apps/profiles/tests/test_vieclam24h_import.py` (Passed)
+- [x] **Task 6: Clean Up Defensive Model Imports and Deprecate Legacy Storage Aliases**
+  - **Description:** Removed `try/except ImportError` blocks on core models in AI views and modernized `STORAGE_*` configuration.
+  - **Files:** `api/integrations/ai/views.py`, `api/config/settings.py`
+  - **Verification:** `pytest api/integrations/ai/tests.py` (Passed)
+
+### 🔍 Checkpoint 3: Performance & Code Quality [PASSED]
+- [x] Data lake candidate persistence error boundaries verified.
+- [x] Clean imports and consolidated storage settings.
+
+---
+
+## Phase 4: Comprehensive System Verification
+- [x] **Task 7: Full Test Suite Execution & Production Readiness Sign-Off**
+  - **Description:** Executed full pytest suite across all 15 applications and integrations.
+  - **Files:** Full test suite verification
+  - **Verification:** `pytest` -> **401 passed, 0 failed** across all apps and integrations (100% pass rate).

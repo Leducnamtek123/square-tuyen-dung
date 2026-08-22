@@ -213,16 +213,30 @@ const NewsContent = () => {
   });
 
   // Fetch Popular Keywords from API
-  const { data: popularKeywordsApi = [] } = useQuery<string[]>({
+  const { data: popularKeywordsApi = [] } = useQuery({
     queryKey: ['popular-keywords'],
     queryFn: async () => {
       const res = await commonService.getPopularKeywords();
-      return res.map((k) => k.title || k.kw).filter(Boolean) as string[];
+      return res || [];
     },
     staleTime: 5 * 60_000,
   });
 
-  const popularKeywords = popularKeywordsApi.length > 0 ? popularKeywordsApi : FALLBACK_POPULAR_KEYWORDS;
+  const popularKeywords = React.useMemo(() => {
+    if (Array.isArray(popularKeywordsApi) && popularKeywordsApi.length > 0) {
+      return popularKeywordsApi
+        .map((k: unknown) => {
+          if (typeof k === 'string') return k;
+          if (k && typeof k === 'object') {
+            const obj = k as { title?: string; kw?: string; name?: string };
+            return obj.title || obj.kw || obj.name || '';
+          }
+          return '';
+        })
+        .filter(Boolean);
+    }
+    return FALLBACK_POPULAR_KEYWORDS;
+  }, [popularKeywordsApi]);
 
   const featuredArticles = featuredData || [];
   const mainFeaturedArticle = featuredArticles[0] || null;
@@ -600,10 +614,11 @@ const NewsContent = () => {
             Từ khoá nổi bật
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ gap: 1 }}>
-            {popularKeywords.map((item) => {
-              const labelText = item;
-              const itemKey = `kw-${item}`;
-              const searchHref = `${jobsHref}?kw=${encodeURIComponent(item)}`;
+            {popularKeywords.map((item, index) => {
+              const labelText = typeof item === 'string' ? item : (item as { title?: string; kw?: string })?.title || (item as { title?: string; kw?: string })?.kw || '';
+              if (!labelText) return null;
+              const itemKey = `kw-${labelText}-${index}`;
+              const searchHref = `${jobsHref}?kw=${encodeURIComponent(labelText)}`;
 
               return (
                 <Chip
