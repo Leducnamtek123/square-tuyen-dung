@@ -11,9 +11,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  console.log('[generateMetadata blog/[slug]] fetching slug:', slug);
   const article = await serverFetch<Article>(`content/web/articles/${slug}/`);
-  console.log('[generateMetadata blog/[slug]] fetched article:', article ? article.title : 'NULL');
 
   if (!article) {
     return buildPageMetadata('news');
@@ -52,10 +50,50 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function Page() {
+export default async function Page({ params }: Props) {
+  const { slug } = await params;
+  const article = await serverFetch<Article>(`content/web/articles/${slug}/`);
+
+  const jsonLd = article
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: article.title,
+        description: article.excerpt || article.title,
+        image: article.thumbnailUrl || 'https://infohr.vn/android-chrome-512x512.png',
+        datePublished: article.createAt || new Date().toISOString(),
+        dateModified: article.updateAt || article.createAt || new Date().toISOString(),
+        author: {
+          '@type': 'Organization',
+          name: 'InfoHR Editorial Team',
+          url: 'https://infohr.vn',
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'InfoHR',
+          logo: {
+            '@type': 'ImageObject',
+            url: 'https://infohr.vn/android-chrome-512x512.png',
+          },
+        },
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': `https://infohr.vn/tin-tuc/${slug}`,
+        },
+      }
+    : null;
+
   return (
-    <DefaultLayout>
-      <ArticleDetailPage />
-    </DefaultLayout>
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      <DefaultLayout>
+        <ArticleDetailPage />
+      </DefaultLayout>
+    </>
   );
 }

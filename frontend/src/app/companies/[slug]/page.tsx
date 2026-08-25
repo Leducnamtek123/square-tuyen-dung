@@ -50,6 +50,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function Page() {
-  return <CompanyDetailClientPage />;
+export default async function Page({ params }: Props) {
+  const { slug } = await params;
+  const company = await serverFetch<Company>(`info/web/companies/${slug}/`);
+
+  const jsonLd = company
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: company.companyName || 'Doanh nghiệp',
+        url: `https://infohr.vn/cong-ty/${slug}`,
+        logo: company.companyImageUrl || company.logoUrl || undefined,
+        description: company.description || undefined,
+        sameAs: company.websiteUrl || undefined,
+      }
+    : null;
+
+  return (
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      <CompanyDetailClientPage />
+    </>
+  );
 }
