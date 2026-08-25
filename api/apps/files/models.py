@@ -86,12 +86,13 @@ class File(CommonBaseModel):
         cloudinary_upload_result,
         file_type: str = OTHER_TYPE,
     ):
+        from django.utils import timezone
         file_data = {
             "public_id": cloudinary_upload_result.get("public_id"),
             "version": cloudinary_upload_result.get("version"),
             "format": cloudinary_upload_result.get("format"),
             "resource_type": cloudinary_upload_result.get("resource_type"),
-            "uploaded_at": cloudinary_upload_result.get("created_at"),
+            "uploaded_at": cloudinary_upload_result.get("created_at") or timezone.now(),
             "metadata": cloudinary_upload_result,
             "file_type": file_type,
         }

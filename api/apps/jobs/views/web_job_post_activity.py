@@ -164,6 +164,52 @@ class JobSeekerJobPostActivityViewSet(
 
         return var_res.response_data(status=status.HTTP_201_CREATED, data=response_serializer.data, headers=headers)
 
+    @action(methods=["get", "post"], detail=True, url_path="offer-letter", url_name="job-seeker-offer-letter")
+    def offer_letter(self, request, pk=None):
+        """Ứng viên xem và phản hồi (chấp nhận/từ chối) Thư mời nhận việc."""
+        from ..models import JobOfferLetter
+        from ..serializers import JobOfferLetterSerializer
+        try:
+            activity = JobPostActivity.objects.select_related('job_post', 'job_post__company', 'user').get(pk=pk, user=request.user)
+        except JobPostActivity.DoesNotExist:
+            return var_res.response_data(status=status.HTTP_404_NOT_FOUND, errors={"detail": ["Không tìm thấy đơn ứng tuyển."]})
+
+        try:
+            offer = activity.offer_letter
+        except JobOfferLetter.DoesNotExist:
+            return var_res.response_data(status=status.HTTP_404_NOT_FOUND, errors={"detail": ["Chưa có thư mời nhận việc cho đơn ứng tuyển này."]})
+
+        if request.method == "GET":
+            return var_res.response_data(data=JobOfferLetterSerializer(offer).data)
+
+        # POST: Candidate responds
+        action_type = request.data.get("action")  # 'accept' or 'decline'
+        feedback = request.data.get("feedback", "")
+        if action_type not in ["accept", "decline"]:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"action": ["Hành động không hợp lệ. Chỉ chấp nhận 'accept' hoặc 'decline'."]}
+            )
+
+        if offer.status in [JobOfferLetter.STATUS_ACCEPTED, JobOfferLetter.STATUS_DECLINED]:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": ["Thư mời nhận việc này đã được phản hồi trước đó."]}
+            )
+
+        if action_type == "accept":
+            offer.status = JobOfferLetter.STATUS_ACCEPTED
+            offer.candidate_signed_at = timezone.now()
+            offer.candidate_feedback = feedback
+            offer.save()
+        else:
+            offer.status = JobOfferLetter.STATUS_DECLINED
+            offer.candidate_signed_at = timezone.now()
+            offer.candidate_feedback = feedback
+            offer.save()
+
+        return var_res.response_data(status=status.HTTP_200_OK, data=JobOfferLetterSerializer(offer).data)
+
 
 class EmployerJobPostActivityViewSet(
     AuditLogViewSetMixin,
@@ -657,6 +703,52 @@ class EmployerJobPostActivityViewSet(
         ])
         return var_res.response_data(status=status.HTTP_200_OK, data=serializer.data)
 
+    @action(methods=["get", "post"], detail=True, url_path="offer-letter", url_name="employer-offer-letter")
+    def offer_letter(self, request, pk=None):
+        """NTD xem, tạo mới hoặc cập nhật Thư mời nhận việc cho ứng viên trúng tuyển."""
+        from ..models import JobOfferLetter
+        from ..serializers import JobOfferLetterSerializer
+        activity = self.get_object()
+        if activity.job_post.company != request.user.active_company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        if request.method == "GET":
+            try:
+                offer = activity.offer_letter
+                return var_res.response_data(data=JobOfferLetterSerializer(offer).data)
+            except JobOfferLetter.DoesNotExist:
+                return var_res.response_data(status=status.HTTP_404_NOT_FOUND, errors={"detail": ["Chưa tạo thư mời nhận việc."]})
+
+        # POST: Create or Update Offer Letter
+        serializer = JobOfferLetterSerializer(data=request.data)
+        if not serializer.is_valid():
+            return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors=serializer.errors)
+
+        vd = serializer.validated_data
+        candidate_user = activity.user or request.user
+
+        offer, created = JobOfferLetter.objects.update_or_create(
+            application=activity,
+            defaults={
+                'job_post': activity.job_post,
+                'company': activity.job_post.company,
+                'candidate': candidate_user,
+                'position_title': vd.get('position_title') or activity.job_post.job_name,
+                'salary_offered': vd.get('salary_offered', 0),
+                'allowance': vd.get('allowance', 0),
+                'start_date': vd.get('start_date'),
+                'expiration_date': vd.get('expiration_date'),
+                'work_location': vd.get('work_location', ''),
+                'benefits_note': vd.get('benefits_note', ''),
+                'terms_and_conditions': vd.get('terms_and_conditions', ''),
+                'status': JobOfferLetter.STATUS_SENT,
+                'created_by': request.user,
+            }
+        )
+        return var_res.response_data(
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+            data=JobOfferLetterSerializer(offer).data
+        )
 
 
 class AdminJobPostActivityViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):

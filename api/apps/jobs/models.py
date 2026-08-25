@@ -188,7 +188,7 @@ class JobPostActivity(CommonBaseModel):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, null=True, blank=True)
+    resume = models.ForeignKey(Resume, on_delete=models.SET_NULL, null=True, blank=True)
 
     manual_candidate_profile = models.ForeignKey(
         EmployerCandidateProfile,
@@ -337,6 +337,72 @@ class JobPostNotification(CommonBaseModel):
         db_table = "project_job_job_post_notification"
 
         verbose_name_plural = "Job post notifications"
+
+
+class JobOfferLetter(CommonBaseModel):
+    """Thư mời nhận việc cho ứng viên đạt trạng thái HIRED/Tuyển dụng."""
+
+    STATUS_DRAFT = 'draft'
+    STATUS_SENT = 'sent'
+    STATUS_ACCEPTED = 'accepted'
+    STATUS_DECLINED = 'declined'
+    STATUS_EXPIRED = 'expired'
+
+    STATUS_CHOICES = [
+        (STATUS_DRAFT, 'Bản nháp'),
+        (STATUS_SENT, 'Đã gửi tới ứng viên'),
+        (STATUS_ACCEPTED, 'Ứng viên đã chấp nhận'),
+        (STATUS_DECLINED, 'Ứng viên từ chối'),
+        (STATUS_EXPIRED, 'Đã hết hạn'),
+    ]
+
+    application = models.OneToOneField(
+        JobPostActivity,
+        on_delete=models.CASCADE,
+        related_name="offer_letter",
+        verbose_name="Đơn ứng tuyển"
+    )
+    job_post = models.ForeignKey(
+        JobPost,
+        on_delete=models.CASCADE,
+        related_name="offer_letters",
+        verbose_name="Tin tuyển dụng"
+    )
+    company = models.ForeignKey(
+        "info.Company",
+        on_delete=models.CASCADE,
+        related_name="offer_letters",
+        verbose_name="Công ty"
+    )
+    candidate = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="received_offer_letters",
+        verbose_name="Ứng viên"
+    )
+    position_title = models.CharField(max_length=255, verbose_name="Vị trí bổ nhiệm")
+    salary_offered = models.DecimalField(max_digits=12, decimal_places=0, verbose_name="Mức lương đề xuất")
+    allowance = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Phụ cấp")
+    start_date = models.DateField(verbose_name="Ngày nhận việc dự kiến")
+    expiration_date = models.DateField(verbose_name="Hạn phản hồi")
+    work_location = models.CharField(max_length=255, blank=True, default="", verbose_name="Địa điểm làm việc")
+    benefits_note = models.TextField(blank=True, default="", verbose_name="Quyền lợi & Đãi ngộ")
+    terms_and_conditions = models.TextField(blank=True, default="", verbose_name="Điều khoản công việc")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_DRAFT, db_index=True)
+
+    candidate_signed_at = models.DateTimeField(null=True, blank=True, verbose_name="Thời điểm ứng viên ký/xác nhận")
+    candidate_feedback = models.TextField(blank=True, default="", verbose_name="Phản hồi từ ứng viên")
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_offers")
+
+    class Meta:
+        db_table = "project_job_offer_letter"
+        ordering = ["-create_at"]
+        verbose_name = "Job Offer Letter"
+        verbose_name_plural = "Job Offer Letters"
+
+    def __str__(self):
+        return f"Offer for {self.candidate.full_name} - {self.position_title} ({self.get_status_display()})"
+
 
 
 

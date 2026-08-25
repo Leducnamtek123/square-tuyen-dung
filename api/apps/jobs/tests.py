@@ -1877,3 +1877,56 @@ class TestScoreJobApplication:
             result = score_job_application(activity)
             assert result["score"] is None
             assert result["summary"] == ""
+
+
+@pytest.mark.django_db
+class TestJobPostActivityResumeDelete:
+    def test_delete_resume_sets_null_on_activity(self, job_post, job_seeker_user, resume):
+        """Deleting a resume should set resume_id to NULL on JobPostActivity rather than deleting the application."""
+        activity = JobPostActivity.objects.create(
+            job_post=job_post,
+            user=job_seeker_user,
+            resume=resume,
+            full_name="Nguyễn Văn A",
+            email="nguyenvana@example.com",
+            phone="0901234567",
+        )
+        activity_id = activity.id
+        resume_id = resume.id
+
+        # Delete resume
+        resume.delete()
+
+        # Reload activity
+        activity.refresh_from_db()
+        assert activity.id == activity_id
+        assert activity.resume is None
+        assert activity.user == job_seeker_user
+
+
+@pytest.mark.django_db
+class TestFlexibleApplicationStatusTransitions:
+    def test_flexible_status_transitions(self, job_post, job_seeker_user, resume):
+        """HR can transition application directly to INTERVIEWED or HIRED without being blocked."""
+        activity = JobPostActivity.objects.create(
+            job_post=job_post,
+            user=job_seeker_user,
+            resume=resume,
+            full_name="Nguyễn Văn A",
+            email="nguyenvana@example.com",
+            phone="0901234567",
+            status=var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+        )
+
+        # Transition directly PENDING_CONFIRMATION -> INTERVIEWED
+        activity = JobActivityService.change_application_status(
+            activity, var_sys.ApplicationStatus.INTERVIEWED, notify=False
+        )
+        assert activity.status == var_sys.ApplicationStatus.INTERVIEWED
+
+        # Transition directly INTERVIEWED -> HIRED
+        activity = JobActivityService.change_application_status(
+            activity, var_sys.ApplicationStatus.HIRED, notify=False
+        )
+        assert activity.status == var_sys.ApplicationStatus.HIRED
+

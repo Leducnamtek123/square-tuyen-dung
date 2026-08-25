@@ -184,14 +184,19 @@ class JobActivityService:
     APPLICATION_STATUS_TRANSITIONS = {
         var_sys.ApplicationStatus.PENDING_CONFIRMATION: {
             var_sys.ApplicationStatus.CONTACTED,
+            var_sys.ApplicationStatus.TESTED,
+            var_sys.ApplicationStatus.INTERVIEWED,
             var_sys.ApplicationStatus.NOT_SELECTED,
         },
         var_sys.ApplicationStatus.CONTACTED: {
             var_sys.ApplicationStatus.TESTED,
+            var_sys.ApplicationStatus.INTERVIEWED,
+            var_sys.ApplicationStatus.HIRED,
             var_sys.ApplicationStatus.NOT_SELECTED,
         },
         var_sys.ApplicationStatus.TESTED: {
             var_sys.ApplicationStatus.INTERVIEWED,
+            var_sys.ApplicationStatus.HIRED,
             var_sys.ApplicationStatus.NOT_SELECTED,
         },
         var_sys.ApplicationStatus.INTERVIEWED: {
@@ -298,6 +303,7 @@ class JobActivityService:
             "full_name": user.full_name,
             "company_name": company.company_name,
             "job_name": job_post.job_name,
+            "job_title": job_post.job_name,
             "find_job_post_link": domain + "viec-lam",
         }
 

@@ -74,9 +74,7 @@ const ProfilePage = () => {
   const rawProfileId = currentUser?.jobSeekerProfile?.id || currentUser?.jobSeekerProfileId || undefined;
   const jobSeekerProfileId = rawProfileId ? String(rawProfileId) : undefined;
 
-  const { data: resumes } = useResumes(jobSeekerProfileId, {
-    resumeType: CV_TYPES.cvWebsite,
-  });
+  const { data: resumes, refetch: refetchResumes } = useResumes(jobSeekerProfileId);
 
   const resume = React.useMemo(() => {
     return resumes && resumes.length > 0 ? (resumes[0] as unknown as ExtendedResume) : null;
@@ -429,6 +427,7 @@ const ProfilePage = () => {
               candidateEmail={profileData.email}
               candidatePhone={profileData.phoneNumber}
               avatarUrl={avatarUrl || currentUser?.avatarUrl || undefined}
+              onRefresh={refetchResumes}
             />
           </Stack>
         </Grid>

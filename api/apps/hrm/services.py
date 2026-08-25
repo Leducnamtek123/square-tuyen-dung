@@ -147,19 +147,22 @@ class CandidateToEmployeeConverter:
         # Extract names, contact & demographic details
         first_name = data.get("first_name", "").strip()
         last_name = data.get("last_name", "").strip()
-        if not first_name and user:
-            # Fallback parsing from full_name if not directly provided
-            parts = user.full_name.strip().split(" ", 1)
-            last_name = parts[0] if len(parts) > 1 else ""
-            first_name = parts[1] if len(parts) > 1 else parts[0]
-        elif not first_name and activity and activity.full_name:
-            parts = activity.full_name.strip().split(" ", 1)
-            last_name = parts[0] if len(parts) > 1 else ""
-            first_name = parts[1] if len(parts) > 1 else parts[0]
+        source_name = ""
+        if user and user.full_name:
+            source_name = user.full_name.strip()
+        elif activity and activity.full_name:
+            source_name = activity.full_name.strip()
 
-        full_name = f"{last_name} {first_name}".strip()
-        if not full_name and user:
-            full_name = user.full_name
+        if not first_name and source_name:
+            # Standard Vietnamese naming: last word is first_name (Tên), preceding words are last_name (Họ & Đệm)
+            parts = source_name.rsplit(" ", 1)
+            if len(parts) == 2:
+                last_name = last_name or parts[0]
+                first_name = parts[1]
+            else:
+                first_name = parts[0]
+
+        full_name = f"{last_name} {first_name}".strip() if (last_name and first_name) else (first_name or last_name or source_name)
 
         email = (data.get("email") or (user.email if user else "") or (activity.email if activity else "")).strip().lower()
         if not email:

@@ -123,26 +123,26 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     title = serializers.CharField(required=True, max_length=200)
     description = serializers.CharField(
         required=False, allow_null=True, allow_blank=True)
-    salaryMin = serializers.IntegerField(source="salary_min", required=True)
-    salaryMax = serializers.IntegerField(source="salary_max", required=True)
+    salaryMin = serializers.IntegerField(source="salary_min", required=False, allow_null=True, default=0)
+    salaryMax = serializers.IntegerField(source="salary_max", required=False, allow_null=True, default=0)
     expectedSalary = serializers.IntegerField(source="expected_salary", required=False, allow_null=True)
     skillsSummary = serializers.CharField(source="skills_summary", required=False, allow_null=True, allow_blank=True)
-    position = serializers.IntegerField(required=True)
+    position = serializers.IntegerField(required=False, allow_null=True, default=1)
     positionChooseData = serializers.SerializerMethodField(
         method_name="get_position_data", read_only=True)
-    experience = serializers.IntegerField(required=True)
+    experience = serializers.IntegerField(required=False, allow_null=True, default=1)
     experienceChooseData = serializers.SerializerMethodField(
         method_name="get_experience_data", read_only=True)
-    academicLevel = serializers.IntegerField(source="academic_level", required=True)
+    academicLevel = serializers.IntegerField(source="academic_level", required=False, allow_null=True, default=1)
     academicLevelChooseData = serializers.SerializerMethodField(
         method_name="get_academic_level_data", read_only=True)
-    typeOfWorkplace = serializers.IntegerField(source="type_of_workplace", required=True)
+    typeOfWorkplace = serializers.IntegerField(source="type_of_workplace", required=False, allow_null=True, default=1)
     typeOfWorkplaceChooseData = serializers.SerializerMethodField(
         method_name="get_type_of_workplace_data", read_only=True)
-    jobType = serializers.IntegerField(source="job_type", required=True)
+    jobType = serializers.IntegerField(source="job_type", required=False, allow_null=True, default=1)
     jobTypeChooseData = serializers.SerializerMethodField(
         method_name="get_job_type_data", read_only=True)
-    isActive = serializers.BooleanField(source="is_active", default=False)
+    isActive = serializers.BooleanField(source="is_active", default=True)
     updateAt = serializers.DateTimeField(source="update_at", read_only=True)
     imageUrl = serializers.SerializerMethodField(
         method_name="get_cv_image_url", read_only=True)
@@ -371,11 +371,13 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             user = request.user
             job_seeker_profile = getattr(user, 'job_seeker_profile', None)
             if not job_seeker_profile:
-                # If it's a job seeker without a profile, we should probably create one or error out gracefully.
-                # For now, we'll error out as a resume requires a profile context.
-                from rest_framework.exceptions import ValidationError
-                raise ValidationError({"errorMessage": ["User does not have a job seeker profile. Please complete your profile first."]})
+                from apps.profiles.models import JobSeekerProfile
+                job_seeker_profile, _ = JobSeekerProfile.objects.get_or_create(user=user)
             pdf_file = validated_data.pop('file')
+
+            validated_data.setdefault('type', var_sys.CV_UPLOAD)
+            validated_data.setdefault('salary_min', 0)
+            validated_data.setdefault('salary_max', 0)
 
             resume = Resume.objects.create(**validated_data,
                                            user=user,

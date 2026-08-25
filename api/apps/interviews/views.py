@@ -473,11 +473,13 @@ class QuestionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         user = self.request.user
         if _is_admin_user(user):
             return
+        if question.company_id is None:
+            raise PermissionDenied("Chỉ quản trị viên hệ thống mới có quyền sửa hoặc xóa câu hỏi toàn hệ thống.")
         company = self._resolve_company(user)
         if not (
             company
             and perms_custom.user_has_company_permission(user, "manage_question_bank", company)
-            and (question.company_id is None or question.company_id == company.id)
+            and question.company_id == company.id
         ):
             raise PermissionDenied("Question bank management permission required.")
 
@@ -532,11 +534,13 @@ class QuestionGroupViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         user = self.request.user
         if _is_admin_user(user):
             return
+        if group.company_id is None:
+            raise PermissionDenied("Chỉ quản trị viên hệ thống mới có quyền sửa hoặc xóa bộ câu hỏi toàn hệ thống.")
         company = self._resolve_company(user)
         if not (
             company
             and perms_custom.user_has_company_permission(user, "manage_question_bank", company)
-            and (group.company_id is None or group.company_id == company.id)
+            and group.company_id == company.id
         ):
             raise PermissionDenied("Question bank management permission required.")
 
@@ -916,6 +920,84 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             "candidateName": session.candidate.full_name if session.candidate else None,
             "jobName": session.job_post.job_name if session.job_post else None,
         })
+
+    # GET /sessions/{pk}/calendar-ics/
+    @action(detail=True, methods=['get'], url_path='calendar-ics',
+            permission_classes=[permissions.AllowAny])
+    def calendar_ics(self, request, pk=None):
+        """Export iCalendar (.ics) format to sync with Google Calendar, Outlook, Apple Calendar."""
+        from django.http import HttpResponse
+        from django.utils import timezone
+        from .calendar_service import generate_interview_ics
+        session = self.get_object()
+        scheduled_at = session.scheduled_at or session.start_time or timezone.now()
+        candidate_name = session.candidate.full_name if session.candidate else "Ứng viên"
+        candidate_email = session.candidate.email if session.candidate else ""
+        job_title = session.job_post.job_name if session.job_post else "Phỏng vấn Tuyển dụng"
+        company_name = session.job_post.company.company_name if session.job_post and session.job_post.company else "Square Platform"
+        room_url = f"https://square.vn/interviews/room/{session.room_name}"
+
+        ics_content = generate_interview_ics(
+            session_id=session.id,
+            candidate_name=candidate_name,
+            candidate_email=candidate_email,
+            job_title=job_title,
+            company_name=company_name,
+            scheduled_at=scheduled_at,
+            duration_minutes=session.duration // 60 if session.duration else 45,
+            room_url=room_url,
+            interviewer_name=session.created_by.full_name if session.created_by else None,
+            interviewer_email=session.created_by.email if session.created_by else None,
+        )
+
+        response = HttpResponse(ics_content, content_type="text/calendar; charset=utf-8")
+        response['Content-Disposition'] = f'attachment; filename="interview-{session.id}.ics"'
+        return response
+
+    # GET/POST /sessions/{pk}/proctoring-events/
+    @action(detail=True, methods=['get', 'post'], url_path='proctoring-events',
+            permission_classes=[permissions.AllowAny])
+    def proctoring_events(self, request, pk=None):
+        """Ghi nhận và tra cứu sự kiện giám sát chống gian lận trong phòng phỏng vấn."""
+        from .models import InterviewProctoringEvent
+        from .serializers import InterviewProctoringEventSerializer
+        session = self.get_object()
+        if request.method == 'GET':
+            events = session.proctoring_events.all()
+            return response_data(data=InterviewProctoringEventSerializer(events, many=True).data)
+
+        event_type = request.data.get("eventType") or request.data.get("event_type")
+        duration = request.data.get("durationSeconds") or request.data.get("duration_seconds", 0.0)
+        details = request.data.get("details", {})
+        if not event_type:
+            return response_data(status=status.HTTP_400_BAD_REQUEST, errors={"eventType": ["Trường eventType là bắt buộc."]})
+
+        event = InterviewProctoringEvent.objects.create(
+            session=session,
+            event_type=event_type,
+            duration_seconds=float(duration),
+            details=details if isinstance(details, dict) else {},
+        )
+        return response_data(status=status.HTTP_201_CREATED, data=InterviewProctoringEventSerializer(event).data)
+
+    # GET/POST /sessions/{pk}/timeline-highlights/
+    @action(detail=True, methods=['get', 'post'], url_path='timeline-highlights',
+            permission_classes=[permissions.IsAuthenticated])
+    def timeline_highlights(self, request, pk=None):
+        """Lưu trữ và xem các mốc thời gian nổi bật (Key Moments) của buổi phỏng vấn."""
+        session = self.get_object()
+        _deny_if_cannot_manage_session(request.user, session, request)
+        if request.method == 'GET':
+            return response_data(data={"timelineHighlights": session.timeline_highlights or []})
+
+        highlights = request.data.get("timelineHighlights") or request.data.get("timeline_highlights")
+        if not isinstance(highlights, list):
+            return response_data(status=status.HTTP_400_BAD_REQUEST, errors={"timelineHighlights": ["Dữ liệu phải là một danh sách các mốc thời gian."]})
+
+        session.timeline_highlights = highlights
+        session.save(update_fields=["timeline_highlights", "update_at"])
+        return response_data(data={"timelineHighlights": session.timeline_highlights})
+
 
 
 class InterviewEvaluationViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):

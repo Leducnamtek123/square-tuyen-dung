@@ -56,7 +56,7 @@ def _build_resume_profile_text(resume) -> str:
         f"Academic level: {_display(resume, 'academic_level')}",
         f"Workplace type: {_display(resume, 'type_of_workplace')}",
         f"Job type: {_display(resume, 'job_type')}",
-        f"Expected salary: {resume.salary_min or 0} - {resume.salary_max or 0}",
+        f"Expected salary: {resume.expected_salary if getattr(resume, 'expected_salary', None) else f'{resume.salary_min or 0} - {resume.salary_max or 0}'}",
         f"Summary: {resume.description or ''}",
         f"Skills summary: {resume.skills_summary or ''}",
     ]

@@ -392,6 +392,10 @@ class InterviewSession(CommonBaseModel):
         default=0,
         verbose_name="Chỉ số câu hỏi hiện tại"
     )
+    timeline_highlights = models.JSONField(
+        blank=True, null=True, default=list,
+        verbose_name="Mốc thời gian nổi bật"
+    )
 
     class Meta:
         db_table = "project_interview_session"
@@ -517,5 +521,45 @@ class InterviewEvaluation(CommonBaseModel):
 
     def __str__(self):
         return f"Eval #{self.pk} for Interview #{self.interview_id} - {self.get_result_display()}"
+
+
+class InterviewProctoringEvent(CommonBaseModel):
+    """Sự kiện giám sát chống gian lận trong buổi phỏng vấn AI/LiveKit."""
+
+    EVENT_TAB_SWITCH = 'tab_switch'
+    EVENT_NO_FACE = 'no_face_detected'
+    EVENT_MULTIPLE_FACES = 'multiple_faces_detected'
+    EVENT_AUDIO_ANOMALY = 'audio_anomaly'
+    EVENT_CHOICES = [
+        (EVENT_TAB_SWITCH, 'Chuyển tab'),
+        (EVENT_NO_FACE, 'Mất nhận diện khuôn mặt'),
+        (EVENT_MULTIPLE_FACES, 'Phát hiện nhiều khuôn mặt'),
+        (EVENT_AUDIO_ANOMALY, 'Âm thanh bất thường'),
+    ]
+
+    session = models.ForeignKey(
+        InterviewSession,
+        on_delete=models.CASCADE,
+        related_name='proctoring_events',
+        verbose_name="Buổi phỏng vấn"
+    )
+    event_type = models.CharField(
+        max_length=40,
+        choices=EVENT_CHOICES,
+        verbose_name="Loại vi phạm"
+    )
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Thời điểm ghi nhận")
+    duration_seconds = models.FloatField(default=0.0, verbose_name="Thời lượng (giây)")
+    details = models.JSONField(blank=True, null=True, verbose_name="Dữ liệu chi tiết")
+
+    class Meta:
+        db_table = "project_interview_proctoring_event"
+        ordering = ['-timestamp']
+        verbose_name = "Proctoring Event"
+        verbose_name_plural = "Proctoring Events"
+
+    def __str__(self):
+        return f"Proctoring: {self.get_event_type_display()} on session #{self.session_id}"
+
 
 

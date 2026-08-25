@@ -289,6 +289,12 @@ export interface Resume {
   isActive?: boolean;
   type?: string;
   fileUrl?: string | null;
+  file?: {
+    id?: number;
+    name?: string;
+    url?: string;
+    fileUrl?: string;
+  } | null;
   city?: City | null;
   career?: Career | null;
   sourcePlatform?: string | null;

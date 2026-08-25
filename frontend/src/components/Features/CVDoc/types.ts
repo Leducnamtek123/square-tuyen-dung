@@ -45,8 +45,20 @@ export type ExtendedResume = Resume & {
   academicLevelChooseData?: ExtraData;
   typeOfWorkplaceChooseData?: ExtraData;
   jobTypeChooseData?: ExtraData;
+  locationChooseData?: ExtraData;
   salaryMin?: number;
   salaryMax?: number;
+  salary?: string;
+  expectedSalary?: number | null;
+  careerObjective?: string;
+  isSearchable?: boolean;
+  fileUrl?: string | null;
+  file?: {
+    id?: number;
+    name?: string;
+    url?: string;
+    fileUrl?: string;
+  } | null;
   experienceDetails?: CVDocExperience[];
   educationDetails?: CVDocEducation[];
   advancedSkills?: CVDocAdvancedSkill[];

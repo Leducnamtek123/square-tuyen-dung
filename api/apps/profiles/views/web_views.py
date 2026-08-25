@@ -157,7 +157,7 @@ class JobSeekerProfileViewSet(viewsets.ViewSet,
 
             serializer = ResumeSerializer(resumes, many=True, fields=[
 
-                "id", "slug", "title", "type", "updateAt", "isActive"
+                "id", "slug", "title", "type", "updateAt", "fileUrl", "imageUrl", "isActive"
 
             ])
 
@@ -237,17 +237,36 @@ class PrivateResumeViewSet(PermissionActionMapMixin, viewsets.ViewSet,
     }
     default_permission_classes = [perms_sys.IsAuthenticated]
 
+    def get_object(self):
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_val = self.kwargs.get(lookup_url_kwarg)
+        queryset = self.filter_queryset(self.get_queryset())
+        if lookup_val is not None and str(lookup_val).isdigit():
+            obj = queryset.filter(Q(pk=int(lookup_val)) | Q(slug=lookup_val)).first()
+        else:
+            obj = queryset.filter(slug=lookup_val).first()
+        if not obj:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Resume not found.")
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     def create(self, request, *args, **kwargs):
 
-        data = request.data.copy()
+        data = {k: v for k, v in request.data.items()} if hasattr(request.data, 'items') else dict(request.data)
+        if "file" in request.FILES:
+            data["file"] = request.FILES["file"]
+        if not data.get("title") and data.get("file"):
+            file_name = getattr(data["file"], "name", "")
+            data["title"] = file_name.rsplit(".", 1)[0] if file_name else "Hồ sơ ứng tuyển"
 
         serializer = ResumeSerializer(data=data, fields=[
 
-            "title", "description", "salaryMin", "salaryMax", "expectedSalary", "skillsSummary",
+            "id", "slug", "title", "description", "salaryMin", "salaryMax", "expectedSalary", "skillsSummary",
 
             "position", "experience", "academicLevel", "typeOfWorkplace",
 
-            "jobType", "city", "career", "file"
+            "jobType", "city", "career", "file", "fileUrl", "type", "updateAt", "isActive"
 
         ], context={'request': request})
 

@@ -185,3 +185,52 @@ class AttendanceRecord(CommonBaseModel):
     class Meta:
         unique_together = ('employee', 'date')
         ordering = ['-date']
+
+
+class MonthlyPayrollRecord(CommonBaseModel):
+    """Bảng lương hàng tháng cho nhân viên (Vietnam Payroll & Tax)."""
+
+    STATUS_DRAFT = 'DRAFT'
+    STATUS_APPROVED = 'APPROVED'
+    STATUS_PAID = 'PAID'
+    STATUS_CHOICES = (
+        (STATUS_DRAFT, 'Bản nháp'),
+        (STATUS_APPROVED, 'Đã phê duyệt'),
+        (STATUS_PAID, 'Đã chi trả'),
+    )
+
+    company = models.ForeignKey('info.Company', on_delete=models.CASCADE, related_name="payroll_records")
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="payroll_records")
+    month = models.PositiveSmallIntegerField(verbose_name="Tháng")
+    year = models.PositiveIntegerField(verbose_name="Năm")
+
+    gross_salary = models.DecimalField(max_digits=12, decimal_places=0, verbose_name="Lương Gross")
+    allowance = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Phụ cấp")
+    bonus = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Thưởng")
+
+    working_days_actual = models.PositiveSmallIntegerField(default=22, verbose_name="Ngày công thực tế")
+    standard_working_days = models.PositiveSmallIntegerField(default=22, verbose_name="Ngày công chuẩn")
+    unpaid_leave_days = models.PositiveSmallIntegerField(default=0, verbose_name="Ngày nghỉ không lương")
+
+    total_income = models.DecimalField(max_digits=12, decimal_places=0, verbose_name="Tổng thu nhập")
+
+    bhxh_amount = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="BHXH (8%)")
+    bhyt_amount = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="BHYT (1.5%)")
+    bhtn_amount = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="BHTN (1%)")
+    total_insurance = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Tổng bảo hiểm")
+
+    taxable_income = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Thu nhập tính thuế")
+    personal_income_tax = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Thuế TNCN")
+
+    net_salary = models.DecimalField(max_digits=12, decimal_places=0, verbose_name="Lương thực nhận (Net)")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_DRAFT, db_index=True)
+    payment_date = models.DateField(null=True, blank=True, verbose_name="Ngày thanh toán")
+    note = models.TextField(blank=True, default="", verbose_name="Ghi chú")
+
+    class Meta:
+        unique_together = ('employee', 'month', 'year')
+        ordering = ['-year', '-month', 'employee']
+
+    def __str__(self):
+        return f"Payroll {self.month}/{self.year} - {self.employee.full_name}: Net {self.net_salary:,.0f} VND"
+

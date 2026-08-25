@@ -10,6 +10,7 @@ router.register(r'contracts', views.EmploymentContractViewSet, basename='hrm-con
 router.register(r'leave-types', views.LeaveTypeViewSet, basename='hrm-leave-types')
 router.register(r'leave-requests', views.LeaveRequestViewSet, basename='hrm-leave-requests')
 router.register(r'attendances', views.AttendanceRecordViewSet, basename='hrm-attendances')
+router.register(r'payroll', views.MonthlyPayrollViewSet, basename='hrm-payroll')
 
 urlpatterns = [
     path('dashboard/stats/', views.HrmDashboardStatsAPIView.as_view(), name='hrm-dashboard-stats'),

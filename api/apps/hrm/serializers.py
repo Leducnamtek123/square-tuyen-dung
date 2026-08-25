@@ -24,6 +24,29 @@ class DepartmentSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['company', 'create_at', 'update_at']
 
+    def validate(self, attrs):
+        request = self.context.get('request')
+        parent = attrs.get('parent')
+        manager = attrs.get('manager')
+        company = attrs.get('company')
+        if not company and self.instance:
+            company = self.instance.company
+        if not company and request:
+            from apps.hrm.views import _get_company_for_request
+            company = _get_company_for_request(request)
+
+        if parent:
+            if company and parent.company_id != company.id:
+                raise serializers.ValidationError({"parent": "Phòng ban cha không thuộc cùng công ty."})
+            if self.instance and parent.id == self.instance.id:
+                raise serializers.ValidationError({"parent": "Phòng ban không thể làm cha của chính nó."})
+
+        if manager:
+            if company and manager.company_id != company.id:
+                raise serializers.ValidationError({"manager": "Trưởng phòng phải là nhân viên thuộc cùng công ty."})
+
+        return attrs
+
 
 class DesignationSerializer(serializers.ModelSerializer):
     employee_count = serializers.IntegerField(source='employees.count', read_only=True)
@@ -49,6 +72,31 @@ class EmploymentContractSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['create_at', 'update_at']
 
+    def validate(self, attrs):
+        start_date = attrs.get('start_date') or (self.instance.start_date if self.instance else None)
+        end_date = attrs.get('end_date') if 'end_date' in attrs else (self.instance.end_date if self.instance else None)
+        base_salary = attrs.get('base_salary') if 'base_salary' in attrs else (self.instance.base_salary if self.instance else None)
+        allowance = attrs.get('allowance') if 'allowance' in attrs else (self.instance.allowance if self.instance else None)
+        employee = attrs.get('employee') or (self.instance.employee if self.instance else None)
+
+        if start_date and end_date and end_date < start_date:
+            raise serializers.ValidationError({"end_date": "Ngày kết thúc hợp đồng không thể trước ngày bắt đầu."})
+
+        if base_salary is not None and base_salary < 0:
+            raise serializers.ValidationError({"base_salary": "Lương cơ bản không thể là số âm."})
+
+        if allowance is not None and allowance < 0:
+            raise serializers.ValidationError({"allowance": "Phụ cấp không thể là số âm."})
+
+        request = self.context.get('request')
+        if request and employee:
+            from apps.hrm.views import _get_company_for_request
+            req_company = _get_company_for_request(request)
+            if req_company and employee.company_id != req_company.id:
+                raise serializers.ValidationError({"employee": "Nhân viên không thuộc công ty hiện tại."})
+
+        return attrs
+
 
 class EmployeeSerializer(serializers.ModelSerializer):
     department_name = serializers.CharField(source='department.name', read_only=True)
@@ -68,6 +116,32 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'tax_id', 'social_insurance_id', 'contracts', 'create_at', 'update_at'
         ]
         read_only_fields = ['company', 'create_at', 'update_at']
+
+    def validate(self, attrs):
+        department = attrs.get('department')
+        designation = attrs.get('designation')
+        reports_to = attrs.get('reports_to')
+        company = attrs.get('company')
+        if not company and self.instance:
+            company = self.instance.company
+        if not company:
+            request = self.context.get('request')
+            if request:
+                from apps.hrm.views import _get_company_for_request
+                company = _get_company_for_request(request)
+
+        if company:
+            if department and department.company_id != company.id:
+                raise serializers.ValidationError({"department": "Phòng ban không thuộc công ty này."})
+            if designation and designation.company_id != company.id:
+                raise serializers.ValidationError({"designation": "Chức danh không thuộc công ty này."})
+            if reports_to:
+                if reports_to.company_id != company.id:
+                    raise serializers.ValidationError({"reports_to": "Người quản lý trực tiếp không thuộc công ty này."})
+                if self.instance and reports_to.id == self.instance.id:
+                    raise serializers.ValidationError({"reports_to": "Nhân viên không thể tự báo cáo cho chính mình."})
+
+        return attrs
 
 
 class LeaveTypeSerializer(serializers.ModelSerializer):
@@ -92,6 +166,31 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['create_at', 'update_at']
 
+    def validate(self, attrs):
+        start_date = attrs.get('start_date') or (self.instance.start_date if self.instance else None)
+        end_date = attrs.get('end_date') or (self.instance.end_date if self.instance else None)
+        total_days = attrs.get('total_days') if 'total_days' in attrs else (self.instance.total_days if self.instance else None)
+        employee = attrs.get('employee') or (self.instance.employee if self.instance else None)
+        leave_type = attrs.get('leave_type') or (self.instance.leave_type if self.instance else None)
+
+        if start_date and end_date and end_date < start_date:
+            raise serializers.ValidationError({"end_date": "Ngày kết thúc nghỉ phép không thể trước ngày bắt đầu."})
+
+        if total_days is not None and total_days <= 0:
+            raise serializers.ValidationError({"total_days": "Tổng số ngày nghỉ phép phải lớn hơn 0."})
+
+        if employee and leave_type and leave_type.company_id != employee.company_id:
+            raise serializers.ValidationError({"leave_type": "Loại nghỉ phép không thuộc công ty của nhân viên này."})
+
+        request = self.context.get('request')
+        if request and employee:
+            from apps.hrm.views import _get_company_for_request
+            req_company = _get_company_for_request(request)
+            if req_company and employee.company_id != req_company.id:
+                raise serializers.ValidationError({"employee": "Nhân viên không thuộc công ty hiện tại."})
+
+        return attrs
+
 
 class AttendanceRecordSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
@@ -103,6 +202,27 @@ class AttendanceRecordSerializer(serializers.ModelSerializer):
             'working_hours', 'status', 'notes', 'create_at', 'update_at'
         ]
         read_only_fields = ['create_at', 'update_at']
+
+    def validate(self, attrs):
+        check_in = attrs.get('check_in') if 'check_in' in attrs else (self.instance.check_in if self.instance else None)
+        check_out = attrs.get('check_out') if 'check_out' in attrs else (self.instance.check_out if self.instance else None)
+        working_hours = attrs.get('working_hours') if 'working_hours' in attrs else (self.instance.working_hours if self.instance else None)
+        employee = attrs.get('employee') or (self.instance.employee if self.instance else None)
+
+        if check_in and check_out and check_out < check_in:
+            raise serializers.ValidationError({"check_out": "Giờ ra không thể trước giờ vào trong cùng ngày."})
+
+        if working_hours is not None and working_hours < 0:
+            raise serializers.ValidationError({"working_hours": "Số giờ làm việc không thể là số âm."})
+
+        request = self.context.get('request')
+        if request and employee:
+            from apps.hrm.views import _get_company_for_request
+            req_company = _get_company_for_request(request)
+            if req_company and employee.company_id != req_company.id:
+                raise serializers.ValidationError({"employee": "Nhân viên không thuộc công ty hiện tại."})
+
+        return attrs
 
 
 class OnboardCandidateSerializer(serializers.Serializer):
@@ -153,3 +273,24 @@ class OnboardCandidateSerializer(serializers.Serializer):
         if not attrs.get('employment_type') and attrs.get('employmentType'):
             attrs['employment_type'] = attrs.get('employmentType')
         return attrs
+
+
+class MonthlyPayrollRecordSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    department_name = serializers.CharField(source='employee.department.name', read_only=True)
+    status_label = serializers.CharField(source='get_status_display', read_only=True)
+
+    class Meta:
+        from .models import MonthlyPayrollRecord
+        model = MonthlyPayrollRecord
+        fields = [
+            'id', 'company', 'employee', 'employee_name', 'employee_code', 'department_name',
+            'month', 'year', 'gross_salary', 'allowance', 'bonus',
+            'working_days_actual', 'standard_working_days', 'unpaid_leave_days',
+            'total_income', 'bhxh_amount', 'bhyt_amount', 'bhtn_amount', 'total_insurance',
+            'taxable_income', 'personal_income_tax', 'net_salary',
+            'status', 'status_label', 'payment_date', 'note', 'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at']
+

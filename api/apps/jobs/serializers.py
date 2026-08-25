@@ -784,6 +784,14 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
             }
         return representation
 
+    def validate_status(self, value):
+        if self.instance:
+            current_status = self.instance.status
+            if current_status in [var_sys.ApplicationStatus.HIRED, var_sys.ApplicationStatus.NOT_SELECTED]:
+                if value == var_sys.ApplicationStatus.PENDING_CONFIRMATION:
+                    raise serializers.ValidationError("Không thể chuyển ngược trạng thái từ Đã Tuyển Dụng / Không Trúng Tuyển về Chờ Xác Nhận.")
+        return value
+
 
 
 
@@ -953,4 +961,40 @@ class StatisticsSerializer(serializers.Serializer):
     startDate = serializers.DateField(required=True)
 
     endDate = serializers.DateField(required=True)
+
+
+class JobOfferLetterSerializer(serializers.ModelSerializer):
+    statusLabel = serializers.CharField(source="get_status_display", read_only=True)
+    candidateName = serializers.CharField(source="candidate.full_name", read_only=True)
+    candidateEmail = serializers.CharField(source="candidate.email", read_only=True)
+    companyName = serializers.CharField(source="company.company_name", read_only=True)
+    jobName = serializers.CharField(source="job_post.job_name", read_only=True)
+
+    class Meta:
+        from .models import JobOfferLetter
+        model = JobOfferLetter
+        fields = (
+            "id", "application", "job_post", "company", "candidate",
+            "candidateName", "candidateEmail", "companyName", "jobName",
+            "position_title", "salary_offered", "allowance", "start_date",
+            "expiration_date", "work_location", "benefits_note",
+            "terms_and_conditions", "status", "statusLabel",
+            "candidate_signed_at", "candidate_feedback", "create_at", "update_at"
+        )
+        read_only_fields = ("id", "application", "company", "candidate", "job_post", "candidate_signed_at", "create_at", "update_at")
+
+    def validate(self, attrs):
+        start_date = attrs.get('start_date')
+        expiration_date = attrs.get('expiration_date')
+        salary_offered = attrs.get('salary_offered')
+        allowance = attrs.get('allowance')
+
+        if salary_offered is not None and salary_offered < 0:
+            raise serializers.ValidationError({"salary_offered": "Mức lương đề xuất không được là số âm."})
+        if allowance is not None and allowance < 0:
+            raise serializers.ValidationError({"allowance": "Phụ cấp không được là số âm."})
+        if start_date and expiration_date and expiration_date > start_date:
+            raise serializers.ValidationError({"expiration_date": "Hạn phản hồi thư mời phải trước hoặc bằng ngày nhận việc."})
+        return attrs
+
 

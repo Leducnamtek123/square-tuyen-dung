@@ -494,7 +494,7 @@ def queue_ai_evaluation(session: InterviewSession) -> None:
 
 def create_observer_livekit_token(session: InterviewSession, request) -> Dict[str, str]:
     """Create a hidden LiveKit token for employer to observe interview silently."""
-    allowed_statuses = ("scheduled", "calibration", "in_progress")
+    allowed_statuses = ("scheduled", "calibration", "in_progress", "interrupted")
     if session.status not in allowed_statuses:
         raise SessionNotJoinableError(
             f"Khong the quan sat buoi phong van nay vi trang thai hien tai la: {session.get_status_display()}"

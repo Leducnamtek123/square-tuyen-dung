@@ -73,7 +73,7 @@ def _can_user_write_company_scoped_item(user, item, request):
         return False
 
     item_company_id = getattr(item, "company_id", None)
-    return item_company_id is None or item_company_id == company.id
+    return item_company_id is not None and item_company_id == company.id
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -685,4 +685,18 @@ class UpdateStatusSerializer(serializers.Serializer):
     status = serializers.ChoiceField(
         choices=['scheduled', 'calibration', 'in_progress', 'completed', 'cancelled', 'interrupted']
     )
+
+
+class InterviewProctoringEventSerializer(serializers.ModelSerializer):
+    eventTypeLabel = serializers.CharField(source="get_event_type_display", read_only=True)
+
+    class Meta:
+        from .models import InterviewProctoringEvent
+        model = InterviewProctoringEvent
+        fields = [
+            'id', 'session', 'event_type', 'eventTypeLabel',
+            'timestamp', 'duration_seconds', 'details', 'create_at'
+        ]
+        read_only_fields = ['id', 'create_at', 'timestamp']
+
 

@@ -22,6 +22,8 @@ import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
+import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import dayjs from 'dayjs';
 import type { ExtendedResume, CVDocExperience, CVDocEducation, CVDocAdvancedSkill, CVDocCertificate } from '@/components/Features/CVDoc';
 
@@ -44,33 +46,29 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
   candidatePhone = '',
   avatarUrl,
 }) => {
-  const displayName = candidateName || resume?.user?.fullName || 'Ứng viên';
-  const displayEmail = candidateEmail || resume?.user?.email || '';
-  const displayPhone = candidatePhone || (resume as any)?.jobSeekerProfile?.phone || '';
+  const displayName = candidateName || resume?.user?.fullName || resume?.userDict?.fullName || 'Ứng viên';
+  const displayEmail = candidateEmail || resume?.user?.email || resume?.userDict?.email || '';
+  const displayPhone = candidatePhone || resume?.jobSeekerProfileDict?.phone || '';
   const resumeTitle = resume?.title || 'Hồ sơ ứng viên';
-  const updatedAt = resume?.updateAt || (resume as any)?.createdAt;
+  const updatedAt = resume?.updateAt || resume?.createAt;
 
   const cityName =
     typeof resume?.city === 'object' && resume.city?.name
       ? resume.city.name
-      : typeof (resume as any)?.city === 'string'
-      ? (resume as any).city
-      : '';
+      : resume?.locationChooseData?.name || '';
 
   const positionName =
-    resume?.positionChooseData?.name ||
-    (typeof (resume as any)?.position === 'object' ? (resume as any)?.position?.name : (resume as any)?.position) ||
-    '';
+    resume?.positionChooseData?.name || '';
 
   const experienceLabel =
     resume?.experienceChooseData?.name ||
-    (typeof (resume as any)?.experience === 'object' ? (resume as any)?.experience?.name : (resume as any)?.experience ? `${(resume as any).experience} năm` : '');
+    (resume?.experience ? `${resume.experience} năm` : '');
 
   const educationLabel =
     resume?.academicLevelChooseData?.name ||
-    (typeof (resume as any)?.academicLevel === 'object' ? (resume as any)?.academicLevel?.name : (resume as any)?.academicLevel ? String((resume as any).academicLevel) : '');
+    (resume?.academicLevel ? String(resume.academicLevel) : '');
 
-  const objectiveText = resume?.description || (resume as any)?.careerObjective || '';
+  const objectiveText = resume?.description || resume?.careerObjective || '';
 
   const formatSalary = () => {
     if (resume?.salaryMin && resume?.salaryMax) {
@@ -79,8 +77,14 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
     if (resume?.salaryMin) {
       return `Từ ${(resume.salaryMin / 1000000).toLocaleString('vi-VN')} triệu VNĐ`;
     }
-    if (typeof (resume as any)?.salary === 'string') {
-      return (resume as any).salary;
+    if (resume?.salaryMax) {
+      return `Lên đến ${(resume.salaryMax / 1000000).toLocaleString('vi-VN')} triệu VNĐ`;
+    }
+    if (resume?.expectedSalary) {
+      return `${(resume.expectedSalary / 1000000).toLocaleString('vi-VN')} triệu VNĐ`;
+    }
+    if (typeof resume?.salary === 'string') {
+      return resume.salary;
     }
     return '';
   };
@@ -91,10 +95,13 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
   const advancedSkills: CVDocAdvancedSkill[] = resume?.advancedSkills || [];
   const certificates: CVDocCertificate[] = resume?.certificates || [];
 
+  const pdfUrl = resume?.fileUrl || resume?.file?.url || resume?.file?.fileUrl;
+
   return (
     <Dialog
       open={open}
       onClose={onClose}
+      aria-labelledby="candidate-resume-preview-title"
       maxWidth="md"
       fullWidth
       PaperProps={{
@@ -107,6 +114,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
     >
       {/* Header Modal */}
       <DialogTitle
+        id="candidate-resume-preview-title"
         sx={{
           m: 0,
           p: 2.5,
@@ -141,13 +149,14 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
           <Button
             size="small"
             variant="outlined"
+            aria-label="In bản CV này"
             onClick={() => window.print()}
             startIcon={<PrintOutlinedIcon sx={{ fontSize: 16 }} />}
             sx={{ borderRadius: '10px', textTransform: 'none', fontWeight: 700, borderColor: '#cbd5e1', color: '#0f172a' }}
           >
             In CV
           </Button>
-          <IconButton aria-label="Đóng" onClick={onClose} size="small" sx={{ color: '#64748b', backgroundColor: '#f1f5f9', '&:hover': { backgroundColor: '#e2e8f0' } }}>
+          <IconButton aria-label="Đóng bản xem trước CV" onClick={onClose} size="small" sx={{ color: '#64748b', backgroundColor: '#f1f5f9', '&:hover': { backgroundColor: '#e2e8f0' } }}>
             <CloseIcon />
           </IconButton>
         </Stack>
@@ -155,6 +164,42 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
 
       <DialogContent sx={{ p: { xs: 2.5, sm: 4 } }}>
         <Stack spacing={3}>
+          {/* Section: Tệp CV đính kèm (nếu có) */}
+          {pdfUrl ? (
+            <Box sx={{ p: 3, borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, pb: 1, borderBottom: '2px solid #2563eb' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <InsertDriveFileOutlinedIcon sx={{ color: '#2563eb' }} />
+                  <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a' }}>
+                    Tệp CV đính kèm
+                  </Typography>
+                </Box>
+                <Button
+                  size="small"
+                  variant="contained"
+                  href={pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Mở tệp PDF gốc trong tab mới"
+                  startIcon={<OpenInNewIcon sx={{ fontSize: 16 }} />}
+                  sx={{ borderRadius: '10px', textTransform: 'none', fontWeight: 700, backgroundColor: '#2563eb' }}
+                >
+                  Mở tệp PDF gốc
+                </Button>
+              </Box>
+              <Box sx={{ width: '100%', height: '520px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
+                <iframe
+                  src={`${pdfUrl}#toolbar=0`}
+                  width="100%"
+                  height="100%"
+                  loading="lazy"
+                  title={`Bản xem trước tệp CV - ${resumeTitle}`}
+                  style={{ border: 'none' }}
+                />
+              </Box>
+            </Box>
+          ) : null}
+
           {/* Section 1: Thông tin cá nhân */}
           <Box sx={{ p: 3, borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, pb: 1, borderBottom: '2px solid #2563eb' }}>

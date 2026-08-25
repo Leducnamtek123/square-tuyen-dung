@@ -30,6 +30,7 @@ from apps.hrm.serializers import (
     LeaveRequestSerializer,
     LeaveTypeSerializer,
     OnboardCandidateSerializer,
+    MonthlyPayrollRecordSerializer,
 )
 from apps.hrm.services import CandidateToEmployeeConverter, generate_next_employee_code
 from shared.configs import variable_system as var_sys
@@ -378,3 +379,96 @@ class HrmDashboardStatsAPIView(APIView):
             'expiring_contracts': expiring_contracts_count,
             'department_breakdown': list(depts),
         })
+
+
+class MonthlyPayrollViewSet(viewsets.ModelViewSet):
+    permission_classes = [perms_custom.CanManageEmployees]
+    serializer_class = MonthlyPayrollRecordSerializer
+
+    def get_queryset(self):
+        from .models import MonthlyPayrollRecord
+        company = _get_company_for_request(self.request)
+        if not company:
+            return MonthlyPayrollRecord.objects.none()
+        return MonthlyPayrollRecord.objects.filter(company=company).select_related('employee', 'employee__department')
+
+    @action(detail=False, methods=['post'], url_path='calculate')
+    def calculate(self, request):
+        """Tính toán bảng lương tháng cho một nhân viên hoặc toàn bộ nhân viên công ty."""
+        from decimal import Decimal
+        from .models import MonthlyPayrollRecord
+        from .payroll_engine import calculate_vietnam_payroll
+        company = _get_company_for_request(request)
+        if not company:
+            raise PermissionDenied("Bạn không có quyền truy cập công ty này.")
+
+        employee_id = request.data.get('employee_id') or request.data.get('employee')
+        month = int(request.data.get('month', timezone.now().month))
+        year = int(request.data.get('year', timezone.now().year))
+        standard_days = int(request.data.get('standard_working_days', 22))
+
+        employees = Employee.objects.filter(company=company, status__in=['ACTIVE', 'PROBATION'])
+        if employee_id:
+            employees = employees.filter(id=employee_id)
+
+        created_records = []
+        for emp in employees:
+            contract = emp.contracts.filter(status='ACTIVE').order_by('-start_date').first()
+            gross = contract.base_salary if contract else Decimal("10000000")
+            allowance = contract.allowance if contract else Decimal("0")
+
+            unpaid_leave_days = LeaveRequest.objects.filter(
+                employee=emp,
+                status='APPROVED',
+                leave_type__is_paid=False,
+                start_date__year=year,
+                start_date__month=month,
+            ).count()
+
+            attendance_days = AttendanceRecord.objects.filter(
+                employee=emp,
+                date__year=year,
+                date__month=month,
+                status__in=['PRESENT', 'LATE', 'EARLY_LEAVE']
+            ).count()
+            actual_days = attendance_days if attendance_days > 0 else standard_days
+
+            calc = calculate_vietnam_payroll(
+                gross_salary=gross,
+                allowance=allowance,
+                bonus=Decimal(str(request.data.get('bonus', 0))),
+                working_days_actual=actual_days,
+                standard_working_days=standard_days,
+                unpaid_leave_days=unpaid_leave_days,
+            )
+
+            record, _ = MonthlyPayrollRecord.objects.update_or_create(
+                company=company,
+                employee=emp,
+                month=month,
+                year=year,
+                defaults={
+                    'gross_salary': calc['gross_salary'],
+                    'allowance': calc['allowance'],
+                    'bonus': calc['bonus'],
+                    'working_days_actual': calc['working_days_actual'],
+                    'standard_working_days': calc['standard_working_days'],
+                    'unpaid_leave_days': calc['unpaid_leave_days'],
+                    'total_income': calc['total_income'],
+                    'bhxh_amount': calc['insurance_deductions']['bhxh_8_percent'],
+                    'bhyt_amount': calc['insurance_deductions']['bhyt_1_5_percent'],
+                    'bhtn_amount': calc['insurance_deductions']['bhtn_1_percent'],
+                    'total_insurance': calc['insurance_deductions']['total_insurance'],
+                    'taxable_income': calc['tax_deductions']['taxable_income'],
+                    'personal_income_tax': calc['tax_deductions']['personal_income_tax'],
+                    'net_salary': calc['net_salary'],
+                    'status': MonthlyPayrollRecord.STATUS_DRAFT,
+                }
+            )
+            created_records.append(record)
+
+        return Response({
+            'message': f'Đã tính toán bảng lương tháng {month}/{year} cho {len(created_records)} nhân viên.',
+            'records': MonthlyPayrollRecordSerializer(created_records, many=True).data
+        })
+
