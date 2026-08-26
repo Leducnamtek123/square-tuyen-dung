@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Card, Stack, Typography, Button } from "@mui/material";
+import { Box, Card, Stack, Typography, Button, Chip } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBriefcase, faUsers, faCalendarDays } from "@fortawesome/free-solid-svg-icons";
@@ -8,7 +8,6 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import ShareIcon from "@mui/icons-material/Share";
 import FlagIcon from "@mui/icons-material/Flag";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import { Chip } from "@mui/material";
 import dayjs from "dayjs";
 
 import { IMAGES, ROLES_NAME } from "../../../configs/constants";
@@ -44,7 +43,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
   t
 }) => {
   return (
-    <Card sx={{ overflow: "visible", boxShadow: (theme: Theme) => (theme as Theme & { customShadows?: { medium?: number } }).customShadows?.medium || 2, mt: 8 }}>
+    <Card sx={{ overflow: "visible", boxShadow: (theme: Theme) => (theme as Theme & { customShadows?: { medium?: number } }).customShadows?.medium || 2, mt: { xs: 2, sm: 4, md: 8 } }}>
       <Box>
         <MuiImageCustom
           src={(companyDetail?.companyCoverImageUrl || IMAGES.companyCoverDefault || IMAGES.coverImageDefault) as string}
@@ -54,7 +53,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
           fit="cover"
         />
       </Box>
-      <Box sx={{ p: 3, pt: 1 }}>
+      <Box sx={{ p: { xs: 2, sm: 3 }, pt: 1 }}>
         <Stack
           direction={{ xs: "column", sm: "column", md: "row", lg: "row", xl: "row" }}
           spacing={3}
@@ -65,7 +64,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
               src={(companyDetail?.companyImageUrl || IMAGES.companyLogoDefault) as string}
               sx={{
                 borderRadius: 2,
-                mt: -7,
+                mt: { xs: -5, sm: -7 },
                 p: 1,
                 bgcolor: "white",
                 boxShadow: (theme: Theme) => (theme as Theme & { customShadows?: { small?: number } }).customShadows?.small || 1,
@@ -76,7 +75,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
               height={120}
             />
           </Box>
-          <Box flex={1}>
+          <Box flex={1} sx={{ width: { xs: '100%', md: 'auto' } }}>
             <Box>
               <Typography
                 variant="h4"
@@ -85,30 +84,36 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
                   textAlign: { xs: "center", sm: "center", md: "left" },
                   color: "primary.main",
                   fontWeight: 600,
+                  fontSize: { xs: '1.35rem', sm: '1.75rem', md: '2.125rem' },
                 }}
               >
                 {companyDetail.companyName}
               </Typography>
               {companyDetail.isVerified && (
-                <Chip
-                  icon={<VerifiedIcon sx={{ fontSize: 16 }} />}
-                  label={t("companyDetail.verified")}
-                  size="small"
-                  color="success"
-                  variant="outlined"
-                  sx={{ ml: { xs: 0, md: 1 }, mb: 1 }}
-                />
+                <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+                  <Chip
+                    icon={<VerifiedIcon sx={{ fontSize: 16 }} />}
+                    label={t("companyDetail.verified")}
+                    size="small"
+                    color="success"
+                    variant="outlined"
+                    sx={{ ml: { xs: 0, md: 1 }, mb: 1 }}
+                  />
+                </Box>
               )}
             </Box>
             <Stack
               direction={{ xs: "column", sm: "row" }}
-              spacing={3}
+              spacing={{ xs: 1.5, sm: 3 }}
               sx={{
+                justifyContent: { xs: 'center', md: 'flex-start' },
+                alignItems: { xs: 'center', md: 'flex-start' },
                 "& .MuiTypography-root": {
                   color: "text.secondary",
                   display: "flex",
                   alignItems: "center",
                   gap: 1,
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
                   "& svg": { color: "primary.main", fontSize: "1.2rem" },
                 },
               }}
@@ -149,7 +154,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
                 variant={companyDetail.isFollowed ? "contained" : "outlined"}
                 color="primary"
                 sx={{
-                  flex: { xs: '1 1 auto', md: 'none' },
+                  flex: { xs: '1 1 calc(50% - 8px)', sm: '1 1 auto', md: 'none' },
                   minWidth: { xs: 120, sm: 140, md: 160 },
                   borderRadius: 2,
                   boxShadow: "none"
@@ -167,7 +172,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
               startIcon={<ShareIcon />}
               onClick={() => setOpenSharePopup(true)}
               sx={{
-                flex: { xs: '1 1 auto', md: 'none' },
+                flex: { xs: '1 1 calc(50% - 8px)', sm: '1 1 auto', md: 'none' },
                 minWidth: { xs: 120, sm: 140, md: 160 },
                 borderRadius: 2,
                 boxShadow: "none"
@@ -182,7 +187,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
                 startIcon={<FlagIcon />}
                 onClick={() => setOpenReportPopup(true)}
                 sx={{
-                  flex: { xs: '1 1 auto', md: 'none' },
+                  flex: { xs: '1 1 calc(50% - 8px)', sm: '1 1 auto', md: 'none' },
                   minWidth: { xs: 120, sm: 140, md: 160 },
                   borderRadius: 2,
                   boxShadow: "none"

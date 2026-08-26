@@ -54,9 +54,9 @@ const Popup = ({
           paper: {
             elevation: 0,
             sx: {
-              borderRadius: '24px',
+              borderRadius: fullScreen ? 0 : '24px',
               boxShadow: '0 28px 70px rgba(15, 57, 127, 0.18)',
-              border: '1px solid rgba(26, 64, 125, 0.1)',
+              border: fullScreen ? 'none' : '1px solid rgba(26, 64, 125, 0.1)',
               overflow: 'hidden',
             },
           },
@@ -64,7 +64,8 @@ const Popup = ({
       >
         <DialogTitle
           sx={{
-            p: 2.5,
+            p: { xs: 2, sm: 2.5 },
+            pt: fullScreen ? 'max(16px, env(safe-area-inset-top, 16px))' : 2.5,
             backgroundColor: theme.palette.grey[50],
           }}
         >
@@ -75,6 +76,7 @@ const Popup = ({
               sx={{
                 color: theme.palette.grey[900],
                 fontWeight: 600,
+                fontSize: { xs: '1.1rem', sm: '1.35rem' },
               }}
             >
               {title}
@@ -96,13 +98,14 @@ const Popup = ({
 
         <Divider />
 
-        <DialogContent sx={{ p: 3 }}>{children}</DialogContent>
+        <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>{children}</DialogContent>
 
         {showDialogAction && (
           <DialogActions
             sx={{
-              py: 2.5,
-              px: 3,
+              py: 2,
+              px: { xs: 2, sm: 3 },
+              pb: fullScreen ? 'max(16px, env(safe-area-inset-bottom, 16px))' : 2,
               background: theme.palette.grey[50],
             }}
           >

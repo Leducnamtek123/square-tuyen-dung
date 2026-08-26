@@ -67,15 +67,16 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
       }}
     >
       <Stack
-        direction={{ xs: 'column', md: 'row' }}
+        direction={{ xs: 'column', sm: 'row' }}
         spacing={1.5}
         component="form"
         onSubmit={handleSubmit(handleSearchSubmit)}
         alignItems="center"
+        flexWrap="wrap"
         sx={{ width: '100%' }}
       >
         {/* Keyword Input */}
-        <Box sx={{ flex: 1, minWidth: 0, width: '100%' }}>
+        <Box sx={{ flex: { xs: '1 1 100%', sm: 1 }, minWidth: { xs: '100%', sm: 180 }, width: { xs: '100%', sm: 'auto' } }}>
           <TextFieldCustom
             name={searchFieldName}
             placeholder={searchPlaceholder}
@@ -87,7 +88,7 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
 
         {/* Context-aware Primary Select (City / Status / Job Post) */}
         {options && options.length > 0 && (
-          <Box sx={{ width: { xs: '100%', sm: 220 }, flexShrink: 0 }}>
+          <Box sx={{ width: { xs: '100%', sm: 180, md: 220 }, flexShrink: 0 }}>
             <SingleSelectCustom
               name={primaryFieldName}
               control={control}
@@ -105,6 +106,7 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
             color={activeFilterCount > 0 ? 'primary' : 'inherit'}
             startIcon={<FilterAltIcon sx={{ fontSize: 18 }} />}
             onClick={onOpenFilterDrawer}
+            fullWidth
             sx={{
               height: 42,
               borderRadius: '8px',
@@ -126,7 +128,7 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
         </Box>
 
         {/* Primary Search Button */}
-        <Box sx={{ width: { xs: '100%', sm: 130 }, flexShrink: 0 }}>
+        <Box sx={{ width: { xs: '100%', sm: 'auto', md: 130 }, flexShrink: 0 }}>
           <Button
             variant="contained"
             color="primary"
@@ -139,6 +141,7 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
               fontWeight: 700,
               fontSize: '0.875rem',
               textTransform: 'none',
+              px: 2.5,
               boxShadow: 'none',
               '&:hover': {
                 boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
@@ -151,7 +154,7 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
 
         {/* Extra Actions Slot (e.g. View switches, Create button, Export) */}
         {extraActions && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: { md: 'auto' }, width: { xs: '100%', md: 'auto' } }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: { sm: 'auto' }, width: { xs: '100%', sm: 'auto' } }}>
             {extraActions}
           </Box>
         )}

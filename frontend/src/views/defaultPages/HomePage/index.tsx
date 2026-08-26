@@ -316,15 +316,15 @@ export default function HomePage() {
 
   return (
     <>
-      <Box sx={{ mt: 8 }}>
+      <Box sx={{ mt: { xs: 3, sm: 5, md: 8 } }}>
         <FilterJobPostCard params={{ isUrgent: true }} />
       </Box>
 
-      <Box sx={{ mt: 6 }}>
+      <Box sx={{ mt: { xs: 3.5, sm: 5, md: 6 } }}>
         <TopCompanyCarousel />
       </Box>
 
-      <Box sx={{ mt: 10 }}>
+      <Box sx={{ mt: { xs: 4, sm: 6, md: 10 } }}>
         <Stack spacing={1} sx={{ mb: 4, textAlign: 'center', alignItems: 'center' }}>
           <Typography variant="h4" sx={{ fontWeight: 800 }}>
             {t('home.choosePathTitle')}
@@ -370,7 +370,7 @@ export default function HomePage() {
       </Box>
 
       {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
-        <Box sx={{ mt: 10 }}>
+        <Box sx={{ mt: { xs: 4, sm: 6, md: 10 } }}>
           <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
             <Avatar
               sx={{
@@ -401,7 +401,7 @@ export default function HomePage() {
         </Box>
       )}
 
-      <Box sx={{ mt: 10 }}>
+      <Box sx={{ mt: { xs: 4, sm: 6, md: 10 } }}>
         <Stack spacing={1} sx={{ mb: 3 }}>
           <Typography variant="h5" sx={{ fontWeight: 800 }} gutterBottom>
             {t('home.userFeedback')}
@@ -416,7 +416,7 @@ export default function HomePage() {
       </Box>
 
       {/* ── Cẩm nang nghề nghiệp (Articles / Handbook Section) ────────────── */}
-      <Box sx={{ mt: 10, mb: 8 }}>
+      <Box sx={{ mt: { xs: 4, sm: 6, md: 10 }, mb: { xs: 4, md: 8 } }}>
         <LazyLoadSection minHeight="400px" rootMargin="300px">
           <CareerHandbookSection />
         </LazyLoadSection>

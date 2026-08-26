@@ -77,11 +77,11 @@ export default function OrgChartPage() {
     const initialChar = nodeName.trim().charAt(0)?.toUpperCase() || 'D';
 
     return (
-      <Box key={node.id} sx={{ ml: level === 0 ? 0 : { xs: 2, sm: 4 }, mt: 2, position: 'relative' }}>
+      <Box key={node.id} sx={{ ml: level === 0 ? 0 : { xs: 1, sm: 2.5, md: 4 }, mt: 1.5, position: 'relative' }}>
         <Paper
           elevation={0}
           sx={{
-            p: 2.25,
+            p: { xs: 1.5, sm: 2.25 },
             borderRadius: 3,
             border: '1px solid',
             borderColor: level === 0 ? '#93c5fd' : '#e2e8f0',
@@ -157,8 +157,8 @@ export default function OrgChartPage() {
           <Collapse in={expanded}>
             <Box
               sx={{
-                pl: { xs: 1.5, sm: 2.5 },
-                ml: { xs: 1.5, sm: 2.5 },
+                pl: { xs: 1, sm: 2 },
+                ml: { xs: 1, sm: 2 },
                 borderLeft: '2px dashed #cbd5e1',
                 mt: 1,
               }}
@@ -172,8 +172,8 @@ export default function OrgChartPage() {
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 1400, mx: 'auto', p: { xs: 2, sm: 3 } }}>
-      <Stack spacing={3.5}>
+    <Box sx={{ width: '100%', maxWidth: 1400, mx: 'auto', p: { xs: 1, sm: 2, md: 3 } }}>
+      <Stack spacing={3}>
         {/* Header */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
           <Stack direction="row" spacing={1.5} alignItems="center">
@@ -187,30 +187,31 @@ export default function OrgChartPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                flexShrink: 0,
               }}
             >
               <AccountTreeOutlinedIcon sx={{ fontSize: 24 }} />
             </Box>
             <Box>
-              <Typography variant="h5" sx={{ fontWeight: 900, color: '#0f172a', fontSize: { xs: '1.25rem', md: '1.5rem' }, letterSpacing: '-0.02em' }}>
+              <Typography variant="h5" sx={{ fontWeight: 900, color: '#0f172a', fontSize: { xs: '1.15rem', sm: '1.35rem', md: '1.5rem' }, letterSpacing: '-0.02em' }}>
                 Sơ đồ Cây Tổ chức Doanh nghiệp
               </Typography>
-              <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 500, fontSize: '0.875rem' }}>
+              <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 500, fontSize: '0.8125rem' }}>
                 Trực quan hóa cấu trúc phân cấp phòng ban, trưởng phòng phụ trách và định biên nhân sự
               </Typography>
             </Box>
           </Stack>
 
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={{ width: { xs: '100%', sm: 'auto' } }}>
             <Tooltip title="Mở rộng tất cả các nhánh">
               <Button
                 variant="outlined"
                 size="small"
                 startIcon={<UnfoldMoreIcon sx={{ fontSize: 16 }} />}
                 onClick={handleExpandAll}
-                sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700, fontSize: '0.8125rem' }}
+                sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700, fontSize: '0.8125rem', flex: { xs: '1 1 auto', sm: 'none' } }}
               >
-                Mở rộng tất cả
+                Mở rộng
               </Button>
             </Tooltip>
             <Tooltip title="Thu gọn tất cả các nhánh">
@@ -219,7 +220,7 @@ export default function OrgChartPage() {
                 size="small"
                 startIcon={<UnfoldLessIcon sx={{ fontSize: 16 }} />}
                 onClick={handleCollapseAll}
-                sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700, fontSize: '0.8125rem' }}
+                sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700, fontSize: '0.8125rem', flex: { xs: '1 1 auto', sm: 'none' } }}
               >
                 Thu gọn
               </Button>
@@ -236,6 +237,7 @@ export default function OrgChartPage() {
                 color: '#0f172a',
                 borderColor: '#cbd5e1',
                 bgcolor: '#ffffff',
+                flex: { xs: '1 1 auto', sm: 'none' },
                 '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' },
               }}
             >
@@ -301,10 +303,12 @@ export default function OrgChartPage() {
           <Paper
             elevation={0}
             sx={{
-              p: { xs: 2.5, sm: 4 },
+              p: { xs: 1.5, sm: 3, md: 4 },
               borderRadius: 3,
               border: '1px solid #e2e8f0',
               bgcolor: '#ffffff',
+              overflowX: 'auto',
+              WebkitOverflowScrolling: 'touch',
             }}
           >
             <Box sx={{ pb: 1, mb: 2, borderBottom: '1px solid #f1f5f9' }}>

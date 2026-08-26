@@ -177,11 +177,14 @@ const DataTable = <TData,>({
     const displayEmptyMessage = emptyMessage || t('common.table.noData');
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%', overflow: 'hidden' }}>
             <TableContainer
                 component={variant === 'flat' ? Box : Paper}
                 sx={{
                     maxHeight: maxHeight || undefined,
+                    overflowX: 'auto',
+                    WebkitOverflowScrolling: 'touch',
+                    width: '100%',
                     ...(variant === 'flat'
                         ? { borderRadius: 0, boxShadow: 'none', border: 'none' }
                         : { borderRadius: 2, boxShadow: 'none', border: '1px solid', borderColor: 'divider' })
@@ -276,6 +279,17 @@ const DataTable = <TData,>({
                     labelDisplayedRows={({ from, to, count }) => 
                         t('common.pagination.displayedRows', { from, to, count })
                     }
+                    sx={{
+                        '& .MuiTablePagination-toolbar': {
+                            flexWrap: 'wrap',
+                            justifyContent: { xs: 'center', sm: 'flex-end' },
+                            px: { xs: 1, sm: 2 },
+                            gap: { xs: 0.5, sm: 0 },
+                        },
+                        '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                            fontSize: '0.8125rem',
+                        },
+                    }}
                 />
             )}
         </Box>

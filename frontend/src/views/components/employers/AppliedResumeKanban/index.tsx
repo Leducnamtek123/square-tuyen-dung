@@ -15,6 +15,8 @@ import {
   Button,
   Tab,
   Tabs,
+  Menu,
+  MenuItem,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -45,6 +47,7 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import AddIcon from '@mui/icons-material/Add';
+import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
 
 import type { JobPostActivity } from '@/types/models';
 import { useConfig } from '@/hooks/useConfig';
@@ -149,9 +152,56 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
   }, [rows]);
 
   const [openDrawerId, setOpenDrawerId] = useState<string | number | null>(null);
+  const [statusMenuAnchor, setStatusMenuAnchor] = useState<{ el: HTMLElement; candidate: JobPostActivity } | null>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileSelectedStatus, setMobileSelectedStatus] = useState<string>('');
+
+  const handleOpenStatusMenu = (event: React.MouseEvent<HTMLElement>, candidate: JobPostActivity) => {
+    event.stopPropagation();
+    setStatusMenuAnchor({ el: event.currentTarget, candidate });
+  };
+
+  const handleCloseStatusMenu = () => {
+    setStatusMenuAnchor(null);
+  };
+
+  const handleDirectStatusChange = (
+    candidateId: string | number,
+    currentStatusId: number,
+    nextStatusId: number
+  ) => {
+    if (currentStatusId === nextStatusId) return;
+    if (!canTransitionApplicationStatus(currentStatusId, nextStatusId)) {
+      errorModal(
+        t('appliedResume.status.errorTitle', 'Không thể chuyển trạng thái'),
+        t('appliedResume.status.errorMsg', {
+          fromStatus: tConfig(allConfig?.applicationStatusDict?.[currentStatusId]) || '---',
+          toStatus: tConfig(allConfig?.applicationStatusDict?.[nextStatusId]) || '---',
+        })
+      );
+      return;
+    }
+
+    const previousRows = [...localRows];
+    setLocalRows((prev) =>
+      prev.map((item) =>
+        String(item.id) === String(candidateId)
+          ? { ...item, status: Number(nextStatusId) }
+          : item
+      )
+    );
+
+    handleChangeApplicationStatus(candidateId, nextStatusId, (success: boolean) => {
+      if (!success) {
+        setLocalRows(previousRows);
+        errorModal(
+          t('appliedResume.status.errorTitle', 'Cập nhật thất bại'),
+          t('appliedResume.status.rollbackMsg', 'Không thể cập nhật trạng thái ứng viên. Đã khôi phục vị trí ban đầu.')
+        );
+      }
+    });
+  };
 
   const statuses = useMemo(() => {
     return allConfig?.applicationStatusOptions || [];
@@ -645,6 +695,20 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
                                             )
                                           )}
 
+                                          <Tooltip title="Chuyển trạng thái" arrow>
+                                            <IconButton aria-label="Chuyển trạng thái"
+                                              size="small"
+                                              onClick={(e) => handleOpenStatusMenu(e, item)}
+                                              sx={{
+                                                color: '#2563EB',
+                                                bgcolor: 'rgba(37, 99, 235, 0.08)',
+                                                '&:hover': { bgcolor: 'rgba(37, 99, 235, 0.16)' },
+                                              }}
+                                            >
+                                              <DriveFileMoveOutlinedIcon sx={{ fontSize: 18 }} />
+                                            </IconButton>
+                                          </Tooltip>
+
                                           <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>
                                             <IconButton aria-label="Thao tác"
                                               size="small"
@@ -703,6 +767,58 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
           </Stack>
         </DragDropContext>
       </Box>
+
+      {/* Mobile Quick Status Change Dropdown Menu */}
+      <Menu
+        anchorEl={statusMenuAnchor?.el}
+        open={Boolean(statusMenuAnchor)}
+        onClose={handleCloseStatusMenu}
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: 2,
+              minWidth: 220,
+              boxShadow: '0 10px 30px rgba(15, 23, 42, 0.15)',
+              border: '1px solid #e2e8f0',
+            },
+          },
+        }}
+      >
+        <Box sx={{ px: 2, py: 1, borderBottom: '1px solid #f1f5f9' }}>
+          <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Chuyển sang trạng thái
+          </Typography>
+        </Box>
+        {statuses.map((st) => {
+          const isCurrent = Number(st.id) === Number(statusMenuAnchor?.candidate.status);
+          const canTransition = statusMenuAnchor
+            ? canTransitionApplicationStatus(Number(statusMenuAnchor.candidate.status), Number(st.id))
+            : false;
+          return (
+            <MenuItem
+              key={st.id}
+              disabled={isCurrent || !canTransition}
+              onClick={() => {
+                if (statusMenuAnchor) {
+                  handleDirectStatusChange(
+                    statusMenuAnchor.candidate.id,
+                    Number(statusMenuAnchor.candidate.status),
+                    Number(st.id)
+                  );
+                  handleCloseStatusMenu();
+                }
+              }}
+              sx={{
+                fontSize: '0.875rem',
+                fontWeight: isCurrent ? 700 : 500,
+                color: isCurrent ? 'primary.main' : canTransition ? 'text.primary' : 'text.disabled',
+              }}
+            >
+              {tConfig(st.name as string)} {isCurrent ? '(Hiện tại)' : ''}
+            </MenuItem>
+          );
+        })}
+      </Menu>
     </>
   );
 };

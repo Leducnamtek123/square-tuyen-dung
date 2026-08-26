@@ -93,15 +93,30 @@ export const ChatWindowComposer = ({
         onClose={onEmojiClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+        slotProps={{
+          paper: {
+            sx: {
+              maxWidth: 'calc(100vw - 32px)',
+              overflow: 'hidden',
+              borderRadius: '16px',
+              boxShadow: '0 12px 32px rgba(15, 23, 42, 0.15)',
+              '& .EmojiPickerReact': {
+                width: '100% !important',
+                maxWidth: '340px !important',
+                '--epr-emoji-size': '26px',
+              },
+            },
+          },
+        }}
       >
         <EmojiPicker onEmojiClick={onEmojiSelect} />
       </Popover>
 
       <InputBase
         sx={{
-          ml: 1,
+          ml: { xs: 0.5, sm: 1 },
           flex: 1,
-          fontSize: 14,
+          fontSize: { xs: 16, sm: 14 },
           px: 1.5,
           py: 0.75,
           borderRadius: 999,

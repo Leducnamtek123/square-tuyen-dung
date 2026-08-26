@@ -122,9 +122,9 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
       <AppBar position="fixed" color="primary">
 
-        <Toolbar sx={{ gap: 2, justifyContent: 'space-between' }}>
+        <Toolbar sx={{ gap: { xs: 1, sm: 2 }, justifyContent: 'space-between', px: { xs: 1, sm: 2 } }}>
 
-          <Stack direction="row" alignItems="center" spacing={2}>
+          <Stack direction="row" alignItems="center" spacing={{ xs: 0.5, sm: 1.5 }} sx={{ minWidth: 0, flexShrink: 1 }}>
 
             <IconButton
 
@@ -144,19 +144,43 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
             </IconButton>
 
-            <AccountSwitchMenu />
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <AccountSwitchMenu />
+            </Box>
 
-            {title ? <Typography variant="h6">{title}</Typography> : null}
+            {title ? (
+              <Typography
+                variant="h6"
+                noWrap
+                sx={{
+                  fontSize: { xs: '0.95rem', sm: '1.25rem' },
+                  fontWeight: 700,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: { xs: 150, sm: 280, md: 'none' },
+                }}
+              >
+                {title}
+              </Typography>
+            ) : null}
 
           </Stack>
 
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <Stack direction="row" alignItems="center" spacing={{ xs: 0.5, sm: 1 }} sx={{ flexShrink: 0 }}>
 
             <LanguageSwitcher />
 
-            {isAuthenticated && <NotificationCard />}
+            {isAuthenticated && (
+              <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
+                <NotificationCard />
+              </Box>
+            )}
 
-            {isAuthenticated && <ChatCard />}
+            {isAuthenticated && (
+              <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
+                <ChatCard />
+              </Box>
+            )}
 
             <Stack
 
@@ -172,11 +196,11 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
             >
 
-              <Avatar src={currentUser?.avatarUrl || undefined}>
+              <Avatar src={currentUser?.avatarUrl || undefined} sx={{ width: 34, height: 34 }}>
                 {currentUser?.fullName?.charAt(0)?.toUpperCase()}
               </Avatar>
 
-              <Typography variant="subtitle1" sx={{ display: { xs: 'none', sm: 'block' }, color: 'inherit' }}>
+              <Typography variant="subtitle1" sx={{ display: { xs: 'none', md: 'block' }, color: 'inherit' }}>
 
                 {currentUser?.fullName}
 
@@ -255,7 +279,7 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
           display: 'flex',
           flexDirection: 'column',
           minHeight: '100dvh',
-          p: 3,
+          p: { xs: 1.5, sm: 2.5, md: 3 },
           width: { sm: `calc(100% - ${drawerWidth}px)` },
         }}
       >
