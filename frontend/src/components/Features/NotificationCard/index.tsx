@@ -116,7 +116,7 @@ const NotificationCard: React.FC = () => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            maxHeight: { xs: 'calc(100vh - 88px)', sm: 'min(600px, calc(100vh - 96px))' },
+            maxHeight: { xs: 'calc(100dvh - 88px)', sm: 'min(600px, calc(100dvh - 96px))' },
             overflow: 'hidden',
             bgcolor: 'background.paper',
             borderRadius: 3,

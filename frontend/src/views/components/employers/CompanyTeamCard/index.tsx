@@ -75,7 +75,8 @@ const companyPermissionOptions = [
 const tableContainerSx = {
   border: '1px solid #e2e8f0',
   borderRadius: 3,
-  overflow: 'hidden',
+  overflowX: 'auto',
+  WebkitOverflowScrolling: 'touch',
   bgcolor: '#ffffff',
   boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.02)',
 };
@@ -367,7 +368,7 @@ const CompanyTeamCard = () => {
         </Stack>
 
         <TableContainer sx={tableContainerSx}>
-          <Table size="medium">
+          <Table size="medium" sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
                 <TableCell sx={tableHeaderCellSx}>{t('employer:company.team.roleName')}</TableCell>
@@ -486,7 +487,7 @@ const CompanyTeamCard = () => {
         </Stack>
 
         <TableContainer sx={tableContainerSx}>
-          <Table size="medium">
+          <Table size="medium" sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
                 <TableCell sx={tableHeaderCellSx}>{t('employer:company.team.member')}</TableCell>

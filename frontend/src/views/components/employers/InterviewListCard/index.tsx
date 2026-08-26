@@ -154,7 +154,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
         onSortingChange={onSortingChange as OnChangeFn<SortingState>}
         emptyMessage={t('interview:interviewListCard.noInterviews')}
         stickyHeader
-        maxHeight="calc(100vh - 280px)"
+        maxHeight="calc(100dvh - 280px)"
       />
 
       {isMutating && <BackdropLoading />}

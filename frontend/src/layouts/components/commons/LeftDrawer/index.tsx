@@ -1,7 +1,9 @@
 'use client';
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Box, Button, Drawer, Stack, Divider, List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
+import { Box, Button, Drawer, Stack, Divider, List, ListItem, ListItemButton, ListItemText, Typography, IconButton, Collapse } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/redux/hooks';
@@ -45,8 +47,7 @@ interface LeftDrawerProps {
   showPublicActions?: boolean;
 }
 
-const DRAWER_WIDTH_SM = 260;
-const DRAWER_WIDTH_XS = '80vw';
+const DRAWER_WIDTH = 'min(320px, 85vw)';
 
 const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPublicActions = true }: LeftDrawerProps) => {
   const { t } = useTranslation('common');
@@ -114,8 +115,8 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
         display: { xs: 'block', md: 'none' },
         '& .MuiDrawer-paper': {
           boxSizing: 'border-box',
-          width: { xs: DRAWER_WIDTH_XS, sm: DRAWER_WIDTH_SM },
-          maxWidth: DRAWER_WIDTH_SM,
+          width: DRAWER_WIDTH,
+          maxWidth: 320,
           boxShadow: (theme) => theme.customShadows?.card || '0 8px 32px rgba(0,0,0,0.15)',
           border: 'none',
           borderRadius: '0 16px 16px 0',
@@ -123,39 +124,63 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
         },
       }}
     >
-      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', minWidth: 0 }} role="dialog" aria-label={t('nav.mainNav', { defaultValue: 'Menu điều hướng' })}>
+        {/* Drawer Header with Logo & Accessible Close Button */}
         <Box
           sx={{
-            px: 2.5,
-            py: 2,
+            px: 2,
+            py: 1.5,
+            minHeight: 56,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             borderBottom: '1px solid',
             borderColor: 'divider',
             flexShrink: 0,
+            minWidth: 0,
           }}
         >
           <Box
             component={Link}
             href="/"
             onClick={handleDrawerToggle}
-            sx={{ display: 'flex', alignItems: 'center', gap: 1, textDecoration: 'none' }}
+            sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none', minWidth: 0 }}
           >
             <Box
               component="img"
               src={IMAGES.getTextLogo('dark')}
-              alt="Logo"
-              sx={{ width: 32, height: 32, objectFit: 'contain' }}
+              alt="InfoHR"
+              sx={{ height: 30, width: 'auto', maxWidth: 130, objectFit: 'contain' }}
             />
-            <Typography variant="h6" fontWeight={700} color="primary.main">
-              INFO HR
-            </Typography>
           </Box>
+
+          <IconButton
+            aria-label={t('actions.closeDrawer', { defaultValue: 'Đóng menu' })}
+            onClick={handleDrawerToggle}
+            size="small"
+            sx={{
+              minWidth: 40,
+              minHeight: 40,
+              color: 'text.secondary',
+              borderRadius: 2,
+              '&:hover': {
+                backgroundColor: 'action.hover',
+                color: 'text.primary',
+              },
+              '&:focus-visible': {
+                outline: '2px solid',
+                outlineColor: 'primary.main',
+                outlineOffset: '2px',
+              },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: 20 }} />
+          </IconButton>
         </Box>
 
-        <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-          <List sx={{ py: 1.5 }}>
+        {/* Scrollable Navigation Body */}
+        <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', minWidth: 0 }} component="nav" aria-label={t('nav.mobileMenu', { defaultValue: 'Menu chính' })}>
+          <List sx={{ py: 1.5, minWidth: 0 }}>
             {pages.map((page) => {
               const hasSubItems = Boolean(page.children && page.children.length > 0);
               const isSubOpen = Boolean(openSubMenus[page.id]);
@@ -168,15 +193,25 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
                     className={pathname.startsWith(page.path) ? 'active' : ''}
                     disablePadding
                     onClick={(e: React.MouseEvent<HTMLElement>) => handleItemClick(e, page)}
-                    sx={{ mb: 0.5, mx: 1, width: 'auto', cursor: 'pointer' }}
+                    sx={{ mb: 0.5, mx: 1, width: 'auto', cursor: 'pointer', minWidth: 0 }}
                   >
                     <ListItemButton
+                      aria-expanded={hasSubItems ? isSubOpen : undefined}
+                      aria-haspopup={hasSubItems ? 'true' : undefined}
                       sx={{
+                        minHeight: 44,
                         textAlign: 'left',
                         borderRadius: 2,
-                        transition: 'all 0.2s ease-in-out',
+                        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                         color: 'text.primary',
                         justifyContent: 'space-between',
+                        minWidth: 0,
+                        px: 1.5,
+                        '&:focus-visible': {
+                          outline: '2px solid',
+                          outlineColor: 'primary.main',
+                          outlineOffset: '2px',
+                        },
                         '&.active': {
                           backgroundColor: 'primary.main',
                           color: 'white',
@@ -189,39 +224,84 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
                         },
                       }}
                     >
-                      <ListItemText primary={page.label} slotProps={{ primary: { fontSize: '0.9rem', fontWeight: 600 } }} />
+                      <ListItemText
+                        primary={page.label}
+                        slotProps={{
+                          primary: {
+                            fontSize: '0.9rem',
+                            fontWeight: 600,
+                            sx: { overflowWrap: 'break-word', wordBreak: 'break-word', minWidth: 0 },
+                          },
+                        }}
+                      />
                       {hasSubItems && (
-                        <Typography variant="caption" sx={{ color: 'text.secondary', ml: 1 }}>
-                          {isSubOpen ? '▲' : '▼'}
-                        </Typography>
+                        <KeyboardArrowDownIcon
+                          sx={{
+                            fontSize: 18,
+                            color: 'text.secondary',
+                            ml: 1,
+                            flexShrink: 0,
+                            transform: isSubOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                            transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                          }}
+                        />
                       )}
                     </ListItemButton>
                   </ListItem>
 
-                  {hasSubItems && isSubOpen && (
-                    <List disablePadding sx={{ pl: 2, pr: 1, mb: 1 }}>
-                      {page.children?.map((child) => (
-                        <ListItem
-                          key={child.id}
-                          component={Link}
-                          href={child.path}
-                          disablePadding
-                          onClick={() => handleDrawerToggle()}
-                          sx={{ mb: 0.5 }}
-                        >
-                          <ListItemButton sx={{ borderRadius: 1.5, py: 0.75 }}>
-                            <ListItemText
-                              primary={child.label}
-                              secondary={child.description}
-                              slotProps={{
-                                primary: { fontSize: '0.825rem', fontWeight: 600, color: '#334155' },
-                                secondary: { fontSize: '0.725rem', color: '#64748b' },
+                  {hasSubItems && (
+                    <Collapse in={isSubOpen} timeout="auto" unmountOnExit>
+                      <List disablePadding sx={{ pl: 2, pr: 1, mb: 1, minWidth: 0 }}>
+                        {page.children?.map((child) => (
+                          <ListItem
+                            key={child.id}
+                            component={Link}
+                            href={child.path}
+                            disablePadding
+                            onClick={() => handleDrawerToggle()}
+                            sx={{ mb: 0.5, minWidth: 0 }}
+                          >
+                            <ListItemButton
+                              sx={{
+                                minHeight: 44,
+                                borderRadius: 1.5,
+                                py: 0.75,
+                                px: 1.25,
+                                minWidth: 0,
+                                alignItems: 'flex-start',
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                transition: 'background-color 0.15s ease',
+                                '&:focus-visible': {
+                                  outline: '2px solid',
+                                  outlineColor: 'primary.main',
+                                  outlineOffset: '2px',
+                                },
                               }}
-                            />
-                          </ListItemButton>
-                        </ListItem>
-                      ))}
-                    </List>
+                            >
+                              <ListItemText
+                                primary={child.label}
+                                secondary={child.description}
+                                slotProps={{
+                                  primary: {
+                                    fontSize: '0.825rem',
+                                    fontWeight: 600,
+                                    color: '#334155',
+                                    sx: { overflowWrap: 'break-word', wordBreak: 'break-word', minWidth: 0 },
+                                  },
+                                  secondary: {
+                                    fontSize: '0.725rem',
+                                    color: '#64748b',
+                                    sx: { overflowWrap: 'break-word', wordBreak: 'break-word', minWidth: 0, mt: 0.25 },
+                                  },
+                                }}
+                                sx={{ m: 0, minWidth: 0, width: '100%' }}
+                              />
+                            </ListItemButton>
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Collapse>
                   )}
                 </React.Fragment>
               );
@@ -229,25 +309,28 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
           </List>
 
           {showPublicActions && !isAuthenticated && (
-            <Box onClick={(e) => e.stopPropagation()}>
+            <Box onClick={(e) => e.stopPropagation()} sx={{ minWidth: 0 }}>
               <Divider sx={{ mx: 2, borderColor: 'divider' }}>
                 <Typography variant="caption" color="text.secondary" sx={{ px: 1, fontSize: '0.7rem' }}>
                   {isEmployerPortal ? t('nav.switch.forJobSeekers') : t('nav.switch.forEmployers')}
                 </Typography>
               </Divider>
-              <Box sx={{ px: 2, py: 1.5 }}>
+              <Box sx={{ px: 2, py: 1.5, minWidth: 0 }}>
                 <AccountSwitchMenu isShowButton={true} />
               </Box>
             </Box>
           )}
         </Box>
 
+        {/* Bottom Actions with Safe Area Inset */}
         <Box
           sx={{
             flexShrink: 0,
             borderTop: '1px solid',
             borderColor: 'divider',
             p: 2,
+            pb: 'max(16px, env(safe-area-inset-bottom, 16px))',
+            minWidth: 0,
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -258,8 +341,10 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
               fullWidth
               size="medium"
               sx={{
+                minHeight: 44,
                 textTransform: 'none',
                 fontWeight: 600,
+                fontSize: '0.875rem',
                 '&:hover': {
                   backgroundColor: 'error.main',
                   color: 'white',
@@ -277,8 +362,10 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
                 fullWidth
                 size="medium"
                 sx={{
+                  minHeight: 44,
                   textTransform: 'none',
-                  fontSize: '0.85rem',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
                 }}
                 onClick={() => {
                   push(`/${loginRoute}`);
@@ -293,8 +380,9 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
                 fullWidth
                 size="medium"
                 sx={{
+                  minHeight: 44,
                   textTransform: 'none',
-                  fontSize: '0.85rem',
+                  fontSize: '0.875rem',
                   fontWeight: 600,
                 }}
                 onClick={() => {

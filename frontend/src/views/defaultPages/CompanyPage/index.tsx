@@ -22,7 +22,7 @@ const CompanyPage = () => {
     <Box
       sx={{
         width: '100%',
-        minHeight: '100vh',
+        minHeight: '100dvh',
         background: 'linear-gradient(180deg, #f0f7ff 0%, #f8fafc 40%, #ffffff 100%)',
         position: 'relative',
         overflow: 'hidden',

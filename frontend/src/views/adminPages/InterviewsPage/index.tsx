@@ -222,7 +222,7 @@ const InterviewsPage = () => {
           sorting={sorting}
           onSortingChange={onSortingChange}
           stickyHeader
-          maxHeight="calc(100vh - 280px)"
+          maxHeight="calc(100dvh - 280px)"
         />
       </Paper>
 

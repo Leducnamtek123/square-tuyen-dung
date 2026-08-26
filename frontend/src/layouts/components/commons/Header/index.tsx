@@ -236,7 +236,16 @@ const Header = (_props: HeaderProps) => {
 
         <Container maxWidth="xl">
 
-          <Toolbar disableGutters sx={{ minHeight: { xs: 56, sm: 64 }, overflow: 'hidden' }}>
+          <Toolbar
+            disableGutters
+            sx={{
+              minHeight: { xs: 56, sm: 64 },
+              px: { xs: 0.75, sm: 1.5, md: 2 },
+              gap: { xs: 0.5, sm: 1 },
+              overflow: 'hidden',
+              justifyContent: 'space-between',
+            }}
+          >
 
             {/* ── Mobile: Hamburger icon TRƯỚC logo (chuẩn MUI) ── */}
             <IconButton
@@ -244,7 +253,14 @@ const Header = (_props: HeaderProps) => {
               aria-label={t('actions.openDrawer')}
               edge="start"
               onClick={handleDrawerToggle}
-              sx={{ mr: 1, display: { md: "none" } }}
+              sx={{
+                mr: { xs: 0.5, sm: 1 },
+                p: { xs: 1, sm: 1.25 },
+                minWidth: 44,
+                minHeight: 44,
+                display: { md: "none" },
+                flexShrink: 0,
+              }}
             >
               <MenuIcon />
             </IconButton>
@@ -267,9 +283,9 @@ const Header = (_props: HeaderProps) => {
                 src={IMAGES.getTextLogo("light")}
                 alt="InfoHR Logo"
                 sx={{
-                  height: { xs: 28, md: 34 },
+                  height: { xs: 26, sm: 30, md: 34 },
                   width: 'auto',
-                  maxWidth: { xs: 120, sm: 160, md: 'none' },
+                  maxWidth: { xs: 105, sm: 140, md: 'none' },
                   display: 'block',
                   objectFit: 'contain',
                   objectPosition: 'left center',
@@ -296,13 +312,14 @@ const Header = (_props: HeaderProps) => {
             />
 
             {/* ── Mobile: spacer để đẩy icons sang phải ── */}
-            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }} />
+            <Box sx={{ flexGrow: 1, minWidth: { xs: 4, sm: 8 }, display: { xs: "flex", md: "none" } }} />
 
             {/* ── Right side: icons + auth ── */}
             <Stack
               direction="row"
               alignItems="center"
-              spacing={{ xs: 0.5, sm: 1, md: 2 }}
+              spacing={{ xs: 0.25, sm: 0.75, md: 1.5 }}
+              sx={{ flexShrink: 0, minWidth: 0 }}
             >
               {/* LanguageSwitcher: visible on all screen sizes */}
               <LanguageSwitcher />
@@ -311,14 +328,14 @@ const Header = (_props: HeaderProps) => {
 
               {/* Notification + Chat: chỉ hiện từ sm trở lên trên mobile */}
               {isAuthenticated && (
-                <React.Suspense fallback={<Box width={40} height={40} />}>
+                <React.Suspense fallback={<Box width={36} height={36} />}>
                   <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
                     <NotificationCard />
                   </Box>
                 </React.Suspense>
               )}
               {isAuthenticated && (
-                <React.Suspense fallback={<Box width={40} height={40} />}>
+                <React.Suspense fallback={<Box width={36} height={36} />}>
                   <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
                     <ChatCard />
                   </Box>
@@ -327,7 +344,7 @@ const Header = (_props: HeaderProps) => {
 
               {/* Auth buttons - hide on xs when not authenticated (available in drawer) */}
               {!isAdminPortal && (
-                <Box sx={{ display: isAuthenticated ? 'flex' : { xs: 'none', sm: 'flex' } }}>
+                <Box sx={{ display: isAuthenticated ? 'flex' : { xs: 'none', sm: 'flex' }, flexShrink: 0 }}>
                   <HeaderAuthArea
                     isAuthenticated={isAuthenticated}
                     currentUserName={currentUser?.fullName}

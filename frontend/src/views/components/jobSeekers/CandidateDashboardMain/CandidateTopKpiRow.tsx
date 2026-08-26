@@ -77,18 +77,20 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
             href={localizeRoutePath(kpi.path, i18n.language)}
             elevation={0}
             sx={{
-              p: { xs: 1.75, sm: 2.5 },
-              borderRadius: '20px',
+              p: { xs: 1.5, sm: 2, md: 2.5 },
+              borderRadius: { xs: '16px', sm: '20px' },
               border: '1px solid rgba(226, 232, 240, 0.85)',
               backgroundColor: '#ffffff',
               boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)',
               display: 'flex',
-              alignItems: 'center',
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: { xs: 'flex-start', sm: 'center' },
               justifyContent: 'space-between',
               textDecoration: 'none',
               color: 'inherit',
               transition: 'transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease, border-color 180ms ease',
               height: '100%',
+              minWidth: 0,
               '&:hover': {
                 borderColor: '#2563eb',
                 transform: 'translateY(-3px)',
@@ -99,17 +101,21 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
               },
             }}
           >
-            <Box sx={{ minWidth: 0 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.5 }}>
+            <Box sx={{ minWidth: 0, width: { xs: '100%', sm: 'auto' } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.25 }, mb: 0.5, minWidth: 0 }}>
                 <Box
                   sx={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: '12px',
+                    width: { xs: 32, sm: 38 },
+                    height: { xs: 32, sm: 38 },
+                    borderRadius: { xs: '10px', sm: '12px' },
                     backgroundColor: kpi.bgColor,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    flexShrink: 0,
+                    '& svg': {
+                      fontSize: { xs: 18, sm: 22 },
+                    },
                   }}
                 >
                   {kpi.icon}
@@ -119,8 +125,10 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
                   sx={{
                     fontWeight: 700,
                     color: '#475569',
-                    fontSize: '0.825rem',
+                    fontSize: { xs: '0.775rem', sm: '0.825rem' },
                     lineHeight: 1.3,
+                    minWidth: 0,
+                    overflowWrap: 'break-word',
                   }}
                 >
                   {kpi.title}
@@ -131,9 +139,10 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
                 variant="caption"
                 sx={{
                   color: '#94a3b8',
-                  fontSize: '0.725rem',
-                  display: 'block',
+                  fontSize: { xs: '0.675rem', sm: '0.725rem' },
+                  display: { xs: 'none', sm: 'block' },
                   lineHeight: 1.2,
+                  minWidth: 0,
                 }}
               >
                 {kpi.subtext}
@@ -146,9 +155,11 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
                 fontWeight: 800,
                 color: '#0f172a',
                 fontFamily: 'var(--font-mono)',
-                fontSize: '1.625rem',
+                fontSize: { xs: '1.35rem', sm: '1.625rem' },
                 letterSpacing: '-0.02em',
-                ml: 1,
+                ml: { xs: 0, sm: 1 },
+                mt: { xs: 1, sm: 0 },
+                alignSelf: { xs: 'flex-end', sm: 'center' },
               }}
             >
               {kpi.value}

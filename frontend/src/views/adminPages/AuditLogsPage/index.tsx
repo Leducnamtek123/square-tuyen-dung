@@ -356,7 +356,7 @@ export default function AuditLogsPage() {
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
           stickyHeader
-          maxHeight="calc(100vh - 280px)"
+          maxHeight="calc(100dvh - 280px)"
         />
       </Paper>
 

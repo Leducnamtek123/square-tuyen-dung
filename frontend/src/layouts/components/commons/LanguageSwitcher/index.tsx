@@ -81,12 +81,16 @@ const LanguageSwitcher = ({ color = 'inherit' }: LanguageSwitcherProps) => {
         sx={{
           textTransform: 'none',
           color: color,
+          minWidth: { xs: 36, sm: 'auto' },
+          minHeight: 44,
+          px: { xs: 0.5, sm: 1 },
+          py: 0.5,
           '&:hover': {
             backgroundColor: color === 'white' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
           }
         }}
-        startIcon={<LanguageIcon sx={{ fontSize: 18 }} />}
-        endIcon={<KeyboardArrowDownIcon />}
+        startIcon={<LanguageIcon sx={{ fontSize: { xs: 20, sm: 18 } }} />}
+        endIcon={<KeyboardArrowDownIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
       >
         <Typography variant="body2" sx={{ fontWeight: 600, display: { xs: 'none', sm: 'block' } }}>
           {currentLanguage.shortLabel}

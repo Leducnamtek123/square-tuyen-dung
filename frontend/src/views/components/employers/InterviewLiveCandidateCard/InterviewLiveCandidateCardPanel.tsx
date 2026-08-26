@@ -81,7 +81,7 @@ const InterviewLiveCandidateCardPanel = ({
           },
         }}
       >
-        <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100dvh' }}>
           <Box
             sx={{
               px: 3,
@@ -361,7 +361,7 @@ const InterviewLiveCandidateCardPanel = ({
           },
         }}
       >
-        <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100dvh' }}>
           <Box
             sx={{
               px: 3,

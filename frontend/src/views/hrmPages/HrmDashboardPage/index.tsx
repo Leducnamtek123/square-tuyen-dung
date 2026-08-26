@@ -515,8 +515,8 @@ export default function HrmDashboardPage() {
                   Hiện không có đơn nghỉ phép nào đang chờ duyệt.
                 </Typography>
               ) : (
-                <TableContainer sx={{ border: '1px solid #f1f5f9', borderRadius: 2 }}>
-                  <Table size="small">
+                <TableContainer sx={{ border: '1px solid #f1f5f9', borderRadius: 2, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                  <Table size="small" sx={{ minWidth: 360 }}>
                     <TableHead sx={{ bgcolor: '#f8fafc' }}>
                       <TableRow>
                         <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.75rem' }}>Nhân viên</TableCell>

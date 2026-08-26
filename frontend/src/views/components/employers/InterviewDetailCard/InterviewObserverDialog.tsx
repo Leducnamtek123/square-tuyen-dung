@@ -61,7 +61,7 @@ const InterviewObserverDialogContent: React.FC<InterviewObserverDialogProps> = (
         },
       }}
     >
-      <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100dvh' }}>
         <InterviewObserverDialogHeader
           candidateName={candidateName}
           jobName={jobName}

@@ -310,8 +310,8 @@ export default function ContractListPage() {
 
         {/* Contract Table */}
         <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid #e2e8f0', overflow: 'hidden', bgcolor: '#ffffff' }}>
-          <TableContainer>
-            <Table size="medium">
+          <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <Table size="medium" sx={{ minWidth: 820 }}>
               <TableHead sx={{ bgcolor: '#f8fafc' }}>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Số Hợp đồng</TableCell>

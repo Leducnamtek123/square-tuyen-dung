@@ -56,6 +56,15 @@ body, html {
   min-width: 0 !important;
 }
 
+/* Hide scrollbar utility for horizontal scroll strips */
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+
 /* Micro-animations and transitions according to specifications */
 .saas-card {
   border-radius: 16px !important;

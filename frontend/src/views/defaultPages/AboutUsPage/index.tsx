@@ -56,7 +56,7 @@ export default function AboutUsPage() {
   ];
 
   return (
-    <Box sx={{ py: 6, bgcolor: '#F8FAFC', minHeight: '100vh' }}>
+    <Box sx={{ py: 6, bgcolor: '#F8FAFC', minHeight: '100dvh' }}>
       <Container maxWidth="lg">
         {/* HEADER TITLE */}
         <Stack spacing={2} textAlign="center" alignItems="center" sx={{ mb: 6 }}>

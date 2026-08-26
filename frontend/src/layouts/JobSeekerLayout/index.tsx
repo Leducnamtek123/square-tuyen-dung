@@ -118,10 +118,10 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
       {/* Persistent Header */}
       <Header />
 
-      <Box sx={{ flexGrow: 1, py: 3 }}>
-        <Container maxWidth="xl">
-          <Grid container spacing={3}>
-            {/* Persistent Fixed Candidate Sidebar Menu */}
+      <Box sx={{ flexGrow: 1, py: { xs: 1, sm: 2, md: 3 } }}>
+        <Container maxWidth="xl" sx={{ px: { xs: 1.5, sm: 2, md: 3, lg: 4 } }}>
+          <Grid container spacing={{ xs: 1.5, md: 3 }}>
+            {/* Persistent Candidate Sidebar Menu */}
             <Grid size={{ xs: 12, md: 3.5, lg: 2.8 }}>
               <CandidateSidebar />
             </Grid>

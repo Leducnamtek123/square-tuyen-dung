@@ -272,7 +272,7 @@ const NewsContent = () => {
   };
 
   return (
-    <Box sx={{ bgcolor: '#f8fafc', minHeight: '100vh', pb: 8 }}>
+    <Box sx={{ bgcolor: '#f8fafc', minHeight: '100dvh', pb: 8 }}>
       {/* ── Sub-header Navigation Bar ──────────────────────────────────────── */}
       <SubHeaderCategoryBar
         categories={categories}

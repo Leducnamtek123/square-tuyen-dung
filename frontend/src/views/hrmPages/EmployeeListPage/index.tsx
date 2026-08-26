@@ -392,8 +392,8 @@ export default function EmployeeListPage() {
             bgcolor: '#ffffff',
           }}
         >
-          <TableContainer>
-            <Table size="medium">
+          <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <Table size="medium" sx={{ minWidth: 780 }}>
               <TableHead sx={{ bgcolor: '#f8fafc' }}>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Mã & Họ tên</TableCell>
