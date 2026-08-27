@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Box, Grid2 as Grid } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { TabTitle } from '../../../utils/generalFunction';
 import { APP_NAME } from '../../../configs/constants';
 import { useAppSelector } from '@/redux/hooks';
@@ -22,6 +24,7 @@ import AiRecommendedJobsSection from '../../components/jobSeekers/CandidateDashb
 
 const DashboardPage = () => {
   const { t } = useTranslation('jobSeeker');
+  const containerRef = useRef<HTMLDivElement>(null);
   TabTitle(t('dashboard.pageTitle', { appName: APP_NAME }));
 
   const { currentUser } = useAppSelector((state) => state.user);
@@ -54,26 +57,61 @@ const DashboardPage = () => {
     };
   }, [appliedData, savedData?.count, viewedData?.count, followedData?.count]);
 
+  useGSAP(
+    () => {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+      tl.fromTo(
+        '.gsap-candidate-kpi',
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.55, clearProps: 'transform' }
+      )
+        .fromTo(
+          '.gsap-candidate-row2',
+          { y: 25, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.55, stagger: 0.12, clearProps: 'transform' },
+          '-=0.3'
+        )
+        .fromTo(
+          '.gsap-candidate-ai-section',
+          { y: 25, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, clearProps: 'transform' },
+          '-=0.3'
+        )
+        .fromTo(
+          '.gsap-candidate-jobs-card',
+          { y: 25, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, clearProps: 'transform' },
+          '-=0.3'
+        );
+    },
+    { scope: containerRef }
+  );
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box ref={containerRef} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       {/* Row 1: Top 4 Real API KPI Cards */}
-      <CandidateTopKpiRow user={currentUser} stats={stats} />
+      <Box className="gsap-candidate-kpi">
+        <CandidateTopKpiRow user={currentUser} stats={stats} />
+      </Box>
 
       {/* Row 2: CV Score Card & Activity Chart Card */}
       <Grid container spacing={3}>
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, md: 4 }} className="gsap-candidate-row2">
           <CandidateCvScoreCard viewedCount={stats.viewedCount} />
         </Grid>
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={{ xs: 12, md: 8 }} className="gsap-candidate-row2">
           <CandidateActivityChartCard stats={stats} />
         </Grid>
       </Grid>
 
       {/* Row 3: AI Smart Job Recommendations Section */}
-      <AiRecommendedJobsSection />
+      <Box className="gsap-candidate-ai-section">
+        <AiRecommendedJobsSection />
+      </Box>
 
       {/* Row 4: Recommended Jobs Full Width Section */}
-      <Box>
+      <Box className="gsap-candidate-jobs-card">
         <CandidateRecommendedJobsCard />
       </Box>
     </Box>

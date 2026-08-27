@@ -6,6 +6,7 @@
     "urgentJobs": "Urgent Jobs",
     "urgentJobsAria": "Urgent jobs",
     "keyCareers": "Key Careers",
+    "keyCareersTitle": "Key Careers",
     "keyCareersSubtitle": "Explore high-demand career groups to narrow your search faster.",
     "suggestedJobs": "Suggested Jobs",
     "suggestedJobsAria": "Suggested jobs",
@@ -252,7 +253,15 @@
       "phoneMax": "Phone number exceeds allowed length.",
       "resumeRequired": "Please select a resume."
     },
-    "note": "Please provide accurate full name, email, and phone number so employers can contact you."
+    "note": "Please provide accurate full name, email, and phone number so employers can contact you.",
+    "consentNotice": {
+      "text": "By clicking submit application, I agree to share my personal information with employers in accordance with InfoHR's",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "and": "and",
+      "dataPolicy": "Personal Data Policy",
+      "ofInfoHR": "."
+    }
   },
   "applyCard": {
     "positionCaption": "Apply for position",

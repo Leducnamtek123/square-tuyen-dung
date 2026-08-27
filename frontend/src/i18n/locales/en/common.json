@@ -60,6 +60,9 @@
     "logout": "Logout",
     "logoutConfirm": "Are you sure you want to logout?",
     "logoutTitle": "Logout Account",
+    "candidateNav": "Candidate Navigation",
+    "mainNav": "Main Navigation",
+    "mobileMenu": "Mobile Menu",
     "switch": {
       "forEmployers": "For Employers",
       "postFreeJob": "Post a free job",
@@ -114,6 +117,7 @@
     "joinNow": "Join now",
     "openNewTab": "Open in new tab",
     "openDrawer": "Open navigation menu",
+    "closeDrawer": "Close drawer",
     "refresh": "Refresh",
     "retry": "Retry",
     "details": "Details",
@@ -1113,6 +1117,10 @@
     "deleteHistory": "Delete chat history",
     "deleteCurrentHistory": "Delete current chat history",
     "deleteError": "Could not delete this chat history. Please try again.",
+    "initError": "Failed to initialize AI Assistant. Please try again.",
+    "createThreadError": "Failed to create a new chat session.",
+    "deleteThreadError": "Failed to delete chat session.",
+    "loadMessagesError": "Failed to load message history.",
     "loadError": "Could not load AILA. Please try again.",
     "sendError": "AILA could not process this request. Please check the content and try again.",
     "thinking": "AILA is thinking...",
@@ -1123,7 +1131,11 @@
       "limit": "You can attach up to {{count}} images.",
       "unsupported": "Only PNG, JPG, WebP, or GIF images are supported.",
       "tooLarge": "Each image must be smaller than 2MB.",
-      "readError": "Could not read this image. Please try another image."
+      "readError": "Could not read this image. Please try another image.",
+      "invalidType": "Unsupported file format. Please upload a valid image.",
+      "fileTooLarge": "Image file size exceeds the allowed limit.",
+      "maxCountExceeded": "Maximum number of image attachments reached.",
+      "readFailed": "Failed to read image file."
     },
     "portals": {
       "admin": "Admin Portal",
@@ -1418,26 +1430,6 @@
     "validation": {
       "companyNameRequired": "Company Name Required",
       "recruiterNameRequired": "Recruiter Name Required"
-    }
-  },
-  "agentAssistant": {
-    "initError": "Failed to initialize AI Assistant. Please try again.",
-    "createThreadError": "Failed to create a new chat session.",
-    "deleteThreadError": "Failed to delete chat session.",
-    "deleteError": "Failed to delete chat session.",
-    "deleteHistory": "Delete history",
-    "loadMessagesError": "Failed to load message history.",
-    "loadError": "Failed to load messages.",
-    "sendError": "Failed to send message.",
-    "attachments": {
-      "invalidType": "Unsupported file format. Please upload a valid image.",
-      "unsupported": "Unsupported file format.",
-      "fileTooLarge": "Image file size exceeds the 5MB limit.",
-      "tooLarge": "File size exceeds the allowed limit.",
-      "maxCountExceeded": "Maximum number of image attachments reached.",
-      "limit": "Maximum attachment limit reached.",
-      "readFailed": "Failed to read image file.",
-      "readError": "Failed to read attachment file."
     }
   },
   "status": {

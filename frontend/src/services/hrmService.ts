@@ -169,25 +169,6 @@ export type OnboardCandidatePayload = {
 };
 
 const hrmService = {
-  // Legacy / Frappe
-  createEmployeeFromApplication: (data: EmployeeFromApplicationPayload): Promise<EmployeeSyncResult> => {
-    return (httpRequest.post('hrm/web/employees/from-application/', data) as Promise<unknown>).then(
-      unwrapDataResponse<EmployeeSyncResult>,
-    );
-  },
-
-  provisionCurrentUser: (): Promise<{ userId: string; companyId: string }> => {
-    return (httpRequest.post('hrm/web/employees/provision-current-user/', {}) as Promise<unknown>).then(
-      unwrapDataResponse<{ userId: string; companyId: string }>,
-    );
-  },
-
-  getIntegrationStatus: (): Promise<HRMIntegrationStatus> => {
-    return (httpRequest.get('hrm/web/integration-status/') as Promise<unknown>).then(
-      unwrapDataResponse<HRMIntegrationStatus>,
-    );
-  },
-
   // Native HRM API Endpoints
   getDashboardStats: (): Promise<HrmDashboardStats> => {
     return httpRequest.get('native-hrm/dashboard/stats/').then((res) => unwrapDataResponse<HrmDashboardStats>(res));

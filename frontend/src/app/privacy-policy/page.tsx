@@ -1,7 +1,8 @@
+import React from 'react';
 import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/utils/serverI18n';
 import DefaultLayout from '@/layouts/DefaultLayout';
-import StaticInfoPage from '@/views/defaultPages/StaticInfoPage';
+import LegalPolicyViewer from '@/views/defaultPages/LegalPolicyPage/LegalPolicyViewer';
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata('privacy-policy');
@@ -10,8 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function Page() {
   return (
     <DefaultLayout>
-      <StaticInfoPage pageKey="privacy" />
+      <LegalPolicyViewer slug="quy-dinh-bao-mat" portal="jobseeker" />
     </DefaultLayout>
   );
 }
-

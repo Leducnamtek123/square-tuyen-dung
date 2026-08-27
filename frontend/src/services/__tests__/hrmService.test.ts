@@ -4,6 +4,8 @@ import httpRequest from '../../utils/httpRequest';
 jest.mock('../../utils/httpRequest', () => ({
   get: jest.fn(),
   post: jest.fn(),
+  patch: jest.fn(),
+  delete: jest.fn(),
 }));
 
 describe('hrmService', () => {
@@ -11,56 +13,34 @@ describe('hrmService', () => {
     jest.clearAllMocks();
   });
 
-  it('createEmployeeFromApplication posts to HRM bridge endpoint', async () => {
-    (httpRequest.post as jest.Mock).mockResolvedValueOnce({ hrmEmployeeId: 'HR-EMP-0001' });
-    await hrmService.createEmployeeFromApplication({
-      applicationId: 10,
-      fullName: 'Candidate',
-      jobTitle: 'Designer',
-      createHrmAccount: true,
-    });
-    expect(httpRequest.post).toHaveBeenCalledWith('hrm/web/employees/from-application/', {
-      applicationId: 10,
-      fullName: 'Candidate',
-      jobTitle: 'Designer',
-      createHrmAccount: true,
-    });
-  });
-
-  it('provisionCurrentUser posts to HRM account endpoint', async () => {
-    (httpRequest.post as jest.Mock).mockResolvedValueOnce({ userId: 'hr@example.com' });
-    await hrmService.provisionCurrentUser();
-    expect(httpRequest.post).toHaveBeenCalledWith('hrm/web/employees/provision-current-user/', {});
-  });
-
-  it('getIntegrationStatus calls HRM status endpoint', async () => {
-    (httpRequest.get as jest.Mock).mockResolvedValueOnce({ enabled: true });
-    await hrmService.getIntegrationStatus();
-    expect(httpRequest.get).toHaveBeenCalledWith('hrm/web/integration-status/');
-  });
-
-  it('unwraps nested HRM bridge response payloads', async () => {
-    const syncResult = {
-      id: 10,
-      applicationId: 10,
-      hrmEmployeeId: 'HR-EMP-0001',
-      hrmUserId: 'candidate@example.com',
-      hrmSyncStatus: 'SYNCED',
+  it('getDashboardStats calls native-hrm dashboard stats endpoint', async () => {
+    const stats = {
+      active_employees: 10,
+      probation_employees: 2,
+      pending_leaves: 1,
+      expiring_contracts: 0,
+      department_breakdown: [],
     };
-    const provisionResult = { userId: 'hr@example.com', companyId: 'Square' };
-    const integrationStatus = {
-      enabled: true,
-    baseUrl: 'https://hrm.infohr.vn',
-      siteName: 'Square HRM',
-    };
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: stats });
+    const result = await hrmService.getDashboardStats();
+    expect(httpRequest.get).toHaveBeenCalledWith('native-hrm/dashboard/stats/');
+    expect(result).toEqual(stats);
+  });
 
-    (httpRequest.post as jest.Mock)
-      .mockResolvedValueOnce({ data: { data: syncResult } })
-      .mockResolvedValueOnce({ data: { data: provisionResult } });
-    (httpRequest.get as jest.Mock).mockResolvedValueOnce({ data: { data: integrationStatus } });
+  it('getEmployees calls native-hrm employees endpoint', async () => {
+    const employees = [{ id: 1, full_name: 'Nguyen Van A' }];
+    (httpRequest.get as jest.Mock).mockResolvedValueOnce({ results: employees });
+    const result = await hrmService.getEmployees();
+    expect(httpRequest.get).toHaveBeenCalledWith('native-hrm/employees/', { params: undefined });
+    expect(result).toEqual(employees);
+  });
 
-    await expect(hrmService.createEmployeeFromApplication({ applicationId: 10 })).resolves.toEqual(syncResult);
-    await expect(hrmService.provisionCurrentUser()).resolves.toEqual(provisionResult);
-    await expect(hrmService.getIntegrationStatus()).resolves.toEqual(integrationStatus);
+  it('onboardCandidate posts to native-hrm onboard-from-candidate endpoint', async () => {
+    const payload = { first_name: 'Van A', last_name: 'Nguyen', email: 'vana@example.com' };
+    const createdEmployee = { id: 1, ...payload };
+    (httpRequest.post as jest.Mock).mockResolvedValueOnce({ data: createdEmployee });
+    const result = await hrmService.onboardCandidate(payload);
+    expect(httpRequest.post).toHaveBeenCalledWith('native-hrm/employees/onboard-from-candidate/', expect.objectContaining(payload));
+    expect(result).toEqual(createdEmployee);
   });
 });

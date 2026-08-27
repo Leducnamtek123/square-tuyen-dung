@@ -12,6 +12,8 @@ export type JobSeekerProfileResumeParams = {
   pageSize?: number;
   ordering?: string;
   resumeType?: string | number;
+  type?: string | number;
+  [key: string]: string | number | boolean | null | undefined;
 };
 
 export interface JobSeekerProfileUpdatePayload {

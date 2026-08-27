@@ -28,6 +28,8 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
@@ -37,6 +39,7 @@ import tokenService from '@/services/tokenService';
 import authService from '@/services/authService';
 import jobSeekerProfileService from '@/services/jobSeekerProfileService';
 import toastMessages from '@/utils/toastMessages';
+import PhoneVerificationModal from '../../components/modals/PhoneVerificationModal';
 
 const AccountPage = () => {
   const { t, i18n } = useTranslation(['jobSeeker', 'common']);
@@ -55,6 +58,27 @@ const AccountPage = () => {
       ''
     );
   });
+
+  const [isPhoneVerified, setIsPhoneVerified] = React.useState<boolean>(() => {
+    if (typeof window !== 'undefined' && currentUser?.id) {
+      return (
+        currentUser.isPhoneVerified === true ||
+        localStorage.getItem(`phone_verified_${currentUser.id}`) === 'true'
+      );
+    }
+    return Boolean(currentUser?.isPhoneVerified);
+  });
+
+  React.useEffect(() => {
+    if (currentUser?.isPhoneVerified) {
+      setIsPhoneVerified(true);
+    } else if (typeof window !== 'undefined' && currentUser?.id) {
+      const stored = localStorage.getItem(`phone_verified_${currentUser.id}`);
+      if (stored === 'true') {
+        setIsPhoneVerified(true);
+      }
+    }
+  }, [currentUser]);
 
   // Notification preferences states (persisted in localStorage)
   const [emailNotify, setEmailNotify] = React.useState<boolean>(() => {
@@ -83,7 +107,6 @@ const AccountPage = () => {
   const [newEmailInput, setNewEmailInput] = React.useState('');
 
   const [phoneDialogOpen, setPhoneDialogOpen] = React.useState(false);
-  const [newPhoneInput, setNewPhoneInput] = React.useState('');
 
   const [passwordDialogOpen, setPasswordDialogOpen] = React.useState(false);
   const [currentPassword, setCurrentPassword] = React.useState('');
@@ -151,25 +174,7 @@ const AccountPage = () => {
   };
 
   const handleOpenPhoneDialog = () => {
-    setNewPhoneInput(phone);
     setPhoneDialogOpen(true);
-  };
-
-  const handleSavePhone = async () => {
-    if (!newPhoneInput.trim() || newPhoneInput.trim().length < 8) {
-      toastMessages.error('Vui lòng nhập số điện thoại hợp lệ!');
-      return;
-    }
-    try {
-      await jobSeekerProfileService.updateProfile({ phone: newPhoneInput.trim() });
-      setPhone(newPhoneInput.trim());
-      void dispatch(getUserInfo());
-      setPhoneDialogOpen(false);
-      toastMessages.success('Cập nhật số điện thoại thành công!');
-    } catch (err) {
-      console.error('Failed to update phone number:', err);
-      toastMessages.error('Không thể cập nhật số điện thoại. Vui lòng thử lại!');
-    }
   };
 
   const handleOpenPasswordDialog = () => {
@@ -311,7 +316,7 @@ const AccountPage = () => {
 
           {/* Phone Row */}
           <Box
-            onClick={handleOpenPhoneDialog}
+            onClick={() => setPhoneDialogOpen(true)}
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -324,28 +329,48 @@ const AccountPage = () => {
               '&:hover': { backgroundColor: '#f8fafc' },
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#64748b', minWidth: 110 }}>
                 Số điện thoại
               </Typography>
               <Typography variant="subtitle2" sx={{ fontWeight: 700, color: phone ? '#0f172a' : '#94a3b8' }}>
                 {phone || 'Chưa cập nhật'}
               </Typography>
-              {phone && (
+              {phone && isPhoneVerified ? (
                 <Chip
                   size="small"
+                  icon={<CheckCircleIcon sx={{ fontSize: '14px !important', color: '#15803d !important' }} />}
                   label="Đã xác thực"
                   sx={{
                     backgroundColor: '#dcfce7',
                     color: '#15803d',
-                    fontSize: '0.7rem',
+                    fontSize: '0.72rem',
                     fontWeight: 700,
-                    height: 20,
+                    height: 22,
                   }}
                 />
-              )}
+              ) : phone ? (
+                <Chip
+                  size="small"
+                  icon={<WarningAmberIcon sx={{ fontSize: '14px !important', color: '#b45309 !important' }} />}
+                  label="Chưa xác thực - Xác thực ngay"
+                  sx={{
+                    backgroundColor: '#fffbeb',
+                    border: '1px solid #fde68a',
+                    color: '#b45309',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    height: 22,
+                  }}
+                />
+              ) : null}
             </Box>
-            <ArrowForwardIosIcon sx={{ fontSize: 14, color: '#94a3b8' }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="caption" sx={{ color: '#2563eb', fontWeight: 700 }}>
+                {phone && isPhoneVerified ? 'Đổi số' : 'Xác thực'}
+              </Typography>
+              <ArrowForwardIosIcon sx={{ fontSize: 14, color: '#2563eb' }} />
+            </Box>
           </Box>
         </Stack>
       </Card>
@@ -495,47 +520,16 @@ const AccountPage = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Edit Phone Dialog */}
-      <Dialog
+      {/* Phone OTP Verification Modal */}
+      <PhoneVerificationModal
         open={phoneDialogOpen}
         onClose={() => setPhoneDialogOpen(false)}
-        maxWidth="xs"
-        fullWidth
-        PaperProps={{ sx: { borderRadius: '20px', p: 1 } }}
-      >
-        <DialogTitle sx={{ fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <PhoneOutlinedIcon sx={{ color: '#2563eb' }} />
-          Cập nhật Số điện thoại
-        </DialogTitle>
-        <DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
-          <Box sx={{ pt: 1 }}>
-            <Typography variant="caption" sx={{ color: '#0f172a', fontWeight: 700, mb: 0.5, display: 'block' }}>
-              Số điện thoại mới *
-            </Typography>
-            <TextField
-              fullWidth
-              size="small"
-              type="tel"
-              value={newPhoneInput}
-              onChange={(e) => setNewPhoneInput(e.target.value)}
-              placeholder="VD: 0901 234 567"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setPhoneDialogOpen(false)} sx={{ color: '#64748b', fontWeight: 700, borderRadius: '10px' }}>
-            Hủy
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleSavePhone}
-            sx={{ borderRadius: '10px', backgroundColor: '#2563eb', fontWeight: 700, px: 3 }}
-          >
-            Lưu thay đổi
-          </Button>
-        </DialogActions>
-      </Dialog>
+        initialPhone={phone}
+        onSuccess={(verifiedPhone) => {
+          setPhone(verifiedPhone);
+          setIsPhoneVerified(true);
+        }}
+      />
 
       {/* Change Password Dialog */}
       <Dialog

@@ -76,6 +76,18 @@ export const EmailIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
   />
 );
 
+export const TiktokIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
+  <AssetIcon src={ICONS.TIKTOK} size={size} label="TikTok" />
+);
+
+export const ZaloIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
+  <AssetIcon src={ICONS.ZALO} size={size} label="Zalo" />
+);
+
+export const InstagramIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
+  <AssetIcon src={ICONS.INSTAGRAM} size={size} label="Instagram" />
+);
+
 export const YoutubeIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
   <AssetIcon src={ICONS.YOUTUBE} size={size} label="YouTube" />
 );

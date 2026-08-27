@@ -18,7 +18,7 @@ describe('common employer navigation routes', () => {
   });
 
   it('localizes employer links in the common footer', () => {
-    const source = readCommonSource('Footer/index.tsx');
+    const source = `${readCommonSource('Footer/index.tsx')}\n${readCommonSource('Footer/EmployerFooter.tsx')}`;
 
     expect(source).toContain('localizeRoutePath');
     expect(source).not.toContain("route: `/${ROUTES.EMPLOYER.JOB_POST}`");

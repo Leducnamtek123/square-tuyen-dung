@@ -71,8 +71,11 @@ USER_INFO_BASIC_FIELDS = (
     "id",
     "fullName",
     "email",
+    "phoneNumber",
     "isActive",
     "isVerifyEmail",
+    "isVerifyPhone",
+    "isPhoneVerified",
     "isOnboarded",
     "onboardingStep",
     "avatarUrl",
@@ -330,7 +333,7 @@ def update_user_account(request):
     user = request.user
 
     user_account_serializer = UserSerializer(
-        user, data=data, partial=True, fields=["id", "fullName"]
+        user, data=data, partial=True, fields=["id", "fullName", "phoneNumber", "phone", "isVerifyPhone", "isPhoneVerified"]
     )
 
     if not user_account_serializer.is_valid():
@@ -345,6 +348,45 @@ def update_user_account(request):
 
     return response_data(
         status=status.HTTP_200_OK, data=user_info_serializer.data
+    )
+
+
+@api_view(http_method_names=["post", "put"])
+@permission_classes(permission_classes=[IsAuthenticated])
+def verify_phone_number(request):
+    data = request.data
+    phone = data.get("phone") or data.get("phoneNumber") or data.get("phone_number")
+    if not phone or not str(phone).strip():
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"phone": ["Vui lòng cung cấp số điện thoại hợp lệ."]},
+        )
+
+    clean_phone = str(phone).strip()
+    user = request.user
+    user.phone_number = clean_phone
+    user.is_verify_phone = True
+    user.save(update_fields=["phone_number", "is_verify_phone"])
+
+    # Synchronize with JobSeekerProfile
+    try:
+        profile = getattr(user, "job_seeker_profile", None)
+        if profile:
+            profile.phone = clean_phone
+            profile.save(update_fields=["phone"])
+    except Exception as ex:
+        helper.print_log_error("verify_phone_number.job_seeker_profile", ex)
+
+    user_info_serializer = UserSerializer(user, fields=USER_INFO_BASIC_FIELDS)
+    return response_data(
+        status=status.HTTP_200_OK,
+        data={
+            "success": True,
+            "phoneNumber": clean_phone,
+            "isVerifyPhone": True,
+            "isPhoneVerified": True,
+            "user": user_info_serializer.data,
+        },
     )
 
 

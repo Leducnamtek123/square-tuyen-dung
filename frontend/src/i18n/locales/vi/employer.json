@@ -1720,6 +1720,14 @@
       "verification": "Xác thực GPKD",
       "complete": "Hoàn tất"
     },
+    "consentNotice": {
+      "text": "Bằng việc tiếp tục thiết lập, bạn đồng ý với",
+      "terms": "Điều khoản sử dụng",
+      "privacy": "Chính sách bảo mật",
+      "and": "và",
+      "postPolicy": "Quy định đăng tin",
+      "ofInfoHR": "của InfoHR."
+    },
     "stepCounter": "Bước {{current}} / {{total}}",
     "invitation": {
       "title": "Bạn đã được mời tham gia doanh nghiệp",

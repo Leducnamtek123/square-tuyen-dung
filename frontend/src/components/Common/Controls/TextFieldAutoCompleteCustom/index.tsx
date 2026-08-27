@@ -104,6 +104,12 @@ const TextFieldAutoCompleteCustom = <T extends FieldValues = FieldValues>({
 
               loading={loading}
 
+              slotProps={{
+                popper: {
+                  sx: { zIndex: 9999 },
+                },
+              }}
+
               onChange={handleSelect}
 
               inputValue={field.value ?? ''}

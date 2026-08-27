@@ -139,24 +139,25 @@ const InfoRow = ({
   </Box>
 );
 
-const ProfileDetailPage = () => {
+const ProfileDetailPage = ({ id }: { id?: string } = {}) => {
   const { t, i18n } = useTranslation('admin');
   const router = useRouter();
-  const params = useParams<{ id: string }>();
-  const profileId = params?.id;
+  const params = useParams<{ id?: string; slug?: string | string[] }>();
+  const slugId = Array.isArray(params?.slug) ? params.slug[params.slug.length - 1] : params?.slug;
+  const profileId = id || params?.id || slugId;
   const queryClient = useQueryClient();
   const { allConfig } = useConfig();
 
   const profileQuery = useQuery<ProfileDetailRecord>({
     queryKey: ['admin-profile-detail', profileId],
-    queryFn: async () => adminManagementService.getProfileDetail(profileId),
+    queryFn: async () => adminManagementService.getProfileDetail(profileId!),
     enabled: Boolean(profileId),
   });
 
   const resumesQuery = useQuery<Resume[]>({
     queryKey: ['admin-profile-resumes', profileId],
     queryFn: async () => {
-      const response = await adminManagementService.getResumes({ jobSeekerProfileId: profileId });
+      const response = await adminManagementService.getResumes({ jobSeekerProfileId: profileId! });
       return response.results || [];
     },
     enabled: Boolean(profileId),

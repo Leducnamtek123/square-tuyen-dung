@@ -25,6 +25,7 @@ import StarOutlineIcon from '@mui/icons-material/StarOutline';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import dayjs from 'dayjs';
+import { getSafeExternalOpenUrl, getSafeResourceUrl } from '@/utils/safeExternalUrl';
 import type { ExtendedResume, CVDocExperience, CVDocEducation, CVDocAdvancedSkill, CVDocCertificate } from '@/components/Features/CVDoc';
 
 interface CandidateResumePreviewModalProps {
@@ -95,7 +96,9 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
   const advancedSkills: CVDocAdvancedSkill[] = resume?.advancedSkills || [];
   const certificates: CVDocCertificate[] = resume?.certificates || [];
 
-  const pdfUrl = resume?.fileUrl || resume?.file?.url || resume?.file?.fileUrl;
+  const rawPdfUrl = resume?.fileUrl || resume?.file?.url || resume?.file?.fileUrl;
+  const safePdfUrl = getSafeExternalOpenUrl(rawPdfUrl);
+  const safeResourcePdfUrl = getSafeResourceUrl(rawPdfUrl);
 
   return (
     <Dialog
@@ -165,7 +168,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
       <DialogContent sx={{ p: { xs: 2.5, sm: 4 } }}>
         <Stack spacing={3}>
           {/* Section: Tệp CV đính kèm (nếu có) */}
-          {pdfUrl ? (
+          {safePdfUrl ? (
             <Box sx={{ p: 3, borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, pb: 1, borderBottom: '2px solid #2563eb' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -177,7 +180,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
                 <Button
                   size="small"
                   variant="contained"
-                  href={pdfUrl}
+                  href={safePdfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Mở tệp PDF gốc trong tab mới"
@@ -189,7 +192,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
               </Box>
               <Box sx={{ width: '100%', height: '520px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
                 <iframe
-                  src={`${pdfUrl}#toolbar=0`}
+                  src={safeResourcePdfUrl ? `${safeResourcePdfUrl}#toolbar=0` : undefined}
                   width="100%"
                   height="100%"
                   loading="lazy"

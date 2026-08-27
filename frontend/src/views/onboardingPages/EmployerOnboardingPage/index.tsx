@@ -245,8 +245,9 @@ export default function EmployerOnboardingPage() {
 
       {/* Navigation Actions Footer (Steps 0, 1, 2) */}
       {activeStep < 3 && (
-        <Box
-          sx={{
+        <>
+          <Box
+            sx={{
             mt: 4.5,
             pt: 3,
             borderTop: '1px solid #E2E8F0',
@@ -362,6 +363,52 @@ export default function EmployerOnboardingPage() {
             )}
           </Stack>
         </Box>
+
+        <Box
+          sx={{
+            mt: 2.5,
+            p: 1.75,
+            borderRadius: 2.5,
+            backgroundColor: '#F8FAFC',
+            border: '1px solid #E2E8F0',
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="caption" sx={{ color: '#475569', fontSize: '0.8125rem', lineHeight: 1.6 }}>
+            {t('employerOnboarding.consentNotice.text', 'Bằng việc tiếp tục thiết lập, bạn đồng ý với')}{' '}
+            <Box
+              component="a"
+              href="/employer/thoa-thuan-su-dung.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+            >
+              {t('employerOnboarding.consentNotice.terms', 'Điều khoản sử dụng')}
+            </Box>
+            ,{' '}
+            <Box
+              component="a"
+              href="/employer/chinh-sach-bao-mat.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+            >
+              {t('employerOnboarding.consentNotice.privacy', 'Chính sách bảo mật')}
+            </Box>{' '}
+            {t('employerOnboarding.consentNotice.and', 'và')}{' '}
+            <Box
+              component="a"
+              href="/employer/quy-dinh-dang-tin.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+            >
+              {t('employerOnboarding.consentNotice.postPolicy', 'Quy định đăng tin')}
+            </Box>{' '}
+            {t('employerOnboarding.consentNotice.ofInfoHR', 'của InfoHR.')}
+          </Typography>
+        </Box>
+      </>
       )}
     </OnboardingShell>
   );

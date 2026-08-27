@@ -25,13 +25,6 @@ export type ThreadGroup = {
   threads: AgentThread[];
 };
 
-export const threadGroupFriendlyLabels: Record<ThreadGroupKey, string> = {
-  today: 'Hôm nay',
-  yesterday: 'Hôm qua',
-  thisWeek: 'Tuần này',
-  earlier: 'Trước đó',
-};
-
 export const threadGroupLabelKeys: Record<ThreadGroupKey, string> = {
   today: 'common:agentAssistant.threadGroups.today',
   yesterday: 'common:agentAssistant.threadGroups.yesterday',
@@ -71,7 +64,7 @@ const ThreadItem = ({
   onDelete,
 }: ThreadItemProps) => {
   const { t } = useTranslation('common');
-  const displayTitle = thread.title || 'Đoạn chat mới';
+  const displayTitle = thread.title || t('common:agentAssistant.newChat');
 
   return (
     <Box
@@ -129,7 +122,7 @@ const ThreadItem = ({
             </Typography>
           </Box>
         </Button>
-        <Tooltip title={t('common:agentAssistant.deleteHistory') || 'Xóa lịch sử'}>
+        <Tooltip title={t('common:agentAssistant.deleteHistory')}>
           <span>
             <IconButton
               className="delete-btn"
@@ -188,14 +181,7 @@ export const ThreadSidebar = ({
   const { t } = useTranslation('common');
 
   const getGroupTitle = (key: ThreadGroupKey) => {
-    const i18nKey = threadGroupLabelKeys[key];
-    if (i18nKey) {
-      const translated = t(i18nKey);
-      if (translated && !translated.startsWith('agentAssistant.threadGroups.')) {
-        return translated;
-      }
-    }
-    return threadGroupFriendlyLabels[key] || key;
+    return t(threadGroupLabelKeys[key]) || key;
   };
 
   return (
@@ -267,7 +253,7 @@ export const ThreadSidebar = ({
             variant="overline"
             sx={{ color: '#64748B', fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.05em' }}
           >
-            GẦN ĐÂY
+            {t('common:agentAssistant.recents')}
           </Typography>
         </Stack>
 
@@ -329,7 +315,7 @@ export const ThreadSidebar = ({
             },
           }}
         >
-          Đoạn chat mới
+          {t('common:agentAssistant.newChat')}
         </Button>
       </Box>
     </Box>

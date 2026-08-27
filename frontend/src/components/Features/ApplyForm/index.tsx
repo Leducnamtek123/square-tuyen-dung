@@ -316,9 +316,49 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
           </Grid>
 
           <Grid size={12}>
-            <Typography color="GrayText" variant="caption">
-              {t("applyForm.note")}
-            </Typography>
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 2.5,
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                textAlign: 'center',
+              }}
+            >
+              <Typography variant="caption" sx={{ color: '#475569', fontSize: '0.8125rem', lineHeight: 1.6 }}>
+                {t('applyForm.consentNotice.text', 'Bằng việc nhấn nút nộp hồ sơ, tôi đồng ý chia sẻ thông tin cá nhân của mình với nhà tuyển dụng theo các')}{' '}
+                <Box
+                  component="a"
+                  href="/thoa-thuan-su-dung.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                >
+                  {t('applyForm.consentNotice.terms', 'Điều khoản sử dụng')}
+                </Box>
+                ,{' '}
+                <Box
+                  component="a"
+                  href="/quy-dinh-bao-mat.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                >
+                  {t('applyForm.consentNotice.privacy', 'Chính sách bảo mật')}
+                </Box>{' '}
+                {t('applyForm.consentNotice.and', 'và')}{' '}
+                <Box
+                  component="a"
+                  href="/tuan-thu-va-su-dong-y-cua-khach-hang.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                >
+                  {t('applyForm.consentNotice.dataPolicy', 'Chính sách dữ liệu cá nhân')}
+                </Box>{' '}
+                {t('applyForm.consentNotice.ofInfoHR', 'của InfoHR.')}
+              </Typography>
+            </Box>
           </Grid>
         </Grid>
       </form>

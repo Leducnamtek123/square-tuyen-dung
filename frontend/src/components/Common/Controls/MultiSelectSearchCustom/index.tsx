@@ -90,6 +90,12 @@ const MultiSelectSearchCustom = <T extends FieldValues = FieldValues>({
 
           getOptionLabel={(option) => typeof option.name === 'string' ? t(`choices.${option.name}`, option.name) : option.name}
 
+          slotProps={{
+            popper: {
+              sx: { zIndex: 9999 },
+            },
+          }}
+
           renderOption={(props, option, { selected }) => (
 
             <li {...(props as any)}>

@@ -106,6 +106,19 @@ const nextConfig = {
       { source: '/dieu-khoan-dich-vu', destination: '/terms-of-service' },
       { source: '/chinh-sach-bao-mat', destination: '/privacy-policy' },
 
+      // ── Legal & Policy HTML Routes (Vieclam24h style) ──
+      { source: '/thoa-thuan-su-dung.html', destination: '/legal/thoa-thuan-su-dung' },
+      { source: '/dieu-khoan-su-dung.html', destination: '/legal/thoa-thuan-su-dung' },
+      { source: '/quy-dinh-bao-mat.html', destination: '/legal/quy-dinh-bao-mat' },
+      { source: '/chinh-sach-bao-mat.html', destination: '/legal/quy-dinh-bao-mat' },
+      { source: '/tuan-thu-va-su-dong-y-cua-khach-hang.html', destination: '/legal/tuan-thu-va-su-dong-y-cua-khach-hang' },
+      { source: '/so-do-trang-web.html', destination: '/legal/so-do-trang-web' },
+      { source: '/chinh-sach-bao-hanh.html', destination: '/legal/chinh-sach-bao-hanh' },
+      { source: '/quy-dinh-dang-tin.html', destination: '/legal/quy-dinh-dang-tin' },
+      { source: '/nha-tuyen-dung/:slug.html', destination: '/employer/legal/:slug' },
+      { source: '/employer/:slug.html', destination: '/employer/legal/:slug' },
+      { source: '/:slug.html', destination: '/legal/:slug' },
+
       // ── Employer (/nha-tuyen-dung → /employer) ──
       { source: '/nha-tuyen-dung/login', destination: '/employer/login' },
       { source: '/nha-tuyen-dung/dang-nhap', destination: '/employer/login' },
@@ -189,6 +202,11 @@ const nextConfig = {
       { source: '/quan-tri/quan-ly-cong-ty', destination: '/admin/companies' },
       { source: '/quan-tri/quan-ly-ho-so-ung-vien', destination: '/admin/profiles' },
       { source: '/quan-tri/quan-ly-ho-so-ung-vien/:id', destination: '/admin/profiles/:id' },
+      { source: '/quan-tri/ho-so/:id', destination: '/admin/profiles/:id' },
+      { source: '/quan-tri/ho-so-ung-vien/:id', destination: '/admin/profiles/:id' },
+      { source: '/quan-tri/profiles/:id', destination: '/admin/profiles/:id' },
+      { source: '/quan-tri/:id(\\d+)', destination: '/admin/profiles/:id' },
+      { source: '/admin/:id(\\d+)', destination: '/admin/profiles/:id' },
       { source: '/quan-tri/quan-tri/quan-ly-ho-so-ung-vien', destination: '/admin/profiles' },
       { source: '/quan-tri/quan-tri/quan-ly-ho-so-ung-vien/:id', destination: '/admin/profiles/:id' },
       { source: '/profiles/:id', destination: '/admin/profiles/:id' },

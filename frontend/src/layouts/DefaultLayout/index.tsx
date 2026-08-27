@@ -30,68 +30,7 @@ const DefaultLayout = ({ children }: { children?: React.ReactNode }) => {
 
       </Container>
 
-      <Box
-
-        sx={{
-
-          mt: {
-
-            xs: 2,
-
-            sm: 10,
-
-            md: 10,
-
-            lg: 10,
-
-            xl: 10,
-
-          },
-
-          px: {
-
-            xs: 1,
-
-            sm: 5,
-
-            md: 8,
-
-            lg: 10,
-
-            xl: 14,
-
-          },
-
-          py: {
-
-            xs: 2,
-
-            sm: 2,
-
-            md: 2,
-
-            lg: 5,
-
-            xl: 5,
-
-          },
-
-          color: 'text.primary',
-
-          bgcolor: 'background.paper',
-
-          borderTop: '1px solid',
-
-          borderColor: 'divider',
-
-        }}
-
-      >
-
-        <Footer />
-
-      </Box>
-
+      <Footer />
     </Box>
 
   );

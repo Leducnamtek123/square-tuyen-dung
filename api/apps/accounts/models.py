@@ -104,6 +104,8 @@ class User(AbstractUser, CommonBaseModel):
 
     is_verify_email = models.BooleanField(default=False)
 
+    is_verify_phone = models.BooleanField(default=False)
+
     is_onboarded = models.BooleanField(default=False, db_index=True)
 
     onboarding_step = models.IntegerField(default=0)

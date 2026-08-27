@@ -1720,6 +1720,14 @@
       "verification": "Business Verification",
       "complete": "Complete"
     },
+    "consentNotice": {
+      "text": "By continuing setup, you agree to InfoHR's",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "and": "and",
+      "postPolicy": "Job Posting Regulations",
+      "ofInfoHR": "."
+    },
     "stepCounter": "Step {{current}} of {{total}}",
     "invitation": {
       "title": "You have been invited to join a company",

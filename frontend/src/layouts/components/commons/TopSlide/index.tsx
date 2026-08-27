@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import {
@@ -9,6 +9,8 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import HomeSearch from '../../../../views/components/defaults/HomeSearch';
 import contentService from '../../../../services/contentService';
 import { BANNER_TYPES, IMAGES } from '../../../../configs/constants';
@@ -74,6 +76,38 @@ const RenderItem = ({ item }: { item: Banner }) => {
 const TopSlide = () => {
   const [banners, setBanners] = React.useState<Banner[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const heroContentRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+      tl.fromTo(
+        '.gsap-hero-tag',
+        { y: -15, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, clearProps: 'transform' }
+      )
+        .fromTo(
+          '.gsap-hero-title',
+          { y: 25, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.7, clearProps: 'transform' },
+          '-=0.35'
+        )
+        .fromTo(
+          '.gsap-hero-subtitle',
+          { y: 15, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, clearProps: 'transform' },
+          '-=0.4'
+        )
+        .fromTo(
+          '.gsap-hero-search',
+          { y: 20, opacity: 0, scale: 0.98 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.7, clearProps: 'transform' },
+          '-=0.3'
+        );
+    },
+    { scope: heroContentRef }
+  );
 
   React.useEffect(() => {
     let isMounted = true;
@@ -186,6 +220,7 @@ const TopSlide = () => {
           }}
         >
           <Box
+            ref={heroContentRef}
             sx={{
               width: '100%',
               maxWidth: HERO_CONTAINER_MAX_WIDTH,
@@ -196,6 +231,7 @@ const TopSlide = () => {
             <Stack spacing={2.5}>
               <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
                 <Box
+                  className="gsap-hero-tag"
                   sx={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -217,6 +253,7 @@ const TopSlide = () => {
                   Nền tảng Tuyển dụng &amp; Phỏng vấn AI chuẩn xác
                 </Box>
                 <Typography
+                  className="gsap-hero-title"
                   variant="h3"
                   sx={{
                     fontWeight: 800,
@@ -241,6 +278,7 @@ const TopSlide = () => {
                   </Box>
                 </Typography>
                 <Typography
+                  className="gsap-hero-subtitle"
                   variant="subtitle1"
                   sx={{
                     fontWeight: 500,
@@ -254,7 +292,9 @@ const TopSlide = () => {
                   Kết nối ứng viên tài năng &amp; nhà tuyển dụng hàng đầu qua hệ thống AI Matching thế hệ mới.
                 </Typography>
               </Box>
-              <HomeSearch variant="hero" />
+              <Box className="gsap-hero-search">
+                <HomeSearch variant="hero" />
+              </Box>
             </Stack>
           </Box>
         </Box>
@@ -264,3 +304,4 @@ const TopSlide = () => {
 };
 
 export default TopSlide;
+

@@ -28,32 +28,7 @@ const HomeLayout = ({ children }: { children?: React.ReactNode }) => {
         {children}
       </Container>
 
-      <Box
-        component="footer"
-        sx={{
-          mt: 12,
-          px: {
-            xs: 2,
-            sm: 5,
-            md: 8,
-            lg: 10,
-            xl: 14,
-          },
-          py: {
-            xs: 4,
-            sm: 4,
-            md: 5,
-            lg: 6,
-            xl: 6,
-          },
-          color: 'text.primary',
-          bgcolor: 'background.paper',
-          borderTop: '1px solid',
-          borderColor: 'divider',
-        }}
-      >
-        <Footer />
-      </Box>
+      <Footer />
     </Box>
 
   );

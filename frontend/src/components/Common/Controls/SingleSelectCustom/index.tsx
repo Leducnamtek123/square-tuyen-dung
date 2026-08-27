@@ -82,6 +82,11 @@ const SingleSelectCustom = <T extends FieldValues = FieldValues>({
               getOptionLabel={(option) => typeof option.name === 'string' ? t(`choices.${option.name}`, option.name) : option.name}
               value={options.find((o) => o.id == field.value) || null}
               onChange={(e, value) => field.onChange(value?.id ?? null)}
+              slotProps={{
+                popper: {
+                  sx: { zIndex: 9999 },
+                },
+              }}
               renderInput={(params) => (
                 <TextField
                   error={fieldState.invalid}

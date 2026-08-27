@@ -227,9 +227,13 @@ class EmployerRegisterSerializer(PasswordConfirmMixin, serializers.Serializer):
 class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     fullName = serializers.CharField(source="full_name", required=False, allow_blank=False, max_length=100)
     email = serializers.EmailField(read_only=True)
+    phoneNumber = serializers.CharField(source="phone_number", required=False, allow_null=True, allow_blank=True, max_length=20)
+    phone = serializers.CharField(source="phone_number", required=False, allow_null=True, allow_blank=True, max_length=20, write_only=True)
     avatarUrl = serializers.SerializerMethodField(method_name="get_avatar_url", read_only=True)
     isActive = serializers.BooleanField(source='is_active', read_only=True)
     isVerifyEmail = serializers.BooleanField(source='is_verify_email', read_only=True)
+    isVerifyPhone = serializers.BooleanField(source='is_verify_phone', required=False)
+    isPhoneVerified = serializers.BooleanField(source='is_verify_phone', read_only=True)
     isOnboarded = serializers.BooleanField(source='is_onboarded', read_only=True)
     onboardingStep = serializers.IntegerField(source='onboarding_step', read_only=True)
     roleName = serializers.ChoiceField(source="role_name", choices=var_sys.ROLE_CHOICES, required=False)
@@ -416,13 +420,27 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         if "role_name" in validated_data:
             user.role_name = validated_data.get("role_name")
 
+        if "phone_number" in validated_data:
+            user.phone_number = validated_data.get("phone_number")
+            try:
+                profile = getattr(user, 'job_seeker_profile', None)
+                if profile:
+                    profile.phone = user.phone_number
+                    profile.save(update_fields=['phone'])
+            except Exception as ex:
+                helper.print_log_error("UserSerializer.update.job_seeker_profile", ex)
+
+        if "is_verify_phone" in validated_data:
+            user.is_verify_phone = validated_data.get("is_verify_phone")
+
         user.save()
         return user
 
     class Meta:
         model = User
-        fields = ("id", "fullName", "email",
-                  "isActive", "isVerifyEmail", "isOnboarded", "onboardingStep",
+        fields = ("id", "fullName", "email", "phoneNumber", "phone",
+                  "isActive", "isVerifyEmail", "isVerifyPhone", "isPhoneVerified",
+                  "isOnboarded", "onboardingStep",
                   "avatarUrl", "roleName",
                   "jobSeekerProfileId", "jobSeekerProfile",
                   "companyId", "company",

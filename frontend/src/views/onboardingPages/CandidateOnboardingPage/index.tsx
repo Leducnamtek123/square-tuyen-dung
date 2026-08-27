@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Alert,
   Fade,
+  Typography,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -136,8 +137,8 @@ export default function CandidateOnboardingPage() {
                 onChange={updateFormField}
                 isUploading={isUploading}
                 setIsUploading={setIsUploading}
-                errorMsg={generalError}
-                setErrorMsg={setGeneralError}
+                errorMsg={errors.fileId || ''}
+                setErrorMsg={(msg) => updateFormField('fileId', msg ? null : formData.fileId)}
               />
             </div>
           </Fade>
@@ -162,100 +163,147 @@ export default function CandidateOnboardingPage() {
 
       {/* Navigation Actions Footer (Steps 0, 1, 2) */}
       {activeStep < 3 && (
-        <Box
-          sx={{
-            mt: 4.5,
-            pt: 3,
-            borderTop: '1px solid #E2E8F0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          {activeStep > 0 ? (
-            <Button
-              variant="outlined"
-              color="inherit"
-              onClick={handleBack}
-              disabled={isSaving || isUploading}
-              startIcon={<ArrowBackIcon />}
-              sx={{
-                borderRadius: 2.5,
-                px: 2.5,
-                py: 1.25,
-                fontWeight: 600,
-                borderColor: '#CBD5E1',
-                color: '#475569',
-              }}
-            >
-              {t('onboarding.actions.back', 'Quay lại')}
-            </Button>
-          ) : (
-            <Box />
-          )}
-
-          <Stack direction="row" spacing={1.5}>
-            {activeStep === 0 && (
+        <>
+          <Box
+            sx={{
+              mt: 4.5,
+              pt: 3,
+              borderTop: '1px solid #E2E8F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            {activeStep > 0 ? (
               <Button
-                variant="contained"
-                color="primary"
-                onClick={handleNextStep1}
-                disabled={isSaving}
-                endIcon={isSaving ? <CircularProgress size={18} color="inherit" /> : <ArrowForwardIcon />}
-                sx={{
-                  borderRadius: 2.5,
-                  px: 3.5,
-                  py: 1.25,
-                  fontWeight: 700,
-                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
-                }}
-              >
-                {isSaving ? t('onboarding.actions.saving', 'Đang lưu...') : t('onboarding.actions.next', 'Tiếp theo')}
-              </Button>
-            )}
-
-            {activeStep === 1 && (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleNextStep2}
-                disabled={isSaving}
-                endIcon={isSaving ? <CircularProgress size={18} color="inherit" /> : <ArrowForwardIcon />}
-                sx={{
-                  borderRadius: 2.5,
-                  px: 3.5,
-                  py: 1.25,
-                  fontWeight: 700,
-                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
-                }}
-              >
-                {isSaving ? t('onboarding.actions.saving', 'Đang lưu...') : t('onboarding.actions.next', 'Tiếp theo')}
-              </Button>
-            )}
-
-            {activeStep === 2 && (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleCompleteCandidate}
+                variant="outlined"
+                color="inherit"
+                onClick={handleBack}
                 disabled={isSaving || isUploading}
-                endIcon={isSaving ? <CircularProgress size={18} color="inherit" /> : <CheckCircleIcon />}
+                startIcon={<ArrowBackIcon />}
                 sx={{
                   borderRadius: 2.5,
-                  px: 3.5,
+                  px: 2.5,
                   py: 1.25,
-                  fontWeight: 700,
-                  background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
-                  boxShadow: '0 4px 14px rgba(37, 99, 235, 0.28)',
+                  fontWeight: 600,
+                  borderColor: '#CBD5E1',
+                  color: '#475569',
                 }}
               >
-                {isSaving
-                  ? t('onboarding.actions.submitting', 'Đang hoàn tất...')
-                  : t('onboarding.actions.complete', 'Hoàn tất hồ sơ cơ bản')}
+                {t('onboarding.actions.back', 'Quay lại')}
               </Button>
+            ) : (
+              <Box />
             )}
-          </Stack>
-        </Box>
+
+            <Stack direction="row" spacing={1.5}>
+              {activeStep === 0 && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleNextStep1}
+                  disabled={isSaving}
+                  endIcon={isSaving ? <CircularProgress size={18} color="inherit" /> : <ArrowForwardIcon />}
+                  sx={{
+                    borderRadius: 2.5,
+                    px: 3.5,
+                    py: 1.25,
+                    fontWeight: 700,
+                    boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
+                  }}
+                >
+                  {isSaving ? t('onboarding.actions.saving', 'Đang lưu...') : t('onboarding.actions.next', 'Tiếp theo')}
+                </Button>
+              )}
+
+              {activeStep === 1 && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleNextStep2}
+                  disabled={isSaving}
+                  endIcon={isSaving ? <CircularProgress size={18} color="inherit" /> : <ArrowForwardIcon />}
+                  sx={{
+                    borderRadius: 2.5,
+                    px: 3.5,
+                    py: 1.25,
+                    fontWeight: 700,
+                    boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
+                  }}
+                >
+                  {isSaving ? t('onboarding.actions.saving', 'Đang lưu...') : t('onboarding.actions.next', 'Tiếp theo')}
+                </Button>
+              )}
+
+              {activeStep === 2 && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleCompleteCandidate}
+                  disabled={isSaving || isUploading}
+                  endIcon={isSaving ? <CircularProgress size={18} color="inherit" /> : <CheckCircleIcon />}
+                  sx={{
+                    borderRadius: 2.5,
+                    px: 3.5,
+                    py: 1.25,
+                    fontWeight: 700,
+                    background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
+                    boxShadow: '0 4px 14px rgba(37, 99, 235, 0.28)',
+                  }}
+                >
+                  {isSaving
+                    ? t('onboarding.actions.submitting', 'Đang hoàn tất...')
+                    : t('onboarding.actions.complete', 'Hoàn tất hồ sơ cơ bản')}
+                </Button>
+              )}
+            </Stack>
+          </Box>
+
+          <Box
+            sx={{
+              mt: 2.5,
+              p: 1.75,
+              borderRadius: 2.5,
+              backgroundColor: '#F8FAFC',
+              border: '1px solid #E2E8F0',
+              textAlign: 'center',
+            }}
+          >
+            <Typography variant="caption" sx={{ color: '#475569', fontSize: '0.8125rem', lineHeight: 1.6 }}>
+              {t('onboarding.consentNotice.text', 'Bằng việc nhấn nút hoàn tất, tôi đồng ý chia sẻ thông tin cá nhân của mình với nhà tuyển dụng theo các')}{' '}
+              <Box
+                component="a"
+                href="/thoa-thuan-su-dung.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+              >
+                {t('onboarding.consentNotice.terms', 'Điều khoản sử dụng')}
+              </Box>
+              ,{' '}
+              <Box
+                component="a"
+                href="/quy-dinh-bao-mat.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+              >
+                {t('onboarding.consentNotice.privacy', 'Chính sách bảo mật')}
+              </Box>{' '}
+              {t('onboarding.consentNotice.and', 'và')}{' '}
+              <Box
+                component="a"
+                href="/tuan-thu-va-su-dong-y-cua-khach-hang.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+              >
+                {t('onboarding.consentNotice.dataPolicy', 'Chính sách dữ liệu cá nhân')}
+              </Box>{' '}
+              {t('onboarding.consentNotice.ofInfoHR', 'của InfoHR.')}
+            </Typography>
+          </Box>
+        </>
       )}
     </OnboardingShell>
   );

@@ -36,6 +36,7 @@
     "joinNow": "Tham gia ngay",
     "openNewTab": "Mở tab mới",
     "openDrawer": "Mở menu điều hướng",
+    "closeDrawer": "Đóng menu",
     "refresh": "Làm mới",
     "retry": "Thử lại",
     "details": "Chi tiết",
@@ -97,6 +98,9 @@
     "logout": "Đăng xuất",
     "logoutConfirm": "Bạn có chắc chắn muốn đăng xuất không?",
     "logoutTitle": "Đăng xuất tài khoản",
+    "candidateNav": "Điều hướng ứng viên",
+    "mainNav": "Menu điều hướng",
+    "mobileMenu": "Menu chính",
     "switch": {
       "forEmployers": "Dành cho nhà tuyển dụng",
       "postFreeJob": "Đăng tin miễn phí",
@@ -1110,6 +1114,10 @@
     "deleteHistory": "Xóa lịch sử chat",
     "deleteCurrentHistory": "Xóa lịch sử chat đang mở",
     "deleteError": "Không thể xóa lịch sử chat này. Vui lòng thử lại.",
+    "initError": "Không thể khởi tạo trợ lý AI. Vui lòng thử lại.",
+    "createThreadError": "Không thể tạo phiên trò chuyện mới.",
+    "deleteThreadError": "Không thể xóa phiên trò chuyện.",
+    "loadMessagesError": "Không thể tải lịch sử tin nhắn.",
     "loadError": "Không thể tải AILA. Vui lòng thử lại.",
     "sendError": "AILA chưa xử lý được yêu cầu này. Vui lòng kiểm tra nội dung và thử lại.",
     "thinking": "AILA đang suy nghĩ...",
@@ -1120,7 +1128,11 @@
       "limit": "Chỉ có thể đính kèm tối đa {{count}} ảnh.",
       "unsupported": "Chỉ hỗ trợ ảnh PNG, JPG, WebP hoặc GIF.",
       "tooLarge": "Mỗi ảnh cần nhỏ hơn 2MB.",
-      "readError": "Không thể đọc ảnh này. Vui lòng thử ảnh khác."
+      "readError": "Không thể đọc ảnh này. Vui lòng thử ảnh khác.",
+      "invalidType": "Định dạng file không được hỗ trợ. Vui lòng chọn ảnh hợp lệ.",
+      "fileTooLarge": "Kích thước ảnh vượt quá giới hạn cho phép.",
+      "maxCountExceeded": "Đã đạt số lượng ảnh đính kèm tối đa.",
+      "readFailed": "Không thể đọc nội dung file ảnh."
     },
     "portals": {
       "admin": "Trang quản trị (Admin)",
@@ -1418,26 +1430,6 @@
     "validation": {
       "companyNameRequired": "[VI] companyNameRequired",
       "recruiterNameRequired": "[VI] recruiterNameRequired"
-    }
-  },
-  "agentAssistant": {
-    "initError": "Không thể khởi tạo trợ lý AI. Vui lòng thử lại.",
-    "createThreadError": "Không thể tạo phiên trò chuyện mới.",
-    "deleteThreadError": "Không thể xóa phiên trò chuyện.",
-    "deleteError": "Không thể xóa phiên trò chuyện.",
-    "deleteHistory": "Xóa lịch sử",
-    "loadMessagesError": "Không thể tải lịch sử tin nhắn.",
-    "loadError": "Không thể tải tin nhắn.",
-    "sendError": "Không thể gửi tin nhắn.",
-    "attachments": {
-      "invalidType": "Định dạng file không được hỗ trợ. Vui lòng chọn ảnh hợp lệ.",
-      "unsupported": "Định dạng file không được hỗ trợ.",
-      "fileTooLarge": "Kích thước ảnh vượt quá giới hạn 5MB.",
-      "tooLarge": "Kích thước file vượt quá giới hạn cho phép.",
-      "maxCountExceeded": "Đã đạt số lượng ảnh đính kèm tối đa.",
-      "limit": "Đã đạt giới hạn số lượng tệp đính kèm.",
-      "readFailed": "Không thể đọc nội dung file ảnh.",
-      "readError": "Lỗi đọc tệp đính kèm."
     }
   },
   "status": {

@@ -95,13 +95,6 @@ def build_inventory_and_findings():
                 "viewsCount": 9,
                 "tasksCount": 0
             },
-            "integrations_frappe_hr": {
-                "role": "ERPNext / Frappe HR sync adapter and webhook handlers",
-                "modelsCount": 0,
-                "serializersCount": 3,
-                "viewsCount": 3,
-                "tasksCount": 1
-            },
             "integrations_livekit": {
                 "role": "LiveKit WebRTC token generation, room dispatching, webhook event handler, egress recording",
                 "modelsCount": 0,

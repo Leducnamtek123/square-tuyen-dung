@@ -538,6 +538,14 @@
       "resumeUpload": "Tải CV / Hồ sơ",
       "complete": "Hoàn tất"
     },
+    "consentNotice": {
+      "text": "Bằng việc nhấn nút hoàn tất, tôi đồng ý chia sẻ thông tin cá nhân của mình với nhà tuyển dụng theo các",
+      "terms": "Điều khoản sử dụng",
+      "privacy": "Chính sách bảo mật",
+      "and": "và",
+      "dataPolicy": "Chính sách dữ liệu cá nhân",
+      "ofInfoHR": "của InfoHR."
+    },
     "stepCounter": "Bước {{current}} / {{total}}",
     "step1": {
       "title": "Mục tiêu & Nguyện vọng nghề nghiệp",

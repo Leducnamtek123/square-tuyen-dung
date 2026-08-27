@@ -137,19 +137,7 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
       </Box>
 
       {/* Persistent Footer */}
-      <Box
-        sx={{
-          mt: 'auto',
-          px: { xs: 2, sm: 5, md: 8, lg: 10 },
-          py: { xs: 3, lg: 5 },
-          color: "text.primary",
-          bgcolor: "background.paper",
-          borderTop: '1px solid',
-          borderColor: 'divider',
-        }}
-      >
-        <Footer />
-      </Box>
+      <Footer />
     </Box>
   );
 };

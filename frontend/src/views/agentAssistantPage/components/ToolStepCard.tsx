@@ -21,25 +21,6 @@ import { useTranslation } from 'react-i18next';
 import { type AgentToolCall } from '@/services/agentAssistantService';
 import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 
-export const toolFriendlyNames: Record<string, string> = {
-  query_notebook_knowledge: 'Truy vấn tài liệu & tiêu chuẩn doanh nghiệp',
-  evaluate_cv_with_notebook: 'Đánh giá hồ sơ ứng viên theo tiêu chuẩn',
-  create_manual_candidate: 'Tạo hồ sơ ứng viên mới',
-  search_candidates: 'Tìm kiếm ứng viên tiềm năng',
-  update_application_status: 'Cập nhật trạng thái ứng tuyển',
-  list_job_posts: 'Tra cứu tin tuyển dụng',
-  list_applications: 'Tra cứu hồ sơ ứng tuyển',
-  list_companies: 'Danh sách doanh nghiệp',
-  review_job_post: 'Đánh giá tin tuyển dụng',
-  create_interview_for_candidate: 'Lên lịch phỏng vấn AI cho ứng viên',
-  create_interview_for_application: 'Lên lịch phỏng vấn hồ sơ',
-  generate_interview_questions: 'Tạo bộ câu hỏi phỏng vấn thông minh',
-  create_interview_question_group: 'Tạo nhóm câu hỏi phỏng vấn',
-  search_candidate_profiles: 'Tra cứu hồ sơ ứng viên',
-  search_job_post_applications: 'Tìm hồ sơ ứng tuyển theo tin',
-  search_job_posts: 'Tìm kiếm tin tuyển dụng',
-};
-
 export const toolDisplayNameKeys: Record<string, string> = {
   create_manual_candidate: 'common:agentAssistant.tools.create_manual_candidate',
   search_candidates: 'common:agentAssistant.tools.search_candidates',
@@ -57,13 +38,6 @@ export const toolDisplayNameKeys: Record<string, string> = {
   search_job_posts: 'common:agentAssistant.tools.searchJobPosts',
   query_notebook_knowledge: 'common:agentAssistant.tools.queryNotebookKnowledge',
   evaluate_cv_with_notebook: 'common:agentAssistant.tools.evaluateCvWithNotebook',
-};
-
-const statusFriendlyLabels: Record<string, string> = {
-  pending: 'Chờ xử lý',
-  running: 'Đang xử lý...',
-  succeeded: 'Hoàn tất',
-  failed: 'Không thành công',
 };
 
 const statusLabelKeys: Record<string, string> = {
@@ -86,21 +60,6 @@ const businessRowLabelKeys: Record<string, string> = {
   interviewId: 'common:agentAssistant.rows.interviewId',
   applicationId: 'common:agentAssistant.rows.applicationId',
   jobPostId: 'common:agentAssistant.rows.jobPostId',
-};
-
-const businessRowFriendlyLabels: Record<string, string> = {
-  candidate: 'Ứng viên',
-  email: 'Email',
-  phone: 'Số điện thoại',
-  jobPost: 'Tin tuyển dụng',
-  company: 'Công ty',
-  status: 'Trạng thái',
-  question: 'Câu hỏi',
-  questionGroup: 'Bộ câu hỏi',
-  questionsCount: 'Số lượng câu hỏi',
-  interviewId: 'Mã phỏng vấn',
-  applicationId: 'Mã ứng tuyển',
-  jobPostId: 'Mã tin tuyển dụng',
 };
 
 const asRecord = (value: unknown): Record<string, unknown> =>
@@ -193,7 +152,7 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
         return translated;
       }
     }
-    return toolFriendlyNames[toolCall.toolName] || toolCall.displayName || toolCall.toolName;
+    return toolCall.displayName || toolCall.toolName;
   };
 
   const getStatusText = () => {
@@ -204,7 +163,7 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
         return translated;
       }
     }
-    return statusFriendlyLabels[toolCall.status] || toolCall.status;
+    return toolCall.status;
   };
 
   return (
@@ -286,7 +245,7 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
                     spacing={1}
                   >
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      {businessRowFriendlyLabels[row.key] || row.key}:
+                      {businessRowLabelKeys[row.key] ? t(businessRowLabelKeys[row.key]) : row.key}:
                     </Typography>
                     <Typography variant="caption" sx={{ fontWeight: 700, textAlign: 'right', color: '#0F172A' }}>
                       {row.value}
@@ -300,10 +259,10 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
           {results.length ? (
             <Stack spacing={0.75}>
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
-                Kết quả tìm thấy ({results.length})
+                {t('common:agentAssistant.results.title')} ({results.length})
               </Typography>
               {results.slice(0, 4).map((item, index) => {
-                const title = resultTitle(item) || 'Kết quả';
+                const title = resultTitle(item) || t('common:agentAssistant.results.fallback', { index: index + 1 });
                 const subtitle = resultSubtitle(item);
                 const itemUrl = resultUrl(item);
                 const safeUrl = getSafeExternalOpenUrl(itemUrl);
@@ -335,7 +294,7 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
                           endIcon={<OpenInNewIcon fontSize="inherit" />}
                           sx={{ fontSize: '0.725rem', py: 0.25, px: 0.75, minWidth: 0 }}
                         >
-                          Xem chi tiết
+                          {t('common:agentAssistant.results.openRecord')}
                         </Button>
                       ) : null}
                     </Stack>
@@ -344,7 +303,7 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
               })}
               {results.length > 4 ? (
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  + Thêm {results.length - 4} kết quả khác
+                  {t('common:agentAssistant.results.more', { count: results.length - 4 })}
                 </Typography>
               ) : null}
             </Stack>
@@ -361,7 +320,7 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
                 endIcon={<OpenInNewIcon fontSize="inherit" />}
                 sx={{ fontSize: '0.75rem', borderRadius: 1.5 }}
               >
-                Mở liên kết chi tiết
+                {t('common:agentAssistant.results.openRecord')}
               </Button>
             </Box>
           ) : null}

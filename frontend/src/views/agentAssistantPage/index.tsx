@@ -148,7 +148,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
         const res = await agentAssistantService.listMessages(threadId);
         setMessages(res.messages || []);
       } catch {
-        setError(t('common:agentAssistant.loadMessagesError'));
+        setError(t('common:agentAssistant.loadError'));
       }
     },
     [t],
@@ -172,7 +172,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
       setMessages([]);
       setError(null);
     } catch {
-      setError(t('common:agentAssistant.createThreadError'));
+      setError(t('common:agentAssistant.loadError'));
     } finally {
       setIsLoading(false);
     }
@@ -193,7 +193,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
         await createThread();
       }
     } catch {
-      setError(t('common:agentAssistant.initError'));
+      setError(t('common:agentAssistant.loadError'));
     } finally {
       setIsLoading(false);
     }
@@ -225,7 +225,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
         }
       }
     } catch {
-      setError(t('common:agentAssistant.deleteThreadError'));
+      setError(t('common:agentAssistant.deleteError'));
     } finally {
       setDeletingThreadId(null);
     }
@@ -236,7 +236,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
 
     const availableSlots = MAX_IMAGE_ATTACHMENTS - attachments.length;
     if (availableSlots <= 0) {
-      setError(t('common:agentAssistant.attachments.maxCountExceeded', { count: MAX_IMAGE_ATTACHMENTS }));
+      setError(t('common:agentAssistant.attachments.limit', { count: MAX_IMAGE_ATTACHMENTS }));
       return;
     }
 
@@ -245,11 +245,11 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
 
     for (const file of selectedFiles) {
       if (!ALLOWED_IMAGE_MIME_TYPES.has(file.type)) {
-        setError(t('common:agentAssistant.attachments.invalidType'));
+        setError(t('common:agentAssistant.attachments.unsupported'));
         continue;
       }
       if (file.size > MAX_IMAGE_ATTACHMENT_BYTES) {
-        setError(t('common:agentAssistant.attachments.fileTooLarge'));
+        setError(t('common:agentAssistant.attachments.tooLarge'));
         continue;
       }
 
@@ -264,7 +264,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
           size: file.size,
         });
       } catch {
-        setError(t('common:agentAssistant.attachments.readFailed'));
+        setError(t('common:agentAssistant.attachments.readError'));
       }
     }
 
@@ -301,8 +301,9 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
       setIsSending(true);
       setError(null);
 
-      optimisticUser = createOptimisticMessage('user', content, 0, cleanAttachments);
-      optimisticAssistant = createOptimisticMessage('assistant', '', 1);
+      const fallbackTitle = content || t('common:agentAssistant.attachments.threadTitle');
+      optimisticUser = createOptimisticMessage('user', fallbackTitle, 0, cleanAttachments);
+      optimisticAssistant = createOptimisticMessage('assistant', t('common:agentAssistant.thinking'), 1);
 
       setMessages((current) => [...current, optimisticUser!, optimisticAssistant!]);
       setInput('');
@@ -395,9 +396,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                 whiteSpace: 'nowrap',
               }}
             >
-              {selectedThread?.title && selectedThread.title !== DEFAULT_AGENT_THREAD_TITLE
-                ? selectedThread.title
-                : 'AILA - Trợ lý AI Tuyển dụng'}
+              {selectedThread?.title || t('common:agentAssistant.title')}
             </Typography>
             <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.75rem' }}>
               {selectedThread ? formatTime(selectedThread.lastMessageAt || selectedThread.createAt, locale) : ''}
@@ -405,10 +404,10 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
           </Box>
           <Stack direction="row" spacing={1} alignItems="center" sx={{ flexShrink: 0 }}>
             {selectedThread ? (
-              <Tooltip title={t('common:agentAssistant.deleteHistory') || 'Xóa đoạn chat'}>
+              <Tooltip title={t('common:agentAssistant.deleteHistory')}>
                 <span>
                   <IconButton
-                    aria-label="Xóa đoạn chat hiện tại"
+                    aria-label={t('common:agentAssistant.deleteCurrentHistory')}
                     size="small"
                     disabled={deletingThreadId === selectedThread.id || isSending}
                     onClick={() => void handleDeleteThread(selectedThread.id)}
@@ -441,7 +440,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
             >
               <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#22C55E' }} />
               <Typography variant="caption" sx={{ fontWeight: 700, color: '#15803D', fontSize: '0.75rem' }}>
-                Online
+                {t('common:agentAssistant.ready')}
               </Typography>
             </Box>
           </Stack>
@@ -471,7 +470,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                 <SmartToyOutlinedIcon sx={{ fontSize: 28 }} />
               </Box>
               <Typography variant="h3" sx={{ fontSize: '1.125rem', fontWeight: 700, color: '#0F172A', mb: 0.75 }}>
-                AILA đã sẵn sàng hỗ trợ bạn
+                {t('common:agentAssistant.empty')}
               </Typography>
               <Typography variant="body2" sx={{ color: '#64748B', maxWidth: 460, fontSize: '0.875rem', lineHeight: 1.6 }}>
                 Đặt câu hỏi về tiêu chuẩn tuyển dụng, tìm kiếm ứng viên tiềm năng, tạo câu hỏi phỏng vấn hoặc đánh giá hồ sơ CV.
@@ -511,10 +510,10 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                       alt={attachment.name}
                       sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                     />
-                    <Tooltip title="Gỡ ảnh">
+                    <Tooltip title={t('common:agentAssistant.attachments.remove')}>
                       <IconButton
                         size="small"
-                        aria-label="Gỡ ảnh"
+                        aria-label={t('common:agentAssistant.attachments.remove')}
                         disabled={isSending}
                         onClick={() => handleRemoveAttachment(attachment.id)}
                         sx={{
@@ -546,10 +545,10 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                 hidden
                 onChange={(event) => void handleSelectAttachments(event.target.files)}
               />
-              <Tooltip title="Đính kèm ảnh">
+              <Tooltip title={t('common:agentAssistant.attachments.addImage')}>
                 <span>
                   <IconButton
-                    aria-label="Đính kèm tệp"
+                    aria-label={t('common:agentAssistant.attachments.addImage')}
                     disabled={isSending || Boolean(deletingThreadId)}
                     onClick={() => fileInputRef.current?.click()}
                     sx={{
@@ -573,7 +572,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                 maxRows={6}
                 value={input}
                 disabled={isSending || Boolean(deletingThreadId)}
-                placeholder="Nhắn cho AILA..."
+                placeholder={t('common:agentAssistant.placeholder')}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
@@ -592,7 +591,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
                   },
                 }}
               />
-              <Tooltip title="Gửi tin nhắn">
+              <Tooltip title={t('common:agentAssistant.send')}>
                 <span>
                   <IconButton
                     color="primary"

@@ -19,6 +19,8 @@ const routeToPagePath = (route: string): string => {
 
 const pageExists = (route: string): boolean => {
   const pagePath = routeToPagePath(route);
+  const isHtmlRoute = pagePath.endsWith('.html');
+  const htmlParentDir = isHtmlRoute ? pagePath.replace(/[^/]+\.html$/, '') : '';
   const candidates = [
     resolve(appDir, pagePath, 'page.tsx'),
     resolve(appDir, pagePath, 'page.ts'),
@@ -28,6 +30,12 @@ const pageExists = (route: string): boolean => {
     resolve(appDir, '(candidate)', pagePath, 'page.ts'),
     resolve(appDir, 'employer', pagePath, 'page.tsx'),
     resolve(appDir, 'admin', pagePath, 'page.tsx'),
+    ...(isHtmlRoute
+      ? [
+          resolve(appDir, htmlParentDir, '[slug].html', 'page.tsx'),
+          resolve(appDir, htmlParentDir, '[slug].html', 'page.ts'),
+        ]
+      : []),
   ];
   return candidates.some(existsSync);
 };

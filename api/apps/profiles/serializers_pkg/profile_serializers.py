@@ -162,6 +162,10 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
             # update in firebase
             queue_auth.update_info.delay(user_obj.id, user_obj.full_name)
 
+        if "phone" in validated_data and instance.phone and user_obj:
+            user_obj.phone_number = instance.phone
+            user_obj.save(update_fields=['phone_number'])
+
         instance.save()
         return instance
 

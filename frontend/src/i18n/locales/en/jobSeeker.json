@@ -538,6 +538,14 @@
       "resumeUpload": "Upload CV / Resume",
       "complete": "Complete"
     },
+    "consentNotice": {
+      "text": "By clicking complete, I agree to share my personal information with employers in accordance with InfoHR's",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "and": "and",
+      "dataPolicy": "Personal Data Policy",
+      "ofInfoHR": "."
+    },
     "stepCounter": "Step {{current}} of {{total}}",
     "step1": {
       "title": "Career Goals & Preferences",

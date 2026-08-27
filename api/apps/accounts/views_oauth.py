@@ -457,9 +457,16 @@ class FirebaseLoginView(TokenView):
             return None, "Sá»‘ Ä‘iá»‡n thoáº¡i nÃ y Ä‘ang liÃªn káº¿t vá»›i nhiá»u tÃ i khoáº£n. Vui lÃ²ng Ä‘Äƒng nháº­p báº±ng email hoáº·c liÃªn há»‡ há»— trá»£."
 
         user = next(iter(unique_users.values()), None)
-        if user and not user.phone_number:
-            user.phone_number = phone_number
-            user.save(update_fields=["phone_number"])
+        if user:
+            update_fields = []
+            if not user.phone_number:
+                user.phone_number = phone_number
+                update_fields.append("phone_number")
+            if not getattr(user, "is_verify_phone", False):
+                user.is_verify_phone = True
+                update_fields.append("is_verify_phone")
+            if update_fields:
+                user.save(update_fields=update_fields)
 
         return user, None
 
@@ -521,6 +528,7 @@ class FirebaseLoginView(TokenView):
                         phone_number=phone_number,
                         is_active=True,
                         is_verify_email=True,
+                        is_verify_phone=True,
                     )
                     # Create associated profile for JOB_SEEKER
                     if role_name == var_sys.JOB_SEEKER:

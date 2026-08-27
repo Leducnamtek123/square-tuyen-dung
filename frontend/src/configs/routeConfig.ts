@@ -110,11 +110,18 @@ export const SEGMENT_MAP = {
   'phong-van': 'interview',
   'room': 'room',
 
-  // Misc
+  // Misc & Legal Policies
   'lien-he': 'contact',
   'cau-hoi-thuong-gap': 'faq',
   'dieu-khoan-dich-vu': 'terms-of-service',
   'chinh-sach-bao-mat': 'privacy-policy',
+  'thoa-thuan-su-dung': 'thoa-thuan-su-dung',
+  'dieu-khoan-su-dung': 'terms-of-service',
+  'quy-dinh-bao-mat': 'quy-dinh-bao-mat',
+  'tuan-thu-va-su-dong-y-cua-khach-hang': 'tuan-thu-va-su-dong-y-cua-khach-hang',
+  'so-do-trang-web': 'so-do-trang-web',
+  'chinh-sach-bao-hanh': 'chinh-sach-bao-hanh',
+  'quy-dinh-dang-tin': 'quy-dinh-dang-tin',
 } as const;
 
 // Reverse map: English → Vietnamese
@@ -182,6 +189,10 @@ export const ROUTES = {
     FAQ: 'faq',
     TERMS_OF_SERVICE: 'terms-of-service',
     PRIVACY_POLICY: 'privacy-policy',
+    TERMS_HTML: 'thoa-thuan-su-dung.html',
+    PRIVACY_HTML: 'quy-dinh-bao-mat.html',
+    CONSENT_HTML: 'tuan-thu-va-su-dong-y-cua-khach-hang.html',
+    SITEMAP_HTML: 'so-do-trang-web.html',
   },
   EMPLOYER: {
     INTRODUCE: 'employer/introduce',
@@ -217,6 +228,10 @@ export const ROUTES = {
     FAQ: 'employer/faq',
     TERMS_OF_SERVICE: 'employer/terms-of-service',
     PRIVACY_POLICY: 'employer/privacy-policy',
+    TERMS_HTML: 'employer/thoa-thuan-su-dung.html',
+    PRIVACY_HTML: 'employer/chinh-sach-bao-mat.html',
+    WARRANTY_HTML: 'employer/chinh-sach-bao-hanh.html',
+    POSTING_RULES_HTML: 'employer/quy-dinh-dang-tin.html',
     HRM: 'employer/hrm',
     HRM_DASHBOARD: 'employer/hrm/dashboard',
     HRM_EMPLOYEES: 'employer/hrm/employees',
@@ -328,10 +343,25 @@ export function generateRewrites(): RewriteRule[] {
     ['/cau-hoi-thuong-gap', '/faq'],
     ['/dieu-khoan-dich-vu', '/terms-of-service'],
     ['/chinh-sach-bao-mat', '/privacy-policy'],
+    ['/thoa-thuan-su-dung.html', '/legal/thoa-thuan-su-dung'],
+    ['/dieu-khoan-su-dung.html', '/legal/thoa-thuan-su-dung'],
+    ['/quy-dinh-bao-mat.html', '/legal/quy-dinh-bao-mat'],
+    ['/chinh-sach-bao-mat.html', '/legal/quy-dinh-bao-mat'],
+    ['/tuan-thu-va-su-dong-y-cua-khach-hang.html', '/legal/tuan-thu-va-su-dong-y-cua-khach-hang'],
+    ['/so-do-trang-web.html', '/legal/so-do-trang-web'],
+    ['/chinh-sach-bao-hanh.html', '/legal/chinh-sach-bao-hanh'],
+    ['/quy-dinh-dang-tin.html', '/legal/quy-dinh-dang-tin'],
+    ['/:slug.html', '/legal/:slug'],
   ];
 
   // ── Employer (/nha-tuyen-dung → /employer) ──
   const employerRewrites: [string, string][] = [
+    ['/nha-tuyen-dung/thoa-thuan-su-dung.html', '/employer/legal/thoa-thuan-su-dung'],
+    ['/nha-tuyen-dung/chinh-sach-bao-mat.html', '/employer/legal/quy-dinh-bao-mat'],
+    ['/nha-tuyen-dung/chinh-sach-bao-hanh.html', '/employer/legal/chinh-sach-bao-hanh'],
+    ['/nha-tuyen-dung/quy-dinh-dang-tin.html', '/employer/legal/quy-dinh-dang-tin'],
+    ['/employer/:slug.html', '/employer/legal/:slug'],
+    ['/nha-tuyen-dung/:slug.html', '/employer/legal/:slug'],
     ['/nha-tuyen-dung/login', '/employer/login'],
     ['/nha-tuyen-dung/register', '/employer/register'],
     ['/nha-tuyen-dung/forgot-password', '/employer/forgot-password'],
@@ -409,6 +439,11 @@ export function generateRewrites(): RewriteRule[] {
     ['/quan-tri/quan-ly-cong-ty', '/admin/companies'],
     ['/quan-tri/quan-ly-ho-so-ung-vien', '/admin/profiles'],
     ['/quan-tri/quan-ly-ho-so-ung-vien/:id', '/admin/profiles/:id'],
+    ['/quan-tri/ho-so/:id', '/admin/profiles/:id'],
+    ['/quan-tri/ho-so-ung-vien/:id', '/admin/profiles/:id'],
+    ['/quan-tri/profiles/:id', '/admin/profiles/:id'],
+    ['/quan-tri/:id(\\d+)', '/admin/profiles/:id'],
+    ['/admin/:id(\\d+)', '/admin/profiles/:id'],
     ['/quan-tri/quan-tri/quan-ly-ho-so-ung-vien', '/admin/profiles'],
     ['/quan-tri/quan-tri/quan-ly-ho-so-ung-vien/:id', '/admin/profiles/:id'],
     ['/profiles/:id', '/admin/profiles/:id'],

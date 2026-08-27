@@ -6,6 +6,7 @@
     "urgentJobs": "Việc làm tuyển gấp",
     "urgentJobsAria": "Việc làm tuyển gấp",
     "keyCareers": "Ngành nghề trọng điểm",
+    "keyCareersTitle": "Ngành nghề nổi bật",
     "keyCareersSubtitle": "Khám phá các nhóm nghề đang có nhu cầu cao để rút ngắn bước tìm kiếm.",
     "suggestedJobs": "Việc làm đề xuất",
     "suggestedJobsAria": "Việc làm đề xuất",
@@ -252,7 +253,15 @@
       "phoneMax": "Số điện thoại vượt quá độ dài cho phép.",
       "resumeRequired": "Vui lòng chọn hồ sơ."
     },
-    "note": "Vui lòng cung cấp chính xác họ tên, email và số điện thoại để nhà tuyển dụng có thể liên hệ với bạn."
+    "note": "Vui lòng cung cấp chính xác họ tên, email và số điện thoại để nhà tuyển dụng có thể liên hệ với bạn.",
+    "consentNotice": {
+      "text": "Bằng việc nhấn nút nộp hồ sơ, tôi đồng ý chia sẻ thông tin cá nhân của mình với nhà tuyển dụng theo các",
+      "terms": "Điều khoản sử dụng",
+      "privacy": "Chính sách bảo mật",
+      "and": "và",
+      "dataPolicy": "Chính sách dữ liệu cá nhân",
+      "ofInfoHR": "của InfoHR."
+    }
   },
   "applyCard": {
     "positionCaption": "Ứng tuyển vị trí",

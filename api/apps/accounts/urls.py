@@ -42,6 +42,7 @@ urlpatterns = [
     path('change-password/', views.change_password),
 
     path('update-user/', views.update_user_account),
+    path('verify-phone/', views.verify_phone_number),
 
     path('avatar/', views.avatar),
 

@@ -79,6 +79,9 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
           onChange={(e, value) => field.onChange(value?.id ?? '')}
 
           slotProps={{
+            popper: {
+              sx: { zIndex: 9999 },
+            },
             paper: {
               sx: {
                 width: 'max-content',

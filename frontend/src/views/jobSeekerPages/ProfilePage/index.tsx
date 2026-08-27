@@ -19,6 +19,10 @@ import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import CakeOutlinedIcon from '@mui/icons-material/CakeOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import Tooltip from '@mui/material/Tooltip';
+import Button from '@mui/material/Button';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
@@ -32,6 +36,7 @@ import CandidateAppliedResumeCard from '../../components/jobSeekers/CandidateDas
 import CandidateProfileHeroBanner from '../../components/jobSeekers/CandidateProfile/CandidateProfileHeroBanner';
 import CandidateEditProfileModal, { ProfileFormData } from '../../components/jobSeekers/CandidateProfile/CandidateEditProfileModal';
 import CandidateSkillsCard from '../../components/jobSeekers/CandidateProfile/CandidateSkillsCard';
+import PhoneVerificationModal from '../../components/modals/PhoneVerificationModal';
 import { useResumes } from '../../components/jobSeekers/hooks/useJobSeekerQueries';
 import { CV_TYPES, ROUTES } from '../../../configs/constants';
 import { localizeRoutePath } from '../../../configs/routeLocalization';
@@ -74,7 +79,7 @@ const ProfilePage = () => {
   const rawProfileId = currentUser?.jobSeekerProfile?.id || currentUser?.jobSeekerProfileId || undefined;
   const jobSeekerProfileId = rawProfileId ? String(rawProfileId) : undefined;
 
-  const { data: resumes, refetch: refetchResumes } = useResumes(jobSeekerProfileId);
+  const { data: resumes, refetch: refetchResumes } = useResumes(jobSeekerProfileId, { type: CV_TYPES.cvWebsite });
 
   const resume = React.useMemo(() => {
     return resumes && resumes.length > 0 ? (resumes[0] as unknown as ExtendedResume) : null;
@@ -93,8 +98,30 @@ const ProfilePage = () => {
   }));
 
   const [editModalOpen, setEditModalOpen] = React.useState(false);
+  const [phoneVerifyModalOpen, setPhoneVerifyModalOpen] = React.useState(false);
+  const [isPhoneVerified, setIsPhoneVerified] = React.useState<boolean>(() => {
+    if (typeof window !== 'undefined' && currentUser?.id) {
+      return (
+        currentUser.isPhoneVerified === true ||
+        localStorage.getItem(`phone_verified_${currentUser.id}`) === 'true'
+      );
+    }
+    return Boolean(currentUser?.isPhoneVerified);
+  });
   const [isJobSeeking, setIsJobSeeking] = React.useState<boolean>(true);
   const [isSubmittingStatus, setIsSubmittingStatus] = React.useState<boolean>(false);
+
+  // Sync phone verification status with currentUser
+  React.useEffect(() => {
+    if (currentUser?.isPhoneVerified) {
+      setIsPhoneVerified(true);
+    } else if (typeof window !== 'undefined' && currentUser?.id) {
+      const stored = localStorage.getItem(`phone_verified_${currentUser.id}`);
+      if (stored === 'true') {
+        setIsPhoneVerified(true);
+      }
+    }
+  }, [currentUser]);
 
   // Clear stale mock localStorage data
   React.useEffect(() => {
@@ -278,8 +305,20 @@ const ProfilePage = () => {
   };
 
   const personalInfoGrid = [
-    { label: 'Email', value: profileData.email || 'Chưa cập nhật', icon: <EmailOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Số điện thoại', value: profileData.phoneNumber || 'Chưa cập nhật', icon: <PhoneIphoneOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
+    {
+      label: 'Email',
+      value: profileData.email || 'Chưa cập nhật',
+      icon: <EmailOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} />,
+      isEmail: true,
+      isVerified: Boolean(currentUser?.isVerifyEmail ?? true),
+    },
+    {
+      label: 'Số điện thoại',
+      value: profileData.phoneNumber || 'Chưa cập nhật',
+      icon: <PhoneIphoneOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} />,
+      isPhone: true,
+      isVerified: isPhoneVerified,
+    },
     { label: 'Tỉnh / Thành phố', value: profileData.city || 'Chưa cập nhật', icon: <LocationOnOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
     { label: 'Quận / Huyện', value: profileData.district || 'Chưa cập nhật', icon: <LocationOnOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
     { label: 'Trình độ học vấn', value: profileData.education ? t(`common:choices.${profileData.education}`, { defaultValue: profileData.education }) : 'Chưa cập nhật', icon: <SchoolOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
@@ -348,7 +387,7 @@ const ProfilePage = () => {
               </Box>
 
               <Grid container spacing={2.5}>
-                {personalInfoGrid.map((item) => (
+                {personalInfoGrid.map((item: any) => (
                   <Grid size={{ xs: 12, sm: 6 }} key={item.label}>
                     <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25 }}>
                       <Box
@@ -370,9 +409,62 @@ const ProfilePage = () => {
                         <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.775rem', display: 'block' }}>
                           {item.label}
                         </Typography>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: item.value && item.value !== 'Chưa cập nhật' ? '#0f172a' : '#94a3b8', fontSize: '0.875rem' }} noWrap>
-                          {item.value || 'Chưa cập nhật'}
-                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap', mt: 0.25 }}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: 700,
+                              color: item.value && item.value !== 'Chưa cập nhật' ? '#0f172a' : '#94a3b8',
+                              fontSize: '0.875rem',
+                            }}
+                            noWrap
+                          >
+                            {item.value || 'Chưa cập nhật'}
+                          </Typography>
+
+                          {/* Email Verified Checkmark */}
+                          {item.isEmail && item.isVerified && item.value && item.value !== 'Chưa cập nhật' && (
+                            <Tooltip title="Email đã được xác thực">
+                              <CheckCircleIcon sx={{ fontSize: 16, color: '#16a34a' }} />
+                            </Tooltip>
+                          )}
+
+                          {/* Phone Verified Checkmark */}
+                          {item.isPhone && item.isVerified && item.value && item.value !== 'Chưa cập nhật' && (
+                            <Tooltip title="Số điện thoại đã được xác thực">
+                              <CheckCircleIcon sx={{ fontSize: 16, color: '#16a34a' }} />
+                            </Tooltip>
+                          )}
+
+                          {/* Phone Not Verified -> 'Xác thực ngay' Button */}
+                          {item.isPhone && !item.isVerified && (
+                            <Button
+                              size="small"
+                              onClick={() => setPhoneVerifyModalOpen(true)}
+                              startIcon={<WarningAmberIcon sx={{ fontSize: 14, color: '#d97706' }} />}
+                              sx={{
+                                py: 0.1,
+                                px: 0.75,
+                                height: 22,
+                                borderRadius: '6px',
+                                backgroundColor: '#fffbeb',
+                                border: '1px solid #fde68a',
+                                color: '#b45309',
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                textTransform: 'none',
+                                transition: 'all 0.15s ease',
+                                '&:hover': {
+                                  backgroundColor: '#fef3c7',
+                                  borderColor: '#fcd34d',
+                                  transform: 'translateY(-1px)',
+                                },
+                              }}
+                            >
+                              Xác thực ngay
+                            </Button>
+                          )}
+                        </Box>
                       </Box>
                     </Box>
                   </Grid>
@@ -439,6 +531,17 @@ const ProfilePage = () => {
         onClose={() => setEditModalOpen(false)}
         initialData={profileData}
         onSave={handleSaveProfile}
+      />
+
+      {/* Phone OTP Verification Modal */}
+      <PhoneVerificationModal
+        open={phoneVerifyModalOpen}
+        onClose={() => setPhoneVerifyModalOpen(false)}
+        initialPhone={profileData.phoneNumber}
+        onSuccess={(verifiedPhone) => {
+          setProfileData((prev) => ({ ...prev, phoneNumber: verifiedPhone }));
+          setIsPhoneVerified(true);
+        }}
       />
     </Box>
   );
