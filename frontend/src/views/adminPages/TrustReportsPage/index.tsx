@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -57,6 +57,10 @@ export default function TrustReportsPage() {
     onSearchChange,
     setPage,
   } = useDataTable({ initialPageSize: 10, initialSorting: [{ id: 'create_at', desc: true }] });
+
+  useEffect(() => {
+    setPage(0);
+  }, [statusFilter, targetTypeFilter, reporterFilter, setPage]);
 
   const [inspectingReport, setInspectingReport] = useState<TrustReport | null>(null);
   const [resolutionDialog, setResolutionDialog] = useState<{

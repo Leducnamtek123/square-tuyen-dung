@@ -48,6 +48,21 @@ export const useDataTable = (options: UseDataTableOptions = {}) => {
     setPage(0); // Reset page when sorting changes
   }, []);
 
+  const resetPage = useCallback(() => {
+    setPage(0);
+  }, []);
+
+  const clampPage = useCallback((totalCount: number) => {
+    if (totalCount <= 0) {
+      if (page !== 0) setPage(0);
+      return;
+    }
+    const maxPageIndex = Math.max(0, Math.ceil(totalCount / pageSize) - 1);
+    if (page > maxPageIndex) {
+      setPage(maxPageIndex);
+    }
+  }, [page, pageSize]);
+
   return {
     // States
     page,
@@ -74,5 +89,7 @@ export const useDataTable = (options: UseDataTableOptions = {}) => {
     onSearchChange,
     onSortingChange,
     onRowSelectionChange: setRowSelection,
+    resetPage,
+    clampPage,
   };
 };

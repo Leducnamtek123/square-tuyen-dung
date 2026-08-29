@@ -444,7 +444,7 @@ const ArticleDetailPage = () => {
             >
               <CardContent sx={{ p: 2.5 }}>
                 <Stack spacing={1.75}>
-                  <Typography variant="h6" fontWeight={900} sx={{ lineHeight: 1.22 }}>
+                  <Typography variant="h6" fontWeight={900} sx={{ color: '#ffffff', lineHeight: 1.22 }}>
                     {t('news.article.moreTitle', { ns: 'public' })}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.86)', lineHeight: 1.7 }}>

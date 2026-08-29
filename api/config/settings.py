@@ -232,6 +232,7 @@ INSTALLED_APPS = [
     'apps.interviews',
     'apps.agent_assistants',
     'apps.hrm',
+    'apps.cv_builder',
     'corsheaders',
     'django_celery_results',
     'timezone_field',

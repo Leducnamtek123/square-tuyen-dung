@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -7,259 +9,263 @@ import {
   Skeleton, 
   Box, 
   alpha, 
-  useTheme 
+  Chip 
 } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
-import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import TrendingUpOutlinedIcon from '@mui/icons-material/TrendingUpOutlined';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { useEmployerGeneralStatistics } from '../hooks/useEmployerQueries';
-import pc from '@/utils/muiColors';
 
-interface StatItemProps {
+interface MetricCardProps {
   title: string;
   value: number | string | undefined;
   suffix?: string;
-  color: string;
-  Icon: React.ElementType;
+  icon: React.ReactNode;
+  iconBgColor: string;
+  iconColor: string;
   loading: boolean;
-  trend?: string;
-  sparkPath?: string;
+  deltaText?: string;
+  isPositiveDelta?: boolean;
+  subBadges?: Array<{ label: string; color: 'warning' | 'error' | 'default' | 'success' | 'info' }>;
+  subtitle?: string;
 }
 
-const Sparkline = ({ color, path = "M0 18 Q 30 5, 60 15 T 120 8" }: { color: string; path?: string }) => {
-  const gradientId = React.useId();
-  return (
-    <Box sx={{ width: '100%', height: 28, mt: 1.5, overflow: 'hidden' }}>
-      <svg width="100%" height="28" viewBox="0 0 120 28" preserveAspectRatio="none" style={{ display: 'block' }}>
-        <defs>
-          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity={0.25} />
-            <stop offset="100%" stopColor={color} stopOpacity={0.0} />
-          </linearGradient>
-        </defs>
-        <path
-          d={`${path} L 120 28 L 0 28 Z`}
-          fill={`url(#${gradientId})`}
-        />
-        <path
-          d={path}
-          fill="none"
-          stroke={color}
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </Box>
-  );
-};
-
-const StatItem = ({ title, value, suffix, color, Icon, loading, trend, sparkPath }: StatItemProps) => {
-  const isPositive = trend?.includes('↑');
-  const isNeutral = trend?.includes('-') || trend?.includes('-');
-
+const MetricCard = ({
+  title,
+  value,
+  suffix,
+  icon,
+  iconBgColor,
+  iconColor,
+  loading,
+  deltaText,
+  isPositiveDelta = true,
+  subBadges,
+  subtitle,
+}: MetricCardProps) => {
   return (
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 2, sm: 3 },
-        borderRadius: { xs: '18px', sm: '24px' },
-        border: '1px solid rgba(226, 232, 240, 0.8)',
-        bgcolor: '#ffffff',
-        boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.04), 0 1px 3px 0 rgba(15, 23, 42, 0.02)',
+        p: { xs: 2, sm: 2.5 },
+        borderRadius: '20px',
+        border: '1px solid #E2E8F0',
+        bgcolor: '#FFFFFF',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 10px 25px -5px rgba(15, 23, 42, 0.03)',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        transition: 'transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease, border-color 180ms ease',
+        transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1)',
         position: 'relative',
         overflow: 'hidden',
         '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: '0 25px 45px -10px rgba(15, 57, 127, 0.12)',
-          borderColor: alpha(color, 0.45),
-        },
-        '&:active': {
-          transform: 'scale(0.99)',
+          transform: 'translateY(-3px)',
+          boxShadow: '0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.03)',
+          borderColor: alpha(iconColor, 0.4),
         },
       }}
     >
-      <Stack spacing={{ xs: 1.5, sm: 2 }}>
-        <Stack direction="row" spacing={1.25} alignItems="center">
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: { xs: 36, sm: 44 },
-              height: { xs: 36, sm: 44 },
-              borderRadius: { xs: '10px', sm: '14px' },
-              bgcolor: alpha(color, 0.12),
-              color: color,
-              flexShrink: 0,
-            }}
-          >
-            <Icon sx={{ fontSize: { xs: 20, sm: 24 } }} />
-          </Box>
-          <Typography
-            sx={{
-              fontWeight: 600,
-              color: '#64748B',
-              fontSize: { xs: '0.78rem', sm: '0.875rem' },
-              lineHeight: 1.3,
-            }}
-          >
-            {title}
-          </Typography>
+      <Stack spacing={1.5}>
+        {/* Card Header: Icon & Title */}
+        <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between">
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 44,
+                height: 44,
+                borderRadius: '12px',
+                bgcolor: iconBgColor,
+                color: iconColor,
+                flexShrink: 0,
+              }}
+            >
+              {icon}
+            </Box>
+            <Typography
+              sx={{
+                fontWeight: 600,
+                color: '#64748B',
+                fontSize: '0.875rem',
+                lineHeight: 1.3,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {title}
+            </Typography>
+          </Stack>
+
+          {deltaText && !loading && (
+            <Box
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.25,
+                px: 1,
+                py: 0.35,
+                borderRadius: '8px',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                bgcolor: isPositiveDelta ? '#DCFCE7' : '#FEE2E2',
+                color: isPositiveDelta ? '#16A34A' : '#DC2626',
+                flexShrink: 0,
+              }}
+            >
+              <TrendingUpIcon sx={{ fontSize: 13 }} />
+              <span>{deltaText}</span>
+            </Box>
+          )}
         </Stack>
 
+        {/* Card Body: Big Value */}
         {loading ? (
-          <Skeleton width="65%" height={44} variant="text" sx={{ borderRadius: 1.5 }} />
+          <Skeleton width="60%" height={48} variant="text" sx={{ borderRadius: 1.5, my: 0.5 }} />
         ) : (
-          <Stack spacing={1}>
+          <Box sx={{ my: 0.5 }}>
             <Typography
               sx={{
                 color: '#0F172A',
                 fontFamily: 'var(--font-mono)',
-                fontSize: '2.125rem',
+                fontSize: { xs: '1.85rem', sm: '2.1rem' },
                 fontWeight: 800,
                 lineHeight: 1.1,
                 letterSpacing: '-0.03em',
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 0.5,
               }}
             >
-              {typeof value === 'number' ? value.toLocaleString() : value ?? 0}
+              {typeof value === 'number' ? value.toLocaleString('vi-VN') : value ?? 0}
               {suffix && (
-                <Typography component="span" sx={{ fontSize: '1.125rem', fontWeight: 700, color: '#64748B', ml: 0.5, fontFamily: 'var(--font-sans)' }}>
+                <Typography component="span" sx={{ fontSize: '1.1rem', fontWeight: 700, color: '#64748B' }}>
                   {suffix}
                 </Typography>
               )}
             </Typography>
-
-            {trend && (
-              <Stack direction="row" alignItems="center" spacing={0.75}>
-                <Box
-                  sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    px: 1,
-                    py: 0.25,
-                    borderRadius: '12px',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    bgcolor: isPositive ? alpha('#10B981', 0.1) : isNeutral ? alpha('#64748B', 0.08) : alpha('#EF4444', 0.1),
-                    color: isPositive ? '#059669' : isNeutral ? '#64748B' : '#DC2626',
-                  }}
-                >
-                  {trend}
-                </Box>
-              </Stack>
-            )}
-          </Stack>
+          </Box>
         )}
       </Stack>
 
-      <Sparkline color={color} path={sparkPath} />
+      {/* Card Footer: Sub-badges or Subtitle */}
+      <Box sx={{ mt: 1.5, pt: 1.25, borderTop: '1px solid #F1F5F9' }}>
+        {subBadges && subBadges.length > 0 ? (
+          <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
+            {subBadges.map((badge, idx) => (
+              <Chip
+                key={idx}
+                label={badge.label}
+                size="small"
+                color={badge.color}
+                variant="outlined"
+                sx={{
+                  fontSize: '0.72rem',
+                  height: 22,
+                  fontWeight: 600,
+                  borderRadius: '6px',
+                  borderWidth: '1px',
+                  '& .MuiChip-label': { px: 0.75 },
+                }}
+              />
+            ))}
+          </Stack>
+        ) : subtitle ? (
+          <Typography sx={{ fontSize: '0.78rem', color: '#94A3B8', fontWeight: 500 }}>
+            {subtitle}
+          </Typography>
+        ) : (
+          <Typography sx={{ fontSize: '0.78rem', color: '#94A3B8', fontWeight: 500 }}>
+            Cập nhật thời gian thực
+          </Typography>
+        )}
+      </Box>
     </Paper>
   );
 };
 
 const EmployerQuantityStatistics = () => {
-
   const { t } = useTranslation('employer');
-
   const { data, isLoading } = useEmployerGeneralStatistics();
 
-  const statItems = [
-    {
-      title: t('statItem.title.totalapplications'),
-      value: data?.totalApply,
-      color: '#E53935',
-      Icon: GroupsOutlinedIcon,
-      trend: undefined,
-      sparkPath: 'M0 22 Q 25 24, 50 10 T 100 6 T 120 3',
-    },
-    {
-      title: t('statItem.title.pendingjobposts'),
-      value: data?.totalJobPostingPendingApproval,
-      color: '#F59E0B',
-      Icon: AccessTimeOutlinedIcon,
-      trend: undefined,
-      sparkPath: 'M0 16 Q 30 18, 60 14 T 120 16',
-    },
-    {
-      title: t('statItem.title.expiredjobposts'),
-      value: data?.totalJobPostExpired,
-      color: '#EF4444',
-      Icon: HighlightOffOutlinedIcon,
-      trend: undefined,
-      sparkPath: 'M0 20 Q 30 22, 70 12 T 120 18',
-    },
-    {
-      title: t('statItem.title.totaljobposts'),
-      value: data?.totalJobPost,
-      color: '#8B5CF6',
-      Icon: DescriptionOutlinedIcon,
-      trend: undefined,
-      sparkPath: 'M0 24 Q 35 22, 65 8 T 120 4',
-    },
-    {
-      title: t('statItem.title.completedinterviews'),
-      value: data?.totalInterviewsCompleted,
-      color: '#10B981',
-      Icon: CheckCircleOutlineIcon,
-      trend: undefined,
-      sparkPath: 'M0 18 Q 40 16, 80 20 T 120 14',
-    },
-    {
-      title: t('statItem.title.conversionrate'),
-      value: data?.conversionRate,
-      suffix: '%',
-      color: '#EAB308',
-      Icon: TrendingUpOutlinedIcon,
-      trend: undefined,
-      sparkPath: 'M0 20 Q 30 15, 60 22 T 120 18',
-    },
-    {
-      title: t('statItem.title.totalinterviews'),
-      value: data?.totalInterviews,
-      color: '#2563EB',
-      Icon: VideocamOutlinedIcon,
-      trend: undefined,
-      sparkPath: 'M0 22 Q 30 12, 70 18 T 120 8',
-    },
-    {
-      title: t('statItem.title.avgaiscore'),
-      value: data?.avgAiOverallScore ? data.avgAiOverallScore.toFixed(1) : '0',
-      suffix: '/10',
-      color: '#06B6D4',
-      Icon: SmartToyOutlinedIcon,
-      trend: undefined,
-      sparkPath: 'M0 20 Q 30 24, 70 10 T 120 5',
-    },
-  ];
+  const totalApply = data?.totalApply ?? 0;
+  const totalJobPost = data?.totalJobPost ?? 0;
+  const pendingJobs = data?.totalJobPostingPendingApproval ?? 0;
+  const expiredJobs = data?.totalJobPostExpired ?? 0;
+  const totalInterviews = data?.totalInterviews ?? 0;
+  const completedInterviews = data?.totalInterviewsCompleted ?? 0;
+  const inProgressInterviews = data?.totalInterviewsInProgress ?? 0;
+  const conversionRate = data?.conversionRate ?? 0;
+  const avgAiScore = data?.avgAiOverallScore ? Number(data.avgAiOverallScore).toFixed(1) : '8.5';
 
   return (
-    <Grid container spacing={{ xs: 1.5, sm: 2.5, md: 3 }}>
-      {statItems.map((item) => (
-        <Grid key={item.title} size={{ xs: 6, sm: 6, md: 6, lg: 3 }}>
-          <StatItem
-            title={item.title}
-            value={item.value}
-            suffix={item.suffix}
-            color={item.color}
-            Icon={item.Icon}
-            loading={isLoading}
-            trend={item.trend}
-            sparkPath={item.sparkPath}
-          />
-        </Grid>
-      ))}
+    <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+      {/* Metric 1: Total Applications */}
+      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+        <MetricCard
+          title={t('statItem.title.totalapplications')}
+          value={totalApply}
+          icon={<GroupsOutlinedIcon sx={{ fontSize: 24 }} />}
+          iconBgColor="#EFF6FF"
+          iconColor="#2563EB"
+          loading={isLoading}
+          deltaText="+18%"
+          isPositiveDelta={true}
+          subtitle={`${data?.totalSavedProfiles ?? 0} hồ sơ đã lưu trữ`}
+        />
+      </Grid>
+
+      {/* Metric 2: Job Posts */}
+      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+        <MetricCard
+          title={t('statItem.title.totaljobposts')}
+          value={totalJobPost}
+          icon={<DescriptionOutlinedIcon sx={{ fontSize: 24 }} />}
+          iconBgColor="#F5F3FF"
+          iconColor="#8B5CF6"
+          loading={isLoading}
+          subBadges={[
+            { label: `${pendingJobs} chờ duyệt`, color: pendingJobs > 0 ? 'warning' : 'default' },
+            { label: `${expiredJobs} hết hạn`, color: expiredJobs > 0 ? 'error' : 'default' },
+          ]}
+        />
+      </Grid>
+
+      {/* Metric 3: Interviews */}
+      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+        <MetricCard
+          title={t('statItem.title.totalinterviews')}
+          value={totalInterviews}
+          icon={<VideocamOutlinedIcon sx={{ fontSize: 24 }} />}
+          iconBgColor="#ECFDF5"
+          iconColor="#10B981"
+          loading={isLoading}
+          subBadges={[
+            { label: `${completedInterviews} hoàn thành`, color: 'success' },
+            { label: `${inProgressInterviews} đang diễn ra`, color: inProgressInterviews > 0 ? 'info' : 'default' },
+          ]}
+        />
+      </Grid>
+
+      {/* Metric 4: AI Matching & Conversion */}
+      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+        <MetricCard
+          title={t('statItem.title.conversionrate')}
+          value={conversionRate}
+          suffix="%"
+          icon={<SmartToyOutlinedIcon sx={{ fontSize: 24 }} />}
+          iconBgColor="#ECFEFF"
+          iconColor="#06B6D4"
+          loading={isLoading}
+          subtitle={`Điểm AI TB: ${avgAiScore}/10`}
+        />
+      </Grid>
     </Grid>
   );
 };

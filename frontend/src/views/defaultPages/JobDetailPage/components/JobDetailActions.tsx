@@ -43,10 +43,6 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
     viewer.currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
 
   const handleApplyClick = () => {
-    if (!viewer.isAuthenticated) {
-      push(`/${ROUTES.AUTH.LOGIN}`);
-      return;
-    }
     handleShowApplyForm();
   };
 
@@ -63,28 +59,26 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
           >
             {isApplied ? t("jobDetail.actions.applied") : t("jobDetail.actions.apply")}
           </Button>
-          {viewer.isAuthenticated && (
-            <Button
-              onClick={handleSave}
-              variant={isSaved ? "default" : "outline"}
-              size="lg"
-              disabled={isLoadingSave}
-              className={`w-full sm:w-auto ${
-                isSaved
-                  ? "bg-secondary text-white"
-                  : "border-primary/25 text-primary hover:bg-primary/5"
-              }`}
-            >
-              {isLoadingSave ? (
-                <span className="mr-2 inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-              ) : isSaved ? (
-                <FavoriteIcon fontSize="small" className="mr-2" />
-              ) : (
-                <FavoriteBorderIcon fontSize="small" className="mr-2" />
-              )}
-              <span>{isSaved ? t("jobDetail.actions.saved") : t("jobDetail.actions.save")}</span>
-            </Button>
-          )}
+          <Button
+            onClick={handleSave}
+            variant={isSaved ? "default" : "outline"}
+            size="lg"
+            disabled={isLoadingSave}
+            className={`w-full sm:w-auto ${
+              isSaved
+                ? "bg-secondary text-white"
+                : "border-primary/25 text-primary hover:bg-primary/5"
+            }`}
+          >
+            {isLoadingSave ? (
+              <span className="mr-2 inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            ) : isSaved ? (
+              <FavoriteIcon fontSize="small" className="mr-2" />
+            ) : (
+              <FavoriteBorderIcon fontSize="small" className="mr-2" />
+            )}
+            <span>{isSaved ? t("jobDetail.actions.saved") : t("jobDetail.actions.save")}</span>
+          </Button>
         </>
       )}
       <Button
@@ -96,17 +90,15 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
         <ShareIcon fontSize="small" className="mr-2" />
         {t("jobDetail.actions.share")}
       </Button>
-      {viewer.isAuthenticated && (
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={onOpenReport}
-          className="w-full sm:w-auto border-amber-300 text-amber-700 hover:bg-amber-50"
-        >
-          <FlagIcon fontSize="small" className="mr-2" />
-          {t("jobDetail.actions.report")}
-        </Button>
-      )}
+      <Button
+        variant="outline"
+        size="lg"
+        onClick={onOpenReport}
+        className="w-full sm:w-auto border-amber-300 text-amber-700 hover:bg-amber-50"
+      >
+        <FlagIcon fontSize="small" className="mr-2" />
+        {t("jobDetail.actions.report")}
+      </Button>
     </div>
   );
 };

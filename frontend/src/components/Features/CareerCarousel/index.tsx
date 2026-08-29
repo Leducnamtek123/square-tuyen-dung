@@ -1,87 +1,132 @@
-﻿'use client';
-import React from "react";
-import { useDispatch } from "react-redux";
+'use client';
+
+import React from 'react';
+import { useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { Pagination, Autoplay } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Avatar, Box, Card, Chip, Skeleton, Stack, Typography } from "@mui/material";
-import { useTranslation } from "react-i18next";
-import commonService from "@/services/commonService";
-import MuiImageCustom from "@/components/Common/MuiImageCustom";
-import { buildJobPostFilter, searchJobPost } from "@/redux/filterSlice";
-import { IMAGES, ROUTES } from "@/configs/constants";
-import { localizeRoutePath } from "@/configs/routeLocalization";
-import { Theme } from "@mui/material/styles";
-import { Career } from "@/types/models";
+import { Pagination, Autoplay } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import {
+  Avatar,
+  Box,
+  Card,
+  Chip,
+  Skeleton,
+  Stack,
+  Typography,
+} from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import commonService from '@/services/commonService';
+import MuiImageCustom from '@/components/Common/MuiImageCustom';
+import { buildJobPostFilter, searchJobPost } from '@/redux/filterSlice';
+import { IMAGES, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import type { Career } from '@/types/models';
+import type { SvgIconComponent } from '@mui/icons-material';
+
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import ArchitectureIcon from '@mui/icons-material/Architecture';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import WeekendIcon from '@mui/icons-material/Weekend';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
-import type { SvgIconComponent } from '@mui/icons-material';
+import ComputerIcon from '@mui/icons-material/Computer';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import CampaignIcon from '@mui/icons-material/Campaign';
+import GroupsIcon from '@mui/icons-material/Groups';
+import ConstructionIcon from '@mui/icons-material/Construction';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
-const styles = {
-  ".swiper-pagination": {
-    bottom: "-5px !important",
+const swiperStyles = {
+  '.swiper, & .swiper': {
+    padding: '14px 8px 36px 8px !important',
+    margin: '-14px -8px 0 -8px !important',
+    overflow: 'hidden',
   },
-  ".swiper-wrapper": {
-    paddingBottom: "35px",
-    alignItems: "stretch",
+  '.swiper-pagination, & .swiper-pagination': {
+    bottom: '4px !important',
   },
-  ".swiper-slide": {
-    height: "auto",
+  '.swiper-wrapper, & .swiper-wrapper': {
+    alignItems: 'stretch',
   },
-  ".swiper-pagination-bullet": {
+  '.swiper-slide, & .swiper-slide': {
+    height: 'auto',
+  },
+  '.swiper-pagination-bullet, & .swiper-pagination-bullet': {
     width: 8,
     height: 8,
-    opacity: 0.5,
-    backgroundColor: '#0f172a',
-    transition: "all 0.3s ease",
+    opacity: 0.35,
+    backgroundColor: '#64748b',
+    transition: 'all 0.3s ease',
   },
-  ".swiper-pagination-bullet-active": {
+  '.swiper-pagination-bullet-active, & .swiper-pagination-bullet-active': {
     width: 24,
     height: 8,
     opacity: 1,
-    borderRadius: "4px",
+    borderRadius: '4px',
+    backgroundColor: '#2563eb',
   },
 };
 
 const CAREER_ICON_MAP: Record<string, SvgIconComponent> = {
   apartment: ApartmentIcon,
+  'bất động sản': ApartmentIcon,
   engineering: EngineeringIcon,
+  'xây dựng': EngineeringIcon,
   weekend: WeekendIcon,
+  'nội thất': WeekendIcon,
   architecture: ArchitectureIcon,
+  'kiến trúc': ArchitectureIcon,
+  construction: ConstructionIcon,
+  it: ComputerIcon,
+  'it - phần mềm': ComputerIcon,
+  software: ComputerIcon,
+  finance: TrendingUpIcon,
+  'tài chính': TrendingUpIcon,
+  'tài chính / ngân hàng': TrendingUpIcon,
+  marketing: CampaignIcon,
+  'marketing / pr': CampaignIcon,
+  hr: GroupsIcon,
+  'nhân sự': GroupsIcon,
+  'hành chính / nhân sự': GroupsIcon,
+  business: BusinessCenterIcon,
+  'kinh doanh': BusinessCenterIcon,
+  'bán hàng / kinh doanh': BusinessCenterIcon,
+  'dịch vụ khách hàng': GroupsIcon,
+  'cơ khí / tự động hóa': EngineeringIcon,
+  'lao động phổ thông': ConstructionIcon,
 };
 
-const CAREER_ACCENTS = ['#0f172a', '#334155', '#475569', '#64748b'];
+const CAREER_THEMES = [
+  { bg: '#EFF6FF', text: '#2563EB', border: 'rgba(37, 99, 235, 0.18)', hoverBorder: '#2563EB', glow: 'rgba(37, 99, 235, 0.14)' }, // Blue
+  { bg: '#F0FDF4', text: '#16A34A', border: 'rgba(22, 163, 74, 0.18)', hoverBorder: '#16A34A', glow: 'rgba(22, 163, 74, 0.14)' }, // Green
+  { bg: '#FAF5FF', text: '#9333EA', border: 'rgba(147, 51, 234, 0.18)', hoverBorder: '#9333EA', glow: 'rgba(147, 51, 234, 0.14)' }, // Purple
+  { bg: '#FFF7ED', text: '#EA580C', border: 'rgba(234, 88, 12, 0.18)', hoverBorder: '#EA580C', glow: 'rgba(234, 88, 12, 0.14)' }, // Orange
+  { bg: '#ECFEFF', text: '#0891B2', border: 'rgba(8, 145, 178, 0.18)', hoverBorder: '#0891B2', glow: 'rgba(8, 145, 178, 0.14)' }, // Cyan
+  { bg: '#FFF1F2', text: '#E11D48', border: 'rgba(225, 29, 72, 0.18)', hoverBorder: '#E11D48', glow: 'rgba(225, 29, 72, 0.14)' }, // Rose
+];
 
-const Loading = (
+const LoadingSkeleton = (
   <Card
     sx={{
-      display: "flex",
-      flexDirection: "column",
-      minHeight: 280,
-      p: 2,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      minHeight: 190,
+      p: 2.5,
       boxShadow: 0,
-      backgroundColor: (theme) => theme.palette.background.paper,
-      transition: "transform 0.2s ease-in-out",
-      borderRadius: "18px",
-      border: '1px solid rgba(196, 198, 209, 0.55)',
+      borderRadius: '20px',
+      border: '1px solid #E2E8F0',
+      backgroundColor: '#ffffff',
     }}
   >
-    <Skeleton
-      variant="rounded"
-      width="100%"
-      height={132}
-      sx={{ borderRadius: 3 }}
-    />
-    <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
-      <Skeleton width="80%" />
-    </Typography>
-    <Typography variant="caption">
-      <Skeleton width="42%" />
-    </Typography>
+    <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Skeleton variant="rounded" width={52} height={52} sx={{ borderRadius: '14px' }} />
+      <Skeleton variant="circular" width={28} height={28} />
+    </Stack>
+    <Box sx={{ mt: 2.5 }}>
+      <Skeleton width="75%" height={26} sx={{ mb: 1 }} />
+      <Skeleton width="45%" height={22} sx={{ borderRadius: '12px' }} />
+    </Box>
   </Card>
 );
 
@@ -95,68 +140,7 @@ const normalizeCareers = (careers: Career[] = []) =>
     }))
     .filter((career) => Number.isFinite(career.id) && career.id > 0 && career.name);
 
-const CareerArtwork = ({ career }: { career: Career }) => {
-  const Icon = career.appIconName ? CAREER_ICON_MAP[career.appIconName.toLowerCase()] : undefined;
-
-  if (career.iconUrl) {
-    return (
-      <Box
-        sx={{
-          width: '100%',
-          height: 132,
-          borderRadius: 3,
-          overflow: 'hidden',
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.66), rgba(255,255,255,0.92))',
-          border: '1px solid rgba(196, 198, 209, 0.35)',
-          display: 'grid',
-          placeItems: 'center',
-        }}
-      >
-        <MuiImageCustom
-          width={160}
-          height={110}
-          src={career.iconUrl}
-          fallbackSrc={IMAGES.companyLogoDefault}
-          loading="eager"
-          sx={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
-        />
-      </Box>
-    );
-  }
-
-  return (
-    <Box
-      sx={{
-        width: '100%',
-        height: 132,
-        borderRadius: 3,
-        display: 'grid',
-        placeItems: 'center',
-        background: 'linear-gradient(135deg, rgba(15,23,42,0.06) 0%, rgba(255,255,255,0.92) 100%)',
-        border: '1px solid rgba(196, 198, 209, 0.35)',
-      }}
-    >
-      <Avatar
-        sx={{
-          width: 78,
-          height: 78,
-          bgcolor: 'white',
-          boxShadow: '0 12px 24px rgba(15,57,127,0.12)',
-          color: '#0f172a',
-        }}
-        aria-label={career.name}
-      >
-        {Icon ? <Icon color="inherit" sx={{ fontSize: 42 }} /> : <BusinessCenterIcon sx={{ fontSize: 42 }} />}
-      </Avatar>
-    </Box>
-  );
-};
-
-const CareerCarousel = () => {
+const CareerCarousel: React.FC = () => {
   const { t, i18n } = useTranslation('public');
   const dispatch = useDispatch();
   const [parentWidth, setParentWidth] = React.useState(0);
@@ -171,18 +155,19 @@ const CareerCarousel = () => {
     },
     staleTime: 5 * 60_000,
   });
+
   const topCareers = React.useMemo(() => normalizeCareers(rawTopCareers), [rawTopCareers]);
 
   React.useEffect(() => {
     const handleResize = () => {
-      const element = document.getElementById("career-carousel");
+      const element = document.getElementById('career-carousel');
       if (element) {
         setParentWidth(element.offsetWidth);
       }
     };
     handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const handleFilter = (id: string | number) => {
@@ -190,108 +175,176 @@ const CareerCarousel = () => {
   };
 
   return (
-    <div id="career-carousel">
-      <Box sx={styles}>
+    <Box id="career-carousel" sx={{ width: '100%' }}>
+      {/* ── Section Header Row ───────────────────────────────────────── */}
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5 }}>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <BusinessCenterIcon sx={{ color: '#2563eb', fontSize: 26 }} />
+          <Typography variant="h5" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.01em' }}>
+            {t('home.keyCareersTitle') || 'Top ngành nghề nổi bật'}
+          </Typography>
+        </Stack>
+
+        <Link href={jobsHref} style={{ textDecoration: 'none' }}>
+          <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: '#2563eb', cursor: 'pointer', '&:hover': { opacity: 0.85 } }}>
+            <Typography sx={{ fontWeight: 600, fontSize: '0.925rem' }}>Xem tất cả</Typography>
+            <ArrowForwardIcon sx={{ fontSize: 16 }} />
+          </Stack>
+        </Link>
+      </Stack>
+
+      <Box sx={swiperStyles}>
         <Swiper
           slidesPerView={col}
-          spaceBetween={15}
+          spaceBetween={16}
           pagination={{
             clickable: true,
           }}
           autoplay={{
-            delay: 2500,
-            disableOnInteraction: true,
+            delay: 3500,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
           }}
           modules={[Pagination, Autoplay]}
         >
           {isLoading
-            ? Array.from(Array(10).keys()).map((value) => (
-              <SwiperSlide key={value}>{Loading}</SwiperSlide>
-            ))
-            : topCareers.map((value: Career & { jobPostTotal?: number }, index) => {
-              const accent = CAREER_ACCENTS[index % CAREER_ACCENTS.length];
-              return (
-                <SwiperSlide key={value.id}>
-                  <Card
-                    component={Link}
-                    href={jobsHref}
-                    prefetch
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      width: "100%",
-                      minHeight: 280,
-                      p: 1.5,
-                      mb: 0.5,
-                      cursor: "pointer",
-                      color: 'inherit',
-                      textDecoration: 'none',
-                      boxShadow: 0,
-                      background: `linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.88) 100%)`,
-                      borderRadius: 4,
-                      border: '1px solid rgba(196, 198, 209, 0.55)',
-                      transition: "all 0.3s ease",
-                      overflow: "hidden",
-                      '&:before': {
-                        content: '""',
-                        display: 'block',
-                        height: 6,
-                        borderRadius: 999,
-                        marginBottom: 1.25,
-                        background: `linear-gradient(90deg, ${accent}, rgba(255,255,255,0.2))`,
-                      },
-                      "&:hover": {
-                        transform: "translateY(-4px)",
-                        boxShadow: '0 18px 34px rgba(4, 48, 104, 0.14)',
-                        borderColor: accent,
-                        "& .career-name": {
-                          color: '#0f172a',
+            ? Array.from(Array(8).keys()).map((val) => (
+                <SwiperSlide key={val}>{LoadingSkeleton}</SwiperSlide>
+              ))
+            : topCareers.map((value: Career & { jobPostTotal?: number }, index: number) => {
+                const theme = CAREER_THEMES[index % CAREER_THEMES.length];
+                const IconComponent =
+                  (value.appIconName && CAREER_ICON_MAP[value.appIconName.toLowerCase()]) ||
+                  CAREER_ICON_MAP[value.name.toLowerCase()] ||
+                  BusinessCenterIcon;
+
+                const jobCount = value.jobPostTotal || 0;
+                const countBadgeText =
+                  jobCount > 0
+                    ? t('home.jobsCount', { count: jobCount })
+                    : t('home.startExploring');
+
+                return (
+                  <SwiperSlide key={value.id}>
+                    <Card
+                      component={Link}
+                      href={jobsHref}
+                      prefetch
+                      onClick={() => handleFilter(value.id)}
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        minHeight: 185,
+                        p: 2.5,
+                        bgcolor: '#ffffff',
+                        border: '1px solid rgba(226, 232, 240, 0.9)',
+                        borderRadius: '20px',
+                        textDecoration: 'none',
+                        color: 'inherit',
+                        boxShadow: '0 4px 14px rgba(15, 23, 42, 0.03)',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          transform: 'translateY(-5px)',
+                          borderColor: theme.hoverBorder,
+                          boxShadow: `0 18px 32px -8px rgba(15, 23, 42, 0.08), 0 4px 12px ${theme.glow}`,
+                          '& .career-arrow-icon': {
+                            transform: 'translateX(4px)',
+                            color: theme.text,
+                          },
+                          '& .career-title-text': {
+                            color: theme.text,
+                          },
                         },
-                      },
-                    }}
-                    onClick={() => handleFilter(value.id)}
-                  >
-                    <Stack spacing={1.5} sx={{ flex: 1, p: 1 }}>
-                      <CareerArtwork career={value} />
-                      <Box sx={{ textAlign: 'center' }}>
-                        <Typography
-                          className="career-name"
-                          variant="h6"
-                          component="h6"
-                          gutterBottom={true}
+                      }}
+                    >
+                      {/* Top Row: Icon Container + Direction Arrow */}
+                      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                        <Box
                           sx={{
-                            fontWeight: 800,
-                            fontSize: '1.02rem',
-                            lineHeight: 1.25,
-                            minHeight: 48,
+                            width: 52,
+                            height: 52,
+                            borderRadius: '15px',
+                            bgcolor: theme.bg,
+                            color: theme.text,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            transition: 'color 0.3s ease',
-                            px: 0.5,
+                            border: `1px solid ${theme.border}`,
+                            transition: 'transform 0.3s ease',
                           }}
                         >
-                          {value?.name}
-                        </Typography>
-                        <Chip
-                          label={t('home.jobsCount', { count: value.jobPostTotal })}
-                          size="small"
+                          <IconComponent sx={{ fontSize: 28, color: theme.text }} />
+                        </Box>
+
+                        <Box
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: '50%',
+                            bgcolor: '#f8fafc',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: '1px solid #f1f5f9',
+                          }}
+                        >
+                          <ArrowForwardIcon
+                            className="career-arrow-icon"
+                            sx={{
+                              fontSize: 16,
+                              color: '#94a3b8',
+                              transition: 'all 0.25s ease',
+                            }}
+                          />
+                        </Box>
+                      </Stack>
+
+                      {/* Middle & Bottom Rows: Title & Count Badge */}
+                      <Box sx={{ mt: 'auto' }}>
+                        <Typography
+                          className="career-title-text"
+                          variant="h6"
                           sx={{
                             fontWeight: 700,
-                            color: accent,
-                            bgcolor: `${accent}12`,
-                            border: `1px solid ${accent}24`,
+                            fontSize: '1.02rem',
+                            color: '#0f172a',
+                            lineHeight: 1.35,
+                            mb: 1,
+                            transition: 'color 0.25s ease',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 1,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {value.name}
+                        </Typography>
+
+                        <Chip
+                          label={countBadgeText}
+                          size="small"
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '0.775rem',
+                            height: 26,
+                            color: jobCount > 0 ? theme.text : '#64748b',
+                            bgcolor: jobCount > 0 ? theme.bg : '#f1f5f9',
+                            border: `1px solid ${jobCount > 0 ? theme.border : '#e2e8f0'}`,
+                            borderRadius: '8px',
                           }}
                         />
                       </Box>
-                    </Stack>
-                  </Card>
-                </SwiperSlide>
-              );
-            })}
+                    </Card>
+                  </SwiperSlide>
+                );
+              })}
         </Swiper>
       </Box>
-    </div>
+    </Box>
   );
 };
 

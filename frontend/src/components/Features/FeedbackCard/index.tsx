@@ -1,15 +1,34 @@
-﻿import React from 'react';
-import { Box, Card, Skeleton, Stack, Typography, useTheme } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faQuoteLeft } from '@fortawesome/free-solid-svg-icons';
-import MuiImageCustom from '@/components/Common/MuiImageCustom';
-import type { Theme as StylesTheme } from '@mui/material/styles';
+import React from 'react';
+import {
+  Avatar,
+  Box,
+  Card,
+  Chip,
+  Rating,
+  Skeleton,
+  Stack,
+  Typography,
+} from '@mui/material';
+import VerifiedIcon from '@mui/icons-material/Verified';
+import BusinessRoundedIcon from '@mui/icons-material/BusinessRounded';
+import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
+import FormatQuoteRoundedIcon from '@mui/icons-material/FormatQuoteRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 
-interface FeedbackCardProps {
+export type FeedbackUserType = 'employer' | 'candidate';
+
+export interface FeedbackCardProps {
   id?: string | number;
   avatarUrl?: string;
   fullName?: string;
   content?: string;
+  roleTitle?: string;
+  companyName?: string;
+  companyLogo?: string;
+  userType?: FeedbackUserType;
+  rating?: number;
+  impactTag?: string;
+  verified?: boolean;
 }
 
 const TESTIMONIAL_AVATARS = [
@@ -28,92 +47,217 @@ const pickFallbackAvatar = (seed?: string | number) => {
   return TESTIMONIAL_AVATARS[hash % TESTIMONIAL_AVATARS.length];
 };
 
-const FeedbackCard = ({ id, avatarUrl = '', fullName = '', content = '' }: FeedbackCardProps) => {
-  const theme = useTheme();
+const FeedbackCard = ({
+  id,
+  avatarUrl = '',
+  fullName = '',
+  content = '',
+  roleTitle,
+  companyName,
+  userType = 'candidate',
+  rating = 5,
+  impactTag,
+  verified = true,
+}: FeedbackCardProps) => {
   const fallbackAvatar = React.useMemo(() => pickFallbackAvatar(id || fullName), [id, fullName]);
   const resolvedAvatar = avatarUrl || fallbackAvatar;
+  const isEmployer = userType === 'employer' || Boolean(companyName);
+
+  const displayRole = roleTitle || (isEmployer ? 'Nhà tuyển dụng' : 'Ứng viên tìm việc');
+  const displayImpact =
+    impactTag ||
+    (isEmployer
+      ? 'Tuyển dụng nhanh & chính xác'
+      : 'Ứng tuyển thành công');
 
   return (
     <Card
+      elevation={0}
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        minHeight: '100%',
-        p: 2.25,
-        py: 2.25,
-        mb: 1,
-        boxShadow: (t: StylesTheme) => t.customShadows.card,
-        transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+        justifyContent: 'space-between',
+        height: '100%',
+        minHeight: 280,
+        p: { xs: 2.5, sm: 3 },
+        borderRadius: 3.5,
+        border: '1px solid',
+        borderColor: 'rgba(226, 232, 240, 0.9)',
+        bgcolor: '#ffffff',
+        boxShadow: '0 2px 12px -2px rgba(15, 23, 42, 0.04)',
+        transition: 'transform 0.25s ease, box-shadow 0.25s ease',
         '&:hover': {
           transform: 'translateY(-4px)',
-          boxShadow: (t: StylesTheme) => t.customShadows.large,
+          boxShadow: '0 14px 28px -6px rgba(15, 23, 42, 0.08)',
         },
       }}
     >
-      <Stack sx={{ mb: 1.75 }} direction="row" justifyContent="center">
-        <MuiImageCustom
-          sx={{
-            borderRadius: '50%',
-            border: (t: StylesTheme) => `4px solid ${t.palette.primary.light}`,
-            boxShadow: (t: StylesTheme) => t.customShadows.medium,
-            objectFit: 'cover',
-            backgroundColor: (t: StylesTheme) => t.palette.common.white,
-          }}
-          width={96}
-          height={96}
-          fit="cover"
-          src={resolvedAvatar}
-          fallbackSrc={fallbackAvatar}
-        />
-      </Stack>
+      <Box>
+        {/* Header: User Avatar + Name + Role + Company/Persona Badge */}
+        <Stack direction="row" spacing={1.5} alignItems="flex-start" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
+            <Box sx={{ position: 'relative', flexShrink: 0 }}>
+              <Avatar
+                src={resolvedAvatar}
+                alt={fullName}
+                sx={{
+                  width: 48,
+                  height: 48,
+                  border: '1.5px solid #e2e8f0',
+                  bgcolor: '#f1f5f9',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                }}
+              >
+                {fullName ? fullName.slice(0, 1).toUpperCase() : 'U'}
+              </Avatar>
+              {verified && (
+                <VerifiedIcon
+                  sx={{
+                    position: 'absolute',
+                    bottom: -2,
+                    right: -2,
+                    fontSize: 18,
+                    color: '#2563eb',
+                    bgcolor: '#ffffff',
+                    borderRadius: '50%',
+                  }}
+                />
+              )}
+            </Box>
 
-      <Typography
-        variant="h6"
-        component="h6"
-        gutterBottom
-        sx={{
-          textAlign: 'center',
-          fontWeight: 'bold',
-          color: (t: StylesTheme) => t.palette.primary.main,
-          mb: 1.1,
-          minHeight: 32,
-        }}
-      >
-        {fullName}
-      </Typography>
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 700,
+                  color: '#0f172a',
+                  lineHeight: 1.3,
+                  fontSize: '0.95rem',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {fullName}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: '#64748b',
+                  fontWeight: 500,
+                  fontSize: '0.8rem',
+                  display: 'block',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {displayRole}
+              </Typography>
+            </Box>
+          </Stack>
 
-      <Typography textAlign="center" sx={{ mb: 1 }}>
-        <FontAwesomeIcon
-          icon={faQuoteLeft}
-          fontSize={28}
-          color={theme.palette.warning.main}
-          style={{ opacity: 0.8 }}
-        />
-      </Typography>
+          {/* Right badge: Company or Persona pill */}
+          <Box sx={{ flexShrink: 0, ml: 1 }}>
+            {companyName ? (
+              <Chip
+                icon={<BusinessRoundedIcon sx={{ fontSize: '14px !important', color: '#64748b' }} />}
+                label={companyName}
+                size="small"
+                sx={{
+                  bgcolor: '#f8fafc',
+                  color: '#334155',
+                  border: '1px solid #e2e8f0',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  height: 26,
+                  maxWidth: 150,
+                  '& .MuiChip-label': {
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    px: 0.75,
+                  },
+                }}
+              />
+            ) : (
+              <Chip
+                icon={<PersonOutlineRoundedIcon sx={{ fontSize: '14px !important', color: '#64748b' }} />}
+                label={isEmployer ? 'Doanh nghiệp' : 'Ứng viên'}
+                size="small"
+                sx={{
+                  bgcolor: '#f8fafc',
+                  color: '#334155',
+                  border: '1px solid #e2e8f0',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  height: 26,
+                  '& .MuiChip-label': {
+                    px: 0.75,
+                  },
+                }}
+              />
+            )}
+          </Box>
+        </Stack>
 
-      <Box sx={{ width: '100%' }}>
+        {/* Star Rating & Quote mark */}
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
+          <Rating
+            value={rating}
+            readOnly
+            size="small"
+            sx={{
+              color: '#f59e0b',
+              fontSize: '1rem',
+            }}
+          />
+          <FormatQuoteRoundedIcon sx={{ color: '#cbd5e1', fontSize: 24, transform: 'rotate(180deg)' }} />
+        </Stack>
+
+        {/* Content Body */}
         <Typography
           variant="body2"
-          display="block"
-          gutterBottom
           sx={{
-            textAlign: 'center',
-            color: (t: StylesTheme) => t.palette.text.secondary,
-            px: 0.5,
-            lineHeight: 1.7,
-            fontStyle: 'italic',
-            minHeight: 86,
+            color: '#334155',
+            lineHeight: 1.65,
+            fontSize: '0.875rem',
+            minHeight: 68,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             display: '-webkit-box',
-            WebkitLineClamp: '4',
+            WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
           }}
         >
           {content}
         </Typography>
+      </Box>
+
+      {/* Footer: Impact Metric Tag */}
+      <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid #f1f5f9' }}>
+        <Stack direction="row" alignItems="center" spacing={0.75}>
+          <CheckCircleRoundedIcon
+            sx={{
+              fontSize: 15,
+              color: '#2563eb',
+              flexShrink: 0,
+            }}
+          />
+          <Typography
+            variant="caption"
+            sx={{
+              color: '#64748b',
+              fontWeight: 600,
+              fontSize: '0.75rem',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {displayImpact}
+          </Typography>
+        </Stack>
       </Box>
     </Card>
   );
@@ -121,52 +265,38 @@ const FeedbackCard = ({ id, avatarUrl = '', fullName = '', content = '' }: Feedb
 
 const Loading = () => (
   <Card
+    elevation={0}
     sx={{
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
-      p: 2.25,
-      py: 2.25,
-      mb: 1,
-      boxShadow: (theme: StylesTheme) => theme.customShadows.card,
+      justifyContent: 'space-between',
+      height: '100%',
+      minHeight: 280,
+      p: { xs: 2.5, sm: 3 },
+      borderRadius: 4,
+      border: '1px solid rgba(226, 232, 240, 0.9)',
+      bgcolor: '#ffffff',
     }}
   >
-    <Skeleton
-      variant="circular"
-      width={96}
-      height={96}
-      sx={{
-        margin: '0 auto',
-        mb: 2,
-        backgroundColor: (theme: StylesTheme) => theme.palette.grey[200],
-      }}
-    />
-    <Stack sx={{ width: '100%' }}>
-      <Skeleton
-        height={28}
-        width="60%"
-        sx={{
-          margin: '0 auto',
-          mb: 1.5,
-          backgroundColor: (theme: StylesTheme) => theme.palette.grey[200],
-        }}
-      />
-      <Skeleton
-        height={18}
-        width="42%"
-        sx={{
-          margin: '0 auto',
-          mb: 1.5,
-          backgroundColor: (theme: StylesTheme) => theme.palette.grey[200],
-        }}
-      />
-      <Skeleton
-        height={86}
-        sx={{
-          backgroundColor: (theme: StylesTheme) => theme.palette.grey[200],
-        }}
-      />
-    </Stack>
+    <Box>
+      <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <Skeleton variant="circular" width={48} height={48} />
+          <Box>
+            <Skeleton variant="text" width={110} height={22} />
+            <Skeleton variant="text" width={80} height={16} />
+          </Box>
+        </Stack>
+        <Skeleton variant="rounded" width={80} height={26} sx={{ borderRadius: 2 }} />
+      </Stack>
+      <Skeleton variant="text" width={90} height={20} sx={{ mb: 1.5 }} />
+      <Skeleton variant="text" width="100%" height={18} />
+      <Skeleton variant="text" width="92%" height={18} />
+      <Skeleton variant="text" width="75%" height={18} />
+    </Box>
+    <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid #f1f5f9' }}>
+      <Skeleton variant="text" width="65%" height={18} />
+    </Box>
   </Card>
 );
 

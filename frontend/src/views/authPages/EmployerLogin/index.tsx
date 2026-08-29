@@ -3,9 +3,8 @@ import * as React from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Alert, AlertTitle, Avatar, Box, Card, Container, Typography, styled } from '@mui/material';
+import { Alert, AlertTitle, Box, Card, Container, Typography, styled } from '@mui/material';
 import { Grid2 as Grid } from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
@@ -16,6 +15,7 @@ import BackdropLoading from '../../../components/Common/Loading/BackdropLoading'
 import { updateVerifyEmail } from '../../../redux/authSlice';
 import { getUserInfo, setActiveWorkspace } from '../../../redux/userSlice';
 import EmployerLoginForm, { EmployerLoginFormData } from '../../components/auths/EmployerLoginForm';
+import AuthShowcasePanel from '../../components/auths/AuthShowcasePanel';
 import authService from '../../../services/authService';
 import tokenService from '../../../services/tokenService';
 import { useAppDispatch } from '../../../hooks/useAppStore';
@@ -23,32 +23,31 @@ import type { RoleName, AuthProvider } from '../../../types/auth';
 import type { User, Workspace } from '../../../types/models';
 import type { AxiosError } from 'axios';
 import type { CodeResponse } from '@react-oauth/google';
+import SecurityIcon from '@mui/icons-material/Security';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const SOCIAL_AUTH_COOLDOWN_MS = 2500;
 
 const StyledCard = styled(Card)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.9)',
-  backdropFilter: 'blur(10px)',
-  borderRadius: '16px',
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+  background: '#FFFFFF',
+  borderRadius: '24px',
+  boxShadow: '0 20px 45px rgba(15, 23, 42, 0.08), 0 4px 16px rgba(15, 23, 42, 0.04)',
+  border: '1px solid #F1F5F9',
   transition: 'all 0.3s ease',
-}));
-
-const StyledAvatar = styled(Avatar)(({ theme }) => ({
-  margin: '16px',
-  width: '56px',
-  height: '56px',
-  backgroundColor: theme.palette.primary.main,
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
 }));
 
 const StyledLink = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
-  color: theme.palette.primary.main,
-  fontWeight: 500,
+  color: '#2563EB',
+  fontWeight: 600,
+  fontSize: '14px',
   transition: 'all 0.2s ease',
   '&:hover': {
-    color: theme.palette.primary.dark,
+    color: '#1D4ED8',
     textDecoration: 'underline',
   },
 }));
@@ -90,6 +89,7 @@ const EmployerLogin = () => {
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
   const forgotPasswordHref = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.FORGOT_PASSWORD}`, i18n.language);
   const registerHref = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language);
+  const candidateLoginHref = localizeRoutePath(`/${ROUTES.AUTH.LOGIN}`, i18n.language);
   const socialAuthInFlightRef = React.useRef(false);
   const lastSocialAuthAttemptAtRef = React.useRef(0);
 
@@ -112,11 +112,9 @@ const EmployerLogin = () => {
   const extractErrorMessage = (res: { data?: ApiErrorPayload } | undefined): string | null => {
     if (!res?.data) return null;
 
-    // V2 envelope: { success: false, error: { details: { errorMessage: [...] }, message: '...' } }
     const v2Details = res.data.error?.details;
     const v2ErrorMsg = v2Details?.errorMessage;
 
-    // V1 format: { errors: { errorMessage: [...] } }
     const v1Errors = res.data.errors;
     const v1ErrorMsg = v1Errors?.errorMessage;
 
@@ -302,121 +300,189 @@ const EmployerLogin = () => {
   return (
     <>
       <Container
-        maxWidth="sm"
+        maxWidth="lg"
         sx={{
-          marginTop: { xs: 0, sm: 2, md: 3 },
-          p: { xs: 0, sm: 3 },
+          py: { xs: 2, sm: 4, md: 6 },
+          px: { xs: 1, sm: 2, md: 3 },
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          minHeight: 'calc(100vh - 120px)',
         }}
       >
-        <StyledCard
+        <Grid
+          container
+          spacing={{ xs: 0, md: 4 }}
+          alignItems="stretch"
           sx={{
-            p: { xs: 2, sm: 4, md: 5 },
             width: '100%',
-            borderRadius: { xs: 0, sm: '16px' },
-            boxShadow: { xs: 'none', sm: '0 8px 32px rgba(0, 0, 0, 0.1)' },
+            maxWidth: '1060px',
+            margin: '0 auto',
           }}
         >
-          <Box
+          {/* Left Column: Login Form */}
+          <Grid
+            size={{ xs: 12, md: 6 }}
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
-              mb: 3,
             }}
           >
-            <Typography
-              component="h1"
-              variant="h4"
-              align="center"
+            <StyledCard
               sx={{
-                fontWeight: 600,
-                color: 'primary.main',
-                mb: 1,
+                p: { xs: 3, sm: 4, md: 5 },
+                width: '100%',
+                borderRadius: { xs: '16px', sm: '24px' },
               }}
             >
-              {t('login.heading')}
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              align="center"
-              sx={{
-                color: 'text.secondary',
-                mb: 2,
-              }}
-            >
-              {t('login.welcomeBack')}
-            </Typography>
-          </Box>
+              {/* Card Top / Header */}
+              <Box>
+                {/* Cross-Portal Switcher Link */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    mb: 2.5,
+                  }}
+                >
+                  <Typography variant="caption" sx={{ color: '#64748B', fontSize: '13px' }}>
+                    Bạn là Người tìm việc?{' '}
+                    <StyledLink
+                      href={candidateLoginHref}
+                      sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 0.25,
+                        fontWeight: 600,
+                        color: '#2563EB',
+                      }}
+                    >
+                      <span>Tìm việc ngay</span>
+                      <ArrowForwardIcon sx={{ fontSize: 13 }} />
+                    </StyledLink>
+                  </Typography>
+                </Box>
 
-          {errorMessage && (
-            <Alert
-              severity="error"
-              sx={{
-                mb: 3,
-                borderRadius: '8px',
-              }}
-            >
-              <AlertTitle>{t('login.errorTitle')}</AlertTitle>
-              {errorMessage}
-            </Alert>
-          )}
+                <Box sx={{ mb: 3 }}>
+                  <Typography
+                    component="h1"
+                    variant="h4"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: { xs: '24px', sm: '28px', md: '30px' },
+                      color: '#0F172A',
+                      letterSpacing: '-0.02em',
+                      mb: 1,
+                    }}
+                  >
+                    {t('login.heading')}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: '#64748B',
+                      fontSize: '14.5px',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {t('login.welcomeBack')}
+                  </Typography>
+                </Box>
 
-          {successMessage && (
-            <Alert
-              severity="success"
-              sx={{
-                mb: 3,
-                borderRadius: '8px',
-              }}
-            >
-              <AlertTitle>{t('login.successTitle')}</AlertTitle>
-              {successMessage}
-            </Alert>
-          )}
+                {errorMessage && (
+                  <Alert
+                    severity="error"
+                    sx={{
+                      mb: 3,
+                      borderRadius: '12px',
+                      fontSize: '13.5px',
+                    }}
+                  >
+                    <AlertTitle sx={{ fontWeight: 600 }}>{t('login.errorTitle')}</AlertTitle>
+                    {errorMessage}
+                  </Alert>
+                )}
 
-          <Box sx={{ mt: 2 }}>
-            <EmployerLoginForm onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} />
-          </Box>
+                {successMessage && (
+                  <Alert
+                    severity="success"
+                    sx={{
+                      mb: 3,
+                      borderRadius: '12px',
+                      fontSize: '13.5px',
+                    }}
+                  >
+                    <AlertTitle sx={{ fontWeight: 600 }}>{t('login.successTitle')}</AlertTitle>
+                    {successMessage}
+                  </Alert>
+                )}
 
-          <Grid
-            container
-            spacing={2}
-            sx={{
-              mt: 4,
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-              }}
-            >
-              <StyledLink href={forgotPasswordHref}>
-                {t('login.forgotPassword')}
-              </StyledLink>
-            </Grid>
+                <Box sx={{ mt: 1 }}>
+                  <EmployerLoginForm onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} />
+                </Box>
+              </Box>
 
-            <Grid
-              sx={{
-                textAlign: { xs: 'left', sm: 'right' },
-              }}
-              size={{
-                xs: 12,
-                sm: 6,
-              }}
-            >
-              <StyledLink href={registerHref}>
-                {t('login.noAccount')} {t('login.signUp')}
-              </StyledLink>
-            </Grid>
+              {/* Card Bottom / Footer Links */}
+              <Box sx={{ mt: 'auto', pt: 3 }}>
+                <Grid
+                  container
+                  spacing={2}
+                  sx={{
+                    pt: 2.5,
+                    borderTop: '1px solid #F1F5F9',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <StyledLink href={forgotPasswordHref}>
+                      {t('login.forgotPassword')}
+                    </StyledLink>
+                  </Grid>
+
+                  <Grid
+                    sx={{
+                      textAlign: { xs: 'left', sm: 'right' },
+                    }}
+                    size={{ xs: 12, sm: 6 }}
+                  >
+                    <StyledLink href={registerHref}>
+                      {t('login.noAccount')} {t('login.signUp')}
+                    </StyledLink>
+                  </Grid>
+                </Grid>
+
+                {/* Security Trust Indicator */}
+                <Box
+                  sx={{
+                    mt: 2.5,
+                    pt: 1.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 1,
+                    color: '#94A3B8',
+                    fontSize: '12px',
+                  }}
+                >
+                  <SecurityIcon sx={{ fontSize: 16, color: '#10B981' }} />
+                  <span>Bảo mật thông tin doanh nghiệp theo tiêu chuẩn SSL 256-bit</span>
+                </Box>
+              </Box>
+            </StyledCard>
           </Grid>
-        </StyledCard>
+
+          {/* Right Column: Showcase Panel (Desktop only) */}
+          <Grid
+            size={{ xs: 12, md: 6 }}
+            sx={{
+              display: { xs: 'none', md: 'flex' },
+            }}
+          >
+            <AuthShowcasePanel variant="employer" />
+          </Grid>
+        </Grid>
       </Container>
 
       {isFullScreenLoading && <BackdropLoading />}

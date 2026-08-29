@@ -5,13 +5,12 @@ import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from "yup";
 import { Box, Button, Stack, styled, Divider } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
-import GoogleIcon from "@mui/icons-material/Google";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useTranslation } from 'react-i18next';
 import TextFieldCustom from "../../../../components/Common/Controls/TextFieldCustom";
 import PasswordTextFieldCustom from "../../../../components/Common/Controls/PasswordTextFieldCustom";
+import { GoogleColoredIcon } from "../../../../components/Common/SocialIcons";
 import type { CodeResponse } from '@react-oauth/google';
-import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 interface JobSeekerLoginFormData {
   email: string;
@@ -39,90 +38,86 @@ export const createJobSeekerLoginSchema = (t: JobSeekerLoginT) =>
       .max(128, t('validation.passwordMax')),
   });
 
-
-
 const StyledButton = styled(Button)(({ theme }) => ({
-
-  padding: "8px 16px",
-
-  borderRadius: "8px",
-
-  fontSize: "14px",
-
-  fontWeight: 500,
-
+  minHeight: "46px",
+  padding: "10px 24px",
+  borderRadius: "12px",
+  fontSize: "15px",
+  fontWeight: 600,
   textTransform: "none",
-
-  color: theme.palette.common.white,
-
-  backgroundColor: theme.palette.primary.main,
-
-  boxShadow: "0 10px 22px rgba(26, 64, 125, 0.2)",
-
-  transition: "all 0.2s ease",
-
+  color: "#ffffff",
+  background: "linear-gradient(135deg, #1E40AF 0%, #2563EB 100%)",
+  boxShadow: "0 8px 20px rgba(37, 99, 235, 0.25)",
+  transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
   "&:hover": {
-
-    backgroundColor: theme.palette.primary.dark,
-
+    background: "linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)",
     transform: "translateY(-1px)",
-
-    boxShadow: "0 14px 28px rgba(26, 64, 125, 0.26)",
-
+    boxShadow: "0 12px 24px rgba(37, 99, 235, 0.32)",
   },
-
+  "&:active": {
+    transform: "scale(0.98)",
+  },
 }));
 
 const StyledSocialButton = styled(Button)(({ theme }) => ({
-
-  padding: "8px 16px",
-
-  borderRadius: "8px",
-
+  minHeight: "44px",
+  padding: "9px 20px",
+  borderRadius: "12px",
   fontSize: "14px",
-
   fontWeight: 500,
-
   textTransform: "none",
-
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-
+  backgroundColor: "#FFFFFF",
+  borderColor: "#E2E8F0",
+  color: "#1E293B",
+  boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
   transition: "all 0.2s ease",
-
   "&:hover": {
-
+    borderColor: "#CBD5E1",
+    backgroundColor: "#F8FAFC",
     transform: "translateY(-1px)",
-
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
   },
-
+  "&:active": {
+    transform: "scale(0.98)",
+  },
 }));
 
 const StyledDivider = styled(Divider)({
-
-  margin: "20px 0",
-
+  margin: "24px 0",
   "&::before, &::after": {
-
-    borderColor: "rgba(0, 0, 0, 0.2)",
-
+    borderColor: "#E2E8F0",
   },
-
   "& .MuiDivider-wrapper": {
-
     padding: "0 16px",
-
     fontSize: "13px",
-
-    color: "rgba(0, 0, 0, 0.6)",
-
+    fontWeight: 500,
+    color: "#64748B",
   },
-
 });
 
-const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: JobSeekerLoginFormProps) => {
+const inputSx = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "12px",
+    backgroundColor: "#F8FAFC",
+    transition: "all 0.2s ease",
+    "&:hover": {
+      backgroundColor: "#F1F5F9",
+    },
+    "&.Mui-focused": {
+      backgroundColor: "#FFFFFF",
+    },
+    "& input:-webkit-autofill": {
+      WebkitBoxShadow: "0 0 0 1000px #F8FAFC inset !important",
+      WebkitTextFillColor: "#0F172A !important",
+      borderRadius: "inherit",
+    },
+    "&.Mui-focused input:-webkit-autofill": {
+      WebkitBoxShadow: "0 0 0 1000px #FFFFFF inset !important",
+    },
+  },
+};
 
+const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: JobSeekerLoginFormProps) => {
   const { t } = useTranslation('auth');
 
   const schema = React.useMemo(() => createJobSeekerLoginSchema(t), [t]);
@@ -136,208 +131,70 @@ const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: JobSeek
   });
 
   const googleLogin = useGoogleLogin({
-
     onSuccess: onGoogleLogin,
-
     flow: "auth-code",
     ux_mode: "popup",
     redirect_uri: (typeof window !== 'undefined' ? window.location.origin : ''),
-
   });
 
   return (
-
     <Box
-
       component="form"
-
       onSubmit={handleSubmit(onLogin)}
-
       sx={{
-
         width: "100%",
-
         "& .MuiTextField-root": {
-
-          borderRadius: "10px",
-
+          borderRadius: "12px",
         },
-
       }}
-
     >
-
       <Stack spacing={2.5} sx={{ mb: 3 }}>
-
         <TextFieldCustom
-
           name="email"
-
           control={control}
-
           title={t('form.email')}
-
           placeholder={t('form.emailPlaceholder')}
-
           showRequired={true}
-
-          sx={{
-
-            "& .MuiOutlinedInput-root": {
-
-              borderRadius: "10px",
-
-              backgroundColor: "rgba(255, 255, 255, 0.8)",
-
-            },
-
-          }}
-
+          sx={inputSx}
         />
 
         <PasswordTextFieldCustom
-
           name="password"
-
           control={control}
-
           title={t('form.password')}
-
           placeholder={t('form.passwordPlaceholder')}
-
           showRequired={true}
-
-          sx={{
-
-            "& .MuiOutlinedInput-root": {
-
-              borderRadius: "10px",
-
-              backgroundColor: "rgba(255, 255, 255, 0.8)",
-
-            },
-
-          }}
-
+          sx={inputSx}
         />
-
       </Stack>
 
       <StyledButton fullWidth variant="contained" type="submit" startIcon={<LoginIcon />}>
-
         {t('actions.login')}
-
       </StyledButton>
 
       <StyledDivider>{t('social.orLoginWith')}</StyledDivider>
 
       <Stack
-
         direction="row"
-
         spacing={2}
-
         sx={{
-
           width: "100%",
-
           "& > *": {
-
             flex: 1,
-
           },
-
         }}
-
       >
-
-{/* <LoginSocialFacebook
-
-          appId={AUTH_CONFIG.FACEBOOK_CLIENT_ID}
-
-          scope="email,public_profile"
-
-          fieldsProfile={"id"}
-
-          isOnlyGetToken={true}
-
-          ux_mode="popup"
-
-          onResolve={onFacebookLogin}
-
-          onReject={(err) => {
-
-            // Auth error handled by toast
-
-          }}
-
-        >
-
-          <StyledSocialButton
-
-            fullWidth
-
-            variant="outlined"
-
-            onClick={onFacebookLogin}
-
-            startIcon={<FacebookIcon />}
-
-            sx={{
-
-              borderColor: "#4267B2",
-
-              color: "#4267B2",
-
-              "&:hover": {
-
-                borderColor: "#4267B2",
-
-                backgroundColor: "rgba(66, 103, 178, 0.04)",
-
-              },
-
-            }}
-
-          >{t('auto.index_facebook_d855', `Facebook`)}</StyledSocialButton>
-
-        </LoginSocialFacebook> */}
-
         <StyledSocialButton
-
           fullWidth
-
           variant="outlined"
-
           onClick={() => googleLogin()}
-
-          startIcon={<GoogleIcon />}
-
-          sx={{
-
-            borderColor: "#DB4437",
-
-            color: "#DB4437",
-
-            "&:hover": {
-
-              borderColor: "#DB4437",
-
-              backgroundColor: "rgba(219, 68, 55, 0.04)",
-
-            },
-
-          }}
-
-        >{t('auto.index_google_8b36', `Google`)}</StyledSocialButton>
-
+          startIcon={<GoogleColoredIcon size={20} />}
+        >
+          {t('auto.index_google_8b36', `Google`)}
+        </StyledSocialButton>
       </Stack>
-
     </Box>
-
   );
-
 };
 
 export default JobSeekerLoginForm;
-

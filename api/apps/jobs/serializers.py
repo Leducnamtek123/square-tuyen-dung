@@ -771,10 +771,15 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
         representation = super().to_representation(instance)
         if self.context.get("blind_screening"):
             representation["fullName"] = f"Candidate #{instance.id}"
+            representation["title"] = f"Hồ sơ ứng viên #{instance.id}"
             representation["email"] = None
             representation["phone"] = None
             representation["resumeFileUrl"] = None
             representation["resumeSlug"] = None
+            if representation.get("resume") and isinstance(representation["resume"], dict):
+                representation["resume"]["title"] = f"Hồ sơ ứng viên #{instance.id}"
+                representation["resume"]["fileUrl"] = None
+                representation["resume"]["slug"] = None
             representation["userDict"] = {
                 "id": instance.user_id,
                 "fullName": f"Candidate #{instance.id}",

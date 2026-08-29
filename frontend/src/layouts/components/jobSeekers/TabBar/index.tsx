@@ -12,6 +12,7 @@ import ApartmentIcon from "@mui/icons-material/Apartment";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
 import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
+import AutoFixHighOutlinedIcon from "@mui/icons-material/AutoFixHighOutlined";
 import { useTranslation } from 'react-i18next';
 import { ROUTES, APP_NAME } from "../../../../configs/constants";
 import { getLocalizedRouteVariants, localizeRoutePath } from "../../../../configs/routeLocalization";
@@ -33,6 +34,12 @@ const TabBar = () => {
       label: 'Hồ sơ của tôi',
       icon: <BadgeOutlinedIcon sx={{ fontSize: 20 }} />,
       path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.PROFILE}`, i18n.language),
+    },
+    {
+      id: 2.5,
+      label: 'Trang trí CV',
+      icon: <AutoFixHighOutlinedIcon sx={{ fontSize: 20 }} />,
+      path: localizeRoutePath('/ung-vien/trang-tri-cv', i18n.language),
     },
     {
       id: 3,

@@ -4,7 +4,7 @@ import {
   Box, Typography, Chip, Stack, Divider, Button, IconButton,
   Paper, Avatar, useTheme,
   FormControl, Select, MenuItem, Tooltip,
-  Grid2 as Grid,
+  Grid2 as Grid, TablePagination,
 } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -181,7 +181,7 @@ const reducer = (
     case 'set-loading':
       return { ...state, loading: action.value };
     case 'set-search-term':
-      return { ...state, searchTerm: action.value };
+      return { ...state, searchTerm: action.value, page: 0 };
     case 'set-view-mode':
       return { ...state, viewMode: action.value };
     default:
@@ -377,13 +377,33 @@ const InterviewHistoryPage = () => {
           </Typography>
         </Paper>
       ) : state.viewMode === 'grid' ? (
-        <Grid container spacing={3}>
-          {state.sessions.map((session) => (
-            <Grid key={session.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-              <VideoCard session={session} />
-            </Grid>
-          ))}
-        </Grid>
+        <Stack spacing={3}>
+          <Grid container spacing={3}>
+            {state.sessions.map((session) => (
+              <Grid key={session.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+                <VideoCard session={session} />
+              </Grid>
+            ))}
+          </Grid>
+          <TablePagination
+            rowsPerPageOptions={[6, 12, 24, 48]}
+            component="div"
+            count={state.count}
+            rowsPerPage={state.rowsPerPage}
+            page={Math.min(Math.max(0, state.page), state.count > 0 ? Math.max(0, Math.ceil(state.count / state.rowsPerPage) - 1) : 0)}
+            onPageChange={(_, newPage) => dispatch({ type: 'set-page', value: newPage })}
+            onRowsPerPageChange={(e) => {
+              dispatch({ type: 'set-rows-per-page', value: parseInt(e.target.value, 10) });
+              dispatch({ type: 'set-page', value: 0 });
+            }}
+            backIconButtonProps={{ disabled: state.loading }}
+            nextIconButtonProps={{ disabled: state.loading }}
+            labelRowsPerPage={t('common:table.rowsPerPage')}
+            labelDisplayedRows={({ from, to, count }) =>
+              `${from}–${to} / ${count !== -1 ? count : `${to}+`}`
+            }
+          />
+        </Stack>
       ) : (
         <DataTable
           columns={columns}

@@ -19,6 +19,13 @@ const CompanyViewedCard = () => {
   const { data, isLoading } = useResumeViewed({ pageSize, page });
   const resumesViewed = data?.results || [];
   const count = data?.count || 0;
+  const totalPages = Math.max(1, Math.ceil(count / pageSize));
+
+  React.useEffect(() => {
+    if (count > 0 && page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [count, page, totalPages]);
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
@@ -63,14 +70,14 @@ const CompanyViewedCard = () => {
               </CompanyAction>
             ))}
             <Stack sx={{ pt: 2 }} alignItems="center">
-              {Math.ceil(count / pageSize) > 1 && (
+              {totalPages > 1 && (
                 <Pagination
                   color="primary"
                   size="medium"
                   variant="text"
                   sx={{ margin: '0 auto' }}
-                  count={Math.ceil(count / pageSize)}
-                  page={page}
+                  count={totalPages}
+                  page={Math.min(page, totalPages)}
                   onChange={handleChangePage}
                 />
               )}

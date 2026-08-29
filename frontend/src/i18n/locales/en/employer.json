@@ -26,7 +26,8 @@
       "tooltips": {
         "view": "View profile",
         "delete": "Delete profile",
-        "scheduleInterview": "Schedule interview"
+        "scheduleInterview": "Schedule interview",
+        "blindDisabled": "Action disabled in Blind Screening mode"
       },
       "clickToDownload": "Click to download",
       "candidateName": "Candidate Name",
@@ -263,7 +264,8 @@
     "candidateChart": "CANDIDATE CHART",
     "applicationChart": "RECRUITMENT & APPLICATION CHART",
     "academicChart": "RECRUITMENT BY ACADEMIC LEVEL",
-    "interviewChart": "INTERVIEW STATISTICS"
+    "interviewChart": "INTERVIEW STATISTICS",
+    "recruitmentFunnel": "Recruitment Funnel"
   },
   "jobPost": {
     "title": "Job Post Management",
@@ -379,7 +381,8 @@
       "tested": "Tested",
       "interviewed": "Interviewed",
       "notselected": "Not Selected"
-    }
+    },
+    "tooltip": "Recruitment statistics for this period"
   },
   "companyForm": {
     "title": {

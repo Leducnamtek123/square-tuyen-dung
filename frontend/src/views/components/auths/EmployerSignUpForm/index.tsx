@@ -3,19 +3,20 @@ import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from 'yup';
-import { Box, Button, Stack, Step, StepLabel, Stepper, styled } from "@mui/material";
+import { Box, Button, Stack, styled } from "@mui/material";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import BusinessIcon from '@mui/icons-material/Business';
 import { useTranslation } from 'react-i18next';
 import useDebounce from '../../../../hooks/useDebounce';
 import { DATE_OPTIONS, REGEX_VALIDATE } from '../../../../configs/constants';
 import errorHandling from '../../../../utils/errorHandling';
 import commonService from '../../../../services/commonService';
 import goongService from '../../../../services/goongService';
-import authService from '../../../../services/authService';
 import { useAppSelector } from '../../../../hooks/useAppStore';
-import type { AxiosError } from 'axios';
 import type { RoleName } from '../../../../types/auth';
 import type { RootState } from '../../../../redux/store';
 import type { SelectOption } from '@/types/models';
@@ -158,35 +159,40 @@ const syncLocationOptions = async (
 };
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  padding: '8px 16px',
-  borderRadius: '8px',
-  fontSize: '14px',
-  fontWeight: 500,
+  minHeight: '46px',
+  padding: '10px 24px',
+  borderRadius: '12px',
+  fontSize: '15px',
+  fontWeight: 600,
   textTransform: 'none',
-  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-  transition: 'all 0.2s ease',
-  '&:hover': {
-    transform: 'translateY(-1px)',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+  '&.MuiButton-contained': {
+    color: '#ffffff',
+    background: 'linear-gradient(135deg, #1E40AF 0%, #2563EB 100%)',
+    boxShadow: '0 8px 20px rgba(37, 99, 235, 0.25)',
+    '&:hover': {
+      background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
+      transform: 'translateY(-1px)',
+      boxShadow: '0 12px 24px rgba(37, 99, 235, 0.32)',
+    },
   },
-}));
-
-const StyledStepper = styled(Stepper)(({ theme }) => ({
-  '& .MuiStepLabel-root .Mui-completed': {
-    color: theme.palette.primary.main,
+  '&.MuiButton-outlined': {
+    borderColor: '#E2E8F0',
+    color: '#475569',
+    backgroundColor: '#FFFFFF',
+    '&:hover': {
+      borderColor: '#CBD5E1',
+      backgroundColor: '#F8FAFC',
+      transform: 'translateY(-1px)',
+    },
   },
-  '& .MuiStepLabel-root .Mui-active': {
-    color: theme.palette.primary.main,
-  },
-  '& .MuiStepLabel-label': {
-    fontSize: '14px',
-    fontWeight: 500,
+  '&:active': {
+    transform: 'scale(0.98)',
   },
 }));
 
 const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, checkCreds }: EmployerSignUpFormProps) => {
   const { t } = useTranslation('auth');
-  const steps = [t('steps.loginInfo'), t('steps.companyInfo')];
   const [activeStep, setActiveStep] = React.useState(0);
   const { allConfig } = useAppSelector((state: RootState & { config?: { allConfig?: { employeeSizeOptions?: SelectOption[]; cityOptions?: SelectOption[] } } }) => state.config || {});
   const [districtOptions, setDistrictOptions] = React.useState<SelectOption[]>([]);
@@ -303,48 +309,124 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
   return (
     <Box
       component="form"
-      onSubmit={activeStep === steps.length - 1 ? handleSubmit(onSignUp) : handleSubmit(handleSubmtNextSuccess, handleSubmitNextError)}
-      sx={{ width: '100%', '& .MuiTextField-root': { borderRadius: '10px' } }}
+      onSubmit={activeStep === 1 ? handleSubmit(onSignUp) : handleSubmit(handleSubmtNextSuccess, handleSubmitNextError)}
+      sx={{ width: '100%', '& .MuiTextField-root': { borderRadius: '12px' } }}
     >
-      <StyledStepper activeStep={activeStep} sx={{ pb: 4 }}>
-        {steps.map((label) => (
-          <Step key={label}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </StyledStepper>
-      <>
-        <Box>
-          <AccountInfoStep control={control} t={t} show={activeStep === 0} />
-          <CompanyInfoStep
-            control={control}
-            t={t}
-            show={activeStep !== 0}
-            allConfig={allConfig as { employeeSizeOptions?: SelectOption[]; cityOptions?: SelectOption[] } | null}
-            districtOptions={districtOptions}
-            locationOptions={locationOptions}
-            handleSelectLocation={handleSelectLocation}
-            locationValue={companyLocationValue}
-            onLocationChange={handleSignUpLocationChange}
-          />
-        </Box>
-        <Stack sx={{ mt: 4 }} spacing={2} direction={{ xs: 'column', sm: 'row' }} justifyContent="flex-end">
-          {activeStep !== 0 && (
-            <StyledButton variant="outlined" onClick={handleBack} startIcon={<NavigateBeforeIcon />}>
-              {t('actions.back')}
-            </StyledButton>
-          )}
-          {activeStep === steps.length - 1 ? (
-            <StyledButton variant="contained" type="submit" startIcon={<HowToRegIcon />}>
-              {t('actions.signUp')}
-            </StyledButton>
+      {/* Modern Segmented Step Indicator */}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 1.5,
+          p: 0.75,
+          backgroundColor: '#F1F5F9',
+          borderRadius: '16px',
+          mb: 4,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1,
+            py: 1.25,
+            px: 2,
+            borderRadius: '12px',
+            backgroundColor: activeStep === 0 ? '#FFFFFF' : 'transparent',
+            boxShadow: activeStep === 0 ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none',
+            color: activeStep === 0 ? '#1E40AF' : activeStep > 0 ? '#10B981' : '#64748B',
+            fontWeight: 600,
+            fontSize: '13.5px',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          {activeStep > 0 ? (
+            <CheckCircleIcon sx={{ fontSize: 18, color: '#10B981' }} />
           ) : (
-            <StyledButton variant="contained" type="submit" endIcon={<NavigateNextIcon />}>
-              {t('actions.next')}
-            </StyledButton>
+            <PersonOutlineIcon sx={{ fontSize: 18 }} />
           )}
-        </Stack>
-      </>
+          <span>1. {t('steps.loginInfo')}</span>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1,
+            py: 1.25,
+            px: 2,
+            borderRadius: '12px',
+            backgroundColor: activeStep === 1 ? '#FFFFFF' : 'transparent',
+            boxShadow: activeStep === 1 ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none',
+            color: activeStep === 1 ? '#1E40AF' : '#64748B',
+            fontWeight: 600,
+            fontSize: '13.5px',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          <BusinessIcon sx={{ fontSize: 18 }} />
+          <span>2. {t('steps.companyInfo')}</span>
+        </Box>
+      </Box>
+
+      {/* Step Form Content */}
+      <Box>
+        <AccountInfoStep control={control} t={t} show={activeStep === 0} />
+        <CompanyInfoStep
+          control={control}
+          t={t}
+          show={activeStep !== 0}
+          allConfig={allConfig as { employeeSizeOptions?: SelectOption[]; cityOptions?: SelectOption[] } | null}
+          districtOptions={districtOptions}
+          locationOptions={locationOptions}
+          handleSelectLocation={handleSelectLocation}
+          locationValue={companyLocationValue}
+          onLocationChange={handleSignUpLocationChange}
+        />
+      </Box>
+
+      {/* Action Buttons */}
+      <Stack
+        sx={{ mt: 4 }}
+        spacing={2}
+        direction={{ xs: 'column-reverse', sm: 'row' }}
+        justifyContent="space-between"
+      >
+        {activeStep !== 0 ? (
+          <StyledButton
+            variant="outlined"
+            onClick={handleBack}
+            startIcon={<NavigateBeforeIcon />}
+            sx={{ flex: { xs: 1, sm: '0 0 auto' } }}
+          >
+            {t('actions.back')}
+          </StyledButton>
+        ) : (
+          <Box sx={{ display: { xs: 'none', sm: 'block' } }} />
+        )}
+
+        {activeStep === 1 ? (
+          <StyledButton
+            variant="contained"
+            type="submit"
+            startIcon={<HowToRegIcon />}
+            sx={{ flex: { xs: 1, sm: '0 0 auto' }, minWidth: { sm: 160 } }}
+          >
+            {t('actions.signUp')}
+          </StyledButton>
+        ) : (
+          <StyledButton
+            variant="contained"
+            type="submit"
+            endIcon={<NavigateNextIcon />}
+            sx={{ flex: { xs: 1, sm: '0 0 auto' }, minWidth: { sm: 160 } }}
+          >
+            {t('actions.next')}
+          </StyledButton>
+        )}
+      </Stack>
     </Box>
   );
 };

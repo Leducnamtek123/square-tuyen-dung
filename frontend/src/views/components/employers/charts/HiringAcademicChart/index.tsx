@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
-  Divider,
   Stack,
   Tooltip as MuiTooltip,
   Typography,
@@ -10,6 +9,7 @@ import {
   useTheme
 } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
+import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import dayjs from 'dayjs';
 import PieChartClient from '@/components/Common/Charts/PieChartClient';
 import {
@@ -88,14 +88,36 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
   return (
     <Paper elevation={0} sx={chartCardSx}>
       <Box>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1.5}>
-          <Typography variant="h4" sx={chartTitleSx}>
-            {title}
-          </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+          <Stack direction="row" spacing={1.25} alignItems="center">
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 36,
+                height: 36,
+                borderRadius: '10px',
+                bgcolor: '#F5F3FF',
+                color: '#8B5CF6',
+              }}
+            >
+              <SchoolOutlinedIcon sx={{ fontSize: 20 }} />
+            </Box>
+            <Box>
+              <Typography variant="h4" sx={chartTitleSx}>
+                {title}
+              </Typography>
+              <Typography sx={{ fontSize: '0.78rem', color: '#94A3B8' }}>
+                Phân bổ hồ sơ ứng tuyển theo trình độ học vấn
+              </Typography>
+            </Box>
+          </Stack>
+
           <MuiTooltip title={t('hiringAcademicChart.title')} arrow placement="top">
             <InfoIcon sx={{ color: '#98A2B3', cursor: 'pointer', fontSize: 18, '&:hover': { color: '#2563EB' } }} />
           </MuiTooltip>
-        </Stack>
+        </Box>
 
         <RangePickerCustom
           allowSubmit={allowSubmit}
@@ -104,7 +126,7 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
           setSelectedDateRange={setSelectedDateRange}
         />
 
-        <Box sx={chartAreaSx(320)}>
+        <Box sx={chartAreaSx(260)}>
           {queryLoading ? (
             <ChartLoadingState height="100%" label={t('hiringAcademicChart.loading')} />
           ) : !hasChartData ? (

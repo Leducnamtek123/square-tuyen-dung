@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import {
   Alert,
   Box,
@@ -116,6 +116,10 @@ const VoiceProfilesPage = () => {
   const [preparingProfileId, setPreparingProfileId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [voiceTypeFilter, setVoiceTypeFilter] = useState('all');
+
+  useEffect(() => {
+    setPage(0);
+  }, [statusFilter, voiceTypeFilter, setPage]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['admin-voice-profiles', page, pageSize, debouncedSearchTerm, statusFilter, voiceTypeFilter, ordering],

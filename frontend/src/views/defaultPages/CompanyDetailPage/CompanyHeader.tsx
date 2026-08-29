@@ -145,7 +145,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
             justifyContent="center"
             sx={{ width: { xs: '100%', md: 'auto' }, flexWrap: 'wrap' }}
           >
-            {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
+            {(!isAuthenticated || currentUser?.roleName === ROLES_NAME.JOB_SEEKER) && (
               <LoadingButton
                 onClick={handleFollow}
                 startIcon={companyDetail.isFollowed ? <BookmarkIcon /> : <BookmarkBorderIcon />}
@@ -180,7 +180,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
             >
               {t("companyDetail.share")}
             </Button>
-            {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
+            {(!isAuthenticated || currentUser?.roleName === ROLES_NAME.JOB_SEEKER) && (
               <Button
                 variant="outlined"
                 color="warning"

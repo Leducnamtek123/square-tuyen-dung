@@ -665,7 +665,7 @@
         "completedMessage": "Đã nhập thành công các hồ sơ CV.",
         "failedMessage": "Có lỗi xảy ra trong quá trình nhập hồ sơ.",
         "processingMessage": "Hệ thống đang tiến hành xử lý hồ sơ nền...",
-        "sourceUrlLabel": "[VI] sourceUrlLabel"
+        "sourceUrlLabel": "Đường dẫn nguồn ứng viên (URL)"
       },
       "bulkSelect": {
         "selectedCount": "Đã chọn {{count}} hồ sơ",
@@ -1875,11 +1875,11 @@
       "rowsPerPage": "Số dòng mỗi trang",
       "displayedRows": "{{from}}-{{to}} trên {{count}}"
     },
-    "noOptions": "[VI] noOptions",
+    "noOptions": "Không có lựa chọn nào",
     "autocomplete": {
-      "open": "[VI] open",
-      "close": "[VI] close",
-      "clear": "[VI] clear"
+      "open": "Mở danh sách",
+      "close": "Đóng danh sách",
+      "clear": "Xóa lựa chọn"
     }
   },
   "chat": {

@@ -113,6 +113,37 @@ const ProfilesPage = () => {
     const debouncedSearch = useDebounce(filters.kw || '', 500);
     const previousFilterSignature = useRef('');
 
+    const filterSignature = useMemo(() => JSON.stringify({
+        kw: debouncedSearch,
+        cityId: filters.cityId,
+        careerId: filters.careerId,
+        experienceId: filters.experienceId,
+        positionId: filters.positionId,
+        academicLevelId: filters.academicLevelId,
+        typeOfWorkplaceId: filters.typeOfWorkplaceId,
+        jobTypeId: filters.jobTypeId,
+        genderId: filters.genderId,
+        maritalStatusId: filters.maritalStatusId,
+    }), [
+        debouncedSearch,
+        filters.cityId,
+        filters.careerId,
+        filters.experienceId,
+        filters.positionId,
+        filters.academicLevelId,
+        filters.typeOfWorkplaceId,
+        filters.jobTypeId,
+        filters.genderId,
+        filters.maritalStatusId,
+    ]);
+
+    useEffect(() => {
+        if (previousFilterSignature.current && previousFilterSignature.current !== filterSignature) {
+            onPaginationChange({ pageIndex: 0, pageSize });
+        }
+        previousFilterSignature.current = filterSignature;
+    }, [filterSignature, onPaginationChange, pageSize]);
+
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [openBulkDeleteDialog, setOpenBulkDeleteDialog] = useState(false);
     const [openImportDialog, setOpenImportDialog] = useState(() => Boolean(readPersistedImportJobId()));

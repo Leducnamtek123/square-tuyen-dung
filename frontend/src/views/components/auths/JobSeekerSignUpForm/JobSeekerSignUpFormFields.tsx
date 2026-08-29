@@ -12,8 +12,23 @@ type Props = {
 
 const inputSx = {
   '& .MuiOutlinedInput-root': {
-    borderRadius: '10px',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: '12px',
+    backgroundColor: '#F8FAFC',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      backgroundColor: '#F1F5F9',
+    },
+    '&.Mui-focused': {
+      backgroundColor: '#FFFFFF',
+    },
+    '& input:-webkit-autofill': {
+      WebkitBoxShadow: '0 0 0 1000px #F8FAFC inset !important',
+      WebkitTextFillColor: '#0F172A !important',
+      borderRadius: 'inherit',
+    },
+    '&.Mui-focused input:-webkit-autofill': {
+      WebkitBoxShadow: '0 0 0 1000px #FFFFFF inset !important',
+    },
   },
 };
 

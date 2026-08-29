@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
@@ -57,6 +57,7 @@ const UsersPage = () => {
 
     const handleRoleFilterChange = (value: string) => {
         setRoleFilter(value);
+        onPaginationChange({ pageIndex: 0, pageSize });
     };
 
     const handleToggleStatus = async (user: UserModel) => {

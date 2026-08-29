@@ -650,3 +650,121 @@ h1, h2, h3, h4, h5, .display-text {
   display: none !important;
 }
 
+/* ==========================================================================
+   CV PRINTING & HIGH-DPI PDF EXPORT STYLES
+   Ensures pixel-perfect A4 printing with zero margins and full UI isolation
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0mm !important;
+  }
+
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* When printing on any CV Editor or Public CV page */
+  html, body,
+  html.cv-printing-active, body.cv-printing-active,
+  html:has(#cv-print-area), body:has(#cv-print-area) {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Global non-printable UI elements */
+  .no-print,
+  .no-print *,
+  .sq-chatbot,
+  .sq-chatbot__launcher,
+  .sq-chatbot__panel,
+  .Toastify,
+  .bg-atmosphere,
+  header,
+  nav,
+  footer,
+  .MuiAppBar-root,
+  .MuiDrawer-root,
+  .MuiBackdrop-root,
+  .MuiDialog-root:not(.allow-print),
+  .cv-editor-header-bar,
+  .cv-editor-sidebar-container,
+  .cv-preview-toolbar,
+  .cv-editor-no-print {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Allow main layout wrappers to expand naturally to multiple pages */
+  body:has(#cv-print-area) main,
+  body:has(#cv-print-area) #__next,
+  body:has(#cv-print-area) .cv-editor-root,
+  body:has(#cv-print-area) .cv-editor-main-body,
+  body:has(#cv-print-area) .cv-preview-container,
+  body:has(#cv-print-area) .cv-preview-viewport,
+  body.cv-printing-active main,
+  body.cv-printing-active #__next,
+  body.cv-printing-active .cv-editor-root,
+  body.cv-printing-active .cv-editor-main-body,
+  body.cv-printing-active .cv-preview-container,
+  body.cv-printing-active .cv-preview-viewport {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    width: 210mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    position: static !important;
+    background: #ffffff !important;
+  }
+
+  /* Normalize Zoom Wrapper for print */
+  .cv-zoom-wrapper {
+    transform: none !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+  }
+
+  /* Isolate and format the CV print target */
+  #cv-print-area,
+  .cv-print-target {
+    display: block !important;
+    visibility: visible !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
+    transform: none !important;
+    position: relative !important;
+    page-break-after: auto;
+    break-inside: auto;
+  }
+}
+
+

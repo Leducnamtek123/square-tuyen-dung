@@ -126,7 +126,7 @@
       "selectLanguage": "Chọn ngoại ngữ",
       "skillName": "Nhập tên kỹ năng",
       "certificateName": "Nhập tên chứng chỉ",
-      "selectCityFirst": "[VI] selectCityFirst"
+      "selectCityFirst": "Vui lòng chọn Tỉnh/Thành phố trước"
     },
     "validation": {
       "fullNameRequired": "Vui lòng nhập họ và tên.",

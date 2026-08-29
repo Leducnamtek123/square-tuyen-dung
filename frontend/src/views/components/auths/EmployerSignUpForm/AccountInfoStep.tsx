@@ -13,11 +13,33 @@ interface AccountInfoStepProps {
   show: boolean;
 }
 
+const inputStyle = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '12px',
+    backgroundColor: '#F8FAFC',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      backgroundColor: '#F1F5F9',
+    },
+    '&.Mui-focused': {
+      backgroundColor: '#FFFFFF',
+    },
+    '& input:-webkit-autofill': {
+      WebkitBoxShadow: '0 0 0 1000px #F8FAFC inset !important',
+      WebkitTextFillColor: '#0F172A !important',
+      borderRadius: 'inherit',
+    },
+    '&.Mui-focused input:-webkit-autofill': {
+      WebkitBoxShadow: '0 0 0 1000px #FFFFFF inset !important',
+    },
+  },
+};
+
 const AccountInfoStep: React.FC<AccountInfoStepProps> = ({ control, t, show }) => {
   return (
     <Stack
       spacing={2.5}
-      sx={{ mb: 2, display: show ? 'block' : 'none' }}
+      sx={{ mb: 2, display: show ? 'flex' : 'none' }}
     >
       <TextFieldCustom
         name="fullName"
@@ -25,12 +47,7 @@ const AccountInfoStep: React.FC<AccountInfoStepProps> = ({ control, t, show }) =
         title={t('form.fullName')}
         placeholder={t('form.fullNamePlaceholder')}
         showRequired={true}
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            borderRadius: '10px',
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          }
-        }}
+        sx={inputStyle}
       />
       <TextFieldCustom
         name="email"
@@ -38,12 +55,7 @@ const AccountInfoStep: React.FC<AccountInfoStepProps> = ({ control, t, show }) =
         title={t('form.email')}
         placeholder={t('form.emailPlaceholder')}
         showRequired={true}
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            borderRadius: '10px',
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          }
-        }}
+        sx={inputStyle}
       />
       <PasswordTextFieldCustom
         name="password"
@@ -51,12 +63,7 @@ const AccountInfoStep: React.FC<AccountInfoStepProps> = ({ control, t, show }) =
         title={t('form.password')}
         placeholder={t('form.passwordPlaceholder')}
         showRequired={true}
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            borderRadius: '10px',
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          }
-        }}
+        sx={inputStyle}
       />
       <PasswordTextFieldCustom
         name="confirmPassword"
@@ -64,12 +71,7 @@ const AccountInfoStep: React.FC<AccountInfoStepProps> = ({ control, t, show }) =
         title={t('form.confirmPassword')}
         placeholder={t('form.confirmPasswordPlaceholder')}
         showRequired={true}
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            borderRadius: '10px',
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          }
-        }}
+        sx={inputStyle}
       />
     </Stack>
   );

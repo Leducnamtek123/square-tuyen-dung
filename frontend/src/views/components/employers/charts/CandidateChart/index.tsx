@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Box, 
-  Divider, 
   Stack, 
   Tooltip as MuiTooltip, 
   Typography, 
@@ -10,6 +9,7 @@ import {
   useTheme
 } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
+import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 import dayjs from 'dayjs';
 import LineChartClient from '@/components/Common/Charts/LineChartClient';
 import {
@@ -32,7 +32,7 @@ interface CandidateChartProps {
 const CandidateChart = ({ title }: CandidateChartProps) => {
   const { t, i18n } = useTranslation('employer');
   const theme = useTheme();
-  const options = React.useMemo(() => createCartesianOptions(theme, { language: i18n.language }), [i18n.language, theme]);
+  const options = React.useMemo(() => createCartesianOptions(theme, { language: i18n.language, displayLegend: true }), [i18n.language, theme]);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([
     dayjs(new Date()).subtract(1, 'month'),
@@ -63,12 +63,12 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
           borderWidth: 3,
           tension: 0.38,
           cubicInterpolationMode: 'monotone' as const,
-          pointRadius: 0,
+          pointRadius: 2,
           pointHoverRadius: 6,
           pointHitRadius: 14,
-          pointBackgroundColor: '#fff',
+          pointBackgroundColor: chartColors.emerald,
           pointHoverBackgroundColor: '#fff',
-          pointBorderColor: chartColors.emerald,
+          pointBorderColor: '#fff',
           pointBorderWidth: 2,
           pointHoverBorderWidth: 2,
         },
@@ -81,12 +81,12 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
           borderWidth: 3,
           tension: 0.38,
           cubicInterpolationMode: 'monotone' as const,
-          pointRadius: 0,
+          pointRadius: 2,
           pointHoverRadius: 6,
           pointHitRadius: 14,
-          pointBackgroundColor: '#fff',
+          pointBackgroundColor: chartColors.sky,
           pointHoverBackgroundColor: '#fff',
-          pointBorderColor: chartColors.sky,
+          pointBorderColor: '#fff',
           pointBorderWidth: 2,
           pointHoverBorderWidth: 2,
         },
@@ -102,14 +102,36 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
   return (
     <Paper elevation={0} sx={chartCardSx}>
       <Box>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1.5}>
-          <Typography variant="h4" sx={chartTitleSx}>
-            {title}
-          </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+          <Stack direction="row" spacing={1.25} alignItems="center">
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 36,
+                height: 36,
+                borderRadius: '10px',
+                bgcolor: '#EFF6FF',
+                color: '#2563EB',
+              }}
+            >
+              <PeopleOutlineIcon sx={{ fontSize: 20 }} />
+            </Box>
+            <Box>
+              <Typography variant="h4" sx={chartTitleSx}>
+                {title}
+              </Typography>
+              <Typography sx={{ fontSize: '0.78rem', color: '#94A3B8' }}>
+                Tương quan ứng viên tiềm năng và hồ sơ mới
+              </Typography>
+            </Box>
+          </Stack>
+
           <MuiTooltip title={t('candidateChart.title')} arrow placement="top">
             <InfoIcon sx={{ color: '#98A2B3', cursor: 'pointer', fontSize: 18, '&:hover': { color: '#2563EB' } }} />
           </MuiTooltip>
-        </Stack>
+        </Box>
 
         <RangePickerCustom
           allowSubmit={allowSubmit}
@@ -118,7 +140,7 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
           setSelectedDateRange={setSelectedDateRange}
         />
 
-        <Box sx={chartAreaSx(320)}>
+        <Box sx={chartAreaSx(260)}>
           {queryLoading ? (
             <ChartLoadingState height="100%" label={t('candidateChart.loading')} />
           ) : !hasChartData ? (

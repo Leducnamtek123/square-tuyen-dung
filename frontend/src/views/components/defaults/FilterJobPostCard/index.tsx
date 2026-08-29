@@ -29,6 +29,8 @@ import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import { faBolt } from '@fortawesome/free-solid-svg-icons';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CheckIcon from '@mui/icons-material/Check';
+import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useConfig } from '../../../../hooks/useConfig';
 import jobService from '../../../../services/jobService';
@@ -37,12 +39,17 @@ import type { GetJobPostsParams } from '../../../../services/jobService';
 import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 import NoDataCard from '../../../../components/Common/NoDataCard';
 import { IMAGES } from '../../../../configs/constants';
+import useRequireAuth from '@/hooks/useRequireAuth';
+import toastMessages from '@/utils/toastMessages';
 
 interface FilterJobPostCardProps {
   params?: GetJobPostsParams;
   compact?: boolean;
   hideHeader?: boolean;
   hideFilterBar?: boolean;
+  headerTitle?: string;
+  fallbackToAllIfEmpty?: boolean;
+  hideIfEmpty?: boolean;
 }
 
 type FilterDimension = 'city' | 'salary' | 'experience' | 'career';
@@ -115,8 +122,17 @@ const DEFAULT_CAREERS = [
   { id: 10, name: 'Lao động phổ thông' },
 ];
 
-const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {}, compact = false, hideHeader = false, hideFilterBar = false }) => {
+const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
+  params = {},
+  compact = false,
+  hideHeader = false,
+  hideFilterBar = false,
+  headerTitle,
+  fallbackToAllIfEmpty = false,
+  hideIfEmpty = false,
+}) => {
   const { allConfig } = useConfig();
+  const { requireAuth, AuthModal } = useRequireAuth();
   const pageSize = compact ? 6 : 9;
   const [page, setPage] = useState(1);
   const [currentDimension, setCurrentDimension] = useState<FilterDimension>('city');
@@ -138,10 +154,25 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
     }
   };
 
-  const toggleFavorite = (e: React.MouseEvent, id: number) => {
+  const toggleFavorite = (e: React.MouseEvent, id: number, slug?: string) => {
     e.preventDefault();
     e.stopPropagation();
-    setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
+    if (!requireAuth({ actionType: 'save_job' })) {
+      return;
+    }
+    const willSave = !favorites[id];
+    setFavorites((prev) => ({ ...prev, [id]: willSave }));
+    const run = async () => {
+      try {
+        const res = await jobService.saveJobPost(slug || String(id)) as { isSaved?: boolean };
+        const saved = res?.isSaved ?? willSave;
+        setFavorites((prev) => ({ ...prev, [id]: saved }));
+        toastMessages.success(saved ? 'Đã lưu tin tuyển dụng' : 'Đã bỏ lưu tin tuyển dụng');
+      } catch {
+        setFavorites((prev) => ({ ...prev, [id]: !willSave }));
+      }
+    };
+    run();
   };
 
   const handleDimensionSelect = (dimId: FilterDimension) => {
@@ -336,16 +367,38 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
   }, [params, currentDimension, selectedSubItem]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['filtered-job-posts', resolvedParams, page],
+    queryKey: ['filtered-job-posts', resolvedParams, page, fallbackToAllIfEmpty],
     queryFn: async () => {
-      const resData = await jobService.getJobPosts({
+      let resData = await jobService.getJobPosts({
         ...resolvedParams,
         pageSize,
         page,
       });
+
+      let isFallback = false;
+      if (
+        fallbackToAllIfEmpty &&
+        (!resData?.results || resData.results.length === 0) &&
+        Boolean(resolvedParams.isUrgent || resolvedParams.isHot)
+      ) {
+        const fallbackParams = { ...resolvedParams };
+        delete fallbackParams.isUrgent;
+        delete fallbackParams.isHot;
+        const fallbackRes = await jobService.getJobPosts({
+          ...fallbackParams,
+          pageSize,
+          page: 1,
+        });
+        if (fallbackRes?.results && fallbackRes.results.length > 0) {
+          resData = fallbackRes;
+          isFallback = true;
+        }
+      }
+
       return {
         results: resData?.results || [],
         count: resData?.count || 0,
+        isFallback,
       };
     },
     staleTime: 5 * 60_000,
@@ -355,6 +408,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
   const jobPosts = data?.results || [];
   const totalCount = data?.count || jobPosts.length || 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const isFallbackActive = Boolean(data?.isFallback);
 
   const formatSalary = (min?: number, max?: number) => {
     if (!min && !max) return 'Thoả thuận';
@@ -375,6 +429,13 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
   };
 
   const activeDimensionLabel = FILTER_DIMENSIONS.find((d) => d.id === currentDimension)?.label || 'Địa điểm';
+  const displayTitle = headerTitle || (isFallbackActive ? 'Việc làm nổi bật' : (resolvedParams.isUrgent ? 'Việc làm tuyển gấp' : 'Việc làm'));
+  const HeaderIcon = isFallbackActive ? TipsAndUpdatesIcon : (resolvedParams.isUrgent ? LocalFireDepartmentIcon : WorkOutlineIcon);
+  const headerIconColor = isFallbackActive ? '#2563eb' : (resolvedParams.isUrgent ? '#ea580c' : '#2563eb');
+
+  if (hideIfEmpty && !isLoading && jobPosts.length === 0) {
+    return null;
+  }
 
   return (
     <Box id="filter-job-post-card" sx={{ width: '100%' }}>
@@ -382,9 +443,9 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
       {!hideHeader && (
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5 }}>
           <Stack direction="row" spacing={1} alignItems="center">
-            <LocalFireDepartmentIcon sx={{ color: '#ea580c', fontSize: 26 }} />
-            <Typography variant="h5" sx={{ fontWeight: 800, color: '#ea580c', letterSpacing: '-0.01em' }}>
-              Việc làm tuyển gấp
+            <HeaderIcon sx={{ color: headerIconColor, fontSize: 26 }} />
+            <Typography variant="h5" sx={{ fontWeight: 800, color: headerIconColor, letterSpacing: '-0.01em' }}>
+              {displayTitle}
             </Typography>
           </Stack>
 
@@ -646,7 +707,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
                         )}
                         <IconButton aria-label="Thao tác"
                           size="small"
-                          onClick={(e) => toggleFavorite(e, job.id)}
+                          onClick={(e) => toggleFavorite(e, job.id, job.slug)}
                           sx={{
                             p: 0.5,
                             color: isFav ? '#ef4444' : '#94a3b8',
@@ -784,6 +845,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = {
           </Stack>
         </>
       )}
+      {AuthModal}
     </Box>
   );
 };

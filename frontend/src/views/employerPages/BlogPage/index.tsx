@@ -108,6 +108,7 @@ const EmployerBlogListPage = () => {
         status: statusFilter === 'all' ? undefined : statusFilter,
         search: search || undefined,
         page: pagination.pageIndex + 1,
+        pageSize: pagination.pageSize,
         page_size: pagination.pageSize,
       });
       dispatch({ type: 'loaded', articles: res.results || [], total: res.count || 0 });

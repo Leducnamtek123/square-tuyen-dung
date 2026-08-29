@@ -27,6 +27,7 @@ import { useAppSelector } from "../../../hooks/useAppStore";
 import useSEO from "../../../hooks/useSEO";
 import useStructuredData from "../../../hooks/useStructuredData";
 import { useConfig } from '@/hooks/useConfig';
+import useRequireAuth from '@/hooks/useRequireAuth';
 import type { Location } from '@/types/models';
 import type { Company } from '@/types/models';
 
@@ -110,6 +111,7 @@ const JobDetailPage = () => {
   const { t } = useTranslation(["public"]);
   const { allConfig } = useConfig();
   const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
+  const { requireAuth, AuthModal } = useRequireAuth();
   const [openReportPopup, setOpenReportPopup] = React.useState(false);
 
   const [state, dispatch] = React.useReducer(jobDetailReducer, initialJobDetailState);
@@ -211,6 +213,7 @@ const JobDetailPage = () => {
   );
 
   const handleSave = () => {
+    if (!requireAuth({ actionType: 'save_job' })) return;
     const saveJobPost = async () => {
       dispatch({ type: 'set-loading-save', value: true });
       try {
@@ -230,15 +233,17 @@ const JobDetailPage = () => {
   };
 
   const handleShowApplyForm = () => {
+    if (!requireAuth({ actionType: 'apply_job' })) return;
     dispatch({ type: 'open-popup' });
   };
 
   const handleMobileApplyClick = () => {
-    if (!isAuthenticated) {
-      push(`/${ROUTES.AUTH.LOGIN}`);
-      return;
-    }
     handleShowApplyForm();
+  };
+
+  const handleOpenReport = () => {
+    if (!requireAuth({ actionType: 'report', title: 'Báo cáo tin tuyển dụng', message: 'Vui lòng đăng nhập để gửi báo cáo về tin tuyển dụng này.' })) return;
+    setOpenReportPopup(true);
   };
 
   return (
@@ -260,7 +265,7 @@ const JobDetailPage = () => {
                 onSave={handleSave}
                 onShowApplyForm={handleShowApplyForm}
                 onOpenSharePopup={(open) => dispatch({ type: 'open-share-popup', value: open })}
-                onOpenReport={() => setOpenReportPopup(true)}
+                onOpenReport={handleOpenReport}
               />
               <JobSalaryInsightCard slug={slug as string} />
               <JobDetailDescriptionCard
@@ -338,6 +343,8 @@ const JobDetailPage = () => {
         jobPostId={state.jobPostDetail?.id ?? null}
         targetName={state.jobPostDetail?.jobName}
       />
+
+      {AuthModal}
     </>
   );
 };

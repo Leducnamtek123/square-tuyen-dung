@@ -148,13 +148,7 @@
     "smsNotifications": "Enable SMS notifications"
   },
   "status": {
-    "pending": "Pending",
-    "active": "Active",
-    "inactive": "Inactive",
-    "scheduled": "Scheduled",
-    "inProgress": "In Progress",
-    "completed": "Completed",
-    "cancelled": "Cancelled",
+    "loading": "Loading...",
     "searchable": "Searchable",
     "notSearchable": "Not Searchable"
   },
@@ -1432,9 +1426,7 @@
       "recruiterNameRequired": "Recruiter Name Required"
     }
   },
-  "status": {
-    "loading": "Loading...",
-    "searchable": "Searchable",
-    "notSearchable": "Not Searchable"
+  "table": {
+    "rowsPerPage": "Rows per page:"
   }
 }

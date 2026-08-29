@@ -117,7 +117,7 @@ const CareerJobSection = ({
           {career.name}
         </Typography>
       </Stack>
-      <FilterJobPostCard params={{ careerId: career.id }} />
+      <FilterJobPostCard params={{ careerId: career.id }} hideHeader hideIfEmpty />
     </Box>
   );
 };
@@ -304,7 +304,9 @@ export default function HomePage() {
     queryKey: ['home-top-careers'],
     queryFn: async () => {
       const data = await commonService.getTop10Careers();
-      return data.slice(0, 4);
+      return (data || [])
+        .filter((career: Career) => Number(career.jobPostTotal ?? career.job_post_total ?? 0) > 0)
+        .slice(0, 4);
     },
     staleTime: 5 * 60_000,
   });
@@ -408,8 +410,8 @@ export default function HomePage() {
 
   return (
     <Box ref={homeContainerRef}>
-      <Box className="gsap-urgent-jobs" sx={{ mt: { xs: 3, sm: 5, md: 8 } }}>
-        <FilterJobPostCard params={{ isUrgent: true }} />
+      <Box className="gsap-urgent-jobs" sx={{ mt: { xs: 3, sm: 5, md: 7 } }}>
+        <FilterJobPostCard params={{ isUrgent: true }} fallbackToAllIfEmpty hideIfEmpty />
       </Box>
 
       <Box className="gsap-top-companies" sx={{ mt: { xs: 3.5, sm: 5, md: 6 } }}>

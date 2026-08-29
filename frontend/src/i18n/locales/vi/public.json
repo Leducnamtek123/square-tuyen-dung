@@ -14,7 +14,12 @@
     "exploreDescription": "Bắt đầu từ một nơi duy nhất để tìm việc, xem công ty, lọc theo ngành và đi nhanh đến hành động tiếp theo.",
     "startExploring": "Bắt đầu khám phá",
     "userFeedback": "Đánh giá từ người dùng",
-    "userFeedbackSubtitle": "Đánh giá thật từ người dùng giúp trải nghiệm tuyển dụng thêm tin cậy.",
+    "userFeedbackSubtitle": "Đánh giá thật từ đối tác doanh nghiệp và người tìm việc giúp trải nghiệm tuyển dụng thêm tin cậy.",
+    "feedbackAll": "Tất cả",
+    "feedbackEmployers": "Nhà tuyển dụng & Doanh nghiệp",
+    "feedbackCandidates": "Ứng viên tìm việc",
+    "feedbackVerifiedEmployer": "Doanh nghiệp xác thực",
+    "feedbackVerifiedCandidate": "Ứng viên đã có việc",
     "noFeedbacks": "Chưa có người dùng nào đánh giá",
     "noCompaniesFound": "Hiện chưa tìm công ty phù hợp với tiêu chí của bạn",
     "jobsCount": "{{count}} Việc Làm",
@@ -475,5 +480,16 @@
         }
       ]
     }
+  },
+  "authRequired": {
+    "title": "Đăng nhập để tiếp tục",
+    "defaultMsg": "Vui lòng đăng nhập tài khoản để sử dụng đầy đủ các tính năng trên hệ thống.",
+    "saveJobMsg": "Vui lòng đăng nhập tài khoản Ứng viên để lưu tin tuyển dụng và xem lại bất cứ lúc nào.",
+    "applyJobMsg": "Vui lòng đăng nhập tài khoản Ứng viên để nộp hồ sơ trực tiếp đến nhà tuyển dụng.",
+    "followCompanyMsg": "Vui lòng đăng nhập để theo dõi và nhận thông báo việc làm mới nhất từ công ty này.",
+    "loginBtn": "Đăng nhập ngay",
+    "registerPrompt": "Chưa có tài khoản?",
+    "registerBtn": "Đăng ký tài khoản",
+    "closeBtn": "Để sau"
   }
 }

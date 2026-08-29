@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Typography,
@@ -54,6 +54,10 @@ const ContactMessagesPage = () => {
     onSearchChange,
     setPage,
   } = useDataTable({ initialPageSize: 10, initialSorting: [{ id: 'create_at', desc: true }] });
+
+  useEffect(() => {
+    setPage(0);
+  }, [categoryFilter, readFilter, setPage]);
 
   const {
     data,

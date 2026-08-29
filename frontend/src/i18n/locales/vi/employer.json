@@ -26,7 +26,8 @@
       "tooltips": {
         "view": "Xem hồ sơ",
         "delete": "Xóa hồ sơ",
-        "scheduleInterview": "Lên lịch phỏng vấn"
+        "scheduleInterview": "Lên lịch phỏng vấn",
+        "blindDisabled": "Thao tác bị vô hiệu hóa ở chế độ đánh giá ẩn danh"
       },
       "clickToDownload": "Nhấp để tải xuống",
       "candidateName": "Họ và tên Ứng viên",
@@ -263,7 +264,8 @@
     "candidateChart": "BIỂU ĐỒ ỨNG VIÊN",
     "applicationChart": "BIỂU ĐỒ TUYỂN DỤNG & ỨNG TUYỂN",
     "academicChart": "BIỂU ĐỒ TUYỂN DỤNG THEO TRÌNH ĐỘ",
-    "interviewChart": "THỐNG KÊ PHỎNG VẤN"
+    "interviewChart": "THỐNG KÊ PHỎNG VẤN",
+    "recruitmentFunnel": "Phễu tuyển dụng"
   },
   "jobPost": {
     "title": "Quản lý tin tuyển dụng",
@@ -278,9 +280,9 @@
       "views": "Lượt xem",
       "status": "Trạng thái",
       "actions": "Thao tác",
-      "title": "[VI] title",
-      "createdDate": "[VI] createdDate",
-      "creator": "[VI] creator"
+      "title": "Tiêu đề công việc",
+      "createdDate": "Ngày tạo",
+      "creator": "Người tạo"
     },
     "urgent": "Gấp",
     "noData": "Bạn chưa có tin tuyển dụng nào",
@@ -379,7 +381,8 @@
       "tested": "Đã làm bài test",
       "interviewed": "Đã phỏng vấn",
       "notselected": "Không được chọn"
-    }
+    },
+    "tooltip": "Thống kê tuyển dụng trong giai đoạn này"
   },
   "companyForm": {
     "title": {
@@ -1761,8 +1764,8 @@
       "addressPlaceholder": "Số nhà, tên đường, tòa nhà...",
       "website": "Website công ty",
       "websitePlaceholder": "https://company.vn",
-      "selectCityFirst": "[VI] selectCityFirst",
-      "cityFirstHelper": "[VI] cityFirstHelper"
+      "selectCityFirst": "Vui lòng chọn Tỉnh/Thành phố trước",
+      "cityFirstHelper": "Chọn Tỉnh/Thành phố để tải danh sách Quận/Huyện"
     },
     "step2": {
       "title": "Thông tin Đại diện Tuyển dụng",

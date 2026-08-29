@@ -421,7 +421,12 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               size="small"
               value={viewMode}
               exclusive
-              onChange={(_, next) => next && setViewMode(next)}
+              onChange={(_, next) => {
+                if (next) {
+                  setViewMode(next);
+                  onPaginationChange({ pageIndex: 0, pageSize });
+                }
+              }}
               sx={{
                 bgcolor: '#F8FAFC',
                 '& .MuiToggleButton-root': {

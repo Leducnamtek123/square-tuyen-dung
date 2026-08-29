@@ -12,6 +12,7 @@ import CandidateChart from '../../components/employers/charts/CandidateChart';
 import ApplicationChart from '../../components/employers/charts/ApplicationChart';
 import HiringAcademicChart from '../../components/employers/charts/HiringAcademicChart';
 import InterviewStatsChart from '../../components/employers/charts/InterviewStatsChart';
+import RecentApplicationsWidget from '../../components/employers/RecentApplicationsWidget';
 
 const DashboardPage = () => {
   const { t } = useTranslation('employer');
@@ -24,14 +25,20 @@ const DashboardPage = () => {
 
       tl.fromTo(
         ".gsap-emp-kpi",
-        { y: 25, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, clearProps: 'transform' }
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, clearProps: 'transform' }
       )
         .fromTo(
-          ".gsap-emp-hero-chart",
-          { y: 30, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.6, clearProps: 'transform' },
-          "-=0.3"
+          ".gsap-emp-hero-row",
+          { y: 25, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.55, clearProps: 'transform' },
+          "-=0.25"
+        )
+        .fromTo(
+          ".gsap-emp-action-row",
+          { y: 25, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.55, clearProps: 'transform' },
+          "-=0.25"
         )
         .fromTo(
           ".gsap-emp-chart-card",
@@ -44,34 +51,37 @@ const DashboardPage = () => {
             ease: "power2.out",
             clearProps: 'transform',
           },
-          "-=0.3"
+          "-=0.25"
         );
     },
     { scope: containerRef }
   );
 
   return (
-    <Box ref={containerRef} sx={{ width: '100%' }}>
-      <Grid container spacing={3}>
-        {/* KPI Summary Row */}
+    <Box ref={containerRef} sx={{ width: '100%', pb: { xs: 4, sm: 6 } }}>
+      <Grid container spacing={{ xs: 2.5, sm: 3, md: 3.5 }}>
+        {/* ROW 1: KPI Core Metric Summary Cards (4 Columns) */}
         <Grid size={12} className="gsap-emp-kpi">
           <EmployerQuantityStatistics />
         </Grid>
 
-        {/* Hero Chart Row: Recruitment Pipeline Overview (12 Columns) */}
-        <Grid size={12} className="gsap-emp-hero-chart">
+        {/* ROW 2: Hero Bento Grid - Application Trend (7 Cols) & Recruitment Funnel (5 Cols) */}
+        <Grid size={{ xs: 12, lg: 7 }} className="gsap-emp-hero-row">
+          <ApplicationChart title={t('dashboard.applicationChart')} />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 5 }} className="gsap-emp-hero-row">
           <RecruitmentChart title={t('dashboard.recruitmentChart')} />
         </Grid>
 
-        {/* Analytics Row 1: Interviews & Applications (6 / 6 Columns) */}
-        <Grid size={{ xs: 12, md: 6 }} className="gsap-emp-chart-card">
+        {/* ROW 3: Actionable Operations - Recent Applications (7 Cols) & Interview Analytics (5 Cols) */}
+        <Grid size={{ xs: 12, lg: 7 }} className="gsap-emp-action-row">
+          <RecentApplicationsWidget />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 5 }} className="gsap-emp-action-row">
           <InterviewStatsChart title={t('dashboard.interviewChart')} />
         </Grid>
-        <Grid size={{ xs: 12, md: 6 }} className="gsap-emp-chart-card">
-          <ApplicationChart title={t('dashboard.applicationChart')} />
-        </Grid>
 
-        {/* Analytics Row 2: Candidate Demographics & Academic Level (6 / 6 Columns) */}
+        {/* ROW 4: Demographics & Candidate Growth (6 / 6 Columns) */}
         <Grid size={{ xs: 12, md: 6 }} className="gsap-emp-chart-card">
           <CandidateChart title={t('dashboard.candidateChart')} />
         </Grid>

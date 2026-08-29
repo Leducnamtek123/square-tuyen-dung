@@ -13,8 +13,13 @@
     "exploreHeading": "Need to find the right job for you?",
     "exploreDescription": "Start from one place to search jobs, view companies, filter by industry, and move quickly to your next step.",
     "startExploring": "Start exploring",
-    "userFeedback": "User Feedback",
-    "userFeedbackSubtitle": "Real user feedback adds more trust to the recruitment experience.",
+    "userFeedback": "User & Partner Feedback",
+    "userFeedbackSubtitle": "Real feedback from enterprise partners and job seekers adds more trust to the recruitment experience.",
+    "feedbackAll": "All",
+    "feedbackEmployers": "Employers & Enterprise",
+    "feedbackCandidates": "Job Seekers",
+    "feedbackVerifiedEmployer": "Verified Employer",
+    "feedbackVerifiedCandidate": "Hired Candidate",
     "noFeedbacks": "No user reviews yet",
     "noCompaniesFound": "No companies match your criteria",
     "jobsCount": "{{count}} Jobs",
@@ -475,5 +480,16 @@
         }
       ]
     }
+  },
+  "authRequired": {
+    "title": "Sign in to continue",
+    "defaultMsg": "Please sign in to access all platform features.",
+    "saveJobMsg": "Please sign in to your Candidate account to save this job post and review it anytime.",
+    "applyJobMsg": "Please sign in to your Candidate account to submit your application directly to the employer.",
+    "followCompanyMsg": "Please sign in to follow and receive job updates from this company.",
+    "loginBtn": "Sign in now",
+    "registerPrompt": "Don't have an account?",
+    "registerBtn": "Create an account",
+    "closeBtn": "Maybe later"
   }
 }

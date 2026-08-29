@@ -17,6 +17,7 @@ import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
 import { APP_NAME } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import CandidateCompletenessBannerCard from '../CandidateDashboardMain/CandidateCompletenessBannerCard';
@@ -52,6 +53,13 @@ const CandidateSidebar = ({ completenessPercent }: CandidateSidebarProps) => {
     switch (key) {
       case 'profile':
         return cleanPathname.includes('/profile') || cleanPathname.includes('/ho-so');
+      case 'cv-templates':
+        return (
+          cleanPathname.includes('/trang-tri-cv') ||
+          cleanPathname.includes('/danh-sach-mau-cv') ||
+          cleanPathname.includes('/cv-templates') ||
+          cleanPathname.includes('/mau-cv')
+        );
       case 'my-jobs':
         return cleanPathname.includes('/my-jobs') || cleanPathname.includes('/viec-lam');
       case 'my-interviews':
@@ -80,6 +88,12 @@ const CandidateSidebar = ({ completenessPercent }: CandidateSidebarProps) => {
       label: 'Hồ sơ của tôi',
       icon: <BadgeOutlinedIcon />,
       rawPath: '/profile',
+    },
+    {
+      key: 'cv-templates',
+      label: 'Trang trí CV',
+      icon: <AutoFixHighOutlinedIcon />,
+      rawPath: '/ung-vien/trang-tri-cv',
     },
     {
       key: 'my-jobs',

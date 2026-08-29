@@ -33,11 +33,19 @@ export default function TablePagination({
   onPageSizeChange,
 }: TablePaginationProps) {
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-  const fromIndex = totalCount === 0 ? 0 : (page - 1) * pageSize + 1;
-  const toIndex = Math.min(page * pageSize, totalCount);
+  const safePage = Math.min(Math.max(1, page), totalPages);
+  const fromIndex = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const toIndex = Math.min(safePage * pageSize, totalCount);
 
-  const canGoPrev = page > 1;
-  const canGoNext = page < totalPages;
+  // Auto-correct page if current page is out of bounds
+  React.useEffect(() => {
+    if (totalCount > 0 && page > totalPages) {
+      onPageChange(totalPages);
+    }
+  }, [page, totalPages, totalCount, onPageChange]);
+
+  const canGoPrev = safePage > 1;
+  const canGoNext = safePage < totalPages;
 
   return (
     <Box
@@ -127,7 +135,7 @@ export default function TablePagination({
         </IconButton>
         <IconButton
           size="medium"
-          onClick={() => onPageChange(page - 1)}
+          onClick={() => onPageChange(safePage - 1)}
           disabled={!canGoPrev}
           sx={{ color: '#64748B', borderRadius: 1.5, minWidth: 36, minHeight: 36 }}
           title="Trang trước"
@@ -138,13 +146,13 @@ export default function TablePagination({
 
         <Box sx={{ px: 1.5, py: 0.5, bgcolor: '#F8FAFC', borderRadius: 1.5, border: '1px solid #E2E8F0', minWidth: 48, textAlign: 'center' }}>
           <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.8125rem', color: '#1E293B' }}>
-            {page} / {totalPages}
+            {safePage} / {totalPages}
           </Typography>
         </Box>
 
         <IconButton
           size="medium"
-          onClick={() => onPageChange(page + 1)}
+          onClick={() => onPageChange(safePage + 1)}
           disabled={!canGoNext}
           sx={{ color: '#64748B', borderRadius: 1.5, minWidth: 36, minHeight: 36 }}
           title="Trang sau"

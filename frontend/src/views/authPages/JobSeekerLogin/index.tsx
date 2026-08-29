@@ -73,8 +73,12 @@ const JobSeekerLogin = () => {
 
   const navigateHome = async () => {
     const user = await dispatch(getUserInfo()).unwrap();
+    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const redirectUrl = params?.get('redirect') || params?.get('redirect_url');
     if (user?.isOnboarded === false) {
       push('/onboarding/candidate');
+    } else if (redirectUrl && redirectUrl.startsWith('/')) {
+      push(redirectUrl);
     } else {
       push('/');
     }

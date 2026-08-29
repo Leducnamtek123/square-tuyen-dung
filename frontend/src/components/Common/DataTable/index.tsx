@@ -96,8 +96,19 @@ const DataTable = <TData,>({
     
     // Resolve props for backward compatibility
     const finalCount = rowCount ?? count;
-    const finalPageIndex = pagination?.pageIndex ?? page;
+    const rawPageIndex = pagination?.pageIndex ?? page;
     const finalPageSize = pagination?.pageSize ?? rowsPerPage;
+    const maxPageIndex = finalCount > 0 ? Math.max(0, Math.ceil(finalCount / finalPageSize) - 1) : 0;
+    const finalPageIndex = Math.min(Math.max(0, rawPageIndex), maxPageIndex);
+
+    // Auto-adjust pagination state if page index is out of bounds
+    React.useEffect(() => {
+        if (finalCount > 0 && rawPageIndex > maxPageIndex) {
+            if (onPaginationChange && pagination) {
+                onPaginationChange({ ...pagination, pageIndex: maxPageIndex });
+            }
+        }
+    }, [finalCount, rawPageIndex, maxPageIndex, onPaginationChange, pagination]);
 
     const handlePageChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         if (onPaginationChange && pagination) {

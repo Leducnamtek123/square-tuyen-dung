@@ -42,16 +42,20 @@ const unwrapResponse = (response: { data?: unknown }): unknown => {
 };
 
 const requestPresign = async (url: string): Promise<string | null> => {
-  const accessToken = tokenService.getAccessTokenFromCookie();
-  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
-  const response = await axios.get(`${getBaseUrl()}common/presign/`, {
-    params: { url },
-    headers,
-    withCredentials: true,
-    timeout: PRESIGN_REQUEST_TIMEOUT_MS,
-  });
-  const data = unwrapResponse(response) as { url?: string } | null;
-  return data?.url || null;
+  try {
+    const accessToken = tokenService.getAccessTokenFromCookie();
+    const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+    const response = await axios.get(`${getBaseUrl()}common/presign/`, {
+      params: { url },
+      headers,
+      withCredentials: true,
+      timeout: PRESIGN_REQUEST_TIMEOUT_MS,
+    });
+    const data = unwrapResponse(response) as { url?: string } | null;
+    return data?.url || null;
+  } catch {
+    return null;
+  }
 };
 
 export const ensurePresignedUrl = async (

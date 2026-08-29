@@ -100,16 +100,21 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       cell: (info) => (
         <Box sx={{ py: 0.5 }}>
           {(() => {
-            const resumeType = info.row.original.type || info.row.original.resume?.type;
+            const fullNameVal = String(info.getValue() ?? '');
+            const isAnonymized = blindMode || fullNameVal.startsWith('Candidate #');
             const resumeTitle = info.row.original.title || info.row.original.resume?.title;
             const isManualCandidate = Boolean(info.row.original.isManualCandidate);
             // File URL for attached CV download
             const cvFileUrl = info.row.original.resumeFileUrl || info.row.original.resume?.fileUrl || '';
             const safeCvFileUrl = getSafeResourceUrl(cvFileUrl);
+            const displayTitle = isAnonymized
+              ? (isManualCandidate ? 'Hồ sơ thủ công ẩn danh' : 'Hồ sơ ứng viên ẩn danh')
+              : (resumeTitle || '---');
+
             return (
               <>
                 <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'text.primary', mb: 0.75 }}>
-                  {String(info.getValue() ?? '')}
+                  {fullNameVal}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   {isManualCandidate && (
@@ -119,7 +124,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                       sx={{ height: 22, fontSize: '0.68rem', fontWeight: 900 }}
                     />
                   )}
-                  {safeCvFileUrl && (
+                  {!isAnonymized && safeCvFileUrl && (
                     <Tooltip title={t('appliedResume.table.clickToDownload')} arrow>
                       <IconButton aria-label="Thao tác"
                         size="small"
@@ -140,7 +145,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                     </Tooltip>
                   )}
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                    {resumeTitle || '---'}
+                    {displayTitle}
                   </Typography>
                 </Box>
               </>
@@ -207,42 +212,46 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       cell: (info) => (
         <Stack direction="row" spacing={1} justifyContent="flex-end" alignItems="center">
           {(() => {
+            const isAnonymized = blindMode || String(info.row.original.fullName ?? '').startsWith('Candidate #');
             const detailSlug = info.row.original.resumeSlug || info.row.original.resume?.slug || '';
-            const detailHref = detailSlug
+            const detailHref = detailSlug && !isAnonymized
               ? localizeRoutePath(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, detailSlug)}`, i18n.language)
               : undefined;
             return (
-          <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
-            <span>
-              <IconButton aria-label="Xem chi tiết"
-                color="primary"
-                size="small"
-                disabled={blindMode || !detailSlug}
-                onClick={() => {
-                  if (blindMode || !detailHref) return;
-                  push(detailHref);
-                }}
-                sx={{ 
-                  bgcolor: pc.primary( 0.06),
-                  
-                  '&:hover': { bgcolor: pc.primary( 0.12) }
-                }}
-              >
-                <RemoveRedEyeIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
+              <Tooltip title={isAnonymized ? t('appliedResume.table.tooltips.blindDisabled', { defaultValue: 'Hồ sơ đang ở chế độ ẩn danh' }) : t('appliedResume.table.tooltips.view')} arrow>
+                <span>
+                  <IconButton aria-label="Xem chi tiết"
+                    color="primary"
+                    size="small"
+                    disabled={isAnonymized || !detailSlug}
+                    onClick={() => {
+                      if (isAnonymized || !detailHref) return;
+                      push(detailHref);
+                    }}
+                    sx={{ 
+                      bgcolor: pc.primary( 0.06),
+                      '&:hover': { bgcolor: pc.primary( 0.12) }
+                    }}
+                  >
+                    <RemoveRedEyeIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
             );
           })()}
           
-          {!blindMode && (
-            <SendEmailComponent
-              jobPostActivityId={String(info.row.original.id)}
-              isSentEmail={info.row.original.isSentEmail || false}
-              email={info.row.original.email || ''}
-              fullName={info.row.original.fullName || ''}
-            />
-          )}
+          {(() => {
+            const isAnonymized = blindMode || String(info.row.original.fullName ?? '').startsWith('Candidate #');
+            if (isAnonymized) return null;
+            return (
+              <SendEmailComponent
+                jobPostActivityId={String(info.row.original.id)}
+                isSentEmail={info.row.original.isSentEmail || false}
+                email={info.row.original.email || ''}
+                fullName={info.row.original.fullName || ''}
+              />
+            );
+          })()}
 
           {!blindMode && info.row.original.hrmEmployeeId ? (
             <Tooltip title={t('employees.hrm.convert.openEmployee')} arrow>

@@ -1,0 +1,367 @@
+'use client';
+
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import {
+  Box,
+  Paper,
+  Typography,
+  Button,
+  IconButton,
+  Stack,
+  Chip,
+  CircularProgress,
+  Tooltip,
+} from '@mui/material';
+import PictureAsPdfOutlinedIcon from '@mui/icons-material/PictureAsPdfOutlined';
+import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+import cvBuilderService from '@/services/cvBuilderService';
+import { PublicCVRecord, CVData } from '@/types/cvBuilder';
+import { CVTemplateRenderer } from '../templates/CVTemplateRenderer';
+import { printCVToPDF } from '../CVEditorPage/utils/pdfExport';
+import { TabTitle } from '@/utils/generalFunction';
+import toastMessages from '@/utils/toastMessages';
+
+export const PublicCVPage: React.FC = () => {
+  const params = useParams();
+  const router = useRouter();
+  const slug = String(params?.slug || '');
+  const [cvLanguage, setCvLanguage] = React.useState<'vi' | 'en'>('vi');
+
+  const {
+    data: cvRecord,
+    isLoading,
+    isError,
+  } = useQuery<PublicCVRecord>({
+    queryKey: ['public-cv', slug],
+    queryFn: () => cvBuilderService.getPublicCV(slug),
+    enabled: Boolean(slug),
+    retry: 1,
+  });
+
+  TabTitle(
+    cvRecord
+      ? `${cvRecord.title} - ${cvRecord.candidate_name || 'Hồ sơ Ứng viên'} | InfoHR Tuyển Dụng`
+      : 'Hồ Sơ CV Trực Tuyến | InfoHR Tuyển Dụng'
+  );
+
+  const handleDownloadPDF = () => {
+    if (!cvRecord) return;
+    const docTitle = `CV_${(cvRecord.candidate_name || 'Ung_Vien').replace(/\s+/g, '_')}`;
+    printCVToPDF('cv-print-area', docTitle);
+    toastMessages.success('Đang chuẩn bị in bản CV PDF A4 chất lượng cao...');
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toastMessages.success('Đã sao chép liên kết CV vào clipboard!');
+  };
+
+  if (isLoading) {
+    return (
+      <Box sx={{ minHeight: '100vh', bgcolor: '#f1f5f9', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+        <CircularProgress size={36} sx={{ color: '#2563eb' }} />
+        <Typography variant="body2" sx={{ fontWeight: 700, color: '#475569' }}>
+          Đang tải hồ sơ CV trực tuyến...
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (isError || !cvRecord) {
+    return (
+      <Box sx={{ minHeight: '100vh', bgcolor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', p: 3 }}>
+        <Paper elevation={0} sx={{ p: 5, borderRadius: '20px', border: '1px solid #e2e8f0', bgcolor: '#ffffff', textAlign: 'center', maxWidth: 450 }}>
+          <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', mb: 1 }}>
+            CV không tồn tại hoặc đã ẩn
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.825rem', mb: 3 }}>
+            Liên kết này có thể đã hết hạn, bị ứng viên đặt ở chế độ riêng tư hoặc đường dẫn không chính xác.
+          </Typography>
+          <Button
+            component={Link}
+            href="/"
+            variant="contained"
+            startIcon={<ArrowBackIcon />}
+            sx={{
+              borderRadius: '10px',
+              bgcolor: '#1e40af',
+              color: '#ffffff',
+              fontWeight: 700,
+              textTransform: 'none',
+              px: 3,
+              py: 1,
+              '&:hover': { bgcolor: '#1d4ed8' },
+            }}
+          >
+            Về Trang chủ Tuyển dụng
+          </Button>
+        </Paper>
+      </Box>
+    );
+  }
+
+  const cvData: CVData = {
+    ...cvRecord.cv_data,
+    templateId: cvRecord.template_code  return (
+    <Box
+      sx={{
+        minHeight: '100vh',
+        bgcolor: '#e2e8f0',
+        display: 'flex',
+        flexDirection: 'column',
+        '@media print': {
+          height: 'auto !important',
+          minHeight: '100% !important',
+          bgcolor: '#ffffff !important',
+          overflow: 'visible !important',
+        },
+      }}
+    >
+      {/* ── Top Recruiter Action Bar ─────────────────────────────────────── */}
+      <Paper
+        elevation={0}
+        className="no-print"
+        sx={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 40,
+          bgcolor: '#ffffff',
+          borderBottom: '1px solid #cbd5e1',
+          px: { xs: 2, sm: 4 },
+          py: 1.5,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 2,
+          '@media print': {
+            display: 'none !important',
+          },
+        }}
+      >
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Box sx={{ width: 32, height: 32, borderRadius: '8px', bgcolor: '#1e40af', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.8rem' }}>
+              HR
+            </Box>
+            <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0f172a', display: { xs: 'none', sm: 'block' } }}>
+              InfoHR
+            </Typography>
+          </Link>
+
+          <Box sx={{ width: '1px', height: 24, bgcolor: '#e2e8f0' }} />
+
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.9rem' }}>
+              {cvRecord.title}
+            </Typography>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <CheckCircleOutlineIcon sx={{ fontSize: 14, color: '#16a34a' }} />
+              <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.725rem' }}>
+                Hồ sơ ứng viên xác thực • Cập nhật {new Date(cvRecord.update_at).toLocaleDateString('vi-VN')}
+              </Typography>
+            </Stack>
+          </Box>
+        </Stack>
+
+        {/* Action Buttons */}
+        <Stack direction="row" spacing={1.25} alignItems="center">
+          {cvData.personalInfo?.email && (
+            <Button
+              component="a"
+              href={`mailto:${cvData.personalInfo.email}`}
+              size="small"
+              variant="outlined"
+              startIcon={<MailOutlineIcon sx={{ fontSize: 16 }} />}
+              sx={{
+                borderRadius: '8px',
+                borderColor: '#cbd5e1',
+                color: '#334155',
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                textTransform: 'none',
+                display: { xs: 'none', sm: 'inline-flex' },
+                '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' },
+              }}
+            >
+              Email
+            </Button>
+          )}
+
+          {cvData.personalInfo?.phoneNumber && (
+            <Button
+              component="a"
+              href={`tel:${cvData.personalInfo.phoneNumber}`}
+              size="small"
+              variant="outlined"
+              startIcon={<PhoneOutlinedIcon sx={{ fontSize: 16 }} />}
+              sx={{
+                borderRadius: '8px',
+                borderColor: '#cbd5e1',
+                color: '#334155',
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                textTransform: 'none',
+                display: { xs: 'none', sm: 'inline-flex' },
+                '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' },
+              }}
+            >
+              Gọi điện
+            </Button>
+          )}
+
+          {/* Language Switcher Pill */}
+          <Stack
+            direction="row"
+            spacing={0.5}
+            sx={{ bgcolor: '#f1f5f9', p: 0.35, borderRadius: '8px', border: '1px solid #e2e8f0' }}
+          >
+            <Button
+              size="small"
+              onClick={() => setCvLanguage('vi')}
+              sx={{
+                py: 0.25,
+                px: 1.25,
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                textTransform: 'none',
+                minWidth: 0,
+                borderRadius: '6px',
+                ...(cvLanguage === 'vi'
+                  ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }
+                  : { color: '#64748b' }),
+              }}
+            >
+              🇻🇳 Việt
+            </Button>
+            <Button
+              size="small"
+              onClick={() => setCvLanguage('en')}
+              sx={{
+                py: 0.25,
+                px: 1.25,
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                textTransform: 'none',
+                minWidth: 0,
+                borderRadius: '6px',
+                ...(cvLanguage === 'en'
+                  ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }
+                  : { color: '#64748b' }),
+              }}
+            >
+              🇬🇧 Anh
+            </Button>
+          </Stack>
+
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={handleCopyLink}
+            startIcon={<ShareOutlinedIcon sx={{ fontSize: 16 }} />}
+            sx={{
+              borderRadius: '8px',
+              borderColor: '#cbd5e1',
+              color: '#334155',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              textTransform: 'none',
+              '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' },
+            }}
+          >
+            Chia sẻ
+          </Button>
+
+          <Button
+            size="small"
+            variant="contained"
+            onClick={handleDownloadPDF}
+            startIcon={<PictureAsPdfOutlinedIcon sx={{ fontSize: 16 }} />}
+            sx={{
+              borderRadius: '8px',
+              bgcolor: '#1e40af',
+              color: '#ffffff',
+              fontWeight: 800,
+              fontSize: '0.75rem',
+              textTransform: 'none',
+              px: 2,
+              py: 0.7,
+              boxShadow: '0 2px 8px rgba(30, 64, 175, 0.25)',
+              '&:hover': { bgcolor: '#1d4ed8' },
+            }}
+          >
+            Tải PDF A4
+          </Button>
+        </Stack>
+      </Paper>
+
+      {/* ── Main CV Sheet Render Area ────────────────────────────────────── */}
+      <Box
+        className="cv-preview-viewport"
+        sx={{
+          flex: 1,
+          p: { xs: 2, sm: 4 },
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          overflowY: 'auto',
+          '@media print': {
+            p: '0 !important',
+            overflow: 'visible !important',
+            display: 'block !important',
+            height: 'auto !important',
+          },
+        }}
+      >
+        <Box
+          className="cv-zoom-wrapper"
+          sx={{
+            width: '210mm',
+            minHeight: '297mm',
+            boxShadow: '0 20px 45px rgba(0, 0, 0, 0.15)',
+            borderRadius: '4px',
+            overflow: 'hidden',
+            bgcolor: '#ffffff',
+            mb: 4,
+            '@media print': {
+              boxShadow: 'none !important',
+              borderRadius: '0 !important',
+              mb: '0 !important',
+              width: '210mm !important',
+              minHeight: '297mm !important',
+              overflow: 'visible !important',
+              bgcolor: '#ffffff !important',
+            },
+          }}
+        >
+          <div id="cv-print-area" className="cv-print-target" style={{ width: '100%', background: '#ffffff' }}>
+            <CVTemplateRenderer data={cvData} language={cvLanguage} />
+          </div>
+        </Box>
+      </Box>
+
+      {/* ── Footer ─────────────────────────────────────────────────────── */}
+      <Box className="no-print" sx={{ py: 2, textAlign: 'center', bgcolor: '#ffffff', borderTop: '1px solid #cbd5e1', '@media print': { display: 'none !important' } }}>
+        <Typography variant="caption" sx={{ color: '#64748b' }}>
+          Được tạo và bảo đảm bởi <strong>InfoHR Tuyển Dụng</strong> • Nền tảng tuyển dụng thông minh hàng đầu Việt Nam
+        </Typography>
+      </Box>
+    </Box>
+  );
+};��─────────────────────────── */}
+      <Box sx={{ py: 2, textAlign: 'center', bgcolor: '#ffffff', borderTop: '1px solid #cbd5e1' }}>
+        <Typography variant="caption" sx={{ color: '#64748b' }}>
+          Được tạo và bảo đảm bởi <strong>InfoHR Tuyển Dụng</strong> • Nền tảng tuyển dụng thông minh hàng đầu Việt Nam
+        </Typography>
+      </Box>
+    </Box>
+  );
+};

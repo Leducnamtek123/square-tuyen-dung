@@ -581,10 +581,10 @@ const NewsContent = () => {
           }}
         >
           <Box>
-            <Typography variant="h5" fontWeight={800} sx={{ mb: 0.5 }}>
+            <Typography variant="h5" fontWeight={800} sx={{ color: '#ffffff', mb: 0.5 }}>
               Khám phá 10.000+ việc làm đang tuyển dụng
             </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.80)' }}>
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)' }}>
               Ứng tuyển nhanh chóng, kết nối trực tiếp với nhà tuyển dụng hàng đầu.
             </Typography>
           </Box>

@@ -23,6 +23,7 @@ import CompanyHeader from "./CompanyHeader";
 import CompanyAbout from "./CompanyAbout";
 import CompanySidebar from "./CompanySidebar";
 import { useConfig } from '@/hooks/useConfig';
+import useRequireAuth from '@/hooks/useRequireAuth';
 import { Theme } from "@mui/material/styles";
 import type { CompanyDetailProps } from './types';
 
@@ -31,6 +32,7 @@ const CompanyDetailPage = () => {
   const { slug } = useParams();
   const { allConfig } = useConfig();
   const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
+  const { requireAuth, AuthModal } = useRequireAuth();
 
   const [openSharePopup, setOpenSharePopup] = React.useState(false);
   const [openReportPopup, setOpenReportPopup] = React.useState(false);
@@ -111,14 +113,20 @@ const CompanyDetailPage = () => {
   });
 
   const handleFollow = () => {
+    if (!requireAuth({ actionType: 'follow_company' })) return;
     if (slug) followMutation.mutate(slug as string);
+  };
+
+  const handleOpenReport = () => {
+    if (!requireAuth({ actionType: 'report', title: 'Báo cáo doanh nghiệp', message: 'Vui lòng đăng nhập để gửi báo cáo về công ty này.' })) return;
+    setOpenReportPopup(true);
   };
 
   return isLoading ? <CompanyDetailLoading /> : companyDetail === null ? <NoDataCard /> : (
     <>
       <Box sx={{ mt: 2 }}>
         <Stack spacing={2}>
-          <CompanyHeader companyDetail={companyDetail} allConfig={allConfig} isAuthenticated={isAuthenticated} currentUser={currentUser} isLoadingFollow={followMutation.isPending} handleFollow={handleFollow} setOpenSharePopup={setOpenSharePopup} setOpenReportPopup={setOpenReportPopup} t={t} />
+          <CompanyHeader companyDetail={companyDetail} allConfig={allConfig} isAuthenticated={isAuthenticated} currentUser={currentUser} isLoadingFollow={followMutation.isPending} handleFollow={handleFollow} setOpenSharePopup={setOpenSharePopup} setOpenReportPopup={handleOpenReport} t={t} />
           <Box>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 8 }}>
@@ -161,6 +169,8 @@ const CompanyDetailPage = () => {
         companyId={companyDetail.id}
         targetName={companyDetail.companyName}
       />
+
+      {AuthModal}
     </>
   );
 };

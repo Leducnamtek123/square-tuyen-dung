@@ -92,6 +92,10 @@ const FeedbacksPage = () => {
     setPage,
   } = useDataTable({ initialPageSize: 10, initialSorting: [{ id: 'create_at', desc: true }] });
 
+  useEffect(() => {
+    setPage(0);
+  }, [userFilter, statusFilter, evidenceFilter, ratingFilter, setPage]);
+
   const {
     data,
     isLoading,

@@ -33,6 +33,13 @@ const JobPostNotificationCard = () => {
   const { data, isLoading } = useJobPostNotifications({ page, pageSize });
   const jobPostNotifications: JobPostNotification[] = (data?.results || []);
   const count = data?.count || 0;
+  const totalPages = Math.max(1, Math.ceil(count / pageSize));
+
+  React.useEffect(() => {
+    if (count > 0 && page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [count, page, totalPages]);
 
   const { addMutation, updateMutation, deleteMutation } = useJobPostNotificationMutations();
 
@@ -184,15 +191,15 @@ const JobPostNotificationCard = () => {
               </Stack>
               <Box>
                 <Stack>
-                  {Math.ceil(count / pageSize) > 1 && (
+                  {totalPages > 1 && (
                     <Pagination
                       siblingCount={0}
                       color="primary"
                       size="medium"
                       variant="text"
                       sx={{ margin: "0 auto", mt: 5 }}
-                      count={Math.ceil(count / pageSize)}
-                      page={page}
+                      count={totalPages}
+                      page={Math.min(page, totalPages)}
                       onChange={handleChangePage}
                     />
                   )}

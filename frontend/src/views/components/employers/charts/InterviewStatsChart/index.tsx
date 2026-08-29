@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
-  Divider,
   Stack,
   Tooltip as MuiTooltip,
   Typography,
@@ -16,6 +15,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import TimerIcon from '@mui/icons-material/Timer';
+import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import dayjs, { Dayjs } from 'dayjs';
 import BarChartClient from '@/components/Common/Charts/BarChartClient';
 import {
@@ -38,10 +38,10 @@ interface InterviewStatsChartProps {
 const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
   const { t, i18n } = useTranslation('employer');
   const theme = useTheme();
-  const options = React.useMemo(() => createCartesianOptions(theme, { stacked: true, language: i18n.language }), [i18n.language, theme]);
+  const options = React.useMemo(() => createCartesianOptions(theme, { stacked: true, language: i18n.language, displayLegend: true }), [i18n.language, theme]);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[Dayjs | null, Dayjs | null]>([
-    dayjs().subtract(6, 'month'),
+    dayjs().subtract(1, 'month'),
     dayjs(),
   ]);
 
@@ -128,68 +128,86 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
     <Paper elevation={0} sx={chartCardSx}>
       <Box>
         {/* Title row */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1.5}>
-          <Typography variant="h4" sx={chartTitleSx}>
-            {title}
-          </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+          <Stack direction="row" spacing={1.25} alignItems="center">
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 36,
+                height: 36,
+                borderRadius: '10px',
+                bgcolor: '#ECFDF5',
+                color: '#10B981',
+              }}
+            >
+              <VideocamOutlinedIcon sx={{ fontSize: 20 }} />
+            </Box>
+            <Box>
+              <Typography variant="h4" sx={chartTitleSx}>
+                {title}
+              </Typography>
+              <Typography sx={{ fontSize: '0.78rem', color: '#94A3B8' }}>
+                Thống kê kết quả và thời lượng các buổi phỏng vấn
+              </Typography>
+            </Box>
+          </Stack>
+
           <MuiTooltip title={t('interviewChart.tooltip')} arrow placement="top">
             <InfoIcon sx={{ color: '#98A2B3', cursor: 'pointer', fontSize: 18, '&:hover': { color: '#2563EB' } }} />
           </MuiTooltip>
-        </Stack>
+        </Box>
 
         {/* Summary chips */}
         {data && !isLoading && (
-          <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap mb={2}>
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap mb={2}>
             <Chip
-              icon={<CheckCircleIcon sx={{ fontSize: 16 }} />}
-              label={`${t('interviewChart.passed')}: ${data.passedCount}`}
+              icon={<CheckCircleIcon sx={{ fontSize: '14px !important', color: '#059669 !important' }} />}
+              label={`${t('interviewChart.passed')}: ${data.passedCount || 0}`}
               size="small"
               sx={{
                 fontWeight: 700,
-                fontSize: '12px',
-                bgcolor: alpha('#00c853', 0.08),
-                color: '#00c853',
-                border: '1px solid',
-                borderColor: alpha('#00c853', 0.2),
+                fontSize: '11.5px',
+                bgcolor: '#DCFCE7',
+                color: '#166534',
+                border: '1px solid #BBF7D0',
               }}
             />
             <Chip
-              icon={<CancelIcon sx={{ fontSize: 16 }} />}
-              label={`${t('interviewChart.failed')}: ${data.failedCount}`}
+              icon={<CancelIcon sx={{ fontSize: '14px !important', color: '#DC2626 !important' }} />}
+              label={`${t('interviewChart.failed')}: ${data.failedCount || 0}`}
               size="small"
               sx={{
                 fontWeight: 700,
-                fontSize: '12px',
-                bgcolor: alpha('#ff5630', 0.08),
-                color: '#ff5630',
-                border: '1px solid',
-                borderColor: alpha('#ff5630', 0.2),
+                fontSize: '11.5px',
+                bgcolor: '#FEE2E2',
+                color: '#991B1B',
+                border: '1px solid #FECACA',
               }}
             />
             <Chip
-              icon={<HourglassEmptyIcon sx={{ fontSize: 16 }} />}
-              label={`${t('interviewChart.pending')}: ${data.pendingCount}`}
+              icon={<HourglassEmptyIcon sx={{ fontSize: '14px !important', color: '#D97706 !important' }} />}
+              label={`${t('interviewChart.pending')}: ${data.pendingCount || 0}`}
               size="small"
               sx={{
                 fontWeight: 700,
-                fontSize: '12px',
-                bgcolor: alpha('#ffab00', 0.08),
-                color: '#b78103',
-                border: '1px solid',
-                borderColor: alpha('#ffab00', 0.2),
+                fontSize: '11.5px',
+                bgcolor: '#FEF3C7',
+                color: '#92400E',
+                border: '1px solid #FDE68A',
               }}
             />
             <Chip
-              icon={<TimerIcon sx={{ fontSize: 16 }} />}
-              label={`${t('interviewChart.avgDuration')}: ${formatDuration(data.avgDurationSeconds)}`}
+              icon={<TimerIcon sx={{ fontSize: '14px !important', color: '#2563EB !important' }} />}
+              label={`${t('interviewChart.avgDuration')}: ${formatDuration(data.avgDurationSeconds || 0)}`}
               size="small"
               sx={{
                 fontWeight: 700,
-                fontSize: '12px',
-                bgcolor: alpha('#2979ff', 0.08),
-                color: '#2979ff',
-                border: '1px solid',
-                borderColor: alpha('#2979ff', 0.2),
+                fontSize: '11.5px',
+                bgcolor: '#EFF6FF',
+                color: '#1E40AF',
+                border: '1px solid #BFDBFE',
               }}
             />
           </Stack>
@@ -201,12 +219,10 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
           setAllowSubmit={setAllowSubmit}
           selectedDateRange={selectedDateRange}
           setSelectedDateRange={setSelectedDateRange}
-          maxRangeMonths={6}
-          resetRangeMonths={6}
         />
 
         {/* Chart Canvas */}
-        <Box sx={chartAreaSx(320)}>
+        <Box sx={chartAreaSx(260)}>
           {isLoading ? (
             <ChartLoadingState height="100%" label={t('interviewChart.loading')} />
           ) : !hasChartData ? (

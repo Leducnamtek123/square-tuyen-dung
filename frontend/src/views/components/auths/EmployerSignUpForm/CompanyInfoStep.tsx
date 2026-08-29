@@ -4,7 +4,6 @@ import { Grid2 as Grid } from "@mui/material";
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
-import TextFieldAutoCompleteCustom from '../../../../components/Common/Controls/TextFieldAutoCompleteCustom';
 import { DATE_OPTIONS } from '../../../../configs/constants';
 import { useWatch, type Control } from 'react-hook-form';
 import type { TFunction } from 'i18next';
@@ -25,14 +24,26 @@ interface CompanyInfoStepProps {
   onLocationChange?: (val: LocationValue) => void;
 }
 
+const inputStyle = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '12px',
+    backgroundColor: '#F8FAFC',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      backgroundColor: '#F1F5F9',
+    },
+    '&.Mui-focused': {
+      backgroundColor: '#FFFFFF',
+    },
+  },
+};
+
 const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
   control,
   t,
   show,
   allConfig,
   districtOptions,
-  locationOptions,
-  handleSelectLocation,
   locationValue,
   onLocationChange,
 }) => {
@@ -48,12 +59,7 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             title={t('form.companyName')}
             placeholder={t('form.companyNamePlaceholder')}
             showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
@@ -63,12 +69,7 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             title={t('form.companyEmail')}
             placeholder={t('form.companyEmailPlaceholder')}
             showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 6, lg: 6, xl: 6 }}>
@@ -78,12 +79,7 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             title={t('form.companyPhone')}
             placeholder={t('form.companyPhonePlaceholder')}
             showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 6, lg: 6, xl: 6 }}>
@@ -93,12 +89,7 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             title={t('form.taxCode')}
             placeholder={t('form.taxCodePlaceholder')}
             showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 4, lg: 4, xl: 4 }}>
@@ -107,12 +98,7 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             control={control}
             title={t('form.foundedDate')}
             maxDate={DATE_OPTIONS.today()}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 8, lg: 8, xl: 8 }}>
@@ -121,12 +107,7 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             control={control}
             title={t('form.fieldOperation')}
             placeholder={t('form.fieldOperationPlaceholder')}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 4, lg: 4, xl: 4 }}>
@@ -137,12 +118,7 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             title={t('form.employeeSize')}
             placeholder={t('form.employeeSizePlaceholder')}
             showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 8, lg: 8, xl: 8 }}>
@@ -151,12 +127,7 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             control={control}
             title={t('form.website')}
             placeholder={t('form.websitePlaceholder')}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 8, lg: 8, xl: 8 }}>
@@ -167,12 +138,7 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             title={t('form.city')}
             placeholder={t('form.cityPlaceholder')}
             showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 4, lg: 4, xl: 4 }}>
@@ -185,12 +151,7 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             title={t('form.district')}
             placeholder={t('form.districtPlaceholder')}
             showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
@@ -201,12 +162,7 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             placeholder={t('form.addressPlaceholder')}
             control={control}
             helperText={t('form.addressHelper')}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
         {show && (

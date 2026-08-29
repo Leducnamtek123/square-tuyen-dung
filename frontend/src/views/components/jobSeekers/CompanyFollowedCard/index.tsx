@@ -27,6 +27,13 @@ const CompanyFollowedCard = () => {
   const { data, isLoading } = useCompaniesFollowed({ pageSize, page });
   const companies = data?.results || [];
   const count = data?.count || 0;
+  const totalPages = Math.max(1, Math.ceil(count / pageSize));
+
+  React.useEffect(() => {
+    if (count > 0 && page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [count, page, totalPages]);
 
   const toggleFollow = useToggleFollowCompany();
 
@@ -84,14 +91,14 @@ const CompanyFollowedCard = () => {
               </CompanyActionFollow>
             ))}
             <Stack sx={{ pt: 2 }} alignItems="center">
-              {Math.ceil(count / pageSize) > 1 && (
+              {totalPages > 1 && (
                 <Pagination
                   color="standard"
                   size="medium"
                   variant="text"
                   sx={{ margin: '0 auto' }}
-                  count={Math.ceil(count / pageSize)}
-                  page={page}
+                  count={totalPages}
+                  page={Math.min(page, totalPages)}
                   onChange={handleChangePage}
                 />
               )}

@@ -22,6 +22,10 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import AddIcon from '@mui/icons-material/Add';
+import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
+import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import toastMessages from '@/utils/toastMessages';
 import resumeService from '@/services/resumeService';
 import dayjs from 'dayjs';
@@ -62,6 +66,8 @@ const CandidateAppliedResumeCard = ({
   avatarUrl,
   onRefresh,
 }: CandidateAppliedResumeCardProps) => {  // Support Multiple Resumes List
+  const router = useRouter();
+  const { i18n } = useTranslation();
   const [items, setItems] = React.useState<ResumeItemData[]>([]);
   const [isUploading, setIsUploading] = React.useState(false);
   const [isUpdating, setIsUpdating] = React.useState(false);
@@ -226,9 +232,9 @@ const CandidateAppliedResumeCard = ({
       />
 
       {/* Card Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5, flexWrap: 'wrap', gap: 1.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '1rem' }}>
             Hồ sơ ứng tuyển
           </Typography>
           <Chip
@@ -238,42 +244,90 @@ const CandidateAppliedResumeCard = ({
           />
         </Box>
 
-        <Button
-          size="small"
-          disabled={isUploading}
-          startIcon={isUploading ? <CircularProgress size={14} color="inherit" /> : <AddIcon sx={{ fontSize: 16 }} />}
-          onClick={() => fileInputRef.current?.click()}
-          sx={{
-            borderRadius: '10px',
-            border: '1px solid #BFDBFE',
-            backgroundColor: '#EFF6FF',
-            color: '#1D4ED8',
-            fontWeight: 700,
-            fontSize: '0.775rem',
-            textTransform: 'none',
-            '&:hover': { backgroundColor: '#DBEAFE', borderColor: '#93C5FD' },
-          }}
-        >
-          {isUploading ? 'Đang tải lên...' : 'Tải CV mới'}
-        </Button>
+        <Stack direction="row" spacing={1.25} sx={{ flexShrink: 0 }}>
+          <Button
+            size="small"
+            variant="contained"
+            startIcon={<AutoFixHighOutlinedIcon sx={{ fontSize: 16 }} />}
+            onClick={() => router.push(localizeRoutePath('/ung-vien/trang-tri-cv', i18n.language))}
+            sx={{
+              borderRadius: '10px',
+              backgroundColor: '#2563eb',
+              color: '#ffffff',
+              fontWeight: 700,
+              fontSize: '0.8rem',
+              textTransform: 'none',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              px: 2,
+              py: 0.8,
+              boxShadow: '0 2px 8px -1px rgba(37,99,235,0.3)',
+              '&:hover': { backgroundColor: '#1d4ed8', boxShadow: '0 4px 12px -1px rgba(37,99,235,0.4)' },
+            }}
+          >
+            Tạo CV từ Mẫu
+          </Button>
+
+          <Button
+            size="small"
+            disabled={isUploading}
+            startIcon={isUploading ? <CircularProgress size={14} color="inherit" /> : <AddIcon sx={{ fontSize: 16 }} />}
+            onClick={() => fileInputRef.current?.click()}
+            sx={{
+              borderRadius: '10px',
+              border: '1px solid #e2e8f0',
+              backgroundColor: '#ffffff',
+              color: '#334155',
+              fontWeight: 700,
+              fontSize: '0.8rem',
+              textTransform: 'none',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              px: 2,
+              py: 0.8,
+              '&:hover': { backgroundColor: '#f8fafc', borderColor: '#cbd5e1' },
+            }}
+          >
+            {isUploading ? 'Đang tải lên...' : 'Tải CV mới'}
+          </Button>
+        </Stack>
       </Box>
 
       {/* List of Multiple Resumes */}
       {items.length === 0 ? (
         <Box sx={{ p: 4, textAlign: 'center', backgroundColor: '#f8fafc', borderRadius: '14px', border: '1px solid #E2E8F0' }}>
-          <Typography variant="body2" sx={{ color: '#64748b', mb: 1.5, fontWeight: 500 }}>
-            Bạn chưa có hồ sơ ứng tuyển nào. Hãy tải CV mới từ máy tính để ứng tuyển công việc.
+          <Typography variant="body2" sx={{ color: '#64748b', mb: 2, fontWeight: 500 }}>
+            Bạn chưa có hồ sơ ứng tuyển nào. Bạn có thể tự tạo CV trực tuyến đẹp mắt hoặc tải file PDF từ máy tính.
           </Typography>
-          <Button
-            size="small"
-            variant="contained"
-            disabled={isUploading}
-            onClick={() => fileInputRef.current?.click()}
-            startIcon={isUploading ? <CircularProgress size={14} color="inherit" /> : <AddIcon sx={{ fontSize: 16 }} />}
-            sx={{ borderRadius: '10px', backgroundColor: '#2563eb', textTransform: 'none', fontWeight: 700 }}
-          >
-            {isUploading ? 'Đang tải lên...' : 'Tải CV ngay'}
-          </Button>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent="center">
+            <Button
+              size="small"
+              variant="contained"
+              startIcon={<AutoFixHighOutlinedIcon sx={{ fontSize: 16 }} />}
+              onClick={() => router.push(localizeRoutePath('/ung-vien/trang-tri-cv', i18n.language))}
+              sx={{
+                borderRadius: '10px',
+                backgroundColor: '#2563eb',
+                color: '#ffffff',
+                textTransform: 'none',
+                fontWeight: 700,
+                boxShadow: '0 2px 8px -1px rgba(37,99,235,0.3)',
+                '&:hover': { backgroundColor: '#1d4ed8' },
+              }}
+            >
+              Tạo CV từ mẫu chuyên nghiệp
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              disabled={isUploading}
+              onClick={() => fileInputRef.current?.click()}
+              startIcon={isUploading ? <CircularProgress size={14} color="inherit" /> : <AddIcon sx={{ fontSize: 16 }} />}
+              sx={{ borderRadius: '10px', borderColor: '#2563eb', color: '#2563eb', textTransform: 'none', fontWeight: 700 }}
+            >
+              {isUploading ? 'Đang tải lên...' : 'Tải CV từ máy tính'}
+            </Button>
+          </Stack>
         </Box>
       ) : (
         <Stack spacing={2}>
