@@ -40,6 +40,7 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
   const pathname = usePathname();
 
   const ensureLeadingSlash = (path: string) => (path.startsWith('/') ? path : `/${path}`);
+  const isEmployerTarget = targetRole === 'employer';
   const defaultLoginRoute = ensureLeadingSlash(
     isEmployerTarget
       ? `/${ROUTES.EMPLOYER_AUTH.LOGIN}`

@@ -63,5 +63,17 @@
   "viewDetails": "Xem thông tin liên quan",
   "backToList": "Quay lại danh sách",
   "chooseConversationHint": "Chọn một cuộc hội thoại ở danh sách bên trái hoặc việc làm bên phải để bắt đầu trò chuyện.",
-  "clickToDownload": "Nhấn để tải về"
+  "clickToDownload": "Nhấn để tải về",
+  "suggestions": {
+    "findDesigners": "Tìm ứng viên cho vị trí thiết kế",
+    "writeInterviewInvite": "Soạn tin mời phỏng vấn",
+    "marketSalary": "Mức lương thị trường hiện nay",
+    "findFrontendJobs": "Tìm việc làm vị trí Frontend",
+    "downloadEnglishCv": "Tải mẫu CV tiếng Anh",
+    "salaryInterviewTips": "Cách trả lời phỏng vấn về mức lương"
+  },
+  "startWithGreeting": "Hãy bắt đầu cuộc trò chuyện bằng một lời chào",
+  "startConversationWith": "Bắt đầu cuộc trò chuyện với {{name}}",
+  "startConversation": "Bắt đầu cuộc trò chuyện",
+  "sendFirstMessageHint": "Gửi lời chào hoặc đặt câu hỏi để kết nối ngay."
 }

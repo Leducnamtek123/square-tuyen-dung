@@ -2,6 +2,7 @@ import React from 'react';
 import { Box } from '@mui/system';
 import AddIcon from '@mui/icons-material/Add';
 import { Button, Typography } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 interface EmptyCardProps {
   content: string | React.ReactNode;
@@ -9,7 +10,10 @@ interface EmptyCardProps {
   onClick?: () => void;
 }
 
-const EmptyCard = ({ content, labelButton="Thêm mới", onClick }: EmptyCardProps) => {
+const EmptyCard = ({ content, labelButton, onClick }: EmptyCardProps) => {
+  const { t } = useTranslation('common');
+  const resolvedLabel = labelButton || t('actions.addNew', 'Thêm mới');
+
   return (
     <Box
       sx={{
@@ -59,22 +63,19 @@ const EmptyCard = ({ content, labelButton="Thêm mới", onClick }: EmptyCardPro
         sx={{
           backgroundColor: '#2563EB',
           color: '#FFFFFF',
-          fontWeight: 600,
           borderRadius: '10px',
-          px: 3,
-          py: 0.9,
           textTransform: 'none',
-          fontSize: '0.875rem',
-          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
-          transition: 'all 0.2s ease',
+          fontWeight: 600,
+          px: 2.5,
+          py: 0.85,
+          boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)',
           '&:hover': {
             backgroundColor: '#1D4ED8',
-            boxShadow: '0 6px 16px rgba(37, 99, 235, 0.3)',
-            transform: 'translateY(-1px)',
+            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.35)',
           },
         }}
       >
-        {labelButton}
+        {resolvedLabel}
       </Button>
     </Box>
   );

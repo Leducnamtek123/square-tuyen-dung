@@ -127,7 +127,7 @@ const ChatBot = () => {
   }, []);
 
   const botTitle = serverConfig?.title || botConfig?.CHAT_TITLE || 'AILA AI';
-  const botSubtitle = serverConfig?.subtitle || (isEmployer ? 'Trợ lý tuyển dụng thông minh' : 'Trợ lý nghề nghiệp thông minh');
+  const botSubtitle = serverConfig?.subtitle || (isEmployer ? t('chat:chatbot.subtitleEmployer', 'Trợ lý tuyển dụng thông minh') : t('chat:chatbot.subtitleJobSeeker', 'Trợ lý nghề nghiệp thông minh'));
 
   const greeting = useMemo(() => {
     if (isEmployer) {
@@ -136,16 +136,28 @@ const ChatBot = () => {
     return serverConfig?.jobSeekerGreeting || t('chat:chatbot.greeting.jobSeeker');
   }, [isEmployer, serverConfig, t]);
 
+  const defaultEmployerSuggestions = useMemo(() => [
+    t('chat:suggestions.findDesigners', 'Tìm ứng viên cho vị trí thiết kế'),
+    t('chat:suggestions.writeInterviewInvite', 'Soạn tin mời phỏng vấn'),
+    t('chat:suggestions.marketSalary', 'Mức lương thị trường hiện nay'),
+  ], [t]);
+
+  const defaultJobSeekerSuggestions = useMemo(() => [
+    t('chat:suggestions.findFrontendJobs', 'Tìm việc làm vị trí Frontend'),
+    t('chat:suggestions.downloadEnglishCv', 'Tải mẫu CV tiếng Anh'),
+    t('chat:suggestions.salaryInterviewTips', 'Cách trả lời phỏng vấn về mức lương'),
+  ], [t]);
+
   const suggestions = useMemo(() => {
     if (isEmployer) {
       return serverConfig?.employerSuggestions && serverConfig.employerSuggestions.length > 0
         ? serverConfig.employerSuggestions
-        : DEFAULT_EMPLOYER_SUGGESTIONS;
+        : defaultEmployerSuggestions;
     }
     return serverConfig?.jobSeekerSuggestions && serverConfig.jobSeekerSuggestions.length > 0
       ? serverConfig.jobSeekerSuggestions
-      : DEFAULT_JOBSEEKER_SUGGESTIONS;
-  }, [isEmployer, serverConfig]);
+      : defaultJobSeekerSuggestions;
+  }, [isEmployer, serverConfig, defaultEmployerSuggestions, defaultJobSeekerSuggestions]);
 
   const systemPrompt = useMemo(() => {
     return isEmployer ? t('chat:chatbot.systemPrompt.employer') : t('chat:chatbot.systemPrompt.jobSeeker');

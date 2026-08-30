@@ -176,6 +176,7 @@ class EmployeeLeaveBalance(CommonBaseModel):
     carried_over_days = models.DecimalField(max_digits=5, decimal_places=1, default=0.0, verbose_name="Phép tồn năm trước")
     used_days = models.DecimalField(max_digits=5, decimal_places=1, default=0.0, verbose_name="Đã sử dụng")
     pending_days = models.DecimalField(max_digits=5, decimal_places=1, default=0.0, verbose_name="Đang chờ duyệt")
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('employee', 'leave_type', 'year')

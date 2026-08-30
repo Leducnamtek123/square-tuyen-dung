@@ -1,21 +1,14 @@
-'use client';
 import * as React from 'react';
-
 import { useTheme } from '@mui/material/styles';
-
 import InputBase from '@mui/material/InputBase';
-
 import Button from '@mui/material/Button';
-
 import SearchIcon from '@mui/icons-material/Search';
-
 import ClearIcon from '@mui/icons-material/Clear';
-
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { Control, FieldValues, Path } from 'react-hook-form';
 import { Box } from "@mui/material";
 import { IconButton, InputAdornment } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
@@ -35,25 +28,15 @@ const InputBaseSearchCompanyCustom = <T extends FieldValues = FieldValues>({
   const { t } = useTranslation('common');
 
   return (
-
     <>
-
         <Box
-
           sx={{
-
           boxShadow: 'none',
-
           borderRadius: 999,
-
           p: '3px 4px',
-
           display: 'flex',
-
           alignItems: 'center',
-
           width: '100%',
-
           backgroundColor: theme.palette.mode === 'light' ? 'white' : '#121212',
           border: '1px solid',
           borderColor: 'rgba(26, 64, 125, 0.16)',
@@ -61,20 +44,14 @@ const InputBaseSearchCompanyCustom = <T extends FieldValues = FieldValues>({
             borderColor: theme.palette.primary.main,
             boxShadow: '0 0 0 4px rgba(26, 64, 125, 0.08)',
           },
-
         }}
-
       >
-
         <SearchIcon color="disabled" />
 
-        <ControllerAny
-
+        <TypedController
           name={name as Path<T>}
-
           control={control}
-
-          render={({ field }: any) => (
+          render={({ field }) => (
 
             <InputBase
 

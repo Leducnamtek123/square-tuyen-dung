@@ -1918,5 +1918,10 @@
       "noMessages": "No messages found.",
       "openAttachment": "Open attachment"
     }
+  },
+  "confirmDialog": {
+    "reasonLabel": "Action Reason (Required)",
+    "reasonPlaceholder": "Enter detailed reason to log into audit trail...",
+    "reasonRequired": "Please provide a reason to continue"
   }
 }

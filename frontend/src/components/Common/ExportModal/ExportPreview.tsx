@@ -14,6 +14,7 @@ import {
   Stack,
 } from '@mui/material';
 import TableViewOutlinedIcon from '@mui/icons-material/TableViewOutlined';
+import { useTranslation } from 'react-i18next';
 import type { ExportColumn } from './types';
 
 interface ExportPreviewProps {
@@ -29,6 +30,7 @@ export const ExportPreview: React.FC<ExportPreviewProps> = ({
   isLoading,
   totalRecords,
 }) => {
+  const { t } = useTranslation('common');
   const checkedColumns = columns.filter((c) => c.checked);
 
   return (
@@ -48,19 +50,19 @@ export const ExportPreview: React.FC<ExportPreviewProps> = ({
         <Stack direction="row" alignItems="center" spacing={1}>
           <TableViewOutlinedIcon sx={{ color: '#2563EB', fontSize: 20 }} />
           <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#1E293B', fontSize: '0.875rem' }}>
-            Xem trước dữ liệu (Preview)
+            {t('export.previewTitle', 'Xem trước dữ liệu (Preview)')}
           </Typography>
         </Stack>
         <Stack direction="row" spacing={1} alignItems="center">
           <Chip
-            label="Hiển thị 10 dòng đầu"
+            label={t('export.previewFirst10', 'Hiển thị 10 dòng đầu')}
             size="small"
             variant="outlined"
             sx={{ height: 22, fontSize: '0.725rem', borderColor: '#CBD5E1', color: '#475569', fontWeight: 500 }}
           />
           {totalRecords !== undefined && (
             <Chip
-              label={`Tổng số: ${totalRecords} bản ghi`}
+              label={t('export.totalRecords', 'Tổng số: {{count}} bản ghi', { count: totalRecords })}
               size="small"
               sx={{ height: 22, fontSize: '0.725rem', backgroundColor: '#E0E7FF', color: '#3730A3', fontWeight: 600 }}
             />
@@ -137,7 +139,7 @@ export const ExportPreview: React.FC<ExportPreviewProps> = ({
               <TableRow>
                 <TableCell colSpan={checkedColumns.length + 1} align="center" sx={{ py: 6 }}>
                   <Typography variant="body2" sx={{ color: '#94A3B8', fontSize: '0.8125rem' }}>
-                    Chưa chọn cột nào để xem trước.
+                    {t('export.noColumnsSelected', 'Chưa chọn cột nào để xem trước.')}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -145,7 +147,7 @@ export const ExportPreview: React.FC<ExportPreviewProps> = ({
               <TableRow>
                 <TableCell colSpan={checkedColumns.length + 1} align="center" sx={{ py: 6 }}>
                   <Typography variant="body2" sx={{ color: '#94A3B8', fontSize: '0.8125rem' }}>
-                    Không có dữ liệu xem trước.
+                    {t('export.noPreviewData', 'Không có dữ liệu xem trước.')}
                   </Typography>
                 </TableCell>
               </TableRow>

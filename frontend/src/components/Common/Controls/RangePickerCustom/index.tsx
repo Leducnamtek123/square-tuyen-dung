@@ -158,12 +158,12 @@ const RangePickerCustom: React.FC<Props> = ({
         }}
       >
         <Typography variant="subtitle2" fontWeight={700} color="#101828" mb={2}>
-          Chọn khoảng thời gian
+          {t('common.dateRange.selectTitle', 'Chọn khoảng thời gian')}
         </Typography>
 
         <Stack direction="row" spacing={1.5} alignItems="center" mb={2.5}>
           <DatePicker
-            label="Từ ngày"
+            label={t('common.dateRange.fromDate', 'Từ ngày')}
             value={tempStart}
             onChange={(val) => setTempStart(val)}
             format="DD/MM/YYYY"
@@ -185,7 +185,7 @@ const RangePickerCustom: React.FC<Props> = ({
           <EastIcon sx={{ fontSize: 16, color: '#667085' }} />
 
           <DatePicker
-            label="Đến ngày"
+            label={t('common.dateRange.toDate', 'Đến ngày')}
             value={tempEnd}
             onChange={(val) => setTempEnd(val)}
             format="DD/MM/YYYY"
@@ -221,7 +221,7 @@ const RangePickerCustom: React.FC<Props> = ({
               '&:hover': { bgcolor: '#F8FAFC' },
             }}
           >
-            Hủy
+            {t('common.actions.cancel', 'Hủy')}
           </Button>
 
           <Button
@@ -241,7 +241,7 @@ const RangePickerCustom: React.FC<Props> = ({
               '&:hover': { bgcolor: '#1D4ED8', boxShadow: 'none' },
             }}
           >
-            Áp dụng
+            {t('common.actions.apply', 'Áp dụng')}
           </Button>
         </Stack>
       </Popover>
@@ -271,7 +271,7 @@ const RangePickerCustom: React.FC<Props> = ({
           },
         }}
       >
-        30 ngày
+        {t('common.dateRange.days30', '30 ngày')}
       </Box>
 
       <Box
@@ -298,7 +298,7 @@ const RangePickerCustom: React.FC<Props> = ({
           },
         }}
       >
-        90 ngày
+        {t('common.dateRange.days90', '90 ngày')}
       </Box>
 
       {/* ── 4. Apply Button (#0F1B3D) ─────────────────────────────────── */}

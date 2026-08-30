@@ -1,17 +1,12 @@
-'use client';
 import React from 'react';
-
 import { useTheme } from '@mui/material/styles';
-
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-
+import { Control, FieldValues, Path } from 'react-hook-form';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
-
 import Autocomplete from '@mui/material/Autocomplete';
 import { useTranslation } from 'react-i18next';
 import type { SelectOption } from '@/types/models';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 const EMPTY_OPTIONS: SelectOption[] = [];
 
@@ -50,10 +45,10 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
   const activePlaceholder = disabled && disabledPlaceholder ? disabledPlaceholder : placeholder;
 
   return (
-    <ControllerAny
+    <TypedController
       name={name as Path<T>}
       control={control}
-      render={({ field }: any) => (
+      render={({ field }) => (
         <Autocomplete
           fullWidth
           disabled={disabled}

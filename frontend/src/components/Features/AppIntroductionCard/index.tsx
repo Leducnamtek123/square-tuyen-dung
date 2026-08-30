@@ -33,13 +33,12 @@ const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
       <Stack spacing={3} alignItems="flex-start">
         <Box>
           <Typography variant="h4" fontWeight="bold" color="primary.main">
-            Sẵn sàng bứt phá nhân sự?
+            {t('appDownload.readyToBreakthrough', 'Sẵn sàng bứt phá nhân sự?')}
           </Typography>
         </Box>
         <Box>
           <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500 }}>
-            Tham gia cộng đồng tuyển dụng hiện đại, nơi doanh nghiệp và nhân tài kết nối 
-            thông qua quy trình xác thực minh bạch và công nghệ phỏng vấn tiên tiến.
+            {t('appDownload.communityDesc', 'Tham gia cộng đồng tuyển dụng hiện đại, nơi doanh nghiệp và nhân tài kết nối thông qua quy trình xác thực minh bạch và công nghệ phỏng vấn tiên tiến.')}
           </Typography>
         </Box>
         <Stack direction="row" spacing={2}>
@@ -50,7 +49,7 @@ const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
             onClick={() => push(jobsHref)}
             sx={{ borderRadius: 2, px: 4 }}
           >
-            Tìm việc ngay
+            {t('appDownload.findJobsNow', 'Tìm việc ngay')}
           </Button>
           <Button
             variant="outlined"
@@ -59,13 +58,13 @@ const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
             onClick={() => openExternalUrlSafely(`https://${HOST_NAME.EMPLOYER_PROJECT}`)}
             sx={{ borderRadius: 2, px: 4 }}
           >
-            Dành cho Nhà tuyển dụng
+            {t('appDownload.forEmployers', 'Dành cho Nhà tuyển dụng')}
           </Button>
         </Stack>
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ width: '100%', maxWidth: 480, pt: 1 }}>
           <TextField
             size="small"
-            placeholder="Nhập số điện thoại nhận link tải app..."
+            placeholder={t('appDownload.enterPhonePlaceholder', 'Nhập số điện thoại nhận link tải app...')}
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
             sx={{ flex: 1, bgcolor: '#FFFFFF', borderRadius: 1 }}
@@ -77,7 +76,7 @@ const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
             onClick={handleSendSmsLink}
             sx={{ borderRadius: 1.5, px: 2.5, whiteSpace: 'nowrap' }}
           >
-            Gửi link tải app
+            {t('appDownload.sendAppLink', 'Gửi link tải app')}
           </Button>
         </Stack>
         <Box sx={{ width: '100%', pt: 2 }}>

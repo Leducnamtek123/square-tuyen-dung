@@ -10,14 +10,13 @@ import {
   Button,
   Stack,
   Chip,
-  Divider,
   Paper,
   InputAdornment,
 } from '@mui/material';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import SelectAllIcon from '@mui/icons-material/SelectAll';
 import DeselectIcon from '@mui/icons-material/Deselect';
+import { useTranslation } from 'react-i18next';
 import type { ExportColumn, ExportFormat, ExportScope, ScopeCount } from './types';
 
 interface ExportOptionsProps {
@@ -47,6 +46,7 @@ export const ExportOptions: React.FC<ExportOptionsProps> = ({
   onClearAllColumns,
   totalRecords,
 }) => {
+  const { t } = useTranslation('common');
   const selectedCount = columns.filter((c) => c.checked).length;
 
   return (
@@ -57,14 +57,14 @@ export const ExportOptions: React.FC<ExportOptionsProps> = ({
           variant="subtitle2"
           sx={{ fontWeight: 600, color: 'text.primary', mb: 1, fontSize: '0.875rem' }}
         >
-          Tên file xuất
+          {t('export.fileName', 'Tên file xuất')}
         </Typography>
         <TextField
           fullWidth
           size="small"
           value={fileName}
           onChange={(e) => onFileNameChange(e.target.value)}
-          placeholder="Nhập tên file..."
+          placeholder={t('export.fileNamePlaceholder', 'Nhập tên file...')}
           slotProps={{
             input: {
               startAdornment: (
@@ -113,12 +113,12 @@ export const ExportOptions: React.FC<ExportOptionsProps> = ({
           variant="subtitle2"
           sx={{ fontWeight: 600, color: 'text.primary', mb: 1, fontSize: '0.875rem' }}
         >
-          Định dạng file
+          {t('export.format', 'Định dạng file')}
         </Typography>
         <Stack direction="row" spacing={1.5}>
           {[
-            { id: 'xlsx', label: 'Excel (.xlsx)', desc: 'Phổ biến & giữ nguyên định dạng' },
-            { id: 'csv', label: 'CSV (.csv)', desc: 'Gọn nhẹ, dùng cho dữ liệu lớn' },
+            { id: 'xlsx', label: t('export.excel', 'Excel (.xlsx)'), desc: t('export.excelDesc', 'Phổ biến & giữ nguyên định dạng') },
+            { id: 'csv', label: t('export.csv', 'CSV (.csv)'), desc: t('export.csvDesc', 'Gọn nhẹ, dùng cho dữ liệu lớn') },
           ].map((fmt) => {
             const isSelected = format === fmt.id;
             return (
@@ -165,7 +165,7 @@ export const ExportOptions: React.FC<ExportOptionsProps> = ({
           variant="subtitle2"
           sx={{ fontWeight: 600, color: 'text.primary', mb: 1, fontSize: '0.875rem' }}
         >
-          Phạm vi dữ liệu
+          {t('export.dataScope', 'Phạm vi dữ liệu')}
         </Typography>
         <RadioGroup value={scope} onChange={(e) => onScopeChange(e.target.value as ExportScope)}>
           <Stack spacing={0.75}>
@@ -188,10 +188,10 @@ export const ExportOptions: React.FC<ExportOptionsProps> = ({
                 label={
                   <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ width: '100%', pr: 1 }}>
                     <Typography variant="body2" sx={{ fontSize: '0.8125rem', fontWeight: 500 }}>
-                      Toàn bộ dữ liệu
+                      {t('export.allData', 'Toàn bộ dữ liệu')}
                     </Typography>
                     {totalRecords?.all !== undefined && (
-                      <Chip label={`${totalRecords.all} dòng`} size="small" sx={{ height: 20, fontSize: '0.7rem' }} />
+                      <Chip label={`${totalRecords.all} ${t('export.rows', 'dòng')}`} size="small" sx={{ height: 20, fontSize: '0.7rem' }} />
                     )}
                   </Stack>
                 }
@@ -218,10 +218,10 @@ export const ExportOptions: React.FC<ExportOptionsProps> = ({
                 label={
                   <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ width: '100%', pr: 1 }}>
                     <Typography variant="body2" sx={{ fontSize: '0.8125rem', fontWeight: 600, color: '#2563EB' }}>
-                      Theo bộ lọc hiện tại
+                      {t('export.filteredData', 'Theo bộ lọc hiện tại')}
                     </Typography>
                     {totalRecords?.filtered !== undefined && (
-                      <Chip label={`${totalRecords.filtered} dòng`} size="small" color="primary" sx={{ height: 20, fontSize: '0.7rem' }} />
+                      <Chip label={`${totalRecords.filtered} ${t('export.rows', 'dòng')}`} size="small" color="primary" sx={{ height: 20, fontSize: '0.7rem' }} />
                     )}
                   </Stack>
                 }
@@ -250,10 +250,10 @@ export const ExportOptions: React.FC<ExportOptionsProps> = ({
                 label={
                   <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ width: '100%', pr: 1 }}>
                     <Typography variant="body2" sx={{ fontSize: '0.8125rem', fontWeight: 500 }}>
-                      Các dòng đã chọn
+                      {t('export.selectedData', 'Các dòng đã chọn')}
                     </Typography>
                     <Chip
-                      label={totalRecords?.selected ? `${totalRecords.selected} dòng` : '0 dòng'}
+                      label={totalRecords?.selected ? `${totalRecords.selected} ${t('export.rows', 'dòng')}` : `0 ${t('export.rows', 'dòng')}`}
                       size="small"
                       sx={{ height: 20, fontSize: '0.7rem' }}
                     />
@@ -270,7 +270,7 @@ export const ExportOptions: React.FC<ExportOptionsProps> = ({
       <Box flex={1}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.875rem' }}>
-            Các cột xuất ({selectedCount}/{columns.length})
+            {t('export.exportColumns', 'Các cột xuất')} ({selectedCount}/{columns.length})
           </Typography>
           <Stack direction="row" spacing={1}>
             <Button
@@ -279,7 +279,7 @@ export const ExportOptions: React.FC<ExportOptionsProps> = ({
               onClick={onSelectAllColumns}
               sx={{ fontSize: '0.75rem', py: 0.25, px: 1, textTransform: 'none', borderRadius: '6px' }}
             >
-              Chọn tất cả
+              {t('export.selectAll', 'Chọn tất cả')}
             </Button>
             <Button
               size="small"
@@ -288,7 +288,7 @@ export const ExportOptions: React.FC<ExportOptionsProps> = ({
               onClick={onClearAllColumns}
               sx={{ fontSize: '0.75rem', py: 0.25, px: 1, textTransform: 'none', borderRadius: '6px', color: 'text.secondary' }}
             >
-              Bỏ chọn tất cả
+              {t('export.deselectAll', 'Bỏ chọn tất cả')}
             </Button>
           </Stack>
         </Stack>

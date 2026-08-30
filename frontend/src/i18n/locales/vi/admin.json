@@ -1918,5 +1918,10 @@
       "noMessages": "Không tìm thấy tin nhắn.",
       "openAttachment": "Mở tệp đính kèm"
     }
+  },
+  "confirmDialog": {
+    "reasonLabel": "Lý do thực hiện (Bắt buộc)",
+    "reasonPlaceholder": "Nhập lý do chi tiết để ghi vào nhật ký kiểm toán...",
+    "reasonRequired": "Vui lòng nhập lý do để tiếp tục"
   }
 }

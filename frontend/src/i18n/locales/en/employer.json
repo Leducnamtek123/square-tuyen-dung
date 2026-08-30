@@ -725,7 +725,11 @@
       "unsave": "Unsave",
       "save": "Save",
       "viewProfile": "View Profile"
-    }
+    },
+    "matchingNeeds": "Matching Needs",
+    "positionNotUpdated": "Position not updated",
+    "unsaveCandidate": "Unsave profile",
+    "saveCandidate": "Save profile"
   },
   "profileSearch": {
     "title": {
@@ -1830,5 +1834,6 @@
       "saveFailed": "Failed to save company information. Please try again.",
       "uploadFailed": "Failed to upload file. Please try again."
     }
-  }
+  },
+  "candidate": "Candidate"
 }

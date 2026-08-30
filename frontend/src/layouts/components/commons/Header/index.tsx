@@ -63,58 +63,58 @@ const Header = (_props: HeaderProps) => {
     return [
       {
         id: 'info-1',
-        label: 'Cẩm nang nghề nghiệp',
-        description: 'Kinh nghiệm và định hướng phát triển sự nghiệp',
+        label: t('nav.careerGuide', 'Cẩm nang nghề nghiệp'),
+        description: t('nav.careerGuideDesc', 'Kinh nghiệm và định hướng phát triển sự nghiệp'),
         path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=cam-nang`, i18n.language),
         iconName: 'book',
       },
       {
         id: 'info-2',
-        label: 'Thủ tục & Quyền lợi lao động',
-        description: 'BHXH, hợp đồng lao động và chế độ người lao động',
+        label: t('nav.laborRights', 'Thủ tục & Quyền lợi lao động'),
+        description: t('nav.laborRightsDesc', 'BHXH, hợp đồng lao động và chế độ người lao động'),
         path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=thu-tuc-lao-dong`, i18n.language),
         iconName: 'gavel',
       },
       {
         id: 'info-3',
-        label: 'Thuế & Quyết toán TNCN',
-        description: 'Hướng dẫn kê khai và quyết toán thuế thu nhập',
+        label: t('nav.taxGuide', 'Thuế & Quyết toán TNCN'),
+        description: t('nav.taxGuideDesc', 'Hướng dẫn kê khai và quyết toán thuế thu nhập'),
         path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=thue-tncn`, i18n.language),
         iconName: 'tax',
       },
       {
         id: 'info-4',
-        label: 'Bí quyết viết CV & Phỏng vấn',
-        description: 'Mẫu CV chuẩn và kỹ năng phỏng vấn thành công',
+        label: t('nav.cvInterviewTips', 'Bí quyết viết CV & Phỏng vấn'),
+        description: t('nav.cvInterviewTipsDesc', 'Mẫu CV chuẩn và kỹ năng phỏng vấn thành công'),
         path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=bi-quyet-cv`, i18n.language),
         iconName: 'cv',
       },
       {
         id: 'info-5',
-        label: 'Báo cáo & Xu hướng tuyển dụng',
-        description: 'Cập nhật báo cáo và thông tin thị trường nhân sự',
+        label: t('nav.recruitmentTrends', 'Báo cáo & Xu hướng tuyển dụng'),
+        description: t('nav.recruitmentTrendsDesc', 'Cập nhật báo cáo và thông tin thị trường nhân sự'),
         path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=xu-huong`, i18n.language),
         iconName: 'trend',
       },
     ];
-  }, [dynamicCategories, i18n.language]);
+  }, [dynamicCategories, i18n.language, t]);
 
   const aboutChildren = React.useMemo(() => [
     {
       id: 'about-1',
-      label: 'Về InfoHR & Hệ sinh thái',
-      description: 'Giới thiệu về nền tảng tuyển dụng & giải pháp quản lý nhân sự InfoHR',
+      label: t('nav.aboutInfoHR', 'Về InfoHR & Hệ sinh thái'),
+      description: t('nav.aboutInfoHRDesc', 'Giới thiệu về nền tảng tuyển dụng & giải pháp quản lý nhân sự InfoHR'),
       path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.ABOUT_US}`, i18n.language),
       iconName: 'infohr',
     },
     {
       id: 'about-2',
-      label: 'AILA AI - Platform Phỏng vấn',
-      description: 'Truy cập giải pháp phỏng vấn giọng nói & video tự động tại aila.infohr.vn',
+      label: t('nav.ailaPlatform', 'AILA AI - Platform Phỏng vấn'),
+      description: t('nav.ailaPlatformDesc', 'Truy cập giải pháp phỏng vấn giọng nói & video tự động tại aila.infohr.vn'),
       path: 'https://aila.infohr.vn/',
       iconName: 'aila',
     },
-  ], [i18n.language]);
+  ], [i18n.language, t]);
 
   const pages = React.useMemo(() => ({
 
@@ -123,7 +123,7 @@ const Header = (_props: HeaderProps) => {
       { id: '2', label: t('nav.companies'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.COMPANY}`, i18n.language) },
       {
         id: '3',
-        label: 'Thông tin',
+        label: t('nav.information', 'Thông tin'),
         path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language),
         children: infoChildren,
       },
@@ -135,8 +135,8 @@ const Header = (_props: HeaderProps) => {
       },
     ],
     [HOST_NAME.EMPLOYER_PROJECT]: [
-      { id: '1', label: 'Giới thiệu & Dịch vụ', path: localizeRoutePath(`/${ROUTES.EMPLOYER.INTRODUCE}`, i18n.language) },
-      { id: '2', label: 'Tìm ứng viên', path: localizeRoutePath(`/${ROUTES.EMPLOYER.PROFILE}`, i18n.language), requireAuth: true, isHighlight: true },
+      { id: '1', label: t('nav.introServices', 'Giới thiệu & Dịch vụ'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.INTRODUCE}`, i18n.language) },
+      { id: '2', label: t('nav.findCandidates', 'Tìm ứng viên'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PROFILE}`, i18n.language), requireAuth: true, isHighlight: true },
       { id: '3', label: t('nav.pricing', { defaultValue: 'Bảng giá' }), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language) },
       { id: '4', label: t('nav.support', { defaultValue: 'Hỗ trợ' }), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SUPPORT}`, i18n.language) },
     ],

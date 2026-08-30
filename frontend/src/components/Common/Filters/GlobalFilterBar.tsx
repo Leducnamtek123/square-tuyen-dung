@@ -4,6 +4,7 @@ import React from 'react';
 import { Paper, Stack, Box, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import { useTranslation } from 'react-i18next';
 import TextFieldCustom from '../Controls/TextFieldCustom';
 import SingleSelectCustom from '../Controls/SingleSelectCustom';
 import type { useForm } from 'react-hook-form';
@@ -44,15 +45,19 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
   primaryFieldOptions,
   primaryFieldPlaceholder,
   cityOptions = [],
-  cityPlaceholder = 'Chọn tỉnh thành',
-  searchPlaceholder = 'Nhập từ khóa...',
+  cityPlaceholder,
+  searchPlaceholder,
   searchFieldName = 'kw',
   onOpenFilterDrawer,
   activeFilterCount,
   extraActions,
 }) => {
+  const { t } = useTranslation('common');
   const options = primaryFieldOptions || cityOptions;
-  const placeholder = primaryFieldPlaceholder || cityPlaceholder;
+  const defaultCityPlaceholder = t('filters.selectCity', 'Chọn tỉnh thành');
+  const defaultSearchPlaceholder = t('filters.searchKeyword', 'Nhập từ khóa...');
+  const placeholder = primaryFieldPlaceholder || cityPlaceholder || defaultCityPlaceholder;
+  const effectiveSearchPlaceholder = searchPlaceholder || defaultSearchPlaceholder;
 
   return (
     <Paper
@@ -79,7 +84,7 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
         <Box sx={{ flex: { xs: '1 1 100%', sm: 1 }, minWidth: { xs: '100%', sm: 180 }, width: { xs: '100%', sm: 'auto' } }}>
           <TextFieldCustom
             name={searchFieldName}
-            placeholder={searchPlaceholder}
+            placeholder={effectiveSearchPlaceholder}
             control={control}
             icon={<SearchIcon sx={{ color: 'primary.main', fontSize: 20 }} />}
             sx={searchControlSx}
@@ -123,7 +128,7 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
               },
             }}
           >
-            Bộ lọc {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}
+            {t('filters.filterButton', 'Bộ lọc')} {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}
           </Button>
         </Box>
 
@@ -148,7 +153,7 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
               },
             }}
           >
-            Tìm kiếm
+            {t('common.search.button', 'Tìm kiếm')}
           </Button>
         </Box>
 

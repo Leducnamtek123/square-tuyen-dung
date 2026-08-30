@@ -16,6 +16,7 @@ import {
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { useTranslation } from 'react-i18next';
 
 export type DialogVariant = 'danger' | 'warning' | 'info';
 
@@ -38,16 +39,22 @@ export default function AdminConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = 'Xác nhận',
-  cancelLabel = 'Hủy bỏ',
+  confirmLabel,
+  cancelLabel,
   variant = 'danger',
   requireReason = false,
-  reasonLabel = 'Lý do thực hiện (Bắt buộc)',
-  reasonPlaceholder = 'Nhập lý do chi tiết để ghi vào nhật ký kiểm toán...',
+  reasonLabel,
+  reasonPlaceholder,
   loading = false,
   onConfirm,
   onClose,
 }: AdminConfirmDialogProps) {
+  const { t } = useTranslation(['admin', 'common']);
+  const resolvedConfirmLabel = confirmLabel || t('common:actions.confirm', 'Xác nhận');
+  const resolvedCancelLabel = cancelLabel || t('common:actions.cancel', 'Hủy bỏ');
+  const resolvedReasonLabel = reasonLabel || t('admin:confirmDialog.reasonLabel', 'Lý do thực hiện (Bắt buộc)');
+  const resolvedReasonPlaceholder = reasonPlaceholder || t('admin:confirmDialog.reasonPlaceholder', 'Nhập lý do chi tiết để ghi vào nhật ký kiểm toán...');
+
   const [reason, setReason] = useState('');
   const [reasonError, setReasonError] = useState(false);
 
@@ -110,30 +117,32 @@ export default function AdminConfirmDialog({
         },
       }}
     >
-      <DialogTitle sx={{ pb: 1, pt: 2, px: 2 }}>
-        <Stack direction="row" spacing={1.5} alignItems="center">
+      <DialogTitle sx={{ pb: 1, pt: 2 }}>
+        <Stack direction="row" spacing={2} alignItems="center">
           <Box
             sx={{
-              width: 44,
-              height: 44,
-              borderRadius: '50%',
-              bgcolor: styles.iconBg,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              bgcolor: styles.iconBg,
               flexShrink: 0,
             }}
           >
             {styles.icon}
           </Box>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: '#1E293B', fontSize: '1.125rem' }}>
-            {title}
-          </Typography>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.1rem', color: '#0F172A' }}>
+              {title}
+            </Typography>
+          </Box>
         </Stack>
       </DialogTitle>
 
-      <DialogContent sx={{ px: 2, py: 1.5 }}>
-        <Box sx={{ color: '#64748B', fontSize: '0.875rem', mb: requireReason ? 2 : 0 }}>
+      <DialogContent sx={{ py: 1.5 }}>
+        <Box sx={{ color: '#475569', fontSize: '0.9rem', mb: requireReason ? 2 : 0 }}>
           {typeof message === 'string' ? <Typography variant="body2">{message}</Typography> : message}
         </Box>
 
@@ -142,15 +151,15 @@ export default function AdminConfirmDialog({
             fullWidth
             multiline
             rows={3}
-            label={reasonLabel}
-            placeholder={reasonPlaceholder}
+            label={resolvedReasonLabel}
+            placeholder={resolvedReasonPlaceholder}
             value={reason}
             onChange={(e) => {
               setReason(e.target.value);
               if (reasonError && e.target.value.trim()) setReasonError(false);
             }}
             error={reasonError}
-            helperText={reasonError ? 'Vui lòng cung cấp lý do để hoàn tất thao tác này.' : undefined}
+            helperText={reasonError ? t('admin:confirmDialog.reasonRequired', 'Vui lòng cung cấp lý do để hoàn tất thao tác này.') : undefined}
             size="small"
             sx={{
               mt: 1,
@@ -174,7 +183,7 @@ export default function AdminConfirmDialog({
             color: '#64748B',
           }}
         >
-          {cancelLabel}
+          {resolvedCancelLabel}
         </Button>
         <Button
           variant="contained"
@@ -189,7 +198,7 @@ export default function AdminConfirmDialog({
             px: 2.5,
           }}
         >
-          {confirmLabel}
+          {resolvedConfirmLabel}
         </Button>
       </DialogActions>
     </Dialog>

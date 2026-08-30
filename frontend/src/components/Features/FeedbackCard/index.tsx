@@ -14,6 +14,7 @@ import BusinessRoundedIcon from '@mui/icons-material/BusinessRounded';
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 import FormatQuoteRoundedIcon from '@mui/icons-material/FormatQuoteRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import { useTranslation } from 'react-i18next';
 
 export type FeedbackUserType = 'employer' | 'candidate';
 
@@ -31,20 +32,17 @@ export interface FeedbackCardProps {
   verified?: boolean;
 }
 
-const TESTIMONIAL_AVATARS = [
-  '/images/testimonials/avatar-1.jpg',
-  '/images/testimonials/avatar-2.jpg',
-  '/images/testimonials/avatar-3.jpg',
-  '/images/testimonials/avatar-4.jpg',
-] as const;
-
-const pickFallbackAvatar = (seed?: string | number) => {
-  const value = String(seed || 'testimonial');
-  let hash = 0;
-  for (let i = 0; i < value.length; i += 1) {
-    hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
-  }
-  return TESTIMONIAL_AVATARS[hash % TESTIMONIAL_AVATARS.length];
+const pickFallbackAvatar = (seed: string | number) => {
+  const avatars = [
+    '/images/avatars/user-1.jpg',
+    '/images/avatars/user-2.jpg',
+    '/images/avatars/user-3.jpg',
+    '/images/avatars/user-4.jpg',
+    '/images/avatars/user-5.jpg',
+    '/images/avatars/user-6.jpg',
+  ];
+  const num = typeof seed === 'number' ? seed : String(seed).length;
+  return avatars[Math.abs(num) % avatars.length];
 };
 
 const FeedbackCard = ({
@@ -59,16 +57,17 @@ const FeedbackCard = ({
   impactTag,
   verified = true,
 }: FeedbackCardProps) => {
+  const { t } = useTranslation('public');
   const fallbackAvatar = React.useMemo(() => pickFallbackAvatar(id || fullName), [id, fullName]);
   const resolvedAvatar = avatarUrl || fallbackAvatar;
   const isEmployer = userType === 'employer' || Boolean(companyName);
 
-  const displayRole = roleTitle || (isEmployer ? 'Nhà tuyển dụng' : 'Ứng viên tìm việc');
+  const displayRole = roleTitle || (isEmployer ? t('feedback.employerRole', 'Nhà tuyển dụng') : t('feedback.candidateRole', 'Ứng viên tìm việc'));
   const displayImpact =
     impactTag ||
     (isEmployer
-      ? 'Tuyển dụng nhanh & chính xác'
-      : 'Ứng tuyển thành công');
+      ? t('feedback.employerImpact', 'Tuyển dụng nhanh & chính xác')
+      : t('feedback.candidateImpact', 'Ứng tuyển thành công'));
 
   return (
     <Card
@@ -101,22 +100,19 @@ const FeedbackCard = ({
                 src={resolvedAvatar}
                 alt={fullName}
                 sx={{
-                  width: 48,
-                  height: 48,
-                  border: '1.5px solid #e2e8f0',
-                  bgcolor: '#f1f5f9',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                  width: 46,
+                  height: 46,
+                  border: '2px solid #ffffff',
+                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.08)',
                 }}
-              >
-                {fullName ? fullName.slice(0, 1).toUpperCase() : 'U'}
-              </Avatar>
+              />
               {verified && (
                 <VerifiedIcon
                   sx={{
                     position: 'absolute',
                     bottom: -2,
                     right: -2,
-                    fontSize: 18,
+                    fontSize: 16,
                     color: '#2563eb',
                     bgcolor: '#ffffff',
                     borderRadius: '50%',
@@ -127,12 +123,12 @@ const FeedbackCard = ({
 
             <Box sx={{ minWidth: 0, flex: 1 }}>
               <Typography
-                variant="subtitle1"
+                variant="subtitle2"
                 sx={{
                   fontWeight: 700,
+                  fontSize: '0.925rem',
                   color: '#0f172a',
                   lineHeight: 1.3,
-                  fontSize: '0.95rem',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -144,8 +140,7 @@ const FeedbackCard = ({
                 variant="caption"
                 sx={{
                   color: '#64748b',
-                  fontWeight: 500,
-                  fontSize: '0.8rem',
+                  fontSize: '0.775rem',
                   display: 'block',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -183,7 +178,7 @@ const FeedbackCard = ({
             ) : (
               <Chip
                 icon={<PersonOutlineRoundedIcon sx={{ fontSize: '14px !important', color: '#64748b' }} />}
-                label={isEmployer ? 'Doanh nghiệp' : 'Ứng viên'}
+                label={isEmployer ? t('feedback.enterpriseBadge', 'Doanh nghiệp') : t('feedback.candidateBadge', 'Ứng viên')}
                 size="small"
                 sx={{
                   bgcolor: '#f8fafc',

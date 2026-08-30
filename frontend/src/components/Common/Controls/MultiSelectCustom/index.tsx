@@ -1,22 +1,15 @@
 import * as React from 'react';
-
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-
+import { Control, FieldValues, Path } from 'react-hook-form';
 import Checkbox from '@mui/material/Checkbox';
-
 import TextField from '@mui/material/TextField';
-
 import Autocomplete from '@mui/material/Autocomplete';
-
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-
 import { Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import ValidationError from '../ValidationError';
+import TypedController from '../TypedController';
 import type { SelectOption } from '@/types/models';
-const ControllerAny = Controller as any;
 
 const EMPTY_OPTIONS: SelectOption[] = [];
 interface Props<T extends FieldValues = FieldValues> {
@@ -29,7 +22,6 @@ interface Props<T extends FieldValues = FieldValues> {
 }
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const valuesAsArray = (value: unknown): Array<string | number> => {
@@ -51,26 +43,17 @@ const MultiSelectCustom = <T extends FieldValues = FieldValues>({
   const { t } = useTranslation('common');
 
   return (
-
     <div>
-
       {title && (
-
         <Typography variant="subtitle2" gutterBottom>
-
           {title} {showRequired && <span style={{ color: 'red' }}>*</span>}
-
         </Typography>
-
       )}
 
-      <ControllerAny
-
+      <TypedController
         name={name as Path<T>}
-
         control={control}
-
-        render={({ field, fieldState }: any) => (
+        render={({ field, fieldState }) => (
 
           <>
 

@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import CloseIcon from '@mui/icons-material/Close';
+import { useTranslation } from 'react-i18next';
 import FilterFieldRenderer from './FilterFieldRenderer';
 import type { FilterSystemConfig } from './types';
 import type { useForm } from 'react-hook-form';
@@ -37,6 +38,8 @@ export const GlobalFilterDrawer: React.FC<GlobalFilterDrawerProps> = ({
   handleSubmit,
   handleApply,
 }) => {
+  const { t } = useTranslation('common');
+
   return (
     <Drawer
       anchor="right"
@@ -70,7 +73,7 @@ export const GlobalFilterDrawer: React.FC<GlobalFilterDrawerProps> = ({
           </Stack>
 
           <Stack direction="row" spacing={1} alignItems="center">
-            <Tooltip title="Xóa bộ lọc" arrow>
+            <Tooltip title={t('filters.clearFilter', 'Xóa bộ lọc')} arrow>
               <Button
                 variant="text"
                 color="error"
@@ -84,10 +87,10 @@ export const GlobalFilterDrawer: React.FC<GlobalFilterDrawerProps> = ({
                   px: 1,
                 }}
               >
-                Xóa bộ lọc
+                {t('filters.clearFilter', 'Xóa bộ lọc')}
               </Button>
             </Tooltip>
-            <IconButton aria-label="Đóng" size="small" onClick={onClose} sx={{ color: '#64748B' }}>
+            <IconButton aria-label={t('common.actions.close', 'Đóng')} size="small" onClick={onClose} sx={{ color: '#64748B' }}>
               <CloseIcon sx={{ fontSize: 20 }} />
             </IconButton>
           </Stack>
@@ -125,7 +128,7 @@ export const GlobalFilterDrawer: React.FC<GlobalFilterDrawerProps> = ({
               textTransform: 'none',
             }}
           >
-            Áp dụng bộ lọc
+            {t('filters.applyFilter', 'Áp dụng bộ lọc')}
           </Button>
         </Box>
       </Box>

@@ -71,6 +71,7 @@ interface JobHoverPreviewCardProps {
   experienceLabel?: string;
   academicLevelLabel?: string;
   cityLabel?: string;
+  placement?: 'right-start' | 'left-start' | 'bottom' | 'top';
 }
 
 const cleanHtmlToLines = (rawHtml?: string | null): string[] => {
@@ -103,8 +104,9 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
   experienceLabel,
   academicLevelLabel,
   cityLabel,
+  placement = 'right-start',
 }) => {
-  const { i18n } = useTranslation(['public', 'common']);
+  const { t, i18n } = useTranslation(['common', 'public']);
 
   const hasDesc = Boolean(job?.jobDescription && job.jobDescription.trim().length > 0);
   const shouldFetchDetail = Boolean(open && job?.slug && !hasDesc);
@@ -124,27 +126,27 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
   const activeJob: JobHoverPreviewData = fullJobDetail ? { ...job, ...fullJobDetail } : job;
 
   const companyName =
-    activeJob.companyDict?.companyName || activeJob.company?.companyName || 'Doanh nghiệp tuyển dụng';
+    activeJob.companyDict?.companyName || activeJob.company?.companyName || t('jobHover.companyDefault', 'Doanh nghiệp tuyển dụng');
   const salaryText = formatLocalizedSalaryRange(activeJob.salaryMin, activeJob.salaryMax, i18n.language);
   const cityName =
     cityLabel ||
     activeJob.locationDict?.cityName ||
     (typeof activeJob.locationDict?.city === 'string' ? activeJob.locationDict.city : '') ||
     (typeof activeJob.location?.city === 'string' ? activeJob.location.city : '') ||
-    'Toàn quốc';
+    t('jobHover.nationwide', 'Toàn quốc');
 
   const expText =
     experienceLabel ||
-    (activeJob.experience ? `${activeJob.experience} năm kinh nghiệm` : 'Không yêu cầu kinh nghiệm');
+    (activeJob.experience ? t('jobHover.yearsExp', '{{count}} năm kinh nghiệm', { count: activeJob.experience }) : t('jobHover.noExpRequired', 'Không yêu cầu kinh nghiệm'));
   const eduText =
     academicLevelLabel ||
-    (activeJob.academicLevel ? `Trình độ ${activeJob.academicLevel}` : 'Không yêu cầu bằng cấp');
+    (activeJob.academicLevel ? t('jobHover.academicLevel', 'Trình độ {{level}}', { level: activeJob.academicLevel }) : t('jobHover.noDegreeRequired', 'Không yêu cầu bằng cấp'));
 
   const deadlineFormatted = activeJob.deadline
     ? dayjs(activeJob.deadline).isValid()
       ? dayjs(activeJob.deadline).format('DD/MM/YYYY')
       : activeJob.deadline
-    : 'Đang tuyển';
+    : t('jobHover.activelyHiring', 'Đang tuyển');
 
   const descLines = cleanHtmlToLines(activeJob.jobDescription);
   const reqLines = cleanHtmlToLines(activeJob.jobRequirement);
@@ -158,31 +160,21 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
       id="job-hover-preview-popper"
       role="tooltip"
       aria-live="polite"
-      open={open && Boolean(anchorEl)}
+      open={open}
       anchorEl={anchorEl}
-      placement="right-start"
-      disablePortal={false}
+      placement={placement}
       modifiers={[
         {
-          name: 'flip',
-          enabled: true,
+          name: 'offset',
           options: {
-            fallbackPlacements: ['left-start', 'bottom', 'top'],
-            padding: 16,
+            offset: [0, 12],
           },
         },
         {
           name: 'preventOverflow',
-          enabled: true,
           options: {
             boundary: 'viewport',
             padding: 16,
-          },
-        },
-        {
-          name: 'offset',
-          options: {
-            offset: [0, 14],
           },
         },
       ]}
@@ -190,13 +182,13 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
         zIndex: 1400,
         pointerEvents: 'auto',
       }}
+      onMouseEnter={onMouseEnterPopper}
+      onMouseLeave={onMouseLeavePopper}
     >
       <Paper
         elevation={0}
-        onMouseEnter={onMouseEnterPopper}
-        onMouseLeave={onMouseLeavePopper}
         sx={{
-          width: { xs: 340, sm: 440, md: 490 },
+          width: { xs: 340, sm: 420, md: 460 },
           maxWidth: 'calc(100vw - 32px)',
           maxHeight: 'min(580px, 85vh)',
           display: 'flex',
@@ -242,10 +234,10 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
               </Typography>
             </Stack>
 
-            <Tooltip title={effectiveIsFavorite ? 'Bỏ lưu tin' : 'Lưu tin tuyển dụng'} arrow placement="top">
+            <Tooltip title={effectiveIsFavorite ? t('jobHover.unsaveJob', 'Bỏ lưu tin') : t('jobHover.saveJob', 'Lưu tin tuyển dụng')} arrow placement="top">
               <IconButton
                 size="small"
-                aria-label={effectiveIsFavorite ? 'Bỏ lưu tin' : 'Lưu tin'}
+                aria-label={effectiveIsFavorite ? t('jobHover.unsaveJob', 'Bỏ lưu tin') : t('jobHover.saveJob', 'Lưu tin')}
                 onClick={(e) => onToggleFavorite && onToggleFavorite(e, activeJob.id, activeJob.slug)}
                 sx={{
                   border: '1px solid #e2e8f0',
@@ -326,14 +318,14 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
             <Stack direction="row" spacing={1} alignItems="center">
               <ElectricBoltRoundedIcon sx={{ fontSize: 18, color: '#ea580c' }} />
               <Typography variant="caption" sx={{ fontWeight: 700, color: '#c2410c', fontSize: '0.8rem' }}>
-                Tuyển nhanh
+                {t('jobHover.urgentHiring', 'Tuyển nhanh')}
               </Typography>
               <Typography variant="caption" sx={{ color: '#9a3412', fontSize: '0.75rem' }}>
-                • Tỷ lệ phản hồi 100%
+                {t('jobHover.responseRate', '• Tỷ lệ phản hồi 100%')}
               </Typography>
             </Stack>
             <Typography variant="caption" sx={{ color: '#2563eb', fontWeight: 600, fontSize: '0.75rem' }}>
-              Ứng tuyển sớm để ưu tiên!
+              {t('jobHover.applyEarlyPrioritized', 'Ứng tuyển sớm để ưu tiên!')}
             </Typography>
           </Box>
 
@@ -360,7 +352,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                 },
               }}
             >
-              Xem chi tiết
+              {t('jobHover.viewDetail', 'Xem chi tiết')}
             </Button>
 
             <Button
@@ -383,7 +375,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                 },
               }}
             >
-              Ứng tuyển ngay
+              {t('jobHover.applyNow', 'Ứng tuyển ngay')}
             </Button>
           </Stack>
         </Box>
@@ -426,7 +418,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                   bgcolor: '#2563eb',
                 }}
               />
-              Mô tả công việc
+              {t('jobHover.jobDescription', 'Mô tả công việc')}
             </Typography>
 
             {isLoadingDetail && !hasDesc ? (
@@ -463,13 +455,13 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                 ))}
                 {descLines.length > 5 && (
                   <Typography variant="caption" sx={{ color: '#2563eb', fontWeight: 600, pt: 0.5 }}>
-                    +{descLines.length - 5} nội dung mô tả chi tiết...
+                    {t('jobHover.moreDescLines', '+{{count}} nội dung mô tả chi tiết...', { count: descLines.length - 5 })}
                   </Typography>
                 )}
               </Stack>
             ) : (
               <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: '0.825rem', fontStyle: 'italic' }}>
-                Chưa có mô tả chi tiết công việc. Nhấn xem chi tiết để tìm hiểu thêm.
+                {t('jobHover.noDesc', 'Chưa có mô tả chi tiết công việc. Nhấn xem chi tiết để tìm hiểu thêm.')}
               </Typography>
             )}
           </Box>
@@ -505,7 +497,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                     bgcolor: '#ea580c',
                   }}
                 />
-                Yêu cầu công việc
+                {t('jobHover.jobRequirements', 'Yêu cầu công việc')}
               </Typography>
 
               {reqLines.length > 0 ? (
@@ -536,13 +528,13 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                   ))}
                   {reqLines.length > 4 && (
                     <Typography variant="caption" sx={{ color: '#ea580c', fontWeight: 600, pt: 0.5 }}>
-                      +{reqLines.length - 4} yêu cầu khác...
+                      {t('jobHover.moreReqLines', '+{{count}} yêu cầu khác...', { count: reqLines.length - 4 })}
                     </Typography>
                   )}
                 </Stack>
               ) : (
                 <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: '0.825rem' }}>
-                  Trao đổi chi tiết khi phỏng vấn.
+                  {t('jobHover.discussInInterview', 'Trao đổi chi tiết khi phỏng vấn.')}
                 </Typography>
               )}
             </Box>
@@ -571,7 +563,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                     bgcolor: '#16a34a',
                   }}
                 />
-                Quyền lợi được hưởng
+                {t('jobHover.benefitsEnjoyed', 'Quyền lợi được hưởng')}
               </Typography>
 
               {benefitLines.length > 0 ? (
@@ -596,7 +588,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                 </Stack>
               ) : (
                 <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: '0.825rem' }}>
-                  Hưởng đầy đủ chế độ theo quy định công ty và Luật Lao động.
+                  {t('jobHover.standardBenefits', 'Hưởng đầy đủ chế độ theo quy định công ty và Luật Lao động.')}
                 </Typography>
               )}
             </Box>

@@ -1,17 +1,13 @@
 'use client';
 import React from 'react';
-
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-
+import { Control, FieldValues, Path } from 'react-hook-form';
 import { DatePicker } from '@mui/x-date-pickers';
-
 import dayjs from '@/configs/moment-config';
-
 import { Typography } from "@mui/material";
 import { SxProps, Theme } from '@mui/material/styles';
 import type { Dayjs } from 'dayjs';
 import ValidationError from '../ValidationError';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 const EMPTY_SX: SxProps<Theme> = {};
 
@@ -70,26 +66,17 @@ const DatePickerCustom = <T extends FieldValues = FieldValues>({
   };
 
   return (
-
     <div>
-
       {title && (
-
         <Typography variant="subtitle2" gutterBottom>
-
           {title} {showRequired && <span style={{ color: 'red' }}>*</span>}
-
         </Typography>
-
       )}
 
-      <ControllerAny
-
+      <TypedController
         name={name as Path<T>}
-
         control={control}
-
-        render={({ field, fieldState }: any) => (
+        render={({ field, fieldState }) => (
 
           <>
 

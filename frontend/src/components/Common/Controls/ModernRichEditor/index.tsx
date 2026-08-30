@@ -24,18 +24,6 @@ import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined';
 import StrikethroughSIcon from '@mui/icons-material/StrikethroughS';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
-import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
-import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
-import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
-import FormatAlignJustifyIcon from '@mui/icons-material/FormatAlignJustify';
-import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
-import CodeIcon from '@mui/icons-material/Code';
-import LinkIcon from '@mui/icons-material/Link';
-import ImageIcon from '@mui/icons-material/Image';
-import TableChartIcon from '@mui/icons-material/TableChart';
-import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
-import UndoIcon from '@mui/icons-material/Undo';
-import RedoIcon from '@mui/icons-material/Redo';
 import FormatColorTextIcon from '@mui/icons-material/FormatColorText';
 import FormatColorFillIcon from '@mui/icons-material/FormatColorFill';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
@@ -44,7 +32,14 @@ import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
-import FormatClearIcon from '@mui/icons-material/FormatClear';
+import CodeIcon from '@mui/icons-material/Code';
+import LinkIcon from '@mui/icons-material/Link';
+import ImageIcon from '@mui/icons-material/Image';
+import TableChartIcon from '@mui/icons-material/TableChart';
+import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
+import UndoIcon from '@mui/icons-material/Undo';
+import RedoIcon from '@mui/icons-material/Redo';
+import { useTranslation } from 'react-i18next';
 
 import commonService from '@/services/commonService';
 import {
@@ -84,39 +79,42 @@ export interface ModernRichEditorProps {
   disabled?: boolean;
 }
 
-const TEXT_COLORS = [
-  { label: 'Mặc định', color: '#1e293b' },
-  { label: 'Xanh Indigo', color: '#4f46e5' },
-  { label: 'Xanh Lam', color: '#0284c7' },
-  { label: 'Xanh Lá', color: '#16a34a' },
-  { label: 'Đỏ Ruby', color: '#dc2626' },
-  { label: 'Tím Violet', color: '#9333ea' },
-  { label: 'Cam Amber', color: '#d97706' },
-  { label: 'Xám Slate', color: '#64748b' },
-];
-
-const BG_HIGHLIGHTS = [
-  { label: 'Không màu', color: 'transparent' },
-  { label: 'Vàng chanh', color: '#fef08a' },
-  { label: 'Xanh bạc hà', color: '#bbf7d0' },
-  { label: 'Xanh mây', color: '#bae6fd' },
-  { label: 'Tím hoa cà', color: '#e9d5ff' },
-  { label: 'Hồng phấn', color: '#fbcfe8' },
-  { label: 'Cam nhạt', color: '#fed7aa' },
-];
-
 export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
   value,
   onChange,
-  placeholder = 'Bắt đầu soạn thảo nội dung hoặc sử dụng Trợ lý AI để tạo tự động...',
+  placeholder,
   minHeight = 260,
   title,
   showRequired = false,
   contextType = 'general',
   disabled = false,
 }) => {
+  const { t } = useTranslation('common');
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+
+  const defaultPlaceholder = placeholder || t('editor.status.markdownShortcutsSupported', 'Bắt đầu soạn thảo nội dung hoặc sử dụng Trợ lý AI để tạo tự động...');
+
+  const TEXT_COLORS = [
+    { label: t('editor.colors.default', 'Mặc định'), color: '#1e293b' },
+    { label: t('editor.colors.blue', 'Xanh Indigo'), color: '#4f46e5' },
+    { label: t('editor.colors.skyBlue', 'Xanh Lam'), color: '#0284c7' },
+    { label: t('editor.colors.green', 'Xanh Lá'), color: '#16a34a' },
+    { label: t('editor.colors.rubyRed', 'Đỏ Ruby'), color: '#dc2626' },
+    { label: t('editor.colors.violet', 'Tím Violet'), color: '#9333ea' },
+    { label: t('editor.colors.peach', 'Cam Amber'), color: '#d97706' },
+    { label: t('editor.colors.slate', 'Xám Slate'), color: '#64748b' },
+  ];
+
+  const BG_HIGHLIGHTS = [
+    { label: t('editor.colors.none', 'Không màu'), color: 'transparent' },
+    { label: t('editor.colors.lemonYellow', 'Vàng chanh'), color: '#fef08a' },
+    { label: t('editor.colors.mintGreen', 'Xanh bạc hà'), color: '#bbf7d0' },
+    { label: t('editor.colors.skyBlue', 'Xanh mây'), color: '#bae6fd' },
+    { label: t('editor.colors.lavender', 'Tím hoa cà'), color: '#e9d5ff' },
+    { label: t('editor.colors.peach', 'Hồng phấn'), color: '#fbcfe8' },
+    { label: t('editor.colors.peach', 'Cam nhạt'), color: '#fed7aa' },
+  ];
 
   // Editor state management
   const getInitialState = (): EditorState => {
@@ -314,7 +312,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
     if (hasHeader) {
       tableHtml += '  <thead>\n    <tr style="background-color: #f1f5f9;">\n';
       for (let c = 1; c <= cols; c++) {
-        tableHtml += `      <th style="border: 1px solid #cbd5e1; padding: 10px 14px; text-align: left; font-weight: 600;">Tiêu đề ${c}</th>\n`;
+        tableHtml += `      <th style="border: 1px solid #cbd5e1; padding: 10px 14px; text-align: left; font-weight: 600;">${t('editor.table.headerCell', 'Tiêu đề')} ${c}</th>\n`;
       }
       tableHtml += '    </tr>\n  </thead>\n';
     }
@@ -322,7 +320,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
     for (let r = 1; r <= rows; r++) {
       tableHtml += '    <tr>\n';
       for (let c = 1; c <= cols; c++) {
-        tableHtml += `      <td style="border: 1px solid #cbd5e1; padding: 10px 14px;">Dữ liệu (${r}, ${c})</td>\n`;
+        tableHtml += `      <td style="border: 1px solid #cbd5e1; padding: 10px 14px;">${t('editor.table.dataCell', 'Dữ liệu')} (${r}, ${c})</td>\n`;
       }
       tableHtml += '    </tr>\n';
     }
@@ -341,7 +339,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
     const c = colors[type];
     const calloutHtml = `<div style="background-color: ${c.bg}; border-left: 4px solid ${c.border}; padding: 14px 18px; border-radius: 6px; margin: 14px 0;">
   <strong style="color: ${c.text}; font-size: 1rem;">${c.icon} ${boxTitle}</strong>
-  <p style="margin: 6px 0 0 0; color: #334155; font-size: 0.92rem; line-height: 1.5;">${boxContent || 'Nội dung thông điệp cần nhấn mạnh.'}</p>
+  <p style="margin: 6px 0 0 0; color: #334155; font-size: 0.92rem; line-height: 1.5;">${boxContent || ''}</p>
 </div>`;
     applyHTMLContent(calloutHtml, 'append');
   };
@@ -434,7 +432,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
                 },
               }}
             >
-              Trợ Lý AI
+              {t('editor.toolbar.aiAssistant', 'Trợ Lý AI')}
             </Button>
 
             {/* Smart Templates Button */}
@@ -457,7 +455,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
                 },
               }}
             >
-              Mẫu Nội Dung
+              {t('editor.toolbar.templates', 'Mẫu Nội Dung')}
             </Button>
 
             <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 22 }} />
@@ -481,68 +479,68 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
                 bgcolor: 'background.paper',
               }}
             >
-              Định dạng
+              {t('editor.toolbar.heading', 'Định dạng')}
             </Button>
             <Menu anchorEl={headingAnchor} open={Boolean(headingAnchor)} onClose={() => setHeadingAnchor(null)}>
               <MenuItem onClick={() => applyBlockType('unstyled')}>
-                <Typography variant="body2">Đoạn văn thường (Normal)</Typography>
+                <Typography variant="body2">{t('editor.toolbar.normalText', 'Đoạn văn thường (Normal)')}</Typography>
               </MenuItem>
               <MenuItem onClick={() => applyBlockType('header-one')}>
                 <Typography variant="subtitle1" fontWeight={700}>
-                  Tiêu đề 1 (H1)
+                  {t('editor.toolbar.heading1', 'Tiêu đề 1 (H1)')}
                 </Typography>
               </MenuItem>
               <MenuItem onClick={() => applyBlockType('header-two')}>
                 <Typography variant="subtitle2" fontWeight={700}>
-                  Tiêu đề 2 (H2)
+                  {t('editor.toolbar.heading2', 'Tiêu đề 2 (H2)')}
                 </Typography>
               </MenuItem>
               <MenuItem onClick={() => applyBlockType('header-three')}>
                 <Typography variant="body2" fontWeight={700} color="primary.main">
-                  Tiêu đề 3 (H3)
+                  {t('editor.toolbar.heading3', 'Tiêu đề 3 (H3)')}
                 </Typography>
               </MenuItem>
               <MenuItem onClick={() => applyBlockType('header-four')}>
                 <Typography variant="body2" fontWeight={700}>
-                  Tiêu đề 4 (H4)
+                  {t('editor.toolbar.heading4', 'Tiêu đề 4 (H4)')}
                 </Typography>
               </MenuItem>
               <Divider />
               <MenuItem onClick={() => applyBlockType('blockquote')}>
                 <Typography variant="body2" fontStyle="italic">
-                  Khối trích dẫn (Quote)
+                  {t('editor.toolbar.blockquote', 'Khối trích dẫn (Quote)')}
                 </Typography>
               </MenuItem>
               <MenuItem onClick={() => applyBlockType('code-block')}>
                 <Typography variant="body2" fontFamily="monospace">
-                  Khối mã nguồn (Code)
+                  {t('editor.toolbar.codeBlock', 'Khối mã nguồn (Code)')}
                 </Typography>
               </MenuItem>
             </Menu>
 
             {/* Inline Styles Group */}
             <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title="In đậm (Ctrl+B)">
+              <Tooltip title={t('editor.toolbar.bold', 'In đậm (Ctrl+B)')}>
                 <IconButton size="small" onClick={() => applyInlineStyle('BOLD')}>
                   <FormatBoldIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="In nghiêng (Ctrl+I)">
+              <Tooltip title={t('editor.toolbar.italic', 'In nghiêng (Ctrl+I)')}>
                 <IconButton size="small" onClick={() => applyInlineStyle('ITALIC')}>
                   <FormatItalicIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Gạch chân (Ctrl+U)">
+              <Tooltip title={t('editor.toolbar.underline', 'Gạch chân (Ctrl+U)')}>
                 <IconButton size="small" onClick={() => applyInlineStyle('UNDERLINE')}>
                   <FormatUnderlinedIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Gạch ngang">
+              <Tooltip title={t('editor.toolbar.strike', 'Gạch ngang')}>
                 <IconButton size="small" onClick={() => applyInlineStyle('STRIKETHROUGH')}>
                   <StrikethroughSIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Mã inline">
+              <Tooltip title={t('editor.toolbar.code', 'Mã inline')}>
                 <IconButton size="small" onClick={() => applyInlineStyle('CODE')}>
                   <CodeIcon fontSize="small" />
                 </IconButton>
@@ -551,12 +549,12 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
 
             {/* Color & Highlight Dropdown */}
             <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title="Màu chữ">
+              <Tooltip title={t('editor.toolbar.textColor', 'Màu chữ')}>
                 <IconButton size="small" onClick={(e) => setColorAnchor(e.currentTarget)}>
                   <FormatColorTextIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Màu nền highlight">
+              <Tooltip title={t('editor.toolbar.highlightColor', 'Màu nền highlight')}>
                 <IconButton size="small" onClick={(e) => setHighlightAnchor(e.currentTarget)}>
                   <FormatColorFillIcon fontSize="small" />
                 </IconButton>
@@ -574,7 +572,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
                   <Tooltip key={item.color} title={item.label}>
                     <Box
                       onClick={() => {
-                        applyHTMLContent(`<span style="color: ${item.color};">Văn bản màu</span>`, 'append');
+                        applyHTMLContent(`<span style="color: ${item.color};">${t('editor.sampleText', 'Văn bản màu')}</span>`, 'append');
                         setColorAnchor(null);
                       }}
                       sx={{
@@ -604,7 +602,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
                   <Tooltip key={item.label} title={item.label}>
                     <Box
                       onClick={() => {
-                        applyHTMLContent(`<mark style="background-color: ${item.color}; padding: 2px 4px; border-radius: 3px;">Văn bản highlight</mark>`, 'append');
+                        applyHTMLContent(`<mark style="background-color: ${item.color}; padding: 2px 4px; border-radius: 3px;">${t('editor.sampleHighlight', 'Văn bản highlight')}</mark>`, 'append');
                         setHighlightAnchor(null);
                       }}
                       sx={{
@@ -624,12 +622,12 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
 
             {/* Lists & Alignment */}
             <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title="Danh sách chấm tròn">
+              <Tooltip title={t('editor.toolbar.bulletList', 'Danh sách chấm tròn')}>
                 <IconButton size="small" onClick={() => applyBlockType('unordered-list-item')}>
                   <FormatListBulletedIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Danh sách số thứ tự">
+              <Tooltip title={t('editor.toolbar.orderedList', 'Danh sách số thứ tự')}>
                 <IconButton size="small" onClick={() => applyBlockType('ordered-list-item')}>
                   <FormatListNumberedIcon fontSize="small" />
                 </IconButton>
@@ -640,27 +638,27 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
 
             {/* Insert Controls: Image, Link, Table, Callout, Divider */}
             <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title="Tải ảnh lên (Upload ảnh / Kéo thả)">
+              <Tooltip title={t('editor.toolbar.uploadImage', 'Tải ảnh lên (Upload ảnh / Kéo thả)')}>
                 <IconButton size="small" onClick={() => fileInputRef.current?.click()}>
                   <ImageIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Chèn liên kết (Link)">
+              <Tooltip title={t('editor.toolbar.link', 'Chèn liên kết (Link)')}>
                 <IconButton size="small" onClick={() => setOpenLinkModal(true)}>
                   <LinkIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Chèn bảng dữ liệu">
+              <Tooltip title={t('editor.toolbar.table', 'Chèn bảng dữ liệu')}>
                 <IconButton size="small" onClick={() => setOpenTableModal(true)}>
                   <TableChartIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Chèn khối ghi chú (Callout box)">
+              <Tooltip title={t('editor.toolbar.callout', 'Chèn khối ghi chú (Callout box)')}>
                 <IconButton size="small" onClick={() => setOpenCalloutModal(true)}>
                   <LightbulbOutlinedIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Chèn đường phân cách ngang">
+              <Tooltip title={t('editor.toolbar.horizontalRule', 'Chèn đường phân cách ngang')}>
                 <IconButton size="small" onClick={handleInsertDivider}>
                   <HorizontalRuleIcon fontSize="small" />
                 </IconButton>
@@ -680,19 +678,19 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
           {/* Right Group: Undo/Redo, Preview, Fullscreen */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
             <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title="Hoàn tác (Undo)">
+              <Tooltip title={t('editor.toolbar.undo', 'Hoàn tác (Undo)')}>
                 <IconButton size="small" onClick={handleUndo}>
                   <UndoIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Làm lại (Redo)">
+              <Tooltip title={t('editor.toolbar.redo', 'Làm lại (Redo)')}>
                 <IconButton size="small" onClick={handleRedo}>
                   <RedoIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
             </ButtonGroup>
 
-            <Tooltip title="Xem trước bản in / hiển thị thực tế">
+            <Tooltip title={t('editor.toolbar.livePreview', 'Xem trước bản in / hiển thị thực tế')}>
               <IconButton
                 size="small"
                 onClick={() => setOpenPreviewModal(true)}
@@ -707,7 +705,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
               </IconButton>
             </Tooltip>
 
-            <Tooltip title={isFullscreen ? 'Thu nhỏ' : 'Toàn màn hình'}>
+            <Tooltip title={isFullscreen ? t('actions.zoomOut', 'Thu nhỏ') : t('actions.zoomIn', 'Toàn màn hình')}>
               <IconButton
                 size="small"
                 onClick={() => setIsFullscreen(!isFullscreen)}
@@ -775,7 +773,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
           <DraftEditor
             editorState={editorState}
             onEditorStateChange={handleEditorStateChange}
-            placeholder={placeholder}
+            placeholder={defaultPlaceholder}
             readOnly={disabled}
             handlePastedFiles={(files: Blob[]) => {
               const img = files.find((f) => f.type.startsWith('image/'));
@@ -814,7 +812,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
             >
               <CircularProgress size={32} />
               <Typography variant="body2" fontWeight={600} color="primary.main">
-                Đang tải ảnh lên máy chủ {uploadState.fileName ? `(${uploadState.fileName})` : ''}: {uploadState.progress}%
+                {t('editor.uploadingImage', 'Đang tải ảnh lên máy chủ')} {uploadState.fileName ? `(${uploadState.fileName})` : ''}: {uploadState.progress}%
               </Typography>
             </Box>
           )}
@@ -837,14 +835,14 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <span>
-              <strong>{wordCount}</strong> từ
+              <strong>{wordCount}</strong> {t('editor.status.wordsUnit', 'từ')}
             </span>
             <span>•</span>
             <span>
-              <strong>{charCount}</strong> ký tự
+              <strong>{charCount}</strong> {t('editor.status.charactersUnit', 'ký tự')}
             </span>
             <span>•</span>
-            <span>Ước tính: <strong>~{readingTime}</strong> phút đọc</span>
+            <span>{t('editor.status.readingTimeEst', 'Ước tính:')} <strong>~{readingTime}</strong> {t('editor.status.minutesRead', 'phút đọc')}</span>
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -861,7 +859,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
               }}
             >
               <AutoAwesomeIcon sx={{ fontSize: 13 }} />
-              AILA AI Ready
+              {t('editor.status.aiReady', 'AILA AI Ready')}
             </Box>
           </Box>
         </Box>
@@ -887,7 +885,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
         open={openPreviewModal}
         onClose={() => setOpenPreviewModal(false)}
         htmlContent={htmlContent}
-        title={title ? `Xem trước: ${title}` : 'Xem Trước Nội Dung'}
+        title={title ? `${t('actions.preview', 'Xem trước')}: ${title}` : t('editor.preview.modalTitle', 'Xem Trước Nội Dung')}
       />
 
       <LinkModal

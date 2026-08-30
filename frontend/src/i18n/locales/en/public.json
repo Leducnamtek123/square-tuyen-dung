@@ -491,5 +491,15 @@
     "registerPrompt": "Don't have an account?",
     "registerBtn": "Create an account",
     "closeBtn": "Maybe later"
-  }
+  },
+  "feedback": {
+    "employerRole": "Employer",
+    "candidateRole": "Job Seeker",
+    "employerImpact": "Fast & Accurate Hiring",
+    "candidateImpact": "Applied Successfully",
+    "enterpriseBadge": "Enterprise",
+    "candidateBadge": "Candidate"
+  },
+  "featuredCompanies": "Featured Companies",
+  "openPositions": "{{count}} open positions"
 }

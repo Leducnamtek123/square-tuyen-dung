@@ -3,6 +3,7 @@ import { Box, Typography, Button, Stack, Paper, Chip } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import CloseIcon from '@mui/icons-material/Close';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import { useTranslation } from 'react-i18next';
 
 interface ExportSuccessProps {
   fileName: string;
@@ -17,6 +18,8 @@ export const ExportSuccess: React.FC<ExportSuccessProps> = ({
   onDownload,
   onClose,
 }) => {
+  const { t } = useTranslation('common');
+
   return (
     <Box
       sx={{
@@ -77,10 +80,10 @@ export const ExportSuccess: React.FC<ExportSuccessProps> = ({
         </Box>
 
         <Typography variant="h6" sx={{ fontWeight: 700, color: '#111827', mb: 0.5, fontSize: '1.25rem' }}>
-          Xuất dữ liệu thành công!
+          {t('export.successTitle', 'Xuất dữ liệu thành công!')}
         </Typography>
         <Typography variant="body2" sx={{ color: '#6B7280', mb: 3, fontSize: '0.875rem' }}>
-          Tệp dữ liệu đã sẵn sàng. Vui lòng bấm nút <strong>Tải xuống</strong> để tải về thiết bị.
+          {t('export.successSubtitle', 'Tệp dữ liệu đã sẵn sàng. Vui lòng bấm nút Tải xuống để tải về thiết bị.')}
         </Typography>
 
         {/* File summary card */}
@@ -119,10 +122,10 @@ export const ExportSuccess: React.FC<ExportSuccessProps> = ({
                 {fileName}
               </Typography>
               <Typography variant="caption" sx={{ color: '#6B7280', fontSize: '0.75rem' }}>
-                Tổng số bản ghi: <strong>{recordCount}</strong> dòng
+                {t('export.totalRecords', 'Tổng số: {{count}} bản ghi', { count: recordCount })}
               </Typography>
             </Box>
-            <Chip label="Sẵn sàng" size="small" color="success" sx={{ height: 22, fontSize: '0.7rem', fontWeight: 600 }} />
+            <Chip label={t('export.ready', 'Sẵn sàng')} size="small" color="success" sx={{ height: 22, fontSize: '0.7rem', fontWeight: 600 }} />
           </Stack>
         </Paper>
 
@@ -146,7 +149,7 @@ export const ExportSuccess: React.FC<ExportSuccessProps> = ({
               },
             }}
           >
-            Đóng
+            {t('common.actions.close', 'Đóng')}
           </Button>
 
           <Button
@@ -166,7 +169,7 @@ export const ExportSuccess: React.FC<ExportSuccessProps> = ({
               },
             }}
           >
-            Tải xuống
+            {t('export.download', 'Tải xuống')}
           </Button>
         </Stack>
       </Paper>

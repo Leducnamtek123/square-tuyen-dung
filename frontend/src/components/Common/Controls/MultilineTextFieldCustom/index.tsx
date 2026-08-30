@@ -1,13 +1,10 @@
 'use client';
 import React from 'react';
-
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-
+import { Control, FieldValues, Path } from 'react-hook-form';
 import { TextField, Typography } from "@mui/material";
 import ValidationError from '../ValidationError';
-
+import TypedController from '../TypedController';
 import type { SxProps, Theme } from '@mui/material/styles';
-const ControllerAny = Controller as any;
 
 interface Props<T extends FieldValues> {
   name: Path<T>;
@@ -34,26 +31,17 @@ const MultilineTextFieldCustom = <T extends FieldValues>({
 }: Props<T>) => {
 
   return (
-
     <div>
-
       {title && (
-
         <Typography variant="subtitle2" gutterBottom>
-
            {title} {showRequired && <span style={{ color: 'red' }}>*</span>}
-
         </Typography>
-
       )}
 
-      <ControllerAny
-
+      <TypedController
         name={name}
-
         control={control}
-
-        render={({ field, fieldState }: any) => (
+        render={({ field, fieldState }) => (
 
           <>
 

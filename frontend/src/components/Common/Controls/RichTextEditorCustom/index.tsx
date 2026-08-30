@@ -1,14 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Control, Controller, FieldValues, Path, PathValue } from 'react-hook-form';
+import { Control, FieldValues, Path, PathValue } from 'react-hook-form';
 import { Box, Typography } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { createEditorStateFromHTMLString } from '@/utils/editorUtils';
 import ModernRichEditor from '../ModernRichEditor';
 import { AIContentType } from '../ModernRichEditor/aiAssistantEngine';
-
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 interface Props<T extends FieldValues = FieldValues> {
   control: Control<T>;
@@ -56,11 +55,11 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
 
   return (
     <Box sx={{ width: '100%' }}>
-      <ControllerAny
+      <TypedController
         control={control}
         name={name as Path<T>}
         defaultValue={createEditorStateFromHTMLString('') as PathValue<T, Path<T>>}
-        render={({ field, fieldState }: any) => {
+        render={({ field, fieldState }) => {
           return (
             <>
               <ModernRichEditor

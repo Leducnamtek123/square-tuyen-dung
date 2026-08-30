@@ -491,5 +491,15 @@
     "registerPrompt": "Chưa có tài khoản?",
     "registerBtn": "Đăng ký tài khoản",
     "closeBtn": "Để sau"
-  }
+  },
+  "feedback": {
+    "employerRole": "Nhà tuyển dụng",
+    "candidateRole": "Ứng viên tìm việc",
+    "employerImpact": "Tuyển dụng nhanh & chính xác",
+    "candidateImpact": "Ứng tuyển thành công",
+    "enterpriseBadge": "Doanh nghiệp",
+    "candidateBadge": "Ứng viên"
+  },
+  "featuredCompanies": "Công ty nổi bật",
+  "openPositions": "{{count}} vị trí đang tuyển"
 }

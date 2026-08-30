@@ -1,21 +1,14 @@
 import * as React from 'react';
-
 import { useTheme } from '@mui/material/styles';
-
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-
+import { Control, FieldValues, Path } from 'react-hook-form';
 import Checkbox from '@mui/material/Checkbox';
-
 import TextField from '@mui/material/TextField';
-
 import Autocomplete from '@mui/material/Autocomplete';
-
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import { useTranslation } from 'react-i18next';
 import type { SelectOption } from '@/types/models';
-
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 const EMPTY_OPTIONS: SelectOption[] = [];
 
@@ -27,7 +20,6 @@ interface Props<T extends FieldValues = FieldValues> {
 }
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const valuesAsArray = (value: unknown): Array<string | number> => {
@@ -49,14 +41,10 @@ const MultiSelectSearchCustom = <T extends FieldValues = FieldValues>({
   const { t } = useTranslation('common');
 
   return (
-
-    <ControllerAny
-
+    <TypedController
       name={name as Path<T>}
-
       control={control}
-
-      render={({ field }: any) => (
+      render={({ field }) => (
 
         <Autocomplete
 

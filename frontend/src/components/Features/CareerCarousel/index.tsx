@@ -141,7 +141,7 @@ const normalizeCareers = (careers: Career[] = []) =>
     .filter((career) => Number.isFinite(career.id) && career.id > 0 && career.name);
 
 const CareerCarousel: React.FC = () => {
-  const { t, i18n } = useTranslation('public');
+  const { t, i18n } = useTranslation(['public', 'common']);
   const dispatch = useDispatch();
   const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
 
@@ -167,13 +167,13 @@ const CareerCarousel: React.FC = () => {
         <Stack direction="row" spacing={1} alignItems="center">
           <BusinessCenterIcon sx={{ color: '#2563eb', fontSize: 26 }} />
           <Typography variant="h5" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.01em' }}>
-            {t('home.keyCareersTitle') || 'Top ngành nghề nổi bật'}
+            {t('public:home.keyCareersTitle') || 'Top ngành nghề nổi bật'}
           </Typography>
         </Stack>
 
         <Link href={jobsHref} style={{ textDecoration: 'none' }}>
           <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: '#2563eb', cursor: 'pointer', '&:hover': { opacity: 0.85 } }}>
-            <Typography sx={{ fontWeight: 600, fontSize: '0.925rem' }}>Xem tất cả</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: '0.925rem' }}>{t('common:actions.viewAll', 'Xem tất cả')}</Typography>
             <ArrowForwardIcon sx={{ fontSize: 16 }} />
           </Stack>
         </Link>

@@ -38,6 +38,7 @@ export const ChatPartnerHeader = ({
     partner?.avatarUrl &&
     partner.avatarUrl.trim() &&
     partner.avatarUrl !== 'null' &&
+    partner.avatarUrl !== 'undefined' &&
     partner.avatarUrl !== '[object Object]'
       ? partner.avatarUrl
       : undefined;

@@ -9,15 +9,14 @@ import {
   IconButton,
   Button,
   Grid2 as Grid,
-  Slide,
   useMediaQuery,
   useTheme,
   Stack,
-  Divider,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import { useTranslation } from 'react-i18next';
 import type { ExportModalProps } from './types';
 import { useExportStateMachine } from './useExportStateMachine';
 import { ExportOptions } from './ExportOptions';
@@ -27,7 +26,8 @@ import { ExportSuccess } from './ExportSuccess';
 import { ExportError } from './ExportError';
 
 export const ExportModal: React.FC<ExportModalProps> = (props) => {
-  const { open, onClose, title = 'Xuất dữ liệu (Export)' } = props;
+  const { t } = useTranslation('common');
+  const { open, onClose, title = t('export.title', 'Xuất dữ liệu (Export)') } = props;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
@@ -81,7 +81,6 @@ export const ExportModal: React.FC<ExportModalProps> = (props) => {
           boxShadow: '0px 20px 25px -5px rgba(0, 0, 0, 0.1), 0px 10px 10px -5px rgba(0, 0, 0, 0.04)',
           overflow: 'hidden',
           backgroundColor: '#FFFFFF',
-          // Fade and scale transition (0.96 -> 1, 200ms)
           animation: open ? 'scaleUp 200ms cubic-bezier(0.16, 1, 0.3, 1)' : 'none',
           '@keyframes scaleUp': {
             '0%': { transform: 'scale(0.96)', opacity: 0 },
@@ -123,7 +122,7 @@ export const ExportModal: React.FC<ExportModalProps> = (props) => {
               {title}
             </Typography>
             <Typography variant="caption" sx={{ color: '#6B7280', fontSize: '0.75rem' }}>
-              Cấu hình phạm vi, xem trước và tải xuống file dữ liệu
+              {t('export.subtitle', 'Cấu hình phạm vi, xem trước và tải xuống file dữ liệu')}
             </Typography>
           </Box>
         </Stack>
@@ -132,7 +131,7 @@ export const ExportModal: React.FC<ExportModalProps> = (props) => {
           <IconButton
             onClick={onClose}
             size="small"
-            aria-label="Đóng modal"
+            aria-label={t('common.actions.close', 'Đóng')}
             sx={{
               color: '#9CA3AF',
               borderRadius: '8px',
@@ -237,7 +236,7 @@ export const ExportModal: React.FC<ExportModalProps> = (props) => {
               },
             }}
           >
-            Hủy
+            {t('common.actions.cancel', 'Hủy')}
           </Button>
 
           <Button
@@ -258,7 +257,7 @@ export const ExportModal: React.FC<ExportModalProps> = (props) => {
               },
             }}
           >
-            Xuất file dữ liệu
+            {t('export.exportButton', 'Xuất file dữ liệu')}
           </Button>
         </DialogActions>
       )}

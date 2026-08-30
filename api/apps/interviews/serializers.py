@@ -420,14 +420,14 @@ class InterviewEvaluationSerializer(serializers.ModelSerializer):
 
 class InterviewSessionListSerializer(serializers.ModelSerializer):
     """Serializer for list endpoint."""
-    candidate = serializers.SerializerMethodField()
-    job_post = serializers.SerializerMethodField()
-    candidate_name = serializers.SerializerMethodField()
-    candidate_email = serializers.SerializerMethodField()
-    job_name = serializers.SerializerMethodField()
+    candidate = serializers.IntegerField(source='candidate_id', read_only=True, default=None)
+    candidate_name = serializers.CharField(source='candidate.full_name', read_only=True, default=None)
+    candidate_email = serializers.CharField(source='candidate.email', read_only=True, default=None)
+    job_post = serializers.IntegerField(source='job_post_id', read_only=True, default=None)
+    job_name = serializers.CharField(source='job_post.job_name', read_only=True, default=None)
     company_name = serializers.SerializerMethodField()
-    voice_profile = serializers.SerializerMethodField()
-    voice_profile_name = serializers.SerializerMethodField()
+    voice_profile = serializers.IntegerField(source='voice_profile_id', read_only=True, default=None)
+    voice_profile_name = serializers.CharField(source='voice_profile.name', read_only=True, default=None)
     evaluations_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -443,90 +443,37 @@ class InterviewSessionListSerializer(serializers.ModelSerializer):
             'create_at', 'update_at'
         ]
 
-    def get_candidate_name(self, obj):
-        try:
-            return obj.candidate.full_name if obj.candidate else None
-        except Exception:
-            return None
-
-    def get_candidate(self, obj):
-        try:
-            return obj.candidate_id
-        except Exception:
-            return None
-
-    def get_candidate_email(self, obj):
-        try:
-            return obj.candidate.email if obj.candidate else None
-        except Exception:
-            return None
-
-    def get_job_post(self, obj):
-        try:
-            return obj.job_post_id
-        except Exception:
-            return None
-
-    def get_job_name(self, obj):
-        try:
-            return obj.job_post.job_name if obj.job_post else None
-        except Exception:
-            return None
-
     def get_company_name(self, obj):
-        try:
-            if obj.job_post and obj.job_post.company:
-                return obj.job_post.company.company_name
-        except Exception:
-            pass
-
-        try:
-            if obj.question_group and obj.question_group.company:
-                return obj.question_group.company.company_name
-        except Exception:
-            pass
-
+        if obj.job_post and getattr(obj.job_post, 'company', None):
+            return obj.job_post.company.company_name
+        if obj.question_group and getattr(obj.question_group, 'company', None):
+            return obj.question_group.company.company_name
         return None
-
-    def get_voice_profile(self, obj):
-        try:
-            return obj.voice_profile_id
-        except Exception:
-            return None
-
-    def get_voice_profile_name(self, obj):
-        try:
-            return obj.voice_profile.name if obj.voice_profile else None
-        except Exception:
-            return None
 
     def get_evaluations_count(self, obj):
         if hasattr(obj, "evaluations_count"):
             return obj.evaluations_count
         if hasattr(obj, "_prefetched_objects_cache") and "evaluations" in obj._prefetched_objects_cache:
             return len(obj.evaluations.all())
-        try:
-            return obj.evaluations.count()
-        except Exception:
-            return 0
+        return obj.evaluations.count()
 
 
 class InterviewSessionDetailSerializer(serializers.ModelSerializer):
     """Serializer for detail endpoint."""
-    candidate = serializers.SerializerMethodField()
-    job_post = serializers.SerializerMethodField()
-    created_by = serializers.SerializerMethodField()
-    question_group = serializers.SerializerMethodField()
-    candidate_name = serializers.SerializerMethodField()
-    candidate_email = serializers.SerializerMethodField()
-    job_name = serializers.SerializerMethodField()
+    candidate = serializers.IntegerField(source='candidate_id', read_only=True, default=None)
+    candidate_name = serializers.CharField(source='candidate.full_name', read_only=True, default=None)
+    candidate_email = serializers.CharField(source='candidate.email', read_only=True, default=None)
+    job_post = serializers.IntegerField(source='job_post_id', read_only=True, default=None)
+    job_name = serializers.CharField(source='job_post.job_name', read_only=True, default=None)
     company_name = serializers.SerializerMethodField()
+    created_by = serializers.IntegerField(source='created_by_id', read_only=True, default=None)
+    question_group = serializers.IntegerField(source='question_group_id', read_only=True, default=None)
     voice_profile = serializers.PrimaryKeyRelatedField(
         queryset=VoiceProfile.objects.all(),
         required=False,
         allow_null=True,
     )
-    voice_profile_name = serializers.SerializerMethodField()
+    voice_profile_name = serializers.CharField(source='voice_profile.name', read_only=True, default=None)
     questions = QuestionSerializer(many=True, read_only=True)
     transcripts = InterviewTranscriptSerializer(many=True, read_only=True)
     evaluations = InterviewEvaluationSerializer(many=True, read_only=True)
@@ -551,67 +498,11 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
             'created_by', 'create_at', 'update_at'
         ]
 
-    def get_candidate_name(self, obj):
-        try:
-            return obj.candidate.full_name if obj.candidate else None
-        except Exception:
-            return None
-
-    def get_candidate(self, obj):
-        try:
-            return obj.candidate_id
-        except Exception:
-            return None
-
-    def get_candidate_email(self, obj):
-        try:
-            return obj.candidate.email if obj.candidate else None
-        except Exception:
-            return None
-
-    def get_job_post(self, obj):
-        try:
-            return obj.job_post_id
-        except Exception:
-            return None
-
-    def get_created_by(self, obj):
-        try:
-            return obj.created_by_id
-        except Exception:
-            return None
-
-    def get_question_group(self, obj):
-        try:
-            return obj.question_group_id
-        except Exception:
-            return None
-
-    def get_voice_profile_name(self, obj):
-        try:
-            return obj.voice_profile.name if obj.voice_profile else None
-        except Exception:
-            return None
-
-    def get_job_name(self, obj):
-        try:
-            return obj.job_post.job_name if obj.job_post else None
-        except Exception:
-            return None
-
     def get_company_name(self, obj):
-        try:
-            if obj.job_post and obj.job_post.company:
-                return obj.job_post.company.company_name
-        except Exception:
-            pass
-
-        try:
-            if obj.question_group and obj.question_group.company:
-                return obj.question_group.company.company_name
-        except Exception:
-            pass
-
+        if obj.job_post and getattr(obj.job_post, 'company', None):
+            return obj.job_post.company.company_name
+        if obj.question_group and getattr(obj.question_group, 'company', None):
+            return obj.question_group.company.company_name
         return None
 
 

@@ -133,6 +133,7 @@ const SidebarRenderer = ({ searchPlaceholderKey, getSubtextName }: SidebarRender
                     room?.user?.avatarUrl &&
                     room.user.avatarUrl.trim() &&
                     room.user.avatarUrl !== 'null' &&
+                    room.user.avatarUrl !== 'undefined' &&
                     room.user.avatarUrl !== '[object Object]'
                       ? room.user.avatarUrl
                       : undefined;

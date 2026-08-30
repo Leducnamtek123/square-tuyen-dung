@@ -30,12 +30,12 @@ export const EmployerFooter: React.FC = () => {
   );
 
   const employerLinks = [
-    { label: 'Bảng giá dịch vụ', route: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, lang) },
-    { label: 'Cẩm nang tuyển dụng', route: localizeRoutePath(`/${ROUTES.EMPLOYER.BLOG}`, lang) },
-    { label: 'Hỏi đáp thường gặp (FAQ)', route: localizeRoutePath(`/${ROUTES.EMPLOYER.FAQ}`, lang) },
-    { label: 'Chính sách bảo hành & Hoàn tiền', route: `/${ROUTES.EMPLOYER.WARRANTY_HTML}` },
-    { label: 'Điều khoản sử dụng cho Nhà tuyển dụng', route: `/${ROUTES.EMPLOYER.TERMS_HTML}` },
-    { label: 'Chính sách bảo mật thông tin', route: `/${ROUTES.EMPLOYER.PRIVACY_HTML}` },
+    { label: t('footer.pricingTable', 'Bảng giá dịch vụ'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, lang) },
+    { label: t('footer.employerBlog', 'Cẩm nang tuyển dụng'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.BLOG}`, lang) },
+    { label: t('footer.employerFaq', 'Hỏi đáp thường gặp (FAQ)'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.FAQ}`, lang) },
+    { label: t('footer.warrantyPolicy', 'Chính sách bảo hành & Hoàn tiền'), route: `/${ROUTES.EMPLOYER.WARRANTY_HTML}` },
+    { label: t('footer.employerTerms', 'Điều khoản sử dụng cho Nhà tuyển dụng'), route: `/${ROUTES.EMPLOYER.TERMS_HTML}` },
+    { label: t('footer.employerPrivacy', 'Chính sách bảo mật thông tin'), route: `/${ROUTES.EMPLOYER.PRIVACY_HTML}` },
   ];
 
   return (
@@ -64,7 +64,7 @@ export const EmployerFooter: React.FC = () => {
                   letterSpacing: '-0.01em',
                 }}
               >
-                Về chúng tôi
+                {t('footer.aboutUs', 'Về chúng tôi')}
               </Typography>
 
               <Stack spacing={1.25} sx={{ color: '#475569', fontSize: '0.875rem', lineHeight: 1.6 }}>
@@ -73,27 +73,27 @@ export const EmployerFooter: React.FC = () => {
                 </Typography>
 
                 <Typography sx={{ fontSize: '0.875rem' }}>
-                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>Trụ sở chính: </Box>
+                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>{t('footer.headquarters', 'Trụ sở chính: ')}</Box>
                   29 Hòa Hảo, Phường 2, Quận 10, TP. Hồ Chí Minh, Việt Nam
                 </Typography>
 
 
                 <Typography sx={{ fontSize: '0.875rem' }}>
-                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>Điện thoại: </Box>
+                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>{t('footer.phone', 'Điện thoại: ')}</Box>
                   <Box component="span" sx={{ color: '#0f172a', fontWeight: 700 }}>0987 987 733</Box>
                   {' '}|{' '}
                   <Box component="span" sx={{ color: '#0f172a', fontWeight: 700 }}>(028) 7108 2424</Box>
                 </Typography>
 
                 <Typography sx={{ fontSize: '0.875rem' }}>
-                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>Email hỗ trợ người tìm việc: </Box>
+                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>{t('footer.jobSeekerEmailSupport', 'Email hỗ trợ người tìm việc: ')}</Box>
                   <Box component="a" href="mailto:ntv@infohr.vn" sx={{ color: '#2563eb', textDecoration: 'none', fontWeight: 600 }}>
                     ntv@infohr.vn
                   </Box>
                 </Typography>
 
                 <Typography sx={{ fontSize: '0.875rem' }}>
-                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>Email hỗ trợ nhà tuyển dụng: </Box>
+                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>{t('footer.employerEmailSupport', 'Email hỗ trợ nhà tuyển dụng: ')}</Box>
                   <Box component="a" href="mailto:ntd@infohr.vn" sx={{ color: '#2563eb', textDecoration: 'none', fontWeight: 600 }}>
                     ntd@infohr.vn
                   </Box>
@@ -112,7 +112,7 @@ export const EmployerFooter: React.FC = () => {
                   color: '#0f172a',
                 }}
               >
-                Thông tin
+                {t('footer.information', 'Thông tin')}
               </Typography>
 
               <Stack spacing={1.25}>
@@ -150,7 +150,7 @@ export const EmployerFooter: React.FC = () => {
                   color: '#0f172a',
                 }}
               >
-                Kết nối với chúng tôi
+                {t('footer.connectWithUs', 'Kết nối với chúng tôi')}
               </Typography>
 
               <FooterSocialIcons variant="light" />
@@ -168,7 +168,7 @@ export const EmployerFooter: React.FC = () => {
             sx={{ textAlign: { xs: 'center', md: 'left' } }}
           >
             <Typography sx={{ color: '#475569', fontSize: '0.85rem' }}>
-              © {currentYear} {APP_NAME}. Bản quyền được bảo lưu.
+              © {currentYear} {APP_NAME}. {t('footer.allRightsReserved', 'Bản quyền được bảo lưu.')}
             </Typography>
 
             {/* Trust Badges: DMCA & Bộ Công Thương */}

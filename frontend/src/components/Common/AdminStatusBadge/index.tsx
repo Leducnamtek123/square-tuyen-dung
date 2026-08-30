@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 export type StatusVariant =
   | 'active'
@@ -82,9 +83,10 @@ export default function AdminStatusBadge({
   showDot = true,
   icon,
 }: AdminStatusBadgeProps) {
+  const { t } = useTranslation('common');
   const normalizedKey = String(status || '').toLowerCase().trim();
   const config = STYLE_MAP[normalizedKey] || DEFAULT_STYLE;
-  const displayLabel = label || config.defaultLabel;
+  const displayLabel = label || t(`common.status.${normalizedKey}`, config.defaultLabel);
 
   const isSmall = size === 'small';
 

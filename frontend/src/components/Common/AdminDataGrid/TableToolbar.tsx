@@ -26,6 +26,7 @@ import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { useTranslation } from 'react-i18next';
 import type { FilterDef, BulkAction } from './types';
 
 interface TableToolbarProps<T> {
@@ -52,7 +53,7 @@ export default function TableToolbar<T>({
   headerAction,
   searchQuery = '',
   onSearchChange,
-  searchPlaceholder = 'Tìm kiếm nhanh...',
+  searchPlaceholder,
   filters = [],
   onFilterChange,
   onResetFilters,
@@ -63,8 +64,11 @@ export default function TableToolbar<T>({
   onRefresh,
   loading = false,
 }: TableToolbarProps<T>) {
+  const { t } = useTranslation('common');
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+
+  const effectiveSearchPlaceholder = searchPlaceholder || t('common.searchPlaceholder', 'Tìm kiếm...');
 
   useEffect(() => {
     setLocalSearch(searchQuery);
@@ -153,7 +157,7 @@ export default function TableToolbar<T>({
           <Stack direction="row" spacing={1.5} alignItems="center">
             <CheckCircleOutlineIcon sx={{ color: '#2563EB', fontSize: 20 }} />
             <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#1E40AF' }}>
-              Đã chọn {selectedCount} mục
+              {t('common.selectedCount', 'Đã chọn {{count}} mục', { count: selectedCount })}
             </Typography>
             {onClearSelection && (
               <Button
@@ -167,7 +171,7 @@ export default function TableToolbar<T>({
                   '&:hover': { color: '#0F172A', bgcolor: 'transparent' },
                 }}
               >
-                Bỏ chọn
+                {t('common.actions.clear', 'Bỏ chọn')}
               </Button>
             )}
           </Stack>
@@ -212,7 +216,7 @@ export default function TableToolbar<T>({
               size="small"
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
-              placeholder={searchPlaceholder}
+              placeholder={effectiveSearchPlaceholder}
               sx={{
                 width: { xs: '100%', sm: 260, md: 320 },
                 '& .MuiOutlinedInput-root': {
@@ -256,7 +260,7 @@ export default function TableToolbar<T>({
                 sx={{ borderRadius: 2, fontSize: '0.875rem' }}
               >
                 <MenuItem value="all">
-                  <em>Tất cả {filter.label.toLowerCase()}</em>
+                  <em>{t('common.all', 'Tất cả')} {filter.label.toLowerCase()}</em>
                 </MenuItem>
                 {filter.options?.map((option) => (
                   <MenuItem key={String(option.value)} value={option.value as string}>
@@ -268,7 +272,7 @@ export default function TableToolbar<T>({
           ))}
 
           {hasActiveFilters && onResetFilters && (
-            <Tooltip title="Đặt lại bộ lọc">
+            <Tooltip title={t('common.actions.resetFilter', 'Đặt lại bộ lọc')}>
               <Button
                 size="small"
                 variant="text"
@@ -282,7 +286,7 @@ export default function TableToolbar<T>({
                   borderRadius: 2,
                 }}
               >
-                Đặt lại
+                {t('common.actions.reset', 'Đặt lại')}
               </Button>
             </Tooltip>
           )}
@@ -291,7 +295,7 @@ export default function TableToolbar<T>({
         {/* Right side: Refresh & Export */}
         <Stack direction="row" spacing={1} alignItems="center">
           {onRefresh && (
-            <Tooltip title="Làm mới dữ liệu">
+            <Tooltip title={t('common.actions.refreshData', 'Làm mới dữ liệu')}>
               <span>
                 <IconButton
                   size="small"
@@ -333,7 +337,7 @@ export default function TableToolbar<T>({
                   '&:hover': { borderColor: '#CBD5E1', bgcolor: '#F8FAFC' },
                 }}
               >
-                Xuất file
+                {t('common.actions.export', 'Xuất file')}
               </Button>
               <Menu
                 anchorEl={exportAnchorEl}
@@ -348,10 +352,10 @@ export default function TableToolbar<T>({
                 }}
               >
                 <MenuItem onClick={() => handleExportSelect('excel')} sx={{ fontSize: '0.875rem' }}>
-                  Xuất Microsoft Excel (.xlsx)
+                  {t('common.export.excel', 'Xuất Microsoft Excel (.xlsx)')}
                 </MenuItem>
                 <MenuItem onClick={() => handleExportSelect('csv')} sx={{ fontSize: '0.875rem' }}>
-                  Xuất CSV (.csv)
+                  {t('common.export.csv', 'Xuất CSV (.csv)')}
                 </MenuItem>
               </Menu>
             </>

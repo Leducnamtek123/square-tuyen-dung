@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, LinearProgress, Stack, Paper, CircularProgress } from '@mui/material';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import { useTranslation } from 'react-i18next';
 import type { ExportFormat } from './types';
 
 interface ExportProgressProps {
@@ -16,6 +17,8 @@ export const ExportProgress: React.FC<ExportProgressProps> = ({
   format,
   fileName,
 }) => {
+  const { t } = useTranslation('common');
+
   return (
     <Box
       sx={{
@@ -66,11 +69,11 @@ export const ExportProgress: React.FC<ExportProgressProps> = ({
         </Box>
 
         <Typography variant="h6" sx={{ fontWeight: 700, color: '#111827', mb: 0.5, fontSize: '1.125rem' }}>
-          Đang chuẩn bị file...
+          {t('export.preparing', 'Đang chuẩn bị file...')}
         </Typography>
 
         <Typography variant="body2" sx={{ color: '#6B7280', mb: 3, fontSize: '0.875rem' }}>
-          Đang tạo file <strong style={{ color: '#111827' }}>{fileName}</strong> ({format.toUpperCase()})
+          {t('export.generating', 'Đang tạo file {{fileName}} ({{format}})', { fileName, format: format.toUpperCase() })}
         </Typography>
 
         {/* Progress Bar Container */}
@@ -93,7 +96,7 @@ export const ExportProgress: React.FC<ExportProgressProps> = ({
 
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Typography variant="caption" sx={{ color: '#6B7280', fontWeight: 500, fontSize: '0.8125rem' }}>
-            {stepText || 'Đang khởi tạo file xuất...'}
+            {stepText || t('export.initializing', 'Đang khởi tạo file xuất...')}
           </Typography>
           <Typography variant="caption" sx={{ color: '#2563EB', fontWeight: 700, fontSize: '0.8125rem' }}>
             {progress}%

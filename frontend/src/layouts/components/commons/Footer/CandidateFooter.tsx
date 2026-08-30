@@ -30,12 +30,12 @@ export const CandidateFooter: React.FC = () => {
   );
 
   const infoLinks = [
-    { label: 'Cẩm nang nghề nghiệp', route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, lang) },
-    { label: 'Báo giá dịch vụ', route: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, lang) },
-    { label: 'Điều khoản sử dụng', route: `/${ROUTES.JOB_SEEKER.TERMS_HTML}` },
-    { label: 'Quy định bảo mật', route: `/${ROUTES.JOB_SEEKER.PRIVACY_HTML}` },
-    { label: 'Sơ đồ trang web', route: `/${ROUTES.JOB_SEEKER.SITEMAP_HTML}` },
-    { label: 'Tuân thủ và sự đồng ý của Khách Hàng', route: `/${ROUTES.JOB_SEEKER.CONSENT_HTML}` },
+    { label: t('footer.careerGuide', 'Cẩm nang nghề nghiệp'), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, lang) },
+    { label: t('footer.servicePricing', 'Báo giá dịch vụ'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, lang) },
+    { label: t('footer.termsOfUse', 'Điều khoản sử dụng'), route: `/${ROUTES.JOB_SEEKER.TERMS_HTML}` },
+    { label: t('footer.privacyPolicy', 'Quy định bảo mật'), route: `/${ROUTES.JOB_SEEKER.PRIVACY_HTML}` },
+    { label: t('footer.sitemap', 'Sơ đồ trang web'), route: `/${ROUTES.JOB_SEEKER.SITEMAP_HTML}` },
+    { label: t('footer.complianceConsent', 'Tuân thủ và sự đồng ý của Khách Hàng'), route: `/${ROUTES.JOB_SEEKER.CONSENT_HTML}` },
   ];
 
   return (
@@ -64,7 +64,7 @@ export const CandidateFooter: React.FC = () => {
                   letterSpacing: '-0.01em',
                 }}
               >
-                Về chúng tôi
+                {t('footer.aboutUs', 'Về chúng tôi')}
               </Typography>
 
               <Stack spacing={1.25} sx={{ color: '#475569', fontSize: '0.875rem', lineHeight: 1.6 }}>
@@ -73,27 +73,27 @@ export const CandidateFooter: React.FC = () => {
                 </Typography>
 
                 <Typography sx={{ fontSize: '0.875rem' }}>
-                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>Trụ sở chính: </Box>
+                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>{t('footer.headquarters', 'Trụ sở chính: ')}</Box>
                   29 Hòa Hảo, Phường 2, Quận 10, TP. Hồ Chí Minh, Việt Nam
                 </Typography>
 
 
                 <Typography sx={{ fontSize: '0.875rem' }}>
-                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>Điện thoại: </Box>
+                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>{t('footer.phone', 'Điện thoại: ')}</Box>
                   <Box component="span" sx={{ color: '#0f172a', fontWeight: 700 }}>0987 987 733</Box>
                   {' '}|{' '}
                   <Box component="span" sx={{ color: '#0f172a', fontWeight: 700 }}>(028) 7108 2424</Box>
                 </Typography>
 
                 <Typography sx={{ fontSize: '0.875rem' }}>
-                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>Email hỗ trợ người tìm việc: </Box>
+                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>{t('footer.jobSeekerEmailSupport', 'Email hỗ trợ người tìm việc: ')}</Box>
                   <Box component="a" href="mailto:ntv@infohr.vn" sx={{ color: '#2563eb', textDecoration: 'none', fontWeight: 600 }}>
                     ntv@infohr.vn
                   </Box>
                 </Typography>
 
                 <Typography sx={{ fontSize: '0.875rem' }}>
-                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>Email hỗ trợ nhà tuyển dụng: </Box>
+                  <Box component="span" sx={{ color: '#64748b', fontWeight: 600 }}>{t('footer.employerEmailSupport', 'Email hỗ trợ nhà tuyển dụng: ')}</Box>
                   <Box component="a" href="mailto:ntd@infohr.vn" sx={{ color: '#2563eb', textDecoration: 'none', fontWeight: 600 }}>
                     ntd@infohr.vn
                   </Box>
@@ -112,7 +112,7 @@ export const CandidateFooter: React.FC = () => {
                   color: '#0f172a',
                 }}
               >
-                Thông tin
+                {t('footer.information', 'Thông tin')}
               </Typography>
 
               <Stack spacing={1.25}>
@@ -150,7 +150,7 @@ export const CandidateFooter: React.FC = () => {
                   color: '#0f172a',
                 }}
               >
-                Kết nối với chúng tôi
+                {t('footer.connectWithUs', 'Kết nối với chúng tôi')}
               </Typography>
 
               <FooterSocialIcons variant="light" />
@@ -168,7 +168,7 @@ export const CandidateFooter: React.FC = () => {
             sx={{ textAlign: { xs: 'center', md: 'left' } }}
           >
             <Typography sx={{ color: '#475569', fontSize: '0.85rem' }}>
-              © {currentYear} {APP_NAME}. Bản quyền được bảo lưu.
+              © {currentYear} {APP_NAME}. {t('footer.allRightsReserved', 'Bản quyền được bảo lưu.')}
             </Typography>
 
             {/* Trust Badges: DMCA & Bộ Công Thương */}

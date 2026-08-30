@@ -41,12 +41,12 @@ const HeaderAuthArea = ({
         title={
           <Box sx={{ p: 0.5, minWidth: 140 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.875rem' }}>
-              {currentUserName || 'Ứng viên'}
+              {currentUserName || t('common.user', 'Ứng viên')}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
               <VerifiedIcon sx={{ fontSize: 13, color: isVerified ? '#4ade80' : '#94a3b8' }} />
               <Typography variant="caption" sx={{ color: isVerified ? '#4ade80' : '#cbd5e1', fontWeight: 700, fontSize: '0.725rem' }}>
-                {isVerified ? 'Tài khoản đã xác thực' : 'Tài khoản chưa xác thực'}
+                {isVerified ? t('auth.verifiedAccount', 'Tài khoản đã xác thực') : t('auth.unverifiedAccount', 'Tài khoản chưa xác thực')}
               </Typography>
             </Box>
           </Box>
@@ -67,7 +67,7 @@ const HeaderAuthArea = ({
           },
         }}
       >
-        <IconButton aria-label="Quay lại"
+        <IconButton aria-label={t('header.userMenu', 'Tài khoản người dùng')}
           onClick={onOpenUserMenu}
           sx={{
             p: 0.4,

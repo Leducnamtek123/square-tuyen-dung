@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import { Box } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import ModernRichEditor from '../ModernRichEditor';
 import { convertEditorStateToHTMLString } from '@/utils/editorUtils';
 import { AIContentType } from '../ModernRichEditor/aiAssistantEngine';
@@ -24,10 +25,13 @@ const SimpleRichEditor = ({
   value,
   onChange,
   minHeight = 320,
-  placeholder = 'Soạn thảo nội dung bài viết hoặc sử dụng Trợ lý AI...',
+  placeholder,
   title,
   contextType = 'blog',
 }: SimpleRichEditorProps) => {
+  const { t } = useTranslation('common');
+  const defaultPlaceholder = placeholder || t('editor.defaultSimplePlaceholder', 'Soạn thảo nội dung bài viết hoặc sử dụng Trợ lý AI...');
+
   const handleChange = (editorStateOrVal: any) => {
     if (editorStateOrVal && typeof editorStateOrVal.getCurrentContent === 'function') {
       const html = convertEditorStateToHTMLString(editorStateOrVal);
@@ -43,7 +47,7 @@ const SimpleRichEditor = ({
         value={value || ''}
         onChange={handleChange}
         minHeight={minHeight}
-        placeholder={placeholder}
+        placeholder={defaultPlaceholder}
         title={title}
         contextType={contextType}
       />

@@ -132,7 +132,15 @@ const RightSidebarRenderer = <T,>({ titleKey, noDataKey, fetchData, mapDataToUI 
                 >
                   <Stack direction="row" spacing={1.5} alignItems="center">
                     <Avatar
-                      src={mapped.imageUrl}
+                      src={
+                        mapped.imageUrl &&
+                        mapped.imageUrl.trim() &&
+                        mapped.imageUrl !== 'null' &&
+                        mapped.imageUrl !== 'undefined' &&
+                        mapped.imageUrl !== '[object Object]'
+                          ? mapped.imageUrl
+                          : undefined
+                      }
                       alt={mapped.primaryText}
                       variant="rounded"
                       sx={{

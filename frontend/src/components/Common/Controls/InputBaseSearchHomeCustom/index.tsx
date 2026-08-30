@@ -9,7 +9,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { Control, FieldValues, Path } from 'react-hook-form';
 import { Box, ClickAwayListener, List, ListItem, ListItemIcon, ListItemText, Popper, Stack, Typography, CircularProgress, IconButton, InputAdornment } from '@mui/material';
 const PopperAny = Popper as unknown as React.ComponentType<any>;
 import { useDebounce } from '@/hooks';
@@ -24,7 +24,7 @@ import {
   writeVersionedJson,
 } from '@/utils/storageKeys';
 import { localizeRoutePath } from '@/configs/routeLocalization';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
@@ -270,10 +270,10 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
           >
             <SearchIcon fontSize="small" />
           </Box>
-          <ControllerAny
+          <TypedController
             name={name as Path<T>}
             control={control}
-            render={({ field }: any) => (
+            render={({ field }) => (
               <InputBase
                 inputRef={inputRef}
                 id={field.name}

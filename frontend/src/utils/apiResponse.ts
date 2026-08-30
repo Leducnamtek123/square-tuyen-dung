@@ -89,8 +89,21 @@ export const normalizePaginatedResponse = <T>(raw: unknown): PaginatedResponse<T
 
 export const getApiErrorMessage = (error: unknown, fallbackMessage: string): string => {
   if (error && typeof error === 'object') {
-    const errObj = error as { response?: { data?: { detail?: string; message?: string } }; message?: string };
-    return errObj.response?.data?.detail || errObj.response?.data?.message || errObj.message || fallbackMessage;
+    const errObj = error as {
+      response?: {
+        data?: {
+          detail?: string;
+          message?: string;
+          error?: { message?: string; details?: unknown };
+        };
+      };
+      message?: string;
+    };
+    const responseData = errObj.response?.data;
+    if (responseData?.error?.message && typeof responseData.error.message === 'string') {
+      return responseData.error.message;
+    }
+    return responseData?.detail || responseData?.message || errObj.message || fallbackMessage;
   }
   return fallbackMessage;
 };

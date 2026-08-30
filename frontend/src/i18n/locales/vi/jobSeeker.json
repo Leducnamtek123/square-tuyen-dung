@@ -700,5 +700,21 @@
       "add": "Thêm",
       "done": "Hoàn tất"
     }
+  },
+  "tabs": {
+    "dashboard": "Trang chủ",
+    "profile": "Hồ sơ của tôi",
+    "cvDesign": "Trang trí CV",
+    "jobs": "Việc làm",
+    "companies": "Công ty của tôi",
+    "interviews": "Phỏng vấn của tôi",
+    "notifications": "Thông báo",
+    "account": "Tài khoản & Thiết lập"
+  },
+  "cv": {
+    "pickColorTitle": "Chọn màu sắc cho CV của bạn",
+    "suggestedColors": "Màu sắc gợi ý",
+    "customColor": "Tự chọn màu:",
+    "selectedColorPreview": "Xem trước màu đã chọn"
   }
 }

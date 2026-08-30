@@ -1,21 +1,15 @@
 'use client';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-
+import { Control, FieldValues, Path } from 'react-hook-form';
 import Radio from '@mui/material/Radio';
-
 import RadioGroup from '@mui/material/RadioGroup';
-
 import FormControlLabel from '@mui/material/FormControlLabel';
 import type { SelectOption } from '@/types/models';
-
 import { FormLabel, Typography } from "@mui/material";
-
 import FormControl from '@mui/material/FormControl';
 import ValidationError from '../ValidationError';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 const EMPTY_OPTIONS: SelectOption[] = [];
 
@@ -37,16 +31,11 @@ const RadioCustom = <T extends FieldValues = FieldValues>({
   const { t } = useTranslation('common');
 
   return (
-
     <div>
-
-      <ControllerAny
-
+      <TypedController
         name={name as Path<T>}
-
         control={control}
-
-        render={({ field, fieldState }: any) => (
+        render={({ field, fieldState }) => (
 
           <>
 

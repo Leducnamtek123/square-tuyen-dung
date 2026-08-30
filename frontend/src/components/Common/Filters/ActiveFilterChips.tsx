@@ -3,6 +3,7 @@
 import React from 'react';
 import { Box, Chip, Stack, Typography, Button } from '@mui/material';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import { useTranslation } from 'react-i18next';
 import type { ActiveFilterTag } from './types';
 
 interface ActiveFilterChipsProps {
@@ -16,6 +17,7 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
   onRemoveTag,
   onClearAll,
 }) => {
+  const { t } = useTranslation('common');
   if (!tags || tags.length === 0) return null;
 
   return (
@@ -39,7 +41,7 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
           variant="caption"
           sx={{ fontWeight: 700, color: '#475569', textTransform: 'uppercase', fontSize: '0.7rem' }}
         >
-          Đang lọc ({tags.length}):
+          {t('filters.filtering', 'Đang lọc ({{count}}):', { count: tags.length })}
         </Typography>
       </Stack>
 
@@ -83,7 +85,7 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
             minWidth: 'auto',
           }}
         >
-          Xóa tất cả
+          {t('filters.clearAll', 'Xóa tất cả')}
         </Button>
       </Box>
     </Stack>

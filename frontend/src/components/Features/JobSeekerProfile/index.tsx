@@ -143,17 +143,17 @@ const JobSeekerProfile = ({
                                     '&:hover': { color: 'primary.main' }
                                 }}
                             >
-                                {user?.fullName || title || "Ứng viên"}
+                                {user?.fullName || title || t('employer:candidate', 'Ứng viên')}
                                 {jobSeekerProfile?.old && String(jobSeekerProfile.old) !== '---' && (
                                     <Box component="span" sx={{ fontWeight: 500, color: '#64748B', ml: 0.75, fontSize: '0.8125rem' }}>
-                                        ({jobSeekerProfile.old} tuổi)
+                                        ({t('employer:profileCard.label.yearsOld', { age: jobSeekerProfile.old })})
                                     </Box>
                                 )}
                             </Typography>
                             
                             {matchScore && matchScore > 0 ? (
                                 <Chip
-                                    label="Phù hợp nhu cầu"
+                                    label={t('employer:profileCard.matchingNeeds', 'Phù hợp nhu cầu')}
                                     size="small"
                                     sx={{ 
                                         borderRadius: '6px', 
@@ -199,7 +199,7 @@ const JobSeekerProfile = ({
                             {type === CV_TYPES.cvUpload && (
                                 <PictureAsPdfIcon color="error" fontSize="small" />
                             )}
-                            {title || "Chưa cập nhật vị trí"}
+                            {title || t('employer:profileCard.positionNotUpdated', 'Chưa cập nhật vị trí')}
                         </Typography>
 
                         <Stack direction="row" spacing={0.75} flexWrap="wrap" sx={{ gap: 0.75, mt: 0.5 }}>
@@ -268,7 +268,7 @@ const JobSeekerProfile = ({
                         alignItems="center"
                     >
                         <Tooltip title={isSaved ? t('employer:profileCard.actions.unsave') : t('employer:profileCard.actions.save')} arrow>
-                            <IconButton aria-label="Thao tác"
+                            <IconButton aria-label={isSaved ? t('employer:profileCard.unsaveCandidate', 'Bỏ lưu hồ sơ') : t('employer:profileCard.saveCandidate', 'Lưu hồ sơ')}
                                 size="small"
                                 onClick={(e: React.MouseEvent) => {
                                     e.stopPropagation();

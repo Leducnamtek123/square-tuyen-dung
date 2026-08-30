@@ -1,15 +1,12 @@
 'use client';
 import React from 'react';
-
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-
+import { Control, FieldValues, Path } from 'react-hook-form';
 import { Autocomplete, TextField, Typography } from "@mui/material";
 import { SxProps, Theme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import ValidationError from '../ValidationError';
-
+import TypedController from '../TypedController';
 import type { SelectOption } from '@/types/models';
-const ControllerAny = Controller as any;
 
 const EMPTY_SX: SxProps<Theme> = {};
 const EMPTY_OPTIONS: SelectOption[] = [];
@@ -52,10 +49,10 @@ const SingleSelectCustom = <T extends FieldValues = FieldValues>({
         </Typography>
       )}
 
-      <ControllerAny
+      <TypedController
         name={name as Path<T>}
         control={control}
-        render={({ field, fieldState }: any) => (
+        render={({ field, fieldState }) => (
           <>
             <Autocomplete
               sx={{

@@ -1,11 +1,10 @@
 'use client';
 import React from 'react';
-import { Controller, Control, FieldValues, Path, PathValue } from 'react-hook-form';
+import { Control, FieldValues, Path, PathValue } from 'react-hook-form';
 import Rating from '@mui/material/Rating';
-const RatingAny = Rating as unknown as React.ComponentType<any>;
 import Typography from '@mui/material/Typography';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 type RatingBaseProps = Record<string, any>;
 
@@ -19,43 +18,25 @@ type RatingCustomProps<T extends FieldValues = FieldValues> = RatingBaseProps & 
 const RatingCustom = <T extends FieldValues = FieldValues>({ name, control, title = null, onChangeActive, ...props }: RatingCustomProps<T>) => {
 
   return (
-
     <div>
-
       {title && (
-
         <Typography variant="subtitle2" gutterBottom>
-
           {title}
-
         </Typography>
-
       )}
 
-      <ControllerAny
-
+      <TypedController
         defaultValue={5 as PathValue<T, Path<T>>}
-
         name={name as Path<T>}
-
         control={control}
-
-        render={({ field, fieldState }: any) => (
-
+        render={({ field, fieldState }) => (
           <>
-
-            <RatingAny
-
+            <Rating
               size="large"
-
-              value={field.value ?? 0}
-
-              onChange={(_event: any, value: number | null) => field.onChange(value ?? 0)}
-
+              value={Number(field.value) || 0}
+              onChange={(_event, value: number | null) => field.onChange(value ?? 0)}
               onChangeActive={onChangeActive}
-
               {...props}
-
             />
 
             {fieldState.invalid && (

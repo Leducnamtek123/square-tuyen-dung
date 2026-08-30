@@ -1,13 +1,11 @@
 'use client';
 import React from 'react';
-
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-
+import { Control, FieldValues, Path } from 'react-hook-form';
 import { Box, InputAdornment, OutlinedInput, Typography } from "@mui/material";
 import { SxProps, Theme } from '@mui/material/styles';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import ValidationError from '../ValidationError';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 const EMPTY_SX = {};
 
@@ -38,26 +36,17 @@ const PasswordTextFieldCustom = <T extends FieldValues = FieldValues>({
   };
 
   return (
-
     <div>
-
       {title && (
-
         <Typography variant="subtitle2" gutterBottom>
-
           {title} {showRequired && <span style={{ color: 'red' }}>*</span>}
-
         </Typography>
-
       )}
 
-      <ControllerAny
-
+      <TypedController
         name={name as Path<T>}
-
         control={control}
-
-        render={({ field, fieldState }: any) => (
+        render={({ field, fieldState }) => (
 
           <>
 

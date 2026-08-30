@@ -8,7 +8,6 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
-  Grid,
   IconButton,
   InputAdornment,
   Paper,
@@ -27,6 +26,7 @@ import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
+import { useTranslation } from 'react-i18next';
 
 export interface EditorTemplateItem {
   id: string;
@@ -102,184 +102,197 @@ const TEMPLATES: EditorTemplateItem[] = [
 
   // 2. Mô tả công việc (JD)
   {
-    id: 'jd_dev',
+    id: 'jd_tech_senior',
     category: 'job_desc',
-    title: 'Kỹ sư Phần mềm / Lập trình viên Fullstack / Backend / Frontend',
-    description: 'Mô tả công việc chuẩn cấu trúc: Kiến trúc hệ thống, phát triển tính năng, tối ưu hóa hiệu năng.',
-    tag: 'Kỹ thuật / IT',
-    htmlContent: `<h3>Mục Tiêu Công Việc</h3>
-<p>Trực tiếp tham gia thiết kế, phát triển và tối ưu hóa hệ thống phần mềm quy mô lớn; đảm bảo tính ổn định, bảo mật và trải nghiệm mượt mà cho người dùng.</p>
+    title: 'Senior Software Engineer / Tech Lead',
+    description: 'Mô tả chuyên sâu cho kỹ sư phần mềm: Trách nhiệm kỹ thuật, Thiết kế kiến trúc & Mentor.',
+    tag: 'Công nghệ / Phần mềm',
+    htmlContent: `<h3>1. Tổng Quan Vị Trí</h3>
+<p>Chúng tôi đang tìm kiếm một <strong>Senior Software Engineer</strong> tài năng để đồng hành xây dựng hệ thống nền tảng phục vụ hàng triệu người dùng. Bạn sẽ giữ vai trò then chốt trong việc thiết kế kiến trúc hệ thống phân tán, tối ưu hiệu năng và dẫn dắt đội ngũ kỹ sư trẻ.</p>
 
-<h3>Nhiệm Vụ & Trách Nhiệm Chính</h3>
+<h3>2. Trách Nhiệm Chính</h3>
 <ul>
-  <li>Tham gia phân tích yêu cầu sản phẩm, thiết kế kiến trúc hệ thống và lập trình các tính năng mới theo quy trình Agile/Scrum.</li>
-  <li>Tối ưu hóa hiệu năng ứng dụng (Performance Tuning), giảm độ trễ API và đảm bảo khả năng chịu tải cao (High Concurrency).</li>
-  <li>Viết Unit Test, Integration Test và phối hợp cùng đội ngũ QA/QC trong việc kiểm thử và rà soát chất lượng mã nguồn (Code Review).</li>
-  <li>Phối hợp cùng DevOps để cấu hình CI/CD pipelines, giám sát hệ thống production và xử lý sự cố nhanh chóng.</li>
-  <li>Nghiên cứu áp dụng các công nghệ mới nhằm nâng cao hiệu suất làm việc của toàn đội ngũ.</li>
+  <li>Tham gia thiết kế, phát triển và tối ưu hóa các dịch vụ backend/frontend hiệu năng cao theo mô hình Microservices.</li>
+  <li>Đảm bảo chất lượng mã nguồn thông qua Code Review nghiêm ngặt, Unit Test và áp dụng các Best Practices về Clean Architecture.</li>
+  <li>Cộng tác chặt chẽ với Product Owner, Designer và QA để hiện thực hóa các tính năng sản phẩm với tốc độ nhanh và độ ổn định cao.</li>
+  <li>Tham gia nghiên cứu, ứng dụng công nghệ mới và đề xuất các giải pháp nâng cao hiệu suất cũng như tính bảo mật của toàn bộ hệ thống.</li>
+  <li>Đào tạo, hướng dẫn và truyền cảm hứng (Mentoring) cho các kỹ sư Junior và Mid trong nhóm.</li>
 </ul>`,
   },
   {
-    id: 'jd_marketing',
+    id: 'jd_marketing_lead',
     category: 'job_desc',
-    title: 'Chuyên viên Marketing & Truyền thông Kỹ thuật số',
-    description: 'Lập kế hoạch chiến dịch, Quản lý ngân sách quảng cáo, Sáng tạo nội dung đa kênh và Đo lường ROI.',
-    tag: 'Marketing',
-    htmlContent: `<h3>Mục Tiêu Công Việc</h3>
-<p>Lên kế hoạch và triển khai các chiến dịch tiếp thị đa kênh (Digital Marketing) nhằm gia tăng độ nhận diện thương hiệu và mang lại tệp khách hàng tiềm năng chất lượng cao.</p>
+    title: 'Marketing Manager / Digital Growth Lead',
+    description: 'Bản mô tả vị trí Marketing: Hoạch định chiến lược tăng trưởng, Quản lý ngân sách & Đo lường ROI.',
+    tag: 'Marketing / Tăng trưởng',
+    htmlContent: `<h3>1. Tổng Quan Vị Trí</h3>
+<p>Vị trí <strong>Marketing Manager</strong> chịu trách nhiệm hoạch định và thực thi toàn bộ chiến lược tiếp thị đa kênh, gia tăng độ nhận diện thương hiệu và thúc đẩy tăng trưởng người dùng cũng như doanh thu bền vững.</p>
 
-<h3>Trách Nhiệm Chi Tiết</h3>
+<h3>2. Trách Nhiệm Chính</h3>
 <ul>
-  <li>Xây dựng và thực thi kế hoạch Marketing đa kênh: SEO, Google Ads, Facebook Ads, TikTok, Email Marketing và Mạng xã hội.</li>
-  <li>Sáng tạo nội dung (Content Strategy), kịch bản video và thông điệp truyền thông phù hợp với chân dung khách hàng mục tiêu.</li>
-  <li>Quản lý ngân sách quảng cáo, theo dõi và tối ưu hóa các chỉ số hiệu quả: CAC, CPL, CTR, Conversion Rate và ROAS.</li>
-  <li>Thu thập và phân tích dữ liệu thị trường, báo cáo hành vi người dùng bằng Google Analytics / Looker Studio để đề xuất cải tiến.</li>
-  <li>Phối hợp cùng bộ phận Kinh doanh để tối ưu hóa quy trình nuôi dưỡng Leads (Lead Nurturing).</li>
+  <li>Xây dựng và quản lý ngân sách tiếp thị tổng thể; theo dõi và tối ưu hóa các chỉ số hiệu quả chuyển đổi (CAC, LTV, ROAS, ROI).</li>
+  <li>Dẫn dắt các chiến dịch tích hợp (Integrated Marketing Campaigns) trên các kênh Digital (SEO/SEM, Performance Ads, Social Media, Content, Email Automation).</li>
+  <li>Phân tích dữ liệu hành vi người tiêu dùng, xu hướng thị trường và hoạt động đối thủ để kịp thời đưa ra các đề xuất chiến lược sắc bén.</li>
+  <li>Phối hợp cùng bộ phận Kinh doanh và Phát triển Sản phẩm nhằm định vị thông điệp sản phẩm thu hút và nhất quán.</li>
+  <li>Xây dựng, đào tạo và phát triển đội ngũ nhân sự tiếp thị nội bộ vững chuyên môn và tinh thần gắn kết.</li>
 </ul>`,
   },
   {
-    id: 'jd_sales',
+    id: 'jd_sales_b2b',
     category: 'job_desc',
-    title: 'Chuyên viên Kinh doanh / Phát triển Thị trường (Sales B2B / B2C)',
-    description: 'Tìm kiếm khách hàng, Đàm phán ký kết hợp đồng, Chăm sóc đối tác và Đạt chỉ tiêu doanh số.',
-    tag: 'Kinh doanh / Sales',
-    htmlContent: `<h3>Mục Tiêu Công Việc</h3>
-<p>Mở rộng mạng lưới khách hàng, xúc tiến đàm phán thương mại và hoàn thành vượt mức các chỉ tiêu doanh số được giao.</p>
+    title: 'B2B Sales Executive / Account Manager',
+    description: 'Bản mô tả vị trí Kinh doanh B2B: Khai thác khách hàng doanh nghiệp, Đàm phán và Chốt hợp đồng.',
+    tag: 'Kinh doanh / B2B',
+    htmlContent: `<h3>1. Tổng Quan Vị Trí</h3>
+<p>Là <strong>Chuyên viên Kinh doanh Doanh nghiệp (B2B)</strong>, bạn sẽ là cầu nối đưa các giải pháp dịch vụ chất lượng cao của chúng tôi đến với các khách hàng doanh nghiệp lớn, trực tiếp đóng góp vào doanh thu bứt phá của công ty.</p>
 
-<h3>Trách Nhiệm Chính</h3>
+<h3>2. Trách Nhiệm Chính</h3>
 <ul>
-  <li>Chủ động tìm kiếm, tiếp cận và thiết lập mối quan hệ với các khách hàng tiềm năng qua các kênh trực tiếp và gián tiếp.</li>
-  <li>Khảo sát nhu cầu, tư vấn giải pháp phù hợp và xây dựng báo giá / hồ sơ đề xuất (Proposal) chuyên nghiệp.</li>
-  <li>Trực tiếp đàm phán điều khoản hợp đồng và theo dõi tiến độ thực hiện đến khi bàn giao và nghiệm thu.</li>
-  <li>Chăm sóc khách hàng sau bán, duy trì mối quan hệ đối tác chiến lược và khai thác cơ hội bán gia tăng (Upsell/Cross-sell).</li>
-  <li>Báo cáo kết quả kinh doanh định kỳ và đóng góp ý kiến hoàn thiện chính sách sản phẩm/giá bán.</li>
+  <li>Tìm kiếm, tiếp cận và mở rộng tệp khách hàng doanh nghiệp tiềm năng thuộc danh mục mục tiêu.</li>
+  <li>Tư vấn giải pháp, thuyết trình đề xuất dự án (Pitching) và thương lượng các điều khoản hợp đồng thương mại.</li>
+  <li>Chăm sóc và duy trì mối quan hệ đối tác bền vững với khách hàng hiện hữu nhằm tối đa hóa cơ hội tái ký và Up-sell/Cross-sell.</li>
+  <li>Theo dõi tiến độ thanh toán, nghiệm thu hợp đồng và phối hợp xử lý kịp thời các yêu cầu phát sinh từ khách hàng.</li>
+  <li>Báo cáo kết quả kinh doanh và dự báo doanh thu định kỳ cho Trưởng bộ phận.</li>
 </ul>`,
   },
 
-  // 3. Yêu cầu ứng viên (Requirements)
+  // 3. Yêu cầu ứng viên
   {
-    id: 'req_standard',
+    id: 'req_tech_senior',
     category: 'job_req',
-    title: 'Khung Yêu Cầu Năng Lực Tiêu Chuẩn (Mid / Senior)',
-    description: 'Bao quát: Bằng cấp/Kinh nghiệm, Kỹ năng chuyên môn cốt lõi, Kỹ năng mềm và Tư duy làm việc.',
-    tag: 'Yêu cầu năng lực',
-    htmlContent: `<h3>Yêu Cầu Chuyên Môn (Hard Skills)</h3>
+    title: 'Khung Yêu Cầu Kỹ Thuật (Senior Tech Spec)',
+    description: 'Khung tiêu chuẩn: Nền tảng chuyên môn vững, Tư duy giải quyết vấn đề và Kỹ năng mềm.',
+    tag: 'Yêu cầu tuyển dụng',
+    htmlContent: `<h3>1. Yêu Cầu Chuyên Môn</h3>
 <ul>
-  <li>Tốt nghiệp Đại học/Cao đẳng chuyên ngành liên quan hoặc có chứng chỉ nghề nghiệp quốc tế tương đương.</li>
-  <li>Tối thiểu từ <strong>2 - 4 năm kinh nghiệm</strong> làm việc thực chiến tại vị trí tương đương.</li>
-  <li>Thành thạo các công cụ chuyên môn, phần mềm nghiệp vụ và quy trình làm việc chuẩn mực.</li>
-  <li>Khả năng đọc hiểu tài liệu và giao tiếp chuyên ngành bằng Tiếng Anh tốt (TOEIC 650+ hoặc IELTS 6.0+ là lợi thế).</li>
+  <li>Có ít nhất <strong>3-5 năm kinh nghiệm</strong> thực chiến ở vị trí tương đương tại các công ty công nghệ / Product.</li>
+  <li>Thành thạo một hoặc nhiều ngôn ngữ/framework: TypeScript/JavaScript (React, Next.js, Node.js), Java/Golang/Python.</li>
+  <li>Hiểu biết sâu sắc về cơ sở dữ liệu (PostgreSQL, MongoDB, Redis), Message Queue (Kafka, RabbitMQ) và kiến trúc Microservices.</li>
+  <li>Kinh nghiệm làm việc thực tế với Docker, Kubernetes và các dịch vụ đám mây (AWS, GCP, Azure).</li>
+  <li>Nắm vững các nguyên lý CI/CD, Git workflows, Automated Testing và bảo mật ứng dụng web.</li>
 </ul>
 
-<h3>Kỹ Năng Mềm & Tư Duy (Soft Skills)</h3>
+<h3>2. Kỹ Năng & Phẩm Chất</h3>
 <ul>
-  <li>Tư duy phản biện (Critical Thinking), khả năng phân tích số liệu và giải quyết vấn đề mạch lạc.</li>
-  <li>Kỹ năng giao tiếp, thuyết trình và kỹ năng làm việc nhóm xuất sắc.</li>
-  <li>Chủ động, có tinh thần trách nhiệm cao (Ownership Mindset) và khả năng chịu áp lực tiến độ tốt.</li>
+  <li>Tư duy giải quyết vấn đề mạch lạc, khả năng tự nghiên cứu và thích ứng nhanh với công nghệ mới.</li>
+  <li>Kỹ năng giao tiếp xuất sắc, có tinh thần làm việc nhóm và trách nhiệm cao với sản phẩm mình làm ra.</li>
+  <li>Khả năng đọc hiểu tài liệu chuyên ngành và giao tiếp tiếng Anh tốt là một lợi thế lớn.</li>
 </ul>`,
   },
 
-  // 4. Quyền lợi & Phúc lợi (Benefits)
+  // 4. Quyền lợi & Phúc lợi
   {
-    id: 'ben_top',
+    id: 'ben_standard_tech',
     category: 'benefits',
-    title: 'Gói Phúc Lợi Toàn Diện & Đãi Ngộ Hấp Dẫn',
-    description: 'Lương thưởng cạnh tranh, Bảo hiểm sức khỏe VIP, Du lịch nghỉ dưỡng, Môi trường phát triển.',
-    tag: 'Phúc lợi cao cấp',
-    htmlContent: `<h3>Thu Nhập & Thưởng</h3>
+    title: 'Gói Đãi Ngộ Tiêu Chuẩn Công Nghệ (Tech Perks Package)',
+    description: 'Chính sách toàn diện: Thu nhập cạnh tranh, Trang thiết bị hiện đại, Chăm sóc sức khỏe và Đào tạo.',
+    tag: 'Quyền lợi / Phúc lợi',
+    htmlContent: `<h3>1. Thu Nhập & Thưởng</h3>
 <ul>
-  <li><strong>Mức lương cạnh tranh:</strong> Đàm phán theo năng lực, cam kết review lương định kỳ 1 - 2 lần/năm.</li>
-  <li><strong>Thưởng phong phú:</strong> Thưởng tháng 13, thưởng hiệu quả kinh doanh (KPIs/Bonus), thưởng dự án và các dịp Lễ/Tết.</li>
-  <li>Hỗ trợ phụ cấp cơm trưa, phụ cấp gửi xe và công tác phí đầy đủ.</li>
+  <li>Mức lương cạnh tranh theo năng lực (Review lương định kỳ 2 lần/năm).</li>
+  <li>Thưởng tháng lương thứ 13, thưởng hiệu quả kinh doanh và thưởng các dịp lễ, Tết.</li>
+  <li>Gói cổ phần thưởng (ESOP) dành cho nhân sự có đóng góp xuất sắc.</li>
 </ul>
 
-<h3>Chế Độ Bảo Hiểm & Sức Khỏe</h3>
+<h3>2. Chăm Sóc Sức Khỏe & Đời Sống</h3>
 <ul>
-  <li>Đóng đầy đủ BHXH, BHYT, BHTN 100% trên tổng lương thực nhận theo luật.</li>
-  <li><strong>Gói bảo hiểm sức khỏe cao cấp (PVI / Bao Viet):</strong> Hạn mức khám chữa bệnh nội/ngoại trú cao cấp.</li>
-  <li>Khám sức khỏe tổng quát định kỳ hàng năm tại bệnh viện quốc tế hàng đầu.</li>
+  <li>Bảo hiểm Xã hội, Y tế, Thất nghiệp theo đúng luật định.</li>
+  <li>Gói <strong>Bảo hiểm Sức khỏe Cao cấp (VIP Healthcare)</strong> cho nhân viên và ưu đãi cho người thân.</li>
+  <li>Khám sức khỏe tổng quát định kỳ hàng năm tại các bệnh viện quốc tế hàng đầu.</li>
+  <li>Phụ cấp ăn trưa, gửi xe miễn phí và teabreak/hoa quả miễn phí mỗi ngày tại văn phòng.</li>
 </ul>
 
-<h3>Đào Tạo & Đời Sống Tinh Thần</h3>
+<h3>3. Môi Trường & Phát Triển Bản Thân</h3>
 <ul>
-  <li>Tài trợ 100% chi phí tham gia các khóa học nâng cao kỹ năng và thi chứng chỉ quốc tế.</li>
-  <li>Du lịch Company Trip nghỉ dưỡng cao cấp (resort 4-5 sao) tối thiểu 1 lần/năm; Teambuilding hàng quý.</li>
-  <li>Môi trường làm việc hiện đại, Pantry ngập tràn bánh kẹo, hoa quả và cà phê pha máy miễn phí mỗi ngày.</li>
+  <li>Trang bị máy tính làm việc cấu hình cao (MacBook Pro / Dell XPS) và màn hình 4K.</li>
+  <li>Chính sách làm việc kết hợp linh hoạt (Hybrid Working / Remote-friendly).</li>
+  <li>Ngân sách đào tạo cá nhân hàng năm (hỗ trợ mua sách, khóa học Udemy/Coursera và thi chứng chỉ quốc tế).</li>
+  <li>Du lịch nghỉ dưỡng 5 sao hàng năm và các hoạt động thể thao, Team Building sôi nổi.</li>
 </ul>`,
   },
 
-  // 5. Thư gửi ứng viên (Email)
+  // 5. Thư gửi ứng viên
   {
     id: 'mail_interview_invite',
     category: 'email',
-    title: 'Thư Mời Phỏng Vấn Trang Trọng (Kèm Thông Tin Chi Tiết)',
-    description: 'Email chuyên nghiệp gửi ứng viên kèm thời gian, hình thức và người phỏng vấn.',
-    tag: 'Email Mời Phỏng Vấn',
-    htmlContent: `<p>Kính gửi Anh/Chị <strong>{{Tên_Ứng_Viên}}</strong>,</p>
+    title: 'Thư Mời Tham Gia Phỏng Vấn (Interview Invitation)',
+    description: 'Mẫu email lịch thiệp, chuyên nghiệp: Thời gian, Địa điểm/Link họp và Hướng dẫn chuẩn bị.',
+    tag: 'Email Mẫu',
+    htmlContent: `<p>Thân gửi <strong>[Họ và tên Ứng viên]</strong>,</p>
 
-<p>Lời đầu tiên, Ban Tuyển dụng Công ty xin gửi lời cảm ơn chân thành đến Anh/Chị vì sự quan tâm dành cho vị trí <strong>{{Tên_Vị_Trí}}</strong>.</p>
+<p>Lời đầu tiên, Ban Tuyển dụng <strong>[Tên Doanh Nghiệp]</strong> xin gửi lời cảm ơn chân thành vì sự quan tâm của bạn dành cho vị trí <strong>[Tên Vị Trí Ứng Tuyển]</strong>.</p>
 
-<p>Chúng tôi rất ấn tượng với hồ sơ năng lực của Anh/Chị và trân trọng kính mời Anh/Chị tham dự buổi phỏng vấn trực tiếp cùng đại diện Ban Giám đốc và Trưởng bộ phận chuyên môn. Thông tin chi tiết như sau:</p>
+<p>Sau khi xem xét kỹ lưỡng hồ sơ của bạn, chúng tôi rất ấn tượng với những kinh nghiệm và thành tựu mà bạn đã đạt được. Chúng tôi trân trọng kính mời bạn tham gia buổi phỏng vấn trực tiếp cùng Hội đồng Tuyển dụng với thông tin chi tiết như sau:</p>
 
 <ul>
-  <li><strong>Thời gian:</strong> {{Thời_Gian_Phỏng_Vấn}}</li>
-  <li><strong>Hình thức:</strong> {{Hình_Thức}} (Trực tiếp / Trực tuyến)</li>
-  <li><strong>Địa điểm / Link phòng họp:</strong> {{Địa_Điểm_Hoặc_Link}}</li>
-  <li><strong>Người phỏng vấn:</strong> {{Người_Phỏng_Vấn}}</li>
+  <li><strong>Thời gian:</strong> [Giờ] - [Thứ, Ngày/Tháng/Năm]</li>
+  <li><strong>Hình thức:</strong> Phỏng vấn Trực tuyến (Online qua Google Meet) / Phỏng vấn Trực tiếp</li>
+  <li><strong>Địa điểm / Đường link họp:</strong> [Link Google Meet hoặc Địa chỉ văn phòng]</li>
+  <li><strong>Người phỏng vấn:</strong> [Tên & Chức vụ người phỏng vấn]</li>
+  <li><strong>Nội dung:</strong> Trao đổi chi tiết về kinh nghiệm chuyên môn và định hướng phát triển công việc.</li>
 </ul>
 
-<p>Để buổi phỏng vấn diễn ra thuận lợi nhất, Anh/Chị vui lòng gửi email phản hồi xác nhận sự tham gia trước <strong>{{Thời_Hạn_Phản_Hồi}}</strong>. Trường hợp cần sắp xếp lại lịch hẹn, Anh/Chị vui lòng thông báo sớm cho chúng tôi.</p>
+<p>Vui lòng phản hồi lại email này trước <strong>[Hạn phản hồi]</strong> để xác nhận sự tham gia của bạn. Nếu thời gian trên chưa thuận tiện, bạn có thể đề xuất khung giờ phù hợp hơn để chúng tôi hỗ trợ sắp xếp.</p>
 
-<p>Chúc Anh/Chị một ngày làm việc hiệu quả và có buổi phỏng vấn thành công!</p>
+<p>Chúc bạn có một buổi phỏng vấn thật thành công!</p>
 
-<p>Trân trọng,<br/>
-<strong>Bộ phận Tuyển dụng & Thu hút Nhân tài</strong><br/>
-<em>Hotline: {{Số_Điện_Thoại}} | Email: {{Email_Tuyển_Dụng}}</em></p>`,
+<p>Trân trọng,<br />
+<strong>[Họ tên Người liên hệ]</strong><br />
+Bộ phận Tuyển dụng | [Tên Doanh Nghiệp]<br />
+Hotline: [Số điện thoại] | Email: [Địa chỉ Email]</p>`,
   },
   {
-    id: 'mail_offer',
+    id: 'mail_offer_letter',
     category: 'email',
-    title: 'Thư Mời Nhận Việc & Chúc Mừng (Job Offer Letter)',
-    description: 'Thư mời gia nhập chính thức với mức lương, ngày bắt đầu và hướng dẫn nhận việc.',
-    tag: 'Email Mời Nhận Việc',
-    htmlContent: `<p>Thân gửi Anh/Chị <strong>{{Tên_Ứng_Viên}}</strong>,</p>
+    title: 'Thư Chúc Mừng & Đề Nghị Nhận Việc (Job Offer Letter)',
+    description: 'Trang trọng, ấm áp: Mức lương, Ngày bắt đầu làm việc, Quy trình tiếp nhận và Xác nhận.',
+    tag: 'Email Mẫu',
+    htmlContent: `<p>Thân gửi <strong>[Họ và tên Ứng viên]</strong>,</p>
 
-<p>Thay mặt Ban Lãnh đạo Công ty, chúng tôi xin chúc mừng Anh/Chị đã hoàn thành xuất sắc các vòng đánh giá và trân trọng gửi đến Anh/Chị Lời mời nhận việc (Job Offer) cho vị trí <strong>{{Tên_Vị_Trí}}</strong> tại bộ phận <strong>{{Tên_Phòng_Ban}}</strong>.</p>
+<p>Thay mặt Ban Lãnh đạo và toàn thể đội ngũ <strong>[Tên Doanh Nghiệp]</strong>, chúng tôi xin chúc mừng bạn đã xuất sắc vượt qua các vòng phỏng vấn và chính thức được lựa chọn cho vị trí <strong>[Tên Vị Trí Tiếp Nhận]</strong>.</p>
 
-<h3>Tóm tắt các điều khoản chính:</h3>
+<p>Chúng tôi tin tưởng rằng với tài năng, sự nhiệt huyết và kinh nghiệm của bạn, bạn sẽ là một mảnh ghép tuyệt vời giúp công ty tiếp tục gặt hái thêm nhiều thành công mới. Dưới đây là các thông tin tóm tắt về đề nghị tiếp nhận:</p>
+
 <ul>
-  <li><strong>Chức danh:</strong> {{Tên_Vị_Trí}}</li>
-  <li><strong>Ngày bắt đầu làm việc (Onboarding):</strong> {{Ngày_Bắt_Đầu}}</li>
-  <li><strong>Mức lương cơ bản:</strong> {{Mức_Lương}} VNĐ / tháng</li>
-  <li><strong>Thời gian thử việc:</strong> 02 tháng (hưởng 85% - 100% lương chính thức theo thỏa thuận)</li>
-  <li><strong>Địa điểm làm việc:</strong> {{Địa_Điểm_Làm_Việc}}</li>
+  <li><strong>Vị trí công tác:</strong> [Tên Vị Trí]</li>
+  <li><strong>Bộ phận:</strong> [Tên Phòng Ban]</li>
+  <li><strong>Ngày bắt đầu làm việc (Onboarding):</strong> [Ngày/Tháng/Năm]</li>
+  <li><strong>Mức lương gộp (Gross):</strong> [Số tiền] VNĐ/tháng</li>
+  <li><strong>Thời gian thử việc:</strong> 02 tháng (hưởng [85% - 100%] lương chính thức)</li>
+  <li><strong>Địa điểm làm việc:</strong> [Địa chỉ văn phòng công ty]</li>
 </ul>
 
-<p>Anh/Chị vui lòng xem chi tiết Thư mời nhận việc đính kèm, ký xác nhận và gửi lại cho chúng tôi trước ngày <strong>{{Hạn_Xác_Nhận}}</strong>.</p>
+<p>Chi tiết đầy đủ về bản thỏa thuận công việc và các chính sách phúc lợi đính kèm trong thư này. Vui lòng xác nhận sự đồng ý bằng cách phản hồi lại email này trước <strong>[Hạn xác nhận]</strong>.</p>
 
-<p>Chúng tôi rất mong đợi được chào đón Anh/Chị trở thành một thành viên trong đại gia đình công ty!</p>
+<p>Chúng tôi rất hào hứng được chào đón bạn gia nhập đại gia đình [Tên Doanh Nghiệp]!</p>
 
-<p>Trân trọng,<br/>
-<strong>Phòng Nhân sự</strong></p>`,
+<p>Trân trọng,<br />
+<strong>[Họ tên Trưởng bộ phận Nhân sự]</strong><br />
+Giám đốc Nhân sự | [Tên Doanh Nghiệp]</p>`,
   },
+
+  // 6. Bài viết / Blog
   {
-    id: 'mail_polite_reject',
-    category: 'email',
-    title: 'Thư Cảm Ơn & Thông Báo Kết Quả Lịch Sự (Lưu Hồ Sơ)',
-    description: 'Thư phản hồi tinh tế, giữ hình ảnh nhà tuyển dụng chuyên nghiệp và giữ liên lạc tương lai.',
-    tag: 'Email Phản Hồi',
-    htmlContent: `<p>Kính gửi Anh/Chị <strong>{{Tên_Ứng_Viên}}</strong>,</p>
+    id: 'article_career_guide',
+    category: 'article',
+    title: 'Bài Viết Hướng Dẫn & Cẩm Nang Tuyển Dụng (Editorial Guide)',
+    description: 'Bố cục bài viết chuyên sâu: Đặt vấn đề, Luận điểm chính, Lời khuyên thực tế & Kết luận.',
+    tag: 'Cẩm nang / Blog',
+    htmlContent: `<h2>Bí Quyết Chuẩn Bị Hồ Sơ Tuyển Dụng Thu Hút Mọi Nhà Tuyển Dụng</h2>
+<p>Trong thị trường lao động cạnh tranh ngày nay, việc sở hữu một bộ hồ sơ ấn tượng là tấm vé vàng đầu tiên mở ra cánh cửa phỏng vấn tại các doanh nghiệp hàng đầu.</p>
 
-<p>Lời đầu tiên, Ban Tuyển dụng xin gửi lời cảm ơn chân thành đến Anh/Chị vì đã dành thời gian quý báu tham gia ứng tuyển và trao đổi cùng chúng tôi cho vị trí <strong>{{Tên_Vị_Trí}}</strong>.</p>
+<h3>1. Tối Ưu Hóa Cấu Trúc Hồ Sơ</h3>
+<p>Một bản CV chuẩn mực cần đảm bảo tính súc tích, làm nổi bật được các con số và thành tích cụ thể (Impact-driven) thay vì chỉ liệt kê danh sách nhiệm vụ thông thường.</p>
+<ul>
+  <li>Sử dụng các động từ hành động mạnh mẽ (Led, Architected, Optimized, Increased).</li>
+  <li>Trình bày các chứng chỉ nghề nghiệp và kỹ năng công nghệ liên quan trực tiếp đến vị trí ứng tuyển.</li>
+</ul>
 
-<p>Hội đồng tuyển dụng đánh giá rất cao năng lực chuyên môn, sự chuẩn bị chu đáo cũng như thái độ làm việc chuyên nghiệp của Anh/Chị. Tuy nhiên, sau khi cân nhắc kỹ lưỡng mức độ phù hợp với các tiêu chí đặc thù của dự án ở giai đoạn hiện tại, chúng tôi rất tiếc chưa thể có cơ hội hợp tác cùng Anh/Chị vào lúc này.</p>
+<h3>2. Chú Trọng Đến Văn Hóa Doanh Nghiệp</h3>
+<p>Bên cạnh năng lực chuyên môn, sự phù hợp về mặt giá trị cốt lõi và phong cách làm việc là yếu tố mang tính quyết định trong các buổi phỏng vấn chuyên sâu.</p>
 
-<p>Dữ liệu hồ sơ của Anh/Chị đã được lưu trữ trong Mạng lưới Nhân tài (Talent Pool) của chúng tôi. Ngay khi có vị trí mới phù hợp hơn với thế mạnh của Anh/Chị, chúng tôi sẽ chủ động liên hệ trước tiên.</p>
-
-<p>Chúc Anh/Chị luôn dồi dào sức khỏe và gặt hái nhiều thành công rực rỡ trên con đường sự nghiệp!</p>
-
-<p>Trân trọng,<br/>
-<strong>Ban Tuyển dụng & Quản trị Nhân tài</strong></p>`,
+<h3>3. Lời Kết</h3>
+<p>Hãy luôn chủ động chuẩn bị kỹ lưỡng, tự tin thể hiện bản thân và không ngừng nâng cấp kỹ năng mỗi ngày để nắm bắt những cơ hội nghề nghiệp bứt phá.</p>`,
   },
 ];
 
@@ -294,22 +307,27 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
   open,
   onClose,
   onSelectTemplate,
-  defaultCategory = 'all',
+  defaultCategory = 'company',
 }) => {
-  const [selectedTab, setSelectedTab] = useState<string>(defaultCategory === 'all' ? 'company' : defaultCategory);
+  const { t } = useTranslation('common');
+  const [selectedTab, setSelectedTab] = useState<string>(
+    defaultCategory === 'all' ? 'company' : defaultCategory
+  );
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTemplateId, setActiveTemplateId] = useState<string>(TEMPLATES[0]?.id || '');
+  const [activeTemplateId, setActiveTemplateId] = useState<string>(TEMPLATES[0].id);
 
-  const filteredTemplates = TEMPLATES.filter((tpl) => {
-    const matchesCategory = selectedTab === 'all' || tpl.category === selectedTab;
+  // Filter templates
+  const filteredTemplates = TEMPLATES.filter((item) => {
+    const matchesCategory = selectedTab === 'all' || item.category === selectedTab;
     const matchesSearch =
-      tpl.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tpl.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tpl.tag.toLowerCase().includes(searchQuery.toLowerCase());
+      !searchQuery.trim() ||
+      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.tag.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
-  const activeTemplate = TEMPLATES.find((t) => t.id === activeTemplateId) || filteredTemplates[0] || TEMPLATES[0];
+  const activeTemplate = TEMPLATES.find((t) => t.id === activeTemplateId) || filteredTemplates[0];
 
   const handleApply = () => {
     if (activeTemplate) {
@@ -332,6 +350,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
         },
       }}
     >
+      {/* Header */}
       <DialogTitle
         sx={{
           display: 'flex',
@@ -340,7 +359,6 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
           pb: 1.5,
           borderBottom: '1px solid',
           borderColor: 'divider',
-          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -354,28 +372,28 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
               justifyContent: 'center',
               bgcolor: 'primary.main',
               color: '#fff',
-              boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
             }}
           >
             <AutoAwesomeIcon fontSize="small" />
           </Box>
           <Box>
             <Typography variant="subtitle1" fontWeight={700}>
-              Kho Mẫu Soạn Thảo Chuẩn Chuyên Nghiệp
+              {t('editor.templates.modalTitle', 'Thư Viện Mẫu Bài Viết & Tuyển Dụng Chuẩn')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              Chọn mẫu có sẵn để tiết kiệm thời gian và đảm bảo đầy đủ cấu trúc chuẩn
+              {t('editor.templates.subtitle', 'Khởi tạo nhanh nội dung chuyên nghiệp với cấu trúc chuẩn hóa cho từng ngành nghề')}
             </Typography>
           </Box>
         </Box>
+
         <IconButton onClick={onClose} size="small">
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
 
       <DialogContent sx={{ p: 0 }}>
-        {/* Navigation Tabs */}
-        <Box sx={{ px: 3, pt: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+        {/* Navigation Category Tabs */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2, bgcolor: 'background.paper' }}>
           <Tabs
             value={selectedTab}
             onChange={(_, val) => setSelectedTab(val)}
@@ -392,12 +410,12 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
               },
             }}
           >
-            <Tab icon={<BusinessIcon fontSize="small" />} iconPosition="start" label="Doanh Nghiệp" value="company" />
-            <Tab icon={<WorkOutlineIcon fontSize="small" />} iconPosition="start" label="Mô Tả JD" value="job_desc" />
-            <Tab icon={<AssignmentTurnedInOutlinedIcon fontSize="small" />} iconPosition="start" label="Yêu Cầu Ứng Viên" value="job_req" />
-            <Tab icon={<CardGiftcardIcon fontSize="small" />} iconPosition="start" label="Phúc Lợi & Đãi Ngộ" value="benefits" />
-            <Tab icon={<EmailOutlinedIcon fontSize="small" />} iconPosition="start" label="Thư Gửi Ứng Viên" value="email" />
-            <Tab icon={<ArticleOutlinedIcon fontSize="small" />} iconPosition="start" label="Bài Viết / Blog" value="article" />
+            <Tab icon={<BusinessIcon fontSize="small" />} iconPosition="start" label={t('editor.templates.categories.company', 'Doanh Nghiệp')} value="company" />
+            <Tab icon={<WorkOutlineIcon fontSize="small" />} iconPosition="start" label={t('editor.templates.categories.job', 'Mô Tả JD')} value="job_desc" />
+            <Tab icon={<AssignmentTurnedInOutlinedIcon fontSize="small" />} iconPosition="start" label={t('editor.templates.categories.jobReq', 'Yêu Cầu Ứng Viên')} value="job_req" />
+            <Tab icon={<CardGiftcardIcon fontSize="small" />} iconPosition="start" label={t('editor.templates.categories.policy', 'Phúc Lợi & Đãi Ngộ')} value="benefits" />
+            <Tab icon={<EmailOutlinedIcon fontSize="small" />} iconPosition="start" label={t('editor.templates.categories.email', 'Thư Gửi Ứng Viên')} value="email" />
+            <Tab icon={<ArticleOutlinedIcon fontSize="small" />} iconPosition="start" label={t('editor.templates.categories.article', 'Bài Viết / Blog')} value="article" />
           </Tabs>
         </Box>
 
@@ -419,7 +437,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
           >
             <TextField
               size="small"
-              placeholder="Tìm kiếm mẫu soạn thảo..."
+              placeholder={t('editor.templates.searchPlaceholder', 'Tìm kiếm mẫu soạn thảo...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               fullWidth
@@ -473,7 +491,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
 
               {filteredTemplates.length === 0 && (
                 <Box sx={{ py: 6, textAlign: 'center', color: 'text.secondary' }}>
-                  <Typography variant="body2">Không tìm thấy mẫu phù hợp.</Typography>
+                  <Typography variant="body2">{t('common.noResults', 'Không tìm thấy mẫu phù hợp.')}</Typography>
                 </Box>
               )}
             </Box>
@@ -499,7 +517,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
                       {activeTemplate.title}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Xem trước nội dung sẽ chèn vào trình soạn thảo
+                      {t('editor.templates.previewSubtitle', 'Xem trước nội dung sẽ chèn vào trình soạn thảo')}
                     </Typography>
                   </Box>
                   <Chip label={activeTemplate.tag} color="primary" size="small" />
@@ -526,7 +544,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
               </Box>
             ) : (
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'text.secondary' }}>
-                <Typography variant="body2">Chọn một mẫu ở cột bên trái để xem trước</Typography>
+                <Typography variant="body2">{t('editor.templates.selectToPreview', 'Chọn một mẫu ở cột bên trái để xem trước')}</Typography>
               </Box>
             )}
           </Box>
@@ -535,11 +553,11 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
 
       <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid', borderColor: 'divider', justifyContent: 'space-between' }}>
         <Typography variant="caption" color="text.secondary">
-          💡 Bạn có thể tùy ý chỉnh sửa lại văn bản sau khi áp dụng mẫu
+          {t('editor.templates.bottomHint', '💡 Bạn có thể tùy ý chỉnh sửa lại văn bản sau khi áp dụng mẫu')}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.5 }}>
           <Button onClick={onClose} variant="outlined" color="inherit">
-            Hủy
+            {t('common.actions.cancel', 'Hủy')}
           </Button>
           <Button
             onClick={handleApply}
@@ -552,7 +570,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
               px: 3,
             }}
           >
-            Sử Dụng Mẫu Này
+            {t('editor.templates.useTemplate', 'Sử Dụng Mẫu Này')}
           </Button>
         </Box>
       </DialogActions>

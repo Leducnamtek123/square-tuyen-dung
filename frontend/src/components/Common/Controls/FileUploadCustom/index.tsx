@@ -1,12 +1,12 @@
 'use client';
 import React from 'react';
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { Control, FieldValues, Path } from 'react-hook-form';
 import { Stack, Box, Button, Typography, Chip } from "@mui/material";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import { useTranslation } from 'react-i18next';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 interface Props<T extends FieldValues = FieldValues> {
   control: Control<T>;
@@ -129,10 +129,10 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
         </Box>
       </Stack>
 
-      <ControllerAny
+      <TypedController
         name={name as Path<T>}
         control={control}
-        render={({ field, fieldState }: any) => {
+        render={({ field, fieldState }) => {
           formOnChangeRef.current = field.onChange;
 
           return (

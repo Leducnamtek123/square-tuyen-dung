@@ -725,7 +725,11 @@
       "unsave": "Bỏ lưu",
       "save": "Lưu lại",
       "viewProfile": "Xem hồ sơ"
-    }
+    },
+    "matchingNeeds": "Phù hợp nhu cầu",
+    "positionNotUpdated": "Chưa cập nhật vị trí",
+    "unsaveCandidate": "Bỏ lưu hồ sơ",
+    "saveCandidate": "Lưu hồ sơ"
   },
   "profileSearch": {
     "title": {
@@ -1830,5 +1834,6 @@
       "saveFailed": "Không thể lưu thông tin doanh nghiệp. Vui lòng thử lại.",
       "uploadFailed": "Tải file lên thất bại. Vui lòng thử lại."
     }
-  }
+  },
+  "candidate": "Ứng viên"
 }

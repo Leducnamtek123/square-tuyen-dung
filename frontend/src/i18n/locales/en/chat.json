@@ -63,5 +63,17 @@
   "viewDetails": "View related details",
   "backToList": "Back to list",
   "chooseConversationHint": "Choose a conversation from the left or a job posting from the right to start chatting.",
-  "clickToDownload": "Click to download"
+  "clickToDownload": "Click to download",
+  "suggestions": {
+    "findDesigners": "Find candidates for UI/UX Designer role",
+    "writeInterviewInvite": "Draft an interview invitation email",
+    "marketSalary": "Current market salary benchmarks",
+    "findFrontendJobs": "Find Frontend Developer jobs",
+    "downloadEnglishCv": "Download English CV templates",
+    "salaryInterviewTips": "Tips on discussing salary in an interview"
+  },
+  "startWithGreeting": "Start the conversation with a warm greeting",
+  "startConversationWith": "Start conversation with {{name}}",
+  "startConversation": "Start conversation",
+  "sendFirstMessageHint": "Send a greeting or ask a question to connect right away."
 }

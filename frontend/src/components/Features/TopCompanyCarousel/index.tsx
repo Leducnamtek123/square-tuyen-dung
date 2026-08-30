@@ -18,6 +18,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useTranslation } from 'react-i18next';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import companyService from '@/services/companyService';
 import commonService from '@/services/commonService';
@@ -36,6 +37,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 const TopCompanyCarousel = () => {
+  const { t } = useTranslation(['public', 'common']);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const scrollRef = useRef<HTMLDivElement>(null);
   const { allConfig } = useConfig();
@@ -50,8 +52,8 @@ const TopCompanyCarousel = () => {
   });
 
   const categoriesList = dynamicCareers.length > 0
-    ? [{ id: 'all', name: 'Tất cả' }, ...dynamicCareers.map((c) => ({ id: String(c.id), name: c.name }))]
-    : DEFAULT_CATEGORIES;
+    ? [{ id: 'all', name: t('common:all', 'Tất cả') }, ...dynamicCareers.map((c) => ({ id: String(c.id), name: c.name }))]
+    : [{ id: 'all', name: t('common:all', 'Tất cả') }, ...DEFAULT_CATEGORIES.slice(1)];
 
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['top-companies'],
@@ -87,13 +89,13 @@ const TopCompanyCarousel = () => {
         <Stack direction="row" spacing={1} alignItems="center">
           <WorkspacePremiumIcon sx={{ color: '#eab308', fontSize: 26 }} />
           <Typography variant="h5" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.01em' }}>
-            Công ty nổi bật
+            {t('public:featuredCompanies', 'Công ty nổi bật')}
           </Typography>
         </Stack>
 
         <Link href="/cong-ty" style={{ textDecoration: 'none' }}>
           <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: '#e11d48', cursor: 'pointer', '&:hover': { opacity: 0.85 } }}>
-            <Typography sx={{ fontWeight: 600, fontSize: '0.925rem' }}>Xem thêm</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: '0.925rem' }}>{t('common:actions.viewMore', 'Xem thêm')}</Typography>
             <ArrowForwardIcon sx={{ fontSize: 16 }} />
           </Stack>
         </Link>
@@ -101,7 +103,7 @@ const TopCompanyCarousel = () => {
 
       {/* ── Industry Category Pills Bar ─────────────────────────────── */}
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3, width: '100%', overflow: 'hidden' }}>
-        <IconButton aria-label="Quay lại"
+        <IconButton aria-label={t('common:actions.scrollLeft', 'Cuộn sang trái')}
           size="small"
           onClick={handleScrollLeft}
           sx={{
@@ -138,19 +140,22 @@ const TopCompanyCarousel = () => {
                 onClick={() => setSelectedCategory(cat.id)}
                 sx={{
                   px: 2.2,
-                  py: 0.75,
-                  borderRadius: '20px',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  fontSize: '0.85rem',
+                  py: 0.85,
+                  borderRadius: '24px',
+                  border: '1px solid',
+                  borderColor: isActive ? '#e11d48' : '#e2e8f0',
+                  backgroundColor: isActive ? '#fff1f2' : '#ffffff',
+                  color: isActive ? '#e11d48' : '#475569',
                   fontWeight: isActive ? 700 : 500,
-                  color: isActive ? '#ffffff' : '#475569',
-                  backgroundColor: isActive ? '#e11d48' : '#f1f5f9',
-                  transition: 'all 0.2s ease',
+                  fontSize: '0.85rem',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
                   userSelect: 'none',
-                  flexShrink: 0,
+                  transition: 'all 0.2s ease',
                   '&:hover': {
-                    backgroundColor: isActive ? '#be123c' : '#e2e8f0',
+                    borderColor: '#e11d48',
+                    backgroundColor: isActive ? '#fff1f2' : '#fff5f5',
+                    color: '#e11d48',
                   },
                 }}
               >
@@ -160,7 +165,7 @@ const TopCompanyCarousel = () => {
           })}
         </Box>
 
-        <IconButton aria-label="Quay lại"
+        <IconButton aria-label={t('common:actions.scrollRight', 'Cuộn sang phải')}
           size="small"
           onClick={handleScrollRight}
           sx={{
@@ -176,20 +181,20 @@ const TopCompanyCarousel = () => {
         </IconButton>
       </Stack>
 
-      {/* ── Companies Grid ────────────────────────────────────────────── */}
+      {/* ── 3-Column / 2-Row Grid Carousel Container ────────────────── */}
       {isLoading ? (
         <Grid container spacing={2.5}>
           {Array.from(Array(6).keys()).map((i) => (
             <Grid key={i} size={{ xs: 12, sm: 6, md: 4 }}>
-              <Skeleton variant="rounded" height={100} sx={{ borderRadius: '16px' }} />
+              <Skeleton variant="rounded" height={96} sx={{ borderRadius: '16px' }} />
             </Grid>
           ))}
         </Grid>
       ) : (
         <Grid container spacing={2.5}>
-          {displayList.map((company: Company) => {
-            const logo = company.companyImageUrl || company.logoUrl || IMAGES.companyLogoDefault;
+          {displayList.slice(0, 9).map((company: Company) => {
             const openJobs = Number.isFinite(Number(company.jobPostNumber)) ? Number(company.jobPostNumber) : 0;
+            const logo = company.companyImageUrl || company.logoUrl || IMAGES.companyLogoDefault;
             const employeeSizeLabel = company.employeeSize != null
               ? tConfig(allConfig?.employeeSizeDict?.[String(company.employeeSize)])
               : '';
@@ -257,7 +262,7 @@ const TopCompanyCarousel = () => {
                     <Stack direction="row" spacing={0.6} alignItems="center">
                       <WorkOutlineIcon sx={{ fontSize: 15, color: '#e11d48' }} />
                       <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#e11d48' }}>
-                        {openJobs} vị trí đang tuyển
+                        {t('public:openPositions', '{{count}} vị trí đang tuyển', { count: openJobs })}
                       </Typography>
                     </Stack>
 

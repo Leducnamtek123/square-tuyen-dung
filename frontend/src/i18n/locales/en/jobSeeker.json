@@ -700,5 +700,21 @@
       "add": "Add",
       "done": "Done"
     }
+  },
+  "tabs": {
+    "dashboard": "Dashboard",
+    "profile": "My Profile",
+    "cvDesign": "CV Decorator",
+    "jobs": "Jobs",
+    "companies": "My Companies",
+    "interviews": "My Interviews",
+    "notifications": "Notifications",
+    "account": "Account & Settings"
+  },
+  "cv": {
+    "pickColorTitle": "Choose a color scheme for your CV",
+    "suggestedColors": "Suggested colors",
+    "customColor": "Custom color:",
+    "selectedColorPreview": "Selected color preview"
   }
 }

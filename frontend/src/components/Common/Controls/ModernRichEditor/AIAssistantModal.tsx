@@ -10,7 +10,6 @@ import {
   DialogTitle,
   Divider,
   FormControl,
-  Grid,
   IconButton,
   InputLabel,
   MenuItem,
@@ -30,6 +29,7 @@ import SpellcheckIcon from '@mui/icons-material/Spellcheck';
 import ShortTextIcon from '@mui/icons-material/ShortText';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import AddTaskIcon from '@mui/icons-material/AddTask';
+import { useTranslation } from 'react-i18next';
 import {
   AIActionType,
   AIContentType,
@@ -46,65 +46,6 @@ interface AIAssistantModalProps {
   detectedContext?: AIContentType;
 }
 
-const CONTEXT_LABELS: Record<AIContentType, string> = {
-  company: '🏢 Giới thiệu doanh nghiệp',
-  job_desc: '💼 Mô tả công việc (JD)',
-  job_req: '🎯 Yêu cầu ứng viên',
-  benefits: '🎁 Quyền lợi & Phúc lợi',
-  email: '✉️ Thư gửi ứng viên',
-  blog: '📝 Bài viết / Tin tức',
-  general: '📄 Soạn thảo tổng hợp',
-};
-
-const ACTION_TABS: Array<{ id: AIActionType; label: string; icon: React.ReactNode; desc: string }> = [
-  { id: 'generate', label: 'Viết Mới Toàn Diện', icon: <AutoAwesomeIcon fontSize="small" />, desc: 'Tạo bài viết hoàn chỉnh chuẩn cấu trúc theo chủ đề của bạn' },
-  { id: 'improve', label: 'Nâng Cấp Văn Phong', icon: <SparklesIcon fontSize="small" />, desc: 'Chỉnh sửa câu từ mượt mà, chuyên nghiệp và cuốn hút hơn' },
-  { id: 'fix_spelling', label: 'Sửa Lỗi Chính Tả', icon: <SpellcheckIcon fontSize="small" />, desc: 'Rà soát và chuẩn hóa chính tả, ngữ pháp tiếng Việt / Anh' },
-  { id: 'shorten', label: 'Rút Gọn Súc Tích', icon: <ShortTextIcon fontSize="small" />, desc: 'Tóm tắt các ý quan trọng nhất thành dạng ngắn gọn dễ nhớ' },
-  { id: 'expand', label: 'Mở Rộng Chi Tiết', icon: <FormatQuoteIcon fontSize="small" />, desc: 'Bổ sung thêm luận điểm, ví dụ thực tế và giải thích chi tiết' },
-  { id: 'change_tone', label: 'Đổi Giọng Văn', icon: <SparklesIcon fontSize="small" />, desc: 'Chuyển đổi phong cách sang: Trang trọng, Thân thiện, Thu hút' },
-  { id: 'translate_en', label: 'Dịch sang Tiếng Anh', icon: <TranslateIcon fontSize="small" />, desc: 'Dịch thuật chuẩn ngữ cảnh doanh nghiệp giữ nguyên định dạng' },
-  { id: 'translate_vi', label: 'Dịch sang Tiếng Việt', icon: <TranslateIcon fontSize="small" />, desc: 'Dịch thuật sang tiếng Việt tự nhiên và chuẩn mực' },
-  { id: 'custom', label: 'Tùy Chỉnh Prompt', icon: <AutoAwesomeIcon fontSize="small" />, desc: 'Yêu cầu AI làm bất cứ điều gì bạn mong muốn' },
-];
-
-const PROMPT_SUGGESTIONS: Record<AIContentType, string[]> = {
-  company: [
-    'Viết bài giới thiệu doanh nghiệp công nghệ năng động, lấy con người làm trọng tâm',
-    'Tập trung vào sứ mệnh chuyển đổi số và các cam kết chất lượng với khách hàng',
-    'Nêu bật văn hóa phẳng, cởi mở và các chính sách phát triển nhân tài vượt trội',
-  ],
-  job_desc: [
-    'Tạo mô tả công việc (JD) thu hút cho vị trí Senior Fullstack Developer',
-    'Soạn bản mô tả công việc Chuyên viên Marketing đa kênh (Digital Marketing)',
-    'Viết nhiệm vụ chính cho vị trí Chuyên viên Tư vấn & Kinh doanh B2B',
-  ],
-  job_req: [
-    'Yêu cầu 2+ năm kinh nghiệm, tư duy phản biện tốt và chủ động trong công việc',
-    'Khung kỹ năng chuyên môn vững vàng, khả năng giao tiếp tiếng Anh lưu loát',
-    'Đòi hỏi tinh thần trách nhiệm cao và khả năng giải quyết vấn đề dưới áp lực',
-  ],
-  benefits: [
-    'Gói đãi ngộ hấp dẫn: Review lương 2 lần/năm, thưởng tháng 13+ và bảo hiểm sức khỏe VIP',
-    'Môi trường làm việc Hybrid linh hoạt, cung cấp MacBook Pro và đào tạo chuyên sâu',
-    'Du lịch resort 5 sao hàng năm, phụ cấp cơm trưa và teambuilding sôi nổi',
-  ],
-  email: [
-    'Thư mời phỏng vấn trực tiếp tại văn phòng vào 9h sáng thứ Hai tuần tới',
-    'Thư mời phỏng vấn online qua Google Meet kèm hướng dẫn chuẩn bị',
-    'Thư đề nghị nhận việc (Offer Letter) kèm mức lương và chế độ đãi ngộ',
-    'Thư từ chối ứng viên lịch sự và lưu hồ sơ vào Talent Pool tương lai',
-  ],
-  blog: [
-    'Viết bài phân tích xu hướng tuyển dụng nhân sự công nghệ năm 2026',
-    'Bí quyết phỏng vấn và giữ chân nhân tài cho các doanh nghiệp vừa và nhỏ',
-  ],
-  general: [
-    'Viết văn bản chuyên nghiệp, cấu trúc rõ ràng với các gạch đầu dòng nổi bật',
-    'Tối ưu hóa nội dung cho người đọc dễ nắm bắt thông tin quan trọng nhất',
-  ],
-};
-
 export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
   open,
   onClose,
@@ -112,6 +53,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
   onApplyContent,
   detectedContext = 'general',
 }) => {
+  const { t } = useTranslation('common');
   const [selectedAction, setSelectedAction] = useState<AIActionType>('generate');
   const [contentType, setContentType] = useState<AIContentType>(detectedContext);
   const [tone, setTone] = useState<AITone>('professional');
@@ -124,6 +66,65 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
   useEffect(() => {
     setContentType(detectedContext);
   }, [detectedContext]);
+
+  const CONTEXT_LABELS: Record<AIContentType, string> = {
+    company: t('editor.templates.categories.company', '🏢 Giới thiệu doanh nghiệp'),
+    job_desc: t('editor.templates.categories.job', '💼 Mô tả công việc (JD)'),
+    job_req: t('editor.ai.context.jobReq', '🎯 Yêu cầu ứng viên'),
+    benefits: t('editor.templates.categories.policy', '🎁 Quyền lợi & Phúc lợi'),
+    email: t('editor.ai.context.email', '✉️ Thư gửi ứng viên'),
+    blog: t('editor.ai.context.blog', '📝 Bài viết / Tin tức'),
+    general: t('editor.ai.context.general', '📄 Soạn thảo tổng hợp'),
+  };
+
+  const ACTION_TABS: Array<{ id: AIActionType; label: string; icon: React.ReactNode; desc: string }> = [
+    { id: 'generate', label: t('editor.ai.tabs.generate', 'Viết Mới Toàn Diện'), icon: <AutoAwesomeIcon fontSize="small" />, desc: t('editor.ai.tabs.generateDesc', 'Tạo bài viết hoàn chỉnh chuẩn cấu trúc theo chủ đề của bạn') },
+    { id: 'improve', label: t('editor.ai.tabs.improve', 'Nâng Cấp Văn Phong'), icon: <SparklesIcon fontSize="small" />, desc: t('editor.ai.tabs.improveDesc', 'Chỉnh sửa câu từ mượt mà, chuyên nghiệp và cuốn hút hơn') },
+    { id: 'fix_spelling', label: t('editor.ai.actions.grammar', 'Sửa Lỗi Chính Tả'), icon: <SpellcheckIcon fontSize="small" />, desc: t('editor.ai.tabs.fixSpellingDesc', 'Rà soát và chuẩn hóa chính tả, ngữ pháp tiếng Việt / Anh') },
+    { id: 'shorten', label: t('editor.ai.actions.shorten', 'Rút Gọn Súc Tích'), icon: <ShortTextIcon fontSize="small" />, desc: t('editor.ai.tabs.shortenDesc', 'Tóm tắt các ý quan trọng nhất thành dạng ngắn gọn dễ nhớ') },
+    { id: 'expand', label: t('editor.ai.actions.expand', 'Mở Rộng Chi Tiết'), icon: <FormatQuoteIcon fontSize="small" />, desc: t('editor.ai.tabs.expandDesc', 'Bổ sung thêm luận điểm, ví dụ thực tế và giải thích chi tiết') },
+    { id: 'change_tone', label: t('editor.ai.tabs.changeTone', 'Đổi Giọng Văn'), icon: <SparklesIcon fontSize="small" />, desc: t('editor.ai.tabs.changeToneDesc', 'Chuyển đổi phong cách sang: Trang trọng, Thân thiện, Thu hút') },
+    { id: 'translate_en', label: t('editor.ai.tabs.translateEn', 'Dịch sang Tiếng Anh'), icon: <TranslateIcon fontSize="small" />, desc: t('editor.ai.tabs.translateEnDesc', 'Dịch thuật chuẩn ngữ cảnh doanh nghiệp giữ nguyên định dạng') },
+    { id: 'translate_vi', label: t('editor.ai.tabs.translateVi', 'Dịch sang Tiếng Việt'), icon: <TranslateIcon fontSize="small" />, desc: t('editor.ai.tabs.translateViDesc', 'Dịch thuật sang tiếng Việt tự nhiên và chuẩn mực') },
+    { id: 'custom', label: t('editor.ai.tabs.custom', 'Tùy Chỉnh Prompt'), icon: <AutoAwesomeIcon fontSize="small" />, desc: t('editor.ai.tabs.customDesc', 'Yêu cầu AI làm bất cứ điều gì bạn mong muốn') },
+  ];
+
+  const PROMPT_SUGGESTIONS: Record<AIContentType, string[]> = {
+    company: [
+      t('editor.ai.suggestions.comp1', 'Viết bài giới thiệu doanh nghiệp công nghệ năng động, lấy con người làm trọng tâm'),
+      t('editor.ai.suggestions.comp2', 'Tập trung vào sứ mệnh chuyển đổi số và các cam kết chất lượng với khách hàng'),
+      t('editor.ai.suggestions.comp3', 'Nêu bật văn hóa phẳng, cởi mở và các chính sách phát triển nhân tài vượt trội'),
+    ],
+    job_desc: [
+      t('editor.ai.suggestions.jd1', 'Tạo mô tả công việc (JD) thu hút cho vị trí Senior Fullstack Developer'),
+      t('editor.ai.suggestions.jd2', 'Soạn bản mô tả công việc Chuyên viên Marketing đa kênh (Digital Marketing)'),
+      t('editor.ai.suggestions.jd3', 'Viết nhiệm vụ chính cho vị trí Chuyên viên Tư vấn & Kinh doanh B2B'),
+    ],
+    job_req: [
+      t('editor.ai.suggestions.req1', 'Yêu cầu 2+ năm kinh nghiệm, tư duy phản biện tốt và chủ động trong công việc'),
+      t('editor.ai.suggestions.req2', 'Khung kỹ năng chuyên môn vững vàng, khả năng giao tiếp tiếng Anh lưu loát'),
+      t('editor.ai.suggestions.req3', 'Đòi hỏi tinh thần trách nhiệm cao và khả năng giải quyết vấn đề dưới áp lực'),
+    ],
+    benefits: [
+      t('editor.ai.suggestions.ben1', 'Gói đãi ngộ hấp dẫn: Review lương 2 lần/năm, thưởng tháng 13+ và bảo hiểm sức khỏe VIP'),
+      t('editor.ai.suggestions.ben2', 'Môi trường làm việc Hybrid linh hoạt, cung cấp MacBook Pro và đào tạo chuyên sâu'),
+      t('editor.ai.suggestions.ben3', 'Du lịch resort 5 sao hàng năm, phụ cấp cơm trưa và teambuilding sôi nổi'),
+    ],
+    email: [
+      t('editor.ai.suggestions.mail1', 'Thư mời phỏng vấn trực tiếp tại văn phòng vào 9h sáng thứ Hai tuần tới'),
+      t('editor.ai.suggestions.mail2', 'Thư mời phỏng vấn online qua Google Meet kèm hướng dẫn chuẩn bị'),
+      t('editor.ai.suggestions.mail3', 'Thư đề nghị nhận việc (Offer Letter) kèm mức lương và chế độ đãi ngộ'),
+      t('editor.ai.suggestions.mail4', 'Thư từ chối ứng viên lịch sự và lưu hồ sơ vào Talent Pool tương lai'),
+    ],
+    blog: [
+      t('editor.ai.suggestions.blog1', 'Viết bài phân tích xu hướng tuyển dụng nhân sự công nghệ năm 2026'),
+      t('editor.ai.suggestions.blog2', 'Bí quyết phỏng vấn và giữ chân nhân tài cho các doanh nghiệp vừa và nhỏ'),
+    ],
+    general: [
+      t('editor.ai.suggestions.gen1', 'Viết văn bản chuyên nghiệp, cấu trúc rõ ràng với các gạch đầu dòng nổi bật'),
+      t('editor.ai.suggestions.gen2', 'Tối ưu hóa nội dung cho người đọc dễ nắm bắt thông tin quan trọng nhất'),
+    ],
+  };
 
   const currentTabInfo = ACTION_TABS.find((t) => t.id === selectedAction) || ACTION_TABS[0];
   const suggestions = PROMPT_SUGGESTIONS[contentType] || PROMPT_SUGGESTIONS.general;
@@ -207,7 +208,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography variant="subtitle1" fontWeight={700}>
-                AILA AI Writing Assistant
+                {t('editor.ai.modalTitle', 'Trợ Lý Soạn Thảo AI (AI Writing Assistant)')}
               </Typography>
               <Chip
                 label="AI v2.0"
@@ -222,7 +223,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
               />
             </Box>
             <Typography variant="caption" color="text.secondary">
-              Trợ lý trí tuệ nhân tạo chuyên biệt cho soạn thảo văn bản doanh nghiệp và tuyển dụng
+              {t('editor.ai.subtitle', 'Tối ưu hóa, mở rộng và hoàn thiện nội dung tuyển dụng chuyên nghiệp')}
             </Typography>
           </Box>
         </Box>
@@ -320,21 +321,21 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
             {/* Parameter Controls */}
             <Box sx={{ display: 'flex', gap: 1.5 }}>
               <FormControl size="small" fullWidth>
-                <InputLabel>Văn phong (Tone)</InputLabel>
-                <Select value={tone} label="Văn phong (Tone)" onChange={(e) => setTone(e.target.value as AITone)}>
-                  <MenuItem value="professional">Trang trọng & Chuẩn mực</MenuItem>
-                  <MenuItem value="friendly">Thân thiện & Truyền cảm hứng</MenuItem>
-                  <MenuItem value="persuasive">Thu hút & Thuyết phục</MenuItem>
-                  <MenuItem value="creative">Hiện đại & Sáng tạo</MenuItem>
+                <InputLabel>{t('editor.ai.tones.label', 'Phong cách diễn đạt:')}</InputLabel>
+                <Select value={tone} label={t('editor.ai.tones.label', 'Phong cách diễn đạt:')} onChange={(e) => setTone(e.target.value as AITone)}>
+                  <MenuItem value="professional">{t('editor.ai.tones.professional', 'Chuyên nghiệp & Trang trọng')}</MenuItem>
+                  <MenuItem value="friendly">{t('editor.ai.tones.friendly', 'Thân thiện & Cởi mở')}</MenuItem>
+                  <MenuItem value="persuasive">{t('editor.ai.tones.persuasive', 'Thuyết phục & Thu hút')}</MenuItem>
+                  <MenuItem value="creative">{t('editor.ai.tones.creative', 'Hiện đại & Sáng tạo')}</MenuItem>
                 </Select>
               </FormControl>
 
               <FormControl size="small" fullWidth>
-                <InputLabel>Độ dài (Length)</InputLabel>
-                <Select value={length} label="Độ dài (Length)" onChange={(e) => setLength(e.target.value as AILength)}>
-                  <MenuItem value="short">Ngắn gọn (2-3 đoạn)</MenuItem>
-                  <MenuItem value="medium">Tiêu chuẩn (300-500 từ)</MenuItem>
-                  <MenuItem value="detailed">Chi tiết toàn diện (500-800 từ)</MenuItem>
+                <InputLabel>{t('editor.ai.length.label', 'Độ dài (Length)')}</InputLabel>
+                <Select value={length} label={t('editor.ai.length.label', 'Độ dài (Length)')} onChange={(e) => setLength(e.target.value as AILength)}>
+                  <MenuItem value="short">{t('editor.ai.length.short', 'Ngắn gọn (2-3 đoạn)')}</MenuItem>
+                  <MenuItem value="medium">{t('editor.ai.length.medium', 'Tiêu chuẩn (300-500 từ)')}</MenuItem>
+                  <MenuItem value="detailed">{t('editor.ai.length.detailed', 'Chi tiết toàn diện (500-800 từ)')}</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -342,7 +343,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
             {/* Prompt Input */}
             <Box>
               <Typography variant="caption" fontWeight={600} color="text.secondary" gutterBottom>
-                Yêu cầu cụ thể / Từ khóa chính:
+                {t('editor.ai.customPromptLabel', 'Hoặc nhập yêu cầu riêng của bạn cho AI:')}
               </Typography>
               <TextField
                 multiline
@@ -351,8 +352,8 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                 size="small"
                 placeholder={
                   selectedAction === 'generate'
-                    ? 'Ví dụ: Viết bài giới thiệu doanh nghiệp công nghệ, định hướng phát triển sản phẩm SaaS B2B, văn hóa năng động...'
-                    : 'Nhập hướng dẫn bổ sung cho AI (tùy chọn)...'
+                    ? t('editor.ai.customPromptPlaceholder', 'Ví dụ: Hãy viết thêm phần yêu cầu kỹ năng ReactJS và TypeScript cho vị trí Senior Frontend...')
+                    : t('editor.ai.customPromptPlaceholderSecondary', 'Nhập hướng dẫn bổ sung cho AI (tùy chọn)...')
                 }
                 value={userPrompt}
                 onChange={(e) => setUserPrompt(e.target.value)}
@@ -363,7 +364,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
             {/* Suggestion Prompts */}
             <Box>
               <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                💡 Gợi ý nhanh cho {CONTEXT_LABELS[contentType]}:
+                💡 {t('editor.ai.suggestionsHeader', 'Gợi ý nhanh cho')} {CONTEXT_LABELS[contentType]}:
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
                 {suggestions.map((sug, idx) => (
@@ -412,7 +413,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                 mt: 'auto',
               }}
             >
-              {loading ? 'AI Đang Soạn Thảo...' : 'Tạo Nội Dung Với AI'}
+              {loading ? t('editor.ai.processing', 'AI đang suy nghĩ và tạo nội dung...') : t('editor.ai.generateButton', 'Xử lý bằng AI')}
             </Button>
           </Box>
 
@@ -430,10 +431,10 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
             <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography variant="subtitle2" fontWeight={700}>
-                  Kết Quả Do AI Tạo Ra
+                  {t('editor.ai.resultTitle', 'Kết quả do AI đề xuất:')}
                 </Typography>
                 {generatedResult && (
-                  <Chip label="Đã hoàn thành" color="success" size="small" sx={{ height: 20, fontSize: '0.72rem' }} />
+                  <Chip label={t('common.status.completed', 'Đã hoàn thành')} color="success" size="small" sx={{ height: 20, fontSize: '0.72rem' }} />
                 )}
               </Box>
 
@@ -446,7 +447,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     onClick={handleGenerate}
                     disabled={loading}
                   >
-                    Tạo lại
+                    {t('common.actions.retry', 'Thử lại')}
                   </Button>
                   <Button
                     size="small"
@@ -455,7 +456,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     onClick={handleCopy}
                     color={copied ? 'success' : 'inherit'}
                   >
-                    {copied ? 'Đã sao chép' : 'Sao chép'}
+                    {copied ? t('editor.ai.copied', 'Đã sao chép vào bộ nhớ tạm') : t('editor.ai.copy', 'Sao chép kết quả')}
                   </Button>
                 </Box>
               )}
@@ -511,7 +512,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     <AutoAwesomeIcon sx={{ fontSize: 32, color: 'primary.main' }} />
                   </Box>
                   <Typography variant="body2" color="text.secondary" fontWeight={600}>
-                    AILA đang tổng hợp và trau chuốt nội dung...
+                    {t('editor.ai.processing', 'AI đang suy nghĩ và tạo nội dung...')}
                   </Typography>
                   <CircularProgress size={24} />
                 </Box>
@@ -533,10 +534,10 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                 >
                   <AutoAwesomeIcon sx={{ fontSize: 44, color: 'text.disabled' }} />
                   <Typography variant="body2" fontWeight={600}>
-                    Chưa có nội dung nào được tạo
+                    {t('editor.ai.emptyResult', 'Chưa có nội dung nào được tạo')}
                   </Typography>
                   <Typography variant="caption" sx={{ maxWidth: 360 }}>
-                    Chọn tác vụ ở cột bên trái, nhập yêu cầu và nhấn nút <strong>"Tạo Nội Dung Với AI"</strong> để bắt đầu.
+                    {t('editor.ai.emptyResultInstruction', 'Chọn tác vụ ở cột bên trái, nhập yêu cầu và nhấn nút "Xử lý bằng AI" để bắt đầu.')}
                   </Typography>
                 </Box>
               )}
@@ -551,7 +552,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                   startIcon={<AddTaskIcon />}
                   onClick={() => handleApply('insert')}
                 >
-                  Chèn Vào Vị Trí Con Trỏ
+                  {t('editor.ai.insertCursor', 'Chèn Vào Vị Trí Con Trỏ')}
                 </Button>
                 <Button
                   variant="outlined"
@@ -559,7 +560,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                   startIcon={<AddTaskIcon />}
                   onClick={() => handleApply('append')}
                 >
-                  Thêm Vào Cuối
+                  {t('editor.ai.insert', 'Chèn vào cuối bài')}
                 </Button>
                 <Button
                   variant="contained"
@@ -571,7 +572,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     px: 2.5,
                   }}
                 >
-                  Thay Thế Toàn Bộ
+                  {t('editor.ai.replace', 'Thay thế nội dung đã chọn')}
                 </Button>
               </Box>
             )}
@@ -581,10 +582,10 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
 
       <DialogActions sx={{ px: 3, py: 1.5, borderTop: '1px solid', borderColor: 'divider', justifyContent: 'space-between' }}>
         <Typography variant="caption" color="text.secondary">
-          ⚡ AI được huấn luyện chuyên sâu cho quy trình tuyển dụng và thương hiệu doanh nghiệp
+          ⚡ {t('editor.ai.footerNote', 'AI được huấn luyện chuyên sâu cho quy trình tuyển dụng và thương hiệu doanh nghiệp')}
         </Typography>
         <Button onClick={onClose} color="inherit">
-          Đóng
+          {t('editor.ai.close', 'Đóng')}
         </Button>
       </DialogActions>
     </Dialog>

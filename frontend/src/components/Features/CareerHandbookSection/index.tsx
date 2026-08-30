@@ -19,6 +19,7 @@ import {
   Button,
 } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useTranslation } from 'react-i18next';
 import contentService, { type Article } from '@/services/contentService';
 import { getArticleImage, withArticleImages } from '@/views/defaultPages/NewsPage/blogImages';
 
@@ -26,6 +27,7 @@ dayjs.extend(relativeTime);
 dayjs.locale('vi');
 
 const CareerHandbookSection = () => {
+  const { t } = useTranslation('common');
   const { data: articles = [], isLoading } = useQuery({
     queryKey: ['public-articles-handbook'],
     queryFn: async () => {
@@ -40,10 +42,10 @@ const CareerHandbookSection = () => {
       {/* ── Section Title ─────────────────────────────────────────────── */}
       <Stack spacing={1} sx={{ mb: 4, textAlign: 'center', alignItems: 'center' }}>
         <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.01em' }}>
-          Tin tức & Thông tin
+          {t('news.sectionTitle', 'Tin tức & Thông tin')}
         </Typography>
         <Typography variant="body1" sx={{ color: '#64748b', maxWidth: 640 }}>
-          Cập nhật những thông tin, tin tức tuyển dụng và thị trường lao động mới nhất.
+          {t('news.sectionSubtitle', 'Cập nhật những thông tin, tin tức tuyển dụng và thị trường lao động mới nhất.')}
         </Typography>
       </Stack>
 
@@ -60,7 +62,7 @@ const CareerHandbookSection = () => {
         <Grid container spacing={3}>
           {articles.map((article: Article) => {
             const articleHref = `/tin-tuc/${article.slug}`;
-            const publishedAgo = article.publishedAt ? dayjs(article.publishedAt).fromNow() : 'Mới cập nhật';
+            const publishedAgo = article.publishedAt ? dayjs(article.publishedAt).fromNow() : t('news.justUpdated', 'Mới cập nhật');
 
             return (
               <Grid key={article.id} size={{ xs: 12, md: 4 }}>
@@ -102,7 +104,7 @@ const CareerHandbookSection = () => {
                       }}
                     />
                     <Chip
-                      label={article.categoryName || 'CẨM NANG'}
+                      label={article.categoryName || t('news.defaultCategory', 'CẨM NANG')}
                       size="small"
                       sx={{
                         position: 'absolute',
@@ -155,7 +157,7 @@ const CareerHandbookSection = () => {
                     </Typography>
 
                     <Typography variant="caption" sx={{ color: '#94a3b8', mt: 'auto', fontWeight: 600 }}>
-                      Bởi {article.authorName || 'Admin'} • {publishedAgo}
+                      {t('news.byAuthor', 'Bởi {{author}} • {{time}}', { author: article.authorName || 'Admin', time: publishedAgo })}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -188,7 +190,7 @@ const CareerHandbookSection = () => {
             },
           }}
         >
-          Xem thêm tin tức & thông tin
+          {t('news.viewMore', 'Xem thêm tin tức & thông tin')}
         </Button>
       </Stack>
     </Box>

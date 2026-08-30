@@ -401,6 +401,7 @@ const ChatWindow = ({
         hasMore={state.hasMore}
         messages={state.messages}
         partnerAvatarUrl={safePartnerAvatarUrl}
+        partnerName={state.partnerAccount?.name || state.partnerAccount?.company?.companyName}
         myAvatarUrl={safeMyAvatarUrl}
         onLoadMore={handleLoadMore}
         messageListRef={messageListRef}
@@ -410,6 +411,12 @@ const ChatWindow = ({
           'Chọn một cuộc hội thoại ở danh sách bên trái hoặc việc làm bên phải để bắt đầu trò chuyện.',
         )}
         loadPreviousMessagesText={t('loadPreviousMessages', 'Xem các tin nhắn trước')}
+        emptyConversationTitle={
+          state.partnerAccount?.name
+            ? t('startConversationWith', 'Bắt đầu cuộc trò chuyện với {{name}}', { name: state.partnerAccount.name })
+            : t('startConversation', 'Bắt đầu cuộc trò chuyện')
+        }
+        emptyConversationSubtitle={t('sendFirstMessageHint', 'Gửi lời chào hoặc đặt câu hỏi để kết nối ngay.')}
       />
 
       {currentUserChat && selectedRoomId && (

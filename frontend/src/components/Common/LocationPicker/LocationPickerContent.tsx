@@ -446,7 +446,7 @@ export default function LocationPickerContent({
           )}
 
           {showGps && (
-            <Tooltip title="Xác định vị trí hiện tại của thiết bị qua GPS">
+            <Tooltip title={t('common.location.gpsTooltip', 'Xác định vị trí hiện tại của thiết bị qua GPS')}>
               <Button
                 variant="outlined"
                 color="primary"
@@ -462,7 +462,7 @@ export default function LocationPickerContent({
                   fontWeight: 600,
                 }}
               >
-                Vị trí của tôi
+                {t('common.location.myLocation', 'Vị trí của tôi')}
               </Button>
             </Tooltip>
           )}
@@ -529,7 +529,7 @@ export default function LocationPickerContent({
           >
             <CircularProgress size={16} />
             <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.primary' }}>
-              Đang xác định địa chỉ...
+              {t('common.location.geocoding', 'Đang xác định địa chỉ...')}
             </Typography>
           </Box>
         )}
@@ -557,7 +557,7 @@ export default function LocationPickerContent({
             }}
           >
             <InfoOutlinedIcon sx={{ fontSize: 14, color: '#60A5FA' }} />
-            Nhấp vào bản đồ hoặc kéo ghim để cập nhật vị trí
+            {t('common.location.helperBadge', 'Nhấp vào bản đồ hoặc kéo ghim để cập nhật vị trí')}
           </Box>
         )}
       </Paper>
@@ -578,7 +578,7 @@ export default function LocationPickerContent({
             <Stack direction="row" alignItems="center" spacing={1}>
               <CheckCircleIcon color="success" sx={{ fontSize: 18 }} />
               <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                Địa chỉ đã chọn:
+                {t('common.location.selectedAddress', 'Địa chỉ đã chọn:')}
               </Typography>
             </Stack>
             <Typography variant="body2" sx={{ color: 'text.secondary', pl: 3.2 }}>
@@ -588,13 +588,13 @@ export default function LocationPickerContent({
               <Stack direction="row" spacing={1} sx={{ pl: 3.2 }}>
                 <Chip
                   size="small"
-                  label={`Vĩ độ: ${position[0].toFixed(6)}`}
+                  label={t('common.location.latitude', 'Vĩ độ: {{val}}', { val: position[0].toFixed(6) })}
                   variant="outlined"
                   sx={{ fontSize: '0.7rem', height: 22 }}
                 />
                 <Chip
                   size="small"
-                  label={`Kinh độ: ${position[1].toFixed(6)}`}
+                  label={t('common.location.longitude', 'Kinh độ: {{val}}', { val: position[1].toFixed(6) })}
                   variant="outlined"
                   sx={{ fontSize: '0.7rem', height: 22 }}
                 />

@@ -59,6 +59,11 @@ COMPANY_CONTACT_ADDRESS = config(
 )
 COMPANY_WORK_TIME = config("COMPANY_WORK_TIME", default="8:00 - 17:30 (Monday - Friday)")
 
+APP_ENV = config("APP_ENV", default=config("APP_ENVIRONMENT", default="development"))
+APP_ENVIRONMENT = config("APP_ENVIRONMENT", default=APP_ENV)
+IS_PRODUCTION = str(APP_ENVIRONMENT).strip().lower() == "production"
+STRICT_ENV_VALIDATION = config("STRICT_ENV_VALIDATION", default=IS_PRODUCTION, cast=_to_bool)
+
 WEB_JOB_SEEKER_CLIENT_URL = config("WEB_JOB_SEEKER_CLIENT_URL", default="http://localhost:3000" if not IS_PRODUCTION else "https://infohr.vn/")
 WEB_EMPLOYER_CLIENT_URL = config("WEB_EMPLOYER_CLIENT_URL", default="http://localhost:3000" if not IS_PRODUCTION else "https://infohr.vn/")
 
@@ -146,10 +151,6 @@ INTERVIEW_AGENT_AUTH_REQUIRED = config(
 )
 INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS = config("INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS", default=300, cast=int)
 INTERVIEW_DISCONNECT_GRACE_SECONDS = config("INTERVIEW_DISCONNECT_GRACE_SECONDS", default=300, cast=int)
-APP_ENV = config("APP_ENV", default=config("APP_ENVIRONMENT", default="development"))
-APP_ENVIRONMENT = config("APP_ENVIRONMENT", default=APP_ENV)
-IS_PRODUCTION = str(APP_ENVIRONMENT).strip().lower() == "production"
-STRICT_ENV_VALIDATION = config("STRICT_ENV_VALIDATION", default=IS_PRODUCTION, cast=_to_bool)
 API_RESPONSE_ENVELOPE_V2 = config("API_RESPONSE_ENVELOPE_V2", default=True, cast=_to_bool)
 FRAPPE_HR_BASE_URL = config("FRAPPE_HR_BASE_URL", default="")
 FRAPPE_HR_PUBLIC_URL = config("FRAPPE_HR_PUBLIC_URL", default=FRAPPE_HR_BASE_URL)

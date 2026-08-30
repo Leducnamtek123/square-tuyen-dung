@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Chip, CircularProgress, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Chip, CircularProgress, Stack, Typography } from '@mui/material';
 import ForumRoundedIcon from '@mui/icons-material/ForumRounded';
 import Message from '../Message';
 import { formatDateDivider } from '../../../../utils/dateHelper';
@@ -20,12 +20,15 @@ type ChatWindowMessagePanelProps = {
   hasMore: boolean;
   messages: ChatWindowMessage[];
   partnerAvatarUrl?: string;
+  partnerName?: string;
   myAvatarUrl?: string;
   onLoadMore: () => void;
   messageListRef: React.RefObject<HTMLDivElement | null>;
   noConversationSelectedText: string;
   chooseConversationText: string;
   loadPreviousMessagesText: string;
+  emptyConversationTitle?: string;
+  emptyConversationSubtitle?: string;
 };
 
 export const ChatWindowMessagePanel = ({
@@ -34,12 +37,15 @@ export const ChatWindowMessagePanel = ({
   hasMore,
   messages,
   partnerAvatarUrl,
+  partnerName,
   myAvatarUrl,
   onLoadMore,
   messageListRef,
   noConversationSelectedText,
   chooseConversationText,
   loadPreviousMessagesText,
+  emptyConversationTitle,
+  emptyConversationSubtitle,
 }: ChatWindowMessagePanelProps) => {
   if (showEmptyState) {
     return (
@@ -121,6 +127,58 @@ export const ChatWindowMessagePanel = ({
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
           <CircularProgress size={28} thickness={4} />
+        </Box>
+      ) : messages.length === 0 ? (
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            py: 8,
+            px: 2,
+            textAlign: 'center',
+          }}
+        >
+          <Avatar
+            src={partnerAvatarUrl}
+            sx={{
+              width: 68,
+              height: 68,
+              mb: 2,
+              bgcolor: 'primary.50',
+              color: 'primary.main',
+              fontWeight: 700,
+              fontSize: '1.5rem',
+              border: '2px solid #e2e8f0',
+              boxShadow: '0 4px 16px rgba(37, 99, 235, 0.1)',
+            }}
+          >
+            {partnerName ? partnerName.trim().split(' ').slice(-1)[0]?.charAt(0)?.toUpperCase() || 'U' : 'U'}
+          </Avatar>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: 700,
+              color: '#0f172a',
+              mb: 0.75,
+              fontSize: '1rem',
+            }}
+          >
+            {emptyConversationTitle || 'Bắt đầu cuộc trò chuyện'}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: '#64748b',
+              maxWidth: 360,
+              fontSize: '0.85rem',
+              lineHeight: 1.5,
+            }}
+          >
+            {emptyConversationSubtitle || 'Gửi lời chào hoặc đặt câu hỏi để kết nối ngay.'}
+          </Typography>
         </Box>
       ) : (
         <>

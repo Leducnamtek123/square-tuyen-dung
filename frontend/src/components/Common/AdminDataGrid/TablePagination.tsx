@@ -14,6 +14,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
+import { useTranslation } from 'react-i18next';
 
 interface TablePaginationProps {
   page: number; // 1-indexed
@@ -32,6 +33,7 @@ export default function TablePagination({
   onPageChange,
   onPageSizeChange,
 }: TablePaginationProps) {
+  const { t } = useTranslation('common');
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const safePage = Math.min(Math.max(1, page), totalPages);
   const fromIndex = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
@@ -76,7 +78,7 @@ export default function TablePagination({
         {/* Rows per page selector */}
         <Stack direction="row" spacing={1} alignItems="center">
           <Typography variant="body2" sx={{ color: '#64748B', fontSize: '0.8125rem' }}>
-            Số hàng:
+            {t('pagination.rowsPerPage', 'Số hàng:')}
           </Typography>
           {onPageSizeChange && (
             <FormControl size="small">
@@ -110,7 +112,7 @@ export default function TablePagination({
               <strong>{fromIndex}</strong>–<strong>{toIndex}</strong> / <strong>{totalCount}</strong>
             </>
           ) : (
-            '0 mục'
+            t('pagination.zeroItems', '0 mục')
           )}
         </Typography>
       </Box>
@@ -128,8 +130,8 @@ export default function TablePagination({
           onClick={() => onPageChange(1)}
           disabled={!canGoPrev}
           sx={{ color: '#64748B', borderRadius: 1.5, minWidth: 36, minHeight: 36 }}
-          title="Trang đầu"
-          aria-label="Trang đầu"
+          title={t('pagination.firstPage', 'Trang đầu')}
+          aria-label={t('pagination.firstPage', 'Trang đầu')}
         >
           <FirstPageIcon sx={{ fontSize: 20 }} />
         </IconButton>
@@ -138,8 +140,8 @@ export default function TablePagination({
           onClick={() => onPageChange(safePage - 1)}
           disabled={!canGoPrev}
           sx={{ color: '#64748B', borderRadius: 1.5, minWidth: 36, minHeight: 36 }}
-          title="Trang trước"
-          aria-label="Trang trước"
+          title={t('pagination.prevPage', 'Trang trước')}
+          aria-label={t('pagination.prevPage', 'Trang trước')}
         >
           <KeyboardArrowLeftIcon sx={{ fontSize: 20 }} />
         </IconButton>
@@ -155,8 +157,8 @@ export default function TablePagination({
           onClick={() => onPageChange(safePage + 1)}
           disabled={!canGoNext}
           sx={{ color: '#64748B', borderRadius: 1.5, minWidth: 36, minHeight: 36 }}
-          title="Trang sau"
-          aria-label="Trang sau"
+          title={t('pagination.nextPage', 'Trang sau')}
+          aria-label={t('pagination.nextPage', 'Trang sau')}
         >
           <KeyboardArrowRightIcon sx={{ fontSize: 20 }} />
         </IconButton>
@@ -165,8 +167,8 @@ export default function TablePagination({
           onClick={() => onPageChange(totalPages)}
           disabled={!canGoNext}
           sx={{ color: '#64748B', borderRadius: 1.5, minWidth: 36, minHeight: 36 }}
-          title="Trang cuối"
-          aria-label="Trang cuối"
+          title={t('pagination.lastPage', 'Trang cuối')}
+          aria-label={t('pagination.lastPage', 'Trang cuối')}
         >
           <LastPageIcon sx={{ fontSize: 20 }} />
         </IconButton>

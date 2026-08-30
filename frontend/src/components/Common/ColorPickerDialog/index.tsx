@@ -1,7 +1,6 @@
-'use client';
-
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Stack, Typography } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 import defaultTheme from '@/themeConfigs/defaultTheme';
 
 interface Props {
@@ -20,6 +19,7 @@ const DEFAULT_COLORS = [
 ];
 
 const ColorPickerDialog = ({ open, onClose, onColorSelect }: Props) => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
   const [selectedColor, setSelectedColor] = React.useState<string>(defaultTheme.palette.primary.main);
   const [showCustomPicker, setShowCustomPicker] = React.useState(false);
 
@@ -45,13 +45,13 @@ const ColorPickerDialog = ({ open, onClose, onColorSelect }: Props) => {
       fullWidth
     >
       <DialogTitle>
-        Chọn màu sắc cho CV của bạn
+        {t('jobSeeker:cv.pickColorTitle', 'Chọn màu sắc cho CV của bạn')}
       </DialogTitle>
       <DialogContent>
         <Stack spacing={3}>
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              Màu sắc gợi ý
+              {t('jobSeeker:cv.suggestedColors', 'Màu sắc gợi ý')}
             </Typography>
             <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
               {DEFAULT_COLORS.map((color) => (
@@ -88,7 +88,7 @@ const ColorPickerDialog = ({ open, onClose, onColorSelect }: Props) => {
 
           {showCustomPicker && (
             <Stack direction="row" alignItems="center" justifyContent="center" spacing={2} sx={{ pt: 1 }}>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>Tự chọn màu:</Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>{t('jobSeeker:cv.customColor', 'Tự chọn màu:')}</Typography>
               <input
                 type="color"
                 value={selectedColor || '#2563EB'}
@@ -111,14 +111,14 @@ const ColorPickerDialog = ({ open, onClose, onColorSelect }: Props) => {
 
           <Box sx={{ p: 2, bgcolor: 'grey.100', borderRadius: 1, border: '1px solid', borderColor: 'grey.300' }}>
             <Typography variant="subtitle2" gutterBottom>
-              Xem trước màu đã chọn
+              {t('jobSeeker:cv.selectedColorPreview', 'Xem trước màu đã chọn')}
             </Typography>
             <Box sx={{ width: '100%', height: 60, bgcolor: selectedColor || '#2563EB', borderRadius: 1, boxShadow: 1 }} />
           </Box>
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Hủy</Button>
+        <Button onClick={onClose}>{t('common:actions.cancel', 'Hủy')}</Button>
         <Button 
           variant="contained"
           onClick={handleConfirm}
@@ -130,7 +130,7 @@ const ColorPickerDialog = ({ open, onClose, onColorSelect }: Props) => {
             },
           }}
         >
-          Xác nhận
+          {t('common:actions.confirm', 'Xác nhận')}
         </Button>
       </DialogActions>
     </Dialog>

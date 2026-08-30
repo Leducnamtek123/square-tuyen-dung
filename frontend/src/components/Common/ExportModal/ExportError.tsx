@@ -3,6 +3,7 @@ import { Box, Typography, Button, Stack, Paper } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import CloseIcon from '@mui/icons-material/Close';
+import { useTranslation } from 'react-i18next';
 
 interface ExportErrorProps {
   errorMessage?: string;
@@ -15,6 +16,8 @@ export const ExportError: React.FC<ExportErrorProps> = ({
   onRetry,
   onClose,
 }) => {
+  const { t } = useTranslation('common');
+
   return (
     <Box
       sx={{
@@ -58,10 +61,10 @@ export const ExportError: React.FC<ExportErrorProps> = ({
         </Box>
 
         <Typography variant="h6" sx={{ fontWeight: 700, color: '#111827', mb: 0.5, fontSize: '1.25rem' }}>
-          Không thể tạo file dữ liệu.
+          {t('export.errorTitle', 'Không thể tạo file dữ liệu.')}
         </Typography>
         <Typography variant="body2" sx={{ color: '#6B7280', mb: 3, fontSize: '0.875rem' }}>
-          {errorMessage || 'Đã xảy ra lỗi trong quá trình tạo dữ liệu xuất. Vui lòng thử lại.'}
+          {errorMessage || t('export.defaultErrorMessage', 'Đã xảy ra lỗi trong quá trình tạo dữ liệu xuất. Vui lòng thử lại.')}
         </Typography>
 
         <Stack direction="row" spacing={1.5} justifyContent="center">
@@ -83,7 +86,7 @@ export const ExportError: React.FC<ExportErrorProps> = ({
               },
             }}
           >
-            Đóng
+            {t('common.actions.close', 'Đóng')}
           </Button>
 
           <Button
@@ -102,7 +105,7 @@ export const ExportError: React.FC<ExportErrorProps> = ({
               },
             }}
           >
-            Thử lại
+            {t('common.actions.retry', 'Thử lại')}
           </Button>
         </Stack>
       </Paper>
