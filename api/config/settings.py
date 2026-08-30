@@ -82,7 +82,7 @@ AI_LLM_BASE_URL = config(
     "AI_LLM_BASE_URL",
     default=config(
         "LLM_BASE_URL",
-        default=config("OLLAMA_BASE_URL", default="https://token.nodelee.tech/v1"),
+        default=config("OLLAMA_BASE_URL", default=""),
     ),
 )
 AI_LLM_MODEL = config(
@@ -702,6 +702,6 @@ CONN_HEALTH_CHECKS = True  # Verify connections before reuse (Django 4.1+)
 
 # === NotebookLM MCP Integration ===
 NOTEBOOKLM_MCP_URL = config('NOTEBOOKLM_MCP_URL', default='http://host.docker.internal:8000/mcp')
-DEFAULT_NOTEBOOKLM_NOTEBOOK_ID = config('DEFAULT_NOTEBOOKLM_NOTEBOOK_ID', default='0a469926-b901-426d-afe5-843096613137')
+DEFAULT_NOTEBOOKLM_NOTEBOOK_ID = config('DEFAULT_NOTEBOOKLM_NOTEBOOK_ID', default='')
 
 

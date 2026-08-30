@@ -40,7 +40,9 @@ const getSafeLiveKitUrl = (preferLocal = false) => {
       const url = new URL(envUrl);
       url.protocol = protocol;
       return url.toString().replace(/\/$/, '');
-    } catch {}
+    } catch (urlErr) {
+      console.warn('[LiveKit URL] Invalid env URL:', urlErr);
+    }
   }
 
   if (preferLocal) {
@@ -619,16 +621,26 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
             const url = new URL(returnedUrl);
             url.protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             urlToUse = url.toString().replace(/\/$/, '');
-          } catch {}
+          } catch (urlErr) {
+            console.warn('[LiveKit URL] Invalid server URL returned from backend:', urlErr);
+          }
         }
       }
 
       const targetRoomName = latestSession.roomName || roomName;
       if (targetRoomName && (state.sessionInviteToken || tokenService.getAccessTokenFromCookie())) {
-        const updatedStatus = await interviewService
-          .updateSessionStatus(targetRoomName, 'in_progress', { inviteToken: state.sessionInviteToken })
-          .catch(() => null);
-        dispatch({ type: 'set-session-status', value: updatedStatus?.status || 'in_progress' });
+        try {
+          const updatedStatus = await interviewService.updateSessionStatus(
+            targetRoomName,
+            'in_progress',
+            { inviteToken: state.sessionInviteToken }
+          );
+          if (updatedStatus?.status) {
+            dispatch({ type: 'set-session-status', value: updatedStatus.status });
+          }
+        } catch (statusErr) {
+          console.warn('[InterviewSession] Failed to update session status to in_progress:', statusErr);
+        }
       }
 
       dispatch({ type: 'set-connection-details', value: { token: tokenData.token, serverUrl: urlToUse } });

@@ -11,16 +11,21 @@ export const useConfig = () => {
   const query = useQuery<SystemConfig>({
     queryKey: CONFIG_QUERY_KEY,
     queryFn: async () => {
-      // Fire all requests in parallel
-      const [resData, careersRes, citiesRes] = await Promise.all([
+      // Fire all requests in parallel with resilient settlement
+      const [configRes, careersSettled, citiesSettled] = await Promise.allSettled([
         commonService.getConfigs(),
-        commonService.getAllCareersSimple().catch(() => [] as Career[]),
-        commonService.getAllCitiesSimple().catch(() => [] as { id: number; name: string }[]),
+        commonService.getAllCareersSimple(),
+        commonService.getAllCitiesSimple(),
       ]);
 
-      let merged = { ...(resData as SystemConfig) };
+      if (configRes.status === 'rejected') {
+        throw configRes.reason;
+      }
 
-      if (Array.isArray(careersRes) && careersRes.length > 0) {
+      let merged = { ...(configRes.value as SystemConfig) };
+
+      if (careersSettled.status === 'fulfilled' && Array.isArray(careersSettled.value) && careersSettled.value.length > 0) {
+        const careersRes = careersSettled.value;
         merged = {
           ...merged,
           careers: careersRes,
@@ -31,7 +36,8 @@ export const useConfig = () => {
         };
       }
 
-      if (Array.isArray(citiesRes) && citiesRes.length > 0) {
+      if (citiesSettled.status === 'fulfilled' && Array.isArray(citiesSettled.value) && citiesSettled.value.length > 0) {
+        const citiesRes = citiesSettled.value;
         merged = {
           ...merged,
           cities: citiesRes.map((c) => ({ id: Number(c.id), name: c.name })),

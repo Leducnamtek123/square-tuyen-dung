@@ -55,7 +55,7 @@ class Config:
     # LLM
     LLM_MODEL: str = os.getenv("LLM_MODEL") or os.getenv("AI_LLM_MODEL", "gpt-5.4-mini")
     LLM_BASE_URL: str = os.getenv("LLM_BASE_URL") or os.getenv(
-        "AI_LLM_BASE_URL", "https://token.nodelee.tech/v1"
+        "AI_LLM_BASE_URL", ""
     )
     LLM_API_KEY: str = os.getenv("LLM_API_KEY") or os.getenv("AI_LLM_API_KEY", "")
     LLM_TEMPERATURE: float = _get_float(

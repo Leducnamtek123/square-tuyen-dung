@@ -246,7 +246,9 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
       if (!resData?.result?.geometry?.location) return;
       setValue('company.location.lat', resData.result.geometry.location.lat.toString() || '');
       setValue('company.location.lng', resData.result.geometry.location.lng.toString() || '');
-    } catch (error) { }
+    } catch (error) {
+      console.warn('Could not fetch place coordinates:', error);
+    }
   };
 
   const prevCityIdRef = React.useRef<number | null>(null);

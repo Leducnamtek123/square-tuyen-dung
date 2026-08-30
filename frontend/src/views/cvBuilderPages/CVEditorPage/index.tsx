@@ -285,13 +285,23 @@ export const CVEditorPage: React.FC = () => {
 
       if (primaryResumeSlug) {
         try {
-          const [expList, eduList, skillList, langList, certList] = await Promise.all([
-            resumeService.getExperiencesDetail(primaryResumeSlug).catch(() => []),
-            resumeService.getEducationsDetail(primaryResumeSlug).catch(() => []),
-            resumeService.getAdvancedSkills(primaryResumeSlug).catch(() => []),
-            resumeService.getLanguageSkills(primaryResumeSlug).catch(() => []),
-            resumeService.getCertificates(primaryResumeSlug).catch(() => []),
+          const [expRes, eduRes, skillRes, langRes, certRes] = await Promise.allSettled([
+            resumeService.getExperiencesDetail(primaryResumeSlug),
+            resumeService.getEducationsDetail(primaryResumeSlug),
+            resumeService.getAdvancedSkills(primaryResumeSlug),
+            resumeService.getLanguageSkills(primaryResumeSlug),
+            resumeService.getCertificates(primaryResumeSlug),
           ]);
+
+          const expList = expRes.status === 'fulfilled' && Array.isArray(expRes.value) ? expRes.value : [];
+          const eduList = eduRes.status === 'fulfilled' && Array.isArray(eduRes.value) ? eduRes.value : [];
+          const skillList = skillRes.status === 'fulfilled' && Array.isArray(skillRes.value) ? skillRes.value : [];
+          const langList = langRes.status === 'fulfilled' && Array.isArray(langRes.value) ? langRes.value : [];
+          const certList = certRes.status === 'fulfilled' && Array.isArray(certRes.value) ? certRes.value : [];
+
+          if ([expRes, eduRes, skillRes, langRes, certRes].some((r) => r.status === 'rejected')) {
+            console.warn('Some resume details could not be loaded for CV sync.');
+          }
 
           if (expList.length > 0) {
             experiencesData = expList.map((e, idx) => ({

@@ -52,7 +52,9 @@ const AdminLayout = (props: AdminLayoutProps) => {
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem('square_sidebar_collapsed', String(!isCollapsed));
-      } catch {}
+      } catch (err) {
+        console.warn('Could not save sidebar collapsed state:', err);
+      }
     }
   }, [isCollapsed]);
 
