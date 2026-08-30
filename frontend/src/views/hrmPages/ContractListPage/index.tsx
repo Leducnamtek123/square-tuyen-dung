@@ -30,6 +30,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import AddIcon from '@mui/icons-material/Add';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import dayjs from 'dayjs';
@@ -64,11 +65,22 @@ export default function ContractListPage() {
 
   const { data: contracts = [], isLoading: loading, refetch } = useHrmContracts();
   const { data: employees = [] } = useHrmEmployees();
-  const { createContract, updateContract, deleteContract } = useHrmMutations();
+  const { createContract, updateContract, deleteContract, renewContract } = useHrmMutations();
 
   const [openModal, setOpenModal] = useState(false);
   const [editingContract, setEditingContract] = useState<NativeContract | null>(null);
   const [deletingContractId, setDeletingContractId] = useState<number | null>(null);
+  const [renewingContract, setRenewingContract] = useState<NativeContract | null>(null);
+
+  const [renewForm, setRenewForm] = useState({
+    contract_number: '',
+    contract_type: 'FIXED_TERM' as 'PROBATION' | 'FIXED_TERM' | 'INDEFINITE',
+    start_date: new Date().toISOString().split('T')[0],
+    end_date: dayjs().add(1, 'year').format('YYYY-MM-DD'),
+    base_salary: 15000000,
+    allowance: 0,
+    notes: '',
+  });
 
   const [form, setForm] = useState({
     employee: '',
@@ -154,6 +166,44 @@ export default function ContractListPage() {
     deleteContract.mutate(deletingContractId, {
       onSuccess: () => setDeletingContractId(null),
     });
+  };
+
+  const handleOpenRenew = (c: NativeContract) => {
+    setRenewingContract(c);
+    const startDate = c.end_date ? dayjs(c.end_date).add(1, 'day').format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
+    const endDate = dayjs(startDate).add(1, 'year').format('YYYY-MM-DD');
+    setRenewForm({
+      contract_number: `HD-${dayjs().format('YYYYMMDD')}-${Math.floor(100 + Math.random() * 900)}`,
+      contract_type: c.contract_type === 'PROBATION' ? 'FIXED_TERM' : c.contract_type,
+      start_date: startDate,
+      end_date: endDate,
+      base_salary: Number(c.base_salary || 0),
+      allowance: Number(c.allowance || 0),
+      notes: `Gia hạn từ hợp đồng ${c.contract_number}`,
+    });
+  };
+
+  const handleConfirmRenew = () => {
+    if (!renewingContract) return;
+    renewContract.mutate(
+      {
+        id: renewingContract.id,
+        data: {
+          contract_number: renewForm.contract_number,
+          contract_type: renewForm.contract_type,
+          start_date: renewForm.start_date,
+          end_date: renewForm.contract_type === 'INDEFINITE' ? null : renewForm.end_date,
+          base_salary: Number(renewForm.base_salary),
+          allowance: Number(renewForm.allowance),
+          notes: renewForm.notes,
+        },
+      },
+      {
+        onSuccess: () => {
+          setRenewingContract(null);
+        },
+      }
+    );
   };
 
   const renderExpirationBadge = (endDateStr?: string) => {
@@ -349,6 +399,11 @@ export default function ContractListPage() {
                       <TableCell>{renderExpirationBadge(c.end_date)}</TableCell>
                       <TableCell align="right">
                         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                          <Tooltip title="Tái ký / Gia hạn hợp đồng">
+                            <IconButton aria-label="Tái ký" size="small" onClick={() => handleOpenRenew(c)} sx={{ color: '#64748b', '&:hover': { color: '#16a34a' } }}>
+                              <AutorenewIcon sx={{ fontSize: 17 }} />
+                            </IconButton>
+                          </Tooltip>
                           <Tooltip title="Chỉnh sửa hợp đồng">
                             <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenEdit(c)} sx={{ color: '#64748b', '&:hover': { color: '#2563eb' } }}>
                               <EditOutlinedIcon sx={{ fontSize: 17 }} />
@@ -505,6 +560,131 @@ export default function ContractListPage() {
             sx={{ fontWeight: 800, borderRadius: 2, textTransform: 'none', bgcolor: '#2563eb' }}
           >
             {editingContract ? (updateContract.isPending ? 'Đang lưu...' : 'Lưu cập nhật') : (createContract.isPending ? 'Đang tạo...' : 'Tạo hợp đồng')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Renew Contract Dialog */}
+      <Dialog
+        open={Boolean(renewingContract)}
+        onClose={() => setRenewingContract(null)}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{ sx: { borderRadius: 3 } }}
+      >
+        <DialogTitle sx={{ fontWeight: 900, color: '#16a34a', borderBottom: '1px solid #e2e8f0', p: 2.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <AutorenewIcon sx={{ color: '#16a34a' }} /> Tái ký / Gia hạn Hợp đồng Lao động
+        </DialogTitle>
+        <DialogContent sx={{ p: 2.5, pt: '20px !important' }}>
+          {renewingContract && (
+            <Stack spacing={2}>
+              <Box sx={{ p: 2, bgcolor: '#f0fdf4', borderRadius: 2, border: '1px solid #bbf7d0' }}>
+                <Typography variant="body2" sx={{ fontWeight: 700, color: '#166534' }}>
+                  Gia hạn cho nhân sự: {renewingContract.employee_name || `#${renewingContract.employee}`}
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#15803d', display: 'block', mt: 0.5 }}>
+                  Hợp đồng cũ ({renewingContract.contract_number}) sẽ được chuyển sang trạng thái <b>EXPIRED</b> và hợp đồng mới sẽ có hiệu lực.
+                </Typography>
+              </Box>
+
+              <Grid container spacing={2}>
+                <Grid size={6}>
+                  <TextField
+                    label="Số Hợp đồng Mới"
+                    value={renewForm.contract_number}
+                    onChange={(e) => setRenewForm({ ...renewForm, contract_number: e.target.value })}
+                    fullWidth
+                    sx={inputSx}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <TextField
+                    select
+                    label="Loại Hợp đồng Mới"
+                    value={renewForm.contract_type}
+                    onChange={(e) => setRenewForm({ ...renewForm, contract_type: e.target.value as any })}
+                    fullWidth
+                    sx={inputSx}
+                  >
+                    <MenuItem value="FIXED_TERM">Xác định thời hạn</MenuItem>
+                    <MenuItem value="INDEFINITE">Không xác định thời hạn</MenuItem>
+                    <MenuItem value="PROBATION">Thử việc</MenuItem>
+                  </TextField>
+                </Grid>
+              </Grid>
+
+              <Grid container spacing={2}>
+                <Grid size={6}>
+                  <TextField
+                    label="Lương cơ bản Mới (VND)"
+                    type="number"
+                    value={renewForm.base_salary}
+                    onChange={(e) => setRenewForm({ ...renewForm, base_salary: Number(e.target.value) })}
+                    fullWidth
+                    sx={inputSx}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <TextField
+                    label="Phụ cấp Mới (VND)"
+                    type="number"
+                    value={renewForm.allowance}
+                    onChange={(e) => setRenewForm({ ...renewForm, allowance: Number(e.target.value) })}
+                    fullWidth
+                    sx={inputSx}
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid container spacing={2}>
+                <Grid size={6}>
+                  <TextField
+                    type="date"
+                    label="Ngày bắt đầu Mới"
+                    slotProps={{ inputLabel: { shrink: true } }}
+                    value={renewForm.start_date}
+                    onChange={(e) => setRenewForm({ ...renewForm, start_date: e.target.value })}
+                    fullWidth
+                    sx={inputSx}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <TextField
+                    type="date"
+                    label="Ngày kết thúc Mới"
+                    slotProps={{ inputLabel: { shrink: true } }}
+                    value={renewForm.end_date}
+                    disabled={renewForm.contract_type === 'INDEFINITE'}
+                    onChange={(e) => setRenewForm({ ...renewForm, end_date: e.target.value })}
+                    fullWidth
+                    sx={inputSx}
+                  />
+                </Grid>
+              </Grid>
+
+              <TextField
+                label="Ghi chú gia hạn"
+                value={renewForm.notes}
+                onChange={(e) => setRenewForm({ ...renewForm, notes: e.target.value })}
+                fullWidth
+                multiline
+                minRows={2}
+                sx={inputSx}
+              />
+            </Stack>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2.5, borderTop: '1px solid #e2e8f0' }}>
+          <Button onClick={() => setRenewingContract(null)} sx={{ fontWeight: 700, color: '#64748b', textTransform: 'none' }}>
+            Hủy
+          </Button>
+          <Button
+            variant="contained"
+            disabled={!renewForm.contract_number || !renewForm.start_date || renewContract.isPending}
+            onClick={handleConfirmRenew}
+            sx={{ fontWeight: 800, borderRadius: 2, textTransform: 'none', bgcolor: '#16a34a', '&:hover': { bgcolor: '#15803d' } }}
+          >
+            {renewContract.isPending ? 'Đang xử lý...' : 'Xác nhận Tái ký Hợp đồng'}
           </Button>
         </DialogActions>
       </Dialog>

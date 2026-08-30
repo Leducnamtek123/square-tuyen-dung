@@ -163,25 +163,58 @@ class ResumeService:
         if validated_data.get("isSendMe", False):
             to.append(requester.email)
 
+        candidate_name = validated_data.get("fullName") or getattr(resume, 'title', '') or "Ứng viên"
+
         email_data = {
+            "candidate_name": candidate_name,
+            "full_name": candidate_name,
             "content": validated_data.get("content"),
+            "message_content": validated_data.get("content"),
             "company_image": (
                 company.logo.get_full_url()
                 if company.logo
                 else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
             ),
             "company_name": company.company_name,
-            "company_phone": company.company_phone,
-            "company_email": company.company_email,
+            "company_phone": company.company_phone or getattr(requester, 'phone', ''),
+            "company_email": company.company_email or getattr(requester, 'email', ''),
+            "contact_email": company.company_email or getattr(requester, 'email', ''),
+            "contact_phone": company.company_phone or getattr(requester, 'phone', ''),
             "company_address": getattr(company.location, "address", "") if company.location else "",
             "company_website_url": company.website_url,
+            "job_title": getattr(resume, 'title', '') or "Hồ sơ ứng viên",
+            "job_name": getattr(resume, 'title', '') or "Hồ sơ ứng viên",
         }
 
-        queue_mail.send_email_reply_job_seeker_task.delay(
-            to=to,
-            subject=validated_data.get("title"),
-            data=email_data,
-        )
+        try:
+            queue_mail.send_email_reply_job_seeker_task.delay(
+                to=to,
+                subject=validated_data.get("title"),
+                data=email_data,
+            )
+        except Exception:
+            try:
+                queue_mail.send_email_reply_job_seeker_task(
+                    to=to,
+                    subject=validated_data.get("title"),
+                    data=email_data,
+                )
+            except Exception as mail_err:
+                logger.exception("Failed to send contact email to resume owner: %s", mail_err)
+
+        # In-app notification to resume owner
+        try:
+            if getattr(resume, 'user', None):
+                from shared.services.notification_service import NotificationService
+                NotificationService.add_apply_status_notifications(
+                    title=f"Lời mời phỏng vấn / liên hệ từ {company.company_name}",
+                    content=f"Nhà tuyển dụng {company.company_name} đã gửi email cho bạn về hồ sơ '{getattr(resume, 'title', 'Hồ sơ')}': {validated_data.get('title')}",
+                    image=company.logo.get_full_url() if company.logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"],
+                    user_id=resume.user.id,
+                )
+        except Exception as notif_err:
+            logger.exception("Failed to send in-app notification: %s", notif_err)
+
         ContactProfile.objects.get_or_create(company=company, resume=resume)
 
 

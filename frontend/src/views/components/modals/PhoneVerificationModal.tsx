@@ -180,10 +180,30 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
   };
 
   // Handle OTP digit changes
+  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '');
+    if (!pastedData) return;
+
+    const pastedDigits = pastedData.slice(0, OTP_LENGTH).split('');
+    const newDigits = [...otpDigits];
+    pastedDigits.forEach((char, idx) => {
+      newDigits[idx] = char;
+    });
+    setOtpDigits(newDigits);
+
+    const nextIndex = Math.min(pastedDigits.length, OTP_LENGTH - 1);
+    otpInputRefs.current[nextIndex]?.focus();
+
+    if (pastedDigits.length === OTP_LENGTH && newDigits.every((d) => d !== '')) {
+      void handleVerifyOtp(newDigits.join(''));
+    }
+  };
+
   const handleOtpChange = (index: number, value: string) => {
     const numeric = value.replace(/\D/g, '');
 
-    // Pasting multiple digits
+    // Pasting multiple digits (fallback for mobile browser autofill)
     if (numeric.length > 1) {
       const pasted = numeric.slice(0, OTP_LENGTH).split('');
       const newDigits = [...otpDigits];
@@ -544,6 +564,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                         value={digit}
                         disabled={isVerifying}
                         onChange={(e) => handleOtpChange(idx, e.target.value)}
+                        onPaste={handleOtpPaste}
                         onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                         style={{
                           width: 46,

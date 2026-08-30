@@ -140,6 +140,10 @@ class CustomTokenView(TokenView):
                         )
 
                     if not allow_login:
+                        try:
+                            token.delete()
+                        except Exception as token_err:
+                            logger.error("Failed to revoke unapproved token %s: %s", access_token, token_err)
                         return response_data(
                             status=status.HTTP_400_BAD_REQUEST,
                             errors={"errorMessage": ["Tài khoản hoặc mật khẩu không chính xác."]}

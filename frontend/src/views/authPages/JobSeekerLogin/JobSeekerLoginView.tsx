@@ -274,7 +274,7 @@ const JobSeekerLoginView = ({
                 }}
               >
                 Bằng việc đăng nhập, tôi đồng ý chia sẻ thông tin cá nhân của mình với nhà tuyển dụng theo các{' '}
-                <StyledLink href="/terms-and-conditions" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
+                <StyledLink href="/terms-of-service" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
                   Điều khoản sử dụng
                 </StyledLink>{' '}
                 và{' '}

@@ -449,11 +449,11 @@ const EmployerLogin = () => {
                   }}
                 >
                   Bằng việc đăng nhập, quý doanh nghiệp đồng ý tuân thủ các{' '}
-                  <StyledLink href="/terms-and-conditions" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
+                  <StyledLink href="/employer/terms-of-service" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
                     Điều khoản dịch vụ
                   </StyledLink>{' '}
                   và{' '}
-                  <StyledLink href="/privacy-policy" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
+                  <StyledLink href="/employer/privacy-policy" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
                     Chính sách bảo mật
                   </StyledLink>{' '}
                   của InfoHR.

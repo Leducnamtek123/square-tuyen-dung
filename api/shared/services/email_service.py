@@ -35,7 +35,13 @@ class EmailService:
                 f"{settings.DOMAIN_CLIENT['job_seeker']}active/{encoded_data}/{token}/APP"
             )
 
+        from apps.accounts.services import EmailVerificationService
+
+        otp_code = EmailVerificationService.generate_and_store_otp(user)
+
         data = {
+            "full_name": user.full_name,
+            "otp_code": otp_code,
             "confirm_email_url": f"{protocol}://{domain}/{func}",
             "confirm_email_deeplink": confirm_email_deeplink,
         }

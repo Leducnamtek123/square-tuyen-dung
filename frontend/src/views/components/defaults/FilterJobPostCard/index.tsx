@@ -73,56 +73,6 @@ const SALARY_RANGES = [
   { id: '20+', label: 'Trên 20 triệu', min: 20000000, max: undefined },
 ];
 
-const DEFAULT_VIETNAM_CITIES = [
-  { id: 1, name: 'TP.HCM' },
-  { id: 2, name: 'Hà Nội' },
-  { id: 3, name: 'Đà Nẵng' },
-  { id: 4, name: 'Bình Dương' },
-  { id: 5, name: 'Đồng Nai' },
-  { id: 6, name: 'Cần Thơ' },
-  { id: 7, name: 'An Giang' },
-  { id: 8, name: 'Bà Rịa - Vũng Tàu' },
-  { id: 9, name: 'Bạc Liêu' },
-  { id: 10, name: 'Bến Tre' },
-  { id: 11, name: 'Lâm Đồng' },
-  { id: 12, name: 'Hải Phòng' },
-  { id: 13, name: 'Khánh Hòa' },
-  { id: 14, name: 'Quảng Ninh' },
-  { id: 15, name: 'Nghệ An' },
-  { id: 16, name: 'Thanh Hóa' },
-  { id: 17, name: 'Thừa Thiên Huế' },
-  { id: 18, name: 'Quảng Nam' },
-  { id: 19, name: 'Bình Định' },
-  { id: 20, name: 'Kiên Giang' },
-  { id: 21, name: 'Tiền Giang' },
-  { id: 22, name: 'Long An' },
-  { id: 23, name: 'Tây Ninh' },
-  { id: 24, name: 'Bình Thuận' },
-  { id: 25, name: 'Đắk Lắk' },
-  { id: 26, name: 'Gia Lai' },
-  { id: 27, name: 'Phú Yên' },
-  { id: 28, name: 'Thái Nguyên' },
-  { id: 29, name: 'Bắc Ninh' },
-  { id: 30, name: 'Hải Dương' },
-  { id: 31, name: 'Hưng Yên' },
-  { id: 32, name: 'Nam Định' },
-  { id: 33, name: 'Ninh Bình' },
-  { id: 34, name: 'Vĩnh Phúc' },
-];
-
-const DEFAULT_CAREERS = [
-  { id: 1, name: 'Bán hàng / Kinh doanh' },
-  { id: 2, name: 'IT - Phần mềm' },
-  { id: 3, name: 'Kế toán / Kiểm toán' },
-  { id: 4, name: 'Marketing / PR' },
-  { id: 5, name: 'Hành chính / Nhân sự' },
-  { id: 6, name: 'Dịch vụ khách hàng' },
-  { id: 7, name: 'Xây dựng / Kiến trúc' },
-  { id: 8, name: 'Cơ khí / Tự động hóa' },
-  { id: 9, name: 'Tài chính / Ngân hàng' },
-  { id: 10, name: 'Lao động phổ thông' },
-];
-
 const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
   params = {},
   compact = false,
@@ -172,7 +122,10 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
     if (!requireAuth({ actionType: 'save_job' })) {
       return;
     }
-    const willSave = !favorites[id];
+    const currentStatus = favorites[id] !== undefined
+      ? favorites[id]
+      : Boolean((jobPosts.find((j) => j.id === id) as any)?.isSaved);
+    const willSave = !currentStatus;
     setFavorites((prev) => ({ ...prev, [id]: willSave }));
     const run = async () => {
       try {
@@ -181,7 +134,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
         setFavorites((prev) => ({ ...prev, [id]: saved }));
         toastMessages.success(saved ? 'Đã lưu tin tuyển dụng' : 'Đã bỏ lưu tin tuyển dụng');
       } catch {
-        setFavorites((prev) => ({ ...prev, [id]: !willSave }));
+        setFavorites((prev) => ({ ...prev, [id]: currentStatus }));
       }
     };
     run();
@@ -285,12 +238,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
     let fullList: { id: string | number; label: string }[] = [];
 
     if (currentDimension === 'city') {
-      const citiesFromApi =
-        allConfig?.cityOptions && allConfig.cityOptions.length > 0
-          ? allConfig.cityOptions
-          : allConfig?.cities && allConfig.cities.length > 0
-          ? allConfig.cities
-          : DEFAULT_VIETNAM_CITIES;
+      const citiesFromApi = allConfig?.cityOptions || allConfig?.cities || [];
       fullList = [{ id: 'all', label: 'Tất cả' }, ...citiesFromApi.map((c: any) => ({ id: c.id, label: c.name }))];
 
       if (activeOptions?.citySet && activeOptions.citySet.size > 0) {
@@ -305,19 +253,8 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
       }
     } else if (currentDimension === 'experience') {
       const expFromApi = allConfig?.experienceOptions || [];
-      if (expFromApi.length > 0) {
-        fullList = [{ id: 'all', label: 'Tất cả' }, ...expFromApi.map((e: any) => ({ id: e.id, label: e.name }))];
-      } else {
-        fullList = [
-          { id: 'all', label: 'Tất cả' },
-          { id: '0', label: 'Chưa có kinh nghiệm' },
-          { id: '1', label: 'Dưới 1 năm' },
-          { id: '2', label: '1 - 2 năm' },
-          { id: '3', label: '2 - 3 năm' },
-          { id: '4', label: '3 - 5 năm' },
-          { id: '5', label: 'Trên 5 năm' },
-        ];
-      }
+      fullList = [{ id: 'all', label: 'Tất cả' }, ...expFromApi.map((e: any) => ({ id: e.id, label: e.name }))];
+
       if (activeOptions?.expSet && activeOptions.expSet.size > 0) {
         fullList = fullList.filter(
           (item) =>
@@ -328,12 +265,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
         );
       }
     } else if (currentDimension === 'career') {
-      const careersFromApi =
-        allConfig?.careerOptions && allConfig.careerOptions.length > 0
-          ? allConfig.careerOptions
-          : allConfig?.careers && allConfig.careers.length > 0
-          ? allConfig.careers
-          : DEFAULT_CAREERS;
+      const careersFromApi = allConfig?.careerOptions || allConfig?.careers || [];
       fullList = [{ id: 'all', label: 'Tất cả' }, ...careersFromApi.map((c: any) => ({ id: c.id, label: c.name }))];
 
       if (activeOptions?.careerSet && activeOptions.careerSet.size > 0) {
@@ -648,11 +580,18 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
       ) : (
         <>
           <Grid container spacing={2.5}>
-            {jobPosts.map((job: ModelsJobPost & { companyDict?: { companyImageUrl?: string | null; companyName?: string | null }; locationDict?: { city?: number | string } }, idx: number) => {
-              const isFav = Boolean(favorites[job.id]);
+            {jobPosts.map((job: ModelsJobPost & { companyDict?: { companyImageUrl?: string | null; companyName?: string | null }; locationDict?: { city?: number | string; cityName?: string }; isSaved?: boolean }, idx: number) => {
+              const isFav = favorites[job.id] !== undefined ? Boolean(favorites[job.id]) : Boolean(job.isSaved);
               const companyNameStr = job.companyDict?.companyName || job.company?.companyName || 'Công ty Tuyển Dụng';
               const companyLogo = job.companyDict?.companyImageUrl || job.company?.logoUrl || IMAGES.companyLogoDefault;
-              const locationCity = job.locationDict?.city || (job.location as any)?.city || 'TP.HCM';
+              const locationCity =
+                (typeof job.locationDict?.city === 'number'
+                  ? allConfig?.cityDict?.[job.locationDict.city]
+                  : job.locationDict?.cityName) ||
+                (typeof (job.location as any)?.city === 'number'
+                  ? allConfig?.cityDict?.[(job.location as any).city]
+                  : (job.location as any)?.cityName || (job.location as any)?.city) ||
+                'Toàn quốc';
               const daysText = getDaysLeft(job.deadline);
               const salaryDisplay = formatSalary(job.salaryMin, job.salaryMax);
 
@@ -806,7 +745,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                         <Stack direction="row" spacing={0.5} alignItems="center">
                           <LocationOnIcon sx={{ fontSize: 14, color: '#94a3b8' }} />
                           <Typography sx={{ fontSize: '0.8rem', color: '#64748b' }} noWrap>
-                            {typeof locationCity === 'string' ? locationCity : 'TP.HCM'}
+                            {locationCity}
                           </Typography>
                         </Stack>
                       </Stack>
@@ -881,7 +820,13 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
         onClose={handleClosePreview}
         onMouseEnterPopper={handlePopperMouseEnter}
         onMouseLeavePopper={handlePopperMouseLeave}
-        isFavorite={hoveredJob ? Boolean(favorites[hoveredJob.id]) : false}
+        isFavorite={
+          hoveredJob
+            ? favorites[hoveredJob.id] !== undefined
+              ? Boolean(favorites[hoveredJob.id])
+              : Boolean(hoveredJob.isSaved)
+            : false
+        }
         onToggleFavorite={toggleFavorite}
         cityLabel={
           hoveredJob

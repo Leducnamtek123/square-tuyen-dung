@@ -19,6 +19,12 @@ export const HRM_QUERY_KEYS = {
   designations: ['hrm-designations'] as const,
   contracts: ['hrm-contracts'] as const,
   leaves: ['hrm-leaves'] as const,
+  leaveTypes: ['hrm-leave-types'] as const,
+  leaveBalances: ['hrm-leave-balances'] as const,
+  timesheet: ['hrm-timesheet'] as const,
+  payroll: ['hrm-payroll'] as const,
+  payrollKPIs: ['hrm-payroll-kpis'] as const,
+  myProfile: ['hrm-my-profile'] as const,
   orgChart: ['hrm-org-chart'] as const,
 };
 
@@ -31,10 +37,10 @@ export const useHrmDashboardStats = () => {
   });
 };
 
-export const useHrmEmployees = () => {
+export const useHrmEmployees = (params?: { department?: number; status?: string; search?: string }) => {
   return useQuery<NativeEmployee[]>({
-    queryKey: HRM_QUERY_KEYS.employees,
-    queryFn: () => hrmService.getEmployees(),
+    queryKey: [...HRM_QUERY_KEYS.employees, params],
+    queryFn: () => hrmService.getEmployees(params),
     staleTime: 60 * 1000,
   });
 };
@@ -63,10 +69,58 @@ export const useHrmContracts = () => {
   });
 };
 
+export const useHrmLeaveTypes = () => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.leaveTypes,
+    queryFn: () => hrmService.getLeaveTypes(),
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
 export const useHrmLeaves = () => {
   return useQuery<NativeLeaveRequest[]>({
     queryKey: HRM_QUERY_KEYS.leaves,
     queryFn: () => hrmService.getLeaveRequests(),
+    staleTime: 60 * 1000,
+  });
+};
+
+export const useHrmLeaveBalances = (params?: { employee?: number; year?: number }) => {
+  return useQuery({
+    queryKey: [...HRM_QUERY_KEYS.leaveBalances, params],
+    queryFn: () => hrmService.getLeaveBalances(params),
+    staleTime: 60 * 1000,
+  });
+};
+
+export const useHrmTimesheet = (params: { month: number; year: number; department?: number }) => {
+  return useQuery({
+    queryKey: [...HRM_QUERY_KEYS.timesheet, params],
+    queryFn: () => hrmService.getMonthlyTimesheet(params),
+    staleTime: 30 * 1000,
+  });
+};
+
+export const useHrmPayrollList = (params?: { month?: number; year?: number; status?: string }) => {
+  return useQuery({
+    queryKey: [...HRM_QUERY_KEYS.payroll, params],
+    queryFn: () => hrmService.getMonthlyPayrollList(params),
+    staleTime: 30 * 1000,
+  });
+};
+
+export const useHrmPayrollKPIs = (params: { month: number; year: number }) => {
+  return useQuery({
+    queryKey: [...HRM_QUERY_KEYS.payrollKPIs, params],
+    queryFn: () => hrmService.getPayrollSummaryKPIs(params),
+    staleTime: 30 * 1000,
+  });
+};
+
+export const useHrmMyProfile = () => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.myProfile,
+    queryFn: () => hrmService.getMyHrmProfile(),
     staleTime: 60 * 1000,
   });
 };
@@ -245,11 +299,25 @@ export const useHrmMutations = () => {
     },
   });
 
+  const renewContract = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => hrmService.renewContract(id, data),
+    onSuccess: () => {
+      toastMessages.success('Đã tái ký / gia hạn hợp đồng thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.contracts });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.employees });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.stats });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể gia hạn hợp đồng.');
+    },
+  });
+
   const createLeaveRequest = useMutation({
     mutationFn: (data: Partial<NativeLeaveRequest>) => hrmService.createLeaveRequest(data),
     onSuccess: () => {
       toastMessages.success('Đã tạo đơn xin nghỉ phép thành công!');
       queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaves });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveBalances });
       queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.stats });
     },
     onError: (err: any) => {
@@ -262,6 +330,7 @@ export const useHrmMutations = () => {
     onSuccess: () => {
       toastMessages.success('Đã hủy đơn xin nghỉ phép thành công!');
       queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaves });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveBalances });
       queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.stats });
     },
     onError: (err: any) => {
@@ -274,6 +343,7 @@ export const useHrmMutations = () => {
     onSuccess: () => {
       toastMessages.success('Đã phê duyệt đơn xin nghỉ phép!');
       queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaves });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveBalances });
       queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.stats });
     },
     onError: (err: any) => {
@@ -287,10 +357,69 @@ export const useHrmMutations = () => {
     onSuccess: () => {
       toastMessages.success('Đã từ chối đơn xin nghỉ phép!');
       queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaves });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveBalances });
       queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.stats });
     },
     onError: (err: any) => {
       toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi từ chối đơn nghỉ phép.');
+    },
+  });
+
+  const autoAllocateLeaveBalances = useMutation({
+    mutationFn: (year: number) => hrmService.autoAllocateLeaveBalances(year),
+    onSuccess: (res) => {
+      toastMessages.success(res?.message || 'Đã cấp phát quỹ phép thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveBalances });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi cấp phát quỹ phép.');
+    },
+  });
+
+  const quickCheckin = useMutation({
+    mutationFn: (data: any) => hrmService.quickCheckin(data),
+    onSuccess: () => {
+      toastMessages.success('Chấm công thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.timesheet });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi chấm công.');
+    },
+  });
+
+  const calculateMonthlyPayroll = useMutation({
+    mutationFn: (data: any) => hrmService.calculateMonthlyPayroll(data),
+    onSuccess: (res) => {
+      toastMessages.success(res?.message || 'Đã tính toán bảng lương thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.payroll });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.payrollKPIs });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi tính toán bảng lương.');
+    },
+  });
+
+  const approveAllPayroll = useMutation({
+    mutationFn: (data: any) => hrmService.approveAllPayroll(data),
+    onSuccess: (res) => {
+      toastMessages.success(res?.message || 'Đã phê duyệt bảng lương!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.payroll });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.payrollKPIs });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi duyệt bảng lương.');
+    },
+  });
+
+  const markPaidAllPayroll = useMutation({
+    mutationFn: (data: any) => hrmService.markPaidAllPayroll(data),
+    onSuccess: (res) => {
+      toastMessages.success(res?.message || 'Đã đánh dấu chi trả bảng lương!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.payroll });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.payrollKPIs });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi đánh dấu chi trả.');
     },
   });
 
@@ -308,9 +437,15 @@ export const useHrmMutations = () => {
     createContract,
     updateContract,
     deleteContract,
+    renewContract,
     createLeaveRequest,
     deleteLeaveRequest,
     approveLeave,
     rejectLeave,
+    autoAllocateLeaveBalances,
+    quickCheckin,
+    calculateMonthlyPayroll,
+    approveAllPayroll,
+    markPaidAllPayroll,
   };
 };

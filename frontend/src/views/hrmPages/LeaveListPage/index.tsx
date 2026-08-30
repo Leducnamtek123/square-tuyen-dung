@@ -36,9 +36,11 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import dayjs from 'dayjs';
 
-import { useHrmLeaves, useHrmEmployees, useHrmMutations } from '../hooks/useHrmQueries';
+import { useHrmLeaves, useHrmEmployees, useHrmLeaveBalances, useHrmMutations } from '../hooks/useHrmQueries';
 import { TabTitle } from '@/utils/generalFunction';
 import pc from '@/utils/muiColors';
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
 
 const inputSx = {
   '& .MuiOutlinedInput-root': {
@@ -61,11 +63,16 @@ const inputSx = {
 };
 
 export default function LeaveListPage() {
-  TabTitle('Quản lý Nghỉ phép (Leave Management) | InfoHR HRM');
+  TabTitle('Quản lý Nghỉ phép & Quỹ Phép | InfoHR HRM');
+
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState<number>(currentYear);
+  const [activeTab, setActiveTab] = useState<'REQUESTS' | 'BALANCES'>('REQUESTS');
 
   const { data: leaveRequests = [], isLoading: loading, refetch } = useHrmLeaves();
+  const { data: leaveBalances = [], isLoading: balancesLoading } = useHrmLeaveBalances({ year: selectedYear });
   const { data: employees = [] } = useHrmEmployees();
-  const { createLeaveRequest, deleteLeaveRequest, approveLeave, rejectLeave } = useHrmMutations();
+  const { createLeaveRequest, deleteLeaveRequest, approveLeave, rejectLeave, autoAllocateLeaveBalances } = useHrmMutations();
 
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>('ALL');
   const [rejectDialogId, setRejectDialogId] = useState<number | null>(null);
@@ -137,6 +144,10 @@ export default function LeaveListPage() {
     deleteLeaveRequest.mutate(deletingLeaveId, {
       onSuccess: () => setDeletingLeaveId(null),
     });
+  };
+
+  const handleAutoAllocate = () => {
+    autoAllocateLeaveBalances.mutate(selectedYear);
   };
 
   const renderStatusChip = (status: string) => {
@@ -219,192 +230,352 @@ export default function LeaveListPage() {
           </Stack>
         </Box>
 
-        {/* Metric Cards */}
-        <Grid container spacing={2.5}>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Paper
-              elevation={0}
-              onClick={() => setStatusFilter('ALL')}
+        {/* Tab Navigation */}
+        <Box sx={{ borderBottom: 1, borderColor: '#e2e8f0' }}>
+          <Stack direction="row" spacing={3}>
+            <Button
+              onClick={() => setActiveTab('REQUESTS')}
               sx={{
-                p: 2.5,
-                borderRadius: 3,
-                border: '1px solid',
-                borderColor: statusFilter === 'ALL' ? '#2563eb' : '#e2e8f0',
-                bgcolor: '#ffffff',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                '&:hover': { borderColor: '#2563eb' },
+                pb: 1.5,
+                borderRadius: 0,
+                borderBottom: '2px solid',
+                borderColor: activeTab === 'REQUESTS' ? '#ea580c' : 'transparent',
+                color: activeTab === 'REQUESTS' ? '#ea580c' : '#64748b',
+                fontWeight: activeTab === 'REQUESTS' ? 800 : 600,
+                fontSize: '0.95rem',
+                textTransform: 'none',
+                '&:hover': { bgcolor: 'transparent', color: '#ea580c' },
               }}
             >
-              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>Tổng số đơn gửi</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 900, color: '#0f172a', fontFamily: 'var(--font-mono)', mt: 0.5 }}>
-                {totalLeaves}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Paper
-              elevation={0}
-              onClick={() => setStatusFilter('PENDING')}
+              Đơn Nghỉ Phép ({totalLeaves})
+            </Button>
+            <Button
+              onClick={() => setActiveTab('BALANCES')}
               sx={{
-                p: 2.5,
-                borderRadius: 3,
-                border: '1px solid',
-                borderColor: statusFilter === 'PENDING' ? '#d97706' : '#e2e8f0',
-                bgcolor: '#ffffff',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                '&:hover': { borderColor: '#d97706' },
+                pb: 1.5,
+                borderRadius: 0,
+                borderBottom: '2px solid',
+                borderColor: activeTab === 'BALANCES' ? '#ea580c' : 'transparent',
+                color: activeTab === 'BALANCES' ? '#ea580c' : '#64748b',
+                fontWeight: activeTab === 'BALANCES' ? 800 : 600,
+                fontSize: '0.95rem',
+                textTransform: 'none',
+                '&:hover': { bgcolor: 'transparent', color: '#ea580c' },
               }}
             >
-              <Typography variant="caption" sx={{ color: '#d97706', fontWeight: 700 }}>Đơn chờ duyệt</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 900, color: '#d97706', fontFamily: 'var(--font-mono)', mt: 0.5 }}>
-                {pendingLeaves}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Paper
-              elevation={0}
-              onClick={() => setStatusFilter('APPROVED')}
-              sx={{
-                p: 2.5,
-                borderRadius: 3,
-                border: '1px solid',
-                borderColor: statusFilter === 'APPROVED' ? '#16a34a' : '#e2e8f0',
-                bgcolor: '#ffffff',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                '&:hover': { borderColor: '#16a34a' },
-              }}
-            >
-              <Typography variant="caption" sx={{ color: '#16a34a', fontWeight: 700 }}>Đã phê duyệt</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 900, color: '#16a34a', fontFamily: 'var(--font-mono)', mt: 0.5 }}>
-                {approvedLeaves}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <Paper
-              elevation={0}
-              onClick={() => setStatusFilter('REJECTED')}
-              sx={{
-                p: 2.5,
-                borderRadius: 3,
-                border: '1px solid',
-                borderColor: statusFilter === 'REJECTED' ? '#dc2626' : '#e2e8f0',
-                bgcolor: '#ffffff',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                '&:hover': { borderColor: '#dc2626' },
-              }}
-            >
-              <Typography variant="caption" sx={{ color: '#dc2626', fontWeight: 700 }}>Đã từ chối</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 900, color: '#dc2626', fontFamily: 'var(--font-mono)', mt: 0.5 }}>
-                {rejectedLeaves}
-              </Typography>
-            </Paper>
-          </Grid>
-        </Grid>
+              Quỹ Phép & Thâm Niên Nhân Sự ({leaveBalances.length})
+            </Button>
+          </Stack>
+        </Box>
 
-        {/* Leave Table */}
-        <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid #e2e8f0', overflow: 'hidden', bgcolor: '#ffffff' }}>
-          <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-            <Table size="medium" sx={{ minWidth: 720 }}>
-              <TableHead sx={{ bgcolor: '#f8fafc' }}>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Nhân sự làm đơn</TableCell>
-                  <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Thời gian nghỉ</TableCell>
-                  <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Số ngày</TableCell>
-                  <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Lý do nghỉ</TableCell>
-                  <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Trạng thái</TableCell>
-                  <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }} align="right">Hành động</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading ? (
-                  <TableRow><TableCell colSpan={6} align="center" sx={{ py: 6 }}><CircularProgress size={28} /></TableCell></TableRow>
-                ) : filteredLeaves.length === 0 ? (
-                  <TableRow><TableCell colSpan={6} align="center" sx={{ py: 6, color: '#64748b' }}>Không có đơn nghỉ phép nào phù hợp.</TableCell></TableRow>
-                ) : (
-                  filteredLeaves.map((l) => (
-                    <TableRow key={l.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
-                      <TableCell sx={{ fontWeight: 800, color: '#0f172a' }}>
-                        {l.employee_name || `#${l.employee}`}
-                      </TableCell>
-                      <TableCell sx={{ fontFamily: 'var(--font-mono)', fontSize: '0.8125rem', color: '#1e293b' }}>
-                        {l.start_date} → {l.end_date}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#2563eb', fontFamily: 'var(--font-mono)' }}>
-                        {l.total_days} ngày
-                      </TableCell>
-                      <TableCell sx={{ color: '#475569', fontSize: '0.825rem', maxWidth: 220 }}>
-                        {l.reason || 'Nghỉ phép cá nhân'}
-                      </TableCell>
-                      <TableCell>{renderStatusChip(l.status)}</TableCell>
-                      <TableCell align="right">
-                        <Stack direction="row" spacing={0.75} justifyContent="flex-end" alignItems="center">
-                          {l.status === 'PENDING' && (
-                            <>
-                              <Button
-                                size="small"
-                                variant="contained"
-                                disabled={approveLeave.isPending}
-                                startIcon={<CheckIcon sx={{ fontSize: 15 }} />}
-                                onClick={() => approveLeave.mutate(l.id)}
-                                sx={{
-                                  borderRadius: 1.75,
-                                  textTransform: 'none',
-                                  fontWeight: 800,
-                                  fontSize: '0.775rem',
-                                  bgcolor: '#16a34a',
-                                  boxShadow: 'none',
-                                  '&:hover': { bgcolor: '#15803d' },
-                                }}
-                              >
-                                Duyệt
-                              </Button>
-                              <Button
-                                size="small"
-                                variant="outlined"
-                                disabled={rejectLeave.isPending}
-                                startIcon={<CloseIcon sx={{ fontSize: 15 }} />}
-                                onClick={() => {
-                                  setRejectDialogId(l.id);
-                                  setRejectReason('');
-                                }}
-                                sx={{
-                                  borderRadius: 1.75,
-                                  textTransform: 'none',
-                                  fontWeight: 700,
-                                  fontSize: '0.775rem',
-                                  color: '#dc2626',
-                                  borderColor: '#fca5a5',
-                                  '&:hover': { bgcolor: '#fef2f2', borderColor: '#ef4444' },
-                                }}
-                              >
-                                Từ chối
-                              </Button>
-                            </>
-                          )}
-                          <Tooltip title="Hủy / Xóa đơn nghỉ phép">
-                            <IconButton aria-label="Thao tác"
-                              size="small"
-                              onClick={() => setDeletingLeaveId(l.id)}
-                              sx={{ color: '#64748b', '&:hover': { color: '#dc2626' } }}
-                            >
-                              <DeleteOutlineOutlinedIcon sx={{ fontSize: 17 }} />
-                            </IconButton>
-                          </Tooltip>
-                        </Stack>
-                      </TableCell>
+        {activeTab === 'REQUESTS' ? (
+          <>
+            {/* Metric Cards */}
+            <Grid container spacing={2.5}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Paper
+                  elevation={0}
+                  onClick={() => setStatusFilter('ALL')}
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 3,
+                    border: '1px solid',
+                    borderColor: statusFilter === 'ALL' ? '#2563eb' : '#e2e8f0',
+                    bgcolor: '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    '&:hover': { borderColor: '#2563eb' },
+                  }}
+                >
+                  <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>Tổng số đơn gửi</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 900, color: '#0f172a', fontFamily: 'var(--font-mono)', mt: 0.5 }}>
+                    {totalLeaves}
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Paper
+                  elevation={0}
+                  onClick={() => setStatusFilter('PENDING')}
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 3,
+                    border: '1px solid',
+                    borderColor: statusFilter === 'PENDING' ? '#d97706' : '#e2e8f0',
+                    bgcolor: '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    '&:hover': { borderColor: '#d97706' },
+                  }}
+                >
+                  <Typography variant="caption" sx={{ color: '#d97706', fontWeight: 700 }}>Đơn chờ duyệt</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 900, color: '#d97706', fontFamily: 'var(--font-mono)', mt: 0.5 }}>
+                    {pendingLeaves}
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Paper
+                  elevation={0}
+                  onClick={() => setStatusFilter('APPROVED')}
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 3,
+                    border: '1px solid',
+                    borderColor: statusFilter === 'APPROVED' ? '#16a34a' : '#e2e8f0',
+                    bgcolor: '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    '&:hover': { borderColor: '#16a34a' },
+                  }}
+                >
+                  <Typography variant="caption" sx={{ color: '#16a34a', fontWeight: 700 }}>Đã phê duyệt</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 900, color: '#16a34a', fontFamily: 'var(--font-mono)', mt: 0.5 }}>
+                    {approvedLeaves}
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Paper
+                  elevation={0}
+                  onClick={() => setStatusFilter('REJECTED')}
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 3,
+                    border: '1px solid',
+                    borderColor: statusFilter === 'REJECTED' ? '#dc2626' : '#e2e8f0',
+                    bgcolor: '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    '&:hover': { borderColor: '#dc2626' },
+                  }}
+                >
+                  <Typography variant="caption" sx={{ color: '#dc2626', fontWeight: 700 }}>Đã từ chối</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 900, color: '#dc2626', fontFamily: 'var(--font-mono)', mt: 0.5 }}>
+                    {rejectedLeaves}
+                  </Typography>
+                </Paper>
+              </Grid>
+            </Grid>
+
+            {/* Leave Requests Table */}
+            <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid #e2e8f0', overflow: 'hidden', bgcolor: '#ffffff' }}>
+              <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <Table size="medium" sx={{ minWidth: 720 }}>
+                  <TableHead sx={{ bgcolor: '#f8fafc' }}>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Nhân sự làm đơn</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Thời gian nghỉ</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Số ngày</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Lý do nghỉ</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Trạng thái</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }} align="right">Hành động</TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+                  </TableHead>
+                  <TableBody>
+                    {loading ? (
+                      <TableRow><TableCell colSpan={6} align="center" sx={{ py: 6 }}><CircularProgress size={28} /></TableCell></TableRow>
+                    ) : filteredLeaves.length === 0 ? (
+                      <TableRow><TableCell colSpan={6} align="center" sx={{ py: 6, color: '#64748b' }}>Không có đơn nghỉ phép nào phù hợp.</TableCell></TableRow>
+                    ) : (
+                      filteredLeaves.map((l) => (
+                        <TableRow key={l.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
+                          <TableCell sx={{ fontWeight: 800, color: '#0f172a' }}>
+                            {l.employee_name || `#${l.employee}`}
+                          </TableCell>
+                          <TableCell sx={{ fontFamily: 'var(--font-mono)', fontSize: '0.8125rem', color: '#1e293b' }}>
+                            {l.start_date} → {l.end_date}
+                          </TableCell>
+                          <TableCell sx={{ fontWeight: 800, color: '#2563eb', fontFamily: 'var(--font-mono)' }}>
+                            {l.total_days} ngày
+                          </TableCell>
+                          <TableCell sx={{ color: '#475569', fontSize: '0.825rem', maxWidth: 220 }}>
+                            {l.reason || 'Nghỉ phép cá nhân'}
+                          </TableCell>
+                          <TableCell>{renderStatusChip(l.status)}</TableCell>
+                          <TableCell align="right">
+                            <Stack direction="row" spacing={0.75} justifyContent="flex-end" alignItems="center">
+                              {l.status === 'PENDING' && (
+                                <>
+                                  <Button
+                                    size="small"
+                                    variant="contained"
+                                    disabled={approveLeave.isPending}
+                                    startIcon={<CheckIcon sx={{ fontSize: 15 }} />}
+                                    onClick={() => approveLeave.mutate(l.id)}
+                                    sx={{
+                                      borderRadius: 1.75,
+                                      textTransform: 'none',
+                                      fontWeight: 800,
+                                      fontSize: '0.775rem',
+                                      bgcolor: '#16a34a',
+                                      boxShadow: 'none',
+                                      '&:hover': { bgcolor: '#15803d' },
+                                    }}
+                                  >
+                                    Duyệt
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    variant="outlined"
+                                    disabled={rejectLeave.isPending}
+                                    startIcon={<CloseIcon sx={{ fontSize: 15 }} />}
+                                    onClick={() => {
+                                      setRejectDialogId(l.id);
+                                      setRejectReason('');
+                                    }}
+                                    sx={{
+                                      borderRadius: 1.75,
+                                      textTransform: 'none',
+                                      fontWeight: 700,
+                                      fontSize: '0.775rem',
+                                      color: '#dc2626',
+                                      borderColor: '#fca5a5',
+                                      '&:hover': { bgcolor: '#fef2f2', borderColor: '#ef4444' },
+                                    }}
+                                  >
+                                    Từ chối
+                                  </Button>
+                                </>
+                              )}
+                              <Tooltip title="Hủy / Xóa đơn nghỉ phép">
+                                <IconButton aria-label="Thao tác"
+                                  size="small"
+                                  onClick={() => setDeletingLeaveId(l.id)}
+                                  sx={{ color: '#64748b', '&:hover': { color: '#dc2626' } }}
+                                >
+                                  <DeleteOutlineOutlinedIcon sx={{ fontSize: 17 }} />
+                                </IconButton>
+                              </Tooltip>
+                            </Stack>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          </>
+        ) : (
+          <>
+            {/* Quota / Balance Management Tab */}
+            <Card sx={{ p: 2, borderRadius: 3, border: '1px solid #e2e8f0', bgcolor: '#ffffff' }}>
+              <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" flexWrap="wrap">
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <TextField
+                    select
+                    label="Năm tính phép"
+                    size="small"
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(Number(e.target.value))}
+                    sx={{ minWidth: 140, ...inputSx }}
+                  >
+                    {[2024, 2025, 2026, 2027].map((y) => (
+                      <MenuItem key={y} value={y}>Năm {y}</MenuItem>
+                    ))}
+                  </TextField>
+                  <Typography variant="body2" sx={{ color: '#64748b' }}>
+                    Luật LĐ: 12 ngày phép/năm + 1 ngày cho mỗi 5 năm thâm niên
+                  </Typography>
+                </Stack>
+
+                <Button
+                  variant="contained"
+                  startIcon={<AutoFixHighOutlinedIcon />}
+                  onClick={handleAutoAllocate}
+                  disabled={autoAllocateLeaveBalances.isPending}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 700,
+                    bgcolor: '#2563eb',
+                    '&:hover': { bgcolor: '#1d4ed8' },
+                  }}
+                >
+                  {autoAllocateLeaveBalances.isPending ? 'Đang cấp phát...' : `Cấp phát Quỹ Phép Năm ${selectedYear}`}
+                </Button>
+              </Stack>
+            </Card>
+
+            {/* Leave Balances Table */}
+            <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid #e2e8f0', overflow: 'hidden', bgcolor: '#ffffff' }}>
+              <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <Table size="medium" sx={{ minWidth: 860 }}>
+                  <TableHead sx={{ bgcolor: '#f8fafc' }}>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Mã NV</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Nhân sự</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Loại phép</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }} align="center">Phép tiêu chuẩn</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }} align="center">Phép thâm niên</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }} align="center">Tồn năm trước</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }} align="center">Đã sử dụng</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }} align="center">Chờ duyệt</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }} align="center">Tổng được hưởng</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }} align="center">Số ngày còn lại</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {balancesLoading ? (
+                      <TableRow><TableCell colSpan={10} align="center" sx={{ py: 6 }}><CircularProgress size={28} /></TableCell></TableRow>
+                    ) : leaveBalances.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={10} align="center" sx={{ py: 6, color: '#64748b' }}>
+                          Chưa có dữ liệu quỹ phép năm {selectedYear}. Hãy bấm "Cấp phát Quỹ Phép Năm {selectedYear}" ở trên.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      leaveBalances.map((bal: any) => (
+                        <TableRow key={bal.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
+                          <TableCell sx={{ fontWeight: 700, color: '#2563eb', fontFamily: 'var(--font-mono)' }}>
+                            {bal.employee_code || '-'}
+                          </TableCell>
+                          <TableCell sx={{ fontWeight: 800, color: '#0f172a' }}>
+                            {bal.employee_name || `#${bal.employee}`}
+                          </TableCell>
+                          <TableCell sx={{ color: '#475569' }}>
+                            {bal.leave_type_name || 'Phép năm'}
+                          </TableCell>
+                          <TableCell align="center" sx={{ fontFamily: 'var(--font-mono)' }}>
+                            {bal.allocated_days}
+                          </TableCell>
+                          <TableCell align="center" sx={{ fontFamily: 'var(--font-mono)', color: '#16a34a', fontWeight: 700 }}>
+                            +{bal.seniority_bonus_days || 0}
+                          </TableCell>
+                          <TableCell align="center" sx={{ fontFamily: 'var(--font-mono)' }}>
+                            {bal.carried_over_days || 0}
+                          </TableCell>
+                          <TableCell align="center" sx={{ fontFamily: 'var(--font-mono)', color: '#dc2626', fontWeight: 600 }}>
+                            {bal.used_days}
+                          </TableCell>
+                          <TableCell align="center" sx={{ fontFamily: 'var(--font-mono)', color: '#d97706' }}>
+                            {bal.pending_days}
+                          </TableCell>
+                          <TableCell align="center" sx={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                            {bal.total_allowed_days}
+                          </TableCell>
+                          <TableCell align="center">
+                            <Chip
+                              label={`${bal.remaining_days} ngày`}
+                              size="small"
+                              sx={{
+                                fontWeight: 900,
+                                bgcolor: bal.remaining_days > 0 ? '#f0fdf4' : '#fef2f2',
+                                color: bal.remaining_days > 0 ? '#16a34a' : '#dc2626',
+                                borderRadius: 1.5,
+                              }}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          </>
+        )}
       </Stack>
 
       {/* Create Leave Request Dialog */}

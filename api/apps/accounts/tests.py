@@ -757,3 +757,63 @@ class TestUserAdminAPI:
 
         assert response.status_code == 400
         assert User.objects.filter(id=admin_user.id).exists()
+
+
+# ==================== Email OTP Verification Tests ====================
+
+@pytest.mark.django_db
+class TestEmailOtpVerification:
+    def test_generate_and_verify_email_otp_success(self, job_seeker_user):
+        from apps.accounts.services import EmailVerificationService
+
+        job_seeker_user.is_active = False
+        job_seeker_user.is_verify_email = False
+        job_seeker_user.save()
+
+        otp = EmailVerificationService.generate_and_store_otp(job_seeker_user)
+        assert len(otp) == 6
+        assert otp.isdigit()
+
+        user, error = EmailVerificationService.verify_email_otp(job_seeker_user.email, otp)
+        assert error is None
+        assert user is not None
+
+        job_seeker_user.refresh_from_db()
+        assert job_seeker_user.is_active is True
+        assert job_seeker_user.is_verify_email is True
+
+    def test_verify_email_otp_invalid_code(self, job_seeker_user):
+        from apps.accounts.services import EmailVerificationService
+
+        job_seeker_user.is_active = False
+        job_seeker_user.is_verify_email = False
+        job_seeker_user.save()
+
+        EmailVerificationService.generate_and_store_otp(job_seeker_user)
+
+        user, error = EmailVerificationService.verify_email_otp(job_seeker_user.email, "000000")
+        assert error == "INVALID_OTP"
+
+    def test_verify_email_otp_api_endpoint(self, job_seeker_user):
+        from apps.accounts.services import EmailVerificationService
+
+        job_seeker_user.is_active = False
+        job_seeker_user.is_verify_email = False
+        job_seeker_user.save()
+
+        otp = EmailVerificationService.generate_and_store_otp(job_seeker_user)
+
+        client = APIClient()
+        response = client.post(
+            "/api/v1/auth/verify-email-otp/",
+            {"email": job_seeker_user.email, "otp": otp},
+            format="json",
+        )
+
+        assert response.status_code == 200
+        assert response.data["data"]["emailVerified"] is True
+
+        job_seeker_user.refresh_from_db()
+        assert job_seeker_user.is_active is True
+        assert job_seeker_user.is_verify_email is True
+

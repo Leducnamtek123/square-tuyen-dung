@@ -9,10 +9,12 @@ import {
   IconButton,
   Paper,
   Popper,
+  Skeleton,
   Stack,
   Tooltip,
   Typography,
 } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
@@ -24,6 +26,7 @@ import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
 import { useTranslation } from 'react-i18next';
 import { formatLocalizedSalaryRange } from '@/utils/customData';
+import jobService from '@/services/jobService';
 
 export interface JobHoverPreviewData {
   id: number;
@@ -48,9 +51,12 @@ export interface JobHoverPreviewData {
   location?: any;
   experience?: number;
   academicLevel?: number;
+  jobType?: number;
   jobDescription?: string;
   jobRequirement?: string | null;
   benefitsEnjoyed?: string | null;
+  isSaved?: boolean;
+  isApplied?: boolean;
 }
 
 interface JobHoverPreviewCardProps {
@@ -100,35 +106,58 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
 }) => {
   const { i18n } = useTranslation(['public', 'common']);
 
+  const hasDesc = Boolean(job?.jobDescription && job.jobDescription.trim().length > 0);
+  const shouldFetchDetail = Boolean(open && job?.slug && !hasDesc);
+
+  const { data: fullJobDetail, isLoading: isLoadingDetail } = useQuery({
+    queryKey: ['hover-preview-job-detail', job?.slug],
+    queryFn: async () => {
+      if (!job?.slug) return null;
+      return await jobService.getJobPostDetailById(job.slug);
+    },
+    enabled: shouldFetchDetail,
+    staleTime: 5 * 60_000,
+  });
+
   if (!job) return null;
 
+  const activeJob: JobHoverPreviewData = fullJobDetail ? { ...job, ...fullJobDetail } : job;
+
   const companyName =
-    job.companyDict?.companyName || job.company?.companyName || 'Doanh nghiệp tuyển dụng';
-  const salaryText = formatLocalizedSalaryRange(job.salaryMin, job.salaryMax, i18n.language);
+    activeJob.companyDict?.companyName || activeJob.company?.companyName || 'Doanh nghiệp tuyển dụng';
+  const salaryText = formatLocalizedSalaryRange(activeJob.salaryMin, activeJob.salaryMax, i18n.language);
   const cityName =
     cityLabel ||
-    job.locationDict?.cityName ||
-    (typeof job.locationDict?.city === 'string' ? job.locationDict.city : '') ||
-    (typeof job.location?.city === 'string' ? job.location.city : '') ||
+    activeJob.locationDict?.cityName ||
+    (typeof activeJob.locationDict?.city === 'string' ? activeJob.locationDict.city : '') ||
+    (typeof activeJob.location?.city === 'string' ? activeJob.location.city : '') ||
     'Toàn quốc';
 
-  const expText = experienceLabel || (job.experience ? `${job.experience} năm kinh nghiệm` : 'Không yêu cầu kinh nghiệm');
-  const eduText = academicLevelLabel || (job.academicLevel ? `Trình độ ${job.academicLevel}` : 'Không yêu cầu bằng cấp');
+  const expText =
+    experienceLabel ||
+    (activeJob.experience ? `${activeJob.experience} năm kinh nghiệm` : 'Không yêu cầu kinh nghiệm');
+  const eduText =
+    academicLevelLabel ||
+    (activeJob.academicLevel ? `Trình độ ${activeJob.academicLevel}` : 'Không yêu cầu bằng cấp');
 
-  const deadlineFormatted = job.deadline
-    ? dayjs(job.deadline).isValid()
-      ? dayjs(job.deadline).format('DD/MM/YYYY')
-      : job.deadline
+  const deadlineFormatted = activeJob.deadline
+    ? dayjs(activeJob.deadline).isValid()
+      ? dayjs(activeJob.deadline).format('DD/MM/YYYY')
+      : activeJob.deadline
     : 'Đang tuyển';
 
-  const descLines = cleanHtmlToLines(job.jobDescription);
-  const reqLines = cleanHtmlToLines(job.jobRequirement);
-  const benefitLines = cleanHtmlToLines(job.benefitsEnjoyed);
+  const descLines = cleanHtmlToLines(activeJob.jobDescription);
+  const reqLines = cleanHtmlToLines(activeJob.jobRequirement);
+  const benefitLines = cleanHtmlToLines(activeJob.benefitsEnjoyed);
 
-  const safeDetailHref = `/viec-lam/${job.slug}`;
+  const safeDetailHref = `/viec-lam/${activeJob.slug}`;
+  const effectiveIsFavorite = isFavorite !== undefined ? isFavorite : Boolean(activeJob.isSaved);
 
   return (
     <Popper
+      id="job-hover-preview-popper"
+      role="tooltip"
+      aria-live="polite"
       open={open && Boolean(anchorEl)}
       anchorEl={anchorEl}
       placement="right-start"
@@ -198,7 +227,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                   letterSpacing: '-0.01em',
                 }}
               >
-                {job.jobName}
+                {activeJob.jobName}
               </Typography>
               <Typography
                 variant="body2"
@@ -213,23 +242,24 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
               </Typography>
             </Stack>
 
-            <Tooltip title={isFavorite ? 'Bỏ lưu tin' : 'Lưu tin tuyển dụng'} arrow placement="top">
+            <Tooltip title={effectiveIsFavorite ? 'Bỏ lưu tin' : 'Lưu tin tuyển dụng'} arrow placement="top">
               <IconButton
                 size="small"
-                onClick={(e) => onToggleFavorite && onToggleFavorite(e, job.id, job.slug)}
+                aria-label={effectiveIsFavorite ? 'Bỏ lưu tin' : 'Lưu tin'}
+                onClick={(e) => onToggleFavorite && onToggleFavorite(e, activeJob.id, activeJob.slug)}
                 sx={{
                   border: '1px solid #e2e8f0',
-                  color: isFavorite ? '#ef4444' : '#64748b',
-                  bgcolor: isFavorite ? '#fef2f2' : '#ffffff',
+                  color: effectiveIsFavorite ? '#ef4444' : '#64748b',
+                  bgcolor: effectiveIsFavorite ? '#fef2f2' : '#ffffff',
                   p: 0.85,
                   '&:hover': {
-                    bgcolor: isFavorite ? '#fee2e2' : '#f8fafc',
+                    bgcolor: effectiveIsFavorite ? '#fee2e2' : '#f8fafc',
                     color: '#ef4444',
                     borderColor: '#fca5a5',
                   },
                 }}
               >
-                {isFavorite ? <FavoriteIcon sx={{ fontSize: 20 }} /> : <FavoriteBorderIcon sx={{ fontSize: 20 }} />}
+                {effectiveIsFavorite ? <FavoriteIcon sx={{ fontSize: 20 }} /> : <FavoriteBorderIcon sx={{ fontSize: 20 }} />}
               </IconButton>
             </Tooltip>
           </Stack>
@@ -399,7 +429,13 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
               Mô tả công việc
             </Typography>
 
-            {descLines.length > 0 ? (
+            {isLoadingDetail && !hasDesc ? (
+              <Stack spacing={1}>
+                <Skeleton variant="text" width="90%" height={20} />
+                <Skeleton variant="text" width="75%" height={20} />
+                <Skeleton variant="text" width="85%" height={20} />
+              </Stack>
+            ) : descLines.length > 0 ? (
               <Stack spacing={0.75}>
                 {descLines.slice(0, 5).map((line, idx) => (
                   <Stack key={idx} direction="row" spacing={1} alignItems="flex-start">
@@ -439,7 +475,15 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
           </Box>
 
           {/* Job Requirements */}
-          {(reqLines.length > 0 || job.jobRequirement) && (
+          {isLoadingDetail && !hasDesc ? (
+            <Box sx={{ mb: 2.5 }}>
+              <Skeleton variant="text" width="40%" height={24} sx={{ mb: 1 }} />
+              <Stack spacing={1}>
+                <Skeleton variant="text" width="85%" height={20} />
+                <Skeleton variant="text" width="70%" height={20} />
+              </Stack>
+            </Box>
+          ) : (reqLines.length > 0 || activeJob.jobRequirement) ? (
             <Box sx={{ mb: 2.5 }}>
               <Typography
                 variant="subtitle2"
@@ -502,10 +546,10 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                 </Typography>
               )}
             </Box>
-          )}
+          ) : null}
 
           {/* Benefits */}
-          {(benefitLines.length > 0 || job.benefitsEnjoyed) && (
+          {(benefitLines.length > 0 || activeJob.benefitsEnjoyed) && (
             <Box>
               <Typography
                 variant="subtitle2"
@@ -530,23 +574,31 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                 Quyền lợi được hưởng
               </Typography>
 
-              <Stack spacing={0.75}>
-                {benefitLines.slice(0, 3).map((line, idx) => (
-                  <Stack key={idx} direction="row" spacing={1} alignItems="flex-start">
-                    <CheckCircleOutlineRoundedIcon sx={{ fontSize: 14, color: '#16a34a', mt: 0.4, flexShrink: 0 }} />
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: '#475569',
-                        fontSize: '0.825rem',
-                        lineHeight: 1.55,
-                      }}
-                    >
-                      {line}
-                    </Typography>
-                  </Stack>
-                ))}
-              </Stack>
+              {benefitLines.length > 0 ? (
+                <Stack spacing={0.75}>
+                  {benefitLines.slice(0, 3).map((line, idx) => (
+                    <Stack key={idx} direction="row" spacing={1} alignItems="flex-start">
+                      <CheckCircleOutlineRoundedIcon
+                        sx={{ fontSize: 16, color: '#16a34a', mt: 0.2, flexShrink: 0 }}
+                      />
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: '#475569',
+                          fontSize: '0.825rem',
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        {line}
+                      </Typography>
+                    </Stack>
+                  ))}
+                </Stack>
+              ) : (
+                <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: '0.825rem' }}>
+                  Hưởng đầy đủ chế độ theo quy định công ty và Luật Lao động.
+                </Typography>
+              )}
             </Box>
           )}
         </Box>
@@ -555,4 +607,4 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
   );
 };
 
-export default JobHoverPreviewCard;
+export default React.memo(JobHoverPreviewCard);

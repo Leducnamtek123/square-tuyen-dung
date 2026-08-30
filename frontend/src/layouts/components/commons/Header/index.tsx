@@ -119,7 +119,7 @@ const Header = (_props: HeaderProps) => {
   const pages = React.useMemo(() => ({
 
     [HOST_NAME.PROJECT]: [
-      { id: '1', label: t('nav.jobs'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language) },
+      { id: '1', label: t('nav.jobs'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language), isHighlight: true },
       { id: '2', label: t('nav.companies'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.COMPANY}`, i18n.language) },
       {
         id: '3',
@@ -136,7 +136,7 @@ const Header = (_props: HeaderProps) => {
     ],
     [HOST_NAME.EMPLOYER_PROJECT]: [
       { id: '1', label: 'Giới thiệu & Dịch vụ', path: localizeRoutePath(`/${ROUTES.EMPLOYER.INTRODUCE}`, i18n.language) },
-      { id: '2', label: 'Tìm ứng viên', path: localizeRoutePath(`/${ROUTES.EMPLOYER.PROFILE}`, i18n.language), requireAuth: true },
+      { id: '2', label: 'Tìm ứng viên', path: localizeRoutePath(`/${ROUTES.EMPLOYER.PROFILE}`, i18n.language), requireAuth: true, isHighlight: true },
       { id: '3', label: t('nav.pricing', { defaultValue: 'Bảng giá' }), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language) },
       { id: '4', label: t('nav.support', { defaultValue: 'Hỗ trợ' }), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SUPPORT}`, i18n.language) },
     ],

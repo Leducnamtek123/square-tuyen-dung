@@ -275,6 +275,45 @@ class OnboardCandidateSerializer(serializers.Serializer):
         return attrs
 
 
+class EmployeeLeaveBalanceSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    leave_type_name = serializers.CharField(source='leave_type.name', read_only=True)
+    total_allowed_days = serializers.FloatField(read_only=True)
+    remaining_days = serializers.FloatField(read_only=True)
+
+    class Meta:
+        from .models import EmployeeLeaveBalance
+        model = EmployeeLeaveBalance
+        fields = [
+            'id', 'employee', 'employee_name', 'employee_code', 'leave_type', 'leave_type_name',
+            'year', 'allocated_days', 'seniority_bonus_days', 'carried_over_days',
+            'used_days', 'pending_days', 'total_allowed_days', 'remaining_days',
+            'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'create_at', 'update_at', 'total_allowed_days', 'remaining_days']
+
+
+class RenewContractSerializer(serializers.Serializer):
+    contract_number = serializers.CharField(max_length=100)
+    contract_type = serializers.ChoiceField(choices=EmploymentContract.CONTRACT_TYPE_CHOICES)
+    start_date = serializers.DateField()
+    end_date = serializers.DateField(required=False, allow_null=True)
+    base_salary = serializers.DecimalField(max_digits=15, decimal_places=2)
+    allowance = serializers.DecimalField(max_digits=15, decimal_places=2, required=False, default=0)
+    notes = serializers.CharField(required=False, allow_blank=True, default='')
+
+
+class QuickCheckinSerializer(serializers.Serializer):
+    employee_id = serializers.IntegerField()
+    date = serializers.DateField(required=False)
+    status = serializers.ChoiceField(choices=AttendanceRecord.STATUS_CHOICES, default='PRESENT')
+    check_in = serializers.TimeField(required=False, allow_null=True)
+    check_out = serializers.TimeField(required=False, allow_null=True)
+    working_hours = serializers.DecimalField(max_digits=4, decimal_places=2, required=False, default=8.0)
+    notes = serializers.CharField(required=False, allow_blank=True, default='')
+
+
 class MonthlyPayrollRecordSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
@@ -287,9 +326,14 @@ class MonthlyPayrollRecordSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'company', 'employee', 'employee_name', 'employee_code', 'department_name',
             'month', 'year', 'gross_salary', 'allowance', 'bonus',
-            'working_days_actual', 'standard_working_days', 'unpaid_leave_days',
-            'total_income', 'bhxh_amount', 'bhyt_amount', 'bhtn_amount', 'total_insurance',
-            'taxable_income', 'personal_income_tax', 'net_salary',
+            'working_days_actual', 'standard_working_days', 'unpaid_leave_days', 'dependents_count',
+            'total_income',
+            # NLĐ đóng
+            'bhxh_amount', 'bhyt_amount', 'bhtn_amount', 'total_insurance',
+            # NSDLĐ đóng
+            'employer_bhxh', 'employer_bhyt', 'employer_bhtn', 'employer_union_fee', 'total_employer_insurance',
+            # Thuế & Thực nhận
+            'taxable_income', 'personal_income_tax', 'net_salary', 'total_company_expense',
             'status', 'status_label', 'payment_date', 'note', 'create_at', 'update_at'
         ]
         read_only_fields = ['id', 'company', 'create_at', 'update_at']

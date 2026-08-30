@@ -870,9 +870,11 @@
     "hrmEmployeesList": "Hrm Employees List",
     "hrmOnboarding": "Hrm Onboarding",
     "hrmDepartments": "Hrm Departments",
-    "hrmContracts": "Hrm Contracts",
-    "hrmLeaves": "Hrm Leaves",
-    "hrmOrgChart": "Hrm Org Chart"
+    "hrmContracts": "HRM Contracts",
+    "hrmAttendances": "Attendance & Timesheet",
+    "hrmLeaves": "Leave Management",
+    "hrmPayroll": "Payroll & Expenses",
+    "hrmOrgChart": "Organization Chart"
   },
   "interviewHistory": {
     "title": "Video Library",

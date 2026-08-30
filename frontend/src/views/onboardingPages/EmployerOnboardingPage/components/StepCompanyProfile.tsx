@@ -99,13 +99,6 @@ export default function StepCompanyProfile({
   const selectedCity = citiesList.find((c) => Number(c.id) === Number(values.cityId)) || null;
   const selectedDistrict = districtsList.find((d) => Number(d.id) === Number(values.districtId)) || null;
 
-  const defaultSizes = [
-    { id: 1, name: 'Dưới 10 nhân viên' },
-    { id: 2, name: '10 - 24 nhân viên' },
-    { id: 3, name: '25 - 99 nhân viên' },
-    { id: 4, name: 'Trên 100 nhân viên' },
-  ];
-
   return (
     <Box>
       <input
@@ -267,7 +260,7 @@ export default function StepCompanyProfile({
                 '&.Mui-focused': { backgroundColor: '#FFFFFF' },
               }}
             >
-              {(employeeSizeOptions?.length ? employeeSizeOptions : defaultSizes).map((sz) => (
+              {(employeeSizeOptions || []).map((sz) => (
                 <MenuItem key={String(sz.id)} value={Number(sz.id)}>
                   {sz.name}
                 </MenuItem>

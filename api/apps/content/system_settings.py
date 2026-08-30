@@ -85,12 +85,23 @@ def decode_setting_value(key: str, raw_value: Any) -> Any:
     return coerce_setting_value(key, decoded)
 
 
+SYSTEM_SETTINGS_CACHE_KEY = "system_settings_all_dict"
+
+
 def load_system_settings() -> Dict[str, Any]:
+    is_test = getattr(settings, "APP_ENVIRONMENT", "") == "test"
+    if not is_test:
+        cached = cache.get(SYSTEM_SETTINGS_CACHE_KEY)
+        if cached is not None and isinstance(cached, dict):
+            return cached
+
     data = dict(SYSTEM_SETTING_DEFAULTS)
     try:
         rows = SystemSetting.objects.filter(key__in=SYSTEM_SETTING_DEFAULTS.keys())
         for row in rows:
             data[row.key] = decode_setting_value(row.key, row.value)
+        if not is_test:
+            cache.set(SYSTEM_SETTINGS_CACHE_KEY, data, timeout=300)
     except (DatabaseError, OperationalError, ProgrammingError):
         return data
     return data
@@ -109,6 +120,7 @@ def update_system_settings(payload: Mapping[str, Any]) -> Dict[str, Any]:
             },
         )
 
+    cache.delete(SYSTEM_SETTINGS_CACHE_KEY)
     cache.delete("common_all_config")
     return load_system_settings()
 

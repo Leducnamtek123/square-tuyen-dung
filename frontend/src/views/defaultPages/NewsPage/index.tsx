@@ -78,14 +78,6 @@ const FALLBACK_POPULAR_KEYWORDS: string[] = [
   'Tuyển dụng việc làm', 'Kinh nghiệm tìm việc', 'Cách deal lương', 'Tạo CV miễn phí'
 ];
 
-const DEFAULT_CATEGORIES: ArticleCategoryInfo[] = [
-  { id: 1, name: 'Cẩm nang nghề nghiệp', slug: 'cam-nang', description: '' },
-  { id: 2, name: 'Thủ tục & Quyền lợi lao động', slug: 'thu-tuc-lao-dong', description: '' },
-  { id: 3, name: 'Thuế & Quyết toán TNCN', slug: 'thue-tncn', description: '' },
-  { id: 4, name: 'Bí quyết viết CV & Phỏng vấn', slug: 'bi-quyet-cv', description: '' },
-  { id: 5, name: 'Báo cáo & Xu hướng tuyển dụng', slug: 'xu-huong', description: '' },
-];
-
 const SubHeaderCategoryBar = ({
   categories,
   activeCategorySlug,
@@ -95,8 +87,6 @@ const SubHeaderCategoryBar = ({
   activeCategorySlug: string;
   onSelectCategory: (slug: string) => void;
 }) => {
-  const displayCategories = categories.length > 0 ? categories : DEFAULT_CATEGORIES;
-
   return (
     <Box
       sx={{
@@ -124,15 +114,16 @@ const SubHeaderCategoryBar = ({
             scrollbarWidth: 'none',
           }}
         >
-          {displayCategories.map((cat) => {
-            const isSelected = activeCategorySlug === cat.slug;
-            return (
-              <Button
-                key={cat.id}
-                variant="text"
-                onClick={() => onSelectCategory(cat.slug)}
-                sx={{
-                  fontWeight: isSelected ? 800 : 600,
+          {categories.length > 0
+            ? categories.map((cat) => {
+                const isSelected = activeCategorySlug === cat.slug;
+                return (
+                  <Button
+                    key={cat.id}
+                    variant="text"
+                    onClick={() => onSelectCategory(cat.slug)}
+                    sx={{
+                      fontWeight: isSelected ? 800 : 600,
                   fontSize: '0.875rem',
                   color: isSelected ? '#e11d48' : '#475569',
                   px: 2.5,
@@ -151,7 +142,7 @@ const SubHeaderCategoryBar = ({
                 {cat.name}
               </Button>
             );
-          })}
+          }) : null}
         </Stack>
       </Container>
     </Box>

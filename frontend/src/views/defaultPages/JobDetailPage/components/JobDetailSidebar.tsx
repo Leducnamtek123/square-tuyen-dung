@@ -32,7 +32,13 @@ const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) =>
   const companyName = company?.companyName || jobPostDetail?.companyName || 'Công ty Tuyển Dụng';
   const companyLogo = company?.logoUrl || company?.companyImageUrl || jobPostDetail?.companyImageUrl || IMAGES.companyLogoDefault;
   const companySlug = company?.slug || jobPostDetail?.companySlug || '';
-  const companyAddress = company?.location?.address || jobPostDetail?.locationName || 'TP.HCM';
+  const companyAddress =
+    company?.location?.address ||
+    jobPostDetail?.locationName ||
+    (typeof (jobPostDetail as any)?.location?.city === 'number'
+      ? allConfig?.cityDict?.[(jobPostDetail as any).location.city]
+      : (jobPostDetail as any)?.location?.cityName || (jobPostDetail as any)?.locationDict?.cityName) ||
+    'Chưa cập nhật địa chỉ';
   const companySize = company?.employeeSize != null
     ? tConfig(allConfig?.employeeSizeDict?.[String(company.employeeSize)])
     : '';

@@ -244,6 +244,45 @@ def user_active(request, encoded_data, token):
     return response_data(status=status.HTTP_200_OK)
 
 
+@api_view(http_method_names=["POST"])
+@permission_classes([AllowAny])
+def verify_email_otp(request):
+    """
+    Verify email via 6-digit OTP.
+    Request payload: { "email": "user@domain.com", "otp": "101485" }
+    """
+    email = request.data.get("email") or ""
+    otp = request.data.get("otp") or request.data.get("code") or ""
+
+    if not email or not otp:
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"errorMessage": ["Vui lòng cung cấp địa chỉ email và mã OTP."]},
+        )
+
+    user, error_key = EmailVerificationService.verify_email_otp(str(email).strip(), str(otp).strip())
+
+    if error_key:
+        error_messages = {
+            "EMAIL_NOT_REGISTERED": "Email không tồn tại trong hệ thống.",
+            "OTP_EXPIRED": "Mã xác thực đã hết hạn (sau 15 phút). Vui lòng nhấn gửi lại mã mới.",
+            "INVALID_OTP": "Mã xác thực không chính xác. Vui lòng kiểm tra lại.",
+        }
+        error_msg = error_messages.get(error_key, "Mã xác thực không hợp lệ.")
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"errorMessage": [error_msg]},
+        )
+
+    return response_data(
+        status=status.HTTP_200_OK,
+        data={
+            "emailVerified": True,
+            "message": SUCCESS_MESSAGES["EMAIL_VERIFIED"],
+        },
+    )
+
+
 
 
 @api_view(http_method_names=["post"])

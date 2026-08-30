@@ -111,6 +111,7 @@ const nextConfig = {
       { source: '/lien-he', destination: '/contact' },
       { source: '/cau-hoi-thuong-gap', destination: '/faq' },
       { source: '/dieu-khoan-dich-vu', destination: '/terms-of-service' },
+      { source: '/terms-and-conditions', destination: '/terms-of-service' },
       { source: '/chinh-sach-bao-mat', destination: '/privacy-policy' },
 
       // ── Legal & Policy HTML Routes (Vieclam24h style) ──
@@ -172,6 +173,8 @@ const nextConfig = {
       { source: '/nha-tuyen-dung/lien-he', destination: '/employer/contact' },
       { source: '/nha-tuyen-dung/cau-hoi-thuong-gap', destination: '/employer/faq' },
       { source: '/nha-tuyen-dung/dieu-khoan-dich-vu', destination: '/employer/terms-of-service' },
+      { source: '/nha-tuyen-dung/terms-and-conditions', destination: '/employer/terms-of-service' },
+      { source: '/employer/terms-and-conditions', destination: '/employer/terms-of-service' },
       { source: '/nha-tuyen-dung/xac-thuc-nha-tuyen-dung', destination: '/employer/verification' },
       { source: '/nha-tuyen-dung/hrm', destination: '/employer/hrm/dashboard' },
       { source: '/nha-tuyen-dung/hrm/dashboard', destination: '/employer/hrm/dashboard' },

@@ -136,7 +136,14 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
         return getattr(obj, "evaluation_rubric", None)
 
     def get_questions_count(self, obj):
-        return obj.questions.count()
+        if hasattr(obj, "questions_count"):
+            return obj.questions_count
+        if hasattr(obj, "_prefetched_objects_cache") and "questions" in obj._prefetched_objects_cache:
+            return len(obj.questions.all())
+        try:
+            return obj.questions.count()
+        except Exception:
+            return 0
 
     def get_canWrite(self, obj):
         request = self.context.get("request")
@@ -269,6 +276,10 @@ class VoiceProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "samples", "grants", "sampleCount", "grantCount", "created_by", "createdBy", "create_at", "update_at"]
 
     def get_sampleCount(self, obj):
+        if hasattr(obj, "sample_count"):
+            return obj.sample_count
+        if hasattr(obj, "_prefetched_objects_cache") and "samples" in obj._prefetched_objects_cache:
+            return len(obj.samples.all())
         try:
             return obj.samples.count()
         except Exception:
@@ -276,8 +287,12 @@ class VoiceProfileSerializer(serializers.ModelSerializer):
 
     def get_totalDurationSeconds(self, obj):
         try:
-            total = 0
-            for sample in obj.samples.all():
+            if hasattr(obj, "_prefetched_objects_cache") and "samples" in obj._prefetched_objects_cache:
+                samples = obj.samples.all()
+            else:
+                samples = obj.samples.all()
+            total = 0.0
+            for sample in samples:
                 if sample.duration_seconds is not None:
                     total += float(sample.duration_seconds)
             return total
@@ -290,6 +305,8 @@ class VoiceProfileSerializer(serializers.ModelSerializer):
                 return False
             if obj.voice_type == VoiceProfile.TYPE_PRESET:
                 return True
+            if hasattr(obj, "_prefetched_objects_cache") and "samples" in obj._prefetched_objects_cache:
+                return len(obj.samples.all()) > 0
             return obj.samples.exists()
         except Exception:
             return False
@@ -484,6 +501,10 @@ class InterviewSessionListSerializer(serializers.ModelSerializer):
             return None
 
     def get_evaluations_count(self, obj):
+        if hasattr(obj, "evaluations_count"):
+            return obj.evaluations_count
+        if hasattr(obj, "_prefetched_objects_cache") and "evaluations" in obj._prefetched_objects_cache:
+            return len(obj.evaluations.all())
         try:
             return obj.evaluations.count()
         except Exception:

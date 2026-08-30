@@ -774,6 +774,6 @@ class CompanyCoverImageSerializer(DynamicFieldsMixin, serializers.ModelSerialize
                 company.save()
 
             return company
-        except:
-            helper.print_log_error("update company cover image", "unknown error")
+        except Exception as e:
+            helper.print_log_error("update company cover image", e)
             raise

@@ -148,16 +148,31 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
             {(!isAuthenticated || currentUser?.roleName === ROLES_NAME.JOB_SEEKER) && (
               <LoadingButton
                 onClick={handleFollow}
-                startIcon={companyDetail.isFollowed ? <BookmarkIcon /> : <BookmarkBorderIcon />}
+                startIcon={companyDetail.isFollowed ? <BookmarkIcon sx={{ color: companyDetail.isFollowed ? '#2563eb' : 'inherit' }} /> : <BookmarkBorderIcon />}
                 loading={isLoadingFollow}
                 loadingPosition="start"
-                variant={companyDetail.isFollowed ? "contained" : "outlined"}
-                color="primary"
+                variant={companyDetail.isFollowed ? "outlined" : "contained"}
                 sx={{
                   flex: { xs: '1 1 calc(50% - 8px)', sm: '1 1 auto', md: 'none' },
                   minWidth: { xs: 120, sm: 140, md: 160 },
-                  borderRadius: 2,
-                  boxShadow: "none"
+                  borderRadius: '10px',
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.875rem',
+                  py: 1,
+                  ...(companyDetail.isFollowed
+                    ? {
+                        bgcolor: '#eff6ff',
+                        color: '#2563eb',
+                        borderColor: '#bfdbfe',
+                        '&:hover': { bgcolor: '#dbeafe', borderColor: '#93c5fd' },
+                      }
+                    : {
+                        bgcolor: '#2563eb',
+                        color: '#ffffff',
+                        boxShadow: '0 4px 14px rgba(37, 99, 235, 0.25)',
+                        '&:hover': { bgcolor: '#1d4ed8' },
+                      }),
                 }}
               >
                 <span>
@@ -167,15 +182,21 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
               </LoadingButton>
             )}
             <Button
-              variant="contained"
-              color="secondary"
-              startIcon={<ShareIcon />}
+              variant="outlined"
+              startIcon={<ShareIcon sx={{ fontSize: 18, color: '#64748b' }} />}
               onClick={() => setOpenSharePopup(true)}
               sx={{
                 flex: { xs: '1 1 calc(50% - 8px)', sm: '1 1 auto', md: 'none' },
                 minWidth: { xs: 120, sm: 140, md: 160 },
-                borderRadius: 2,
-                boxShadow: "none"
+                borderRadius: '10px',
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                py: 1,
+                bgcolor: '#ffffff',
+                color: '#334155',
+                borderColor: '#e2e8f0',
+                '&:hover': { bgcolor: '#f8fafc', borderColor: '#cbd5e1' },
               }}
             >
               {t("companyDetail.share")}
@@ -183,14 +204,20 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
             {(!isAuthenticated || currentUser?.roleName === ROLES_NAME.JOB_SEEKER) && (
               <Button
                 variant="outlined"
-                color="warning"
-                startIcon={<FlagIcon />}
+                startIcon={<FlagIcon sx={{ fontSize: 18, color: '#64748b' }} />}
                 onClick={() => setOpenReportPopup(true)}
                 sx={{
                   flex: { xs: '1 1 calc(50% - 8px)', sm: '1 1 auto', md: 'none' },
                   minWidth: { xs: 120, sm: 140, md: 160 },
-                  borderRadius: 2,
-                  boxShadow: "none"
+                  borderRadius: '10px',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.875rem',
+                  py: 1,
+                  bgcolor: '#ffffff',
+                  color: '#64748b',
+                  borderColor: '#e2e8f0',
+                  '&:hover': { bgcolor: '#fef2f2', color: '#ef4444', borderColor: '#fca5a5', '& svg': { color: '#ef4444' } },
                 }}
               >
                 {t("companyDetail.report")}

@@ -438,41 +438,72 @@ class JobActivityService:
         from shared.configs import variable_system as var_sys
         from console.jobs import queue_mail
 
-        if not email_notifications_enabled():
-            logger.info("Employer email skipped because email notifications are disabled.")
-            return
-
-        company = user.active_company
+        company = getattr(user, 'active_company', None) or getattr(activity.job_post, 'company', None)
         if not company:
-            logger.error("Cannot send email: Recruiter %s has no active company", user.email)
+            logger.error("Cannot send email: Recruiter %s has no active company", getattr(user, 'email', 'unknown'))
             return
 
         to = [validated_data.get("email")]
         is_send_me = validated_data.get("isSendMe", False)
 
-        if is_send_me:
+        if is_send_me and getattr(user, 'email', None):
             to.append(user.email)
 
+        candidate_name = validated_data.get("fullName") or activity.full_name or "Ứng viên"
+        job_title = activity.job_post.job_name if activity.job_post else "Vị trí tuyển dụng"
+
         email_data = {
+            'candidate_name': candidate_name,
+            'full_name': candidate_name,
             'content': validated_data.get("content"),
+            'message_content': validated_data.get("content"),
             'company_image': company.logo.get_full_url()
             if company.logo
             else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"],
             'company_name': company.company_name,
-            'company_phone': company.company_phone,
-            'company_email': company.company_email,
+            'company_phone': company.company_phone or getattr(user, 'phone', ''),
+            'company_email': company.company_email or getattr(user, 'email', ''),
+            'contact_email': company.company_email or getattr(user, 'email', ''),
+            'contact_phone': company.company_phone or getattr(user, 'phone', ''),
             'company_address': getattr(company.location, 'address', "") if company.location else "",
             'company_website_url': company.website_url,
+            'job_name': job_title,
+            'job_title': job_title,
+            'status': activity.get_status_display() if hasattr(activity, 'get_status_display') else "Đang xử lý",
         }
 
-        queue_mail.send_email_reply_job_seeker_task.delay(
-            to=to,
-            subject=validated_data.get("title"),
-            data=email_data,
-        )
+        # 1. Send Email (with Celery delay and direct synchronous fallback)
+        try:
+            queue_mail.send_email_reply_job_seeker_task.delay(
+                to=to,
+                subject=validated_data.get("title"),
+                data=email_data,
+            )
+        except Exception:
+            try:
+                queue_mail.send_email_reply_job_seeker_task(
+                    to=to,
+                    subject=validated_data.get("title"),
+                    data=email_data,
+                )
+            except Exception as mail_err:
+                logger.exception("Failed to send email reply to job seeker: %s", mail_err)
+
+        # 2. In-App Notification to Job Seeker
+        try:
+            if activity.user:
+                from shared.services.notification_service import NotificationService
+                NotificationService.add_apply_status_notifications(
+                    title=f"Thư phản hồi từ {company.company_name}",
+                    content=f"Nhà tuyển dụng {company.company_name} đã gửi email phản hồi cho bạn về hồ sơ ứng tuyển '{job_title}': {validated_data.get('title')}",
+                    image=company.logo.get_full_url() if company.logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"],
+                    user_id=activity.user.id,
+                )
+        except Exception as notif_err:
+            logger.exception("Failed to push in-app notification for email reply: %s", notif_err)
 
         activity.is_sent_email = True
-        activity.save()
+        activity.save(update_fields=['is_sent_email'])
 
     @staticmethod
     def trigger_ai_analysis(activity: JobPostActivity, criteria: Any = None) -> None:

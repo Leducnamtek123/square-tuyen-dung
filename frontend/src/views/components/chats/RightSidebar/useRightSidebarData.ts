@@ -94,31 +94,23 @@ export const useRightSidebarData = <T,>(fetchData: (params: { page: number; page
     const normalizedPartnerId = String(partnerId || '').trim();
     if (!userId || !setSelectedRoomId || !normalizedPartnerId) return;
 
-    let allowCreateNewChatRoom = false;
-    const isExists = await checkExists('accounts', normalizedPartnerId);
-    if (!isExists) {
-      const createResult = await createUser('accounts', userData, normalizedPartnerId);
-      if (createResult) {
-        allowCreateNewChatRoom = true;
-      }
-    } else {
-      allowCreateNewChatRoom = true;
+    // Always merge latest partner information (avatar, name, company) into Firestore accounts
+    if (userData) {
+      await createUser('accounts', userData, normalizedPartnerId);
     }
 
-    if (allowCreateNewChatRoom) {
-      let chatRoomId = await checkChatRoomExists('chatRooms', userId, normalizedPartnerId);
-      if (chatRoomId === null) {
-        const newRoom: ChatRoomDocument = {
-          members: [`${userId}`, normalizedPartnerId],
-          membersString: [`${userId}-${normalizedPartnerId}`, `${normalizedPartnerId}-${userId}`],
-          recipientId: normalizedPartnerId,
-          createdBy: `${userId}`,
-          unreadCount: 0
-        };
-        chatRoomId = await addDocument('chatRooms', newRoom);
-      }
-      setSelectedRoomId(chatRoomId);
+    let chatRoomId = await checkChatRoomExists('chatRooms', userId, normalizedPartnerId);
+    if (chatRoomId === null) {
+      const newRoom: ChatRoomDocument = {
+        members: [`${userId}`, normalizedPartnerId],
+        membersString: [`${userId}-${normalizedPartnerId}`, `${normalizedPartnerId}-${userId}`],
+        recipientId: normalizedPartnerId,
+        createdBy: `${userId}`,
+        unreadCount: 0
+      };
+      chatRoomId = await addDocument('chatRooms', newRoom);
     }
+    setSelectedRoomId(chatRoomId);
   };
 
   return {

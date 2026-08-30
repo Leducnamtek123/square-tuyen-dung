@@ -69,7 +69,9 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     '/employer/faq',
     '/nha-tuyen-dung/cau-hoi-thuong-gap',
     '/employer/terms-of-service',
+    '/employer/terms-and-conditions',
     '/nha-tuyen-dung/dieu-khoan-dich-vu',
+    '/nha-tuyen-dung/terms-and-conditions',
     '/employer/privacy-policy',
     '/nha-tuyen-dung/chinh-sach-bao-mat',
   ];

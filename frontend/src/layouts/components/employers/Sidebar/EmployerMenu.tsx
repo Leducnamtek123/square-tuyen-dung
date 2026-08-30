@@ -143,7 +143,9 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand, language, live
             { text: t('employer:sidebar.hrmOnboarding'), to: routePath(ROUTES.EMPLOYER.HRM_ONBOARDING), isSelected: isSelected(ROUTES.EMPLOYER.HRM_ONBOARDING) },
             { text: t('employer:sidebar.hrmDepartments'), to: routePath(ROUTES.EMPLOYER.HRM_DEPARTMENTS), isSelected: isSelected(ROUTES.EMPLOYER.HRM_DEPARTMENTS) },
             { text: t('employer:sidebar.hrmContracts'), to: routePath(ROUTES.EMPLOYER.HRM_CONTRACTS), isSelected: isSelected(ROUTES.EMPLOYER.HRM_CONTRACTS) },
+            { text: t('employer:sidebar.hrmAttendances'), to: routePath(ROUTES.EMPLOYER.HRM_ATTENDANCES), isSelected: isSelected(ROUTES.EMPLOYER.HRM_ATTENDANCES) },
             { text: t('employer:sidebar.hrmLeaves'), to: routePath(ROUTES.EMPLOYER.HRM_LEAVES), isSelected: isSelected(ROUTES.EMPLOYER.HRM_LEAVES) },
+            { text: t('employer:sidebar.hrmPayroll'), to: routePath(ROUTES.EMPLOYER.HRM_PAYROLL), isSelected: isSelected(ROUTES.EMPLOYER.HRM_PAYROLL) },
             { text: t('employer:sidebar.hrmOrgChart'), to: routePath(ROUTES.EMPLOYER.HRM_ORG_CHART), isSelected: isSelected(ROUTES.EMPLOYER.HRM_ORG_CHART) },
           ]}
         />
@@ -156,7 +158,9 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand, language, live
             <MenuItem text={t('employer:sidebar.hrmOnboarding')} to={routePath(ROUTES.EMPLOYER.HRM_ONBOARDING)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_ONBOARDING) }} />
             <MenuItem text={t('employer:sidebar.hrmDepartments')} to={routePath(ROUTES.EMPLOYER.HRM_DEPARTMENTS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_DEPARTMENTS) }} />
             <MenuItem text={t('employer:sidebar.hrmContracts')} to={routePath(ROUTES.EMPLOYER.HRM_CONTRACTS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_CONTRACTS) }} />
+            <MenuItem text={t('employer:sidebar.hrmAttendances')} to={routePath(ROUTES.EMPLOYER.HRM_ATTENDANCES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_ATTENDANCES) }} />
             <MenuItem text={t('employer:sidebar.hrmLeaves')} to={routePath(ROUTES.EMPLOYER.HRM_LEAVES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_LEAVES) }} />
+            <MenuItem text={t('employer:sidebar.hrmPayroll')} to={routePath(ROUTES.EMPLOYER.HRM_PAYROLL)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_PAYROLL) }} />
             <MenuItem text={t('employer:sidebar.hrmOrgChart')} to={routePath(ROUTES.EMPLOYER.HRM_ORG_CHART)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.HRM_ORG_CHART) }} />
           </List>
         </Collapse>

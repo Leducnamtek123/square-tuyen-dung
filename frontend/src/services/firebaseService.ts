@@ -94,10 +94,14 @@ export const createUser = async (
 ): Promise<boolean> => {
   try {
     const userRef = doc(db, collectionName, `${userId}`);
-    await setDoc(userRef, {
-      ...userData,
-      createdAt: serverTimestamp(),
-    });
+    await setDoc(
+      userRef,
+      {
+        ...userData,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
     return true;
   } catch {
     return false;

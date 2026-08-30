@@ -3,75 +3,85 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Xác thực Email | InfoHR</title>
+    <title>Mã xác thực email | InfoHR</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: #0f172a;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; padding: 30px 10px;">
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0f172a;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; padding: 40px 15px;">
         <tr>
             <td align="center">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 580px; background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
-                    <!-- Header -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 540px; background-color: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06);">
+                    <!-- Header with Brand Logo -->
                     <tr>
-                        <td style="padding: 24px 32px; border-bottom: 1px solid #f1f5f9; text-align: left;">
-                            <a href="https://infohr.vn" target="_blank" style="text-decoration: none;">
-                                <img src="https://infohr.vn/infohr-icons/logo-brand.png" alt="InfoHR" style="height: 36px; max-height: 36px; border: 0; outline: none; display: block;" />
+                        <td style="padding: 32px 32px 20px 32px; text-align: center;">
+                            <a href="https://infohr.vn" target="_blank" style="text-decoration: none; display: inline-block;">
+                                <img src="https://infohr.vn/infohr-icons/logo-brand.png" alt="InfoHR" style="height: 38px; max-height: 38px; border: 0; outline: none; display: block;" />
                             </a>
                         </td>
                     </tr>
-                    <!-- Body -->
+                    <!-- Main Body -->
                     <tr>
-                        <td style="padding: 36px 32px; text-align: center;">
-                            <!-- Icon Badge -->
-                            <table align="center" width="72" height="72" cellpadding="0" cellspacing="0" border="0" style="background-color: #eff6ff; border-radius: 50%; margin: 0 auto 20px auto;">
+                        <td style="padding: 10px 36px 36px 36px; text-align: center;">
+                            <h1 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 24px 0; letter-spacing: -0.02em;">
+                                Mã xác thực email của bạn:
+                            </h1>
+
+                            <!-- Big Bold OTP Code Box (Hostinger Style) -->
+                            <table align="center" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 24px auto;">
                                 <tr>
-                                    <td align="center" valign="middle" style="font-size: 32px; line-height: 1;">✉️</td>
+                                    <td align="center" style="background-color: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 24px 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);">
+                                        <div style="font-size: 38px; font-weight: 900; letter-spacing: 10px; color: #4338ca; font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; line-height: 1;">
+                                            {{ otp_code|default:code|default:"101485" }}
+                                        </div>
+                                    </td>
                                 </tr>
                             </table>
 
-                            <h1 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">Xác thực email để kích hoạt tài khoản</h1>
-                            
-                            <p style="font-size: 15px; line-height: 1.6; color: #475569; margin: 0 0 24px 0;">
-                                Xin chào{% if full_name %} <strong>{{ full_name }}</strong>{% elif candidate_name %} <strong>{{ candidate_name }}</strong>{% endif %},<br />
-                                Cảm ơn bạn đã đăng ký tài khoản trên <strong>InfoHR</strong>.<br />
-                                Vui lòng nhấn nút bên dưới để xác thực email và kích hoạt tài khoản của bạn.
+                            <!-- Security Warning & Expiry Notice -->
+                            <p style="font-size: 14px; line-height: 1.6; color: #475569; margin: 0 0 8px 0;">
+                                Vui lòng tuyệt đối không chia sẻ mã này với bất kỳ ai.
+                            </p>
+                            <p style="font-size: 14px; font-weight: 600; line-height: 1.6; color: #0f172a; margin: 0 0 24px 0;">
+                                Lưu ý: <span style="font-weight: 400; color: #64748b;">Mã xác thực sẽ hết hạn trong</span> <strong style="color: #ef4444;">15 phút</strong>.
                             </p>
 
                             {% if confirm_email_url %}
-                            <table align="center" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 24px auto;">
-                                <tr>
-                                    <td align="center" style="border-radius: 8px; background-color: #dc2626;">
-                                        <a href="{{ confirm_email_url }}" target="_blank" style="font-size: 15px; font-weight: 700; color: #ffffff; text-decoration: none; display: inline-block; padding: 14px 32px; border-radius: 8px;">Xác thực email</a>
-                                    </td>
-                                </tr>
-                            </table>
-                            {% endif %}
-
-                            {% if otp_code or code %}
-                            <table align="center" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1; margin: 20px 0; padding: 16px;">
-                                <tr>
-                                    <td align="center">
-                                        <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">Hoặc sử dụng mã xác thực bên dưới:</div>
-                                        <div style="font-size: 28px; font-weight: 800; letter-spacing: 6px; color: #0f172a; font-family: monospace;">{{ otp_code|default:code }}</div>
-                                    </td>
-                                </tr>
-                            </table>
-                            {% endif %}
-
-                            <p style="font-size: 13px; color: #64748b; margin: 20px 0 0 0;">
-                                Liên kết / mã xác thực này sẽ hết hạn sau <strong>24 giờ</strong>.
-                            </p>
-
-                            <div style="font-size: 12px; color: #94a3b8; margin-top: 24px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
-                                Nếu bạn không tạo tài khoản trên InfoHR, vui lòng bỏ qua email này.
+                            <!-- 1-Click Fast Activation Option -->
+                            <div style="margin: 20px 0; padding-top: 20px; border-top: 1px dashed #e2e8f0;">
+                                <p style="font-size: 13px; color: #64748b; margin: 0 0 14px 0;">
+                                    Hoặc bạn có thể kích hoạt nhanh bằng cách nhấn nút bên dưới:
+                                </p>
+                                <table align="center" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+                                    <tr>
+                                        <td align="center" style="border-radius: 10px; background-color: #2563eb;">
+                                            <a href="{{ confirm_email_url }}" target="_blank" style="font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; display: inline-block; padding: 12px 28px; border-radius: 10px;">
+                                                Xác thực email 1-chạm &rarr;
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
+                            {% endif %}
                         </td>
                     </tr>
-                    <!-- Footer -->
+                    <!-- Minimalist Footer (Hostinger Style) -->
                     <tr>
-                        <td style="padding: 20px 32px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; font-size: 13px; color: #64748b; text-align: center;">
-                            <span>© 2026 InfoHR. Bản quyền được bảo hộ.</span>
-                            <span style="margin: 0 8px;">|</span>
-                            <a href="https://infohr.vn" target="_blank" style="color: #64748b; text-decoration: none;">infohr.vn</a>
+                        <td style="padding: 24px 32px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; font-size: 12px; line-height: 1.6; color: #64748b; text-align: center;">
+                            <div style="font-weight: 700; color: #334155; margin-bottom: 6px; font-size: 13px;">
+                                InfoHR Vietnam
+                            </div>
+                            <p style="margin: 0 0 12px 0; color: #64748b; font-size: 12px;">
+                                Bạn nhận được email này vì đã đăng ký tài khoản tại InfoHR, nhằm đảm bảo tuân thủ Điều khoản sử dụng và tính bảo mật của tài khoản.
+                            </p>
+                            <div style="margin-bottom: 12px;">
+                                <a href="https://infohr.vn/terms-of-service" target="_blank" style="color: #475569; text-decoration: underline; margin: 0 6px;">Điều khoản dịch vụ</a>
+                                <span>•</span>
+                                <a href="https://infohr.vn/privacy-policy" target="_blank" style="color: #475569; text-decoration: underline; margin: 0 6px;">Chính sách bảo mật</a>
+                                <span>•</span>
+                                <a href="https://infohr.vn/contact" target="_blank" style="color: #475569; text-decoration: underline; margin: 0 6px;">Trung tâm hỗ trợ</a>
+                            </div>
+                            <div style="color: #94a3b8; font-size: 11px;">
+                                &copy; 2026 InfoHR Vietnam Ltd. Bản quyền được bảo hộ.
+                            </div>
                         </td>
                     </tr>
                 </table>

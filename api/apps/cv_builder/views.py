@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 
 from .models import CVTemplate, CandidateCV, CVSuggestion
@@ -43,8 +44,8 @@ class CVTemplateViewSet(viewsets.ReadOnlyModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.view_count += 1
-        instance.save(update_fields=["view_count"])
+        CVTemplate.objects.filter(pk=instance.pk).update(view_count=F("view_count") + 1)
+        instance.refresh_from_db(fields=["view_count"])
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 

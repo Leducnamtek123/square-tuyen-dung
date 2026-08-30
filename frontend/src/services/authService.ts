@@ -256,6 +256,11 @@ const authService = {
       unwrapDataResponse<{ message: string; company: unknown; user: User }>,
     );
   },
+
+  verifyEmailOtp: (email: string, otp: string): Promise<ActionResponse> => {
+    const url = 'auth/verify-email-otp/';
+    return Promise.resolve(httpRequest.post(url, { email, otp })).then(normalizeActionResponse);
+  },
 };
 
 export default authService;

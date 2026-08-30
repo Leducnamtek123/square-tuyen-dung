@@ -8,11 +8,18 @@ progressive PIT (Thuế TNCN 7 bậc) according to Vietnamese Labor & Tax Laws.
 from decimal import Decimal, ROUND_HALF_UP
 from typing import Dict, Any
 
-# Statutory Insurance Rates (Người lao động đóng)
+# Statutory Insurance Rates (Người lao động đóng - 10.5%)
 BHXH_RATE = Decimal("0.08")     # 8% Bảo hiểm xã hội
 BHYT_RATE = Decimal("0.015")    # 1.5% Bảo hiểm y tế
 BHTN_RATE = Decimal("0.01")     # 1% Bảo hiểm thất nghiệp
 TOTAL_INSURANCE_RATE = BHXH_RATE + BHYT_RATE + BHTN_RATE  # 10.5%
+
+# Employer Contributions (Doanh nghiệp / Người sử dụng lao động đóng - 23.5%)
+EMPLOYER_BHXH_RATE = Decimal("0.175")    # 17.5% BHXH
+EMPLOYER_BHYT_RATE = Decimal("0.03")     # 3% BHYT
+EMPLOYER_BHTN_RATE = Decimal("0.01")     # 1% BHTN
+EMPLOYER_UNION_RATE = Decimal("0.02")    # 2% Kinh phí công đoàn
+TOTAL_EMPLOYER_RATE = EMPLOYER_BHXH_RATE + EMPLOYER_BHYT_RATE + EMPLOYER_BHTN_RATE + EMPLOYER_UNION_RATE  # 23.5%
 
 # Deductions (Mức giảm trừ gia cảnh quy định hiện hành)
 PERSONAL_DEDUCTION = Decimal("11000000")   # 11,000,000 VND / tháng cho bản thân
@@ -62,7 +69,8 @@ def calculate_vietnam_payroll(
     unpaid_leave_days: int = 0,
 ) -> Dict[str, Any]:
     """
-    Tính toán chi tiết bảng lương Gross sang Net chuẩn Việt Nam.
+    Tính toán chi tiết bảng lương Gross sang Net chuẩn Việt Nam, bao gồm cả nghĩa vụ
+    thuế của Người lao động và chi phí bảo hiểm của Người sử dụng lao động.
     """
     gross = Decimal(str(gross_salary))
     allow = Decimal(str(allowance))
@@ -76,7 +84,7 @@ def calculate_vietnam_payroll(
 
     total_income = prorated_salary + allow + bon
 
-    # 2. Tính các khoản bảo hiểm bắt buộc
+    # 2. Tính các khoản bảo hiểm bắt buộc - Người lao động đóng (10.5%)
     salary_for_bhxh = min(prorated_salary, MAX_SALARY_BHXH_BHYT)
     salary_for_bhtn = min(prorated_salary, MAX_SALARY_BHTN)
 
@@ -85,20 +93,27 @@ def calculate_vietnam_payroll(
     bhtn = (salary_for_bhtn * BHTN_RATE).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
     total_insurance = bhxh + bhyt + bhtn
 
-    # 3. Tính giảm trừ gia cảnh
+    # 3. Tính các khoản bảo hiểm bắt buộc - Người sử dụng lao động đóng (23.5%)
+    emp_bhxh = (salary_for_bhxh * EMPLOYER_BHXH_RATE).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    emp_bhyt = (salary_for_bhxh * EMPLOYER_BHYT_RATE).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    emp_bhtn = (salary_for_bhtn * EMPLOYER_BHTN_RATE).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    emp_union = (salary_for_bhxh * EMPLOYER_UNION_RATE).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    total_employer_insurance = emp_bhxh + emp_bhyt + emp_bhtn + emp_union
+
+    # 4. Tính giảm trừ gia cảnh
     dep_count = max(0, int(dependents_count))
     total_family_deductions = PERSONAL_DEDUCTION + (Decimal(dep_count) * DEPENDENT_DEDUCTION)
 
-    # 4. Thu nhập tính thuế (Taxable Income)
-    # Phụ cấp ăn trưa / điện thoại thường được miễn trừ một phần, ở đây giả định tính thuế trên tổng trừ bảo hiểm & gia cảnh
+    # 5. Thu nhập tính thuế (Taxable Income)
     income_before_pit = max(Decimal("0"), total_income - total_insurance)
     taxable_income = max(Decimal("0"), income_before_pit - total_family_deductions)
 
-    # 5. Thuế TNCN
+    # 6. Thuế TNCN
     pit = calculate_pit_vietnam(taxable_income)
 
-    # 6. Lương thực nhận (Net Salary)
+    # 7. Lương thực nhận (Net Salary) & Tổng chi phí Doanh nghiệp
     net_salary = total_income - total_insurance - pit
+    total_company_expense = total_income + total_employer_insurance
 
     return {
         "gross_salary": gross,
@@ -114,6 +129,13 @@ def calculate_vietnam_payroll(
             "bhtn_1_percent": bhtn,
             "total_insurance": total_insurance,
         },
+        "employer_contributions": {
+            "bhxh_17_5_percent": emp_bhxh,
+            "bhyt_3_percent": emp_bhyt,
+            "bhtn_1_percent": emp_bhtn,
+            "union_fee_2_percent": emp_union,
+            "total_employer_insurance": total_employer_insurance,
+        },
         "tax_deductions": {
             "personal_deduction": PERSONAL_DEDUCTION,
             "dependents_count": dep_count,
@@ -123,4 +145,5 @@ def calculate_vietnam_payroll(
             "personal_income_tax": pit,
         },
         "net_salary": net_salary,
+        "total_company_expense": total_company_expense,
     }

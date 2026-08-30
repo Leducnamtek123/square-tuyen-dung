@@ -9,6 +9,7 @@ import secrets
 
 import pytz
 from django.conf import settings
+from django.core.cache import cache
 from django.db import transaction
 
 from shared.configs import variable_system as var_sys
@@ -340,6 +341,59 @@ class EmailVerificationService:
             noti_title,
             [user.id],
         )
+
+        return user, None
+
+    @staticmethod
+    def generate_and_store_otp(user: User) -> str:
+        """Generate 6-digit OTP and store in cache for 15 minutes (900s)."""
+        otp = f"{secrets.randbelow(900000) + 100000}"
+        cache_key = f"email_verify_otp:{user.email.strip().lower()}"
+        cache.set(cache_key, otp, timeout=900)
+        return otp
+
+    @staticmethod
+    def verify_email_otp(email: str, otp_code: str) -> tuple:
+        """
+        Verify email by 6-digit OTP.
+        Returns (user, error_key) — error_key is None on success.
+        """
+        normalized_email = email.strip().lower()
+        user = User.objects.filter(email__iexact=normalized_email).first()
+        if not user:
+            return None, "EMAIL_NOT_REGISTERED"
+
+        if user.is_verify_email and user.is_active:
+            return user, None
+
+        cache_key = f"email_verify_otp:{normalized_email}"
+        stored_otp = cache.get(cache_key)
+
+        if not stored_otp:
+            return user, "OTP_EXPIRED"
+
+        if str(stored_otp).strip() != str(otp_code).strip():
+            return user, "INVALID_OTP"
+
+        # Correct OTP! Activate user
+        with transaction.atomic():
+            user.is_active = True
+            user.is_verify_email = True
+            user.save(update_fields=["is_active", "is_verify_email", "update_at"])
+
+            # Invalidate OTP from cache
+            cache.delete(cache_key)
+
+            # Send welcome notification
+            noti_title = SYSTEM_MESSAGES["WELCOME_JOBSEEKER"]
+            if user.role_name == var_sys.EMPLOYER:
+                noti_title = SYSTEM_MESSAGES["WELCOME_EMPLOYER"]
+
+            helper.add_system_notifications(
+                "Chào mừng bạn!",
+                noti_title,
+                [user.id],
+            )
 
         return user, None
 

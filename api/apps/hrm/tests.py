@@ -1,5 +1,7 @@
 from datetime import date
+from decimal import Decimal
 from django.test import TestCase
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -14,13 +16,17 @@ from apps.profiles.models import (
     Resume,
 )
 from apps.hrm.models import (
+    AttendanceRecord,
     Department,
     Designation,
     Employee,
+    EmployeeLeaveBalance,
     EmploymentContract,
     LeaveRequest,
     LeaveType,
+    MonthlyPayrollRecord,
 )
+from apps.hrm.payroll_engine import calculate_vietnam_payroll, calculate_pit_vietnam
 from apps.hrm.services import CandidateToEmployeeConverter, generate_next_employee_code
 from shared.configs import variable_system as var_sys
 
@@ -341,4 +347,262 @@ class HrmAppTestCase(TestCase):
         client_a.force_authenticate(user=self.owner_a)
         resp = client_a.get('/api/v1/native-hrm/departments/', HTTP_X_ACTIVE_COMPANY_ID=str(self.company_b.id))
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_payroll_engine_vietnam_compliance(self):
+        """Test calculation of Vietnam Gross-to-Net and employer contributions."""
+        # 1. Test Gross 15,000,000 VND, 0 dependents
+        res = calculate_vietnam_payroll(gross_salary=Decimal("15000000"), dependents_count=0)
+        self.assertEqual(res['gross_salary'], Decimal("15000000"))
+        # Employee insurance: 8% + 1.5% + 1% = 10.5% = 1,575,000
+        self.assertEqual(res['insurance_deductions']['total_insurance'], Decimal("1575000"))
+        # Employer insurance: 17.5% + 3% + 1% + 2% = 23.5% = 3,525,000
+        self.assertEqual(res['employer_contributions']['total_employer_insurance'], Decimal("3525000"))
+        # Taxable income = 15,000,000 - 1,575,000 - 11,000,000 = 2,425,000
+        # Tax: Bracket 1 (5% of 2,425,000) = 121,250
+        self.assertEqual(res['tax_deductions']['personal_income_tax'], Decimal("121250"))
+        # Net salary: 15,000,000 - 1,575,000 - 121,250 = 13,303,750
+        self.assertEqual(res['net_salary'], Decimal("13303750"))
+        # Total company cost: 15,000,000 + 3,525,000 = 18,525,000
+        self.assertEqual(res['total_company_expense'], Decimal("18525000"))
+
+    def test_leave_balance_auto_allocation_and_seniority(self):
+        """Test auto allocation of annual leaves including seniority bonus calculation."""
+        # Employee joined 11 years ago -> 11 // 5 = 2 extra days
+        emp = Employee.objects.create(
+            company=self.company_a,
+            employee_code='SQ-EMP-SENIOR',
+            first_name='Văn',
+            last_name='Trần',
+            full_name='Trần Văn',
+            email='tran.van@company-a.vn',
+            join_date=date(2015, 1, 1),
+            status='ACTIVE',
+        )
+
+        resp = self.client_a.post('/api/v1/native-hrm/leave-balances/auto-allocate/', {'year': 2026})
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        balance = EmployeeLeaveBalance.objects.get(employee=emp, year=2026)
+        self.assertEqual(balance.allocated_days, Decimal("12.0"))
+        self.assertEqual(balance.seniority_bonus_days, Decimal("2.0"))
+        self.assertEqual(balance.total_allowed_days, 14.0)
+        self.assertEqual(balance.remaining_days, 14.0)
+
+    def test_leave_request_approval_updates_balance(self):
+        """Test submitting leave increments pending_days, approving decrements pending and increments used."""
+        emp = Employee.objects.create(
+            company=self.company_a,
+            employee_code='SQ-EMP-LEAVE',
+            first_name='Hoa',
+            last_name='Lê',
+            full_name='Lê Hoa',
+            email='le.hoa@company-a.vn',
+            status='ACTIVE',
+        )
+        leave_type = LeaveType.objects.create(
+            company=self.company_a,
+            name='Nghỉ phép năm',
+            code='ANNUAL',
+            days_per_year=12,
+            is_paid=True,
+        )
+        balance = EmployeeLeaveBalance.objects.create(
+            employee=emp,
+            leave_type=leave_type,
+            year=2026,
+            allocated_days=Decimal("12.0"),
+            seniority_bonus_days=Decimal("0.0"),
+        )
+
+        # 1. Create Leave Request for 2 days
+        create_resp = self.client_a.post('/api/v1/native-hrm/leave-requests/', {
+            'employee': emp.id,
+            'leave_type': leave_type.id,
+            'start_date': '2026-06-10',
+            'end_date': '2026-06-11',
+            'total_days': 2.0,
+            'reason': 'Du lịch nghỉ dưỡng',
+        })
+        self.assertEqual(create_resp.status_code, status.HTTP_201_CREATED)
+        leave_req_id = create_resp.data['id']
+
+        balance.refresh_from_db()
+        self.assertEqual(balance.pending_days, Decimal("2.0"))
+        self.assertEqual(balance.remaining_days, 10.0)
+
+        # 2. Approve Leave Request
+        approve_resp = self.client_a.patch(f'/api/v1/native-hrm/leave-requests/{leave_req_id}/approve/')
+        self.assertEqual(approve_resp.status_code, status.HTTP_200_OK)
+
+        balance.refresh_from_db()
+        self.assertEqual(balance.pending_days, Decimal("0.0"))
+        self.assertEqual(balance.used_days, Decimal("2.0"))
+        self.assertEqual(balance.remaining_days, 10.0)
+
+    def test_monthly_timesheet_and_quick_checkin(self):
+        """Test quick check-in and timesheet matrix calculation."""
+        emp = Employee.objects.create(
+            company=self.company_a,
+            employee_code='SQ-EMP-ATT',
+            first_name='Minh',
+            last_name='Phạm',
+            full_name='Phạm Minh',
+            email='pham.minh@company-a.vn',
+            status='ACTIVE',
+        )
+
+        # Quick check-in
+        checkin_resp = self.client_a.post('/api/v1/native-hrm/attendances/quick-checkin/', {
+            'employee_id': emp.id,
+            'date': '2026-08-15',
+            'status': 'PRESENT',
+            'check_in': '08:30:00',
+            'check_out': '17:30:00',
+            'working_hours': 8.0,
+        })
+        self.assertEqual(checkin_resp.status_code, status.HTTP_201_CREATED)
+
+        # Retrieve timesheet
+        timesheet_resp = self.client_a.get('/api/v1/native-hrm/attendances/timesheet/?month=8&year=2026')
+        self.assertEqual(timesheet_resp.status_code, status.HTTP_200_OK)
+        data = timesheet_resp.data
+        self.assertEqual(data['month'], 8)
+        self.assertEqual(data['year'], 2026)
+        self.assertEqual(data['total_days'], 31)
+        self.assertTrue(len(data['employees']) >= 1)
+
+        emp_entry = next((e for e in data['employees'] if e['employee_id'] == emp.id), None)
+        self.assertIsNotNone(emp_entry)
+        self.assertEqual(emp_entry['records'][15]['status'], 'PRESENT')
+        self.assertEqual(emp_entry['stats']['total_present'], 1)
+
+    def test_monthly_payroll_calculation_and_workflow(self):
+        """Test monthly payroll calculate, KPI summary, approve all, and mark paid all."""
+        emp = Employee.objects.create(
+            company=self.company_a,
+            employee_code='SQ-EMP-PAY',
+            first_name='Tuấn',
+            last_name='Đỗ',
+            full_name='Đỗ Tuấn',
+            email='do.tuan@company-a.vn',
+            status='ACTIVE',
+        )
+        EmploymentContract.objects.create(
+            employee=emp,
+            contract_number='HD-2026-TUAN',
+            contract_type='FIXED_TERM',
+            start_date=date(2026, 1, 1),
+            base_salary=Decimal("20000000"),
+            allowance=Decimal("2000000"),
+            status='ACTIVE',
+        )
+
+        # 1. Calculate Payroll
+        calc_resp = self.client_a.post('/api/v1/native-hrm/payroll/calculate/', {
+            'month': 8,
+            'year': 2026,
+            'standard_working_days': 22,
+        })
+        self.assertEqual(calc_resp.status_code, status.HTTP_200_OK)
+        payroll = MonthlyPayrollRecord.objects.get(employee=emp, month=8, year=2026)
+        self.assertEqual(payroll.status, 'DRAFT')
+        self.assertTrue(payroll.net_salary > 0)
+        self.assertTrue(payroll.total_company_expense > payroll.gross_salary)
+
+        # 2. Get KPIs
+        kpi_resp = self.client_a.get('/api/v1/native-hrm/payroll/summary-kpis/?month=8&year=2026')
+        self.assertEqual(kpi_resp.status_code, status.HTTP_200_OK)
+        self.assertTrue(kpi_resp.data['total_employees'] >= 1)
+        self.assertEqual(kpi_resp.data['draft_count'], 1)
+
+        # 3. Approve All
+        approve_resp = self.client_a.post('/api/v1/native-hrm/payroll/approve-all/', {'month': 8, 'year': 2026})
+        self.assertEqual(approve_resp.status_code, status.HTTP_200_OK)
+        payroll.refresh_from_db()
+        self.assertEqual(payroll.status, 'APPROVED')
+
+        # 4. Mark Paid All
+        paid_resp = self.client_a.post('/api/v1/native-hrm/payroll/mark-paid-all/', {'month': 8, 'year': 2026})
+        self.assertEqual(paid_resp.status_code, status.HTTP_200_OK)
+        payroll.refresh_from_db()
+        self.assertEqual(payroll.status, 'PAID')
+        self.assertIsNotNone(payroll.payment_date)
+
+    def test_contract_renewal_workflow(self):
+        """Test renewing contract sets previous to EXPIRED and upgrades PROBATION employee to ACTIVE."""
+        emp = Employee.objects.create(
+            company=self.company_a,
+            employee_code='SQ-EMP-PROB',
+            first_name='Bình',
+            last_name='Vũ',
+            full_name='Vũ Bình',
+            email='vu.binh@company-a.vn',
+            status='PROBATION',
+        )
+        old_contract = EmploymentContract.objects.create(
+            employee=emp,
+            contract_number='HD-PROB-001',
+            contract_type='PROBATION',
+            start_date=date(2026, 6, 1),
+            end_date=date(2026, 8, 1),
+            base_salary=Decimal("12000000"),
+            status='ACTIVE',
+        )
+
+        renew_resp = self.client_a.post(f'/api/v1/native-hrm/contracts/{old_contract.id}/renew/', {
+            'contract_number': 'HD-OFFICIAL-001',
+            'contract_type': 'FIXED_TERM',
+            'start_date': '2026-08-02',
+            'end_date': '2027-08-02',
+            'base_salary': 18000000,
+            'allowance': 1500000,
+        })
+        self.assertEqual(renew_resp.status_code, status.HTTP_201_CREATED)
+
+        old_contract.refresh_from_db()
+        self.assertEqual(old_contract.status, 'EXPIRED')
+
+        emp.refresh_from_db()
+        self.assertEqual(emp.status, 'ACTIVE')
+
+        new_contract = EmploymentContract.objects.get(contract_number='HD-OFFICIAL-001')
+        self.assertEqual(new_contract.employee, emp)
+        self.assertEqual(new_contract.status, 'ACTIVE')
+        self.assertEqual(new_contract.base_salary, Decimal("18000000"))
+
+    def test_employee_self_service_me_endpoint(self):
+        """Employee accessing /api/v1/native-hrm/me/ retrieves personal profile and records."""
+        emp_user = User.objects.create_user(
+            'self.service@jobseeker.vn',
+            'Nguyễn Tự Phục Vụ',
+            password='Password123!',
+            role=var_sys.JOB_SEEKER,
+        )
+        emp = Employee.objects.create(
+            company=self.company_a,
+            user=emp_user,
+            employee_code='SQ-EMP-SELF',
+            first_name='Tự Phục Vụ',
+            last_name='Nguyễn',
+            full_name='Nguyễn Tự Phục Vụ',
+            email='self.service@jobseeker.vn',
+            status='ACTIVE',
+        )
+        contract = EmploymentContract.objects.create(
+            employee=emp,
+            contract_number='HD-SELF-001',
+            contract_type='INDEFINITE',
+            start_date=date(2026, 1, 1),
+            base_salary=Decimal("25000000"),
+            status='ACTIVE',
+        )
+
+        emp_client = APIClient()
+        emp_client.force_authenticate(user=emp_user)
+
+        resp = emp_client.get('/api/v1/native-hrm/me/')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data['employee']['employee_code'], 'SQ-EMP-SELF')
+        self.assertEqual(resp.data['active_contract']['contract_number'], 'HD-SELF-001')
+
 

@@ -184,7 +184,7 @@ const JobSeekerSignUpView = ({
                   }}
                 >
                   Bằng việc đăng ký, tôi đồng ý với các{' '}
-                  <StyledLink href="/terms-and-conditions" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
+                  <StyledLink href="/terms-of-service" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
                     Điều khoản sử dụng
                   </StyledLink>{' '}
                   và{' '}

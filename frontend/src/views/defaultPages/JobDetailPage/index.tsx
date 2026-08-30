@@ -2,7 +2,7 @@ import React from "react";
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@mui/material";
 import type { JobPost } from "@/types/models";
 import type { AxiosError } from "axios";
 import type { ApiError } from "@/types/api";
@@ -283,14 +283,28 @@ const JobDetailPage = () => {
 
       {!state.isLoading && state.jobPostDetail && canApply && (
         <div
-          className="job-detail-sticky-bar fixed inset-x-0 bottom-0 z-50 block border-t border-border bg-background/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md md:hidden"
+          className="job-detail-sticky-bar fixed inset-x-0 bottom-0 z-50 block border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md md:hidden"
           data-sticky-bottom="true"
         >
           <Button
-            className="w-full bg-primary text-white hover:bg-primary/90"
-            size="lg"
+            fullWidth
+            variant="contained"
+            size="large"
             disabled={state.jobPostDetail?.isApplied}
             onClick={handleMobileApplyClick}
+            sx={{
+              bgcolor: '#2563eb',
+              color: '#ffffff',
+              fontWeight: 700,
+              borderRadius: '10px',
+              py: 1.25,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.28)',
+              '&:hover': {
+                bgcolor: '#1d4ed8',
+              },
+            }}
           >
             {state.jobPostDetail?.isApplied
               ? t("jobDetail.actions.applied")

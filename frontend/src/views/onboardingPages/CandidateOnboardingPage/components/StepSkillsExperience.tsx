@@ -233,7 +233,7 @@ export default function StepSkillsExperience({
           </Typography>
           <FormControl fullWidth>
             <Select
-              value={values.experience || 1}
+              value={values.experience || ''}
               onChange={(e) => onChange('experience', Number(e.target.value))}
               sx={{
                 borderRadius: 2.5,
@@ -242,16 +242,7 @@ export default function StepSkillsExperience({
                 '&.Mui-focused': { backgroundColor: '#FFFFFF' },
               }}
             >
-              {(experienceOptions?.length ? experienceOptions : [
-                { id: 1, name: 'Chưa có kinh nghiệm' },
-                { id: 2, name: 'Dưới 1 năm' },
-                { id: 3, name: '1 năm' },
-                { id: 4, name: '2 năm' },
-                { id: 5, name: '3 năm' },
-                { id: 6, name: '4 năm' },
-                { id: 7, name: '5 năm' },
-                { id: 8, name: 'Trên 5 năm' },
-              ]).map((exp) => (
+              {(experienceOptions || []).map((exp) => (
                 <MenuItem key={String(exp.id)} value={Number(exp.id)}>
                   {exp.name}
                 </MenuItem>
@@ -267,7 +258,7 @@ export default function StepSkillsExperience({
           </Typography>
           <FormControl fullWidth>
             <Select
-              value={values.academicLevel || 3}
+              value={values.academicLevel || ''}
               onChange={(e) => onChange('academicLevel', Number(e.target.value))}
               sx={{
                 borderRadius: 2.5,
@@ -276,14 +267,7 @@ export default function StepSkillsExperience({
                 '&.Mui-focused': { backgroundColor: '#FFFFFF' },
               }}
             >
-              {(academicLevelOptions?.length ? academicLevelOptions : [
-                { id: 1, name: 'Sau đại học' },
-                { id: 2, name: 'Đại học' },
-                { id: 3, name: 'Cao đẳng' },
-                { id: 4, name: 'Trung cấp / Nghề' },
-                { id: 5, name: 'Trung học phổ thông' },
-                { id: 6, name: 'Chứng chỉ nghề' },
-              ]).map((ac) => (
+              {(academicLevelOptions || []).map((ac) => (
                 <MenuItem key={String(ac.id)} value={Number(ac.id)}>
                   {ac.name}
                 </MenuItem>

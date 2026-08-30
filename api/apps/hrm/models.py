@@ -165,6 +165,34 @@ class LeaveRequest(CommonBaseModel):
         return f"{self.employee.full_name} - {self.leave_type} ({self.start_date} -> {self.end_date})"
 
 
+class EmployeeLeaveBalance(CommonBaseModel):
+    """Theo dõi quỹ phép và số ngày phép còn lại hàng năm của nhân sự."""
+
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="leave_balances")
+    leave_type = models.ForeignKey(LeaveType, on_delete=models.CASCADE, related_name="employee_balances")
+    year = models.PositiveIntegerField(verbose_name="Năm")
+    allocated_days = models.DecimalField(max_digits=5, decimal_places=1, default=12.0, verbose_name="Phép tiêu chuẩn")
+    seniority_bonus_days = models.DecimalField(max_digits=5, decimal_places=1, default=0.0, verbose_name="Phép thâm niên")
+    carried_over_days = models.DecimalField(max_digits=5, decimal_places=1, default=0.0, verbose_name="Phép tồn năm trước")
+    used_days = models.DecimalField(max_digits=5, decimal_places=1, default=0.0, verbose_name="Đã sử dụng")
+    pending_days = models.DecimalField(max_digits=5, decimal_places=1, default=0.0, verbose_name="Đang chờ duyệt")
+
+    class Meta:
+        unique_together = ('employee', 'leave_type', 'year')
+        ordering = ['-year', 'employee']
+
+    @property
+    def total_allowed_days(self) -> float:
+        return float(self.allocated_days + self.seniority_bonus_days + self.carried_over_days)
+
+    @property
+    def remaining_days(self) -> float:
+        return max(0.0, float(self.total_allowed_days - float(self.used_days) - float(self.pending_days)))
+
+    def __str__(self):
+        return f"{self.employee.full_name} - {self.leave_type.name} ({self.year}): Còn {self.remaining_days} ngày"
+
+
 class AttendanceRecord(CommonBaseModel):
     STATUS_CHOICES = (
         ('PRESENT', 'Có mặt'),
@@ -199,7 +227,7 @@ class MonthlyPayrollRecord(CommonBaseModel):
         (STATUS_PAID, 'Đã chi trả'),
     )
 
-    company = models.ForeignKey('info.Company', on_delete=models.CASCADE, related_name="payroll_records")
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="payroll_records")
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="payroll_records")
     month = models.PositiveSmallIntegerField(verbose_name="Tháng")
     year = models.PositiveIntegerField(verbose_name="Năm")
@@ -211,18 +239,29 @@ class MonthlyPayrollRecord(CommonBaseModel):
     working_days_actual = models.PositiveSmallIntegerField(default=22, verbose_name="Ngày công thực tế")
     standard_working_days = models.PositiveSmallIntegerField(default=22, verbose_name="Ngày công chuẩn")
     unpaid_leave_days = models.PositiveSmallIntegerField(default=0, verbose_name="Ngày nghỉ không lương")
+    dependents_count = models.PositiveSmallIntegerField(default=0, verbose_name="Số người phụ thuộc")
 
     total_income = models.DecimalField(max_digits=12, decimal_places=0, verbose_name="Tổng thu nhập")
 
+    # Người lao động đóng (10.5%)
     bhxh_amount = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="BHXH (8%)")
     bhyt_amount = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="BHYT (1.5%)")
     bhtn_amount = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="BHTN (1%)")
-    total_insurance = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Tổng bảo hiểm")
+    total_insurance = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Tổng BH NLĐ")
+
+    # Người sử dụng lao động đóng (23.5%)
+    employer_bhxh = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="BHXH NSDLĐ (17.5%)")
+    employer_bhyt = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="BHYT NSDLĐ (3%)")
+    employer_bhtn = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="BHTN NSDLĐ (1%)")
+    employer_union_fee = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Kinh phí Công đoàn (2%)")
+    total_employer_insurance = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Tổng BH NSDLĐ")
 
     taxable_income = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Thu nhập tính thuế")
     personal_income_tax = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Thuế TNCN")
 
     net_salary = models.DecimalField(max_digits=12, decimal_places=0, verbose_name="Lương thực nhận (Net)")
+    total_company_expense = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Tổng chi phí Doanh nghiệp")
+
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_DRAFT, db_index=True)
     payment_date = models.DateField(null=True, blank=True, verbose_name="Ngày thanh toán")
     note = models.TextField(blank=True, default="", verbose_name="Ghi chú")
