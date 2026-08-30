@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Box, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import {
   collection,
   onSnapshot,
@@ -25,8 +25,11 @@ import db from '../../../../configs/firebase-config';
 import { RootState } from '../../../../redux/store';
 import { useChatContext } from '../../../../context/ChatProvider';
 import commonService from '../../../../services/commonService';
+import { getUserAccount } from '../../../../services/firebaseService';
 import { ChatWindowComposer } from './ChatWindowComposer';
 import { ChatWindowMessagePanel, type ChatWindowMessage } from './ChatWindowMessagePanel';
+import { ChatPartnerHeader } from './ChatPartnerHeader';
+import type { UserAccount } from '../LeftSidebar/useChatRooms';
 
 interface ChatRoom {
   id: string;
@@ -41,6 +44,7 @@ type ChatWindowState = {
   inputValue: string;
   selectedRoom: ChatRoom | null;
   partnerId: string | null;
+  partnerAccount: UserAccount | null;
   isLoading: boolean;
   hasMore: boolean;
   lastDocument: QueryDocumentSnapshot<DocumentData> | null;
@@ -55,6 +59,7 @@ type ChatWindowAction =
   | { type: 'set-input-value'; value: string }
   | { type: 'set-selected-room'; value: ChatRoom | null }
   | { type: 'set-partner-id'; value: string | null }
+  | { type: 'set-partner-account'; value: UserAccount | null }
   | { type: 'set-loading'; value: boolean }
   | { type: 'set-has-more'; value: boolean }
   | { type: 'set-last-document'; value: QueryDocumentSnapshot<DocumentData> | null }
@@ -72,6 +77,7 @@ const initialState: ChatWindowState = {
   inputValue: '',
   selectedRoom: null,
   partnerId: null,
+  partnerAccount: null,
   isLoading: true,
   hasMore: true,
   lastDocument: null,
@@ -90,6 +96,8 @@ const reducer = (state: ChatWindowState, action: ChatWindowAction): ChatWindowSt
       return { ...state, selectedRoom: action.value };
     case 'set-partner-id':
       return { ...state, partnerId: action.value };
+    case 'set-partner-account':
+      return { ...state, partnerAccount: action.value };
     case 'set-loading':
       return { ...state, isLoading: action.value };
     case 'set-has-more':
@@ -113,10 +121,21 @@ const reducer = (state: ChatWindowState, action: ChatWindowAction): ChatWindowSt
   }
 };
 
-const ChatWindow = () => {
+interface ChatWindowProps {
+  onToggleLeftDrawer?: () => void;
+  onToggleRightDrawer?: () => void;
+  onBackToList?: () => void;
+  isMobile?: boolean;
+}
+
+const ChatWindow = ({
+  onToggleRightDrawer,
+  onBackToList,
+  isMobile,
+}: ChatWindowProps) => {
   const { t } = useTranslation('chat');
   const { currentUser } = useSelector((state: RootState) => state.user);
-  const { currentUserChat, selectedRoomId } = useChatContext();
+  const { currentUserChat, selectedRoomId, setSelectedRoomId } = useChatContext();
 
   const inputRef = React.useRef<HTMLInputElement>(null);
   const messageListRef = React.useRef<HTMLDivElement>(null);
@@ -146,16 +165,25 @@ const ChatWindow = () => {
   }, [selectedRoomId, currentUserChat]);
 
   React.useEffect(() => {
-    if (!selectedRoomId) return;
+    if (!selectedRoomId) {
+      dispatch({ type: 'set-selected-room', value: null });
+      dispatch({ type: 'set-partner-id', value: null });
+      dispatch({ type: 'set-partner-account', value: null });
+      return;
+    }
 
     const chatRoomRef = doc(db, 'chatRooms', selectedRoomId);
-    const unsubscribeChatRoom = onSnapshot(chatRoomRef, (snapshot) => {
+    const unsubscribeChatRoom = onSnapshot(chatRoomRef, async (snapshot) => {
       if (snapshot.exists()) {
         const roomData = { id: snapshot.id, ...snapshot.data() } as ChatRoom;
         dispatch({ type: 'set-selected-room', value: roomData });
         if (currentUserChat) {
-          const partner = roomData.members.find((member) => member !== `${currentUserChat.userId}`);
-          dispatch({ type: 'set-partner-id', value: partner || null });
+          const partner = roomData.members.find((member) => String(member) !== String(currentUserChat.userId));
+          dispatch({ type: 'set-partner-id', value: partner ? String(partner) : null });
+          if (partner) {
+            const partnerAcc = await getUserAccount('accounts', String(partner));
+            dispatch({ type: 'set-partner-account', value: partnerAcc as UserAccount | null });
+          }
         }
       }
     });
@@ -213,8 +241,8 @@ const ChatWindow = () => {
         is_deleted: false,
         is_read: false,
         image: currentUser?.avatarUrl || '',
-        title: 'Tin nhan moi',
-        content: `${currentUser?.fullName || 'Ai do'} gui mot tin nhan.`,
+        title: 'Tin nhắn mới',
+        content: `${currentUser?.fullName || 'Ai đó'} đã gửi một tin nhắn.`,
         time: serverTimestamp(),
         type: 'NEW_MESSAGE',
         NEW_MESSAGE: {
@@ -227,7 +255,7 @@ const ChatWindow = () => {
     }
   };
 
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!state.inputValue.trim() || !selectedRoomId || !currentUserChat) return;
 
@@ -278,7 +306,7 @@ const ChatWindow = () => {
       const messageData = {
         chatRoomId: selectedRoomId,
         senderId: `${currentUserChat.userId}`,
-        text: isImage ? 'Da gui mot hinh anh' : `Da gui file: ${fileName}`,
+        text: isImage ? 'Đã gửi một hình ảnh' : `Đã gửi tệp: ${fileName}`,
         createdAt: serverTimestamp(),
         attachmentUrl: downloadURL,
         attachmentType,
@@ -334,6 +362,22 @@ const ChatWindow = () => {
     }
   }, [state.messages]);
 
+  const safePartnerAvatarUrl =
+    state.partnerAccount?.avatarUrl &&
+    state.partnerAccount.avatarUrl.trim() &&
+    state.partnerAccount.avatarUrl !== 'null' &&
+    state.partnerAccount.avatarUrl !== '[object Object]'
+      ? state.partnerAccount.avatarUrl
+      : undefined;
+
+  const safeMyAvatarUrl =
+    currentUserChat?.avatarUrl &&
+    currentUserChat.avatarUrl.trim() &&
+    currentUserChat.avatarUrl !== 'null' &&
+    currentUserChat.avatarUrl !== '[object Object]'
+      ? currentUserChat.avatarUrl
+      : undefined;
+
   return (
     <Stack
       sx={{
@@ -342,20 +386,31 @@ const ChatWindow = () => {
         backgroundImage: 'linear-gradient(180deg, rgba(248, 250, 252, 0.96) 0%, rgba(255, 255, 255, 1) 100%)',
       }}
     >
+      {currentUserChat && selectedRoomId && (
+        <ChatPartnerHeader
+          partner={state.partnerAccount}
+          isMobile={isMobile}
+          onBack={onBackToList || (() => setSelectedRoomId(''))}
+          onToggleRightDrawer={onToggleRightDrawer}
+        />
+      )}
+
       <ChatWindowMessagePanel
         showEmptyState={!currentUserChat || !selectedRoomId}
         isLoading={state.isLoading}
         hasMore={state.hasMore}
         messages={state.messages}
+        partnerAvatarUrl={safePartnerAvatarUrl}
+        myAvatarUrl={safeMyAvatarUrl}
         onLoadMore={handleLoadMore}
         messageListRef={messageListRef}
-        noConversationSelectedText={t('noConversationSelected')}
-          chooseConversationText={t(
-            'auto.index_chn_mt_cuc_hi_thoi_danh_sch_bn_5d32',
-            'Chon mot cuoc hoi thoai o danh sach ben trai de bat dau nhan tin',
-          )}
-          loadPreviousMessagesText={t('loadPreviousMessages')}
-        />
+        noConversationSelectedText={t('noConversationSelected', 'Chưa có cuộc hội thoại nào được chọn')}
+        chooseConversationText={t(
+          'chooseConversationHint',
+          'Chọn một cuộc hội thoại ở danh sách bên trái hoặc việc làm bên phải để bắt đầu trò chuyện.',
+        )}
+        loadPreviousMessagesText={t('loadPreviousMessages', 'Xem các tin nhắn trước')}
+      />
 
       {currentUserChat && selectedRoomId && (
         <ChatWindowComposer
@@ -372,7 +427,7 @@ const ChatWindow = () => {
           onEmojiClose={handleEmojiClose}
           onEmojiSelect={onEmojiSelect}
           onInputChange={(value) => dispatch({ type: 'set-input-value', value })}
-          placeholderText={t('typeAMessage')}
+          placeholderText={t('typeAMessage', 'Nhập tin nhắn...')}
         />
       )}
     </Stack>
@@ -380,3 +435,4 @@ const ChatWindow = () => {
 };
 
 export default ChatWindow;
+

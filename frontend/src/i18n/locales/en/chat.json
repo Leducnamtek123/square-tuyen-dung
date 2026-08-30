@@ -52,5 +52,16 @@
     "index_chn_mt_cuc_hi_thoi_danh_sch_bn_5d32": "Choose a conversation from the list on the left to start messaging"
   },
   "slogan": "New way to follow your chance.",
-  "sloganSub": "More engage, more success"
+  "sloganSub": "More engage, more success",
+  "noSearchResults": "No matching conversations found",
+  "tryDifferentKeyword": "Try searching with a different keyword or name",
+  "startChatFromRight": "Select a job or candidate from the right to start messaging",
+  "conversationPartner": "Contact person",
+  "activeNow": "Active now",
+  "employerBadge": "Employer",
+  "candidateBadge": "Candidate",
+  "viewDetails": "View related details",
+  "backToList": "Back to list",
+  "chooseConversationHint": "Choose a conversation from the left or a job posting from the right to start chatting.",
+  "clickToDownload": "Click to download"
 }

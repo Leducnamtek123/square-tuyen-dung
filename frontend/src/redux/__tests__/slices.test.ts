@@ -21,7 +21,7 @@ import filterReducer, {
 } from '../filterSlice';
 import profileReducer, { reloadResume } from '../profileSlice';
 import type { RootState } from '../store';
-import type { User } from '../types/models';
+import type { User } from '../../types/models';
 
 // ─── userSlice tests ────────────────────────────────────────────
 describe('userSlice', () => {

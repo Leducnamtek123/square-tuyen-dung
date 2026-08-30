@@ -24,7 +24,7 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ data, language = 'v
       style={{ fontFamily }}
     >
       {/* Header: Centered Corporate Header with Horizontal Divider */}
-      <div className="text-center pb-3 border-b-2 flex flex-col items-center gap-2" style={{ borderColor: primaryColor }}>
+      <div className="text-center pb-3 border-b-2 flex flex-col items-center gap-2 cv-section break-inside-avoid" style={{ borderColor: primaryColor }}>
         {theme.showAvatar && (
           <AvatarRenderer
             avatarUrl={personalInfo.avatarUrl}
@@ -87,7 +87,7 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ data, language = 'v
 
       {/* Summary */}
       {personalInfo.bio && (
-        <div>
+        <div className="cv-section break-inside-avoid">
           <div
             className="text-[12px] font-black uppercase tracking-wider mb-1 pb-0.5 border-b"
             style={{ color: primaryColor, borderColor: '#cbd5e1' }}
@@ -102,7 +102,7 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ data, language = 'v
 
       {/* Experience */}
       {experiences && experiences.length > 0 && (
-        <div>
+        <div className="cv-section">
           <div
             className="text-[12px] font-black uppercase tracking-wider mb-2 pb-0.5 border-b"
             style={{ color: primaryColor, borderColor: '#cbd5e1' }}
@@ -111,7 +111,7 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ data, language = 'v
           </div>
           <div className={itemGapClass}>
             {experiences.map((exp) => (
-              <div key={exp.id}>
+              <div key={exp.id} className="break-inside-avoid cv-item">
                 <div className="flex justify-between items-baseline">
                   <span className="font-extrabold text-[12.5px] text-slate-900">
                     {exp.company}
@@ -140,7 +140,7 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ data, language = 'v
 
       {/* Education */}
       {educations && educations.length > 0 && (
-        <div>
+        <div className="cv-section">
           <div
             className="text-[12px] font-black uppercase tracking-wider mb-2 pb-0.5 border-b"
             style={{ color: primaryColor, borderColor: '#cbd5e1' }}
@@ -149,7 +149,7 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ data, language = 'v
           </div>
           <div className="space-y-1.5">
             {educations.map((edu) => (
-              <div key={edu.id} className="flex justify-between items-baseline">
+              <div key={edu.id} className="flex justify-between items-baseline break-inside-avoid cv-item">
                 <div>
                   <span className="font-bold text-[12px] text-slate-900">{edu.school}</span>
                   <span className="text-slate-600 text-[11.5px]"> — {edu.major}</span>
@@ -163,7 +163,7 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ data, language = 'v
       )}
 
       {/* Skills & Certifications: Compact 2 Column Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 cv-section break-inside-avoid">
         {/* Skills */}
         {skills && skills.length > 0 && (
           <div>
@@ -209,7 +209,7 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ data, language = 'v
 
       {/* Projects (if available) */}
       {projects && projects.length > 0 && (
-        <div>
+        <div className="cv-section">
           <div
             className="text-[12px] font-black uppercase tracking-wider mb-1.5 pb-0.5 border-b"
             style={{ color: primaryColor, borderColor: '#cbd5e1' }}
@@ -218,7 +218,7 @@ export const CorporateTemplate: React.FC<TemplateProps> = ({ data, language = 'v
           </div>
           <div className="space-y-1.5">
             {projects.map((p) => (
-              <div key={p.id} className="text-[11.5px] text-slate-700">
+              <div key={p.id} className="text-[11.5px] text-slate-700 break-inside-avoid cv-item">
                 <span className="font-bold text-slate-900">{p.name}</span>
                 {p.role && <span className="text-slate-600"> ({p.role})</span>}
                 {p.description && <span className="text-slate-600">: {p.description}</span>}

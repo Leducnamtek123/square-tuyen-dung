@@ -3,7 +3,7 @@
 import React from 'react';
 import {
   Box,
-  Grid,
+  Grid2 as Grid,
   Typography,
   TextField,
   FormControl,
@@ -82,7 +82,7 @@ export default function StepCareerGoals({
 
       <Grid container spacing={3}>
         {/* Field 1: Desired Job Title */}
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('onboarding.step1.desiredJobTitle', 'Bạn đang tìm công việc gì?')} <Box component="span" sx={{ color: '#EF4444' }}>*</Box>
           </Typography>
@@ -93,8 +93,10 @@ export default function StepCareerGoals({
             onChange={(e) => onChange('desiredJobTitle', e.target.value)}
             error={Boolean(errors.desiredJobTitle)}
             helperText={errors.desiredJobTitle || t('onboarding.step1.desiredJobTitleHelper', 'Nhập tên vị trí chức danh bạn mong muốn ứng tuyển')}
-            FormHelperTextProps={{
-              sx: { color: errors.desiredJobTitle ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+            slotProps={{
+              formHelperText: {
+                sx: { color: errors.desiredJobTitle ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+              },
             }}
             sx={{
               '& .MuiOutlinedInput-root': {
@@ -108,7 +110,7 @@ export default function StepCareerGoals({
         </Grid>
 
         {/* Field 2: Primary Industry / Career */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('onboarding.step1.career', 'Ngành nghề chính')} <Box component="span" sx={{ color: '#EF4444' }}>*</Box>
           </Typography>
@@ -124,8 +126,10 @@ export default function StepCareerGoals({
                 placeholder={t('onboarding.step1.careerPlaceholder', 'Chọn ngành nghề chuyên môn...')}
                 error={Boolean(errors.careerId)}
                 helperText={errors.careerId || t('onboarding.step1.careerHelper', 'Lĩnh vực ngành nghề phù hợp chuyên môn của bạn')}
-                FormHelperTextProps={{
-                  sx: { color: errors.careerId ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+                slotProps={{
+                  formHelperText: {
+                    sx: { color: errors.careerId ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+                  },
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
@@ -141,7 +145,7 @@ export default function StepCareerGoals({
         </Grid>
 
         {/* Field 3: Working Location / City */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('onboarding.step1.city', 'Bạn muốn làm việc ở đâu?')} <Box component="span" sx={{ color: '#EF4444' }}>*</Box>
           </Typography>
@@ -157,8 +161,10 @@ export default function StepCareerGoals({
                 placeholder={t('onboarding.step1.cityPlaceholder', 'Chọn Tỉnh / Thành phố...')}
                 error={Boolean(errors.cityId)}
                 helperText={errors.cityId || t('onboarding.step1.cityHelper', 'Địa điểm bạn ưu tiên làm việc')}
-                FormHelperTextProps={{
-                  sx: { color: errors.cityId ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+                slotProps={{
+                  formHelperText: {
+                    sx: { color: errors.cityId ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+                  },
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
@@ -174,7 +180,7 @@ export default function StepCareerGoals({
         </Grid>
 
         {/* Field 4: Workplace Type Pills */}
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 1 }}>
             {t('onboarding.step1.workplaceType', 'Hình thức làm việc ưu tiên')}
           </Typography>
@@ -182,7 +188,7 @@ export default function StepCareerGoals({
             {workplaceOptions.map((opt) => {
               const isSelected = Number(values.typeOfWorkplace) === opt.value;
               return (
-                <Grid item xs={12} sm={4} key={opt.value}>
+                <Grid size={{ xs: 12, sm: 4 }} key={opt.value}>
                   <ButtonBase
                     onClick={() => onChange('typeOfWorkplace', opt.value)}
                     sx={{

@@ -5,7 +5,7 @@ import {
   Box,
   Typography,
   Card,
-  Grid,
+  Grid2 as Grid,
   Stack,
   Button,
   Avatar,
@@ -126,7 +126,7 @@ export default function StepEmployerComplete({
         <Divider sx={{ mb: 2 }} />
 
         <Grid container spacing={2.5}>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <PersonOutlineIcon fontSize="small" sx={{ color: '#64748B' }} />
               <Box>
@@ -140,7 +140,7 @@ export default function StepEmployerComplete({
             </Stack>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <LocationOnOutlinedIcon fontSize="small" sx={{ color: '#64748B' }} />
               <Box>
@@ -154,7 +154,7 @@ export default function StepEmployerComplete({
             </Stack>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <VerifiedUserOutlinedIcon
                 fontSize="small"

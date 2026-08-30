@@ -34,6 +34,22 @@ export const PublicCVPage: React.FC = () => {
   const router = useRouter();
   const slug = String(params?.slug || '');
   const [cvLanguage, setCvLanguage] = React.useState<'vi' | 'en'>('vi');
+  const previewContainerRef = React.useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = React.useState<number>(850);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (previewContainerRef.current) {
+        setContainerWidth(previewContainerRef.current.clientWidth);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const a4WidthPx = 794; // 210mm in pixels at 96dpi
+  const scaleRatio = Math.max(0.35, Math.min(1, (containerWidth - 24) / a4WidthPx));
 
   const {
     data: cvRecord,
@@ -110,21 +126,15 @@ export const PublicCVPage: React.FC = () => {
 
   const cvData: CVData = {
     ...cvRecord.cv_data,
-    templateId: cvRecord.template_code  return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        bgcolor: '#e2e8f0',
-        display: 'flex',
-        flexDirection: 'column',
-        '@media print': {
-          height: 'auto !important',
-          minHeight: '100% !important',
-          bgcolor: '#ffffff !important',
-          overflow: 'visible !important',
-        },
-      }}
-    >
+    templateId: cvRecord.template_code,
+    theme: {
+      ...(cvRecord.cv_data?.theme || {}),
+      ...(cvRecord.theme_config || {}),
+    },
+  };
+
+  return (
+    <Box sx={{ minHeight: '100vh', bgcolor: '#e2e8f0', display: 'flex', flexDirection: 'column' }}>
       {/* ── Top Recruiter Action Bar ─────────────────────────────────────── */}
       <Paper
         elevation={0}
@@ -142,9 +152,6 @@ export const PublicCVPage: React.FC = () => {
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: 2,
-          '@media print': {
-            display: 'none !important',
-          },
         }}
       >
         <Stack direction="row" spacing={2} alignItems="center">
@@ -173,7 +180,17 @@ export const PublicCVPage: React.FC = () => {
         </Stack>
 
         {/* Action Buttons */}
-        <Stack direction="row" spacing={1.25} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          sx={{
+            flexWrap: 'wrap',
+            justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+            width: { xs: '100%', sm: 'auto' },
+            gap: 1,
+          }}
+        >
           {cvData.personalInfo?.email && (
             <Button
               component="a"
@@ -192,7 +209,7 @@ export const PublicCVPage: React.FC = () => {
                 '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' },
               }}
             >
-              Email
+              Gửi Email
             </Button>
           )}
 
@@ -303,61 +320,49 @@ export const PublicCVPage: React.FC = () => {
         </Stack>
       </Paper>
 
-      {/* ── Main CV Sheet Render Area ────────────────────────────────────── */}
+      {/* ── Main CV Sheet Render Area with Responsive Scaling ────────────── */}
       <Box
-        className="cv-preview-viewport"
+        ref={previewContainerRef}
         sx={{
           flex: 1,
-          p: { xs: 2, sm: 4 },
+          p: { xs: 1.5, sm: 3, md: 4 },
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'flex-start',
+          overflowX: 'hidden',
           overflowY: 'auto',
-          '@media print': {
-            p: '0 !important',
-            overflow: 'visible !important',
-            display: 'block !important',
-            height: 'auto !important',
-          },
+          width: '100%',
         }}
       >
         <Box
-          className="cv-zoom-wrapper"
           sx={{
-            width: '210mm',
-            minHeight: '297mm',
+            width: scaleRatio < 1 ? `${Math.round(a4WidthPx * scaleRatio)}px` : '210mm',
+            minHeight: scaleRatio < 1 ? `${Math.round(1123 * scaleRatio)}px` : '297mm',
             boxShadow: '0 20px 45px rgba(0, 0, 0, 0.15)',
             borderRadius: '4px',
             overflow: 'hidden',
             bgcolor: '#ffffff',
             mb: 4,
-            '@media print': {
-              boxShadow: 'none !important',
-              borderRadius: '0 !important',
-              mb: '0 !important',
-              width: '210mm !important',
-              minHeight: '297mm !important',
-              overflow: 'visible !important',
-              bgcolor: '#ffffff !important',
-            },
+            position: 'relative',
           }}
         >
-          <div id="cv-print-area" className="cv-print-target" style={{ width: '100%', background: '#ffffff' }}>
-            <CVTemplateRenderer data={cvData} language={cvLanguage} />
-          </div>
+          <Box
+            sx={{
+              width: '210mm',
+              minHeight: '297mm',
+              transform: scaleRatio < 1 ? `scale(${scaleRatio})` : 'none',
+              transformOrigin: 'top left',
+            }}
+          >
+            <div id="cv-print-area" style={{ width: '100%', background: '#ffffff' }}>
+              <CVTemplateRenderer data={cvData} language={cvLanguage} />
+            </div>
+          </Box>
         </Box>
       </Box>
 
       {/* ── Footer ─────────────────────────────────────────────────────── */}
-      <Box className="no-print" sx={{ py: 2, textAlign: 'center', bgcolor: '#ffffff', borderTop: '1px solid #cbd5e1', '@media print': { display: 'none !important' } }}>
-        <Typography variant="caption" sx={{ color: '#64748b' }}>
-          Được tạo và bảo đảm bởi <strong>InfoHR Tuyển Dụng</strong> • Nền tảng tuyển dụng thông minh hàng đầu Việt Nam
-        </Typography>
-      </Box>
-    </Box>
-  );
-};��─────────────────────────── */}
-      <Box sx={{ py: 2, textAlign: 'center', bgcolor: '#ffffff', borderTop: '1px solid #cbd5e1' }}>
+      <Box className="no-print" sx={{ py: 2, textAlign: 'center', bgcolor: '#ffffff', borderTop: '1px solid #cbd5e1' }}>
         <Typography variant="caption" sx={{ color: '#64748b' }}>
           Được tạo và bảo đảm bởi <strong>InfoHR Tuyển Dụng</strong> • Nền tảng tuyển dụng thông minh hàng đầu Việt Nam
         </Typography>

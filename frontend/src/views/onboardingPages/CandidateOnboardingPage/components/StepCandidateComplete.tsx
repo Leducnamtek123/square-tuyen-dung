@@ -5,7 +5,7 @@ import {
   Box,
   Typography,
   Card,
-  Grid,
+  Grid2 as Grid,
   Stack,
   Button,
   LinearProgress,
@@ -39,8 +39,8 @@ export default function StepCandidateComplete({
   formData,
   careerName,
   cityName,
-  completeness = 80,
-  recommendedJobs = [],
+  completeness,
+  recommendedJobs,
   onExploreJobs,
   onViewDashboard,
 }: StepCandidateCompleteProps) {
@@ -49,10 +49,7 @@ export default function StepCandidateComplete({
   const formatSalaryText = () => {
     if (formData.isSalaryNegotiable) return t('onboarding.step2.salaryNegotiable', 'Thỏa thuận');
     if (formData.salaryMin && formData.salaryMax) {
-      return `${Number(formData.salaryMin).toLocaleString('vi-VN')} - ${Number(formData.salaryMax).toLocaleString('vi-VN')} VNĐ`;
-    }
-    if (formData.salaryMin) {
-      return `Từ ${Number(formData.salaryMin).toLocaleString('vi-VN')} VNĐ`;
+      return `${(Number(formData.salaryMin) / 1000000).toFixed(0)} - ${(Number(formData.salaryMax) / 1000000).toFixed(0)} triệu/tháng`;
     }
     return t('onboarding.step2.salaryNegotiable', 'Thỏa thuận');
   };
@@ -79,32 +76,58 @@ export default function StepCandidateComplete({
       </Box>
 
       <Typography variant="h4" sx={{ fontWeight: 800, color: '#0F172A', mb: 1, fontSize: { xs: '1.5rem', sm: '1.85rem' } }}>
-        {t('onboarding.step4.title', 'Hồ sơ của bạn đã sẵn sàng!')}
+        {t('onboarding.step4.title', 'Tuyệt vời! Bạn đã sẵn sàng')}
       </Typography>
-      <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 540, mx: 'auto', mb: 3.5 }}>
-        {t('onboarding.step4.subtitle', 'Hệ thống đã phân tích mục tiêu và tìm thấy các cơ hội việc làm phù hợp nhất cho bạn.')}
+      <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 520, mx: 'auto', mb: 3 }}>
+        {t('onboarding.step4.subtitle', 'Mục tiêu nghề nghiệp đã được lưu. Hệ thống đã cá nhân hóa danh sách việc làm phù hợp dành riêng cho bạn.')}
       </Typography>
 
-      {/* Completeness Progress Meter */}
+      {/* Profile Completeness Card */}
       <Card
         variant="outlined"
         sx={{
-          p: 2.5,
-          mb: 3.5,
-          borderRadius: 3,
+          p: { xs: 2.5, sm: 3 },
+          mb: 3,
+          borderRadius: 3.5,
+          textAlign: 'left',
           backgroundColor: '#F8FAFC',
           borderColor: '#E2E8F0',
-          textAlign: 'left',
         }}
       >
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B' }}>
-            {t('onboarding.step4.completenessScore', 'Mức độ hoàn thiện hồ sơ')}
-          </Typography>
-          <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#2563EB' }}>
-            {completeness}%
-          </Typography>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Avatar
+              sx={{
+                width: 44,
+                height: 44,
+                backgroundColor: '#2563EB',
+                color: '#FFFFFF',
+                fontWeight: 800,
+                fontSize: '1.1rem',
+              }}
+            >
+              {formData.desiredJobTitle ? formData.desiredJobTitle.charAt(0).toUpperCase() : 'U'}
+            </Avatar>
+            <Box>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A', lineHeight: 1.3 }}>
+                {formData.desiredJobTitle || 'Ứng viên'}
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#64748B' }}>
+                {careerName || 'Chưa chọn ngành nghề'} • {cityName || 'Toàn quốc'}
+              </Typography>
+            </Box>
+          </Stack>
+
+          <Box sx={{ textAlign: 'right' }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: '#2563EB', lineHeight: 1 }}>
+              {completeness}%
+            </Typography>
+            <Typography variant="caption" sx={{ color: '#64748B' }}>
+              {t('onboarding.step4.profileScore', 'Điểm hồ sơ')}
+            </Typography>
+          </Box>
         </Stack>
+
         <LinearProgress
           variant="determinate"
           value={completeness}
@@ -114,18 +137,18 @@ export default function StepCandidateComplete({
             backgroundColor: '#E2E8F0',
             '& .MuiLinearProgress-bar': {
               borderRadius: 4,
-              background: 'linear-gradient(90deg, #10B981 0%, #059669 100%)',
+              backgroundColor: completeness >= 80 ? '#16A34A' : '#2563EB',
             },
           }}
         />
       </Card>
 
-      {/* Preferences Summary Card */}
+      {/* Career Preferences Summary */}
       <Card
         variant="outlined"
         sx={{
           p: { xs: 2.5, sm: 3 },
-          mb: 4,
+          mb: 3.5,
           borderRadius: 3.5,
           textAlign: 'left',
           backgroundColor: '#FFFFFF',
@@ -147,7 +170,7 @@ export default function StepCandidateComplete({
         </Typography>
 
         <Grid container spacing={2.5}>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <WorkOutlineIcon fontSize="small" sx={{ color: '#64748B' }} />
               <Box>
@@ -161,7 +184,7 @@ export default function StepCandidateComplete({
             </Stack>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <BusinessCenterOutlinedIcon fontSize="small" sx={{ color: '#64748B' }} />
               <Box>
@@ -175,7 +198,7 @@ export default function StepCandidateComplete({
             </Stack>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <LocationOnOutlinedIcon fontSize="small" sx={{ color: '#64748B' }} />
               <Box>
@@ -189,7 +212,7 @@ export default function StepCandidateComplete({
             </Stack>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <AttachMoneyOutlinedIcon fontSize="small" sx={{ color: '#64748B' }} />
               <Box>
@@ -205,7 +228,7 @@ export default function StepCandidateComplete({
 
           {/* Skills List */}
           {Boolean(formData.skills?.length) && (
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Divider sx={{ my: 0.5 }} />
               <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 1 }}>
                 {t('onboarding.step4.skills', 'Kỹ năng chính')}
@@ -229,7 +252,7 @@ export default function StepCandidateComplete({
           )}
 
           {/* CV Status */}
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Divider sx={{ my: 0.5 }} />
             <Stack direction="row" spacing={1.5} alignItems="center">
               <InsertDriveFileOutlinedIcon

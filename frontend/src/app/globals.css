@@ -651,119 +651,146 @@ h1, h2, h3, h4, h5, .display-text {
 }
 
 /* ==========================================================================
-   CV PRINTING & HIGH-DPI PDF EXPORT STYLES
-   Ensures pixel-perfect A4 printing with zero margins and full UI isolation
+   CV Builder & A4 Document PDF Print Engine
    ========================================================================== */
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
 @media print {
-  @page {
-    size: A4 portrait;
-    margin: 0mm !important;
-  }
-
-  *, *::before, *::after {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color-adjust: exact !important;
-  }
-
-  /* When printing on any CV Editor or Public CV page */
-  html, body,
-  html.cv-printing-active, body.cv-printing-active,
-  html:has(#cv-print-area), body:has(#cv-print-area) {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-    margin: 0 !important;
-    padding: 0 !important;
+  /* Enforce A4 dimensions and reset page bounds */
+  html,
+  body {
     width: 210mm !important;
     min-height: 297mm !important;
-    overflow: visible !important;
     height: auto !important;
-  }
-
-  /* Global non-printable UI elements */
-  .no-print,
-  .no-print *,
-  .sq-chatbot,
-  .sq-chatbot__launcher,
-  .sq-chatbot__panel,
-  .Toastify,
-  .bg-atmosphere,
-  header,
-  nav,
-  footer,
-  .MuiAppBar-root,
-  .MuiDrawer-root,
-  .MuiBackdrop-root,
-  .MuiDialog-root:not(.allow-print),
-  .cv-editor-header-bar,
-  .cv-editor-sidebar-container,
-  .cv-preview-toolbar,
-  .cv-editor-no-print {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    height: 0 !important;
-    width: 0 !important;
-    pointer-events: none !important;
-  }
-
-  /* Allow main layout wrappers to expand naturally to multiple pages */
-  body:has(#cv-print-area) main,
-  body:has(#cv-print-area) #__next,
-  body:has(#cv-print-area) .cv-editor-root,
-  body:has(#cv-print-area) .cv-editor-main-body,
-  body:has(#cv-print-area) .cv-preview-container,
-  body:has(#cv-print-area) .cv-preview-viewport,
-  body.cv-printing-active main,
-  body.cv-printing-active #__next,
-  body.cv-printing-active .cv-editor-root,
-  body.cv-printing-active .cv-editor-main-body,
-  body.cv-printing-active .cv-preview-container,
-  body.cv-printing-active .cv-preview-viewport {
-    display: block !important;
-    overflow: visible !important;
-    height: auto !important;
-    min-height: 100% !important;
-    max-height: none !important;
-    width: 210mm !important;
     margin: 0 auto !important;
     padding: 0 !important;
-    position: static !important;
     background: #ffffff !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    box-sizing: border-box !important;
   }
 
-  /* Normalize Zoom Wrapper for print */
-  .cv-zoom-wrapper {
-    transform: none !important;
+  /* Reset all Next.js and layout containers */
+  #__next,
+  [data-nextjs-scroll-focus-boundary],
+  main,
+  div {
+    overflow: visible !important;
+  }
+
+  /* Hide interactive web UI */
+  header,
+  nav,
+  aside,
+  button,
+  .no-print,
+  .Toastify,
+  .swal2-container,
+  .no-print-area {
+    display: none !important;
+  }
+
+  /* Ensure CV Print Area is isolated, centered, and exact A4 */
+  #cv-print-area {
     width: 210mm !important;
     min-height: 297mm !important;
+    max-width: 210mm !important;
     margin: 0 auto !important;
     padding: 0 !important;
     box-shadow: none !important;
     border: none !important;
     border-radius: 0 !important;
+    background: transparent !important;
+    position: relative !important;
+    display: block !important;
+    transform: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Cancel all zoom/transform scaling on parents of #cv-print-area */
+  div:has(> #cv-print-area),
+  div:has(> div > #cv-print-area) {
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  /* Prevent awkward page break splits */
+  .cv-break-avoid,
+  .break-inside-avoid,
+  #cv-print-area .cv-item,
+  #cv-print-area .cv-section,
+  #cv-print-area h1,
+  #cv-print-area h2,
+  #cv-print-area h3 {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Ensure colors and background gradients render faithfully */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Support clean printing for Material UI Dialog modals */
+  .MuiBackdrop-root {
+    display: none !important;
+  }
+
+  .MuiDialog-root {
+    position: static !important;
+    display: block !important;
+    overflow: visible !important;
+    z-index: auto !important;
+  }
+
+  .MuiDialog-container {
+    position: static !important;
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .MuiDialog-paper {
+    position: static !important;
+    max-height: none !important;
+    max-width: 210mm !important;
+    width: 210mm !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
     overflow: visible !important;
     background: #ffffff !important;
   }
 
-  /* Isolate and format the CV print target */
-  #cv-print-area,
-  .cv-print-target {
-    display: block !important;
-    visibility: visible !important;
-    width: 210mm !important;
-    min-height: 297mm !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    box-shadow: none !important;
-    border: none !important;
-    transform: none !important;
-    position: relative !important;
-    page-break-after: auto;
-    break-inside: auto;
+  .MuiDialogActions-root {
+    display: none !important;
+  }
+
+  /* Prevent split on document cards and tables */
+  .MuiPaper-root,
+  .MuiCard-root,
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 }
 

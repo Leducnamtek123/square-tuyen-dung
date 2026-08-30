@@ -19,7 +19,7 @@ type ChatWindowComposerProps = {
   isUploading: boolean;
   uploadProgress: number;
   emojiAnchorEl: HTMLButtonElement | null;
-  onSubmit: (event: React.FormEvent) => void;
+  onSubmit: (event: React.SyntheticEvent) => void;
   onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
   onOpenFilePicker: () => void;
   onEmojiClick: (event: React.MouseEvent<HTMLButtonElement>) => void;

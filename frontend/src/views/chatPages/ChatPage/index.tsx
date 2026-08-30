@@ -1,13 +1,11 @@
 'use client';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Box, Stack, Typography, Drawer, IconButton, useTheme, useMediaQuery, Theme } from "@mui/material";
+import { Box, Stack, Drawer, useTheme, useMediaQuery } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
-import MenuIcon from '@mui/icons-material/Menu';
-import GroupIcon from '@mui/icons-material/Group';
 import { ROLES_NAME } from '../../../configs/constants';
 import { RootState } from '../../../redux/store';
-import { useTranslation } from 'react-i18next';
+import { useChatContext } from '../../../context/ChatProvider';
 
 // page components
 import RightSidebar from '../../components/chats/RightSidebar';
@@ -16,18 +14,20 @@ import LeftSidebar from '../../components/chats/LeftSidebar';
 import SidebarHeader from '../../../components/Features/Chats/SidebarHeader';
 
 const ChatLeftSidebar = ({ isJobSeeker }: { isJobSeeker: boolean }) => (
-  <Box px={2} py={2} sx={{ height: '100%', bgcolor: 'background.paper' }}>
-    <Stack spacing={2}>
+  <Box px={{ xs: 1.5, sm: 2 }} py={2} sx={{ height: '100%', bgcolor: 'background.paper', display: 'flex', flexDirection: 'column' }}>
+    <Stack spacing={2} sx={{ height: '100%' }}>
       <Box>
         <SidebarHeader />
       </Box>
-      <Box>{isJobSeeker ? <LeftSidebar /> : <LeftSidebar.Employer />}</Box>
+      <Box sx={{ flex: 1, minHeight: 0 }}>
+        {isJobSeeker ? <LeftSidebar /> : <LeftSidebar.Employer />}
+      </Box>
     </Stack>
   </Box>
 );
 
 const ChatRightSidebar = ({ isJobSeeker }: { isJobSeeker: boolean }) => (
-  <Box px={2} py={2}>
+  <Box px={{ xs: 1.5, sm: 2 }} py={2} sx={{ height: '100%', bgcolor: 'background.paper' }}>
     {isJobSeeker ? <RightSidebar /> : <RightSidebar.Employer />}
   </Box>
 );
@@ -38,126 +38,86 @@ const ChatPage = () => {
   const isMedium = useMediaQuery(theme.breakpoints.down('md'));
 
   const { currentUser } = useSelector((state: RootState) => state.user);
-  const { t } = useTranslation('chat');
+  const { selectedRoomId, setSelectedRoomId } = useChatContext();
 
-  const [openLeftDrawer, setOpenLeftDrawer] = React.useState(false);
   const [openRightDrawer, setOpenRightDrawer] = React.useState(false);
-
   const isJobSeeker = currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
 
-  return (
-    <Grid container sx={{ height: '100dvh', minHeight: '100dvh', bgcolor: 'background.default' }}>
-      {/* Left Sidebar */}
-      {isMobile ? (
+  // Mobile View Logic: When a room is selected, display ChatWindow. When not, display LeftSidebar.
+  if (isMobile) {
+    return (
+      <Box sx={{ height: '100dvh', minHeight: '100dvh', bgcolor: 'background.default', overflow: 'hidden' }}>
+        {!selectedRoomId ? (
+          <Box sx={{ height: '100%' }}>
+            <ChatLeftSidebar isJobSeeker={isJobSeeker} />
+          </Box>
+        ) : (
+          <Box sx={{ height: '100%' }}>
+            <ChatWindow
+              isMobile={true}
+              onBackToList={() => setSelectedRoomId('')}
+              onToggleRightDrawer={() => setOpenRightDrawer(true)}
+            />
+          </Box>
+        )}
+
         <Drawer
-          anchor="left"
-          open={openLeftDrawer}
-          onClose={() => setOpenLeftDrawer(false)}
+          anchor="right"
+          open={openRightDrawer}
+          onClose={() => setOpenRightDrawer(false)}
           slotProps={{
             paper: {
               sx: {
-                width: '80%',
+                width: '85%',
                 maxWidth: 360,
                 bgcolor: 'background.paper',
               },
             },
           }}
         >
-          <ChatLeftSidebar isJobSeeker={isJobSeeker} />
+          <ChatRightSidebar isJobSeeker={isJobSeeker} />
         </Drawer>
-      ) : (
-        <Grid
-          sx={{
-            height: '100dvh',
-            borderRight: 1,
-            borderColor: 'divider',
-            display: { xs: 'none', sm: 'block' }
-          }}
-          size={{
-            xs: 12,
-            sm: 4,
-            md: 3
-          }}>
-          <ChatLeftSidebar isJobSeeker={isJobSeeker} />
-        </Grid>
-      )}
+      </Box>
+    );
+  }
+
+  return (
+    <Grid container sx={{ height: '100dvh', minHeight: '100dvh', bgcolor: 'background.default', overflow: 'hidden' }}>
+      {/* Left Sidebar */}
+      <Grid
+        sx={{
+          height: '100dvh',
+          borderRight: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+        }}
+        size={{
+          xs: 12,
+          sm: 4.5,
+          md: 3.5,
+          lg: 3,
+        }}
+      >
+        <ChatLeftSidebar isJobSeeker={isJobSeeker} />
+      </Grid>
 
       {/* Main Chat Window */}
       <Grid
-        sx={{ 
+        sx={{
           height: '100dvh',
           bgcolor: '#f8fafc',
         }}
         size={{
           xs: 12,
-          sm: 8,
-          md: 6
-        }}>
-        <Box sx={{ height: '100%' }}>
-          <Stack direction="column" sx={{ height: '100%' }}>
-            <Box 
-              sx={{ 
-                borderBottom: 1, 
-                borderColor: 'rgba(148, 163, 184, 0.28)',
-                p: 2,
-                bgcolor: 'rgba(255,255,255,0.9)',
-                backdropFilter: 'blur(12px)',
-                boxShadow: '0 8px 24px rgba(15, 23, 42, 0.06)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2
-              }}
-            >
-              {/* Mobile Menu Buttons */}
-              {(isMobile || isMedium) && (
-                <Stack direction="row" spacing={1}>
-                  {isMobile && (
-                    <IconButton aria-label="Thao tác" 
-                      onClick={() => setOpenLeftDrawer(true)}
-                      sx={{ 
-                        bgcolor: 'primary.background',
-                        '&:hover': { bgcolor: 'primary.background' }
-                      }}
-                    >
-                      <GroupIcon color="primary" />
-                    </IconButton>
-                  )}
-                  {(isMobile || isMedium) && (
-                    <IconButton aria-label="Thao tác" 
-                      onClick={() => setOpenRightDrawer(true)}
-                      sx={{ 
-                        bgcolor: 'primary.background',
-                        '&:hover': { bgcolor: 'primary.background' }
-                      }}
-                    >
-                      <MenuIcon color="primary" />
-                    </IconButton>
-                  )}
-                </Stack>
-              )}
-
-              <Typography 
-                variant="subtitle1" 
-                fontWeight={600}
-                sx={{
-                  flex: 1,
-                  background: (theme: Theme) => theme.palette.primary.main,
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  textAlign: 'center'
-                }}
-              >
-                {t('slogan')}{' '}
-                <span>{t('sloganSub')}</span>
-              </Typography>
-            </Box>
-
-            <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
-              <ChatWindow />
-            </Box>
-          </Stack>
-        </Box>
+          sm: 7.5,
+          md: isMedium ? 8.5 : 5.5,
+          lg: 6,
+        }}
+      >
+        <ChatWindow
+          isMobile={false}
+          onToggleRightDrawer={isMedium ? () => setOpenRightDrawer(true) : undefined}
+        />
       </Grid>
 
       {/* Right Sidebar */}
@@ -169,8 +129,8 @@ const ChatPage = () => {
           slotProps={{
             paper: {
               sx: {
-                width: '80%',
-                maxWidth: 360,
+                width: '85%',
+                maxWidth: 380,
                 bgcolor: 'background.paper',
               },
             },
@@ -182,14 +142,16 @@ const ChatPage = () => {
         <Grid
           sx={{
             height: '100dvh',
-            borderLeft: 1,
+            borderLeft: '1px solid',
             borderColor: 'divider',
-            display: { xs: 'none', md: 'block' },
-            bgcolor: 'background.paper'
+            bgcolor: 'background.paper',
+            overflow: 'hidden',
           }}
           size={{
-            md: 3
-          }}>
+            md: 3,
+            lg: 3,
+          }}
+        >
           <ChatRightSidebar isJobSeeker={isJobSeeker} />
         </Grid>
       )}
@@ -198,3 +160,4 @@ const ChatPage = () => {
 };
 
 export default ChatPage;
+

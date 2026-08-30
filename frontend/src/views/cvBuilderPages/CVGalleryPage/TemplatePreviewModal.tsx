@@ -52,9 +52,11 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
   const router = useRouter();
   const { i18n } = useTranslation();
 
-  const defaultColors = template?.color_palettes && template.color_palettes.length > 0
-    ? template.color_palettes
-    : ['#1e40af', '#0f766e', '#374151'];
+  const defaultColors = React.useMemo(() => {
+    return template?.color_palettes && template.color_palettes.length > 0
+      ? template.color_palettes
+      : ['#1e40af', '#0f766e', '#374151'];
+  }, [template?.color_palettes]);
 
   const [currentColor, setCurrentColor] = useState<string>(
     initialColor || template?.default_theme?.primaryColor || defaultColors[0] || '#1e40af'
@@ -68,7 +70,7 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
     } else if (defaultColors[0]) {
       setCurrentColor(defaultColors[0]);
     }
-  }, [initialColor, template]);
+  }, [initialColor, template, defaultColors]);
 
   if (!template) return null;
 

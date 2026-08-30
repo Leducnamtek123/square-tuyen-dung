@@ -270,7 +270,7 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
     return () => {
       isMounted = false;
     };
-  }, [open, activityId, syncActivityPatch]);
+  }, [open, activityId, syncActivityPatch, i18n.language]);
 
   React.useEffect(() => {
     if (!open || !activityId || state.data?.aiAnalysisStatus !== 'processing') return;

@@ -102,7 +102,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ data, language = '
 
       {/* Experience */}
       {experiences && experiences.length > 0 && (
-        <div>
+        <div className="cv-section">
           <h2
             className="text-[13px] font-bold uppercase tracking-wider mb-2.5 pb-0.5 border-b"
             style={{ color: primaryColor, borderColor: '#e2e8f0' }}
@@ -111,7 +111,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ data, language = '
           </h2>
           <div className={itemGapClass}>
             {experiences.map((exp) => (
-              <div key={exp.id}>
+              <div key={exp.id} className="break-inside-avoid cv-item">
                 <div className="flex flex-wrap justify-between items-baseline">
                   <span className="font-bold text-slate-900 text-[13px]">{exp.position}</span>
                   <DateRangeText
@@ -134,7 +134,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ data, language = '
 
       {/* Education */}
       {educations && educations.length > 0 && (
-        <div>
+        <div className="cv-section">
           <h2
             className="text-[13px] font-bold uppercase tracking-wider mb-2 pb-0.5 border-b"
             style={{ color: primaryColor, borderColor: '#e2e8f0' }}
@@ -143,7 +143,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ data, language = '
           </h2>
           <div className="space-y-2">
             {educations.map((edu) => (
-              <div key={edu.id}>
+              <div key={edu.id} className="break-inside-avoid cv-item">
                 <div className="flex flex-wrap justify-between items-baseline">
                   <span className="font-bold text-slate-900 text-[12.5px]">{edu.school}</span>
                   <DateRangeText startDate={edu.startDate} endDate={edu.endDate} language={language} className="text-[11px] text-slate-500" />
@@ -164,7 +164,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ data, language = '
 
       {/* Projects */}
       {projects && projects.length > 0 && (
-        <div>
+        <div className="cv-section">
           <h2
             className="text-[13px] font-bold uppercase tracking-wider mb-2 pb-0.5 border-b"
             style={{ color: primaryColor, borderColor: '#e2e8f0' }}
@@ -173,7 +173,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ data, language = '
           </h2>
           <div className="space-y-2">
             {projects.map((proj) => (
-              <div key={proj.id}>
+              <div key={proj.id} className="break-inside-avoid cv-item">
                 <div className="flex justify-between items-baseline">
                   <span className="font-bold text-slate-800 text-[12.5px]">{proj.name}</span>
                   <DateRangeText startDate={proj.startDate} endDate={proj.endDate} language={language} className="text-[11px] text-slate-400" />
@@ -192,7 +192,7 @@ export const MinimalistTemplate: React.FC<TemplateProps> = ({ data, language = '
       )}
 
       {/* Skills, Languages & Certificates in Multi-column Bottom */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-1">
+      <div className="grid grid-cols-2 gap-5 pt-1 cv-section break-inside-avoid">
         {skills && skills.length > 0 && (
           <div>
             <h2

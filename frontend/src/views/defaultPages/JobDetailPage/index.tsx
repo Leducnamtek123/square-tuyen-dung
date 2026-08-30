@@ -253,7 +253,7 @@ const JobDetailPage = () => {
       ) : state.jobPostDetail === null ? (
         <NoDataCard title={t("jobDetail.noData")} />
       ) : (
-        <div className={cn("mt-2", canApply ? "pb-28 md:pb-0" : "")}>
+        <div className={cn("mt-2", canApply ? "pb-[calc(96px+env(safe-area-inset-bottom,1.25rem))] md:pb-0" : "")}>
           <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             <div className="flex flex-col gap-8">
               <JobDetailHeaderCard
@@ -282,7 +282,10 @@ const JobDetailPage = () => {
       )}
 
       {!state.isLoading && state.jobPostDetail && canApply && (
-        <div className="fixed inset-x-0 bottom-0 z-50 block border-t border-border bg-background px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-lg backdrop-blur-md md:hidden">
+        <div
+          className="job-detail-sticky-bar fixed inset-x-0 bottom-0 z-50 block border-t border-border bg-background/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md md:hidden"
+          data-sticky-bottom="true"
+        >
           <Button
             className="w-full bg-primary text-white hover:bg-primary/90"
             size="lg"

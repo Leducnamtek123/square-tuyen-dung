@@ -33,6 +33,7 @@ import toastMessages from '@/utils/toastMessages';
 import type { ResumeDetailResponse } from '@/types/models';
 import { useToggleSaveResumeOptimistic } from '../hooks/useEmployerQueries';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
+import { downloadPdf } from '@/utils/funcUtils';
 
 interface CandidateHeaderProps {
   profileDetail: ResumeDetailResponse;
@@ -312,13 +313,17 @@ export const CandidateHeader: React.FC<CandidateHeaderProps> = ({
 
 
             {/* Export Profile / CV Button */}
-            {safeFileUrl ? (
+            {safeFileUrl || profileDetail.slug ? (
               <Button
                 variant="outlined"
                 color="inherit"
-                component="a"
-                href={safeFileUrl}
-                download
+                onClick={() => {
+                  if (safeFileUrl) {
+                    downloadPdf(safeFileUrl, candidateName || profileDetail.title);
+                  } else if (profileDetail.slug) {
+                    window.open(`/cv/${profileDetail.slug}`, '_blank');
+                  }
+                }}
                 size="small"
                 startIcon={<FileDownloadOutlinedIcon />}
                 sx={{

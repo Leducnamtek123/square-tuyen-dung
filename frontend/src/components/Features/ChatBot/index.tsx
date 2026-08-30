@@ -164,15 +164,15 @@ const ChatBot = () => {
 
   const enableRichRendering = true;
 
-  const buildPayload = (nextMessages: ChatMessage[]): ChatPayload => {
+  const buildPayload = useCallback((nextMessages: ChatMessage[]): ChatPayload => {
     const history: ChatMessagePayload[] = nextMessages
       .filter((message) => message.role !== 'system')
       .slice(-MAX_HISTORY)
       .map((message) => ({ role: message.role, content: message.content }));
     return { messages: [{ role: 'system', content: systemPrompt }, ...history], max_tokens: 1024 };
-  };
+  }, [systemPrompt]);
 
-  const sendChat = async (payload: ChatPayload) => {
+  const sendChat = useCallback(async (payload: ChatPayload) => {
     try {
       const response = await chatbotService.chat(payload);
       const reply = response?.reply || (response as { data?: { reply?: string } })?.data?.reply || t('chat:chatbot.error.apology');
@@ -189,7 +189,7 @@ const ChatBot = () => {
     } finally {
       dispatch({ type: 'set_sending', value: false });
     }
-  };
+  }, [t]);
 
   const executeSendText = useCallback(async (text: string) => {
     const trimmed = text.trim();
@@ -206,9 +206,9 @@ const ChatBot = () => {
     const payload = buildPayload(nextMessages);
     lastPayloadRef.current = payload;
     await sendChat(payload);
-  }, [state.isSending, state.messages, systemPrompt, t]);
+  }, [buildPayload, sendChat, state.isSending, state.messages]);
 
-  const handleSend = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSend = async (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     await executeSendText(state.input);
   };

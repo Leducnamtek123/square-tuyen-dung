@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import { Box, Typography, Stack, IconButton, Tooltip, Button, Chip } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -75,7 +76,7 @@ export default function JobsPage() {
   const totalCount = data?.count || 0;
 
   // Single Action Handlers
-  const handleOpenApprove = (job: JobPost) => {
+  const handleOpenApprove = useCallback((job: JobPost) => {
     setDialogState({
       open: true,
       type: 'approve',
@@ -83,9 +84,9 @@ export default function JobsPage() {
       title: t('pages.jobs.table.approveAction'),
       message: `Bạn có chắc chắn muốn phê duyệt tin "${job.jobName}" cho nhà tuyển dụng "${job.companyDict?.companyName}"?`,
     });
-  };
+  }, [t]);
 
-  const handleOpenReject = (job: JobPost) => {
+  const handleOpenReject = useCallback((job: JobPost) => {
     setDialogState({
       open: true,
       type: 'reject',
@@ -94,9 +95,9 @@ export default function JobsPage() {
       message: `Vui lòng nhập lý do từ chối tin "${job.jobName}" để thông báo cho nhà tuyển dụng.`,
       requireReason: true,
     });
-  };
+  }, [t]);
 
-  const handleOpenDelete = (job: JobPost) => {
+  const handleOpenDelete = useCallback((job: JobPost) => {
     setDialogState({
       open: true,
       type: 'delete',
@@ -104,7 +105,7 @@ export default function JobsPage() {
       title: 'Xóa vĩnh viễn tin tuyển dụng',
       message: `Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa tin "${job.jobName}"?`,
     });
-  };
+  }, []);
 
   // Bulk Action Handlers
   const handleBulkApproveTrigger = (selected: JobPost[]) => {
@@ -287,7 +288,7 @@ export default function JobsPage() {
         ),
       },
     ],
-    [t]
+    [t, handleOpenApprove, handleOpenReject, handleOpenDelete]
   );
 
   const filters: FilterDef[] = [
@@ -460,7 +461,7 @@ export default function JobsPage() {
               </Typography>
               <Box
                 sx={{ p: 2, bgcolor: '#FFFFFF', borderRadius: 2, border: '1px solid #E2E8F0', fontSize: '0.875rem' }}
-                dangerouslySetInnerHTML={{ __html: inspectingJob.jobDescription || '<p>Chưa có mô tả</p>' }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(inspectingJob.jobDescription || '<p>Chưa có mô tả</p>') }}
               />
             </Box>
 
@@ -471,7 +472,7 @@ export default function JobsPage() {
                 </Typography>
                 <Box
                   sx={{ p: 2, bgcolor: '#FFFFFF', borderRadius: 2, border: '1px solid #E2E8F0', fontSize: '0.875rem' }}
-                  dangerouslySetInnerHTML={{ __html: inspectingJob.jobRequirement }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(inspectingJob.jobRequirement) }}
                 />
               </Box>
             )}
@@ -483,7 +484,7 @@ export default function JobsPage() {
                 </Typography>
                 <Box
                   sx={{ p: 2, bgcolor: '#FFFFFF', borderRadius: 2, border: '1px solid #E2E8F0', fontSize: '0.875rem' }}
-                  dangerouslySetInnerHTML={{ __html: inspectingJob.benefitsEnjoyed }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(inspectingJob.benefitsEnjoyed) }}
                 />
               </Box>
             )}

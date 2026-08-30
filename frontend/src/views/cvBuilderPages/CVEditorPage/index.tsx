@@ -410,25 +410,11 @@ export const CVEditorPage: React.FC = () => {
   };
 
   return (
-    <Box
-      className="cv-editor-root"
-      sx={{
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        bgcolor: '#f1f5f9',
-        overflow: 'hidden',
-        '@media print': {
-          height: 'auto !important',
-          overflow: 'visible !important',
-          bgcolor: '#ffffff !important',
-        },
-      }}
-    >
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f1f5f9', overflow: 'hidden' }}>
       {/* ── Top Navbar (Material UI AppBar standard) ──────────────────────── */}
       <Paper
         elevation={0}
-        className="cv-editor-header-bar no-print"
+        className="no-print"
         sx={{
           height: 64,
           bgcolor: '#ffffff',
@@ -439,9 +425,6 @@ export const CVEditorPage: React.FC = () => {
           justifyContent: 'space-between',
           zIndex: 30,
           shrink: 0,
-          '@media print': {
-            display: 'none !important',
-          },
         }}
       >
         {/* Left: Back & Title input */}
@@ -658,31 +641,16 @@ export const CVEditorPage: React.FC = () => {
       </Paper>
 
       {/* ── Main Studio Body ─────────────────────────────────────────────── */}
-      <Box
-        className="cv-editor-main-body"
-        sx={{
-          flex: 1,
-          display: 'flex',
-          overflow: 'hidden',
-          '@media print': {
-            display: 'block !important',
-            overflow: 'visible !important',
-            height: 'auto !important',
-          },
-        }}
-      >
+      <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Left Side: Form Controls Sidebar (460px fixed) */}
         <Box
-          className="cv-editor-sidebar-container no-print"
+          className="no-print"
           sx={{
             width: { xs: '100%', md: 450, lg: 480 },
             shrink: 0,
             height: '100%',
             overflow: 'hidden',
             display: { xs: mobileView === 'editor' ? 'block' : 'none', md: 'block' },
-            '@media print': {
-              display: 'none !important',
-            },
           }}
         >
           <CVEditorSidebar
@@ -696,18 +664,11 @@ export const CVEditorPage: React.FC = () => {
 
         {/* Right Side: Live A4 Visual Canvas */}
         <Box
-          className="cv-preview-container"
           sx={{
             flex: 1,
             height: '100%',
             overflow: 'hidden',
             display: { xs: mobileView === 'preview' ? 'block' : 'none', md: 'block' },
-            '@media print': {
-              display: 'block !important',
-              width: '100% !important',
-              height: 'auto !important',
-              overflow: 'visible !important',
-            },
           }}
         >
           <CVLivePreview

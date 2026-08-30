@@ -41,6 +41,7 @@ import NoDataCard from '../../../../components/Common/NoDataCard';
 import { IMAGES } from '../../../../configs/constants';
 import useRequireAuth from '@/hooks/useRequireAuth';
 import toastMessages from '@/utils/toastMessages';
+import { JobHoverPreviewCard, useJobHoverPreview } from '@/components/Features/JobHoverPreview';
 
 interface FilterJobPostCardProps {
   params?: GetJobPostsParams;
@@ -139,6 +140,17 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
   const [selectedSubItem, setSelectedSubItem] = useState<string | number>('all');
   const [favorites, setFavorites] = useState<Record<number, boolean>>({});
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const {
+    hoveredJob,
+    anchorEl: previewAnchorEl,
+    isOpen: isPreviewOpen,
+    handleCardMouseEnter,
+    handleCardMouseLeave,
+    handlePopperMouseEnter,
+    handlePopperMouseLeave,
+    handleClose: handleClosePreview,
+  } = useJobHoverPreview();
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -460,7 +472,12 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
 
       {/* ── Filter Bar (Filter Mode dropdown + Scrollable Sub-item Pills) ───── */}
       {!hideFilterBar && (
-        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3, width: '100%', overflow: 'hidden' }}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1.5}
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          sx={{ mb: 3, width: '100%', overflow: 'hidden' }}
+        >
           {/* Filter Dimension Dropdown Button */}
           <Button
             variant="outlined"
@@ -529,82 +546,91 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
             })}
           </Menu>
 
-          {/* Scroll Left Button */}
-          <IconButton aria-label="Quay lại"
-            size="small"
-            onClick={handleScrollLeft}
-            sx={{
-              border: '1px solid #e2e8f0',
-              backgroundColor: '#ffffff',
-              width: 32,
-              height: 32,
-              flexShrink: 0,
-              '&:hover': { backgroundColor: '#f1f5f9' },
-            }}
+          {/* Sub-items Row with Left/Right Buttons and scrollable container */}
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{ width: '100%', flex: 1, minWidth: 0, overflow: 'hidden' }}
           >
-            <KeyboardArrowLeftIcon sx={{ fontSize: 18, color: '#64748b' }} />
-          </IconButton>
+            {/* Scroll Left Button */}
+            <IconButton aria-label="Quay lại"
+              size="small"
+              onClick={handleScrollLeft}
+              sx={{
+                border: '1px solid #e2e8f0',
+                backgroundColor: '#ffffff',
+                width: 32,
+                height: 32,
+                flexShrink: 0,
+                '&:hover': { backgroundColor: '#f1f5f9' },
+              }}
+            >
+              <KeyboardArrowLeftIcon sx={{ fontSize: 18, color: '#64748b' }} />
+            </IconButton>
 
-          {/* Scrollable Pills Container */}
-          <Box
-            ref={scrollRef}
-            sx={{
-              display: 'flex',
-              gap: 1,
-              overflowX: 'auto',
-              scrollBehavior: 'smooth',
-              py: 0.5,
-              flex: 1,
-              '&::-webkit-scrollbar': { display: 'none' },
-              msOverflowStyle: 'none',
-              scrollbarWidth: 'none',
-            }}
-          >
-            {subItems.map((item) => {
-              const isActive = String(selectedSubItem) === String(item.id);
-              return (
-                <Box
-                  key={String(item.id)}
-                  onClick={() => handleSubItemSelect(item.id)}
-                  sx={{
-                    px: 2.2,
-                    py: 0.75,
-                    borderRadius: '20px',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    fontSize: '0.85rem',
-                    fontWeight: isActive ? 700 : 500,
-                    color: isActive ? '#ffffff' : '#475569',
-                    backgroundColor: isActive ? '#e11d48' : '#f1f5f9',
-                    transition: 'all 0.2s ease',
-                    userSelect: 'none',
-                    flexShrink: 0,
-                    '&:hover': {
-                      backgroundColor: isActive ? '#be123c' : '#e2e8f0',
-                    },
-                  }}
-                >
-                  {item.label}
-                </Box>
-              );
-            })}
-          </Box>
+            {/* Scrollable Pills Container */}
+            <Box
+              ref={scrollRef}
+              sx={{
+                display: 'flex',
+                gap: 1,
+                overflowX: 'auto',
+                scrollBehavior: 'smooth',
+                py: 0.5,
+                flex: 1,
+                minWidth: 0,
+                '&::-webkit-scrollbar': { display: 'none' },
+                msOverflowStyle: 'none',
+                scrollbarWidth: 'none',
+              }}
+            >
+              {subItems.map((item) => {
+                const isActive = String(selectedSubItem) === String(item.id);
+                return (
+                  <Box
+                    key={String(item.id)}
+                    onClick={() => handleSubItemSelect(item.id)}
+                    sx={{
+                      px: 2.2,
+                      py: 0.75,
+                      borderRadius: '20px',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      fontSize: '0.85rem',
+                      fontWeight: isActive ? 700 : 500,
+                      color: isActive ? '#ffffff' : '#475569',
+                      backgroundColor: isActive ? '#e11d48' : '#f1f5f9',
+                      transition: 'all 0.2s ease',
+                      userSelect: 'none',
+                      flexShrink: 0,
+                      '&:hover': {
+                        backgroundColor: isActive ? '#be123c' : '#e2e8f0',
+                      },
+                    }}
+                  >
+                    {item.label}
+                  </Box>
+                );
+              })}
+            </Box>
 
-          {/* Scroll Right Button */}
-          <IconButton aria-label="Quay lại"
-            size="small"
-            onClick={handleScrollRight}
-            sx={{
-              border: '1px solid #e2e8f0',
-              backgroundColor: '#ffffff',
-              width: 32,
-              height: 32,
-              flexShrink: 0,
-              '&:hover': { backgroundColor: '#f1f5f9' },
-            }}
-          >
-            <KeyboardArrowRightIcon sx={{ fontSize: 18, color: '#64748b' }} />
-          </IconButton>
+            {/* Scroll Right Button */}
+            <IconButton aria-label="Quay lại"
+              size="small"
+              onClick={handleScrollRight}
+              sx={{
+                border: '1px solid #e2e8f0',
+                backgroundColor: '#ffffff',
+                width: 32,
+                height: 32,
+                flexShrink: 0,
+                '&:hover': { backgroundColor: '#f1f5f9' },
+              }}
+            >
+              <KeyboardArrowRightIcon sx={{ fontSize: 18, color: '#64748b' }} />
+            </IconButton>
+          </Stack>
         </Stack>
       )}
 
@@ -635,6 +661,8 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                   <Box
                     component={Link}
                     href={`/viec-lam/${job.slug}`}
+                    onMouseEnter={(e) => handleCardMouseEnter(e, job)}
+                    onMouseLeave={handleCardMouseLeave}
                     sx={{
                       display: 'flex',
                       flexDirection: 'column',
@@ -845,6 +873,33 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
           </Stack>
         </>
       )}
+
+      <JobHoverPreviewCard
+        job={hoveredJob}
+        anchorEl={previewAnchorEl}
+        open={isPreviewOpen}
+        onClose={handleClosePreview}
+        onMouseEnterPopper={handlePopperMouseEnter}
+        onMouseLeavePopper={handlePopperMouseLeave}
+        isFavorite={hoveredJob ? Boolean(favorites[hoveredJob.id]) : false}
+        onToggleFavorite={toggleFavorite}
+        cityLabel={
+          hoveredJob
+            ? typeof hoveredJob.locationDict?.city === 'number'
+              ? allConfig?.cityDict?.[hoveredJob.locationDict.city]
+              : hoveredJob.locationDict?.cityName
+            : undefined
+        }
+        experienceLabel={
+          hoveredJob?.experience ? allConfig?.experienceDict?.[hoveredJob.experience] : undefined
+        }
+        academicLevelLabel={
+          hoveredJob?.academicLevel
+            ? allConfig?.academicLevelDict?.[hoveredJob.academicLevel]
+            : undefined
+        }
+      />
+
       {AuthModal}
     </Box>
   );

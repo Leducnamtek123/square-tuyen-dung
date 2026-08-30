@@ -28,16 +28,16 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const SOCIAL_AUTH_COOLDOWN_MS = 2500;
 
-const StyledCard = styled(Card)(({ theme }) => ({
+const UnifiedAuthCard = styled(Card)(({ theme }) => ({
   background: '#FFFFFF',
-  borderRadius: '24px',
-  boxShadow: '0 20px 45px rgba(15, 23, 42, 0.08), 0 4px 16px rgba(15, 23, 42, 0.04)',
-  border: '1px solid #F1F5F9',
+  borderRadius: '28px',
+  boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
+  border: '1px solid #E2E8F0',
   transition: 'all 0.3s ease',
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
+  width: '100%',
+  maxWidth: '1080px',
+  margin: '0 auto',
+  overflow: 'hidden',
 }));
 
 const StyledLink = styled(Link)(({ theme }) => ({
@@ -302,7 +302,7 @@ const EmployerLogin = () => {
       <Container
         maxWidth="lg"
         sx={{
-          py: { xs: 2, sm: 4, md: 6 },
+          py: { xs: 2, sm: 4, md: 5 },
           px: { xs: 1, sm: 2, md: 3 },
           display: 'flex',
           alignItems: 'center',
@@ -310,42 +310,54 @@ const EmployerLogin = () => {
           minHeight: 'calc(100vh - 120px)',
         }}
       >
-        <Grid
-          container
-          spacing={{ xs: 0, md: 4 }}
-          alignItems="stretch"
-          sx={{
-            width: '100%',
-            maxWidth: '1060px',
-            margin: '0 auto',
-          }}
-        >
-          {/* Left Column: Login Form */}
+        <UnifiedAuthCard>
           <Grid
-            size={{ xs: 12, md: 6 }}
+            container
+            spacing={0}
+            alignItems="stretch"
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
+              width: '100%',
             }}
           >
-            <StyledCard
+            {/* Left Column: Login Form */}
+            <Grid
+              size={{ xs: 12, md: 6 }}
               sx={{
-                p: { xs: 3, sm: 4, md: 5 },
-                width: '100%',
-                borderRadius: { xs: '16px', sm: '24px' },
+                p: { xs: 3, sm: 4, md: 4.5 },
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                backgroundColor: '#FFFFFF',
               }}
             >
               {/* Card Top / Header */}
               <Box>
-                {/* Cross-Portal Switcher Link */}
+                {/* Role and Switcher header */}
                 <Box
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'flex-end',
-                    mb: 2.5,
+                    justifyContent: 'space-between',
+                    mb: 2,
                   }}
                 >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: '#2563EB',
+                      fontWeight: 700,
+                      fontSize: '13px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      backgroundColor: '#EFF6FF',
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: '8px',
+                    }}
+                  >
+                    Nhà tuyển dụng
+                  </Typography>
+
                   <Typography variant="caption" sx={{ color: '#64748B', fontSize: '13px' }}>
                     Bạn là Người tìm việc?{' '}
                     <StyledLink
@@ -364,25 +376,25 @@ const EmployerLogin = () => {
                   </Typography>
                 </Box>
 
-                <Box sx={{ mb: 3 }}>
+                <Box sx={{ mb: 2.5 }}>
                   <Typography
                     component="h1"
                     variant="h4"
                     sx={{
-                      fontWeight: 700,
-                      fontSize: { xs: '24px', sm: '28px', md: '30px' },
+                      fontWeight: 800,
+                      fontSize: { xs: '22px', sm: '26px', md: '28px' },
                       color: '#0F172A',
                       letterSpacing: '-0.02em',
-                      mb: 1,
+                      mb: 0.75,
                     }}
                   >
                     {t('login.heading')}
                   </Typography>
                   <Typography
-                    variant="body1"
+                    variant="body2"
                     sx={{
                       color: '#64748B',
-                      fontSize: '14.5px',
+                      fontSize: '14px',
                       lineHeight: 1.5,
                     }}
                   >
@@ -394,7 +406,7 @@ const EmployerLogin = () => {
                   <Alert
                     severity="error"
                     sx={{
-                      mb: 3,
+                      mb: 2.5,
                       borderRadius: '12px',
                       fontSize: '13.5px',
                     }}
@@ -408,7 +420,7 @@ const EmployerLogin = () => {
                   <Alert
                     severity="success"
                     sx={{
-                      mb: 3,
+                      mb: 2.5,
                       borderRadius: '12px',
                       fontSize: '13.5px',
                     }}
@@ -418,25 +430,47 @@ const EmployerLogin = () => {
                   </Alert>
                 )}
 
-                <Box sx={{ mt: 1 }}>
+                <Box sx={{ mt: 0.5 }}>
                   <EmployerLoginForm onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} />
                 </Box>
               </Box>
 
-              {/* Card Bottom / Footer Links */}
-              <Box sx={{ mt: 'auto', pt: 3 }}>
+              {/* Card Bottom / Legal Disclaimer & Links */}
+              <Box sx={{ mt: 'auto', pt: 2.5 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: 'block',
+                    textAlign: 'center',
+                    color: '#64748B',
+                    fontSize: '12.5px',
+                    lineHeight: 1.55,
+                    mb: 2,
+                  }}
+                >
+                  Bằng việc đăng nhập, quý doanh nghiệp đồng ý tuân thủ các{' '}
+                  <StyledLink href="/terms-and-conditions" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
+                    Điều khoản dịch vụ
+                  </StyledLink>{' '}
+                  và{' '}
+                  <StyledLink href="/privacy-policy" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
+                    Chính sách bảo mật
+                  </StyledLink>{' '}
+                  của InfoHR.
+                </Typography>
+
                 <Grid
                   container
                   spacing={2}
                   sx={{
-                    pt: 2.5,
+                    pt: 2,
                     borderTop: '1px solid #F1F5F9',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}
                 >
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <StyledLink href={forgotPasswordHref}>
+                    <StyledLink href={forgotPasswordHref} sx={{ color: '#64748B', '&:hover': { color: '#2563EB' } }}>
                       {t('login.forgotPassword')}
                     </StyledLink>
                   </Grid>
@@ -447,7 +481,7 @@ const EmployerLogin = () => {
                     }}
                     size={{ xs: 12, sm: 6 }}
                   >
-                    <StyledLink href={registerHref}>
+                    <StyledLink href={registerHref} sx={{ color: '#2563EB', fontWeight: 600 }}>
                       {t('login.noAccount')} {t('login.signUp')}
                     </StyledLink>
                   </Grid>
@@ -456,33 +490,34 @@ const EmployerLogin = () => {
                 {/* Security Trust Indicator */}
                 <Box
                   sx={{
-                    mt: 2.5,
-                    pt: 1.5,
+                    mt: 2,
+                    pt: 1,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 1,
+                    gap: 0.75,
                     color: '#94A3B8',
                     fontSize: '12px',
                   }}
                 >
-                  <SecurityIcon sx={{ fontSize: 16, color: '#10B981' }} />
+                  <SecurityIcon sx={{ fontSize: 15, color: '#10B981' }} />
                   <span>Bảo mật thông tin doanh nghiệp theo tiêu chuẩn SSL 256-bit</span>
                 </Box>
               </Box>
-            </StyledCard>
-          </Grid>
+            </Grid>
 
-          {/* Right Column: Showcase Panel (Desktop only) */}
-          <Grid
-            size={{ xs: 12, md: 6 }}
-            sx={{
-              display: { xs: 'none', md: 'flex' },
-            }}
-          >
-            <AuthShowcasePanel variant="employer" />
+            {/* Right Column: Showcase Panel (Desktop only) */}
+            <Grid
+              size={{ xs: 12, md: 6 }}
+              sx={{
+                display: { xs: 'none', md: 'flex' },
+                position: 'relative',
+              }}
+            >
+              <AuthShowcasePanel variant="employer" />
+            </Grid>
           </Grid>
-        </Grid>
+        </UnifiedAuthCard>
       </Container>
 
       {isFullScreenLoading && <BackdropLoading />}

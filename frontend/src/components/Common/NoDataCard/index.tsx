@@ -53,8 +53,9 @@ const NoDataCard = ({
       >
         <Box
           sx={{
-            width: { xs: 160, sm: 200 },
-            p: 2.5,
+            width: { xs: 140, sm: 180 },
+            height: { xs: 140, sm: 160 },
+            p: 2,
             borderRadius: '20px',
             backgroundColor: '#EFF6FF',
             border: '1px solid #DBEAFE',
@@ -72,7 +73,13 @@ const NoDataCard = ({
           {imgComponentSgv ? (
             imgComponentSgv
           ) : (
-            <SvgIcon src={SVG_IMAGES[svgKey as keyof typeof SVG_IMAGES]} />
+            <SvgIcon
+              src={
+                typeof SVG_IMAGES[svgKey as keyof typeof SVG_IMAGES] === 'object'
+                  ? (SVG_IMAGES[svgKey as keyof typeof SVG_IMAGES] as any)?.src || ''
+                  : (SVG_IMAGES[svgKey as keyof typeof SVG_IMAGES] || '')
+              }
+            />
           )}
         </Box>
         <Typography

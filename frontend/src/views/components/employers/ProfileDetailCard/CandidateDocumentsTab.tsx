@@ -13,6 +13,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
+import { downloadPdf } from '@/utils/funcUtils';
 import type { ResumeDetailResponse } from '@/types/models';
 
 const LazyPdf = lazy(() => import('../../../../components/Common/Pdf'));
@@ -34,6 +35,7 @@ export const CandidateDocumentsTab: React.FC<CandidateDocumentsTabProps> = ({
     (profileDetail.sourcePayload as any)?.cv_file_url ||
     '';
   const safeFileUrl = getSafeResourceUrl(actualFileUrl);
+  const publicCvHref = profileDetail.slug ? `/cv/${profileDetail.slug}` : undefined;
 
   return (
     <Stack spacing={3}>
@@ -73,7 +75,7 @@ export const CandidateDocumentsTab: React.FC<CandidateDocumentsTabProps> = ({
             </Typography>
           </Stack>
 
-          {safeFileUrl && (
+          {safeFileUrl ? (
             <Stack direction="row" spacing={1}>
               <Button
                 size="small"
@@ -98,9 +100,7 @@ export const CandidateDocumentsTab: React.FC<CandidateDocumentsTabProps> = ({
                 size="small"
                 variant="contained"
                 color="primary"
-                component="a"
-                href={safeFileUrl}
-                download
+                onClick={() => downloadPdf(safeFileUrl, profileDetail.title || 'CV')}
                 startIcon={<FileDownloadOutlinedIcon sx={{ fontSize: 15 }} />}
                 sx={{
                   borderRadius: '8px',
@@ -110,10 +110,30 @@ export const CandidateDocumentsTab: React.FC<CandidateDocumentsTabProps> = ({
                   bgcolor: '#2563EB',
                 }}
               >
-                Tải xuống
+                Tải xuống PDF
               </Button>
             </Stack>
-          )}
+          ) : publicCvHref ? (
+            <Button
+              size="small"
+              variant="contained"
+              color="primary"
+              component="a"
+              href={publicCvHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              startIcon={<OpenInNewIcon sx={{ fontSize: 15 }} />}
+              sx={{
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontWeight: 700,
+                fontSize: '0.8125rem',
+                bgcolor: '#2563EB',
+              }}
+            >
+              Xem CV trực tuyến
+            </Button>
+          ) : null}
         </Stack>
 
         {safeFileUrl ? (
@@ -150,11 +170,26 @@ export const CandidateDocumentsTab: React.FC<CandidateDocumentsTabProps> = ({
           >
             <DescriptionOutlinedIcon sx={{ fontSize: 44, color: '#94A3B8', mb: 1 }} />
             <Typography variant="subtitle1" sx={{ color: '#334155', fontWeight: 700 }}>
-              Chưa có tài liệu đính kèm
+              {publicCvHref ? 'Hồ sơ CV trực tuyến' : 'Chưa có tài liệu đính kèm'}
             </Typography>
             <Typography variant="body2" sx={{ color: '#64748B', mt: 0.5 }}>
-              Ứng viên chưa đính kèm tệp CV dạng PDF hoặc Word.
+              {publicCvHref
+                ? 'Ứng viên sử dụng mẫu CV trực tuyến trên hệ thống.'
+                : 'Ứng viên chưa đính kèm tệp CV dạng PDF hoặc Word.'}
             </Typography>
+            {publicCvHref && (
+              <Button
+                variant="outlined"
+                component="a"
+                href={publicCvHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                startIcon={<OpenInNewIcon />}
+                sx={{ mt: 2, borderRadius: '8px', textTransform: 'none', fontWeight: 700 }}
+              >
+                Mở xem và in CV
+              </Button>
+            )}
           </Box>
         )}
       </Paper>

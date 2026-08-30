@@ -24,7 +24,7 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
       style={{ fontFamily }}
     >
       {/* Header: Nordic Asymmetric Clean Layout */}
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-6 pb-5 border-b border-slate-200">
+      <div className="flex flex-row justify-between items-start gap-6 pb-5 border-b border-slate-200 cv-section break-inside-avoid">
         <div className="flex items-center gap-5">
           {theme.showAvatar && (
             <AvatarRenderer
@@ -99,7 +99,7 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
       {/* Summary / Bio */}
       {personalInfo.bio && (
         <div
-          className="relative pl-4 border-l-2 py-0.5"
+          className="relative pl-4 border-l-2 py-0.5 cv-section break-inside-avoid"
           style={{ borderColor: primaryColor }}
         >
           <p className="text-slate-700 leading-relaxed font-normal whitespace-pre-line">
@@ -109,12 +109,12 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
       )}
 
       {/* Main Grid: 2 Columns (8 cols left / 4 cols right) */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-7">
+      <div className="grid grid-cols-12 gap-7">
         {/* Left Column: Experience & Projects (8 cols) */}
-        <div className="md:col-span-8 flex flex-col gap-6">
+        <div className="col-span-8 flex flex-col gap-6">
           {/* Experience */}
           {experiences && experiences.length > 0 && (
-            <div>
+            <div className="cv-section">
               <div className="flex items-center gap-2 mb-3 pb-1 border-b border-slate-200">
                 <Briefcase className="w-4 h-4" style={{ color: primaryColor }} />
                 <h2 className="text-[13px] font-bold uppercase tracking-wider text-slate-900">
@@ -124,12 +124,12 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
 
               <div className={itemGapClass}>
                 {experiences.map((exp) => (
-                  <div key={exp.id} className="relative pl-4 border-l border-slate-200">
+                  <div key={exp.id} className="relative pl-4 border-l border-slate-200 break-inside-avoid cv-item">
                     <div
                       className="absolute -left-[4.5px] top-1.5 w-2 h-2 rounded-full"
                       style={{ backgroundColor: primaryColor }}
                     />
-                    <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                    <div className="flex flex-row items-baseline justify-between gap-1">
                       <h3 className="font-bold text-slate-900">{exp.position}</h3>
                       <DateRangeText
                         startDate={exp.startDate}
@@ -155,7 +155,7 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
 
           {/* Projects */}
           {projects && projects.length > 0 && (
-            <div>
+            <div className="cv-section">
               <div className="flex items-center gap-2 mb-3 pb-1 border-b border-slate-200">
                 <Sparkles className="w-4 h-4" style={{ color: primaryColor }} />
                 <h2 className="text-[13px] font-bold uppercase tracking-wider text-slate-900">
@@ -167,7 +167,7 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
                 {projects.map((proj) => (
                   <div
                     key={proj.id}
-                    className="p-3.5 rounded-xl border"
+                    className="p-3.5 rounded-xl border break-inside-avoid cv-item"
                     style={{
                       backgroundColor: hexToRgba(primaryColor, 0.02),
                       borderColor: hexToRgba(primaryColor, 0.1),
@@ -197,10 +197,10 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
         </div>
 
         {/* Right / Sidebar Column: Skills, Education, Certs, Languages (4 cols) */}
-        <div className="md:col-span-4 flex flex-col gap-6">
+        <div className="col-span-4 flex flex-col gap-6">
           {/* Skills */}
           {skills && skills.length > 0 && (
-            <div>
+            <div className="cv-section break-inside-avoid">
               <div className="flex items-center gap-2 mb-2.5 pb-1 border-b border-slate-200">
                 <Sparkles className="w-4 h-4" style={{ color: primaryColor }} />
                 <h2 className="text-[12.5px] font-bold uppercase tracking-wider text-slate-900">
@@ -222,7 +222,7 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
 
           {/* Education */}
           {educations && educations.length > 0 && (
-            <div>
+            <div className="cv-section">
               <div className="flex items-center gap-2 mb-2.5 pb-1 border-b border-slate-200">
                 <GraduationCap className="w-4 h-4" style={{ color: primaryColor }} />
                 <h2 className="text-[12.5px] font-bold uppercase tracking-wider text-slate-900">
@@ -231,7 +231,7 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
               </div>
               <div className="space-y-2.5">
                 {educations.map((edu) => (
-                  <div key={edu.id}>
+                  <div key={edu.id} className="break-inside-avoid cv-item">
                     <div className="font-bold text-slate-900">{edu.school}</div>
                     <div className="text-slate-700 text-[11.5px]">{edu.major}</div>
                     <div className="text-[11px] text-slate-500 mt-0.5">
@@ -246,7 +246,7 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
 
           {/* Certificates */}
           {certificates && certificates.length > 0 && (
-            <div>
+            <div className="cv-section break-inside-avoid">
               <div className="flex items-center gap-2 mb-2.5 pb-1 border-b border-slate-200">
                 <Award className="w-4 h-4" style={{ color: primaryColor }} />
                 <h2 className="text-[12.5px] font-bold uppercase tracking-wider text-slate-900">
@@ -268,7 +268,7 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
 
           {/* Languages */}
           {languages && languages.length > 0 && (
-            <div>
+            <div className="cv-section break-inside-avoid">
               <div className="flex items-center gap-2 mb-2 pb-1 border-b border-slate-200">
                 <Globe className="w-4 h-4" style={{ color: primaryColor }} />
                 <h2 className="text-[12.5px] font-bold uppercase tracking-wider text-slate-900">

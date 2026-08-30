@@ -38,7 +38,7 @@ import DataTable from '@/components/Common/DataTable';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import adminManagementService from '@/services/adminManagementService';
 import { CV_TYPES, ROUTES } from '@/configs/constants';
-import { formatRoute } from '@/utils/funcUtils';
+import { formatRoute, downloadPdf } from '@/utils/funcUtils';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import dayjs from '@/configs/dayjs-config';
 import { useConfig } from '@/hooks/useConfig';
@@ -243,6 +243,8 @@ const ProfileDetailPage = ({ id }: { id?: string } = {}) => {
         const onlineHref = resume.slug
           ? localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.STEP_PROFILE, resume.slug, ':slug')}`, i18n.language)
           : undefined;
+        const publicCvHref = resume.slug ? `/cv/${resume.slug}` : undefined;
+        const safeTargetViewUrl = isOnline ? (publicCvHref || onlineHref) : (safeFileUrl || onlineHref);
 
         return (
           <Stack direction="row" spacing={0.5} justifyContent="flex-end">
@@ -251,11 +253,11 @@ const ProfileDetailPage = ({ id }: { id?: string } = {}) => {
                 <IconButton aria-label="Thao tác"
                   size="small"
                   component="a"
-                  href={isOnline ? onlineHref : safeFileUrl || undefined}
+                  href={safeTargetViewUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   color="info"
-                  disabled={!onlineHref && !safeFileUrl}
+                  disabled={!safeTargetViewUrl}
                 >
                   {isOnline ? <OpenInNewIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
                 </IconButton>
@@ -265,11 +267,15 @@ const ProfileDetailPage = ({ id }: { id?: string } = {}) => {
               <span>
                 <IconButton aria-label="Tải xuống"
                   size="small"
-                  component="a"
-                  href={safeFileUrl || undefined}
-                  download
+                  onClick={() => {
+                    if (safeFileUrl) {
+                      downloadPdf(safeFileUrl, resume.title);
+                    } else if (publicCvHref || onlineHref) {
+                      window.open(publicCvHref || onlineHref, '_blank');
+                    }
+                  }}
                   color="primary"
-                  disabled={!safeFileUrl}
+                  disabled={!safeFileUrl && !publicCvHref && !onlineHref}
                 >
                   <DownloadIcon fontSize="small" />
                 </IconButton>

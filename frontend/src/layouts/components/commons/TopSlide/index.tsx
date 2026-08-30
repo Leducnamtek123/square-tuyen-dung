@@ -11,10 +11,16 @@ import {
 } from '@mui/material';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import {
+  GSAP_MEDIA_CONDITIONS,
+  registerGsapPlugins,
+} from '@/utils/gsapHelpers';
 import HomeSearch from '../../../../views/components/defaults/HomeSearch';
 import contentService from '../../../../services/contentService';
 import { BANNER_TYPES, IMAGES } from '../../../../configs/constants';
 import type { Banner } from '../../../../types/models';
+
+registerGsapPlugins();
 
 const HERO_CONTAINER_MAX_WIDTH = 1280;
 const HERO_HEADER_OFFSET = { xs: '56px', sm: '64px' };
@@ -80,31 +86,75 @@ const TopSlide = () => {
 
   useGSAP(
     () => {
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      const mm = gsap.matchMedia();
 
-      tl.fromTo(
-        '.gsap-hero-tag',
-        { y: -15, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, clearProps: 'transform' }
-      )
-        .fromTo(
-          '.gsap-hero-title',
-          { y: 25, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.7, clearProps: 'transform' },
-          '-=0.35'
+      // ── Desktop Breakpoint (≥769px) ─────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.isDesktop, () => {
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+        tl.fromTo(
+          '.gsap-hero-tag',
+          { y: -15, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, clearProps: 'all' }
         )
-        .fromTo(
-          '.gsap-hero-subtitle',
-          { y: 15, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.6, clearProps: 'transform' },
-          '-=0.4'
+          .fromTo(
+            '.gsap-hero-title',
+            { y: 25, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.7, clearProps: 'all' },
+            '-=0.35'
+          )
+          .fromTo(
+            '.gsap-hero-subtitle',
+            { y: 15, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.6, clearProps: 'all' },
+            '-=0.4'
+          )
+          .fromTo(
+            '.gsap-hero-search',
+            { y: 20, opacity: 0, scale: 0.98 },
+            { y: 0, opacity: 1, scale: 1, duration: 0.7, clearProps: 'all' },
+            '-=0.3'
+          );
+      });
+
+      // ── Mobile Breakpoint (≤768px) ──────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.isMobile, () => {
+        const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+
+        tl.fromTo(
+          '.gsap-hero-tag',
+          { y: -8, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.45, clearProps: 'all' }
         )
-        .fromTo(
-          '.gsap-hero-search',
-          { y: 20, opacity: 0, scale: 0.98 },
-          { y: 0, opacity: 1, scale: 1, duration: 0.7, clearProps: 'transform' },
-          '-=0.3'
-        );
+          .fromTo(
+            '.gsap-hero-title',
+            { y: 14, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, clearProps: 'all' },
+            '-=0.25'
+          )
+          .fromTo(
+            '.gsap-hero-subtitle',
+            { y: 10, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.45, clearProps: 'all' },
+            '-=0.3'
+          )
+          .fromTo(
+            '.gsap-hero-search',
+            { y: 12, opacity: 0, scale: 0.99 },
+            { y: 0, opacity: 1, scale: 1, duration: 0.5, clearProps: 'all' },
+            '-=0.25'
+          );
+      });
+
+      // ── Reduced Motion ───────────────────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.reduceMotion, () => {
+        gsap.set('.gsap-hero-tag, .gsap-hero-title, .gsap-hero-subtitle, .gsap-hero-search', {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          clearProps: 'all',
+        });
+      });
     },
     { scope: heroContentRef }
   );

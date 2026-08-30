@@ -6,14 +6,17 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import {
+  GSAP_MEDIA_CONDITIONS,
+  registerGsapPlugins,
+  safeScrollTriggerRefresh,
+} from '@/utils/gsapHelpers';
 import {
   Avatar,
   Box,
   Button,
   Card,
   CardContent,
-  CardHeader,
   Chip,
   Stack,
   Typography,
@@ -37,6 +40,7 @@ import CareerHandbookSection from '../../../components/Features/CareerHandbookSe
 import JobByCategory from '../../components/defaults/JobByCategory';
 import FilterJobPostCard from '../../components/defaults/FilterJobPostCard';
 import SuggestedJobPostCard from '../../components/defaults/SuggestedJobPostCard';
+import CareerJobPostTabs from '../../components/defaults/CareerJobPostTabs';
 import commonService from '../../../services/commonService';
 import bannerExplorePcImport from '../../../assets/images/banner-explore-pc.webp';
 import bannerExploreGirlImport from '../../../assets/images/banner-explore-girl.webp';
@@ -46,9 +50,7 @@ import LazyLoadSection from '../../../components/Common/LazyLoadSection';
 import type { TFunction } from 'i18next';
 import type { Career } from '@/types/models';
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
+registerGsapPlugins();
 
 // Home hero copy coverage for i18n tests:
 const HOME_HERO_KEYS = [
@@ -176,22 +178,29 @@ const EntryPointCard = ({
           bgcolor: accent,
         }}
       />
-      <CardHeader
-        avatar={
+      <Box sx={{ p: { xs: 2.5, sm: 3 }, pb: 1 }}>
+        {/* Top row: Avatar on left + Status Badge on right */}
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="flex-start"
+          spacing={1.5}
+          sx={{ mb: 2 }}
+        >
           <Avatar
             sx={{
               bgcolor: `${accent}15`,
               color: accent,
-              width: 56,
-              height: 56,
+              width: { xs: 48, sm: 56 },
+              height: { xs: 48, sm: 56 },
               borderRadius: 3,
+              flexShrink: 0,
             }}
           >
             {icon}
           </Avatar>
-        }
-        action={
-          statusBadge && (
+
+          {statusBadge && (
             <Chip
               label={statusBadge.text}
               size="small"
@@ -200,24 +209,48 @@ const EntryPointCard = ({
                 border: '1px solid #e2e8f0',
                 color: '#334155',
                 fontWeight: 600,
-                fontSize: '0.75rem',
+                fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                maxWidth: 'calc(100% - 64px)',
+                height: 'auto',
+                py: 0.5,
+                '& .MuiChip-label': {
+                  whiteSpace: 'normal',
+                  textAlign: 'right',
+                  lineHeight: 1.3,
+                  px: 1,
+                },
               }}
             />
-          )
-        }
-        title={
-          <Typography variant="h5" sx={{ fontWeight: 800, color: '#0f172a', mt: 0.5 }}>
+          )}
+        </Stack>
+
+        {/* Title and Description full width */}
+        <Box sx={{ minWidth: 0 }}>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 800,
+              color: '#0f172a',
+              fontSize: { xs: '1.2rem', sm: '1.35rem' },
+              lineHeight: 1.3,
+              mb: 1,
+            }}
+          >
             {title}
           </Typography>
-        }
-        subheader={
-          <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: '#64748b',
+              fontSize: { xs: '0.85rem', sm: '0.875rem' },
+              lineHeight: 1.55,
+            }}
+          >
             {description}
           </Typography>
-        }
-        sx={{ pb: 1 }}
-      />
-      <CardContent sx={{ pt: 1, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        </Box>
+      </Box>
+      <CardContent sx={{ pt: 1, px: { xs: 2.5, sm: 3 }, pb: { xs: 2.5, sm: 3 }, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <Stack spacing={1.5} sx={{ mb: 3 }}>
           {benefits.map((benefit, idx) => (
             <Stack key={idx} direction="row" spacing={1.25} alignItems="center">
@@ -311,101 +344,221 @@ export default function HomePage() {
     staleTime: 5 * 60_000,
   });
 
+  React.useEffect(() => {
+    if (careerSections && careerSections.length > 0) {
+      safeScrollTriggerRefresh(100);
+    }
+  }, [careerSections]);
+
   useGSAP(
     () => {
-      // 1. Urgent jobs section entrance
-      gsap.fromTo(
-        '.gsap-urgent-jobs',
-        { y: 25, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.65, ease: 'power3.out', clearProps: 'transform' }
-      );
+      const mm = gsap.matchMedia();
 
-      // 2. Top company carousel entrance with ScrollTrigger
-      gsap.fromTo(
-        '.gsap-top-companies',
-        { y: 30, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: '.gsap-top-companies',
-            start: 'top 85%',
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.65,
-          ease: 'power3.out',
-          clearProps: 'transform',
-        }
-      );
+      // ── Desktop Breakpoint (≥769px) ─────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.isDesktop, () => {
+        // 1. Urgent jobs section entrance
+        gsap.fromTo(
+          '.gsap-urgent-jobs',
+          { y: 25, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.65, ease: 'power3.out', clearProps: 'all' }
+        );
 
-      // 3. Choose Path section with ScrollTrigger & stagger
-      gsap.fromTo(
-        '.gsap-path-header',
-        { y: 25, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: '.gsap-choose-path',
-            start: 'top 85%',
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.6,
-          ease: 'power3.out',
-          clearProps: 'transform',
-        }
-      );
+        // 2. Top company carousel entrance with ScrollTrigger
+        gsap.fromTo(
+          '.gsap-top-companies',
+          { y: 30, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: '.gsap-top-companies',
+              start: 'top 85%',
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.65,
+            ease: 'power3.out',
+            clearProps: 'all',
+          }
+        );
 
-      gsap.fromTo(
-        '.gsap-entry-card',
-        { y: 35, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: '.gsap-choose-path-grid',
-            start: 'top 85%',
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.65,
-          stagger: 0.15,
-          ease: 'power3.out',
-          clearProps: 'transform',
-        }
-      );
+        // 3. Choose Path section with ScrollTrigger & stagger
+        gsap.fromTo(
+          '.gsap-path-header',
+          { y: 25, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: '.gsap-choose-path',
+              start: 'top 85%',
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            ease: 'power3.out',
+            clearProps: 'all',
+          }
+        );
 
-      // 4. Feedback section with ScrollTrigger
-      gsap.fromTo(
-        '.gsap-feedback-section',
-        { y: 30, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: '.gsap-feedback-section',
-            start: 'top 85%',
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.65,
-          ease: 'power3.out',
-          clearProps: 'transform',
-        }
-      );
+        gsap.fromTo(
+          '.gsap-entry-card',
+          { y: 35, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: '.gsap-choose-path-grid',
+              start: 'top 85%',
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.65,
+            stagger: 0.15,
+            ease: 'power3.out',
+            clearProps: 'all',
+          }
+        );
 
-      // 5. Handbook section with ScrollTrigger
-      gsap.fromTo(
-        '.gsap-handbook-section',
-        { y: 30, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: '.gsap-handbook-section',
-            start: 'top 85%',
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.65,
-          ease: 'power3.out',
-          clearProps: 'transform',
-        }
-      );
+        // 4. Feedback section with ScrollTrigger
+        gsap.fromTo(
+          '.gsap-feedback-section',
+          { y: 30, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: '.gsap-feedback-section',
+              start: 'top 85%',
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.65,
+            ease: 'power3.out',
+            clearProps: 'all',
+          }
+        );
+
+        // 5. Handbook section with ScrollTrigger
+        gsap.fromTo(
+          '.gsap-handbook-section',
+          { y: 30, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: '.gsap-handbook-section',
+              start: 'top 85%',
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.65,
+            ease: 'power3.out',
+            clearProps: 'all',
+          }
+        );
+      });
+
+      // ── Mobile Breakpoint (≤768px) ──────────────────────────────────
+      // Subtle movements (y: 12-16px), earlier trigger (top 92%) and faster durations to eliminate lag
+      mm.add(GSAP_MEDIA_CONDITIONS.isMobile, () => {
+        gsap.fromTo(
+          '.gsap-urgent-jobs',
+          { y: 12, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.45, ease: 'power2.out', clearProps: 'all' }
+        );
+
+        gsap.fromTo(
+          '.gsap-top-companies',
+          { y: 14, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: '.gsap-top-companies',
+              start: 'top 92%',
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.45,
+            ease: 'power2.out',
+            clearProps: 'all',
+          }
+        );
+
+        gsap.fromTo(
+          '.gsap-path-header',
+          { y: 12, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: '.gsap-choose-path',
+              start: 'top 92%',
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.45,
+            ease: 'power2.out',
+            clearProps: 'all',
+          }
+        );
+
+        gsap.fromTo(
+          '.gsap-entry-card',
+          { y: 16, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: '.gsap-choose-path-grid',
+              start: 'top 92%',
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.45,
+            stagger: 0.08,
+            ease: 'power2.out',
+            clearProps: 'all',
+          }
+        );
+
+        gsap.fromTo(
+          '.gsap-feedback-section',
+          { y: 14, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: '.gsap-feedback-section',
+              start: 'top 92%',
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.45,
+            ease: 'power2.out',
+            clearProps: 'all',
+          }
+        );
+
+        gsap.fromTo(
+          '.gsap-handbook-section',
+          { y: 14, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: '.gsap-handbook-section',
+              start: 'top 92%',
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.45,
+            ease: 'power2.out',
+            clearProps: 'all',
+          }
+        );
+      });
+
+      // ── Reduced Motion ───────────────────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.reduceMotion, () => {
+        gsap.set(
+          '.gsap-urgent-jobs, .gsap-top-companies, .gsap-path-header, .gsap-entry-card, .gsap-feedback-section, .gsap-handbook-section',
+          { opacity: 1, y: 0, clearProps: 'all' }
+        );
+      });
     },
-    { scope: homeContainerRef }
+    { scope: homeContainerRef, dependencies: [careerSections], revertOnUpdate: true }
   );
 
   return (
@@ -495,22 +648,8 @@ export default function HomePage() {
         </Box>
       )}
 
-      {/* ── Key Careers Sections ────────────────────────────────────────── */}
-      {careerSections.length > 0 && (
-        <Box sx={{ mt: { xs: 4, sm: 6, md: 10 } }}>
-          <Stack spacing={1} sx={{ mb: 4, textAlign: 'center', alignItems: 'center' }}>
-            <Typography variant="h4" sx={{ fontWeight: 800 }}>
-              {t('home.keyCareersTitle')}
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 640 }}>
-              {t('home.keyCareersSubtitle')}
-            </Typography>
-          </Stack>
-          {careerSections.map((career) => (
-            <CareerJobSection key={career.id} career={career} t={t} />
-          ))}
-        </Box>
-      )}
+      {/* ── Key Careers Section (Tabbed Pills & Smart Fallback) ──────── */}
+      <CareerJobPostTabs />
 
       {/* ── Top Career Carousel (Industries) ────────────────────────────── */}
       <Box sx={{ mt: { xs: 4, sm: 6, md: 10 } }}>

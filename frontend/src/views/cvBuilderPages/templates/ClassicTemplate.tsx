@@ -26,7 +26,7 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi'
     >
       {/* Editorial Header */}
       <div className="border-b-4 border-double pb-4" style={{ borderColor: primaryColor }}>
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-5">
+        <div className="flex flex-row justify-between items-center gap-5">
           <div className="flex items-center gap-4">
             {theme.showAvatar && (
               <AvatarRenderer
@@ -38,7 +38,7 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi'
                 borderWidth={2}
               />
             )}
-            <div className="text-center sm:text-left">
+            <div className="text-left">
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
                 {personalInfo.fullName || (language === 'vi' ? 'Họ và Tên' : 'Full Name')}
               </h1>
@@ -48,20 +48,20 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi'
             </div>
           </div>
 
-          <div className="text-[11.5px] text-slate-600 space-y-1 font-sans text-center sm:text-right">
-            {personalInfo.email && <div className="flex items-center justify-center sm:justify-end gap-1.5"><Mail className="w-3 h-3 text-slate-400" /><span>{personalInfo.email}</span></div>}
-            {personalInfo.phoneNumber && <div className="flex items-center justify-center sm:justify-end gap-1.5"><Phone className="w-3 h-3 text-slate-400" /><span>{personalInfo.phoneNumber}</span></div>}
-            {personalInfo.address && <div className="flex items-center justify-center sm:justify-end gap-1.5"><MapPin className="w-3 h-3 text-slate-400" /><span>{personalInfo.address}</span></div>}
-            {personalInfo.linkedin && <div className="flex items-center justify-center sm:justify-end gap-1.5"><LinkedinIcon className="w-3 h-3 text-slate-400" /><span>{personalInfo.linkedin}</span></div>}
-            {personalInfo.github && <div className="flex items-center justify-center sm:justify-end gap-1.5"><GithubIcon className="w-3 h-3 text-slate-400" /><span>{personalInfo.github}</span></div>}
-            {personalInfo.website && <div className="flex items-center justify-center sm:justify-end gap-1.5"><Globe className="w-3 h-3 text-slate-400" /><span>{personalInfo.website}</span></div>}
+          <div className="text-[11.5px] text-slate-600 space-y-1 font-sans text-right">
+            {personalInfo.email && <div className="flex items-center justify-end gap-1.5"><Mail className="w-3 h-3 text-slate-400" /><span>{personalInfo.email}</span></div>}
+            {personalInfo.phoneNumber && <div className="flex items-center justify-end gap-1.5"><Phone className="w-3 h-3 text-slate-400" /><span>{personalInfo.phoneNumber}</span></div>}
+            {personalInfo.address && <div className="flex items-center justify-end gap-1.5"><MapPin className="w-3 h-3 text-slate-400" /><span>{personalInfo.address}</span></div>}
+            {personalInfo.linkedin && <div className="flex items-center justify-end gap-1.5"><LinkedinIcon className="w-3 h-3 text-slate-400" /><span>{personalInfo.linkedin}</span></div>}
+            {personalInfo.github && <div className="flex items-center justify-end gap-1.5"><GithubIcon className="w-3 h-3 text-slate-400" /><span>{personalInfo.github}</span></div>}
+            {personalInfo.website && <div className="flex items-center justify-end gap-1.5"><Globe className="w-3 h-3 text-slate-400" /><span>{personalInfo.website}</span></div>}
           </div>
         </div>
       </div>
 
       {/* Summary */}
       {personalInfo.bio && (
-        <div>
+        <div className="cv-section break-inside-avoid">
           <h2
             className="text-[13.5px] font-bold uppercase tracking-widest mb-1.5 pb-1 border-b"
             style={{ color: primaryColor, borderColor: '#cbd5e1' }}
@@ -76,7 +76,7 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi'
 
       {/* Experience */}
       {experiences && experiences.length > 0 && (
-        <div>
+        <div className="cv-section">
           <h2
             className="text-[13.5px] font-bold uppercase tracking-widest mb-3 pb-1 border-b"
             style={{ color: primaryColor, borderColor: '#cbd5e1' }}
@@ -85,7 +85,7 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi'
           </h2>
           <div className={itemGapClass}>
             {experiences.map((exp) => (
-              <div key={exp.id}>
+              <div key={exp.id} className="break-inside-avoid cv-item">
                 <div className="flex justify-between items-baseline">
                   <span className="font-bold text-slate-900 text-[13px]">{exp.position}</span>
                   <DateRangeText
@@ -106,9 +106,9 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi'
         </div>
       )}
 
-      {/* Projects (Previously Missing!) */}
+      {/* Projects */}
       {projects && projects.length > 0 && (
-        <div>
+        <div className="cv-section">
           <h2
             className="text-[13.5px] font-bold uppercase tracking-widest mb-2.5 pb-1 border-b"
             style={{ color: primaryColor, borderColor: '#cbd5e1' }}
@@ -117,7 +117,7 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi'
           </h2>
           <div className={itemGapClass}>
             {projects.map((proj) => (
-              <div key={proj.id} className="font-sans">
+              <div key={proj.id} className="font-sans break-inside-avoid cv-item">
                 <div className="flex justify-between items-baseline">
                   <span className="font-bold text-slate-900 text-[12.5px]">{proj.name}</span>
                   <DateRangeText startDate={proj.startDate} endDate={proj.endDate} language={language} className="text-[11px] text-slate-500" />
@@ -138,7 +138,7 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi'
 
       {/* Education */}
       {educations && educations.length > 0 && (
-        <div>
+        <div className="cv-section">
           <h2
             className="text-[13.5px] font-bold uppercase tracking-widest mb-2.5 pb-1 border-b"
             style={{ color: primaryColor, borderColor: '#cbd5e1' }}
@@ -147,7 +147,7 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi'
           </h2>
           <div className="space-y-2">
             {educations.map((edu) => (
-              <div key={edu.id}>
+              <div key={edu.id} className="break-inside-avoid cv-item">
                 <div className="flex justify-between items-baseline">
                   <span className="font-bold text-slate-900 text-[12.5px]">{edu.school}</span>
                   <DateRangeText startDate={edu.startDate} endDate={edu.endDate} language={language} className="text-[11px] text-slate-500 font-sans" />
@@ -164,7 +164,7 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi'
       )}
 
       {/* Bottom Grid: Skills, Languages & Certificates */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-1 font-sans">
+      <div className="grid grid-cols-3 gap-6 pt-1 font-sans cv-section break-inside-avoid">
         {skills && skills.length > 0 && (
           <div>
             <h2
@@ -227,3 +227,4 @@ export const ClassicTemplate: React.FC<TemplateProps> = ({ data, language = 'vi'
     </div>
   );
 };
+

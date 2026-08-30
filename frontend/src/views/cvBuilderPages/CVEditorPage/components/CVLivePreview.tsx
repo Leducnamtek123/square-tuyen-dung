@@ -77,7 +77,7 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
       {/* ── Vieclam24h-Style Top Control Bar ─────────────────────────────── */}
       <Paper
         elevation={0}
-        className="cv-preview-toolbar no-print"
+        className="no-print"
         sx={{
           py: 1,
           px: { xs: 2, sm: 3 },
@@ -89,9 +89,6 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
           zIndex: 15,
           flexWrap: 'wrap',
           gap: 1.5,
-          '@media print': {
-            display: 'none !important',
-          },
         }}
       >
         {/* Left: Template Switcher & Language & Colors */}
@@ -264,7 +261,6 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
 
       {/* ── Center Canvas Area with Pan & Scroll ─────────────────────────── */}
       <Box
-        className="cv-preview-viewport"
         sx={{
           flex: 1,
           overflow: 'auto',
@@ -272,16 +268,9 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'flex-start',
-          '@media print': {
-            p: '0 !important',
-            overflow: 'visible !important',
-            display: 'block !important',
-            height: 'auto !important',
-          },
         }}
       >
         <Box
-          className="cv-zoom-wrapper"
           sx={{
             transition: 'transform 0.15s ease-out',
             transformOrigin: 'top center',
@@ -293,19 +282,9 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
             borderRadius: '4px',
             overflow: 'hidden',
             bgcolor: '#ffffff',
-            '@media print': {
-              transform: 'none !important',
-              boxShadow: 'none !important',
-              borderRadius: '0 !important',
-              mb: '0 !important',
-              width: '210mm !important',
-              minHeight: '297mm !important',
-              overflow: 'visible !important',
-              bgcolor: '#ffffff !important',
-            },
           }}
         >
-          <div id="cv-print-area" className="cv-print-target" style={{ width: '100%', background: '#ffffff' }}>
+          <div id="cv-print-area" style={{ width: '100%', background: '#ffffff' }}>
             <CVTemplateRenderer data={data} language={cvLanguage} />
           </div>
         </Box>

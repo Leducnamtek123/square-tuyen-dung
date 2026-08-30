@@ -8,6 +8,6 @@ describe('ResumesPage file actions', () => {
     expect(source).not.toContain("href={resume.fileUrl || '#'}");
     expect(source).toContain('const fileUrl = resume.fileUrl ||');
     expect(source).toContain('const safeFileUrl = getSafeResourceUrl(fileUrl)');
-    expect(source).toContain('disabled={!safeFileUrl}');
+    expect(source).toContain('disabled={!safeTargetUrl}');
   });
 });

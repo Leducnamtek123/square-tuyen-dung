@@ -47,7 +47,7 @@ interface Props {
   legalProfile: VerificationLegalProfile;
   onChange: (field: keyof VerificationLegalProfile) => (event: React.ChangeEvent<HTMLInputElement>) => void;
   onLicenseFileUploaded?: (fileUrl: string) => void;
-  onSubmit: (event: React.FormEvent) => void;
+  onSubmit: (event: React.SyntheticEvent) => void;
   statusLabel: string;
   statusColor?: ChipProps['color'];
   errors?: Partial<Record<keyof VerificationLegalProfile, string>>;

@@ -107,7 +107,7 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
     return () => {
       isMounted = false;
     };
-  }, [currentUser, dispatch, i18n.language]);
+  }, [currentUser, dispatch, i18n.language, pathname]);
 
   if (!isAllowed) {
     return <AuthLoadingScreen />;

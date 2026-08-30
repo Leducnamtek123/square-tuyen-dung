@@ -166,7 +166,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ data, language = 'vi
         {/* Bio */}
         {personalInfo.bio && (
           <div
-            className="p-4 rounded-xl border"
+            className="p-4 rounded-xl border cv-section break-inside-avoid"
             style={{
               backgroundColor: hexToRgba(primaryColor, 0.04),
               borderColor: hexToRgba(primaryColor, 0.15),
@@ -184,7 +184,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ data, language = 'vi
 
         {/* Work Experience */}
         {experiences && experiences.length > 0 && (
-          <div>
+          <div className="cv-section">
             <h2
               className="text-[13.5px] font-black uppercase tracking-wider pb-1 mb-3.5 border-b-2 flex items-center gap-2"
               style={{ color: primaryColor, borderColor: primaryColor }}
@@ -194,7 +194,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ data, language = 'vi
             </h2>
             <div className={itemGapClass}>
               {experiences.map((exp) => (
-                <div key={exp.id} className="relative pl-4 border-l-2" style={{ borderColor: primaryColor }}>
+                <div key={exp.id} className="relative pl-4 border-l-2 break-inside-avoid cv-item" style={{ borderColor: primaryColor }}>
                   <div className="flex justify-between items-baseline">
                     <h3 className="font-bold text-slate-900 text-[13px]">{exp.position}</h3>
                     <DateRangeText
@@ -217,7 +217,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ data, language = 'vi
 
         {/* Projects */}
         {projects && projects.length > 0 && (
-          <div>
+          <div className="cv-section">
             <h2
               className="text-[13.5px] font-black uppercase tracking-wider pb-1 mb-3 border-b-2 flex items-center gap-2"
               style={{ color: primaryColor, borderColor: primaryColor }}
@@ -229,7 +229,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ data, language = 'vi
               {projects.map((proj) => (
                 <div
                   key={proj.id}
-                  className="p-3.5 rounded-xl border"
+                  className="p-3.5 rounded-xl border break-inside-avoid cv-item"
                   style={{
                     backgroundColor: hexToRgba(primaryColor, 0.02),
                     borderColor: hexToRgba(primaryColor, 0.12),
@@ -251,7 +251,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ data, language = 'vi
 
         {/* Certificates */}
         {certificates && certificates.length > 0 && (
-          <div>
+          <div className="cv-section break-inside-avoid">
             <h2
               className="text-[13.5px] font-black uppercase tracking-wider pb-1 mb-2 border-b-2 flex items-center gap-2"
               style={{ color: primaryColor, borderColor: primaryColor }}

@@ -26,6 +26,7 @@ export interface ChatRoomData {
   user?: UserAccount;
   recipientId?: string;
   unreadCount?: number;
+  lastMessage?: string;
 }
 
 const LIMIT = 20;
@@ -112,7 +113,7 @@ type ChatRoomsAction =
 
 const initialChatRoomsState: ChatRoomsState = {
   isLoading: true,
-  hasMore: true,
+  hasMore: false,
   lastDocument: null,
   chatRooms: [],
   page: 0,
@@ -129,7 +130,7 @@ const chatRoomsReducer = (state: ChatRoomsState, action: ChatRoomsAction): ChatR
       return {
         ...state,
         isLoading: false,
-        hasMore: true,
+        hasMore: action.chatRooms.length >= LIMIT,
         page: 1,
         chatRooms: action.chatRooms,
         lastDocument: action.lastDocument,
@@ -140,6 +141,7 @@ const chatRoomsReducer = (state: ChatRoomsState, action: ChatRoomsAction): ChatR
         page: state.page + 1,
         chatRooms: [...state.chatRooms, ...action.chatRooms],
         lastDocument: action.lastDocument,
+        hasMore: action.chatRooms.length >= LIMIT,
       };
     case 'noMore':
       return { ...state, hasMore: false };
@@ -148,8 +150,8 @@ const chatRoomsReducer = (state: ChatRoomsState, action: ChatRoomsAction): ChatR
   }
 };
 
-export const useChatRooms = () => {
-  const { currentUserChat, setSelectedRoomId } = useChatContext();
+export const useChatRooms = (searchQuery?: string) => {
+  const { currentUserChat, selectedRoomId, setSelectedRoomId } = useChatContext();
   const [state, dispatch] = React.useReducer(chatRoomsReducer, initialChatRoomsState);
   const currentUserId = currentUserChat?.userId ? `${currentUserChat.userId}` : undefined;
 
@@ -198,10 +200,24 @@ export const useChatRooms = () => {
     setSelectedRoomId(chatRoom?.id);
   };
 
+  const filteredChatRooms = React.useMemo(() => {
+    const queryTerm = searchQuery?.trim().toLowerCase();
+    if (!queryTerm) return state.chatRooms;
+    return state.chatRooms.filter((room) => {
+      const name = room.user?.name?.toLowerCase() || '';
+      const email = room.user?.email?.toLowerCase() || '';
+      const company = room.user?.company?.companyName?.toLowerCase() || '';
+      const lastMsg = room.lastMessage?.toLowerCase() || '';
+      return name.includes(queryTerm) || email.includes(queryTerm) || company.includes(queryTerm) || lastMsg.includes(queryTerm);
+    });
+  }, [state.chatRooms, searchQuery]);
+
   return {
     isLoading: state.isLoading,
     hasMore: state.hasMore,
-    chatRooms: state.chatRooms,
+    chatRooms: filteredChatRooms,
+    rawChatRooms: state.chatRooms,
+    selectedRoomId,
     handleLoadMore,
     handleSelectRoom,
     currentUserChat

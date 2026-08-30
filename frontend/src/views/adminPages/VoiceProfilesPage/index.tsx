@@ -213,13 +213,13 @@ const VoiceProfilesPage = () => {
 
   const getProfileSampleCount = (profile?: VoiceProfile | null) => profile?.sampleCount ?? profile?.samples?.length ?? 0;
   const getProfileTotalDuration = (profile?: VoiceProfile | null) => Number(profile?.totalDurationSeconds ?? 0);
-  const getProfileReadyFlag = (profile?: VoiceProfile | null) => Boolean(
+  const getProfileReadyFlag = useCallback((profile?: VoiceProfile | null) => Boolean(
     profile?.isReadyForTts
     ?? (
       profile?.status === 'ready'
       && (getProfileType(profile as VoiceProfile) === 'preset' || getProfileSampleCount(profile) > 0)
     )
-  );
+  ), [getProfileType]);
 
   const resetCreateDialog = () => {
     setCreateOpen(false);
@@ -410,7 +410,7 @@ const VoiceProfilesPage = () => {
     }
     setTestAudioUrl(null);
     setTestProfile(profile);
-  }, [testAudioUrl, t]);
+  }, [testAudioUrl, t, getProfileReadyFlag]);
 
   const closeTestDialog = () => {
     if (testAudioUrl) {

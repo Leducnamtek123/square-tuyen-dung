@@ -245,7 +245,7 @@ export default function LocationPickerContent({
         setPosition([numLat, numLng]);
       }
     }
-  }, [value]);
+  }, [value, address, position]);
 
   // Handle Nominatim search autocomplete
   useEffect(() => {

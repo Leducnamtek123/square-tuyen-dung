@@ -3,7 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
   Box,
-  Grid,
+  Grid2 as Grid,
   Typography,
   TextField,
   FormControl,
@@ -196,7 +196,7 @@ export default function StepCompanyProfile({
 
       <Grid container spacing={3}>
         {/* Field: Company Name */}
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step1.companyName', 'Tên doanh nghiệp / Công ty đầy đủ')} <Box component="span" sx={{ color: '#EF4444' }}>*</Box>
           </Typography>
@@ -207,8 +207,10 @@ export default function StepCompanyProfile({
             onChange={(e) => onChange('companyName', e.target.value)}
             error={Boolean(errors.companyName)}
             helperText={errors.companyName || t('employerOnboarding.step1.companyNameHelper', 'Nhập chính xác tên doanh nghiệp theo Giấy phép ĐKKD')}
-            FormHelperTextProps={{
-              sx: { color: errors.companyName ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+            slotProps={{
+              formHelperText: {
+                sx: { color: errors.companyName ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+              },
             }}
             sx={{
               '& .MuiOutlinedInput-root': {
@@ -222,7 +224,7 @@ export default function StepCompanyProfile({
         </Grid>
 
         {/* Field: Tax Code */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step1.taxCode', 'Mã số thuế (MST)')}
           </Typography>
@@ -233,8 +235,10 @@ export default function StepCompanyProfile({
             onChange={(e) => onChange('taxCode', e.target.value)}
             error={Boolean(errors.taxCode)}
             helperText={errors.taxCode || t('employerOnboarding.step1.taxCodeHelper', 'Mã số thuế doanh nghiệp (tuỳ chọn khi khởi tạo)')}
-            FormHelperTextProps={{
-              sx: { color: errors.taxCode ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+            slotProps={{
+              formHelperText: {
+                sx: { color: errors.taxCode ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+              },
             }}
             sx={{
               '& .MuiOutlinedInput-root': {
@@ -248,7 +252,7 @@ export default function StepCompanyProfile({
         </Grid>
 
         {/* Field: Employee Size */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step1.employeeSize', 'Quy mô nhân sự')}
           </Typography>
@@ -273,7 +277,7 @@ export default function StepCompanyProfile({
         </Grid>
 
         {/* Field: Field of Operation */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step1.fieldOperation', 'Lĩnh vực hoạt động chính')}
           </Typography>
@@ -294,7 +298,7 @@ export default function StepCompanyProfile({
         </Grid>
 
         {/* Field: Website */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step1.website', 'Website công ty')}
           </Typography>
@@ -315,7 +319,7 @@ export default function StepCompanyProfile({
         </Grid>
 
         {/* Field: Location Section */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step1.city', 'Tỉnh / Thành phố trụ sở')}
           </Typography>
@@ -345,7 +349,7 @@ export default function StepCompanyProfile({
           />
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: !values.cityId ? '#94A3B8' : '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step1.district', 'Quận / Huyện')}
           </Typography>
@@ -370,7 +374,11 @@ export default function StepCompanyProfile({
                       : t('employerOnboarding.step1.districtPlaceholder', 'Chọn Quận / Huyện...')
                 }
                 helperText={!values.cityId ? t('employerOnboarding.step1.cityFirstHelper', 'Chọn Tỉnh / Thành phố để chọn Quận / Huyện') : ''}
-                FormHelperTextProps={{ sx: { mx: 0.5, mt: 0.5, color: '#64748B', fontSize: '0.75rem' } }}
+                slotProps={{
+                  formHelperText: {
+                    sx: { mx: 0.5, mt: 0.5, color: '#64748B', fontSize: '0.75rem' },
+                  },
+                }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 2.5,
@@ -384,7 +392,7 @@ export default function StepCompanyProfile({
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step1.address', 'Địa chỉ chi tiết')}
           </Typography>

@@ -3,7 +3,7 @@
 import React from 'react';
 import {
   Box,
-  Grid,
+  Grid2 as Grid,
   Typography,
   TextField,
   Chip,
@@ -70,7 +70,7 @@ export default function StepRecruiterProfile({
 
       <Grid container spacing={3}>
         {/* Recruiter Full Name */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step2.recruiterName', 'Họ và tên người phụ trách')} <Box component="span" sx={{ color: '#EF4444' }}>*</Box>
           </Typography>
@@ -81,8 +81,10 @@ export default function StepRecruiterProfile({
             onChange={(e) => onChange('recruiterName', e.target.value)}
             error={Boolean(errors.recruiterName)}
             helperText={errors.recruiterName || ''}
-            FormHelperTextProps={{
-              sx: { color: errors.recruiterName ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+            slotProps={{
+              formHelperText: {
+                sx: { color: errors.recruiterName ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+              },
             }}
             sx={{
               '& .MuiOutlinedInput-root': {
@@ -96,7 +98,7 @@ export default function StepRecruiterProfile({
         </Grid>
 
         {/* Recruiter Job Title */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step2.recruiterTitle', 'Chức danh / Vị trí công tác')}
           </Typography>
@@ -117,7 +119,7 @@ export default function StepRecruiterProfile({
         </Grid>
 
         {/* Phone Number */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step2.recruiterPhone', 'Số điện thoại liên hệ / Zalo')}
           </Typography>
@@ -138,7 +140,7 @@ export default function StepRecruiterProfile({
         </Grid>
 
         {/* Email */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step2.recruiterEmail', 'Email nhận thông báo ứng tuyển')}
           </Typography>
@@ -159,7 +161,7 @@ export default function StepRecruiterProfile({
         </Grid>
 
         {/* Hiring Needs Tags */}
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step2.hiringNeeds', 'Nhu cầu tuyển dụng trọng tâm')}
           </Typography>
@@ -195,7 +197,11 @@ export default function StepRecruiterProfile({
                 {...params}
                 placeholder={values.hiringNeeds?.length ? '' : t('employerOnboarding.step2.hiringNeedsPlaceholder', 'Nhập vị trí/ngành cần tuyển (VD: Frontend, Kế toán, Sales...)')}
                 helperText={t('employerOnboarding.step2.hiringNeedsHelper', 'Nhập và nhấn Enter để thêm các vị trí ưu tiên tuyển dụng')}
-                FormHelperTextProps={{ sx: { color: '#64748B', mx: 0, mt: 0.5 } }}
+                slotProps={{
+                  formHelperText: {
+                    sx: { color: '#64748B', mx: 0, mt: 0.5 },
+                  },
+                }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 2.5,
@@ -211,7 +217,7 @@ export default function StepRecruiterProfile({
         </Grid>
 
         {/* Company Description / Culture */}
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step2.description', 'Giới thiệu ngắn về môi trường làm việc & văn hóa')}
           </Typography>

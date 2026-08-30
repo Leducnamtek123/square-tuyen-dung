@@ -6,6 +6,10 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import {
+  GSAP_MEDIA_CONDITIONS,
+  registerGsapPlugins,
+} from '@/utils/gsapHelpers';
 import { TabTitle } from '../../../utils/generalFunction';
 import { APP_NAME } from '../../../configs/constants';
 import { useAppSelector } from '@/redux/hooks';
@@ -21,6 +25,8 @@ import CandidateCvScoreCard from '../../components/jobSeekers/CandidateDashboard
 import CandidateActivityChartCard from '../../components/jobSeekers/CandidateDashboardMain/CandidateActivityChartCard';
 import CandidateRecommendedJobsCard from '../../components/jobSeekers/CandidateDashboardMain/CandidateRecommendedJobsCard';
 import AiRecommendedJobsSection from '../../components/jobSeekers/CandidateDashboardMain/AiRecommendedJobsSection';
+
+registerGsapPlugins();
 
 const DashboardPage = () => {
   const { t } = useTranslation('jobSeeker');
@@ -59,33 +65,75 @@ const DashboardPage = () => {
 
   useGSAP(
     () => {
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      const mm = gsap.matchMedia();
 
-      tl.fromTo(
-        '.gsap-candidate-kpi',
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.55, clearProps: 'transform' }
-      )
-        .fromTo(
-          '.gsap-candidate-row2',
-          { y: 25, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.55, stagger: 0.12, clearProps: 'transform' },
-          '-=0.3'
+      // ── Desktop Breakpoint (≥769px) ─────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.isDesktop, () => {
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+        tl.fromTo(
+          '.gsap-candidate-kpi',
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.55, clearProps: 'all' }
         )
-        .fromTo(
-          '.gsap-candidate-ai-section',
-          { y: 25, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.6, clearProps: 'transform' },
-          '-=0.3'
+          .fromTo(
+            '.gsap-candidate-row2',
+            { y: 25, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.55, stagger: 0.12, clearProps: 'all' },
+            '-=0.3'
+          )
+          .fromTo(
+            '.gsap-candidate-ai-section',
+            { y: 25, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.6, clearProps: 'all' },
+            '-=0.3'
+          )
+          .fromTo(
+            '.gsap-candidate-jobs-card',
+            { y: 25, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.6, clearProps: 'all' },
+            '-=0.3'
+          );
+      });
+
+      // ── Mobile Breakpoint (≤768px) ──────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.isMobile, () => {
+        const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+
+        tl.fromTo(
+          '.gsap-candidate-kpi',
+          { y: 12, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.45, clearProps: 'all' }
         )
-        .fromTo(
-          '.gsap-candidate-jobs-card',
-          { y: 25, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.6, clearProps: 'transform' },
-          '-=0.3'
+          .fromTo(
+            '.gsap-candidate-row2',
+            { y: 14, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.45, stagger: 0.08, clearProps: 'all' },
+            '-=0.25'
+          )
+          .fromTo(
+            '.gsap-candidate-ai-section',
+            { y: 14, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.45, clearProps: 'all' },
+            '-=0.25'
+          )
+          .fromTo(
+            '.gsap-candidate-jobs-card',
+            { y: 14, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.45, clearProps: 'all' },
+            '-=0.25'
+          );
+      });
+
+      // ── Reduced Motion ───────────────────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.reduceMotion, () => {
+        gsap.set(
+          '.gsap-candidate-kpi, .gsap-candidate-row2, .gsap-candidate-ai-section, .gsap-candidate-jobs-card',
+          { opacity: 1, y: 0, clearProps: 'all' }
         );
+      });
     },
-    { scope: containerRef }
+    { scope: containerRef, dependencies: [stats], revertOnUpdate: true }
   );
 
   return (

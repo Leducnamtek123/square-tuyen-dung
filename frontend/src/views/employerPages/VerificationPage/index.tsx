@@ -168,7 +168,7 @@ const VerificationPage = () => {
       setLegalErrors((prev) => ({ ...prev, [field]: undefined }));
     };
 
-  const handleSaveLegalProfile = async (event: React.FormEvent) => {
+  const handleSaveLegalProfile = async (event: React.SyntheticEvent) => {
     event.preventDefault();
     if (!validateLegalProfile()) {
       showSnackbar(t('verification.messages.fixRequiredFields'), 'error');

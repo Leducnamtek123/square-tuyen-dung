@@ -52,5 +52,16 @@
     "index_chn_mt_cuc_hi_thoi_danh_sch_bn_5d32": "Chọn một cuộc hội thoại ở danh sách bên trái để bắt đầu nhắn tin"
   },
   "slogan": "Cách mới để nắm bắt cơ hội của bạn.",
-  "sloganSub": "Tương tác nhiều hơn, thành công nhiều hơn"
+  "sloganSub": "Tương tác nhiều hơn, thành công nhiều hơn",
+  "noSearchResults": "Không tìm thấy hội thoại phù hợp",
+  "tryDifferentKeyword": "Thử tìm với từ khóa hoặc tên khác",
+  "startChatFromRight": "Chọn việc làm hoặc ứng viên bên phải để bắt đầu nhắn tin",
+  "conversationPartner": "Người liên hệ",
+  "activeNow": "Đang hoạt động",
+  "employerBadge": "Nhà tuyển dụng",
+  "candidateBadge": "Ứng viên",
+  "viewDetails": "Xem thông tin liên quan",
+  "backToList": "Quay lại danh sách",
+  "chooseConversationHint": "Chọn một cuộc hội thoại ở danh sách bên trái hoặc việc làm bên phải để bắt đầu trò chuyện.",
+  "clickToDownload": "Nhấn để tải về"
 }

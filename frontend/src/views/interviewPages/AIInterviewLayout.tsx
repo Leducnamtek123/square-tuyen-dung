@@ -583,7 +583,7 @@ function ChatPanel({
 
           <Box
             component="form"
-            onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+            onSubmit={(event: React.SyntheticEvent<HTMLFormElement>) => {
               event.preventDefault();
               if (composerMode === 'takeover') return;
               onSend();

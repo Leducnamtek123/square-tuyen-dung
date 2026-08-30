@@ -889,16 +889,31 @@ function useReactShaderToyRuntime({
     animFrameIdRef.current = requestAnimationFrame(drawScene);
   };
 
+  const handlersRef = useRef({
+    mouseMove,
+    mouseUp,
+    mouseDown,
+    onDeviceOrientationChange,
+    onResize,
+  });
+  handlersRef.current = {
+    mouseMove,
+    mouseUp,
+    mouseDown,
+    onDeviceOrientationChange,
+    onResize,
+  };
+
   useEffect(() => {
     const options = { passive: true } as AddEventListenerOptions;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const handleMouseMove = (e: Event) => mouseMove(e as MouseEvent | TouchEvent);
-    const handleMouseUp = () => mouseUp();
-    const handleMouseDown = (e: Event) => mouseDown(e as MouseEvent | TouchEvent);
-    const handleDeviceOrientation = (e: Event) => onDeviceOrientationChange(e as DeviceOrientationEvent);
-    const handleResize = () => onResize();
+    const handleMouseMove = (e: Event) => handlersRef.current.mouseMove(e as MouseEvent | TouchEvent);
+    const handleMouseUp = () => handlersRef.current.mouseUp();
+    const handleMouseDown = (e: Event) => handlersRef.current.mouseDown(e as MouseEvent | TouchEvent);
+    const handleDeviceOrientation = (e: Event) => handlersRef.current.onDeviceOrientationChange(e as DeviceOrientationEvent);
+    const handleResize = () => handlersRef.current.onResize();
 
     canvas.addEventListener('mousemove', handleMouseMove, options);
     canvas.addEventListener('mouseout', handleMouseUp, options);

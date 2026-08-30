@@ -25,7 +25,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, language = 'v
     >
       {/* Top Banner Header with Primary Color */}
       <div
-        className="p-8 text-white relative overflow-hidden flex flex-col sm:flex-row items-center gap-6"
+        className="p-8 text-white relative overflow-hidden flex flex-row items-center gap-6"
         style={{ backgroundColor: primaryColor }}
       >
         {theme.showAvatar && (
@@ -41,7 +41,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, language = 'v
           />
         )}
 
-        <div className="flex-1 text-center sm:text-left">
+        <div className="flex-1 text-left">
           <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wider text-white">
             {personalInfo.fullName || (language === 'vi' ? 'Họ và Tên' : 'Full Name')}
           </h1>
@@ -49,7 +49,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, language = 'v
             {personalInfo.title || (language === 'vi' ? 'Vị trí quản lý / Chuyên gia' : 'Executive / Leadership')}
           </div>
 
-          <div className="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-1.5 mt-2.5 text-[11.5px] text-white/85">
+          <div className="flex flex-wrap justify-start gap-x-4 gap-y-1.5 mt-2.5 text-[11.5px] text-white/85">
             {personalInfo.email && (
               <span className="flex items-center gap-1">
                 <Mail className="w-3.5 h-3.5 opacity-80" />
@@ -91,12 +91,12 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, language = 'v
       </div>
 
       {/* 2-Column Content */}
-      <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="p-8 grid grid-cols-3 gap-8">
         {/* Main Content (2 cols) */}
-        <div className={`md:col-span-2 flex flex-col ${sectionGapClass}`}>
+        <div className={`col-span-2 flex flex-col ${sectionGapClass}`}>
           {/* Executive Summary */}
           {personalInfo.bio && (
-            <div>
+            <div className="cv-section break-inside-avoid">
               <div
                 className="text-[13px] font-bold uppercase tracking-wider pb-1 mb-2 border-b-2 flex items-center gap-2"
                 style={{ color: primaryColor, borderColor: primaryColor }}
@@ -112,7 +112,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, language = 'v
 
           {/* Experience */}
           {experiences && experiences.length > 0 && (
-            <div>
+            <div className="cv-section">
               <div
                 className="text-[13px] font-bold uppercase tracking-wider pb-1 mb-3 border-b-2 flex items-center gap-2"
                 style={{ color: primaryColor, borderColor: primaryColor }}
@@ -122,7 +122,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, language = 'v
               </div>
               <div className={itemGapClass}>
                 {experiences.map((exp) => (
-                  <div key={exp.id} className="border-l-2 pl-3.5" style={{ borderColor: primaryColor }}>
+                  <div key={exp.id} className="border-l-2 pl-3.5 break-inside-avoid cv-item" style={{ borderColor: primaryColor }}>
                     <div className="flex justify-between items-baseline">
                       <h3 className="font-bold text-slate-900 text-[13px]">{exp.position}</h3>
                       <DateRangeText
@@ -145,7 +145,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, language = 'v
 
           {/* Key Projects */}
           {projects && projects.length > 0 && (
-            <div>
+            <div className="cv-section">
               <div
                 className="text-[13px] font-bold uppercase tracking-wider pb-1 mb-3 border-b-2 flex items-center gap-2"
                 style={{ color: primaryColor, borderColor: primaryColor }}
@@ -157,7 +157,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, language = 'v
                 {projects.map((proj) => (
                   <div
                     key={proj.id}
-                    className="p-3.5 rounded border"
+                    className="p-3.5 rounded border break-inside-avoid cv-item"
                     style={{
                       backgroundColor: hexToRgba(primaryColor, 0.03),
                       borderColor: hexToRgba(primaryColor, 0.15),
@@ -183,7 +183,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, language = 'v
         <div className={`flex flex-col ${sectionGapClass}`}>
           {/* Education */}
           {educations && educations.length > 0 && (
-            <div>
+            <div className="cv-section">
               <div
                 className="text-[13px] font-bold uppercase tracking-wider pb-1 mb-2.5 border-b-2 flex items-center gap-2"
                 style={{ color: primaryColor, borderColor: primaryColor }}
@@ -193,7 +193,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, language = 'v
               </div>
               <div className="space-y-2.5">
                 {educations.map((edu) => (
-                  <div key={edu.id} className="text-[11.5px]">
+                  <div key={edu.id} className="text-[11.5px] break-inside-avoid cv-item">
                     <div className="font-bold text-slate-900">{edu.school}</div>
                     <div className="text-slate-700 font-medium">{edu.major}</div>
                     <div className="text-slate-500 text-[10.5px]">
@@ -207,7 +207,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, language = 'v
 
           {/* Core Competencies */}
           {skills && skills.length > 0 && (
-            <div>
+            <div className="cv-section break-inside-avoid">
               <div
                 className="text-[13px] font-bold uppercase tracking-wider pb-1 mb-2.5 border-b-2"
                 style={{ color: primaryColor, borderColor: primaryColor }}
@@ -238,7 +238,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, language = 'v
 
           {/* Languages */}
           {languages && languages.length > 0 && (
-            <div>
+            <div className="cv-section break-inside-avoid">
               <div
                 className="text-[13px] font-bold uppercase tracking-wider pb-1 mb-2 border-b-2"
                 style={{ color: primaryColor, borderColor: primaryColor }}
@@ -258,7 +258,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, language = 'v
 
           {/* Certificates */}
           {certificates && certificates.length > 0 && (
-            <div>
+            <div className="cv-section break-inside-avoid">
               <div
                 className="text-[13px] font-bold uppercase tracking-wider pb-1 mb-2 border-b-2"
                 style={{ color: primaryColor, borderColor: primaryColor }}

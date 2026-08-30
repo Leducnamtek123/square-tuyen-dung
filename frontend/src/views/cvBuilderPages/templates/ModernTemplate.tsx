@@ -193,14 +193,14 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
 
         {/* Work Experience */}
         {experiences && experiences.length > 0 && (
-          <div>
+          <div className="cv-section">
             <div className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider mb-3" style={{ color: primaryColor }}>
               <Briefcase className="w-4 h-4" />
               <span>{labels.workExperience}</span>
             </div>
             <div className={itemGapClass}>
               {experiences.map((exp) => (
-                <div key={exp.id} className="relative pl-4 border-l-2 border-slate-200">
+                <div key={exp.id} className="relative pl-4 border-l-2 border-slate-200 break-inside-avoid cv-item">
                   <div
                     className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full"
                     style={{ backgroundColor: primaryColor }}
@@ -227,14 +227,14 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
 
         {/* Education */}
         {educations && educations.length > 0 && (
-          <div>
+          <div className="cv-section">
             <div className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider mb-3" style={{ color: primaryColor }}>
               <GraduationCap className="w-4 h-4" />
               <span>{labels.education}</span>
             </div>
             <div className="space-y-2.5">
               {educations.map((edu) => (
-                <div key={edu.id} className="relative pl-4 border-l-2 border-slate-200">
+                <div key={edu.id} className="relative pl-4 border-l-2 border-slate-200 break-inside-avoid cv-item">
                   <div
                     className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full"
                     style={{ backgroundColor: primaryColor }}
@@ -259,14 +259,14 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
 
         {/* Projects */}
         {projects && projects.length > 0 && (
-          <div>
+          <div className="cv-section">
             <div className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider mb-2.5" style={{ color: primaryColor }}>
               <Code2 className="w-4 h-4" />
               <span>{labels.projects}</span>
             </div>
             <div className="space-y-2.5">
               {projects.map((proj) => (
-                <div key={proj.id} className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <div key={proj.id} className="p-3 bg-slate-50 rounded-lg border border-slate-200 break-inside-avoid cv-item">
                   <div className="flex justify-between items-baseline">
                     <h4 className="font-bold text-slate-800 text-[12px]">{proj.name}</h4>
                     <DateRangeText startDate={proj.startDate} endDate={proj.endDate} language={language} className="text-[10.5px] text-slate-400" />

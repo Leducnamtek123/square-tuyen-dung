@@ -8,8 +8,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default [
   {
+    ignores: [".next/**", "dist/**", "build/**", "node_modules/**", "coverage/**"],
+  },
+  {
     files: ["src/**/*.{ts,tsx}"],
-    ignores: ["dist/**", "build/**", "node_modules/**"],
     languageOptions: {
       parser: tsParser,
       parserOptions: {

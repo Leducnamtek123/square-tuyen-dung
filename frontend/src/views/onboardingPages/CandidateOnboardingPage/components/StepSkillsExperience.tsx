@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Grid,
+  Grid2 as Grid,
   Typography,
   TextField,
   Chip,
@@ -121,7 +121,7 @@ export default function StepSkillsExperience({
 
       <Grid container spacing={3.5}>
         {/* Field 1: Skills Free-form Input & Tag Chips */}
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('onboarding.step2.skillsLabel', 'Kỹ năng thế mạnh của bạn')} <Box component="span" sx={{ color: '#EF4444' }}>*</Box>
           </Typography>
@@ -194,8 +194,10 @@ export default function StepSkillsExperience({
                     'Nhập các kỹ năng chuyên môn của bạn (nhấn Enter hoặc dấu phẩy để thêm)',
                   )
                 }
-                FormHelperTextProps={{
-                  sx: { color: errors.skills ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+                slotProps={{
+                  formHelperText: {
+                    sx: { color: errors.skills ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+                  },
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ',') {
@@ -225,7 +227,7 @@ export default function StepSkillsExperience({
         </Grid>
 
         {/* Field 2: Experience */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('onboarding.step2.experienceLabel', 'Số năm kinh nghiệm làm việc')}
           </Typography>
@@ -259,7 +261,7 @@ export default function StepSkillsExperience({
         </Grid>
 
         {/* Field 3: Academic Level */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('onboarding.step2.academicLevelLabel', 'Trình độ học vấn cao nhất')}
           </Typography>
@@ -291,7 +293,7 @@ export default function StepSkillsExperience({
         </Grid>
 
         {/* Field 4: Salary Expectation */}
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 1 }}>
             {t('onboarding.step2.salaryLabel', 'Mức lương mong muốn (VNĐ / tháng)')}
           </Typography>
@@ -307,7 +309,7 @@ export default function StepSkillsExperience({
                     Number(values.salaryMax) === range.max);
 
               return (
-                <Grid item xs={6} sm={2.4} key={range.label}>
+                <Grid size={{ xs: 6, sm: 2.4 }} key={range.label}>
                   <ButtonBase
                     onClick={() => handleSelectSalaryQuick(range)}
                     sx={{
@@ -357,7 +359,7 @@ export default function StepSkillsExperience({
 
           {showCustomSalary && (
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   type="number"
@@ -375,7 +377,7 @@ export default function StepSkillsExperience({
                   }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   type="number"

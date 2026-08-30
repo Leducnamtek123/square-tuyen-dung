@@ -25,7 +25,7 @@ export const TechTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' })
     >
       {/* Header with Developer Terminal Aesthetic */}
       <div
-        className="p-6 rounded-xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5"
+        className="p-6 rounded-xl border flex flex-row justify-between items-center gap-5 cv-section break-inside-avoid"
         style={{
           backgroundColor: '#111827',
           borderColor: hexToRgba(primaryColor, 0.25),
@@ -61,39 +61,39 @@ export const TechTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' })
         </div>
 
         {/* Links & Contacts */}
-        <div className="flex flex-col gap-1.5 text-[11.5px] text-slate-300 font-mono">
+        <div className="flex flex-col gap-1.5 text-[11.5px] text-slate-300 font-mono text-right">
           {personalInfo.email && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-end gap-2">
               <Mail className="w-3.5 h-3.5" style={{ color: primaryColor }} />
               <span className="truncate">{personalInfo.email}</span>
             </div>
           )}
           {personalInfo.phoneNumber && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-end gap-2">
               <Phone className="w-3.5 h-3.5" style={{ color: primaryColor }} />
               <span>{personalInfo.phoneNumber}</span>
             </div>
           )}
           {personalInfo.github && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-end gap-2">
               <GithubIcon className="w-3.5 h-3.5" style={{ color: primaryColor }} />
               <span className="truncate">{personalInfo.github}</span>
             </div>
           )}
           {personalInfo.linkedin && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-end gap-2">
               <LinkedinIcon className="w-3.5 h-3.5" style={{ color: primaryColor }} />
               <span className="truncate">{personalInfo.linkedin}</span>
             </div>
           )}
           {personalInfo.website && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-end gap-2">
               <Globe className="w-3.5 h-3.5" style={{ color: primaryColor }} />
               <span className="truncate">{personalInfo.website}</span>
             </div>
           )}
           {personalInfo.address && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-end gap-2">
               <MapPin className="w-3.5 h-3.5" style={{ color: primaryColor }} />
               <span className="truncate">{personalInfo.address}</span>
             </div>
@@ -104,7 +104,7 @@ export const TechTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' })
       {/* Profile Summary */}
       {personalInfo.bio && (
         <div
-          className="p-4 rounded-xl border"
+          className="p-4 rounded-xl border cv-section break-inside-avoid"
           style={{
             backgroundColor: '#111827',
             borderColor: '#1f2937',
@@ -122,7 +122,7 @@ export const TechTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' })
 
       {/* Tech Stack / Skills Badges */}
       {skills && skills.length > 0 && (
-        <div>
+        <div className="cv-section break-inside-avoid">
           <div className="flex items-center gap-2 font-bold uppercase text-[12.5px] mb-2.5 pb-1 border-b border-slate-800 text-white font-mono">
             <Code2 className="w-4 h-4" style={{ color: primaryColor }} />
             <span>{labels.technicalSkills}</span>
@@ -156,19 +156,19 @@ export const TechTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' })
 
       {/* Work Experience */}
       {experiences && experiences.length > 0 && (
-        <div>
+        <div className="cv-section">
           <div className="flex items-center gap-2 font-bold uppercase text-[12.5px] mb-3 pb-1 border-b border-slate-800 text-white font-mono">
             <GitBranch className="w-4 h-4" style={{ color: primaryColor }} />
             <span>{labels.workExperience}</span>
           </div>
           <div className={itemGapClass}>
             {experiences.map((exp) => (
-              <div key={exp.id} className="relative pl-4 border-l-2 border-slate-800">
+              <div key={exp.id} className="relative pl-4 border-l-2 border-slate-800 break-inside-avoid cv-item">
                 <div
                   className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full shadow-sm"
                   style={{ backgroundColor: primaryColor }}
                 />
-                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                <div className="flex flex-row items-baseline justify-between gap-1">
                   <h3 className="font-bold text-white text-[13px]">{exp.position}</h3>
                   <DateRangeText
                     startDate={exp.startDate}
@@ -192,16 +192,16 @@ export const TechTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' })
 
       {/* Key Projects & Open Source */}
       {projects && projects.length > 0 && (
-        <div>
+        <div className="cv-section">
           <div className="flex items-center gap-2 font-bold uppercase text-[12.5px] mb-3 pb-1 border-b border-slate-800 text-white font-mono">
             <Terminal className="w-4 h-4" style={{ color: primaryColor }} />
             <span>{labels.projects}</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {projects.map((proj) => (
               <div
                 key={proj.id}
-                className="p-3.5 rounded-xl border"
+                className="p-3.5 rounded-xl border break-inside-avoid cv-item"
                 style={{
                   backgroundColor: '#111827',
                   borderColor: '#1f2937',
@@ -219,7 +219,7 @@ export const TechTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' })
       )}
 
       {/* Education, Languages & Certs in Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+      <div className="grid grid-cols-3 gap-4 pt-1 cv-section break-inside-avoid">
         {educations && educations.length > 0 && (
           <div>
             <div className="flex items-center gap-1.5 font-bold uppercase text-[12px] mb-2 pb-1 border-b border-slate-800 text-white font-mono">

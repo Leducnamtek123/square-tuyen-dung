@@ -1,31 +1,40 @@
-# Implementation Tasks: CV Templates Overhaul
+# Implementation Tasks: Code Modernization & Deprecation Cleanup
 
-- [x] **Task 1: Create Shared Helpers & Bilingual Dictionary**
-  - `frontend/src/views/cvBuilderPages/templates/utils/cvDictionary.ts`
-  - `frontend/src/views/cvBuilderPages/templates/utils/themeStyles.ts`
-  - `frontend/src/views/cvBuilderPages/templates/components/AvatarRenderer.tsx`
-  - `frontend/src/views/cvBuilderPages/templates/components/DateRangeText.tsx`
+- [x] **Task 1: Migrate StepCompanyProfile.tsx to Grid2 & slotProps**
+  - Target: `frontend/src/views/onboardingPages/EmployerOnboardingPage/components/StepCompanyProfile.tsx`
+  - Converted to `Grid2 as Grid`
+  - Replaced `item xs={...}` with `size={{ xs: ... }}`
+  - Replaced `FormHelperTextProps` with `slotProps={{ formHelperText: ... }}`
 
-- [x] **Task 2: Update Bridge Layer (Renderer & Preview)**
-  - `frontend/src/views/cvBuilderPages/templates/CVTemplateRenderer.tsx`
-  - `frontend/src/views/cvBuilderPages/CVEditorPage/components/CVLivePreview.tsx`
-  - `frontend/src/views/cvBuilderPages/PublicCVPage/index.tsx`
-  - `frontend/src/views/cvBuilderPages/CVGalleryPage/TemplateCard.tsx`
-  - `frontend/src/views/cvBuilderPages/CVGalleryPage/TemplatePreviewModal.tsx`
+- [x] **Task 2: Migrate StepRecruiterProfile.tsx to Grid2 & slotProps**
+  - Target: `frontend/src/views/onboardingPages/EmployerOnboardingPage/components/StepRecruiterProfile.tsx`
+  - Converted to `Grid2 as Grid`
+  - Replaced `item xs={...}` with `size={{ xs: ... }}`
+  - Replaced `FormHelperTextProps` with `slotProps={{ formHelperText: ... }}`
 
-- [x] **Task 3: Overhaul Nordic & Tech Templates (Critical Bug Fixes)**
-  - `frontend/src/views/cvBuilderPages/templates/NordicTemplate.tsx`
-  - `frontend/src/views/cvBuilderPages/templates/TechTemplate.tsx`
+- [x] **Task 3: Migrate StepEmployerComplete.tsx to Grid2**
+  - Target: `frontend/src/views/onboardingPages/EmployerOnboardingPage/components/StepEmployerComplete.tsx`
+  - Converted to `Grid2 as Grid`
+  - Replaced `item xs={...}` with `size={{ xs: ... }}`
 
-- [x] **Task 4: Overhaul Classic & Corporate Templates**
-  - `frontend/src/views/cvBuilderPages/templates/ClassicTemplate.tsx`
-  - `frontend/src/views/cvBuilderPages/templates/CorporateTemplate.tsx`
+- [x] **Task 4: Migrate StepSkillsExperience.tsx to Grid2 & slotProps**
+  - Target: `frontend/src/views/onboardingPages/CandidateOnboardingPage/components/StepSkillsExperience.tsx`
+  - Converted to `Grid2 as Grid`
+  - Replaced `item xs={...}` with `size={{ xs: ... }}`
+  - Replaced `FormHelperTextProps` with `slotProps={{ formHelperText: ... }}`
 
-- [x] **Task 5: Overhaul Creative, Modern, Minimalist & Executive Templates**
-  - `frontend/src/views/cvBuilderPages/templates/CreativeTemplate.tsx`
-  - `frontend/src/views/cvBuilderPages/templates/ModernTemplate.tsx`
-  - `frontend/src/views/cvBuilderPages/templates/MinimalistTemplate.tsx`
-  - `frontend/src/views/cvBuilderPages/templates/ExecutiveTemplate.tsx`
+- [x] **Task 5: Migrate StepCareerGoals.tsx to Grid2 & slotProps**
+  - Target: `frontend/src/views/onboardingPages/CandidateOnboardingPage/components/StepCareerGoals.tsx`
+  - Converted to `Grid2 as Grid`
+  - Replaced `item xs={...}` with `size={{ xs: ... }}`
+  - Replaced `FormHelperTextProps` with `slotProps={{ formHelperText: ... }}`
 
-- [x] **Task 6: End-to-End Build & Verification**
-  - Next.js production build succeeded with 0 TypeScript/Turbopack errors across 136 routes.
+- [x] **Task 6: Migrate StepCandidateComplete.tsx to Grid2**
+  - Target: `frontend/src/views/onboardingPages/CandidateOnboardingPage/components/StepCandidateComplete.tsx`
+  - Converted to `Grid2 as Grid`
+  - Replaced `item xs={...}` with `size={{ xs: ... }}`
+
+- [x] **Task 7: Full Verification & Automated Tests**
+  - `npm run typecheck`: Passed with 0 errors
+  - `npm run lint`: Passed with 0 errors
+  - `npm test`: Passed (100% of test suites pass)

@@ -113,7 +113,8 @@ const SubHeaderCategoryBar = ({
         <Stack
           direction="row"
           alignItems="center"
-          justifyContent="space-between"
+          justifyContent={{ xs: 'flex-start', md: 'space-between' }}
+          spacing={{ xs: 1, md: 0 }}
           sx={{
             py: 1,
             width: '100%',
@@ -242,7 +243,7 @@ const NewsContent = () => {
   const mainFeaturedArticle = featuredArticles[0] || null;
   const sideFeaturedArticles = featuredArticles.slice(1, 4);
 
-  const articles = articleData?.articles || [];
+  const articles = React.useMemo(() => articleData?.articles || [], [articleData?.articles]);
   const total = articleData?.total || 0;
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
 

@@ -148,7 +148,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
           </Box>
         </Box>
 
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} alignItems="center" className="no-print">
           <Button
             size="small"
             variant="outlined"
@@ -401,7 +401,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
         </Stack>
       </DialogContent>
 
-      <DialogActions sx={{ p: 2.5, backgroundColor: '#ffffff', borderTop: '1px solid #e2e8f0' }}>
+      <DialogActions className="no-print" sx={{ p: 2.5, backgroundColor: '#ffffff', borderTop: '1px solid #e2e8f0' }}>
         <Button onClick={onClose} sx={{ color: '#64748b', fontWeight: 700, borderRadius: '10px' }}>
           Đóng bản xem trước
         </Button>

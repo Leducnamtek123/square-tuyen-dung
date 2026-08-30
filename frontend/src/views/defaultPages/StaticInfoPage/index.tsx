@@ -76,7 +76,7 @@ const StaticInfoPage = ({ pageKey }: Props) => {
     setFormData((prev) => ({ ...prev, [field]: String(value) }));
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!formData.name.trim() || !formData.email.trim() || !formData.content.trim()) {
       toastMessages.error(t('static.contact.validation.required'));

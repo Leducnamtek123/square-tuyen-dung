@@ -7,7 +7,10 @@ import { Grid2 as Grid } from "@mui/material";
 import Link from 'next/link';
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  GSAP_MEDIA_CONDITIONS,
+  registerGsapPlugins,
+} from "@/utils/gsapHelpers";
 
 import CampaignOutlinedIcon from "@mui/icons-material/CampaignOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
@@ -25,9 +28,7 @@ import { TabTitle } from "../../../utils/generalFunction";
 import { APP_NAME, ROUTES } from "../../../configs/constants";
 import { localizeRoutePath } from "../../../configs/routeLocalization";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+registerGsapPlugins();
 
 const IntroducePage = () => {
   const { t, i18n } = useTranslation("employer");
@@ -36,103 +37,217 @@ const IntroducePage = () => {
 
   useGSAP(
     () => {
-      // 1. Hero entrance timeline
-      const heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      const mm = gsap.matchMedia();
 
-      heroTl
-        .fromTo(
-          ".gsap-hero-badge",
-          { y: -15, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.5, clearProps: 'transform' }
-        )
-        .fromTo(
-          ".gsap-hero-title",
-          { y: 30, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.7, clearProps: 'transform' },
-          "-=0.3"
-        )
-        .fromTo(
-          ".gsap-hero-desc",
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.6, clearProps: 'transform' },
-          "-=0.4"
-        )
-        .fromTo(
-          ".gsap-hero-actions",
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.6, clearProps: 'transform' },
-          "-=0.3"
+      // ── Desktop Breakpoint (≥769px) ─────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.isDesktop, () => {
+        const heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+        heroTl
+          .fromTo(
+            ".gsap-hero-badge",
+            { y: -15, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, clearProps: "all" }
+          )
+          .fromTo(
+            ".gsap-hero-title",
+            { y: 30, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.7, clearProps: "all" },
+            "-=0.3"
+          )
+          .fromTo(
+            ".gsap-hero-desc",
+            { y: 20, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.6, clearProps: "all" },
+            "-=0.4"
+          )
+          .fromTo(
+            ".gsap-hero-actions",
+            { y: 20, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.6, clearProps: "all" },
+            "-=0.3"
+          );
+
+        gsap.fromTo(
+          ".gsap-highlight-card",
+          { y: 35, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: ".gsap-highlights-grid",
+              start: "top 85%",
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.55,
+            stagger: 0.12,
+            ease: "power2.out",
+            clearProps: "all",
+          }
         );
 
-      // 2. Highlights with ScrollTrigger
-      gsap.fromTo(
-        ".gsap-highlight-card",
-        { y: 35, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: ".gsap-highlights-grid",
-            start: "top 85%",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.55,
-          stagger: 0.12,
-          ease: "power2.out",
-          clearProps: 'transform',
-        }
-      );
+        gsap.fromTo(
+          ".gsap-services-box",
+          { y: 30, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: ".gsap-services-box",
+              start: "top 85%",
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            ease: "power3.out",
+            clearProps: "all",
+          }
+        );
 
-      // 3. Services box & cards with ScrollTrigger
-      gsap.fromTo(
-        ".gsap-services-box",
-        { y: 30, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: ".gsap-services-box",
-            start: "top 85%",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.6,
-          ease: "power3.out",
-          clearProps: 'transform',
-        }
-      );
+        gsap.fromTo(
+          ".gsap-service-card",
+          { y: 25, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: ".gsap-services-grid",
+              start: "top 85%",
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.1,
+            ease: "power2.out",
+            clearProps: "all",
+          }
+        );
 
-      gsap.fromTo(
-        ".gsap-service-card",
-        { y: 25, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: ".gsap-services-grid",
-            start: "top 85%",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.5,
-          stagger: 0.1,
-          ease: "power2.out",
-          clearProps: 'transform',
-        }
-      );
+        gsap.fromTo(
+          ".gsap-step-card",
+          { y: 25, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: ".gsap-steps-grid",
+              start: "top 85%",
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.12,
+            ease: "power2.out",
+            clearProps: "all",
+          }
+        );
+      });
 
-      // 4. Steps with ScrollTrigger
-      gsap.fromTo(
-        ".gsap-step-card",
-        { y: 25, opacity: 0 },
-        {
-          scrollTrigger: {
-            trigger: ".gsap-steps-grid",
-            start: "top 85%",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 0.5,
-          stagger: 0.12,
-          ease: "power2.out",
-          clearProps: 'transform',
-        }
-      );
+      // ── Mobile Breakpoint (≤768px) ──────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.isMobile, () => {
+        const heroTl = gsap.timeline({ defaults: { ease: "power2.out" } });
+
+        heroTl
+          .fromTo(
+            ".gsap-hero-badge",
+            { y: -10, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.4, clearProps: "all" }
+          )
+          .fromTo(
+            ".gsap-hero-title",
+            { y: 16, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, clearProps: "all" },
+            "-=0.2"
+          )
+          .fromTo(
+            ".gsap-hero-desc",
+            { y: 12, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.45, clearProps: "all" },
+            "-=0.25"
+          )
+          .fromTo(
+            ".gsap-hero-actions",
+            { y: 12, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.45, clearProps: "all" },
+            "-=0.2"
+          );
+
+        gsap.fromTo(
+          ".gsap-highlight-card",
+          { y: 16, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: ".gsap-highlights-grid",
+              start: "top 92%",
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.45,
+            stagger: 0.08,
+            ease: "power2.out",
+            clearProps: "all",
+          }
+        );
+
+        gsap.fromTo(
+          ".gsap-services-box",
+          { y: 14, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: ".gsap-services-box",
+              start: "top 92%",
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.45,
+            ease: "power2.out",
+            clearProps: "all",
+          }
+        );
+
+        gsap.fromTo(
+          ".gsap-service-card",
+          { y: 14, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: ".gsap-services-grid",
+              start: "top 92%",
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.4,
+            stagger: 0.06,
+            ease: "power2.out",
+            clearProps: "all",
+          }
+        );
+
+        gsap.fromTo(
+          ".gsap-step-card",
+          { y: 14, opacity: 0 },
+          {
+            scrollTrigger: {
+              trigger: ".gsap-steps-grid",
+              start: "top 92%",
+              once: true,
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.4,
+            stagger: 0.06,
+            ease: "power2.out",
+            clearProps: "all",
+          }
+        );
+      });
+
+      // ── Reduced Motion ───────────────────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.reduceMotion, () => {
+        gsap.set(
+          ".gsap-hero-badge, .gsap-hero-title, .gsap-hero-desc, .gsap-hero-actions, .gsap-highlight-card, .gsap-services-box, .gsap-service-card, .gsap-step-card",
+          { opacity: 1, y: 0, clearProps: "all" }
+        );
+      });
     },
     { scope: containerRef }
   );

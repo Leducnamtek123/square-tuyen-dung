@@ -25,7 +25,7 @@ import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
 import { localizeRoutePath } from '../../../../configs/routeLocalization';
 import DataTable from '../../../../components/Common/DataTable';
-import { formatRoute } from '@/utils/funcUtils';
+import { formatRoute, downloadPdf } from '@/utils/funcUtils';
 import { getSafeResourceUrl, openExternalUrlSafely } from '@/utils/safeExternalUrl';
 
 import SendEmailComponent from './SendEmailComponent';
@@ -107,6 +107,10 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             // File URL for attached CV download
             const cvFileUrl = info.row.original.resumeFileUrl || info.row.original.resume?.fileUrl || '';
             const safeCvFileUrl = getSafeResourceUrl(cvFileUrl);
+            const resumeSlug = info.row.original.resumeSlug || info.row.original.resume?.slug || '';
+            const publicCvHref = resumeSlug ? `/cv/${resumeSlug}` : undefined;
+            const hasCvTarget = Boolean(safeCvFileUrl || publicCvHref);
+
             const displayTitle = isAnonymized
               ? (isManualCandidate ? 'Hồ sơ thủ công ẩn danh' : 'Hồ sơ ứng viên ẩn danh')
               : (resumeTitle || '---');
@@ -124,13 +128,17 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                       sx={{ height: 22, fontSize: '0.68rem', fontWeight: 900 }}
                     />
                   )}
-                  {!isAnonymized && safeCvFileUrl && (
+                  {!isAnonymized && hasCvTarget && (
                     <Tooltip title={t('appliedResume.table.clickToDownload')} arrow>
                       <IconButton aria-label="Thao tác"
                         size="small"
                         onClick={(e) => {
                           e.stopPropagation();
-                          window.open(safeCvFileUrl, '_blank', 'noopener,noreferrer');
+                          if (safeCvFileUrl) {
+                            downloadPdf(safeCvFileUrl, fullNameVal || resumeTitle || 'CV');
+                          } else if (publicCvHref) {
+                            window.open(publicCvHref, '_blank', 'noopener,noreferrer');
+                          }
                         }}
                         sx={{
                           p: 0.5,

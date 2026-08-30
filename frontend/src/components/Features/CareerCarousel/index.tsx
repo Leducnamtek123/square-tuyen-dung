@@ -38,9 +38,9 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const swiperStyles = {
   '.swiper, & .swiper': {
-    padding: '14px 8px 36px 8px !important',
-    margin: '-14px -8px 0 -8px !important',
+    padding: '10px 4px 36px 4px !important',
     overflow: 'hidden',
+    width: '100%',
   },
   '.swiper-pagination, & .swiper-pagination': {
     bottom: '4px !important',
@@ -143,8 +143,6 @@ const normalizeCareers = (careers: Career[] = []) =>
 const CareerCarousel: React.FC = () => {
   const { t, i18n } = useTranslation('public');
   const dispatch = useDispatch();
-  const [parentWidth, setParentWidth] = React.useState(0);
-  const col = parentWidth < 600 ? 1 : parentWidth < 900 ? 2 : parentWidth < 1200 ? 3 : 4;
   const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
 
   const { data: rawTopCareers = [], isLoading } = useQuery({
@@ -157,18 +155,6 @@ const CareerCarousel: React.FC = () => {
   });
 
   const topCareers = React.useMemo(() => normalizeCareers(rawTopCareers), [rawTopCareers]);
-
-  React.useEffect(() => {
-    const handleResize = () => {
-      const element = document.getElementById('career-carousel');
-      if (element) {
-        setParentWidth(element.offsetWidth);
-      }
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const handleFilter = (id: string | number) => {
     dispatch(searchJobPost(buildJobPostFilter({ careerId: String(id) })));
@@ -195,8 +181,12 @@ const CareerCarousel: React.FC = () => {
 
       <Box sx={swiperStyles}>
         <Swiper
-          slidesPerView={col}
-          spaceBetween={16}
+          breakpoints={{
+            0: { slidesPerView: 1.15, spaceBetween: 12 },
+            600: { slidesPerView: 2, spaceBetween: 16 },
+            900: { slidesPerView: 3, spaceBetween: 16 },
+            1200: { slidesPerView: 4, spaceBetween: 16 },
+          }}
           pagination={{
             clickable: true,
           }}

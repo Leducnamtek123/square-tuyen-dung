@@ -5,6 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid, Box } from "@mui/material";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import {
+  GSAP_MEDIA_CONDITIONS,
+  registerGsapPlugins,
+} from "@/utils/gsapHelpers";
 import { TabTitle } from '../../../utils/generalFunction';
 import EmployerQuantityStatistics from '../../components/employers/EmployerQuantityStatistics';
 import RecruitmentChart from '../../components/employers/charts/RecruitmentChart';
@@ -14,6 +18,8 @@ import HiringAcademicChart from '../../components/employers/charts/HiringAcademi
 import InterviewStatsChart from '../../components/employers/charts/InterviewStatsChart';
 import RecentApplicationsWidget from '../../components/employers/RecentApplicationsWidget';
 
+registerGsapPlugins();
+
 const DashboardPage = () => {
   const { t } = useTranslation('employer');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -21,38 +27,87 @@ const DashboardPage = () => {
 
   useGSAP(
     () => {
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      const mm = gsap.matchMedia();
 
-      tl.fromTo(
-        ".gsap-emp-kpi",
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, clearProps: 'transform' }
-      )
-        .fromTo(
-          ".gsap-emp-hero-row",
-          { y: 25, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.55, clearProps: 'transform' },
-          "-=0.25"
+      // ── Desktop Breakpoint (≥769px) ─────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.isDesktop, () => {
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+        tl.fromTo(
+          ".gsap-emp-kpi",
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.5, clearProps: 'all' }
         )
-        .fromTo(
-          ".gsap-emp-action-row",
-          { y: 25, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.55, clearProps: 'transform' },
-          "-=0.25"
+          .fromTo(
+            ".gsap-emp-hero-row",
+            { y: 25, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.55, clearProps: 'all' },
+            "-=0.25"
+          )
+          .fromTo(
+            ".gsap-emp-action-row",
+            { y: 25, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.55, clearProps: 'all' },
+            "-=0.25"
+          )
+          .fromTo(
+            ".gsap-emp-chart-card",
+            { y: 25, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.5,
+              stagger: 0.1,
+              ease: "power2.out",
+              clearProps: 'all',
+            },
+            "-=0.25"
+          );
+      });
+
+      // ── Mobile Breakpoint (≤768px) ──────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.isMobile, () => {
+        const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+
+        tl.fromTo(
+          ".gsap-emp-kpi",
+          { y: 12, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.45, clearProps: 'all' }
         )
-        .fromTo(
-          ".gsap-emp-chart-card",
-          { y: 25, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.5,
-            stagger: 0.1,
-            ease: "power2.out",
-            clearProps: 'transform',
-          },
-          "-=0.25"
+          .fromTo(
+            ".gsap-emp-hero-row",
+            { y: 14, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.45, clearProps: 'all' },
+            "-=0.2"
+          )
+          .fromTo(
+            ".gsap-emp-action-row",
+            { y: 14, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.45, clearProps: 'all' },
+            "-=0.2"
+          )
+          .fromTo(
+            ".gsap-emp-chart-card",
+            { y: 14, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.4,
+              stagger: 0.06,
+              ease: "power2.out",
+              clearProps: 'all',
+            },
+            "-=0.2"
+          );
+      });
+
+      // ── Reduced Motion ───────────────────────────────────────────────
+      mm.add(GSAP_MEDIA_CONDITIONS.reduceMotion, () => {
+        gsap.set(
+          ".gsap-emp-kpi, .gsap-emp-hero-row, .gsap-emp-action-row, .gsap-emp-chart-card",
+          { opacity: 1, y: 0, clearProps: 'all' }
         );
+      });
     },
     { scope: containerRef }
   );

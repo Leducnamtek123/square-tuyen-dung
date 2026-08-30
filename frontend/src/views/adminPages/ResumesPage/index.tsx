@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useMemo } from 'react';
 import { Box, Typography, Paper, Tooltip, IconButton, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
@@ -14,6 +14,7 @@ import { Resume } from '../../../types/models';
 import dayjs from '../../../configs/dayjs-config';
 import FilterBar from '@/components/Common/FilterBar';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
+import { downloadPdf } from '@/utils/funcUtils';
 
 const ResumesPage = () => {
     const { t } = useTranslation('admin');
@@ -109,15 +110,39 @@ const ResumesPage = () => {
                 const resume = info.row.original;
                 const fileUrl = resume.fileUrl || '';
                 const safeFileUrl = getSafeResourceUrl(fileUrl);
+                const onlineHref = resume.slug ? `/cv/${resume.slug}` : undefined;
+                const safeTargetUrl = safeFileUrl || onlineHref;
+
                 return (
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                         <Tooltip title={t('pages.resumes.table.view')}>
-                             <IconButton aria-label="Thao tác" size="small" component="a" href={safeFileUrl} target="_blank" rel="noopener noreferrer" color="info" disabled={!safeFileUrl}>
+                             <IconButton
+                                aria-label="Thao tác"
+                                size="small"
+                                component="a"
+                                href={safeTargetUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                color="info"
+                                disabled={!safeTargetUrl}
+                            >
                                 <VisibilityIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title={t('pages.resumes.table.download')}>
-                             <IconButton aria-label="Tải xuống" size="small" component="a" href={safeFileUrl} download color="primary" disabled={!safeFileUrl}>
+                             <IconButton
+                                aria-label="Tải xuống"
+                                size="small"
+                                onClick={() => {
+                                    if (safeFileUrl) {
+                                        downloadPdf(safeFileUrl, resume.title);
+                                    } else if (onlineHref) {
+                                        window.open(onlineHref, '_blank');
+                                    }
+                                }}
+                                color="primary"
+                                disabled={!safeTargetUrl}
+                            >
                                 <DownloadIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
