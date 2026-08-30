@@ -1428,5 +1428,170 @@
   },
   "table": {
     "rowsPerPage": "Số hàng mỗi trang:"
+  },
+  "editor": {
+    "toolbar": {
+      "undo": "Hoàn tác (Ctrl+Z)",
+      "redo": "Làm lại (Ctrl+Y)",
+      "templates": "Mẫu bài viết",
+      "aiAssistant": "Trợ lý AI",
+      "clearFormat": "Xóa định dạng",
+      "heading": "Tiêu đề",
+      "normalText": "Văn bản thường (Normal text)",
+      "heading1": "Tiêu đề 1 (H1)",
+      "heading2": "Tiêu đề 2 (H2)",
+      "heading3": "Tiêu đề 3 (H3)",
+      "heading4": "Tiêu đề 4 (H4)",
+      "fontSize": "Cỡ chữ",
+      "fontSmall": "Nhỏ (13px)",
+      "fontNormal": "Chuẩn (15px)",
+      "fontMedium": "Vừa (18px)",
+      "fontLarge": "Lớn (22px)",
+      "fontXLarge": "Rất lớn (28px)",
+      "bold": "In đậm (Ctrl+B)",
+      "italic": "In nghiêng (Ctrl+I)",
+      "underline": "Gạch chân (Ctrl+U)",
+      "strike": "Gạch ngang",
+      "code": "Mã nội dòng",
+      "textColor": "Màu chữ",
+      "highlightColor": "Màu nền highlight",
+      "alignLeft": "Căn trái",
+      "alignCenter": "Căn giữa",
+      "alignRight": "Căn phải",
+      "alignJustify": "Căn đều hai bên",
+      "bulletList": "Danh sách gạch đầu dòng",
+      "orderedList": "Danh sách đánh số",
+      "taskList": "Danh sách việc cần làm (Task list)",
+      "blockquote": "Trích dẫn",
+      "codeBlock": "Khối mã (Code block)",
+      "callout": "Khối ghi chú nổi bật (Callout box)",
+      "table": "Chèn bảng dữ liệu",
+      "link": "Chèn / Sửa liên kết (Ctrl+K)",
+      "horizontalRule": "Đường kẻ phân cách",
+      "livePreview": "Xem trước bài viết"
+    },
+    "colors": {
+      "default": "Mặc định",
+      "green": "Xanh lá",
+      "rubyRed": "Đỏ Ruby",
+      "violet": "Tím Violet",
+      "blue": "Xanh dương",
+      "slate": "Xám Slate",
+      "none": "Không màu",
+      "lemonYellow": "Vàng chanh",
+      "mintGreen": "Xanh bạc hà",
+      "skyBlue": "Xanh mây",
+      "lavender": "Tím hoa cà",
+      "peach": "Cam đào",
+      "customColor": "Màu tùy chỉnh"
+    },
+    "status": {
+      "words": "{{count}} từ",
+      "characters": "{{count}} ký tự",
+      "readingTime": "~{{minutes}} phút đọc",
+      "richEditorReady": "Trình soạn thảo sẵn sàng",
+      "markdownShortcutsSupported": "Hỗ trợ phím tắt Markdown (#, *, -, 1., >)"
+    },
+    "callout": {
+      "modalTitle": "Chèn Khối Ghi Chú Nổi Bật (Callout Box)",
+      "selectType": "Chọn loại khối ghi chú:",
+      "customTitle": "Tiêu đề tùy chỉnh:",
+      "content": "Nội dung ghi chú:",
+      "contentPlaceholder": "Nhập nội dung thông điệp cần làm nổi bật...",
+      "preview": "Xem trước hiển thị:",
+      "cancel": "Hủy",
+      "insert": "Chèn Vào Bài Viết",
+      "types": {
+        "info": {
+          "label": "Thông tin bổ sung (Info)",
+          "defaultTitle": "Lưu ý quan trọng:"
+        },
+        "tip": {
+          "label": "Mẹo & Bí quyết (Tip)",
+          "defaultTitle": "Bí quyết hữu ích:"
+        },
+        "warning": {
+          "label": "Cảnh báo / Lưu ý (Warning)",
+          "defaultTitle": "Lưu ý cần biết:"
+        },
+        "success": {
+          "label": "Điểm nổi bật / Thành tựu (Success)",
+          "defaultTitle": "Cam kết chất lượng:"
+        }
+      }
+    },
+    "table": {
+      "modalTitle": "Chèn Bảng Dữ Liệu",
+      "gridSize": "Kích thước:",
+      "sizeReadout": "{{rows}} hàng x {{cols}} cột",
+      "headerRow": "Có hàng tiêu đề nổi bật (Header row)",
+      "cancel": "Hủy",
+      "insertButton": "Chèn Bảng ({{rows}}x{{cols}})"
+    },
+    "link": {
+      "modalTitle": "Chèn Liên Kết (Hyperlink)",
+      "urlLabel": "Địa chỉ liên kết (URL)",
+      "urlPlaceholder": "https://example.com",
+      "textLabel": "Văn bản hiển thị",
+      "textPlaceholder": "Nhập chữ hiển thị (nếu có)...",
+      "openNewTab": "Mở trong tab mới (target=\"_blank\")",
+      "cancel": "Hủy",
+      "insert": "Chèn Liên Kết"
+    },
+    "preview": {
+      "modalTitle": "Xem Trước Bài Viết (Live Preview)",
+      "subtitle": "Giao diện thực tế người xem sẽ nhìn thấy sau khi xuất bản",
+      "empty": "Chưa có nội dung để hiển thị",
+      "close": "Đóng"
+    },
+    "templates": {
+      "modalTitle": "Thư Viện Mẫu Bài Viết & Tuyển Dụng Chuẩn",
+      "subtitle": "Khởi tạo nhanh nội dung chuyên nghiệp với cấu trúc chuẩn hóa cho từng ngành nghề",
+      "searchPlaceholder": "Tìm kiếm mẫu theo tên, mô tả hoặc từ khóa...",
+      "allCategory": "Tất cả mẫu",
+      "categories": {
+        "company": "Giới thiệu Công ty",
+        "job": "Mô tả Tuyển dụng (JD)",
+        "policy": "Chính sách & Phúc lợi",
+        "interview": "Quy trình & Hướng dẫn"
+      },
+      "previewHeader": "Bản xem trước:",
+      "useTemplate": "Sử dụng mẫu này",
+      "cancel": "Đóng",
+      "confirmOverwriteTitle": "Xác nhận áp dụng mẫu",
+      "confirmOverwriteDesc": "Nội dung hiện tại trong khung soạn thảo sẽ được thay thế bằng mẫu đã chọn. Bạn có chắc muốn tiếp tục?",
+      "confirmOverwriteOk": "Đồng ý thay thế",
+      "confirmOverwriteCancel": "Hủy"
+    },
+    "ai": {
+      "modalTitle": "Trợ Lý Soạn Thảo AI (AI Writing Assistant)",
+      "subtitle": "Tối ưu hóa, mở rộng và hoàn thiện nội dung tuyển dụng chuyên nghiệp",
+      "tones": {
+        "label": "Phong cách diễn đạt:",
+        "professional": "Chuyên nghiệp & Trang trọng",
+        "friendly": "Thân thiện & Cởi mở",
+        "persuasive": "Thuyết phục & Thu hút",
+        "concise": "Ngắn gọn & Súc tích"
+      },
+      "actions": {
+        "grammar": "Sửa lỗi chính tả & ngữ pháp",
+        "rewrite": "Viết lại hấp dẫn hơn",
+        "expand": "Mở rộng & chi tiết hóa",
+        "shorten": "Tóm tắt & cô đọng",
+        "generateJd": "Tạo JD tuyển dụng mẫu",
+        "addBenefits": "Bổ sung quyền lợi hấp dẫn",
+        "makeProfessional": "Chuyển sang giọng văn chuẩn B2B"
+      },
+      "customPromptLabel": "Hoặc nhập yêu cầu riêng của bạn cho AI:",
+      "customPromptPlaceholder": "Ví dụ: Hãy viết thêm phần yêu cầu kỹ năng ReactJS và TypeScript cho vị trí Senior Frontend...",
+      "generateButton": "Xử lý bằng AI",
+      "processing": "AI đang suy nghĩ và tạo nội dung...",
+      "resultTitle": "Kết quả do AI đề xuất:",
+      "insert": "Chèn vào cuối bài",
+      "replace": "Thay thế nội dung đã chọn",
+      "copy": "Sao chép kết quả",
+      "copied": "Đã sao chép vào bộ nhớ tạm",
+      "close": "Đóng"
+    }
   }
 }

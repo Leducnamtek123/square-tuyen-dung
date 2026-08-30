@@ -387,8 +387,9 @@ h1, h2, h3, h4, h5, .display-text {
   max-width: 100% !important;
   width: auto !important;
   height: auto !important;
-  margin: 12px 0;
-  border-radius: 6px;
+  margin: 16px 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 /* Figure wrapper also gets inline width - must override */
@@ -397,7 +398,7 @@ h1, h2, h3, h4, h5, .display-text {
   display: block !important;
   max-width: 100% !important;
   width: auto !important;
-  margin: 12px 0 !important;
+  margin: 16px 0 !important;
 }
 
 .rdw-editor-main .rdw-image-center {
@@ -411,6 +412,84 @@ h1, h2, h3, h4, h5, .display-text {
 .rdw-editor-main .rdw-image-right {
   justify-content: flex-end;
 }
+
+/* Modern Rich Editor canvas typography */
+.rdw-editor-main h1 {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--foreground, #0f172a);
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.rdw-editor-main h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--foreground, #0f172a);
+  margin-top: 1.15rem;
+  margin-bottom: 0.65rem;
+}
+
+.rdw-editor-main h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #4f46e5;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.rdw-editor-main p {
+  margin-bottom: 0.85rem;
+  line-height: 1.75;
+  color: var(--foreground, #334155);
+}
+
+.rdw-editor-main ul,
+.rdw-editor-main ol {
+  padding-left: 1.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.rdw-editor-main li {
+  margin-bottom: 0.35rem;
+  line-height: 1.65;
+}
+
+.rdw-editor-main blockquote {
+  border-left: 4px solid #6366f1;
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  background-color: rgba(99, 102, 241, 0.05);
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+}
+
+.rdw-editor-main table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rdw-editor-main table th,
+.rdw-editor-main table td {
+  border: 1px solid #cbd5e1;
+  padding: 10px 14px;
+}
+
+.rdw-editor-main table th {
+  background-color: rgba(99, 102, 241, 0.08);
+  font-weight: 700;
+}
+
+.rdw-editor-main a {
+  color: #4f46e5;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
 
 /* Removed SVG Noise Filter as it is extremely expensive for rendering */
 .bg-noise {

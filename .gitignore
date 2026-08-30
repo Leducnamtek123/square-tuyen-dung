@@ -2,15 +2,30 @@
 .env
 .env.*
 !.env.example
+infra/fpt-gpu/*.env
+infra/fpt-gpu/*.runtime.env
+!infra/fpt-gpu/*.env.example
 
-# Database dumps
+# Secrets & Certificates
+.secrets/
+*.key
+*.pem
+*.crt
+docker/nginx/certs/
+frontend/docker/nginx/certs/
+
+# Database dumps & backups
 *.sql
+*.sql.gz
+backups/
 api/data/*.sql
 
 # Python
 __pycache__/
 *.py[cod]
 *.pyo
+.pytest_cache/
+*.egg-info/
 
 # Node
 node_modules/
@@ -42,14 +57,5 @@ build_err*.txt
 expect_output*.txt
 expect_cli_output*.txt
 
-# Python cache
-.pytest_cache/
-*.egg-info/
-
 # Local isolated worktrees
 .worktrees/
-
-# Certificates & SSL keys
-*.key
-docker/nginx/certs/
-

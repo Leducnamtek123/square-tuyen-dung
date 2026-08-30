@@ -1428,5 +1428,170 @@
   },
   "table": {
     "rowsPerPage": "Rows per page:"
+  },
+  "editor": {
+    "toolbar": {
+      "undo": "Undo (Ctrl+Z)",
+      "redo": "Redo (Ctrl+Y)",
+      "templates": "Article & JD Templates",
+      "aiAssistant": "AI Writing Assistant",
+      "clearFormat": "Clear formatting",
+      "heading": "Heading",
+      "normalText": "Normal text",
+      "heading1": "Heading 1 (H1)",
+      "heading2": "Heading 2 (H2)",
+      "heading3": "Heading 3 (H3)",
+      "heading4": "Heading 4 (H4)",
+      "fontSize": "Font size",
+      "fontSmall": "Small (13px)",
+      "fontNormal": "Normal (15px)",
+      "fontMedium": "Medium (18px)",
+      "fontLarge": "Large (22px)",
+      "fontXLarge": "Extra Large (28px)",
+      "bold": "Bold (Ctrl+B)",
+      "italic": "Italic (Ctrl+I)",
+      "underline": "Underline (Ctrl+U)",
+      "strike": "Strikethrough",
+      "code": "Inline code",
+      "textColor": "Text color",
+      "highlightColor": "Highlight color",
+      "alignLeft": "Align left",
+      "alignCenter": "Align center",
+      "alignRight": "Align right",
+      "alignJustify": "Justify",
+      "bulletList": "Bullet list",
+      "orderedList": "Numbered list",
+      "taskList": "Task checklist",
+      "blockquote": "Blockquote",
+      "codeBlock": "Code block",
+      "callout": "Callout box",
+      "table": "Insert data table",
+      "link": "Insert / Edit link (Ctrl+K)",
+      "horizontalRule": "Horizontal divider",
+      "livePreview": "Live preview"
+    },
+    "colors": {
+      "default": "Default",
+      "green": "Green",
+      "rubyRed": "Ruby Red",
+      "violet": "Violet",
+      "blue": "Blue",
+      "slate": "Slate Gray",
+      "none": "None",
+      "lemonYellow": "Lemon Yellow",
+      "mintGreen": "Mint Green",
+      "skyBlue": "Sky Blue",
+      "lavender": "Lavender",
+      "peach": "Peach",
+      "customColor": "Custom color"
+    },
+    "status": {
+      "words": "{{count}} words",
+      "characters": "{{count}} characters",
+      "readingTime": "~{{minutes}} min read",
+      "richEditorReady": "Rich editor ready",
+      "markdownShortcutsSupported": "Supports Markdown shortcuts (#, *, -, 1., >)"
+    },
+    "callout": {
+      "modalTitle": "Insert Callout Box",
+      "selectType": "Select callout type:",
+      "customTitle": "Custom title:",
+      "content": "Callout content:",
+      "contentPlaceholder": "Enter content to highlight...",
+      "preview": "Live preview:",
+      "cancel": "Cancel",
+      "insert": "Insert Into Document",
+      "types": {
+        "info": {
+          "label": "Additional Information (Info)",
+          "defaultTitle": "Important Note:"
+        },
+        "tip": {
+          "label": "Tips & Tricks (Tip)",
+          "defaultTitle": "Helpful Tip:"
+        },
+        "warning": {
+          "label": "Warning & Notice (Warning)",
+          "defaultTitle": "Caution:"
+        },
+        "success": {
+          "label": "Highlights & Achievements (Success)",
+          "defaultTitle": "Quality Commitment:"
+        }
+      }
+    },
+    "table": {
+      "modalTitle": "Insert Data Table",
+      "gridSize": "Dimension:",
+      "sizeReadout": "{{rows}} rows x {{cols}} columns",
+      "headerRow": "Include prominent header row",
+      "cancel": "Cancel",
+      "insertButton": "Insert Table ({{rows}}x{{cols}})"
+    },
+    "link": {
+      "modalTitle": "Insert Hyperlink",
+      "urlLabel": "Link URL",
+      "urlPlaceholder": "https://example.com",
+      "textLabel": "Display text",
+      "textPlaceholder": "Enter display text (optional)...",
+      "openNewTab": "Open in new tab (target=\"_blank\")",
+      "cancel": "Cancel",
+      "insert": "Insert Link"
+    },
+    "preview": {
+      "modalTitle": "Live Preview",
+      "subtitle": "Actual layout viewers will see after publication",
+      "empty": "No content to display",
+      "close": "Close"
+    },
+    "templates": {
+      "modalTitle": "Professional Article & Job Templates Library",
+      "subtitle": "Quickly jumpstart professional content with standardized structures for every industry",
+      "searchPlaceholder": "Search templates by name, description or keyword...",
+      "allCategory": "All Templates",
+      "categories": {
+        "company": "Company Profile",
+        "job": "Job Descriptions (JD)",
+        "policy": "Policies & Benefits",
+        "interview": "Process & Guides"
+      },
+      "previewHeader": "Preview:",
+      "useTemplate": "Use this template",
+      "cancel": "Close",
+      "confirmOverwriteTitle": "Confirm apply template",
+      "confirmOverwriteDesc": "Current editor content will be replaced by the selected template. Are you sure you want to continue?",
+      "confirmOverwriteOk": "Yes, replace",
+      "confirmOverwriteCancel": "Cancel"
+    },
+    "ai": {
+      "modalTitle": "AI Writing Assistant",
+      "subtitle": "Optimize, expand and polish professional recruitment content",
+      "tones": {
+        "label": "Writing Tone:",
+        "professional": "Professional & Formal",
+        "friendly": "Friendly & Approachable",
+        "persuasive": "Persuasive & Engaging",
+        "concise": "Concise & Direct"
+      },
+      "actions": {
+        "grammar": "Fix grammar & spelling",
+        "rewrite": "Rewrite & polish",
+        "expand": "Expand & elaborate",
+        "shorten": "Summarize & shorten",
+        "generateJd": "Generate Job Description (JD)",
+        "addBenefits": "Add attractive benefits",
+        "makeProfessional": "Make tone executive/B2B"
+      },
+      "customPromptLabel": "Or enter your custom request for AI:",
+      "customPromptPlaceholder": "E.g. Add technical requirements for Senior Frontend Engineer using ReactJS and TypeScript...",
+      "generateButton": "Generate with AI",
+      "processing": "AI is processing and generating content...",
+      "resultTitle": "AI Suggested Result:",
+      "insert": "Insert at end",
+      "replace": "Replace selected",
+      "copy": "Copy result",
+      "copied": "Copied to clipboard",
+      "close": "Close"
+    }
   }
 }

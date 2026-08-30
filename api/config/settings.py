@@ -59,12 +59,12 @@ COMPANY_CONTACT_ADDRESS = config(
 )
 COMPANY_WORK_TIME = config("COMPANY_WORK_TIME", default="8:00 - 17:30 (Monday - Friday)")
 
-WEB_JOB_SEEKER_CLIENT_URL = config("WEB_JOB_SEEKER_CLIENT_URL", default="https://infohr.vn/")
-WEB_EMPLOYER_CLIENT_URL = config("WEB_EMPLOYER_CLIENT_URL", default="https://infohr.vn/")
+WEB_JOB_SEEKER_CLIENT_URL = config("WEB_JOB_SEEKER_CLIENT_URL", default="http://localhost:3000" if not IS_PRODUCTION else "https://infohr.vn/")
+WEB_EMPLOYER_CLIENT_URL = config("WEB_EMPLOYER_CLIENT_URL", default="http://localhost:3000" if not IS_PRODUCTION else "https://infohr.vn/")
 
 DOMAIN_CLIENT = {
-    "job_seeker": WEB_JOB_SEEKER_CLIENT_URL if WEB_JOB_SEEKER_CLIENT_URL else "https://infohr.vn/",
-    "employer": WEB_EMPLOYER_CLIENT_URL if WEB_EMPLOYER_CLIENT_URL else "https://infohr.vn/",
+    "job_seeker": WEB_JOB_SEEKER_CLIENT_URL if WEB_JOB_SEEKER_CLIENT_URL else ("http://localhost:3000" if not IS_PRODUCTION else "https://infohr.vn/"),
+    "employer": WEB_EMPLOYER_CLIENT_URL if WEB_EMPLOYER_CLIENT_URL else ("http://localhost:3000" if not IS_PRODUCTION else "https://infohr.vn/"),
 }
 
 # Local AI (Voice) services
@@ -149,7 +149,7 @@ INTERVIEW_DISCONNECT_GRACE_SECONDS = config("INTERVIEW_DISCONNECT_GRACE_SECONDS"
 APP_ENV = config("APP_ENV", default=config("APP_ENVIRONMENT", default="development"))
 APP_ENVIRONMENT = config("APP_ENVIRONMENT", default=APP_ENV)
 IS_PRODUCTION = str(APP_ENVIRONMENT).strip().lower() == "production"
-STRICT_ENV_VALIDATION = config("STRICT_ENV_VALIDATION", default=False, cast=_to_bool)
+STRICT_ENV_VALIDATION = config("STRICT_ENV_VALIDATION", default=IS_PRODUCTION, cast=_to_bool)
 API_RESPONSE_ENVELOPE_V2 = config("API_RESPONSE_ENVELOPE_V2", default=True, cast=_to_bool)
 FRAPPE_HR_BASE_URL = config("FRAPPE_HR_BASE_URL", default="")
 FRAPPE_HR_PUBLIC_URL = config("FRAPPE_HR_PUBLIC_URL", default=FRAPPE_HR_BASE_URL)
@@ -181,7 +181,7 @@ FRAPPE_HR_RECRUITER_READONLY_ROLES = config(
 FRAPPE_HR_SYNC_RECRUITER_ACCOUNTS = config("FRAPPE_HR_SYNC_RECRUITER_ACCOUNTS", default=True, cast=_to_bool)
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY", default="django-insecure-square-tuyen-dung-local-only")
+SECRET_KEY = config("SECRET_KEY", default="" if IS_PRODUCTION else "django-insecure-square-tuyen-dung-local-only")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=_to_bool)
@@ -525,8 +525,8 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 MINIO_ENDPOINT = config('MINIO_ENDPOINT', default='minio:9000')
-MINIO_ACCESS_KEY = config('MINIO_ACCESS_KEY', default='admin')
-MINIO_SECRET_KEY = config('MINIO_SECRET_KEY', default='password')
+MINIO_ACCESS_KEY = config('MINIO_ACCESS_KEY', default='' if IS_PRODUCTION else 'admin')
+MINIO_SECRET_KEY = config('MINIO_SECRET_KEY', default='' if IS_PRODUCTION else 'password')
 MINIO_BUCKET = config('MINIO_BUCKET', default='Project-bucket')
 MINIO_SECURE = config('MINIO_SECURE', default=False, cast=bool)
 MINIO_PUBLIC_URL = config('MINIO_PUBLIC_URL', default='http://localhost:9000')
@@ -571,7 +571,7 @@ INTERVIEW_MAX_DURATION_SECONDS = int(os.getenv("INTERVIEW_MAX_DURATION_SECONDS",
 
 REDIS_JOB_TITLE_EXPIRE_SECONDS = 14400
 
-SMS_BASE_URL = "https://qy1kdr.api.infobip.com"
+SMS_BASE_URL = config('SMS_BASE_URL', default='https://api.infobip.com')
 SMS_API_KEY = config('SMS_API_KEY', default='')
 
 FIREBASE_CONFIG = {

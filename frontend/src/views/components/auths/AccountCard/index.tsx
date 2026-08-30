@@ -74,7 +74,7 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
         await authService.changePassword(data);
         setOpenPopup(false);
         toastMessages.success(t('account.passwordChangeSuccess'));
-        let path = ROUTES.AUTH.LOGIN;
+        let path = `/${ROUTES.AUTH.LOGIN}`;
         const accessToken = tokenService.getAccessTokenFromCookie() as string;
         const backend = tokenService.getProviderFromCookie() as string | undefined;
         dispatch(removeUserInfo({ accessToken, backend }))

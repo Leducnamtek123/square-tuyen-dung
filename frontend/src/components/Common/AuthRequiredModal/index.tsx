@@ -39,9 +39,17 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
   const router = useRouter();
   const pathname = usePathname();
 
-  const isEmployerTarget = targetRole === 'employer';
-  const defaultLoginRoute = isEmployerTarget ? `/${ROUTES.EMPLOYER_AUTH.LOGIN}` : localizeRoutePath(ROUTES.AUTH.LOGIN, i18n.language);
-  const defaultRegisterRoute = isEmployerTarget ? `/${ROUTES.EMPLOYER_AUTH.REGISTER}` : localizeRoutePath(ROUTES.AUTH.REGISTER, i18n.language);
+  const ensureLeadingSlash = (path: string) => (path.startsWith('/') ? path : `/${path}`);
+  const defaultLoginRoute = ensureLeadingSlash(
+    isEmployerTarget
+      ? `/${ROUTES.EMPLOYER_AUTH.LOGIN}`
+      : localizeRoutePath(`/${ROUTES.AUTH.LOGIN}`, i18n.language)
+  );
+  const defaultRegisterRoute = ensureLeadingSlash(
+    isEmployerTarget
+      ? `/${ROUTES.EMPLOYER_AUTH.REGISTER}`
+      : localizeRoutePath(`/${ROUTES.AUTH.REGISTER}`, i18n.language)
+  );
 
   const displayTitle = title || t('authRequired.title');
   const displayMessage =

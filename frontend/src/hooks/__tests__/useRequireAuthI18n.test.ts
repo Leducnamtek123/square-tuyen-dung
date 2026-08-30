@@ -37,6 +37,9 @@ describe('useRequireAuth and AuthRequiredModal i18n & structure', () => {
     expect(authModalSource).toContain('defaultLoginRoute');
     expect(authModalSource).toContain('defaultRegisterRoute');
     expect(authModalSource).toContain('AuthRequiredModal');
+    expect(authModalSource).toContain('ensureLeadingSlash');
+    expect(authModalSource).toContain('`/${ROUTES.AUTH.LOGIN}`');
+    expect(authModalSource).toContain('`/${ROUTES.AUTH.REGISTER}`');
   });
 
   it('provides requireAuth and AuthModal in useRequireAuth hook', () => {

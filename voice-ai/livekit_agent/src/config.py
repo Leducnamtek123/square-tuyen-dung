@@ -95,7 +95,7 @@ class Config:
     )
     STT_LANGUAGE: str = os.getenv("STT_LANGUAGE") or os.getenv("AI_STT_LANGUAGE", "vi")
     STT_API_KEY: str = os.getenv("STT_API_KEY") or os.getenv(
-        "AI_STT_API_KEY", "no-key-needed"
+        "AI_STT_API_KEY", ""
     )
 
     TTS_BASE_URL: str = os.getenv("TTS_BASE_URL") or os.getenv(
@@ -104,7 +104,7 @@ class Config:
     TTS_MODEL: str = os.getenv("TTS_MODEL") or os.getenv("AI_TTS_MODEL", "tts-1")
     TTS_VOICE: str = os.getenv("TTS_VOICE") or os.getenv("AI_TTS_DEFAULT_VOICE", "Ly")
     TTS_API_KEY: str = os.getenv("TTS_API_KEY") or os.getenv(
-        "AI_TTS_API_KEY", "no-key-needed"
+        "AI_TTS_API_KEY", ""
     )
     TTS_CONNECT_TIMEOUT_SECONDS: float = _get_float("TTS_CONNECT_TIMEOUT_SECONDS", 15.0)
     TTS_READ_TIMEOUT_SECONDS: float = _get_float("TTS_READ_TIMEOUT_SECONDS", 300.0)

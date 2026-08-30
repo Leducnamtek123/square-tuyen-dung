@@ -32,11 +32,11 @@
 - Modify: `frontend/src/views/hrmPages/LeaveListPage/index.tsx`
 - Test: `api/apps/hrm/tests.py`
 
-- [ ] **Step 1.1: Add `EmployeeLeaveBalance` model in `api/apps/hrm/models.py`**
-- [ ] **Step 1.2: Add Serializers & ViewSet in `serializers.py` and `views.py`**
-- [ ] **Step 1.3: Update URL routing in `api/apps/hrm/urls.py`**
-- [ ] **Step 1.4: Update Frontend `hrmService.ts` and `useHrmQueries.ts`**
-- [ ] **Step 1.5: Enhance `LeaveListPage/index.tsx`**
+- [x] **Step 1.1: Add `EmployeeLeaveBalance` model in `api/apps/hrm/models.py`**
+- [x] **Step 1.2: Add Serializers & ViewSet in `serializers.py` and `views.py`**
+- [x] **Step 1.3: Update URL routing in `api/apps/hrm/urls.py`**
+- [x] **Step 1.4: Update Frontend `hrmService.ts` and `useHrmQueries.ts`**
+- [x] **Step 1.5: Enhance `LeaveListPage/index.tsx`**
 
 ---
 
@@ -53,10 +53,10 @@
 - Create: `frontend/src/app/employer/hrm/payroll/page.tsx`
 - Create: `frontend/src/app/admin/hrm/payroll/page.tsx`
 
-- [ ] **Step 2.1: Enhance `payroll_engine.py` with Employer Statutory Contributions**
-- [ ] **Step 2.2: Extend `MonthlyPayrollRecord` & `MonthlyPayrollViewSet`**
-- [ ] **Step 2.3: Build `PayrollListPage/index.tsx`**
-- [ ] **Step 2.4: Create page routes `/employer/hrm/payroll` & `/admin/hrm/payroll`**
+- [x] **Step 2.1: Enhance `payroll_engine.py` with Employer Statutory Contributions**
+- [x] **Step 2.2: Extend `MonthlyPayrollRecord` & `MonthlyPayrollViewSet`**
+- [x] **Step 2.3: Build `PayrollListPage/index.tsx`**
+- [x] **Step 2.4: Create page routes `/employer/hrm/payroll` & `/admin/hrm/payroll`**
 
 ---
 
@@ -70,9 +70,9 @@
 - Create: `frontend/src/app/employer/hrm/attendances/page.tsx`
 - Create: `frontend/src/app/admin/hrm/attendances/page.tsx`
 
-- [ ] **Step 3.1: Add `timesheet` & `quick_checkin` actions on `AttendanceRecordViewSet`**
-- [ ] **Step 3.2: Build `AttendanceListPage/index.tsx`**
-- [ ] **Step 3.3: Create page routes `/employer/hrm/attendances` & `/admin/hrm/attendances`**
+- [x] **Step 3.1: Add `timesheet` & `quick_checkin` actions on `AttendanceRecordViewSet`**
+- [x] **Step 3.2: Build `AttendanceListPage/index.tsx`**
+- [x] **Step 3.3: Create page routes `/employer/hrm/attendances` & `/admin/hrm/attendances`**
 
 ---
 
@@ -84,8 +84,8 @@
 - Modify: `frontend/src/services/hrmService.ts`
 - Modify: `frontend/src/views/hrmPages/ContractListPage/index.tsx`
 
-- [ ] **Step 4.1: Add `renew_contract` action on `EmploymentContractViewSet`**
-- [ ] **Step 4.2: Add "Tái ký / Gia hạn" modal to `ContractListPage/index.tsx`**
+- [x] **Step 4.1: Add `renew_contract` action on `EmploymentContractViewSet`**
+- [x] **Step 4.2: Add "Tái ký / Gia hạn" modal to `ContractListPage/index.tsx`**
 
 ---
 
@@ -96,8 +96,8 @@
 - Modify: `api/apps/hrm/urls.py`
 - Modify: `frontend/src/services/hrmService.ts`
 
-- [ ] **Step 5.1: Create `MyHrmProfileView` in `views.py`**
-- [ ] **Step 5.2: Register endpoint `/api/v1/native-hrm/me/` in `urls.py`**
+- [x] **Step 5.1: Create `MyHrmProfileView` in `views.py`**
+- [x] **Step 5.2: Register endpoint `/api/v1/native-hrm/me/` in `urls.py`**
 
 ---
 
@@ -108,6 +108,6 @@
 - Modify: `frontend/src/layouts/components/employers/Sidebar/AdminMenu.tsx`
 - Modify: `api/apps/hrm/tests.py`
 
-- [ ] **Step 6.1: Add menu items for Payroll and Attendances**
-- [ ] **Step 6.2: Write comprehensive tests in `api/apps/hrm/tests.py`**
-- [ ] **Step 6.3: Run full verification inside Docker container**
+- [x] **Step 6.1: Add menu items for Payroll and Attendances**
+- [x] **Step 6.2: Write comprehensive tests in `api/apps/hrm/tests.py`**
+- [x] **Step 6.3: Run full verification inside Docker container**

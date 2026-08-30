@@ -76,10 +76,23 @@ def score_resume_job_fit(resume_data, job_data, resume_id=None, job_id=None):
     prompt = build_scoring_prompt(resume_data, job_data)
 
     try:
-        api_key = getattr(settings, 'OPENAI_API_KEY', '') or \
-                  getattr(settings, 'AI_API_KEY', '')
-        api_url = getattr(settings, 'OPENAI_API_URL', 'https://api.openai.com/v1/chat/completions')
-        model = getattr(settings, 'AI_MODEL', 'gpt-5.4-mini')
+        api_key = (
+            getattr(settings, 'AI_LLM_API_KEY', '')
+            or getattr(settings, 'LLM_API_KEY', '')
+            or getattr(settings, 'OPENAI_API_KEY', '')
+            or getattr(settings, 'AI_API_KEY', '')
+        )
+        base_url = (
+            getattr(settings, 'AI_LLM_BASE_URL', '')
+            or getattr(settings, 'LLM_BASE_URL', '')
+            or getattr(settings, 'OPENAI_API_URL', 'https://api.openai.com/v1')
+        ).rstrip('/')
+        api_url = f"{base_url}/chat/completions" if not base_url.endswith("/chat/completions") else base_url
+        model = (
+            getattr(settings, 'AI_LLM_MODEL', '')
+            or getattr(settings, 'LLM_MODEL', '')
+            or getattr(settings, 'AI_MODEL', 'gpt-5.4-mini')
+        )
 
         if not api_key:
             logger.warning("AI scoring skipped: no API key configured")
