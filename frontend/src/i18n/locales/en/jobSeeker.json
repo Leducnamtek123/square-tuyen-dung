@@ -614,7 +614,8 @@
       "recommendedJobsTitle": "Recommended Jobs for You",
       "viewJob": "View Details",
       "exploreJobs": "Explore Matching Jobs Now",
-      "viewDashboard": "View My Profile"
+      "viewDashboard": "View My Profile",
+      "profileScore": "Your profile score"
     },
     "actions": {
       "back": "Back",

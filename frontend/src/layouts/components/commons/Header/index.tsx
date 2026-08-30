@@ -349,6 +349,7 @@ const Header = (_props: HeaderProps) => {
                     isAuthenticated={isAuthenticated}
                     currentUserName={currentUser?.fullName}
                     currentUserAvatarUrl={currentUser?.avatarUrl ?? undefined}
+                    isVerified={Boolean(currentUser?.isOnboarded || currentUser?.isPhoneVerified || currentUser?.isVerifyEmail)}
                     anchorElUser={anchorElUser}
                     onOpenUserMenu={handleOpenUserMenu}
                     onCloseUserMenu={handleCloseUserMenu}

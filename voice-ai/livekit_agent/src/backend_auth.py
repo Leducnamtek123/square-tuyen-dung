@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import time
+import uuid
 from urllib.parse import urlparse
 
 import httpx
@@ -13,6 +14,7 @@ async def sign_backend_request(request: httpx.Request) -> None:
     # originally HTTPS so SecurityMiddleware does not redirect to
     # https://backend:8000, which is not a TLS listener.
     request.headers.setdefault("X-Forwarded-Proto", "https")
+    request.headers.setdefault("X-Correlation-Id", str(uuid.uuid4()))
 
     secret = (config.INTERVIEW_AGENT_SHARED_SECRET or "").strip()
     if not secret:

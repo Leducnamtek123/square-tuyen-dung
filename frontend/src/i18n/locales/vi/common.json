@@ -4,7 +4,8 @@
     "auth": {
       "login": "Đăng nhập",
       "signUp": "Đăng ký"
-    }
+    },
+    "userMenu": "Menu người dùng"
   },
   "city": "Tỉnh/Thành phố",
   "career": "Ngành nghề",
@@ -60,7 +61,12 @@
     "change": "Thay đổi",
     "saveChanges": "Lưu thay đổi",
     "preview": "Xem trước",
-    "back": "Quay lại"
+    "back": "Quay lại",
+    "addNew": "Thêm mới",
+    "scrollLeft": "Cuộn sang trái",
+    "scrollRight": "Cuộn sang phải",
+    "viewAll": "Xem tất cả",
+    "viewMore": "Xem thêm"
   },
   "userSettings": {
     "emailNotifications": "Bật thông báo qua email",
@@ -774,12 +780,53 @@
   "common": {
     "hot": "Nổi bật",
     "status": {
-      "unknown": "Không xác định"
+      "unknown": "Không xác định",
+      "completed": "Hoàn thành"
     },
     "na": "N/A",
     "table": {
       "noData": "Không có dữ liệu"
-    }
+    },
+    "actions": {
+      "apply": "Áp dụng",
+      "cancel": "Hủy",
+      "clear": "Xóa",
+      "close": "Đóng",
+      "export": "Xuất dữ liệu",
+      "refreshData": "Làm mới dữ liệu",
+      "reset": "Đặt lại",
+      "resetFilter": "Đặt lại bộ lọc",
+      "retry": "Thử lại"
+    },
+    "all": "Tất cả",
+    "dateRange": {
+      "days30": "30 ngày",
+      "days90": "90 ngày",
+      "fromDate": "Từ ngày",
+      "selectTitle": "Chọn khoảng thời gian",
+      "toDate": "Đến ngày"
+    },
+    "export": {
+      "csv": "Xuất CSV",
+      "excel": "Xuất Excel"
+    },
+    "location": {
+      "geocoding": "Đang định vị địa chỉ...",
+      "gpsTooltip": "Lấy tọa độ hiện tại qua GPS",
+      "helperBadge": "Chọn vị trí chính xác trên bản đồ",
+      "latitude": "Vĩ độ",
+      "longitude": "Kinh độ",
+      "myLocation": "Vị trí của tôi",
+      "selectedAddress": "Địa chỉ đã chọn"
+    },
+    "noResults": "Không có kết quả",
+    "search": {
+      "button": "Tìm kiếm"
+    },
+    "searchPlaceholder": "Tìm kiếm nhanh...",
+    "selectedCount": "Đã chọn {{count}} mục",
+    "urgent": "Tuyển gấp",
+    "user": "Người dùng"
   },
   "messages": {
     "loadingPdf": "Đang tải PDF...",
@@ -800,7 +847,12 @@
   "none": "Không có",
   "view": "Xem",
   "pagination": {
-    "rowsPerPage": "Số dòng mỗi trang"
+    "rowsPerPage": "Số dòng mỗi trang",
+    "firstPage": "Trang đầu",
+    "lastPage": "Trang cuối",
+    "nextPage": "Trang tiếp",
+    "prevPage": "Trang trước",
+    "zeroItems": "0 mục"
   },
   "errors": {
     "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",
@@ -1520,7 +1572,8 @@
       "table": "Chèn bảng dữ liệu",
       "link": "Chèn / Sửa liên kết (Ctrl+K)",
       "horizontalRule": "Đường kẻ phân cách",
-      "livePreview": "Xem trước bài viết"
+      "livePreview": "Xem trước bài viết",
+      "uploadImage": "Tải lên hình ảnh"
     },
     "colors": {
       "default": "Mặc định",
@@ -1542,7 +1595,12 @@
       "characters": "{{count}} ký tự",
       "readingTime": "~{{minutes}} phút đọc",
       "richEditorReady": "Trình soạn thảo sẵn sàng",
-      "markdownShortcutsSupported": "Hỗ trợ phím tắt Markdown (#, *, -, 1., >)"
+      "markdownShortcutsSupported": "Hỗ trợ phím tắt Markdown (#, *, -, 1., >)",
+      "aiReady": "Sẵn sàng AI",
+      "charactersUnit": "ký tự",
+      "minutesRead": "phút đọc",
+      "readingTimeEst": "Ước tính thời gian đọc",
+      "wordsUnit": "từ"
     },
     "callout": {
       "modalTitle": "Chèn Khối Ghi Chú Nổi Bật (Callout Box)",
@@ -1578,7 +1636,9 @@
       "sizeReadout": "{{rows}} hàng x {{cols}} cột",
       "headerRow": "Có hàng tiêu đề nổi bật (Header row)",
       "cancel": "Hủy",
-      "insertButton": "Chèn Bảng ({{rows}}x{{cols}})"
+      "insertButton": "Chèn Bảng ({{rows}}x{{cols}})",
+      "dataCell": "Ô dữ liệu",
+      "headerCell": "Ô tiêu đề"
     },
     "link": {
       "modalTitle": "Chèn Liên Kết (Hyperlink)",
@@ -1605,7 +1665,10 @@
         "company": "Giới thiệu Công ty",
         "job": "Mô tả Tuyển dụng (JD)",
         "policy": "Chính sách & Phúc lợi",
-        "interview": "Quy trình & Hướng dẫn"
+        "interview": "Quy trình & Hướng dẫn",
+        "article": "Bài viết",
+        "email": "Thư điện tử",
+        "jobReq": "Yêu cầu tuyển dụng"
       },
       "previewHeader": "Bản xem trước:",
       "useTemplate": "Sử dụng mẫu này",
@@ -1613,7 +1676,10 @@
       "confirmOverwriteTitle": "Xác nhận áp dụng mẫu",
       "confirmOverwriteDesc": "Nội dung hiện tại trong khung soạn thảo sẽ được thay thế bằng mẫu đã chọn. Bạn có chắc muốn tiếp tục?",
       "confirmOverwriteOk": "Đồng ý thay thế",
-      "confirmOverwriteCancel": "Hủy"
+      "confirmOverwriteCancel": "Hủy",
+      "bottomHint": "Nhấp để áp dụng mẫu",
+      "previewSubtitle": "Xem trước mẫu nội dung",
+      "selectToPreview": "Chọn mẫu bên trái để xem trước"
     },
     "ai": {
       "modalTitle": "Trợ Lý Soạn Thảo AI (AI Writing Assistant)",
@@ -1623,7 +1689,8 @@
         "professional": "Chuyên nghiệp & Trang trọng",
         "friendly": "Thân thiện & Cởi mở",
         "persuasive": "Thuyết phục & Thu hút",
-        "concise": "Ngắn gọn & Súc tích"
+        "concise": "Ngắn gọn & Súc tích",
+        "creative": "Sáng tạo"
       },
       "actions": {
         "grammar": "Sửa lỗi chính tả & ngữ pháp",
@@ -1643,8 +1710,69 @@
       "replace": "Thay thế nội dung đã chọn",
       "copy": "Sao chép kết quả",
       "copied": "Đã sao chép vào bộ nhớ tạm",
-      "close": "Đóng"
-    }
+      "close": "Đóng",
+      "context": {
+        "blog": "Bài viết blog",
+        "email": "Thư điện tử",
+        "general": "Tổng quát",
+        "jobReq": "Yêu cầu tuyển dụng"
+      },
+      "customPromptPlaceholderSecondary": "Nhập yêu cầu tùy chỉnh cho AI...",
+      "emptyResult": "Chưa có nội dung tạo từ AI",
+      "emptyResultInstruction": "Chọn mẫu hoặc nhập yêu cầu để bắt đầu",
+      "footerNote": "Nội dung do AI tạo, vui lòng kiểm tra trước khi sử dụng.",
+      "insertCursor": "Chèn vào vị trí con trỏ",
+      "length": {
+        "detailed": "Chi tiết",
+        "label": "Độ dài",
+        "medium": "Vừa phải",
+        "short": "Ngắn gọn"
+      },
+      "suggestions": {
+        "ben1": "Bảo hiểm và chăm sóc sức khỏe",
+        "ben2": "Thưởng hiệu suất và tháng 13",
+        "ben3": "Du lịch hàng năm và teambuilding",
+        "blog1": "Xu hướng tuyển dụng năm nay",
+        "blog2": "Kinh nghiệm phỏng vấn hiệu quả",
+        "comp1": "Môi trường làm việc năng động",
+        "comp2": "Cơ hội phát triển nghề nghiệp",
+        "comp3": "Văn hóa tôn trọng và cởi mở",
+        "gen1": "Giới thiệu ngắn gọn và ấn tượng",
+        "gen2": "Tóm tắt các điểm nổi bật",
+        "jd1": "Mô tả vị trí lập trình viên",
+        "jd2": "Mô tả vị trí nhân viên kinh doanh",
+        "jd3": "Mô tả vị trí chuyên viên tuyển dụng",
+        "mail1": "Thư mời nhận việc (Offer letter)",
+        "mail2": "Thư mời phỏng vấn",
+        "mail3": "Thư cảm ơn ứng viên",
+        "mail4": "Thư từ chối ứng viên lịch sự",
+        "req1": "Yêu cầu kỹ năng chuyên môn",
+        "req2": "Yêu cầu kỹ năng mềm",
+        "req3": "Yêu cầu kinh nghiệm làm việc"
+      },
+      "suggestionsHeader": "Gợi ý nội dung",
+      "tabs": {
+        "changeTone": "Đổi giọng văn",
+        "changeToneDesc": "Điều chỉnh sắc thái bài viết chuyên nghiệp hoặc thân thiện",
+        "custom": "Tùy chỉnh",
+        "customDesc": "Tạo nội dung theo yêu cầu chi tiết",
+        "expandDesc": "Mở rộng nội dung với các ý chi tiết hơn",
+        "fixSpellingDesc": "Sửa lỗi chính tả và ngữ pháp tự động",
+        "generate": "Tạo mới",
+        "generateDesc": "Tạo nội dung mới từ ý tưởng ban đầu",
+        "improve": "Cải thiện",
+        "improveDesc": "Nâng cao chất lượng câu văn và cấu trúc",
+        "shortenDesc": "Rút gọn nội dung súc tích",
+        "translateEn": "Dịch sang tiếng Anh",
+        "translateEnDesc": "Dịch văn bản sang tiếng Anh chuẩn chuyên nghiệp",
+        "translateVi": "Dịch sang tiếng Việt",
+        "translateViDesc": "Dịch văn bản sang tiếng Việt chuẩn tự nhiên"
+      }
+    },
+    "defaultSimplePlaceholder": "Nhập nội dung văn bản...",
+    "sampleHighlight": "Điểm nổi bật",
+    "sampleText": "Văn bản mẫu",
+    "uploadingImage": "Đang tải ảnh lên..."
   },
   "export": {
     "title": "Xuất dữ liệu (Export)",
@@ -1725,5 +1853,9 @@
     "moreReqLines": "+{{count}} yêu cầu khác...",
     "discussInInterview": "Trao đổi chi tiết khi phỏng vấn.",
     "standardBenefits": "Hưởng đầy đủ chế độ theo quy định công ty và Luật Lao động."
+  },
+  "auth": {
+    "unverifiedAccount": "Tài khoản chưa xác thực",
+    "verifiedAccount": "Tài khoản đã xác thực"
   }
 }

@@ -4,7 +4,8 @@
     "auth": {
       "login": "Login",
       "signUp": "Sign Up"
-    }
+    },
+    "userMenu": "User Menu"
   },
   "city": "City/Province",
   "career": "Industry",
@@ -181,7 +182,12 @@
     "sendOTP": "Send OTP",
     "verifyOTP": "Verify OTP",
     "changePhone": "Change Phone",
-    "resendOTP": "Resend OTP"
+    "resendOTP": "Resend OTP",
+    "addNew": "Add new",
+    "scrollLeft": "Scroll left",
+    "scrollRight": "Scroll right",
+    "viewAll": "View all",
+    "viewMore": "View more"
   },
   "userSettings": {
     "emailNotifications": "Enable email notifications",
@@ -373,12 +379,53 @@
   "common": {
     "hot": "Hot",
     "status": {
-      "unknown": "Unknown"
+      "unknown": "Unknown",
+      "completed": "Completed"
     },
     "na": "N/A",
     "table": {
       "noData": "No data"
-    }
+    },
+    "actions": {
+      "apply": "Apply",
+      "cancel": "Cancel",
+      "clear": "Clear",
+      "close": "Close",
+      "export": "Export",
+      "refreshData": "Refresh Data",
+      "reset": "Reset",
+      "resetFilter": "Reset Filter",
+      "retry": "Retry"
+    },
+    "all": "All",
+    "dateRange": {
+      "days30": "30 days",
+      "days90": "90 days",
+      "fromDate": "From date",
+      "selectTitle": "Select date range",
+      "toDate": "To date"
+    },
+    "export": {
+      "csv": "Export CSV",
+      "excel": "Export Excel"
+    },
+    "location": {
+      "geocoding": "Geocoding address...",
+      "gpsTooltip": "Get current GPS coordinates",
+      "helperBadge": "Select precise location on map",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "myLocation": "My Location",
+      "selectedAddress": "Selected Address"
+    },
+    "noResults": "No results",
+    "search": {
+      "button": "Search"
+    },
+    "searchPlaceholder": "Quick search...",
+    "selectedCount": "Selected {{count}} items",
+    "urgent": "Urgent",
+    "user": "User"
   },
   "validation": {
     "max255": "Maximum 255 characters",
@@ -803,7 +850,12 @@
     }
   },
   "pagination": {
-    "rowsPerPage": "Rows per page"
+    "rowsPerPage": "Rows per page",
+    "firstPage": "First page",
+    "lastPage": "Last page",
+    "nextPage": "Next page",
+    "prevPage": "Previous page",
+    "zeroItems": "0 items"
   },
   "errors": {
     "networkError": "Network error. Please check your connection.",
@@ -1520,7 +1572,8 @@
       "table": "Insert data table",
       "link": "Insert / Edit link (Ctrl+K)",
       "horizontalRule": "Horizontal divider",
-      "livePreview": "Live preview"
+      "livePreview": "Live preview",
+      "uploadImage": "Upload image"
     },
     "colors": {
       "default": "Default",
@@ -1542,7 +1595,12 @@
       "characters": "{{count}} characters",
       "readingTime": "~{{minutes}} min read",
       "richEditorReady": "Rich editor ready",
-      "markdownShortcutsSupported": "Supports Markdown shortcuts (#, *, -, 1., >)"
+      "markdownShortcutsSupported": "Supports Markdown shortcuts (#, *, -, 1., >)",
+      "aiReady": "AI Ready",
+      "charactersUnit": "chars",
+      "minutesRead": "min read",
+      "readingTimeEst": "Est. reading time",
+      "wordsUnit": "words"
     },
     "callout": {
       "modalTitle": "Insert Callout Box",
@@ -1578,7 +1636,9 @@
       "sizeReadout": "{{rows}} rows x {{cols}} columns",
       "headerRow": "Include prominent header row",
       "cancel": "Cancel",
-      "insertButton": "Insert Table ({{rows}}x{{cols}})"
+      "insertButton": "Insert Table ({{rows}}x{{cols}})",
+      "dataCell": "Data cell",
+      "headerCell": "Header cell"
     },
     "link": {
       "modalTitle": "Insert Hyperlink",
@@ -1605,7 +1665,10 @@
         "company": "Company Profile",
         "job": "Job Descriptions (JD)",
         "policy": "Policies & Benefits",
-        "interview": "Process & Guides"
+        "interview": "Process & Guides",
+        "article": "Article",
+        "email": "Email",
+        "jobReq": "Job Requirement"
       },
       "previewHeader": "Preview:",
       "useTemplate": "Use this template",
@@ -1613,7 +1676,10 @@
       "confirmOverwriteTitle": "Confirm apply template",
       "confirmOverwriteDesc": "Current editor content will be replaced by the selected template. Are you sure you want to continue?",
       "confirmOverwriteOk": "Yes, replace",
-      "confirmOverwriteCancel": "Cancel"
+      "confirmOverwriteCancel": "Cancel",
+      "bottomHint": "Click to apply template",
+      "previewSubtitle": "Template preview",
+      "selectToPreview": "Select template on left to preview"
     },
     "ai": {
       "modalTitle": "AI Writing Assistant",
@@ -1623,7 +1689,8 @@
         "professional": "Professional & Formal",
         "friendly": "Friendly & Approachable",
         "persuasive": "Persuasive & Engaging",
-        "concise": "Concise & Direct"
+        "concise": "Concise & Direct",
+        "creative": "Creative"
       },
       "actions": {
         "grammar": "Fix grammar & spelling",
@@ -1643,8 +1710,69 @@
       "replace": "Replace selected",
       "copy": "Copy result",
       "copied": "Copied to clipboard",
-      "close": "Close"
-    }
+      "close": "Close",
+      "context": {
+        "blog": "Blog post",
+        "email": "Email",
+        "general": "General",
+        "jobReq": "Job requirement"
+      },
+      "customPromptPlaceholderSecondary": "Enter custom prompt for AI...",
+      "emptyResult": "No content generated yet",
+      "emptyResultInstruction": "Select a template or enter prompt to start",
+      "footerNote": "AI generated content, please review before use.",
+      "insertCursor": "Insert at cursor",
+      "length": {
+        "detailed": "Detailed",
+        "label": "Length",
+        "medium": "Medium",
+        "short": "Short"
+      },
+      "suggestions": {
+        "ben1": "Healthcare & Insurance",
+        "ben2": "Performance bonus & 13th month salary",
+        "ben3": "Annual company trip & team building",
+        "blog1": "Hiring trends this year",
+        "blog2": "Effective interview tips",
+        "comp1": "Dynamic work environment",
+        "comp2": "Career growth opportunities",
+        "comp3": "Open and respectful culture",
+        "gen1": "Brief and impressive introduction",
+        "gen2": "Summary of key highlights",
+        "jd1": "Software engineer job description",
+        "jd2": "Sales executive job description",
+        "jd3": "Recruiter job description",
+        "mail1": "Job offer letter",
+        "mail2": "Interview invitation email",
+        "mail3": "Candidate thank-you email",
+        "mail4": "Polite candidate rejection email",
+        "req1": "Technical skill requirements",
+        "req2": "Soft skill requirements",
+        "req3": "Experience requirements"
+      },
+      "suggestionsHeader": "Content Suggestions",
+      "tabs": {
+        "changeTone": "Change Tone",
+        "changeToneDesc": "Adjust professional or friendly tone",
+        "custom": "Custom",
+        "customDesc": "Generate content with custom prompt",
+        "expandDesc": "Expand content with more details",
+        "fixSpellingDesc": "Auto fix spelling and grammar",
+        "generate": "Generate",
+        "generateDesc": "Generate new content from ideas",
+        "improve": "Improve",
+        "improveDesc": "Improve clarity and flow",
+        "shortenDesc": "Shorten and condense content",
+        "translateEn": "Translate to English",
+        "translateEnDesc": "Translate text to professional English",
+        "translateVi": "Translate to Vietnamese",
+        "translateViDesc": "Translate text to natural Vietnamese"
+      }
+    },
+    "defaultSimplePlaceholder": "Enter text content...",
+    "sampleHighlight": "Highlights",
+    "sampleText": "Sample text",
+    "uploadingImage": "Uploading image..."
   },
   "export": {
     "title": "Export Data",
@@ -1725,5 +1853,9 @@
     "moreReqLines": "+{{count}} more requirements...",
     "discussInInterview": "To be discussed during interview.",
     "standardBenefits": "Full benefits according to company policy and Labor Code."
+  },
+  "auth": {
+    "unverifiedAccount": "Unverified Account",
+    "verifiedAccount": "Verified Account"
   }
 }

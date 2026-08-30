@@ -125,7 +125,22 @@
     "chatWithEmployers": "Kết nối với nhà tuyển dụng",
     "voiceProfiles": "Hồ sơ giọng nói AI",
     "interviewPreview": "Xem trước giao diện phỏng vấn",
-    "squareHrmAdmin": "Mở HRM"
+    "squareHrmAdmin": "Mở HRM",
+    "aiAgents": "Trợ lý AI",
+    "articles": "Bài viết",
+    "banners": "Banner quảng cáo",
+    "careers": "Ngành nghề",
+    "cities": "Tỉnh / Thành phố",
+    "companies": "Công ty",
+    "dashboard": "Bảng điều khiển",
+    "hrmDashboard": "HRM Tổng quan",
+    "hrmEmployees": "HRM Nhân viên",
+    "hrmOrgChart": "HRM Sơ đồ tổ chức",
+    "jobs": "Tin tuyển dụng",
+    "questions": "Ngân hàng câu hỏi",
+    "settings": "Cài đặt hệ thống",
+    "users": "Người dùng",
+    "verifications": "Xác thực công ty"
   },
   "aiHealth": {
     "title": "Dịch vụ AI",
@@ -1923,5 +1938,21 @@
     "reasonLabel": "Lý do thực hiện (Bắt buộc)",
     "reasonPlaceholder": "Nhập lý do chi tiết để ghi vào nhật ký kiểm toán...",
     "reasonRequired": "Vui lòng nhập lý do để tiếp tục"
+  },
+  "commandPalette": {
+    "ai": "AI & Tự động hóa",
+    "aiInterview": "Phỏng vấn AI",
+    "categories": "Danh mục",
+    "content": "Nội dung",
+    "hintNavigate": "Điều hướng",
+    "hintToClose": "để đóng",
+    "hintToMove": "để di chuyển",
+    "hintToSelect": "để chọn",
+    "noResults": "Không tìm thấy kết quả",
+    "overview": "Tổng quan",
+    "placeholder": "Tìm kiếm lệnh hoặc trang...",
+    "profiles": "Hồ sơ",
+    "recruitment": "Tuyển dụng",
+    "system": "Hệ thống"
   }
 }

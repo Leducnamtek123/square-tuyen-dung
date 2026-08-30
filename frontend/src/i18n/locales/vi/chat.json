@@ -44,7 +44,9 @@
       "busy": "Máy chủ đang bận, vui lòng thử lại sau.",
       "tryAgainLater": "Tôi xin lỗi, hiện tại tôi không thể phản hồi. Vui lòng thử lại sau giây lát."
     },
-    "retry": "Thử lại"
+    "retry": "Thử lại",
+    "subtitleEmployer": "Hỗ trợ tuyển dụng thông minh cho Doanh nghiệp",
+    "subtitleJobSeeker": "Trợ lý tìm việc và tối ưu hồ sơ AI"
   },
   "loadPreviousMessages": "Tải tin nhắn trước",
   "typeAMessage": "Nhập tin nhắn...",

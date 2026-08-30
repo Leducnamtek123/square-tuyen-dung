@@ -44,7 +44,9 @@
     "panelAria": "InfoHR AI chat",
     "launcherAria": "Open InfoHR AI assistant",
     "closeAria": "Close chat",
-    "retry": "Retry"
+    "retry": "Retry",
+    "subtitleEmployer": "Smart recruitment assistant for Employers",
+    "subtitleJobSeeker": "AI job search and profile optimization assistant"
   },
   "loadPreviousMessages": "Load previous messages",
   "typeAMessage": "Type a message...",

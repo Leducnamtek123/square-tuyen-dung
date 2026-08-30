@@ -13,27 +13,15 @@ class RedisService:
     def __init__(self):
 
         try:
-
-            self.redis_service = redis.StrictRedis(
-
+            self.redis_service = redis.Redis(
                 host=settings.SERVICE_REDIS_HOST,
-
                 port=settings.SERVICE_REDIS_PORT,
-
                 db=settings.SERVICE_REDIS_DB,
-
                 password=settings.SERVICE_REDIS_PASSWORD,
-
                 decode_responses=True,
-
                 encoding="utf-8",
-
                 socket_connect_timeout=3,
-
                 socket_timeout=3,
-
-                retry_on_timeout=False
-
             )
 
         except Exception as e:

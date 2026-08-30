@@ -228,6 +228,20 @@ httpRequest.interceptors.request.use(
 
     const accessToken = tokenService.getAccessTokenFromCookie();
 
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      config.headers = config.headers ?? {};
+      const headers = config.headers as Record<string, unknown> & {
+        set?: (name: string, value: string) => void;
+      };
+      if (!headers['X-Correlation-Id'] && !headers['x-correlation-id']) {
+        if (typeof headers.set === 'function') {
+          headers.set('X-Correlation-Id', crypto.randomUUID());
+        } else {
+          headers['X-Correlation-Id'] = crypto.randomUUID();
+        }
+      }
+    }
+
     if (accessToken && !isAuthTokenEndpoint(config.url)) {
       setAuthorizationHeader(config, accessToken);
       setActiveCompanyHeader(config);
@@ -270,7 +284,8 @@ httpRequest.interceptors.response.use(
       !originalConfig._serverRetry
     ) {
       originalConfig._serverRetry = true;
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      const retryDelay = 200 + Math.floor(Math.random() * 150);
+      await new Promise((resolve) => setTimeout(resolve, retryDelay));
       return httpRequest(originalConfig);
     }
 

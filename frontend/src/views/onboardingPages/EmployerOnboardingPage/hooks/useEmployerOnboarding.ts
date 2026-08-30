@@ -286,7 +286,7 @@ export function useEmployerOnboarding() {
   };
 
   const handlePostJob = () => {
-    router.push('/employer/post-job');
+    router.push('/employer/job-posts');
   };
 
   const handleViewDashboard = () => {

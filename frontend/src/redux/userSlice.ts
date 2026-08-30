@@ -143,7 +143,9 @@ const userSlice = createSlice({
   reducers: {
     setUserInfo: (state, action: PayloadAction<User>) => {
       state.isAuthenticated = true;
-      state.currentUser = action.payload;
+      state.currentUser = state.currentUser
+        ? { ...state.currentUser, ...action.payload }
+        : action.payload;
     },
     setActiveWorkspace: (state, action: PayloadAction<AnyWorkspace>) => {
       state.activeWorkspace = normalizeWorkspace(action.payload);
@@ -153,23 +155,29 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(getUserInfo.fulfilled, (state, action) => {
       state.isAuthenticated = true;
-      state.currentUser = action.payload;
-      if (Array.isArray(action.payload?.workspaces) && action.payload.workspaces.length) {
+      const mergedUser: User = state.currentUser
+        ? { ...state.currentUser, ...action.payload, workspaces: action.payload?.workspaces || state.currentUser.workspaces }
+        : action.payload;
+      state.currentUser = mergedUser;
+      if (Array.isArray(mergedUser?.workspaces) && mergedUser.workspaces.length) {
         state.activeWorkspace = resolveActiveWorkspace(
-          action.payload.workspaces,
+          mergedUser.workspaces,
           state.activeWorkspace || storedWorkspace,
-          action.payload
+          mergedUser
         );
       }
     });
 
     builder.addCase(updateUserInfo.fulfilled, (state, action) => {
       state.isAuthenticated = true;
-      state.currentUser = action.payload;
+      const mergedUser: User = state.currentUser
+        ? { ...state.currentUser, ...action.payload, workspaces: action.payload?.workspaces || state.currentUser.workspaces }
+        : action.payload;
+      state.currentUser = mergedUser;
       state.activeWorkspace = resolveActiveWorkspace(
-        action.payload?.workspaces,
+        mergedUser?.workspaces,
         state.activeWorkspace || storedWorkspace,
-        action.payload
+        mergedUser
       );
     });
 

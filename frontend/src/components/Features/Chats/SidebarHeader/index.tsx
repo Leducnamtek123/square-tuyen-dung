@@ -16,7 +16,7 @@ interface SidebarHeaderProps {
 }
 
 const SidebarHeader = (_props: SidebarHeaderProps) => {
-  const { activeWorkspace } = useAppSelector((state) => state.user);
+  const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
   const { push } = useRouter();
   const { t, i18n } = useTranslation('common');
 
@@ -25,7 +25,15 @@ const SidebarHeader = (_props: SidebarHeaderProps) => {
   }, [activeWorkspace]);
 
   const handleRedirect = () => {
-    push(localizeRoutePath(isEmployer ? `/${ROUTES.EMPLOYER.DASHBOARD}` : '/', i18n.language));
+    if (isEmployer) {
+      if (currentUser?.isOnboarded === false) {
+        push('/onboarding/employer');
+        return;
+      }
+      push(localizeRoutePath(`/${ROUTES.EMPLOYER.DASHBOARD}`, i18n.language));
+      return;
+    }
+    push(localizeRoutePath('/', i18n.language));
   };
 
   return (

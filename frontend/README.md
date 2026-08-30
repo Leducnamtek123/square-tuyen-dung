@@ -199,8 +199,7 @@ VITE_FACEBOOK_CLIENT_SECRET=<Client_Secret>
 **Required environment variables:**
 
 ```env
-VITE_GOOGLE_CLIENT_ID=<Client_ID>
-VITE_GOOGLE_CLIENT_SECRET=<Client_Secret>
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=<Client_ID>
 ```
 
 **Configuration steps:**
@@ -209,14 +208,13 @@ VITE_GOOGLE_CLIENT_SECRET=<Client_Secret>
 2. Click **`New Application`** button
 3. Fill in information as follows:
    - **Name**: Choose any name (e.g., `Authenticate with Google`)
-   - **Client id**: Paste the value of `SOCIAL_AUTH_GOOGLE_OAUTH2_KEY` that you configured in the Backend → Copy and update to `VITE_GOOGLE_CLIENT_ID`
-   - **Client secret**: Paste the value of `SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET` that you configured in the Backend → Copy and update to `VITE_GOOGLE_CLIENT_SECRET`
+   - **Client id**: Paste the value of `SOCIAL_AUTH_GOOGLE_OAUTH2_KEY` that you configured in the Backend → Copy and update to `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
    - **Hash client secret**: ✅ Check
    - **Client type**: Select `Confidential`
    - **Authorization grant type**: Select `Client credentials`
    - Other fields can be left empty
 
-   > ⚠️ **Important note**: Client id and Client secret must be **copied and saved** before clicking Save
+   > ⚠️ **Important note**: Google Client Secret must remain only in Backend `.env` (`SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET`) and must NEVER be exposed in Frontend environment variables.
 
 4. Click **`Save`**
 
@@ -530,8 +528,7 @@ VITE_FACEBOOK_CLIENT_SECRET=<Client_Secret>
 **Biến môi trường cần thiết:**
 
 ```env
-VITE_GOOGLE_CLIENT_ID=<Client_ID>
-VITE_GOOGLE_CLIENT_SECRET=<Client_Secret>
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=<Client_ID>
 ```
 
 **Các bước cấu hình:**
@@ -540,14 +537,13 @@ VITE_GOOGLE_CLIENT_SECRET=<Client_Secret>
 2. Click nút **`New Application`**
 3. Điền thông tin như sau:
    - **Name**: Đặt tên tuỳ ý (ví dụ: `Authenticate with Google`)
-   - **Client id**: Paste giá trị `SOCIAL_AUTH_GOOGLE_OAUTH2_KEY` đã config ở Backend → Copy và cập nhật vào `VITE_GOOGLE_CLIENT_ID`
-   - **Client secret**: Paste giá trị `SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET` đã config ở Backend → Copy và cập nhật vào `VITE_GOOGLE_CLIENT_SECRET`
+   - **Client id**: Paste giá trị `SOCIAL_AUTH_GOOGLE_OAUTH2_KEY` đã config ở Backend → Copy và cập nhật vào `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
    - **Hash client secret**: ✅ Tích chọn
    - **Client type**: Chọn `Confidential`
    - **Authorization grant type**: Chọn `Client credentials`
    - Các trường còn lại có thể để trống
 
-   > ⚠️ **Lưu ý quan trọng**: Client id và Client secret phải được **copy và lưu lại** trước khi nhấn Save
+   > ⚠️ **Lưu ý quan trọng**: Google Client Secret chỉ nằm trong file `.env` Backend (`SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET`), TUYỆT ĐỐI KHÔNG đưa vào biến môi trường Frontend.
 
 4. Nhấn **`Save`**
 

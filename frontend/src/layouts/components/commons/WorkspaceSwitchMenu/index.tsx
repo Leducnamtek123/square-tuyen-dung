@@ -53,7 +53,15 @@ const WorkspaceSwitchMenu = () => {
     dispatch(setActiveWorkspace(workspace));
     setAnchorEl(null);
     if (workspace.type === "company") {
+      if (currentUser?.isOnboarded === false) {
+        window.location.href = '/onboarding/employer';
+        return;
+      }
       openPortal(true, ROUTES.EMPLOYER.DASHBOARD);
+      return;
+    }
+    if (currentUser?.isOnboarded === false) {
+      window.location.href = '/onboarding/candidate';
       return;
     }
     openPortal(false, ROUTES.JOB_SEEKER.DASHBOARD);

@@ -7,6 +7,7 @@ from decimal import Decimal
 from typing import Dict, Iterable, Optional
 
 from django.conf import settings
+from django.db import transaction
 from django.utils import timezone
 from django.utils.html import strip_tags
 from django.core.exceptions import ValidationError
@@ -339,14 +340,15 @@ def update_interview_status(
 ) -> str:
     old_status = session.status
     was_started = session.start_time is not None
-    apply_status_transition(session, new_status)
-    run_status_side_effects(
-        session,
-        new_status,
-        was_started=was_started,
-        max_duration_seconds=max_duration_seconds,
-    )
-    # Broadcast status change to SSE subscribers
+    with transaction.atomic():
+        apply_status_transition(session, new_status)
+        run_status_side_effects(
+            session,
+            new_status,
+            was_started=was_started,
+            max_duration_seconds=max_duration_seconds,
+        )
+    # Broadcast status change to SSE subscribers after transaction commits successfully
     broadcast_interview_event(
         session.id,
         "status_changed",

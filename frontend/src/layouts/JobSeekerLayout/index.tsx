@@ -42,7 +42,13 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
   const { currentUser } = useAppSelector((state) => state.user);
 
   const [isAllowed, setIsAllowed] = React.useState(() => {
-    return hasVerifiedCandidateAuthGlobal || Boolean(tokenService.getAccessTokenFromCookie() && currentUser);
+    if (currentUser?.isOnboarded === false) {
+      return false;
+    }
+    return Boolean(
+      hasVerifiedCandidateAuthGlobal ||
+        (tokenService.getAccessTokenFromCookie() && currentUser)
+    );
   });
 
   React.useEffect(() => {
@@ -87,6 +93,7 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
       }
 
       if (user?.isOnboarded === false && !pathname.includes('/onboarding')) {
+        hasVerifiedCandidateAuthGlobal = false;
         redirectTo('/onboarding/candidate');
         return;
       }

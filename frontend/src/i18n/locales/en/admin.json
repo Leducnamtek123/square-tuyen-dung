@@ -125,7 +125,22 @@
     "chatWithEmployers": "Chat with Employers",
     "voiceProfiles": "AI Voice Profiles",
     "interviewPreview": "Interview UI Preview",
-    "squareHrmAdmin": "Open HRM"
+    "squareHrmAdmin": "Open HRM",
+    "aiAgents": "AI Assistants",
+    "articles": "Articles",
+    "banners": "Banners",
+    "careers": "Careers",
+    "cities": "Cities",
+    "companies": "Companies",
+    "dashboard": "Dashboard",
+    "hrmDashboard": "HRM Dashboard",
+    "hrmEmployees": "HRM Employees",
+    "hrmOrgChart": "HRM Org Chart",
+    "jobs": "Job Posts",
+    "questions": "Question Bank",
+    "settings": "System Settings",
+    "users": "Users",
+    "verifications": "Company Verifications"
   },
   "aiHealth": {
     "title": "AI services",
@@ -1923,5 +1938,21 @@
     "reasonLabel": "Action Reason (Required)",
     "reasonPlaceholder": "Enter detailed reason to log into audit trail...",
     "reasonRequired": "Please provide a reason to continue"
+  },
+  "commandPalette": {
+    "ai": "AI & Automation",
+    "aiInterview": "AI Interview",
+    "categories": "Categories",
+    "content": "Content",
+    "hintNavigate": "Navigate",
+    "hintToClose": "to close",
+    "hintToMove": "to move",
+    "hintToSelect": "to select",
+    "noResults": "No results found",
+    "overview": "Overview",
+    "placeholder": "Search commands or pages...",
+    "profiles": "Profiles",
+    "recruitment": "Recruitment",
+    "system": "System"
   }
 }

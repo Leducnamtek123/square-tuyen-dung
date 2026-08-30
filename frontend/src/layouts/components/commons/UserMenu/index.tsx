@@ -97,6 +97,40 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
 
   const menuItems = React.useMemo(() => {
     const items: MenuItem[] = [];
+
+    if (workspaces.length === 0 && currentUser && currentUser.roleName !== ROLES_NAME.ADMIN) {
+      const isEmployer = currentUser.roleName === ROLES_NAME.EMPLOYER || currentUser.canAccessEmployerPortal;
+      const isNotOnboarded = currentUser.isOnboarded === false;
+      const label = isEmployer
+        ? isNotOnboarded
+          ? t("nav.setupEmployer", { defaultValue: "Thiết lập doanh nghiệp" })
+          : t("nav.employerPortal", { defaultValue: "Quản lý tuyển dụng" })
+        : isNotOnboarded
+          ? t("nav.setupProfile", { defaultValue: "Hoàn tất hồ sơ ứng viên" })
+          : t("nav.accountManagement");
+
+      items.push({
+        key: 'default-workspace',
+        isSelected: false,
+        label,
+        onClick: () => {
+          if (isEmployer) {
+            if (isNotOnboarded) {
+              window.location.href = '/onboarding/employer';
+              return;
+            }
+            openPortal(true, ROUTES.EMPLOYER.DASHBOARD);
+            return;
+          }
+          if (isNotOnboarded) {
+            window.location.href = '/onboarding/candidate';
+            return;
+          }
+          openPortal(false, ROUTES.JOB_SEEKER.DASHBOARD);
+        },
+      });
+    }
+
     workspaces.forEach((workspace) => {
       const key = `${workspace.type}-${workspace.companyId || "candidate"}`;
       const isSelected =
@@ -122,7 +156,15 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
           };
           dispatch(setActiveWorkspace(normalizedWorkspace));
           if (workspace.type === "company") {
+            if (currentUser?.isOnboarded === false) {
+              window.location.href = '/onboarding/employer';
+              return;
+            }
             openPortal(true, ROUTES.EMPLOYER.DASHBOARD);
+            return;
+          }
+          if (currentUser?.isOnboarded === false) {
+            window.location.href = '/onboarding/candidate';
             return;
           }
           openPortal(false, ROUTES.JOB_SEEKER.DASHBOARD);
@@ -130,7 +172,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
       });
     });
     return items;
-  }, [activeWorkspace, dispatch, openPortal, t, workspaces]);
+  }, [activeWorkspace, currentUser, dispatch, openPortal, t, workspaces]);
 
   const handleLogout = () => {
     const accessToken = tokenService.getAccessTokenFromCookie() || '';
