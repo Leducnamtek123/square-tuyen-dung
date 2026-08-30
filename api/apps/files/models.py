@@ -106,6 +106,8 @@ class File(CommonBaseModel):
 
         return file
 
+    update_or_create_file_with_minio = update_or_create_file_with_cloudinary
+
     class Meta:
         db_table = "project_files"
         ordering = ["-create_at"]

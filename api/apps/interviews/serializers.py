@@ -2,11 +2,14 @@
 Interview Module — DRF Serializers
 """
 
+import logging
 from decimal import Decimal
 
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+
+logger = logging.getLogger(__name__)
 from .models import (
     Question, QuestionGroup,
     InterviewSession, InterviewTranscript, InterviewEvaluation,
@@ -142,7 +145,8 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
             return len(obj.questions.all())
         try:
             return obj.questions.count()
-        except Exception:
+        except Exception as ex:
+            logger.warning("Failed to count questions for QuestionGroup #%s: %s", getattr(obj, "id", None), ex)
             return 0
 
     def get_canWrite(self, obj):
@@ -155,7 +159,13 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
         for question in obj.questions.all():
             try:
                 items.append(QuestionSerializer(question, context=self.context).data)
-            except Exception:
+            except Exception as ex:
+                logger.warning(
+                    "Failed to serialize question #%s in QuestionGroup #%s: %s",
+                    getattr(question, "id", None),
+                    getattr(obj, "id", None),
+                    ex,
+                )
                 continue
         return items
 

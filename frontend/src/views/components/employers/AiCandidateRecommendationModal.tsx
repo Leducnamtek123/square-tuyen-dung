@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -20,6 +20,7 @@ import {
   Tooltip,
   Paper,
   useTheme,
+  alpha,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
@@ -31,11 +32,10 @@ import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlin
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 import SearchIcon from '@mui/icons-material/Search';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
-import StarsIcon from '@mui/icons-material/Stars';
-import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import resumeService from '@/services/resumeService';
 import { useQueryClient } from '@tanstack/react-query';
 import httpRequest from '@/utils/httpRequest';
@@ -65,25 +65,45 @@ interface AiCandidateRecommendationModalProps {
   jobPost: JobPost | null;
 }
 
-const getScoreColor = (score: number) => {
-  if (score >= 70) return { bg: '#ecfdf5', text: '#059669', border: '#a7f3d0', dot: '#10b981' };
-  if (score >= 40) return { bg: '#eff6ff', text: '#2563eb', border: '#bfdbfe', dot: '#3b82f6' };
-  return { bg: '#f5f3ff', text: '#7c3aed', border: '#ddd6fe', dot: '#8b5cf6' };
+const getScoreColor = (score: number, isDark: boolean) => {
+  if (score >= 70) {
+    return {
+      bg: isDark ? 'rgba(5, 150, 105, 0.15)' : '#ecfdf5',
+      text: isDark ? '#6ee7b7' : '#047857',
+      border: isDark ? 'rgba(5, 150, 105, 0.35)' : '#a7f3d0',
+      dot: '#10b981',
+    };
+  }
+  if (score >= 40) {
+    return {
+      bg: isDark ? 'rgba(37, 99, 235, 0.15)' : '#eff6ff',
+      text: isDark ? '#93c5fd' : '#1d4ed8',
+      border: isDark ? 'rgba(37, 99, 235, 0.35)' : '#bfdbfe',
+      dot: '#2563eb',
+    };
+  }
+  return {
+    bg: isDark ? 'rgba(100, 116, 139, 0.15)' : '#f8fafc',
+    text: isDark ? '#cbd5e1' : '#475569',
+    border: isDark ? 'rgba(100, 116, 139, 0.3)' : '#cbd5e1',
+    dot: '#64748b',
+  };
 };
 
-const getAvatarGradient = (name: string) => {
-  const gradients = [
-    'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-    'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
-    'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-    'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
-    'linear-gradient(135deg, #db2777 0%, #ec4899 100%)',
+const getAvatarColor = (name: string) => {
+  const colors = [
+    '#1e40af', // Slate Blue
+    '#0f766e', // Teal
+    '#0369a1', // Sky
+    '#047857', // Emerald
+    '#4338ca', // Indigo
+    '#b45309', // Amber
   ];
   let sum = 0;
   for (let i = 0; i < name.length; i++) {
     sum += name.charCodeAt(i);
   }
-  return gradients[sum % gradients.length];
+  return colors[sum % colors.length];
 };
 
 export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationModalProps> = ({
@@ -103,7 +123,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'high_match' | 'experienced'>('all');
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open || !jobPost) {
       setCandidates([]);
       return;
@@ -186,7 +206,6 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
     const isCurrentlySaved = savedCandidateIds.has(candIdNum) || savedCandidateIds.has(rawId);
     const targetSlug = cand.slug ? String(cand.slug) : String(cand.id);
 
-    // Optimistically update save state in UI
     setSavedCandidateIds((prev) => {
       const next = new Set(prev);
       if (!isCurrentlySaved) {
@@ -277,21 +296,21 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
       }}
       PaperProps={{
         sx: {
-          borderRadius: '24px',
+          borderRadius: '20px',
           overflow: 'hidden',
           backgroundColor: isDark ? '#0f172a' : '#f8fafc',
           border: '1px solid',
           borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(226, 232, 240, 0.9)',
           boxShadow: isDark
-            ? '0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.2)'
-            : '0 25px 50px -12px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(99, 102, 241, 0.08)',
+            ? '0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(37, 99, 235, 0.2)'
+            : '0 25px 50px -12px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(37, 99, 235, 0.08)',
           maxHeight: '90vh',
           display: 'flex',
           flexDirection: 'column',
         },
       }}
     >
-      {/* 1. Header Studio Bar */}
+      {/* 1. Header Bar */}
       <DialogTitle
         sx={{
           m: 0,
@@ -313,26 +332,26 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.8 }}>
             <Box
               sx={{
-                width: 46,
-                height: 46,
-                borderRadius: '14px',
-                background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                width: 44,
+                height: 44,
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
                 color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 6px 18px rgba(79, 70, 229, 0.3)',
+                boxShadow: '0 4px 14px rgba(37, 99, 235, 0.3)',
                 position: 'relative',
               }}
             >
-              <AutoAwesomeIcon sx={{ fontSize: 24 }} />
+              <AutoAwesomeIcon sx={{ fontSize: 22 }} />
               <Box
                 sx={{
                   position: 'absolute',
                   top: -2,
                   right: -2,
-                  width: 10,
-                  height: 10,
+                  width: 9,
+                  height: 9,
                   borderRadius: '50%',
                   bgcolor: '#10b981',
                   border: '2px solid',
@@ -348,7 +367,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                   sx={{
                     fontWeight: 800,
                     color: isDark ? '#f8fafc' : '#0f172a',
-                    fontSize: { xs: '1.05rem', sm: '1.2rem' },
+                    fontSize: { xs: '1.02rem', sm: '1.15rem' },
                     letterSpacing: '-0.02em',
                   }}
                 >
@@ -361,10 +380,10 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                     height: 22,
                     fontSize: '0.72rem',
                     fontWeight: 700,
-                    bgcolor: isDark ? 'rgba(99, 102, 241, 0.25)' : 'rgba(79, 70, 229, 0.1)',
-                    color: isDark ? '#a5b4fc' : '#4f46e5',
+                    bgcolor: isDark ? 'rgba(37, 99, 235, 0.2)' : 'rgba(37, 99, 235, 0.08)',
+                    color: isDark ? '#93c5fd' : '#1d4ed8',
                     border: '1px solid',
-                    borderColor: isDark ? 'rgba(99, 102, 241, 0.4)' : 'rgba(79, 70, 229, 0.2)',
+                    borderColor: isDark ? 'rgba(37, 99, 235, 0.35)' : 'rgba(37, 99, 235, 0.2)',
                   }}
                 />
               </Box>
@@ -373,7 +392,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                 sx={{
                   color: isDark ? '#94a3b8' : '#64748b',
                   fontWeight: 500,
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 0.5,
@@ -407,11 +426,11 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
           </Tooltip>
         </Box>
 
-        {/* 2. Sub-Toolbar: Filter & Search */}
+        {/* 2. Sub-Toolbar: Filters & Instant Search */}
         {!loading && candidates.length > 0 && (
           <Box
             sx={{
-              px: { xs: 2.5, sm: 3 },
+              px: { xs: 2, sm: 3 },
               py: 1.2,
               bgcolor: isDark ? '#111c38' : '#f1f5f9',
               borderTop: '1px solid',
@@ -437,10 +456,12 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                   fontSize: '0.75rem',
                   fontWeight: selectedFilter === 'all' ? 700 : 500,
                   cursor: 'pointer',
-                  bgcolor: selectedFilter === 'all' ? '#4f46e5' : isDark ? 'rgba(255,255,255,0.06)' : '#ffffff',
+                  bgcolor: selectedFilter === 'all' ? '#2563eb' : isDark ? 'rgba(255,255,255,0.06)' : '#ffffff',
                   color: selectedFilter === 'all' ? '#ffffff' : isDark ? '#cbd5e1' : '#475569',
                   border: '1px solid',
-                  borderColor: selectedFilter === 'all' ? '#4f46e5' : isDark ? 'rgba(255,255,255,0.1)' : '#cbd5e1',
+                  borderColor: selectedFilter === 'all' ? '#2563eb' : isDark ? 'rgba(255,255,255,0.1)' : '#cbd5e1',
+                  transition: 'all 0.15s ease',
+                  '&:active': { transform: 'scale(0.97)' },
                 }}
               />
               <Chip
@@ -452,10 +473,12 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                   fontSize: '0.75rem',
                   fontWeight: selectedFilter === 'high_match' ? 700 : 500,
                   cursor: 'pointer',
-                  bgcolor: selectedFilter === 'high_match' ? '#4f46e5' : isDark ? 'rgba(255,255,255,0.06)' : '#ffffff',
+                  bgcolor: selectedFilter === 'high_match' ? '#2563eb' : isDark ? 'rgba(255,255,255,0.06)' : '#ffffff',
                   color: selectedFilter === 'high_match' ? '#ffffff' : isDark ? '#cbd5e1' : '#475569',
                   border: '1px solid',
-                  borderColor: selectedFilter === 'high_match' ? '#4f46e5' : isDark ? 'rgba(255,255,255,0.1)' : '#cbd5e1',
+                  borderColor: selectedFilter === 'high_match' ? '#2563eb' : isDark ? 'rgba(255,255,255,0.1)' : '#cbd5e1',
+                  transition: 'all 0.15s ease',
+                  '&:active': { transform: 'scale(0.97)' },
                 }}
               />
               <Chip
@@ -467,10 +490,12 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                   fontSize: '0.75rem',
                   fontWeight: selectedFilter === 'experienced' ? 700 : 500,
                   cursor: 'pointer',
-                  bgcolor: selectedFilter === 'experienced' ? '#4f46e5' : isDark ? 'rgba(255,255,255,0.06)' : '#ffffff',
+                  bgcolor: selectedFilter === 'experienced' ? '#2563eb' : isDark ? 'rgba(255,255,255,0.06)' : '#ffffff',
                   color: selectedFilter === 'experienced' ? '#ffffff' : isDark ? '#cbd5e1' : '#475569',
                   border: '1px solid',
-                  borderColor: selectedFilter === 'experienced' ? '#4f46e5' : isDark ? 'rgba(255,255,255,0.1)' : '#cbd5e1',
+                  borderColor: selectedFilter === 'experienced' ? '#2563eb' : isDark ? 'rgba(255,255,255,0.1)' : '#cbd5e1',
+                  transition: 'all 0.15s ease',
+                  '&:active': { transform: 'scale(0.97)' },
                 }}
               />
             </Box>
@@ -485,7 +510,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                      <SearchIcon sx={{ fontSize: 15, color: 'text.secondary' }} />
                     </InputAdornment>
                   ),
                 }}
@@ -513,12 +538,13 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                     textTransform: 'none',
                     borderRadius: '8px',
                     whiteSpace: 'nowrap',
-                    borderColor: '#4f46e5',
-                    color: '#4f46e5',
+                    borderColor: '#2563eb',
+                    color: '#2563eb',
                     '&:hover': {
-                      bgcolor: 'rgba(79, 70, 229, 0.08)',
-                      borderColor: '#4338ca',
+                      bgcolor: 'rgba(37, 99, 235, 0.08)',
+                      borderColor: '#1d4ed8',
                     },
+                    '&:active': { transform: 'scale(0.97)' },
                   }}
                 >
                   Mời tất cả ({filteredCandidates.length})
@@ -530,26 +556,40 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
       </DialogTitle>
 
       {/* 3. Candidate List Content */}
-      <DialogContent sx={{ p: { xs: 2, sm: 3 }, overflowX: 'hidden', flex: 1 }}>
+      <DialogContent
+        sx={{
+          p: { xs: 2, sm: 3 },
+          pr: { xs: 2, sm: 2.5 },
+          overflowX: 'hidden',
+          flex: 1,
+          '&::-webkit-scrollbar': {
+            width: '6px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: isDark ? 'rgba(255,255,255,0.15)' : '#cbd5e1',
+            borderRadius: '3px',
+          },
+        }}
+      >
         {loading ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 8, gap: 2.5 }}>
             <Box
               sx={{
-                width: 64,
-                height: 64,
+                width: 60,
+                height: 60,
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(124, 58, 237, 0.15) 100%)',
+                background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(30, 64, 175, 0.12) 100%)',
                 animation: 'pulse 1.8s infinite',
                 '@keyframes pulse': {
                   '0%, 100%': { transform: 'scale(1)', opacity: 1 },
-                  '50%': { transform: 'scale(1.1)', opacity: 0.7 },
+                  '50%': { transform: 'scale(1.08)', opacity: 0.7 },
                 },
               }}
             >
-              <AutoAwesomeIcon sx={{ fontSize: 32, color: '#4f46e5' }} />
+              <AutoAwesomeIcon sx={{ fontSize: 30, color: '#2563eb' }} />
             </Box>
             <Box sx={{ textAlign: 'center' }}>
               <Typography variant="body1" sx={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 700, mb: 0.5 }}>
@@ -559,15 +599,15 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                 Hệ thống đang quét độ tương thích về kỹ năng, kinh nghiệm và mức đãi ngộ
               </Typography>
             </Box>
-            <CircularProgress size={24} sx={{ color: '#4f46e5' }} />
+            <CircularProgress size={24} sx={{ color: '#2563eb' }} />
           </Box>
         ) : filteredCandidates.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 8, color: 'text.secondary' }}>
             <Box
               sx={{
-                width: 64,
-                height: 64,
-                borderRadius: '16px',
+                width: 60,
+                height: 60,
+                borderRadius: '14px',
                 bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -575,7 +615,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                 mb: 1.5,
               }}
             >
-              <AutoAwesomeIcon sx={{ fontSize: 32, color: isDark ? '#475569' : '#94a3b8' }} />
+              <PersonOutlineIcon sx={{ fontSize: 30, color: isDark ? '#475569' : '#94a3b8' }} />
             </Box>
             <Typography variant="body1" sx={{ color: isDark ? '#e2e8f0' : '#334155', fontWeight: 700, mb: 0.5 }}>
               {candidates.length === 0
@@ -604,7 +644,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
         ) : (
           <Stack spacing={2}>
             {filteredCandidates.map((cand) => {
-              const scoreStyle = getScoreColor(cand.matchScore);
+              const scoreStyle = getScoreColor(cand.matchScore, isDark);
               const isInvited = invitedCandidateIds.has(cand.id);
               const candIdNum = Number(cand.id);
               const rawId = cand.id as any;
@@ -617,7 +657,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                   elevation={0}
                   sx={{
                     p: { xs: 2, sm: 2.5 },
-                    borderRadius: '16px',
+                    borderRadius: '14px',
                     backgroundColor: isDark ? '#1e293b' : '#ffffff',
                     border: '1px solid',
                     borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(226, 232, 240, 0.9)',
@@ -628,22 +668,22 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                     position: 'relative',
                     overflow: 'hidden',
                     '&:hover': {
-                      borderColor: '#6366f1',
+                      borderColor: '#2563eb',
                       boxShadow: isDark
                         ? '0 8px 25px rgba(0,0,0,0.4)'
-                        : '0 8px 24px rgba(79, 70, 229, 0.08)',
+                        : '0 8px 24px rgba(37, 99, 235, 0.08)',
                       transform: 'translateY(-1px)',
                     },
                   }}
                 >
-                  {/* Left Highlight Strip */}
+                  {/* Left Indicator Strip */}
                   <Box
                     sx={{
                       position: 'absolute',
                       left: 0,
                       top: 0,
                       bottom: 0,
-                      width: 4,
+                      width: 3.5,
                       bgcolor: scoreStyle.dot,
                     }}
                   />
@@ -657,22 +697,22 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                       gap: 2.5,
                     }}
                   >
-                    {/* Left & Middle: Candidate Info & AI Insights */}
+                    {/* Left & Middle Block */}
                     <Box sx={{ display: 'flex', gap: 2, flex: 1, minWidth: 0 }}>
                       {/* Avatar */}
                       <Avatar
                         src={cand.avatarUrl}
                         alt={cand.fullName}
                         sx={{
-                          width: 52,
-                          height: 52,
-                          borderRadius: '14px',
+                          width: 48,
+                          height: 48,
+                          borderRadius: '12px',
                           border: '2px solid',
                           borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#ffffff',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                          background: getAvatarGradient(cand.fullName),
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+                          backgroundColor: getAvatarColor(cand.fullName),
                           fontWeight: 800,
-                          fontSize: '1.2rem',
+                          fontSize: '1.1rem',
                           color: '#ffffff',
                           flexShrink: 0,
                         }}
@@ -680,16 +720,16 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                         {cand.fullName.charAt(0)}
                       </Avatar>
 
-                      {/* Details Block */}
+                      {/* Details */}
                       <Box sx={{ flex: 1, minWidth: 0 }}>
-                        {/* Name + Match Score + Source */}
+                        {/* Name + Match Score */}
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, flexWrap: 'wrap', mb: 0.4 }}>
                           <Typography
                             variant="subtitle1"
                             sx={{
                               fontWeight: 800,
                               color: isDark ? '#f8fafc' : '#0f172a',
-                              fontSize: '0.98rem',
+                              fontSize: '0.96rem',
                               lineHeight: 1.3,
                             }}
                           >
@@ -701,22 +741,22 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                             sx={{
                               display: 'inline-flex',
                               alignItems: 'center',
-                              gap: 0.6,
-                              px: 1.2,
+                              gap: 0.5,
+                              px: 1.1,
                               py: 0.3,
-                              borderRadius: '8px',
-                              bgcolor: isDark ? 'rgba(99, 102, 241, 0.2)' : scoreStyle.bg,
+                              borderRadius: '6px',
+                              bgcolor: scoreStyle.bg,
                               border: '1px solid',
-                              borderColor: isDark ? 'rgba(99, 102, 241, 0.4)' : scoreStyle.border,
+                              borderColor: scoreStyle.border,
                             }}
                           >
-                            <AutoAwesomeIcon sx={{ fontSize: 13, color: isDark ? '#a5b4fc' : scoreStyle.text }} />
+                            <AutoAwesomeIcon sx={{ fontSize: 13, color: scoreStyle.text }} />
                             <Typography
                               variant="caption"
                               sx={{
                                 fontWeight: 800,
-                                fontSize: '0.75rem',
-                                color: isDark ? '#a5b4fc' : scoreStyle.text,
+                                fontSize: '0.74rem',
+                                color: scoreStyle.text,
                               }}
                             >
                               Phù hợp {cand.matchScore}%
@@ -724,22 +764,22 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                           </Box>
                         </Box>
 
-                        {/* Title / Current Position */}
+                        {/* Title */}
                         <Typography
                           variant="body2"
                           sx={{
-                            color: isDark ? '#818cf8' : '#4f46e5',
+                            color: isDark ? '#93c5fd' : '#2563eb',
                             fontWeight: 700,
-                            fontSize: '0.85rem',
-                            mb: 1,
+                            fontSize: '0.84rem',
+                            mb: 0.8,
                             wordBreak: 'break-word',
                           }}
                         >
                           {cand.title}
                         </Typography>
 
-                        {/* Metadata Row: City & Experience */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', mb: 1.5 }}>
+                        {/* Metadata Row */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', mb: 1.2 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: isDark ? '#94a3b8' : '#64748b' }}>
                             <LocationOnOutlinedIcon sx={{ fontSize: 15 }} />
                             <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.78rem' }}>
@@ -755,13 +795,13 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                           </Box>
                         </Box>
 
-                        {/* AI Match Reasons Box */}
+                        {/* AI Match Reasons */}
                         {cand.matchReasons && cand.matchReasons.length > 0 && (
                           <Box
                             sx={{
                               p: 1.2,
-                              px: 1.5,
-                              borderRadius: '10px',
+                              px: 1.4,
+                              borderRadius: '8px',
                               bgcolor: isDark ? 'rgba(15, 23, 42, 0.6)' : '#f8fafc',
                               border: '1px solid',
                               borderColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(226, 232, 240, 0.8)',
@@ -776,23 +816,23 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 0.5,
-                                mb: 0.6,
+                                mb: 0.5,
                                 fontSize: '0.72rem',
                               }}
                             >
-                              <AutoAwesomeIcon sx={{ fontSize: 12, color: '#4f46e5' }} /> Đánh giá tương thích AI:
+                              <AutoAwesomeIcon sx={{ fontSize: 12, color: '#2563eb' }} /> Đánh giá tương thích AI:
                             </Typography>
 
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4 }}>
                               {cand.matchReasons.map((reason, idx) => (
-                                <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.8 }}>
+                                <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.7 }}>
                                   <CheckCircleOutlineIcon
-                                    sx={{ fontSize: 14, color: '#10b981', mt: '2px', flexShrink: 0 }}
+                                    sx={{ fontSize: 14, color: '#059669', mt: '2px', flexShrink: 0 }}
                                   />
                                   <Typography
                                     variant="caption"
                                     sx={{
-                                      fontSize: '0.78rem',
+                                      fontSize: '0.77rem',
                                       lineHeight: 1.45,
                                       color: isDark ? '#cbd5e1' : '#334155',
                                     }}
@@ -805,9 +845,9 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                           </Box>
                         )}
 
-                        {/* Skills Summary Chips */}
+                        {/* Skills Summary */}
                         {cand.skillsSummary && (
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, flexWrap: 'wrap' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, flexWrap: 'wrap' }}>
                             <Typography variant="caption" sx={{ color: isDark ? '#94a3b8' : '#64748b', fontWeight: 600, fontSize: '0.72rem' }}>
                               Kỹ năng:
                             </Typography>
@@ -824,7 +864,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                                   color: isDark ? '#e2e8f0' : '#334155',
                                   border: '1px solid',
                                   borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#e2e8f0',
-                                  borderRadius: '6px',
+                                  borderRadius: '4px',
                                 }}
                               />
                             ))}
@@ -833,13 +873,13 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                       </Box>
                     </Box>
 
-                    {/* Right Column: Actions (Non-wrapping, Fixed Ergonomics) */}
+                    {/* Right Column: Actions */}
                     <Box
                       sx={{
                         display: 'flex',
                         flexDirection: { xs: 'row', md: 'column' },
                         gap: 1,
-                        minWidth: { xs: '100%', md: '145px' },
+                        minWidth: { xs: '100%', md: '140px' },
                         flexShrink: 0,
                         justifyContent: 'center',
                       }}
@@ -852,23 +892,20 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                         startIcon={isInvited ? <CheckCircleOutlineIcon sx={{ fontSize: 16 }} /> : <SendOutlinedIcon sx={{ fontSize: 15 }} />}
                         onClick={() => handleInvite(cand)}
                         sx={{
-                          borderRadius: '10px',
+                          borderRadius: '8px',
                           py: 0.8,
                           px: 1.8,
-                          background: isInvited
-                            ? '#10b981'
-                            : 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                          bgcolor: isInvited ? '#059669' : '#2563eb',
                           fontWeight: 700,
                           fontSize: '0.82rem',
                           textTransform: 'none',
                           whiteSpace: 'nowrap',
-                          boxShadow: isInvited ? 'none' : '0 4px 12px rgba(79, 70, 229, 0.3)',
+                          boxShadow: 'none',
                           flex: { xs: 1, md: 'none' },
                           '&:hover': {
-                            background: isInvited
-                              ? '#059669'
-                              : 'linear-gradient(135deg, #4338ca 0%, #6d28d9 100%)',
+                            bgcolor: isInvited ? '#047857' : '#1d4ed8',
                           },
+                          '&:active': { transform: 'scale(0.97)' },
                         }}
                       >
                         {isInvited ? 'Đã mời' : 'Mời ứng tuyển'}
@@ -876,7 +913,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
 
                       {/* Secondary Save Resume Button */}
                       <Button
-                        variant={isSaved ? 'contained' : 'outlined'}
+                        variant="outlined"
                         size="small"
                         disabled={isSaving}
                         startIcon={
@@ -890,7 +927,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                         }
                         onClick={() => handleToggleSave(cand)}
                         sx={{
-                          borderRadius: '10px',
+                          borderRadius: '8px',
                           py: 0.8,
                           px: 1.8,
                           fontSize: '0.82rem',
@@ -898,14 +935,15 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                           textTransform: 'none',
                           whiteSpace: 'nowrap',
                           flex: { xs: 1, md: 'none' },
-                          borderColor: isSaved ? '#10b981' : isDark ? 'rgba(255, 255, 255, 0.15)' : '#cbd5e1',
-                          backgroundColor: isSaved ? '#10b981' : 'transparent',
-                          color: isSaved ? '#ffffff' : isDark ? '#f1f5f9' : '#334155',
+                          borderColor: isSaved ? '#059669' : isDark ? 'rgba(255, 255, 255, 0.15)' : '#cbd5e1',
+                          backgroundColor: isSaved ? (isDark ? 'rgba(5, 150, 105, 0.2)' : '#ecfdf5') : 'transparent',
+                          color: isSaved ? '#059669' : isDark ? '#f1f5f9' : '#334155',
                           boxShadow: 'none',
                           '&:hover': {
-                            borderColor: isSaved ? '#059669' : '#6366f1',
-                            backgroundColor: isSaved ? '#059669' : isDark ? 'rgba(99, 102, 241, 0.1)' : '#f8fafc',
+                            borderColor: isSaved ? '#047857' : '#2563eb',
+                            backgroundColor: isSaved ? (isDark ? 'rgba(5, 150, 105, 0.3)' : '#d1fae5') : isDark ? 'rgba(37, 99, 235, 0.08)' : '#f8fafc',
                           },
+                          '&:active': { transform: 'scale(0.97)' },
                         }}
                       >
                         {isSaving ? 'Đang lưu...' : isSaved ? 'Đã lưu' : 'Lưu ứng viên'}
@@ -918,7 +956,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                         startIcon={<OpenInNewIcon sx={{ fontSize: 14 }} />}
                         onClick={() => handleOpenProfile(cand)}
                         sx={{
-                          borderRadius: '8px',
+                          borderRadius: '6px',
                           py: 0.5,
                           fontSize: '0.75rem',
                           fontWeight: 600,
@@ -926,8 +964,8 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                           color: isDark ? '#94a3b8' : '#64748b',
                           whiteSpace: 'nowrap',
                           '&:hover': {
-                            color: '#4f46e5',
-                            bgcolor: isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(79, 70, 229, 0.05)',
+                            color: '#2563eb',
+                            bgcolor: isDark ? 'rgba(37, 99, 235, 0.08)' : 'rgba(37, 99, 235, 0.04)',
                           },
                         }}
                       >
@@ -946,14 +984,14 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
       <Divider sx={{ borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(226, 232, 240, 0.8)' }} />
       <DialogActions
         sx={{
-          p: 2,
+          p: 1.8,
           px: 3,
           backgroundColor: isDark ? '#1e293b' : '#ffffff',
           justifyContent: 'space-between',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <AutoAwesomeIcon sx={{ fontSize: 14, color: '#4f46e5' }} />
+          <AutoAwesomeIcon sx={{ fontSize: 14, color: '#2563eb' }} />
           <Typography variant="caption" sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.75rem' }}>
             Hệ thống tự động học và đối soát từ hơn 50,000+ hồ sơ ứng viên theo tiêu chuẩn JD InfoHR.
           </Typography>
@@ -964,16 +1002,17 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
           variant="outlined"
           size="small"
           sx={{
-            borderRadius: '10px',
+            borderRadius: '8px',
             fontWeight: 700,
             px: 2.5,
             color: isDark ? '#cbd5e1' : '#475569',
             borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#cbd5e1',
             textTransform: 'none',
             '&:hover': {
-              borderColor: '#6366f1',
-              bgcolor: isDark ? 'rgba(99, 102, 241, 0.1)' : '#f8fafc',
+              borderColor: '#2563eb',
+              bgcolor: isDark ? 'rgba(37, 99, 235, 0.08)' : '#f8fafc',
             },
+            '&:active': { transform: 'scale(0.97)' },
           }}
         >
           Đóng

@@ -347,3 +347,8 @@ class CloudinaryService:
         except Exception as e:
             helper.print_log_error("minio_get_url", e)
             return None, None
+
+
+# Clean alias for modern storage architecture imports
+MinioStorageService = CloudinaryService
+

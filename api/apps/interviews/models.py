@@ -409,13 +409,14 @@ class InterviewSession(CommonBaseModel):
     def save(self, *args, **kwargs):
         from django.core.exceptions import ValidationError
         
-        if self.pk:
-            old_instance = InterviewSession.objects.get(pk=self.pk)
-            if old_instance.status != self.status:
-                allowed_next_states = self.VALID_TRANSITIONS.get(old_instance.status, set())
+        update_fields = kwargs.get("update_fields")
+        if self.pk and (update_fields is None or "status" in update_fields):
+            old_status = InterviewSession.objects.filter(pk=self.pk).values_list("status", flat=True).first()
+            if old_status and old_status != self.status:
+                allowed_next_states = self.VALID_TRANSITIONS.get(old_status, set())
                 if self.status not in allowed_next_states:
                     raise ValidationError(
-                        f"Chuyển trạng thái phỏng vấn không hợp lệ: từ '{old_instance.status}' sang '{self.status}'"
+                        f"Chuyển trạng thái phỏng vấn không hợp lệ: từ '{old_status}' sang '{self.status}'"
                     )
 
         if not self.room_name:

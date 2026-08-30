@@ -9,7 +9,6 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
-  Fade,
   IconButton,
   Menu,
   MenuItem,
@@ -20,7 +19,6 @@ import {
   Tooltip,
   Typography,
   useTheme,
-  alpha,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
@@ -39,13 +37,15 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import TuneIcon from '@mui/icons-material/Tune';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import PostAddIcon from '@mui/icons-material/PostAdd';
-import SendIcon from '@mui/icons-material/Send';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import BusinessIcon from '@mui/icons-material/Business';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import EditNoteIcon from '@mui/icons-material/EditNote';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import PsychologyIcon from '@mui/icons-material/Psychology';
 import { useTranslation } from 'react-i18next';
 import {
   AIActionType,
@@ -124,43 +124,43 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
     job_desc: {
       label: t('editor.templates.categories.job', 'Mô tả công việc (JD)'),
       icon: <WorkOutlineIcon fontSize="small" />,
-      color: '#3b82f6',
+      color: '#2563eb',
       desc: 'Bản mô tả chi tiết nhiệm vụ và trách nhiệm vị trí tuyển dụng',
     },
     job_req: {
       label: t('editor.ai.context.jobReq', 'Yêu cầu ứng viên'),
       icon: <AssignmentTurnedInIcon fontSize="small" />,
-      color: '#8b5cf6',
+      color: '#0284c7',
       desc: 'Khung năng lực chuyên môn, kinh nghiệm và kỹ năng mềm',
     },
     benefits: {
       label: t('editor.templates.categories.policy', 'Chính sách & Phúc lợi'),
       icon: <CardGiftcardIcon fontSize="small" />,
-      color: '#10b981',
+      color: '#059669',
       desc: 'Gói đãi ngộ, lương thưởng, bảo hiểm và môi trường làm việc',
     },
     company: {
       label: t('editor.templates.categories.company', 'Giới thiệu công ty'),
       icon: <BusinessIcon fontSize="small" />,
-      color: '#f59e0b',
+      color: '#d97706',
       desc: 'Tầm nhìn, sứ mệnh, văn hóa và giá trị cốt lõi doanh nghiệp',
     },
     email: {
       label: t('editor.ai.context.email', 'Thư gửi ứng viên'),
       icon: <EmailOutlinedIcon fontSize="small" />,
-      color: '#ec4899',
+      color: '#7c3aed',
       desc: 'Email mời phỏng vấn, thư trúng tuyển hoặc thư cảm ơn',
     },
     blog: {
       label: t('editor.ai.context.blog', 'Bài viết / Tin tức'),
       icon: <DescriptionOutlinedIcon fontSize="small" />,
-      color: '#06b6d4',
+      color: '#0891b2',
       desc: 'Bài viết chia sẻ văn hóa, xu hướng nghề nghiệp và tuyển dụng',
     },
     general: {
       label: t('editor.ai.context.general', 'Soạn thảo tổng hợp'),
-      icon: <DescriptionOutlinedIcon fontSize="small" />,
-      color: '#6366f1',
+      icon: <EditNoteIcon fontSize="small" />,
+      color: '#2563eb',
       desc: 'Soạn thảo văn bản tự do theo mọi chủ đề doanh nghiệp',
     },
   };
@@ -175,56 +175,56 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
     {
       id: 'generate',
       label: t('editor.ai.tabs.generate', 'Tạo mới'),
-      icon: <AutoAwesomeIcon sx={{ fontSize: 17 }} />,
+      icon: <AutoAwesomeIcon sx={{ fontSize: 16 }} />,
       desc: t('editor.ai.tabs.generateDesc', 'Soạn thảo bài viết hoàn chỉnh chuẩn cấu trúc chuyên nghiệp'),
       badge: 'Phổ biến',
     },
     {
       id: 'improve',
       label: t('editor.ai.tabs.improve', 'Cải thiện'),
-      icon: <SparklesIcon sx={{ fontSize: 17 }} />,
+      icon: <SparklesIcon sx={{ fontSize: 16 }} />,
       desc: t('editor.ai.tabs.improveDesc', 'Nâng cấp văn phong mượt mà, chuyên nghiệp và giàu sức hút hơn'),
     },
     {
       id: 'fix_spelling',
       label: t('editor.ai.actions.grammar', 'Sửa chính tả & ngữ pháp'),
-      icon: <SpellcheckIcon sx={{ fontSize: 17 }} />,
+      icon: <SpellcheckIcon sx={{ fontSize: 16 }} />,
       desc: t('editor.ai.tabs.fixSpellingDesc', 'Rà soát và chuẩn hóa chính tả, lỗi dấu tiếng Việt và ngữ pháp'),
     },
     {
       id: 'shorten',
       label: t('editor.ai.actions.shorten', 'Tóm tắt & cô đọng'),
-      icon: <ShortTextIcon sx={{ fontSize: 17 }} />,
+      icon: <ShortTextIcon sx={{ fontSize: 16 }} />,
       desc: t('editor.ai.tabs.shortenDesc', 'Chắt lọc các ý quan trọng nhất thành dạng bullet points súc tích'),
     },
     {
       id: 'expand',
       label: t('editor.ai.actions.expand', 'Mở rộng chi tiết'),
-      icon: <FormatQuoteIcon sx={{ fontSize: 17 }} />,
+      icon: <FormatQuoteIcon sx={{ fontSize: 16 }} />,
       desc: t('editor.ai.tabs.expandDesc', 'Bổ sung thêm luận điểm, ví dụ thực tế và giải thích chuyên sâu'),
     },
     {
       id: 'change_tone',
       label: t('editor.ai.tabs.changeTone', 'Đổi giọng văn'),
-      icon: <TuneIcon sx={{ fontSize: 17 }} />,
+      icon: <TuneIcon sx={{ fontSize: 16 }} />,
       desc: t('editor.ai.tabs.changeToneDesc', 'Chuyển đổi phong cách sang Trang trọng, Thân thiện hoặc Thuyết phục'),
     },
     {
       id: 'translate_en',
       label: t('editor.ai.tabs.translateEn', 'Dịch sang English'),
-      icon: <TranslateIcon sx={{ fontSize: 17 }} />,
+      icon: <TranslateIcon sx={{ fontSize: 16 }} />,
       desc: t('editor.ai.tabs.translateEnDesc', 'Dịch thuật chuẩn Business English giữ nguyên định dạng HTML'),
     },
     {
       id: 'translate_vi',
       label: t('editor.ai.tabs.translateVi', 'Dịch sang Tiếng Việt'),
-      icon: <TranslateIcon sx={{ fontSize: 17 }} />,
+      icon: <TranslateIcon sx={{ fontSize: 16 }} />,
       desc: t('editor.ai.tabs.translateViDesc', 'Dịch thuật sang tiếng Việt tự nhiên và chuẩn văn phong HR'),
     },
     {
       id: 'custom',
       label: t('editor.ai.tabs.custom', 'Tùy chỉnh Prompt'),
-      icon: <PostAddIcon sx={{ fontSize: 17 }} />,
+      icon: <PostAddIcon sx={{ fontSize: 16 }} />,
       desc: t('editor.ai.tabs.customDesc', 'Yêu cầu AI xử lý bất kỳ tác vụ đặc thù nào bạn mong muốn'),
     },
   ];
@@ -276,17 +276,17 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
     ],
   };
 
-  const TONE_OPTIONS: Array<{ id: AITone; label: string; icon: string; desc: string }> = [
-    { id: 'professional', label: 'Trang trọng', icon: '🎯', desc: 'Chuẩn mực, uy tín' },
-    { id: 'friendly', label: 'Thân thiện', icon: '🤝', desc: 'Gần gũi, cởi mở' },
-    { id: 'persuasive', label: 'Thuyết phục', icon: '🚀', desc: 'Thu hút, tạo động lực' },
-    { id: 'creative', label: 'Sáng tạo', icon: '💡', desc: 'Đột phá, tươi mới' },
+  const TONE_OPTIONS: Array<{ id: AITone; label: string; desc: string }> = [
+    { id: 'professional', label: 'Trang trọng', desc: 'Chuẩn mực doanh nghiệp' },
+    { id: 'friendly', label: 'Thân thiện', desc: 'Gần gũi, cởi mở' },
+    { id: 'persuasive', label: 'Thuyết phục', desc: 'Thu hút, tạo động lực' },
+    { id: 'creative', label: 'Sáng tạo', desc: 'Đột phá, tươi mới' },
   ];
 
-  const LENGTH_OPTIONS: Array<{ id: AILength; label: string; desc: string; icon: string }> = [
-    { id: 'short', label: 'Ngắn gọn', desc: '~150 từ', icon: '⚡' },
-    { id: 'medium', label: 'Vừa phải', desc: '~400 từ', icon: '📄' },
-    { id: 'detailed', label: 'Chi tiết', desc: '~750 từ', icon: '📚' },
+  const LENGTH_OPTIONS: Array<{ id: AILength; label: string; desc: string }> = [
+    { id: 'short', label: 'Ngắn gọn', desc: '~150 từ' },
+    { id: 'medium', label: 'Vừa phải', desc: '~400 từ' },
+    { id: 'detailed', label: 'Chi tiết', desc: '~750 từ' },
   ];
 
   const currentTabInfo = useMemo(() => {
@@ -361,7 +361,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
       slotProps={{
         backdrop: {
           sx: {
-            backdropFilter: 'blur(10px)',
+            backdropFilter: 'blur(8px)',
             backgroundColor: isDark ? 'rgba(15, 23, 42, 0.75)' : 'rgba(15, 23, 42, 0.45)',
           },
         },
@@ -370,20 +370,20 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
         sx: {
           borderRadius: '20px',
           overflow: 'hidden',
-          minHeight: '680px',
+          minHeight: '660px',
           maxHeight: '92vh',
           display: 'flex',
           flexDirection: 'column',
           border: '1px solid',
           borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(226, 232, 240, 0.9)',
           boxShadow: isDark
-            ? '0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.2)'
-            : '0 25px 50px -12px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(99, 102, 241, 0.08)',
+            ? '0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(37, 99, 235, 0.2)'
+            : '0 25px 50px -12px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(37, 99, 235, 0.08)',
           bgcolor: isDark ? '#0f172a' : '#ffffff',
         },
       }}
     >
-      {/* 1. Header: AI Copilot Studio Bar */}
+      {/* 1. Header Studio Bar */}
       <DialogTitle
         sx={{
           p: 0,
@@ -409,24 +409,24 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
               sx={{
                 width: 44,
                 height: 44,
-                borderRadius: '14px',
+                borderRadius: '12px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)',
                 color: '#ffffff',
-                boxShadow: '0 6px 18px rgba(79, 70, 229, 0.35)',
+                boxShadow: '0 4px 14px rgba(37, 99, 235, 0.3)',
                 position: 'relative',
               }}
             >
-              <AutoAwesomeIcon sx={{ fontSize: 24 }} />
+              <AutoAwesomeIcon sx={{ fontSize: 22 }} />
               <Box
                 sx={{
                   position: 'absolute',
                   top: -2,
                   right: -2,
-                  width: 10,
-                  height: 10,
+                  width: 9,
+                  height: 9,
                   borderRadius: '50%',
                   bgcolor: '#10b981',
                   border: '2px solid',
@@ -455,10 +455,10 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     height: 22,
                     fontSize: '0.72rem',
                     fontWeight: 700,
-                    bgcolor: isDark ? 'rgba(99, 102, 241, 0.25)' : 'rgba(79, 70, 229, 0.1)',
-                    color: isDark ? '#a5b4fc' : '#4f46e5',
+                    bgcolor: isDark ? 'rgba(37, 99, 235, 0.2)' : 'rgba(37, 99, 235, 0.08)',
+                    color: isDark ? '#93c5fd' : '#1d4ed8',
                     border: '1px solid',
-                    borderColor: isDark ? 'rgba(99, 102, 241, 0.4)' : 'rgba(79, 70, 229, 0.2)',
+                    borderColor: isDark ? 'rgba(37, 99, 235, 0.35)' : 'rgba(37, 99, 235, 0.2)',
                   }}
                 />
               </Box>
@@ -470,14 +470,13 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
 
           {/* Right Context Switcher & Close */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            {/* Context Dropdown Button */}
             <Button
               size="small"
               onClick={(e) => setContextMenuAnchor(e.currentTarget)}
               endIcon={<KeyboardArrowDownIcon />}
               startIcon={currentContextObj.icon}
               sx={{
-                borderRadius: '10px',
+                borderRadius: '8px',
                 textTransform: 'none',
                 fontWeight: 600,
                 fontSize: '0.82rem',
@@ -501,7 +500,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
               onClose={() => setContextMenuAnchor(null)}
               PaperProps={{
                 sx: {
-                  borderRadius: '12px',
+                  borderRadius: '10px',
                   mt: 0.5,
                   minWidth: 240,
                   boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
@@ -527,16 +526,14 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                       gap: 1.5,
                       py: 1,
                       px: 2,
-                      fontSize: '0.85rem',
+                      fontSize: '0.84rem',
                       fontWeight: isSelected ? 700 : 500,
                     }}
                   >
                     <Box sx={{ color: item.color, display: 'flex' }}>{item.icon}</Box>
-                    <Box>
-                      <Typography variant="body2" fontWeight={isSelected ? 700 : 500}>
-                        {item.label}
-                      </Typography>
-                    </Box>
+                    <Typography variant="body2" fontWeight={isSelected ? 700 : 500}>
+                      {item.label}
+                    </Typography>
                   </MenuItem>
                 );
               })}
@@ -548,7 +545,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                 size="small"
                 sx={{
                   color: isDark ? '#94a3b8' : '#64748b',
-                  borderRadius: '10px',
+                  borderRadius: '8px',
                   bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
                   transition: 'all 0.2s',
                   '&:hover': {
@@ -586,22 +583,22 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                 startIcon={tab.icon}
                 size="small"
                 sx={{
-                  borderRadius: '10px',
+                  borderRadius: '8px',
                   textTransform: 'none',
                   fontWeight: isSelected ? 700 : 500,
                   whiteSpace: 'nowrap',
-                  px: 1.6,
-                  py: 0.7,
+                  px: 1.5,
+                  py: 0.6,
                   fontSize: '0.82rem',
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.15s ease',
                   flexShrink: 0,
                   ...(isSelected
                     ? {
-                        background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                        background: '#2563eb',
                         color: '#ffffff',
-                        boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)',
+                        boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)',
                         '&:hover': {
-                          background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 100%)',
+                          background: '#1d4ed8',
                         },
                       }
                     : {
@@ -612,9 +609,9 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                         '&:hover': {
                           color: isDark ? '#f1f5f9' : '#0f172a',
                           bgcolor: isDark ? 'rgba(51, 65, 85, 0.7)' : 'rgba(226, 232, 240, 0.9)',
-                          borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(203, 213, 225, 1)',
                         },
                       }),
+                  '&:active': { transform: 'scale(0.97)' },
                 }}
               >
                 {tab.label}
@@ -653,20 +650,20 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
             {/* Action Banner */}
             <Box
               sx={{
-                p: 1.5,
-                px: 2,
-                borderRadius: '12px',
-                bgcolor: isDark ? 'rgba(79, 70, 229, 0.12)' : 'rgba(79, 70, 229, 0.06)',
+                p: 1.4,
+                px: 1.8,
+                borderRadius: '10px',
+                bgcolor: isDark ? 'rgba(37, 99, 235, 0.1)' : 'rgba(37, 99, 235, 0.06)',
                 border: '1px solid',
-                borderColor: isDark ? 'rgba(99, 102, 241, 0.25)' : 'rgba(79, 70, 229, 0.15)',
+                borderColor: isDark ? 'rgba(37, 99, 235, 0.25)' : 'rgba(37, 99, 235, 0.15)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1.2,
               }}
             >
-              <Box sx={{ color: '#6366f1', display: 'flex' }}>{currentTabInfo.icon}</Box>
+              <Box sx={{ color: '#2563eb', display: 'flex' }}>{currentTabInfo.icon}</Box>
               <Box>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: isDark ? '#c7d2fe' : '#4338ca', fontSize: '0.85rem' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: isDark ? '#93c5fd' : '#1e40af', fontSize: '0.85rem' }}>
                   {currentTabInfo.label}
                 </Typography>
                 <Typography variant="caption" sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.75rem' }}>
@@ -683,15 +680,9 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                   variant="caption"
                   sx={{ fontWeight: 700, color: isDark ? '#94a3b8' : '#475569', display: 'block', mb: 0.8, fontSize: '0.75rem' }}
                 >
-                  🎭 Phong cách diễn đạt:
+                  Phong cách diễn đạt:
                 </Typography>
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: 0.6,
-                  }}
-                >
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0.6 }}>
                   {TONE_OPTIONS.map((item) => {
                     const isSelected = tone === item.id;
                     return (
@@ -706,25 +697,26 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                           textAlign: 'center',
                           border: '1px solid',
                           borderColor: isSelected
-                            ? '#4f46e5'
+                            ? '#2563eb'
                             : isDark
                             ? 'rgba(255, 255, 255, 0.08)'
                             : 'rgba(226, 232, 240, 0.9)',
                           bgcolor: isSelected
                             ? isDark
-                              ? 'rgba(79, 70, 229, 0.25)'
-                              : 'rgba(79, 70, 229, 0.08)'
+                              ? 'rgba(37, 99, 235, 0.25)'
+                              : 'rgba(37, 99, 235, 0.08)'
                             : isDark
                             ? 'rgba(30, 41, 59, 0.4)'
                             : '#ffffff',
                           transition: 'all 0.15s ease',
                           '&:hover': {
-                            borderColor: '#6366f1',
+                            borderColor: '#2563eb',
                           },
+                          '&:active': { transform: 'scale(0.97)' },
                         }}
                       >
                         <Typography variant="caption" sx={{ fontWeight: isSelected ? 700 : 500, fontSize: '0.75rem', display: 'block' }}>
-                          {item.icon} {item.label}
+                          {item.label}
                         </Typography>
                       </Paper>
                     );
@@ -738,7 +730,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                   variant="caption"
                   sx={{ fontWeight: 700, color: isDark ? '#94a3b8' : '#475569', display: 'block', mb: 0.8, fontSize: '0.75rem' }}
                 >
-                  📏 Độ dài (Length):
+                  Độ dài văn bản:
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.6 }}>
                   {LENGTH_OPTIONS.map((item) => {
@@ -758,25 +750,26 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                           justifyContent: 'space-between',
                           border: '1px solid',
                           borderColor: isSelected
-                            ? '#4f46e5'
+                            ? '#2563eb'
                             : isDark
                             ? 'rgba(255, 255, 255, 0.08)'
                             : 'rgba(226, 232, 240, 0.9)',
                           bgcolor: isSelected
                             ? isDark
-                              ? 'rgba(79, 70, 229, 0.25)'
-                              : 'rgba(79, 70, 229, 0.08)'
+                              ? 'rgba(37, 99, 235, 0.25)'
+                              : 'rgba(37, 99, 235, 0.08)'
                             : isDark
                             ? 'rgba(30, 41, 59, 0.4)'
                             : '#ffffff',
                           transition: 'all 0.15s ease',
                           '&:hover': {
-                            borderColor: '#6366f1',
+                            borderColor: '#2563eb',
                           },
+                          '&:active': { transform: 'scale(0.97)' },
                         }}
                       >
                         <Typography variant="caption" sx={{ fontWeight: isSelected ? 700 : 500, fontSize: '0.75rem' }}>
-                          {item.icon} {item.label}
+                          {item.label}
                         </Typography>
                         <Typography variant="caption" sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.7rem' }}>
                           {item.desc}
@@ -792,7 +785,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.8 }}>
                 <Typography variant="caption" sx={{ fontWeight: 700, color: isDark ? '#e2e8f0' : '#334155', fontSize: '0.78rem' }}>
-                  💬 {t('editor.ai.customPromptLabel', 'Hoặc nhập yêu cầu riêng của bạn cho AI:')}
+                  {t('editor.ai.customPromptLabel', 'Hoặc nhập yêu cầu riêng của bạn cho AI:')}
                 </Typography>
                 {userPrompt && (
                   <Button
@@ -822,9 +815,9 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                       border: '1px dashed',
                       borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)',
                       '&:hover': {
-                        borderColor: '#6366f1',
-                        color: '#6366f1',
-                        bgcolor: isDark ? 'rgba(99, 102, 241, 0.15)' : 'rgba(79, 70, 229, 0.06)',
+                        borderColor: '#2563eb',
+                        color: '#2563eb',
+                        bgcolor: isDark ? 'rgba(37, 99, 235, 0.15)' : 'rgba(37, 99, 235, 0.06)',
                       },
                     }}
                   />
@@ -849,17 +842,17 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                 onChange={(e) => setUserPrompt(e.target.value)}
                 sx={{
                   bgcolor: isDark ? '#111c38' : '#ffffff',
-                  borderRadius: '12px',
+                  borderRadius: '10px',
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
+                    borderRadius: '10px',
                     fontSize: '0.88rem',
                     lineHeight: 1.5,
                     borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(203, 213, 225, 0.8)',
                     '&:hover fieldset': {
-                      borderColor: '#6366f1',
+                      borderColor: '#2563eb',
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: '#4f46e5',
+                      borderColor: '#2563eb',
                       borderWidth: '1.5px',
                     },
                   },
@@ -867,7 +860,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
               />
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
                 <Typography variant="caption" sx={{ color: isDark ? '#64748b' : '#94a3b8', fontSize: '0.7rem' }}>
-                  Phím tắt: <strong style={{ color: '#6366f1' }}>Ctrl + Enter</strong> để xử lý
+                  Phím tắt: <strong style={{ color: '#2563eb' }}>Ctrl + Enter</strong> để xử lý
                 </Typography>
                 <Typography variant="caption" sx={{ color: isDark ? '#64748b' : '#94a3b8', fontSize: '0.7rem' }}>
                   {userPrompt.length} ký tự
@@ -881,7 +874,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                 variant="caption"
                 sx={{ fontWeight: 700, color: isDark ? '#94a3b8' : '#475569', display: 'block', mb: 1, fontSize: '0.75rem' }}
               >
-                💡 Gợi ý nhanh cho {currentContextObj.label}:
+                Gợi ý nhanh cho {currentContextObj.label}:
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
                 {suggestions.map((sug, idx) => (
@@ -895,7 +888,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     sx={{
                       p: 1.1,
                       px: 1.4,
-                      borderRadius: '10px',
+                      borderRadius: '8px',
                       border: '1px solid',
                       borderColor: isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(226, 232, 240, 0.9)',
                       cursor: 'pointer',
@@ -907,14 +900,15 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                       gap: 1,
                       transition: 'all 0.15s ease',
                       '&:hover': {
-                        borderColor: '#6366f1',
-                        color: '#4f46e5',
-                        bgcolor: isDark ? 'rgba(79, 70, 229, 0.15)' : 'rgba(79, 70, 229, 0.04)',
+                        borderColor: '#2563eb',
+                        color: '#2563eb',
+                        bgcolor: isDark ? 'rgba(37, 99, 235, 0.15)' : 'rgba(37, 99, 235, 0.04)',
                         transform: 'translateX(3px)',
                       },
+                      '&:active': { transform: 'scale(0.98)' },
                     }}
                   >
-                    <AutoAwesomeIcon sx={{ fontSize: 13, color: '#6366f1', flexShrink: 0 }} />
+                    <AutoAwesomeIcon sx={{ fontSize: 13, color: '#2563eb', flexShrink: 0 }} />
                     <Typography variant="caption" sx={{ fontSize: '0.78rem', lineHeight: 1.4 }}>
                       {sug}
                     </Typography>
@@ -931,22 +925,20 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
               startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <AutoAwesomeIcon />}
               fullWidth
               sx={{
-                py: 1.3,
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                boxShadow: '0 6px 20px rgba(79, 70, 229, 0.35)',
+                py: 1.2,
+                borderRadius: '10px',
+                bgcolor: '#2563eb',
+                boxShadow: 'none',
                 fontWeight: 700,
-                fontSize: '0.92rem',
+                fontSize: '0.9rem',
                 textTransform: 'none',
                 mt: 'auto',
-                transition: 'all 0.2s ease',
+                transition: 'all 0.15s ease',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 100%)',
-                  boxShadow: '0 8px 25px rgba(79, 70, 229, 0.45)',
-                  transform: 'translateY(-1px)',
+                  bgcolor: '#1d4ed8',
                 },
                 '&:active': {
-                  transform: 'translateY(0px)',
+                  transform: 'scale(0.98)',
                 },
               }}
             >
@@ -989,14 +981,16 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
 
                 {resultStats && (
                   <Chip
-                    label={`${resultStats.wordCount} từ • ~${resultStats.readingTimeMin}p đọc`}
+                    label={`${resultStats.wordCount} từ - ~${resultStats.readingTimeMin}p đọc`}
                     size="small"
                     sx={{
                       height: 22,
                       fontSize: '0.72rem',
                       fontWeight: 600,
-                      bgcolor: isDark ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.1)',
-                      color: isDark ? '#6ee7b7' : '#059669',
+                      bgcolor: isDark ? 'rgba(5, 150, 105, 0.2)' : '#ecfdf5',
+                      color: isDark ? '#6ee7b7' : '#047857',
+                      border: '1px solid',
+                      borderColor: isDark ? 'rgba(5, 150, 105, 0.35)' : '#a7f3d0',
                     }}
                   />
                 )}
@@ -1009,7 +1003,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     value={previewTab}
                     onChange={(_, v) => setPreviewTab(v)}
                     sx={{
-                      minHeight: 32,
+                      minHeight: 30,
                       bgcolor: isDark ? 'rgba(30, 41, 59, 0.6)' : 'rgba(241, 245, 249, 0.9)',
                       borderRadius: '8px',
                       p: 0.3,
@@ -1022,7 +1016,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                       icon={<VisibilityIcon sx={{ fontSize: 14 }} />}
                       iconPosition="start"
                       sx={{
-                        minHeight: 26,
+                        minHeight: 24,
                         py: 0.3,
                         px: 1.2,
                         fontSize: '0.75rem',
@@ -1032,7 +1026,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                         color: isDark ? '#94a3b8' : '#64748b',
                         ...(previewTab === 'preview' && {
                           bgcolor: isDark ? '#1e293b' : '#ffffff',
-                          color: '#4f46e5',
+                          color: '#2563eb',
                           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                         }),
                       }}
@@ -1043,7 +1037,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                       icon={<CodeIcon sx={{ fontSize: 14 }} />}
                       iconPosition="start"
                       sx={{
-                        minHeight: 26,
+                        minHeight: 24,
                         py: 0.3,
                         px: 1.2,
                         fontSize: '0.75rem',
@@ -1053,7 +1047,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                         color: isDark ? '#94a3b8' : '#64748b',
                         ...(previewTab === 'code' && {
                           bgcolor: isDark ? '#1e293b' : '#ffffff',
-                          color: '#4f46e5',
+                          color: '#2563eb',
                           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                         }),
                       }}
@@ -1071,8 +1065,8 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                         borderRadius: '8px',
                         textTransform: 'none',
                         fontSize: '0.75rem',
-                        py: 0.5,
-                        borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(203, 213, 225, 0.9)',
+                        py: 0.4,
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#cbd5e1',
                       }}
                     >
                       {t('common.actions.retry', 'Thử lại')}
@@ -1090,8 +1084,8 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                         borderRadius: '8px',
                         textTransform: 'none',
                         fontSize: '0.75rem',
-                        py: 0.5,
-                        borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(203, 213, 225, 0.9)',
+                        py: 0.4,
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#cbd5e1',
                       }}
                     >
                       {copied ? t('editor.ai.copied', 'Đã sao chép') : t('editor.ai.copy', 'Sao chép')}
@@ -1106,7 +1100,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
               elevation={0}
               sx={{
                 p: 3,
-                borderRadius: '16px',
+                borderRadius: '14px',
                 border: '1px solid',
                 borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(226, 232, 240, 0.9)',
                 bgcolor: isDark ? '#111827' : '#ffffff',
@@ -1114,9 +1108,9 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                 overflowY: 'auto',
                 minHeight: '340px',
                 position: 'relative',
-                boxShadow: isDark ? 'inset 0 2px 4px rgba(0,0,0,0.2)' : 'inset 0 1px 3px rgba(0,0,0,0.03)',
+                boxShadow: 'none',
                 '& h1, & h2, & h3': {
-                  color: isDark ? '#818cf8' : '#4338ca',
+                  color: isDark ? '#93c5fd' : '#1e40af',
                   fontWeight: 700,
                   mt: 1.8,
                   mb: 0.8,
@@ -1124,7 +1118,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                 },
                 '& h1': { fontSize: '1.3rem' },
                 '& h2': { fontSize: '1.15rem' },
-                '& h3': { fontSize: '1.02rem', borderBottom: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', pb: 0.5 },
+                '& h3': { fontSize: '1.02rem', borderBottom: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0', pb: 0.5 },
                 '& p': { fontSize: '0.9rem', lineHeight: 1.65, mb: 1.2, color: isDark ? '#e2e8f0' : '#334155' },
                 '& ul, & ol': { pl: 2.8, mb: 1.2 },
                 '& li': { fontSize: '0.9rem', mb: 0.6, lineHeight: 1.6, color: isDark ? '#e2e8f0' : '#334155' },
@@ -1132,8 +1126,8 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                 '& blockquote': {
                   pl: 2,
                   py: 0.5,
-                  borderLeft: '3px solid #6366f1',
-                  bgcolor: isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(79, 70, 229, 0.04)',
+                  borderLeft: '3px solid #2563eb',
+                  bgcolor: isDark ? 'rgba(37, 99, 235, 0.1)' : 'rgba(37, 99, 235, 0.04)',
                   borderRadius: '0 8px 8px 0',
                   my: 1.5,
                   fontStyle: 'italic',
@@ -1154,38 +1148,36 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                 >
                   <Box
                     sx={{
-                      width: 72,
-                      height: 72,
+                      width: 64,
+                      height: 64,
                       borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.2) 0%, rgba(124, 58, 237, 0.2) 100%)',
-                      border: '2px solid',
-                      borderColor: 'rgba(99, 102, 241, 0.4)',
-                      boxShadow: '0 0 25px rgba(99, 102, 241, 0.25)',
-                      animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                      background: 'rgba(37, 99, 235, 0.12)',
+                      border: '2px solid rgba(37, 99, 235, 0.3)',
+                      animation: 'pulse 1.8s infinite',
                       '@keyframes pulse': {
                         '0%, 100%': { transform: 'scale(1)', opacity: 1 },
                         '50%': { transform: 'scale(1.08)', opacity: 0.7 },
                       },
                     }}
                   >
-                    <AutoAwesomeIcon sx={{ fontSize: 36, color: '#6366f1' }} />
+                    <AutoAwesomeIcon sx={{ fontSize: 32, color: '#2563eb' }} />
                   </Box>
 
                   <Box sx={{ textAlign: 'center' }}>
                     <Typography variant="body1" sx={{ fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a', mb: 0.5 }}>
-                      {loadingStep === 0 && '⚡ Đang phân tích ngữ cảnh & yêu cầu...'}
-                      {loadingStep === 1 && '✨ Đang tối ưu cấu trúc & văn phong chuyên nghiệp...'}
-                      {loadingStep === 2 && '🪄 Đang hoàn tất và xuất bản mã HTML...'}
+                      {loadingStep === 0 && 'Đang phân tích ngữ cảnh & yêu cầu...'}
+                      {loadingStep === 1 && 'Đang tối ưu cấu trúc & văn phong chuyên nghiệp...'}
+                      {loadingStep === 2 && 'Đang hoàn tất và xuất bản mã HTML...'}
                     </Typography>
                     <Typography variant="caption" sx={{ color: isDark ? '#94a3b8' : '#64748b' }}>
                       AILA Copilot v2.5 được tối ưu riêng cho định dạng tuyển dụng InfoHR
                     </Typography>
                   </Box>
 
-                  <CircularProgress size={26} thickness={4} sx={{ color: '#6366f1' }} />
+                  <CircularProgress size={24} thickness={4} sx={{ color: '#2563eb' }} />
                 </Box>
               ) : generatedResult ? (
                 previewTab === 'preview' ? (
@@ -1198,7 +1190,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                       fontFamily: 'monospace',
                       whiteSpace: 'pre-wrap',
                       wordBreak: 'break-all',
-                      color: isDark ? '#a5b4fc' : '#4338ca',
+                      color: isDark ? '#93c5fd' : '#1e40af',
                       p: 1.5,
                       borderRadius: '8px',
                       bgcolor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',
@@ -1224,9 +1216,9 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                 >
                   <Box
                     sx={{
-                      width: 64,
-                      height: 64,
-                      borderRadius: '16px',
+                      width: 56,
+                      height: 56,
+                      borderRadius: '12px',
                       bgcolor: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.03)',
                       display: 'flex',
                       alignItems: 'center',
@@ -1235,7 +1227,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                       borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                     }}
                   >
-                    <AutoAwesomeIcon sx={{ fontSize: 32, color: isDark ? '#475569' : '#cbd5e1' }} />
+                    <AutoAwesomeIcon sx={{ fontSize: 28, color: isDark ? '#475569' : '#cbd5e1' }} />
                   </Box>
                   <Typography variant="body2" sx={{ fontWeight: 700, color: isDark ? '#cbd5e1' : '#475569' }}>
                     {t('editor.ai.emptyResult', 'Chưa có nội dung tạo từ AI')}
@@ -1251,15 +1243,15 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     onClick={() => handleGenerate(suggestions[0])}
                     sx={{
                       mt: 1,
-                      borderRadius: '10px',
+                      borderRadius: '8px',
                       textTransform: 'none',
                       fontSize: '0.8rem',
                       fontWeight: 600,
-                      borderColor: '#6366f1',
-                      color: '#4f46e5',
+                      borderColor: '#2563eb',
+                      color: '#2563eb',
                       '&:hover': {
-                        bgcolor: 'rgba(99, 102, 241, 0.08)',
-                        borderColor: '#4f46e5',
+                        bgcolor: 'rgba(37, 99, 235, 0.06)',
+                        borderColor: '#1d4ed8',
                       },
                     }}
                   >
@@ -1278,7 +1270,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     Chỉnh nhanh:
                   </Typography>
                   <Chip
-                    label="⚡ Rút ngắn hơn"
+                    label="Rút ngắn hơn"
                     size="small"
                     onClick={() => {
                       setSelectedAction('shorten');
@@ -1287,7 +1279,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     sx={{ height: 22, fontSize: '0.72rem', cursor: 'pointer' }}
                   />
                   <Chip
-                    label="📖 Mở rộng thêm"
+                    label="Mở rộng thêm"
                     size="small"
                     onClick={() => {
                       setSelectedAction('expand');
@@ -1296,7 +1288,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     sx={{ height: 22, fontSize: '0.72rem', cursor: 'pointer' }}
                   />
                   <Chip
-                    label="🎯 Trang trọng hơn"
+                    label="Trang trọng hơn"
                     size="small"
                     onClick={() => {
                       setTone('professional');
@@ -1306,7 +1298,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     sx={{ height: 22, fontSize: '0.72rem', cursor: 'pointer' }}
                   />
                   <Chip
-                    label="🇬🇧 Dịch English"
+                    label="Dịch sang English"
                     size="small"
                     onClick={() => {
                       setSelectedAction('translate_en');
@@ -1332,7 +1324,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     startIcon={<AddTaskIcon sx={{ fontSize: 16 }} />}
                     onClick={() => handleApply('insert')}
                     sx={{
-                      borderRadius: '10px',
+                      borderRadius: '8px',
                       textTransform: 'none',
                       fontWeight: 600,
                       fontSize: '0.82rem',
@@ -1349,7 +1341,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     startIcon={<AddTaskIcon sx={{ fontSize: 16 }} />}
                     onClick={() => handleApply('append')}
                     sx={{
-                      borderRadius: '10px',
+                      borderRadius: '8px',
                       textTransform: 'none',
                       fontWeight: 600,
                       fontSize: '0.82rem',
@@ -1366,17 +1358,18 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     startIcon={<CheckIcon sx={{ fontSize: 16 }} />}
                     onClick={() => handleApply('replace')}
                     sx={{
-                      borderRadius: '10px',
+                      borderRadius: '8px',
                       textTransform: 'none',
                       fontWeight: 700,
                       fontSize: '0.85rem',
                       px: 2.4,
                       py: 0.8,
-                      background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                      boxShadow: '0 4px 14px rgba(79, 70, 229, 0.35)',
+                      bgcolor: '#2563eb',
+                      boxShadow: 'none',
                       '&:hover': {
-                        background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 100%)',
+                        bgcolor: '#1d4ed8',
                       },
+                      '&:active': { transform: 'scale(0.97)' },
                     }}
                   >
                     {t('editor.ai.replace', 'Thay thế nội dung')}
@@ -1400,7 +1393,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <AutoAwesomeIcon sx={{ fontSize: 14, color: '#6366f1' }} />
+          <AutoAwesomeIcon sx={{ fontSize: 14, color: '#2563eb' }} />
           <Typography variant="caption" sx={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: '0.75rem' }}>
             {t('editor.ai.footerNote', 'Nội dung do AI tạo, vui lòng kiểm tra và hiệu chỉnh trước khi phát hành.')}
           </Typography>
