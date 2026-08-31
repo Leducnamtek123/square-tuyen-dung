@@ -60,23 +60,27 @@ const inputSx = {
 const renderStatusBadge = (record: any) => {
   if (!record) return <Typography variant="caption" color="text.disabled">-</Typography>;
   const status = record.status;
+  const workingHours = record.workingHours || record.working_hours || 8;
+  const checkIn = record.checkIn || record.check_in || '08:30';
+  const checkOut = record.checkOut || record.check_out || '17:30';
+
   if (status === 'PRESENT') {
     return (
-      <Tooltip title={`Có mặt | ${record.working_hours || 8}h (${record.check_in || '08:30'} - ${record.check_out || '17:30'})`}>
+      <Tooltip title={`Có mặt | ${workingHours}h (${checkIn} - ${checkOut})`}>
         <Chip size="small" label="P" sx={{ bgcolor: '#dcfce7', color: '#15803d', fontWeight: 700, minWidth: 28, height: 24, fontSize: '0.75rem' }} />
       </Tooltip>
     );
   }
   if (status === 'LATE') {
     return (
-      <Tooltip title={`Đi muộn | Vào lúc ${record.check_in || '09:15'}`}>
+      <Tooltip title={`Đi muộn | Vào lúc ${record.checkIn || record.check_in || '09:15'}`}>
         <Chip size="small" label="L" sx={{ bgcolor: '#fef3c7', color: '#b45309', fontWeight: 700, minWidth: 28, height: 24, fontSize: '0.75rem' }} />
       </Tooltip>
     );
   }
   if (status === 'EARLY_LEAVE') {
     return (
-      <Tooltip title={`Về sớm | Ra lúc ${record.check_out || '16:00'}`}>
+      <Tooltip title={`Về sớm | Ra lúc ${record.checkOut || record.check_out || '16:00'}`}>
         <Chip size="small" label="EL" sx={{ bgcolor: '#ffedd5', color: '#c2410c', fontWeight: 700, minWidth: 28, height: 24, fontSize: '0.7rem' }} />
       </Tooltip>
     );
@@ -299,7 +303,7 @@ export default function AttendanceListPage() {
                       {d.day}
                     </Typography>
                     <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
-                      {d.day_of_week}
+                      {d.dayOfWeek || d.day_of_week}
                     </Typography>
                   </TableCell>
                 ))}
@@ -339,15 +343,15 @@ export default function AttendanceListPage() {
                 </TableRow>
               ) : (
                 timesheetData?.employees?.map((emp) => (
-                  <TableRow key={emp.employee_id} hover>
+                  <TableRow key={emp.employeeId || emp.employee_id} hover>
                     <TableCell sx={{ fontWeight: 600, color: 'primary.main', position: 'sticky', left: 0, bgcolor: 'background.paper', zIndex: 1 }}>
-                      {emp.employee_code}
+                      {emp.employeeCode || emp.employee_code}
                     </TableCell>
                     <TableCell sx={{ fontWeight: 600, position: 'sticky', left: 100, bgcolor: 'background.paper', zIndex: 1 }}>
-                      {emp.full_name}
+                      {emp.fullName || emp.full_name}
                     </TableCell>
                     <TableCell sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
-                      {emp.department_name || '-'}
+                      {emp.departmentName || emp.department_name || '-'}
                     </TableCell>
 
                     {/* Day Cells */}
@@ -359,7 +363,7 @@ export default function AttendanceListPage() {
                           align="center"
                           sx={{
                             p: 0.25,
-                            bgcolor: d.is_weekend ? '#f8fafc' : 'inherit',
+                            bgcolor: (d.isWeekend ?? d.is_weekend) ? '#f8fafc' : 'inherit',
                           }}
                         >
                           {renderStatusBadge(record)}
@@ -369,16 +373,16 @@ export default function AttendanceListPage() {
 
                     {/* Summary Data */}
                     <TableCell align="center" sx={{ fontWeight: 700, bgcolor: '#f0fdf4', color: '#15803d' }}>
-                      {emp.stats.total_present}
+                      {emp.stats?.totalPresent ?? emp.stats?.total_present ?? 0}
                     </TableCell>
                     <TableCell align="center" sx={{ fontWeight: 700, bgcolor: '#fffbeb', color: '#b45309' }}>
-                      {emp.stats.total_late}
+                      {emp.stats?.totalLate ?? emp.stats?.total_late ?? 0}
                     </TableCell>
                     <TableCell align="center" sx={{ fontWeight: 700, bgcolor: '#eff6ff', color: '#1d4ed8' }}>
-                      {emp.stats.total_leave}
+                      {emp.stats?.totalLeave ?? emp.stats?.total_leave ?? 0}
                     </TableCell>
                     <TableCell align="center" sx={{ fontWeight: 700, bgcolor: '#faf5ff', color: '#7e22ce' }}>
-                      {emp.stats.total_hours}h
+                      {emp.stats?.totalHours ?? emp.stats?.total_hours ?? 0}h
                     </TableCell>
                   </TableRow>
                 ))
@@ -407,7 +411,7 @@ export default function AttendanceListPage() {
             >
               {employees.map((emp) => (
                 <MenuItem key={emp.id} value={emp.id}>
-                  {emp.full_name} ({emp.employee_code})
+                  {emp.fullName || emp.full_name} ({emp.employeeCode || emp.employee_code})
                 </MenuItem>
               ))}
             </TextField>

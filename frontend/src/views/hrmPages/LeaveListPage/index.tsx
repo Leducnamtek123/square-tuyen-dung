@@ -381,13 +381,13 @@ export default function LeaveListPage() {
                       filteredLeaves.map((l) => (
                         <TableRow key={l.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
                           <TableCell sx={{ fontWeight: 800, color: '#0f172a' }}>
-                            {l.employee_name || `#${l.employee}`}
+                            {l.employeeName || l.employee_name || `#${l.employee}`}
                           </TableCell>
                           <TableCell sx={{ fontFamily: 'var(--font-mono)', fontSize: '0.8125rem', color: '#1e293b' }}>
-                            {l.start_date} → {l.end_date}
+                            {l.startDate || l.start_date} → {l.endDate || l.end_date}
                           </TableCell>
                           <TableCell sx={{ fontWeight: 800, color: '#2563eb', fontFamily: 'var(--font-mono)' }}>
-                            {l.total_days} ngày
+                            {l.totalDays ?? l.total_days} ngày
                           </TableCell>
                           <TableCell sx={{ color: '#475569', fontSize: '0.825rem', maxWidth: 220 }}>
                             {l.reason || 'Nghỉ phép cá nhân'}
@@ -529,40 +529,40 @@ export default function LeaveListPage() {
                       leaveBalances.map((bal: any) => (
                         <TableRow key={bal.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
                           <TableCell sx={{ fontWeight: 700, color: '#2563eb', fontFamily: 'var(--font-mono)' }}>
-                            {bal.employee_code || '-'}
+                            {bal.employeeCode || bal.employee_code || '-'}
                           </TableCell>
                           <TableCell sx={{ fontWeight: 800, color: '#0f172a' }}>
-                            {bal.employee_name || `#${bal.employee}`}
+                            {bal.employeeName || bal.employee_name || `#${bal.employee}`}
                           </TableCell>
                           <TableCell sx={{ color: '#475569' }}>
-                            {bal.leave_type_name || 'Phép năm'}
+                            {bal.leaveTypeName || bal.leave_type_name || 'Phép năm'}
                           </TableCell>
                           <TableCell align="center" sx={{ fontFamily: 'var(--font-mono)' }}>
-                            {bal.allocated_days}
+                            {bal.allocatedDays ?? bal.allocated_days}
                           </TableCell>
                           <TableCell align="center" sx={{ fontFamily: 'var(--font-mono)', color: '#16a34a', fontWeight: 700 }}>
-                            +{bal.seniority_bonus_days || 0}
+                            +{bal.seniorityBonusDays ?? bal.seniority_bonus_days ?? 0}
                           </TableCell>
                           <TableCell align="center" sx={{ fontFamily: 'var(--font-mono)' }}>
-                            {bal.carried_over_days || 0}
+                            {bal.carriedOverDays ?? bal.carried_over_days ?? 0}
                           </TableCell>
                           <TableCell align="center" sx={{ fontFamily: 'var(--font-mono)', color: '#dc2626', fontWeight: 600 }}>
-                            {bal.used_days}
+                            {bal.usedDays ?? bal.used_days}
                           </TableCell>
                           <TableCell align="center" sx={{ fontFamily: 'var(--font-mono)', color: '#d97706' }}>
-                            {bal.pending_days}
+                            {bal.pendingDays ?? bal.pending_days}
                           </TableCell>
                           <TableCell align="center" sx={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
-                            {bal.total_allowed_days}
+                            {bal.totalAllowedDays ?? bal.total_allowed_days}
                           </TableCell>
                           <TableCell align="center">
                             <Chip
-                              label={`${bal.remaining_days} ngày`}
+                              label={`${bal.remainingDays ?? bal.remaining_days} ngày`}
                               size="small"
                               sx={{
                                 fontWeight: 900,
-                                bgcolor: bal.remaining_days > 0 ? '#f0fdf4' : '#fef2f2',
-                                color: bal.remaining_days > 0 ? '#16a34a' : '#dc2626',
+                                bgcolor: (bal.remainingDays ?? bal.remaining_days) > 0 ? '#f0fdf4' : '#fef2f2',
+                                color: (bal.remainingDays ?? bal.remaining_days) > 0 ? '#16a34a' : '#dc2626',
                                 borderRadius: 1.5,
                               }}
                             />
@@ -600,7 +600,7 @@ export default function LeaveListPage() {
               sx={inputSx}
             >
               {employees.map((emp) => (
-                <MenuItem key={emp.id} value={emp.id}>{emp.full_name} ({emp.employee_code})</MenuItem>
+                <MenuItem key={emp.id} value={emp.id}>{emp.fullName || emp.full_name} ({emp.employeeCode || emp.employee_code})</MenuItem>
               ))}
             </TextField>
 

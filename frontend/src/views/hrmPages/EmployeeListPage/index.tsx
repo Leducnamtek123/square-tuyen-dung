@@ -207,10 +207,12 @@ export default function EmployeeListPage() {
   };
 
   const filteredEmployees = employees.filter((emp) => {
+    const name = emp.fullName || emp.full_name || '';
+    const code = emp.employeeCode || emp.employee_code || '';
     const matchesSearch =
       searchQuery === '' ||
-      emp.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.employee_code?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      code.toLowerCase().includes(searchQuery.toLowerCase()) ||
       emp.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       emp.phone?.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -426,24 +428,24 @@ export default function EmployeeListPage() {
                             src={emp.avatar}
                             sx={{ width: 38, height: 38, bgcolor: '#eff6ff', color: '#2563eb', fontWeight: 800, fontSize: '0.875rem' }}
                           >
-                            {emp.full_name?.charAt(0)?.toUpperCase() || 'E'}
+                            {(emp.fullName || emp.full_name)?.charAt(0)?.toUpperCase() || 'E'}
                           </Avatar>
                           <Box>
                             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
-                              {emp.full_name}
+                              {emp.fullName || emp.full_name}
                             </Typography>
                             <Typography variant="caption" sx={{ color: '#64748b', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-                              {emp.employee_code}
+                              {emp.employeeCode || emp.employee_code}
                             </Typography>
                           </Box>
                         </Stack>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" sx={{ fontWeight: 700, color: '#1e293b' }}>
-                          {emp.designation_title || 'Chưa gán vị trí'}
+                          {emp.designationTitle || emp.designation_title || 'Chưa gán vị trí'}
                         </Typography>
                         <Typography variant="caption" sx={{ color: '#64748b' }}>
-                          {emp.department_name || 'Chưa phân phòng'}
+                          {emp.departmentName || emp.department_name || 'Chưa phân phòng'}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -521,13 +523,13 @@ export default function EmployeeListPage() {
                 src={selectedEmp.avatar}
                 sx={{ width: 64, height: 64, mx: 'auto', mb: 1.5, bgcolor: '#eff6ff', color: '#2563eb', fontWeight: 800, fontSize: '1.5rem' }}
               >
-                {selectedEmp.full_name?.charAt(0)?.toUpperCase()}
+                {(selectedEmp.fullName || selectedEmp.full_name)?.charAt(0)?.toUpperCase()}
               </Avatar>
               <Typography variant="h6" sx={{ fontWeight: 900, color: '#0f172a' }}>
-                {selectedEmp.full_name}
+                {selectedEmp.fullName || selectedEmp.full_name}
               </Typography>
               <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
-                {selectedEmp.employee_code}
+                {selectedEmp.employeeCode || selectedEmp.employee_code}
               </Typography>
               <Box sx={{ mt: 1 }}>{renderStatusChip(selectedEmp.status)}</Box>
 
@@ -624,7 +626,7 @@ export default function EmployeeListPage() {
         PaperProps={{ sx: { borderRadius: 3 } }}
       >
         <DialogTitle sx={{ fontWeight: 900, color: '#0f172a', borderBottom: '1px solid #e2e8f0', p: 2.5 }}>
-          {editingEmp ? `Chỉnh sửa Hồ sơ: ${editingEmp.full_name}` : 'Tạo mới Hồ sơ Nhân sự'}
+          {editingEmp ? `Chỉnh sửa Hồ sơ: ${editingEmp.fullName || editingEmp.full_name}` : 'Tạo mới Hồ sơ Nhân sự'}
         </DialogTitle>
         <DialogContent sx={{ p: 2.5, pt: '20px !important' }}>
           <Stack spacing={2.5}>

@@ -113,38 +113,63 @@ export interface CVTemplateRecord {
   name: string;
   description: string;
   category: string;
-  category_name: string;
-  thumbnail_url: string | null;
-  color_palettes: string[];
-  default_theme: Partial<CVThemeConfig>;
+  categoryName?: string;
+  category_name?: string;
+  thumbnailUrl?: string | null;
+  thumbnail_url?: string | null;
+  colorPalettes?: string[];
+  color_palettes?: string[];
+  defaultTheme?: Partial<CVThemeConfig>;
+  default_theme?: Partial<CVThemeConfig>;
+  sampleData?: Partial<CVData>;
   sample_data?: Partial<CVData>;
-  is_active: boolean;
-  is_premium: boolean;
-  is_popular: boolean;
-  sort_order: number;
-  use_count: number;
-  view_count: number;
+  isActive?: boolean;
+  is_active?: boolean;
+  isPremium?: boolean;
+  is_premium?: boolean;
+  isPopular?: boolean;
+  is_popular?: boolean;
+  sortOrder?: number;
+  sort_order?: number;
+  useCount?: number;
+  use_count?: number;
+  viewCount?: number;
+  view_count?: number;
+  createAt?: string;
   create_at?: string;
+  updateAt?: string;
   update_at?: string;
 }
 
 export interface CandidateCVListItem {
   id: number;
-  template: number | null;
-  template_code: string;
+  template?: number | null;
+  templateCode?: string;
+  template_code?: string;
+  templateName?: string;
   template_name?: string;
+  templateCategory?: string;
   template_category?: string;
   title: string;
   slug: string;
+  thumbnailUrl?: string | null;
   thumbnail_url?: string | null;
+  pdfUrl?: string | null;
   pdf_url?: string | null;
-  is_main_cv: boolean;
-  is_public: boolean;
-  views_count: number;
-  download_count: number;
+  isMainCv?: boolean;
+  is_main_cv?: boolean;
+  isPublic?: boolean;
+  is_public?: boolean;
+  viewsCount?: number;
+  views_count?: number;
+  downloadCount?: number;
+  download_count?: number;
+  aiScore?: number | null;
   ai_score?: number | null;
-  create_at: string;
-  update_at: string;
+  createAt?: string;
+  create_at?: string;
+  updateAt?: string;
+  update_at?: string;
 }
 
 export interface AICvReviewResult {
@@ -171,50 +196,77 @@ export interface AICvReviewResult {
 
 export interface CandidateCVRecord {
   id: number;
-  user: number;
-  template: number | null;
-  template_code: string;
+  user?: number;
+  template?: number | null;
+  templateCode?: string;
+  template_code?: string;
+  templateInfo?: CVTemplateRecord;
   template_info?: CVTemplateRecord;
   title: string;
   slug: string;
-  theme_config: CVThemeConfig;
-  cv_data: CVData;
+  themeConfig?: CVThemeConfig;
+  theme_config?: CVThemeConfig;
+  cvData?: CVData;
+  cv_data?: CVData;
+  thumbnailUrl?: string | null;
   thumbnail_url?: string | null;
+  pdfUrl?: string | null;
   pdf_url?: string | null;
-  is_main_cv: boolean;
-  is_public: boolean;
-  views_count: number;
-  download_count: number;
+  isMainCv?: boolean;
+  is_main_cv?: boolean;
+  isPublic?: boolean;
+  is_public?: boolean;
+  viewsCount?: number;
+  views_count?: number;
+  downloadCount?: number;
+  download_count?: number;
+  aiScore?: number | null;
   ai_score?: number | null;
+  aiReviewData?: AICvReviewResult | null;
   ai_review_data?: AICvReviewResult | null;
-  create_at: string;
-  update_at: string;
+  createAt?: string;
+  create_at?: string;
+  updateAt?: string;
+  update_at?: string;
 }
 
 export interface PublicCVRecord {
   id: number;
-  template_code: string;
+  templateCode?: string;
+  template_code?: string;
+  templateInfo?: CVTemplateRecord;
   template_info?: CVTemplateRecord;
   title: string;
   slug: string;
-  theme_config: CVThemeConfig;
-  cv_data: CVData;
+  themeConfig?: CVThemeConfig;
+  theme_config?: CVThemeConfig;
+  cvData?: CVData;
+  cv_data?: CVData;
+  thumbnailUrl?: string | null;
   thumbnail_url?: string | null;
+  pdfUrl?: string | null;
   pdf_url?: string | null;
+  candidateName?: string;
   candidate_name?: string;
-  create_at: string;
-  update_at: string;
+  createAt?: string;
+  create_at?: string;
+  updateAt?: string;
+  update_at?: string;
 }
 
 export interface CVSuggestionRecord {
   id: number;
   industry: string;
-  industry_name: string;
-  suggestion_type: 'summary' | 'experience' | 'skills';
+  industryName?: string;
+  industry_name?: string;
+  suggestionType?: 'summary' | 'experience' | 'skills';
+  suggestion_type?: 'summary' | 'experience' | 'skills';
   title: string;
   content: string;
-  skills_list: string[];
-  sort_order: number;
+  skillsList?: string[];
+  skills_list?: string[];
+  sortOrder?: number;
+  sort_order?: number;
 }
 
 export interface CVTemplateMeta {

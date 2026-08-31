@@ -43,22 +43,24 @@ const TEMPLATE_DISPLAY_INFO: Record<string, { displayName: string; tags: string[
 export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onPreview }) => {
   const router = useRouter();
   const { i18n } = useTranslation();
-  const defaultColors = template.color_palettes && template.color_palettes.length > 0
+  const defaultColors = (template.colorPalettes && template.colorPalettes.length > 0)
+    ? template.colorPalettes
+    : (template.color_palettes && template.color_palettes.length > 0)
     ? template.color_palettes
     : ['#1e40af', '#0f766e', '#374151'];
 
   const [selectedColor, setSelectedColor] = useState(
-    template.default_theme?.primaryColor || defaultColors[0] || '#1e40af'
+    template.defaultTheme?.primaryColor || template.default_theme?.primaryColor || defaultColors[0] || '#1e40af'
   );
 
   const displayInfo = TEMPLATE_DISPLAY_INFO[template.code] || {
     displayName: template.name.replace(/\s*\(.*\)/, ''),
-    tags: [template.category_name || 'Chuyên nghiệp'],
+    tags: [template.categoryName || template.category_name || 'Chuyên nghiệp'],
   };
 
   // Build rich sample data so preview is ALWAYS realistic and beautiful
   const baseSample = getSampleDataForTemplate(template.code);
-  const rawSample = (template.sample_data as CVData) || {};
+  const rawSample = ((template.sampleData || template.sample_data) as CVData) || {};
 
   const previewData: CVData = {
     ...baseSample,

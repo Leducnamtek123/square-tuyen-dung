@@ -139,6 +139,22 @@ class AdminBannerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         )
         read_only_fields = ('id', 'create_at', 'update_at', 'imageUrl', 'imageMobileUrl')
 
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, "copy") else dict(data)
+        if "buttonText" in payload and "button_text" not in payload:
+            payload["button_text"] = payload.get("buttonText")
+        if "buttonLink" in payload and "button_link" not in payload:
+            payload["button_link"] = payload.get("buttonLink")
+        if "isShowButton" in payload and "is_show_button" not in payload:
+            payload["is_show_button"] = payload.get("isShowButton")
+        if "descriptionLocation" in payload and "description_location" not in payload:
+            payload["description_location"] = payload.get("descriptionLocation")
+        if "isActive" in payload and "is_active" not in payload:
+            payload["is_active"] = payload.get("isActive")
+        if "imageMobile" in payload and "image_mobile" not in payload:
+            payload["image_mobile"] = payload.get("imageMobile")
+        return super().to_internal_value(payload)
+
     def validate(self, attrs):
         for bool_field in ('is_show_button', 'is_active'):
             val = attrs.get(bool_field)

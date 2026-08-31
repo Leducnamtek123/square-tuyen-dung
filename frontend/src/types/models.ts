@@ -259,16 +259,22 @@ export interface UserDict {
   id?: number;
   fullName?: string;
   avatarUrl?: string | null;
+  avatar?: string | null;
   email?: string;
+  phone?: string;
+  gender?: string;
+  birthday?: string;
 }
 
 /* Resume & Profile */
 
 export interface ResumeDetailResponse extends Resume {
   jobSeekerProfile?: JobSeekerProfile;
+  experienceDetails?: ExperienceDetail[];
   experiencesDetails?: ExperienceDetail[];
   educationDetails?: EducationDetail[];
   certificates?: Certificate[];
+  certificateDetails?: Certificate[];
   languageSkills?: LanguageSkill[];
   advancedSkills?: AdvancedSkill[];
   user?: User;
@@ -510,14 +516,17 @@ export interface InterviewSession {
   startTime?: string | null;
   endTime?: string | null;
   duration?: number | null;
-  candidate?: User;
-  jobPost?: JobPost | null;
+  candidateId?: number | null;
+  candidate?: User | number | null;
+  jobPostId?: number | null;
+  jobPost?: JobPost | number | null;
   jobName?: string | null;
   candidateName?: string | null;
   candidateEmail?: string | null;
   candidate_email?: string | null;
   companyName?: string | null;
-  createdBy?: User | null;
+  createdById?: number | null;
+  createdBy?: User | number | null;
   aiOverallScore?: number | null;
   ai_overall_score?: number | null;
   aiTechnicalScore?: number | null;

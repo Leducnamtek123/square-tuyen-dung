@@ -66,10 +66,12 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
 
     def get_user_dict(self, profile):
         user = profile.user
+        avatar_url = user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else None
         return {
             "fullName": user.full_name,
             "email": user.email,
-            "avatar": user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else None,
+            "avatar": avatar_url,
+            "avatarUrl": avatar_url,
             "phone": profile.phone,
             "gender": profile.gender,
             "birthday": profile.birthday,

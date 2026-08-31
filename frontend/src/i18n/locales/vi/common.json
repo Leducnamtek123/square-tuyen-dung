@@ -1861,7 +1861,9 @@
     "unverifiedAccount": "Tài khoản chưa xác thực",
     "verifiedAccount": "Tài khoản đã xác thực",
     "testModeHint": "Chế độ thử nghiệm: Nhập mã OTP",
-    "testModeInstantVerify": "để xác thực tức thì."
+    "testModeInstantVerify": "để xác thực tức thì.",
+    "loginToSyncProfile": "Đăng nhập để đồng bộ hồ sơ",
+    "loginToSyncProfileDesc": "Vui lòng đăng nhập để tự động điền kinh nghiệm, học vấn và kỹ năng từ hồ sơ của bạn vào CV."
   },
   "cvBuilder": {
     "pageTitle": "Trình Tạo & Trang Trí CV Trực Tuyến | InfoHR Tuyển Dụng",

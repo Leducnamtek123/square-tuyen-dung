@@ -351,7 +351,7 @@ const AIAnalysisDrawerStatePanels = ({
           <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
             <Chip
               size="small"
-              label={t(`appliedResume.ai.reviewStatus.${data?.aiAnalysisReviewStatus || 'ai_only'}`, {
+              label={t(`employer:appliedResume.ai.reviewStatus.${data?.aiAnalysisReviewStatus || 'ai_only'}`, {
                 defaultValue: data?.aiAnalysisReviewStatus || 'ai_only',
               })}
               sx={{ fontWeight: 800, borderRadius: 1.5 }}
@@ -360,7 +360,7 @@ const AIAnalysisDrawerStatePanels = ({
               <Chip
                 size="small"
                 variant="outlined"
-                label={t('appliedResume.ai.reviewedAtLabel', {
+                label={t('employer:appliedResume.ai.reviewedAtLabel', {
                   date: dayjs(data.aiAnalysisReviewedAt).format('DD/MM/YYYY HH:mm'),
                 })}
                 sx={{ borderRadius: 1.5 }}

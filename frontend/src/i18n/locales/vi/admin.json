@@ -1696,7 +1696,9 @@
         "active": "Hiển thị",
         "hidden": "Ẩn",
         "withEvidence": "Có bằng chứng",
-        "withoutEvidence": "Không có bằng chứng"
+        "withoutEvidence": "Không có bằng chứng",
+        "star": "sao",
+        "stars": "sao"
       },
       "deleteTitle": "Xóa Đánh giá",
       "deleteConfirm": "Bạn có chắc muốn xóa đánh giá của {{name}}?",

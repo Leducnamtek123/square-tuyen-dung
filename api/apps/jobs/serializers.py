@@ -739,13 +739,16 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
                 "fullName": activity.full_name,
                 "email": activity.email,
                 "avatar": None,
+                "avatarUrl": None,
                 "phone": activity.phone,
             }
+        avatar_url = user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else None
         return {
             "id": user.id,
             "fullName": user.full_name,
             "email": user.email,
-            "avatar": user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else None,
+            "avatar": avatar_url,
+            "avatarUrl": avatar_url,
             "phone": activity.phone,
         }
 

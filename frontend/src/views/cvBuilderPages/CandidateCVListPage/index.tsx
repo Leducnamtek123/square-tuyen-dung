@@ -106,8 +106,8 @@ export const CandidateCVListPage: React.FC = () => {
     toastMessages.success('Đã sao chép liên kết CV trực tuyến vào clipboard!');
   };
 
-  const totalViews = cvList.reduce((acc, item) => acc + (item.views_count || 0), 0);
-  const mainCV = cvList.find((item) => item.is_main_cv);
+  const totalViews = cvList.reduce((acc, item) => acc + (item.viewsCount ?? item.views_count ?? 0), 0);
+  const mainCV = cvList.find((item) => item.isMainCv ?? item.is_main_cv);
 
   return (
     <Box sx={{ width: '100%', pb: 6, display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -285,7 +285,7 @@ export const CandidateCVListPage: React.FC = () => {
                     <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem' }}>
                       {cv.title}
                     </Typography>
-                    {cv.is_main_cv && (
+                    {(cv.isMainCv ?? cv.is_main_cv) && (
                       <Chip
                         icon={<StarOutlinedIcon sx={{ fontSize: '13px !important', color: '#b45309 !important' }} />}
                         label="CV Chính"
@@ -296,13 +296,13 @@ export const CandidateCVListPage: React.FC = () => {
                   </Stack>
 
                   <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mb: 1.5 }}>
-                    Mẫu: <strong style={{ color: '#334155' }}>{cv.template_name || cv.template_code}</strong> • {new Date(cv.update_at).toLocaleDateString('vi-VN')}
+                    Mẫu: <strong style={{ color: '#334155' }}>{cv.templateName || cv.template_name || cv.templateCode || cv.template_code}</strong> • {new Date((cv.updateAt || cv.update_at) as string).toLocaleDateString('vi-VN')}
                   </Typography>
 
                   <Stack direction="row" spacing={1} alignItems="center">
                     <VisibilityOutlinedIcon sx={{ fontSize: 15, color: '#94a3b8' }} />
                     <Typography variant="caption" sx={{ color: '#64748b' }}>
-                      {cv.views_count || 0} lượt xem
+                      {cv.viewsCount ?? cv.views_count ?? 0} lượt xem
                     </Typography>
                   </Stack>
                 </Box>
@@ -330,7 +330,7 @@ export const CandidateCVListPage: React.FC = () => {
                       </Tooltip>
                     )}
 
-                    {!cv.is_main_cv && (
+                    {!(cv.isMainCv ?? cv.is_main_cv) && (
                       <Tooltip title="Đặt làm CV chính">
                         <IconButton size="small" disabled={setMainMutation.isPending} onClick={() => setMainMutation.mutate(cv.id)} sx={{ color: '#475569', '&:hover': { color: '#d97706', bgcolor: '#ffffff' } }}>
                           <StarBorderOutlinedIcon sx={{ fontSize: 18 }} />

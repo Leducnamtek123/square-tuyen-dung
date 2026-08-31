@@ -313,7 +313,8 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         for lang in resume.language_skills.all():
             languages.append({
                 'id': lang.id,
-                'language': lang.get_language_display() if lang.language else None,
+                'language': lang.language,
+                'languageName': lang.get_language_display() if lang.language else None,
                 'level': lang.level
             })
         return languages
@@ -890,6 +891,11 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 "permanentAddress", "contactAddress",
                 "emergencyContactName", "emergencyContactPhone"],
         read_only=True)
+    experienceDetails = ExperienceSerializer(
+        source="experience_details",
+        fields=['id', 'jobName', 'companyName', 'startDate', 'endDate',
+                'description', 'lastSalary', 'leaveReason'],
+        read_only=True, many=True)
     experiencesDetails = ExperienceSerializer(
         source="experience_details",
         fields=['id', 'jobName', 'companyName', 'startDate', 'endDate',
@@ -901,6 +907,10 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 'startDate', 'completedDate', 'description', 'gradeOrRank'],
         read_only=True, many=True)
     certificates = CertificateSerializer(
+        fields=['id', 'name', 'trainingPlace', 'startDate', 'expirationDate'],
+        read_only=True, many=True)
+    certificateDetails = CertificateSerializer(
+        source="certificates",
         fields=['id', 'name', 'trainingPlace', 'startDate', 'expirationDate'],
         read_only=True, many=True)
     languageSkills = LanguageSkillSerializer(
@@ -1018,7 +1028,7 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   "city", "career", "updateAt", "fileUrl",
                   "filePublicId", 'isSaved', "type",
                   "user", "jobSeekerProfile",
-                  "experiencesDetails", "educationDetails",
-                  "certificates", "languageSkills", "advancedSkills",
+                  "experienceDetails", "experiencesDetails", "educationDetails",
+                  "certificates", "certificateDetails", "languageSkills", "advancedSkills",
                   "lastViewedDate", "isSentEmail", "aiAnalysis", "matchScore",
                   "sourcePlatform", "sourceUrl", "sourceAccount", "sourceRef", "isImported")

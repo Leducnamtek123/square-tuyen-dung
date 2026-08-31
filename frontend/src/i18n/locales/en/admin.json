@@ -1747,7 +1747,9 @@
         "active": "Active",
         "hidden": "Hidden",
         "withEvidence": "With evidence",
-        "withoutEvidence": "Without evidence"
+        "withoutEvidence": "Without evidence",
+        "star": "star",
+        "stars": "stars"
       },
       "deleteTitle": "Delete Review",
       "deleteConfirm": "Are you sure you want to delete review from {{name}}?",

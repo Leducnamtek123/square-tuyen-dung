@@ -624,8 +624,16 @@ class AdminCompanyVerificationSerializer(CompanyVerificationSerializer):
 
 class CompanyRoleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     companyId = serializers.IntegerField(source="company_id", read_only=True)
+    isActive = serializers.BooleanField(source="is_active", required=False)
+    isSystem = serializers.BooleanField(source="is_system", read_only=True)
     createAt = serializers.DateTimeField(source="create_at", read_only=True)
     updateAt = serializers.DateTimeField(source="update_at", read_only=True)
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, "copy") else dict(data)
+        if "isActive" in payload and "is_active" not in payload:
+            payload["is_active"] = payload.get("isActive")
+        return super().to_internal_value(payload)
 
     def validate_permissions(self, value):
         if value is None:
@@ -657,9 +665,9 @@ class CompanyRoleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         model = CompanyRole
         fields = (
             "id", "companyId", "code", "name", "description",
-            "permissions", "is_system", "is_active", "createAt", "updateAt",
+            "permissions", "is_system", "isSystem", "is_active", "isActive", "createAt", "updateAt",
         )
-        read_only_fields = ("id", "companyId", "is_system", "createAt", "updateAt")
+        read_only_fields = ("id", "companyId", "is_system", "isSystem", "createAt", "updateAt")
 
 
 class CompanyMemberSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
@@ -669,17 +677,32 @@ class CompanyMemberSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     userDict = auth_serializers.UserSerializer(source="user", read_only=True, fields=["id", "fullName", "email", "avatarUrl"])
     invitedById = serializers.IntegerField(source="invited_by_id", read_only=True)
     companyId = serializers.IntegerField(source="company_id", read_only=True)
+    isActive = serializers.BooleanField(source="is_active", required=False)
+    invitedEmail = serializers.EmailField(source="invited_email", required=False, allow_null=True, allow_blank=True)
+    joinedAt = serializers.DateTimeField(source="joined_at", read_only=True)
     createAt = serializers.DateTimeField(source="create_at", read_only=True)
     updateAt = serializers.DateTimeField(source="update_at", read_only=True)
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, "copy") else dict(data)
+        if "roleId" in payload and "role_id" not in payload:
+            payload["role_id"] = payload.get("roleId")
+        if "userId" in payload and "user_id" not in payload:
+            payload["user_id"] = payload.get("userId")
+        if "invitedEmail" in payload and "invited_email" not in payload:
+            payload["invited_email"] = payload.get("invitedEmail")
+        if "isActive" in payload and "is_active" not in payload:
+            payload["is_active"] = payload.get("isActive")
+        return super().to_internal_value(payload)
 
     class Meta:
         model = CompanyMember
         fields = (
             "id", "companyId", "userId", "userDict", "roleId", "role",
-            "status", "joined_at", "invited_email", "invitedById",
-            "is_active", "createAt", "updateAt",
+            "status", "joined_at", "joinedAt", "invited_email", "invitedEmail", "invitedById",
+            "is_active", "isActive", "createAt", "updateAt",
         )
-        read_only_fields = ("id", "companyId", "userDict", "role", "invitedById", "createAt", "updateAt")
+        read_only_fields = ("id", "companyId", "userDict", "role", "joinedAt", "invitedById", "createAt", "updateAt")
 
     def update(self, instance, validated_data):
         validated_data.pop("user_id", None)

@@ -1861,7 +1861,9 @@
     "unverifiedAccount": "Unverified Account",
     "verifiedAccount": "Verified Account",
     "testModeHint": "Test Mode: Enter OTP",
-    "testModeInstantVerify": "for instant verification."
+    "testModeInstantVerify": "for instant verification.",
+    "loginToSyncProfile": "Sign in to sync profile",
+    "loginToSyncProfileDesc": "Please sign in to auto-fill experience, education, and skills from your profile into your CV."
   },
   "cvBuilder": {
     "pageTitle": "Online CV Builder & Designer | InfoHR Recruitment",

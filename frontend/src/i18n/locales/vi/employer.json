@@ -81,6 +81,12 @@
       "overrideScore": "Điểm ghi đè",
       "reviewNote": "Ghi chú rà soát",
       "saveReview": "Lưu rà soát",
+      "reviewedAtLabel": "Đã đánh giá: {{date}}",
+      "reviewStatus": {
+        "ai_only": "Chỉ AI",
+        "reviewed": "Đã rà soát",
+        "overridden": "Đã ghi đè điểm"
+      },
       "criteriaTitle": "Tiêu chí có trọng số",
       "evidenceTitle": "Bằng chứng",
       "identityWarningTitle": "Cảnh báo tên CV không khớp",

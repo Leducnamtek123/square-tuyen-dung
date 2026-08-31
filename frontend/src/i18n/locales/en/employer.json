@@ -81,6 +81,12 @@
       "overrideScore": "Override score",
       "reviewNote": "Review note",
       "saveReview": "Save review",
+      "reviewedAtLabel": "Reviewed: {{date}}",
+      "reviewStatus": {
+        "ai_only": "AI Only",
+        "reviewed": "Reviewed",
+        "overridden": "Score Overridden"
+      },
       "criteriaTitle": "Weighted criteria",
       "evidenceTitle": "Evidence",
       "identityWarningTitle": "CV name mismatch warning",

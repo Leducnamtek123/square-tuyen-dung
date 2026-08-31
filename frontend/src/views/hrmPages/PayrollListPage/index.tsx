@@ -176,10 +176,10 @@ export default function PayrollListPage() {
               </Box>
               <Box>
                 <Typography variant="caption" color="text.secondary" fontWeight={500}>
-                  Tổng Lương Gross
+                  Tổng Quỹ Lương Gross
                 </Typography>
-                <Typography variant="h6" fontWeight={700} color="text.primary">
-                  {formatVND(kpis?.total_gross)}
+                <Typography variant="h6" fontWeight={700} color="#2563eb">
+                  {formatVND(kpis?.totalGross ?? kpis?.total_gross)}
                 </Typography>
               </Box>
             </Stack>
@@ -194,10 +194,10 @@ export default function PayrollListPage() {
               </Box>
               <Box>
                 <Typography variant="caption" color="text.secondary" fontWeight={500}>
-                  Tổng Lương Net (Thực nhận)
+                  Tổng Thực Nhận (Net)
                 </Typography>
                 <Typography variant="h6" fontWeight={700} color="#16a34a">
-                  {formatVND(kpis?.total_net)}
+                  {formatVND(kpis?.totalNet ?? kpis?.total_net)}
                 </Typography>
               </Box>
             </Stack>
@@ -215,7 +215,7 @@ export default function PayrollListPage() {
                   Tổng Thuế TNCN
                 </Typography>
                 <Typography variant="h6" fontWeight={700} color="#d97706">
-                  {formatVND(kpis?.total_pit)}
+                  {formatVND(kpis?.totalPit ?? kpis?.total_pit)}
                 </Typography>
               </Box>
             </Stack>
@@ -233,7 +233,7 @@ export default function PayrollListPage() {
                   BH NSDLĐ Đóng (23.5%)
                 </Typography>
                 <Typography variant="h6" fontWeight={700} color="#9333ea">
-                  {formatVND(kpis?.total_employer_insurance)}
+                  {formatVND(kpis?.totalEmployerInsurance ?? kpis?.total_employer_insurance)}
                 </Typography>
               </Box>
             </Stack>
@@ -251,7 +251,7 @@ export default function PayrollListPage() {
                   Tổng Chi Phí Doanh Nghiệp
                 </Typography>
                 <Typography variant="h6" fontWeight={700} color="#dc2626">
-                  {formatVND(kpis?.total_company_expense)}
+                  {formatVND(kpis?.totalCompanyExpense ?? kpis?.total_company_expense)}
                 </Typography>
               </Box>
             </Stack>
@@ -364,32 +364,32 @@ export default function PayrollListPage() {
                 payrollRecords.map((row) => (
                   <TableRow key={row.id} hover>
                     <TableCell sx={{ fontWeight: 600, color: 'primary.main' }}>
-                      {row.employee_code}
+                      {row.employeeCode || row.employee_code}
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{row.employee_name}</TableCell>
-                    <TableCell>{row.department_name || '-'}</TableCell>
-                    <TableCell align="right">{formatVND(row.gross_salary)}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{row.employeeName || row.employee_name}</TableCell>
+                    <TableCell>{row.departmentName || row.department_name || '-'}</TableCell>
+                    <TableCell align="right">{formatVND(row.grossSalary ?? row.gross_salary)}</TableCell>
                     <TableCell align="center">
                       <Chip
                         size="small"
-                        label={`${row.working_days_actual} / ${row.standard_working_days}`}
+                        label={`${row.workingDaysActual ?? row.working_days_actual} / ${row.standardWorkingDays ?? row.standard_working_days}`}
                         sx={{ bgcolor: pc.bgDefault(0.6), fontWeight: 600 }}
                       />
                     </TableCell>
                     <TableCell align="right" sx={{ fontWeight: 600 }}>
-                      {formatVND(row.total_income)}
+                      {formatVND(row.totalIncome ?? row.total_income)}
                     </TableCell>
                     <TableCell align="right" sx={{ color: '#dc2626' }}>
-                      -{formatVND(row.total_insurance)}
+                      -{formatVND(row.totalInsurance ?? row.total_insurance)}
                     </TableCell>
                     <TableCell align="right" sx={{ color: '#d97706' }}>
-                      -{formatVND(row.personal_income_tax)}
+                      -{formatVND(row.personalIncomeTax ?? row.personal_income_tax)}
                     </TableCell>
                     <TableCell align="right" sx={{ fontWeight: 700, color: '#16a34a', fontSize: '0.95rem' }}>
-                      {formatVND(row.net_salary)}
+                      {formatVND(row.netSalary ?? row.net_salary)}
                     </TableCell>
                     <TableCell align="right" sx={{ fontWeight: 600, color: '#9333ea' }}>
-                      {formatVND(row.total_company_expense)}
+                      {formatVND(row.totalCompanyExpense ?? row.total_company_expense)}
                     </TableCell>
                     <TableCell align="center">
                       {row.status === 'PAID' ? (
@@ -508,16 +508,16 @@ export default function PayrollListPage() {
             <Grid container spacing={2} sx={{ mb: 2.5, bgcolor: pc.bgDefault(0.4), p: 2, borderRadius: 2 }}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="body2" color="text.secondary">Họ và tên:</Typography>
-                <Typography variant="subtitle1" fontWeight={700}>{viewingPayslip.employee_name}</Typography>
+                <Typography variant="subtitle1" fontWeight={700}>{viewingPayslip.employeeName || viewingPayslip.employee_name}</Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Mã nhân viên:</Typography>
-                <Typography variant="body2" fontWeight={600}>{viewingPayslip.employee_code}</Typography>
+                <Typography variant="body2" fontWeight={600}>{viewingPayslip.employeeCode || viewingPayslip.employee_code}</Typography>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="body2" color="text.secondary">Phòng ban:</Typography>
-                <Typography variant="body2" fontWeight={600}>{viewingPayslip.department_name || 'Chưa phân bổ'}</Typography>
+                <Typography variant="body2" fontWeight={600}>{viewingPayslip.departmentName || viewingPayslip.department_name || 'Chưa phân bổ'}</Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Ngày công thực tế:</Typography>
                 <Typography variant="body2" fontWeight={600}>
-                  {viewingPayslip.working_days_actual} / {viewingPayslip.standard_working_days} ngày
+                  {viewingPayslip.workingDaysActual ?? viewingPayslip.working_days_actual} / {viewingPayslip.standardWorkingDays ?? viewingPayslip.standard_working_days} ngày
                 </Typography>
               </Grid>
             </Grid>
@@ -532,7 +532,7 @@ export default function PayrollListPage() {
                 <Stack spacing={1}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="body2" color="text.secondary">Lương Gross hợp đồng:</Typography>
-                    <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.gross_salary)}</Typography>
+                    <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.grossSalary ?? viewingPayslip.gross_salary)}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="body2" color="text.secondary">Phụ cấp:</Typography>
@@ -545,7 +545,7 @@ export default function PayrollListPage() {
                   <Divider />
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="body2" fontWeight={700}>Tổng thu nhập:</Typography>
-                    <Typography variant="body2" fontWeight={700} color="primary.main">{formatVND(viewingPayslip.total_income)}</Typography>
+                    <Typography variant="body2" fontWeight={700} color="primary.main">{formatVND(viewingPayslip.totalIncome ?? viewingPayslip.total_income)}</Typography>
                   </Box>
                 </Stack>
               </Grid>
@@ -558,25 +558,25 @@ export default function PayrollListPage() {
                 <Stack spacing={1}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="body2" color="text.secondary">BHXH (8%):</Typography>
-                    <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.bhxh_amount)}</Typography>
+                    <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.bhxhAmount ?? viewingPayslip.bhxh_amount)}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="body2" color="text.secondary">BHYT (1.5%):</Typography>
-                    <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.bhyt_amount)}</Typography>
+                    <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.bhytAmount ?? viewingPayslip.bhyt_amount)}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="body2" color="text.secondary">BHTN (1%):</Typography>
-                    <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.bhtn_amount)}</Typography>
+                    <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.bhtnAmount ?? viewingPayslip.bhtn_amount)}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="body2" color="text.secondary">Thuế TNCN lũy tiến:</Typography>
-                    <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.personal_income_tax)}</Typography>
+                    <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.personalIncomeTax ?? viewingPayslip.personal_income_tax)}</Typography>
                   </Box>
                   <Divider />
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="body2" fontWeight={700}>Tổng giảm trừ:</Typography>
                     <Typography variant="body2" fontWeight={700} color="error.main">
-                      {formatVND(Number(viewingPayslip.total_insurance) + Number(viewingPayslip.personal_income_tax))}
+                      {formatVND(Number(viewingPayslip.totalInsurance ?? viewingPayslip.total_insurance ?? 0) + Number(viewingPayslip.personalIncomeTax ?? viewingPayslip.personal_income_tax ?? 0))}
                     </Typography>
                   </Box>
                 </Stack>
@@ -589,7 +589,7 @@ export default function PayrollListPage() {
                 THỰC LĨNH (NET SALARY):
               </Typography>
               <Typography variant="h5" fontWeight={800} color="#15803d">
-                {formatVND(viewingPayslip.net_salary)}
+                {formatVND(viewingPayslip.netSalary ?? viewingPayslip.net_salary)}
               </Typography>
             </Box>
 
@@ -601,19 +601,19 @@ export default function PayrollListPage() {
               <Grid container spacing={2}>
                 <Grid size={{ xs: 6, sm: 3 }}>
                   <Typography variant="caption" color="text.secondary">BHXH (17.5%):</Typography>
-                  <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.employer_bhxh)}</Typography>
+                  <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.employerBhxh ?? viewingPayslip.employer_bhxh)}</Typography>
                 </Grid>
                 <Grid size={{ xs: 6, sm: 3 }}>
                   <Typography variant="caption" color="text.secondary">BHYT (3%):</Typography>
-                  <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.employer_bhyt)}</Typography>
+                  <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.employerBhyt ?? viewingPayslip.employer_bhyt)}</Typography>
                 </Grid>
                 <Grid size={{ xs: 6, sm: 3 }}>
                   <Typography variant="caption" color="text.secondary">BHTN (1%):</Typography>
-                  <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.employer_bhtn)}</Typography>
+                  <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.employerBhtn ?? viewingPayslip.employer_bhtn)}</Typography>
                 </Grid>
                 <Grid size={{ xs: 6, sm: 3 }}>
                   <Typography variant="caption" color="text.secondary">Công đoàn (2%):</Typography>
-                  <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.employer_union_fee)}</Typography>
+                  <Typography variant="body2" fontWeight={600}>{formatVND(viewingPayslip.employerUnionFee ?? viewingPayslip.employer_union_fee)}</Typography>
                 </Grid>
               </Grid>
               <Divider sx={{ my: 1.5 }} />
@@ -622,7 +622,7 @@ export default function PayrollListPage() {
                   Tổng chi phí nhân sự Doanh nghiệp chi trả:
                 </Typography>
                 <Typography variant="subtitle1" fontWeight={700} color="#7e22ce">
-                  {formatVND(viewingPayslip.total_company_expense)}
+                  {formatVND(viewingPayslip.totalCompanyExpense ?? viewingPayslip.total_company_expense)}
                 </Typography>
               </Box>
             </Box>

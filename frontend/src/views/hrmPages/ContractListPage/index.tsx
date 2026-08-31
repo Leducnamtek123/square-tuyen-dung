@@ -96,19 +96,21 @@ export default function ContractListPage() {
 
   const totalContracts = contracts.length;
   const activeContracts = contracts.filter((c) => c.status === 'ACTIVE').length;
-  const probationContracts = contracts.filter((c) => c.contract_type === 'PROBATION').length;
+  const probationContracts = contracts.filter((c) => (c.contractType || c.contract_type) === 'PROBATION').length;
   
   const expiringSoonCount = contracts.filter((c) => {
-    if (!c.end_date || c.status !== 'ACTIVE') return false;
-    const diff = dayjs(c.end_date).diff(dayjs(), 'day');
+    const endDate = c.endDate || c.end_date;
+    if (!endDate || c.status !== 'ACTIVE') return false;
+    const diff = dayjs(endDate).diff(dayjs(), 'day');
     return diff >= 0 && diff <= 30;
   }).length;
 
   const handleOpenCreate = () => {
     setEditingContract(null);
     const selectedEmp = employees.length > 0 ? employees[0] : null;
-    const defaultContractNum = selectedEmp?.employee_code
-      ? `HD-${selectedEmp.employee_code}-01`
+    const empCode = selectedEmp?.employeeCode || selectedEmp?.employee_code;
+    const defaultContractNum = empCode
+      ? `HD-${empCode}-01`
       : `HD-${dayjs().format('YYYYMMDD')}-01`;
     setForm({
       employee: selectedEmp ? String(selectedEmp.id) : '',
@@ -128,11 +130,11 @@ export default function ContractListPage() {
     setEditingContract(c);
     setForm({
       employee: String(c.employee),
-      contract_number: c.contract_number,
-      contract_type: c.contract_type || 'FIXED_TERM',
-      start_date: c.start_date || new Date().toISOString().split('T')[0],
-      end_date: c.end_date || '',
-      base_salary: Number(c.base_salary || 0),
+      contract_number: c.contractNumber || c.contract_number || '',
+      contract_type: (c.contractType || c.contract_type || 'FIXED_TERM') as 'PROBATION' | 'FIXED_TERM' | 'INDEFINITE',
+      start_date: c.startDate || c.start_date || new Date().toISOString().split('T')[0],
+      end_date: c.endDate || c.end_date || '',
+      base_salary: Number(c.baseSalary ?? c.base_salary ?? 0),
       allowance: Number(c.allowance || 0),
       status: c.status || 'ACTIVE',
       notes: c.notes || '',
@@ -147,20 +149,28 @@ export default function ContractListPage() {
       contract_number: form.contract_number,
       contract_type: form.contract_type,
       start_date: form.start_date,
-      end_date: form.end_date || undefined,
+      end_date: form.contract_type === 'INDEFINITE' ? null : form.end_date || null,
       base_salary: Number(form.base_salary),
       allowance: Number(form.allowance),
       status: form.status,
-      notes: form.notes || undefined,
+      notes: form.notes,
     };
 
     if (editingContract) {
-      updateContract.mutate({ id: editingContract.id, data: payload as any }, {
-        onSuccess: () => setOpenModal(false),
-      });
+      updateContract.mutate(
+        { id: editingContract.id, data: payload },
+        {
+          onSuccess: () => {
+            setOpenModal(false);
+            setEditingContract(null);
+          },
+        }
+      );
     } else {
-      createContract.mutate(payload as any, {
-        onSuccess: () => setOpenModal(false),
+      createContract.mutate(payload, {
+        onSuccess: () => {
+          setOpenModal(false);
+        },
       });
     }
   };
@@ -174,17 +184,20 @@ export default function ContractListPage() {
 
   const handleOpenRenew = (c: NativeContract) => {
     setRenewingContract(c);
-    const startDate = c.end_date ? dayjs(c.end_date).add(1, 'day').format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
+    const contractEnd = c.endDate || c.end_date;
+    const startDate = contractEnd ? dayjs(contractEnd).add(1, 'day').format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
     const endDate = dayjs(startDate).add(1, 'year').format('YYYY-MM-DD');
-    const baseNum = c.contract_number.replace(/-PL\d+$/, '');
+    const contractNum = c.contractNumber || c.contract_number || 'HD';
+    const contractType = c.contractType || c.contract_type || 'FIXED_TERM';
+    const baseNum = contractNum.replace(/-PL\d+$/, '');
     setRenewForm({
       contract_number: `${baseNum}-PL01`,
-      contract_type: c.contract_type === 'PROBATION' ? 'FIXED_TERM' : c.contract_type,
+      contract_type: contractType === 'PROBATION' ? 'FIXED_TERM' : (contractType as 'PROBATION' | 'FIXED_TERM' | 'INDEFINITE'),
       start_date: startDate,
       end_date: endDate,
-      base_salary: Number(c.base_salary || 0),
+      base_salary: Number(c.baseSalary ?? c.base_salary ?? 0),
       allowance: Number(c.allowance || 0),
-      notes: `Gia hạn từ hợp đồng ${c.contract_number}`,
+      notes: `Gia hạn từ hợp đồng ${contractNum}`,
     });
   };
 
@@ -211,7 +224,7 @@ export default function ContractListPage() {
     );
   };
 
-  const renderExpirationBadge = (endDateStr?: string) => {
+  const renderExpirationBadge = (endDateStr?: string | null) => {
     if (!endDateStr) {
       return <Typography variant="caption" sx={{ color: '#64748b' }}>Không thời hạn</Typography>;
     }
@@ -245,7 +258,7 @@ export default function ContractListPage() {
     );
   };
 
-  const renderContractTypeChip = (type: string) => {
+  const renderContractTypeChip = (type?: string) => {
     switch (type) {
       case 'PROBATION':
         return <Chip label="Thử việc" size="small" sx={{ fontWeight: 800, fontSize: '0.725rem', bgcolor: '#fffbeb', color: '#d97706', borderRadius: 1.5 }} />;
@@ -254,7 +267,7 @@ export default function ContractListPage() {
       case 'INDEFINITE':
         return <Chip label="Không xác định thời hạn" size="small" sx={{ fontWeight: 800, fontSize: '0.725rem', bgcolor: '#f0fdf4', color: '#16a34a', borderRadius: 1.5 }} />;
       default:
-        return <Chip label={type} size="small" sx={{ borderRadius: 1.5 }} />;
+        return <Chip label={type || 'Hợp đồng'} size="small" sx={{ borderRadius: 1.5 }} />;
     }
   };
 
@@ -388,20 +401,20 @@ export default function ContractListPage() {
                     <TableRow key={c.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
                       <TableCell>
                         <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#2563eb', fontFamily: 'var(--font-mono)' }}>
-                          {c.contract_number}
+                          {c.contractNumber || c.contract_number}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ fontWeight: 700, color: '#0f172a' }}>
-                        {c.employee_name || `#${c.employee}`}
+                        {c.employeeName || c.employee_name || `#${c.employee}`}
                       </TableCell>
-                      <TableCell>{renderContractTypeChip(c.contract_type)}</TableCell>
+                      <TableCell>{renderContractTypeChip(c.contractType || c.contract_type)}</TableCell>
                       <TableCell sx={{ fontWeight: 800, color: '#16a34a', fontFamily: 'var(--font-mono)', fontSize: '0.875rem' }}>
-                        {Number(c.base_salary || 0).toLocaleString()} ₫
+                        {Number(c.baseSalary ?? c.base_salary ?? 0).toLocaleString()} ₫
                       </TableCell>
                       <TableCell sx={{ fontFamily: 'var(--font-mono)', fontSize: '0.8125rem', color: '#475569' }}>
-                        {c.start_date}
+                        {c.startDate || c.start_date}
                       </TableCell>
-                      <TableCell>{renderExpirationBadge(c.end_date)}</TableCell>
+                      <TableCell>{renderExpirationBadge(c.endDate || c.end_date)}</TableCell>
                       <TableCell align="right">
                         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                           <Tooltip title="Tái ký / Gia hạn hợp đồng">
@@ -452,7 +465,7 @@ export default function ContractListPage() {
               sx={inputSx}
             >
               {employees.map((emp) => (
-                <MenuItem key={emp.id} value={emp.id}>{emp.full_name} ({emp.employee_code})</MenuItem>
+                <MenuItem key={emp.id} value={emp.id}>{emp.fullName || emp.full_name} ({emp.employeeCode || emp.employee_code})</MenuItem>
               ))}
             </TextField>
 

@@ -65,13 +65,13 @@ export const PublicCVPage: React.FC = () => {
 
   TabTitle(
     cvRecord
-      ? `${cvRecord.title} - ${cvRecord.candidate_name || 'Hồ sơ Ứng viên'} | InfoHR Tuyển Dụng`
+      ? `${cvRecord.title} - ${cvRecord.candidateName || cvRecord.candidate_name || 'Hồ sơ Ứng viên'} | InfoHR Tuyển Dụng`
       : 'Hồ Sơ CV Trực Tuyến | InfoHR Tuyển Dụng'
   );
 
   const handleDownloadPDF = () => {
     if (!cvRecord) return;
-    const docTitle = `CV_${(cvRecord.candidate_name || 'Ung_Vien').replace(/\s+/g, '_')}`;
+    const docTitle = `CV_${(cvRecord.candidateName || cvRecord.candidate_name || 'Ung_Vien').replace(/\s+/g, '_')}`;
     printCVToPDF('cv-print-area', docTitle);
     toastMessages.success('Đang chuẩn bị in bản CV PDF A4 chất lượng cao...');
   };
@@ -125,13 +125,40 @@ export const PublicCVPage: React.FC = () => {
     );
   }
 
+  const cvDataVal = (cvRecord.cvData || cvRecord.cv_data || {}) as Partial<CVData>;
+  const themeConfigVal = cvRecord.themeConfig || cvRecord.theme_config || {};
+  const templateCodeVal = cvRecord.templateCode || cvRecord.template_code || 'modern-navy';
+
   const cvData: CVData = {
-    ...cvRecord.cv_data,
-    templateId: cvRecord.template_code,
+    title: cvRecord.title || 'CV Ứng viên',
+    templateId: templateCodeVal,
     theme: {
-      ...(cvRecord.cv_data?.theme || {}),
-      ...(cvRecord.theme_config || {}),
+      primaryColor: '#1e40af',
+      fontFamily: 'Inter',
+      fontSize: 'medium',
+      spacing: 'normal',
+      avatarShape: 'circle',
+      showAvatar: true,
+      paperSize: 'A4',
+      ...(cvDataVal.theme || {}),
+      ...themeConfigVal,
     },
+    personalInfo: {
+      fullName: cvRecord.candidateName || cvRecord.candidate_name || '',
+      title: '',
+      email: '',
+      phoneNumber: '',
+      address: '',
+      bio: '',
+      ...(cvDataVal.personalInfo || {}),
+    },
+    experiences: cvDataVal.experiences || [],
+    educations: cvDataVal.educations || [],
+    skills: cvDataVal.skills || [],
+    languages: cvDataVal.languages || [],
+    certificates: cvDataVal.certificates || [],
+    projects: cvDataVal.projects || [],
+    ...cvDataVal,
   };
 
   return (
@@ -155,26 +182,33 @@ export const PublicCVPage: React.FC = () => {
           gap: 2,
         }}
       >
+        {/* Left Candidate Info */}
         <Stack direction="row" spacing={2} alignItems="center">
-          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Box sx={{ width: 32, height: 32, borderRadius: '8px', bgcolor: '#1e40af', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.8rem' }}>
-              HR
-            </Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0f172a', display: { xs: 'none', sm: 'block' } }}>
-              InfoHR
-            </Typography>
-          </Link>
+          <Button
+            component={Link}
+            href="/"
+            size="small"
+            startIcon={<ArrowBackIcon sx={{ fontSize: 16 }} />}
+            sx={{
+              color: '#475569',
+              textTransform: 'none',
+              fontWeight: 700,
+              fontSize: '0.8125rem',
+              borderRadius: 1.5,
+              '&:hover': { bgcolor: '#f1f5f9' },
+            }}
+          >
+            Trang chủ
+          </Button>
 
-          <Box sx={{ width: '1px', height: 24, bgcolor: '#e2e8f0' }} />
-
-          <Box>
+          <Box sx={{ borderLeft: '1px solid #e2e8f0', pl: 2 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.9rem' }}>
               {cvRecord.title}
             </Typography>
             <Stack direction="row" spacing={1} alignItems="center">
               <CheckCircleOutlineIcon sx={{ fontSize: 14, color: '#16a34a' }} />
               <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.725rem' }}>
-                Hồ sơ ứng viên xác thực • Cập nhật {new Date(cvRecord.update_at).toLocaleDateString('vi-VN')}
+                Hồ sơ ứng viên xác thực • Cập nhật {new Date((cvRecord.updateAt || cvRecord.update_at || Date.now()) as string).toLocaleDateString('vi-VN')}
               </Typography>
             </Stack>
           </Box>

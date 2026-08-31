@@ -92,21 +92,26 @@ export const CVEditorPage: React.FC = () => {
         try {
           const record = await cvBuilderService.getCandidateCVDetail(Number(cvIdParam));
           setActiveCVId(record.id);
-          setCvSlug(record.slug);
-          setIsPublic(record.is_public);
-          setIsMainCv(record.is_main_cv);
+          const isPublicVal = record.isPublic ?? record.is_public ?? false;
+          const isMainCvVal = record.isMainCv ?? record.is_main_cv ?? false;
+          const templateCodeVal = record.templateCode || record.template_code || 'modern-navy';
+          const themeConfigVal = record.themeConfig || record.theme_config || {};
+          const cvDataVal = record.cvData || record.cv_data || {};
+
+          setIsPublic(isPublicVal);
+          setIsMainCv(isMainCvVal);
 
           const templateMeta =
-            CV_TEMPLATES_CATALOG.find((t) => t.id === record.template_code) || CV_TEMPLATES_CATALOG[0];
+            CV_TEMPLATES_CATALOG.find((t) => t.id === templateCodeVal) || CV_TEMPLATES_CATALOG[0];
           const baseEmpty = createEmptyCVData(
-            record.template_code || 'modern-navy',
+            templateCodeVal,
             templateMeta.defaultColors[0]
           );
 
-          const rawCV = record.cv_data || {};
+          const rawCV = (cvDataVal as Partial<CVData>) || {};
           const mergedTheme = {
             ...baseEmpty.theme,
-            ...(record.theme_config || {}),
+            ...themeConfigVal,
             ...(rawCV.theme || {}),
           };
 
@@ -115,7 +120,7 @@ export const CVEditorPage: React.FC = () => {
             ...rawCV,
             id: record.id,
             title: record.title || t('cvBuilder.untitledCv', 'CV Chưa Đặt Tên'),
-            templateId: record.template_code || 'modern-navy',
+            templateId: templateCodeVal,
             personalInfo: {
               ...baseEmpty.personalInfo,
               ...(rawCV.personalInfo || {}),

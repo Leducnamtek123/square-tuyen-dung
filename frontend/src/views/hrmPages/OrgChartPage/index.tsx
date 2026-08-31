@@ -134,13 +134,13 @@ export default function OrgChartPage() {
                   {nodeName}
                 </Typography>
                 <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 500 }}>
-                  Trưởng phòng: <strong style={{ color: '#1e293b' }}>{node.manager_name || 'Chưa gán'}</strong>
+                  Trưởng phòng: <strong style={{ color: '#1e293b' }}>{node.managerName || node.manager_name || 'Chưa gán'}</strong>
                 </Typography>
               </Box>
             </Stack>
 
             <Chip
-              label={`${node.employee_count ?? 0} Nhân sự`}
+              label={`${node.employeeCount ?? node.employee_count ?? 0} Nhân sự`}
               size="small"
               sx={{
                 fontWeight: 800,

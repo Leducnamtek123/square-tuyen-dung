@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
 import ThemeRegistry from '../components/ThemeRegistry/ThemeRegistry';
 import { Providers } from './providers';
@@ -88,6 +89,22 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body style={{ fontFamily: 'var(--font-inter), var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }} suppressHydrationWarning>
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-JCRQ029S1S"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-JCRQ029S1S');
+            `,
+          }}
+        />
         <div className="bg-atmosphere" />
         <ThemeRegistry>
           <Providers>

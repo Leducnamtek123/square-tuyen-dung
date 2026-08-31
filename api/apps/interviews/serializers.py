@@ -420,6 +420,18 @@ class InterviewEvaluationSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'evaluator', 'create_at', 'update_at']
 
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, "copy") else dict(data)
+        if "attitudeScore" in payload and "attitude_score" not in payload:
+            payload["attitude_score"] = payload.get("attitudeScore")
+        if "professionalScore" in payload and "professional_score" not in payload:
+            payload["professional_score"] = payload.get("professionalScore")
+        if "overallScore" in payload and "overall_score" not in payload:
+            payload["overall_score"] = payload.get("overallScore")
+        if "proposedSalary" in payload and "proposed_salary" not in payload:
+            payload["proposed_salary"] = payload.get("proposedSalary")
+        return super().to_internal_value(payload)
+
     def validate(self, attrs):
         attitude = attrs.get("attitude_score")
         professional = attrs.get("professional_score")
@@ -531,6 +543,20 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
             'question_group', 'question_ids', 'voice_profile'
         ]
 
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, "copy") else dict(data)
+        if "jobPost" in payload and "job_post" not in payload:
+            payload["job_post"] = payload.get("jobPost")
+        if "scheduledAt" in payload and "scheduled_at" not in payload:
+            payload["scheduled_at"] = payload.get("scheduledAt")
+        if "questionIds" in payload and "question_ids" not in payload:
+            payload["question_ids"] = payload.get("questionIds")
+        if "questionGroup" in payload and "question_group" not in payload:
+            payload["question_group"] = payload.get("questionGroup")
+        if "voiceProfile" in payload and "voice_profile" not in payload:
+            payload["voice_profile"] = payload.get("voiceProfile")
+        return super().to_internal_value(payload)
+
     def get_fields(self):
         fields = super().get_fields()
         request = self.context.get("request")
@@ -601,6 +627,14 @@ class AppendTranscriptSerializer(serializers.Serializer):
     speaker_role = serializers.ChoiceField(choices=['ai_agent', 'candidate'])
     content = serializers.CharField()
     speech_duration_ms = serializers.IntegerField(required=False, allow_null=True)
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, "copy") else dict(data)
+        if "speakerRole" in payload and "speaker_role" not in payload:
+            payload["speaker_role"] = payload.get("speakerRole")
+        if "speechDurationMs" in payload and "speech_duration_ms" not in payload:
+            payload["speech_duration_ms"] = payload.get("speechDurationMs")
+        return super().to_internal_value(payload)
 
 class UpdateStatusSerializer(serializers.Serializer):
     """Serializer cập nhật status."""

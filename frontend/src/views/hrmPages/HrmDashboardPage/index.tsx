@@ -124,14 +124,14 @@ export default function HrmDashboardPage() {
     );
   };
 
-  const totalEmployeesCount = (stats?.active_employees || 0) + (stats?.probation_employees || 0);
+  const totalEmployeesCount = (stats?.activeEmployees ?? stats?.active_employees ?? 0) + (stats?.probationEmployees ?? stats?.probation_employees ?? 0);
   const pendingLeaves = leaveRequests.filter((l) => l.status === 'PENDING');
   const recentEmployees = [...employees].slice(0, 5);
 
   const kpis = [
     {
       title: 'Nhân sự Chính thức',
-      value: stats?.active_employees ?? 0,
+      value: stats?.activeEmployees ?? stats?.active_employees ?? 0,
       icon: <PeopleAltOutlinedIcon sx={{ fontSize: 24 }} />,
       color: '#2563eb',
       bgColor: '#eff6ff',
@@ -140,7 +140,7 @@ export default function HrmDashboardPage() {
     },
     {
       title: 'Nhân sự Thử việc',
-      value: stats?.probation_employees ?? 0,
+      value: stats?.probationEmployees ?? stats?.probation_employees ?? 0,
       icon: <BadgeOutlinedIcon sx={{ fontSize: 24 }} />,
       color: '#d97706',
       bgColor: '#fffbeb',
@@ -149,7 +149,7 @@ export default function HrmDashboardPage() {
     },
     {
       title: 'Đơn nghỉ phép chờ duyệt',
-      value: stats?.pending_leaves ?? pendingLeaves.length,
+      value: stats?.pendingLeaves ?? stats?.pending_leaves ?? pendingLeaves.length,
       icon: <EventBusyOutlinedIcon sx={{ fontSize: 24 }} />,
       color: '#ea580c',
       bgColor: '#fff7ed',
@@ -158,7 +158,7 @@ export default function HrmDashboardPage() {
     },
     {
       title: 'Hợp đồng cần tái ký',
-      value: stats?.expiring_contracts ?? 0,
+      value: stats?.expiringContracts ?? stats?.expiring_contracts ?? 0,
       icon: <AssignmentOutlinedIcon sx={{ fontSize: 24 }} />,
       color: '#dc2626',
       bgColor: '#fef2f2',
@@ -371,13 +371,14 @@ export default function HrmDashboardPage() {
                 </Stack>
 
                 <Stack spacing={2}>
-                  {(stats?.department_breakdown || []).length === 0 ? (
+                  {(stats?.departmentBreakdown || stats?.department_breakdown || []).length === 0 ? (
                     <Typography variant="body2" sx={{ color: '#94a3b8', py: 3, textAlign: 'center' }}>
                       Chưa có dữ liệu phòng ban.
                     </Typography>
                   ) : (
-                    (stats?.department_breakdown || []).slice(0, 5).map((dept) => {
-                      const percentage = totalEmployeesCount > 0 ? Math.round((dept.emp_count / totalEmployeesCount) * 100) : 0;
+                    (stats?.departmentBreakdown || stats?.department_breakdown || []).slice(0, 5).map((dept) => {
+                      const count = dept.empCount ?? dept.emp_count ?? 0;
+                      const percentage = totalEmployeesCount > 0 ? Math.round((count / totalEmployeesCount) * 100) : 0;
                       return (
                         <Box key={dept.id}>
                           <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.75 }}>
@@ -385,7 +386,7 @@ export default function HrmDashboardPage() {
                               {dept.name}
                             </Typography>
                             <Typography variant="body2" sx={{ fontWeight: 800, color: '#64748b', fontSize: '0.8125rem', fontFamily: 'var(--font-mono)' }}>
-                              {dept.emp_count} nhân sự ({percentage}%)
+                              {count} nhân sự ({percentage}%)
                             </Typography>
                           </Stack>
                           <LinearProgress
@@ -528,10 +529,10 @@ export default function HrmDashboardPage() {
                       {pendingLeaves.slice(0, 4).map((leave) => (
                         <TableRow key={leave.id} hover>
                           <TableCell sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.8125rem' }}>
-                            {leave.employee_name || `#${leave.employee}`}
+                            {leave.employeeName || leave.employee_name || `#${leave.employee}`}
                           </TableCell>
                           <TableCell sx={{ fontSize: '0.775rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
-                            {leave.start_date} ({leave.total_days} ngày)
+                            {leave.startDate || leave.start_date} ({leave.totalDays ?? leave.total_days} ngày)
                           </TableCell>
                           <TableCell align="right">
                             <Stack direction="row" spacing={0.5} justifyContent="flex-end">
@@ -608,14 +609,14 @@ export default function HrmDashboardPage() {
                           src={emp.avatar}
                           sx={{ width: 34, height: 34, bgcolor: '#eff6ff', color: '#2563eb', fontWeight: 800, fontSize: '0.875rem' }}
                         >
-                          {emp.full_name?.charAt(0)?.toUpperCase() || 'E'}
+                          {(emp.fullName || emp.full_name)?.charAt(0)?.toUpperCase() || 'E'}
                         </Avatar>
                         <Box>
                           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.8125rem' }}>
-                            {emp.full_name}
+                            {emp.fullName || emp.full_name}
                           </Typography>
                           <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.725rem' }}>
-                            {emp.department_name || 'Chưa phân phòng ban'}
+                            {emp.departmentName || emp.department_name || 'Chưa phân phòng ban'}
                           </Typography>
                         </Box>
                       </Stack>

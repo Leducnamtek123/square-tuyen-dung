@@ -24,6 +24,12 @@ class DepartmentSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['company', 'create_at', 'update_at']
 
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        if 'isActive' in payload and 'is_active' not in payload:
+            payload['is_active'] = payload.get('isActive')
+        return super().to_internal_value(payload)
+
     def validate(self, attrs):
         request = self.context.get('request')
         parent = attrs.get('parent')
@@ -59,6 +65,12 @@ class DesignationSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['company', 'create_at', 'update_at']
 
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        if 'isActive' in payload and 'is_active' not in payload:
+            payload['is_active'] = payload.get('isActive')
+        return super().to_internal_value(payload)
+
 
 class EmploymentContractSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
@@ -71,6 +83,20 @@ class EmploymentContractSerializer(serializers.ModelSerializer):
             'allowance', 'status', 'notes', 'create_at', 'update_at'
         ]
         read_only_fields = ['create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'contractNumber': 'contract_number',
+            'contractType': 'contract_type',
+            'startDate': 'start_date',
+            'endDate': 'end_date',
+            'baseSalary': 'base_salary',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
 
     def validate(self, attrs):
         start_date = attrs.get('start_date') or (self.instance.start_date if self.instance else None)
@@ -117,6 +143,32 @@ class EmployeeSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['company', 'create_at', 'update_at']
 
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeCode': 'employee_code',
+            'firstName': 'first_name',
+            'lastName': 'last_name',
+            'fullName': 'full_name',
+            'dateOfBirth': 'date_of_birth',
+            'reportsTo': 'reports_to',
+            'employmentType': 'employment_type',
+            'joinDate': 'join_date',
+            'probationEndDate': 'probation_end_date',
+            'resignDate': 'resign_date',
+            'bankName': 'bank_name',
+            'bankAccountNumber': 'bank_account_number',
+            'bankAccountHolder': 'bank_account_holder',
+            'taxId': 'tax_id',
+            'socialInsuranceId': 'social_insurance_id',
+            'candidateProfile': 'candidate_profile',
+            'onboardedFromActivity': 'onboarded_from_activity',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
     def validate(self, attrs):
         department = attrs.get('department')
         designation = attrs.get('designation')
@@ -150,6 +202,17 @@ class LeaveTypeSerializer(serializers.ModelSerializer):
         fields = ['id', 'company', 'name', 'code', 'days_per_year', 'is_paid']
         read_only_fields = ['company']
 
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'daysPerYear': 'days_per_year',
+            'isPaid': 'is_paid',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
 
 class LeaveRequestSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
@@ -165,6 +228,20 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
             'create_at', 'update_at'
         ]
         read_only_fields = ['create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'leaveType': 'leave_type',
+            'startDate': 'start_date',
+            'endDate': 'end_date',
+            'totalDays': 'total_days',
+            'rejectionReason': 'rejection_reason',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
 
     def validate(self, attrs):
         start_date = attrs.get('start_date') or (self.instance.start_date if self.instance else None)
@@ -202,6 +279,18 @@ class AttendanceRecordSerializer(serializers.ModelSerializer):
             'working_hours', 'status', 'notes', 'create_at', 'update_at'
         ]
         read_only_fields = ['create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'checkIn': 'check_in',
+            'checkOut': 'check_out',
+            'workingHours': 'working_hours',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
 
     def validate(self, attrs):
         check_in = attrs.get('check_in') if 'check_in' in attrs else (self.instance.check_in if self.instance else None)
@@ -303,6 +392,20 @@ class RenewContractSerializer(serializers.Serializer):
     allowance = serializers.DecimalField(max_digits=15, decimal_places=2, required=False, default=0)
     notes = serializers.CharField(required=False, allow_blank=True, default='')
 
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'contractNumber': 'contract_number',
+            'contractType': 'contract_type',
+            'startDate': 'start_date',
+            'endDate': 'end_date',
+            'baseSalary': 'base_salary',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
 
 class QuickCheckinSerializer(serializers.Serializer):
     employee_id = serializers.IntegerField()
@@ -312,6 +415,19 @@ class QuickCheckinSerializer(serializers.Serializer):
     check_out = serializers.TimeField(required=False, allow_null=True)
     working_hours = serializers.DecimalField(max_digits=4, decimal_places=2, required=False, default=8.0)
     notes = serializers.CharField(required=False, allow_blank=True, default='')
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeId': 'employee_id',
+            'checkIn': 'check_in',
+            'checkOut': 'check_out',
+            'workingHours': 'working_hours',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
 
 
 class MonthlyPayrollRecordSerializer(serializers.ModelSerializer):
@@ -337,4 +453,19 @@ class MonthlyPayrollRecordSerializer(serializers.ModelSerializer):
             'status', 'status_label', 'payment_date', 'note', 'create_at', 'update_at'
         ]
         read_only_fields = ['id', 'company', 'create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'grossSalary': 'gross_salary',
+            'workingDaysActual': 'working_days_actual',
+            'standardWorkingDays': 'standard_working_days',
+            'unpaidLeaveDays': 'unpaid_leave_days',
+            'dependentsCount': 'dependents_count',
+            'paymentDate': 'payment_date',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
 

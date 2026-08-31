@@ -305,7 +305,7 @@ export default function DepartmentListPage() {
                         </Box>
                         <Stack direction="row" spacing={0.5} alignItems="center">
                           <Chip
-                            label={`${dept.employee_count || 0} Nhân sự`}
+                            label={`${dept.employeeCount ?? dept.employee_count ?? 0} Nhân sự`}
                             size="small"
                             sx={{
                               fontWeight: 800,
@@ -345,7 +345,7 @@ export default function DepartmentListPage() {
                         Trưởng phòng:
                       </Typography>
                       <Typography variant="caption" sx={{ color: '#1e293b', fontWeight: 700 }}>
-                        {dept.manager_name || 'Chưa gán'}
+                        {dept.managerName || dept.manager_name || 'Chưa gán'}
                       </Typography>
                     </Box>
                   </Paper>
@@ -405,7 +405,7 @@ export default function DepartmentListPage() {
                         <TableCell sx={{ color: '#475569', fontSize: '0.85rem' }}>{desig.description || '---'}</TableCell>
                         <TableCell align="center">
                           <Chip
-                            label={`${desig.employee_count || 0} người`}
+                            label={`${desig.employeeCount ?? desig.employee_count ?? 0} người`}
                             size="small"
                             sx={{ fontWeight: 700, fontSize: '0.725rem', bgcolor: '#f1f5f9', color: '#334155' }}
                           />
@@ -475,7 +475,7 @@ export default function DepartmentListPage() {
                 >
                   <MenuItem value="">-- Chưa gán trưởng phòng --</MenuItem>
                   {employees.map((emp) => (
-                    <MenuItem key={emp.id} value={emp.id}>{emp.full_name} ({emp.employee_code})</MenuItem>
+                    <MenuItem key={emp.id} value={emp.id}>{emp.fullName || emp.full_name} ({emp.employeeCode || emp.employee_code})</MenuItem>
                   ))}
                 </TextField>
               </Grid>
