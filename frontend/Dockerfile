@@ -10,9 +10,9 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
 # Install dependencies first (layer caching)
-COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* .npmrc* ./
 
-RUN pnpm install
+RUN pnpm install --ignore-scripts
 
 # Copy application code
 COPY . .

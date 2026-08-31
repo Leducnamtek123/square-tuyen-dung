@@ -1,17 +1,23 @@
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 type ToastKind = 'success' | 'error' | 'warn' | 'info';
 
 const showToast = (kind: ToastKind, message: string) => {
   if (!message) return;
-  toast[kind](message, {
-    theme: 'light',
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-  });
+  switch (kind) {
+    case 'success':
+      toast.success(message, { duration: 3000 });
+      break;
+    case 'error':
+      toast.error(message, { duration: 3500 });
+      break;
+    case 'warn':
+      toast.warning(message, { duration: 3000 });
+      break;
+    case 'info':
+      toast.info(message, { duration: 3000 });
+      break;
+  }
 };
 
 const toastMessages = {
@@ -19,6 +25,9 @@ const toastMessages = {
   error: (message: string) => showToast('error', message),
   warn: (message: string) => showToast('warn', message),
   info: (message: string) => showToast('info', message),
+  dismiss: (id?: string | number) => toast.dismiss(id),
 };
 
+export { toast };
 export default toastMessages;
+

@@ -43,7 +43,6 @@ const nextConfig = {
     'leaflet',
     'react-draft-wysiwyg',
     'react-image-gallery',
-    'react-toastify',
     'react-easy-crop',
   ],
   compiler: {

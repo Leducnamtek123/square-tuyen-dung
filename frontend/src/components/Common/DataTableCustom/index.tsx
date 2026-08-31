@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableCell from '@mui/material/TableCell';
@@ -93,12 +92,6 @@ function EnhancedTableHead({ headCells = EMPTY_HEAD_CELLS, order, orderBy, onReq
     </TableHead>
   );
 }
-
-EnhancedTableHead.propTypes = {
-  onRequestSort: PropTypes.func,
-  order: PropTypes.oneOf(['asc', 'desc']),
-  orderBy: PropTypes.string,
-};
 
 interface DataTableCustomProps {
   headCells?: HeadCell[];

@@ -6,8 +6,8 @@ import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { getUserInfo, removeUserInfo } from "../redux/userSlice";
 import { useConfig } from "@/hooks/useConfig";
-import { toast, ToastContainer, Bounce } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import ChatBot from "../components/Features/ChatBot";
 import ScrollToTop from "../components/Common/ScrollToTop";
 import { ConfirmDialogRoot } from "../components/Common/ConfirmDialog";
@@ -133,10 +133,8 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
           <strong>{t('systemError.occurred')}</strong> {t('systemError.tryAgain')}
         </div>,
         {
-          autoClose: 8000,
+          duration: 8000,
           position: "top-right",
-          closeOnClick: true,
-          pauseOnHover: true,
         }
       );
     };
@@ -155,7 +153,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
         <div style={{ textAlign: "left" }}>
           <strong>{t('systemError.requestFailed')}</strong> {t('systemError.tryAgain')}
         </div>,
-        { autoClose: 6000 }
+        { duration: 6000 }
       );
     };
 
@@ -197,7 +195,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     <ErrorBoundary>
       <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
           {children}
-          <ToastContainer autoClose={2500} transition={Bounce} position="top-right" theme="light" style={{ top: '72px' }} />
+          <Toaster richColors position="top-right" />
           {canShowChatBot && <ChatBot />}
       </GoogleOAuthProvider>
       <ConfirmDialogRoot />
@@ -205,3 +203,4 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     </ErrorBoundary>
   );
 }
+

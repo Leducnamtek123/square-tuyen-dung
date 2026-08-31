@@ -1,7 +1,6 @@
 import React from 'react';
-import { Box } from '@mui/system';
 import AddIcon from '@mui/icons-material/Add';
-import { Button, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 
 interface EmptyCardProps {

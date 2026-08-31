@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { Box } from "@mui/material";
 
 import Header from '../components/employers/Header';
@@ -148,10 +147,6 @@ const AdminLayout = (props: AdminLayoutProps) => {
       />
     </Box>
   );
-};
-
-AdminLayout.propTypes = {
-  window: PropTypes.func,
 };
 
 export default AdminLayout;
