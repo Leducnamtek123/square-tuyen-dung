@@ -7,14 +7,22 @@ FROM public.ecr.aws/docker/library/node:22-slim AS deps
 
 WORKDIR /app
 
-COPY package*.json ./
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
-RUN npm ci --include=optional --no-audit --no-fund --legacy-peer-deps || npm install --include=optional --no-audit --no-fund --legacy-peer-deps
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* ./
+
+RUN pnpm install --frozen-lockfile || pnpm install
 
 # --- Stage 2: Build ---
 FROM public.ecr.aws/docker/library/node:22-slim AS builder
 
 WORKDIR /app
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -65,7 +73,7 @@ ENV NEXT_PUBLIC_NODE_ENV=$NEXT_PUBLIC_NODE_ENV \
     NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=$NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+RUN pnpm run build
 
 # --- Stage 3: Run (Next.js standalone server) ---
 FROM public.ecr.aws/docker/library/node:22-slim AS runner

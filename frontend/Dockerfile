@@ -5,17 +5,18 @@ FROM node:22-slim
 
 WORKDIR /project_web_app
 
-# Install dependencies first (layer caching)
-COPY --chown=node:node package*.json ./
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
-ENV NPM_CONFIG_INCLUDE_OPTIONAL=true
-RUN npm ci --include=optional --no-audit --no-fund --legacy-peer-deps
+# Install dependencies first (layer caching)
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* ./
+
+RUN pnpm install
 
 # Copy application code
-COPY --chown=node:node . .
-
-USER node
+COPY . .
 
 EXPOSE 80
 
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "run", "dev"]

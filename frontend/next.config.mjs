@@ -44,7 +44,6 @@ const nextConfig = {
     'react-draft-wysiwyg',
     'react-image-gallery',
     'react-toastify',
-    'sweetalert2',
     'react-easy-crop',
   ],
   compiler: {
