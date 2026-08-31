@@ -342,16 +342,6 @@ code {
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* SweetAlert2: remove default icon border for custom iconHtml */
-.swal2-icon.swal2-no-border {
-  border: none !important;
-  box-shadow: none !important;
-  margin-bottom: 0 !important;
-}
-.swal2-icon.swal2-no-border::before,
-.swal2-icon.swal2-no-border::after {
-  display: none !important;
-}
 
 /* === ENHANCED AESTHETICS & MOTION === */
 
@@ -727,6 +717,36 @@ h1, h2, h3, h4, h5, .display-text {
 
 .Toastify__progress-bar {
   display: none !important;
+}
+
+/* ==========================================================================
+   MUI DIALOG GLOBAL OVERRIDES (Backdrop Blur & Smooth Rounded Borders)
+   ========================================================================== */
+.MuiDialog-root > .MuiBackdrop-root,
+.MuiModal-root:not(.MuiPopover-root):not(.MuiMenu-root) > .MuiBackdrop-root:not(.MuiBackdrop-invisible) {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+.MuiBackdrop-invisible,
+.MuiPopover-root .MuiBackdrop-root,
+.MuiMenu-root .MuiBackdrop-root {
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.MuiDialog-paper:not(.MuiDialog-paperFullScreen) {
+  border-radius: 20px !important;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+.dark .MuiDialog-paper:not(.MuiDialog-paperFullScreen) {
+  background-color: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* ==========================================================================

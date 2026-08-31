@@ -1,6 +1,5 @@
 'use client';
 
-import "sweetalert2/dist/sweetalert2.min.css";
 import * as React from "react";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
@@ -11,6 +10,7 @@ import { toast, ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ChatBot from "../components/Features/ChatBot";
 import ScrollToTop from "../components/Common/ScrollToTop";
+import { ConfirmDialogRoot } from "../components/Common/ConfirmDialog";
 import { ROUTES, AUTH_CONFIG } from "../configs/constants";
 import { isAdminPortalPath } from "../configs/portalRouting";
 import { GoogleOAuthProvider } from "@react-oauth/google";
@@ -200,6 +200,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
           <ToastContainer autoClose={2500} transition={Bounce} position="top-right" theme="light" style={{ top: '72px' }} />
           {canShowChatBot && <ChatBot />}
       </GoogleOAuthProvider>
+      <ConfirmDialogRoot />
       <ScrollToTop />
     </ErrorBoundary>
   );

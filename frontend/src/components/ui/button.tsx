@@ -47,4 +47,4 @@ const Button = ({ className, variant, size, type = 'button', ref, ...props }: Bu
   />
 );
 
-export { Button };
+export { Button, buttonVariants };

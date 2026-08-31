@@ -230,63 +230,135 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
         </Grid>
 
         {/* Font Size & Spacing Switchers */}
-        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+        <Stack spacing={2.5} sx={{ pt: 1.5, borderTop: '1px solid #f1f5f9' }}>
+          {/* Cỡ chữ */}
           <Box>
-            <Typography variant="caption" sx={{ fontWeight: 700, color: '#64748b', display: 'block', mb: 0.75 }}>
-              Cỡ chữ:
-            </Typography>
-            <Stack direction="row" spacing={0.5} sx={{ bgcolor: '#f1f5f9', p: 0.5, borderRadius: '8px' }}>
-              {(['small', 'medium', 'large'] as const).map((sz) => (
-                <Button
-                  key={sz}
-                  size="small"
-                  onClick={() => onChangeTheme({ ...theme, fontSize: sz })}
-                  sx={{
-                    flex: 1,
-                    py: 0.4,
-                    fontSize: '0.725rem',
-                    fontWeight: 700,
-                    textTransform: 'none',
-                    borderRadius: '6px',
-                    ...(theme.fontSize === sz
-                      ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }
-                      : { color: '#64748b' }),
-                  }}
-                >
-                  {sz === 'small' ? 'Nhỏ' : sz === 'medium' ? 'Vừa' : 'Lớn'}
-                </Button>
-              ))}
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+              <Typography variant="caption" sx={{ fontWeight: 700, color: '#334155', fontSize: '0.775rem' }}>
+                Cỡ chữ:
+              </Typography>
+              <Typography variant="caption" sx={{ fontWeight: 600, color: '#2563eb', fontSize: '0.725rem' }}>
+                {theme.fontSize === 'small' ? 'Thu nhỏ' : theme.fontSize === 'large' ? 'Phóng to' : 'Vừa (Chuẩn)'}
+              </Typography>
+            </Stack>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                bgcolor: '#f8fafc',
+                p: 0.5,
+                borderRadius: '10px',
+                border: '1px solid #e2e8f0',
+              }}
+            >
+              {(
+                [
+                  { id: 'small', label: 'Nhỏ' },
+                  { id: 'medium', label: 'Vừa' },
+                  { id: 'large', label: 'Lớn' },
+                ] as const
+              ).map((sz) => {
+                const isSelected = (theme.fontSize || 'medium') === sz.id;
+                return (
+                  <Button
+                    key={sz.id}
+                    size="small"
+                    onClick={() => onChangeTheme({ ...theme, fontSize: sz.id })}
+                    sx={{
+                      flex: 1,
+                      py: 0.65,
+                      px: 1,
+                      fontSize: '0.775rem',
+                      fontWeight: isSelected ? 700 : 500,
+                      textTransform: 'none',
+                      borderRadius: '8px',
+                      transition: 'all 0.15s ease',
+                      ...(isSelected
+                        ? {
+                            bgcolor: '#ffffff',
+                            color: '#1e40af',
+                            border: '1px solid #cbd5e1',
+                            boxShadow: '0 2px 5px rgba(15, 23, 42, 0.08)',
+                            '&:hover': { bgcolor: '#ffffff' },
+                          }
+                        : {
+                            color: '#64748b',
+                            border: '1px solid transparent',
+                            '&:hover': { bgcolor: 'rgba(255,255,255,0.6)', color: '#0f172a' },
+                          }),
+                    }}
+                  >
+                    {sz.label}
+                  </Button>
+                );
+              })}
             </Stack>
           </Box>
 
+          {/* Giãn cách */}
           <Box>
-            <Typography variant="caption" sx={{ fontWeight: 700, color: '#64748b', display: 'block', mb: 0.75 }}>
-              Giãn cách:
-            </Typography>
-            <Stack direction="row" spacing={0.5} sx={{ bgcolor: '#f1f5f9', p: 0.5, borderRadius: '8px' }}>
-              {(['compact', 'normal', 'relaxed'] as const).map((sp) => (
-                <Button
-                  key={sp}
-                  size="small"
-                  onClick={() => onChangeTheme({ ...theme, spacing: sp })}
-                  sx={{
-                    flex: 1,
-                    py: 0.4,
-                    fontSize: '0.725rem',
-                    fontWeight: 700,
-                    textTransform: 'none',
-                    borderRadius: '6px',
-                    ...(theme.spacing === sp
-                      ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }
-                      : { color: '#64748b' }),
-                  }}
-                >
-                  {sp === 'compact' ? 'Gọn' : sp === 'normal' ? 'Chuẩn' : 'Rộng'}
-                </Button>
-              ))}
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+              <Typography variant="caption" sx={{ fontWeight: 700, color: '#334155', fontSize: '0.775rem' }}>
+                Giãn cách:
+              </Typography>
+              <Typography variant="caption" sx={{ fontWeight: 600, color: '#2563eb', fontSize: '0.725rem' }}>
+                {theme.spacing === 'compact' ? 'Gọn (Tiết kiệm)' : theme.spacing === 'relaxed' ? 'Rộng (Thoáng)' : 'Chuẩn (Cân đối)'}
+              </Typography>
+            </Stack>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                bgcolor: '#f8fafc',
+                p: 0.5,
+                borderRadius: '10px',
+                border: '1px solid #e2e8f0',
+              }}
+            >
+              {(
+                [
+                  { id: 'compact', label: 'Gọn' },
+                  { id: 'normal', label: 'Chuẩn' },
+                  { id: 'relaxed', label: 'Rộng' },
+                ] as const
+              ).map((sp) => {
+                const isSelected = (theme.spacing || 'normal') === sp.id;
+                return (
+                  <Button
+                    key={sp.id}
+                    size="small"
+                    onClick={() => onChangeTheme({ ...theme, spacing: sp.id })}
+                    sx={{
+                      flex: 1,
+                      py: 0.65,
+                      px: 1,
+                      fontSize: '0.775rem',
+                      fontWeight: isSelected ? 700 : 500,
+                      textTransform: 'none',
+                      borderRadius: '8px',
+                      transition: 'all 0.15s ease',
+                      ...(isSelected
+                        ? {
+                            bgcolor: '#ffffff',
+                            color: '#1e40af',
+                            border: '1px solid #cbd5e1',
+                            boxShadow: '0 2px 5px rgba(15, 23, 42, 0.08)',
+                            '&:hover': { bgcolor: '#ffffff' },
+                          }
+                        : {
+                            color: '#64748b',
+                            border: '1px solid transparent',
+                            '&:hover': { bgcolor: 'rgba(255,255,255,0.6)', color: '#0f172a' },
+                          }),
+                    }}
+                  >
+                    {sp.label}
+                  </Button>
+                );
+              })}
             </Stack>
           </Box>
-        </Box>
+        </Stack>
       </Paper>
 
       {/* ── 4. Avatar Customization ────────────────────────────────────── */}

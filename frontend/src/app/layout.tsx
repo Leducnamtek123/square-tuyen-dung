@@ -5,7 +5,6 @@ import ThemeRegistry from '../components/ThemeRegistry/ThemeRegistry';
 import { Providers } from './providers';
 import ClientAppRoot from './ClientAppRoot';
 import './globals.css';
-import './app-overrides.css';
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
