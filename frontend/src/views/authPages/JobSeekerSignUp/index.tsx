@@ -29,6 +29,7 @@ import tokenService from '@/services/tokenService';
 
 import { JobSeekerSignUpFormData } from '@/views/components/auths/JobSeekerSignUpForm';
 import type { JobSeekerRegisterData } from '@/types/auth';
+import type { User } from '@/types/models';
 import type { CodeResponse } from '@react-oauth/google';
 import JobSeekerSignUpView from './JobSeekerSignUpView';
 
@@ -143,7 +144,7 @@ const JobSeekerSignUp = () => {
       if (isSaveTokenToCookie) {
         dispatch(getUserInfo())
           .unwrap()
-          .then((user) => {
+          .then((user: User | null) => {
             if (user?.isOnboarded === false) {
               push('/onboarding/candidate');
             } else {

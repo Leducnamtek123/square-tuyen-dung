@@ -137,12 +137,21 @@ const syncLocationOptions = async (
 };
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  minHeight: '46px',
+  minHeight: '48px',
   padding: '10px 24px',
   borderRadius: '12px',
   fontSize: '15px',
-  fontWeight: 600,
+  fontWeight: 700,
   textTransform: 'none',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '10px',
+  '& .MuiButton-startIcon, & .MuiButton-endIcon': {
+    margin: 0,
+    display: 'inline-flex',
+    alignItems: 'center',
+  },
   transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
   '&.MuiButton-contained': {
     color: '#ffffff',

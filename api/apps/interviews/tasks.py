@@ -201,7 +201,7 @@ def send_interview_invitation(session_id, initial_password=None):
         session = InterviewSession.objects.select_related("candidate", "job_post").get(id=session_id)
         candidate = session.candidate
 
-        web_url = config("WEB_CLIENT_URL", default="https://infohr.vn")
+        web_url = config("WEB_CLIENT_URL", default="https://infohr.vn").rstrip("/")
         interview_url = f"{web_url}/phong-van/{session.invite_token}"
         login_url = f"{web_url}/login"
         scheduled_at_display = "Ngay khi bạn thuận tiện"
@@ -234,23 +234,22 @@ def send_interview_invitation(session_id, initial_password=None):
             fail_silently=False,
         )
         logger.info("Invitation email sent to %s for session %s", candidate.email, session_id)
+        return True
     except Exception as e:
         logger.error("Error sending invitation email for session %s: %s", session_id, e)
+        return False
+
 
 @shared_task
-def send_evaluation_report(session_id):
-    """Send AI interview evaluation report to employer."""
-    if not session_id:
-        return
-
+def send_interview_report_notification(session_id):
+    """Notify employer that interview report & video are ready."""
     try:
-        session = InterviewSession.objects.select_related("candidate", "job_post", "created_by").get(id=session_id)
-        employer = session.created_by
-        if not employer or not employer.email:
-            logger.warning("Skip report email for session %s because employer email is missing.", session_id)
-            return
+        session = InterviewSession.objects.select_related("candidate", "job_post", "company").get(id=session_id)
+        employer_email = session.company.email if session.company else None
+        if not employer_email:
+            return False
 
-        web_url = config("WEB_CLIENT_URL", default="http://localhost:3002")
+        web_url = config("WEB_CLIENT_URL", default="https://infohr.vn").rstrip("/")
         report_url = f"{web_url}/employer/interviews/{session.id}"
 
         candidate_display_name = session.candidate.full_name or session.candidate.username or "Ứng viên"

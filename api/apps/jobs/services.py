@@ -295,7 +295,7 @@ class JobActivityService:
                 activity.ai_analysis_summary = "Không thể khởi tạo tác vụ phân tích AI. Vui lòng thử lại."
                 activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
         company = job_post.company
-        domain = settings.DOMAIN_CLIENT["job_seeker"]
+        domain = settings.DOMAIN_CLIENT["job_seeker"].rstrip("/")
 
         subject = f"Xác nhận ứng tuyển: {job_post.job_name}"
         to = [user.email]
@@ -304,7 +304,7 @@ class JobActivityService:
             "company_name": company.company_name,
             "job_name": job_post.job_name,
             "job_title": job_post.job_name,
-            "find_job_post_link": domain + "viec-lam",
+            "find_job_post_link": f"{domain}/viec-lam",
         }
 
         if email_notifications_enabled():

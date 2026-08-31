@@ -5,8 +5,7 @@ import { Box, Button, Drawer, Stack, Divider, List, ListItem, ListItemButton, Li
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { useAppSelector } from '@/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import Link from 'next/link';
 import { confirmModal } from '@/utils/sweetalert2Modal';
 import errorHandling from '@/utils/errorHandling';
@@ -51,7 +50,7 @@ const DRAWER_WIDTH = 'min(320px, 85vw)';
 
 const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPublicActions = true }: LeftDrawerProps) => {
   const { t } = useTranslation('common');
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { push } = useRouter();
   const pathname = usePathname() || '';
   const { isAuthenticated } = useAppSelector((state) => state.user);
@@ -70,7 +69,7 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
     const accessToken = tokenService.getAccessTokenFromCookie() || '';
     const backend = tokenService.getProviderFromCookie() || '';
 
-    (dispatch as AppDispatch)(removeUserInfo({ accessToken, backend }))
+    dispatch(removeUserInfo({ accessToken, backend }))
       .unwrap()
       .then(() => {
         dispatch(resetSearchJobPostFilter());

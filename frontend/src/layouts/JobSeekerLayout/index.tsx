@@ -98,7 +98,7 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
         return;
       }
 
-      const jobSeekerWorkspace = (user.workspaces || []).find((workspace) => workspace.type === "job_seeker");
+      const jobSeekerWorkspace = (user?.workspaces || []).find((workspace) => workspace.type === "job_seeker");
       if (jobSeekerWorkspace) {
         dispatch(setActiveWorkspace(jobSeekerWorkspace));
       }

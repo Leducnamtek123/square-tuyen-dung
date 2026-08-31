@@ -174,16 +174,29 @@ const OtpCodeInput = ({ value, disabled, label, onChange, onEnter }: OtpCodeInpu
 };
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  padding: '12px 16px',
-  borderRadius: '8px',
-  fontSize: '14px',
-  fontWeight: 600,
+  minHeight: '48px',
+  padding: '12px 20px',
+  borderRadius: '14px',
+  fontSize: '15px',
+  fontWeight: 700,
   textTransform: 'none',
-  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '10px',
+  '& .MuiButton-startIcon': {
+    margin: 0,
+    display: 'inline-flex',
+    alignItems: 'center',
+  },
+  boxShadow: '0 4px 14px rgba(37, 99, 235, 0.25)',
   transition: 'all 0.2s ease',
   '&:hover': {
     transform: 'translateY(-1px)',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    boxShadow: '0 8px 20px rgba(37, 99, 235, 0.35)',
+  },
+  '&:active': {
+    transform: 'scale(0.98)',
   },
 }));
 

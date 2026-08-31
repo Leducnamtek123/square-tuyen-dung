@@ -100,40 +100,66 @@ const JobSeekerLoginView = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  mb: 2,
+                  flexWrap: 'wrap',
+                  gap: 1.5,
+                  mb: 2.5,
                 }}
               >
-                <Typography
-                  variant="caption"
+                <Box
                   sx={{
-                    color: '#2563EB',
-                    fontWeight: 700,
-                    fontSize: '13px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
+                    display: 'inline-flex',
+                    alignItems: 'center',
                     backgroundColor: '#EFF6FF',
+                    border: '1px solid #DBEAFE',
                     px: 1.5,
-                    py: 0.5,
+                    py: 0.6,
                     borderRadius: '8px',
                   }}
                 >
-                  Người tìm việc
-                </Typography>
+                  <Typography
+                    component="span"
+                    sx={{
+                      color: '#2563EB',
+                      fontWeight: 700,
+                      fontSize: '12px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em',
+                      whiteSpace: 'nowrap',
+                      lineHeight: 1,
+                    }}
+                  >
+                    Người tìm việc
+                  </Typography>
+                </Box>
 
-                <Typography variant="caption" sx={{ color: '#64748B', fontSize: '13px' }}>
-                  Bạn là NTD?{' '}
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: '#64748B',
+                    fontSize: '13px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <span>Bạn là NTD?</span>
                   <StyledLink
                     href={`/${ROUTES.EMPLOYER_AUTH.LOGIN}`}
                     sx={{
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: 0.25,
-                      fontWeight: 600,
+                      gap: 0.35,
+                      fontWeight: 700,
                       color: '#2563EB',
+                      textDecoration: 'none',
+                      '&:hover': {
+                        textDecoration: 'underline',
+                      },
                     }}
                   >
                     <span>Cổng Doanh nghiệp</span>
-                    <ArrowForwardIcon sx={{ fontSize: 13 }} />
+                    <ArrowForwardIcon sx={{ fontSize: 14 }} />
                   </StyledLink>
                 </Typography>
               </Box>
@@ -284,27 +310,43 @@ const JobSeekerLoginView = ({
                 của InfoHR.
               </Typography>
 
-              <Grid
-                container
-                spacing={2}
+              <Box
                 sx={{
                   pt: 2,
                   borderTop: '1px solid #F1F5F9',
+                  display: 'flex',
+                  flexDirection: { xs: 'column', sm: 'row' },
                   justifyContent: 'space-between',
                   alignItems: 'center',
+                  gap: 1.5,
+                  textAlign: { xs: 'center', sm: 'left' },
                 }}
               >
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <StyledLink href={`/${ROUTES.AUTH.FORGOT_PASSWORD}`} sx={{ color: '#64748B', '&:hover': { color: '#2563EB' } }}>
-                    {t('login.forgotPassword')}
-                  </StyledLink>
-                </Grid>
-                <Grid sx={{ textAlign: { xs: 'left', sm: 'right' } }} size={{ xs: 12, sm: 6 }}>
-                  <StyledLink href={`/${ROUTES.AUTH.REGISTER}`} sx={{ color: '#2563EB', fontWeight: 600 }}>
-                    {t('login.noAccount')} {t('login.signUp')}
-                  </StyledLink>
-                </Grid>
-              </Grid>
+                <StyledLink
+                  href={`/${ROUTES.AUTH.FORGOT_PASSWORD}`}
+                  sx={{
+                    color: '#64748B',
+                    fontSize: '13.5px',
+                    fontWeight: 500,
+                    textDecoration: 'none',
+                    '&:hover': { color: '#2563EB', textDecoration: 'underline' },
+                  }}
+                >
+                  {t('login.forgotPassword')}
+                </StyledLink>
+                <StyledLink
+                  href={`/${ROUTES.AUTH.REGISTER}`}
+                  sx={{
+                    color: '#2563EB',
+                    fontWeight: 700,
+                    fontSize: '13.5px',
+                    textDecoration: 'none',
+                    '&:hover': { textDecoration: 'underline' },
+                  }}
+                >
+                  {t('login.noAccount')} {t('login.signUp')}
+                </StyledLink>
+              </Box>
 
               {/* Security Trust Indicator */}
               <Box

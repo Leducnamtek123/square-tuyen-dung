@@ -190,7 +190,7 @@ const EmployerSignUp = () => {
       if (isSaveTokenToCookie) {
         dispatch(getUserInfo())
           .unwrap()
-          .then((user) => {
+          .then((user: any) => {
             if (user?.isOnboarded === false) {
               push('/onboarding/employer');
             } else {
@@ -275,40 +275,66 @@ const EmployerSignUp = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    mb: 2,
+                    flexWrap: 'wrap',
+                    gap: 1.5,
+                    mb: 2.5,
                   }}
                 >
-                  <Typography
-                    variant="caption"
+                  <Box
                     sx={{
-                      color: '#2563EB',
-                      fontWeight: 700,
-                      fontSize: '13px',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
+                      display: 'inline-flex',
+                      alignItems: 'center',
                       backgroundColor: '#EFF6FF',
+                      border: '1px solid #DBEAFE',
                       px: 1.5,
-                      py: 0.5,
+                      py: 0.6,
                       borderRadius: '8px',
                     }}
                   >
-                    Nhà tuyển dụng
-                  </Typography>
+                    <Typography
+                      component="span"
+                      sx={{
+                        color: '#2563EB',
+                        fontWeight: 700,
+                        fontSize: '12px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em',
+                        whiteSpace: 'nowrap',
+                        lineHeight: 1,
+                      }}
+                    >
+                      Nhà tuyển dụng
+                    </Typography>
+                  </Box>
 
-                  <Typography variant="caption" sx={{ color: '#64748B', fontSize: '13px' }}>
-                    Bạn là Người tìm việc?{' '}
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: '#64748B',
+                      fontSize: '13px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 0.5,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <span>Bạn là Người tìm việc?</span>
                     <StyledLink
                       href={candidateRegisterHref}
                       sx={{
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: 0.25,
-                        fontWeight: 600,
+                        gap: 0.35,
+                        fontWeight: 700,
                         color: '#2563EB',
+                        textDecoration: 'none',
+                        '&:hover': {
+                          textDecoration: 'underline',
+                        },
                       }}
                     >
                       <span>Đăng ký tìm việc</span>
-                      <ArrowForwardIcon sx={{ fontSize: 13 }} />
+                      <ArrowForwardIcon sx={{ fontSize: 14 }} />
                     </StyledLink>
                   </Typography>
                 </Box>

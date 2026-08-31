@@ -1,8 +1,7 @@
 'use client';
 import React, { useMemo } from "react";
-import { useAppSelector } from '@/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { usePathname, useRouter } from 'next/navigation';
-import { useDispatch } from "react-redux";
 import { useTranslation } from 'react-i18next';
 import { Button, Menu, Stack, Typography } from "@mui/material";
 
@@ -56,7 +55,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
   const { t, i18n } = useTranslation('common');
   const { push } = useRouter();
   const pathname = usePathname() || "/";
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [feedbackOpen, setFeedbackOpen] = React.useState(false);
   const openFeedbackAfterMenuCloseRef = React.useRef(false);
   const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
@@ -177,7 +176,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
   const handleLogout = () => {
     const accessToken = tokenService.getAccessTokenFromCookie() || '';
     const backend = tokenService.getProviderFromCookie() || '';
-    (dispatch as AppDispatch)(removeUserInfo({ accessToken, backend }))
+    dispatch(removeUserInfo({ accessToken, backend }))
       .unwrap()
       .then(() => {
         dispatch(resetSearchJobPostFilter());

@@ -107,11 +107,11 @@ class PasswordResetService:
         access_token = secrets.token_urlsafe(32)
 
         if user.role_name == var_sys.JOB_SEEKER:
-            domain = settings.DOMAIN_CLIENT["job_seeker"]
+            domain = settings.DOMAIN_CLIENT["job_seeker"].rstrip("/")
+            reset_password_url = f"{domain}/cap-nhat-mat-khau/{access_token}"
         else:
-            domain = settings.DOMAIN_CLIENT["employer"]
-
-        reset_password_url = f"{domain}cap-nhat-mat-khau/{access_token}"
+            domain = settings.DOMAIN_CLIENT["employer"].rstrip("/")
+            reset_password_url = f"{domain}/nha-tuyen-dung/cap-nhat-mat-khau/{access_token}"
 
         ForgotPasswordToken.objects.create(
             user=user,

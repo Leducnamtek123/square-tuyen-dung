@@ -70,7 +70,7 @@ const store = configureStore({
     profile: profileReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().prepend(persistenceMiddleware.middleware),
+    getDefaultMiddleware().prepend(persistenceMiddleware.middleware as any),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

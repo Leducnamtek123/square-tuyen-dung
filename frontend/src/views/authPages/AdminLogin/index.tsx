@@ -1,8 +1,7 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
-import type { AppDispatch } from '@/redux/store';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '@/redux/hooks';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
@@ -96,7 +95,7 @@ const Dot = styled('button')<{ active: boolean }>(({ active }) => ({
 const AdminLogin: React.FC = () => {
   const { t } = useTranslation(['auth', 'admin']);
   TabTitle(t('auth:login.adminTitle'));
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const { push } = useRouter();
 
   const [isAuthenticating, setIsAuthenticating] = React.useState(false);
