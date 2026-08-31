@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import { ROLES_NAME } from '../../../../configs/constants';
+import { ROLES_NAME } from '@/configs/constants';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import type { SxProps, Theme } from '@mui/material/styles';
 

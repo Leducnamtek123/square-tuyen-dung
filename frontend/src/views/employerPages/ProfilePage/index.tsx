@@ -2,8 +2,8 @@
 import React from "react";
 import { Box, Card, Divider, Typography, Theme } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { TabTitle } from "../../../utils/generalFunction";
-import ProfileCard from "../../components/employers/ProfileCard";
+import { TabTitle } from "@/utils/generalFunction";
+import ProfileCard from "@/views/components/employers/ProfileCard";
 
 const ProfilePage = () => {
   const { t } = useTranslation('employer');

@@ -4,9 +4,9 @@ import React from 'react';
 import { Box, Typography, Container, Paper } from "@mui/material";
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { useTranslation } from 'react-i18next';
-import CompanySearch from '../../components/defaults/CompanySearch';
-import Companies from '../../../components/Features/Companies';
-import useSEO from '../../../hooks/useSEO';
+import CompanySearch from '@/views/components/defaults/CompanySearch';
+import Companies from '@/components/Features/Companies';
+import useSEO from '@/hooks/useSEO';
 
 const CompanyPage = () => {
   const { t } = useTranslation('public');

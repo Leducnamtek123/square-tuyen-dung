@@ -4,15 +4,14 @@ import React from 'react';
 import { Collapse, List, ListItem } from '@mui/material';
 import GridViewIcon from '@mui/icons-material/GridView';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
-import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
-import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
-import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import { ROUTES, LINKS } from '@/configs/constants';
+import { ROUTES } from '@/configs/constants';
 import { getLocalizedRouteVariants, localizeRoutePath } from '@/configs/routeLocalization';
+import { useQuery } from '@tanstack/react-query';
+import adminManagementService from '@/services/adminManagementService';
+import contactMessageService from '@/services/contactMessageService';
 import MenuItem from './MenuItem';
 
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
@@ -36,13 +35,32 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
     return getLocalizedRouteVariants(`/${route}`).some((path) => pathname === path || pathname.startsWith(`${path}/`));
   };
 
+  const { data: verificationsData } = useQuery({
+    queryKey: ['admin-pending-verifications-count'],
+    queryFn: () => adminManagementService.getCompanyVerifications({ page: 1, pageSize: 1, status: 'pending' }),
+    staleTime: 60000,
+  });
+
+  const { data: trustReportsData } = useQuery({
+    queryKey: ['admin-pending-reports-count'],
+    queryFn: () => adminManagementService.getTrustReports({ page: 1, pageSize: 1, status: 'pending' }),
+    staleTime: 60000,
+  });
+
+  const { data: contactMessagesData } = useQuery({
+    queryKey: ['admin-unread-contact-messages-count'],
+    queryFn: () => contactMessageService.getList({ page: 1, pageSize: 1, is_read: false }),
+    staleTime: 60000,
+  });
+
+  const pendingVerificationsCount = verificationsData?.count || 0;
+  const pendingReportsCount = trustReportsData?.count || 0;
+  const unreadContactCount = contactMessagesData?.count || 0;
+
   return (
     <>
       <ListItem disablePadding>
         <MenuItem icon={GridViewIcon} text={t('admin:sidebar.systemOverview')} to={routePath(ROUTES.ADMIN.DASHBOARD)} isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.DASHBOARD) }} />
-      </ListItem>
-      <ListItem disablePadding>
-        <MenuItem icon={WidgetsOutlinedIcon} text="Thư viện Giao diện" to={routePath(ROUTES.ADMIN.COMPONENTS)} isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.COMPONENTS) }} />
       </ListItem>
       <ListItem disablePadding>
         <MenuItem icon={SmartToyOutlinedIcon} text={t('admin:sidebar.agentAssistants')} to={routePath(ROUTES.ADMIN.AGENT_ASSISTANTS)} isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.AGENT_ASSISTANTS) }} />
@@ -148,7 +166,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
             { text: t('admin:sidebar.bannersManagement'), to: routePath(ROUTES.ADMIN.BANNERS), isSelected: isSelected(ROUTES.ADMIN.BANNERS) },
             { text: t('admin:sidebar.bannerTypes'), to: routePath(ROUTES.ADMIN.BANNER_TYPES), isSelected: isSelected(ROUTES.ADMIN.BANNER_TYPES) },
             { text: t('admin:sidebar.feedbacksManagement'), to: routePath(ROUTES.ADMIN.FEEDBACKS), isSelected: isSelected(ROUTES.ADMIN.FEEDBACKS) },
-            { text: t('admin:sidebar.contactMessages'), to: routePath(ROUTES.ADMIN.CONTACT_MESSAGES), isSelected: isSelected(ROUTES.ADMIN.CONTACT_MESSAGES) },
+            { text: t('admin:sidebar.contactMessages'), to: routePath(ROUTES.ADMIN.CONTACT_MESSAGES), isSelected: isSelected(ROUTES.ADMIN.CONTACT_MESSAGES), badgeContent: unreadContactCount },
             { text: t('admin:sidebar.articlesManagement'), to: routePath(ROUTES.ADMIN.ARTICLES), isSelected: isSelected(ROUTES.ADMIN.ARTICLES) },
             { text: t('admin:sidebar.chatWithEmployers'), to: routePath(ROUTES.ADMIN.CHAT), isSelected: isSelected(ROUTES.ADMIN.CHAT) },
           ]}
@@ -160,7 +178,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
             <MenuItem text={t('admin:sidebar.bannersManagement')} to={routePath(ROUTES.ADMIN.BANNERS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.BANNERS) }} />
             <MenuItem text={t('admin:sidebar.bannerTypes')} to={routePath(ROUTES.ADMIN.BANNER_TYPES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.BANNER_TYPES) }} />
             <MenuItem text={t('admin:sidebar.feedbacksManagement')} to={routePath(ROUTES.ADMIN.FEEDBACKS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.FEEDBACKS) }} />
-            <MenuItem text={t('admin:sidebar.contactMessages')} to={routePath(ROUTES.ADMIN.CONTACT_MESSAGES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.CONTACT_MESSAGES) }} />
+            <MenuItem text={t('admin:sidebar.contactMessages')} to={routePath(ROUTES.ADMIN.CONTACT_MESSAGES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.CONTACT_MESSAGES) }} badgeContent={unreadContactCount} />
             <MenuItem text={t('admin:sidebar.articlesManagement')} to={routePath(ROUTES.ADMIN.ARTICLES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.ARTICLES) }} />
             <MenuItem text={t('admin:sidebar.chatWithEmployers')} to={routePath(ROUTES.ADMIN.CHAT)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.CHAT) }} />
           </List>
@@ -177,7 +195,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
           onClick={() => handleExpand('profiles')}
           subItems={[
             { text: t('admin:sidebar.companyManagement'), to: routePath(ROUTES.ADMIN.COMPANIES), isSelected: isSelected(ROUTES.ADMIN.COMPANIES) },
-            { text: t('admin:sidebar.companyVerifications'), to: routePath(ROUTES.ADMIN.COMPANY_VERIFICATIONS), isSelected: isSelected(ROUTES.ADMIN.COMPANY_VERIFICATIONS) },
+            { text: t('admin:sidebar.companyVerifications'), to: routePath(ROUTES.ADMIN.COMPANY_VERIFICATIONS), isSelected: isSelected(ROUTES.ADMIN.COMPANY_VERIFICATIONS), badgeContent: pendingVerificationsCount },
             { text: t('admin:sidebar.candidateProfiles'), to: routePath(ROUTES.ADMIN.PROFILES), isSelected: isSelected(ROUTES.ADMIN.PROFILES) },
             { text: t('admin:sidebar.resumeManagement'), to: routePath(ROUTES.ADMIN.RESUMES), isSelected: isSelected(ROUTES.ADMIN.RESUMES) },
           ]}
@@ -187,7 +205,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
         <Collapse in={expandedItems.profiles} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
             <MenuItem text={t('admin:sidebar.companyManagement')} to={routePath(ROUTES.ADMIN.COMPANIES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.COMPANIES) }} />
-            <MenuItem text={t('admin:sidebar.companyVerifications')} to={routePath(ROUTES.ADMIN.COMPANY_VERIFICATIONS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.COMPANY_VERIFICATIONS) }} />
+            <MenuItem text={t('admin:sidebar.companyVerifications')} to={routePath(ROUTES.ADMIN.COMPANY_VERIFICATIONS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.COMPANY_VERIFICATIONS) }} badgeContent={pendingVerificationsCount} />
             <MenuItem text={t('admin:sidebar.candidateProfiles')} to={routePath(ROUTES.ADMIN.PROFILES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.PROFILES) }} />
             <MenuItem text={t('admin:sidebar.resumeManagement')} to={routePath(ROUTES.ADMIN.RESUMES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.RESUMES) }} />
           </List>
@@ -206,7 +224,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
             { text: t('admin:sidebar.jobPosts'), to: routePath(ROUTES.ADMIN.JOBS), isSelected: isSelected(ROUTES.ADMIN.JOBS) },
             { text: t('admin:sidebar.questionBank'), to: routePath(ROUTES.ADMIN.QUESTIONS), isSelected: isSelected(ROUTES.ADMIN.QUESTIONS) },
             { text: t('admin:sidebar.interviewQuestionSets'), to: routePath(ROUTES.ADMIN.QUESTION_GROUPS), isSelected: isSelected(ROUTES.ADMIN.QUESTION_GROUPS) },
-            { text: t('admin:sidebar.trustReports'), to: routePath(ROUTES.ADMIN.TRUST_REPORTS), isSelected: isSelected(ROUTES.ADMIN.TRUST_REPORTS) },
+            { text: t('admin:sidebar.trustReports'), to: routePath(ROUTES.ADMIN.TRUST_REPORTS), isSelected: isSelected(ROUTES.ADMIN.TRUST_REPORTS), badgeContent: pendingReportsCount },
             { text: t('admin:sidebar.activityLogs'), to: routePath(ROUTES.ADMIN.JOB_ACTIVITY), isSelected: isSelected(ROUTES.ADMIN.JOB_ACTIVITY) },
             { text: t('admin:sidebar.interviewSchedule'), to: routePath(ROUTES.ADMIN.INTERVIEWS), isSelected: isSelected(ROUTES.ADMIN.INTERVIEWS) },
             { text: t('admin:sidebar.voiceProfiles'), to: routePath(ROUTES.ADMIN.VOICE_PROFILES), isSelected: isSelected(ROUTES.ADMIN.VOICE_PROFILES) },
@@ -221,7 +239,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
             <MenuItem text={t('admin:sidebar.jobPosts')} to={routePath(ROUTES.ADMIN.JOBS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.JOBS) }} />
             <MenuItem text={t('admin:sidebar.questionBank')} to={routePath(ROUTES.ADMIN.QUESTIONS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.QUESTIONS) }} />
             <MenuItem text={t('admin:sidebar.interviewQuestionSets')} to={routePath(ROUTES.ADMIN.QUESTION_GROUPS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.QUESTION_GROUPS) }} />
-            <MenuItem text={t('admin:sidebar.trustReports')} to={routePath(ROUTES.ADMIN.TRUST_REPORTS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.TRUST_REPORTS) }} />
+            <MenuItem text={t('admin:sidebar.trustReports')} to={routePath(ROUTES.ADMIN.TRUST_REPORTS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.TRUST_REPORTS) }} badgeContent={pendingReportsCount} />
             <MenuItem text={t('admin:sidebar.activityLogs')} to={routePath(ROUTES.ADMIN.JOB_ACTIVITY)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.JOB_ACTIVITY) }} />
             <MenuItem text={t('admin:sidebar.interviewSchedule')} to={routePath(ROUTES.ADMIN.INTERVIEWS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.INTERVIEWS) }} />
             <MenuItem text={t('admin:sidebar.voiceProfiles')} to={routePath(ROUTES.ADMIN.VOICE_PROFILES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.VOICE_PROFILES) }} />

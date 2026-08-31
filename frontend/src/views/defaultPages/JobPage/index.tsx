@@ -3,13 +3,13 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import JobPostSearch from "../../components/defaults/JobPostSearch";
-import SuggestedJobPostCard from "../../components/defaults/SuggestedJobPostCard";
-import MainJobPostCard from "../../components/defaults/MainJobPostCard";
-import MainJobRightBanner from "../../../components/Features/MainJobRightBanner";
-import { ROLES_NAME } from "../../../configs/constants";
-import { useAppSelector } from "../../../hooks/useAppStore";
-import useSEO from "../../../hooks/useSEO";
+import JobPostSearch from "@/views/components/defaults/JobPostSearch";
+import SuggestedJobPostCard from "@/views/components/defaults/SuggestedJobPostCard";
+import MainJobPostCard from "@/views/components/defaults/MainJobPostCard";
+import MainJobRightBanner from "@/components/Features/MainJobRightBanner";
+import { ROLES_NAME } from "@/configs/constants";
+import { useAppSelector } from "@/hooks/useAppStore";
+import useSEO from "@/hooks/useSEO";
 
 
 

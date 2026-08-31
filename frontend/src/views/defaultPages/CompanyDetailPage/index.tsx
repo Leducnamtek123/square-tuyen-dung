@@ -4,20 +4,20 @@ import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import { Box, Card, Stack, Typography } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
-import errorHandling from "../../../utils/errorHandling";
-import toastMessages from "../../../utils/toastMessages";
-import SocialNetworkSharingPopup from "../../../components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
-import TrustReportDialog from "../../../components/Features/TrustReportDialog";
-import NoDataCard from "../../../components/Common/NoDataCard";
-import companyService from "../../../services/companyService";
-import FilterJobPostCard from "../../components/defaults/FilterJobPostCard";
+import errorHandling from "@/utils/errorHandling";
+import toastMessages from "@/utils/toastMessages";
+import SocialNetworkSharingPopup from "@/components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
+import TrustReportDialog from "@/components/Features/TrustReportDialog";
+import NoDataCard from "@/components/Common/NoDataCard";
+import companyService from "@/services/companyService";
+import FilterJobPostCard from "@/views/components/defaults/FilterJobPostCard";
 import CompanyDetailLoading from "./components/CompanyDetailLoading";
-import { useAppSelector } from "../../../hooks/useAppStore";
+import { useAppSelector } from "@/hooks/useAppStore";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
-import useSEO from "../../../hooks/useSEO";
-import useStructuredData from "../../../hooks/useStructuredData";
-import sanitizeHtml from "../../../utils/sanitizeHtml";
+import useSEO from "@/hooks/useSEO";
+import useStructuredData from "@/hooks/useStructuredData";
+import sanitizeHtml from "@/utils/sanitizeHtml";
 
 import CompanyHeader from "./CompanyHeader";
 import CompanyAbout from "./CompanyAbout";
@@ -124,17 +124,38 @@ const CompanyDetailPage = () => {
 
   return isLoading ? <CompanyDetailLoading /> : companyDetail === null ? <NoDataCard /> : (
     <>
-      <Box sx={{ mt: 2 }}>
-        <Stack spacing={2}>
+      <Box sx={{ mt: { xs: 1, md: 2 }, pb: { xs: 12, md: 6 } }}>
+        <Stack spacing={{ xs: 2, md: 3 }}>
           <CompanyHeader companyDetail={companyDetail} allConfig={allConfig} isAuthenticated={isAuthenticated} currentUser={currentUser} isLoadingFollow={followMutation.isPending} handleFollow={handleFollow} setOpenSharePopup={setOpenSharePopup} setOpenReportPopup={handleOpenReport} t={t} />
           <Box>
-            <Grid container spacing={3}>
+            <Grid container spacing={{ xs: 2, md: 3 }}>
               <Grid size={{ xs: 12, md: 8 }}>
-                <Card sx={{ p: 3, boxShadow: (theme: Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.small || 1 }}>
-                  <Stack spacing={4}>
+                <Card sx={{ p: { xs: 2, sm: 3 }, borderRadius: { xs: 2.5, md: 3 }, boxShadow: (theme: Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.small || 1 }}>
+                  <Stack spacing={{ xs: 3, md: 4 }}>
                     <CompanyAbout companyDetail={companyDetail} safeDescriptionHtml={safeDescriptionHtml} t={t} />
                     <Box>
-                      <Typography variant="h5" gutterBottom sx={{ color: "primary.main", fontWeight: 600, mb: 3 }}>
+                      <Typography
+                        variant="h5"
+                        gutterBottom
+                        sx={{
+                          color: "#0f172a",
+                          fontWeight: 700,
+                          fontSize: { xs: '1.15rem', sm: '1.25rem', md: '1.4rem' },
+                          mb: { xs: 2, md: 2.5 },
+                          letterSpacing: '-0.01em',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1.25,
+                          '&::before': {
+                            content: '""',
+                            width: 4,
+                            height: 18,
+                            borderRadius: 2,
+                            bgcolor: 'primary.main',
+                            display: 'inline-block',
+                          }
+                        }}
+                      >
                         {t("companyDetail.hiring")}
                       </Typography>
                       <FilterJobPostCard params={{ companyId: companyDetail.id }} hideHeader />

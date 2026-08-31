@@ -1,8 +1,8 @@
 ﻿import React from "react";
 import { Switch } from "@mui/material";
-import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
-import jobPostNotificationService from "../../../../services/jobPostNotificationService";
-import errorHandling from "../../../../utils/errorHandling";
+import BackdropLoading from "@/components/Common/Loading/BackdropLoading";
+import jobPostNotificationService from "@/services/jobPostNotificationService";
+import errorHandling from "@/utils/errorHandling";
 import type { AxiosError } from 'axios';
 
 interface ActiveButtonComponentProps {

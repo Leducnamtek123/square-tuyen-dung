@@ -18,7 +18,7 @@ import {
   chartColors,
   createDoughnutOptions,
 } from '@/components/Common/Charts/chartDesign';
-import { useEmployerRecruitmentStatistics } from '../../hooks/useEmployerQueries';
+import { useEmployerRecruitmentStatistics } from '@/views/components/employers/hooks/useEmployerQueries';
 
 interface RecruitmentFunnelCardProps {
   title?: string;

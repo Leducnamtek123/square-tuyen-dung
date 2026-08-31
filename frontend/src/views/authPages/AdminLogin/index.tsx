@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import * as React from 'react';
-import type { AppDispatch } from '../../../redux/store';
+import type { AppDispatch } from '@/redux/store';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -15,18 +15,18 @@ import {
   styled,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { TabTitle } from '../../../utils/generalFunction';
-import { ROLES_NAME, ROUTES } from '../../../configs/constants';
-import toastMessages from '../../../utils/toastMessages';
-import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
-import { updateVerifyEmail } from '../../../redux/authSlice';
-import { getUserInfo } from '../../../redux/userSlice';
-import AdminLoginForm from '../../components/auths/JobSeekerLoginForm';
-import authService from '../../../services/authService';
-import tokenService from '../../../services/tokenService';
-import type { RoleName } from '../../../types/auth';
-import { getPreferredLanguage } from '../../../configs/portalRouting';
-import { localizeRoutePath } from '../../../configs/routeLocalization';
+import { TabTitle } from '@/utils/generalFunction';
+import { ROLES_NAME, ROUTES } from '@/configs/constants';
+import toastMessages from '@/utils/toastMessages';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import { updateVerifyEmail } from '@/redux/authSlice';
+import { getUserInfo } from '@/redux/userSlice';
+import AdminLoginForm from '@/views/components/auths/JobSeekerLoginForm';
+import authService from '@/services/authService';
+import tokenService from '@/services/tokenService';
+import type { RoleName } from '@/types/auth';
+import { getPreferredLanguage } from '@/configs/portalRouting';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 const INTERVAL_MS = 5000;
 

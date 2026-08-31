@@ -22,22 +22,22 @@ import { useTranslation } from 'react-i18next';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 
-import errorHandling from '../../../../utils/errorHandling';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import toastMessages from '../../../../utils/toastMessages';
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import errorHandling from '@/utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import toastMessages from '@/utils/toastMessages';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import FormPopup from '@/components/Common/Controls/FormPopup';
 import AppliedResumeTable from '../AppliedResumeTable';
 import AppliedResumeKanban from '../AppliedResumeKanban';
-import jobPostActivityService from '../../../../services/jobPostActivityService';
-import hrmService, { type OnboardCandidatePayload } from '../../../../services/hrmService';
+import jobPostActivityService from '@/services/jobPostActivityService';
+import hrmService, { type OnboardCandidatePayload } from '@/services/hrmService';
 import {
   useAppliedResumes,
   useJobPostOptions,
   useDeleteJobPostActivity,
   useUpdateApplicationStatus,
 } from '../hooks/useEmployerQueries';
-import { useDataTable } from '../../../../hooks';
+import { useDataTable } from '@/hooks';
 import { useConfig } from '@/hooks/useConfig';
 import type { JobPostActivity } from '@/types/models';
 import type { OnChangeFn, PaginationState, SortingState, RowSelectionState } from '@tanstack/react-table';

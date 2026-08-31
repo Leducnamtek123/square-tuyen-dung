@@ -1,28 +1,6 @@
-import type { RoleName } from '../../../../types/auth';
+import type { RoleName, EmployerSignUpFormData } from '@/types/auth';
 
-export interface EmployerSignUpFormData {
-  fullName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  company: {
-    companyName: string;
-    companyEmail: string;
-    companyPhone: string;
-    taxCode: string;
-    since?: Date | null;
-    fieldOperation: string;
-    employeeSize: number;
-    websiteUrl: string;
-    location: {
-      city: string | number;
-      district: string | number;
-      address: string;
-      lat: number | string | null;
-      lng: number | string | null;
-    };
-  };
-}
+export type { EmployerSignUpFormData };
 
 interface EmployerSignUpFormProps {
   onSignUp: (data: EmployerSignUpFormData) => void;

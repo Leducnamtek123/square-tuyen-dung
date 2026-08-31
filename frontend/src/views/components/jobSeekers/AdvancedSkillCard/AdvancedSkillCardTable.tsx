@@ -2,8 +2,8 @@ import React from 'react';
 import { IconButton, Rating, Stack } from '@mui/material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
-import DataTable from '../../../../components/Common/DataTable';
-import type { AdvancedSkill } from '../../../../types/models';
+import DataTable from '@/components/Common/DataTable';
+import type { AdvancedSkill } from '@/types/models';
 
 type Props = {
   data: AdvancedSkill[];

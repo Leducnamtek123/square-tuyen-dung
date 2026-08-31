@@ -138,9 +138,9 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                         </Stack>
 
                         <List dense sx={{ py: 0, flex: 1 }}>
-                            {strengths.length > 0 ? strengths.map((item) => (
+                            {strengths.length > 0 ? strengths.map((item, idx) => (
                                 <ListItem 
-                                    key={item} 
+                                    key={`${item}-${idx}`} 
                                     sx={{ 
                                         px: 1.75, 
                                         py: 1.25, 
@@ -213,9 +213,9 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                         </Stack>
 
                         <List dense sx={{ py: 0, flex: 1 }}>
-                            {weaknesses.length > 0 ? weaknesses.map((item) => (
+                            {weaknesses.length > 0 ? weaknesses.map((item, idx) => (
                                 <ListItem 
-                                    key={item} 
+                                    key={`${item}-${idx}`} 
                                     sx={{ 
                                         px: 1.75, 
                                         py: 1.25, 
@@ -360,7 +360,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
 
                                                 return (
                                                     <Box
-                                                        key={String((item as { id?: unknown })?.id || `${question}-${feedback}`)}
+                                                        key={String((item as { id?: unknown })?.id || `${question}-${idx}`)}
                                                         sx={{
                                                             p: 2,
                                                             borderRadius: 2,

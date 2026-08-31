@@ -8,8 +8,8 @@ import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import LibraryBooksOutlinedIcon from "@mui/icons-material/LibraryBooksOutlined";
 import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
 
-import { TabTitle } from "../../../utils/generalFunction";
-import { APP_NAME } from "../../../configs/constants";
+import { TabTitle } from "@/utils/generalFunction";
+import { APP_NAME } from "@/configs/constants";
 
 const SupportPage = () => {
   const { t } = useTranslation("employer");

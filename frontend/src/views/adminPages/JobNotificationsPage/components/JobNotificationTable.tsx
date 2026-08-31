@@ -5,9 +5,9 @@ import { Typography, IconButton, Tooltip, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import dayjs from '../../../../configs/dayjs-config';
+import dayjs from '@/configs/dayjs-config';
 import { ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
-import DataTable from '../../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 
 type JobNotificationRow = {
   title?: string;

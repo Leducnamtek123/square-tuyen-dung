@@ -237,9 +237,9 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
           {rows.length ? (
             <Paper variant="outlined" sx={{ p: 1.25, borderRadius: 1.5, bgcolor: '#ffffff', borderColor: '#E2E8F0' }}>
               <Stack spacing={0.65}>
-                {rows.map((row) => (
+                {rows.map((row, rIdx) => (
                   <Stack
-                    key={`${row.key}-${row.value}`}
+                    key={`${row.key}-${row.value}-${rIdx}`}
                     direction="row"
                     justifyContent="space-between"
                     spacing={1}
@@ -269,7 +269,7 @@ export const ToolStepCard = ({ toolCall }: { toolCall: AgentToolCall }) => {
 
                 return (
                   <Paper
-                    key={`${title}-${index}`}
+                    key={(item as any)?.id != null ? String((item as any).id) : `${title}-${index}`}
                     variant="outlined"
                     sx={{ p: 1, borderRadius: 1.25, bgcolor: '#ffffff', borderColor: '#E2E8F0' }}
                   >

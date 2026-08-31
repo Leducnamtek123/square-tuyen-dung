@@ -6,7 +6,7 @@ import { Grid2 as Grid } from "@mui/material";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import SettingForm from "../SettingForm";
-import { useUserSettings, useUpdateUserSettings } from "../../jobSeekers/hooks/useJobSeekerQueries";
+import { useUserSettings, useUpdateUserSettings } from "@/views/components/jobSeekers/hooks/useJobSeekerQueries";
 import type { FormValues as SettingformFormValues } from '../SettingForm';
 import { useTranslation } from 'react-i18next';
 
@@ -90,7 +90,6 @@ const SettingCard = ({ title, sx }: SettingCardProps) => {
           ) : (
             <Box>
               <SettingForm
-                key={JSON.stringify(editData ?? {})}
                 editData={editData ?? null}
                 handleUpdate={handleUpdateUserSetting}
               />

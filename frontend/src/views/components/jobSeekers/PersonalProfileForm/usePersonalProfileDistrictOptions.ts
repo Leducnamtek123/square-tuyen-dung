@@ -2,9 +2,9 @@
 import React from 'react';
 import { useWatch, type Control, type UseFormSetValue } from 'react-hook-form';
 import type { SelectOption } from '@/types/models';
-import commonService from '../../../../services/commonService';
-import errorHandling from '../../../../utils/errorHandling';
-import { shouldResetChildLocationValue } from '../../../../utils/locationForm';
+import commonService from '@/services/commonService';
+import errorHandling from '@/utils/errorHandling';
+import { shouldResetChildLocationValue } from '@/utils/locationForm';
 import type { PersonalProfileFormValues } from './types';
 
 type DistrictOptionsResponse =

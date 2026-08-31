@@ -8,7 +8,7 @@ from oauth2_provider.models import Application
 from rest_framework.test import APIClient
 
 from apps.files.models import File
-from common.models import AuditLog, Career
+from apps.common.models import AuditLog, Career
 from shared.configs.env_validation import validate_required_settings
 
 
@@ -129,7 +129,7 @@ def test_presign_allows_public_asset_path(monkeypatch):
             return f"https://cdn.example.test/{bucket}/{object_path}?X-Amz-Signature=test"
 
     monkeypatch.setattr(
-        "common.views.CloudinaryService._get_presign_client",
+        "apps.common.views.CloudinaryService._get_presign_client",
         lambda: FakePresignClient(),
     )
 
@@ -156,7 +156,7 @@ def test_presign_allows_resume_owner_for_cv_file(monkeypatch, job_seeker_user, r
     resume.save(update_fields=["file", "update_at"])
 
     monkeypatch.setattr(
-        "common.views.CloudinaryService._get_presign_client",
+        "apps.common.views.CloudinaryService._get_presign_client",
         lambda: FakePresignClient(),
     )
     client = APIClient()
@@ -200,7 +200,7 @@ def test_presign_allows_employer_for_submitted_inactive_cv(
     )
 
     monkeypatch.setattr(
-        "common.views.CloudinaryService._get_presign_client",
+        "apps.common.views.CloudinaryService._get_presign_client",
         lambda: FakePresignClient(),
     )
     client = APIClient()

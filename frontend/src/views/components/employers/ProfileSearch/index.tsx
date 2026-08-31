@@ -6,8 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { Stack } from '@mui/material';
-import { resetSearchResume, searchResume } from '../../../../redux/filterSlice';
-import type { ResumeFilter } from '../../../../redux/filterSlice';
+import { resetSearchResume, searchResume } from '@/redux/filterSlice';
+import type { ResumeFilter } from '@/redux/filterSlice';
 import { useConfig } from '@/hooks/useConfig';
 import {
   useGlobalFilter,
@@ -15,7 +15,7 @@ import {
   GlobalFilterDrawer,
   ActiveFilterChips,
   candidateFilterConfig,
-} from '../../../../components/Common/Filters';
+} from '@/components/Common/Filters';
 
 export interface ProfileSearchValues {
   kw: string;

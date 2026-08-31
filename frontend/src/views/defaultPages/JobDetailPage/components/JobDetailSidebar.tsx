@@ -5,9 +5,9 @@ import { Box, Card, CardContent, Stack, Typography, Button } from '@mui/material
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PeopleIcon from '@mui/icons-material/People';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import FilterJobPostCard from '../../../components/defaults/FilterJobPostCard';
-import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
-import { IMAGES } from '../../../../configs/constants';
+import FilterJobPostCard from '@/views/components/defaults/FilterJobPostCard';
+import MuiImageCustom from '@/components/Common/MuiImageCustom';
+import { IMAGES } from '@/configs/constants';
 import { useConfig } from '@/hooks/useConfig';
 import { tConfig } from '@/utils/tConfig';
 import type { Company, JobPost } from '@/types/models';

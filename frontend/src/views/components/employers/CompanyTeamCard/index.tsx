@@ -399,9 +399,9 @@ const CompanyTeamCard = () => {
                   <TableCell sx={{ color: '#475569', fontWeight: 600, fontSize: '0.85rem' }}>{role.code || '---'}</TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
-                      {(role.permissions || []).map((perm, idx) => (
+                      {(role.permissions || []).map((perm) => (
                         <Chip
-                          key={idx}
+                          key={typeof perm === 'object' ? String((perm as any).id ?? (perm as any).code) : String(perm)}
                           label={getPermissionLabel(perm)}
                           size="small"
                           sx={{

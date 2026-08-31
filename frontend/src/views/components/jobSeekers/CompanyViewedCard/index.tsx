@@ -1,16 +1,16 @@
 import React from 'react';
 import { Box, Stack, Pagination, Chip } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
-import NoDataCard from '../../../../components/Common/NoDataCard';
-import CompanyAction from '../../../../components/Features/CompanyAction';
-import CompanyActionLoading from '../../../../components/Features/CompanyAction/Loading';
+import NoDataCard from '@/components/Common/NoDataCard';
+import CompanyAction from '@/components/Features/CompanyAction';
+import CompanyActionLoading from '@/components/Features/CompanyAction/Loading';
 import { useResumeViewed } from '../hooks/useJobSeekerQueries';
 import { useTranslation } from 'react-i18next';
 
 const pageSize = 10;
 
-import type { Company, Resume } from '../../../../types/models';
-import type { ResumeViewed } from '../../../../services/resumeViewedService';
+import type { Company, Resume } from '@/types/models';
+import type { ResumeViewed } from '@/services/resumeViewedService';
 
 const CompanyViewedCard = () => {
   const { t } = useTranslation(['jobSeeker']);

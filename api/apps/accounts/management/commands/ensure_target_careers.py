@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from common.models import Career
+from apps.common.models import Career
 
 
 TARGET_CAREERS = [

@@ -23,11 +23,13 @@ import {
   chartTitleSx,
   createDoughnutOptions,
 } from '@/components/Common/Charts/chartDesign';
-import { useEmployerRecruitmentStatistics } from '../../hooks/useEmployerQueries';
-import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
+import { useEmployerRecruitmentStatistics } from '@/views/components/employers/hooks/useEmployerQueries';
+import RangePickerCustom from '@/components/Common/Controls/RangePickerCustom';
 
 interface RecruitmentChartProps {
   title: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 const STAGE_COLORS: Record<string, string> = {
@@ -54,19 +56,19 @@ const DEFAULT_COLORS = [
   chartColors.red,
 ];
 
-const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
+const RecruitmentChart = ({ title, startDate, endDate }: RecruitmentChartProps) => {
   const { t, i18n } = useTranslation('employer');
   const theme = useTheme();
-  const [allowSubmit, setAllowSubmit] = useState(false);
-  const [selectedDateRange, setSelectedDateRange] = useState<[Dayjs | null, Dayjs | null]>([
-    dayjs().subtract(1, 'month'),
-    dayjs(),
-  ]);
 
-  const queryParams = useMemo(() => ({
-    startDate: dayjs(selectedDateRange[0]).format('YYYY-MM-DD'),
-    endDate: dayjs(selectedDateRange[1]).format('YYYY-MM-DD'),
-  }), [selectedDateRange]);
+  const queryParams = useMemo(() => {
+    if (startDate && endDate) {
+      return { startDate, endDate };
+    }
+    return {
+      startDate: dayjs().subtract(30, 'day').format('YYYY-MM-DD'),
+      endDate: dayjs().format('YYYY-MM-DD'),
+    };
+  }, [startDate, endDate]);
 
   const { data, isLoading } = useEmployerRecruitmentStatistics(queryParams);
 
@@ -113,9 +115,21 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
   }, [theme, i18n.language]);
 
   return (
-    <Paper elevation={0} sx={chartCardSx}>
+    <Paper
+      elevation={0}
+      sx={{
+        p: 2.5,
+        borderRadius: 3,
+        border: '1px solid #E2E8F0',
+        bgcolor: '#FFFFFF',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04)',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Stack direction="row" spacing={1.25} alignItems="center">
           <Box
             sx={{
@@ -124,7 +138,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
               justifyContent: 'center',
               width: 36,
               height: 36,
-              borderRadius: '10px',
+              borderRadius: 2.5,
               bgcolor: '#F0FDF4',
               color: '#10B981',
             }}
@@ -132,10 +146,10 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
             <FilterAltOutlinedIcon sx={{ fontSize: 20 }} />
           </Box>
           <Box>
-            <Typography variant="h4" sx={chartTitleSx}>
+            <Typography variant="h6" sx={{ fontSize: '1.05rem', fontWeight: 700, color: '#0F172A', lineHeight: 1.2 }}>
               {title}
             </Typography>
-            <Typography sx={{ fontSize: '0.78rem', color: '#94A3B8' }}>
+            <Typography variant="body2" sx={{ fontSize: '0.78rem', color: '#64748B', mt: 0.25 }}>
               Phân bổ ứng viên qua từng vòng tuyển dụng
             </Typography>
           </Box>
@@ -147,7 +161,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
               sx={{
                 px: 1.25,
                 py: 0.35,
-                borderRadius: '8px',
+                borderRadius: 1.5,
                 bgcolor: '#F1F5F9',
                 color: '#475569',
                 fontWeight: 700,
@@ -158,24 +172,16 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
             </Box>
           )}
           <MuiTooltip title={t('recruitmentChart.tooltip', { defaultValue: 'Phễu phân bổ ứng viên qua các giai đoạn tuyển dụng' })} arrow placement="top">
-            <InfoIcon sx={{ color: '#98A2B3', cursor: 'pointer', fontSize: 18, '&:hover': { color: '#2563EB' } }} />
+            <InfoIcon sx={{ color: '#94A3B8', cursor: 'pointer', fontSize: 18, '&:hover': { color: '#2563EB' } }} />
           </MuiTooltip>
         </Stack>
       </Box>
 
-      {/* Date Filter Row */}
-      <RangePickerCustom
-        allowSubmit={allowSubmit}
-        setAllowSubmit={setAllowSubmit}
-        selectedDateRange={selectedDateRange}
-        setSelectedDateRange={setSelectedDateRange}
-      />
-
       {/* Body Content */}
       {isLoading ? (
-        <ChartLoadingState height="260px" label={t('recruitmentChart.loading')} />
+        <ChartLoadingState height="280px" label={t('recruitmentChart.loading')} />
       ) : funnelItems.length === 0 || totalCount === 0 ? (
-        <ChartEmptyState height="260px" label={t('recruitmentChart.noData', { defaultValue: 'Chưa có dữ liệu phễu tuyển dụng' })} />
+        <ChartEmptyState height="280px" label={t('recruitmentChart.noData', { defaultValue: 'Chưa có dữ liệu phễu tuyển dụng' })} />
       ) : (
         <Box
           sx={{
@@ -184,7 +190,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
             alignItems: 'center',
             gap: 3,
             flexGrow: 1,
-            mt: 1,
+            mt: 0.5,
             py: 1,
           }}
         >

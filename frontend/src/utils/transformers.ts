@@ -63,11 +63,20 @@ const asMap = (value: unknown): GenericMap | null => {
   return value as GenericMap;
 };
 
+export const parseEntityId = (val: unknown): number => {
+  if (typeof val === 'number' && !Number.isNaN(val)) return val;
+  if (typeof val === 'string' && val.trim() !== '') {
+    const parsed = Number(val);
+    if (!Number.isNaN(parsed)) return parsed;
+  }
+  return 0;
+};
+
 const transformQuestion = (q: unknown): Question | null => {
   const map = asMap(q) as QuestionLike | null;
   if (!map) return null;
 
-  const id = typeof map.id === 'number' ? map.id : 0;
+  const id = parseEntityId(map.id);
   const text =
     (typeof map.text === 'string' && map.text) ||
     (typeof map.questionText === 'string' && map.questionText) ||
@@ -92,7 +101,7 @@ const transformQuestionGroup = (group: unknown): QuestionGroup | null => {
   if (!map) return null;
 
   return {
-    id: typeof map.id === 'number' ? map.id : 0,
+    id: parseEntityId(map.id),
     name: typeof map.name === 'string' ? map.name : '',
     description: typeof map.description === 'string' ? map.description : '',
     questions: (Array.isArray(map.questions) ? map.questions : []).flatMap((item) => {
@@ -146,7 +155,7 @@ export const transformInterviewSession = (session: unknown): InterviewSession | 
     undefined;
 
   return {
-    id: typeof s.id === 'number' ? s.id : typeof s.sessionId === 'number' ? s.sessionId : 0,
+    id: parseEntityId(s.id ?? s.sessionId),
     candidateName,
     candidateEmail,
     companyName,
@@ -172,14 +181,16 @@ const transformJobPost = (job: unknown): JobPost | null => {
   const map = asMap(job) as JobPostLike | null;
   if (!map) return null;
 
+  const locId = parseEntityId((map.location as any)?.id ?? (map.locationDict as any)?.id);
+
   return {
-    id: typeof map.id === 'number' ? map.id : 0,
+    id: parseEntityId(map.id),
     jobName:
       (typeof map.jobName === 'string' && map.jobName) ||
       (typeof map.title === 'string' ? map.title : ''),
     slug: typeof map.slug === 'string' ? map.slug : '',
     company: map.companyDict ? ({ companyName: map.companyDict.companyName || '' } as Company) : null,
-    location: { id: 0, city: map.locationDict?.city || '', address: '' } as Location,
+    location: { id: locId, city: map.locationDict?.city || (map.location as any)?.city || '', address: (map.location as any)?.address || '' } as Location,
     salaryMin: typeof map.salaryMin === 'number' ? map.salaryMin : 0,
     salaryMax: typeof map.salaryMax === 'number' ? map.salaryMax : 0,
     deadline: typeof map.deadline === 'string' ? map.deadline : '',
@@ -192,14 +203,15 @@ const transformAppliedResume = (resume: unknown): GenericMap | null => {
   const map = asMap(resume) as AppliedResumeLike | null;
   if (!map) return null;
 
-  const userId = (typeof map.userId === 'number' ? map.userId : map.user?.id) || 0;
+  const rawUserId = map.userId ?? map.user?.id;
+  const userId = parseEntityId(rawUserId);
   const candidateName =
     (typeof map.fullName === 'string' && map.fullName) ||
     (typeof map.user?.fullName === 'string' ? map.user.fullName : '');
 
   return {
     ...map,
-    id: typeof map.id === 'number' ? map.id : 0,
+    id: parseEntityId(map.id),
     candidateId: userId,
     userId,
     candidateName,

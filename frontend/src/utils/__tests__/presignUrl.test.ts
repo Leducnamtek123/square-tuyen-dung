@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ensurePresignedUrl, presignInObject } from '../presignUrl';
-import tokenService from '../../services/tokenService';
+import tokenService from '@/services/tokenService';
 
 jest.mock('axios');
 jest.mock('../../services/tokenService', () => ({

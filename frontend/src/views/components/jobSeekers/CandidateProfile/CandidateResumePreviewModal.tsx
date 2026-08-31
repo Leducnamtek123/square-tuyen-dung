@@ -297,8 +297,8 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
 
             {experiences.length > 0 ? (
               <Stack spacing={2}>
-                {experiences.map((exp, idx) => (
-                  <Box key={idx} sx={{ pl: 2, borderLeft: '3px solid #2563eb' }}>
+                {experiences.map((exp) => (
+                  <Box key={String(exp.id)} sx={{ pl: 2, borderLeft: '3px solid #2563eb' }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
                       {exp.jobName} {exp.companyName ? `- ${exp.companyName}` : ''}
                     </Typography>
@@ -334,8 +334,8 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
                 </Box>
                 {educations.length > 0 ? (
                   <Stack spacing={1.5}>
-                    {educations.map((edu, idx) => (
-                      <Box key={idx}>
+                    {educations.map((edu) => (
+                      <Box key={String(edu.id)}>
                         <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
                           {edu.degreeName || edu.major || 'Học vấn'}
                         </Typography>
@@ -372,15 +372,15 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
                   <Stack spacing={2}>
                     {advancedSkills.length > 0 && (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {advancedSkills.map((skill, idx) => (
-                          <Chip key={idx} label={skill.name} size="small" sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 700 }} />
+                        {advancedSkills.map((skill) => (
+                          <Chip key={String(skill.id)} label={skill.name} size="small" sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 700 }} />
                         ))}
                       </Box>
                     )}
                     {certificates.length > 0 && (
                       <Stack spacing={1}>
-                        {certificates.map((cert, idx) => (
-                          <Box key={idx} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {certificates.map((cert) => (
+                          <Box key={String(cert.id)} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <CardMembershipIcon sx={{ fontSize: 16, color: '#16a34a' }} />
                             <Typography variant="body2" sx={{ fontWeight: 600, color: '#0f172a' }}>
                               {cert.name} {cert.trainingPlace ? `(${cert.trainingPlace})` : ''}

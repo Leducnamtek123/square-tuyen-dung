@@ -17,7 +17,7 @@ import { type VariantProps, cva } from 'class-variance-authority';
 import { type LocalAudioTrack, type RemoteAudioTrack } from 'livekit-client';
 import { type AgentState, type TrackReferenceOrPlaceholder } from '@livekit/components-react';
 
-import { ReactShaderToy } from '@/components/agents-ui/react-shader-toy';
+import { ReactShaderToy } from './react-shader-toy';
 import { useAgentAudioVisualizerAura } from '@/hooks/agents-ui/use-agent-audio-visualizer-aura';
 import { cn } from '@/lib/utils';
 

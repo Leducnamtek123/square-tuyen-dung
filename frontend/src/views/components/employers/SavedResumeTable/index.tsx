@@ -20,13 +20,13 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import type { ColumnDef, PaginationState, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 
-import { CV_TYPES, ROUTES } from '../../../../configs/constants';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
-import DataTable from '../../../../components/Common/DataTable';
+import { CV_TYPES, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import DataTable from '@/components/Common/DataTable';
 import { formatRoute } from '@/utils/funcUtils';
 
-import { formatLocalizedSalaryRange } from '../../../../utils/customData';
-import { tConfig } from '../../../../utils/tConfig';
+import { formatLocalizedSalaryRange } from '@/utils/customData';
+import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import type { ResumeSaved } from '@/types/models';
 import pc from '@/utils/muiColors';

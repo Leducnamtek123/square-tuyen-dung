@@ -5,23 +5,23 @@ import { useRouter } from 'next/navigation';
 
 import { useTranslation } from 'react-i18next';
 
-import { TabTitle } from '../../../utils/generalFunction';
+import { TabTitle } from '@/utils/generalFunction';
 
-import { AUTH_CONFIG, AUTH_PROVIDER, ROLES_NAME, ROUTES } from '../../../configs/constants';
+import { AUTH_CONFIG, AUTH_PROVIDER, ROLES_NAME, ROUTES } from '@/configs/constants';
 
-import toastMessages from '../../../utils/toastMessages';
+import toastMessages from '@/utils/toastMessages';
 
-import { updateVerifyEmail } from '../../../redux/authSlice';
+import { updateVerifyEmail } from '@/redux/authSlice';
 
-import { getUserInfo } from '../../../redux/userSlice';
+import { getUserInfo } from '@/redux/userSlice';
 
-import authService from '../../../services/authService';
+import authService from '@/services/authService';
 
-import tokenService from '../../../services/tokenService';
+import tokenService from '@/services/tokenService';
 
-import { useAppDispatch } from '../../../hooks/useAppStore';
+import { useAppDispatch } from '@/hooks/useAppStore';
 
-import type { RoleName, AuthProvider } from '../../../types/auth';
+import type { RoleName, AuthProvider } from '@/types/auth';
 
 import type { AxiosError } from 'axios';
 

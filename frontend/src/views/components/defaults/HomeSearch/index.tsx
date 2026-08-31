@@ -9,24 +9,24 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import SearchIcon from '@mui/icons-material/Search';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import InputBaseSearchHomeCustom from '../../../../components/Common/Controls/InputBaseSearchHomeCustom';
-import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
+import InputBaseSearchHomeCustom from '@/components/Common/Controls/InputBaseSearchHomeCustom';
+import SingleSelectSearchCustom from '@/components/Common/Controls/SingleSelectSearchCustom';
 import { useTranslation } from 'react-i18next';
 import {
   resetSearchJobPostFilter,
   searchJobPost,
-} from '../../../../redux/filterSlice';
-import { ROUTES } from '../../../../configs/constants';
+} from '@/redux/filterSlice';
+import { ROUTES } from '@/configs/constants';
 import { useConfig } from '@/hooks/useConfig';
-import commonService from '../../../../services/commonService';
-import type { JobPostFilter } from '../../../../redux/filterSlice';
+import commonService from '@/services/commonService';
+import type { JobPostFilter } from '@/redux/filterSlice';
 import {
   PROJECT_SEARCH_HISTORY_STORAGE_KEY,
   LEGACY_PROJECT_SEARCH_HISTORY_STORAGE_KEY,
   readVersionedJson,
   writeVersionedJson,
 } from '@/utils/storageKeys';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 type HomeSearchProps = {
   variant?: 'default' | 'hero';

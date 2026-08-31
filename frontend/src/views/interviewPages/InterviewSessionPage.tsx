@@ -16,10 +16,10 @@ import {
 } from '@livekit/components-react';
 import { TokenSource } from 'livekit-client';
 
-import interviewService from '../../services/interviewService';
-import tokenService from '../../services/tokenService';
-import { transformInterviewSession } from '../../utils/transformers';
-import type { InterviewSession } from '../../types/models';
+import interviewService from '@/services/interviewService';
+import tokenService from '@/services/tokenService';
+import { transformInterviewSession } from '@/utils/transformers';
+import type { InterviewSession } from '@/types/models';
 import { PreflightRoom } from './PreflightRoom';
 import { AIInterviewLayout } from './AIInterviewLayout';
 import { cn } from '@/lib/utils';

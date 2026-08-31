@@ -10,15 +10,15 @@ import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import CardMembershipOutlinedIcon from '@mui/icons-material/CardMembershipOutlined';
 import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
-import { TabTitle } from '../../../utils/generalFunction';
-import PersonalInfoCard from '../../components/jobSeekers/PersonalInfoCard';
-import GeneralInfoCard from '../../components/jobSeekers/GeneralInfoCard';
-import ExperienceDetailCard from '../../components/jobSeekers/ExperienceDetailCard';
-import EducationDetailCard from '../../components/jobSeekers/EducationDetailCard';
-import CertificateCard from '../../components/jobSeekers/CertificateCard';
-import LanguageSkillCard from '../../components/jobSeekers/LanguageSkillCard';
-import AdvancedSkillCard from '../../components/jobSeekers/AdvancedSkillCard';
-import usePreventUnsavedChanges from '../../../hooks/usePreventUnsavedChanges';
+import { TabTitle } from '@/utils/generalFunction';
+import PersonalInfoCard from '@/views/components/jobSeekers/PersonalInfoCard';
+import GeneralInfoCard from '@/views/components/jobSeekers/GeneralInfoCard';
+import ExperienceDetailCard from '@/views/components/jobSeekers/ExperienceDetailCard';
+import EducationDetailCard from '@/views/components/jobSeekers/EducationDetailCard';
+import CertificateCard from '@/views/components/jobSeekers/CertificateCard';
+import LanguageSkillCard from '@/views/components/jobSeekers/LanguageSkillCard';
+import AdvancedSkillCard from '@/views/components/jobSeekers/AdvancedSkillCard';
+import usePreventUnsavedChanges from '@/hooks/usePreventUnsavedChanges';
 
 const OnlineProfilePage = () => {
     const { t } = useTranslation('jobSeeker');

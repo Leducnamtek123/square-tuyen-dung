@@ -218,12 +218,12 @@ const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderD
     }
     if (Array.isArray(allConfig?.careerOptions)) {
       return allConfig.careerOptions
+        .filter((option): option is typeof option & { id: string | number } => option.id != null && Boolean(option.name))
         .map((option) => ({
-          id: option.id ?? '',
-          name: String(option.name ?? '').trim(),
+          id: option.id,
+          name: String(option.name).trim(),
           isHot: Boolean(option.isHot),
-        }))
-        .filter((option) => option.id && option.name);
+        }));
     }
     return [];
   }, [allConfig?.careers, allConfig?.careerOptions]);

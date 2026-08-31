@@ -15,6 +15,7 @@ import {
   Tabs,
   TextField,
   Typography,
+  Stack,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
@@ -26,6 +27,7 @@ import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
+import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import { useTranslation } from 'react-i18next';
 
 export interface EditorTemplateItem {
@@ -552,9 +554,12 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid', borderColor: 'divider', justifyContent: 'space-between' }}>
-        <Typography variant="caption" color="text.secondary">
-          {t('editor.templates.bottomHint', '💡 Bạn có thể tùy ý chỉnh sửa lại văn bản sau khi áp dụng mẫu')}
-        </Typography>
+        <Stack direction="row" spacing={0.75} alignItems="center">
+          <LightbulbOutlinedIcon sx={{ fontSize: 16, color: '#f59e0b' }} />
+          <Typography variant="caption" color="text.secondary">
+            {t('editor.templates.bottomHint', 'Bạn có thể tùy ý chỉnh sửa lại văn bản sau khi áp dụng mẫu')}
+          </Typography>
+        </Stack>
         <Box sx={{ display: 'flex', gap: 1.5 }}>
           <Button onClick={onClose} variant="outlined" color="inherit">
             {t('common.actions.cancel', 'Hủy')}

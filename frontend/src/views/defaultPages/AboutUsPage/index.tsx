@@ -25,8 +25,8 @@ import ApartmentIcon from '@mui/icons-material/Apartment';
 import ArchitectureIcon from '@mui/icons-material/Architecture';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import BoltIcon from '@mui/icons-material/Bolt';
-import { TabTitle } from '../../../utils/generalFunction';
-import { APP_NAME } from '../../../configs/constants';
+import { TabTitle } from '@/utils/generalFunction';
+import { APP_NAME } from '@/configs/constants';
 
 export default function AboutUsPage() {
   TabTitle(`Về chúng tôi - Hệ sinh thái Tuyển dụng & Nhân sự ${APP_NAME}`);

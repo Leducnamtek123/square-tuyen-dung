@@ -1,11 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { Alert, AlertTitle, Box, Button, Card, Container, Typography, styled, Grid2 as Grid } from '@mui/material';
-import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
-import JobSeekerLoginForm from '../../components/auths/JobSeekerLoginForm';
-import PhoneOTPLoginForm from '../../components/auths/PhoneOTPLoginForm';
-import AuthShowcasePanel from '../../components/auths/AuthShowcasePanel';
-import { ROUTES } from '../../../configs/constants';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import JobSeekerLoginForm from '@/views/components/auths/JobSeekerLoginForm';
+import PhoneOTPLoginForm from '@/views/components/auths/PhoneOTPLoginForm';
+import AuthShowcasePanel from '@/views/components/auths/AuthShowcasePanel';
+import { ROUTES } from '@/configs/constants';
 import SecurityIcon from '@mui/icons-material/Security';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import PhoneIphoneOutlinedIcon from '@mui/icons-material/PhoneIphoneOutlined';

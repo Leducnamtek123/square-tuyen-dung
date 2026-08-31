@@ -1,5 +1,5 @@
 import React from 'react';
-import jobPostActivityService from '../../../../services/jobPostActivityService';
+import jobPostActivityService from '@/services/jobPostActivityService';
 import RightSidebarRenderer from './RightSidebarRenderer';
 
 interface JobPostChatActivityData {

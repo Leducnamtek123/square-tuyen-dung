@@ -6,8 +6,8 @@
  */
 
 import interviewService from '../interviewService';
-import httpRequest from '../../utils/httpRequest';
-import { presignInObject } from '../../utils/presignUrl';
+import httpRequest from '@/utils/httpRequest';
+import { presignInObject } from '@/utils/presignUrl';
 import type { ScheduleSessionInput, SubmitEvaluationInput } from '../interviewService';
 import fs from 'fs';
 import path from 'path';

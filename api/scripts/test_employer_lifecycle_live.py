@@ -58,7 +58,7 @@ from rest_framework.test import APIClient
 
 from apps.accounts.models import User
 from apps.locations.models import City, Location
-from common.models import Career
+from apps.common.models import Career
 from apps.profiles.models import (
     Company, CompanyMember, CompanyRole, CompanyVerification,
     JobSeekerProfile, Resume, AdvancedSkill, ExperienceDetail,

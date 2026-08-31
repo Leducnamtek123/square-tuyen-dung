@@ -5,7 +5,7 @@ from django.db.models import Q
 from apps.accounts.models import User
 from apps.profiles.models import JobSeekerProfile, Resume
 from apps.profiles.services.vieclam24h_import import _candidate_text, _match_career, DEFAULT_VIECLAM24H_CAREER_NAMES
-from common.models import Career
+from apps.common.models import Career
 from shared.configs import variable_system as var_sys
 
 

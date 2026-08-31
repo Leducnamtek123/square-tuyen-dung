@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Avatar, Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
 import { useJobSeekerTotalView } from "../hooks/useJobSeekerQueries";
-import { ROUTES } from "../../../../configs/constants";
+import { ROUTES } from "@/configs/constants";
 import type { Theme as MaterialTheme } from '@mui/material';
-import { localizeRoutePath } from "../../../../configs/routeLocalization";
+import { localizeRoutePath } from "@/configs/routeLocalization";
 
 const SidebarViewTotal = () => {
   const { t, i18n } = useTranslation('jobSeeker');

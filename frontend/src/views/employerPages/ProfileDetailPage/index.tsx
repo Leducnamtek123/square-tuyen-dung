@@ -5,8 +5,8 @@ import { Box, Button, Stack } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { TabTitle } from '../../../utils/generalFunction';
-import ProfileDetailCard from '../../components/employers/ProfileDetailCard';
+import { TabTitle } from '@/utils/generalFunction';
+import ProfileDetailCard from '@/views/components/employers/ProfileDetailCard';
 import pc from '@/utils/muiColors';
 
 const ProfileDetailPage = () => {

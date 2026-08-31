@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 
 type Question = {
     id: string | number;

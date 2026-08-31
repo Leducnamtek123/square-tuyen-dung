@@ -1,6 +1,6 @@
 import resumeService from '../resumeService';
-import httpRequest from '../../utils/httpRequest';
-import { presignInObject } from '../../utils/presignUrl';
+import httpRequest from '@/utils/httpRequest';
+import { presignInObject } from '@/utils/presignUrl';
 import fs from 'fs';
 import path from 'path';
 

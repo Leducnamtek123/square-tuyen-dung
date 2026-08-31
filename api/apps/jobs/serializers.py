@@ -27,7 +27,7 @@ from .models import (
 from apps.locations.models import Location
 from apps.profiles.models import Resume
 
-from common import serializers as common_serializers
+from apps.common import serializers as common_serializers
 
 from apps.profiles import serializers as info_serializers
 

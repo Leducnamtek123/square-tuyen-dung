@@ -10,21 +10,21 @@ import {
   GSAP_MEDIA_CONDITIONS,
   registerGsapPlugins,
 } from '@/utils/gsapHelpers';
-import { TabTitle } from '../../../utils/generalFunction';
-import { APP_NAME } from '../../../configs/constants';
+import { TabTitle } from '@/utils/generalFunction';
+import { APP_NAME } from '@/configs/constants';
 import { useAppSelector } from '@/redux/hooks';
-import jobPostActivityService from '../../../services/jobPostActivityService';
+import jobPostActivityService from '@/services/jobPostActivityService';
 import {
   useSavedJobs,
   useCompaniesFollowed,
   useResumeViewed,
-} from '../../components/jobSeekers/hooks/useJobSeekerQueries';
+} from '@/views/components/jobSeekers/hooks/useJobSeekerQueries';
 
-import CandidateTopKpiRow from '../../components/jobSeekers/CandidateDashboardMain/CandidateTopKpiRow';
-import CandidateCvScoreCard from '../../components/jobSeekers/CandidateDashboardMain/CandidateCvScoreCard';
-import CandidateActivityChartCard from '../../components/jobSeekers/CandidateDashboardMain/CandidateActivityChartCard';
-import CandidateRecommendedJobsCard from '../../components/jobSeekers/CandidateDashboardMain/CandidateRecommendedJobsCard';
-import AiRecommendedJobsSection from '../../components/jobSeekers/CandidateDashboardMain/AiRecommendedJobsSection';
+import CandidateTopKpiRow from '@/views/components/jobSeekers/CandidateDashboardMain/CandidateTopKpiRow';
+import CandidateCvScoreCard from '@/views/components/jobSeekers/CandidateDashboardMain/CandidateCvScoreCard';
+import CandidateActivityChartCard from '@/views/components/jobSeekers/CandidateDashboardMain/CandidateActivityChartCard';
+import CandidateRecommendedJobsCard from '@/views/components/jobSeekers/CandidateDashboardMain/CandidateRecommendedJobsCard';
+import AiRecommendedJobsSection from '@/views/components/jobSeekers/CandidateDashboardMain/AiRecommendedJobsSection';
 
 registerGsapPlugins();
 

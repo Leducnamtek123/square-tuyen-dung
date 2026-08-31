@@ -2,13 +2,13 @@ import React from 'react';
 import Link from 'next/link';
 import { Box, Stack, Button, Pagination } from "@mui/material";
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import { ROUTES } from '../../../../configs/constants';
-import NoDataCard from '../../../../components/Common/NoDataCard';
-import JobPostAction from '../../../../components/Features/JobPostAction';
-import toastMessages from '../../../../utils/toastMessages';
+import { ROUTES } from '@/configs/constants';
+import NoDataCard from '@/components/Common/NoDataCard';
+import JobPostAction from '@/components/Features/JobPostAction';
+import toastMessages from '@/utils/toastMessages';
 import { useTranslation } from 'react-i18next';
 import { useSavedJobs, useToggleSaveJob } from '../hooks/useJobSeekerQueries';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 interface JobPost {
   id: string | number;

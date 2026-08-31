@@ -1,12 +1,12 @@
 ﻿'use client';
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
-import adminManagementService from '../../../../services/adminManagementService';
-import type { AdminListParams, WardPayload } from '../../../../services/adminManagementService';
-import toastMessages from '../../../../utils/toastMessages';
+import adminManagementService from '@/services/adminManagementService';
+import type { AdminListParams, WardPayload } from '@/services/adminManagementService';
+import toastMessages from '@/utils/toastMessages';
 import i18next from 'i18next';
-import { Ward } from '../../../../types/models';
-import { PaginatedResponse } from '../../../../types/api';
+import { Ward } from '@/types/models';
+import { PaginatedResponse } from '@/types/api';
 
 type UseWardsResult = UseQueryResult<PaginatedResponse<Ward>> & {
     createWard: (data: WardPayload) => Promise<Ward>;

@@ -5,18 +5,18 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Alert, Box, Stack } from "@mui/material";
 
-import errorHandling from '../../../../utils/errorHandling';
-import { DATE_OPTIONS, REGEX_VALIDATE } from '../../../../configs/constants';
-import commonService from '../../../../services/commonService';
-import useDebounce from '../../../../hooks/useDebounce';
-import goongService from '../../../../services/goongService';
+import errorHandling from '@/utils/errorHandling';
+import { DATE_OPTIONS, REGEX_VALIDATE } from '@/configs/constants';
+import commonService from '@/services/commonService';
+import useDebounce from '@/hooks/useDebounce';
+import goongService from '@/services/goongService';
 import { createEditorStateFromHTMLString } from '@/utils/editorUtils';
 import { shouldResetChildLocationValue } from '@/utils/locationForm';
 
 import CompanyFormFields from './CompanyFormFields';
 import { useConfig } from '@/hooks/useConfig';
-import type { SelectOption } from '../../../../types/models';
-import type { PlacePrediction } from '../../../../services/goongService';
+import type { SelectOption } from '@/types/models';
+import type { PlacePrediction } from '@/services/goongService';
 import type { CompanyFormValues } from './types';
 
 interface CompanyFormProps {

@@ -25,11 +25,11 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../components/Common/DataTable';
-import { ChatConversation } from '../../../types/models';
-import { useDataTable } from '../../../hooks';
+import DataTable from '@/components/Common/DataTable';
+import { ChatConversation } from '@/types/models';
+import { useDataTable } from '@/hooks';
 import { useChat, useChatMessages } from './hooks/useChat';
-import dayjs from '../../../configs/dayjs-config';
+import dayjs from '@/configs/dayjs-config';
 import FilterBar from '@/components/Common/FilterBar';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 

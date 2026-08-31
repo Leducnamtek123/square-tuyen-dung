@@ -14,7 +14,7 @@ from apps.accounts.models import User
 
 from apps.files.models import File
 from apps.locations.models import City, Location
-from common.models import Career
+from apps.common.models import Career
 
 
 class JobSeekerProfile(CommonBaseModel):

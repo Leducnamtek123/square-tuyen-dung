@@ -20,7 +20,7 @@ from apps.profiles.models import (
 )
 from apps.locations.models import Location
 from apps.files.models import File
-from common.serializers import LocationSerializer
+from apps.common.serializers import LocationSerializer
 from shared.helpers.cloudinary_service import CloudinaryService
 
 PHONE_PATTERN = re.compile(

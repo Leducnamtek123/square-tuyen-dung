@@ -14,8 +14,8 @@ import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlin
 import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
 import AutoFixHighOutlinedIcon from "@mui/icons-material/AutoFixHighOutlined";
 import { useTranslation } from 'react-i18next';
-import { ROUTES, APP_NAME } from "../../../../configs/constants";
-import { getLocalizedRouteVariants, localizeRoutePath } from "../../../../configs/routeLocalization";
+import { ROUTES, APP_NAME } from "@/configs/constants";
+import { getLocalizedRouteVariants, localizeRoutePath } from "@/configs/routeLocalization";
 
 const TabBar = () => {
   const pathname = usePathname();

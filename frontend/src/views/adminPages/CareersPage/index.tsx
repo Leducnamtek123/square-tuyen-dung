@@ -25,10 +25,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import DataTable from '../../../components/Common/DataTable';
-import { useDataTable, useDebounce } from '../../../hooks';
-import { Career } from '../../../types/models';
-import type { CareerPayload } from '../../../services/adminManagementService';
+import DataTable from '@/components/Common/DataTable';
+import { useDataTable, useDebounce } from '@/hooks';
+import { Career } from '@/types/models';
+import type { CareerPayload } from '@/services/adminManagementService';
 import { useCareers } from './hooks/useCareers';
 import FilterBar from '@/components/Common/FilterBar';
 import {

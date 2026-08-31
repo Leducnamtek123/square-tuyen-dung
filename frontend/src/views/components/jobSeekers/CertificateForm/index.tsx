@@ -1,13 +1,13 @@
 'use client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid } from '@mui/material';
-import { DATE_OPTIONS } from '../../../../configs/constants';
-import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
-import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
+import { DATE_OPTIONS } from '@/configs/constants';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
+import DatePickerCustom from '@/components/Common/Controls/DatePickerCustom';
 import type { TFunction } from 'i18next';
 
 export interface FormValues {

@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 
 import * as yup from 'yup';
 
@@ -11,7 +11,7 @@ import { Box, Button, Stack } from "@mui/material";
 
 import { useTranslation } from 'react-i18next';
 
-import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
 
 interface ForgotPasswordFormData {
   email: string;

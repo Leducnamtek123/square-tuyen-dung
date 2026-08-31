@@ -20,7 +20,7 @@ from apps.files.models import File
 from apps.jobs.models import JobPostActivity
 from apps.accounts import serializers as auth_serializers
 from apps.locations.models import City
-from common.models import Career
+from apps.common.models import Career
 
 # Import from sibling submodules
 from .profile_serializers import JobSeekerProfileSerializer, PHONE_PATTERN

@@ -18,9 +18,9 @@ import {
 
 } from '@fortawesome/free-solid-svg-icons';
 
-import { HOST_NAME, ROUTES } from '../../../../configs/constants';
-import { getPreferredLanguage, isEmployerPortalPath } from '../../../../configs/portalRouting';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { HOST_NAME, ROUTES } from '@/configs/constants';
+import { getPreferredLanguage, isEmployerPortalPath } from '@/configs/portalRouting';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 interface AccountSwitchMenuProps {
   isShowButton?: boolean;

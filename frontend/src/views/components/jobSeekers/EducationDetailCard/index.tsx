@@ -19,19 +19,19 @@ import IconButton from '@mui/material/IconButton';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import EmptyCard from '../../../../components/Common/EmptyCard';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import EmptyCard from '@/components/Common/EmptyCard';
+import FormPopup from '@/components/Common/Controls/FormPopup';
 import EducationDetaiForm from '../EducationDetailForm';
-import resumeService from '../../../../services/resumeService';
-import educationDetailService from '../../../../services/educationDetailService';
-import TimeAgo from '../../../../components/Common/TimeAgo';
+import resumeService from '@/services/resumeService';
+import educationDetailService from '@/services/educationDetailService';
+import TimeAgo from '@/components/Common/TimeAgo';
 import { Theme } from '@mui/material/styles';
 import { FormValues } from '../EducationDetailForm';
-import type { EducationDetail } from '../../../../types/models';
+import type { EducationDetail } from '@/types/models';
 
 interface EducationDetailCardProps {
   title: string;

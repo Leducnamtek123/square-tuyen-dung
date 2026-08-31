@@ -4,8 +4,8 @@ import { Box, Card, Stack, Typography, Button, Theme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Grid2 as Grid } from "@mui/material";
 
-import { TabTitle } from "../../../utils/generalFunction";
-import { APP_NAME } from "../../../configs/constants";
+import { TabTitle } from "@/utils/generalFunction";
+import { APP_NAME } from "@/configs/constants";
 
 const PricingPage = () => {
   const { t } = useTranslation("employer");

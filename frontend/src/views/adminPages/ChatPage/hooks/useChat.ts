@@ -10,10 +10,10 @@ import {
     where,
     type DocumentData,
 } from 'firebase/firestore';
-import db from '../../../../configs/firebase-config';
-import { getUserAccount, type ChatAccountData } from '../../../../services/firebaseService';
-import { ChatConversation } from '../../../../types/models';
-import { PaginatedResponse } from '../../../../types/api';
+import db from '@/configs/firebase-config';
+import { getUserAccount, type ChatAccountData } from '@/services/firebaseService';
+import { ChatConversation } from '@/types/models';
+import { PaginatedResponse } from '@/types/api';
 
 type UseChatResult = UseQueryResult<PaginatedResponse<ChatConversation>> & {
     isMutating: boolean;

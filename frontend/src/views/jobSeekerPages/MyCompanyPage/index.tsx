@@ -4,10 +4,10 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Box, Card, Stack, Tab, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid } from "@mui/material";
-import { TabTitle } from '../../../utils/generalFunction';
-import CompanyViewedCard from '../../components/jobSeekers/CompanyViewedCard';
-import CompanyFollowedCard from '../../components/jobSeekers/CompanyFollowedCard';
-import SuggestedJobPostCard from '../../components/defaults/SuggestedJobPostCard';
+import { TabTitle } from '@/utils/generalFunction';
+import CompanyViewedCard from '@/views/components/jobSeekers/CompanyViewedCard';
+import CompanyFollowedCard from '@/views/components/jobSeekers/CompanyFollowedCard';
+import SuggestedJobPostCard from '@/views/components/defaults/SuggestedJobPostCard';
 
 const MyCompanyPage = () => {
     const { t } = useTranslation('jobSeeker');

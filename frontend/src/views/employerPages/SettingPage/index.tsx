@@ -3,8 +3,8 @@
 import React from "react";
 import { Box, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { TabTitle } from "../../../utils/generalFunction";
-import SettingCard from "../../components/settings/SettingCard";
+import { TabTitle } from "@/utils/generalFunction";
+import SettingCard from "@/views/components/settings/SettingCard";
 
 const SettingPage = () => {
   const { t } = useTranslation("employer");

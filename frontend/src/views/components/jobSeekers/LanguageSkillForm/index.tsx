@@ -1,14 +1,14 @@
 'use client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { Grid2 as Grid } from '@mui/material';
 
-import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
-import RatingCustom from '../../../../components/Common/Controls/RatingCustom';
+import SingleSelectCustom from '@/components/Common/Controls/SingleSelectCustom';
+import RatingCustom from '@/components/Common/Controls/RatingCustom';
 import { useConfig } from '@/hooks/useConfig';
 import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';
 

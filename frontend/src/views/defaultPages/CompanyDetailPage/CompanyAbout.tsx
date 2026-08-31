@@ -16,20 +16,52 @@ const CompanyAbout: React.FC<CompanyAboutProps> = ({ companyDetail, safeDescript
       <Typography
         variant="h5"
         gutterBottom
-        sx={{ color: "primary.main", fontWeight: 600, mb: 3 }}
+        sx={{
+          color: "#0f172a",
+          fontWeight: 700,
+          fontSize: { xs: '1.15rem', sm: '1.25rem', md: '1.4rem' },
+          mb: { xs: 2, md: 2.5 },
+          letterSpacing: '-0.01em',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.25,
+          '&::before': {
+            content: '""',
+            width: 4,
+            height: 18,
+            borderRadius: 2,
+            bgcolor: 'primary.main',
+            display: 'inline-block',
+          }
+        }}
       >
         {t("companyDetail.about")}
       </Typography>
-      <Box sx={{ p: 2.5, borderRadius: 2, bgcolor: "grey.50" }}>
-        <Box sx={{ textAlign: "justify", color: "text.secondary", lineHeight: 1.8 }}>
-          {companyDetail?.description ? (
-            <HtmlContent html={safeDescriptionHtml} />
-          ) : (
-            <span style={{ color: "#e0e0e0", fontStyle: "italic", fontSize: 13 }}>
-              {t("companyDetail.notUpdated")}
-            </span>
-          )}
-        </Box>
+      <Box
+        sx={{
+          color: "#334155",
+          fontSize: { xs: '0.925rem', sm: '0.975rem' },
+          lineHeight: 1.85,
+          '& p': { mb: 2 },
+          '& h1, & h2, & h3, & h4': {
+            color: '#0f172a',
+            fontWeight: 700,
+            mt: 2.5,
+            mb: 1.5,
+          },
+          '& strong': {
+            color: '#0f172a',
+            fontWeight: 600,
+          },
+        }}
+      >
+        {companyDetail?.description ? (
+          <HtmlContent html={safeDescriptionHtml} />
+        ) : (
+          <span style={{ color: "#94a3b8", fontStyle: "italic", fontSize: 14 }}>
+            {t("companyDetail.notUpdated")}
+          </span>
+        )}
       </Box>
     </Box>
   );

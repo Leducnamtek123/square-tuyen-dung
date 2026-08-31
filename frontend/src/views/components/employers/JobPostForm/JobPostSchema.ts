@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import dayjs from 'dayjs';
-import { REGEX_VALIDATE } from '../../../../configs/constants';
+import { REGEX_VALIDATE } from '@/configs/constants';
 import type { TFunction } from 'i18next';
 import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';
 

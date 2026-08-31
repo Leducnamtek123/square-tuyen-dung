@@ -1,11 +1,11 @@
 ﻿import React from 'react';
 import { Box, Pagination, Stack, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import JobPostLarge from '../../../../components/Features/JobPostLarge';
-import NoDataCard from '../../../../components/Common/NoDataCard';
-import { useAppSelector } from '../../../../hooks/useAppStore';
+import JobPostLarge from '@/components/Features/JobPostLarge';
+import NoDataCard from '@/components/Common/NoDataCard';
+import { useAppSelector } from '@/hooks/useAppStore';
 import { useJobPosts } from './hooks/useJobPosts';
-import type { JobPost } from '../../../../types/models';
+import type { JobPost } from '@/types/models';
 
 const MainJobPostCardContent = () => {
   const { t } = useTranslation('public');

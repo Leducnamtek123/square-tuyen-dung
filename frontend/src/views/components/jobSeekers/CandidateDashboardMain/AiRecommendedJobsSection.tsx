@@ -133,7 +133,7 @@ const AiRecommendedJobsSection = () => {
             const detailPath = localizeRoutePath(`/jobs/${item.slug || item.id}`, i18n.language);
 
             return (
-              <Grid size={{ xs: 12, md: 6 }} key={job.id || idx}>
+              <Grid size={{ xs: 12, md: 6 }} key={item.id}>
                 <Card
                   variant="outlined"
                   sx={{

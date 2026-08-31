@@ -86,10 +86,10 @@ const CandidateAppliedResumeCard = ({
           isSearchable: Boolean(r.isSearchable ?? r.isActive ?? true),
         }))
       );
-    } else if (resume) {
+    } else if (resume && resume.id != null) {
       setItems([
         {
-          id: resume.id || 1,
+          id: resume.id,
           slug: resume.slug,
           title: resume.title || 'Hồ sơ ứng tuyển',
           updatedDate: resume.updateAt || resume.createAt ? dayjs(resume.updateAt || resume.createAt).format('DD/MM/YYYY') : '---',
@@ -187,9 +187,13 @@ const CandidateAppliedResumeCard = ({
       try {
         setIsUploading(true);
         const res = await resumeService.addResume(formData);
+        const resumeId = res.id ?? (res as any).data?.id;
+        if (!resumeId) {
+          throw new Error('Không nhận được mã định danh hồ sơ từ máy chủ.');
+        }
         const newResumeItem: ResumeItemData = {
-          id: res.id || Date.now(),
-          slug: res.slug,
+          id: resumeId,
+          slug: res.slug || String(resumeId),
           title: res.title || file.name.replace(/\.[^/.]+$/, ''),
           updatedDate: dayjs().format('DD/MM/YYYY'),
           fileName: file.name,

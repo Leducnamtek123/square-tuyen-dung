@@ -1,4 +1,4 @@
-import { isPublicEndpoint, isAuthTokenEndpoint } from '../../configs/apiEndpoints';
+import { isPublicEndpoint, isAuthTokenEndpoint } from '@/configs/apiEndpoints';
 
 describe('apiEndpoints', () => {
   describe('isPublicEndpoint', () => {

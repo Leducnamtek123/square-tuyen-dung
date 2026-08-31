@@ -19,6 +19,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import FlashOnIcon from '@mui/icons-material/FlashOn';
+import { useTranslation } from 'react-i18next';
 import toastMessages from '@/utils/toastMessages';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import authService from '@/services/authService';
@@ -58,6 +60,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
   initialPhone = '',
   onSuccess,
 }) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.user);
 
@@ -539,8 +542,12 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                   </Box>
 
                   {isTestMode && (
-                    <Alert severity="info" sx={{ mb: 2, borderRadius: '12px', fontSize: '0.825rem' }}>
-                      ⚡ Chế độ thử nghiệm: Nhập mã OTP <strong>123456</strong> để xác thực tức thì.
+                    <Alert
+                      severity="info"
+                      icon={<FlashOnIcon sx={{ fontSize: 18, color: '#f59e0b' }} />}
+                      sx={{ mb: 2, borderRadius: '12px', fontSize: '0.825rem' }}
+                    >
+                      {t('auth.testModeHint', 'Chế độ thử nghiệm: Nhập mã OTP')} <strong>123456</strong> {t('auth.testModeInstantVerify', 'để xác thực tức thì.')}
                     </Alert>
                   )}
 
@@ -554,7 +561,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                   <Stack direction="row" spacing={{ xs: 1, sm: 1.5 }} justifyContent="center" sx={{ my: 3 }}>
                     {otpDigits.map((digit, idx) => (
                       <input
-                        key={idx}
+                        key={`otp-slot-${idx}`}
                         ref={(el) => {
                           otpInputRefs.current[idx] = el;
                         }}

@@ -21,11 +21,11 @@ import {
 } from 'firebase/firestore';
 import type { Timestamp } from 'firebase/firestore';
 import type { FieldValue } from 'firebase/firestore';
-import db from '../../../../configs/firebase-config';
-import { RootState } from '../../../../redux/store';
-import { useChatContext } from '../../../../context/ChatProvider';
-import commonService from '../../../../services/commonService';
-import { getUserAccount } from '../../../../services/firebaseService';
+import db from '@/configs/firebase-config';
+import { RootState } from '@/redux/store';
+import { useChatContext } from '@/context/ChatProvider';
+import commonService from '@/services/commonService';
+import { getUserAccount } from '@/services/firebaseService';
 import { ChatWindowComposer } from './ChatWindowComposer';
 import { ChatWindowMessagePanel, type ChatWindowMessage } from './ChatWindowMessagePanel';
 import { ChatPartnerHeader } from './ChatPartnerHeader';

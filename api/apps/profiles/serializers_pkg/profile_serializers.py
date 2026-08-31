@@ -15,7 +15,7 @@ from console.jobs import queue_auth
 from ..models import JobSeekerProfile
 from apps.locations.models import Location
 from apps.accounts import serializers as auth_serializers
-from common import serializers as common_serializers
+from apps.common import serializers as common_serializers
 
 
 PHONE_PATTERN = re.compile(

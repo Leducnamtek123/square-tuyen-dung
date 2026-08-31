@@ -24,9 +24,9 @@ import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import BoltIcon from "@mui/icons-material/Bolt";
 
-import { TabTitle } from "../../../utils/generalFunction";
-import { APP_NAME, ROUTES } from "../../../configs/constants";
-import { localizeRoutePath } from "../../../configs/routeLocalization";
+import { TabTitle } from "@/utils/generalFunction";
+import { APP_NAME, ROUTES } from "@/configs/constants";
+import { localizeRoutePath } from "@/configs/routeLocalization";
 
 registerGsapPlugins();
 

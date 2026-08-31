@@ -9,8 +9,8 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import VideoCallOutlinedIcon from "@mui/icons-material/VideoCallOutlined";
 import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 
-import { TabTitle } from "../../../utils/generalFunction";
-import { APP_NAME } from "../../../configs/constants";
+import { TabTitle } from "@/utils/generalFunction";
+import { APP_NAME } from "@/configs/constants";
 
 const ServicePage = () => {
   const { t } = useTranslation("employer");

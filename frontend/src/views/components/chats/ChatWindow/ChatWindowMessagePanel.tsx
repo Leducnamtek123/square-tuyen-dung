@@ -2,7 +2,7 @@ import React from 'react';
 import { Avatar, Box, Chip, CircularProgress, Stack, Typography } from '@mui/material';
 import ForumRoundedIcon from '@mui/icons-material/ForumRounded';
 import Message from '../Message';
-import { formatDateDivider } from '../../../../utils/dateHelper';
+import { formatDateDivider } from '@/utils/dateHelper';
 
 export type ChatWindowMessage = {
   id: string;

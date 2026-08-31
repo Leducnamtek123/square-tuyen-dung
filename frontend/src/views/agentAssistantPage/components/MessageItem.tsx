@@ -93,7 +93,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
           {toolCalls.length ? (
             <Stack spacing={1} sx={{ mb: 0.5 }}>
               {toolCalls.map((tc) => (
-                <ToolStepCard key={tc.id || tc.toolName} toolCall={tc} />
+                <ToolStepCard key={tc.id} toolCall={tc} />
               ))}
             </Stack>
           ) : null}
@@ -102,7 +102,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
             <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
               {imageParts.map((part, partIdx) => (
                 <Box
-                  key={part.dataUrl || part.name || `img-part-${partIdx}`}
+                  key={part.dataUrl ? `img-${partIdx}-${part.dataUrl.slice(0, 32)}` : `img-part-${partIdx}`}
                   component="img"
                   src={part.dataUrl}
                   alt={part.name || `attachment-${partIdx + 1}`}

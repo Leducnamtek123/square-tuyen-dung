@@ -4,7 +4,7 @@ from rest_framework.test import APIClient
 from apps.accounts.models import User
 from apps.locations.models import City, Location
 from apps.profiles.models import JobSeekerProfile, Resume
-from common.models import Career
+from apps.common.models import Career
 from shared.configs import variable_system as var_sys
 
 

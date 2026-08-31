@@ -7,8 +7,8 @@ import CheckIcon from '@mui/icons-material/Check';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { useTranslation } from 'react-i18next';
 
-import interviewService from '../../../services/interviewService';
-import { type InterviewSession } from '../../../types/models';
+import interviewService from '@/services/interviewService';
+import { type InterviewSession } from '@/types/models';
 import { ACTIVE_STATUSES, ElapsedTimer, getSafeLiveKitUrl, normalizeStatus } from './InterviewLiveCandidateCard/InterviewLiveCandidateCardPresence';
 import InterviewLiveCandidateCardPanel from './InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel';
 import pc from '@/utils/muiColors';

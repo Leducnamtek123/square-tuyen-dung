@@ -179,7 +179,7 @@ const FeedbackCarousel = () => {
       const fallbackItem = defaultPool[index % defaultPool.length];
 
       return {
-        id: item.id || fallbackItem.id,
+        id: item.id,
         avatarUrl: item?.userDict?.avatarUrl || fallbackItem.avatarUrl,
         fullName: item?.userDict?.fullName || fallbackItem.fullName,
         roleTitle: fallbackItem.roleTitle,

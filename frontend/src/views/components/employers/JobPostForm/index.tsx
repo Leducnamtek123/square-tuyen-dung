@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useForm, useWatch, Resolver } from 'react-hook-form';
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 import { useTranslation } from 'react-i18next';
-import useDebounce from '../../../../hooks/useDebounce';
-import errorHandling from '../../../../utils/errorHandling';
-import commonService from '../../../../services/commonService';
-import goongService from '../../../../services/goongService';
-import type { PlacePrediction } from '../../../../services/goongService';
+import useDebounce from '@/hooks/useDebounce';
+import errorHandling from '@/utils/errorHandling';
+import commonService from '@/services/commonService';
+import goongService from '@/services/goongService';
+import type { PlacePrediction } from '@/services/goongService';
 import { JobPostFormValues, getJobPostSchema } from './JobPostSchema';
 import JobPostFormFields from './JobPostFormFields';
 import { useConfig } from '@/hooks/useConfig';

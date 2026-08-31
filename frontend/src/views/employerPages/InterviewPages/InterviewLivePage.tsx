@@ -16,9 +16,9 @@ import { useTranslation } from 'react-i18next';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
-import interviewService from '../../../services/interviewService';
-import { type InterviewSession } from '../../../types/models';
-import InterviewLiveCandidateCard from '../../../views/components/employers/InterviewLiveCandidateCard';
+import interviewService from '@/services/interviewService';
+import { type InterviewSession } from '@/types/models';
+import InterviewLiveCandidateCard from '@/views/components/employers/InterviewLiveCandidateCard';
 import { getLiveInterviewSessions } from './liveInterviewSessions';
 
 type InterviewLivePageState = {

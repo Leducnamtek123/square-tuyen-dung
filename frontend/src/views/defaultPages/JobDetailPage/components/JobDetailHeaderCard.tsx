@@ -12,16 +12,16 @@ import {
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { Chip } from "@mui/material";
 
-import QRCodeBox from "../../../../components/Common/QRCodeBox";
-import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
-import { formatLocalizedSalaryRange } from "../../../../utils/customData";
-import { tConfig } from "../../../../utils/tConfig";
-import { ROUTES } from "../../../../configs/constants";
-import { localizeRoutePath } from "../../../../configs/routeLocalization";
-import { formatRoute } from "../../../../utils/funcUtils";
+import QRCodeBox from "@/components/Common/QRCodeBox";
+import MuiImageCustom from "@/components/Common/MuiImageCustom";
+import { formatLocalizedSalaryRange } from "@/utils/customData";
+import { tConfig } from "@/utils/tConfig";
+import { ROUTES } from "@/configs/constants";
+import { localizeRoutePath } from "@/configs/routeLocalization";
+import { formatRoute } from "@/utils/funcUtils";
 import JobDetailActions from "./JobDetailActions";
 import JobDetailInfoItem from "./JobDetailInfoItem";
-import type { JobPost, SystemConfig, User } from '../../../../types/models';
+import type { JobPost, SystemConfig, User } from '@/types/models';
 import type { Company } from '@/types/models';
 
 interface JobDetailHeaderCardProps {

@@ -18,10 +18,10 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
 import { useTranslation } from 'react-i18next';
-import { ROUTES } from '../../../../configs/constants';
+import { ROUTES } from '@/configs/constants';
 import {
   useAppliedResumes,
   useEmployerJobPosts,
@@ -32,13 +32,13 @@ import {
   useQuestionGroups,
   useQuestionMutations,
 } from '../hooks/useEmployerQueries';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import CloseIcon from '@mui/icons-material/Close';
 import InterviewCreateCardForm from './InterviewCreateCardForm';
 import type { FormValues } from './types';
-import type { JobPostActivity, Question, QuestionGroup, VoiceProfile } from '../../../../types/models';
+import type { JobPostActivity, Question, QuestionGroup, VoiceProfile } from '@/types/models';
 import pc from '@/utils/muiColors';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 interface InterviewCreateCardProps {
   title?: string;

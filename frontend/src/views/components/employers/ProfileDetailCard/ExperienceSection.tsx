@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
 import BusinessIcon from '@mui/icons-material/Business';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import TimeAgo from '../../../../components/Common/TimeAgo';
+import TimeAgo from '@/components/Common/TimeAgo';
 
 import { ResumeDetailResponse } from '@/types/models';
 import pc from '@/utils/muiColors';
@@ -52,8 +52,8 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ profileDetail }) 
                 }}
             >
                 <Stack spacing={4}>
-                    {(profileDetail.experiencesDetails || []).map((value, itemIdx: number) => (
-                        <Box key={value.id || value.jobName || `exp-item-${itemIdx}`}>
+                    {(profileDetail.experiencesDetails || []).map((value, itemIdx) => (
+                        <Box key={String(value.id)}>
                             <Grid container spacing={4}>
                                 <Grid size={{ xs: 12, md: 4 }}>
                                     <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', mb: 1.5, lineHeight: 1.3 }}>

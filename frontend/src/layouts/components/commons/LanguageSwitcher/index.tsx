@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button, Menu, MenuItem, Stack, Typography, useTheme, Avatar } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import LanguageIcon from '@mui/icons-material/Language';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 
 interface LanguageSwitcherProps {

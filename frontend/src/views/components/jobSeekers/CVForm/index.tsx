@@ -2,13 +2,13 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 
 import * as yup from 'yup';
 
 import { Grid2 as Grid } from "@mui/material";
 
-import BasicDropzone from '../../../../components/Common/Controls/BasicDropzone';
+import BasicDropzone from '@/components/Common/Controls/BasicDropzone';
 
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';

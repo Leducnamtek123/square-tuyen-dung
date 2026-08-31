@@ -13,7 +13,7 @@ import { AppBar, Box, Container, Divider, IconButton, Stack, Toolbar, useMediaQu
 
 import MenuIcon from "@mui/icons-material/Menu";
 
-import { HOST_NAME, IMAGES, ROUTES } from "../../../../configs/constants";
+import { HOST_NAME, IMAGES, ROUTES } from "@/configs/constants";
 
 import LeftDrawer from "../LeftDrawer";
 
@@ -24,13 +24,13 @@ const NotificationCard = React.lazy(() => import("../../../../components/Feature
 const ChatCard = React.lazy(() => import("../../../../components/Features/ChatCard"));
 
 import LanguageSwitcher from "../LanguageSwitcher";
-import { isAdminPortalPath, isEmployerPortalPath } from "../../../../configs/portalRouting";
-import { localizeRoutePath } from "../../../../configs/routeLocalization";
+import { isAdminPortalPath, isEmployerPortalPath } from "@/configs/portalRouting";
+import { localizeRoutePath } from "@/configs/routeLocalization";
 import HeaderNavLinks from "./HeaderNavLinks";
 import HeaderAuthArea from "./HeaderAuthArea";
 
 import { useQuery } from '@tanstack/react-query';
-import contentService from '../../../../services/contentService';
+import contentService from '@/services/contentService';
 
 interface HeaderProps {
   windowProp?: () => Window;

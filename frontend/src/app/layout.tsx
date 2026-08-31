@@ -1,10 +1,16 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Inter } from 'next/font/google';
 import ThemeRegistry from '../components/ThemeRegistry/ThemeRegistry';
 import { Providers } from './providers';
 import ClientAppRoot from './ClientAppRoot';
 import './globals.css';
 import './app-overrides.css';
+
+const inter = Inter({
+  subsets: ['latin', 'vietnamese'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -73,7 +79,7 @@ export default function RootLayout({
   children: any;
 }) {
   return (
-    <html lang="vi" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+    <html lang="vi" className={`${inter.variable} ${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -81,7 +87,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
       </head>
-      <body style={{ fontFamily: 'var(--font-sans), var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }} suppressHydrationWarning>
+      <body style={{ fontFamily: 'var(--font-inter), var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }} suppressHydrationWarning>
         <div className="bg-atmosphere" />
         <ThemeRegistry>
           <Providers>

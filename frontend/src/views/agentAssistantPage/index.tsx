@@ -256,7 +256,7 @@ export default function AgentAssistantPage({ portal }: AgentAssistantPageProps) 
       try {
         const dataUrl = await readFileAsDataUrl(file);
         nextAttachments.push({
-          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          id: `att-${crypto.randomUUID()}`,
           type: 'image',
           mimeType: file.type,
           dataUrl,

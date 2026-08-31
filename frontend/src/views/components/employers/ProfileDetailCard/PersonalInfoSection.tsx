@@ -9,8 +9,8 @@ import CakeIcon from '@mui/icons-material/Cake';
 import FamilyIcon from '@mui/icons-material/FamilyRestroom';
 import LocationIcon from '@mui/icons-material/LocationOn';
 import HomeIcon from '@mui/icons-material/Home';
-import TimeAgo from '../../../../components/Common/TimeAgo';
-import { tConfig } from '../../../../utils/tConfig';
+import TimeAgo from '@/components/Common/TimeAgo';
+import { tConfig } from '@/utils/tConfig';
 import InfoItem from './InfoItem';
 import { useConfig } from '@/hooks/useConfig';
 

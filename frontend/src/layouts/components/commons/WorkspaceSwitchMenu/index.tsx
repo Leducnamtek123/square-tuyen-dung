@@ -6,10 +6,10 @@ import { useDispatch } from "react-redux";
 import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
-import { HOST_NAME, ROUTES } from "../../../../configs/constants";
-import { localizeRoutePath } from "../../../../configs/routeLocalization";
-import { getPreferredLanguage } from "../../../../configs/portalRouting";
-import { setActiveWorkspace } from "../../../../redux/userSlice";
+import { HOST_NAME, ROUTES } from "@/configs/constants";
+import { localizeRoutePath } from "@/configs/routeLocalization";
+import { getPreferredLanguage } from "@/configs/portalRouting";
+import { setActiveWorkspace } from "@/redux/userSlice";
 
 type WorkspaceItem = {
   type: "company" | "job_seeker";

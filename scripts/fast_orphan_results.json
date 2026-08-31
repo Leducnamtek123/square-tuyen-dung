@@ -1,0 +1,2528 @@
+[
+  {
+    "file": "api/apps/accounts/tokens_custom.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 323
+  },
+  {
+    "file": "api/apps/accounts/tests/test_clear_square_demo_data.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2017
+  },
+  {
+    "file": "api/apps/accounts/tests/test_seed_users_command.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 453
+  },
+  {
+    "file": "api/apps/chatbot/chat_responses/common_chat_response.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 6439
+  },
+  {
+    "file": "api/apps/chatbot/chat_responses/employer_chat_response.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 40566
+  },
+  {
+    "file": "api/apps/chatbot/chat_responses/job_seeker_chat_response.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 45978
+  },
+  {
+    "file": "api/apps/interviews/agent_auth.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2099
+  },
+  {
+    "file": "api/apps/interviews/calendar_service.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3114
+  },
+  {
+    "file": "api/apps/interviews/livekit_service.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 11654
+  },
+  {
+    "file": "api/apps/interviews/sse_views.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 6771
+  },
+  {
+    "file": "api/apps/interviews/tests_voice_profiles.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 5298
+  },
+  {
+    "file": "api/apps/jobs/manual_candidate_validation.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 870
+  },
+  {
+    "file": "api/apps/jobs/recommendation_service.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 6111
+  },
+  {
+    "file": "api/apps/jobs/tests_api_contract_rbac.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2910
+  },
+  {
+    "file": "api/apps/jobs/test_auto_pipeline.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 10671
+  },
+  {
+    "file": "api/apps/jobs/views/web_search.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 898
+  },
+  {
+    "file": "api/apps/profiles/services/vieclam24h_import.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 34779
+  },
+  {
+    "file": "api/apps/profiles/services/vieclam24h_import_browser.js",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 7361
+  },
+  {
+    "file": "api/apps/profiles/services/vieclam24h_import_browser.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 61550
+  },
+  {
+    "file": "api/apps/profiles/tests/test_admin_job_seeker_profile_filters.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3271
+  },
+  {
+    "file": "api/apps/profiles/tests/test_admin_resume_import.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 5910
+  },
+  {
+    "file": "api/apps/profiles/tests/test_vieclam24h_import.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 30863
+  },
+  {
+    "file": "api/apps/profiles/views/web_helpers.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 781
+  },
+  {
+    "file": "frontend/src/app/app-overrides.css",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 6018
+  },
+  {
+    "file": "frontend/src/app/api/test/__tests__/routeSecurity.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 245
+  },
+  {
+    "file": "frontend/src/app/employer/__tests__/EmployerPublicRoutes.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1508
+  },
+  {
+    "file": "frontend/src/app/employer/__tests__/EmployerSectionClientAuthGuard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 493
+  },
+  {
+    "file": "frontend/src/app/interview/livekit-vendor.css",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 20798
+  },
+  {
+    "file": "frontend/src/app/__tests__/ClientAppRootI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1310
+  },
+  {
+    "file": "frontend/src/app/__tests__/ErrorPagesI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 451
+  },
+  {
+    "file": "frontend/src/app/__tests__/LoadingI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 473
+  },
+  {
+    "file": "frontend/src/components/Common/AdminConfirmDialog/__tests__/AdminConfirmDialog.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1632
+  },
+  {
+    "file": "frontend/src/components/Common/AdminDataGrid/__tests__/AdminDataGrid.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1871
+  },
+  {
+    "file": "frontend/src/components/Common/Charts/__tests__/chartDesignLocale.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1140
+  },
+  {
+    "file": "frontend/src/components/Common/Controls/ModernRichEditor/aiAssistantEngine.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 14072
+  },
+  {
+    "file": "frontend/src/components/Common/Controls/__tests__/AutocompleteI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1886
+  },
+  {
+    "file": "frontend/src/components/Common/Controls/__tests__/RangePickerCustomI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1016
+  },
+  {
+    "file": "frontend/src/components/Common/Filters/configs/appliedResumeFilter.config.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 8857
+  },
+  {
+    "file": "frontend/src/components/Common/Filters/configs/candidateFilter.config.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 5877
+  },
+  {
+    "file": "frontend/src/components/Common/Filters/configs/jobPostFilter.config.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 6464
+  },
+  {
+    "file": "frontend/src/components/Common/Filters/configs/savedResumeFilter.config.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2325
+  },
+  {
+    "file": "frontend/src/components/Common/Filters/__tests__/GlobalFilter.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3642
+  },
+  {
+    "file": "frontend/src/components/Common/HtmlContent/__tests__/HtmlContentHref.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2068
+  },
+  {
+    "file": "frontend/src/components/Common/Loading/BackdropLoading/__tests__/BackdropLoadingI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1129
+  },
+  {
+    "file": "frontend/src/components/Common/MaintenanceModeScreen/__tests__/MaintenanceModeScreenI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1568
+  },
+  {
+    "file": "frontend/src/components/Common/MuiImageCustom/__tests__/MuiImageCustom.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 845
+  },
+  {
+    "file": "frontend/src/components/Common/Pdf/__tests__/PdfI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1538
+  },
+  {
+    "file": "frontend/src/components/Common/ProfileUploadCard/__tests__/ProfileUploadCardI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1602
+  },
+  {
+    "file": "frontend/src/components/ErrorBoundary/__tests__/ErrorBoundaryI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 898
+  },
+  {
+    "file": "frontend/src/components/Features/AiElements/__tests__/MessageBranchI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1326
+  },
+  {
+    "file": "frontend/src/components/Features/AIServiceHealthBanner/__tests__/AIServiceHealthBannerI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1337
+  },
+  {
+    "file": "frontend/src/components/Features/ApplyCard/__tests__/ApplyCardI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1097
+  },
+  {
+    "file": "frontend/src/components/Features/ApplyForm/__tests__/ApplyFormI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1120
+  },
+  {
+    "file": "frontend/src/components/Features/ApplyForm/__tests__/ApplyFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1198
+  },
+  {
+    "file": "frontend/src/components/Features/ChatBot/__tests__/ChatBotI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1118
+  },
+  {
+    "file": "frontend/src/components/Features/ChatCard/__tests__/ChatCardI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1015
+  },
+  {
+    "file": "frontend/src/components/Features/Company/__tests__/CompanyI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1916
+  },
+  {
+    "file": "frontend/src/components/Features/CompanyAction/__tests__/CompanyActionI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1248
+  },
+  {
+    "file": "frontend/src/components/Features/Feedback/__tests__/FeedbackI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 766
+  },
+  {
+    "file": "frontend/src/components/Features/Feedback/__tests__/FeedbackSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 488
+  },
+  {
+    "file": "frontend/src/components/Features/JobHoverPreview/__tests__/JobHoverPreviewCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1419
+  },
+  {
+    "file": "frontend/src/components/Features/JobPost/__tests__/JobPostI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1768
+  },
+  {
+    "file": "frontend/src/components/Features/JobPostAction/__tests__/JobPostActionI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1267
+  },
+  {
+    "file": "frontend/src/components/Features/JobPostLarge/__tests__/JobPostLargeI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2071
+  },
+  {
+    "file": "frontend/src/components/Features/JobSalaryInsightCard/salaryInsightFormatting.ts",
+    "status": "TEST_ONLY / POTENTIALLY_UNUSED",
+    "reason": "Only referenced in test files (['frontend/src/components/Features/JobSalaryInsightCard/__tests__/salaryInsightFormatting.test.ts'])",
+    "size_bytes": 1514
+  },
+  {
+    "file": "frontend/src/components/Features/JobSalaryInsightCard/__tests__/JobSalaryInsightCardI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1003
+  },
+  {
+    "file": "frontend/src/components/Features/JobSalaryInsightCard/__tests__/salaryInsightFormatting.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1213
+  },
+  {
+    "file": "frontend/src/components/Features/JobSeekerProfile/__tests__/JobSeekerProfileI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1069
+  },
+  {
+    "file": "frontend/src/components/Features/MainJobRightBanner/__tests__/MainJobRightBannerActions.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 405
+  },
+  {
+    "file": "frontend/src/components/Features/TrustReportDialog/__tests__/TrustReportDialogI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 673
+  },
+  {
+    "file": "frontend/src/components/Features/VoiceAssistant/app-config.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 917
+  },
+  {
+    "file": "frontend/src/components/Features/VoiceAssistant/components/app/__tests__/ThemeToggleI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1524
+  },
+  {
+    "file": "frontend/src/components/Features/VoiceAssistant/components/livekit/agent-control-bar/hooks/use-input-controls.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4148
+  },
+  {
+    "file": "frontend/src/components/Features/VoiceAssistant/components/livekit/agent-control-bar/hooks/use-publish-permissions.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1239
+  },
+  {
+    "file": "frontend/src/components/Features/VoiceAssistant/components/livekit/agent-control-bar/__tests__/AgentControlBarI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3667
+  },
+  {
+    "file": "frontend/src/components/Features/VoiceAssistant/hooks/useDebug.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 830
+  },
+  {
+    "file": "frontend/src/components/Features/VoiceAssistant/__tests__/VoiceAssistantUtils.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 5241
+  },
+  {
+    "file": "frontend/src/components/Features/__tests__/ChatRouteLinks.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 843
+  },
+  {
+    "file": "frontend/src/components/Features/__tests__/CompanySizeFallbacks.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1523
+  },
+  {
+    "file": "frontend/src/components/Features/__tests__/HomeFeatureI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1929
+  },
+  {
+    "file": "frontend/src/components/Features/__tests__/PublicDetailLinksRoute.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1583
+  },
+  {
+    "file": "frontend/src/configs/dayjs-config.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 531
+  },
+  {
+    "file": "frontend/src/configs/firebase-config.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1916
+  },
+  {
+    "file": "frontend/src/configs/moment-config.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 60
+  },
+  {
+    "file": "frontend/src/configs/portalBreadcrumbs.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 9754
+  },
+  {
+    "file": "frontend/src/configs/__tests__/apiEndpoints.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3150
+  },
+  {
+    "file": "frontend/src/configs/__tests__/constants.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3366
+  },
+  {
+    "file": "frontend/src/configs/__tests__/portalBreadcrumbs.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2784
+  },
+  {
+    "file": "frontend/src/configs/__tests__/rewriteCompleteness.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 7064
+  },
+  {
+    "file": "frontend/src/configs/__tests__/routeConfig.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 8731
+  },
+  {
+    "file": "frontend/src/configs/__tests__/routePageExistence.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1725
+  },
+  {
+    "file": "frontend/src/configs/__tests__/routing.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 5485
+  },
+  {
+    "file": "frontend/src/hooks/notificationsState.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 5310
+  },
+  {
+    "file": "frontend/src/hooks/useAppStore.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 178
+  },
+  {
+    "file": "frontend/src/hooks/useFirebaseFireStore.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1849
+  },
+  {
+    "file": "frontend/src/hooks/useFireStoreGetChatRoom.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3950
+  },
+  {
+    "file": "frontend/src/hooks/AgentsUi/use-agent-audio-visualizer-grid.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2880
+  },
+  {
+    "file": "frontend/src/hooks/AgentsUi/use-agent-audio-visualizer-radial.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2380
+  },
+  {
+    "file": "frontend/src/hooks/AgentsUi/use-agent-audio-visualizer-wave.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4827
+  },
+  {
+    "file": "frontend/src/hooks/AgentsUi/use-agent-control-bar.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 7622
+  },
+  {
+    "file": "frontend/src/hooks/__tests__/useNotifications.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2708
+  },
+  {
+    "file": "frontend/src/hooks/__tests__/useRequireAuthI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2112
+  },
+  {
+    "file": "frontend/src/layouts/AdminLayout/__tests__/AdminLayout.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1146
+  },
+  {
+    "file": "frontend/src/layouts/components/MuiShellLayout.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 6454
+  },
+  {
+    "file": "frontend/src/layouts/components/commons/Footer/FooterBadges.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 6257
+  },
+  {
+    "file": "frontend/src/layouts/components/commons/TopSlide/__tests__/TopSlideAnimation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 880
+  },
+  {
+    "file": "frontend/src/layouts/components/commons/TopSlide/__tests__/TopSlideBannerActions.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1601
+  },
+  {
+    "file": "frontend/src/layouts/components/commons/__tests__/CommonEmployerNavigationRoutes.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1311
+  },
+  {
+    "file": "frontend/src/layouts/components/commons/__tests__/LanguageSwitcherRoutes.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 643
+  },
+  {
+    "file": "frontend/src/layouts/components/commons/__tests__/SubHeaderI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1455
+  },
+  {
+    "file": "frontend/src/layouts/components/commons/__tests__/WorkspacePortalRoutes.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2306
+  },
+  {
+    "file": "frontend/src/layouts/components/employers/Sidebar/__tests__/AdminMenuI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1121
+  },
+  {
+    "file": "frontend/src/layouts/components/employers/Sidebar/__tests__/PortalSidebarRoutes.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1630
+  },
+  {
+    "file": "frontend/src/layouts/components/__tests__/DrawerAriaI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1184
+  },
+  {
+    "file": "frontend/src/layouts/components/__tests__/JobSeekerTabRoutes.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 925
+  },
+  {
+    "file": "frontend/src/layouts/components/__tests__/PortalTabsI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1768
+  },
+  {
+    "file": "frontend/src/layouts/__tests__/PortalAuthRedirectRoutes.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 620
+  },
+  {
+    "file": "frontend/src/lib/server-fetch.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2894
+  },
+  {
+    "file": "frontend/src/lib/__tests__/server-fetch.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 640
+  },
+  {
+    "file": "frontend/src/mocks/initMock.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4640
+  },
+  {
+    "file": "frontend/src/mocks/mockData.ts",
+    "status": "TEST_ONLY / POTENTIALLY_UNUSED",
+    "reason": "Only referenced in test files (['frontend/src/services/__tests__/userService.test.ts'])",
+    "size_bytes": 19512
+  },
+  {
+    "file": "frontend/src/redux/__tests__/slices.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 10346
+  },
+  {
+    "file": "frontend/src/scripts/generate_exact_badges.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3521
+  },
+  {
+    "file": "frontend/src/scripts/prepare_badges.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1549
+  },
+  {
+    "file": "frontend/src/scripts/process_user_badges.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2096
+  },
+  {
+    "file": "frontend/src/services/__tests__/adminJobService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2505
+  },
+  {
+    "file": "frontend/src/services/__tests__/adminListServicesResponse.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4716
+  },
+  {
+    "file": "frontend/src/services/__tests__/adminManagementServiceResponse.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 6415
+  },
+  {
+    "file": "frontend/src/services/__tests__/adminSettingsService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2570
+  },
+  {
+    "file": "frontend/src/services/__tests__/agentAssistantService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2548
+  },
+  {
+    "file": "frontend/src/services/__tests__/aiService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1597
+  },
+  {
+    "file": "frontend/src/services/__tests__/authService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 11724
+  },
+  {
+    "file": "frontend/src/services/__tests__/chatbotService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1332
+  },
+  {
+    "file": "frontend/src/services/__tests__/commonService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4116
+  },
+  {
+    "file": "frontend/src/services/__tests__/contentService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 5767
+  },
+  {
+    "file": "frontend/src/services/__tests__/cvBuilderService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 5522
+  },
+  {
+    "file": "frontend/src/services/__tests__/employerListServicesResponse.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 11119
+  },
+  {
+    "file": "frontend/src/services/__tests__/hrmService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1798
+  },
+  {
+    "file": "frontend/src/services/__tests__/interviewService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 8582
+  },
+  {
+    "file": "frontend/src/services/__tests__/jobPostActivityService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4776
+  },
+  {
+    "file": "frontend/src/services/__tests__/jobSeekerProfileService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2025
+  },
+  {
+    "file": "frontend/src/services/__tests__/jobSeekerServicesContracts.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1850
+  },
+  {
+    "file": "frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 14627
+  },
+  {
+    "file": "frontend/src/services/__tests__/resumeDetailServices.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3728
+  },
+  {
+    "file": "frontend/src/services/__tests__/resumeService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 5025
+  },
+  {
+    "file": "frontend/src/services/__tests__/statisticService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1382
+  },
+  {
+    "file": "frontend/src/services/__tests__/tokenService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1958
+  },
+  {
+    "file": "frontend/src/services/__tests__/trustReportService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 899
+  },
+  {
+    "file": "frontend/src/services/__tests__/userService.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2487
+  },
+  {
+    "file": "frontend/src/types/mui-image.d.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 123
+  },
+  {
+    "file": "frontend/src/utils/accessControl.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 224
+  },
+  {
+    "file": "frontend/src/utils/apiClient.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1340
+  },
+  {
+    "file": "frontend/src/utils/apiResponse.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3408
+  },
+  {
+    "file": "frontend/src/utils/articleContent.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 500
+  },
+  {
+    "file": "frontend/src/utils/backendChoiceValues.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 390
+  },
+  {
+    "file": "frontend/src/utils/customData.ts",
+    "status": "TEST_ONLY / POTENTIALLY_UNUSED",
+    "reason": "Only referenced in test files (['frontend/src/utils/__tests__/customData.test.ts'])",
+    "size_bytes": 2727
+  },
+  {
+    "file": "frontend/src/utils/dateHelper.ts",
+    "status": "TEST_ONLY / POTENTIALLY_UNUSED",
+    "reason": "Only referenced in test files (['frontend/src/utils/__tests__/dateHelper.test.ts'])",
+    "size_bytes": 1306
+  },
+  {
+    "file": "frontend/src/utils/editorUtils.ts",
+    "status": "TEST_ONLY / POTENTIALLY_UNUSED",
+    "reason": "Only referenced in test files (['frontend/src/utils/__tests__/editorUtils.test.ts'])",
+    "size_bytes": 1112
+  },
+  {
+    "file": "frontend/src/utils/formHelpers.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1484
+  },
+  {
+    "file": "frontend/src/utils/funcUtils.ts",
+    "status": "TEST_ONLY / POTENTIALLY_UNUSED",
+    "reason": "Only referenced in test files (['frontend/src/utils/__tests__/funcUtils.test.ts'])",
+    "size_bytes": 2257
+  },
+  {
+    "file": "frontend/src/utils/generalFunction.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 260
+  },
+  {
+    "file": "frontend/src/utils/gsapHelpers.ts",
+    "status": "TEST_ONLY / POTENTIALLY_UNUSED",
+    "reason": "Only referenced in test files (['frontend/src/utils/__tests__/gsapHelpers.test.ts'])",
+    "size_bytes": 1757
+  },
+  {
+    "file": "frontend/src/utils/imageCompression.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1863
+  },
+  {
+    "file": "frontend/src/utils/locationForm.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 488
+  },
+  {
+    "file": "frontend/src/utils/muiColors.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1667
+  },
+  {
+    "file": "frontend/src/utils/notificationRouting.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2534
+  },
+  {
+    "file": "frontend/src/utils/storageKeys.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1550
+  },
+  {
+    "file": "frontend/src/utils/sweetalert2Modal.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4966
+  },
+  {
+    "file": "frontend/src/utils/__tests__/apiResponse.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1552
+  },
+  {
+    "file": "frontend/src/utils/__tests__/articleContent.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 479
+  },
+  {
+    "file": "frontend/src/utils/__tests__/camelCase.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2855
+  },
+  {
+    "file": "frontend/src/utils/__tests__/customData.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 963
+  },
+  {
+    "file": "frontend/src/utils/__tests__/dateHelper.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1427
+  },
+  {
+    "file": "frontend/src/utils/__tests__/editorUtils.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2539
+  },
+  {
+    "file": "frontend/src/utils/__tests__/errorHandlingI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1743
+  },
+  {
+    "file": "frontend/src/utils/__tests__/funcUtils.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1337
+  },
+  {
+    "file": "frontend/src/utils/__tests__/gsapHelpers.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1371
+  },
+  {
+    "file": "frontend/src/utils/__tests__/httpRequest.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 10107
+  },
+  {
+    "file": "frontend/src/utils/__tests__/locationForm.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 741
+  },
+  {
+    "file": "frontend/src/utils/__tests__/maintenanceMode.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 996
+  },
+  {
+    "file": "frontend/src/utils/__tests__/notificationRouting.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3518
+  },
+  {
+    "file": "frontend/src/utils/__tests__/params.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1085
+  },
+  {
+    "file": "frontend/src/utils/__tests__/presignUrl.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4957
+  },
+  {
+    "file": "frontend/src/utils/__tests__/safeExternalUrl.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3201
+  },
+  {
+    "file": "frontend/src/utils/__tests__/safeExternalUrlUsage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4207
+  },
+  {
+    "file": "frontend/src/utils/__tests__/salaryDisplayUsage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1268
+  },
+  {
+    "file": "frontend/src/utils/__tests__/transformers.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1156
+  },
+  {
+    "file": "frontend/src/views/adminPages/locationFormValidation.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1486
+  },
+  {
+    "file": "frontend/src/views/adminPages/ArticlesPage/articleFormValidation.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1645
+  },
+  {
+    "file": "frontend/src/views/adminPages/ArticlesPage/__tests__/AdminArticleFormValidation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2168
+  },
+  {
+    "file": "frontend/src/views/adminPages/ArticlesPage/__tests__/ArticlesPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3794
+  },
+  {
+    "file": "frontend/src/views/adminPages/AuditLogsPage/__tests__/AuditLogsPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1336
+  },
+  {
+    "file": "frontend/src/views/adminPages/BannersPage/bannerFormChoices.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3123
+  },
+  {
+    "file": "frontend/src/views/adminPages/BannersPage/__tests__/bannerFormChoices.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4286
+  },
+  {
+    "file": "frontend/src/views/adminPages/BannerTypesPage/bannerTypeFormValidation.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1308
+  },
+  {
+    "file": "frontend/src/views/adminPages/BannerTypesPage/__tests__/bannerTypeFormValidation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2271
+  },
+  {
+    "file": "frontend/src/views/adminPages/BannerTypesPage/__tests__/BannerTypesPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3497
+  },
+  {
+    "file": "frontend/src/views/adminPages/CareersPage/careerFormValidation.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 504
+  },
+  {
+    "file": "frontend/src/views/adminPages/CareersPage/__tests__/careerFormValidation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1207
+  },
+  {
+    "file": "frontend/src/views/adminPages/ChatPage/__tests__/ChatPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 819
+  },
+  {
+    "file": "frontend/src/views/adminPages/CompaniesPage/companyFormValidation.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4177
+  },
+  {
+    "file": "frontend/src/views/adminPages/CompaniesPage/__tests__/CompanyFormDialogI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2361
+  },
+  {
+    "file": "frontend/src/views/adminPages/CompaniesPage/__tests__/CompanyFormDialogValidation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3967
+  },
+  {
+    "file": "frontend/src/views/adminPages/CompanyVerificationsPage/__tests__/CompanyVerificationsPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1213
+  },
+  {
+    "file": "frontend/src/views/adminPages/DashboardPage/components/StatCard.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 5461
+  },
+  {
+    "file": "frontend/src/views/adminPages/DashboardPage/__tests__/DashboardPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2383
+  },
+  {
+    "file": "frontend/src/views/adminPages/InterviewsPage/components/InterviewTable.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 8092
+  },
+  {
+    "file": "frontend/src/views/adminPages/InterviewsPage/__tests__/InterviewsPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1365
+  },
+  {
+    "file": "frontend/src/views/adminPages/JobActivityPage/__tests__/applicationStatus.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 942
+  },
+  {
+    "file": "frontend/src/views/adminPages/JobNotificationsPage/components/JobNotificationTable.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4097
+  },
+  {
+    "file": "frontend/src/views/adminPages/JobNotificationsPage/__tests__/JobNotificationFormValidation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2292
+  },
+  {
+    "file": "frontend/src/views/adminPages/JobNotificationsPage/__tests__/JobNotificationFrequencyContract.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1115
+  },
+  {
+    "file": "frontend/src/views/adminPages/JobsPage/components/JobFilters.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 769
+  },
+  {
+    "file": "frontend/src/views/adminPages/JobsPage/components/JobTable.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 6778
+  },
+  {
+    "file": "frontend/src/views/adminPages/JobsPage/__tests__/JobsPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1415
+  },
+  {
+    "file": "frontend/src/views/adminPages/ProfilesPage/components/ProfileTable.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4783
+  },
+  {
+    "file": "frontend/src/views/adminPages/ResumesPage/components/ResumeTable.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4793
+  },
+  {
+    "file": "frontend/src/views/adminPages/ResumesPage/__tests__/ResumesPageFileActions.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 542
+  },
+  {
+    "file": "frontend/src/views/adminPages/SettingsPage/__tests__/SettingsPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4382
+  },
+  {
+    "file": "frontend/src/views/adminPages/UsersPage/components/ScheduleInterviewDialog.tsx",
+    "status": "TEST_ONLY / POTENTIALLY_UNUSED",
+    "reason": "Only referenced in test files (['frontend/src/views/adminPages/UsersPage/__tests__/ScheduleInterviewDialog.test.ts'])",
+    "size_bytes": 10150
+  },
+  {
+    "file": "frontend/src/views/adminPages/UsersPage/__tests__/ScheduleInterviewDialog.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4153
+  },
+  {
+    "file": "frontend/src/views/adminPages/VoiceProfilesPage/voiceProfileFormValidation.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1608
+  },
+  {
+    "file": "frontend/src/views/adminPages/VoiceProfilesPage/__tests__/voiceProfileFormValidation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3328
+  },
+  {
+    "file": "frontend/src/views/adminPages/VoiceProfilesPage/__tests__/VoiceProfilesPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 6481
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/AdminBreadcrumbAriaI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 764
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/AdminCamelizedResponseFields.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2102
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/AdminCrudHooksI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 5418
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/AdminListFiltersI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1999
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/AdminLocationFormValidation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2698
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/AdminOrderingContract.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 5702
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/AdminPublicDetailLinks.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1022
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/AuditLogsPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 711
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/CareersAndLocationsPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1168
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/CompaniesPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 695
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/CompanyVerificationsPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1372
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/InterviewPreviewPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4834
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/JobsPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1359
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/ProfileDetailPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 850
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/ProfilesPageFilters.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 979
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/ProfilesPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1091
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/ProfilesPageImportPersistence.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 504
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/ResumesPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 634
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/SettingsPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 753
+  },
+  {
+    "file": "frontend/src/views/adminPages/__tests__/UsersPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 735
+  },
+  {
+    "file": "frontend/src/views/agentAssistantPage/hooks/useAgentStreamingEngine.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 9968
+  },
+  {
+    "file": "frontend/src/views/agentAssistantPage/__tests__/AgentAssistantPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3893
+  },
+  {
+    "file": "frontend/src/views/authPages/__tests__/AdminLoginRoutes.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 609
+  },
+  {
+    "file": "frontend/src/views/authPages/__tests__/EmployerLoginRoutes.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 822
+  },
+  {
+    "file": "frontend/src/views/authPages/__tests__/ResetPasswordPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1324
+  },
+  {
+    "file": "frontend/src/views/components/auths/EmployerLoginForm/__tests__/EmployerLoginFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 790
+  },
+  {
+    "file": "frontend/src/views/components/auths/EmployerSignUpForm/__tests__/EmployerSignUpFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4850
+  },
+  {
+    "file": "frontend/src/views/components/auths/ForgotPasswordForm/__tests__/ForgotPasswordFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 883
+  },
+  {
+    "file": "frontend/src/views/components/auths/JobSeekerLoginForm/__tests__/JobSeekerLoginFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 794
+  },
+  {
+    "file": "frontend/src/views/components/auths/JobSeekerSignUpForm/__tests__/JobSeekerSignUpFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 835
+  },
+  {
+    "file": "frontend/src/views/components/auths/PhoneOTPLoginForm/phoneNumberUtils.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2645
+  },
+  {
+    "file": "frontend/src/views/components/auths/PhoneOTPLoginForm/__tests__/PhoneOTPLoginFormI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1031
+  },
+  {
+    "file": "frontend/src/views/components/chats/ChatWindow/__tests__/ChatPartnerHeader.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 790
+  },
+  {
+    "file": "frontend/src/views/components/chats/ChatWindow/__tests__/ChatWindowComposerI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1430
+  },
+  {
+    "file": "frontend/src/views/components/chats/LeftSidebar/__tests__/SidebarRenderer.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1005
+  },
+  {
+    "file": "frontend/src/views/components/chats/LeftSidebar/__tests__/useChatRooms.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1261
+  },
+  {
+    "file": "frontend/src/views/components/chats/Message/__tests__/MessageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1399
+  },
+  {
+    "file": "frontend/src/views/components/chats/RightSidebar/__tests__/RightSidebarRenderer.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1758
+  },
+  {
+    "file": "frontend/src/views/components/chats/RightSidebar/__tests__/useRightSidebarData.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1081
+  },
+  {
+    "file": "frontend/src/views/components/defaults/CareerJobPostTabs/__tests__/CareerJobPostTabs.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 667
+  },
+  {
+    "file": "frontend/src/views/components/defaults/CompanySearch/__tests__/CompanySearchI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 639
+  },
+  {
+    "file": "frontend/src/views/components/defaults/JobPostSearch/__tests__/JobPostSearchI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2006
+  },
+  {
+    "file": "frontend/src/views/components/employers/applicationStatusTransitions.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 691
+  },
+  {
+    "file": "frontend/src/views/components/employers/appliedResumeUtils.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 257
+  },
+  {
+    "file": "frontend/src/views/components/employers/employeeFromApplicationDialogState.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1220
+  },
+  {
+    "file": "frontend/src/views/components/employers/AIAnalysisDrawer/__tests__/AIAnalysisDrawer.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 741
+  },
+  {
+    "file": "frontend/src/views/components/employers/AIAnalysisDrawer/__tests__/AIAnalysisDrawerI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2787
+  },
+  {
+    "file": "frontend/src/views/components/employers/AiCandidateRecommendationModal/__tests__/AiCandidateRecommendationModal.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 724
+  },
+  {
+    "file": "frontend/src/views/components/employers/AppliedResumeCard/AppliedResumeToolbar.tsx",
+    "status": "TEST_ONLY / POTENTIALLY_UNUSED",
+    "reason": "Only referenced in test files (['frontend/src/views/components/employers/AppliedResumeCard/__tests__/AppliedResumeToolbarI18n.test.ts'])",
+    "size_bytes": 8561
+  },
+  {
+    "file": "frontend/src/views/components/employers/AppliedResumeCard/__tests__/AppliedResumeToolbarI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1019
+  },
+  {
+    "file": "frontend/src/views/components/employers/AppliedResumeKanban/__tests__/AppliedResumeKanban.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 898
+  },
+  {
+    "file": "frontend/src/views/components/employers/AppliedResumeTable/applicationStatusPresentation.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 435
+  },
+  {
+    "file": "frontend/src/views/components/employers/AppliedResumeTable/sendEmailAction.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 707
+  },
+  {
+    "file": "frontend/src/views/components/employers/AppliedResumeTable/__tests__/applicationStatusPresentation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 608
+  },
+  {
+    "file": "frontend/src/views/components/employers/AppliedResumeTable/__tests__/AppliedResumeListI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1798
+  },
+  {
+    "file": "frontend/src/views/components/employers/AppliedResumeTable/__tests__/AppliedResumeTable.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 729
+  },
+  {
+    "file": "frontend/src/views/components/employers/AppliedResumeTable/__tests__/sendEmailAction.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 808
+  },
+  {
+    "file": "frontend/src/views/components/employers/charts/InterviewStatsChart/__tests__/InterviewStatsChartI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 632
+  },
+  {
+    "file": "frontend/src/views/components/employers/charts/__tests__/DashboardChartsI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1107
+  },
+  {
+    "file": "frontend/src/views/components/employers/CompanyForm/__tests__/CompanyFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 6474
+  },
+  {
+    "file": "frontend/src/views/components/employers/CompanyImageCard/__tests__/CompanyImageCardI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1258
+  },
+  {
+    "file": "frontend/src/views/components/employers/CompanyTeamCard/__tests__/CompanyTeamCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 747
+  },
+  {
+    "file": "frontend/src/views/components/employers/CompanyTeamCard/__tests__/CompanyTeamCardI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2764
+  },
+  {
+    "file": "frontend/src/views/components/employers/EmployerQuantityStatistics/__tests__/EmployerQuantityStatisticsI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 405
+  },
+  {
+    "file": "frontend/src/views/components/employers/hooks/__tests__/useEmployerQueries.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3288
+  },
+  {
+    "file": "frontend/src/views/components/employers/InterviewCreateCard/__tests__/InterviewCreateCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 744
+  },
+  {
+    "file": "frontend/src/views/components/employers/InterviewCreateCard/__tests__/InterviewCreateCardFormI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2611
+  },
+  {
+    "file": "frontend/src/views/components/employers/InterviewCreateCard/__tests__/InterviewCreateCardQuestionSection.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 509
+  },
+  {
+    "file": "frontend/src/views/components/employers/InterviewDetailCard/evaluationFormValidation.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2650
+  },
+  {
+    "file": "frontend/src/views/components/employers/InterviewDetailCard/sectionStyles.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 372
+  },
+  {
+    "file": "frontend/src/views/components/employers/InterviewDetailCard/__tests__/evaluationFormValidation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2942
+  },
+  {
+    "file": "frontend/src/views/components/employers/InterviewDetailCard/__tests__/InterviewDetailCardI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2441
+  },
+  {
+    "file": "frontend/src/views/components/employers/InterviewDetailCard/__tests__/InterviewInfoCardVisibility.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 474
+  },
+  {
+    "file": "frontend/src/views/components/employers/InterviewListCard/__tests__/InterviewStatusI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1137
+  },
+  {
+    "file": "frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPresence.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 7604
+  },
+  {
+    "file": "frontend/src/views/components/employers/InterviewLiveCandidateCard/__tests__/InterviewLiveAudioRenderer.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1464
+  },
+  {
+    "file": "frontend/src/views/components/employers/InterviewLiveCandidateCard/__tests__/InterviewLiveCandidateCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 720
+  },
+  {
+    "file": "frontend/src/views/components/employers/JobPostCard/__tests__/JobPostCardI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 386
+  },
+  {
+    "file": "frontend/src/views/components/employers/JobPostForm/JobPostSchema.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 7275
+  },
+  {
+    "file": "frontend/src/views/components/employers/JobPostForm/__tests__/JobPostForm.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2142
+  },
+  {
+    "file": "frontend/src/views/components/employers/JobPostForm/__tests__/JobPostSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 8432
+  },
+  {
+    "file": "frontend/src/views/components/employers/ManualCandidateForm/__tests__/ManualCandidateFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 6234
+  },
+  {
+    "file": "frontend/src/views/components/employers/ProfileDetailCard/CareerGoalsSection.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2308
+  },
+  {
+    "file": "frontend/src/views/components/employers/ProfileDetailCard/GeneralInfoSection.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 6361
+  },
+  {
+    "file": "frontend/src/views/components/employers/ProfileSearch/__tests__/ProfileSearch.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 732
+  },
+  {
+    "file": "frontend/src/views/components/employers/QuestionBankCard/__tests__/QuestionBankCardI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 410
+  },
+  {
+    "file": "frontend/src/views/components/employers/QuestionGroupsCard/__tests__/QuestionGroupsCardI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 408
+  },
+  {
+    "file": "frontend/src/views/components/employers/SavedResumeCard/__tests__/SavedResumeCardI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 396
+  },
+  {
+    "file": "frontend/src/views/components/employers/SavedResumeTable/savedResumeActions.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 459
+  },
+  {
+    "file": "frontend/src/views/components/employers/SavedResumeTable/__tests__/savedResumeActions.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 718
+  },
+  {
+    "file": "frontend/src/views/components/employers/SendMailCard/__tests__/SendMailCardSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 664
+  },
+  {
+    "file": "frontend/src/views/components/employers/__tests__/applicationStatusTransitions.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1050
+  },
+  {
+    "file": "frontend/src/views/components/employers/__tests__/appliedResumeUtils.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 627
+  },
+  {
+    "file": "frontend/src/views/components/employers/__tests__/employeeFromApplicationDialogState.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1792
+  },
+  {
+    "file": "frontend/src/views/components/employers/__tests__/EmployerRemainingRouteLinks.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1298
+  },
+  {
+    "file": "frontend/src/views/components/employers/__tests__/EmployerRouteLinks.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1308
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/AdvancedSkillForm/__tests__/AdvancedSkillFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 413
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/AppliedJobCard/__tests__/AppliedJobCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1079
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/BoxProfile/__tests__/BoxProfile.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1050
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/__tests__/AiRecommendedJobsSection.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 935
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/__tests__/CandidateActivityChartCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1498
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/__tests__/CandidateAppliedResumeCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1063
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/__tests__/CandidateCvScoreCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 925
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/__tests__/CandidateRecommendedJobsCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1129
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/__tests__/CandidateTopKpiRow.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1195
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/CandidateProfile/__tests__/CandidateEditProfileModal.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 855
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/CandidateProfile/__tests__/CandidateProfileHeroBanner.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1511
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/CandidateProfile/__tests__/CandidateSkillsCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1145
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/CertificateForm/__tests__/CertificateFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1408
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/charts/ActivityChartClient.tsx",
+    "status": "TEST_ONLY / POTENTIALLY_UNUSED",
+    "reason": "Only referenced in test files (['frontend/src/views/components/jobSeekers/charts/__tests__/ActivityChartClientI18n.test.ts'])",
+    "size_bytes": 2720
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/charts/__tests__/ActivityChartClientI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 787
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/CompanyFollowedCard/__tests__/CompanyFollowedCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1024
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/CompanyViewedCard/__tests__/CompanyViewedCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 973
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/CVForm/__tests__/CVFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1154
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/EducationDetailForm/__tests__/EducationDetailFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1234
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/ExperienceDetailForm/__tests__/ExperienceDetailFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1517
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/GeneralInfoForm/__tests__/CandidateSalaryFields.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1121
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/GeneralInfoForm/__tests__/GeneralInfoFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3642
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/hooks/__tests__/useJobSeekerQueriesFlow.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1251
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/hooks/__tests__/useJobSeekerQueriesI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1071
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/JobPostNotificationCard/__tests__/JobPostNotificationCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1116
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/JobPostNotificationForm/__tests__/JobPostNotificationFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2883
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/JobSeekerQuantityStatistics/__tests__/JobSeekerQuantityStatistics.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 635
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/LanguageSkillForm/__tests__/LanguageSkillFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 562
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/PersonalProfileForm/__tests__/PersonalProfileFormFields.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1185
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/PersonalProfileForm/__tests__/PersonalProfileFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2337
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/PersonalProfileForm/__tests__/usePersonalProfileDistrictOptions.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1345
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/ProfileUploadForm/__tests__/ProfileUploadFormSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4564
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/SavedJobCard/__tests__/SavedJobCard.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1062
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/SidebarProfile/__tests__/SidebarProfile.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 900
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/__tests__/JobSeekerActionRoutes.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1370
+  },
+  {
+    "file": "frontend/src/views/components/jobSeekers/__tests__/JobSeekerProfileRoutes.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 972
+  },
+  {
+    "file": "frontend/src/views/components/settings/__tests__/UserSettingsI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1314
+  },
+  {
+    "file": "frontend/src/views/cvBuilderPages/components/SocialIcons.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1758
+  },
+  {
+    "file": "frontend/src/views/cvBuilderPages/CVEditorPage/utils/docxExport.ts",
+    "status": "TEST_ONLY / POTENTIALLY_UNUSED",
+    "reason": "Only referenced in test files (['frontend/src/views/cvBuilderPages/__tests__/cvBuilderPages.test.ts'])",
+    "size_bytes": 7324
+  },
+  {
+    "file": "frontend/src/views/cvBuilderPages/CVEditorPage/utils/pdfExport.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 5909
+  },
+  {
+    "file": "frontend/src/views/cvBuilderPages/templates/templatesData.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 14594
+  },
+  {
+    "file": "frontend/src/views/cvBuilderPages/templates/utils/cvDictionary.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2701
+  },
+  {
+    "file": "frontend/src/views/cvBuilderPages/templates/utils/themeStyles.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2916
+  },
+  {
+    "file": "frontend/src/views/cvBuilderPages/__tests__/cvBuilderPages.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 8305
+  },
+  {
+    "file": "frontend/src/views/defaultPages/HomePage/__tests__/HomePageAnimation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1267
+  },
+  {
+    "file": "frontend/src/views/defaultPages/HomePage/__tests__/HomePageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2346
+  },
+  {
+    "file": "frontend/src/views/defaultPages/HomePage/__tests__/PublicSearchRoutes.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 820
+  },
+  {
+    "file": "frontend/src/views/defaultPages/JobDetailPage/__tests__/JobDetailPageResponsive.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1200
+  },
+  {
+    "file": "frontend/src/views/defaultPages/LegalPolicyPage/legalData.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 22326
+  },
+  {
+    "file": "frontend/src/views/defaultPages/NewsPage/blogImages.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1858
+  },
+  {
+    "file": "frontend/src/views/defaultPages/NewsPage/__tests__/NewsPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2776
+  },
+  {
+    "file": "frontend/src/views/defaultPages/NewsPage/__tests__/NewsPageRoutes.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1705
+  },
+  {
+    "file": "frontend/src/views/defaultPages/StaticInfoPage/__tests__/StaticInfoPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1170
+  },
+  {
+    "file": "frontend/src/views/defaultPages/__tests__/PublicDetailActionsI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2868
+  },
+  {
+    "file": "frontend/src/views/employerPages/BlogPage/__tests__/BlogPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2895
+  },
+  {
+    "file": "frontend/src/views/employerPages/CompanyPage/__tests__/CompanyPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 775
+  },
+  {
+    "file": "frontend/src/views/employerPages/DashboardPage/__tests__/EmployerDashboardAnimation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 917
+  },
+  {
+    "file": "frontend/src/views/employerPages/InterviewPages/liveInterviewSessions.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 724
+  },
+  {
+    "file": "frontend/src/views/employerPages/InterviewPages/components/QuestionGroupTable.tsx",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3212
+  },
+  {
+    "file": "frontend/src/views/employerPages/InterviewPages/hooks/__tests__/useInterviewSSE.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 830
+  },
+  {
+    "file": "frontend/src/views/employerPages/InterviewPages/__tests__/InterviewHistoryPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 503
+  },
+  {
+    "file": "frontend/src/views/employerPages/InterviewPages/__tests__/InterviewLivePageFocus.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1919
+  },
+  {
+    "file": "frontend/src/views/employerPages/IntroducePage/__tests__/IntroducePageAnimation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 969
+  },
+  {
+    "file": "frontend/src/views/employerPages/VerificationPage/__tests__/VerificationPageValidation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 4302
+  },
+  {
+    "file": "frontend/src/views/employerPages/__tests__/CompanyPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 785
+  },
+  {
+    "file": "frontend/src/views/employerPages/__tests__/JobPostPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 511
+  },
+  {
+    "file": "frontend/src/views/employerPages/__tests__/ProfileAppliedPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 496
+  },
+  {
+    "file": "frontend/src/views/employerPages/__tests__/SavedProfilePage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 477
+  },
+  {
+    "file": "frontend/src/views/employerPages/__tests__/SettingPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 530
+  },
+  {
+    "file": "frontend/src/views/employerPages/__tests__/VerificationPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2415
+  },
+  {
+    "file": "frontend/src/views/hrmPages/__tests__/HrmArchitecture.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1770
+  },
+  {
+    "file": "frontend/src/views/interviewPages/livekitParticipant.ts",
+    "status": "TEST_ONLY / POTENTIALLY_UNUSED",
+    "reason": "Only referenced in test files (['frontend/src/views/interviewPages/__tests__/livekitParticipant.test.ts'])",
+    "size_bytes": 3887
+  },
+  {
+    "file": "frontend/src/views/interviewPages/__tests__/AIInterviewLayoutI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2225
+  },
+  {
+    "file": "frontend/src/views/interviewPages/__tests__/InterviewSessionPageI18n.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 725
+  },
+  {
+    "file": "frontend/src/views/interviewPages/__tests__/livekitParticipant.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1550
+  },
+  {
+    "file": "frontend/src/views/interviewPages/__tests__/useInterviewMessages.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1627
+  },
+  {
+    "file": "frontend/src/views/jobSeekerPages/DashboardPage/__tests__/DashboardAnimation.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1009
+  },
+  {
+    "file": "frontend/src/views/jobSeekerPages/__tests__/AttachedProfilePage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 753
+  },
+  {
+    "file": "frontend/src/views/jobSeekerPages/__tests__/CandidateLoginPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1099
+  },
+  {
+    "file": "frontend/src/views/jobSeekerPages/__tests__/MyCompanyPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 772
+  },
+  {
+    "file": "frontend/src/views/jobSeekerPages/__tests__/MyInterviewsPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1995
+  },
+  {
+    "file": "frontend/src/views/jobSeekerPages/__tests__/OnlineProfilePage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1163
+  },
+  {
+    "file": "frontend/src/views/jobSeekerPages/__tests__/ProfilePage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1183
+  },
+  {
+    "file": "frontend/src/views/jobSeekerPages/__tests__/ProjectPage.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 968
+  },
+  {
+    "file": "frontend/src/views/onboardingPages/CandidateOnboardingPage/schemas/candidateOnboardingSchema.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2878
+  },
+  {
+    "file": "frontend/src/views/onboardingPages/CandidateOnboardingPage/__tests__/CandidateOnboardingFlow.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1276
+  },
+  {
+    "file": "frontend/src/views/onboardingPages/CandidateOnboardingPage/__tests__/CandidateOnboardingSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2951
+  },
+  {
+    "file": "frontend/src/views/onboardingPages/EmployerOnboardingPage/schemas/employerOnboardingSchema.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2205
+  },
+  {
+    "file": "frontend/src/views/onboardingPages/EmployerOnboardingPage/__tests__/EmployerOnboardingFlow.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1134
+  },
+  {
+    "file": "frontend/src/views/onboardingPages/EmployerOnboardingPage/__tests__/EmployerOnboardingSchema.test.ts",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2246
+  },
+  {
+    "file": "voice-ai/docker-compose.macos.yml",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 286
+  },
+  {
+    "file": "voice-ai/livekit_agent/.github/workflows/ruff.yml",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 634
+  },
+  {
+    "file": "voice-ai/livekit_agent/.github/workflows/template-check.yml",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1117
+  },
+  {
+    "file": "voice-ai/livekit_agent/src/backend_auth.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1160
+  },
+  {
+    "file": "voice-ai/livekit_agent/src/interview_flow.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 2681
+  },
+  {
+    "file": "voice-ai/livekit_agent/src/session_settings.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1065
+  },
+  {
+    "file": "voice-ai/livekit_agent/tests/test_interviewer_auto_end.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 3160
+  },
+  {
+    "file": "voice-ai/livekit_agent/tests/test_interviewer_flow.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 15790
+  },
+  {
+    "file": "voice-ai/livekit_agent/tests/test_preemptive_policy.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 559
+  },
+  {
+    "file": "voice-ai/livekit_agent/tests/test_session_settings.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 1707
+  },
+  {
+    "file": "voice-ai/livekit_agent/tests/test_takeover_control.py",
+    "status": "DEAD / ORPHAN",
+    "reason": "No imports or references found in entire repository",
+    "size_bytes": 493
+  }
+]

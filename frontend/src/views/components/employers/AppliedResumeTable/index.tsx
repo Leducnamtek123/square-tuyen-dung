@@ -22,9 +22,9 @@ import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import type { ColumnDef, PaginationState, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
-import { CV_TYPES, ROUTES } from '../../../../configs/constants';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
-import DataTable from '../../../../components/Common/DataTable';
+import { CV_TYPES, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import DataTable from '@/components/Common/DataTable';
 import { formatRoute, downloadPdf } from '@/utils/funcUtils';
 import { getSafeResourceUrl, openExternalUrlSafely } from '@/utils/safeExternalUrl';
 

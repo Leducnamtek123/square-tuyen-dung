@@ -1,6 +1,6 @@
 'use client';
 
-import SpaContentTransition from '@/components/Commons/SpaContentTransition';
+import SpaContentTransition from '@/components/Common/SpaContentTransition';
 
 export default function CandidateSectionLoading() {
   return (

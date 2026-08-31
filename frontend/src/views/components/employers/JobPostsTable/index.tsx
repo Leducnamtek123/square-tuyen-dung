@@ -7,10 +7,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import LaunchIcon from '@mui/icons-material/Launch';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import dayjs from 'dayjs';
-import DataTable from '../../../../components/Common/DataTable';
-import { JOB_POST_STATUS_BG_COLOR } from '../../../../configs/constants';
+import DataTable from '@/components/Common/DataTable';
+import { JOB_POST_STATUS_BG_COLOR } from '@/configs/constants';
 import { useConfig } from '@/hooks/useConfig';
-import type { JobPost } from '../../../../types/models';
+import type { JobPost } from '@/types/models';
 import type { ColumnDef, SortingState, Updater, PaginationState, RowSelectionState, OnChangeFn } from '@tanstack/react-table';
 import pc from '@/utils/muiColors';
 
@@ -145,7 +145,7 @@ const JobPostsTable = ({
                 >
                   {avatars.slice(0, 3).map((item, idx) => (
                     <Avatar
-                      key={idx}
+                      key={(item as any).id != null ? String((item as any).id) : ((item as any).resumeId != null ? String((item as any).resumeId) : `avatar-${job.id}-${item.name || idx}`)}
                       src={item.avatarUrl || undefined}
                       alt={item.name}
                       sx={{

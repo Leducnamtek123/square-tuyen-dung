@@ -16,7 +16,7 @@ from .models import (
     VoiceProfile, VoiceProfileSample, VoiceProfileGrant
 )
 from apps.jobs.models import JobPost
-from common import serializers as common_serializers
+from apps.common import serializers as common_serializers
 from shared.configs import variable_system as var_sys
 from apps.accounts.permissions import user_has_company_permission
 

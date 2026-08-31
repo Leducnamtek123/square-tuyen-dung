@@ -6,16 +6,16 @@ import { Box, Divider, Fab, Stack, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { Theme } from '@mui/material/styles';
 
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import EmptyCard from '../../../../components/Common/EmptyCard';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import EmptyCard from '@/components/Common/EmptyCard';
+import FormPopup from '@/components/Common/Controls/FormPopup';
 import AdvancedSkillForm, { FormValues as AdvancedSkillFormValues } from '../AdvancedSkillForm';
-import resumeService from '../../../../services/resumeService';
-import advancedSkillService from '../../../../services/advancedSkillService';
-import type { AdvancedSkill } from '../../../../types/models';
+import resumeService from '@/services/resumeService';
+import advancedSkillService from '@/services/advancedSkillService';
+import type { AdvancedSkill } from '@/types/models';
 import AdvancedSkillCardLoading from './AdvancedSkillCardLoading';
 import AdvancedSkillCardTable from './AdvancedSkillCardTable';
 
@@ -23,13 +23,15 @@ interface AdvancedSkillCardProps {
   title: string;
 }
 
+type AdvancedSkillEditData = Partial<AdvancedSkillFormValues> & { id?: number | string };
+
 type UiState = {
   openPopup: boolean;
   isLoadingAdvancedSkills: boolean;
   isFullScreenLoading: boolean;
   refreshToken: number;
   serverErrors: Record<string, string[]> | null;
-  editData: Partial<AdvancedSkillFormValues> | null;
+  editData: AdvancedSkillEditData | null;
 };
 
 type UiAction =
@@ -39,7 +41,7 @@ type UiAction =
   | { type: 'set_full_screen_loading'; payload: boolean }
   | { type: 'refresh' }
   | { type: 'set_server_errors'; payload: Record<string, string[]> | null }
-  | { type: 'set_edit_data'; payload: Partial<AdvancedSkillFormValues> | null };
+  | { type: 'set_edit_data'; payload: AdvancedSkillEditData | null };
 
 const initialUiState: UiState = {
   openPopup: false,
@@ -255,7 +257,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
         setOpenPopup={(open) => dispatch({ type: open ? 'open_popup' : 'close_popup' })}
       >
         <AdvancedSkillForm
-          key={`${uiState.openPopup ? 'open' : 'closed'}-${uiState.editData?.name || uiState.editData?.level || 'new'}`}
+          key={uiState.editData?.id ?? 'create'}
           handleAddOrUpdate={handleAddOrUpdate as (data: AdvancedSkillFormValues) => void}
           editData={uiState.editData}
           serverErrors={uiState.serverErrors}

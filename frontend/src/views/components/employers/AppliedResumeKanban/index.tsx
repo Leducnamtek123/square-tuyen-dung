@@ -22,8 +22,8 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import { tConfig } from '../../../../utils/tConfig';
-import { errorModal } from '../../../../utils/sweetalert2Modal';
+import { tConfig } from '@/utils/tConfig';
+import { errorModal } from '@/utils/sweetalert2Modal';
 import {
   DragDropContext,
   Droppable,
@@ -51,8 +51,8 @@ import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined
 
 import type { JobPostActivity } from '@/types/models';
 import { useConfig } from '@/hooks/useConfig';
-import { ROUTES, CV_TYPES } from '../../../../configs/constants';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { ROUTES, CV_TYPES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import { formatRoute } from '@/utils/funcUtils';
 import { openExternalUrlSafely } from '@/utils/safeExternalUrl';
 import { canTransitionApplicationStatus } from '../applicationStatusTransitions';

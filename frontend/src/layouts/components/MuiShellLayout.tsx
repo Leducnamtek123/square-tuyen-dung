@@ -14,14 +14,14 @@ import AccountSwitchMenu from './commons/AccountSwitchMenu';
 
 import UserMenu from './commons/UserMenu';
 
-import NotificationCard from '../../components/Features/NotificationCard';
+import NotificationCard from '@/components/Features/NotificationCard';
 
-import ChatCard from '../../components/Features/ChatCard';
+import ChatCard from '@/components/Features/ChatCard';
 
 import LanguageSwitcher from './commons/LanguageSwitcher';
 import ManagementFooter from './commons/ManagementFooter';
 
-import { IMAGES } from '../../configs/constants';
+import { IMAGES } from '@/configs/constants';
 
 import MuiShellNavList, { type NavItem } from './MuiShellNavList';
 

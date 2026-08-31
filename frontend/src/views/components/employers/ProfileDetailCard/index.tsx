@@ -15,9 +15,9 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useTranslation } from 'react-i18next';
 
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import { formatLocalizedSalaryRange } from '../../../../utils/customData';
-import { tConfig } from '../../../../utils/tConfig';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import { formatLocalizedSalaryRange } from '@/utils/customData';
+import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import type { ResumeDetailResponse } from '@/types/models';
 import pc from '@/utils/muiColors';

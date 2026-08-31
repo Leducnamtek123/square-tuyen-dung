@@ -46,7 +46,7 @@ const STEPS: { key: Step; labelKey: string; descKey: string }[] = [
   },
 ];
 
-import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
+import { AgentAudioVisualizerAura } from '@/components/Features/AgentsUI/agent-audio-visualizer-aura';
 
 // ─── Mock Participant Tile ────────────────────────────────────────────────────
 function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {

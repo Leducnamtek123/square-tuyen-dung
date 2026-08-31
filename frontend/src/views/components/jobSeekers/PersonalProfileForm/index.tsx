@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { useConfig } from '@/hooks/useConfig';
@@ -10,7 +10,7 @@ import PersonalProfileFormFields from './PersonalProfileFormFields';
 import { usePersonalProfileDistrictOptions } from './usePersonalProfileDistrictOptions';
 import type { PersonalProfileFormProps, PersonalProfileFormValues } from './types';
 export type { PersonalProfileFormValues } from './types';
-import { DATE_OPTIONS, REGEX_VALIDATE } from '../../../../configs/constants';
+import { DATE_OPTIONS, REGEX_VALIDATE } from '@/configs/constants';
 import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';
 
 export const createPersonalProfileSchema = (t: TFunction) =>

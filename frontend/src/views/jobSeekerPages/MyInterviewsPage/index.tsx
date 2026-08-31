@@ -15,14 +15,14 @@ import {
 import { Grid2 as Grid } from '@mui/material';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
-import { TabTitle } from '../../../utils/generalFunction';
+import { TabTitle } from '@/utils/generalFunction';
 import { useMyInterviews } from './hooks/useMyInterviews';
-import { transformInterviewSession } from '../../../utils/transformers';
-import type { InterviewSession } from '../../../types/models';
-import { ROUTES } from '../../../configs/constants';
+import { transformInterviewSession } from '@/utils/transformers';
+import type { InterviewSession } from '@/types/models';
+import { ROUTES } from '@/configs/constants';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { localizeRoutePath } from '../../../configs/routeLocalization';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 const MyInterviewsPage = () => {
   const { t, i18n } = useTranslation(['jobSeeker', 'common', 'errors', 'interview', 'employer']);

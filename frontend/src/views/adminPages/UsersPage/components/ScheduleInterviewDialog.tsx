@@ -1,6 +1,6 @@
-﻿'use client';
+'use client';
 
-import toastMessages from '../../../../utils/toastMessages';
+import toastMessages from '@/utils/toastMessages';
 import React, { useEffect, useReducer, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Chip, Autocomplete, CircularProgress, Alert } from "@mui/material";
 import { useTranslation, Trans } from 'react-i18next';
@@ -11,10 +11,10 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
-import interviewService from '../../../../services/interviewService';
-import questionService from '../../../../services/questionService';
-import { normalizePaginatedResponse } from '../../../../utils/apiResponse';
-import { User as UserModel, Question } from '../../../../types/models';
+import interviewService from '@/services/interviewService';
+import questionService from '@/services/questionService';
+import { normalizePaginatedResponse } from '@/utils/apiResponse';
+import { User as UserModel, Question } from '@/types/models';
 
 interface ScheduleInterviewDialogProps {
     open: boolean;
@@ -182,10 +182,10 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                         )}
                         renderTags={(value, getTagProps) =>
                             value.map((opt, idx) => {
-                                const { key: tagKey, ...tagProps } = getTagProps({ index: idx });
+                                const { key: _tagKey, ...tagProps } = getTagProps({ index: idx });
                                 return (
                                     <Chip
-                                        key={opt.id ?? tagKey}
+                                        key={opt.id}
                                         {...tagProps}
                                         label={getQuestionLabel(opt)}
                                         size="small"

@@ -34,9 +34,9 @@ import ChatbotSettingsTab from './components/ChatbotSettingsTab';
 import VoiceInterviewTab from './components/VoiceInterviewTab';
 import GeneralSettingsTab from './components/GeneralSettingsTab';
 import ApiIntegrationTab from './components/ApiIntegrationTab';
-import fptGpuService from '../../../services/fptGpuService';
-import toastMessages from '../../../utils/toastMessages';
-import { getApiErrorMessage } from '../../../utils/apiResponse';
+import fptGpuService from '@/services/fptGpuService';
+import toastMessages from '@/utils/toastMessages';
+import { getApiErrorMessage } from '@/utils/apiResponse';
 import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 
 const INITIAL_SETTINGS: SystemSettings = {

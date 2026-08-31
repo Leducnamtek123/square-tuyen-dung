@@ -9,15 +9,15 @@ import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
-import { IMAGES } from "../../../../configs/constants";
-import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
-import NoDataCard from "../../../../components/Common/NoDataCard";
-import TimeAgo from "../../../../components/Common/TimeAgo";
-import { useNotifications } from "../../../../hooks/useNotifications";
-import { useAppSelector } from "../../../../hooks/useAppStore";
+import { IMAGES } from "@/configs/constants";
+import MuiImageCustom from "@/components/Common/MuiImageCustom";
+import NoDataCard from "@/components/Common/NoDataCard";
+import TimeAgo from "@/components/Common/TimeAgo";
+import { useNotifications } from "@/hooks/useNotifications";
+import { useAppSelector } from "@/hooks/useAppStore";
 import { useTranslation } from 'react-i18next';
-import { getNotificationTargetPath, isExternalNotificationTarget } from "../../../../utils/notificationRouting";
-import type { AppNotification } from "../../../../hooks/useNotifications";
+import { getNotificationTargetPath, isExternalNotificationTarget } from "@/utils/notificationRouting";
+import type { AppNotification } from "@/hooks/useNotifications";
 
 interface NotificationCardProps {
   title: React.ReactNode;

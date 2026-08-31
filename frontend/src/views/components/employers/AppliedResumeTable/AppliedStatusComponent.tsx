@@ -1,8 +1,8 @@
 ﻿import React from 'react';
 import { TextField, MenuItem, Box, Typography, alpha, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { confirmModal, errorModal } from '../../../../utils/sweetalert2Modal';
-import { tConfig } from '../../../../utils/tConfig';
+import { confirmModal, errorModal } from '@/utils/sweetalert2Modal';
+import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import { SelectOption } from '@/types/models';
 import {

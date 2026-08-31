@@ -1,9 +1,9 @@
 import React from 'react';
 import { Grid2 as Grid } from '@mui/material';
-import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
-import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
-import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
-import { DATE_OPTIONS } from '../../../../configs/constants';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
+import SingleSelectCustom from '@/components/Common/Controls/SingleSelectCustom';
+import DatePickerCustom from '@/components/Common/Controls/DatePickerCustom';
+import { DATE_OPTIONS } from '@/configs/constants';
 import { useWatch, type Control } from 'react-hook-form';
 import type { SelectOption, SystemConfig } from '@/types/models';
 import type { PersonalProfileFormValues } from './types';

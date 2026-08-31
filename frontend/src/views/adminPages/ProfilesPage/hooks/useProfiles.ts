@@ -1,16 +1,16 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
-import adminManagementService from '../../../../services/adminManagementService';
-import toastMessages from '../../../../utils/toastMessages';
-import { JobSeekerProfile } from '../../../../types/models';
-import { PaginatedResponse } from '../../../../types/api';
+import adminManagementService from '@/services/adminManagementService';
+import toastMessages from '@/utils/toastMessages';
+import { JobSeekerProfile } from '@/types/models';
+import { PaginatedResponse } from '@/types/api';
 import type {
     AdminListParams,
     JobSeekerProfilePayload,
     Vieclam24hImportJob,
     Vieclam24hImportPayload,
-} from '../../../../services/adminManagementService';
+} from '@/services/adminManagementService';
 import i18next from 'i18next';
 
 type UseProfilesResult = UseQueryResult<PaginatedResponse<JobSeekerProfile>> & {

@@ -2,12 +2,12 @@
 import React from "react";
 import { Pagination, Stack } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
-import { ROLES_NAME } from "../../../../configs/constants";
-import NoDataCard from "../../../../components/Common/NoDataCard";
-import JobPost from "../../../../components/Features/JobPost";
-import { useAppSelector } from "../../../../hooks/useAppStore";
+import { ROLES_NAME } from "@/configs/constants";
+import NoDataCard from "@/components/Common/NoDataCard";
+import JobPost from "@/components/Features/JobPost";
+import { useAppSelector } from "@/hooks/useAppStore";
 import { useSuggestedJobPosts } from "../MainJobPostCard/hooks/useJobPosts";
-import type { JobPost as ModelsJobPost } from '../../../../types/models';
+import type { JobPost as ModelsJobPost } from '@/types/models';
 
 interface SuggestedJobPostCardProps {
   pageSize?: number;

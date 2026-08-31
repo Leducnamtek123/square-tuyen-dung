@@ -1,6 +1,6 @@
 import authService from '../authService';
-import httpRequest from '../../utils/httpRequest';
-import { ensurePresignedUrl } from '../../utils/presignUrl';
+import httpRequest from '@/utils/httpRequest';
+import { ensurePresignedUrl } from '@/utils/presignUrl';
 
 jest.mock('../../utils/httpRequest', () => ({
   post: jest.fn(),

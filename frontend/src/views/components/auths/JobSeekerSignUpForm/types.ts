@@ -1,4 +1,4 @@
-import type { RoleName } from '../../../../types/auth';
+import type { RoleName } from '@/types/auth';
 import type { CodeResponse } from '@react-oauth/google';
 
 export interface JobSeekerSignUpFormData {

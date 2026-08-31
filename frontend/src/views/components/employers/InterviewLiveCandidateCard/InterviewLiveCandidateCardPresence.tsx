@@ -6,8 +6,8 @@ import WorkIcon from '@mui/icons-material/Work';
 import { BarVisualizer, RoomAudioRenderer, StartAudio, VideoTrack, useTracks } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { useTranslation } from 'react-i18next';
-import interviewService from '../../../../services/interviewService';
-import { type InterviewSession } from '../../../../types/models';
+import interviewService from '@/services/interviewService';
+import { type InterviewSession } from '@/types/models';
 
 const ACTIVE_STATUSES = new Set(['scheduled', 'calibration', 'in_progress']);
 const normalizeStatus = (status: string) => status.trim().toLowerCase();

@@ -31,13 +31,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import ImageIcon from '@mui/icons-material/Image';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import DataTable from '../../../components/Common/DataTable';
-import FilterBar, { filterControlSx } from '../../../components/Common/FilterBar';
-import { useDataTable } from '../../../hooks';
-import { Feedback } from '../../../types/models';
+import DataTable from '@/components/Common/DataTable';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
+import { useDataTable } from '@/hooks';
+import { Feedback } from '@/types/models';
 import { useFeedbacks } from './hooks/useFeedbacks';
-import dayjs from '../../../configs/dayjs-config';
-import toastMessages from '../../../utils/toastMessages';
+import AdminConfirmDialog from '@/components/Common/AdminConfirmDialog';
+import dayjs from '@/configs/dayjs-config';
+import toastMessages from '@/utils/toastMessages';
 
 type EvidenceFilter = 'all' | 'with' | 'without';
 type StatusFilter = 'all' | 'active' | 'hidden';
@@ -407,77 +408,85 @@ const FeedbacksPage = () => {
           {t('pages.feedbacks.addBtn')}
         </Button>
       </Box>
-
-      <FilterBar
-        title={t('pages.feedbacks.filter.title')}
-        description={t('pages.feedbacks.filter.description')}
-        searchValue={searchTerm}
-        searchPlaceholder={t('pages.feedbacks.searchPlaceholder')}
-        onSearchChange={onSearchChange}
-        onReset={resetFilters}
-        resetLabel={t('pages.feedbacks.filter.reset')}
-        activeFilterCount={activeFilterCount}
-        advancedLabel={t('pages.feedbacks.filter.advanced')}
-        advancedFilters={(
-          <Stack spacing={2} sx={{ pt: 0.5 }}>
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-              <TextField
-                label={t('pages.feedbacks.filter.user')}
-                value={userFilter}
-                onChange={(event) => setUserFilter(event.target.value)}
-                fullWidth
-                sx={filterControlSx}
-                placeholder={t('pages.feedbacks.filter.userPlaceholder')}
-              />
-              <FormControl fullWidth sx={filterControlSx}>
-                <InputLabel>{t('pages.feedbacks.filter.status')}</InputLabel>
-                <Select
-                  label={t('pages.feedbacks.filter.status')}
-                  value={statusFilter}
-                  onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
-                >
-                  <MenuItem value="all">{t('pages.feedbacks.filter.all')}</MenuItem>
-                  <MenuItem value="active">{t('pages.feedbacks.filter.active')}</MenuItem>
-                  <MenuItem value="hidden">{t('pages.feedbacks.filter.hidden')}</MenuItem>
-                </Select>
-              </FormControl>
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 2, sm: 2.5 },
+          mb: 3,
+          borderRadius: 3,
+          border: '1px solid #E2E8F0',
+          bgcolor: '#FFFFFF',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04)',
+        }}
+      >
+        <FilterBar
+          title={t('pages.feedbacks.filter.title')}
+          description={t('pages.feedbacks.filter.description')}
+          searchValue={searchTerm}
+          searchPlaceholder={t('pages.feedbacks.searchPlaceholder')}
+          onSearchChange={onSearchChange}
+          onReset={resetFilters}
+          resetLabel={t('pages.feedbacks.filter.reset')}
+          activeFilterCount={activeFilterCount}
+          advancedLabel={t('pages.feedbacks.filter.advanced')}
+          advancedFilters={(
+            <Stack spacing={2} sx={{ pt: 0.5 }}>
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+                <TextField
+                  label={t('pages.feedbacks.filter.user')}
+                  value={userFilter}
+                  onChange={(event) => setUserFilter(event.target.value)}
+                  fullWidth
+                  sx={filterControlSx}
+                  placeholder={t('pages.feedbacks.filter.userPlaceholder')}
+                />
+                <FormControl fullWidth sx={filterControlSx}>
+                  <InputLabel>{t('pages.feedbacks.filter.status')}</InputLabel>
+                  <Select
+                    label={t('pages.feedbacks.filter.status')}
+                    value={statusFilter}
+                    onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
+                  >
+                    <MenuItem value="all">{t('pages.feedbacks.filter.all')}</MenuItem>
+                    <MenuItem value="active">{t('pages.feedbacks.filter.active')}</MenuItem>
+                    <MenuItem value="hidden">{t('pages.feedbacks.filter.hidden')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Stack>
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+                <FormControl fullWidth sx={filterControlSx}>
+                  <InputLabel>{t('pages.feedbacks.filter.evidence')}</InputLabel>
+                  <Select
+                    label={t('pages.feedbacks.filter.evidence')}
+                    value={evidenceFilter}
+                    onChange={(event) => setEvidenceFilter(event.target.value as EvidenceFilter)}
+                  >
+                    <MenuItem value="all">{t('pages.feedbacks.filter.all')}</MenuItem>
+                    <MenuItem value="with">{t('pages.feedbacks.filter.withEvidence')}</MenuItem>
+                    <MenuItem value="without">{t('pages.feedbacks.filter.withoutEvidence')}</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth sx={filterControlSx}>
+                  <InputLabel>{t('pages.feedbacks.filter.rating')}</InputLabel>
+                  <Select
+                    label={t('pages.feedbacks.filter.rating')}
+                    value={ratingFilter}
+                    onChange={(event) => setRatingFilter(event.target.value as RatingFilter)}
+                  >
+                    <MenuItem value="all">{t('pages.feedbacks.filter.all')}</MenuItem>
+                    <MenuItem value="5">5 {t('pages.feedbacks.filter.stars')}</MenuItem>
+                    <MenuItem value="4">4 {t('pages.feedbacks.filter.stars')}</MenuItem>
+                    <MenuItem value="3">3 {t('pages.feedbacks.filter.stars')}</MenuItem>
+                    <MenuItem value="2">2 {t('pages.feedbacks.filter.stars')}</MenuItem>
+                    <MenuItem value="1">1 {t('pages.feedbacks.filter.star')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Stack>
             </Stack>
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-              <FormControl fullWidth sx={filterControlSx}>
-                <InputLabel>{t('pages.feedbacks.filter.evidence')}</InputLabel>
-                <Select
-                  label={t('pages.feedbacks.filter.evidence')}
-                  value={evidenceFilter}
-                  onChange={(event) => setEvidenceFilter(event.target.value as EvidenceFilter)}
-                >
-                  <MenuItem value="all">{t('pages.feedbacks.filter.all')}</MenuItem>
-                  <MenuItem value="with">{t('pages.feedbacks.filter.withEvidence')}</MenuItem>
-                  <MenuItem value="without">{t('pages.feedbacks.filter.withoutEvidence')}</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth sx={filterControlSx}>
-                <InputLabel>{t('pages.feedbacks.filter.rating')}</InputLabel>
-                <Select
-                  label={t('pages.feedbacks.filter.rating')}
-                  value={ratingFilter}
-                  onChange={(event) => setRatingFilter(event.target.value as RatingFilter)}
-                >
-                  <MenuItem value="all">{t('pages.feedbacks.filter.all')}</MenuItem>
-                  <MenuItem value="5">5</MenuItem>
-                  <MenuItem value="4">4</MenuItem>
-                  <MenuItem value="3">3</MenuItem>
-                  <MenuItem value="2">2</MenuItem>
-                  <MenuItem value="1">1</MenuItem>
-                </Select>
-              </FormControl>
-            </Stack>
-          </Stack>
-        )}
-        advancedDefaultOpen
-        sx={{ mb: 3 }}
-      />
+          )}
+          advancedDefaultOpen
+        />
 
-      <Paper sx={{ p: 2, borderRadius: '12px' }} elevation={0}>
         <DataTable
           columns={columns}
           data={feedbacks}
@@ -493,7 +502,25 @@ const FeedbacksPage = () => {
         />
       </Paper>
 
-      <Dialog open={openForm} onClose={closeFormDialog} fullWidth maxWidth="md">
+      {/* Delete Confirmation Dialog */}
+      <AdminConfirmDialog
+        open={openDelete}
+        title={t('pages.feedbacks.deleteTitle')}
+        message={t('pages.feedbacks.deleteConfirm', {
+          name: current?.userDict?.fullName || `#${current?.id}`,
+        })}
+        variant="danger"
+        loading={isMutating}
+        onConfirm={handleDelete}
+        onClose={() => setOpenDelete(false)}
+      />
+
+      <Dialog
+        open={openForm}
+        onClose={closeFormDialog}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>
           {dialogMode === 'add' ? t('pages.feedbacks.addTitle') : t('pages.feedbacks.editTitle')}
         </DialogTitle>

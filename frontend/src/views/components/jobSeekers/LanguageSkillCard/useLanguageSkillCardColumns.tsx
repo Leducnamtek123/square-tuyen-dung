@@ -4,8 +4,8 @@ import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutl
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import { tConfig } from '../../../../utils/tConfig';
-import type { LanguageSkill } from '../../../../types/models';
+import { tConfig } from '@/utils/tConfig';
+import type { LanguageSkill } from '@/types/models';
 
 interface Args {
   languageDict?: Record<string, string>;

@@ -222,7 +222,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'import_export',
     # internal apps
-    'common',
+    'apps.common',
     'apps.locations',
     'apps.files',
     'apps.accounts',

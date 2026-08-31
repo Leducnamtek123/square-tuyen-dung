@@ -1,6 +1,6 @@
 import adminManagementService from '../adminManagementService';
-import httpRequest from '../../utils/httpRequest';
-import { presignInObject } from '../../utils/presignUrl';
+import httpRequest from '@/utils/httpRequest';
+import { presignInObject } from '@/utils/presignUrl';
 
 jest.mock('../../utils/httpRequest', () => ({
   get: jest.fn(),

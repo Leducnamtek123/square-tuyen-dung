@@ -15,18 +15,18 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Link from 'next/link';
-import interviewService from '../../../services/interviewService';
-import { type InterviewSession } from '../../../types/models';
-import { ROUTES } from '../../../configs/constants';
-import DataTable from '../../../components/Common/DataTable';
-import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
+import interviewService from '@/services/interviewService';
+import { type InterviewSession } from '@/types/models';
+import { ROUTES } from '@/configs/constants';
+import DataTable from '@/components/Common/DataTable';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import type { CellContext as ReactTableCellContext } from '@tanstack/react-table';
-import useDebounce from '../../../hooks/useDebounce';
+import useDebounce from '@/hooks/useDebounce';
 import pc from '@/utils/muiColors';
 import dayjs from '@/configs/dayjs-config';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { localizeRoutePath } from '../../../configs/routeLocalization';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
 interface VideoCardProps {

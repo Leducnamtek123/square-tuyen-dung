@@ -23,10 +23,10 @@ import AdminStatusBadge from '@/components/Common/AdminStatusBadge';
 import AdminConfirmDialog from '@/components/Common/AdminConfirmDialog';
 import AdminDetailDrawer from '@/components/Common/AdminDetailDrawer';
 
-import adminManagementService from '../../../services/adminManagementService';
-import toastMessages from '../../../utils/toastMessages';
-import type { CompanyVerification } from '../../../types/models';
-import dayjs from '../../../configs/dayjs-config';
+import adminManagementService from '@/services/adminManagementService';
+import toastMessages from '@/utils/toastMessages';
+import type { CompanyVerification } from '@/types/models';
+import dayjs from '@/configs/dayjs-config';
 import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 
 type VerificationStatus = NonNullable<CompanyVerification['status']>;

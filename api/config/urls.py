@@ -5,7 +5,8 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 from config.admin import custom_admin_site
-from config import interviews_compat_views, views
+from config import views
+from apps.interviews import views_compat as interviews_compat_views
 from config.health import health_check
 from integrations.ai import views as ai_views
 from integrations.livekit import webhook as livekit_webhook
@@ -23,7 +24,7 @@ schema_view = get_schema_view(
 )
 
 api_v1_patterns = [
-    path("common/", include("common.urls")),
+    path("common/", include("apps.common.urls")),
     path("auth/", include("apps.accounts.urls")),
     path("info/", include("apps.profiles.urls")),
     path("job/", include("apps.jobs.urls")),

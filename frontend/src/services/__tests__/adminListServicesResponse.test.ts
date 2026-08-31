@@ -1,7 +1,7 @@
 import adminInterviewService from '../adminInterviewService';
 import adminJobService from '../adminJobService';
 import userService from '../userService';
-import httpRequest from '../../utils/httpRequest';
+import httpRequest from '@/utils/httpRequest';
 import fs from 'fs';
 import path from 'path';
 

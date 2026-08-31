@@ -43,12 +43,14 @@
     "candidateBenefit2": "Lưu và theo dõi job",
     "candidateBenefit3": "Gợi ý phù hợp",
     "candidateCta": "Khám phá việc làm",
+    "candidateStatusBadge": "+450 việc làm mới cập nhật hôm nay",
     "employerTitle": "Dành cho nhà tuyển dụng",
     "employerDescription": "Đăng tin, tìm hồ sơ và rút ngắn quy trình tuyển dụng với bộ công cụ dành cho doanh nghiệp.",
     "employerBenefit1": "Đăng tin nhanh",
     "employerBenefit2": "Tìm hồ sơ phù hợp",
     "employerBenefit3": "Phỏng vấn hiệu quả",
-    "employerCta": "Xem giải pháp"
+    "employerCta": "Xem giải pháp",
+    "employerStatusBadge": "AI Matching 98.4% chuẩn xác"
   },
   "jobDetail": {
     "deadline": "Hạn nộp",

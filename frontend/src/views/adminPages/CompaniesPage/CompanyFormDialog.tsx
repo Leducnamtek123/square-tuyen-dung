@@ -13,7 +13,7 @@ import {
 import { Grid2 as Grid } from '@mui/material';
 import type { CompanyFormData } from './types';
 import type { TFunction } from 'i18next';
-import { IMAGES } from '../../../configs/constants';
+import { IMAGES } from '@/configs/constants';
 import {
   getCompanyFormValidationErrors,
   type CompanyFormValidationErrors,

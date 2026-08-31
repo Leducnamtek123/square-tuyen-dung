@@ -17,7 +17,7 @@ const CVDocExperienceSection = ({ title, items, styles }: Props) => {
     <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
       <Text style={styles.sectionTitle}>{title}</Text>
       {items.map((exp) => (
-        <View key={`${exp?.companyName || 'company'}-${exp?.jobName || 'job'}-${exp?.startDate || 'start'}-${exp?.endDate || 'end'}`} style={styles.experienceItem}>
+        <View key={String(exp?.id)} style={styles.experienceItem}>
           <View style={styles.experienceHeader}>
             <View>
               <Text style={styles.experienceTitle}>{exp?.jobName || ''}</Text>

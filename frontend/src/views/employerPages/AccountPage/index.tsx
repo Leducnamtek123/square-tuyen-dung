@@ -3,8 +3,8 @@
 import React from "react";
 import { Box, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { TabTitle } from "../../../utils/generalFunction";
-import AccountCard from "../../components/auths/AccountCard";
+import { TabTitle } from "@/utils/generalFunction";
+import AccountCard from "@/views/components/auths/AccountCard";
 
 const AccountPage = () => {
   const { t } = useTranslation("employer");

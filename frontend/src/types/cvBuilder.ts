@@ -1,5 +1,6 @@
 export interface CVExperienceItem {
   id: string;
+  sourceEntityId?: number;
   position: string;
   company: string;
   startDate: string;
@@ -10,6 +11,7 @@ export interface CVExperienceItem {
 
 export interface CVEducationItem {
   id: string;
+  sourceEntityId?: number;
   school: string;
   major: string;
   degree?: string;
@@ -21,12 +23,14 @@ export interface CVEducationItem {
 
 export interface CVSkillItem {
   id: string;
+  sourceEntityId?: number;
   name: string;
   level?: number; // 1 to 5
 }
 
 export interface CVCertificateItem {
   id: string;
+  sourceEntityId?: number;
   name: string;
   organization: string;
   issueDate: string;
@@ -35,6 +39,7 @@ export interface CVCertificateItem {
 
 export interface CVLanguageItem {
   id: string;
+  sourceEntityId?: number;
   name: string;
   proficiency: string; // 'Bản ngữ' | 'Thành thạo' | 'Trung cấp' | 'Cơ bản'
 }

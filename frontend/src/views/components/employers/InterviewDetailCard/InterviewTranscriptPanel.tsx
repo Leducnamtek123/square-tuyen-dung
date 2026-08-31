@@ -8,7 +8,7 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { InterviewSession } from '@/types/models';
 
 import { i18n, TFunction } from 'i18next';
-import type { SSETranscript } from '../../../employerPages/InterviewPages/hooks/useInterviewSSE';
+import type { SSETranscript } from '@/views/employerPages/InterviewPages/hooks/useInterviewSSE';
 import type { InterviewTranscript } from '@/types/models';
 import pc from '@/utils/muiColors';
 

@@ -24,6 +24,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import cvBuilderService from '@/services/cvBuilderService';
 import { PublicCVRecord, CVData } from '@/types/cvBuilder';
+import * as CountryFlags from 'country-flag-icons/react/3x2';
 import { CVTemplateRenderer } from '../templates/CVTemplateRenderer';
 import { printCVToPDF } from '../CVEditorPage/utils/pdfExport';
 import { TabTitle } from '@/utils/generalFunction';
@@ -236,6 +237,7 @@ export const PublicCVPage: React.FC = () => {
           )}
 
           {/* Language Switcher Pill */}
+          {/* Language Switcher Pill with Vector Flag Icons */}
           <Stack
             direction="row"
             spacing={0.5}
@@ -244,38 +246,48 @@ export const PublicCVPage: React.FC = () => {
             <Button
               size="small"
               onClick={() => setCvLanguage('vi')}
+              startIcon={
+                <Box sx={{ width: 17, height: 11, borderRadius: '2px', overflow: 'hidden', display: 'flex', alignItems: 'center', boxShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>
+                  <CountryFlags.VN style={{ display: 'block', width: '100%', height: '100%' }} />
+                </Box>
+              }
               sx={{
-                py: 0.25,
+                py: 0.3,
                 px: 1.25,
-                fontSize: '0.7rem',
+                fontSize: '0.725rem',
                 fontWeight: 700,
                 textTransform: 'none',
                 minWidth: 0,
                 borderRadius: '6px',
                 ...(cvLanguage === 'vi'
                   ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }
-                  : { color: '#64748b' }),
+                  : { color: '#64748b', '&:hover': { bgcolor: 'rgba(255,255,255,0.6)', color: '#0f172a' } }),
               }}
             >
-              🇻🇳 Việt
+              Việt
             </Button>
             <Button
               size="small"
               onClick={() => setCvLanguage('en')}
+              startIcon={
+                <Box sx={{ width: 17, height: 11, borderRadius: '2px', overflow: 'hidden', display: 'flex', alignItems: 'center', boxShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>
+                  <CountryFlags.GB style={{ display: 'block', width: '100%', height: '100%' }} />
+                </Box>
+              }
               sx={{
-                py: 0.25,
+                py: 0.3,
                 px: 1.25,
-                fontSize: '0.7rem',
+                fontSize: '0.725rem',
                 fontWeight: 700,
                 textTransform: 'none',
                 minWidth: 0,
                 borderRadius: '6px',
                 ...(cvLanguage === 'en'
                   ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }
-                  : { color: '#64748b' }),
+                  : { color: '#64748b', '&:hover': { bgcolor: 'rgba(255,255,255,0.6)', color: '#0f172a' } }),
               }}
             >
-              🇬🇧 Anh
+              Anh
             </Button>
           </Stack>
 

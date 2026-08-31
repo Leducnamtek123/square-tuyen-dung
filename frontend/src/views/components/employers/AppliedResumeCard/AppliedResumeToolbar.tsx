@@ -25,7 +25,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { alpha, useTheme } from '@mui/material/styles';
 import type { TFunction } from 'i18next';
 import type { SelectOption, SystemConfig } from '@/types/models';
-import { tConfig } from '../../../../utils/tConfig';
+import { tConfig } from '@/utils/tConfig';
 import type { JobPostOption } from '../hooks/useEmployerQueries';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 

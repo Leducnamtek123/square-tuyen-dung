@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Box } from "@mui/material";
-import ChatProvider from '../../context/ChatProvider';
+import ChatProvider from '@/context/ChatProvider';
 
 const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
 

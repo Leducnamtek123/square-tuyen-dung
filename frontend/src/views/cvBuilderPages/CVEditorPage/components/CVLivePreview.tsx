@@ -18,8 +18,10 @@ import PictureAsPdfOutlinedIcon from '@mui/icons-material/PictureAsPdfOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import { CVData } from '@/types/cvBuilder';
-import { CVTemplateRenderer } from '../../templates/CVTemplateRenderer';
-import { CV_TEMPLATES_CATALOG } from '../../templates/templatesData';
+import * as CountryFlags from 'country-flag-icons/react/3x2';
+import { useTranslation } from 'react-i18next';
+import { CVTemplateRenderer } from '@/views/cvBuilderPages/templates/CVTemplateRenderer';
+import { CV_TEMPLATES_CATALOG } from '@/views/cvBuilderPages/templates/templatesData';
 
 interface CVLivePreviewProps {
   data: CVData;
@@ -36,6 +38,7 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
   onDownloadPDF,
   isDownloadingPDF,
 }) => {
+  const { t } = useTranslation();
   const [zoomLevel, setZoomLevel] = useState<number>(0.85);
   const [cvLanguage, setCvLanguage] = useState<'vi' | 'en'>('vi');
 
@@ -112,11 +115,11 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
                 '&:hover': { borderColor: '#2563eb', bgcolor: '#eff6ff', color: '#2563eb' },
               }}
             >
-              Đổi mẫu ({currentTemplate.name})
+              {t('cvBuilder.preview.switchTemplate', 'Đổi mẫu')} ({currentTemplate.name})
             </Button>
           )}
 
-          {/* Language Switcher Pill */}
+          {/* Language Switcher Pill with Vector Flag Icons */}
           <Stack
             direction="row"
             spacing={0.5}
@@ -125,38 +128,48 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
             <Button
               size="small"
               onClick={() => setCvLanguage('vi')}
+              startIcon={
+                <Box sx={{ width: 17, height: 11, borderRadius: '2px', overflow: 'hidden', display: 'flex', alignItems: 'center', boxShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>
+                  <CountryFlags.VN style={{ display: 'block', width: '100%', height: '100%' }} />
+                </Box>
+              }
               sx={{
-                py: 0.25,
+                py: 0.3,
                 px: 1.25,
-                fontSize: '0.7rem',
+                fontSize: '0.725rem',
                 fontWeight: 700,
                 textTransform: 'none',
                 minWidth: 0,
                 borderRadius: '6px',
                 ...(cvLanguage === 'vi'
                   ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }
-                  : { color: '#64748b' }),
+                  : { color: '#64748b', '&:hover': { bgcolor: 'rgba(255,255,255,0.6)', color: '#0f172a' } }),
               }}
             >
-              🇻🇳 Việt
+              {t('cvBuilder.preview.vietnamese', 'Việt')}
             </Button>
             <Button
               size="small"
               onClick={() => setCvLanguage('en')}
+              startIcon={
+                <Box sx={{ width: 17, height: 11, borderRadius: '2px', overflow: 'hidden', display: 'flex', alignItems: 'center', boxShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>
+                  <CountryFlags.GB style={{ display: 'block', width: '100%', height: '100%' }} />
+                </Box>
+              }
               sx={{
-                py: 0.25,
+                py: 0.3,
                 px: 1.25,
-                fontSize: '0.7rem',
+                fontSize: '0.725rem',
                 fontWeight: 700,
                 textTransform: 'none',
                 minWidth: 0,
                 borderRadius: '6px',
                 ...(cvLanguage === 'en'
                   ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }
-                  : { color: '#64748b' }),
+                  : { color: '#64748b', '&:hover': { bgcolor: 'rgba(255,255,255,0.6)', color: '#0f172a' } }),
               }}
             >
-              🇬🇧 Anh
+              {t('cvBuilder.preview.english', 'Anh')}
             </Button>
           </Stack>
 
@@ -164,7 +177,7 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
           {onChangeColor && (
             <Stack direction="row" spacing={1} alignItems="center" sx={{ pl: 0.5 }}>
               <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem', display: { xs: 'none', md: 'inline' } }}>
-                Màu sắc:
+                {t('cvBuilder.preview.color', 'Màu sắc:')}
               </Typography>
               {paletteColors.map((color) => {
                 const isSelected = (data.theme.primaryColor || '').toLowerCase() === color.toLowerCase();
@@ -192,9 +205,8 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
           )}
         </Stack>
 
-        {/* Right: Zoom controls & Download Button */}
+        {/* Right: Zoom controls */}
         <Stack direction="row" spacing={1.5} alignItems="center">
-          {/* Zoom controls */}
           <Stack
             direction="row"
             alignItems="center"
@@ -206,7 +218,7 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
               border: '1px solid #e2e8f0',
             }}
           >
-            <Tooltip title="Thu nhỏ">
+            <Tooltip title={t('cvBuilder.preview.zoomOut', 'Thu nhỏ')}>
               <IconButton size="small" onClick={handleZoomOut} sx={{ color: '#475569', p: 0.5 }}>
                 <ZoomOutOutlinedIcon sx={{ fontSize: 16 }} />
               </IconButton>
@@ -214,48 +226,23 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
 
             <Typography
               variant="caption"
-              sx={{ fontWeight: 800, color: '#1e293b', minWidth: 38, textAlign: 'center', fontFamily: 'monospace', fontSize: '0.75rem' }}
+              sx={{ fontWeight: 800, color: '#1e293b', minWidth: 42, textAlign: 'center', fontFamily: 'Inter, monospace', fontSize: '0.75rem' }}
             >
               {Math.round(zoomLevel * 100)}%
             </Typography>
 
-            <Tooltip title="Phóng to">
+            <Tooltip title={t('cvBuilder.preview.zoomIn', 'Phóng to')}>
               <IconButton size="small" onClick={handleZoomIn} sx={{ color: '#475569', p: 0.5 }}>
                 <ZoomInOutlinedIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </Tooltip>
 
-            <Tooltip title="Tỉ lệ chuẩn 85%">
+            <Tooltip title={t('cvBuilder.preview.zoomReset', 'Tỉ lệ chuẩn 85%')}>
               <IconButton size="small" onClick={handleResetZoom} sx={{ color: '#475569', p: 0.5 }}>
                 <RestartAltOutlinedIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </Tooltip>
           </Stack>
-
-          {/* Primary Hoàn tất & Tải PDF Button */}
-          {onDownloadPDF && (
-            <Button
-              size="small"
-              variant="contained"
-              disabled={isDownloadingPDF}
-              onClick={onDownloadPDF}
-              startIcon={<PictureAsPdfOutlinedIcon sx={{ fontSize: 16 }} />}
-              sx={{
-                bgcolor: '#2563eb',
-                color: '#ffffff',
-                fontWeight: 700,
-                fontSize: '0.75rem',
-                borderRadius: '10px',
-                textTransform: 'none',
-                px: 2,
-                py: 0.7,
-                boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)',
-                '&:hover': { bgcolor: '#1d4ed8' },
-              }}
-            >
-              {isDownloadingPDF ? 'Đang xuất PDF...' : 'Hoàn tất & Tải PDF'}
-            </Button>
-          )}
         </Stack>
       </Paper>
 

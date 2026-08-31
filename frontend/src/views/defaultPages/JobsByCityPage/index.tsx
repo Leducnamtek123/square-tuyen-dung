@@ -2,8 +2,8 @@
 import React from 'react';
 import { Container, Divider, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import CategoryCard from '../../components/defaults/CategoryCard';
-import useSEO from '../../../hooks/useSEO';
+import CategoryCard from '@/views/components/defaults/CategoryCard';
+import useSEO from '@/hooks/useSEO';
 import { useConfig } from '@/hooks/useConfig';
 
 

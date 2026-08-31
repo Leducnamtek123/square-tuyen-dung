@@ -17,7 +17,7 @@ const CVDocCertificatesSection = ({ title, items, styles }: Props) => {
     <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
       <Text style={styles.sectionTitle}>{title}</Text>
       {items.map((cert) => (
-        <View key={`${cert?.name || 'cert'}-${cert?.trainingPlace || 'place'}-${cert?.startDate || 'start'}-${cert?.expirationDate || 'end'}`} style={styles.experienceItem}>
+        <View key={String(cert?.id)} style={styles.experienceItem}>
           <View style={styles.experienceHeader}>
             <View>
               <Text style={styles.experienceTitle}>{cert?.name || ''}</Text>

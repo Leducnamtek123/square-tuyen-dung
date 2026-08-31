@@ -1,15 +1,15 @@
 'use client';
 import React from "react";
 import { useForm } from "react-hook-form";
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 import * as yup from "yup";
 import { Box, Button, Stack, styled, Divider } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useTranslation } from 'react-i18next';
-import TextFieldCustom from "../../../../components/Common/Controls/TextFieldCustom";
-import PasswordTextFieldCustom from "../../../../components/Common/Controls/PasswordTextFieldCustom";
-import { GoogleColoredIcon } from "../../../../components/Common/SocialIcons";
+import TextFieldCustom from "@/components/Common/Controls/TextFieldCustom";
+import PasswordTextFieldCustom from "@/components/Common/Controls/PasswordTextFieldCustom";
+import { GoogleColoredIcon } from "@/components/Common/SocialIcons";
 import type { CodeResponse } from '@react-oauth/google';
 
 interface JobSeekerLoginFormData {

@@ -19,29 +19,29 @@ import {
   faWarning,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { CV_TYPES, ROUTES, APP_NAME } from "../../../../configs/constants";
-import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
-import toastMessages from "../../../../utils/toastMessages";
-import errorHandling from "../../../../utils/errorHandling";
-import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
-import toSlug, { formatLocalizedSalaryRange } from "../../../../utils/customData";
-import NoDataCard from "../../../../components/Common/NoDataCard";
-import type { ExtendedResume } from "../../../../components/Features/CVDoc";
-import { reloadResume } from "../../../../redux/profileSlice";
-import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
-import resumeService from "../../../../services/resumeService";
-import { formatRoute } from "../../../../utils/funcUtils";
+import { CV_TYPES, ROUTES, APP_NAME } from "@/configs/constants";
+import BackdropLoading from "@/components/Common/Loading/BackdropLoading";
+import toastMessages from "@/utils/toastMessages";
+import errorHandling from "@/utils/errorHandling";
+import MuiImageCustom from "@/components/Common/MuiImageCustom";
+import toSlug, { formatLocalizedSalaryRange } from "@/utils/customData";
+import NoDataCard from "@/components/Common/NoDataCard";
+import type { ExtendedResume } from "@/components/Features/CVDoc";
+import { reloadResume } from "@/redux/profileSlice";
+import jobSeekerProfileService from "@/services/jobSeekerProfileService";
+import resumeService from "@/services/resumeService";
+import { formatRoute } from "@/utils/funcUtils";
 import { localizeRoutePath } from "@/configs/routeLocalization";
-import ColorPickerDialog from '../../../../components/Common/ColorPickerDialog';
+import ColorPickerDialog from '@/components/Common/ColorPickerDialog';
 import { useTranslation } from "react-i18next";
-import { tConfig } from '../../../../utils/tConfig';
+import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import { useQueryClient } from '@tanstack/react-query';
 import { useResumes } from '../hooks/useJobSeekerQueries';
 import type { AxiosError } from "axios";
 import type { ApiError } from '@/types/api';
 
-import type { Resume } from '../../../../types/models';
+import type { Resume } from '@/types/models';
 import dynamic from "next/dynamic";
 const CVDocDownloadButton = dynamic(() => import("./CVDocDownloadButton"), { ssr: false });
 

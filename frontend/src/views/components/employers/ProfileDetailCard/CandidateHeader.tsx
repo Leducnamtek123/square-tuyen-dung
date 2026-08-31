@@ -221,7 +221,7 @@ export const CandidateHeader: React.FC<CandidateHeaderProps> = ({
 
               {tags.map((tag, idx) => (
                 <Chip
-                  key={idx}
+                  key={`tag-${tag}-${idx}`}
                   label={tag}
                   size="small"
                   sx={{

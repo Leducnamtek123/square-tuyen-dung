@@ -5,7 +5,7 @@ from django.utils import timezone
 from apps.jobs.models import JobPost
 from apps.locations.models import City, Location
 from apps.profiles.models import Company
-from common.models import Career
+from apps.common.models import Career
 from shared.configs import variable_system as var_sys
 
 

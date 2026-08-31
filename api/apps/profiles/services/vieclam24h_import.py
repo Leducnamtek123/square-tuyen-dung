@@ -13,7 +13,7 @@ from apps.accounts.models import User
 from apps.files.models import File
 from apps.locations.models import City, District, Location
 from apps.profiles.models import JobSeekerProfile, Resume
-from common.models import Career
+from apps.common.models import Career
 from shared.configs import variable_system as var_sys
 from shared.helpers.cloudinary_service import CloudinaryService
 

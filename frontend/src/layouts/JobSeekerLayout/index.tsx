@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import Header from "../components/commons/Header";
 import Footer from "../components/commons/Footer";
 import CandidateSidebar from "@/views/components/jobSeekers/CandidateDashboard/CandidateSidebar";
-import SpaContentTransition from "@/components/Commons/SpaContentTransition";
+import SpaContentTransition from "@/components/Common/SpaContentTransition";
 import { ROUTES, ROLES_NAME } from "@/configs/constants";
 import { localizeRoutePath } from "@/configs/routeLocalization";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";

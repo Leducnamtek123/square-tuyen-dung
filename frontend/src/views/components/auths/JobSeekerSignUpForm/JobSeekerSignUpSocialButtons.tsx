@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Stack, styled, Divider } from '@mui/material';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
-import { GoogleColoredIcon } from '../../../../components/Common/SocialIcons';
+import { GoogleColoredIcon } from '@/components/Common/SocialIcons';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   minHeight: '48px',

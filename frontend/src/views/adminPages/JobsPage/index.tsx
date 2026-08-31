@@ -15,12 +15,12 @@ import AdminConfirmDialog from '@/components/Common/AdminConfirmDialog';
 import AdminDetailDrawer from '@/components/Common/AdminDetailDrawer';
 
 import { useJobs } from './hooks/useJobs';
-import { useDebounce } from '../../../hooks';
-import { JobPost } from '../../../types/models';
-import dayjs from '../../../configs/dayjs-config';
-import { ROUTES } from '../../../configs/routeConfig';
-import { localizeRoutePath } from '../../../configs/routeLocalization';
-import { formatRoute } from '../../../utils/funcUtils';
+import { useDebounce } from '@/hooks';
+import { JobPost } from '@/types/models';
+import dayjs from '@/configs/dayjs-config';
+import { ROUTES } from '@/configs/routeConfig';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import { formatRoute } from '@/utils/funcUtils';
 import LaunchIcon from '@mui/icons-material/Launch';
 
 export default function JobsPage() {

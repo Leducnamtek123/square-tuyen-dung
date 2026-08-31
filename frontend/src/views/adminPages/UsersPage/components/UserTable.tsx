@@ -5,11 +5,11 @@ import { Chip, Tooltip, Switch, Typography, Stack, Select, MenuItem, SelectChang
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
-import { ROLES_NAME } from '../../../../configs/constants';
+import { ROLES_NAME } from '@/configs/constants';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
-import DataTable from '../../../../components/Common/DataTable';
-import { User as UserModel } from '../../../../types/models';
-import { RoleName } from '../../../../types/auth';
+import DataTable from '@/components/Common/DataTable';
+import { User as UserModel } from '@/types/models';
+import { RoleName } from '@/types/auth';
 
 interface UserTableProps {
     users: UserModel[];

@@ -1,18 +1,18 @@
 import React from 'react';
 import Link from 'next/link';
 import { Box, Stack, Pagination, Button } from "@mui/material";
-import { ROUTES } from '../../../../configs/constants';
-import NoDataCard from '../../../../components/Common/NoDataCard';
-import CompanyActionFollow from '../../../../components/Features/CompanyAction/CompanyActionFollow';
-import CompanyActionLoading from '../../../../components/Features/CompanyAction/Loading';
-import toastMessages from '../../../../utils/toastMessages';
+import { ROUTES } from '@/configs/constants';
+import NoDataCard from '@/components/Common/NoDataCard';
+import CompanyActionFollow from '@/components/Features/CompanyAction/CompanyActionFollow';
+import CompanyActionLoading from '@/components/Features/CompanyAction/Loading';
+import toastMessages from '@/utils/toastMessages';
 import { useTranslation } from 'react-i18next';
 import { useCompaniesFollowed, useToggleFollowCompany } from '../hooks/useJobSeekerQueries';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 const pageSize = 10;
 
-import type { Company } from '../../../../types/models';
+import type { Company } from '@/types/models';
 
 interface CompanyFollowed {
   id: number;

@@ -7,10 +7,10 @@ import { Grid2 as Grid } from "@mui/material";
 import PersonPinOutlinedIcon from "@mui/icons-material/PersonPinOutlined";
 import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
-import { TabTitle } from "../../../utils/generalFunction";
-import PersonalInfoCard from "../../components/jobSeekers/PersonalInfoCard";
-import GeneralInfoCard from "../../components/jobSeekers/GeneralInfoCard";
-import CVCard from "../../components/jobSeekers/CVCard";
+import { TabTitle } from "@/utils/generalFunction";
+import PersonalInfoCard from "@/views/components/jobSeekers/PersonalInfoCard";
+import GeneralInfoCard from "@/views/components/jobSeekers/GeneralInfoCard";
+import CVCard from "@/views/components/jobSeekers/CVCard";
 
 const AttachedProfilePage = () => {
     const { t } = useTranslation('jobSeeker');

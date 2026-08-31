@@ -32,7 +32,7 @@ from shared.configs.messages import ERROR_MESSAGES
 from shared.configs.variable_response import response_data
 from shared.helpers import helper
 
-from common.firebase import verify_id_token
+from apps.common.firebase import verify_id_token
 
 from .models import User
 

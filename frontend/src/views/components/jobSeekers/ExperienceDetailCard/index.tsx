@@ -7,16 +7,16 @@ import { Timeline, timelineItemClasses } from '@mui/lab';
 import AddIcon from '@mui/icons-material/Add';
 import { Theme } from '@mui/material/styles';
 
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import EmptyCard from '../../../../components/Common/EmptyCard';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import EmptyCard from '@/components/Common/EmptyCard';
+import FormPopup from '@/components/Common/Controls/FormPopup';
 import ExperienceDetaiForm, { FormValues } from '../ExperienceDetailForm';
-import resumeService from '../../../../services/resumeService';
-import experienceDetailService from '../../../../services/experienceDetailService';
-import type { ExperienceDetail } from '../../../../types/models';
+import resumeService from '@/services/resumeService';
+import experienceDetailService from '@/services/experienceDetailService';
+import type { ExperienceDetail } from '@/types/models';
 import ExperienceDetailCardLoading from './ExperienceDetailCardLoading';
 import ExperienceDetailTimelineItem from './ExperienceDetailTimelineItem';
 

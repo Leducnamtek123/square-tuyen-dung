@@ -174,7 +174,7 @@ export const CVGuideSection: React.FC = () => {
                   color: '#7c3aed',
                 },
               ].map((item, idx) => (
-                <Grid size={{ xs: 12, sm: 6 }} key={idx}>
+                <Grid size={{ xs: 12, sm: 6 }} key={item.title || `guide-item-${idx}`}>
                   <Card
                     elevation={0}
                     sx={{
@@ -263,7 +263,7 @@ export const CVGuideSection: React.FC = () => {
                   resume: 'Thường được sử dụng để ứng tuyển công việc nhanh chóng tại các doanh nghiệp.',
                 },
               ].map((row, idx) => (
-                <TableRow key={idx} sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                <TableRow key={row.criterion || `cv-diff-${idx}`} sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
                   <TableCell sx={{ fontWeight: 700, color: '#0f172a', bgcolor: '#f8fafc', fontSize: '0.825rem' }}>
                     {row.criterion}
                   </TableCell>
@@ -397,7 +397,7 @@ export const CVGuideSection: React.FC = () => {
                 'Kiểm tra và chỉnh sửa kỹ lưỡng trước khi gửi đến nhà tuyển dụng.',
                 'Nộp CV đúng thời hạn và luôn cập nhật CV thường xuyên khi có thay đổi mới.',
               ].map((rule, idx) => (
-                <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25 }}>
+                <Box key={`cv-rule-${idx}`} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25 }}>
                   <CheckCircleOutlineIcon sx={{ fontSize: 18, color: '#10b981', shrink: 0, mt: 0.2 }} />
                   <Typography variant="body2" sx={{ color: '#334155', fontSize: '0.825rem', lineHeight: 1.6 }}>
                     {rule}
@@ -428,7 +428,7 @@ export const CVGuideSection: React.FC = () => {
                 { step: 'Bước 8', title: 'Đọc lại và chỉnh sửa', desc: 'Rà soát lỗi chính tả, ngữ pháp và xuất file PDF chất lượng cao.' },
               ].map((item, idx) => (
                 <Card
-                  key={idx}
+                  key={item.step || `step-${idx}`}
                   elevation={0}
                   sx={{
                     p: 1.5,

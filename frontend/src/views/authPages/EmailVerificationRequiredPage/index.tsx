@@ -35,12 +35,12 @@ import ExpandLessOutlinedIcon from '@mui/icons-material/ExpandLessOutlined';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 
-import { TabTitle } from '../../../utils/generalFunction';
-import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
-import authService from '../../../services/authService';
-import toastMessages from '../../../utils/toastMessages';
-import { useAppSelector } from '../../../hooks/useAppStore';
-import { getSafeRedirectPath, getSafeExternalOpenUrl } from '../../../utils/safeExternalUrl';
+import { TabTitle } from '@/utils/generalFunction';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import authService from '@/services/authService';
+import toastMessages from '@/utils/toastMessages';
+import { useAppSelector } from '@/hooks/useAppStore';
+import { getSafeRedirectPath, getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 
 const OTP_LENGTH = 6;
 const RESEND_EMAIL_COOLDOWN_SECONDS = 60;
@@ -560,7 +560,7 @@ const EmailVerificationRequiredPage = () => {
               <Stack direction="row" spacing={{ xs: 1, sm: 1.25 }} justifyContent="center" sx={{ mb: 1.5 }}>
                 {otpDigits.map((digit, idx) => (
                   <input
-                    key={idx}
+                    key={`otp-slot-${idx}`}
                     ref={(el) => {
                       otpInputRefs.current[idx] = el;
                     }}

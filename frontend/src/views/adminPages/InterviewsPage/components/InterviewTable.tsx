@@ -6,10 +6,10 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import dayjs from '../../../../configs/dayjs-config';
+import dayjs from '@/configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
-import DataTable from '../../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 
 type InterviewTableRow = {
     id: number | string;

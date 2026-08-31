@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useReducer, useRef } from 'react';
-import tokenService from '../../../../services/tokenService';
-import { useAppSelector } from '../../../../hooks/useAppStore';
+import tokenService from '@/services/tokenService';
+import { useAppSelector } from '@/hooks/useAppStore';
 
 /**
  * SSE event data types for realtime interview monitoring.

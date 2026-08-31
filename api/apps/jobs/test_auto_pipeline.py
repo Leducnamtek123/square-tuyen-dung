@@ -7,7 +7,7 @@ from apps.accounts.models import User
 from apps.profiles.models import Company, Resume, JobSeekerProfile
 from apps.locations.models import City, Location
 from apps.interviews.models import QuestionGroup
-from common.models import Career
+from apps.common.models import Career
 from apps.jobs.candidate_matching_service import match_and_source_candidates_for_job
 from apps.jobs.auto_pipeline_service import run_full_auto_recruitment_pipeline
 from apps.jobs.services import JobActivityService

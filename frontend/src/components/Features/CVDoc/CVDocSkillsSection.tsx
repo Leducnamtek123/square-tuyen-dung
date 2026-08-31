@@ -17,7 +17,7 @@ const CVDocSkillsSection = ({ title, items, styles }: Props) => {
       <View style={styles.skillsWrapper}>
         <View style={styles.skillsGrid}>
           {items.map((skill) => (
-            <View key={`${skill?.name || 'skill'}-${skill?.level ?? 'level'}`} style={styles.skillItem}>
+            <View key={String(skill?.id)} style={styles.skillItem}>
               <Text>{skill?.name || ''} ({skill?.level ?? 0}/5)</Text>
             </View>
           ))}

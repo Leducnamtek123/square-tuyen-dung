@@ -30,7 +30,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 
-import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
+import { AgentAudioVisualizerAura } from '@/components/Features/AgentsUI/agent-audio-visualizer-aura';
 import {
   getParticipantCompanyName,
   getParticipantRole,

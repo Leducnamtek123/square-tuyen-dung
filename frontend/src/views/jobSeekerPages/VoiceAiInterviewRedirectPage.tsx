@@ -5,7 +5,7 @@ import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { ROUTES } from '../../configs/constants';
+import { ROUTES } from '@/configs/constants';
 
 const VoiceAiInterviewRedirectPage = () => {
   const { id } = useParams();

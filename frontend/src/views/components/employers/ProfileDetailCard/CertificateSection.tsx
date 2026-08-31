@@ -3,7 +3,7 @@ import { Box, Typography, Stack, Paper, Divider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import TimeAgo from '../../../../components/Common/TimeAgo';
+import TimeAgo from '@/components/Common/TimeAgo';
 
 import { ResumeDetailResponse } from '@/types/models';
 import pc from '@/utils/muiColors';
@@ -50,8 +50,8 @@ const CertificateSection: React.FC<CertificateSectionProps> = ({ profileDetail }
                 }}
             >
                 <Stack spacing={4}>
-                    {(profileDetail.certificates || []).map((value, itemIdx: number) => (
-                        <Box key={value.id || value.name || value.certificateName || `cert-item-${itemIdx}`}>
+                    {(profileDetail.certificates || []).map((value, itemIdx) => (
+                        <Box key={String(value.id)}>
                             <Stack spacing={2}>
                                 <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', lineHeight: 1.3 }}>
                                     {value?.name || value?.certificateName}

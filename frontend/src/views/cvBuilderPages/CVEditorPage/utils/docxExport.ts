@@ -1,5 +1,5 @@
 import { CVData } from '@/types/cvBuilder';
-import { CVLanguage, getCVLabels } from '../../templates/utils/cvDictionary';
+import { CVLanguage, getCVLabels } from '@/views/cvBuilderPages/templates/utils/cvDictionary';
 
 /**
  * Generates and downloads a clean, formatted Microsoft Word (.doc / .docx compatible)

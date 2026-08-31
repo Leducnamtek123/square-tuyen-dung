@@ -5,8 +5,8 @@ import { Grid2 as Grid } from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ClearIcon from '@mui/icons-material/Clear';
 import { Control } from 'react-hook-form';
-import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
-import type { SelectOption } from '../../../../types/models';
+import SingleSelectSearchCustom from '@/components/Common/Controls/SingleSelectSearchCustom';
+import type { SelectOption } from '@/types/models';
 import type { JobPostSearchFormValues } from './types';
 
 type JobPostSearchAdvancedFiltersProps = {

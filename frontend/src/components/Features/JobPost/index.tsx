@@ -152,44 +152,27 @@ const JobPost = ({
           width: '100%',
           height: '100%',
           minHeight: 150,
-          boxShadow: 0,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
           cursor: 'pointer',
           color: 'inherit',
           textDecoration: 'none',
           px: 2,
           pt: 2,
-          pb: 1,
-          transition: 'all 0.3s ease',
-          borderRadius: '24px 8px 24px 8px',
+          pb: 1.5,
+          transition: 'all 0.25s ease',
+          borderRadius: '16px',
           border: `1px solid ${theme.palette.divider}`,
           position: 'relative',
           overflow: 'hidden',
           backgroundColor: theme.palette.background.paper,
           ...(isUrgent && {
-            borderLeft: 'none',
-            backgroundColor: theme.palette.secondary.background,
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: 4,
-              background: theme.palette.secondary.main,
-              borderRadius: '24px 0 0 8px',
-              boxShadow: `0 0 8px ${theme.palette.secondary.main}40`,
-            },
+            borderLeft: '3.5px solid #f97316',
+            backgroundColor: '#fffcf7',
           }),
           '&:hover': {
             transform: 'translateY(-2px)',
-            boxShadow: theme.customShadows.large,
-            ...(isUrgent
-              ? {
-                  borderColor: theme.palette.secondary.main,
-                  borderLeft: 'none',
-                  backgroundColor: theme.palette.secondary.backgroundHover,
-                }
-              : { borderColor: theme.palette.primary.main }),
+            boxShadow: '0 10px 25px rgba(37, 99, 235, 0.12)',
+            borderColor: isUrgent ? '#f97316' : '#93c5fd',
           },
         }}
       >
@@ -198,74 +181,80 @@ const JobPost = ({
             <Box
               sx={{
                 position: 'absolute',
-                top: 5,
-                right: 6,
+                top: 8,
+                right: 8,
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                backgroundColor: theme.palette.hot.background,
-                padding: '4px 8px',
-                borderRadius: '8px',
+                backgroundColor: '#fef2f2',
+                border: '1px solid #fecaca',
+                padding: '3px 8px',
+                borderRadius: '6px',
+                zIndex: 2,
               }}
             >
-              <FontAwesomeIcon icon={faFire} color={theme.palette.hot.main} />
-              <Typography sx={{ color: theme.palette.hot.main, fontSize: 11, fontWeight: 700 }}>
+              <FontAwesomeIcon icon={faFire} style={{ color: '#ef4444', fontSize: 11 }} />
+              <Typography sx={{ color: '#ef4444', fontSize: 11, fontWeight: 700, lineHeight: 1 }}>
                 {t('common:common.hot')}
               </Typography>
             </Box>
           </Tooltip>
         )}
 
-        {isUrgent && (
+        {isUrgent && !isHot && (
           <Tooltip title={t('common:common.urgent')} placement="top">
             <Box
               sx={{
                 position: 'absolute',
-                top: 5,
-                right: 6,
+                top: 8,
+                right: 8,
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                backgroundColor: theme.palette.secondary.backgroundHover,
-                padding: '4px 8px',
-                borderRadius: '8px',
+                backgroundColor: '#fff7ed',
+                border: '1px solid #fed7aa',
+                padding: '3px 8px',
+                borderRadius: '6px',
+                zIndex: 2,
               }}
             >
-              <FontAwesomeIcon icon={faBolt} color={theme.palette.secondary.main} />
-              <Typography sx={{ color: theme.palette.secondary.main, fontSize: 11, fontWeight: 700 }}>
+              <FontAwesomeIcon icon={faBolt} style={{ color: '#f97316', fontSize: 11 }} />
+              <Typography sx={{ color: '#f97316', fontSize: 11, fontWeight: 700, lineHeight: 1 }}>
                 {t('common:common.urgent')}
               </Typography>
             </Box>
           </Tooltip>
         )}
 
-        <Stack direction="row" spacing={1} sx={{ minWidth: 0 }}>
+        <Stack direction="row" spacing={1.5} sx={{ minWidth: 0 }}>
           <Box sx={{ flexShrink: 0 }}>
             <MuiImageCustom
               src={companyImageUrl || IMAGES.companyLogoDefault}
               alt={companyName}
-              width={60}
-              height={60}
+              width={54}
+              height={54}
               sx={{
-                borderRadius: '50%',
-                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
                 p: 0.5,
                 objectFit: 'contain',
+                backgroundColor: '#ffffff',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
               }}
             />
           </Box>
-          <Stack flex={1} sx={{ minWidth: 0 }} spacing={0.5}>
+          <Stack flex={1} sx={{ minWidth: 0, pr: (isHot || isUrgent) ? 9.5 : 0 }} spacing={0.4}>
             <Tooltip followCursor title={jobName}>
               <Typography
                 variant="subtitle2"
                 noWrap
                 sx={{
-                  fontSize: 14,
-                  fontWeight: 600,
-                  fontFamily: 'Open Sans',
-                  color: theme.palette.grey[800],
+                  fontSize: '0.925rem',
+                  fontWeight: 700,
+                  color: '#0f172a',
                   textOverflow: 'ellipsis',
                   minWidth: 0,
+                  lineHeight: 1.35,
                 }}
               >
                 {jobName}
@@ -275,7 +264,7 @@ const JobPost = ({
               <Typography
                 variant="subtitle2"
                 noWrap
-                sx={{ fontSize: 13, color: theme.palette.grey[600], fontWeight: 500 }}
+                sx={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}
               >
                 {companyName}
               </Typography>
@@ -283,23 +272,27 @@ const JobPost = ({
           </Stack>
         </Stack>
 
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', columnGap: 2, rowGap: 1, mt: 2 }}>
-          <MetaItem icon={<FontAwesomeIcon icon={faCircleDollarToSlot} color={theme.palette.primary.main} />}>
-            {formatLocalizedSalaryRange(salaryMin, salaryMax, i18n.language)}
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', columnGap: 2, rowGap: 0.75, mt: 1.5 }}>
+          <MetaItem icon={<FontAwesomeIcon icon={faCircleDollarToSlot} style={{ color: '#2563eb', fontSize: 13 }} />}>
+            <span style={{ color: '#2563eb', fontWeight: 700 }}>
+              {formatLocalizedSalaryRange(salaryMin, salaryMax, i18n.language)}
+            </span>
           </MetaItem>
-          <MetaItem icon={<FontAwesomeIcon icon={faLocationDot} color={theme.palette.primary.main} />}>
-            {tConfig(allConfig?.cityDict?.[cityId]) || <span style={{ fontStyle: 'italic', color: theme.palette.grey[500] }}>{t('common:labels.notUpdated')}</span>}
+          <MetaItem icon={<FontAwesomeIcon icon={faLocationDot} style={{ color: '#64748b', fontSize: 13 }} />}>
+            {tConfig(allConfig?.cityDict?.[cityId]) || <span style={{ fontStyle: 'italic', color: '#94a3b8' }}>{t('common:labels.notUpdated')}</span>}
           </MetaItem>
-          <MetaItem icon={<FontAwesomeIcon icon={faCalendarDays} color={theme.palette.primary.main} />}>
+          <MetaItem icon={<FontAwesomeIcon icon={faCalendarDays} style={{ color: '#64748b', fontSize: 13 }} />}>
             {dayjs(deadline).format('DD/MM/YYYY')}
           </MetaItem>
         </Box>
 
-        <Divider sx={{ mt: 'auto', mb: 0.75, pt: 1, borderColor: theme.palette.grey[400] }} />
+        <Divider sx={{ mt: 'auto', mb: 0.75, pt: 1, borderColor: '#f1f5f9' }} />
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <MetaItem icon={<FontAwesomeIcon icon={faClock} style={{ fontSize: 14 }} color={theme.palette.grey[400]} />}>
-            {t('jobPost.timeLeft')} <TimeAgo date={deadline} type="fromNow" />
+          <MetaItem icon={<FontAwesomeIcon icon={faClock} style={{ fontSize: 13, color: '#94a3b8' }} />}>
+            <span style={{ color: '#64748b', fontSize: '0.775rem' }}>
+              {t('jobPost.timeLeft')} <TimeAgo date={deadline} type="fromNow" />
+            </span>
           </MetaItem>
         </Box>
       </Card>

@@ -6,9 +6,9 @@ import { useDispatch } from 'react-redux';
 import { InputBase, Paper, Typography } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-import { buildJobPostFilter, searchJobPost } from '../../../../redux/filterSlice';
-import { ROUTES } from '../../../../configs/constants';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { buildJobPostFilter, searchJobPost } from '@/redux/filterSlice';
+import { ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 interface CategoryCardProps {
   options: CategoryOption[];

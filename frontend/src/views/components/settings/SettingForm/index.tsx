@@ -3,7 +3,7 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 import { Box, Card, Grid2 as Grid, Stack, Switch, Typography } from "@mui/material";
 import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
 import SmsOutlinedIcon from '@mui/icons-material/SmsOutlined';

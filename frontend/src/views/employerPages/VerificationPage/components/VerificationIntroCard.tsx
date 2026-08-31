@@ -16,11 +16,11 @@ import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
-import { ROUTES } from '../../../../configs/constants';
+import { ROUTES } from '@/configs/constants';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import type { ChipProps } from '@mui/material';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 interface Props {
   statusLabel: string;

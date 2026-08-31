@@ -1,12 +1,12 @@
 'use client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 import * as yup from 'yup';
 import { Box } from '@mui/material';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useTranslation } from 'react-i18next';
-import type { RoleName } from '../../../../types/auth';
+import type { RoleName } from '@/types/auth';
 import type { CodeResponse } from '@react-oauth/google';
 import JobSeekerSignUpFormFields from './JobSeekerSignUpFormFields';
 import JobSeekerSignUpSocialButtons from './JobSeekerSignUpSocialButtons';

@@ -1,4 +1,4 @@
-import httpRequest from '../../utils/httpRequest';
+import httpRequest from '@/utils/httpRequest';
 import contentService from '../contentService';
 import { readFileSync } from 'fs';
 import { join } from 'path';

@@ -1,4 +1,4 @@
-import httpRequest from '../../utils/httpRequest';
+import httpRequest from '@/utils/httpRequest';
 import adminSettingsService from '../adminSettingsService';
 
 jest.mock('../../utils/httpRequest', () => ({

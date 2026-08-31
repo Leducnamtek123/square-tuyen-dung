@@ -1,11 +1,11 @@
 ﻿'use client';
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
-import adminManagementService from '../../../../services/adminManagementService';
-import toastMessages from '../../../../utils/toastMessages';
-import { JobPostActivity } from '../../../../types/models';
-import { PaginatedResponse } from '../../../../types/api';
-import type { AdminListParams, JobPostActivityPayload } from '../../../../services/adminManagementService';
+import adminManagementService from '@/services/adminManagementService';
+import toastMessages from '@/utils/toastMessages';
+import { JobPostActivity } from '@/types/models';
+import { PaginatedResponse } from '@/types/api';
+import type { AdminListParams, JobPostActivityPayload } from '@/services/adminManagementService';
 import i18next from 'i18next';
 
 type UseJobActivitiesResult = UseQueryResult<PaginatedResponse<JobPostActivity>> & {

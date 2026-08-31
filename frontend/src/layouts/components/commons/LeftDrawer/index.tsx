@@ -8,22 +8,22 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/redux/hooks';
 import Link from 'next/link';
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import errorHandling from '../../../../utils/errorHandling';
-import { IMAGES, ROUTES } from '../../../../configs/constants';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
-import { removeUserInfo } from '../../../../redux/userSlice';
-import tokenService from '../../../../services/tokenService';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import errorHandling from '@/utils/errorHandling';
+import { IMAGES, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import { removeUserInfo } from '@/redux/userSlice';
+import tokenService from '@/services/tokenService';
 import AccountSwitchMenu from '../AccountSwitchMenu';
-import { isEmployerPortalPath } from '../../../../configs/portalRouting';
-import type { ApiError } from '../../../../types/api';
+import { isEmployerPortalPath } from '@/configs/portalRouting';
+import type { ApiError } from '@/types/api';
 import type { AxiosError } from 'axios';
-import type { AppDispatch } from '../../../../redux/store';
+import type { AppDispatch } from '@/redux/store';
 import {
   resetSearchCompany,
   resetSearchJobPostFilter,
   resetSearchResume,
-} from '../../../../redux/filterSlice';
+} from '@/redux/filterSlice';
 
 interface PageItem {
   id: string;

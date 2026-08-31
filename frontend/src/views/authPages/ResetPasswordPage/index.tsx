@@ -3,12 +3,12 @@ import * as React from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Alert, AlertTitle, Card, Container, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import { TabTitle } from '../../../utils/generalFunction';
-import ResetPasswordForm from '../../components/auths/ResetPasswordForm';
-import authService from '../../../services/authService';
-import { ROUTES } from '../../../configs/constants';
+import { TabTitle } from '@/utils/generalFunction';
+import ResetPasswordForm from '@/views/components/auths/ResetPasswordForm';
+import authService from '@/services/authService';
+import { ROUTES } from '@/configs/constants';
 import type { AxiosError } from 'axios';
-import type { ResetPasswordFormData } from '../../components/auths/ResetPasswordForm';
+import type { ResetPasswordFormData } from '@/views/components/auths/ResetPasswordForm';
 
 
 

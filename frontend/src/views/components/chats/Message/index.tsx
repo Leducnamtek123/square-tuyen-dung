@@ -4,9 +4,9 @@ import Image from 'next/image';
 import DoneAllRoundedIcon from '@mui/icons-material/DoneAllRounded';
 import InsertDriveFileRoundedIcon from '@mui/icons-material/InsertDriveFileRounded';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import { formatMessageDate } from "../../../../utils/dateHelper";
+import { formatMessageDate } from "@/utils/dateHelper";
 import { useTranslation } from 'react-i18next';
-import { useChatContext } from "../../../../context/ChatProvider";
+import { useChatContext } from "@/context/ChatProvider";
 import { getSafeResourceUrl, openResourceUrlSafely } from '@/utils/safeExternalUrl';
 
 interface MessageProps {

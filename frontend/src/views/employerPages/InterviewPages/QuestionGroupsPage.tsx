@@ -1,6 +1,6 @@
  'use client';
 import { useTranslation } from 'react-i18next';
-import QuestionGroupsCard from '../../components/employers/QuestionGroupsCard';
+import QuestionGroupsCard from '@/views/components/employers/QuestionGroupsCard';
 
 const QuestionGroupsPage = () => {
     const { t } = useTranslation('employer');

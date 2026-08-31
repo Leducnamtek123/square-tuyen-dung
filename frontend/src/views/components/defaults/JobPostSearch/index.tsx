@@ -9,25 +9,25 @@ import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
-import InputBaseSearchHomeCustom from '../../../../components/Common/Controls/InputBaseSearchHomeCustom';
-import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import InputBaseSearchHomeCustom from '@/components/Common/Controls/InputBaseSearchHomeCustom';
+import SingleSelectSearchCustom from '@/components/Common/Controls/SingleSelectSearchCustom';
+import FormPopup from '@/components/Common/Controls/FormPopup';
 import {
   resetSearchJobPostFilter,
   searchJobPost,
   JobPostFilter,
-} from '../../../../redux/filterSlice';
-import { useAppDispatch, useAppSelector } from '../../../../hooks/useAppStore';
-import { ROLES_NAME, ROUTES } from '../../../../configs/constants';
+} from '@/redux/filterSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/useAppStore';
+import { ROLES_NAME, ROUTES } from '@/configs/constants';
 import { useConfig } from '@/hooks/useConfig';
-import { SelectOption } from '../../../../types/models';
+import { SelectOption } from '@/types/models';
 import type { JobPostSearchFormValues } from './types';
 import { useJobPostSearchLocationOptions } from './useJobPostSearchLocationOptions';
 import JobPostSearchAdvancedFilters from './JobPostSearchAdvancedFilters';
 import JobPostNotificationForm, {
   getDefaultFrequency,
   type JobPostNotificationFormValues,
-} from '../../jobSeekers/JobPostNotificationForm';
+} from '@/views/components/jobSeekers/JobPostNotificationForm';
 import jobPostNotificationService from '@/services/jobPostNotificationService';
 import errorHandling from '@/utils/errorHandling';
 import toastMessages from '@/utils/toastMessages';

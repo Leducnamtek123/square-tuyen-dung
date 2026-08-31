@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
-import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
-import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
-import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
-import { DATE_OPTIONS } from '../../../../configs/constants';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
+import SingleSelectCustom from '@/components/Common/Controls/SingleSelectCustom';
+import DatePickerCustom from '@/components/Common/Controls/DatePickerCustom';
+import { DATE_OPTIONS } from '@/configs/constants';
 import { useWatch, type Control } from 'react-hook-form';
 import type { TFunction } from 'i18next';
 import type { EmployerSignUpFormData } from './types';

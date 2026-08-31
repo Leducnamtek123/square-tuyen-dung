@@ -43,7 +43,13 @@ export default function AdminDataGrid<T>({
   selectable = false,
   selectedRows = [],
   onSelectRows,
-  getRowId = (row: any, idx?: number) => row?.id ?? row?.code ?? idx ?? Math.random(),
+  getRowId = (row: any, idx?: number) => {
+    const candidate = row?.id ?? row?.code ?? row?.slug ?? row?.uuid;
+    if (candidate != null && String(candidate).trim() !== '') {
+      return String(candidate);
+    }
+    return idx !== undefined ? `row-${idx}` : '';
+  },
   bulkActions,
   onExport,
   onRefresh,

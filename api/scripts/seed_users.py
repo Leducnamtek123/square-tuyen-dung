@@ -1,9 +1,12 @@
 import datetime
 import os
+import sys
+from pathlib import Path
 
 import django
 from django.utils import timezone
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
@@ -12,7 +15,7 @@ from apps.jobs.models import JobPost, JobPostActivity
 from apps.interviews.models import InterviewSession, Question, QuestionGroup
 from apps.locations.models import City, District, Location
 from apps.profiles.models import Company, JobSeekerProfile, Resume
-from common.models import Career
+from apps.common.models import Career
 from oauth2_provider.models import Application
 from shared.configs import variable_system as var_sys
 

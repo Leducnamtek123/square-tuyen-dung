@@ -1,12 +1,12 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { Box, Card, Container, Typography, Grid2 as Grid, styled } from '@mui/material';
-import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
-import JobSeekerSignUpForm from '../../components/auths/JobSeekerSignUpForm';
-import AuthShowcasePanel from '../../components/auths/AuthShowcasePanel';
-import { ROUTES } from '../../../configs/constants';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import JobSeekerSignUpForm from '@/views/components/auths/JobSeekerSignUpForm';
+import AuthShowcasePanel from '@/views/components/auths/AuthShowcasePanel';
+import { ROUTES } from '@/configs/constants';
 import type { TFunction } from 'i18next';
-import type { RoleName } from '../../../types/auth';
+import type { RoleName } from '@/types/auth';
 import type { CodeResponse } from '@react-oauth/google';
 import SecurityIcon from '@mui/icons-material/Security';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';

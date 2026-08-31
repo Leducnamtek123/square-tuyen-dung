@@ -32,14 +32,14 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 import { useTranslation } from 'react-i18next';
-import { TabTitle } from '../../../utils/generalFunction';
+import { TabTitle } from '@/utils/generalFunction';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { removeUserInfo, getUserInfo } from '@/redux/userSlice';
 import tokenService from '@/services/tokenService';
 import authService from '@/services/authService';
 import jobSeekerProfileService from '@/services/jobSeekerProfileService';
 import toastMessages from '@/utils/toastMessages';
-import PhoneVerificationModal from '../../components/modals/PhoneVerificationModal';
+import PhoneVerificationModal from '@/views/components/modals/PhoneVerificationModal';
 
 const AccountPage = () => {
   const { t, i18n } = useTranslation(['jobSeeker', 'common']);

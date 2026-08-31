@@ -1859,6 +1859,78 @@
   },
   "auth": {
     "unverifiedAccount": "Unverified Account",
-    "verifiedAccount": "Verified Account"
+    "verifiedAccount": "Verified Account",
+    "testModeHint": "Test Mode: Enter OTP",
+    "testModeInstantVerify": "for instant verification."
+  },
+  "cvBuilder": {
+    "pageTitle": "Online CV Builder & Designer | InfoHR Recruitment",
+    "defaultCvPrefix": "CV",
+    "defaultCvTitle": "Job Application CV",
+    "untitledCv": "Untitled CV",
+    "backToGallery": "Back to Template Gallery",
+    "renameHint": "Click to rename CV",
+    "guestMode": "Guest Mode",
+    "saveStatus": {
+      "saving": "Auto-saving...",
+      "saved": "Saved",
+      "savedAt": "Saved at {{time}}",
+      "idle": "Edit to auto-save"
+    },
+    "mobile": {
+      "edit": "Edit",
+      "preview": "Preview"
+    },
+    "tabs": {
+      "content": "Content",
+      "design": "Design",
+      "aiScore": "ATS Score",
+      "aiAssist": "AI Suggestions"
+    },
+    "editor": {
+      "sidebarTitle": "Edit CV Profile",
+      "syncFromProfile": "Sync from Profile"
+    },
+    "preview": {
+      "switchTemplate": "Switch Template",
+      "vietnamese": "VI",
+      "english": "EN",
+      "color": "Color:",
+      "zoomOut": "Zoom out",
+      "zoomIn": "Zoom in",
+      "zoomReset": "Default 85%"
+    },
+    "actions": {
+      "publicLink": "Online Link",
+      "exportWord": "Export Word (.doc)",
+      "backupJson": "Backup JSON",
+      "saveNow": "Save Now",
+      "downloadPdf": "Download PDF A4"
+    },
+    "toasts": {
+      "cvNotFound": "CV record not found or you don't have access.",
+      "saveSuccess": "CV saved successfully!",
+      "saveBeforeShare": "Please save your CV before generating a share link.",
+      "copyLinkSuccess": "Public CV link copied to clipboard!",
+      "syncSuccess": "Profile data synced successfully!",
+      "syncFailed": "Could not sync profile. Please try again!",
+      "applyTemplateSuccess": "New CV template applied successfully!"
+    },
+    "templateModal": {
+      "title": "Select CV Template",
+      "subtitle": "All your entered information will be 100% preserved when switching layouts.",
+      "selectedLabel": "Selected template:",
+      "apply": "Apply this template"
+    },
+    "categories": {
+      "all": "All Templates",
+      "popular": "Most Popular",
+      "modern": "Modern",
+      "simple": "Simple & ATS",
+      "executive": "Executive",
+      "professional": "Professional",
+      "creative": "Creative",
+      "tech": "IT & Tech"
+    }
   }
 }

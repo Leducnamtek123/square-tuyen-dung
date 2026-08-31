@@ -24,7 +24,7 @@ from apps.jobs.exceptions import CompanyNotVerifiedError
 from apps.jobs.ai_scoring_service import _fallback_scoring, build_scoring_prompt
 from apps.jobs.recommendation_service import get_recommended_jobs
 from apps.content.models import SystemSetting
-from common.serializers import LocationSerializer
+from apps.common.serializers import LocationSerializer
 from shared.configs import table_export, variable_system as var_sys
 
 

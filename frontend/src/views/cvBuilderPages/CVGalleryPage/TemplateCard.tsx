@@ -288,7 +288,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onPreview 
           <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 0.75 }}>
             {displayInfo.tags.map((tag, idx) => (
               <Chip
-                key={idx}
+                key={`tag-${tag}-${idx}`}
                 label={tag}
                 size="small"
                 sx={{

@@ -8,7 +8,7 @@ from apps.jobs.models import JobPost
 from apps.locations.models import City
 from apps.profiles.models import Company, Resume, JobSeekerProfile
 from shared.configs import variable_system as var_sys
-from common.models import Career
+from apps.common.models import Career
 
 logger = logging.getLogger(__name__)
 

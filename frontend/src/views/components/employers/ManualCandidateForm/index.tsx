@@ -7,11 +7,11 @@ import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 
-import FileUploadCustom from '../../../../components/Common/Controls/FileUploadCustom';
-import MultilineTextFieldCustom from '../../../../components/Common/Controls/MultilineTextFieldCustom';
-import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
-import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import FileUploadCustom from '@/components/Common/Controls/FileUploadCustom';
+import MultilineTextFieldCustom from '@/components/Common/Controls/MultilineTextFieldCustom';
+import SingleSelectCustom from '@/components/Common/Controls/SingleSelectCustom';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
+import { typedYupResolver } from '@/utils/formHelpers';
 import { useConfig } from '@/hooks/useConfig';
 import { REGEX_VALIDATE } from '@/configs/constants';
 import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';

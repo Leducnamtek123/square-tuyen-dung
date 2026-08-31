@@ -1,10 +1,10 @@
 ﻿'use client';
 
 import { useMutation, useQuery, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
-import adminInterviewService from '../../../../services/adminInterviewService';
-import { InterviewSession } from '../../../../types/models';
-import { PaginatedResponse } from '../../../../types/api';
-import type { AdminListParams } from '../../../../services/adminManagementService';
+import adminInterviewService from '@/services/adminInterviewService';
+import { InterviewSession } from '@/types/models';
+import { PaginatedResponse } from '@/types/api';
+import type { AdminListParams } from '@/services/adminManagementService';
 
 type UseInterviewsResult = UseQueryResult<PaginatedResponse<InterviewSession>> & {
     updateInterviewStatus: (args: { id: string | number; status: string }) => Promise<InterviewSession>;

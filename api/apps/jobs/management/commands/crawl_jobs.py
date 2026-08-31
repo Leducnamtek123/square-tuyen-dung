@@ -5,7 +5,7 @@ from django.utils.text import slugify
 from apps.jobs.models import JobPost
 from apps.profiles.models import Company
 from apps.locations.models import City, Location
-from common.models import Career
+from apps.common.models import Career
 from apps.accounts.models import User
 from shared.configs import variable_system as var_sys
 import random

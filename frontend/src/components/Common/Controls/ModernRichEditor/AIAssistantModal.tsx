@@ -879,7 +879,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
                 {suggestions.map((sug, idx) => (
                   <Paper
-                    key={idx}
+                    key={sug || `sug-${idx}`}
                     elevation={0}
                     onClick={() => {
                       setUserPrompt(sug);

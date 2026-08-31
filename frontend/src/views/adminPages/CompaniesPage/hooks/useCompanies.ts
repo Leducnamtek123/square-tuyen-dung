@@ -1,11 +1,11 @@
 ﻿'use client';
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
-import adminManagementService from '../../../../services/adminManagementService';
-import type { AdminListParams } from '../../../../services/adminManagementService';
-import toastMessages from '../../../../utils/toastMessages';
-import { Company } from '../../../../types/models';
-import { PaginatedResponse } from '../../../../types/api';
+import adminManagementService from '@/services/adminManagementService';
+import type { AdminListParams } from '@/services/adminManagementService';
+import toastMessages from '@/utils/toastMessages';
+import { Company } from '@/types/models';
+import { PaginatedResponse } from '@/types/api';
 import i18next from 'i18next';
 
 export interface AdminCompanyPayload {

@@ -7,7 +7,7 @@ import { LiveKitRoom, RoomAudioRenderer, SessionProvider, useSession } from '@li
 import { TokenSource } from 'livekit-client';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { AIInterviewLayout } from '../../../interviewPages/AIInterviewLayout';
+import { AIInterviewLayout } from '@/views/interviewPages/AIInterviewLayout';
 import InterviewAiEvaluationCard from './InterviewAiEvaluationCard';
 import InterviewAnalysisPanel from './InterviewAnalysisPanel';
 import InterviewHrEvaluationForm from './InterviewHrEvaluationForm';
@@ -24,14 +24,14 @@ import {
   getEvaluationFormValidationError,
 } from './evaluationFormValidation';
 import { useInterviewDetail, useInterviewMutations } from '../hooks/useEmployerQueries';
-import { useInterviewSSE } from '../../../employerPages/InterviewPages/hooks/useInterviewSSE';
-import interviewService from '../../../../services/interviewService';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
+import { useInterviewSSE } from '@/views/employerPages/InterviewPages/hooks/useInterviewSSE';
+import interviewService from '@/services/interviewService';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import type { AxiosError } from 'axios';
-import type { ApiError } from '../../../../types/api';
-import type { InterviewSession } from '../../../../types/models';
+import type { ApiError } from '@/types/api';
+import type { InterviewSession } from '@/types/models';
 import type { EvalFormType } from './types';
 
 const ACTIVE_STATUSES = ['scheduled', 'calibration', 'in_progress'];

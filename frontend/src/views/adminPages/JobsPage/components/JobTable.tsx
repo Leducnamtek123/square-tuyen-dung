@@ -7,12 +7,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import dayjs from '../../../../configs/dayjs-config';
+import dayjs from '@/configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
-import DataTable from '../../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 
-import { JobPost } from '../../../../types/models';
+import { JobPost } from '@/types/models';
 import type { CellContext as ReactTableCellContext } from '@tanstack/react-table';
 
 interface JobPostExt extends JobPost {

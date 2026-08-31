@@ -4,16 +4,16 @@ import { Box, Typography, Button, Stack, Paper } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
-import { ROUTES } from '../../../../configs/constants';
-import DataTable from '../../../../components/Common/DataTable';
+import { ROUTES } from '@/configs/constants';
+import DataTable from '@/components/Common/DataTable';
 import { useInterviewSessions, useInterviewMutations } from '../hooks/useEmployerQueries';
-import { useDataTable } from '../../../../hooks';
-import toastMessages from '../../../../utils/toastMessages';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
+import { useDataTable } from '@/hooks';
+import toastMessages from '@/utils/toastMessages';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import { confirmModal } from '@/utils/sweetalert2Modal';
 import { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
 import { useInterviewListCardColumns } from './useInterviewListCardColumns';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 interface InterviewListCardProps {
   title?: string;

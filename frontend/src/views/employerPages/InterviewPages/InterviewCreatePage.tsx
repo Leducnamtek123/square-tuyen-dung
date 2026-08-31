@@ -1,6 +1,6 @@
 'use client';
 import { useTranslation } from 'react-i18next';
-import InterviewCreateCard from '../../components/employers/InterviewCreateCard';
+import InterviewCreateCard from '@/views/components/employers/InterviewCreateCard';
 
 const InterviewCreatePage = () => {
     const { t } = useTranslation('employer');

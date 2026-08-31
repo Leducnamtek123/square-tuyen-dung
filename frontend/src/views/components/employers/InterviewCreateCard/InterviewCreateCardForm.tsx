@@ -7,7 +7,7 @@ import WorkIcon from '@mui/icons-material/Work';
 import PersonIcon from '@mui/icons-material/Person';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import type { FormValues } from './types';
-import type { JobPostActivity, Question, QuestionGroup, VoiceProfile } from '../../../../types/models';
+import type { JobPostActivity, Question, QuestionGroup, VoiceProfile } from '@/types/models';
 import type { TFunction } from 'i18next';
 import InterviewCreateCardQuestionSection from './InterviewCreateCardQuestionSection';
 

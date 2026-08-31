@@ -22,13 +22,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
-import DataTable from '../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 import { useWards } from './hooks/useWards';
 import { useDistricts } from '../DistrictsPage/hooks/useDistricts';
 import { useCities } from '../CitiesPage/hooks/useCities';
-import { useDataTable, useDebounce } from '../../../hooks';
-import type { Ward, District, City } from '../../../types/models';
-import type { WardPayload } from '../../../services/adminManagementService';
+import { useDataTable, useDebounce } from '@/hooks';
+import type { Ward, District, City } from '@/types/models';
+import type { WardPayload } from '@/services/adminManagementService';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import type { SxProps, Theme } from '@mui/material/styles';
 import {

@@ -272,7 +272,7 @@ export default function HrmDashboardPage() {
         {/* 1. Top Bento KPI Cards */}
         <Grid container spacing={2.5}>
           {kpis.map((kpi, idx) => (
-            <Grid key={idx} size={{ xs: 12, sm: 6, lg: 3 }}>
+            <Grid key={kpi.title || `kpi-${idx}`} size={{ xs: 12, sm: 6, lg: 3 }}>
               <Paper
                 elevation={0}
                 sx={{
@@ -428,7 +428,7 @@ export default function HrmDashboardPage() {
 
               <Grid container spacing={1.5}>
                 {quickActions.map((action, idx) => (
-                  <Grid key={idx} size={12}>
+                  <Grid key={action.href || action.title || `action-${idx}`} size={12}>
                     <Box
                       onClick={() => push(action.href)}
                       sx={{

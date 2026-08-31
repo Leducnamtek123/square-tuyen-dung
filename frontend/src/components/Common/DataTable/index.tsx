@@ -177,7 +177,7 @@ const DataTable = <TData,>({
         enableSorting,
         onSortingChange,
         onRowSelectionChange,
-        getRowId: getRowId || ((row: any, index) => String(row?.id ?? row?.slug ?? index)),
+        getRowId: getRowId || ((row: any, index) => String(row?.id ?? row?.code ?? row?.slug ?? row?.uuid ?? (index !== undefined ? `row-${index}` : ''))),
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         manualPagination: true,

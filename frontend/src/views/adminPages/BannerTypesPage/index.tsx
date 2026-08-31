@@ -23,9 +23,9 @@ import { ColumnDef } from '@tanstack/react-table';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import DataTable from '../../../components/Common/DataTable';
-import { BannerType } from '../../../types/models';
-import { useDataTable, useDebounce } from '../../../hooks';
+import DataTable from '@/components/Common/DataTable';
+import { BannerType } from '@/types/models';
+import { useDataTable, useDebounce } from '@/hooks';
 import { useBannerTypes } from './hooks/useBannerTypes';
 import FilterBar from '@/components/Common/FilterBar';
 import {

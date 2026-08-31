@@ -29,15 +29,15 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { ColumnDef } from '@tanstack/react-table';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import adminJobService from '../../../services/adminJobService';
-import adminManagementService from '../../../services/adminManagementService';
-import aiService from '../../../services/aiService';
-import voiceProfileService, { type VoiceProfilePayload } from '../../../services/voiceProfileService';
-import type { VoiceProfile } from '../../../types/models';
-import toastMessages from '../../../utils/toastMessages';
-import { useDataTable } from '../../../hooks';
-import DataTable from '../../../components/Common/DataTable';
-import FilterBar, { filterControlSx } from '../../../components/Common/FilterBar';
+import adminJobService from '@/services/adminJobService';
+import adminManagementService from '@/services/adminManagementService';
+import aiService from '@/services/aiService';
+import voiceProfileService, { type VoiceProfilePayload } from '@/services/voiceProfileService';
+import type { VoiceProfile } from '@/types/models';
+import toastMessages from '@/utils/toastMessages';
+import { useDataTable } from '@/hooks';
+import DataTable from '@/components/Common/DataTable';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import {
   getVoiceProfileFormValidationErrors,
   type VoiceProfileFormValidationErrors,

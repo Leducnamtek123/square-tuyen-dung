@@ -4,14 +4,14 @@ import React, { useMemo, useReducer } from 'react';
 import { Box, Typography, Paper, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Tooltip, IconButton, Chip, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import dayjs from '../../../configs/dayjs-config';
+import dayjs from '@/configs/dayjs-config';
 
 import { useJobActivities } from './hooks/useJobActivities';
-import { useDataTable, useDebounce } from '../../../hooks';
-import { JobPostActivity } from '../../../types/models';
+import { useDataTable, useDebounce } from '@/hooks';
+import { JobPostActivity } from '@/types/models';
 import FilterBar from '@/components/Common/FilterBar';
 import {
     JOB_ACTIVITY_STATUS_OPTIONS,

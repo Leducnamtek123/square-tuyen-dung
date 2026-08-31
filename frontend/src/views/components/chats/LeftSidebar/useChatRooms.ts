@@ -1,8 +1,8 @@
 import React from 'react';
 import { collection, onSnapshot, query, where, orderBy, startAfter, limit, getDocs } from 'firebase/firestore';
-import db from '../../../../configs/firebase-config';
-import { useChatContext } from '../../../../context/ChatProvider';
-import { getUserAccount } from '../../../../services/firebaseService';
+import db from '@/configs/firebase-config';
+import { useChatContext } from '@/context/ChatProvider';
+import { getUserAccount } from '@/services/firebaseService';
 import type { Timestamp } from 'firebase/firestore';
 import type { DocumentSnapshot } from 'firebase/firestore';
 import type { QueryDocumentSnapshot } from 'firebase/firestore';

@@ -11,8 +11,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import { Theme } from '@mui/material/styles';
-import TimeAgo from '../../../../components/Common/TimeAgo';
-import type { ExperienceDetail } from '../../../../types/models';
+import TimeAgo from '@/components/Common/TimeAgo';
+import type { ExperienceDetail } from '@/types/models';
 
 type Props = {
   value: ExperienceDetail;

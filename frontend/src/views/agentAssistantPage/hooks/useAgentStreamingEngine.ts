@@ -225,7 +225,7 @@ export const useAgentStreamingEngine = ({ portal, t }: UseAgentStreamingEnginePr
         try {
           const dataUrl = await readFileAsDataUrl(file);
           validFiles.push({
-            id: `${Date.now()}-${i}-${file.name}`,
+            id: `att-${crypto.randomUUID()}`,
             type: 'image',
             mimeType: file.type,
             dataUrl,
@@ -264,14 +264,13 @@ export const useAgentStreamingEngine = ({ portal, t }: UseAgentStreamingEnginePr
 
     try {
       const res = await agentAssistantService.sendMessage(selectedThreadId, text, attachmentsToSend);
-      setMessages((prev) => {
-        const next = [...prev];
-        const lastIdx = next.length - 1;
-        if (lastIdx >= 0 && next[lastIdx].role === 'assistant') {
-          next[lastIdx] = res.assistantMessage;
-        }
-        return next;
-      });
+      setMessages((prev) =>
+        prev.map((msg) => {
+          if (msg.id === optimisticUserMessage.id) return res.userMessage;
+          if (msg.id === optimisticAssistantMessage.id) return res.assistantMessage;
+          return msg;
+        })
+      );
     } catch {
       setErrorMessage(t('common:agentAssistant.sendError'));
       setMessages((prev) => prev.filter((msg) => !msg.metadata?.optimistic));

@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 import * as yup from 'yup';
 import { Box, Button, Stack, styled } from "@mui/material";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
@@ -11,14 +11,14 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import BusinessIcon from '@mui/icons-material/Business';
 import { useTranslation } from 'react-i18next';
-import useDebounce from '../../../../hooks/useDebounce';
-import { DATE_OPTIONS, REGEX_VALIDATE } from '../../../../configs/constants';
-import errorHandling from '../../../../utils/errorHandling';
-import commonService from '../../../../services/commonService';
-import goongService from '../../../../services/goongService';
-import { useAppSelector } from '../../../../hooks/useAppStore';
-import type { RoleName } from '../../../../types/auth';
-import type { RootState } from '../../../../redux/store';
+import useDebounce from '@/hooks/useDebounce';
+import { DATE_OPTIONS, REGEX_VALIDATE } from '@/configs/constants';
+import errorHandling from '@/utils/errorHandling';
+import commonService from '@/services/commonService';
+import goongService from '@/services/goongService';
+import { useAppSelector } from '@/hooks/useAppStore';
+import type { RoleName, EmployerSignUpFormData } from '@/types/auth';
+import type { RootState } from '@/redux/store';
 import type { SelectOption } from '@/types/models';
 import { shouldResetChildLocationValue } from '@/utils/locationForm';
 
@@ -27,29 +27,7 @@ import CompanyInfoStep from './CompanyInfoStep';
 import type { FieldErrors } from 'react-hook-form';
 import type { UseFormSetError } from 'react-hook-form';
 
-export interface EmployerSignUpFormData {
-  fullName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  company: {
-    companyName: string;
-    companyEmail: string;
-    companyPhone: string;
-    taxCode: string;
-    since?: Date | null;
-    fieldOperation: string;
-    employeeSize: number;
-    websiteUrl: string;
-    location: {
-      city: string | number;
-      district: string | number;
-      address: string;
-      lat: number | string | null;
-      lng: number | string | null;
-    };
-  };
-}
+export type { EmployerSignUpFormData };
 
 interface EmployerSignUpFormProps {
   onSignUp: (data: EmployerSignUpFormData) => void;

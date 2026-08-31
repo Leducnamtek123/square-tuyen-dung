@@ -1859,6 +1859,78 @@
   },
   "auth": {
     "unverifiedAccount": "Tài khoản chưa xác thực",
-    "verifiedAccount": "Tài khoản đã xác thực"
+    "verifiedAccount": "Tài khoản đã xác thực",
+    "testModeHint": "Chế độ thử nghiệm: Nhập mã OTP",
+    "testModeInstantVerify": "để xác thực tức thì."
+  },
+  "cvBuilder": {
+    "pageTitle": "Trình Tạo & Trang Trí CV Trực Tuyến | InfoHR Tuyển Dụng",
+    "defaultCvPrefix": "CV",
+    "defaultCvTitle": "CV Ứng tuyển",
+    "untitledCv": "CV Chưa Đặt Tên",
+    "backToGallery": "Quay lại danh sách mẫu",
+    "renameHint": "Bấm để đổi tên CV",
+    "guestMode": "Chế độ khách",
+    "saveStatus": {
+      "saving": "Đang tự động lưu...",
+      "saved": "Đã lưu",
+      "savedAt": "Đã lưu lúc {{time}}",
+      "idle": "Chỉnh sửa để tự động lưu"
+    },
+    "mobile": {
+      "edit": "Chỉnh sửa",
+      "preview": "Xem trước"
+    },
+    "tabs": {
+      "content": "Nhập liệu",
+      "design": "Thiết kế",
+      "aiScore": "Chấm ATS",
+      "aiAssist": "Gợi ý AI"
+    },
+    "editor": {
+      "sidebarTitle": "Chỉnh sửa hồ sơ CV",
+      "syncFromProfile": "Đồng bộ từ hồ sơ"
+    },
+    "preview": {
+      "switchTemplate": "Đổi mẫu",
+      "vietnamese": "Việt",
+      "english": "Anh",
+      "color": "Màu sắc:",
+      "zoomOut": "Thu nhỏ",
+      "zoomIn": "Phóng to",
+      "zoomReset": "Tỉ lệ chuẩn 85%"
+    },
+    "actions": {
+      "publicLink": "Link trực tuyến",
+      "exportWord": "Xuất Word (.doc)",
+      "backupJson": "Sao lưu JSON",
+      "saveNow": "Lưu ngay",
+      "downloadPdf": "Tải PDF A4"
+    },
+    "toasts": {
+      "cvNotFound": "Không tìm thấy bản ghi CV hoặc bạn không có quyền truy cập.",
+      "saveSuccess": "Đã lưu CV thành công lên hệ thống!",
+      "saveBeforeShare": "Vui lòng lưu CV trước khi tạo link chia sẻ.",
+      "copyLinkSuccess": "Đã sao chép đường link CV công khai!",
+      "syncSuccess": "Đã đồng bộ thông tin từ Hồ sơ cá nhân thành công!",
+      "syncFailed": "Không thể đồng bộ hồ sơ. Vui lòng thử lại!",
+      "applyTemplateSuccess": "Đã áp dụng mẫu CV mới thành công!"
+    },
+    "templateModal": {
+      "title": "Chọn Mẫu Giao Diện CV",
+      "subtitle": "Toàn bộ nội dung & thông tin bạn đã nhập sẽ được giữ nguyên 100% khi chuyển sang mẫu mới.",
+      "selectedLabel": "Mẫu đang chọn:",
+      "apply": "Áp dụng mẫu này"
+    },
+    "categories": {
+      "all": "Tất cả mẫu",
+      "popular": "Phổ biến nhất",
+      "modern": "Hiện đại",
+      "simple": "Đơn giản & ATS",
+      "executive": "Cấp Quản lý",
+      "professional": "Chuyên nghiệp",
+      "creative": "Sáng tạo",
+      "tech": "Công nghệ IT"
+    }
   }
 }

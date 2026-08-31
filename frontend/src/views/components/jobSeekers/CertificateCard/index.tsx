@@ -16,17 +16,17 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import { Theme } from '@mui/material/styles';
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import EmptyCard from '../../../../components/Common/EmptyCard';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import EmptyCard from '@/components/Common/EmptyCard';
+import FormPopup from '@/components/Common/Controls/FormPopup';
 import CertificateForm, { FormValues as CertificateFormValues } from '../CertificateForm';
-import TimeAgo from '../../../../components/Common/TimeAgo';
-import resumeService from '../../../../services/resumeService';
-import certificateService from '../../../../services/certificateService';
-import type { Certificate } from '../../../../types/models';
+import TimeAgo from '@/components/Common/TimeAgo';
+import resumeService from '@/services/resumeService';
+import certificateService from '@/services/certificateService';
+import type { Certificate } from '@/types/models';
 
 interface CertificateCardProps {
   title: string;

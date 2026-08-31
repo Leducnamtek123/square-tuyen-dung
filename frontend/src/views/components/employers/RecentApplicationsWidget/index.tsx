@@ -37,11 +37,11 @@ export default function RecentApplicationsWidget() {
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 2, sm: 2.5 },
-        borderRadius: '20px',
+        p: 2.5,
+        borderRadius: 3,
         border: '1px solid #E2E8F0',
         bgcolor: '#FFFFFF',
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 10px 25px -5px rgba(15, 23, 42, 0.03)',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04)',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',

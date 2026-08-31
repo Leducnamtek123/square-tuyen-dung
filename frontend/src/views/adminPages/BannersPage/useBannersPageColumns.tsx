@@ -6,8 +6,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import { IMAGES } from '../../../configs/constants';
-import type { Banner } from '../../../types/models';
+import { IMAGES } from '@/configs/constants';
+import type { Banner } from '@/types/models';
 
 interface UseBannersPageColumnsArgs {
   typeOptions: { value: string | number; label: string }[];

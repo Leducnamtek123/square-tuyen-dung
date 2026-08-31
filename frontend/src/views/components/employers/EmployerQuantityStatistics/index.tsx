@@ -50,49 +50,34 @@ const MetricCard = ({
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 2, sm: 2.5 },
-        borderRadius: '20px',
+        p: 2.5,
+        borderRadius: 3,
         border: '1px solid #E2E8F0',
         bgcolor: '#FFFFFF',
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 10px 25px -5px rgba(15, 23, 42, 0.03)',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04)',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1)',
-        position: 'relative',
         overflow: 'hidden',
         '&:hover': {
-          transform: 'translateY(-3px)',
-          boxShadow: '0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.03)',
-          borderColor: alpha(iconColor, 0.4),
+          transform: 'translateY(-2px)',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)',
+          borderColor: alpha(iconColor, 0.35),
         },
       }}
     >
       <Stack spacing={1.5}>
-        {/* Card Header: Icon & Title */}
-        <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between">
-          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 44,
-                height: 44,
-                borderRadius: '12px',
-                bgcolor: iconBgColor,
-                color: iconColor,
-                flexShrink: 0,
-              }}
-            >
-              {icon}
-            </Box>
+        {/* Card Header: Title & Icon */}
+        <Stack direction="row" spacing={1.5} alignItems="flex-start" justifyContent="space-between">
+          <Box sx={{ minWidth: 0, flexGrow: 1 }}>
             <Typography
+              variant="body2"
               sx={{
                 fontWeight: 600,
                 color: '#64748B',
-                fontSize: '0.875rem',
+                fontSize: '0.8125rem',
                 lineHeight: 1.3,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -101,56 +86,74 @@ const MetricCard = ({
             >
               {title}
             </Typography>
-          </Stack>
 
-          {deltaText && !loading && (
+            {loading ? (
+              <Skeleton width="60%" height={38} variant="text" sx={{ borderRadius: 1.5, mt: 0.5 }} />
+            ) : (
+              <Typography
+                variant="h4"
+                sx={{
+                  color: '#0F172A',
+                  fontSize: { xs: '1.55rem', sm: '1.75rem' },
+                  fontWeight: 700,
+                  mt: 0.5,
+                  lineHeight: 1.1,
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 0.5,
+                }}
+              >
+                {typeof value === 'number' ? value.toLocaleString('vi-VN') : value ?? 0}
+                {suffix && (
+                  <Typography component="span" sx={{ fontSize: '1rem', fontWeight: 600, color: '#64748B' }}>
+                    {suffix}
+                  </Typography>
+                )}
+              </Typography>
+            )}
+          </Box>
+
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 44,
+              height: 44,
+              borderRadius: 2.5,
+              bgcolor: iconBgColor,
+              color: iconColor,
+              flexShrink: 0,
+            }}
+          >
+            {icon}
+          </Box>
+        </Stack>
+
+        {/* Delta trend */}
+        {deltaText && !loading && (
+          <Stack direction="row" spacing={0.75} alignItems="center">
             <Box
               sx={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 0.25,
-                px: 1,
-                py: 0.35,
-                borderRadius: '8px',
-                fontSize: '0.75rem',
+                px: 0.85,
+                py: 0.2,
+                borderRadius: 1,
+                fontSize: '0.72rem',
                 fontWeight: 700,
                 bgcolor: isPositiveDelta ? '#DCFCE7' : '#FEE2E2',
                 color: isPositiveDelta ? '#16A34A' : '#DC2626',
-                flexShrink: 0,
               }}
             >
               <TrendingUpIcon sx={{ fontSize: 13 }} />
               <span>{deltaText}</span>
             </Box>
-          )}
-        </Stack>
-
-        {/* Card Body: Big Value */}
-        {loading ? (
-          <Skeleton width="60%" height={48} variant="text" sx={{ borderRadius: 1.5, my: 0.5 }} />
-        ) : (
-          <Box sx={{ my: 0.5 }}>
-            <Typography
-              sx={{
-                color: '#0F172A',
-                fontFamily: 'var(--font-mono)',
-                fontSize: { xs: '1.85rem', sm: '2.1rem' },
-                fontWeight: 800,
-                lineHeight: 1.1,
-                letterSpacing: '-0.03em',
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: 0.5,
-              }}
-            >
-              {typeof value === 'number' ? value.toLocaleString('vi-VN') : value ?? 0}
-              {suffix && (
-                <Typography component="span" sx={{ fontSize: '1.1rem', fontWeight: 700, color: '#64748B' }}>
-                  {suffix}
-                </Typography>
-              )}
+            <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.72rem' }}>
+              so với tháng trước
             </Typography>
-          </Box>
+          </Stack>
         )}
       </Stack>
 
@@ -160,7 +163,7 @@ const MetricCard = ({
           <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
             {subBadges.map((badge, idx) => (
               <Chip
-                key={idx}
+                key={`badge-${badge.label}-${idx}`}
                 label={badge.label}
                 size="small"
                 color={badge.color}
@@ -205,13 +208,13 @@ const EmployerQuantityStatistics = () => {
   const avgAiScore = data?.avgAiOverallScore ? Number(data.avgAiOverallScore).toFixed(1) : '8.5';
 
   return (
-    <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+    <Grid container spacing={{ xs: 1.5, sm: 2.5 }}>
       {/* Metric 1: Total Applications */}
       <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
         <MetricCard
           title={t('statItem.title.totalapplications')}
           value={totalApply}
-          icon={<GroupsOutlinedIcon sx={{ fontSize: 24 }} />}
+          icon={<GroupsOutlinedIcon sx={{ fontSize: 22 }} />}
           iconBgColor="#EFF6FF"
           iconColor="#2563EB"
           loading={isLoading}
@@ -226,7 +229,7 @@ const EmployerQuantityStatistics = () => {
         <MetricCard
           title={t('statItem.title.totaljobposts')}
           value={totalJobPost}
-          icon={<DescriptionOutlinedIcon sx={{ fontSize: 24 }} />}
+          icon={<DescriptionOutlinedIcon sx={{ fontSize: 22 }} />}
           iconBgColor="#F5F3FF"
           iconColor="#8B5CF6"
           loading={isLoading}
@@ -242,7 +245,7 @@ const EmployerQuantityStatistics = () => {
         <MetricCard
           title={t('statItem.title.totalinterviews')}
           value={totalInterviews}
-          icon={<VideocamOutlinedIcon sx={{ fontSize: 24 }} />}
+          icon={<VideocamOutlinedIcon sx={{ fontSize: 22 }} />}
           iconBgColor="#ECFDF5"
           iconColor="#10B981"
           loading={isLoading}
@@ -259,7 +262,7 @@ const EmployerQuantityStatistics = () => {
           title={t('statItem.title.conversionrate')}
           value={conversionRate}
           suffix="%"
-          icon={<SmartToyOutlinedIcon sx={{ fontSize: 24 }} />}
+          icon={<SmartToyOutlinedIcon sx={{ fontSize: 22 }} />}
           iconBgColor="#ECFEFF"
           iconColor="#06B6D4"
           loading={isLoading}

@@ -13,7 +13,7 @@ from django.utils.text import slugify
 from apps.accounts.models import User
 
 from apps.locations.models import City, District, Location
-from common.models import Career
+from apps.common.models import Career
 
 from apps.profiles.models import Company, EmployerCandidateProfile, Resume
 

@@ -6,9 +6,9 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
-import DataTable from '../../../../components/Common/DataTable';
-import dayjs from '../../../../configs/dayjs-config';
-import { Resume } from '../../../../types/models';
+import DataTable from '@/components/Common/DataTable';
+import dayjs from '@/configs/dayjs-config';
+import { Resume } from '@/types/models';
 
 interface ResumeTableProps {
     data: Resume[];

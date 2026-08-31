@@ -24,7 +24,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
-import { useResumeDetail } from '../../hooks/useEmployerQueries';
+import { useResumeDetail } from '@/views/components/employers/hooks/useEmployerQueries';
 import type { Resume } from '@/types/models';
 import { formatLocalizedSalaryRange } from '@/utils/customData';
 import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
@@ -577,7 +577,7 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
             <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap sx={{ gap: 0.75 }}>
               {resume.skillsSummary.split(',').map((skill: string, idx: number) => (
                 <Chip
-                  key={idx}
+                  key={`skill-${skill.trim()}-${idx}`}
                   label={skill.trim()}
                   size="small"
                   sx={{

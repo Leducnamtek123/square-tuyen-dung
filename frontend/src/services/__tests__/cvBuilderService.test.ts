@@ -1,5 +1,5 @@
 import { cvBuilderService } from '../cvBuilderService';
-import httpRequest from '../../utils/httpRequest';
+import httpRequest from '@/utils/httpRequest';
 
 jest.mock('../../utils/httpRequest', () => ({
   __esModule: true,

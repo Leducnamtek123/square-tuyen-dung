@@ -18,9 +18,9 @@ import {
   Typography,
 } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import ImageCropDialog from '../../../components/Common/ImageCropDialog';
-import { IMAGES } from '../../../configs/constants';
-import type { Banner } from '../../../types/models';
+import ImageCropDialog from '@/components/Common/ImageCropDialog';
+import { IMAGES } from '@/configs/constants';
+import type { Banner } from '@/types/models';
 import {
   getBannerFormValidationErrors,
   type BannerChoiceOption,

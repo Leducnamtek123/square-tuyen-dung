@@ -24,9 +24,9 @@ import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import { LiveKitRoom, RoomAudioRenderer } from '@livekit/components-react';
 import { useTranslation } from 'react-i18next';
-import { type InterviewSession } from '../../../../types/models';
+import { type InterviewSession } from '@/types/models';
 import { ElapsedTimer, LiveObserverVisualizer, normalizeStatus } from './InterviewLiveCandidateCardPresence';
-import { AIInterviewLayout } from '../../../interviewPages/AIInterviewLayout';
+import { AIInterviewLayout } from '@/views/interviewPages/AIInterviewLayout';
 import pc from '@/utils/muiColors';
 
 type Props = {

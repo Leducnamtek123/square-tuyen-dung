@@ -1,32 +1,32 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 
-import jobService from '../../../../services/jobService';
-import companyFollowed from '../../../../services/companyFollowed';
-import companyService from '../../../../services/companyService';
-import resumeViewedService from '../../../../services/resumeViewedService';
-import statisticService from '../../../../services/statisticService';
-import jobSeekerProfileService from '../../../../services/jobSeekerProfileService';
-import jobPostNotificationService from '../../../../services/jobPostNotificationService';
-import authService from '../../../../services/authService';
+import jobService from '@/services/jobService';
+import companyFollowed from '@/services/companyFollowed';
+import companyService from '@/services/companyService';
+import resumeViewedService from '@/services/resumeViewedService';
+import statisticService from '@/services/statisticService';
+import jobSeekerProfileService from '@/services/jobSeekerProfileService';
+import jobPostNotificationService from '@/services/jobPostNotificationService';
+import authService from '@/services/authService';
 import { PaginatedResponse } from '@/types/api';
-import { JobPost, Company, Resume } from '../../../../types/models';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
+import { JobPost, Company, Resume } from '@/types/models';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
 import i18next from 'i18next';
-import type { UserSettingsData } from '../../../../types/auth';
+import type { UserSettingsData } from '@/types/auth';
 
 // ─── Query Helpers ──────────────────────────────────────────
 import type { UseQueryResult } from '@tanstack/react-query';
-import type { JobSeekerTotalViewStats } from '../../../../services/statisticService';
-import type { GetJobPostsParams } from '../../../../services/jobService';
+import type { JobSeekerTotalViewStats } from '@/services/statisticService';
+import type { GetJobPostsParams } from '@/services/jobService';
 import type { AxiosError } from 'axios';
-import type { JobSeekerActivityStats } from '../../../../services/statisticService';
-import type { JobPostNotification } from '../../../../services/jobPostNotificationService';
-import type { ResumeViewed } from '../../../../services/resumeViewedService';
-import type { CompanyFollowedListParams } from '../../../../services/companyFollowed';
-import type { JobSeekerProfileResumeParams } from '../../../../services/jobSeekerProfileService';
-import type { JobPostNotificationListParams, JobPostNotificationPayload } from '../../../../services/jobPostNotificationService';
+import type { JobSeekerActivityStats } from '@/services/statisticService';
+import type { JobPostNotification } from '@/services/jobPostNotificationService';
+import type { ResumeViewed } from '@/services/resumeViewedService';
+import type { CompanyFollowedListParams } from '@/services/companyFollowed';
+import type { JobSeekerProfileResumeParams } from '@/services/jobSeekerProfileService';
+import type { JobPostNotificationListParams, JobPostNotificationPayload } from '@/services/jobPostNotificationService';
 import { useAppSelector } from '@/redux/hooks';
 import tokenService from '@/services/tokenService';
 

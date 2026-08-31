@@ -6,8 +6,8 @@ import jobPostActivityService from '../jobPostActivityService';
 import questionGroupService from '../questionGroupService';
 import questionService from '../questionService';
 import resumeSavedService from '../resumeSavedService';
-import httpRequest from '../../utils/httpRequest';
-import { presignInObject } from '../../utils/presignUrl';
+import httpRequest from '@/utils/httpRequest';
+import { presignInObject } from '@/utils/presignUrl';
 import fs from 'fs';
 import path from 'path';
 

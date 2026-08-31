@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Box, Stack, Typography } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBriefcase, faFontAwesome, faMapLocation, faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
-import defaultTheme from '@/themeConfigs/defaultTheme';
+import defaultTheme from '@/configs/theme/defaultTheme';
 import { ROUTES } from '@/configs/constants';
 import { formatRoute } from '@/utils/funcUtils';
 import { localizeRoutePath } from '@/configs/routeLocalization';

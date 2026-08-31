@@ -21,7 +21,7 @@ from apps.profiles.models import (
 from apps.files.models import File
 from apps.locations.models import City, District, Location
 from apps.jobs.models import JobPost
-from common.models import Career
+from apps.common.models import Career
 
 logger = logging.getLogger(__name__)
 

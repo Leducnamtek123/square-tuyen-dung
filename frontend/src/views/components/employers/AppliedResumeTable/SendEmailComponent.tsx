@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next';
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
 import MarkEmailReadRoundedIcon from '@mui/icons-material/MarkEmailReadRounded';
 
-import { convertEditorStateToHTMLString } from '../../../../utils/editorUtils';
+import { convertEditorStateToHTMLString } from '@/utils/editorUtils';
 import SendMailCard, { SendMailData, SendMailFormData } from '../SendMailCard';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import jobPostActivityService from '../../../../services/jobPostActivityService';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import jobPostActivityService from '@/services/jobPostActivityService';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
 import pc from '@/utils/muiColors';
 import { getAppliedResumeEmailActionState } from './sendEmailAction';
 

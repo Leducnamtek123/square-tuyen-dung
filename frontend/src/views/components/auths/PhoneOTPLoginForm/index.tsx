@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert, Box, Button, Stack, styled, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { setupRecaptcha, signInWithPhone, verifyCode } from '../../../../services/firebaseService';
+import { setupRecaptcha, signInWithPhone, verifyCode } from '@/services/firebaseService';
 import PhoneIcon from '@mui/icons-material/Phone';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import type { ConfirmationResult, RecaptchaVerifier } from 'firebase/auth';

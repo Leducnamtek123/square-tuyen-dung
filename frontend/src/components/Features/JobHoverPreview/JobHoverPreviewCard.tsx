@@ -430,7 +430,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
             ) : descLines.length > 0 ? (
               <Stack spacing={0.75}>
                 {descLines.slice(0, 5).map((line, idx) => (
-                  <Stack key={idx} direction="row" spacing={1} alignItems="flex-start">
+                  <Stack key={`desc-line-${idx}`} direction="row" spacing={1} alignItems="flex-start">
                     <Box
                       sx={{
                         width: 5,
@@ -503,7 +503,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
               {reqLines.length > 0 ? (
                 <Stack spacing={0.75}>
                   {reqLines.slice(0, 4).map((line, idx) => (
-                    <Stack key={idx} direction="row" spacing={1} alignItems="flex-start">
+                    <Stack key={`req-line-${idx}`} direction="row" spacing={1} alignItems="flex-start">
                       <Box
                         sx={{
                           width: 5,
@@ -569,7 +569,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
               {benefitLines.length > 0 ? (
                 <Stack spacing={0.75}>
                   {benefitLines.slice(0, 3).map((line, idx) => (
-                    <Stack key={idx} direction="row" spacing={1} alignItems="flex-start">
+                    <Stack key={`ben-line-${idx}`} direction="row" spacing={1} alignItems="flex-start">
                       <CheckCircleOutlineRoundedIcon
                         sx={{ fontSize: 16, color: '#16a34a', mt: 0.2, flexShrink: 0 }}
                       />

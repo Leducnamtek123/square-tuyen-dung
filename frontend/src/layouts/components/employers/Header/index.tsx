@@ -7,11 +7,11 @@ import { useAppSelector } from '@/redux/hooks';
 import { useTranslation } from 'react-i18next';
 import { AppBar, Avatar, Box, Breadcrumbs, Card, IconButton, Link as MuiLink, Stack, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
-import UserMenu from '../../commons/UserMenu';
-import AccountSwitchMenu from '../../commons/AccountSwitchMenu';
+import UserMenu from '@/layouts/components/commons/UserMenu';
+import AccountSwitchMenu from '@/layouts/components/commons/AccountSwitchMenu';
 const NotificationCard = React.lazy(() => import('../../../../components/Features/NotificationCard'));
 const ChatCard = React.lazy(() => import('../../../../components/Features/ChatCard'));
-import LanguageSwitcher from '../../commons/LanguageSwitcher';
+import LanguageSwitcher from '@/layouts/components/commons/LanguageSwitcher';
 import { getPortalBreadcrumbs } from '@/configs/portalBreadcrumbs';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 

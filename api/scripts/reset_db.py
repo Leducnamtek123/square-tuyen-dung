@@ -1,16 +1,19 @@
 import os
+import sys
+from pathlib import Path
 import django
 import datetime
 from django.utils import timezone
 
 # Setup Django 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
 from apps.accounts.models import User
 from apps.profiles.models import JobSeekerProfile, Resume, Company
 from apps.locations.models import Location, City, District
-from common.models import Career
+from apps.common.models import Career
 from apps.jobs.models import JobPost, JobPostActivity
 from apps.interviews.models import Question, QuestionGroup, InterviewSession
 from oauth2_provider.models import Application

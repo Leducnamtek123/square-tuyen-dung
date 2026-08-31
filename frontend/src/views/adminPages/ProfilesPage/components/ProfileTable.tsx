@@ -7,7 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
-import DataTable from '../../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 
 type ProfileTableRow = {
     id?: number | string;

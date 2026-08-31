@@ -9,7 +9,7 @@ import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined';
 import SendIcon from '@mui/icons-material/Send';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
-import { ROLES_NAME } from '../../../../configs/constants';
+import { ROLES_NAME } from '@/configs/constants';
 import type { User } from '@/types/models';
 
 interface JobDetailActionsProps {
@@ -49,10 +49,9 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
   return (
     <Stack
       direction={{ xs: 'column', sm: 'row' }}
-      spacing={1.5}
+      spacing={1.25}
       alignItems="center"
-      flexWrap="wrap"
-      sx={{ '& > *': { m: '0 !important', mr: { sm: '12px !important' }, mb: { xs: '8px !important', sm: '0 !important' } } }}
+      sx={{ width: '100%' }}
     >
       {canApply && (
         <>
@@ -108,7 +107,12 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
               {t("jobDetail.actions.apply")}
             </Button>
           )}
+        </>
+      )}
 
+      {/* Secondary Actions row on mobile, inline on desktop */}
+      <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+        {canApply && (
           <Button
             onClick={handleSave}
             variant="outlined"
@@ -118,18 +122,19 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
               isLoadingSave ? (
                 <CircularProgress size={16} color="inherit" />
               ) : isSaved ? (
-                <FavoriteIcon sx={{ color: '#ef4444', fontSize: 20 }} />
+                <FavoriteIcon sx={{ color: '#ef4444', fontSize: 18 }} />
               ) : (
-                <FavoriteBorderIcon sx={{ color: '#64748b', fontSize: 20 }} />
+                <FavoriteBorderIcon sx={{ color: '#64748b', fontSize: 18 }} />
               )
             }
             sx={{
-              width: { xs: '100%', sm: 'auto' },
+              flex: { xs: 1, sm: 'none' },
+              minWidth: { xs: 0, sm: 'auto' },
               fontWeight: isSaved ? 700 : 600,
-              fontSize: '0.925rem',
+              fontSize: '0.85rem',
               borderRadius: '10px',
-              px: 2.75,
-              py: 1.15,
+              px: { xs: 1.5, sm: 2.5 },
+              py: 1.1,
               textTransform: 'none',
               transition: 'all 0.2s ease',
               ...(isSaved
@@ -157,63 +162,65 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
           >
             <span>{isSaved ? t("jobDetail.actions.saved") : t("jobDetail.actions.save")}</span>
           </Button>
-        </>
-      )}
+        )}
 
-      <Button
-        variant="outlined"
-        size="large"
-        onClick={() => setOpenSharePopup(true)}
-        startIcon={<ShareIcon sx={{ fontSize: 18, color: '#64748b' }} />}
-        sx={{
-          width: { xs: '100%', sm: 'auto' },
-          bgcolor: '#ffffff',
-          color: '#334155',
-          border: '1px solid #e2e8f0',
-          fontWeight: 600,
-          fontSize: '0.925rem',
-          borderRadius: '10px',
-          px: 2.75,
-          py: 1.15,
-          textTransform: 'none',
-          transition: 'all 0.2s ease',
-          '&:hover': {
-            bgcolor: '#f8fafc',
-            borderColor: '#cbd5e1',
-            color: '#0f172a',
-          },
-        }}
-      >
-        {t("jobDetail.actions.share")}
-      </Button>
+        <Button
+          variant="outlined"
+          size="large"
+          onClick={() => setOpenSharePopup(true)}
+          startIcon={<ShareIcon sx={{ fontSize: 18, color: '#64748b' }} />}
+          sx={{
+            flex: { xs: 1, sm: 'none' },
+            minWidth: { xs: 0, sm: 'auto' },
+            bgcolor: '#ffffff',
+            color: '#334155',
+            border: '1px solid #e2e8f0',
+            fontWeight: 600,
+            fontSize: '0.85rem',
+            borderRadius: '10px',
+            px: { xs: 1.5, sm: 2.5 },
+            py: 1.1,
+            textTransform: 'none',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              bgcolor: '#f8fafc',
+              borderColor: '#cbd5e1',
+              color: '#0f172a',
+            },
+          }}
+        >
+          {t("jobDetail.actions.share")}
+        </Button>
 
-      <Button
-        variant="outlined"
-        size="large"
-        onClick={onOpenReport}
-        startIcon={<FlagOutlinedIcon sx={{ fontSize: 18, color: '#64748b' }} />}
-        sx={{
-          width: { xs: '100%', sm: 'auto' },
-          bgcolor: '#ffffff',
-          color: '#64748b',
-          border: '1px solid #e2e8f0',
-          fontWeight: 600,
-          fontSize: '0.925rem',
-          borderRadius: '10px',
-          px: 2.75,
-          py: 1.15,
-          textTransform: 'none',
-          transition: 'all 0.2s ease',
-          '&:hover': {
-            bgcolor: '#fef2f2',
-            color: '#ef4444',
-            borderColor: '#fca5a5',
-            '& .MuiButton-startIcon svg': { color: '#ef4444' },
-          },
-        }}
-      >
-        {t("jobDetail.actions.report")}
-      </Button>
+        <Button
+          variant="outlined"
+          size="large"
+          onClick={onOpenReport}
+          startIcon={<FlagOutlinedIcon sx={{ fontSize: 18, color: '#64748b' }} />}
+          sx={{
+            flex: { xs: 1, sm: 'none' },
+            minWidth: { xs: 0, sm: 'auto' },
+            bgcolor: '#ffffff',
+            color: '#64748b',
+            border: '1px solid #e2e8f0',
+            fontWeight: 600,
+            fontSize: '0.85rem',
+            borderRadius: '10px',
+            px: { xs: 1.5, sm: 2.5 },
+            py: 1.1,
+            textTransform: 'none',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              bgcolor: '#fef2f2',
+              color: '#ef4444',
+              borderColor: '#fca5a5',
+              '& .MuiButton-startIcon svg': { color: '#ef4444' },
+            },
+          }}
+        >
+          {t("jobDetail.actions.report")}
+        </Button>
+      </Stack>
     </Stack>
   );
 };

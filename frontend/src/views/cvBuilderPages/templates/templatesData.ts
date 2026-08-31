@@ -320,6 +320,44 @@ export const TEMPLATE_SAMPLE_DATA_MAP: Record<string, Partial<CVData>> = {
   },
 };
 
+export function createEmptyCVData(templateCode: string, primaryColor?: string): CVData {
+  const templateMeta =
+    CV_TEMPLATES_CATALOG.find((t) => t.id === templateCode) || CV_TEMPLATES_CATALOG[0];
+  return {
+    title: 'CV Ứng tuyển',
+    templateId: templateMeta.id,
+    theme: {
+      primaryColor: primaryColor || templateMeta.defaultColors[0] || '#1e40af',
+      fontFamily: 'Inter',
+      fontSize: 'medium',
+      spacing: 'normal',
+      avatarShape: 'circle',
+      showAvatar: true,
+      paperSize: 'A4',
+    },
+    personalInfo: {
+      fullName: '',
+      title: '',
+      email: '',
+      phoneNumber: '',
+      address: '',
+      dob: '',
+      gender: '',
+      avatarUrl: '',
+      website: '',
+      linkedin: '',
+      github: '',
+      bio: '',
+    },
+    experiences: [],
+    educations: [],
+    skills: [],
+    languages: [],
+    certificates: [],
+    projects: [],
+  };
+}
+
 export function getSampleDataForTemplate(templateCode: string): CVData {
   const specificSample = TEMPLATE_SAMPLE_DATA_MAP[templateCode] || {};
   return {
@@ -332,3 +370,4 @@ export function getSampleDataForTemplate(templateCode: string): CVData {
     },
   };
 }
+

@@ -67,7 +67,7 @@ export const cvBuilderService = {
     template?: number | null;
     template_code: string;
     title: string;
-    theme_config: any;
+    theme_config?: any;
     cv_data: any;
     thumbnail_url?: string | null;
     is_main_cv?: boolean;

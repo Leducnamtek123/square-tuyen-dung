@@ -9,19 +9,19 @@ import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import {
   convertEditorStateToHTMLString,
   createEditorStateFromHTMLString,
-} from '../../../../utils/editorUtils';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
+} from '@/utils/editorUtils';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import FormPopup from '@/components/Common/Controls/FormPopup';
 import JobPostForm from '../JobPostForm';
 import type { JobPostFormValues } from '../JobPostForm/JobPostSchema';
-import jobService from '../../../../services/jobService';
+import jobService from '@/services/jobService';
 import JobPostsTable from '../JobPostsTable';
-import { useDataTable } from '../../../../hooks';
+import { useDataTable } from '@/hooks';
 import { useCompanyProfile, useEmployerJobPosts, useJobPostMutations } from '../hooks/useEmployerQueries';
-import type { JobPostInput } from '../../../../services/jobService';
+import type { JobPostInput } from '@/services/jobService';
 import type { RowSelectionState } from '@tanstack/react-table';
 import { useConfig } from '@/hooks/useConfig';
 import { useForm } from 'react-hook-form';

@@ -25,7 +25,7 @@ from apps.accounts.models import User
 from apps.files.models import File
 from apps.locations.models import Location
 from apps.accounts import serializers as auth_serializers
-from common import serializers as common_serializers
+from apps.common import serializers as common_serializers
 from .profile_serializers import PHONE_PATTERN
 
 

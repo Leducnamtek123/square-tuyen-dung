@@ -19,7 +19,7 @@ import {
   type Theme,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import type { QuestionGroup, Question } from '../../../../types/models';
+import type { QuestionGroup, Question } from '@/types/models';
 import type { TFunction } from 'i18next';
 import type { SelectChangeEvent } from '@mui/material';
 import type { SxProps } from '@mui/material/styles';

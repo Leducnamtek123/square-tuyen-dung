@@ -3,9 +3,9 @@
 import { useQuery, useMutation, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-import adminSettingsService from '../../../../services/adminSettingsService';
-import toastMessages from '../../../../utils/toastMessages';
-import type { SystemSettingsPayload } from '../../../../services/adminSettingsService';
+import adminSettingsService from '@/services/adminSettingsService';
+import toastMessages from '@/utils/toastMessages';
+import type { SystemSettingsPayload } from '@/services/adminSettingsService';
 
 export interface SystemSettings extends SystemSettingsPayload {
     maintenanceMode: boolean;

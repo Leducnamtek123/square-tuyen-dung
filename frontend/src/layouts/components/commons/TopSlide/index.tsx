@@ -15,10 +15,10 @@ import {
   GSAP_MEDIA_CONDITIONS,
   registerGsapPlugins,
 } from '@/utils/gsapHelpers';
-import HomeSearch from '../../../../views/components/defaults/HomeSearch';
-import contentService from '../../../../services/contentService';
-import { BANNER_TYPES, IMAGES } from '../../../../configs/constants';
-import type { Banner } from '../../../../types/models';
+import HomeSearch from '@/views/components/defaults/HomeSearch';
+import contentService from '@/services/contentService';
+import { BANNER_TYPES, IMAGES } from '@/configs/constants';
+import type { Banner } from '@/types/models';
 
 registerGsapPlugins();
 

@@ -4,14 +4,14 @@ import React, { useMemo } from 'react';
 import { Box, Typography, Paper, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton, Stack } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useCities } from './hooks/useCities';
-import { useDataTable, useDebounce } from '../../../hooks';
-import { City } from '../../../types/models';
-import type { CityPayload } from '../../../services/adminManagementService';
+import { useDataTable, useDebounce } from '@/hooks';
+import { City } from '@/types/models';
+import type { CityPayload } from '@/services/adminManagementService';
 import FilterBar from '@/components/Common/FilterBar';
 import {
   getLocationEntityFormValidationErrors,

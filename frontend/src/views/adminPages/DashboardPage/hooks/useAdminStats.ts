@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
-import statisticService, { AdminGeneralStats, AdminTrendStats } from '../../../../services/statisticService';
+import statisticService, { AdminGeneralStats, AdminTrendStats } from '@/services/statisticService';
 
 export const useAdminStats = (): UseQueryResult<AdminGeneralStats> => {
   return useQuery({

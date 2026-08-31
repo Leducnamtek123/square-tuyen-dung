@@ -36,12 +36,42 @@ export const AICvScoreTab: React.FC<AICvScoreTabProps> = ({ data, candidateCvId,
   const handleRunAnalysis = async () => {
     try {
       setIsAnalyzing(true);
-      if (candidateCvId) {
-        const res = await cvBuilderService.reviewCvWithAI(candidateCvId);
+      let targetId = candidateCvId;
+
+      if (targetId) {
+        try {
+          await cvBuilderService.updateCandidateCV(targetId, {
+            cv_data: data,
+            template_code: data.templateId,
+            title: data.title || 'CV Ứng tuyển',
+          });
+        } catch (syncErr) {
+          console.warn('Failed auto-sync before AI review:', syncErr);
+        }
+
+        const res = await cvBuilderService.reviewCvWithAI(targetId);
         setReviewResult(res);
         toastMessages.success(`AI đã chấm điểm thành công: ${res.score}/100 điểm (${res.grade})`);
       } else {
-        // Fallback local ATS analysis if not yet saved on server
+        try {
+          const created = await cvBuilderService.createCandidateCV({
+            title: data.title || 'CV Ứng tuyển',
+            template_code: data.templateId,
+            cv_data: data,
+            theme_config: data.theme || { primaryColor: '#1e40af' },
+            is_public: true,
+          });
+          if (created?.id) {
+            const res = await cvBuilderService.reviewCvWithAI(created.id);
+            setReviewResult(res);
+            toastMessages.success(`AI đã chấm điểm thành công: ${res.score}/100 điểm (${res.grade})`);
+            return;
+          }
+        } catch (createErr) {
+          console.warn('Auto-save before AI review failed, running comprehensive ATS engine:', createErr);
+        }
+
+        // Fallback local ATS analysis if unauthenticated or offline
         const personalInfo = data.personalInfo || {};
         const experiences = data.experiences || [];
         const skills = data.skills || [];

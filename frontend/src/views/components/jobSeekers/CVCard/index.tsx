@@ -5,11 +5,11 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { useTranslation } from 'react-i18next';
 import { Theme } from '@mui/material/styles';
 import CVForm, { FormValues as CVFormValues } from '../CVForm';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import errorHandling from '../../../../utils/errorHandling';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
-import resumeService from '../../../../services/resumeService';
-import toastMessages from '../../../../utils/toastMessages';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import errorHandling from '@/utils/errorHandling';
+import FormPopup from '@/components/Common/Controls/FormPopup';
+import resumeService from '@/services/resumeService';
+import toastMessages from '@/utils/toastMessages';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
 const LazyPdf = lazy(() => import('../../../../components/Common/Pdf'));
@@ -19,6 +19,7 @@ interface CVCardProps {
 }
 
 interface CVData {
+  id?: number | string;
   title: string;
   fileUrl: string;
   updateAt?: string;
@@ -202,7 +203,7 @@ const CVCard = ({ title }: CVCardProps) => {
                   }
                 >
                   <LazyPdf
-                    key={`${safeCvFileUrl}-${state.cv.updateAt || ''}`}
+                    key={state.cv.id}
                     title={state.cv.title}
                     fileUrl={safeCvFileUrl}
                   />

@@ -4,8 +4,8 @@ import { Box, Paper, Typography, TextField, Button, Container } from "@mui/mater
 
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { ROUTES } from '../../../configs/constants';
-import LanguageSwitcher from '../../../layouts/components/commons/LanguageSwitcher';
+import { ROUTES } from '@/configs/constants';
+import LanguageSwitcher from '@/layouts/components/commons/LanguageSwitcher';
 
 const JobSeekerInterviewLoginPage = () => {
     const [sessionId, setSessionId] = useState('');

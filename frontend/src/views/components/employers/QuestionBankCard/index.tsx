@@ -19,14 +19,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
-import toastMessages from '../../../../utils/toastMessages';
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import errorHandling from '../../../../utils/errorHandling';
-import DataTable from '../../../../components/Common/DataTable';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import { useDataTable } from '../../../../hooks';
+import toastMessages from '@/utils/toastMessages';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import errorHandling from '@/utils/errorHandling';
+import DataTable from '@/components/Common/DataTable';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import { useDataTable } from '@/hooks';
 import { useEmployerQuestions, useQuestionMutations } from '../hooks/useEmployerQueries';
-import type { Question } from '../../../../types/models';
+import type { Question } from '@/types/models';
 import pc from '@/utils/muiColors';
 
 interface QuestionBankCardProps {

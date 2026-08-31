@@ -12,25 +12,25 @@ import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
 import LogoutIcon from "@mui/icons-material/Logout";
 import Feedback from '@/components/Features/Feedback';
 
-import { confirmModal } from "../../../../utils/sweetalert2Modal";
-import errorHandling from "../../../../utils/errorHandling";
+import { confirmModal } from "@/utils/sweetalert2Modal";
+import errorHandling from "@/utils/errorHandling";
 
-import { removeUserInfo } from "../../../../redux/userSlice";
-import { setActiveWorkspace } from "../../../../redux/userSlice";
+import { removeUserInfo } from "@/redux/userSlice";
+import { setActiveWorkspace } from "@/redux/userSlice";
 
-import { HOST_NAME, ROLES_NAME, ROUTES } from "../../../../configs/constants";
-import { isAdminPortalPath, isEmployerPortalPath } from "../../../../configs/portalRouting";
-import { localizeRoutePath } from "../../../../configs/routeLocalization";
-import tokenService from "../../../../services/tokenService";
+import { HOST_NAME, ROLES_NAME, ROUTES } from "@/configs/constants";
+import { isAdminPortalPath, isEmployerPortalPath } from "@/configs/portalRouting";
+import { localizeRoutePath } from "@/configs/routeLocalization";
+import tokenService from "@/services/tokenService";
 import type { Workspace } from '@/types/models';
-import type { ApiError } from '../../../../types/api';
+import type { ApiError } from '@/types/api';
 import type { AxiosError } from 'axios';
-import type { AppDispatch } from '../../../../redux/store';
+import type { AppDispatch } from '@/redux/store';
 import {
   resetSearchCompany,
   resetSearchJobPostFilter,
   resetSearchResume,
-} from "../../../../redux/filterSlice";
+} from "@/redux/filterSlice";
 
 interface UserMenuProps {
   anchorElUser: HTMLElement | null;

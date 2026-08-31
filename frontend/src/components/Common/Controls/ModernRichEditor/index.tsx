@@ -330,15 +330,15 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
 
   // Callout insertion
   const handleInsertCallout = (type: CalloutType, boxTitle: string, boxContent: string) => {
-    const colors: Record<CalloutType, { bg: string; border: string; text: string; icon: string }> = {
-      info: { bg: '#eff6ff', border: '#3b82f6', text: '#1e40af', icon: 'ℹ️' },
-      tip: { bg: '#faf5ff', border: '#a855f7', text: '#6b21a8', icon: '💡' },
-      warning: { bg: '#fffbeb', border: '#f59e0b', text: '#92400e', icon: '⚠️' },
-      success: { bg: '#f0fdf4', border: '#22c55e', text: '#166534', icon: '✅' },
+    const colors: Record<CalloutType, { bg: string; border: string; text: string }> = {
+      info: { bg: '#eff6ff', border: '#3b82f6', text: '#1e40af' },
+      tip: { bg: '#faf5ff', border: '#a855f7', text: '#6b21a8' },
+      warning: { bg: '#fffbeb', border: '#f59e0b', text: '#92400e' },
+      success: { bg: '#f0fdf4', border: '#22c55e', text: '#166534' },
     };
     const c = colors[type];
     const calloutHtml = `<div style="background-color: ${c.bg}; border-left: 4px solid ${c.border}; padding: 14px 18px; border-radius: 6px; margin: 14px 0;">
-  <strong style="color: ${c.text}; font-size: 1rem;">${c.icon} ${boxTitle}</strong>
+  <strong style="color: ${c.text}; font-size: 1rem;">${boxTitle}</strong>
   <p style="margin: 6px 0 0 0; color: #334155; font-size: 0.92rem; line-height: 1.5;">${boxContent || ''}</p>
 </div>`;
     applyHTMLContent(calloutHtml, 'append');

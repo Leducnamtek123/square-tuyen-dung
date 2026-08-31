@@ -1,4 +1,5 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import {
   Box,
   Button,
@@ -39,21 +40,28 @@ type Props = {
   t: TFunction;
 };
 
-const toRecordArray = (value: unknown): Array<Record<string, unknown>> => {
+type ParsedAIRecord = Record<string, unknown> & { clientId: string };
+
+const toRecordArray = (value: unknown, prefix = 'item'): ParsedAIRecord[] => {
   if (Array.isArray(value)) {
-    return value.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object' && !Array.isArray(item));
+    return value
+      .filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object' && !Array.isArray(item))
+      .map((item, idx) => ({
+        ...item,
+        clientId: item.id != null ? String(item.id) : (item.key ? String(item.key) : `${prefix}-${idx}`),
+      }));
   }
   return [];
 };
 
 const getEvidenceArrays = (value: AIAnalysisData['aiAnalysisEvidence']) => {
   if (Array.isArray(value)) {
-    return { criteriaResults: [], evidence: toRecordArray(value) };
+    return { criteriaResults: [], evidence: toRecordArray(value, 'evid') };
   }
   if (value && typeof value === 'object') {
     return {
-      criteriaResults: toRecordArray(value.criteria_results),
-      evidence: toRecordArray(value.evidence),
+      criteriaResults: toRecordArray(value.criteria_results, 'crit'),
+      evidence: toRecordArray(value.evidence, 'evid'),
     };
   }
   return { criteriaResults: [], evidence: [] };
@@ -64,7 +72,7 @@ const getIdentityWarnings = (value: AIAnalysisData['aiAnalysisEvidence']) => {
     return [];
   }
   const record = value as { identity_warnings?: unknown; identityWarnings?: unknown };
-  return toRecordArray(record.identity_warnings ?? record.identityWarnings);
+  return toRecordArray(record.identity_warnings ?? record.identityWarnings, 'warn');
 };
 
 const textValue = (value: unknown): string => (value == null ? '' : String(value));
@@ -318,7 +326,7 @@ const AIAnalysisDrawerStatePanels = ({
 
               return (
                 <Paper
-                  key={textValue(item.type || item.message || `${applicationName}-${resumeName}-${index}`)}
+                  key={item.clientId}
                   elevation={0}
                   sx={{
                     p: 1.5,
@@ -348,6 +356,16 @@ const AIAnalysisDrawerStatePanels = ({
               })}
               sx={{ fontWeight: 800, borderRadius: 1.5 }}
             />
+            {data?.aiAnalysisReviewedAt && (
+              <Chip
+                size="small"
+                variant="outlined"
+                label={t('appliedResume.ai.reviewedAtLabel', {
+                  date: dayjs(data.aiAnalysisReviewedAt).format('DD/MM/YYYY HH:mm'),
+                })}
+                sx={{ borderRadius: 1.5 }}
+              />
+            )}
           </Stack>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
             <TextField
@@ -388,12 +406,12 @@ const AIAnalysisDrawerStatePanels = ({
       {criteriaResults.length > 0 && (
         <SectionCard title={t('employer:appliedResume.ai.criteriaTitle')} icon={<CheckCircleIcon fontSize="small" />} iconColor={theme.palette.info.main}>
           <Stack spacing={1.25}>
-            {criteriaResults.map((item, index) => (
-              <Paper key={textValue(item.key || item.label || item.reason || item.evidence || JSON.stringify(item))} elevation={0} sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+            {criteriaResults.map((item) => (
+              <Paper key={item.clientId} elevation={0} sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Stack direction="row" justifyContent="space-between" spacing={2} alignItems="flex-start">
                   <Box>
                     <Typography variant="subtitle2" sx={{ fontWeight: 900 }}>
-                      {textValue(item.label || item.key || `Criterion ${index + 1}`)}
+                      {textValue(item.label || item.key || 'Criterion')}
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontWeight: 600 }}>
                       {textValue(item.reason || item.evidence)}
@@ -411,7 +429,7 @@ const AIAnalysisDrawerStatePanels = ({
         <SectionCard title={t('employer:appliedResume.ai.evidenceTitle')} icon={<AutoFixHighIcon fontSize="small" />} iconColor={theme.palette.primary.main}>
           <Stack spacing={1.25}>
             {evidence.map((item, index) => (
-              <Paper key={textValue(item.claim || item.source || item.quote || item.evidence || JSON.stringify(item))} elevation={0} sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+              <Paper key={item.clientId} elevation={0} sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 0.5 }}>
                   {textValue(item.claim || item.source || `Evidence ${index + 1}`)}
                 </Typography>

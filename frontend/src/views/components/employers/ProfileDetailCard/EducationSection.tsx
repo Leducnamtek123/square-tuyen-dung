@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import SchoolIcon from '@mui/icons-material/School';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import TimeAgo from '../../../../components/Common/TimeAgo';
+import TimeAgo from '@/components/Common/TimeAgo';
 
 import { ResumeDetailResponse } from '@/types/models';
 import pc from '@/utils/muiColors';
@@ -51,8 +51,8 @@ const EducationSection: React.FC<EducationSectionProps> = ({ profileDetail }) =>
                 }}
             >
                 <Stack spacing={4}>
-                    {(profileDetail.educationDetails || []).map((value, itemIdx: number) => (
-                        <Box key={value.id || value.degreeName || `edu-item-${itemIdx}`}>
+                    {(profileDetail.educationDetails || []).map((value, itemIdx) => (
+                        <Box key={String(value.id)}>
                             <Stack spacing={2}>
                                 <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', lineHeight: 1.3 }}>
                                     {value?.degreeName} - {t('profileDetailCard.label.major')}: {value?.major}

@@ -1,16 +1,12 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   Box,
   Typography,
   Paper,
   IconButton,
   Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
   Tooltip,
   Stack,
@@ -21,23 +17,26 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MarkEmailReadOutlinedIcon from '@mui/icons-material/MarkEmailReadOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../components/Common/DataTable';
-import FilterBar, { filterControlSx } from '../../../components/Common/FilterBar';
-import { useDataTable } from '../../../hooks';
-import { ContactMessage } from '../../../types/models';
+import DataTable from '@/components/Common/DataTable';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
+import AdminStatusBadge from '@/components/Common/AdminStatusBadge';
+import AdminConfirmDialog from '@/components/Common/AdminConfirmDialog';
+import AdminDetailDrawer from '@/components/Common/AdminDetailDrawer';
+import { useDataTable } from '@/hooks';
+import { ContactMessage } from '@/types/models';
 import { useContactMessages } from './hooks/useContactMessages';
-import dayjs from '../../../configs/dayjs-config';
+import dayjs from '@/configs/dayjs-config';
 
 type CategoryFilter = 'all' | 'bug_report' | 'feedback' | 'support';
 type ReadFilter = 'all' | 'read' | 'unread';
 
 const ContactMessagesPage = () => {
-  const { t } = useTranslation('admin');
-  const [openDelete, setOpenDelete] = useState(false);
-  const [current, setCurrent] = useState<ContactMessage | null>(null);
-  const [viewDetail, setViewDetail] = useState<ContactMessage | null>(null);
+  const { t } = useTranslation(['admin', 'common']);
+  const [deleteTarget, setDeleteTarget] = useState<ContactMessage | null>(null);
+  const [inspectingMessage, setInspectingMessage] = useState<ContactMessage | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const [readFilter, setReadFilter] = useState<ReadFilter>('all');
 
@@ -46,7 +45,6 @@ const ContactMessagesPage = () => {
     pageSize,
     sorting,
     onSortingChange,
-    ordering,
     pagination,
     onPaginationChange,
     searchTerm,
@@ -54,10 +52,6 @@ const ContactMessagesPage = () => {
     onSearchChange,
     setPage,
   } = useDataTable({ initialPageSize: 10, initialSorting: [{ id: 'create_at', desc: true }] });
-
-  useEffect(() => {
-    setPage(0);
-  }, [categoryFilter, readFilter, setPage]);
 
   const {
     data,
@@ -68,7 +62,7 @@ const ContactMessagesPage = () => {
   } = useContactMessages({
     page: page + 1,
     pageSize,
-    ordering,
+    ordering: sorting.length > 0 ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}` : undefined,
     search: debouncedSearchTerm || undefined,
     category: categoryFilter === 'all' ? undefined : categoryFilter,
     is_read:
@@ -84,27 +78,26 @@ const ContactMessagesPage = () => {
     if (msg.is_read || msg.isRead) return;
     try {
       await markAsRead(msg.id);
+      if (inspectingMessage?.id === msg.id) {
+        setInspectingMessage((prev) => prev ? { ...prev, is_read: true, isRead: true } : null);
+      }
     } catch (e) {
       console.error(e);
     }
-  }, [markAsRead]);
+  }, [inspectingMessage?.id, markAsRead]);
 
   const handleDelete = async () => {
-    if (!current) return;
+    if (!deleteTarget) return;
     try {
-      await deleteMessage(current.id);
-      setOpenDelete(false);
-      setCurrent(null);
+      await deleteMessage(deleteTarget.id);
+      setDeleteTarget(null);
+      if (inspectingMessage?.id === deleteTarget.id) {
+        setInspectingMessage(null);
+      }
     } catch (e) {
       console.error(e);
     }
   };
-
-  const activeFilterCount = [
-    Boolean(searchTerm.trim()),
-    categoryFilter !== 'all',
-    readFilter !== 'all',
-  ].filter(Boolean).length;
 
   const resetFilters = () => {
     setCategoryFilter('all');
@@ -113,203 +106,228 @@ const ContactMessagesPage = () => {
     setPage(0);
   };
 
-  const columns = useMemo<ColumnDef<ContactMessage>[]>(() => [
-    {
-      accessorKey: 'id',
-      header: t('pages.contactMessages.table.id') as string,
-      enableSorting: true,
-    },
-    {
-      accessorKey: 'category',
-      header: t('pages.contactMessages.table.category') as string,
-      cell: (info) => {
-        const value = info.getValue() as string | undefined;
-        return (
-          <Chip
-            size="small"
-            variant="outlined"
-            color={value === 'bug_report' ? 'error' : value === 'feedback' ? 'primary' : 'default'}
-            label={value ? t(`pages.contactMessages.categories.${value}`) : t('common:na')}
-          />
-        );
+  const activeFilterCount = [
+    Boolean(searchTerm.trim()),
+    categoryFilter !== 'all',
+    readFilter !== 'all',
+  ].filter(Boolean).length;
+
+  const columns = useMemo<ColumnDef<ContactMessage>[]>(
+    () => [
+      {
+        accessorKey: 'category',
+        header: t('pages.contactMessages.table.category') as string,
+        cell: (info) => {
+          const value = info.getValue() as string | undefined;
+          return (
+            <Chip
+              size="small"
+              variant="outlined"
+              color={value === 'bug_report' ? 'error' : value === 'feedback' ? 'primary' : 'default'}
+              label={value ? t(`pages.contactMessages.categories.${value}`) : t('common:na')}
+            />
+          );
+        },
       },
-    },
-    {
-      accessorKey: 'subject',
-      header: t('pages.contactMessages.table.subject') as string,
-      cell: (info) => info.getValue() || '-',
-    },
-    {
-      accessorKey: 'name',
-      header: t('pages.contactMessages.table.name') as string,
-      enableSorting: true,
-      cell: (info) => {
-        const row = info.row.original;
-        const isRead = row.is_read ?? row.isRead;
-        return (
-          <Typography variant="body2" sx={{ fontWeight: isRead ? 400 : 700 }}>
-            {info.getValue() as string}
-          </Typography>
-        );
-      },
-    },
-    {
-      accessorKey: 'email',
-      header: t('pages.contactMessages.table.email') as string,
-      enableSorting: true,
-    },
-    {
-      accessorKey: 'phone',
-      header: t('pages.contactMessages.table.phone') as string,
-      cell: (info) => info.getValue() || '-',
-    },
-    {
-      accessorKey: 'pageUrl',
-      header: t('pages.contactMessages.table.pageUrl') as string,
-      cell: (info) => {
-        const url = info.getValue() as string | undefined;
-        if (!url) return '-';
-        return (
-          <Typography variant="body2" sx={{ maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {url}
-          </Typography>
-        );
-      },
-    },
-    {
-      accessorKey: 'content',
-      header: t('pages.contactMessages.table.content') as string,
-      cell: (info) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      {
+        accessorKey: 'subject',
+        header: t('pages.contactMessages.table.subject') as string,
+        cell: (info) => (
           <Typography
             variant="body2"
-            sx={{
-              maxWidth: 280,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              cursor: 'pointer',
+            onClick={() => {
+              setInspectingMessage(info.row.original);
+              handleToggleRead(info.row.original);
             }}
-            onClick={() => setViewDetail(info.row.original)}
+            sx={{ fontWeight: 600, color: '#1E293B', cursor: 'pointer', '&:hover': { color: '#2563EB', textDecoration: 'underline' } }}
           >
-            {(info.getValue() as string)?.slice(0, 100)}
-            {(info.getValue() as string)?.length > 100 ? '...' : ''}
+            {(info.getValue() as string) || '-'}
           </Typography>
-        </Box>
-      ),
-    },
-    {
-      id: 'is_read',
-      accessorFn: (row) => row.is_read ?? row.isRead,
-      header: t('pages.contactMessages.table.status') as string,
-      cell: (info) => {
-        const isRead = info.getValue();
-        return (
-          <Chip
-            label={isRead ? t('pages.contactMessages.read') : t('pages.contactMessages.unread')}
-            size="small"
-            color={isRead ? 'default' : 'info'}
-            variant="outlined"
-          />
-        );
+        ),
       },
-    },
-    {
-      id: 'create_at',
-      accessorFn: (row) => row.createAt || row.create_at,
-      header: t('pages.contactMessages.table.createdAt') as string,
-      enableSorting: true,
-      cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '-',
-    },
-    {
-      id: 'actions',
-      header: t('pages.contactMessages.table.actions') as string,
-      meta: { align: 'right' },
-      cell: (info) => {
-        const msg = info.row.original;
-        const isRead = msg.is_read ?? msg.isRead;
-        return (
-          <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-            {!isRead && (
-              <Tooltip title={t('pages.contactMessages.markAsRead')}>
-                <IconButton aria-label="Thao tác"
+      {
+        accessorKey: 'name',
+        header: t('pages.contactMessages.table.name') as string,
+        enableSorting: true,
+        cell: (info) => {
+          const row = info.row.original;
+          const isRead = row.is_read ?? row.isRead;
+          return (
+            <Typography variant="body2" sx={{ fontWeight: isRead ? 500 : 700, color: isRead ? '#475569' : '#0F172A' }}>
+              {info.getValue() as string}
+            </Typography>
+          );
+        },
+      },
+      {
+        accessorKey: 'email',
+        header: t('pages.contactMessages.table.email') as string,
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'phone',
+        header: t('pages.contactMessages.table.phone') as string,
+        cell: (info) => info.getValue() || '-',
+      },
+      {
+        accessorKey: 'pageUrl',
+        header: t('pages.contactMessages.table.pageUrl') as string,
+        cell: (info) => {
+          const url = info.getValue() as string | undefined;
+          if (!url) return '-';
+          return (
+            <Typography variant="body2" sx={{ maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {url}
+            </Typography>
+          );
+        },
+      },
+      {
+        id: 'is_read',
+        accessorFn: (row) => row.is_read ?? row.isRead,
+        header: t('pages.contactMessages.table.status') as string,
+        cell: (info) => {
+          const isRead = info.getValue();
+          return isRead ? (
+            <AdminStatusBadge status="verified" label={t('pages.contactMessages.read')} />
+          ) : (
+            <AdminStatusBadge status="pending" label={t('pages.contactMessages.unread')} />
+          );
+        },
+      },
+      {
+        id: 'create_at',
+        accessorFn: (row) => row.createAt || row.create_at,
+        header: t('pages.contactMessages.table.createdAt') as string,
+        enableSorting: true,
+        cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '-'),
+      },
+      {
+        id: 'actions',
+        header: t('pages.contactMessages.table.actions') as string,
+        meta: { align: 'right' },
+        cell: (info) => {
+          const msg = info.row.original;
+          const isRead = msg.is_read ?? msg.isRead;
+          return (
+            <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+              <Tooltip title={t('pages.contactMessages.table.content')}>
+                <IconButton
                   size="small"
-                  color="primary"
-                  onClick={() => handleToggleRead(msg)}
-                  disabled={isMutating}
+                  onClick={() => {
+                    setInspectingMessage(msg);
+                    handleToggleRead(msg);
+                  }}
+                  sx={{ color: '#64748B' }}
                 >
-                  <MarkEmailReadOutlinedIcon fontSize="small" />
+                  <VisibilityOutlinedIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
-            )}
-            <Tooltip title={t('pages.contactMessages.deleteTooltip')}>
-              <IconButton aria-label="Thao tác"
-                size="small"
-                color="error"
-                onClick={() => { setCurrent(msg); setOpenDelete(true); }}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-        );
+              {!isRead && (
+                <Tooltip title={t('pages.contactMessages.markAsRead')}>
+                  <IconButton
+                    aria-label="Thao tác"
+                    size="small"
+                    color="primary"
+                    onClick={() => handleToggleRead(msg)}
+                    disabled={isMutating}
+                  >
+                    <MarkEmailReadOutlinedIcon sx={{ fontSize: 18 }} />
+                  </IconButton>
+                </Tooltip>
+              )}
+              <Tooltip title={t('pages.contactMessages.deleteTooltip')}>
+                <IconButton
+                  aria-label="Thao tác"
+                  size="small"
+                  color="error"
+                  onClick={() => setDeleteTarget(msg)}
+                >
+                  <DeleteIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          );
+        },
       },
-    },
-  ], [handleToggleRead, isMutating, t]);
+    ],
+    [handleToggleRead, isMutating, t]
+  );
 
   return (
-    <Box>
+    <Box sx={{ width: '100%', pb: 6 }}>
+      {/* Header */}
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.5rem', sm: '1.875rem' }, lineHeight: 1.2 }}>
           {t('pages.contactMessages.title')}
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#64748B', mt: 0.5 }}>
+          {t('pages.contactMessages.filter.description')}
         </Typography>
       </Box>
 
-      <FilterBar
-        title={t('pages.contactMessages.filter.title')}
-        description={t('pages.contactMessages.filter.description')}
-        searchValue={searchTerm}
-        searchPlaceholder={t('pages.contactMessages.searchPlaceholder')}
-        onSearchChange={onSearchChange}
-        onReset={resetFilters}
-        resetLabel={t('pages.contactMessages.filter.reset')}
-        activeFilterCount={activeFilterCount}
-        advancedLabel={t('pages.contactMessages.filter.advanced')}
-        advancedFilters={(
-          <Stack spacing={2} sx={{ pt: 0.5 }}>
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-              <FormControl fullWidth sx={filterControlSx}>
-                <InputLabel>{t('pages.contactMessages.filter.category')}</InputLabel>
-                <Select
-                  label={t('pages.contactMessages.filter.category')}
-                  value={categoryFilter}
-                  onChange={(event) => setCategoryFilter(event.target.value as CategoryFilter)}
-                >
-                  <MenuItem value="all">{t('common:all')}</MenuItem>
-                  <MenuItem value="bug_report">{t('pages.contactMessages.categories.bug_report')}</MenuItem>
-                  <MenuItem value="feedback">{t('pages.contactMessages.categories.feedback')}</MenuItem>
-                  <MenuItem value="support">{t('pages.contactMessages.categories.support')}</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth sx={filterControlSx}>
-                <InputLabel>{t('pages.contactMessages.filter.readStatus')}</InputLabel>
-                <Select
-                  label={t('pages.contactMessages.filter.readStatus')}
-                  value={readFilter}
-                  onChange={(event) => setReadFilter(event.target.value as ReadFilter)}
-                >
-                  <MenuItem value="all">{t('common:all')}</MenuItem>
-                  <MenuItem value="read">{t('pages.contactMessages.read')}</MenuItem>
-                  <MenuItem value="unread">{t('pages.contactMessages.unread')}</MenuItem>
-                </Select>
-              </FormControl>
+      {/* Main Table Paper */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 2, sm: 2.5 },
+          mb: 3,
+          borderRadius: 3,
+          border: '1px solid #E2E8F0',
+          bgcolor: '#FFFFFF',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04)',
+        }}
+      >
+        <FilterBar
+          title={t('pages.contactMessages.filter.title')}
+          description={t('pages.contactMessages.filter.description')}
+          searchValue={searchTerm}
+          searchPlaceholder={t('pages.contactMessages.searchPlaceholder')}
+          onSearchChange={onSearchChange}
+          onReset={resetFilters}
+          resetLabel={t('pages.contactMessages.filter.reset')}
+          activeFilterCount={activeFilterCount}
+          advancedLabel={t('pages.contactMessages.filter.advanced')}
+          advancedFilters={(
+            <Stack spacing={2} sx={{ pt: 0.5 }}>
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+                <FormControl fullWidth sx={filterControlSx}>
+                  <InputLabel>{t('pages.contactMessages.filter.category')}</InputLabel>
+                  <Select
+                    label={t('pages.contactMessages.filter.category')}
+                    value={categoryFilter}
+                    onChange={(event) => {
+                      setCategoryFilter(event.target.value as CategoryFilter);
+                      setPage(0);
+                    }}
+                  >
+                    <MenuItem value="all">{t('common:all')}</MenuItem>
+                    <MenuItem value="bug_report">{t('pages.contactMessages.categories.bug_report')}</MenuItem>
+                    <MenuItem value="feedback">{t('pages.contactMessages.categories.feedback')}</MenuItem>
+                    <MenuItem value="support">{t('pages.contactMessages.categories.support')}</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth sx={filterControlSx}>
+                  <InputLabel>{t('pages.contactMessages.filter.readStatus')}</InputLabel>
+                  <Select
+                    label={t('pages.contactMessages.filter.readStatus')}
+                    value={readFilter}
+                    onChange={(event) => {
+                      setReadFilter(event.target.value as ReadFilter);
+                      setPage(0);
+                    }}
+                  >
+                    <MenuItem value="all">{t('common:all')}</MenuItem>
+                    <MenuItem value="read">{t('pages.contactMessages.read')}</MenuItem>
+                    <MenuItem value="unread">{t('pages.contactMessages.unread')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Stack>
             </Stack>
-          </Stack>
-        )}
-        advancedDefaultOpen
-        sx={{ mb: 3 }}
-      />
+          )}
+          advancedDefaultOpen
+        />
 
-      <Paper sx={{ p: 2, borderRadius: '12px' }} elevation={0}>
         <DataTable
           columns={columns}
           data={messages}
@@ -325,80 +343,96 @@ const ContactMessagesPage = () => {
         />
       </Paper>
 
-      <Dialog open={openDelete} onClose={() => setOpenDelete(false)}>
-        <DialogTitle>{t('pages.contactMessages.deleteTitle')}</DialogTitle>
-        <DialogContent>
-          <Typography>
-            {t('pages.contactMessages.deleteConfirm', { name: current?.name || 'N/A' })}
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setOpenDelete(false)} color="inherit">{t('pages.contactMessages.cancel')}</Button>
-          <Button onClick={handleDelete} color="error" variant="contained" disabled={isMutating}>
-            {isMutating ? t('pages.contactMessages.deleting') : t('pages.contactMessages.delete')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {/* Delete Confirmation Dialog */}
+      <AdminConfirmDialog
+        open={Boolean(deleteTarget)}
+        title={t('pages.contactMessages.deleteTitle')}
+        message={t('pages.contactMessages.deleteConfirm', { name: deleteTarget?.name || 'N/A' })}
+        variant="danger"
+        loading={isMutating}
+        onConfirm={handleDelete}
+        onClose={() => setDeleteTarget(null)}
+      />
 
-      <Dialog
-        open={!!viewDetail}
-        onClose={() => setViewDetail(null)}
-        maxWidth="sm"
-        fullWidth
+      {/* Detail Drawer */}
+      <AdminDetailDrawer
+        open={Boolean(inspectingMessage)}
+        onClose={() => setInspectingMessage(null)}
+        title={t('pages.contactMessages.detailTitle')}
+        subtitle={`Người gửi: ${inspectingMessage?.name || 'Ẩn danh'}`}
+        footerAction={
+          inspectingMessage && !(inspectingMessage.is_read || inspectingMessage.isRead) ? (
+            <Button
+              size="small"
+              variant="contained"
+              startIcon={<MarkEmailReadOutlinedIcon />}
+              onClick={() => handleToggleRead(inspectingMessage)}
+              sx={{ textTransform: 'none', fontWeight: 600 }}
+            >
+              {t('pages.contactMessages.markAsRead')}
+            </Button>
+          ) : undefined
+        }
       >
-        <DialogTitle>
-          {t('pages.contactMessages.detailTitle')}
-        </DialogTitle>
-        <DialogContent dividers>
-          {viewDetail && (
-            <Stack spacing={2}>
-              <Box>
-                <Typography variant="caption" color="text.secondary">{t('pages.contactMessages.table.category')}</Typography>
-                <Typography variant="body1">{t(`pages.contactMessages.categories.${viewDetail.category || 'bug_report'}`)}</Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">{t('pages.contactMessages.table.subject')}</Typography>
-                <Typography variant="body1">{viewDetail.subject || '-'}</Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">{t('pages.contactMessages.table.name')}</Typography>
-                <Typography variant="body1">{viewDetail.name}</Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">{t('pages.contactMessages.table.email')}</Typography>
-                <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>{viewDetail.email}</Typography>
-              </Box>
-              {viewDetail.phone && (
-                <Box>
-                  <Typography variant="caption" color="text.secondary">{t('pages.contactMessages.table.phone')}</Typography>
-                  <Typography variant="body1">{viewDetail.phone}</Typography>
+        {inspectingMessage && (
+          <Stack spacing={2.5}>
+            <Box sx={{ p: 2, bgcolor: '#F8FAFC', borderRadius: 2, border: '1px solid #E2E8F0' }}>
+              <Stack spacing={1}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" sx={{ color: '#64748B' }}>{t('pages.contactMessages.table.category')}:</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>{t(`pages.contactMessages.categories.${inspectingMessage.category || 'bug_report'}`)}</Typography>
                 </Box>
-              )}
-              <Box>
-                <Typography variant="caption" color="text.secondary">{t('pages.contactMessages.table.pageUrl')}</Typography>
-                <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-                  {viewDetail.pageUrl || '-'}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">{t('pages.contactMessages.table.content')}</Typography>
-                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>{viewDetail.content}</Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">{t('pages.contactMessages.table.createdAt')}</Typography>
-                <Typography variant="body2">
-                  {dayjs(viewDetail.createAt || viewDetail.create_at).format('DD/MM/YYYY HH:mm')}
-                </Typography>
-              </Box>
-            </Stack>
-          )}
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setViewDetail(null)} variant="contained">
-            {t('pages.contactMessages.close')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" sx={{ color: '#64748B' }}>{t('pages.contactMessages.table.subject')}:</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>{inspectingMessage.subject || '-'}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" sx={{ color: '#64748B' }}>{t('pages.contactMessages.table.name')}:</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>{inspectingMessage.name}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" sx={{ color: '#64748B' }}>{t('pages.contactMessages.table.email')}:</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: '#2563EB' }}>
+                    <a href={`mailto:${inspectingMessage.email}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                      {inspectingMessage.email}
+                    </a>
+                  </Typography>
+                </Box>
+                {inspectingMessage.phone && (
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2" sx={{ color: '#64748B' }}>{t('pages.contactMessages.table.phone')}:</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{inspectingMessage.phone}</Typography>
+                  </Box>
+                )}
+                {inspectingMessage.pageUrl && (
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2" sx={{ color: '#64748B' }}>{t('pages.contactMessages.table.pageUrl')}:</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600, wordBreak: 'break-all' }}>{inspectingMessage.pageUrl}</Typography>
+                  </Box>
+                )}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" sx={{ color: '#64748B' }}>{t('pages.contactMessages.table.createdAt')}:</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    {dayjs(inspectingMessage.createAt || inspectingMessage.create_at).format('DD/MM/YYYY HH:mm')}
+                  </Typography>
+                </Box>
+              </Stack>
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', mb: 1 }}>
+                {t('pages.contactMessages.table.content')}
+              </Typography>
+              <Paper
+                variant="outlined"
+                sx={{ p: 2, borderRadius: 2, bgcolor: '#FFFFFF', whiteSpace: 'pre-wrap', fontSize: '0.875rem', lineHeight: 1.6 }}
+              >
+                {inspectingMessage.content || '-'}
+              </Paper>
+            </Box>
+          </Stack>
+        )}
+      </AdminDetailDrawer>
     </Box>
   );
 };

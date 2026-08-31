@@ -50,24 +50,21 @@ export const CandidateSkillsTab: React.FC<CandidateSkillsTabProps> = ({ profileD
 
         {skills.length > 0 ? (
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-            {skills.map((skill: any, idx: number) => {
-              const skillName = typeof skill === 'object' ? skill.name || skill.skillName : skill;
-              return (
-                <Chip
-                  key={idx}
-                  label={skillName}
-                  sx={{
-                    bgcolor: '#EFF6FF',
-                    color: '#1D4ED8',
-                    border: '1px solid #BFDBFE',
-                    fontWeight: 700,
-                    borderRadius: '8px',
-                    fontSize: '0.8125rem',
-                    py: 2,
-                  }}
-                />
-              );
-            })}
+            {skills.map((skill) => (
+              <Chip
+                key={String(skill.id)}
+                label={skill.name}
+                sx={{
+                  bgcolor: '#EFF6FF',
+                  color: '#1D4ED8',
+                  border: '1px solid #BFDBFE',
+                  fontWeight: 700,
+                  borderRadius: '8px',
+                  fontSize: '0.8125rem',
+                  py: 2,
+                }}
+              />
+            ))}
           </Stack>
         ) : (
           <Typography variant="body2" sx={{ color: '#94A3B8', fontStyle: 'italic' }}>

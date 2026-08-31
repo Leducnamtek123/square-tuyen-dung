@@ -7,9 +7,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import { ROUTES } from '../../../../configs/constants';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
-import { formatRoute } from '../../../../utils/funcUtils';
+import { ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import { formatRoute } from '@/utils/funcUtils';
 import dayjs from '@/configs/dayjs-config';
 import type { InterviewSession } from '@/types/models';
 

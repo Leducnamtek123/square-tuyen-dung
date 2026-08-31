@@ -6,7 +6,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
-import Map from "../../../../components/Common/Map";
+import Map from "@/components/Common/Map";
 import type { Location } from '@/types/models';
 import type { Company } from '@/types/models';
 import type { JobPost } from '@/types/models';

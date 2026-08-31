@@ -124,7 +124,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
   // ── Experiences Handlers ──────────────────────────────────────────
   const handleAddExperience = () => {
     const newItem: CVExperienceItem = {
-      id: `exp-${Date.now()}`,
+      id: `exp-${crypto.randomUUID()}`,
       position: '',
       company: '',
       startDate: '',
@@ -152,7 +152,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
   // ── Educations Handlers ───────────────────────────────────────────
   const handleAddEducation = () => {
     const newItem: CVEducationItem = {
-      id: `edu-${Date.now()}`,
+      id: `edu-${crypto.randomUUID()}`,
       school: '',
       major: '',
       degree: 'Cử nhân',
@@ -187,7 +187,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
     if (data.skills.some((s) => s.name.toLowerCase() === skillName.toLowerCase())) return;
 
     const newItem: CVSkillItem = {
-      id: `sk-${Date.now()}-${Math.random()}`,
+      id: `sk-${crypto.randomUUID()}`,
       name: skillName,
       level: 5,
     };
@@ -212,7 +212,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
   // ── Languages Handlers (Vieclam24h 5-Star Style) ───────────────────
   const handleAddLanguage = (name = 'Tiếng Anh') => {
     const newItem: CVLanguageItem = {
-      id: `lang-${Date.now()}`,
+      id: `lang-${crypto.randomUUID()}`,
       name,
       proficiency: 'Thành thạo',
     };
@@ -255,7 +255,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
   // ── Certificates Handlers ─────────────────────────────────────────
   const handleAddCertificate = () => {
     const newItem: CVCertificateItem = {
-      id: `cert-${Date.now()}`,
+      id: `cert-${crypto.randomUUID()}`,
       name: '',
       organization: '',
       issueDate: '',
@@ -280,7 +280,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
   // ── Projects Handlers ─────────────────────────────────────────────
   const handleAddProject = () => {
     const newItem: CVProjectItem = {
-      id: `proj-${Date.now()}`,
+      id: `proj-${crypto.randomUUID()}`,
       name: '',
       role: '',
       description: '',
@@ -374,24 +374,29 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
 
         {/* Grid Inputs */}
         <Stack spacing={2}>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
-            <TextField
-              label="Họ và tên *"
-              value={data.personalInfo.fullName}
-              onChange={(e) => updatePersonalInfo('fullName', e.target.value)}
-              placeholder="VD: NGUYỄN VĂN A"
-              size="small"
-              fullWidth
-            />
-            <TextField
-              label="Vị trí ứng tuyển *"
-              value={data.personalInfo.title}
-              onChange={(e) => updatePersonalInfo('title', e.target.value)}
-              placeholder="VD: Chuyên viên Marketing / Kỹ sư CNTT"
-              size="small"
-              fullWidth
-            />
-          </Box>
+          <TextField
+            label="Họ và tên *"
+            value={data.personalInfo.fullName}
+            onChange={(e) => updatePersonalInfo('fullName', e.target.value)}
+            placeholder="VD: NGUYỄN VĂN A"
+            size="small"
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': { fontWeight: 600, fontFamily: 'Inter, sans-serif' },
+            }}
+          />
+
+          <TextField
+            label="Vị trí ứng tuyển *"
+            value={data.personalInfo.title}
+            onChange={(e) => updatePersonalInfo('title', e.target.value)}
+            placeholder="VD: Chuyên viên Marketing / Kỹ sư Xây dựng"
+            size="small"
+            fullWidth
+            sx={{
+              '& .MuiInputBase-input': { fontFamily: 'Inter, sans-serif' },
+            }}
+          />
 
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
             <TextField
@@ -401,6 +406,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               placeholder="email@example.com"
               size="small"
               fullWidth
+              sx={{ '& .MuiInputBase-input': { fontFamily: 'Inter, sans-serif' } }}
             />
             <TextField
               label="Số điện thoại"
@@ -409,6 +415,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               placeholder="0912 345 678"
               size="small"
               fullWidth
+              sx={{ '& .MuiInputBase-input': { fontFamily: 'Inter, sans-serif' } }}
             />
           </Box>
 
@@ -420,6 +427,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               placeholder="Quận 1, TP. Hồ Chí Minh"
               size="small"
               fullWidth
+              sx={{ '& .MuiInputBase-input': { fontFamily: 'Inter, sans-serif' } }}
             />
             <TextField
               label="Ngày sinh"
@@ -428,6 +436,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               placeholder="DD/MM/YYYY"
               size="small"
               fullWidth
+              sx={{ '& .MuiInputBase-input': { fontFamily: 'Inter, sans-serif' } }}
             />
           </Box>
 
@@ -441,6 +450,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               fontSize: '0.75rem',
               color: '#2563eb',
               textTransform: 'none',
+              fontFamily: 'Inter, sans-serif',
               p: 0,
               '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' },
             }}
@@ -449,32 +459,35 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           </Button>
 
           <Collapse in={showExtraPersonalInfo}>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' }, gap: 1.5, pt: 1 }}>
+            <Stack spacing={1.5} sx={{ pt: 1 }}>
               <TextField
                 label="Website / Portfolio"
                 value={data.personalInfo.website || ''}
                 onChange={(e) => updatePersonalInfo('website', e.target.value)}
-                placeholder="portfolio.me"
+                placeholder="https://yourportfolio.me"
                 size="small"
                 fullWidth
+                sx={{ '& .MuiInputBase-input': { fontFamily: 'Inter, sans-serif' } }}
               />
               <TextField
                 label="LinkedIn Profile"
                 value={data.personalInfo.linkedin || ''}
                 onChange={(e) => updatePersonalInfo('linkedin', e.target.value)}
-                placeholder="linkedin.com/in/..."
+                placeholder="https://linkedin.com/in/username"
                 size="small"
                 fullWidth
+                sx={{ '& .MuiInputBase-input': { fontFamily: 'Inter, sans-serif' } }}
               />
               <TextField
-                label="GitHub"
+                label="GitHub / Behance"
                 value={data.personalInfo.github || ''}
                 onChange={(e) => updatePersonalInfo('github', e.target.value)}
-                placeholder="github.com/..."
+                placeholder="https://github.com/username"
                 size="small"
                 fullWidth
+                sx={{ '& .MuiInputBase-input': { fontFamily: 'Inter, sans-serif' } }}
               />
-            </Box>
+            </Stack>
           </Collapse>
         </Stack>
       </Paper>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stack } from '@mui/material';
-import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
-import PasswordTextFieldCustom from '../../../../components/Common/Controls/PasswordTextFieldCustom';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
+import PasswordTextFieldCustom from '@/components/Common/Controls/PasswordTextFieldCustom';
 import type { Control } from 'react-hook-form';
 import type { JobSeekerSignUpFormData } from './types';
 

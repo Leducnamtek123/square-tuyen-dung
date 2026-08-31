@@ -36,6 +36,7 @@ import { UnifiedCVForm } from './forms/UnifiedCVForm';
 import { DesignCustomizer } from './forms/DesignCustomizer';
 import { AIAssistantTab } from './forms/AIAssistantTab';
 import { AICvScoreTab } from './forms/AICvScoreTab';
+import { useTranslation } from 'react-i18next';
 
 interface CVEditorSidebarProps {
   data: CVData;
@@ -54,6 +55,7 @@ export const CVEditorSidebar: React.FC<CVEditorSidebarProps> = ({
   onSyncFromProfile,
   isSyncing,
 }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<MainTab>('content');
 
   const updateTheme = (theme: CVThemeConfig) => {
@@ -88,7 +90,7 @@ export const CVEditorSidebar: React.FC<CVEditorSidebarProps> = ({
       <Box sx={{ p: 2, borderBottom: '1px solid #e2e8f0', bgcolor: '#f8fafc', display: 'flex', flexDirection: 'column', gap: 1.5 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.875rem' }}>
-            Chỉnh sửa hồ sơ CV
+            {t('cvBuilder.editor.sidebarTitle', 'Chỉnh sửa hồ sơ CV')}
           </Typography>
           <Button
             size="small"
@@ -109,17 +111,17 @@ export const CVEditorSidebar: React.FC<CVEditorSidebarProps> = ({
               '&:hover': { bgcolor: '#1d4ed8' },
             }}
           >
-            Đồng bộ từ hồ sơ
+            {t('cvBuilder.editor.syncFromProfile', 'Đồng bộ từ hồ sơ')}
           </Button>
         </Stack>
 
         {/* Navigation Tabs (4 Main Tabs) */}
         <Stack direction="row" spacing={0.75} sx={{ bgcolor: '#f1f5f9', p: 0.5, borderRadius: '12px' }}>
           {[
-            { id: 'content', label: 'Nhập liệu', icon: EditNoteOutlinedIcon },
-            { id: 'design', label: 'Thiết kế', icon: PaletteOutlinedIcon },
-            { id: 'ai-score', label: 'Chấm ATS', icon: FactCheckOutlinedIcon },
-            { id: 'ai', label: 'Gợi ý AI', icon: AutoFixHighOutlinedIcon },
+            { id: 'content', label: t('cvBuilder.tabs.content', 'Nhập liệu'), icon: EditNoteOutlinedIcon },
+            { id: 'design', label: t('cvBuilder.tabs.design', 'Thiết kế'), icon: PaletteOutlinedIcon },
+            { id: 'ai-score', label: t('cvBuilder.tabs.aiScore', 'Chấm ATS'), icon: FactCheckOutlinedIcon },
+            { id: 'ai', label: t('cvBuilder.tabs.aiAssist', 'Gợi ý AI'), icon: AutoFixHighOutlinedIcon },
           ].map((tab) => {
             const Icon = tab.icon;
             const isSelected = activeTab === tab.id;

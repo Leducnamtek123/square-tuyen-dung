@@ -124,7 +124,7 @@ export const ExportPreview: React.FC<ExportPreviewProps> = ({
           <TableBody>
             {isLoading ? (
               Array.from({ length: 6 }).map((_, idx) => (
-                <TableRow key={idx}>
+                <TableRow key={`export-skel-${idx}`}>
                   <TableCell align="center">
                     <Skeleton variant="text" width={15} />
                   </TableCell>
@@ -154,7 +154,7 @@ export const ExportPreview: React.FC<ExportPreviewProps> = ({
             ) : (
               rows.map((row, rowIdx) => (
                 <TableRow
-                  key={rowIdx}
+                  key={row.id != null ? String(row.id) : `preview-row-${rowIdx}`}
                   sx={{
                     '&:nth-of-type(even)': { backgroundColor: '#F8FAFC' },
                     '&:hover': { backgroundColor: '#F1F5F9' },

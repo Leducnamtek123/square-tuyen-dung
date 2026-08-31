@@ -234,9 +234,9 @@ export const LegalPolicyViewer: React.FC<Props> = ({ slug, portal = 'jobseeker' 
 
           {/* Document Body Sections */}
           <Box sx={{ mt: 3 }}>
-            {doc.sections.map((section: LegalSection, sIdx: number) => (
+            {doc.sections.map((section: LegalSection) => (
               <Box
-                key={section.id || sIdx}
+                key={section.id}
                 id={section.id}
                 sx={{
                   mb: 4,
@@ -377,8 +377,8 @@ export const LegalPolicyViewer: React.FC<Props> = ({ slug, portal = 'jobseeker' 
                 {/* Subsections */}
                 {section.subsections && section.subsections.length > 0 && (
                   <Stack spacing={2.5} sx={{ pl: { xs: 1, sm: 2 }, mt: 2 }}>
-                    {section.subsections.map((sub, subIdx) => (
-                      <Box key={sub.id || subIdx} id={sub.id}>
+                    {section.subsections.map((sub) => (
+                      <Box key={sub.id} id={sub.id}>
                         <Typography
                           component="h3"
                           sx={{

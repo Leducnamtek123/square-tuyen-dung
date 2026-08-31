@@ -18,15 +18,15 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useDistricts } from './hooks/useDistricts';
 import { useCities } from '../CitiesPage/hooks/useCities';
-import { useDataTable, useDebounce } from '../../../hooks';
-import { District, City } from '../../../types/models';
-import type { DistrictPayload } from '../../../services/adminManagementService';
+import { useDataTable, useDebounce } from '@/hooks';
+import { District, City } from '@/types/models';
+import type { DistrictPayload } from '@/services/adminManagementService';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import type { SxProps, Theme } from '@mui/material/styles';
 import {

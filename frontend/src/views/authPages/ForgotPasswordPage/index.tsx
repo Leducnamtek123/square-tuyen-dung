@@ -3,9 +3,9 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Alert, AlertTitle, Box, Card, Container, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import { TabTitle } from '../../../utils/generalFunction';
-import ForgotPasswordForm from '../../components/auths/ForgotPasswordForm';
-import authService from '../../../services/authService';
+import { TabTitle } from '@/utils/generalFunction';
+import ForgotPasswordForm from '@/views/components/auths/ForgotPasswordForm';
+import authService from '@/services/authService';
 import type { AxiosError } from 'axios';
 
 

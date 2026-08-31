@@ -4,11 +4,11 @@ import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Box, Card, Stack, Tab, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid } from "@mui/material";
-import { TabTitle } from "../../../utils/generalFunction";
-import SavedJobCard from "../../components/jobSeekers/SavedJobCard";
-import AppliedJobCard from "../../components/jobSeekers/AppliedJobCard";
-import SuggestedJobPostCard from "../../components/defaults/SuggestedJobPostCard";
-import JobPostNotificationCard from "../../components/jobSeekers/JobPostNotificationCard";
+import { TabTitle } from "@/utils/generalFunction";
+import SavedJobCard from "@/views/components/jobSeekers/SavedJobCard";
+import AppliedJobCard from "@/views/components/jobSeekers/AppliedJobCard";
+import SuggestedJobPostCard from "@/views/components/defaults/SuggestedJobPostCard";
+import JobPostNotificationCard from "@/views/components/jobSeekers/JobPostNotificationCard";
 const ProjectPage = () => {
 
     const { t } = useTranslation('jobSeeker');

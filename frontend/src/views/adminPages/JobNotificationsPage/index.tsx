@@ -4,13 +4,13 @@ import React, { useMemo, useReducer } from 'react';
 import { Box, Typography, Paper, Button, Tooltip, IconButton, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useJobNotifications } from './hooks/useJobNotifications';
-import { useDataTable, useDebounce } from '../../../hooks';
-import { JobPostNotification } from '../../../types/models';
+import { useDataTable, useDebounce } from '@/hooks';
+import { JobPostNotification } from '@/types/models';
 import JobNotificationFormDialog from './JobNotificationFormDialog';
 import JobNotificationDeleteDialog from './JobNotificationDeleteDialog';
 import {

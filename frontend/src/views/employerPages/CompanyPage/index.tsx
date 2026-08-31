@@ -1,10 +1,10 @@
 'use client';
 import React from 'react';
 import { Box, Tab } from "@mui/material";
-import { TabTitle } from '../../../utils/generalFunction';
-import CompanyCard from '../../components/employers/CompanyCard';
-import CompanyImageCard from '../../components/employers/CompanyImageCard';
-import CompanyTeamCard from '../../components/employers/CompanyTeamCard';
+import { TabTitle } from '@/utils/generalFunction';
+import CompanyCard from '@/views/components/employers/CompanyCard';
+import CompanyImageCard from '@/views/components/employers/CompanyImageCard';
+import CompanyTeamCard from '@/views/components/employers/CompanyTeamCard';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useTranslation } from 'react-i18next';
 

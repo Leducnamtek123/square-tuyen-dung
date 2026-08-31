@@ -3,11 +3,11 @@ import { Avatar, Badge, Box, CircularProgress, Skeleton, Stack, Typography } fro
 import InfiniteScroll from 'react-infinite-scroll-component';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import SearchOffRoundedIcon from '@mui/icons-material/SearchOffRounded';
-import ChatRoomSearch from '../../../../components/Features/Chats/ChatRoomSearch';
+import ChatRoomSearch from '@/components/Features/Chats/ChatRoomSearch';
 import { useTranslation } from 'react-i18next';
 import { useChatRooms, ChatRoomData } from './useChatRooms';
-import { useDebounce } from '../../../../hooks';
-import { formatMessageTime } from '../../../../utils/dateHelper';
+import { useDebounce } from '@/hooks';
+import { formatMessageTime } from '@/utils/dateHelper';
 import type { UserAccount } from './useChatRooms';
 
 const LoadingComponentItem = () => (

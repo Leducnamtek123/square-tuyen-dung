@@ -7,7 +7,7 @@ import StopCircleIcon from '@mui/icons-material/StopCircle';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import type { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
-import type { InterviewSession } from '../../../../types/models';
+import type { InterviewSession } from '@/types/models';
 
 type Props = {
   session: InterviewSession;

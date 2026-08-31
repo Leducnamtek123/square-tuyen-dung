@@ -15,7 +15,7 @@ import DeleteForever from '@mui/icons-material/DeleteForever';
 import downloadPdf, { formatRoute } from '@/utils/funcUtils';
 import { IMAGES, ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
-import defaultTheme from '@/themeConfigs/defaultTheme';
+import defaultTheme from '@/configs/theme/defaultTheme';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
 interface ProfileUploadCardProps {

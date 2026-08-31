@@ -125,8 +125,16 @@ export default function AttendanceListPage() {
   const { quickCheckin } = useHrmMutations();
 
   const [openCheckinModal, setOpenCheckinModal] = useState(false);
-  const [checkinForm, setCheckinForm] = useState({
-    employee_id: employees[0]?.id || 0,
+  const [checkinForm, setCheckinForm] = useState<{
+    employee_id: number | null;
+    date: string;
+    status: string;
+    check_in: string;
+    check_out: string;
+    working_hours: number;
+    notes: string;
+  }>({
+    employee_id: employees[0]?.id ?? null,
     date: new Date().toISOString().split('T')[0],
     status: 'PRESENT',
     check_in: '08:30:00',
@@ -137,7 +145,7 @@ export default function AttendanceListPage() {
 
   const handleRunCheckin = () => {
     if (!checkinForm.employee_id) return;
-    quickCheckin.mutate(checkinForm, {
+    quickCheckin.mutate({ ...checkinForm, employee_id: checkinForm.employee_id }, {
       onSuccess: () => {
         setOpenCheckinModal(false);
         refetch();
@@ -393,8 +401,8 @@ export default function AttendanceListPage() {
               label="Nhân viên"
               fullWidth
               size="small"
-              value={checkinForm.employee_id}
-              onChange={(e) => setCheckinForm({ ...checkinForm, employee_id: Number(e.target.value) })}
+              value={checkinForm.employee_id ?? ''}
+              onChange={(e) => setCheckinForm({ ...checkinForm, employee_id: e.target.value ? Number(e.target.value) : null })}
               sx={inputSx}
             >
               {employees.map((emp) => (

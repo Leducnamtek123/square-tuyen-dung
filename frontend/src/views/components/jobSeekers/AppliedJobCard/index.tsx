@@ -3,16 +3,16 @@ import Link from 'next/link';
 import { Box, Stack, Button, Pagination, Chip, Typography } from "@mui/material";
 import DoneIcon from '@mui/icons-material/Done';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import {CV_TYPES, ROUTES} from '../../../../configs/constants';
-import NoDataCard from '../../../../components/Common/NoDataCard';
-import JobPostAction from '../../../../components/Features/JobPostAction';
+import {CV_TYPES, ROUTES} from '@/configs/constants';
+import NoDataCard from '@/components/Common/NoDataCard';
+import JobPostAction from '@/components/Features/JobPostAction';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile, faFilePdf } from '@fortawesome/free-solid-svg-icons';
-import jobPostActivityService from '../../../../services/jobPostActivityService';
-import type { JobPostActivity } from '../../../../types/models';
+import jobPostActivityService from '@/services/jobPostActivityService';
+import type { JobPostActivity } from '@/types/models';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 const pageSize = 10;
 

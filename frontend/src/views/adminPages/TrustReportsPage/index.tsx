@@ -27,10 +27,10 @@ import AdminStatusBadge from '@/components/Common/AdminStatusBadge';
 import AdminConfirmDialog from '@/components/Common/AdminConfirmDialog';
 import AdminDetailDrawer from '@/components/Common/AdminDetailDrawer';
 
-import { useDataTable } from '../../../hooks';
-import type { TrustReport } from '../../../types/models';
+import { useDataTable } from '@/hooks';
+import type { TrustReport } from '@/types/models';
 import { useTrustReports } from './hooks/useTrustReports';
-import dayjs from '../../../configs/dayjs-config';
+import dayjs from '@/configs/dayjs-config';
 
 type StatusFilter = 'all' | TrustReport['status'];
 type TargetTypeFilter = 'all' | TrustReport['targetType'];

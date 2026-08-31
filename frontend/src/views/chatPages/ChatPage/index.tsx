@@ -3,15 +3,15 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { Box, Stack, Drawer, useTheme, useMediaQuery } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
-import { ROLES_NAME } from '../../../configs/constants';
-import { RootState } from '../../../redux/store';
-import { useChatContext } from '../../../context/ChatProvider';
+import { ROLES_NAME } from '@/configs/constants';
+import { RootState } from '@/redux/store';
+import { useChatContext } from '@/context/ChatProvider';
 
 // page components
-import RightSidebar from '../../components/chats/RightSidebar';
-import ChatWindow from '../../components/chats/ChatWindow';
-import LeftSidebar from '../../components/chats/LeftSidebar';
-import SidebarHeader from '../../../components/Features/Chats/SidebarHeader';
+import RightSidebar from '@/views/components/chats/RightSidebar';
+import ChatWindow from '@/views/components/chats/ChatWindow';
+import LeftSidebar from '@/views/components/chats/LeftSidebar';
+import SidebarHeader from '@/components/Features/Chats/SidebarHeader';
 
 const ChatLeftSidebar = ({ isJobSeeker }: { isJobSeeker: boolean }) => (
   <Box px={{ xs: 1.5, sm: 2 }} py={2} sx={{ height: '100%', bgcolor: 'background.paper', display: 'flex', flexDirection: 'column' }}>

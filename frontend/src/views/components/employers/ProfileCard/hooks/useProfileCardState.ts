@@ -4,12 +4,12 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/redux/hooks';
-import { useProfileSearch } from '../../ProfileSearch';
+import { useProfileSearch } from '@/views/components/employers/ProfileSearch';
 import {
   useEmployerResumes,
   useToggleSaveResumeOptimistic,
   useJobPostOptions,
-} from '../../hooks/useEmployerQueries';
+} from '@/views/components/employers/hooks/useEmployerQueries';
 import { searchResume } from '@/redux/filterSlice';
 import type { ResumeFilter } from '@/redux/filterSlice';
 import type { Resume } from '@/types/models';

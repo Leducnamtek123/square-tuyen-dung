@@ -106,9 +106,13 @@ export default function ContractListPage() {
 
   const handleOpenCreate = () => {
     setEditingContract(null);
+    const selectedEmp = employees.length > 0 ? employees[0] : null;
+    const defaultContractNum = selectedEmp?.employee_code
+      ? `HD-${selectedEmp.employee_code}-01`
+      : `HD-${dayjs().format('YYYYMMDD')}-01`;
     setForm({
-      employee: employees.length > 0 ? String(employees[0].id) : '',
-      contract_number: `HD-${dayjs().format('YYYYMMDD')}-${Math.floor(100 + Math.random() * 900)}`,
+      employee: selectedEmp ? String(selectedEmp.id) : '',
+      contract_number: defaultContractNum,
       contract_type: 'FIXED_TERM',
       start_date: new Date().toISOString().split('T')[0],
       end_date: dayjs().add(1, 'year').format('YYYY-MM-DD'),
@@ -172,8 +176,9 @@ export default function ContractListPage() {
     setRenewingContract(c);
     const startDate = c.end_date ? dayjs(c.end_date).add(1, 'day').format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
     const endDate = dayjs(startDate).add(1, 'year').format('YYYY-MM-DD');
+    const baseNum = c.contract_number.replace(/-PL\d+$/, '');
     setRenewForm({
-      contract_number: `HD-${dayjs().format('YYYYMMDD')}-${Math.floor(100 + Math.random() * 900)}`,
+      contract_number: `${baseNum}-PL01`,
       contract_type: c.contract_type === 'PROBATION' ? 'FIXED_TERM' : c.contract_type,
       start_date: startDate,
       end_date: endDate,

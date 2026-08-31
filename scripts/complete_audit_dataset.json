@@ -1,0 +1,1303 @@
+{
+  "summary": {
+    "total_files": 2224,
+    "root_files_count": 17,
+    "django_apps": [],
+    "django_apps_count": 0,
+    "asset_files_count": 196,
+    "unused_assets_count": 5,
+    "duplicate_asset_groups_count": 18,
+    "duplicate_filenames_count": 35,
+    "orphan_files_count": 203,
+    "debug_findings_count": 5,
+    "deep_relative_imports_count": 1018,
+    "extension_distribution": {
+      ".tsx": 758,
+      ".ts": 580,
+      ".py": 387,
+      ".png": 70,
+      ".json": 66,
+      ".md": 61,
+      ".jpg": 53,
+      ".svg": 38,
+      ".gz": 28,
+      ".html": 14,
+      ".js": 14,
+      ".ttf": 12,
+      "Dockerfile": 11,
+      ".yaml": 11,
+      ".gif": 11,
+      ".yml": 10,
+      ".css": 10,
+      ".sh": 9,
+      ".webp": 9,
+      ".env": 7,
+      ".example": 6,
+      ".gitignore": 6,
+      ".dockerignore": 5,
+      ".conf": 4,
+      ".prod": 3
+    }
+  },
+  "root_hygiene": {
+    "root_files": [
+      {
+        "name": ".dockerignore",
+        "size": 490,
+        "ext": ""
+      },
+      {
+        "name": ".env",
+        "size": 15798,
+        "ext": ""
+      },
+      {
+        "name": ".env.example",
+        "size": 6267,
+        "ext": ".example"
+      },
+      {
+        "name": ".env.prod",
+        "size": 15834,
+        "ext": ".prod"
+      },
+      {
+        "name": ".firebaserc",
+        "size": 57,
+        "ext": ""
+      },
+      {
+        "name": ".gitattributes",
+        "size": 18,
+        "ext": ""
+      },
+      {
+        "name": ".gitignore",
+        "size": 758,
+        "ext": ""
+      },
+      {
+        "name": "docker-compose.yml",
+        "size": 19581,
+        "ext": ".yml"
+      },
+      {
+        "name": "ENVIRONMENT_AUDIT.md",
+        "size": 28688,
+        "ext": ".md"
+      },
+      {
+        "name": "firebase-storage-cors.json",
+        "size": 409,
+        "ext": ".json"
+      },
+      {
+        "name": "firebase.json",
+        "size": 76,
+        "ext": ".json"
+      },
+      {
+        "name": "firestore.indexes.json",
+        "size": 2906,
+        "ext": ".json"
+      },
+      {
+        "name": "HCNS.QT.01.F06 v1.3 Cau hoi phong van.doc",
+        "size": 310272,
+        "ext": ".doc"
+      },
+      {
+        "name": "MIGRATIONS.md",
+        "size": 3697,
+        "ext": ".md"
+      },
+      {
+        "name": "README.md",
+        "size": 5836,
+        "ext": ".md"
+      },
+      {
+        "name": "START_GUIDE.md",
+        "size": 2887,
+        "ext": ".md"
+      },
+      {
+        "name": "tuyendungsqstudio.sql",
+        "size": 0,
+        "ext": ".sql"
+      }
+    ],
+    "root_dirs": [
+      ".github",
+      "api",
+      "backups",
+      "docs",
+      "frontend",
+      "infra",
+      "nginx-gateway",
+      "notebooklm-mcp",
+      "scripts",
+      "tasks",
+      "voice-ai"
+    ]
+  },
+  "assets": {
+    "total": 196,
+    "unused": [
+      "api/data/seed_images/banners/home_architecture.svg",
+      "api/data/seed_images/banners/home_construction.svg",
+      "api/data/seed_images/banners/home_interior.svg",
+      "api/data/seed_images/banners/home_real_estate.svg",
+      "api/data/seed_images/banners/right_hiring.svg"
+    ],
+    "duplicates": {
+      "827a3df2561678f1561f380a4029600db744c2123526669ed47546ef5c5c1778": [
+        "api/config/static/admin/images/light-logo-medium.png",
+        "frontend/public/favicon.png"
+      ],
+      "7ee9ceae905b6053511ebdf6827ab9233614f298fee0975a12a9c8a44a0ea8f4": [
+        "api/data/seed_images/articles/ai_interview.jpg",
+        "frontend/public/images/blog/blog-ai-interview.jpg"
+      ],
+      "ba20dc83bd4711443756ffee40654e4edbf87bd1321da260c0d3f69a39cee4cd": [
+        "api/data/seed_images/articles/architecture.jpg",
+        "frontend/public/images/blog/blog-architecture-portfolio.jpg"
+      ],
+      "df001c2150c87df1cb0ad76d323575e2aba94b5fc8e7e13ad7b6ec8044bab4d2": [
+        "api/data/seed_images/articles/candidate_skills.jpg",
+        "frontend/public/images/blog/blog-candidate-skills.jpg"
+      ],
+      "78f8d35f6fb9c74eca550df8e928eed3f3e08bc2729f16fb6a1e5759480637a2": [
+        "api/data/seed_images/articles/construction.jpg",
+        "frontend/public/images/blog/blog-construction-site-hiring.jpg"
+      ],
+      "8dc635dc48feda4515511f0263803a2a0fce894ef46197510cd4abdab8eb72b7": [
+        "api/data/seed_images/articles/interior.jpg",
+        "frontend/public/images/blog/blog-interior-design-team.jpg"
+      ],
+      "eba6fe7633569741012a1b728c6438df297304a918265b4bedbcfbfae8d63309": [
+        "api/data/seed_images/articles/real_estate.jpg",
+        "frontend/public/images/blog/blog-real-estate-consultant.jpg"
+      ],
+      "431486e05690590015663cf0b3912d72bf5ffd351001348facb082a2979bfe23": [
+        "frontend/public/android-chrome-192x192.png",
+        "frontend/public/infohr-icons/android-chrome-192x192.png",
+        "frontend/src/app/android-chrome-192x192.png"
+      ],
+      "875defa637fae567e1188977b215badaf8c7a09678430ffe3e87e3b1f7921ebc": [
+        "frontend/public/android-chrome-512x512.png",
+        "frontend/public/infohr-icons/android-chrome-512x512.png",
+        "frontend/src/app/android-chrome-512x512.png"
+      ],
+      "9be5eacbd02d4a66990e72d2db062db5cb2799bbef5284a14378a3baf91f3f92": [
+        "frontend/public/apple-touch-icon.png",
+        "frontend/public/infohr-icons/apple-touch-icon.png",
+        "frontend/src/app/apple-touch-icon.png"
+      ],
+      "7b591514bad39e7d23c9bfc58908528ba0dbe20e9ae43d2856c69032cdfcaaaa": [
+        "frontend/public/company_cover_default.png",
+        "frontend/src/assets/images/company_cover_default.png"
+      ],
+      "352921785f0a0b3cecd49d000d649fb446331830412b8f1ac277d79c8803b35c": [
+        "frontend/public/company_logo_default.png",
+        "frontend/src/assets/images/company_logo_default.png"
+      ],
+      "367221db3af18735e5e89fb6770ee7aae28e27554bdd56d9a394b37d859a69d5": [
+        "frontend/public/favicon-16x16.png",
+        "frontend/public/infohr-icons/favicon-16x16.png",
+        "frontend/src/app/favicon-16x16.png"
+      ],
+      "273177f1728d72a7c6fd256e470466098839dc94b58745074d858f5585c0165b": [
+        "frontend/public/favicon-32x32.png",
+        "frontend/public/infohr-icons/favicon-32x32.png",
+        "frontend/src/app/favicon-32x32.png"
+      ],
+      "08208fc20003f1e6deeddd25da677c482653e0584af16f62bb0a06b14d13fce3": [
+        "frontend/public/favicon.ico",
+        "frontend/public/infohr-icons/favicon.ico",
+        "frontend/src/app/favicon.ico"
+      ],
+      "48c01564b22e0da29eedf002334de02fcdb6b1bb682a04576ca403a52153ece8": [
+        "frontend/public/loading-spinner.gif",
+        "frontend/src/assets/images/loading/loading-spinner.gif"
+      ],
+      "a769dcb3d8929e362ced705dc3b12262fa8693f705365121f68ae751030894e4": [
+        "frontend/public/images/aila/infohr-logo.png",
+        "frontend/public/infohr-icons/logo-brand.png"
+      ],
+      "f8598578acf79ffb1e11b1b51bd7c3b5ffc886613cc5b56f0b01ec4fad02ce86": [
+        "frontend/public/images/cv-avatars/avatar-minimal.jpg",
+        "frontend/public/images/cv-avatars/avatar-nordic.jpg"
+      ]
+    },
+    "usage_sample": {
+      "api/config/static/admin/images/dark-logo-large.png": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 11025
+      },
+      "api/config/static/admin/images/dark-logo-medium.png": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 6003
+      },
+      "api/config/static/admin/images/dark-logo-small.png": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 1890
+      },
+      "api/config/static/admin/images/dark-text-logo.png": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 19446
+      },
+      "api/config/static/admin/images/light-logo-large.png": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 9668
+      },
+      "api/config/static/admin/images/light-logo-medium.png": {
+        "references": [
+          "api/config/templates/admin/base.html",
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 2,
+        "size": 5288
+      },
+      "api/config/static/admin/images/light-logo-small.png": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 1567
+      },
+      "api/config/static/admin/images/light-text-logo.png": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 10754
+      },
+      "api/data/seed_images/articles/ai_interview.jpg": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 190112
+      },
+      "api/data/seed_images/articles/architecture.jpg": {
+        "references": [
+          "api/apps/accounts/management/commands/seeders/career_seeder.py",
+          "api/apps/content/management/commands/seed_articles.py",
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 3,
+        "size": 183702
+      },
+      "api/data/seed_images/articles/architecture.svg": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 1780
+      },
+      "api/data/seed_images/articles/candidate_skills.jpg": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 162125
+      },
+      "api/data/seed_images/articles/construction.jpg": {
+        "references": [
+          "api/apps/accounts/management/commands/seeders/career_seeder.py",
+          "api/apps/content/management/commands/seed_articles.py",
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 3,
+        "size": 131132
+      },
+      "api/data/seed_images/articles/construction.svg": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 2023
+      },
+      "api/data/seed_images/articles/interior.jpg": {
+        "references": [
+          "api/apps/accounts/management/commands/seeders/career_seeder.py",
+          "api/apps/content/management/commands/seed_articles.py",
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 3,
+        "size": 188343
+      },
+      "api/data/seed_images/articles/interior.svg": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 1870
+      },
+      "api/data/seed_images/articles/real_estate.jpg": {
+        "references": [
+          "api/apps/accounts/management/commands/seeders/career_seeder.py",
+          "api/apps/content/management/commands/seed_articles.py",
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 3,
+        "size": 137450
+      },
+      "api/data/seed_images/articles/real_estate.svg": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 1982
+      },
+      "api/data/seed_images/avatars/avatar_1.png": {
+        "references": [
+          "api/apps/accounts/management/commands/seeders/account_seeder.py"
+        ],
+        "ref_count": 1,
+        "size": 62907
+      },
+      "api/data/seed_images/avatars/avatar_2.png": {
+        "references": [
+          "api/apps/accounts/management/commands/seeders/account_seeder.py"
+        ],
+        "ref_count": 1,
+        "size": 58085
+      },
+      "api/data/seed_images/avatars/avatar_3.png": {
+        "references": [
+          "api/apps/accounts/management/commands/seeders/account_seeder.py"
+        ],
+        "ref_count": 1,
+        "size": 55098
+      },
+      "api/data/seed_images/avatars/avatar_4.png": {
+        "references": [
+          "api/apps/accounts/management/commands/seeders/account_seeder.py"
+        ],
+        "ref_count": 1,
+        "size": 66556
+      },
+      "api/data/seed_images/avatars/avatar_5.png": {
+        "references": [
+          "api/apps/accounts/management/commands/seeders/account_seeder.py"
+        ],
+        "ref_count": 1,
+        "size": 47491
+      },
+      "api/data/seed_images/avatars/avatar_6.png": {
+        "references": [
+          "api/apps/accounts/management/commands/seeders/account_seeder.py"
+        ],
+        "ref_count": 1,
+        "size": 71494
+      },
+      "api/data/seed_images/avatars/avatar_7.png": {
+        "references": [
+          "api/apps/accounts/management/commands/seeders/account_seeder.py"
+        ],
+        "ref_count": 1,
+        "size": 63981
+      },
+      "api/data/seed_images/avatars/avatar_8.png": {
+        "references": [
+          "api/apps/accounts/management/commands/seeders/account_seeder.py"
+        ],
+        "ref_count": 1,
+        "size": 58584
+      },
+      "api/data/seed_images/banners/banner_1_web.png": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 109117
+      },
+      "api/data/seed_images/banners/banner_2_web.png": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 83325
+      },
+      "api/data/seed_images/banners/banner_3_web.png": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 99587
+      },
+      "api/data/seed_images/banners/banner_4_web.png": {
+        "references": [
+          "scripts/audit_report_data.json"
+        ],
+        "ref_count": 1,
+        "size": 87655
+      }
+    }
+  },
+  "frontend": {
+    "components_count": 0,
+    "views_count": 0,
+    "services_count": 0,
+    "hooks_count": 0,
+    "utils_count": 0,
+    "stores_count": 0,
+    "types_count": 0,
+    "deep_relative_imports": [
+      {
+        "file": "frontend/src/layouts/components/commons/AccountSwitchMenu/index.tsx",
+        "line": 21,
+        "code": "import { HOST_NAME, ROUTES } from '../../../../configs/constants';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/AccountSwitchMenu/index.tsx",
+        "line": 22,
+        "code": "import { getPreferredLanguage, isEmployerPortalPath } from '../../../../configs/portalRouting';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/AccountSwitchMenu/index.tsx",
+        "line": 23,
+        "code": "import { localizeRoutePath } from '../../../../configs/routeLocalization';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/Header/index.tsx",
+        "line": 16,
+        "code": "import { HOST_NAME, IMAGES, ROUTES } from \"../../../../configs/constants\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/Header/index.tsx",
+        "line": 27,
+        "code": "import { isAdminPortalPath, isEmployerPortalPath } from \"../../../../configs/portalRouting\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/Header/index.tsx",
+        "line": 28,
+        "code": "import { localizeRoutePath } from \"../../../../configs/routeLocalization\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/Header/index.tsx",
+        "line": 33,
+        "code": "import contentService from '../../../../services/contentService';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/LanguageSwitcher/index.tsx",
+        "line": 8,
+        "code": "import { localizeRoutePath } from '../../../../configs/routeLocalization';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/LeftDrawer/index.tsx",
+        "line": 11,
+        "code": "import { confirmModal } from '../../../../utils/sweetalert2Modal';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/LeftDrawer/index.tsx",
+        "line": 12,
+        "code": "import errorHandling from '../../../../utils/errorHandling';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/LeftDrawer/index.tsx",
+        "line": 13,
+        "code": "import { IMAGES, ROUTES } from '../../../../configs/constants';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/LeftDrawer/index.tsx",
+        "line": 14,
+        "code": "import { localizeRoutePath } from '../../../../configs/routeLocalization';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/LeftDrawer/index.tsx",
+        "line": 15,
+        "code": "import { removeUserInfo } from '../../../../redux/userSlice';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/LeftDrawer/index.tsx",
+        "line": 16,
+        "code": "import tokenService from '../../../../services/tokenService';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/LeftDrawer/index.tsx",
+        "line": 18,
+        "code": "import { isEmployerPortalPath } from '../../../../configs/portalRouting';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/LeftDrawer/index.tsx",
+        "line": 19,
+        "code": "import type { ApiError } from '../../../../types/api';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/LeftDrawer/index.tsx",
+        "line": 21,
+        "code": "import type { AppDispatch } from '../../../../redux/store';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/LeftDrawer/index.tsx",
+        "line": 26,
+        "code": "} from '../../../../redux/filterSlice';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/SubHeader/index.tsx",
+        "line": 12,
+        "code": "import commonService from '../../../../services/commonService';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/SubHeader/index.tsx",
+        "line": 14,
+        "code": "import { buildJobPostFilter, searchJobPost } from '../../../../redux/filterSlice';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/SubHeader/index.tsx",
+        "line": 15,
+        "code": "import { ROUTES } from '../../../../configs/constants';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/SubHeader/index.tsx",
+        "line": 16,
+        "code": "import { localizeRoutePath } from '../../../../configs/routeLocalization';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/TopSlide/index.tsx",
+        "line": 18,
+        "code": "import HomeSearch from '../../../../views/components/defaults/HomeSearch';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/TopSlide/index.tsx",
+        "line": 19,
+        "code": "import contentService from '../../../../services/contentService';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/TopSlide/index.tsx",
+        "line": 20,
+        "code": "import { BANNER_TYPES, IMAGES } from '../../../../configs/constants';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/TopSlide/index.tsx",
+        "line": 21,
+        "code": "import type { Banner } from '../../../../types/models';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/UserMenu/index.tsx",
+        "line": 15,
+        "code": "import { confirmModal } from \"../../../../utils/sweetalert2Modal\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/UserMenu/index.tsx",
+        "line": 16,
+        "code": "import errorHandling from \"../../../../utils/errorHandling\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/UserMenu/index.tsx",
+        "line": 18,
+        "code": "import { removeUserInfo } from \"../../../../redux/userSlice\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/UserMenu/index.tsx",
+        "line": 19,
+        "code": "import { setActiveWorkspace } from \"../../../../redux/userSlice\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/UserMenu/index.tsx",
+        "line": 21,
+        "code": "import { HOST_NAME, ROLES_NAME, ROUTES } from \"../../../../configs/constants\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/UserMenu/index.tsx",
+        "line": 22,
+        "code": "import { isAdminPortalPath, isEmployerPortalPath } from \"../../../../configs/portalRouting\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/UserMenu/index.tsx",
+        "line": 23,
+        "code": "import { localizeRoutePath } from \"../../../../configs/routeLocalization\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/UserMenu/index.tsx",
+        "line": 24,
+        "code": "import tokenService from \"../../../../services/tokenService\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/UserMenu/index.tsx",
+        "line": 26,
+        "code": "import type { ApiError } from '../../../../types/api';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/UserMenu/index.tsx",
+        "line": 28,
+        "code": "import type { AppDispatch } from '../../../../redux/store';"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/UserMenu/index.tsx",
+        "line": 33,
+        "code": "} from \"../../../../redux/filterSlice\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/WorkspaceSwitchMenu/index.tsx",
+        "line": 9,
+        "code": "import { HOST_NAME, ROUTES } from \"../../../../configs/constants\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/WorkspaceSwitchMenu/index.tsx",
+        "line": 10,
+        "code": "import { localizeRoutePath } from \"../../../../configs/routeLocalization\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/WorkspaceSwitchMenu/index.tsx",
+        "line": 11,
+        "code": "import { getPreferredLanguage } from \"../../../../configs/portalRouting\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/commons/WorkspaceSwitchMenu/index.tsx",
+        "line": 12,
+        "code": "import { setActiveWorkspace } from \"../../../../redux/userSlice\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/jobSeekers/TabBar/index.tsx",
+        "line": 17,
+        "code": "import { ROUTES, APP_NAME } from \"../../../../configs/constants\";"
+      },
+      {
+        "file": "frontend/src/layouts/components/jobSeekers/TabBar/index.tsx",
+        "line": 18,
+        "code": "import { getLocalizedRouteVariants, localizeRoutePath } from \"../../../../configs/routeLocalization\";"
+      },
+      {
+        "file": "frontend/src/views/adminPages/BannersPage/BannerFormDialog.tsx",
+        "line": 21,
+        "code": "import ImageCropDialog from '../../../components/Common/ImageCropDialog';"
+      },
+      {
+        "file": "frontend/src/views/adminPages/BannersPage/BannerFormDialog.tsx",
+        "line": 22,
+        "code": "import { IMAGES } from '../../../configs/constants';"
+      },
+      {
+        "file": "frontend/src/views/adminPages/BannersPage/BannerFormDialog.tsx",
+        "line": 23,
+        "code": "import type { Banner } from '../../../types/models';"
+      },
+      {
+        "file": "frontend/src/views/adminPages/BannersPage/index.tsx",
+        "line": 7,
+        "code": "import DataTable from '../../../components/Common/DataTable';"
+      },
+      {
+        "file": "frontend/src/views/adminPages/BannersPage/index.tsx",
+        "line": 8,
+        "code": "import { useDataTable } from '../../../hooks';"
+      },
+      {
+        "file": "frontend/src/views/adminPages/BannersPage/index.tsx",
+        "line": 9,
+        "code": "import { Banner } from '../../../types/models';"
+      },
+      {
+        "file": "frontend/src/views/adminPages/BannersPage/index.tsx",
+        "line": 15,
+        "code": "import { compressImageFile } from '../../../utils/imageCompression';"
+      }
+    ],
+    "component_usages_sample": {}
+  },
+  "backend": {
+    "apps": [],
+    "models_count": 0,
+    "serializers_count": 0,
+    "views_count": 0,
+    "services_count": 0,
+    "tasks_count": 0,
+    "seeders_count": 0
+  },
+  "duplicate_filenames": {
+    "conftest.py": [
+      "api/conftest.py",
+      "voice-ai/livekit_agent/tests/conftest.py"
+    ],
+    "seed_jobs.py": [
+      "api/seed_jobs.py",
+      "api/apps/jobs/management/commands/seed_jobs.py"
+    ],
+    "seed_users.py": [
+      "api/seed_users.py",
+      "api/apps/accounts/management/commands/seed_users.py"
+    ],
+    "permissions.py": [
+      "api/apps/accounts/permissions.py",
+      "api/shared/permissions.py"
+    ],
+    "pipeline.py": [
+      "api/apps/accounts/pipeline.py",
+      "api/apps/profiles/pipeline.py"
+    ],
+    "selectors.py": [
+      "api/apps/accounts/selectors.py",
+      "api/apps/chatbot/selectors.py",
+      "api/apps/content/selectors.py",
+      "api/apps/files/selectors.py",
+      "api/apps/interviews/selectors.py",
+      "api/apps/jobs/selectors.py",
+      "api/apps/locations/selectors.py",
+      "api/apps/profiles/selectors.py"
+    ],
+    "services.py": [
+      "api/apps/accounts/services.py",
+      "api/apps/agent_assistants/services.py",
+      "api/apps/chatbot/services.py",
+      "api/apps/content/services.py",
+      "api/apps/files/services.py",
+      "api/apps/hrm/services.py",
+      "api/apps/interviews/services.py",
+      "api/apps/jobs/services.py",
+      "api/apps/locations/services.py",
+      "api/apps/profiles/services.py"
+    ],
+    "tasks.py": [
+      "api/apps/accounts/tasks.py",
+      "api/apps/chatbot/tasks.py",
+      "api/apps/content/tasks.py",
+      "api/apps/files/tasks.py",
+      "api/apps/interviews/tasks.py",
+      "api/apps/jobs/tasks.py",
+      "api/apps/locations/tasks.py",
+      "api/apps/profiles/tasks.py"
+    ],
+    "tests.py": [
+      "api/apps/accounts/tests.py",
+      "api/apps/agent_assistants/tests.py",
+      "api/apps/chatbot/tests.py",
+      "api/apps/content/tests.py",
+      "api/apps/cv_builder/tests.py",
+      "api/apps/hrm/tests.py",
+      "api/apps/interviews/tests.py",
+      "api/apps/jobs/tests.py",
+      "api/apps/profiles/tests.py",
+      "api/common/tests.py",
+      "api/config/tests.py",
+      "api/integrations/ai/tests.py"
+    ],
+    "0001_initial.py": [
+      "api/apps/accounts/migrations/0001_initial.py",
+      "api/apps/agent_assistants/migrations/0001_initial.py",
+      "api/apps/content/migrations/0001_initial.py",
+      "api/apps/cv_builder/migrations/0001_initial.py",
+      "api/apps/files/migrations/0001_initial.py",
+      "api/apps/hrm/migrations/0001_initial.py",
+      "api/apps/interviews/migrations/0001_initial.py",
+      "api/apps/jobs/migrations/0001_initial.py",
+      "api/apps/locations/migrations/0001_initial.py",
+      "api/apps/profiles/migrations/0001_initial.py",
+      "api/common/migrations/0001_initial.py"
+    ],
+    "auto_pipeline_service.py": [
+      "api/apps/jobs/auto_pipeline_service.py",
+      "api/apps/jobs/services/auto_pipeline_service.py"
+    ],
+    "candidate_matching_service.py": [
+      "api/apps/jobs/candidate_matching_service.py",
+      "api/apps/jobs/services/candidate_matching_service.py"
+    ],
+    "documents.py": [
+      "api/apps/jobs/documents.py",
+      "api/apps/profiles/documents.py"
+    ],
+    "exceptions.py": [
+      "api/apps/jobs/exceptions.py",
+      "api/apps/profiles/exceptions.py",
+      "api/shared/exceptions.py"
+    ],
+    "filters.py": [
+      "api/apps/jobs/filters.py",
+      "api/apps/profiles/filters.py"
+    ],
+    "app_views.py": [
+      "api/apps/jobs/views/app_views.py",
+      "api/apps/profiles/views/app_views.py"
+    ],
+    "web_views.py": [
+      "api/apps/jobs/views/web_views.py",
+      "api/apps/profiles/views/web_views.py"
+    ],
+    "eslint.config.js": [
+      "frontend/eslint.config.js",
+      "notebooklm-mcp/eslint.config.js"
+    ],
+    "layout.tsx": [
+      "frontend/src/app/layout.tsx",
+      "frontend/src/app/(candidate)/layout.tsx",
+      "frontend/src/app/admin/layout.tsx",
+      "frontend/src/app/chat/layout.tsx",
+      "frontend/src/app/employer/layout.tsx",
+      "frontend/src/app/employer/interviews/session/[id]/layout.tsx",
+      "frontend/src/app/interview/layout.tsx"
+    ],
+    "loading.tsx": [
+      "frontend/src/app/loading.tsx",
+      "frontend/src/app/(candidate)/loading.tsx"
+    ],
+    "page.tsx": [
+      "frontend/src/app/page.tsx",
+      "frontend/src/app/(candidate)/account/page.tsx",
+      "frontend/src/app/(candidate)/dashboard/page.tsx",
+      "frontend/src/app/(candidate)/my-cvs/page.tsx",
+      "frontend/src/app/(candidate)/my-interviews/page.tsx",
+      "frontend/src/app/(candidate)/my-jobs/page.tsx",
+      "frontend/src/app/(candidate)/profile/page.tsx",
+      "frontend/src/app/(candidate)/ung-vien/danh-sach-mau-cv/page.tsx",
+      "frontend/src/app/(candidate)/ung-vien/quan-ly-cv/page.tsx",
+      "frontend/src/app/(candidate)/ung-vien/trang-tri-cv/page.tsx",
+      "frontend/src/app/about-us/page.tsx",
+      "frontend/src/app/admin/page.tsx",
+      "frontend/src/app/admin/agent-assistants/page.tsx",
+      "frontend/src/app/admin/articles/page.tsx",
+      "frontend/src/app/admin/articles/create/page.tsx",
+      "frontend/src/app/admin/articles/[id]/page.tsx",
+      "frontend/src/app/admin/audit-logs/page.tsx",
+      "frontend/src/app/admin/banner-types/page.tsx",
+      "frontend/src/app/admin/banners/page.tsx",
+      "frontend/src/app/admin/careers/page.tsx",
+      "frontend/src/app/admin/chat/page.tsx",
+      "frontend/src/app/admin/cities/page.tsx",
+      "frontend/src/app/admin/companies/page.tsx",
+      "frontend/src/app/admin/company-verifications/page.tsx",
+      "frontend/src/app/admin/components/page.tsx",
+      "frontend/src/app/admin/contact-messages/page.tsx",
+      "frontend/src/app/admin/dashboard/page.tsx",
+      "frontend/src/app/admin/districts/page.tsx",
+      "frontend/src/app/admin/feedbacks/page.tsx",
+      "frontend/src/app/admin/forgot-password/page.tsx",
+      "frontend/src/app/admin/hrm/page.tsx",
+      "frontend/src/app/admin/hrm/attendances/page.tsx",
+      "frontend/src/app/admin/hrm/contracts/page.tsx",
+      "frontend/src/app/admin/hrm/dashboard/page.tsx",
+      "frontend/src/app/admin/hrm/departments/page.tsx",
+      "frontend/src/app/admin/hrm/employees/page.tsx",
+      "frontend/src/app/admin/hrm/leaves/page.tsx",
+      "frontend/src/app/admin/hrm/onboarding/page.tsx",
+      "frontend/src/app/admin/hrm/org-chart/page.tsx",
+      "frontend/src/app/admin/hrm/payroll/page.tsx",
+      "frontend/src/app/admin/interview-preview/page.tsx",
+      "frontend/src/app/admin/interviews/page.tsx",
+      "frontend/src/app/admin/job-activity/page.tsx",
+      "frontend/src/app/admin/job-notifications/page.tsx",
+      "frontend/src/app/admin/jobs/page.tsx",
+      "frontend/src/app/admin/login/page.tsx",
+      "frontend/src/app/admin/profiles/page.tsx",
+      "frontend/src/app/admin/profiles/[id]/page.tsx",
+      "frontend/src/app/admin/question-groups/page.tsx",
+      "frontend/src/app/admin/questions/page.tsx",
+      "frontend/src/app/admin/reset-password/[token]/page.tsx",
+      "frontend/src/app/admin/resumes/page.tsx",
+      "frontend/src/app/admin/settings/page.tsx",
+      "frontend/src/app/admin/trust-reports/page.tsx",
+      "frontend/src/app/admin/users/page.tsx",
+      "frontend/src/app/admin/voice-profiles/page.tsx",
+      "frontend/src/app/admin/wards/page.tsx",
+      "frontend/src/app/admin/[...slug]/page.tsx",
+      "frontend/src/app/attached-profile/[slug]/page.tsx",
+      "frontend/src/app/blog/page.tsx",
+      "frontend/src/app/blog/[slug]/page.tsx",
+      "frontend/src/app/chat/page.tsx",
+      "frontend/src/app/companies/page.tsx",
+      "frontend/src/app/companies/[slug]/page.tsx",
+      "frontend/src/app/contact/page.tsx",
+      "frontend/src/app/cv/[slug]/page.tsx",
+      "frontend/src/app/cv-builder/page.tsx",
+      "frontend/src/app/cv-builder/[templateId]/page.tsx",
+      "frontend/src/app/cv-templates/page.tsx",
+      "frontend/src/app/danh-sach-mau-cv/page.tsx",
+      "frontend/src/app/email-verification-required/page.tsx",
+      "frontend/src/app/employer/page.tsx",
+      "frontend/src/app/employer/account/page.tsx",
+      "frontend/src/app/employer/agent-assistants/page.tsx",
+      "frontend/src/app/employer/applied-profiles/page.tsx",
+      "frontend/src/app/employer/blog/page.tsx",
+      "frontend/src/app/employer/blog/create/page.tsx",
+      "frontend/src/app/employer/blog/[id]/page.tsx",
+      "frontend/src/app/employer/candidates/page.tsx",
+      "frontend/src/app/employer/candidates/[slug]/page.tsx",
+      "frontend/src/app/employer/chat/page.tsx",
+      "frontend/src/app/employer/company/page.tsx",
+      "frontend/src/app/employer/contact/page.tsx",
+      "frontend/src/app/employer/dashboard/page.tsx",
+      "frontend/src/app/employer/faq/page.tsx",
+      "frontend/src/app/employer/forgot-password/page.tsx",
+      "frontend/src/app/employer/hrm/page.tsx",
+      "frontend/src/app/employer/hrm/attendances/page.tsx",
+      "frontend/src/app/employer/hrm/contracts/page.tsx",
+      "frontend/src/app/employer/hrm/dashboard/page.tsx",
+      "frontend/src/app/employer/hrm/departments/page.tsx",
+      "frontend/src/app/employer/hrm/employees/page.tsx",
+      "frontend/src/app/employer/hrm/leaves/page.tsx",
+      "frontend/src/app/employer/hrm/onboarding/page.tsx",
+      "frontend/src/app/employer/hrm/org-chart/page.tsx",
+      "frontend/src/app/employer/hrm/payroll/page.tsx",
+      "frontend/src/app/employer/interviews/page.tsx",
+      "frontend/src/app/employer/interviews/create/page.tsx",
+      "frontend/src/app/employer/interviews/history/page.tsx",
+      "frontend/src/app/employer/interviews/live/page.tsx",
+      "frontend/src/app/employer/interviews/session/[id]/page.tsx",
+      "frontend/src/app/employer/interviews/[id]/page.tsx",
+      "frontend/src/app/employer/interviews/[id]/edit/page.tsx",
+      "frontend/src/app/employer/introduce/page.tsx",
+      "frontend/src/app/employer/job-posts/page.tsx",
+      "frontend/src/app/employer/legal/[slug]/page.tsx",
+      "frontend/src/app/employer/login/page.tsx",
+      "frontend/src/app/employer/notifications/page.tsx",
+      "frontend/src/app/employer/pricing/page.tsx",
+      "frontend/src/app/employer/privacy-policy/page.tsx",
+      "frontend/src/app/employer/question-bank/page.tsx",
+      "frontend/src/app/employer/question-groups/page.tsx",
+      "frontend/src/app/employer/register/page.tsx",
+      "frontend/src/app/employer/reset-password/[token]/page.tsx",
+      "frontend/src/app/employer/saved-profiles/page.tsx",
+      "frontend/src/app/employer/service/page.tsx",
+      "frontend/src/app/employer/settings/page.tsx",
+      "frontend/src/app/employer/support/page.tsx",
+      "frontend/src/app/employer/terms-and-conditions/page.tsx",
+      "frontend/src/app/employer/terms-of-service/page.tsx",
+      "frontend/src/app/employer/verification/page.tsx",
+      "frontend/src/app/employer/[slug].html/page.tsx",
+      "frontend/src/app/faq/page.tsx",
+      "frontend/src/app/forbidden/page.tsx",
+      "frontend/src/app/forgot-password/page.tsx",
+      "frontend/src/app/gioi-thieu/page.tsx",
+      "frontend/src/app/interview/login/page.tsx",
+      "frontend/src/app/interview/[id]/page.tsx",
+      "frontend/src/app/jobs/page.tsx",
+      "frontend/src/app/jobs/[slug]/page.tsx",
+      "frontend/src/app/jobs-by-career/page.tsx",
+      "frontend/src/app/jobs-by-city/page.tsx",
+      "frontend/src/app/jobs-by-type/page.tsx",
+      "frontend/src/app/legal/[slug]/page.tsx",
+      "frontend/src/app/lien-he/page.tsx",
+      "frontend/src/app/login/page.tsx",
+      "frontend/src/app/my-company/page.tsx",
+      "frontend/src/app/onboarding/candidate/page.tsx",
+      "frontend/src/app/onboarding/employer/page.tsx",
+      "frontend/src/app/online-profile/[slug]/page.tsx",
+      "frontend/src/app/privacy-policy/page.tsx",
+      "frontend/src/app/register/page.tsx",
+      "frontend/src/app/reset-password/[token]/page.tsx",
+      "frontend/src/app/tao-cv/page.tsx",
+      "frontend/src/app/terms-and-conditions/page.tsx",
+      "frontend/src/app/terms-of-service/page.tsx",
+      "frontend/src/app/tin-tuc/page.tsx",
+      "frontend/src/app/tin-tuc/[slug]/page.tsx",
+      "frontend/src/app/[slug].html/page.tsx"
+    ],
+    "page.client.tsx": [
+      "frontend/src/app/attached-profile/[slug]/page.client.tsx",
+      "frontend/src/app/employer/saved-profiles/page.client.tsx",
+      "frontend/src/app/interview/[id]/page.client.tsx"
+    ],
+    "ClientPage.tsx": [
+      "frontend/src/app/companies/[slug]/ClientPage.tsx",
+      "frontend/src/app/jobs/[slug]/ClientPage.tsx"
+    ],
+    "agent-audio-visualizer-aura.tsx": [
+      "frontend/src/components/agents-ui/agent-audio-visualizer-aura.tsx",
+      "frontend/src/components/Features/VoiceAssistant/components/livekit/agent-audio-visualizer-aura.tsx"
+    ],
+    "SpaContentTransition.tsx": [
+      "frontend/src/components/Common/SpaContentTransition.tsx",
+      "frontend/src/components/Commons/SpaContentTransition.tsx"
+    ],
+    "NotificationCardI18n.test.ts": [
+      "frontend/src/components/Features/NotificationCard/__tests__/NotificationCardI18n.test.ts",
+      "frontend/src/views/components/defaults/NotificationCard/__tests__/NotificationCardI18n.test.ts"
+    ],
+    "utils.ts": [
+      "frontend/src/components/Features/VoiceAssistant/utils.ts",
+      "frontend/src/lib/utils.ts"
+    ],
+    "button.tsx": [
+      "frontend/src/components/Features/VoiceAssistant/components/livekit/button.tsx",
+      "frontend/src/components/ui/button.tsx"
+    ],
+    "use-agent-audio-visualizer-aura.ts": [
+      "frontend/src/hooks/agents-ui/use-agent-audio-visualizer-aura.ts",
+      "frontend/src/hooks/AgentsUi/use-agent-audio-visualizer-aura.ts"
+    ],
+    "store.ts": [
+      "frontend/src/redux/store.ts",
+      "frontend/src/types/store.ts"
+    ],
+    "DashboardPage.test.ts": [
+      "frontend/src/views/adminPages/__tests__/DashboardPage.test.ts",
+      "frontend/src/views/employerPages/__tests__/DashboardPage.test.ts",
+      "frontend/src/views/jobSeekerPages/__tests__/DashboardPage.test.ts"
+    ],
+    "CandidateSidebar.tsx": [
+      "frontend/src/views/components/employers/ProfileDetailCard/CandidateSidebar.tsx",
+      "frontend/src/views/components/jobSeekers/CandidateDashboard/CandidateSidebar.tsx"
+    ],
+    "InterviewSessionPage.tsx": [
+      "frontend/src/views/employerPages/InterviewPages/InterviewSessionPage.tsx",
+      "frontend/src/views/interviewPages/InterviewSessionPage.tsx"
+    ],
+    "AccountPage.test.ts": [
+      "frontend/src/views/employerPages/__tests__/AccountPage.test.ts",
+      "frontend/src/views/jobSeekerPages/__tests__/AccountPage.test.ts"
+    ],
+    "sources.ts": [
+      "notebooklm-mcp/src/notebooklm/sources.ts",
+      "notebooklm-mcp/src/tools/definitions/sources.ts"
+    ]
+  },
+  "orphan_files": [
+    "api/apps/accounts/migrations/0004_user_is_verify_phone.py",
+    "api/apps/accounts/tests/test_clear_square_demo_data.py",
+    "api/apps/accounts/tests/test_seed_users_command.py",
+    "api/apps/content/migrations/0010_alter_article_category_alter_banner_is_active_and_more.py",
+    "api/apps/cv_builder/migrations/0002_candidatecv_ai_score_and_review.py",
+    "api/apps/files/migrations/0002_alter_file_file_type.py",
+    "api/apps/hrm/migrations/0004_employeeleavebalance_and_payroll_extensions.py",
+    "api/apps/interviews/migrations/0004_interviewsession_timeline_highlights_and_more.py",
+    "api/apps/jobs/migrations/0012_alter_jobpostactivity_resume_jobofferletter.py",
+    "api/apps/profiles/tests/test_admin_resume_import.py",
+    "frontend/src/components/Common/AdminConfirmDialog/__tests__/AdminConfirmDialog.test.ts",
+    "frontend/src/components/Common/AdminDataGrid/__tests__/AdminDataGrid.test.ts",
+    "frontend/src/components/Common/Charts/__tests__/chartDesignLocale.test.ts",
+    "frontend/src/components/Common/Controls/__tests__/AutocompleteI18n.test.ts",
+    "frontend/src/components/Common/Controls/__tests__/RangePickerCustomI18n.test.ts",
+    "frontend/src/components/Common/Filters/__tests__/GlobalFilter.test.ts",
+    "frontend/src/components/Common/HtmlContent/__tests__/HtmlContentHref.test.ts",
+    "frontend/src/components/Common/Loading/BackdropLoading/__tests__/BackdropLoadingI18n.test.ts",
+    "frontend/src/components/Common/MaintenanceModeScreen/__tests__/MaintenanceModeScreenI18n.test.ts",
+    "frontend/src/components/Common/MuiImageCustom/__tests__/MuiImageCustom.test.ts",
+    "frontend/src/components/Common/Pdf/__tests__/PdfI18n.test.ts",
+    "frontend/src/components/Common/ProfileUploadCard/__tests__/ProfileUploadCardI18n.test.ts",
+    "frontend/src/components/ErrorBoundary/__tests__/ErrorBoundaryI18n.test.ts",
+    "frontend/src/components/Features/AiElements/__tests__/MessageBranchI18n.test.ts",
+    "frontend/src/components/Features/AIServiceHealthBanner/__tests__/AIServiceHealthBannerI18n.test.ts",
+    "frontend/src/components/Features/ApplyCard/__tests__/ApplyCardI18n.test.ts",
+    "frontend/src/components/Features/ApplyForm/__tests__/ApplyFormI18n.test.ts",
+    "frontend/src/components/Features/ApplyForm/__tests__/ApplyFormSchema.test.ts",
+    "frontend/src/components/Features/ChatBot/__tests__/ChatBotI18n.test.ts",
+    "frontend/src/components/Features/ChatCard/__tests__/ChatCardI18n.test.ts",
+    "frontend/src/components/Features/Company/__tests__/CompanyI18n.test.ts",
+    "frontend/src/components/Features/CompanyAction/__tests__/CompanyActionI18n.test.ts",
+    "frontend/src/components/Features/Feedback/__tests__/FeedbackI18n.test.ts",
+    "frontend/src/components/Features/Feedback/__tests__/FeedbackSchema.test.ts",
+    "frontend/src/components/Features/JobHoverPreview/__tests__/JobHoverPreviewCard.test.ts",
+    "frontend/src/components/Features/JobPost/__tests__/JobPostI18n.test.ts",
+    "frontend/src/components/Features/JobPostAction/__tests__/JobPostActionI18n.test.ts",
+    "frontend/src/components/Features/JobPostLarge/__tests__/JobPostLargeI18n.test.ts",
+    "frontend/src/components/Features/JobSalaryInsightCard/__tests__/JobSalaryInsightCardI18n.test.ts",
+    "frontend/src/components/Features/JobSalaryInsightCard/__tests__/salaryInsightFormatting.test.ts",
+    "frontend/src/components/Features/JobSeekerProfile/__tests__/JobSeekerProfileI18n.test.ts",
+    "frontend/src/components/Features/MainJobRightBanner/__tests__/MainJobRightBannerActions.test.ts",
+    "frontend/src/components/Features/TrustReportDialog/__tests__/TrustReportDialogI18n.test.ts",
+    "frontend/src/components/Features/VoiceAssistant/components/livekit/agent-control-bar/__tests__/AgentControlBarI18n.test.ts",
+    "frontend/src/components/Features/VoiceAssistant/__tests__/VoiceAssistantUtils.test.ts",
+    "frontend/src/components/Features/__tests__/ChatRouteLinks.test.ts",
+    "frontend/src/components/Features/__tests__/CompanySizeFallbacks.test.ts",
+    "frontend/src/components/Features/__tests__/HomeFeatureI18n.test.ts",
+    "frontend/src/components/Features/__tests__/PublicDetailLinksRoute.test.ts",
+    "frontend/src/configs/__tests__/apiEndpoints.test.ts",
+    "frontend/src/configs/__tests__/constants.test.ts",
+    "frontend/src/configs/__tests__/portalBreadcrumbs.test.ts",
+    "frontend/src/configs/__tests__/rewriteCompleteness.test.ts",
+    "frontend/src/configs/__tests__/routeConfig.test.ts",
+    "frontend/src/configs/__tests__/routePageExistence.test.ts",
+    "frontend/src/configs/__tests__/routing.test.ts",
+    "frontend/src/hooks/__tests__/useNotifications.test.ts",
+    "frontend/src/hooks/__tests__/useRequireAuthI18n.test.ts",
+    "frontend/src/layouts/AdminLayout/__tests__/AdminLayout.test.ts",
+    "frontend/src/layouts/components/commons/TopSlide/__tests__/TopSlideBannerActions.test.ts",
+    "frontend/src/layouts/components/commons/__tests__/CommonEmployerNavigationRoutes.test.ts",
+    "frontend/src/layouts/components/commons/__tests__/LanguageSwitcherRoutes.test.ts",
+    "frontend/src/layouts/components/commons/__tests__/SubHeaderI18n.test.ts",
+    "frontend/src/layouts/components/commons/__tests__/WorkspacePortalRoutes.test.ts",
+    "frontend/src/layouts/components/employers/Sidebar/__tests__/AdminMenuI18n.test.ts",
+    "frontend/src/layouts/components/employers/Sidebar/__tests__/PortalSidebarRoutes.test.ts",
+    "frontend/src/layouts/components/__tests__/DrawerAriaI18n.test.ts",
+    "frontend/src/layouts/components/__tests__/JobSeekerTabRoutes.test.ts",
+    "frontend/src/layouts/components/__tests__/PortalTabsI18n.test.ts",
+    "frontend/src/layouts/__tests__/PortalAuthRedirectRoutes.test.ts",
+    "frontend/src/lib/__tests__/server-fetch.test.ts",
+    "frontend/src/scripts/generate_exact_badges.py",
+    "frontend/src/scripts/prepare_badges.py",
+    "frontend/src/scripts/process_user_badges.py",
+    "frontend/src/services/__tests__/adminJobService.test.ts",
+    "frontend/src/services/__tests__/adminListServicesResponse.test.ts",
+    "frontend/src/services/__tests__/adminManagementServiceResponse.test.ts",
+    "frontend/src/services/__tests__/adminSettingsService.test.ts",
+    "frontend/src/services/__tests__/agentAssistantService.test.ts",
+    "frontend/src/services/__tests__/aiService.test.ts",
+    "frontend/src/services/__tests__/authService.test.ts",
+    "frontend/src/services/__tests__/chatbotService.test.ts",
+    "frontend/src/services/__tests__/commonService.test.ts",
+    "frontend/src/services/__tests__/contentService.test.ts",
+    "frontend/src/services/__tests__/cvBuilderService.test.ts",
+    "frontend/src/services/__tests__/employerListServicesResponse.test.ts",
+    "frontend/src/services/__tests__/hrmService.test.ts",
+    "frontend/src/services/__tests__/interviewService.test.ts",
+    "frontend/src/services/__tests__/jobPostActivityService.test.ts",
+    "frontend/src/services/__tests__/jobSeekerProfileService.test.ts",
+    "frontend/src/services/__tests__/jobSeekerServicesContracts.test.ts",
+    "frontend/src/services/__tests__/publicJobSeekerListServicesResponse.test.ts",
+    "frontend/src/services/__tests__/resumeDetailServices.test.ts",
+    "frontend/src/services/__tests__/resumeService.test.ts",
+    "frontend/src/services/__tests__/statisticService.test.ts",
+    "frontend/src/services/__tests__/tokenService.test.ts",
+    "frontend/src/services/__tests__/trustReportService.test.ts",
+    "frontend/src/services/__tests__/userService.test.ts",
+    "frontend/src/types/mui-image.d.ts",
+    "frontend/src/utils/__tests__/apiResponse.test.ts",
+    "frontend/src/utils/__tests__/articleContent.test.ts",
+    "frontend/src/utils/__tests__/camelCase.test.ts",
+    "frontend/src/utils/__tests__/customData.test.ts",
+    "frontend/src/utils/__tests__/dateHelper.test.ts",
+    "frontend/src/utils/__tests__/editorUtils.test.ts",
+    "frontend/src/utils/__tests__/errorHandlingI18n.test.ts",
+    "frontend/src/utils/__tests__/funcUtils.test.ts",
+    "frontend/src/utils/__tests__/httpRequest.test.ts",
+    "frontend/src/utils/__tests__/locationForm.test.ts",
+    "frontend/src/utils/__tests__/maintenanceMode.test.ts",
+    "frontend/src/utils/__tests__/notificationRouting.test.ts",
+    "frontend/src/utils/__tests__/params.test.ts",
+    "frontend/src/utils/__tests__/presignUrl.test.ts",
+    "frontend/src/utils/__tests__/safeExternalUrl.test.ts",
+    "frontend/src/utils/__tests__/safeExternalUrlUsage.test.ts",
+    "frontend/src/utils/__tests__/salaryDisplayUsage.test.ts",
+    "frontend/src/utils/__tests__/transformers.test.ts",
+    "frontend/src/views/adminPages/ArticlesPage/__tests__/AdminArticleFormValidation.test.ts",
+    "frontend/src/views/adminPages/ArticlesPage/__tests__/ArticlesPageI18n.test.ts",
+    "frontend/src/views/adminPages/AuditLogsPage/__tests__/AuditLogsPageI18n.test.ts",
+    "frontend/src/views/adminPages/BannersPage/__tests__/bannerFormChoices.test.ts",
+    "frontend/src/views/adminPages/BannerTypesPage/__tests__/bannerTypeFormValidation.test.ts",
+    "frontend/src/views/adminPages/BannerTypesPage/__tests__/BannerTypesPageI18n.test.ts",
+    "frontend/src/views/adminPages/CareersPage/__tests__/careerFormValidation.test.ts",
+    "frontend/src/views/adminPages/ChatPage/__tests__/ChatPageI18n.test.ts",
+    "frontend/src/views/adminPages/CompaniesPage/__tests__/CompanyFormDialogI18n.test.ts",
+    "frontend/src/views/adminPages/CompaniesPage/__tests__/CompanyFormDialogValidation.test.ts",
+    "frontend/src/views/adminPages/CompanyVerificationsPage/__tests__/CompanyVerificationsPageI18n.test.ts",
+    "frontend/src/views/adminPages/DashboardPage/__tests__/DashboardPageI18n.test.ts",
+    "frontend/src/views/adminPages/InterviewsPage/__tests__/InterviewsPageI18n.test.ts",
+    "frontend/src/views/adminPages/JobActivityPage/__tests__/applicationStatus.test.ts",
+    "frontend/src/views/adminPages/JobNotificationsPage/__tests__/JobNotificationFormValidation.test.ts",
+    "frontend/src/views/adminPages/JobNotificationsPage/__tests__/JobNotificationFrequencyContract.test.ts",
+    "frontend/src/views/adminPages/JobsPage/__tests__/JobsPageI18n.test.ts",
+    "frontend/src/views/adminPages/ResumesPage/__tests__/ResumesPageFileActions.test.ts",
+    "frontend/src/views/adminPages/SettingsPage/__tests__/SettingsPageI18n.test.ts",
+    "frontend/src/views/adminPages/UsersPage/__tests__/ScheduleInterviewDialog.test.ts",
+    "frontend/src/views/adminPages/VoiceProfilesPage/__tests__/voiceProfileFormValidation.test.ts",
+    "frontend/src/views/adminPages/VoiceProfilesPage/__tests__/VoiceProfilesPageI18n.test.ts",
+    "frontend/src/views/adminPages/__tests__/AdminBreadcrumbAriaI18n.test.ts",
+    "frontend/src/views/adminPages/__tests__/AdminCamelizedResponseFields.test.ts",
+    "frontend/src/views/adminPages/__tests__/AdminCrudHooksI18n.test.ts",
+    "frontend/src/views/adminPages/__tests__/AdminListFiltersI18n.test.ts",
+    "frontend/src/views/adminPages/__tests__/AdminLocationFormValidation.test.ts",
+    "frontend/src/views/adminPages/__tests__/AdminOrderingContract.test.ts",
+    "frontend/src/views/adminPages/__tests__/AdminPublicDetailLinks.test.ts",
+    "frontend/src/views/adminPages/__tests__/AuditLogsPage.test.ts",
+    "frontend/src/views/adminPages/__tests__/CareersAndLocationsPage.test.ts",
+    "frontend/src/views/adminPages/__tests__/CompaniesPage.test.ts",
+    "frontend/src/views/adminPages/__tests__/CompanyVerificationsPage.test.ts",
+    "frontend/src/views/adminPages/__tests__/DashboardPage.test.ts",
+    "frontend/src/views/adminPages/__tests__/InterviewPreviewPageI18n.test.ts",
+    "frontend/src/views/adminPages/__tests__/JobsPage.test.ts",
+    "frontend/src/views/adminPages/__tests__/ProfileDetailPageI18n.test.ts",
+    "frontend/src/views/adminPages/__tests__/ProfilesPageFilters.test.ts",
+    "frontend/src/views/adminPages/__tests__/ProfilesPageI18n.test.ts",
+    "frontend/src/views/adminPages/__tests__/ProfilesPageImportPersistence.test.ts",
+    "frontend/src/views/adminPages/__tests__/ResumesPage.test.ts",
+    "frontend/src/views/adminPages/__tests__/SettingsPage.test.ts",
+    "frontend/src/views/adminPages/__tests__/UsersPage.test.ts",
+    "frontend/src/views/agentAssistantPage/__tests__/AgentAssistantPageI18n.test.ts",
+    "frontend/src/views/authPages/__tests__/AdminLoginRoutes.test.ts",
+    "frontend/src/views/authPages/__tests__/ResetPasswordPageI18n.test.ts",
+    "frontend/src/views/cvBuilderPages/__tests__/cvBuilderPages.test.ts",
+    "frontend/src/views/defaultPages/HomePage/__tests__/HomePageI18n.test.ts",
+    "frontend/src/views/defaultPages/HomePage/__tests__/PublicSearchRoutes.test.ts",
+    "frontend/src/views/defaultPages/JobDetailPage/__tests__/JobDetailPageResponsive.test.ts",
+    "frontend/src/views/defaultPages/NewsPage/__tests__/NewsPageI18n.test.ts",
+    "frontend/src/views/defaultPages/NewsPage/__tests__/NewsPageRoutes.test.ts",
+    "frontend/src/views/defaultPages/StaticInfoPage/__tests__/StaticInfoPageI18n.test.ts",
+    "frontend/src/views/defaultPages/__tests__/PublicDetailActionsI18n.test.ts",
+    "frontend/src/views/employerPages/BlogPage/__tests__/BlogPageI18n.test.ts",
+    "frontend/src/views/employerPages/CompanyPage/__tests__/CompanyPageI18n.test.ts",
+    "frontend/src/views/employerPages/InterviewPages/hooks/__tests__/useInterviewSSE.test.ts",
+    "frontend/src/views/employerPages/InterviewPages/__tests__/InterviewHistoryPageI18n.test.ts",
+    "frontend/src/views/employerPages/InterviewPages/__tests__/InterviewLivePageFocus.test.ts",
+    "frontend/src/views/employerPages/VerificationPage/__tests__/VerificationPageValidation.test.ts",
+    "frontend/src/views/employerPages/__tests__/AccountPage.test.ts",
+    "frontend/src/views/employerPages/__tests__/CompanyPage.test.ts",
+    "frontend/src/views/employerPages/__tests__/DashboardPage.test.ts",
+    "frontend/src/views/employerPages/__tests__/JobPostPage.test.ts",
+    "frontend/src/views/employerPages/__tests__/ProfileAppliedPage.test.ts",
+    "frontend/src/views/employerPages/__tests__/SavedProfilePage.test.ts",
+    "frontend/src/views/employerPages/__tests__/SettingPage.test.ts",
+    "frontend/src/views/employerPages/__tests__/VerificationPage.test.ts",
+    "frontend/src/views/hrmPages/__tests__/HrmArchitecture.test.ts",
+    "frontend/src/views/interviewPages/__tests__/AIInterviewLayoutI18n.test.ts",
+    "frontend/src/views/interviewPages/__tests__/InterviewSessionPageI18n.test.ts",
+    "frontend/src/views/interviewPages/__tests__/livekitParticipant.test.ts",
+    "frontend/src/views/interviewPages/__tests__/useInterviewMessages.test.ts",
+    "frontend/src/views/jobSeekerPages/__tests__/AccountPage.test.ts",
+    "frontend/src/views/jobSeekerPages/__tests__/AttachedProfilePage.test.ts",
+    "frontend/src/views/jobSeekerPages/__tests__/CandidateLoginPage.test.ts",
+    "frontend/src/views/jobSeekerPages/__tests__/DashboardPage.test.ts",
+    "frontend/src/views/jobSeekerPages/__tests__/MyCompanyPage.test.ts",
+    "frontend/src/views/jobSeekerPages/__tests__/MyInterviewsPage.test.ts",
+    "frontend/src/views/jobSeekerPages/__tests__/OnlineProfilePage.test.ts",
+    "frontend/src/views/jobSeekerPages/__tests__/ProfilePage.test.ts",
+    "frontend/src/views/jobSeekerPages/__tests__/ProjectPage.test.ts",
+    "frontend/src/views/onboardingPages/CandidateOnboardingPage/__tests__/CandidateOnboardingFlow.test.ts",
+    "frontend/src/views/onboardingPages/CandidateOnboardingPage/__tests__/CandidateOnboardingSchema.test.ts",
+    "frontend/src/views/onboardingPages/EmployerOnboardingPage/__tests__/EmployerOnboardingFlow.test.ts",
+    "frontend/src/views/onboardingPages/EmployerOnboardingPage/__tests__/EmployerOnboardingSchema.test.ts"
+  ],
+  "debug_findings_summary": {
+    "console.log": 3,
+    "TODO/FIXME": 2
+  },
+  "debug_findings_samples": [
+    {
+      "file": "frontend/src/app/tin-tuc/[slug]/page.tsx",
+      "line": 14,
+      "type": "console.log",
+      "code": "console.log('[generateMetadata tin-tuc/[slug]] fetching slug:', slug);"
+    },
+    {
+      "file": "frontend/src/app/tin-tuc/[slug]/page.tsx",
+      "line": 16,
+      "type": "console.log",
+      "code": "console.log('[generateMetadata tin-tuc/[slug]] fetched article:', article ? article.title : 'NULL');"
+    },
+    {
+      "file": "frontend/src/i18n/locales/en/employer.json",
+      "line": 1435,
+      "type": "TODO/FIXME",
+      "code": "\"TODO\": \"To do\","
+    },
+    {
+      "file": "frontend/src/i18n/locales/vi/employer.json",
+      "line": 1435,
+      "type": "TODO/FIXME",
+      "code": "\"TODO\": \"C\u1ea7n l\u00e0m\","
+    },
+    {
+      "file": "frontend/src/mocks/initMock.ts",
+      "line": 30,
+      "type": "console.log",
+      "code": "console.log('\ud83d\udca1 [Mock Mode] Initializing Axios Mock Adapter with rich sample data...');"
+    }
+  ]
+}

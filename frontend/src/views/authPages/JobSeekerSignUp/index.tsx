@@ -5,30 +5,30 @@ import { useRouter } from 'next/navigation';
 
 import { useTranslation } from 'react-i18next';
 
-import { TabTitle } from '../../../utils/generalFunction';
+import { TabTitle } from '@/utils/generalFunction';
 
-import { PLATFORM, ROLES_NAME, ROUTES, AUTH_CONFIG, AUTH_PROVIDER } from '../../../configs/constants';
+import { PLATFORM, ROLES_NAME, ROUTES, AUTH_CONFIG, AUTH_PROVIDER } from '@/configs/constants';
 
-import errorHandling from '../../../utils/errorHandling';
+import errorHandling from '@/utils/errorHandling';
 
-import { updateVerifyEmail } from '../../../redux/authSlice';
+import { updateVerifyEmail } from '@/redux/authSlice';
 
-import { getUserInfo } from '../../../redux/userSlice';
+import { getUserInfo } from '@/redux/userSlice';
 
-import authService from '../../../services/authService';
+import authService from '@/services/authService';
 
-import JobSeekerSignUpForm from '../../components/auths/JobSeekerSignUpForm';
+import JobSeekerSignUpForm from '@/views/components/auths/JobSeekerSignUpForm';
 
-import { useAppDispatch } from '../../../hooks/useAppStore';
+import { useAppDispatch } from '@/hooks/useAppStore';
 
-import type { RoleName, AuthProvider } from '../../../types/auth';
+import type { RoleName, AuthProvider } from '@/types/auth';
 
 import type { AxiosError } from 'axios';
 
-import tokenService from '../../../services/tokenService';
+import tokenService from '@/services/tokenService';
 
-import { JobSeekerSignUpFormData } from '../../components/auths/JobSeekerSignUpForm';
-import type { JobSeekerRegisterData } from '../../../types/auth';
+import { JobSeekerSignUpFormData } from '@/views/components/auths/JobSeekerSignUpForm';
+import type { JobSeekerRegisterData } from '@/types/auth';
 import type { CodeResponse } from '@react-oauth/google';
 import JobSeekerSignUpView from './JobSeekerSignUpView';
 

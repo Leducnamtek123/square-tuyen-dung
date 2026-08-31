@@ -17,12 +17,12 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import CollectionsOutlinedIcon from '@mui/icons-material/CollectionsOutlined';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import { compressImageFiles } from '../../../../utils/imageCompression';
-import ImageCropDialog from '../../../../components/Common/ImageCropDialog';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import { compressImageFiles } from '@/utils/imageCompression';
+import ImageCropDialog from '@/components/Common/ImageCropDialog';
 import { useCompanyImages, useCompanyImageMutations } from '../hooks/useEmployerQueries';
 
 interface FileItem {

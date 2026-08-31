@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next';
 import { Card, Button, Stack, IconButton, Box, Grid2 as Grid } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import InputBaseSearchCompanyCustom from '../../../../components/Common/Controls/InputBaseSearchCompanyCustom';
-import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
-import { resetSearchCompany, searchCompany, type CompanyFilter } from '../../../../redux/filterSlice';
-import { useAppDispatch, useAppSelector } from '../../../../hooks/useAppStore';
+import InputBaseSearchCompanyCustom from '@/components/Common/Controls/InputBaseSearchCompanyCustom';
+import SingleSelectSearchCustom from '@/components/Common/Controls/SingleSelectSearchCustom';
+import { resetSearchCompany, searchCompany, type CompanyFilter } from '@/redux/filterSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/useAppStore';
 import { useConfig } from '@/hooks/useConfig';
 
 const CompanySearch = () => {

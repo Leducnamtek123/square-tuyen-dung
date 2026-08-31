@@ -4,13 +4,13 @@ import { Box, Stack, IconButton, Typography, Avatar, Button } from "@mui/materia
 import { useTranslation } from 'react-i18next';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import toastMessages from '../../../../utils/toastMessages';
-import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
-import { deleteAvatar, updateAvatar } from '../../../../redux/userSlice';
-import { compressImageFile } from '../../../../utils/imageCompression';
-import ImageCropDialog from '../../../../components/Common/ImageCropDialog';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import toastMessages from '@/utils/toastMessages';
+import MuiImageCustom from '@/components/Common/MuiImageCustom';
+import { deleteAvatar, updateAvatar } from '@/redux/userSlice';
+import { compressImageFile } from '@/utils/imageCompression';
+import ImageCropDialog from '@/components/Common/ImageCropDialog';
 
 const AvatarCard = () => {
   const { t } = useTranslation('auth');

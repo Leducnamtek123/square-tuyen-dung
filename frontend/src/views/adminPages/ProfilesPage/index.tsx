@@ -33,17 +33,17 @@ import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-import DataTable from '../../../components/Common/DataTable';
-import TextFieldCustom from '../../../components/Common/Controls/TextFieldCustom';
-import SingleSelectCustom from '../../../components/Common/Controls/SingleSelectCustom';
+import DataTable from '@/components/Common/DataTable';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
+import SingleSelectCustom from '@/components/Common/Controls/SingleSelectCustom';
 import { useConfig } from '@/hooks/useConfig';
-import { useDataTable, useDebounce } from '../../../hooks';
-import { JobSeekerProfile } from '../../../types/models';
-import dayjs from '../../../configs/dayjs-config';
-import { ROUTES } from '../../../configs/routeConfig';
-import { formatRoute } from '../../../utils/funcUtils';
-import adminManagementService, { Vieclam24hSourceOccupation } from '../../../services/adminManagementService';
-import type { Vieclam24hImportJob } from '../../../services/adminManagementService';
+import { useDataTable, useDebounce } from '@/hooks';
+import { JobSeekerProfile } from '@/types/models';
+import dayjs from '@/configs/dayjs-config';
+import { ROUTES } from '@/configs/routeConfig';
+import { formatRoute } from '@/utils/funcUtils';
+import adminManagementService, { Vieclam24hSourceOccupation } from '@/services/adminManagementService';
+import type { Vieclam24hImportJob } from '@/services/adminManagementService';
 import { useProfiles } from './hooks/useProfiles';
 
 const IMPORT_JOB_STORAGE_KEY = 'admin-profiles-vieclam24h-import-job-id';

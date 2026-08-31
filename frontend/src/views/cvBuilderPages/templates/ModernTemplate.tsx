@@ -33,8 +33,9 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
               fullName={personalInfo.fullName}
               size={110}
               borderRadius={avatarRadius}
-              borderColor={primaryColor}
-              borderWidth={3}
+              borderColor="#ffffff"
+              borderWidth={2}
+              className="shadow-md ring-1 ring-slate-200"
             />
           </div>
         )}

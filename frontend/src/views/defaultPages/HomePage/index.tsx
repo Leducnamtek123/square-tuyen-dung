@@ -29,24 +29,26 @@ import EngineeringIcon from '@mui/icons-material/Engineering';
 import SearchIcon from '@mui/icons-material/Search';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import WeekendIcon from '@mui/icons-material/Weekend';
-import { ROLES_NAME, ROUTES } from '../../../configs/constants';
-import { localizeRoutePath } from '../../../configs/routeLocalization';
-import useSEO from '../../../hooks/useSEO';
-import useStructuredData from '../../../hooks/useStructuredData';
-import TopCompanyCarousel from '../../../components/Features/TopCompanyCarousel';
-import CareerCarousel from '../../../components/Features/CareerCarousel';
-import FeedbackCarousel from '../../../components/Features/FeedbackCarousel';
-import CareerHandbookSection from '../../../components/Features/CareerHandbookSection';
-import JobByCategory from '../../components/defaults/JobByCategory';
-import FilterJobPostCard from '../../components/defaults/FilterJobPostCard';
-import SuggestedJobPostCard from '../../components/defaults/SuggestedJobPostCard';
-import CareerJobPostTabs from '../../components/defaults/CareerJobPostTabs';
-import commonService from '../../../services/commonService';
-import bannerExplorePcImport from '../../../assets/images/banner-explore-pc.webp';
-import bannerExploreGirlImport from '../../../assets/images/banner-explore-girl.webp';
-import { useAppSelector } from '../../../hooks/useAppStore';
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import { ROLES_NAME, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import useSEO from '@/hooks/useSEO';
+import useStructuredData from '@/hooks/useStructuredData';
+import TopCompanyCarousel from '@/components/Features/TopCompanyCarousel';
+import CareerCarousel from '@/components/Features/CareerCarousel';
+import FeedbackCarousel from '@/components/Features/FeedbackCarousel';
+import CareerHandbookSection from '@/components/Features/CareerHandbookSection';
+import JobByCategory from '@/views/components/defaults/JobByCategory';
+import FilterJobPostCard from '@/views/components/defaults/FilterJobPostCard';
+import SuggestedJobPostCard from '@/views/components/defaults/SuggestedJobPostCard';
+import CareerJobPostTabs from '@/views/components/defaults/CareerJobPostTabs';
+import commonService from '@/services/commonService';
+import bannerExplorePcImport from '@/assets/images/banner-explore-pc.webp';
+import bannerExploreGirlImport from '@/assets/images/banner-explore-girl.webp';
+import { useAppSelector } from '@/hooks/useAppStore';
 import type { SvgIconComponent } from '@mui/icons-material';
-import LazyLoadSection from '../../../components/Common/LazyLoadSection';
+import LazyLoadSection from '@/components/Common/LazyLoadSection';
 import type { TFunction } from 'i18next';
 import type { Career } from '@/types/models';
 
@@ -134,6 +136,7 @@ interface EntryPointCardProps {
   accent: string;
   statusBadge?: {
     text: string;
+    icon?: React.ReactNode;
   };
 }
 
@@ -202,6 +205,7 @@ const EntryPointCard = ({
 
           {statusBadge && (
             <Chip
+              icon={statusBadge.icon ? (statusBadge.icon as React.ReactElement) : undefined}
               label={statusBadge.text}
               size="small"
               sx={{
@@ -594,7 +598,10 @@ export default function HomePage() {
               ctaLabel={t('home.candidateCta')}
               href={jobsHref}
               accent="#2563eb"
-              statusBadge={{ text: '🔥 +450 việc làm mới cập nhật hôm nay' }}
+              statusBadge={{
+                icon: <LocalFireDepartmentIcon sx={{ fontSize: '15px !important', color: '#ea580c !important' }} />,
+                text: t('home.candidateStatusBadge'),
+              }}
             />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }} className="gsap-entry-card">
@@ -610,7 +617,10 @@ export default function HomePage() {
               ctaLabel={t('home.employerCta')}
               href={employerIntroHref}
               accent="#0f766e"
-              statusBadge={{ text: '⚡ AI Matching 98.4% chuẩn xác' }}
+              statusBadge={{
+                icon: <AutoAwesomeIcon sx={{ fontSize: '15px !important', color: '#0f766e !important' }} />,
+                text: t('home.employerStatusBadge'),
+              }}
             />
           </Grid>
         </Grid>

@@ -4,22 +4,22 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
-import DataTable from '../../../components/Common/DataTable';
-import { useDataTable } from '../../../hooks';
-import { Banner } from '../../../types/models';
+import DataTable from '@/components/Common/DataTable';
+import { useDataTable } from '@/hooks';
+import { Banner } from '@/types/models';
 import { useBanners } from './hooks/useBanners';
 import { useBannerTypes } from '../BannerTypesPage/hooks/useBannerTypes';
 import BannerFormDialog from './BannerFormDialog';
 import BannerDeleteDialog from './BannerDeleteDialog';
 import { useBannersPageColumns } from './useBannersPageColumns';
-import { compressImageFile } from '../../../utils/imageCompression';
+import { compressImageFile } from '@/utils/imageCompression';
 import {
   getBannerFormValidationErrors,
   normalizeBannerFormChoices,
   type BannerFormData,
   type BannerFormValidationErrors,
 } from './bannerFormChoices';
-import toastMessages from '../../../utils/toastMessages';
+import toastMessages from '@/utils/toastMessages';
 
 type BannersPageState = {
   openDialog: boolean;

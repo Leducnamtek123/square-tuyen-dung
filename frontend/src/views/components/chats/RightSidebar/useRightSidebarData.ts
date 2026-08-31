@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { ChatContext } from '../../../../context/ChatProvider';
-import { addDocument, checkChatRoomExists, checkExists, createUser } from '../../../../services/firebaseService';
-import { RootState } from '../../../../redux/store';
-import { normalizePaginatedResponse } from '../../../../utils/apiResponse';
-import type { ChatAccountData, ChatRoomDocument } from '../../../../services/firebaseService';
+import { ChatContext } from '@/context/ChatProvider';
+import { addDocument, checkChatRoomExists, checkExists, createUser } from '@/services/firebaseService';
+import { RootState } from '@/redux/store';
+import { normalizePaginatedResponse } from '@/utils/apiResponse';
+import type { ChatAccountData, ChatRoomDocument } from '@/services/firebaseService';
 
 export type UserDataPayload = ChatAccountData;
 

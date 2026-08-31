@@ -1,11 +1,11 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import sanitizeHtml from "../../../../utils/sanitizeHtml";
+import sanitizeHtml from "@/utils/sanitizeHtml";
 import HtmlContent from '@/components/Common/HtmlContent';
 
 import JobDetailInfoItem from "./JobDetailInfoItem";
 
-import type { JobPost, SystemConfig } from '../../../../types/models';
+import type { JobPost, SystemConfig } from '@/types/models';
 import type { Company } from '@/types/models';
 
 interface JobDetailDescriptionCardProps {

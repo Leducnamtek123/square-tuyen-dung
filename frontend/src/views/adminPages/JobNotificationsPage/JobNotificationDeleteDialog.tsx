@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 import type { TFunction } from 'i18next';
-import type { JobPostNotification } from '../../../types/models';
+import type { JobPostNotification } from '@/types/models';
 
 type JobNotificationDeleteDialogProps = {
   open: boolean;
