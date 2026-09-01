@@ -96,6 +96,9 @@ export interface CandidateDraft {
   careerId?: number | string;
   cityId?: number | string;
   typeOfWorkplace?: number;
+  address?: string;
+  lat?: number | string | null;
+  lng?: number | string | null;
   salaryMin?: number;
   salaryMax?: number;
   expectedSalary?: number;

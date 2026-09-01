@@ -79,11 +79,14 @@ class GetOnboardingStatusView(APIView):
                 if not skill_names and resume.skills_summary:
                     skill_names = [s.strip() for s in resume.skills_summary.split(',') if s.strip()]
 
-                file_obj = resume.file
+                loc = getattr(profile, 'location', None) if profile else None
                 candidate_draft = {
                     "desiredJobTitle": resume.title or "",
                     "careerId": resume.career_id,
                     "cityId": resume.city_id,
+                    "address": loc.address if loc else (profile.contact_address if profile else ""),
+                    "lat": float(loc.lat) if (loc and loc.lat is not None) else None,
+                    "lng": float(loc.lng) if (loc and loc.lng is not None) else None,
                     "typeOfWorkplace": resume.type_of_workplace if resume.type_of_workplace is not None else 1,
                     "salaryMin": int(resume.salary_min) if resume.salary_min is not None else 0,
                     "salaryMax": int(resume.salary_max) if resume.salary_max is not None else 0,
@@ -211,6 +214,35 @@ class CandidateStepSaveView(APIView):
                     resume.city = City.objects.get(id=city_id)
                 except City.DoesNotExist:
                     pass
+
+        # Handle candidate precise location & address
+        if "address" in data or "lat" in data or "lng" in data:
+            profile, _ = JobSeekerProfile.objects.get_or_create(user=user)
+            address_val = data.get("address")
+            lat_val = data.get("lat")
+            lng_val = data.get("lng")
+            if address_val or lat_val is not None or lng_val is not None:
+                if not profile.location:
+                    profile.location = Location.objects.create(
+                        address=address_val or "",
+                        lat=lat_val if lat_val is not None else None,
+                        lng=lng_val if lng_val is not None else None,
+                        city_id=city_id if "cityId" in data else None
+                    )
+                else:
+                    if address_val is not None:
+                        profile.location.address = address_val
+                    if lat_val is not None:
+                        profile.location.lat = lat_val
+                    if lng_val is not None:
+                        profile.location.lng = lng_val
+                    if "cityId" in data and data.get("cityId"):
+                        profile.location.city_id = data.get("cityId")
+                    profile.location.save()
+                if address_val:
+                    profile.contact_address = address_val
+                profile.save()
+
         if "typeOfWorkplace" in data:
             resume.type_of_workplace = data.get("typeOfWorkplace")
 
@@ -319,7 +351,32 @@ class CandidateOnboardingView(APIView):
         phone = data.get("phone")
         if phone:
             profile.phone = phone
-            profile.save()
+
+        address_val = data.get("address")
+        lat_val = data.get("lat")
+        lng_val = data.get("lng")
+        if address_val or lat_val is not None or lng_val is not None:
+            if not profile.location:
+                profile.location = Location.objects.create(
+                    address=address_val or "",
+                    lat=lat_val if lat_val is not None else None,
+                    lng=lng_val if lng_val is not None else None,
+                    city_id=city_id
+                )
+            else:
+                if address_val is not None:
+                    profile.location.address = address_val
+                if lat_val is not None:
+                    profile.location.lat = lat_val
+                if lng_val is not None:
+                    profile.location.lng = lng_val
+                if city_id:
+                    profile.location.city_id = city_id
+                profile.location.save()
+            if address_val:
+                profile.contact_address = address_val
+
+        profile.save()
 
         # 2. Get or create Resume
         resume = Resume.objects.filter(user=user).first()

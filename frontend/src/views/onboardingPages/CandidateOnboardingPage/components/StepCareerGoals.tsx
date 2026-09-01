@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Grid2 as Grid,
@@ -22,6 +22,8 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import HomeWorkOutlinedIcon from '@mui/icons-material/HomeWorkOutlined';
 import PublicIcon from '@mui/icons-material/Public';
+import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
+import LocationPicker from '@/components/Common/LocationPicker';
 import { useTranslation } from 'react-i18next';
 import type { CandidateStep1Values } from '../schemas/candidateOnboardingSchema';
 import type { SelectOption } from '@/types/models';
@@ -42,6 +44,7 @@ export default function StepCareerGoals({
   citiesList,
 }: StepCareerGoalsProps) {
   const { t } = useTranslation('jobSeeker');
+  const [showMap, setShowMap] = useState<boolean>(Boolean(values.address || values.lat));
 
   const workplaceOptions = [
     { value: 1, label: t('onboarding.step1.workplaceOnsite', 'Tại văn phòng (Onsite)'), icon: <ApartmentIcon fontSize="small" /> },
@@ -220,7 +223,82 @@ export default function StepCareerGoals({
             })}
           </Grid>
         </Grid>
+
+        {/* Field 5: Optional Precise Location Map Picker */}
+        <Grid size={{ xs: 12 }}>
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: '12px',
+              backgroundColor: '#F8FAFC',
+              border: '1px solid #E2E8F0',
+            }}
+          >
+            <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent="space-between" spacing={1.5}>
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '8px',
+                    backgroundColor: '#EFF6FF',
+                    color: '#2563EB',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <MapOutlinedIcon fontSize="small" />
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B' }}>
+                    {t('onboarding.step1.mapTitle', 'Định vị khu vực làm việc mong muốn trên bản đồ')}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block' }}>
+                    {t('onboarding.step1.mapSubtitle', 'Tùy chọn: Giúp hệ thống ưu tiên đề xuất việc làm gần bạn nhất trong bán kính thuận tiện di chuyển')}
+                  </Typography>
+                </Box>
+              </Stack>
+
+              <ButtonBase
+                onClick={() => setShowMap((prev) => !prev)}
+                sx={{
+                  color: showMap ? '#DC2626' : '#2563EB',
+                  fontWeight: 700,
+                  fontSize: '0.8125rem',
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  alignSelf: { xs: 'flex-end', sm: 'center' },
+                }}
+              >
+                {showMap ? t('onboarding.step1.hideMap', 'Ẩn bản đồ') : t('onboarding.step1.showMap', '+ Mở bản đồ định vị')}
+              </ButtonBase>
+            </Stack>
+
+            {showMap && (
+              <Box sx={{ mt: 2, borderRadius: '10px', overflow: 'hidden', border: '1px solid #E2E8F0' }}>
+                <LocationPicker
+                  value={{
+                    address: values.address || '',
+                    lat: values.lat !== null && values.lat !== undefined ? Number(values.lat) : undefined,
+                    lng: values.lng !== null && values.lng !== undefined ? Number(values.lng) : undefined,
+                  }}
+                  onChange={(loc) => {
+                    if (loc.address !== undefined) onChange('address', loc.address);
+                    if (loc.lat !== undefined && loc.lat !== null) onChange('lat', loc.lat);
+                    if (loc.lng !== undefined && loc.lng !== null) onChange('lng', loc.lng);
+                  }}
+                  label={t('onboarding.step1.mapPickerLabel', 'Ghim vị trí ưu tiên làm việc trên bản đồ')}
+                  height="280px"
+                />
+              </Box>
+            )}
+          </Box>
+        </Grid>
       </Grid>
     </Box>
   );
 }
+

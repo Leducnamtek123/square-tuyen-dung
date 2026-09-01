@@ -51,14 +51,14 @@ export default function EmployerStepper({ activeStep, steps }: EmployerStepperPr
 
   return (
     <Box sx={{ mb: 4.5, width: '100%' }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ position: 'relative' }}>
+      <Stack direction="row" alignItems="flex-start" justifyContent="space-between" sx={{ position: 'relative' }}>
         {/* Background Connecting Line */}
         <Box
           sx={{
             position: 'absolute',
             top: 18,
-            left: '5%',
-            right: '5%',
+            left: '6%',
+            right: '6%',
             height: 2,
             backgroundColor: '#E2E8F0',
             zIndex: 0,
@@ -69,8 +69,8 @@ export default function EmployerStepper({ activeStep, steps }: EmployerStepperPr
           sx={{
             position: 'absolute',
             top: 18,
-            left: '5%',
-            width: `${(activeStep / (totalSteps - 1)) * 90}%`,
+            left: '6%',
+            width: `${(activeStep / (totalSteps - 1)) * 88}%`,
             height: 2,
             backgroundColor: '#2563EB',
             transition: 'width 0.3s ease',
@@ -86,19 +86,19 @@ export default function EmployerStepper({ activeStep, steps }: EmployerStepperPr
             <Stack
               key={stepLabel}
               alignItems="center"
-              spacing={1}
-              sx={{ zIndex: 1, minWidth: { xs: 48, sm: 80 }, cursor: 'default' }}
+              spacing={1.25}
+              sx={{ zIndex: 1, minWidth: { xs: 60, sm: 90 }, maxWidth: { xs: 80, sm: 120 }, cursor: 'default' }}
             >
               <Box
                 sx={{
-                  width: { xs: 32, sm: 36 },
-                  height: { xs: 32, sm: 36 },
+                  width: 36,
+                  height: 36,
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontWeight: 700,
-                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  fontSize: '0.875rem',
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                   backgroundColor: isCompleted ? '#10B981' : isActive ? '#2563EB' : '#FFFFFF',
                   color: isCompleted || isActive ? '#FFFFFF' : '#64748B',
@@ -112,9 +112,10 @@ export default function EmployerStepper({ activeStep, steps }: EmployerStepperPr
                     : isCompleted
                     ? '0 0 0 4px rgba(16, 185, 129, 0.12)'
                     : 'none',
+                  flexShrink: 0,
                 }}
               >
-                {isCompleted ? <CheckIcon sx={{ fontSize: { xs: 16, sm: 20 } }} /> : index + 1}
+                {isCompleted ? <CheckIcon sx={{ fontSize: 20 }} /> : index + 1}
               </Box>
 
               <Typography
@@ -123,10 +124,12 @@ export default function EmployerStepper({ activeStep, steps }: EmployerStepperPr
                   fontWeight: isActive ? 700 : 500,
                   color: isActive ? '#0F172A' : isCompleted ? '#10B981' : '#64748B',
                   textAlign: 'center',
-                  maxWidth: { xs: 68, sm: 120 },
-                  lineHeight: 1.2,
-                  fontSize: { xs: '0.72rem', sm: '0.8125rem' },
-                  display: { xs: isActive ? 'block' : 'none', sm: 'block' },
+                  lineHeight: 1.3,
+                  fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                  minHeight: 36,
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
                 }}
               >
                 {stepLabel}

@@ -94,6 +94,9 @@ export default function CandidateOnboardingPage() {
                   careerId: formData.careerId,
                   cityId: formData.cityId,
                   typeOfWorkplace: formData.typeOfWorkplace,
+                  address: formData.address,
+                  lat: formData.lat,
+                  lng: formData.lng,
                 }}
                 onChange={updateFormField}
                 errors={errors}

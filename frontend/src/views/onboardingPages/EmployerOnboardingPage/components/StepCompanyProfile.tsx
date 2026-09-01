@@ -20,6 +20,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 import commonService from '@/services/commonService';
 import { useTranslation } from 'react-i18next';
+import { tConfig } from '@/utils/tConfig';
 import type { EmployerStep1Values } from '../schemas/employerOnboardingSchema';
 import type { SelectOption } from '@/types/models';
 
@@ -262,7 +263,7 @@ export default function StepCompanyProfile({
             >
               {(employeeSizeOptions || []).map((sz) => (
                 <MenuItem key={String(sz.id)} value={Number(sz.id)}>
-                  {sz.name}
+                  {tConfig(sz.name)}
                 </MenuItem>
               ))}
             </Select>

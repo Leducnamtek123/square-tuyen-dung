@@ -26,15 +26,19 @@ describe('CandidateOnboarding Validation Schemas (Yup)', () => {
       ).rejects.toThrow('Vui lòng chọn địa điểm làm việc mong muốn.');
     });
 
-    it('accepts valid Step 1 data', async () => {
-      const validData = {
-        desiredJobTitle: 'Senior React Developer',
-        careerId: 2,
+    it('accepts valid Step 1 data with optional address and coordinates', async () => {
+      const validDataWithLoc = {
+        desiredJobTitle: 'Kiến trúc sư',
+        careerId: 3,
         cityId: 1,
-        typeOfWorkplace: 1,
+        typeOfWorkplace: 2,
+        address: '72 Lê Thánh Tôn, Bến Nghé, Quận 1, TP.HCM',
+        lat: 10.7769,
+        lng: 106.7009,
       };
-      const result = await schema.validate(validData);
-      expect(result.desiredJobTitle).toBe('Senior React Developer');
+      const result = await schema.validate(validDataWithLoc);
+      expect(result.desiredJobTitle).toBe('Kiến trúc sư');
+      expect((result as any).address).toBe('72 Lê Thánh Tôn, Bến Nghé, Quận 1, TP.HCM');
     });
   });
 

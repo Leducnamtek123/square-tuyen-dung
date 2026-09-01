@@ -283,7 +283,7 @@ export default function StepCandidateComplete({
                     {t('onboarding.step4.location', 'Địa điểm làm việc')}
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
-                    {cityName || '-'}
+                    {formData.address ? `${formData.address}${cityName ? ` (${cityName})` : ''}` : cityName || '-'}
                   </Typography>
                 </Box>
               </Stack>

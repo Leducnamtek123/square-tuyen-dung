@@ -5,6 +5,9 @@ export interface CandidateStep1Values {
   careerId: number | string;
   cityId: number | string;
   typeOfWorkplace: number;
+  address?: string;
+  lat?: number | string | null;
+  lng?: number | string | null;
 }
 
 export interface CandidateStep2Values {

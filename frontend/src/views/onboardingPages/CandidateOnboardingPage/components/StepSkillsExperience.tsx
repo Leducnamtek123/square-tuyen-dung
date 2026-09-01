@@ -22,6 +22,7 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import TipsAndUpdatesOutlinedIcon from '@mui/icons-material/TipsAndUpdatesOutlined';
 import { useTranslation } from 'react-i18next';
+import { tConfig } from '@/utils/tConfig';
 import type { CandidateStep2Values } from '../schemas/candidateOnboardingSchema';
 import type { SelectOption } from '@/types/models';
 
@@ -420,7 +421,9 @@ export default function StepSkillsExperience({
               sx={{ borderRadius: '12px', backgroundColor: '#F8FAFC' }}
             >
               {(experienceOptions || []).map((exp) => (
-                <MenuItem key={String(exp.id)} value={Number(exp.id)}>{exp.name}</MenuItem>
+                <MenuItem key={String(exp.id)} value={Number(exp.id)}>
+                  {tConfig(exp.name)}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -437,7 +440,9 @@ export default function StepSkillsExperience({
               sx={{ borderRadius: '12px', backgroundColor: '#F8FAFC' }}
             >
               {(academicLevelOptions || []).map((ac) => (
-                <MenuItem key={String(ac.id)} value={Number(ac.id)}>{ac.name}</MenuItem>
+                <MenuItem key={String(ac.id)} value={Number(ac.id)}>
+                  {tConfig(ac.name)}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>

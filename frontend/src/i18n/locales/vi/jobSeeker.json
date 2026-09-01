@@ -562,7 +562,12 @@
       "workplaceType": "Hình thức làm việc ưu tiên",
       "workplaceOnsite": "Tại văn phòng (Onsite)",
       "workplaceHybrid": "Linh hoạt (Hybrid)",
-      "workplaceRemote": "Từ xa (Remote)"
+      "workplaceRemote": "Từ xa (Remote)",
+      "mapTitle": "Định vị khu vực làm việc mong muốn trên bản đồ",
+      "mapSubtitle": "Tùy chọn: Giúp hệ thống ưu tiên đề xuất việc làm gần bạn nhất trong bán kính thuận tiện di chuyển",
+      "showMap": "+ Mở bản đồ định vị",
+      "hideMap": "Ẩn bản đồ",
+      "mapPickerLabel": "Ghim vị trí ưu tiên làm việc trên bản đồ"
     },
     "step2": {
       "title": "Kỹ năng & Kinh nghiệm làm việc",
