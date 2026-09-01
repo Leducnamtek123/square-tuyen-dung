@@ -91,7 +91,7 @@ const JobSalaryInsightCard = ({ slug }: Props) => {
                 <TrendingUpIcon fontSize="small" />
               </Box>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                <Typography variant="h6" component="h2" sx={{ fontWeight: 800 }}>
                   {t('jobDetail.salaryInsightTitle')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -140,7 +140,13 @@ const JobSalaryInsightCard = ({ slug }: Props) => {
                   <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
                     {t('jobDetail.salaryInsightComparison')}
                   </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 900, color: data.salaryPosition === 'above' ? 'success.main' : data.salaryPosition === 'below' ? 'warning.main' : 'primary.main' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 900,
+                      color: data.salaryPosition === 'above' ? '#15803d' : data.salaryPosition === 'below' ? '#b45309' : '#1d4ed8'
+                    }}
+                  >
                     {deltaPercent == null ? positionLabel : `${positionLabel} (${deltaPrefix}${deltaPercent}%)`}
                   </Typography>
                 </Box>

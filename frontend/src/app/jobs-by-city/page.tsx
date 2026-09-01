@@ -5,7 +5,7 @@ import JobsByCityPage from '@/views/defaultPages/JobsByCityPage';
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildSeoMetadata({
-    title: 'Việc làm theo tỉnh thành | InfoHR',
+    title: 'Việc làm mới nhất theo tỉnh thành',
     description: 'Tìm kiếm cơ hội việc làm tại Hà Nội, TP. Hồ Chí Minh, Đà Nẵng, Bình Dương, Hải Phòng và tất cả các tỉnh thành trên cả nước.',
     path: '/viec-lam-theo-tinh-thanh',
   });

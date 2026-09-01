@@ -12,46 +12,58 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const job = await serverFetch<JobPost & { company?: Company; city?: { name?: string } }>(`job/web/job-posts/${slug}/`);
 
+  const canonicalUrl = `https://infohr.vn/viec-lam/${slug}`;
+
   if (!job) {
     return {
-      title: 'Việc làm | InfoHR Tuyển Dụng',
-      description: 'Chi tiết việc làm trên InfoHR Tuyển Dụng',
+      title: 'Tuyển dụng việc làm hấp dẫn',
+      description: 'Khám phá cơ hội việc làm lương cao, đãi ngộ tốt và ứng tuyển nhanh chóng trên InfoHR.',
+      alternates: {
+        canonical: canonicalUrl,
+      },
     };
   }
 
-  const jobTitle = job.jobName || 'Việc làm';
-  const companyName = job.company?.companyName || '';
+  const cleanJobTitle = (job.jobName || 'Việc làm').replace(/\s*\|\s*InfoHR\s*$/i, '').trim();
+  const companyName = (job.company?.companyName || '').trim();
   const location = job.city?.name || '';
   const salary = job.salaryMin && job.salaryMax
     ? `${job.salaryMin} - ${job.salaryMax} triệu`
     : 'Thỏa thuận';
 
   const title = companyName
-    ? `${jobTitle} - ${companyName} | InfoHR`
-    : `${jobTitle} | InfoHR`;
+    ? `${cleanJobTitle} - ${companyName}`
+    : `${cleanJobTitle} tuyển dụng`;
 
-  const description = [
-    jobTitle,
+  const rawDescription = [
+    cleanJobTitle,
     companyName && `tại ${companyName}`,
     location && `ở ${location}`,
     `Mức lương: ${salary}`,
-    'Ứng tuyển ngay trên InfoHR Tuyển Dụng.',
+    'Ứng tuyển ngay trên InfoHR.',
   ]
     .filter(Boolean)
     .join('. ');
 
+  const description = rawDescription.length > 155
+    ? rawDescription.slice(0, 152) + '...'
+    : rawDescription;
+
   return {
     title,
     description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title,
       description,
       type: 'article',
-      url: `/viec-lam/${slug}`,
-      siteName: 'InfoHR Tuyển Dụng',
+      url: canonicalUrl,
+      siteName: 'InfoHR',
       locale: 'vi_VN',
       ...(job.company?.companyImageUrl && {
-        images: [{ url: job.company.companyImageUrl }],
+        images: [{ url: job.company.companyImageUrl, alt: title }],
       }),
     },
   };

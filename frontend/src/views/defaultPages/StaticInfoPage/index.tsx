@@ -117,7 +117,7 @@ const StaticInfoPage = ({ pageKey }: Props) => {
       <Container maxWidth="md">
         <Stack spacing={3}>
           <Box>
-            <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>
+            <Typography variant="h3" component="h1" sx={{ fontWeight: 800, mb: 1 }}>
               {page.title}
             </Typography>
             <Typography variant="body1" color="text.secondary">

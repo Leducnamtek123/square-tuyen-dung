@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Box, Pagination, Stack, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import JobPostLarge from '@/components/Features/JobPostLarge';
@@ -36,6 +36,7 @@ const MainJobPostCardContent = () => {
       >
         <Typography 
           variant="h5" 
+          component="h1"
           sx={{
             color: 'text.primary',
             fontWeight: 600,

@@ -5,7 +5,7 @@ import {
   Box,
   Typography,
   Card,
-  Grid,
+  Grid2 as Grid,
   Stack,
   Button,
   LinearProgress,
@@ -164,7 +164,7 @@ export default function StepVerificationGPKD({
         <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E40AF', mb: 1.5 }}>
           {t('employerOnboarding.step3.benefitsTitle', 'Lợi ích khi xác thực Giấy phép ĐKKD ngay:')}
         </Typography>
-        <Stack spacing={1}>
+        <Stack spacing={1.25}>
           <Stack direction="row" spacing={1.25} alignItems="center">
             <CheckCircleOutlineIcon sx={{ color: '#2563EB', fontSize: 18 }} />
             <Typography variant="body2" sx={{ color: '#1E3A8A', fontWeight: 600 }}>
@@ -206,6 +206,7 @@ export default function StepVerificationGPKD({
             '&:hover': {
               borderColor: '#2563EB',
               backgroundColor: 'rgba(37, 99, 235, 0.02)',
+              transform: isUploading ? 'none' : 'translateY(-2px)',
             },
           }}
         >
@@ -224,7 +225,7 @@ export default function StepVerificationGPKD({
                 }}
               />
               <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#1E293B', mb: 1 }}>
-                {t('jobSeeker:onboarding.step3.uploading', 'Đang tải file lên...')}
+                {t('employerOnboarding.step3.uploading', 'Đang tải file lên...')}
               </Typography>
               <Box sx={{ width: '60%', mx: 'auto', mt: 1 }}>
                 <LinearProgress sx={{ borderRadius: 1.5, height: 6 }} />
@@ -266,7 +267,7 @@ export default function StepVerificationGPKD({
                 }}
                 sx={{ borderRadius: 2, px: 2.5, fontWeight: 700 }}
               >
-                {t('jobSeeker:onboarding.step3.selectFile', 'Chọn tệp từ máy tính')}
+                {t('employerOnboarding.step3.selectFile', 'Chọn tệp từ máy tính')}
               </Button>
             </>
           )}
@@ -293,6 +294,7 @@ export default function StepVerificationGPKD({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  flexShrink: 0,
                 }}
               >
                 <InsertDriveFileOutlinedIcon fontSize="medium" />
@@ -305,7 +307,7 @@ export default function StepVerificationGPKD({
                   <CheckCircleRoundedIcon sx={{ color: '#16A34A', fontSize: 18 }} />
                 </Stack>
                 <Typography variant="caption" sx={{ color: '#15803D', fontWeight: 600 }}>
-                  {t('employerOnboarding.step3.uploadedFile', 'Giấy phép kinh doanh đã tải lên')}
+                  {t('employerOnboarding.step3.uploadedFile', 'Giấy phép kinh doanh đã tải lên thành công')}
                 </Typography>
               </Box>
             </Stack>
@@ -338,9 +340,10 @@ export default function StepVerificationGPKD({
       {/* Skip Notice */}
       <Box sx={{ mt: 3, textAlign: 'center' }}>
         <Typography variant="caption" sx={{ color: '#64748B', fontStyle: 'italic', fontSize: '0.8125rem' }}>
-          {t('employerOnboarding.step3.skipNotice', 'Bạn có thể bỏ qua bước này và cập nhật GPKD bất kỳ lúc nào trong phần Cài đặt công ty.')}
+          {t('employerOnboarding.step3.skipNotice', 'Bạn có thể bấm "Bỏ qua & Xác thực sau" để hoàn tất thiết lập trước.')}
         </Typography>
       </Box>
     </Box>
   );
 }
+

@@ -156,12 +156,12 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
   });
 
   const { data: topCareers = [] } = useQuery({
-    queryKey: ['top-careers-popup'],
+    queryKey: ['top-careers'],
     queryFn: async () => {
       const res = await commonService.getTop10Careers();
       return res || [];
     },
-    staleTime: 5 * 60_000,
+    staleTime: 10 * 60_000,
   });
 
   React.useEffect(() => {

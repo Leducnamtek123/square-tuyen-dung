@@ -15,6 +15,7 @@ const ProfilePage = () => {
         <Box>
           <Typography
             variant="h4"
+            component="h1"
             sx={{
               fontWeight: 800,
               color: '#0F172A',

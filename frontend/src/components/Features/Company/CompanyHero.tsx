@@ -8,12 +8,14 @@ import { localizeRoutePath } from '@/configs/routeLocalization';
 
 type CompanyHeroProps = {
   slug: string;
+  companyName?: string;
   companyImageUrl?: string;
   companyCoverImageUrl?: string;
   language: string;
 };
 
-const CompanyHero = ({ slug, companyImageUrl, companyCoverImageUrl, language }: CompanyHeroProps) => {
+const CompanyHero = ({ slug, companyName, companyImageUrl, companyCoverImageUrl, language }: CompanyHeroProps) => {
+  const name = companyName || 'Doanh nghiệp';
   return (
     <Box sx={{ position: 'relative' }}>
       <MuiImageCustom
@@ -21,6 +23,7 @@ const CompanyHero = ({ slug, companyImageUrl, companyCoverImageUrl, language }: 
         fit="cover"
         src={companyCoverImageUrl || IMAGES.companyCoverDefault || IMAGES.coverImageDefault}
         fallbackSrc={IMAGES.companyCoverDefault || IMAGES.coverImageDefault}
+        alt={`Ảnh bìa ${name}`}
         sx={{
           height: { xs: 130, sm: 160, md: 180 },
           borderRadius: 2,
@@ -43,10 +46,12 @@ const CompanyHero = ({ slug, companyImageUrl, companyCoverImageUrl, language }: 
         }}
         component={Link}
         href={localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, slug)}`, language)}
+        aria-label={`Chi tiết ${name}`}
       >
         <MuiImageCustom
           src={companyImageUrl || IMAGES.companyLogoDefault}
           fallbackSrc={IMAGES.companyLogoDefault}
+          alt={`Logo ${name}`}
           sx={{
             width: '100%',
             height: '100%',

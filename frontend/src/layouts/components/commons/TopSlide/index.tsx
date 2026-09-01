@@ -305,6 +305,7 @@ const TopSlide = () => {
                 <Typography
                   className="gsap-hero-title"
                   variant="h3"
+                  component="h1"
                   sx={{
                     fontWeight: 800,
                     fontSize: { xs: '1.65rem', sm: '2.15rem', md: '2.65rem' },

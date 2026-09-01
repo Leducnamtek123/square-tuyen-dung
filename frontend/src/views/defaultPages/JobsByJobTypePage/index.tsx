@@ -24,7 +24,7 @@ const JobsByJobTypePage = () => {
 
     <Container maxWidth="lg" sx={{ py: 2 }}>
 
-      <Typography variant="h4">{t("jobsByCategoryPage.jobTypeTitle")}</Typography>
+      <Typography variant="h4" component="h1">{t("jobsByCategoryPage.jobTypeTitle")}</Typography>
 
       <Divider sx={{ mt: 1, mb: 4 }} />
 

@@ -82,12 +82,12 @@ export const CareerJobPostTabs: React.FC = () => {
   const [selectedCareerId, setSelectedCareerId] = useState<number | 'all'>('all');
 
   const { data: rawCareers = [], isLoading: isLoadingCareers } = useQuery({
-    queryKey: ['home-career-tabs-list'],
+    queryKey: ['top-careers'],
     queryFn: async () => {
       const list = await commonService.getTop10Careers();
       return (list || []).filter((c: Career) => c.name && c.name.trim().length > 0);
     },
-    staleTime: 5 * 60_000,
+    staleTime: 10 * 60_000,
   });
 
   const careers = useMemo(() => {

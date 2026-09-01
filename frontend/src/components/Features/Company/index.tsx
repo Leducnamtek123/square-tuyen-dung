@@ -70,6 +70,7 @@ const Company = ({
         <Box>
           <CompanyHero
             slug={slug}
+            companyName={companyName}
             companyImageUrl={companyImageUrl}
             companyCoverImageUrl={companyCoverImageUrl}
             language={i18n.language}

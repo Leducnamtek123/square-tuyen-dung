@@ -5,7 +5,7 @@ import JobPage from '@/views/defaultPages/JobPage';
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildSeoMetadata({
-    title: 'Tìm việc làm nhanh, việc làm mới nhất | InfoHR',
+    title: 'Tìm việc làm nhanh, việc làm mới nhất',
     description: 'Tìm kiếm hàng ngàn cơ hội việc làm hấp dẫn từ các nhà tuyển dụng hàng đầu. Lương cao, phúc lợi tốt, ứng tuyển trực tuyến nhanh chóng trên InfoHR.',
     path: '/viec-lam',
   });

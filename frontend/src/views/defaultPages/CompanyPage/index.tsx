@@ -52,6 +52,7 @@ const CompanyPage = () => {
         <Box sx={{ mb: { xs: 4, md: 6 }, textAlign: { xs: 'center', md: 'left' } }}>
           <Typography
             variant="h3"
+            component="h1"
             sx={{
               fontWeight: 800,
               fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },

@@ -237,7 +237,7 @@ const CompanyFormDialog = ({
                 if (val.lat !== null && val.lat !== undefined) onLocationChange('lat', String(val.lat));
                 if (val.lng !== null && val.lng !== undefined) onLocationChange('lng', String(val.lng));
               }}
-              label="Bản đồ định vị trụ sở (OpenStreetMap)"
+              label="Bản đồ định vị trụ sở"
               height="300px"
             />
           </Grid>

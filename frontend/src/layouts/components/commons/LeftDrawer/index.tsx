@@ -109,6 +109,7 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
       onClose={handleDrawerToggle}
       ModalProps={{
         keepMounted: true, // Better open performance on mobile.
+        disableRestoreFocus: true,
       }}
       sx={{
         display: { xs: 'block', md: 'none' },

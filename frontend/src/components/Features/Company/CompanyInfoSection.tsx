@@ -66,7 +66,7 @@ const CompanyInfoSection = ({
         <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <FontAwesomeIcon icon={faFontAwesome} style={{ width: 16, color: '#757575' }} />
           {fieldOperation || (
-            <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
+            <span style={{ color: '#64748b', fontStyle: 'italic', fontSize: 13 }}>
               {t('company.notUpdated')}
             </span>
           )}
@@ -75,7 +75,7 @@ const CompanyInfoSection = ({
         <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <FontAwesomeIcon icon={faMapLocation} style={{ width: 16, color: '#757575' }} />
           {tConfig(companyConfig.cityDict?.[city]) || (
-            <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
+            <span style={{ color: '#64748b', fontStyle: 'italic', fontSize: 13 }}>
               {t('company.notUpdated')}
             </span>
           )}
@@ -84,7 +84,7 @@ const CompanyInfoSection = ({
         <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <FontAwesomeIcon icon={faUser} style={{ width: 16, color: '#757575' }} />
           {tConfig(companyConfig.employeeSizeDict?.[employeeSize]) || (
-            <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
+            <span style={{ color: '#64748b', fontStyle: 'italic', fontSize: 13 }}>
               0
             </span>
           )}
@@ -100,13 +100,22 @@ const CompanyInfoSection = ({
             fontWeight: 500,
           }}
         >
-          <FontAwesomeIcon icon={faBriefcase} style={{ width: 16, color: defaultTheme.palette.primary.main }} />
-          {t('company.jobCount', { count: jobPostNumber })}
+          <FontAwesomeIcon icon={faBriefcase} style={{ width: 16 }} />
+          {jobPostNumber || 0} {t('company.openingJobs')}
         </Typography>
 
-        <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <FontAwesomeIcon icon={faUsers} style={{ width: 16, color: '#757575' }} />
-          {t('company.followers', { count: followNumber })}
+        <Typography
+          variant="body2"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            color: 'primary.main',
+            fontWeight: 500,
+          }}
+        >
+          <FontAwesomeIcon icon={faUsers} style={{ width: 16 }} />
+          {followNumber || 0} {t('company.followers')}
         </Typography>
       </Stack>
     </Box>

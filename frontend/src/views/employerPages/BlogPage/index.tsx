@@ -201,7 +201,7 @@ const EmployerBlogListPage = () => {
       {/* Header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
         <Box>
-          <Typography variant="h4" fontWeight={900} letterSpacing="-0.5px">
+          <Typography variant="h4" component="h1" fontWeight={900} letterSpacing="-0.5px">
             {t('blog.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary" mt={0.5}>

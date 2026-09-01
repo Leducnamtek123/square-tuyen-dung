@@ -165,81 +165,69 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
         const anchorEl = dropdownAnchors[page.id] || null;
         const isMenuOpen = Boolean(anchorEl);
 
-        const buttonNode = (
-          <Button
-            color="inherit"
-            variant="text"
-            onClick={(e) => {
-              if (hasChildren) {
-                handleOpenDropdown(e, page.id);
-              } else {
-                handleClick(e, page);
-              }
-            }}
-            endIcon={hasChildren ? <KeyboardArrowDownIcon sx={{ fontSize: '18px !important', ml: -0.5 }} /> : undefined}
-            sx={{
-              my: 1,
-              mr: 0.75,
-              color: '#0f172a',
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              whiteSpace: "nowrap",
-              textDecoration: "none",
-              fontWeight: 700,
-              fontSize: '0.925rem',
-              px: isHighlight ? 2.25 : 2,
-              py: isHighlight ? 0.9 : 0.85,
-              borderRadius: isHighlight ? '12px' : '8px',
-              position: 'relative',
-              backgroundColor: isActive
-                ? isHighlight
-                  ? '#f1f5f9'
-                  : 'rgba(15, 23, 42, 0.06)'
-                : 'transparent',
-              border: "1px solid",
-              borderColor: isActive
-                ? isHighlight
-                  ? '#e2e8f0'
-                  : 'rgba(15, 23, 42, 0.10)'
-                : 'transparent',
-              boxShadow: isActive && isHighlight ? '0 2px 6px rgba(15, 23, 42, 0.04)' : 'none',
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                backgroundColor: isHighlight ? '#f1f5f9' : 'rgba(15, 23, 42, 0.04)',
-                borderColor: isHighlight ? '#e2e8f0' : 'rgba(15, 23, 42, 0.10)',
-                transform: isHighlight ? 'translateY(-1px)' : 'none',
-                textDecoration: "none",
-                '& .doodle-underline-stroke': {
-                  transform: 'translateX(-50%) scale(1.04)',
-                  opacity: 1,
-                },
-              },
-              '&:focus, &:active': {
-                textDecoration: "none",
-              },
-            }}
-          >
-            <Box component="span" sx={{ position: 'relative', display: 'inline-block', pb: isHighlight ? 0.75 : 0 }}>
-              {page.label}
-              {isHighlight && <DoodleUnderlineSvg isVisible={true} />}
-            </Box>
-          </Button>
-        );
-
         return (
           <React.Fragment key={page.id}>
-            {hasChildren ? (
-              buttonNode
-            ) : (
-              <Link
-                href={page.path}
-                onClick={(e) => handleClick(e, page)}
-                style={{ textDecoration: "none" }}
-              >
-                {buttonNode}
-              </Link>
-            )}
+            <Button
+              component={hasChildren ? 'button' : Link}
+              {...(!hasChildren && { href: page.path })}
+              color="inherit"
+              variant="text"
+              onClick={(e: React.MouseEvent<HTMLElement>) => {
+                if (hasChildren) {
+                  handleOpenDropdown(e, page.id);
+                } else {
+                  handleClick(e, page);
+                }
+              }}
+              endIcon={hasChildren ? <KeyboardArrowDownIcon sx={{ fontSize: '18px !important', ml: -0.5 }} /> : undefined}
+              sx={{
+                my: 1,
+                mr: 0.75,
+                color: '#0f172a',
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                whiteSpace: "nowrap",
+                textDecoration: "none",
+                fontWeight: 700,
+                fontSize: '0.925rem',
+                px: isHighlight ? 2.25 : 2,
+                py: isHighlight ? 0.9 : 0.85,
+                borderRadius: isHighlight ? '12px' : '8px',
+                position: 'relative',
+                backgroundColor: isActive
+                  ? isHighlight
+                    ? '#f1f5f9'
+                    : 'rgba(15, 23, 42, 0.06)'
+                  : 'transparent',
+                border: "1px solid",
+                borderColor: isActive
+                  ? isHighlight
+                    ? '#e2e8f0'
+                    : 'rgba(15, 23, 42, 0.10)'
+                  : 'transparent',
+                boxShadow: isActive && isHighlight ? '0 2px 6px rgba(15, 23, 42, 0.04)' : 'none',
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                  backgroundColor: isHighlight ? '#f1f5f9' : 'rgba(15, 23, 42, 0.04)',
+                  borderColor: isHighlight ? '#e2e8f0' : 'rgba(15, 23, 42, 0.10)',
+                  transform: isHighlight ? 'translateY(-1px)' : 'none',
+                  textDecoration: "none",
+                  '& .doodle-underline-stroke': {
+                    transform: 'translateX(-50%) scale(1.04)',
+                    opacity: 1,
+                  },
+                },
+                '&:focus, &:active': {
+                  textDecoration: "none",
+                },
+              }}
+            >
+              <Box component="span" sx={{ position: 'relative', display: 'inline-block', pb: isHighlight ? 0.75 : 0 }}>
+                {page.label}
+                {isHighlight && <DoodleUnderlineSvg isVisible={true} />}
+              </Box>
+            </Button>
 
             {/* Dropdown Menu Popup */}
             {hasChildren && (

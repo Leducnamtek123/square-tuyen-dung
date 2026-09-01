@@ -14,7 +14,7 @@ from django.utils.dateparse import parse_date, parse_datetime
 import csv
 import json
 
-from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
+from rest_framework.decorators import action, api_view, permission_classes, authentication_classes, throttle_classes
 
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
@@ -327,6 +327,7 @@ def _run_blocking(func, timeout: int = 5):
 @api_view(http_method_names=["GET"])
 @authentication_classes([])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def get_all_config(request):
 
     CACHE_KEY = 'common_all_config'
@@ -409,6 +410,7 @@ def get_all_config(request):
 @api_view(http_method_names=["GET"])
 @authentication_classes([])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def get_cities(request):
     try:
         def _build_cities():
@@ -426,6 +428,7 @@ def get_cities(request):
 @api_view(http_method_names=["GET"])
 @authentication_classes([])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def get_districts(request):
     params = request.query_params
     city_id_raw = params.get('cityId', None)
@@ -454,6 +457,7 @@ def get_districts(request):
 @api_view(http_method_names=["GET"])
 @authentication_classes([])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def get_wards(request):
     params = request.query_params
     district_id_raw = params.get('districtId', None)
@@ -482,6 +486,7 @@ def get_wards(request):
 @api_view(http_method_names=["GET"])
 @authentication_classes([])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def get_top_10_careers(request):
     try:
         hot_qs = _run_blocking(lambda: list(
@@ -517,6 +522,7 @@ def get_top_10_careers(request):
 @api_view(http_method_names=["GET"])
 @authentication_classes([])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def get_all_careers(request):
     paginator = paginations.CustomPagination()
 
@@ -542,6 +548,7 @@ def get_all_careers(request):
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def health_check(request):
 
     def _check_database():
@@ -589,6 +596,7 @@ def health_check(request):
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def presign_url(request):
     """
     Return a presigned URL for a MinIO object.
@@ -916,6 +924,7 @@ def upload_file(request):
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def get_popular_keywords(request):
     """
     Returns popular keywords for search bar and discovery pages.

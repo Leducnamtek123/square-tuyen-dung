@@ -56,6 +56,7 @@ const SupportPage = () => {
       <Box sx={{ mb: 6, textAlign: "center" }}>
         <Typography
           variant="h3"
+          component="h1"
           sx={{
             mb: 2,
             background: (theme: Theme) => theme.palette.primary.main,

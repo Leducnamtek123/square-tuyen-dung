@@ -14,6 +14,7 @@ const DefaultLayout = ({ children }: { children?: React.ReactNode }) => {
       <Header />
 
       <Container
+        component="main"
         maxWidth="xl"
         sx={{
           paddingLeft: { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
@@ -21,9 +22,7 @@ const DefaultLayout = ({ children }: { children?: React.ReactNode }) => {
           pb: { xs: 8, md: 4 },
         }}
       >
-        <section>
-          {children}
-        </section>
+        {children}
       </Container>
 
       <Footer />

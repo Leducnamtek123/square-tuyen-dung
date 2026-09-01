@@ -52,8 +52,12 @@ export const useConfig = () => {
     },
     staleTime: STALE_TIME,
     gcTime: STALE_TIME + 5 * 60 * 1000,
-    retry: (failureCount, error) =>
-      !isMaintenanceModeError(error) && failureCount < 2,
+    retry: (failureCount, error: any) => {
+      if (isMaintenanceModeError(error)) return false;
+      if (error?.response?.status === 429 || error?.status === 429) return false;
+      return failureCount < 2;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
     refetchOnWindowFocus: false,
   });
 

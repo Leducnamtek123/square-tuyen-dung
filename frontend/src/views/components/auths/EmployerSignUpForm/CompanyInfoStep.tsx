@@ -170,7 +170,7 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             <LocationPicker
               value={locationValue}
               onChange={onLocationChange}
-              label="Bản đồ vị trí công ty (OpenStreetMap)"
+              label="Bản đồ vị trí trụ sở công ty"
               height="340px"
             />
           </Grid>

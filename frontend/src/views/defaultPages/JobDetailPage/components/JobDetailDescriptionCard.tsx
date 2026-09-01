@@ -19,9 +19,9 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
     <div className="rounded-xl border border-border/60 bg-card px-4 py-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)] sm:px-6 lg:px-8">
       <div className="space-y-6">
         <div>
-          <h3 className="text-lg font-semibold">
+          <h2 className="text-lg font-semibold">
             {t("jobDetail.description")}
-          </h3>
+          </h2>
           <div className="mt-1 h-1 w-12 rounded bg-primary" />
           <HtmlContent
             className="mt-6 text-sm leading-6"
@@ -31,9 +31,9 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
 
         {/* Job Requirements */}
         <div>
-          <h3 className="text-lg font-semibold">
+          <h2 className="text-lg font-semibold">
             {t("jobDetail.requirements")}
-          </h3>
+          </h2>
           <div className="mt-1 h-1 w-12 rounded bg-primary" />
           <HtmlContent
             className="mt-6 text-sm leading-6"
@@ -43,9 +43,9 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
 
         {/* Benefits */}
         <div>
-          <h3 className="text-lg font-semibold">
+          <h2 className="text-lg font-semibold">
             {t("jobDetail.benefits")}
-          </h3>
+          </h2>
           <div className="mt-1 h-1 w-12 rounded bg-primary" />
           <HtmlContent
             className="mt-6 text-sm leading-6"

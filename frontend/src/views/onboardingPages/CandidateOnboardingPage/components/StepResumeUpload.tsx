@@ -257,6 +257,7 @@ export default function StepResumeUpload({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  flexShrink: 0,
                 }}
               >
                 <InsertDriveFileOutlinedIcon fontSize="medium" />

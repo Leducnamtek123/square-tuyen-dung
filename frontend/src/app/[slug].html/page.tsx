@@ -20,18 +20,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!doc) {
     return {
-      title: `Điều khoản & Chính sách | ${APP_NAME}`,
+      title: 'Điều khoản & Chính sách',
       description: `Văn bản pháp lý và chính sách hoạt động của ${APP_NAME}.`,
     };
   }
 
+  const canonicalUrl = `https://infohr.vn/${cleanSlug}.html`;
+  const description = doc.subtitle || doc.summary;
+
   return {
-    title: `${doc.title} | ${APP_NAME}`,
-    description: doc.subtitle || doc.summary,
+    title: doc.title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title: `${doc.title} | ${APP_NAME}`,
-      description: doc.subtitle || doc.summary,
-      url: `https://infohr.vn/${cleanSlug}.html`,
+      description,
+      url: canonicalUrl,
       type: 'article',
     },
   };

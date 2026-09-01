@@ -607,6 +607,9 @@ export const CVEditorPage: React.FC = () => {
           <Box sx={{ display: { xs: 'none', sm: 'block' }, width: '1px', height: 24, bgcolor: '#e2e8f0' }} />
 
           <Box sx={{ maxWidth: { xs: 180, sm: 280, md: 380 } }}>
+            <Typography component="h1" sx={{ position: 'absolute', width: '1px', height: '1px', p: 0, m: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>
+              {cvData.title || 'Tạo CV Trực Tuyến & Studio Thiết Kế CV'}
+            </Typography>
             <Stack direction="row" spacing={1} alignItems="center">
               <input
                 type="text"

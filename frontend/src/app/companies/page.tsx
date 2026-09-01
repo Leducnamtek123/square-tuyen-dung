@@ -5,7 +5,7 @@ import CompanyPage from '@/views/defaultPages/CompanyPage';
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildSeoMetadata({
-    title: 'Danh sách công ty & Nhà tuyển dụng hàng đầu | InfoHR',
+    title: 'Danh sách công ty & Nhà tuyển dụng hàng đầu',
     description: 'Khám phá môi trường làm việc, chế độ đãi ngộ và các cơ hội tuyển dụng hấp dẫn từ hàng ngàn doanh nghiệp uy tín trên InfoHR.',
     path: '/cong-ty',
   });

@@ -326,7 +326,7 @@ const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({
           <LocationPicker
             value={locationValue}
             onChange={onLocationChange}
-            label="Bản đồ vị trí trụ sở công ty (OpenStreetMap)"
+            label="Bản đồ vị trí trụ sở công ty"
             height="350px"
           />
         </Grid>

@@ -23,8 +23,11 @@ function makeQueryClient() {
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
-        retry: (failureCount, error) =>
-          !isMaintenanceModeError(error) && failureCount < 1,
+        retry: (failureCount, error: any) =>
+          !isMaintenanceModeError(error) &&
+          error?.response?.status !== 429 &&
+          error?.status !== 429 &&
+          failureCount < 1,
         staleTime: 5 * 60_000,
         gcTime: 10 * 60_000,
       },

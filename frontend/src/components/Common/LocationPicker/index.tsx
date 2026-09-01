@@ -37,7 +37,7 @@ const LocationPickerContent = dynamic(() => import('./LocationPickerContent'), {
         }}
       >
         <LocationOnIcon fontSize="small" color="primary" />
-        Đang tải bản đồ định vị OpenStreetMap...
+        Đang tải bản đồ định vị...
       </Typography>
     </Box>
   ),

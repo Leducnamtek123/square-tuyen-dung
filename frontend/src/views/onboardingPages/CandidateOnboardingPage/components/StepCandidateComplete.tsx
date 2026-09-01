@@ -169,109 +169,242 @@ export default function StepCandidateComplete({
           {t('onboarding.step4.summaryTitle', 'Tóm tắt mục tiêu công việc đã lưu')}
         </Typography>
 
-        <Grid container spacing={2.5}>
+        <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <WorkOutlineIcon fontSize="small" sx={{ color: '#64748B' }} />
-              <Box>
-                <Typography variant="caption" sx={{ color: '#64748B', display: 'block' }}>
-                  {t('onboarding.step4.position', 'Vị trí')}
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
-                  {formData.desiredJobTitle || '-'}
-                </Typography>
-              </Box>
-            </Stack>
+            <Box
+              sx={{
+                p: 1.75,
+                borderRadius: '12px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '8px',
+                    backgroundColor: '#EFF6FF',
+                    color: '#2563EB',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <WorkOutlineIcon fontSize="small" />
+                </Box>
+                <Box>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>
+                    {t('onboarding.step4.position', 'Vị trí mong muốn')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
+                    {formData.desiredJobTitle || '-'}
+                  </Typography>
+                </Box>
+              </Stack>
+            </Box>
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <BusinessCenterOutlinedIcon fontSize="small" sx={{ color: '#64748B' }} />
-              <Box>
-                <Typography variant="caption" sx={{ color: '#64748B', display: 'block' }}>
-                  {t('onboarding.step4.career', 'Ngành nghề')}
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
-                  {careerName || '-'}
-                </Typography>
-              </Box>
-            </Stack>
+            <Box
+              sx={{
+                p: 1.75,
+                borderRadius: '12px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '8px',
+                    backgroundColor: '#EFF6FF',
+                    color: '#2563EB',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <BusinessCenterOutlinedIcon fontSize="small" />
+                </Box>
+                <Box>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>
+                    {t('onboarding.step4.career', 'Ngành nghề')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
+                    {careerName || '-'}
+                  </Typography>
+                </Box>
+              </Stack>
+            </Box>
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <LocationOnOutlinedIcon fontSize="small" sx={{ color: '#64748B' }} />
-              <Box>
-                <Typography variant="caption" sx={{ color: '#64748B', display: 'block' }}>
-                  {t('onboarding.step4.location', 'Địa điểm')}
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
-                  {cityName || '-'}
-                </Typography>
-              </Box>
-            </Stack>
+            <Box
+              sx={{
+                p: 1.75,
+                borderRadius: '12px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '8px',
+                    backgroundColor: '#EFF6FF',
+                    color: '#2563EB',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <LocationOnOutlinedIcon fontSize="small" />
+                </Box>
+                <Box>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>
+                    {t('onboarding.step4.location', 'Địa điểm làm việc')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
+                    {cityName || '-'}
+                  </Typography>
+                </Box>
+              </Stack>
+            </Box>
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <AttachMoneyOutlinedIcon fontSize="small" sx={{ color: '#64748B' }} />
-              <Box>
-                <Typography variant="caption" sx={{ color: '#64748B', display: 'block' }}>
-                  {t('onboarding.step4.salary', 'Mức lương')}
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
-                  {formatSalaryText()}
-                </Typography>
-              </Box>
-            </Stack>
+            <Box
+              sx={{
+                p: 1.75,
+                borderRadius: '12px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '8px',
+                    backgroundColor: '#EFF6FF',
+                    color: '#2563EB',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <AttachMoneyOutlinedIcon fontSize="small" />
+                </Box>
+                <Box>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>
+                    {t('onboarding.step4.salary', 'Mức lương mong muốn')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
+                    {formatSalaryText()}
+                  </Typography>
+                </Box>
+              </Stack>
+            </Box>
           </Grid>
 
           {/* Skills List */}
           {Boolean(formData.skills?.length) && (
             <Grid size={{ xs: 12 }}>
-              <Divider sx={{ my: 0.5 }} />
-              <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 1 }}>
-                {t('onboarding.step4.skills', 'Kỹ năng chính')}
-              </Typography>
-              <Stack direction="row" flexWrap="wrap" gap={0.75}>
-                {formData.skills?.map((skill) => (
-                  <Chip
-                    key={skill}
-                    label={skill}
-                    size="small"
-                    sx={{
-                      borderRadius: 1.5,
-                      fontWeight: 600,
-                      backgroundColor: '#EFF6FF',
-                      color: '#1D4ED8',
-                    }}
-                  />
-                ))}
-              </Stack>
+              <Box
+                sx={{
+                  p: 1.75,
+                  borderRadius: '12px',
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                }}
+              >
+                <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 1, fontSize: '0.75rem', fontWeight: 600 }}>
+                  {t('onboarding.step4.skills', 'Kỹ năng thế mạnh')} ({formData.skills?.length})
+                </Typography>
+                <Stack direction="row" flexWrap="wrap" gap={0.75}>
+                  {formData.skills?.map((skill) => (
+                    <Chip
+                      key={skill}
+                      label={skill}
+                      size="small"
+                      sx={{
+                        borderRadius: '8px',
+                        fontWeight: 600,
+                        backgroundColor: '#EFF6FF',
+                        color: '#1D4ED8',
+                        border: '1px solid #BFDBFE',
+                      }}
+                    />
+                  ))}
+                </Stack>
+              </Box>
             </Grid>
           )}
 
           {/* CV Status */}
           <Grid size={{ xs: 12 }}>
-            <Divider sx={{ my: 0.5 }} />
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <InsertDriveFileOutlinedIcon
-                fontSize="small"
-                sx={{ color: formData.fileName ? '#16A34A' : '#94A3B8' }}
-              />
-              <Typography variant="body2" sx={{ color: '#475569' }}>
-                <strong>{t('onboarding.step4.cvStatus', 'Trạng thái CV')}:</strong>{' '}
-                {formData.fileName ? (
-                  <Box component="span" sx={{ color: '#16A34A', fontWeight: 700 }}>
-                    {t('onboarding.step4.cvAttached', 'Đã đính kèm')} ({formData.fileName})
-                  </Box>
-                ) : (
-                  <Box component="span" sx={{ color: '#64748B' }}>
-                    {t('onboarding.step4.cvNotAttached', 'Chưa đính kèm')}
-                  </Box>
-                )}
-              </Typography>
-            </Stack>
+            <Box
+              sx={{
+                p: 1.75,
+                borderRadius: '12px',
+                backgroundColor: formData.fileName ? '#F0FDF4' : '#F8FAFC',
+                border: '1px solid',
+                borderColor: formData.fileName ? '#BBF7D0' : '#E2E8F0',
+              }}
+            >
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '8px',
+                    backgroundColor: formData.fileName ? '#DCFCE7' : '#F1F5F9',
+                    color: formData.fileName ? '#16A34A' : '#64748B',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <InsertDriveFileOutlinedIcon fontSize="small" />
+                </Box>
+                <Typography variant="body2" sx={{ color: '#475569' }}>
+                  <strong>{t('onboarding.step4.cvStatus', 'Trạng thái CV')}:</strong>{' '}
+                  {formData.fileName ? (
+                    <Box component="span" sx={{ color: '#16A34A', fontWeight: 700 }}>
+                      {t('onboarding.step4.cvAttached', 'Đã đính kèm')} ({formData.fileName})
+                    </Box>
+                  ) : (
+                    <Box component="span" sx={{ color: '#64748B' }}>
+                      {t('onboarding.step4.cvNotAttached', 'Chưa đính kèm (Bổ sung sau trong hồ sơ)')}
+                    </Box>
+                  )}
+                </Typography>
+              </Stack>
+            </Box>
           </Grid>
         </Grid>
       </Card>

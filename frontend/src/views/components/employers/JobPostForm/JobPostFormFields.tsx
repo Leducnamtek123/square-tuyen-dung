@@ -191,7 +191,7 @@ function JobPostFormFields({
         <LocationPicker
           value={locationValue}
           onChange={onLocationChange}
-          label="Định vị địa điểm làm việc trên bản đồ OpenStreetMap"
+          label="Định vị địa điểm làm việc trên bản đồ"
           height="350px"
         />
       </Grid>

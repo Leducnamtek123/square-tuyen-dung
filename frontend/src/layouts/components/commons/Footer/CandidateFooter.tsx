@@ -31,6 +31,7 @@ export const CandidateFooter: React.FC = () => {
 
   const infoLinks = [
     { label: t('footer.careerGuide', 'Cẩm nang nghề nghiệp'), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, lang) },
+    { label: t('footer.createCv', 'Tạo CV trực tuyến'), route: localizeRoutePath('/tao-cv', lang) },
     { label: t('footer.servicePricing', 'Báo giá dịch vụ'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, lang) },
     { label: t('footer.termsOfUse', 'Điều khoản sử dụng'), route: `/${ROUTES.JOB_SEEKER.TERMS_HTML}` },
     { label: t('footer.privacyPolicy', 'Quy định bảo mật'), route: `/${ROUTES.JOB_SEEKER.PRIVACY_HTML}` },

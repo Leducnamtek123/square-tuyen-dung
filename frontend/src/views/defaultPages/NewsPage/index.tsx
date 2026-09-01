@@ -275,8 +275,8 @@ const NewsContent = () => {
       <Container maxWidth="xl" sx={{ mt: 3 }}>
         {/* ── Featured Articles Section ──────────────────────────────────────── */}
         <Box sx={{ mb: 6 }}>
-          <Typography variant="h5" fontWeight={800} color="#0f172a" sx={{ mb: 3, letterSpacing: '-0.01em' }}>
-            Bài viết nổi bật
+          <Typography variant="h5" component="h1" fontWeight={800} color="#0f172a" sx={{ mb: 3, letterSpacing: '-0.01em' }}>
+            Tin tức &amp; Cẩm nang nghề nghiệp
           </Typography>
 
           {isLoading && featuredArticles.length === 0 ? (

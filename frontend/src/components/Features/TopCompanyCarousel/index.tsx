@@ -43,12 +43,12 @@ const TopCompanyCarousel = () => {
   const { allConfig } = useConfig();
 
   const { data: dynamicCareers = [] } = useQuery({
-    queryKey: ['top-careers-carousel'],
+    queryKey: ['top-careers'],
     queryFn: async () => {
       const res = await commonService.getTop10Careers();
       return res || [];
     },
-    staleTime: 5 * 60_000,
+    staleTime: 10 * 60_000,
   });
 
   const categoriesList = dynamicCareers.length > 0

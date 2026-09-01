@@ -12,12 +12,10 @@ interface SEOProps {
 }
 
 const SITE_NAME = 'InfoHR';
-const DEFAULT_IMAGE = 'https://infohr.vn/android-chrome-512x512.png';
-const DEFAULT_DESCRIPTION =
-  'InfoHR - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín.';
 
 /** Upsert a <meta> tag by name or property attribute */
 const upsertMeta = (attrName: string, attrValue: string, content: string) => {
+  if (typeof document === 'undefined') return;
   let el = document.querySelector<HTMLMetaElement>(
     `meta[${attrName}="${attrValue}"]`
   );
@@ -31,6 +29,7 @@ const upsertMeta = (attrName: string, attrValue: string, content: string) => {
 
 /** Upsert a <link> tag by rel attribute */
 const upsertLink = (rel: string, href: string) => {
+  if (typeof document === 'undefined') return;
   let el = document.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`);
   if (!el) {
     el = document.createElement('link');
@@ -41,8 +40,9 @@ const upsertLink = (rel: string, href: string) => {
 };
 
 /**
- * useSEO – Dynamic SEO meta tag manager.
- * Updates title, description, OG, Twitter Card, and canonical link per page.
+ * useSEO – Dynamic SEO meta tag manager for client-side navigation.
+ * Updates title, description, OG, Twitter Card, and canonical link per page only when explicitly provided,
+ * preserving Next.js App Router server-rendered metadata as the primary source of truth.
  */
 const useSEO = ({
   title,
@@ -54,38 +54,48 @@ const useSEO = ({
   noIndex = false,
 }: SEOProps = {}) => {
   useEffect(() => {
-    const resolvedTitle = title ? `${title} | InfoHR` : 'InfoHR | Tìm việc nhanh, tuyển dụng hiệu quả';
-    const resolvedDesc = description || DEFAULT_DESCRIPTION;
-    const resolvedImage = image || DEFAULT_IMAGE;
-    const resolvedUrl = url || window.location.href;
+    if (typeof document === 'undefined') return;
 
-    // --- Document title ---
-    document.title = resolvedTitle;
+    // Only update document title if title is provided and doesn't already end with InfoHR
+    if (title) {
+      const cleanTitle = title.replace(/\s*\|\s*InfoHR\s*$/i, '').trim();
+      const resolvedTitle = `${cleanTitle} | InfoHR`;
+      if (document.title !== resolvedTitle) {
+        document.title = resolvedTitle;
+      }
+      upsertMeta('property', 'og:title', resolvedTitle);
+      upsertMeta('name', 'twitter:title', resolvedTitle);
+    }
 
-    // --- Base meta ---
-    upsertMeta('name', 'description', resolvedDesc);
-    upsertMeta('name', 'robots', noIndex ? 'noindex, nofollow' : 'index, follow');
+    if (description) {
+      const trimmedDesc = description.length > 160 ? description.slice(0, 157) + '...' : description;
+      upsertMeta('name', 'description', trimmedDesc);
+      upsertMeta('property', 'og:description', trimmedDesc);
+      upsertMeta('name', 'twitter:description', trimmedDesc);
+    }
+
+    if (noIndex) {
+      upsertMeta('name', 'robots', 'noindex, nofollow');
+    }
+
     if (keywords) {
       upsertMeta('name', 'keywords', keywords);
     }
 
-    // --- Canonical ---
-    upsertLink('canonical', resolvedUrl);
+    if (url) {
+      upsertLink('canonical', url);
+      upsertMeta('property', 'og:url', url);
+    }
 
-    // --- Open Graph ---
-    upsertMeta('property', 'og:title', resolvedTitle);
-    upsertMeta('property', 'og:description', resolvedDesc);
-    upsertMeta('property', 'og:image', resolvedImage);
-    upsertMeta('property', 'og:url', resolvedUrl);
+    if (image) {
+      upsertMeta('property', 'og:image', image);
+      upsertMeta('name', 'twitter:image', image);
+    }
+
     upsertMeta('property', 'og:type', type);
     upsertMeta('property', 'og:site_name', SITE_NAME);
     upsertMeta('property', 'og:locale', 'vi_VN');
-
-    // --- Twitter Card ---
     upsertMeta('name', 'twitter:card', 'summary_large_image');
-    upsertMeta('name', 'twitter:title', resolvedTitle);
-    upsertMeta('name', 'twitter:description', resolvedDesc);
-    upsertMeta('name', 'twitter:image', resolvedImage);
   }, [title, description, image, url, type, keywords, noIndex]);
 };
 

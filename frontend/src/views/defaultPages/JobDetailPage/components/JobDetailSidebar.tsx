@@ -74,7 +74,7 @@ const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) =>
             />
 
             {/* Company Name */}
-            <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', lineHeight: 1.3, fontSize: '1rem' }}>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 800, color: '#0f172a', lineHeight: 1.3, fontSize: '1rem' }}>
               {companyName}
             </Typography>
 

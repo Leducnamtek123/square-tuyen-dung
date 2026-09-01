@@ -83,6 +83,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
             <Box>
               <Typography
                 variant="h4"
+                component="h1"
                 gutterBottom
                 sx={{
                   textAlign: { xs: "center", md: "left" },

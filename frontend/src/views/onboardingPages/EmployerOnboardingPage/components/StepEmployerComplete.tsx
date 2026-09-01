@@ -125,54 +125,127 @@ export default function StepEmployerComplete({
 
         <Divider sx={{ mb: 2 }} />
 
-        <Grid container spacing={2.5}>
+        <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <PersonOutlineIcon fontSize="small" sx={{ color: '#64748B' }} />
-              <Box>
-                <Typography variant="caption" sx={{ color: '#64748B', display: 'block' }}>
-                  {t('employerOnboarding.step4.recruiter', 'Đại diện tuyển dụng')}
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
-                  {formData.recruiterName} {formData.recruiterTitle ? `(${formData.recruiterTitle})` : ''}
-                </Typography>
-              </Box>
-            </Stack>
+            <Box
+              sx={{
+                p: 1.75,
+                borderRadius: '12px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '8px',
+                    backgroundColor: '#EFF6FF',
+                    color: '#2563EB',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <PersonOutlineIcon fontSize="small" />
+                </Box>
+                <Box>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>
+                    {t('employerOnboarding.step4.recruiter', 'Đại diện tuyển dụng')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
+                    {formData.recruiterName} {formData.recruiterTitle ? `(${formData.recruiterTitle})` : ''}
+                  </Typography>
+                </Box>
+              </Stack>
+            </Box>
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <LocationOnOutlinedIcon fontSize="small" sx={{ color: '#64748B' }} />
-              <Box>
-                <Typography variant="caption" sx={{ color: '#64748B', display: 'block' }}>
-                  {t('employerOnboarding.step4.location', 'Địa chỉ trụ sở')}
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
-                  {formData.address ? `${formData.address}, ` : ''}{cityName || 'Toàn quốc'}
-                </Typography>
-              </Box>
-            </Stack>
+            <Box
+              sx={{
+                p: 1.75,
+                borderRadius: '12px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '8px',
+                    backgroundColor: '#EFF6FF',
+                    color: '#2563EB',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <LocationOnOutlinedIcon fontSize="small" />
+                </Box>
+                <Box>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>
+                    {t('employerOnboarding.step4.location', 'Địa chỉ trụ sở')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
+                    {formData.address ? `${formData.address}, ` : ''}{cityName || 'Toàn quốc'}
+                  </Typography>
+                </Box>
+              </Stack>
+            </Box>
           </Grid>
 
           <Grid size={{ xs: 12 }}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <VerifiedUserOutlinedIcon
-                fontSize="small"
-                sx={{ color: formData.gpkdFileName ? '#16A34A' : '#94A3B8' }}
-              />
-              <Typography variant="body2" sx={{ color: '#475569' }}>
-                <strong>{t('employerOnboarding.step4.verificationStatus', 'Trạng thái xác thực')}:</strong>{' '}
-                {formData.gpkdFileName ? (
-                  <Box component="span" sx={{ color: '#16A34A', fontWeight: 700 }}>
-                    {t('employerOnboarding.step4.verifiedPending', 'Đã nộp GPKD (Chờ duyệt tích xanh)')}
-                  </Box>
-                ) : (
-                  <Box component="span" sx={{ color: '#64748B' }}>
-                    {t('employerOnboarding.step4.notSubmitted', 'Chưa nộp GPKD (Có thể xác thực sau trong Cài đặt)')}
-                  </Box>
-                )}
-              </Typography>
-            </Stack>
+            <Box
+              sx={{
+                p: 1.75,
+                borderRadius: '12px',
+                backgroundColor: formData.gpkdFileName ? '#F0FDF4' : '#F8FAFC',
+                border: '1px solid',
+                borderColor: formData.gpkdFileName ? '#BBF7D0' : '#E2E8F0',
+              }}
+            >
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '8px',
+                    backgroundColor: formData.gpkdFileName ? '#DCFCE7' : '#F1F5F9',
+                    color: formData.gpkdFileName ? '#16A34A' : '#64748B',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <VerifiedUserOutlinedIcon fontSize="small" />
+                </Box>
+                <Typography variant="body2" sx={{ color: '#475569' }}>
+                  <strong>{t('employerOnboarding.step4.verificationStatus', 'Trạng thái xác thực')}:</strong>{' '}
+                  {formData.gpkdFileName ? (
+                    <Box component="span" sx={{ color: '#16A34A', fontWeight: 700 }}>
+                      {t('employerOnboarding.step4.verifiedPending', 'Đã nộp GPKD (Chờ duyệt tích xanh)')}
+                    </Box>
+                  ) : (
+                    <Box component="span" sx={{ color: '#64748B' }}>
+                      {t('employerOnboarding.step4.notSubmitted', 'Chưa nộp GPKD (Có thể xác thực sau trong Cài đặt)')}
+                    </Box>
+                  )}
+                </Typography>
+              </Stack>
+            </Box>
           </Grid>
         </Grid>
       </Card>
