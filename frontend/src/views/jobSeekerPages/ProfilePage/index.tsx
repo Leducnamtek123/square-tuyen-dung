@@ -29,6 +29,7 @@ import { TabTitle } from '@/utils/generalFunction';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { getUserInfo, setUserInfo } from '@/redux/userSlice';
 import authService from '@/services/authService';
+import commonService from '@/services/commonService';
 import jobSeekerProfileService from '@/services/jobSeekerProfileService';
 import resumeService from '@/services/resumeService';
 import toastMessages from '@/utils/toastMessages';
@@ -41,7 +42,7 @@ import { useResumes } from '@/views/components/jobSeekers/hooks/useJobSeekerQuer
 import { CV_TYPES, ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import type { ExtendedResume } from '@/components/Features/CVDoc';
-import type { User } from '@/types/models';
+import type { User, SystemConfig } from '@/types/models';
 
 const formatDate = (dateStr?: string | null) => {
   if (!dateStr) return 'Chưa cập nhật';
@@ -77,9 +78,21 @@ const ProfilePage = () => {
   const { currentUser } = useAppSelector((state) => state.user);
 
   const rawProfileId = currentUser?.jobSeekerProfile?.id || currentUser?.jobSeekerProfileId || undefined;
-  const jobSeekerProfileId = rawProfileId ? String(rawProfileId) : undefined;
+  const [profileIdState, setProfileIdState] = React.useState<string | undefined>(
+    rawProfileId ? String(rawProfileId) : undefined
+  );
 
-  const { data: resumes, refetch: refetchResumes } = useResumes(jobSeekerProfileId, { type: CV_TYPES.cvWebsite });
+  React.useEffect(() => {
+    const rawId = currentUser?.jobSeekerProfile?.id || currentUser?.jobSeekerProfileId;
+    if (rawId) {
+      setProfileIdState(String(rawId));
+    }
+  }, [currentUser]);
+
+  const { data: resumes, refetch: refetchResumes } = useResumes(profileIdState, {
+    resumeType: CV_TYPES.cvWebsite,
+    type: CV_TYPES.cvWebsite,
+  });
 
   const resume = React.useMemo(() => {
     return resumes && resumes.length > 0 ? (resumes[0] as unknown as ExtendedResume) : null;
@@ -123,6 +136,25 @@ const ProfilePage = () => {
     }
   }, [currentUser]);
 
+  // Load system configs for ID resolution
+  const [systemConfig, setSystemConfig] = React.useState<SystemConfig | null>(null);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    commonService
+      .getConfigs()
+      .then((res) => {
+        if (isMounted && res) {
+          setSystemConfig(res);
+        }
+      })
+      .catch(console.error);
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Clear stale mock localStorage data
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -136,13 +168,27 @@ const ProfilePage = () => {
       try {
         const p = await jobSeekerProfileService.getProfile();
         if (p) {
+          if (p.id) {
+            setProfileIdState(String(p.id));
+          }
           setIsJobSeeking(p.isJobSeeking ?? p.isSeekingJob ?? true);
           setProfileData((prev) => {
             const loc = p.location as any;
-            const cityName = loc?.city?.name || (typeof loc?.city === 'string' ? loc.city : '') || '';
-            const districtName = loc?.district?.name || (typeof loc?.district === 'string' ? loc.district : '') || '';
-            const genderVal = p.gender === 'M' ? 'Nam' : p.gender === 'F' ? 'Nữ' : p.gender === 'O' ? 'Khác' : '';
-            const maritalVal = p.maritalStatus === 'M' ? 'Đã kết hôn' : p.maritalStatus === 'S' ? 'Độc thân' : '';
+            const cityName =
+              loc?.cityDict?.name ||
+              loc?.city?.name ||
+              (typeof loc?.city === 'string' ? loc.city : '') ||
+              (loc?.city ? systemConfig?.cityOptions?.find((c) => String(c.id) === String(loc.city))?.name : '') ||
+              '';
+            const districtName =
+              loc?.districtDict?.name ||
+              loc?.district?.name ||
+              (typeof loc?.district === 'string' ? loc.district : '') ||
+              '';
+            const genderVal =
+              p.gender === 'M' ? 'Nam' : p.gender === 'F' ? 'Nữ' : p.gender === 'O' ? 'Khác' : '';
+            const maritalVal =
+              p.maritalStatus === 'M' ? 'Đã kết hôn' : p.maritalStatus === 'S' ? 'Độc thân' : '';
             return {
               ...prev,
               fullName: currentUser?.fullName || (p as any).user?.fullName || prev.fullName,
@@ -165,22 +211,62 @@ const ProfilePage = () => {
     if (currentUser) {
       void fetchProfileStatus();
     }
-  }, [currentUser]);
+  }, [currentUser, systemConfig]);
 
   // Synchronize resume title, career, experience, education, bio from primary active resume
   React.useEffect(() => {
     if (resume) {
-      setProfileData((prev) => ({
-        ...prev,
-        title: resume.title || prev.title,
-        career: (resume as any).career?.name || (typeof (resume as any).career === 'string' ? (resume as any).career : '') || prev.career,
-        city: (resume as any).city?.name || (typeof (resume as any).city === 'string' ? (resume as any).city : '') || prev.city,
-        experience: typeof (resume as any).experience === 'object' ? (resume as any).experience?.name : (resume as any).experience ? `${(resume as any).experience} năm` : prev.experience,
-        education: typeof (resume as any).academicLevel === 'object' ? (resume as any).academicLevel?.name : (resume as any).academicLevel ? String((resume as any).academicLevel) : prev.education,
-        bio: (resume as any).description || prev.bio,
-      }));
+      setProfileData((prev) => {
+        const careerName =
+          (resume as any).careerChooseData?.name ||
+          (resume as any).career?.name ||
+          (typeof (resume as any).career === 'string' ? (resume as any).career : '') ||
+          (typeof (resume as any).career === 'number'
+            ? systemConfig?.careerOptions?.find((c) => Number(c.id) === (resume as any).career)?.name
+            : '') ||
+          prev.career;
+
+        const cityName =
+          (resume as any).cityChooseData?.name ||
+          (resume as any).city?.name ||
+          (typeof (resume as any).city === 'string' ? (resume as any).city : '') ||
+          (typeof (resume as any).city === 'number'
+            ? systemConfig?.cityOptions?.find((c) => Number(c.id) === (resume as any).city)?.name
+            : '') ||
+          prev.city;
+
+        const expName =
+          (resume as any).experienceChooseData?.name ||
+          (typeof (resume as any).experience === 'object'
+            ? (resume as any).experience?.name
+            : typeof (resume as any).experience === 'number'
+              ? systemConfig?.experienceOptions?.find((e) => Number(e.id) === (resume as any).experience)?.name
+              : (resume as any).experience
+                ? String((resume as any).experience)
+                : prev.experience);
+
+        const eduName =
+          (resume as any).academicLevelChooseData?.name ||
+          (typeof (resume as any).academicLevel === 'object'
+            ? (resume as any).academicLevel?.name
+            : typeof (resume as any).academicLevel === 'number'
+              ? systemConfig?.academicLevelOptions?.find((e) => Number(e.id) === (resume as any).academicLevel)?.name
+              : (resume as any).academicLevel
+                ? String((resume as any).academicLevel)
+                : prev.education);
+
+        return {
+          ...prev,
+          title: resume.title || prev.title,
+          career: careerName || prev.career,
+          city: cityName || prev.city,
+          experience: expName || prev.experience,
+          education: eduName || prev.education,
+          bio: (resume as any).description || prev.bio,
+        };
+      });
     }
-  }, [resume]);
+  }, [resume, systemConfig]);
 
   // Skills from primary resume
   const skillsList = React.useMemo(() => {
@@ -269,11 +355,104 @@ const ProfilePage = () => {
             ? 'S'
             : undefined;
 
+      // Resolve City ID
+      let resolvedCityId: number | undefined;
+      if (updated.city) {
+        const foundCity = systemConfig?.cityOptions?.find(
+          (c) =>
+            String(c.id) === String(updated.city) ||
+            String(c.name || '').toLowerCase() === updated.city.toLowerCase()
+        );
+        if (foundCity) {
+          resolvedCityId = Number(foundCity.id);
+        } else if (!isNaN(Number(updated.city))) {
+          resolvedCityId = Number(updated.city);
+        }
+      }
+
+      // Resolve District ID
+      let resolvedDistrictId: number | undefined;
+      if (updated.district && updated.district !== 'Chưa cập nhật') {
+        if (!isNaN(Number(updated.district))) {
+          resolvedDistrictId = Number(updated.district);
+        } else if (resolvedCityId) {
+          try {
+            const districtsRes = await commonService.getDistrictsByCityId(resolvedCityId);
+            const districtsList = Array.isArray(districtsRes) ? districtsRes : districtsRes?.data || [];
+            const foundDistrict = districtsList.find(
+              (d: any) =>
+                String(d.id) === String(updated.district) ||
+                String(d.name || '').toLowerCase() === updated.district.toLowerCase()
+            );
+            if (foundDistrict) {
+              resolvedDistrictId = Number(foundDistrict.id);
+            }
+          } catch (dErr) {
+            console.warn('Could not resolve district ID:', dErr);
+          }
+        }
+      }
+
+      // Resolve Career ID
+      let resolvedCareerId: number | undefined;
+      if (updated.career && updated.career !== 'Chưa cập nhật') {
+        const foundCareer = systemConfig?.careerOptions?.find(
+          (c) =>
+            String(c.id) === String(updated.career) ||
+            String(c.name || '').toLowerCase() === updated.career.toLowerCase()
+        );
+        if (foundCareer) {
+          resolvedCareerId = Number(foundCareer.id);
+        } else if (!isNaN(Number(updated.career))) {
+          resolvedCareerId = Number(updated.career);
+        }
+      }
+
+      // Resolve Academic Level ID
+      let resolvedAcademicId: number | undefined;
+      if (updated.education && updated.education !== 'Chưa cập nhật') {
+        const foundEdu = systemConfig?.academicLevelOptions?.find(
+          (e) =>
+            String(e.id) === String(updated.education) ||
+            String(e.name || '').toLowerCase() === updated.education.toLowerCase() ||
+            t(`common:choices.${e.name}`, { defaultValue: e.name || '' }).toLowerCase() === updated.education.toLowerCase()
+        );
+        if (foundEdu) {
+          resolvedAcademicId = Number(foundEdu.id);
+        } else if (!isNaN(Number(updated.education))) {
+          resolvedAcademicId = Number(updated.education);
+        }
+      }
+
+      // Resolve Experience ID
+      let resolvedExpId: number | undefined;
+      if (updated.experience && updated.experience !== 'Chưa cập nhật') {
+        const foundExp = systemConfig?.experienceOptions?.find(
+          (ex) =>
+            String(ex.id) === String(updated.experience) ||
+            String(ex.name || '').toLowerCase() === updated.experience.toLowerCase() ||
+            t(`common:choices.${ex.name}`, { defaultValue: ex.name || '' }).toLowerCase() === updated.experience.toLowerCase()
+        );
+        if (foundExp) {
+          resolvedExpId = Number(foundExp.id);
+        } else if (!isNaN(Number(updated.experience))) {
+          resolvedExpId = Number(updated.experience);
+        }
+      }
+
+      const locationPayload: any = {};
+      if (resolvedCityId) locationPayload.city = resolvedCityId;
+      if (resolvedDistrictId) locationPayload.district = resolvedDistrictId;
+      if (updated.address && updated.address !== 'Chưa cập nhật') {
+        locationPayload.address = updated.address.trim();
+      }
+
       await jobSeekerProfileService.updateProfile({
         phone: updated.phoneNumber ? updated.phoneNumber.trim() : undefined,
         birthday: updated.dob || undefined,
         gender: genderPayload,
         maritalStatus: maritalPayload,
+        location: Object.keys(locationPayload).length > 0 ? locationPayload : undefined,
         user: updated.fullName ? { fullName: updated.fullName.trim() } : undefined,
       });
 
@@ -285,22 +464,81 @@ const ProfilePage = () => {
         }
       }
 
-      if (resume?.slug) {
+      let targetResumeSlug = resume?.slug;
+      if (!targetResumeSlug && profileIdState) {
         try {
-          await resumeService.updateResume(resume.slug, {
+          const fetched = await jobSeekerProfileService.getResumes(profileIdState, {
+            resumeType: CV_TYPES.cvWebsite,
+            type: CV_TYPES.cvWebsite,
+          });
+          const list = Array.isArray(fetched) ? fetched : fetched?.results || [];
+          if (list.length > 0 && list[0]?.slug) {
+            targetResumeSlug = list[0].slug;
+          }
+        } catch (fErr) {
+          console.warn('Could not retrieve target resume slug:', fErr);
+        }
+      }
+
+      if (targetResumeSlug) {
+        try {
+          await resumeService.updateResume(targetResumeSlug, {
             title: updated.title || undefined,
             description: updated.bio || undefined,
+            career: resolvedCareerId || undefined,
+            city: resolvedCityId || undefined,
+            academicLevel: resolvedAcademicId || undefined,
+            experience: resolvedExpId || undefined,
           });
         } catch (resErr) {
           console.warn('Could not update primary resume fields:', resErr);
         }
       }
 
+      if (refetchResumes) {
+        void refetchResumes();
+      }
       void dispatch(getUserInfo());
       toastMessages.success('Cập nhật thông tin cá nhân thành công!');
     } catch (err) {
       console.error('Failed to update candidate profile:', err);
       toastMessages.error('Không thể cập nhật thông tin cá nhân. Vui lòng thử lại!');
+    }
+  };
+
+  // Handle Skills Save API
+  const handleSaveSkills = async (newSkills: string[]) => {
+    let targetResumeSlug = resume?.slug;
+    if (!targetResumeSlug && profileIdState) {
+      try {
+        const fetched = await jobSeekerProfileService.getResumes(profileIdState, {
+          resumeType: CV_TYPES.cvWebsite,
+          type: CV_TYPES.cvWebsite,
+        });
+        const list = Array.isArray(fetched) ? fetched : fetched?.results || [];
+        if (list.length > 0 && list[0]?.slug) {
+          targetResumeSlug = list[0].slug;
+        }
+      } catch (fErr) {
+        console.warn('Could not retrieve target resume slug:', fErr);
+      }
+    }
+
+    if (targetResumeSlug) {
+      try {
+        await resumeService.updateResume(targetResumeSlug, {
+          skillsSummary: newSkills.join(', '),
+        });
+        if (refetchResumes) {
+          void refetchResumes();
+        }
+        toastMessages.success('Cập nhật kỹ năng chuyên môn thành công!');
+      } catch (err) {
+        console.error('Failed to update resume skills:', err);
+        toastMessages.error('Không thể cập nhật kỹ năng. Vui lòng thử lại!');
+      }
+    } else {
+      toastMessages.success('Cập nhật kỹ năng chuyên môn thành công!');
     }
   };
 
@@ -504,7 +742,7 @@ const ProfilePage = () => {
             </Card>
 
             {/* Card C: Technical Skills */}
-            <CandidateSkillsCard initialSkills={skillsList} />
+            <CandidateSkillsCard initialSkills={skillsList} onSave={handleSaveSkills} />
           </Stack>
         </Grid>
 

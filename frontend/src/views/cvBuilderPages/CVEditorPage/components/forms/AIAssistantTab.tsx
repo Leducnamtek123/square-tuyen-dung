@@ -34,12 +34,15 @@ interface AIAssistantTabProps {
 
 const INDUSTRY_OPTIONS = [
   { value: 'all', label: 'Tất cả ngành nghề' },
-  { value: 'IT', label: 'Công nghệ thông tin / IT' },
-  { value: 'Marketing', label: 'Marketing & Truyền thông' },
+  { value: 'Construction', label: 'Xây dựng & Quản lý dự án' },
+  { value: 'RealEstate', label: 'Bất động sản & Phát triển kinh doanh' },
+  { value: 'Architecture', label: 'Kiến trúc & Thiết kế nội thất' },
+  { value: 'Engineering', label: 'Kỹ thuật & Cơ điện công trình (M&E)' },
   { value: 'Sales', label: 'Kinh doanh & B2B Sales' },
-  { value: 'HR', label: 'Nhân sự & Tuyển dụng' },
+  { value: 'Marketing', label: 'Marketing & Truyền thông' },
   { value: 'Finance', label: 'Tài chính & Kế toán' },
-  { value: 'Construction', label: 'Xây dựng & Kiến trúc' },
+  { value: 'HR', label: 'Hành chính & Nhân sự' },
+  { value: 'IT', label: 'Công nghệ thông tin / IT' },
 ];
 
 interface GeneratedAICity {

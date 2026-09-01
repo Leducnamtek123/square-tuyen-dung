@@ -116,7 +116,7 @@ class GetOnboardingStatusView(APIView):
                 score = 30
                 if company.company_name:
                     score += 20
-                if company.tax_code and not company.tax_code.startswith("TAX") and not company.tax_code.startswith("PENDING"):
+                if company.tax_code and not company.tax_code.startswith("PENDING") and not company.tax_code.startswith("TAX_") and not company.tax_code.startswith("DRAFT_"):
                     score += 20
                 if company.logo:
                     score += 15
@@ -141,7 +141,7 @@ class GetOnboardingStatusView(APIView):
                     "companyName": company.company_name or "",
                     "logoId": logo_file.id if logo_file else None,
                     "logoUrl": logo_file.get_full_url() if logo_file else "",
-                    "taxCode": company.tax_code if (company.tax_code and not company.tax_code.startswith("TAX") and not company.tax_code.startswith("PENDING")) else "",
+                    "taxCode": company.tax_code if (company.tax_code and not company.tax_code.startswith("PENDING") and not company.tax_code.startswith("TAX_") and not company.tax_code.startswith("DRAFT_")) else "",
                     "employeeSize": company.employee_size,
                     "fieldOperation": company.field_operation or "",
                     "cityId": loc.city_id if loc else None,
@@ -149,7 +149,7 @@ class GetOnboardingStatusView(APIView):
                     "address": loc.address if loc else "",
                     "websiteUrl": company.website_url or "",
                     "description": company.description or "",
-                    "companyEmail": company.company_email if (company.company_email and not company.company_email.endswith("@infohr.vn")) else "",
+                    "companyEmail": company.company_email or "",
                     "companyPhone": company.company_phone or "",
                     "recruiterName": user.full_name or "",
                     "recruiterTitle": "",
@@ -635,30 +635,48 @@ class EmployerOnboardingView(APIView):
         if not company and company_name:
             company = Company.objects.filter(company_name=company_name).first()
 
-        clean_tax = tax_code or f"TAX_{user.id}_{int(timezone.now().timestamp())}"
-        clean_email = company_email or user.email
-        clean_phone = company_phone or user.phone_number or "0900000000"
+        clean_tax = (tax_code or "").strip()
+        clean_email = (company_email or user.email or "").strip()
+        clean_phone = (company_phone or user.phone_number or "").strip()
 
         if not company:
-            if Company.objects.filter(tax_code=clean_tax).exists():
-                clean_tax = f"{clean_tax}_{user.id}"[:30]
-            if Company.objects.filter(company_email=clean_email).exists():
-                clean_email = f"c_{user.id}_{int(timezone.now().timestamp())}@infohr.vn"[:100]
+            # Duplicate validation
+            if clean_tax and Company.objects.filter(tax_code=clean_tax).exists():
+                return Response(
+                    {"errors": {"taxCode": ["Mã số thuế này đã được đăng ký bởi doanh nghiệp khác."]}},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if clean_email and Company.objects.filter(company_email=clean_email).exists():
+                return Response(
+                    {"errors": {"companyEmail": ["Email này đã được sử dụng bởi doanh nghiệp khác."]}},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if clean_phone and Company.objects.filter(company_phone=clean_phone).exists():
+                return Response(
+                    {"errors": {"companyPhone": ["Số điện thoại này đã được sử dụng bởi doanh nghiệp khác."]}},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            final_tax = clean_tax or f"PENDING_{user.id}"
+            final_email = clean_email or user.email
+            final_phone = clean_phone or user.phone_number or ""
 
             company = Company.objects.create(
                 user=user,
-                company_name=company_name,
-                company_email=clean_email,
-                company_phone=clean_phone,
-                tax_code=clean_tax,
+                company_name=company_name or f"Doanh nghiệp {user.full_name or user.id}",
+                company_email=final_email,
+                company_phone=final_phone,
+                tax_code=final_tax,
                 employee_size=employee_size,
-                field_operation=field_operation,
-                description=description
+                field_operation=field_operation or "",
+                description=description or ""
             )
         else:
-            company.company_name = company_name
+            if company_name:
+                company.company_name = company_name
             company.employee_size = employee_size
-            company.field_operation = field_operation
+            if field_operation:
+                company.field_operation = field_operation
             if description:
                 company.description = description
             if tax_code and not Company.objects.filter(tax_code=tax_code).exclude(id=company.id).exists():

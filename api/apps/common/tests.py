@@ -8,6 +8,7 @@ from oauth2_provider.models import Application
 from rest_framework.test import APIClient
 
 from apps.files.models import File
+from apps.locations.models import City
 from apps.common.models import AuditLog, Career
 from shared.configs.env_validation import validate_required_settings
 
@@ -467,11 +468,35 @@ def test_sync_oauth_client_supports_public_web_client_without_secret(monkeypatch
 @pytest.mark.django_db
 def test_get_popular_keywords_returns_success_list():
     client = APIClient()
+
+    # Case 1: Empty database returns clean empty list, no fake data
+    City.objects.all().delete()
+    Career.objects.all().delete()
+    response = client.get("/api/v1/common/popular-keywords/")
+    assert response.status_code == 200
+    payload = response.json()
+    data = payload.get("data", payload)
+    assert data == []
+
+    # Case 2: Seed real database records -> returns exact DB IDs & names
+    hn_city = City.objects.create(name="Thành phố Hà Nội", code="01")
+    career_it = Career.objects.create(name="Công nghệ thông tin")
+
     response = client.get("/api/v1/common/popular-keywords/")
     assert response.status_code == 200
     payload = response.json()
     data = payload.get("data", payload)
     assert isinstance(data, list)
-    assert len(data) >= 3
-    assert any("title" in item for item in data)
+    assert len(data) == 2
+
+    # City keyword matches real City DB record
+    city_item = next((item for item in data if item.get("cityId") == hn_city.id), None)
+    assert city_item is not None
+    assert "Hà Nội" in city_item["title"]
+
+    # Career keyword matches real Career DB record
+    career_item = next((item for item in data if item.get("careerId") == career_it.id), None)
+    assert career_item is not None
+    assert career_item["kw"] == "Công nghệ thông tin"
+
 

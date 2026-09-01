@@ -150,10 +150,14 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
 
         if location_data:
             if location_obj:
-                location_obj.city = location_data.get("city", location_obj.city)
-                location_obj.district = location_data.get("district", location_obj.district)
-                location_obj.ward = location_data.get("ward", location_obj.ward)
-                location_obj.address = location_data.get("address", location_obj.address)
+                if "city" in location_data:
+                    location_obj.city = location_data.get("city")
+                if "district" in location_data:
+                    location_obj.district = location_data.get("district")
+                if "ward" in location_data:
+                    location_obj.ward = location_data.get("ward")
+                if "address" in location_data:
+                    location_obj.address = location_data.get("address")
                 location_obj.save()
             else:
                 location_new = Location.objects.create(**location_data)

@@ -39,7 +39,9 @@ const CandidateCompletenessBannerCard = ({
   const { data: onboardingStatus } = useQuery({
     queryKey: ['onboardingStatus'],
     queryFn: () => authService.getOnboardingStatus(),
-    staleTime: 30_000,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   // Compute percentage from Backend API with real-time user fallback

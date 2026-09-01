@@ -1,76 +1,114 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Việc làm phù hợp dành cho bạn | InfoHR</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: #0f172a;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; padding: 30px 10px;">
-        <tr>
-            <td align="center">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 580px; background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
-                    <!-- Header -->
-                    <tr>
-                        <td style="padding: 24px 32px; border-bottom: 1px solid #f1f5f9; text-align: left;">
-                            <a href="https://infohr.vn" target="_blank" style="text-decoration: none;">
-                                <img src="https://infohr.vn/infohr-icons/logo-brand.png" alt="InfoHR" style="height: 36px; max-height: 36px; border: 0; outline: none; display: block;" />
-                            </a>
-                        </td>
-                    </tr>
-                    <!-- Body -->
-                    <tr>
-                        <td style="padding: 32px;">
-                            <!-- Icon Badge -->
-                            <table align="center" width="72" height="72" cellpadding="0" cellspacing="0" border="0" style="background-color: #f0fdf4; border-radius: 50%; margin: 0 auto 20px auto;">
-                                <tr>
-                                    <td align="center" valign="middle" style="font-size: 36px; line-height: 1;">📨</td>
-                                </tr>
-                            </table>
+{% extends 'base-email.html' %}
 
-                            <h1 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 12px 0; text-align: center;">Việc làm phù hợp dành cho bạn</h1>
-                            
-                            <p style="font-size: 15px; line-height: 1.6; color: #475569; text-align: center; margin-bottom: 24px;">
-                                Xin chào{% if full_name %} <strong>{{ full_name }}</strong>{% endif %},<br />
-                                {{ description|default:"Dưới đây là một số việc làm phù hợp với hồ sơ và sở thích của bạn." }}
-                            </p>
+{% block title %}Việc làm phù hợp dành cho bạn | InfoHR{% endblock %}
 
-                            {% if job_post_list %}
-                                {% for job in job_post_list %}
-                                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 14px; padding: 16px;">
-                                    <tr>
-                                        <td valign="top">
-                                            <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">{{ job.job_name }}</div>
-                                            {% if job.company__company_name %}<div style="font-size: 13px; color: #64748b; margin-bottom: 6px;">{{ job.company__company_name }}</div>{% endif %}
-                                            <div style="font-size: 13px; color: #475569;">
-                                                {% if job.location__city__name %}📍 {{ job.location__city__name }}{% endif %}
-                                                {% if job.salary_min or job.salary_max %} &bull; 💵 {{ job.salary_min|default:0 }} - {{ job.salary_max|default:"Thỏa thuận" }}{% endif %}
-                                            </div>
-                                        </td>
-                                        <td align="right" valign="middle" width="110">
-                                            <a href="{{ job_post_link|default:'https://infohr.vn/viec-lam/' }}" target="_blank" style="background-color: #dc2626; color: #ffffff; font-weight: 700; font-size: 13px; padding: 8px 14px; border-radius: 6px; text-decoration: none; display: inline-block;">Ứng tuyển ngay</a>
-                                        </td>
-                                    </tr>
-                                </table>
-                                {% endfor %}
-                            {% endif %}
+{% block preheader %}InfoHR gợi ý những cơ hội việc làm mới nhất phù hợp với hồ sơ của bạn.{% endblock %}
 
-                            <div style="text-align: center; margin-top: 24px;">
-                                <a href="{{ job_post_link|default:'https://infohr.vn/viec-lam/' }}" target="_blank" style="font-size: 15px; font-weight: 700; color: #2563eb; text-decoration: none;">Xem thêm việc làm phù hợp →</a>
-                            </div>
-                        </td>
-                    </tr>
-                    <!-- Footer -->
-                    <tr>
-                        <td style="padding: 20px 32px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; font-size: 13px; color: #64748b; text-align: center;">
-                            <span>© 2026 InfoHR. Bản quyền được bảo hộ.</span>
-                            <span style="margin: 0 8px;">|</span>
-                            <a href="https://infohr.vn" target="_blank" style="color: #64748b; text-decoration: none;">infohr.vn</a>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
+{% block content %}
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <!-- Discovery / Sparkle Badge -->
+    <tr>
+        <td align="center" style="padding-bottom: 20px;">
+            <table align="center" width="68" height="68" cellpadding="0" cellspacing="0" border="0" style="background-color: #eff6ff; border: 2px solid #bfdbfe; border-radius: 50%; margin: 0 auto; text-align: center;">
+                <tr>
+                    <td align="center" valign="middle" style="text-align: center; height: 68px; width: 68px;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto;">
+                            <rect x="2" y="7" width="20" height="14" rx="2" stroke="#2563eb" stroke-width="2.2"/>
+                            <path d="M16 7V5C16 3.89543 15.1046 3 14 3H10C8.89543 3 8 3.89543 8 5V7" stroke="#2563eb" stroke-width="2.2"/>
+                            <path d="M12 12V14" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <!--[if mso]>
+                        <span style="font-size: 24px; color: #2563eb; font-weight: bold; line-height: 1;">&#128188;</span>
+                        <![endif]-->
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Main Heading -->
+    <tr>
+        <td align="center" style="padding-bottom: 8px;">
+            <h1 class="text-dark" style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.02em;">
+                Việc làm phù hợp dành cho bạn
+            </h1>
+        </td>
+    </tr>
+
+    <!-- Salutation -->
+    <tr>
+        <td align="center" style="padding-bottom: 24px;">
+            <p class="text-muted" style="font-size: 15px; line-height: 1.6; color: #475569; margin: 0; max-width: 480px;">
+                Xin chào{% if full_name %} <strong class="text-dark" style="color: #0f172a;">{{ full_name }}</strong>{% endif %},<br />
+                {{ description|default:"Dưới đây là các vị trí tuyển dụng mới nhất phù hợp với kỹ năng và tiêu chí tìm việc của bạn:" }}
+            </p>
+        </td>
+    </tr>
+
+    <!-- Job Cards List -->
+    {% if job_post_list %}
+    <tr>
+        <td style="padding-bottom: 20px;">
+            {% for job in job_post_list %}
+            <table class="meta-box" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <tr>
+                    <td style="padding: 16px 18px;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td valign="middle">
+                                    <div class="text-dark" style="font-size: 16px; font-weight: 700; color: #0f172a; line-height: 1.3; margin-bottom: 4px;">
+                                        {{ job.job_name }}
+                                    </div>
+                                    {% if job.company__company_name %}
+                                    <div style="font-size: 13px; font-weight: 600; color: #2563eb; margin-bottom: 8px;">
+                                        {{ job.company__company_name }}
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        {% if job.location__city__name %}
+                                        <span class="badge-neutral" style="display: inline-block; padding: 2px 8px; background-color: #f1f5f9; color: #475569; border-radius: 4px; font-size: 11px; font-weight: 600; margin-right: 6px;">
+                                            {{ job.location__city__name }}
+                                        </span>
+                                        {% endif %}
+                                        {% if job.salary_min or job.salary_max %}
+                                        <span style="display: inline-block; padding: 2px 8px; background-color: #ecfdf5; color: #059669; border-radius: 4px; font-size: 11px; font-weight: 700;">
+                                            {{ job.salary_min|default:0 }} - {{ job.salary_max|default:"Thỏa thuận" }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td align="right" valign="middle" width="110">
+                                    <a href="{{ job_post_link|default:'https://infohr.vn/viec-lam/' }}" target="_blank" style="background-color: #2563eb; color: #ffffff; font-weight: 700; font-size: 12px; padding: 8px 14px; border-radius: 6px; text-decoration: none; display: inline-block; white-space: nowrap;">
+                                        Ứng tuyển
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            {% endfor %}
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Bottom Action Button -->
+    <tr>
+        <td align="center" style="padding-top: 10px;">
+            <a href="{{ job_post_link|default:'https://infohr.vn/viec-lam/' }}" target="_blank" style="font-size: 14px; font-weight: 700; color: #2563eb; text-decoration: none; display: inline-block;">
+                Khám phá thêm việc làm phù hợp &rarr;
+            </a>
+        </td>
+    </tr>
+</table>
+{% endblock %}
+
+{% block footer_note %}
+{% if job_post_notification_link %}
+<tr>
+    <td style="padding: 12px 36px 0 36px; text-align: center; font-size: 12px; color: #94a3b8;">
+        Bạn có thể tùy chỉnh tiêu chí hoặc tắt thông báo gợi ý việc làm tại <a href="{{ job_post_notification_link }}" target="_blank" style="color: #64748b; text-decoration: underline;">Cài đặt thông báo</a>.
+    </td>
+</tr>
+{% endif %}
+{% endblock %}

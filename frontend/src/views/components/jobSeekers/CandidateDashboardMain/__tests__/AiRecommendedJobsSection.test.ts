@@ -12,7 +12,7 @@ describe('AiRecommendedJobsSection Component & API Contract', () => {
   });
 
   it('slices the top 4 AI suggested job posts', () => {
-    expect(source).toContain('setJobs(list.slice(0, 4))');
+    expect(source).toContain('list.slice(0, 4)');
   });
 
   it('uses candidateDashboard.aiRecommended translation keys', () => {

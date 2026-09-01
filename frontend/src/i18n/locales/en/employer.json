@@ -109,9 +109,9 @@
     },
     "status": {
       "updateTitle": "Update application status",
-      "updateConfirm": "The profile will be updated to status <strong style=\"color:red;\">\"{{statusName}}\"</strong>. Are you sure?",
+      "updateConfirm": "The profile will be updated to status <strong>\"{{statusName}}\"</strong>. Are you sure?",
       "errorTitle": "Error occurred",
-      "errorMsg": "You are not allowed to change the application status from <strong style=\"color:red;\">\"{{fromStatus}}\"</strong> to <strong style=\"color:red;\">\"{{toStatus}}\"</strong>",
+      "errorMsg": "You are not allowed to change the application status from <strong>\"{{fromStatus}}\"</strong> to <strong>\"{{toStatus}}\"</strong>",
       "updateSuccess": "Update successful.",
       "rollbackMsg": "Could not update status. Reverted to previous state."
     },

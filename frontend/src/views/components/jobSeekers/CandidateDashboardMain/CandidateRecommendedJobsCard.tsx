@@ -26,6 +26,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import jobService from '@/services/jobService';
+import { useQuery } from '@tanstack/react-query';
 import type { JobPost } from '@/types/models';
 
 const formatSalary = (min?: number | null, max?: number | null) => {
@@ -60,36 +61,23 @@ const getLocationName = (loc: unknown): string => {
   return 'Toàn quốc';
 };
 
+const RECOMMENDED_JOBS_PARAMS = Object.freeze({ page: 1, pageSize: 6 });
+
 const CandidateRecommendedJobsCard = () => {
   const { i18n } = useTranslation('common');
-  const [jobs, setJobs] = React.useState<JobPost[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
   const [savedJobs, setSavedJobs] = React.useState<Record<number, boolean>>({});
   const [toastMessage, setToastMessage] = React.useState<string | null>(null);
 
-  React.useEffect(() => {
-    let isMounted = true;
-    setIsLoading(true);
-
-    // Fetch real jobs from backend API
-    jobService
-      .getJobPosts({ page: 1, pageSize: 6 })
-      .then((res) => {
-        if (!isMounted) return;
-        const jobList = res.results || [];
-        setJobs(jobList);
-      })
-      .catch((err) => {
-        console.error('Failed to load recommended jobs from API:', err);
-      })
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { data: jobs = [], isLoading } = useQuery<JobPost[]>({
+    queryKey: ['candidateRecommendedJobsCard', RECOMMENDED_JOBS_PARAMS],
+    queryFn: async () => {
+      const res = await jobService.getJobPosts(RECOMMENDED_JOBS_PARAMS);
+      return res.results || [];
+    },
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
 
   const handleToggleSave = async (e: React.MouseEvent, jobId: number, title: string, slug: string) => {
     e.preventDefault();

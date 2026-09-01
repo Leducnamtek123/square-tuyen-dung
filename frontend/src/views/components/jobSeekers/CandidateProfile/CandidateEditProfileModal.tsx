@@ -334,6 +334,21 @@ const CandidateEditProfileModal: React.FC<CandidateEditProfileModalProps> = ({
               />
             </Grid>
 
+            {/* Địa chỉ chi tiết */}
+            <Grid size={{ xs: 12 }}>
+              <Typography variant="caption" sx={{ color: '#0f172a', fontWeight: 700, mb: 0.5, display: 'block' }}>
+                Địa chỉ chi tiết
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="VD: Số 29 Hòa Hảo, Phường 2..."
+                value={formData.address}
+                onChange={(e) => handleChange('address', e.target.value)}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+              />
+            </Grid>
+
             {/* Trình độ học vấn */}
             <Grid size={{ xs: 12, sm: 6 }}>
               <Typography variant="caption" sx={{ color: '#0f172a', fontWeight: 700, mb: 0.5, display: 'block' }}>

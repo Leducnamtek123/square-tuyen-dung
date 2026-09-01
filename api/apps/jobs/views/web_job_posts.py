@@ -134,7 +134,7 @@ class PrivateJobPostViewSet(
             matching_qs = matching_qs.filter(city_id=job_city_id)
         matching_qs = matching_qs.select_related('user', 'user__avatar', 'city', 'career')
 
-        resumes = list(matching_qs[:50])
+        resumes = list(matching_qs[:25])
 
         from apps.profiles.models import ResumeSaved
         saved_resume_ids = set()
@@ -146,40 +146,41 @@ class PrivateJobPostViewSet(
                 )
 
         recommendations: list[dict] = []
-        for resume in resumes:
+        for idx, resume in enumerate(resumes):
             user = resume.user
             if not user or not user.is_active:
                 continue
 
-            # Evaluate fit using LLM Service
-            resume_data = {
-                "title": resume.title or "",
-                "skills": resume.skills_summary or "",
-                "experience": resume.experience or 0,
-                "academic_level": getattr(resume, "academic_level", 0) or 0,
-                "salary_min": getattr(resume, "salary_min", 0) or 0,
-                "salary_max": getattr(resume, "salary_max", 0) or 0,
-            }
-            job_data = {
-                "job_name": job_post.job_name or "",
-                "description": job_post.job_description or "",
-                "experience": job_post.experience or 0,
-                "salary_min": job_post.salary_min or 0,
-                "salary_max": job_post.salary_max or 0,
-            }
-
-            llm_result = score_resume_job_fit(resume_data, job_data, resume_id=resume.id, job_id=job_post.id)
-            
             score = None
             reasons = []
-            if isinstance(llm_result, dict):
-                score_val = llm_result.get("overall_score")
-                if score_val is not None:
-                    try:
-                        score = int(score_val)
-                    except (ValueError, TypeError):
-                        score = None
-                reasons = [r for r in llm_result.get("strengths", []) if isinstance(r, str) and r.strip()]
+
+            # Only invoke live LLM evaluation on top 5 candidates to keep HTTP response under 500ms
+            if idx < 5:
+                resume_data = {
+                    "title": resume.title or "",
+                    "skills": resume.skills_summary or "",
+                    "experience": resume.experience or 0,
+                    "academic_level": getattr(resume, "academic_level", 0) or 0,
+                    "salary_min": getattr(resume, "salary_min", 0) or 0,
+                    "salary_max": getattr(resume, "salary_max", 0) or 0,
+                }
+                job_data = {
+                    "job_name": job_post.job_name or "",
+                    "description": job_post.job_description or "",
+                    "experience": job_post.experience or 0,
+                    "salary_min": job_post.salary_min or 0,
+                    "salary_max": job_post.salary_max or 0,
+                }
+
+                try:
+                    llm_result = score_resume_job_fit(resume_data, job_data, resume_id=resume.id, job_id=job_post.id)
+                    if isinstance(llm_result, dict):
+                        score_val = llm_result.get("overall_score")
+                        if score_val is not None:
+                            score = int(score_val)
+                        reasons = [r for r in llm_result.get("strengths", []) if isinstance(r, str) and r.strip()]
+                except Exception as ex:
+                    helper.print_log_error("score_resume_job_fit", ex)
 
             if not reasons:
                 if job_career_id and resume.career_id == job_career_id:

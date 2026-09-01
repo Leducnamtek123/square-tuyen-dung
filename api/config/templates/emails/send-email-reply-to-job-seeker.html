@@ -1,76 +1,129 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Phản hồi từ Nhà tuyển dụng | InfoHR</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: #0f172a;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; padding: 30px 10px;">
-        <tr>
-            <td align="center">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 580px; background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
-                    <!-- Header -->
-                    <tr>
-                        <td style="padding: 24px 32px; border-bottom: 1px solid #f1f5f9; text-align: left;">
-                            <a href="https://infohr.vn" target="_blank" style="text-decoration: none;">
-                                <img src="https://infohr.vn/infohr-icons/logo-brand.png" alt="InfoHR" style="height: 36px; max-height: 36px; border: 0; outline: none; display: block;" />
-                            </a>
-                        </td>
-                    </tr>
-                    <!-- Body -->
-                    <tr>
-                        <td style="padding: 32px;">
-                            <!-- Icon Badge -->
-                            <table align="center" width="72" height="72" cellpadding="0" cellspacing="0" border="0" style="background-color: #eff6ff; border-radius: 50%; margin: 0 auto 20px auto;">
-                                <tr>
-                                    <td align="center" valign="middle" style="font-size: 36px; line-height: 1;">📩</td>
-                                </tr>
-                            </table>
+{% extends 'base-email.html' %}
 
-                            <h1 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 12px 0; text-align: center;">Phản hồi từ nhà tuyển dụng</h1>
-                            
-                            <div style="font-size: 15px; line-height: 1.6; color: #475569; margin-bottom: 20px; text-align: center;">
-                                Xin chào{% if candidate_name %} <strong>{{ candidate_name }}</strong>{% elif full_name %} <strong>{{ full_name }}</strong>{% endif %},<br />
-                                {% if company_name %}Nhà tuyển dụng <strong>{{ company_name }}</strong> đã phản hồi về hồ sơ của bạn{% endif %}
-                                {% if job_title or job_name %} cho vị trí:<br />
-                                <div style="display: inline-block; padding: 8px 16px; background-color: #eff6ff; border-radius: 20px; color: #1d4ed8; font-weight: 700; font-size: 14px; margin-top: 8px;">👤 {{ job_title|default:job_name }}</div>
-                                {% endif %}
-                            </div>
+{% block title %}Phản hồi từ Nhà tuyển dụng | InfoHR{% endblock %}
 
-                            {% if content or message_content or note %}
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f0f9ff; border-left: 4px solid #0284c7; border-radius: 8px; margin: 24px 0; padding: 18px 22px; text-align: left;">
-                                <tr>
-                                    <td style="font-size: 14px; line-height: 1.7; color: #0369a1; font-style: italic;">
-                                        “ {{ content|default:message_content|default:note }} ”
-                                    </td>
-                                </tr>
-                            </table>
+{% block preheader %}Nhà tuyển dụng {% if company_name %}{{ company_name }}{% else %}InfoHR{% endif %} đã phản hồi về hồ sơ ứng tuyển của bạn.{% endblock %}
+
+{% block content %}
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <!-- Message Notification Badge -->
+    <tr>
+        <td align="center" style="padding-bottom: 20px;">
+            <table align="center" width="68" height="68" cellpadding="0" cellspacing="0" border="0" style="background-color: #eff6ff; border: 2px solid #bfdbfe; border-radius: 50%; margin: 0 auto; text-align: center;">
+                <tr>
+                    <td align="center" valign="middle" style="text-align: center; height: 68px; width: 68px;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto;">
+                            <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <!--[if mso]>
+                        <span style="font-size: 24px; color: #2563eb; font-weight: bold; line-height: 1;">&#9993;</span>
+                        <![endif]-->
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Main Heading -->
+    <tr>
+        <td align="center" style="padding-bottom: 8px;">
+            <h1 class="text-dark" style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.02em;">
+                Phản hồi từ Nhà tuyển dụng
+            </h1>
+        </td>
+    </tr>
+
+    <!-- Salutation & Context -->
+    <tr>
+        <td align="center" style="padding-bottom: 20px;">
+            <p class="text-muted" style="font-size: 15px; line-height: 1.6; color: #475569; margin: 0; max-width: 480px;">
+                Xin chào{% if candidate_name %} <strong class="text-dark" style="color: #0f172a;">{{ candidate_name }}</strong>{% elif full_name %} <strong class="text-dark" style="color: #0f172a;">{{ full_name }}</strong>{% endif %},<br />
+                {% if company_name %}Nhà tuyển dụng <strong style="color: #2563eb;">{{ company_name }}</strong> đã gửi thông tin phản hồi về hồ sơ ứng tuyển của bạn.{% else %}Bạn có thông báo phản hồi mới từ nhà tuyển dụng.{% endif %}
+            </p>
+            {% if job_title or job_name %}
+            <div style="margin-top: 10px;">
+                <span class="badge-neutral" style="display: inline-block; padding: 4px 12px; background-color: #f1f5f9; color: #334155; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                    Vị trí: {% if job_title %}{{ job_title }}{% else %}{{ job_name }}{% endif %}
+                </span>
+            </div>
+            {% endif %}
+        </td>
+    </tr>
+
+    <!-- Message Quote Card -->
+    {% if content or message_content or note %}
+    <tr>
+        <td style="padding-bottom: 24px;">
+            <table class="meta-box" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border-left: 4px solid #2563eb; border-radius: 8px; border-top: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 18px 20px;">
+                <tr>
+                    <td>
+                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 6px; letter-spacing: 0.5px;">Lời nhắn từ nhà tuyển dụng:</div>
+                        <div style="font-size: 14px; line-height: 1.7; color: #1e293b; font-style: italic;">
+                            “ {% if content %}{{ content }}{% elif message_content %}{{ message_content }}{% else %}{{ note }}{% endif %} ”
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    {% endif %}
+
+    <!-- Contact & Application Metadata -->
+    <tr>
+        <td style="padding-bottom: 28px;">
+            <table class="meta-box" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px;">
+                <tr>
+                    <td>
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="font-size: 13px; font-weight: 700; color: #0f172a; padding-bottom: 10px;" colspan="2">
+                                    Thông tin liên hệ & Trạng thái:
+                                </td>
+                            </tr>
+                            {% if contact_email %}
+                            <tr>
+                                <td class="text-muted" style="font-size: 13px; color: #64748b; padding: 4px 0;" width="110">Email liên hệ:</td>
+                                <td class="text-dark" style="font-size: 13px; font-weight: 600; color: #0f172a; padding: 4px 0;"><a href="mailto:{{ contact_email }}" style="color: #2563eb; text-decoration: none;">{{ contact_email }}</a></td>
+                            </tr>
                             {% endif %}
+                            {% if contact_phone %}
+                            <tr>
+                                <td class="text-muted" style="font-size: 13px; color: #64748b; padding: 4px 0;">Số điện thoại:</td>
+                                <td class="text-dark" style="font-size: 13px; font-weight: 600; color: #0f172a; padding: 4px 0;">{{ contact_phone }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if status or application_status %}
+                            <tr>
+                                <td class="text-muted" style="font-size: 13px; color: #64748b; padding: 4px 0;">Trạng thái hồ sơ:</td>
+                                <td style="font-size: 13px; padding: 4px 0;">
+                                    <span style="display: inline-block; padding: 2px 8px; background-color: #dbeafe; color: #1d4ed8; border-radius: 4px; font-weight: 700;">
+                                        {% if status %}{{ status }}{% else %}{{ application_status }}{% endif %}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: left;">
-                                <tr>
-                                    <td style="font-size: 14px; line-height: 1.8; color: #334155;">
-                                        <strong>Thông tin liên hệ:</strong><br />
-                                        {% if contact_email %}📧 Email: <strong>{{ contact_email }}</strong><br />{% endif %}
-                                        {% if contact_phone %}📞 SĐT: <strong>{{ contact_phone }}</strong><br />{% endif %}
-                                        {% if status or application_status %}🏷️ Trạng thái hồ sơ: <span style="color: #2563eb; font-weight: 700;">{{ status|default:application_status }}</span>{% endif %}
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <!-- Footer -->
-                    <tr>
-                        <td style="padding: 20px 32px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; font-size: 13px; color: #64748b; text-align: center;">
-                            <span>© 2026 InfoHR. Bản quyền được bảo hộ.</span>
-                            <span style="margin: 0 8px;">|</span>
-                            <a href="https://infohr.vn" target="_blank" style="color: #64748b; text-decoration: none;">infohr.vn</a>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
+    <!-- Call to Action Button -->
+    <tr>
+        <td align="center">
+            <!--[if mso]>
+            <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://infohr.vn/ung-vien/viec-lam-cua-toi/?tab=1" style="height:44px;v-text-anchor:middle;width:240px;" arcsize="18%" strokecolor="#1d4ed8" fillcolor="#2563eb">
+                <w:anchorlock/>
+                <center style="color:#ffffff;font-family:sans-serif;font-size:14px;font-weight:bold;">Xem chi tiết hồ sơ &rarr;</center>
+            </v:roundrect>
+            <![endif]-->
+            <!--[if !mso]><!-- -->
+            <a href="https://infohr.vn/ung-vien/viec-lam-cua-toi/?tab=1" target="_blank" style="background-color: #2563eb; color: #ffffff; display: inline-block; font-size: 14px; font-weight: 700; line-height: 44px; text-align: center; text-decoration: none; width: 240px; -webkit-text-size-adjust: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);">
+                Xem chi tiết hồ sơ &rarr;
+            </a>
+            <!--<![endif]-->
+        </td>
+    </tr>
+</table>
+{% endblock %}

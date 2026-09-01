@@ -61,7 +61,7 @@ describe('CV Builder Pages & Fullstack Components Test Suite', () => {
     it('supports 1-click sync from candidate profile and active resume', () => {
       expect(editorSource).toContain('handleSyncFromProfile');
       expect(editorSource).toContain('jobSeekerProfileService.getProfile');
-      expect(editorSource).toContain('resumeService.getResumes');
+      expect(editorSource).toContain('jobSeekerProfileService.getResumes');
       expect(editorSource).toContain('resumeService.getExperiencesDetail');
       expect(editorSource).toContain('resumeService.getEducationsDetail');
     });

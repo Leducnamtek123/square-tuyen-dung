@@ -104,10 +104,11 @@ class CompanyView(viewsets.ViewSet):
 
         try:
             job_post_queryset = JobPost.objects.get(pk=pk, company=company)
-
         except JobPost.DoesNotExist:
-
-            return var_res.response_data(data=None)
+            return var_res.response_data(
+                status=status.HTTP_404_NOT_FOUND,
+                errors={"detail": "Không tìm thấy tin tuyển dụng hoặc bạn không có quyền truy cập."}
+            )
 
         job_post_serializer = job_serializers.JobPostSerializer(
             job_post_queryset,

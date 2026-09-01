@@ -49,16 +49,6 @@ class CloudinaryService:
     @staticmethod
     def _get_client(endpoint_override: str = None):
         endpoint = endpoint_override or getattr(settings, "MINIO_ENDPOINT", "minio:9000")
-        if not endpoint_override:
-            try:
-                import socket
-                host = endpoint.replace("http://", "").replace("https://", "").split("/")[0].split(":")[0]
-                socket.gethostbyname(host)
-            except Exception:
-                public_url = getattr(settings, "MINIO_PUBLIC_URL", "")
-                if public_url:
-                    endpoint = public_url
-
         endpoint, secure = CloudinaryService._resolve_endpoint(
             endpoint, settings.MINIO_SECURE
         )

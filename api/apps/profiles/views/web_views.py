@@ -139,7 +139,15 @@ class JobSeekerProfileViewSet(viewsets.ViewSet,
 
         query_params = request.query_params
 
-        resume_type = query_params.get("resumeType", None)
+        raw_type = query_params.get("resumeType", None) or query_params.get("type", None)
+        resume_type = None
+        if raw_type is not None:
+            if str(raw_type).upper() == "WEBSITE" or str(raw_type) == "1":
+                resume_type = var_sys.CV_WEBSITE
+            elif str(raw_type).upper() == "UPLOAD" or str(raw_type) == "2":
+                resume_type = var_sys.CV_UPLOAD
+            else:
+                resume_type = raw_type
 
         job_seeker_profile = JobSeekerProfile.objects.filter(pk=pk, user=request.user).first()
 
@@ -152,53 +160,43 @@ class JobSeekerProfileViewSet(viewsets.ViewSet,
         resumes = job_seeker_profile.resumes
 
         # get all
-
         if resume_type is None:
-
             serializer = ResumeSerializer(resumes, many=True, fields=[
-
                 "id", "slug", "title", "type", "updateAt", "fileUrl", "imageUrl", "isActive"
-
             ])
 
         else:
-
             # get by type
-
             if not (resume_type == var_sys.CV_WEBSITE) and not (resume_type == var_sys.CV_UPLOAD):
-
                 return var_res.response_data(status=status.HTTP_400_BAD_REQUEST,
-
                                              errors={"detail": "resumeType is invalid."})
 
             resumes = resumes.filter(type=resume_type)
 
             if resume_type == var_sys.CV_WEBSITE:
+                resume_obj = resumes.first()
+                if not resume_obj:
+                    user_label = getattr(job_seeker_profile.user, 'full_name', None) or getattr(job_seeker_profile.user, 'email', '')
+                    resume_obj = Resume.objects.create(
+                        user=job_seeker_profile.user,
+                        job_seeker_profile=job_seeker_profile,
+                        type=var_sys.CV_WEBSITE,
+                        title=f"Hồ sơ trực tuyến của {user_label}".strip()
+                    )
 
-                if not resumes.first():
-
-                    return var_res.response_data()
-
-                serializer = ResumeSerializer(resumes.first(),
-
-                                              fields=["id", "slug", "title", "experience", "position",
-
-                                                      "salaryMin", "salaryMax", "updateAt", "user", "isActive",
-
+                serializer = ResumeSerializer(resume_obj,
+                                              fields=["id", "slug", "title", "description", "career", "city",
+                                                      "academicLevel", "experience", "position",
+                                                      "salaryMin", "salaryMax", "expectedSalary", "skillsSummary",
+                                                      "updateAt", "user", "isActive",
                                                       "positionChooseData", "experienceChooseData", "academicLevelChooseData",
-
-                                                      "typeOfWorkplaceChooseData", "jobTypeChooseData",
-
+                                                      "typeOfWorkplaceChooseData", "jobTypeChooseData", "careerChooseData", "cityChooseData",
                                                       "experienceDetails", "educationDetails", "certificateDetails",
-
                                                       "languageSkills", "advancedSkills"])
 
             else:
-
                 serializer = ResumeSerializer(resumes, many=True,
-
                                               fields=["id", "slug", "title", "updateAt",
-
                                                       "imageUrl", "fileUrl", "isActive"])
 
         return var_res.response_data(data=serializer.data)
@@ -701,31 +699,27 @@ class ResumeViewSet(viewsets.ViewSet,
             )
             is_saved = True
 
-        # send notification safely in background thread to avoid blocking HTTP response
-        import threading
-        def _send_notification_async():
-            try:
-                notification_content = NOTIFICATION_MESSAGES[
-                    'RESUME_SAVED'] if is_saved else NOTIFICATION_MESSAGES['RESUME_UNSAVED']
+        # Send notification via Celery async queue
+        try:
+            notification_content = NOTIFICATION_MESSAGES[
+                'RESUME_SAVED'] if is_saved else NOTIFICATION_MESSAGES['RESUME_UNSAVED']
 
-                logo_url = var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
-                if company and company.logo:
-                    if hasattr(company.logo, 'get_full_url'):
-                        try:
-                            logo_url = company.logo.get_full_url()
-                        except Exception:
-                            pass
+            logo_url = var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+            if company and company.logo:
+                if hasattr(company.logo, 'get_full_url'):
+                    try:
+                        logo_url = company.logo.get_full_url()
+                    except Exception:
+                        pass
 
-                helper.add_employer_saved_resume_notifications(
-                    company.company_name if company else "Công ty",
-                    notification_content,
-                    logo_url,
-                    resume_obj.user_id
-                )
-            except Exception:
-                pass
-
-        threading.Thread(target=_send_notification_async, daemon=True).start()
+            helper.add_employer_saved_resume_notifications(
+                company.company_name if company else "Công ty",
+                notification_content,
+                logo_url,
+                resume_obj.user_id
+            )
+        except Exception as ex:
+            helper.print_log_error("ResumeSavedViewSet.toggle_save_resume.notify", ex)
 
         return var_res.response_data(data={
             "isSaved": is_saved
@@ -976,40 +970,38 @@ class ResumeSavedViewSet(viewsets.ViewSet,
             return var_res.response_data(data=serializer.data)
         except Exception as ex:
             helper.print_log_error("ResumeSavedViewSet.list", ex)
-            return var_res.response_data(data=self._empty_result())
+            return var_res.response_data(
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                errors={"detail": "Không thể tải danh sách hồ sơ đã lưu."}
+            )
 
     @action(methods=["get"], detail=False,
-
             url_path="export", url_name="resumes-export")
-
     def export_resumes(self, request):
         try:
             user = request.user
-
             company = user.get_active_company()
-
             if not company:
-
-                return var_res.response_data(data=[])
+                return var_res.response_data(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    errors={"detail": "Tài khoản chưa liên kết doanh nghiệp."}
+                )
 
             queryset = self.filter_queryset(self.get_queryset()
-
                                             .filter(company=company,
-
                                                     resume__is_active=True)
-
                                             .order_by("-create_at"))
 
             serializer = ResumeSavedExportSerializer(queryset, many=True)
-
             result_data = utils.convert_data_with_en_key_to_vn_kew(serializer.data,
-
                                                                    table_export.RESUMES_EXPORT_FIELD)
-
             return var_res.response_data(data=result_data)
         except Exception as ex:
             helper.print_log_error("ResumeSavedViewSet.export_resumes", ex)
-            return var_res.response_data(data=[])
+            return var_res.response_data(
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                errors={"detail": "Không thể xuất danh sách hồ sơ."}
+            )
 
 class EducationDetailViewSet(viewsets.ViewSet,
 

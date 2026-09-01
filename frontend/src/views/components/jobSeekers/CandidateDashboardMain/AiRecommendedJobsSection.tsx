@@ -22,36 +22,24 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import httpRequest from '@/utils/httpRequest';
 import { unwrapDataResponse } from '@/utils/apiResponse';
+import { useQuery } from '@tanstack/react-query';
 import type { JobPost } from '@/types/models';
 
 const AiRecommendedJobsSection = () => {
   const { t, i18n } = useTranslation(['jobSeeker', 'common']);
-  const [loading, setLoading] = React.useState(true);
-  const [jobs, setJobs] = React.useState<JobPost[]>([]);
 
-  React.useEffect(() => {
-    let isMounted = true;
-    setLoading(true);
-
-    httpRequest
-      .get('job/web/job-posts/recommended-jobs/')
-      .then((res) => {
-        if (!isMounted) return;
-        const data = unwrapDataResponse<JobPost[] | { results?: JobPost[] }>(res);
-        const list = Array.isArray(data) ? data : data?.results || [];
-        setJobs(list.slice(0, 4));
-      })
-      .catch(() => {
-        if (isMounted) setJobs([]);
-      })
-      .finally(() => {
-        if (isMounted) setLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { data: jobs = [], isLoading: loading } = useQuery<JobPost[]>({
+    queryKey: ['aiRecommendedJobsDashboard'],
+    queryFn: async () => {
+      const res = await httpRequest.get('job/web/job-posts/recommended-jobs/');
+      const data = unwrapDataResponse<JobPost[] | { results?: JobPost[] }>(res);
+      const list = Array.isArray(data) ? data : data?.results || [];
+      return list.slice(0, 4);
+    },
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
 
   const jobsPath = localizeRoutePath('/jobs', i18n.language);
 

@@ -142,6 +142,10 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     jobType = serializers.IntegerField(source="job_type", required=False, allow_null=True, default=1)
     jobTypeChooseData = serializers.SerializerMethodField(
         method_name="get_job_type_data", read_only=True)
+    careerChooseData = serializers.SerializerMethodField(
+        method_name="get_career_data", read_only=True)
+    cityChooseData = serializers.SerializerMethodField(
+        method_name="get_city_data", read_only=True)
     isActive = serializers.BooleanField(source="is_active", default=True)
     updateAt = serializers.DateTimeField(source="update_at", read_only=True)
     imageUrl = serializers.SerializerMethodField(
@@ -183,8 +187,11 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super(ResumeSerializer, self).get_fields(*args, **kwargs)
         request = self.context.get('request', None)
-        if request and getattr(request, 'method', None) in ["PUT"]:
-            fields['file'].required = False
+        if request and getattr(request, 'method', None) in ["PUT", "PATCH"]:
+            if 'file' in fields:
+                fields['file'].required = False
+            if 'title' in fields:
+                fields['title'].required = False
         if request:
             user = getattr(request, 'user', None)
             if user and (getattr(user, 'role_name', None) == 'EMPLOYER' or getattr(user, 'active_company', None) is not None):
@@ -274,6 +281,16 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             return {'id': resume.job_type, 'name': resume.get_job_type_display()}
         return None
 
+    def get_career_data(self, resume):
+        if resume.career:
+            return {'id': resume.career.id, 'name': resume.career.name}
+        return None
+
+    def get_city_data(self, resume):
+        if resume.city:
+            return {'id': resume.city.id, 'name': resume.city.name}
+        return None
+
     def get_experience_details(self, resume):
         experiences = []
         for exp in resume.experience_details.all():
@@ -361,7 +378,7 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   "viewEmployerNumber", "lastViewedDate",
                   "userDict", "jobSeekerProfileDict",
                   "type", "positionChooseData", "experienceChooseData", "academicLevelChooseData",
-                  "typeOfWorkplaceChooseData", "jobTypeChooseData",
+                  "typeOfWorkplaceChooseData", "jobTypeChooseData", "careerChooseData", "cityChooseData",
                   "experienceDetails", "educationDetails", "certificateDetails",
                   "languageSkills", "advancedSkills",
                   "sourcePlatform", "sourceUrl", "sourceAccount", "sourceRef", "isImported", "matchScore")

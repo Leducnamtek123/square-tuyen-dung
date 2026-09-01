@@ -929,13 +929,26 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         from django.http import HttpResponse
         from django.utils import timezone
         from .calendar_service import generate_interview_ics
-        session = self.get_object()
+
+        # Require authenticated user OR valid invite token
+        token = request.query_params.get("token") or request.headers.get("X-Invite-Token")
+        if request.user.is_authenticated:
+            session = self.get_object()
+        elif token:
+            session = InterviewSession.objects.filter(pk=pk, invite_token=token).first()
+            if not session:
+                return response_data(status=status.HTTP_404_NOT_FOUND, errors={"detail": "Phiên phỏng vấn hoặc mã mời không hợp lệ."})
+        else:
+            return response_data(status=status.HTTP_401_UNAUTHORIZED, errors={"detail": "Yêu cầu đăng nhập hoặc cung cấp mã mời hợp lệ."})
+
         scheduled_at = session.scheduled_at or session.start_time or timezone.now()
         candidate_name = session.candidate.full_name if session.candidate else "Ứng viên"
         candidate_email = session.candidate.email if session.candidate else ""
         job_title = session.job_post.job_name if session.job_post else "Phỏng vấn Tuyển dụng"
-        company_name = session.job_post.company.company_name if session.job_post and session.job_post.company else "Square Platform"
-        room_url = f"https://square.vn/interviews/room/{session.room_name}"
+        company_name = session.job_post.company.company_name if session.job_post and session.job_post.company else "InfoHR Platform"
+        
+        client_base_url = str(getattr(settings, "WEB_CLIENT_URL", "") or getattr(settings, "DOMAIN_CLIENT", "") or "https://infohr.vn").rstrip("/")
+        room_url = f"{client_base_url}/interviews/room/{session.room_name}"
 
         ics_content = generate_interview_ics(
             session_id=session.id,
@@ -961,7 +974,21 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         """Ghi nhận và tra cứu sự kiện giám sát chống gian lận trong phòng phỏng vấn."""
         from .models import InterviewProctoringEvent
         from .serializers import InterviewProctoringEventSerializer
-        session = self.get_object()
+
+        token = request.query_params.get("token") or request.headers.get("X-Invite-Token")
+        if request.user.is_authenticated:
+            session = self.get_object()
+        elif token:
+            session = InterviewSession.objects.filter(pk=pk, invite_token=token).first()
+            if not session:
+                return response_data(status=status.HTTP_404_NOT_FOUND, errors={"detail": "Phiên phỏng vấn không tồn tại hoặc mã token không hợp lệ."})
+        elif _request_has_agent_auth_headers(request):
+            session = InterviewSession.objects.filter(pk=pk).first()
+            if not session:
+                return response_data(status=status.HTTP_404_NOT_FOUND, errors={"detail": "Phiên phỏng vấn không tồn tại."})
+        else:
+            return response_data(status=status.HTTP_401_UNAUTHORIZED, errors={"detail": "Yêu cầu đăng nhập hoặc cung cấp mã mời phỏng vấn để truy cập sự kiện giám sát."})
+
         if request.method == 'GET':
             events = session.proctoring_events.all()
             return response_data(data=InterviewProctoringEventSerializer(events, many=True).data)

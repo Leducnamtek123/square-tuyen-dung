@@ -39,7 +39,7 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
   const pathname = usePathname() || "/";
   const dispatch = useAppDispatch();
   const { i18n } = useTranslation("common");
-  const { currentUser } = useAppSelector((state) => state.user);
+  const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
 
   const [isAllowed, setIsAllowed] = React.useState(() => {
     if (currentUser?.isOnboarded === false) {
@@ -99,7 +99,7 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
       }
 
       const jobSeekerWorkspace = (user?.workspaces || []).find((workspace) => workspace.type === "job_seeker");
-      if (jobSeekerWorkspace) {
+      if (jobSeekerWorkspace && activeWorkspace?.type !== "job_seeker") {
         dispatch(setActiveWorkspace(jobSeekerWorkspace));
       }
 
@@ -114,7 +114,7 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
     return () => {
       isMounted = false;
     };
-  }, [currentUser, dispatch, i18n.language, pathname]);
+  }, [activeWorkspace?.type, currentUser, dispatch, i18n.language, pathname]);
 
   if (!isAllowed) {
     return <AuthLoadingScreen />;

@@ -91,15 +91,17 @@ CHATBOT_ICONS = {
     "common_privacy_policy": asset_url("icons", "common_privacy_policy.png"),
 }
 
+import os
+
 SOCIAL_MEDIA_LINKS = {
-    "facebook": "https://www.facebook.com/bkhuy/",
-    "linkedin": "https://www.linkedin.com/in/huy-khanh-10041b20b/",
-    "youtube": "https://www.youtube.com/channel/UCn49BvcP1w1mamaOSGTKVZw",
-    "instagram": "https://www.instagram.com/huy.buikhanh_/",
-    "github": "https://github.com/Square",
-    "tiktok": "https://www.tiktok.com/@khanhhuy_27?_t=ZS-8vSsKoClLBB&_r=1",
-    "twitter": "",
-    "telegram": "",
+    "facebook": os.environ.get("SOCIAL_FACEBOOK_URL", "https://facebook.com/infohr.vn"),
+    "linkedin": os.environ.get("SOCIAL_LINKEDIN_URL", "https://linkedin.com/company/infohr"),
+    "youtube": os.environ.get("SOCIAL_YOUTUBE_URL", "https://youtube.com/@infohr"),
+    "instagram": os.environ.get("SOCIAL_INSTAGRAM_URL", "https://instagram.com/infohr.vn"),
+    "github": os.environ.get("SOCIAL_GITHUB_URL", "https://github.com/infohr"),
+    "tiktok": os.environ.get("SOCIAL_TIKTOK_URL", "https://tiktok.com/@infohr.vn"),
+    "twitter": os.environ.get("SOCIAL_TWITTER_URL", ""),
+    "telegram": os.environ.get("SOCIAL_TELEGRAM_URL", ""),
 }
 
 class Platform(models.TextChoices):

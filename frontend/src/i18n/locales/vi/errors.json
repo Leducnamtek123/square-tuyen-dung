@@ -1,6 +1,6 @@
 {
-  "notFoundTitle": "Không tìm thấy trang",
-  "notFoundBody": "Trang bạn đang tìm kiếm không tồn tại hoặc đã được di chuyển.",
+  "notFoundTitle": "Không tìm thấy trang yêu cầu",
+  "notFoundBody": "Đường dẫn bạn truy cập có thể đã đổi tên, bị gỡ bỏ hoặc tạm thời không khả dụng. Đừng lo lắng, hãy thử tìm kiếm hoặc khám phá các mục phổ biến bên dưới.",
   "notFoundCode": "404",
   "forbiddenTitle": "Truy cập bị từ chối",
   "forbiddenBody": "Bạn không có quyền truy cập vào trang này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là lỗi.",
@@ -9,6 +9,19 @@
   "systemErrorBody": "Hệ thống đang gặp sự cố. Vui lòng thử lại sau.",
   "systemErrorCode": "500",
   "backHome": "Về trang chủ",
+  "goBack": "Quay lại trang trước",
+  "searchPlaceholder": "Nhập từ khóa tìm việc làm, công ty, vị trí...",
+  "search": "Tìm kiếm",
+  "popularDestinations": "Các trang hữu ích có thể bạn quan tâm:",
+  "findJobsTitle": "Tìm việc làm hot",
+  "findJobsDesc": "Khám phá hàng ngàn việc làm lương cao mới nhất",
+  "cvBuilderTitle": "Tạo & Mẫu CV đẹp",
+  "cvBuilderDesc": "Thiết kế CV chuẩn ATS chuyên nghiệp miễn phí",
+  "topCompaniesTitle": "Top Công ty hàng đầu",
+  "topCompaniesDesc": "Khám phá văn hóa & môi trường làm việc lý tưởng",
+  "notificationsTitle": "Thông báo & Tin mới",
+  "notificationsDesc": "Xem gợi ý việc làm và cập nhật mới nhất",
+  "needHelp": "Cần hỗ trợ nhanh? Liên hệ đội ngũ CSKH InfoHR để được giải đáp ngay.",
   "tryAgain": "Thử lại",
   "or": "hoặc"
 }

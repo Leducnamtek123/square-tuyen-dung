@@ -109,9 +109,9 @@
     },
     "status": {
       "updateTitle": "Cập nhật trạng thái ứng tuyển",
-      "updateConfirm": "Hồ sơ sẽ được cập nhật sang trạng thái <strong style=\"color:red;\">\"{{statusName}}\"</strong>. Bạn có chắc chắn không?",
+      "updateConfirm": "Hồ sơ sẽ được cập nhật sang trạng thái <strong>\"{{statusName}}\"</strong>. Bạn có chắc chắn không?",
       "errorTitle": "Đã xảy ra lỗi",
-      "errorMsg": "Bạn không được phép thay đổi trạng thái ứng tuyển từ <strong style=\"color:red;\">\"{{fromStatus}}\"</strong> sang <strong style=\"color:red;\">\"{{toStatus}}\"</strong>",
+      "errorMsg": "Bạn không được phép thay đổi trạng thái ứng tuyển từ <strong>\"{{fromStatus}}\"</strong> sang <strong>\"{{toStatus}}\"</strong>",
       "updateSuccess": "Cập nhật thành công.",
       "rollbackMsg": "Không thể cập nhật trạng thái hồ sơ. Đã khôi phục trạng thái ban đầu."
     },

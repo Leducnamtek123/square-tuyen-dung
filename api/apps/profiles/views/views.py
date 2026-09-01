@@ -39,9 +39,9 @@ class ProfileView(viewsets.ViewSet):
 
         user = request.user
 
-        profile = JobSeekerProfile.objects.select_related(
-            'location', 'location__city'
-        ).get(user_id__exact=user.id)
+        profile, _ = JobSeekerProfile.objects.select_related(
+            'location', 'location__city', 'location__district', 'user'
+        ).get_or_create(user_id=user.id)
 
         profile_serializer = JobSeekerProfileSerializer(profile)
         return var_res.response_data(data=profile_serializer.data)
@@ -52,10 +52,7 @@ class ProfileView(viewsets.ViewSet):
 
         job_seeker_profile = getattr(request.user, 'job_seeker_profile', None)
         if not job_seeker_profile:
-            return var_res.response_data(
-                status=status.HTTP_400_BAD_REQUEST,
-                errors={"errorMessage": ["User does not have a job seeker profile."]},
-            )
+            job_seeker_profile, _ = JobSeekerProfile.objects.get_or_create(user=request.user)
 
         serializer = JobSeekerProfileSerializer(job_seeker_profile, data=data, partial=True)
         if not serializer.is_valid():

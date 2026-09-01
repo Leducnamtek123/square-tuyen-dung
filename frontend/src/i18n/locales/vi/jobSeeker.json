@@ -697,9 +697,26 @@
       "empty": "Chưa thêm kỹ năng chuyên môn nào.",
       "addSkill": "Thêm kỹ năng",
       "manageModalTitle": "Quản lý kỹ năng chuyên môn",
-      "skillInputPlaceholder": "Nhập tên kỹ năng...",
+      "modalSubtitle": "Thêm các kỹ năng thế mạnh và kinh nghiệm thực chiến giúp CV của bạn thu hút nhà tuyển dụng.",
+      "skillInputPlaceholder": "Nhập tên kỹ năng (VD: AutoCAD, Revit, Bóc tách khối lượng, Môi giới BĐS...)",
       "add": "Thêm",
-      "done": "Hoàn tất"
+      "done": "Hoàn tất",
+      "selectedSkills": "Kỹ năng đã chọn",
+      "clearAll": "Xóa tất cả",
+      "suggestedTitle": "Gợi ý kỹ năng phổ biến",
+      "categoryAll": "Tất cả",
+      "categoryConstruction": "Xây dựng",
+      "categoryRealEstate": "Bất động sản",
+      "categoryArchitecture": "Kiến trúc",
+      "categoryInterior": "Nội thất",
+      "categorySoft": "Kỹ năng mềm",
+      "categoryTech": "Công nghệ & IT",
+      "categoryDesign": "Thiết kế",
+      "categoryBusiness": "Kinh doanh",
+      "saveChanges": "Lưu thay đổi",
+      "cancel": "Hủy bỏ",
+      "maxSkillsReached": "Đã đạt giới hạn tối đa 20 kỹ năng",
+      "duplicateSkill": "Kỹ năng này đã được thêm trước đó"
     }
   },
   "tabs": {

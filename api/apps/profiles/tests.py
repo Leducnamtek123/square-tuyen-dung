@@ -398,53 +398,80 @@ def test_job_seeker_profile_serializer_rejects_district_outside_selected_city(jo
 
 
 @pytest.mark.django_db
-def test_job_seeker_profile_serializer_requires_location_city_and_district(job_seeker_profile, city):
+def test_job_seeker_profile_serializer_supports_partial_location(job_seeker_profile, city):
     from apps.locations.models import District
     from apps.profiles.serializers import JobSeekerProfileSerializer
 
     district = District.objects.create(name="Quan 1", code="Q1-PROFILE-REQUIRED", city=city)
     job_seeker_profile.location = None
     job_seeker_profile.save(update_fields=["location", "update_at"])
-    missing_city = JobSeekerProfileSerializer(
-        job_seeker_profile,
-        data={
-            "location": {
-                "district": district.id,
-                "address": "123 Nguyen Trai",
-            },
-        },
-        partial=True,
-    )
-    missing_district = JobSeekerProfileSerializer(
-        job_seeker_profile,
-        data={
-            "location": {
-                "city": city.id,
-                "address": "123 Nguyen Trai",
-            },
-        },
-        partial=True,
-    )
-    missing_address = JobSeekerProfileSerializer(
-        job_seeker_profile,
-        data={
-            "location": {
-                "city": city.id,
-                "district": district.id,
-            },
-        },
-        partial=True,
-    )
 
-    assert missing_city.is_valid() is False
-    assert "location" in missing_city.errors
-    assert "city" in missing_city.errors["location"]
-    assert missing_district.is_valid() is False
-    assert "location" in missing_district.errors
-    assert "district" in missing_district.errors["location"]
-    assert missing_address.is_valid() is False
-    assert "location" in missing_address.errors
-    assert "address" in missing_address.errors["location"]
+    # Location with only city
+    city_only = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={
+            "location": {
+                "city": city.id,
+            },
+        },
+        partial=True,
+    )
+    assert city_only.is_valid(), city_only.errors
+
+    # Location with city and district
+    city_district = JobSeekerProfileSerializer(
+        job_seeker_profile,
+        data={
+            "location": {
+                "city": city.id,
+                "district": district.id,
+            },
+        },
+        partial=True,
+    )
+    assert city_district.is_valid(), city_district.errors
+
+
+@pytest.mark.django_db
+def test_get_resumes_website_creates_if_missing_and_returns_full_fields(job_seeker_user, job_seeker_profile, city):
+    from rest_framework.test import APIClient
+    from shared.configs import variable_system as var_sys
+    from apps.common.models import Career
+
+    career = Career.objects.create(name="IT - Phan mem")
+    client = APIClient()
+    client.force_authenticate(user=job_seeker_user)
+
+    # 1. Request with type=WEBSITE when no resume exists yet
+    url = f"/api/v1/info/web/job-seeker-profiles/{job_seeker_profile.id}/resumes/?type=WEBSITE"
+    response = client.get(url)
+    assert response.status_code == 200
+    data = response.data.get("data")
+    assert data is not None
+    assert "slug" in data
+    assert "skillsSummary" in data
+    resume_slug = data["slug"]
+
+    # 2. Update resume fields
+    update_url = f"/api/v1/info/web/private-resumes/{resume_slug}/"
+    update_res = client.put(update_url, {
+        "title": "Lap trinh vien Fullstack",
+        "description": "Toi la ky su phan mem",
+        "career": career.id,
+        "city": city.id,
+        "skillsSummary": "React, Python, Django",
+    }, format="json")
+    assert update_res.status_code == 200
+
+    # 3. Request with resumeType=1 to verify persistence
+    get_res = client.get(f"/api/v1/info/web/job-seeker-profiles/{job_seeker_profile.id}/resumes/?resumeType=1")
+    assert get_res.status_code == 200
+    updated_data = get_res.data.get("data")
+    assert updated_data["title"] == "Lap trinh vien Fullstack"
+    assert updated_data["description"] == "Toi la ky su phan mem"
+    assert updated_data["skillsSummary"] == "React, Python, Django"
+    assert updated_data["career"] == career.id
+    assert updated_data["city"] == city.id
 
 
 @pytest.mark.django_db

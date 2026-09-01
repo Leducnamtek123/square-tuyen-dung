@@ -161,20 +161,20 @@ def get_location_validation_instance(serializer):
     return getattr(parent_instance, "location", None)
 
 
-def validate_location_hierarchy(attrs, instance=None):
+def validate_location_hierarchy(attrs, instance=None, require_city=True, require_district=True, require_address=True):
     city = attrs.get("city") if "city" in attrs else getattr(instance, "city", None)
     district = attrs.get("district") if "district" in attrs else getattr(instance, "district", None)
     ward = attrs.get("ward") if "ward" in attrs else getattr(instance, "ward", None)
     address = attrs.get("address") if "address" in attrs else getattr(instance, "address", None)
     errors = {}
 
-    if not city:
+    if require_city and not city:
         errors["city"] = ["City is required."]
 
-    if not district:
+    if require_district and not district:
         errors["district"] = ["District is required."]
 
-    if not str(address or "").strip():
+    if require_address and not str(address or "").strip():
         errors["address"] = ["Address is required."]
 
     if city and district and district.city_id != city.id:
@@ -200,7 +200,13 @@ class ProfileLocationSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        return validate_location_hierarchy(attrs, get_location_validation_instance(self))
+        return validate_location_hierarchy(
+            attrs,
+            get_location_validation_instance(self),
+            require_city=False,
+            require_district=False,
+            require_address=False,
+        )
 
     class Meta:
 

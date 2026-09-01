@@ -228,7 +228,10 @@ def get_web_banner(request):
         return var_res.response_data(data=_run_blocking(_build))
     except Exception as ex:
         helper.print_log_error("get_web_banner", ex)
-        return var_res.response_data(data=[])
+        return var_res.response_data(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            errors={"detail": "Không thể tải banner web."}
+        )
 
 
 @api_view(http_method_names=['get'])
@@ -261,7 +264,10 @@ def get_mobile_banner(request):
         return var_res.response_data(data=data)
     except Exception as ex:
         helper.print_log_error("get_mobile_banner", ex)
-        return var_res.response_data(data=[])
+        return var_res.response_data(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            errors={"detail": "Không thể tải banner mobile."}
+        )
 
 
 
@@ -855,6 +861,9 @@ def send_notification_demo(request):
     notification_type = request.data.get("type", "SYSTEM")
     user_list = request.data.get("userList", [])
 
+    dispatched_count = 0
+    failed_count = 0
+
     if user_list:
         for uid in user_list:
             try:
@@ -864,8 +873,10 @@ def send_notification_demo(request):
                     content=content,
                     user_id=int(uid),
                 )
-            except Exception:
-                pass
+                dispatched_count += 1
+            except Exception as ex:
+                helper.print_log_error("send_notification_demo", ex)
+                failed_count += 1
     else:
         try:
             queue_notification.delay(
@@ -874,10 +885,23 @@ def send_notification_demo(request):
                 content=content,
                 user_id=request.user.id,
             )
-        except Exception:
-            pass
+            dispatched_count += 1
+        except Exception as ex:
+            helper.print_log_error("send_notification_demo", ex)
+            failed_count += 1
+
+    if dispatched_count == 0 and failed_count > 0:
+        return var_res.response_data(
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            errors={"detail": "Không thể kết nối hàng đợi Celery/Redis để gửi thông báo."}
+        )
 
     return var_res.response_data(
-        data={"success": True, "message": "Demo notification triggered successfully."},
+        data={
+            "success": True,
+            "dispatched": dispatched_count,
+            "failed": failed_count,
+            "message": "Demo notification triggered successfully."
+        },
         status=status.HTTP_200_OK,
     )

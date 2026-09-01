@@ -57,21 +57,27 @@ export const useSavedJobs = (params: GetJobPostsParams = {}): UseSavedJobsResult
         },
         enabled: !!isAuthenticated && !!currentUser?.id && hasToken,
         retry: shouldRetryQuery,
+        staleTime: 60_000,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
         placeholderData: keepPreviousData,
     });
 
     const queryClient = useQueryClient();
+    const page = params.page || 1;
+    const pageSize = params.pageSize || 10;
+    const totalCount = query.data?.count;
+
     React.useEffect(() => {
-        if (query.data?.count && (params.page || 1) * (params.pageSize || 10) < query.data.count) {
-            const nextParams = { ...params, page: (params.page || 1) + 1 };
+        if (totalCount && page * pageSize < totalCount) {
+            const nextParams = { ...params, page: page + 1 };
             queryClient.prefetchQuery({
                 queryKey: ['savedJobs', nextParams],
                 queryFn: () => jobService.getJobPostsSaved(nextParams),
+                staleTime: 60_000,
             });
         }
-    }, [query.data, params, queryClient]);
+    }, [totalCount, page, pageSize, queryClient]);
 
     return query;
 };
@@ -95,6 +101,9 @@ export const useCompaniesFollowed = (params: CompanyFollowedListParams = {}): Us
             const response = await companyFollowed.getCompaniesFollowed(params);
             return response;
         },
+        staleTime: 60_000,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
         placeholderData: keepPreviousData,
     });
 };
@@ -118,6 +127,9 @@ export const useResumeViewed = (params: { page?: number; pageSize?: number; orde
             const response = await resumeViewedService.getResumeViewed(params);
             return response;
         },
+        staleTime: 60_000,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
         placeholderData: keepPreviousData,
     });
 };

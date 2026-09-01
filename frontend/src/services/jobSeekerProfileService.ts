@@ -138,8 +138,12 @@ const jobSeekerProfileService = {
     if (!jobSeekerProfileId) {
       return { count: 0, results: [] };
     }
+    const clean = cleanParams(params);
+    if (clean.type && !clean.resumeType) {
+      clean.resumeType = clean.type;
+    }
     const url = `info/web/job-seeker-profiles/${jobSeekerProfileId}/resumes/`;
-    const raw = await httpRequest.get<unknown>(url, { params: cleanParams(params) });
+    const raw = await httpRequest.get<unknown>(url, { params: clean });
     const data = await presignInObject(raw);
     return normalizePaginatedResponse<Resume>(data);
   },

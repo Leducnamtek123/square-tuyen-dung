@@ -78,10 +78,15 @@ export const normalizePaginatedResponse = <T>(raw: unknown): PaginatedResponse<T
     const results =
       asItems<T>(current.results) ||
       asItems<T>(current.data) ||
-      asItems<T>(current.items) ||
-      [];
-    const count = asCount(current.count) ?? results.length;
-    return { count, results };
+      asItems<T>(current.items);
+    if (results !== null) {
+      const count = asCount(current.count) ?? results.length;
+      return { count, results };
+    }
+    if ('id' in current || 'slug' in current) {
+      return { count: 1, results: [current as unknown as T] };
+    }
+    return { count: 0, results: [] };
   }
 
   return { count: 0, results: [] };

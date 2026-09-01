@@ -30,7 +30,15 @@ class JobSeekerProfileViewSet(
     def get_resumes(self, request, pk):
         query_params = request.query_params
 
-        resume_type = query_params.get("resumeType", None)
+        raw_type = query_params.get("resumeType", None) or query_params.get("type", None)
+        resume_type = None
+        if raw_type is not None:
+            if str(raw_type).upper() == "WEBSITE" or str(raw_type) == "1":
+                resume_type = var_sys.CV_WEBSITE
+            elif str(raw_type).upper() == "UPLOAD" or str(raw_type) == "2":
+                resume_type = var_sys.CV_UPLOAD
+            else:
+                resume_type = raw_type
 
         job_seeker_profile = JobSeekerProfile.objects.filter(pk=pk, user=request.user).first()
 
@@ -66,21 +74,47 @@ class JobSeekerProfileViewSet(
             resumes = resumes.filter(type=resume_type)
 
             if resume_type == var_sys.CV_WEBSITE:
-                if not resumes.first():
-                    return var_res.response_data()
+                resume_obj = resumes.first()
+                if not resume_obj:
+                    user_label = getattr(job_seeker_profile.user, 'full_name', None) or getattr(job_seeker_profile.user, 'email', '')
+                    resume_obj = Resume.objects.create(
+                        user=job_seeker_profile.user,
+                        job_seeker_profile=job_seeker_profile,
+                        type=var_sys.CV_WEBSITE,
+                        title=f"Hồ sơ trực tuyến của {user_label}".strip()
+                    )
 
                 serializer = ResumeSerializer(
-                    resumes.first(),
+                    resume_obj,
                     fields=[
                         "id",
+                        "slug",
                         "title",
+                        "description",
+                        "career",
+                        "city",
+                        "academicLevel",
                         "experience",
                         "position",
                         "salaryMin",
                         "salaryMax",
+                        "expectedSalary",
+                        "skillsSummary",
                         "updateAt",
                         "user",
                         "isActive",
+                        "positionChooseData",
+                        "experienceChooseData",
+                        "academicLevelChooseData",
+                        "typeOfWorkplaceChooseData",
+                        "jobTypeChooseData",
+                        "careerChooseData",
+                        "cityChooseData",
+                        "experienceDetails",
+                        "educationDetails",
+                        "certificateDetails",
+                        "languageSkills",
+                        "advancedSkills",
                     ],
                 )
             else:

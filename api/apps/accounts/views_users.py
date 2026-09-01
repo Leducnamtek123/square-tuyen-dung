@@ -395,6 +395,14 @@ def update_user_account(request):
 def verify_phone_number(request):
     data = request.data
     phone = data.get("phone") or data.get("phoneNumber") or data.get("phone_number")
+    id_token = (
+        data.get("id_token")
+        or data.get("idToken")
+        or data.get("firebaseToken")
+        or data.get("otp")
+        or data.get("code")
+    )
+
     if not phone or not str(phone).strip():
         return response_data(
             status=status.HTTP_400_BAD_REQUEST,
@@ -402,6 +410,33 @@ def verify_phone_number(request):
         )
 
     clean_phone = str(phone).strip()
+
+    # Validate verification proof via Firebase ID token or OTP code
+    is_verified = False
+    if id_token:
+        try:
+            from apps.common.firebase import verify_id_token
+            decoded = verify_id_token(str(id_token).strip())
+            if decoded:
+                is_verified = True
+        except Exception as ex:
+            helper.print_log_error("verify_phone_number.firebase_token", ex)
+
+    # In development mode or if test OTP code provided
+    if not is_verified:
+        if getattr(settings, "DEBUG", False) and str(id_token).strip() in ["123456", "test", "dev"]:
+            is_verified = True
+        elif not id_token:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": ["Vui lòng cung cấp mã xác thực OTP hoặc token xác minh hợp lệ."]},
+            )
+        else:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": ["Mã xác thực hoặc token không hợp lệ hoặc đã hết hạn."]},
+            )
+
     user = request.user
     user.phone_number = clean_phone
     user.is_verify_phone = True

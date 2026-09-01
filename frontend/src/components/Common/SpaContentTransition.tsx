@@ -34,22 +34,24 @@ const LinkedInSkeleton = () => {
 
 const SpaContentTransition = ({ children }: SpaContentTransitionProps) => {
   const pathname = usePathname();
+  const prevPathnameRef = React.useRef(pathname);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
-  const [displayChildren, setDisplayChildren] = React.useState(children);
 
   React.useEffect(() => {
-    setIsTransitioning(true);
-    const timer = setTimeout(() => {
-      setDisplayChildren(children);
-      setIsTransitioning(false);
-    }, 120);
-
-    return () => clearTimeout(timer);
-  }, [pathname, children]);
+    if (prevPathnameRef.current !== pathname) {
+      prevPathnameRef.current = pathname;
+      setIsTransitioning(true);
+      const timer = setTimeout(() => {
+        setIsTransitioning(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname]);
 
   return (
     <Box
       id="main-content"
+      key={pathname}
       sx={{
         width: '100%',
         minHeight: '400px',
@@ -67,7 +69,7 @@ const SpaContentTransition = ({ children }: SpaContentTransitionProps) => {
         },
       }}
     >
-      {isTransitioning ? <LinkedInSkeleton /> : displayChildren}
+      {isTransitioning ? <LinkedInSkeleton /> : children}
     </Box>
   );
 };

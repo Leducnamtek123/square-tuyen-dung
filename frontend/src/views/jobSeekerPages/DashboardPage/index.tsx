@@ -28,6 +28,8 @@ import AiRecommendedJobsSection from '@/views/components/jobSeekers/CandidateDas
 
 registerGsapPlugins();
 
+const KPI_QUERY_PARAMS = Object.freeze({ pageSize: 1 });
+
 const DashboardPage = () => {
   const { t } = useTranslation('jobSeeker');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -39,20 +41,20 @@ const DashboardPage = () => {
   const { data: appliedData } = useQuery({
     queryKey: ['dashboardAppliedJobsCount'],
     queryFn: async () => {
-      const res = await jobPostActivityService.getJobPostActivity({ pageSize: 1 });
+      const res = await jobPostActivityService.getJobPostActivity(KPI_QUERY_PARAMS);
       return res?.count || 0;
     },
     staleTime: 60_000,
   });
 
   // 2. Fetch Real Saved Jobs Count
-  const { data: savedData } = useSavedJobs({ pageSize: 1 });
+  const { data: savedData } = useSavedJobs(KPI_QUERY_PARAMS);
 
   // 3. Fetch Real Followed Companies Count
-  const { data: followedData } = useCompaniesFollowed({ pageSize: 1 });
+  const { data: followedData } = useCompaniesFollowed(KPI_QUERY_PARAMS);
 
   // 4. Fetch Real Employer Resume Viewed Count
-  const { data: viewedData } = useResumeViewed({ pageSize: 1 });
+  const { data: viewedData } = useResumeViewed(KPI_QUERY_PARAMS);
 
   const stats = React.useMemo(() => {
     return {
@@ -63,6 +65,7 @@ const DashboardPage = () => {
     };
   }, [appliedData, savedData?.count, viewedData?.count, followedData?.count]);
 
+  // Entrance animation runs ONLY ONCE on mount
   useGSAP(
     () => {
       const mm = gsap.matchMedia();

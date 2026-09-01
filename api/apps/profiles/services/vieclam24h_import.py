@@ -166,7 +166,7 @@ def _match_city(candidate: dict, target_city: City | None = None) -> City | None
     if target_city:
         return target_city
 
-    return City.objects.filter(name__icontains="Hồ Chí Minh").first() or City.objects.first()
+    return None
 
 
 def _resolve_import_location(target_city: City | None, target_district: District | None) -> Location | None:
@@ -197,9 +197,6 @@ def _match_location(candidate: dict, target_city: City | None = None, target_dis
         if loc:
             return loc
     city = _match_city(candidate, target_city=target_city)
-    if not city:
-        city = target_city or City.objects.filter(name__icontains="Hồ Chí Minh").first() or City.objects.first()
-
     if not city:
         return None
 

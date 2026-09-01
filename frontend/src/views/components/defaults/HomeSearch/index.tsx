@@ -91,8 +91,35 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
 
   const handlePillClick = (item: { title: string; kw?: string; cityId?: number | string; careerId?: number | string }) => {
     const kw = item.kw || '';
-    const cityId = item.cityId ? String(item.cityId) : '';
+    let cityId = item.cityId ? String(item.cityId) : '';
     const careerId = item.careerId ? String(item.careerId) : '';
+
+    // Smart resolution for location pills if title mentions a specific city:
+    if (allConfig?.cityOptions && allConfig.cityOptions.length > 0) {
+      const lowerTitle = item.title.toLowerCase();
+      if (lowerTitle.includes('hà nội') || lowerTitle.includes('ha noi')) {
+        const found = allConfig.cityOptions.find((c) =>
+          c.name?.toLowerCase().includes('hà nội') || (c as any).label?.toLowerCase().includes('hà nội')
+        );
+        if (found) cityId = String(found.id);
+      } else if (
+        lowerTitle.includes('tp.hcm') ||
+        lowerTitle.includes('hồ chí minh') ||
+        lowerTitle.includes('hcm')
+      ) {
+        const found = allConfig.cityOptions.find((c) =>
+          c.name?.toLowerCase().includes('hồ chí minh') ||
+          c.name?.toLowerCase().includes('hcm') ||
+          (c as any).label?.toLowerCase().includes('hồ chí minh')
+        );
+        if (found) cityId = String(found.id);
+      } else if (lowerTitle.includes('đà nẵng') || lowerTitle.includes('da nang')) {
+        const found = allConfig.cityOptions.find((c) =>
+          c.name?.toLowerCase().includes('đà nẵng') || (c as any).label?.toLowerCase().includes('đà nẵng')
+        );
+        if (found) cityId = String(found.id);
+      }
+    }
 
     setValue('kw', kw);
     setValue('cityId', cityId);

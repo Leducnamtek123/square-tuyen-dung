@@ -417,16 +417,17 @@ def get_cities(request):
         city_options = _run_blocking(_build_cities)
     except Exception as ex:
         helper.print_log_error("get_cities", ex)
-        return var_res.response_data(data=[])
+        return var_res.response_data(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            errors={"detail": "Không thể tải danh sách tỉnh thành."}
+        )
     return var_res.response_data(data=city_options)
 
 @api_view(http_method_names=["GET"])
 @authentication_classes([])
 @permission_classes([AllowAny])
 def get_districts(request):
-
     params = request.query_params
-
     city_id_raw = params.get('cityId', None)
 
     try:
@@ -440,12 +441,13 @@ def get_districts(request):
 
         district_options = _run_blocking(_build_districts)
     except (TypeError, ValueError):
-
-        # Invalid cityId should not break dependent forms.
         return var_res.response_data(data=[])
     except Exception as ex:
         helper.print_log_error("get_districts", ex)
-        return var_res.response_data(data=[])
+        return var_res.response_data(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            errors={"detail": "Không thể tải danh sách quận huyện."}
+        )
 
     return var_res.response_data(data=district_options)
 
@@ -453,9 +455,7 @@ def get_districts(request):
 @authentication_classes([])
 @permission_classes([AllowAny])
 def get_wards(request):
-
     params = request.query_params
-
     district_id_raw = params.get('districtId', None)
 
     try:
@@ -469,11 +469,13 @@ def get_wards(request):
 
         ward_options = _run_blocking(_build_wards)
     except (TypeError, ValueError):
-
         return var_res.response_data(data=[])
     except Exception as ex:
         helper.print_log_error("get_wards", ex)
-        return var_res.response_data(data=[])
+        return var_res.response_data(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            errors={"detail": "Không thể tải danh sách phường xã."}
+        )
 
     return var_res.response_data(data=ward_options)
 
@@ -498,9 +500,11 @@ def get_top_10_careers(request):
 
         queryset = hot_qs[:10] + normal_qs
     except Exception as ex:
-        helper.print_log_error("get_top_careers_fallback", ex)
-        # Fallback path to keep homepage usable when aggregate query fails.
-        queryset = _run_blocking(lambda: list(Career.objects.all().order_by('id')[:10]))
+        helper.print_log_error("get_top_careers", ex)
+        return var_res.response_data(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            errors={"detail": "Không thể tải danh sách top ngành nghề."}
+        )
 
     serializer = CareerSerializer(
         queryset,
@@ -915,39 +919,52 @@ def upload_file(request):
 def get_popular_keywords(request):
     """
     Returns popular keywords for search bar and discovery pages.
+    100% data-driven: queries real City and Career models directly from the database.
+    Does NOT fabricate mock data or guessed IDs if the database is empty.
     """
-    keywords = [
-        {"id": 1, "title": "Việc làm Hà Nội", "cityId": 2},
-        {"id": 2, "title": "Việc làm TP.HCM", "cityId": 1},
-        {"id": 3, "title": "Việc làm Đà Nẵng", "cityId": 3},
-        {"id": 4, "title": "Việc làm IT - Software", "kw": "Software", "careerId": 1},
-        {"id": 5, "title": "Việc làm Marketing", "kw": "Marketing"},
-        {"id": 6, "title": "Việc làm Kế toán", "kw": "Kế toán"},
-    ]
+    keywords = []
+    idx = 1
 
     try:
+        # 1. Real Hub Cities from Database
+        hub_cities = list(
+            City.objects.filter(
+                Q(code__in=["01", "79", "48"]) |
+                Q(name__icontains="Hà Nội") |
+                Q(name__icontains="Hồ Chí Minh") |
+                Q(name__icontains="Đà Nẵng")
+            ).order_by("id")[:3]
+        )
+
+        for city in hub_cities:
+            keywords.append({
+                "id": idx,
+                "title": f"Việc làm {city.name}",
+                "cityId": city.id,
+            })
+            idx += 1
+
+        # 2. Real Top Careers from Database
         top_careers = list(
             Career.objects.annotate(
                 job_count=Count('job_posts', filter=Q(job_posts__status=var_sys.JobPostStatus.APPROVED))
-            ).order_by('-job_count')[:4]
+            ).filter(job_count__gt=0).order_by('-job_count')[:4]
         )
 
-        if top_careers:
-            keywords = [
-                {"id": 1, "title": "Việc làm Hà Nội", "cityId": 2},
-                {"id": 2, "title": "Việc làm TP.HCM", "cityId": 1},
-                {"id": 3, "title": "Việc làm Đà Nẵng", "cityId": 3},
-            ]
-            idx = 4
-            for career in top_careers:
-                keywords.append({
-                    "id": idx,
-                    "title": f"Việc làm {career.name}",
-                    "kw": career.name,
-                    "careerId": career.id,
-                })
-                idx += 1
-    except Exception:
-        pass
+        # If no careers have approved jobs yet, use existing careers from DB
+        if not top_careers:
+            top_careers = list(Career.objects.all().order_by('id')[:4])
+
+        for career in top_careers:
+            keywords.append({
+                "id": idx,
+                "title": f"Việc làm {career.name}",
+                "kw": career.name,
+                "careerId": career.id,
+            })
+            idx += 1
+
+    except Exception as e:
+        helper.print_log_error("get_popular_keywords", e)
 
     return var_res.response_data(data=keywords)

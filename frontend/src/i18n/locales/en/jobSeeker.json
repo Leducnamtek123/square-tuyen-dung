@@ -697,9 +697,26 @@
       "empty": "No professional skills added yet.",
       "addSkill": "Add skill",
       "manageModalTitle": "Manage Professional Skills",
-      "skillInputPlaceholder": "Enter skill name...",
+      "modalSubtitle": "Add your core skills and practical expertise to make your profile stand out to recruiters.",
+      "skillInputPlaceholder": "Enter skill name (e.g. AutoCAD, Revit, Quantity Surveying, Real Estate Brokerage...)",
       "add": "Add",
-      "done": "Done"
+      "done": "Done",
+      "selectedSkills": "Selected Skills",
+      "clearAll": "Clear all",
+      "suggestedTitle": "Popular Skills Recommendations",
+      "categoryAll": "All",
+      "categoryConstruction": "Construction",
+      "categoryRealEstate": "Real Estate",
+      "categoryArchitecture": "Architecture",
+      "categoryInterior": "Interior Design",
+      "categorySoft": "Soft Skills",
+      "categoryTech": "Tech & Engineering",
+      "categoryDesign": "Design",
+      "categoryBusiness": "Business",
+      "saveChanges": "Save changes",
+      "cancel": "Cancel",
+      "maxSkillsReached": "Maximum 20 skills reached",
+      "duplicateSkill": "This skill has already been added"
     }
   },
   "tabs": {

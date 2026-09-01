@@ -1,6 +1,6 @@
 {
   "notFoundTitle": "Page not found",
-  "notFoundBody": "The page you're looking for doesn't exist or has been moved.",
+  "notFoundBody": "The link you followed may be broken, renamed, or temporarily unavailable. Please try searching or explore the popular destinations below.",
   "notFoundCode": "404",
   "forbiddenTitle": "Access denied",
   "forbiddenBody": "You don't have permission to access this page. Please contact an administrator if you believe this is an error.",
@@ -9,6 +9,19 @@
   "systemErrorBody": "The system is experiencing issues. Please try again later.",
   "systemErrorCode": "500",
   "backHome": "Back to home",
+  "goBack": "Go back",
+  "searchPlaceholder": "Search jobs, companies, skills...",
+  "search": "Search",
+  "popularDestinations": "Helpful destinations you might find useful:",
+  "findJobsTitle": "Explore Jobs",
+  "findJobsDesc": "Discover thousands of high-paying job opportunities",
+  "cvBuilderTitle": "CV Builder & Templates",
+  "cvBuilderDesc": "Create ATS-friendly professional resumes for free",
+  "topCompaniesTitle": "Top Companies",
+  "topCompaniesDesc": "Learn about company cultures and benefits",
+  "notificationsTitle": "Notifications & Alerts",
+  "notificationsDesc": "Check your job recommendations and updates",
+  "needHelp": "Need help? InfoHR Customer Support is here to assist you anytime.",
   "tryAgain": "Try again",
   "or": "or"
 }

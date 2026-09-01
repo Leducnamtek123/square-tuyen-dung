@@ -154,9 +154,9 @@ export const CVEditorPage: React.FC = () => {
         try {
           const profile = await jobSeekerProfileService.getProfile();
           let primaryResumeSlug: string | null = null;
-          if (profile) {
+          if (profile?.id) {
             try {
-              const resumes = await resumeService.getResumes({ pageSize: 1 });
+              const resumes = await jobSeekerProfileService.getResumes(profile.id, { resumeType: 'WEBSITE' });
               if (resumes && resumes.results && resumes.results.length > 0) {
                 primaryResumeSlug = resumes.results[0].slug;
               }
@@ -410,9 +410,9 @@ export const CVEditorPage: React.FC = () => {
       const profile = await jobSeekerProfileService.getProfile();
 
       let primaryResumeSlug: string | null = null;
-      if (profile) {
+      if (profile?.id) {
         try {
-          const resumes = await resumeService.getResumes({ pageSize: 1 });
+          const resumes = await jobSeekerProfileService.getResumes(profile.id, { resumeType: 'WEBSITE' });
           if (resumes && resumes.results && resumes.results.length > 0) {
             primaryResumeSlug = resumes.results[0].slug;
           }

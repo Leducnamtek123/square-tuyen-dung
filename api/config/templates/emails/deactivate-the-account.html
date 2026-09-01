@@ -1,66 +1,93 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tài khoản bị vô hiệu hóa | InfoHR</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: #0f172a;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; padding: 30px 10px;">
-        <tr>
-            <td align="center">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 580px; background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
-                    <!-- Header -->
-                    <tr>
-                        <td style="padding: 24px 32px; border-bottom: 1px solid #f1f5f9; text-align: left;">
-                            <a href="https://infohr.vn" target="_blank" style="text-decoration: none;">
-                                <img src="https://infohr.vn/infohr-icons/logo-brand.png" alt="InfoHR" style="height: 36px; max-height: 36px; border: 0; outline: none; display: block;" />
-                            </a>
-                        </td>
-                    </tr>
-                    <!-- Body -->
-                    <tr>
-                        <td style="padding: 36px 32px; text-align: center;">
-                            <!-- Icon Badge -->
-                            <table align="center" width="72" height="72" cellpadding="0" cellspacing="0" border="0" style="background-color: #fef2f2; border-radius: 50%; margin: 0 auto 20px auto;">
-                                <tr>
-                                    <td align="center" valign="middle" style="font-size: 32px; line-height: 1;">🔒</td>
-                                </tr>
-                            </table>
+{% extends 'base-email.html' %}
 
-                            <h1 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 16px 0;">Tài khoản của bạn đã bị vô hiệu hóa</h1>
-                            
-                            <p style="font-size: 15px; line-height: 1.6; color: #475569; margin: 0 0 24px 0;">
-                                Xin chào{% if full_name %} <strong>{{ full_name }}</strong>{% endif %},<br />
-                                Tài khoản của bạn{% if email %} (<strong>{{ email }}</strong>){% endif %} trên <strong>InfoHR</strong> đã bị vô hiệu hóa.
-                            </p>
+{% block title %}Thông báo vô hiệu hóa tài khoản | InfoHR{% endblock %}
 
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; margin: 20px 0; padding: 18px; text-align: left;">
-                                <tr>
-                                    <td style="font-size: 14px; color: #991b1b; line-height: 1.6;">
-                                        <strong>Lý do:</strong> {{ reason|default:"Vi phạm điều khoản sử dụng và chính sách của InfoHR." }}
-                                    </td>
-                                </tr>
-                            </table>
+{% block preheader %}Thông báo về việc tạm khóa / vô hiệu hóa tài khoản InfoHR của bạn.{% endblock %}
 
-                            <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #f1f5f9; font-size: 14px; color: #475569; text-align: left; line-height: 1.8;">
-                                Nếu bạn cho rằng đây là nhầm lẫn, vui lòng liên hệ với chúng tôi để được hỗ trợ.<br />
-                                📧 Liên hệ hỗ trợ: <a href="mailto:{{ my_email|default:'support@infohr.vn' }}" style="color: #dc2626; font-weight: 700; text-decoration: none;">{{ my_email|default:'support@infohr.vn' }}</a><br />
-                                {% if my_phone %}📞 Hotline: <strong>{{ my_phone }}</strong>{% endif %}
-                            </div>
-                        </td>
-                    </tr>
-                    <!-- Footer -->
-                    <tr>
-                        <td style="padding: 20px 32px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; font-size: 13px; color: #64748b; text-align: center;">
-                            <span>© 2026 InfoHR. Bản quyền được bảo hộ.</span>
-                            <span style="margin: 0 8px;">|</span>
-                            <a href="https://infohr.vn" target="_blank" style="color: #64748b; text-decoration: none;">infohr.vn</a>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
+{% block content %}
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <!-- Alert Badge -->
+    <tr>
+        <td align="center" style="padding-bottom: 20px;">
+            <table align="center" width="68" height="68" cellpadding="0" cellspacing="0" border="0" style="background-color: #fef2f2; border: 2px solid #fecaca; border-radius: 50%; margin: 0 auto; text-align: center;">
+                <tr>
+                    <td align="center" valign="middle" style="text-align: center; height: 68px; width: 68px;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto;">
+                            <circle cx="12" cy="12" r="9" stroke="#dc2626" stroke-width="2.2"/>
+                            <path d="M4.93 4.93L19.07 19.07" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round"/>
+                        </svg>
+                        <!--[if mso]>
+                        <span style="font-size: 24px; color: #dc2626; font-weight: bold; line-height: 1;">&#9888;</span>
+                        <![endif]-->
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Main Heading -->
+    <tr>
+        <td align="center" style="padding-bottom: 8px;">
+            <h1 class="text-dark" style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.02em;">
+                Tài khoản của bạn đã bị vô hiệu hóa
+            </h1>
+        </td>
+    </tr>
+
+    <!-- Salutation -->
+    <tr>
+        <td align="center" style="padding-bottom: 24px;">
+            <p class="text-muted" style="font-size: 15px; line-height: 1.6; color: #475569; margin: 0; max-width: 480px;">
+                Xin chào{% if full_name %} <strong class="text-dark" style="color: #0f172a;">{{ full_name }}</strong>{% endif %},<br />
+                Tài khoản{% if email %} (<strong class="text-dark" style="color: #0f172a;">{{ email }}</strong>){% endif %} của bạn trên hệ thống <strong>InfoHR</strong> hiện đã bị vô hiệu hóa.
+            </p>
+        </td>
+    </tr>
+
+    <!-- Reason Box -->
+    <tr>
+        <td style="padding-bottom: 24px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 16px 20px;">
+                <tr>
+                    <td style="font-size: 14px; color: #991b1b; line-height: 1.6;">
+                        <strong style="color: #7f1d1d;">Lý do:</strong> {{ reason|default:"Vi phạm điều khoản sử dụng hoặc chính sách bảo mật cộng đồng của InfoHR." }}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Support Guidance -->
+    <tr>
+        <td style="padding-bottom: 24px;">
+            <table class="meta-box" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px;">
+                <tr>
+                    <td style="font-size: 13px; line-height: 1.7; color: #334155;">
+                        <div style="font-weight: 700; color: #0f172a; margin-bottom: 6px;">Cần khiếu nại hoặc hỗ trợ?</div>
+                        Nếu bạn cho rằng đây là một sự nhầm lẫn, vui lòng liên hệ với bộ phận chăm sóc khách hàng của chúng tôi để được kiểm tra lại:<br />
+                        <span style="color: #64748b;">Email:</span> <a href="mailto:{{ my_email|default:'support@infohr.vn' }}" style="color: #2563eb; font-weight: 600; text-decoration: none;">{{ my_email|default:'support@infohr.vn' }}</a>
+                        {% if my_phone %}<br /><span style="color: #64748b;">Hotline:</span> <strong style="color: #0f172a;">{{ my_phone }}</strong>{% endif %}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- CTA Button -->
+    <tr>
+        <td align="center">
+            <!--[if mso]>
+            <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="mailto:{{ my_email|default:'support@infohr.vn' }}" style="height:44px;v-text-anchor:middle;width:240px;" arcsize="18%" strokecolor="#1d4ed8" fillcolor="#2563eb">
+                <w:anchorlock/>
+                <center style="color:#ffffff;font-family:sans-serif;font-size:14px;font-weight:bold;">Liên hệ bộ phận hỗ trợ &rarr;</center>
+            </v:roundrect>
+            <![endif]-->
+            <!--[if !mso]><!-- -->
+            <a href="mailto:{{ my_email|default:'support@infohr.vn' }}" style="background-color: #2563eb; color: #ffffff; display: inline-block; font-size: 14px; font-weight: 700; line-height: 44px; text-align: center; text-decoration: none; width: 240px; -webkit-text-size-adjust: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);">
+                Liên hệ bộ phận hỗ trợ &rarr;
+            </a>
+            <!--<![endif]-->
+        </td>
+    </tr>
+</table>
+{% endblock %}
