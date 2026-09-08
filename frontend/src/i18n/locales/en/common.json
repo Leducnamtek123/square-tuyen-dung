@@ -45,6 +45,7 @@
     "followers": "{{count}} followers"
   },
   "nav": {
+    "createCv": "Create CV",
     "jobs": "Jobs",
     "companies": "Companies",
     "aboutUs": "About Us",
@@ -108,6 +109,7 @@
     "ailaPlatformDesc": "Access automated voice & video interview solutions at aila.infohr.vn"
   },
   "footer": {
+    "createCv": "Create CV Online",
     "aboutApp": "About {{appName}}",
     "contact": "Contact",
     "faq": "FAQ",

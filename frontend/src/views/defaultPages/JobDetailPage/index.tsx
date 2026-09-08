@@ -123,7 +123,7 @@ const JobDetailPage = () => {
     let isActive = true;
     const getJobPostDetail = async (jobPostSlug: string | undefined) => {
 
-      if (!jobPostSlug) return;
+      if (!jobPostSlug || jobPostSlug === ':slug') return;
       try {
         const resData = await jobService.getJobPostDetailById(jobPostSlug);
         const data = resData;

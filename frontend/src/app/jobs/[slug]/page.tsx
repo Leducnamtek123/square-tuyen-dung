@@ -10,6 +10,12 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  if (!slug || slug === ':slug') {
+    return {
+      title: 'Tuyển dụng việc làm hấp dẫn',
+      description: 'Khám phá cơ hội việc làm lương cao, đãi ngộ tốt và ứng tuyển nhanh chóng trên InfoHR.',
+    };
+  }
   const job = await serverFetch<JobPost & { company?: Company; city?: { name?: string } }>(`job/web/job-posts/${slug}/`);
 
   const canonicalUrl = `https://infohr.vn/viec-lam/${slug}`;
@@ -71,6 +77,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { slug } = await params;
+  if (!slug || slug === ':slug') {
+    return <JobDetailClientPage />;
+  }
   const job = await serverFetch<JobPost & { company?: Company; city?: { name?: string }; location?: { address?: string; city?: { name?: string } } }>(`job/web/job-posts/${slug}/`);
 
   const jsonLd = job

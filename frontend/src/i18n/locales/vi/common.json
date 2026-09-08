@@ -88,6 +88,7 @@
     "followers": "{{count}} người theo dõi"
   },
   "nav": {
+    "createCv": "Tạo CV",
     "jobs": "Việc làm",
     "companies": "Công ty",
     "news": "Tin tức",
@@ -183,6 +184,7 @@
     "allCities": "Tất cả tỉnh thành"
   },
   "footer": {
+    "createCv": "Tạo CV trực tuyến",
     "aboutApp": "Về {{appName}}",
     "contact": "Liên hệ",
     "faq": "Câu hỏi thường gặp",

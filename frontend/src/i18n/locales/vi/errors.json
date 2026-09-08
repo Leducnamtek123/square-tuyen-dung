@@ -23,5 +23,15 @@
   "notificationsDesc": "Xem gợi ý việc làm và cập nhật mới nhất",
   "needHelp": "Cần hỗ trợ nhanh? Liên hệ đội ngũ CSKH InfoHR để được giải đáp ngay.",
   "tryAgain": "Thử lại",
-  "or": "hoặc"
+  "or": "hoặc",
+  "backEmployerHome": "Về trang chủ NTD",
+  "employerSearchPlaceholder": "Tìm ứng viên theo vị trí, kỹ năng...",
+  "employerCandidatesTitle": "Tìm kiếm ứng viên",
+  "employerCandidatesDesc": "Khám phá hàng ngàn hồ sơ ứng viên tài năng",
+  "employerJobPostsTitle": "Quản lý tin tuyển dụng",
+  "employerJobPostsDesc": "Đăng tin mới và theo dõi tiến độ tuyển dụng",
+  "employerAppliedTitle": "Hồ sơ ứng tuyển mới",
+  "employerAppliedDesc": "Xem danh sách và đánh giá ứng viên nộp CV",
+  "employerDashboardTitle": "Bảng điều khiển NTD",
+  "employerDashboardDesc": "Tổng quan báo cáo & hiệu suất tuyển dụng"
 }

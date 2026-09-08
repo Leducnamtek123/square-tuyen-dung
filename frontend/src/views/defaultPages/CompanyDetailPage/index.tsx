@@ -41,7 +41,7 @@ const CompanyDetailPage = () => {
   const { data: fetchRes, isLoading } = useQuery({
     queryKey: ['companyDetail', slug],
     queryFn: () => companyService.getCompanyDetailById(slug as string),
-    enabled: !!slug
+    enabled: !!slug && slug !== ':slug'
   });
 
   const companyDetail = React.useMemo(() => {

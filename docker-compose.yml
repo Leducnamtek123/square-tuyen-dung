@@ -91,6 +91,7 @@ services:
     environment:
       - DEBUG=${DEBUG:-False}
       - AUTO_MIGRATE=${AUTO_MIGRATE:-1}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-infohr.vn,s3.infohr.vn,admin.infohr.vn,employer.infohr.vn,113.177.113.137,113.177.129.249,localhost,127.0.0.1,backend,thinkgift.square.vn,.square.vn,.infohr.vn}
       - AI_TTS_FALLBACK_BASE_URLS=http://vieneu-tts:8298/v1
       - NOTEBOOKLM_MCP_URL=${NOTEBOOKLM_MCP_URL:-http://host.docker.internal:8000/mcp}
       - DEFAULT_NOTEBOOKLM_NOTEBOOK_ID=${DEFAULT_NOTEBOOKLM_NOTEBOOK_ID:-}
@@ -231,7 +232,6 @@ services:
       MYSQL_DATABASE: ${DB_NAME:-square_db}
     volumes:
       - db_data:/var/lib/mysql
-      - ./tuyendungsqstudio.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_ROOT_PASSWORD\" mysqladmin ping -h localhost -u root || exit 1"]
       interval: 10s

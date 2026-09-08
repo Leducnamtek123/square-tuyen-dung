@@ -9,6 +9,12 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  if (!slug || slug === ':slug') {
+    return {
+      title: 'Thông tin công ty & Doanh nghiệp',
+      description: 'Khám phá văn hóa doanh nghiệp, chế độ đãi ngộ và các vị trí tuyển dụng mới nhất trên InfoHR.',
+    };
+  }
   const company = await serverFetch<Company>(`info/web/companies/${slug}/`);
 
   const canonicalUrl = `https://infohr.vn/cong-ty/${slug}`;
@@ -64,6 +70,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { slug } = await params;
+  if (!slug || slug === ':slug') {
+    return <CompanyDetailClientPage />;
+  }
   const company = await serverFetch<Company>(`info/web/companies/${slug}/`);
 
   const jsonLd = company

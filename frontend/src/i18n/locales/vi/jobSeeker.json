@@ -1,6 +1,9 @@
 {
   "myInterviewsTitle": "Phỏng vấn của tôi",
   "noInterviewsTitle": "Bạn không có buổi phỏng vấn nào được lên lịch",
+  "common": {
+    "add": "Thêm"
+  },
   "nav": {
     "dashboard": "Bảng điều khiển",
     "myDashboard": "Trang chủ {{appName}}",

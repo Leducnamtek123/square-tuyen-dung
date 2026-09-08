@@ -11,6 +11,12 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  if (!slug || slug === ':slug') {
+    return {
+      title: 'Tin tức & Cẩm nang nghề nghiệp',
+      description: 'Cập nhật tin tức thị trường lao động, xu hướng tuyển dụng và cẩm nang phát triển sự nghiệp toàn diện từ InfoHR.',
+    };
+  }
   const article = await serverFetch<Article>(`content/web/articles/${slug}/`);
 
   const canonicalUrl = `https://infohr.vn/tin-tuc/${slug}`;

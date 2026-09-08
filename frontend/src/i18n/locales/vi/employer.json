@@ -1805,6 +1805,8 @@
       "benefit3": "Tăng x3 tỷ lệ ứng tuyển của các ứng viên chất lượng cao",
       "dropzoneTitle": "Kéo thả file GPKD (Ảnh hoặc PDF) vào đây hoặc bấm để chọn",
       "dropzoneSubtitle": "Định dạng hỗ trợ: JPG, PNG, PDF (Dung lượng tối đa 10MB)",
+      "uploading": "Đang tải file lên...",
+      "selectFile": "Chọn tệp từ máy tính",
       "uploadedFile": "Giấy phép kinh doanh đã tải lên",
       "replaceFile": "Thay đổi file",
       "removeFile": "Xóa file",

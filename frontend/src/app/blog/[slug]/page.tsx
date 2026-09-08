@@ -11,6 +11,9 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  if (!slug || slug === ':slug') {
+    return buildPageMetadata('news');
+  }
   const article = await serverFetch<Article>(`content/web/articles/${slug}/`);
 
   if (!article) {
@@ -52,6 +55,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { slug } = await params;
+  if (!slug || slug === ':slug') {
+    return (
+      <DefaultLayout>
+        <ArticleDetailPage />
+      </DefaultLayout>
+    );
+  }
   const article = await serverFetch<Article>(`content/web/articles/${slug}/`);
 
   const jsonLd = article

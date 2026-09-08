@@ -415,7 +415,9 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             if full_name is not None:
                 user.full_name = full_name
             if not user.has_company:
-                queue_auth.update_info.delay(user.id, full_name)
+                user_id = user.id
+                name_val = full_name
+                transaction.on_commit(lambda: queue_auth.update_info.delay(user_id, name_val))
 
         if "role_name" in validated_data:
             user.role_name = validated_data.get("role_name")

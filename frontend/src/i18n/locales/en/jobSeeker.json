@@ -1,6 +1,9 @@
 {
   "myInterviewsTitle": "My interviews",
   "noInterviewsTitle": "You have no interviews scheduled",
+  "common": {
+    "add": "Add"
+  },
   "nav": {
     "dashboard": "My Dashboard",
     "profile": "My Profile",
@@ -562,7 +565,12 @@
       "workplaceType": "Preferred Workplace Type",
       "workplaceOnsite": "Office-based (Onsite)",
       "workplaceHybrid": "Hybrid",
-      "workplaceRemote": "Remote"
+      "workplaceRemote": "Remote",
+      "mapTitle": "Pin preferred work location on map",
+      "mapSubtitle": "Optional: Helps the system prioritize job recommendations closest to you",
+      "showMap": "+ Open location map",
+      "hideMap": "Hide map",
+      "mapPickerLabel": "Pin preferred work location on map"
     },
     "step2": {
       "title": "Skills & Work Experience",

@@ -23,5 +23,15 @@
   "notificationsDesc": "Check your job recommendations and updates",
   "needHelp": "Need help? InfoHR Customer Support is here to assist you anytime.",
   "tryAgain": "Try again",
-  "or": "or"
+  "or": "or",
+  "backEmployerHome": "Back to Employer Portal",
+  "employerSearchPlaceholder": "Search candidates by title, skills...",
+  "employerCandidatesTitle": "Search Candidates",
+  "employerCandidatesDesc": "Discover thousands of talented candidate profiles",
+  "employerJobPostsTitle": "Manage Job Posts",
+  "employerJobPostsDesc": "Post new jobs and track hiring progress",
+  "employerAppliedTitle": "Recent Applications",
+  "employerAppliedDesc": "Review and evaluate applicants' CVs",
+  "employerDashboardTitle": "Employer Dashboard",
+  "employerDashboardDesc": "Overview of recruitment metrics and performance"
 }

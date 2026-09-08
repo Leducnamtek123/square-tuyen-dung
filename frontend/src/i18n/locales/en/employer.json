@@ -1805,6 +1805,8 @@
       "benefit3": "3x higher application rate from high-quality candidates",
       "dropzoneTitle": "Drag and drop business license file (Image or PDF) here",
       "dropzoneSubtitle": "Supported formats: JPG, PNG, PDF (Max 10MB)",
+      "uploading": "Uploading file...",
+      "selectFile": "Select file from computer",
       "uploadedFile": "Uploaded business license",
       "replaceFile": "Change file",
       "removeFile": "Remove file",

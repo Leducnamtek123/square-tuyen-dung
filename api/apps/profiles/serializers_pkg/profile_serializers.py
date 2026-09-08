@@ -166,7 +166,9 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
             user_obj.full_name = user_data.get("full_name", user_obj.full_name)
             user_obj.save()
             # update in firebase
-            queue_auth.update_info.delay(user_obj.id, user_obj.full_name)
+            user_id = user_obj.id
+            full_name = user_obj.full_name
+            transaction.on_commit(lambda: queue_auth.update_info.delay(user_id, full_name))
 
         if "phone" in validated_data and instance.phone and user_obj:
             user_obj.phone_number = instance.phone
