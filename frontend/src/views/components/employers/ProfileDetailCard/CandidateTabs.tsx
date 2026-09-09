@@ -49,6 +49,15 @@ export const CandidateTabs: React.FC<CandidateTabsProps> = ({
       <Stack direction="row" spacing={1} sx={{ minWidth: 'max-content', py: 0.5 }}>
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
+          let countBadge: number | undefined;
+          if (tab.id === 'experience' && experienceCount !== undefined && experienceCount > 0) {
+            countBadge = experienceCount;
+          } else if (tab.id === 'skills' && skillsCount !== undefined && skillsCount > 0) {
+            countBadge = skillsCount;
+          } else if (tab.id === 'documents' && documentsCount !== undefined && documentsCount > 0) {
+            countBadge = documentsCount;
+          }
+
           const Icon = tab.icon;
 
           return (
@@ -84,6 +93,22 @@ export const CandidateTabs: React.FC<CandidateTabsProps> = ({
               >
                 {tab.label}
               </Typography>
+              {countBadge !== undefined && (
+                <Box
+                  component="span"
+                  sx={{
+                    px: 0.85,
+                    py: 0.15,
+                    borderRadius: '10px',
+                    fontSize: '0.72rem',
+                    fontWeight: 750,
+                    bgcolor: isActive ? '#EFF6FF' : '#F1F5F9',
+                    color: isActive ? '#2563EB' : '#64748B',
+                  }}
+                >
+                  {countBadge}
+                </Box>
+              )}
 
               {/* Active Bottom Underline Bar */}
               {isActive && (

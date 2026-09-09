@@ -147,7 +147,7 @@ export const AttachedDocumentRow: React.FC<AttachedDocumentRowProps> = ({
                       fontSize: '0.75rem',
                     }}
                   >
-                    PDF · 245 KB · {dateFormatted}
+                    Tệp đính kèm · Cập nhật ngày {dateFormatted}
                   </Typography>
                 </Box>
               </Stack>
@@ -202,6 +202,89 @@ export const AttachedDocumentRow: React.FC<AttachedDocumentRowProps> = ({
                   Tải xuống
                 </Button>
               </Stack>
+            </Stack>
+          </Paper>
+        ) : profileDetail.slug ? (
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              borderRadius: '12px',
+              border: '1px solid #E2E8F0',
+              bgcolor: '#F8FAFC',
+            }}
+          >
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              alignItems={{ xs: 'flex-start', sm: 'center' }}
+              justifyContent="space-between"
+              spacing={2}
+            >
+              <Stack direction="row" spacing={1.75} alignItems="center">
+                <Box
+                  sx={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: '10px',
+                    bgcolor: '#EFF6FF',
+                    color: '#2563EB',
+                    display: 'grid',
+                    placeItems: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <DescriptionOutlinedIcon sx={{ fontSize: 24 }} />
+                </Box>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      fontWeight: 700,
+                      color: '#0F172A',
+                      fontSize: '0.925rem',
+                      lineHeight: 1.3,
+                      mb: 0.25,
+                    }}
+                  >
+                    Hồ sơ CV trực tuyến
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: '#64748B',
+                      fontWeight: 500,
+                      fontSize: '0.75rem',
+                    }}
+                  >
+                    Hệ thống tạo trực tuyến · Cập nhật ngày {dateFormatted}
+                  </Typography>
+                </Box>
+              </Stack>
+
+              <Button
+                size="small"
+                variant="outlined"
+                component="a"
+                href={`/cv/${profileDetail.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                startIcon={<OpenInNewIcon sx={{ fontSize: 16 }} />}
+                sx={{
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.8125rem',
+                  borderColor: '#CBD5E1',
+                  color: '#334155',
+                  bgcolor: '#FFFFFF',
+                  '&:hover': {
+                    bgcolor: '#F8FAFC',
+                    borderColor: '#94A3B8',
+                  },
+                }}
+              >
+                Xem trực tuyến
+              </Button>
             </Stack>
           </Paper>
         ) : (

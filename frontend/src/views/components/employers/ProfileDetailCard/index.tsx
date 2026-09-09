@@ -150,6 +150,7 @@ const ProfileDetailCard: React.FC = () => {
           onChangeTab={setActiveTab}
           experienceCount={profileDetail.experiencesDetails?.length}
           skillsCount={profileDetail.advancedSkills?.length}
+          documentsCount={safeFileUrl || profileDetail.slug ? 1 : 0}
         />
 
         {/* 4. MAIN LAYOUT: CONTENT + SIDEBAR */}

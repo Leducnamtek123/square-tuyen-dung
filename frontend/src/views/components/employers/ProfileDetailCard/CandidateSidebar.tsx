@@ -48,8 +48,25 @@ export const CandidateSidebar: React.FC<CandidateSidebarProps> = ({ profileDetai
   const [comment, setComment] = useState('');
   const [isSavingRating, setIsSavingRating] = useState(false);
 
+  const evalKey = `candidate_eval_${profileDetail.id || 'default'}`;
+
+  // Load saved rating and comment on mount
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && profileDetail.id) {
+      try {
+        const saved = localStorage.getItem(evalKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (typeof parsed.rating === 'number') setRating(parsed.rating);
+          if (typeof parsed.comment === 'string') setComment(parsed.comment);
+        }
+      } catch {}
+    }
+  }, [profileDetail.id, evalKey]);
+
   const user = profileDetail.user || (profileDetail as any).userDict || {};
   const seeker = profileDetail.jobSeekerProfile || (profileDetail as any).jobSeekerProfileDict || {};
+  const isSeekingJob = seeker.isSeekingJob ?? profileDetail.jobSeekerProfile?.isSeekingJob ?? true;
 
   const email = user.email || seeker.userDict?.email || '';
   const phone = seeker.phone || user.phone || '';
@@ -86,10 +103,23 @@ export const CandidateSidebar: React.FC<CandidateSidebarProps> = ({ profileDetai
     }
 
     setIsSavingRating(true);
-    setTimeout(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(
+          evalKey,
+          JSON.stringify({
+            rating,
+            comment: comment.trim(),
+            savedAt: new Date().toISOString(),
+          })
+        );
+      }
+      toastMessages.success('Đã lưu đánh giá ứng viên thành công');
+    } catch {
+      toastMessages.error('Không thể lưu đánh giá');
+    } finally {
       setIsSavingRating(false);
-      toastMessages.success('Đã lưu đánh giá ứng viên');
-    }, 400);
+    }
   };
 
   return (
@@ -287,11 +317,11 @@ export const CandidateSidebar: React.FC<CandidateSidebarProps> = ({ profileDetai
               </Typography>
             </Stack>
             <Chip
-              label="Chưa cập nhật"
+              label={isSeekingJob ? 'Đang tìm việc' : 'Tạm dừng tìm việc'}
               size="small"
               sx={{
-                bgcolor: '#FEF3C7',
-                color: '#D97706',
+                bgcolor: isSeekingJob ? '#ECFDF5' : '#F1F5F9',
+                color: isSeekingJob ? '#059669' : '#64748B',
                 fontWeight: 700,
                 fontSize: '0.72rem',
                 height: 22,
@@ -411,6 +441,31 @@ export const CandidateSidebar: React.FC<CandidateSidebarProps> = ({ profileDetai
                 Tải xuống hồ sơ
               </Button>
             </>
+          ) : profileDetail.slug ? (
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              component="a"
+              href={`/cv/${profileDetail.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              startIcon={<OpenInNewIcon sx={{ fontSize: 16 }} />}
+              sx={{
+                py: 1.1,
+                borderRadius: '10px',
+                fontWeight: 700,
+                textTransform: 'none',
+                fontSize: '0.875rem',
+                bgcolor: '#2563EB',
+                boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)',
+                '&:hover': {
+                  bgcolor: '#1D4ED8',
+                },
+              }}
+            >
+              Xem CV trực tuyến
+            </Button>
           ) : (
             <Button
               variant="outlined"

@@ -62,10 +62,22 @@ export const CandidateHeader: React.FC<CandidateHeaderProps> = ({
 }) => {
   const { t } = useTranslation(['employer', 'common']);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [tags, setTags] = useState<string[]>(['Kinh nghiệm tốt', 'Phù hợp']);
+  const storageKey = `candidate_tags_${profileDetail.id || 'default'}`;
+
+  const [tags, setTags] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored) return JSON.parse(stored);
+      } catch {}
+    }
+    // Fallback to real candidate skills if available
+    const skillTags = (profileDetail.advancedSkills || []).slice(0, 2).map((s) => s.name);
+    return skillTags.length > 0 ? skillTags : ['Kinh nghiệm tốt'];
+  });
+
   const { toggleSaveResume, isMutating } = useToggleSaveResumeOptimistic();
   const isSaved = Boolean((profileDetail as any).isSaved);
-
 
   const safeFileUrl = getSafeResourceUrl(fileUrl || profileDetail.fileUrl);
 
@@ -80,10 +92,29 @@ export const CandidateHeader: React.FC<CandidateHeaderProps> = ({
   const handleAddTag = () => {
     const newTag = prompt('Nhập tên tag mới cho ứng viên:');
     if (newTag && newTag.trim()) {
-      setTags((prev) => [...prev, newTag.trim()]);
-      toastMessages.success('Đã thêm tag');
+      const updated = [...tags, newTag.trim()];
+      setTags(updated);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(updated));
+        } catch {}
+      }
+      toastMessages.success('Đã thêm tag cho ứng viên');
     }
   };
+
+  const handleDeleteTag = (tagToDelete: string) => {
+    const updated = tags.filter((t) => t !== tagToDelete);
+    setTags(updated);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(updated));
+      } catch {}
+    }
+  };
+
+  const isSeekingJob = profileDetail.jobSeekerProfile?.isSeekingJob ?? true;
+  const statusLabel = isSeekingJob ? 'Đang tìm việc' : 'Tạm dừng tìm việc';
 
   const code = candidateCode || (profileDetail.id ? `UV${String(profileDetail.id).padStart(8, '0')}` : '-');
 
@@ -173,12 +204,13 @@ export const CandidateHeader: React.FC<CandidateHeaderProps> = ({
 
               {/* Status Pill Badge */}
               <Chip
-                label="Ứng viên tiềm năng"
+                label={statusLabel}
                 size="small"
                 sx={{
-                  bgcolor: '#EFF6FF',
-                  color: '#2563EB',
-                  border: '1px solid #BFDBFE',
+                  bgcolor: isSeekingJob ? '#ECFDF5' : '#EFF6FF',
+                  color: isSeekingJob ? '#059669' : '#2563EB',
+                  border: '1px solid',
+                  borderColor: isSeekingJob ? '#A7F3D0' : '#BFDBFE',
                   fontWeight: 700,
                   fontSize: '0.75rem',
                   height: 24,
@@ -224,6 +256,7 @@ export const CandidateHeader: React.FC<CandidateHeaderProps> = ({
                   key={`tag-${tag}-${idx}`}
                   label={tag}
                   size="small"
+                  onDelete={() => handleDeleteTag(tag)}
                   sx={{
                     bgcolor: '#F1F5F9',
                     color: '#475569',
@@ -231,6 +264,13 @@ export const CandidateHeader: React.FC<CandidateHeaderProps> = ({
                     fontSize: '0.72rem',
                     height: 24,
                     borderRadius: '6px',
+                    '& .MuiChip-deleteIcon': {
+                      fontSize: 14,
+                      color: '#94A3B8',
+                      '&:hover': {
+                        color: '#EF4444',
+                      },
+                    },
                   }}
                 />
               ))}
