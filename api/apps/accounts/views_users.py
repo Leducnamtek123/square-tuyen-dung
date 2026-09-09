@@ -366,13 +366,14 @@ def change_password(request):
 
 @api_view(http_method_names=["patch"])
 @permission_classes(permission_classes=[IsAuthenticated])
+@transaction.atomic
 def update_user_account(request):
     data = request.data
 
     user = request.user
 
     user_account_serializer = UserSerializer(
-        user, data=data, partial=True, fields=["id", "fullName", "phoneNumber", "phone", "isVerifyPhone", "isPhoneVerified"]
+        user, data=data, partial=True, fields=["id", "fullName", "phoneNumber", "phone", "isPhoneVerified"]
     )
 
     if not user_account_serializer.is_valid():
@@ -632,7 +633,11 @@ class UserViewSet(
     pagination_class = paginations.CustomPagination
 
     def get_queryset(self):
-        queryset = User.objects.all().order_by("-id")
+        queryset = (
+            User.objects.select_related("avatar", "company")
+            .prefetch_related("companymember_set__role")
+            .order_by("-id")
+        )
         role_name = self.request.query_params.get("roleName", None)
         if role_name:
             queryset = queryset.filter(role_name=role_name)

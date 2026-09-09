@@ -232,7 +232,7 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     avatarUrl = serializers.SerializerMethodField(method_name="get_avatar_url", read_only=True)
     isActive = serializers.BooleanField(source='is_active', read_only=True)
     isVerifyEmail = serializers.BooleanField(source='is_verify_email', read_only=True)
-    isVerifyPhone = serializers.BooleanField(source='is_verify_phone', required=False)
+    isVerifyPhone = serializers.BooleanField(source='is_verify_phone', read_only=True)
     isPhoneVerified = serializers.BooleanField(source='is_verify_phone', read_only=True)
     isOnboarded = serializers.BooleanField(source='is_onboarded', read_only=True)
     onboardingStep = serializers.IntegerField(source='onboarding_step', read_only=True)
@@ -410,14 +410,14 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
 
     def update(self, user, validated_data):
+        should_sync_firebase = False
+
         if "full_name" in validated_data:
             full_name = validated_data.get("full_name")
             if full_name is not None:
                 user.full_name = full_name
-            if not user.has_company:
-                user_id = user.id
-                name_val = full_name
-                transaction.on_commit(lambda: queue_auth.update_info.delay(user_id, name_val))
+                if not user.has_company:
+                    should_sync_firebase = True
 
         if "role_name" in validated_data:
             user.role_name = validated_data.get("role_name")
@@ -432,10 +432,13 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             except Exception as ex:
                 helper.print_log_error("UserSerializer.update.job_seeker_profile", ex)
 
-        if "is_verify_phone" in validated_data:
-            user.is_verify_phone = validated_data.get("is_verify_phone")
-
         user.save()
+
+        if should_sync_firebase:
+            user_id = user.id
+            sync_name = user.full_name
+            transaction.on_commit(lambda: queue_auth.update_info.delay(user_id, sync_name))
+
         return user
 
     class Meta:

@@ -66,6 +66,32 @@ class PrivateJobPostViewSet(
         ('appliedTotal', 'applied_total'),
     )
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = getattr(self.request, 'user', None)
+        if not user or not user.is_authenticated:
+            return queryset.none()
+        if (
+            getattr(user, 'is_staff', False)
+            or getattr(user, 'is_superuser', False)
+            or getattr(user, 'role_name', None) == var_sys.ADMIN
+        ):
+            return queryset
+
+        from apps.accounts.active_company import apply_active_company_from_request
+        from apps.profiles.models import Company
+        company = apply_active_company_from_request(self.request)
+        if not company:
+            company = (
+                getattr(user, 'active_company', None)
+                or getattr(user, 'company', None)
+                or Company.objects.filter(user=user).first()
+            )
+        if not company:
+            return queryset.none()
+
+        return queryset.filter(company=company)
+
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field

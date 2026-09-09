@@ -105,7 +105,11 @@ const jobDetailReducer = (
   }
 };
 
-const JobDetailPage = () => {
+interface JobDetailPageProps {
+  initialJob?: ExtendedJobPost | JobPost | null;
+}
+
+const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
   const { slug } = useParams();
   const { push } = useRouter();
   const { t } = useTranslation(["public"]);
@@ -114,7 +118,20 @@ const JobDetailPage = () => {
   const { requireAuth, AuthModal } = useRequireAuth();
   const [openReportPopup, setOpenReportPopup] = React.useState(false);
 
-  const [state, dispatch] = React.useReducer(jobDetailReducer, initialJobDetailState);
+  const [state, dispatch] = React.useReducer(
+    jobDetailReducer,
+    initialJobDetailState,
+    (baseState) => {
+      if (initialJob) {
+        return {
+          ...baseState,
+          loading: false,
+          jobPostDetail: initialJob as ExtendedJobPost,
+        };
+      }
+      return baseState;
+    }
+  );
   const canApply =
     !isAuthenticated ||
     currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
@@ -122,8 +139,13 @@ const JobDetailPage = () => {
   React.useEffect(() => {
     let isActive = true;
     const getJobPostDetail = async (jobPostSlug: string | undefined) => {
-
       if (!jobPostSlug || jobPostSlug === ':slug') return;
+      if (
+        initialJob &&
+        (initialJob.slug === jobPostSlug || String(initialJob.id) === String(jobPostSlug))
+      ) {
+        return;
+      }
       try {
         const resData = await jobService.getJobPostDetailById(jobPostSlug);
         const data = resData;
