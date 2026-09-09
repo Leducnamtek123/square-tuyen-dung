@@ -2,12 +2,15 @@
 
 import React from 'react';
 import { Box, Stack, Typography, ButtonBase } from '@mui/material';
-import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
-import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
-import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
-import MicNoneOutlinedIcon from '@mui/icons-material/MicNoneOutlined';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
+import { motion } from 'motion/react';
+import {
+  SquaresFour,
+  Briefcase,
+  Sparkle,
+  Microphone,
+  FileText,
+  ClockCounterClockwise,
+} from '@phosphor-icons/react';
 
 export type CandidateTabKey = 'overview' | 'experience' | 'skills' | 'interview' | 'documents' | 'activity';
 
@@ -19,13 +22,19 @@ interface CandidateTabsProps {
   documentsCount?: number;
 }
 
-const TABS: { id: CandidateTabKey; label: string; icon: React.ElementType }[] = [
-  { id: 'overview', label: 'Tổng quan', icon: DashboardOutlinedIcon },
-  { id: 'experience', label: 'Hồ sơ & Kinh nghiệm', icon: WorkOutlineOutlinedIcon },
-  { id: 'skills', label: 'Kỹ năng', icon: AutoAwesomeOutlinedIcon },
-  { id: 'interview', label: 'Phỏng vấn', icon: MicNoneOutlinedIcon },
-  { id: 'documents', label: 'Tài liệu', icon: DescriptionOutlinedIcon },
-  { id: 'activity', label: 'Nhật ký hoạt động', icon: HistoryOutlinedIcon },
+interface TabDef {
+  id: CandidateTabKey;
+  label: string;
+  icon: React.ElementType;
+}
+
+const TABS: TabDef[] = [
+  { id: 'overview', label: 'Tổng quan', icon: SquaresFour },
+  { id: 'experience', label: 'Hồ sơ & Kinh nghiệm', icon: Briefcase },
+  { id: 'skills', label: 'Kỹ năng', icon: Sparkle },
+  { id: 'interview', label: 'Phỏng vấn', icon: Microphone },
+  { id: 'documents', label: 'Tài liệu', icon: FileText },
+  { id: 'activity', label: 'Nhật ký hoạt động', icon: ClockCounterClockwise },
 ];
 
 export const CandidateTabs: React.FC<CandidateTabsProps> = ({
@@ -46,7 +55,7 @@ export const CandidateTabs: React.FC<CandidateTabsProps> = ({
         scrollbarWidth: 'none',
       }}
     >
-      <Stack direction="row" spacing={1} sx={{ minWidth: 'max-content', py: 0.5 }}>
+      <Stack direction="row" spacing={0.75} sx={{ minWidth: 'max-content', py: 0.5 }}>
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           let countBadge: number | undefined;
@@ -58,7 +67,7 @@ export const CandidateTabs: React.FC<CandidateTabsProps> = ({
             countBadge = documentsCount;
           }
 
-          const Icon = tab.icon;
+          const IconComponent = tab.icon;
 
           return (
             <ButtonBase
@@ -68,59 +77,79 @@ export const CandidateTabs: React.FC<CandidateTabsProps> = ({
                 position: 'relative',
                 px: 2,
                 py: 1.5,
-                borderRadius: '8px',
-                color: isActive ? '#2563EB' : '#64748B',
+                borderRadius: '10px',
+                color: isActive ? '#1D4ED8' : '#64748B',
                 fontWeight: isActive ? 700 : 500,
                 fontSize: '0.875rem',
-                transition: 'all 0.15s ease-in-out',
+                transition: 'color 0.15s ease, background-color 0.15s ease, transform 0.1s ease',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 1,
+                gap: 1.1,
+                cursor: 'pointer',
                 '&:hover': {
                   color: '#0F172A',
-                  bgcolor: 'rgba(241, 245, 249, 0.7)',
+                  bgcolor: isActive ? 'rgba(239, 246, 255, 0.7)' : 'rgba(241, 245, 249, 0.8)',
+                },
+                '&:active': {
+                  transform: 'scale(0.98)',
                 },
               }}
             >
-              <Icon sx={{ fontSize: 18, color: isActive ? '#2563EB' : '#94A3B8' }} />
+              <IconComponent
+                size={18}
+                weight={isActive ? 'duotone' : 'regular'}
+                style={{
+                  color: isActive ? '#2563EB' : '#94A3B8',
+                  transition: 'color 0.15s ease',
+                }}
+              />
               <Typography
                 component="span"
                 sx={{
                   fontSize: '0.875rem',
-                  fontWeight: isActive ? 700 : 600,
+                  fontWeight: isActive ? 750 : 600,
                   color: 'inherit',
+                  letterSpacing: '-0.01em',
                 }}
               >
                 {tab.label}
               </Typography>
+
               {countBadge !== undefined && (
                 <Box
                   component="span"
                   sx={{
                     px: 0.85,
                     py: 0.15,
-                    borderRadius: '10px',
+                    borderRadius: '8px',
                     fontSize: '0.72rem',
-                    fontWeight: 750,
+                    fontWeight: 700,
+                    fontFamily: 'var(--font-mono)',
                     bgcolor: isActive ? '#EFF6FF' : '#F1F5F9',
                     color: isActive ? '#2563EB' : '#64748B',
+                    border: '1px solid',
+                    borderColor: isActive ? 'rgba(191, 219, 254, 0.6)' : 'rgba(226, 232, 240, 0.8)',
+                    lineHeight: 1.3,
                   }}
                 >
                   {countBadge}
                 </Box>
               )}
 
-              {/* Active Bottom Underline Bar */}
+              {/* Shared Spring Physical Sliding Indicator Bar */}
               {isActive && (
-                <Box
-                  sx={{
+                <motion.div
+                  layoutId="activeCandidateTabIndicator"
+                  transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  style={{
                     position: 'absolute',
                     bottom: -5,
-                    left: 12,
-                    right: 12,
+                    left: 8,
+                    right: 8,
                     height: 2.5,
-                    bgcolor: '#2563EB',
-                    borderRadius: '3px 3px 0 0',
+                    backgroundColor: '#2563EB',
+                    borderRadius: '4px 4px 0 0',
+                    boxShadow: '0 1px 4px rgba(37, 99, 235, 0.35)',
                   }}
                 />
               )}
