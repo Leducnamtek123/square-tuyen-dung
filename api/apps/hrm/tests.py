@@ -606,3 +606,82 @@ class HrmAppTestCase(TestCase):
         self.assertEqual(resp.data['active_contract']['contract_number'], 'HD-SELF-001')
 
 
+class HRMAttendanceModelTests(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.owner_a = User.objects.create_user(
+            'att_owner_a@company-a.vn',
+            'Owner A',
+            password='Password123!',
+            role=var_sys.EMPLOYER,
+        )
+        self.company_a = Company.objects.create(
+            user=self.owner_a,
+            company_name='Attendance Company A',
+            company_email='hr_att@company-a.vn',
+            company_phone='0901111999',
+            tax_code='TAX-ATT-A',
+        )
+        self.employee_a = Employee.objects.create(
+            company=self.company_a,
+            employee_code='SQ-ATT-001',
+            first_name='An',
+            last_name='Nguyễn',
+            full_name='Nguyễn An',
+            email='an.nguyen@att-comp-a.vn',
+            status='ACTIVE',
+        )
+
+    def test_create_work_shift_and_assignment(self):
+        from apps.hrm.models import WorkShift, ShiftAssignment
+        from datetime import time
+
+        shift = WorkShift.objects.create(
+            company=self.company_a,
+            code="CA_HC",
+            name="Ca hành chính 8h00 - 17h00",
+            start_time=time(8, 0),
+            end_time=time(17, 0),
+            break_start=time(12, 0),
+            break_end=time(13, 0),
+            working_hours=Decimal("8.0"),
+            grace_period_late_minutes=15,
+        )
+        self.assertEqual(str(shift), "Ca hành chính 8h00 - 17h00 (CA_HC)")
+
+        assignment = ShiftAssignment.objects.create(
+            company=self.company_a,
+            employee=self.employee_a,
+            shift=shift,
+            date=date(2026, 9, 10),
+            is_off_day=False,
+        )
+        self.assertEqual(assignment.shift.code, "CA_HC")
+
+    def test_create_attendance_request_and_summary(self):
+        from apps.hrm.models import AttendanceRequest, MonthlyAttendanceSummary
+
+        req = AttendanceRequest.objects.create(
+            company=self.company_a,
+            employee=self.employee_a,
+            request_type="REGULARISATION",
+            start_date=date(2026, 9, 10),
+            end_date=date(2026, 9, 10),
+            reason="Quên chấm công buổi sáng",
+            status="PENDING_STAGE_1",
+        )
+        self.assertEqual(req.status, "PENDING_STAGE_1")
+
+        summary = MonthlyAttendanceSummary.objects.create(
+            company=self.company_a,
+            employee=self.employee_a,
+            month=9,
+            year=2026,
+            standard_work_days=Decimal("22.0"),
+            actual_work_days=Decimal("21.5"),
+            paid_leave_days=Decimal("0.5"),
+        )
+        self.assertFalse(summary.is_locked)
+
+
+
