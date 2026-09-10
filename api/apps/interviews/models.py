@@ -54,6 +54,26 @@ class Question(CommonBaseModel):
         related_name='questions',
         verbose_name="Thuộc công ty"
     )
+    default_duration_seconds = models.IntegerField(
+        default=120,
+        verbose_name="Thời gian trả lời (giây)"
+    )
+    answer_structure = models.JSONField(
+        blank=True, null=True,
+        verbose_name="Cấu trúc gợi ý trả lời"
+    )
+    interviewer_intent = models.TextField(
+        blank=True, default="",
+        verbose_name="Mục đích phỏng vấn / Ý đồ đánh giá"
+    )
+    important_tips = models.JSONField(
+        blank=True, null=True,
+        verbose_name="Mẹo quan trọng cho ứng viên"
+    )
+    follow_up_questions = models.JSONField(
+        blank=True, null=True,
+        verbose_name="Câu hỏi nối tiếp có thể gặp"
+    )
 
     class Meta:
         db_table = "project_interview_question"
@@ -286,6 +306,27 @@ class InterviewSession(CommonBaseModel):
         choices=TYPE_CHOICES,
         default='mixed',
         verbose_name="Loại phỏng vấn"
+    )
+    SESSION_TYPE_OFFICIAL = 'official'
+    SESSION_TYPE_MOCK = 'mock'
+    SESSION_TYPE_CHOICES = [
+        (SESSION_TYPE_OFFICIAL, 'Phỏng vấn ứng tuyển'),
+        (SESSION_TYPE_MOCK, 'Phỏng vấn thử'),
+    ]
+    session_type = models.CharField(
+        max_length=20,
+        choices=SESSION_TYPE_CHOICES,
+        default=SESSION_TYPE_OFFICIAL,
+        db_index=True,
+        verbose_name="Phân loại phiên phỏng vấn"
+    )
+    time_limit_per_question = models.IntegerField(
+        default=120,
+        verbose_name="Thời gian trả lời mỗi câu (giây)"
+    )
+    session_metadata = models.JSONField(
+        blank=True, null=True,
+        verbose_name="Metadata phiên phỏng vấn / Gợi ý AI"
     )
 
     scheduled_at = models.DateTimeField(
@@ -561,6 +602,86 @@ class InterviewProctoringEvent(CommonBaseModel):
 
     def __str__(self):
         return f"Proctoring: {self.get_event_type_display()} on session #{self.session_id}"
+
+
+class SalaryBenchmark(CommonBaseModel):
+    """Bảng dữ liệu mức lương thị trường theo ngành nghề và chức danh."""
+
+    EXPERIENCE_CHOICES = [
+        ('entry', 'Mới ra trường / Dưới 1 năm'),
+        ('junior', '1 - 2 năm'),
+        ('mid', '2 - 4 năm'),
+        ('senior', '4 - 7 năm'),
+        ('lead', 'Trưởng nhóm / Manager / Chuyên gia'),
+    ]
+
+    career = models.ForeignKey(
+        'common.Career',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='salary_benchmarks',
+        verbose_name="Ngành nghề"
+    )
+    position_title = models.CharField(
+        max_length=255,
+        db_index=True,
+        verbose_name="Tên vị trí / Chức danh"
+    )
+    experience_level = models.CharField(
+        max_length=30,
+        choices=EXPERIENCE_CHOICES,
+        default='junior',
+        db_index=True,
+        verbose_name="Cấp bậc kinh nghiệm"
+    )
+    salary_min = models.DecimalField(
+        max_digits=14,
+        decimal_places=0,
+        default=0,
+        verbose_name="Mức lương tối thiểu (VND)"
+    )
+    salary_max = models.DecimalField(
+        max_digits=14,
+        decimal_places=0,
+        default=0,
+        verbose_name="Mức lương tối đa (VND)"
+    )
+    salary_avg = models.DecimalField(
+        max_digits=14,
+        decimal_places=0,
+        default=0,
+        null=True,
+        blank=True,
+        verbose_name="Mức lương trung bình (VND)"
+    )
+    year = models.IntegerField(
+        default=2026,
+        db_index=True,
+        verbose_name="Năm khảo sát"
+    )
+    sample_count = models.IntegerField(
+        default=100,
+        verbose_name="Số lượng mẫu khảo sát"
+    )
+    is_hot = models.BooleanField(
+        default=False,
+        verbose_name="Vị trí tuyển dụng hot"
+    )
+
+    class Meta:
+        db_table = "project_interview_salary_benchmark"
+        ordering = ['-is_hot', 'position_title', 'salary_min']
+        indexes = [
+            models.Index(fields=['career', 'experience_level'], name='idx_salary_career_exp'),
+            models.Index(fields=['position_title', 'year'], name='idx_salary_pos_year'),
+        ]
+        verbose_name = "Salary Benchmark"
+        verbose_name_plural = "Salary Benchmarks"
+
+    def __str__(self):
+        return f"{self.position_title} ({self.get_experience_level_display()}): {self.salary_min:,} - {self.salary_max:,} VND"
+
 
 
 
