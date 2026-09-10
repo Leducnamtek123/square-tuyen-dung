@@ -419,6 +419,137 @@ export type MyHrmProfileResponse = {
   recentPayrolls?: NativeMonthlyPayrollRecord[];
 };
 
+export type NativeWorkShift = {
+  id: number;
+  company?: number;
+  code: string;
+  name: string;
+  start_time: string;
+  end_time: string;
+  break_start?: string | null;
+  break_end?: string | null;
+  working_hours: number | string;
+  work_factor?: number | string;
+  is_overnight?: boolean;
+  grace_period_late_minutes?: number;
+  grace_period_early_minutes?: number;
+  is_active?: boolean;
+  create_at?: string;
+  update_at?: string;
+};
+
+export type NativeShiftAssignment = {
+  id: number;
+  company?: number;
+  employee: number;
+  employee_name?: string;
+  employee_code?: string;
+  department_name?: string;
+  shift?: number | null;
+  shift_code?: string;
+  shift_name?: string;
+  date: string;
+  is_off_day: boolean;
+  note?: string;
+};
+
+export type BatchAssignShiftsPayload = {
+  employee_ids: number[];
+  shift_id?: number | null;
+  start_date: string;
+  end_date: string;
+  applicable_days_of_week?: number[];
+  is_off_day?: boolean;
+  note?: string;
+};
+
+export type AttendanceRequestType =
+  | 'LEAVE'
+  | 'REGULARISATION'
+  | 'BUSINESS_TRIP'
+  | 'OVERTIME'
+  | 'LATE_EARLY';
+
+export type AttendanceRequestStatus =
+  | 'PENDING_STAGE_1'
+  | 'APPROVED_STAGE_1'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'CANCELLED';
+
+export type NativeAttendanceRequest = {
+  id: number;
+  company?: number;
+  employee: number;
+  employee_name?: string;
+  employee_code?: string;
+  department_name?: string;
+  request_type: AttendanceRequestType;
+  request_type_label?: string;
+  leave_type?: number | null;
+  leave_type_name?: string;
+  start_date: string;
+  end_date: string;
+  start_time?: string | null;
+  end_time?: string | null;
+  duration_hours?: number | string | null;
+  reason?: string;
+  status: AttendanceRequestStatus;
+  status_label?: string;
+  manager_reviewer?: number | null;
+  manager_reviewer_name?: string;
+  manager_approved_at?: string | null;
+  hr_reviewer?: number | null;
+  hr_reviewer_name?: string;
+  hr_approved_at?: string | null;
+  rejection_reason?: string;
+  create_at?: string;
+};
+
+export type NativeBiometricPunchLog = {
+  id: number;
+  company?: number;
+  employee?: number | null;
+  employee_name?: string;
+  employee_code?: string;
+  department_name?: string;
+  biometric_id: string;
+  punch_time: string;
+  device_name?: string;
+  device_ip?: string;
+  punch_type: 'CHECK_IN' | 'CHECK_OUT' | 'AUTO' | string;
+  punch_type_label?: string;
+  source: 'ZKTECO' | 'EXCEL_IMPORT' | 'WEB_APP' | 'MANUAL' | string;
+  source_label?: string;
+  create_at?: string;
+};
+
+export type NativeMonthlyAttendanceSummary = {
+  id: number;
+  company?: number;
+  employee: number;
+  employee_name?: string;
+  employee_code?: string;
+  department_name?: string;
+  month: number;
+  year: number;
+  standard_work_days: number | string;
+  actual_work_days: number | string;
+  paid_leave_days: number | string;
+  unpaid_leave_days: number | string;
+  overtime_hours_weekday: number | string;
+  overtime_hours_weekend: number | string;
+  overtime_hours_holiday: number | string;
+  late_occurrences: number;
+  early_occurrences: number;
+  is_locked: boolean;
+  locked_by?: number | null;
+  locked_by_name?: string;
+  locked_at?: string | null;
+  pushed_to_payroll_at?: string | null;
+};
+
+
 export type NativeLeaveType = {
   id: number;
   name: string;
@@ -614,6 +745,101 @@ const hrmService = {
       responseType: 'blob',
     });
     return response as unknown as Blob;
+  },
+
+  // ── Time & Attendance Methods (MISA AMIS Model) ───────────────────────────
+  getWorkShifts: (params?: any): Promise<NativeWorkShift[]> => {
+    return httpRequest.get('native-hrm/work-shifts/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeWorkShift>(res).results;
+    });
+  },
+
+  createWorkShift: (data: Partial<NativeWorkShift>): Promise<NativeWorkShift> => {
+    return httpRequest.post('native-hrm/work-shifts/', data).then((res) => unwrapDataResponse<NativeWorkShift>(res));
+  },
+
+  updateWorkShift: (id: number, data: Partial<NativeWorkShift>): Promise<NativeWorkShift> => {
+    return httpRequest.patch(`native-hrm/work-shifts/${id}/`, data).then((res) => unwrapDataResponse<NativeWorkShift>(res));
+  },
+
+  deleteWorkShift: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/work-shifts/${id}/`).then(() => undefined);
+  },
+
+  getShiftAssignments: (params?: { month?: number; year?: number; employee_id?: number; department_id?: number; start_date?: string; end_date?: string }): Promise<NativeShiftAssignment[]> => {
+    return httpRequest.get('native-hrm/shift-assignments/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeShiftAssignment>(res).results;
+    });
+  },
+
+  batchAssignShifts: (data: BatchAssignShiftsPayload): Promise<{ message: string; count: number; assignments: NativeShiftAssignment[] }> => {
+    return httpRequest.post('native-hrm/shift-assignments/batch/', data).then((res) => unwrapDataResponse<{ message: string; count: number; assignments: NativeShiftAssignment[] }>(res));
+  },
+
+  deleteShiftAssignment: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/shift-assignments/${id}/`).then(() => undefined);
+  },
+
+  getAttendanceRequests: (params?: { status?: string; request_type?: string; employee_id?: number }): Promise<NativeAttendanceRequest[]> => {
+    return httpRequest.get('native-hrm/attendance-requests/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeAttendanceRequest>(res).results;
+    });
+  },
+
+  createAttendanceRequest: (data: Partial<NativeAttendanceRequest>): Promise<NativeAttendanceRequest> => {
+    return httpRequest.post('native-hrm/attendance-requests/', data).then((res) => unwrapDataResponse<NativeAttendanceRequest>(res));
+  },
+
+  approveAttendanceRequestStage1: (id: number): Promise<NativeAttendanceRequest> => {
+    return httpRequest.post(`native-hrm/attendance-requests/${id}/approve-stage-1/`, {}).then((res) => unwrapDataResponse<NativeAttendanceRequest>(res));
+  },
+
+  approveAttendanceRequestStage2: (id: number): Promise<NativeAttendanceRequest> => {
+    return httpRequest.post(`native-hrm/attendance-requests/${id}/approve-stage-2/`, {}).then((res) => unwrapDataResponse<NativeAttendanceRequest>(res));
+  },
+
+  rejectAttendanceRequest: (id: number, reason?: string): Promise<NativeAttendanceRequest> => {
+    return httpRequest.post(`native-hrm/attendance-requests/${id}/reject/`, { reason }).then((res) => unwrapDataResponse<NativeAttendanceRequest>(res));
+  },
+
+  cancelAttendanceRequest: (id: number): Promise<NativeAttendanceRequest> => {
+    return httpRequest.post(`native-hrm/attendance-requests/${id}/cancel/`, {}).then((res) => unwrapDataResponse<NativeAttendanceRequest>(res));
+  },
+
+  getBiometricPunchLogs: (params?: { date?: string; employee_id?: number; source?: string }): Promise<NativeBiometricPunchLog[]> => {
+    return httpRequest.get('native-hrm/biometric-punch-logs/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeBiometricPunchLog>(res).results;
+    });
+  },
+
+  createBiometricPunchLog: (data: Partial<NativeBiometricPunchLog>): Promise<NativeBiometricPunchLog> => {
+    return httpRequest.post('native-hrm/biometric-punch-logs/', data).then((res) => unwrapDataResponse<NativeBiometricPunchLog>(res));
+  },
+
+  processDailyPunchLogs: (date?: string): Promise<{ message: string; count: number }> => {
+    return httpRequest.post('native-hrm/biometric-punch-logs/process-daily/', { date }).then((res) => unwrapDataResponse<{ message: string; count: number }>(res));
+  },
+
+  getMonthlyAttendanceSummaries: (params?: { month?: number; year?: number; employee_id?: number; department_id?: number }): Promise<NativeMonthlyAttendanceSummary[]> => {
+    return httpRequest.get('native-hrm/monthly-summaries/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeMonthlyAttendanceSummary>(res).results;
+    });
+  },
+
+  recalculateMonthlyAttendanceSummary: (data: { month: number; year: number; employee_ids?: number[] }): Promise<{ message: string; count: number; summaries: NativeMonthlyAttendanceSummary[] }> => {
+    return httpRequest.post('native-hrm/monthly-summaries/recalculate/', data).then((res) => unwrapDataResponse<{ message: string; count: number; summaries: NativeMonthlyAttendanceSummary[] }>(res));
+  },
+
+  lockMonthlyAttendanceSummary: (id: number): Promise<NativeMonthlyAttendanceSummary> => {
+    return httpRequest.post(`native-hrm/monthly-summaries/${id}/lock/`, {}).then((res) => unwrapDataResponse<NativeMonthlyAttendanceSummary>(res));
+  },
+
+  unlockMonthlyAttendanceSummary: (id: number): Promise<NativeMonthlyAttendanceSummary> => {
+    return httpRequest.post(`native-hrm/monthly-summaries/${id}/unlock/`, {}).then((res) => unwrapDataResponse<NativeMonthlyAttendanceSummary>(res));
+  },
+
+  pushSummaryToPayroll: (id: number): Promise<{ message: string; payroll_id: number; summary: NativeMonthlyAttendanceSummary }> => {
+    return httpRequest.post(`native-hrm/monthly-summaries/${id}/push-to-payroll/`, {}).then((res) => unwrapDataResponse<{ message: string; payroll_id: number; summary: NativeMonthlyAttendanceSummary }>(res));
   },
 };
 

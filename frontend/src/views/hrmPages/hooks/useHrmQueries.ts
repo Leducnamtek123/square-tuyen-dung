@@ -8,6 +8,12 @@ import hrmService, {
   NativeLeaveRequest,
   NativeOrgTreeNode,
   OnboardCandidatePayload,
+  NativeWorkShift,
+  NativeShiftAssignment,
+  BatchAssignShiftsPayload,
+  NativeAttendanceRequest,
+  NativeBiometricPunchLog,
+  NativeMonthlyAttendanceSummary,
 } from '@/services/hrmService';
 import toastMessages from '@/utils/toastMessages';
 
@@ -22,6 +28,11 @@ export const HRM_QUERY_KEYS = {
   leaveTypes: ['hrm-leave-types'] as const,
   leaveBalances: ['hrm-leave-balances'] as const,
   timesheet: ['hrm-timesheet'] as const,
+  workShifts: ['hrm-work-shifts'] as const,
+  shiftAssignments: ['hrm-shift-assignments'] as const,
+  attendanceRequests: ['hrm-attendance-requests'] as const,
+  biometricPunchLogs: ['hrm-biometric-punch-logs'] as const,
+  monthlyAttendanceSummaries: ['hrm-monthly-attendance-summaries'] as const,
   payroll: ['hrm-payroll'] as const,
   payrollKPIs: ['hrm-payroll-kpis'] as const,
   myProfile: ['hrm-my-profile'] as const,
@@ -130,6 +141,66 @@ export const useHrmOrgChart = () => {
     queryKey: HRM_QUERY_KEYS.orgChart,
     queryFn: () => hrmService.getOrgChart(),
     staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useHrmWorkShifts = (params?: any) => {
+  return useQuery<NativeWorkShift[]>({
+    queryKey: [...HRM_QUERY_KEYS.workShifts, params],
+    queryFn: () => hrmService.getWorkShifts(params),
+    staleTime: 60 * 1000,
+  });
+};
+
+export const useHrmShiftAssignments = (params?: {
+  month?: number;
+  year?: number;
+  employee_id?: number;
+  department_id?: number;
+  start_date?: string;
+  end_date?: string;
+}) => {
+  return useQuery<NativeShiftAssignment[]>({
+    queryKey: [...HRM_QUERY_KEYS.shiftAssignments, params],
+    queryFn: () => hrmService.getShiftAssignments(params),
+    staleTime: 30 * 1000,
+  });
+};
+
+export const useHrmAttendanceRequests = (params?: {
+  status?: string;
+  request_type?: string;
+  employee_id?: number;
+}) => {
+  return useQuery<NativeAttendanceRequest[]>({
+    queryKey: [...HRM_QUERY_KEYS.attendanceRequests, params],
+    queryFn: () => hrmService.getAttendanceRequests(params),
+    staleTime: 30 * 1000,
+  });
+};
+
+export const useHrmBiometricPunchLogs = (params?: {
+  date?: string;
+  employee_id?: number;
+  source?: string;
+}) => {
+  return useQuery<NativeBiometricPunchLog[]>({
+    queryKey: [...HRM_QUERY_KEYS.biometricPunchLogs, params],
+    queryFn: () => hrmService.getBiometricPunchLogs(params),
+    staleTime: 15 * 1000,
+  });
+};
+
+export const useHrmMonthlyAttendanceSummaries = (params?: {
+  month?: number;
+  year?: number;
+  employee_id?: number;
+  department_id?: number;
+}) => {
+  return useQuery<NativeMonthlyAttendanceSummary[]>({
+    queryKey: [...HRM_QUERY_KEYS.monthlyAttendanceSummaries, params],
+    queryFn: () => hrmService.getMonthlyAttendanceSummaries(params),
+    staleTime: 30 * 1000,
   });
 };
 
@@ -423,6 +494,204 @@ export const useHrmMutations = () => {
     },
   });
 
+  // ── Time & Attendance Mutations ───────────────────────────────────────────
+  const createWorkShift = useMutation({
+    mutationFn: (data: Partial<NativeWorkShift>) => hrmService.createWorkShift(data),
+    onSuccess: () => {
+      toastMessages.success('Đã thêm ca làm việc mới!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.workShifts });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể tạo ca làm việc.');
+    },
+  });
+
+  const updateWorkShift = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<NativeWorkShift> }) =>
+      hrmService.updateWorkShift(id, data),
+    onSuccess: () => {
+      toastMessages.success('Đã cập nhật ca làm việc!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.workShifts });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể cập nhật ca làm việc.');
+    },
+  });
+
+  const deleteWorkShift = useMutation({
+    mutationFn: (id: number) => hrmService.deleteWorkShift(id),
+    onSuccess: () => {
+      toastMessages.success('Đã xóa ca làm việc!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.workShifts });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể xóa ca làm việc.');
+    },
+  });
+
+  const batchAssignShifts = useMutation({
+    mutationFn: (data: BatchAssignShiftsPayload) => hrmService.batchAssignShifts(data),
+    onSuccess: (res) => {
+      toastMessages.success(res?.message || 'Phân ca thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.shiftAssignments });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi phân ca.');
+    },
+  });
+
+  const deleteShiftAssignment = useMutation({
+    mutationFn: (id: number) => hrmService.deleteShiftAssignment(id),
+    onSuccess: () => {
+      toastMessages.success('Đã xóa phân ca!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.shiftAssignments });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể xóa phân ca.');
+    },
+  });
+
+  const createAttendanceRequest = useMutation({
+    mutationFn: (data: Partial<NativeAttendanceRequest>) =>
+      hrmService.createAttendanceRequest(data),
+    onSuccess: () => {
+      toastMessages.success('Gửi đơn từ thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.attendanceRequests });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi gửi đơn từ.');
+    },
+  });
+
+  const approveAttendanceRequestStage1 = useMutation({
+    mutationFn: (id: number) => hrmService.approveAttendanceRequestStage1(id),
+    onSuccess: () => {
+      toastMessages.success('Quản lý cấp 1 đã duyệt đơn!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.attendanceRequests });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.timesheet });
+    },
+    onError: (err: any) => {
+      toastMessages.error(
+        err?.response?.data?.detail || err?.response?.data?.message || err?.message || 'Lỗi khi duyệt cấp 1.'
+      );
+    },
+  });
+
+  const approveAttendanceRequestStage2 = useMutation({
+    mutationFn: (id: number) => hrmService.approveAttendanceRequestStage2(id),
+    onSuccess: () => {
+      toastMessages.success('HR / Admin đã duyệt đơn & tự động bù công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.attendanceRequests });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.timesheet });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.monthlyAttendanceSummaries });
+    },
+    onError: (err: any) => {
+      toastMessages.error(
+        err?.response?.data?.detail || err?.response?.data?.message || err?.message || 'Lỗi khi duyệt cấp 2.'
+      );
+    },
+  });
+
+  const rejectAttendanceRequest = useMutation({
+    mutationFn: ({ id, reason }: { id: number; reason?: string }) =>
+      hrmService.rejectAttendanceRequest(id, reason),
+    onSuccess: () => {
+      toastMessages.success('Đã từ chối đơn!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.attendanceRequests });
+    },
+    onError: (err: any) => {
+      toastMessages.error(
+        err?.response?.data?.detail || err?.response?.data?.message || err?.message || 'Lỗi khi từ chối đơn.'
+      );
+    },
+  });
+
+  const cancelAttendanceRequest = useMutation({
+    mutationFn: (id: number) => hrmService.cancelAttendanceRequest(id),
+    onSuccess: () => {
+      toastMessages.success('Đã hủy đơn!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.attendanceRequests });
+    },
+    onError: (err: any) => {
+      toastMessages.error(
+        err?.response?.data?.detail || err?.response?.data?.message || err?.message || 'Lỗi khi hủy đơn.'
+      );
+    },
+  });
+
+  const createBiometricPunchLog = useMutation({
+    mutationFn: (data: Partial<NativeBiometricPunchLog>) =>
+      hrmService.createBiometricPunchLog(data),
+    onSuccess: () => {
+      toastMessages.success('Đã ghi nhận dữ liệu quẹt thẻ!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.biometricPunchLogs });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi tạo log máy chấm công.');
+    },
+  });
+
+  const processDailyPunchLogs = useMutation({
+    mutationFn: (date?: string) => hrmService.processDailyPunchLogs(date),
+    onSuccess: (res) => {
+      toastMessages.success(res?.message || 'Đã tổng hợp dữ liệu quẹt thẻ!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.timesheet });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.biometricPunchLogs });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi tổng hợp quẹt thẻ.');
+    },
+  });
+
+  const recalculateMonthlyAttendanceSummary = useMutation({
+    mutationFn: (data: { month: number; year: number; employee_ids?: number[] }) =>
+      hrmService.recalculateMonthlyAttendanceSummary(data),
+    onSuccess: (res) => {
+      toastMessages.success(res?.message || 'Đã tổng hợp bảng công tháng!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.monthlyAttendanceSummaries });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi tổng hợp công tháng.');
+    },
+  });
+
+  const lockMonthlyAttendanceSummary = useMutation({
+    mutationFn: (id: number) => hrmService.lockMonthlyAttendanceSummary(id),
+    onSuccess: () => {
+      toastMessages.success('Đã khóa bảng chấm công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.monthlyAttendanceSummaries });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.timesheet });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi khóa bảng công.');
+    },
+  });
+
+  const unlockMonthlyAttendanceSummary = useMutation({
+    mutationFn: (id: number) => hrmService.unlockMonthlyAttendanceSummary(id),
+    onSuccess: () => {
+      toastMessages.success('Đã mở khóa bảng chấm công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.monthlyAttendanceSummaries });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.timesheet });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi mở khóa bảng công.');
+    },
+  });
+
+  const pushSummaryToPayroll = useMutation({
+    mutationFn: (id: number) => hrmService.pushSummaryToPayroll(id),
+    onSuccess: (res) => {
+      toastMessages.success(res?.message || 'Đã chuyển dữ liệu sang Bảng lương thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.monthlyAttendanceSummaries });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.payroll });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.payrollKPIs });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Lỗi khi chuyển tính lương.');
+    },
+  });
+
   return {
     createDepartment,
     updateDepartment,
@@ -447,5 +716,21 @@ export const useHrmMutations = () => {
     calculateMonthlyPayroll,
     approveAllPayroll,
     markPaidAllPayroll,
+    createWorkShift,
+    updateWorkShift,
+    deleteWorkShift,
+    batchAssignShifts,
+    deleteShiftAssignment,
+    createAttendanceRequest,
+    approveAttendanceRequestStage1,
+    approveAttendanceRequestStage2,
+    rejectAttendanceRequest,
+    cancelAttendanceRequest,
+    createBiometricPunchLog,
+    processDailyPunchLogs,
+    recalculateMonthlyAttendanceSummary,
+    lockMonthlyAttendanceSummary,
+    unlockMonthlyAttendanceSummary,
+    pushSummaryToPayroll,
   };
 };
