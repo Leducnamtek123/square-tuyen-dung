@@ -28,4 +28,4 @@ RUN pip3 install --no-cache-dir --upgrade pip \
 
 ENV DATA_DIR=/data
 
-CMD ["sh", "-c", "vox-box start --host 0.0.0.0 --port 8080 --huggingface-repo-id ${VOXBOX_HF_REPO_ID:-Systran/faster-whisper-medium} --data-dir ${DATA_DIR} --device ${VOXBOX_DEVICE:-cpu}"]
+CMD ["sh", "-c", "vox-box start --host 0.0.0.0 --port 8080 --huggingface-repo-id ${VOXBOX_HF_REPO_ID:-Systran/faster-whisper-large-v3-turbo} --data-dir ${DATA_DIR} --device ${VOXBOX_DEVICE:-cuda}"]
