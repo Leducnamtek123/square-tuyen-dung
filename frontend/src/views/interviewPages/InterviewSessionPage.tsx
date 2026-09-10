@@ -228,6 +228,7 @@ function ActiveInterviewRoom({
   participantRole,
   formattedSchedule,
   timeLabel,
+  questions,
   onDisconnected,
   onEndSession,
 }: {
@@ -240,6 +241,7 @@ function ActiveInterviewRoom({
   participantRole: string;
   formattedSchedule?: string | false;
   timeLabel: string;
+  questions?: Question[];
   onDisconnected: () => void;
   onEndSession: () => Promise<void>;
 }) {
@@ -279,7 +281,7 @@ function ActiveInterviewRoom({
           style={{ height: '100%' }}
         >
           <InterviewSessionBridge connectionDetails={connectionDetails}>
-            <AIInterviewLayout onEndSession={onEndSession} />
+            <AIInterviewLayout onEndSession={onEndSession} questions={questions} />
             <RoomAudioRenderer />
           </InterviewSessionBridge>
         </LiveKitRoom>
@@ -741,6 +743,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
         participantRole={normalizedRole}
         formattedSchedule={formattedSchedule}
         timeLabel={t('common:labels.time')}
+        questions={state.session?.questions || []}
         onDisconnected={handleDisconnected}
         onEndSession={finalizeInterviewSession}
       />

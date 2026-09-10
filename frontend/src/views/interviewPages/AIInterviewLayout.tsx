@@ -38,6 +38,11 @@ import {
   sanitizeInterviewText,
 } from './livekitParticipant';
 import { useInterviewMessages } from './useInterviewMessages';
+import type { Question } from '@/types/models';
+import { useInterviewQuestionHUD } from './useInterviewQuestionHUD';
+import { InterviewHintsDrawer } from './components/InterviewHintsDrawer';
+import { InterviewRoadmapDrawer } from './components/InterviewRoadmapDrawer';
+import { InterviewQuestionCard } from './components/InterviewQuestionCard';
 
 const AI_CONTROL_TOPIC = 'square.interview.ai_control';
 const AI_TAKEOVER_TOPIC = 'square.interview.ai_takeover';
@@ -726,9 +731,15 @@ function ChatPanel({
 
 type AIInterviewLayoutProps = {
   onEndSession?: () => Promise<void> | void;
+  questions?: Question[];
+  defaultDurationSeconds?: number;
 };
 
-export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
+export function AIInterviewLayout({
+  onEndSession,
+  questions: propQuestions,
+  defaultDurationSeconds,
+}: AIInterviewLayoutProps) {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatDraft, setChatDraft] = useState('');
   const [composerMode, setComposerMode] = useState<ChatComposerMode>('chat');
@@ -741,6 +752,11 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   const { localParticipant } = useLocalParticipant();
   const voiceAssistant = useVoiceAssistant();
   const room = useRoomContext();
+  const hud = useInterviewQuestionHUD({
+    initialQuestions: propQuestions,
+    defaultDurationSeconds: defaultDurationSeconds || 120,
+    room,
+  });
   const { messages, send, isSending } = useInterviewMessages();
   const { t } = useTranslation(['interview']);
   const candidateLabel = t('liveRoom.participants.candidate');
@@ -884,8 +900,43 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
 
   return (
     <div className="relative flex h-full w-full overflow-hidden bg-[#020617]">
+      {/* Left Drawer: Gợi ý trả lời & Mẹo quan trọng */}
+      <InterviewHintsDrawer
+        open={hud.hintsDrawerOpen}
+        onClose={() => hud.setHintsDrawerOpen(false)}
+        question={hud.currentQuestion}
+      />
+
+      {/* Right Drawer: Lộ trình phỏng vấn */}
+      <InterviewRoadmapDrawer
+        open={hud.roadmapDrawerOpen}
+        onClose={() => hud.setRoadmapDrawerOpen(false)}
+        questions={hud.questions}
+        currentIndex={hud.currentIndex}
+        onSelectQuestion={hud.goToQuestion}
+        completedIds={hud.completedQuestionIds}
+      />
+
       <div className={`flex flex-1 flex-col h-full transition-all duration-300 ${chatOpen ? 'sm:pr-[352px] md:pr-[380px]' : ''} ${chatOpen && isCompactChatView ? 'pb-[58dvh]' : ''}`}>
         <div className="flex flex-1 flex-col gap-2 min-h-0 p-2">
+          {/* Top HUD: Question Card with live Countdown Timer */}
+          {hud.currentQuestion && (
+            <InterviewQuestionCard
+              question={hud.currentQuestion}
+              currentIndex={hud.currentIndex}
+              totalQuestions={hud.totalQuestions}
+              formattedTime={hud.formattedTime}
+              isLowTime={hud.isLowTime}
+              progressPercent={hud.progressPercent}
+              hintsDrawerOpen={hud.hintsDrawerOpen}
+              roadmapDrawerOpen={hud.roadmapDrawerOpen}
+              onToggleHints={() => hud.setHintsDrawerOpen((prev) => !prev)}
+              onToggleRoadmap={() => hud.setRoadmapDrawerOpen((prev) => !prev)}
+              onExtendTime={() => hud.extendTime(30)}
+              onNextQuestion={hud.nextQuestion}
+            />
+          )}
+
           <div className="min-h-0 flex-1">
             <div className="grid h-full min-h-0 grid-cols-1 gap-2 lg:grid-cols-2">
               <AIParticipantTile
