@@ -469,3 +469,91 @@ class MonthlyPayrollRecordSerializer(serializers.ModelSerializer):
                 payload[snake] = payload.get(camel)
         return super().to_internal_value(payload)
 
+
+class WorkShiftSerializer(serializers.ModelSerializer):
+    class Meta:
+        from .models import WorkShift
+        model = WorkShift
+        fields = [
+            'id', 'company', 'code', 'name', 'start_time', 'end_time',
+            'break_start', 'break_end', 'working_hours', 'work_factor',
+            'grace_period_late_minutes', 'grace_period_early_minutes',
+            'is_overnight', 'is_active', 'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'startTime': 'start_time',
+            'endTime': 'end_time',
+            'breakStart': 'break_start',
+            'breakEnd': 'break_end',
+            'workingHours': 'working_hours',
+            'workFactor': 'work_factor',
+            'gracePeriodLateMinutes': 'grace_period_late_minutes',
+            'gracePeriodEarlyMinutes': 'grace_period_early_minutes',
+            'isOvernight': 'is_overnight',
+            'isNightShift': 'is_overnight',
+            'isActive': 'is_active',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+class ShiftAssignmentSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    department_name = serializers.CharField(source='employee.department.name', read_only=True)
+    shift_code = serializers.CharField(source='shift.code', read_only=True)
+    shift_name = serializers.CharField(source='shift.name', read_only=True)
+
+    class Meta:
+        from .models import ShiftAssignment
+        model = ShiftAssignment
+        fields = [
+            'id', 'company', 'employee', 'employee_name', 'employee_code', 'department_name',
+            'shift', 'shift_code', 'shift_name', 'date', 'is_off_day', 'note',
+            'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeId': 'employee',
+            'shiftId': 'shift',
+            'isOffDay': 'is_off_day',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+class ShiftAssignmentBatchSerializer(serializers.Serializer):
+    employee_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        allow_empty=False
+    )
+    shift_id = serializers.IntegerField(required=False, allow_null=True)
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
+    applicable_days_of_week = serializers.ListField(
+        child=serializers.IntegerField(min_value=0, max_value=6),
+        required=False,
+        default=[0, 1, 2, 3, 4, 5, 6]
+    )
+    is_off_day = serializers.BooleanField(default=False)
+    note = serializers.CharField(required=False, allow_blank=True, default='')
+
+    def validate(self, data):
+        if data['start_date'] > data['end_date']:
+            raise serializers.ValidationError("start_date phải trước hoặc bằng end_date.")
+        if not data.get('is_off_day') and not data.get('shift_id'):
+            raise serializers.ValidationError("Vui lòng chọn ca làm việc nếu không phải ngày nghỉ.")
+        return data
+
+

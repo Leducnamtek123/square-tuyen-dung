@@ -15,6 +15,8 @@ from apps.accounts.active_company import apply_active_company_from_request, acti
 from apps.profiles.models import Company, CompanyMember
 from apps.hrm.models import (
     AttendanceRecord,
+    AttendanceRequest,
+    BiometricPunchLog,
     Department,
     Designation,
     Employee,
@@ -22,7 +24,10 @@ from apps.hrm.models import (
     EmploymentContract,
     LeaveRequest,
     LeaveType,
+    MonthlyAttendanceSummary,
     MonthlyPayrollRecord,
+    ShiftAssignment,
+    WorkShift,
 )
 from apps.hrm.serializers import (
     AttendanceRecordSerializer,
@@ -37,6 +42,9 @@ from apps.hrm.serializers import (
     MonthlyPayrollRecordSerializer,
     QuickCheckinSerializer,
     RenewContractSerializer,
+    ShiftAssignmentBatchSerializer,
+    ShiftAssignmentSerializer,
+    WorkShiftSerializer,
 )
 from apps.hrm.services import CandidateToEmployeeConverter, generate_next_employee_code
 from shared.configs import variable_system as var_sys
@@ -847,4 +855,106 @@ class EmployeeSelfServiceView(APIView):
             'leave_balances': EmployeeLeaveBalanceSerializer(leave_balances, many=True).data,
             'recent_payrolls': MonthlyPayrollRecordSerializer(recent_payrolls, many=True).data
         })
+
+
+class WorkShiftViewSet(viewsets.ModelViewSet):
+    permission_classes = [perms_custom.CanManageEmployees]
+    serializer_class = WorkShiftSerializer
+
+    def get_queryset(self):
+        company = _get_company_for_request(self.request)
+        if not company:
+            return WorkShift.objects.none()
+        return WorkShift.objects.filter(company=company).order_by('code')
+
+    def perform_create(self, serializer):
+        company = _get_company_for_request(self.request)
+        if not company:
+            raise PermissionDenied("Bạn không có quyền quản lý ca làm việc cho công ty này.")
+        serializer.save(company=company)
+
+
+class ShiftAssignmentViewSet(viewsets.ModelViewSet):
+    permission_classes = [perms_custom.CanManageEmployees]
+    serializer_class = ShiftAssignmentSerializer
+
+    def get_queryset(self):
+        company = _get_company_for_request(self.request)
+        if not company:
+            return ShiftAssignment.objects.none()
+        qs = ShiftAssignment.objects.filter(company=company).select_related('employee', 'shift', 'employee__department')
+        
+        employee_id = self.request.query_params.get('employee_id')
+        if employee_id:
+            qs = qs.filter(employee_id=employee_id)
+
+        department_id = self.request.query_params.get('department_id')
+        if department_id:
+            qs = qs.filter(employee__department_id=department_id)
+
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
+        if start_date:
+            qs = qs.filter(date__gte=start_date)
+        if end_date:
+            qs = qs.filter(date__lte=end_date)
+
+        return qs.order_by('date', 'employee__first_name')
+
+    def perform_create(self, serializer):
+        company = _get_company_for_request(self.request)
+        if not company:
+            raise PermissionDenied("Bạn không có quyền phân ca cho công ty này.")
+        serializer.save(company=company)
+
+    @action(detail=False, methods=['post'], url_path='batch')
+    def batch(self, request):
+        company = _get_company_for_request(request)
+        if not company:
+            raise PermissionDenied("Bạn không có quyền phân ca cho công ty này.")
+
+        serializer = ShiftAssignmentBatchSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        employee_ids = data['employee_ids']
+        shift_id = data.get('shift_id')
+        start_date = data['start_date']
+        end_date = data['end_date']
+        applicable_days = set(data.get('applicable_days_of_week', [0, 1, 2, 3, 4, 5, 6]))
+        is_off_day = data.get('is_off_day', False)
+        note = data.get('note', '')
+
+        employees = Employee.objects.filter(company=company, id__in=employee_ids)
+        shift = None
+        if shift_id:
+            try:
+                shift = WorkShift.objects.get(company=company, id=shift_id)
+            except WorkShift.DoesNotExist:
+                raise ValidationError({"shift_id": "Ca làm việc không tồn tại hoặc không thuộc công ty."})
+
+        curr_date = start_date
+        total_assigned = 0
+        with transaction.atomic():
+            while curr_date <= end_date:
+                if curr_date.weekday() in applicable_days:
+                    for emp in employees:
+                        ShiftAssignment.objects.update_or_create(
+                            company=company,
+                            employee=emp,
+                            date=curr_date,
+                            defaults={
+                                'shift': shift,
+                                'is_off_day': is_off_day,
+                                'note': note,
+                            }
+                        )
+                        total_assigned += 1
+                curr_date += timedelta(days=1)
+
+        return Response({
+            'success': True,
+            'created_or_updated': total_assigned,
+        }, status=status.HTTP_200_OK)
+
 

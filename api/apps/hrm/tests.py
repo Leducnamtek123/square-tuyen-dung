@@ -684,4 +684,80 @@ class HRMAttendanceModelTests(TestCase):
         self.assertFalse(summary.is_locked)
 
 
+class ShiftAPITests(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.owner_a = User.objects.create_user(
+            'shift_owner_a@company-a.vn',
+            'Owner A',
+            password='Password123!',
+            role=var_sys.EMPLOYER,
+        )
+        self.company_a = Company.objects.create(
+            user=self.owner_a,
+            company_name='Shift Company A',
+            company_email='hr_shift@company-a.vn',
+            company_phone='0901111888',
+            tax_code='TAX-SHIFT-A',
+        )
+        self.employee_a = Employee.objects.create(
+            company=self.company_a,
+            employee_code='SQ-SHIFT-001',
+            first_name='Bình',
+            last_name='Trần',
+            full_name='Trần Bình',
+            email='binh.tran@shift-a.vn',
+            status='ACTIVE',
+        )
+        self.client_a = APIClient()
+        self.client_a.force_authenticate(user=self.owner_a)
+
+    def test_work_shift_crud(self):
+        payload = {
+            'code': 'CA_SANG',
+            'name': 'Ca sáng 08:00 - 12:00',
+            'start_time': '08:00:00',
+            'end_time': '12:00:00',
+            'working_hours': '4.00',
+            'grace_period_late_minutes': 10,
+        }
+        resp = self.client_a.post('/api/v1/native-hrm/work-shifts/', payload, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.data['code'], 'CA_SANG')
+
+        list_resp = self.client_a.get('/api/v1/native-hrm/work-shifts/')
+        self.assertEqual(list_resp.status_code, status.HTTP_200_OK)
+        results = list_resp.data if isinstance(list_resp.data, list) else list_resp.data.get('results', [])
+        self.assertTrue(any(s['code'] == 'CA_SANG' for s in results))
+
+    def test_shift_assignment_batch(self):
+        from apps.hrm.models import WorkShift, ShiftAssignment
+        from datetime import time
+
+        shift = WorkShift.objects.create(
+            company=self.company_a,
+            code="CA_HC",
+            name="Ca hành chính",
+            start_time=time(8, 0),
+            end_time=time(17, 0),
+            working_hours=Decimal("8.00"),
+        )
+
+        batch_payload = {
+            'employee_ids': [self.employee_a.id],
+            'shift_id': shift.id,
+            'start_date': '2026-09-07',  # Monday
+            'end_date': '2026-09-11',    # Friday
+            'applicable_days_of_week': [0, 1, 2, 3, 4],  # Mon-Fri
+            'is_off_day': False,
+        }
+        resp = self.client_a.post('/api/v1/native-hrm/shift-assignments/batch/', batch_payload, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data['created_or_updated'], 5)
+
+        assignments = ShiftAssignment.objects.filter(company=self.company_a, employee=self.employee_a)
+        self.assertEqual(assignments.count(), 5)
+
+
+
 
