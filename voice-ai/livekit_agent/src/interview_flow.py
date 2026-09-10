@@ -66,6 +66,11 @@ _SPACE_BEFORE_PUNCTUATION_PATTERN = re.compile(r"\s+([,.;:!?…])")
 _MISSING_SPACE_AFTER_PUNCTUATION_PATTERN = re.compile(r"([,.;:!?…])(?=\S)")
 
 
+_EMOTION_CUE_PATTERN = re.compile(
+    r"\[(cười|thở dài|hắng giọng|ngập ngừng|cười nhẹ)\]", re.IGNORECASE
+)
+
+
 def redact_question_progress_labels(text: str) -> str:
     cleaned = _QUESTION_PROGRESS_PATTERN.sub(" ", text)
     cleaned = _NEXT_QUESTION_LABEL_PATTERN.sub(" ", cleaned)
@@ -76,7 +81,21 @@ def redact_question_progress_labels(text: str) -> str:
 def strip_punctuation_for_tts(text: str) -> str:
     cleaned = redact_question_progress_labels(text)
     cleaned = _FRACTION_PATTERN.sub(" ", cleaned)
+
+    # Protect VieNeu-TTS v3 Turbo emotion cues like [cười], [thở dài]
+    preserved_cues: dict[str, str] = {}
+
+    def _mask_cue(m: re.Match) -> str:
+        key = f"__CUE_{len(preserved_cues)}__"
+        preserved_cues[key] = m.group(0)
+        return key
+
+    cleaned = _EMOTION_CUE_PATTERN.sub(_mask_cue, cleaned)
     cleaned = _TTS_SYMBOL_PATTERN.sub(" ", cleaned)
+
+    for key, val in preserved_cues.items():
+        cleaned = cleaned.replace(key, val)
+
     cleaned = _SPACE_BEFORE_PUNCTUATION_PATTERN.sub(r"\1", cleaned)
     cleaned = _MISSING_SPACE_AFTER_PUNCTUATION_PATTERN.sub(r"\1 ", cleaned)
     cleaned = _EXTRA_SPACES_PATTERN.sub(" ", cleaned)
