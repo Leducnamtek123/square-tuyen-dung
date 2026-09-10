@@ -821,6 +821,131 @@ class AttendanceRequestAPITests(TestCase):
         self.assertTrue(att_rec.is_manually_adjusted)
 
 
+class BiometricIngestionTests(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.owner = User.objects.create_user(
+            'bio_owner@company.vn',
+            'Bio Owner',
+            password='Password123!',
+            role=var_sys.EMPLOYER,
+        )
+        self.company = Company.objects.create(
+            user=self.owner,
+            company_name='Biometric Ingestion Corp',
+            company_email='hr@bio.vn',
+            company_phone='0901111666',
+            tax_code='TAX-BIO-01',
+        )
+        self.employee = Employee.objects.create(
+            company=self.company,
+            employee_code='SQ-BIO-001',
+            first_name='Đạt',
+            last_name='Phạm',
+            full_name='Phạm Đạt',
+            email='dat.pham@bio.vn',
+            status='ACTIVE',
+        )
+        from datetime import time
+        from apps.hrm.models import WorkShift, ShiftAssignment
+        self.shift = WorkShift.objects.create(
+            company=self.company,
+            code="CA_HC_BIO",
+            name="Ca HC Chuẩn",
+            start_time=time(8, 0),
+            end_time=time(17, 0),
+            break_start=time(12, 0),
+            break_end=time(13, 0),
+            working_hours=Decimal("8.00"),
+            grace_period_late_minutes=15,
+            grace_period_early_minutes=10,
+        )
+        ShiftAssignment.objects.create(
+            company=self.company,
+            employee=self.employee,
+            shift=self.shift,
+            date=date(2026, 9, 10),
+            is_off_day=False,
+        )
+
+    def test_process_punch_logs_within_grace_period(self):
+        from apps.hrm.models import BiometricPunchLog, AttendanceRecord
+        from apps.hrm.services import process_punch_logs_for_date
+        from django.utils import timezone
+        import datetime
+
+        target_date = date(2026, 9, 10)
+        # Punch in at 08:10 (within 15m grace period)
+        BiometricPunchLog.objects.create(
+            company=self.company,
+            employee=self.employee,
+            biometric_id="BIO-001",
+            punch_time=timezone.make_aware(datetime.datetime(2026, 9, 10, 8, 10, 0)),
+            punch_type="CHECK_IN",
+            source="ZKTECO",
+        )
+        # Punch out at 17:05
+        BiometricPunchLog.objects.create(
+            company=self.company,
+            employee=self.employee,
+            biometric_id="BIO-001",
+            punch_time=timezone.make_aware(datetime.datetime(2026, 9, 10, 17, 5, 0)),
+            punch_type="CHECK_OUT",
+            source="ZKTECO",
+        )
+
+        count = process_punch_logs_for_date(self.company, target_date)
+        self.assertEqual(count, 1)
+
+        att = AttendanceRecord.objects.get(employee=self.employee, date=target_date)
+        self.assertEqual(att.late_minutes, 0)
+        self.assertEqual(att.early_minutes, 0)
+        self.assertEqual(att.status, "PRESENT")
+        self.assertEqual(att.working_hours, Decimal("8.00"))
+
+    def test_process_punch_logs_exceeding_grace_period(self):
+        from apps.hrm.models import BiometricPunchLog, AttendanceRecord, ShiftAssignment
+        from apps.hrm.services import process_punch_logs_for_date
+        from django.utils import timezone
+        import datetime
+
+        target_date = date(2026, 9, 11)
+        ShiftAssignment.objects.create(
+            company=self.company,
+            employee=self.employee,
+            shift=self.shift,
+            date=target_date,
+            is_off_day=False,
+        )
+        # Punch in at 08:35 (late by 35m > 15m grace)
+        BiometricPunchLog.objects.create(
+            company=self.company,
+            employee=self.employee,
+            biometric_id="BIO-001",
+            punch_time=timezone.make_aware(datetime.datetime(2026, 9, 11, 8, 35, 0)),
+            punch_type="CHECK_IN",
+            source="ZKTECO",
+        )
+        # Punch out at 17:00
+        BiometricPunchLog.objects.create(
+            company=self.company,
+            employee=self.employee,
+            biometric_id="BIO-001",
+            punch_time=timezone.make_aware(datetime.datetime(2026, 9, 11, 17, 0, 0)),
+            punch_type="CHECK_OUT",
+            source="ZKTECO",
+        )
+
+        count = process_punch_logs_for_date(self.company, target_date)
+        self.assertEqual(count, 1)
+
+        att = AttendanceRecord.objects.get(employee=self.employee, date=target_date)
+        self.assertEqual(att.late_minutes, 35)
+        self.assertEqual(att.status, "LATE")
+
+
+
+
 
 
 

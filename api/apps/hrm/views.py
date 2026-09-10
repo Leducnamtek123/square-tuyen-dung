@@ -41,6 +41,7 @@ from apps.hrm.serializers import (
     OnboardCandidateSerializer,
     MonthlyPayrollRecordSerializer,
     AttendanceRequestSerializer,
+    BiometricPunchLogSerializer,
     QuickCheckinSerializer,
     RenewContractSerializer,
     ShiftAssignmentBatchSerializer,
@@ -1138,6 +1139,60 @@ class AttendanceRequestViewSet(viewsets.ModelViewSet):
 
             record.save()
             curr_date += timedelta(days=1)
+
+
+class BiometricPunchLogViewSet(viewsets.ModelViewSet):
+    permission_classes = [perms_custom.CanManageEmployees]
+    serializer_class = BiometricPunchLogSerializer
+
+    def get_queryset(self):
+        company = _get_company_for_request(self.request)
+        if not company:
+            return BiometricPunchLog.objects.none()
+        qs = BiometricPunchLog.objects.filter(company=company).select_related('employee', 'employee__department')
+
+        employee_id = self.request.query_params.get('employee_id')
+        if employee_id:
+            qs = qs.filter(employee_id=employee_id)
+
+        source = self.request.query_params.get('source')
+        if source:
+            qs = qs.filter(source=source)
+
+        date_val = self.request.query_params.get('date')
+        if date_val:
+            qs = qs.filter(punch_time__date=date_val)
+
+        return qs.order_by('-punch_time')
+
+    def perform_create(self, serializer):
+        company = _get_company_for_request(self.request)
+        if not company:
+            raise PermissionDenied("Bạn không có quyền quản lý log máy chấm công cho công ty này.")
+        serializer.save(company=company)
+
+    @action(detail=False, methods=['post'], url_path='process-daily')
+    def process_daily(self, request):
+        company = _get_company_for_request(request)
+        if not company:
+            raise PermissionDenied("Không có quyền thực hiện.")
+        date_str = request.data.get('date')
+        if not date_str:
+            target_date = timezone.now().date()
+        else:
+            try:
+                from datetime import datetime as dt_cls
+                target_date = dt_cls.strptime(date_str, '%Y-%m-%d').date()
+            except ValueError:
+                return Response({'detail': 'Định dạng ngày không hợp lệ (YYYY-MM-DD).'}, status=status.HTTP_400_BAD_REQUEST)
+
+        from apps.hrm.services import process_punch_logs_for_date
+        count = process_punch_logs_for_date(company, target_date)
+        return Response({
+            'message': f'Đã tổng hợp dữ liệu chấm công ngày {target_date} cho {count} nhân viên.',
+            'count': count,
+        }, status=status.HTTP_200_OK)
+
 
 
 

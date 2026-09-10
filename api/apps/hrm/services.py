@@ -1,8 +1,11 @@
 import logging
 import re
+from datetime import date, datetime, time, timedelta
+from decimal import Decimal
 from typing import Any, Dict, Optional, Tuple
 
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError, PermissionDenied
 
@@ -296,3 +299,129 @@ class CandidateToEmployeeConverter:
         )
 
         return employee, True
+
+
+def process_punch_logs_for_date(company: Company, target_date: date) -> int:
+    """
+    Core Timecard Calculation Engine:
+    Processes biometric punch logs for a given company and date, matches with
+    work shifts, applies grace periods, calculates late/early minutes and effective
+    work hours, then updates or creates AttendanceRecord records.
+    """
+    from apps.hrm.models import Employee, ShiftAssignment, WorkShift, BiometricPunchLog, AttendanceRecord
+
+    active_employees = Employee.objects.filter(
+        company=company,
+        status__in=['ACTIVE', 'PROBATION']
+    )
+
+    updated_count = 0
+
+    for emp in active_employees:
+        # Check if record is locked or manually adjusted
+        existing_record = AttendanceRecord.objects.filter(employee=emp, date=target_date).first()
+        if existing_record and (existing_record.is_locked or existing_record.is_manually_adjusted):
+            continue
+
+        # Get shift assignment
+        assignment = ShiftAssignment.objects.filter(employee=emp, date=target_date).first()
+        if assignment and assignment.is_off_day:
+            continue
+        shift = assignment.shift if assignment else None
+
+        # Fetch punch logs for this date
+        q_filter = Q(company=company, punch_time__date=target_date)
+        bio_id = getattr(emp, 'biometric_id', None)
+        if bio_id:
+            q_filter &= (Q(employee=emp) | Q(biometric_id=bio_id))
+        else:
+            q_filter &= Q(employee=emp)
+
+        punches = BiometricPunchLog.objects.filter(q_filter).order_by('punch_time')
+
+        if not punches.exists():
+            continue
+
+        first_punch = punches.first()
+        last_punch = punches.last()
+
+        # Handle local timezone time conversion cleanly
+        local_first_dt = timezone.localtime(first_punch.punch_time)
+        local_last_dt = timezone.localtime(last_punch.punch_time)
+
+        check_in_time = local_first_dt.time()
+        check_out_time = local_last_dt.time() if punches.count() > 1 else None
+
+        late_minutes = 0
+        early_minutes = 0
+        working_hours = Decimal("0.00")
+        record_status = 'PRESENT'
+
+        scheduled_in = shift.start_time if shift else None
+        scheduled_out = shift.end_time if shift else None
+
+        if shift:
+            # Late calculation
+            if check_in_time > shift.start_time:
+                diff_sec = (datetime.combine(target_date, check_in_time) - datetime.combine(target_date, shift.start_time)).total_seconds()
+                diff_min = int(diff_sec // 60)
+                if diff_min > shift.grace_period_late_minutes:
+                    late_minutes = diff_min
+
+            # Early leave calculation
+            if check_out_time and check_out_time < shift.end_time:
+                diff_sec = (datetime.combine(target_date, shift.end_time) - datetime.combine(target_date, check_out_time)).total_seconds()
+                diff_min = int(diff_sec // 60)
+                if diff_min > shift.grace_period_early_minutes:
+                    early_minutes = diff_min
+
+            # Effective working hours calculation using grace period logic
+            if check_in_time and check_out_time:
+                effective_start_time = shift.start_time if late_minutes == 0 else check_in_time
+                effective_end_time = shift.end_time if (early_minutes == 0 and check_out_time >= shift.end_time) else check_out_time
+
+                start_dt = datetime.combine(target_date, effective_start_time)
+                end_dt = datetime.combine(target_date, effective_end_time)
+                raw_seconds = (end_dt - start_dt).total_seconds()
+
+                # Deduct break time if worked spans break period
+                if shift.break_start and shift.break_end:
+                    if effective_start_time <= shift.break_start and effective_end_time >= shift.break_end:
+                        break_seconds = (datetime.combine(target_date, shift.break_end) - datetime.combine(target_date, shift.break_start)).total_seconds()
+                        raw_seconds -= max(0.0, break_seconds)
+
+                earned_hours = max(0.0, raw_seconds / 3600.0)
+                working_hours = min(Decimal(f"{earned_hours:.2f}"), shift.working_hours)
+            else:
+                working_hours = Decimal("0.00")
+
+            if late_minutes > 0 and early_minutes > 0:
+                record_status = 'LATE'
+            elif late_minutes > 0:
+                record_status = 'LATE'
+            elif early_minutes > 0:
+                record_status = 'EARLY_LEAVE'
+            elif working_hours > 0:
+                record_status = 'PRESENT'
+            else:
+                record_status = 'ABSENT'
+
+        AttendanceRecord.objects.update_or_create(
+            employee=emp,
+            date=target_date,
+            defaults={
+                'shift': shift,
+                'check_in': check_in_time,
+                'check_out': check_out_time,
+                'scheduled_in': scheduled_in,
+                'scheduled_out': scheduled_out,
+                'late_minutes': late_minutes,
+                'early_minutes': early_minutes,
+                'working_hours': working_hours,
+                'status': record_status,
+            }
+        )
+        updated_count += 1
+
+    return updated_count
+

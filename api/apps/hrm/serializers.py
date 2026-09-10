@@ -607,4 +607,40 @@ class AttendanceRequestSerializer(serializers.ModelSerializer):
         return super().to_internal_value(payload)
 
 
+class BiometricPunchLogSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    department_name = serializers.CharField(source='employee.department.name', read_only=True)
+    punch_type_label = serializers.CharField(source='get_punch_type_display', read_only=True)
+    source_label = serializers.CharField(source='get_source_display', read_only=True)
+
+    class Meta:
+        from .models import BiometricPunchLog
+        model = BiometricPunchLog
+        fields = [
+            'id', 'company', 'employee', 'employee_name', 'employee_code', 'department_name',
+            'biometric_id', 'punch_time', 'device_name', 'device_ip',
+            'punch_type', 'punch_type_label', 'source', 'source_label',
+            'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeId': 'employee',
+            'employee_id': 'employee',
+            'biometricId': 'biometric_id',
+            'punchTime': 'punch_time',
+            'deviceName': 'device_name',
+            'deviceIp': 'device_ip',
+            'punchType': 'punch_type',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+
 
