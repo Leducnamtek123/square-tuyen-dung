@@ -61,7 +61,10 @@ class GetOnboardingStatusView(APIView):
 
         if role_name == var_sys.JOB_SEEKER:
             profile = getattr(user, 'job_seeker_profile', None)
-            resume = Resume.objects.filter(user=user, is_active=True).first() or Resume.objects.filter(user=user).first()
+            resume = (
+                Resume.objects.select_related('file').filter(user=user, is_active=True).first()
+                or Resume.objects.select_related('file').filter(user=user).first()
+            )
             
             score = 20
             if profile and profile.phone:
@@ -75,6 +78,7 @@ class GetOnboardingStatusView(APIView):
             completeness = min(score, 100)
 
             if resume:
+                file_obj = getattr(resume, 'file', None)
                 skill_names = list(resume.advanced_skills.values_list('name', flat=True))
                 if not skill_names and resume.skills_summary:
                     skill_names = [s.strip() for s in resume.skills_summary.split(',') if s.strip()]

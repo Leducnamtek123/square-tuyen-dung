@@ -27,7 +27,7 @@ services:
   #   volumes:
   #     - whisper-data:/data
   #   environment:
-  #     - VOXBOX_HF_REPO_ID=${VOXBOX_HF_REPO_ID:-Systran/faster-whisper-large-v3-turbo}
+  #     - VOXBOX_HF_REPO_ID=${VOXBOX_HF_REPO_ID:-deepdml/faster-whisper-large-v3-turbo-ct2}
   #     - VOXBOX_DEVICE=cuda
   #     - DATA_DIR=/data
   #   ports:

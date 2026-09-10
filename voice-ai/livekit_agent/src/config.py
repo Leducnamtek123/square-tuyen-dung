@@ -91,7 +91,7 @@ class Config:
         "AI_STT_BASE_URL", "http://whisper:8080/v1"
     )
     STT_MODEL: str = os.getenv("STT_MODEL") or os.getenv(
-        "AI_STT_MODEL", "Systran/faster-whisper-large-v3-turbo"
+        "AI_STT_MODEL", "deepdml/faster-whisper-large-v3-turbo-ct2"
     )
     STT_LANGUAGE: str = os.getenv("STT_LANGUAGE") or os.getenv("AI_STT_LANGUAGE", "vi")
     STT_API_KEY: str = os.getenv("STT_API_KEY") or os.getenv(
