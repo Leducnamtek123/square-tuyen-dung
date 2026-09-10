@@ -205,6 +205,21 @@ const interviewService = {
       .then(unwrapDataResponse<SessionMetrics>);
   },
 
+  getQuestionBank: (params?: { search?: string; career_id?: number; difficulty?: number; category?: string }): Promise<PaginatedResponse<any>> => {
+    const url = 'interview/web/questions/bank/';
+    return httpRequest.get(url, { params }).then((data) => normalizePaginatedResponse(data));
+  },
+
+  getQuestionHints: (questionId: IdType): Promise<any> => {
+    const url = `interview/web/questions/${questionId}/hints/`;
+    return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse);
+  },
+
+  createMockSession: (data: { career_id?: number | null; position_title?: string; question_count?: number }): Promise<any> => {
+    const url = 'interview/web/sessions/create-mock/';
+    return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse);
+  },
+
   getSSEUrl: (sessionId: IdType): string => {
     const base = (process.env.NEXT_PUBLIC_API_BASE || '/api').replace(/\/$/, '');
     return `${base}/interview/web/sessions/${sessionId}/stream/`;

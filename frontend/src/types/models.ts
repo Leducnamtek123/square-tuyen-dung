@@ -474,19 +474,92 @@ export interface Location {
 
 /* Interview */
 
+export interface QuestionStep {
+  step: number;
+  title: string;
+  detail?: string;
+}
+
+export interface QuestionAnswerStructure {
+  start?: string;
+  steps: QuestionStep[];
+  end?: string;
+  time_guidance?: string;
+}
+
+export interface QuestionImportantTip {
+  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  text: string;
+}
+
 export interface Question {
   id: number;
   text: string;
-  difficulty?: string;
+  difficulty?: string | number;
+  difficulty_display?: string;
   career?: number | null;
+  career_name?: string;
   category?: string;
+  category_display?: string;
   company?: number | null;
   canWrite?: boolean;
   questionType?: string;
+  default_duration_seconds?: number;
+  defaultDurationSeconds?: number;
+  answer_structure?: QuestionAnswerStructure | null;
+  answerStructure?: QuestionAnswerStructure | null;
+  interviewer_intent?: string;
+  interviewerIntent?: string;
+  important_tips?: QuestionImportantTip[] | null;
+  importantTips?: QuestionImportantTip[] | null;
+  follow_up_questions?: string[] | null;
+  followUpQuestions?: string[] | null;
   // Fallbacks for raw API response or transformer mapped fields
   content?: string;
   questionText?: string;
   type?: string;
+}
+
+export interface QuestionBankItem extends Question {
+  create_at?: string;
+  createAt?: string;
+}
+
+export interface SalaryBenchmarkItem {
+  id: number;
+  career?: number | null;
+  career_name?: string;
+  careerName?: string;
+  position_title: string;
+  positionTitle?: string;
+  experience_level: string;
+  experienceLevel?: string;
+  experience_level_display?: string;
+  experienceLevelDisplay?: string;
+  salary_min: number;
+  salaryMin?: number;
+  salary_max: number;
+  salaryMax?: number;
+  salary_avg?: number | null;
+  salaryAvg?: number | null;
+  year: number;
+  sample_count: number;
+  sampleCount?: number;
+  is_hot: boolean;
+  isHot?: boolean;
+  create_at?: string;
+}
+
+export interface CreateMockSessionPayload {
+  career_id?: number | null;
+  position_title?: string;
+  question_count?: number;
+}
+
+export interface MockSessionResponse extends InterviewSession {
+  questions?: Question[];
+  livekit_token?: string;
+  livekitToken?: string;
 }
 
 export interface QuestionGroup {
@@ -552,6 +625,14 @@ export interface InterviewSession {
   voice_profile?: number | null;
   voiceProfileName?: string | null;
   voice_profile_name?: string | null;
+  sessionType?: 'official' | 'mock' | string;
+  session_type?: 'official' | 'mock' | string;
+  timeLimitPerQuestion?: number;
+  time_limit_per_question?: number;
+  sessionMetadata?: any;
+  session_metadata?: any;
+  livekitToken?: string;
+  livekit_token?: string;
 }
 
 export interface InterviewTranscript {
