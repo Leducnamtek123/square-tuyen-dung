@@ -40,6 +40,7 @@ from apps.hrm.serializers import (
     LeaveTypeSerializer,
     OnboardCandidateSerializer,
     MonthlyPayrollRecordSerializer,
+    AttendanceRequestSerializer,
     QuickCheckinSerializer,
     RenewContractSerializer,
     ShiftAssignmentBatchSerializer,
@@ -956,5 +957,187 @@ class ShiftAssignmentViewSet(viewsets.ModelViewSet):
             'success': True,
             'created_or_updated': total_assigned,
         }, status=status.HTTP_200_OK)
+
+
+class AttendanceRequestViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = AttendanceRequestSerializer
+
+    def get_queryset(self):
+        company = _get_company_for_request(self.request)
+        if not company:
+            return AttendanceRequest.objects.none()
+        qs = AttendanceRequest.objects.filter(company=company).select_related(
+            'employee', 'leave_type', 'manager_reviewer', 'hr_reviewer', 'employee__department'
+        )
+
+        request_type = self.request.query_params.get('request_type')
+        if request_type:
+            qs = qs.filter(request_type=request_type)
+
+        req_status = self.request.query_params.get('status')
+        if req_status:
+            qs = qs.filter(status=req_status)
+
+        employee_id = self.request.query_params.get('employee_id')
+        if employee_id:
+            qs = qs.filter(employee_id=employee_id)
+
+        department_id = self.request.query_params.get('department_id')
+        if department_id:
+            qs = qs.filter(employee__department_id=department_id)
+
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
+        if start_date:
+            qs = qs.filter(end_date__gte=start_date)
+        if end_date:
+            qs = qs.filter(start_date__lte=end_date)
+
+        return qs.order_by('-create_at')
+
+    def perform_create(self, serializer):
+        company = _get_company_for_request(self.request)
+        if not company:
+            raise PermissionDenied("Bạn không có quyền gửi đơn cho công ty này.")
+
+        emp = serializer.validated_data.get('employee')
+        if not emp:
+            emp = Employee.objects.filter(company=company, user=self.request.user).first()
+            if not emp:
+                raise ValidationError({"employee": "Không tìm thấy hồ sơ nhân viên tương ứng."})
+            serializer.save(company=company, employee=emp)
+        else:
+            serializer.save(company=company)
+
+    @action(detail=True, methods=['post'], url_path='approve-stage-1')
+    def approve_stage_1(self, request, pk=None):
+        company = _get_company_for_request(request)
+        if not company:
+            raise PermissionDenied("Không có quyền thực hiện.")
+        attendance_request = self.get_object()
+
+        if attendance_request.status != 'PENDING_STAGE_1':
+            return Response(
+                {'detail': f'Không thể duyệt cấp 1 khi đơn đang ở trạng thái {attendance_request.get_status_display()}.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        reviewer = Employee.objects.filter(company=company, user=request.user).first()
+        attendance_request.status = 'APPROVED_STAGE_1'
+        attendance_request.manager_reviewer = reviewer
+        attendance_request.manager_approved_at = timezone.now()
+        attendance_request.save()
+
+        return Response(AttendanceRequestSerializer(attendance_request).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='approve-stage-2')
+    def approve_stage_2(self, request, pk=None):
+        company = _get_company_for_request(request)
+        if not company:
+            raise PermissionDenied("Không có quyền thực hiện.")
+        attendance_request = self.get_object()
+
+        if attendance_request.status not in ['PENDING_STAGE_1', 'APPROVED_STAGE_1']:
+            return Response(
+                {'detail': f'Không thể duyệt cấp 2 khi đơn đang ở trạng thái {attendance_request.get_status_display()}.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        reviewer = Employee.objects.filter(company=company, user=request.user).first()
+        attendance_request.status = 'APPROVED'
+        attendance_request.hr_reviewer = reviewer
+        attendance_request.hr_approved_at = timezone.now()
+        attendance_request.save()
+
+        self._apply_approved_request_to_attendance(attendance_request)
+
+        return Response(AttendanceRequestSerializer(attendance_request).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='reject')
+    def reject(self, request, pk=None):
+        company = _get_company_for_request(request)
+        if not company:
+            raise PermissionDenied("Không có quyền thực hiện.")
+        attendance_request = self.get_object()
+
+        if attendance_request.status in ['APPROVED', 'CANCELLED', 'REJECTED']:
+            return Response(
+                {'detail': f'Đơn đã ở trạng thái {attendance_request.get_status_display()}, không thể từ chối.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        reason = request.data.get('reason') or request.data.get('rejection_reason', '')
+        attendance_request.status = 'REJECTED'
+        attendance_request.rejection_reason = reason
+        attendance_request.save()
+
+        return Response(AttendanceRequestSerializer(attendance_request).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='cancel')
+    def cancel(self, request, pk=None):
+        company = _get_company_for_request(request)
+        if not company:
+            raise PermissionDenied("Không có quyền thực hiện.")
+        attendance_request = self.get_object()
+
+        if attendance_request.status in ['APPROVED', 'CANCELLED']:
+            return Response(
+                {'detail': f'Đơn đã ở trạng thái {attendance_request.get_status_display()}, không thể hủy.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        attendance_request.status = 'CANCELLED'
+        attendance_request.save()
+
+        return Response(AttendanceRequestSerializer(attendance_request).data, status=status.HTTP_200_OK)
+
+    def _apply_approved_request_to_attendance(self, req):
+        from apps.hrm.models import AttendanceRecord, ShiftAssignment
+        from decimal import Decimal
+        curr_date = req.start_date
+        while curr_date <= req.end_date:
+            record, _ = AttendanceRecord.objects.get_or_create(
+                employee=req.employee,
+                date=curr_date,
+            )
+            assignment = ShiftAssignment.objects.filter(employee=req.employee, date=curr_date).first()
+            shift = assignment.shift if assignment else getattr(record, 'shift', None)
+
+            if req.request_type == 'REGULARISATION':
+                if req.start_time:
+                    record.check_in = req.start_time
+                if req.end_time:
+                    record.check_out = req.end_time
+                record.is_manually_adjusted = True
+                record.adjustment_reason = req.reason or "Duyệt đề nghị cập nhật công"
+                record.status = 'PRESENT'
+                if not record.working_hours and shift:
+                    record.working_hours = shift.working_hours
+
+            elif req.request_type == 'LEAVE':
+                record.status = 'ON_LEAVE'
+                record.notes = f"Nghỉ phép: {req.leave_type.name if req.leave_type else ''}. {req.reason or ''}"
+                if req.leave_type and req.leave_type.is_paid:
+                    record.working_hours = shift.working_hours if shift else Decimal("8.00")
+
+            elif req.request_type == 'BUSINESS_TRIP':
+                record.status = 'PRESENT'
+                record.notes = f"Đi công tác: {req.reason or ''}"
+                record.working_hours = shift.working_hours if shift else Decimal("8.00")
+
+            elif req.request_type == 'OVERTIME':
+                ot_hrs = req.duration_hours or Decimal("0.00")
+                record.overtime_hours = (record.overtime_hours or Decimal("0.00")) + ot_hrs
+                record.notes = f"Tăng ca: {ot_hrs}h. {req.reason or ''}"
+
+            elif req.request_type == 'LATE_EARLY':
+                record.late_minutes = 0
+                record.early_minutes = 0
+                record.notes = f"Đơn đi muộn về sớm: {req.reason or ''}"
+
+            record.save()
+            curr_date += timedelta(days=1)
+
 
 

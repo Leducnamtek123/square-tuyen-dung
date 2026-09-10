@@ -557,3 +557,54 @@ class ShiftAssignmentBatchSerializer(serializers.Serializer):
         return data
 
 
+class AttendanceRequestSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    department_name = serializers.CharField(source='employee.department.name', read_only=True)
+    leave_type_name = serializers.CharField(source='leave_type.name', read_only=True)
+    manager_reviewer_name = serializers.CharField(source='manager_reviewer.full_name', read_only=True)
+    hr_reviewer_name = serializers.CharField(source='hr_reviewer.full_name', read_only=True)
+    status_label = serializers.CharField(source='get_status_display', read_only=True)
+    request_type_label = serializers.CharField(source='get_request_type_display', read_only=True)
+
+    class Meta:
+        from .models import AttendanceRequest
+        model = AttendanceRequest
+        fields = [
+            'id', 'company', 'employee', 'employee_name', 'employee_code', 'department_name',
+            'request_type', 'request_type_label', 'leave_type', 'leave_type_name',
+            'start_date', 'end_date', 'start_time', 'end_time', 'duration_hours',
+            'reason', 'status', 'status_label',
+            'manager_reviewer', 'manager_reviewer_name', 'manager_approved_at',
+            'hr_reviewer', 'hr_reviewer_name', 'hr_approved_at',
+            'rejection_reason', 'create_at', 'update_at'
+        ]
+        read_only_fields = [
+            'id', 'company', 'status', 'status_label',
+            'manager_reviewer', 'manager_approved_at',
+            'hr_reviewer', 'hr_approved_at', 'rejection_reason',
+            'create_at', 'update_at'
+        ]
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeId': 'employee',
+            'employee_id': 'employee',
+            'requestType': 'request_type',
+            'leaveTypeId': 'leave_type',
+            'leave_type_id': 'leave_type',
+            'startDate': 'start_date',
+            'endDate': 'end_date',
+            'startTime': 'start_time',
+            'endTime': 'end_time',
+            'durationHours': 'duration_hours',
+            'rejectionReason': 'rejection_reason',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+

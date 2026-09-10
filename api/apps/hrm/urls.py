@@ -13,6 +13,7 @@ router.register(r'leave-balances', views.LeaveBalanceViewSet, basename='hrm-leav
 router.register(r'attendances', views.AttendanceRecordViewSet, basename='hrm-attendances')
 router.register(r'work-shifts', views.WorkShiftViewSet, basename='hrm-work-shifts')
 router.register(r'shift-assignments', views.ShiftAssignmentViewSet, basename='hrm-shift-assignments')
+router.register(r'attendance-requests', views.AttendanceRequestViewSet, basename='hrm-attendance-requests')
 router.register(r'payroll', views.MonthlyPayrollViewSet, basename='hrm-payroll')
 
 urlpatterns = [

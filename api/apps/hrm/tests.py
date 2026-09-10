@@ -759,5 +759,68 @@ class ShiftAPITests(TestCase):
         self.assertEqual(assignments.count(), 5)
 
 
+class AttendanceRequestAPITests(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.owner_a = User.objects.create_user(
+            'req_owner_a@company-a.vn',
+            'Owner A',
+            password='Password123!',
+            role=var_sys.EMPLOYER,
+        )
+        self.company_a = Company.objects.create(
+            user=self.owner_a,
+            company_name='Req Company A',
+            company_email='hr_req@company-a.vn',
+            company_phone='0901111777',
+            tax_code='TAX-REQ-A',
+        )
+        self.employee_a = Employee.objects.create(
+            company=self.company_a,
+            employee_code='SQ-REQ-001',
+            first_name='Chi',
+            last_name='Lê',
+            full_name='Lê Chi',
+            email='chi.le@req-a.vn',
+            status='ACTIVE',
+        )
+        self.client_a = APIClient()
+        self.client_a.force_authenticate(user=self.owner_a)
+
+    def test_create_and_2stage_approval_workflow(self):
+        from apps.hrm.models import AttendanceRecord
+
+        payload = {
+            'employee_id': self.employee_a.id,
+            'request_type': 'REGULARISATION',
+            'start_date': '2026-09-10',
+            'end_date': '2026-09-10',
+            'start_time': '08:00:00',
+            'end_time': '17:00:00',
+            'reason': 'Quên quẹt thẻ sáng chiều',
+        }
+        create_resp = self.client_a.post('/api/v1/native-hrm/attendance-requests/', payload, format='json')
+        self.assertEqual(create_resp.status_code, status.HTTP_201_CREATED)
+        req_id = create_resp.data['id']
+        self.assertEqual(create_resp.data['status'], 'PENDING_STAGE_1')
+
+        # Approve Stage 1
+        s1_resp = self.client_a.post(f'/api/v1/native-hrm/attendance-requests/{req_id}/approve-stage-1/')
+        self.assertEqual(s1_resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(s1_resp.data['status'], 'APPROVED_STAGE_1')
+
+        # Approve Stage 2
+        s2_resp = self.client_a.post(f'/api/v1/native-hrm/attendance-requests/{req_id}/approve-stage-2/')
+        self.assertEqual(s2_resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(s2_resp.data['status'], 'APPROVED')
+
+        # Verify AttendanceRecord updated/created
+        att_rec = AttendanceRecord.objects.get(employee=self.employee_a, date=date(2026, 9, 10))
+        self.assertEqual(str(att_rec.check_in), '08:00:00')
+        self.assertEqual(str(att_rec.check_out), '17:00:00')
+        self.assertTrue(att_rec.is_manually_adjusted)
+
+
+
 
 
