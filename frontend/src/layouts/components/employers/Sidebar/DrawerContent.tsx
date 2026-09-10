@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Box, Divider, IconButton, List, Toolbar, Tooltip, useTheme } from "@mui/material";
@@ -48,14 +48,18 @@ const getInitialExpandedItems = (pathname: string | null, isAdmin?: boolean) => 
       initial.profiles = true;
     } else if (pathname.includes('/admin/jobs') || pathname.includes('/admin/questions') || pathname.includes('/admin/question-groups') || pathname.includes('/admin/trust-reports') || pathname.includes('/admin/job-activity') || pathname.includes('/admin/interviews') || pathname.includes('/admin/voice-profiles') || pathname.includes('/admin/job-notifications') || pathname.includes('/admin/interview-preview')) {
       initial.recruitment = true;
+    } else if (pathname.includes('/admin/hrm')) {
+      initial.hrm = true;
     }
   } else {
-    if (pathname.includes('/employer/applied-profiles') || pathname.includes('/employer/saved-profiles') || pathname.includes('/employer/candidates') || pathname.includes('/employer/profiles')) {
+    if (pathname.includes('/employer/applied-profiles') || pathname.includes('/employer/saved-profiles') || pathname.includes('/employer/candidates') || pathname.includes('/employer/profiles') || pathname.includes('ung-vien')) {
       initial.candidates = true;
-    } else if (pathname.includes('/employer/interviews') || pathname.includes('/employer/question-bank') || pathname.includes('/employer/question-groups')) {
+    } else if (pathname.includes('/employer/interviews') || pathname.includes('/employer/question-bank') || pathname.includes('/employer/question-groups') || pathname.includes('phong-van')) {
       initial.interviews = true;
-    } else if (pathname.includes('/employer/company') || pathname.includes('/employer/verification') || pathname.includes('/employer/account') || pathname.includes('/employer/settings')) {
+    } else if (pathname.includes('/employer/company') || pathname.includes('/employer/verification') || pathname.includes('/employer/account') || pathname.includes('/employer/settings') || pathname.includes('tai-khoan')) {
       initial.account = true;
+    } else if (pathname.includes('/hrm') || pathname.includes('hrm')) {
+      initial.hrm = true;
     }
   }
 
@@ -73,6 +77,19 @@ const DrawerContent = ({ isAdmin, liveInterviewCount = 0, isCollapsed = false, t
   );
 
   const [expandedItems, setExpandedItems] = useState(() => getInitialExpandedItems(pathname, isAdmin));
+
+  useEffect(() => {
+    const currentExpanded = getInitialExpandedItems(pathname, isAdmin);
+    setExpandedItems(prev => {
+      const next = { ...prev };
+      Object.keys(currentExpanded).forEach((key) => {
+        if (currentExpanded[key as keyof typeof currentExpanded]) {
+          next[key as keyof typeof next] = true;
+        }
+      });
+      return next;
+    });
+  }, [pathname, isAdmin]);
 
   const handleExpand = (section: string) => {
     setExpandedItems(prev => ({
