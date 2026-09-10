@@ -578,6 +578,8 @@ export interface MockSessionResponse extends InterviewSession {
   questions?: Question[];
   livekit_token?: string;
   livekitToken?: string;
+  invite_token?: string;
+  interview_url?: string;
 }
 
 export interface InterviewEvaluationRubric {

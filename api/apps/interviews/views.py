@@ -690,10 +690,13 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             permission_classes=[permissions.AllowAny])
     def retrieve_by_invite_token(self, request, invite_token=None):
         try:
+            filter_q = Q(invite_token=invite_token)
+            if invite_token and invite_token.isdigit():
+                filter_q |= Q(pk=int(invite_token))
             session = InterviewSession.objects.select_related(
                 'candidate', 'job_post', 'created_by'
-            ).prefetch_related('questions', 'transcripts', 'evaluations').get(invite_token=invite_token)
-        except InterviewSession.DoesNotExist:
+            ).prefetch_related('questions', 'transcripts', 'evaluations').get(filter_q)
+        except (InterviewSession.DoesNotExist, InterviewSession.MultipleObjectsReturned):
             return response_data(
                 status=status.HTTP_404_NOT_FOUND,
                 errors={"detail": ["Interview session not found."]},
@@ -706,8 +709,11 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             permission_classes=[permissions.AllowAny])
     def livekit_token_by_invite_token(self, request, invite_token=None):
         try:
-            session = InterviewSession.objects.select_related('candidate').get(invite_token=invite_token)
-        except InterviewSession.DoesNotExist:
+            filter_q = Q(invite_token=invite_token)
+            if invite_token and invite_token.isdigit():
+                filter_q |= Q(pk=int(invite_token))
+            session = InterviewSession.objects.select_related('candidate').get(filter_q)
+        except (InterviewSession.DoesNotExist, InterviewSession.MultipleObjectsReturned):
             return response_data(
                 status=status.HTTP_404_NOT_FOUND,
                 errors={"detail": ["Interview session not found."]},

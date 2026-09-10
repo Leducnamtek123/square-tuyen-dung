@@ -525,7 +525,15 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
       if (normalizedRole === 'jobseeker') {
         inviteToken = routeId || '';
         if (!inviteToken) throw new Error(translate('errors.missingInvite'));
-        detailRaw = await interviewService.getSessionDetailByInviteToken(inviteToken);
+        try {
+          detailRaw = await interviewService.getSessionDetailByInviteToken(inviteToken);
+        } catch (inviteErr: unknown) {
+          if (routeId && /^\d+$/.test(routeId)) {
+            detailRaw = await interviewService.getSessionDetail(routeId);
+          } else {
+            throw inviteErr;
+          }
+        }
       } else {
         if (!routeId) throw new Error(translate('errors.missingSessionId'));
         detailRaw = await interviewService.getSessionDetail(routeId);

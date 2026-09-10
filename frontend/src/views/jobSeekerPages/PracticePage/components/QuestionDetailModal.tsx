@@ -2,15 +2,24 @@
 
 import React from 'react';
 import {
-  X,
-  Clock,
-  Lightbulb,
-  Target,
-  AlertTriangle,
-  HelpCircle,
-  Layers,
-  Sparkles,
-} from 'lucide-react';
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+  Chip,
+  Stack,
+  Box,
+  Button,
+  IconButton,
+  Divider,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
 import { QuestionBankItem } from '@/types/models';
 
 interface QuestionDetailModalProps {
@@ -37,216 +46,229 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
-  const getSeniorityBadge = (seniority?: string) => {
+  const getSeniorityLabel = (seniority?: string) => {
     switch (seniority) {
       case 'senior':
       case 'lead':
-        return { label: 'Senior / Quản lý', bg: 'bg-purple-100 text-purple-700 border-purple-200' };
+        return 'Senior / Quản lý';
       case 'middle':
-        return { label: 'Trung cấp (Middle)', bg: 'bg-blue-100 text-blue-700 border-blue-200' };
+        return 'Trung cấp (Middle)';
       default:
-        return { label: 'Junior / Mới bắt đầu', bg: 'bg-emerald-100 text-emerald-700 border-emerald-200' };
+        return 'Junior / Fresher';
     }
   };
 
-  const seniority = getSeniorityBadge(question.seniority);
   const steps = question.answer_structure?.steps || [];
   const tips = question.important_tips || [];
   const followUps = question.follow_up_questions || [];
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-question-title"
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: '16px',
+          boxShadow: '0 20px 40px -15px rgba(0,0,0,0.1)',
+          overflow: 'hidden',
+        },
+      }}
     >
-      <div
-        className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl flex flex-col"
-        onClick={(e) => e.stopPropagation()}
+      <DialogTitle
+        sx={{
+          p: 3,
+          pb: 2,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          borderBottom: '1px solid #e2e8f0',
+          bgcolor: '#ffffff',
+        }}
       >
-        {/* Header */}
-        <div className="flex items-start justify-between border-b border-slate-100 bg-gradient-to-r from-sky-50/50 via-white to-indigo-50/50 p-6">
-          <div className="pr-6">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold ${seniority.bg}`}>
-                {seniority.label}
-              </span>
-              {question.category && (
-                <span className="inline-flex items-center rounded-md border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
-                  {question.category}
-                </span>
-              )}
-              <span className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800">
-                <Clock className="h-3 w-3" />
-                Thời lượng khuyến nghị: {formatDuration(question.default_duration_seconds)}
-              </span>
-            </div>
-            <h2 id="modal-question-title" className="text-lg md:text-xl font-bold text-slate-900 leading-snug">
-              {question.question_text}
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
-            aria-label="Đóng modal"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+        <Box sx={{ pr: 2 }}>
+          <Stack direction="row" spacing={1} flexWrap="wrap" gap={0.5} sx={{ mb: 1 }}>
+            <Chip
+              size="small"
+              label={getSeniorityLabel(question.seniority)}
+              sx={{ bgcolor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, fontSize: '0.75rem' }}
+            />
+            {question.category && (
+              <Chip
+                size="small"
+                label={question.category_display || question.category}
+                sx={{ bgcolor: '#f1f5f9', color: '#475569', fontWeight: 600, fontSize: '0.75rem' }}
+              />
+            )}
+            <Chip
+              size="small"
+              icon={<AccessTimeIcon sx={{ fontSize: '14px !important', color: '#64748b' }} />}
+              label={`Thời lượng gợi ý: ${formatDuration(question.default_duration_seconds)}`}
+              sx={{ bgcolor: '#f8fafc', color: '#64748b', fontSize: '0.75rem' }}
+            />
+          </Stack>
+          <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', lineHeight: 1.4 }}>
+            {question.question_text || question.text}
+          </Typography>
+        </Box>
+        <IconButton onClick={onClose} size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#0f172a' } }}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
 
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Interviewer Intent */}
+      <DialogContent sx={{ p: 3, bgcolor: '#ffffff' }}>
+        <Stack spacing={3}>
+          {/* Ý đồ của nhà tuyển dụng */}
           {question.interviewer_intent && (
-            <div className="rounded-xl border border-sky-100 bg-gradient-to-br from-sky-50 to-blue-50/40 p-4">
-              <div className="flex items-center gap-2 mb-1.5">
-                <Target className="h-4 w-4 text-sky-600" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-sky-900">
-                  Mục đích của Người phỏng vấn
-                </h3>
-              </div>
-              <p className="text-sm leading-relaxed text-slate-700">
-                {question.interviewer_intent}
-              </p>
-            </div>
-          )}
-
-          {/* Answer Structure */}
-          {question.answer_structure && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Layers className="h-4 w-4 text-indigo-600" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
-                  Cấu trúc Dàn bài Trả lời Gợi ý
-                </h3>
-              </div>
-
-              <div className="relative pl-6 space-y-4 border-l-2 border-indigo-100 ml-2">
-                {/* START */}
-                {question.answer_structure.start && (
-                  <div className="relative">
-                    <div className="absolute -left-[31px] top-0 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-black text-white shadow-sm ring-4 ring-white">
-                      S
-                    </div>
-                    <div className="rounded-lg border border-slate-200/80 bg-slate-50/70 p-3">
-                      <div className="text-xs font-bold text-indigo-700 mb-0.5">MỞ ĐẦU (START)</div>
-                      <p className="text-sm text-slate-700">{question.answer_structure.start}</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Steps */}
-                {steps.map((step, idx) => (
-                  <div key={idx} className="relative">
-                    <div className="absolute -left-[31px] top-0 flex h-5 w-5 items-center justify-center rounded-full bg-slate-800 text-[10px] font-black text-white shadow-sm ring-4 ring-white">
-                      {step.step || idx + 1}
-                    </div>
-                    <div className="rounded-lg border border-slate-200 bg-white p-3.5 shadow-xs">
-                      <div className="text-xs font-bold text-slate-900 mb-1">{step.title}</div>
-                      <p className="text-sm text-slate-600">{step.guidance}</p>
-                    </div>
-                  </div>
-                ))}
-
-                {/* END */}
-                {question.answer_structure.end && (
-                  <div className="relative">
-                    <div className="absolute -left-[31px] top-0 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-black text-white shadow-sm ring-4 ring-white">
-                      E
-                    </div>
-                    <div className="rounded-lg border border-slate-200/80 bg-slate-50/70 p-3">
-                      <div className="text-xs font-bold text-emerald-700 mb-0.5">KẾT LUẬN (END)</div>
-                      <p className="text-sm text-slate-700">{question.answer_structure.end}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Important Tips */}
-          {tips.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="h-4 w-4 text-amber-500" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
-                  Mẹo Quan Trọng &amp; Lời Khuyên
-                </h3>
-              </div>
-              <div className="grid gap-2.5 sm:grid-cols-2">
-                {tips.map((tip, idx) => (
-                  <div
-                    key={idx}
-                    className={`rounded-xl border p-3 text-xs leading-relaxed ${
-                      tip.type === 'do'
-                        ? 'border-emerald-200 bg-emerald-50/60 text-emerald-900'
-                        : 'border-rose-200 bg-rose-50/60 text-rose-900'
-                    }`}
-                  >
-                    <span className="font-bold mr-1">
-                      {tip.type === 'do' ? '✓ NÊN:' : '✕ TRÁNH:'}
-                    </span>
-                    {tip.content}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Follow-up Traps */}
-          {followUps.length > 0 && (
-            <div className="space-y-2.5 rounded-xl border border-amber-200/80 bg-amber-50/40 p-4">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-amber-600" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-amber-900">
-                  Câu Hỏi Mở Rộng / Đào Sâu Của Nhà Tuyển Dụng
-                </h3>
-              </div>
-              <ul className="space-y-2">
-                {followUps.map((q, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-xs text-slate-700">
-                    <HelpCircle className="h-3.5 w-3.5 text-amber-500 shrink-0 mt-0.5" />
-                    <span>{q}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50 px-6 py-4">
-          <button
-            onClick={onClose}
-            className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition shadow-xs"
-          >
-            Đóng
-          </button>
-
-          {onPracticeQuestion && (
-            <button
-              onClick={() => onPracticeQuestion(question)}
-              disabled={isStarting}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 px-5 py-2 text-xs font-bold text-white shadow-md shadow-sky-500/20 hover:from-sky-500 hover:to-indigo-500 transition disabled:opacity-60"
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: '10px',
+                bgcolor: '#eff6ff',
+                border: '1px solid #bfdbfe',
+              }}
             >
-              {isStarting ? (
-                <>
-                  <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Đang khởi tạo phòng phỏng vấn...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4 text-amber-300" />
-                  Luyện tập câu này trong Mock Interview
-                </>
-              )}
-            </button>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1d4ed8', mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <PsychologyOutlinedIcon sx={{ fontSize: 20 }} />
+                Ý đồ &amp; Trọng tâm nhà tuyển dụng muốn đánh giá
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#1e3a8a', lineHeight: 1.6 }}>
+                {question.interviewer_intent}
+              </Typography>
+            </Box>
           )}
-        </div>
-      </div>
-    </div>
+
+          {/* Dàn ý trả lời theo chuẩn STAR */}
+          {steps.length > 0 && (
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CheckCircleOutlineIcon sx={{ fontSize: 20, color: '#2563eb' }} />
+                Dàn ý trả lời đề xuất (Khung chuẩn STAR)
+              </Typography>
+              <Stack spacing={1.5}>
+                {steps.map((step, idx) => (
+                  <Box
+                    key={idx}
+                    sx={{
+                      p: 2,
+                      borderRadius: '10px',
+                      border: '1px solid #e2e8f0',
+                      bgcolor: '#f8fafc',
+                    }}
+                  >
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Bước {step.step || idx + 1}: {step.title || `Bước ${idx + 1}`}
+                    </Typography>
+                    {(step.guidance || step.detail) && (
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b', mt: 0.25, mb: 0.5 }}>
+                        {step.guidance || step.detail}
+                      </Typography>
+                    )}
+                    {step.detail && step.guidance && (
+                      <Typography variant="caption" sx={{ color: '#64748b', fontStyle: 'italic', display: 'block', bgcolor: '#ffffff', p: 1, borderRadius: '6px', border: '1px dashed #cbd5e1' }}>
+                        Chi tiết: {step.detail}
+                      </Typography>
+                    )}
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+          )}
+
+          {/* Mẹo ứng xử & Điểm cộng */}
+          {tips.length > 0 && (
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <LightbulbOutlinedIcon sx={{ fontSize: 20, color: '#d97706' }} />
+                Mẹo ghi điểm &amp; Bẫy cần tránh
+              </Typography>
+              <Stack spacing={1}>
+                {tips.map((tip, idx) => {
+                  const tipText = typeof tip === 'string' ? tip : (tip?.text || tip?.content || '');
+                  return (
+                    <Box
+                      key={idx}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 1.5,
+                        p: 1.5,
+                        borderRadius: '8px',
+                        bgcolor: '#fffbeb',
+                        border: '1px solid #fde68a',
+                      }}
+                    >
+                      <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#d97706', mt: 1, flexShrink: 0 }} />
+                      <Typography variant="body2" sx={{ color: '#92400e', lineHeight: 1.5 }}>
+                        {tipText}
+                      </Typography>
+                    </Box>
+                  );
+                })}
+              </Stack>
+            </Box>
+          )}
+
+          {/* Câu hỏi đào sâu tiếp theo */}
+          {followUps.length > 0 && (
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <HelpOutlineIcon sx={{ fontSize: 20, color: '#64748b' }} />
+                Câu hỏi phỏng vấn đào sâu có thể gặp (Follow-up)
+              </Typography>
+              <Stack spacing={1}>
+                {followUps.map((fu, idx) => (
+                  <Box
+                    key={idx}
+                    sx={{
+                      p: 1.5,
+                      borderRadius: '8px',
+                      bgcolor: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                    }}
+                  >
+                    <Typography variant="body2" sx={{ color: '#334155' }}>
+                      &bull; {fu}
+                    </Typography>
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+          )}
+        </Stack>
+      </DialogContent>
+
+      <Divider />
+
+      <DialogActions sx={{ p: 2.5, px: 3, bgcolor: '#ffffff', justifyContent: 'space-between' }}>
+        <Button
+          variant="outlined"
+          onClick={onClose}
+          sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600, color: '#64748b', borderColor: '#cbd5e1' }}
+        >
+          Đóng
+        </Button>
+        {onPracticeQuestion && (
+          <Button
+            variant="contained"
+            disabled={isStarting}
+            onClick={() => onPracticeQuestion(question)}
+            sx={{
+              borderRadius: '8px',
+              textTransform: 'none',
+              fontWeight: 700,
+              bgcolor: '#2563eb',
+              boxShadow: 'none',
+              px: 3,
+              '&:hover': { bgcolor: '#1d4ed8', boxShadow: 'none' },
+            }}
+          >
+            Luyện câu này trong phòng AI
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
   );
 };
 

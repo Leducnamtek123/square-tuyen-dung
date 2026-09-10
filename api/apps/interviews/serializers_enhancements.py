@@ -70,5 +70,6 @@ class MockSessionResponseSerializer(serializers.ModelSerializer):
         ]
 
     def get_interview_url(self, obj):
-        return f"/interview/{obj.id}"
+        token = obj.invite_token or obj.id
+        return f"/interview/{token}"
 
