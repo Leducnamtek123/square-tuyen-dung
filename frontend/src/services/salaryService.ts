@@ -5,6 +5,8 @@ import type { PaginatedResponse } from '../types/api';
 
 export interface GetSalaryBenchmarksParams {
   search?: string;
+  category?: string;
+  seniority?: string;
   career_id?: number;
   experience_level?: string;
   is_hot?: boolean;
@@ -22,4 +24,5 @@ const salaryService = {
   },
 };
 
+export { salaryService };
 export default salaryService;

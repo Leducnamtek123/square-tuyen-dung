@@ -205,7 +205,7 @@ const interviewService = {
       .then(unwrapDataResponse<SessionMetrics>);
   },
 
-  getQuestionBank: (params?: { search?: string; career_id?: number; difficulty?: number; category?: string }): Promise<PaginatedResponse<any>> => {
+  getQuestionBank: (params?: { search?: string; career_id?: number; difficulty?: number; category?: string; seniority?: string }): Promise<PaginatedResponse<any>> => {
     const url = 'interview/web/questions/bank/';
     return httpRequest.get(url, { params }).then((data) => normalizePaginatedResponse(data));
   },
@@ -226,4 +226,5 @@ const interviewService = {
   },
 };
 
+export { interviewService };
 export default interviewService;

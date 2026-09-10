@@ -47,7 +47,9 @@ export const SalaryBenchmarkPage: React.FC = () => {
         search: searchQuery.trim() || undefined,
       });
 
-      const data = Array.isArray(res.data) ? res.data : (res.data?.results || []);
+      const data = Array.isArray(res)
+        ? res
+        : (res?.results || (res as any)?.data?.results || (res as any)?.data || []);
       setBenchmarks(data);
     } catch (err) {
       console.error('Failed to fetch salary benchmarks:', err);

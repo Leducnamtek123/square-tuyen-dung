@@ -65,9 +65,9 @@ export const CandidatePracticePage: React.FC = () => {
       });
 
       // Format from paginated or array response
-      const results = Array.isArray(res.data)
-        ? res.data
-        : res.data?.results || [];
+      const results = Array.isArray(res)
+        ? res
+        : (res?.results || (res as any)?.data?.results || (res as any)?.data || []);
       setQuestions(results);
     } catch (err: any) {
       console.error('Failed to fetch question bank:', err);

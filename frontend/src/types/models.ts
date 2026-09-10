@@ -478,6 +478,7 @@ export interface QuestionStep {
   step: number;
   title: string;
   detail?: string;
+  guidance?: string;
 }
 
 export interface QuestionAnswerStructure {
@@ -488,13 +489,18 @@ export interface QuestionAnswerStructure {
 }
 
 export interface QuestionImportantTip {
-  priority: 'HIGH' | 'MEDIUM' | 'LOW';
-  text: string;
+  priority?: 'HIGH' | 'MEDIUM' | 'LOW';
+  text?: string;
+  type?: 'do' | 'dont' | string;
+  content?: string;
 }
 
 export interface Question {
   id: number;
-  text: string;
+  text?: string;
+  question_text?: string;
+  questionText?: string;
+  seniority?: string;
   difficulty?: string | number;
   difficulty_display?: string;
   career?: number | null;
@@ -516,7 +522,6 @@ export interface Question {
   followUpQuestions?: string[] | null;
   // Fallbacks for raw API response or transformer mapped fields
   content?: string;
-  questionText?: string;
   type?: string;
 }
 
@@ -527,32 +532,45 @@ export interface QuestionBankItem extends Question {
 
 export interface SalaryBenchmarkItem {
   id: number;
+  job_title?: string;
+  position_title?: string;
+  positionTitle?: string;
+  category?: string;
   career?: number | null;
   career_name?: string;
   careerName?: string;
-  position_title: string;
-  positionTitle?: string;
-  experience_level: string;
+  seniority?: string;
+  experience_level?: string;
   experienceLevel?: string;
   experience_level_display?: string;
   experienceLevelDisplay?: string;
-  salary_min: number;
+  min_salary?: number;
+  salary_min?: number;
   salaryMin?: number;
-  salary_max: number;
-  salaryMax?: number;
+  median_salary?: number;
   salary_avg?: number | null;
   salaryAvg?: number | null;
-  year: number;
-  sample_count: number;
+  max_salary?: number;
+  salary_max?: number;
+  salaryMax?: number;
+  currency?: string;
+  year?: number;
+  sample_size?: number;
+  sample_count?: number;
   sampleCount?: number;
-  is_hot: boolean;
+  is_hot?: boolean;
   isHot?: boolean;
+  source_notes?: string;
   create_at?: string;
 }
 
 export interface CreateMockSessionPayload {
-  career_id?: number | null;
+  job_title?: string;
   position_title?: string;
+  category?: string;
+  career_id?: number | null;
+  seniority?: string;
+  experience_level?: string;
   question_count?: number;
 }
 

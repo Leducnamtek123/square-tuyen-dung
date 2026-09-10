@@ -90,10 +90,15 @@ export const SalaryIndustryTable: React.FC<SalaryIndustryTableProps> = ({
 
         <div className="divide-y divide-slate-100">
           {benchmarks.map((item) => {
-            const seniority = getSeniorityBadge(item.seniority);
-            // Calculate median relative position percentage
-            const span = item.max_salary - item.min_salary;
-            const medianPercent = span > 0 ? Math.round(((item.median_salary - item.min_salary) / span) * 100) : 50;
+            const min = item.min_salary ?? item.salary_min ?? 0;
+            const max = item.max_salary ?? item.salary_max ?? 0;
+            const median = item.median_salary ?? item.salary_avg ?? Math.round((min + max) / 2);
+            const title = item.job_title ?? item.position_title ?? '';
+            const cat = item.category ?? item.career_name ?? 'Chung';
+            const sampleSize = item.sample_size ?? item.sample_count ?? 0;
+            const seniority = getSeniorityBadge(item.seniority || item.experience_level);
+            const span = max - min;
+            const medianPercent = span > 0 ? Math.round(((median - min) / span) * 100) : 50;
 
             return (
               <div
@@ -107,18 +112,18 @@ export const SalaryIndustryTable: React.FC<SalaryIndustryTableProps> = ({
                       {seniority.label}
                     </span>
                     <span className="inline-flex items-center rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-                      {item.category}
+                      {cat}
                     </span>
                   </div>
 
                   <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
-                    {item.job_title}
+                    {title}
                   </h3>
 
                   <div className="flex items-center gap-3 text-xs text-slate-500">
                     <span className="flex items-center gap-1">
                       <Users className="h-3 w-3 text-slate-400" />
-                      <span>{item.sample_size ? `${item.sample_size.toLocaleString()} mẫu tin tuyển dụng` : 'Khảo sát chuẩn hóa'}</span>
+                      <span>{sampleSize ? `${sampleSize.toLocaleString()} mẫu tin tuyển dụng` : 'Khảo sát chuẩn hóa'}</span>
                     </span>
                     {item.source_notes && (
                       <span>&bull; {item.source_notes}</span>
@@ -130,13 +135,13 @@ export const SalaryIndustryTable: React.FC<SalaryIndustryTableProps> = ({
                 <div className="flex-1 lg:max-w-md space-y-2">
                   <div className="flex items-baseline justify-between text-xs font-semibold">
                     <span className="text-slate-600">
-                      Thấp nhất: <strong className="text-slate-900">{formatCurrencyMillions(item.min_salary)}</strong>
+                      Thấp nhất: <strong className="text-slate-900">{formatCurrencyMillions(min)}</strong>
                     </span>
                     <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-bold">
-                      Trung vị: {formatCurrencyMillions(item.median_salary)}
+                      Trung vị: {formatCurrencyMillions(median)}
                     </span>
                     <span className="text-slate-600">
-                      Cao nhất: <strong className="text-slate-900">{formatCurrencyMillions(item.max_salary)}</strong>
+                      Cao nhất: <strong className="text-slate-900">{formatCurrencyMillions(max)}</strong>
                     </span>
                   </div>
 
@@ -146,15 +151,15 @@ export const SalaryIndustryTable: React.FC<SalaryIndustryTableProps> = ({
                   </div>
 
                   <div className="flex justify-between text-[10px] text-slate-400">
-                    <span>{formatVND(item.min_salary)}</span>
-                    <span>{formatVND(item.max_salary)}</span>
+                    <span>{formatVND(min)}</span>
+                    <span>{formatVND(max)}</span>
                   </div>
                 </div>
 
                 {/* Right: CTA to practice */}
                 <div className="shrink-0 flex items-center lg:justify-end">
                   <Link
-                    href={`/practice?category=${encodeURIComponent(item.category)}&search=${encodeURIComponent(item.job_title)}`}
+                    href={`/practice?category=${encodeURIComponent(cat)}&search=${encodeURIComponent(title)}`}
                     className="inline-flex w-full lg:w-auto items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-sky-600 transition"
                   >
                     <Sparkles className="h-3.5 w-3.5 text-amber-300" />
