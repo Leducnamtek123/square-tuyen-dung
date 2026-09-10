@@ -18,6 +18,7 @@ import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
+import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
 import { APP_NAME } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import CandidateCompletenessBannerCard from '../CandidateDashboardMain/CandidateCompletenessBannerCard';
@@ -64,6 +65,8 @@ const CandidateSidebar = ({ completenessPercent }: CandidateSidebarProps) => {
         return cleanPathname.includes('/my-jobs') || cleanPathname.includes('/viec-lam');
       case 'my-interviews':
         return cleanPathname.includes('/my-interviews') || cleanPathname.includes('/phong-van');
+      case 'practice':
+        return cleanPathname.includes('/practice') || cleanPathname.includes('/luyen-phong-van');
       case 'account':
         return (
           cleanPathname.includes('/account') ||
@@ -106,6 +109,12 @@ const CandidateSidebar = ({ completenessPercent }: CandidateSidebarProps) => {
       label: 'Phòng vấn của tôi',
       icon: <VideocamOutlinedIcon />,
       rawPath: '/my-interviews',
+    },
+    {
+      key: 'practice',
+      label: 'Luyện phỏng vấn AI',
+      icon: <PsychologyOutlinedIcon />,
+      rawPath: '/practice',
     },
     {
       key: 'account',
