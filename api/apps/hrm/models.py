@@ -5,6 +5,86 @@ from apps.accounts.models import User
 from apps.profiles.models import Company, JobSeekerProfile
 
 
+class WorkLocation(CommonBaseModel):
+    LOCATION_TYPE_CHOICES = (
+        ('HEADQUARTERS', 'Trụ sở chính'),
+        ('BRANCH', 'Chi nhánh'),
+        ('FACTORY', 'Nhà xưởng / Nhà máy'),
+        ('WAREHOUSE', 'Kho hàng'),
+        ('RETAIL', 'Điểm bán lẻ / Showroom'),
+        ('OTHER', 'Khác'),
+    )
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="work_locations")
+    name = models.CharField(max_length=255, verbose_name="Tên trụ sở hoặc chi nhánh")
+    code = models.CharField(max_length=50, blank=True, null=True, verbose_name="Mã chi nhánh")
+    location_type = models.CharField(max_length=20, choices=LOCATION_TYPE_CHOICES, default='BRANCH', verbose_name="Phân loại địa điểm")
+    address = models.CharField(max_length=500, blank=True, null=True, verbose_name="Địa chỉ")
+    city = models.CharField(max_length=100, blank=True, null=True, verbose_name="Tỉnh / Thành phố")
+    latitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True, verbose_name="Vĩ độ")
+    longitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True, verbose_name="Kinh độ")
+    radius_meters = models.PositiveIntegerField(default=200, verbose_name="Bán kính chấm công cho phép (mét)")
+    allowed_ip_ranges = models.TextField(blank=True, null=True, verbose_name="Dải IP mạng cho phép chấm công")
+    timezone = models.CharField(max_length=50, default="Asia/Ho_Chi_Minh", verbose_name="Múi giờ")
+    is_active = models.BooleanField(default=True, verbose_name="Đang hoạt động")
+
+    class Meta:
+        ordering = ['name']
+        unique_together = ('company', 'code')
+
+    def __str__(self):
+        return f"{self.name} ({self.code})" if self.code else self.name
+
+
+class BiometricDevice(CommonBaseModel):
+    PROTOCOL_CHOICES = (
+        ('ZKTECO_PULL', 'ZKTeco Kéo dữ liệu (TCP 4370)'),
+        ('ZKTECO_PUSH', 'ZKTeco Đẩy tự động (ADMS / Cổng 4200)'),
+        ('HIKVISION', 'Hikvision ISUP / ISAPI'),
+        ('CAMERA_AI', 'Camera AI nhận diện khuôn mặt'),
+        ('OTHER', 'Khác'),
+    )
+    DIRECTION_CHOICES = (
+        ('BOTH', 'Cả vào và ra'),
+        ('IN', 'Chỉ quẹt vào'),
+        ('OUT', 'Chỉ quẹt ra'),
+    )
+    STATUS_CHOICES = (
+        ('ONLINE', 'Đang kết nối'),
+        ('OFFLINE', 'Mất kết nối'),
+        ('SYNCING', 'Đang đồng bộ'),
+        ('ERROR', 'Lỗi kết nối'),
+    )
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="biometric_devices")
+    location = models.ForeignKey(WorkLocation, on_delete=models.CASCADE, related_name="devices", verbose_name="Trụ sở hoặc chi nhánh")
+    name = models.CharField(max_length=255, verbose_name="Tên máy chấm công")
+    device_code = models.CharField(max_length=50, blank=True, null=True, verbose_name="Mã thiết bị")
+    protocol = models.CharField(max_length=30, choices=PROTOCOL_CHOICES, default='ZKTECO_PULL', verbose_name="Giao thức kết nối")
+    ip_or_domain = models.CharField(max_length=255, verbose_name="Địa chỉ IP hoặc tên miền")
+    device_port = models.PositiveIntegerField(default=4370, verbose_name="Cổng thiết bị phần cứng")
+    service_port = models.PositiveIntegerField(default=4200, verbose_name="Cổng dịch vụ máy chủ")
+    comm_key = models.CharField(max_length=50, default="0", blank=True, verbose_name="Mật mã kết nối (Comm Key)")
+    direction = models.CharField(max_length=10, choices=DIRECTION_CHOICES, default='BOTH', verbose_name="Hướng quẹt")
+    serial_number = models.CharField(max_length=100, blank=True, null=True, verbose_name="Số sê-ri máy")
+    model_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Dòng máy / Hãng")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='OFFLINE', verbose_name="Trạng thái kết nối")
+    last_ping = models.DateTimeField(null=True, blank=True, verbose_name="Lần kiểm tra gần nhất")
+    last_sync_time = models.DateTimeField(null=True, blank=True, verbose_name="Lần đồng bộ gần nhất")
+    last_error_message = models.TextField(null=True, blank=True, verbose_name="Thông điệp lỗi gần nhất")
+    total_punches_synced = models.PositiveIntegerField(default=0, verbose_name="Tổng số lượt quẹt đã đồng bộ")
+    auto_sync_interval = models.PositiveIntegerField(default=15, verbose_name="Chu kỳ quét tự động (phút)")
+    is_active = models.BooleanField(default=True, verbose_name="Kích hoạt")
+
+    class Meta:
+        ordering = ['location', 'name']
+        unique_together = ('company', 'device_code')
+
+    def __str__(self):
+        loc_name = self.location.name if self.location else "Chưa gán chi nhánh"
+        return f"{self.name} - {loc_name} ({self.ip_or_domain}:{self.device_port})"
+
+
 class Department(CommonBaseModel):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="departments")
     name = models.CharField(max_length=255)
@@ -75,6 +155,7 @@ class Employee(CommonBaseModel):
     address = models.TextField(blank=True, null=True)
     
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name="employees")
+    work_location = models.ForeignKey(WorkLocation, on_delete=models.SET_NULL, null=True, blank=True, related_name="employees", verbose_name="Trụ sở hoặc chi nhánh")
     designation = models.ForeignKey(Designation, on_delete=models.SET_NULL, null=True, blank=True, related_name="employees")
     reports_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name="subordinates")
     
@@ -249,12 +330,15 @@ class BiometricPunchLog(CommonBaseModel):
 
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="punch_logs")
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name="punch_logs")
+    device = models.ForeignKey(BiometricDevice, on_delete=models.SET_NULL, null=True, blank=True, related_name="punch_logs", verbose_name="Thiết bị chấm công")
+    location = models.ForeignKey(WorkLocation, on_delete=models.SET_NULL, null=True, blank=True, related_name="punch_logs", verbose_name="Trụ sở hoặc chi nhánh")
     biometric_id = models.CharField(max_length=50, verbose_name="Mã máy chấm công")
     punch_time = models.DateTimeField(db_index=True, verbose_name="Thời gian quẹt")
     device_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Tên máy chấm công")
     device_ip = models.CharField(max_length=50, blank=True, null=True, verbose_name="IP máy chấm công")
     punch_type = models.CharField(max_length=20, choices=PUNCH_CHOICES, default='AUTO', verbose_name="Loại quẹt")
     source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default='ZKTECO', verbose_name="Nguồn dữ liệu")
+    is_duplicate = models.BooleanField(default=False, db_index=True, verbose_name="Cờ quẹt trùng lặp")
 
     class Meta:
         ordering = ['-punch_time']

@@ -1,5 +1,7 @@
 from django.contrib import admin
 from apps.hrm.models import (
+    WorkLocation,
+    BiometricDevice,
     Department,
     Designation,
     Employee,
@@ -8,6 +10,20 @@ from apps.hrm.models import (
     LeaveRequest,
     AttendanceRecord,
 )
+
+
+@admin.register(WorkLocation)
+class WorkLocationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'code', 'location_type', 'city', 'company', 'is_active')
+    search_fields = ('name', 'code', 'city')
+    list_filter = ('location_type', 'is_active', 'company')
+
+
+@admin.register(BiometricDevice)
+class BiometricDeviceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'device_code', 'location', 'protocol', 'ip_or_domain', 'device_port', 'status', 'is_active')
+    search_fields = ('name', 'device_code', 'ip_or_domain')
+    list_filter = ('protocol', 'status', 'is_active', 'company')
 
 
 @admin.register(Department)

@@ -3,6 +3,8 @@ from rest_framework.routers import DefaultRouter
 from apps.hrm import views
 
 router = DefaultRouter()
+router.register(r'work-locations', views.WorkLocationViewSet, basename='hrm-work-locations')
+router.register(r'biometric-devices', views.BiometricDeviceViewSet, basename='hrm-biometric-devices')
 router.register(r'departments', views.DepartmentViewSet, basename='hrm-departments')
 router.register(r'designations', views.DesignationViewSet, basename='hrm-designations')
 router.register(r'employees', views.EmployeeViewSet, basename='hrm-employees')

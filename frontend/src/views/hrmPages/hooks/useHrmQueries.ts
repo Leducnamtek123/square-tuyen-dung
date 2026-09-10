@@ -14,6 +14,8 @@ import hrmService, {
   NativeAttendanceRequest,
   NativeBiometricPunchLog,
   NativeMonthlyAttendanceSummary,
+  NativeWorkLocation,
+  NativeBiometricDevice,
 } from '@/services/hrmService';
 import toastMessages from '@/utils/toastMessages';
 
@@ -23,6 +25,8 @@ export const HRM_QUERY_KEYS = {
   employees: ['hrm-employees'] as const,
   departments: ['hrm-departments'] as const,
   designations: ['hrm-designations'] as const,
+  workLocations: ['hrm-work-locations'] as const,
+  biometricDevices: ['hrm-biometric-devices'] as const,
   contracts: ['hrm-contracts'] as const,
   leaves: ['hrm-leaves'] as const,
   leaveTypes: ['hrm-leave-types'] as const,
@@ -201,6 +205,31 @@ export const useHrmMonthlyAttendanceSummaries = (params?: {
     queryKey: [...HRM_QUERY_KEYS.monthlyAttendanceSummaries, params],
     queryFn: () => hrmService.getMonthlyAttendanceSummaries(params),
     staleTime: 30 * 1000,
+  });
+};
+
+export const useHrmWorkLocations = (params?: {
+  is_active?: boolean;
+  location_type?: string;
+  search?: string;
+}) => {
+  return useQuery<NativeWorkLocation[]>({
+    queryKey: [...HRM_QUERY_KEYS.workLocations, params],
+    queryFn: () => hrmService.getWorkLocations(params),
+    staleTime: 30 * 1000,
+  });
+};
+
+export const useHrmBiometricDevices = (params?: {
+  location_id?: number;
+  status?: string;
+  protocol?: string;
+  search?: string;
+}) => {
+  return useQuery<NativeBiometricDevice[]>({
+    queryKey: [...HRM_QUERY_KEYS.biometricDevices, params],
+    queryFn: () => hrmService.getBiometricDevices(params),
+    staleTime: 15 * 1000,
   });
 };
 
@@ -726,11 +755,148 @@ export const useHrmMutations = () => {
     approveAttendanceRequestStage2,
     rejectAttendanceRequest,
     cancelAttendanceRequest,
+  const createWorkLocation = useMutation({
+    mutationFn: (data: Partial<NativeWorkLocation>) => hrmService.createWorkLocation(data),
+    onSuccess: () => {
+      toastMessages.success('Đã tạo chi nhánh mới thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.workLocations });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể tạo chi nhánh.');
+    },
+  });
+
+  const updateWorkLocation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<NativeWorkLocation> }) =>
+      hrmService.updateWorkLocation(id, data),
+    onSuccess: () => {
+      toastMessages.success('Đã cập nhật chi nhánh thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.workLocations });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể cập nhật chi nhánh.');
+    },
+  });
+
+  const deleteWorkLocation = useMutation({
+    mutationFn: (id: number) => hrmService.deleteWorkLocation(id),
+    onSuccess: () => {
+      toastMessages.success('Đã xóa chi nhánh thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.workLocations });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể xóa chi nhánh.');
+    },
+  });
+
+  const createBiometricDevice = useMutation({
+    mutationFn: (data: Partial<NativeBiometricDevice>) => hrmService.createBiometricDevice(data),
+    onSuccess: () => {
+      toastMessages.success('Đã thêm thiết bị máy chấm công mới thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.biometricDevices });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể tạo thiết bị.');
+    },
+  });
+
+  const updateBiometricDevice = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<NativeBiometricDevice> }) =>
+      hrmService.updateBiometricDevice(id, data),
+    onSuccess: () => {
+      toastMessages.success('Đã cập nhật thiết bị thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.biometricDevices });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể cập nhật thiết bị.');
+    },
+  });
+
+  const deleteBiometricDevice = useMutation({
+    mutationFn: (id: number) => hrmService.deleteBiometricDevice(id),
+    onSuccess: () => {
+      toastMessages.success('Đã xóa thiết bị thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.biometricDevices });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể xóa thiết bị.');
+    },
+  });
+
+  const testDeviceConnection = useMutation({
+    mutationFn: (id: number) => hrmService.testDeviceConnection(id),
+    onSuccess: (res) => {
+      if (res.success) {
+        toastMessages.success(res.message);
+      } else {
+        toastMessages.error(res.message);
+      }
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.biometricDevices });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể kiểm tra kết nối thiết bị.');
+    },
+  });
+
+  const syncDevice = useMutation({
+    mutationFn: (id: number) => hrmService.syncDevice(id),
+    onSuccess: (res) => {
+      toastMessages.success(res.message);
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.biometricDevices });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.biometricPunchLogs });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể đồng bộ thiết bị.');
+    },
+  });
+
+  return {
+    createDepartment,
+    updateDepartment,
+    deleteDepartment,
+    createDesignation,
+    updateDesignation,
+    deleteDesignation,
+    createEmployee,
+    updateEmployee,
+    deleteEmployee,
+    onboardCandidate,
+    createContract,
+    updateContract,
+    deleteContract,
+    renewContract,
+    createLeaveRequest,
+    deleteLeaveRequest,
+    approveLeave,
+    rejectLeave,
+    autoAllocateLeaveBalances,
+    quickCheckin,
+    calculateMonthlyPayroll,
+    approveAllPayroll,
+    markPaidAllPayroll,
+    createWorkShift,
+    updateWorkShift,
+    deleteWorkShift,
+    batchAssignShifts,
+    deleteShiftAssignment,
+    createAttendanceRequest,
+    approveAttendanceRequestStage1,
+    approveAttendanceRequestStage2,
+    rejectAttendanceRequest,
+    cancelAttendanceRequest,
     createBiometricPunchLog,
     processDailyPunchLogs,
     recalculateMonthlyAttendanceSummary,
     lockMonthlyAttendanceSummary,
     unlockMonthlyAttendanceSummary,
     pushSummaryToPayroll,
+    createWorkLocation,
+    updateWorkLocation,
+    deleteWorkLocation,
+    createBiometricDevice,
+    updateBiometricDevice,
+    deleteBiometricDevice,
+    testDeviceConnection,
+    syncDevice,
   };
 };

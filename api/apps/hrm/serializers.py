@@ -126,6 +126,7 @@ class EmploymentContractSerializer(serializers.ModelSerializer):
 
 class EmployeeSerializer(serializers.ModelSerializer):
     department_name = serializers.CharField(source='department.name', read_only=True)
+    work_location_name = serializers.CharField(source='work_location.name', read_only=True)
     designation_title = serializers.CharField(source='designation.title', read_only=True)
     reports_to_name = serializers.CharField(source='reports_to.full_name', read_only=True)
     contracts = EmploymentContractSerializer(many=True, read_only=True)
@@ -136,6 +137,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'id', 'company', 'user', 'candidate_profile', 'onboarded_from_activity',
             'employee_code', 'first_name', 'last_name', 'full_name', 'email', 'phone', 'avatar',
             'gender', 'date_of_birth', 'address', 'department', 'department_name',
+            'work_location', 'work_location_name',
             'designation', 'designation_title', 'reports_to', 'reports_to_name',
             'status', 'employment_type', 'join_date', 'probation_end_date',
             'resign_date', 'bank_name', 'bank_account_number', 'bank_account_holder',
@@ -152,6 +154,9 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'fullName': 'full_name',
             'dateOfBirth': 'date_of_birth',
             'reportsTo': 'reports_to',
+            'workLocation': 'work_location',
+            'workLocationId': 'work_location',
+            'work_location_id': 'work_location',
             'employmentType': 'employment_type',
             'joinDate': 'join_date',
             'probationEndDate': 'probation_end_date',
@@ -607,10 +612,87 @@ class AttendanceRequestSerializer(serializers.ModelSerializer):
         return super().to_internal_value(payload)
 
 
+class WorkLocationSerializer(serializers.ModelSerializer):
+    location_type_label = serializers.CharField(source='get_location_type_display', read_only=True)
+    device_count = serializers.IntegerField(source='devices.count', read_only=True)
+    employee_count = serializers.IntegerField(source='employees.count', read_only=True)
+
+    class Meta:
+        from .models import WorkLocation
+        model = WorkLocation
+        fields = [
+            'id', 'company', 'name', 'code', 'location_type', 'location_type_label',
+            'address', 'city', 'latitude', 'longitude', 'radius_meters',
+            'allowed_ip_ranges', 'timezone', 'is_active', 'device_count', 'employee_count',
+            'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'locationType': 'location_type',
+            'radiusMeters': 'radius_meters',
+            'allowedIpRanges': 'allowed_ip_ranges',
+            'isActive': 'is_active',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+class BiometricDeviceSerializer(serializers.ModelSerializer):
+    location_name = serializers.CharField(source='location.name', read_only=True)
+    location_code = serializers.CharField(source='location.code', read_only=True)
+    protocol_label = serializers.CharField(source='get_protocol_display', read_only=True)
+    direction_label = serializers.CharField(source='get_direction_display', read_only=True)
+    status_label = serializers.CharField(source='get_status_display', read_only=True)
+
+    class Meta:
+        from .models import BiometricDevice
+        model = BiometricDevice
+        fields = [
+            'id', 'company', 'location', 'location_name', 'location_code',
+            'name', 'device_code', 'protocol', 'protocol_label',
+            'ip_or_domain', 'device_port', 'service_port', 'comm_key',
+            'direction', 'direction_label', 'serial_number', 'model_name',
+            'status', 'status_label', 'last_ping', 'last_sync_time',
+            'last_error_message', 'total_punches_synced', 'auto_sync_interval',
+            'is_active', 'create_at', 'update_at'
+        ]
+        read_only_fields = [
+            'id', 'company', 'last_ping', 'last_sync_time',
+            'last_error_message', 'total_punches_synced', 'create_at', 'update_at'
+        ]
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'locationId': 'location',
+            'location_id': 'location',
+            'deviceCode': 'device_code',
+            'ipOrDomain': 'ip_or_domain',
+            'devicePort': 'device_port',
+            'servicePort': 'service_port',
+            'commKey': 'comm_key',
+            'serialNumber': 'serial_number',
+            'modelName': 'model_name',
+            'autoSyncInterval': 'auto_sync_interval',
+            'isActive': 'is_active',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
 class BiometricPunchLogSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
     department_name = serializers.CharField(source='employee.department.name', read_only=True)
+    device_title = serializers.CharField(source='device.name', read_only=True)
+    location_name = serializers.CharField(source='location.name', read_only=True)
     punch_type_label = serializers.CharField(source='get_punch_type_display', read_only=True)
     source_label = serializers.CharField(source='get_source_display', read_only=True)
 
@@ -619,9 +701,10 @@ class BiometricPunchLogSerializer(serializers.ModelSerializer):
         model = BiometricPunchLog
         fields = [
             'id', 'company', 'employee', 'employee_name', 'employee_code', 'department_name',
+            'device', 'device_title', 'location', 'location_name',
             'biometric_id', 'punch_time', 'device_name', 'device_ip',
             'punch_type', 'punch_type_label', 'source', 'source_label',
-            'create_at', 'update_at'
+            'is_duplicate', 'create_at', 'update_at'
         ]
         read_only_fields = ['id', 'company', 'create_at', 'update_at']
 
@@ -630,11 +713,16 @@ class BiometricPunchLogSerializer(serializers.ModelSerializer):
         mappings = {
             'employeeId': 'employee',
             'employee_id': 'employee',
+            'deviceId': 'device',
+            'device_id': 'device',
+            'locationId': 'location',
+            'location_id': 'location',
             'biometricId': 'biometric_id',
             'punchTime': 'punch_time',
             'deviceName': 'device_name',
             'deviceIp': 'device_ip',
             'punchType': 'punch_type',
+            'isDuplicate': 'is_duplicate',
         }
         for camel, snake in mappings.items():
             if camel in payload and snake not in payload:

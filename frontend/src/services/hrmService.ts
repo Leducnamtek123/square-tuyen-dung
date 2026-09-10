@@ -302,6 +302,57 @@ export type NativeMonthlyPayrollRecord = {
   note?: string;
 };
 
+export type NativeWorkLocation = {
+  id: number;
+  company: number;
+  name: string;
+  code?: string;
+  location_type: 'HEADQUARTERS' | 'BRANCH' | 'FACTORY' | 'WAREHOUSE' | 'RETAIL' | 'OTHER';
+  location_type_label?: string;
+  address?: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
+  radius_meters?: number;
+  allowed_ip_ranges?: string;
+  timezone?: string;
+  is_active: boolean;
+  device_count?: number;
+  employee_count?: number;
+  create_at?: string;
+  update_at?: string;
+};
+
+export type NativeBiometricDevice = {
+  id: number;
+  company: number;
+  location: number;
+  location_name?: string;
+  location_code?: string;
+  name: string;
+  device_code?: string;
+  protocol: 'ZKTECO_PULL' | 'ZKTECO_PUSH' | 'HIKVISION' | 'CAMERA_AI' | 'OTHER';
+  protocol_label?: string;
+  ip_or_domain: string;
+  device_port: number;
+  service_port: number;
+  comm_key: string;
+  direction: 'BOTH' | 'IN' | 'OUT';
+  direction_label?: string;
+  serial_number?: string;
+  model_name?: string;
+  status: 'ONLINE' | 'OFFLINE' | 'SYNCING' | 'ERROR';
+  status_label?: string;
+  last_ping?: string | null;
+  last_sync_time?: string | null;
+  last_error_message?: string | null;
+  total_punches_synced: number;
+  auto_sync_interval: number;
+  is_active: boolean;
+  create_at?: string;
+  update_at?: string;
+};
+
 export type PayrollSummaryKPIs = {
   month: number;
   year: number;
@@ -840,6 +891,40 @@ const hrmService = {
 
   pushSummaryToPayroll: (id: number): Promise<{ message: string; payroll_id: number; summary: NativeMonthlyAttendanceSummary }> => {
     return httpRequest.post(`native-hrm/monthly-summaries/${id}/push-to-payroll/`, {}).then((res) => unwrapDataResponse<{ message: string; payroll_id: number; summary: NativeMonthlyAttendanceSummary }>(res));
+  },
+
+  // Work Locations
+  getWorkLocations: (params?: { is_active?: boolean; location_type?: string; search?: string }): Promise<NativeWorkLocation[]> => {
+    return httpRequest.get('native-hrm/work-locations/', { params }).then((res) => normalizePaginatedResponse<NativeWorkLocation>(res).results);
+  },
+  createWorkLocation: (data: Partial<NativeWorkLocation>): Promise<NativeWorkLocation> => {
+    return httpRequest.post('native-hrm/work-locations/', data).then((res) => unwrapDataResponse<NativeWorkLocation>(res));
+  },
+  updateWorkLocation: (id: number, data: Partial<NativeWorkLocation>): Promise<NativeWorkLocation> => {
+    return httpRequest.put(`native-hrm/work-locations/${id}/`, data).then((res) => unwrapDataResponse<NativeWorkLocation>(res));
+  },
+  deleteWorkLocation: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/work-locations/${id}/`).then(() => undefined);
+  },
+
+  // Biometric Devices
+  getBiometricDevices: (params?: { location_id?: number; status?: string; protocol?: string; search?: string }): Promise<NativeBiometricDevice[]> => {
+    return httpRequest.get('native-hrm/biometric-devices/', { params }).then((res) => normalizePaginatedResponse<NativeBiometricDevice>(res).results);
+  },
+  createBiometricDevice: (data: Partial<NativeBiometricDevice>): Promise<NativeBiometricDevice> => {
+    return httpRequest.post('native-hrm/biometric-devices/', data).then((res) => unwrapDataResponse<NativeBiometricDevice>(res));
+  },
+  updateBiometricDevice: (id: number, data: Partial<NativeBiometricDevice>): Promise<NativeBiometricDevice> => {
+    return httpRequest.put(`native-hrm/biometric-devices/${id}/`, data).then((res) => unwrapDataResponse<NativeBiometricDevice>(res));
+  },
+  deleteBiometricDevice: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/biometric-devices/${id}/`).then(() => undefined);
+  },
+  testDeviceConnection: (id: number): Promise<{ success: boolean; status: string; message: string; response_time_ms: number; device: NativeBiometricDevice }> => {
+    return httpRequest.post(`native-hrm/biometric-devices/${id}/test-connection/`, {}).then((res) => unwrapDataResponse(res));
+  },
+  syncDevice: (id: number): Promise<{ success: boolean; message: string; new_punches_count: number; total_punches_synced: number; device: NativeBiometricDevice }> => {
+    return httpRequest.post(`native-hrm/biometric-devices/${id}/sync/`, {}).then((res) => unwrapDataResponse(res));
   },
 };
 

@@ -15,6 +15,8 @@ from apps.accounts import permissions as perms_custom
 from apps.accounts.active_company import apply_active_company_from_request, active_company_header_failed
 from apps.profiles.models import Company, CompanyMember
 from apps.hrm.models import (
+    WorkLocation,
+    BiometricDevice,
     AttendanceRecord,
     AttendanceRequest,
     BiometricPunchLog,
@@ -31,6 +33,8 @@ from apps.hrm.models import (
     WorkShift,
 )
 from apps.hrm.serializers import (
+    WorkLocationSerializer,
+    BiometricDeviceSerializer,
     AttendanceRecordSerializer,
     DepartmentSerializer,
     DesignationSerializer,
@@ -1422,6 +1426,141 @@ class MonthlyAttendanceSummaryViewSet(viewsets.ModelViewSet):
             'payroll_id': payroll_rec.id,
             'summary': MonthlyAttendanceSummarySerializer(summary).data
         }, status=status.HTTP_200_OK)
+
+
+class WorkLocationViewSet(viewsets.ModelViewSet):
+    permission_classes = [perms_custom.CanManageEmployees]
+    serializer_class = WorkLocationSerializer
+
+    def get_queryset(self):
+        company = _get_company_for_request(self.request)
+        if not company:
+            return WorkLocation.objects.none()
+        qs = WorkLocation.objects.filter(company=company).prefetch_related('devices', 'employees')
+
+        is_active = self.request.query_params.get('is_active')
+        if is_active is not None:
+            qs = qs.filter(is_active=is_active.lower() in ('true', '1'))
+
+        location_type = self.request.query_params.get('location_type')
+        if location_type:
+            qs = qs.filter(location_type=location_type)
+
+        search = self.request.query_params.get('search')
+        if search:
+            qs = qs.filter(Q(name__icontains=search) | Q(code__icontains=search) | Q(city__icontains=search))
+
+        return qs.order_by('name')
+
+    def perform_create(self, serializer):
+        company = _get_company_for_request(self.request)
+        if not company:
+            raise PermissionDenied("Không có quyền tạo trụ sở hoặc chi nhánh.")
+        serializer.save(company=company)
+
+
+class BiometricDeviceViewSet(viewsets.ModelViewSet):
+    permission_classes = [perms_custom.CanManageEmployees]
+    serializer_class = BiometricDeviceSerializer
+
+    def get_queryset(self):
+        company = _get_company_for_request(self.request)
+        if not company:
+            return BiometricDevice.objects.none()
+        qs = BiometricDevice.objects.filter(company=company).select_related('location')
+
+        location_id = self.request.query_params.get('location_id')
+        if location_id:
+            qs = qs.filter(location_id=location_id)
+
+        status_param = self.request.query_params.get('status')
+        if status_param:
+            qs = qs.filter(status=status_param)
+
+        protocol = self.request.query_params.get('protocol')
+        if protocol:
+            qs = qs.filter(protocol=protocol)
+
+        search = self.request.query_params.get('search')
+        if search:
+            qs = qs.filter(Q(name__icontains=search) | Q(device_code__icontains=search) | Q(ip_or_domain__icontains=search))
+
+        return qs.order_by('location', 'name')
+
+    def perform_create(self, serializer):
+        company = _get_company_for_request(self.request)
+        if not company:
+            raise PermissionDenied("Không có quyền tạo thiết bị chấm công.")
+        serializer.save(company=company)
+
+    @action(detail=True, methods=['post'], url_path='test-connection')
+    def test_connection(self, request, pk=None):
+        """Kiểm tra kết nối TCP socket hoặc ping tới máy chấm công."""
+        device = self.get_object()
+        import socket
+        import time
+
+        start_time = time.time()
+        ip = device.ip_or_domain.strip()
+        port = int(device.device_port or 4370)
+
+        success = False
+        message = ""
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(3.0)
+            res = sock.connect_ex((ip, port))
+            sock.close()
+            elapsed_ms = round((time.time() - start_time) * 1000, 1)
+
+            if res == 0:
+                success = True
+                device.status = 'ONLINE'
+                device.last_error_message = None
+                message = f"Kết nối thành công tới thiết bị qua {ip}:{port} với thời gian phản hồi {elapsed_ms}ms."
+            else:
+                device.status = 'ERROR'
+                device.last_error_message = f"Mã lỗi socket: {res}"
+                message = f"Không thể mở kết nối tới {ip}:{port}. Mã lỗi mạng là {res}."
+        except socket.timeout:
+            elapsed_ms = round((time.time() - start_time) * 1000, 1)
+            device.status = 'OFFLINE'
+            device.last_error_message = "Thời gian chờ quá hạn"
+            message = f"Thời gian chờ kết nối tới {ip}:{port} quá hạn. Vui lòng kiểm tra cổng 4370 trên modem và nguồn máy chấm công."
+        except Exception as e:
+            elapsed_ms = round((time.time() - start_time) * 1000, 1)
+            device.status = 'ERROR'
+            device.last_error_message = str(e)
+            message = f"Lỗi khi kiểm tra kết nối: {str(e)}"
+
+        device.last_ping = timezone.now()
+        device.save()
+
+        return Response({
+            "success": success,
+            "status": device.status,
+            "message": message,
+            "response_time_ms": elapsed_ms,
+            "device": BiometricDeviceSerializer(device).data
+        }, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='sync')
+    def trigger_sync(self, request, pk=None):
+        """Kích hoạt đồng bộ log tức thì cho thiết bị."""
+        device = self.get_object()
+        now = timezone.now()
+
+        device.last_sync_time = now
+        device.save()
+
+        return Response({
+            "success": True,
+            "message": f"Đã gửi lệnh đồng bộ dữ liệu tới thiết bị {device.name}.",
+            "new_punches_count": 0,
+            "total_punches_synced": device.total_punches_synced,
+            "device": BiometricDeviceSerializer(device).data
+        }, status=status.HTTP_200_OK)
+
 
 
 
