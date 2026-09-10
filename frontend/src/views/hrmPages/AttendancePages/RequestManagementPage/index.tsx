@@ -81,8 +81,8 @@ const REQUEST_TYPES = [
   { value: 'LEAVE', label: 'Đơn xin nghỉ', icon: <EventBusyIcon fontSize="small" /> },
   { value: 'REGULARISATION', label: 'Cập nhật công', icon: <AddTaskIcon fontSize="small" /> },
   { value: 'BUSINESS_TRIP', label: 'Đi công tác', icon: <FlightTakeoffIcon fontSize="small" /> },
-  { value: 'OVERTIME', label: 'Làm thêm giờ (OT)', icon: <MoreTimeIcon fontSize="small" /> },
-  { value: 'LATE_EARLY', label: 'Đi muộn/Về sớm', icon: <ScheduleSendIcon fontSize="small" /> },
+  { value: 'OVERTIME', label: 'Làm thêm giờ', icon: <MoreTimeIcon fontSize="small" /> },
+  { value: 'LATE_EARLY', label: 'Đi muộn, về sớm', icon: <ScheduleSendIcon fontSize="small" /> },
 ];
 
 export default function RequestManagementPage() {
@@ -693,8 +693,8 @@ export default function RequestManagementPage() {
                   <MenuItem value="LEAVE">Đơn xin nghỉ</MenuItem>
                   <MenuItem value="REGULARISATION">Đề nghị cập nhật công</MenuItem>
                   <MenuItem value="BUSINESS_TRIP">Đề nghị đi công tác</MenuItem>
-                  <MenuItem value="OVERTIME">Đơn làm thêm giờ (OT)</MenuItem>
-                  <MenuItem value="LATE_EARLY">Đơn đi muộn / về sớm</MenuItem>
+                  <MenuItem value="OVERTIME">Đơn làm thêm giờ</MenuItem>
+                  <MenuItem value="LATE_EARLY">Đơn đi muộn, về sớm</MenuItem>
                 </TextField>
               </Grid>
 
@@ -783,7 +783,7 @@ export default function RequestManagementPage() {
               {createForm.request_type === 'OVERTIME' && (
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5, color: '#334155' }}>
-                    Số giờ làm thêm (OT) *
+                    Số giờ làm thêm *
                   </Typography>
                   <TextField
                     type="number"

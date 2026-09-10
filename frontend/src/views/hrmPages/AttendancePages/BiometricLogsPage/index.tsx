@@ -89,7 +89,7 @@ export default function BiometricLogsPage() {
     punch_time: `${todayStr}T08:00:00`,
     punch_type: 'AUTO',
     source: 'MANUAL',
-    device_name: 'Máy chấm công Cổng chính (ZKTeco)',
+    device_name: 'Máy chấm công Cổng chính',
   });
 
   const handleOpenCreate = () => {
@@ -99,7 +99,7 @@ export default function BiometricLogsPage() {
       punch_time: `${todayStr}T08:00:00`,
       punch_type: 'AUTO',
       source: 'MANUAL',
-      device_name: 'Máy chấm công Cổng chính (ZKTeco)',
+      device_name: 'Máy chấm công Cổng chính',
     });
     setOpenModal(true);
   };
@@ -173,7 +173,7 @@ export default function BiometricLogsPage() {
     if (type === 'CHECK_IN') {
       return (
         <Chip
-          label="VÀO (Check In)"
+          label="Giờ vào"
           size="small"
           sx={{ height: 22, fontSize: '0.6875rem', fontWeight: 700, bgcolor: '#DCFCE7', color: '#15803D' }}
         />
@@ -182,7 +182,7 @@ export default function BiometricLogsPage() {
     if (type === 'CHECK_OUT') {
       return (
         <Chip
-          label="RA (Check Out)"
+          label="Giờ ra"
           size="small"
           sx={{ height: 22, fontSize: '0.6875rem', fontWeight: 700, bgcolor: '#FFEDD5', color: '#C2410C' }}
         />
@@ -190,7 +190,7 @@ export default function BiometricLogsPage() {
     }
     return (
       <Chip
-        label="Tự động (AUTO)"
+        label="Tự động"
         size="small"
         sx={{ height: 22, fontSize: '0.6875rem', fontWeight: 600, bgcolor: '#F1F5F9', color: '#475569' }}
       />
@@ -230,10 +230,10 @@ export default function BiometricLogsPage() {
         >
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 700, color: '#0F172A', mb: 0.5 }}>
-              Dữ liệu máy chấm công (Biometric Punch Logs)
+              Dữ liệu máy chấm công
             </Typography>
             <Typography variant="body2" sx={{ color: '#64748B' }}>
-              Tiếp nhận dữ liệu quẹt thẻ thô từ cổng TCP 4200 (ZKTeco), đối chiếu ca làm việc để tính giờ công tự động
+              Tiếp nhận dữ liệu quẹt thẻ từ máy chấm công kết nối mạng, đối chiếu ca làm việc để tính giờ công tự động
             </Typography>
           </Box>
 
@@ -500,9 +500,9 @@ export default function BiometricLogsPage() {
                 onChange={(e) => setPunchForm({ ...punchForm, punch_type: e.target.value })}
                 sx={inputSx}
               >
-                <MenuItem value="AUTO">Tự động (Hệ thống tự nhận diện vào/ra)</MenuItem>
-                <MenuItem value="CHECK_IN">Giờ vào (Check In)</MenuItem>
-                <MenuItem value="CHECK_OUT">Giờ ra (Check Out)</MenuItem>
+                <MenuItem value="AUTO">Tự động nhận diện</MenuItem>
+                <MenuItem value="CHECK_IN">Giờ vào</MenuItem>
+                <MenuItem value="CHECK_OUT">Giờ ra</MenuItem>
               </TextField>
 
               <TextField

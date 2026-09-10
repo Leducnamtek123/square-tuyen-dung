@@ -408,7 +408,7 @@ export default function SummaryTimesheetPage() {
               </Box>
               <Box>
                 <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
-                  Tổng làm thêm (OT)
+                  Tổng giờ làm thêm
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 700, color: '#7E22CE', lineHeight: 1.2 }}>
                   {kpiStats.totalOTHours} giờ
@@ -672,7 +672,7 @@ export default function SummaryTimesheetPage() {
         </DialogTitle>
         <DialogContent sx={{ pt: 2.5 }}>
           <Alert severity="info" sx={{ mb: 2.5, borderRadius: 2 }}>
-            Hành động này sẽ khóa bảng chấm công và tự động tính toán lương theo quy chuẩn pháp luật Việt Nam (BHXH, BHYT, BHTN, Giảm trừ gia cảnh và Thuế TNCN lũy tiến) vào phân hệ <strong>Bảng lương (Payroll)</strong>.
+            Hành động này sẽ khóa bảng chấm công và tự động tính toán chi tiết tiền lương theo các quy định hiện hành vào phân hệ <strong>Bảng lương</strong>.
           </Alert>
 
           {pushConfirmModal.summary && (
@@ -682,7 +682,7 @@ export default function SummaryTimesheetPage() {
                   Nhân viên:
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                  {pushConfirmModal.summary.employee_name} ({pushConfirmModal.summary.employee_code})
+                  {pushConfirmModal.summary.employee_name} • Mã {pushConfirmModal.summary.employee_code}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>

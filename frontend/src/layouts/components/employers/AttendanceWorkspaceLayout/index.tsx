@@ -368,8 +368,8 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
                 <DescriptionOutlinedIcon fontSize="small" sx={{ color: '#2563EB' }} />
               </ListItemIcon>
               <ListItemText
-                primary="Tất cả đơn từ (Trung tâm duyệt)"
-                secondary="Quy trình 2 cấp Quản lý ➔ HR"
+                primary="Tất cả đơn từ"
+                secondary="Quy trình duyệt 2 cấp Quản lý và Nhân sự"
                 primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: 600 }}
                 secondaryTypographyProps={{ fontSize: '0.75rem' }}
               />
@@ -417,7 +417,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
               <ListItemIcon>
                 <MoreTimeOutlinedIcon fontSize="small" sx={{ color: '#7C3AED' }} />
               </ListItemIcon>
-              <ListItemText primary="Đơn làm thêm giờ (OT)" primaryTypographyProps={{ fontSize: '0.875rem' }} />
+              <ListItemText primary="Đơn làm thêm giờ" primaryTypographyProps={{ fontSize: '0.875rem' }} />
             </MenuItem>
             <MenuItem
               onClick={() => {
@@ -428,7 +428,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
               <ListItemIcon>
                 <ScheduleSendOutlinedIcon fontSize="small" sx={{ color: '#D97706' }} />
               </ListItemIcon>
-              <ListItemText primary="Đơn đi muộn / về sớm" primaryTypographyProps={{ fontSize: '0.875rem' }} />
+              <ListItemText primary="Đơn đi muộn, về sớm" primaryTypographyProps={{ fontSize: '0.875rem' }} />
             </MenuItem>
           </Menu>
 

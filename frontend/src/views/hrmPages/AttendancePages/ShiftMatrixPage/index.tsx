@@ -415,16 +415,16 @@ export default function ShiftMatrixPage() {
             <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
               Ghi chú:
             </Typography>
-            {shifts.slice(0, 3).map((s) => (
+            {shifts.map((s) => (
               <Chip
                 key={s.id}
-                label={`${s.code} (${s.start_time?.slice(0, 5)}-${s.end_time?.slice(0, 5)})`}
+                label={`${s.code}: ${s.start_time?.slice(0, 5)} - ${s.end_time?.slice(0, 5)}`}
                 size="small"
                 sx={{ height: 22, fontSize: '0.6875rem', backgroundColor: '#EFF6FF', color: '#1D4ED8' }}
               />
             ))}
             <Chip
-              label="OFF (Nghỉ)"
+              label="Ngày nghỉ"
               size="small"
               sx={{ height: 22, fontSize: '0.6875rem', backgroundColor: '#F1F5F9', color: '#64748B' }}
             />
@@ -598,7 +598,7 @@ export default function ShiftMatrixPage() {
                               }}
                             />
                           ) : shiftCode ? (
-                            <Tooltip title={`${asg.shift_name || shiftCode} (Click để sửa)`}>
+                            <Tooltip title={asg.shift_name || shiftCode}>
                               <Chip
                                 label={shiftCode}
                                 size="small"
@@ -681,7 +681,7 @@ export default function ShiftMatrixPage() {
                       color="primary"
                     />
                   }
-                  label="Đánh dấu là ngày nghỉ (OFF)"
+                  label="Đánh dấu là ngày nghỉ tuần"
                   sx={{ mt: 0.5 }}
                 />
               </Grid>
@@ -864,14 +864,14 @@ export default function ShiftMatrixPage() {
             sx={inputSx}
           >
             <MenuItem value="">
-              <em>-- Chưa phân ca (Xóa phân ca) --</em>
+              <em>-- Chưa phân ca --</em>
             </MenuItem>
             <MenuItem value="OFF">
-              <strong>OFF - Ngày nghỉ</strong>
+              <strong>Ngày nghỉ tuần</strong>
             </MenuItem>
             {shifts.map((s) => (
               <MenuItem key={s.id} value={String(s.id)}>
-                {s.code} - {s.name} ({s.start_time?.slice(0, 5)} - {s.end_time?.slice(0, 5)})
+                {s.code} - {s.name}: {s.start_time?.slice(0, 5)} đến {s.end_time?.slice(0, 5)}
               </MenuItem>
             ))}
           </TextField>

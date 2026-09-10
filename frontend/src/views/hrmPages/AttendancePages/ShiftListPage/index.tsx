@@ -553,7 +553,7 @@ export default function ShiftListPage() {
                       color="primary"
                     />
                   }
-                  label="Ca qua đêm (vắt qua ngày hôm sau)"
+                  label="Ca làm việc qua đêm"
                 />
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>

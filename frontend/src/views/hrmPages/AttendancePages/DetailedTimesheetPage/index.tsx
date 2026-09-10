@@ -615,7 +615,7 @@ export default function DetailedTimesheetPage() {
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="body2" sx={{ color: '#64748B' }}>
-                  Giờ vào (Check-in):
+                  Giờ vào:
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                   {cellDetail.record.checkIn || cellDetail.record.check_in || '-'}
@@ -623,7 +623,7 @@ export default function DetailedTimesheetPage() {
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="body2" sx={{ color: '#64748B' }}>
-                  Giờ ra (Check-out):
+                  Giờ ra:
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                   {cellDetail.record.checkOut || cellDetail.record.check_out || '-'}
@@ -712,11 +712,11 @@ export default function DetailedTimesheetPage() {
                 onChange={(e) => setCheckinForm({ ...checkinForm, status: e.target.value })}
                 sx={inputSx}
               >
-                <MenuItem value="PRESENT">Đủ công (Có mặt)</MenuItem>
+                <MenuItem value="PRESENT">Đủ công</MenuItem>
                 <MenuItem value="LATE">Đi muộn</MenuItem>
                 <MenuItem value="EARLY_LEAVE">Về sớm</MenuItem>
                 <MenuItem value="ON_LEAVE">Nghỉ phép</MenuItem>
-                <MenuItem value="ABSENT">Vắng mặt (Không phép)</MenuItem>
+                <MenuItem value="ABSENT">Vắng mặt không phép</MenuItem>
               </TextField>
 
               <Stack direction="row" spacing={2}>

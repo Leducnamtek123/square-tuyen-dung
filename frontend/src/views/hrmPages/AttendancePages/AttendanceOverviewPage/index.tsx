@@ -319,14 +319,14 @@ export default function AttendanceOverviewPage() {
           },
           {
             title: 'Trung tâm quản lý đơn từ',
-            desc: 'Phê duyệt 2 cấp đơn xin nghỉ, cập nhật công, OT, công tác',
+            desc: 'Phê duyệt 2 cấp đơn xin nghỉ, cập nhật công, làm thêm giờ, công tác',
             icon: <DescriptionOutlinedIcon sx={{ color: '#EA580C' }} />,
             url: '/employer/hrm/attendances/requests',
             bg: '#FFF7ED',
           },
           {
             title: 'Dữ liệu máy chấm công',
-            desc: 'Log quẹt thẻ ZKTeco (TCP 4200) và dữ liệu Import Excel',
+            desc: 'Log quẹt thẻ máy chấm công và dữ liệu nhập từ Excel',
             icon: <FingerprintOutlinedIcon sx={{ color: '#0284C7' }} />,
             url: '/employer/hrm/attendances/biometric-logs',
             bg: '#F0F9FF',
