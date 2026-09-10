@@ -14,6 +14,7 @@ import {
   Alert,
   Divider,
   Snackbar,
+  CircularProgress,
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
@@ -62,6 +63,9 @@ interface AttendanceSettingsState {
   syncLeaveBalance: boolean;
 
   // Biometric device integration
+  biometricHost: string;
+  biometricDevicePort: number;
+  commKey: string;
   biometricPort: number;
   syncIntervalMinutes: number;
   autoProcessPunches: boolean;
@@ -82,6 +86,9 @@ const DEFAULT_SETTINGS: AttendanceSettingsState = {
   lockCutoffDay: 25,
   autoLockAfterPayrollPush: true,
   syncLeaveBalance: true,
+  biometricHost: 'Squareely.ddns.net',
+  biometricDevicePort: 4370,
+  commKey: '123456',
   biometricPort: 4200,
   syncIntervalMinutes: 15,
   autoProcessPunches: true,
@@ -127,6 +134,48 @@ export default function AttendanceSettingsPage() {
       setShowToast(true);
     } catch {
       // Ignore
+    }
+  };
+
+  const [testingConnection, setTestingConnection] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<{
+    tested: boolean;
+    success: boolean;
+    message: string;
+  } | null>(null);
+
+  const handleTestConnection = async () => {
+    setTestingConnection(true);
+    setConnectionStatus(null);
+    try {
+      const res = await fetch('http://localhost:4200/api/zk/devices');
+      if (res.ok) {
+        const devices = await res.json();
+        const activeDev = devices[0];
+        if (activeDev && activeDev.status === 'online') {
+          setConnectionStatus({
+            tested: true,
+            success: true,
+            message: `Kết nối thành công tới ${activeDev.name} qua địa chỉ ${activeDev.ip_address}:${activeDev.port}. Đã đồng bộ ${activeDev.total_punches_synced} bản ghi.`,
+          });
+        } else {
+          setConnectionStatus({
+            tested: true,
+            success: false,
+            message: `Không thể kết nối trực tiếp đến ${settings.biometricHost}:${settings.biometricDevicePort} do máy đang ngoại tuyến hoặc cổng mạng 4370 chưa được chuyển tiếp trên modem văn phòng.`,
+          });
+        }
+      } else {
+        throw new Error('Dịch vụ phản hồi lỗi');
+      }
+    } catch {
+      setConnectionStatus({
+        tested: true,
+        success: false,
+        message: `Không thể kết nối đến thiết bị qua địa chỉ ${settings.biometricHost}:${settings.biometricDevicePort}. Vui lòng kiểm tra nguồn điện máy chấm công, dây mạng và cấu hình mở cổng 4370 trên modem router.`,
+      });
+    } finally {
+      setTestingConnection(false);
     }
   };
 
@@ -707,7 +756,53 @@ export default function AttendanceSettingsPage() {
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, sm: 4 }}>
                 <Typography variant="body2" sx={{ fontWeight: 600, color: '#334155', mb: 0.5 }}>
-                  Cổng kết nối máy chấm công
+                  Địa chỉ máy chấm công
+                </Typography>
+                <TextField
+                  fullWidth
+                  value={settings.biometricHost}
+                  onChange={(e) =>
+                    setSettings({ ...settings, biometricHost: e.target.value })
+                  }
+                  helperText="Tên miền động hoặc địa chỉ IP của thiết bị, ví dụ Squareely.ddns.net"
+                  sx={inputSx}
+                />
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, color: '#334155', mb: 0.5 }}>
+                  Cổng thiết bị máy chấm công
+                </Typography>
+                <TextField
+                  type="number"
+                  fullWidth
+                  value={settings.biometricDevicePort}
+                  onChange={(e) =>
+                    setSettings({ ...settings, biometricDevicePort: Number(e.target.value) })
+                  }
+                  helperText="Cổng giao tiếp phần cứng tiêu chuẩn là 4370"
+                  sx={inputSx}
+                />
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, color: '#334155', mb: 0.5 }}>
+                  Mật mã kết nối máy chấm công
+                </Typography>
+                <TextField
+                  fullWidth
+                  value={settings.commKey}
+                  onChange={(e) =>
+                    setSettings({ ...settings, commKey: e.target.value })
+                  }
+                  helperText="Mật mã kết nối thiết lập trên máy, ví dụ 123456"
+                  sx={inputSx}
+                />
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, color: '#334155', mb: 0.5 }}>
+                  Cổng dịch vụ trung gian trên máy chủ
                 </Typography>
                 <TextField
                   type="number"
@@ -716,14 +811,14 @@ export default function AttendanceSettingsPage() {
                   onChange={(e) =>
                     setSettings({ ...settings, biometricPort: Number(e.target.value) })
                   }
-                  helperText="Cổng mạng tiêu chuẩn dành cho thiết bị chấm công (mặc định: 4200)"
+                  helperText="Cổng dịch vụ nhận dữ liệu nền, mặc định là 4200"
                   sx={inputSx}
                 />
               </Grid>
 
               <Grid size={{ xs: 12, sm: 4 }}>
                 <Typography variant="body2" sx={{ fontWeight: 600, color: '#334155', mb: 0.5 }}>
-                  Chu kỳ tự động quét & kéo log
+                  Chu kỳ tự động quét và kéo dữ liệu
                 </Typography>
                 <TextField
                   select
@@ -759,11 +854,55 @@ export default function AttendanceSettingsPage() {
                           Tự động đối chiếu ca làm việc
                         </Typography>
                         <Typography variant="caption" sx={{ color: '#64748B' }}>
-                          Tính toán công và đi muộn ngay khi log mới được ghi nhận
+                          Tính toán công và đi muộn ngay khi dữ liệu mới được ghi nhận
                         </Typography>
                       </Box>
                     }
                   />
+                </Box>
+              </Grid>
+
+              {/* Box hướng dẫn & Kiểm tra kết nối */}
+              <Grid size={{ xs: 12 }}>
+                <Box
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 2,
+                    backgroundColor: '#F8FAFC',
+                    border: '1px solid #E2E8F0',
+                  }}
+                >
+                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="space-between" alignItems={{ sm: 'center' }}>
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.5 }}>
+                        Trạng thái kết nối máy chấm công
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#64748B' }}>
+                        Địa chỉ hiện tại: {settings.biometricHost}:{settings.biometricDevicePort} với mật mã {settings.commKey}. Dịch vụ máy chủ kéo log tự động mỗi {settings.syncIntervalMinutes} phút.
+                      </Typography>
+                    </Box>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={handleTestConnection}
+                      disabled={testingConnection}
+                      startIcon={testingConnection ? <CircularProgress size={16} color="inherit" /> : <RouterOutlinedIcon />}
+                      sx={{ textTransform: 'none', fontWeight: 600, px: 2.5, py: 1, borderRadius: 2 }}
+                    >
+                      {testingConnection ? 'Đang kiểm tra...' : 'Kiểm tra kết nối thiết bị'}
+                    </Button>
+                  </Stack>
+
+                  {connectionStatus && (
+                    <Box sx={{ mt: 2 }}>
+                      <Alert
+                        severity={connectionStatus.success ? 'success' : 'warning'}
+                        sx={{ borderRadius: 2, fontSize: '0.85rem' }}
+                      >
+                        {connectionStatus.message}
+                      </Alert>
+                    </Box>
+                  )}
                 </Box>
               </Grid>
             </Grid>
