@@ -362,54 +362,76 @@ services:
       - data-net
 
   # ---------------------------------------------------------------------------
-  # Local AI Services are disabled because LLM/STT/TTS run on FPT GPU.
-  # Uncomment this block only when intentionally running inference locally.
   # ---------------------------------------------------------------------------
-  # whisper:
-  #   container_name: tuyendung-studio-whisper
-  #   build:
-  #     context: ./voice-ai/inference/whisper
-  #   profiles: ["local-ai"]
-  #   init: true
-  #   environment:
-  #     - VOXBOX_HF_REPO_ID=${VOXBOX_HF_REPO_ID:-Systran/faster-whisper-large-v3}
-  #     - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cpu}
-  #     - DATA_DIR=${WHISPER_DATA_DIR:-/data}
-  #   volumes:
-  #     - whisper-data:/data
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/v1/models > /dev/null"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 20
-  #     start_period: 60s
-  #   restart: always
-  #   networks:
-  #     - app-net
+  # Local Voice AI Inference Services (Whisper STT & VieNeu TTS on GPU)
+  # ---------------------------------------------------------------------------
+  whisper:
+    container_name: tuyendung-studio-whisper
+    image: voice-ai-whisper:latest
+    build:
+      context: ./voice-ai/inference/whisper
+    environment:
+      - VOXBOX_HF_REPO_ID=${VOXBOX_HF_REPO_ID:-deepdml/faster-whisper-large-v3-turbo-ct2}
+      - VOXBOX_DEVICE=cuda
+      - DATA_DIR=/data
+    volumes:
+      - whisper-data:/data
+    ports:
+      - "11437:8080"
+    expose:
+      - "8080"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/v1/models > /dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+    restart: always
+    networks:
+      - app-net
 
-  # vieneu-tts:
-  #   container_name: tuyendung-studio-tts
-  #   build:
-  #     context: ./voice-ai/inference/vieneu-text-to-speech
-  #   profiles: ["local-ai"]
-  #   init: true
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     - PORT=${VIENEU_TTS_PORT:-8298}
-  #     - TTS_DEVICE=${TTS_DEVICE:-cuda}
-  #     - TTS_MODE=${TTS_MODE:-turbo_gpu}
-  #   volumes:
-  #     - huggingface-cache:/root/.cache/huggingface
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:$${PORT:-8298}/health > /dev/null"]
-  #     interval: 10s
-  #     timeout: 10s
-  #     retries: 120
-  #     start_period: 20m
-  #   restart: always
-  #   networks:
-  #     - app-net
+  vieneu-tts:
+    container_name: tuyendung-studio-vieneu-tts
+    image: voice-ai-vieneu:latest
+    build:
+      context: ./voice-ai/inference/vieneu-text-to-speech
+    env_file:
+      - .env
+    environment:
+      - PORT=8298
+      - TTS_DEVICE=cuda
+      - TTS_MODE=v3turbo
+      - TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS-v3-Turbo
+      - HF_HOME=/models/huggingface
+    volumes:
+      - huggingface-cache:/models/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    expose:
+      - "8298"
+    ports:
+      - "8298:8298"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8298/health > /dev/null"]
+      interval: 20s
+      timeout: 10s
+      retries: 20
+      start_period: 2m
+    networks:
+      - app-net
 
   livekit-agent:
     container_name: tuyendung-studio-livekit-agent
@@ -424,46 +446,19 @@ services:
       - LIVEKIT_AGENT_NAME=square-ai-interviewer
       - STT_LANGUAGE=${STT_LANGUAGE:-vi}
       - TTS_VOICE=${TTS_VOICE:-Ly}
-
     depends_on:
       backend:
         condition: service_started
       livekit:
         condition: service_healthy
-    # Needed only when enabling local Docker/host AI fallback.
-    # extra_hosts:
-    #   - "host.docker.internal:host-gateway"
+      whisper:
+        condition: service_healthy
+      vieneu-tts:
+        condition: service_healthy
     restart: always
     networks:
       - app-net
       - data-net
-
-  vieneu-tts:
-    container_name: tuyendung-studio-vieneu-tts
-    build:
-      context: ./voice-ai/inference/vieneu-text-to-speech
-    env_file:
-      - .env
-    environment:
-      - PORT=8298
-      - TTS_DEVICE=cpu
-      - TTS_MODE=turbo
-      - TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS-v2-Turbo-GGUF
-      - TTS_GGUF_FILENAME=vieneu-tts-v2-turbo.gguf
-      - HF_HOME=/models/huggingface
-    expose:
-      - "8298"
-    ports:
-      - "8298:8298"
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:8298/health > /dev/null"]
-      interval: 20s
-      timeout: 10s
-      retries: 20
-      start_period: 2m
-    networks:
-      - app-net
 
   # ---------------------------------------------------------------------------
   # MinIO (Object Storage)
@@ -557,8 +552,7 @@ networks:
 
 volumes:
   db_data:
-  # Local AI volumes are disabled while using FPT GPU.
-  # huggingface-cache:
-  # whisper-data:
+  huggingface-cache:
+  whisper-data:
   minio-data:
   elasticsearch-data:
