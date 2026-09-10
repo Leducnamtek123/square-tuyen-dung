@@ -121,6 +121,8 @@ const Header = (_props: HeaderProps) => {
     [HOST_NAME.PROJECT]: [
       { id: '1', label: t('nav.jobs'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language), isHighlight: true },
       { id: '2', label: t('nav.companies'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.COMPANY}`, i18n.language) },
+      { id: 'salary', label: t('nav.salary', 'Tra cứu lương'), path: localizeRoutePath('/salary', i18n.language) },
+      { id: 'practice', label: t('nav.practice', 'Luyện phỏng vấn AI'), path: localizeRoutePath('/practice', i18n.language) },
       { id: 'cv', label: t('nav.createCv', 'Tạo CV'), path: localizeRoutePath('/tao-cv', i18n.language) },
       {
         id: '3',
