@@ -580,19 +580,53 @@ export interface MockSessionResponse extends InterviewSession {
   livekitToken?: string;
 }
 
+export interface InterviewEvaluationRubric {
+  criteria?: Array<{
+    name: string;
+    weight: number;
+    description?: string;
+  }>;
+  [key: string]: unknown;
+}
+
 export interface QuestionGroup {
   id: number;
   name: string;
   description?: string;
   author?: UserDict;
   company?: number;
-  evaluation_rubric?: any;
+  evaluation_rubric?: InterviewEvaluationRubric | null;
   questions?: Question[];
   questionIds?: number[];
   question_ids?: number[]; // Raw API payload field
   canWrite?: boolean;
   createAt?: string;
   updateAt?: string;
+}
+
+export interface InterviewSessionMetadata {
+  position_title?: string;
+  job_title?: string;
+  category?: string;
+  career_id?: number | null;
+  total_questions?: number;
+  current_question_index?: number;
+  [key: string]: unknown;
+}
+
+export interface QuestionHintsDetailResponse {
+  id: number;
+  text: string;
+  question_text?: string;
+  category?: string;
+  category_display?: string;
+  difficulty?: number | string;
+  difficulty_display?: string;
+  default_duration_seconds?: number;
+  answer_structure?: QuestionAnswerStructure | null;
+  interviewer_intent?: string;
+  important_tips?: QuestionImportantTip[] | null;
+  follow_up_questions?: string[] | null;
 }
 
 export interface InterviewSession {
@@ -647,10 +681,12 @@ export interface InterviewSession {
   session_type?: 'official' | 'mock' | string;
   timeLimitPerQuestion?: number;
   time_limit_per_question?: number;
-  sessionMetadata?: any;
-  session_metadata?: any;
+  sessionMetadata?: InterviewSessionMetadata | null;
+  session_metadata?: InterviewSessionMetadata | null;
   livekitToken?: string;
   livekit_token?: string;
+  interview_url?: string;
+  interviewUrl?: string;
 }
 
 export interface InterviewTranscript {

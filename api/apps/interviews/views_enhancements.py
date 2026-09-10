@@ -94,7 +94,12 @@ class CreateMockSessionView(APIView):
         serializer.is_valid(raise_exception=True)
 
         career_id = serializer.validated_data.get('career_id')
-        position_title = serializer.validated_data.get('position_title', 'Phỏng vấn thử AI')
+        position_title = (
+            serializer.validated_data.get('job_title') or
+            serializer.validated_data.get('position_title') or
+            'Phỏng vấn thử AI'
+        )
+        category = serializer.validated_data.get('category')
         question_count = serializer.validated_data.get('question_count', 6)
 
         # Xác định user ứng viên (hoặc fallback nếu user chưa đăng nhập)
@@ -112,6 +117,9 @@ class CreateMockSessionView(APIView):
         if career_id:
             qs_career = list(Question.objects.filter(career_id=career_id))
             candidate_questions.extend(qs_career)
+        elif category and category != 'Tất cả ngành nghề':
+            qs_cat = list(Question.objects.filter(Q(category__icontains=category) | Q(career__name__icontains=category)))
+            candidate_questions.extend(qs_cat)
 
         # Bổ sung câu hỏi chung nếu chưa đủ số lượng
         remaining = question_count - len(candidate_questions)
@@ -137,6 +145,7 @@ class CreateMockSessionView(APIView):
             session_metadata={
                 "position_title": position_title,
                 "career_id": career_id,
+                "category": category,
                 "total_questions": len(selected_questions),
             }
         )
@@ -176,6 +185,10 @@ class SalaryBenchmarkListView(generics.ListAPIView):
         if career_id:
             qs = qs.filter(career_id=career_id)
 
+        category = self.request.query_params.get('category')
+        if category and category != 'Tất cả ngành nghề':
+            qs = qs.filter(Q(career__name__icontains=category) | Q(position_title__icontains=category))
+
         search = self.request.query_params.get('search')
         if search:
             qs = qs.filter(
@@ -183,7 +196,7 @@ class SalaryBenchmarkListView(generics.ListAPIView):
                 Q(career__name__icontains=search)
             )
 
-        experience = self.request.query_params.get('experience_level')
+        experience = self.request.query_params.get('experience_level') or self.request.query_params.get('seniority')
         if experience:
             qs = qs.filter(experience_level=experience)
 

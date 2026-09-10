@@ -47,11 +47,9 @@ export const SalaryBenchmarkPage: React.FC = () => {
         search: searchQuery.trim() || undefined,
       });
 
-      const data = Array.isArray(res)
-        ? res
-        : (res?.results || (res as any)?.data?.results || (res as any)?.data || []);
+      const data = Array.isArray(res) ? res : (res?.results ?? []);
       setBenchmarks(data);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to fetch salary benchmarks:', err);
       toast.error('Không thể tải dữ liệu mức lương. Vui lòng thử lại!');
     } finally {

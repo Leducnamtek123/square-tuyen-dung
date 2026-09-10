@@ -64,12 +64,12 @@ export const CandidatePracticePage: React.FC = () => {
         search: searchQuery.trim() || undefined,
       });
 
-      // Format from paginated or array response
+      // Type-safe extraction from PaginatedResponse<QuestionBankItem>
       const results = Array.isArray(res)
         ? res
-        : (res?.results || (res as any)?.data?.results || (res as any)?.data || []);
+        : (res?.results ?? []);
       setQuestions(results);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to fetch question bank:', err);
       toast.error('Không thể tải danh sách câu hỏi. Vui lòng thử lại!');
     } finally {
@@ -94,19 +94,21 @@ export const CandidatePracticePage: React.FC = () => {
         question_count: customPayload?.question_count || mockCount,
       };
 
-      const res = await interviewService.createMockSession(payload);
-      const data = res.data;
+      const session = await interviewService.createMockSession(payload);
 
       toast.success('Đã khởi tạo phòng phỏng vấn thử thành công!');
 
-      if (data?.interview_url) {
-        router.push(data.interview_url);
-      } else if (data?.session_id) {
-        router.push(`/interview/${data.session_id}`);
+      const targetUrl =
+        session.interview_url ||
+        session.interviewUrl ||
+        (session.id ? `/interview/${session.id}` : undefined);
+
+      if (targetUrl) {
+        router.push(targetUrl);
       } else {
         router.push('/my-interviews');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to create mock interview session:', err);
       toast.error('Khởi tạo buổi phỏng vấn thử thất bại. Vui lòng thử lại!');
       setIsStartingMock(false);

@@ -1,6 +1,13 @@
 import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
-import type { InterviewSession, InterviewEvaluation } from '../types/models';
+import type {
+  InterviewSession,
+  InterviewEvaluation,
+  QuestionBankItem,
+  QuestionHintsDetailResponse,
+  CreateMockSessionPayload,
+  MockSessionResponse,
+} from '../types/models';
 import type { PaginatedResponse } from '../types/api';
 import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 
@@ -205,19 +212,19 @@ const interviewService = {
       .then(unwrapDataResponse<SessionMetrics>);
   },
 
-  getQuestionBank: (params?: { search?: string; career_id?: number; difficulty?: number; category?: string; seniority?: string }): Promise<PaginatedResponse<any>> => {
+  getQuestionBank: (params?: { search?: string; career_id?: number; difficulty?: number; category?: string; seniority?: string }): Promise<PaginatedResponse<QuestionBankItem>> => {
     const url = 'interview/web/questions/bank/';
-    return httpRequest.get(url, { params }).then((data) => normalizePaginatedResponse(data));
+    return httpRequest.get(url, { params }).then((data) => normalizePaginatedResponse<QuestionBankItem>(data));
   },
 
-  getQuestionHints: (questionId: IdType): Promise<any> => {
+  getQuestionHints: (questionId: IdType): Promise<QuestionHintsDetailResponse> => {
     const url = `interview/web/questions/${questionId}/hints/`;
-    return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse);
+    return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<QuestionHintsDetailResponse>);
   },
 
-  createMockSession: (data: { career_id?: number | null; position_title?: string; question_count?: number }): Promise<any> => {
+  createMockSession: (data: CreateMockSessionPayload): Promise<MockSessionResponse> => {
     const url = 'interview/web/sessions/create-mock/';
-    return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse);
+    return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<MockSessionResponse>);
   },
 
   getSSEUrl: (sessionId: IdType): string => {
