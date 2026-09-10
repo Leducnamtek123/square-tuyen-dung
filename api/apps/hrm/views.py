@@ -1,5 +1,6 @@
 import csv
 from datetime import timedelta
+from decimal import Decimal
 from django.db import transaction
 from django.db.models import Count, Q, Prefetch
 from django.http import HttpResponse
@@ -42,6 +43,7 @@ from apps.hrm.serializers import (
     MonthlyPayrollRecordSerializer,
     AttendanceRequestSerializer,
     BiometricPunchLogSerializer,
+    MonthlyAttendanceSummarySerializer,
     QuickCheckinSerializer,
     RenewContractSerializer,
     ShiftAssignmentBatchSerializer,
@@ -1192,6 +1194,235 @@ class BiometricPunchLogViewSet(viewsets.ModelViewSet):
             'message': f'Đã tổng hợp dữ liệu chấm công ngày {target_date} cho {count} nhân viên.',
             'count': count,
         }, status=status.HTTP_200_OK)
+
+
+class MonthlyAttendanceSummaryViewSet(viewsets.ModelViewSet):
+    permission_classes = [perms_custom.CanManageEmployees]
+    serializer_class = MonthlyAttendanceSummarySerializer
+
+    def get_queryset(self):
+        company = _get_company_for_request(self.request)
+        if not company:
+            return MonthlyAttendanceSummary.objects.none()
+        qs = MonthlyAttendanceSummary.objects.filter(company=company).select_related(
+            'employee', 'employee__department', 'locked_by'
+        )
+
+        month = self.request.query_params.get('month')
+        year = self.request.query_params.get('year')
+        if month:
+            qs = qs.filter(month=month)
+        if year:
+            qs = qs.filter(year=year)
+
+        employee_id = self.request.query_params.get('employee_id')
+        if employee_id:
+            qs = qs.filter(employee_id=employee_id)
+
+        department_id = self.request.query_params.get('department_id')
+        if department_id:
+            qs = qs.filter(employee__department_id=department_id)
+
+        return qs.order_by('employee__first_name', 'employee__last_name')
+
+    def perform_create(self, serializer):
+        company = _get_company_for_request(self.request)
+        if not company:
+            raise PermissionDenied("Không có quyền thực hiện.")
+        serializer.save(company=company)
+
+    @action(detail=False, methods=['post'], url_path='recalculate')
+    def recalculate(self, request):
+        company = _get_company_for_request(request)
+        if not company:
+            raise PermissionDenied("Không có quyền thực hiện.")
+
+        month = int(request.data.get('month', timezone.now().month))
+        year = int(request.data.get('year', timezone.now().year))
+        employee_ids = request.data.get('employee_ids', [])
+
+        emp_qs = Employee.objects.filter(company=company, status__in=['ACTIVE', 'PROBATION'])
+        if employee_ids:
+            emp_qs = emp_qs.filter(id__in=employee_ids)
+
+        summaries = []
+        for emp in emp_qs:
+            records = AttendanceRecord.objects.filter(
+                employee=emp,
+                date__year=year,
+                date__month=month
+            )
+
+            actual_work_days = Decimal("0.0")
+            paid_leave_days = Decimal("0.0")
+            unpaid_leave_days = Decimal("0.0")
+            ot_weekday = Decimal("0.0")
+            ot_weekend = Decimal("0.0")
+            ot_holiday = Decimal("0.0")
+            late_count = 0
+            early_count = 0
+
+            for rec in records:
+                if rec.status == 'ON_LEAVE':
+                    paid_leave_days += Decimal("1.0")
+                elif rec.status == 'ABSENT':
+                    unpaid_leave_days += Decimal("1.0")
+                elif rec.status in ['PRESENT', 'LATE', 'EARLY_LEAVE']:
+                    if rec.working_hours and rec.working_hours > 0:
+                        work_shift_hrs = rec.shift.working_hours if rec.shift else Decimal("8.00")
+                        ratio = min(Decimal("1.0"), rec.working_hours / work_shift_hrs)
+                        actual_work_days += ratio
+                    else:
+                        unpaid_leave_days += Decimal("1.0")
+
+                if rec.late_minutes > 0:
+                    late_count += 1
+                if rec.early_minutes > 0:
+                    early_count += 1
+
+                if rec.overtime_hours and rec.overtime_hours > 0:
+                    if rec.date.weekday() in [5, 6]:
+                        ot_weekend += rec.overtime_hours
+                    else:
+                        ot_weekday += rec.overtime_hours
+
+            summary, _ = MonthlyAttendanceSummary.objects.update_or_create(
+                company=company,
+                employee=emp,
+                month=month,
+                year=year,
+                defaults={
+                    'standard_work_days': Decimal("22.0"),
+                    'actual_work_days': actual_work_days,
+                    'paid_leave_days': paid_leave_days,
+                    'unpaid_leave_days': unpaid_leave_days,
+                    'overtime_hours_weekday': ot_weekday,
+                    'overtime_hours_weekend': ot_weekend,
+                    'overtime_hours_holiday': ot_holiday,
+                    'late_occurrences': late_count,
+                    'early_occurrences': early_count,
+                }
+            )
+            summaries.append(summary)
+
+        return Response({
+            'message': f'Đã tổng hợp bảng công tháng {month}/{year} cho {len(summaries)} nhân viên.',
+            'count': len(summaries),
+            'summaries': MonthlyAttendanceSummarySerializer(summaries, many=True).data
+        }, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='lock')
+    def lock(self, request, pk=None):
+        company = _get_company_for_request(request)
+        if not company:
+            raise PermissionDenied("Không có quyền thực hiện.")
+        summary = self.get_object()
+
+        reviewer = Employee.objects.filter(company=company, user=request.user).first()
+        summary.is_locked = True
+        summary.locked_by = reviewer
+        summary.locked_at = timezone.now()
+        summary.save()
+
+        AttendanceRecord.objects.filter(
+            employee=summary.employee,
+            date__year=summary.year,
+            date__month=summary.month
+        ).update(is_locked=True)
+
+        return Response(MonthlyAttendanceSummarySerializer(summary).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='unlock')
+    def unlock(self, request, pk=None):
+        company = _get_company_for_request(request)
+        if not company:
+            raise PermissionDenied("Không có quyền thực hiện.")
+        summary = self.get_object()
+
+        summary.is_locked = False
+        summary.locked_by = None
+        summary.locked_at = None
+        summary.save()
+
+        AttendanceRecord.objects.filter(
+            employee=summary.employee,
+            date__year=summary.year,
+            date__month=summary.month
+        ).update(is_locked=False)
+
+        return Response(MonthlyAttendanceSummarySerializer(summary).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='push-to-payroll')
+    def push_to_payroll(self, request, pk=None):
+        company = _get_company_for_request(request)
+        if not company:
+            raise PermissionDenied("Không có quyền thực hiện.")
+        summary = self.get_object()
+
+        if not summary.is_locked:
+            reviewer = Employee.objects.filter(company=company, user=request.user).first()
+            summary.is_locked = True
+            summary.locked_by = reviewer
+            summary.locked_at = timezone.now()
+
+        active_contract = summary.employee.contracts.filter(status='ACTIVE').order_by('-start_date').first()
+        base_salary = getattr(active_contract, 'base_salary', Decimal("10000000"))
+        allowance = getattr(active_contract, 'allowance', Decimal("0"))
+
+        actual_days = int(round(summary.actual_work_days + summary.paid_leave_days))
+        standard_days = int(round(summary.standard_work_days))
+        unpaid_days = int(round(summary.unpaid_leave_days))
+
+        from .payroll_engine import calculate_vietnam_payroll
+        calc = calculate_vietnam_payroll(
+            gross_salary=base_salary,
+            allowance=allowance,
+            bonus=Decimal("0"),
+            working_days_actual=actual_days,
+            standard_working_days=standard_days,
+            unpaid_leave_days=unpaid_days,
+        )
+
+        payroll_rec, _ = MonthlyPayrollRecord.objects.update_or_create(
+            company=company,
+            employee=summary.employee,
+            month=summary.month,
+            year=summary.year,
+            defaults={
+                'gross_salary': calc['gross_salary'],
+                'allowance': calc['allowance'],
+                'bonus': calc['bonus'],
+                'working_days_actual': actual_days,
+                'standard_working_days': standard_days,
+                'unpaid_leave_days': unpaid_days,
+                'dependents_count': calc['tax_deductions']['dependents_count'],
+                'total_income': calc['total_income'],
+                'bhxh_amount': calc['insurance_deductions']['bhxh_8_percent'],
+                'bhyt_amount': calc['insurance_deductions']['bhyt_1_5_percent'],
+                'bhtn_amount': calc['insurance_deductions']['bhtn_1_percent'],
+                'total_insurance': calc['insurance_deductions']['total_insurance'],
+                'employer_bhxh': calc['employer_contributions']['bhxh_17_5_percent'],
+                'employer_bhyt': calc['employer_contributions']['bhyt_3_percent'],
+                'employer_bhtn': calc['employer_contributions']['bhtn_1_percent'],
+                'employer_union_fee': calc['employer_contributions']['union_fee_2_percent'],
+                'total_employer_insurance': calc['employer_contributions']['total_employer_insurance'],
+                'taxable_income': calc['tax_deductions']['taxable_income'],
+                'personal_income_tax': calc['tax_deductions']['personal_income_tax'],
+                'net_salary': calc['net_salary'],
+                'total_company_expense': calc['total_company_expense'],
+                'status': MonthlyPayrollRecord.STATUS_DRAFT,
+            }
+        )
+
+        summary.pushed_to_payroll_at = timezone.now()
+        summary.save()
+
+        return Response({
+            'message': f'Đã chuyển dữ liệu ngày công vào bảng lương tháng {summary.month}/{summary.year}.',
+            'payroll_id': payroll_rec.id,
+            'summary': MonthlyAttendanceSummarySerializer(summary).data
+        }, status=status.HTTP_200_OK)
+
 
 
 

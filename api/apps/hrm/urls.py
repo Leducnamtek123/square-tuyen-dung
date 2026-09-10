@@ -15,6 +15,7 @@ router.register(r'work-shifts', views.WorkShiftViewSet, basename='hrm-work-shift
 router.register(r'shift-assignments', views.ShiftAssignmentViewSet, basename='hrm-shift-assignments')
 router.register(r'attendance-requests', views.AttendanceRequestViewSet, basename='hrm-attendance-requests')
 router.register(r'biometric-punch-logs', views.BiometricPunchLogViewSet, basename='hrm-biometric-punch-logs')
+router.register(r'monthly-summaries', views.MonthlyAttendanceSummaryViewSet, basename='hrm-monthly-summaries')
 router.register(r'payroll', views.MonthlyPayrollViewSet, basename='hrm-payroll')
 
 urlpatterns = [

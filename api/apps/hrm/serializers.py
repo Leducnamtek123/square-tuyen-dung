@@ -642,5 +642,50 @@ class BiometricPunchLogSerializer(serializers.ModelSerializer):
         return super().to_internal_value(payload)
 
 
+class MonthlyAttendanceSummarySerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    department_name = serializers.CharField(source='employee.department.name', read_only=True)
+    locked_by_name = serializers.CharField(source='locked_by.full_name', read_only=True)
+
+    class Meta:
+        from .models import MonthlyAttendanceSummary
+        model = MonthlyAttendanceSummary
+        fields = [
+            'id', 'company', 'employee', 'employee_name', 'employee_code', 'department_name',
+            'month', 'year', 'standard_work_days', 'actual_work_days',
+            'paid_leave_days', 'unpaid_leave_days',
+            'overtime_hours_weekday', 'overtime_hours_weekend', 'overtime_hours_holiday',
+            'late_occurrences', 'early_occurrences',
+            'is_locked', 'locked_by', 'locked_by_name', 'locked_at',
+            'pushed_to_payroll_at', 'create_at', 'update_at'
+        ]
+        read_only_fields = [
+            'id', 'company', 'is_locked', 'locked_by', 'locked_at',
+            'pushed_to_payroll_at', 'create_at', 'update_at'
+        ]
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeId': 'employee',
+            'standardWorkDays': 'standard_work_days',
+            'actualWorkDays': 'actual_work_days',
+            'paidLeaveDays': 'paid_leave_days',
+            'unpaidLeaveDays': 'unpaid_leave_days',
+            'overtimeHoursWeekday': 'overtime_hours_weekday',
+            'overtimeHoursWeekend': 'overtime_hours_weekend',
+            'overtimeHoursHoliday': 'overtime_hours_holiday',
+            'lateOccurrences': 'late_occurrences',
+            'earlyOccurrences': 'early_occurrences',
+            'isLocked': 'is_locked',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+
 
 

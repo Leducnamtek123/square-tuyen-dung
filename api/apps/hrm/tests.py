@@ -944,6 +944,105 @@ class BiometricIngestionTests(TestCase):
         self.assertEqual(att.status, "LATE")
 
 
+class MonthlyTimesheetAPITests(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.owner = User.objects.create_user(
+            'summary_owner@company.vn',
+            'Summary Owner',
+            password='Password123!',
+            role=var_sys.EMPLOYER,
+        )
+        self.company = Company.objects.create(
+            user=self.owner,
+            company_name='Summary Payroll Corp',
+            company_email='hr@payrollcorp.vn',
+            company_phone='0901111555',
+            tax_code='TAX-SUM-01',
+        )
+        self.employee = Employee.objects.create(
+            company=self.company,
+            employee_code='SQ-SUM-001',
+            first_name='Huy',
+            last_name='Vũ',
+            full_name='Vũ Huy',
+            email='huy.vu@summary.vn',
+            status='ACTIVE',
+        )
+        EmploymentContract.objects.create(
+            employee=self.employee,
+            contract_number="HD-SUM-001",
+            contract_type="INDEFINITE",
+            start_date=date(2026, 1, 1),
+            base_salary=Decimal("25000000"),
+            status="ACTIVE",
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.owner)
+
+    def test_recalculate_lock_and_push_to_payroll(self):
+        from apps.hrm.models import AttendanceRecord, MonthlyAttendanceSummary, MonthlyPayrollRecord
+
+        # Create attendance records: 2 days present (8h each), 1 day leave, 1 day absent
+        AttendanceRecord.objects.create(
+            employee=self.employee,
+            date=date(2026, 9, 1),
+            working_hours=Decimal("8.00"),
+            status='PRESENT',
+        )
+        AttendanceRecord.objects.create(
+            employee=self.employee,
+            date=date(2026, 9, 2),
+            working_hours=Decimal("8.00"),
+            status='PRESENT',
+        )
+        AttendanceRecord.objects.create(
+            employee=self.employee,
+            date=date(2026, 9, 3),
+            working_hours=Decimal("8.00"),
+            status='ON_LEAVE',
+        )
+        AttendanceRecord.objects.create(
+            employee=self.employee,
+            date=date(2026, 9, 4),
+            working_hours=Decimal("0.00"),
+            status='ABSENT',
+        )
+
+        # 1. Recalculate
+        recalc_resp = self.client.post('/api/v1/native-hrm/monthly-summaries/recalculate/', {
+            'month': 9,
+            'year': 2026,
+            'employee_ids': [self.employee.id],
+        }, format='json')
+        self.assertEqual(recalc_resp.status_code, status.HTTP_200_OK)
+
+        summary = MonthlyAttendanceSummary.objects.get(employee=self.employee, month=9, year=2026)
+        self.assertEqual(summary.actual_work_days, Decimal("2.0"))
+        self.assertEqual(summary.paid_leave_days, Decimal("1.0"))
+        self.assertEqual(summary.unpaid_leave_days, Decimal("1.0"))
+        self.assertFalse(summary.is_locked)
+
+        # 2. Lock
+        lock_resp = self.client.post(f'/api/v1/native-hrm/monthly-summaries/{summary.id}/lock/')
+        self.assertEqual(lock_resp.status_code, status.HTTP_200_OK)
+        summary.refresh_from_db()
+        self.assertTrue(summary.is_locked)
+
+        # 3. Push to Payroll
+        push_resp = self.client.post(f'/api/v1/native-hrm/monthly-summaries/{summary.id}/push-to-payroll/')
+        self.assertEqual(push_resp.status_code, status.HTTP_200_OK)
+        summary.refresh_from_db()
+        self.assertIsNotNone(summary.pushed_to_payroll_at)
+
+        # Verify MonthlyPayrollRecord created/updated with actual and unpaid days
+        payroll_rec = MonthlyPayrollRecord.objects.get(employee=self.employee, month=9, year=2026)
+        self.assertEqual(payroll_rec.working_days_actual, 3) # 2 actual + 1 paid leave
+        self.assertEqual(payroll_rec.unpaid_leave_days, 1)
+        self.assertEqual(payroll_rec.gross_salary, Decimal("25000000"))
+
+
+
 
 
 
