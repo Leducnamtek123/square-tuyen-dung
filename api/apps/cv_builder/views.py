@@ -3,8 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import F
-from django.shortcuts import get_object_or_404
+from django.db.models import F, Q
+from django.utils import timezone
 
 from .models import CVTemplate, CandidateCV, CVSuggestion
 from .serializers import (
@@ -15,6 +15,8 @@ from .serializers import (
     PublicCVSerializer,
     CVSuggestionSerializer,
 )
+from apps.profiles.models import Resume, EmployerCandidateProfile
+
 
 
 class CVTemplateViewSet(viewsets.ReadOnlyModelViewSet):
@@ -270,19 +272,359 @@ class CandidateCVViewSet(viewsets.ModelViewSet):
         return Response(review_result, status=status.HTTP_200_OK)
 
 
+LANGUAGE_NAME_MAP = {
+    1: "Tiếng Việt",
+    2: "Tiếng Anh",
+    3: "Tiếng Nhật",
+    4: "Tiếng Pháp",
+    5: "Tiếng Trung",
+    6: "Tiếng Nga",
+    7: "Tiếng Hàn",
+    8: "Tiếng Đức",
+    9: "Tiếng Ý",
+    10: "Tiếng Ả Rập",
+    11: "Khác",
+}
+
+LANGUAGE_LEVEL_NAME_MAP = {
+    1: "Cơ bản",
+    2: "Sơ cấp",
+    3: "Trung cấp",
+    4: "Thành thạo",
+    5: "Bản ngữ",
+}
+
+
+def _build_adapted_resume_data(resume):
+    user = resume.user
+    jsp = getattr(resume, "job_seeker_profile", None)
+    if not jsp and user:
+        jsp = getattr(user, "job_seeker_profile", None)
+
+    candidate_name = (getattr(user, "full_name", "") or "").strip()
+    candidate_email = (getattr(user, "email", "") or "").strip()
+    candidate_phone = (
+        (jsp.phone if jsp and jsp.phone else "")
+        or getattr(user, "phone_number", "")
+        or ""
+    ).strip()
+
+    address_parts = []
+    if jsp:
+        if jsp.contact_address:
+            address_parts.append(jsp.contact_address.strip())
+        elif jsp.permanent_address:
+            address_parts.append(jsp.permanent_address.strip())
+    if resume.city and resume.city.name:
+        city_name = resume.city.name.strip()
+        if not address_parts or city_name not in address_parts[0]:
+            address_parts.append(city_name)
+    candidate_address = ", ".join(address_parts) if address_parts else ""
+
+    avatar_url = ""
+    if user and getattr(user, "avatar", None):
+        try:
+            avatar_url = user.avatar.get_full_url() or ""
+        except Exception:
+            avatar_url = ""
+
+    dob = jsp.birthday.strftime("%d/%m/%Y") if (jsp and jsp.birthday) else ""
+    gender_map = {"M": "Nam", "F": "Nữ", "O": "Khác"}
+    gender = gender_map.get(jsp.gender, "") if (jsp and jsp.gender) else ""
+
+    # 1. Experiences
+    experiences = []
+    for exp in resume.experience_details.all().order_by("-start_date"):
+        experiences.append({
+            "id": f"exp-{exp.id}",
+            "sourceEntityId": exp.id,
+            "position": exp.job_name or "",
+            "company": exp.company_name or "",
+            "startDate": exp.start_date.strftime("%m/%Y") if exp.start_date else "",
+            "endDate": exp.end_date.strftime("%m/%Y") if exp.end_date else "",
+            "isCurrent": not bool(exp.end_date),
+            "description": exp.description or "",
+        })
+
+    # 2. Educations
+    educations = []
+    for edu in resume.education_details.all().order_by("-start_date"):
+        educations.append({
+            "id": f"edu-{edu.id}",
+            "sourceEntityId": edu.id,
+            "school": edu.training_place_name or "",
+            "major": edu.major or "",
+            "degree": edu.degree_name or "",
+            "startDate": edu.start_date.strftime("%m/%Y") if edu.start_date else "",
+            "endDate": edu.completed_date.strftime("%m/%Y") if edu.completed_date else "",
+            "gpa": edu.grade_or_rank or "",
+            "description": edu.description or "",
+        })
+
+    # 3. Skills
+    skills = []
+    existing_skills_lower = set()
+    for s in resume.advanced_skills.all():
+        s_name = (s.name or "").strip()
+        if s_name:
+            skills.append({
+                "id": f"skill-{s.id}",
+                "sourceEntityId": s.id,
+                "name": s_name,
+                "level": s.level or 3,
+            })
+            existing_skills_lower.add(s_name.lower())
+
+    if resume.skills_summary:
+        raw_items = [item.strip() for item in resume.skills_summary.replace(";", ",").split(",")]
+        for idx, item in enumerate(raw_items):
+            if item and item.lower() not in existing_skills_lower:
+                skills.append({
+                    "id": f"skill-sum-{idx}",
+                    "name": item,
+                    "level": 4,
+                })
+                existing_skills_lower.add(item.lower())
+
+    # 4. Certificates
+    certificates = []
+    for cert in resume.certificates.all():
+        certificates.append({
+            "id": f"cert-{cert.id}",
+            "sourceEntityId": cert.id,
+            "name": cert.name or "",
+            "organization": cert.training_place or "",
+            "issueDate": cert.start_date.strftime("%m/%Y") if cert.start_date else "",
+        })
+
+    # 5. Languages
+    languages = []
+    for lang in resume.language_skills.all():
+        languages.append({
+            "id": f"lang-{lang.id}",
+            "sourceEntityId": lang.id,
+            "name": LANGUAGE_NAME_MAP.get(lang.language, "Ngoại ngữ"),
+            "proficiency": LANGUAGE_LEVEL_NAME_MAP.get(lang.level, "Trung cấp"),
+        })
+
+    # 6. PDF File URL
+    pdf_url = ""
+    if resume.file:
+        try:
+            pdf_url = resume.file.get_full_url() or ""
+        except Exception:
+            pdf_url = ""
+
+    template_code = "modern-navy"
+    theme_config = {
+        "primaryColor": "#1e40af",
+        "fontFamily": "Inter",
+        "fontSize": "medium",
+        "spacing": "normal",
+        "avatarShape": "circle",
+        "showAvatar": bool(avatar_url),
+        "paperSize": "A4",
+    }
+
+    cv_title = resume.title or f"Hồ sơ CV {candidate_name}".strip()
+    headline = resume.title or (resume.career.name if resume.career else "Chuyên viên")
+
+    return {
+        "id": resume.id,
+        "template_code": template_code,
+        "template_info": {
+            "code": template_code,
+            "name": "Modern Navy",
+            "description": "Mẫu CV tiêu chuẩn hiện đại, thanh lịch và chuyên nghiệp",
+        },
+        "title": cv_title,
+        "slug": resume.slug or f"resume-{resume.id}",
+        "theme_config": theme_config,
+        "cv_data": {
+            "title": cv_title,
+            "templateId": template_code,
+            "theme": theme_config,
+            "personalInfo": {
+                "fullName": candidate_name,
+                "title": headline,
+                "email": candidate_email,
+                "phoneNumber": candidate_phone,
+                "address": candidate_address,
+                "avatarUrl": avatar_url,
+                "bio": resume.description or "",
+                "dob": dob,
+                "gender": gender,
+            },
+            "experiences": experiences,
+            "educations": educations,
+            "skills": skills,
+            "languages": languages,
+            "certificates": certificates,
+            "projects": [],
+        },
+        "thumbnail_url": None,
+        "pdf_url": pdf_url or None,
+        "candidate_name": candidate_name,
+        "create_at": resume.create_at.isoformat() if resume.create_at else None,
+        "update_at": resume.update_at.isoformat() if resume.update_at else None,
+    }
+
+
+def _build_adapted_employer_candidate_data(candidate):
+    candidate_name = (candidate.full_name or "").strip()
+    candidate_email = (candidate.email or "").strip()
+    candidate_phone = (candidate.phone or "").strip()
+    address = candidate.city.name.strip() if (candidate.city and candidate.city.name) else ""
+
+    skills = []
+    if candidate.skills_summary:
+        raw_items = [item.strip() for item in candidate.skills_summary.replace(";", ",").split(",")]
+        for idx, item in enumerate(raw_items):
+            if item:
+                skills.append({
+                    "id": f"emp-skill-{idx}",
+                    "name": item,
+                    "level": 4,
+                })
+
+    pdf_url = ""
+    if candidate.file:
+        try:
+            pdf_url = candidate.file.get_full_url() or ""
+        except Exception:
+            pdf_url = ""
+
+    template_code = "modern-navy"
+    theme_config = {
+        "primaryColor": "#1e40af",
+        "fontFamily": "Inter",
+        "fontSize": "medium",
+        "spacing": "normal",
+        "avatarShape": "circle",
+        "showAvatar": False,
+        "paperSize": "A4",
+    }
+
+    cv_title = candidate.title or f"Hồ sơ {candidate_name}".strip()
+
+    return {
+        "id": candidate.id,
+        "template_code": template_code,
+        "template_info": {
+            "code": template_code,
+            "name": "Modern Navy",
+            "description": "Mẫu CV tiêu chuẩn hiện đại, thanh lịch và chuyên nghiệp",
+        },
+        "title": cv_title,
+        "slug": candidate.slug or f"candidate-{candidate.id}",
+        "theme_config": theme_config,
+        "cv_data": {
+            "title": cv_title,
+            "templateId": template_code,
+            "theme": theme_config,
+            "personalInfo": {
+                "fullName": candidate_name,
+                "title": candidate.title or "",
+                "email": candidate_email,
+                "phoneNumber": candidate_phone,
+                "address": address,
+                "avatarUrl": "",
+                "bio": candidate.description or "",
+            },
+            "experiences": [],
+            "educations": [],
+            "skills": skills,
+            "languages": [],
+            "certificates": [],
+            "projects": [],
+        },
+        "thumbnail_url": None,
+        "pdf_url": pdf_url or None,
+        "candidate_name": candidate_name,
+        "create_at": candidate.create_at.isoformat() if candidate.create_at else None,
+        "update_at": candidate.update_at.isoformat() if candidate.update_at else None,
+    }
+
+
 class PublicCVView(APIView):
     """
     Public Endpoint allowing Recruiters and viewers to inspect a candidate's CV
     by shareable slug without authentication.
+    Supports CandidateCV instances as well as adapting Resume and EmployerCandidateProfile records.
     """
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, slug=None):
-        cv = get_object_or_404(CandidateCV, slug=slug, is_public=True)
-        cv.views_count += 1
-        cv.save(update_fields=["views_count"])
-        serializer = PublicCVSerializer(cv)
-        return Response(serializer.data)
+        clean_slug = (slug or "").strip()
+        if not clean_slug:
+            return Response({"detail": "Vui lòng cung cấp định danh CV hợp lệ."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 1. Try resolving via CandidateCV
+        cv_filter = Q(slug=clean_slug)
+        if clean_slug.isdigit():
+            cv_filter |= Q(id=int(clean_slug))
+        cv = CandidateCV.objects.filter(cv_filter, is_public=True).select_related("user", "template").first()
+        if cv:
+            CandidateCV.objects.filter(id=cv.id).update(views_count=F("views_count") + 1)
+            serializer = PublicCVSerializer(cv)
+            return Response(serializer.data)
+
+        # 2. Try resolving via Resume (slug="resume-5", slug="giam-sat-cong-trinh", or id=1325)
+        potential_id = None
+        if clean_slug.startswith("resume-") and clean_slug[7:].isdigit():
+            potential_id = int(clean_slug[7:])
+        elif clean_slug.isdigit():
+            potential_id = int(clean_slug)
+
+        resume_q = Q(slug=clean_slug)
+        if potential_id is not None:
+            resume_q |= Q(id=potential_id)
+
+        resume = (
+            Resume.objects.filter(resume_q)
+            .select_related("user", "user__avatar", "job_seeker_profile", "city", "career", "file")
+            .prefetch_related(
+                "experience_details",
+                "education_details",
+                "certificates",
+                "language_skills",
+                "advanced_skills",
+            )
+            .first()
+        )
+
+        if resume:
+            # Check if this candidate has an active CandidateCV in CV Builder
+            candidate_cv = (
+                CandidateCV.objects.filter(user=resume.user, is_public=True)
+                .order_by("-is_main_cv", "-update_at")
+                .first()
+            )
+            if candidate_cv:
+                CandidateCV.objects.filter(id=candidate_cv.id).update(views_count=F("views_count") + 1)
+                return Response(PublicCVSerializer(candidate_cv).data)
+
+            adapted_data = _build_adapted_resume_data(resume)
+            return Response(adapted_data)
+
+        # 3. Try resolving via EmployerCandidateProfile
+        emp_filter = Q(slug=clean_slug)
+        if potential_id is not None:
+            emp_filter |= Q(id=potential_id)
+
+        emp_candidate = (
+            EmployerCandidateProfile.objects.filter(emp_filter)
+            .select_related("city", "career", "file")
+            .first()
+        )
+        if emp_candidate:
+            return Response(_build_adapted_employer_candidate_data(emp_candidate))
+
+        return Response(
+            {"detail": "Hồ sơ CV không tồn tại hoặc đã bị ẩn bởi ứng viên."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
 
 
 class CVSuggestionViewSet(viewsets.ReadOnlyModelViewSet):

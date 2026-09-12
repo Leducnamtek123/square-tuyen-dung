@@ -73,10 +73,13 @@ DOMAIN_CLIENT = {
 }
 
 # Local AI (Voice) services
-AI_TTS_BASE_URL = config("AI_TTS_BASE_URL", default=config("TTS_BASE_URL", default="http://localhost:8298/v1"))
-AI_TTS_DEFAULT_VOICE = config("AI_TTS_DEFAULT_VOICE", default=config("TTS_VOICE", default="Ly"))
-AI_STT_BASE_URL = config("AI_STT_BASE_URL", default=config("STT_BASE_URL", default="http://localhost:11437/v1"))
-AI_STT_MODEL = config("AI_STT_MODEL", default=config("STT_MODEL", default="openai/whisper-large-v3"))
+AI_TTS_BASE_URL = config("AI_TTS_BASE_URL", default=config("TTS_BASE_URL", default="https://api.metaconnect.vn/v1"))
+AI_TTS_API_KEY = config("AI_TTS_API_KEY", default=config("TTS_API_KEY", default=""))
+AI_TTS_MODEL = config("AI_TTS_MODEL", default=config("TTS_MODEL", default="tts-vi"))
+AI_TTS_DEFAULT_VOICE = config("AI_TTS_DEFAULT_VOICE", default=config("TTS_VOICE", default="Trúc Ly"))
+AI_STT_BASE_URL = config("AI_STT_BASE_URL", default=config("STT_BASE_URL", default="https://api.metaconnect.vn/v1"))
+AI_STT_API_KEY = config("AI_STT_API_KEY", default=config("STT_API_KEY", default=""))
+AI_STT_MODEL = config("AI_STT_MODEL", default=config("STT_MODEL", default="asr-vi"))
 AI_STT_LANGUAGE = config("AI_STT_LANGUAGE", default=config("STT_LANGUAGE", default="vi"))
 AI_LLM_BASE_URL = config(
     "AI_LLM_BASE_URL",

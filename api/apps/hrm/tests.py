@@ -604,6 +604,7 @@ class HrmAppTestCase(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data['employee']['employee_code'], 'SQ-EMP-SELF')
         self.assertEqual(resp.data['active_contract']['contract_number'], 'HD-SELF-001')
+        self.assertIn('recent_attendance_summaries', resp.data)
 
 
 class HRMAttendanceModelTests(TestCase):
@@ -1040,6 +1041,286 @@ class MonthlyTimesheetAPITests(TestCase):
         self.assertEqual(payroll_rec.working_days_actual, 3) # 2 actual + 1 paid leave
         self.assertEqual(payroll_rec.unpaid_leave_days, 1)
         self.assertEqual(payroll_rec.gross_salary, Decimal("25000000"))
+
+
+class DeduplicationAndShiftMatchingTests(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.owner = User.objects.create_user(
+            'dedup_owner@company.vn',
+            'Dedup Owner',
+            password='Password123!',
+            role=var_sys.EMPLOYER,
+        )
+        self.company = Company.objects.create(
+            user=self.owner,
+            company_name='Dedup Shift Corp',
+            company_email='hr@dedupshift.vn',
+            company_phone='0901111777',
+            tax_code='TAX-DEDUP-01',
+        )
+        self.employee = Employee.objects.create(
+            company=self.company,
+            employee_code='SQ-DEDUP-001',
+            first_name='An',
+            last_name='Lê',
+            full_name='Lê An',
+            email='an.le@dedup.vn',
+            status='ACTIVE',
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.owner)
+
+    def test_deduplication_engine(self):
+        from apps.hrm.models import BiometricPunchLog
+        from apps.hrm.services import deduplicate_punch_logs
+        import datetime
+
+        target_date = date(2026, 9, 12)
+        base_time = timezone.make_aware(datetime.datetime(2026, 9, 12, 8, 0, 0))
+
+        # First punch at 08:00:00 (valid)
+        p1 = BiometricPunchLog.objects.create(
+            company=self.company,
+            employee=self.employee,
+            biometric_id="BIO-999",
+            punch_time=base_time,
+            punch_type="CHECK_IN",
+            source="ZKTECO",
+        )
+        # Second punch at 08:00:45 (< 120s duplicate)
+        p2 = BiometricPunchLog.objects.create(
+            company=self.company,
+            employee=self.employee,
+            biometric_id="BIO-999",
+            punch_time=base_time + datetime.timedelta(seconds=45),
+            punch_type="CHECK_IN",
+            source="ZKTECO",
+        )
+        # Third punch at 08:01:30 (< 120s duplicate of p1)
+        p3 = BiometricPunchLog.objects.create(
+            company=self.company,
+            employee=self.employee,
+            biometric_id="BIO-999",
+            punch_time=base_time + datetime.timedelta(seconds=90),
+            punch_type="CHECK_IN",
+            source="ZKTECO",
+        )
+        # Fourth punch at 17:00:00 (> 120s valid checkout)
+        p4 = BiometricPunchLog.objects.create(
+            company=self.company,
+            employee=self.employee,
+            biometric_id="BIO-999",
+            punch_time=base_time + datetime.timedelta(hours=9),
+            punch_type="CHECK_OUT",
+            source="ZKTECO",
+        )
+
+        dup_count = deduplicate_punch_logs(self.company, target_date=target_date, window_seconds=120)
+        self.assertEqual(dup_count, 2)
+
+        p1.refresh_from_db()
+        p2.refresh_from_db()
+        p3.refresh_from_db()
+        p4.refresh_from_db()
+
+        self.assertFalse(p1.is_duplicate)
+        self.assertTrue(p2.is_duplicate)
+        self.assertTrue(p3.is_duplicate)
+        self.assertFalse(p4.is_duplicate)
+
+    def test_overnight_shift_and_anomaly_detection(self):
+        from apps.hrm.models import WorkShift, ShiftAssignment, BiometricPunchLog, AttendanceRecord
+        from apps.hrm.services import process_punch_logs_for_date
+        import datetime
+        from datetime import time
+
+        # Overnight shift from 22:00 to 06:00
+        shift_night = WorkShift.objects.create(
+            company=self.company,
+            code="CA_DEM",
+            name="Ca Đêm 22h - 6h",
+            start_time=time(22, 0),
+            end_time=time(6, 0),
+            working_hours=Decimal("8.00"),
+            is_overnight=True,
+            grace_period_late_minutes=15,
+            grace_period_early_minutes=15,
+        )
+
+        target_date = date(2026, 9, 15)
+        ShiftAssignment.objects.create(
+            company=self.company,
+            employee=self.employee,
+            shift=shift_night,
+            date=target_date,
+            is_off_day=False,
+        )
+
+        # In at 22:05 (Sep 15)
+        BiometricPunchLog.objects.create(
+            company=self.company,
+            employee=self.employee,
+            biometric_id="BIO-999",
+            punch_time=timezone.make_aware(datetime.datetime(2026, 9, 15, 22, 5, 0)),
+            punch_type="CHECK_IN",
+            source="ZKTECO",
+        )
+        # Out at 06:00 (Sep 16)
+        BiometricPunchLog.objects.create(
+            company=self.company,
+            employee=self.employee,
+            biometric_id="BIO-999",
+            punch_time=timezone.make_aware(datetime.datetime(2026, 9, 16, 6, 0, 0)),
+            punch_type="CHECK_OUT",
+            source="ZKTECO",
+        )
+
+        count = process_punch_logs_for_date(self.company, target_date)
+        self.assertEqual(count, 1)
+
+        att = AttendanceRecord.objects.get(employee=self.employee, date=target_date)
+        self.assertEqual(att.status, 'PRESENT')
+        self.assertEqual(att.working_hours, Decimal("8.00"))
+        self.assertEqual(att.late_minutes, 0)
+        self.assertEqual(att.early_minutes, 0)
+
+
+class CareerHistoryAndDocumentTests(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.owner = User.objects.create_user(
+            'doc_owner@company.vn',
+            'Doc Owner',
+            password='Password123!',
+            role=var_sys.EMPLOYER,
+        )
+        self.company = Company.objects.create(
+            user=self.owner,
+            company_name='Document Career Corp',
+            company_email='hr@doccorp.vn',
+            company_phone='0901111888',
+            tax_code='TAX-DOC-01',
+        )
+        self.employee = Employee.objects.create(
+            company=self.company,
+            employee_code='SQ-DOC-001',
+            first_name='Bảo',
+            last_name='Trần',
+            full_name='Trần Bảo',
+            email='bao.tran@doccorp.vn',
+            status='ACTIVE',
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.owner)
+
+    def test_career_history_crud(self):
+        from apps.hrm.models import EmployeeCareerHistory
+
+        resp = self.client.post('/api/v1/native-hrm/career-histories/', {
+            'employee': self.employee.id,
+            'effective_date': '2026-09-01',
+            'event_type': 'PROMOTION',
+            'new_salary': 30000000,
+            'decision_number': 'QD-01/2026',
+            'note': 'Bổ nhiệm Trưởng nhóm Kỹ thuật',
+        }, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        history = EmployeeCareerHistory.objects.get(employee=self.employee)
+        self.assertEqual(history.event_type, 'PROMOTION')
+        self.assertEqual(history.new_salary, Decimal('30000000'))
+
+    def test_employee_document_crud(self):
+        from apps.hrm.models import EmployeeDocument
+
+        resp = self.client.post('/api/v1/native-hrm/documents/', {
+            'employee': self.employee.id,
+            'document_type': 'IDENTITY_CARD',
+            'name': 'Căn cước công dân gắn chip',
+            'file_url': 'https://s3.infohr.vn/docs/cccd.pdf',
+            'issue_date': '2022-01-01',
+            'expiry_date': '2032-01-01',
+        }, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        doc = EmployeeDocument.objects.get(employee=self.employee)
+        self.assertEqual(doc.document_type, 'IDENTITY_CARD')
+        self.assertEqual(doc.name, 'Căn cước công dân gắn chip')
+
+
+class HRMRemediationTests(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(
+            'owner@remediation.vn', 'Owner Rem', password='Password123!', role=var_sys.EMPLOYER
+        )
+        self.company = Company.objects.create(
+            user=self.owner, company_name='Remediation Corp', tax_code='TAX-REM-001'
+        )
+        self.employee = Employee.objects.create(
+            company=self.company,
+            employee_code='SQ-REM-01',
+            first_name='An',
+            last_name='Lê',
+            full_name='Lê An',
+            email='an.le@remediation.vn',
+            dependents_count=2,
+            status='ACTIVE',
+        )
+        self.contract = EmploymentContract.objects.create(
+            employee=self.employee,
+            contract_number='HD-REM-01',
+            contract_type='FIXED_TERM',
+            start_date=date(2026, 1, 1),
+            base_salary=Decimal("25000000"),
+            status='ACTIVE',
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.owner)
+
+    def test_dependents_count_reduces_tax(self):
+        # Without dependents: personal deduction 11M
+        # Total insurance = 25M * 10.5% = 2,625,000
+        # Taxable income without dep = 25M - 2,625,000 - 11M = 11,375,000
+        res_0 = calculate_vietnam_payroll(gross_salary=Decimal("25000000"), dependents_count=0)
+        # With 2 dependents: deduction 11M + 2 * 4.4M = 19,800,000
+        # Taxable income with 2 dep = 25M - 2,625,000 - 19.8M = 2,575,000
+        res_2 = calculate_vietnam_payroll(gross_salary=Decimal("25000000"), dependents_count=2)
+        self.assertLess(res_2['tax_deductions']['personal_income_tax'], res_0['tax_deductions']['personal_income_tax'])
+        self.assertGreater(res_2['net_salary'], res_0['net_salary'])
+
+    def test_payroll_engine_prevents_double_deduction(self):
+        # If caller passed 20 actual worked days (already excluded 2 unpaid days), engine keeps 20 days
+        res = calculate_vietnam_payroll(
+            gross_salary=Decimal("22000000"),
+            standard_working_days=22,
+            working_days_actual=20,
+            unpaid_leave_days=2
+        )
+        self.assertEqual(res['working_days_actual'], 20)
+
+    def test_approved_payroll_protected_from_overwrite(self):
+        payroll = MonthlyPayrollRecord.objects.create(
+            company=self.company,
+            employee=self.employee,
+            month=9,
+            year=2026,
+            gross_salary=Decimal("25000000"),
+            total_income=Decimal("25000000"),
+            net_salary=Decimal("22000000"),
+            status=MonthlyPayrollRecord.STATUS_APPROVED,
+        )
+        # Recalculate without force flag should not overwrite
+        resp = self.client.post('/api/v1/native-hrm/payroll/calculate/', {
+            'month': 9,
+            'year': 2026,
+            'standard_working_days': 22,
+        })
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        payroll.refresh_from_db()
+        self.assertEqual(payroll.status, MonthlyPayrollRecord.STATUS_APPROVED)
+
+
 
 
 

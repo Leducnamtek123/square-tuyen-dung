@@ -18,6 +18,8 @@ router.register(r'shift-assignments', views.ShiftAssignmentViewSet, basename='hr
 router.register(r'attendance-requests', views.AttendanceRequestViewSet, basename='hrm-attendance-requests')
 router.register(r'biometric-punch-logs', views.BiometricPunchLogViewSet, basename='hrm-biometric-punch-logs')
 router.register(r'monthly-summaries', views.MonthlyAttendanceSummaryViewSet, basename='hrm-monthly-summaries')
+router.register(r'career-histories', views.EmployeeCareerHistoryViewSet, basename='hrm-career-histories')
+router.register(r'documents', views.EmployeeDocumentViewSet, basename='hrm-documents')
 router.register(r'payroll', views.MonthlyPayrollViewSet, basename='hrm-payroll')
 
 urlpatterns = [

@@ -17,6 +17,7 @@ export interface SubMenuItemData {
 interface MenuItemProps {
   icon?: React.ElementType;
   text: string;
+  tooltip?: string;
   to?: string;
   external?: boolean;
   onClick?: () => void;
@@ -80,7 +81,7 @@ const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementT
   },
 }));
 
-const MenuItem = ({ icon: Icon, text, to, external = false, onClick, kind = 'item', badgeContent, isCollapsed = false, subItems, state }: MenuItemProps) => {
+const MenuItem = ({ icon: Icon, text, tooltip, to, external = false, onClick, kind = 'item', badgeContent, isCollapsed = false, subItems, state }: MenuItemProps) => {
   const pathname = usePathname();
   const isChild = kind === 'child';
   const hasChildren = kind === 'group';
@@ -200,7 +201,7 @@ const MenuItem = ({ icon: Icon, text, to, external = false, onClick, kind = 'ite
   return (
     <>
       {isCollapsed ? (
-        <Tooltip title={text} placement="right" arrow slotProps={{ tooltip: { sx: { bgcolor: '#0f172a', fontSize: '0.8rem', py: 0.75, px: 1.5, fontWeight: 500 } } }}>
+        <Tooltip title={tooltip || text} placement="right" arrow slotProps={{ tooltip: { sx: { bgcolor: '#0f172a', fontSize: '0.8rem', py: 0.75, px: 1.5, fontWeight: 500 } } }}>
           <Box sx={{ width: '100%' }}>
             {itemContent}
           </Box>

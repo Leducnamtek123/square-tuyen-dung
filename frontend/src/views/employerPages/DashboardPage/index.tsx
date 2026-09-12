@@ -20,6 +20,7 @@ import ApplicationChart from '@/views/components/employers/charts/ApplicationCha
 import HiringAcademicChart from '@/views/components/employers/charts/HiringAcademicChart';
 import InterviewStatsChart from '@/views/components/employers/charts/InterviewStatsChart';
 import RecentApplicationsWidget from '@/views/components/employers/RecentApplicationsWidget';
+import { ProductTourTrigger, useTourAutoStart } from '@/components/Features/ProductTour';
 
 registerGsapPlugins();
 
@@ -29,6 +30,9 @@ const DashboardPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [days, setDays] = useState<number>(30);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  // Auto-start employer dashboard tour on first visit
+  useTourAutoStart('employer_dashboard', 800);
 
   TabTitle(t('dashboard.pageTitle'));
 
@@ -225,6 +229,7 @@ const DashboardPage = () => {
           </ToggleButtonGroup>
 
           <Button
+            data-tour="employer-quick-actions"
             variant="outlined"
             startIcon={<RefreshIcon />}
             onClick={handleRefresh}
@@ -244,12 +249,14 @@ const DashboardPage = () => {
           >
             {isRefreshing ? 'Đang làm mới...' : 'Làm mới'}
           </Button>
+
+          <ProductTourTrigger tourKey="employer_dashboard" variant="chip" label="Hướng dẫn NTD" />
         </Box>
       </Box>
 
       <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
         {/* ROW 1: KPI Core Metric Summary Cards (4 Columns) */}
-        <Grid size={12} className="gsap-emp-kpi">
+        <Grid size={12} data-tour="employer-kpis" className="gsap-emp-kpi">
           <EmployerQuantityStatistics />
         </Grid>
 
@@ -273,7 +280,7 @@ const DashboardPage = () => {
         <Grid size={{ xs: 12, lg: 7 }} className="gsap-emp-action-row">
           <RecentApplicationsWidget />
         </Grid>
-        <Grid size={{ xs: 12, lg: 5 }} className="gsap-emp-action-row">
+        <Grid size={{ xs: 12, lg: 5 }} data-tour="employer-active-interviews" className="gsap-emp-action-row">
           <InterviewStatsChart
             title={t('dashboard.interviewChart')}
             startDate={startDate}

@@ -564,6 +564,10 @@ export type NativeBiometricPunchLog = {
   employee_name?: string;
   employee_code?: string;
   department_name?: string;
+  device?: number | null;
+  device_title?: string;
+  location?: number | null;
+  location_name?: string;
   biometric_id: string;
   punch_time: string;
   device_name?: string;
@@ -572,6 +576,48 @@ export type NativeBiometricPunchLog = {
   punch_type_label?: string;
   source: 'ZKTECO' | 'EXCEL_IMPORT' | 'WEB_APP' | 'MANUAL' | string;
   source_label?: string;
+  is_duplicate?: boolean;
+  create_at?: string;
+};
+
+export type NativeEmployeeCareerHistory = {
+  id: number;
+  company?: number;
+  employee: number;
+  employee_name?: string;
+  employee_code?: string;
+  effective_date: string;
+  event_type: 'ONBOARDING' | 'PROMOTION' | 'TRANSFER' | 'SALARY_ADJUSTMENT' | 'ROLE_CHANGE' | 'DEMOTION' | 'RESIGNATION' | string;
+  event_type_label?: string;
+  old_department?: number | null;
+  old_department_name?: string;
+  new_department?: number | null;
+  new_department_name?: string;
+  old_designation?: number | null;
+  old_designation_title?: string;
+  new_designation?: number | null;
+  new_designation_title?: string;
+  old_salary?: number | string | null;
+  new_salary?: number | string | null;
+  decision_number?: string;
+  attachment?: string;
+  note?: string;
+  create_at?: string;
+};
+
+export type NativeEmployeeDocument = {
+  id: number;
+  company?: number;
+  employee: number;
+  employee_name?: string;
+  employee_code?: string;
+  document_type: 'IDENTITY_CARD' | 'LABOR_CONTRACT' | 'DEGREE_CERTIFICATE' | 'HEALTH_CERTIFICATE' | 'TAX_DOCUMENT' | 'DECISION' | 'OTHER' | string;
+  document_type_label?: string;
+  name: string;
+  file_url: string;
+  issue_date?: string | null;
+  expiry_date?: string | null;
+  note?: string;
   create_at?: string;
 };
 
@@ -857,10 +903,21 @@ const hrmService = {
     return httpRequest.post(`native-hrm/attendance-requests/${id}/cancel/`, {}).then((res) => unwrapDataResponse<NativeAttendanceRequest>(res));
   },
 
-  getBiometricPunchLogs: (params?: { date?: string; employee_id?: number; source?: string }): Promise<NativeBiometricPunchLog[]> => {
+  getBiometricPunchLogs: (params?: {
+    date?: string;
+    employee_id?: number;
+    source?: string;
+    device_id?: number;
+    location_id?: number;
+    is_duplicate?: boolean;
+  }): Promise<NativeBiometricPunchLog[]> => {
     return httpRequest.get('native-hrm/biometric-punch-logs/', { params }).then((res) => {
       return normalizePaginatedResponse<NativeBiometricPunchLog>(res).results;
     });
+  },
+
+  deduplicatePunchLogs: (data?: { date?: string; window_seconds?: number }): Promise<{ message: string; duplicate_count: number }> => {
+    return httpRequest.post('native-hrm/biometric-punch-logs/deduplicate/', data || {}).then((res) => unwrapDataResponse<{ message: string; duplicate_count: number }>(res));
   },
 
   createBiometricPunchLog: (data: Partial<NativeBiometricPunchLog>): Promise<NativeBiometricPunchLog> => {
@@ -869,6 +926,32 @@ const hrmService = {
 
   processDailyPunchLogs: (date?: string): Promise<{ message: string; count: number }> => {
     return httpRequest.post('native-hrm/biometric-punch-logs/process-daily/', { date }).then((res) => unwrapDataResponse<{ message: string; count: number }>(res));
+  },
+
+  // Career Histories (Giai đoạn 3)
+  getCareerHistories: (params?: { employee_id?: number; event_type?: string }): Promise<NativeEmployeeCareerHistory[]> => {
+    return httpRequest.get('native-hrm/career-histories/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeEmployeeCareerHistory>(res).results;
+    });
+  },
+  createCareerHistory: (data: Partial<NativeEmployeeCareerHistory>): Promise<NativeEmployeeCareerHistory> => {
+    return httpRequest.post('native-hrm/career-histories/', data).then((res) => unwrapDataResponse<NativeEmployeeCareerHistory>(res));
+  },
+  deleteCareerHistory: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/career-histories/${id}/`).then(() => undefined);
+  },
+
+  // Employee Documents (Giai đoạn 3)
+  getEmployeeDocuments: (params?: { employee_id?: number; document_type?: string }): Promise<NativeEmployeeDocument[]> => {
+    return httpRequest.get('native-hrm/documents/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeEmployeeDocument>(res).results;
+    });
+  },
+  createEmployeeDocument: (data: Partial<NativeEmployeeDocument>): Promise<NativeEmployeeDocument> => {
+    return httpRequest.post('native-hrm/documents/', data).then((res) => unwrapDataResponse<NativeEmployeeDocument>(res));
+  },
+  deleteEmployeeDocument: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/documents/${id}/`).then(() => undefined);
   },
 
   getMonthlyAttendanceSummaries: (params?: { month?: number; year?: number; employee_id?: number; department_id?: number }): Promise<NativeMonthlyAttendanceSummary[]> => {

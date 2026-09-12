@@ -195,27 +195,104 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
           </Typography>
         </Stack>
       ) : (
-        <Stack spacing={1.5} alignItems="center" sx={{ py: 2 }}>
+        <Stack spacing={2} alignItems="center" sx={{ width: '100%', py: 3 }}>
           <Box
             sx={{
               width: '100%',
               minHeight,
-              borderRadius: 2,
-              border: '1px dashed',
-              borderColor: alpha('#60a5fa', 0.28),
-              bgcolor: alpha('#0f172a', 0.55),
-              display: 'grid',
-              placeItems: 'center',
+              borderRadius: 3,
+              border: '1px solid',
+              borderColor: alpha('#38bdf8', 0.2),
+              bgcolor: 'rgba(15, 23, 42, 0.65)',
+              backdropFilter: 'blur(8px)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              p: 3,
+              position: 'relative',
+              overflow: 'hidden',
             }}
           >
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 900, mb: 0.5 }}>
-                {t('employer:interviewLive.candidateCard.waitingSignal')}
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                {t('employer:interviewLive.candidateCard.waitingSignalHint')}
-              </Typography>
+            {/* Ambient subtle radar ring animation */}
+            <Box
+              sx={{
+                width: 76,
+                height: 76,
+                borderRadius: '50%',
+                bgcolor: alpha('#0ea5e9', 0.12),
+                border: '1px solid',
+                borderColor: alpha('#38bdf8', 0.35),
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mb: 2.5,
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  inset: -10,
+                  borderRadius: '50%',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  animation: 'radarPulseLive 2.2s cubic-bezier(0, 0, 0.2, 1) infinite',
+                },
+                '@keyframes radarPulseLive': {
+                  '0%': { transform: 'scale(0.85)', opacity: 1 },
+                  '100%': { transform: 'scale(1.9)', opacity: 0 },
+                },
+              }}
+            >
+              <FiberManualRecordIcon sx={{ fontSize: 14, color: '#38bdf8' }} />
             </Box>
+
+            <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 900, mb: 0.75, letterSpacing: '-0.01em', textAlign: 'center' }}>
+              {t('employer:interviewLive.candidateCard.waitingSignal')}
+            </Typography>
+
+            <Typography variant="body2" sx={{ color: '#94a3b8', maxWidth: 440, textAlign: 'center', lineHeight: 1.6, mb: 2.5, fontSize: '0.84rem' }}>
+              {t('employer:interviewLive.candidateCard.waitingSignalHint')}
+            </Typography>
+
+            {/* Live Telemetry Status Chips */}
+            <Stack direction="row" spacing={1.25} sx={{ flexWrap: 'wrap', justifyContent: 'center' }}>
+              <Chip
+                label="Camera: Chờ mở"
+                size="small"
+                sx={{
+                  bgcolor: 'rgba(255, 255, 255, 0.06)',
+                  color: '#cbd5e1',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  height: 24,
+                }}
+              />
+              <Chip
+                label="Micrô: Chờ mở"
+                size="small"
+                sx={{
+                  bgcolor: 'rgba(255, 255, 255, 0.06)',
+                  color: '#cbd5e1',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  height: 24,
+                }}
+              />
+              <Chip
+                label="Kênh LiveKit: Sẵn sàng"
+                size="small"
+                sx={{
+                  bgcolor: alpha('#22c55e', 0.12),
+                  color: '#4ade80',
+                  border: '1px solid',
+                  borderColor: alpha('#22c55e', 0.3),
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  height: 24,
+                }}
+              />
+            </Stack>
           </Box>
         </Stack>
       )}

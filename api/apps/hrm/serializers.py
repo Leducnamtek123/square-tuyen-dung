@@ -141,7 +141,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'designation', 'designation_title', 'reports_to', 'reports_to_name',
             'status', 'employment_type', 'join_date', 'probation_end_date',
             'resign_date', 'bank_name', 'bank_account_number', 'bank_account_holder',
-            'tax_id', 'social_insurance_id', 'contracts', 'create_at', 'update_at'
+            'tax_id', 'social_insurance_id', 'dependents_count', 'contracts', 'create_at', 'update_at'
         ]
         read_only_fields = ['company', 'create_at', 'update_at']
 
@@ -166,6 +166,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'bankAccountHolder': 'bank_account_holder',
             'taxId': 'tax_id',
             'socialInsuranceId': 'social_insurance_id',
+            'dependentsCount': 'dependents_count',
             'candidateProfile': 'candidate_profile',
             'onboardedFromActivity': 'onboarded_from_activity',
         }
@@ -772,6 +773,87 @@ class MonthlyAttendanceSummarySerializer(serializers.ModelSerializer):
             if camel in payload and snake not in payload:
                 payload[snake] = payload.get(camel)
         return super().to_internal_value(payload)
+
+
+class EmployeeCareerHistorySerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    event_type_label = serializers.CharField(source='get_event_type_display', read_only=True)
+    old_department_name = serializers.CharField(source='old_department.name', read_only=True)
+    new_department_name = serializers.CharField(source='new_department.name', read_only=True)
+    old_designation_title = serializers.CharField(source='old_designation.title', read_only=True)
+    new_designation_title = serializers.CharField(source='new_designation.title', read_only=True)
+
+    class Meta:
+        from .models import EmployeeCareerHistory
+        model = EmployeeCareerHistory
+        fields = [
+            'id', 'company', 'employee', 'employee_name', 'employee_code',
+            'effective_date', 'event_type', 'event_type_label',
+            'old_department', 'old_department_name',
+            'new_department', 'new_department_name',
+            'old_designation', 'old_designation_title',
+            'new_designation', 'new_designation_title',
+            'old_salary', 'new_salary',
+            'decision_number', 'attachment', 'note',
+            'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeId': 'employee',
+            'effectiveDate': 'effective_date',
+            'eventType': 'event_type',
+            'oldDepartmentId': 'old_department',
+            'old_department_id': 'old_department',
+            'newDepartmentId': 'new_department',
+            'new_department_id': 'new_department',
+            'oldDesignationId': 'old_designation',
+            'old_designation_id': 'old_designation',
+            'newDesignationId': 'new_designation',
+            'new_designation_id': 'new_designation',
+            'oldSalary': 'old_salary',
+            'newSalary': 'new_salary',
+            'decisionNumber': 'decision_number',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+class EmployeeDocumentSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    document_type_label = serializers.CharField(source='get_document_type_display', read_only=True)
+
+    class Meta:
+        from .models import EmployeeDocument
+        model = EmployeeDocument
+        fields = [
+            'id', 'company', 'employee', 'employee_name', 'employee_code',
+            'document_type', 'document_type_label',
+            'name', 'file_url', 'issue_date', 'expiry_date', 'note',
+            'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeId': 'employee',
+            'documentType': 'document_type',
+            'fileUrl': 'file_url',
+            'issueDate': 'issue_date',
+            'expiryDate': 'expiry_date',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
 
 
 

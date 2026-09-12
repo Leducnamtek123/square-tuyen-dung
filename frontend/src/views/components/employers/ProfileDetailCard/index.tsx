@@ -119,12 +119,12 @@ const ProfileDetailCard: React.FC = () => {
             Nhà tuyển dụng
           </Typography>
         </Link>
-        <Link href="/employer/resumes" style={{ textDecoration: 'none' }}>
+        <Link href="/nha-tuyen-dung/danh-sach-ung-vien" style={{ textDecoration: 'none' }}>
           <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.8125rem', '&:hover': { color: '#2563EB' } }}>
             Quản lý ứng viên
           </Typography>
         </Link>
-        <Link href="/employer/candidates" style={{ textDecoration: 'none' }}>
+        <Link href="/nha-tuyen-dung/danh-sach-ung-vien" style={{ textDecoration: 'none' }}>
           <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.8125rem', '&:hover': { color: '#2563EB' } }}>
             Tìm kiếm ứng viên
           </Typography>

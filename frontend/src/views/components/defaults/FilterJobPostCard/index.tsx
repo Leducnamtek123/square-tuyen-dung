@@ -132,7 +132,6 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
         const res = await jobService.saveJobPost(slug || String(id)) as { isSaved?: boolean };
         const saved = res?.isSaved ?? willSave;
         setFavorites((prev) => ({ ...prev, [id]: saved }));
-        toastMessages.success(saved ? 'Đã lưu tin tuyển dụng' : 'Đã bỏ lưu tin tuyển dụng');
       } catch {
         setFavorites((prev) => ({ ...prev, [id]: currentStatus }));
       }

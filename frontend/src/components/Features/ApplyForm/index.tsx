@@ -209,76 +209,95 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                   onChange={(event) => setValue("resume", event.target.value, { shouldValidate: true })}
                 >
                   <Stack spacing={1.5}>
-                    {state.resumes.map((value) => (
-                      <Card
-                        sx={{
-                          p: 1.5,
-                          transition: "all 0.2s",
-                          "&:hover": {
-                            borderColor: "primary.main",
-                            bgcolor: pc.primary( 0.02),
-                          },
-                        }}
-                        variant="outlined"
-                        key={value.id}
-                      >
-                        <Stack direction="row" spacing={1} alignItems="center" sx={{ width: "100%" }}>
-                          <FormControlLabel
-                            value={value.id}
-                            control={<Radio />}
-                            label={
-                              <Stack spacing={0.5}>
-                                {value?.title && (
-                                  <Typography variant="subtitle1" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
-                                    {value.title}
-                                  </Typography>
-                                )}
-                                <Stack direction="row" spacing={1} alignItems="center">
+                    {state.resumes.map((value) => {
+                      const isSelected = String(selectedResumeId) === String(value.id);
+                      return (
+                        <Card
+                          sx={{
+                            p: 2,
+                            borderRadius: 2.5,
+                            cursor: 'pointer',
+                            border: '1.5px solid',
+                            borderColor: isSelected ? 'primary.main' : '#E2E8F0',
+                            bgcolor: isSelected ? 'rgba(37, 99, 235, 0.04)' : '#FFFFFF',
+                            boxShadow: isSelected ? '0 2px 10px rgba(37, 99, 235, 0.08)' : 'none',
+                            transition: 'all 0.2s ease',
+                            '&:hover': {
+                              borderColor: isSelected ? 'primary.main' : '#CBD5E1',
+                              bgcolor: isSelected ? 'rgba(37, 99, 235, 0.06)' : '#F8FAFC',
+                            },
+                          }}
+                          onClick={() => setValue("resume", String(value.id), { shouldValidate: true })}
+                          key={value.id}
+                        >
+                          <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between">
+                            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
+                              <Radio
+                                checked={isSelected}
+                                value={value.id}
+                                size="small"
+                                sx={{ p: 0.5, color: isSelected ? 'primary.main' : '#94A3B8' }}
+                              />
+                              <Box sx={{ minWidth: 0, flex: 1 }}>
+                                <Typography
+                                  variant="subtitle2"
+                                  sx={{
+                                    fontWeight: 700,
+                                    fontSize: '0.9375rem',
+                                    color: '#0F172A',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
+                                  {value.title || 'Hồ sơ ứng viên'}
+                                </Typography>
+                                <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mt: 0.25 }}>
                                   <FontAwesomeIcon
                                     icon={value.type === CV_TYPES.cvWebsite ? faFile : faFilePdf}
-                                    color={value.type === CV_TYPES.cvWebsite ? theme.palette.primary.main : theme.palette.error.main}
-                                    size="sm"
+                                    color={value.type === CV_TYPES.cvWebsite ? '#2563EB' : '#EF4444'}
+                                    size="xs"
                                   />
-                                  <Typography variant="body2" sx={{ fontStyle: "italic", color: "text.secondary" }}>
+                                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500, fontSize: '0.8125rem' }}>
                                     {value.type === CV_TYPES.cvWebsite
                                       ? t("applyForm.resume.online")
                                       : t("applyForm.resume.attached")}
                                   </Typography>
                                 </Stack>
-                              </Stack>
-                            }
-                            sx={{
-                              flex: 1,
-                              ml: 0,
-                              mr: 0,
-                              "& .MuiFormControlLabel-label": { flex: 1 },
-                            }}
-                          />
-                          <Box
-                            onClick={(e: React.MouseEvent) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setPreviewResume(value);
-                            }}
-                            sx={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 0.75,
-                              cursor: 'pointer',
-                              color: 'primary.main',
-                              fontWeight: 700,
-                              fontSize: '0.875rem',
-                              '&:hover': { opacity: 0.8, textDecoration: 'underline' },
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faEye} />
-                            <Typography component="span" sx={{ fontWeight: 700, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
-                              {t("applyForm.resume.preview")}
-                            </Typography>
-                          </Box>
-                        </Stack>
-                      </Card>
-                    ))}
+                              </Box>
+                            </Stack>
+
+                            <Box
+                              onClick={(e: React.MouseEvent) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setPreviewResume(value);
+                              }}
+                              sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 0.75,
+                                cursor: 'pointer',
+                                color: 'primary.main',
+                                fontWeight: 600,
+                                fontSize: '0.8125rem',
+                                px: 1.25,
+                                py: 0.5,
+                                borderRadius: '8px',
+                                bgcolor: 'rgba(37, 99, 235, 0.08)',
+                                transition: 'all 0.15s ease',
+                                '&:hover': { bgcolor: 'rgba(37, 99, 235, 0.16)' },
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faEye} size="xs" />
+                              <Typography component="span" sx={{ fontWeight: 600, fontSize: '0.8125rem', whiteSpace: 'nowrap' }}>
+                                {t("applyForm.resume.preview")}
+                              </Typography>
+                            </Box>
+                          </Stack>
+                        </Card>
+                      );
+                    })}
                   </Stack>
                 </RadioGroup>
               )}
@@ -292,6 +311,15 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
               showRequired={true}
               placeholder={t("applyForm.placeholders.fullName")}
               control={control}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '10px',
+                  backgroundColor: '#F8FAFC',
+                  transition: 'all 0.2s ease',
+                  '&:hover': { backgroundColor: '#FFFFFF' },
+                  '&.Mui-focused': { backgroundColor: '#FFFFFF' },
+                },
+              }}
             />
           </Grid>
 
@@ -302,6 +330,15 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
               showRequired={true}
               placeholder={t("applyForm.placeholders.email")}
               control={control}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '10px',
+                  backgroundColor: '#F8FAFC',
+                  transition: 'all 0.2s ease',
+                  '&:hover': { backgroundColor: '#FFFFFF' },
+                  '&.Mui-focused': { backgroundColor: '#FFFFFF' },
+                },
+              }}
             />
           </Grid>
 
@@ -312,20 +349,29 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
               showRequired={true}
               placeholder={t("applyForm.placeholders.phone")}
               control={control}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '10px',
+                  backgroundColor: '#F8FAFC',
+                  transition: 'all 0.2s ease',
+                  '&:hover': { backgroundColor: '#FFFFFF' },
+                  '&.Mui-focused': { backgroundColor: '#FFFFFF' },
+                },
+              }}
             />
           </Grid>
 
           <Grid size={12}>
             <Box
               sx={{
-                p: 2,
-                borderRadius: 2.5,
+                p: 1.75,
+                borderRadius: '10px',
                 backgroundColor: '#F8FAFC',
                 border: '1px solid #E2E8F0',
-                textAlign: 'center',
+                textAlign: 'left',
               }}
             >
-              <Typography variant="caption" sx={{ color: '#475569', fontSize: '0.8125rem', lineHeight: 1.6 }}>
+              <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.75rem', lineHeight: 1.6, display: 'block' }}>
                 {t('applyForm.consentNotice.text', 'Bằng việc nhấn nút nộp hồ sơ, tôi đồng ý chia sẻ thông tin cá nhân của mình với nhà tuyển dụng theo các')}{' '}
                 <Box
                   component="a"

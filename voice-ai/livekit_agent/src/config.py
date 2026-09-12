@@ -88,23 +88,27 @@ class Config:
     STT_PROVIDER: str = os.getenv("STT_PROVIDER", "whisper").lower()
 
     STT_BASE_URL: str = os.getenv("STT_BASE_URL") or os.getenv(
-        "AI_STT_BASE_URL", "http://whisper:8080/v1"
+        "AI_STT_BASE_URL", "https://api.metaconnect.vn/v1"
     )
     STT_MODEL: str = os.getenv("STT_MODEL") or os.getenv(
-        "AI_STT_MODEL", "deepdml/faster-whisper-large-v3-turbo-ct2"
+        "AI_STT_MODEL", "asr-vi"
     )
     STT_LANGUAGE: str = os.getenv("STT_LANGUAGE") or os.getenv("AI_STT_LANGUAGE", "vi")
-    STT_API_KEY: str = os.getenv("STT_API_KEY") or os.getenv(
-        "AI_STT_API_KEY", ""
+    STT_API_KEY: str = (
+        os.getenv("STT_API_KEY")
+        or os.getenv("AI_STT_API_KEY", "")
+        or "airp_live_ZX173OjElohx_4xp3OhMBdtNZkfgdGbFxbgIWLTH4LCP8"
     )
 
     TTS_BASE_URL: str = os.getenv("TTS_BASE_URL") or os.getenv(
-        "AI_TTS_BASE_URL", "http://vieneu-tts:8298/v1"
+        "AI_TTS_BASE_URL", "https://api.metaconnect.vn/v1"
     )
-    TTS_MODEL: str = os.getenv("TTS_MODEL") or os.getenv("AI_TTS_MODEL", "tts-1")
-    TTS_VOICE: str = os.getenv("TTS_VOICE") or os.getenv("AI_TTS_DEFAULT_VOICE", "Ly")
-    TTS_API_KEY: str = os.getenv("TTS_API_KEY") or os.getenv(
-        "AI_TTS_API_KEY", ""
+    TTS_MODEL: str = os.getenv("TTS_MODEL") or os.getenv("AI_TTS_MODEL", "tts-vi")
+    TTS_VOICE: str = os.getenv("TTS_VOICE") or os.getenv("AI_TTS_DEFAULT_VOICE", "Trúc Ly")
+    TTS_API_KEY: str = (
+        os.getenv("TTS_API_KEY")
+        or os.getenv("AI_TTS_API_KEY", "")
+        or "airp_live_ZX173OjElohx_4xp3OhMBdtNZkfgdGbFxbgIWLTH4LCP8"
     )
     TTS_CONNECT_TIMEOUT_SECONDS: float = _get_float("TTS_CONNECT_TIMEOUT_SECONDS", 15.0)
     TTS_READ_TIMEOUT_SECONDS: float = _get_float("TTS_READ_TIMEOUT_SECONDS", 300.0)

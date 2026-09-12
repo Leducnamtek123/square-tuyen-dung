@@ -34,6 +34,7 @@ import FlightTakeoffOutlinedIcon from '@mui/icons-material/FlightTakeoffOutlined
 import MoreTimeOutlinedIcon from '@mui/icons-material/MoreTimeOutlined';
 import ScheduleSendOutlinedIcon from '@mui/icons-material/ScheduleSendOutlined';
 import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
+import RouterOutlinedIcon from '@mui/icons-material/RouterOutlined';
 
 interface AttendanceWorkspaceLayoutProps {
   children: React.ReactNode;
@@ -51,7 +52,8 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
   const isChamCongActive =
     pathname.includes('/attendances/timesheets') ||
     pathname.includes('/attendances/monthly-summary') ||
-    pathname.includes('/attendances/biometric-logs');
+    pathname.includes('/attendances/biometric-logs') ||
+    pathname.includes('/attendances/devices');
 
   const isCaLamViecActive =
     pathname.includes('/attendances/shift-assignments') ||

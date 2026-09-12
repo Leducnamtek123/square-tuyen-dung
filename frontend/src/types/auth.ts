@@ -16,6 +16,8 @@ export interface CheckCredsResponse {
   exists: boolean;
   email: string;
   emailVerified: boolean;
+  otherRole?: RoleName | null;
+  other_role?: RoleName | null;
 }
 
 /** Response from auth/email-exists/ */

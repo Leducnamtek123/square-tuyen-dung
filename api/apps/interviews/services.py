@@ -237,7 +237,20 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
     job_requirement = _truncate_text(_clean_text(getattr(session.job_post, "job_requirement", "")), 900)
     question_group_description = _truncate_text(_clean_text(getattr(question_group, "description", "")), 900)
     notes = _truncate_text(_clean_text(session.notes), 500)
-    voice_profile_payload = build_tts_voice_profile_payload(resolve_voice_profile_for_session(session))
+    session_meta = session.session_metadata if isinstance(session.session_metadata, dict) else {}
+    avatar_image_url = session_meta.get("avatar_image_url") or session_meta.get("avatarImageUrl")
+    avatar_backdrop = session_meta.get("avatar_backdrop") or session_meta.get("avatarBackdrop") or "modern_office"
+    avatar_background_url = session_meta.get("avatar_background_url") or session_meta.get("avatarBackgroundUrl")
+    interviewer_name = session_meta.get("interviewer_name") or session_meta.get("interviewerName") or "Trợ lý AI Ly"
+    custom_speed = session_meta.get("ai_speed") or session_meta.get("ttsSpeed")
+    custom_voice = session_meta.get("ai_voice") or session_meta.get("ttsVoice")
+
+    speed_value = get_tts_speed()
+    if custom_speed:
+        try:
+            speed_value = float(custom_speed)
+        except (ValueError, TypeError):
+            pass
 
     payload = {
         "participantIdentity": f"candidate-{session.candidate_id}",
@@ -264,13 +277,24 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
             for q in questions
         ],
         "interviewType": session.type,
-        "ttsSpeed": get_tts_speed(),
+        "ttsSpeed": speed_value,
         "interviewQuestionGapSeconds": get_interview_question_gap_seconds(),
         "interviewMinimumSilenceSeconds": get_interview_minimum_silence_seconds(),
+        "avatarImageUrl": avatar_image_url,
+        "avatarBackdrop": avatar_backdrop,
+        "avatarBackgroundUrl": avatar_background_url,
+        "interviewerName": interviewer_name,
     }
+    voice_profile_payload = (
+        build_tts_voice_profile_payload(getattr(session, "voice_profile", None))
+        if getattr(session, "voice_profile", None)
+        else None
+    )
     if voice_profile_payload:
         payload["ttsVoice"] = f"profile:{voice_profile_payload['id']}"
         payload["ttsVoiceProfile"] = voice_profile_payload
+    elif custom_voice:
+        payload["ttsVoice"] = custom_voice
     return payload
 
 
@@ -288,13 +312,20 @@ def _build_public_livekit_url(request) -> str:
 def create_livekit_participant_token(session: InterviewSession, request) -> Dict[str, str]:
     # Security: only allow when the session is joinable.
     allowed_statuses = ("scheduled", "calibration", "in_progress", "interrupted")
-    if session.status not in allowed_statuses:
+    if (session.status or "").lower() not in allowed_statuses:
         raise SessionNotJoinableError(
             f"Khong the tham gia buoi phong van nay vi trang thai hien tai la: {session.get_status_display()}"
         )
 
     participant_identity = f"candidate-{session.candidate_id}"
     participant_name = session.candidate.full_name or session.candidate.email or participant_identity
+
+    # Reset question_cursor if session is in scheduled/calibration or is mock so entering doesn't start at the end
+    if session.status in ("scheduled", "calibration") or getattr(session, "session_type", None) == "mock":
+        if (session.question_cursor or 0) > 0:
+            session.question_cursor = 0
+            session.save(update_fields=["question_cursor", "update_at"])
+
     LiveKitService.ensure_room_with_agent(session.room_name)
     token = LiveKitService.create_token(
         room_name=session.room_name,
@@ -338,16 +369,29 @@ def update_interview_status(
     *,
     max_duration_seconds: Optional[int] = None,
 ) -> str:
+    new_status = str(new_status).lower()
+    if (session.status or "").lower() == new_status:
+        return session.status
+
     old_status = session.status
     was_started = session.start_time is not None
     with transaction.atomic():
+        fresh_session = InterviewSession.objects.select_for_update().get(id=session.id)
+        if (fresh_session.status or "").lower() == new_status:
+            return fresh_session.status
+        session.status = fresh_session.status
+        session.start_time = fresh_session.start_time
+        session.end_time = fresh_session.end_time
+        session.duration = fresh_session.duration
+
         apply_status_transition(session, new_status)
-        run_status_side_effects(
-            session,
-            new_status,
-            was_started=was_started,
-            max_duration_seconds=max_duration_seconds,
-        )
+
+    run_status_side_effects(
+        session,
+        new_status,
+        was_started=was_started,
+        max_duration_seconds=max_duration_seconds,
+    )
     # Broadcast status change to SSE subscribers after transaction commits successfully
     broadcast_interview_event(
         session.id,
@@ -393,14 +437,14 @@ def run_status_side_effects(
         queue_ai_evaluation(session)
 
     if new_status == "in_progress" and not was_started:
-        from .tasks import end_interview_session
+        from .tasks import end_interview_session, start_room_recording_task
 
         timeout = int(max_duration_seconds or getattr(settings, "INTERVIEW_MAX_DURATION_SECONDS", 1800))
         end_interview_session.apply_async(args=[session.id, "max_duration"], countdown=timeout)
-        # Start recording as soon as the interview becomes active.
-        import threading
-
-        threading.Thread(target=LiveKitService.start_recording, args=(session.room_name,)).start()
+        try:
+            start_room_recording_task.apply_async(args=[session.room_name])
+        except Exception as exc:
+            logger.warning("Failed to dispatch start_room_recording_task: %s", exc)
 
     if new_status == "interrupted":
         from .tasks import finalize_disconnected_session
@@ -563,3 +607,108 @@ def create_hr_presence_livekit_token(session: InterviewSession, request) -> Dict
         "server_url": server_url,
         "mode": "hr_presence",
     }
+
+
+def sync_salary_benchmarks_from_jobs() -> int:
+    """
+    Đồng bộ dữ liệu bảng project_interview_salary_benchmark từ các tin tuyển dụng (JobPost)
+    thực tế đang hoạt động trên hệ thống InfoHR.
+    Tuyệt đối không sử dụng dữ liệu ảo, bám sát các tin đã được duyệt và có thông tin mức lương.
+    """
+    from apps.jobs.models import JobPost
+    from apps.interviews.models import SalaryBenchmark
+    from apps.common.models import Career
+    from shared.configs.variable_system import JobPostStatus
+
+    approved_jobs = JobPost.objects.filter(
+        status=JobPostStatus.APPROVED,
+        salary_min__gt=0
+    ).select_related('career')
+
+    if not approved_jobs.exists():
+        return 0
+
+    careers = list(Career.objects.all())
+    career_by_name = {c.name.lower(): c for c in careers}
+
+    groups: Dict[tuple, Dict[str, object]] = {}
+    for job in approved_jobs:
+        raw_title = (job.job_name or "").strip()
+        # Loại bỏ các tiền tố/hậu tố thông báo như [TUYỂN GẤP], [HOT], (Tuyển gấp)
+        cleaned_title = re.sub(r'\[.*?\]|\(.*?(gấp|hot|tuyển).*?\)', '', raw_title, flags=re.IGNORECASE).strip()
+        cleaned_title = cleaned_title or raw_title
+
+        career = job.career
+        if not career:
+            lower_title = cleaned_title.lower()
+            if 'nội thất' in lower_title:
+                career = career_by_name.get('nội thất') or career_by_name.get('thiết kế nội thất')
+            elif 'xây dựng' in lower_title or 'công trình' in lower_title or 'hiện trường' in lower_title:
+                career = career_by_name.get('xây dựng') or career_by_name.get('xây dựng - kiến trúc')
+            elif 'kiến trúc' in lower_title:
+                career = career_by_name.get('kiến trúc') or career_by_name.get('xây dựng - kiến trúc')
+            elif 'bất động sản' in lower_title or 'tư vấn khách hàng' in lower_title or 'kinh doanh' in lower_title:
+                career = career_by_name.get('bất động sản') or career_by_name.get('kinh doanh - bán hàng')
+            if career:
+                JobPost.objects.filter(id=job.id).update(career=career)
+
+        # Map kinh nghiệm / cấp bậc
+        pos = getattr(job, 'position', 5)
+        exp = getattr(job, 'experience', 3)
+        if pos in [1, 2, 3]:
+            experience_level = 'lead'
+        elif exp in [1, 2]:
+            experience_level = 'entry'
+        elif exp in [3, 4]:
+            experience_level = 'junior'
+        elif exp in [5, 6]:
+            experience_level = 'mid'
+        elif exp >= 7:
+            experience_level = 'senior'
+        else:
+            experience_level = 'mid'
+
+        career_id = career.id if career else None
+        key = (cleaned_title, career_id, experience_level)
+        if key not in groups:
+            groups[key] = {
+                'title': cleaned_title,
+                'career': career,
+                'experience_level': experience_level,
+                'jobs': []
+            }
+        groups[key]['jobs'].append(job)
+
+    current_ids = set()
+    for (title, career_id, exp_level), g_data in groups.items():
+        job_list = g_data['jobs']
+        mins = [j.salary_min for j in job_list if j.salary_min and j.salary_min > 0]
+        maxs = [j.salary_max for j in job_list if j.salary_max and j.salary_max > 0]
+        if not mins or not maxs:
+            continue
+
+        sal_min = min(mins)
+        sal_max = max(maxs)
+        sal_avg = int(sum((j.salary_min + j.salary_max) / 2 for j in job_list) / len(job_list))
+        sample_count = len(job_list)
+        is_hot = any(getattr(j, 'is_hot', False) or getattr(j, 'is_urgent', False) for j in job_list)
+
+        sb, _ = SalaryBenchmark.objects.update_or_create(
+            position_title=title,
+            career=g_data['career'],
+            experience_level=exp_level,
+            year=2026,
+            defaults={
+                'salary_min': sal_min,
+                'salary_max': sal_max,
+                'salary_avg': sal_avg,
+                'sample_count': sample_count,
+                'is_hot': is_hot,
+            }
+        )
+        current_ids.add(sb.id)
+
+    # Loại bỏ các bản ghi salary benchmark ảo không thuộc tin tuyển dụng hiện có
+    SalaryBenchmark.objects.exclude(id__in=current_ids).delete()
+    return len(current_ids)
+

@@ -43,8 +43,9 @@ import {
   useHrmPayrollKPIs,
   useHrmMutations,
 } from '../hooks/useHrmQueries';
-import { NativeMonthlyPayrollRecord } from '@/services/hrmService';
+import hrmService, { NativeMonthlyPayrollRecord } from '@/services/hrmService';
 import { TabTitle } from '@/utils/generalFunction';
+import toastMessages from '@/utils/toastMessages';
 import pc from '@/utils/muiColors';
 
 const formatVND = (num: number | string | undefined | null) => {
@@ -117,6 +118,28 @@ export default function PayrollListPage() {
     markPaidAllPayroll.mutate({ month: selectedMonth, year: selectedYear });
   };
 
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportPayroll = async () => {
+    try {
+      setExporting(true);
+      const blob = await hrmService.exportPayrollCsv();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `hrm_payroll_export_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toastMessages.success('Đã tải xuống bảng lương CSV thành công!');
+    } catch (err) {
+      toastMessages.error('Không thể xuất bảng lương.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -134,6 +157,16 @@ export default function PayrollListPage() {
           </Typography>
         </Box>
         <Stack direction="row" spacing={1.5}>
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={exporting ? <CircularProgress size={16} /> : <FileDownloadOutlinedIcon />}
+            onClick={handleExportPayroll}
+            disabled={exporting}
+            sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2 }}
+          >
+            {exporting ? 'Đang xuất...' : 'Xuất CSV'}
+          </Button>
           <Button
             variant="outlined"
             color="primary"
@@ -494,12 +527,64 @@ export default function PayrollListPage() {
 
       {/* Payslip Detail Modal */}
       {viewingPayslip && (
-        <Dialog open={Boolean(viewingPayslip)} onClose={() => setViewingPayslip(null)} maxWidth="md" fullWidth>
+        <Dialog
+          open={Boolean(viewingPayslip)}
+          onClose={() => setViewingPayslip(null)}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{
+            id: 'payslip-dialog-paper',
+            sx: {
+              '@media print': {
+                boxShadow: 'none',
+                border: 'none',
+                maxWidth: '100% !important',
+                width: '100% !important',
+                m: 0,
+              },
+            },
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+                @media print {
+                  body > *:not(.MuiDialog-root) {
+                    display: none !important;
+                  }
+                  .MuiBackdrop-root {
+                    display: none !important;
+                  }
+                  .no-print {
+                    display: none !important;
+                  }
+                  .MuiDialog-container {
+                    height: auto !important;
+                    display: block !important;
+                  }
+                  #payslip-dialog-paper {
+                    position: static !important;
+                    max-height: none !important;
+                    overflow: visible !important;
+                    width: 100% !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                  }
+                  @page {
+                    size: A4 portrait;
+                    margin: 15mm;
+                  }
+                }
+              `,
+            }}
+          />
           <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
             <Typography variant="h6" fontWeight={700}>
               PHIẾU LƯƠNG NHÂN VIÊN (PAYSLIP) - THÁNG {viewingPayslip.month}/{viewingPayslip.year}
             </Typography>
-            <IconButton size="small" onClick={() => setViewingPayslip(null)}>
+            <IconButton size="small" onClick={() => setViewingPayslip(null)} className="no-print">
               <CloseIcon />
             </IconButton>
           </DialogTitle>
@@ -627,7 +712,7 @@ export default function PayrollListPage() {
               </Box>
             </Box>
           </DialogContent>
-          <DialogActions sx={{ p: 2 }}>
+          <DialogActions sx={{ p: 2 }} className="no-print">
             <Button startIcon={<PrintOutlinedIcon />} onClick={handlePrint} sx={{ textTransform: 'none' }}>
               In Phiếu Lương
             </Button>

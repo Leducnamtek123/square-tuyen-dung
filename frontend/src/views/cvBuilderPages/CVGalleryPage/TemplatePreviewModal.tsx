@@ -247,7 +247,7 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
       </DialogTitle>
 
       {/* ── Dialog Content: Centered High-Fidelity A4 Sheet ─────────────── */}
-      <DialogContent sx={{ p: 4, bgcolor: '#e2e8f0', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', overflowY: 'auto' }}>
+      <DialogContent sx={{ p: 4, pt: '24px !important', bgcolor: '#e2e8f0', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', overflowY: 'auto' }}>
         <Box
           sx={{
             width: 794,

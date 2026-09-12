@@ -190,7 +190,7 @@ export function ConfirmDialogRoot() {
           {showCancelButton && (
             <AlertDialogCancel
               onClick={handleCancel}
-              className="h-10 rounded-xl px-5 text-sm font-semibold border-slate-200 bg-white hover:bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-all duration-150"
+              className="h-10 rounded-xl px-5 text-sm font-semibold border border-slate-200 !bg-white hover:!bg-slate-50 !text-slate-700 shadow-xs transition-all duration-150 cursor-pointer"
             >
               {cancelButtonText}
             </AlertDialogCancel>
@@ -198,10 +198,10 @@ export function ConfirmDialogRoot() {
           <AlertDialogAction
             variant={isDanger ? 'destructive' : 'default'}
             onClick={handleConfirm}
-            className={`h-10 rounded-xl px-5 text-sm font-bold text-white transition-all duration-150 ${
+            className={`h-10 rounded-xl px-5 text-sm font-bold transition-all duration-150 cursor-pointer ${
               isDanger
-                ? 'bg-red-600 hover:bg-red-700 shadow-md shadow-red-600/20'
-                : 'bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/25'
+                ? 'bg-red-600 hover:bg-red-700 !bg-red-600 hover:!bg-red-700 !text-white shadow-md shadow-red-600/20'
+                : 'bg-blue-600 hover:bg-blue-700 !bg-blue-600 hover:!bg-blue-700 !text-white shadow-md shadow-blue-600/25'
             }`}
           >
             {confirmButtonText}

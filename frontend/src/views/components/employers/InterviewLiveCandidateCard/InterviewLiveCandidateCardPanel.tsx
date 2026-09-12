@@ -27,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { type InterviewSession } from '@/types/models';
 import { ElapsedTimer, LiveObserverVisualizer, normalizeStatus } from './InterviewLiveCandidateCardPresence';
 import { AIInterviewLayout } from '@/views/interviewPages/AIInterviewLayout';
+import { InterviewRecordingBadge } from '@/views/interviewPages/components/InterviewRecordingBadge';
 import pc from '@/utils/muiColors';
 
 type Props = {
@@ -102,16 +103,19 @@ const InterviewLiveCandidateCardPanel = ({
                 {t('employer:interviewLive.candidateCard.presenceSubtitle')}
               </Typography>
             </Box>
-            <Button
-              variant="outlined"
-              color="error"
-              size="small"
-              startIcon={<CloseIcon />}
-              onClick={onLeaveHR}
-              sx={{ textTransform: 'none', fontWeight: 800, color: '#f87171', borderColor: 'rgba(248,113,113,0.4)', borderRadius: '10px' }}
-            >
-              {t('employer:interviewLive.candidateCard.presenceExit')}
-            </Button>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <InterviewRecordingBadge />
+              <Button
+                variant="outlined"
+                color="error"
+                size="small"
+                startIcon={<CloseIcon />}
+                onClick={onLeaveHR}
+                sx={{ textTransform: 'none', fontWeight: 800, color: '#f87171', borderColor: 'rgba(248,113,113,0.4)', borderRadius: '10px' }}
+              >
+                {t('employer:interviewLive.candidateCard.presenceExit')}
+              </Button>
+            </Stack>
           </Box>
 
           <Box sx={{ flex: 1, minHeight: 0 }}>
@@ -140,13 +144,14 @@ const InterviewLiveCandidateCardPanel = ({
           borderRadius: 3.5,
           overflow: 'hidden',
           border: '1px solid',
-          borderColor: alpha('#38BDF8', 0.15),
-          bgcolor: '#0B1120',
-          backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(14,165,233,0.12) 0%, rgba(2,6,23,0.95) 75%)',
+          borderColor: alpha('#0284c7', 0.25),
+          bgcolor: '#090e1a',
+          backgroundImage: 'radial-gradient(ellipse at 50% -20%, rgba(14, 165, 233, 0.2) 0%, rgba(9, 14, 26, 0.98) 75%)',
           minHeight: 280,
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
+          boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.08), 0 12px 30px -4px rgba(2, 6, 23, 0.25)',
         }}
       >
         {/* Top Floating Mini-Action Bar */}
@@ -154,9 +159,9 @@ const InterviewLiveCandidateCardPanel = ({
           sx={{
             p: 1.75,
             borderBottom: '1px solid',
-            borderColor: 'rgba(255, 255, 255, 0.06)',
-            bgcolor: 'rgba(15, 23, 42, 0.65)',
-            backdropFilter: 'blur(12px)',
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+            bgcolor: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(16px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -183,15 +188,15 @@ const InterviewLiveCandidateCardPanel = ({
               label={isLive ? t('employer:interviewLive.candidateCard.live') : statusLabel || 'Chờ bắt đầu'}
               size="small"
               sx={{
-                fontWeight: 800,
+                fontWeight: 900,
                 fontSize: '0.6875rem',
-                letterSpacing: '0.04em',
+                letterSpacing: '0.06em',
                 height: 26,
                 borderRadius: '8px',
-                bgcolor: isLive ? alpha('#22c55e', 0.12) : 'rgba(255,255,255,0.06)',
+                bgcolor: isLive ? alpha('#22c55e', 0.16) : 'rgba(255,255,255,0.06)',
                 color: isLive ? '#4ade80' : 'rgba(255,255,255,0.75)',
                 border: '1px solid',
-                borderColor: isLive ? alpha('#22c55e', 0.3) : 'rgba(255,255,255,0.1)',
+                borderColor: isLive ? alpha('#22c55e', 0.35) : 'rgba(255,255,255,0.12)',
               }}
             />
           </Stack>
@@ -202,20 +207,15 @@ const InterviewLiveCandidateCardPanel = ({
                 <Button
                   size="small"
                   variant="contained"
+                  color="primary"
                   startIcon={<MeetingRoomIcon sx={{ fontSize: 16 }} />}
                   onClick={onJoinAsHR}
                   disabled={hrPresenceLoading || !isLive}
                   sx={{
-                    fontWeight: 750,
+                    fontWeight: 700,
                     fontSize: '0.75rem',
                     textTransform: 'none',
-                    borderRadius: '10px',
-                    bgcolor: '#0284c7',
-                    color: '#ffffff',
-                    px: 1.75,
-                    py: 0.6,
                     boxShadow: 'none',
-                    '&:hover': { bgcolor: '#0369a1', boxShadow: 'none' },
                   }}
                 >
                   {hrPresenceLoading
@@ -232,17 +232,18 @@ const InterviewLiveCandidateCardPanel = ({
                 startIcon={<FullscreenIcon sx={{ fontSize: 16 }} />}
                 onClick={onOpenFullscreen}
                 sx={{
-                  fontWeight: 750,
+                  fontWeight: 800,
                   fontSize: '0.75rem',
                   textTransform: 'none',
                   borderRadius: '10px',
-                  color: 'rgba(255,255,255,0.85)',
-                  borderColor: 'rgba(255,255,255,0.18)',
+                  color: '#ffffff',
+                  borderColor: 'rgba(255,255,255,0.22)',
+                  bgcolor: 'rgba(255,255,255,0.08)',
                   px: 1.5,
-                  py: 0.6,
+                  py: 0.65,
                   '&:hover': {
-                    borderColor: 'rgba(255,255,255,0.4)',
-                    bgcolor: 'rgba(255,255,255,0.06)',
+                    borderColor: 'rgba(255,255,255,0.45)',
+                    bgcolor: 'rgba(255,255,255,0.16)',
                   },
                 }}
               >
@@ -253,19 +254,25 @@ const InterviewLiveCandidateCardPanel = ({
             {normalizedStatus === 'in_progress' && (
               <Button
                 size="small"
-                variant="text"
+                variant="outlined"
                 color="error"
                 startIcon={<StopCircleIcon sx={{ fontSize: 16 }} />}
                 onClick={() => onForceEnd(session)}
                 disabled={isForceEnding}
                 sx={{
-                  fontWeight: 750,
+                  fontWeight: 800,
                   fontSize: '0.75rem',
                   textTransform: 'none',
                   borderRadius: '10px',
-                  color: '#f87171',
+                  color: '#fb7185',
+                  borderColor: 'rgba(244, 63, 94, 0.35)',
+                  bgcolor: 'rgba(244, 63, 94, 0.1)',
                   px: 1.5,
-                  '&:hover': { bgcolor: alpha('#ef4444', 0.1) },
+                  py: 0.65,
+                  '&:hover': {
+                    bgcolor: 'rgba(244, 63, 94, 0.22)',
+                    borderColor: 'rgba(244, 63, 94, 0.6)',
+                  },
                 }}
               >
                 {t('employer:interviewLive.candidateCard.end')}

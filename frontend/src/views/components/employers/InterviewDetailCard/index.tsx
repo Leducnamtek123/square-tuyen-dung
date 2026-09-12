@@ -29,6 +29,7 @@ import interviewService from '@/services/interviewService';
 import toastMessages from '@/utils/toastMessages';
 import errorHandling from '@/utils/errorHandling';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import { useTourAutoStart } from '@/components/Features/ProductTour';
 import type { AxiosError } from 'axios';
 import type { ApiError } from '@/types/api';
 import type { InterviewSession } from '@/types/models';
@@ -194,6 +195,9 @@ const InterviewDetailCard = () => {
   const { t, i18n } = useTranslation(['employer', 'interview', 'common']);
   const queryClient = useQueryClient();
   const [state, dispatch] = React.useReducer(reducer, initialState);
+
+  // Auto-start interview detail evaluation tour on first visit
+  useTourAutoStart('employer_interview_detail', 1000);
 
   const { data: session, isLoading: loading } = useInterviewDetail(id);
   const { submitEvaluation, isMutating: isInterviewMutating } = useInterviewMutations();
@@ -400,15 +404,19 @@ const InterviewDetailCard = () => {
         <Grid size={{ xs: 12, lg: 4 }}>
           <Stack spacing={3}>
             <InterviewInfoCard session={session} t={t} i18n={i18n} />
-            <InterviewAiEvaluationCard session={session} effectiveStatus={effectiveStatus} t={t} onTriggerAi={handleTriggerAi} isTriggeringAi={state.isTriggeringAi} />
-            <InterviewHrEvaluationForm
-              evalForm={state.evalForm}
-              onChange={handleEvalChange}
-              onSubmit={submitHRInfo}
-              disabled={isInterviewMutating || effectiveStatus !== 'completed'}
-              submitting={isInterviewMutating}
-              t={t}
-            />
+            <Box data-tour="interview-detail-score">
+              <InterviewAiEvaluationCard session={session} effectiveStatus={effectiveStatus} t={t} onTriggerAi={handleTriggerAi} isTriggeringAi={state.isTriggeringAi} />
+            </Box>
+            <Box data-tour="interview-detail-actions">
+              <InterviewHrEvaluationForm
+                evalForm={state.evalForm}
+                onChange={handleEvalChange}
+                onSubmit={submitHRInfo}
+                disabled={isInterviewMutating || effectiveStatus !== 'completed'}
+                submitting={isInterviewMutating}
+                t={t}
+              />
+            </Box>
             <InterviewQuestionsCard session={session} t={t} />
           </Stack>
         </Grid>
@@ -417,11 +425,13 @@ const InterviewDetailCard = () => {
           <Stack spacing={3}>
             <InterviewRecordingCard recordingUrl={recordingUrl} isCompleted={effectiveStatus === 'completed'} t={t} />
             <InterviewAnalysisPanel session={session} t={t} />
-            {liveKitReady ? (
-              <InterviewTranscriptPanelLive session={session} t={t} i18n={i18n} />
-            ) : (
-              <InterviewTranscriptPanel session={session} t={t} i18n={i18n} />
-            )}
+            <Box data-tour="interview-detail-transcript">
+              {liveKitReady ? (
+                <InterviewTranscriptPanelLive session={session} t={t} i18n={i18n} />
+              ) : (
+                <InterviewTranscriptPanel session={session} t={t} i18n={i18n} />
+              )}
+            </Box>
           </Stack>
         </Grid>
       </Grid>

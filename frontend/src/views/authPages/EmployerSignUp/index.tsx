@@ -15,7 +15,6 @@ import { getUserInfo } from '@/redux/userSlice';
 import authService from '@/services/authService';
 import tokenService from '@/services/tokenService';
 import EmployerSignUpForm, { EmployerSignUpFormData } from '@/views/components/auths/EmployerSignUpForm';
-import AuthShowcasePanel from '@/views/components/auths/AuthShowcasePanel';
 import { useAppDispatch } from '@/hooks/useAppStore';
 import type { RoleName, AuthProvider } from '@/types/auth';
 import type { AxiosError } from 'axios';
@@ -29,11 +28,11 @@ const SOCIAL_AUTH_COOLDOWN_MS = 2500;
 const UnifiedAuthCard = styled(Card)(({ theme }) => ({
   background: '#FFFFFF',
   borderRadius: '28px',
-  boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
+  boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
   border: '1px solid #E2E8F0',
   transition: 'all 0.3s ease',
   width: '100%',
-  maxWidth: '1080px',
+  maxWidth: '780px',
   margin: '0 auto',
   overflow: 'hidden',
 }));
@@ -257,11 +256,11 @@ const EmployerSignUp = () => {
               width: '100%',
             }}
           >
-            {/* Left Column: Sign Up Form */}
+            {/* Full-width Registration Form */}
             <Grid
-              size={{ xs: 12, md: 6 }}
+              size={{ xs: 12 }}
               sx={{
-                p: { xs: 3, sm: 4, md: 4.5 },
+                p: { xs: 3, sm: 5, md: 6 },
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
@@ -376,7 +375,7 @@ const EmployerSignUp = () => {
               </Box>
 
               {/* Card Bottom / Legal Disclaimer & Links */}
-              <Box sx={{ mt: 'auto', pt: 2.5 }}>
+              <Box sx={{ mt: 'auto', pt: 3 }}>
                 <Typography
                   variant="caption"
                   sx={{
@@ -435,17 +434,6 @@ const EmployerSignUp = () => {
                   <span>Bảo mật thông tin doanh nghiệp theo tiêu chuẩn SSL 256-bit</span>
                 </Box>
               </Box>
-            </Grid>
-
-            {/* Right Column: Showcase Panel (Desktop only) */}
-            <Grid
-              size={{ xs: 12, md: 6 }}
-              sx={{
-                display: { xs: 'none', md: 'flex' },
-                position: 'relative',
-              }}
-            >
-              <AuthShowcasePanel variant="employer" />
             </Grid>
           </Grid>
         </UnifiedAuthCard>

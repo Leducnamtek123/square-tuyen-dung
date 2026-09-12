@@ -51,12 +51,27 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
     );
   });
 
+  const hasCheckedAuthRef = React.useRef(false);
+
   React.useEffect(() => {
     let isMounted = true;
 
     const redirectTo = (path: string) => {
       window.location.replace(path);
     };
+
+    if (
+      hasCheckedAuthRef.current &&
+      hasVerifiedCandidateAuthGlobal &&
+      currentUser &&
+      canAccessJobSeekerPortal(currentUser)
+    ) {
+      const jobSeekerWorkspace = (currentUser.workspaces || []).find((workspace) => workspace.type === "job_seeker");
+      if (jobSeekerWorkspace && activeWorkspace?.type !== "job_seeker") {
+        dispatch(setActiveWorkspace(jobSeekerWorkspace));
+      }
+      return;
+    }
 
     const checkAuth = async () => {
       const token = tokenService.getAccessTokenFromCookie();
@@ -104,6 +119,7 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
       }
 
       hasVerifiedCandidateAuthGlobal = true;
+      hasCheckedAuthRef.current = true;
       if (isMounted) {
         setIsAllowed(true);
       }

@@ -388,15 +388,17 @@ export default function DetailedTimesheetPage() {
           />
 
           {/* Ký hiệu công legend */}
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ ml: 'auto !important' }} flexWrap="wrap">
-            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
+          <Stack direction="row" spacing={0.75} alignItems="center" sx={{ ml: 'auto !important' }} flexWrap="wrap">
+            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, mr: 0.5 }}>
               Ký hiệu:
             </Typography>
-            <Chip size="small" label="X: Đủ công" sx={{ height: 20, fontSize: '0.6875rem', bgcolor: '#DCFCE7', color: '#15803D', fontWeight: 600 }} />
-            <Chip size="small" label="M: Đi muộn" sx={{ height: 20, fontSize: '0.6875rem', bgcolor: '#FEF3C7', color: '#B45309', fontWeight: 600 }} />
-            <Chip size="small" label="S: Về sớm" sx={{ height: 20, fontSize: '0.6875rem', bgcolor: '#FFEDD5', color: '#C2410C', fontWeight: 600 }} />
-            <Chip size="small" label="P: Nghỉ phép" sx={{ height: 20, fontSize: '0.6875rem', bgcolor: '#DBEAFE', color: '#1D4ED8', fontWeight: 600 }} />
-            <Chip size="small" label="V: Vắng mặt" sx={{ height: 20, fontSize: '0.6875rem', bgcolor: '#FEE2E2', color: '#B91C1C', fontWeight: 600 }} />
+            <Chip size="small" label="X: Đủ công" sx={{ height: 20, fontSize: '0.6875rem', bgcolor: '#DCFCE7', color: '#15803D', fontWeight: 700 }} />
+            <Chip size="small" label="X*: Đã chỉnh" sx={{ height: 20, fontSize: '0.6875rem', bgcolor: '#DCFCE7', color: '#15803D', fontWeight: 700, border: '1px dashed #15803D' }} />
+            <Chip size="small" label="M: Đi muộn" sx={{ height: 20, fontSize: '0.6875rem', bgcolor: '#FEF3C7', color: '#B45309', fontWeight: 700 }} />
+            <Chip size="small" label="S: Về sớm" sx={{ height: 20, fontSize: '0.6875rem', bgcolor: '#FFEDD5', color: '#C2410C', fontWeight: 700 }} />
+            <Chip size="small" label="P: Nghỉ phép" sx={{ height: 20, fontSize: '0.6875rem', bgcolor: '#DBEAFE', color: '#1D4ED8', fontWeight: 700 }} />
+            <Chip size="small" label="KP: Không phép" sx={{ height: 20, fontSize: '0.6875rem', bgcolor: '#FEE2E2', color: '#B91C1C', fontWeight: 700 }} />
+            <Chip size="small" label="V: Vắng mặt" sx={{ height: 20, fontSize: '0.6875rem', bgcolor: '#F1F5F9', color: '#475569', fontWeight: 700 }} />
           </Stack>
         </Stack>
       </Card>
@@ -421,7 +423,7 @@ export default function DetailedTimesheetPage() {
                     minWidth: 180,
                     position: 'sticky',
                     left: 0,
-                    zIndex: 10,
+                    zIndex: 15,
                     backgroundColor: '#F8FAFC',
                     borderRight: '1px solid #E2E8F0',
                   }}
@@ -434,7 +436,7 @@ export default function DetailedTimesheetPage() {
                     minWidth: 120,
                     position: 'sticky',
                     left: 180,
-                    zIndex: 10,
+                    zIndex: 15,
                     backgroundColor: '#F8FAFC',
                     borderRight: '2px solid #CBD5E1',
                   }}

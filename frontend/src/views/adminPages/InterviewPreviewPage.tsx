@@ -46,7 +46,8 @@ const STEPS: { key: Step; labelKey: string; descKey: string }[] = [
   },
 ];
 
-import { AgentAudioVisualizerAura } from '@/components/Features/AgentsUI/agent-audio-visualizer-aura';
+import { LiveAudioVisualizerContainer } from '../interviewPages/components/LiveAudioVisualizerContainer';
+import { InterviewAvatar } from '../interviewPages/components/avatar/InterviewAvatar';
 
 // ─── Mock Participant Tile ────────────────────────────────────────────────────
 function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
@@ -54,23 +55,54 @@ function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
 }) {
   const { t } = useTranslation('admin');
 
+  if (isAI) {
+    return (
+      <div className="aspect-video w-full">
+        <InterviewAvatar
+          isSpeakingHint={speaking}
+          voiceAssistantState={speaking ? 'speaking' : 'listening'}
+          interviewerName={name}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={`relative flex flex-col items-center justify-center rounded-2xl border bg-[#0f172a] overflow-hidden aspect-video
       ${speaking ? 'border-cyan-400/60 shadow-[0_0_0_2px_rgba(14,165,233,0.3)]' : 'border-white/8'}`}>
       {/* Fake video bg */}
       <div className={`absolute inset-0 ${isAI ? 'bg-zinc-950' : isSelf ? 'bg-gradient-to-br from-zinc-800 to-zinc-900' : 'bg-gradient-to-br from-blue-950 to-zinc-900'}`} />
       {/* Avatar / Visualizer */}
-      <div className="relative z-10 flex h-full w-full items-center justify-center">
+      <div className="relative z-10 flex h-full w-full items-center justify-center px-4">
         {isAI ? (
-           <AgentAudioVisualizerAura 
-             state={speaking ? 'speaking' : 'listening'} 
-             size="lg" 
-             color="#0284c7" 
-           />
+          <LiveAudioVisualizerContainer
+            isSpeakingHint={speaking}
+            state={speaking ? 'speaking' : 'listening'}
+            color="#38bdf8"
+            secondaryColor="#818cf8"
+            defaultMode="wave"
+            allowModeSwitch={true}
+            role="agent"
+            height={130}
+          />
         ) : (
-          <div className={`flex size-16 items-center justify-center rounded-full border text-2xl
-            ${isSelf ? 'border-cyan-400/30 bg-cyan-500/10 text-zinc-200' : 'border-zinc-500/30 bg-zinc-500/10 text-zinc-200'}`}>
-            <FontAwesomeIcon icon={faUser} />
+          <div className="flex flex-col items-center justify-center gap-1.5">
+            <div className={`flex size-14 items-center justify-center rounded-full border text-xl
+              ${isSelf ? 'border-cyan-400/30 bg-cyan-500/10 text-zinc-200' : 'border-zinc-500/30 bg-zinc-500/10 text-zinc-200'}`}>
+              <FontAwesomeIcon icon={faUser} />
+            </div>
+            <div className="w-[180px] sm:w-[220px]">
+              <LiveAudioVisualizerContainer
+                isSpeakingHint={speaking}
+                state={speaking ? 'speaking' : 'listening'}
+                color="#38bdf8"
+                secondaryColor="#6366f1"
+                defaultMode="wave"
+                allowModeSwitch={false}
+                role="candidate"
+                height={75}
+              />
+            </div>
           </div>
         )}
       </div>
@@ -328,7 +360,7 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
 // ─── Main Preview Page ────────────────────────────────────────────────────────
 export default function InterviewPreviewPage() {
   const { t, i18n } = useTranslation('admin');
-  const [step, setStep] = useState<Step>('waiting');
+  const [step, setStep] = useState<Step>('connected');
   const previewRoute = localizeRoutePath(`/${ROUTES.ADMIN.INTERVIEW_PREVIEW}`, i18n.language);
 
   const statusChip = {

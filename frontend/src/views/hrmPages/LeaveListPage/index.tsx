@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   Box,
   Typography,
@@ -36,11 +37,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import dayjs from 'dayjs';
 
-import { useHrmLeaves, useHrmEmployees, useHrmLeaveBalances, useHrmMutations } from '../hooks/useHrmQueries';
+import { useHrmLeaves, useHrmEmployees, useHrmLeaveBalances, useHrmLeaveTypes, useHrmMutations } from '../hooks/useHrmQueries';
 import { TabTitle } from '@/utils/generalFunction';
 import pc from '@/utils/muiColors';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ChecklistRtlOutlinedIcon from '@mui/icons-material/ChecklistRtlOutlined';
 
 const inputSx = {
   '& .MuiOutlinedInput-root': {
@@ -71,6 +74,7 @@ export default function LeaveListPage() {
 
   const { data: leaveRequests = [], isLoading: loading, refetch } = useHrmLeaves();
   const { data: leaveBalances = [], isLoading: balancesLoading } = useHrmLeaveBalances({ year: selectedYear });
+  const { data: leaveTypes = [] } = useHrmLeaveTypes();
   const { data: employees = [] } = useHrmEmployees();
   const { createLeaveRequest, deleteLeaveRequest, approveLeave, rejectLeave, autoAllocateLeaveBalances } = useHrmMutations();
 
@@ -82,6 +86,7 @@ export default function LeaveListPage() {
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [createForm, setCreateForm] = useState({
     employee: '',
+    leave_type: '',
     start_date: new Date().toISOString().split('T')[0],
     end_date: new Date().toISOString().split('T')[0],
     total_days: 1,
@@ -101,6 +106,7 @@ export default function LeaveListPage() {
   const handleOpenCreate = () => {
     setCreateForm({
       employee: employees.length > 0 ? String(employees[0].id) : '',
+      leave_type: leaveTypes.length > 0 ? String(leaveTypes[0].id) : '',
       start_date: new Date().toISOString().split('T')[0],
       end_date: new Date().toISOString().split('T')[0],
       total_days: 1,
@@ -114,6 +120,7 @@ export default function LeaveListPage() {
     createLeaveRequest.mutate(
       {
         employee: Number(createForm.employee),
+        leave_type: createForm.leave_type ? Number(createForm.leave_type) : undefined,
         start_date: createForm.start_date,
         end_date: createForm.end_date,
         total_days: Number(createForm.total_days),
@@ -229,6 +236,54 @@ export default function LeaveListPage() {
             </Button>
           </Stack>
         </Box>
+
+        {/* Centralized Request Hub Banner */}
+        <Card
+          elevation={0}
+          sx={{
+            p: 2,
+            px: 2.5,
+            borderRadius: 2.5,
+            bgcolor: '#F0FDF4',
+            border: '1px solid #BBF7D0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 2,
+          }}
+        >
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <ChecklistRtlOutlinedIcon sx={{ color: '#16A34A', fontSize: 26 }} />
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#14532D' }}>
+                Trung tâm Duyệt Đơn Từ Tập Trung (Attendance & Leave Hub)
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#166534', fontSize: '0.825rem' }}>
+                Quản trị viên có thể xem và phê duyệt liên thông toàn bộ Đơn Nghỉ phép, Đơn OT, Đơn Công tác và Đơn Đi trễ / Về sớm tại một nơi.
+              </Typography>
+            </Box>
+          </Stack>
+          <Button
+            component={Link}
+            href="/employer/hrm/attendances/requests"
+            size="small"
+            variant="contained"
+            endIcon={<ArrowForwardIcon sx={{ fontSize: 15 }} />}
+            sx={{
+              textTransform: 'none',
+              borderRadius: 2,
+              bgcolor: '#16A34A',
+              fontWeight: 700,
+              fontSize: '0.825rem',
+              boxShadow: 'none',
+              whiteSpace: 'nowrap',
+              '&:hover': { bgcolor: '#15803D', boxShadow: 'none' },
+            }}
+          >
+            Đến Cổng Duyệt Đơn Tập Trung
+          </Button>
+        </Card>
 
         {/* Tab Navigation */}
         <Box sx={{ borderBottom: 1, borderColor: '#e2e8f0' }}>
@@ -381,7 +436,17 @@ export default function LeaveListPage() {
                       filteredLeaves.map((l) => (
                         <TableRow key={l.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
                           <TableCell sx={{ fontWeight: 800, color: '#0f172a' }}>
-                            {l.employeeName || l.employee_name || `#${l.employee}`}
+                            <Typography variant="body2" sx={{ fontWeight: 800, color: '#0f172a' }}>
+                              {l.employeeName || l.employee_name || `#${l.employee}`}
+                            </Typography>
+                            {(l.leaveTypeName || l.leave_type_name) && (
+                              <Chip
+                                label={l.leaveTypeName || l.leave_type_name}
+                                size="small"
+                                variant="outlined"
+                                sx={{ fontSize: '0.7rem', height: 20, mt: 0.5, borderColor: '#cbd5e1', bgcolor: '#f8fafc' }}
+                              />
+                            )}
                           </TableCell>
                           <TableCell sx={{ fontFamily: 'var(--font-mono)', fontSize: '0.8125rem', color: '#1e293b' }}>
                             {l.startDate || l.start_date} → {l.endDate || l.end_date}
@@ -601,6 +666,21 @@ export default function LeaveListPage() {
             >
               {employees.map((emp) => (
                 <MenuItem key={emp.id} value={emp.id}>{emp.fullName || emp.full_name} ({emp.employeeCode || emp.employee_code})</MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              select
+              label="Loại nghỉ phép"
+              value={createForm.leave_type}
+              onChange={(e) => setCreateForm({ ...createForm, leave_type: e.target.value })}
+              fullWidth
+              sx={inputSx}
+            >
+              {leaveTypes.map((lt) => (
+                <MenuItem key={lt.id} value={lt.id}>
+                  {lt.name} ({lt.isPaid || lt.is_paid ? 'Có lương' : 'Không lương'})
+                </MenuItem>
               ))}
             </TextField>
 

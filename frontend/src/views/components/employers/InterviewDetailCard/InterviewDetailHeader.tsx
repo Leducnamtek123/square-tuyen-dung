@@ -8,6 +8,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import type { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
 import type { InterviewSession } from '@/types/models';
+import { ProductTourTrigger } from '@/components/Features/ProductTour';
 
 type Props = {
   session: InterviewSession;
@@ -221,7 +222,8 @@ const InterviewDetailHeader = ({
           )}
         </Box>
 
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} sx={{ width: { xs: '100%', lg: 'auto' } }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} alignItems="center" sx={{ width: { xs: '100%', lg: 'auto' } }}>
+          <ProductTourTrigger tourKey="employer_interview_detail" variant="chip" label="Hướng dẫn báo cáo" />
           {canObserve && (
             <Tooltip title={t('interview:interviewDetail.tooltips.forceEndNow')} arrow placement="top">
               <Button

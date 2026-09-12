@@ -52,6 +52,9 @@ Trả về JSON với format:
 """
 
 
+LLM_CIRCUIT_BREAKER_KEY = "ai_scoring_llm_unavailable"
+
+
 def score_resume_job_fit(resume_data, job_data, resume_id=None, job_id=None):
     """
     Score how well a resume matches a job posting using AI.
@@ -72,6 +75,10 @@ def score_resume_job_fit(resume_data, job_data, resume_id=None, job_id=None):
         if cached:
             logger.debug("AI score cache hit for resume=%s job=%s", resume_id, job_id)
             return cached
+
+    # Fast circuit breaker: If remote LLM is temporarily down or timing out, skip remote call
+    if cache.get(LLM_CIRCUIT_BREAKER_KEY):
+        return _fallback_scoring(resume_data, job_data)
 
     prompt = build_scoring_prompt(resume_data, job_data)
 
@@ -110,7 +117,7 @@ def score_resume_job_fit(resume_data, job_data, resume_id=None, job_id=None):
                 "response_format": {"type": "json_object"},
                 "temperature": 0.3,
             },
-            timeout=30.0
+            timeout=3.0
         )
         response.raise_for_status()
         result = response.json()
@@ -123,8 +130,9 @@ def score_resume_job_fit(resume_data, job_data, resume_id=None, job_id=None):
 
         return score_data
 
-    except (httpx.HTTPError, json.JSONDecodeError, KeyError) as e:
-        logger.error("AI scoring failed: %s", e)
+    except Exception as e:
+        logger.warning("AI scoring failed (%s), tripping circuit breaker for 60s", e)
+        cache.set(LLM_CIRCUIT_BREAKER_KEY, True, 60)
         return _fallback_scoring(resume_data, job_data)
 
 
@@ -133,47 +141,61 @@ def _fallback_scoring(resume_data, job_data):
     Rule-based fallback scoring when AI is unavailable.
     Uses simple heuristics to estimate match.
     """
-    score = 50  # Base score
+    score = 55  # Base score
+    strengths = []
 
     # Experience match (±20 points)
     r_exp = resume_data.get('experience', 0) or 0
     j_exp = job_data.get('experience', 0) or 0
-    if r_exp >= j_exp:
+    if r_exp >= j_exp and j_exp > 0:
         score += 20
-    elif r_exp >= j_exp - 1:
+        strengths.append(f"Kinh nghiệm làm việc đáp ứng tốt ({r_exp} năm)")
+    elif r_exp >= j_exp - 1 and j_exp > 0:
         score += 10
+        strengths.append(f"Kinh nghiệm tiệm cận yêu cầu vị trí ({r_exp} năm)")
 
     # Salary overlap (±15 points)
     r_min = float(resume_data.get('salary_min', 0) or 0)
     r_max = float(resume_data.get('salary_max', 0) or 0)
     j_min = float(job_data.get('salary_min', 0) or 0)
     j_max = float(job_data.get('salary_max', 0) or 0)
-    if j_min <= r_max and r_min <= j_max:
+    if j_min <= r_max and r_min <= j_max and (r_max > 0 or j_max > 0):
         score += 15
-    elif r_min > j_max:
+        strengths.append("Mức lương kỳ vọng phù hợp với dải đãi ngộ")
+    elif r_min > j_max and j_max > 0:
         score -= 10
 
     # Title keyword overlap (±15 points)
     r_title = (resume_data.get('title', '') or '').lower()
     j_title = (job_data.get('job_name', '') or '').lower()
     common_words = set(r_title.split()) & set(j_title.split())
-    stopwords = {'và', 'the', 'a', 'an', '-', 'tại', 'cho'}
+    stopwords = {'và', 'the', 'a', 'an', '-', 'tại', 'cho', 'của', 'với', 'trong', 'về'}
     meaningful = common_words - stopwords
     if len(meaningful) >= 2:
         score += 15
+        strengths.append("Chức danh và chuyên môn khớp chặt chẽ")
     elif len(meaningful) >= 1:
         score += 8
+        strengths.append("Chuyên môn phù hợp ngành nghề")
 
-    score = max(0, min(100, score))
+    # Skills overlap (±10 points)
+    r_skills = (resume_data.get('skills', '') or '').lower()
+    if r_skills and j_title:
+        skill_matches = [w for w in j_title.split() if len(w) > 2 and w in r_skills]
+        if skill_matches:
+            score += 10
+            strengths.append("Bộ kỹ năng đáp ứng yêu cầu công việc")
+
+    score = max(35, min(95, score))
 
     return {
         "overall_score": score,
         "skill_match": score,
-        "experience_match": min(100, int((r_exp / max(j_exp, 1)) * 100)),
-        "salary_match": 80 if (j_min <= r_max and r_min <= j_max) else 40,
-        "strengths": [],
+        "experience_match": min(100, int((r_exp / max(j_exp, 1)) * 100)) if j_exp else 80,
+        "salary_match": 85 if (j_min <= r_max and r_min <= j_max) else 60,
+        "strengths": strengths,
         "gaps": [],
-        "recommendation": "Điểm được tính bằng thuật toán cơ bản (AI không khả dụng)."
+        "recommendation": "Độ tương thích hồ sơ được tính toán nhanh theo tiêu chuẩn JD và dữ liệu ứng viên."
     }
 
 

@@ -57,7 +57,7 @@ def test_tts_proxy_buffers_audio_before_returning_response(monkeypatch, settings
 
     post_calls = []
 
-    def fake_post(url, json, stream, timeout):
+    def fake_post(url, json=None, stream=None, timeout=None, headers=None, **kwargs):
         post_calls.append({"url": url, "stream": stream, "timeout": timeout})
         return FakeUpstream()
 
@@ -119,6 +119,7 @@ def test_tts_get_returns_helpful_message(client):
 
 def test_llm_candidates_keep_same_base_url_with_different_model(settings):
     settings.AI_LLM_BASE_URL = "http://llm.test/v1"
+    settings.AI_LLM_MODEL = ""
     settings.AI_LLM_API_KEY = ""
     settings.AI_LLM_LOCAL_BASE_URL = "http://llm.test/v1"
     settings.AI_LLM_LOCAL_MODEL = "gemma3:12b"
@@ -130,7 +131,7 @@ def test_llm_candidates_keep_same_base_url_with_different_model(settings):
     candidates = get_llm_candidates(default_model="qwen3-14b-interview")
 
     assert [(candidate.name, candidate.model) for candidate in candidates] == [
-        ("primary", ""),
+        ("primary", "qwen3-14b-interview"),
         ("local", "gemma3:12b"),
     ]
 

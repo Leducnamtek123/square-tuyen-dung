@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Question } from '@/types/models';
 
 export const QUESTION_CHANGE_TOPIC = 'square.interview.question_change';
+export const QUESTION_CONTROL_TOPIC = 'square.interview.question_control';
 
 export interface QuestionHUDState {
   questions: Question[];
@@ -36,6 +37,8 @@ export interface UseInterviewQuestionHUDOptions {
   defaultDurationSeconds?: number;
   room?: any;
   onQuestionChange?: (index: number, question: Question | null) => void;
+  onTimeUp?: (index: number) => void;
+  onCompleteInterview?: () => void;
 }
 
 export function formatSecondsToTime(totalSec: number): string {
@@ -51,6 +54,8 @@ export function useInterviewQuestionHUD(options: UseInterviewQuestionHUDOptions 
     defaultDurationSeconds = 120,
     room,
     onQuestionChange,
+    onTimeUp,
+    onCompleteInterview,
   } = options;
 
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
@@ -75,16 +80,37 @@ export function useInterviewQuestionHUD(options: UseInterviewQuestionHUDOptions 
 
   // Sync timer when question changes
   const prevIndexRef = useRef<number>(currentIndex);
+  const onTimeUpFiredRef = useRef<number | null>(null);
+
   useEffect(() => {
     if (prevIndexRef.current !== currentIndex) {
       const dur = questions[currentIndex]?.default_duration_seconds || defaultDurationSeconds;
       setInitialSeconds(dur);
       setRemainingSeconds(dur);
       setIsTimerRunning(true);
+      onTimeUpFiredRef.current = null;
       prevIndexRef.current = currentIndex;
       onQuestionChange?.(currentIndex, questions[currentIndex] || null);
     }
   }, [currentIndex, questions, defaultDurationSeconds, onQuestionChange]);
+
+  const broadcastTimeUp = useCallback(
+    (index: number) => {
+      if (!room || !room.localParticipant) return;
+      try {
+        const payload = JSON.stringify({
+          action: 'time_up',
+          question_index: index,
+        });
+        room.localParticipant.sendText(payload, {
+          topic: QUESTION_CONTROL_TOPIC,
+        });
+      } catch (err) {
+        console.warn('[HUD] Failed to broadcast time_up:', err);
+      }
+    },
+    [room]
+  );
 
   // Countdown interval
   useEffect(() => {
@@ -143,11 +169,57 @@ export function useInterviewQuestionHUD(options: UseInterviewQuestionHUDOptions 
     [questions.length, currentQuestion, markQuestionCompleted, broadcastQuestionChange]
   );
 
+  // When timer reaches 0, trigger time_up transition
+  useEffect(() => {
+    if (questions.length === 0) return;
+    if (remainingSeconds === 0 && isTimerRunning && onTimeUpFiredRef.current !== currentIndex) {
+      onTimeUpFiredRef.current = currentIndex;
+      setIsTimerRunning(false);
+      broadcastTimeUp(currentIndex);
+      onTimeUp?.(currentIndex);
+
+      const fallbackTimer = setTimeout(() => {
+        if (onTimeUpFiredRef.current === currentIndex) {
+          if (currentIndex < questions.length - 1) {
+            goToQuestion(currentIndex + 1);
+          } else {
+            onCompleteInterview?.();
+          }
+        }
+      }, 7000);
+
+      return () => clearTimeout(fallbackTimer);
+    }
+  }, [questions.length, remainingSeconds, isTimerRunning, currentIndex, broadcastTimeUp, onTimeUp, goToQuestion, onCompleteInterview]);
+
   const nextQuestion = useCallback(() => {
+    if (questions.length === 0) return;
     if (currentIndex < questions.length - 1) {
       goToQuestion(currentIndex + 1);
+      if (room?.localParticipant) {
+        try {
+          room.localParticipant.sendText(
+            JSON.stringify({ action: 'next_question', question_index: currentIndex + 1 }),
+            { topic: QUESTION_CONTROL_TOPIC }
+          );
+        } catch (err) {
+          console.warn('[HUD] Failed to broadcast next_question:', err);
+        }
+      }
+    } else {
+      if (room?.localParticipant) {
+        try {
+          room.localParticipant.sendText(
+            JSON.stringify({ action: 'finish_interview' }),
+            { topic: QUESTION_CONTROL_TOPIC }
+          );
+        } catch (err) {
+          console.warn('[HUD] Failed to broadcast finish_interview:', err);
+        }
+      }
+      onCompleteInterview?.();
     }
-  }, [currentIndex, questions.length, goToQuestion]);
+  }, [currentIndex, questions.length, goToQuestion, room, onCompleteInterview]);
 
   const previousQuestion = useCallback(() => {
     if (currentIndex > 0) {
@@ -187,8 +259,32 @@ export function useInterviewQuestionHUD(options: UseInterviewQuestionHUDOptions 
       }
     };
 
+    const handleRemoteControl = async (reader: { readAll: () => Promise<string> }) => {
+      try {
+        const text = await reader.readAll();
+        const data = JSON.parse(text);
+        if (
+          data.action === 'question_advanced' &&
+          typeof data.question_index === 'number' &&
+          data.question_index !== currentIndex
+        ) {
+          setCurrentIndex(data.question_index);
+        } else if (data.action === 'session_completed') {
+          onCompleteInterview?.();
+        }
+      } catch (err) {
+        console.warn('[HUD] Error parsing remote question control event:', err);
+      }
+    };
+
     try {
       room.registerTextStreamHandler(QUESTION_CHANGE_TOPIC, handleRemoteChange);
+    } catch {
+      // Ignore register failure
+    }
+
+    try {
+      room.registerTextStreamHandler(QUESTION_CONTROL_TOPIC, handleRemoteControl);
     } catch {
       // Ignore register failure
     }
@@ -197,6 +293,7 @@ export function useInterviewQuestionHUD(options: UseInterviewQuestionHUDOptions 
       try {
         if (typeof room.unregisterTextStreamHandler === 'function') {
           room.unregisterTextStreamHandler(QUESTION_CHANGE_TOPIC);
+          room.unregisterTextStreamHandler(QUESTION_CONTROL_TOPIC);
         }
       } catch {
         // Ignore

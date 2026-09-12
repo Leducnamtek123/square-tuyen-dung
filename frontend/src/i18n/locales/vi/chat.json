@@ -32,7 +32,7 @@
     "status": "Đang sẵn sàng",
     "placeholder": "Nhập tin nhắn...",
     "greeting": {
-      "employer": "Chào bạn! Tôi là AILA AI, trợ lý tuyển dụng của bạn. Tôi có thể giúp gì cho quý đối tác hôm nay? (Ví dụ: tìm ứng viên tiềm năng, soạn tin nhắn mời phỏng vấn...)",
+      "employer": "Chào bạn! Tôi là AILA AI, trợ lý tuyển dụng của bạn. Tôi có thể hỗ trợ quý đối tác tìm ứng viên tiềm năng, soạn tin nhắn mời phỏng vấn và giải đáp mọi thắc mắc tuyển dụng.",
       "jobSeeker": "Chào bạn! Tôi là AILA AI, trợ lý sự nghiệp của bạn. Bạn cần tìm việc làm hay tư vấn gì không?"
     },
     "systemPrompt": {

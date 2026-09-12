@@ -1,3 +1,4 @@
+import json
 import logging
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional, Tuple
@@ -26,10 +27,10 @@ class AIEndpointCandidate:
         return {"Authorization": f"Bearer {self.api_key}"}
 
     def payload(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        if not self.model:
-            return payload
         next_payload = dict(payload)
-        next_payload["model"] = self.model
+        effective_model = self.model or next_payload.get("model") or _setting("AI_LLM_MODEL", _setting("LLM_MODEL", ""))
+        if effective_model:
+            next_payload["model"] = effective_model
         return next_payload
 
 
@@ -258,7 +259,7 @@ def _add_candidate(
             name=candidate.name,
             base_url=base_url,
             api_key=candidate.api_key,
-            model=candidate.model,
+            model=effective_model,
         )
     )
     seen.add(dedupe_key)
@@ -267,6 +268,7 @@ def _add_candidate(
 def get_llm_candidates(default_model: str = "") -> List[AIEndpointCandidate]:
     candidates: List[AIEndpointCandidate] = []
     seen: set[tuple[str, str, str]] = set()
+    resolved_default_model = default_model or _setting("AI_LLM_MODEL", _setting("LLM_MODEL", ""))
 
     # settings.AI_LLM_API_KEY already applies the legacy LLM_API_KEY/GROQ_API_KEY
     # fallback when AI_LLM_API_KEY is not configured. Reading only the resolved
@@ -280,9 +282,9 @@ def get_llm_candidates(default_model: str = "") -> List[AIEndpointCandidate]:
             name="primary",
             base_url=_setting("AI_LLM_BASE_URL", _setting("LLM_BASE_URL", _setting("OLLAMA_BASE_URL", ""))),
             api_key=primary_api_key,
-            model="",
+            model=_setting("AI_LLM_MODEL", resolved_default_model),
         ),
-        default_model=default_model,
+        default_model=resolved_default_model,
     )
 
     local_base_url = _setting("AI_LLM_LOCAL_BASE_URL")
@@ -348,6 +350,16 @@ def _response_error(label: str, response: Any) -> str:
     return f"{label}: HTTP {response.status_code} {text}".strip()
 
 
+def _safe_parse_completion_json(response: Any) -> Dict[str, Any]:
+    try:
+        return response.json()
+    except Exception:
+        text = str(getattr(response, "text", "") or "").strip()
+        if "data: [DONE]" in text:
+            text = text.split("data: [DONE]")[0].strip()
+        return json.loads(text)
+
+
 def post_chat_completion_requests(
     payload: Dict[str, Any],
     *,
@@ -388,8 +400,8 @@ def post_chat_completion_requests(
 
         if response.status_code < 400:
             try:
-                return response.json(), candidate
-            except ValueError as exc:
+                return _safe_parse_completion_json(response), candidate
+            except (ValueError, json.JSONDecodeError) as exc:
                 attempts.append(f"{candidate.name}: invalid JSON response")
                 logger.warning("LLM candidate %s returned invalid JSON: %s", candidate.name, exc)
                 continue
@@ -443,8 +455,8 @@ def post_chat_completion_httpx(
 
             if response.status_code < 400:
                 try:
-                    return response.json(), candidate
-                except ValueError as exc:
+                    return _safe_parse_completion_json(response), candidate
+                except (ValueError, json.JSONDecodeError) as exc:
                     attempts.append(f"{candidate.name}: invalid JSON response")
                     logger.warning("LLM candidate %s returned invalid JSON: %s", candidate.name, exc)
                     continue

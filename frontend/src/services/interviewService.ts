@@ -4,6 +4,7 @@ import type {
   InterviewSession,
   InterviewEvaluation,
   QuestionBankItem,
+  CompanyQuestionSet,
   QuestionHintsDetailResponse,
   CreateMockSessionPayload,
   MockSessionResponse,
@@ -210,6 +211,11 @@ const interviewService = {
     const url = `interview/web/sessions/${sessionId}/live-metrics/`;
     return (httpRequest.get(url) as Promise<unknown>)
       .then(unwrapDataResponse<SessionMetrics>);
+  },
+
+  getCompanyQuestionSets: (params?: { search?: string; career_id?: number; seniority?: string }): Promise<CompanyQuestionSet[]> => {
+    const url = 'interview/web/question-groups/public/';
+    return (httpRequest.get(url, { params }) as Promise<unknown>).then(unwrapDataResponse<CompanyQuestionSet[]>);
   },
 
   getQuestionBank: (params?: { search?: string; career_id?: number; difficulty?: number; category?: string; seniority?: string }): Promise<PaginatedResponse<QuestionBankItem>> => {

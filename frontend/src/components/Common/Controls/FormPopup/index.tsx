@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import {
+  Box,
   Dialog,
   DialogActions,
   DialogContent,
@@ -24,6 +25,8 @@ interface Props {
   buttonIcon?: React.ReactNode;
   isSubmitting?: boolean;
   formId?: string;
+  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  fullWidthButton?: boolean;
   children: any;
 }
 
@@ -36,10 +39,12 @@ const Popup = ({
   buttonIcon = <SaveIcon />,
   isSubmitting = false,
   formId = 'modal-form',
+  maxWidth = 'sm',
+  fullWidthButton = true,
   children,
 }: Props) => {
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <div>
@@ -48,15 +53,15 @@ const Popup = ({
         open={openPopup}
         onClose={() => setOpenPopup(false)}
         aria-labelledby="responsive-dialog-title"
-        maxWidth="md"
+        maxWidth={maxWidth}
         fullWidth
         slotProps={{
           paper: {
             elevation: 0,
             sx: {
-              borderRadius: fullScreen ? 0 : '24px',
-              boxShadow: '0 28px 70px rgba(15, 57, 127, 0.18)',
-              border: fullScreen ? 'none' : '1px solid rgba(26, 64, 125, 0.1)',
+              borderRadius: fullScreen ? 0 : '20px',
+              boxShadow: '0 24px 60px rgba(15, 23, 42, 0.16)',
+              border: fullScreen ? 'none' : '1px solid rgba(226, 232, 240, 0.9)',
               overflow: 'hidden',
             },
           },
@@ -66,47 +71,58 @@ const Popup = ({
           sx={{
             p: { xs: 2, sm: 2.5 },
             pt: fullScreen ? 'max(16px, env(safe-area-inset-top, 16px))' : 2.5,
-            backgroundColor: theme.palette.grey[50],
+            backgroundColor: '#ffffff',
+            borderBottom: '1px solid #F1F5F9',
           }}
         >
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography
-              variant="h5"
-              component="div"
-              sx={{
-                color: theme.palette.grey[900],
-                fontWeight: 600,
-                fontSize: { xs: '1.1rem', sm: '1.35rem' },
-              }}
-            >
-              {title}
-            </Typography>
+          <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+            <Box sx={{ flex: 1, minWidth: 0, pr: 1.5 }}>
+              {typeof title === 'string' ? (
+                <Typography
+                  variant="h6"
+                  component="div"
+                  sx={{
+                    color: '#0F172A',
+                    fontWeight: 700,
+                    fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {title}
+                </Typography>
+              ) : (
+                title
+              )}
+            </Box>
 
-            <IconButton aria-label="Thao tác"
+            <IconButton
+              aria-label="Đóng"
               onClick={() => setOpenPopup(false)}
               sx={{
-                color: theme.palette.grey[500],
+                color: '#64748B',
+                p: 0.75,
+                borderRadius: '10px',
                 '&:hover': {
-                  backgroundColor: theme.palette.grey[100],
+                  backgroundColor: '#F1F5F9',
+                  color: '#0F172A',
                 },
               }}
             >
-              <CloseIcon />
+              <CloseIcon sx={{ fontSize: 20 }} />
             </IconButton>
           </Stack>
         </DialogTitle>
 
-        <Divider />
-
-        <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>{children}</DialogContent>
+        <DialogContent sx={{ p: { xs: 2, sm: 2.5 }, pt: { xs: '20px !important', sm: '24px !important' } }}>{children}</DialogContent>
 
         {showDialogAction && (
           <DialogActions
             sx={{
               py: 2,
-              px: { xs: 2, sm: 3 },
-              pb: fullScreen ? 'max(16px, env(safe-area-inset-bottom, 16px))' : 2,
-              background: theme.palette.grey[50],
+              px: { xs: 2, sm: 2.5 },
+              pb: fullScreen ? 'max(16px, env(safe-area-inset-bottom, 16px))' : 2.5,
+              background: '#ffffff',
+              borderTop: '1px solid #F1F5F9',
             }}
           >
             <LoadingButton
@@ -115,10 +131,18 @@ const Popup = ({
               startIcon={buttonIcon}
               variant="contained"
               sx={{
-                margin: '0 auto',
-                minWidth: 120,
-                minHeight: 44,
+                width: fullWidthButton ? '100%' : 'auto',
+                minWidth: 140,
+                minHeight: 46,
                 px: 3,
+                borderRadius: '12px',
+                fontWeight: 700,
+                fontSize: '0.9375rem',
+                textTransform: 'none',
+                boxShadow: '0 4px 14px rgba(37, 99, 235, 0.28)',
+                '&:hover': {
+                  boxShadow: '0 6px 20px rgba(37, 99, 235, 0.38)',
+                },
               }}
               type="submit"
               form={formId}

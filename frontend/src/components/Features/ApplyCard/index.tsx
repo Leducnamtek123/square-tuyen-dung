@@ -60,18 +60,41 @@ const ApplyCard = ({
   return (
     <>
       <FormPopup
+        maxWidth="sm"
+        fullWidthButton={true}
         title={
-          <Stack>
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, fontSize: '0.875rem' }}>
+          <Stack spacing={0.5}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'primary.main',
+                fontWeight: 600,
+                fontSize: '0.8125rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.03em',
+              }}
+            >
               {t("applyCard.positionCaption")}
             </Typography>
-            <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 700, mt: -0.5 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#0F172A',
+                fontWeight: 700,
+                fontSize: { xs: '1.05rem', sm: '1.2rem' },
+                lineHeight: 1.35,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
               {title}
             </Typography>
           </Stack>
         }
         buttonText={t("applyCard.submit")}
-        buttonIcon={<SendIcon />}
+        buttonIcon={<SendIcon sx={{ fontSize: 18 }} />}
         isSubmitting={isFullScreenLoading}
         formId={formId}
         openPopup={openPopup}

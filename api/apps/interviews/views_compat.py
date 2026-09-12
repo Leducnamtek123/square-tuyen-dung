@@ -92,18 +92,28 @@ def interview_next_question(request: HttpRequest, room_name: str):
         return auth_error
 
     advance = True
+    target_index = None
     if request.method == "GET":
         advance = request.GET.get("advance", "1").lower() in ("1", "true", "yes")
+        raw_idx = request.GET.get("target_index") or request.GET.get("question_index")
+        if raw_idx and raw_idx.isdigit():
+            target_index = int(raw_idx)
     else:
         try:
             body = json.loads(request.body.decode("utf-8") or "{}")
         except Exception:
             body = {}
         advance = bool(body.get("advance", True))
+        raw_idx = body.get("target_index") if body.get("target_index") is not None else body.get("question_index")
+        if isinstance(raw_idx, int):
+            target_index = raw_idx
 
     try:
         session = _run_in_thread(_get_question_session, room_name)
-        payload = _run_in_thread(get_next_question_payload, session)
+        if target_index is not None:
+            session.question_cursor = target_index
+            _run_in_thread(session.save, update_fields=["question_cursor", "update_at"])
+        payload = _run_in_thread(get_next_question_payload, session, cursor=target_index)
         if advance and not payload.get("done"):
             _run_in_thread(advance_question_cursor, session)
             payload["advance"] = True

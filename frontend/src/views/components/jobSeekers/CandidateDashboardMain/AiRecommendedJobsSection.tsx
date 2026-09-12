@@ -248,4 +248,4 @@ const AiRecommendedJobsSection = () => {
   );
 };
 
-export default AiRecommendedJobsSection;
+export default React.memo(AiRecommendedJobsSection);

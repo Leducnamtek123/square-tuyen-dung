@@ -42,12 +42,13 @@
     "defaultDescription": "A dynamic, creative workplace with many opportunities for advancement and career growth.",
     "notUpdated": "Not updated",
     "jobCount": "{{count}} jobs",
-    "followers": "{{count}} followers"
+    "followers": "followers"
   },
   "nav": {
     "createCv": "Create CV",
     "jobs": "Jobs",
     "companies": "Companies",
+    "practice": "Mock Interview",
     "aboutUs": "About Us",
     "introduction": "Introduction",
     "services": "Services",

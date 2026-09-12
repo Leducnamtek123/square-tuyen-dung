@@ -121,11 +121,11 @@ const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
   const [state, dispatch] = React.useReducer(
     jobDetailReducer,
     initialJobDetailState,
-    (baseState) => {
+    (baseState: JobDetailState): JobDetailState => {
       if (initialJob) {
         return {
           ...baseState,
-          loading: false,
+          isLoading: false,
           jobPostDetail: initialJob as ExtendedJobPost,
         };
       }
@@ -137,41 +137,57 @@ const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
     currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
 
   React.useEffect(() => {
+    if (initialJob) {
+      dispatch({ type: 'set-job-post-detail', value: initialJob as ExtendedJobPost });
+      dispatch({ type: 'set-loading', value: false });
+    }
+  }, [initialJob]);
+
+  React.useEffect(() => {
     let isActive = true;
     const getJobPostDetail = async (jobPostSlug: string | undefined) => {
       if (!jobPostSlug || jobPostSlug === ':slug') return;
+      // If we have initialJob and user is NOT authenticated, SSR data is already sufficient
       if (
         initialJob &&
+        !isAuthenticated &&
         (initialJob.slug === jobPostSlug || String(initialJob.id) === String(jobPostSlug))
       ) {
         return;
       }
+
+      // Only show full loading spinner if we do not already have SSR job data
+      if (!initialJob) {
+        dispatch({ type: 'set-loading', value: true });
+      }
+
       try {
         const resData = await jobService.getJobPostDetailById(jobPostSlug);
-        const data = resData;
         if (isActive) {
-          dispatch({ type: 'set-job-post-detail', value: data as ExtendedJobPost });
+          dispatch({ type: 'set-job-post-detail', value: resData as ExtendedJobPost });
         }
       } catch (error) {
-        const slugValue = String(jobPostSlug || '');
-        const isNumericId = /^\d+$/.test(slugValue);
-        if (isNumericId) {
-          try {
-            const fallbackData = await companyService.getCompanyJobPostDetailById(
-              Number(slugValue)
-            );
-            if (isActive) {
-              dispatch({ type: 'set-job-post-detail', value: fallbackData as ExtendedJobPost });
+        if (!initialJob) {
+          const slugValue = String(jobPostSlug || '');
+          const isNumericId = /^\d+$/.test(slugValue);
+          if (isNumericId) {
+            try {
+              const fallbackData = await companyService.getCompanyJobPostDetailById(
+                Number(slugValue)
+              );
+              if (isActive) {
+                dispatch({ type: 'set-job-post-detail', value: fallbackData as ExtendedJobPost });
+              }
+              return;
+            } catch (fallbackError) {
+              errorHandling(fallbackError as AxiosError<{ errors?: ApiError }>);
             }
-            return;
-          } catch (fallbackError) {
-            errorHandling(fallbackError as AxiosError<{ errors?: ApiError }>);
+          } else {
+            errorHandling(error);
           }
-        } else {
-          errorHandling(error);
         }
       } finally {
-        if (isActive) {
+        if (isActive && !initialJob) {
           dispatch({ type: 'set-loading', value: false });
         }
       }
@@ -180,7 +196,7 @@ const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
     return () => {
       isActive = false;
     };
-  }, [slug]);
+  }, [slug, initialJob, isAuthenticated]);
 
   // --- Dynamic SEO ---
   const jobDescription = state.jobPostDetail?.jobDescription || '';
@@ -242,9 +258,6 @@ const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
         const resData = await jobService.saveJobPost(slug as string) as { isSaved: boolean };
         const isSaved = resData.isSaved;
         dispatch({ type: 'mark-saved', value: isSaved });
-        toastMessages.success(
-          isSaved ? t("jobDetail.savedSuccess") : t("jobDetail.unsavedSuccess")
-        );
       } catch (error) {
         errorHandling(error);
       } finally {

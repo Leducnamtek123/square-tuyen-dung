@@ -16,6 +16,8 @@ import hrmService, {
   NativeMonthlyAttendanceSummary,
   NativeWorkLocation,
   NativeBiometricDevice,
+  NativeEmployeeCareerHistory,
+  NativeEmployeeDocument,
 } from '@/services/hrmService';
 import toastMessages from '@/utils/toastMessages';
 
@@ -37,6 +39,8 @@ export const HRM_QUERY_KEYS = {
   attendanceRequests: ['hrm-attendance-requests'] as const,
   biometricPunchLogs: ['hrm-biometric-punch-logs'] as const,
   monthlyAttendanceSummaries: ['hrm-monthly-attendance-summaries'] as const,
+  careerHistories: ['hrm-career-histories'] as const,
+  documents: ['hrm-documents'] as const,
   payroll: ['hrm-payroll'] as const,
   payrollKPIs: ['hrm-payroll-kpis'] as const,
   myProfile: ['hrm-my-profile'] as const,
@@ -187,11 +191,36 @@ export const useHrmBiometricPunchLogs = (params?: {
   date?: string;
   employee_id?: number;
   source?: string;
+  device_id?: number;
+  location_id?: number;
+  is_duplicate?: boolean;
 }) => {
   return useQuery<NativeBiometricPunchLog[]>({
     queryKey: [...HRM_QUERY_KEYS.biometricPunchLogs, params],
     queryFn: () => hrmService.getBiometricPunchLogs(params),
     staleTime: 15 * 1000,
+  });
+};
+
+export const useHrmCareerHistories = (params?: {
+  employee_id?: number;
+  event_type?: string;
+}) => {
+  return useQuery<NativeEmployeeCareerHistory[]>({
+    queryKey: [...HRM_QUERY_KEYS.careerHistories, params],
+    queryFn: () => hrmService.getCareerHistories(params),
+    staleTime: 30 * 1000,
+  });
+};
+
+export const useHrmDocuments = (params?: {
+  employee_id?: number;
+  document_type?: string;
+}) => {
+  return useQuery<NativeEmployeeDocument[]>({
+    queryKey: [...HRM_QUERY_KEYS.documents, params],
+    queryFn: () => hrmService.getEmployeeDocuments(params),
+    staleTime: 30 * 1000,
   });
 };
 
@@ -816,6 +845,65 @@ export const useHrmMutations = () => {
     },
   });
 
+  // Deduplicate punch logs
+  const deduplicatePunchLogs = useMutation({
+    mutationFn: (data?: { date?: string; window_seconds?: number }) => hrmService.deduplicatePunchLogs(data),
+    onSuccess: (res) => {
+      toastMessages.success(res.message || `Đã lọc ${res.duplicate_count} bản ghi quẹt trùng.`);
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.biometricPunchLogs });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.detail || 'Lỗi khi chạy lọc trùng lặp.');
+    },
+  });
+
+  // Career History Mutations
+  const createCareerHistory = useMutation({
+    mutationFn: (data: Partial<NativeEmployeeCareerHistory>) => hrmService.createCareerHistory(data),
+    onSuccess: () => {
+      toastMessages.success('Đã lưu biến động nhân sự mới thành công.');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.careerHistories });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.employees });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.detail || 'Không thể lưu biến động nhân sự.');
+    },
+  });
+
+  const deleteCareerHistory = useMutation({
+    mutationFn: (id: number) => hrmService.deleteCareerHistory(id),
+    onSuccess: () => {
+      toastMessages.success('Đã xóa bản ghi biến động nhân sự.');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.careerHistories });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.detail || 'Không thể xóa bản ghi biến động.');
+    },
+  });
+
+  // Employee Document Mutations
+  const createEmployeeDocument = useMutation({
+    mutationFn: (data: Partial<NativeEmployeeDocument>) => hrmService.createEmployeeDocument(data),
+    onSuccess: () => {
+      toastMessages.success('Đã tải lên tài liệu số thành công.');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.documents });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.detail || 'Không thể lưu tài liệu số.');
+    },
+  });
+
+  const deleteEmployeeDocument = useMutation({
+    mutationFn: (id: number) => hrmService.deleteEmployeeDocument(id),
+    onSuccess: () => {
+      toastMessages.success('Đã xóa tài liệu số.');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.documents });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.detail || 'Không thể xóa tài liệu số.');
+    },
+  });
+
   return {
     createDepartment,
     updateDepartment,
@@ -852,6 +940,7 @@ export const useHrmMutations = () => {
     cancelAttendanceRequest,
     createBiometricPunchLog,
     processDailyPunchLogs,
+    deduplicatePunchLogs,
     recalculateMonthlyAttendanceSummary,
     lockMonthlyAttendanceSummary,
     unlockMonthlyAttendanceSummary,
@@ -864,5 +953,9 @@ export const useHrmMutations = () => {
     deleteBiometricDevice,
     testDeviceConnection,
     syncDevice,
+    createCareerHistory,
+    deleteCareerHistory,
+    createEmployeeDocument,
+    deleteEmployeeDocument,
   };
 };

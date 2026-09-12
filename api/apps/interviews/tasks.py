@@ -71,8 +71,21 @@ def _extract_json_object(raw_content: str) -> str:
 def _mark_evaluation_unavailable(session: InterviewSession, reason: str):
     old_status = session.status
     session.status = "completed"
+    session.ai_overall_score = 0
+    session.ai_technical_score = 0
+    session.ai_communication_score = 0
     session.ai_summary = reason
-    session.save(update_fields=["status", "ai_summary", "update_at"])
+    session.ai_strengths = []
+    session.ai_weaknesses = ["Phiên phỏng vấn kết thúc sớm khi chưa ghi nhận câu trả lời từ ứng viên."]
+    session.ai_detailed_feedback = {
+        "soft_skills": {"confidence": 0, "clarity": 0, "tone": "chưa ghi nhận"},
+        "cultural_fit": "Chưa đủ dữ liệu đánh giá do phiên phỏng vấn kết thúc sớm.",
+        "question_performance": [],
+    }
+    session.save(update_fields=[
+        "status", "ai_overall_score", "ai_technical_score", "ai_communication_score",
+        "ai_summary", "ai_strengths", "ai_weaknesses", "ai_detailed_feedback", "update_at"
+    ])
 
     if old_status == "processing":
         broadcast_interview_event(session.id, "status_changed", {
@@ -122,7 +135,7 @@ def end_interview_session(session_id, reason="max_duration"):
 
         chain(
             evaluate_interview_session.s(session.id),
-            send_evaluation_report.s(),
+            send_interview_report_notification.s(),
         ).delay()
 
     except InterviewSession.DoesNotExist:
@@ -289,7 +302,24 @@ def evaluate_interview_session(self, session_id):
             logger.warning("Session %s has no transcripts to evaluate.", session_id)
             _mark_evaluation_unavailable(
                 session,
-                "AI evaluation could not run because this interview has no transcript.",
+                "Chưa có dữ liệu hội thoại để thực hiện đánh giá cho buổi phỏng vấn này.",
+            )
+            return None
+
+        # Check if candidate actually spoke in the interview
+        candidate_transcripts = [
+            t for t in transcripts if t.speaker_role in ("candidate", "jobseeker", "user")
+        ]
+        total_candidate_words = sum(len(t.content.strip().split()) for t in candidate_transcripts)
+
+        if not candidate_transcripts or total_candidate_words < 5:
+            logger.warning(
+                "Session %s has insufficient candidate speech to evaluate (transcripts=%s, words=%s).",
+                session_id, len(candidate_transcripts), total_candidate_words
+            )
+            _mark_evaluation_unavailable(
+                session,
+                "Phiên phỏng vấn kết thúc sớm khi chưa ghi nhận câu trả lời phỏng vấn từ ứng viên.",
             )
             return None
 
@@ -299,18 +329,24 @@ def evaluate_interview_session(self, session_id):
             history_text += f"{role}: {transcript.content}\n"
 
         prompt = f"""
-Bạn là một chuyên gia tuyển dụng chuyên nghiệp. Hãy phân tích nội dung buổi phỏng vấn sau đây và đưa ra đánh giá khách quan.
+Bạn là một chuyên gia tuyển dụng chuyên nghiệp. Hãy phân tích nội dung buổi phỏng vấn sau đây và đưa ra đánh giá khách quan, trung thực dựa HOÀN TOÀN vào những gì ứng viên thực tế đã trả lời.
 
 NỘI DUNG BUỔI PHỎNG VẤN:
 {history_text}
+
+QUY TẮC ĐÁNH GIÁ VÀ CHẤM ĐIỂM BẮT BUỘC:
+1. Chỉ chấm điểm và đánh giá dựa trên những gì ứng viên THỰC TẾ ĐÃ TRẢ LỜI. Tuyệt đối KHÔNG tự suy diễn, KHÔNG khen ngợi những kỹ năng không xuất hiện trong hội thoại.
+2. Nếu ứng viên trả lời rất ngắn gọn, sơ sài, không đúng trọng tâm hoặc chỉ nói không biết, điểm số từng phần và tổng quát phải từ 1 đến 4 điểm.
+3. Chỉ đưa vào danh sách question_performance những câu hỏi mà ứng viên thực sự đã có câu trả lời.
+4. Điểm số (1-10) phải phản ánh đúng năng lực thể hiện thực tế.
 
 Hãy trả về kết quả DƯỚI DẠNG JSON với các trường:
 - overall_score: điểm tổng quát (1-10)
 - technical_score: điểm kiến thức chuyên môn (1-10)
 - communication_score: điểm giao tiếp (1-10)
-- summary: tóm tắt ngắn gọn (dưới 100 từ)
-- strengths: danh sách 3-5 điểm mạnh (list string)
-- weaknesses: danh sách 2-3 điểm cần cải thiện (list string)
+- summary: tóm tắt ngắn gọn nhận xét thực tế (dưới 100 từ)
+- strengths: danh sách điểm mạnh thực tế (list string, nếu ứng viên chưa thể hiện được thì trả về [])
+- weaknesses: danh sách điểm cần cải thiện (list string)
 - detailed_feedback: object gồm:
   - question_performance: list object {{question: string, feedback: string, score: 1-10}}
   - soft_skills: {{confidence: 1-10, clarity: 1-10, tone: string}}
@@ -453,4 +489,14 @@ def auto_schedule_screening_interview(activity_id: int):
         logger.info(f"Auto-scheduled screening AI interview for candidate {candidate.id} on job {job_post.id}")
     except Exception as e:
         logger.error(f"Failed to auto-schedule screening interview: {e}")
+
+
+@shared_task
+def start_room_recording_task(room_name: str) -> None:
+    """Start LiveKit room composite egress asynchronously via Celery worker."""
+    try:
+        LiveKitService.start_recording(room_name)
+    except Exception as exc:
+        logger.warning("start_room_recording_task failed for room %s: %s", room_name, exc)
+
 

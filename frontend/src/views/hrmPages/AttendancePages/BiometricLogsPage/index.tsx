@@ -36,11 +36,17 @@ import RouterOutlinedIcon from '@mui/icons-material/RouterOutlined';
 import {
   useHrmBiometricPunchLogs,
   useHrmEmployees,
+  useHrmWorkLocations,
+  useHrmBiometricDevices,
   useHrmMutations,
 } from '../../hooks/useHrmQueries';
 import { NativeBiometricPunchLog } from '@/services/hrmService';
 import { TabTitle } from '@/utils/generalFunction';
 import pc from '@/utils/muiColors';
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
+import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 
 const inputSx = {
   '& .MuiOutlinedInput-root': {
@@ -64,6 +70,9 @@ export default function BiometricLogsPage() {
   const todayStr = new Date().toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
   const [sourceFilter, setSourceFilter] = useState<string>('ALL');
+  const [locationFilter, setLocationFilter] = useState<string>('ALL');
+  const [deviceFilter, setDeviceFilter] = useState<string>('ALL');
+  const [duplicateFilter, setDuplicateFilter] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   // Queries
@@ -74,12 +83,17 @@ export default function BiometricLogsPage() {
   } = useHrmBiometricPunchLogs({
     date: selectedDate || undefined,
     source: sourceFilter === 'ALL' ? undefined : sourceFilter,
+    location_id: locationFilter === 'ALL' ? undefined : Number(locationFilter),
+    device_id: deviceFilter === 'ALL' ? undefined : Number(deviceFilter),
+    is_duplicate: duplicateFilter === 'ALL' ? undefined : duplicateFilter === 'DUPLICATE',
   });
 
   const { data: employees = [] } = useHrmEmployees();
+  const { data: locations = [] } = useHrmWorkLocations();
+  const { data: devices = [] } = useHrmBiometricDevices();
 
   // Mutations
-  const { createBiometricPunchLog, processDailyPunchLogs } = useHrmMutations();
+  const { createBiometricPunchLog, processDailyPunchLogs, deduplicatePunchLogs } = useHrmMutations();
 
   // Create Manual Punch Modal
   const [openModal, setOpenModal] = useState(false);
@@ -90,6 +104,8 @@ export default function BiometricLogsPage() {
     punch_type: 'AUTO',
     source: 'MANUAL',
     device_name: 'Máy chấm công Cổng chính',
+    location: '',
+    device: '',
   });
 
   const handleOpenCreate = () => {
@@ -100,6 +116,8 @@ export default function BiometricLogsPage() {
       punch_type: 'AUTO',
       source: 'MANUAL',
       device_name: 'Máy chấm công Cổng chính',
+      location: locations.length > 0 ? String(locations[0].id) : '',
+      device: devices.length > 0 ? String(devices[0].id) : '',
     });
     setOpenModal(true);
   };
@@ -122,6 +140,8 @@ export default function BiometricLogsPage() {
       punch_type: punchForm.punch_type,
       source: punchForm.source,
       device_name: punchForm.device_name,
+      location: punchForm.location ? Number(punchForm.location) : null,
+      device: punchForm.device ? Number(punchForm.device) : null,
     };
     await createBiometricPunchLog.mutateAsync(payload);
     setOpenModal(false);
@@ -129,6 +149,10 @@ export default function BiometricLogsPage() {
 
   const handleProcessDaily = async () => {
     await processDailyPunchLogs.mutateAsync(selectedDate);
+  };
+
+  const handleDeduplicate = async () => {
+    await deduplicatePunchLogs.mutateAsync({ date: selectedDate, window_seconds: 120 });
   };
 
   const getSourceChip = (source: string) => {
@@ -254,6 +278,20 @@ export default function BiometricLogsPage() {
             </Button>
             <Button
               variant="outlined"
+              color="warning"
+              startIcon={<FilterAltOutlinedIcon />}
+              onClick={handleDeduplicate}
+              disabled={deduplicatePunchLogs.isPending}
+              sx={{
+                textTransform: 'none',
+                borderRadius: 2,
+                fontWeight: 600,
+              }}
+            >
+              {deduplicatePunchLogs.isPending ? 'Đang lọc...' : 'Khử trùng lặp (< 2p)'}
+            </Button>
+            <Button
+              variant="outlined"
               color="success"
               startIcon={<PlayArrowOutlinedIcon />}
               onClick={handleProcessDaily}
@@ -285,15 +323,60 @@ export default function BiometricLogsPage() {
         </Stack>
 
         {/* Filters */}
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 2.5 }} alignItems="center" flexWrap="wrap">
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mt: 2.5 }} alignItems="center" flexWrap="wrap">
           <TextField
             type="date"
             size="small"
             label="Ngày quẹt thẻ"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            sx={{ minWidth: 160, ...inputSx }}
+            sx={{ minWidth: 150, ...inputSx }}
           />
+
+          <TextField
+            select
+            size="small"
+            label="Chi nhánh / Trụ sở"
+            value={locationFilter}
+            onChange={(e) => setLocationFilter(e.target.value)}
+            sx={{ minWidth: 170, ...inputSx }}
+          >
+            <MenuItem value="ALL">Tất cả chi nhánh</MenuItem>
+            {locations.map((loc) => (
+              <MenuItem key={loc.id} value={String(loc.id)}>
+                {loc.name} {loc.code ? `(${loc.code})` : ''}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            select
+            size="small"
+            label="Thiết bị máy"
+            value={deviceFilter}
+            onChange={(e) => setDeviceFilter(e.target.value)}
+            sx={{ minWidth: 160, ...inputSx }}
+          >
+            <MenuItem value="ALL">Tất cả thiết bị</MenuItem>
+            {devices.map((dev) => (
+              <MenuItem key={dev.id} value={String(dev.id)}>
+                {dev.name}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            select
+            size="small"
+            label="Trạng thái lọc trùng"
+            value={duplicateFilter}
+            onChange={(e) => setDuplicateFilter(e.target.value)}
+            sx={{ minWidth: 160, ...inputSx }}
+          >
+            <MenuItem value="ALL">Tất cả trạng thái</MenuItem>
+            <MenuItem value="VALID">Chỉ bản ghi hợp lệ</MenuItem>
+            <MenuItem value="DUPLICATE">Chỉ bản ghi trùng lặp</MenuItem>
+          </TextField>
 
           <TextField
             select
@@ -301,7 +384,7 @@ export default function BiometricLogsPage() {
             label="Nguồn dữ liệu"
             value={sourceFilter}
             onChange={(e) => setSourceFilter(e.target.value)}
-            sx={{ minWidth: 180, ...inputSx }}
+            sx={{ minWidth: 160, ...inputSx }}
           >
             <MenuItem value="ALL">Tất cả nguồn</MenuItem>
             <MenuItem value="ZKTECO">ZKTeco (TCP 4200)</MenuItem>
@@ -312,7 +395,7 @@ export default function BiometricLogsPage() {
 
           <TextField
             size="small"
-            placeholder="Tìm theo mã vân tay, nhân viên, thiết bị..."
+            placeholder="Tìm theo mã vân tay, nhân viên..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
@@ -322,7 +405,7 @@ export default function BiometricLogsPage() {
                 </InputAdornment>
               ),
             }}
-            sx={{ minWidth: 280, ...inputSx }}
+            sx={{ minWidth: 220, ...inputSx }}
           />
 
           <Box sx={{ ml: 'auto !important' }}>
@@ -350,32 +433,33 @@ export default function BiometricLogsPage() {
                 <TableCell sx={{ fontWeight: 600, color: '#475569', py: 1.5 }}>Mã vân tay / Thẻ</TableCell>
                 <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Nhân viên</TableCell>
                 <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Phòng ban</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Thời gian quẹt thẻ</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Thời gian quẹt</TableCell>
                 <TableCell align="center" sx={{ fontWeight: 600, color: '#475569' }}>
                   Loại quẹt
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Nguồn dữ liệu</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Tên thiết bị / IP</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Chi nhánh & Thiết bị</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: '#475569' }}>Nguồn</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600, color: '#475569' }}>Trạng thái</TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
+                  <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
                     <CircularProgress size={32} sx={{ color: '#2563EB' }} />
                   </TableCell>
                 </TableRow>
               ) : filteredLogs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 6, color: '#64748B' }}>
+                  <TableCell colSpan={8} align="center" sx={{ py: 6, color: '#64748B' }}>
                     <FingerprintIcon sx={{ fontSize: 40, color: '#CBD5E1', mb: 1, display: 'block', mx: 'auto' }} />
-                    Không có log máy chấm công nào cho ngày {selectedDate}.
+                    Không có log máy chấm công nào cho bộ lọc hiện tại.
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredLogs.map((log) => (
-                  <TableRow key={log.id} hover>
+                  <TableRow key={log.id} hover sx={log.is_duplicate ? { backgroundColor: '#FFFBEB' } : undefined}>
                     <TableCell sx={{ py: 1.5 }}>
                       <Chip
                         label={log.biometric_id}
@@ -429,11 +513,43 @@ export default function BiometricLogsPage() {
 
                     <TableCell align="center">{getPunchTypeChip(log.punch_type)}</TableCell>
 
+                    <TableCell sx={{ color: '#334155', fontSize: '0.8125rem' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.8125rem' }}>
+                        {log.location_name || 'Hội sở chính'}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#64748B' }}>
+                        {log.device_title || log.device_name || 'Cổng mặc định'}
+                      </Typography>
+                    </TableCell>
+
                     <TableCell>{getSourceChip(log.source)}</TableCell>
 
-                    <TableCell sx={{ color: '#64748B', fontSize: '0.8125rem' }}>
-                      {log.device_name || 'Cổng kết nối mặc định'}
-                      {log.device_ip && ` (${log.device_ip})`}
+                    <TableCell align="center">
+                      {log.is_duplicate ? (
+                        <Chip
+                          icon={<WarningAmberOutlinedIcon sx={{ fontSize: '0.875rem !important' }} />}
+                          label="Trùng lặp (< 2p)"
+                          size="small"
+                          sx={{
+                            fontWeight: 600,
+                            backgroundColor: '#FEF3C7',
+                            color: '#D97706',
+                            border: '1px solid #FDE68A',
+                          }}
+                        />
+                      ) : (
+                        <Chip
+                          icon={<CheckCircleOutlineIcon sx={{ fontSize: '0.875rem !important' }} />}
+                          label="Hợp lệ"
+                          size="small"
+                          sx={{
+                            fontWeight: 600,
+                            backgroundColor: '#ECFDF5',
+                            color: '#059669',
+                            border: '1px solid #A7F3D0',
+                          }}
+                        />
+                      )}
                     </TableCell>
                   </TableRow>
                 ))

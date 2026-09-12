@@ -18,6 +18,8 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
+import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
+import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import dayjs from '@/configs/dayjs-config';
 import interviewService from '@/services/interviewService';
 import jobService from '@/services/jobService';
@@ -223,13 +225,22 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
               onChange={(e) => setInterviewType(e.target.value as any)}
             >
               <MenuItem value="mixed">
-                🤖 Phỏng vấn AI Voice Bot (Hỗn hợp: Chuyên môn & Kỹ năng mềm)
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <SmartToyOutlinedIcon sx={{ fontSize: 18, color: '#7c3aed' }} />
+                  <span>Phỏng vấn AI Voice Bot (Hỗn hợp: Chuyên môn & Kỹ năng mềm)</span>
+                </Box>
               </MenuItem>
               <MenuItem value="technical">
-                💼 Phỏng vấn Chuyên môn Kỹ thuật (Technical Focus)
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <WorkOutlineOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} />
+                  <span>Phỏng vấn Chuyên môn Kỹ thuật (Technical Focus)</span>
+                </Box>
               </MenuItem>
               <MenuItem value="behavioral">
-                💬 Phỏng vấn Hành vi & Tính cách (Behavioral Focus)
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <ChatBubbleOutlineOutlinedIcon sx={{ fontSize: 18, color: '#059669' }} />
+                  <span>Phỏng vấn Hành vi & Tính cách (Behavioral Focus)</span>
+                </Box>
               </MenuItem>
             </TextField>
 

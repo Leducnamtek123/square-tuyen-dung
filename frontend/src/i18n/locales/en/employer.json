@@ -466,7 +466,7 @@
     "label": {
       "selectjobpost": "Select job post",
       "selectcandidate": "Select candidate",
-      "selectquestiongroupoptional": "Select Question Group (Optional)",
+      "selectquestiongroupoptional": "Select Question Group",
       "selectinterviewquestions": "Select Interview Questions"
     },
     "helperText": {
@@ -561,11 +561,11 @@
       "resultLabel": "Final Result",
       "commentsPlaceholder": "Add HR notes and final assessment...",
       "comments": "Detailed Comments",
-      "proposedSalary": "Proposed Salary (VND)",
+      "proposedSalary": "Proposed Salary",
       "submitEvaluation": "Submit Final Evaluation",
       "evalSuccess": "Evaluation submitted successfully!",
-      "passed": "Accepted (Pass)",
-      "failed": "Rejected (Fail)",
+      "passed": "Qualified",
+      "failed": "Unqualified",
       "pending": "Pending Review"
     }
   },
@@ -618,7 +618,9 @@
       "contactpersonphoneexceededallowedlength": "Contact person phone exceeded allowed length.",
       "contactpersonemailisrequired": "Contact person email is required.",
       "invalidemail": "Invalid email.",
-      "contactpersonemailexceededallowedlength": "Contact person email exceeded allowed length."
+      "contactpersonemailexceededallowedlength": "Contact person email exceeded allowed length.",
+      "invalidminscore": "Invalid minimum score.",
+      "minscoreoutofrange": "Minimum score must be between 0 and 100."
     },
     "warning": "When you update the post, it will be pending approval!",
     "title": {
@@ -647,7 +649,14 @@
       "contactpersonphone": "Contact Person Phone",
       "contactpersonemail": "Contact Person Email",
       "urgent": "Urgent",
-      "contactinformation": "Contact Information"
+      "contactinformation": "Contact Information",
+      "autointerview": "Auto AI Interview for Qualified Candidates",
+      "autointerviewdesc": "Automatically send an AI interview invitation as soon as the candidate's CV score meets the threshold.",
+      "minscreeningscore": "Minimum CV score for auto-invitation",
+      "aiPipelineHelp": "Parallel Mode: Candidates scoring at or above this threshold will automatically receive an AI interview invitation email. Candidates below threshold or when auto-interview is turned off will be queued in pending status for manual review."
+    },
+    "tooltip": {
+      "minscreeningscore": "Score scale from 0 to 100 points."
     },
     "placeholder": {
       "enterjobtitle": "Enter job title",
@@ -662,6 +671,7 @@
       "entermaximumsalary": "Enter maximum salary",
       "selectacademiclevel": "Select academic level",
       "selectinterviewtemplate": "Select an interview template for automated preliminary assessment...",
+      "enterminscreeningscore": "Enter score between 0 and 100 (default: 70)",
       "selectcityprovince": "Select city/province",
       "selectCityFirst": "Please select City / Province first",
       "selectdistrict": "Select district",
@@ -680,6 +690,8 @@
     },
     "section": {
       "basicInfo": "Basic Information",
+      "aiPipeline": "AI Interview & Automation Pipeline",
+      "content": "Job Details & Benefits",
       "location": "Work Location",
       "contact": "Contact Information"
     }
@@ -812,12 +824,17 @@
       "updateError": "Error occurred while updating question set",
       "deleteSuccess": "Deleted question group successfully",
       "deleteError": "Error occurred while deleting question set",
-      "createSuccess": "Question group created successfully"
+      "createSuccess": "Question group created successfully",
+      "testRoomCreated": "Mock interview room created successfully!",
+      "emptyGroupWarning": "This question group does not have any questions to test."
     },
     "title": "Question Groups",
     "actions": {
       "addGroup": "Add Group",
-      "createNewQuestion": "Create New Question"
+      "createNewQuestion": "Create New Question",
+      "testWithAI": "Test with AI",
+      "testGroupTooltip": "Practice / Test interview with this question group",
+      "testInDialog": "Test question group"
     },
     "noData": "No question groups yet"
   },
@@ -851,7 +868,7 @@
   },
   "sidebar": {
     "dashboard": "Dashboard",
-    "agentAssistants": "AI Assistant (AILA)",
+    "agentAssistants": "AI Assistant AILA",
     "jobPostList": "Job Post List",
     "candidateManagement": "Candidate Management",
     "appliedApplications": "Applied Applications",

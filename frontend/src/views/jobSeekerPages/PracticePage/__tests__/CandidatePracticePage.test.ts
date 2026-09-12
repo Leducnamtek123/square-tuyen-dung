@@ -66,7 +66,7 @@ describe('CandidatePracticePage logic and data handling', () => {
       case 'lead':
         return { label: 'Senior / Quản lý', bg: 'bg-purple-100 text-purple-700 border-purple-200' };
       case 'middle':
-        return { label: 'Trung cấp (Middle)', bg: 'bg-blue-100 text-blue-700 border-blue-200' };
+        return { label: 'Cấp độ Middle', bg: 'bg-blue-100 text-blue-700 border-blue-200' };
       default:
         return { label: 'Junior / Mới bắt đầu', bg: 'bg-emerald-100 text-emerald-700 border-emerald-200' };
     }
@@ -82,7 +82,7 @@ describe('CandidatePracticePage logic and data handling', () => {
 
   test('maps seniority levels accurately to display labels and styles', () => {
     expect(getSeniorityBadge('junior').label).toBe('Junior / Mới bắt đầu');
-    expect(getSeniorityBadge('middle').label).toBe('Trung cấp (Middle)');
+    expect(getSeniorityBadge('middle').label).toBe('Cấp độ Middle');
     expect(getSeniorityBadge('senior').label).toBe('Senior / Quản lý');
     expect(getSeniorityBadge('lead').label).toBe('Senior / Quản lý');
     expect(getSeniorityBadge(undefined).label).toBe('Junior / Mới bắt đầu');
@@ -108,28 +108,33 @@ describe('CandidatePracticePage logic and data handling', () => {
     expect(searchedQuestions[0].id).toBe(1);
   });
 
-  test('builds mock interview creation payloads with correct defaults and custom single-question overrides', () => {
-    // Default studio launch payload
-    const defaultPayload: CreateMockSessionPayload = {
-      job_title: 'Kỹ sư giám sát công trình',
-      category: 'Xây dựng & Kiến trúc',
+  test('builds mock interview creation payloads with dynamic career_id and profile title', () => {
+    // Dynamic launch payload with career_id
+    const dynamicPayload: CreateMockSessionPayload = {
+      job_title: 'Kiến trúc sư công trình',
+      position_title: 'Kiến trúc sư công trình',
+      career_id: 78,
+      category: 'Xây dựng - Kiến trúc',
       seniority: 'middle',
       question_count: 5,
     };
-    expect(defaultPayload.job_title).toBe('Kỹ sư giám sát công trình');
-    expect(defaultPayload.question_count).toBe(5);
+    expect(dynamicPayload.job_title).toBe('Kiến trúc sư công trình');
+    expect(dynamicPayload.career_id).toBe(78);
+    expect(dynamicPayload.question_count).toBe(5);
 
-    // Custom single question click payload
+    // Custom single question click payload with career_id and question_ids
     const targetQuestion = mockQuestions[1];
     const customPayload: CreateMockSessionPayload = {
       job_title: targetQuestion.question_text,
-      category: targetQuestion.category || 'Chung',
+      career_id: 80,
+      category: targetQuestion.category || 'Công nghệ thông tin',
       seniority: targetQuestion.seniority || 'middle',
-      question_count: 3,
+      question_count: 5,
+      question_ids: [targetQuestion.id],
     };
     expect(customPayload.job_title).toBe('Làm thế nào để tối ưu hóa hiệu năng render Next.js và loại bỏ waterfalls?');
-    expect(customPayload.category).toBe('Công nghệ thông tin');
-    expect(customPayload.question_count).toBe(3);
+    expect(customPayload.career_id).toBe(80);
+    expect(customPayload.question_ids).toEqual([2]);
   });
 
   test('determines correct redirection target for created mock interview sessions', () => {

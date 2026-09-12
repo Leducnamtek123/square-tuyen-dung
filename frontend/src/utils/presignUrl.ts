@@ -45,14 +45,28 @@ const requestPresign = async (url: string): Promise<string | null> => {
   try {
     const accessToken = tokenService.getAccessTokenFromCookie();
     const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
-    const response = await axios.get(`${getBaseUrl()}common/presign/`, {
-      params: { url },
-      headers,
-      withCredentials: true,
-      timeout: PRESIGN_REQUEST_TIMEOUT_MS,
-    });
-    const data = unwrapResponse(response) as { url?: string } | null;
-    return data?.url || null;
+    try {
+      const response = await axios.get(`${getBaseUrl()}common/presign/`, {
+        params: { url },
+        headers,
+        withCredentials: true,
+        timeout: PRESIGN_REQUEST_TIMEOUT_MS,
+      });
+      const data = unwrapResponse(response) as { url?: string } | null;
+      return data?.url || null;
+    } catch (firstErr: any) {
+      if (accessToken && firstErr?.response?.status === 401) {
+        // Stale or expired token: retry anonymously for public assets (logos, system icons)
+        const retryResponse = await axios.get(`${getBaseUrl()}common/presign/`, {
+          params: { url },
+          withCredentials: true,
+          timeout: PRESIGN_REQUEST_TIMEOUT_MS,
+        });
+        const retryData = unwrapResponse(retryResponse) as { url?: string } | null;
+        return retryData?.url || null;
+      }
+      throw firstErr;
+    }
   } catch {
     return null;
   }

@@ -82,7 +82,7 @@ const MyCompanyPage = () => {
                             </Box>
                             <Box>
                                 {/* Start: SuggestedJobPostCard */}
-                                <SuggestedJobPostCard fullWidth={true} />
+                                <SuggestedJobPostCard fullWidth={true} pageSize={5} />
                                 {/* End: SuggestedJobPostCardf */}
                             </Box>
                         </Stack>

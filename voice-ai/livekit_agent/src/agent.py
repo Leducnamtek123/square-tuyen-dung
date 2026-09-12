@@ -20,6 +20,7 @@ from livekit.agents.job import get_job_context
 from livekit.agents.llm import ChatMessage
 from livekit.agents.voice.events import CloseEvent, SessionUsageUpdatedEvent
 from livekit.plugins import openai, silero
+from livekit.plugins.openai import tts as openai_tts
 
 from .backend_auth import auth_event_hook
 from .config import config
@@ -35,6 +36,8 @@ logger.setLevel(logging.INFO)
 CHAT_TOPIC = "lk.chat"
 AI_CONTROL_TOPIC = "square.interview.ai_control"
 AI_TAKEOVER_TOPIC = "square.interview.ai_takeover"
+QUESTION_CONTROL_TOPIC = "square.interview.question_control"
+QUESTION_CHANGE_TOPIC = "square.interview.question_change"
 EMPLOYER_CONTROL_ROLES = {"employer", "observer"}
 _BACKGROUND_TASKS: set[asyncio.Task[Any]] = set()
 
@@ -197,15 +200,17 @@ async def entrypoint(ctx: JobContext) -> None:
 
     # 1. Initialize Models
     stt_model = openai.STT(
-        api_key=config.STT_API_KEY,
-        base_url=config.STT_BASE_URL,
+        client=openai_lib.AsyncOpenAI(
+            api_key=config.STT_API_KEY or "dummy",
+            base_url=config.STT_BASE_URL,
+        ),
         model=config.STT_MODEL,
         language=config.STT_LANGUAGE,
     )
 
     llm_model = openai.LLM(
         client=openai_lib.AsyncOpenAI(
-            api_key=config.LLM_API_KEY,
+            api_key=config.LLM_API_KEY or "dummy",
             base_url=config.LLM_BASE_URL,
             http_client=httpx.AsyncClient(timeout=httpx.Timeout(600.0, connect=15.0)),
         ),
@@ -267,9 +272,13 @@ async def entrypoint(ctx: JobContext) -> None:
     if tts_speed is not None:
         logger.info("Using TTS speed for room %s: %s", ctx.room.name, tts_speed)
 
+    # Ensure custom audio stream models stream raw audio chunks instead of expecting SSE events
+    openai_tts.AUDIO_STREAM_MODELS.add(config.TTS_MODEL)
+    openai_tts.AUDIO_STREAM_MODELS.add("tts-vi")
+
     tts_kwargs = {
         "client": openai_lib.AsyncOpenAI(
-            api_key=config.TTS_API_KEY,
+            api_key=config.TTS_API_KEY or "dummy",
             base_url=config.TTS_BASE_URL,
             max_retries=config.TTS_MAX_RETRIES,
             http_client=httpx.AsyncClient(
@@ -283,6 +292,7 @@ async def entrypoint(ctx: JobContext) -> None:
         ),
         "model": config.TTS_MODEL,
         "voice": tts_voice,
+        "response_format": "mp3",
     }
     if tts_speed is not None:
         tts_kwargs["speed"] = tts_speed
@@ -422,6 +432,49 @@ async def entrypoint(ctx: JobContext) -> None:
 
         interviewer.resume_from_employer_takeover(speaker_name)
 
+    async def _handle_question_control_stream(reader, participant_identity) -> None:
+        participant_identity = _participant_identity(participant_identity)
+        text = (await reader.read_all()).strip()
+        if not text:
+            return
+
+        try:
+            payload = json.loads(text)
+        except Exception:
+            payload = {"action": text}
+
+        action = str(payload.get("action") or payload.get("type") or "").strip().lower()
+        logger.info(
+            "Received question control event for room %s from %s: action=%s",
+            ctx.room.name,
+            participant_identity,
+            action,
+        )
+
+        target_index = payload.get("question_index")
+        if not isinstance(target_index, int):
+            target_index = None
+
+        if action in {"time_up", "timeout"}:
+            next_idx = target_index + 1 if target_index is not None else None
+            await interviewer.handle_question_timeout(target_index=next_idx)
+        elif action in {"next_question", "skip_question", "done_question"}:
+            await interviewer.handle_candidate_next_question(target_index=target_index)
+        elif action in {"finish_interview", "end_session", "complete_interview"}:
+            await interviewer.handle_candidate_finish_interview()
+
+    async def _handle_question_change_stream(reader, participant_identity) -> None:
+        text = (await reader.read_all()).strip()
+        if not text:
+            return
+        try:
+            payload = json.loads(text)
+        except Exception:
+            return
+        q_idx = payload.get("question_index")
+        if isinstance(q_idx, int) and 0 <= q_idx < len(interviewer.questions):
+            interviewer.current_question_index = q_idx
+
     # 4. Setup Session (Standard 1.5.x Pattern)
     session = AgentSession(
         stt=stt_model,
@@ -531,6 +584,18 @@ async def entrypoint(ctx: JobContext) -> None:
         AI_TAKEOVER_TOPIC,
         lambda reader, participant_identity: asyncio.create_task(
             _handle_employer_takeover_stream(reader, participant_identity)
+        ),
+    )
+    ctx.room.register_text_stream_handler(
+        QUESTION_CONTROL_TOPIC,
+        lambda reader, participant_identity: asyncio.create_task(
+            _handle_question_control_stream(reader, participant_identity)
+        ),
+    )
+    ctx.room.register_text_stream_handler(
+        QUESTION_CHANGE_TOPIC,
+        lambda reader, participant_identity: asyncio.create_task(
+            _handle_question_change_stream(reader, participant_identity)
         ),
     )
 

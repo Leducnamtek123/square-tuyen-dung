@@ -6,6 +6,7 @@
   "forbiddenBody": "Bạn không có quyền truy cập vào trang này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là lỗi.",
   "forbiddenCode": "403",
   "systemErrorTitle": "Đã có lỗi xảy ra",
+  "systemErrorDesc": "Không thể nạp dữ liệu phỏng vấn. Vui lòng tải lại trang hoặc liên hệ hỗ trợ.",
   "systemErrorBody": "Hệ thống đang gặp sự cố. Vui lòng thử lại sau.",
   "systemErrorCode": "500",
   "backHome": "Về trang chủ",

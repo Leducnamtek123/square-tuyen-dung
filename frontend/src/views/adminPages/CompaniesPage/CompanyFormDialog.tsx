@@ -65,8 +65,8 @@ const CompanyFormDialog = ({
       <DialogTitle sx={{ fontWeight: 700 }}>
         {mode === 'add' ? t('pages.companies.addConfirmTitle') : t('pages.companies.editConfirmTitle')}
       </DialogTitle>
-      <DialogContent>
-        <Grid container spacing={3} sx={{ pt: 1 }}>
+      <DialogContent sx={{ pt: '20px !important' }}>
+        <Grid container spacing={3}>
           <Grid size={12} sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
             <Box sx={{ position: 'relative' }}>
               <Avatar

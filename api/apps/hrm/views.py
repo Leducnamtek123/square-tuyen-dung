@@ -2,7 +2,7 @@ import csv
 from datetime import timedelta
 from decimal import Decimal
 from django.db import transaction
-from django.db.models import Count, Q, Prefetch
+from django.db.models import Count, Q, Prefetch, Sum
 from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework import permissions, status, viewsets
@@ -31,6 +31,8 @@ from apps.hrm.models import (
     MonthlyPayrollRecord,
     ShiftAssignment,
     WorkShift,
+    EmployeeCareerHistory,
+    EmployeeDocument,
 )
 from apps.hrm.serializers import (
     WorkLocationSerializer,
@@ -53,6 +55,8 @@ from apps.hrm.serializers import (
     ShiftAssignmentBatchSerializer,
     ShiftAssignmentSerializer,
     WorkShiftSerializer,
+    EmployeeCareerHistorySerializer,
+    EmployeeDocumentSerializer,
 )
 from apps.hrm.services import CandidateToEmployeeConverter, generate_next_employee_code
 from shared.configs import variable_system as var_sys
@@ -220,6 +224,15 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             full_name=full_name,
         )
 
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        first_name = serializer.validated_data.get('first_name', instance.first_name).strip()
+        last_name = serializer.validated_data.get('last_name', instance.last_name).strip()
+        full_name = f"{last_name} {first_name}".strip()
+        if full_name and full_name != instance.full_name:
+            instance.full_name = full_name
+            instance.save(update_fields=['full_name', 'update_at'])
+
     @action(detail=False, methods=['post'], url_path='onboard-from-candidate')
     def onboard_from_candidate(self, request):
         """
@@ -298,7 +311,13 @@ class EmploymentContractViewSet(viewsets.ModelViewSet):
         employee = serializer.validated_data.get('employee')
         if employee and employee.company != company:
             raise PermissionDenied("Nhân viên này không thuộc công ty của bạn.")
-        serializer.save()
+        status_val = serializer.validated_data.get('status', 'ACTIVE')
+        with transaction.atomic():
+            if status_val == 'ACTIVE' and employee:
+                EmploymentContract.objects.filter(employee=employee, status='ACTIVE').update(
+                    status='EXPIRED', update_at=timezone.now()
+                )
+            serializer.save()
 
     @action(detail=True, methods=['post'], url_path='renew')
     def renew(self, request, pk=None):
@@ -433,19 +452,27 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
         if employee and employee.company != company:
             raise PermissionDenied("Nhân viên này không thuộc công ty của bạn.")
 
-        leave_req = serializer.save()
+        leave_type = serializer.validated_data.get('leave_type')
+        start_date = serializer.validated_data.get('start_date')
+        total_days = serializer.validated_data.get('total_days', Decimal("1.0"))
 
-        # Cập nhật số ngày chờ duyệt trên Quỹ phép
-        if leave_req.leave_type:
-            year = leave_req.start_date.year
-            balance = EmployeeLeaveBalance.objects.filter(
-                employee=leave_req.employee,
-                leave_type=leave_req.leave_type,
-                year=year
-            ).first()
-            if balance:
-                balance.pending_days = float(balance.pending_days) + float(leave_req.total_days)
-                balance.save(update_fields=['pending_days', 'update_at'])
+        with transaction.atomic():
+            if leave_type and employee:
+                year = start_date.year if start_date else timezone.now().year
+                balance = EmployeeLeaveBalance.objects.select_for_update().filter(
+                    employee=employee,
+                    leave_type=leave_type,
+                    year=year
+                ).first()
+                if balance:
+                    if leave_type.is_paid and float(total_days) > balance.remaining_days:
+                        raise ValidationError({
+                            "total_days": [f"Số ngày phép khả dụng ({balance.remaining_days:.1f} ngày) không đủ cho đơn nghỉ ({float(total_days):.1f} ngày)."]
+                        })
+                    balance.pending_days = float(balance.pending_days) + float(total_days)
+                    balance.save(update_fields=['pending_days', 'update_at'])
+
+            leave_req = serializer.save()
 
     @action(detail=True, methods=['patch'], url_path='approve')
     def approve(self, request, pk=None):
@@ -551,17 +578,21 @@ class AttendanceRecordViewSet(viewsets.ModelViewSet):
                 'check_out': att.check_out.strftime('%H:%M') if att.check_out else None,
             }
 
+        from datetime import date as dt_date
+        month_start_date = dt_date(year, month, 1)
+        month_end_date = dt_date(year, month, num_days)
+
         leaves = LeaveRequest.objects.filter(
             employee__company=company,
             status='APPROVED',
-            start_date__year=year,
-            start_date__month=month
+            start_date__lte=month_end_date,
+            end_date__gte=month_start_date
         )
         leave_map = {}
         for l in leaves:
-            start_d = max(1, l.start_date.day)
-            end_d = min(num_days, l.end_date.day)
-            for d in range(start_d, end_d + 1):
+            eff_start = max(month_start_date, l.start_date)
+            eff_end = min(month_end_date, l.end_date)
+            for d in range(eff_start.day, eff_end.day + 1):
                 leave_map[(l.employee_id, d)] = 'ON_LEAVE'
 
         employee_data = []
@@ -774,18 +805,33 @@ class MonthlyPayrollViewSet(viewsets.ModelViewSet):
             employees = employees.filter(id=employee_id)
 
         created_records = []
+        force_recalc = request.data.get('force', False)
         for emp in employees:
+            existing_payroll = MonthlyPayrollRecord.objects.filter(
+                company=company, employee=emp, month=month, year=year
+            ).first()
+            if existing_payroll and existing_payroll.status in [MonthlyPayrollRecord.STATUS_APPROVED, MonthlyPayrollRecord.STATUS_PAID] and not force_recalc:
+                created_records.append(existing_payroll)
+                continue
+
             contract = emp.contracts.filter(status='ACTIVE').order_by('-start_date').first()
             gross = contract.base_salary if contract else Decimal("10000000")
             allowance = contract.allowance if contract else Decimal("0")
 
-            unpaid_leave_days = LeaveRequest.objects.filter(
+            unpaid_leave_agg = LeaveRequest.objects.filter(
                 employee=emp,
                 status='APPROVED',
                 leave_type__is_paid=False,
                 start_date__year=year,
                 start_date__month=month,
-            ).count()
+            ).aggregate(total_days=Sum('total_days'))
+            unpaid_leave_days = int(unpaid_leave_agg['total_days'] or 0)
+
+            has_attendance_entries = AttendanceRecord.objects.filter(
+                employee=emp,
+                date__year=year,
+                date__month=month,
+            ).exists()
 
             attendance_days = AttendanceRecord.objects.filter(
                 employee=emp,
@@ -793,7 +839,13 @@ class MonthlyPayrollViewSet(viewsets.ModelViewSet):
                 date__month=month,
                 status__in=['PRESENT', 'LATE', 'EARLY_LEAVE']
             ).count()
-            actual_days = attendance_days if attendance_days > 0 else standard_days
+
+            if has_attendance_entries:
+                actual_days = attendance_days
+            else:
+                actual_days = max(0, standard_days - unpaid_leave_days)
+
+            dep_count = getattr(emp, 'dependents_count', 0) or 0
 
             calc = calculate_vietnam_payroll(
                 gross_salary=gross,
@@ -802,6 +854,7 @@ class MonthlyPayrollViewSet(viewsets.ModelViewSet):
                 working_days_actual=actual_days,
                 standard_working_days=standard_days,
                 unpaid_leave_days=unpaid_leave_days,
+                dependents_count=dep_count,
             )
 
             record, _ = MonthlyPayrollRecord.objects.update_or_create(
@@ -856,12 +909,14 @@ class EmployeeSelfServiceView(APIView):
         year = timezone.now().year
         leave_balances = EmployeeLeaveBalance.objects.filter(employee=emp, year=year).select_related('leave_type')
         recent_payrolls = MonthlyPayrollRecord.objects.filter(employee=emp).order_by('-year', '-month')[:6]
+        recent_attendance_summaries = MonthlyAttendanceSummary.objects.filter(employee=emp).order_by('-year', '-month')[:6]
 
         return Response({
             'employee': EmployeeSerializer(emp).data,
             'active_contract': EmploymentContractSerializer(active_contract).data if active_contract else None,
             'leave_balances': EmployeeLeaveBalanceSerializer(leave_balances, many=True).data,
-            'recent_payrolls': MonthlyPayrollRecordSerializer(recent_payrolls, many=True).data
+            'recent_payrolls': MonthlyPayrollRecordSerializer(recent_payrolls, many=True).data,
+            'recent_attendance_summaries': MonthlyAttendanceSummarySerializer(recent_attendance_summaries, many=True).data,
         })
 
 
@@ -1111,6 +1166,10 @@ class AttendanceRequestViewSet(viewsets.ModelViewSet):
             assignment = ShiftAssignment.objects.filter(employee=req.employee, date=curr_date).first()
             shift = assignment.shift if assignment else getattr(record, 'shift', None)
 
+            if record.is_locked:
+                curr_date += timedelta(days=1)
+                continue
+
             if req.request_type == 'REGULARISATION':
                 if req.start_time:
                     record.check_in = req.start_time
@@ -1127,6 +1186,14 @@ class AttendanceRequestViewSet(viewsets.ModelViewSet):
                 record.notes = f"Nghỉ phép: {req.leave_type.name if req.leave_type else ''}. {req.reason or ''}"
                 if req.leave_type and req.leave_type.is_paid:
                     record.working_hours = shift.working_hours if shift else Decimal("8.00")
+                    balance = EmployeeLeaveBalance.objects.filter(
+                        employee=req.employee,
+                        leave_type=req.leave_type,
+                        year=curr_date.year
+                    ).first()
+                    if balance:
+                        balance.used_days = float(balance.used_days) + 1.0
+                        balance.save(update_fields=['used_days', 'update_at'])
 
             elif req.request_type == 'BUSINESS_TRIP':
                 record.status = 'PRESENT'
@@ -1155,7 +1222,9 @@ class BiometricPunchLogViewSet(viewsets.ModelViewSet):
         company = _get_company_for_request(self.request)
         if not company:
             return BiometricPunchLog.objects.none()
-        qs = BiometricPunchLog.objects.filter(company=company).select_related('employee', 'employee__department')
+        qs = BiometricPunchLog.objects.filter(company=company).select_related(
+            'employee', 'employee__department', 'device', 'location'
+        )
 
         employee_id = self.request.query_params.get('employee_id')
         if employee_id:
@@ -1169,13 +1238,49 @@ class BiometricPunchLogViewSet(viewsets.ModelViewSet):
         if date_val:
             qs = qs.filter(punch_time__date=date_val)
 
+        device_id = self.request.query_params.get('device_id')
+        if device_id:
+            qs = qs.filter(device_id=device_id)
+
+        location_id = self.request.query_params.get('location_id')
+        if location_id:
+            qs = qs.filter(location_id=location_id)
+
+        is_dup = self.request.query_params.get('is_duplicate')
+        if is_dup is not None:
+            qs = qs.filter(is_duplicate=(is_dup.lower() in ['true', '1']))
+
         return qs.order_by('-punch_time')
 
     def perform_create(self, serializer):
         company = _get_company_for_request(self.request)
         if not company:
             raise PermissionDenied("Bạn không có quyền quản lý log máy chấm công cho công ty này.")
-        serializer.save(company=company)
+        instance = serializer.save(company=company)
+        from apps.hrm.services import mark_if_duplicate_on_punch
+        mark_if_duplicate_on_punch(instance, window_seconds=120)
+
+    @action(detail=False, methods=['post'], url_path='deduplicate')
+    def deduplicate(self, request):
+        company = _get_company_for_request(request)
+        if not company:
+            raise PermissionDenied("Không có quyền thực hiện.")
+        date_str = request.data.get('date')
+        target_date = None
+        if date_str:
+            try:
+                from datetime import datetime as dt_cls
+                target_date = dt_cls.strptime(date_str, '%Y-%m-%d').date()
+            except ValueError:
+                return Response({'detail': 'Định dạng ngày không hợp lệ (YYYY-MM-DD).'}, status=status.HTTP_400_BAD_REQUEST)
+
+        from apps.hrm.services import deduplicate_punch_logs
+        window_seconds = int(request.data.get('window_seconds', 120))
+        dup_count = deduplicate_punch_logs(company, target_date=target_date, window_seconds=window_seconds)
+        return Response({
+            'message': f'Đã chạy thuật toán khử trùng lặp ({window_seconds}s). Phát hiện và gắn cờ {dup_count} bản ghi quẹt trùng.',
+            'duplicate_count': dup_count,
+        }, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], url_path='process-daily')
     def process_daily(self, request):
@@ -1198,6 +1303,7 @@ class BiometricPunchLogViewSet(viewsets.ModelViewSet):
             'message': f'Đã tổng hợp dữ liệu chấm công ngày {target_date} cho {count} nhân viên.',
             'count': count,
         }, status=status.HTTP_200_OK)
+
 
 
 class MonthlyAttendanceSummaryViewSet(viewsets.ModelViewSet):
@@ -1268,7 +1374,17 @@ class MonthlyAttendanceSummaryViewSet(viewsets.ModelViewSet):
 
             for rec in records:
                 if rec.status == 'ON_LEAVE':
-                    paid_leave_days += Decimal("1.0")
+                    is_unpaid = LeaveRequest.objects.filter(
+                        employee=emp,
+                        status='APPROVED',
+                        leave_type__is_paid=False,
+                        start_date__lte=rec.date,
+                        end_date__gte=rec.date
+                    ).exists()
+                    if is_unpaid:
+                        unpaid_leave_days += Decimal("1.0")
+                    else:
+                        paid_leave_days += Decimal("1.0")
                 elif rec.status == 'ABSENT':
                     unpaid_leave_days += Decimal("1.0")
                 elif rec.status in ['PRESENT', 'LATE', 'EARLY_LEAVE']:
@@ -1363,6 +1479,19 @@ class MonthlyAttendanceSummaryViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Không có quyền thực hiện.")
         summary = self.get_object()
 
+        existing_payroll = MonthlyPayrollRecord.objects.filter(
+            company=company,
+            employee=summary.employee,
+            month=summary.month,
+            year=summary.year
+        ).first()
+        force_push = request.data.get('force', False)
+        if existing_payroll and existing_payroll.status in [MonthlyPayrollRecord.STATUS_APPROVED, MonthlyPayrollRecord.STATUS_PAID] and not force_push:
+            return Response(
+                {'detail': f'Bảng lương tháng {summary.month}/{summary.year} của {summary.employee.full_name} đã ở trạng thái {existing_payroll.get_status_display()}, không thể ghi đè.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         if not summary.is_locked:
             reviewer = Employee.objects.filter(company=company, user=request.user).first()
             summary.is_locked = True
@@ -1376,6 +1505,7 @@ class MonthlyAttendanceSummaryViewSet(viewsets.ModelViewSet):
         actual_days = int(round(summary.actual_work_days + summary.paid_leave_days))
         standard_days = int(round(summary.standard_work_days))
         unpaid_days = int(round(summary.unpaid_leave_days))
+        dep_count = getattr(summary.employee, 'dependents_count', 0) or 0
 
         from .payroll_engine import calculate_vietnam_payroll
         calc = calculate_vietnam_payroll(
@@ -1385,6 +1515,7 @@ class MonthlyAttendanceSummaryViewSet(viewsets.ModelViewSet):
             working_days_actual=actual_days,
             standard_working_days=standard_days,
             unpaid_leave_days=unpaid_days,
+            dependents_count=dep_count,
         )
 
         payroll_rec, _ = MonthlyPayrollRecord.objects.update_or_create(
@@ -1560,6 +1691,57 @@ class BiometricDeviceViewSet(viewsets.ModelViewSet):
             "total_punches_synced": device.total_punches_synced,
             "device": BiometricDeviceSerializer(device).data
         }, status=status.HTTP_200_OK)
+
+
+class EmployeeCareerHistoryViewSet(viewsets.ModelViewSet):
+    permission_classes = [perms_custom.CanManageEmployees]
+    serializer_class = EmployeeCareerHistorySerializer
+
+    def get_queryset(self):
+        company = _get_company_for_request(self.request)
+        if not company:
+            return EmployeeCareerHistory.objects.none()
+        qs = EmployeeCareerHistory.objects.filter(company=company).select_related(
+            'employee', 'old_department', 'new_department', 'old_designation', 'new_designation'
+        )
+        employee_id = self.request.query_params.get('employee_id')
+        if employee_id:
+            qs = qs.filter(employee_id=employee_id)
+        event_type = self.request.query_params.get('event_type')
+        if event_type:
+            qs = qs.filter(event_type=event_type)
+        return qs
+
+    def perform_create(self, serializer):
+        company = _get_company_for_request(self.request)
+        if not company:
+            raise PermissionDenied("Không có quyền thực hiện.")
+        serializer.save(company=company)
+
+
+class EmployeeDocumentViewSet(viewsets.ModelViewSet):
+    permission_classes = [perms_custom.CanManageEmployees]
+    serializer_class = EmployeeDocumentSerializer
+
+    def get_queryset(self):
+        company = _get_company_for_request(self.request)
+        if not company:
+            return EmployeeDocument.objects.none()
+        qs = EmployeeDocument.objects.filter(company=company).select_related('employee')
+        employee_id = self.request.query_params.get('employee_id')
+        if employee_id:
+            qs = qs.filter(employee_id=employee_id)
+        document_type = self.request.query_params.get('document_type')
+        if document_type:
+            qs = qs.filter(document_type=document_type)
+        return qs
+
+    def perform_create(self, serializer):
+        company = _get_company_for_request(self.request)
+        if not company:
+            raise PermissionDenied("Không có quyền thực hiện.")
+        serializer.save(company=company)
+
 
 
 

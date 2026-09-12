@@ -91,7 +91,18 @@ export default function OnboardingPage() {
     employment_type: 'FULL_TIME',
   });
 
-  const onboardingEmployees = employees.filter((e) => e.status === 'PROBATION' || e.status === 'ACTIVE');
+  const sixtyDaysAgo = new Date();
+  sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+
+  const onboardingEmployees = employees.filter((e) => {
+    if (e.status === 'PROBATION') return true;
+    const joinDateStr = e.joinDate || e.join_date;
+    if (joinDateStr) {
+      const joinDate = new Date(joinDateStr);
+      return joinDate >= sixtyDaysAgo;
+    }
+    return false;
+  });
 
   const handleNext = () => {
     setActiveStep((prev) => prev + 1);
@@ -284,31 +295,31 @@ export default function OnboardingPage() {
                             src={emp.avatar}
                             sx={{ width: 38, height: 38, bgcolor: '#f0fdf4', color: '#16a34a', fontWeight: 800, fontSize: '0.875rem' }}
                           >
-                            {emp.full_name?.charAt(0)?.toUpperCase() || 'E'}
+                            {(emp.fullName || emp.full_name)?.charAt(0)?.toUpperCase() || 'E'}
                           </Avatar>
                           <Box>
                             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
-                              {emp.full_name}
+                              {emp.fullName || emp.full_name}
                             </Typography>
                             <Typography variant="caption" sx={{ color: '#64748b', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-                              {emp.employee_code}
+                              {emp.employeeCode || emp.employee_code}
                             </Typography>
                           </Box>
                         </Stack>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" sx={{ fontWeight: 700, color: '#1e293b' }}>
-                          {emp.designation_title || 'Chưa gán'}
+                          {emp.designationTitle || emp.designation_title || 'Chưa gán'}
                         </Typography>
                         <Typography variant="caption" sx={{ color: '#64748b' }}>
-                          {emp.department_name || 'Chưa phân phòng'}
+                          {emp.departmentName || emp.department_name || 'Chưa phân phòng'}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ fontFamily: 'var(--font-mono)', fontSize: '0.8125rem', color: '#475569' }}>
-                        {emp.join_date || '---'}
+                        {emp.joinDate || emp.join_date || '---'}
                       </TableCell>
                       <TableCell sx={{ fontFamily: 'var(--font-mono)', fontSize: '0.8125rem', color: '#d97706', fontWeight: 700 }}>
-                        {emp.probation_end_date || '---'}
+                        {emp.probationEndDate || emp.probation_end_date || '---'}
                       </TableCell>
                       <TableCell>
                         <Chip

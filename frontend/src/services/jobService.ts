@@ -45,6 +45,8 @@ export interface JobPostInput {
   academicLevel?: number;
   jobType?: number;
   interviewTemplate?: number | string | null;
+  autoInterviewEnabled?: boolean;
+  minScreeningScore?: number;
   typeOfWorkplace?: number;
   genderRequired?: string;
   jobDescription?: string;

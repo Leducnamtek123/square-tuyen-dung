@@ -6,6 +6,7 @@ from shared.helpers import utils, helper
 
 from shared.configs import variable_response as var_res
 from shared.audit import AuditLogViewSetMixin, record_audit_log
+from shared.authentication import SafeOAuth2Authentication
 
 from django.db.models import Count, Q
 from django.http import HttpResponse
@@ -595,6 +596,7 @@ def health_check(request):
     return Response(response_data, status=status_code)
 
 @api_view(["GET"])
+@authentication_classes([SafeOAuth2Authentication])
 @permission_classes([AllowAny])
 @throttle_classes([])
 def presign_url(request):

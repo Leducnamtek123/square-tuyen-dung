@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -24,17 +24,32 @@ import BusinessIcon from '@mui/icons-material/Business';
 import AddIcon from '@mui/icons-material/Add';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
+import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import Link from 'next/link';
 
-import { useHrmOrgChart } from '../hooks/useHrmQueries';
-import { NativeOrgTreeNode } from '@/services/hrmService';
+import { useHrmOrgChart, useHrmEmployees } from '../hooks/useHrmQueries';
+import { NativeOrgTreeNode, NativeEmployee } from '@/services/hrmService';
 import { TabTitle } from '@/utils/generalFunction';
 
 export default function OrgChartPage() {
   TabTitle('Sơ đồ Cây Tổ chức | InfoHR HRM');
 
   const { data: orgTree = [], isLoading: loading, error, refetch } = useHrmOrgChart();
+  const { data: employees = [] } = useHrmEmployees();
   const [collapsedNodes, setCollapsedNodes] = useState<Record<number, boolean>>({});
+  const [showMembers, setShowMembers] = useState<Record<number, boolean>>({});
+
+  const employeesByDept = useMemo(() => {
+    const map = new Map<number, NativeEmployee[]>();
+    employees.forEach((emp) => {
+      const deptId = Number(emp.department);
+      if (deptId) {
+        if (!map.has(deptId)) map.set(deptId, []);
+        map.get(deptId)!.push(emp);
+      }
+    });
+    return map;
+  }, [employees]);
 
   const toggleNode = (id: number) => {
     setCollapsedNodes((prev) => ({
@@ -45,6 +60,13 @@ export default function OrgChartPage() {
 
   const isExpanded = (id: number) => {
     return !collapsedNodes[id]; // Default expanded
+  };
+
+  const toggleShowMembers = (id: number) => {
+    setShowMembers((prev) => ({
+      ...prev,
+      [id]: prev[id] === false ? true : false,
+    }));
   };
 
   const handleExpandAll = () => {
@@ -72,9 +94,12 @@ export default function OrgChartPage() {
   const renderTreeNode = (node: NativeOrgTreeNode, level: number = 0) => {
     if (!node) return null;
     const hasChildren = Array.isArray(node.children) && node.children.length > 0;
+    const deptEmployees = employeesByDept.get(node.id) || [];
+    const hasSubItems = hasChildren || deptEmployees.length > 0;
     const expanded = isExpanded(node.id);
     const nodeName = node.name || `Phòng ban #${node.id}`;
     const initialChar = nodeName.trim().charAt(0)?.toUpperCase() || 'D';
+    const isMembersVisible = showMembers[node.id] !== false;
 
     return (
       <Box key={node.id} sx={{ ml: level === 0 ? 0 : { xs: 1, sm: 2.5, md: 4 }, mt: 1.5, position: 'relative' }}>
@@ -97,8 +122,9 @@ export default function OrgChartPage() {
         >
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
             <Stack direction="row" spacing={1.5} alignItems="center">
-              {hasChildren ? (
-                <IconButton aria-label="Thao tác"
+              {hasSubItems ? (
+                <IconButton
+                  aria-label="Thao tác"
                   size="small"
                   onClick={() => toggleNode(node.id)}
                   sx={{
@@ -139,32 +165,227 @@ export default function OrgChartPage() {
               </Box>
             </Stack>
 
-            <Chip
-              label={`${node.employeeCount ?? node.employee_count ?? 0} Nhân sự`}
-              size="small"
-              sx={{
-                fontWeight: 800,
-                fontSize: '0.75rem',
-                bgcolor: level === 0 ? '#dbeafe' : '#f1f5f9',
-                color: level === 0 ? '#1d4ed8' : '#334155',
-                borderRadius: 1.5,
-              }}
-            />
+            <Stack direction="row" spacing={1} alignItems="center">
+              {deptEmployees.length > 0 && (
+                <Button
+                  size="small"
+                  onClick={() => toggleShowMembers(node.id)}
+                  startIcon={<GroupOutlinedIcon sx={{ fontSize: 16 }} />}
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 700,
+                    fontSize: '0.75rem',
+                    borderRadius: 1.5,
+                    px: 1.25,
+                    py: 0.25,
+                    bgcolor: isMembersVisible ? '#eff6ff' : '#f1f5f9',
+                    color: isMembersVisible ? '#2563eb' : '#475569',
+                    '&:hover': { bgcolor: '#dbeafe' },
+                  }}
+                >
+                  {deptEmployees.length} Thành viên
+                </Button>
+              )}
+              <Chip
+                label={`${deptEmployees.length > 0 ? deptEmployees.length : (node.employeeCount || node.employee_count || 0)} Nhân sự`}
+                size="small"
+                sx={{
+                  fontWeight: 800,
+                  fontSize: '0.75rem',
+                  bgcolor: level === 0 ? '#dbeafe' : '#f1f5f9',
+                  color: level === 0 ? '#1d4ed8' : '#334155',
+                  borderRadius: 1.5,
+                }}
+              />
+            </Stack>
           </Box>
         </Paper>
 
-        {hasChildren && (
+        {hasSubItems && (
           <Collapse in={expanded}>
-            <Box
-              sx={{
-                pl: { xs: 1, sm: 2 },
-                ml: { xs: 1, sm: 2 },
-                borderLeft: '2px dashed #cbd5e1',
-                mt: 1,
-              }}
-            >
-              {node.children.map((child) => renderTreeNode(child, level + 1))}
-            </Box>
+            {/* Department Members List */}
+            {deptEmployees.length > 0 && (
+              <Box
+                sx={{
+                  pl: { xs: 1, sm: 2 },
+                  ml: { xs: 1, sm: 2 },
+                  borderLeft: '2px solid #e2e8f0',
+                  mt: 1.5,
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 1,
+                    maxWidth: 680,
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 700,
+                      color: '#64748b',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em',
+                    }}
+                  >
+                    <GroupOutlinedIcon sx={{ fontSize: 15, color: '#3b82f6' }} />
+                    Nhân viên trực thuộc ({deptEmployees.length})
+                  </Typography>
+                  <Button
+                    size="small"
+                    onClick={() => toggleShowMembers(node.id)}
+                    sx={{
+                      textTransform: 'none',
+                      fontSize: '0.725rem',
+                      fontWeight: 600,
+                      color: '#3b82f6',
+                      p: 0,
+                      minWidth: 'auto',
+                    }}
+                  >
+                    {isMembersVisible ? 'Thu gọn' : 'Hiện danh sách'}
+                  </Button>
+                </Box>
+
+                <Collapse in={isMembersVisible}>
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: { xs: '1fr', sm: 'repeat(auto-fill, minmax(260px, 1fr))' },
+                      gap: 1.25,
+                      maxWidth: 680,
+                      mb: hasChildren ? 2 : 0,
+                    }}
+                  >
+                    {deptEmployees.map((emp) => {
+                      const empName =
+                        emp.fullName ||
+                        emp.full_name ||
+                        `${emp.firstName || emp.first_name || ''} ${emp.lastName || emp.last_name || ''}`.trim() ||
+                        'Nhân viên';
+                      const empCode = emp.employeeCode || emp.employee_code || '';
+                      const designation = emp.designationTitle || emp.designation_title || 'Nhân viên';
+                      const isProbation = emp.status === 'PROBATION';
+
+                      return (
+                        <Paper
+                          key={emp.id}
+                          elevation={0}
+                          sx={{
+                            p: 1.25,
+                            borderRadius: 2,
+                            bgcolor: '#ffffff',
+                            border: '1px solid #e2e8f0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.25,
+                            transition: 'all 0.15s ease',
+                            '&:hover': {
+                              borderColor: '#3b82f6',
+                              bgcolor: '#f8fafc',
+                              boxShadow: '0 2px 8px rgba(59, 130, 246, 0.08)',
+                            },
+                          }}
+                        >
+                          <Avatar
+                            src={emp.avatar}
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              bgcolor: '#eff6ff',
+                              color: '#2563eb',
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                            }}
+                          >
+                            {empName.charAt(0).toUpperCase()}
+                          </Avatar>
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontWeight: 700,
+                                  color: '#0f172a',
+                                  fontSize: '0.8rem',
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                }}
+                              >
+                                {empName}
+                              </Typography>
+                              {empCode && (
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    color: '#64748b',
+                                    fontSize: '0.65rem',
+                                    bgcolor: '#f1f5f9',
+                                    px: 0.5,
+                                    py: 0.1,
+                                    borderRadius: 0.5,
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  {empCode}
+                                </Typography>
+                              )}
+                            </Box>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: '#64748b',
+                                fontSize: '0.7rem',
+                                display: 'block',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              {designation}
+                            </Typography>
+                          </Box>
+                          {isProbation && (
+                            <Chip
+                              label="Thử việc"
+                              size="small"
+                              sx={{
+                                height: 18,
+                                fontSize: '0.625rem',
+                                fontWeight: 600,
+                                bgcolor: '#fef3c7',
+                                color: '#92400e',
+                              }}
+                            />
+                          )}
+                        </Paper>
+                      );
+                    })}
+                  </Box>
+                </Collapse>
+              </Box>
+            )}
+
+            {/* Child Departments */}
+            {hasChildren && (
+              <Box
+                sx={{
+                  pl: { xs: 1, sm: 2 },
+                  ml: { xs: 1, sm: 2 },
+                  borderLeft: '2px dashed #cbd5e1',
+                  mt: 1,
+                }}
+              >
+                {node.children.map((child) => renderTreeNode(child, level + 1))}
+              </Box>
+            )}
           </Collapse>
         )}
       </Box>

@@ -103,6 +103,10 @@ class JobSeekerRegisterSerializer(PasswordConfirmMixin, serializers.Serializer):
         email_clean = value.strip().lower()
         existing_user = User.objects.filter(email__iexact=email_clean).first()
         if existing_user and existing_user.has_usable_password():
+            if existing_user.role_name == var_sys.EMPLOYER:
+                raise serializers.ValidationError(
+                    "Email này đã được đăng ký cho tài khoản Nhà tuyển dụng. Vui lòng đăng nhập tại Cổng Doanh nghiệp."
+                )
             raise serializers.ValidationError(ERROR_MESSAGES['EMAIL_EXISTS'])
         return email_clean
 

@@ -1,7 +1,8 @@
 'use client';
 import React, { useCallback, useMemo } from 'react';
-import { Box, Typography, Button, Stack, Paper } from '@mui/material';
+import { Box, Typography, Button, Stack, Paper, Alert } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { ROUTES } from '@/configs/constants';
@@ -141,6 +142,43 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
           {t('interview:interviewListCard.scheduleInterview')}
         </Button>
       </Stack>
+
+      <Alert
+        severity="info"
+        icon={<AutoAwesomeIcon sx={{ color: '#2563eb' }} />}
+        action={
+          <Button
+            component={Link}
+            href={localizeRoutePath(`/${ROUTES.EMPLOYER.JOB_POST}`, i18n.language)}
+            size="small"
+            color="primary"
+            variant="outlined"
+            sx={{ fontWeight: 700, textTransform: 'none', borderRadius: '8px', px: 2, whiteSpace: 'nowrap' }}
+          >
+            {t('interview:interviewListCard.autoInterviewBanner.action')}
+          </Button>
+        }
+        sx={{
+          mb: 3,
+          borderRadius: '12px',
+          bgcolor: 'rgba(37, 99, 235, 0.05)',
+          border: '1px solid rgba(37, 99, 235, 0.15)',
+          alignItems: 'center',
+          '& .MuiAlert-message': {
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            gap: 1,
+          },
+        }}
+      >
+        <Typography variant="body2" component="span" sx={{ color: '#1e3a8a', fontWeight: 700 }}>
+          {t('interview:interviewListCard.autoInterviewBanner.title')}:
+        </Typography>
+        <Typography variant="body2" component="span" sx={{ color: '#334155' }}>
+          {t('interview:interviewListCard.autoInterviewBanner.description')}
+        </Typography>
+      </Alert>
 
       <DataTable
         columns={columns}

@@ -490,7 +490,7 @@ const AccountPage = () => {
           <EmailOutlinedIcon sx={{ color: '#2563eb' }} />
           Cập nhật Email tài khoản
         </DialogTitle>
-        <DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
+        <DialogContent dividers sx={{ borderColor: '#f1f5f9', pt: '16px !important' }}>
           <Box sx={{ pt: 1 }}>
             <Typography variant="caption" sx={{ color: '#0f172a', fontWeight: 700, mb: 0.5, display: 'block' }}>
               Địa chỉ Email mới *
@@ -543,7 +543,7 @@ const AccountPage = () => {
           <LockOutlinedIcon sx={{ color: '#2563eb' }} />
           Đổi mật khẩu tài khoản
         </DialogTitle>
-        <DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
+        <DialogContent dividers sx={{ borderColor: '#f1f5f9', pt: '16px !important' }}>
           <Stack spacing={2} sx={{ pt: 1 }}>
             <Box>
               <Typography variant="caption" sx={{ color: '#0f172a', fontWeight: 700, mb: 0.5, display: 'block' }}>
@@ -644,14 +644,14 @@ const AccountPage = () => {
           <LanguageOutlinedIcon sx={{ color: '#2563eb' }} />
           Chọn Ngôn ngữ giao diện
         </DialogTitle>
-        <DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
+        <DialogContent dividers sx={{ borderColor: '#f1f5f9', pt: '16px !important' }}>
           <RadioGroup value={selectedLang} onChange={(e) => setSelectedLang(e.target.value)}>
             <FormControlLabel
               value="vi"
               control={<Radio color="primary" />}
               label={
                 <Typography variant="body2" sx={{ fontWeight: 700, color: '#0f172a' }}>
-                  Tiếng Việt (Việt Nam)
+                  Tiếng Việt - Việt Nam
                 </Typography>
               }
               sx={{ py: 1, borderBottom: '1px solid #f1f5f9' }}
@@ -661,7 +661,7 @@ const AccountPage = () => {
               control={<Radio color="primary" />}
               label={
                 <Typography variant="body2" sx={{ fontWeight: 700, color: '#0f172a' }}>
-                  English (United States)
+                  English - United States
                 </Typography>
               }
               sx={{ py: 1 }}
@@ -691,7 +691,7 @@ const AccountPage = () => {
         PaperProps={{ sx: { borderRadius: '20px', p: 1 } }}
       >
         <DialogTitle sx={{ fontWeight: 800, color: '#ef4444' }}>Đăng xuất tài khoản</DialogTitle>
-        <DialogContent dividers sx={{ borderColor: '#f1f5f9' }}>
+        <DialogContent dividers sx={{ borderColor: '#f1f5f9', pt: '20px !important' }}>
           <Typography variant="body2" sx={{ color: '#334155', lineHeight: 1.6 }}>
             Bạn có chắc chắn muốn đăng xuất khỏi tài khoản InfoHR không?
           </Typography>

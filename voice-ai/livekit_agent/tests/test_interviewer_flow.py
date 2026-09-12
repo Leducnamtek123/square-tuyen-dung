@@ -506,3 +506,111 @@ def test_redact_question_progress_labels() -> None:
         redact_question_progress_labels("Câu hỏi 1/2: Giới thiệu bản thân?")
         == "Giới thiệu bản thân?"
     )
+
+
+def test_end_interview_intent_detection() -> None:
+    from livekit_agent.interviewer import _looks_like_end_interview_intent
+
+    assert _looks_like_end_interview_intent("Chấm dứt") is True
+    assert _looks_like_end_interview_intent("kết thúc phỏng vấn") is True
+    assert _looks_like_end_interview_intent("dừng phỏng vấn ở đây") is True
+    assert _looks_like_end_interview_intent("thôi mình nghỉ") is True
+    assert _looks_like_end_interview_intent("cho mình dừng nhé") is True
+    assert _looks_like_end_interview_intent("hết câu hỏi rồi") is True
+    assert _looks_like_end_interview_intent("Tôi có 5 năm kinh nghiệm") is False
+
+
+def test_scripted_llm_node_handles_candidate_end_interview_verbally() -> None:
+    async def run() -> None:
+        agent = Interviewer(
+            context={
+                "questions": [
+                    {"text": "Gioi thieu ban than"},
+                    {"text": "Ly do ung tuyen"},
+                ]
+            }
+        )
+        reply1 = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u1", "San sang")), [], None
+        )
+        assert "Gioi thieu ban than" in reply1
+        assert agent.completed is False
+
+        reply2 = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u2", "Mình muốn chấm dứt phỏng vấn ở đây")),
+            [],
+            None,
+        )
+        assert agent.completed is True
+        assert "ket thuc" in _strip_accents(reply2).lower()
+
+    asyncio.run(run())
+
+
+def test_handle_question_timeout_advances_to_next_question() -> None:
+    async def run() -> None:
+        agent = Interviewer(
+            context={
+                "questions": [
+                    {"text": "Gioi thieu ban than"},
+                    {"text": "Ly do ung tuyen"},
+                ]
+            }
+        )
+        recorded = []
+        async def fake_record(role, content, speech_duration_ms=None):
+            recorded.append((role, content))
+        agent.record_transcript = fake_record
+
+        reply = await agent.handle_question_timeout()
+        assert "het thoi gian" in _strip_accents(reply).lower()
+        assert "Gioi thieu ban than" in reply
+
+        reply2 = await agent.handle_question_timeout()
+        assert "het thoi gian" in _strip_accents(reply2).lower()
+        assert "Ly do ung tuyen" in reply2
+
+    asyncio.run(run())
+
+
+def test_handle_candidate_next_question_advances() -> None:
+    async def run() -> None:
+        agent = Interviewer(
+            context={
+                "questions": [
+                    {"text": "Gioi thieu ban than"},
+                    {"text": "Ly do ung tuyen"},
+                ]
+            }
+        )
+        recorded = []
+        async def fake_record(role, content, speech_duration_ms=None):
+            recorded.append((role, content))
+        agent.record_transcript = fake_record
+
+        reply = await agent.handle_candidate_next_question()
+        assert "chuyen sang" in _strip_accents(reply).lower()
+        assert "Gioi thieu ban than" in reply
+
+    asyncio.run(run())
+
+
+def test_handle_candidate_finish_interview_marks_completed() -> None:
+    async def run() -> None:
+        agent = Interviewer(
+            context={
+                "questions": [
+                    {"text": "Gioi thieu ban than"},
+                ]
+            }
+        )
+        recorded = []
+        async def fake_record(role, content, speech_duration_ms=None):
+            recorded.append((role, content))
+        agent.record_transcript = fake_record
+
+        reply = await agent.handle_candidate_finish_interview()
+        assert agent.completed is True
+        assert "ket thuc" in _strip_accents(reply).lower()
+
+    asyncio.run(run())

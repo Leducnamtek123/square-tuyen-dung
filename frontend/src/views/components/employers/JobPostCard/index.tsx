@@ -156,6 +156,9 @@ const JobPostCard = () => {
       const resData = await jobService.getEmployerJobPostDetailById(slugOrId);
       const data: JobPostEditData = {
         ...resData,
+        interviewTemplate: resData.interviewTemplate ?? null,
+        autoInterviewEnabled: resData.autoInterviewEnabled !== undefined ? Boolean(resData.autoInterviewEnabled) : true,
+        minScreeningScore: resData.minScreeningScore !== undefined && resData.minScreeningScore !== null ? Number(resData.minScreeningScore) : 70,
         career: getSelectId(resData.career),
         position: resData.position ?? '',
         experience: resData.experience ?? '',
@@ -204,6 +207,8 @@ const JobPostCard = () => {
       academicLevel: Number(formData.academicLevel),
       jobType: Number(formData.jobType),
       interviewTemplate: formData.interviewTemplate ? Number(formData.interviewTemplate) : null,
+      autoInterviewEnabled: formData.autoInterviewEnabled !== undefined ? Boolean(formData.autoInterviewEnabled) : true,
+      minScreeningScore: formData.minScreeningScore !== undefined && formData.minScreeningScore !== null ? Number(formData.minScreeningScore) : 70,
       typeOfWorkplace: Number(formData.typeOfWorkplace),
       genderRequired: formData.genderRequired,
       jobDescription: convertEditorStateToHTMLString(formData.jobDescription as ReturnType<typeof createEditorStateFromHTMLString>),

@@ -70,3 +70,18 @@ class InterviewEnhancementsAPITestCase(APITestCase):
         results = response.data.get('results', response.data)
         self.assertGreaterEqual(len(results), 1)
         self.assertEqual(results[0]['position_title'], "Kiến trúc sư công trình")
+
+    def test_create_mock_session_with_specific_questions(self):
+        self.client.force_authenticate(user=self.candidate)
+        q2 = Question.objects.create(text="Câu hỏi thử nghiệm 2", difficulty=1)
+        response = self.client.post('/api/v1/interview/sessions/create-mock/', {
+            "job_title": "Frontend Engineer Preview",
+            "question_ids": [self.question.id, q2.id]
+        }, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['session_type'], 'mock')
+        session_id = response.data['id']
+        session = InterviewSession.objects.get(id=session_id)
+        self.assertEqual(session.questions.count(), 2)
+        self.assertIn(self.question, session.questions.all())
+        self.assertIn(q2, session.questions.all())

@@ -199,6 +199,9 @@ export interface JobPost {
   appliedNumber?: number;
   aiRecommendedCount?: number;
   aiRecommendedAvatars?: Array<{ name: string; initial: string; avatarUrl?: string | null }>;
+  interviewTemplate?: number | null;
+  autoInterviewEnabled?: boolean;
+  minScreeningScore?: number;
 }
 
 export interface JobPostActivity {
@@ -497,16 +500,21 @@ export interface QuestionImportantTip {
 
 export interface Question {
   id: number;
+  title?: string;
   text?: string;
   question_text?: string;
   questionText?: string;
+  sort_order?: number;
+  sortOrder?: number;
   seniority?: string;
   difficulty?: string | number;
   difficulty_display?: string;
   career?: number | null;
   career_name?: string;
+  careerName?: string;
   category?: string;
   category_display?: string;
+  categoryDisplay?: string;
   company?: number | null;
   canWrite?: boolean;
   questionType?: string;
@@ -530,9 +538,34 @@ export interface QuestionBankItem extends Question {
   createAt?: string;
 }
 
+export interface CompanyQuestionSet {
+  id: number;
+  name: string;
+  description?: string;
+  company_id?: number | null;
+  companyId?: number | null;
+  company_name?: string;
+  companyName?: string;
+  company_logo?: string | null;
+  companyLogo?: string | null;
+  career_id?: number | null;
+  careerId?: number | null;
+  career_name?: string | null;
+  careerName?: string | null;
+  seniority?: string;
+  questions_count?: number;
+  questionsCount?: number;
+  total_duration_minutes?: number;
+  totalDurationMinutes?: number;
+  category_tags?: string[];
+  categoryTags?: string[];
+  questions?: QuestionBankItem[];
+}
+
 export interface SalaryBenchmarkItem {
   id: number;
   job_title?: string;
+  jobTitle?: string;
   position_title?: string;
   positionTitle?: string;
   category?: string;
@@ -544,24 +577,30 @@ export interface SalaryBenchmarkItem {
   experienceLevel?: string;
   experience_level_display?: string;
   experienceLevelDisplay?: string;
-  min_salary?: number;
-  salary_min?: number;
-  salaryMin?: number;
-  median_salary?: number;
-  salary_avg?: number | null;
-  salaryAvg?: number | null;
-  max_salary?: number;
-  salary_max?: number;
-  salaryMax?: number;
+  min_salary?: number | string;
+  minSalary?: number | string;
+  salary_min?: number | string;
+  salaryMin?: number | string;
+  median_salary?: number | string;
+  medianSalary?: number | string;
+  salary_avg?: number | string | null;
+  salaryAvg?: number | string | null;
+  max_salary?: number | string;
+  maxSalary?: number | string;
+  salary_max?: number | string;
+  salaryMax?: number | string;
   currency?: string;
   year?: number;
   sample_size?: number;
+  sampleSize?: number;
   sample_count?: number;
   sampleCount?: number;
   is_hot?: boolean;
   isHot?: boolean;
   source_notes?: string;
+  sourceNotes?: string;
   create_at?: string;
+  createAt?: string;
 }
 
 export interface CreateMockSessionPayload {
@@ -572,6 +611,11 @@ export interface CreateMockSessionPayload {
   seniority?: string;
   experience_level?: string;
   question_count?: number;
+  question_group_id?: number | string | null;
+  question_ids?: number[];
+  voice_profile_id?: number | string | null;
+  job_post_id?: number | string | null;
+  session_metadata?: Record<string, unknown>;
 }
 
 export interface MockSessionResponse extends InterviewSession {
@@ -652,6 +696,10 @@ export interface InterviewSession {
   candidateEmail?: string | null;
   candidate_email?: string | null;
   companyName?: string | null;
+  companyLogo?: string | null;
+  company_logo?: string | null;
+  questionsCount?: number;
+  questions_count?: number;
   createdById?: number | null;
   createdBy?: User | number | null;
   aiOverallScore?: number | null;
@@ -666,8 +714,8 @@ export interface InterviewSession {
   ai_strengths?: string[] | string | null;
   aiWeaknesses?: string[] | string | null;
   ai_weaknesses?: string[] | string | null;
-  aiDetailedFeedback?: InterviewAiDetailedFeedback;
-  ai_detailed_feedback?: InterviewAiDetailedFeedback;
+  aiDetailedFeedback?: InterviewAiDetailedFeedback | null;
+  ai_detailed_feedback?: InterviewAiDetailedFeedback | null;
   recordingUrl?: string | null;
   recording_url?: string | null;
   evaluations?: InterviewEvaluation[];
@@ -699,7 +747,7 @@ export interface InterviewTranscript {
   createAt?: string | null;
 }
 
-interface InterviewAiDetailedFeedback {
+export interface InterviewAiDetailedFeedback {
   technical?: string;
   communication?: string;
   attitude?: string;

@@ -171,4 +171,4 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
   );
 };
 
-export default CandidateTopKpiRow;
+export default React.memo(CandidateTopKpiRow);

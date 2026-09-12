@@ -52,9 +52,9 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
       case 'lead':
         return 'Senior / Quản lý';
       case 'middle':
-        return 'Trung cấp (Middle)';
+        return 'Cấp độ Middle';
       default:
-        return 'Junior / Fresher';
+        return 'Cấp độ Junior và Fresher';
     }
   };
 
@@ -94,6 +94,13 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
               label={getSeniorityLabel(question.seniority)}
               sx={{ bgcolor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, fontSize: '0.75rem' }}
             />
+            {question.career_name && (
+              <Chip
+                size="small"
+                label={question.career_name}
+                sx={{ bgcolor: '#eff6ff', color: '#1d4ed8', fontWeight: 700, fontSize: '0.75rem' }}
+              />
+            )}
             {question.category && (
               <Chip
                 size="small"
@@ -117,7 +124,7 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 3, bgcolor: '#ffffff' }}>
+      <DialogContent sx={{ p: 3, pt: '24px !important', bgcolor: '#ffffff' }}>
         <Stack spacing={3}>
           {/* Ý đồ của nhà tuyển dụng */}
           {question.interviewer_intent && (
@@ -144,7 +151,7 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
             <Box>
               <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <CheckCircleOutlineIcon sx={{ fontSize: 20, color: '#2563eb' }} />
-                Dàn ý trả lời đề xuất (Khung chuẩn STAR)
+                Dàn ý trả lời đề xuất theo khung chuẩn STAR
               </Typography>
               <Stack spacing={1.5}>
                 {steps.map((step, idx) => (
@@ -259,9 +266,9 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
               textTransform: 'none',
               fontWeight: 700,
               bgcolor: '#2563eb',
-              boxShadow: 'none',
+              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
               px: 3,
-              '&:hover': { bgcolor: '#1d4ed8', boxShadow: 'none' },
+              '&:hover': { bgcolor: '#1d4ed8', boxShadow: '0 6px 16px rgba(37, 99, 235, 0.35)' },
             }}
           >
             Luyện câu này trong phòng AI

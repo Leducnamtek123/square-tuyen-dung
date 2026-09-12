@@ -38,6 +38,7 @@ import toastMessages from '@/utils/toastMessages';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { useTranslation } from 'react-i18next';
 import useRequireAuth from '@/hooks/useRequireAuth';
+import { ProductTourTrigger, useTourAutoStart } from '@/components/Features/ProductTour';
 
 export const CVEditorPage: React.FC = () => {
   const router = useRouter();
@@ -51,6 +52,9 @@ export const CVEditorPage: React.FC = () => {
   const initialColorParam = searchParams.get('color') || undefined;
 
   TabTitle(t('cvBuilder.pageTitle', 'Trình Tạo & Trang Trí CV Trực Tuyến | InfoHR Tuyển Dụng'));
+
+  // Auto-start CV builder tour on first visit
+  useTourAutoStart('cv_builder', 1000);
 
   const [activeCVId, setActiveCVId] = useState<number | null>(cvIdParam ? Number(cvIdParam) : null);
   const activeCVIdRef = useRef<number | null>(activeCVId);
@@ -707,6 +711,8 @@ export const CVEditorPage: React.FC = () => {
 
         {/* Right: Actions (Share, Word, JSON, Save, PDF) */}
         <Stack direction="row" spacing={1} alignItems="center">
+          <ProductTourTrigger tourKey="cv_builder" variant="chip" label="Hướng dẫn tạo CV" />
+
           {cvSlug && (
             <Button
               size="small"
@@ -799,6 +805,7 @@ export const CVEditorPage: React.FC = () => {
 
           {/* Primary Download PDF Button */}
           <Button
+            data-tour="cv-export"
             size="small"
             variant="contained"
             startIcon={<PictureAsPdfOutlinedIcon sx={{ fontSize: 16 }} />}
@@ -825,6 +832,7 @@ export const CVEditorPage: React.FC = () => {
       <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Left Side: Form Controls Sidebar (460px fixed) */}
         <Box
+          data-tour="cv-ai-assist"
           className="no-print"
           sx={{
             width: { xs: '100%', md: 450, lg: 480 },
@@ -845,6 +853,7 @@ export const CVEditorPage: React.FC = () => {
 
         {/* Right Side: Live A4 Visual Canvas */}
         <Box
+          data-tour="cv-templates"
           sx={{
             flex: 1,
             height: '100%',

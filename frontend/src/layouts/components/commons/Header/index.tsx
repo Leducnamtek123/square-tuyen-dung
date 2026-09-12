@@ -121,8 +121,7 @@ const Header = (_props: HeaderProps) => {
     [HOST_NAME.PROJECT]: [
       { id: '1', label: t('nav.jobs'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language), isHighlight: true },
       { id: '2', label: t('nav.companies'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.COMPANY}`, i18n.language) },
-      { id: 'salary', label: t('nav.salary', 'Tra cứu lương'), path: localizeRoutePath('/salary', i18n.language) },
-      { id: 'practice', label: t('nav.practice', 'Luyện phỏng vấn AI'), path: localizeRoutePath('/practice', i18n.language) },
+      { id: 'practice', label: t('nav.practice', 'Phỏng vấn thử'), path: localizeRoutePath('/practice', i18n.language) },
       { id: 'cv', label: t('nav.createCv', 'Tạo CV'), path: localizeRoutePath('/tao-cv', i18n.language) },
       {
         id: '3',
@@ -229,11 +228,15 @@ const Header = (_props: HeaderProps) => {
         position="sticky"
         id="common-header"
         sx={{
+          top: 0,
+          zIndex: (theme) => theme.zIndex.appBar || 1100,
           boxShadow: '0 2px 18px rgba(15, 23, 42, 0.08)',
-          background: 'rgba(255, 255, 255, 0.92)',
+          background: 'rgba(255, 255, 255, 0.95)',
           color: '#1f2937',
-          backdropFilter: 'blur(14px)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           borderBottom: '1px solid rgba(226, 232, 240, 0.9)',
+          transition: 'box-shadow 0.2s ease, background-color 0.2s ease',
         }}
       >
 

@@ -242,6 +242,71 @@ def _looks_like_no_candidate_question(text: str) -> bool:
     return any(phrase in normalized for phrase in no_question_phrases)
 
 
+def _looks_like_end_interview_intent(text: str) -> bool:
+    normalized = _normalize_text(text).lower()
+    if not normalized or len(normalized) > 160:
+        return False
+
+    normalized = re.sub(r"[^\wÀ-ỹ\s]", " ", normalized, flags=re.IGNORECASE)
+    normalized = " ".join(normalized.split())
+    words = normalized.split()
+
+    short_end_phrases = (
+        "chấm dứt",
+        "cham dut",
+        "kết thúc",
+        "ket thuc",
+        "dừng lại",
+        "dung lai",
+        "xin dừng",
+        "xin dung",
+    )
+    if len(words) <= 4 and any(phrase in normalized for phrase in short_end_phrases):
+        return True
+
+    explicit_end_phrases = (
+        "dừng phỏng vấn",
+        "dung phong van",
+        "ngừng phỏng vấn",
+        "ngung phong van",
+        "kết thúc phỏng vấn",
+        "ket thuc phong van",
+        "không muốn phỏng vấn nữa",
+        "khong muon phong van nua",
+        "không phỏng vấn nữa",
+        "khong phong van nua",
+        "thôi mình nghỉ",
+        "thoi minh nghi",
+        "dừng ở đây",
+        "dung o day",
+        "kết thúc ở đây",
+        "ket thuc o day",
+        "chấm dứt cuộc phỏng vấn",
+        "cham dut cuoc phong van",
+        "kết thúc buổi phỏng vấn",
+        "ket thuc buoi phong van",
+        "hết câu hỏi rồi",
+        "het cau hoi roi",
+        "mình muốn dừng",
+        "minh muon dung",
+        "tôi muốn dừng",
+        "toi muon dung",
+        "em muốn dừng",
+        "em muon dung",
+        "mình muốn kết thúc",
+        "minh muon ket thuc",
+        "em muốn kết thúc",
+        "em muon ket thuc",
+        "tôi muốn kết thúc",
+        "toi muon ket thuc",
+        "cho mình dừng",
+        "cho minh dung",
+        "xin phép dừng",
+        "xin phep dung",
+    )
+    return any(phrase in normalized for phrase in explicit_end_phrases)
+
+
 def _candidate_question_prompt() -> str:
     return (
         "Cảm ơn bạn, mình đã ghi nhận các phần trả lời. "
@@ -408,12 +473,31 @@ class Interviewer(Agent):
         return self._current_stage
 
     @property
+    def questions(self) -> list[str]:
+        return self._scripted_questions
+
+    @property
+    def current_question_index(self) -> int:
+        return self._scripted_question_index
+
+    @current_question_index.setter
+    def current_question_index(self, value: int) -> None:
+        self._scripted_question_index = value
+
+    @property
     def completed(self) -> bool:
         return self._completed
 
     @property
     def employer_takeover_active(self) -> bool:
         return self._employer_takeover_active
+
+    @property
+    def _safe_session(self) -> Any | None:
+        try:
+            return self.session
+        except RuntimeError:
+            return None
 
     def pause_for_employer_takeover(self, speaker_name: str | None = None) -> None:
         del speaker_name
@@ -482,6 +566,8 @@ class Interviewer(Agent):
             self._last_handled_user_turn_id = user_turn_id
         if response:
             await self.record_transcript("ai_agent", response)
+            if self._completed:
+                self._create_background_task(self.finalize_completed_interview())
         return response
 
     def _needs_more_answer_detail(self, user_text: str) -> bool:
@@ -504,6 +590,16 @@ class Interviewer(Agent):
         return True
 
     async def _build_scripted_response(self, *, user_text: str = "") -> str | None:
+        if _looks_like_end_interview_intent(user_text):
+            logger.info(
+                "Detected candidate end-interview intent for room %s: %s",
+                self._room_name,
+                user_text,
+            )
+            self._awaiting_candidate_questions = False
+            self._mark_completed()
+            return _closing_response()
+
         if self._awaiting_candidate_questions:
             if not user_text:
                 return None
@@ -521,6 +617,8 @@ class Interviewer(Agent):
             action = decide_next_action(parsed_payload)
             if action.kind == "ask_question" and action.text:
                 self._last_asked_question_text = action.text
+                self._scripted_question_index = parsed_payload.index + 1
+                await self._broadcast_question_index(parsed_payload.index)
                 return _format_question_prompt(
                     action.text,
                     index=parsed_payload.index,
@@ -528,6 +626,18 @@ class Interviewer(Agent):
                     user_text=user_text,
                 )
             if action.kind == "closing":
+                if self._scripted_question_index < len(self._scripted_questions):
+                    question = self._scripted_questions[self._scripted_question_index]
+                    self._scripted_question_index += 1
+                    self._last_asked_question_text = question
+                    await self._broadcast_question_index(self._scripted_question_index - 1)
+                    return _format_question_prompt(
+                        question,
+                        index=self._scripted_question_index - 1,
+                        total=len(self._scripted_questions),
+                        user_text=user_text,
+                    )
+                await self._broadcast_session_completed()
                 return self._offer_pending_followup_or_candidate_question()
 
         if self._scripted_question_index < len(self._scripted_questions):
@@ -572,15 +682,18 @@ class Interviewer(Agent):
         self._completed = True
         self._current_stage = InterviewStage.CLOSING
 
-    async def _fetch_next_question_payload(self) -> dict[str, Any] | None:
+    async def _fetch_next_question_payload(self, target_index: int | None = None) -> dict[str, Any] | None:
         if not self._backend_api_url or not self._room_name:
             return None
         try:
             url = f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/next-question"
+            body: dict[str, Any] = {"advance": True}
+            if target_index is not None:
+                body["target_index"] = target_index
             async with httpx.AsyncClient(
                 event_hooks={"request": [auth_event_hook()]}
             ) as client:
-                resp = await client.post(url, json={"advance": True}, timeout=5.0)
+                resp = await client.post(url, json=body, timeout=5.0)
             if resp.status_code == 200:
                 payload = resp.json()
                 if isinstance(payload, dict):
@@ -698,6 +811,203 @@ class Interviewer(Agent):
             logger.warning("Failed to update status: %s", exc)
             return False
 
+    async def _broadcast_question_index(self, index: int) -> None:
+        try:
+            job_ctx = get_job_context()
+        except RuntimeError:
+            return
+        try:
+            if job_ctx and job_ctx.room and job_ctx.room.local_participant:
+                import json
+                payload = json.dumps({"action": "question_advanced", "question_index": index})
+                await job_ctx.room.local_participant.send_text(
+                    payload,
+                    topic="square.interview.question_control",
+                )
+        except Exception as exc:
+            logger.warning("Could not broadcast question_advanced: %s", exc)
+
+    async def _broadcast_session_completed(self) -> None:
+        try:
+            job_ctx = get_job_context()
+        except RuntimeError:
+            return
+        try:
+            if job_ctx and job_ctx.room and job_ctx.room.local_participant:
+                import json
+                payload = json.dumps({"action": "session_completed"})
+                await job_ctx.room.local_participant.send_text(
+                    payload,
+                    topic="square.interview.question_control",
+                )
+                logger.info("Broadcast session_completed event to room %s", self._room_name)
+        except Exception as exc:
+            logger.warning("Could not broadcast session_completed event: %s", exc)
+
+    async def handle_question_timeout(self, target_index: int | None = None) -> str | None:
+        if self._completed or self._employer_takeover_active:
+            return None
+
+        logger.info("Handling question timeout for room %s (target_index=%s)", self._room_name, target_index)
+        sess = self._safe_session
+        if sess:
+            try:
+                await sess.interrupt(force=True)
+            except Exception as exc:
+                logger.debug("Could not interrupt session on timeout: %s", exc)
+
+        backend_payload = await self._fetch_next_question_payload(target_index=target_index)
+        if backend_payload is not None:
+            parsed_payload = parse_question_payload(backend_payload)
+            action = decide_next_action(parsed_payload)
+            if action.kind == "ask_question" and action.text:
+                self._last_asked_question_text = action.text
+                self._short_answer_prompted_for = None
+                self._scripted_question_index = parsed_payload.index + 1
+                response = f"Đã hết thời gian cho câu hỏi này, chúng ta cùng chuyển sang câu tiếp theo nhé. {action.text}"
+                if sess:
+                    await sess.say(response, allow_interruptions=False)
+                await self.record_transcript("ai_agent", response)
+                await self._broadcast_question_index(parsed_payload.index)
+                return response
+            if action.kind == "closing":
+                if self._scripted_question_index < len(self._scripted_questions):
+                    question = self._scripted_questions[self._scripted_question_index]
+                    self._scripted_question_index += 1
+                    self._last_asked_question_text = question
+                    self._short_answer_prompted_for = None
+                    response = f"Đã hết thời gian cho câu hỏi này, chúng ta cùng chuyển sang câu tiếp theo nhé. {question}"
+                    if sess:
+                        await sess.say(response, allow_interruptions=False)
+                    await self.record_transcript("ai_agent", response)
+                    await self._broadcast_question_index(self._scripted_question_index - 1)
+                    return response
+                closing_turn = self._offer_pending_followup_or_candidate_question()
+                response = f"Đã hết thời gian cho câu hỏi này. {closing_turn}"
+                if sess:
+                    await sess.say(response, allow_interruptions=False)
+                await self.record_transcript("ai_agent", response)
+                await self._broadcast_session_completed()
+                if self._completed:
+                    self._create_background_task(self.finalize_completed_interview())
+                return response
+
+        if target_index is not None and 0 <= target_index < len(self._scripted_questions):
+            self._scripted_question_index = target_index
+
+        if self._scripted_question_index < len(self._scripted_questions):
+            question = self._scripted_questions[self._scripted_question_index]
+            self._scripted_question_index += 1
+            self._last_asked_question_text = question
+            self._short_answer_prompted_for = None
+            response = f"Đã hết thời gian cho câu hỏi này, chúng ta cùng chuyển sang câu tiếp theo nhé. {question}"
+            if sess:
+                await sess.say(response, allow_interruptions=False)
+            await self.record_transcript("ai_agent", response)
+            await self._broadcast_question_index(self._scripted_question_index - 1)
+            return response
+
+        closing_turn = self._offer_pending_followup_or_candidate_question()
+        response = f"Đã hết thời gian cho câu hỏi này. {closing_turn}"
+        if sess:
+            await sess.say(response, allow_interruptions=False)
+        await self.record_transcript("ai_agent", response)
+        await self._broadcast_session_completed()
+        if self._completed:
+            self._create_background_task(self.finalize_completed_interview())
+        return response
+
+    async def handle_candidate_next_question(self, target_index: int | None = None) -> str | None:
+        if self._completed or self._employer_takeover_active:
+            return None
+
+        logger.info("Handling candidate next-question request for room %s (target_index=%s)", self._room_name, target_index)
+        sess = self._safe_session
+        if sess:
+            try:
+                await sess.interrupt(force=True)
+            except Exception as exc:
+                logger.debug("Could not interrupt session on next_question: %s", exc)
+
+        backend_payload = await self._fetch_next_question_payload(target_index=target_index)
+        if backend_payload is not None:
+            parsed_payload = parse_question_payload(backend_payload)
+            action = decide_next_action(parsed_payload)
+            if action.kind == "ask_question" and action.text:
+                self._last_asked_question_text = action.text
+                self._short_answer_prompted_for = None
+                self._scripted_question_index = parsed_payload.index + 1
+                response = f"Cảm ơn bạn, mình chuyển sang câu tiếp theo nhé. {action.text}"
+                if sess:
+                    await sess.say(response, allow_interruptions=False)
+                await self.record_transcript("ai_agent", response)
+                await self._broadcast_question_index(parsed_payload.index)
+                return response
+            if action.kind == "closing":
+                if self._scripted_question_index < len(self._scripted_questions):
+                    question = self._scripted_questions[self._scripted_question_index]
+                    self._scripted_question_index += 1
+                    self._last_asked_question_text = question
+                    self._short_answer_prompted_for = None
+                    response = f"Cảm ơn bạn, mình chuyển sang câu tiếp theo nhé. {question}"
+                    if sess:
+                        await sess.say(response, allow_interruptions=False)
+                    await self.record_transcript("ai_agent", response)
+                    await self._broadcast_question_index(self._scripted_question_index - 1)
+                    return response
+                response = self._offer_pending_followup_or_candidate_question()
+                if sess:
+                    await sess.say(response, allow_interruptions=False)
+                await self.record_transcript("ai_agent", response)
+                await self._broadcast_session_completed()
+                if self._completed:
+                    self._create_background_task(self.finalize_completed_interview())
+                return response
+
+        if target_index is not None and 0 <= target_index < len(self._scripted_questions):
+            self._scripted_question_index = target_index
+
+        if self._scripted_question_index < len(self._scripted_questions):
+            question = self._scripted_questions[self._scripted_question_index]
+            self._scripted_question_index += 1
+            self._last_asked_question_text = question
+            self._short_answer_prompted_for = None
+            response = f"Cảm ơn bạn, mình chuyển sang câu tiếp theo nhé. {question}"
+            if sess:
+                await sess.say(response, allow_interruptions=False)
+            await self.record_transcript("ai_agent", response)
+            await self._broadcast_question_index(self._scripted_question_index - 1)
+            return response
+
+        response = self._offer_pending_followup_or_candidate_question()
+        if sess:
+            await sess.say(response, allow_interruptions=False)
+        await self.record_transcript("ai_agent", response)
+        await self._broadcast_session_completed()
+        if self._completed:
+            self._create_background_task(self.finalize_completed_interview())
+        return response
+
+    async def handle_candidate_finish_interview(self) -> str:
+        if self._completed and self._finalizing:
+            return "Buổi phỏng vấn đang trong quá trình kết thúc."
+
+        logger.info("Handling candidate finish interview request for room %s", self._room_name)
+        self._awaiting_candidate_questions = False
+        self._mark_completed()
+        response = _closing_response()
+        sess = self._safe_session
+        if sess:
+            try:
+                await sess.interrupt(force=True)
+                await sess.say(response, allow_interruptions=False)
+            except Exception as exc:
+                logger.debug("Could not speak farewell: %s", exc)
+
+        await self.record_transcript("ai_agent", response)
+        self._create_background_task(self.finalize_completed_interview())
+        return response
+
     async def finalize_completed_interview(self) -> None:
         if not self._completed:
             return
@@ -706,6 +1016,7 @@ class Interviewer(Agent):
 
         self._finalizing = True
         logger.info("Finalizing completed interview for room: %s", self._room_name)
+        await self._broadcast_session_completed()
         status_updated = await self._update_backend_status("completed")
         if not status_updated:
             await asyncio.sleep(0.5)

@@ -410,9 +410,10 @@ export default function AttendanceOverviewPage() {
               <Button
                 size="small"
                 onClick={() => router.push('/employer/hrm/attendances/requests')}
+                endIcon={<ArrowForwardOutlinedIcon sx={{ fontSize: 14 }} />}
                 sx={{ textTransform: 'none', fontWeight: 600 }}
               >
-                Xem tất cả ➔
+                Xem tất cả
               </Button>
             </Box>
 
@@ -537,9 +538,10 @@ export default function AttendanceOverviewPage() {
               <Button
                 size="small"
                 onClick={() => router.push('/employer/hrm/attendances/shifts')}
+                endIcon={<ArrowForwardOutlinedIcon sx={{ fontSize: 14 }} />}
                 sx={{ textTransform: 'none', fontWeight: 600 }}
               >
-                Cài đặt ca ➔
+                Cài đặt ca
               </Button>
             </Box>
 

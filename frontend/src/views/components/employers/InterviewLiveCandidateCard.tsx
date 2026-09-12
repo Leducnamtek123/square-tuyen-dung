@@ -195,10 +195,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
           top: 0,
           left: 0,
           right: 0,
-          height: 3,
-          background: isLive
-            ? `linear-gradient(90deg, #38BDF8, ${theme.palette.primary.main}, #818CF8)`
-            : `linear-gradient(90deg, #22C55E, ${theme.palette.success.main}, #4ADE80)`,
+          bgcolor: isLive ? 'primary.main' : 'success.main',
         }}
       />
 
@@ -213,28 +210,48 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
         <Stack direction="row" alignItems="center" spacing={1.75}>
           <Avatar
             sx={{
-              width: 44,
-              height: 44,
+              width: 46,
+              height: 46,
               bgcolor: alpha(theme.palette.primary.main, 0.1),
               color: 'primary.main',
-              fontWeight: 800,
-              fontSize: '1.05rem',
+              fontWeight: 900,
+              fontSize: '1.1rem',
               border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.2),
+              borderColor: alpha(theme.palette.primary.main, 0.25),
+              boxShadow: '0 2px 8px rgba(37, 99, 235, 0.12)',
             }}
           >
-            {session.candidateName ? session.candidateName.charAt(0).toUpperCase() : <PersonIcon />}
+            {session.candidateName && session.candidateName !== 'Công ty Square'
+              ? session.candidateName.charAt(0).toUpperCase()
+              : <PersonIcon />}
           </Avatar>
           <Box>
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1.05rem', letterSpacing: '-0.01em' }}>
-                {session.candidateName || t('employer:interviewLive.candidateCard.unknownCandidate')}
+              <Typography variant="h6" sx={{ fontWeight: 900, color: 'text.primary', fontSize: '1.05rem', letterSpacing: '-0.02em' }}>
+                {session.candidateName && session.candidateName !== 'Công ty Square'
+                  ? session.candidateName
+                  : t('employer:interviewLive.candidateCard.unknownCandidate', 'Ứng viên phỏng vấn')}
               </Typography>
+              <Chip
+                label={isLive ? 'Trực tiếp' : 'Đang xử lý'}
+                size="small"
+                sx={{
+                  height: 20,
+                  fontSize: '0.65rem',
+                  fontWeight: 800,
+                  bgcolor: isLive ? alpha('#22c55e', 0.1) : alpha(theme.palette.primary.main, 0.08),
+                  color: isLive ? '#16a34a' : 'primary.main',
+                  border: '1px solid',
+                  borderColor: isLive ? alpha('#22c55e', 0.25) : alpha(theme.palette.primary.main, 0.2),
+                }}
+              />
             </Stack>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.25 }}>
-              <WorkIcon sx={{ fontSize: 13, color: 'text.secondary' }} />
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.35 }}>
+              <WorkIcon sx={{ fontSize: 13, color: '#64748b' }} />
               <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.8125rem' }}>
-                {session.jobName || 'Chuyên viên'}
+                {typeof session.questionGroup === 'object' && session.questionGroup && 'name' in session.questionGroup
+                  ? String((session.questionGroup as any).name)
+                  : session.jobName || 'Tuyển dụng Kỹ sư Giám sát Xây dựng & Kết cấu'}
               </Typography>
             </Stack>
           </Box>

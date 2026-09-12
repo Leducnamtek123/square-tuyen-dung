@@ -23,6 +23,8 @@ urlpatterns = [
     # Question Bank & Hints
     path('questions/bank/', views_enhancements.QuestionBankListView.as_view(), name='question-bank-list'),
     path('web/questions/bank/', views_enhancements.QuestionBankListView.as_view(), name='web-question-bank-list'),
+    path('question-groups/public/', views_enhancements.PublicQuestionGroupListView.as_view(), name='public-question-group-list'),
+    path('web/question-groups/public/', views_enhancements.PublicQuestionGroupListView.as_view(), name='web-public-question-group-list'),
     path('questions/<int:pk>/hints/', views_enhancements.QuestionHintsDetailView.as_view(), name='question-hints-detail'),
     path('web/questions/<int:pk>/hints/', views_enhancements.QuestionHintsDetailView.as_view(), name='web-question-hints-detail'),
 

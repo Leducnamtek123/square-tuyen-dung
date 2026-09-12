@@ -40,6 +40,7 @@ import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import WorkHistoryOutlinedIcon from '@mui/icons-material/WorkHistoryOutlined';
 import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
 import MoreTimeOutlinedIcon from '@mui/icons-material/MoreTimeOutlined';
+import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 
 import {
   useHrmMonthlyAttendanceSummaries,
@@ -104,6 +105,18 @@ export default function SummaryTimesheetPage() {
   }>({
     open: false,
     summary: null,
+  });
+
+  const [pushSuccessModal, setPushSuccessModal] = useState<{
+    open: boolean;
+    employeeName: string;
+    month: number;
+    year: number;
+  }>({
+    open: false,
+    employeeName: '',
+    month: currentDate.getMonth() + 1,
+    year: currentDate.getFullYear(),
   });
 
   const [lockConfirmModal, setLockConfirmModal] = useState<{
@@ -171,8 +184,15 @@ export default function SummaryTimesheetPage() {
 
   const handleConfirmPush = async () => {
     if (!pushConfirmModal.summary) return;
-    await pushSummaryToPayroll.mutateAsync(pushConfirmModal.summary.id);
+    const targetSummary = pushConfirmModal.summary;
+    await pushSummaryToPayroll.mutateAsync(targetSummary.id);
     setPushConfirmModal({ open: false, summary: null });
+    setPushSuccessModal({
+      open: true,
+      employeeName: targetSummary.employee_name || 'Nhân viên',
+      month: targetSummary.month,
+      year: targetSummary.year,
+    });
   };
 
   return (
@@ -319,8 +339,9 @@ export default function SummaryTimesheetPage() {
                 fontWeight: 600,
                 '&:hover': { borderColor: '#059669', backgroundColor: '#ECFDF5' },
               }}
+              endIcon={<ArrowForwardOutlinedIcon sx={{ fontSize: 14 }} />}
             >
-              Xem Bảng lương ➔
+              Xem Bảng lương
             </Button>
           </Box>
         </Stack>
@@ -724,6 +745,65 @@ export default function SummaryTimesheetPage() {
             }}
           >
             {pushSummaryToPayroll.isPending ? 'Đang chuyển...' : 'Xác nhận chuyển tính lương'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Push Success Navigation Modal */}
+      <Dialog
+        open={pushSuccessModal.open}
+        onClose={() => setPushSuccessModal({ ...pushSuccessModal, open: false })}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}>
+          <Avatar sx={{ bgcolor: '#ECFDF5', color: '#059669', width: 44, height: 44 }}>
+            <CheckCircleOutlineIcon />
+          </Avatar>
+          <Box>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0F172A' }}>
+              Chuyển dữ liệu thành công!
+            </Typography>
+            <Typography variant="caption" sx={{ color: '#64748B' }}>
+              Kỳ công tháng {pushSuccessModal.month}/{pushSuccessModal.year}
+            </Typography>
+          </Box>
+        </DialogTitle>
+
+        <DialogContent sx={{ py: 2 }}>
+          <Typography variant="body2" sx={{ color: '#334155', lineHeight: 1.6 }}>
+            Dữ liệu tổng hợp công của nhân viên <strong>{pushSuccessModal.employeeName}</strong> đã được đồng bộ sang Bảng Lương thành công.
+          </Typography>
+          <Alert severity="success" sx={{ mt: 2, borderRadius: 2 }}>
+            Bạn có muốn chuyển sang phân hệ <strong>Bảng Lương</strong> để tính toán Gross-to-Net và duyệt phiếu lương ngay không?
+          </Alert>
+        </DialogContent>
+
+        <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #E2E8F0', justifyContent: 'space-between' }}>
+          <Button
+            onClick={() => setPushSuccessModal({ ...pushSuccessModal, open: false })}
+            sx={{ textTransform: 'none', color: '#64748B' }}
+          >
+            Ở lại bảng công
+          </Button>
+          <Button
+            variant="contained"
+            endIcon={<ArrowForwardOutlinedIcon />}
+            onClick={() => {
+              setPushSuccessModal({ ...pushSuccessModal, open: false });
+              router.push('/employer/hrm/payroll');
+            }}
+            sx={{
+              textTransform: 'none',
+              borderRadius: 2,
+              backgroundColor: '#2563EB',
+              fontWeight: 600,
+              boxShadow: 'none',
+              '&:hover': { backgroundColor: '#1D4ED8', boxShadow: 'none' },
+            }}
+          >
+            Đến Bảng Lương
           </Button>
         </DialogActions>
       </Dialog>

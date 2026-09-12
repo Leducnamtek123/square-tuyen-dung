@@ -17,6 +17,8 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from drf_social_oauth2.views import TokenView, ConvertTokenView, RevokeTokenView
+from drf_social_oauth2 import oauth2_endpoints
+from oauth2_provider.generators import generate_client_secret
 
 from oauth2_provider.models import (
     get_access_token_model,
@@ -37,6 +39,33 @@ from apps.common.firebase import verify_id_token
 from .models import User
 
 logger = logging.getLogger(__name__)
+
+# Bugfix for drf-social-oauth2: automatically create RefreshToken if missing on AccessToken
+_orig_social_token_server_create = oauth2_endpoints.SocialTokenServer.create_token_response
+
+
+def _safe_social_token_server_create(self, uri, http_method="GET", body=None, headers=None, credentials=None):
+    try:
+        return _orig_social_token_server_create(self, uri, http_method, body, headers, credentials)
+    except Exception as exc:
+        if "refresh_token" in str(exc) or "RelatedObjectDoesNotExist" in exc.__class__.__name__:
+            logger.warning("Auto-healing missing refresh_token in SocialTokenServer: %s", exc)
+            RefreshToken = get_refresh_token_model()
+            AccessToken = get_access_token_model()
+            for tok in AccessToken.objects.filter(refresh_token__isnull=True):
+                RefreshToken.objects.get_or_create(
+                    access_token=tok,
+                    defaults={
+                        "user": tok.user,
+                        "token": generate_client_secret(),
+                        "application": tok.application,
+                    },
+                )
+            return _orig_social_token_server_create(self, uri, http_method, body, headers, credentials)
+        raise
+
+
+oauth2_endpoints.SocialTokenServer.create_token_response = _safe_social_token_server_create
 
 
 def _phone_digits(value):
@@ -290,7 +319,25 @@ class CustomConvertTokenView(ConvertTokenView):
                 )
 
             oauth_request = _build_oauth_request(request, request_data)
-            url, headers, body, stt = self.create_token_response(oauth_request)
+            try:
+                url, headers, body, stt = self.create_token_response(oauth_request)
+            except Exception as ex:
+                if "refresh_token" in str(ex) or "RelatedObjectDoesNotExist" in ex.__class__.__name__:
+                    logger.warning("CustomConvertTokenView: Auto-healing missing refresh token: %s", ex)
+                    RefreshToken = get_refresh_token_model()
+                    AccessToken = get_access_token_model()
+                    for tok in AccessToken.objects.filter(refresh_token__isnull=True):
+                        RefreshToken.objects.get_or_create(
+                            access_token=tok,
+                            defaults={
+                                "user": tok.user,
+                                "token": generate_client_secret(),
+                                "application": tok.application,
+                            },
+                        )
+                    url, headers, body, stt = self.create_token_response(oauth_request)
+                else:
+                    raise
 
             if stt == status.HTTP_400_BAD_REQUEST:
                 error_body = json.loads(body)

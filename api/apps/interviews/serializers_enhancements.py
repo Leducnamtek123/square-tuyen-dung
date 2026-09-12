@@ -51,6 +51,13 @@ class CreateMockSessionInputSerializer(serializers.Serializer):
     seniority = serializers.CharField(required=False, max_length=50)
     experience_level = serializers.CharField(required=False, max_length=50)
     question_count = serializers.IntegerField(required=False, default=6, min_value=1, max_value=15)
+    question_group_id = serializers.IntegerField(required=False, allow_null=True)
+    question_ids = serializers.ListField(
+        child=serializers.IntegerField(), required=False, allow_empty=True
+    )
+    voice_profile_id = serializers.IntegerField(required=False, allow_null=True)
+    job_post_id = serializers.IntegerField(required=False, allow_null=True)
+    session_metadata = serializers.JSONField(required=False, default=dict)
 
 
 class MockSessionResponseSerializer(serializers.ModelSerializer):

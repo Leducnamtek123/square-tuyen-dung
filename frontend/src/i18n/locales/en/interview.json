@@ -10,12 +10,18 @@
   "processingTitle": "Processing interview results",
   "processingBody": "This interview has ended. The system is preparing the transcript and evaluation, so please check again in a few minutes.",
   "startInterview": "Start interview",
+  "activeRoomTitle": "Online Interview Room",
   "preflight": {
     "title": "Device check",
     "subtitle": "Make sure your microphone works before starting the AI interview.",
     "mic_ready": "Microphone is ready",
     "join": "Join interview",
     "mic_denied": "Microphone permission was denied. Please allow microphone access to continue."
+  },
+  "recordingBadge": {
+    "tooltip": "This meeting is being recorded for professional interview evaluation & auditing",
+    "ariaLabel": "Meeting is being recorded",
+    "recording": "Recording"
   },
   "transcriptTitle": "Transcript",
   "noMessages": "No messages yet.",
@@ -112,7 +118,7 @@
   "errors": {
     "missingInvite": "Missing interview invite code.",
     "missingSessionId": "Missing interview session ID.",
-    "tokenMissing": "Unable to fetch token to join the interview.",
+    "tokenMissing": "Unable to connect to the interview room.",
     "invalidSession": "Connection error or invalid interview session.",
     "sessionNotReadyForJoin": "Cannot join this room right now because the session is currently {{status}}.",
     "endSessionFailed": "Unable to update the end status. The room has been disconnected.",
@@ -158,6 +164,12 @@
   "interviewListCard": {
     "title": "Online Interview List",
     "scheduleInterview": "Schedule Interview",
+    "interviewer": "Interviewer",
+    "autoInterviewBanner": {
+      "title": "Automated AI Interviews",
+      "description": "You can enable automatic AI interview scheduling and invitations whenever candidate CVs meet qualifications.",
+      "action": "Configure in Job Posts"
+    },
     "noInterviews": "No interview sessions created yet.",
     "deleteInterview": "Delete Interview",
     "editInterview": "Edit Interview",
@@ -225,7 +237,8 @@
   "interviewCreateCard": {
     "messages": {
       "updateSuccess": "Interview updated successfully",
-      "scheduleSuccess": "Interview scheduled successfully"
+      "scheduleSuccess": "Interview scheduled successfully",
+      "testRoomCreated": "Mock interview room created successfully! Opening room..."
     },
     "title": {
       "editOnlineInterview": "Edit Online Interview",
@@ -243,14 +256,19 @@
       "autoDefaultVoice": "Auto/default voice",
       "defaultVoiceSuffix": "default",
       "questions": "Questions",
-      "selectquestiongroupoptional": "Select Question Group (Optional)",
+      "selectquestiongroupoptional": "Select Question Group",
       "selectinterviewquestions": "Select Interview Questions",
       "selectquestions": "Select Questions"
     },
     "validation": {
       "selectJobPost": "Please select a job post",
       "selectCandidate": "Please select a candidate",
-      "selectScheduleTime": "Please select interview time"
+      "selectScheduleTime": "Please select interview time",
+      "selectAtLeastOneQuestionForTest": "Please select at least one question or question group to test."
+    },
+    "actions": {
+      "testInterviewWithAI": "Test with AI",
+      "testing": "Starting..."
     },
     "helperText": {
       "selectaquestiongrouptoautomaticallyfillthequestions below": "Select a question group to auto-fill questions",
@@ -345,18 +363,18 @@
       "overallScore": "Overall Score",
       "resultLabel": "Final Result",
       "comments": "Detailed Comments",
-      "proposedSalary": "Proposed Salary (VND)",
+      "proposedSalary": "Proposed Salary",
       "submitEvaluation": "Submit Final Evaluation",
       "evalSuccess": "Evaluation submitted successfully!",
-      "passed": "Accepted (Pass)",
-      "failed": "Rejected (Fail)",
+      "passed": "Qualified",
+      "failed": "Unqualified",
       "pending": "Pending Review",
       "joinAsHrLoading": "Connecting..."
     }
   },
   "liveRoom": {
     "participants": {
-      "aiInterviewer": "AI Interviewer",
+      "aiInterviewer": "AILA AI",
       "employer": "Employer",
       "you": "You",
       "candidate": "Candidate",
@@ -364,7 +382,7 @@
       "observer": "Observer"
     },
     "chips": {
-      "ai": "AI",
+      "ai": "AILA",
       "you": "YOU",
       "employer": "HR",
       "live": "LIVE"
@@ -398,6 +416,22 @@
       "employerObserving": "Employer is observing this interview session",
       "live": "LIVE",
       "waiting": "WAITING"
+    },
+    "competencyOverview": {
+      "title": "Competency Overview",
+      "subtitle": "Total Score: 0-100",
+      "radarTitle": "Competency Radar Chart",
+      "axes": {
+        "content": "Content",
+        "clarity": "Clarity",
+        "relevance": "Relevance",
+        "confidence": "Confidence"
+      },
+      "retryQuestion": "Retry this question",
+      "retryAll": "Retry entire session",
+      "shareResult": "Share result",
+      "backToList": "Back to list",
+      "continue": "Continue"
     }
   }
 }

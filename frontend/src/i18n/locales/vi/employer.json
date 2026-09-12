@@ -300,7 +300,7 @@
       "keywordsPlaceholder": "Nhập tiêu đề công việc",
       "urgent": "Gấp",
       "notUrgent": "Không gấp",
-      "urgentPlaceholder": "Trạng thái tuyển dụng (gấp)",
+      "urgentPlaceholder": "Trạng thái tuyển dụng khẩn cấp",
       "statusPlaceholder": "Trạng thái phê duyệt",
       "reset": "Làm mới",
       "search": "Tìm kiếm"
@@ -466,7 +466,7 @@
     "label": {
       "selectjobpost": "Chọn tin tuyển dụng",
       "selectcandidate": "Chọn ứng viên",
-      "selectquestiongroupoptional": "Chọn nhóm câu hỏi (Không bắt buộc)",
+      "selectquestiongroupoptional": "Chọn nhóm câu hỏi",
       "selectinterviewquestions": "Chọn câu hỏi phỏng vấn"
     },
     "helperText": {
@@ -491,7 +491,7 @@
     "scheduleNow": "Lên lịch ngay"
   },
   "interviewDetail": {
-    "title": "Chi tiết Phỏng vấn Online",
+    "title": "Chi tiết phỏng vấn trực tuyến",
     "subtitle": {
       "info": "Thông tin Phỏng vấn",
       "aiEvaluation": "Kết quả đánh giá AI",
@@ -561,11 +561,11 @@
       "resultLabel": "Kết quả cuối cùng",
       "commentsPlaceholder": "Thêm ghi chú HR và đánh giá cuối cùng...",
       "comments": "Nhận xét chi tiết",
-      "proposedSalary": "Lương đề xuất (VNĐ)",
+      "proposedSalary": "Lương đề xuất",
       "submitEvaluation": "Gửi đánh giá cuối cùng",
       "evalSuccess": "Gửi đánh giá thành công!",
-      "passed": "Chấp nhận (Đạt)",
-      "failed": "Từ chối (Không đạt)",
+      "passed": "Đạt yêu cầu",
+      "failed": "Không đạt",
       "pending": "Chờ xem xét"
     }
   },
@@ -618,7 +618,9 @@
       "contactpersonphoneexceededallowedlength": "SĐT quá dài",
       "contactpersonemailisrequired": "Yêu cầu email",
       "invalidemail": "Email không hợp lệ",
-      "contactpersonemailexceededallowedlength": "Email quá dài"
+      "contactpersonemailexceededallowedlength": "Email quá dài",
+      "invalidminscore": "Điểm tối thiểu không hợp lệ.",
+      "minscoreoutofrange": "Điểm tối thiểu phải từ 0 đến 100."
     },
     "warning": "Khi cập nhật, bài viết sẽ ở trạng thái chờ duyệt!",
     "title": {
@@ -647,7 +649,14 @@
       "contactpersonphone": "SĐT liên hệ",
       "contactpersonemail": "Email liên hệ",
       "contactinformation": "Thông tin liên hệ",
-      "urgent": "Gấp"
+      "urgent": "Gấp",
+      "autointerview": "Tự động mời phỏng vấn AI khi đạt yêu cầu",
+      "autointerviewdesc": "Tự động gửi thư mời phỏng vấn AI ngay khi điểm sàng lọc CV của ứng viên đạt hoặc vượt ngưỡng.",
+      "minscreeningscore": "Ngưỡng điểm CV tối thiểu để tự động mời",
+      "aiPipelineHelp": "Cơ chế song song: Ứng viên đạt từ điểm này trở lên sẽ được hệ thống tự động tạo lịch phỏng vấn và gửi email mời ngay. Ứng viên chưa đủ điểm hoặc khi tắt tính năng tự động sẽ được lưu ở danh sách chờ để Nhà tuyển dụng xem xét và bấm hẹn lịch thủ công."
+    },
+    "tooltip": {
+      "minscreeningscore": "Thang điểm đánh giá từ 0 đến 100 điểm."
     },
     "label": {
       "isUrgent": "Tuyển gấp"
@@ -665,6 +674,7 @@
       "entermaximumsalary": "Nhập lương tối đa",
       "selectacademiclevel": "Chọn trình độ HV",
       "selectinterviewtemplate": "Chọn mẫu phỏng vấn cho đánh giá sơ bộ tự động...",
+      "enterminscreeningscore": "Nhập điểm từ 0 đến 100",
       "selectcityprovince": "Chọn Tỉnh/Thành phố",
       "selectCityFirst": "Vui lòng chọn Tỉnh / Thành phố trước",
       "selectdistrict": "Chọn Quận/Huyện",
@@ -680,6 +690,8 @@
     },
     "section": {
       "basicInfo": "Thông tin cơ bản",
+      "aiPipeline": "Quy trình Phỏng vấn AI & Tự động hóa",
+      "content": "Chi tiết công việc & Quyền lợi",
       "location": "Địa điểm làm việc",
       "contact": "Thông tin liên hệ"
     }
@@ -785,7 +797,9 @@
       "updateError": "Có lỗi xảy ra khi cập nhật bộ câu hỏi",
       "deleteSuccess": "Xóa nhóm câu hỏi thành công",
       "deleteError": "Có lỗi xảy ra khi xóa bộ câu hỏi",
-      "createSuccess": "Tạo nhóm câu hỏi thành công"
+      "createSuccess": "Tạo nhóm câu hỏi thành công",
+      "testRoomCreated": "Đã khởi tạo phòng phỏng vấn thử nghiệm thành công!",
+      "emptyGroupWarning": "Bộ câu hỏi này chưa có câu hỏi nào để thử nghiệm."
     },
     "onlineInterview": "Phỏng vấn trực tuyến",
     "questionGroups": "Nhóm câu hỏi",
@@ -817,7 +831,10 @@
     "title": "Nhóm câu hỏi",
     "actions": {
       "addGroup": "Thêm nhóm",
-      "createNewQuestion": "Tạo câu hỏi mới"
+      "createNewQuestion": "Tạo câu hỏi mới",
+      "testWithAI": "Thử nghiệm AI",
+      "testGroupTooltip": "Phỏng vấn thử với bộ câu hỏi này",
+      "testInDialog": "Thử nghiệm bộ câu hỏi"
     },
     "noData": "Chưa có nhóm câu hỏi"
   },
@@ -851,17 +868,17 @@
   },
   "sidebar": {
     "dashboard": "Bảng điều khiển",
-    "agentAssistants": "Trợ lý AI (AILA)",
-    "jobPostList": "Danh sách tin TD",
+    "agentAssistants": "Trợ lý AI AILA",
+    "jobPostList": "Tin tuyển dụng",
     "candidateManagement": "Quản lý ứng viên",
     "appliedApplications": "Hồ sơ ứng tuyển",
     "savedProfiles": "Hồ sơ đã lưu",
     "findCandidates": "Tìm kiếm ứng viên",
-    "onlineInterviews": "Phỏng vấn Online",
-    "interviewList": "Danh sách PV",
-    "interviewLive": "Phỏng vấn Live",
+    "onlineInterviews": "Phỏng vấn trực tuyến",
+    "interviewList": "Lịch phỏng vấn",
+    "interviewLive": "Phỏng vấn trực tiếp",
     "interviewHistory": "Thư viện Video",
-    "questionBank": "Ngân hàng QA",
+    "questionBank": "Ngân hàng câu hỏi",
     "questionSets": "Bộ câu hỏi",
     "notifications": "Thông báo",
     "accountManagement": "Quản lý tài khoản",
@@ -871,9 +888,9 @@
     "settings": "Cài đặt",
     "squareHrmAdmin": "Quản lý Nhân sự",
     "hrmManagement": "Quản lý Nhân sự",
-    "hrmDashboard": "Tổng quan HRM",
+    "hrmDashboard": "Tổng quan nhân sự",
     "hrmEmployeesList": "Hồ sơ Nhân viên",
-    "hrmOnboarding": "Tiếp nhận & Onboarding",
+    "hrmOnboarding": "Tiếp nhận nhân sự",
     "hrmDepartments": "Phòng ban & Vị trí",
     "hrmContracts": "Hợp đồng Lao động",
     "hrmAttendances": "Chấm công",
@@ -1232,7 +1249,7 @@
         "desc": "Hệ thống lọc thông minh theo kỹ năng, kinh nghiệm và vị trí địa lý giúp bạn tiếp cận đúng đối tượng mục tiêu."
       },
       "h3": {
-        "title": "Quản lý ứng viên tập trung (CRM)",
+        "title": "Quản lý ứng viên tập trung",
         "desc": "Theo dõi toàn bộ vòng đời ứng viên từ lúc nộp hồ sơ đến khi nhận việc trên một giao diện quản trị duy nhất."
       },
       "h4": {
@@ -1266,7 +1283,7 @@
     "directSupport": {
       "title": "Hỗ trợ trực tiếp",
       "desc": "Liên hệ with đội ngũ hỗ trợ kỹ thuật và tư vấn tuyển dụng.",
-      "note": "Thời gian: 8:00 - 18:00 (Thứ 2 - Thứ 7)"
+      "note": "Thời gian: 8:00 - 18:00 từ Thứ 2 đến Thứ 7"
     },
     "docs": {
       "title": "Tài liệu hướng dẫn",
@@ -1638,7 +1655,7 @@
     "dialog": {
       "addRoleTitle": "Thêm vai trò mới",
       "roleNameLabel": "Tên vai trò",
-      "codeLabel": "Mã (slug)",
+      "codeLabel": "Mã vai trò",
       "codeHelperText": "Để trống sẽ tự sinh từ tên vai trò.",
       "descriptionLabel": "Mô tả",
       "permissionsLabel": "Quyền",
@@ -1649,7 +1666,7 @@
       "userIdHelperText": "Nhập ID tài khoản người dùng cần thêm vào công ty.",
       "roleLabel": "Vai trò",
       "statusLabel": "Trạng thái",
-      "invitedEmailLabel": "Email được mời (không bắt buộc)",
+      "invitedEmailLabel": "Email được mời",
       "createMember": "Thêm nhân viên"
     },
     "memberStatus": {
@@ -1757,13 +1774,13 @@
       "logoLabel": "Logo Doanh nghiệp",
       "logoUpload": "Tải Logo",
       "logoChange": "Đổi Logo",
-      "logoHint": "Định dạng PNG, JPG (tối đa 5MB). Khuyên dùng tỉ lệ 1:1.",
+      "logoHint": "Định dạng PNG, JPG với dung lượng tối đa 5MB. Khuyên dùng tỉ lệ 1:1.",
       "companyName": "Tên doanh nghiệp / Công ty đầy đủ",
       "companyNamePlaceholder": "VD: Công ty Cổ phần Công nghệ Square...",
       "companyNameHelper": "Nhập chính xác tên doanh nghiệp theo Giấy phép ĐKKD",
-      "taxCode": "Mã số thuế (MST)",
+      "taxCode": "Mã số thuế",
       "taxCodePlaceholder": "VD: 0101234567",
-      "taxCodeHelper": "Mã số thuế doanh nghiệp (tuỳ chọn khi khởi tạo)",
+      "taxCodeHelper": "Mã số thuế doanh nghiệp",
       "employeeSize": "Quy mô nhân sự",
       "fieldOperation": "Lĩnh vực hoạt động chính",
       "fieldOperationPlaceholder": "VD: Công nghệ thông tin, Xây dựng, Bán lẻ...",
@@ -1791,20 +1808,20 @@
       "recruiterEmail": "Email nhận thông báo ứng tuyển",
       "recruiterEmailPlaceholder": "recruitment@company.vn",
       "hiringNeeds": "Nhu cầu tuyển dụng trọng tâm",
-      "hiringNeedsPlaceholder": "Nhập vị trí/ngành cần tuyển (VD: Frontend, Kế toán, Sales...)",
+      "hiringNeedsPlaceholder": "Nhập vị trí hoặc ngành cần tuyển",
       "hiringNeedsHelper": "Nhập và nhấn Enter để thêm các vị trí ưu tiên tuyển dụng",
       "description": "Giới thiệu ngắn về môi trường làm việc & văn hóa",
       "descriptionPlaceholder": "Mô tả điểm nổi bật về phúc lợi, môi trường làm việc, văn hóa doanh nghiệp..."
     },
     "step3": {
-      "title": "Xác thực Doanh nghiệp (GPKD)",
+      "title": "Xác thực doanh nghiệp",
       "subtitle": "Doanh nghiệp có tích xanh xác thực sẽ nhận được độ tin cậy cao và thu hút ứng viên gấp 3 lần",
       "benefitsTitle": "Lợi ích khi xác thực Giấy phép ĐKKD ngay:",
       "benefit1": "Huy hiệu Tích xanh Doanh nghiệp uy tín",
       "benefit2": "Ưu tiên hiển thị tin tuyển dụng ở vị trí nổi bật",
       "benefit3": "Tăng x3 tỷ lệ ứng tuyển của các ứng viên chất lượng cao",
-      "dropzoneTitle": "Kéo thả file GPKD (Ảnh hoặc PDF) vào đây hoặc bấm để chọn",
-      "dropzoneSubtitle": "Định dạng hỗ trợ: JPG, PNG, PDF (Dung lượng tối đa 10MB)",
+      "dropzoneTitle": "Kéo thả tài liệu xác thực vào đây hoặc bấm để chọn",
+      "dropzoneSubtitle": "Định dạng hỗ trợ: JPG, PNG, PDF với dung lượng tối đa 10MB",
       "uploading": "Đang tải file lên...",
       "selectFile": "Chọn tệp từ máy tính",
       "uploadedFile": "Giấy phép kinh doanh đã tải lên",

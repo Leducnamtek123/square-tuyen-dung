@@ -45,6 +45,9 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import BeachAccessOutlinedIcon from '@mui/icons-material/BeachAccessOutlined';
+import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 
 import {
   useHrmDashboardStats,
@@ -55,6 +58,7 @@ import {
 } from '../hooks/useHrmQueries';
 import { TabTitle } from '@/utils/generalFunction';
 import pc from '@/utils/muiColors';
+import { ProductTourTrigger, useTourAutoStart } from '@/components/Features/ProductTour';
 
 const inputSx = {
   '& .MuiOutlinedInput-root': {
@@ -79,6 +83,9 @@ const inputSx = {
 export default function HrmDashboardPage() {
   TabTitle('Tổng quan Quản lý Nhân sự (HRM)');
   const { push } = useRouter();
+
+  // Auto-start HRM dashboard tour on first visit
+  useTourAutoStart('hrm_dashboard', 800);
 
   const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useHrmDashboardStats();
   const { data: employees = [], isLoading: empLoading } = useHrmEmployees();
@@ -128,6 +135,13 @@ export default function HrmDashboardPage() {
   const pendingLeaves = leaveRequests.filter((l) => l.status === 'PENDING');
   const recentEmployees = [...employees].slice(0, 5);
 
+  const todayStr = new Date().toISOString().split('T')[0];
+  const leavesToday = leaveRequests.filter((l) => {
+    const startDate = l.startDate || l.start_date;
+    const endDate = l.endDate || l.end_date;
+    return l.status === 'APPROVED' && startDate && endDate && startDate <= todayStr && endDate >= todayStr;
+  });
+
   const kpis = [
     {
       title: 'Nhân sự Chính thức',
@@ -169,8 +183,24 @@ export default function HrmDashboardPage() {
 
   const quickActions = [
     {
-      title: 'Hồ sơ Nhân viên',
-      desc: 'Xem danh bạ, sơ yếu lý lịch và chi tiết công tác',
+      title: 'Bảng Chấm công Tháng',
+      desc: 'Theo dõi quẹt thẻ, giờ làm và chốt bảng công',
+      icon: <TableChartOutlinedIcon sx={{ fontSize: 22 }} />,
+      href: '/employer/hrm/attendances/timesheets',
+      color: '#0d9488',
+      bgColor: '#f0fdfa',
+    },
+    {
+      title: 'Tính Lương Gross sang Net',
+      desc: 'Bảng lương, BHXH & Thuế TNCN chuẩn luật',
+      icon: <ReceiptLongOutlinedIcon sx={{ fontSize: 22 }} />,
+      href: '/employer/hrm/payroll',
+      color: '#16a34a',
+      bgColor: '#f0fdf4',
+    },
+    {
+      title: 'Hồ sơ Nhân viên 360°',
+      desc: 'Danh bạ, hợp đồng, biến động và tài liệu số',
       icon: <PeopleAltOutlinedIcon sx={{ fontSize: 22 }} />,
       href: '/employer/hrm/employees',
       color: '#2563eb',
@@ -181,24 +211,8 @@ export default function HrmDashboardPage() {
       desc: 'Quy trình đón nhân sự mới từ tuyển dụng',
       icon: <PersonAddOutlinedIcon sx={{ fontSize: 22 }} />,
       href: '/employer/hrm/onboarding',
-      color: '#16a34a',
-      bgColor: '#f0fdf4',
-    },
-    {
-      title: 'Phòng ban & Vị trí',
-      desc: 'Quản lý cơ cấu phòng ban và chức danh',
-      icon: <BusinessIcon sx={{ fontSize: 22 }} />,
-      href: '/employer/hrm/departments',
       color: '#7c3aed',
       bgColor: '#f5f3ff',
-    },
-    {
-      title: 'Sơ đồ Cây Tổ chức',
-      desc: 'Trực quan hóa cấu trúc phân cấp quản lý',
-      icon: <AccountTreeOutlinedIcon sx={{ fontSize: 22 }} />,
-      href: '/employer/hrm/org-chart',
-      color: '#d97706',
-      bgColor: '#fffbeb',
     },
   ];
 
@@ -266,11 +280,12 @@ export default function HrmDashboardPage() {
             >
               Tiếp nhận Onboarding
             </Button>
+            <ProductTourTrigger tourKey="hrm_dashboard" variant="chip" label="Hướng dẫn HRM" />
           </Stack>
         </Box>
 
         {/* 1. Top Bento KPI Cards */}
-        <Grid container spacing={2.5}>
+        <Grid data-tour="hrm-metrics" container spacing={2.5}>
           {kpis.map((kpi, idx) => (
             <Grid key={kpi.title || `kpi-${idx}`} size={{ xs: 12, sm: 6, lg: 3 }}>
               <Paper
@@ -341,7 +356,7 @@ export default function HrmDashboardPage() {
         {/* 2. Middle Bento Row (60% Department Breakdown | 40% Quick Actions) */}
         <Grid container spacing={3}>
           {/* Department Breakdown */}
-          <Grid size={{ xs: 12, md: 7 }}>
+          <Grid size={{ xs: 12, md: 7 }} data-tour="hrm-reminders">
             <Paper
               elevation={0}
               sx={{
@@ -412,7 +427,7 @@ export default function HrmDashboardPage() {
           </Grid>
 
           {/* Quick Workflows */}
-          <Grid size={{ xs: 12, md: 5 }}>
+          <Grid size={{ xs: 12, md: 5 }} data-tour="hrm-quick-actions">
             <Paper
               elevation={0}
               sx={{
@@ -484,10 +499,10 @@ export default function HrmDashboardPage() {
           </Grid>
         </Grid>
 
-        {/* 3. Bottom Bento Row (Recent Leaves | Recent Employees) */}
+        {/* 3. Bottom Bento Row (Recent Leaves | Who's Away Today | Recent Employees) */}
         <Grid container spacing={3}>
           {/* Recent Leave Requests */}
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Paper
               elevation={0}
               sx={{
@@ -495,11 +510,12 @@ export default function HrmDashboardPage() {
                 borderRadius: 3,
                 border: '1px solid #e2e8f0',
                 bgcolor: '#ffffff',
+                height: '100%',
               }}
             >
               <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '1rem' }}>
-                  Đơn Nghỉ phép Chờ duyệt ({pendingLeaves.length})
+                  Đơn Chờ duyệt ({pendingLeaves.length})
                 </Typography>
                 <Button
                   size="small"
@@ -517,12 +533,12 @@ export default function HrmDashboardPage() {
                 </Typography>
               ) : (
                 <TableContainer sx={{ border: '1px solid #f1f5f9', borderRadius: 2, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-                  <Table size="small" sx={{ minWidth: 360 }}>
+                  <Table size="small" sx={{ minWidth: 280 }}>
                     <TableHead sx={{ bgcolor: '#f8fafc' }}>
                       <TableRow>
                         <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.75rem' }}>Nhân viên</TableCell>
                         <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.75rem' }}>Thời gian</TableCell>
-                        <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.75rem' }} align="right">Hành động</TableCell>
+                        <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.75rem' }} align="right">Duyệt</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -561,8 +577,94 @@ export default function HrmDashboardPage() {
             </Paper>
           </Grid>
 
+          {/* Who's Away Today */}
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                border: '1px solid #e2e8f0',
+                bgcolor: '#ffffff',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <BeachAccessOutlinedIcon sx={{ fontSize: 18, color: '#ea580c' }} />
+                  <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '1rem' }}>
+                    Vắng mặt Hôm nay ({leavesToday.length})
+                  </Typography>
+                </Stack>
+                <Chip
+                  label={new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })}
+                  size="small"
+                  sx={{ height: 20, fontSize: '0.675rem', fontWeight: 800, bgcolor: '#fff7ed', color: '#ea580c' }}
+                />
+              </Stack>
+
+              {leavesToday.length === 0 ? (
+                <Box sx={{ py: 5, textAlign: 'center', my: 'auto' }}>
+                  <Typography variant="body2" sx={{ color: '#16a34a', fontWeight: 700 }}>
+                    Toàn bộ nhân sự đang có mặt đầy đủ hôm nay 🎉
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
+                    Không ghi nhận đơn nghỉ phép nào trùng ngày
+                  </Typography>
+                </Box>
+              ) : (
+                <Stack spacing={1.25} sx={{ overflowY: 'auto', maxHeight: 260 }}>
+                  {leavesToday.slice(0, 5).map((leave) => (
+                    <Box
+                      key={leave.id}
+                      sx={{
+                        p: 1.25,
+                        borderRadius: 2,
+                        bgcolor: '#fff7ed',
+                        border: '1px solid #ffedd5',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Stack direction="row" spacing={1.25} alignItems="center">
+                        <Avatar
+                          sx={{ width: 34, height: 34, bgcolor: '#ea580c', color: '#ffffff', fontWeight: 800, fontSize: '0.8125rem' }}
+                        >
+                          {(leave.employeeName || leave.employee_name || 'E')[0]}
+                        </Avatar>
+                        <Box>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.8125rem' }}>
+                            {leave.employeeName || leave.employee_name || `#${leave.employee}`}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: '#c2410c', fontWeight: 600, fontSize: '0.7rem' }}>
+                            {leave.leaveTypeName || leave.leave_type_name || 'Nghỉ phép'} ({leave.startDate || leave.start_date} → {leave.endDate || leave.end_date})
+                          </Typography>
+                        </Box>
+                      </Stack>
+                      <Chip
+                        label={`${leave.totalDays ?? leave.total_days} ngày`}
+                        size="small"
+                        sx={{
+                          height: 20,
+                          fontSize: '0.675rem',
+                          fontWeight: 800,
+                          borderRadius: 1,
+                          bgcolor: '#fed7aa',
+                          color: '#9a3412',
+                        }}
+                      />
+                    </Box>
+                  ))}
+                </Stack>
+              )}
+            </Paper>
+          </Grid>
+
           {/* Recent Employees */}
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Paper
               elevation={0}
               sx={{

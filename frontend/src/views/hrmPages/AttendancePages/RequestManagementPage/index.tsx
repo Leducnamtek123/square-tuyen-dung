@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   Box,
@@ -315,7 +316,7 @@ export default function RequestManagementPage() {
               Trung tâm quản lý đơn từ chấm công
             </Typography>
             <Typography variant="body2" sx={{ color: '#64748B' }}>
-              Quy trình phê duyệt 2 cấp (Quản lý trực tiếp ➔ HR/Admin). Khi cấp 2 phê duyệt, hệ thống tự động bù công vào bảng chấm công chi tiết.
+              Quy trình phê duyệt 2 cấp (Quản lý trực tiếp chuyển tiếp đến HR/Admin). Khi cấp 2 phê duyệt, hệ thống tự động bù công vào bảng chấm công chi tiết.
             </Typography>
           </Box>
 
@@ -380,6 +381,44 @@ export default function RequestManagementPage() {
             ))}
           </Tabs>
         </Box>
+
+        {/* Contextual link to Leave Balances when viewing LEAVE requests */}
+        {activeTab === 'LEAVE' && (
+          <Alert
+            severity="info"
+            variant="outlined"
+            action={
+              <Button
+                component={Link}
+                href="/employer/hrm/leaves"
+                size="small"
+                variant="contained"
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  borderRadius: 2,
+                  boxShadow: 'none',
+                  bgcolor: '#0284C7',
+                  whiteSpace: 'nowrap',
+                  '&:hover': { bgcolor: '#0369A1', boxShadow: 'none' },
+                }}
+              >
+                Xem Quỹ Phép & Cấp Phát →
+              </Button>
+            }
+            sx={{
+              mt: 2.5,
+              borderRadius: 2.5,
+              bgcolor: '#F0F9FF',
+              borderColor: '#BAE6FD',
+              color: '#0369A1',
+              alignItems: 'center',
+            }}
+          >
+            Đang lọc danh sách <strong>Đơn xin nghỉ phép</strong>. Để kiểm tra số ngày phép còn lại của từng nhân viên hoặc cấp phép năm tự động, truy cập trang <strong>Quản lý Phép & Quỹ Phép</strong>.
+          </Alert>
+        )}
 
         {/* Filter Toolbar */}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 2.5 }} alignItems="center">
@@ -508,7 +547,7 @@ export default function RequestManagementPage() {
 
                     <TableCell>
                       <Typography variant="body2" sx={{ fontWeight: 500, color: '#0F172A' }}>
-                        {req.start_date === req.end_date ? req.start_date : `${req.start_date} ➔ ${req.end_date}`}
+                        {req.start_date === req.end_date ? req.start_date : `${req.start_date} – ${req.end_date}`}
                       </Typography>
                       {(req.start_time || req.end_time || req.duration_hours) && (
                         <Typography variant="caption" sx={{ color: '#64748B' }}>

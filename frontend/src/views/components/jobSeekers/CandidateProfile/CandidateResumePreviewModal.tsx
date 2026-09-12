@@ -165,7 +165,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
         </Stack>
       </DialogTitle>
 
-      <DialogContent sx={{ p: { xs: 2.5, sm: 4 } }}>
+      <DialogContent sx={{ p: { xs: 2.5, sm: 4 }, pt: { xs: '20px !important', sm: '28px !important' } }}>
         <Stack spacing={3}>
           {/* Section: Tệp CV đính kèm (nếu có) */}
           {safePdfUrl ? (

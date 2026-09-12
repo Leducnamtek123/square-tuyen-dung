@@ -159,7 +159,7 @@ export const TemplateSwitcherModal: React.FC<TemplateSwitcherModalProps> = ({
       </DialogTitle>
 
       {/* ── Dialog Content ───────────────────────────────────────────── */}
-      <DialogContent sx={{ p: { xs: 2, sm: 3.5 }, bgcolor: '#f8fafc' }}>
+      <DialogContent sx={{ p: { xs: 2, sm: 3.5 }, pt: { xs: '20px !important', sm: '24px !important' }, bgcolor: '#f8fafc' }}>
         {/* Category Filters Carousel */}
         <Stack
           direction="row"

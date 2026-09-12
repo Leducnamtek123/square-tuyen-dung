@@ -366,8 +366,18 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
     >
       {/* Optional Title */}
       {title && (
-        <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          {title} {showRequired && <span style={{ color: '#ef4444' }}>*</span>}
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: 700,
+            mb: 1,
+            color: 'text.primary',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+          }}
+        >
+          {title} {showRequired && <Box component="span" sx={{ color: 'error.main' }}>*</Box>}
         </Typography>
       )}
 
@@ -375,21 +385,24 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 3,
-          border: '1.5px solid',
-          borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
+          borderRadius: 2.5,
+          border: '1px solid',
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#CBD5E1',
           bgcolor: 'background.paper',
           overflow: 'hidden',
-          transition: 'all 0.2s ease',
+          transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
           display: 'flex',
           flexDirection: 'column',
           flex: isFullscreen ? 1 : undefined,
           boxShadow: isDark
             ? '0 4px 20px rgba(0, 0, 0, 0.4)'
-            : '0 2px 12px rgba(0, 0, 0, 0.04)',
+            : '0 1px 3px rgba(0, 0, 0, 0.04)',
+          '&:hover': {
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.25)' : '#94A3B8',
+          },
           '&:focus-within': {
             borderColor: 'primary.main',
-            boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+            boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.15)',
           },
         }}
       >
@@ -398,10 +411,9 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
           sx={{
             p: 1,
             px: 1.5,
-            bgcolor: isDark ? 'rgba(15, 23, 42, 0.8)' : 'rgba(248, 250, 252, 0.9)',
-            backdropFilter: 'blur(8px)',
+            bgcolor: isDark ? '#0F172A' : '#F8FAFC',
             borderBottom: '1px solid',
-            borderColor: 'divider',
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#E2E8F0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -409,56 +421,60 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
             gap: 1,
           }}
         >
-          {/* Left Group: AI Sparkle Button + Smart Templates Hub */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-            {/* AI Assistant Button */}
-            <Button
-              size="small"
-              onClick={() => setOpenAIModal(true)}
-              startIcon={<AutoAwesomeIcon sx={{ fontSize: '1.1rem !important' }} />}
-              sx={{
-                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-                color: '#fff',
-                fontWeight: 700,
-                fontSize: '0.82rem',
-                textTransform: 'none',
-                borderRadius: 2,
-                px: 1.8,
-                py: 0.6,
-                boxShadow: '0 3px 10px rgba(99, 102, 241, 0.35)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #4f46e5 0%, #9333ea 100%)',
-                  boxShadow: '0 4px 14px rgba(99, 102, 241, 0.45)',
-                },
-              }}
-            >
-              {t('editor.toolbar.aiAssistant', 'Trợ Lý AI')}
-            </Button>
+          {/* Left Group: Grouped Toolbar Clusters */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', flex: '1 1 auto' }}>
+            {/* Cluster 1: AI Assistant & Templates */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {/* AI Assistant Button */}
+              <Button
+                size="small"
+                onClick={() => setOpenAIModal(true)}
+                startIcon={<AutoAwesomeIcon sx={{ fontSize: '1.1rem !important' }} />}
+                sx={{
+                  background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                  color: '#fff',
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  textTransform: 'none',
+                  borderRadius: 2,
+                  px: 1.8,
+                  py: 0.6,
+                  boxShadow: '0 3px 10px rgba(99, 102, 241, 0.35)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #4f46e5 0%, #9333ea 100%)',
+                    boxShadow: '0 4px 14px rgba(99, 102, 241, 0.45)',
+                  },
+                }}
+              >
+                {t('editor.toolbar.aiAssistant', 'Trợ Lý AI')}
+              </Button>
 
-            {/* Smart Templates Button */}
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => setOpenTemplatesModal(true)}
-              startIcon={<MenuBookIcon sx={{ fontSize: '1rem !important' }} />}
-              sx={{
-                borderRadius: 2,
-                textTransform: 'none',
-                fontWeight: 600,
-                fontSize: '0.82rem',
-                borderColor: 'divider',
-                color: 'text.primary',
-                bgcolor: 'background.paper',
-                '&:hover': {
-                  borderColor: 'primary.main',
-                  bgcolor: 'rgba(99, 102, 241, 0.05)',
-                },
-              }}
-            >
-              {t('editor.toolbar.templates', 'Mẫu Nội Dung')}
-            </Button>
+              {/* Smart Templates Button */}
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => setOpenTemplatesModal(true)}
+                startIcon={<MenuBookIcon sx={{ fontSize: '1rem !important' }} />}
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.82rem',
+                  borderColor: 'divider',
+                  color: 'text.primary',
+                  bgcolor: 'background.paper',
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    bgcolor: 'rgba(99, 102, 241, 0.05)',
+                  },
+                }}
+              >
+                {t('editor.toolbar.templates', 'Mẫu Nội Dung')}
+              </Button>
+            </Box>
 
-            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 22 }} />
+            {/* Cluster 2: Headings & Inline Formatting */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
 
             {/* Headings Dropdown */}
             <Button
@@ -520,17 +536,17 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
 
             {/* Inline Styles Group */}
             <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title={t('editor.toolbar.bold', 'In đậm (Ctrl+B)')}>
+              <Tooltip title={t('editor.toolbar.bold', 'In đậm')}>
                 <IconButton size="small" onClick={() => applyInlineStyle('BOLD')}>
                   <FormatBoldIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title={t('editor.toolbar.italic', 'In nghiêng (Ctrl+I)')}>
+              <Tooltip title={t('editor.toolbar.italic', 'In nghiêng')}>
                 <IconButton size="small" onClick={() => applyInlineStyle('ITALIC')}>
                   <FormatItalicIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title={t('editor.toolbar.underline', 'Gạch chân (Ctrl+U)')}>
+              <Tooltip title={t('editor.toolbar.underline', 'Gạch chân')}>
                 <IconButton size="small" onClick={() => applyInlineStyle('UNDERLINE')}>
                   <FormatUnderlinedIcon fontSize="small" />
                 </IconButton>
@@ -619,31 +635,32 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
                 ))}
               </Box>
             </Popover>
+          </Box>
 
-            {/* Lists & Alignment */}
-            <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title={t('editor.toolbar.bulletList', 'Danh sách chấm tròn')}>
-                <IconButton size="small" onClick={() => applyBlockType('unordered-list-item')}>
-                  <FormatListBulletedIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('editor.toolbar.orderedList', 'Danh sách số thứ tự')}>
-                <IconButton size="small" onClick={() => applyBlockType('ordered-list-item')}>
-                  <FormatListNumberedIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </ButtonGroup>
-
-            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 22 }} />
+          {/* Cluster 3: Lists & Insert Controls */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+              {/* Lists & Alignment */}
+              <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
+                <Tooltip title={t('editor.toolbar.bulletList', 'Danh sách chấm tròn')}>
+                  <IconButton size="small" onClick={() => applyBlockType('unordered-list-item')}>
+                    <FormatListBulletedIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={t('editor.toolbar.orderedList', 'Danh sách số thứ tự')}>
+                  <IconButton size="small" onClick={() => applyBlockType('ordered-list-item')}>
+                    <FormatListNumberedIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </ButtonGroup>
 
             {/* Insert Controls: Image, Link, Table, Callout, Divider */}
             <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title={t('editor.toolbar.uploadImage', 'Tải ảnh lên (Upload ảnh / Kéo thả)')}>
+              <Tooltip title={t('editor.toolbar.uploadImage', 'Tải ảnh lên')}>
                 <IconButton size="small" onClick={() => fileInputRef.current?.click()}>
                   <ImageIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title={t('editor.toolbar.link', 'Chèn liên kết (Link)')}>
+              <Tooltip title={t('editor.toolbar.link', 'Chèn liên kết')}>
                 <IconButton size="small" onClick={() => setOpenLinkModal(true)}>
                   <LinkIcon fontSize="small" />
                 </IconButton>
@@ -653,7 +670,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
                   <TableChartIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title={t('editor.toolbar.callout', 'Chèn khối ghi chú (Callout box)')}>
+              <Tooltip title={t('editor.toolbar.callout', 'Chèn khối ghi chú nổi bật')}>
                 <IconButton size="small" onClick={() => setOpenCalloutModal(true)}>
                   <LightbulbOutlinedIcon fontSize="small" />
                 </IconButton>
@@ -665,25 +682,26 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
               </Tooltip>
             </ButtonGroup>
 
-            {/* Hidden image file input */}
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleFileInputChange}
-            />
+              {/* Hidden image file input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleFileInputChange}
+              />
+            </Box>
           </Box>
 
           {/* Right Group: Undo/Redo, Preview, Fullscreen */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
             <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title={t('editor.toolbar.undo', 'Hoàn tác (Undo)')}>
+              <Tooltip title={t('editor.toolbar.undo', 'Hoàn tác')}>
                 <IconButton size="small" onClick={handleUndo}>
                   <UndoIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title={t('editor.toolbar.redo', 'Làm lại (Redo)')}>
+              <Tooltip title={t('editor.toolbar.redo', 'Làm lại')}>
                 <IconButton size="small" onClick={handleRedo}>
                   <RedoIcon fontSize="small" />
                 </IconButton>

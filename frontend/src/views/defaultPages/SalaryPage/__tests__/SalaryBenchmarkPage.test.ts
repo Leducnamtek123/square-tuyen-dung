@@ -121,4 +121,45 @@ describe('SalaryBenchmarkPage data formatting and calculations', () => {
     expect(link).toContain(encodeURIComponent('Xây dựng & Bất động sản'));
     expect(link).toContain(encodeURIComponent('Kỹ sư giám sát thi công công trình'));
   });
+
+  test('clamps median pin position correctly for visual stability', () => {
+    const calculateMedianPercentClamped = (min: number, max: number, median: number) => {
+      const span = max - min;
+      return span > 0 ? Math.min(Math.max(Math.round(((median - min) / span) * 100), 10), 90) : 50;
+    };
+
+    // Extreme close to min: (10.1M - 10M) / (50M - 10M) = 0.1 / 40 = 0.25% -> clamped to 10%
+    expect(calculateMedianPercentClamped(10000000, 50000000, 10100000)).toBe(10);
+
+    // Extreme close to max: (49.9M - 10M) / (50M - 10M) = 39.9 / 40 = 99.75% -> clamped to 90%
+    expect(calculateMedianPercentClamped(10000000, 50000000, 49900000)).toBe(90);
+
+    // Zero span fallback
+    expect(calculateMedianPercentClamped(20000000, 20000000, 20000000)).toBe(50);
+  });
+
+  test('correctly parses camelCase API responses transformed by httpRequest interceptor', () => {
+    const camelBenchmark: SalaryBenchmarkItem = {
+      id: 5,
+      positionTitle: 'Chỉ huy trưởng công trình',
+      careerName: 'Xây dựng - Kiến trúc',
+      seniority: 'lead',
+      minSalary: 35000000,
+      medianSalary: 48000000,
+      maxSalary: 70000000,
+      sampleSize: 100,
+    };
+
+    const min = Number(camelBenchmark.minSalary ?? camelBenchmark.min_salary ?? 0);
+    const max = Number(camelBenchmark.maxSalary ?? camelBenchmark.max_salary ?? 0);
+    const median = Number(camelBenchmark.medianSalary ?? camelBenchmark.median_salary ?? 0);
+    const title = camelBenchmark.positionTitle ?? camelBenchmark.jobTitle ?? '';
+    const cat = camelBenchmark.careerName ?? camelBenchmark.category ?? '';
+
+    expect(min).toBe(35000000);
+    expect(max).toBe(70000000);
+    expect(median).toBe(48000000);
+    expect(title).toBe('Chỉ huy trưởng công trình');
+    expect(cat).toBe('Xây dựng - Kiến trúc');
+  });
 });

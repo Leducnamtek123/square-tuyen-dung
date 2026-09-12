@@ -278,7 +278,7 @@
   "company": {
     "following": "Following",
     "follow": "Follow",
-    "followers": "{{count}} followers",
+    "followers": "followers",
     "openingJobs": "opening jobs",
     "notUpdated": "Not updated",
     "jobCount": "{{count}} jobs"

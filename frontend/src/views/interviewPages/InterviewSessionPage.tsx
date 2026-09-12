@@ -3,18 +3,18 @@ import React from 'react';
 import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import Button from '@mui/material/Button';
+import { Button } from '@/components/ui/button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
+import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
+import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { AilaLogo } from '@/components/Common/AilaLogo';
 
 import {
   LiveKitRoom,
-  SessionProvider,
-  useSession,
-  VideoConference,
   RoomAudioRenderer,
 } from '@livekit/components-react';
-import { TokenSource } from 'livekit-client';
 
 import interviewService from '@/services/interviewService';
 import tokenService from '@/services/tokenService';
@@ -22,8 +22,16 @@ import { transformInterviewSession } from '@/utils/transformers';
 import type { InterviewSession, Question } from '@/types/models';
 import { PreflightRoom } from './PreflightRoom';
 import { AIInterviewLayout } from './AIInterviewLayout';
+import { InterviewCompletedView } from './components/InterviewCompletedView';
+import { InterviewRecordingBadge } from './components/InterviewRecordingBadge';
+import {
+  InterviewPreparationModal,
+  PreparationStepState,
+} from './components/InterviewPreparationModal';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import { cn } from '@/lib/utils';
 import { IMAGES } from '@/configs/images';
+import DottedWorldMapBackground from '@/views/onboardingPages/components/DottedWorldMapBackground';
 
 // â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -102,6 +110,29 @@ const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number): Promise<
   }
 };
 
+function resolveLiveKitServerUrl(returnedUrl?: string): string {
+  const isLocalOrigin =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  let urlToUse = getSafeLiveKitUrl(isLocalOrigin);
+  if (!isLocalOrigin && returnedUrl) {
+    const isInternal =
+      returnedUrl.includes('localhost') ||
+      returnedUrl.includes('127.0.0.1') ||
+      returnedUrl.includes('livekit:');
+    if (!isInternal) {
+      try {
+        const url = new URL(returnedUrl);
+        url.protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        urlToUse = url.toString().replace(/\/$/, '');
+      } catch (urlErr) {
+        console.warn('[LiveKit URL] Invalid server URL returned from backend:', urlErr);
+      }
+    }
+  }
+  return urlToUse;
+}
+
 // â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type InterviewSessionPageProps = {
@@ -165,26 +196,7 @@ const reducer = (state: SessionPageState, action: SessionPageAction): SessionPag
   }
 };
 
-function InterviewSessionBridge({
-  connectionDetails,
-  children,
-}: {
-  connectionDetails: LiveKitConnectionDetails;
-  children: any;
-}) {
-  const tokenSource = React.useMemo(() => {
-    return TokenSource.custom(async () => ({
-      participantToken: connectionDetails.token,
-      serverUrl: connectionDetails.serverUrl,
-    }));
-  }, [connectionDetails.serverUrl, connectionDetails.token]);
-
-  const session = useSession(tokenSource);
-
-  return <SessionProvider session={session}>{children}</SessionProvider>;
-}
-
-// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Component ──────────────────────────────────────────────────────────────────
 
 function InterviewSessionLoading({ label }: { label: string }) {
   return (
@@ -210,7 +222,11 @@ function InterviewSessionError({
     <main className="grid min-h-[100dvh] place-items-center bg-[#f8fafc] px-6">
       <section className="w-full max-w-lg rounded-2xl border border-rose-200 bg-rose-50/80 p-8 text-center text-rose-900 shadow-sm">
         <p className="mb-6 text-lg font-medium">{message}</p>
-        <Button variant="contained" sx={{ bgcolor: '#0284c7', color: '#fff', '&:hover': { bgcolor: '#0369a1' } }} onClick={onBackHome}>
+        <Button
+          variant="default"
+          onClick={onBackHome}
+          className="rounded-xl bg-blue-600 px-6 py-2.5 font-bold text-white shadow-sm hover:bg-blue-700 active:scale-98"
+        >
           {actionLabel}
         </Button>
       </section>
@@ -231,6 +247,8 @@ function ActiveInterviewRoom({
   questions,
   onDisconnected,
   onEndSession,
+  isMock,
+  session,
 }: {
   connectionDetails: LiveKitConnectionDetails;
   sessionTitle: string;
@@ -244,10 +262,18 @@ function ActiveInterviewRoom({
   questions?: Question[];
   onDisconnected: () => void;
   onEndSession: () => Promise<void>;
+  isMock?: boolean;
+  session?: InterviewSession | null;
 }) {
+  const sessionMeta = ((session?.sessionMetadata || session?.session_metadata || {}) as Record<string, any>);
+  const avatarImageUrl = sessionMeta.avatar_image_url || sessionMeta.avatarImageUrl || null;
+  const avatarBackgroundUrl = sessionMeta.avatar_background_url || sessionMeta.avatarBackgroundUrl || null;
+  const avatarBackdrop = sessionMeta.avatar_backdrop || sessionMeta.avatarBackdrop || 'modern_office';
+  const interviewerName = sessionMeta.interviewer_name || sessionMeta.interviewerName || (isMock ? 'Trợ lý AI AILA' : 'Trợ lý AI Phỏng vấn');
+
   return (
-    <main className="flex min-h-[100dvh] flex-col bg-[#f1f5f9] text-slate-900">
-      <header className="relative z-10 flex items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur-xl md:px-6 shadow-sm">
+    <main className="flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#f8fafc] text-slate-900">
+      <header className="relative z-10 flex shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 py-2.5 backdrop-blur-xl md:px-6 shadow-xs">
         <div className="flex items-center gap-3">
           <Image
             src={IMAGES.getTextLogo('dark')}
@@ -255,22 +281,38 @@ function ActiveInterviewRoom({
             width={90}
             height={28}
             style={{ height: 24, width: 'auto', objectFit: 'contain' }}
-            priority
           />
           <div className="h-4 w-px bg-slate-200" />
           <div>
             <h1 className="text-sm font-bold text-slate-900 md:text-base">{sessionTitle}</h1>
-            <p className="mt-0.5 text-xs font-medium text-slate-500">{jobLabel} • {candidateLabel}</p>
+            <p className="mt-0.5 text-xs font-medium text-slate-500">
+              {jobLabel ? `${jobLabel} • ` : ''}{candidateLabel}
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <span className={cn('inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider', statusClass)}>
+        <div className="flex items-center gap-2.5">
+          {formattedSchedule && (
+            <span className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600 shadow-2xs">
+              <span className="size-1.5 rounded-full bg-slate-400" /> {formattedSchedule}
+            </span>
+          )}
+          {isMock ? (
+            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50/90 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700 shadow-xs">
+              <AilaLogo size={13} variant="mark" /> Phiên luyện tập AILA thực chiến
+            </span>
+          ) : (
+            <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700 shadow-xs">
+              <ApartmentOutlinedIcon sx={{ fontSize: 13 }} /> Phỏng vấn chính thức
+            </span>
+          )}
+          <InterviewRecordingBadge />
+          <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700 shadow-xs">
             {statusText}
           </span>
         </div>
       </header>
 
-      <div className="flex-1" style={{ height: 'calc(100dvh - 57px)', minHeight: 'calc(100dvh - 57px)' }}>
+      <div className="flex flex-1 flex-col min-h-0 h-full w-full overflow-hidden">
         <LiveKitRoom
           token={connectionDetails.token}
           serverUrl={connectionDetails.serverUrl}
@@ -278,20 +320,20 @@ function ActiveInterviewRoom({
           video={participantRole === 'jobseeker'}
           audio={participantRole === 'jobseeker' ? INTERVIEW_AUDIO_CAPTURE_OPTIONS : false}
           onDisconnected={onDisconnected}
-          style={{ height: '100%' }}
+          className="flex flex-1 flex-col min-h-0 h-full w-full overflow-hidden"
+          style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}
         >
-          <InterviewSessionBridge connectionDetails={connectionDetails}>
-            <AIInterviewLayout onEndSession={onEndSession} questions={questions} />
-            <RoomAudioRenderer />
-          </InterviewSessionBridge>
+          <AIInterviewLayout
+            onEndSession={onEndSession}
+            questions={questions}
+            avatarImageUrl={avatarImageUrl}
+            avatarBackgroundUrl={avatarBackgroundUrl}
+            avatarBackdrop={avatarBackdrop}
+            interviewerName={interviewerName}
+          />
+          <RoomAudioRenderer />
         </LiveKitRoom>
       </div>
-
-      {formattedSchedule && (
-        <p className="border-t border-slate-200 bg-white px-4 py-2 text-center text-xs text-slate-500">
-          {timeLabel} &bull; {formattedSchedule}
-        </p>
-      )}
     </main>
   );
 }
@@ -301,6 +343,7 @@ type WaitingRoomViewState = {
   showPreflight: boolean;
   starting: boolean;
   isJoinable: boolean;
+  session: InterviewSession | null;
 };
 
 type WaitingRoomLabels = {
@@ -342,8 +385,20 @@ function InterviewWaitingRoom({
   formattedSchedule?: string | false;
   actions: WaitingRoomActions;
 }) {
+  const isMock =
+    viewState.session?.sessionType === 'mock' ||
+    (viewState.session as any)?.type === 'practice' ||
+    (!viewState.session?.jobPost && !viewState.session?.companyName);
+
   return (
-    <main className="flex min-h-[100dvh] flex-col bg-[#f8fafc] text-slate-800">
+    <main className="relative flex min-h-[100dvh] flex-col bg-[#f8fafc] text-slate-800 overflow-x-hidden">
+      {/* Subtle Dotted World Map Background Pattern */}
+      <DottedWorldMapBackground
+        dotColor="#2563eb"
+        mapOpacity={0.32}
+        dotRadius={1.6}
+      />
+
       {/* Top Header Bar */}
       <header className="relative z-20 flex items-center justify-between border-b border-slate-200/80 bg-white/85 px-4 py-3.5 backdrop-blur-xl md:px-8 shadow-sm">
         <div className="flex items-center gap-4">
@@ -354,16 +409,24 @@ function InterviewWaitingRoom({
               width={100}
               height={32}
               style={{ height: 26, width: 'auto', objectFit: 'contain' }}
-              priority
             />
           </div>
           <div className="hidden h-5 w-px bg-slate-200 sm:block" />
           <div>
             <h1 className="text-sm font-bold tracking-tight text-slate-900 md:text-base">{labels.sessionTitle}</h1>
-            <p className="text-xs font-medium text-slate-500">{labels.jobLabel} • {labels.candidateLabel}</p>
+            <p className="text-xs font-medium text-slate-500">{labels.jobLabel ? `${labels.jobLabel} • ` : ''}{labels.candidateLabel}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {isMock ? (
+            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50/90 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700 shadow-2xs">
+              <AilaLogo size={13} variant="mark" /> Luyện tập AILA thực chiến
+            </span>
+          ) : (
+            <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700 shadow-2xs">
+              <ApartmentOutlinedIcon sx={{ fontSize: 13 }} /> Phỏng vấn chính thức
+            </span>
+          )}
           <span className={cn('inline-flex items-center rounded-full border px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm', statusClass)}>
             {labels.statusText}
           </span>
@@ -376,7 +439,7 @@ function InterviewWaitingRoom({
         <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-[350px] w-[600px] rounded-full bg-sky-500/8 blur-[120px]" />
         <div className="pointer-events-none absolute bottom-0 right-1/4 h-[250px] w-[400px] rounded-full bg-cyan-500/6 blur-[100px]" />
 
-        <div className="relative z-10 w-full max-w-xl">
+        <div className={cn("relative z-10 w-full transition-all duration-300", viewState.showPreflight ? "max-w-5xl" : "max-w-xl")}>
           {viewState.isInterrupted && (
             <Alert severity="warning" sx={{ mb: 3, borderRadius: '14px', bgcolor: '#fffbeb', color: '#b45309', border: '1px solid #fde68a' }}>
               {labels.interruptedResumeHint}
@@ -388,6 +451,7 @@ function InterviewWaitingRoom({
               onJoin={actions.onJoin}
               onCancel={actions.onCancelPreflight}
               starting={viewState.starting}
+              session={viewState.session}
             />
           ) : (
             <div className="relative flex flex-col items-center gap-6 rounded-3xl border border-slate-200/90 bg-white/95 p-8 text-center shadow-[0_25px_50px_-12px_rgba(15,23,42,0.06),0_1px_0_rgba(255,255,255,1)_inset] backdrop-blur-2xl md:p-10">
@@ -398,19 +462,26 @@ function InterviewWaitingRoom({
                   width={240}
                   height={80}
                   style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
-                  priority
                 />
               </div>
 
               <div className="space-y-2">
                 <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">
-                  {viewState.isJoinable ? labels.readyTitle : labels.unavailableTitle}
+                  {viewState.isJoinable
+                    ? isMock
+                      ? 'Phòng Luyện tập Phỏng vấn AI'
+                      : labels.readyTitle
+                    : labels.unavailableTitle}
                 </h2>
                 {error && (
                   <p className="text-xs font-bold uppercase tracking-widest text-rose-600">{error}</p>
                 )}
-                <p className="mx-auto max-w-sm text-sm leading-relaxed text-slate-600">
-                  {viewState.isJoinable ? labels.readyBody : labels.unavailableBody}
+                <p className="mx-auto max-w-md text-sm leading-relaxed text-slate-600">
+                  {viewState.isJoinable
+                    ? isMock
+                      ? 'Chào mừng bạn đến với phiên luyện tập tự do cùng Trợ lý AI AILA. Buổi luyện tập hoàn toàn riêng tư, không chia sẻ với nhà tuyển dụng.'
+                      : labels.readyBody
+                    : labels.unavailableBody}
                 </p>
               </div>
 
@@ -418,60 +489,35 @@ function InterviewWaitingRoom({
                 {viewState.isJoinable ? (
                   <>
                     <Button
-                      variant="contained"
+                      variant="default"
+                      size="lg"
                       onClick={actions.onShowPreflight}
                       disabled={viewState.starting}
-                      sx={{
-                        width: '100%',
-                        maxWidth: '280px',
-                        py: 1.5,
-                        borderRadius: '12px',
-                        background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
-                        color: '#ffffff',
-                        fontSize: '0.875rem',
-                        fontWeight: 700,
-                        letterSpacing: '0.02em',
-                        textTransform: 'none',
-                        boxShadow: '0 4px 18px rgba(14, 165, 233, 0.35)',
-                        transition: 'all 0.2s ease',
-                        '&:hover': {
-                          background: 'linear-gradient(135deg, #38bdf8, #0ea5e9)',
-                          boxShadow: '0 6px 22px rgba(14, 165, 233, 0.5)',
-                        },
-                        '&:active': { transform: 'scale(0.98)' },
-                      }}
+                      className="w-full max-w-[300px] h-12 rounded-xl bg-blue-600 font-bold text-white shadow-[0_10px_25px_-5px_rgba(37,99,235,0.4)] hover:bg-blue-700 active:scale-[0.98] border-0"
                     >
-                      {viewState.starting ? <CircularProgress size={20} color="inherit" /> : labels.startInterview}
+                      {viewState.starting ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : isMock ? (
+                        'Bắt đầu luyện tập với AI'
+                      ) : (
+                        labels.startInterview
+                      )}
                     </Button>
                     <Button
-                      variant="text"
+                      variant="ghost"
+                      size="sm"
                       onClick={actions.onBack}
-                      sx={{
-                        fontSize: '0.8rem',
-                        fontWeight: 600,
-                        color: '#64748b',
-                        textTransform: 'none',
-                        '&:hover': { color: '#0f172a' },
-                      }}
+                      className="text-xs font-semibold text-slate-500 hover:text-slate-900 border-0 bg-transparent"
                     >
                       {labels.back}
                     </Button>
                   </>
                 ) : (
                   <Button
-                    variant="contained"
+                    variant="default"
+                    size="lg"
                     onClick={actions.onBackHome}
-                    sx={{
-                      py: 1.5,
-                      px: 4,
-                      borderRadius: '12px',
-                      background: '#0284c7',
-                      color: '#ffffff',
-                      fontSize: '0.85rem',
-                      fontWeight: 700,
-                      textTransform: 'none',
-                      '&:hover': { background: '#0369a1' },
-                    }}
+                    className="w-full max-w-[280px] h-11 rounded-xl bg-blue-600 font-bold text-white shadow-sm hover:bg-blue-700 active:scale-98"
                   >
                     {labels.backHome}
                   </Button>
@@ -504,9 +550,71 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
     tRef.current = t;
   }, [t]);
 
+  // Preparation Modal States
+  const [prepModalOpen, setPrepModalOpen] = React.useState(false);
+  const [prepSteps, setPrepSteps] = React.useState<PreparationStepState>({
+    room: 'pending',
+    script: 'pending',
+    agent: 'pending',
+  });
+  const [prepProgress, setPrepProgress] = React.useState(10);
+  const [prepMessage, setPrepMessage] = React.useState('Đang chuẩn bị phòng phỏng vấn...');
+  const [prepError, setPrepError] = React.useState<string | undefined>(undefined);
+
   const roomName   = state.session?.roomName;
-  const isJoinable = !!state.session && JOINABLE_STATUSES.includes(state.session.status);
-  const isInterrupted = state.session?.status === 'interrupted';
+  const rawStatus  = (state.session?.status || 'scheduled').toLowerCase();
+  const isJoinable = !!state.session && JOINABLE_STATUSES.includes(rawStatus);
+  const isInterrupted = rawStatus === 'interrupted';
+
+  const prefetchedConnectionRef = React.useRef<{
+    promise: Promise<LiveKitConnectionDetails | null> | null;
+    data: LiveKitConnectionDetails | null;
+    key: string;
+  }>({ promise: null, data: null, key: '' });
+
+  const prefetchToken = React.useCallback(async (inviteToken: string, id?: string): Promise<LiveKitConnectionDetails | null> => {
+    const key = `${normalizedRole}:${inviteToken || id || ''}`;
+    if (prefetchedConnectionRef.current.key === key && prefetchedConnectionRef.current.data) {
+      return prefetchedConnectionRef.current.data;
+    }
+    if (prefetchedConnectionRef.current.key === key && prefetchedConnectionRef.current.promise) {
+      return prefetchedConnectionRef.current.promise;
+    }
+
+    const fetchPromise = (async () => {
+      try {
+        const tokenData =
+          normalizedRole === 'jobseeker'
+            ? await interviewService.getLiveKitToken(inviteToken)
+            : await interviewService.getHrPresenceToken(id as string);
+        if (!tokenData?.token) return null;
+        const details: LiveKitConnectionDetails = {
+          token: tokenData.token,
+          serverUrl: resolveLiveKitServerUrl(tokenData.serverUrl),
+        };
+        prefetchedConnectionRef.current.data = details;
+        return details;
+      } catch (err) {
+        console.warn('[InterviewSession] Background token prefetch deferred or failed:', err);
+        return null;
+      }
+    })();
+
+    prefetchedConnectionRef.current = {
+      promise: fetchPromise,
+      data: null,
+      key,
+    };
+    return fetchPromise;
+  }, [normalizedRole]);
+
+  React.useEffect(() => {
+    if (!isJoinable || state.connectRoom) return;
+    const tokenOrId = normalizedRole === 'jobseeker' ? state.sessionInviteToken : routeId;
+    if (tokenOrId) {
+      void prefetchToken(state.sessionInviteToken, routeId);
+    }
+  }, [isJoinable, normalizedRole, prefetchToken, routeId, state.connectRoom, state.sessionInviteToken]);
 
   // â”€â”€ Fetch session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -575,6 +683,51 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
     return () => window.clearInterval(intervalId);
   }, [fetchSessionDetails, state.session?.status]);
 
+  React.useEffect(() => {
+    if (!state.connectRoom || !roomName) return undefined;
+
+    const intervalId = window.setInterval(async () => {
+      try {
+        const detailRaw = normalizedRole === 'jobseeker'
+          ? (state.sessionInviteToken ? await interviewService.getSessionDetailByInviteToken(state.sessionInviteToken) : null)
+          : (routeId ? await interviewService.getSessionDetail(routeId) : null);
+        if (detailRaw) {
+          const status = (detailRaw as any)?.status?.toLowerCase();
+          if (status === 'completed' || status === 'processing') {
+            dispatch({ type: 'set-session-status', value: status });
+            dispatch({ type: 'set-connect-room', value: false });
+            dispatch({ type: 'set-connection-details', value: undefined });
+            void fetchSessionDetails({ showLoading: false });
+          }
+        }
+      } catch {
+        // silent check
+      }
+    }, 4000);
+
+    return () => window.clearInterval(intervalId);
+  }, [state.connectRoom, roomName, normalizedRole, state.sessionInviteToken, routeId, fetchSessionDetails]);
+
+  // Auto-refresh completed/processing session until AI evaluation is loaded
+  React.useEffect(() => {
+    const statusKey = (state.session?.status || '').toLowerCase();
+    const hasAiScore = state.session?.aiOverallScore != null;
+    if (statusKey !== 'processing' && (statusKey !== 'completed' || hasAiScore)) {
+      return undefined;
+    }
+
+    let pollCount = 0;
+    const pollInterval = window.setInterval(async () => {
+      pollCount += 1;
+      await fetchSessionDetails({ showLoading: false });
+      if (pollCount >= 15) {
+        window.clearInterval(pollInterval);
+      }
+    }, 3000);
+
+    return () => window.clearInterval(pollInterval);
+  }, [state.session?.status, state.session?.aiOverallScore, fetchSessionDetails]);
+
   // â”€â”€ Start / terminate session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const initiateInterviewSession = React.useCallback(async () => {
@@ -583,90 +736,114 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
       dispatch({ type: 'set-starting', value: true });
       dispatch({ type: 'set-error', value: '' });
 
-      if (!state.sessionInviteToken) throw new Error(translate('errors.missingInvite'));
-      if (normalizedRole !== 'jobseeker' && !routeId) throw new Error(translate('errors.missingSessionId'));
-
-      const latestRaw =
-        normalizedRole === 'jobseeker'
-          ? await interviewService.getSessionDetailByInviteToken(state.sessionInviteToken)
-          : await interviewService.getSessionDetail(routeId as string);
-      const latestSession = transformInterviewSession(latestRaw);
-      if (!latestSession) throw new Error(translate('errors.invalidSession'));
-
-      dispatch({ type: 'set-session', value: latestSession });
-      dispatch({
-        type: 'set-session-invite-token',
-        value:
-          latestSession.inviteToken ||
-          (latestRaw as { invite_token?: string } | null)?.invite_token ||
-          state.sessionInviteToken,
-      });
-
-      if (!JOINABLE_STATUSES.includes(latestSession.status)) {
-        throw new Error(
-          translate('errors.sessionNotReadyForJoin', {
-            status: translate(`interviewListCard.statuses.${latestSession.status}`),
-          })
-        );
+      if (!state.sessionInviteToken && normalizedRole === 'jobseeker') {
+        throw new Error(translate('errors.missingInvite'));
+      }
+      if (normalizedRole !== 'jobseeker' && !routeId) {
+        throw new Error(translate('errors.missingSessionId'));
       }
 
-      const tokenData =
-        normalizedRole === 'jobseeker'
-          ? await interviewService.getLiveKitToken(state.sessionInviteToken)
-          : await interviewService.getHrPresenceToken(routeId as string);
-      if (!tokenData?.token) throw new Error(translate('errors.tokenMissing'));
+      // 0. Open Preparation Checklist Modal
+      setPrepModalOpen(true);
+      setPrepSteps({ room: 'processing', script: 'pending', agent: 'pending' });
+      setPrepProgress(15);
+      setPrepMessage('Đang chuẩn bị phòng phỏng vấn...');
+      setPrepError(undefined);
 
-      const isLocalOrigin =
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1';
-      let urlToUse = getSafeLiveKitUrl(isLocalOrigin);
-      const returnedUrl = tokenData.serverUrl;
-      if (!isLocalOrigin && returnedUrl) {
-        const isInternal =
-          returnedUrl.includes('localhost') ||
-          returnedUrl.includes('127.0.0.1') ||
-          returnedUrl.includes('livekit:');
-        if (!isInternal) {
-          try {
-            const url = new URL(returnedUrl);
-            url.protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            urlToUse = url.toString().replace(/\/$/, '');
-          } catch (urlErr) {
-            console.warn('[LiveKit URL] Invalid server URL returned from backend:', urlErr);
-          }
-        }
+      // 1. Stage 1: Room & LiveKit Token Setup
+      let connectionDetails = prefetchedConnectionRef.current.data;
+      if (!connectionDetails && prefetchedConnectionRef.current.promise) {
+        connectionDetails = await prefetchedConnectionRef.current.promise;
       }
 
-      const targetRoomName = latestSession.roomName || roomName;
+      if (!connectionDetails?.token) {
+        const tokenData =
+          normalizedRole === 'jobseeker'
+            ? await interviewService.getLiveKitToken(state.sessionInviteToken)
+            : await interviewService.getHrPresenceToken(routeId as string);
+        if (!tokenData?.token) throw new Error(translate('errors.tokenMissing'));
+        connectionDetails = {
+          token: tokenData.token,
+          serverUrl: resolveLiveKitServerUrl(tokenData.serverUrl),
+        };
+      }
+
+      // Mark Room step complete, start Script step
+      setPrepSteps({ room: 'completed', script: 'processing', agent: 'pending' });
+      setPrepProgress(45);
+      setPrepMessage('Đang chuẩn bị kịch bản phỏng vấn...');
+
+      // 2. Stage 2: Questions & Session Context
+      let currentSession = state.session;
+      if (!currentSession?.questions || currentSession.questions.length === 0) {
+        await fetchSessionDetails({ showLoading: false });
+      }
+      await new Promise((res) => setTimeout(res, 400));
+
+      // Mark Script step complete, start Agent step
+      setPrepSteps({ room: 'completed', script: 'completed', agent: 'processing' });
+      setPrepProgress(75);
+      setPrepMessage('Agent đang tham gia phòng phỏng vấn...');
+
+      // 3. Stage 3: Agent Readiness & in_progress Status
+      const targetRoomName = state.session?.roomName || roomName;
       if (targetRoomName && (state.sessionInviteToken || tokenService.getAccessTokenFromCookie())) {
         try {
-          const updatedStatus = await interviewService.updateSessionStatus(
-            targetRoomName,
-            'in_progress',
-            { inviteToken: state.sessionInviteToken }
+          const updatedStatus = await withTimeout(
+            interviewService.updateSessionStatus(targetRoomName, 'in_progress', {
+              inviteToken: state.sessionInviteToken,
+            }),
+            8000
           );
           if (updatedStatus?.status) {
             dispatch({ type: 'set-session-status', value: updatedStatus.status });
           }
         } catch (statusErr) {
-          console.warn('[InterviewSession] Failed to update session status to in_progress:', statusErr);
+          console.warn('[InterviewSession] Session status sync:', statusErr);
         }
       }
 
-      dispatch({ type: 'set-connection-details', value: { token: tokenData.token, serverUrl: urlToUse } });
+      await new Promise((res) => setTimeout(res, 600));
+
+      // All Steps Complete
+      setPrepSteps({ room: 'completed', script: 'completed', agent: 'completed' });
+      setPrepProgress(100);
+      setPrepMessage('Mọi thứ đã sẵn sàng!');
+
+      // Brief pause so candidate sees 100% completion & all green checkmarks
+      await new Promise((res) => setTimeout(res, 450));
+
+      setPrepModalOpen(false);
+      dispatch({ type: 'set-connection-details', value: connectionDetails });
       dispatch({ type: 'set-connect-room', value: true });
     } catch (err) {
-      dispatch({ type: 'set-error', value: getErrorDetail(err) || translate('errors.invalidSession') });
+      const errDetail = getErrorDetail(err) || translate('errors.invalidSession');
+      setPrepSteps((prev) => ({
+        ...prev,
+        room: prev.room === 'processing' ? 'error' : prev.room,
+        script: prev.script === 'processing' ? 'error' : prev.script,
+        agent: prev.agent === 'processing' ? 'error' : prev.agent,
+      }));
+      setPrepError(errDetail);
+      dispatch({ type: 'set-error', value: errDetail });
     } finally {
       dispatch({ type: 'set-starting', value: false });
     }
-  }, [normalizedRole, roomName, routeId, state.sessionInviteToken]);
+  }, [
+    fetchSessionDetails,
+    normalizedRole,
+    roomName,
+    routeId,
+    state.session,
+    state.sessionInviteToken,
+  ]);
 
   const handleDisconnected = React.useCallback(() => {
     dispatch({ type: 'set-connect-room', value: false });
     dispatch({ type: 'set-connection-details', value: undefined });
     dispatch({ type: 'set-show-preflight', value: false });
     finalizeOnDisconnectRef.current = false;
+    prefetchedConnectionRef.current = { promise: null, data: null, key: '' };
   }, []);
 
   const finalizeInterviewSession = React.useCallback(async () => {
@@ -727,17 +904,34 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
     ? new Date(state.session.scheduledAt).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US', { timeZone: 'Asia/Ho_Chi_Minh' })
     : undefined;
 
-  const jobLabel       = state.session?.jobName       || t('common:labels.job');
-  const candidateLabel = state.session?.candidateName || t('interviewListCard.candidate');
-  const sessionTitle   = isJoinable
-    ? normalizedRole === 'jobseeker'
-      ? t('readyTitle')
-      : t('interviewDetail.title', { ns: 'employer' })
-    : isProcessing
-      ? t('processingTitle')
-      : t('unavailableTitle');
+  const isMock =
+    state.session?.sessionType === 'mock' ||
+    (state.session as any)?.type === 'practice' ||
+    (!state.session?.jobPost && !state.session?.companyName);
 
-  // â”€â”€â”€ Active video conference (LiveKit VideoConference) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const jobLabel = isMock
+    ? 'Luyện tập kỹ năng phỏng vấn AI'
+    : (state.session?.jobName?.trim() || '');
+  const candidateLabel = state.session?.candidateName || t('interviewListCard.candidate');
+  const activeRoomTitle = isMock
+    ? 'Phiên luyện tập cùng Trợ lý AI AILA'
+    : (state.session?.jobName?.trim() ||
+      (normalizedRole === 'jobseeker'
+        ? t('activeRoomTitle')
+        : t('interviewDetail.title', { ns: 'employer' })));
+  const sessionTitle = state.connectRoom
+    ? activeRoomTitle
+    : isJoinable
+      ? (isMock
+          ? 'Phòng Luyện tập Phỏng vấn AI'
+          : (normalizedRole === 'jobseeker'
+              ? t('readyTitle')
+              : t('interviewDetail.title', { ns: 'employer' })))
+      : isProcessing
+        ? t('processingTitle')
+        : t('unavailableTitle');
+
+  // ─── Active video conference (LiveKit VideoConference) ────────────────
 
   if (state.connectRoom && state.connectionDetails) {
     return (
@@ -754,46 +948,74 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
         questions={state.session?.questions || []}
         onDisconnected={handleDisconnected}
         onEndSession={finalizeInterviewSession}
+        isMock={isMock}
+        session={state.session}
       />
     );
   }
 
-  // â”€â”€â”€ Preflight / waiting room â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Completed or Processing: Show Results / Completion View ─────────────────
+  if (statusKey === 'completed' || isProcessing) {
+    return (
+      <InterviewCompletedView
+        session={state.session}
+        isProcessing={isProcessing}
+        myInterviewsPath={localizeRoutePath('/phong-van-cua-toi', i18n.language)}
+        practicePath={localizeRoutePath('/practice', i18n.language)}
+        onBackHome={() => push('/')}
+      />
+    );
+  }
+
+  // ─── Preflight / waiting room ──────────────────────────────────────────
 
   return (
-    <InterviewWaitingRoom
-      viewState={{
-        isInterrupted,
-        showPreflight: state.showPreflight,
-        starting: state.starting,
-        isJoinable,
-      }}
-      labels={{
-        interruptedResumeHint: t('interview:interviewDetail.messages.interruptedResumeHint'),
-        sessionTitle,
-        jobLabel,
-        candidateLabel,
-        statusText,
-        readyTitle: t('readyTitle'),
-        unavailableTitle: isProcessing ? t('processingTitle') : t('sessionNotJoinable'),
-        readyBody: t('readyBody'),
-        unavailableBody: isProcessing ? t('processingBody') : t('sessionNotJoinableBody'),
-        startInterview: t('startInterview'),
-        back: t('common:actions.back'),
-        backHome: t('common:actions.backHome'),
-        time: t('common:labels.time'),
-      }}
-      statusClass={statusClass}
-      error={state.error}
-      formattedSchedule={formattedSchedule}
-      actions={{
-        onJoin: initiateInterviewSession,
-        onCancelPreflight: () => dispatch({ type: 'set-show-preflight', value: false }),
-        onShowPreflight: () => dispatch({ type: 'set-show-preflight', value: true }),
-        onBack: () => back(),
-        onBackHome: () => push('/'),
-      }}
-    />
+    <>
+      <InterviewWaitingRoom
+        viewState={{
+          isInterrupted,
+          showPreflight: state.showPreflight,
+          starting: state.starting,
+          isJoinable,
+          session: state.session,
+        }}
+        labels={{
+          interruptedResumeHint: t('interview:interviewDetail.messages.interruptedResumeHint'),
+          sessionTitle,
+          jobLabel,
+          candidateLabel,
+          statusText,
+          readyTitle: t('readyTitle'),
+          unavailableTitle: isProcessing ? t('processingTitle') : t('sessionNotJoinable'),
+          readyBody: t('readyBody'),
+          unavailableBody: isProcessing ? t('processingBody') : t('sessionNotJoinableBody'),
+          startInterview: t('startInterview'),
+          back: t('common:actions.back'),
+          backHome: t('common:actions.backHome'),
+          time: t('common:labels.time'),
+        }}
+        statusClass={statusClass}
+        error={state.error}
+        formattedSchedule={formattedSchedule}
+        actions={{
+          onJoin: initiateInterviewSession,
+          onCancelPreflight: () => dispatch({ type: 'set-show-preflight', value: false }),
+          onShowPreflight: () => dispatch({ type: 'set-show-preflight', value: true }),
+          onBack: () => back(),
+          onBackHome: () => push('/'),
+        }}
+      />
+      <InterviewPreparationModal
+        open={prepModalOpen}
+        steps={prepSteps}
+        progress={prepProgress}
+        currentMessage={prepMessage}
+        errorMessage={prepError}
+        onRetry={initiateInterviewSession}
+        onCancel={() => setPrepModalOpen(false)}
+        isMock={isMock}
+      />
+    </>
   );
 };
 

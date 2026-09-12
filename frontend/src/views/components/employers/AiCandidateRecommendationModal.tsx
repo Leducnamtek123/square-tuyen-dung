@@ -276,9 +276,10 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
   };
 
   const handleOpenProfile = (cand: CandidateRecommendation) => {
-    const targetUrl = cand.slug ? `/online-profile/${cand.slug}` : `/employer/candidates/${cand.id}`;
+    const targetUrl = cand.slug ? `/cv/${cand.slug}` : `/cv/${cand.id}`;
     window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
+
 
   return (
     <Dialog
@@ -404,7 +405,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
             </Box>
           </Box>
 
-          <Tooltip title="Đóng (Esc)">
+          <Tooltip title="Đóng cửa sổ">
             <IconButton
               aria-label="Đóng"
               onClick={onClose}
@@ -430,8 +431,8 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
         {!loading && candidates.length > 0 && (
           <Box
             sx={{
-              px: { xs: 2, sm: 3 },
-              py: 1.2,
+              px: { xs: 2.5, sm: 3 },
+              py: 1.5,
               bgcolor: isDark ? '#111c38' : '#f1f5f9',
               borderTop: '1px solid',
               borderColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(226, 232, 240, 0.8)',
@@ -464,23 +465,25 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                   '&:active': { transform: 'scale(0.97)' },
                 }}
               />
-              <Chip
-                label="Phù hợp cao (>50%)"
-                size="small"
-                onClick={() => setSelectedFilter('high_match')}
-                sx={{
-                  height: 26,
-                  fontSize: '0.75rem',
-                  fontWeight: selectedFilter === 'high_match' ? 700 : 500,
-                  cursor: 'pointer',
-                  bgcolor: selectedFilter === 'high_match' ? '#2563eb' : isDark ? 'rgba(255,255,255,0.06)' : '#ffffff',
-                  color: selectedFilter === 'high_match' ? '#ffffff' : isDark ? '#cbd5e1' : '#475569',
-                  border: '1px solid',
-                  borderColor: selectedFilter === 'high_match' ? '#2563eb' : isDark ? 'rgba(255,255,255,0.1)' : '#cbd5e1',
-                  transition: 'all 0.15s ease',
-                  '&:active': { transform: 'scale(0.97)' },
-                }}
-              />
+              <Tooltip title="Chỉ hiển thị các hồ sơ có điểm tương thích từ 50% trở lên">
+                <Chip
+                  label="Phù hợp cao"
+                  size="small"
+                  onClick={() => setSelectedFilter('high_match')}
+                  sx={{
+                    height: 26,
+                    fontSize: '0.75rem',
+                    fontWeight: selectedFilter === 'high_match' ? 700 : 500,
+                    cursor: 'pointer',
+                    bgcolor: selectedFilter === 'high_match' ? '#2563eb' : isDark ? 'rgba(255,255,255,0.06)' : '#ffffff',
+                    color: selectedFilter === 'high_match' ? '#ffffff' : isDark ? '#cbd5e1' : '#475569',
+                    border: '1px solid',
+                    borderColor: selectedFilter === 'high_match' ? '#2563eb' : isDark ? 'rgba(255,255,255,0.1)' : '#cbd5e1',
+                    transition: 'all 0.15s ease',
+                    '&:active': { transform: 'scale(0.97)' },
+                  }}
+                />
+              </Tooltip>
               <Chip
                 label="Có kinh nghiệm"
                 size="small"
@@ -558,8 +561,13 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
       {/* 3. Candidate List Content */}
       <DialogContent
         sx={{
-          p: { xs: 2, sm: 3 },
+          px: { xs: 2.5, sm: 3 },
           pr: { xs: 2, sm: 2.5 },
+          pt: { xs: '22px !important', sm: '26px !important' },
+          pb: { xs: '24px !important', sm: '28px !important' },
+          '&.MuiDialogContent-root': {
+            pt: { xs: '22px !important', sm: '26px !important' },
+          },
           overflowX: 'hidden',
           flex: 1,
           '&::-webkit-scrollbar': {
@@ -642,7 +650,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
             )}
           </Box>
         ) : (
-          <Stack spacing={2}>
+          <Stack spacing={2.5}>
             {filteredCandidates.map((cand) => {
               const scoreStyle = getScoreColor(cand.matchScore, isDark);
               const isInvited = invitedCandidateIds.has(cand.id);
@@ -656,7 +664,7 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                   key={cand.id}
                   elevation={0}
                   sx={{
-                    p: { xs: 2, sm: 2.5 },
+                    p: { xs: 2.2, sm: 2.6 },
                     borderRadius: '14px',
                     backgroundColor: isDark ? '#1e293b' : '#ffffff',
                     border: '1px solid',
@@ -683,7 +691,9 @@ export const AiCandidateRecommendationModal: React.FC<AiCandidateRecommendationM
                       left: 0,
                       top: 0,
                       bottom: 0,
-                      width: 3.5,
+                      width: 4,
+                      borderTopLeftRadius: '14px',
+                      borderBottomLeftRadius: '14px',
                       bgcolor: scoreStyle.dot,
                     }}
                   />

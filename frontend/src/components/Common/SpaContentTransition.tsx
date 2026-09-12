@@ -8,7 +8,7 @@ interface SpaContentTransitionProps {
   children: React.ReactNode;
 }
 
-const LinkedInSkeleton = () => {
+export const LinkedInSkeleton = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Skeleton variant="rounded" height={100} sx={{ borderRadius: '16px' }} />
@@ -34,19 +34,6 @@ const LinkedInSkeleton = () => {
 
 const SpaContentTransition = ({ children }: SpaContentTransitionProps) => {
   const pathname = usePathname();
-  const prevPathnameRef = React.useRef(pathname);
-  const [isTransitioning, setIsTransitioning] = React.useState(false);
-
-  React.useEffect(() => {
-    if (prevPathnameRef.current !== pathname) {
-      prevPathnameRef.current = pathname;
-      setIsTransitioning(true);
-      const timer = setTimeout(() => {
-        setIsTransitioning(false);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [pathname]);
 
   return (
     <Box
@@ -69,7 +56,7 @@ const SpaContentTransition = ({ children }: SpaContentTransitionProps) => {
         },
       }}
     >
-      {isTransitioning ? <LinkedInSkeleton /> : children}
+      {children}
     </Box>
   );
 };

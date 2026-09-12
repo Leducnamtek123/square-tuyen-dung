@@ -2,10 +2,10 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import markerShadowImport from "leaflet/dist/images/marker-shadow.png";
 import markerIconRetinaImport from "leaflet/dist/images/marker-icon-2x.png";
+import markerIconImport from "leaflet/dist/images/marker-icon.png";
 import * as React from "react";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { Box, Typography, Paper } from "@mui/material";
-import { ICONS } from "@/configs/constants";
 
 interface StaticImageData {
   src: string;
@@ -17,40 +17,42 @@ interface StaticImageData {
 }
 
 // Next.js image imports return objects; extract string src
-const toSrc = (img: string | StaticImageData | { default: StaticImageData }): string => 
-  typeof img === 'string' ? img : (img as { src?: string; default?: { src?: string } })?.src || (img as { default?: { src?: string } })?.default?.src || '';
+const toSrc = (img: unknown): string => {
+  if (typeof img === 'string') return img;
+  if (img && typeof img === 'object') {
+    if ('src' in img && typeof (img as { src: string }).src === 'string') {
+      return (img as { src: string }).src;
+    }
+    if ('default' in img && (img as { default: { src?: string } }).default?.src) {
+      return (img as { default: { src: string } }).default.src;
+    }
+  }
+  return '';
+};
 
-const markerShadow = toSrc(markerShadowImport as string | StaticImageData | { default: StaticImageData });
-const markerIconRetina = toSrc(markerIconRetinaImport as string | StaticImageData | { default: StaticImageData });
+const mapMarkerIcon = new L.Icon({
+  iconUrl: toSrc(markerIconImport),
+  iconRetinaUrl: toSrc(markerIconRetinaImport),
+  shadowUrl: toSrc(markerShadowImport),
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
 
 interface Props {
   title?: string;
   subTitle?: string;
   latitude?: number;
   longitude?: number;
+  height?: string | number;
 }
 
 type LeafletContainer = HTMLDivElement & {
   _leaflet_id?: number;
 };
 
-// Fix for default Leaflet icon issues in Webpack/Next.js
-interface LeafletIconDefault extends L.Icon.Default {
-  _getIconUrl?: string;
-}
-delete (L.Icon.Default.prototype as LeafletIconDefault)._getIconUrl;
-
-L.Icon.Default.mergeOptions({
-  iconUrl: ICONS.LOCATION_MARKER,
-  iconRetinaUrl: markerIconRetina,
-  shadowUrl: markerShadow,
-  iconSize: [56, 56],
-  iconAnchor: [28, 60],
-  popupAnchor: [0, -60],
-  shadowSize: [41, 41]
-});
-
-const Map = ({ title, subTitle, latitude, longitude }: Props) => {
+const Map = ({ title, subTitle, latitude, longitude, height = '260px' }: Props) => {
   const mapRef = React.useRef<L.Map | null>(null);
   const containerRef = React.useRef<LeafletContainer | null>(null);
 
@@ -69,9 +71,14 @@ const Map = ({ title, subTitle, latitude, longitude }: Props) => {
       center: position,
       zoom: 15,
       scrollWheelZoom: false,
+      attributionControl: false,
     });
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      subdomains: "abc",
+      maxZoom: 19,
+      attribution: "",
+    }).addTo(map);
 
     const popup = document.createElement("div");
     const popupTitle = document.createElement("strong");
@@ -82,12 +89,55 @@ const Map = ({ title, subTitle, latitude, longitude }: Props) => {
     popup.appendChild(popupTitle);
     popup.appendChild(popupSubtitle);
 
-    L.marker(position).addTo(map).bindPopup(popup);
+    L.marker(position, { icon: mapMarkerIcon }).addTo(map).bindPopup(popup);
     mapRef.current = map;
 
-    window.setTimeout(() => map.invalidateSize(), 0);
+    const timers = [
+      window.setTimeout(() => {
+        try {
+          map.invalidateSize();
+        } catch {
+          // ignore
+        }
+      }, 50),
+      window.setTimeout(() => {
+        try {
+          map.invalidateSize();
+        } catch {
+          // ignore
+        }
+      }, 200),
+      window.setTimeout(() => {
+        try {
+          map.invalidateSize();
+        } catch {
+          // ignore
+        }
+      }, 600),
+      window.setTimeout(() => {
+        try {
+          map.invalidateSize();
+        } catch {
+          // ignore
+        }
+      }, 1200),
+    ];
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && container) {
+      ro = new ResizeObserver(() => {
+        try {
+          map.invalidateSize();
+        } catch {
+          // ignore
+        }
+      });
+      ro.observe(container);
+    }
 
     return () => {
+      timers.forEach(clearTimeout);
+      ro?.disconnect();
       map.remove();
       mapRef.current = null;
       delete container._leaflet_id;
@@ -101,7 +151,7 @@ const Map = ({ title, subTitle, latitude, longitude }: Props) => {
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          height: '250px', 
+          height, 
           backgroundColor: '#f8f9fa', 
           borderRadius: 2,
           border: '1px dashed #ced4da'
@@ -126,11 +176,14 @@ const Map = ({ title, subTitle, latitude, longitude }: Props) => {
 
   return (
     <Paper 
-      elevation={3} 
+      elevation={2} 
       sx={{ 
         overflow: "hidden", 
-        height: "250px", 
+        height, 
+        width: "100%",
         borderRadius: 2,
+        border: '1px solid',
+        borderColor: 'divider',
       }}
     >
       <Box

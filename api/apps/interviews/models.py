@@ -19,16 +19,24 @@ class Question(CommonBaseModel):
     """Ngân hàng câu hỏi phỏng vấn — chỉ cần nội dung text."""
 
     CATEGORY_CHOICES = [
-        ('soft_skills', 'Kỹ năng mềm'),
-        ('technical', 'Kỹ thuật'),
+        ('culture_fit', 'Phù hợp văn hóa'),
+        ('general', 'Chung / Văn hóa'),
+        ('technical', 'Kỹ năng chuyên môn'),
         ('behavioral', 'Hành vi'),
-        ('situational', 'Tình huống'),
-        ('general', 'Chung'),
+        ('situational', 'Xử lý tình huống'),
+        ('problem_solving', 'Giải quyết vấn đề'),
+        ('soft_skills', 'Kỹ năng mềm'),
     ]
 
+    title = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Tiêu đề / Chủ đề ngắn"
+    )
     text = models.TextField(verbose_name="Nội dung câu hỏi")
     category = models.CharField(
-        max_length=20,
+        max_length=30,
         choices=CATEGORY_CHOICES,
         default='general',
         verbose_name="Danh mục"
@@ -77,7 +85,7 @@ class Question(CommonBaseModel):
 
     class Meta:
         db_table = "project_interview_question"
-        ordering = ['sort_order', '-create_at']
+        ordering = ['sort_order', 'create_at', 'id']
         verbose_name = "Question"
         verbose_name_plural = "Questions"
 
@@ -450,6 +458,9 @@ class InterviewSession(CommonBaseModel):
     def save(self, *args, **kwargs):
         from django.core.exceptions import ValidationError
         
+        if self.status:
+            self.status = str(self.status).lower()
+
         update_fields = kwargs.get("update_fields")
         if self.pk and (update_fields is None or "status" in update_fields):
             old_status = InterviewSession.objects.filter(pk=self.pk).values_list("status", flat=True).first()

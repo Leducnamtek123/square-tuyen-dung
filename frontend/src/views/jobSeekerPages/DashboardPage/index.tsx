@@ -25,6 +25,7 @@ import CandidateCvScoreCard from '@/views/components/jobSeekers/CandidateDashboa
 import CandidateActivityChartCard from '@/views/components/jobSeekers/CandidateDashboardMain/CandidateActivityChartCard';
 import CandidateRecommendedJobsCard from '@/views/components/jobSeekers/CandidateDashboardMain/CandidateRecommendedJobsCard';
 import AiRecommendedJobsSection from '@/views/components/jobSeekers/CandidateDashboardMain/AiRecommendedJobsSection';
+import { ProductTourTrigger, useTourAutoStart } from '@/components/Features/ProductTour';
 
 registerGsapPlugins();
 
@@ -34,6 +35,9 @@ const DashboardPage = () => {
   const { t } = useTranslation('jobSeeker');
   const containerRef = useRef<HTMLDivElement>(null);
   TabTitle(t('dashboard.pageTitle', { appName: APP_NAME }));
+
+  // Auto-start candidate dashboard tour on first visit
+  useTourAutoStart('candidate_dashboard', 800);
 
   const { currentUser } = useAppSelector((state) => state.user);
 
@@ -65,9 +69,20 @@ const DashboardPage = () => {
     };
   }, [appliedData, savedData?.count, viewedData?.count, followedData?.count]);
 
+  const hasAnimatedRef = useRef(false);
+
   // Entrance animation runs ONLY ONCE on mount
   useGSAP(
     () => {
+      if (hasAnimatedRef.current) {
+        gsap.set(
+          '.gsap-candidate-kpi, .gsap-candidate-row2, .gsap-candidate-ai-section, .gsap-candidate-jobs-card',
+          { opacity: 1, y: 0, clearProps: 'all' }
+        );
+        return;
+      }
+      hasAnimatedRef.current = true;
+
       const mm = gsap.matchMedia();
 
       // ── Desktop Breakpoint (≥769px) ─────────────────────────────────
@@ -141,8 +156,13 @@ const DashboardPage = () => {
 
   return (
     <Box ref={containerRef} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      {/* Top Bar with Tour Trigger */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <ProductTourTrigger tourKey="candidate_dashboard" variant="chip" label="Hướng dẫn bảng điều khiển" />
+      </Box>
+
       {/* Row 1: Top 4 Real API KPI Cards */}
-      <Box className="gsap-candidate-kpi">
+      <Box data-tour="candidate-kpi" className="gsap-candidate-kpi">
         <CandidateTopKpiRow user={currentUser} stats={stats} />
       </Box>
 
@@ -152,12 +172,14 @@ const DashboardPage = () => {
           <CandidateCvScoreCard viewedCount={stats.viewedCount} />
         </Grid>
         <Grid size={{ xs: 12, md: 8 }} className="gsap-candidate-row2">
-          <CandidateActivityChartCard stats={stats} />
+          <Box data-tour="candidate-activity-chart">
+            <CandidateActivityChartCard stats={stats} />
+          </Box>
         </Grid>
       </Grid>
 
       {/* Row 3: AI Smart Job Recommendations Section */}
-      <Box className="gsap-candidate-ai-section">
+      <Box data-tour="candidate-ai-jobs" className="gsap-candidate-ai-section">
         <AiRecommendedJobsSection />
       </Box>
 

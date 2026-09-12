@@ -1,7 +1,7 @@
 
 import re
 
-from console.jobs import queue_notification
+from console.jobs.queue_notification import add_notification_to_user
 
 from django.db import models
 
@@ -14,7 +14,7 @@ from shared.configs import variable_response as var_res, variable_system as var_
 from shared.configs.messages import NOTIFICATION_MESSAGES, ERROR_MESSAGES
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 
 from rest_framework import status
 
@@ -831,6 +831,7 @@ class AdminContactMessageViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
 
 @api_view(["GET"])
+@authentication_classes([])
 @permission_classes([perms_sys.AllowAny])
 def get_article_categories(request):
     """
@@ -867,11 +868,11 @@ def send_notification_demo(request):
     if user_list:
         for uid in user_list:
             try:
-                queue_notification.delay(
-                    type=notification_type,
+                add_notification_to_user.delay(
                     title=title,
                     content=content,
-                    user_id=int(uid),
+                    type_name=notification_type,
+                    user_id_list=[int(uid)],
                 )
                 dispatched_count += 1
             except Exception as ex:
@@ -879,11 +880,11 @@ def send_notification_demo(request):
                 failed_count += 1
     else:
         try:
-            queue_notification.delay(
-                type=notification_type,
+            add_notification_to_user.delay(
                 title=title,
                 content=content,
-                user_id=request.user.id,
+                type_name=notification_type,
+                user_id_list=[request.user.id],
             )
             dispatched_count += 1
         except Exception as ex:

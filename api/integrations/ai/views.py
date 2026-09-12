@@ -202,20 +202,26 @@ def _tts_response_from_body(body: Dict[str, Any]):
     if voice_profile_id:
         voice = f"profile:{voice_profile_id}"
     response_format = body.get("format") or body.get("response_format") or "mp3"
+    model = body.get("model") or getattr(settings, "AI_TTS_MODEL", "tts-vi")
     payload = {
         "input": text,
-        "model": body.get("model") or "tts-1",
-        "voice": voice or "Ly",
+        "model": model,
+        "voice": voice or "Trúc Ly",
         "response_format": response_format,
     }
     if body.get("speed") is not None:
         payload["speed"] = body.get("speed")
 
+    tts_api_key = getattr(settings, "AI_TTS_API_KEY", "") or getattr(settings, "TTS_API_KEY", "")
+    headers = {"Content-Type": "application/json"}
+    if tts_api_key:
+        headers["Authorization"] = f"Bearer {tts_api_key}"
+
     last_error: Dict[str, Any] = {}
     for index, base_url in enumerate(get_service_base_urls("tts")):
         url = f"{base_url}/audio/speech"
         try:
-            upstream = requests.post(url, json=payload, stream=False, timeout=(5, 30))
+            upstream = requests.post(url, json=payload, headers=headers, stream=False, timeout=(5, 30))
         except requests.RequestException as e:
             last_error = {"source": "primary" if index == 0 else f"fallback-{index}", "detail": str(e)}
             logger.warning("TTS candidate %s unavailable: %s", base_url, e)
@@ -299,11 +305,16 @@ def _transcribe_fn(request: HttpRequest):
         "language": language,
     }
 
+    stt_api_key = getattr(settings, "AI_STT_API_KEY", "") or getattr(settings, "STT_API_KEY", "")
+    headers = {}
+    if stt_api_key:
+        headers["Authorization"] = f"Bearer {stt_api_key}"
+
     last_error: Dict[str, Any] = {}
     for index, base_url in enumerate(get_service_base_urls("stt")):
         url = f"{base_url}/audio/transcriptions"
         try:
-            upstream = requests.post(url, data=data, files=files, timeout=(5, 30))
+            upstream = requests.post(url, data=data, files=files, headers=headers, timeout=(5, 30))
         except requests.RequestException as e:
             last_error = {"source": "primary" if index == 0 else f"fallback-{index}", "detail": str(e)}
             logger.warning("STT candidate %s unavailable: %s", base_url, e)
@@ -374,6 +385,14 @@ def _probe_http_service(name: str, base_url: str, path: str = "/models", headers
     started_at = time.time()
     try:
         response = requests.get(f"{probe_url.rstrip('/')}{path}", headers=headers or {}, timeout=(2, 4))
+        # If /voices returned 404 on OpenAI-compatible TTS upstream, try /models
+        if response.status_code == 404 and path == "/voices":
+            try:
+                fallback_resp = requests.get(f"{probe_url.rstrip('/')}/models", headers=headers or {}, timeout=(2, 4))
+                if fallback_resp.status_code < 500:
+                    response = fallback_resp
+            except Exception:
+                pass
         latency_ms = int((time.time() - started_at) * 1000)
         return {
             "status": "online" if response.status_code < 500 else "offline",
@@ -437,12 +456,22 @@ def _ai_service_checks() -> Dict[str, Any]:
         }
         for candidate in get_llm_candidates(default_model=llm_model)
     ]
+    stt_api_key = getattr(settings, "AI_STT_API_KEY", "") or getattr(settings, "STT_API_KEY", "")
+    tts_api_key = getattr(settings, "AI_TTS_API_KEY", "") or getattr(settings, "TTS_API_KEY", "")
     stt_candidates = [
-        {"name": "primary" if index == 0 else f"fallback-{index}", "baseUrl": base_url}
+        {
+            "name": "primary" if index == 0 else f"fallback-{index}",
+            "baseUrl": base_url,
+            "headers": {"Authorization": f"Bearer {stt_api_key}"} if stt_api_key else {},
+        }
         for index, base_url in enumerate(get_service_base_urls("stt"))
     ]
     tts_candidates = [
-        {"name": "primary" if index == 0 else f"fallback-{index}", "baseUrl": base_url}
+        {
+            "name": "primary" if index == 0 else f"fallback-{index}",
+            "baseUrl": base_url,
+            "headers": {"Authorization": f"Bearer {tts_api_key}"} if tts_api_key else {},
+        }
         for index, base_url in enumerate(get_service_base_urls("tts"))
     ]
 
@@ -1109,6 +1138,7 @@ chat = ChatAPIView.as_view()
 
 
 class ChatbotConfigAPIView(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def get(self, request):

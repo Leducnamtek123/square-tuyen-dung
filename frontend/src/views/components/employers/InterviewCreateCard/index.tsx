@@ -22,6 +22,7 @@ import toastMessages from '@/utils/toastMessages';
 import errorHandling from '@/utils/errorHandling';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/configs/constants';
+import { interviewService } from '@/services/interviewService';
 import {
   useAppliedResumes,
   useEmployerJobPosts,
@@ -39,6 +40,7 @@ import type { FormValues } from './types';
 import type { JobPostActivity, Question, QuestionGroup, VoiceProfile } from '@/types/models';
 import pc from '@/utils/muiColors';
 import { localizeRoutePath } from '@/configs/routeLocalization';
+import { useTourAutoStart } from '@/components/Features/ProductTour';
 
 interface InterviewCreateCardProps {
   title?: string;
@@ -183,6 +185,15 @@ const InterviewCreateCardInner = ({
         voice_profile: selectedVoiceProfile,
         question_ids: data.selected_questions.filter(Boolean),
         type: 'mixed' as const,
+        session_metadata: {
+          avatar_id: data.ai_avatar_id || 'ly_3d',
+          avatar_image_url: data.avatar_image_url || '',
+          avatar_backdrop: data.avatar_backdrop || 'modern_office',
+          avatar_background_url: data.avatar_background_url || '',
+          interviewer_name: data.interviewer_name || 'Trợ lý AI Ly',
+          ai_voice: data.ai_voice || 'vi-VN-Standard-A',
+          ai_speed: data.ai_speed || 1.0,
+        },
       };
 
       if (sessionId) {
@@ -214,6 +225,48 @@ const InterviewCreateCardInner = ({
     setIsQuestionDialogOpen(true);
   }, [watch, questions]);
 
+  const [isStartingMock, setIsStartingMock] = useState(false);
+
+  const handleTestMockInterview = useCallback(async () => {
+    const values = watch();
+    const selectedGroup = values.selected_group;
+    const selectedQuestions = values.selected_questions || [];
+
+    if (!selectedGroup && (!selectedQuestions || selectedQuestions.length === 0)) {
+      toastMessages.warn(t('interview:interviewCreateCard.validation.selectAtLeastOneQuestionForTest'));
+      return;
+    }
+
+    setIsStartingMock(true);
+    try {
+      const selectedJob = jobs.find((j) => String(j.id) === String(values.job_post));
+      const res = await interviewService.createMockSession({
+        job_title: selectedJob?.jobName || 'Thử nghiệm phỏng vấn AI',
+        job_post_id: values.job_post ? Number(values.job_post) : undefined,
+        question_group_id: selectedGroup ? Number(selectedGroup) : undefined,
+        question_ids: selectedQuestions.length > 0 ? selectedQuestions : undefined,
+        voice_profile_id: values.voice_profile && values.voice_profile !== 'auto' ? Number(values.voice_profile) : undefined,
+        session_metadata: {
+          avatar_id: values.ai_avatar_id || 'ly_3d',
+          avatar_image_url: values.avatar_image_url || '',
+          avatar_backdrop: values.avatar_backdrop || 'modern_office',
+          avatar_background_url: values.avatar_background_url || '',
+          interviewer_name: values.interviewer_name || 'Trợ lý AI Ly',
+          ai_voice: values.ai_voice || 'vi-VN-Standard-A',
+          ai_speed: values.ai_speed || 1.0,
+        },
+      });
+
+      toastMessages.success(t('interview:interviewCreateCard.messages.testRoomCreated'));
+      const targetUrl = res.interview_url || res.interviewUrl || `/interview/${res.invite_token || res.id}`;
+      window.open(targetUrl, '_blank');
+    } catch (err) {
+      errorHandling(err);
+    } finally {
+      setIsStartingMock(false);
+    }
+  }, [jobs, t, watch]);
+
   const inputSx = useMemo(() => ({
     '& .MuiOutlinedInput-root': {
       borderRadius: 2.5,
@@ -244,6 +297,7 @@ const InterviewCreateCardInner = ({
         isLoadingCandidates={isLoadingCandidates}
         isLoadingVoiceProfiles={isLoadingVoiceProfiles}
         isInterviewMutating={isInterviewMutating || isLoadingSessionSave}
+        isStartingMock={isStartingMock}
         selectedJobPostId={selectedJobPostId}
         selectedQuestionsCount={(watch('selected_questions') ?? []).length}
         onCancel={() => back()}
@@ -251,6 +305,7 @@ const InterviewCreateCardInner = ({
         onQuestionGroupChange={handleQuestionGroupChange}
         onOpenAddQuestion={handleOpenAddQuestion}
         onOpenEditQuestion={handleOpenEditQuestion}
+        onTestMockInterview={handleTestMockInterview}
       />
 
       <Dialog
@@ -323,6 +378,9 @@ const InterviewCreateCardInner = ({
 };
 
 const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessionId }) => {
+  // Auto-start interview create tour on first visit
+  useTourAutoStart('employer_interview_create', 1000);
+
   const searchParams = useMemo(() => {
     if (typeof window === 'undefined') {
       return new URLSearchParams('');
@@ -342,14 +400,24 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
   const questions = useMemo(() => questionData?.results ?? [], [questionData]);
   const questionGroups = useMemo(() => groupData?.results ?? [], [groupData]);
 
-  const initialValues = useMemo<FormValues>(() => ({
-    job_post: sessionDetail?.jobPost ? extractId(sessionDetail.jobPost) : (jobPostIdQuery ? Number(jobPostIdQuery) : ''),
-    candidate: sessionDetail?.candidate ? extractId(sessionDetail.candidate) : (candidateIdQuery ? Number(candidateIdQuery) : ''),
-    scheduled_at: sessionDetail?.scheduledAt ?? '',
-    selected_group: sessionDetail?.questionGroup ? extractId(sessionDetail.questionGroup) : '',
-    voice_profile: sessionDetail?.voiceProfile ?? sessionDetail?.voice_profile ?? '',
-    selected_questions: sessionDetail?.questions?.map((q: Question) => q.id) ?? [],
-  }), [candidateIdQuery, jobPostIdQuery, sessionDetail]);
+  const initialValues = useMemo<FormValues>(() => {
+    const meta = ((sessionDetail?.sessionMetadata || sessionDetail?.session_metadata || {}) as Record<string, any>);
+    return {
+      job_post: sessionDetail?.jobPost ? extractId(sessionDetail.jobPost) : (jobPostIdQuery ? Number(jobPostIdQuery) : ''),
+      candidate: sessionDetail?.candidate ? extractId(sessionDetail.candidate) : (candidateIdQuery ? Number(candidateIdQuery) : ''),
+      scheduled_at: sessionDetail?.scheduledAt ?? '',
+      selected_group: sessionDetail?.questionGroup ? extractId(sessionDetail.questionGroup) : '',
+      voice_profile: sessionDetail?.voiceProfile ?? sessionDetail?.voice_profile ?? '',
+      selected_questions: sessionDetail?.questions?.map((q: Question) => q.id) ?? [],
+      ai_avatar_id: meta.avatar_id || 'ly_3d',
+      avatar_image_url: meta.avatar_image_url || '',
+      avatar_backdrop: meta.avatar_backdrop || 'modern_office',
+      avatar_background_url: meta.avatar_background_url || '',
+      interviewer_name: meta.interviewer_name || 'Trợ lý AI Ly',
+      ai_voice: meta.ai_voice || 'vi-VN-Standard-A',
+      ai_speed: meta.ai_speed != null ? Number(meta.ai_speed) : 1.0,
+    };
+  }, [candidateIdQuery, jobPostIdQuery, sessionDetail]);
 
   if (sessionId && isLoadingSession) {
     return (

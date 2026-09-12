@@ -22,4 +22,9 @@ describe('JobDetailPage Mobile Responsive Layout', () => {
     expect(chatbotCssSource).toContain('body:has([data-sticky-bottom="true"]) .sq-chatbot');
     expect(chatbotCssSource).toContain('bottom: calc(84px + env(safe-area-inset-bottom, 16px))');
   });
+
+  it('correctly sets isLoading to false when initialJob is provided to avoid infinite skeleton loading', () => {
+    expect(jobDetailSource).not.toContain('loading: false');
+    expect(jobDetailSource).toContain('isLoading: false');
+  });
 });

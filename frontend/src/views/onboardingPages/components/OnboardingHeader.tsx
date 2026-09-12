@@ -22,9 +22,9 @@ export default function OnboardingHeader({ appName = 'InfoHR' }: OnboardingHeade
         width: '100%',
         py: 2,
         px: { xs: 2, md: 4 },
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(226, 232, 240, 0.8)',
+        backgroundColor: 'rgba(255, 255, 255, 0.75)',
+        backdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(226, 232, 240, 0.6)',
         position: 'sticky',
         top: 0,
         zIndex: 10,
@@ -75,8 +75,8 @@ export default function OnboardingHeader({ appName = 'InfoHR' }: OnboardingHeade
                   borderRadius: 2,
                   transition: 'all 0.15s ease',
                   '&:hover': {
-                    color: 'primary.main',
-                    backgroundColor: 'rgba(239, 68, 68, 0.06)',
+                    color: '#2563EB',
+                    backgroundColor: 'rgba(37, 99, 235, 0.06)',
                   },
                 }}
               >

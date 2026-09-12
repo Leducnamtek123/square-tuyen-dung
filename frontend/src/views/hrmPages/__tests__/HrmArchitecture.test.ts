@@ -35,4 +35,23 @@ describe('HRM Architecture & Operational Pages', () => {
     expect(source).toContain('useHrmDepartments');
     expect(source).toContain('useHrmLeaves');
   });
+
+  it('implements BiometricLogsPage deduplication and device filtering', () => {
+    const biometricFile = join(__dirname, '../AttendancePages/BiometricLogsPage/index.tsx');
+    expect(existsSync(biometricFile)).toBe(true);
+    const source = readFileSync(biometricFile, 'utf8');
+    expect(source).toContain('deduplicatePunchLogs');
+    expect(source).toContain('Khử trùng lặp');
+    expect(source).toContain('is_duplicate');
+  });
+
+  it('implements EmployeeListPage Career Timeline and Digital Document Vault', () => {
+    const source = readFileSync(employeeListFile, 'utf8');
+    expect(source).toContain('useHrmCareerHistories');
+    expect(source).toContain('useHrmDocuments');
+    expect(source).toContain('CAREER_EVENT_CONFIG');
+    expect(source).toContain('DOCUMENT_TYPE_CONFIG');
+    expect(source).toContain('Lịch sử công tác');
+    expect(source).toContain('Hồ sơ tài liệu số');
+  });
 });

@@ -278,7 +278,7 @@
   "company": {
     "following": "Đang theo dõi",
     "follow": "Theo dõi",
-    "followers": "{{count}} người theo dõi",
+    "followers": "người theo dõi",
     "openingJobs": "việc làm đang tuyển",
     "notUpdated": "Chưa cập nhật",
     "jobCount": "{{count}} việc làm"

@@ -130,7 +130,7 @@ export default async function Page({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <JobDetailClientPage initialJob={job} />
+      <JobDetailClientPage key={slug} initialJob={job} />
     </>
   );
 }

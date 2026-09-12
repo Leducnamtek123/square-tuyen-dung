@@ -230,11 +230,11 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
   ];
 
   const QUICK_PROMPT_TAGS: Record<AIContentType, string[]> = {
-    job_desc: ['Kỹ năng React & TypeScript', 'Làm việc Hybrid', 'Senior 3+ năm', 'Quản lý nhóm 5 người', 'KPIs rõ ràng'],
+    job_desc: ['Kỹ năng React & TypeScript', 'Làm việc linh hoạt', 'Senior 3+ năm', 'Quản lý nhóm 5 người', 'KPIs rõ ràng'],
     job_req: ['Tư duy phản biện', 'Tiếng Anh giao tiếp', 'Chủ động giải quyết vấn đề', 'Kinh nghiệm Agile/Scrum'],
     benefits: ['Bảo hiểm sức khỏe VIP', 'Thưởng tháng 13+', 'Cấp MacBook Pro', 'Review lương 2 lần/năm', 'Du lịch 5 sao'],
     company: ['Môi trường phẳng', 'Công nghệ tiên phong', 'Khách hàng toàn cầu', 'Đào tạo chuyên sâu'],
-    email: ['Phỏng vấn online Meet', 'Đề nghị nhận việc (Offer)', 'Hạn phản hồi 3 ngày', 'Trực tiếp tại trụ sở'],
+    email: ['Phỏng vấn trực tuyến Meet', 'Đề nghị nhận việc', 'Hạn phản hồi 3 ngày', 'Trực tiếp tại trụ sở'],
     blog: ['Xu hướng HR 2026', 'Bí quyết giữ chân nhân tài', 'Văn hóa doanh nghiệp'],
     general: ['Định dạng gạch đầu dòng', 'Văn phong trang trọng', 'Ngắn gọn dễ hiểu'],
   };
@@ -246,8 +246,8 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
       t('editor.ai.suggestions.comp3', 'Nêu bật văn hóa phẳng, cởi mở và các chính sách phát triển nhân tài vượt trội'),
     ],
     job_desc: [
-      t('editor.ai.suggestions.jd1', 'Tạo mô tả công việc (JD) thu hút cho vị trí Senior Fullstack Developer'),
-      t('editor.ai.suggestions.jd2', 'Soạn bản mô tả công việc Chuyên viên Marketing đa kênh (Digital Marketing)'),
+      t('editor.ai.suggestions.jd1', 'Tạo mô tả công việc thu hút cho vị trí Senior Fullstack Developer'),
+      t('editor.ai.suggestions.jd2', 'Soạn bản mô tả công việc Chuyên viên Marketing đa kênh'),
       t('editor.ai.suggestions.jd3', 'Viết nhiệm vụ chính cho vị trí Chuyên viên Tư vấn & Kinh doanh B2B'),
     ],
     job_req: [
@@ -257,13 +257,13 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
     ],
     benefits: [
       t('editor.ai.suggestions.ben1', 'Gói đãi ngộ hấp dẫn: Review lương 2 lần/năm, thưởng tháng 13+ và bảo hiểm sức khỏe VIP'),
-      t('editor.ai.suggestions.ben2', 'Môi trường làm việc Hybrid linh hoạt, cung cấp MacBook Pro và đào tạo chuyên sâu'),
+      t('editor.ai.suggestions.ben2', 'Môi trường làm việc linh hoạt, cung cấp MacBook Pro và đào tạo chuyên sâu'),
       t('editor.ai.suggestions.ben3', 'Du lịch resort 5 sao hàng năm, phụ cấp cơm trưa và teambuilding sôi nổi'),
     ],
     email: [
       t('editor.ai.suggestions.mail1', 'Thư mời phỏng vấn trực tiếp tại văn phòng vào 9h sáng thứ Hai tuần tới'),
-      t('editor.ai.suggestions.mail2', 'Thư mời phỏng vấn online qua Google Meet kèm hướng dẫn chuẩn bị'),
-      t('editor.ai.suggestions.mail3', 'Thư đề nghị nhận việc (Offer Letter) kèm mức lương và chế độ đãi ngộ'),
+      t('editor.ai.suggestions.mail2', 'Thư mời phỏng vấn trực tuyến qua Google Meet kèm hướng dẫn chuẩn bị'),
+      t('editor.ai.suggestions.mail3', 'Thư đề nghị nhận việc kèm mức lương và chế độ đãi ngộ'),
       t('editor.ai.suggestions.mail4', 'Thư từ chối ứng viên lịch sự và lưu hồ sơ vào Talent Pool tương lai'),
     ],
     blog: [

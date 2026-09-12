@@ -36,6 +36,7 @@ const PUBLIC_PREFIX_URLS: readonly string[] = [
   'common/cities/',
   'common/districts/',
   'common/wards/',
+  'common/presign/',
 
   // Public job search
   'job/web/search/',
@@ -43,10 +44,13 @@ const PUBLIC_PREFIX_URLS: readonly string[] = [
   // Public company info
   'info/web/companies/',
 
-  // Public content
+  // Public content & salary
   'content/web/banner',
   'content/web/feedbacks/',
   'content/web/articles/',
+  'content/web/article-categories/',
+  'interview/web/salary-benchmarks/',
+  'ai/chatbot/config/',
 
   // Interview invite (public token-based access)
   'interview/web/sessions/invite/',

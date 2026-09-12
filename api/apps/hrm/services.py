@@ -301,12 +301,101 @@ class CandidateToEmployeeConverter:
         return employee, True
 
 
+def deduplicate_punch_logs(
+    company: Company,
+    target_date: Optional[date] = None,
+    window_seconds: int = 120,
+) -> int:
+    """
+    Deduplication Engine (Giai đoạn 2):
+    Iterates through BiometricPunchLog records for a given company and date (or all records),
+    identifies punch events within the window (default: 120 seconds / 2 minutes) from the same employee
+    or biometric_id, and marks duplicate records with is_duplicate=True.
+    Returns the total count of duplicate punches identified.
+    """
+    from apps.hrm.models import BiometricPunchLog
+
+    q_filter = Q(company=company)
+    if target_date:
+        q_filter &= Q(punch_time__date=target_date)
+
+    all_logs = BiometricPunchLog.objects.filter(q_filter).order_by('punch_time')
+
+    # Group by key: employee_id if present, else biometric_id
+    grouped_logs: Dict[str, list] = {}
+    for punch in all_logs:
+        group_key = f"emp_{punch.employee_id}" if punch.employee_id else f"bio_{punch.biometric_id}"
+        if group_key not in grouped_logs:
+            grouped_logs[group_key] = []
+        grouped_logs[group_key].append(punch)
+
+    duplicate_count = 0
+
+    with transaction.atomic():
+        for group_key, logs in grouped_logs.items():
+            last_valid_time: Optional[datetime] = None
+            for p in logs:
+                if last_valid_time is not None:
+                    diff_seconds = abs((p.punch_time - last_valid_time).total_seconds())
+                    if diff_seconds < window_seconds:
+                        # Mark as duplicate
+                        if not p.is_duplicate:
+                            p.is_duplicate = True
+                            p.save(update_fields=['is_duplicate', 'update_at'])
+                        duplicate_count += 1
+                        continue
+
+                # Valid distinct punch event
+                if p.is_duplicate:
+                    p.is_duplicate = False
+                    p.save(update_fields=['is_duplicate', 'update_at'])
+                last_valid_time = p.punch_time
+
+    logger.info(
+        "Company %s punch log deduplication complete: %s duplicates flagged.",
+        company.id,
+        duplicate_count,
+    )
+    return duplicate_count
+
+
+def mark_if_duplicate_on_punch(punch_log, window_seconds: int = 120) -> bool:
+    """
+    Real-time Deduplication Check:
+    Checks if an existing valid punch exists within the deduplication window
+    for the same employee or biometric ID. If found, flags the new punch as is_duplicate=True.
+    """
+    from apps.hrm.models import BiometricPunchLog
+
+    time_start = punch_log.punch_time - timedelta(seconds=window_seconds)
+    time_end = punch_log.punch_time + timedelta(seconds=window_seconds)
+
+    q_filter = Q(company_id=punch_log.company_id, is_duplicate=False, punch_time__range=(time_start, time_end))
+    if punch_log.id:
+        q_filter &= ~Q(id=punch_log.id)
+
+    if punch_log.employee_id:
+        q_filter &= (Q(employee_id=punch_log.employee_id) | Q(biometric_id=punch_log.biometric_id))
+    else:
+        q_filter &= Q(biometric_id=punch_log.biometric_id)
+
+    exists = BiometricPunchLog.objects.filter(q_filter).exists()
+    if exists:
+        punch_log.is_duplicate = True
+        if punch_log.id:
+            punch_log.save(update_fields=['is_duplicate', 'update_at'])
+        return True
+
+    return False
+
+
 def process_punch_logs_for_date(company: Company, target_date: date) -> int:
     """
-    Core Timecard Calculation Engine:
-    Processes biometric punch logs for a given company and date, matches with
-    work shifts, applies grace periods, calculates late/early minutes and effective
-    work hours, then updates or creates AttendanceRecord records.
+    Core Timecard Calculation Engine (Enhanced for Overnight Shifts & Anomalies):
+    Processes valid (non-duplicate) biometric punch logs for a given company and date,
+    matches with work shifts (including overnight shifts across midnight), applies grace periods,
+    calculates late/early minutes, effective work hours, identifies anomalies (MISSED_IN, MISSED_OUT),
+    and updates/creates AttendanceRecord records.
     """
     from apps.hrm.models import Employee, ShiftAssignment, WorkShift, BiometricPunchLog, AttendanceRecord
 
@@ -329,13 +418,21 @@ def process_punch_logs_for_date(company: Company, target_date: date) -> int:
             continue
         shift = assignment.shift if assignment else None
 
-        # Fetch punch logs for this date
-        q_filter = Q(company=company, punch_time__date=target_date)
+        # Build query for valid (non-duplicate) punch logs
         bio_id = getattr(emp, 'biometric_id', None)
-        if bio_id:
-            q_filter &= (Q(employee=emp) | Q(biometric_id=bio_id))
+        emp_bio_q = (Q(employee=emp) | Q(biometric_id=bio_id)) if bio_id else Q(employee=emp)
+
+        # Handle overnight shift vs standard day shift
+        is_overnight = shift.is_overnight if shift else False
+        if is_overnight:
+            # For overnight shift starting on target_date (e.g. 22:00 to 06:00 next day):
+            # Window starts at target_date 18:00 and ends at (target_date + 1) 12:00
+            next_date = target_date + timedelta(days=1)
+            window_start = timezone.make_aware(datetime.combine(target_date, time(18, 0, 0)))
+            window_end = timezone.make_aware(datetime.combine(next_date, time(12, 0, 0)))
+            q_filter = Q(company=company, is_duplicate=False, punch_time__range=(window_start, window_end)) & emp_bio_q
         else:
-            q_filter &= Q(employee=emp)
+            q_filter = Q(company=company, is_duplicate=False, punch_time__date=target_date) & emp_bio_q
 
         punches = BiometricPunchLog.objects.filter(q_filter).order_by('punch_time')
 
@@ -356,36 +453,70 @@ def process_punch_logs_for_date(company: Company, target_date: date) -> int:
         early_minutes = 0
         working_hours = Decimal("0.00")
         record_status = 'PRESENT'
+        anomaly_note = ""
 
         scheduled_in = shift.start_time if shift else None
         scheduled_out = shift.end_time if shift else None
 
+        # Detect Anomaly: Single punch
+        if punches.count() == 1:
+            if shift:
+                if is_overnight:
+                    # Ca đêm: Nếu quẹt buổi tối (>= 18h hoặc >= giờ bắt đầu ca) là quẹt vào (MISSED_OUT)
+                    # Nếu quẹt buổi sáng (< 12h) là quẹt ra (MISSED_IN)
+                    if check_in_time >= time(18, 0) or check_in_time >= shift.start_time:
+                        anomaly_note = "[Ngoại lệ] Thiếu quẹt ra (MISSED_OUT)"
+                    else:
+                        check_out_time = check_in_time
+                        check_in_time = None
+                        anomaly_note = "[Ngoại lệ] Thiếu quẹt vào (MISSED_IN)"
+                else:
+                    # Ca ngày: Nếu quẹt sau giờ nghỉ trưa thì là quẹt ra (MISSED_IN), ngược lại là quẹt vào (MISSED_OUT)
+                    midpoint = shift.break_start or time(12, 0)
+                    if check_in_time > midpoint:
+                        check_out_time = check_in_time
+                        check_in_time = None
+                        anomaly_note = "[Ngoại lệ] Thiếu quẹt vào (MISSED_IN)"
+                    else:
+                        anomaly_note = "[Ngoại lệ] Thiếu quẹt ra (MISSED_OUT)"
+            else:
+                anomaly_note = "[Ngoại lệ] Chỉ có 1 lần quẹt trong ngày"
+
         if shift:
-            # Late calculation
-            if check_in_time > shift.start_time:
+            # Late calculation (consider overnight boundary)
+            if check_in_time and check_in_time > shift.start_time:
                 diff_sec = (datetime.combine(target_date, check_in_time) - datetime.combine(target_date, shift.start_time)).total_seconds()
                 diff_min = int(diff_sec // 60)
                 if diff_min > shift.grace_period_late_minutes:
                     late_minutes = diff_min
 
             # Early leave calculation
-            if check_out_time and check_out_time < shift.end_time:
-                diff_sec = (datetime.combine(target_date, shift.end_time) - datetime.combine(target_date, check_out_time)).total_seconds()
-                diff_min = int(diff_sec // 60)
-                if diff_min > shift.grace_period_early_minutes:
-                    early_minutes = diff_min
+            if check_out_time:
+                out_date = target_date + timedelta(days=1) if (is_overnight and check_out_time < shift.start_time) else target_date
+                sched_out_date = target_date + timedelta(days=1) if is_overnight else target_date
+                out_dt = datetime.combine(out_date, check_out_time)
+                sched_out_dt = datetime.combine(sched_out_date, shift.end_time)
+
+                if out_dt < sched_out_dt:
+                    diff_sec = (sched_out_dt - out_dt).total_seconds()
+                    diff_min = int(diff_sec // 60)
+                    if diff_min > shift.grace_period_early_minutes:
+                        early_minutes = diff_min
 
             # Effective working hours calculation using grace period logic
             if check_in_time and check_out_time:
                 effective_start_time = shift.start_time if late_minutes == 0 else check_in_time
                 effective_end_time = shift.end_time if (early_minutes == 0 and check_out_time >= shift.end_time) else check_out_time
 
-                start_dt = datetime.combine(target_date, effective_start_time)
-                end_dt = datetime.combine(target_date, effective_end_time)
+                start_date = target_date
+                end_date = target_date + timedelta(days=1) if (is_overnight and effective_end_time < shift.start_time) else target_date
+
+                start_dt = datetime.combine(start_date, effective_start_time)
+                end_dt = datetime.combine(end_date, effective_end_time)
                 raw_seconds = (end_dt - start_dt).total_seconds()
 
                 # Deduct break time if worked spans break period
-                if shift.break_start and shift.break_end:
+                if shift.break_start and shift.break_end and not is_overnight:
                     if effective_start_time <= shift.break_start and effective_end_time >= shift.break_end:
                         break_seconds = (datetime.combine(target_date, shift.break_end) - datetime.combine(target_date, shift.break_start)).total_seconds()
                         raw_seconds -= max(0.0, break_seconds)
@@ -403,8 +534,14 @@ def process_punch_logs_for_date(company: Company, target_date: date) -> int:
                 record_status = 'EARLY_LEAVE'
             elif working_hours > 0:
                 record_status = 'PRESENT'
+            elif check_in_time or check_out_time:
+                record_status = 'PRESENT'
             else:
                 record_status = 'ABSENT'
+
+        notes_content = existing_record.notes if (existing_record and existing_record.notes) else ""
+        if anomaly_note and anomaly_note not in notes_content:
+            notes_content = f"{notes_content}; {anomaly_note}".strip("; ")
 
         AttendanceRecord.objects.update_or_create(
             employee=emp,
@@ -419,9 +556,11 @@ def process_punch_logs_for_date(company: Company, target_date: date) -> int:
                 'early_minutes': early_minutes,
                 'working_hours': working_hours,
                 'status': record_status,
+                'notes': notes_content,
             }
         )
         updated_count += 1
 
     return updated_count
+
 

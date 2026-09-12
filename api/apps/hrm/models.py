@@ -171,6 +171,7 @@ class Employee(CommonBaseModel):
     bank_account_holder = models.CharField(max_length=150, blank=True, null=True)
     tax_id = models.CharField(max_length=100, blank=True, null=True)
     social_insurance_id = models.CharField(max_length=100, blank=True, null=True)
+    dependents_count = models.PositiveSmallIntegerField(default=0, verbose_name="Số người phụ thuộc")
 
     class Meta:
         ordering = ['-create_at']
@@ -505,4 +506,73 @@ class MonthlyPayrollRecord(CommonBaseModel):
 
     def __str__(self):
         return f"Payroll {self.month}/{self.year} - {self.employee.full_name}: Net {self.net_salary:,.0f} VND"
+
+
+class EmployeeCareerHistory(CommonBaseModel):
+    EVENT_TYPE_CHOICES = (
+        ('ONBOARDING', 'Tiếp nhận / Tuyển dụng mới'),
+        ('HIRED', 'Tuyển dụng mới'),
+        ('PROMOTION', 'Bổ nhiệm / Thăng chức'),
+        ('TRANSFER', 'Điều chuyển phòng ban'),
+        ('SALARY_ADJUSTMENT', 'Điều chỉnh lương'),
+        ('SALARY_INCREASE', 'Điều chỉnh lương'),
+        ('ROLE_CHANGE', 'Thay đổi vị trí / Chức danh'),
+        ('DEMOTION', 'Miễn nhiệm / Giáng chức'),
+        ('REWARD', 'Khen thưởng'),
+        ('DISCIPLINE', 'Kỷ luật'),
+        ('RESIGNATION', 'Thôi việc / Nghỉ việc'),
+        ('TERMINATION', 'Chấm dứt hợp đồng'),
+    )
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="career_histories")
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="career_histories")
+    effective_date = models.DateField(db_index=True, verbose_name="Ngày hiệu lực")
+    event_type = models.CharField(max_length=30, choices=EVENT_TYPE_CHOICES, default='TRANSFER', verbose_name="Loại biến động")
+    old_department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    new_department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    old_designation = models.ForeignKey(Designation, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    new_designation = models.ForeignKey(Designation, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    old_salary = models.DecimalField(max_digits=12, decimal_places=0, null=True, blank=True, verbose_name="Mức lương cũ")
+    new_salary = models.DecimalField(max_digits=12, decimal_places=0, null=True, blank=True, verbose_name="Mức lương mới")
+    decision_number = models.CharField(max_length=100, blank=True, null=True, verbose_name="Số quyết định")
+    attachment = models.URLField(max_length=500, blank=True, null=True, verbose_name="Văn bản quyết định đính kèm")
+    note = models.TextField(blank=True, null=True, verbose_name="Ghi chú diễn giải")
+
+    class Meta:
+        ordering = ['-effective_date', '-create_at']
+
+    def __str__(self):
+        return f"{self.employee.full_name} - {self.get_event_type_display()} ({self.effective_date})"
+
+
+class EmployeeDocument(CommonBaseModel):
+    DOCUMENT_TYPE_CHOICES = (
+        ('IDENTITY_CARD', 'CCCD / Hộ chiếu'),
+        ('CCCD', 'CCCD / CMND / Hộ chiếu'),
+        ('LABOR_CONTRACT', 'Hợp đồng lao động bản scan'),
+        ('DEGREE_CERTIFICATE', 'Bằng cấp / Chứng chỉ chuyên môn'),
+        ('DEGREE', 'Bằng cấp / Chứng chỉ'),
+        ('HEALTH_CERTIFICATE', 'Giấy khám sức khỏe định kỳ'),
+        ('HEALTH_CERT', 'Giấy khám sức khỏe'),
+        ('TAX_DOCUMENT', 'Mã số thuế / Giảm trừ gia cảnh'),
+        ('DECISION', 'Quyết định bổ nhiệm / khen thưởng / kỷ luật'),
+        ('RESUME', 'Sơ yếu lý lịch'),
+        ('OTHER', 'Tài liệu khác'),
+    )
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="employee_documents")
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="documents")
+    document_type = models.CharField(max_length=30, choices=DOCUMENT_TYPE_CHOICES, default='OTHER', verbose_name="Phân loại tài liệu")
+    name = models.CharField(max_length=255, verbose_name="Tên tài liệu")
+    file_url = models.URLField(max_length=500, verbose_name="Đường dẫn lưu trữ văn bản")
+    issue_date = models.DateField(null=True, blank=True, verbose_name="Ngày cấp")
+    expiry_date = models.DateField(null=True, blank=True, verbose_name="Ngày hết hạn hiệu lực")
+    note = models.TextField(blank=True, null=True, verbose_name="Ghi chú")
+
+    class Meta:
+        ordering = ['-create_at']
+
+    def __str__(self):
+        return f"{self.employee.full_name} - {self.name} ({self.get_document_type_display()})"
+
 

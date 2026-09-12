@@ -93,7 +93,7 @@ export default function AdminSectionClient({
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.user);
 
-  const authSubPaths = ['/login', '/forgot-password', '/reset-password'];
+  const authSubPaths = ['/login', '/forgot-password', '/reset-password', '/interview-preview'];
   const isAuthPage = authSubPaths.some((subPath) => pathname.endsWith(subPath) || pathname.includes(`${subPath}/`));
   const isLoginPage = pathname.endsWith('/login') || pathname.endsWith('/quan-tri');
   const token = tokenService.getAccessTokenFromCookie();

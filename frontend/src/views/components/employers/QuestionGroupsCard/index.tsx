@@ -1,12 +1,14 @@
 'use client';
-import React, { useCallback, useMemo, useReducer } from 'react';
-import { Box, Typography, Button, Stack, Paper, useTheme, IconButton } from '@mui/material';
+import React, { useCallback, useMemo, useReducer, useState } from 'react';
+import { Box, Typography, Button, Stack, Paper, useTheme, IconButton, Tooltip, CircularProgress } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '@/components/Common/DataTable';
+import { interviewService } from '@/services/interviewService';
 import { useEmployerQuestions, useQuestionGroups, useQuestionMutations, useQuestionGroupMutations } from '../hooks/useEmployerQueries';
 import { useDataTable, useDebounce } from '@/hooks';
 import { confirmModal } from '@/utils/sweetalert2Modal';
@@ -174,6 +176,32 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
     );
   }, [deleteQuestionGroup, t]);
 
+  const [startingMockGroupId, setStartingMockGroupId] = useState<number | null>(null);
+
+  const handleTestGroupMock = useCallback(async (group: QuestionGroup) => {
+    const qIds = group.questions?.map((q: Question) => q.id) || [];
+    if (qIds.length === 0) {
+      toastMessages.warn(t('employer:questionGroupsCard.messages.emptyGroupWarning'));
+      return;
+    }
+
+    setStartingMockGroupId(group.id);
+    try {
+      const res = await interviewService.createMockSession({
+        job_title: group.name,
+        question_group_id: group.id,
+        question_ids: qIds,
+      });
+      toastMessages.success(t('employer:questionGroupsCard.messages.testRoomCreated'));
+      const targetUrl = res.interview_url || res.interviewUrl || `/interview/${res.invite_token || res.id}`;
+      window.open(targetUrl, '_blank');
+    } catch (error) {
+      errorHandling(error);
+    } finally {
+      setStartingMockGroupId(null);
+    }
+  }, [t]);
+
   const columns = useMemo<ColumnDef<QuestionGroup>[]>(() => [
     {
       header: t('employer:questionGroupsCard.table.groupName'),
@@ -202,7 +230,30 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
       header: '',
       id: 'actions',
       cell: ({ row }) => (
-        <Stack direction="row" spacing={1} justifyContent="flex-end">
+        <Stack direction="row" spacing={1} justifyContent="flex-end" alignItems="center">
+          <Tooltip title={t('employer:questionGroupsCard.actions.testGroupTooltip')}>
+            <span>
+              <Button
+                size="small"
+                variant="outlined"
+                color="info"
+                startIcon={startingMockGroupId === row.original.id ? <CircularProgress size={14} color="inherit" /> : <PlayCircleOutlineIcon fontSize="small" />}
+                disabled={startingMockGroupId === row.original.id}
+                onClick={() => handleTestGroupMock(row.original)}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  borderRadius: '8px',
+                  py: 0.5,
+                  px: 1.5,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {t('employer:questionGroupsCard.actions.testWithAI')}
+              </Button>
+            </span>
+          </Tooltip>
           <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenEdit(row.original)} color="primary">
             <EditIcon fontSize="small" />
           </IconButton>
@@ -212,7 +263,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
         </Stack>
       ),
     },
-  ], [handleDelete, handleOpenEdit, t]);
+  ], [handleDelete, handleOpenEdit, handleTestGroupMock, startingMockGroupId, t]);
 
   return (
     <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 4, boxShadow: (muiTheme) => muiTheme.customShadows?.z1, border: '1px solid', borderColor: 'divider' }}>
@@ -264,6 +315,18 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
         onNewQuestionContentChange={(value) => dispatch({ type: 'set_new_question_content', value })}
         onSaveGroup={handleSave}
         onCreateQuestion={handleCreateQuestion}
+        onTestGroup={() => {
+          if (state.selectedQuestions.length === 0) {
+            toastMessages.warn(t('employer:questionGroupsCard.messages.emptyGroupWarning'));
+            return;
+          }
+          handleTestGroupMock({
+            id: state.currentGroup?.id || 0,
+            name: state.groupName || t('employer:questionGroupsCard.title'),
+            questions: state.selectedQuestions.map((id) => ({ id } as Question)),
+          } as QuestionGroup);
+        }}
+        isTestingGroup={startingMockGroupId != null}
       />
 
       {(isGroupMutating || isQuestionMutating) && <BackdropLoading />}
