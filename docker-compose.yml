@@ -92,7 +92,15 @@ services:
       - DEBUG=${DEBUG:-False}
       - AUTO_MIGRATE=${AUTO_MIGRATE:-1}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-infohr.vn,s3.infohr.vn,admin.infohr.vn,employer.infohr.vn,113.177.113.137,113.177.129.249,localhost,127.0.0.1,backend,thinkgift.square.vn,.square.vn,.infohr.vn}
-      - AI_TTS_FALLBACK_BASE_URLS=http://vieneu-tts:8298/v1
+      - AI_TTS_BASE_URL=${AI_TTS_BASE_URL:-https://api.metaconnect.vn/v1}
+      - AI_TTS_API_KEY=${AI_TTS_API_KEY:-airp_live_ZX173OjElohx_4xp3OhMBdtNZkfgdGbFxbgIWLTH4LCP8}
+      - AI_TTS_MODEL=${AI_TTS_MODEL:-tts-vi}
+      - AI_TTS_DEFAULT_VOICE=${AI_TTS_DEFAULT_VOICE:-Trúc Ly}
+      - AI_TTS_FALLBACK_BASE_URLS=${AI_TTS_FALLBACK_BASE_URLS:-}
+      - AI_STT_BASE_URL=${AI_STT_BASE_URL:-https://api.metaconnect.vn/v1}
+      - AI_STT_API_KEY=${AI_STT_API_KEY:-airp_live_ZX173OjElohx_4xp3OhMBdtNZkfgdGbFxbgIWLTH4LCP8}
+      - AI_STT_MODEL=${AI_STT_MODEL:-asr-vi}
+      - AI_STT_LANGUAGE=${AI_STT_LANGUAGE:-vi}
       - NOTEBOOKLM_MCP_URL=${NOTEBOOKLM_MCP_URL:-http://host.docker.internal:8000/mcp}
       - DEFAULT_NOTEBOOKLM_NOTEBOOK_ID=${DEFAULT_NOTEBOOKLM_NOTEBOOK_ID:-}
       - INTERVIEW_AGENT_SHARED_SECRET=${INTERVIEW_AGENT_SHARED_SECRET:?Set INTERVIEW_AGENT_SHARED_SECRET in .env and share it with livekit-agent}
@@ -363,9 +371,10 @@ services:
 
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
-  # Local Voice AI Inference Services (Whisper STT & VieNeu TTS on GPU)
+  # Local Voice AI Inference Services (Optional local GPU fallback)
   # ---------------------------------------------------------------------------
   whisper:
+    profiles: ["local-gpu"]
     container_name: tuyendung-studio-whisper
     image: voice-ai-whisper:latest
     build:
@@ -398,6 +407,7 @@ services:
       - app-net
 
   vieneu-tts:
+    profiles: ["local-gpu"]
     container_name: tuyendung-studio-vieneu-tts
     image: voice-ai-vieneu:latest
     build:
@@ -444,17 +454,21 @@ services:
       - INTERVIEW_AGENT_SHARED_SECRET=${INTERVIEW_AGENT_SHARED_SECRET:?Set INTERVIEW_AGENT_SHARED_SECRET in .env and share it with backend}
       - LIVEKIT_URL=${LIVEKIT_URL:-http://tuyendung-studio-livekit:7880}
       - LIVEKIT_AGENT_NAME=square-ai-interviewer
+      - STT_BASE_URL=${STT_BASE_URL:-https://api.metaconnect.vn/v1}
+      - STT_API_KEY=${STT_API_KEY:-airp_live_ZX173OjElohx_4xp3OhMBdtNZkfgdGbFxbgIWLTH4LCP8}
+      - STT_MODEL=${STT_MODEL:-asr-vi}
       - STT_LANGUAGE=${STT_LANGUAGE:-vi}
-      - TTS_VOICE=${TTS_VOICE:-Ly}
+      - TTS_BASE_URL=${TTS_BASE_URL:-https://api.metaconnect.vn/v1}
+      - TTS_API_KEY=${TTS_API_KEY:-airp_live_ZX173OjElohx_4xp3OhMBdtNZkfgdGbFxbgIWLTH4LCP8}
+      - TTS_MODEL=${TTS_MODEL:-tts-vi}
+      - TTS_VOICE=${TTS_VOICE:-Trúc Ly}
     depends_on:
       backend:
         condition: service_started
       livekit:
         condition: service_healthy
-      whisper:
-        condition: service_healthy
-      vieneu-tts:
-        condition: service_healthy
+    volumes:
+      - ./voice-ai/livekit_agent/src:/app/src
     restart: always
     networks:
       - app-net
