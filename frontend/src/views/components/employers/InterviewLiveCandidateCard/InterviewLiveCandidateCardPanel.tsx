@@ -28,6 +28,7 @@ import { type InterviewSession } from '@/types/models';
 import { ElapsedTimer, LiveObserverVisualizer, normalizeStatus } from './InterviewLiveCandidateCardPresence';
 import { AIInterviewLayout } from '@/views/interviewPages/AIInterviewLayout';
 import { InterviewRecordingBadge } from '@/views/interviewPages/components/InterviewRecordingBadge';
+import employerAiSettingService from '@/services/employerAiSettingService';
 import pc from '@/utils/muiColors';
 
 type Props = {
@@ -128,7 +129,12 @@ const InterviewLiveCandidateCardPanel = ({
               onDisconnected={onLeaveHR}
               style={{ height: '100%', width: '100%' }}
             >
-              <AIInterviewLayout onEndSession={onLeaveHR} />
+              <AIInterviewLayout
+                onEndSession={onLeaveHR}
+                avatarImageUrl={employerAiSettingService.resolveActiveAvatarUrl()}
+                avatarBackgroundUrl={employerAiSettingService.resolveActiveBackgroundUrl()}
+                interviewerName={employerAiSettingService.getSettings().interviewerName}
+              />
               <RoomAudioRenderer />
             </LiveKitRoom>
           </Box>

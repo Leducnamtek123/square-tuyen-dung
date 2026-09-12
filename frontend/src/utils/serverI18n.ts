@@ -115,6 +115,7 @@ const PAGE_TITLES: Record<string, Record<SupportedLocale, string>> = {
   'employer.saved-profiles':  { vi: 'Hồ sơ ứng viên đã lưu trữ', en: 'Saved Candidate Profiles' },
   'employer.question-bank':   { vi: 'Ngân hàng câu hỏi tuyển dụng', en: 'Recruitment Question Bank' },
   'employer.question-groups': { vi: 'Bộ nhóm câu hỏi phỏng vấn', en: 'Interview Question Sets' },
+  'employer.ai-settings':     { vi: 'Cài đặt AI Phỏng vấn doanh nghiệp', en: 'Employer AI Interview Settings' },
   'employer.verification':    { vi: 'Xác minh giấy phép doanh nghiệp', en: 'Company License Verification' },
   'employer.notifications':   { vi: 'Thông báo tuyển dụng & ứng viên', en: 'Employer Notifications' },
   'employer.hrm.employees':   { vi: 'Quản lý nhân sự nội bộ', en: 'Internal HR Employee Management' },

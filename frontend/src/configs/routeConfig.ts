@@ -80,6 +80,7 @@ export const SEGMENT_MAP = {
   'sua-lich-phong-van': 'interviews',
   'ngan-hang-cau-hoi': 'question-bank',
   'bo-cau-hoi': 'question-groups',
+  'cai-dat-ai': 'ai-settings',
   'xac-thuc-nha-tuyen-dung': 'verification',
 
   // Admin
@@ -238,6 +239,7 @@ export const ROUTES = {
     INTERVIEW_EDIT: 'employer/interviews/:id/edit',
     QUESTION_BANK: 'employer/question-bank',
     QUESTION_GROUPS: 'employer/question-groups',
+    AI_SETTINGS: 'employer/ai-settings',
     VERIFICATION: 'employer/verification',
     CONTACT: 'employer/contact',
     FAQ: 'employer/faq',
@@ -493,6 +495,7 @@ export function generateRewrites(): RewriteRule[] {
     ['/nha-tuyen-dung/cau-hoi-thuong-gap', '/employer/faq'],
     ['/nha-tuyen-dung/dieu-khoan-dich-vu', '/employer/terms-of-service'],
     ['/nha-tuyen-dung/chinh-sach-bao-mat', '/employer/privacy-policy'],
+    ['/nha-tuyen-dung/cai-dat-ai', '/employer/ai-settings'],
     // Catch-all for employer (must be last)
     ['/nha-tuyen-dung/:path*', '/employer/:path*'],
   ];

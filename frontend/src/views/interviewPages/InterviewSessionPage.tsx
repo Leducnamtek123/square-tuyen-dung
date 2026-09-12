@@ -18,6 +18,7 @@ import {
 
 import interviewService from '@/services/interviewService';
 import tokenService from '@/services/tokenService';
+import employerAiSettingService from '@/services/employerAiSettingService';
 import { transformInterviewSession } from '@/utils/transformers';
 import type { InterviewSession, Question } from '@/types/models';
 import { PreflightRoom } from './PreflightRoom';
@@ -266,10 +267,11 @@ function ActiveInterviewRoom({
   session?: InterviewSession | null;
 }) {
   const sessionMeta = ((session?.sessionMetadata || session?.session_metadata || {}) as Record<string, any>);
-  const avatarImageUrl = sessionMeta.avatar_image_url || sessionMeta.avatarImageUrl || null;
-  const avatarBackgroundUrl = sessionMeta.avatar_background_url || sessionMeta.avatarBackgroundUrl || null;
-  const avatarBackdrop = sessionMeta.avatar_backdrop || sessionMeta.avatarBackdrop || 'modern_office';
-  const interviewerName = sessionMeta.interviewer_name || sessionMeta.interviewerName || (isMock ? 'Trợ lý AI AILA' : 'Trợ lý AI Phỏng vấn');
+  const savedSettings = employerAiSettingService.getSettings();
+  const avatarImageUrl = sessionMeta.avatar_image_url || sessionMeta.avatarImageUrl || (savedSettings.avatarType === 'custom' && savedSettings.customAvatarUrl ? savedSettings.customAvatarUrl : null);
+  const avatarBackgroundUrl = sessionMeta.avatar_background_url || sessionMeta.avatarBackgroundUrl || employerAiSettingService.resolveActiveBackgroundUrl(savedSettings);
+  const avatarBackdrop = sessionMeta.avatar_backdrop || sessionMeta.avatarBackdrop || savedSettings.selectedBackgroundId || 'modern_office';
+  const interviewerName = sessionMeta.interviewer_name || sessionMeta.interviewerName || savedSettings.interviewerName || (isMock ? 'Trợ lý AI AILA' : 'Trợ lý AI Phỏng vấn');
 
   return (
     <main className="flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#f8fafc] text-slate-900">
