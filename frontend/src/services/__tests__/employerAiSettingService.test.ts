@@ -76,7 +76,13 @@ describe('employerAiSettingService', () => {
     };
 
     expect(employerAiSettingService.resolveActiveBackgroundUrl(settings)).toBe(PRESET_BACKGROUNDS[1].url);
-    expect(employerAiSettingService.resolveActiveAvatarUrl(settings)).toBe(PRESET_AVATARS[1].previewUrl);
+    expect(employerAiSettingService.resolveActiveAvatarUrl(settings)).toBe('/assets/images/avatar/expert_male/idle.webp');
+
+    const ailaSettings = {
+      ...DEFAULT_EMPLOYER_AI_SETTINGS,
+      selectedAvatarId: 'aila_recruiter',
+    };
+    expect(employerAiSettingService.resolveActiveAvatarUrl(ailaSettings)).toBeNull();
   });
 
   it('resets settings to default', () => {

@@ -33,33 +33,33 @@ export const PRESET_BACKGROUNDS: readonly PresetBackground[] = [
     id: 'modern_office',
     nameVi: 'Văn phòng hiện đại',
     nameEn: 'Modern High-rise Office',
-    url: '/images/avatar/ai-interview-office-bg.jpg',
-    descriptionVi: 'Phòng họp kính hướng nhìn quang cảnh thành phố chuẩn doanh nghiệp quốc tế',
+    url: '/images/avatar/bg-modern-office.jpg',
+    descriptionVi: 'Không gian mở thanh lịch với tường ốp gỗ lam sóng và tầm nhìn thành phố ngập tràn ánh sáng',
     badge: 'Khuyên dùng',
   },
   {
     id: 'studio_tech',
-    nameVi: 'Studio công nghệ',
+    nameVi: 'Studio công nghệ cao',
     nameEn: 'Deep Tech Studio',
-    url: '/images/avatar/ai-interview-office-bg.jpg',
-    descriptionVi: 'Không gian phỏng vấn công nghệ cao với ánh sáng xanh vi mô sang trọng',
-    badge: 'Chuyên nghiệp',
+    url: '/images/avatar/bg-studio-tech.jpg',
+    descriptionVi: 'Không gian phòng thu AI hiện đại với tường tiêu âm hình học và dải led xanh vi mô sang trọng',
+    badge: 'Công nghệ',
   },
   {
     id: 'executive_boardroom',
     nameVi: 'Phòng hội đồng quản trị',
     nameEn: 'Executive Boardroom',
-    url: '/images/avatar/ai-interview-office-bg.jpg',
-    descriptionVi: 'Bối cảnh trang trọng phù hợp các vị trí quản lý và chuyên gia cấp cao',
+    url: '/images/avatar/bg-executive-boardroom.jpg',
+    descriptionVi: 'Không gian trang trọng với tường gỗ óc chó ấm cúng và khung cảnh đêm thành phố đẳng cấp',
     badge: 'Trang trọng',
   },
   {
     id: 'minimalist_clean',
-    nameVi: 'Tối giản thanh lịch',
+    nameVi: 'Tối giản Bắc Âu',
     nameEn: 'Minimalist Workspace',
-    url: '/images/avatar/ai-interview-office-bg.jpg',
-    descriptionVi: 'Tông màu trung tính giúp ứng viên tập trung tối đa vào phần trả lời',
-    badge: 'Tập trung',
+    url: '/images/avatar/bg-minimalist-clean.jpg',
+    descriptionVi: 'Phông nền tường vữa ấm thanh bình kết hợp ánh sáng tự nhiên và cây xanh tạo cảm giác thư thái',
+    badge: 'Thanh lịch',
   },
 ];
 
@@ -67,18 +67,18 @@ export const PRESET_AVATARS: readonly PresetAvatar[] = [
   {
     id: 'aila_recruiter',
     name: 'AILA AI',
-    titleVi: 'Chuyên viên tuyển dụng cao cấp',
+    titleVi: 'Nữ chuyên viên tuyển dụng cao cấp',
     previewUrl: '/assets/images/avatar/hr/idle.webp',
-    descriptionVi: 'Bộ ảnh đại diện WebP 22 trạng thái biểu cảm cử động nhép môi chân thực',
+    descriptionVi: 'Phong cách chuyên nghiệp, thân thiện, tương tác biểu cảm và cử động nhép môi tự nhiên 22 trạng thái',
     isFullWebpAnimation: true,
   },
   {
-    id: 'ai_expert',
-    name: 'Chuyên gia AI',
-    titleVi: 'Hội đồng phỏng vấn kỹ thuật',
-    previewUrl: '/assets/images/avatar/hr/serious.webp',
-    descriptionVi: 'Phong cách đánh giá kỹ thuật chuyên sâu và nghiêm túc',
-    isFullWebpAnimation: true,
+    id: 'expert_male',
+    name: 'MINH TRÍ AI',
+    titleVi: 'Nam chuyên gia phỏng vấn công nghệ',
+    previewUrl: '/assets/images/avatar/expert_male/preview.jpg',
+    descriptionVi: 'Phong thái đĩnh đạc, sắc sảo, chuyên trách đánh giá chuyên môn kỹ thuật và kỹ năng giải quyết vấn đề',
+    isFullWebpAnimation: false,
   },
 ];
 
@@ -155,13 +155,15 @@ export const employerAiSettingService = {
     return preset?.url || PRESET_BACKGROUNDS[0].url;
   },
 
-  resolveActiveAvatarUrl: (settings?: EmployerAiSettings): string => {
+  resolveActiveAvatarUrl: (settings?: EmployerAiSettings): string | null => {
     const s = settings || employerAiSettingService.getSettings();
     if (s.avatarType === 'custom' && s.customAvatarUrl) {
       return s.customAvatarUrl;
     }
-    const preset = PRESET_AVATARS.find((p) => p.id === s.selectedAvatarId);
-    return preset?.previewUrl || PRESET_AVATARS[0].previewUrl;
+    if (s.selectedAvatarId === 'expert_male') {
+      return '/assets/images/avatar/expert_male/idle.webp';
+    }
+    return null;
   },
 };
 

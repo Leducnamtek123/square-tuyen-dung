@@ -16,6 +16,17 @@ import {
   Chip,
   Alert,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from '@mui/material';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
@@ -28,6 +39,9 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import PhotoCameraBackOutlinedIcon from '@mui/icons-material/PhotoCameraBackOutlined';
 import FaceRetouchingNaturalOutlinedIcon from '@mui/icons-material/FaceRetouchingNaturalOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import CloseIcon from '@mui/icons-material/Close';
 
 import employerAiSettingService, {
   type EmployerAiSettings,
@@ -45,6 +59,7 @@ export default function EmployerAiSettingsCard() {
   const [uploadingBg, setUploadingBg] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
 
   const bgInputRef = useRef<HTMLInputElement>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -118,7 +133,7 @@ export default function EmployerAiSettingsCard() {
   const activeBgUrl = employerAiSettingService.resolveActiveBackgroundUrl(settings);
   const activeAvatarUrl = settings.avatarType === 'custom' && settings.customAvatarUrl
     ? settings.customAvatarUrl
-    : null;
+    : (settings.selectedAvatarId === 'expert_male' ? '/assets/images/avatar/expert_male/idle.webp' : null);
 
   return (
     <Box sx={{ width: '100%', maxWidth: 1400, mx: 'auto', p: { xs: 2, md: 3 } }}>
@@ -257,7 +272,7 @@ export default function EmployerAiSettingsCard() {
                       Hình nền
                     </Typography>
                     <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                      {settings.backgroundType === 'custom' ? 'Ảnh riêng Nhà tuyển dụng' : 'Hình nền mẫu'}
+                      {settings.backgroundType === 'custom' ? 'Ảnh riêng Nhà tuyển dụng' : 'Phông nền trống chuyên nghiệp'}
                     </Typography>
                   </Stack>
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -265,7 +280,7 @@ export default function EmployerAiSettingsCard() {
                       Ảnh nhân vật
                     </Typography>
                     <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                      {settings.avatarType === 'custom' ? 'Ảnh WebP riêng' : 'AILA AI WebP chuẩn'}
+                      {settings.avatarType === 'custom' ? 'Ảnh WebP riêng' : (settings.selectedAvatarId === 'expert_male' ? 'MINH TRÍ AI Nam' : 'AILA AI Nữ WebP')}
                     </Typography>
                   </Stack>
                 </Stack>
@@ -289,7 +304,7 @@ export default function EmployerAiSettingsCard() {
                       Hình nền phòng phỏng vấn
                     </Typography>
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                      Chọn một trong các không gian studio mẫu hoặc tải ảnh văn phòng thương hiệu riêng
+                      Chọn một trong các không gian studio phông trống hoặc tải ảnh văn phòng thương hiệu riêng
                     </Typography>
                   </Box>
                 </Stack>
@@ -305,7 +320,7 @@ export default function EmployerAiSettingsCard() {
                   <FormControlLabel
                     value="preset"
                     control={<Radio size="small" />}
-                    label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Hình nền mẫu có sẵn</Typography>}
+                    label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Phông nền mẫu tiêu chuẩn</Typography>}
                   />
                   <FormControlLabel
                     value="custom"
@@ -478,21 +493,49 @@ export default function EmployerAiSettingsCard() {
               </CardContent>
             </Card>
 
-            {/* Khối 2: Tùy chọn nhân vật AI WebP */}
+            {/* Khối 2: Tùy chọn nhân vật AI WebP và Tài liệu chuẩn cấu trúc */}
             <Card elevation={0} sx={{ borderRadius: 3.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
               <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Stack direction="row" alignItems="center" spacing={1.5}>
-                  <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: '#fdf2f8', color: '#db2777', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <FaceRetouchingNaturalOutlinedIcon sx={{ fontSize: 20 }} />
-                  </Box>
-                  <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                      Nhân vật AI phỏng vấn
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                      Chọn nhân vật AI cử động nhép môi WebP hoặc tải ảnh nhân vật tùy biến riêng
-                    </Typography>
-                  </Box>
+                <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ sm: 'center' }} justifyContent="space-between" spacing={1.5}>
+                  <Stack direction="row" alignItems="center" spacing={1.5}>
+                    <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: '#fdf2f8', color: '#db2777', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <FaceRetouchingNaturalOutlinedIcon sx={{ fontSize: 20 }} />
+                    </Box>
+                    <Box>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                        Nhân vật AI phỏng vấn
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                        Chọn nhân vật AI cử động nhép môi WebP hoặc tải bộ ảnh tùy biến riêng
+                      </Typography>
+                    </Box>
+                  </Stack>
+
+                  {/* Cụm nút công cụ: Xuất gói mẫu và Hướng dẫn */}
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      component="a"
+                      href="/downloads/ai-avatar-sample-pack.zip"
+                      download="ai-avatar-sample-pack.zip"
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      startIcon={<DownloadOutlinedIcon />}
+                      sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2, fontSize: '0.8rem' }}
+                    >
+                      Xuất gói mẫu chuẩn
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="inherit"
+                      size="small"
+                      onClick={() => setGuideOpen(true)}
+                      startIcon={<MenuBookOutlinedIcon />}
+                      sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2, fontSize: '0.8rem', color: 'text.secondary', borderColor: '#cbd5e1' }}
+                    >
+                      Hướng dẫn cấu trúc
+                    </Button>
+                  </Stack>
                 </Stack>
               </Box>
 
@@ -511,7 +554,7 @@ export default function EmployerAiSettingsCard() {
                   <FormControlLabel
                     value="custom"
                     control={<Radio size="small" />}
-                    label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Tải ảnh nhân vật WebP riêng</Typography>}
+                    label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Tải ảnh hoặc gói nhân vật riêng</Typography>}
                   />
                 </RadioGroup>
 
@@ -546,10 +589,10 @@ export default function EmployerAiSettingsCard() {
                               src={item.previewUrl}
                               alt={item.name}
                               sx={{
-                                width: 72,
-                                height: 72,
+                                width: 80,
+                                height: 80,
                                 objectFit: 'contain',
-                                borderRadius: 2,
+                                borderRadius: 2.5,
                                 bgcolor: '#0f172a',
                                 p: 0.5,
                               }}
@@ -603,7 +646,7 @@ export default function EmployerAiSettingsCard() {
                             Ảnh AI WebP Nhà tuyển dụng đã tải lên
                           </Typography>
                           <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5, mb: 1.5 }}>
-                            Ảnh nhân vật đang được sử dụng trong phiên phỏng vấn
+                            Ảnh nhân vật đang được sử dụng trong các phiên phỏng vấn
                           </Typography>
                           <Stack direction="row" spacing={1.5}>
                             <Button
@@ -656,7 +699,7 @@ export default function EmployerAiSettingsCard() {
                               Nhấp để tải lên ảnh nhân vật AI WebP hoặc PNG tách nền
                             </Typography>
                             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
-                              Định dạng khuyên dùng WebP hoặc PNG trong suốt để tích hợp mượt mà vào khung phòng phỏng vấn
+                              Khuyên dùng tệp WebP hoặc PNG trong suốt chuẩn 1024x1024 để hiển thị sắc nét nhất
                             </Typography>
                           </>
                         )}
@@ -766,6 +809,147 @@ export default function EmployerAiSettingsCard() {
           </Stack>
         </Grid>
       </Grid>
+
+      {/* Hộp thoại Hướng dẫn chuẩn hóa bộ ảnh hành vi AI */}
+      <Dialog
+        open={guideOpen}
+        onClose={() => setGuideOpen(false)}
+        maxWidth="md"
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            borderRadius: 3.5,
+            p: 1,
+          },
+        }}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
+          <Stack direction="row" alignItems="center" spacing={1.5}>
+            <MenuBookOutlinedIcon color="primary" />
+            <Typography variant="h6" sx={{ fontWeight: 800 }}>
+              Hướng dẫn cấu trúc gói ảnh hành vi nhân vật AI
+            </Typography>
+          </Stack>
+          <Button
+            size="small"
+            onClick={() => setGuideOpen(false)}
+            sx={{ minWidth: 36, width: 36, height: 36, borderRadius: '50%', color: 'text.secondary' }}
+          >
+            <CloseIcon sx={{ fontSize: 20 }} />
+          </Button>
+        </DialogTitle>
+
+        <DialogContent dividers sx={{ py: 2.5 }}>
+          <Alert severity="info" sx={{ mb: 2.5, borderRadius: 2 }}>
+            Hệ thống AI phỏng vấn của InfoHR sử dụng cơ chế chuyển đổi biểu cảm thông minh theo ngữ cảnh câu trả lời của ứng viên. Để nhân vật tương tác nhịp nhàng, bộ ảnh nạp vào cần tuân thủ cấu trúc tên tệp tiêu chuẩn.
+          </Alert>
+
+          <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, color: 'text.primary' }}>
+            1. Yêu cầu kỹ thuật tệp hình ảnh
+          </Typography>
+          <Box sx={{ mb: 2.5, pl: 1 }}>
+            <Typography variant="body2" sx={{ mb: 0.5 }}>
+              • <strong>Định dạng</strong>: WebP trong suốt khuyến nghị hoặc PNG tách nền
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 0.5 }}>
+              • <strong>Tỷ lệ khung hình</strong>: Vuông 1:1 hoặc chân dung 3:4
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 0.5 }}>
+              • <strong>Độ phân giải</strong>: 1024x1024 pixel
+            </Typography>
+            <Typography variant="body2">
+              • <strong>Dung lượng</strong>: Dưới 300KB mỗi tệp để đảm bảo tải tức thì trong phòng họp
+            </Typography>
+          </Box>
+
+          <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, color: 'text.primary' }}>
+            2. Bảng quy tắc đặt tên các tệp trạng thái và khẩu hình
+          </Typography>
+          <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: 2, mb: 2 }}>
+            <Table size="small">
+              <TableHead sx={{ bgcolor: '#f8fafc' }}>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 700, width: 220 }}>Tên tệp quy ước</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>Hành vi tương ứng trong phòng phỏng vấn</TableCell>
+                  <TableCell sx={{ fontWeight: 700, width: 140 }}>Mức độ</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700, color: 'primary.main' }}>idle.webp</TableCell>
+                  <TableCell>Trạng thái sẵn sàng tiếp nhận ứng viên khi vào phòng</TableCell>
+                  <TableCell><Chip label="Bắt buộc" size="small" color="primary" sx={{ height: 20, fontSize: '0.7rem' }} /></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700, color: 'primary.main' }}>listening.webp</TableCell>
+                  <TableCell>Trạng thái chăm chú lắng nghe khi ứng viên đang nói</TableCell>
+                  <TableCell><Chip label="Bắt buộc" size="small" color="primary" sx={{ height: 20, fontSize: '0.7rem' }} /></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700, color: 'primary.main' }}>thinking.webp</TableCell>
+                  <TableCell>Trạng thái AI phân tích và chấm điểm dữ liệu câu trả lời</TableCell>
+                  <TableCell><Chip label="Bắt buộc" size="small" color="primary" sx={{ height: 20, fontSize: '0.7rem' }} /></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700, color: 'primary.main' }}>processing.webp</TableCell>
+                  <TableCell>Trạng thái trích xuất báo cáo đánh giá năng lực</TableCell>
+                  <TableCell><Chip label="Bắt buộc" size="small" color="primary" sx={{ height: 20, fontSize: '0.7rem' }} /></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700, color: 'primary.main' }}>speaking_01.webp đến 08</TableCell>
+                  <TableCell>Chuỗi 8 khung hình chuyển động nhép môi tự nhiên khớp với giọng đọc</TableCell>
+                  <TableCell><Chip label="Bắt buộc" size="small" color="primary" sx={{ height: 20, fontSize: '0.7rem' }} /></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700, color: '#475569' }}>blink.webp</TableCell>
+                  <TableCell>Cử động chớp mắt tự nhiên mỗi 4 giây chống đứng hình</TableCell>
+                  <TableCell><Chip label="Khuyên dùng" size="small" variant="outlined" sx={{ height: 20, fontSize: '0.7rem' }} /></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700, color: '#475569' }}>agree.webp</TableCell>
+                  <TableCell>Gật đầu khích lệ khi ứng viên trả lời tốt</TableCell>
+                  <TableCell><Chip label="Tùy chọn" size="small" variant="outlined" sx={{ height: 20, fontSize: '0.7rem' }} /></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700, color: '#475569' }}>serious.webp</TableCell>
+                  <TableCell>Biểu cảm tập trung cao độ đánh giá câu hỏi kỹ thuật</TableCell>
+                  <TableCell><Chip label="Tùy chọn" size="small" variant="outlined" sx={{ height: 20, fontSize: '0.7rem' }} /></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700, color: '#475569' }}>goodbye.webp</TableCell>
+                  <TableCell>Biểu cảm mỉm cười chào kết thúc buổi phỏng vấn</TableCell>
+                  <TableCell><Chip label="Tùy chọn" size="small" variant="outlined" sx={{ height: 20, fontSize: '0.7rem' }} /></TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 1 }}>
+            Gợi ý: Nhà tuyển dụng có thể tải trực tiếp Gói mẫu chuẩn bao gồm tệp cấu hình manifest mẫu và 22 trạng thái biểu cảm sẵn có để làm tư liệu tham khảo cho đội ngũ thiết kế.
+          </Typography>
+        </DialogContent>
+
+        <DialogActions sx={{ p: 2 }}>
+          <Button
+            component="a"
+            href="/downloads/ai-avatar-sample-pack.zip"
+            download="ai-avatar-sample-pack.zip"
+            variant="contained"
+            color="primary"
+            startIcon={<DownloadOutlinedIcon />}
+            sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
+          >
+            Tải gói mẫu chuẩn về máy
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => setGuideOpen(false)}
+            sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
+          >
+            Đóng hướng dẫn
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
