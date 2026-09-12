@@ -199,6 +199,7 @@ const nextConfig = {
       { source: '/nha-tuyen-dung/danh-sach-phong-van/:id/edit', destination: '/employer/interviews/:id/edit' },
       { source: '/nha-tuyen-dung/ngan-hang-cau-hoi', destination: '/employer/question-bank' },
       { source: '/nha-tuyen-dung/bo-cau-hoi', destination: '/employer/question-groups' },
+      { source: '/nha-tuyen-dung/cai-dat-ai', destination: '/employer/ai-settings' },
       { source: '/nha-tuyen-dung/xac-thuc-nha-tuyen-dung', destination: '/employer/verification' },
       { source: '/nha-tuyen-dung/phong-van-ung-vien-truc-tiep', destination: '/employer/interviews/live' },
       { source: '/nha-tuyen-dung/phong-van-truc-tiep/:id', destination: '/employer/interviews/:id' },
