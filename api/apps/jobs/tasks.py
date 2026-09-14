@@ -924,9 +924,43 @@ def analyze_resume_ai(self, activity_id):
         resume = activity.resume
         manual_profile = activity.manual_candidate_profile
         if not resume and not manual_profile:
+            if activity.user:
+                from apps.profiles.models import Resume
+                candidate_resume = Resume.objects.filter(user=activity.user).order_by('-create_at').first()
+                if candidate_resume:
+                    activity.resume = candidate_resume
+                    activity.save(update_fields=['resume', 'update_at'])
+                    resume = candidate_resume
+
+        resume_text = ""
+        if not resume and not manual_profile:
+            try:
+                from apps.interviews.models import InterviewSession
+                session = (
+                    InterviewSession.objects
+                    .filter(candidate=activity.user, job_post=activity.job_post)
+                    .order_by('-create_at')
+                    .first()
+                ) if activity.user and activity.job_post else None
+
+                if session and session.transcripts.exists():
+                    tx_snippets = [
+                        f"{t.speaker_role}: {t.content}"
+                        for t in session.transcripts.order_by('created_at')[:10]
+                    ]
+                    resume_text = (
+                        f"Candidate Name: {activity.full_name or (activity.user.full_name if activity.user else '')}\n"
+                        f"Candidate Email: {activity.email or (activity.user.email if activity.user else '')}\n"
+                        f"Interview Session Summary: {session.ai_summary or ''}\n"
+                        f"Interview Q&A:\n" + "\n".join(tx_snippets)
+                    )
+            except Exception as sess_err:
+                logger.warning("Could not build interview transcript text: %s", sess_err)
+
+        if not resume and not manual_profile and not resume_text:
             activity.ai_analysis_status = 'failed'
             activity.ai_analysis_progress = 0
-            activity.ai_analysis_summary = "Khong tim thay ho so ung vien de phan tich."
+            activity.ai_analysis_summary = "Không tìm thấy tệp CV hoặc thông tin hồ sơ ứng viên để thực hiện phân tích."
             activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
             return
 
@@ -1020,7 +1054,7 @@ def analyze_resume_ai(self, activity_id):
         if not resume_text or len(resume_text.strip()) < 50:
             activity.ai_analysis_status = 'failed'
             activity.ai_analysis_progress = 0
-            activity.ai_analysis_summary = "Khong the doc duoc noi dung CV hoac ho so truc tuyen."
+            activity.ai_analysis_summary = "Không thể đọc được nội dung tệp CV hoặc thông tin hồ sơ trực tuyến của ứng viên."
             activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
             return
 
@@ -1267,9 +1301,8 @@ def analyze_resume_ai(self, activity_id):
         if (self.request.retries or 0) >= max_r:
             try:
                 act = JobPostActivity.objects.get(id=activity_id)
-                act.ai_analysis_status = 'failed'
-                act.ai_analysis_progress = 0
-                act.ai_analysis_summary = f"LLM khong phan hoi sau nhieu lan thu: {str(exc)[:300]}"
+                err_text = str(exc)[:300]
+                act.ai_analysis_summary = f"Mô hình AI không phản hồi sau nhiều lần thử: {err_text}"
                 act.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
             except Exception:
                 logger.error("Failed to update activity %s after final retry", activity_id)

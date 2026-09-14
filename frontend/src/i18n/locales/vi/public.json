@@ -193,7 +193,16 @@
     "searchPlaceholder": "Nhập tên công ty hoặc lĩnh vực cần tìm kiếm",
     "allCities": "Tất cả tỉnh thành",
     "searchButton": "Tìm kiếm",
-    "resetFiltersAria": "Đặt lại bộ lọc tìm công ty"
+    "resetFiltersAria": "Đặt lại bộ lọc tìm công ty",
+    "openFiltersAria": "Mở bộ lọc tìm công ty",
+    "filterDrawerTitle": "Bộ lọc nâng cao",
+    "filterLocation": "Địa điểm / Tỉnh thành",
+    "filterEmployeeSize": "Quy mô nhân sự",
+    "allEmployeeSizes": "Tất cả quy mô nhân sự",
+    "applyFilters": "Áp dụng",
+    "resetFilters": "Xóa bộ lọc",
+    "activeFilters": "Đang lọc",
+    "clearAll": "Xóa tất cả"
   },
   "jobsByCategoryPage": {
     "careerTitle": "Việc làm theo ngành nghề",

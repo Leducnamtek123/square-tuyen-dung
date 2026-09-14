@@ -4,6 +4,7 @@ export type AIActionType =
   | 'generate'
   | 'improve'
   | 'fix_spelling'
+  | 'format_bullets'
   | 'shorten'
   | 'expand'
   | 'change_tone'
@@ -30,6 +31,7 @@ export interface AIGenerateOptions {
   userPrompt?: string;
   tone?: AITone;
   length?: AILength;
+  jobTitle?: string;
 }
 
 const TONE_INSTRUCTIONS: Record<AITone, string> = {
@@ -45,11 +47,27 @@ const LENGTH_INSTRUCTIONS: Record<AILength, string> = {
   detailed: 'Trình bày chi tiết, toàn diện (500 - 800 từ), phân tách rõ ràng từng đề mục với luận điểm, ví dụ và cam kết.',
 };
 
+// Helper to repair double-encoded UTF-8 or mojibake in Vietnamese text if encountered
+export const fixMojibake = (text: string): string => {
+  if (!text) return '';
+  if (/[\u00C2\u00C3\u00E1][\u0080-\u00BF]/.test(text)) {
+    try {
+      const fixed = decodeURIComponent(escape(text));
+      if (fixed && fixed.length > 0) {
+        return fixed;
+      }
+    } catch {
+      // ignore fallback
+    }
+  }
+  return text;
+};
+
 // Convert plain text or markdown to clean HTML
 export const formatAITextToHTML = (text: string): string => {
   if (!text) return '';
 
-  let html = text.trim();
+  let html = fixMojibake(text).trim();
 
   // If already full HTML, return sanitized
   if (html.includes('<p>') || html.includes('<div>') || html.includes('<h3>')) {
@@ -222,6 +240,64 @@ const getLocalSmartResponse = (options: AIGenerateOptions): string => {
     }
   }
 
+  // Format into clean bullet points list (like Square recruitment standard)
+  if (action === 'format_bullets') {
+    if (contentType === 'benefits') {
+      return `<ul>
+  <li>Chính sách thưởng P3 theo quy định của công ty</li>
+  <li>Thai sản dành cho CBNV</li>
+  <li>Chính sách nghỉ du lịch trong năm</li>
+  <li>Người thân tham gia vui chơi cùng Square</li>
+  <li>Tham gia 8 sự kiện lớn theo Vòng lặp truyền thông sự kiện trong năm SQUARE</li>
+  <li><strong>Thời gian làm việc:</strong></li>
+  <li>Thứ 2 đến Thứ 6: 8h00 – 17h30</li>
+  <li>Thứ 7: Từ 8h00 – 12h00 (theo tính chất công việc hoặc dự án).</li>
+  <li><strong>Trang thiết bị/ môi trường:</strong> Máy tính và VPP phục vụ công việc, Đồng phục Thi công</li>
+</ul>`;
+    }
+
+    if (contentType === 'job_desc') {
+      return `<ul>
+  <li><strong>Lập kế hoạch & triển khai:</strong> Xây dựng và thực hiện kế hoạch công việc chi tiết theo định hướng của dự án.</li>
+  <li><strong>Quản lý chất lượng & tiến độ:</strong> Đảm bảo hoàn thành đúng thời hạn và đáp ứng các tiêu chuẩn chuyên môn cao nhất.</li>
+  <li><strong>Phối hợp liên chức năng:</strong> Hợp tác chặt chẽ cùng các phòng ban liên quan để giải quyết nhanh chóng các phát sinh.</li>
+  <li><strong>Nghiên cứu & đổi mới:</strong> Cập nhật xu hướng công nghệ / thị trường để cải tiến quy trình và sản phẩm.</li>
+  <li><strong>Báo cáo định kỳ:</strong> Thực hiện báo cáo tiến độ và đề xuất giải pháp tối ưu hiệu suất công việc.</li>
+</ul>`;
+    }
+
+    if (contentType === 'job_req') {
+      return `<ul>
+  <li><strong>Trình độ chuyên môn:</strong> Tốt nghiệp Cao đẳng/Đại học chuyên ngành liên quan hoặc có từ 1 - 3 năm kinh nghiệm làm việc thực tế.</li>
+  <li><strong>Kỹ năng nghiệp vụ:</strong> Nắm vững các công cụ và quy trình làm việc chuẩn trong lĩnh vực phụ trách.</li>
+  <li><strong>Kỹ năng mềm:</strong> Khả năng giao tiếp rõ ràng, tư duy phản biện và phối hợp nhóm hiệu quả.</li>
+  <li><strong>Thái độ & Trách nhiệm:</strong> Chủ động, cẩn thận, có tinh thần trách nhiệm cao và sẵn sàng học hỏi điều mới.</li>
+</ul>`;
+    }
+
+    // Generic bullets from existing content
+    const cleaned = currentContent.replace(/<[^>]*>?/gm, '\n').trim();
+    const lines = cleaned.split(/\n+/).map((l) => l.trim()).filter((l) => l.length > 2);
+    if (lines.length > 0) {
+      const items = lines.map((line) => {
+        const colonIdx = line.indexOf(':');
+        if (colonIdx > 0 && colonIdx < 35) {
+          const prefix = line.substring(0, colonIdx);
+          const rest = line.substring(colonIdx);
+          return `  <li><strong>${prefix}</strong>${rest}</li>`;
+        }
+        return `  <li>${line.replace(/^[-*•]\s*/, '')}</li>`;
+      });
+      return `<ul>\n${items.join('\n')}\n</ul>`;
+    }
+
+    return `<ul>
+  <li><strong>Nhiệm vụ 1:</strong> Phối hợp cùng các bộ phận triển khai kế hoạch mục tiêu đã đề ra.</li>
+  <li><strong>Nhiệm vụ 2:</strong> Kiểm soát chất lượng và xử lý các vấn đề phát sinh trong phạm vi công việc.</li>
+  <li><strong>Nhiệm vụ 3:</strong> Tham gia các buổi họp và đề xuất phương án tối ưu năng suất lao động.</li>
+</ul>`;
+  }
+
   // Fallback for rewrite / improve
   if (action === 'fix_spelling' || action === 'improve') {
     const cleaned = currentContent.replace(/<[^>]*>?/gm, ' ').trim();
@@ -248,7 +324,7 @@ const getLocalSmartResponse = (options: AIGenerateOptions): string => {
 };
 
 export const generateWithAI = async (options: AIGenerateOptions): Promise<string> => {
-  const { action, contentType = 'general', currentContent = '', userPrompt = '', tone = 'professional', length = 'medium' } = options;
+  const { action, contentType = 'general', currentContent = '', userPrompt = '', tone = 'professional', length = 'medium', jobTitle = '' } = options;
 
   const toneRule = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.professional;
   const lengthRule = LENGTH_INSTRUCTIONS[length] || LENGTH_INSTRUCTIONS.medium;
@@ -264,8 +340,18 @@ QUY TẮC BẮT BUỘC:
   let requestMessage = '';
 
   switch (action) {
+    case 'format_bullets':
+      requestMessage = `Hãy định dạng lại đoạn văn bản sau đây thành danh sách gạch đầu dòng (bullet points <ul><li>) chuẩn mực, đẹp mắt và rõ ràng như mẫu tin tuyển dụng chuyên nghiệp.
+Đối với các mục chính, hãy in đậm cụm từ tiêu đề ở đầu gạch đầu dòng bằng thẻ <strong> (ví dụ: <li><strong>Thời gian làm việc:</strong> Thứ 2 đến Thứ 6: 8h00 - 17h30</li> hoặc <li><strong>Chính sách thưởng P3:</strong> theo quy định công ty</li>).
+${jobTitle ? `Chức danh công việc: "${jobTitle}"` : ''}
+---
+${currentContent || (jobTitle ? `Tạo danh sách chuẩn cho phần: ${contentType} của vị trí ${jobTitle}` : '')}
+---`;
+      break;
+
     case 'generate':
       requestMessage = `Hãy viết một bài viết hoàn chỉnh cho phần: "${contentType}".
+${jobTitle ? `Chức danh công việc: "${jobTitle}". Hãy viết nội dung phù hợp nhất với vị trí này.` : ''}
 Yêu cầu cụ thể của người dùng: "${userPrompt || 'Tạo nội dung chuyên nghiệp, đầy đủ bố cục tiêu chuẩn'}".`;
       break;
 

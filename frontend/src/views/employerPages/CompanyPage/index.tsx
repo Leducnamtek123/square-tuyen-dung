@@ -5,6 +5,7 @@ import { TabTitle } from '@/utils/generalFunction';
 import CompanyCard from '@/views/components/employers/CompanyCard';
 import CompanyImageCard from '@/views/components/employers/CompanyImageCard';
 import CompanyTeamCard from '@/views/components/employers/CompanyTeamCard';
+import CompanyEvaluationWeightsCard from '@/views/components/employers/CompanyEvaluationWeightsCard';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { useTranslation } from 'react-i18next';
 
@@ -52,6 +53,7 @@ const CompanyPage = () => {
                         <Tab label={t("company.tabs.info")} value="0" />
                         <Tab label={t("company.tabs.multimedia")} value="1" />
                         <Tab label={t("company.tabs.team")} value="2" />
+                        <Tab label="Trọng số văn hóa" value="3" />
                     </TabList>
                 </Box>
                 <TabPanel value="0" sx={{ px: 0, pt: 3, pb: 0 }}>
@@ -66,6 +68,9 @@ const CompanyPage = () => {
                 </TabPanel>
                 <TabPanel value="2" sx={{ px: 0, pt: 3, pb: 0 }}>
                     <CompanyTeamCard />
+                </TabPanel>
+                <TabPanel value="3" sx={{ px: 0, pt: 3, pb: 0 }}>
+                    <CompanyEvaluationWeightsCard />
                 </TabPanel>
             </TabContext>
         </Box>

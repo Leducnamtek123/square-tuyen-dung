@@ -158,7 +158,21 @@
       },
       "deleteTitle": "Delete Question",
       "noData": "No questions yet",
-      "hint": "Create questions to use in interviews"
+      "hint": "Create questions to use in interviews",
+      "categoryLabel": "Question Category",
+      "difficultyLabel": "Evaluation Level",
+      "durationLabel": "Estimated Duration",
+      "categories": {
+        "technical": "Technical",
+        "situational": "Situational",
+        "culture": "Culture & Motivation",
+        "general": "General"
+      },
+      "difficulties": {
+        "easy": "Basic",
+        "medium": "Standard",
+        "hard": "Advanced"
+      }
     }
   },
   "interviewListCard": {

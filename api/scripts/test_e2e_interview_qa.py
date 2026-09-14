@@ -245,7 +245,35 @@ def run_official_interview_test():
         candidate_user.save()
     print(f"[3] Ứng viên ảo nộp hồ sơ: {candidate_user.full_name} — email: {candidate_user.email}")
 
-    # 4. JobPostActivity Pipeline
+    # 4. JobPostActivity Pipeline & Resume
+    from apps.profiles.models import Resume, JobSeekerProfile
+    from apps.common.models import File
+    from django.utils import timezone
+    jsp, _ = JobSeekerProfile.objects.get_or_create(user=candidate_user)
+    candidate_resume = Resume.objects.filter(user=candidate_user).first()
+    if not candidate_resume:
+        existing_file = File.objects.filter(file_type='CV', format='pdf').first()
+        f_entry = None
+        if existing_file:
+            f_entry = File.objects.create(
+                public_id=existing_file.public_id,
+                version=existing_file.version,
+                format=existing_file.format,
+                resource_type=existing_file.resource_type,
+                file_type=existing_file.file_type,
+                metadata=existing_file.metadata,
+                uploaded_at=timezone.now(),
+            )
+        candidate_resume = Resume.objects.create(
+            user=candidate_user,
+            job_seeker_profile=jsp,
+            title="Kỹ sư Giám sát công trình",
+            description="Kỹ sư Giám sát công trình xây dựng và nội thất với 4 năm kinh nghiệm thực tế.",
+            skills_summary="Giám sát thi công, quản lý nhà thầu phụ, tiến độ Gantt, an toàn lao động, kiểm soát chất lượng QA/QC",
+            file=f_entry,
+            is_active=True,
+        )
+
     activity, act_created = JobPostActivity.objects.get_or_create(
         user=candidate_user,
         job_post=job_post,
@@ -253,9 +281,12 @@ def run_official_interview_test():
             "status": ApplicationStatus.PENDING_CONFIRMATION,
             "full_name": candidate_user.full_name,
             "email": candidate_user.email,
+            "resume": candidate_resume,
         }
     )
     activity.status = ApplicationStatus.PENDING_CONFIRMATION
+    if not activity.resume and candidate_resume:
+        activity.resume = candidate_resume
     activity.save()
     print(f"[4] Hồ sơ ứng tuyển ban đầu: Trạng thái pipeline={activity.status}")
 

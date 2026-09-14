@@ -15,6 +15,7 @@ interface InterviewAvatarProps {
   isSpeakingHint?: boolean;
   sessionStatus?: string;
   interviewerName?: string;
+  avatarId?: string;
   avatarImageUrl?: string | null;
   avatarBackgroundUrl?: string | null;
   avatarBackdrop?: string | null;
@@ -32,12 +33,23 @@ export function InterviewAvatar({
   isSpeakingHint = false,
   sessionStatus,
   interviewerName = 'Trợ lý AI AILA',
+  avatarId,
   avatarImageUrl,
   avatarBackgroundUrl,
   avatarBackdrop = 'modern_office',
   className = '',
 }: InterviewAvatarProps) {
+  const isCustomUploadedImage = Boolean(
+    avatarImageUrl &&
+    !avatarImageUrl.includes('/assets/images/avatar/') &&
+    avatarId !== 'expert_male' &&
+    avatarId !== 'aila_recruiter'
+  );
+
+  const effectiveAvatarId = avatarId || (avatarImageUrl?.includes('expert_male') ? 'expert_male' : 'aila_recruiter');
+
   const { state, assetSrc, isSpeaking } = useAvatarState({
+    avatarId: effectiveAvatarId,
     voiceAssistantState,
     isSpeaking: isSpeakingHint,
     sessionStatus,
@@ -57,7 +69,7 @@ export function InterviewAvatar({
     const bgUrl = avatarBackgroundUrl || defaultOfficeBg;
 
     return {
-      backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.04), rgba(15, 23, 42, 0.14)), url("${bgUrl}")`,
+      backgroundImage: `url("${bgUrl}")`,
       backgroundSize: 'cover',
       backgroundPosition: 'center 40%',
       backgroundColor: '#0f172a',
@@ -78,7 +90,7 @@ export function InterviewAvatar({
         height: '100%',
         overflow: 'hidden',
         borderRadius: '16px',
-        ...studioBg,
+        backgroundColor: '#0f172a',
         border: '1px solid',
         borderColor: isSpeaking ? '#0ea5e9' : '#e2e8f0',
         boxShadow: isSpeaking
@@ -88,27 +100,18 @@ export function InterviewAvatar({
       }}
       className={className}
     >
-      {/* Subtle Studio Ambient Lighting to make character pop from background */}
+      {/* Studio Background Layer */}
       <Box
         sx={{
           position: 'absolute',
-          top: '38%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '75%',
-          height: '68%',
-          borderRadius: '50%',
-          background: isSpeaking
-            ? 'radial-gradient(circle, rgba(14, 165, 233, 0.22) 0%, rgba(99, 102, 241, 0.08) 50%, transparent 75%)'
-            : 'radial-gradient(circle, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.1) 50%, transparent 75%)',
+          inset: 0,
+          ...studioBg,
           pointerEvents: 'none',
-          filter: 'blur(28px)',
-          zIndex: 4,
-          transition: 'background 0.4s ease',
+          zIndex: 1,
         }}
       />
 
-      {/* Main Avatar Character Frame with GPU Breathing Animation */}
+      {/* Main Avatar Character Frame */}
       <Box
         sx={{
           position: 'absolute',
@@ -116,26 +119,26 @@ export function InterviewAvatar({
           left: '50%',
           transform: 'translateX(-50%)',
           width: '100%',
-          height: { xs: '86%', sm: '82%', md: '78%', lg: '76%' },
-          maxHeight: { xs: '86%', sm: '82%', md: '78%', lg: '76%' },
+          height: { xs: '88%', sm: '85%', md: '82%', lg: '80%' },
+          maxHeight: { xs: '88%', sm: '85%', md: '82%', lg: '80%' },
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'center',
           zIndex: 10,
           '@keyframes avatarBreathing': {
-            '0%': { transform: 'translateX(-50%) translateY(0px) scale(1)' },
-            '50%': { transform: 'translateX(-50%) translateY(-2.5px) scale(1.008)' },
-            '100%': { transform: 'translateX(-50%) translateY(0px) scale(1)' },
+            '0%': { transform: 'translateX(-50%) translateY(0px)' },
+            '50%': { transform: 'translateX(-50%) translateY(-1.5px)' },
+            '100%': { transform: 'translateX(-50%) translateY(0px)' },
           },
           animation: isSpeaking
-            ? 'avatarBreathing 2.4s ease-in-out infinite'
-            : 'avatarBreathing 4s ease-in-out infinite',
+            ? 'avatarBreathing 2.6s ease-in-out infinite'
+            : 'avatarBreathing 4.5s ease-in-out infinite',
           '@media (prefers-reduced-motion: reduce)': {
             animation: 'none',
           },
         }}
       >
-        {avatarImageUrl ? (
+        {isCustomUploadedImage && avatarImageUrl ? (
           <Box
             component="img"
             src={avatarImageUrl}
@@ -145,13 +148,13 @@ export function InterviewAvatar({
               height: '100%',
               objectFit: 'contain',
               objectPosition: 'bottom center',
-              filter: 'drop-shadow(0 10px 24px rgba(15, 23, 42, 0.12))',
               userSelect: 'none',
               pointerEvents: 'none',
             }}
           />
         ) : (
           <AvatarImage
+            avatarId={effectiveAvatarId}
             src={assetSrc}
             state={state}
             alt={`${interviewerName} - ${meta.labelVi}`}

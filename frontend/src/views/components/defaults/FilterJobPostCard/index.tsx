@@ -382,7 +382,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
 
   return (
     <Box id="filter-job-post-card" sx={{ width: '100%' }}>
-      {/* ── Section Header Row ───────────────────────────────────────── */}
+      {/* -- Section Header Row ----------------------------------------- */}
       {!hideHeader && (
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5 }}>
           <Stack direction="row" spacing={1} alignItems="center">
@@ -401,7 +401,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
         </Stack>
       )}
 
-      {/* ── Filter Bar (Filter Mode dropdown + Scrollable Sub-item Pills) ───── */}
+      {/* -- Filter Bar (Filter Mode dropdown + Scrollable Sub-item Pills) ----- */}
       {!hideFilterBar && (
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
@@ -565,7 +565,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
         </Stack>
       )}
 
-      {/* ── Cards Grid (3 Columns or 1 Column in compact mode) ─────── */}
+      {/* -- Cards Grid (3 Columns or 1 Column in compact mode) ------- */}
       {isLoading && !data ? (
         <Grid container spacing={2.5}>
           {Array.from(Array(compact ? 6 : 9).keys()).map((i) => (
@@ -771,7 +771,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
             })}
           </Grid>
 
-          {/* ── Bottom Circular Pagination ──────────────────────────────────── */}
+          {/* -- Bottom Circular Pagination ------------------------------------ */}
           <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ mt: 4 }}>
             <IconButton
               aria-label="Trang trước"

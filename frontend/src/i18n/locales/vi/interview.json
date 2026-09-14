@@ -158,7 +158,21 @@
       },
       "deleteTitle": "Xóa câu hỏi",
       "noData": "Chưa có câu hỏi nào",
-      "hint": "Tạo câu hỏi để sử dụng trong phỏng vấn"
+      "hint": "Tạo câu hỏi để sử dụng trong phỏng vấn",
+      "categoryLabel": "Phân loại câu hỏi",
+      "difficultyLabel": "Mức độ đánh giá",
+      "durationLabel": "Thời lượng dự kiến",
+      "categories": {
+        "technical": "Chuyên môn",
+        "situational": "Tình huống",
+        "culture": "Văn hóa & Động lực",
+        "general": "Tổng quát"
+      },
+      "difficulties": {
+        "easy": "Cơ bản",
+        "medium": "Tiêu chuẩn",
+        "hard": "Nâng cao"
+      }
     }
   },
   "interviewListCard": {

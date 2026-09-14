@@ -64,7 +64,7 @@ export const LegalPolicyViewer: React.FC<Props> = ({ slug, portal = 'jobseeker' 
       }}
     >
       <Container maxWidth="lg">
-        {/* ── Breadcrumbs ── */}
+        {/* -- Breadcrumbs -- */}
         <Breadcrumbs
           separator={<NavigateNextIcon fontSize="small" sx={{ color: '#94a3b8' }} />}
           aria-label="breadcrumb"
@@ -92,7 +92,7 @@ export const LegalPolicyViewer: React.FC<Props> = ({ slug, portal = 'jobseeker' 
           </Typography>
         </Breadcrumbs>
 
-        {/* ── Main Document Container (Clean Vieclam24h Format) ── */}
+        {/* -- Main Document Container (Clean Vieclam24h Format) -- */}
         <Paper
           elevation={0}
           sx={{

@@ -39,7 +39,7 @@ const CareerHandbookSection = () => {
 
   return (
     <Box sx={{ width: '100%', mt: 8, mb: 4 }}>
-      {/* ── Section Title ─────────────────────────────────────────────── */}
+      {/* -- Section Title ----------------------------------------------- */}
       <Stack spacing={1} sx={{ mb: 4, textAlign: 'center', alignItems: 'center' }}>
         <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.01em' }}>
           {t('news.sectionTitle', 'Tin tức & Thông tin')}
@@ -49,7 +49,7 @@ const CareerHandbookSection = () => {
         </Typography>
       </Stack>
 
-      {/* ── Articles Grid (3 Columns) ─────────────────────────────────── */}
+      {/* -- Articles Grid (3 Columns) ----------------------------------- */}
       {isLoading ? (
         <Grid container spacing={3}>
           {Array.from(Array(3).keys()).map((i) => (
@@ -167,7 +167,7 @@ const CareerHandbookSection = () => {
         </Grid>
       )}
 
-      {/* ── Bottom Button ─────────────────────────────────────────────── */}
+      {/* -- Bottom Button ----------------------------------------------- */}
       <Stack direction="row" justifyContent="center" sx={{ mt: 4 }}>
         <Button
           component={Link}

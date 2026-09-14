@@ -411,7 +411,7 @@ const JobPostSearch = () => {
         </Grid>
       </Card>
 
-      {/* ── Active Filters Chips Bar ────────────────────────────────────────── */}
+      {/* -- Active Filters Chips Bar ------------------------------------------ */}
       {activeAdvancedFilterCount > 0 && (
         <Box
           sx={{
@@ -535,7 +535,7 @@ const JobPostSearch = () => {
         </Box>
       )}
 
-      {/* ── Advanced Filters Drawer ────────────────────────────────────────── */}
+      {/* -- Advanced Filters Drawer ------------------------------------------ */}
       <JobPostSearchAdvancedFilters
         open={showAdvanceFilter}
         t={t}

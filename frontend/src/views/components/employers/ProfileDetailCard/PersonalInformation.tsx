@@ -92,7 +92,7 @@ export const PersonalInformation: React.FC<PersonalInformationProps> = ({ profil
     const bDate = dayjs(rawBirthday);
     if (bDate.isValid()) {
       const age = dayjs().diff(bDate, 'year');
-      birthdayFormatted = `${bDate.format('DD/MM/YYYY')} (${age} tuổi)`;
+      birthdayFormatted = `${bDate.format('DD/MM/YYYY')} - ${age} tuổi`;
     }
   }
 

@@ -307,7 +307,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
         minHeight: { md: 620 },
       }}
     >
-      {/* ── Left Column: Branded InfoHR Half (Refined Dark Slate Navy) ── */}
+      {/* -- Left Column: Branded InfoHR Half (Refined Dark Slate Navy) -- */}
       <Box
         sx={{
           width: { xs: '100%', md: '40%' },
@@ -637,7 +637,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
         </Box>
       </Box>
 
-      {/* ── Right Column: Clean White Hardware & Testing Half ─────── */}
+      {/* -- Right Column: Clean White Hardware & Testing Half ------- */}
       <Box
         sx={{
           flex: 1,

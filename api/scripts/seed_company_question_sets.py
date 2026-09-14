@@ -37,60 +37,9 @@ def run():
             is_verified=True,
         )
 
-    from apps.accounts.models import User
+    # All Question Sets are tied to the single flagship company: Square Construction & Design
+    # (Square Group encompasses Architecture, Interior, Engineering, Technology, and Business divisions)
 
-    def get_or_create_employer(email, full_name):
-        user, _ = User.objects.get_or_create(
-            email=email,
-            defaults={"full_name": full_name, "role_name": "employer"}
-        )
-        return user
-
-    user_it = get_or_create_employer("tech.recruitment@square.vn", "Bộ phận Tuyển dụng Square AI Tech")
-    user_studio = get_or_create_employer("studio.recruitment@square.vn", "Ban Thiết kế Square Studio")
-    user_corp = get_or_create_employer("corp.recruitment@square.vn", "Khối Nhân tài Square Corporation")
-
-    company_it, _ = Company.objects.get_or_create(
-        slug="square-ai-tech",
-        defaults={
-            "company_name": "Square AI Technology",
-            "company_email": "tech@square.vn",
-            "company_phone": "0901000001",
-            "tax_code": "0316000001",
-            "field_operation": "Trí tuệ nhân tạo và Phần mềm doanh nghiệp",
-            "employee_size": 120,
-            "is_verified": True,
-            "user": user_it,
-        }
-    )
-
-    company_studio, _ = Company.objects.get_or_create(
-        slug="square-studio-architecture",
-        defaults={
-            "company_name": "Square Studio Architecture & Interior",
-            "company_email": "studio@square.vn",
-            "company_phone": "0901000002",
-            "tax_code": "0316000002",
-            "field_operation": "Thiết kế Kiến trúc và Nội thất cao cấp",
-            "employee_size": 45,
-            "is_verified": True,
-            "user": user_studio,
-        }
-    )
-
-    company_corp, _ = Company.objects.get_or_create(
-        slug="square-global-corp",
-        defaults={
-            "company_name": "Square Global Corporation",
-            "company_email": "corp@square.vn",
-            "company_phone": "0901000003",
-            "tax_code": "0316000003",
-            "field_operation": "Đầu tư và Phát triển Dự án Thương mại",
-            "employee_size": 350,
-            "is_verified": True,
-            "user": user_corp,
-        }
-    )
 
     # 3. Create Questions & Group 1: Xây dựng & Giám sát (Square Construction)
     q1_data = [
@@ -205,7 +154,7 @@ def run():
             "text": "Bạn thiết kế kiến trúc hệ thống như thế nào để đảm bảo khả năng chịu tải hàng trăm nghìn người dùng đồng thời?",
             "category": "technical",
             "career": career_it,
-            "company": company_it,
+            "company": company_xd,
             "default_duration_seconds": 150,
             "interviewer_intent": "Đánh giá tư duy thiết kế hệ thống, microservices, caching đa tầng và cân bằng tải.",
             "answer_structure": {
@@ -222,7 +171,7 @@ def run():
             "text": "Khi hệ thống gặp lỗi nghiêm trọng trên môi trường Production, quy trình xử lý sự cố của bạn gồm những bước nào?",
             "category": "situational",
             "career": career_it,
-            "company": company_it,
+            "company": company_xd,
             "default_duration_seconds": 120,
             "interviewer_intent": "Đánh giá quy trình phản ứng nhanh, kỹ năng khoanh vùng lỗi và tư duy phục hồi dịch vụ.",
             "answer_structure": {
@@ -239,7 +188,7 @@ def run():
             "text": "Hãy giải thích sự khác biệt giữa SQL và NoSQL, và trường hợp thực tế nào bạn quyết định chọn mỗi loại?",
             "category": "technical",
             "career": career_it,
-            "company": company_it,
+            "company": company_xd,
             "default_duration_seconds": 120,
             "interviewer_intent": "Đánh giá nền tảng cơ sở dữ liệu, hiểu biết về tính toàn vẹn dữ liệu ACID và khả năng mở rộng."
         },
@@ -247,7 +196,7 @@ def run():
             "text": "Bạn xử lý thế nào khi có bất đồng kỹ thuật sâu sắc với Tech Lead hoặc đồng nghiệp về một giải pháp kiến trúc?",
             "category": "behavioral",
             "career": career_it,
-            "company": company_it,
+            "company": company_xd,
             "default_duration_seconds": 120,
             "interviewer_intent": "Đánh giá tinh thần cộng tác, lắng nghe và khả năng thuyết phục bằng dữ liệu thực tế."
         },
@@ -255,7 +204,7 @@ def run():
             "text": "Bạn làm thế nào để đảm bảo chất lượng code và bảo mật ứng dụng trước khi đưa lên môi trường thử nghiệm?",
             "category": "technical",
             "career": career_it,
-            "company": company_it,
+            "company": company_xd,
             "default_duration_seconds": 120,
             "interviewer_intent": "Kiểm tra quy trình CI CD, Unit Testing, Code Review và quét lỗ hổng bảo mật tự động."
         },
@@ -263,7 +212,7 @@ def run():
             "text": "Động lực nào thôi thúc bạn liên tục học hỏi các công nghệ mới và ứng dụng trí tuệ nhân tạo vào công việc?",
             "category": "culture_fit",
             "career": career_it,
-            "company": company_it,
+            "company": company_xd,
             "default_duration_seconds": 120,
             "interviewer_intent": "Đánh giá tinh thần cầu tiến, đam mê công nghệ và sự phù hợp với văn hóa đổi mới sáng tạo."
         }
@@ -283,7 +232,7 @@ def run():
         name="Bộ câu hỏi Tuyển dụng Kỹ sư Lập trình Full-stack & Cloud System",
         defaults={
             "description": "Bộ câu hỏi chuẩn kiểm tra tư duy kiến trúc phân tán, khả năng xử lý sự cố Production, tối ưu database và phong cách làm việc nhóm Agile.",
-            "company": company_it,
+            "company": company_xd,
         }
     )
     g2.questions.set(q_it_objs)
@@ -295,7 +244,7 @@ def run():
             "text": "Trình bày quy trình triển khai ý tưởng từ bản phác thảo concept ban đầu đến hồ sơ thiết kế kỹ thuật thi công.",
             "category": "technical",
             "career": career_nt,
-            "company": company_studio,
+            "company": company_xd,
             "default_duration_seconds": 150,
             "interviewer_intent": "Đánh giá tư duy không gian, quy trình sáng tạo và khả năng biến ý tưởng thành hồ sơ thi công thực tế."
         },
@@ -303,7 +252,7 @@ def run():
             "text": "Khi khách hàng khăng khăng đưa ra yêu cầu thẩm mỹ không hợp lý hoặc lỗi thời, bạn tư vấn và thuyết phục như thế nào?",
             "category": "situational",
             "career": career_nt,
-            "company": company_studio,
+            "company": company_xd,
             "default_duration_seconds": 120,
             "interviewer_intent": "Đánh giá sự khéo léo trong giao tiếp, thẩm mỹ chuyên nghiệp và khả năng bảo vệ ngôn ngữ thiết kế."
         },
@@ -311,7 +260,7 @@ def run():
             "text": "Bạn cập nhật xu hướng vật liệu mới và các giải pháp tiết kiệm năng lượng xanh vào đồ án thiết kế ra sao?",
             "category": "technical",
             "career": career_nt,
-            "company": company_studio,
+            "company": company_xd,
             "default_duration_seconds": 120,
             "interviewer_intent": "Đánh giá vốn hiểu biết về vật liệu kiến trúc, tính bền vững và sự am hiểu thị trường cao cấp."
         },
@@ -319,7 +268,7 @@ def run():
             "text": "Kể về một dự án thiết kế khiến bạn tự hào nhất và những thách thức kỹ thuật lớn nhất bạn đã giải quyết.",
             "category": "behavioral",
             "career": career_nt,
-            "company": company_studio,
+            "company": company_xd,
             "default_duration_seconds": 150,
             "interviewer_intent": "Khám phá phong cách cá nhân, đam mê nghề nghiệp và kinh nghiệm thực chiến."
         },
@@ -327,7 +276,7 @@ def run():
             "text": "Bạn phối hợp như thế nào với kỹ sư kết cấu và đội ngũ thi công nội thất để đảm bảo sản phẩm thực tế đúng bản vẽ?",
             "category": "situational",
             "career": career_nt,
-            "company": company_studio,
+            "company": company_xd,
             "default_duration_seconds": 120,
             "interviewer_intent": "Đánh giá khả năng bám sát công trường và tinh thần hợp tác liên ngành."
         }
@@ -347,7 +296,7 @@ def run():
         name="Bộ câu hỏi Tuyển dụng Kiến trúc sư Thiết kế & Diễn họa Không gian",
         defaults={
             "description": "Đánh giá chuyên sâu tư duy thẩm mỹ, năng lực triển khai concept thành hiện thực, am hiểu vật liệu cao cấp và kỹ năng tư vấn khách hàng.",
-            "company": company_studio,
+            "company": company_xd,
         }
     )
     g3.questions.set(q_studio_objs)
@@ -359,7 +308,7 @@ def run():
             "text": "Hãy chia sẻ chiến lược tiếp cận và phát triển mối quan hệ với các khách hàng doanh nghiệp lớn trong giai đoạn đầu.",
             "category": "technical",
             "career": career_kd,
-            "company": company_corp,
+            "company": company_xd,
             "default_duration_seconds": 120,
             "interviewer_intent": "Đánh giá tư duy phân tích thị trường, kỹ năng thấu hiểu chân dung khách hàng và phương pháp mở rộng mạng lưới B2B."
         },
@@ -367,7 +316,7 @@ def run():
             "text": "Khi khách hàng doanh nghiệp so sánh giá của công ty bạn đắt hơn đối thủ cạnh tranh 20 phần trăm, bạn đàm phán thế nào?",
             "category": "situational",
             "career": career_kd,
-            "company": company_corp,
+            "company": company_xd,
             "default_duration_seconds": 150,
             "interviewer_intent": "Đánh giá năng lực làm nổi bật giá trị cốt lõi, dịch vụ hậu mãi và nghệ thuật thương lượng giá trị thay vì giá cả."
         },
@@ -375,7 +324,7 @@ def run():
             "text": "Bạn xây dựng kế hoạch quản lý chỉ tiêu doanh số cá nhân và dự báo kết quả kinh doanh quý như thế nào?",
             "category": "technical",
             "career": career_kd,
-            "company": company_corp,
+            "company": company_xd,
             "default_duration_seconds": 120,
             "interviewer_intent": "Đánh giá kỹ năng lập kế hoạch, kỷ luật mục tiêu và khả năng quản trị phễu bán hàng."
         },
@@ -383,7 +332,7 @@ def run():
             "text": "Chia sẻ về một hợp đồng dự án bạn đã kiên trì theo đuổi và thuyết phục thành công sau nhiều lần bị từ chối.",
             "category": "behavioral",
             "career": career_kd,
-            "company": company_corp,
+            "company": company_xd,
             "default_duration_seconds": 150,
             "interviewer_intent": "Đánh giá sự bền bỉ, tính kiên trì và tư duy vượt qua trở ngại trong kinh doanh."
         },
@@ -391,7 +340,7 @@ def run():
             "text": "Theo bạn, điều gì tạo nên uy tín lâu dài của một chuyên viên phát triển dự án chuyên nghiệp đối với khách hàng?",
             "category": "culture_fit",
             "career": career_kd,
-            "company": company_corp,
+            "company": company_xd,
             "default_duration_seconds": 120,
             "interviewer_intent": "Đánh giá tính chính trực, tinh thần đồng hành cùng khách hàng và đạo đức nghề nghiệp."
         }
@@ -411,7 +360,7 @@ def run():
         name="Bộ câu hỏi Phỏng vấn Chuyên viên Kinh doanh B2B & Phát triển Dự án",
         defaults={
             "description": "Đánh giá kỹ năng thương thảo hợp đồng dự án, nghệ thuật làm nổi bật giá trị giải pháp, xử lý từ chối và xây dựng mối quan hệ khách hàng bền vững.",
-            "company": company_corp,
+            "company": company_xd,
         }
     )
     g4.questions.set(q_corp_objs)

@@ -8,6 +8,7 @@ from enum import Enum, auto
 from typing import Any
 
 import httpx
+import openai as openai_lib
 from livekit.agents import Agent, RunContext
 from livekit.agents.job import get_job_context
 from livekit.agents.llm import function_tool
@@ -16,12 +17,20 @@ from .backend_auth import auth_event_hook
 from .config import config
 from .interview_flow import (
     decide_next_action,
+    is_explicit_refusal_or_skip,
+    is_hostile_or_abusive,
     is_substantive_answer,
     parse_question_payload,
     redact_question_progress_labels,
     strip_punctuation_for_tts,
 )
-from .prompts import INTERVIEWER_INSTRUCTIONS
+from .prompts import (
+    INTERVIEWER_INSTRUCTIONS,
+    LANGUAGE_GREETINGS,
+    LANGUAGE_PROMPT_CONSTRAINTS,
+    LANGUAGE_CANDIDATE_QUESTION_PROMPTS,
+    LANGUAGE_CLOSINGS,
+)
 
 logger = logging.getLogger("interviewer")
 
@@ -113,7 +122,8 @@ _QUESTION_TRANSITIONS = (
 )
 
 _PROMPT_LEAK_PATTERNS = (
-    r"\b(?:bạn\s+)?hãy\s+trả\s+lời\s+theo\s+bối\s+cảnh,\s*vai\s+trò\s+của\s+bạn\s+và\s+kết\s+quả\s+cụ\s+thể\s+nếu\s+có\s+nhé\.?",
+    r"\bbạn\s+hãy\s+trả\s+lời\s+theo\s+bối\s+cảnh,\s*vai\s+trò\s+của\s+bạn\s+và\s+kết\s+quả\s+cụ\s+thể\s+nếu\s+có\s+nhé\.?",
+    r"\bhãy\s+trả\s+lời\s+theo\s+bối\s+cảnh,\s*vai\s+trò\s+của\s+bạn\s+và\s+kết\s+quả\s+cụ\s+thể\s+nếu\s+có\s+nhé\.?",
     r"\bvui\s+lòng\s+trình\s+bày\s+theo\s+mô\s+hình\s+star\.?",
     r"\btheo\s+mô\s+hình\s+star\.?",
 )
@@ -153,20 +163,72 @@ def _clean_question_for_candidate(question: str) -> str:
     return " ".join(text.split()).strip(" -:;")
 
 
-def _format_opening_greeting(candidate_name: str, job_title: str) -> str:
+def _format_opening_greeting(
+    candidate_name: str,
+    job_title: str,
+    language: str = "vi",
+    has_cv: bool = False,
+) -> str:
+    lang = (language or "vi").lower()
     name = candidate_name.strip()
-    if not name or name.lower() in {"ứng viên", "ung vien"}:
+    title = job_title.strip()
+    is_placeholder_name = not name or name.lower() in {"ứng viên", "ung vien", "candidate", "applicant"}
+    is_placeholder_title = not title or title.lower() in {"đang ứng tuyển", "dang ung tuyen", "applicant"}
+
+    if lang == "en":
+        cand = f" {name}" if not is_placeholder_name else ""
+        if has_cv:
+            if not is_placeholder_title:
+                return f"Hello{cand}, I am your interviewer from Square for the {title} position. I have thoroughly reviewed your CV and look forward to our discussion. Before we begin, can you hear me clearly?"
+            return f"Hello{cand}, I am your interviewer from Square. I have thoroughly reviewed your CV and look forward to our discussion. Before we begin, can you hear me clearly?"
+        if not is_placeholder_title:
+            return f"Hello{cand}, I am your interviewer from Square for the {title} position. Before we begin, can you hear me clearly?"
+        return f"Hello{cand}, I am your interviewer from Square. Before we begin, can you hear me clearly?"
+
+    if lang == "ja":
+        cand = f"{name}様、" if not is_placeholder_name else ""
+        if has_cv:
+            if not is_placeholder_title:
+                return f"こんにちは。{cand}本日は{title}ポジションの面接を担当いたします、Squareの採用担当です。事前に履歴書を拝見いたしました。始める前に、こちらの声がはっきりと聞こえていますでしょうか。"
+            return f"こんにちは。{cand}本日の面接を担当いたします、Squareの採用担当です。事前に履歴書を拝見いたしました。始める前に、こちらの声がはっきりと聞こえていますでしょうか。"
+        if not is_placeholder_title:
+            return f"こんにちは。{cand}本日は{title}ポジションの面接を担当いたします、Squareの採用担当です。始める前に、こちらの声がはっきりと聞こえていますでしょうか。"
+        return f"こんにちは。{cand}本日の面接を担当いたします、Squareの採用担当です。始める前に、こちらの声がはっきりと聞こえていますでしょうか。"
+
+    if lang == "ko":
+        cand = f"{name}님, " if not is_placeholder_name else ""
+        if has_cv:
+            if not is_placeholder_title:
+                return f"안녕하세요. {cand}오늘 {title} 직무 면접을 진행하게 된 Square 채용 담당자입니다. 이력서를 꼼꼼히 확인하였습니다. 시작하기 전에 제 목소리가 잘 들리시나요?"
+            return f"안녕하세요. {cand}오늘 면접을 진행하게 된 Square 채용 담당자입니다. 이력서를 꼼꼼히 확인하였습니다. 시작하기 전에 제 목소리가 잘 들리시나요?"
+        if not is_placeholder_title:
+            return f"안녕하세요. {cand}오늘 {title} 직무 면접을 진행하게 된 Square 채용 담당자입니다. 시작하기 전에 제 목소리가 잘 들리시나요?"
+        return f"안녕하세요. {cand}오늘 면접을 진행하게 된 Square 채용 담당자입니다. 시작하기 전에 제 목소리가 잘 들리시나요?"
+
+    if is_placeholder_name:
         greeting = "Chào bạn"
     else:
         greeting = f"Chào {name}"
 
-    title = job_title.strip()
-    if title and title.lower() not in {"đang ứng tuyển", "dang ung tuyen"}:
+    if has_cv:
+        if not is_placeholder_title:
+            return (
+                f"{greeting}, mình là Nhà tuyển dụng của Square cho vị trí {title}. "
+                "Mình đã xem kỹ hồ sơ ứng tuyển của bạn và rất vui được trao đổi hôm nay. "
+                "Trước khi bắt đầu, bạn nghe mình rõ không?"
+            )
         return (
-            f"{greeting}, mình là AI phỏng vấn của Square cho vị trí {title}. "
+            f"{greeting}, mình là Nhà tuyển dụng của Square. "
+            "Mình đã xem kỹ hồ sơ ứng tuyển của bạn và rất vui được trao đổi hôm nay. "
             "Trước khi bắt đầu, bạn nghe mình rõ không?"
         )
-    return f"{greeting}, mình là AI phỏng vấn của Square. Trước khi bắt đầu, bạn nghe mình rõ không?"
+
+    if not is_placeholder_title:
+        return (
+            f"{greeting}, mình là Nhà tuyển dụng của Square cho vị trí {title}. "
+            "Trước khi bắt đầu, bạn nghe mình rõ không?"
+        )
+    return f"{greeting}, mình là Nhà tuyển dụng của Square. Trước khi bắt đầu, bạn nghe mình rõ không?"
 
 
 def _format_question_prompt(
@@ -175,22 +237,31 @@ def _format_question_prompt(
     index: int | None = None,
     total: int | None = None,
     user_text: str = "",
+    language: str = "vi",
 ) -> str:
     del total
     question_text = _clean_question_for_candidate(question)
     if not question_text:
         return ""
 
-    if index == 0:
-        opener = (
-            "Hi bạn, mình bắt đầu nhẹ nhé."
-            if _looks_like_greeting_or_ready(user_text)
-            else "Ok, mình bắt đầu nhé."
-        )
-    elif index is None:
-        opener = "Mình hỏi tiếp nhé."
+    lang = (language or "vi").lower()
+    if lang == "en":
+        opener = "Let us begin with our first question." if index == 0 else "Moving on to our next question."
+    elif lang == "ja":
+        opener = "それでは最初の質問に移らせていただきます。" if index == 0 else "続きまして、次の質問に移らせていただきます。"
+    elif lang == "ko":
+        opener = "그럼 첫 번째 질문부터 시작하겠습니다." if index == 0 else "이어서 다음 질문 드리겠습니다."
     else:
-        opener = _QUESTION_TRANSITIONS[(index - 1) % len(_QUESTION_TRANSITIONS)]
+        if index == 0:
+            opener = (
+                "Hi bạn, mình bắt đầu nhẹ nhé."
+                if _looks_like_greeting_or_ready(user_text)
+                else "Ok, mình bắt đầu nhé."
+            )
+        elif index is None:
+            opener = "Mình hỏi tiếp nhé."
+        else:
+            opener = _QUESTION_TRANSITIONS[(index - 1) % len(_QUESTION_TRANSITIONS)]
 
     return f"{opener} {question_text}"
 
@@ -271,6 +342,8 @@ def _looks_like_end_interview_intent(text: str) -> bool:
         "ngung phong van",
         "kết thúc phỏng vấn",
         "ket thuc phong van",
+        "chấm dứt phỏng vấn",
+        "cham dut phong van",
         "không muốn phỏng vấn nữa",
         "khong muon phong van nua",
         "không phỏng vấn nữa",
@@ -281,6 +354,14 @@ def _looks_like_end_interview_intent(text: str) -> bool:
         "dung o day",
         "kết thúc ở đây",
         "ket thuc o day",
+        "chấm dứt ở đây",
+        "cham dut o day",
+        "chấm dứt tại đây",
+        "cham dut tai day",
+        "dừng tại đây",
+        "dung tai day",
+        "kết thúc tại đây",
+        "ket thuc tai day",
         "chấm dứt cuộc phỏng vấn",
         "cham dut cuoc phong van",
         "kết thúc buổi phỏng vấn",
@@ -303,33 +384,39 @@ def _looks_like_end_interview_intent(text: str) -> bool:
         "cho minh dung",
         "xin phép dừng",
         "xin phep dung",
+        "thôi dẹp",
+        "thoi dep",
+        "khỏi phỏng vấn",
+        "khoi phong van",
     )
     return any(phrase in normalized for phrase in explicit_end_phrases)
 
 
-def _candidate_question_prompt() -> str:
-    return (
-        "Cảm ơn bạn, mình đã ghi nhận các phần trả lời. "
-        "Trước khi kết thúc, bạn có câu hỏi nào muốn gửi tới công ty hoặc bộ phận tuyển dụng không?"
-    )
+def _candidate_question_prompt(language: str = "vi") -> str:
+    lang = (language or "vi").lower()
+    return LANGUAGE_CANDIDATE_QUESTION_PROMPTS.get(lang, LANGUAGE_CANDIDATE_QUESTION_PROMPTS["vi"])
 
 
-def _closing_response() -> str:
-    return (
-        "Cảm ơn bạn đã dành thời gian trao đổi hôm nay. "
-        "Mình đã ghi nhận đầy đủ phần trả lời của bạn để bộ phận tuyển dụng xem xét tiếp. "
-        "Chúc bạn một ngày tốt lành, buổi phỏng vấn kết thúc tại đây nhé."
-    )
+def _closing_response(language: str = "vi") -> str:
+    lang = (language or "vi").lower()
+    return LANGUAGE_CLOSINGS.get(lang, LANGUAGE_CLOSINGS["vi"])
 
 
-def _candidate_question_closing_response(user_text: str) -> str:
+def _candidate_question_closing_response(user_text: str, language: str = "vi") -> str:
+    lang = (language or "vi").lower()
     if _looks_like_no_candidate_question(user_text):
-        return _closing_response()
+        return _closing_response(language=lang)
 
-    return (
-        "Cảm ơn bạn, mình đã ghi nhận câu hỏi của bạn để bộ phận tuyển dụng phản hồi thêm nếu cần. "
-        f"{_closing_response()}"
-    )
+    if lang == "en":
+        prefix = "Thank you, I have noted your question for our recruitment team to follow up. "
+    elif lang == "ja":
+        prefix = "ご質問ありがとうございます。いただいたご質問は採用チームにて共有し、後ほど回答させていただきます。 "
+    elif lang == "ko":
+        prefix = "질문 감사합니다. 문의하신 내용은 채용팀에 전달하여 추후 상세히 답변드리겠습니다. "
+    else:
+        prefix = "Cảm ơn bạn, mình đã ghi nhận câu hỏi của bạn để bộ phận tuyển dụng phản hồi chi tiết sau buổi hôm nay nhé. "
+
+    return f"{prefix}{_closing_response(language=lang)}"
 
 
 def _parse_question_gap_seconds(value: Any, default: float = 2.5) -> float:
@@ -349,23 +436,34 @@ def _format_employer_instruction_response(instruction: str) -> str:
     if not instruction:
         return ""
 
-    ask_prompt = re.sub(
-        r"^(?:hãy\s+|vui\s+lòng\s+)?(?:hỏi|hoi)(?:\s+(?:ứng\s+viên|ung\s+vien|bạn|ban))?\s*",
-        "",
-        instruction,
-        flags=re.IGNORECASE,
-    ).strip(" :,-")
-    if ask_prompt and ask_prompt != instruction:
-        return f"Mình muốn hỏi thêm: {ask_prompt}."
+    instruction_lower = instruction.lower()
+    ask_prefixes = [
+        "hãy hỏi ứng viên", "vui lòng hỏi ứng viên", "hỏi ứng viên",
+        "hãy hỏi bạn", "vui lòng hỏi bạn", "hỏi bạn",
+        "hãy hỏi", "vui lòng hỏi", "hỏi",
+        "hay hoi ung vien", "vui long hoi ung vien", "hoi ung vien",
+        "hay hoi ban", "vui long hoi ban", "hoi ban",
+        "hay hoi", "vui long hoi", "hoi"
+    ]
+    for pfx in ask_prefixes:
+        if instruction_lower.startswith(pfx):
+            ask_prompt = instruction[len(pfx):].strip(" :,-")
+            if ask_prompt:
+                return f"Mình muốn hỏi thêm: {ask_prompt}."
 
-    remind_prompt = re.sub(
-        r"^(?:hãy\s+|vui\s+lòng\s+)?(?:nhắc|nhac)(?:\s+(?:ứng\s+viên|ung\s+vien|bạn|ban))?\s*",
-        "",
-        instruction,
-        flags=re.IGNORECASE,
-    ).strip(" :,-")
-    if remind_prompt and remind_prompt != instruction:
-        return f"Nhà tuyển dụng muốn nhắc bạn: {remind_prompt}."
+    remind_prefixes = [
+        "hãy nhắc ứng viên", "vui lòng nhắc ứng viên", "nhắc ứng viên",
+        "hãy nhắc bạn", "vui lòng nhắc bạn", "nhắc bạn",
+        "hãy nhắc", "vui lòng nhắc", "nhắc",
+        "hay nhac ung vien", "vui long nhac ung vien", "nhac ung vien",
+        "hay nhac ban", "vui long nhac ban", "nhac ban",
+        "hay nhac", "vui long nhac", "nhac"
+    ]
+    for pfx in remind_prefixes:
+        if instruction_lower.startswith(pfx):
+            remind_prompt = instruction[len(pfx):].strip(" :,-")
+            if remind_prompt:
+                return f"Nhà tuyển dụng muốn nhắc bạn: {remind_prompt}."
 
     return f"Nhà tuyển dụng muốn làm rõ thêm: {instruction}."
 
@@ -374,6 +472,7 @@ class Interviewer(Agent):
     def __init__(self, context: dict[str, Any] | None = None) -> None:
         instructions = INTERVIEWER_INSTRUCTIONS
         self._context = context or {}
+        self._language = str(self._context.get("interviewLanguage") or "vi").lower()
         self._backend_api_url = self._context.get("backendApiUrl")
         self._room_name = self._context.get("roomName")
         self._completed = False
@@ -398,6 +497,7 @@ class Interviewer(Agent):
         self._awaiting_candidate_questions = False
         self._employer_takeover_active = False
         self._pending_employer_followups: list[str] = []
+        self._abusive_turn_count = 0
         self._question_gap_seconds = _parse_question_gap_seconds(
             self._context.get("interviewQuestionGapSeconds"),
             default=2.5,
@@ -441,6 +541,39 @@ class Interviewer(Agent):
         if notes:
             instructions += f"- Ghi chú phỏng vấn: {notes}\n"
 
+        cv_title = _brief_text(self._context.get("candidateCvTitle", ""), 120)
+        cv_skills = _brief_text(self._context.get("candidateCvSkills", ""), 300)
+        cv_experience = _brief_text(self._context.get("candidateCvExperience", ""), 400)
+        cv_education = _brief_text(self._context.get("candidateCvEducation", ""), 200)
+        semantic_fit = _brief_text(self._context.get("candidateFitLevel", ""), 80)
+        matched_skills = self._context.get("candidateMatchedSkills", [])
+        missing_skills = self._context.get("candidateMissingSkills", [])
+        ai_rec = _brief_text(self._context.get("candidateAiRecommendation", ""), 300)
+
+        if cv_title or cv_experience or cv_skills:
+            instructions += (
+                "\n\nHồ sơ ứng viên và Đánh giá sơ bộ CV:\n"
+                f"- Chức danh trong CV: {cv_title or 'Chưa cung cấp'}\n"
+                f"- Kinh nghiệm làm việc: {cv_experience or 'Xem thêm trong quá trình phỏng vấn'}\n"
+                f"- Kỹ năng chuyên môn khai báo: {cv_skills or 'N/A'}\n"
+            )
+            if cv_education:
+                instructions += f"- Học vấn: {cv_education}\n"
+            if semantic_fit:
+                instructions += f"- Kết quả đối sánh sơ bộ CV với JD: {semantic_fit}\n"
+            if matched_skills:
+                instructions += f"- Kỹ năng ứng viên đáp ứng tốt: {', '.join(matched_skills)}\n"
+            if missing_skills:
+                instructions += f"- Kỹ năng cần phỏng vấn đào sâu xác minh: {', '.join(missing_skills)}\n"
+            if ai_rec:
+                instructions += f"- Khuyến nghị trước phỏng vấn: {ai_rec}\n"
+            instructions += (
+                "\nChỉ dẫn phong cách phỏng vấn cho Nhà tuyển dụng AI AILA:\n"
+                "- Bạn đã nghiên cứu kỹ hồ sơ ứng viên trước khi vào phòng.\n"
+                "- Hãy công nhận các kinh nghiệm và kỹ năng nổi bật trong CV của ứng viên.\n"
+                "- Khi ứng viên trả lời câu hỏi chuyên môn, hãy chủ động liên hệ với hồ sơ CV hoặc đào sâu xác minh các kỹ năng cần kiểm tra thêm.\n"
+            )
+
         questions = self._context.get("questions", [])
         if questions:
             q_text = ""
@@ -458,8 +591,27 @@ class Interviewer(Agent):
             "\nQuy tắc độ dài: mỗi câu nói chỉ 1 đến 2 câu, tối đa khoảng 40 từ."
             "\nKhi đã đến bước kết thúc và đã nói lời cảm ơn, hãy kết thúc buổi phỏng vấn ngay."
             "\nKhông bao giờ nhắc tới tên hàm nội bộ, tên công cụ, JSON, hoặc bất kỳ chuỗi kiểu `finish_interview`, `set_interview_stage`, `get_interview_progress` trong câu nói của bạn."
-            "\nBắt buộc: mọi câu trả lời phải là tiếng Việt có dấu đầy đủ, tự nhiên, không được viết không dấu."
         )
+        lang_constraint = LANGUAGE_PROMPT_CONSTRAINTS.get(self._language, LANGUAGE_PROMPT_CONSTRAINTS["vi"])
+        instructions += f"\n{lang_constraint}"
+
+        self._candidate_name = candidate_name
+        self._job_title = job_title
+        try:
+            self._llm_client = (
+                openai_lib.AsyncOpenAI(
+                    api_key=config.LLM_API_KEY or "dummy",
+                    base_url=config.LLM_BASE_URL,
+                    http_client=httpx.AsyncClient(
+                        timeout=httpx.Timeout(10.0, connect=3.0)
+                    ),
+                )
+                if config.LLM_BASE_URL
+                else None
+            )
+        except Exception as exc:
+            logger.warning("Could not initialize Interviewer LLM client: %s", exc)
+            self._llm_client = None
 
         super().__init__(instructions=instructions)
 
@@ -467,6 +619,138 @@ class Interviewer(Agent):
         task = asyncio.create_task(coro)
         self._background_tasks.add(task)
         task.add_done_callback(self._background_tasks.discard)
+
+    async def _finalize_after_speech_or_delay(
+        self,
+        speech_handle: Any = None,
+        delay_seconds: float = 3.5,
+    ) -> None:
+        if self._finalizing:
+            return
+
+        if speech_handle is not None and hasattr(speech_handle, "wait_for_completion"):
+            try:
+                await speech_handle.wait_for_completion()
+            except Exception as exc:
+                logger.debug("wait_for_completion exception: %s", exc)
+
+        await asyncio.sleep(delay_seconds)
+        await self.finalize_completed_interview()
+
+    async def _generate_intelligent_question_turn(
+        self,
+        question: str,
+        *,
+        index: int | None = None,
+        total: int | None = None,
+        user_text: str = "",
+    ) -> str:
+        question_text = _clean_question_for_candidate(question)
+        if not question_text:
+            return ""
+
+        if index == 0:
+            if self._language == 'en':
+                return f"Hello, very glad to meet you today. Let us begin with our first question: {question_text}"
+            elif self._language == 'ja':
+                return f"本日はよろしくお願いいたします。それでは最初の質問から始めさせていただきます：{question_text}"
+            elif self._language == 'ko':
+                return f"반갑습니다. 그럼 첫 번째 질문부터 시작하겠습니다: {question_text}"
+            else:
+                if _looks_like_greeting_or_ready(user_text):
+                    return f"Chào bạn, rất vui được gặp bạn hôm nay. Chúng ta cùng bắt đầu với câu hỏi đầu tiên nhé: {question_text}"
+                return f"Tuyệt vời, chúng ta cùng bắt đầu nhé. {question_text}"
+
+        clean_user = _normalize_text(user_text).strip()
+        if clean_user and len(clean_user) >= 10 and self._llm_client and config.LLM_BASE_URL:
+            try:
+                system_prompt = (
+                    "Bạn là Nhà tuyển dụng chuyên nghiệp của Square đang phỏng vấn ứng viên trực tiếp. "
+                    "Hãy giao tiếp tự nhiên, ấm áp, thông minh, không theo khuôn mẫu."
+                )
+                user_prompt = (
+                    f"Vị trí phỏng vấn: {self._job_title or 'chuyên môn'}\n"
+                    f"Ứng viên vừa trả lời câu trước: \"{_brief_text(clean_user, 280)}\"\n"
+                    f"Câu hỏi tiếp theo bạn cần hỏi là: \"{question_text}\"\n"
+                )
+                cv_skills = _brief_text(self._context.get("candidateCvSkills", ""), 150)
+                if cv_skills:
+                    user_prompt += f"Kỹ năng trong CV của ứng viên: {cv_skills}\n"
+                missing_skills = self._context.get("candidateMissingSkills", [])
+                if missing_skills:
+                    user_prompt += f"Kỹ năng cần kiểm chứng thêm: {', '.join(missing_skills[:3])}\n"
+                user_prompt += (
+                    "\nHãy đưa ra lời nói tiếp theo của Nhà tuyển dụng:\n"
+                    "1. Nếu câu trả lời của ứng viên có ý hay, hãy nhận xét ngắn gọn, chân thành. "
+                    "Nếu ứng viên trả lời đơn giản hoặc chưa rõ, chỉ ghi nhận tự nhiên, tuyệt đối không khen ngợi gượng gạo.\n"
+                    "2. Dẫn dắt mượt mà và đặt câu hỏi tiếp theo.\n"
+                    "3. Độ dài: từ 2 đến 3 câu ngắn, tối đa khoảng 45 từ.\n"
+                    "4. Tuyệt đối không dùng dấu ngoặc đơn trong toàn bộ văn bản.\n"
+                    "5. Không dùng markdown hay gạch đầu dòng, không đọc số thứ tự câu hỏi."
+                )
+                res = await asyncio.wait_for(
+                    self._llm_client.chat.completions.create(
+                        model=config.LLM_MODEL,
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_prompt},
+                        ],
+                        temperature=0.7,
+                        max_tokens=160,
+                    ),
+                    timeout=3.5,
+                )
+                reply = res.choices[0].message.content or ""
+                cleaned = _sanitize_output_text(reply).replace("(", "").replace(")", "").strip()
+                if cleaned and len(cleaned) > 20:
+                    logger.info("Generated intelligent question turn for room %s (index %s)", self._room_name, index)
+                    return cleaned
+            except Exception as exc:
+                logger.info("Fallback to standard transition for room %s: %s", self._room_name, exc)
+
+        return _format_question_prompt(
+            question_text,
+            index=index,
+            total=total,
+            user_text=user_text,
+            language=self._language,
+        )
+
+    async def _answer_candidate_question_and_close(self, user_text: str) -> str:
+        clean_user = _normalize_text(user_text).strip()
+        if _looks_like_no_candidate_question(clean_user) or _looks_like_end_interview_intent(clean_user):
+            return _closing_response(language=self._language)
+
+        if clean_user and len(clean_user) >= 6 and self._llm_client and config.LLM_BASE_URL:
+            try:
+                system_prompt = "Bạn là Nhà tuyển dụng chuyên nghiệp của Square."
+                user_prompt = (
+                    f"Ứng viên đặt câu hỏi cho bạn: \"{_brief_text(clean_user, 260)}\"\n"
+                    "Hãy trả lời câu hỏi của ứng viên một cách thiện chí, súc tích và ấm áp trong 1 đến 2 câu ngắn dưới 35 từ. "
+                    "Sau đó cảm ơn họ và thông báo kết thúc buổi phỏng vấn hôm nay. "
+                    "Tuyệt đối không dùng dấu ngoặc đơn. Không dùng markdown."
+                )
+                res = await asyncio.wait_for(
+                    self._llm_client.chat.completions.create(
+                        model=config.LLM_MODEL,
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_prompt},
+                        ],
+                        temperature=0.7,
+                        max_tokens=160,
+                    ),
+                    timeout=3.5,
+                )
+                reply = res.choices[0].message.content or ""
+                cleaned = _sanitize_output_text(reply).replace("(", "").replace(")", "").strip()
+                if cleaned and len(cleaned) > 20:
+                    logger.info("Generated candidate question answer for room %s", self._room_name)
+                    return cleaned
+            except Exception as exc:
+                logger.info("Fallback for candidate question answer in room %s: %s", self._room_name, exc)
+
+        return _candidate_question_closing_response(clean_user, language=self._language)
 
     @property
     def current_stage(self) -> InterviewStage:
@@ -537,12 +821,37 @@ class Interviewer(Agent):
         logger.info("Interviewer agent entered session. Generating initial greeting...")
         candidate_name = _brief_text(self._context.get("candidateName", "Ứng viên"), 80)
         job_title = _brief_text(self._context.get("jobTitle", "đang ứng tuyển"), 120)
-        greeting = _format_opening_greeting(candidate_name, job_title)
+        has_cv = bool(
+            self._context.get("candidateCvTitle")
+            or self._context.get("candidateCvSkills")
+            or self._context.get("candidateCvExperience")
+        )
+        greeting = _format_opening_greeting(
+            candidate_name,
+            job_title,
+            language=self._language,
+            has_cv=has_cv,
+        )
 
-        # Keep the bootstrap greeting short so CPU TTS can finish quickly in
-        # local smoke tests and the agent can start the interview promptly.
-        await self.session.say(greeting, allow_interruptions=False)
-        await self.record_transcript("ai_agent", greeting)
+        # Keep the bootstrap greeting short and resilient with retry loop to withstand cold starts or transient TTS delays
+        max_retries = 3
+        for attempt in range(1, max_retries + 1):
+            try:
+                logger.info("Playing initial greeting (attempt %d/%d)...", attempt, max_retries)
+                await self.session.say(greeting, allow_interruptions=False)
+                logger.info("Initial greeting played successfully.")
+                break
+            except Exception as exc:
+                logger.warning("Greeting attempt %d failed: %s", attempt, exc)
+                if attempt < max_retries:
+                    await asyncio.sleep(1.0 * attempt)
+                else:
+                    logger.error("All greeting attempts failed due to cold-start or TTS issue. Proceeding without crashing room.")
+
+        try:
+            await self.record_transcript("ai_agent", greeting)
+        except Exception as exc:
+            logger.warning("Failed to record greeting transcript: %s", exc)
 
     def llm_node(self, chat_ctx, tools, model_settings):
         if self._backend_questions_available:
@@ -567,7 +876,7 @@ class Interviewer(Agent):
         if response:
             await self.record_transcript("ai_agent", response)
             if self._completed:
-                self._create_background_task(self.finalize_completed_interview())
+                self._create_background_task(self._finalize_after_speech_or_delay(delay_seconds=4.0))
         return response
 
     def _needs_more_answer_detail(self, user_text: str) -> bool:
@@ -598,12 +907,43 @@ class Interviewer(Agent):
             )
             self._awaiting_candidate_questions = False
             self._mark_completed()
-            return _closing_response()
+            return _closing_response(language=self._language)
+
+        if is_hostile_or_abusive(user_text):
+            self._abusive_turn_count += 1
+            logger.warning(
+                "Detected candidate abusive/hostile language for room %s (strike %s): %s",
+                self._room_name,
+                self._abusive_turn_count,
+                user_text,
+            )
+            self._short_answer_prompted_for = None
+            if self._abusive_turn_count >= 2:
+                self._mark_completed()
+                self._awaiting_candidate_questions = False
+                return (
+                    "Vì bạn tiếp tục sử dụng ngôn từ thiếu chuẩn mực và không phù hợp với tiêu chuẩn phỏng vấn, "
+                    "mình xin phép kết thúc buổi phỏng vấn tại đây. Cảm ơn bạn."
+                )
+            return (
+                "Square luôn hướng tới môi trường phỏng vấn văn minh và tôn trọng lẫn nhau. "
+                "Mong bạn giữ ngôn từ phù hợp để chúng ta có thể tiếp tục buổi trao đổi. "
+                "Nếu bạn muốn bỏ qua câu hỏi vừa rồi, bạn có thể nói bỏ qua để sang câu hỏi mới nhé."
+            )
+
+        if is_explicit_refusal_or_skip(user_text):
+            logger.info(
+                "Candidate requested to skip or refused answer for room %s: %s",
+                self._room_name,
+                user_text,
+            )
+            self._short_answer_prompted_for = None
+            return await self._advance_to_next_question_after_skip(user_text)
 
         if self._awaiting_candidate_questions:
             if not user_text:
                 return None
-            return self._finish_after_candidate_question(user_text)
+            return await self._finish_after_candidate_question(user_text)
 
         if self._needs_more_answer_detail(user_text):
             return _format_detail_nudge(self._last_asked_question_text or "", user_text)
@@ -619,7 +959,7 @@ class Interviewer(Agent):
                 self._last_asked_question_text = action.text
                 self._scripted_question_index = parsed_payload.index + 1
                 await self._broadcast_question_index(parsed_payload.index)
-                return _format_question_prompt(
+                return await self._generate_intelligent_question_turn(
                     action.text,
                     index=parsed_payload.index,
                     total=parsed_payload.total,
@@ -631,25 +971,58 @@ class Interviewer(Agent):
                     self._scripted_question_index += 1
                     self._last_asked_question_text = question
                     await self._broadcast_question_index(self._scripted_question_index - 1)
-                    return _format_question_prompt(
+                    return await self._generate_intelligent_question_turn(
                         question,
                         index=self._scripted_question_index - 1,
                         total=len(self._scripted_questions),
                         user_text=user_text,
                     )
-                await self._broadcast_session_completed()
                 return self._offer_pending_followup_or_candidate_question()
 
         if self._scripted_question_index < len(self._scripted_questions):
             question = self._scripted_questions[self._scripted_question_index]
             self._scripted_question_index += 1
             self._last_asked_question_text = question
-            return _format_question_prompt(
+            return await self._generate_intelligent_question_turn(
                 question,
                 index=self._scripted_question_index - 1,
                 total=len(self._scripted_questions),
                 user_text=user_text,
             )
+
+        return self._offer_pending_followup_or_candidate_question()
+
+    async def _advance_to_next_question_after_skip(self, user_text: str = "") -> str:
+        del user_text
+        if self._reply_delay_seconds > 0:
+            await asyncio.sleep(min(self._reply_delay_seconds, 1.0))
+
+        backend_payload = await self._fetch_next_question_payload()
+        if backend_payload is not None:
+            parsed_payload = parse_question_payload(backend_payload)
+            action = decide_next_action(parsed_payload)
+            if action.kind == "ask_question" and action.text:
+                self._last_asked_question_text = action.text
+                self._scripted_question_index = parsed_payload.index + 1
+                await self._broadcast_question_index(parsed_payload.index)
+                cleaned_q = _clean_question_for_candidate(action.text)
+                return f"Không sao cả, mình ghi nhận và chúng ta cùng chuyển sang câu hỏi tiếp theo nhé: {cleaned_q}"
+            if action.kind == "closing":
+                if self._scripted_question_index < len(self._scripted_questions):
+                    question = self._scripted_questions[self._scripted_question_index]
+                    self._scripted_question_index += 1
+                    self._last_asked_question_text = question
+                    await self._broadcast_question_index(self._scripted_question_index - 1)
+                    cleaned_q = _clean_question_for_candidate(question)
+                    return f"Không sao cả, mình ghi nhận và chúng ta cùng chuyển sang câu hỏi tiếp theo nhé: {cleaned_q}"
+                return self._offer_pending_followup_or_candidate_question()
+
+        if self._scripted_question_index < len(self._scripted_questions):
+            question = self._scripted_questions[self._scripted_question_index]
+            self._scripted_question_index += 1
+            self._last_asked_question_text = question
+            cleaned_q = _clean_question_for_candidate(question)
+            return f"Không sao cả, mình ghi nhận và chúng ta cùng chuyển sang câu hỏi tiếp theo nhé: {cleaned_q}"
 
         return self._offer_pending_followup_or_candidate_question()
 
@@ -666,17 +1039,20 @@ class Interviewer(Agent):
         if not self._candidate_question_prompted:
             self._candidate_question_prompted = True
             self._awaiting_candidate_questions = True
+            self._current_stage = InterviewStage.Q_AND_A
             self._last_asked_question_text = None
             self._short_answer_prompted_for = None
-            return _candidate_question_prompt()
+            return _candidate_question_prompt(language=self._language)
 
         self._mark_completed()
-        return _closing_response()
+        return _closing_response(language=self._language)
 
-    def _finish_after_candidate_question(self, user_text: str) -> str:
+    async def _finish_after_candidate_question(self, user_text: str) -> str:
         self._awaiting_candidate_questions = False
         self._mark_completed()
-        return _candidate_question_closing_response(user_text)
+        if is_hostile_or_abusive(user_text) or _looks_like_no_candidate_question(user_text):
+            return _closing_response(language=self._language)
+        return await self._answer_candidate_question_and_close(user_text)
 
     def _mark_completed(self) -> None:
         self._completed = True
@@ -759,7 +1135,7 @@ class Interviewer(Agent):
         else:
             self._create_background_task(self.finalize_completed_interview())
 
-        return _closing_response()
+        return _closing_response(language=self._language)
 
     async def transcription_node(self, text, model_settings):
         async for delta in super().transcription_node(text, model_settings):
@@ -885,11 +1261,12 @@ class Interviewer(Agent):
                 closing_turn = self._offer_pending_followup_or_candidate_question()
                 response = f"Đã hết thời gian cho câu hỏi này. {closing_turn}"
                 if sess:
-                    await sess.say(response, allow_interruptions=False)
+                    speech_handle = await sess.say(response, allow_interruptions=False)
+                    if self._completed:
+                        self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, delay_seconds=3.5))
+                elif self._completed:
+                    self._create_background_task(self._finalize_after_speech_or_delay(delay_seconds=3.5))
                 await self.record_transcript("ai_agent", response)
-                await self._broadcast_session_completed()
-                if self._completed:
-                    self._create_background_task(self.finalize_completed_interview())
                 return response
 
         if target_index is not None and 0 <= target_index < len(self._scripted_questions):
@@ -910,11 +1287,12 @@ class Interviewer(Agent):
         closing_turn = self._offer_pending_followup_or_candidate_question()
         response = f"Đã hết thời gian cho câu hỏi này. {closing_turn}"
         if sess:
-            await sess.say(response, allow_interruptions=False)
+            speech_handle = await sess.say(response, allow_interruptions=False)
+            if self._completed:
+                self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, delay_seconds=3.5))
+        elif self._completed:
+            self._create_background_task(self._finalize_after_speech_or_delay(delay_seconds=3.5))
         await self.record_transcript("ai_agent", response)
-        await self._broadcast_session_completed()
-        if self._completed:
-            self._create_background_task(self.finalize_completed_interview())
         return response
 
     async def handle_candidate_next_question(self, target_index: int | None = None) -> str | None:
@@ -957,11 +1335,12 @@ class Interviewer(Agent):
                     return response
                 response = self._offer_pending_followup_or_candidate_question()
                 if sess:
-                    await sess.say(response, allow_interruptions=False)
+                    speech_handle = await sess.say(response, allow_interruptions=False)
+                    if self._completed:
+                        self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, delay_seconds=3.5))
+                elif self._completed:
+                    self._create_background_task(self._finalize_after_speech_or_delay(delay_seconds=3.5))
                 await self.record_transcript("ai_agent", response)
-                await self._broadcast_session_completed()
-                if self._completed:
-                    self._create_background_task(self.finalize_completed_interview())
                 return response
 
         if target_index is not None and 0 <= target_index < len(self._scripted_questions):
@@ -981,11 +1360,12 @@ class Interviewer(Agent):
 
         response = self._offer_pending_followup_or_candidate_question()
         if sess:
-            await sess.say(response, allow_interruptions=False)
+            speech_handle = await sess.say(response, allow_interruptions=False)
+            if self._completed:
+                self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, delay_seconds=3.5))
+        elif self._completed:
+            self._create_background_task(self._finalize_after_speech_or_delay(delay_seconds=3.5))
         await self.record_transcript("ai_agent", response)
-        await self._broadcast_session_completed()
-        if self._completed:
-            self._create_background_task(self.finalize_completed_interview())
         return response
 
     async def handle_candidate_finish_interview(self) -> str:
@@ -1000,12 +1380,15 @@ class Interviewer(Agent):
         if sess:
             try:
                 await sess.interrupt(force=True)
-                await sess.say(response, allow_interruptions=False)
+                speech_handle = await sess.say(response, allow_interruptions=False)
+                self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, delay_seconds=3.5))
             except Exception as exc:
                 logger.debug("Could not speak farewell: %s", exc)
+                self._create_background_task(self._finalize_after_speech_or_delay(delay_seconds=3.5))
+        else:
+            self._create_background_task(self._finalize_after_speech_or_delay(delay_seconds=3.5))
 
         await self.record_transcript("ai_agent", response)
-        self._create_background_task(self.finalize_completed_interview())
         return response
 
     async def finalize_completed_interview(self) -> None:

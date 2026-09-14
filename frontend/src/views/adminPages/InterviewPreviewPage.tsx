@@ -16,7 +16,7 @@ import { IMAGES } from '@/configs/images';
 import { ROUTES } from '@/configs/routeConfig';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 
-// ─── Fake data ────────────────────────────────────────────────────────────────
+// --- Fake data ----------------------------------------------------------------
 const FAKE_SESSION = {
   jobName: 'Frontend Engineer – React/Next.js',
   candidateName: 'Ứng viên mẫu (Demo)',
@@ -27,7 +27,7 @@ const FAKE_SESSION = {
 
 type Step = 'waiting' | 'preflight' | 'connected';
 
-// ─── Step labels ──────────────────────────────────────────────────────────────
+// --- Step labels --------------------------------------------------------------
 const STEPS: { key: Step; labelKey: string; descKey: string }[] = [
   {
     key: 'waiting',
@@ -49,7 +49,7 @@ const STEPS: { key: Step; labelKey: string; descKey: string }[] = [
 import { LiveAudioVisualizerContainer } from '../interviewPages/components/LiveAudioVisualizerContainer';
 import { InterviewAvatar } from '../interviewPages/components/avatar/InterviewAvatar';
 
-// ─── Mock Participant Tile ────────────────────────────────────────────────────
+// --- Mock Participant Tile ----------------------------------------------------
 function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
   name: string; isAI?: boolean; isSelf?: boolean; speaking?: boolean;
 }) {
@@ -123,7 +123,7 @@ function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
   );
 }
 
-// ─── Step: Waiting ────────────────────────────────────────────────────────────
+// --- Step: Waiting ------------------------------------------------------------
 function WaitingStep({ onNext }: { onNext: () => void }) {
   const { t } = useTranslation('admin');
 
@@ -162,7 +162,7 @@ function WaitingStep({ onNext }: { onNext: () => void }) {
   );
 }
 
-// ─── Step: Preflight ──────────────────────────────────────────────────────────
+// --- Step: Preflight ----------------------------------------------------------
 function PreflightStep({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   const { t } = useTranslation('admin');
   const [micOk] = useState(true);
@@ -225,7 +225,7 @@ function PreflightStep({ onNext, onBack }: { onNext: () => void; onBack: () => v
   );
 }
 
-// ─── Step: Connected (mock VideoConference) ───────────────────────────────────
+// --- Step: Connected (mock VideoConference) -----------------------------------
 function ConnectedStep({ onEnd }: { onEnd: () => void }) {
   const { t } = useTranslation('admin');
   const [micOn, setMicOn] = useState(true);
@@ -357,7 +357,7 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
   );
 }
 
-// ─── Main Preview Page ────────────────────────────────────────────────────────
+// --- Main Preview Page --------------------------------------------------------
 export default function InterviewPreviewPage() {
   const { t, i18n } = useTranslation('admin');
   const [step, setStep] = useState<Step>('connected');

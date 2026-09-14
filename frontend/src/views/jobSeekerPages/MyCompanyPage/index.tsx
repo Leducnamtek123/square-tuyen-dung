@@ -4,6 +4,7 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Box, Card, Stack, Tab, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid } from "@mui/material";
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { TabTitle } from '@/utils/generalFunction';
 import CompanyViewedCard from '@/views/components/jobSeekers/CompanyViewedCard';
 import CompanyFollowedCard from '@/views/components/jobSeekers/CompanyFollowedCard';
@@ -11,11 +12,22 @@ import SuggestedJobPostCard from '@/views/components/defaults/SuggestedJobPostCa
 
 const MyCompanyPage = () => {
     const { t } = useTranslation('jobSeeker');
-    TabTitle(t("myCompany.title"))
-    const [value, setValue] = React.useState('1');
+    TabTitle(t("myCompany.title"));
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+    const tabParam = searchParams?.get('tab');
+    const [value, setValue] = React.useState(tabParam === '2' ? '2' : '1');
+
+    React.useEffect(() => {
+        if (tabParam === '1' || tabParam === '2') {
+            setValue(tabParam);
+        }
+    }, [tabParam]);
 
     const selectCompanyTab = (event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
+        router.replace(`${pathname}?tab=${newValue}`, { scroll: false });
     };
 
     return (

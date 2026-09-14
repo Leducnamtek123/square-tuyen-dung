@@ -459,7 +459,12 @@ export const CandidateHeader: React.FC<CandidateHeaderProps> = ({
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  window.open(`mailto:${profileDetail.user?.email || ''}`);
+                  const email = profileDetail.user?.email;
+                  if (email) {
+                    window.open(`mailto:${email}`);
+                  } else {
+                    toastMessages.error(t('employer:candidateDetail.messages.noEmail', { defaultValue: 'Ứng viên chưa cập nhật địa chỉ email' }));
+                  }
                   setAnchorEl(null);
                 }}
                 sx={{ borderRadius: '6px', py: 1, fontSize: '0.85rem' }}

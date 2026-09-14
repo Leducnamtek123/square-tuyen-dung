@@ -72,13 +72,30 @@ const WorkspaceSwitchMenu = () => {
       <Button
         color="inherit"
         onClick={(e) => setAnchorEl(e.currentTarget)}
-        endIcon={<KeyboardArrowDownIcon />}
+        endIcon={<KeyboardArrowDownIcon sx={{ fontSize: 18, color: '#64748b' }} />}
         sx={{
           textTransform: "none",
-          border: "1px solid rgba(255,255,255,0.25)",
-          
+          border: "1px solid #e2e8f0",
+          borderRadius: "10px",
+          height: 38,
+          minHeight: 38,
           px: 1.5,
-          minWidth: 150,
+          minWidth: 140,
+          color: '#0f172a',
+          fontWeight: 600,
+          backgroundColor: '#ffffff',
+          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          '&:hover': {
+            backgroundColor: '#f8fafc',
+            borderColor: '#cbd5e1',
+          },
+          '&:focus-visible': {
+            outline: '2px solid #2563eb',
+            outlineOffset: '2px',
+          },
+          '&:active': {
+            transform: 'scale(0.98)',
+          },
         }}
       >
         <Typography variant="body2" noWrap sx={{ maxWidth: 120 }}>

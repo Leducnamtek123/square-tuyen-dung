@@ -180,6 +180,7 @@ function AIParticipantTile({
   hasDetectedAgent,
   variant,
   candidateLabel,
+  avatarId,
   avatarImageUrl,
   avatarBackgroundUrl,
   avatarBackdrop,
@@ -194,6 +195,7 @@ function AIParticipantTile({
   hasDetectedAgent?: boolean;
   variant: 'agent' | 'candidate';
   candidateLabel: string;
+  avatarId?: string;
   avatarImageUrl?: string | null;
   avatarBackgroundUrl?: string | null;
   avatarBackdrop?: string | null;
@@ -236,6 +238,7 @@ function AIParticipantTile({
         isSpeakingHint={isSpeaking}
         sessionStatus={props?.sessionStatus}
         interviewerName={displayName}
+        avatarId={avatarId}
         avatarImageUrl={avatarImageUrl}
         avatarBackgroundUrl={avatarBackgroundUrl}
         avatarBackdrop={avatarBackdrop}
@@ -753,6 +756,7 @@ type AIInterviewLayoutProps = {
   onEndSession?: () => Promise<void> | void;
   questions?: Question[];
   defaultDurationSeconds?: number;
+  avatarId?: string;
   avatarImageUrl?: string | null;
   avatarBackgroundUrl?: string | null;
   avatarBackdrop?: string | null;
@@ -763,6 +767,7 @@ export function AIInterviewLayout({
   onEndSession,
   questions: propQuestions,
   defaultDurationSeconds,
+  avatarId,
   avatarImageUrl,
   avatarBackgroundUrl,
   avatarBackdrop,
@@ -775,6 +780,7 @@ export function AIInterviewLayout({
   const [takeoverOwnerIdentity, setTakeoverOwnerIdentity] = useState<string | null>(null);
   const [isTakeoverSending, setIsTakeoverSending] = useState(false);
   const [isCompactChatView, setIsCompactChatView] = useState(false);
+  const [isFinishingTransition, setIsFinishingTransition] = useState(false);
   const timeFormatted = useLiveTimer();
   const participants = useParticipants();
   const { localParticipant } = useLocalParticipant();
@@ -933,7 +939,10 @@ export function AIInterviewLayout({
         const payload = JSON.parse(text);
         if (payload?.action === 'session_completed') {
           console.log('[AIInterviewLayout] Received session_completed event from AI Agent');
-          void onEndSession?.();
+          setIsFinishingTransition(true);
+          setTimeout(() => {
+            void onEndSession?.();
+          }, 3500);
         }
       } catch (err) {
         console.warn('[AIInterviewLayout] Error parsing question control event:', err);
@@ -1024,7 +1033,7 @@ export function AIInterviewLayout({
         </button>
       )}
 
-      {/* Floating Right Tab: Lộ trình (media_1789070804030.png) */}
+      {/* Tab nổi bên phải: Lộ trình phỏng vấn */}
       {!hud.roadmapDrawerOpen && (
         <button
           type="button"
@@ -1085,13 +1094,25 @@ export function AIInterviewLayout({
                   agentState={voiceAssistant.state}
                   agentIdentity={agentIdentity}
                   agentSid={agentSid}
+                  avatarId={avatarId}
                   avatarImageUrl={avatarImageUrl}
                   avatarBackgroundUrl={avatarBackgroundUrl}
                   avatarBackdrop={avatarBackdrop}
                   interviewerName={interviewerName}
+                  sessionStatus={isFinishingTransition ? 'completed' : undefined}
                 />
               </div>
             </div>
+            {isFinishingTransition && (
+              <div className="pointer-events-none mt-2 flex items-center justify-center">
+                <div className="flex items-center gap-3 rounded-xl border border-sky-500/40 bg-slate-900/90 px-5 py-2.5 text-white shadow-xl backdrop-blur-md">
+                  <div className="size-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-xs font-semibold">
+                    Buổi phỏng vấn đã hoàn tất. Hệ thống đang tiến hành tổng hợp kết quả đánh giá...
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {showObservingBar && (

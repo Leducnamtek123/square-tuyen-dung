@@ -161,6 +161,7 @@ const ProfileDetailCard: React.FC = () => {
               <CandidateOverview
                 profileDetail={profileDetail}
                 onOpenDocumentTab={() => setActiveTab('documents')}
+                onScheduleInterview={() => setActiveTab('interview')}
               />
             )}
 

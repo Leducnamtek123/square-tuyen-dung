@@ -199,7 +199,7 @@ const EmailVerificationRequiredPage = () => {
     };
   }, [email, checkVerificationStatus]);
 
-  // ── OTP Handlers ──
+  // -- OTP Handlers --
   const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text').replace(/\D/g, '');
@@ -551,7 +551,7 @@ const EmailVerificationRequiredPage = () => {
               </Tooltip>
             </Box>
 
-            {/* ── 6-Digit OTP Input Boxes ── */}
+            {/* -- 6-Digit OTP Input Boxes -- */}
             <Box sx={{ mb: 2 }}>
               <Typography variant="body2" sx={{ fontWeight: 700, color: '#334155', mb: 1.5, fontSize: '0.875rem' }}>
                 Nhập mã 6 chữ số nhận được trong email:

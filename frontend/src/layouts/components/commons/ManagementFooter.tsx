@@ -20,6 +20,7 @@ const ManagementFooter: React.FC<Props> = ({ sx }) => {
   return (
     <Box
       component="footer"
+      className="no-print"
       sx={{
         py: 2.5,
         px: { xs: 2, sm: 3 },

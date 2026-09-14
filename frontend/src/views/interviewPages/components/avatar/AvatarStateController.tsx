@@ -4,12 +4,13 @@ import { useMemo, useState, useEffect } from 'react';
 import type { AgentState } from '@livekit/components-react';
 import {
   AvatarState,
-  AVATAR_ASSET_PATHS,
-  SPEAKING_CYCLE_FRAMES,
+  getAvatarAssetPaths,
+  getSpeakingCycleFrames,
   resolveAvatarState,
 } from './avatarStates';
 
 export interface UseAvatarStateOptions {
+  avatarId?: string;
   voiceAssistantState?: AgentState;
   isSpeaking?: boolean;
   audioLevel?: number;
@@ -28,12 +29,16 @@ export interface AvatarStateOutput {
  * Handles speaking multi-frame loops seamlessly with zero CPU overhead.
  */
 export function useAvatarState({
+  avatarId,
   voiceAssistantState,
   isSpeaking = false,
   sessionStatus,
   contextHint,
 }: UseAvatarStateOptions): AvatarStateOutput {
   const [speakingFrameIndex, setSpeakingFrameIndex] = useState(0);
+
+  const avatarAssetPaths = useMemo(() => getAvatarAssetPaths(avatarId), [avatarId]);
+  const speakingCycleFrames = useMemo(() => getSpeakingCycleFrames(avatarId), [avatarId]);
 
   // 1. Derive canonical AvatarState
   const state: AvatarState = useMemo(() => {
@@ -55,11 +60,11 @@ export function useAvatarState({
     }
 
     const interval = setInterval(() => {
-      setSpeakingFrameIndex((prev) => (prev + 1) % SPEAKING_CYCLE_FRAMES.length);
+      setSpeakingFrameIndex((prev) => (prev + 1) % speakingCycleFrames.length);
     }, 165);
 
     return () => clearInterval(interval);
-  }, [isAgentSpeaking]);
+  }, [isAgentSpeaking, speakingCycleFrames.length]);
 
   // 3. Natural human eye blinking micro-cycle (every 4.2s for 140ms)
   const [isBlinking, setIsBlinking] = useState(false);
@@ -80,13 +85,13 @@ export function useAvatarState({
   // 4. Resolve actual asset image path
   const assetSrc = useMemo(() => {
     if (state === 'speaking') {
-      return SPEAKING_CYCLE_FRAMES[speakingFrameIndex] || AVATAR_ASSET_PATHS.speaking;
+      return speakingCycleFrames[speakingFrameIndex] || avatarAssetPaths.speaking;
     }
     if (isBlinking && (state === 'idle' || state === 'listening')) {
-      return AVATAR_ASSET_PATHS.blink;
+      return avatarAssetPaths.blink;
     }
-    return AVATAR_ASSET_PATHS[state] || AVATAR_ASSET_PATHS.idle;
-  }, [state, speakingFrameIndex, isBlinking]);
+    return avatarAssetPaths[state] || avatarAssetPaths.idle;
+  }, [state, speakingFrameIndex, isBlinking, speakingCycleFrames, avatarAssetPaths]);
 
   return {
     state,

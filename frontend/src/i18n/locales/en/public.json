@@ -193,7 +193,16 @@
     "searchPlaceholder": "Enter company name or field to search",
     "allCities": "All cities",
     "searchButton": "Search",
-    "resetFiltersAria": "Reset company search filters"
+    "resetFiltersAria": "Reset company search filters",
+    "openFiltersAria": "Open company search filters",
+    "filterDrawerTitle": "Advanced Filters",
+    "filterLocation": "Location / City",
+    "filterEmployeeSize": "Company Size",
+    "allEmployeeSizes": "All company sizes",
+    "applyFilters": "Apply",
+    "resetFilters": "Reset filters",
+    "activeFilters": "Filtering by",
+    "clearAll": "Clear all"
   },
   "jobsByCategoryPage": {
     "careerTitle": "Jobs by Career",

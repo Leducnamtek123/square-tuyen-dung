@@ -50,7 +50,7 @@ const unwrapDetailResponse = <T>(raw: unknown): T => {
   return value as T;
 };
 
-// ─── Article & Category Types ──────────────────────────────────────────────────
+// --- Article & Category Types --------------------------------------------------
 
 export type ArticleCategory = string;
 export type ArticleStatus = 'draft' | 'pending' | 'published' | 'archived';
@@ -127,7 +127,7 @@ type PaginatedArticles = PaginatedResponse<Article> & {
 const normalizeArticleListResponse = (raw: unknown): PaginatedArticles =>
   normalizePaginatedResponse<Article>(raw);
 
-// ─── Content Service ──────────────────────────────────────────────────────────
+// --- Content Service ----------------------------------------------------------
 
 const contentService = {
   normalizeArticleListParams: (params: ArticleListParams = {}): Record<string, string | number | undefined> => {
@@ -170,7 +170,7 @@ const contentService = {
     return toListData<Banner>(response);
   },
 
-  // ─── Public Article Category API ─────────────────────────────────────────
+  // --- Public Article Category API -----------------------------------------
 
   getPublicArticleCategories: async (): Promise<ArticleCategoryInfo[]> => {
     const url = 'content/web/article-categories/';
@@ -178,7 +178,7 @@ const contentService = {
     return toListData<ArticleCategoryInfo>(response);
   },
 
-  // ─── Admin Article Category CMS API ──────────────────────────────────────
+  // --- Admin Article Category CMS API --------------------------------------
 
   adminGetArticleCategories: async (): Promise<ArticleCategoryInfo[]> => {
     const url = 'content/web/admin/article-categories/';
@@ -186,7 +186,7 @@ const contentService = {
     return toListData<ArticleCategoryInfo>(response);
   },
 
-  // ─── Public Article API ──────────────────────────────────────────────────
+  // --- Public Article API --------------------------------------------------
 
   getPublicArticles: async (params: ArticleListParams = {}): Promise<PaginatedArticles> => {
     const response = await httpRequest.get('content/web/articles/', {
@@ -200,7 +200,7 @@ const contentService = {
     return unwrapDetailResponse<Article>(response);
   },
 
-  // ─── Admin Article API ───────────────────────────────────────────────────
+  // --- Admin Article API ---------------------------------------------------
 
   adminGetArticles: async (params: ArticleListParams = {}): Promise<PaginatedArticles> => {
     const response = await httpRequest.get('content/web/admin/articles/', {
@@ -242,7 +242,7 @@ const contentService = {
     return httpRequest.delete(`content/web/admin/articles/${id}/`) as Promise<void>;
   },
 
-  // ─── Employer Article (Blog) API ─────────────────────────────────────────
+  // --- Employer Article (Blog) API -----------------------------------------
 
   employerGetBlogs: async (params: ArticleListParams = {}): Promise<PaginatedArticles> => {
     const response = await httpRequest.get('content/web/employer/articles/', {

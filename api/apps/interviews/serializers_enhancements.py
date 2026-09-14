@@ -57,6 +57,7 @@ class CreateMockSessionInputSerializer(serializers.Serializer):
     )
     voice_profile_id = serializers.IntegerField(required=False, allow_null=True)
     job_post_id = serializers.IntegerField(required=False, allow_null=True)
+    interview_language = serializers.CharField(required=False, default='vi')
     session_metadata = serializers.JSONField(required=False, default=dict)
 
 
@@ -66,11 +67,12 @@ class MockSessionResponseSerializer(serializers.ModelSerializer):
     livekit_token = serializers.CharField(read_only=True, default="")
     interview_url = serializers.SerializerMethodField()
     session_id = serializers.IntegerField(source="id", read_only=True)
+    interview_language_display = serializers.CharField(source='get_interview_language_display', read_only=True)
 
     class Meta:
         model = InterviewSession
         fields = [
-            'id', 'session_id', 'room_name', 'invite_token', 'status', 'session_type',
+            'id', 'session_id', 'room_name', 'invite_token', 'status', 'session_type', 'interview_language', 'interview_language_display',
             'type', 'scheduled_at', 'duration', 'candidate', 'candidate_name',
             'time_limit_per_question', 'session_metadata', 'questions', 'livekit_token',
             'interview_url', 'create_at'

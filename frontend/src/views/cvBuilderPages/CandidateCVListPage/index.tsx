@@ -111,17 +111,20 @@ export const CandidateCVListPage: React.FC = () => {
 
   return (
     <Box sx={{ width: '100%', pb: 6, display: 'flex', flexDirection: 'column', gap: 3 }}>
-      {/* ── Top Hero Banner (Matching InfoHR Standard) ──────────────────── */}
+      {/* -- Top Hero Banner (Matching InfoHR Standard) -------------------- */}
       <Card
         elevation={0}
         sx={{
           borderRadius: '20px',
-          background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 55%, #1d4ed8 100%)',
+          background: `linear-gradient(100deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.82) 45%, rgba(15, 23, 42, 0.42) 100%), url(/images/banners/banner-cv-gallery.jpg)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center right',
           color: '#ffffff',
           p: { xs: 3, sm: 4 },
           position: 'relative',
           overflow: 'hidden',
-          boxShadow: '0 8px 30px rgba(37, 99, 235, 0.2)',
+          boxShadow: '0 12px 35px -5px rgba(15, 23, 42, 0.35)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
         }}
       >
         <Stack
@@ -181,7 +184,7 @@ export const CandidateCVListPage: React.FC = () => {
         </Stack>
       </Card>
 
-      {/* ── Quick Stats Grid ───────────────────────────────────────────── */}
+      {/* -- Quick Stats Grid --------------------------------------------- */}
       <Grid container spacing={2.5}>
         <Grid size={{ xs: 12, sm: 4 }}>
           <Card elevation={0} sx={{ p: 2.5, borderRadius: '16px', border: '1px solid #e2e8f0', bgcolor: '#ffffff', display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -204,7 +207,7 @@ export const CandidateCVListPage: React.FC = () => {
               <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {mainCV ? mainCV.title : 'Chưa thiết lập'}
               </Typography>
-              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>CV Chính (Mặc định ứng tuyển)</Typography>
+              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>CV Chính - Mặc định ứng tuyển</Typography>
             </Box>
           </Card>
         </Grid>
@@ -222,7 +225,7 @@ export const CandidateCVListPage: React.FC = () => {
         </Grid>
       </Grid>
 
-      {/* ── Search Bar ─────────────────────────────────────────────────── */}
+      {/* -- Search Bar --------------------------------------------------- */}
       <Card elevation={0} sx={{ p: 2, borderRadius: '16px', border: '1px solid #e2e8f0', bgcolor: '#ffffff' }}>
         <TextField
           size="small"
@@ -240,7 +243,7 @@ export const CandidateCVListPage: React.FC = () => {
         />
       </Card>
 
-      {/* ── CV Cards Grid ──────────────────────────────────────────────── */}
+      {/* -- CV Cards Grid ------------------------------------------------ */}
       {isLoading ? (
         <Grid container spacing={3}>
           {[1, 2, 3].map((idx) => (
@@ -400,7 +403,7 @@ export const CandidateCVListPage: React.FC = () => {
         </Card>
       )}
 
-      {/* ── Delete Confirmation Dialog ─────────────────────────────────── */}
+      {/* -- Delete Confirmation Dialog ----------------------------------- */}
       <Dialog
         open={Boolean(deleteConfirmId)}
         onClose={() => setDeleteConfirmId(null)}

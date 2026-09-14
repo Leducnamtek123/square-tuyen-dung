@@ -88,7 +88,7 @@ const TopSlide = () => {
     () => {
       const mm = gsap.matchMedia();
 
-      // ── Desktop Breakpoint (≥769px) ─────────────────────────────────
+      // -- Desktop Breakpoint (≥769px) ---------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.isDesktop, () => {
         const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
@@ -117,7 +117,7 @@ const TopSlide = () => {
           );
       });
 
-      // ── Mobile Breakpoint (≤768px) ──────────────────────────────────
+      // -- Mobile Breakpoint (≤768px) ----------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.isMobile, () => {
         const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
 
@@ -146,7 +146,7 @@ const TopSlide = () => {
           );
       });
 
-      // ── Reduced Motion ───────────────────────────────────────────────
+      // -- Reduced Motion -----------------------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.reduceMotion, () => {
         gsap.set('.gsap-hero-tag, .gsap-hero-title, .gsap-hero-subtitle, .gsap-hero-search', {
           opacity: 1,

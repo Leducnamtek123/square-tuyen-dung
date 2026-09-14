@@ -32,6 +32,34 @@ interface CandidateSidebarProps {
 const CandidateSidebar = ({ completenessPercent }: CandidateSidebarProps) => {
   const pathname = usePathname() || '';
   const { t, i18n } = useTranslation('common');
+  const desktopSidebarRef = React.useRef<HTMLElement>(null);
+  const [sidebarHeight, setSidebarHeight] = React.useState<number>(1030);
+
+  React.useEffect(() => {
+    const el = desktopSidebarRef.current;
+    if (!el) return;
+
+    const measureHeight = () => {
+      if (el) {
+        const h = el.offsetHeight;
+        if (h > 0) {
+          setSidebarHeight(h);
+        }
+      }
+    };
+
+    measureHeight();
+
+    if (typeof ResizeObserver !== 'undefined') {
+      const ro = new ResizeObserver(() => {
+        measureHeight();
+      });
+      ro.observe(el);
+      return () => {
+        ro.disconnect();
+      };
+    }
+  }, []);
 
   // Helper function to check if a route is active regardless of language prefix (/vi/, /en/) or localized slug (/tai-khoan, /ho-so, /viec-lam)
   const isRouteActive = (key: string, rawPath: string, localizedPath: string) => {
@@ -149,7 +177,7 @@ const CandidateSidebar = ({ completenessPercent }: CandidateSidebarProps) => {
 
   return (
     <>
-      {/* ── Mobile Layout (< 900px) ── */}
+      {/* -- Mobile Layout (< 900px) -- */}
       <Box
         sx={{
           display: { xs: 'flex', md: 'none' },
@@ -249,14 +277,19 @@ const CandidateSidebar = ({ completenessPercent }: CandidateSidebarProps) => {
         <CandidateQuickSupportCard />
       </Box>
 
-      {/* ── Desktop Layout (>= 900px) ── */}
+      {/* -- Desktop Layout: Sticky panel for screens >= 900px -- */}
       <Box
+        ref={desktopSidebarRef}
         component="nav"
         aria-label={t('nav.candidateNav', { defaultValue: 'Điều hướng ứng viên' })}
         sx={{
           display: { xs: 'none', md: 'flex' },
           flexDirection: 'column',
           gap: 2.5,
+          position: 'sticky',
+          top: `min(88px, calc(100dvh - ${sidebarHeight}px - 24px))`,
+          zIndex: 10,
+          transition: 'top 0.1s ease-out',
         }}
       >
         {/* Sidebar Navigation Card */}

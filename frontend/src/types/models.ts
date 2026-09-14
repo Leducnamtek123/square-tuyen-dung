@@ -646,6 +646,8 @@ export interface QuestionGroup {
   questionIds?: number[];
   question_ids?: number[]; // Raw API payload field
   canWrite?: boolean;
+  is_public?: boolean;
+  isPublic?: boolean;
   createAt?: string;
   updateAt?: string;
 }
@@ -737,6 +739,10 @@ export interface InterviewSession {
   livekit_token?: string;
   interview_url?: string;
   interviewUrl?: string;
+  interviewLanguage?: 'vi' | 'en' | 'ja' | 'ko' | string;
+  interview_language?: 'vi' | 'en' | 'ja' | 'ko' | string;
+  interviewLanguageDisplay?: string;
+  interview_language_display?: string;
 }
 
 export interface InterviewTranscript {

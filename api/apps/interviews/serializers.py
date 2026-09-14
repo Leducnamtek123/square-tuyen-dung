@@ -132,7 +132,7 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionGroup
         fields = [
-            'id', 'name', 'description', 'evaluation_rubric', 'questions', 'questions_count',
+            'id', 'name', 'description', 'is_public', 'evaluation_rubric', 'questions', 'questions_count',
             'evaluation_rubric_input', 'question_ids', 'author', 'company', 'canWrite', 'create_at', 'update_at'
         ]
         read_only_fields = ['id', 'author', 'company', 'create_at', 'update_at']
@@ -494,7 +494,7 @@ def resolve_session_company_name(obj):
         if comp and getattr(comp, 'company_name', None):
             return comp.company_name
     if getattr(obj, 'session_type', '') == 'mock':
-        return "Trợ lý Phỏng vấn AI (AILA InfoHR)"
+        return "Trợ lý Phỏng vấn AI - AILA InfoHR"
     return "InfoHR Tuyển Dụng"
 
 def resolve_session_company_logo(obj):
@@ -534,11 +534,12 @@ class InterviewSessionListSerializer(serializers.ModelSerializer):
     voice_profile_name = serializers.CharField(source='voice_profile.name', read_only=True, default=None)
     evaluations_count = serializers.SerializerMethodField()
     questions_count = serializers.SerializerMethodField()
+    interview_language_display = serializers.CharField(source='get_interview_language_display', read_only=True)
 
     class Meta:
         model = InterviewSession
         fields = [
-            'id', 'room_name', 'invite_token', 'status', 'type', 'session_type',
+            'id', 'room_name', 'invite_token', 'status', 'type', 'session_type', 'interview_language', 'interview_language_display',
             'candidate', 'candidate_name', 'candidate_email',
             'job_post', 'job_name', 'company_name', 'company_logo',
             'voice_profile', 'voice_profile_name',
@@ -590,11 +591,12 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
     questions = serializers.SerializerMethodField()
     transcripts = InterviewTranscriptSerializer(many=True, read_only=True)
     evaluations = InterviewEvaluationSerializer(many=True, read_only=True)
+    interview_language_display = serializers.CharField(source='get_interview_language_display', read_only=True)
 
     class Meta:
         model = InterviewSession
         fields = [
-            'id', 'room_name', 'invite_token', 'status', 'type', 'session_type',
+            'id', 'room_name', 'invite_token', 'status', 'type', 'session_type', 'interview_language', 'interview_language_display',
             'candidate', 'candidate_name', 'candidate_email',
             'job_post', 'job_name', 'company_name', 'company_logo',
             'voice_profile', 'voice_profile_name',
@@ -640,7 +642,7 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = InterviewSession
         fields = [
-            'candidate', 'job_post', 'type',
+            'candidate', 'job_post', 'type', 'interview_language',
             'scheduled_at', 'notes',
             'question_group', 'question_ids', 'voice_profile',
             'session_metadata',
@@ -650,6 +652,8 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
         payload = data.copy() if hasattr(data, "copy") else dict(data)
         if "jobPost" in payload and "job_post" not in payload:
             payload["job_post"] = payload.get("jobPost")
+        if "interviewLanguage" in payload and "interview_language" not in payload:
+            payload["interview_language"] = payload.get("interviewLanguage")
         if "scheduledAt" in payload and "scheduled_at" not in payload:
             payload["scheduled_at"] = payload.get("scheduledAt")
         if "questionIds" in payload and "question_ids" not in payload:

@@ -77,7 +77,7 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
         overflow: 'hidden',
       }}
     >
-      {/* ── Vieclam24h-Style Top Control Bar ─────────────────────────────── */}
+      {/* -- Vieclam24h-Style Top Control Bar ------------------------------- */}
       <Paper
         elevation={0}
         className="no-print"
@@ -115,7 +115,7 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
                 '&:hover': { borderColor: '#2563eb', bgcolor: '#eff6ff', color: '#2563eb' },
               }}
             >
-              {t('cvBuilder.preview.switchTemplate', 'Đổi mẫu')} ({currentTemplate.name})
+              {t('cvBuilder.preview.switchTemplate', 'Đổi mẫu')} - {currentTemplate.name}
             </Button>
           )}
 
@@ -246,7 +246,7 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
         </Stack>
       </Paper>
 
-      {/* ── Center Canvas Area with Pan & Scroll ─────────────────────────── */}
+      {/* -- Center Canvas Area with Pan & Scroll --------------------------- */}
       <Box
         sx={{
           flex: 1,

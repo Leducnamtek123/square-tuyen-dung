@@ -41,7 +41,18 @@ export const MasterCandidateItem: React.FC<MasterCandidateItemProps> = ({
 
   const user = resume.userDict || resume.user;
   const fullName = user?.fullName || resume.title || 'Ứng viên';
-  const age = resume.jobSeekerProfileDict?.old;
+  const rawAge: any = resume.jobSeekerProfileDict?.old;
+  const birthday = (resume.jobSeekerProfileDict as any)?.birthday || (resume as any).jobSeekerProfile?.birthday;
+  const calculateAge = (bday: string | Date | undefined) => {
+    if (!bday) return null;
+    const bDate = new Date(bday);
+    const birthYear = bDate.getFullYear();
+    if (isNaN(birthYear) || birthYear <= 1970) return null;
+    const currentYear = new Date().getFullYear();
+    return currentYear - birthYear;
+  };
+  const calculatedAge = birthday ? calculateAge(birthday) : null;
+  const age = calculatedAge || (rawAge && rawAge < 55 ? rawAge : null);
   const experienceLabel =
     resume.experience && allConfig?.experienceDict?.[resume.experience]
       ? tConfig(String(allConfig.experienceDict[resume.experience]))
@@ -123,7 +134,7 @@ export const MasterCandidateItem: React.FC<MasterCandidateItemProps> = ({
               {fullName}
               {age && String(age) !== '---' && (
                 <Box component="span" sx={{ fontWeight: 500, color: '#64748B', ml: 0.5, fontSize: '0.78rem' }}>
-                  ({age} tuổi)
+                  · {age} tuổi
                 </Box>
               )}
             </Typography>

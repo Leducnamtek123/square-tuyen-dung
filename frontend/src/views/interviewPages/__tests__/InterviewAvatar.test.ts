@@ -6,11 +6,15 @@ import {
   PRELOAD_AVATAR_STATES,
   AVATAR_STATE_META,
   resolveAvatarState,
+  resolveAvatarBasePath,
+  getAvatarAssetPaths,
+  getSpeakingCycleFrames,
   type AvatarState,
 } from '../components/avatar/avatarStates';
 
 describe('InterviewAvatar System Suite', () => {
   const publicAvatarDir = join(__dirname, '../../../../public/assets/images/avatar/hr');
+  const publicMaleAvatarDir = join(__dirname, '../../../../public/assets/images/avatar/expert_male');
 
   describe('Asset Directory & Physical Files', () => {
     it('verifies that all mapped state assets physically exist on disk as WebP files', () => {
@@ -19,16 +23,43 @@ describe('InterviewAvatar System Suite', () => {
 
       for (const state of states) {
         const relativePath = AVATAR_ASSET_PATHS[state];
-        const filename = relativePath.replace('/assets/images/avatar/hr/', '');
+        const filename = relativePath.split('?')[0].replace('/assets/images/avatar/hr/', '');
         const fullPath = join(publicAvatarDir, filename);
         expect(existsSync(fullPath)).toBe(true);
       }
     });
 
+    it('verifies that expert_male assets physically exist with all 22 states on disk', () => {
+      const malePaths = getAvatarAssetPaths('expert_male');
+      const maleStates = Object.keys(malePaths) as AvatarState[];
+      expect(maleStates.length).toBeGreaterThanOrEqual(14);
+
+      for (const state of maleStates) {
+        const relativePath = malePaths[state];
+        const filename = relativePath.split('?')[0].replace('/assets/images/avatar/expert_male/', '');
+        const fullPath = join(publicMaleAvatarDir, filename);
+        expect(existsSync(fullPath)).toBe(true);
+      }
+
+      const maleSpeakingFrames = getSpeakingCycleFrames('expert_male');
+      expect(maleSpeakingFrames.length).toBe(8);
+      for (const frame of maleSpeakingFrames) {
+        const filename = frame.split('?')[0].replace('/assets/images/avatar/expert_male/', '');
+        const fullPath = join(publicMaleAvatarDir, filename);
+        expect(existsSync(fullPath)).toBe(true);
+      }
+    });
+
+    it('verifies avatar base path resolver returns correct paths', () => {
+      expect(resolveAvatarBasePath('expert_male')).toBe('/assets/images/avatar/expert_male');
+      expect(resolveAvatarBasePath('aila_recruiter')).toBe('/assets/images/avatar/hr');
+      expect(resolveAvatarBasePath(undefined)).toBe('/assets/images/avatar/hr');
+    });
+
     it('verifies that speaking cycle frames exist and have distinct frames', () => {
       expect(SPEAKING_CYCLE_FRAMES.length).toBe(8);
       for (const frame of SPEAKING_CYCLE_FRAMES) {
-        const filename = frame.replace('/assets/images/avatar/hr/', '');
+        const filename = frame.split('?')[0].replace('/assets/images/avatar/hr/', '');
         const fullPath = join(publicAvatarDir, filename);
         expect(existsSync(fullPath)).toBe(true);
       }

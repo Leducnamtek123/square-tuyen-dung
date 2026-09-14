@@ -88,15 +88,31 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
     user?.phone ||
     (resume as any).phone ||
     (resume as any).contactPhone;
-  const email =
+  const rawEmail =
     (resume as any).user?.email ||
     (resume as any).userDict?.email ||
     user?.email ||
     profileObj?.email ||
     (resume as any).email ||
     (resume as any).contactEmail;
+  const isInternalProxyEmail = (val?: string) =>
+    !val || val.includes('.private.nhanlucsieuviet.com') || val.includes('@imported.infohr.vn');
+  const email = isInternalProxyEmail(rawEmail) ? '' : rawEmail;
+
   const fullName = user?.fullName || resume.title || 'Ứng viên';
-  const age = (resume as any).jobSeekerProfileDict?.old;
+
+  const rawAge = (resume as any).jobSeekerProfileDict?.old || (resume as any).jobSeekerProfile?.old;
+  const birthday = (resume as any).jobSeekerProfile?.birthday || (resume as any).jobSeekerProfileDict?.birthday;
+  const calculateAge = (bday: string | Date | undefined) => {
+    if (!bday) return null;
+    const bDate = new Date(bday);
+    const birthYear = bDate.getFullYear();
+    if (isNaN(birthYear) || birthYear <= 1970) return null;
+    const currentYear = new Date().getFullYear();
+    return currentYear - birthYear;
+  };
+  const calculatedAge = birthday ? calculateAge(birthday) : null;
+  const age = calculatedAge || (rawAge && rawAge < 55 ? rawAge : null);
   const profileDetailHref = localizeRoutePath(
     `/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, resume.slug)}`,
     i18n.language
@@ -201,7 +217,7 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
               {fullName}
               {age && String(age) !== '---' && (
                 <Box component="span" sx={{ fontWeight: 500, color: '#64748B', ml: 0.75, fontSize: '0.9rem' }}>
-                  ({age} tuổi)
+                  · {age} tuổi
                 </Box>
               )}
             </Typography>
@@ -621,7 +637,7 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
                   variant="subtitle2"
                   sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.875rem' }}
                 >
-                  File Hồ sơ đính kèm (CV PDF)
+                  Tệp hồ sơ đính kèm định dạng PDF
                 </Typography>
               </Stack>
               <Button

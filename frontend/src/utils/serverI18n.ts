@@ -6,7 +6,7 @@
 import { cookies, headers } from 'next/headers';
 import type { Metadata } from 'next';
 
-// ─── Locale detection ──────────────────────────────────────────────────────
+// --- Locale detection ------------------------------------------------------
 
 type SupportedLocale = 'vi' | 'en';
 
@@ -34,7 +34,7 @@ async function getServerLocale(): Promise<SupportedLocale> {
   return 'vi';
 }
 
-// ─── Page title map (Optimized for 35-65 char SEO length without duplicate suffixes) ──
+// --- Page title map (Optimized for 35-65 char SEO length without duplicate suffixes) --
 
 const PAGE_TITLES: Record<string, Record<SupportedLocale, string>> = {
   // Root
@@ -100,6 +100,8 @@ const PAGE_TITLES: Record<string, Record<SupportedLocale, string>> = {
   'employer.account':         { vi: 'Quản lý tài khoản doanh nghiệp', en: 'Employer Account' },
   'employer.settings':        { vi: 'Cài đặt tài khoản tuyển dụng', en: 'Employer Settings' },
   'employer.job-posts':       { vi: 'Quản lý tin đăng tuyển dụng', en: 'Job Posts Management' },
+  'employer.job-posts-create': { vi: 'Tạo tin tuyển dụng mới', en: 'Create New Job Post' },
+  'employer.job-posts-edit':   { vi: 'Chỉnh sửa tin tuyển dụng', en: 'Edit Job Post' },
   'employer.company':         { vi: 'Hồ sơ thương hiệu doanh nghiệp', en: 'Company Brand Profile' },
   'employer.employees':       { vi: 'Quản lý tài khoản thành viên', en: 'Team Members' },
   'employer.candidates':      { vi: 'Danh sách ứng viên tiềm năng hàng đầu', en: 'Top Talent Candidate List' },
@@ -173,7 +175,7 @@ const PAGE_TITLES: Record<string, Record<SupportedLocale, string>> = {
   'error.forbidden':          { vi: 'Truy cập bị từ chối (403)', en: 'Access Forbidden (403)' },
 };
 
-// ─── Page Description Map (Unique, high-quality 120-155 char descriptions) ──
+// --- Page Description Map (Unique, high-quality 120-155 char descriptions) --
 
 const PAGE_DESCRIPTIONS: Record<string, Record<SupportedLocale, string>> = {
   'home': {
@@ -262,7 +264,7 @@ const PAGE_DESCRIPTIONS: Record<string, Record<SupportedLocale, string>> = {
   },
 };
 
-// ─── Canonical path mapping for public routes ──────────────────────────────
+// --- Canonical path mapping for public routes ------------------------------
 
 const PAGE_CANONICAL_PATHS: Record<string, string> = {
   'home': '/',

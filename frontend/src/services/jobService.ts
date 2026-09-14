@@ -6,7 +6,7 @@ import type { ExportTableRow, PaginatedResponse } from '../types/api';
 
 type IdType = string | number;
 
-/* ── Request DTOs ─────────────────────────────────────────────────────── */
+/* -- Request DTOs ------------------------------------------------------- */
 
 export type GetJobPostsParams = {
   kw?: string;
@@ -66,7 +66,7 @@ export interface JobPostInput {
   };
 }
 
-/* ── Response Types ───────────────────────────────────────────────────── */
+/* -- Response Types ----------------------------------------------------- */
 
 interface SuggestTitleResponse {
   results: string[];
@@ -109,7 +109,7 @@ const normalizeJobTitleSuggestions = (raw: unknown): SuggestTitleResponse => ({
   ),
 });
 
-/* ── Service ──────────────────────────────────────────────────────────── */
+/* -- Service ------------------------------------------------------------ */
 
 const jobService = {
   searchJobSuggestTitle: (kw: string): Promise<SuggestTitleResponse> => {

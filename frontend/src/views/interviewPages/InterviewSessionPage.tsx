@@ -34,7 +34,7 @@ import { cn } from '@/lib/utils';
 import { IMAGES } from '@/configs/images';
 import DottedWorldMapBackground from '@/views/onboardingPages/components/DottedWorldMapBackground';
 
-// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Hàm tiện ích hỗ trợ phòng phỏng vấn
 
 const getSafeLiveKitUrl = (preferLocal = false) => {
   if (typeof window === 'undefined') return '';
@@ -134,7 +134,7 @@ function resolveLiveKitServerUrl(returnedUrl?: string): string {
   return urlToUse;
 }
 
-// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Định nghĩa kiểu dữ liệu phòng phỏng vấn
 
 type InterviewSessionPageProps = {
   participantRole?: 'jobseeker' | 'employer' | 'admin' | string;
@@ -197,7 +197,7 @@ const reducer = (state: SessionPageState, action: SessionPageAction): SessionPag
   }
 };
 
-// ─── Component ──────────────────────────────────────────────────────────────────
+// --- Component ------------------------------------------------------------------
 
 function InterviewSessionLoading({ label }: { label: string }) {
   return (
@@ -268,6 +268,7 @@ function ActiveInterviewRoom({
 }) {
   const sessionMeta = ((session?.sessionMetadata || session?.session_metadata || {}) as Record<string, any>);
   const savedSettings = employerAiSettingService.getSettings();
+  const avatarId = sessionMeta.avatar_id || sessionMeta.avatarId || savedSettings.selectedAvatarId || 'aila_recruiter';
   const avatarImageUrl = sessionMeta.avatar_image_url || sessionMeta.avatarImageUrl || (savedSettings.avatarType === 'custom' && savedSettings.customAvatarUrl ? savedSettings.customAvatarUrl : null);
   const avatarBackgroundUrl = sessionMeta.avatar_background_url || sessionMeta.avatarBackgroundUrl || employerAiSettingService.resolveActiveBackgroundUrl(savedSettings);
   const avatarBackdrop = sessionMeta.avatar_backdrop || sessionMeta.avatarBackdrop || savedSettings.selectedBackgroundId || 'modern_office';
@@ -328,6 +329,7 @@ function ActiveInterviewRoom({
           <AIInterviewLayout
             onEndSession={onEndSession}
             questions={questions}
+            avatarId={avatarId}
             avatarImageUrl={avatarImageUrl}
             avatarBackgroundUrl={avatarBackgroundUrl}
             avatarBackdrop={avatarBackdrop}
@@ -618,7 +620,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
     }
   }, [isJoinable, normalizedRole, prefetchToken, routeId, state.connectRoom, state.sessionInviteToken]);
 
-  // â”€â”€ Fetch session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Tải thông tin phiên phỏng vấn
 
   const fetchSessionDetails = React.useCallback(async (options: FetchSessionDetailsOptions = {}) => {
     const showLoading = options.showLoading ?? true;
@@ -730,7 +732,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
     return () => window.clearInterval(pollInterval);
   }, [state.session?.status, state.session?.aiOverallScore, fetchSessionDetails]);
 
-  // â”€â”€ Start / terminate session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Khởi tạo hoặc kết thúc phiên phỏng vấn
 
   const initiateInterviewSession = React.useCallback(async () => {
     const translate = tRef.current;
@@ -773,7 +775,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
       // Mark Room step complete, start Script step
       setPrepSteps({ room: 'completed', script: 'processing', agent: 'pending' });
       setPrepProgress(45);
-      setPrepMessage('Đang chuẩn bị kịch bản phỏng vấn...');
+      setPrepMessage('Đang phân tích hồ sơ CV và kịch bản phỏng vấn...');
 
       // 2. Stage 2: Questions & Session Context
       let currentSession = state.session;
@@ -784,11 +786,35 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
 
       // Mark Script step complete, start Agent step
       setPrepSteps({ room: 'completed', script: 'completed', agent: 'processing' });
-      setPrepProgress(75);
-      setPrepMessage('Agent đang tham gia phòng phỏng vấn...');
+      setPrepProgress(65);
+      setPrepMessage('Đang kết nối và làm nóng mô hình giọng nói AI...');
 
-      // 3. Stage 3: Agent Readiness & in_progress Status
+      // 3. Stage 3: Real TTS/STT Warmup & Agent Readiness Gate
       const targetRoomName = state.session?.roomName || roomName;
+      const warmupIdentifier = state.sessionInviteToken || routeId || state.session?.id || targetRoomName;
+      if (warmupIdentifier) {
+        setPrepProgress(72);
+        try {
+          const warmupResult = await withTimeout(
+            interviewService.warmupSession(warmupIdentifier, {
+              inviteToken: state.sessionInviteToken,
+            }),
+            35000
+          );
+          if (warmupResult && !warmupResult.success) {
+            throw new Error(
+              warmupResult.detail || 'Hệ thống giọng nói AI đang chuẩn bị. Vui lòng nhấn Thử lại.'
+            );
+          }
+        } catch (warmupErr) {
+          console.warn('[InterviewSession] Session warmup error:', warmupErr);
+          throw warmupErr;
+        }
+      }
+
+      setPrepProgress(88);
+      setPrepMessage('Trợ lý AI AILA đã sẵn sàng, đang kích hoạt phiên...');
+
       if (targetRoomName && (state.sessionInviteToken || tokenService.getAccessTokenFromCookie())) {
         try {
           const updatedStatus = await withTimeout(
@@ -804,8 +830,6 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
           console.warn('[InterviewSession] Session status sync:', statusErr);
         }
       }
-
-      await new Promise((res) => setTimeout(res, 600));
 
       // All Steps Complete
       setPrepSteps({ room: 'completed', script: 'completed', agent: 'completed' });
@@ -874,13 +898,13 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
     }
   }, [fetchSessionDetails, roomName, state.sessionInviteToken]);
 
-  // â”€â”€ Loading state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Trạng thái đang tải
 
   if (state.loading) {
     return <InterviewSessionLoading label={t('loading')} />;
   }
 
-  // â”€â”€ Error (no session) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Khối hiển thị khi có lỗi không tìm thấy phiên phỏng vấn
 
   if (state.error && !state.session) {
     return (
@@ -892,7 +916,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
     );
   }
 
-  // â”€â”€ Derived display values â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Giá trị hiển thị tính toán
 
   const statusKey = (state.session?.status || 'scheduled').toLowerCase();
   const displayStatusKey =
@@ -933,7 +957,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
         ? t('processingTitle')
         : t('unavailableTitle');
 
-  // ─── Active video conference (LiveKit VideoConference) ────────────────
+  // --- Active video conference (LiveKit VideoConference) ----------------
 
   if (state.connectRoom && state.connectionDetails) {
     return (
@@ -956,7 +980,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
     );
   }
 
-  // ─── Completed or Processing: Show Results / Completion View ─────────────────
+  // --- Completed or Processing: Show Results / Completion View -----------------
   if (statusKey === 'completed' || isProcessing) {
     return (
       <InterviewCompletedView
@@ -969,7 +993,7 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
     );
   }
 
-  // ─── Preflight / waiting room ──────────────────────────────────────────
+  // --- Preflight / waiting room ------------------------------------------
 
   return (
     <>

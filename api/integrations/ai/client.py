@@ -351,6 +351,21 @@ def _response_error(label: str, response: Any) -> str:
 
 
 def _safe_parse_completion_json(response: Any) -> Dict[str, Any]:
+    if hasattr(response, "encoding"):
+        response.encoding = "utf-8"
+
+    # Prefer decoding raw bytes as UTF-8 directly to prevent requests/httpx from
+    # falling back to ISO-8859-1 when upstream returns text/event-stream or text/plain
+    content = getattr(response, "content", None)
+    if content:
+        try:
+            raw_text = content.decode("utf-8", errors="replace").strip()
+            if "data: [DONE]" in raw_text:
+                raw_text = raw_text.split("data: [DONE]")[0].strip()
+            return json.loads(raw_text)
+        except Exception:
+            pass
+
     try:
         return response.json()
     except Exception:

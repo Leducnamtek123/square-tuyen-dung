@@ -23,6 +23,7 @@ import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import PictureAsPdfOutlinedIcon from '@mui/icons-material/PictureAsPdfOutlined';
 import { AilaLogo } from '@/components/Common/AilaLogo';
 
 import { IMAGES } from '@/configs/images';
@@ -157,6 +158,12 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
     }
   };
 
+  const handleExportPdf = () => {
+    if (!session?.id) return;
+    const pdfUrl = `/api/interview/web/sessions/${session.id}/export-pdf/`;
+    window.open(pdfUrl, '_blank');
+  };
+
   const handleRetryQuestion = (question: QuestionReviewItem) => {
     // Redirect to practice room or retry
     router.push(practicePath);
@@ -168,7 +175,7 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
 
   return (
     <main className="flex min-h-[100dvh] flex-col bg-[#f8fafc] text-slate-800 pb-28">
-      {/* ─── Top Navigation Header ────────────────────────────────────────── */}
+      {/* --- Top Navigation Header ------------------------------------------ */}
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur-xl md:px-8 shadow-2xs">
         <div className="flex items-center gap-3">
           <Button
@@ -193,7 +200,7 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
         </div>
       </header>
 
-      {/* ─── Main Content Container ──────────────────────────────────────── */}
+      {/* --- Main Content Container ---------------------------------------- */}
       <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 md:py-8 space-y-6">
         {/* Processing State Banner */}
         {isProcessing && (
@@ -205,7 +212,7 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
           </div>
         )}
 
-        {/* ─── Title & Meta Block ──────────────────────────────────────────── */}
+        {/* --- Title & Meta Block -------------------------------------------- */}
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
             <div className="mb-1.5 flex items-center gap-2">
@@ -257,6 +264,15 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
             <Button
               variant="outline"
               size="sm"
+              onClick={handleExportPdf}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50/80 px-3.5 text-xs font-semibold text-blue-700 shadow-2xs hover:bg-blue-100 transition-all h-9"
+            >
+              <PictureAsPdfOutlinedIcon sx={{ fontSize: 16 }} />
+              <span>Xuất báo cáo PDF</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleShare}
               className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/90 px-3.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-all h-9"
             >
@@ -266,7 +282,7 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
           </div>
         </div>
 
-        {/* ─── 1. Competency Overview Bento (Donut + Radar Chart) ─────────── */}
+        {/* --- 1. Competency Overview Bento (Donut + Radar Chart) ----------- */}
         <CompetencyOverviewCard
           overallScore={score100}
           isEvaluating={isEvaluating}
@@ -282,7 +298,7 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
           }
         />
 
-        {/* ─── 2. Strengths & Weaknesses Quick Highlights (If present) ───── */}
+        {/* --- 2. Strengths & Weaknesses Quick Highlights (If present) ----- */}
         {(strengthsList.length > 0 || weaknessesList.length > 0) && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {strengthsList.length > 0 && (
@@ -315,14 +331,14 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
           </div>
         )}
 
-        {/* ─── 3. Two-Column Question Review Drilldown ────────────────────── */}
+        {/* --- 3. Two-Column Question Review Drilldown ---------------------- */}
         <InterviewQuestionReviewSection
           questions={reviewQuestions}
           onRetryQuestion={handleRetryQuestion}
         />
       </div>
 
-      {/* ─── Sticky Bottom Action Bar ─────────────────────────────────────── */}
+      {/* --- Sticky Bottom Action Bar --------------------------------------- */}
       <footer className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-center border-t border-slate-200/90 bg-white/95 px-4 py-3 backdrop-blur-lg shadow-lg">
         <div className="flex w-full max-w-5xl items-center justify-center gap-3 sm:justify-end">
           {/* Back to list */}

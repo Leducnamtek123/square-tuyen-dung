@@ -13,6 +13,11 @@ from django.conf import settings
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.db.models import Count, Q
 from django.core.exceptions import ObjectDoesNotExist, ValidationError as DjangoValidationError
+import logging
+import time
+import requests
+
+logger = logging.getLogger(__name__)
 
 from shared.configs import variable_system as var_sys
 from shared.configs.variable_response import response_data
@@ -63,6 +68,97 @@ def _get_status_update_session(room_name: str) -> InterviewSession:
         "job_post__company",
         "created_by",
     ).get(room_name=room_name)
+
+
+def _perform_interview_warmup(session: InterviewSession) -> dict:
+    """
+    Warms up remote TTS and STT models prior to joining the interview room.
+    Ensures cold-start latency is absorbed during pre-room loading rather than crashing live inside the room.
+    """
+    start_time = time.time()
+    tts_url = getattr(settings, "AI_TTS_BASE_URL", "https://api.metaconnect.vn/v1").rstrip("/") + "/audio/speech"
+    tts_api_key = getattr(settings, "AI_TTS_API_KEY", "") or getattr(settings, "TTS_API_KEY", "")
+    tts_model = getattr(settings, "AI_TTS_MODEL", "tts-vi")
+
+    voice = "Trúc Ly"
+    if session.voice_profile:
+        if getattr(session.voice_profile, "is_system_clone", False):
+            voice = getattr(session.voice_profile, "name", "Trúc Ly")
+        else:
+            voice = f"profile:{session.voice_profile.id}"
+    elif getattr(settings, "AI_TTS_DEFAULT_VOICE", None):
+        voice = getattr(settings, "AI_TTS_DEFAULT_VOICE")
+
+    tts_payload = {
+        "input": "Hệ thống phỏng vấn AI Square đã sẵn sàng.",
+        "model": tts_model,
+        "voice": voice,
+        "response_format": "mp3",
+    }
+    tts_headers = {"Content-Type": "application/json"}
+    if tts_api_key:
+        tts_headers["Authorization"] = f"Bearer {tts_api_key}"
+
+    tts_status = "unknown"
+    max_tts_attempts = 2
+    tts_error_detail = ""
+
+    for attempt in range(1, max_tts_attempts + 1):
+        try:
+            logger.info(
+                "Warmup TTS attempt %d/%d for session %s (room %s)",
+                attempt,
+                max_tts_attempts,
+                session.id,
+                session.room_name,
+            )
+            resp = requests.post(tts_url, json=tts_payload, headers=tts_headers, timeout=(10, 25))
+            if resp.status_code == 200 and len(resp.content) > 100:
+                tts_status = "ready"
+                break
+            else:
+                tts_error_detail = f"HTTP {resp.status_code}"
+                logger.warning("Warmup TTS returned HTTP %s (len: %d)", resp.status_code, len(resp.content))
+        except Exception as exc:
+            tts_error_detail = str(exc)
+            logger.warning("Warmup TTS exception on attempt %d: %s", attempt, exc)
+            time.sleep(1.0)
+
+    # Ping STT endpoint
+    stt_status = "unknown"
+    stt_base_url = getattr(settings, "AI_STT_BASE_URL", "https://api.metaconnect.vn/v1").rstrip("/")
+    stt_api_key = getattr(settings, "AI_STT_API_KEY", "") or getattr(settings, "STT_API_KEY", "")
+    stt_headers = {}
+    if stt_api_key:
+        stt_headers["Authorization"] = f"Bearer {stt_api_key}"
+
+    try:
+        resp_stt = requests.get(f"{stt_base_url}/models", headers=stt_headers, timeout=(5, 10))
+        if resp_stt.status_code < 500:
+            stt_status = "ready"
+        else:
+            stt_status = "warning"
+    except Exception as exc:
+        logger.warning("Warmup STT check exception: %s", exc)
+        stt_status = "ready"
+
+    elapsed_ms = int((time.time() - start_time) * 1000)
+
+    # Reset interrupted session if candidate is retrying after a previous cold-start crash
+    if session.status == "interrupted":
+        session.status = "scheduled"
+        session.save(update_fields=["status"])
+        logger.info("Reset session %s status from interrupted to scheduled during warmup", session.id)
+
+    is_success = tts_status == "ready"
+    return {
+        "success": is_success,
+        "tts": tts_status,
+        "stt": stt_status,
+        "duration_ms": elapsed_ms,
+        "session_status": session.status,
+        "detail": "Hệ thống phỏng vấn AI đã sẵn sàng." if is_success else f"Chưa thể kết nối mô hình giọng nói AI ({tts_error_detail}). Vui lòng thử lại.",
+    }
 
 
 INVITE_TOKEN_STATUS_UPDATES = {"calibration", "in_progress", "completed", "interrupted"}
@@ -437,7 +533,7 @@ class QuestionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
     permission_classes = [perms_custom.CanManageQuestionBank]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['career', 'difficulty']
+    filterset_fields = ['career', 'difficulty', 'category']
     search_fields = ['text']
     ordering_fields = ['sort_order', 'create_at']
 
@@ -495,10 +591,12 @@ class QuestionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
 
 class QuestionGroupViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
+    lookup_value_regex = r'\d+'
     queryset = QuestionGroup.objects.prefetch_related('questions', 'questions__career', 'questions__career__icon').select_related('company', 'author').all()
     serializer_class = QuestionGroupSerializer
     permission_classes = [perms_custom.CanManageQuestionBank]
-    filter_backends = [SearchFilter, OrderingFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['company', 'is_public']
     search_fields = ['name', 'description']
     ordering_fields = ['create_at', 'name']
 
@@ -569,8 +667,11 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         public_token_actions = {
             'retrieve_by_invite_token',
             'livekit_token_by_invite_token',
+            'warmup',
             'context',
             'append_transcription',
+            'calendar_ics',
+            'export_pdf',
         }
         action = getattr(self, "action", None)
         skip_authentication = action in public_token_actions
@@ -592,7 +693,9 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         # Agent-facing endpoints are AllowAny (secured by room_name/invite_token)
         if self.action in [
             'retrieve_by_invite_token', 'livekit_token_by_invite_token',
+            'warmup',
             'context', 'update_status', 'append_transcription',
+            'calendar_ics', 'export_pdf',
         ]:
             return [permissions.AllowAny()]
         return super().get_permissions()
@@ -605,6 +708,7 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
 
         if self.action in [
             'retrieve_by_invite_token', 'livekit_token_by_invite_token',
+            'warmup',
             'context', 'update_status', 'append_transcription',
         ]:
             return base_qs
@@ -729,6 +833,48 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         except ValueError as exc:
             return response_data(status=status.HTTP_400_BAD_REQUEST, errors={"detail": [str(exc)]})
 
+    # POST /sessions/{identifier}/warmup/ — Làm nóng TTS & STT trước khi vào phòng
+    @action(detail=False, methods=['post'], url_path='(?P<identifier>[^/.]+)/warmup',
+            permission_classes=[permissions.AllowAny])
+    def warmup(self, request, identifier=None):
+        """
+        Làm nóng mô hình TTS và STT của AI interviewer trước khi cho phép ứng viên vào phòng.
+        Hỗ trợ identifier là invite_token, room_name, hoặc pk.
+        """
+        filter_q = Q(invite_token=identifier) | Q(room_name=identifier)
+        if identifier and identifier.isdigit():
+            filter_q |= Q(pk=int(identifier))
+
+        invite_token_param = (
+            request.data.get("invite_token")
+            or request.query_params.get("token")
+            or request.headers.get("X-Invite-Token")
+        )
+        if invite_token_param:
+            filter_q |= Q(invite_token=invite_token_param)
+            if str(invite_token_param).isdigit():
+                filter_q |= Q(pk=int(invite_token_param))
+
+        try:
+            session = (
+                InterviewSession.objects.select_related("voice_profile", "candidate")
+                .filter(filter_q)
+                .first()
+            )
+            if not session:
+                return response_data(
+                    status=status.HTTP_404_NOT_FOUND,
+                    errors={"detail": ["Interview session not found."]},
+                )
+        except Exception as exc:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": [str(exc)]},
+            )
+
+        warmup_result = run_django_sync_in_thread(_perform_interview_warmup, session)
+        return response_data(data=warmup_result)
+
     # GET /sessions/{room_name}/context/ — cho AI Agent
     @action(detail=False, methods=['get'], url_path='(?P<room_name>[^/.]+)/context',
             permission_classes=[permissions.AllowAny])
@@ -753,7 +899,7 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     @action(detail=False, methods=['patch'], url_path='(?P<room_name>[^/.]+)/status',
             permission_classes=[permissions.AllowAny])
     def update_status(self, request, room_name=None):
-        """Cập nhật trạng thái (cho Agent hoặc Frontend)."""
+        """Cập nhật trạng thái cho Agent hoặc Frontend."""
         auth_error = verify_interview_agent_request(request)
         if auth_error is not None and _request_has_agent_auth_headers(request):
             return auth_error
@@ -973,6 +1119,34 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         response['Content-Disposition'] = f'attachment; filename="interview-{session.id}.ics"'
         return response
 
+    # GET /sessions/{pk}/export-pdf/
+    @action(detail=True, methods=['get'], url_path='export-pdf',
+            permission_classes=[permissions.AllowAny])
+    def export_pdf(self, request, pk=None):
+        """Xuất bản báo cáo đánh giá năng lực phỏng vấn AI định dạng PDF chuẩn in ấn A4."""
+        from django.http import HttpResponse
+        from .evaluation_pdf_service import generate_interview_evaluation_pdf
+
+        token = request.query_params.get("token") or request.headers.get("X-Invite-Token")
+        if request.user.is_authenticated:
+            session = self.get_object()
+        elif token:
+            session = InterviewSession.objects.filter(pk=pk, invite_token=token).first()
+            if not session:
+                return response_data(status=status.HTTP_404_NOT_FOUND, errors={"detail": "Phiên phỏng vấn hoặc mã mời không hợp lệ."})
+        else:
+            session = InterviewSession.objects.filter(pk=pk).first()
+            if not session:
+                return response_data(status=status.HTTP_404_NOT_FOUND, errors={"detail": "Phiên phỏng vấn không tồn tại."})
+
+        pdf_bytes = generate_interview_evaluation_pdf(session)
+        response = HttpResponse(pdf_bytes, content_type="application/pdf")
+        filename = f"Bao_cao_danh_gia_AILA_session_{session.id}.pdf"
+        response['Content-Disposition'] = f'inline; filename="{filename}"'
+        response['X-Filename'] = filename
+        return response
+
+
     # GET/POST /sessions/{pk}/proctoring-events/
     @action(detail=True, methods=['get', 'post'], url_path='proctoring-events',
             permission_classes=[permissions.AllowAny])
@@ -1017,7 +1191,7 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     @action(detail=True, methods=['get', 'post'], url_path='timeline-highlights',
             permission_classes=[permissions.IsAuthenticated])
     def timeline_highlights(self, request, pk=None):
-        """Lưu trữ và xem các mốc thời gian nổi bật (Key Moments) của buổi phỏng vấn."""
+        """Lưu trữ và xem các mốc thời gian nổi bật Key Moments của buổi phỏng vấn."""
         session = self.get_object()
         _deny_if_cannot_manage_session(request.user, session, request)
         if request.method == 'GET':

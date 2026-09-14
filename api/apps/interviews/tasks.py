@@ -391,9 +391,40 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
         raw_json = _extract_json_object(content)
         validated = InterviewEvaluationSchema.model_validate_json(raw_json)
 
-        session.ai_overall_score = validated.overall_score
         session.ai_technical_score = validated.technical_score
         session.ai_communication_score = validated.communication_score
+        session.ai_overall_score = validated.overall_score
+
+        try:
+            company = getattr(session.job_post, "company", None)
+            if company and hasattr(company, "get_evaluation_weights"):
+                weights = company.get_evaluation_weights()
+                tech = float(validated.technical_score or 0)
+                comm = float(validated.communication_score or 0)
+                overall = float(validated.overall_score or 75)
+                soft_skills = validated.detailed_feedback.soft_skills
+                confidence = float(getattr(soft_skills, "confidence", 7.0) or 7.0) * 10
+                clarity = float(getattr(soft_skills, "clarity", 7.0) or 7.0) * 10
+
+                total_w = (
+                    weights.get("technical", 30) +
+                    weights.get("communication", 20) +
+                    weights.get("situational", 20) +
+                    weights.get("culture_fit", 20) +
+                    weights.get("attitude", 10)
+                ) or 100
+
+                weighted = (
+                    tech * weights.get("technical", 30) +
+                    comm * weights.get("communication", 20) +
+                    clarity * weights.get("situational", 20) +
+                    confidence * weights.get("culture_fit", 20) +
+                    overall * weights.get("attitude", 10)
+                ) / total_w
+                session.ai_overall_score = round(Decimal(str(weighted)), 1)
+        except Exception as w_exc:
+            logger.warning("Error applying company weights to evaluation score: %s", w_exc)
+
         session.ai_summary = validated.summary
         session.ai_strengths = validated.strengths
         session.ai_weaknesses = validated.weaknesses

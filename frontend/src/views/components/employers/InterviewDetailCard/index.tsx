@@ -352,7 +352,7 @@ const InterviewDetailCard = () => {
   const recordingUrl = session.recordingUrl || session.recording_url || null;
   const liveKitReady = Boolean(isSessionActive && state.connectionDetails);
 
-  // â”€â”€ HR Presence fullscreen session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Phiên làm việc toàn màn hình của Nhà tuyển dụng
   if (state.hrConnected && state.hrConnectionDetails) {
     return (
       <Paper elevation={0} sx={{ position: 'fixed', inset: 0, zIndex: 1300, borderRadius: 0, bgcolor: '#020617' }}>

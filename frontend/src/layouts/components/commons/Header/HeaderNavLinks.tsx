@@ -31,6 +31,7 @@ type HeaderNavLink = {
   path: string;
   requireAuth?: boolean;
   isHighlight?: boolean;
+  isHot?: boolean;
   children?: HeaderNavSubLink[];
 };
 
@@ -223,8 +224,46 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                 },
               }}
             >
-              <Box component="span" sx={{ position: 'relative', display: 'inline-block', pb: isHighlight ? 0.75 : 0 }}>
+              <Box component="span" sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 0.75, pb: isHighlight ? 0.75 : 0 }}>
                 {page.label}
+                {page.isHot && (
+                  <Box
+                    component="span"
+                    sx={{
+                      bgcolor: '#ef4444',
+                      color: '#ffffff',
+                      fontSize: '0.625rem',
+                      fontWeight: 900,
+                      letterSpacing: '0.04em',
+                      lineHeight: 1,
+                      px: 0.75,
+                      py: 0.35,
+                      borderRadius: '5px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      verticalAlign: 'middle',
+                      boxShadow: '0 2px 6px rgba(239, 68, 68, 0.45)',
+                      animation: 'hotBadgePulse 1.8s infinite ease-in-out',
+                      '@keyframes hotBadgePulse': {
+                        '0%': {
+                          transform: 'scale(1)',
+                          boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.65)',
+                        },
+                        '50%': {
+                          transform: 'scale(1.08)',
+                          boxShadow: '0 0 0 5px rgba(239, 68, 68, 0)',
+                        },
+                        '100%': {
+                          transform: 'scale(1)',
+                          boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)',
+                        },
+                      },
+                    }}
+                  >
+                    HOT
+                  </Box>
+                )}
                 {isHighlight && <DoodleUnderlineSvg isVisible={true} />}
               </Box>
             </Button>

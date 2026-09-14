@@ -718,13 +718,25 @@ def _with_vietnamese_chat_instruction(messages: List[Dict[str, Any]]) -> List[Di
 def _is_manual_candidate_create_intent(messages: List[Dict[str, Any]]) -> bool:
     user_text = _recent_chat_text(messages, roles={"user"})
     normalized = _normalize_chat_text(user_text)
-    if "tao" not in normalized:
+    if "tao" not in normalized and "them" not in normalized:
         return False
-    return (
-        ("ho so" in normalized and "ung vien" in normalized)
-        or "manual candidate" in normalized
-        or "candidate profile" in normalized
-    )
+
+    # Exclude editor formatting / writing / rewriting instructions
+    editor_intents = [
+        "dinh dang", "viet lai", "chinh sua", "sua loi", "rut gon", "mo rong",
+        "trinh bay", "bullet", "soan thao", "bai viet", "mo ta cong viec", "quyen loi"
+    ]
+    for intent in editor_intents:
+        if intent in normalized:
+            return False
+
+    create_candidate_patterns = [
+        r"(?:tao|them)\s+(?:moi\s+)?(?:ho\s+so\s+)?ung\s+vien",
+        r"(?:tao|them)\s+(?:moi\s+)?ho\s+so",
+        r"manual\s+candidate",
+        r"candidate\s+profile",
+    ]
+    return any(re.search(pattern, normalized) for pattern in create_candidate_patterns)
 
 
 def _clean_extracted_name(value: str) -> str:

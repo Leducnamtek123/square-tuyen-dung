@@ -19,7 +19,7 @@ type UpdateSessionStatusOptions = {
   inviteToken?: string;
 };
 
-/* ── Request DTOs ─────────────────────────────────────────────────────── */
+/* -- Request DTOs ------------------------------------------------------- */
 
 export interface GetSessionsParams {
   page?: number;
@@ -35,6 +35,8 @@ export interface ScheduleSessionInput {
   job_post?: number;
   scheduled_at?: string;
   type?: 'technical' | 'behavioral' | 'mixed';
+  interview_language?: 'vi' | 'en' | 'ja' | 'ko' | string;
+  interviewLanguage?: 'vi' | 'en' | 'ja' | 'ko' | string;
   question_ids?: number[];
   question_group?: number;
   voice_profile?: number | null;
@@ -51,7 +53,7 @@ export interface SubmitEvaluationInput {
   proposed_salary?: number;
 }
 
-/* ── Response Types ───────────────────────────────────────────────────── */
+/* -- Response Types ----------------------------------------------------- */
 
 interface LiveKitTokenResponse {
   token: string;
@@ -87,6 +89,15 @@ interface TriggerAiEvaluationResponse {
   detail?: string;
 }
 
+export interface WarmupSessionResponse {
+  success: boolean;
+  tts?: string;
+  stt?: string;
+  duration_ms?: number;
+  session_status?: string;
+  detail?: string;
+}
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
@@ -107,7 +118,7 @@ const normalizeTriggerAiEvaluationResponse = (raw: unknown): TriggerAiEvaluation
   return detail ? { status, detail } : { status };
 };
 
-/* ── Service ──────────────────────────────────────────────────────────── */
+/* -- Service ------------------------------------------------------------ */
 
 const interviewService = {
   getSessions: (params: GetSessionsParams = {}): Promise<PaginatedResponse<InterviewSession>> => {
@@ -175,6 +186,16 @@ const interviewService = {
     const url = `interview/web/sessions/invite/${inviteToken}/livekit-token/`;
     return (httpRequest.get(url) as Promise<unknown>)
       .then(unwrapDataResponse<LiveKitTokenResponse>);
+  },
+
+  warmupSession: (
+    identifier: IdType,
+    options: { inviteToken?: string } = {}
+  ): Promise<WarmupSessionResponse> => {
+    const url = `interview/web/sessions/${identifier}/warmup/`;
+    const payload = options.inviteToken ? { invite_token: options.inviteToken } : {};
+    return (httpRequest.post(url, payload) as Promise<unknown>)
+      .then(unwrapDataResponse<WarmupSessionResponse>);
   },
 
   triggerAiEvaluation: (id: IdType): Promise<TriggerAiEvaluationResponse> => {

@@ -6,7 +6,7 @@ import type { SystemConfig, Career, District } from '../types/models';
 type CityInput = { id?: number | string } | number | string | null | undefined;
 type DistrictInput = { id?: number | string } | number | string | null | undefined;
 
-/* ── Response Types ───────────────────────────────────────────────────── */
+/* -- Response Types ----------------------------------------------------- */
 
 interface DistrictsResponse {
   data: District[];
@@ -32,7 +32,7 @@ const extractExplicitCount = (raw: unknown): number | null => {
   return typeof nestedData.count === 'number' ? nestedData.count : null;
 };
 
-/* ── Service ──────────────────────────────────────────────────────────── */
+/* -- Service ------------------------------------------------------------ */
 
 const commonService = {
   getConfigs: async (): Promise<SystemConfig> => {

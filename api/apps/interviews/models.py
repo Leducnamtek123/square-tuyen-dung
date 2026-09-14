@@ -64,7 +64,7 @@ class Question(CommonBaseModel):
     )
     default_duration_seconds = models.IntegerField(
         default=120,
-        verbose_name="Thời gian trả lời (giây)"
+        verbose_name="Thời gian trả lời tính bằng giây"
     )
     answer_structure = models.JSONField(
         blank=True, null=True,
@@ -93,16 +93,20 @@ class Question(CommonBaseModel):
         return self.text[:80]
 
 class QuestionGroup(CommonBaseModel):
-    """Nhóm câu hỏi (cho một vị trí hoặc chủ đề cụ thể)."""
+    """Nhóm câu hỏi cho một vị trí hoặc chủ đề cụ thể."""
 
     name = models.CharField(max_length=255, verbose_name="Tên nhóm")
     description = models.TextField(
         blank=True, null=True,
         verbose_name="Mô tả"
     )
+    is_public = models.BooleanField(
+        default=False,
+        verbose_name="Công khai cho ứng viên luyện tập"
+    )
     evaluation_rubric = models.JSONField(
         blank=True, null=True,
-        verbose_name="Tiêu chí đánh giá (Rubric)"
+        verbose_name="Tiêu chí đánh giá Rubric"
     )
     questions = models.ManyToManyField(
         Question,
@@ -296,7 +300,7 @@ class InterviewSession(CommonBaseModel):
 
     room_name = models.CharField(
         max_length=255, unique=True,
-        verbose_name="Tên phòng (LiveKit Room)"
+        verbose_name="Tên phòng LiveKit Room"
     )
     invite_token = models.CharField(
         max_length=255, unique=True, blank=True, null=True,
@@ -328,9 +332,26 @@ class InterviewSession(CommonBaseModel):
         db_index=True,
         verbose_name="Phân loại phiên phỏng vấn"
     )
+    LANGUAGE_VI = 'vi'
+    LANGUAGE_EN = 'en'
+    LANGUAGE_JA = 'ja'
+    LANGUAGE_KO = 'ko'
+    LANGUAGE_CHOICES = [
+        (LANGUAGE_VI, 'Tiếng Việt'),
+        (LANGUAGE_EN, 'Tiếng Anh'),
+        (LANGUAGE_JA, 'Tiếng Nhật'),
+        (LANGUAGE_KO, 'Tiếng Hàn'),
+    ]
+    interview_language = models.CharField(
+        max_length=10,
+        choices=LANGUAGE_CHOICES,
+        default=LANGUAGE_VI,
+        db_index=True,
+        verbose_name="Ngôn ngữ phỏng vấn"
+    )
     time_limit_per_question = models.IntegerField(
         default=120,
-        verbose_name="Thời gian trả lời mỗi câu (giây)"
+        verbose_name="Thời gian trả lời mỗi câu tính bằng giây"
     )
     session_metadata = models.JSONField(
         blank=True, null=True,
@@ -352,7 +373,7 @@ class InterviewSession(CommonBaseModel):
     )
     duration = models.IntegerField(
         blank=True, null=True,
-        verbose_name="Thời lượng (giây)"
+        verbose_name="Thời lượng tính bằng giây"
     )
 
     recording_url = models.URLField(
@@ -390,15 +411,15 @@ class InterviewSession(CommonBaseModel):
     )
     ai_strengths = models.JSONField(
         blank=True, null=True,
-        verbose_name="Điểm mạnh (AI)"
+        verbose_name="Điểm mạnh AI"
     )
     ai_weaknesses = models.JSONField(
         blank=True, null=True,
-        verbose_name="Điểm yếu (AI)"
+        verbose_name="Điểm yếu AI"
     )
     ai_detailed_feedback = models.JSONField(
         blank=True, null=True,
-        verbose_name="Phân tích chi tiết (AI)"
+        verbose_name="Phân tích chi tiết AI"
     )
 
     # Foreign Keys
@@ -417,7 +438,7 @@ class InterviewSession(CommonBaseModel):
         User, on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name='created_interviews',
-        verbose_name="Người tạo (HR)"
+        verbose_name="Người tạo Nhà tuyển dụng"
     )
 
     questions = models.ManyToManyField(
@@ -498,7 +519,7 @@ class InterviewTranscript(models.Model):
     content = models.TextField(verbose_name="Nội dung")
     speech_duration_ms = models.IntegerField(
         blank=True, null=True,
-        verbose_name="Thời lượng nói (ms)"
+        verbose_name="Thời lượng nói tính bằng mili giây"
     )
     create_at = models.DateTimeField(auto_now_add=True)
 
@@ -511,10 +532,10 @@ class InterviewTranscript(models.Model):
     def __str__(self):
         return f"[{self.get_speaker_role_display()}] {self.content[:60]}"
 
-# Interview Evaluation (HR đánh giá)
+# Interview Evaluation - Nhà tuyển dụng đánh giá
 
 class InterviewEvaluation(CommonBaseModel):
-    """Đánh giá kết quả phỏng vấn bởi HR."""
+    """Đánh giá kết quả phỏng vấn bởi Nhà tuyển dụng."""
 
     RESULT_CHOICES = [
         ('passed', 'Đạt'),
@@ -602,7 +623,7 @@ class InterviewProctoringEvent(CommonBaseModel):
         verbose_name="Loại vi phạm"
     )
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Thời điểm ghi nhận")
-    duration_seconds = models.FloatField(default=0.0, verbose_name="Thời lượng (giây)")
+    duration_seconds = models.FloatField(default=0.0, verbose_name="Thời lượng tính bằng giây")
     details = models.JSONField(blank=True, null=True, verbose_name="Dữ liệu chi tiết")
 
     class Meta:
@@ -650,13 +671,13 @@ class SalaryBenchmark(CommonBaseModel):
         max_digits=14,
         decimal_places=0,
         default=0,
-        verbose_name="Mức lương tối thiểu (VND)"
+        verbose_name="Mức lương tối thiểu VND"
     )
     salary_max = models.DecimalField(
         max_digits=14,
         decimal_places=0,
         default=0,
-        verbose_name="Mức lương tối đa (VND)"
+        verbose_name="Mức lương tối đa VND"
     )
     salary_avg = models.DecimalField(
         max_digits=14,
@@ -664,7 +685,7 @@ class SalaryBenchmark(CommonBaseModel):
         default=0,
         null=True,
         blank=True,
-        verbose_name="Mức lương trung bình (VND)"
+        verbose_name="Mức lương trung bình VND"
     )
     year = models.IntegerField(
         default=2026,

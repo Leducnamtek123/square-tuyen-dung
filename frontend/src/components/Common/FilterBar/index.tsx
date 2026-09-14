@@ -18,7 +18,7 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import { alpha } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
-import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -154,7 +154,7 @@ const FilterBar = ({
                 flexShrink: 0,
               })}
             >
-              <ManageSearchIcon fontSize="small" />
+              <TuneRoundedIcon fontSize="small" />
             </Box>
             <Box sx={{ minWidth: 0 }}>
               {title && (

@@ -130,7 +130,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onPreview 
         },
       }}
     >
-      {/* ── Top Template Preview Container ──────────────────────────────── */}
+      {/* -- Top Template Preview Container -------------------------------- */}
       <Box
         sx={{
           position: 'relative',
@@ -274,7 +274,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onPreview 
         </Box>
       </Box>
 
-      {/* ── Footer Information Section (Vieclam24h style) ──────────────── */}
+      {/* -- Footer Information Section (Vieclam24h style) ---------------- */}
       <CardContent sx={{ p: 2.5, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 2 }}>
         <Box>
           <Stack direction="row" justifyContent="space-between" alignItems="baseline">

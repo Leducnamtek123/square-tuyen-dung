@@ -368,7 +368,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
         </IconButton>
 
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, minHeight: 460 }}>
-          {/* ── Left Column: Form Content ── */}
+          {/* -- Left Column: Form Content -- */}
           <Box
             sx={{
               flex: { xs: '1 1 auto', md: '0 0 55%' },
@@ -687,7 +687,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
             )}
           </Box>
 
-          {/* ── Right Column: Graphic Illustration ── */}
+          {/* -- Right Column: Graphic Illustration -- */}
           <Box
             sx={{
               display: { xs: 'none', md: 'flex' },

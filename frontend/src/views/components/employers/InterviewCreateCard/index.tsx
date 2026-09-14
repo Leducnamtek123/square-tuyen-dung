@@ -41,6 +41,7 @@ import type { JobPostActivity, Question, QuestionGroup, VoiceProfile } from '@/t
 import pc from '@/utils/muiColors';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { useTourAutoStart } from '@/components/Features/ProductTour';
+import employerAiSettingService from '@/services/employerAiSettingService';
 
 interface InterviewCreateCardProps {
   title?: string;
@@ -402,6 +403,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
   const initialValues = useMemo<FormValues>(() => {
     const meta = ((sessionDetail?.sessionMetadata || sessionDetail?.session_metadata || {}) as Record<string, any>);
+    const customAi = employerAiSettingService.getSettings();
     return {
       job_post: sessionDetail?.jobPost ? extractId(sessionDetail.jobPost) : (jobPostIdQuery ? Number(jobPostIdQuery) : ''),
       candidate: sessionDetail?.candidate ? extractId(sessionDetail.candidate) : (candidateIdQuery ? Number(candidateIdQuery) : ''),
@@ -409,13 +411,13 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
       selected_group: sessionDetail?.questionGroup ? extractId(sessionDetail.questionGroup) : '',
       voice_profile: sessionDetail?.voiceProfile ?? sessionDetail?.voice_profile ?? '',
       selected_questions: sessionDetail?.questions?.map((q: Question) => q.id) ?? [],
-      ai_avatar_id: meta.avatar_id || 'ly_3d',
-      avatar_image_url: meta.avatar_image_url || '',
-      avatar_backdrop: meta.avatar_backdrop || 'modern_office',
-      avatar_background_url: meta.avatar_background_url || '',
-      interviewer_name: meta.interviewer_name || 'Trợ lý AI Ly',
-      ai_voice: meta.ai_voice || 'vi-VN-Standard-A',
-      ai_speed: meta.ai_speed != null ? Number(meta.ai_speed) : 1.0,
+      ai_avatar_id: meta.avatar_id || customAi.selectedAvatarId || 'ly_3d',
+      avatar_image_url: meta.avatar_image_url || customAi.customAvatarUrl || '',
+      avatar_backdrop: meta.avatar_backdrop || customAi.selectedBackgroundId || 'modern_office',
+      avatar_background_url: meta.avatar_background_url || customAi.customBackgroundUrl || '',
+      interviewer_name: meta.interviewer_name || customAi.interviewerName || 'Trợ lý AI Ly',
+      ai_voice: meta.ai_voice || customAi.ttsVoice || 'vi-VN-Standard-A',
+      ai_speed: meta.ai_speed != null ? Number(meta.ai_speed) : (customAi.ttsSpeed ?? 1.0),
     };
   }, [candidateIdQuery, jobPostIdQuery, sessionDetail]);
 

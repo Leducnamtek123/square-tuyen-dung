@@ -169,7 +169,7 @@ export const PublicCVPage: React.FC = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#e2e8f0', display: 'flex', flexDirection: 'column' }}>
-      {/* ── Top Recruiter Action Bar ─────────────────────────────────────── */}
+      {/* -- Top Recruiter Action Bar --------------------------------------- */}
       <Paper
         elevation={0}
         className="no-print"
@@ -396,7 +396,7 @@ export const PublicCVPage: React.FC = () => {
         </Stack>
       </Paper>
 
-      {/* ── Main CV Sheet Render Area with Responsive Scaling ────────────── */}
+      {/* -- Main CV Sheet Render Area with Responsive Scaling -------------- */}
       <Box
         ref={previewContainerRef}
         sx={{
@@ -437,7 +437,7 @@ export const PublicCVPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* ── Footer ─────────────────────────────────────────────────────── */}
+      {/* -- Footer ------------------------------------------------------- */}
       <Box className="no-print" sx={{ py: 2, textAlign: 'center', bgcolor: '#ffffff', borderTop: '1px solid #cbd5e1' }}>
         <Typography variant="caption" sx={{ color: '#64748b' }}>
           Được tạo và bảo đảm bởi <strong>InfoHR Tuyển Dụng</strong> • Nền tảng tuyển dụng thông minh hàng đầu Việt Nam

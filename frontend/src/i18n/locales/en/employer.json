@@ -320,7 +320,38 @@
       "toast": "Please verify your employer profile before posting a job."
     },
     "popupTitle": "Job Post",
-    "manageSubtitle": "Manage your job postings"
+    "manageSubtitle": "Manage your job postings",
+    "editor": {
+      "createTitle": "Create New Job Post",
+      "editTitle": "Edit Job Post",
+      "createSubtitle": "Fill in position details, compensation, and AI interview parameters to attract qualified candidates quickly.",
+      "editSubtitle": "Update recruitment information, requirements, and adjust AI screening score thresholds.",
+      "backToList": "Back to List",
+      "confirmCancelTitle": "Discard changes?",
+      "confirmCancelMessage": "You have unsaved changes. Leaving this page will discard them. Are you sure you want to exit?",
+      "confirmCancelButton": "Leave page",
+      "continueEditingButton": "Keep editing",
+      "saveButton": "Publish Job Post",
+      "updateButton": "Save Changes",
+      "cancelButton": "Cancel",
+      "progressTitle": "Form Completion Progress",
+      "progressSubtitle": "A more detailed post attracts more high-caliber applicants",
+      "sectionBasic": "Basic Information",
+      "sectionSalary": "Salary & Deadline",
+      "sectionAi": "AI Interview Settings",
+      "sectionContent": "Description & Benefits",
+      "sectionLocation": "Workplace Location",
+      "sectionContact": "Contact Details",
+      "tipsTitle": "Tips for an effective job post",
+      "tip1Title": "Clear job responsibilities",
+      "tip1Desc": "List 5-7 core responsibilities and clearly outline key technologies or required skills.",
+      "tip2Title": "Transparent salary range",
+      "tip2Desc": "Posts with specific salary ranges receive up to 40% more qualified applications.",
+      "tip3Title": "Automated AI interview pipeline",
+      "tip3Desc": "Enabling auto-screening shortens response time and improves candidate experience.",
+      "policyTitle": "Job posting policy",
+      "policyDesc": "Job postings are reviewed within 2 business hours to ensure transparency and protect candidate rights."
+    }
   },
   "sendEmailComponent": {
     "label": {
@@ -794,6 +825,7 @@
     "table": {
       "groupName": "Question Group Name",
       "numberOfQuestions": "Number of Questions",
+      "status": "Status",
       "description": "Description",
       "na": "N/A",
       "noData": "No data"

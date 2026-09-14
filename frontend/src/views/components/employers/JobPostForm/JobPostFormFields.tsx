@@ -76,6 +76,7 @@ function JobPostFormFields({
   const theme = useTheme();
   const cityId = useWatch({ control, name: 'location.city' });
   const autoInterviewEnabled = useWatch({ control, name: 'autoInterviewEnabled' }) ?? true;
+  const jobName = useWatch({ control, name: 'jobName' });
 
   const inputSx = {
     '& .MuiOutlinedInput-root': {
@@ -317,13 +318,34 @@ function JobPostFormFields({
       </Grid>
       
       <Grid size={12}>
-        <RichTextEditorCustom name="jobDescription" control={control} title={t('jobPostForm.title.jobdescription')} showRequired={true} />
+        <RichTextEditorCustom
+          name="jobDescription"
+          control={control}
+          title={t('jobPostForm.title.jobdescription')}
+          showRequired={true}
+          contextType="job_desc"
+          jobTitle={jobName}
+        />
       </Grid>
       <Grid size={12}>
-        <RichTextEditorCustom name="jobRequirement" control={control} title={t('jobPostForm.title.jobrequirement')} showRequired={true} />
+        <RichTextEditorCustom
+          name="jobRequirement"
+          control={control}
+          title={t('jobPostForm.title.jobrequirement')}
+          showRequired={true}
+          contextType="job_req"
+          jobTitle={jobName}
+        />
       </Grid>
       <Grid size={12}>
-        <RichTextEditorCustom name="benefitsEnjoyed" control={control} title={t('jobPostForm.title.benefits')} showRequired={true} />
+        <RichTextEditorCustom
+          name="benefitsEnjoyed"
+          control={control}
+          title={t('jobPostForm.title.benefits')}
+          showRequired={true}
+          contextType="benefits"
+          jobTitle={jobName}
+        />
       </Grid>
 
       <Grid size={12}>

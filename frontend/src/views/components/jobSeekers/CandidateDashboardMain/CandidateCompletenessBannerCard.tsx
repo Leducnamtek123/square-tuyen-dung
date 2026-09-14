@@ -76,7 +76,7 @@ const CandidateCompletenessBannerCard = ({
 
   return (
     <>
-      {/* ── Mobile Compact View (< 900px) ── */}
+      {/* -- Mobile Compact View (< 900px) -- */}
       <Card
         elevation={0}
         sx={{
@@ -219,7 +219,7 @@ const CandidateCompletenessBannerCard = ({
         </Collapse>
       </Card>
 
-      {/* ── Desktop Full View (>= 900px) ── */}
+      {/* -- Desktop Full View (>= 900px) -- */}
       <Card
         elevation={0}
         sx={{

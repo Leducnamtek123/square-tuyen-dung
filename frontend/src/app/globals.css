@@ -657,16 +657,37 @@ h1, h2, h3, h4, h5, .display-text {
     overflow: visible !important;
   }
 
-  /* Hide interactive web UI */
+  /* Hide interactive web UI and website structural chrome */
   header,
+  footer,
   nav,
   aside,
-  button,
+  [role="navigation"],
+  [role="contentinfo"],
+  #common-header,
+  #common-footer,
   .no-print,
+  .no-print-area,
+  button,
   .toaster,
   [data-sonner-toaster],
   .swal2-container,
-  .no-print-area {
+  .MuiAppBar-root,
+  .MuiDrawer-root,
+  .MuiBackdrop-root,
+  .MuiSpeedDial-root,
+  .floating-chat,
+  #chat-widget-root,
+  [data-tour] {
+    display: none !important;
+  }
+
+  /* When CV is printed, hide any layout sibling that does not contain the CV */
+  body.cv-printing-active > *:not(:has(#cv-print-area)):not(#cv-print-area) {
+    display: none !important;
+  }
+
+  *:has(#cv-print-area) > *:not(:has(#cv-print-area)):not(#cv-print-area) {
     display: none !important;
   }
 
@@ -688,7 +709,10 @@ h1, h2, h3, h4, h5, .display-text {
     print-color-adjust: exact !important;
   }
 
-  /* Cancel all zoom/transform scaling on parents of #cv-print-area */
+  /* Cancel all zoom/transform scaling and overflow clipping on all ancestors of #cv-print-area */
+  :has(#cv-print-area),
+  main:has(#cv-print-area),
+  div:has(#cv-print-area),
   div:has(> #cv-print-area),
   div:has(> div > #cv-print-area) {
     transform: none !important;
@@ -703,6 +727,15 @@ h1, h2, h3, h4, h5, .display-text {
     background: transparent !important;
     overflow: visible !important;
     display: block !important;
+  }
+
+  /* Reset Material UI Container padding when printing CV */
+  .MuiContainer-root:has(#cv-print-area) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    max-width: none !important;
   }
 
   /* Prevent awkward page break splits */

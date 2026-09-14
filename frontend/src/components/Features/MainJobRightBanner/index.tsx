@@ -159,7 +159,7 @@ const MainJobRightBanner = () => {
         px: { xs: 2, md: 0 },
       }}
     >
-      {/* ── 1. Smart Carousel Banner Card ── */}
+      {/* -- 1. Smart Carousel Banner Card -- */}
       <CarouselContainer
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -386,7 +386,7 @@ const MainJobRightBanner = () => {
         )}
       </CarouselContainer>
 
-      {/* ── 2. Companion Action Widget: CV & Employer Hub ── */}
+      {/* -- 2. Companion Action Widget: CV & Employer Hub -- */}
       <Box
         sx={{
           p: 2.2,

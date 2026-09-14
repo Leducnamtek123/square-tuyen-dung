@@ -1,11 +1,13 @@
 'use client';
 import React, { useCallback, useMemo, useReducer, useState } from 'react';
-import { Box, Typography, Button, Stack, Paper, useTheme, IconButton, Tooltip, CircularProgress } from '@mui/material';
+import { Box, Typography, Button, Stack, Paper, useTheme, IconButton, Tooltip, CircularProgress, alpha, Chip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
+import PublicIcon from '@mui/icons-material/Public';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '@/components/Common/DataTable';
 import { interviewService } from '@/services/interviewService';
@@ -30,6 +32,7 @@ type State = {
   currentGroup: QuestionGroup | null;
   groupName: string;
   groupDescription: string;
+  isPublic: boolean;
   selectedQuestions: number[];
   openCreateQuestion: boolean;
   newQuestionContent: string;
@@ -43,6 +46,7 @@ type Action =
   | { type: 'close_create_question' }
   | { type: 'set_group_name'; value: string }
   | { type: 'set_group_description'; value: string }
+  | { type: 'set_is_public'; value: boolean }
   | { type: 'set_selected_questions'; value: number[] }
   | { type: 'set_new_question_content'; value: string }
   | { type: 'reset_group_form' };
@@ -53,6 +57,7 @@ const initialState: State = {
   currentGroup: null,
   groupName: '',
   groupDescription: '',
+  isPublic: false,
   selectedQuestions: [],
   openCreateQuestion: false,
   newQuestionContent: '',
@@ -70,6 +75,7 @@ function reducer(state: State, action: Action): State {
         currentGroup: action.group,
         groupName: action.group.name,
         groupDescription: action.group.description || '',
+        isPublic: Boolean(action.group.is_public ?? action.group.isPublic ?? false),
         selectedQuestions: action.group.questions?.map((q: Question) => q.id) || [],
       };
     case 'close_dialog':
@@ -82,12 +88,14 @@ function reducer(state: State, action: Action): State {
       return { ...state, groupName: action.value };
     case 'set_group_description':
       return { ...state, groupDescription: action.value };
+    case 'set_is_public':
+      return { ...state, isPublic: action.value };
     case 'set_selected_questions':
       return { ...state, selectedQuestions: action.value };
     case 'set_new_question_content':
       return { ...state, newQuestionContent: action.value };
     case 'reset_group_form':
-      return { ...state, groupName: '', groupDescription: '', selectedQuestions: [], currentGroup: null, dialogMode: 'add' };
+      return { ...state, groupName: '', groupDescription: '', isPublic: false, selectedQuestions: [], currentGroup: null, dialogMode: 'add' };
     default:
       return state;
   }
@@ -129,6 +137,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
       name: state.groupName.trim(),
       description: state.groupDescription.trim(),
       question_ids: state.selectedQuestions,
+      is_public: state.isPublic,
     };
 
     try {
@@ -143,7 +152,22 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
     } catch (error) {
       errorHandling(error);
     }
-  }, [createQuestionGroup, handleCloseDialog, state.currentGroup, state.dialogMode, state.groupDescription, state.groupName, state.selectedQuestions, t, updateQuestionGroup]);
+  }, [createQuestionGroup, handleCloseDialog, state.currentGroup, state.dialogMode, state.groupDescription, state.groupName, state.isPublic, state.selectedQuestions, t, updateQuestionGroup]);
+
+  const handleTogglePublic = useCallback(async (group: QuestionGroup) => {
+    const currentStatus = Boolean(group.is_public ?? group.isPublic ?? false);
+    const nextStatus = !currentStatus;
+    try {
+      await updateQuestionGroup({ id: group.id, data: { is_public: nextStatus } });
+      toastMessages.success(
+        nextStatus
+          ? 'Đã chuyển sang trạng thái công khai cho ứng viên'
+          : 'Đã chuyển sang trạng thái riêng tư nội bộ'
+      );
+    } catch (error) {
+      errorHandling(error);
+    }
+  }, [updateQuestionGroup]);
 
   const handleCreateQuestion = useCallback(async () => {
     if (!state.newQuestionContent.trim()) return;
@@ -218,6 +242,43 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
       ),
     },
     {
+      header: t('employer:questionGroupsCard.table.status', { defaultValue: 'Trạng thái' }),
+      accessorKey: 'is_public',
+      cell: ({ row }) => {
+        const isPublic = Boolean(row.original.is_public ?? row.original.isPublic);
+        return (
+          <Tooltip
+            title={isPublic ? 'Bấm để chuyển sang riêng tư nội bộ' : 'Bấm để công khai cho ứng viên luyện tập'}
+            arrow
+          >
+            <Chip
+              icon={isPublic ? <PublicIcon sx={{ fontSize: '15px !important' }} /> : <LockOutlinedIcon sx={{ fontSize: '15px !important' }} />}
+              label={isPublic ? 'Công khai' : 'Riêng tư'}
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleTogglePublic(row.original);
+              }}
+              sx={{
+                cursor: 'pointer',
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                color: isPublic ? '#047857' : '#475569',
+                bgcolor: isPublic ? '#d1fae5' : '#f1f5f9',
+                border: '1px solid',
+                borderColor: isPublic ? '#a7f3d0' : '#cbd5e1',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  bgcolor: isPublic ? '#a7f3d0' : '#e2e8f0',
+                  transform: 'scale(1.04)',
+                },
+              }}
+            />
+          </Tooltip>
+        );
+      },
+    },
+    {
       header: t('employer:questionGroupsCard.table.description'),
       accessorKey: 'description',
       cell: ({ row }) => (
@@ -231,39 +292,75 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
       id: 'actions',
       cell: ({ row }) => (
         <Stack direction="row" spacing={1} justifyContent="flex-end" alignItems="center">
-          <Tooltip title={t('employer:questionGroupsCard.actions.testGroupTooltip')}>
+          <Tooltip title={t('employer:questionGroupsCard.actions.testGroupTooltip')} arrow>
             <span>
               <Button
                 size="small"
                 variant="outlined"
-                color="info"
-                startIcon={startingMockGroupId === row.original.id ? <CircularProgress size={14} color="inherit" /> : <PlayCircleOutlineIcon fontSize="small" />}
+                color="primary"
+                startIcon={startingMockGroupId === row.original.id ? <CircularProgress size={14} color="inherit" /> : <AutoAwesomeRoundedIcon sx={{ fontSize: 16 }} />}
                 disabled={startingMockGroupId === row.original.id}
                 onClick={() => handleTestGroupMock(row.original)}
                 sx={{
                   textTransform: 'none',
                   fontWeight: 700,
                   fontSize: '0.8rem',
-                  borderRadius: '8px',
+                  borderRadius: '999px',
                   py: 0.5,
-                  px: 1.5,
+                  px: 1.75,
                   whiteSpace: 'nowrap',
+                  borderColor: 'primary.main',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                    borderColor: 'primary.dark',
+                  },
                 }}
               >
                 {t('employer:questionGroupsCard.actions.testWithAI')}
               </Button>
             </span>
           </Tooltip>
-          <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenEdit(row.original)} color="primary">
-            <EditIcon fontSize="small" />
-          </IconButton>
-          <IconButton aria-label="Thao tác" size="small" onClick={() => handleDelete(row.original)} color="error">
-            <DeleteIcon fontSize="small" />
-          </IconButton>
+          <Tooltip title={t('common:actions.edit', { defaultValue: 'Chỉnh sửa' })} arrow>
+            <span>
+              <IconButton
+                aria-label="Sửa nhóm câu hỏi"
+                size="small"
+                onClick={() => handleOpenEdit(row.original)}
+                sx={{
+                  bgcolor: alpha(theme.palette.primary.main, 0.08),
+                  color: 'primary.main',
+                  borderRadius: '10px',
+                  transition: 'all 0.2s ease',
+                  '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.18), transform: 'scale(1.05)' },
+                }}
+              >
+                <EditOutlinedIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title={t('common:actions.delete', { defaultValue: 'Xóa bỏ' })} arrow>
+            <span>
+              <IconButton
+                aria-label="Xóa nhóm câu hỏi"
+                size="small"
+                onClick={() => handleDelete(row.original)}
+                sx={{
+                  bgcolor: alpha(theme.palette.error.main, 0.08),
+                  color: 'error.main',
+                  borderRadius: '10px',
+                  transition: 'all 0.2s ease',
+                  '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.18), transform: 'scale(1.05)' },
+                }}
+              >
+                <DeleteOutlineRoundedIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
         </Stack>
       ),
     },
-  ], [handleDelete, handleOpenEdit, handleTestGroupMock, startingMockGroupId, t]);
+  ], [handleDelete, handleOpenEdit, handleTestGroupMock, handleTogglePublic, startingMockGroupId, t, theme]);
 
   return (
     <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 4, boxShadow: (muiTheme) => muiTheme.customShadows?.z1, border: '1px solid', borderColor: 'divider' }}>
@@ -297,6 +394,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
         currentGroup={state.currentGroup}
         groupName={state.groupName}
         groupDescription={state.groupDescription}
+        isPublic={state.isPublic}
         selectedQuestions={state.selectedQuestions}
         openCreateQuestion={state.openCreateQuestion}
         newQuestionContent={state.newQuestionContent}
@@ -309,6 +407,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
         onCloseDialog={handleCloseDialog}
         onGroupNameChange={(value) => dispatch({ type: 'set_group_name', value })}
         onGroupDescriptionChange={(value) => dispatch({ type: 'set_group_description', value })}
+        onIsPublicChange={(value) => dispatch({ type: 'set_is_public', value })}
         onSelectedQuestionsChange={(value) => dispatch({ type: 'set_selected_questions', value })}
         onOpenCreateQuestion={() => dispatch({ type: 'open_create_question' })}
         onCloseCreateQuestion={() => dispatch({ type: 'close_create_question' })}

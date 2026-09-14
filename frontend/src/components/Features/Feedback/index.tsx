@@ -8,17 +8,23 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography, Box } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
+import { alpha } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
+import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
+import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
+import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import SentimentVeryDissatisfiedRoundedIcon from '@mui/icons-material/SentimentVeryDissatisfiedRounded';
+import SentimentDissatisfiedRoundedIcon from '@mui/icons-material/SentimentDissatisfiedRounded';
+import SentimentNeutralRoundedIcon from '@mui/icons-material/SentimentNeutralRounded';
+import SentimentSatisfiedAltRoundedIcon from '@mui/icons-material/SentimentSatisfiedAltRounded';
+import SentimentVerySatisfiedRoundedIcon from '@mui/icons-material/SentimentVerySatisfiedRounded';
 import errorHandling from '@/utils/errorHandling';
 import toastMessages from '@/utils/toastMessages';
 import RatingCustom from '@/components/Common/Controls/RatingCustom';
 import MultilineTextFieldCustom from '@/components/Common/Controls/MultilineTextFieldCustom';
 import contentService from '@/services/contentService';
-import { FEEDBACK_IMAGES } from '@/configs/constants';
 
 interface FeedbackProps {
   trigger?: 'floating' | 'menuItem' | 'none';
@@ -47,8 +53,59 @@ export const createFeedbackSchema = (t: TFunction<'common', undefined>) =>
       .max(500, t('feedback.contentMax')),
   });
 
+const getSentimentDetails = (ratingVal: number) => {
+  switch (ratingVal) {
+    case 1:
+      return {
+        icon: <SentimentVeryDissatisfiedRoundedIcon sx={{ fontSize: 34, color: '#ef4444' }} />,
+        label: 'Rất không hài lòng',
+        labelEn: 'Very Dissatisfied',
+        color: '#ef4444',
+        bg: '#fef2f2',
+        border: '#fecaca',
+      };
+    case 2:
+      return {
+        icon: <SentimentDissatisfiedRoundedIcon sx={{ fontSize: 34, color: '#f97316' }} />,
+        label: 'Chưa hài lòng',
+        labelEn: 'Dissatisfied',
+        color: '#f97316',
+        bg: '#fff7ed',
+        border: '#fed7aa',
+      };
+    case 3:
+      return {
+        icon: <SentimentNeutralRoundedIcon sx={{ fontSize: 34, color: '#64748b' }} />,
+        label: 'Bình thường',
+        labelEn: 'Neutral',
+        color: '#64748b',
+        bg: '#f8fafc',
+        border: '#e2e8f0',
+      };
+    case 4:
+      return {
+        icon: <SentimentSatisfiedAltRoundedIcon sx={{ fontSize: 34, color: '#10b981' }} />,
+        label: 'Hài lòng',
+        labelEn: 'Satisfied',
+        color: '#10b981',
+        bg: '#ecfdf5',
+        border: '#a7f3d0',
+      };
+    case 5:
+    default:
+      return {
+        icon: <SentimentVerySatisfiedRoundedIcon sx={{ fontSize: 34, color: '#2563eb' }} />,
+        label: 'Rất hài lòng',
+        labelEn: 'Very Satisfied',
+        color: '#2563eb',
+        bg: '#eff6ff',
+        border: '#bfdbfe',
+      };
+  }
+};
+
 const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, onOpenChange }: FeedbackProps) => {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
 
   const [internalOpen, setInternalOpen] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -140,9 +197,12 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
     }
   };
 
+  const activeRating = hover !== -1 ? hover : currentRating;
+  const sentiment = getSentimentDetails(activeRating);
+
   const triggerButton = trigger === 'none' ? null : trigger === 'menuItem' ? (
     <Button
-      startIcon={<FeedbackOutlinedIcon style={{ marginLeft: 4 }} />}
+      startIcon={<RateReviewOutlinedIcon style={{ marginLeft: 4 }} />}
       variant="text"
       color="primary"
       sx={{ textTransform: "inherit" }}
@@ -159,16 +219,17 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
         position: 'fixed',
         right: { xs: 16, md: 96 },
         bottom: { xs: 88, md: 24 },
-        padding: { xs: '9px 14px', md: '8px 16px' },
+        padding: { xs: '9px 16px', md: '8px 18px' },
         textTransform: 'none',
-        color: 'white',
+        color: '#ffffff',
         zIndex: 1250,
         boxShadow: (theme) => theme.customShadows.feedback,
         backdropFilter: 'blur(8px)',
         backgroundColor: (theme) => theme.palette.feedback.button.background,
         borderRadius: '999px',
-        fontSize: '0.95rem',
+        fontSize: '0.925rem',
         fontWeight: 600,
+        letterSpacing: '-0.01em',
         '&:hover': {
           backgroundColor: (theme) => theme.palette.feedback.button.hover,
           transform: 'translateY(-2px)',
@@ -176,7 +237,7 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
         },
         transition: 'all 0.2s ease',
       }}
-      startIcon={<SentimentVerySatisfiedIcon sx={{ fontSize: '1.4rem' }} />}
+      startIcon={<RateReviewOutlinedIcon sx={{ fontSize: '1.25rem' }} />}
     >
       {t('feedback.button')}
     </Button>
@@ -194,30 +255,55 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
         slotProps={{
           paper: {
             sx: {
-              borderRadius: '18px',
+              borderRadius: '20px',
               boxShadow: (theme) => theme.customShadows.large,
               border: (theme) => `1px solid ${theme.palette.feedback.dialog.border}`,
             }
           }
         }}
       >
-        <DialogTitle>
+        <DialogTitle sx={{ p: 2.5, pb: 1.5 }}>
           <Stack
             direction="row"
             justifyContent="space-between"
             alignItems="center"
-            sx={{ pb: 1 }}
           >
-            <Typography
-              variant="h5"
-              component="div"
-              sx={{
-                fontWeight: 700,
-                color: 'text.primary',
-              }}
-            >
-              {t('feedback.title')}
-            </Typography>
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Box
+                sx={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: '12px',
+                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
+                  color: 'primary.main',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <RateReviewOutlinedIcon sx={{ fontSize: 22 }} />
+              </Box>
+              <Box>
+                <Typography
+                  variant="h6"
+                  component="div"
+                  sx={{
+                    fontWeight: 800,
+                    color: 'text.primary',
+                    fontSize: '1.15rem',
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  {t('feedback.title')}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'text.secondary', fontWeight: 500, display: 'block' }}
+                >
+                  {t('feedback.subtitle', { defaultValue: 'Chia sẻ trải nghiệm để nâng cao chất lượng dịch vụ' })}
+                </Typography>
+              </Box>
+            </Stack>
 
             <IconButton
               onClick={handleClose}
@@ -237,36 +323,47 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
           </Stack>
         </DialogTitle>
 
-        <DialogContent sx={{ pt: 2 }}>
+        <DialogContent sx={{ px: 3, pt: 2 }}>
           <Grid container spacing={3}>
             <Grid size={12}>
               <Box sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 2
+                gap: 1.25,
+                pt: 0.5,
+                pb: 1,
               }}>
                 <Box
-                  component="img"
-                  src={FEEDBACK_IMAGES[`${(hover !== -1 ? hover : currentRating)}star` as keyof typeof FEEDBACK_IMAGES]}
-                  alt={`${hover !== -1 ? hover : currentRating} star feedback`}
                   sx={{
-                    width: 50,
-                    height: 50,
-                    objectFit: 'contain',
-                    animation: 'fadeIn 0.3s ease-in-out',
-                    '@keyframes fadeIn': {
-                      '0%': {
-                        opacity: 0,
-                        transform: 'scale(0.8)',
-                      },
-                      '100%': {
-                        opacity: 1,
-                        transform: 'scale(1)',
-                      },
-                    },
+                    width: 64,
+                    height: 64,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: sentiment.bg,
+                    border: `1.5px solid ${sentiment.border}`,
+                    boxShadow: `0 4px 14px ${alpha(sentiment.color, 0.16)}`,
+                    transition: 'all 0.25s ease',
+                    transform: hover !== -1 ? 'scale(1.08)' : 'scale(1)',
                   }}
-                />
+                >
+                  {sentiment.icon}
+                </Box>
+
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 700,
+                    color: sentiment.color,
+                    letterSpacing: '0.01em',
+                    fontSize: '0.9rem',
+                    transition: 'color 0.2s ease',
+                  }}
+                >
+                  {i18n.language.startsWith('en') ? sentiment.labelEn : sentiment.label}
+                </Typography>
 
                 <RatingCustom
                   name="rating"
@@ -327,10 +424,10 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
                 {!evidenceImageFile ? (
                   <Button
                     variant="outlined"
-                    startIcon={<PhotoCameraIcon fontSize="small" />}
+                    startIcon={<AddPhotoAlternateOutlinedIcon fontSize="small" />}
                     disabled={isSubmitting}
                     onClick={() => evidenceInputRef.current?.click()}
-                    sx={{ textTransform: 'none', borderRadius: '10px' }}
+                    sx={{ textTransform: 'none', borderRadius: '10px', fontWeight: 600 }}
                   >
                     {t('feedback.evidenceImageUpload')}
                   </Button>
@@ -395,12 +492,15 @@ const Feedback = ({ trigger = 'floating', onBeforeOpen, open: controlledOpen, on
             onClick={handleSubmit(handleSendFeedback)}
             fullWidth
             disabled={isSubmitting}
-            startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : null}
+            startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : <SendRoundedIcon sx={{ fontSize: '1.15rem' }} />}
             sx={{
-              py: 1.5,
+              py: 1.35,
               borderRadius: '12px',
               background: (theme) => theme.palette.feedback.button.background,
               boxShadow: (theme) => theme.customShadows.feedback,
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              letterSpacing: '-0.01em',
               '&:hover': {
                 background: (theme) => theme.palette.feedback.button.background,
                 transform: 'translateY(-1px)',

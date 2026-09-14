@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { Box } from '@mui/material';
-import { PRELOAD_AVATAR_STATES, AVATAR_ASSET_PATHS, AvatarState } from './avatarStates';
+import { PRELOAD_AVATAR_STATES, getAvatarAssetPaths, AVATAR_ASSET_PATHS, AvatarState } from './avatarStates';
 
 interface AvatarImageProps {
   src: string;
   state: AvatarState;
+  avatarId?: string;
   alt?: string;
   className?: string;
   priority?: boolean;
@@ -19,6 +20,7 @@ interface AvatarImageProps {
 export function AvatarImage({
   src,
   state,
+  avatarId,
   alt = 'AI Interviewer Avatar',
   className = '',
 }: AvatarImageProps) {
@@ -28,19 +30,20 @@ export function AvatarImage({
   const [hasError, setHasError] = useState(false);
   const preloadedMapRef = useRef<Set<string>>(new Set());
 
-  // 1. One-time preloading of core avatar states
+  // 1. Preloading of core avatar states for active avatar
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    const paths = getAvatarAssetPaths(avatarId);
     PRELOAD_AVATAR_STATES.forEach((st) => {
-      const path = AVATAR_ASSET_PATHS[st];
+      const path = paths[st];
       if (path && !preloadedMapRef.current.has(path)) {
         const img = new window.Image();
         img.src = path;
         preloadedMapRef.current.add(path);
       }
     });
-  }, []);
+  }, [avatarId]);
 
   // 2. Smooth crossfade when src changes
   useEffect(() => {
@@ -59,7 +62,19 @@ export function AvatarImage({
       return;
     }
 
-    // Preload incoming image before fading
+    // Instant swap for speaking frames and eye blinks to avoid ghosting or blurry mouth
+    const isSpeakingTransition = src.includes('speaking') || currentSrc.includes('speaking');
+    const isBlinkTransition = src.includes('blink') || currentSrc.includes('blink');
+
+    if (isSpeakingTransition || isBlinkTransition) {
+      setCurrentSrc(src);
+      setPrevSrc(null);
+      setIsCrossFading(false);
+      setHasError(false);
+      return;
+    }
+
+    // Preload incoming image before fading for major state transitions
     const incomingImg = new window.Image();
     incomingImg.src = src;
     incomingImg.onload = () => {
@@ -111,7 +126,6 @@ export function AvatarImage({
             objectFit: 'contain',
             opacity: 0,
             transition: 'opacity 0.12s cubic-bezier(0.4, 0, 0.2, 1)',
-            filter: 'drop-shadow(0 10px 24px rgba(15, 23, 42, 0.08))',
           }}
         />
       )}
@@ -119,7 +133,7 @@ export function AvatarImage({
       {/* Current active image buffer */}
       <Box
         component="img"
-        src={hasError ? AVATAR_ASSET_PATHS.idle : currentSrc}
+        src={hasError ? (getAvatarAssetPaths(avatarId).idle || AVATAR_ASSET_PATHS.idle) : currentSrc}
         alt={alt}
         onError={() => {
           console.warn(`[InterviewAvatar] Primary image load error for state: ${state}`);
@@ -132,7 +146,6 @@ export function AvatarImage({
           objectPosition: 'bottom center',
           opacity: 1,
           transition: 'opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-          filter: 'drop-shadow(0 10px 24px rgba(15, 23, 42, 0.09))',
           willChange: 'transform',
         }}
       />

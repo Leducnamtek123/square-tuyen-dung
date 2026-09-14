@@ -270,7 +270,9 @@ export function useInterviewQuestionHUD(options: UseInterviewQuestionHUDOptions 
         ) {
           setCurrentIndex(data.question_index);
         } else if (data.action === 'session_completed') {
-          onCompleteInterview?.();
+          setTimeout(() => {
+            onCompleteInterview?.();
+          }, 3500);
         }
       } catch (err) {
         console.warn('[HUD] Error parsing remote question control event:', err);

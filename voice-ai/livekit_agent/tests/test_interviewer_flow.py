@@ -4,6 +4,8 @@ import unicodedata
 from livekit_agent import interviewer as interviewer_module
 from livekit_agent.interview_flow import (
     decide_next_action,
+    is_explicit_refusal_or_skip,
+    is_hostile_or_abusive,
     is_substantive_answer,
     parse_question_payload,
     redact_question_progress_labels,
@@ -92,6 +94,7 @@ def test_scripted_llm_node_prompts_for_more_detail_before_advancing() -> None:
                 ]
             }
         )
+        agent._llm_client = None
         recorded = []
 
         async def fake_record_transcript(
@@ -280,6 +283,7 @@ def test_completed_scripted_interview_finalizes_status_and_session() -> None:
 def test_scripted_llm_node_acknowledges_candidate_question_before_closing() -> None:
     async def run() -> None:
         agent = Interviewer(context={"questions": [{"text": "Cau hoi 1"}]})
+        agent._llm_client = None
 
         async def fake_record_transcript(
             speaker_role, content, speech_duration_ms=None
@@ -614,3 +618,104 @@ def test_handle_candidate_finish_interview_marks_completed() -> None:
         assert "ket thuc" in _strip_accents(reply).lower()
 
     asyncio.run(run())
+
+
+def test_is_hostile_or_abusive_detection() -> None:
+    assert is_hostile_or_abusive("Cút đi mày") is True
+    assert is_hostile_or_abusive("dm cút") is True
+    assert is_hostile_or_abusive("fuck you") is True
+    assert is_hostile_or_abusive("con điên này") is True
+    assert is_hostile_or_abusive("thằng ngu") is True
+    assert is_hostile_or_abusive("mất dạy thật sự") is True
+
+    # Normal conversation phrases must NOT be flagged
+    assert is_hostile_or_abusive("Toi da tung lam giam sat du an lon") is False
+    assert is_hostile_or_abusive("Buoi phong van rat thu vi") is False
+    assert is_hostile_or_abusive("Cac ban co the cho toi biet them") is False
+    assert is_hostile_or_abusive("Toi la Linh") is False
+
+
+def test_is_explicit_refusal_or_skip_detection() -> None:
+    assert is_explicit_refusal_or_skip("Em khong biet cau nay") is True
+    assert is_explicit_refusal_or_skip("Bỏ qua đi") is True
+    assert is_explicit_refusal_or_skip("Next câu khác đi ạ") is True
+    assert is_explicit_refusal_or_skip("Chuyển câu khác đi") is True
+    assert is_explicit_refusal_or_skip("Chịu thôi") is True
+
+    assert is_explicit_refusal_or_skip("Tôi biết rất rõ về quy trình này") is False
+    assert is_explicit_refusal_or_skip("Kinh nghiệm của tôi là năm năm") is False
+
+
+def test_scripted_llm_node_handles_abusive_language_with_warning_and_termination() -> None:
+    async def run() -> None:
+        agent = Interviewer(
+            context={
+                "questions": [
+                    {"text": "Gioi thieu ban than"},
+                    {"text": "Ly do ung tuyen"},
+                ]
+            }
+        )
+        recorded = []
+        async def fake_record(role, content, speech_duration_ms=None):
+            recorded.append((role, content))
+        agent.record_transcript = fake_record
+
+        first = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u1", "Xin chào")), [], None
+        )
+        assert "Gioi thieu ban than" in first
+        assert agent.completed is False
+
+        # Strike 1: Candidate swears
+        strike1_reply = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u2", "Cút đi mày")), [], None
+        )
+        assert agent.completed is False
+        assert "nói thêm" not in strike1_reply.lower()
+        assert "case cụ thể" not in strike1_reply.lower()
+        normalized_strike1 = _strip_accents(strike1_reply).lower()
+        assert "van minh" in normalized_strike1 or "phu hop" in normalized_strike1
+
+        # Strike 2: Candidate swears again
+        strike2_reply = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u3", "dm biến đi con điên")), [], None
+        )
+        assert agent.completed is True
+        normalized_strike2 = _strip_accents(strike2_reply).lower()
+        assert "ket thuc" in normalized_strike2
+
+    asyncio.run(run())
+
+
+def test_scripted_llm_node_advances_on_explicit_refusal_or_skip() -> None:
+    async def run() -> None:
+        agent = Interviewer(
+            context={
+                "questions": [
+                    {"text": "Gioi thieu ban than"},
+                    {"text": "Ly do ung tuyen"},
+                ]
+            }
+        )
+        recorded = []
+        async def fake_record(role, content, speech_duration_ms=None):
+            recorded.append((role, content))
+        agent.record_transcript = fake_record
+
+        first = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u1", "Xin chào")), [], None
+        )
+        assert "Gioi thieu ban than" in first
+
+        # Candidate asks to skip
+        skip_reply = await agent.llm_node(
+            DummyChatContext(DummyUserMessage("u2", "Em không biết câu này, cho em bỏ qua")), [], None
+        )
+        assert "nói thêm" not in skip_reply.lower()
+        assert "case cụ thể" not in skip_reply.lower()
+        assert "Ly do ung tuyen" in skip_reply
+        assert "chuyen sang" in _strip_accents(skip_reply).lower()
+
+    asyncio.run(run())
+

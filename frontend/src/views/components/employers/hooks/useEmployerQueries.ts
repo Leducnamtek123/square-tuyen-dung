@@ -31,7 +31,7 @@ import type { ResumeSavedListParams } from '@/services/resumeSavedService';
 import type { JobPostActivityListParams } from '@/services/jobPostActivityService';
 import type { GetResumesParams } from '@/services/resumeService';
 
-// ─── Types ───────────────────────────────────────────────────
+// --- Types ---------------------------------------------------
 type UseEmployerGeneralStatsResult = UseQueryResult<EmployerGeneralStats>;
 type UseEmployerApplicationStatsResult = UseQueryResult<EmployerApplicationStats>;
 type UseEmployerCandidateStatsResult = UseQueryResult<EmployerCandidateStats>;
@@ -85,7 +85,7 @@ export const normalizeJobPostOptions = (response: RawJobPostOptionResponse): Job
     .filter((option) => option.id !== undefined && option.id !== null && option.jobName);
 };
 
-// ─── Employer Statistics ─────────────────────────────────────
+// --- Employer Statistics -------------------------------------
 export const useEmployerGeneralStatistics = (): UseEmployerGeneralStatsResult => {
   return useQuery({
     queryKey: ['employerGeneralStatistics'],
@@ -146,7 +146,7 @@ export const useEmployerInterviewStatistics = (params: EmployerStatsParams = {})
   });
 };
 
-// ─── Job Posts ──────────────────────────────────────────────
+// --- Job Posts ----------------------------------------------
 export const useEmployerJobPosts = (params: GetJobPostsParams = {}): UseEmployerJobPostsResult => {
   return useQuery({
     queryKey: ['employerJobPosts', params],
@@ -193,7 +193,7 @@ export const useJobPostMutations = () => {
   };
 };
 
-// ─── Saved Resumes ──────────────────────────────────────────
+// --- Saved Resumes ------------------------------------------
 export const useSavedResumes = (params: ResumeSavedListParams): UseSavedResumesResult => {
   return useQuery({
     queryKey: ['savedResumes', params],
@@ -221,7 +221,7 @@ export const useToggleSaveResume = () => {
   };
 };
 
-// ─── Applied Resumes ────────────────────────────────────────
+// --- Applied Resumes ----------------------------------------
 export const useAppliedResumes = (params: JobPostActivityListParams, enabled: boolean = true): UseAppliedResumesResult => {
   return useQuery({
     queryKey: ['appliedResumes', params],
@@ -284,7 +284,7 @@ export const useUpdateApplicationStatus = () => {
   };
 };
 
-// ─── Employer Profile Search ────────────────────────────────
+// --- Employer Profile Search --------------------------------
 export const useEmployerResumes = (params: GetResumesParams): UseEmployerResumesResult => {
   return useQuery({
     queryKey: ['employerResumes', params],
@@ -361,7 +361,7 @@ export const useResumeDetail = (slug: string) => {
   });
 };
 
-// ─── Interview Management ────────────────────────────────────
+// --- Interview Management ------------------------------------
 export const useInterviewSessions = (params: GetSessionsParams = {}, refetchInterval?: number | false): UseInterviewSessionsResult => {
   return useQuery({
     queryKey: ['interviewSessions', params],
@@ -446,7 +446,7 @@ export const useInterviewMutations = () => {
   };
 };
 
-// ─── Questions & Groups ──────────────────────────────────────
+// --- Questions & Groups --------------------------------------
 export const useEmployerQuestions = (params: QuestionListParams = {}): UseEmployerQuestionsResult => {
   return useQuery({
     queryKey: ['employerQuestions', params],
@@ -527,7 +527,7 @@ export const useQuestionGroupMutations = () => {
   };
 };
 
-// ─── Company Profile ─────────────────────────────────────────
+// --- Company Profile -----------------------------------------
 export const useCompanyProfile = () => {
   return useQuery({
     queryKey: ['companyProfile'],

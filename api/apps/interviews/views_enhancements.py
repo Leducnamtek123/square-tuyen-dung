@@ -151,7 +151,7 @@ class CreateMockSessionView(APIView):
         elif category and category != 'Tất cả ngành nghề':
             career_obj = Career.objects.filter(name__icontains=category).first()
 
-        # Xác định user ứng viên (hoặc fallback nếu user chưa đăng nhập)
+        # Xác định user ứng viên hoặc fallback nếu user chưa đăng nhập
         candidate = request.user if request.user and request.user.is_authenticated else None
         if not candidate:
             from apps.accounts.models import User
@@ -180,7 +180,7 @@ class CreateMockSessionView(APIView):
             candidate_questions.extend(qs_cat)
 
         # Bổ sung câu hỏi chung nếu chưa đủ question_count:
-        # CHỈ bổ sung từ câu hỏi chung (career__isnull=True), TUYỆT ĐỐI không lấy câu hỏi chuyên ngành của nghề khác!
+        # CHỈ bổ sung từ câu hỏi chung career__isnull=True, TUYỆT ĐỐI không lấy câu hỏi chuyên ngành của nghề khác!
         if not candidate_questions:
             general_qs = list(
                 Question.objects.filter(
@@ -229,6 +229,7 @@ class CreateMockSessionView(APIView):
             question_group=question_group_obj,
             voice_profile=voice_profile_obj,
             session_type=InterviewSession.SESSION_TYPE_MOCK,
+            interview_language=serializer.validated_data.get('interview_language', 'vi'),
             status='scheduled',
             type='mixed',
             scheduled_at=timezone.now(),
@@ -339,7 +340,7 @@ class PublicQuestionGroupListView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        groups_qs = QuestionGroup.objects.prefetch_related(
+        groups_qs = QuestionGroup.objects.filter(is_public=True).prefetch_related(
             'questions', 'questions__career'
         ).select_related('company', 'company__logo').all()
 

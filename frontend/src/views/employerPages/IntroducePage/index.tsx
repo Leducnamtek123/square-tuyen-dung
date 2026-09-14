@@ -39,7 +39,7 @@ const IntroducePage = () => {
     () => {
       const mm = gsap.matchMedia();
 
-      // ── Desktop Breakpoint (≥769px) ─────────────────────────────────
+      // -- Desktop Breakpoint (≥769px) ---------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.isDesktop, () => {
         const heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
@@ -140,7 +140,7 @@ const IntroducePage = () => {
         );
       });
 
-      // ── Mobile Breakpoint (≤768px) ──────────────────────────────────
+      // -- Mobile Breakpoint (≤768px) ----------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.isMobile, () => {
         const heroTl = gsap.timeline({ defaults: { ease: "power2.out" } });
 
@@ -241,7 +241,7 @@ const IntroducePage = () => {
         );
       });
 
-      // ── Reduced Motion ───────────────────────────────────────────────
+      // -- Reduced Motion -----------------------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.reduceMotion, () => {
         gsap.set(
           ".gsap-hero-badge, .gsap-hero-title, .gsap-hero-desc, .gsap-hero-actions, .gsap-highlight-card, .gsap-services-box, .gsap-service-card, .gsap-step-card",
@@ -319,7 +319,7 @@ const IntroducePage = () => {
 
   return (
     <Box ref={containerRef} sx={{ maxWidth: "1200px", margin: "0 auto", py: 5, px: 3 }}>
-      {/* ── Hero Banner Header ────────────────────────────────────────── */}
+      {/* -- Hero Banner Header ------------------------------------------ */}
       <Box sx={{ mb: 8, textAlign: "center" }}>
         <Box
           className="gsap-hero-badge"
@@ -407,7 +407,7 @@ const IntroducePage = () => {
         </Stack>
       </Box>
 
-      {/* ── Highlights Grid ────────────────────────────────────────── */}
+      {/* -- Highlights Grid ------------------------------------------ */}
       <Grid container spacing={4} sx={{ mb: 10 }} className="gsap-highlights-grid">
         {highlights.map((item) => (
           <Grid key={item.title} size={{ xs: 12, sm: 6, md: 3 }} className="gsap-highlight-card">
@@ -440,7 +440,7 @@ const IntroducePage = () => {
         ))}
       </Grid>
 
-      {/* ── Integrated Services Section ────────────────────────────────── */}
+      {/* -- Integrated Services Section ---------------------------------- */}
       <Box className="gsap-services-box" sx={{ mb: 10, p: { xs: 3, md: 5 }, borderRadius: '24px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
         <Box sx={{ textAlign: 'center', mb: 5 }}>
           <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', mb: 1 }}>
@@ -505,7 +505,7 @@ const IntroducePage = () => {
         </Stack>
       </Box>
 
-      {/* ── Process Steps Section ──────────────────────────────────────── */}
+      {/* -- Process Steps Section ---------------------------------------- */}
       <Box>
         <Typography
           variant="h4"

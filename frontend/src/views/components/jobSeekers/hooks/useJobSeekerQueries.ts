@@ -16,7 +16,7 @@ import errorHandling from '@/utils/errorHandling';
 import i18next from 'i18next';
 import type { UserSettingsData } from '@/types/auth';
 
-// ─── Query Helpers ──────────────────────────────────────────
+// --- Query Helpers ------------------------------------------
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { JobSeekerTotalViewStats } from '@/services/statisticService';
 import type { GetJobPostsParams } from '@/services/jobService';
@@ -45,7 +45,7 @@ type UseResumesResult = UseQueryResult<Resume[]>;
 type UseJobPostNotificationsResult = UseQueryResult<PaginatedResponse<JobPostNotification>>;
 
 
-// ─── Saved Jobs ─────────────────────────────────────────────
+// --- Saved Jobs ---------------------------------------------
 export const useSavedJobs = (params: GetJobPostsParams = {}): UseSavedJobsResult => {
     const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
     const hasToken = !!tokenService.getAccessTokenFromCookie();
@@ -93,7 +93,7 @@ export const useToggleSaveJob = () => {
     });
 };
 
-// ─── Companies Followed ─────────────────────────────────────
+// --- Companies Followed -------------------------------------
 export const useCompaniesFollowed = (params: CompanyFollowedListParams = {}): UseCompaniesFollowedResult => {
     return useQuery({
         queryKey: ['companiesFollowed', params],
@@ -119,7 +119,7 @@ export const useToggleFollowCompany = () => {
     });
 };
 
-// ─── Companies Viewed (Resume) ──────────────────────────────
+// --- Companies Viewed (Resume) ------------------------------
 export const useResumeViewed = (params: { page?: number; pageSize?: number; ordering?: string } = {}): UseResumeViewedResult => {
     return useQuery({
         queryKey: ['resumeViewed', params],
@@ -134,7 +134,7 @@ export const useResumeViewed = (params: { page?: number; pageSize?: number; orde
     });
 };
 
-// ─── Statistics ─────────────────────────────────────────────
+// --- Statistics ---------------------------------------------
 export const useJobSeekerTotalView = (): UseJobSeekerTotalViewResult => {
     return useQuery({
         queryKey: ['jobSeekerTotalView'],
@@ -155,7 +155,7 @@ export const useJobSeekerActivityStatistics = (): UseJobSeekerActivityStatsResul
     });
 };
 
-// ─── Job Application (Resumes) ──────────────────────────────
+// --- Job Application (Resumes) ------------------------------
 export const useResumes = (jobSeekerProfileId: string | undefined, params: JobSeekerProfileResumeParams = {}): UseResumesResult => {
     const { isAuthenticated } = useAppSelector((state) => state.user);
     const hasToken = !!tokenService.getAccessTokenFromCookie();
@@ -172,7 +172,7 @@ export const useResumes = (jobSeekerProfileId: string | undefined, params: JobSe
     });
 };
 
-// ─── Job Post Notifications ─────────────────────────────────
+// --- Job Post Notifications ---------------------------------
 export const useJobPostNotifications = (params: JobPostNotificationListParams = {}): UseJobPostNotificationsResult => {
     return useQuery({
         queryKey: ['jobPostNotifications', params],
@@ -214,7 +214,7 @@ export const useJobPostNotificationMutations = () => {
     return { addMutation, updateMutation, deleteMutation };
 };
 
-// ─── User Settings ──────────────────────────────────────────
+// --- User Settings ------------------------------------------
 export const useUserSettings = (enabled: boolean = true) => {
     return useQuery({
         queryKey: ['userSettings'],

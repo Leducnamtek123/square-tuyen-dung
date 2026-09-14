@@ -265,7 +265,7 @@ const NewsContent = () => {
 
   return (
     <Box sx={{ bgcolor: '#f8fafc', minHeight: '100dvh', pb: 8 }}>
-      {/* ── Sub-header Navigation Bar ──────────────────────────────────────── */}
+      {/* -- Sub-header Navigation Bar ---------------------------------------- */}
       <SubHeaderCategoryBar
         categories={categories}
         activeCategorySlug={activeCategorySlug}
@@ -273,7 +273,7 @@ const NewsContent = () => {
       />
 
       <Container maxWidth="xl" sx={{ mt: 3 }}>
-        {/* ── Featured Articles Section ──────────────────────────────────────── */}
+        {/* -- Featured Articles Section ---------------------------------------- */}
         <Box sx={{ mb: 6 }}>
           <Typography variant="h5" component="h1" fontWeight={800} color="#0f172a" sx={{ mb: 3, letterSpacing: '-0.01em' }}>
             Tin tức &amp; Cẩm nang nghề nghiệp
@@ -398,7 +398,7 @@ const NewsContent = () => {
           )}
         </Box>
 
-        {/* ── Latest Articles Section with Filter Tabs ────────────────────────── */}
+        {/* -- Latest Articles Section with Filter Tabs -------------------------- */}
         <Box sx={{ mb: 6 }}>
           <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} spacing={2} sx={{ mb: 3 }}>
             <Typography variant="h5" fontWeight={800} color="#0f172a" sx={{ letterSpacing: '-0.01em' }}>
@@ -556,7 +556,7 @@ const NewsContent = () => {
           )}
         </Box>
 
-        {/* ── In-feed Banner Promotion ───────────────────────────────────────── */}
+        {/* -- In-feed Banner Promotion ----------------------------------------- */}
         <Box
           sx={{
             borderRadius: '16px',
@@ -600,7 +600,7 @@ const NewsContent = () => {
           </Button>
         </Box>
 
-        {/* ── Popular Keywords Tag Cloud ────────────────────────────────────── */}
+        {/* -- Popular Keywords Tag Cloud -------------------------------------- */}
         <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid #e2e8f0', p: 3, bgcolor: '#ffffff' }}>
           <Typography variant="h6" fontWeight={800} color="#0f172a" sx={{ mb: 2 }}>
             Từ khoá nổi bật

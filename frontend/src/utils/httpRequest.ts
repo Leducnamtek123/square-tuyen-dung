@@ -259,7 +259,7 @@ httpRequest.interceptors.response.use(
     // Return payload directly; fall back to raw response for legacy endpoints.
     const payload = unwrapEnvelopeData(response.data);
 
-    // Auto-transform snake_case keys â†’ camelCase
+    // Auto-transform snake_case keys -> camelCase
     return camelizeKeys(payload);
   },
 

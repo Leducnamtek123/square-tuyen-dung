@@ -41,8 +41,16 @@ import PhoneVerificationModal from '@/views/components/modals/PhoneVerificationM
 import { useResumes } from '@/views/components/jobSeekers/hooks/useJobSeekerQueries';
 import { CV_TYPES, ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
+import { downloadPdf } from '@/utils/funcUtils';
+import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
+import dynamic from 'next/dynamic';
 import type { ExtendedResume } from '@/components/Features/CVDoc';
 import type { User, SystemConfig } from '@/types/models';
+
+const CandidateResumePreviewModal = dynamic(
+  () => import('@/views/components/jobSeekers/CandidateProfile/CandidateResumePreviewModal'),
+  { ssr: false }
+);
 
 const formatDate = (dateStr?: string | null) => {
   if (!dateStr) return 'Chưa cập nhật';
@@ -123,6 +131,40 @@ const ProfilePage = () => {
   });
   const [isJobSeeking, setIsJobSeeking] = React.useState<boolean>(true);
   const [isSubmittingStatus, setIsSubmittingStatus] = React.useState<boolean>(false);
+  const [previewResumeOpen, setPreviewResumeOpen] = React.useState<boolean>(false);
+
+  const handleViewCvClick = () => {
+    if (resume) {
+      setPreviewResumeOpen(true);
+    } else {
+      toastMessages.info('Bạn chưa có CV nào. Vui lòng tạo hoặc tải lên hồ sơ ứng tuyển.');
+      const el = document.getElementById('applied-resume-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  const handleDownloadCvClick = async () => {
+    const rawFileUrl = (resume as any)?.fileUrl || (resume as any)?.file?.url || (resume as any)?.file?.fileUrl;
+    if (rawFileUrl) {
+      const safeFileUrl = getSafeResourceUrl(rawFileUrl);
+      if (safeFileUrl) {
+        await downloadPdf(safeFileUrl, resume?.title || profileData.fullName || 'CV');
+        return;
+      }
+    }
+    if (resume) {
+      setPreviewResumeOpen(true);
+      toastMessages.info('Đang mở bản xem trước CV để xem và lưu.');
+    } else {
+      toastMessages.info('Bạn chưa có CV nào để tải xuống. Vui lòng tạo hoặc tải lên CV.');
+      const el = document.getElementById('applied-resume-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   // Sync phone verification status with currentUser
   React.useEffect(() => {
@@ -597,6 +639,8 @@ const ProfilePage = () => {
         onAvatarChange={handleAvatarChange}
         onCoverChange={handleCoverChange}
         onSeekingStatusChange={handleSeekingStatusChange}
+        onViewCvClick={handleViewCvClick}
+        onDownloadCvClick={handleDownloadCvClick}
       />
 
       {/* 2. Main Content 2-Column Grid */}
@@ -747,7 +791,7 @@ const ProfilePage = () => {
         </Grid>
 
         {/* Right Column: Applied Resume */}
-        <Grid size={{ xs: 12, lg: 5 }}>
+        <Grid size={{ xs: 12, lg: 5 }} id="applied-resume-section">
           <Stack spacing={3}>
             {/* Applied Resume Card */}
             <CandidateAppliedResumeCard
@@ -780,6 +824,17 @@ const ProfilePage = () => {
           setProfileData((prev) => ({ ...prev, phoneNumber: verifiedPhone }));
           setIsPhoneVerified(true);
         }}
+      />
+
+      {/* Resume Preview Modal */}
+      <CandidateResumePreviewModal
+        open={previewResumeOpen}
+        onClose={() => setPreviewResumeOpen(false)}
+        resume={resume}
+        candidateName={profileData.fullName}
+        candidateEmail={profileData.email}
+        candidatePhone={profileData.phoneNumber}
+        avatarUrl={avatarUrl || currentUser?.avatarUrl || undefined}
       />
     </Box>
   );

@@ -77,14 +77,18 @@ const TopCompanyCarousel = () => {
 
   const filteredCompanies = companies.filter((c: any) => {
     if (selectedCategory === 'all') return true;
-    return c.category?.toLowerCase().includes(selectedCategory.toLowerCase());
+    const activeCat = categoriesList.find((cat) => cat.id === selectedCategory);
+    const catName = activeCat?.name?.toLowerCase() || selectedCategory.toLowerCase();
+    const fieldOp = (c.fieldOperation || c.field_operation || c.category || '')?.toLowerCase();
+    const compName = (c.companyName || c.company_name || '')?.toLowerCase();
+    return fieldOp.includes(catName) || compName.includes(catName);
   });
 
-  const displayList = filteredCompanies.length > 0 ? filteredCompanies : companies;
+  const displayList = filteredCompanies;
 
   return (
     <Box id="top-company-carousel" sx={{ width: '100%', mt: 4 }}>
-      {/* ── Section Header Row ───────────────────────────────────────── */}
+      {/* -- Section Header Row ----------------------------------------- */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
         <Stack direction="row" spacing={1} alignItems="center">
           <WorkspacePremiumIcon sx={{ color: '#eab308', fontSize: 26 }} />
@@ -101,7 +105,7 @@ const TopCompanyCarousel = () => {
         </Link>
       </Stack>
 
-      {/* ── Industry Category Pills Bar ─────────────────────────────── */}
+      {/* -- Industry Category Pills Bar ------------------------------- */}
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3, width: '100%', overflow: 'hidden' }}>
         <IconButton aria-label={t('common:actions.scrollLeft', 'Cuộn sang trái')}
           size="small"
@@ -181,7 +185,7 @@ const TopCompanyCarousel = () => {
         </IconButton>
       </Stack>
 
-      {/* ── 3-Column / 2-Row Grid Carousel Container ────────────────── */}
+      {/* -- 3-Column / 2-Row Grid Carousel Container ------------------ */}
       {isLoading ? (
         <Grid container spacing={2.5}>
           {Array.from(Array(6).keys()).map((i) => (
@@ -190,6 +194,10 @@ const TopCompanyCarousel = () => {
             </Grid>
           ))}
         </Grid>
+      ) : displayList.length === 0 ? (
+        <Box sx={{ p: 4, textAlign: 'center', width: '100%', color: '#64748b' }}>
+          <Typography variant="body2">{t('common:noData', 'Không tìm thấy công ty phù hợp trong danh mục này')}</Typography>
+        </Box>
       ) : (
         <Grid container spacing={2.5}>
           {displayList.slice(0, 9).map((company: Company) => {

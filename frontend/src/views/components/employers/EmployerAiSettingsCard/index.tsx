@@ -42,14 +42,22 @@ import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import GraphicEqIcon from '@mui/icons-material/GraphicEq';
+import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
+import StopRoundedIcon from '@mui/icons-material/StopRounded';
 
 import employerAiSettingService, {
   type EmployerAiSettings,
+  type PresetVoice,
   PRESET_BACKGROUNDS,
   PRESET_AVATARS,
+  PRESET_VOICES,
+  PRESET_SPEEDS,
   DEFAULT_EMPLOYER_AI_SETTINGS,
 } from '@/services/employerAiSettingService';
 import commonService from '@/services/commonService';
+import aiService from '@/services/aiService';
 import toastMessages from '@/utils/toastMessages';
 import { InterviewAvatar } from '@/views/interviewPages/components/avatar/InterviewAvatar';
 
@@ -60,21 +68,89 @@ export default function EmployerAiSettingsCard() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [saving, setSaving] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [playingVoiceId, setPlayingVoiceId] = useState<string | null>(null);
+  const [loadingVoiceId, setLoadingVoiceId] = useState<string | null>(null);
 
   const bgInputRef = useRef<HTMLInputElement>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const loaded = employerAiSettingService.getSettings();
     setSettings(loaded);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current = null;
+      }
+    };
+  }, []);
+
+  const handlePlayVoiceSample = async (voice: PresetVoice) => {
+    if (playingVoiceId === voice.id && currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+      setPlayingVoiceId(null);
+      setIsSpeakingTest(false);
+      return;
+    }
+
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+      setPlayingVoiceId(null);
+      setIsSpeakingTest(false);
+    }
+
+    setLoadingVoiceId(voice.id);
+    try {
+      const blob = await aiService.tts({
+        text: voice.sampleText,
+        voice: voice.name,
+        speed: settings.ttsSpeed || 1.0,
+        format: 'mp3',
+      });
+      const objectUrl = URL.createObjectURL(blob);
+      const audio = new Audio(objectUrl);
+      currentAudioRef.current = audio;
+      setPlayingVoiceId(voice.id);
+      setIsSpeakingTest(true);
+
+      audio.onended = () => {
+        URL.revokeObjectURL(objectUrl);
+        setPlayingVoiceId(null);
+        setIsSpeakingTest(false);
+        currentAudioRef.current = null;
+      };
+
+      audio.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        setPlayingVoiceId(null);
+        setIsSpeakingTest(false);
+        currentAudioRef.current = null;
+        toastMessages.error('Không thể phát âm thanh mẫu, vui lòng thử lại');
+      };
+
+      await audio.play();
+    } catch {
+      setPlayingVoiceId(null);
+      setIsSpeakingTest(false);
+      currentAudioRef.current = null;
+      toastMessages.error('Lỗi khi tải mẫu giọng nói');
+    } finally {
+      setLoadingVoiceId(null);
+    }
+  };
+
   const handleSave = () => {
     setSaving(true);
     try {
       const updated = employerAiSettingService.saveSettings(settings);
       setSettings(updated);
-      toastMessages.success('Lưu cài đặt diện mạo AI thành công');
+      toastMessages.success('Lưu cài đặt diện mạo và giọng đọc AI thành công');
     } catch {
       toastMessages.error('Có lỗi xảy ra khi lưu cấu hình');
     } finally {
@@ -133,7 +209,7 @@ export default function EmployerAiSettingsCard() {
   const activeBgUrl = employerAiSettingService.resolveActiveBackgroundUrl(settings);
   const activeAvatarUrl = settings.avatarType === 'custom' && settings.customAvatarUrl
     ? settings.customAvatarUrl
-    : (settings.selectedAvatarId === 'expert_male' ? '/assets/images/avatar/expert_male/idle.webp' : null);
+    : null;
 
   return (
     <Box sx={{ width: '100%', maxWidth: 1400, mx: 'auto', p: { xs: 2, md: 3 } }}>
@@ -222,6 +298,7 @@ export default function EmployerAiSettingsCard() {
                 <InterviewAvatar
                   interviewerName={settings.interviewerName}
                   avatarBackgroundUrl={activeBgUrl}
+                  avatarId={settings.selectedAvatarId}
                   avatarImageUrl={activeAvatarUrl}
                   isSpeakingHint={isSpeakingTest}
                   avatarBackdrop={settings.selectedBackgroundId}
@@ -281,6 +358,22 @@ export default function EmployerAiSettingsCard() {
                     </Typography>
                     <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary' }}>
                       {settings.avatarType === 'custom' ? 'Ảnh WebP riêng' : (settings.selectedAvatarId === 'expert_male' ? 'MINH TRÍ AI Nam' : 'AILA AI Nữ WebP')}
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      Giọng đọc AI
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                      {settings.ttsVoice || 'Trúc Ly'}
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      Tốc độ phát âm
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                      {settings.ttsSpeed ? `${settings.ttsSpeed}x` : '1.0x'}
                     </Typography>
                   </Stack>
                 </Stack>
@@ -565,7 +658,22 @@ export default function EmployerAiSettingsCard() {
                       return (
                         <Grid item xs={12} sm={6} key={item.id}>
                           <Box
-                            onClick={() => setSettings((prev) => ({ ...prev, selectedAvatarId: item.id }))}
+                            onClick={() => {
+                              const isMale = item.id === 'expert_male' || item.id.startsWith('male_');
+                              const currentVoice = employerAiSettingService.getPresetVoice(settings.ttsVoice);
+                              const currentIsMale = currentVoice?.gender === 'male';
+                              let newVoice = settings.ttsVoice;
+                              if (isMale && !currentIsMale) {
+                                newVoice = 'Mạnh Dũng';
+                              } else if (!isMale && currentIsMale) {
+                                newVoice = 'Trúc Ly';
+                              }
+                              setSettings((prev) => ({
+                                ...prev,
+                                selectedAvatarId: item.id,
+                                ttsVoice: newVoice,
+                              }));
+                            }}
                             sx={{
                               p: 1.5,
                               borderRadius: 3,
@@ -710,7 +818,189 @@ export default function EmployerAiSettingsCard() {
               </CardContent>
             </Card>
 
-            {/* Khối 3: Tên và chức vụ trợ lý AI */}
+            {/* Khối 3: Tùy chọn Giọng đọc và Âm điệu AI */}
+            <Card elevation={0} sx={{ borderRadius: 3.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+              <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Stack direction="row" alignItems="center" spacing={1.5}>
+                  <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: '#faf5ff', color: '#9333ea', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <GraphicEqIcon sx={{ fontSize: 20 }} />
+                  </Box>
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                      Giọng đọc và âm điệu AI
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                      Tùy biến chất giọng ba miền Bắc Trung Nam và nhịp điệu phát âm tự nhiên của AI phỏng vấn
+                    </Typography>
+                  </Box>
+                </Stack>
+              </Box>
+
+              <CardContent sx={{ p: 2.5 }}>
+                {/* Lưới các giọng đọc tiêu chuẩn */}
+                <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', mb: 1.5 }}>
+                  Chất giọng phỏng vấn tiêu chuẩn
+                </Typography>
+
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                  {PRESET_VOICES.map((v) => {
+                    const isSelected = (settings.ttsVoice === v.id || settings.ttsVoice === v.name);
+                    const isPlaying = playingVoiceId === v.id;
+                    const isLoading = loadingVoiceId === v.id;
+
+                    return (
+                      <Grid item xs={12} sm={6} key={v.id}>
+                        <Box
+                          onClick={() => setSettings((prev) => ({ ...prev, ttsVoice: v.name }))}
+                          sx={{
+                            p: 2,
+                            borderRadius: 3,
+                            border: '2px solid',
+                            borderColor: isSelected ? 'primary.main' : '#e2e8f0',
+                            bgcolor: isSelected ? '#eff6ff' : '#ffffff',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            height: '100%',
+                            position: 'relative',
+                            '&:hover': {
+                              borderColor: 'primary.light',
+                              transform: 'translateY(-2px)',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                            },
+                          }}
+                        >
+                          <Box>
+                            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                              <Stack direction="row" alignItems="center" spacing={1}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1rem' }}>
+                                  {v.name}
+                                </Typography>
+                                <Chip
+                                  label={`${v.genderVi} - ${v.regionVi}`}
+                                  size="small"
+                                  sx={{
+                                    height: 22,
+                                    fontSize: '0.7rem',
+                                    fontWeight: 700,
+                                    bgcolor: v.gender === 'female' ? '#fdf2f8' : '#eff6ff',
+                                    color: v.gender === 'female' ? '#db2777' : '#2563eb',
+                                    border: '1px solid',
+                                    borderColor: v.gender === 'female' ? '#fbcfe8' : '#bfdbfe',
+                                  }}
+                                />
+                              </Stack>
+                              {isSelected ? (
+                                <CheckCircleRoundedIcon color="primary" sx={{ fontSize: 22 }} />
+                              ) : v.badge ? (
+                                <Chip
+                                  label={v.badge}
+                                  size="small"
+                                  variant="outlined"
+                                  sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, color: 'text.secondary' }}
+                                />
+                              ) : null}
+                            </Stack>
+
+                            <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 700, display: 'block', mb: 0.5 }}>
+                              {v.toneVi}
+                            </Typography>
+
+                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.4, mb: 1.5 }}>
+                              {v.descriptionVi}
+                            </Typography>
+                          </Box>
+
+                          <Box sx={{ pt: 1, borderTop: '1px dashed #e2e8f0' }}>
+                            <Button
+                              size="small"
+                              variant={isPlaying ? 'contained' : 'outlined'}
+                              color={isPlaying ? 'primary' : 'inherit'}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handlePlayVoiceSample(v);
+                              }}
+                              disabled={isLoading}
+                              startIcon={
+                                isLoading ? (
+                                  <CircularProgress size={14} color="inherit" />
+                                ) : isPlaying ? (
+                                  <StopRoundedIcon sx={{ fontSize: 16 }} />
+                                ) : (
+                                  <PlayArrowRoundedIcon sx={{ fontSize: 16 }} />
+                                )
+                              }
+                              sx={{
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                fontSize: '0.75rem',
+                                borderRadius: 2,
+                                py: 0.4,
+                                px: 1.5,
+                                color: isPlaying ? '#ffffff' : 'text.primary',
+                                borderColor: isPlaying ? 'transparent' : '#cbd5e1',
+                              }}
+                            >
+                              {isLoading ? 'Đang tải mẫu...' : isPlaying ? 'Dừng phát' : 'Nghe thử giọng mẫu'}
+                            </Button>
+                          </Box>
+                        </Box>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+
+                {/* Bộ điều chỉnh tốc độ phát âm */}
+                <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                  <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
+                    <SpeedOutlinedIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                      Tốc độ và nhịp điệu phát âm
+                    </Typography>
+                  </Stack>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 2 }}>
+                    Tùy chỉnh nhịp nói của AI để câu hỏi được truyền tải tự nhiên, rõ ràng và mạch lạc nhất
+                  </Typography>
+
+                  <Grid container spacing={1.5}>
+                    {PRESET_SPEEDS.map((sp) => {
+                      const isSelected = (settings.ttsSpeed ?? 1.0) === sp.value;
+                      return (
+                        <Grid item xs={6} sm={3} key={sp.value}>
+                          <Box
+                            onClick={() => setSettings((prev) => ({ ...prev, ttsSpeed: sp.value }))}
+                            sx={{
+                              p: 1.5,
+                              borderRadius: 2,
+                              border: '2px solid',
+                              borderColor: isSelected ? 'primary.main' : '#e2e8f0',
+                              bgcolor: isSelected ? '#eff6ff' : '#ffffff',
+                              cursor: 'pointer',
+                              textAlign: 'center',
+                              transition: 'all 0.15s ease',
+                              '&:hover': {
+                                borderColor: 'primary.light',
+                              },
+                            }}
+                          >
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: isSelected ? 'primary.main' : 'text.primary' }}>
+                              {sp.label}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem', display: 'block', mt: 0.25 }}>
+                              {sp.descriptionVi}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
+                </Box>
+              </CardContent>
+            </Card>
+
+            {/* Khối 4: Tên và chức vụ trợ lý AI */}
             <Card elevation={0} sx={{ borderRadius: 3.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
               <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
                 <Stack direction="row" alignItems="center" spacing={1.5}>

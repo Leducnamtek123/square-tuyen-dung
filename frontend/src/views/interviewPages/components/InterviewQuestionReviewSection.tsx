@@ -44,7 +44,7 @@ export const InterviewQuestionReviewSection: React.FC<InterviewQuestionReviewSec
 
   return (
     <div className={`grid grid-cols-1 gap-6 lg:grid-cols-12 ${className}`}>
-      {/* ─── Left Column: Question List ───────────────────────────────────── */}
+      {/* --- Left Column: Question List ------------------------------------- */}
       <div className="flex flex-col gap-3 lg:col-span-5">
         {/* Header */}
         <div className="flex items-center justify-between px-1">
@@ -121,7 +121,7 @@ export const InterviewQuestionReviewSection: React.FC<InterviewQuestionReviewSec
         </div>
       </div>
 
-      {/* ─── Right Column: Selected Question Drilldown ────────────────────── */}
+      {/* --- Right Column: Selected Question Drilldown ---------------------- */}
       <div className="lg:col-span-7">
         <div className="relative flex flex-col justify-between rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm min-h-[420px] md:p-8">
           <div>

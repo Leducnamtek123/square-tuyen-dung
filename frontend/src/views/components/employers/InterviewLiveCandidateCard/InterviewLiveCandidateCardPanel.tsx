@@ -69,7 +69,7 @@ const InterviewLiveCandidateCardPanel = ({
   const normalizedStatus = normalizeStatus(session.status);
   const statusLabel = normalizedStatus ? t(`interview:interviewListCard.statuses.${normalizedStatus}`) : '';
 
-  // ── Fullscreen HR Presence dialog ──────────────────────────────────────────
+  // -- Fullscreen HR Presence dialog ------------------------------------------
   if (hrPresenceDetails) {
     return (
       <Dialog
@@ -131,6 +131,7 @@ const InterviewLiveCandidateCardPanel = ({
             >
               <AIInterviewLayout
                 onEndSession={onLeaveHR}
+                avatarId={employerAiSettingService.resolveActiveAvatarId()}
                 avatarImageUrl={employerAiSettingService.resolveActiveAvatarUrl()}
                 avatarBackgroundUrl={employerAiSettingService.resolveActiveBackgroundUrl()}
                 interviewerName={employerAiSettingService.getSettings().interviewerName}
@@ -150,24 +151,24 @@ const InterviewLiveCandidateCardPanel = ({
           borderRadius: 3.5,
           overflow: 'hidden',
           border: '1px solid',
-          borderColor: alpha('#0284c7', 0.25),
-          bgcolor: '#090e1a',
-          backgroundImage: 'radial-gradient(ellipse at 50% -20%, rgba(14, 165, 233, 0.2) 0%, rgba(9, 14, 26, 0.98) 75%)',
+          borderColor: '#e2e8f0',
+          bgcolor: '#ffffff',
+          backgroundImage: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
           minHeight: 280,
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
-          boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.08), 0 12px 30px -4px rgba(2, 6, 23, 0.25)',
+          boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02)',
         }}
       >
         {/* Top Floating Mini-Action Bar */}
         <Box
           sx={{
-            p: 1.75,
+            p: 1.5,
+            px: 2,
             borderBottom: '1px solid',
-            borderColor: 'rgba(255, 255, 255, 0.08)',
-            bgcolor: 'rgba(15, 23, 42, 0.75)',
-            backdropFilter: 'blur(16px)',
+            borderColor: '#f1f5f9',
+            bgcolor: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -181,7 +182,7 @@ const InterviewLiveCandidateCardPanel = ({
                 <FiberManualRecordIcon
                   sx={{
                     fontSize: '9px !important',
-                    color: isLive ? '#22c55e !important' : '#94a3b8 !important',
+                    color: isLive ? '#16a34a !important' : '#94a3b8 !important',
                     animation: isLive ? 'radarPulse 1.5s infinite' : 'none',
                     '@keyframes radarPulse': {
                       '0%': { transform: 'scale(1)', opacity: 1 },
@@ -199,10 +200,10 @@ const InterviewLiveCandidateCardPanel = ({
                 letterSpacing: '0.06em',
                 height: 26,
                 borderRadius: '8px',
-                bgcolor: isLive ? alpha('#22c55e', 0.16) : 'rgba(255,255,255,0.06)',
-                color: isLive ? '#4ade80' : 'rgba(255,255,255,0.75)',
+                bgcolor: isLive ? '#ecfdf5' : '#f1f5f9',
+                color: isLive ? '#15803d' : '#64748b',
                 border: '1px solid',
-                borderColor: isLive ? alpha('#22c55e', 0.35) : 'rgba(255,255,255,0.12)',
+                borderColor: isLive ? '#bbf7d0' : '#e2e8f0',
               }}
             />
           </Stack>
@@ -222,6 +223,9 @@ const InterviewLiveCandidateCardPanel = ({
                     fontSize: '0.75rem',
                     textTransform: 'none',
                     boxShadow: 'none',
+                    borderRadius: '10px',
+                    bgcolor: '#2563eb',
+                    '&:hover': { bgcolor: '#1d4ed8' },
                   }}
                 >
                   {hrPresenceLoading
@@ -242,14 +246,14 @@ const InterviewLiveCandidateCardPanel = ({
                   fontSize: '0.75rem',
                   textTransform: 'none',
                   borderRadius: '10px',
-                  color: '#ffffff',
-                  borderColor: 'rgba(255,255,255,0.22)',
-                  bgcolor: 'rgba(255,255,255,0.08)',
+                  color: '#334155',
+                  borderColor: '#cbd5e1',
+                  bgcolor: '#ffffff',
                   px: 1.5,
                   py: 0.65,
                   '&:hover': {
-                    borderColor: 'rgba(255,255,255,0.45)',
-                    bgcolor: 'rgba(255,255,255,0.16)',
+                    borderColor: '#94a3b8',
+                    bgcolor: '#f8fafc',
                   },
                 }}
               >
@@ -270,14 +274,14 @@ const InterviewLiveCandidateCardPanel = ({
                   fontSize: '0.75rem',
                   textTransform: 'none',
                   borderRadius: '10px',
-                  color: '#fb7185',
-                  borderColor: 'rgba(244, 63, 94, 0.35)',
-                  bgcolor: 'rgba(244, 63, 94, 0.1)',
+                  color: '#e11d48',
+                  borderColor: '#fecdd3',
+                  bgcolor: '#fff1f2',
                   px: 1.5,
                   py: 0.65,
                   '&:hover': {
-                    bgcolor: 'rgba(244, 63, 94, 0.22)',
-                    borderColor: 'rgba(244, 63, 94, 0.6)',
+                    bgcolor: '#ffe4e6',
+                    borderColor: '#fda4af',
                   },
                 }}
               >
@@ -292,8 +296,8 @@ const InterviewLiveCandidateCardPanel = ({
           {loadingToken ? (
             <Box sx={{ minHeight: 220, display: 'grid', placeItems: 'center' }}>
               <Stack spacing={2} alignItems="center">
-                <CircularProgress size={32} thickness={4} sx={{ color: '#38bdf8' }} />
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.65)', fontWeight: 600 }}>
+                <CircularProgress size={32} thickness={4} sx={{ color: '#2563eb' }} />
+                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
                   {t('employer:interviewLive.candidateCard.connecting')}
                 </Typography>
               </Stack>
@@ -326,9 +330,9 @@ const InterviewLiveCandidateCardPanel = ({
                   width: 64,
                   height: 64,
                   borderRadius: '50%',
-                  bgcolor: alpha('#38BDF8', 0.1),
+                  bgcolor: alpha('#2563eb', 0.08),
                   border: '1px solid',
-                  borderColor: alpha('#38BDF8', 0.3),
+                  borderColor: alpha('#2563eb', 0.2),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -339,7 +343,7 @@ const InterviewLiveCandidateCardPanel = ({
                     position: 'absolute',
                     inset: -8,
                     borderRadius: '50%',
-                    border: '1px solid rgba(56, 189, 248, 0.25)',
+                    border: '1px solid rgba(37, 99, 235, 0.25)',
                     animation: 'radarRing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite',
                   },
                   '@keyframes radarRing': {
@@ -348,14 +352,14 @@ const InterviewLiveCandidateCardPanel = ({
                   },
                 }}
               >
-                <VideocamOutlinedIcon sx={{ fontSize: 28, color: '#38BDF8' }} />
+                <VideocamOutlinedIcon sx={{ fontSize: 28, color: '#2563eb' }} />
               </Box>
 
-              <Typography variant="subtitle2" sx={{ color: '#FFFFFF', fontWeight: 800, letterSpacing: '-0.01em', mb: 0.5 }}>
+              <Typography variant="subtitle2" sx={{ color: '#0f172a', fontWeight: 800, letterSpacing: '-0.01em', mb: 0.5 }}>
                 Đang chờ tín hiệu phòng phỏng vấn
               </Typography>
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)', maxWidth: 360, lineHeight: 1.6, display: 'block' }}>
-                Hệ thống sẽ tự động bắt sóng và truyền hình ảnh/âm thanh khi ứng viên tham gia vào phòng phỏng vấn.
+              <Typography variant="caption" sx={{ color: '#64748b', maxWidth: 380, lineHeight: 1.6, display: 'block' }}>
+                Hệ thống sẽ tự động bắt sóng và truyền hình ảnh cùng âm thanh khi ứng viên tham gia vào phòng phỏng vấn.
               </Typography>
             </Box>
           )}

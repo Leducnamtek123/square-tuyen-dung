@@ -222,22 +222,30 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
           sx={{
             backgroundColor: '#ffffff',
             color: '#0f172a',
-            
+            borderRadius: '10px',
+            minHeight: 38,
+            height: 38,
             px: 1.5,
             py: 0.6,
-            fontSize: '0.78rem',
+            fontSize: '0.8rem',
             fontWeight: 600,
             textTransform: 'none',
             whiteSpace: 'nowrap',
             boxShadow: 'none',
-            border: '1px solid rgba(15, 23, 42, 0.16)',
+            border: '1px solid #e2e8f0',
             backdropFilter: 'blur(8px)',
-            transition: 'all 0.25s ease',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
-              backgroundColor: 'rgba(15, 23, 42, 0.04)',
-              borderColor: 'rgba(15, 23, 42, 0.24)',
-              boxShadow: '0 2px 8px rgba(15, 23, 42, 0.08)',
-              transform: 'translateY(-1px)',
+              backgroundColor: '#f8fafc',
+              borderColor: '#cbd5e1',
+              boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+            },
+            '&:focus-visible': {
+              outline: '2px solid #2563eb',
+              outlineOffset: '2px',
+            },
+            '&:active': {
+              transform: 'scale(0.98)',
             },
           }}
         >

@@ -20,16 +20,18 @@ import {
   Grid2 as Grid,
   Theme
 } from "@mui/material";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import QuizOutlinedIcon from '@mui/icons-material/QuizOutlined';
+import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import Diversity3OutlinedIcon from '@mui/icons-material/Diversity3Outlined';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import { useTranslation } from 'react-i18next';
 import toastMessages from '@/utils/toastMessages';
 import { confirmModal } from '@/utils/sweetalert2Modal';
@@ -45,78 +47,186 @@ interface QuestionBankCardProps {
   title?: string;
 }
 
-const getQuestionMeta = (text: string) => {
-  const lower = (text || '').toLowerCase();
-  if (
-    lower.includes('kỹ sư') ||
-    lower.includes('kết cấu') ||
-    lower.includes('giám sát') ||
-    lower.includes('chuyên môn') ||
-    lower.includes('kỹ thuật') ||
-    lower.includes('phần mềm') ||
-    lower.includes('kinh nghiệm') ||
-    lower.includes('chính sách') ||
-    lower.includes('đãi ngộ')
-  ) {
-    return {
-      category: 'Chuyên môn',
-      categoryKey: 'technical',
-      color: '#0284c7',
-      bgcolor: alpha('#0284c7', 0.1),
-      borderColor: alpha('#0284c7', 0.25),
-      difficulty: 'Trung bình',
-      duration: '3 phút',
-    };
-  }
-  if (
-    lower.includes('tình huống') ||
-    lower.includes('xử lý') ||
-    lower.includes('vấn đề') ||
-    lower.includes('khi xảy ra') ||
-    lower.includes('trách nhiệm') ||
-    lower.includes('áp lực') ||
-    lower.includes('nghĩ gì') ||
-    lower.includes('góp ý')
-  ) {
-    return {
-      category: 'Tình huống',
-      categoryKey: 'situational',
-      color: '#16a34a',
-      bgcolor: alpha('#16a34a', 0.1),
-      borderColor: alpha('#16a34a', 0.25),
-      difficulty: 'Nâng cao',
-      duration: '3 - 5 phút',
-    };
-  }
-  if (
-    lower.includes('văn hóa') ||
-    lower.includes('square') ||
-    lower.includes('gắn bó') ||
-    lower.includes('tương lai') ||
-    lower.includes('ước mơ') ||
-    lower.includes('mục tiêu') ||
-    lower.includes('gia đình') ||
-    lower.includes('đồng nghiệp') ||
-    lower.includes('tính cách')
-  ) {
-    return {
-      category: 'Văn hóa & Động lực',
-      categoryKey: 'culture',
-      color: '#d97706',
-      bgcolor: alpha('#d97706', 0.1),
-      borderColor: alpha('#d97706', 0.25),
-      difficulty: 'Cơ bản',
-      duration: '2 phút',
-    };
-  }
-  return {
-    category: 'Tổng quát',
-    categoryKey: 'general',
+interface QuestionMetaInput {
+  text?: string;
+  category?: string;
+  difficulty?: string | number;
+  default_duration_seconds?: number;
+  defaultDurationSeconds?: number;
+}
+
+const CATEGORY_OPTIONS = [
+  {
+    key: 'technical',
+    i18nKey: 'interview:employer.questionBank.categories.technical',
+    color: '#0284c7',
+    icon: PsychologyOutlinedIcon,
+  },
+  {
+    key: 'situational',
+    i18nKey: 'interview:employer.questionBank.categories.situational',
+    color: '#16a34a',
+    icon: FactCheckOutlinedIcon,
+  },
+  {
+    key: 'culture_fit',
+    i18nKey: 'interview:employer.questionBank.categories.culture',
+    color: '#d97706',
+    icon: Diversity3OutlinedIcon,
+  },
+  {
+    key: 'general',
+    i18nKey: 'interview:employer.questionBank.categories.general',
     color: '#6366f1',
-    bgcolor: alpha('#6366f1', 0.1),
-    borderColor: alpha('#6366f1', 0.25),
-    difficulty: 'Tiêu chuẩn',
-    duration: '2 - 3 phút',
+    icon: QuizOutlinedIcon,
+  },
+];
+
+const DIFFICULTY_OPTIONS = [
+  { value: 1, i18nKey: 'interview:employer.questionBank.difficulties.easy', color: '#16a34a' },
+  { value: 2, i18nKey: 'interview:employer.questionBank.difficulties.medium', color: '#0284c7' },
+  { value: 3, i18nKey: 'interview:employer.questionBank.difficulties.hard', color: '#d97706' },
+];
+
+const DURATION_OPTIONS = [
+  { value: 60, label: '1 phút' },
+  { value: 120, label: '2 phút' },
+  { value: 180, label: '3 phút' },
+  { value: 300, label: '5 phút' },
+];
+
+const getQuestionMeta = (input: string | QuestionMetaInput) => {
+  const item: QuestionMetaInput = typeof input === 'string' ? { text: input } : (input || {});
+  const text = item.text || '';
+  const lower = text.toLowerCase();
+
+  let categoryKey = 'general';
+  let categoryLabel = 'Tổng quát';
+  let color = '#6366f1';
+
+  const rawCat = (item.category || '').toLowerCase();
+  if (rawCat === 'technical') {
+    categoryKey = 'technical';
+    categoryLabel = 'Chuyên môn';
+    color = '#0284c7';
+  } else if (rawCat === 'situational') {
+    categoryKey = 'situational';
+    categoryLabel = 'Tình huống';
+    color = '#16a34a';
+  } else if (rawCat === 'culture_fit' || rawCat === 'culture') {
+    categoryKey = 'culture';
+    categoryLabel = 'Văn hóa & Động lực';
+    color = '#d97706';
+  } else if (rawCat === 'general') {
+    categoryKey = 'general';
+    categoryLabel = 'Tổng quát';
+    color = '#6366f1';
+  } else {
+    if (
+      lower.includes('kỹ sư') ||
+      lower.includes('kết cấu') ||
+      lower.includes('giám sát') ||
+      lower.includes('chuyên môn') ||
+      lower.includes('kỹ thuật') ||
+      lower.includes('phần mềm') ||
+      lower.includes('kinh nghiệm') ||
+      lower.includes('chính sách') ||
+      lower.includes('đãi ngộ')
+    ) {
+      categoryKey = 'technical';
+      categoryLabel = 'Chuyên môn';
+      color = '#0284c7';
+    } else if (
+      lower.includes('tình huống') ||
+      lower.includes('xử lý') ||
+      lower.includes('vấn đề') ||
+      lower.includes('khi xảy ra') ||
+      lower.includes('trách nhiệm') ||
+      lower.includes('áp lực') ||
+      lower.includes('nghĩ gì') ||
+      lower.includes('góp ý')
+    ) {
+      categoryKey = 'situational';
+      categoryLabel = 'Tình huống';
+      color = '#16a34a';
+    } else if (
+      lower.includes('văn hóa') ||
+      lower.includes('square') ||
+      lower.includes('gắn bó') ||
+      lower.includes('tương lai') ||
+      lower.includes('ước mơ') ||
+      lower.includes('mục tiêu') ||
+      lower.includes('gia đình') ||
+      lower.includes('đồng nghiệp') ||
+      lower.includes('tính cách')
+    ) {
+      categoryKey = 'culture';
+      categoryLabel = 'Văn hóa & Động lực';
+      color = '#d97706';
+    } else {
+      categoryKey = 'general';
+      categoryLabel = 'Tổng quát';
+      color = '#6366f1';
+    }
+  }
+
+  let difficultyLabel = 'Tiêu chuẩn';
+  let difficultyLevel = 2;
+  const rawDiff = item.difficulty;
+  if (rawDiff === 1 || rawDiff === '1' || rawDiff === 'easy' || rawDiff === 'Dễ' || rawDiff === 'Cơ bản') {
+    difficultyLabel = 'Cơ bản';
+    difficultyLevel = 1;
+  } else if (rawDiff === 3 || rawDiff === '3' || rawDiff === 'hard' || rawDiff === 'Khó' || rawDiff === 'Nâng cao') {
+    difficultyLabel = 'Nâng cao';
+    difficultyLevel = 3;
+  } else if (rawDiff === 2 || rawDiff === '2' || rawDiff === 'medium' || rawDiff === 'Trung bình' || rawDiff === 'Tiêu chuẩn') {
+    difficultyLabel = 'Tiêu chuẩn';
+    difficultyLevel = 2;
+  } else {
+    if (categoryKey === 'situational') {
+      difficultyLabel = 'Nâng cao';
+      difficultyLevel = 3;
+    } else if (categoryKey === 'culture') {
+      difficultyLabel = 'Cơ bản';
+      difficultyLevel = 1;
+    } else {
+      difficultyLabel = 'Tiêu chuẩn';
+      difficultyLevel = 2;
+    }
+  }
+
+  let durationSeconds = Number(item.default_duration_seconds || item.defaultDurationSeconds || 0);
+  let durationLabel = '';
+  if (durationSeconds > 0) {
+    const mins = Math.max(1, Math.round(durationSeconds / 60));
+    durationLabel = `${mins} phút`;
+  } else {
+    if (categoryKey === 'technical') {
+      durationLabel = '3 phút';
+      durationSeconds = 180;
+    } else if (categoryKey === 'situational') {
+      durationLabel = '3 - 5 phút';
+      durationSeconds = 180;
+    } else if (categoryKey === 'culture') {
+      durationLabel = '2 phút';
+      durationSeconds = 120;
+    } else {
+      durationLabel = '2 - 3 phút';
+      durationSeconds = 120;
+    }
+  }
+
+  return {
+    category: categoryLabel,
+    categoryKey,
+    rawCategoryKey: rawCat || (categoryKey === 'culture' ? 'culture_fit' : categoryKey),
+    color,
+    bgcolor: alpha(color, 0.1),
+    borderColor: alpha(color, 0.25),
+    difficulty: difficultyLabel,
+    difficultyLevel,
+    duration: durationLabel,
+    durationSeconds,
   };
 };
 
@@ -141,8 +251,24 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
         onPaginationChange,
     } = useDataTable({ initialPageSize: 10 });
 
+    interface QuestionFormState {
+        id?: number | null;
+        text: string;
+        category: string;
+        difficulty: number;
+        default_duration_seconds: number;
+        isCategoryManuallySet: boolean;
+    }
+
     const [open, setOpen] = useState(false);
-    const [currentQuestion, setCurrentQuestion] = useState<{ text?: string; id?: number | null }>({ text: '', id: null });
+    const [currentQuestion, setCurrentQuestion] = useState<QuestionFormState>({
+        id: null,
+        text: '',
+        category: 'general',
+        difficulty: 2,
+        default_duration_seconds: 120,
+        isCategoryManuallySet: false,
+    });
     const [isEdit, setIsEdit] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -164,7 +290,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
             const textMatch = !searchQuery.trim() || (q.text && q.text.toLowerCase().includes(searchQuery.toLowerCase().trim()));
             if (!textMatch) return false;
             if (selectedCategory === 'all') return true;
-            const meta = getQuestionMeta(q.text || '');
+            const meta = getQuestionMeta(q);
             return meta.categoryKey === selectedCategory;
         });
     }, [rawQuestions, searchQuery, selectedCategory]);
@@ -175,7 +301,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
         let situationCount = 0;
         let cultureCount = 0;
         rawQuestions.forEach((q) => {
-            const meta = getQuestionMeta(q.text || '');
+            const meta = getQuestionMeta(q);
             if (meta.categoryKey === 'technical') techCount += 1;
             else if (meta.categoryKey === 'situational') situationCount += 1;
             else if (meta.categoryKey === 'culture') cultureCount += 1;
@@ -188,16 +314,88 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
         };
     }, [rawQuestions, count]);
 
-    const handleOpen = useCallback((q: { text?: string; id?: number | null } = { text: '' }) => {
-        setCurrentQuestion(q);
-        setIsEdit(!!q.id);
+    const handleOpen = useCallback((q?: Question) => {
+        if (q && q.id) {
+            const meta = getQuestionMeta(q);
+            const catKey = q.category || (meta.categoryKey === 'culture' ? 'culture_fit' : meta.categoryKey);
+            const diff = typeof q.difficulty === 'number' ? q.difficulty : (meta.difficultyLevel || 2);
+            const dur = q.default_duration_seconds || meta.durationSeconds || 120;
+            setCurrentQuestion({
+                id: q.id,
+                text: q.text || '',
+                category: catKey,
+                difficulty: diff,
+                default_duration_seconds: dur,
+                isCategoryManuallySet: true,
+            });
+            setIsEdit(true);
+        } else {
+            setCurrentQuestion({
+                id: null,
+                text: '',
+                category: 'general',
+                difficulty: 2,
+                default_duration_seconds: 120,
+                isCategoryManuallySet: false,
+            });
+            setIsEdit(false);
+        }
         setOpen(true);
     }, []);
 
     const handleClose = useCallback(() => {
         setOpen(false);
-        setCurrentQuestion({ text: '', id: null });
+        setCurrentQuestion({
+            id: null,
+            text: '',
+            category: 'general',
+            difficulty: 2,
+            default_duration_seconds: 120,
+            isCategoryManuallySet: false,
+        });
         setIsEdit(false);
+    }, []);
+
+    const handleTextChange = useCallback((newText: string) => {
+        setCurrentQuestion((prev) => {
+            if (!prev.isCategoryManuallySet) {
+                const meta = getQuestionMeta({ text: newText });
+                const autoCat = meta.categoryKey === 'culture' ? 'culture_fit' : meta.categoryKey;
+                return {
+                    ...prev,
+                    text: newText,
+                    category: autoCat,
+                    difficulty: meta.difficultyLevel,
+                    default_duration_seconds: meta.durationSeconds,
+                };
+            }
+            return {
+                ...prev,
+                text: newText,
+            };
+        });
+    }, []);
+
+    const handleCategorySelect = useCallback((catKey: string) => {
+        setCurrentQuestion((prev) => ({
+            ...prev,
+            category: catKey,
+            isCategoryManuallySet: true,
+        }));
+    }, []);
+
+    const handleDifficultySelect = useCallback((diff: number) => {
+        setCurrentQuestion((prev) => ({
+            ...prev,
+            difficulty: diff,
+        }));
+    }, []);
+
+    const handleDurationSelect = useCallback((durationSeconds: number) => {
+        setCurrentQuestion((prev) => ({
+            ...prev,
+            default_duration_seconds: durationSeconds,
+        }));
     }, []);
 
     const handleSubmit = async () => {
@@ -207,12 +405,19 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
             return;
         }
 
+        const payload = {
+            text,
+            category: currentQuestion.category,
+            difficulty: currentQuestion.difficulty,
+            default_duration_seconds: currentQuestion.default_duration_seconds,
+        };
+
         try {
             if (isEdit && currentQuestion.id) {
-                await updateQuestion({ id: currentQuestion.id, data: { text } });
+                await updateQuestion({ id: currentQuestion.id, data: payload });
                 toastMessages.success(t('interview:employer.questionBank.updateSuccess'));
             } else {
-                await createQuestion({ text });
+                await createQuestion(payload);
                 toastMessages.success(t('interview:employer.questionBank.createSuccess'));
             }
             handleClose();
@@ -297,7 +502,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
             id: 'category',
             size: 180,
             cell: ({ row }: { row: { original: Question } }) => {
-                const meta = getQuestionMeta(row.original.text || '');
+                const meta = getQuestionMeta(row.original);
                 return (
                     <Stack direction="row" spacing={1} alignItems="center">
                         <Chip
@@ -336,7 +541,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
             id: 'duration',
             size: 130,
             cell: ({ row }: { row: { original: Question } }) => {
-                const meta = getQuestionMeta(row.original.text || '');
+                const meta = getQuestionMeta(row.original);
                 return (
                     <Stack direction="row" spacing={0.75} alignItems="center" sx={{ color: 'text.secondary' }}>
                         <AccessTimeIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
@@ -367,7 +572,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                                     '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.18), transform: 'scale(1.05)' } 
                                 }}
                             >
-                                <EditIcon fontSize="small" />
+                                <EditOutlinedIcon fontSize="small" />
                             </IconButton>
                         </span>
                     </Tooltip>
@@ -385,7 +590,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                                     '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.18), transform: 'scale(1.05)' } 
                                 }}
                             >
-                                <DeleteIcon fontSize="small" />
+                                <DeleteOutlineRoundedIcon fontSize="small" />
                             </IconButton>
                         </span>
                     </Tooltip>
@@ -426,7 +631,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                                 flexShrink: 0,
                             }}
                         >
-                            <HelpOutlineOutlinedIcon sx={{ fontSize: 24 }} />
+                            <QuizOutlinedIcon sx={{ fontSize: 24 }} />
                         </Box>
                         <Box>
                             <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
@@ -625,11 +830,10 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                     justifyContent="space-between"
                     sx={{ 
                         mb: 3,
-                        p: 1.75,
+                        p: 1.5,
                         borderRadius: 3,
-                        bgcolor: alpha(theme.palette.action.hover, 0.5),
-                        border: '1px solid',
-                        borderColor: 'divider',
+                        bgcolor: '#f8fafc',
+                        border: '1px solid #e2e8f0',
                     }}
                 >
                     <TextField
@@ -653,13 +857,15 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                                 ) : null,
                                 sx: {
                                     borderRadius: '10px',
-                                    bgcolor: 'background.paper',
+                                    bgcolor: '#ffffff',
                                     fontSize: '0.85rem',
-                                    '& fieldset': { borderColor: 'divider' },
+                                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
+                                    '& fieldset': { borderColor: '#e2e8f0' },
+                                    '&:hover fieldset': { borderColor: 'primary.main' },
                                 }
                             }
                         }}
-                        sx={{ minWidth: { xs: '100%', md: 340 } }}
+                        sx={{ minWidth: { xs: '100%', md: 360 } }}
                     />
 
                     {/* Category Filter Pills */}
@@ -668,7 +874,8 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                             { key: 'all', label: 'Tất cả' },
                             { key: 'technical', label: 'Chuyên môn' },
                             { key: 'situational', label: 'Tình huống' },
-                            { key: 'culture', label: 'Văn hóa' },
+                            { key: 'culture', label: 'Văn hóa & Động lực' },
+                            { key: 'general', label: 'Tổng quát' },
                         ].map((cat) => {
                             const isSelected = selectedCategory === cat.key;
                             return (
@@ -679,18 +886,20 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                                     onClick={() => setSelectedCategory(cat.key)}
                                     sx={{
                                         cursor: 'pointer',
-                                        height: 32,
-                                        px: 0.75,
+                                        height: 34,
+                                        px: 1,
                                         borderRadius: '10px',
                                         fontWeight: isSelected ? 800 : 600,
-                                        fontSize: '0.78rem',
-                                        bgcolor: isSelected ? 'primary.main' : 'background.paper',
+                                        fontSize: '0.8rem',
+                                        bgcolor: isSelected ? 'primary.main' : '#ffffff',
                                         color: isSelected ? '#ffffff' : 'text.primary',
                                         border: '1px solid',
-                                        borderColor: isSelected ? 'primary.main' : 'divider',
+                                        borderColor: isSelected ? 'primary.main' : '#e2e8f0',
+                                        boxShadow: isSelected ? '0 1px 3px rgba(37, 99, 235, 0.2)' : '0 1px 2px rgba(0, 0, 0, 0.02)',
                                         transition: 'all 0.2s ease',
                                         '&:hover': {
-                                            bgcolor: isSelected ? 'primary.dark' : alpha(theme.palette.primary.main, 0.06),
+                                            bgcolor: isSelected ? 'primary.dark' : '#f1f5f9',
+                                            borderColor: isSelected ? 'primary.dark' : '#cbd5e1',
                                         },
                                     }}
                                 />
@@ -726,32 +935,223 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                         } 
                     }}
                 >
-                    <DialogTitle sx={{ fontWeight: 900, pt: 3, px: 3, fontSize: '1.35rem', letterSpacing: '-0.01em' }}>
-                        {isEdit ? t('interview:employer.questionBank.editTitle') : t('interview:employer.questionBank.createTitle')}
-                    </DialogTitle>
-                    <DialogContent sx={{ px: 3, pb: 0 }}>
-                        <Box sx={{ pt: 1.5 }}>
-                            <TextField
-                                margin="dense"
-                                label={t('interview:employer.questionBank.textLabel')}
-                                fullWidth
-                                multiline
-                                rows={5}
-                                variant="outlined"
-                                value={currentQuestion.text || ''}
-                                onChange={(e) => setCurrentQuestion((prev) => ({ ...prev, text: e.target.value }))}
-                                sx={inputSx}
-                            />
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1.5, px: 0.5, fontWeight: 500, lineHeight: 1.6 }}>
-                                {t('interview:employer.questionBank.hint')}
+                    <DialogTitle sx={{ fontWeight: 900, pt: 3, px: 3, pb: 1, fontSize: '1.25rem', letterSpacing: '-0.01em' }}>
+                        <Stack direction="row" spacing={1.5} alignItems="center">
+                            <Box
+                                sx={{
+                                    width: 38,
+                                    height: 38,
+                                    borderRadius: '10px',
+                                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                    color: 'primary.main',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <QuizOutlinedIcon sx={{ fontSize: 20 }} />
+                            </Box>
+                            <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.2rem', letterSpacing: '-0.01em' }}>
+                                {isEdit ? t('interview:employer.questionBank.editTitle') : t('interview:employer.questionBank.createTitle')}
                             </Typography>
-                        </Box>
+                        </Stack>
+                    </DialogTitle>
+                    <DialogContent sx={{ px: 3, pb: 1 }}>
+                        <Stack spacing={2.5} sx={{ pt: 1.5 }}>
+                            <Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: 'text.primary' }}>
+                                    {t('interview:employer.questionBank.textLabel')} *
+                                </Typography>
+                                <TextField
+                                    margin="dense"
+                                    placeholder="Nhập nội dung chi tiết của câu hỏi phỏng vấn..."
+                                    fullWidth
+                                    multiline
+                                    rows={4}
+                                    variant="outlined"
+                                    value={currentQuestion.text || ''}
+                                    onChange={(e) => handleTextChange(e.target.value)}
+                                    sx={inputSx}
+                                />
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, px: 0.5, fontWeight: 500, lineHeight: 1.6 }}>
+                                    {t('interview:employer.questionBank.hint')}
+                                </Typography>
+                            </Box>
+
+                            {/* Category Selector */}
+                            <Box>
+                                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.25 }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                        {t('interview:employer.questionBank.categoryLabel')}
+                                    </Typography>
+                                    {!currentQuestion.isCategoryManuallySet && currentQuestion.text.trim().length > 0 && (
+                                        <Chip
+                                            icon={<AutoAwesomeRoundedIcon sx={{ fontSize: '14px !important', color: '#6366f1 !important' }} />}
+                                            label="AI gợi ý phân loại"
+                                            size="small"
+                                            sx={{
+                                                height: 22,
+                                                fontSize: '0.7rem',
+                                                fontWeight: 700,
+                                                bgcolor: alpha('#6366f1', 0.08),
+                                                color: '#6366f1',
+                                                border: '1px solid',
+                                                borderColor: alpha('#6366f1', 0.2),
+                                                borderRadius: '6px',
+                                            }}
+                                        />
+                                    )}
+                                </Stack>
+
+                                <Grid container spacing={1.25}>
+                                    {CATEGORY_OPTIONS.map((cat) => {
+                                        const IconComponent = cat.icon;
+                                        const isSelected = currentQuestion.category === cat.key || 
+                                            (cat.key === 'culture_fit' && currentQuestion.category === 'culture');
+                                        const labelText = t(cat.i18nKey);
+
+                                        return (
+                                            <Grid size={{ xs: 6, sm: 6 }} key={cat.key}>
+                                                <Box
+                                                    onClick={() => handleCategorySelect(cat.key)}
+                                                    sx={{
+                                                        p: 1.5,
+                                                        borderRadius: '12px',
+                                                        cursor: 'pointer',
+                                                        border: '1.5px solid',
+                                                        borderColor: isSelected ? cat.color : '#e2e8f0',
+                                                        bgcolor: isSelected ? alpha(cat.color, 0.08) : '#ffffff',
+                                                        transition: 'all 0.2s ease',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 1.25,
+                                                        '&:hover': {
+                                                            borderColor: cat.color,
+                                                            bgcolor: alpha(cat.color, 0.04),
+                                                            transform: 'translateY(-1px)',
+                                                        },
+                                                    }}
+                                                >
+                                                    <Box
+                                                        sx={{
+                                                            width: 32,
+                                                            height: 32,
+                                                            borderRadius: '8px',
+                                                            bgcolor: isSelected ? cat.color : alpha(cat.color, 0.1),
+                                                            color: isSelected ? '#ffffff' : cat.color,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            flexShrink: 0,
+                                                            transition: 'all 0.2s ease',
+                                                        }}
+                                                    >
+                                                        <IconComponent sx={{ fontSize: 18 }} />
+                                                    </Box>
+                                                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                fontWeight: isSelected ? 800 : 600,
+                                                                fontSize: '0.82rem',
+                                                                color: isSelected ? cat.color : 'text.primary',
+                                                                whiteSpace: 'nowrap',
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis',
+                                                            }}
+                                                        >
+                                                            {labelText}
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                            </Grid>
+                                        );
+                                    })}
+                                </Grid>
+                            </Box>
+
+                            {/* Difficulty and Duration */}
+                            <Grid container spacing={2}>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: 'text.primary' }}>
+                                        {t('interview:employer.questionBank.difficultyLabel')}
+                                    </Typography>
+                                    <Stack direction="row" spacing={1}>
+                                        {DIFFICULTY_OPTIONS.map((diff) => {
+                                            const isSelected = currentQuestion.difficulty === diff.value;
+                                            const labelText = t(diff.i18nKey);
+                                            return (
+                                                <Chip
+                                                    key={diff.value}
+                                                    label={labelText}
+                                                    onClick={() => handleDifficultySelect(diff.value)}
+                                                    sx={{
+                                                        flex: 1,
+                                                        height: 34,
+                                                        cursor: 'pointer',
+                                                        borderRadius: '10px',
+                                                        fontWeight: isSelected ? 800 : 600,
+                                                        fontSize: '0.78rem',
+                                                        bgcolor: isSelected ? diff.color : '#ffffff',
+                                                        color: isSelected ? '#ffffff' : 'text.primary',
+                                                        border: '1px solid',
+                                                        borderColor: isSelected ? diff.color : '#e2e8f0',
+                                                        transition: 'all 0.2s ease',
+                                                        '&:hover': {
+                                                            bgcolor: isSelected ? diff.color : alpha(diff.color, 0.08),
+                                                            borderColor: diff.color,
+                                                        },
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                    </Stack>
+                                </Grid>
+
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: 'text.primary' }}>
+                                        {t('interview:employer.questionBank.durationLabel')}
+                                    </Typography>
+                                    <Stack direction="row" spacing={0.75}>
+                                        {DURATION_OPTIONS.map((dur) => {
+                                            const isSelected = currentQuestion.default_duration_seconds === dur.value;
+                                            return (
+                                                <Chip
+                                                    key={dur.value}
+                                                    icon={<AccessTimeIcon sx={{ fontSize: '13px !important', color: isSelected ? '#ffffff !important' : 'text.secondary !important' }} />}
+                                                    label={dur.label}
+                                                    onClick={() => handleDurationSelect(dur.value)}
+                                                    sx={{
+                                                        flex: 1,
+                                                        height: 34,
+                                                        px: 0.5,
+                                                        cursor: 'pointer',
+                                                        borderRadius: '10px',
+                                                        fontWeight: isSelected ? 800 : 600,
+                                                        fontSize: '0.76rem',
+                                                        bgcolor: isSelected ? 'primary.main' : '#ffffff',
+                                                        color: isSelected ? '#ffffff' : 'text.primary',
+                                                        border: '1px solid',
+                                                        borderColor: isSelected ? 'primary.main' : '#e2e8f0',
+                                                        transition: 'all 0.2s ease',
+                                                        '&:hover': {
+                                                            bgcolor: isSelected ? 'primary.main' : '#f1f5f9',
+                                                            borderColor: isSelected ? 'primary.main' : '#cbd5e1',
+                                                        },
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                    </Stack>
+                                </Grid>
+                            </Grid>
+                        </Stack>
                     </DialogContent>
-                    <DialogActions sx={{ p: 4, pt: 3, gap: 2 }}>
+                    <DialogActions sx={{ p: 3, pt: 2, gap: 1.5 }}>
                         <Button 
                             onClick={handleClose} 
                             color="inherit" 
-                            sx={{ fontWeight: 700, textTransform: 'none', px: 3 }}
+                            sx={{ fontWeight: 700, textTransform: 'none', px: 2.5, borderRadius: '10px' }}
                         >
                             {t('common:actions.cancel')}
                         </Button>
@@ -759,7 +1159,8 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                             onClick={handleSubmit} 
                             variant="contained" 
                             color="primary"
-                            sx={{ px: 4, py: 1.25, fontWeight: 700, boxShadow: 'none', textTransform: 'none' }}
+                            startIcon={<SaveRoundedIcon />}
+                            sx={{ px: 3.5, py: 1.1, fontWeight: 700, boxShadow: 'none', textTransform: 'none', borderRadius: '10px' }}
                         >
                             {t('common:actions.save')}
                         </Button>

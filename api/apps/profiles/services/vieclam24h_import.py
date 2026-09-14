@@ -17,6 +17,7 @@ from apps.common.models import Career
 from shared.configs import variable_system as var_sys
 from shared.helpers.cloudinary_service import CloudinaryService
 
+from .pdf_extraction import extract_and_apply_pdf_info
 from .vieclam24h_import_browser import collect_vieclam24h_candidates
 
 DEFAULT_VIECLAM24H_CAREER_NAMES = [
@@ -861,6 +862,9 @@ def persist_vieclam24h_candidates(
                 resume.file = _sync_remote_file(resume.file, remote_cv_url, "cv", File.CV_TYPE)
                 if resume.file:
                     resume.save(update_fields=["file", "update_at"])
+                    extract_and_apply_pdf_info(resume, job_seeker_profile, user)
+            elif resume.file:
+                extract_and_apply_pdf_info(resume, job_seeker_profile, user)
 
             if remote_avatar_url:
                 _sync_remote_avatar(user, remote_avatar_url)

@@ -174,17 +174,29 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
           />
         </Box>
       ) : audioTracks.length > 0 ? (
-        <Stack spacing={1.5} alignItems="center" sx={{ py: 2 }}>
-          <Box sx={{ height: 92, width: '100%', maxWidth: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <BarVisualizer barCount={15} style={{ height: '60px', width: '200px' }} />
+        <Stack
+          spacing={1.5}
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            width: '100%',
+            minHeight,
+            py: 3,
+            borderRadius: 3,
+            border: '1px solid #e2e8f0',
+            bgcolor: '#f8fafc',
+          }}
+        >
+          <Box sx={{ height: 80, width: '100%', maxWidth: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <BarVisualizer barCount={15} style={{ height: '52px', width: '200px' }} />
           </Box>
           <Typography
             variant="caption"
             sx={{
-              color: '#22c55e',
-              fontWeight: 900,
+              color: '#16a34a',
+              fontWeight: 800,
               textTransform: 'uppercase',
-              letterSpacing: 2,
+              letterSpacing: 1.5,
               display: 'flex',
               alignItems: 'center',
               gap: 1,
@@ -195,16 +207,14 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
           </Typography>
         </Stack>
       ) : (
-        <Stack spacing={2} alignItems="center" sx={{ width: '100%', py: 3 }}>
+        <Stack spacing={2} alignItems="center" sx={{ width: '100%', py: 1 }}>
           <Box
             sx={{
               width: '100%',
               minHeight,
               borderRadius: 3,
-              border: '1px solid',
-              borderColor: alpha('#38bdf8', 0.2),
-              bgcolor: 'rgba(15, 23, 42, 0.65)',
-              backdropFilter: 'blur(8px)',
+              border: '1px solid #e2e8f0',
+              bgcolor: '#f8fafc',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -217,23 +227,23 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
             {/* Ambient subtle radar ring animation */}
             <Box
               sx={{
-                width: 76,
-                height: 76,
+                width: 64,
+                height: 64,
                 borderRadius: '50%',
-                bgcolor: alpha('#0ea5e9', 0.12),
+                bgcolor: alpha('#2563eb', 0.08),
                 border: '1px solid',
-                borderColor: alpha('#38bdf8', 0.35),
+                borderColor: alpha('#2563eb', 0.2),
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                mb: 2.5,
+                mb: 2,
                 position: 'relative',
                 '&::after': {
                   content: '""',
                   position: 'absolute',
-                  inset: -10,
+                  inset: -8,
                   borderRadius: '50%',
-                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  border: '1px solid rgba(37, 99, 235, 0.25)',
                   animation: 'radarPulseLive 2.2s cubic-bezier(0, 0, 0.2, 1) infinite',
                 },
                 '@keyframes radarPulseLive': {
@@ -242,14 +252,14 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
                 },
               }}
             >
-              <FiberManualRecordIcon sx={{ fontSize: 14, color: '#38bdf8' }} />
+              <FiberManualRecordIcon sx={{ fontSize: 14, color: '#2563eb' }} />
             </Box>
 
-            <Typography variant="subtitle1" sx={{ color: '#ffffff', fontWeight: 900, mb: 0.75, letterSpacing: '-0.01em', textAlign: 'center' }}>
+            <Typography variant="subtitle1" sx={{ color: '#0f172a', fontWeight: 800, mb: 0.75, letterSpacing: '-0.01em', textAlign: 'center' }}>
               {t('employer:interviewLive.candidateCard.waitingSignal')}
             </Typography>
 
-            <Typography variant="body2" sx={{ color: '#94a3b8', maxWidth: 440, textAlign: 'center', lineHeight: 1.6, mb: 2.5, fontSize: '0.84rem' }}>
+            <Typography variant="body2" sx={{ color: '#64748b', maxWidth: 440, textAlign: 'center', lineHeight: 1.6, mb: 2.5, fontSize: '0.84rem' }}>
               {t('employer:interviewLive.candidateCard.waitingSignalHint')}
             </Typography>
 
@@ -259,9 +269,9 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
                 label="Camera: Chờ mở"
                 size="small"
                 sx={{
-                  bgcolor: 'rgba(255, 255, 255, 0.06)',
-                  color: '#cbd5e1',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  bgcolor: '#ffffff',
+                  color: '#64748b',
+                  border: '1px solid #e2e8f0',
                   fontSize: '0.7rem',
                   fontWeight: 700,
                   height: 24,
@@ -271,22 +281,22 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
                 label="Micrô: Chờ mở"
                 size="small"
                 sx={{
-                  bgcolor: 'rgba(255, 255, 255, 0.06)',
-                  color: '#cbd5e1',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  bgcolor: '#ffffff',
+                  color: '#64748b',
+                  border: '1px solid #e2e8f0',
                   fontSize: '0.7rem',
                   fontWeight: 700,
                   height: 24,
                 }}
               />
               <Chip
-                label="Kênh LiveKit: Sẵn sàng"
+                label="Đường truyền phòng: Sẵn sàng"
                 size="small"
                 sx={{
-                  bgcolor: alpha('#22c55e', 0.12),
-                  color: '#4ade80',
+                  bgcolor: alpha('#16a34a', 0.08),
+                  color: '#15803d',
                   border: '1px solid',
-                  borderColor: alpha('#22c55e', 0.3),
+                  borderColor: alpha('#16a34a', 0.25),
                   fontSize: '0.7rem',
                   fontWeight: 800,
                   height: 24,

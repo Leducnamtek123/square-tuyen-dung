@@ -107,6 +107,7 @@ export const SEGMENT_MAP = {
   'quan-ly-danh-gia': 'feedbacks',
   'tin-tuc-blog': 'articles',
   'tao-moi': 'create',
+  'chinh-sua': 'edit',
   'xac-thuc-cong-ty': 'company-verifications',
   'bao-cao-tin-cay': 'trust-reports',
   'nhat-ky-he-thong': 'audit-logs',
@@ -221,6 +222,8 @@ export const ROUTES = {
     DASHBOARD: 'employer/dashboard',
     AGENT_ASSISTANTS: 'employer/agent-assistants',
     JOB_POST: 'employer/job-posts',
+    JOB_POST_CREATE: 'employer/job-posts/create',
+    JOB_POST_EDIT: 'employer/job-posts/:id/edit',
     APPLIED_PROFILE: 'employer/applied-profiles',
     SAVED_PROFILE: 'employer/saved-profiles',
     PROFILE: 'employer/candidates',
@@ -330,7 +333,7 @@ type RewriteRule = { source: string; destination: string };
 export function generateRewrites(): RewriteRule[] {
   const rules: RewriteRule[] = [];
 
-  // ── Job Seeker (root level) ──
+  // -- Job Seeker (root level) --
   const jobSeekerRewrites: [string, string, boolean?][] = [
     // Auth
     ['/dang-nhap', '/login'],
@@ -413,7 +416,7 @@ export function generateRewrites(): RewriteRule[] {
     ['/:slug.html', '/legal/:slug'],
   ];
 
-  // ── Employer (/nha-tuyen-dung → /employer) ──
+  // -- Employer (/nha-tuyen-dung → /employer) --
   const employerRewrites: [string, string][] = [
     ['/nha-tuyen-dung/thoa-thuan-su-dung.html', '/employer/legal/thoa-thuan-su-dung'],
     ['/nha-tuyen-dung/chinh-sach-bao-mat.html', '/employer/legal/quy-dinh-bao-mat'],
@@ -422,11 +425,14 @@ export function generateRewrites(): RewriteRule[] {
     ['/nha-tuyen-dung/terms-and-conditions', '/employer/terms-of-service'],
     ['/employer/terms-and-conditions', '/employer/terms-of-service'],
     ['/employer/:slug.html', '/employer/legal/:slug'],
-    ['/nha-tuyen-dung/:slug.html', '/employer/legal/:slug'],
     ['/nha-tuyen-dung/login', '/employer/login'],
+    ['/nha-tuyen-dung/dang-nhap', '/employer/login'],
     ['/nha-tuyen-dung/register', '/employer/register'],
+    ['/nha-tuyen-dung/dang-ky', '/employer/register'],
     ['/nha-tuyen-dung/forgot-password', '/employer/forgot-password'],
+    ['/nha-tuyen-dung/quen-mat-khau', '/employer/forgot-password'],
     ['/nha-tuyen-dung/reset-password/:path*', '/employer/reset-password/:path*'],
+    ['/nha-tuyen-dung/cap-nhat-mat-khau/:path*', '/employer/reset-password/:path*'],
     ['/nha-tuyen-dung/gioi-thieu', '/employer/introduce'],
     ['/nha-tuyen-dung/dich-vu', '/employer/service'],
     ['/nha-tuyen-dung/bao-gia', '/employer/pricing'],
@@ -436,6 +442,9 @@ export function generateRewrites(): RewriteRule[] {
     ['/nha-tuyen-dung/bang-dieu-khien', '/employer/dashboard'],
     ['/nha-tuyen-dung/tro-ly-agent', '/employer/agent-assistants'],
     ['/nha-tuyen-dung/tin-tuyen-dung', '/employer/job-posts'],
+    ['/nha-tuyen-dung/tin-tuyen-dung/tao-moi', '/employer/job-posts/create'],
+    ['/nha-tuyen-dung/tin-tuyen-dung/:id/chinh-sua', '/employer/job-posts/:id/edit'],
+    ['/nha-tuyen-dung/tin-tuyen-dung/:id/sua', '/employer/job-posts/:id/edit'],
     ['/nha-tuyen-dung/ho-so-ung-tuyen', '/employer/applied-profiles'],
     ['/nha-tuyen-dung/ho-so-da-luu', '/employer/saved-profiles'],
     ['/nha-tuyen-dung/danh-sach-ung-vien', '/employer/candidates'],
@@ -500,7 +509,7 @@ export function generateRewrites(): RewriteRule[] {
     ['/nha-tuyen-dung/:path*', '/employer/:path*'],
   ];
 
-  // ── Admin (/quan-tri → /admin) ──
+  // -- Admin (/quan-tri → /admin) --
   const adminRewrites: [string, string][] = [
     ['/admin/bang-dieu-khien', '/admin/dashboard'],
     ['/quan-tri/bang-dieu-khien', '/admin/dashboard'],
@@ -566,7 +575,7 @@ export function generateRewrites(): RewriteRule[] {
     ['/quan-tri/:path*', '/admin/:path*'],
   ];
 
-  // ── Candidate interview ──
+  // -- Candidate interview --
   const interviewRewrites: [string, string][] = [
     ['/phong-van/room/:id', '/interview/:id'],
     ['/phong-van/:path*', '/interview/:path*'],

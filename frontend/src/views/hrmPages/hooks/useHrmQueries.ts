@@ -21,7 +21,7 @@ import hrmService, {
 } from '@/services/hrmService';
 import toastMessages from '@/utils/toastMessages';
 
-// ── Query Keys ─────────────────────────────────────────────────────────────
+// -- Query Keys -------------------------------------------------------------
 export const HRM_QUERY_KEYS = {
   stats: ['hrm-stats'] as const,
   employees: ['hrm-employees'] as const,
@@ -47,7 +47,7 @@ export const HRM_QUERY_KEYS = {
   orgChart: ['hrm-org-chart'] as const,
 };
 
-// ── Queries ────────────────────────────────────────────────────────────────
+// -- Queries ----------------------------------------------------------------
 export const useHrmDashboardStats = () => {
   return useQuery<HrmDashboardStats>({
     queryKey: HRM_QUERY_KEYS.stats,
@@ -262,7 +262,7 @@ export const useHrmBiometricDevices = (params?: {
   });
 };
 
-// ── Mutations ──────────────────────────────────────────────────────────────
+// -- Mutations --------------------------------------------------------------
 export const useHrmMutations = () => {
   const queryClient = useQueryClient();
 
@@ -552,7 +552,7 @@ export const useHrmMutations = () => {
     },
   });
 
-  // ── Time & Attendance Mutations ───────────────────────────────────────────
+  // -- Time & Attendance Mutations -------------------------------------------
   const createWorkShift = useMutation({
     mutationFn: (data: Partial<NativeWorkShift>) => hrmService.createWorkShift(data),
     onSuccess: () => {

@@ -384,6 +384,27 @@ class Company(CommonBaseModel):
 
     followers = models.ManyToManyField(User, through='CompanyFollowed', related_name="companies_followed")
 
+    evaluation_weights = models.JSONField(
+        default=dict,
+        blank=True,
+        null=True,
+        verbose_name="Trọng số đánh giá năng lực theo tiêu chuẩn văn hóa công ty",
+    )
+
+    def get_evaluation_weights(self) -> dict:
+        default_weights = {
+            "technical": 30,
+            "communication": 20,
+            "situational": 20,
+            "culture_fit": 20,
+            "attitude": 10,
+        }
+        if isinstance(self.evaluation_weights, dict) and self.evaluation_weights:
+            merged = default_weights.copy()
+            merged.update(self.evaluation_weights)
+            return merged
+        return default_weights
+
     class Meta:
 
         db_table = "project_info_company"

@@ -162,7 +162,7 @@ const CareerCarousel: React.FC = () => {
 
   return (
     <Box id="career-carousel" sx={{ width: '100%' }}>
-      {/* ── Section Header Row ───────────────────────────────────────── */}
+      {/* -- Section Header Row ----------------------------------------- */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5 }}>
         <Stack direction="row" spacing={1} alignItems="center">
           <BusinessCenterIcon sx={{ color: '#2563eb', fontSize: 26 }} />

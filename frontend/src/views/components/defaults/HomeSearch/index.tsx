@@ -247,7 +247,7 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
         </Grid>
       </Box>
 
-      {/* ── Popular Keywords Pills ────────────────── */}
+      {/* -- Popular Keywords Pills ------------------ */}
       {isHero && popularKeywords.length > 0 && (
         <Stack
           direction="row"

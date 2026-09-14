@@ -17,13 +17,11 @@ interface Props<T extends FieldValues = FieldValues> {
   minHeight?: number | string;
   placeholder?: string;
   contextType?: AIContentType;
+  jobTitle?: string;
 }
 
 const resolveContextTypeFromName = (name: string): AIContentType => {
   const lower = name.toLowerCase();
-  if (lower.includes('company') || lower.includes('description') || lower.includes('about')) {
-    return 'company';
-  }
   if (lower.includes('jobdesc') || lower.includes('job_desc') || lower.includes('jobdescription')) {
     return 'job_desc';
   }
@@ -33,11 +31,17 @@ const resolveContextTypeFromName = (name: string): AIContentType => {
   if (lower.includes('benefit') || lower.includes('welfare') || lower.includes('benefitenjoyed')) {
     return 'benefits';
   }
-  if (lower.includes('mail') || lower.includes('email') || lower.includes('letter') || lower.includes('content')) {
+  if (lower.includes('company') || lower.includes('about')) {
+    return 'company';
+  }
+  if (lower.includes('mail') || lower.includes('email') || lower.includes('letter')) {
     return 'email';
   }
   if (lower.includes('blog') || lower.includes('article') || lower.includes('news')) {
     return 'blog';
+  }
+  if (lower.includes('description')) {
+    return 'job_desc';
   }
   return 'general';
 };
@@ -50,6 +54,7 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
   minHeight = 240,
   placeholder,
   contextType,
+  jobTitle,
 }: Props<T>) => {
   const resolvedContext = contextType || resolveContextTypeFromName(name);
 
@@ -70,6 +75,7 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
                 minHeight={minHeight}
                 placeholder={placeholder}
                 contextType={resolvedContext}
+                jobTitle={jobTitle}
               />
 
               {fieldState.invalid && (

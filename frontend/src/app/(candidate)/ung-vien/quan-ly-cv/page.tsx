@@ -1,7 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { buildSeoMetadata } from '@/utils/serverI18n';
-import DefaultLayout from '@/layouts/DefaultLayout';
 import { CandidateCVListPage } from '@/views/cvBuilderPages/CandidateCVListPage';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -14,9 +13,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Page() {
-  return (
-    <DefaultLayout>
-      <CandidateCVListPage />
-    </DefaultLayout>
-  );
+  return <CandidateCVListPage />;
 }
+

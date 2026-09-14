@@ -198,30 +198,7 @@ async def entrypoint(ctx: JobContext) -> None:
     ctx.log_context_fields = {"room": ctx.room.name}
     logger.info(f"Starting interview agent for room: {ctx.room.name}")
 
-    # 1. Initialize Models
-    stt_model = openai.STT(
-        client=openai_lib.AsyncOpenAI(
-            api_key=config.STT_API_KEY or "dummy",
-            base_url=config.STT_BASE_URL,
-        ),
-        model=config.STT_MODEL,
-        language=config.STT_LANGUAGE,
-    )
-
-    llm_model = openai.LLM(
-        client=openai_lib.AsyncOpenAI(
-            api_key=config.LLM_API_KEY or "dummy",
-            base_url=config.LLM_BASE_URL,
-            http_client=httpx.AsyncClient(timeout=httpx.Timeout(600.0, connect=15.0)),
-        ),
-        model=config.LLM_MODEL,
-        temperature=config.LLM_TEMPERATURE,
-        top_p=config.LLM_TOP_P,
-        max_completion_tokens=config.LLM_MAX_COMPLETION_TOKENS,
-        extra_body=_build_llm_extra_body(),
-    )
-
-    # 2. Context Preparation from room metadata
+    # 1. Context Preparation from room metadata
     agent_context = {
         "candidateName": "Ứng viên",
         "jobTitle": "đang ứng tuyển",
@@ -229,6 +206,7 @@ async def entrypoint(ctx: JobContext) -> None:
         "backendApiUrl": config.BACKEND_API_URL,
         "roomName": ctx.room.name,
         "participantIdentity": "",
+        "interviewLanguage": "vi",
     }
     try:
         metadata = ctx.room.metadata
@@ -239,6 +217,7 @@ async def entrypoint(ctx: JobContext) -> None:
                     "candidateName": pm.get("candidate_name", "Ứng viên"),
                     "jobTitle": pm.get("job_title", "đang ứng tuyển"),
                     "jobDescription": pm.get("job_description", ""),
+                    "interviewLanguage": pm.get("interview_language") or pm.get("interviewLanguage", "vi"),
                 }
             )
     except Exception as e:
@@ -257,17 +236,49 @@ async def entrypoint(ctx: JobContext) -> None:
                 agent_context.update(data)
                 agent_context["questions"] = data.get("questions", [])
                 logger.info(
-                    "Loaded interview context for room %s: questionCount=%s, candidate=%s, job=%s",
+                    "Loaded interview context for room %s: questionCount=%s, candidate=%s, job=%s, lang=%s",
                     ctx.room.name,
                     data.get("questionCount", len(data.get("questions", []))),
                     data.get("candidateName"),
                     data.get("jobTitle"),
+                    data.get("interviewLanguage", "vi"),
                 )
     except Exception as e:
         logger.warning(f"Failed to fetch predefined questions: {e}")
 
-    tts_voice = str(agent_context.get("ttsVoice") or config.TTS_VOICE)
-    logger.info("Using TTS voice for room %s: %s", ctx.room.name, tts_voice)
+    session_lang = str(agent_context.get("interviewLanguage") or "vi").lower()
+    stt_lang = session_lang if session_lang in {"vi", "en", "ja", "ko"} else config.STT_LANGUAGE
+
+    # 2. Initialize Models
+    stt_model = openai.STT(
+        client=openai_lib.AsyncOpenAI(
+            api_key=config.STT_API_KEY or "dummy",
+            base_url=config.STT_BASE_URL,
+        ),
+        model=config.STT_MODEL,
+        language=stt_lang,
+    )
+
+    llm_model = openai.LLM(
+        client=openai_lib.AsyncOpenAI(
+            api_key=config.LLM_API_KEY or "dummy",
+            base_url=config.LLM_BASE_URL,
+            http_client=httpx.AsyncClient(timeout=httpx.Timeout(600.0, connect=15.0)),
+        ),
+        model=config.LLM_MODEL,
+        temperature=config.LLM_TEMPERATURE,
+        top_p=config.LLM_TOP_P,
+        max_completion_tokens=config.LLM_MAX_COMPLETION_TOKENS,
+        extra_body=_build_llm_extra_body(),
+    )
+
+    tts_voice = str(agent_context.get("ttsVoice") or "")
+    if not tts_voice:
+        if session_lang in {"en", "ja", "ko"}:
+            tts_voice = "alloy"
+        else:
+            tts_voice = config.TTS_VOICE
+    logger.info("Using TTS voice for room %s (%s): %s", ctx.room.name, session_lang, tts_voice)
     tts_speed = resolve_tts_speed(agent_context)
     if tts_speed is not None:
         logger.info("Using TTS speed for room %s: %s", ctx.room.name, tts_speed)

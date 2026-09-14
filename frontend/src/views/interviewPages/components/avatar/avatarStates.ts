@@ -16,33 +16,57 @@ export type AvatarState =
 
 export const AVATAR_ASSET_BASE_PATH = '/assets/images/avatar/hr';
 
-export const AVATAR_ASSET_PATHS: Record<AvatarState, string> = {
-  idle: `${AVATAR_ASSET_BASE_PATH}/idle.webp`,
-  listening: `${AVATAR_ASSET_BASE_PATH}/listening.webp`,
-  thinking: `${AVATAR_ASSET_BASE_PATH}/thinking.webp`,
-  processing: `${AVATAR_ASSET_BASE_PATH}/processing.webp`,
-  speaking: `${AVATAR_ASSET_BASE_PATH}/speaking_01.webp`,
-  encouraging: `${AVATAR_ASSET_BASE_PATH}/encouraging.webp`,
-  curious: `${AVATAR_ASSET_BASE_PATH}/curious.webp`,
-  serious: `${AVATAR_ASSET_BASE_PATH}/serious.webp`,
-  happy: `${AVATAR_ASSET_BASE_PATH}/happy.webp`,
-  impressed: `${AVATAR_ASSET_BASE_PATH}/impressed.webp`,
-  surprised: `${AVATAR_ASSET_BASE_PATH}/surprised.webp`,
-  agree: `${AVATAR_ASSET_BASE_PATH}/agree.webp`,
-  goodbye: `${AVATAR_ASSET_BASE_PATH}/goodbye.webp`,
-  blink: `${AVATAR_ASSET_BASE_PATH}/blink.webp`,
-};
+export function resolveAvatarBasePath(avatarId?: string): string {
+  if (avatarId === 'expert_male' || avatarId === 'male_03') {
+    return '/assets/images/avatar/expert_male';
+  }
+  if (avatarId && (avatarId.startsWith('female_') || avatarId.startsWith('male_'))) {
+    return `/assets/images/avatar/${avatarId}`;
+  }
+  return '/assets/images/avatar/hr';
+}
 
-export const SPEAKING_CYCLE_FRAMES: readonly string[] = [
-  `${AVATAR_ASSET_BASE_PATH}/speaking_01.webp`,
-  `${AVATAR_ASSET_BASE_PATH}/speaking_02.webp`,
-  `${AVATAR_ASSET_BASE_PATH}/speaking_03.webp`,
-  `${AVATAR_ASSET_BASE_PATH}/speaking_04.webp`,
-  `${AVATAR_ASSET_BASE_PATH}/speaking_05.webp`,
-  `${AVATAR_ASSET_BASE_PATH}/speaking_06.webp`,
-  `${AVATAR_ASSET_BASE_PATH}/speaking_07.webp`,
-  `${AVATAR_ASSET_BASE_PATH}/speaking_08.webp`,
-];
+export const AVATAR_ASSET_VERSION = '20260913_photoreal_v8_uniform';
+
+export function getAvatarAssetPaths(avatarId?: string): Record<AvatarState, string> {
+  const basePath = resolveAvatarBasePath(avatarId);
+  const versionQuery = `?v=${AVATAR_ASSET_VERSION}`;
+  return {
+    idle: `${basePath}/idle.webp${versionQuery}`,
+    listening: `${basePath}/listening.webp${versionQuery}`,
+    thinking: `${basePath}/thinking.webp${versionQuery}`,
+    processing: `${basePath}/processing.webp${versionQuery}`,
+    speaking: `${basePath}/speaking_01.webp${versionQuery}`,
+    encouraging: `${basePath}/encouraging.webp${versionQuery}`,
+    curious: `${basePath}/curious.webp${versionQuery}`,
+    serious: `${basePath}/serious.webp${versionQuery}`,
+    happy: `${basePath}/happy.webp${versionQuery}`,
+    impressed: `${basePath}/impressed.webp${versionQuery}`,
+    surprised: `${basePath}/surprised.webp${versionQuery}`,
+    agree: `${basePath}/agree.webp${versionQuery}`,
+    goodbye: `${basePath}/goodbye.webp${versionQuery}`,
+    blink: `${basePath}/blink.webp${versionQuery}`,
+  };
+}
+
+export function getSpeakingCycleFrames(avatarId?: string): readonly string[] {
+  const basePath = resolveAvatarBasePath(avatarId);
+  const versionQuery = `?v=${AVATAR_ASSET_VERSION}`;
+  return [
+    `${basePath}/speaking_01.webp${versionQuery}`,
+    `${basePath}/speaking_02.webp${versionQuery}`,
+    `${basePath}/speaking_03.webp${versionQuery}`,
+    `${basePath}/speaking_04.webp${versionQuery}`,
+    `${basePath}/speaking_05.webp${versionQuery}`,
+    `${basePath}/speaking_06.webp${versionQuery}`,
+    `${basePath}/speaking_07.webp${versionQuery}`,
+    `${basePath}/speaking_08.webp${versionQuery}`,
+  ];
+}
+
+export const AVATAR_ASSET_PATHS: Record<AvatarState, string> = getAvatarAssetPaths('aila_recruiter');
+
+export const SPEAKING_CYCLE_FRAMES: readonly string[] = getSpeakingCycleFrames('aila_recruiter');
 
 export const PRELOAD_AVATAR_STATES: readonly AvatarState[] = [
   'idle',

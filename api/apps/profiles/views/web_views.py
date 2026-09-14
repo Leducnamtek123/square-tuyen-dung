@@ -494,6 +494,11 @@ class ResumeViewSet(viewsets.ViewSet,
 
     permission_classes = [perms_custom.CanManageCandidates]
 
+    def get_permissions(self):
+        if self.action in ["semantic_match"]:
+            return [perms_custom.IsEmployerOrAdminUser()]
+        return super().get_permissions()
+
     renderer_classes = [renderers.MyJSONRenderer]
 
     pagination_class = paginations.CustomPagination
@@ -814,6 +819,35 @@ class ResumeViewSet(viewsets.ViewSet,
             )
 
         return var_res.response_data()
+
+    @action(methods=["post", "get"], detail=True,
+            url_path="semantic-match", url_name="semantic-match")
+    def semantic_match(self, request, slug=None):
+        user = request.user
+        company = user.get_active_company() if hasattr(user, 'get_active_company') else getattr(user, 'active_company', None)
+        resume_obj = self.get_object()
+
+        job_post_id = (
+            request.data.get("job_post_id")
+            or request.query_params.get("job_post_id")
+            or request.data.get("jobPostId")
+            or request.query_params.get("jobPostId")
+        )
+        manual_jd_text = request.data.get("jd_text") or request.data.get("manual_job_text", "")
+
+        from apps.jobs.models import JobPost
+        job_post = None
+        if job_post_id and str(job_post_id).isdigit():
+            job_post = JobPost.objects.filter(id=int(job_post_id)).first()
+        elif company:
+            job_post = JobPost.objects.filter(company=company).order_by('-create_at').first()
+
+        from apps.profiles.services.semantic_matching import evaluate_cv_jd_semantic_match
+        result = evaluate_cv_jd_semantic_match(resume=resume_obj, job_post=job_post, manual_job_text=manual_jd_text)
+        if job_post:
+            result["job_name"] = job_post.job_name
+            result["job_post_id"] = job_post.id
+        return var_res.response_data(data=result)
 
 
 class EmployerCandidateProfileViewSet(viewsets.ModelViewSet):

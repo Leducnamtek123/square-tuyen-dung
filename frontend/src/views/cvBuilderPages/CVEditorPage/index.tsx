@@ -575,7 +575,7 @@ export const CVEditorPage: React.FC = () => {
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f1f5f9', overflow: 'hidden' }}>
-      {/* ── Top Navbar (Material UI AppBar standard) ──────────────────────── */}
+      {/* -- Top Navbar (Material UI AppBar standard) ------------------------ */}
       <Paper
         elevation={0}
         className="no-print"
@@ -755,7 +755,7 @@ export const CVEditorPage: React.FC = () => {
               '&:hover': { borderColor: '#cbd5e1', bgcolor: '#f8fafc' },
             }}
           >
-            {t('cvBuilder.actions.exportWord', 'Xuất Word (.doc)')}
+            {t('cvBuilder.actions.exportWord', 'Xuất Word - Định dạng DOC')}
           </Button>
 
           {/* Backup JSON */}
@@ -828,7 +828,7 @@ export const CVEditorPage: React.FC = () => {
         </Stack>
       </Paper>
 
-      {/* ── Main Studio Body ─────────────────────────────────────────────── */}
+      {/* -- Main Studio Body ----------------------------------------------- */}
       <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Left Side: Form Controls Sidebar (460px fixed) */}
         <Box
@@ -870,7 +870,7 @@ export const CVEditorPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* ── Template Switcher Dialog ─────────────────────────────────────── */}
+      {/* -- Template Switcher Dialog --------------------------------------- */}
       <TemplateSwitcherModal
         open={isTemplateModalOpen}
         onClose={() => setIsTemplateModalOpen(false)}
@@ -879,7 +879,7 @@ export const CVEditorPage: React.FC = () => {
         onSelectTemplate={handleSelectTemplate}
       />
 
-      {/* ── Auth Required Modal for Guest Actions ───────────────────────── */}
+      {/* -- Auth Required Modal for Guest Actions ------------------------- */}
       {AuthModal}
     </Box>
   );

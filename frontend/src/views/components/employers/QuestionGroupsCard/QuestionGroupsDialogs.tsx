@@ -18,6 +18,7 @@ import {
   IconButton,
   Tooltip,
   Paper,
+  Switch,
   alpha,
   type Theme,
 } from '@mui/material';
@@ -41,6 +42,7 @@ type Props = {
   currentGroup: QuestionGroup | null;
   groupName: string;
   groupDescription: string;
+  isPublic: boolean;
   selectedQuestions: number[];
   openCreateQuestion: boolean;
   newQuestionContent: string;
@@ -54,6 +56,7 @@ type Props = {
   onCloseDialog: () => void;
   onGroupNameChange: (value: string) => void;
   onGroupDescriptionChange: (value: string) => void;
+  onIsPublicChange: (value: boolean) => void;
   onSelectedQuestionsChange: (value: number[]) => void;
   onOpenCreateQuestion: () => void;
   onCloseCreateQuestion: () => void;
@@ -69,6 +72,7 @@ const QuestionGroupsDialogs = ({
   currentGroup,
   groupName,
   groupDescription,
+  isPublic,
   selectedQuestions,
   openCreateQuestion,
   newQuestionContent,
@@ -82,6 +86,7 @@ const QuestionGroupsDialogs = ({
   onCloseDialog,
   onGroupNameChange,
   onGroupDescriptionChange,
+  onIsPublicChange,
   onSelectedQuestionsChange,
   onOpenCreateQuestion,
   onCloseCreateQuestion,
@@ -195,6 +200,49 @@ const QuestionGroupsDialogs = ({
               onChange={(e) => onGroupDescriptionChange(e.target.value)}
               sx={inputSx}
             />
+
+            {/* Public Status Toggle Card */}
+            <Paper
+              variant="outlined"
+              sx={{
+                p: 2,
+                borderRadius: 2.5,
+                bgcolor: isPublic ? '#f0fdf4' : '#f8fafc',
+                borderColor: isPublic ? '#bbf7d0' : '#e2e8f0',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+                <Box>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: isPublic ? '#166534' : '#1e293b' }}>
+                      Công khai cho ứng viên luyện tập
+                    </Typography>
+                    <Chip
+                      label={isPublic ? 'Đang công khai' : 'Riêng tư nội bộ'}
+                      size="small"
+                      sx={{
+                        height: 20,
+                        fontSize: '0.6875rem',
+                        fontWeight: 700,
+                        bgcolor: isPublic ? '#dcfce7' : '#e2e8f0',
+                        color: isPublic ? '#15803d' : '#475569',
+                      }}
+                    />
+                  </Stack>
+                  <Typography variant="caption" sx={{ color: isPublic ? '#15803d' : '#64748b', display: 'block', mt: 0.5 }}>
+                    {isPublic
+                      ? 'Ứng viên có thể nhìn thấy và làm bài phỏng vấn thử với bộ câu hỏi này'
+                      : 'Chỉ Nhà tuyển dụng sử dụng nội bộ, không hiển thị cho ứng viên'}
+                  </Typography>
+                </Box>
+                <Switch
+                  checked={isPublic}
+                  onChange={(e) => onIsPublicChange(e.target.checked)}
+                  color="success"
+                />
+              </Stack>
+            </Paper>
 
             {/* Select Questions Dropdown */}
             <FormControl fullWidth variant="outlined" sx={inputSx}>

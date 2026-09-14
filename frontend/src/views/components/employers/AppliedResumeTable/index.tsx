@@ -19,8 +19,10 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DownloadIcon from '@mui/icons-material/Download';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import EventIcon from '@mui/icons-material/Event';
 import type { ColumnDef, PaginationState, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 
+import { getAppliedResumeJobPostId } from '../appliedResumeUtils';
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import { CV_TYPES, ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
@@ -242,6 +244,41 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                     }}
                   >
                     <RemoveRedEyeIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            );
+          })()}
+
+          {(() => {
+            const item = info.row.original;
+            const jobPostId = getAppliedResumeJobPostId(item);
+            const canScheduleInterview = !blindMode && Boolean(item.userId) && Boolean(jobPostId);
+            const scheduleHref = canScheduleInterview
+              ? localizeRoutePath(
+                  `/${ROUTES.EMPLOYER.INTERVIEW_CREATE}?candidate=${item.userId}&jobPost=${jobPostId}`,
+                  i18n.language
+                )
+              : undefined;
+
+            return (
+              <Tooltip title={t('appliedResume.table.tooltips.scheduleInterview', { defaultValue: 'Lên lịch phỏng vấn' })} arrow>
+                <span>
+                  <IconButton
+                    aria-label={t('appliedResume.table.tooltips.scheduleInterview', { defaultValue: 'Lên lịch phỏng vấn' })}
+                    size="small"
+                    disabled={!canScheduleInterview}
+                    onClick={() => {
+                      if (!scheduleHref) return;
+                      push(scheduleHref);
+                    }}
+                    sx={{
+                      color: '#2563EB',
+                      bgcolor: pc.primary(0.06),
+                      '&:hover': { bgcolor: pc.primary(0.12) },
+                    }}
+                  >
+                    <EventIcon fontSize="small" />
                   </IconButton>
                 </span>
               </Tooltip>

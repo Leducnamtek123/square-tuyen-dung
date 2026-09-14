@@ -26,7 +26,7 @@ import MasterCandidateItem from './components/MasterCandidateItem';
 import CandidateDetailPreviewPanel from './components/CandidateDetailPreviewPanel';
 import { useProfileCardState } from './hooks/useProfileCardState';
 
-/* ─── ProfileCard Master-Detail View ────────────────────────────────────────── */
+/* --- ProfileCard Master-Detail View ------------------------------------------ */
 const ProfileCardContent: React.FC = () => {
   const {
     t,

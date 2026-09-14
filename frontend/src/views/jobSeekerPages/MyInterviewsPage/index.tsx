@@ -126,21 +126,26 @@ const MyInterviewsPage = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 1120, mx: 'auto', px: { xs: 1.5, sm: 2, md: 3 }, py: { xs: 2, md: 3 } }}>
+    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Header Banner */}
       <Box
         sx={{
           mb: 3,
           p: { xs: 2.5, md: 3.5 },
           borderRadius: '16px',
-          background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%)',
+          background: `linear-gradient(100deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.80) 45%, rgba(15, 23, 42, 0.40) 100%), url(/images/banners/banner-interviews.jpg)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center right',
           color: '#ffffff',
           display: 'flex',
           flexDirection: { xs: 'column', sm: 'row' },
           alignItems: { xs: 'flex-start', sm: 'center' },
           justifyContent: 'space-between',
           gap: 2,
-          boxShadow: '0 10px 25px -5px rgba(37,99,235,0.25)',
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: '0 12px 35px -5px rgba(15, 23, 42, 0.35)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
         }}
       >
         <Box>

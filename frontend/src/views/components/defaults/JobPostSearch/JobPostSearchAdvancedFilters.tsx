@@ -118,7 +118,7 @@ const JobPostSearchAdvancedFilters: React.FC<JobPostSearchAdvancedFiltersProps> 
         keepMounted: true,
       }}
     >
-      {/* ── Sticky Header ────────────────────────────────────────── */}
+      {/* -- Sticky Header ------------------------------------------ */}
       <Box
         sx={{
           p: { xs: 2, sm: 2.5 },
@@ -226,7 +226,7 @@ const JobPostSearchAdvancedFilters: React.FC<JobPostSearchAdvancedFiltersProps> 
         </Stack>
       </Box>
 
-      {/* ── Scrollable Body ──────────────────────────────────────── */}
+      {/* -- Scrollable Body ---------------------------------------- */}
       <Box
         sx={{
           p: { xs: 2, sm: 2.5 },
@@ -352,7 +352,7 @@ const JobPostSearchAdvancedFilters: React.FC<JobPostSearchAdvancedFiltersProps> 
         </FilterSection>
       </Box>
 
-      {/* ── Sticky Footer Actions ────────────────────────────────── */}
+      {/* -- Sticky Footer Actions ---------------------------------- */}
       <Box
         sx={{
           p: { xs: 2, sm: 2.5 },

@@ -376,7 +376,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
             }}
           >
             <Stack spacing={2}>
-              {/* ── Active Search Results when typing ─────────────────── */}
+              {/* -- Active Search Results when typing ------------------- */}
               {state.searchValue.trim() !== '' ? (
                 <Box>
                   <Typography fontWeight={800} fontSize={14} color="#0f172a" sx={{ mb: 1 }}>
@@ -414,7 +414,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                   )}
                 </Box>
               ) : (
-                /* ── Default Popup when Input is Empty ──────────────────── */
+                /* -- Default Popup when Input is Empty -------------------- */
                 <>
                   {/* 1. Từ khóa phổ biến */}
                   {popularKeywords.length > 0 && (

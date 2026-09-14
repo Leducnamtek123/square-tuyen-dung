@@ -35,4 +35,26 @@ describe('CandidateSidebar Navigation Configuration', () => {
     expect(source).toMatch(/label:\s*'(?:Lịch phỏng vấn tuyển dụng|Phỏng vấn của tôi)'/);
     expect(source).not.toContain("label: 'Phòng vấn của tôi'");
   });
+
+  describe('Desktop Sticky Sidebar Scrolling Behavior', () => {
+    it('applies position sticky to desktop sidebar nav', () => {
+      expect(source).toContain("position: 'sticky'");
+    });
+
+    it('calculates dynamic top offset based on viewport and sidebar height', () => {
+      expect(source).toContain("min(88px, calc(100dvh - ");
+      expect(source).toContain("calc(100dvh - ${sidebarHeight}px - 24px)");
+    });
+
+    it('observes sidebar height dynamically using ResizeObserver', () => {
+      expect(source).toContain('new ResizeObserver');
+      expect(source).toContain('ro.observe(el)');
+    });
+
+    it('preserves responsive layout without sticky sidebar on mobile devices', () => {
+      expect(source).toContain("display: { xs: 'none', md: 'flex' }");
+      expect(source).toContain("display: { xs: 'flex', md: 'none' }");
+    });
+  });
 });
+

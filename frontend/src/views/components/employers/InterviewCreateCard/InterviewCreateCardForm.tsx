@@ -616,7 +616,7 @@ const InterviewCreateCardForm = ({
                     select
                     fullWidth
                     label="Chất giọng Trợ lý AI"
-                    value={field.value || 'vi-VN-Standard-A'}
+                    value={field.value || 'Trúc Ly'}
                     sx={inputSx}
                     slotProps={{
                       input: {
@@ -630,17 +630,35 @@ const InterviewCreateCardForm = ({
                     }}
                     helperText="Giọng phát âm câu hỏi tiếng Việt tự nhiên"
                   >
-                    <MenuItem value="vi-VN-Standard-A" sx={{ fontWeight: 600 }}>
-                      Trúc Ly - Giọng nữ miền Nam chuẩn
+                    <MenuItem value="Trúc Ly" sx={{ fontWeight: 600 }}>
+                      Trúc Ly - Giọng nữ miền Bắc truyền cảm
                     </MenuItem>
-                    <MenuItem value="vi-VN-Standard-B" sx={{ fontWeight: 600 }}>
-                      Nam Minh - Giọng nam miền Bắc đĩnh đạc
+                    <MenuItem value="Mạnh Dũng" sx={{ fontWeight: 600 }}>
+                      Mạnh Dũng - Giọng nam miền Bắc đĩnh đạc
                     </MenuItem>
-                    <MenuItem value="vi-VN-Standard-C" sx={{ fontWeight: 600 }}>
-                      Mai Phương - Giọng nữ miền Bắc nhẹ nhàng
+                    <MenuItem value="Minh Triết" sx={{ fontWeight: 600 }}>
+                      Minh Triết - Giọng nam miền Nam phong độ
                     </MenuItem>
-                    <MenuItem value="vi-VN-Standard-D" sx={{ fontWeight: 600 }}>
-                      Quang Dũng - Giọng nam miền Trung ấm áp
+                    <MenuItem value="Quang Sơn" sx={{ fontWeight: 600 }}>
+                      Quang Sơn - Giọng nam miền Trung ấm áp
+                    </MenuItem>
+                    <MenuItem value="Thùy Dung" sx={{ fontWeight: 600 }}>
+                      Thùy Dung - Giọng nữ miền Nam thanh lịch
+                    </MenuItem>
+                    <MenuItem value="Ngọc Trân" sx={{ fontWeight: 600 }}>
+                      Ngọc Trân - Giọng nữ miền Trung dịu dàng
+                    </MenuItem>
+                    <MenuItem value="vi-VN-Standard-A" sx={{ display: 'none' }}>
+                      Trúc Ly
+                    </MenuItem>
+                    <MenuItem value="vi-VN-Standard-B" sx={{ display: 'none' }}>
+                      Mạnh Dũng
+                    </MenuItem>
+                    <MenuItem value="vi-VN-Standard-C" sx={{ display: 'none' }}>
+                      Thùy Dung
+                    </MenuItem>
+                    <MenuItem value="vi-VN-Standard-D" sx={{ display: 'none' }}>
+                      Quang Sơn
                     </MenuItem>
                   </TextField>
                 )}

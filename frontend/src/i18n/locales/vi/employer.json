@@ -320,7 +320,38 @@
       "toast": "Vui lòng xác thực Nhà tuyển dụng trước khi đăng tin."
     },
     "popupTitle": "Tin tuyển dụng",
-    "manageSubtitle": "Quản lý các tin tuyển dụng"
+    "manageSubtitle": "Quản lý các tin tuyển dụng",
+    "editor": {
+      "createTitle": "Tạo tin tuyển dụng mới",
+      "editTitle": "Chỉnh sửa tin tuyển dụng",
+      "createSubtitle": "Điền đầy đủ thông tin vị trí công việc, đãi ngộ và cấu hình phỏng vấn AI để tiếp cận ứng viên tiềm năng nhanh chóng.",
+      "editSubtitle": "Cập nhật nội dung tin tuyển dụng, yêu cầu ứng viên và điều chỉnh ngưỡng điểm đánh giá phỏng vấn AI.",
+      "backToList": "Quay lại danh sách",
+      "confirmCancelTitle": "Hủy bỏ thao tác",
+      "confirmCancelMessage": "Bạn có thay đổi chưa được lưu. Rời khỏi trang này sẽ làm mất toàn bộ nội dung vừa nhập. Bạn có chắc chắn muốn rời đi?",
+      "confirmCancelButton": "Rời khỏi trang",
+      "continueEditingButton": "Tiếp tục chỉnh sửa",
+      "saveButton": "Đăng tin tuyển dụng",
+      "updateButton": "Lưu thay đổi",
+      "cancelButton": "Hủy bỏ",
+      "progressTitle": "Tiến độ hoàn thiện tin",
+      "progressSubtitle": "Tin càng chi tiết càng tăng cơ hội thu hút ứng viên xuất sắc",
+      "sectionBasic": "Thông tin vị trí",
+      "sectionSalary": "Lương và thời hạn",
+      "sectionAi": "Thiết lập phỏng vấn AI",
+      "sectionContent": "Mô tả và quyền lợi",
+      "sectionLocation": "Địa điểm làm việc",
+      "sectionContact": "Thông tin liên hệ",
+      "tipsTitle": "Mẹo đăng tin tuyển dụng hiệu quả",
+      "tip1Title": "Mô tả công việc rõ ràng",
+      "tip1Desc": "Liệt kê từ 5 đến 7 trách nhiệm chính và nêu rõ các công nghệ hoặc kỹ năng cần thiết.",
+      "tip2Title": "Mức lương minh bạch",
+      "tip2Desc": "Tin tuyển dụng có khoảng lương cụ thể nhận được lượng ứng tuyển cao hơn 40 phần trăm.",
+      "tip3Title": "Tự động hóa phỏng vấn AI",
+      "tip3Desc": "Bật sàng lọc tự động giúp rút ngắn thời gian liên hệ và nâng cao trải nghiệm ứng viên.",
+      "policyTitle": "Quy định kiểm duyệt tin",
+      "policyDesc": "Tin tuyển dụng sẽ được kiểm duyệt trong vòng 2 giờ làm việc để đảm bảo tính minh bạch và bảo vệ quyền lợi ứng viên."
+    }
   },
   "sendEmailComponent": {
     "label": {
@@ -808,6 +839,7 @@
     "table": {
       "groupName": "Tên nhóm câu hỏi",
       "numberOfQuestions": "Số câu hỏi",
+      "status": "Trạng thái",
       "description": "Mô tả",
       "na": "N/A",
       "noData": "Không có dữ liệu"

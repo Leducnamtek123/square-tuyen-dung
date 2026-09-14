@@ -229,6 +229,82 @@ def prepare_voice_profile(profile: VoiceProfile, *, prepared_by=None) -> VoicePr
         raise
 
 
+def _get_candidate_resume_summary(session: InterviewSession) -> Dict[str, object]:
+    candidate = getattr(session, "candidate", None)
+    if not candidate:
+        return {}
+
+    resume = None
+    try:
+        from apps.profiles.models import Resume
+        resume = Resume.objects.filter(user=candidate).order_by("-is_active", "-update_at").first()
+        if not resume and hasattr(candidate, "job_seeker_profile"):
+            resume = Resume.objects.filter(job_seeker_profile=candidate.job_seeker_profile).order_by("-is_active", "-update_at").first()
+        if not resume and session.job_post_id:
+            from apps.jobs.models import JobPostActivity
+            activity = JobPostActivity.objects.filter(job_post=session.job_post, user=candidate).exclude(resume__isnull=True).first()
+            if activity:
+                resume = activity.resume
+    except Exception as e:
+        logger.warning("Error fetching candidate resume for session %s: %s", getattr(session, "id", None), e)
+
+    if not resume:
+        return {}
+
+    cv_title = _clean_text(getattr(resume, "title", ""))
+    cv_skills = _clean_text(getattr(resume, "skills_summary", ""))
+
+    exp_list = []
+    try:
+        if hasattr(resume, "experience_details"):
+            for exp in resume.experience_details.all()[:3]:
+                comp = getattr(exp, "company_name", "")
+                role = getattr(exp, "job_name", "")
+                desc = _clean_text(getattr(exp, "description", ""))
+                item = f"{role} tại {comp}".strip()
+                if desc:
+                    item += f": {_truncate_text(desc, 120)}"
+                exp_list.append(item)
+    except Exception:
+        pass
+
+    cv_experience = "; ".join(exp_list) if exp_list else _truncate_text(_clean_text(getattr(resume, "description", "")), 300)
+
+    edu_list = []
+    try:
+        if hasattr(resume, "education_details"):
+            for edu in resume.education_details.all()[:2]:
+                school = getattr(edu, "training_place_name", "")
+                grade = getattr(edu, "grade_or_rank", "") or ""
+                desc = _clean_text(getattr(edu, "description", ""))
+                edu_item = f"{school} {grade} {desc}".strip()
+                if edu_item:
+                    edu_list.append(edu_item)
+    except Exception:
+        pass
+    cv_education = "; ".join(edu_list)
+
+    semantic_data = {}
+    if session.job_post:
+        try:
+            from apps.profiles.services.semantic_matching import evaluate_cv_jd_semantic_match
+            semantic_data = evaluate_cv_jd_semantic_match(resume=resume, job_post=session.job_post)
+        except Exception as exc:
+            logger.warning("Error evaluating semantic match in context: %s", exc)
+
+    return {
+        "candidateCvTitle": cv_title or None,
+        "candidateCvSkills": cv_skills or None,
+        "candidateCvExperience": cv_experience or None,
+        "candidateCvEducation": cv_education or None,
+        "candidateFitLevel": semantic_data.get("fit_level") or None,
+        "candidateSemanticScore": semantic_data.get("semantic_score"),
+        "candidateMatchedSkills": semantic_data.get("matched_skills") or [],
+        "candidateMissingSkills": semantic_data.get("missing_skills") or [],
+        "candidateAiRecommendation": semantic_data.get("ai_recommendation") or None,
+    }
+
+
 def build_interview_context(session: InterviewSession) -> Dict[str, object]:
     questions = list(get_session_questions(session).order_by("sort_order", "create_at", "id"))
     template = getattr(getattr(session, "job_post", None), "interview_template", None)
@@ -244,6 +320,18 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
     interviewer_name = session_meta.get("interviewer_name") or session_meta.get("interviewerName") or "Trợ lý AI Ly"
     custom_speed = session_meta.get("ai_speed") or session_meta.get("ttsSpeed")
     custom_voice = session_meta.get("ai_voice") or session_meta.get("ttsVoice")
+    voice_aliases = {
+        "vi-VN-Standard-A": "Trúc Ly",
+        "vi-VN-Standard-B": "Mạnh Dũng",
+        "vi-VN-Standard-C": "Thùy Dung",
+        "vi-VN-Standard-D": "Quang Sơn",
+        "Nam Minh": "Mạnh Dũng",
+        "Mai Phương": "Thùy Dung",
+        "Quang Dũng": "Quang Sơn",
+        "Minh Quang": "Minh Triết",
+    }
+    if custom_voice and custom_voice in voice_aliases:
+        custom_voice = voice_aliases[custom_voice]
 
     speed_value = get_tts_speed()
     if custom_speed:
@@ -277,6 +365,7 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
             for q in questions
         ],
         "interviewType": session.type,
+        "interviewLanguage": getattr(session, "interview_language", "vi") or "vi",
         "ttsSpeed": speed_value,
         "interviewQuestionGapSeconds": get_interview_question_gap_seconds(),
         "interviewMinimumSilenceSeconds": get_interview_minimum_silence_seconds(),
@@ -285,6 +374,7 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
         "avatarBackgroundUrl": avatar_background_url,
         "interviewerName": interviewer_name,
     }
+    payload.update(_get_candidate_resume_summary(session))
     voice_profile_payload = (
         build_tts_voice_profile_payload(getattr(session, "voice_profile", None))
         if getattr(session, "voice_profile", None)
