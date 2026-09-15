@@ -16,9 +16,10 @@ class JobSeekerAgent(BaseAgent):
         self.wait_network_settle(3000)
 
         # Fill credentials
-        email_selector = "input[name='email']"
-        password_selector = "input[name='password']"
+        email_selector = "input[placeholder*='email' i], input[type='email']"
+        password_selector = "input[type='password']"
 
+        self.page.wait_for_selector(email_selector, timeout=8000)
         self.safe_fill(email_selector, self.creds["email"], description="Candidate Email")
         self.safe_fill(password_selector, self.creds["password"], description="Candidate Password")
         self.capture_step("01_seeker_login_filled")

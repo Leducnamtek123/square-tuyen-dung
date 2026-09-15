@@ -1,0 +1,1039 @@
+{
+  "start_time": "2026-09-16 00:35:35",
+  "gateway": "http://localhost:8080",
+  "database_checks": {
+    "preflight_job_sample": {
+      "found": true,
+      "id": 209,
+      "job_name": "Kiến Trúc Sư Thiết Kế Nội Thất & Không Gian",
+      "status": 3,
+      "salary_min": 18000000,
+      "salary_max": 30000000,
+      "user_id": 2,
+      "company_id": 1
+    }
+  },
+  "agents": {
+    "EMPLOYER": {
+      "role": "EMPLOYER",
+      "total_actions": 42,
+      "console_errors_count": 8,
+      "console_warnings_count": 0,
+      "network_errors_count": 0,
+      "slow_requests_count": 2,
+      "ux_issues_count": 2,
+      "screenshots_count": 14,
+      "console_errors": [
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://a.tile.openstreetmap.org/15/16385/16384.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:35:53.853494"
+        },
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://a.tile.openstreetmap.org/15/16383/16383.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:35:53.853674"
+        },
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://a.tile.openstreetmap.org/15/16382/16384.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:35:53.853674"
+        },
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://b.tile.openstreetmap.org/15/16383/16384.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:35:53.853674"
+        },
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://b.tile.openstreetmap.org/15/16384/16383.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:35:53.853674"
+        },
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://c.tile.openstreetmap.org/15/16384/16384.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:35:53.853674"
+        },
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://c.tile.openstreetmap.org/15/16382/16383.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:35:53.853674"
+        },
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://c.tile.openstreetmap.org/15/16385/16383.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:35:53.854691"
+        }
+      ],
+      "network_errors": [],
+      "slow_requests": [
+        {
+          "url": "http://localhost:8080/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Floading-spinner.3e8xj-71ru3uz.gif&w=128&q=75",
+          "method": "GET",
+          "status": 200,
+          "duration_ms": 3512,
+          "timestamp": "2026-09-16T00:35:45.824676"
+        },
+        {
+          "url": "http://localhost:8080/api/v1/auth/check-creds/",
+          "method": "POST",
+          "status": 200,
+          "duration_ms": 3517,
+          "timestamp": "2026-09-16T00:35:45.825699"
+        }
+      ],
+      "ux_issues": [
+        {
+          "title": "Employer Login Error",
+          "category": "Authentication",
+          "severity": "BLOCKER",
+          "description": "Login failed or showed error: ",
+          "screenshot": "C:\\Users\\WIN10\\Documents\\square-tuyen-dung\\docs\\audit_reports\\screenshots\\employer_UX_Employer_Login_Error_1789493746344.png",
+          "recommendation": "Ensure test employer credentials and OAuth backend are operational.",
+          "timestamp": "2026-09-16T00:35:46.673327"
+        },
+        {
+          "title": "Dữ liệu hiển thị NaN hoặc undefined trên Dashboard",
+          "category": "Data Presentation",
+          "severity": "HIGH",
+          "description": "Phát hiện chuỗi NaN hoặc undefined hiển thị trong giao diện dashboard employer.",
+          "screenshot": "C:\\Users\\WIN10\\Documents\\square-tuyen-dung\\docs\\audit_reports\\screenshots\\employer_UX_Dữ_liệu_hiển_thị_NaN_1789493752288.png",
+          "recommendation": "Thêm fallback default value (0 hoặc '-') khi dữ liệu API chưa tải hoặc null.",
+          "timestamp": "2026-09-16T00:35:52.601308"
+        }
+      ],
+      "actions_log": [
+        {
+          "action": "Bắt đầu đăng nhập Employer...",
+          "details": "",
+          "time": "2026-09-16T00:35:39.523253"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/employer/login",
+          "details": "",
+          "time": "2026-09-16T00:35:39.523253"
+        },
+        {
+          "action": "Filled input[placeholder*='email' i], input[type='email'] with text (Employer Email)",
+          "details": "",
+          "time": "2026-09-16T00:35:41.450525"
+        },
+        {
+          "action": "Filled input[type='password'] with text (Employer Password)",
+          "details": "",
+          "time": "2026-09-16T00:35:41.470652"
+        },
+        {
+          "action": "Captured screenshot: 01_login_filled -> employer_01_login_filled_1789493741470.png",
+          "details": "",
+          "time": "2026-09-16T00:35:41.888076"
+        },
+        {
+          "action": "Clicked button[type='submit'] (Submit Login)",
+          "details": "",
+          "time": "2026-09-16T00:35:42.319732"
+        },
+        {
+          "action": "Current URL after login submit: http://localhost:8080/employer/login",
+          "details": "",
+          "time": "2026-09-16T00:35:45.822518"
+        },
+        {
+          "action": "Captured screenshot: 02_dashboard_after_login -> employer_02_dashboard_after_login_1789493745822.png",
+          "details": "",
+          "time": "2026-09-16T00:35:46.304897"
+        },
+        {
+          "action": "Login alert: ",
+          "details": "",
+          "time": "2026-09-16T00:35:46.344568"
+        },
+        {
+          "action": "Captured screenshot: UX_Employer Login Error -> employer_UX_Employer_Login_Error_1789493746344.png",
+          "details": "",
+          "time": "2026-09-16T00:35:46.673327"
+        },
+        {
+          "action": "Chưa chuyển hướng khỏi trang login, có thể cần xác thực hoặc kiểm tra form",
+          "details": "",
+          "time": "2026-09-16T00:35:46.673327"
+        },
+        {
+          "action": "Kiểm tra giao diện Dashboard của Nhà tuyển dụng...",
+          "details": "",
+          "time": "2026-09-16T00:35:46.673327"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/employer/dashboard",
+          "details": "",
+          "time": "2026-09-16T00:35:46.673327"
+        },
+        {
+          "action": "Captured screenshot: 03_employer_dashboard_full -> employer_03_employer_dashboard_full_1789493751884.png",
+          "details": "",
+          "time": "2026-09-16T00:35:52.259032"
+        },
+        {
+          "action": "Captured screenshot: UX_Dữ liệu hiển thị NaN -> employer_UX_Dữ_liệu_hiển_thị_NaN_1789493752288.png",
+          "details": "",
+          "time": "2026-09-16T00:35:52.601204"
+        },
+        {
+          "action": "Bắt đầu tạo tin tuyển dụng mới: 'Chỉ Huy Trưởng Công Trình (Multi-Agent Test)'...",
+          "details": "",
+          "time": "2026-09-16T00:35:52.601308"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/employer/job-posts/create",
+          "details": "",
+          "time": "2026-09-16T00:35:52.601308"
+        },
+        {
+          "action": "Captured screenshot: 04_create_job_form_initial -> employer_04_create_job_form_initial_1789493757828.png",
+          "details": "",
+          "time": "2026-09-16T00:35:58.397231"
+        },
+        {
+          "action": "Filled form input[type='text']:first-of-type with text (Job Title Field)",
+          "details": "",
+          "time": "2026-09-16T00:36:02.538620"
+        },
+        {
+          "action": "Captured screenshot: 05_create_job_form_filled -> employer_05_create_job_form_filled_1789493762538.png",
+          "details": "",
+          "time": "2026-09-16T00:36:03.089538"
+        },
+        {
+          "action": "Kiểm tra trang Quản lý Ứng viên / Hồ sơ ứng tuyển...",
+          "details": "",
+          "time": "2026-09-16T00:36:48.169843"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/employer/applied-profiles",
+          "details": "",
+          "time": "2026-09-16T00:36:48.169843"
+        },
+        {
+          "action": "Captured screenshot: 06_applied_candidates_list -> employer_06_applied_candidates_list_1789493813513.png",
+          "details": "",
+          "time": "2026-09-16T00:36:53.927379"
+        },
+        {
+          "action": "Bắt đầu khảo sát mở rộng các trang phụ của Employer...",
+          "details": "",
+          "time": "2026-09-16T00:36:53.935703"
+        },
+        {
+          "action": "Deep-dive: Khám phá trang question-bank (http://localhost:8080/employer/question-bank)",
+          "details": "",
+          "time": "2026-09-16T00:36:53.935703"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/employer/question-bank",
+          "details": "",
+          "time": "2026-09-16T00:36:53.935703"
+        },
+        {
+          "action": "Captured screenshot: deepdive_question-bank -> employer_deepdive_question-bank_1789493818157.png",
+          "details": "",
+          "time": "2026-09-16T00:36:58.527044"
+        },
+        {
+          "action": "Deep-dive: Khám phá trang question-groups (http://localhost:8080/employer/question-groups)",
+          "details": "",
+          "time": "2026-09-16T00:36:59.027888"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/employer/question-groups",
+          "details": "",
+          "time": "2026-09-16T00:36:59.027888"
+        },
+        {
+          "action": "Captured screenshot: deepdive_question-groups -> employer_deepdive_question-groups_1789493823222.png",
+          "details": "",
+          "time": "2026-09-16T00:37:03.594859"
+        },
+        {
+          "action": "Deep-dive: Khám phá trang ai-settings (http://localhost:8080/employer/ai-settings)",
+          "details": "",
+          "time": "2026-09-16T00:37:04.095393"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/employer/ai-settings",
+          "details": "",
+          "time": "2026-09-16T00:37:04.095393"
+        },
+        {
+          "action": "Captured screenshot: deepdive_ai-settings -> employer_deepdive_ai-settings_1789493828307.png",
+          "details": "",
+          "time": "2026-09-16T00:37:09.087414"
+        },
+        {
+          "action": "Deep-dive: Khám phá trang agent-assistants (http://localhost:8080/employer/agent-assistants)",
+          "details": "",
+          "time": "2026-09-16T00:37:09.587950"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/employer/agent-assistants",
+          "details": "",
+          "time": "2026-09-16T00:37:09.587950"
+        },
+        {
+          "action": "Captured screenshot: deepdive_agent-assistants -> employer_deepdive_agent-assistants_1789493833756.png",
+          "details": "",
+          "time": "2026-09-16T00:37:14.011248"
+        },
+        {
+          "action": "Deep-dive: Khám phá trang settings (http://localhost:8080/employer/settings)",
+          "details": "",
+          "time": "2026-09-16T00:37:14.511770"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/employer/settings",
+          "details": "",
+          "time": "2026-09-16T00:37:14.511770"
+        },
+        {
+          "action": "Captured screenshot: deepdive_settings -> employer_deepdive_settings_1789493838673.png",
+          "details": "",
+          "time": "2026-09-16T00:37:18.843536"
+        },
+        {
+          "action": "Deep-dive: Khám phá trang pricing (http://localhost:8080/employer/pricing)",
+          "details": "",
+          "time": "2026-09-16T00:37:19.344390"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/employer/pricing",
+          "details": "",
+          "time": "2026-09-16T00:37:19.344390"
+        },
+        {
+          "action": "Captured screenshot: deepdive_pricing -> employer_deepdive_pricing_1789493843847.png",
+          "details": "",
+          "time": "2026-09-16T00:37:24.132874"
+        }
+      ]
+    },
+    "ADMIN": {
+      "role": "ADMIN",
+      "total_actions": 34,
+      "console_errors_count": 6,
+      "console_warnings_count": 0,
+      "network_errors_count": 4,
+      "slow_requests_count": 2,
+      "ux_issues_count": 0,
+      "screenshots_count": 10,
+      "console_errors": [
+        {
+          "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "location": {
+            "url": "http://localhost:8080/api/v1/auth/users/?page=1&pageSize=10",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:37:25.859594"
+        },
+        {
+          "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "location": {
+            "url": "http://localhost:8080/api/v1/auth/users/?page=1&pageSize=10",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:37:25.945049"
+        },
+        {
+          "text": "[API Error] GET auth/users/ {status: 500, params: Object, data: \n<!doctype html>\n<html lang=\"en\">\n<head>\n  <title>…1>Server Error (500)</h1><p></p>\n</body>\n</html>\n}",
+          "location": {
+            "url": "http://localhost:8080/_next/static/chunks/2ymiqj_497t3a.js",
+            "line": 0,
+            "column": 82363,
+            "lineNumber": 0,
+            "columnNumber": 82363
+          },
+          "timestamp": "2026-09-16T00:37:25.948334"
+        },
+        {
+          "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "location": {
+            "url": "http://localhost:8080/api/v1/auth/users/?page=1&pageSize=10",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:37:27.033483"
+        },
+        {
+          "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+          "location": {
+            "url": "http://localhost:8080/api/v1/auth/users/?page=1&pageSize=10",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:37:27.393886"
+        },
+        {
+          "text": "[API Error] GET auth/users/ {status: 500, params: Object, data: \n<!doctype html>\n<html lang=\"en\">\n<head>\n  <title>…1>Server Error (500)</h1><p></p>\n</body>\n</html>\n}",
+          "location": {
+            "url": "http://localhost:8080/_next/static/chunks/2ymiqj_497t3a.js",
+            "line": 0,
+            "column": 82363,
+            "lineNumber": 0,
+            "columnNumber": 82363
+          },
+          "timestamp": "2026-09-16T00:37:27.394942"
+        }
+      ],
+      "network_errors": [
+        {
+          "url": "http://localhost:8080/api/v1/auth/users/?page=1&pageSize=10",
+          "method": "GET",
+          "status": 500,
+          "duration_ms": 7,
+          "response_sample": "",
+          "timestamp": "2026-09-16T00:37:25.859594"
+        },
+        {
+          "url": "http://localhost:8080/api/v1/auth/users/?page=1&pageSize=10",
+          "method": "GET",
+          "status": 500,
+          "duration_ms": 78,
+          "response_sample": "",
+          "timestamp": "2026-09-16T00:37:25.944505"
+        },
+        {
+          "url": "http://localhost:8080/api/v1/auth/users/?page=1&pageSize=10",
+          "method": "GET",
+          "status": 500,
+          "duration_ms": 80,
+          "response_sample": "",
+          "timestamp": "2026-09-16T00:37:27.032851"
+        },
+        {
+          "url": "http://localhost:8080/api/v1/auth/users/?page=1&pageSize=10",
+          "method": "GET",
+          "status": 500,
+          "duration_ms": 97,
+          "response_sample": "",
+          "timestamp": "2026-09-16T00:37:27.393886"
+        }
+      ],
+      "slow_requests": [
+        {
+          "url": "http://localhost:8080/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Floading-spinner.3e8xj-71ru3uz.gif&w=128&q=75",
+          "method": "GET",
+          "status": 200,
+          "duration_ms": 3507,
+          "timestamp": "2026-09-16T00:36:09.428055"
+        },
+        {
+          "url": "http://localhost:8080/api/v1/auth/check-creds/",
+          "method": "POST",
+          "status": 200,
+          "duration_ms": 3510,
+          "timestamp": "2026-09-16T00:36:09.429249"
+        }
+      ],
+      "ux_issues": [],
+      "actions_log": [
+        {
+          "action": "Bắt đầu đăng nhập Quản trị viên (Admin)...",
+          "details": "",
+          "time": "2026-09-16T00:36:03.089538"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/admin/login",
+          "details": "",
+          "time": "2026-09-16T00:36:03.089538"
+        },
+        {
+          "action": "Filled input[placeholder*='email' i], input[type='email'], input[name='username'] with text (Admin Email/Username)",
+          "details": "",
+          "time": "2026-09-16T00:36:05.018019"
+        },
+        {
+          "action": "Filled input[type='password'] with text (Admin Password)",
+          "details": "",
+          "time": "2026-09-16T00:36:05.048206"
+        },
+        {
+          "action": "Captured screenshot: 01_admin_login_filled -> admin_01_admin_login_filled_1789493765048.png",
+          "details": "",
+          "time": "2026-09-16T00:36:05.512393"
+        },
+        {
+          "action": "Clicked button[type='submit'], input[type='submit'] (Submit Admin Login)",
+          "details": "",
+          "time": "2026-09-16T00:36:05.921609"
+        },
+        {
+          "action": "Current Admin URL after login: http://localhost:8080/admin/login",
+          "details": "",
+          "time": "2026-09-16T00:36:09.424752"
+        },
+        {
+          "action": "Captured screenshot: 02_admin_dashboard_after_login -> admin_02_admin_dashboard_after_login_1789493769424.png",
+          "details": "",
+          "time": "2026-09-16T00:36:09.784382"
+        },
+        {
+          "action": "Admin chưa chuyển hướng khỏi trang login, kiểm tra quyền hoặc mật khẩu",
+          "details": "",
+          "time": "2026-09-16T00:36:09.784919"
+        },
+        {
+          "action": "Kiểm tra trang Quản lý tin tuyển dụng của Admin...",
+          "details": "",
+          "time": "2026-09-16T00:36:09.784919"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/admin/jobs",
+          "details": "",
+          "time": "2026-09-16T00:36:09.784919"
+        },
+        {
+          "action": "Captured screenshot: 03_admin_jobs_management -> admin_03_admin_jobs_management_1789493774995.png",
+          "details": "",
+          "time": "2026-09-16T00:36:15.323152"
+        },
+        {
+          "action": "Bắt đầu khảo sát mở rộng các trang quản trị hệ thống...",
+          "details": "",
+          "time": "2026-09-16T00:37:24.633352"
+        },
+        {
+          "action": "Admin Deep-dive: Khám phá trang users (http://localhost:8080/admin/users)",
+          "details": "",
+          "time": "2026-09-16T00:37:24.633352"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/admin/users",
+          "details": "",
+          "time": "2026-09-16T00:37:24.633352"
+        },
+        {
+          "action": "Captured screenshot: admin_deepdive_users -> admin_admin_deepdive_users_1789493848834.png",
+          "details": "",
+          "time": "2026-09-16T00:37:28.999632"
+        },
+        {
+          "action": "Admin Deep-dive: Khám phá trang questions (http://localhost:8080/admin/questions)",
+          "details": "",
+          "time": "2026-09-16T00:37:29.499851"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/admin/questions",
+          "details": "",
+          "time": "2026-09-16T00:37:29.499851"
+        },
+        {
+          "action": "Captured screenshot: admin_deepdive_questions -> admin_admin_deepdive_questions_1789493853658.png",
+          "details": "",
+          "time": "2026-09-16T00:37:33.972847"
+        },
+        {
+          "action": "Admin Deep-dive: Khám phá trang question-groups (http://localhost:8080/admin/question-groups)",
+          "details": "",
+          "time": "2026-09-16T00:37:34.473560"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/admin/question-groups",
+          "details": "",
+          "time": "2026-09-16T00:37:34.473560"
+        },
+        {
+          "action": "Captured screenshot: admin_deepdive_question-groups -> admin_admin_deepdive_question-groups_1789493858725.png",
+          "details": "",
+          "time": "2026-09-16T00:37:39.062683"
+        },
+        {
+          "action": "Admin Deep-dive: Khám phá trang voice-profiles (http://localhost:8080/admin/voice-profiles)",
+          "details": "",
+          "time": "2026-09-16T00:37:39.563568"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/admin/voice-profiles",
+          "details": "",
+          "time": "2026-09-16T00:37:39.563568"
+        },
+        {
+          "action": "Captured screenshot: admin_deepdive_voice-profiles -> admin_admin_deepdive_voice-profiles_1789493863729.png",
+          "details": "",
+          "time": "2026-09-16T00:37:43.924423"
+        },
+        {
+          "action": "Admin Deep-dive: Khám phá trang careers (http://localhost:8080/admin/careers)",
+          "details": "",
+          "time": "2026-09-16T00:37:44.424972"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/admin/careers",
+          "details": "",
+          "time": "2026-09-16T00:37:44.424972"
+        },
+        {
+          "action": "Captured screenshot: admin_deepdive_careers -> admin_admin_deepdive_careers_1789493868616.png",
+          "details": "",
+          "time": "2026-09-16T00:37:48.942174"
+        },
+        {
+          "action": "Admin Deep-dive: Khám phá trang cities (http://localhost:8080/admin/cities)",
+          "details": "",
+          "time": "2026-09-16T00:37:49.442936"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/admin/cities",
+          "details": "",
+          "time": "2026-09-16T00:37:49.442936"
+        },
+        {
+          "action": "Captured screenshot: admin_deepdive_cities -> admin_admin_deepdive_cities_1789493873621.png",
+          "details": "",
+          "time": "2026-09-16T00:37:53.867199"
+        },
+        {
+          "action": "Admin Deep-dive: Khám phá trang settings (http://localhost:8080/admin/settings)",
+          "details": "",
+          "time": "2026-09-16T00:37:54.367708"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/admin/settings",
+          "details": "",
+          "time": "2026-09-16T00:37:54.367708"
+        },
+        {
+          "action": "Captured screenshot: admin_deepdive_settings -> admin_admin_deepdive_settings_1789493878513.png",
+          "details": "",
+          "time": "2026-09-16T00:37:58.883487"
+        }
+      ]
+    },
+    "JOB_SEEKER": {
+      "role": "JOB_SEEKER",
+      "total_actions": 53,
+      "console_errors_count": 6,
+      "console_warnings_count": 0,
+      "network_errors_count": 0,
+      "slow_requests_count": 3,
+      "ux_issues_count": 0,
+      "screenshots_count": 16,
+      "console_errors": [
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://a.tile.openstreetmap.org/15/26014/14423.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:36:30.854095"
+        },
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://a.tile.openstreetmap.org/15/26015/14422.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:36:30.855100"
+        },
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://b.tile.openstreetmap.org/15/26015/14423.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:36:30.855100"
+        },
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://b.tile.openstreetmap.org/15/26014/14424.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:36:30.855100"
+        },
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://c.tile.openstreetmap.org/15/26014/14422.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:36:30.855698"
+        },
+        {
+          "text": "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+          "location": {
+            "url": "https://c.tile.openstreetmap.org/15/26015/14424.png",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "timestamp": "2026-09-16T00:36:30.855698"
+        }
+      ],
+      "network_errors": [],
+      "slow_requests": [
+        {
+          "url": "http://localhost:8080/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Floading-spinner.3e8xj-71ru3uz.gif&w=128&q=75",
+          "method": "GET",
+          "status": 200,
+          "duration_ms": 3507,
+          "timestamp": "2026-09-16T00:36:21.605434"
+        },
+        {
+          "url": "http://localhost:8080/api/v1/auth/check-creds/",
+          "method": "POST",
+          "status": 200,
+          "duration_ms": 3511,
+          "timestamp": "2026-09-16T00:36:21.606489"
+        },
+        {
+          "url": "http://localhost:8080/api/v1/info/web/job-seeker-profiles/874/resumes/",
+          "method": "GET",
+          "status": 200,
+          "duration_ms": 2027,
+          "timestamp": "2026-09-16T00:36:37.965539"
+        }
+      ],
+      "ux_issues": [],
+      "actions_log": [
+        {
+          "action": "Bắt đầu đăng nhập Ứng viên (Job Seeker)...",
+          "details": "",
+          "time": "2026-09-16T00:36:15.349856"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/login",
+          "details": "",
+          "time": "2026-09-16T00:36:15.349856"
+        },
+        {
+          "action": "Filled input[placeholder*='email' i], input[type='email'] with text (Candidate Email)",
+          "details": "",
+          "time": "2026-09-16T00:36:17.258962"
+        },
+        {
+          "action": "Filled input[type='password'] with text (Candidate Password)",
+          "details": "",
+          "time": "2026-09-16T00:36:17.288049"
+        },
+        {
+          "action": "Captured screenshot: 01_seeker_login_filled -> job_seeker_01_seeker_login_filled_1789493777288.png",
+          "details": "",
+          "time": "2026-09-16T00:36:17.666523"
+        },
+        {
+          "action": "Clicked button[type='submit'] (Submit Seeker Login)",
+          "details": "",
+          "time": "2026-09-16T00:36:18.101726"
+        },
+        {
+          "action": "Current Candidate URL after login: http://localhost:8080/login",
+          "details": "",
+          "time": "2026-09-16T00:36:21.603776"
+        },
+        {
+          "action": "Captured screenshot: 02_seeker_after_login -> job_seeker_02_seeker_after_login_1789493781603.png",
+          "details": "",
+          "time": "2026-09-16T00:36:22.923973"
+        },
+        {
+          "action": "Ứng viên chưa chuyển hướng khỏi trang login, có thể cần xác thực",
+          "details": "",
+          "time": "2026-09-16T00:36:22.923973"
+        },
+        {
+          "action": "Khám phá trang Tìm việc làm & Bộ lọc...",
+          "details": "",
+          "time": "2026-09-16T00:36:22.923973"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/viec-lam",
+          "details": "",
+          "time": "2026-09-16T00:36:22.923973"
+        },
+        {
+          "action": "Captured screenshot: 03_seeker_jobs_portal -> job_seeker_03_seeker_jobs_portal_1789493788074.png",
+          "details": "",
+          "time": "2026-09-16T00:36:28.857936"
+        },
+        {
+          "action": "Filled input[placeholder*='tìm' i], input[type='search'], input[name='keyword'] with text (Search Keyword)",
+          "details": "",
+          "time": "2026-09-16T00:36:28.980050"
+        },
+        {
+          "action": "Captured screenshot: 04_seeker_jobs_searched -> job_seeker_04_seeker_jobs_searched_1789493788980.png",
+          "details": "",
+          "time": "2026-09-16T00:36:29.637556"
+        },
+        {
+          "action": "Mở chi tiết tin tuyển dụng: /viec-lam/chuyen-vien-ieu-hanh-tour-du-lich-noi-ia-va-quoc-te",
+          "details": "",
+          "time": "2026-09-16T00:36:29.655937"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/viec-lam/chuyen-vien-ieu-hanh-tour-du-lich-noi-ia-va-quoc-te",
+          "details": "",
+          "time": "2026-09-16T00:36:29.655937"
+        },
+        {
+          "action": "Captured screenshot: 05_seeker_job_detail -> job_seeker_05_seeker_job_detail_1789493794843.png",
+          "details": "",
+          "time": "2026-09-16T00:36:35.389618"
+        },
+        {
+          "action": "Tìm thấy nút Ứng tuyển ngay!",
+          "details": "",
+          "time": "2026-09-16T00:36:35.416379"
+        },
+        {
+          "action": "Clicked button:has-text('Ứng tuyển'), button:has-text('Nộp hồ sơ'), button:has-text('Apply') (Click Apply Button)",
+          "details": "",
+          "time": "2026-09-16T00:36:35.962393"
+        },
+        {
+          "action": "Captured screenshot: 06_seeker_apply_modal -> job_seeker_06_seeker_apply_modal_1789493797963.png",
+          "details": "",
+          "time": "2026-09-16T00:36:38.446048"
+        },
+        {
+          "action": "Khám phá phòng Luyện phỏng vấn AI (LiveKit WebRTC)...",
+          "details": "",
+          "time": "2026-09-16T00:36:38.446048"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/practice",
+          "details": "",
+          "time": "2026-09-16T00:36:38.446048"
+        },
+        {
+          "action": "Captured screenshot: 07_ai_interview_entry -> job_seeker_07_ai_interview_entry_1789493803565.png",
+          "details": "",
+          "time": "2026-09-16T00:36:44.164164"
+        },
+        {
+          "action": "Chưa thấy nút bắt đầu trực tiếp, kiểm tra layout phòng phỏng vấn",
+          "details": "",
+          "time": "2026-09-16T00:36:48.169843"
+        },
+        {
+          "action": "Bắt đầu khảo sát mở rộng các trang của Ứng viên...",
+          "details": "",
+          "time": "2026-09-16T00:37:59.383995"
+        },
+        {
+          "action": "JobSeeker Deep-dive: Khám phá cv-builder (http://localhost:8080/cv-builder)",
+          "details": "",
+          "time": "2026-09-16T00:37:59.383995"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/cv-builder",
+          "details": "",
+          "time": "2026-09-16T00:37:59.383995"
+        },
+        {
+          "action": "Captured screenshot: seeker_deepdive_cv-builder -> job_seeker_seeker_deepdive_cv-builder_1789493881094.png",
+          "details": "",
+          "time": "2026-09-16T00:38:01.328749"
+        },
+        {
+          "action": "JobSeeker Deep-dive: Khám phá salary (http://localhost:8080/salary)",
+          "details": "",
+          "time": "2026-09-16T00:38:01.828986"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/salary",
+          "details": "",
+          "time": "2026-09-16T00:38:01.828986"
+        },
+        {
+          "action": "Captured screenshot: seeker_deepdive_salary -> job_seeker_seeker_deepdive_salary_1789493885972.png",
+          "details": "",
+          "time": "2026-09-16T00:38:06.692223"
+        },
+        {
+          "action": "JobSeeker Deep-dive: Khám phá companies (http://localhost:8080/companies)",
+          "details": "",
+          "time": "2026-09-16T00:38:07.192676"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/companies",
+          "details": "",
+          "time": "2026-09-16T00:38:07.192676"
+        },
+        {
+          "action": "Captured screenshot: seeker_deepdive_companies -> job_seeker_seeker_deepdive_companies_1789493891380.png",
+          "details": "",
+          "time": "2026-09-16T00:38:11.792208"
+        },
+        {
+          "action": "JobSeeker Deep-dive: Khám phá my-jobs (http://localhost:8080/my-jobs)",
+          "details": "",
+          "time": "2026-09-16T00:38:12.292923"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/my-jobs",
+          "details": "",
+          "time": "2026-09-16T00:38:12.292923"
+        },
+        {
+          "action": "Captured screenshot: seeker_deepdive_my-jobs -> job_seeker_seeker_deepdive_my-jobs_1789493896460.png",
+          "details": "",
+          "time": "2026-09-16T00:38:16.817982"
+        },
+        {
+          "action": "JobSeeker Deep-dive: Khám phá profile (http://localhost:8080/profile)",
+          "details": "",
+          "time": "2026-09-16T00:38:17.318580"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/profile",
+          "details": "",
+          "time": "2026-09-16T00:38:17.318580"
+        },
+        {
+          "action": "Captured screenshot: seeker_deepdive_profile -> job_seeker_seeker_deepdive_profile_1789493901531.png",
+          "details": "",
+          "time": "2026-09-16T00:38:22.026928"
+        },
+        {
+          "action": "JobSeeker Deep-dive: Khám phá notifications (http://localhost:8080/notifications)",
+          "details": "",
+          "time": "2026-09-16T00:38:22.527606"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/notifications",
+          "details": "",
+          "time": "2026-09-16T00:38:22.527606"
+        },
+        {
+          "action": "Captured screenshot: seeker_deepdive_notifications -> job_seeker_seeker_deepdive_notifications_1789493906730.png",
+          "details": "",
+          "time": "2026-09-16T00:38:27.066450"
+        },
+        {
+          "action": "Kiểm tra giao diện Responsive trên Mobile (390x844)...",
+          "details": "",
+          "time": "2026-09-16T00:38:27.567368"
+        },
+        {
+          "action": "Mobile check: mobile_home (http://localhost:8080/)",
+          "details": "",
+          "time": "2026-09-16T00:38:28.097937"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/",
+          "details": "",
+          "time": "2026-09-16T00:38:28.098078"
+        },
+        {
+          "action": "Captured screenshot: mobile_home -> job_seeker_mobile_home_1789493912297.png",
+          "details": "",
+          "time": "2026-09-16T00:38:32.806551"
+        },
+        {
+          "action": "Mobile check: mobile_jobs (http://localhost:8080/viec-lam)",
+          "details": "",
+          "time": "2026-09-16T00:38:32.814091"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/viec-lam",
+          "details": "",
+          "time": "2026-09-16T00:38:32.814091"
+        },
+        {
+          "action": "Captured screenshot: mobile_jobs -> job_seeker_mobile_jobs_1789493916965.png",
+          "details": "",
+          "time": "2026-09-16T00:38:37.393069"
+        },
+        {
+          "action": "Mobile check: mobile_cv_builder (http://localhost:8080/cv-builder)",
+          "details": "",
+          "time": "2026-09-16T00:38:37.399474"
+        },
+        {
+          "action": "Navigate to http://localhost:8080/cv-builder",
+          "details": "",
+          "time": "2026-09-16T00:38:37.399474"
+        },
+        {
+          "action": "Captured screenshot: mobile_cv_builder -> job_seeker_mobile_cv_builder_1789493919090.png",
+          "details": "",
+          "time": "2026-09-16T00:38:39.196716"
+        }
+      ]
+    }
+  },
+  "end_time": "2026-09-16 00:38:39"
+}
