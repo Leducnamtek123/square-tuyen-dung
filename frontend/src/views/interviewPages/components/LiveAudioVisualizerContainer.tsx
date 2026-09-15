@@ -18,7 +18,7 @@ interface LiveAudioVisualizerContainerProps {
   secondaryColor?: string;
   defaultMode?: VisualizerMode;
   allowModeSwitch?: boolean;
-  role?: 'agent' | 'candidate';
+  role?: 'agent' | 'candidate' | 'employer';
   height?: number | string;
 }
 

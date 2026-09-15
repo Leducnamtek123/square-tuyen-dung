@@ -82,13 +82,13 @@ export const CompetencyOverviewCard: React.FC<CompetencyOverviewCardProps> = ({
 
   return (
     <div
-      className={`rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm md:p-8 ${className}`}
+      className={`rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-4 sm:p-6 md:p-8 shadow-sm ${className}`}
     >
-      <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
+      <div className="grid grid-cols-1 items-center gap-6 sm:gap-8 lg:grid-cols-12">
         {/* Left column: Circular Score Ring & Assessment */}
         <div className="flex flex-col items-center justify-center text-center lg:col-span-5 lg:border-r lg:border-slate-100 lg:pr-8">
           {/* Circular Score Ring */}
-          <div className="relative mb-3 flex h-36 w-36 items-center justify-center">
+          <div className="relative mb-3 flex h-32 w-32 sm:h-36 sm:w-36 items-center justify-center">
             {/* SVG Circle Track & Progress */}
             <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 120 120">
               <circle
@@ -124,7 +124,7 @@ export const CompetencyOverviewCard: React.FC<CompetencyOverviewCardProps> = ({
                 </>
               ) : (
                 <>
-                  <span className="text-4xl font-extrabold tracking-tight text-slate-900 tabular-nums">
+                  <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 tabular-nums">
                     {normalizedScore}
                   </span>
                   <span className="mt-0.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
@@ -144,7 +144,7 @@ export const CompetencyOverviewCard: React.FC<CompetencyOverviewCardProps> = ({
 
           {/* Notice Banner */}
           {(noticeMessage || hasIncompleteQuestions) && (
-            <div className="mt-5 flex w-full items-start gap-2.5 rounded-xl border border-amber-200/90 bg-amber-50/80 p-3 text-left">
+            <div className="mt-4 sm:mt-5 flex w-full items-start gap-2.5 rounded-xl border border-amber-200/90 bg-amber-50/80 p-3 text-left">
               <InfoOutlinedIcon sx={{ fontSize: 18, color: '#d97706', mt: 0.2, flexShrink: 0 }} />
               <p className="text-xs font-medium leading-relaxed text-amber-900">
                 {noticeMessage ||
@@ -155,7 +155,7 @@ export const CompetencyOverviewCard: React.FC<CompetencyOverviewCardProps> = ({
         </div>
 
         {/* Right column: Competency Radar Overview */}
-        <div className="flex flex-col items-center justify-center lg:col-span-7">
+        <div className="flex flex-col items-center justify-center lg:col-span-7 w-full overflow-hidden">
           <div className="mb-2 text-center lg:text-left w-full">
             <h3 className="text-base font-bold text-slate-900 md:text-lg">
               Tổng quan năng lực
@@ -165,10 +165,10 @@ export const CompetencyOverviewCard: React.FC<CompetencyOverviewCardProps> = ({
             </p>
           </div>
 
-          <div className="flex w-full items-center justify-center py-2">
+          <div className="flex w-full max-w-[270px] sm:max-w-[320px] items-center justify-center py-2 px-1">
             <CompetencyRadarChart
               dimensions={radarDimensions}
-              size={300}
+              size={260}
               accentColor="#4f46e5"
             />
           </div>

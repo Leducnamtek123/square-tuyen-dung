@@ -276,24 +276,25 @@ function ActiveInterviewRoom({
 
   return (
     <main className="flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#f8fafc] text-slate-900">
-      <header className="relative z-10 flex shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 py-2.5 backdrop-blur-xl md:px-6 shadow-xs">
-        <div className="flex items-center gap-3">
+      <header className="relative z-10 flex shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/95 px-3 py-2 backdrop-blur-xl md:px-6 md:py-2.5 shadow-xs">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Image
             src={IMAGES.getTextLogo('dark')}
             alt="InfoHR"
             width={90}
             height={28}
-            style={{ height: 24, width: 'auto', objectFit: 'contain' }}
+            style={{ height: 20, width: 'auto', objectFit: 'contain' }}
+            className="sm:h-6 shrink-0"
           />
-          <div className="h-4 w-px bg-slate-200" />
-          <div>
-            <h1 className="text-sm font-bold text-slate-900 md:text-base">{sessionTitle}</h1>
-            <p className="mt-0.5 text-xs font-medium text-slate-500">
+          <div className="h-4 w-px bg-slate-200 shrink-0" />
+          <div className="min-w-0">
+            <h1 className="text-xs sm:text-sm md:text-base font-bold text-slate-900 truncate max-w-[150px] sm:max-w-[280px] md:max-w-none">{sessionTitle}</h1>
+            <p className="mt-0.5 text-[10px] sm:text-xs font-medium text-slate-500 truncate max-w-[150px] sm:max-w-[280px] md:max-w-none">
               {jobLabel ? `${jobLabel} • ` : ''}{candidateLabel}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {formattedSchedule && (
             <span className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600 shadow-2xs">
               <span className="size-1.5 rounded-full bg-slate-400" /> {formattedSchedule}
@@ -309,7 +310,7 @@ function ActiveInterviewRoom({
             </span>
           )}
           <InterviewRecordingBadge />
-          <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700 shadow-xs">
+          <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-emerald-700 shadow-xs">
             {statusText}
           </span>
         </div>
@@ -415,10 +416,9 @@ function InterviewWaitingRoom({
               style={{ height: 26, width: 'auto', objectFit: 'contain' }}
             />
           </div>
-          <div className="hidden h-5 w-px bg-slate-200 sm:block" />
-          <div>
-            <h1 className="text-sm font-bold tracking-tight text-slate-900 md:text-base">{labels.sessionTitle}</h1>
-            <p className="text-xs font-medium text-slate-500">{labels.jobLabel ? `${labels.jobLabel} • ` : ''}{labels.candidateLabel}</p>
+          <div className="min-w-0">
+            <h1 className="text-sm font-bold tracking-tight text-slate-900 md:text-base truncate max-w-[140px] sm:max-w-[280px] md:max-w-none">{labels.sessionTitle}</h1>
+            <p className="text-xs font-medium text-slate-500 truncate max-w-[140px] sm:max-w-[280px] md:max-w-none">{labels.jobLabel ? `${labels.jobLabel} • ` : ''}{labels.candidateLabel}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -458,7 +458,7 @@ function InterviewWaitingRoom({
               session={viewState.session}
             />
           ) : (
-            <div className="relative flex flex-col items-center gap-6 rounded-3xl border border-slate-200/90 bg-white/95 p-8 text-center shadow-[0_25px_50px_-12px_rgba(15,23,42,0.06),0_1px_0_rgba(255,255,255,1)_inset] backdrop-blur-2xl md:p-10">
+            <div className="relative flex flex-col items-center gap-6 rounded-3xl border border-slate-200/90 bg-white/95 p-5 text-center shadow-[0_25px_50px_-12px_rgba(15,23,42,0.06),0_1px_0_rgba(255,255,255,1)_inset] backdrop-blur-2xl sm:p-8 md:p-10">
               <div className="relative flex h-[80px] w-[200px] items-center justify-center">
                 <Image
                   src={IMAGES.getTextLogo('dark')}

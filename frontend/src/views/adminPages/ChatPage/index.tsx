@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import {
@@ -76,9 +76,9 @@ const AdminChatPage = () => {
 
   const columns: ColumnDef<ChatConversation>[] = [
     {
-      header: '#',
+      header: 'STT',
       id: 'index',
-      size: 50,
+      size: 60,
       cell: (info) => info.row.index + 1,
     },
     {

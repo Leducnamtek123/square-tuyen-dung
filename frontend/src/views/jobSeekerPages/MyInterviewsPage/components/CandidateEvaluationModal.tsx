@@ -33,10 +33,13 @@ import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import VideoLibraryOutlinedIcon from '@mui/icons-material/VideoLibraryOutlined';
+import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 
 import type { InterviewSession } from '@/types/models';
 import interviewService from '@/services/interviewService';
 import { transformInterviewSession } from '@/utils/transformers';
+import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 import CompetencyRadarChart, { RadarDimension } from '@/views/interviewPages/components/CompetencyRadarChart';
 
 interface CandidateEvaluationModalProps {
@@ -120,6 +123,10 @@ export const CandidateEvaluationModal: React.FC<CandidateEvaluationModalProps> =
     currentSession.sessionType === 'mock' ||
     (currentSession as any).type === 'practice' ||
     (!currentSession.jobPost && !currentSession.companyName);
+
+  const isCompleted = currentSession.status === 'completed';
+  const rawRecordingUrl = currentSession.recordingUrl || currentSession.recording_url;
+  const safeRecordingUrl = getSafeResourceUrl(rawRecordingUrl);
 
   const hasScores = numOverallScore != null || technicalScore != null || communicationScore != null;
   const isZeroDataSession =
@@ -291,6 +298,50 @@ export const CandidateEvaluationModal: React.FC<CandidateEvaluationModalProps> =
               {currentSession.aiSummary ||
                 'Buổi phỏng vấn này chưa ghi nhận được tín hiệu giọng nói hoặc đã kết thúc trước khi hoàn tất câu hỏi. Bạn có thể bấm "Luyện tập lại" để bắt đầu một buổi phỏng vấn mới đầy đủ hơn.'}
             </Typography>
+            {safeRecordingUrl && (
+              <Box sx={{ maxWidth: 520, mx: 'auto', mb: 3 }}>
+                <Box
+                  sx={{
+                    width: '100%',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    bgcolor: '#000000',
+                    aspectRatio: '16/9',
+                    border: '1px solid #e2e8f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mb: 1.5,
+                  }}
+                >
+                  <Box
+                    component="video"
+                    src={safeRecordingUrl}
+                    controls
+                    preload="metadata"
+                    sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
+                </Box>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  href={safeRecordingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  startIcon={<OpenInNewRoundedIcon sx={{ fontSize: 16 }} />}
+                  sx={{
+                    borderRadius: '8px',
+                    borderColor: '#cbd5e1',
+                    color: '#334155',
+                    fontWeight: 700,
+                    textTransform: 'none',
+                    fontSize: '0.8125rem',
+                  }}
+                >
+                  Mở bản ghi video
+                </Button>
+              </Box>
+            )}
             {isMock && (
               <Button
                 component={Link}
@@ -563,6 +614,108 @@ export const CandidateEvaluationModal: React.FC<CandidateEvaluationModalProps> =
                 )}
               </Box>
             )}
+
+            {/* Video Recording Section (Mock & Official) */}
+            {safeRecordingUrl ? (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2.5,
+                  borderRadius: '16px',
+                  bgcolor: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  boxShadow: '0 2px 10px rgba(15, 23, 42, 0.03)',
+                }}
+              >
+                <Stack spacing={2}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: 1.5,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <VideoLibraryOutlinedIcon sx={{ color: '#2563eb', fontSize: 20 }} />
+                      <Box>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
+                          {isMock ? 'Bản ghi video luyện tập AI' : 'Bản ghi video phỏng vấn'}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#64748b' }}>
+                          Xem lại toàn bộ buổi trao đổi để rút kinh nghiệm về phong thái và cách truyền đạt
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      href={safeRecordingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      startIcon={<OpenInNewRoundedIcon sx={{ fontSize: 16 }} />}
+                      sx={{
+                        borderRadius: '8px',
+                        borderColor: '#cbd5e1',
+                        color: '#334155',
+                        fontWeight: 700,
+                        textTransform: 'none',
+                        fontSize: '0.8125rem',
+                        '&:hover': { bgcolor: '#f1f5f9', borderColor: '#94a3b8' },
+                      }}
+                    >
+                      Mở bản ghi
+                    </Button>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      width: '100%',
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      bgcolor: '#000000',
+                      aspectRatio: '16/9',
+                      border: '1px solid #e2e8f0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Box
+                      component="video"
+                      src={safeRecordingUrl}
+                      controls
+                      preload="metadata"
+                      sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
+                  </Box>
+                </Stack>
+              </Paper>
+            ) : isCompleted ? (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  borderRadius: '16px',
+                  bgcolor: '#eff6ff',
+                  border: '1px solid #bfdbfe',
+                  textAlign: 'center',
+                }}
+              >
+                <Stack spacing={0.5} alignItems="center">
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#1d4ed8' }}>
+                    <VideoLibraryOutlinedIcon sx={{ fontSize: 18 }} />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, fontSize: '0.875rem' }}>
+                      Video ghi hình đang được hệ thống đồng bộ
+                    </Typography>
+                  </Box>
+                  <Typography variant="caption" sx={{ color: '#64748b', maxWidth: 480 }}>
+                    Hệ thống đang trích xuất và tải bản ghi video lên máy chủ an toàn. Video sẽ hiển thị tại đây sau khi xử lý hoàn tất.
+                  </Typography>
+                </Stack>
+              </Paper>
+            ) : null}
 
             {/* Question Performance List */}
             {questionPerformance.length > 0 && (

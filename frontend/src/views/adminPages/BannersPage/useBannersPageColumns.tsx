@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Chip, IconButton, Stack, Typography } from '@mui/material';
@@ -22,8 +22,9 @@ export const useBannersPageColumns = ({ typeOptions, onEdit, onDelete }: UseBann
     () => [
       {
         accessorKey: 'id',
-        header: t('pages.banners.table.id') as string,
-        enableSorting: true,
+        header: 'STT',
+        cell: (info) => info.row.index + 1,
+        size: 60,
       },
       {
         accessorKey: 'imageUrl',

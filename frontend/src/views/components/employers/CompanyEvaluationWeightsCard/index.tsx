@@ -9,8 +9,6 @@ import {
   Slider,
   Button,
   Stack,
-  Alert,
-  Snackbar,
   CircularProgress,
   Chip,
   Grid2 as Grid,
@@ -25,6 +23,7 @@ import EngineeringIcon from '@mui/icons-material/Engineering';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import httpRequest from '@/utils/httpRequest';
+import toastMessages from '@/utils/toastMessages';
 
 interface EvaluationWeights {
   technical: number;
@@ -84,8 +83,6 @@ export const CompanyEvaluationWeightsCard: React.FC = () => {
   const [weights, setWeights] = useState<EvaluationWeights>(DEFAULT_WEIGHTS);
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [toastSeverity, setToastSeverity] = useState<'success' | 'error'>('success');
 
   const totalWeight =
     weights.technical +
@@ -134,8 +131,7 @@ export const CompanyEvaluationWeightsCard: React.FC = () => {
 
   const handleSave = async () => {
     if (!isValidTotal) {
-      setToastSeverity('error');
-      setToastMessage('Tổng các trọng số phải bằng đúng 100%.');
+      toastMessages.error('Tổng các trọng số phải bằng đúng 100%.');
       return;
     }
 
@@ -144,11 +140,9 @@ export const CompanyEvaluationWeightsCard: React.FC = () => {
       await httpRequest.put('info/web/private-companies/evaluation-weights/', {
         evaluationWeights: weights,
       });
-      setToastSeverity('success');
-      setToastMessage('Đã lưu thành công cấu hình trọng số văn hóa tuyển dụng!');
+      toastMessages.success('Đã lưu thành công cấu hình trọng số văn hóa tuyển dụng!');
     } catch (err: any) {
-      setToastSeverity('error');
-      setToastMessage(err?.response?.data?.error?.details?.detail || 'Có lỗi xảy ra khi lưu cấu hình.');
+      toastMessages.error(err?.response?.data?.error?.details?.detail || 'Có lỗi xảy ra khi lưu cấu hình.');
     } finally {
       setSaving(false);
     }
@@ -378,22 +372,6 @@ export const CompanyEvaluationWeightsCard: React.FC = () => {
           {saving ? 'Đang lưu cấu hình...' : 'Lưu cấu hình trọng số'}
         </Button>
       </Stack>
-
-      {/* Notification Toast */}
-      <Snackbar
-        open={Boolean(toastMessage)}
-        autoHideDuration={4000}
-        onClose={() => setToastMessage(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          severity={toastSeverity}
-          onClose={() => setToastMessage(null)}
-          sx={{ width: '100%', borderRadius: 2 }}
-        >
-          {toastMessage}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };

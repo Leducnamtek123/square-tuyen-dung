@@ -399,7 +399,9 @@
       "ai": "AILA",
       "you": "BẠN",
       "employer": "NTD",
-      "live": "TRỰC TIẾP"
+      "live": "TRỰC TIẾP",
+      "screenSharing": "ĐANG CHIA SẺ MÀN HÌNH",
+      "yourScreenSharing": "MÀN HÌNH CỦA BẠN ĐANG CHIA SẺ"
     },
     "chat": {
       "title": "Hội thoại",

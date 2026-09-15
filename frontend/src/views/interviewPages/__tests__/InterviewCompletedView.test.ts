@@ -1,4 +1,4 @@
-﻿import { readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join } from 'path';
 
 describe('InterviewCompletedView & Shadcn Component Integration', () => {
@@ -36,9 +36,9 @@ describe('InterviewCompletedView & Shadcn Component Integration', () => {
     expect(content).toContain('variant="outline"');
     expect(content).toContain('<span>Chia sẻ kết quả</span>');
     // Bottom bar buttons
-    expect(content).toContain('<span>{isMock ? \'Lịch phỏng vấn\' : \'Về lịch phỏng vấn\'}</span>');
-    expect(content).toContain('<span>{isMock ? \'Luyện tập phiên mới\' : \'Luyện phỏng vấn AI\'}</span>');
-    expect(content).toContain('<span>{isMock ? \'Luyện lại phiên này\' : \'Luyện tập lại\'}</span>');
+    expect(content).toContain("<span>{isMock ? 'Lịch phỏng vấn' : 'Về lịch'}</span>");
+    expect(content).toContain("<span>{isMock ? 'Luyện phiên mới' : 'Luyện AI'}</span>");
+    expect(content).toContain("<span>{isMock ? 'Luyện lại' : 'Luyện tập lại'}</span>");
   });
 
   it('verifies that shadcn Button supports asChild with Slot from @radix-ui/react-slot', () => {

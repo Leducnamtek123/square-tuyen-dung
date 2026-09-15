@@ -434,9 +434,10 @@ const CareersPage = () => {
 
   const columns: ColumnDef<Career>[] = [
     {
-      accessorKey: 'id',
-      header: 'ID',
-      enableSorting: true,
+      id: 'index',
+      header: 'STT',
+      cell: (info) => info.row.index + 1,
+      size: 60,
     },
     {
       id: 'icon',

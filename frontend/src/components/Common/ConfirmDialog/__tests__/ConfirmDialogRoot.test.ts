@@ -28,4 +28,15 @@ describe('ConfirmDialogRoot formatting and design-taste tests', () => {
     expect(rootSource).toContain('bg-blue-600 hover:bg-blue-700');
     expect(rootSource).toContain('bg-red-600 hover:bg-red-700');
   });
+
+  it('ensures alert-dialog opens as a clean centered popup without sliding from the top-left corner', () => {
+    const alertDialogSource = readFileSync(join(__dirname, '../../../ui/alert-dialog.tsx'), 'utf8');
+    expect(alertDialogSource).toContain('fixed inset-0 m-auto');
+    expect(alertDialogSource).toContain('zoom-in-95');
+    expect(alertDialogSource).not.toContain('slide-in-from-left');
+    expect(alertDialogSource).not.toContain('slide-in-from-top');
+    expect(alertDialogSource).not.toContain('slide-out-to-left');
+    expect(alertDialogSource).not.toContain('slide-out-to-top');
+  });
 });
+

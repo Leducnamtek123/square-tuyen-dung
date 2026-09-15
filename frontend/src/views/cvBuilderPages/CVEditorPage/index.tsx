@@ -610,7 +610,7 @@ export const CVEditorPage: React.FC = () => {
 
           <Box sx={{ display: { xs: 'none', sm: 'block' }, width: '1px', height: 24, bgcolor: '#e2e8f0' }} />
 
-          <Box sx={{ maxWidth: { xs: 180, sm: 280, md: 380 } }}>
+          <Box sx={{ maxWidth: { xs: 110, sm: 280, md: 380 }, minWidth: 0, overflow: 'hidden' }}>
             <Typography component="h1" sx={{ position: 'absolute', width: '1px', height: '1px', p: 0, m: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>
               {cvData.title || 'Tạo CV Trực Tuyến & Studio Thiết Kế CV'}
             </Typography>
@@ -674,18 +674,20 @@ export const CVEditorPage: React.FC = () => {
         </Stack>
 
         {/* Center: Mobile Toggle Tabs (Editor / Preview) */}
-        <Stack direction="row" spacing={0.5} sx={{ display: { xs: 'flex', md: 'none' }, bgcolor: '#f1f5f9', p: 0.5, borderRadius: '10px' }}>
+        <Stack direction="row" spacing={0.5} sx={{ display: { xs: 'flex', md: 'none' }, bgcolor: '#f1f5f9', p: 0.5, borderRadius: '10px', flexShrink: 0 }}>
           <Button
             size="small"
             variant={mobileView === 'editor' ? 'contained' : 'text'}
             onClick={() => setMobileView('editor')}
             sx={{
               py: 0.5,
-              px: 1.5,
-              fontSize: '0.75rem',
+              px: { xs: 1, sm: 1.5 },
+              fontSize: '0.72rem',
               fontWeight: 700,
               textTransform: 'none',
               borderRadius: '8px',
+              whiteSpace: 'nowrap',
+              minWidth: 'auto',
               ...(mobileView === 'editor' ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' } : { color: '#64748b' }),
             }}
           >
@@ -697,11 +699,13 @@ export const CVEditorPage: React.FC = () => {
             onClick={() => setMobileView('preview')}
             sx={{
               py: 0.5,
-              px: 1.5,
-              fontSize: '0.75rem',
+              px: { xs: 1, sm: 1.5 },
+              fontSize: '0.72rem',
               fontWeight: 700,
               textTransform: 'none',
               borderRadius: '8px',
+              whiteSpace: 'nowrap',
+              minWidth: 'auto',
               ...(mobileView === 'preview' ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' } : { color: '#64748b' }),
             }}
           >
@@ -711,7 +715,9 @@ export const CVEditorPage: React.FC = () => {
 
         {/* Right: Actions (Share, Word, JSON, Save, PDF) */}
         <Stack direction="row" spacing={1} alignItems="center">
-          <ProductTourTrigger tourKey="cv_builder" variant="chip" label="Hướng dẫn tạo CV" />
+          <Box sx={{ display: { xs: 'none', md: 'inline-flex' } }}>
+            <ProductTourTrigger tourKey="cv_builder" variant="chip" label="Hướng dẫn tạo CV" />
+          </Box>
 
           {cvSlug && (
             <Button
@@ -817,13 +823,20 @@ export const CVEditorPage: React.FC = () => {
               fontSize: '0.8rem',
               borderRadius: '10px',
               textTransform: 'none',
-              px: 2.5,
+              px: { xs: 1.25, sm: 2.5 },
               py: 0.85,
+              whiteSpace: 'nowrap',
+              minWidth: 'auto',
               boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
               '&:hover': { bgcolor: '#1d4ed8' },
             }}
           >
-            {t('cvBuilder.actions.downloadPdf', 'Tải PDF A4')}
+            <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+              {t('cvBuilder.actions.downloadPdf', 'Tải PDF A4')}
+            </Box>
+            <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
+              PDF
+            </Box>
           </Button>
         </Stack>
       </Paper>

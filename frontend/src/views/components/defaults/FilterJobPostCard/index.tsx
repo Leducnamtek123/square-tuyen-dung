@@ -27,7 +27,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import { faBolt } from '@fortawesome/free-solid-svg-icons';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
@@ -348,7 +348,15 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
     placeholderData: keepPreviousData,
   });
 
-  const jobPosts = data?.results || [];
+  const rawJobPosts = data?.results || [];
+  // For compact/similar jobs card, filter out expired jobs so candidates don't get dead suggestions
+  const jobPosts = React.useMemo(() => {
+    if (!compact) return rawJobPosts;
+    return rawJobPosts.filter((job) => {
+      if (!job.deadline) return true;
+      return dayjs(job.deadline).diff(dayjs(), 'day') >= 0;
+    });
+  }, [rawJobPosts, compact]);
   const totalCount = data?.count || jobPosts.length || 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const isFallbackActive = Boolean(data?.isFallback);
@@ -358,10 +366,10 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
     if (min && max) {
       const minTr = Math.round(min / 1000000);
       const maxTr = Math.round(max / 1000000);
-      return `${minTr} - ${maxTr} triệu`;
+      return `${minTr} - ${maxTr} triệu VNĐ`;
     }
-    if (min) return `Từ ${Math.round(min / 1000000)} triệu`;
-    if (max) return `Đến ${Math.round(max / 1000000)} triệu`;
+    if (min) return `Từ ${Math.round(min / 1000000)} triệu VNĐ`;
+    if (max) return `Đến ${Math.round(max / 1000000)} triệu VNĐ`;
     return 'Thoả thuận';
   };
 
@@ -736,7 +744,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                           {companyNameStr}
                         </Typography>
                         <Stack direction="row" spacing={0.5} alignItems="center">
-                          <AttachMoneyIcon sx={{ fontSize: 16, color: '#2563eb' }} />
+                          <PaymentsOutlinedIcon sx={{ fontSize: 16, color: '#2563eb' }} />
                           <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: '#2563eb', fontFamily: 'var(--font-mono)', letterSpacing: '-0.01em' }}>
                             {salaryDisplay}
                           </Typography>

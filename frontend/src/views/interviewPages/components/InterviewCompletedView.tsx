@@ -24,10 +24,13 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import PictureAsPdfOutlinedIcon from '@mui/icons-material/PictureAsPdfOutlined';
+import VideoLibraryOutlinedIcon from '@mui/icons-material/VideoLibraryOutlined';
+import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import { AilaLogo } from '@/components/Common/AilaLogo';
 
 import { IMAGES } from '@/configs/images';
 import type { InterviewSession } from '@/types/models';
+import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 import CompetencyOverviewCard from './CompetencyOverviewCard';
 import InterviewQuestionReviewSection, { QuestionReviewItem } from './InterviewQuestionReviewSection';
 import type { RadarDimension } from './CompetencyRadarChart';
@@ -56,6 +59,9 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
     session?.sessionType === 'mock' ||
     (session as any)?.type === 'practice' ||
     (!session?.jobPost && !session?.companyName);
+
+  const rawRecordingUrl = session?.recordingUrl || session?.recording_url;
+  const safeRecordingUrl = getSafeResourceUrl(rawRecordingUrl);
 
   // 1. Calculate Scores normalized to 0 - 100 scale
   const isEvaluating = Boolean(
@@ -200,8 +206,8 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
         </div>
       </header>
 
-      {/* --- Main Content Container ---------------------------------------- */}
-      <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 md:py-8 space-y-6">
+      {/* --- Main Content Container with bottom padding for fixed footer --- */}
+      <div className="mx-auto w-full max-w-5xl px-3 sm:px-6 py-4 sm:py-8 space-y-6 pb-28 pb-[max(6rem,env(safe-area-inset-bottom)+4rem)]">
         {/* Processing State Banner */}
         {isProcessing && (
           <div className="flex items-center justify-center gap-3 rounded-2xl border border-blue-200 bg-blue-50/90 p-4 text-blue-900 shadow-xs">
@@ -331,6 +337,54 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
           </div>
         )}
 
+        {/* --- Video Recording Section (Mock & Official) ------------------ */}
+        {safeRecordingUrl ? (
+          <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-2xs space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                  <VideoLibraryOutlinedIcon sx={{ fontSize: 18 }} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">
+                    {isMock ? 'Bản ghi video luyện tập AI' : 'Bản ghi video phỏng vấn'}
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Xem lại toàn bộ buổi trao đổi để rút kinh nghiệm về phong thái và cách truyền đạt
+                  </p>
+                </div>
+              </div>
+              <a
+                href={safeRecordingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-all shadow-2xs"
+              >
+                <OpenInNewRoundedIcon sx={{ fontSize: 14 }} />
+                <span>Mở bản ghi</span>
+              </a>
+            </div>
+            <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black border border-slate-200 flex items-center justify-center">
+              <video
+                src={safeRecordingUrl}
+                controls
+                preload="metadata"
+                className="h-full w-full object-contain"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-blue-200/80 bg-blue-50/60 p-4 text-center">
+            <div className="flex items-center justify-center gap-2 text-xs font-bold text-blue-800">
+              <VideoLibraryOutlinedIcon sx={{ fontSize: 16 }} />
+              <span>Video ghi hình đang được hệ thống đồng bộ</span>
+            </div>
+            <p className="mt-1 text-[11px] text-slate-600">
+              Hệ thống đang trích xuất và tải bản ghi video lên máy chủ an toàn. Video sẽ hiển thị tại đây sau khi xử lý hoàn tất.
+            </p>
+          </div>
+        )}
+
         {/* --- 3. Two-Column Question Review Drilldown ---------------------- */}
         <InterviewQuestionReviewSection
           questions={reviewQuestions}
@@ -338,19 +392,19 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
         />
       </div>
 
-      {/* --- Sticky Bottom Action Bar --------------------------------------- */}
-      <footer className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-center border-t border-slate-200/90 bg-white/95 px-4 py-3 backdrop-blur-lg shadow-lg">
-        <div className="flex w-full max-w-5xl items-center justify-center gap-3 sm:justify-end">
+      {/* --- Sticky Bottom Action Bar with Mobile Safe Area Support --- */}
+      <footer className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-center border-t border-slate-200/90 bg-white/95 px-2.5 sm:px-4 py-2.5 sm:py-3 backdrop-blur-lg shadow-lg pb-[max(0.6rem,env(safe-area-inset-bottom))]">
+        <div className="flex w-full max-w-5xl items-center justify-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
           {/* Back to list */}
           <Button
             variant="outline"
             size="sm"
             asChild
-            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/90 px-4 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-all h-9"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/90 px-3 sm:px-4 text-[11px] sm:text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-all h-9"
           >
             <Link href={myInterviewsPath}>
               <ArrowBackIcon sx={{ fontSize: 14 }} />
-              <span>{isMock ? 'Lịch phỏng vấn' : 'Về lịch phỏng vấn'}</span>
+              <span>{isMock ? 'Lịch phỏng vấn' : 'Về lịch'}</span>
             </Link>
           </Button>
 
@@ -359,11 +413,11 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
             variant="outline"
             size="sm"
             asChild
-            className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50/90 px-4 text-xs font-semibold text-blue-700 shadow-2xs hover:bg-blue-100 transition-all h-9"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50/90 px-3 sm:px-4 text-[11px] sm:text-xs font-semibold text-blue-700 shadow-2xs hover:bg-blue-100 transition-all h-9"
           >
             <Link href={practicePath}>
               <PlayArrowRoundedIcon sx={{ fontSize: 16 }} />
-              <span>{isMock ? 'Luyện tập phiên mới' : 'Luyện phỏng vấn AI'}</span>
+              <span>{isMock ? 'Luyện phiên mới' : 'Luyện AI'}</span>
             </Link>
           </Button>
 
@@ -372,10 +426,10 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
             variant="default"
             size="sm"
             onClick={handleRetryAll}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 text-xs font-semibold text-white shadow-xs hover:bg-blue-700 transition-all h-9 active:scale-98"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-3 sm:px-4 text-[11px] sm:text-xs font-semibold text-white shadow-xs hover:bg-blue-700 transition-all h-9 active:scale-98"
           >
             <ReplayRoundedIcon sx={{ fontSize: 16 }} />
-            <span>{isMock ? 'Luyện lại phiên này' : 'Luyện tập lại'}</span>
+            <span>{isMock ? 'Luyện lại' : 'Luyện tập lại'}</span>
           </Button>
         </div>
       </footer>

@@ -128,10 +128,14 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
         onScheduled();
       }
     } catch (err: any) {
-      console.error('Failed to schedule interview:', err);
+      const resData = err?.response?.data;
       const detail =
-        err?.response?.data?.errors?.detail?.[0] ||
-        err?.response?.data?.message ||
+        resData?.error?.details?.scheduled_at?.[0] ||
+        resData?.error?.details?.detail?.[0] ||
+        resData?.errors?.scheduled_at?.[0] ||
+        resData?.errors?.detail?.[0] ||
+        resData?.error?.message ||
+        resData?.message ||
         'Không thể tạo lịch phỏng vấn. Vui lòng thử lại sau.';
       setErrorMessage(detail);
       toastMessages.error(detail);

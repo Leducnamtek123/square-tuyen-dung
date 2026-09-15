@@ -1692,7 +1692,7 @@
         "deleteError": "Could not delete banner type"
       },
       "table": {
-        "id": "ID",
+        "id": "No.",
         "code": "Code",
         "name": "Name",
         "value": "Value",

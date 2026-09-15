@@ -123,23 +123,10 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
               <CalendarMonthOutlinedIcon fontSize="medium" />
             </Box>
             <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="h5" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '1.25rem' }}>
-                  Chấm công & Ca làm việc
-                </Typography>
-                <Chip
-                  label="Chuẩn MISA AMIS"
-                  size="small"
-                  sx={{
-                    height: 20,
-                    fontSize: '0.6875rem',
-                    fontWeight: 600,
-                    backgroundColor: '#E0F2FE',
-                    color: '#0369A1',
-                  }}
-                />
-              </Box>
-              <Typography variant="body2" sx={{ color: '#64748B', fontSize: '0.8125rem' }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '1.25rem' }}>
+                Chấm công & Ca làm việc
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#64748B', fontSize: '0.8125rem', mt: 0.5 }}>
                 Tổng quan dữ liệu chấm công, quản lý ca, bảng tổng hợp tháng và phê duyệt đơn từ 2 cấp
               </Typography>
             </Box>
@@ -147,7 +134,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
         </Box>
       </Box>
 
-      {/* MISA AMIS Styled Persistent Sub-Navbar */}
+      {/* Persistent Sub-Navbar */}
       <Paper
         elevation={0}
         sx={{

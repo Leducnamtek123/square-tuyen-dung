@@ -18,6 +18,8 @@ import CompanyDeleteDialog from './CompanyDeleteDialog';
 import { createEmptyCompanyFormData, type CompanyFormData } from './types';
 import FilterBar from '@/components/Common/FilterBar';
 import AdminDetailDrawer from '@/components/Common/AdminDetailDrawer';
+import TechnicalDetails from '@/components/Common/TechnicalDetails';
+import dayjs from 'dayjs';
 import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 import { ROUTES } from '@/configs/routeConfig';
 import { localizeRoutePath } from '@/configs/routeLocalization';
@@ -343,7 +345,7 @@ const CompaniesPage = () => {
         open={Boolean(inspectingCompany)}
         onClose={() => setInspectingCompany(null)}
         title={inspectingCompany?.companyName || 'Hồ sơ doanh nghiệp'}
-        subtitle={`Mã doanh nghiệp: #${inspectingCompany?.id}`}
+        subtitle={inspectingCompany?.taxCode ? `MST: ${inspectingCompany.taxCode}` : (inspectingCompany?.fieldOperation || undefined)}
         footerAction={
           inspectingCompany && (
             <Stack direction="row" spacing={1}>
@@ -430,6 +432,13 @@ const CompaniesPage = () => {
                 </Stack>
               </Box>
             </Box>
+
+            <TechnicalDetails
+              data={{
+                'ID Doanh nghiệp': inspectingCompany.id,
+                'Ngày tạo': inspectingCompany.createAt,
+              }}
+            />
           </Stack>
         )}
       </AdminDetailDrawer>

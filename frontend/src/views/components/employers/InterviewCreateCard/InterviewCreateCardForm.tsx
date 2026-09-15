@@ -76,7 +76,7 @@ const InterviewCreateCardForm = ({
   onTestMockInterview,
 }: Props) => {
   const getCandidateUserId = React.useCallback((candidate: JobPostActivity) => {
-    return candidate.userId ?? candidate.userDict?.id ?? null;
+    return candidate.userId ?? candidate.userDict?.id ?? candidate.id ?? null;
   }, []);
 
   const getCandidateLabel = React.useCallback((candidate: JobPostActivity) => {
@@ -187,12 +187,15 @@ const InterviewCreateCardForm = ({
                 control={control}
                 rules={{ required: t('interview:interviewCreateCard.validation.selectJobPost') }}
                 render={({ field }) => {
-                  const jobValueHasOption = jobs.some((job) => String(job.id) === String(field.value));
+                  const matchedJob = jobs.find((job) => String(job.id) === String(field.value));
+                  const jobValueHasOption = Boolean(matchedJob);
+                  const normalizedValue = matchedJob ? matchedJob.id : field.value;
                   const shouldRenderSelectedJobFallback = hasSelectValue(field.value) && !jobValueHasOption;
 
                   return (
                     <TextField
                       {...field}
+                      value={normalizedValue}
                       onChange={(e) => onJobPostChange(e.target.value)}
                       select
                       fullWidth
@@ -229,15 +232,25 @@ const InterviewCreateCardForm = ({
                 control={control}
                 rules={{ required: t('interview:interviewCreateCard.validation.selectCandidate') }}
                 render={({ field }) => {
-                  const candidateValueHasOption = candidates.some((candidate) => {
+                  const matchedCandidate = candidates.find((candidate) => {
                     const candidateUserId = getCandidateUserId(candidate);
-                    return candidateUserId != null && String(candidateUserId) === String(field.value);
+                    return (
+                      (candidateUserId != null && String(candidateUserId) === String(field.value)) ||
+                      String(candidate.id) === String(field.value)
+                    );
                   });
-                  const shouldRenderSelectedCandidateFallback = hasSelectValue(field.value) && !candidateValueHasOption;
+                  const candidateValueHasOption = Boolean(matchedCandidate);
+                  const normalizedCandidateValue = matchedCandidate
+                    ? (getCandidateUserId(matchedCandidate) ?? field.value)
+                    : field.value;
+                  const shouldRenderSelectedCandidateFallback =
+                    hasSelectValue(field.value) && !candidateValueHasOption;
 
                   return (
                     <TextField
                       {...field}
+                      value={normalizedCandidateValue}
+                      onChange={(e) => field.onChange(e.target.value)}
                       select
                       fullWidth
                       label={t('interview:interviewCreateCard.label.selectcandidate')}

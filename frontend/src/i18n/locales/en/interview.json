@@ -399,7 +399,9 @@
       "ai": "AILA",
       "you": "YOU",
       "employer": "HR",
-      "live": "LIVE"
+      "live": "LIVE",
+      "screenSharing": "SCREEN SHARING",
+      "yourScreenSharing": "YOUR SCREEN IS SHARING"
     },
     "chat": {
       "title": "Conversation",

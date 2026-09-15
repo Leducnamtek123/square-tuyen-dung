@@ -908,7 +908,7 @@
     "findCandidates": "Tìm kiếm ứng viên",
     "onlineInterviews": "Phỏng vấn trực tuyến",
     "interviewList": "Lịch phỏng vấn",
-    "interviewLive": "Phỏng vấn trực tiếp",
+    "interviewLive": "Phỏng vấn Live",
     "interviewHistory": "Thư viện Video",
     "questionBank": "Ngân hàng câu hỏi",
     "questionSets": "Bộ câu hỏi",
@@ -962,13 +962,16 @@
       "scheduledLabel": "Đã lên lịch",
       "completedLabel": "Đã hoàn thành"
     },
-    "subtitle": "Chỉ hiển thị các phiên đang live và preview realtime của ứng viên.",
+    "subtitle": "Giám sát tín hiệu và đồng hành cùng các phiên phỏng vấn đang diễn ra theo thời gian thực.",
     "autoRefresh": {
       "on": "Tự động làm mới: Bật",
       "off": "Tự động làm mới: Tắt"
     },
     "updating": "Đang cập nhật...",
     "activeNow": "Đang hoạt động",
+    "searchPlaceholder": "Tìm theo tên ứng viên, vị trí...",
+    "noSearchMatch": "Không tìm thấy phiên phỏng vấn phù hợp",
+    "noSearchMatchHint": "Thử tìm kiếm với từ khóa khác hoặc xóa bộ lọc",
     "noData": {
       "title": "Chưa có phiên live nào",
       "subtitle": "Khi ứng viên bật camera hoặc mic, card realtime sẽ xuất hiện ở đây."
@@ -1006,7 +1009,7 @@
       "screenShare": "Chia sẻ màn hình",
       "liveAudioNoVideo": "Âm thanh trực tiếp - Không có video",
       "waitingForMediaTracks": "Đang chờ luồng âm thanh/video...",
-      "waitingSignal": "Đang chờ tín hiệu",
+      "waitingSignal": "Đang chờ tín hiệu...",
       "waitingSignalHint": "Khi ứng viên bật camera hoặc mic, preview sẽ hiện ở đây",
       "tokenError": "Không thể lấy token quan sát.",
       "unknownCandidate": "Ứng viên không xác định",
@@ -1021,16 +1024,16 @@
       "time": "Thời gian",
       "endSession": "Kết thúc phiên",
       "noConnectionDetails": "Chưa có connection details để mở fullscreen.",
-      "joinPresence": "Tham gia hiện diện",
+      "joinPresence": "Tham gia phòng",
       "joinPresenceLoading": "Đang kết nối...",
       "joinPresenceTooltip": "Vào phòng với tư cách Nhà tuyển dụng - ứng viên sẽ thấy bạn",
-      "presenceTitle": "Tham gia hiện diện",
+      "presenceTitle": "Tham gia phòng",
       "presenceSubtitle": "Bạn đang tham gia với tư cách Nhà tuyển dụng. Ứng viên có thể thấy sự hiện diện của bạn.",
       "presenceExit": "Rời phòng"
     }
   },
   "verification": {
-    "title": "Xác thực Nhà tuyển dụng",
+    "title": "Xác thực doanh nghiệp",
     "step1": {
       "title": "Bước 1: Cập nhật Hồ sơ công ty",
       "description": "Hoàn thiện thông tin công ty trước khi gửi tài liệu xác thực. Admin sẽ xem xét nội dung này trước khi cấp quyền đăng tin.",
@@ -1051,10 +1054,10 @@
       "statusPending": "Trạng thái: Chờ phê duyệt"
     },
     "status": {
-      "pending": "Chờ duyệt",
-      "reviewing": "Đang xem xét",
-      "approved": "Đã duyệt",
-      "rejected": "Từ chối"
+      "pending": "Chưa hoàn tất",
+      "reviewing": "Đang chờ duyệt",
+      "approved": "Đã xác minh",
+      "rejected": "Cần bổ sung"
     },
     "messages": {
       "infoRecorded": "Thông tin đã được ghi lại.",
@@ -1063,8 +1066,8 @@
       "saveFailed": "Không thể lưu hồ sơ xác thực. Vui lòng thử lại."
     },
     "summary": {
-      "companyProfile": "Hồ sơ công ty",
-      "legalProfile": "Hồ sơ pháp lý",
+      "companyProfile": "Thông tin doanh nghiệp",
+      "legalProfile": "Tài liệu pháp lý",
       "progress": "Mức độ hoàn thiện",
       "canPost": "Công ty đã được xác thực và có thể đăng tin tuyển dụng.",
       "cannotPost": "Vui lòng hoàn thiện hồ sơ pháp lý và chờ admin xác thực trước khi đăng tin."

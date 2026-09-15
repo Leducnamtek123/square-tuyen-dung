@@ -16,7 +16,7 @@ import {
   type Theme,
   useTheme,
 } from '@mui/material';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import toastMessages from '@/utils/toastMessages';
 import errorHandling from '@/utils/errorHandling';
@@ -129,6 +129,48 @@ const InterviewCreateCardInner = ({
     setValue('candidate', '', { shouldValidate: false });
     setValue('voice_profile', '', { shouldValidate: false });
   }, [setValue]);
+
+  // Auto-sync job post and candidate from URL query params
+  React.useEffect(() => {
+    if (!sessionId && jobPostIdQuery) {
+      const parsedJobId = Number(jobPostIdQuery);
+      const targetJobId = !isNaN(parsedJobId) ? parsedJobId : jobPostIdQuery;
+      const currentJob = watch('job_post');
+      if (String(currentJob) !== String(targetJobId)) {
+        setValue('job_post', targetJobId, { shouldValidate: true });
+      }
+    }
+  }, [sessionId, jobPostIdQuery, setValue, watch]);
+
+  React.useEffect(() => {
+    if (!sessionId && candidateIdQuery) {
+      const parsedCandId = Number(candidateIdQuery);
+      const targetCandId = !isNaN(parsedCandId) ? parsedCandId : candidateIdQuery;
+      const currentCand = watch('candidate');
+      if (String(currentCand) !== String(targetCandId)) {
+        setValue('candidate', targetCandId, { shouldValidate: true });
+      }
+    }
+  }, [sessionId, candidateIdQuery, setValue, watch]);
+
+  // When candidate list finishes loading, resolve and select the exact candidate
+  React.useEffect(() => {
+    if (!sessionId && candidateIdQuery && candidates.length > 0) {
+      const matched = candidates.find(
+        (c) =>
+          String(c.userId) === String(candidateIdQuery) ||
+          String(c.userDict?.id) === String(candidateIdQuery) ||
+          String(c.id) === String(candidateIdQuery)
+      );
+      if (matched) {
+        const correctUserId = matched.userId ?? matched.userDict?.id ?? matched.id;
+        const currentCand = watch('candidate');
+        if (String(currentCand) !== String(correctUserId)) {
+          setValue('candidate', correctUserId, { shouldValidate: true });
+        }
+      }
+    }
+  }, [sessionId, candidateIdQuery, candidates, setValue, watch]);
 
   React.useEffect(() => {
     if (!selectedVoiceProfileId) return;
@@ -382,14 +424,22 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
   // Auto-start interview create tour on first visit
   useTourAutoStart('employer_interview_create', 1000);
 
-  const searchParams = useMemo(() => {
-    if (typeof window === 'undefined') {
-      return new URLSearchParams('');
-    }
-    return new URLSearchParams(window.location.search);
-  }, []);
-  const candidateIdQuery = searchParams.get('candidate') || '';
-  const jobPostIdQuery = searchParams.get('jobPost') || '';
+  const nextSearchParams = useSearchParams();
+  const candidateIdQuery =
+    nextSearchParams?.get('candidate') ||
+    nextSearchParams?.get('candidate_id') ||
+    nextSearchParams?.get('candidateId') ||
+    (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('candidate') : '') ||
+    '';
+  const jobPostIdQuery =
+    nextSearchParams?.get('jobPost') ||
+    nextSearchParams?.get('job_post') ||
+    nextSearchParams?.get('jobPostId') ||
+    (typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('jobPost') ||
+        new URLSearchParams(window.location.search).get('job_post')
+      : '') ||
+    '';
 
   const { t } = useTranslation(['employer', 'interview', 'common']);
   const { data: jobData, isLoading: isLoadingJobs } = useEmployerJobPosts({ pageSize: 1000 });
@@ -405,8 +455,12 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
     const meta = ((sessionDetail?.sessionMetadata || sessionDetail?.session_metadata || {}) as Record<string, any>);
     const customAi = employerAiSettingService.getSettings();
     return {
-      job_post: sessionDetail?.jobPost ? extractId(sessionDetail.jobPost) : (jobPostIdQuery ? Number(jobPostIdQuery) : ''),
-      candidate: sessionDetail?.candidate ? extractId(sessionDetail.candidate) : (candidateIdQuery ? Number(candidateIdQuery) : ''),
+      job_post: sessionDetail?.jobPost
+        ? extractId(sessionDetail.jobPost)
+        : (jobPostIdQuery ? (Number(jobPostIdQuery) || jobPostIdQuery) : ''),
+      candidate: sessionDetail?.candidate
+        ? extractId(sessionDetail.candidate)
+        : (candidateIdQuery ? (Number(candidateIdQuery) || candidateIdQuery) : ''),
       scheduled_at: sessionDetail?.scheduledAt ?? '',
       selected_group: sessionDetail?.questionGroup ? extractId(sessionDetail.questionGroup) : '',
       voice_profile: sessionDetail?.voiceProfile ?? sessionDetail?.voice_profile ?? '',

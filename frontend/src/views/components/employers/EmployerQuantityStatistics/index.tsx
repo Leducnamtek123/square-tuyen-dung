@@ -103,7 +103,9 @@ const MetricCard = ({
                   gap: 0.5,
                 }}
               >
-                {typeof value === 'number' ? value.toLocaleString('vi-VN') : value ?? 0}
+                {typeof value === 'number'
+                  ? (Number.isFinite(value) ? value.toLocaleString('vi-VN') : 0)
+                  : ((value === 'NaN' || value === 'undefined') ? 0 : (value ?? 0))}
                 {suffix && (
                   <Typography component="span" sx={{ fontSize: '1rem', fontWeight: 600, color: '#64748B' }}>
                     {suffix}
@@ -204,8 +206,10 @@ const EmployerQuantityStatistics = () => {
   const totalInterviews = data?.totalInterviews ?? 0;
   const completedInterviews = data?.totalInterviewsCompleted ?? 0;
   const inProgressInterviews = data?.totalInterviewsInProgress ?? 0;
-  const conversionRate = data?.conversionRate ?? 0;
-  const avgAiScore = data?.avgAiOverallScore ? Number(data.avgAiOverallScore).toFixed(1) : '8.5';
+  const rawConversionRate = Number(data?.conversionRate);
+  const conversionRate = Number.isFinite(rawConversionRate) ? rawConversionRate : 0;
+  const rawAiScore = Number(data?.avgAiOverallScore);
+  const avgAiScore = Number.isFinite(rawAiScore) && rawAiScore > 0 ? rawAiScore.toFixed(1) : '8.5';
 
   return (
     <Grid container spacing={{ xs: 1.5, sm: 2.5 }}>

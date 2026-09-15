@@ -126,7 +126,17 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
           {displayTitle}
         </Typography>
 
-        <Typography variant="body2" sx={{ color: '#64748b', lineHeight: 1.6, mb: 3 }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: '#64748b',
+            lineHeight: 1.6,
+            mb: 3,
+            maxWidth: 320,
+            mx: 'auto',
+            textWrap: 'balance',
+          }}
+        >
           {displayMessage}
         </Typography>
 
@@ -135,8 +145,8 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
             variant="contained"
             fullWidth
             onClick={handleLoginClick}
-            endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: 18 }} />}
             sx={{
+              position: 'relative',
               bgcolor: '#2563eb',
               color: '#ffffff',
               py: 1.2,
@@ -152,6 +162,7 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
             }}
           >
             {t('authRequired.loginBtn')}
+            <ArrowForwardRoundedIcon sx={{ fontSize: 18, position: 'absolute', right: 16 }} />
           </Button>
 
           <Button
@@ -168,7 +179,7 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
             }}
           >
             {t('authRequired.registerPrompt')}{' '}
-            <strong style={{ marginLeft: 4, textDecoration: 'underline' }}>
+            <strong style={{ marginLeft: 4, fontWeight: 700 }}>
               {t('authRequired.registerBtn')}
             </strong>
           </Button>

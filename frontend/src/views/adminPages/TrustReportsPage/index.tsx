@@ -26,6 +26,7 @@ import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import AdminStatusBadge from '@/components/Common/AdminStatusBadge';
 import AdminConfirmDialog from '@/components/Common/AdminConfirmDialog';
 import AdminDetailDrawer from '@/components/Common/AdminDetailDrawer';
+import TechnicalDetails from '@/components/Common/TechnicalDetails';
 
 import { useDataTable } from '@/hooks';
 import type { TrustReport } from '@/types/models';
@@ -161,7 +162,7 @@ export default function TrustReportsPage() {
                   '&:hover': { color: '#2563EB', textDecoration: 'underline' },
                 }}
               >
-                {row.targetTitle || `Báo cáo #${row.id}`}
+                {row.targetTitle || (row.targetType === 'job' ? 'Tin tuyển dụng' : 'Doanh nghiệp')}
               </Typography>
               <Typography variant="caption" sx={{ color: '#64748B' }}>
                 Loại: {row.targetType === 'job' ? 'Tin tuyển dụng' : 'Doanh nghiệp'}
@@ -359,7 +360,7 @@ export default function TrustReportsPage() {
         open={Boolean(inspectingReport)}
         onClose={() => setInspectingReport(null)}
         title="Chi tiết Báo cáo vi phạm"
-        subtitle={`Mã báo cáo: #${inspectingReport?.id}`}
+        subtitle={inspectingReport?.reportType ? `Loại: ${inspectingReport.reportType}` : undefined}
         footerAction={
           inspectingReport && (
             <Stack direction="row" spacing={1}>
@@ -402,7 +403,7 @@ export default function TrustReportsPage() {
                 Thông tin đối tượng
               </Typography>
               <Box sx={{ p: 2, bgcolor: '#F8FAFC', borderRadius: 2, border: '1px solid #E2E8F0' }}>
-                <Typography variant="body2"><strong>Tiêu đề:</strong> {inspectingReport.targetTitle || `Báo cáo #${inspectingReport.id}`}</Typography>
+                <Typography variant="body2"><strong>Tiêu đề:</strong> {inspectingReport.targetTitle || 'Báo cáo vi phạm'}</Typography>
                 <Typography variant="body2" sx={{ mt: 0.5 }}><strong>Loại đối tượng:</strong> {inspectingReport.targetType === 'job' ? 'Tin tuyển dụng' : 'Doanh nghiệp'}</Typography>
                 <Typography variant="body2" sx={{ mt: 0.5 }}><strong>Người gửi báo cáo:</strong> {inspectingReport.reporterDict?.email || 'Ẩn danh'}</Typography>
                 <Typography variant="body2" sx={{ mt: 0.5 }}><strong>Thời gian gửi:</strong> {dayjs(inspectingReport.createAt).format('DD/MM/YYYY HH:mm')}</Typography>
@@ -431,6 +432,16 @@ export default function TrustReportsPage() {
                   </Typography>
                 </Box>
               </Box>
+            )}
+
+            {inspectingReport && (
+              <TechnicalDetails
+                data={{
+                  'ID Báo cáo': inspectingReport.id,
+                  'ID Đối tượng': inspectingReport.targetId,
+                  'Ngày tạo': inspectingReport.createdAt || inspectingReport.createAt,
+                }}
+              />
             )}
           </Stack>
         )}

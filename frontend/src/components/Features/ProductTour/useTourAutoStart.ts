@@ -14,6 +14,9 @@ export function useTourAutoStart(tourKey: string, delayMs = 600) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    // Do not auto-start intrusive tour overlays on mobile screens (< 768px)
+    if (window.innerWidth < 768) return;
+
     if (hasCompletedTour(tourKey)) return;
 
     const timer = setTimeout(() => {

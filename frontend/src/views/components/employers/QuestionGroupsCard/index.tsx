@@ -127,6 +127,11 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
     onPaginationChange({ pageIndex: 0, pageSize });
   };
 
+  const isSystemGroup = useCallback((group?: QuestionGroup | null) => {
+    if (!group) return false;
+    return group.canWrite === false || !group.company;
+  }, []);
+
   const handleOpenAdd = useCallback(() => dispatch({ type: 'open_add' }), []);
   const handleOpenEdit = useCallback((group: QuestionGroup) => dispatch({ type: 'open_edit', group }), []);
   const handleCloseDialog = useCallback(() => dispatch({ type: 'close_dialog' }), []);
@@ -145,16 +150,25 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
         await createQuestionGroup(payload);
         toastMessages.success(t('employer:questionGroupsCard.messages.createSuccess'));
       } else if (state.currentGroup) {
-        await updateQuestionGroup({ id: state.currentGroup.id, data: payload });
-        toastMessages.success(t('employer:questionGroupsCard.messages.updateSuccess'));
+        if (isSystemGroup(state.currentGroup)) {
+          await createQuestionGroup(payload);
+          toastMessages.success('Đã nhân bản bộ câu hỏi thành công cho doanh nghiệp!');
+        } else {
+          await updateQuestionGroup({ id: state.currentGroup.id, data: payload });
+          toastMessages.success(t('employer:questionGroupsCard.messages.updateSuccess'));
+        }
       }
       handleCloseDialog();
     } catch (error) {
       errorHandling(error);
     }
-  }, [createQuestionGroup, handleCloseDialog, state.currentGroup, state.dialogMode, state.groupDescription, state.groupName, state.isPublic, state.selectedQuestions, t, updateQuestionGroup]);
+  }, [createQuestionGroup, handleCloseDialog, isSystemGroup, state.currentGroup, state.dialogMode, state.groupDescription, state.groupName, state.isPublic, state.selectedQuestions, t, updateQuestionGroup]);
 
   const handleTogglePublic = useCallback(async (group: QuestionGroup) => {
+    if (isSystemGroup(group)) {
+      toastMessages.warn('Không thể thay đổi trạng thái bộ câu hỏi chuẩn hệ thống');
+      return;
+    }
     const currentStatus = Boolean(group.is_public ?? group.isPublic ?? false);
     const nextStatus = !currentStatus;
     try {
@@ -167,7 +181,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
     } catch (error) {
       errorHandling(error);
     }
-  }, [updateQuestionGroup]);
+  }, [isSystemGroup, updateQuestionGroup]);
 
   const handleCreateQuestion = useCallback(async () => {
     if (!state.newQuestionContent.trim()) return;
@@ -185,6 +199,10 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
   }, [createQuestion, state.newQuestionContent, state.selectedQuestions, t]);
 
   const handleDelete = useCallback((group: QuestionGroup) => {
+    if (isSystemGroup(group)) {
+      toastMessages.warn('Bộ câu hỏi chuẩn hệ thống không thể xóa');
+      return;
+    }
     confirmModal(
       async () => {
         try {
@@ -198,7 +216,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
       t('employer:questionGroupsCard.dialog.confirmDeleteMessage', { name: group.name }),
       'warning'
     );
-  }, [deleteQuestionGroup, t]);
+  }, [deleteQuestionGroup, isSystemGroup, t]);
 
   const [startingMockGroupId, setStartingMockGroupId] = useState<number | null>(null);
 
@@ -230,7 +248,30 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
     {
       header: t('employer:questionGroupsCard.table.groupName'),
       accessorKey: 'name',
-      cell: ({ row }) => <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main' }}>{row.original.name}</Typography>,
+      cell: ({ row }) => {
+        const isSystem = isSystemGroup(row.original);
+        return (
+          <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+            <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main' }}>
+              {row.original.name}
+            </Typography>
+            {isSystem && (
+              <Chip
+                label="Mẫu hệ thống"
+                size="small"
+                sx={{
+                  height: 20,
+                  fontSize: '0.6875rem',
+                  fontWeight: 700,
+                  bgcolor: '#e0f2fe',
+                  color: '#0369a1',
+                  border: '1px solid #bae6fd',
+                }}
+              />
+            )}
+          </Stack>
+        );
+      },
     },
     {
       header: t('employer:questionGroupsCard.table.numberOfQuestions'),
@@ -242,38 +283,55 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
       ),
     },
     {
-      header: t('employer:questionGroupsCard.table.status', { defaultValue: 'Trạng thái' }),
+      header: t('employer:questionGroupsCard.table.status'),
       accessorKey: 'is_public',
       cell: ({ row }) => {
         const isPublic = Boolean(row.original.is_public ?? row.original.isPublic);
+        const isSystem = isSystemGroup(row.original);
         return (
           <Tooltip
-            title={isPublic ? 'Bấm để chuyển sang riêng tư nội bộ' : 'Bấm để công khai cho ứng viên luyện tập'}
+            title={
+              isSystem
+                ? 'Bộ câu hỏi chuẩn hệ thống không thể thay đổi trạng thái'
+                : isPublic
+                ? 'Bấm để chuyển sang riêng tư nội bộ'
+                : 'Bấm để công khai cho ứng viên luyện tập'
+            }
             arrow
           >
-            <Chip
-              icon={isPublic ? <PublicIcon sx={{ fontSize: '15px !important' }} /> : <LockOutlinedIcon sx={{ fontSize: '15px !important' }} />}
-              label={isPublic ? 'Công khai' : 'Riêng tư'}
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleTogglePublic(row.original);
-              }}
-              sx={{
-                cursor: 'pointer',
-                fontWeight: 700,
-                fontSize: '0.75rem',
-                color: isPublic ? '#047857' : '#475569',
-                bgcolor: isPublic ? '#d1fae5' : '#f1f5f9',
-                border: '1px solid',
-                borderColor: isPublic ? '#a7f3d0' : '#cbd5e1',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  bgcolor: isPublic ? '#a7f3d0' : '#e2e8f0',
-                  transform: 'scale(1.04)',
-                },
-              }}
-            />
+            <span>
+              <Chip
+                icon={isPublic ? <PublicIcon sx={{ fontSize: '15px !important' }} /> : <LockOutlinedIcon sx={{ fontSize: '15px !important' }} />}
+                label={isPublic ? 'Công khai' : 'Riêng tư'}
+                size="small"
+                disabled={isSystem}
+                onClick={
+                  isSystem
+                    ? undefined
+                    : (e) => {
+                        e.stopPropagation();
+                        handleTogglePublic(row.original);
+                      }
+                }
+                sx={{
+                  cursor: isSystem ? 'not-allowed' : 'pointer',
+                  opacity: isSystem ? 0.65 : 1,
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  color: isPublic ? '#047857' : '#475569',
+                  bgcolor: isPublic ? '#d1fae5' : '#f1f5f9',
+                  border: '1px solid',
+                  borderColor: isPublic ? '#a7f3d0' : '#cbd5e1',
+                  transition: 'all 0.2s ease',
+                  '&:hover': isSystem
+                    ? undefined
+                    : {
+                        bgcolor: isPublic ? '#a7f3d0' : '#e2e8f0',
+                        transform: 'scale(1.04)',
+                      },
+                }}
+              />
+            </span>
           </Tooltip>
         );
       },
@@ -321,7 +379,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
               </Button>
             </span>
           </Tooltip>
-          <Tooltip title={t('common:actions.edit', { defaultValue: 'Chỉnh sửa' })} arrow>
+          <Tooltip title={t('common:actions.edit')} arrow>
             <span>
               <IconButton
                 aria-label="Sửa nhóm câu hỏi"
@@ -339,18 +397,32 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
               </IconButton>
             </span>
           </Tooltip>
-          <Tooltip title={t('common:actions.delete', { defaultValue: 'Xóa bỏ' })} arrow>
+          <Tooltip
+            title={
+              isSystemGroup(row.original)
+                ? 'Bộ câu hỏi chuẩn hệ thống không thể xóa'
+                : t('common:actions.delete')
+            }
+            arrow
+          >
             <span>
               <IconButton
                 aria-label="Xóa nhóm câu hỏi"
                 size="small"
+                disabled={isSystemGroup(row.original)}
                 onClick={() => handleDelete(row.original)}
                 sx={{
-                  bgcolor: alpha(theme.palette.error.main, 0.08),
-                  color: 'error.main',
+                  bgcolor: isSystemGroup(row.original)
+                    ? alpha(theme.palette.action.disabledBackground, 0.1)
+                    : alpha(theme.palette.error.main, 0.08),
+                  color: isSystemGroup(row.original)
+                    ? theme.palette.action.disabled
+                    : 'error.main',
                   borderRadius: '10px',
                   transition: 'all 0.2s ease',
-                  '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.18), transform: 'scale(1.05)' },
+                  '&:hover': isSystemGroup(row.original)
+                    ? undefined
+                    : { bgcolor: alpha(theme.palette.error.main, 0.18), transform: 'scale(1.05)' },
                 }}
               >
                 <DeleteOutlineRoundedIcon fontSize="small" />
@@ -360,7 +432,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
         </Stack>
       ),
     },
-  ], [handleDelete, handleOpenEdit, handleTestGroupMock, handleTogglePublic, startingMockGroupId, t, theme]);
+  ], [handleDelete, handleOpenEdit, handleTestGroupMock, handleTogglePublic, isSystemGroup, startingMockGroupId, t, theme]);
 
   return (
     <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 4, boxShadow: (muiTheme) => muiTheme.customShadows?.z1, border: '1px solid', borderColor: 'divider' }}>

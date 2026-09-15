@@ -86,33 +86,60 @@ const InterviewLiveCandidateCardPanel = ({
         <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100dvh' }}>
           <Box
             sx={{
-              px: 3,
-              py: 2,
+              px: { xs: 1.5, sm: 3 },
+              py: { xs: 1.25, sm: 2 },
               borderBottom: '1px solid rgba(255,255,255,0.06)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               bgcolor: 'rgba(10,14,26,0.86)',
               backdropFilter: 'blur(8px)',
+              gap: 1.5,
             }}
           >
-            <Box>
-              <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 900 }}>
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  color: '#fff',
+                  fontWeight: 900,
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
                 {t('employer:interviewLive.candidateCard.presenceTitle')}: {session.candidateName || t('employer:interviewLive.candidateCard.unknownCandidate')}
               </Typography>
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)' }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'rgba(255,255,255,0.55)',
+                  display: { xs: 'none', sm: 'block' },
+                }}
+              >
                 {t('employer:interviewLive.candidateCard.presenceSubtitle')}
               </Typography>
             </Box>
-            <Stack direction="row" spacing={2} alignItems="center">
-              <InterviewRecordingBadge />
+            <Stack direction="row" spacing={{ xs: 1, sm: 2 }} alignItems="center" sx={{ flexShrink: 0 }}>
+              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                <InterviewRecordingBadge />
+              </Box>
               <Button
                 variant="outlined"
                 color="error"
                 size="small"
                 startIcon={<CloseIcon />}
                 onClick={onLeaveHR}
-                sx={{ textTransform: 'none', fontWeight: 800, color: '#f87171', borderColor: 'rgba(248,113,113,0.4)', borderRadius: '10px' }}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 800,
+                  color: '#f87171',
+                  borderColor: 'rgba(248,113,113,0.4)',
+                  borderRadius: '10px',
+                  px: { xs: 1.25, sm: 2 },
+                  minHeight: { xs: 36, sm: 32 },
+                }}
               >
                 {t('employer:interviewLive.candidateCard.presenceExit')}
               </Button>
@@ -146,225 +173,333 @@ const InterviewLiveCandidateCardPanel = ({
 
   return (
     <>
+      {/* Studio Viewport Screen */}
       <Box
         sx={{
-          borderRadius: 3.5,
+          width: '100%',
+          height: { xs: 260, sm: 280 },
+          borderRadius: 3,
           overflow: 'hidden',
-          border: '1px solid',
-          borderColor: '#e2e8f0',
-          bgcolor: '#ffffff',
-          backgroundImage: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
-          minHeight: 280,
+          bgcolor: '#080c14',
+          border: '1px solid #1a2234',
+          boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 8px 24px -4px rgba(0, 0, 0, 0.25)',
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
-          boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02)',
+          justifyContent: 'center',
         }}
       >
-        {/* Top Floating Mini-Action Bar */}
+        {/* Top Floating Telemetry Overlay inside Viewport */}
         <Box
           sx={{
-            p: 1.5,
-            px: 2,
-            borderBottom: '1px solid',
-            borderColor: '#f1f5f9',
-            bgcolor: '#ffffff',
+            position: 'absolute',
+            top: 10,
+            left: 12,
+            right: 12,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: 1,
-            flexWrap: 'wrap',
+            zIndex: 4,
+            pointerEvents: 'none',
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <Chip
-              icon={
-                <FiberManualRecordIcon
-                  sx={{
-                    fontSize: '9px !important',
-                    color: isLive ? '#16a34a !important' : '#94a3b8 !important',
-                    animation: isLive ? 'radarPulse 1.5s infinite' : 'none',
-                    '@keyframes radarPulse': {
-                      '0%': { transform: 'scale(1)', opacity: 1 },
-                      '50%': { transform: 'scale(1.35)', opacity: 0.5 },
-                      '100%': { transform: 'scale(1)', opacity: 1 },
-                    },
-                  }}
-                />
-              }
-              label={isLive ? t('employer:interviewLive.candidateCard.live') : statusLabel || 'Chờ bắt đầu'}
-              size="small"
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.6,
+              px: 1,
+              py: 0.35,
+              borderRadius: '6px',
+              bgcolor: 'rgba(0, 0, 0, 0.65)',
+              backdropFilter: 'blur(6px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              color: isLive ? '#34d399' : '#94a3b8',
+              fontSize: '0.65rem',
+              fontFamily: 'monospace',
+              fontWeight: 800,
+              letterSpacing: '0.06em',
+            }}
+          >
+            <FiberManualRecordIcon
               sx={{
-                fontWeight: 900,
-                fontSize: '0.6875rem',
-                letterSpacing: '0.06em',
-                height: 26,
-                borderRadius: '8px',
-                bgcolor: isLive ? '#ecfdf5' : '#f1f5f9',
-                color: isLive ? '#15803d' : '#64748b',
-                border: '1px solid',
-                borderColor: isLive ? '#bbf7d0' : '#e2e8f0',
+                fontSize: 8,
+                color: isLive ? '#10b981' : '#64748b',
+                animation: isLive ? 'radarPulse 1.5s infinite' : 'none',
               }}
             />
-          </Stack>
+            {isLive ? 'LIVE FEED' : 'STANDBY'}
+          </Box>
 
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Tooltip title={t('employer:interviewLive.candidateCard.joinPresenceTooltip')} arrow>
-              <span>
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  startIcon={<MeetingRoomIcon sx={{ fontSize: 16 }} />}
-                  onClick={onJoinAsHR}
-                  disabled={hrPresenceLoading || !isLive}
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: '0.75rem',
-                    textTransform: 'none',
-                    boxShadow: 'none',
-                    borderRadius: '10px',
-                    bgcolor: '#2563eb',
-                    '&:hover': { bgcolor: '#1d4ed8' },
-                  }}
-                >
-                  {hrPresenceLoading
-                    ? t('employer:interviewLive.candidateCard.joinPresenceLoading')
-                    : t('employer:interviewLive.candidateCard.joinPresence')}
-                </Button>
-              </span>
-            </Tooltip>
-
-            {connectionDetails && (
-              <Button
+          {connectionDetails && (
+            <Tooltip title={t('employer:interviewLive.candidateCard.maximize')} arrow>
+              <IconButton
                 size="small"
-                variant="outlined"
-                startIcon={<FullscreenIcon sx={{ fontSize: 16 }} />}
                 onClick={onOpenFullscreen}
                 sx={{
-                  fontWeight: 800,
-                  fontSize: '0.75rem',
-                  textTransform: 'none',
-                  borderRadius: '10px',
-                  color: '#334155',
-                  borderColor: '#cbd5e1',
-                  bgcolor: '#ffffff',
-                  px: 1.5,
-                  py: 0.65,
+                  pointerEvents: 'auto',
+                  bgcolor: 'rgba(0, 0, 0, 0.65)',
+                  backdropFilter: 'blur(6px)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  color: '#f8fafc',
+                  width: 28,
+                  height: 28,
+                  transition: 'all 0.15s ease',
                   '&:hover': {
-                    borderColor: '#94a3b8',
-                    bgcolor: '#f8fafc',
+                    bgcolor: 'rgba(37, 99, 235, 0.9)',
+                    borderColor: '#3b82f6',
                   },
                 }}
               >
-                {t('employer:interviewLive.candidateCard.maximize')}
-              </Button>
-            )}
+                <FullscreenIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
 
-            {normalizedStatus === 'in_progress' && (
+        {/* Video Canvas / Live Content / Smart Standby */}
+        {loadingToken ? (
+          <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1.5 }}>
+            <CircularProgress size={28} thickness={4} sx={{ color: '#3b82f6' }} />
+            <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600 }}>
+              {t('employer:interviewLive.candidateCard.connecting')}
+            </Typography>
+          </Box>
+        ) : tokenError ? (
+          <Box sx={{ p: 2.5, textAlign: 'center' }}>
+            <Alert
+              severity="warning"
+              sx={{
+                borderRadius: 2,
+                bgcolor: 'rgba(245, 158, 11, 0.1)',
+                color: '#fbbf24',
+                border: '1px solid rgba(245, 158, 11, 0.25)',
+              }}
+            >
+              {tokenError}
+            </Alert>
+          </Box>
+        ) : connectionDetails ? (
+          <LiveKitRoom
+            token={connectionDetails.token}
+            serverUrl={connectionDetails.serverUrl}
+            connect={isLive}
+            audio={false}
+            video={false}
+            style={{ width: '100%', height: '100%' }}
+          >
+            <LiveObserverVisualizer compact />
+          </LiveKitRoom>
+        ) : (
+          /* Smart Standby State */
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              backgroundImage: 'radial-gradient(circle at 50% 35%, rgba(37, 99, 235, 0.14) 0%, #080c14 70%)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              p: 2.5,
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            <Box
+              sx={{
+                width: 54,
+                height: 54,
+                borderRadius: '50%',
+                bgcolor: 'rgba(37, 99, 235, 0.15)',
+                border: '1px solid rgba(59, 130, 246, 0.35)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mb: 1.5,
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  inset: -8,
+                  borderRadius: '50%',
+                  border: '1px solid rgba(59, 130, 246, 0.35)',
+                  animation: 'radarPulse 2.2s cubic-bezier(0, 0, 0.2, 1) infinite',
+                },
+                '@keyframes radarPulse': {
+                  '0%': { transform: 'scale(0.8)', opacity: 1 },
+                  '100%': { transform: 'scale(1.8)', opacity: 0 },
+                },
+              }}
+            >
+              <VideocamOutlinedIcon sx={{ fontSize: 24, color: '#60a5fa' }} />
+            </Box>
+
+            <Typography variant="subtitle2" sx={{ color: '#f8fafc', fontWeight: 700, mb: 0.5, letterSpacing: '-0.01em', textAlign: 'center' }}>
+              {t('employer:interviewLive.candidateCard.waitingSignal', 'Đang chờ tín hiệu...')}
+            </Typography>
+
+            <Typography variant="caption" sx={{ color: '#94a3b8', maxWidth: 360, textAlign: 'center', lineHeight: 1.5, mb: 2, fontSize: '0.78rem' }}>
+              {t('employer:interviewLive.candidateCard.waitingSignalHint', 'Khi ứng viên bật camera hoặc mic, preview sẽ hiện ở đây')}
+            </Typography>
+
+            {/* Live Telemetry Status Chips */}
+            <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', justifyContent: 'center' }}>
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  px: 1.2,
+                  py: 0.3,
+                  borderRadius: '6px',
+                  bgcolor: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#94a3b8',
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                }}
+              >
+                Camera: Chờ mở
+              </Box>
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  px: 1.2,
+                  py: 0.3,
+                  borderRadius: '6px',
+                  bgcolor: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#94a3b8',
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                }}
+              >
+                Micrô: Chờ mở
+              </Box>
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  px: 1.2,
+                  py: 0.3,
+                  borderRadius: '6px',
+                  bgcolor: 'rgba(16, 185, 129, 0.12)',
+                  border: '1px solid rgba(16, 185, 129, 0.25)',
+                  color: '#34d399',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                }}
+              >
+                Phòng AI: Sẵn sàng
+              </Box>
+            </Stack>
+          </Box>
+        )}
+      </Box>
+
+      {/* Card Action Controls */}
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ mt: 2 }}
+      >
+        <Stack direction="row" spacing={1.25} alignItems="center">
+          <Tooltip title={t('employer:interviewLive.candidateCard.joinPresenceTooltip', 'Vào phòng với tư cách Nhà tuyển dụng - ứng viên sẽ thấy bạn')} arrow>
+            <span>
+              <Button
+                size="small"
+                variant="contained"
+                startIcon={hrPresenceLoading ? <CircularProgress size={15} color="inherit" /> : <MeetingRoomIcon sx={{ fontSize: 16 }} />}
+                onClick={onJoinAsHR}
+                disabled={hrPresenceLoading || !isLive}
+                sx={{
+                  fontWeight: 700,
+                  fontSize: '0.78rem',
+                  textTransform: 'none',
+                  boxShadow: 'none',
+                  borderRadius: '9px',
+                  bgcolor: '#2563eb',
+                  px: 1.75,
+                  py: 0.65,
+                  minHeight: 34,
+                  transition: 'all 0.15s ease',
+                  '&:hover': { bgcolor: '#1d4ed8', boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)' },
+                }}
+              >
+                {hrPresenceLoading
+                  ? t('employer:interviewLive.candidateCard.joinPresenceLoading', 'Đang kết nối...')
+                  : t('employer:interviewLive.candidateCard.joinPresence', 'Tham gia phòng')}
+              </Button>
+            </span>
+          </Tooltip>
+
+          {connectionDetails && (
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<FullscreenIcon sx={{ fontSize: 17 }} />}
+              onClick={onOpenFullscreen}
+              sx={{
+                fontWeight: 700,
+                fontSize: '0.78rem',
+                textTransform: 'none',
+                borderRadius: '9px',
+                color: '#1e293b',
+                borderColor: '#cbd5e1',
+                bgcolor: '#ffffff',
+                px: 1.75,
+                py: 0.65,
+                minHeight: 34,
+                boxShadow: 'none',
+                transition: 'all 0.15s ease',
+                '&:hover': {
+                  borderColor: '#94a3b8',
+                  bgcolor: '#f8fafc',
+                  boxShadow: 'none',
+                },
+              }}
+            >
+              {t('employer:interviewLive.candidateCard.maximize', 'Phóng to')}
+            </Button>
+          )}
+        </Stack>
+
+        {normalizedStatus === 'in_progress' && (
+          <Tooltip title="Kết thúc buổi phỏng vấn của ứng viên này" arrow>
+            <span>
               <Button
                 size="small"
                 variant="outlined"
                 color="error"
-                startIcon={<StopCircleIcon sx={{ fontSize: 16 }} />}
+                startIcon={isForceEnding ? <CircularProgress size={14} color="inherit" /> : <StopCircleIcon sx={{ fontSize: 16 }} />}
                 onClick={() => onForceEnd(session)}
                 disabled={isForceEnding}
                 sx={{
-                  fontWeight: 800,
-                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  fontSize: '0.78rem',
                   textTransform: 'none',
-                  borderRadius: '10px',
-                  color: '#e11d48',
-                  borderColor: '#fecdd3',
-                  bgcolor: '#fff1f2',
+                  borderRadius: '9px',
+                  borderColor: 'rgba(239, 68, 68, 0.3)',
+                  color: '#ef4444',
                   px: 1.5,
                   py: 0.65,
+                  minHeight: 34,
+                  transition: 'all 0.15s ease',
                   '&:hover': {
-                    bgcolor: '#ffe4e6',
-                    borderColor: '#fda4af',
+                    bgcolor: 'rgba(239, 68, 68, 0.06)',
+                    borderColor: '#ef4444',
+                    color: '#dc2626',
                   },
                 }}
               >
-                {t('employer:interviewLive.candidateCard.end')}
+                {t('employer:interviewLive.candidateCard.end', 'Kết thúc')}
               </Button>
-            )}
-          </Stack>
-        </Box>
-
-        {/* Video Canvas / Live Content / Smart Standby */}
-        <Box sx={{ flex: 1, p: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          {loadingToken ? (
-            <Box sx={{ minHeight: 220, display: 'grid', placeItems: 'center' }}>
-              <Stack spacing={2} alignItems="center">
-                <CircularProgress size={32} thickness={4} sx={{ color: '#2563eb' }} />
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
-                  {t('employer:interviewLive.candidateCard.connecting')}
-                </Typography>
-              </Stack>
-            </Box>
-          ) : tokenError ? (
-            <Box sx={{ p: 2 }}>
-              <Alert severity="warning" sx={{ borderRadius: 2.5 }}>{tokenError}</Alert>
-            </Box>
-          ) : connectionDetails ? (
-            <LiveKitRoom token={connectionDetails.token} serverUrl={connectionDetails.serverUrl} connect={isLive} audio={false} video={false}>
-              <LiveObserverVisualizer compact />
-            </LiveKitRoom>
-          ) : (
-            /* Smart Standby State */
-            <Box
-              sx={{
-                minHeight: 220,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center',
-                p: 3,
-                position: 'relative',
-              }}
-            >
-              {/* Animated Radar Pulse Core */}
-              <Box
-                sx={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: '50%',
-                  bgcolor: alpha('#2563eb', 0.08),
-                  border: '1px solid',
-                  borderColor: alpha('#2563eb', 0.2),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mb: 2,
-                  position: 'relative',
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    inset: -8,
-                    borderRadius: '50%',
-                    border: '1px solid rgba(37, 99, 235, 0.25)',
-                    animation: 'radarRing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite',
-                  },
-                  '@keyframes radarRing': {
-                    '0%': { transform: 'scale(0.8)', opacity: 1 },
-                    '100%': { transform: 'scale(1.8)', opacity: 0 },
-                  },
-                }}
-              >
-                <VideocamOutlinedIcon sx={{ fontSize: 28, color: '#2563eb' }} />
-              </Box>
-
-              <Typography variant="subtitle2" sx={{ color: '#0f172a', fontWeight: 800, letterSpacing: '-0.01em', mb: 0.5 }}>
-                Đang chờ tín hiệu phòng phỏng vấn
-              </Typography>
-              <Typography variant="caption" sx={{ color: '#64748b', maxWidth: 380, lineHeight: 1.6, display: 'block' }}>
-                Hệ thống sẽ tự động bắt sóng và truyền hình ảnh cùng âm thanh khi ứng viên tham gia vào phòng phỏng vấn.
-              </Typography>
-            </Box>
-          )}
-        </Box>
-      </Box>
+            </span>
+          </Tooltip>
+        )}
+      </Stack>
 
       {/* Fullscreen Observer Dialog */}
       <Dialog
@@ -437,8 +572,8 @@ const InterviewLiveCandidateCardPanel = ({
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)', display: 'block' }}>
                           {t('employer:interviewLive.candidateCard.room')}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#fff', fontWeight: 700, fontFamily: 'monospace' }}>
-                          {session.roomName || 'N/A'}
+                        <Typography variant="body2" sx={{ color: '#fff', fontWeight: 700 }}>
+                          {isLive ? 'Trực tuyến (Live)' : 'Phòng phỏng vấn AI'}
                         </Typography>
                       </Box>
                       <Box>
@@ -453,7 +588,7 @@ const InterviewLiveCandidateCardPanel = ({
                         <Button
                           variant="contained"
                           color="error"
-                          startIcon={<StopCircleIcon />}
+                          startIcon={isForceEnding ? <CircularProgress size={14} color="inherit" /> : <StopCircleIcon />}
                           onClick={() => onForceEnd(session)}
                           disabled={isForceEnding}
                           sx={{ textTransform: 'none', fontWeight: 800, borderRadius: '10px' }}

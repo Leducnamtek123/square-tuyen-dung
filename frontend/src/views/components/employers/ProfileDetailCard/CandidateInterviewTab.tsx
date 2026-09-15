@@ -291,7 +291,7 @@ export const CandidateInterviewTab: React.FC<CandidateInterviewTabProps> = ({ pr
                       <Box sx={{ minWidth: 0 }}>
                         <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 0.5 }}>
                           <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.95rem' }}>
-                            {session.jobName ? `Phỏng vấn vị trí: ${session.jobName}` : `Buổi phỏng vấn #${session.id}`}
+                            {session.jobName ? `Phỏng vấn vị trí: ${session.jobName}` : 'Buổi phỏng vấn ứng viên'}
                           </Typography>
                           <Chip
                             label={isAi ? 'AI Voice Bot' : 'Trực tiếp - Live'}

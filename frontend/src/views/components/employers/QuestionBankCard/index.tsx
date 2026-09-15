@@ -18,7 +18,8 @@ import {
   alpha,
   useTheme,
   Grid2 as Grid,
-  Theme
+  Theme,
+  Alert,
 } from "@mui/material";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
@@ -32,6 +33,8 @@ import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import Diversity3OutlinedIcon from '@mui/icons-material/Diversity3Outlined';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
+import PublicIcon from '@mui/icons-material/Public';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from 'react-i18next';
 import toastMessages from '@/utils/toastMessages';
 import { confirmModal } from '@/utils/sweetalert2Modal';
@@ -258,7 +261,16 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
         difficulty: number;
         default_duration_seconds: number;
         isCategoryManuallySet: boolean;
+        canWrite?: boolean;
+        company?: number | null;
+        is_public?: boolean;
+        isPublic?: boolean;
     }
+
+    const isSystemQuestion = useCallback((q?: Question | QuestionFormState | null) => {
+        if (!q) return false;
+        return q.canWrite === false || !q.company;
+    }, []);
 
     const [open, setOpen] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState<QuestionFormState>({
@@ -327,6 +339,9 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                 difficulty: diff,
                 default_duration_seconds: dur,
                 isCategoryManuallySet: true,
+                canWrite: q.canWrite,
+                company: q.company,
+                is_public: Boolean(q.is_public ?? q.isPublic ?? false),
             });
             setIsEdit(true);
         } else {
@@ -337,6 +352,9 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                 difficulty: 2,
                 default_duration_seconds: 120,
                 isCategoryManuallySet: false,
+                canWrite: true,
+                company: undefined,
+                is_public: false,
             });
             setIsEdit(false);
         }
@@ -412,10 +430,15 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
             default_duration_seconds: currentQuestion.default_duration_seconds,
         };
 
+        const isSystem = Boolean(isEdit && isSystemQuestion(currentQuestion));
+
         try {
-            if (isEdit && currentQuestion.id) {
+            if (isEdit && currentQuestion.id && !isSystem) {
                 await updateQuestion({ id: currentQuestion.id, data: payload });
                 toastMessages.success(t('interview:employer.questionBank.updateSuccess'));
+            } else if (isEdit && isSystem) {
+                await createQuestion(payload);
+                toastMessages.success('Đã nhân bản câu hỏi cho doanh nghiệp thành công!');
             } else {
                 await createQuestion(payload);
                 toastMessages.success(t('interview:employer.questionBank.createSuccess'));
@@ -426,11 +449,21 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
         }
     };
 
-    const handleDelete = useCallback((id: string | number) => {
+    const handleDelete = useCallback((idOrQuestion: Question | string | number) => {
+        const questionId = typeof idOrQuestion === 'object' && idOrQuestion !== null ? idOrQuestion.id : idOrQuestion;
+        const target = typeof idOrQuestion === 'object' && idOrQuestion !== null
+            ? idOrQuestion
+            : rawQuestions.find((item) => item.id === questionId);
+
+        if (target && isSystemQuestion(target)) {
+            toastMessages.warn('Câu hỏi chuẩn hệ thống không thể xóa');
+            return;
+        }
+
         confirmModal(
             async () => {
                 try {
-                    await deleteQuestion(id);
+                    await deleteQuestion(questionId);
                     toastMessages.success(t('interview:employer.questionBank.deleteSuccess'));
                 } catch (error) {
                     // Error handled by mutation hook
@@ -440,11 +473,30 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
             t('interview:employer.questionBank.deleteConfirm'),
             'warning'
         );
-    }, [deleteQuestion, t]);
+    }, [deleteQuestion, isSystemQuestion, rawQuestions, t]);
+
+    const handleTogglePublic = useCallback(async (question: Question) => {
+        if (isSystemQuestion(question)) {
+            toastMessages.warn('Câu hỏi chuẩn hệ thống không thể thay đổi trạng thái');
+            return;
+        }
+        const currentStatus = Boolean(question.is_public ?? question.isPublic ?? false);
+        const nextStatus = !currentStatus;
+        try {
+            await updateQuestion({ id: question.id, data: { is_public: nextStatus } as Partial<Question> });
+            toastMessages.success(
+                nextStatus
+                    ? 'Đã chuyển sang trạng thái công khai cho ứng viên'
+                    : 'Đã chuyển sang trạng thái riêng tư nội bộ'
+            );
+        } catch (error) {
+            errorHandling(error);
+        }
+    }, [isSystemQuestion, updateQuestion]);
 
     const columns = useMemo(() => [
         {
-            header: '#',
+            header: 'STT',
             id: 'index',
             size: 60,
             cell: ({ row }: { row: { index: number } }) => {
@@ -467,7 +519,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                             letterSpacing: 0.5,
                         }}
                     >
-                        #{padded}
+                        {padded}
                     </Box>
                 );
             },
@@ -475,25 +527,42 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
         {
             header: t('interview:employer.questionBank.columns.text'),
             accessorKey: 'text',
-            cell: ({ getValue }: { getValue: () => unknown }) => {
-                const text = String(getValue() ?? '---');
+            cell: ({ row }: { row: { original: Question } }) => {
+                const text = row.original.text || '---';
+                const isSystem = isSystemQuestion(row.original);
                 return (
-                    <Typography
-                        variant="body2"
-                        sx={{
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            fontWeight: 700,
-                            color: 'text.primary',
-                            lineHeight: 1.6,
-                            fontSize: '0.875rem',
-                        }}
-                    >
-                        {text}
-                    </Typography>
+                    <Stack spacing={0.5} alignItems="flex-start">
+                        {isSystem && (
+                            <Chip
+                                label="Mẫu hệ thống"
+                                size="small"
+                                sx={{
+                                    height: 20,
+                                    fontSize: '0.6875rem',
+                                    fontWeight: 700,
+                                    bgcolor: '#e0f2fe',
+                                    color: '#0369a1',
+                                    border: '1px solid #bae6fd',
+                                }}
+                            />
+                        )}
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                fontWeight: 700,
+                                color: 'text.primary',
+                                lineHeight: 1.6,
+                                fontSize: '0.875rem',
+                            }}
+                        >
+                            {text}
+                        </Typography>
+                    </Stack>
                 );
             },
         },
@@ -553,51 +622,121 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
             },
         },
         {
+            header: 'Trạng thái',
+            id: 'is_public',
+            size: 130,
+            cell: ({ row }: { row: { original: Question } }) => {
+                const isPublic = Boolean(row.original.is_public ?? row.original.isPublic);
+                const isSystem = isSystemQuestion(row.original);
+                return (
+                    <Tooltip
+                        title={
+                            isSystem
+                                ? 'Câu hỏi chuẩn hệ thống không thể thay đổi trạng thái'
+                                : isPublic
+                                ? 'Bấm để chuyển sang riêng tư nội bộ'
+                                : 'Bấm để công khai cho ứng viên'
+                        }
+                        arrow
+                    >
+                        <span>
+                            <Chip
+                                icon={isPublic ? <PublicIcon sx={{ fontSize: '15px !important' }} /> : <LockOutlinedIcon sx={{ fontSize: '15px !important' }} />}
+                                label={isPublic ? 'Công khai' : 'Riêng tư'}
+                                size="small"
+                                disabled={isSystem}
+                                onClick={
+                                    isSystem
+                                        ? undefined
+                                        : (e) => {
+                                            e.stopPropagation();
+                                            handleTogglePublic(row.original);
+                                        }
+                                }
+                                sx={{
+                                    cursor: isSystem ? 'not-allowed' : 'pointer',
+                                    opacity: isSystem ? 0.65 : 1,
+                                    fontWeight: 700,
+                                    fontSize: '0.75rem',
+                                    color: isPublic ? '#047857' : '#475569',
+                                    bgcolor: isPublic ? '#d1fae5' : '#f1f5f9',
+                                    border: '1px solid',
+                                    borderColor: isPublic ? '#a7f3d0' : '#cbd5e1',
+                                    transition: 'all 0.2s ease',
+                                    '&:hover': isSystem
+                                        ? undefined
+                                        : {
+                                            bgcolor: isPublic ? '#a7f3d0' : '#e2e8f0',
+                                            transform: 'scale(1.04)',
+                                        },
+                                }}
+                            />
+                        </span>
+                    </Tooltip>
+                );
+            },
+        },
+        {
             header: '',
             id: 'actions',
             size: 110,
-            cell: ({ row }: { row: { original: Question } }) => (
-                <Stack direction="row" spacing={1} justifyContent="flex-end">
-                    <Tooltip title={t('common:actions.edit')} arrow>
-                        <span>
-                            <IconButton 
-                                aria-label="Sửa câu hỏi"
-                                size="small"
-                                onClick={() => handleOpen(row.original)}
-                                sx={{ 
-                                    bgcolor: alpha(theme.palette.primary.main, 0.08), 
-                                    color: 'primary.main',
-                                    borderRadius: '10px',
-                                    transition: 'all 0.2s ease',
-                                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.18), transform: 'scale(1.05)' } 
-                                }}
-                            >
-                                <EditOutlinedIcon fontSize="small" />
-                            </IconButton>
-                        </span>
-                    </Tooltip>
-                    <Tooltip title={t('common:actions.delete')} arrow>
-                        <span>
-                            <IconButton 
-                                aria-label="Xóa câu hỏi"
-                                size="small"
-                                onClick={() => handleDelete(row.original.id)}
-                                sx={{ 
-                                    bgcolor: alpha(theme.palette.error.main, 0.08), 
-                                    color: 'error.main',
-                                    borderRadius: '10px',
-                                    transition: 'all 0.2s ease',
-                                    '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.18), transform: 'scale(1.05)' } 
-                                }}
-                            >
-                                <DeleteOutlineRoundedIcon fontSize="small" />
-                            </IconButton>
-                        </span>
-                    </Tooltip>
-                </Stack>
-            ),
+            cell: ({ row }: { row: { original: Question } }) => {
+                const isSystem = isSystemQuestion(row.original);
+                return (
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                        <Tooltip title={t('common:actions.edit')} arrow>
+                            <span>
+                                <IconButton 
+                                    aria-label="Sửa câu hỏi"
+                                    size="small"
+                                    onClick={() => handleOpen(row.original)}
+                                    sx={{ 
+                                        bgcolor: alpha(theme.palette.primary.main, 0.08), 
+                                        color: 'primary.main',
+                                        borderRadius: '10px',
+                                        transition: 'all 0.2s ease',
+                                        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.18), transform: 'scale(1.05)' } 
+                                    }}
+                                >
+                                    <EditOutlinedIcon fontSize="small" />
+                                </IconButton>
+                            </span>
+                        </Tooltip>
+                        <Tooltip
+                            title={
+                                isSystem
+                                    ? 'Câu hỏi chuẩn hệ thống không thể xóa'
+                                    : t('common:actions.delete')
+                            }
+                            arrow
+                        >
+                            <span>
+                                <IconButton 
+                                    aria-label="Xóa câu hỏi"
+                                    size="small"
+                                    disabled={isSystem}
+                                    onClick={() => handleDelete(row.original)}
+                                    sx={{ 
+                                        bgcolor: isSystem
+                                            ? alpha(theme.palette.action.disabledBackground, 0.1)
+                                            : alpha(theme.palette.error.main, 0.08), 
+                                        color: isSystem ? theme.palette.action.disabled : 'error.main',
+                                        borderRadius: '10px',
+                                        transition: 'all 0.2s ease',
+                                        '&:hover': isSystem
+                                            ? undefined
+                                            : { bgcolor: alpha(theme.palette.error.main, 0.18), transform: 'scale(1.05)' } 
+                                    }}
+                                >
+                                    <DeleteOutlineRoundedIcon fontSize="small" />
+                                </IconButton>
+                            </span>
+                        </Tooltip>
+                    </Stack>
+                );
+            },
         },
-    ], [t, page, pageSize, theme, handleOpen, handleDelete]);
+    ], [t, page, pageSize, theme, handleOpen, handleDelete, handleTogglePublic, isSystemQuestion]);
 
     return (
         <Stack spacing={3}>
@@ -958,6 +1097,23 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                     </DialogTitle>
                     <DialogContent sx={{ px: 3, pb: 1 }}>
                         <Stack spacing={2.5} sx={{ pt: 1.5 }}>
+                            {isEdit && isSystemQuestion(currentQuestion) && (
+                                <Alert
+                                    severity="info"
+                                    icon={<AutoAwesomeRoundedIcon fontSize="inherit" />}
+                                    sx={{
+                                        borderRadius: 2.5,
+                                        fontWeight: 600,
+                                        fontSize: '0.85rem',
+                                        bgcolor: '#eff6ff',
+                                        color: '#1e40af',
+                                        border: '1px solid #bfdbfe',
+                                        '& .MuiAlert-icon': { color: '#2563eb' },
+                                    }}
+                                >
+                                    Câu hỏi chuẩn hệ thống. Lưu thay đổi sẽ tự động nhân bản thành câu hỏi của doanh nghiệp.
+                                </Alert>
+                            )}
                             <Box>
                                 <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: 'text.primary' }}>
                                     {t('interview:employer.questionBank.textLabel')} *

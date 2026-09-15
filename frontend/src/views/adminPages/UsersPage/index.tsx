@@ -11,6 +11,7 @@ import UserTable from './components/UserTable';
 import UserFilters from './components/UserFilters';
 import AdminConfirmDialog from '@/components/Common/AdminConfirmDialog';
 import AdminDetailDrawer from '@/components/Common/AdminDetailDrawer';
+import TechnicalDetails from '@/components/Common/TechnicalDetails';
 import AdminStatusBadge from '@/components/Common/AdminStatusBadge';
 import { User as UserModel } from '@/types/models';
 import type { RoleName } from '@/types/auth';
@@ -228,7 +229,7 @@ const UsersPage = () => {
                 open={Boolean(inspectingUser)}
                 onClose={() => setInspectingUser(null)}
                 title={inspectingUser?.fullName || inspectingUser?.email || 'Chi tiết người dùng'}
-                subtitle={`Mã người dùng: #${inspectingUser?.id}`}
+                subtitle={inspectingUser?.email || inspectingUser?.phoneNumber || undefined}
                 footerAction={
                     inspectingUser && (
                         <Stack direction="row" spacing={1}>
@@ -302,6 +303,16 @@ const UsersPage = () => {
                                 </Stack>
                             </Box>
                         </Box>
+
+                        {inspectingUser && (
+                            <TechnicalDetails
+                                data={{
+                                    'ID Người dùng': inspectingUser.id,
+                                    'Vai trò': inspectingUser.roleName,
+                                    'Ngày tham gia': inspectingUser.dateJoined,
+                                }}
+                            />
+                        )}
                     </Stack>
                 )}
             </AdminDetailDrawer>

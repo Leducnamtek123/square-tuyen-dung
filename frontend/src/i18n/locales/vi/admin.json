@@ -1641,7 +1641,7 @@
         "deleteError": "Không thể xóa loại banner"
       },
       "table": {
-        "id": "ID",
+        "id": "STT",
         "code": "Mã",
         "name": "Tên",
         "value": "Giá trị",

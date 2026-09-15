@@ -69,6 +69,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
   const [bars, setBars] = useState<number[]>(() =>
     Array.from({ length: TOTAL_EQUALIZER_BARS }, () => 4)
   );
+  const [tipsExpanded, setTipsExpanded] = useState<boolean>(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const activeVideoTrackRef = useRef<MediaStreamTrack | null>(null);
@@ -314,11 +315,11 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
           minWidth: { md: '350px' },
           background: 'linear-gradient(165deg, #090d16 0%, #0f172a 45%, #18223c 100%)',
           color: '#ffffff',
-          p: { xs: 3, sm: 3.5, md: 4 },
+          p: { xs: 2, sm: 3, md: 4 },
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          gap: 3,
+          gap: { xs: 2, md: 3 },
           position: 'relative',
           overflow: 'hidden',
           boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.08), inset -1px 0 0 rgba(255, 255, 255, 0.05)',
@@ -354,12 +355,12 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
 
         {/* Top InfoHR Branding & Badges */}
         <Box sx={{ position: 'relative', zIndex: 1 }}>
-          <Stack direction="row" alignItems="center" spacing={1.25} sx={{ mb: 2 }}>
+          <Stack direction="row" alignItems="center" spacing={1.25} sx={{ mb: 1.5 }}>
             <Box
               component="img"
               src={IMAGES.getTextLogo('light')}
               alt="InfoHR"
-              sx={{ height: 26, width: 'auto', display: 'block' }}
+              sx={{ height: 24, width: 'auto', display: 'block' }}
             />
             <Chip
               icon={
@@ -369,7 +370,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
                   <ApartmentOutlinedIcon sx={{ fontSize: '13px !important', color: '#93c5fd !important' }} />
                 )
               }
-              label={isMock ? 'AILA MOCK PRACTICE' : 'OFFICIAL INTERVIEW'}
+              label={isMock ? 'AILA MOCK' : 'OFFICIAL INTERVIEW'}
               size="small"
               sx={{
                 bgcolor: 'rgba(37, 99, 235, 0.18)',
@@ -385,7 +386,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
             />
           </Stack>
 
-          <Stack direction="row" spacing={1} sx={{ mb: 2.5, flexWrap: 'wrap', gap: 0.75 }}>
+          <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap', gap: 0.75 }}>
             <Chip
               icon={
                 isMock ? (
@@ -463,14 +464,14 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
           </Stack>
 
           {/* Job Title & Company */}
-          <Stack direction="row" spacing={1.75} alignItems="center" sx={{ mb: 3 }}>
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: { xs: 2, md: 3 } }}>
             <Avatar
               src={isMock ? undefined : (companyLogo || undefined)}
               alt={isMock ? 'AILA AI' : companyName}
               sx={{
-                width: 52,
-                height: 52,
-                borderRadius: '16px',
+                width: { xs: 44, md: 52 },
+                height: { xs: 44, md: 52 },
+                borderRadius: '14px',
                 bgcolor: isMock ? 'rgba(37, 99, 235, 0.15)' : '#0f172a',
                 border: isMock ? '1.5px solid rgba(59, 130, 246, 0.4)' : '1.5px solid rgba(255, 255, 255, 0.2)',
                 boxShadow: '0 8px 24px -4px rgba(0, 0, 0, 0.45)',
@@ -478,12 +479,13 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 p: isMock ? 0.5 : 0,
+                flexShrink: 0,
               }}
             >
               {isMock ? (
-                <AilaLogo size={36} variant="mark" />
+                <AilaLogo size={30} variant="mark" />
               ) : (
-                <ApartmentOutlinedIcon sx={{ color: '#ffffff', fontSize: 26 }} />
+                <ApartmentOutlinedIcon sx={{ color: '#ffffff', fontSize: 24 }} />
               )}
             </Avatar>
             <Box sx={{ minWidth: 0 }}>
@@ -492,7 +494,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
                 sx={{
                   fontWeight: 800,
                   color: '#ffffff',
-                  fontSize: { xs: '1.25rem', md: '1.45rem' },
+                  fontSize: { xs: '1.1rem', md: '1.45rem' },
                   lineHeight: 1.25,
                   letterSpacing: '-0.01em',
                   display: '-webkit-box',
@@ -512,7 +514,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
                   fontWeight: 600,
                   textTransform: isMock ? 'none' : 'uppercase',
                   letterSpacing: isMock ? '0.01em' : '0.04em',
-                  fontSize: '0.75rem',
+                  fontSize: '0.725rem',
                   display: 'block',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -524,12 +526,13 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
             </Box>
           </Stack>
 
-          {/* Two Frosted Metric Cards */}
-          <Stack spacing={1.5}>
+          {/* Two Frosted Metric Cards: Side-by-side on mobile, stacked on desktop */}
+          <Stack direction={{ xs: 'row', md: 'column' }} spacing={{ xs: 1, md: 1.5 }}>
             <Box
               sx={{
-                p: 2,
-                borderRadius: '16px',
+                flex: 1,
+                p: { xs: 1.25, md: 2 },
+                borderRadius: '14px',
                 bgcolor: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 backdropFilter: 'blur(10px)',
@@ -539,11 +542,11 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
                 },
               }}
             >
-              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.75 }}>
-                <QuizOutlinedIcon sx={{ fontSize: 15, color: '#94a3b8' }} />
+              <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 0.5 }}>
+                <QuizOutlinedIcon sx={{ fontSize: 14, color: '#94a3b8' }} />
                 <Typography
                   sx={{
-                    fontSize: '0.6875rem',
+                    fontSize: '0.625rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.06em',
@@ -553,15 +556,16 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
                   CÂU HỎI
                 </Typography>
               </Stack>
-              <Typography sx={{ fontSize: '1.85rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>
+              <Typography sx={{ fontSize: { xs: '1.35rem', md: '1.85rem' }, fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>
                 {questionsCount}
               </Typography>
             </Box>
 
             <Box
               sx={{
-                p: 2,
-                borderRadius: '16px',
+                flex: 1,
+                p: { xs: 1.25, md: 2 },
+                borderRadius: '14px',
                 bgcolor: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 backdropFilter: 'blur(10px)',
@@ -571,31 +575,31 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
                 },
               }}
             >
-              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.75 }}>
-                <TranslateOutlinedIcon sx={{ fontSize: 15, color: '#94a3b8' }} />
+              <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 0.5 }}>
+                <TranslateOutlinedIcon sx={{ fontSize: 14, color: '#94a3b8' }} />
                 <Typography
                   sx={{
-                    fontSize: '0.6875rem',
+                    fontSize: '0.625rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.06em',
                     color: '#94a3b8',
                   }}
                 >
-                  NGÔN NGỮ PHỎNG VẤN
+                  NGÔN NGỮ
                 </Typography>
               </Stack>
-              <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff' }}>
+              <Typography sx={{ fontSize: { xs: '0.8125rem', md: '1rem' }, fontWeight: 700, color: '#ffffff' }}>
                 VN Tiếng Việt
               </Typography>
             </Box>
           </Stack>
         </Box>
 
-        {/* Bottom Tips Card */}
+        {/* Bottom Tips Card: Collapsible on mobile to avoid pushing camera off screen */}
         <Box
           sx={{
-            p: 2.25,
+            p: { xs: 1.5, md: 2.25 },
             borderRadius: '16px',
             bgcolor: 'rgba(255, 255, 255, 0.04)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -603,37 +607,60 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
             zIndex: 1,
           }}
         >
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-            <LightbulbOutlinedIcon sx={{ fontSize: 17, color: '#fbbf24' }} />
-            <Typography sx={{ fontWeight: 700, fontSize: '0.8125rem', color: '#f8fafc' }}>
-              {isMock ? 'Mẹo luyện tập AI hiệu quả' : 'Mẹo phỏng vấn chính thức'}
-            </Typography>
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            justifyContent="space-between"
+            onClick={() => setTipsExpanded((prev) => !prev)}
+            sx={{ cursor: { xs: 'pointer', md: 'default' } }}
+          >
+            <Stack direction="row" spacing={1} alignItems="center">
+              <LightbulbOutlinedIcon sx={{ fontSize: 17, color: '#fbbf24' }} />
+              <Typography sx={{ fontWeight: 700, fontSize: '0.8125rem', color: '#f8fafc' }}>
+                {isMock ? 'Mẹo luyện tập AI hiệu quả' : 'Mẹo phỏng vấn chính thức'}
+              </Typography>
+            </Stack>
+            <Box
+              component="span"
+              sx={{
+                display: { xs: 'inline-flex', md: 'none' },
+                color: '#60a5fa',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+              }}
+            >
+              {tipsExpanded ? 'Thu gọn' : 'Xem mẹo'}
+            </Box>
           </Stack>
-          {isMock ? (
-            <Box sx={{ color: '#cbd5e1', fontSize: '0.75rem', lineHeight: 1.65 }}>
-              <div style={{ color: '#e2e8f0' }}>• Tự do luyện tập nhiều lần để rèn luyện sự tự tin</div>
-              <div style={{ color: '#e2e8f0' }}>• Trả lời tự nhiên theo cấu trúc STAR: Tình huống, Nhiệm vụ, Hành động và Kết quả</div>
-              <div style={{ color: '#e2e8f0' }}>• AI sẽ phân tích giọng nói, độ lưu loát và đưa ra gợi ý sau phiên</div>
-              <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mt: 1.25 }}>
-                <LockOutlinedIcon sx={{ fontSize: 13, color: '#34d399 !important' }} />
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: '#6ee7b7 !important' }}>
-                  Dữ liệu riêng tư — Kết quả không gửi cho nhà tuyển dụng
-                </Typography>
-              </Stack>
-            </Box>
-          ) : (
-            <Box sx={{ color: '#cbd5e1', fontSize: '0.75rem', lineHeight: 1.65 }}>
-              <div style={{ color: '#e2e8f0' }}>• Tìm không gian yên tĩnh và đủ ánh sáng</div>
-              <div style={{ color: '#e2e8f0' }}>• Nói rõ ràng, tốc độ đều đặn và tự nhiên</div>
-              <div style={{ color: '#e2e8f0' }}>• Sử dụng phương pháp STAR cho các câu hỏi tình huống và hành vi</div>
-              <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mt: 1.25 }}>
-                <FiberManualRecordIcon sx={{ fontSize: '8px', color: '#f43f5e !important' }} />
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: '#fca5a5 !important' }}>
-                  Cuộc họp được tự động ghi hình để Hội đồng tuyển dụng đánh giá
-                </Typography>
-              </Stack>
-            </Box>
-          )}
+
+          <Box sx={{ display: { xs: tipsExpanded ? 'block' : 'none', md: 'block' }, mt: 1.25 }}>
+            {isMock ? (
+              <Box sx={{ color: '#cbd5e1', fontSize: '0.75rem', lineHeight: 1.65 }}>
+                <div style={{ color: '#e2e8f0' }}>• Tự do luyện tập nhiều lần để rèn luyện sự tự tin</div>
+                <div style={{ color: '#e2e8f0' }}>• Trả lời tự nhiên theo cấu trúc STAR: Tình huống, Nhiệm vụ, Hành động và Kết quả</div>
+                <div style={{ color: '#e2e8f0' }}>• AI sẽ phân tích giọng nói, độ lưu loát và đưa ra gợi ý sau phiên</div>
+                <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mt: 1.25 }}>
+                  <LockOutlinedIcon sx={{ fontSize: 13, color: '#34d399 !important' }} />
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: '#6ee7b7 !important' }}>
+                    Dữ liệu riêng tư — Kết quả không gửi cho nhà tuyển dụng
+                  </Typography>
+                </Stack>
+              </Box>
+            ) : (
+              <Box sx={{ color: '#cbd5e1', fontSize: '0.75rem', lineHeight: 1.65 }}>
+                <div style={{ color: '#e2e8f0' }}>• Tìm không gian yên tĩnh và đủ ánh sáng</div>
+                <div style={{ color: '#e2e8f0' }}>• Nói rõ ràng, tốc độ đều đặn và tự nhiên</div>
+                <div style={{ color: '#e2e8f0' }}>• Sử dụng phương pháp STAR cho các câu hỏi tình huống và hành vi</div>
+                <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mt: 1.25 }}>
+                  <FiberManualRecordIcon sx={{ fontSize: '8px', color: '#f43f5e !important' }} />
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: '#fca5a5 !important' }}>
+                    Cuộc họp được tự động ghi hình để Hội đồng tuyển dụng đánh giá
+                  </Typography>
+                </Stack>
+              </Box>
+            )}
+          </Box>
         </Box>
       </Box>
 
@@ -641,12 +668,12 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
       <Box
         sx={{
           flex: 1,
-          p: { xs: 3, sm: 3.5, md: 4 },
+          p: { xs: 2, sm: 3, md: 4 },
           bgcolor: '#ffffff',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          gap: 2.5,
+          gap: { xs: 2, md: 2.5 },
         }}
       >
         {/* Error Notification if mic is blocked */}
@@ -675,7 +702,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
           sx={{
             width: '100%',
             aspectRatio: '16/9',
-            maxHeight: { xs: 210, sm: 250, md: 280 },
+            maxHeight: { xs: 190, sm: 240, md: 280 },
             bgcolor: '#0f172a',
             borderRadius: '16px',
             overflow: 'hidden',
@@ -730,7 +757,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
         </Box>
 
         {/* 2. Device Controls: Select Micro & Toggle Camera */}
-        <Grid container spacing={2}>
+        <Grid container spacing={1.5}>
           {/* Micro Selection */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <Box
@@ -767,7 +794,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
                   sx={{
                     bgcolor: '#ffffff',
                     borderRadius: '10px',
-                    fontSize: '0.8125rem',
+                    fontSize: { xs: '0.875rem', sm: '0.8125rem' },
                     fontWeight: 600,
                     '& .MuiOutlinedInput-notchedOutline': {
                       borderColor: '#e2e8f0',
@@ -872,7 +899,8 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
               sx={{
                 fontWeight: 600,
                 color: volume > 10 ? '#16a34a' : '#475569',
-                fontSize: '0.75rem',
+                fontSize: { xs: '0.72rem', sm: '0.75rem' },
+                textAlign: 'center',
               }}
             >
               {volume > 10 ? 'Đang nhận tín hiệu giọng nói — Rất tốt!' : 'Đang nghe — Hãy nói để kiểm tra'}
@@ -889,6 +917,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
               height: 38,
               mb: 1.5,
               px: 1,
+              overflow: 'hidden',
             }}
           >
             {bars.map((barVal, i) => {
@@ -898,7 +927,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
                 <Box
                   key={i}
                   sx={{
-                    width: 4,
+                    width: { xs: 3, sm: 4 },
                     height: `${height}px`,
                     borderRadius: '2px',
                     bgcolor: isActive ? '#2563eb' : '#cbd5e1',
@@ -939,23 +968,34 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
           />
         </Box>
 
-        {/* 4. Action Footer Buttons */}
-        <Box>
-          <Stack direction="row" spacing={1.5} alignItems="center">
+        {/* 4. Action Footer Buttons - Sticky on mobile with safe area */}
+        <Box
+          sx={{
+            position: { xs: 'sticky', md: 'static' },
+            bottom: { xs: 0, md: 'auto' },
+            bgcolor: { xs: 'rgba(255, 255, 255, 0.96)', md: 'transparent' },
+            backdropFilter: { xs: 'blur(12px)', md: 'none' },
+            pt: { xs: 1.5, md: 0 },
+            pb: { xs: 'max(0.5rem, env(safe-area-inset-bottom))', md: 0 },
+            zIndex: 10,
+          }}
+        >
+          <Stack direction="row" spacing={1.25} alignItems="center">
             <Button
               onClick={onCancel}
               disabled={starting}
               variant="outlined"
-              startIcon={<ArrowBackOutlinedIcon />}
+              startIcon={<ArrowBackOutlinedIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
               sx={{
                 borderRadius: '12px',
                 textTransform: 'none',
                 fontWeight: 600,
-                fontSize: '0.875rem',
+                fontSize: { xs: '0.8125rem', sm: '0.875rem' },
                 borderColor: '#e2e8f0',
                 color: '#475569',
-                px: 2.5,
-                py: 1.25,
+                px: { xs: 1.75, sm: 2.5 },
+                py: { xs: 1, sm: 1.25 },
+                minHeight: 44,
                 '&:hover': {
                   borderColor: '#cbd5e1',
                   bgcolor: '#f1f5f9',
@@ -970,15 +1010,16 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
               disabled={starting || !audioStream || !!error}
               variant="contained"
               startIcon={hasDetectedVoice && isMock ? <AilaLogo size={16} variant="mark" /> : undefined}
-              endIcon={hasDetectedVoice ? <ArrowForwardOutlinedIcon /> : <GraphicEqOutlinedIcon />}
+              endIcon={hasDetectedVoice ? <ArrowForwardOutlinedIcon sx={{ fontSize: { xs: 16, sm: 20 } }} /> : <GraphicEqOutlinedIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
               sx={{
                 flex: 1,
                 borderRadius: '12px',
                 textTransform: 'none',
                 fontWeight: 700,
-                fontSize: '0.875rem',
-                py: 1.25,
-                px: 3,
+                fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                py: { xs: 1, sm: 1.25 },
+                px: { xs: 2, sm: 3 },
+                minHeight: 44,
                 bgcolor: '#2563eb',
                 boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)',
                 '&:hover': {

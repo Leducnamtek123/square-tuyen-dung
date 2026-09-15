@@ -74,10 +74,23 @@ const Map = ({ title, subTitle, latitude, longitude, height = '260px' }: Props) 
       attributionControl: false,
     });
 
+    const FALLBACK_TILE_DATA_URI =
+      "data:image/svg+xml;charset=utf-8," +
+      encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">' +
+        '<rect width="256" height="256" fill="#f8fafc"/>' +
+        '<path d="M0 64 H256 M0 128 H256 M0 192 H256 M64 0 V256 M128 0 V256 M192 0 V256" stroke="#e2e8f0" stroke-width="1"/>' +
+        '<path d="M0 100 Q128 140 256 110" stroke="#cbd5e1" stroke-width="4" fill="none"/>' +
+        '<path d="M80 0 Q110 128 100 256" stroke="#cbd5e1" stroke-width="3" fill="none"/>' +
+        '<circle cx="128" cy="128" r="6" fill="#94a3b8" opacity="0.4"/>' +
+        '</svg>'
+      );
+
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       subdomains: "abc",
       maxZoom: 19,
       attribution: "",
+      errorTileUrl: FALLBACK_TILE_DATA_URI,
     }).addTo(map);
 
     const popup = document.createElement("div");
@@ -184,13 +197,48 @@ const Map = ({ title, subTitle, latitude, longitude, height = '260px' }: Props) 
         borderRadius: 2,
         border: '1px solid',
         borderColor: 'divider',
+        position: 'relative',
       }}
     >
       <Box
         ref={containerRef}
         aria-label={title || "Map"}
-        sx={{ height: "100%", width: "100%" }}
+        sx={{ height: "100%", width: "100%", bgcolor: '#f8fafc' }}
       />
+      <Box
+        component="a"
+        href={`https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        sx={{
+          position: 'absolute',
+          bottom: 10,
+          right: 10,
+          zIndex: 1000,
+          bgcolor: 'rgba(255, 255, 255, 0.94)',
+          backdropFilter: 'blur(4px)',
+          px: 1.25,
+          py: 0.5,
+          borderRadius: 1.5,
+          border: '1px solid #e2e8f0',
+          fontSize: '0.75rem',
+          fontWeight: 600,
+          color: '#2563eb',
+          textDecoration: 'none',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
+          '&:hover': {
+            bgcolor: '#ffffff',
+            color: '#1d4ed8',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.12)',
+          },
+        }}
+      >
+        <LocationOnIcon sx={{ fontSize: 14 }} />
+        Mở Google Maps
+      </Box>
     </Paper>
   );
 };

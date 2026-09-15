@@ -969,6 +969,9 @@
     },
     "updating": "Updating...",
     "activeNow": "Active Now",
+    "searchPlaceholder": "Search by candidate name, position...",
+    "noSearchMatch": "No matching live interviews found",
+    "noSearchMatchHint": "Try searching with a different keyword or clear filter",
     "noData": {
       "title": "No live sessions yet",
       "subtitle": "When a candidate turns on camera or mic, their realtime card will appear here."
@@ -1006,7 +1009,7 @@
       "screenShare": "Screen share",
       "liveAudioNoVideo": "Live audio - No video",
       "waitingForMediaTracks": "Waiting for audio/video tracks...",
-      "waitingSignal": "Waiting for signal",
+      "waitingSignal": "Waiting for signal...",
       "waitingSignalHint": "When the candidate turns on camera or mic, the preview will appear here",
       "tokenError": "Unable to fetch observer token.",
       "unknownCandidate": "Unknown candidate",
@@ -1021,16 +1024,16 @@
       "time": "Time",
       "endSession": "End session",
       "noConnectionDetails": "No connection details available for fullscreen.",
-      "joinPresence": "Join as Present",
+      "joinPresence": "Join Room",
       "joinPresenceLoading": "Connecting...",
-      "joinPresenceTooltip": "Join the room as Employer â€” candidate will see you",
+      "joinPresenceTooltip": "Join the room as Employer — candidate will see you",
       "presenceTitle": "Present in Room",
       "presenceSubtitle": "You are joining as Employer. The candidate can see your presence.",
       "presenceExit": "Leave room"
     }
   },
   "verification": {
-    "title": "Employer Verification",
+    "title": "Business Verification",
     "step1": {
       "title": "Step 1: Update Company Profile",
       "description": "Complete company information before submitting verification documents. Admin will review this content before granting posting rights.",
@@ -1051,10 +1054,10 @@
       "statusPending": "Status: Pending Approval"
     },
     "status": {
-      "pending": "Pending review",
-      "reviewing": "Reviewing",
-      "approved": "Approved",
-      "rejected": "Rejected"
+      "pending": "Incomplete",
+      "reviewing": "Under Review",
+      "approved": "Verified",
+      "rejected": "Needs Update"
     },
     "messages": {
       "infoRecorded": "Information recorded.",
@@ -1063,8 +1066,8 @@
       "saveFailed": "Could not save the verification profile. Please try again."
     },
     "summary": {
-      "companyProfile": "Company profile",
-      "legalProfile": "Legal profile",
+      "companyProfile": "Company Profile",
+      "legalProfile": "Legal Documents",
       "progress": "Completion progress",
       "canPost": "Your company has been verified and can post jobs.",
       "cannotPost": "Please complete the legal profile and wait for admin verification before posting jobs."

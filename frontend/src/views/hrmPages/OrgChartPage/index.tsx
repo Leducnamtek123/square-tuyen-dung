@@ -97,7 +97,7 @@ export default function OrgChartPage() {
     const deptEmployees = employeesByDept.get(node.id) || [];
     const hasSubItems = hasChildren || deptEmployees.length > 0;
     const expanded = isExpanded(node.id);
-    const nodeName = node.name || `Phòng ban #${node.id}`;
+    const nodeName = node.name || 'Phòng ban';
     const initialChar = nodeName.trim().charAt(0)?.toUpperCase() || 'D';
     const isMembersVisible = showMembers[node.id] !== false;
 

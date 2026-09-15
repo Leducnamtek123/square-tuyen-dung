@@ -115,8 +115,28 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
     getValues,
   } = useForm<ApplyFormValues>({
     resolver: typedYupResolver(schema),
-    defaultValues: { fullName: "", email: "", phone: "", resume: "" },
+    defaultValues: {
+      fullName: currentUser?.fullName || "",
+      email: currentUser?.email || "",
+      phone: currentUser?.phoneNumber || (currentUser as any)?.phone || "",
+      resume: "",
+    },
   });
+
+  React.useEffect(() => {
+    if (currentUser) {
+      if (!getValues("fullName") && currentUser.fullName) {
+        setValue("fullName", currentUser.fullName, { shouldValidate: true });
+      }
+      if (!getValues("email") && currentUser.email) {
+        setValue("email", currentUser.email, { shouldValidate: true });
+      }
+      const phone = currentUser.phoneNumber || (currentUser as any)?.phone;
+      if (!getValues("phone") && phone) {
+        setValue("phone", phone, { shouldValidate: true });
+      }
+    }
+  }, [currentUser, getValues, setValue]);
 
   React.useEffect(() => {
     let isActive = true;

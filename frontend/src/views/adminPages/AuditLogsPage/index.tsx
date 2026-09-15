@@ -185,10 +185,10 @@ export default function AuditLogsPage() {
   const columns = useMemo<ColumnDef<AuditLog>[]>(
     () => [
       {
-        accessorKey: 'id',
-        header: 'ID',
-        enableSorting: true,
-        size: 72,
+        id: 'index',
+        header: 'STT',
+        cell: (info) => info.row.index + 1,
+        size: 60,
       },
       {
         id: 'create_at',
@@ -220,7 +220,7 @@ export default function AuditLogsPage() {
               {String(info.getValue() || '---')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              #{info.row.original.resourceId || '---'} {info.row.original.resourceRepr ? `· ${info.row.original.resourceRepr}` : ''}
+              {info.row.original.resourceRepr || 'Đối tượng'}
             </Typography>
           </Box>
         ),

@@ -191,28 +191,19 @@ const InterviewDetailHeader = ({
           )}
 
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} alignItems={{ xs: 'flex-start', sm: 'center' }}>
-            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700 }}>
-              {t('interview:interviewDetail.label.roomCode')}
-            </Typography>
-            <Box
+            <Chip
+              label={session.isLive ? 'Phòng phỏng vấn Trực tiếp (Live)' : 'Phòng phỏng vấn AI'}
+              size="small"
               sx={{
-                fontWeight: 850,
+                fontWeight: 750,
                 color: 'primary.main',
-                bgcolor: pc.primary(0.06),
-                px: 1.5,
-                py: 0.5,
-                borderRadius: 1.5,
-                fontSize: '0.9rem',
+                bgcolor: pc.primary(0.08),
                 border: '1px solid',
-                borderColor: pc.primary(0.14),
-                letterSpacing: 0,
+                borderColor: pc.primary(0.18),
+                borderRadius: 1.5,
+                fontSize: '0.8125rem',
               }}
-            >
-              {session.roomName}
-            </Box>
-            <Typography variant="body2" color="text.disabled" sx={{ fontWeight: 650 }}>
-              ID: <Box component="span" sx={{ color: 'text.secondary', fontWeight: 800 }}>{session.id}</Box>
-            </Typography>
+            />
           </Stack>
 
           {isInterrupted && (

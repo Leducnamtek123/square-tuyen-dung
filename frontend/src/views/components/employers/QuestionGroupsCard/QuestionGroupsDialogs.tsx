@@ -19,6 +19,7 @@ import {
   Tooltip,
   Paper,
   Switch,
+  Alert,
   alpha,
   type Theme,
 } from '@mui/material';
@@ -28,6 +29,7 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import CloseIcon from '@mui/icons-material/Close';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import MapIcon from '@mui/icons-material/Map';
 import type { QuestionGroup, Question } from '@/types/models';
 import type { TFunction } from 'i18next';
@@ -167,6 +169,8 @@ const QuestionGroupsDialogs = ({
     return { label: 'Giải quyết vấn đề', color: '#059669', bg: '#d1fae5' };
   };
 
+  const isSystem = dialogMode === 'edit' && Boolean(currentGroup && (currentGroup.canWrite === false || !currentGroup.company));
+
   return (
     <>
       <Dialog
@@ -181,6 +185,23 @@ const QuestionGroupsDialogs = ({
         </DialogTitle>
         <DialogContent sx={{ px: 3, pb: 0 }}>
           <Stack spacing={3} sx={{ pt: 2 }}>
+            {isSystem && (
+              <Alert
+                severity="info"
+                icon={<AutoAwesomeRoundedIcon fontSize="inherit" />}
+                sx={{
+                  borderRadius: 2.5,
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  bgcolor: '#eff6ff',
+                  color: '#1e40af',
+                  border: '1px solid #bfdbfe',
+                  '& .MuiAlert-icon': { color: '#2563eb' },
+                }}
+              >
+                Bộ câu hỏi chuẩn hệ thống. Lưu thay đổi sẽ tự động nhân bản thành bộ câu hỏi của doanh nghiệp.
+              </Alert>
+            )}
             <TextField
               label={t('employer:questionGroupsCard.label.questiongroupname')}
               fullWidth
@@ -419,7 +440,7 @@ const QuestionGroupsDialogs = ({
                         {/* Title & Preview */}
                         <Box sx={{ minWidth: 0, flex: 1 }}>
                           <Typography variant="body2" sx={{ fontWeight: 700, color: '#0f172a', lineHeight: 1.3 }} noWrap>
-                            {shortTitle || `Câu hỏi #${qId}`}
+                            {shortTitle || 'Câu hỏi'}
                           </Typography>
                           <Typography variant="caption" sx={{ color: '#64748b' }} noWrap display="block">
                             {q?.text || ''}

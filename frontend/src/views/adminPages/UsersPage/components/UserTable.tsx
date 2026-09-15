@@ -67,9 +67,10 @@ const UserTable = ({
 
     const columns = useMemo<ColumnDef<UserModel>[]>(() => [
         {
-            accessorKey: 'id',
-            header: t('pages.users.table.id') as string,
-            enableSorting: true,
+            id: 'index',
+            header: 'STT',
+            cell: (info) => info.row.index + 1,
+            size: 60,
         },
         {
             accessorKey: 'fullName',

@@ -9,7 +9,7 @@ describe('CandidateTopKpiRow Component & Localization', () => {
     expect(source).toContain('/my-jobs?tab=2');
     expect(source).toContain('/my-jobs?tab=1');
     expect(source).toContain('/my-company');
-    expect(source).toContain('/companies');
+    expect(source).toContain('/my-company?tab=2');
   });
 
   it('uses candidateDashboard.kpi translation keys instead of hardcoded strings', () => {

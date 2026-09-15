@@ -437,7 +437,7 @@ export default function LeaveListPage() {
                         <TableRow key={l.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
                           <TableCell sx={{ fontWeight: 800, color: '#0f172a' }}>
                             <Typography variant="body2" sx={{ fontWeight: 800, color: '#0f172a' }}>
-                              {l.employeeName || l.employee_name || `#${l.employee}`}
+                              {l.employeeName || l.employee_name || 'Nhân sự'}
                             </Typography>
                             {(l.leaveTypeName || l.leave_type_name) && (
                               <Chip
@@ -597,7 +597,7 @@ export default function LeaveListPage() {
                             {bal.employeeCode || bal.employee_code || '-'}
                           </TableCell>
                           <TableCell sx={{ fontWeight: 800, color: '#0f172a' }}>
-                            {bal.employeeName || bal.employee_name || `#${bal.employee}`}
+                            {bal.employeeName || bal.employee_name || 'Nhân sự'}
                           </TableCell>
                           <TableCell sx={{ color: '#475569' }}>
                             {bal.leaveTypeName || bal.leave_type_name || 'Phép năm'}

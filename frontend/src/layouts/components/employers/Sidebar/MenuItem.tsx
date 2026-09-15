@@ -120,7 +120,7 @@ const MenuItem = ({ icon: Icon, text, tooltip, to, external = false, onClick, ki
       onClick={handleClick}
       selected={isSelected}
       sx={{
-        pl: isCollapsed ? 0 : (isChild ? 3.5 : 1.75),
+        pl: isCollapsed ? 0 : (isChild ? 2.5 : 1.75),
         justifyContent: isCollapsed ? 'center' : 'flex-start',
         minHeight: 42,
         px: isCollapsed ? 0 : undefined,
@@ -140,8 +140,8 @@ const MenuItem = ({ icon: Icon, text, tooltip, to, external = false, onClick, ki
             borderRadius: '50%',
             backgroundColor: isSelected ? '#2563eb' : '#cbd5e1',
             boxShadow: isSelected ? '0 0 0 3px rgba(37, 99, 235, 0.18)' : 'none',
-            mr: isCollapsed ? 0 : 2,
-            ml: isCollapsed ? 0 : 0.5,
+            mr: isCollapsed ? 0 : 1.25,
+            ml: isCollapsed ? 0 : 0.25,
             transition: 'all 0.15s ease-in-out',
             flexShrink: 0,
           }}

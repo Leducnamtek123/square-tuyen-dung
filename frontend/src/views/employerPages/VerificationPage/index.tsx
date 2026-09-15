@@ -1,6 +1,7 @@
 'use client';
+
 import React, { useMemo, useState } from 'react';
-import { Box, Snackbar, Alert, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
@@ -9,11 +10,13 @@ import { TabTitle } from '@/utils/generalFunction';
 import companyVerificationService, { type CompanyVerificationPayload } from '@/services/companyVerificationService';
 import VerificationIntroCard from './components/VerificationIntroCard';
 import VerificationLegalProfileForm, { type VerificationLegalProfile } from './components/VerificationLegalProfileForm';
+import VerificationLegalProfileReviewCard from './components/VerificationLegalProfileReviewCard';
 import type { AlertColor, ChipProps } from '@mui/material';
+import toastMessages from '@/utils/toastMessages';
 
 export type LegalErrors = Partial<Record<keyof VerificationLegalProfile, string>>;
 
-const REQUIRED_LEGAL_FIELDS: Array<keyof VerificationLegalProfile> = [
+export const REQUIRED_LEGAL_FIELDS: Array<keyof VerificationLegalProfile> = [
   'companyName',
   'taxCode',
   'businessLicense',
@@ -22,7 +25,7 @@ const REQUIRED_LEGAL_FIELDS: Array<keyof VerificationLegalProfile> = [
   'email',
 ];
 
-const LEGAL_PROFILE_MAX_LENGTHS: Partial<Record<keyof VerificationLegalProfile, number>> = {
+export const LEGAL_PROFILE_MAX_LENGTHS: Partial<Record<keyof VerificationLegalProfile, number>> = {
   companyName: 255,
   taxCode: 30,
   businessLicense: 255,
@@ -32,7 +35,7 @@ const LEGAL_PROFILE_MAX_LENGTHS: Partial<Record<keyof VerificationLegalProfile, 
   website: 300,
 };
 
-const getStatusLabelKey = (status?: string) => {
+export const getStatusLabelKey = (status?: string) => {
   switch (status) {
     case 'reviewing':
       return 'verification.status.reviewing';
@@ -46,11 +49,23 @@ const getStatusLabelKey = (status?: string) => {
   }
 };
 
-const getStatusColor = (status?: string): ChipProps['color'] => {
+export const getStatusColor = (status?: string): ChipProps['color'] => {
   if (status === 'approved') return 'success';
   if (status === 'rejected') return 'error';
   if (status === 'reviewing') return 'warning';
   return 'info';
+};
+
+export const calculateLegalCompletion = (
+  legalProfile: Partial<VerificationLegalProfile>,
+): { missingFields: Array<keyof VerificationLegalProfile>; completion: number } => {
+  const missingFields = REQUIRED_LEGAL_FIELDS.filter(
+    (field) => !String(legalProfile[field] || '').trim(),
+  );
+  const completion = Math.round(
+    ((REQUIRED_LEGAL_FIELDS.length - missingFields.length) / REQUIRED_LEGAL_FIELDS.length) * 100,
+  );
+  return { missingFields, completion };
 };
 
 export const validateVerificationLegalProfile = (
@@ -93,9 +108,7 @@ const VerificationPage = () => {
   const queryClient = useQueryClient();
   TabTitle(t('verification.title'));
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('success');
+  const [isEditing, setIsEditing] = useState(false);
   const [legalErrors, setLegalErrors] = useState<LegalErrors>({});
   const [legalProfile, setLegalProfile] = useState<VerificationLegalProfile>({
     companyName: '',
@@ -138,22 +151,21 @@ const VerificationPage = () => {
 
   const statusColor = useMemo(() => getStatusColor(verification?.status), [verification?.status]);
 
-  const missingLegalFields = useMemo(
-    () => REQUIRED_LEGAL_FIELDS.filter((field) => !String(legalProfile[field] || '').trim()),
+  const { missingFields, completion: legalCompletion } = useMemo(
+    () => calculateLegalCompletion(legalProfile),
     [legalProfile],
   );
 
-  const legalCompletion = useMemo(() => {
-    return Math.round(((REQUIRED_LEGAL_FIELDS.length - missingLegalFields.length) / REQUIRED_LEGAL_FIELDS.length) * 100);
-  }, [missingLegalFields.length]);
-
-  const legalReady = missingLegalFields.length === 0;
-  const canPost = verification?.status === 'approved' || Boolean(verification?.companyDict?.isVerified);
+  const legalReady = missingFields.length === 0;
+  const isVerified = verification?.status === 'approved' || Boolean(verification?.companyDict?.isVerified);
+  const canPost = isVerified;
 
   const showSnackbar = (message: string, severity: AlertColor = 'success') => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setSnackbarOpen(true);
+    if (severity === 'error') {
+      toastMessages.error(message);
+    } else {
+      toastMessages.success(message);
+    }
   };
 
   const validateLegalProfile = () => {
@@ -168,6 +180,22 @@ const VerificationPage = () => {
       setLegalErrors((prev) => ({ ...prev, [field]: undefined }));
     };
 
+  const handleCancelEdit = () => {
+    if (verification) {
+      setLegalProfile({
+        companyName: verification.companyName || '',
+        taxCode: verification.taxCode || '',
+        businessLicense: verification.businessLicense || '',
+        representative: verification.representative || '',
+        phone: verification.phone || '',
+        email: verification.email || '',
+        website: verification.website || '',
+      });
+    }
+    setLegalErrors({});
+    setIsEditing(false);
+  };
+
   const handleSaveLegalProfile = async (event: React.SyntheticEvent) => {
     event.preventDefault();
     if (!validateLegalProfile()) {
@@ -178,6 +206,8 @@ const VerificationPage = () => {
     try {
       await updateMutation.mutateAsync(legalProfile);
       showSnackbar(t('verification.messages.profileSaved'));
+      setIsEditing(false);
+      await queryClient.invalidateQueries({ queryKey: ['company-verification'] });
     } catch {
       showSnackbar(t('verification.messages.saveFailed'), 'error');
     }
@@ -185,37 +215,38 @@ const VerificationPage = () => {
 
   return (
     <Box>
-      <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
-        {t('verification.title')}
-      </Typography>
       <VerificationIntroCard
         statusLabel={statusLabel}
         statusColor={statusColor}
         completion={legalCompletion}
-        missingCount={missingLegalFields.length}
+        missingCount={missingFields.length}
         canPost={canPost}
         legalReady={legalReady}
+        status={verification?.status}
+        adminNote={verification?.adminNote}
+        hasLicense={Boolean(legalProfile.businessLicense)}
       />
-      <VerificationLegalProfileForm
-        legalProfile={legalProfile}
-        onChange={handleLegalProfileChange}
-        onLicenseFileUploaded={(url) => setLegalProfile((prev) => ({ ...prev, businessLicense: url }))}
-        onSubmit={handleSaveLegalProfile}
-        statusLabel={statusLabel}
-        statusColor={statusColor}
-        errors={legalErrors}
-        loading={isLoading || updateMutation.isPending}
-      />
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+
+      {isVerified && !isEditing ? (
+        <VerificationLegalProfileReviewCard
+          legalProfile={legalProfile}
+          verification={verification}
+          onStartEditing={() => setIsEditing(true)}
+        />
+      ) : (
+        <VerificationLegalProfileForm
+          legalProfile={legalProfile}
+          onChange={handleLegalProfileChange}
+          onLicenseFileUploaded={(url) => setLegalProfile((prev) => ({ ...prev, businessLicense: url }))}
+          onSubmit={handleSaveLegalProfile}
+          onCancel={isVerified ? handleCancelEdit : undefined}
+          isPreviouslyVerified={isVerified}
+          statusLabel={statusLabel}
+          statusColor={statusColor}
+          errors={legalErrors}
+          loading={isLoading || updateMutation.isPending}
+        />
+      )}
     </Box>
   );
 };

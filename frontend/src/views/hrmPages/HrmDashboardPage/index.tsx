@@ -545,7 +545,7 @@ export default function HrmDashboardPage() {
                       {pendingLeaves.slice(0, 4).map((leave) => (
                         <TableRow key={leave.id} hover>
                           <TableCell sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.8125rem' }}>
-                            {leave.employeeName || leave.employee_name || `#${leave.employee}`}
+                            {leave.employeeName || leave.employee_name || 'Nhân sự'}
                           </TableCell>
                           <TableCell sx={{ fontSize: '0.775rem', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
                             {leave.startDate || leave.start_date} ({leave.totalDays ?? leave.total_days} ngày)
@@ -637,7 +637,7 @@ export default function HrmDashboardPage() {
                         </Avatar>
                         <Box>
                           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.8125rem' }}>
-                            {leave.employeeName || leave.employee_name || `#${leave.employee}`}
+                            {leave.employeeName || leave.employee_name || 'Nhân sự'}
                           </Typography>
                           <Typography variant="caption" sx={{ color: '#c2410c', fontWeight: 600, fontSize: '0.7rem' }}>
                             {leave.leaveTypeName || leave.leave_type_name || 'Nghỉ phép'} ({leave.startDate || leave.start_date} → {leave.endDate || leave.end_date})

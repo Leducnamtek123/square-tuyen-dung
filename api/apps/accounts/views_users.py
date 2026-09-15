@@ -640,7 +640,7 @@ class UserViewSet(
     def get_queryset(self):
         queryset = (
             User.objects.select_related("avatar", "company")
-            .prefetch_related("companymember_set__role")
+            .prefetch_related("company_memberships__role")
             .order_by("-id")
         )
         role_name = self.request.query_params.get("roleName", None)

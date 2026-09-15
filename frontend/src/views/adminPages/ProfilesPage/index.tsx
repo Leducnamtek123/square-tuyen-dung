@@ -288,9 +288,10 @@ const ProfilesPage = () => {
 
     const columns = useMemo<ColumnDef<JobSeekerProfile>[]>(() => [
         {
-            accessorKey: 'id',
-            header: 'ID',
-            enableSorting: true,
+            id: 'index',
+            header: 'STT',
+            cell: (info) => info.row.index + 1,
+            size: 60,
         },
         {
             id: 'candidate',
@@ -817,9 +818,6 @@ const ProfilesPage = () => {
                                     <Box sx={{ flex: 1, minWidth: 0 }}>
                                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                             {option.name}
-                                        </Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                            #{option.id}
                                         </Typography>
                                     </Box>
                                 </li>

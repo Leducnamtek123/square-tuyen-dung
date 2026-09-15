@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useMemo } from 'react';
 import { Box, Typography, Paper, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton, Stack } from '@mui/material';
@@ -142,7 +142,6 @@ const CitiesPage = () => {
 
   const columns = useMemo<ColumnDef<City>[]>(
     () => [
-      { accessorKey: 'id', header: 'ID', enableSorting: true },
       {
         accessorKey: 'name',
         header: t('pages.cities.table.name') as string,

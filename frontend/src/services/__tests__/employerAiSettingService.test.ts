@@ -74,18 +74,18 @@ describe('employerAiSettingService', () => {
 
   it('resolves voice name and preset voice correctly', () => {
     expect(employerAiSettingService.resolveVoiceName('vi-VN-Standard-A')).toBe('Trúc Ly');
-    expect(employerAiSettingService.resolveVoiceName('vi-VN-Standard-B')).toBe('Nam Minh');
-    expect(employerAiSettingService.resolveVoiceName('vi-VN-Standard-C')).toBe('Mai Phương');
-    expect(employerAiSettingService.resolveVoiceName('vi-VN-Standard-D')).toBe('Quang Dũng');
+    expect(employerAiSettingService.resolveVoiceName('vi-VN-Standard-B')).toBe('Mạnh Dũng');
+    expect(employerAiSettingService.resolveVoiceName('vi-VN-Standard-C')).toBe('Thùy Dung');
+    expect(employerAiSettingService.resolveVoiceName('vi-VN-Standard-D')).toBe('Quang Sơn');
     expect(employerAiSettingService.resolveVoiceName('Trúc Ly')).toBe('Trúc Ly');
 
-    const voice = employerAiSettingService.getPresetVoice('Nam Minh');
+    const voice = employerAiSettingService.getPresetVoice('Mạnh Dũng');
     expect(voice).toBeDefined();
     expect(voice?.gender).toBe('male');
     expect(voice?.region).toBe('north');
 
-    expect(employerAiSettingService.suggestVoiceForAvatar('expert_male')).toBe('Nam Minh');
-    expect(employerAiSettingService.suggestVoiceForAvatar('male_01')).toBe('Nam Minh');
+    expect(employerAiSettingService.suggestVoiceForAvatar('expert_male')).toBe('Mạnh Dũng');
+    expect(employerAiSettingService.suggestVoiceForAvatar('male_01')).toBe('Mạnh Dũng');
     expect(employerAiSettingService.suggestVoiceForAvatar('aila_recruiter')).toBe('Trúc Ly');
     expect(employerAiSettingService.suggestVoiceForAvatar('female_02')).toBe('Trúc Ly');
   });

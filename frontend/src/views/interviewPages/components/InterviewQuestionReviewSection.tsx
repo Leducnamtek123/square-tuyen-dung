@@ -123,7 +123,7 @@ export const InterviewQuestionReviewSection: React.FC<InterviewQuestionReviewSec
 
       {/* --- Right Column: Selected Question Drilldown ---------------------- */}
       <div className="lg:col-span-7">
-        <div className="relative flex flex-col justify-between rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm min-h-[420px] md:p-8">
+        <div className="relative flex flex-col justify-between rounded-3xl border border-slate-200/90 bg-white p-4 sm:p-6 md:p-8 shadow-sm min-h-[420px]">
           <div>
             {/* Header: Question label & Score /100 */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -188,17 +188,17 @@ export const InterviewQuestionReviewSection: React.FC<InterviewQuestionReviewSec
           </div>
 
           {/* Bottom Action: "Muốn cải thiện điểm số? -> Thử lại câu này" */}
-          <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-slate-100 pt-5 sm:flex-row">
-            <span className="text-xs font-medium text-slate-500">
+          <div className="mt-8 flex flex-col items-stretch justify-between gap-4 border-t border-slate-100 pt-5 sm:flex-row sm:items-center">
+            <span className="text-xs font-medium text-slate-500 text-center sm:text-left">
               Muốn cải thiện điểm số?
             </span>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center gap-3">
               {/* Optional mic/listen icon */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 transition-colors"
+                className="h-9 w-9 shrink-0 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 transition-colors"
                 title="Ghi âm giọng nói"
               >
                 <MicOutlinedIcon sx={{ fontSize: 18 }} />
@@ -209,7 +209,7 @@ export const InterviewQuestionReviewSection: React.FC<InterviewQuestionReviewSec
                 variant="outline"
                 size="sm"
                 onClick={() => onRetryQuestion?.(activeQuestion)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50/90 px-4 text-xs font-semibold text-blue-700 shadow-2xs hover:bg-blue-100 transition-all h-9 active:scale-98"
+                className="inline-flex flex-1 sm:flex-initial items-center justify-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50/90 px-4 text-xs font-semibold text-blue-700 shadow-2xs hover:bg-blue-100 transition-all h-9 active:scale-98"
               >
                 <ReplayRoundedIcon sx={{ fontSize: 16 }} />
                 <span>Thử lại câu này</span>

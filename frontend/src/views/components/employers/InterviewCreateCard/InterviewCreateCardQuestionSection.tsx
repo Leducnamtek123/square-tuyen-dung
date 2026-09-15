@@ -162,7 +162,7 @@ const InterviewCreateCardQuestionSection = ({
                       return (
                         <Chip
                           key={val}
-                          label={(q?.text ?? `Q#${val}`).substring(0, 50)}
+                          label={(q?.text ?? 'Câu hỏi').substring(0, 50)}
                           size="small"
                           sx={{
                             fontWeight: 900,

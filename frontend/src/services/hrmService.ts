@@ -844,7 +844,7 @@ const hrmService = {
     return response as unknown as Blob;
   },
 
-  // -- Time & Attendance Methods (MISA AMIS Model) ---------------------------
+  // -- Time & Attendance Methods ---------------------------
   getWorkShifts: (params?: any): Promise<NativeWorkShift[]> => {
     return httpRequest.get('native-hrm/work-shifts/', { params }).then((res) => {
       return normalizePaginatedResponse<NativeWorkShift>(res).results;

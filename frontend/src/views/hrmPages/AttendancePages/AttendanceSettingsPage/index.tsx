@@ -13,7 +13,6 @@ import {
   FormControlLabel,
   Alert,
   Divider,
-  Snackbar,
   CircularProgress,
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
@@ -25,6 +24,7 @@ import MoreTimeOutlinedIcon from '@mui/icons-material/MoreTimeOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import LockClockOutlinedIcon from '@mui/icons-material/LockClockOutlined';
 import RouterOutlinedIcon from '@mui/icons-material/RouterOutlined';
+import toastMessages from '@/utils/toastMessages';
 
 import { TabTitle } from '@/utils/generalFunction';
 
@@ -100,8 +100,6 @@ export default function AttendanceSettingsPage() {
   TabTitle('Thiết lập Quy định Chấm công | InfoHR HRM');
 
   const [settings, setSettings] = useState<AttendanceSettingsState>(DEFAULT_SETTINGS);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
 
   // Load from localStorage if present
   useEffect(() => {
@@ -118,11 +116,9 @@ export default function AttendanceSettingsPage() {
   const handleSave = () => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-      setToastMessage('Đã lưu các thiết lập quy định chấm công thành công');
-      setShowToast(true);
+      toastMessages.success('Đã lưu các thiết lập quy định chấm công thành công');
     } catch {
-      setToastMessage('Lưu cài đặt thất bại, vui lòng thử lại');
-      setShowToast(true);
+      toastMessages.error('Lưu cài đặt thất bại, vui lòng thử lại');
     }
   };
 
@@ -130,8 +126,7 @@ export default function AttendanceSettingsPage() {
     setSettings(DEFAULT_SETTINGS);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_SETTINGS));
-      setToastMessage('Đã khôi phục các thiết lập quy định mặc định');
-      setShowToast(true);
+      toastMessages.success('Đã khôi phục các thiết lập quy định mặc định');
     } catch {
       // Ignore
     }
@@ -909,18 +904,6 @@ export default function AttendanceSettingsPage() {
           </Card>
         </Grid>
       </Grid>
-
-      {/* Toast Feedback */}
-      <Snackbar
-        open={showToast}
-        autoHideDuration={4000}
-        onClose={() => setShowToast(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert severity="success" onClose={() => setShowToast(false)} sx={{ borderRadius: 2 }}>
-          {toastMessage}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

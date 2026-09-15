@@ -135,7 +135,7 @@ export const InterviewRoadmapDrawer: React.FC<InterviewRoadmapDrawerProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Đóng lộ trình"
-            className="flex size-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            className="flex size-9 sm:size-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
           >
             <FontAwesomeIcon icon={faXmark} className="text-sm" />
           </button>
@@ -143,7 +143,7 @@ export const InterviewRoadmapDrawer: React.FC<InterviewRoadmapDrawerProps> = ({
       </div>
 
       {/* Grouped Question Stages */}
-      <div className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-5">
+      <div className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-5 pb-[max(1.5rem,env(safe-area-inset-bottom)+1rem)]">
         {allStages.map((stage) => {
           const stageQuestions = stage.items;
           const completedCount = stageQuestions.filter(({ question }) =>
@@ -221,7 +221,7 @@ export const InterviewRoadmapDrawer: React.FC<InterviewRoadmapDrawerProps> = ({
                       key={question.id || origIdx}
                       type="button"
                       onClick={() => onSelectQuestion(origIdx)}
-                      className={`group flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-all ${
+                      className={`group flex min-h-[44px] w-full items-center gap-3 rounded-xl border p-3 text-left transition-all ${
                         isDone
                           ? 'border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50/70'
                           : 'border-slate-100 bg-slate-50/40 hover:border-slate-200 hover:bg-slate-50'

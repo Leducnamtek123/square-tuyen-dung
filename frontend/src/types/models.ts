@@ -25,6 +25,7 @@ export interface User {
   workspaces?: Workspace[];
   canAccessEmployerPortal?: boolean;
   isActive?: boolean;
+  dateJoined?: string;
   /** Job seeker profile object returned by backend (when roleName === 'JOB_SEEKER') */
   jobSeekerProfile?: { id: number | string } | null;
   /** Flat job seeker profile ID (alternative backend serialization) */
@@ -80,6 +81,7 @@ export interface Company {
     district?: string;
     address?: string;
   };
+  createAt?: string;
 }
 
 export interface CompanyImage {
@@ -120,6 +122,7 @@ export interface CompanyVerification {
   taxCode?: string;
   businessLicense?: string;
   representative?: string;
+  representativeName?: string;
   phone?: string;
   email?: string;
   website?: string;
@@ -137,11 +140,14 @@ export interface CompanyVerification {
 export interface TrustReport {
   id: number;
   targetType: 'job' | 'company';
+  reportType?: string;
   reason: string;
   message?: string;
   status: 'open' | 'reviewing' | 'resolved' | 'rejected';
   company?: number | null;
   jobPost?: number | null;
+  targetId?: number | null;
+  createdAt?: string;
   targetTitle?: string;
   reporterDict?: User;
   createAt?: string;
@@ -378,6 +384,7 @@ export interface JobSeekerProfile {
   permanentAddress?: string | null;
   location?: Location | null;
   userDict?: UserDict;
+  user?: number | string | null;
   isJobSeeking?: boolean;
   isSeekingJob?: boolean;
 }
@@ -531,6 +538,8 @@ export interface Question {
   // Fallbacks for raw API response or transformer mapped fields
   content?: string;
   type?: string;
+  is_public?: boolean;
+  isPublic?: boolean;
 }
 
 export interface QuestionBankItem extends Question {
@@ -682,6 +691,7 @@ export interface InterviewSession {
   roomName: string;
   inviteToken?: string;
   status: string;
+  isLive?: boolean;
   type: string;
   interview_type?: string;
   scheduledAt?: string | null;

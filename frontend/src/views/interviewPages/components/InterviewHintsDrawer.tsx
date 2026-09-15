@@ -47,14 +47,14 @@ export const InterviewHintsDrawer: React.FC<InterviewHintsDrawerProps> = ({
           type="button"
           onClick={onClose}
           aria-label="Đóng gợi ý"
-          className="flex size-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+          className="flex size-9 sm:size-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
         >
           <FontAwesomeIcon icon={faXmark} className="text-sm" />
         </button>
       </div>
 
       {/* Content scroll area */}
-      <div className="flex-1 space-y-6 overflow-y-auto p-5 text-sm">
+      <div className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-5 text-sm pb-[max(1.5rem,env(safe-area-inset-bottom)+1rem)]">
         {/* Interviewer Intent */}
         {intent && (
           <div className="rounded-xl border border-sky-200 bg-sky-50/70 p-4">

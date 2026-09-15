@@ -1364,24 +1364,22 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
             </Box>
           </Grid>
         </Grid>
-      </Container>
 
-      {/* Sticky Bottom Action Bar */}
-      <Box
-        sx={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1100,
-          bgcolor: '#FFFFFF',
-          borderTop: '1px solid #E2E8F0',
-          boxShadow: '0 -4px 20px rgba(15, 23, 42, 0.08)',
-          py: 1.75,
-          px: { xs: 2, sm: 4 },
-        }}
-      >
-        <Container maxWidth="xl">
+        {/* Sticky Bottom Action Bar */}
+        <Box
+          sx={{
+            position: 'sticky',
+            bottom: 16,
+            zIndex: 100,
+            bgcolor: '#FFFFFF',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 4px 24px rgba(15, 23, 42, 0.12)',
+            py: 1.75,
+            px: { xs: 2, sm: 3.5 },
+            mt: 4,
+            borderRadius: 3,
+          }}
+        >
           <Stack
             direction="row"
             justifyContent="space-between"
@@ -1447,8 +1445,8 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
               </LoadingButton>
             </Stack>
           </Stack>
-        </Container>
-      </Box>
+        </Box>
+      </Container>
     </Box>
   );
 };
