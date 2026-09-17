@@ -11,6 +11,7 @@ import '../i18n';
 import { useTranslation } from 'react-i18next';
 import errorHandling from '@/utils/errorHandling';
 import { isMaintenanceModeError } from '@/utils/maintenanceMode';
+import { OperationProvider, OperationCenterDock } from '@/components/operation';
 
 function makeQueryClient() {
   return new QueryClient({
@@ -46,7 +47,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={activeLocale}>
-          {children}
+          <OperationProvider>
+            {children}
+            <OperationCenterDock />
+          </OperationProvider>
         </LocalizationProvider>
       </QueryClientProvider>
     </Provider>

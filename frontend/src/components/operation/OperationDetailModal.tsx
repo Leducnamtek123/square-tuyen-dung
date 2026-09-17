@@ -61,10 +61,6 @@ export const OperationDetailModal: React.FC<OperationDetailModalProps> = ({
 }) => {
   const theme = useTheme();
 
-  if (!open) {
-    return null;
-  }
-
   const status = operation?.status || 'queued';
   const statusColor = STATUS_COLORS[status] || STATUS_COLORS.queued;
   const statusLabel = STATUS_LABELS[status] || status;
