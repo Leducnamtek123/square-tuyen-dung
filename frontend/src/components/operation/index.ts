@@ -7,3 +7,4 @@ export * from './OperationProvider';
 export * from './OperationCenterDock';
 export * from './adapters/resumeAnalysisAdapter';
 export * from './adapters/vieclam24hImportAdapter';
+export * from './adapters/interviewEvaluationAdapter';

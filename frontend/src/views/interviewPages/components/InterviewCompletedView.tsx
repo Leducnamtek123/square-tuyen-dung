@@ -34,6 +34,7 @@ import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 import CompetencyOverviewCard from './CompetencyOverviewCard';
 import InterviewQuestionReviewSection, { QuestionReviewItem } from './InterviewQuestionReviewSection';
 import type { RadarDimension } from './CompetencyRadarChart';
+import { OperationTimeline, adaptInterviewEvaluationOperation } from '@/components/operation';
 
 export interface InterviewCompletedViewProps {
   session: InterviewSession | null;
@@ -54,6 +55,11 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
 }) => {
   const router = useRouter();
   const [shareCopied, setShareCopied] = React.useState(false);
+
+  const evalOperation = React.useMemo(
+    () => adaptInterviewEvaluationOperation(session),
+    [session]
+  );
 
   const isMock =
     session?.sessionType === 'mock' ||
@@ -208,13 +214,16 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
 
       {/* --- Main Content Container with bottom padding for fixed footer --- */}
       <div className="mx-auto w-full max-w-5xl px-3 sm:px-6 py-4 sm:py-8 space-y-6 pb-28 pb-[max(6rem,env(safe-area-inset-bottom)+4rem)]">
-        {/* Processing State Banner */}
+        {/* Processing State Timeline & Banner */}
         {isProcessing && (
-          <div className="flex items-center justify-center gap-3 rounded-2xl border border-blue-200 bg-blue-50/90 p-4 text-blue-900 shadow-xs">
-            <CircularProgress size={20} sx={{ color: '#2563eb' }} />
-            <span className="text-xs font-bold md:text-sm">
-              Trợ lý AI đang xử lý và tổng hợp bảng điểm năng lực... Kết quả sẽ tự động cập nhật.
-            </span>
+          <div className="space-y-4">
+            {evalOperation && <OperationTimeline operation={evalOperation} />}
+            <div className="flex items-center justify-center gap-3 rounded-2xl border border-blue-200 bg-blue-50/90 p-4 text-blue-900 shadow-xs">
+              <CircularProgress size={20} sx={{ color: '#2563eb' }} />
+              <span className="text-xs font-bold md:text-sm">
+                Trợ lý AI đang xử lý và tổng hợp bảng điểm năng lực... Kết quả sẽ tự động cập nhật.
+              </span>
+            </div>
           </div>
         )}
 

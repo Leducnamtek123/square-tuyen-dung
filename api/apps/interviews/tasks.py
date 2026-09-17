@@ -12,6 +12,9 @@ from django.utils.html import strip_tags
 from pydantic import BaseModel, Field, ValidationError
 
 from integrations.ai.client import post_chat_completion_httpx
+from apps.operations.services import OperationTracker
+from apps.operations.models import AsyncOperation
+from decimal import Decimal
 from .livekit_service import LiveKitService
 from .models import InterviewSession
 from .services import broadcast_interview_event
@@ -108,6 +111,10 @@ def end_interview_session(session_id, reason="max_duration"):
         if session.status in ("completed", "cancelled"):
             return
 
+        if (session.session_metadata or {}).get("persistent"):
+            logger.info("Skip auto-ending persistent session %s.", session_id)
+            return
+
         now = tz.now()
         if not session.start_time:
             session.start_time = now
@@ -159,6 +166,13 @@ def finalize_disconnected_session(session_id):
         session = InterviewSession.objects.get(id=session_id)
     except InterviewSession.DoesNotExist:
         logger.warning("Interview session %s not found when finalizing disconnect.", session_id)
+        return
+
+    if (session.session_metadata or {}).get("persistent"):
+        logger.info(
+            "Skip finalizing disconnect for persistent session %s.",
+            session_id,
+        )
         return
 
     if session.status != "interrupted":
@@ -294,12 +308,58 @@ def send_interview_report_notification(session_id):
              retry_backoff=True, retry_kwargs={'max_retries': 3})
 def evaluate_interview_session(self, session_id):
     """Call LLM to evaluate interview transcript and persist validated structured output."""
+    tracker = None
     try:
         session = InterviewSession.objects.prefetch_related("transcripts").get(id=session_id)
+        company = getattr(session.job_post, "company", None) if getattr(session, "job_post", None) else None
+        user = getattr(session, "candidate", None)
+        user_id = getattr(user, "id", None) if user else None
+        company_id = getattr(company, "id", None) if company else None
+
+        create_kwargs = {
+            "type": "interview.evaluate",
+            "title": f"Đánh giá phỏng vấn AI #{session.id}",
+            "steps": [
+                {"key": "sync_recording", "label": "Đồng bộ dữ liệu phòng phỏng vấn"},
+                {"key": "transcribe_align", "label": "Tổng hợp hội thoại & phiên âm"},
+                {"key": "ai_scoring", "label": "AI đánh giá năng lực & chuyên môn"},
+                {"key": "apply_weights", "label": "Áp dụng thang điểm & trọng số"},
+                {"key": "publish_report", "label": "Hoàn tất báo cáo & công bố kết quả"},
+            ],
+            "metadata": {"session_id": session.id, "job_post_id": getattr(session, "job_post_id", None)},
+        }
+        try:
+            tracker = OperationTracker.create(
+                **create_kwargs,
+                company_id=company_id,
+                user_id=user_id,
+            )
+        except TypeError:
+            tracker = OperationTracker.create(
+                **create_kwargs,
+                company=company,
+                user=user,
+            )
+
+        meta = session.session_metadata or {}
+        if isinstance(meta, dict):
+            meta["operation_id"] = tracker.operation.id
+            session.session_metadata = meta
+            session.save(update_fields=["session_metadata", "update_at"])
+
+        if tracker:
+            tracker.start_step("sync_recording", detail="Đang đồng bộ dữ liệu phiên phỏng vấn...")
+            tracker.complete_step("sync_recording", detail="Đồng bộ dữ liệu phiên phỏng vấn thành công.")
+
+        if tracker:
+            tracker.start_step("transcribe_align", detail="Đang tổng hợp nội dung hội thoại...")
+
         transcripts = session.transcripts.all().order_by("create_at")
 
         if not transcripts:
             logger.warning("Session %s has no transcripts to evaluate.", session_id)
+            if tracker:
+                tracker.fail("Chưa có đủ dữ liệu hội thoại từ ứng viên.", code="INSUFFICIENT_DATA")
             _mark_evaluation_unavailable(
                 session,
                 "Chưa có dữ liệu hội thoại để thực hiện đánh giá cho buổi phỏng vấn này.",
@@ -317,11 +377,19 @@ def evaluate_interview_session(self, session_id):
                 "Session %s has insufficient candidate speech to evaluate (transcripts=%s, words=%s).",
                 session_id, len(candidate_transcripts), total_candidate_words
             )
+            if tracker:
+                tracker.fail("Chưa có đủ dữ liệu hội thoại từ ứng viên.", code="INSUFFICIENT_DATA")
             _mark_evaluation_unavailable(
                 session,
                 "Phiên phỏng vấn kết thúc sớm khi chưa ghi nhận câu trả lời phỏng vấn từ ứng viên.",
             )
             return None
+
+        if tracker:
+            tracker.complete_step(
+                "transcribe_align",
+                detail=f"Tổng hợp {len(candidate_transcripts)} câu trả lời ({total_candidate_words} từ).",
+            )
 
         history_text = ""
         for transcript in transcripts:
@@ -373,6 +441,12 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
             "response_format": {"type": "json_object"},
         }
 
+        if tracker:
+            tracker.start_step(
+                "ai_scoring",
+                detail="Mô hình AI đang phân tích năng lực và dẫn chứng câu trả lời...",
+            )
+
         logger.info("Starting AI evaluation for session %s using %s", session_id, model_alias)
 
         response_json, llm_candidate = post_chat_completion_httpx(
@@ -391,9 +465,18 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
         raw_json = _extract_json_object(content)
         validated = InterviewEvaluationSchema.model_validate_json(raw_json)
 
+        if tracker:
+            tracker.complete_step(
+                "ai_scoring",
+                detail=f"AI hoàn thành đánh giá chuyên môn (Kỹ thuật: {validated.technical_score}, Giao tiếp: {validated.communication_score}).",
+            )
+
         session.ai_technical_score = validated.technical_score
         session.ai_communication_score = validated.communication_score
         session.ai_overall_score = validated.overall_score
+
+        if tracker:
+            tracker.start_step("apply_weights", detail="Đang áp dụng trọng số đánh giá doanh nghiệp...")
 
         try:
             company = getattr(session.job_post, "company", None)
@@ -425,6 +508,18 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
         except Exception as w_exc:
             logger.warning("Error applying company weights to evaluation score: %s", w_exc)
 
+        if tracker:
+            tracker.complete_step(
+                "apply_weights",
+                detail=f"Điểm số tổng quan sau trọng số: {session.ai_overall_score}/10.",
+            )
+
+        if tracker:
+            tracker.start_step(
+                "publish_report",
+                detail="Đang lưu trữ báo cáo và phát sự kiện hoàn tất...",
+            )
+
         session.ai_summary = validated.summary
         session.ai_strengths = validated.strengths
         session.ai_weaknesses = validated.weaknesses
@@ -441,6 +536,20 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
             "duration": session.duration,
         })
 
+        if tracker:
+            tracker.complete_step(
+                "publish_report",
+                detail="Hoàn tất báo cáo & công bố kết quả.",
+            )
+            tracker.finish(
+                result={
+                    "overallScore": float(session.ai_overall_score or 0),
+                    "technicalScore": float(session.ai_technical_score or 0),
+                    "communicationScore": float(session.ai_communication_score or 0),
+                    "summary": session.ai_summary,
+                }
+            )
+
         logger.info(
             "AI evaluation for session %s completed successfully. Score=%s",
             session_id,
@@ -453,12 +562,20 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
         return None
     except ValidationError as e:
         logger.error("AI output schema validation failed for session %s: %s", session_id, e)
+        if tracker:
+            tracker.fail(str(e)[:500], code="EVALUATION_FAILED")
     except ValueError as e:
         logger.error("Could not extract JSON payload for session %s: %s", session_id, e)
+        if tracker:
+            tracker.fail(str(e)[:500], code="EVALUATION_FAILED")
     except json.JSONDecodeError:
         logger.error("Failed to decode JSON from AI response for session %s", session_id)
+        if tracker:
+            tracker.fail("Failed to decode JSON from AI response", code="EVALUATION_FAILED")
     except Exception as e:
         logger.error("Unexpected error in evaluate_interview_session(%s): %s", session_id, e)
+        if tracker:
+            tracker.fail(str(e)[:500], code="EVALUATION_FAILED")
 
     # If we caught an error (other than DoesNotExist), revert to completed so frontend doesn't hang
     try:

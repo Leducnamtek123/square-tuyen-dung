@@ -41,6 +41,7 @@ import interviewService from '@/services/interviewService';
 import { transformInterviewSession } from '@/utils/transformers';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 import CompetencyRadarChart, { RadarDimension } from '@/views/interviewPages/components/CompetencyRadarChart';
+import { OperationTimeline, adaptInterviewEvaluationOperation } from '@/components/operation';
 
 interface CandidateEvaluationModalProps {
   session: InterviewSession | null;
@@ -74,7 +75,11 @@ export const CandidateEvaluationModal: React.FC<CandidateEvaluationModalProps> =
       Boolean(initialSession.aiStrengths) ||
       Boolean(initialSession.aiWeaknesses);
 
-    if (!hasFullDetail && (initialSession.id || initialSession.inviteToken)) {
+    if (
+      !hasFullDetail &&
+      initialSession.status !== 'processing' &&
+      (initialSession.id || initialSession.inviteToken)
+    ) {
       setLoading(true);
       const fetchPromise = initialSession.id
         ? interviewService.getSessionDetail(initialSession.id)
@@ -125,6 +130,11 @@ export const CandidateEvaluationModal: React.FC<CandidateEvaluationModalProps> =
     (!currentSession.jobPost && !currentSession.companyName);
 
   const isCompleted = currentSession.status === 'completed';
+  const isProcessing = currentSession.status === 'processing';
+  const evalOperation = React.useMemo(
+    () => adaptInterviewEvaluationOperation(currentSession),
+    [currentSession]
+  );
   const rawRecordingUrl = currentSession.recordingUrl || currentSession.recording_url;
   const safeRecordingUrl = getSafeResourceUrl(rawRecordingUrl);
 
@@ -255,7 +265,11 @@ export const CandidateEvaluationModal: React.FC<CandidateEvaluationModalProps> =
 
       {/* Modal Body */}
       <DialogContent sx={{ p: { xs: 2, sm: 3 }, pt: { xs: '20px !important', sm: '24px !important' }, bgcolor: '#f8fafc' }}>
-        {loading ? (
+        {isProcessing && evalOperation ? (
+          <Box sx={{ py: 2 }}>
+            <OperationTimeline operation={evalOperation} />
+          </Box>
+        ) : loading ? (
           <Box sx={{ py: 8, textAlign: 'center' }}>
             <CircularProgress size={36} sx={{ color: '#2563eb', mb: 2 }} />
             <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 500 }}>
